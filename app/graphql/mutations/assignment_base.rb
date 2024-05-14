@@ -25,6 +25,7 @@ class Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate < GraphQL::Sch
   argument :due_at, Types::DateTimeType, required: false
   argument :lock_at, Types::DateTimeType, required: false
   argument :unlock_at, Types::DateTimeType, required: false
+  argument :unassign_item, Boolean, required: false
 
   argument :course_id, ID, required: false
   argument :course_section_id, ID, required: false

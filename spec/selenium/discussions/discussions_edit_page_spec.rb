@@ -1281,6 +1281,32 @@ describe "discussions" do
             expect(assignment.assignment_overrides.first.set_type).to eq "Course"
           end
 
+          it "does not display module override if an unassigned override exists" do
+            graded_discussion = create_graded_discussion(course)
+            module1 = course.context_modules.create!(name: "Module 1")
+            graded_discussion.context_module_tags.create! context_module: module1, context: course, tag_type: "context_module"
+
+            override = module1.assignment_overrides.create!
+            override.assignment_override_students.create!(user: @student1)
+
+            unassigned_override = graded_discussion.assignment.assignment_overrides.create!
+            unassigned_override.assignment_override_students.create!(user: @student1)
+            unassigned_override.update(unassign_item: true)
+
+            assigned_override = graded_discussion.assignment.assignment_overrides.create!
+            assigned_override.assignment_override_students.create!(user: @student2)
+
+            # Open page and assignTo tray
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            # Verify the module override is not shown
+            expect(module_item_assign_to_card.count).to eq 1
+            expect(module_item_assign_to_card[0].find_all(assignee_selected_option_selector).map(&:text)).to eq ["User"]
+            expect(module_item_assign_to_card[0]).not_to contain_css(inherited_from_selector)
+          end
+
           it "does not create an override if the modules override is not updated" do
             graded_discussion = create_graded_discussion(course)
             module1 = course.context_modules.create!(name: "Module 1")

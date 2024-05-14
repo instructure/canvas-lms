@@ -370,14 +370,28 @@ const DifferentiatedModulesSection = ({
       assignee => !disabledOptionIds.includes(assignee)
     )
 
-    deletedModuleAssignees.forEach(assignee => {
-      newOverrides.push({
-        id: undefined,
-        course_section_id: assignee.includes('section-') ? assignee.split('-')[1] : undefined,
-        student_ids: assignee.includes('student-') ? [assignee.split('-')[1]] : undefined,
-        unassign_item: true,
+    if (deletedModuleAssignees.length > 0) {
+      const studentIds = deletedModuleAssignees
+        .filter(assignee => assignee.includes('student'))
+        ?.map(id => id.split('-')[1])
+      if (studentIds.length > 0) {
+        newOverrides.push({
+          id: undefined,
+          student_ids: studentIds,
+          unassign_item: true,
+        })
+      }
+      const sectionIds = deletedModuleAssignees
+        .filter(assignee => assignee.includes('section'))
+        ?.map(id => id.split('-')[1])
+      sectionIds.forEach(section => {
+        newOverrides.push({
+          id: undefined,
+          course_section_id: section,
+          unassign_item: true,
+        })
       })
-    })
+    }
 
     const withoutModuleOverrides = processModuleOverrides(newOverrides, checkPoint)
     resetOverrides(newOverrides, withoutModuleOverrides)

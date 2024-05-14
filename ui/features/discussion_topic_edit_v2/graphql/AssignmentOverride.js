@@ -28,6 +28,7 @@ export const AssignmentOverride = {
       dueAt
       lockAt
       unlockAt
+      unassignItem
       contextModule {
         ...ContextModule
       }
@@ -70,6 +71,7 @@ export const AssignmentOverride = {
     dueAt: string,
     lockAt: string,
     unlockAt: string,
+    unassignItem: Boolean,
     module: ContextModule.shape,
   }),
   mock: ({
@@ -78,6 +80,7 @@ export const AssignmentOverride = {
     dueAt = '2020-01-01',
     lockAt = '2020-01-01',
     unlockAt = '2020-01-01',
+    unassignItem = false,
     set = {
       __typename: 'Section',
       id: '1',
@@ -91,6 +94,7 @@ export const AssignmentOverride = {
     dueAt,
     lockAt,
     unlockAt,
+    unassignItem,
     set,
     contextModule,
   }),

@@ -628,6 +628,7 @@ window.modules = (function () {
           $a.attr('data-item-context-id', data.context_id)
           $a.attr('data-item-context-type', data.context_type)
           $a.attr('data-item-content-id', data.content_id)
+          $a.attr('data-item-has-assignment', data.assignment_id ? 'true' : 'false')
         }
       }
 
