@@ -343,6 +343,14 @@ class ProfileController < ApplicationController
     render json: {}
   end
 
+  def admin?
+    @domain_root_account.grants_right?(@current_user, :manage_courses_admin)
+  end
+
+  def allowed_to_change_pronouns?
+    @domain_root_account.can_change_pronouns? || (@domain_root_account.can_add_pronouns? && admin?)
+  end
+
   def update
     @user = @current_user
 
@@ -376,9 +384,13 @@ class ProfileController < ApplicationController
         user_params.delete(:short_name)
         user_params.delete(:sortable_name)
       end
-      if !@domain_root_account.can_change_pronouns? || (user_params[:pronouns].present? && @domain_root_account.pronouns.exclude?(user_params[:pronouns].strip))
+
+      is_invalid_pronoun = user_params[:pronouns].present? && @domain_root_account.pronouns.exclude?(user_params[:pronouns].strip)
+
+      if !allowed_to_change_pronouns? || is_invalid_pronoun
         user_params.delete(:pronouns)
       end
+
       if @user.update(user_params)
         pseudonymed = false
         if params[:default_email_id].present?
@@ -437,7 +449,7 @@ class ProfileController < ApplicationController
     @profile = @user.profile
     @context = @profile
 
-    if @domain_root_account.can_change_pronouns?
+    if allowed_to_change_pronouns?
       valid_pronoun = @domain_root_account.pronouns.include?(params[:pronouns]&.strip) || params[:pronouns] == ""
       @user.pronouns = params[:pronouns] if valid_pronoun
     end
