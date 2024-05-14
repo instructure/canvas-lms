@@ -956,6 +956,94 @@ describe "Api::V1::Assignment" do
     end
   end
 
+  describe "#create_api_assignment" do
+    subject do
+      api.create_api_assignment(assignment, assignment_create_params, user, assignment.context)
+      Assignment.last
+    end
+
+    let_once(:tool) { external_tool_1_3_model(context: account, developer_key:) }
+    let_once(:assignment_create_params) do
+      ActionController::Parameters.new(
+        name: "New Assignment",
+        submission_types: ["external_tool"],
+        external_tool_tag_attributes: {
+          url: tool.url
+        }
+      )
+    end
+    let_once(:assignment) { Assignment.new(context: course) }
+    let_once(:course) { course_model }
+    let_once(:account) { assignment.root_account }
+    let_once(:developer_key) { dev_key_model_1_3(account:) }
+    let_once(:user) { user_model }
+
+    context "external tool url" do
+      it "creates the assignment with the passed in URL" do
+        expect { subject }.to change { Assignment.count }.by(1)
+        expect(subject.external_tool_tag.content).to eq tool
+      end
+
+      it "still creates the assignment if the URL is not passed in" do
+        assignment_create_params[:external_tool_tag_attributes].delete(:url)
+        expect { subject }.to change { Assignment.count }.by(1)
+      end
+    end
+
+    context "external tool title" do
+      let(:title) { "title" }
+      let(:assignment_create_params) do
+        ActionController::Parameters.new(
+          name: "New Assignment",
+          submission_types: ["external_tool"],
+          external_tool_tag_attributes: {
+            url: tool.url,
+            title:
+          }
+        )
+      end
+
+      it "sets the resource link title to the passed in value" do
+        expect(subject.primary_resource_link.title).to eq title
+      end
+
+      it "doesn't set the resource link title if an empty string is passed in" do
+        assignment_create_params[:external_tool_tag_attributes][:title] = ""
+
+        expect(subject.primary_resource_link.title).to be_nil
+      end
+
+      it "doesn't set the resource link title if it's not passed in" do
+        assignment_create_params[:external_tool_tag_attributes].delete(:title)
+
+        expect(subject.primary_resource_link.title).to be_nil
+      end
+    end
+
+    context "external tool custom_params" do
+      let(:custom_params) { { "custom_param" => "value" } }
+      let(:assignment_create_params) do
+        ActionController::Parameters.new(
+          name: "New Assignment",
+          submission_types: ["external_tool"],
+          external_tool_tag_attributes: {
+            url: tool.url,
+            custom_params:
+          }
+        )
+      end
+
+      it "creates the assignment if the custom params are valid" do
+        expect(subject.primary_resource_link.custom).to eq custom_params
+      end
+
+      it "doesn't create the assignment if the custom params are invalid" do
+        assignment_create_params[:external_tool_tag_attributes][:custom_params] = "invalid"
+        expect { subject }.not_to change { Assignment.count }
+      end
+    end
+  end
+
   describe "#update_api_assignment" do
     subject { api.update_api_assignment(assignment, assignment_update_params, user, assignment.context, opts) }
 

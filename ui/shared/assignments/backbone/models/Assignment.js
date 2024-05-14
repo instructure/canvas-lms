@@ -809,10 +809,7 @@ Assignment.prototype.externalToolData = function () {
 
 Assignment.prototype.externalToolDataTitle = function () {
   const data = this.get('external_tool_tag_attributes')
-  if (!data) {
-    return ''
-  }
-  return data.title
+  return data?.title
 }
 
 Assignment.prototype.resourceLink = function () {
