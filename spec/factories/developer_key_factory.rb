@@ -38,6 +38,7 @@ module Factories
   end
 
   def dev_key_model_1_3(opts = {})
+    opts[:account] ||= Account.default
     opts = dev_key_valid_attributes({ is_lti_key: true,
                                       public_jwk_url: "http://example.com/jwks" }.merge(opts))
 

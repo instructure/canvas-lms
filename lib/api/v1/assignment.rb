@@ -1106,11 +1106,11 @@ module Api::V1::Assignment
     end
 
     if external_tool_tag_attributes&.include?(:url)
-      assignment.lti_resource_link_url = external_tool_tag_attributes[:url]
+      assignment.lti_resource_link_url = external_tool_tag_attributes[:url].presence
     end
 
     if external_tool_tag_attributes&.include?(:title)
-      assignment.lti_resource_link_title = external_tool_tag_attributes[:title]
+      assignment.lti_resource_link_title = external_tool_tag_attributes[:title].presence
     end
 
     if assignment.external_tool?
