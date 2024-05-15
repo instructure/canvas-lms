@@ -240,7 +240,11 @@ export default function AssignToPanel({
             <Text>{I18n.t('By default, this module is visible to everyone.')}</Text>
           </Flex.Item>
           <Flex.Item overflowX="hidden" margin="small 0 0 0">
-            <RadioInputGroup description={I18n.t('Set Visibility')} name="access_type">
+            <RadioInputGroup
+              description={I18n.t('Set Visibility')}
+              name="access_type"
+              data-testid="assign-to-panel-radio-group"
+            >
               {[EVERYONE_OPTION, CUSTOM_OPTION].map(option => (
                 <Flex key={option.value} margin="0 xx-small 0 0">
                   <Flex.Item align="start">
