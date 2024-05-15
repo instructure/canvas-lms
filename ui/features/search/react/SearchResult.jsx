@@ -72,9 +72,9 @@ export default function SearchResult({onExplain, onLike, onDislike, result}) {
 
   return (
     <View as="li" borderColor="primary" borderWidth="small 0 0 0" padding="medium 0">
-      <Flex alignItems={'start'} as="div" gap="large" justifyItems={'space-between'}>
+      <Flex alignItems="start" as="div" gap="large" justifyItems="space-between">
         <Flex.Item shouldShrink={true} size="60%">
-          <Heading as={'h2'} level={'h3'}>
+          <Heading as="h2" level="h3">
             {title}
           </Heading>
 
@@ -96,16 +96,16 @@ export default function SearchResult({onExplain, onLike, onDislike, result}) {
         <Flex.Item shouldShrink={true}>
           <Flex gap="small">
             <Flex.Item as="div">
-              <Text size={'small'} weight="bold">
+              <Text size="small" weight="bold">
                 {I18n.t('%{percent}% Relevance', {percent: relevance(distance)})}
               </Text>
               <ProgressBar
                 meterColor="success"
-                size={'x-small'}
+                size="x-small"
                 screenReaderLabel={I18n.t('Relevance')}
                 valueNow={relevance(distance)}
                 valueMax={100}
-                width={'150px'}
+                width="150px"
               />
               <span className="hidden">
                 <Text size="small">

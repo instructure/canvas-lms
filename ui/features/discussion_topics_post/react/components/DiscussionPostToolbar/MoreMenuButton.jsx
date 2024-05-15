@@ -19,8 +19,7 @@
 import {IconMoreSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {useContext, useEffect, useState} from 'react'
-import React from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
@@ -46,7 +45,7 @@ export const MoreMenuButton = () => {
     setShowMenu(false)
   }
 
-  let menuOptions = []
+  const menuOptions = []
   if (translationLanguages.current.length > 0) {
     menuOptions.push({text: translationOptionText, onClick: toggleTranslateText})
   }

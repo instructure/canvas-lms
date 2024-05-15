@@ -24,6 +24,7 @@ import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import ToolLaunchIframe from './ToolLaunchIframe'
 import {handleExternalContentMessages} from '../../messages'
+
 const I18n = useI18nScope('external_toolsModalLauncher')
 
 export default class ExternalToolModalLauncher extends React.Component {

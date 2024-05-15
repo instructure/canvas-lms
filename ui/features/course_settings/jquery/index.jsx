@@ -397,7 +397,7 @@ $(document).ready(function () {
           initiallySelectedGradingSchemeId={selectedGradingSchemeId}
           onChange={gradingSchemeId => handleSelectedGradingSchemeIdChanged(gradingSchemeId)}
           archivedGradingSchemesEnabled={ENV.ARCHIVED_GRADING_SCHEMES_ENABLED}
-          shrinkSearchBar
+          shrinkSearchBar={true}
         />,
         grading_scheme_selector
       )

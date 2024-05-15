@@ -78,12 +78,12 @@ describe('PlannerApp', () => {
   })
 
   it('shows only the loading component when the isLoading prop is true', () => {
-    const wrapper = shallow(<PlannerApp {...getDefaultValues()} isLoading />)
+    const wrapper = shallow(<PlannerApp {...getDefaultValues()} isLoading={true} />)
     expect(wrapper).toMatchSnapshot()
   })
 
   it('shows the loading past indicator when loadingPast prop is true', () => {
-    const wrapper = shallow(<PlannerApp {...getDefaultValues()} loadingPast />)
+    const wrapper = shallow(<PlannerApp {...getDefaultValues()} loadingPast={true} />)
     expect(wrapper).toMatchSnapshot()
   })
 
@@ -94,7 +94,7 @@ describe('PlannerApp', () => {
         timeZone="UTC"
         changeDashboardView={() => {}}
         firstNewActivityDate={moment().add(-1, 'days')}
-        loadingPast
+        loadingPast={true}
       />
     )
     expect(wrapper).toMatchSnapshot()
@@ -116,14 +116,14 @@ describe('PlannerApp', () => {
   })
 
   it('does not show load prior items button when all past items are loaded', () => {
-    const wrapper = shallow(<PlannerApp {...getDefaultValues()} allPastItemsLoaded />)
+    const wrapper = shallow(<PlannerApp {...getDefaultValues()} allPastItemsLoaded={true} />)
     expect(wrapper.find('ShowOnFocusButton')).toHaveLength(0)
   })
 
   describe('focus handling', () => {
     const dae = document.activeElement
     let containerElement = null
-    let wrapper = null
+    const wrapper = null
 
     beforeEach(() => {
       containerElement = document.createElement('div')

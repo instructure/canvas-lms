@@ -27,17 +27,17 @@ it('renders very little', () => {
 })
 
 it('renders spinner while loading', () => {
-  const wrapper = shallow(<LoadingPastIndicator loadingPast />)
+  const wrapper = shallow(<LoadingPastIndicator loadingPast={true} />)
   expect(wrapper).toMatchSnapshot()
 })
 
 it('prioritizes loading complete over currently loading', () => {
-  const wrapper = shallow(<LoadingPastIndicator loadingPast allPastItemsLoaded />)
+  const wrapper = shallow(<LoadingPastIndicator loadingPast={true} allPastItemsLoaded={true} />)
   expect(wrapper).toMatchSnapshot()
 })
 
 it('renders TV when all past items loaded', () => {
-  const wrapper = shallow(<LoadingPastIndicator allPastItemsLoaded />)
+  const wrapper = shallow(<LoadingPastIndicator allPastItemsLoaded={true} />)
   expect(wrapper).toMatchSnapshot()
 })
 

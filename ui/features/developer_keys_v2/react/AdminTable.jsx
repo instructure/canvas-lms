@@ -270,7 +270,7 @@ class AdminTable extends React.Component {
               searchScreenReaderLabel={I18n.t('Search Developer Keys')}
             />
           ) : (
-            <div></div>
+            <div />
           )}
           <DeveloperKeyModalTrigger
             store={this.props.store}
