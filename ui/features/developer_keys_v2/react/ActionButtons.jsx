@@ -130,7 +130,7 @@ class DeveloperKeyActionButtons extends React.Component {
       <Tooltip renderTip={I18n.t('Edit this key')}>
         <IconButton
           id="edit-developer-key-button"
-          as={'a'}
+          as="a"
           href={`/accounts/${this.props.contextId}/developer_keys/${developerKey.id}`}
           withBackground={false}
           withBorder={false}

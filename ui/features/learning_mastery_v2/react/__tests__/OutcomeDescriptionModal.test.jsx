@@ -81,7 +81,7 @@ describe('OutcomeDescriptionModal', () => {
   }
 
   const defaultProps = outcome => ({
-    outcome: outcome,
+    outcome,
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
   })

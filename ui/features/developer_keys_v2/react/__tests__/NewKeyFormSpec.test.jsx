@@ -236,7 +236,7 @@ describe('NewKeyForm', () => {
         updateDeveloperKey={() => {}}
         validPlacements={{}}
         isLtiKey={false}
-        isRedirectUriRequired
+        isRedirectUriRequired={true}
       />
     )
 

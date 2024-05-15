@@ -24,7 +24,7 @@ import TimeBlockSelector from '../TimeBlockSelector'
 import TimeBlockSelectRow from '../TimeBlockSelectRow'
 import sinon from 'sinon'
 
-let props = {
+const props = {
   timeData: [
     {
       slotEventId: '1',

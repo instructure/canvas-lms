@@ -108,7 +108,9 @@ describe('Dashboard Options Menu', () => {
   })
 
   test('it should include a List View menu item when Student Planner is enabled', async () => {
-    const wrapper = render(<DashboardOptionsMenu planner_enabled onDashboardChange={() => {}} />)
+    const wrapper = render(
+      <DashboardOptionsMenu planner_enabled={true} onDashboardChange={() => {}} />
+    )
     const button = wrapper.container.querySelector('button')
     const user = userEvent.setup({delay: null})
     await user.click(button)
@@ -119,7 +121,7 @@ describe('Dashboard Options Menu', () => {
 
   test('it should include an Homeroom View option when the Elementary dashboard is disabled', async () => {
     const wrapper = render(
-      <DashboardOptionsMenu canEnableElementaryDashboard onDashboardChange={() => {}} />
+      <DashboardOptionsMenu canEnableElementaryDashboard={true} onDashboardChange={() => {}} />
     )
     const button = wrapper.container.querySelector('button')
     const user = userEvent.setup({delay: null})

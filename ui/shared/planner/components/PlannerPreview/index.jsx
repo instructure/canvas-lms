@@ -65,7 +65,7 @@ export default function PlannerPreview({timeZone, singleCourse}) {
         itemsForDay={singleCourse ? SINGLE_COURSE_ITEMS : MULTI_COURSE_ITEMS}
         toggleCompletion={noOp}
         updateTodo={noOp}
-        simplifiedControls
+        simplifiedControls={true}
         showMissingAssignments={false}
         responsiveSize={responsiveSize}
         singleCourseView={singleCourse}

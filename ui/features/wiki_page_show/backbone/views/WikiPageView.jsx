@@ -330,8 +330,8 @@ export default class WikiPageView extends Backbone.View {
       this.toolDrawer = {
         open: false,
         tool: null,
-        pageContent: pageContent,
-        mountPoint: mountPoint,
+        pageContent,
+        mountPoint,
       }
       window.addEventListener('resize', this.renderExternalToolDrawer.bind(this))
       this.renderExternalToolDrawer()

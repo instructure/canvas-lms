@@ -155,7 +155,7 @@ describe('AnnouncementsIndex component', function () {
   test('clicking announcement checkbox triggers setAnnouncementSelection with correct data', async () => {
     const selectSpy = sinon.spy()
     const props = {
-      announcements: announcements,
+      announcements,
       announcementSelectionChangeStart: selectSpy,
       hasLoadedAnnouncements: true,
       permissions: {moderate: true, manage_course_content_delete: true},
@@ -177,7 +177,7 @@ describe('AnnouncementsIndex component', function () {
   test('does not show checkbox if manage_course_content_edit/delete is false', () => {
     const selectSpy = sinon.spy()
     const props = {
-      announcements: announcements,
+      announcements,
       announcementSelectionChangeStart: selectSpy,
       hasLoadedAnnouncements: true,
       permissions: {
@@ -197,7 +197,7 @@ describe('AnnouncementsIndex component', function () {
 
   test('onManageAnnouncement shows delete modal when called with delete action', done => {
     const props = {
-      announcements: announcements,
+      announcements,
       hasLoadedAnnouncements: true,
       permissions: {
         moderate: true,
@@ -226,7 +226,7 @@ describe('AnnouncementsIndex component', function () {
   test('onManageAnnouncement calls toggleAnnouncementsLock when called with lock action', done => {
     const lockSpy = sinon.spy()
     const props = {
-      announcements: announcements,
+      announcements,
       hasLoadedAnnouncements: true,
       permissions: {
         moderate: true,

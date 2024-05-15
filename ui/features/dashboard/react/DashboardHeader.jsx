@@ -106,7 +106,7 @@ class DashboardHeader extends React.Component {
         dateTimeFormatters: {
           dateString,
           timeString,
-          datetimeString: datetimeString,
+          datetimeString,
         },
         externalFallbackFocusable: this.menuButtonFocusable,
         observedUser,

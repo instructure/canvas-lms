@@ -23,15 +23,16 @@ import {MediaCapture, canUseMediaCapture} from '@instructure/media-capture'
 import {ScreenCapture, canUseScreenCapture} from '@instructure/media-capture-new'
 import {func, string} from 'prop-types'
 import {mediaExtension} from '../../mimetypes'
-const I18n = useI18nScope('media_recorder')
-const DEFAULT_EXTENSION = 'webm'
-const fileExtensionRegex = /\.\S/
 
 import {IconRecordSolid, IconStopLine} from '@instructure/ui-icons'
 
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Button} from '@instructure/ui-buttons'
+
+const I18n = useI18nScope('media_recorder')
+const DEFAULT_EXTENSION = 'webm'
+const fileExtensionRegex = /\.\S/
 
 const translations = {
   ARIA_VIDEO_LABEL: I18n.t('Video Player'),
@@ -190,7 +191,7 @@ export default class CanvasMediaRecorder extends React.Component {
 
 const ScreenCaptureIndicatorBar = ({onCancelClick, onFinishClick}) => {
   return (
-    <View as="div" className="RecordingBar" padding={'x-small small'}>
+    <View as="div" className="RecordingBar" padding="x-small small">
       <View margin="0 auto 0 0" className="RecordingBar__time">
         <View className="RecordingBar__icon">
           <IconRecordSolid color="error" />
@@ -201,7 +202,7 @@ const ScreenCaptureIndicatorBar = ({onCancelClick, onFinishClick}) => {
       </View>
       <Button
         color="secondary"
-        withBackground
+        withBackground={true}
         margin="none"
         size="medium"
         onClick={onCancelClick}

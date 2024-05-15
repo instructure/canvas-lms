@@ -189,7 +189,7 @@ describe('DiscussionThreadContainer', () => {
       window.location = {assign: jest.fn()}
       const setHighlightEntryId = jest.fn()
       const {getByTestId, getAllByText} = setup(
-        defaultProps({propOverrides: {setHighlightEntryId: setHighlightEntryId}}),
+        defaultProps({propOverrides: {setHighlightEntryId}}),
         updateDiscussionThreadReadStateMock({
           discussionEntryId: 'DiscussionEntry-default-mock',
           read: false,

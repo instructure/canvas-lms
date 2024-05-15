@@ -215,7 +215,7 @@ it('does not render the grouping image and title when using singleCourseView', (
 
 describe('handleFacadeClick', () => {
   let containerElement = null
-  let wrapper = null
+  const wrapper = null
 
   beforeEach(() => {
     containerElement = document.createElement('div')

@@ -243,7 +243,7 @@ function renderDrawerLayout(tool, onDismiss) {
         allowItemSelection={false}
         selectableItems={[]}
         onDismiss={onDismiss}
-        open={!!tool ? true : false}
+        open={!!tool}
         placement="assignment_menu"
         extraQueryParams=""
       />,
