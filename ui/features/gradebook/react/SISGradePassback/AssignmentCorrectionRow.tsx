@@ -24,6 +24,7 @@ import React from 'react'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import assignmentUtils from './assignmentUtils'
 import classnames from 'classnames'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import type {AssignmentWithOverride} from '../default_gradebook/gradebook.d'
 
 const I18n = useI18nScope('modules')
@@ -62,7 +63,7 @@ class AssignmentCorrectionRow extends React.Component<Props> {
   initDueAtDateTimeField = () => {
     if (this.dueAtRef.current) {
       const $picker = $(this.dueAtRef.current)
-      $picker.datetime_field().change(this.handleDateChanged)
+      renderDatetimeField($picker).change(this.handleDateChanged)
     }
   }
 

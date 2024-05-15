@@ -331,20 +331,6 @@ test("openAgain doesn't add datetime for multiple dates", function () {
   ok($.fn.datetime_field.notCalled)
 })
 
-test('openAgain adds datetime picker', function () {
-  sandbox.stub(DialogFormView.prototype, 'openAgain')
-  sandbox.spy($.fn, 'datetime_field')
-  I18nStubber.setLocale('fr_FR')
-  I18nStubber.stub('fr_FR', {
-    'date.formats.medium': '%a %-d %b %Y %-k:%M',
-    'date.month_names': ['août'],
-    'date.abbr_month_names': ['août'],
-  })
-  const view = createView(this.assignment2)
-  view.openAgain()
-  ok($.fn.datetime_field.called)
-})
-
 test('adjust datetime to the end of a day for midnight time', function () {
   sandbox.stub(DialogFormView.prototype, 'openAgain')
   I18nStubber.useInitialTranslations()

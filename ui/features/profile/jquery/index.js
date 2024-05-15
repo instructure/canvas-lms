@@ -23,6 +23,7 @@ import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym'
 import AvatarWidget from '@canvas/avatar-dialog-view'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {datetimeString} from '@canvas/datetime/date-functions'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
@@ -240,7 +241,7 @@ $('.delete_pseudonym_link').click(function (event) {
       message: I18n.t('confirms.delete_login', 'Are you sure you want to delete this login?'),
     })
 })
-$('.datetime_field').datetime_field()
+renderDatetimeField($('.datetime_field'))
 $('.expires_field').bind('change keyup', function () {
   $(this).closest('td').find('.hint').showIf(!$(this).val())
 })

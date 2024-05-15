@@ -53,6 +53,7 @@ import SisValidationHelper from '@canvas/sis/SisValidationHelper'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags, /\$\.underscore/ */
@@ -1368,7 +1369,7 @@ correctAnswerVisibility = {
       const formattedDate = Handlebars.helpers.datetimeFormatted($field.val() || '')
 
       $field.val(formattedDate)
-      $field.datetime_field()
+      renderDatetimeField($field)
     })
 
     $('#quiz_options_form').on('xhrError', that.onFormError).on('serializing', that.serialize)
@@ -1947,7 +1948,7 @@ ready(function () {
 
   const $quiz_options_form = $('#quiz_options_form')
   const $quiz_edit_wrapper = $('#quiz_edit_wrapper')
-  $('.datetime_field').datetime_field()
+  renderDatetimeField($('.datetime_field'))
   $('#questions')
     .on('mouseover', '.group_top,.question,.answer_select,.comment', function (event) {
       $(this).addClass('hover')
