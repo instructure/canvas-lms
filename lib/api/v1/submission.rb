@@ -47,6 +47,15 @@ module Api::V1::Submission
     # information. Only return it if the caller has permissions.
     hash["body"] = nil if assignment.quiz? && !submission.user_can_read_grade?(current_user)
 
+    if includes.include?("sub_assignment_submissions") && assignment.root_account.feature_enabled?(:discussion_checkpoints)
+      hash["has_sub_assignment_submissions"] = assignment.has_sub_assignments
+      hash["sub_assignment_submissions"] = (assignment.has_sub_assignments &&
+                                           assignment.sub_assignments&.map do |sub_assignment|
+                                             sub_assignment_submission = sub_assignment.submissions.active.find_by(user_id: submission.user_id)
+                                             sub_assignnment_submission_json(sub_assignment_submission, sub_assignment_submission.assignment, current_user, session, context, includes, params, avatars)
+                                           end) || []
+    end
+
     if includes.include?("submission_history")
       if submission.quiz_submission && assignment.quiz && !assignment.quiz.anonymous_survey?
         hash["submission_history"] =
@@ -389,6 +398,23 @@ module Api::V1::Submission
     hash[:graded_at] = attempt[:end_at]
 
     hash
+  end
+
+  def sub_assignnment_submission_json(
+    submission,
+    assignment,
+    current_user,
+    session,
+    context = nil,
+    includes = [],
+    params = {},
+    avatars = false
+  )
+
+    json = submission_json(submission, assignment, current_user, session, context, includes, params, avatars)
+    json["sub_assignment_tag"] = assignment.sub_assignment_tag
+    json.delete("id")
+    json
   end
 
   # Create an attachment with a ZIP archive of an assignment's submissions.
