@@ -23,10 +23,15 @@ require "swearjar"
 
 class CanvasSlug
   class << self
-    CHARS = ("0".."9").to_a + ("a".."z").to_a + ("A".."Z").to_a
+    # omit easily-confused characters in user-visible slugs
+    CHARS = %w[2 3 4 6 7 8 9 a c e f h k m n r t u v w x y z A B C D E F G H J K L M N P Q R T U V W X Y Z].freeze
     SJ = Swearjar.default
 
     def generate_securish_uuid(length = 40)
+      SecureRandom.alphanumeric(length)
+    end
+
+    def generate_user_friendly_code(length = 4)
       # Ensure we don't get naughties by looping until we get something
       # "clean". Loop count is arbitrary, we use length as shorter strings
       # are less likely to result in problematic strings.
@@ -44,7 +49,7 @@ class CanvasSlug
     def generate(purpose = nil, length = 4)
       slug = +""
       slug << purpose << "-" if purpose
-      slug << generate_securish_uuid(length)
+      slug << generate_user_friendly_code(length)
       slug
     end
   end
