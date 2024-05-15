@@ -142,6 +142,12 @@ module CanvasSecurity
             expect { ServicesJwt.generate(foo: "bar", bang: "baz") }
               .to raise_error(ArgumentError)
           end
+
+          it "can generate a non-encrypted JWT" do
+            jwt = ServicesJwt.generate({ sub: 1, foo: "bar" }, false, encrypt: false)
+            body = JSON::JWT.decode(jwt, ServicesJwt::KeyStorage.public_keyset)
+            expect(body[:foo]).to eq "bar"
+          end
         end
 
         describe "via .for_user" do
