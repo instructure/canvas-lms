@@ -16,22 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import {MockedProvider} from '@apollo/react-testing'
 import {fireEvent, render, waitFor, within} from '@testing-library/react'
 import {
   mockAssignmentAndSubmission,
-  mockSubmission,
   mockQuery,
+  mockSubmission,
 } from '@canvas/assignments/graphql/studentMocks'
-import {MockedProvider} from '@apollo/react-testing'
-import {initializeReaderButton} from '../../../../../shared/immersive-reader/ImmersiveReader'
-import React from 'react'
-import StudentViewContext from '../Context'
-import StudentContent from '../StudentContent'
+import {initializeReaderButton} from '@canvas/immersive-reader/ImmersiveReader'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import {AssignmentMocks} from '@canvas/assignments/graphql/student/Assignment'
-import ContextModuleApi from '../../apis/ContextModuleApi'
 import {RUBRIC_QUERY, SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+import StudentViewContext from '../Context'
+import StudentContent from '../StudentContent'
+import ContextModuleApi from '../../apis/ContextModuleApi'
 
 injectGlobalAlertContainers()
 
@@ -579,7 +579,7 @@ describe('Assignment Student Content View', () => {
         SubmissionCommentConnection: {nodes: []},
       }
       const result = await mockQuery(SUBMISSION_COMMENT_QUERY, overrides, variables)
-      const mocks = [
+      return [
         {
           request: {
             query: SUBMISSION_COMMENT_QUERY,
@@ -588,22 +588,18 @@ describe('Assignment Student Content View', () => {
           result,
         },
       ]
-      return mocks
     }
 
-    // https://instructure.atlassian.net/browse/USERS-385
-
-    it.skip('renders Comments', async () => {
-      // To be unskipped in EVAL-1679
+    it('renders Comments', async () => {
       const mocks = await makeMocks()
       const props = await mockAssignmentAndSubmission()
-      const {getByText} = render(
+      const {findByText} = render(
         <MockedProvider mocks={mocks}>
           <StudentContent {...props} />
         </MockedProvider>
       )
-      fireEvent.click(getByText('Add Comment'))
-      await waitFor(() => expect(getByText('Send Comment')).toBeInTheDocument())
+      fireEvent.click(await findByText(/add comment/i))
+      expect(await findByText(/attempt 1 feedback/i)).toBeInTheDocument()
     })
 
     it('renders spinner while lazy loading comments', async () => {
