@@ -47,6 +47,7 @@ export function reportCatch(error) {
 }
 
 export const submissionsParams = {
+  include: ['sub_assignment_submissions'],
   exclude_response_fields: ['preview_url', 'external_tool_url', 'url'],
   grouped: 1,
   response_fields: [
