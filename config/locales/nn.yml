@@ -14617,6 +14617,9 @@ nn:
       new_tab: "Du må laste dette verktøyet i eit nytt nettlesarvindauge"
       new_tab_expired: "Økta for verktøyet er utgått. Om du vil ha tilgang til verktøyet, må du laste opp sida på nytt"
       new_tab_loaded: "Verktøyet er lasta opp i eit nytt nettlesarvindu. Om du vil bruke verktøyet, må du laste opp sida på nytt."
+    registrations: 
+      index: 
+        title: Utvidingar
   lti2: 
     register_tool: "Registrer verktøyet"
   lti_1_3_and_lti_advantage_b81c3d6c: "LTI 1.3 og LTI Advantage"

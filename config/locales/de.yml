@@ -4543,7 +4543,7 @@ de:
       graded_count: "%{graded_count} * von * %{total} Abgaben benotet"
       links: 
         download_submissions: "Einsendungen herunterladen"
-        peer_reviews: Peer-Korrekturen
+        peer_reviews: "Peer Reviews"
         reupload_submissions: "Einsendungen erneut hochladen"
       resubmission_count: 
         one: "1 unbenotete erneute Abgabe"
@@ -4688,12 +4688,12 @@ de:
     peer_reviews: 
       buttons: 
         add: Hinzufügen
-        assign_peer_reviews: "Peer-Korrekturen zuweisen"
+        assign_peer_reviews: "Peer Reviews zuweisen"
       descriptions: 
-        automatically_assign_reviews: "Durch das Anklicken der Schaltfläche unten können Sie den Benutzern Peer-Korrekturen zuweisen, die abgegeben haben, aber bisher keine Korrekturen zugewiesen bekommen haben."
-      details: "Links befindet sich eine Liste der Studierenden für diese Aufgabe, zusammen mit den ihnen zur Korrektur zugewiesenen Abgaben."
+        automatically_assign_reviews: "Durch das Anklicken der untenstehenden Schaltfläche können Sie jenen Personen Peer Reviews zuweisen, die bereits eine eigene Abgabe vorgenommen haben und die bislang keine Peer Reviews zugewiesen bekommen haben."
+      details: "Auf der linken Seite sehen Sie, welchen Personen diese Abgabe zugewiesen wurde, sowie eine Übersicht der ihnen zugewiesenen Peer Reviews."
       links: 
-        assign_peer_review: "%{student} weitere Abgabe zur Beurteilung zuweisen."
+        assign_peer_review: "%{student} weitere Abgaben zum Peer Review zuweisen."
         back_to_assignment: "Zurück zur Aufgabe"
       messages: 
         cancel_peer_review: "Diese Peer-Korrektur abbrechen?"
@@ -4704,26 +4704,26 @@ de:
         select_student: "[Eine\\*n Studierende\\*n auswählen]"
       overview: "Peer Reviews gelten als vollständig, wenn die Studierenden mindestens einen Kommentar auf der Seite abgegeben haben."
       overview_with_rubric: "Peer Reviews gelten als vollständig, wenn die Studierenden das Bewertungsschema für die Aufgabe ausgefüllt haben."
-      page_title: Peer-Korrekturen
-      reviews_per_user: "%{count} Korrekturen pro Benutzer\\*in"
+      page_title: "Peer Reviews"
+      reviews_per_user: "%{count} Peer Reviews pro Person"
       submitted: abgegeben
-      title: "%{assignment}-Peer-Korrekturen"
+      title: "%{assignment}-Peer Reviews"
       titles: 
-        automatically_assign_reviews: "Korrekturen automatisch zuweisen"
+        automatically_assign_reviews: "Peer Reviews automatisch zuweisen"
         remind: "%{assessor} an Leistungstest erinnern, zuletzt benachrichtigt um %{time}"
         reminder: "%{assessor} an Leistungstest erinnern, zuletzt benachrichtigt um %{time}"
     peer_reviews_selector: 
       anonymous_peer_reviews: Anonymität
-      how_to_peer_review: "Zuweisen von Peer-Korrekturen"
+      how_to_peer_review: "Zuweisen der Peer Reviews"
       labels: 
-        anonymous_peer_reviews: "Peer-Korrekturen erscheinen anonym"
-        automatically_assign_peer_reviews: "Peer-Korrekturen automatisch zuweisen"
-        manually_assign_peer_reviews: "Peer-Korrekturen manuell zuweisen"
-        require_peer_reviews: "Peer-Korrekturen anfordern"
-      locked_until: "Korrekturen zuweisen"
+        anonymous_peer_reviews: "Anonyme Peer Reviews"
+        automatically_assign_peer_reviews: "Peer Reviews automatisch zuweisen"
+        manually_assign_peer_reviews: "Peer Reviews manuell zuweisen"
+        require_peer_reviews: "Peer Review verwenden"
+      locked_until: "Peer Reviews zuweisen"
       peer_reviews_assign_at_explanation: "Falls leer, wird das Fälligkeitsdatum verwendet."
-      peer_reviews_header: Peer-Korrekturen
-      reviews_per_user: "Korrekturen pro Benutzer\\*in"
+      peer_reviews_header: "Peer Reviews"
+      reviews_per_user: "Peer Reviews pro Person"
     points_possible_number: "Der Wert für die möglichen Punkte muss eine Zahl sein."
     positive_number: "Sie müssen eine positive Zahl verwenden"
     processing_submission: "Canvas verarbeitet gerade Ihre Einsendung. Sie können diese Seite ruhig verlassen. Wir werden Sie per E-Mail benachrichtigen, falls die Verarbeitung Ihrer Einsendung fehlschlägt."
@@ -4815,7 +4815,7 @@ de:
         no_comments: "Keine Kommentare"
         submission_late_timestamp: "%{submitted_at} (verspätet)"
       titles: 
-        assigned_peer_reviews: "Zugewiesene Peer-Korrekturen"
+        assigned_peer_reviews: "Zugewiesene Peer Reviews"
         comments: "Kommentare:"
         submission: Abgabe
         submission_not_turned_in: "Nicht abgegeben!"
@@ -10911,7 +10911,7 @@ de:
       from_context: "Von *%{context_name}*"
       initial_post_required: "Die Antworten sind nur für Benutzer\\*innen sichtbar, die mindestens eine Antwort gepostet haben."
       links: 
-        peer_reviews: Peer-Korrekturen
+        peer_reviews: "Peer Reviews"
       loading_replies: "Antworten werden geladen ..."
       lock_topic: "Für Kommentare schließen"
       locked: "Dieses Thema ist für Kommentare geschlossen"
@@ -15032,8 +15032,8 @@ de:
       conversation_label: "Konversationen aufrufen"
       discussion_details: Diskussionsdetails
       discussion_label: "Kursdiskussionen aufrufen"
-      peer_review_details: "Details der Peer-Korrekturen"
-      peer_review_label: "Peer-Korrekturen für Kurs aufrufen"
+      peer_review_details: "Details der Peer Reviews"
+      peer_review_label: "Peer Reviews für Kurs aufrufen"
       x_more: "%{x} weitere ..."
       x_new_in_announcements: 
         one: "*1* Ankündigung"
@@ -15048,8 +15048,8 @@ de:
         one: "*1* Diskussion"
         other: "*%{count}* Diskussionen"
       x_new_in_peer_reviews: 
-        one: "*1* Peer-Korrektur"
-        other: "*%{count}* Peer-Korrekturen"
+        one: "*1* Peer Review"
+        other: "*%{count}* Peer Reviews"
     local: Lokal
     local_time: Lokal
     select: 
@@ -21657,8 +21657,8 @@ de:
   peer_reviews_api: 
     errors: 
       delete_reminder_failed: "Löschen fehlgeschlagen"
-  peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Peer-Korrekturen können für moderierte Aufgaben nicht aktiviert werden."
-  peer_reviews_e3a55964: Peer-Korrekturen
+  peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Peer Reviews können für moderierte Aufgaben nicht aktiviert werden."
+  peer_reviews_e3a55964: "Peer Reviews"
   peer_service_6b4828b9: Peer-Service
   peer_services_102357e3: Kollegendienste
   peer_submissions_ready_for_review_availablecount_3ac80091: "Peer-Einsendungen bereit zur Überprüfung: %{availableCount}"
