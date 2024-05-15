@@ -84,7 +84,9 @@ describe('GradeSummary GridRow', () => {
 
   test('includes a cell for each grader', () => {
     renderComponent()
-    const cells = screen.getAllByRole('cell').filter(cell => cell.className.match(/GradesGrid__ProvisionalGradeCell/))
+    const cells = screen
+      .getAllByRole('cell')
+      .filter(cell => cell.className.match(/GradesGrid__ProvisionalGradeCell/))
     expect(cells.length).toBe(props.graders.length)
   })
 

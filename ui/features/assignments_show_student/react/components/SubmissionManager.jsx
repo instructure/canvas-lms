@@ -292,7 +292,6 @@ const SubmissionManager = ({
         setOnFailure(I18n.t('Invalid Rubric Submission'))
       }
     }
-
   }, [isSavingRubricAssessment])
 
   const isRubricComplete = assessment => {

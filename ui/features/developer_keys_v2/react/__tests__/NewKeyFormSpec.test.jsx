@@ -160,7 +160,7 @@ describe('NewKeyForm', () => {
 
   test('populates the key notes when lti key', () => {
     const textarea = formFieldOfTypeAndName(developerKey, 'textarea', 'notes')
-    expect(textarea.value).toEqual(developerKey.notes);
+    expect(textarea.value).toEqual(developerKey.notes)
   })
 
   test('renders the tool configuration form if isLtiKey is true', () => {
@@ -240,9 +240,13 @@ describe('NewKeyForm', () => {
       />
     )
 
-    const match1 = wrapper.container.innerHTML.match(new RegExp(/<span class=.*>Redirect URIs:<\/span>/))
+    const match1 = wrapper.container.innerHTML.match(
+      new RegExp(/<span class=.*>Redirect URIs:<\/span>/)
+    )
     expect(match1).toBeFalsy()
-    const match2 = wrapper.container.innerHTML.match(new RegExp(/<span class=.*>* Redirect URIs:<\/span>/))
+    const match2 = wrapper.container.innerHTML.match(
+      new RegExp(/<span class=.*>* Redirect URIs:<\/span>/)
+    )
     expect(match2).toBeTruthy()
   })
 })

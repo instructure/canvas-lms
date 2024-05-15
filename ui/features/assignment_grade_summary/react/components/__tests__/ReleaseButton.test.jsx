@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import {render, screen, fireEvent} from '@testing-library/react'
 
 import {
   FAILURE,
@@ -60,7 +60,7 @@ describe('GradeSummary ReleaseButton', () => {
 
     test('is labeled with "Releasing Grades"', () => {
       render(<ReleaseButton {...props} />)
-      expect(screen.getByRole('button', { name: 'Releasing Grades' })).toBeInTheDocument()
+      expect(screen.getByRole('button', {name: 'Releasing Grades'})).toBeInTheDocument()
     })
 
     test('does not call the onClick prop when clicked', () => {
@@ -83,7 +83,7 @@ describe('GradeSummary ReleaseButton', () => {
 
     test('is labeled with "Grades Released"', () => {
       render(<ReleaseButton {...props} />)
-      expect(screen.getByRole('button', { name: 'Grades Released' })).toBeInTheDocument()
+      expect(screen.getByRole('button', {name: 'Grades Released'})).toBeInTheDocument()
     })
   })
 
@@ -94,7 +94,7 @@ describe('GradeSummary ReleaseButton', () => {
 
     test('is labeled with "Release Grades"', () => {
       render(<ReleaseButton {...props} />)
-      expect(screen.getByRole('button', { name: 'Release Grades' })).toBeInTheDocument()
+      expect(screen.getByRole('button', {name: 'Release Grades'})).toBeInTheDocument()
     })
 
     test('calls the onClick prop when clicked', () => {

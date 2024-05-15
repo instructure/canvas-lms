@@ -175,7 +175,7 @@ describe('AssignmentDueDatesManager', () => {
       window.ENV.K5_SUBJECT_COURSE = false
       setup({})
 
-      const importantDates = screen.queryByTestId('important-dates-checkbox');
+      const importantDates = screen.queryByTestId('important-dates-checkbox')
 
       expect(importantDates).not.toBeInTheDocument()
     })

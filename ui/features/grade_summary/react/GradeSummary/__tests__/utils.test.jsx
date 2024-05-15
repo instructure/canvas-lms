@@ -639,11 +639,13 @@ describe('util', () => {
     })
 
     it('should return "Submitted" status when submission has been submitted', () => {
-      const submittedAt = (new Date()).toISOString()
+      const submittedAt = new Date().toISOString()
       const assignment = {
         dueAt: getTime(false),
         submissionsConnection: {
-          nodes: [Submission.mock({state: 'submitted', submittedAt, gradingStatus: 'needs_grading'})],
+          nodes: [
+            Submission.mock({state: 'submitted', submittedAt, gradingStatus: 'needs_grading'}),
+          ],
         },
       }
       expect(getDisplayStatus(assignment)).toEqual(DateHelper.formatDatetimeForDisplay(submittedAt))

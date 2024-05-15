@@ -72,8 +72,11 @@ export default class UsersPane extends React.Component {
     this.unsubscribe = this.props.store.subscribe(this.handleStateChange)
 
     // make page reflect what the querystring params asked for
-    const {search_term, role_filter_id, include_deleted_users} = {...UsersToolbar.defaultProps, ...this.props.queryParams}
-    const bool_include_deleted_users = (include_deleted_users === 'true')
+    const {search_term, role_filter_id, include_deleted_users} = {
+      ...UsersToolbar.defaultProps,
+      ...this.props.queryParams,
+    }
+    const bool_include_deleted_users = include_deleted_users === 'true'
     this.props.store.dispatch(
       UserActions.updateSearchFilter({
         search_term,

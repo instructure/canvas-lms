@@ -29,7 +29,10 @@ import {
   outcomeGroupsMocks,
 } from '@canvas/outcomes/mocks/Outcomes'
 import {createCache} from '@canvas/apollo'
-import {showOutcomesImporter, showOutcomesImporterIfInProgress} from '@canvas/outcomes/react/OutcomesImporter'
+import {
+  showOutcomesImporter,
+  showOutcomesImporterIfInProgress,
+} from '@canvas/outcomes/react/OutcomesImporter'
 import {courseMocks, groupDetailMocks, groupMocks} from '@canvas/outcomes/mocks/Management'
 
 jest.mock('@canvas/outcomes/react/OutcomesImporter', () => ({
@@ -123,7 +126,7 @@ describe('OutcomeManagement', () => {
     const modal = await findByTestId('createOutcomeModal')
     expect(within(modal).getByText('Course folder 0')).not.toBeNull()
     expect(within(modal).getByText('Group 200 folder 0')).not.toBeNull()
-  }, 7500)  // Increase time to 7.5 seconds
+  }, 7500) // Increase time to 7.5 seconds
 
   const sharedExamples = () => {
     beforeEach(() => {

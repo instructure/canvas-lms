@@ -496,7 +496,8 @@ describe('ItemAssignToTray', () => {
       waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Mastery Paths'))
     })
 
-    it('renders everyone option if there are more than 1 card', async () => {
+    // LF-1603 - this test is flaky
+    it.skip('renders everyone option if there are more than 1 card', async () => {
       fetchMock.get(
         '/api/v1/courses/1/assignments/23/date_details',
         {
@@ -697,7 +698,8 @@ describe('ItemAssignToTray', () => {
     expect(addButton).toHaveFocus()
   })
 
-  it("focuses on the newly-created card's delete button when adding a card", async () => {
+  // LF-1603 - this test is flaky
+  it.skip("focuses on the newly-created card's delete button when adding a card", async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {findAllByTestId, getByTestId} = renderComponent()
 

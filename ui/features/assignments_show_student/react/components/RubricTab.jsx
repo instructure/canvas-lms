@@ -16,22 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useState} from 'react'
-import { arrayOf, bool } from 'prop-types'
+import {arrayOf, bool} from 'prop-types'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
-import { fillAssessment } from '@canvas/rubrics/react/helpers'
-import { useScope as useI18nScope } from '@canvas/i18n'
-import { ProficiencyRating } from '@canvas/assignments/graphql/student/ProficiencyRating'
-import { Rubric } from '@canvas/assignments/graphql/student/Rubric'
-import { RubricAssessment } from '@canvas/assignments/graphql/student/RubricAssessment'
-import { RubricAssociation } from '@canvas/assignments/graphql/student/RubricAssociation'
+import {fillAssessment} from '@canvas/rubrics/react/helpers'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import {ProficiencyRating} from '@canvas/assignments/graphql/student/ProficiencyRating'
+import {Rubric} from '@canvas/assignments/graphql/student/Rubric'
+import {RubricAssessment} from '@canvas/assignments/graphql/student/RubricAssessment'
+import {RubricAssociation} from '@canvas/assignments/graphql/student/RubricAssociation'
 import RubricComponent from '@canvas/rubrics/react/Rubric'
-import { Text } from '@instructure/ui-text'
-import { ToggleDetails } from '@instructure/ui-toggle-details'
-import { Alert } from '@instructure/ui-alerts'
-import { View } from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {Alert} from '@instructure/ui-alerts'
+import {View} from '@instructure/ui-view'
 import useStore from './stores/index'
-import { RubricAssessmentTray, TraditionalView } from '@canvas/rubrics/react/RubricAssessment'
-import { Button } from '@instructure/ui-buttons'
+import {RubricAssessmentTray, TraditionalView} from '@canvas/rubrics/react/RubricAssessment'
+import {Button} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('assignments_2')
 
@@ -59,7 +59,7 @@ export default function RubricTab(props) {
   }
 
   const onAssessmentChange = updatedAssessment => {
-    const newState = { displayedAssessment: updatedAssessment }
+    const newState = {displayedAssessment: updatedAssessment}
     if (enhancedRubricsEnabled) {
       newState['isSavingRubricAssessment'] = true
       setRubricTrayOpen(false)
@@ -70,7 +70,7 @@ export default function RubricTab(props) {
   const assessmentSelectorChanged = assessmentId => {
     const assessment = findAssessmentById(assessmentId)
     const filledAssessment = fillAssessment(props.rubric, assessment || {})
-    useStore.setState({ displayedAssessment: filledAssessment })
+    useStore.setState({displayedAssessment: filledAssessment})
   }
 
   const hasSubmittedAssessment = props.assessments?.some(
@@ -82,7 +82,7 @@ export default function RubricTab(props) {
     return {
       ...data,
       criterionId: data.criterion_id,
-      points: typeof points === 'number' ? points : points.value
+      points: typeof points === 'number' ? points : points.value,
     }
   })
 
@@ -100,7 +100,7 @@ export default function RubricTab(props) {
         criteria={props.rubric.criteria}
         hidePoints={hidePoints}
         isPreviewMode={true}
-        onUpdateAssessmentData={() => { }}
+        onUpdateAssessmentData={() => {}}
         rubricTitle={props.rubric.title}
         rubricAssessmentData={rubricAssessmentData}
       />
@@ -128,75 +128,74 @@ export default function RubricTab(props) {
           </Alert>
         )}
 
-        {
-          showEnhancedRubricPeerReview ? (
-            <View as="div" margin="small 0 0 0">
-              <Button onClick={() => setRubricTrayOpen(!rubricTrayOpen)}>
-                {hasSubmittedAssessment ? I18n.t('View Rubric') : I18n.t('Fill Out Rubric')}
-              </Button>
-              <RubricAssessmentTray
-                hidePoints={hidePoints}
-                isOpen={rubricTrayOpen}
-                isPreviewMode={hasSubmittedAssessment}
-                isPeerReview={true}
-                onDismiss={() => setRubricTrayOpen(false)}
-                rubricAssessmentData={rubricAssessmentData}
-                rubric={props.rubric}
-                onSubmit={(assessment) => {
-                  const updatedState = {
-                    score: assessment.reduce((prev, curr) => prev + curr.points, 0),
-                    data: assessment.map(criterionAssessment => {
-                      const {points} = criterionAssessment
-                      const valid = !Number.isNaN(points)
-                      return {
-                        ...criterionAssessment,
-                        points: {
-                          text: points.toString(),
-                          valid,
-                          value: points
-                      }
-                    }})
-                  }
-                  onAssessmentChange(updatedState)
-                }}
-              />
-            </View>
-          ) : (
-            <ToggleDetails
-              defaultExpanded={true}
-              fluidWidth={true}
-              data-testid="fill-out-rubric-toggle"
-              summary={
-                <Text weight="bold">
-                  {props.peerReviewModeEnabled ? I18n.t('Fill Out Rubric') : I18n.t('View Rubric')}
-                </Text>
-              }
-            >
-              {!props.peerReviewModeEnabled && !!props.assessments?.length && (
-                <div style={{ marginBottom: '22px', width: '325px' }}>
-                  <CanvasSelect
-                    label={I18n.t('Select Grader')}
-                    value={displayedAssessment?._id}
-                    data-testid="select-grader-dropdown"
-                    onChange={(e, optionValue) => assessmentSelectorChanged(optionValue)}
-                  >
-                    {props.assessments.map(assessment => (
-                      <CanvasSelect.Option
-                        key={assessment._id}
-                        value={assessment._id}
-                        id={assessment._id}
-                      >
-                        {formatAssessor(assessment.assessor)}
-                      </CanvasSelect.Option>
-                    ))}
-                  </CanvasSelect>
-                </div>
-              )}
+        {showEnhancedRubricPeerReview ? (
+          <View as="div" margin="small 0 0 0">
+            <Button onClick={() => setRubricTrayOpen(!rubricTrayOpen)}>
+              {hasSubmittedAssessment ? I18n.t('View Rubric') : I18n.t('Fill Out Rubric')}
+            </Button>
+            <RubricAssessmentTray
+              hidePoints={hidePoints}
+              isOpen={rubricTrayOpen}
+              isPreviewMode={hasSubmittedAssessment}
+              isPeerReview={true}
+              onDismiss={() => setRubricTrayOpen(false)}
+              rubricAssessmentData={rubricAssessmentData}
+              rubric={props.rubric}
+              onSubmit={assessment => {
+                const updatedState = {
+                  score: assessment.reduce((prev, curr) => prev + curr.points, 0),
+                  data: assessment.map(criterionAssessment => {
+                    const {points} = criterionAssessment
+                    const valid = !Number.isNaN(points)
+                    return {
+                      ...criterionAssessment,
+                      points: {
+                        text: points.toString(),
+                        valid,
+                        value: points,
+                      },
+                    }
+                  }),
+                }
+                onAssessmentChange(updatedState)
+              }}
+            />
+          </View>
+        ) : (
+          <ToggleDetails
+            defaultExpanded={true}
+            fluidWidth={true}
+            data-testid="fill-out-rubric-toggle"
+            summary={
+              <Text weight="bold">
+                {props.peerReviewModeEnabled ? I18n.t('Fill Out Rubric') : I18n.t('View Rubric')}
+              </Text>
+            }
+          >
+            {!props.peerReviewModeEnabled && !!props.assessments?.length && (
+              <div style={{marginBottom: '22px', width: '325px'}}>
+                <CanvasSelect
+                  label={I18n.t('Select Grader')}
+                  value={displayedAssessment?._id}
+                  data-testid="select-grader-dropdown"
+                  onChange={(e, optionValue) => assessmentSelectorChanged(optionValue)}
+                >
+                  {props.assessments.map(assessment => (
+                    <CanvasSelect.Option
+                      key={assessment._id}
+                      value={assessment._id}
+                      id={assessment._id}
+                    >
+                      {formatAssessor(assessment.assessor)}
+                    </CanvasSelect.Option>
+                  ))}
+                </CanvasSelect>
+              </div>
+            )}
 
-              {renderRubricPreview()}
-            </ToggleDetails>
-          )
-        }
+            {renderRubricPreview()}
+          </ToggleDetails>
+        )}
       </View>
     </div>
   )

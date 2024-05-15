@@ -38,7 +38,7 @@ import {getRootFolder, uploadFile} from '@canvas/files/util/apiFileUtils'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import natcompare from '@canvas/util/natcompare'
-import { captureException } from '@sentry/react'
+import {captureException} from '@sentry/react'
 
 const I18n = useI18nScope('react_files')
 

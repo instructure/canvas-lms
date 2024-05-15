@@ -128,23 +128,13 @@ QUnit.module('DueDateCalendarPicker', suiteHooks => {
   test('forwards properties to label', () => {
     props.labelClasses = 'special-label'
     mountComponent()
-    ok(
-      wrapper
-        .container.querySelector('label')
-        .className
-        .match(/special-label/)
-    )
+    ok(wrapper.container.querySelector('label').className.match(/special-label/))
   })
 
   test('forwards properties to input', () => {
     props.name = 'special-name'
     mountComponent()
-    ok(
-      wrapper
-        .container.querySelector('input')
-        .name
-        .match(/special-name/)
-    )
+    ok(wrapper.container.querySelector('input').name.match(/special-name/))
   })
 
   test('label and input reference each other', () => {

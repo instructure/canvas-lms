@@ -45,8 +45,7 @@ if (ENV.FEATURES?.instui_header) {
     'click .navigation_title': '_onTitleClick',
     'keyclick .navigation_title': '_onTitleClick',
   }
-}
-else {
+} else {
   CalendarNavigator.prototype.els = {
     '.navigation_title': '$title',
     '.navigation_title_text': '$titleText',
@@ -70,7 +69,7 @@ CalendarNavigator.prototype.initialize = function () {
   CalendarNavigator.__super__.initialize.apply(this, arguments)
   this.render()
   this._savedButtonsVisibility = true
-  
+
   // use debounce to make the aria-live updates nicer
   this._flashDateSuggestion = debounce(this._flashDateSuggestion, 1500)
 }
@@ -86,7 +85,7 @@ CalendarNavigator.prototype.hide = function () {
   return this.show(false)
 }
 
-CalendarNavigator.prototype.setTitle = function (new_text) {  
+CalendarNavigator.prototype.setTitle = function (new_text) {
   this.$titleText.attr('aria-label', new_text + ' click to change')
   return this.$titleText.text(new_text)
 }
@@ -194,7 +193,7 @@ CalendarNavigator.prototype._onPickerClose = function () {
   return this.hidePicker()
 }
 
-CalendarNavigator.prototype._loadDateField = function () {  
+CalendarNavigator.prototype._loadDateField = function () {
   // make sure our jquery key handler is called first
   this.$dateField.keydown(this._onDateFieldKey)
   this.$dateField.date_field({
@@ -217,7 +216,7 @@ CalendarNavigator.prototype.afterRender = function () {
   }
 
   ReactDOM.render(
-    <CalendarNavigatorComponent 
+    <CalendarNavigatorComponent
       size={this.options.size || 'large'}
       bridge={{
         navigatePrev: () => this.trigger('navigatePrev'),
@@ -225,7 +224,7 @@ CalendarNavigator.prototype.afterRender = function () {
         navigateNext: () => this.trigger('navigateNext'),
         onLoadReady: () => {
           // class.prototype.els is disabled with instui_header FF
-          // because els initializes with the template BEFORE react is injected in the DOM 
+          // because els initializes with the template BEFORE react is injected in the DOM
           // so we need to redefine the els vars each time the component is rendered
 
           if (this._reactViewAlreadyLoaded) {
@@ -235,24 +234,25 @@ CalendarNavigator.prototype.afterRender = function () {
               dateFieldValue: this.$dateField.val(),
             }
           }
-    
+
           this.$title = this.$el.find('.navigation_title')
           this.$titleText = this.$el.find('.navigation_title_text')
           this.$buttons = this.$el.find('.navigation_buttons')
           this.$dateField = this.$el.find('.date_field')
           this.$dateWrapper = this.$el.find('.date_field_wrapper')
           this._reactViewAlreadyLoaded = true
-    
+
           this._loadDateField()
 
           if (this._restorePreviousData) {
             this.setTitle(this._restorePreviousData.titleTextValue)
             this.$dateField.val(this._restorePreviousData.dateFieldValue)
-            
+
             this.$buttons.toggle(this._savedButtonsVisibility)
           }
         },
-      }} />,
+      }}
+    />,
     this.$el.find('#calendar_navigator_component')[0]
   )
 }

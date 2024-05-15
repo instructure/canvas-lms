@@ -27,7 +27,7 @@ import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {CONTENT_SHARE_TYPES} from '@canvas/content-sharing/react/proptypes/contentShare'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import { captureException } from '@sentry/react'
+import {captureException} from '@sentry/react'
 
 const I18n = useI18nScope('direct_share_user_modal')
 

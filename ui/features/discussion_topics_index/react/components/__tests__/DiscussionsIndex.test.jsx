@@ -135,7 +135,7 @@ describe('DiscussionIndex', () => {
   })
 
   it('does not render pinned discussions in studentView if there are no pinned discussions', () => {
-    const overrideProps = {closedForCommentsDiscussions: [],}
+    const overrideProps = {closedForCommentsDiscussions: []}
     renderConnectedComponent(overrideProps)
     expect(screen.getAllByTestId('discussion-connected-container').length).toBe(2)
   })

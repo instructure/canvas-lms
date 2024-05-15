@@ -34,7 +34,7 @@ import {throttle} from 'lodash'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import CanvasMultiSelect from '@canvas/multi-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import { captureException } from '@sentry/react'
+import {captureException} from '@sentry/react'
 
 const I18n = useI18nScope('student_groups')
 

@@ -397,14 +397,14 @@ describe('DiscussionTopicContainer', () => {
     const container = setup({
       discussionTopic: Discussion.mock({permissions: DiscussionPermissions.mock({reply: false})}),
     })
-    
+
     expect(await container.findByText('This is a Discussion Topic Message')).toBeInTheDocument()
     expect(await container.findByTestId('discussion-topic-closed-for-comments')).toBeInTheDocument()
   })
-  
+
   it('does not renders "discussion topic closed for comments" message if user has reply permission true', () => {
     const container = setup({discussionTopic: Discussion.mock()})
-    
+
     expect(container.queryByTestId('discussion-topic-closed-for-comments')).toBeNull()
   })
 
@@ -818,7 +818,7 @@ describe('DiscussionTopicContainer', () => {
 
   describe('Discussion Summary', () => {
     it('renders a summary', () => {
-      const { queryByTestId } = setup({
+      const {queryByTestId} = setup({
         discussionTopic: Discussion.mock(),
         isSummaryEnabled: true,
       })
@@ -826,11 +826,11 @@ describe('DiscussionTopicContainer', () => {
     })
 
     it('does not render a summary', () => {
-      const { queryAllByTestId } = setup({
+      const {queryAllByTestId} = setup({
         discussionTopic: Discussion.mock(),
         isSummaryEnabled: false,
       })
-      expect( queryAllByTestId(/summary-.*/) ).toEqual([])
+      expect(queryAllByTestId(/summary-.*/)).toEqual([])
     })
   })
 })

@@ -27,11 +27,16 @@ export default function renderCanvasMediaRecorder(element, onSaveFile) {
   let onModalShowToggle = null
 
   if (fromSpeedGrader) {
-    indicatorBarMountPointId = "screen-capture-indicator-mount-point"
+    indicatorBarMountPointId = 'screen-capture-indicator-mount-point'
 
-    onModalShowToggle = (disabled) => {
+    onModalShowToggle = disabled => {
       // disable media comment button and next/prev student buttons when recording
-      ['media_comment_button', 'next-student-button', 'prev-student-button', 'comment_submit_button'].forEach(id => {
+      ;[
+        'media_comment_button',
+        'next-student-button',
+        'prev-student-button',
+        'comment_submit_button',
+      ].forEach(id => {
         const element = document.getElementById(id)
         if (element) {
           element.disabled = disabled
@@ -45,7 +50,6 @@ export default function renderCanvasMediaRecorder(element, onSaveFile) {
       }
     }
   }
-
 
   ReactDOM.render(
     <CanvasMediaRecorder

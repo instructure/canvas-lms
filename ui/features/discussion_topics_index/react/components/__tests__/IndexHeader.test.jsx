@@ -59,7 +59,7 @@ describe('IndexHeader', () => {
   it('renders the search input', () => {
     const props = makeProps()
     render(<IndexHeader {...props} />)
-    expect(screen.getByPlaceholderText('Search by title or author...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search by title or author...')).toBeInTheDocument()
   })
 
   it('renders the filter input', () => {

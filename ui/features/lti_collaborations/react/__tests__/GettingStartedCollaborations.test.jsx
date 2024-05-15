@@ -21,7 +21,6 @@ import {render} from '@testing-library/react'
 import GettingStartedCollaborations from '../GettingStartedCollaborations'
 
 describe('GettingStartedCollaborations', () => {
-
   function setEnvironment(roles, context) {
     ENV.context_asset_string = context
     ENV.current_user_roles = roles
@@ -46,7 +45,9 @@ describe('GettingStartedCollaborations', () => {
       'Collaborations are web-based tools to work collaboratively on tasks like taking notes or grouped papers. Get started by clicking on the "+ Collaboration" button.'
     const expectedLinkText = 'Learn more about collaborations'
 
-    expect(expectedHeader).toEqual(wrapper.container.querySelector('.ic-Action-header__Heading').textContent)
+    expect(expectedHeader).toEqual(
+      wrapper.container.querySelector('.ic-Action-header__Heading').textContent
+    )
     expect(expectedContent).toEqual(wrapper.container.querySelector('p').textContent)
     expect(expectedLinkText).toEqual(wrapper.container.querySelector('a').textContent)
   })
@@ -61,7 +62,9 @@ describe('GettingStartedCollaborations', () => {
       'Collaborations are web-based tools to work collaboratively on tasks like taking notes or grouped papers. Get started by adding a collaboration app.'
     const expectedLinkText = 'Learn more about collaborations'
 
-    expect(expectedHeader).toEqual(wrapper.container.querySelector('.ic-Action-header__Heading').textContent)
+    expect(expectedHeader).toEqual(
+      wrapper.container.querySelector('.ic-Action-header__Heading').textContent
+    )
     expect(expectedContent).toEqual(wrapper.container.querySelector('p').textContent)
     expect(expectedLinkText).toEqual(wrapper.container.querySelector('a').textContent)
   })
@@ -75,7 +78,9 @@ describe('GettingStartedCollaborations', () => {
     const expectedContent =
       'You have no Collaboration apps configured. Talk to your teacher to get some set up.'
 
-    expect(expectedHeader).toEqual(wrapper.container.querySelector('.ic-Action-header__Heading').textContent)
+    expect(expectedHeader).toEqual(
+      wrapper.container.querySelector('.ic-Action-header__Heading').textContent
+    )
     expect(expectedContent).toEqual(wrapper.container.querySelector('p').textContent)
   })
 
@@ -89,7 +94,9 @@ describe('GettingStartedCollaborations', () => {
       'Collaborations are web-based tools to work collaboratively on tasks like taking notes or grouped papers. Get started by clicking on the "+ Collaboration" button.'
     const expectedLinkText = 'Learn more about collaborations'
 
-    expect(expectedHeader).toEqual(wrapper.container.querySelector('.ic-Action-header__Heading').textContent)
+    expect(expectedHeader).toEqual(
+      wrapper.container.querySelector('.ic-Action-header__Heading').textContent
+    )
     expect(expectedContent).toEqual(wrapper.container.querySelector('p').textContent)
     expect(expectedLinkText).toEqual(wrapper.container.querySelector('a').textContent)
   })
@@ -106,7 +113,9 @@ describe('GettingStartedCollaborations', () => {
       'Collaborations are web-based tools to work collaboratively on tasks like taking notes or grouped papers. Talk to your teacher to get started.'
     const expectedLinkText = 'Learn more about collaborations'
 
-    expect(expectedHeader).toEqual(wrapper.container.querySelector('.ic-Action-header__Heading').textContent)
+    expect(expectedHeader).toEqual(
+      wrapper.container.querySelector('.ic-Action-header__Heading').textContent
+    )
     expect(expectedContent).toEqual(wrapper.container.querySelector('p').textContent)
     expect(expectedLinkText).toEqual(wrapper.container.querySelector('a').textContent)
   })

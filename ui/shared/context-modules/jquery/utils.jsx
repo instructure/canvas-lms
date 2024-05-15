@@ -194,9 +194,9 @@ export function initPublishButton($el, data) {
 }
 
 export function setExpandAllButtonVisible(visible) {
-  const element = ENV.FEATURES.instui_header ? 
-    $('#expand_collapse_all').parent() : 
-    $('#expand_collapse_all')
+  const element = ENV.FEATURES.instui_header
+    ? $('#expand_collapse_all').parent()
+    : $('#expand_collapse_all')
   visible ? element.show() : element.hide()
 }
 
@@ -209,12 +209,14 @@ export function setExpandAllButton() {
   })
 
   if (ENV.FEATURES.instui_header) {
-    $('#expand_collapse_all').children().children().text(someVisible ? I18n.t('Collapse All') : I18n.t('Expand All'))
-  }
-  else {
+    $('#expand_collapse_all')
+      .children()
+      .children()
+      .text(someVisible ? I18n.t('Collapse All') : I18n.t('Expand All'))
+  } else {
     $('#expand_collapse_all').text(someVisible ? I18n.t('Collapse All') : I18n.t('Expand All'))
   }
-  
+
   $('#expand_collapse_all').attr(
     'aria-label',
     someVisible ? I18n.t('Collapse All Modules') : I18n.t('Expand All Modules')
@@ -228,9 +230,11 @@ export function setExpandAllButtonHandler() {
     const shouldExpand = $(this).data('expand')
 
     if (ENV.FEATURES.instui_header) {
-      $(this).children().children().text(shouldExpand ? I18n.t('Collapse All') : I18n.t('Expand All'))
-    }
-    else {
+      $(this)
+        .children()
+        .children()
+        .text(shouldExpand ? I18n.t('Collapse All') : I18n.t('Expand All'))
+    } else {
       $(this).text(shouldExpand ? I18n.t('Collapse All') : I18n.t('Expand All'))
     }
 
@@ -269,7 +273,7 @@ export function setExpandAllButtonHandler() {
 }
 
 export function resetExpandAllButtonBindings() {
-  $('#expand_collapse_all').off('click');
+  $('#expand_collapse_all').off('click')
 }
 
 export function updateProgressionState($module) {

@@ -419,7 +419,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                 color="secondary"
                                 data-testid="discussion-topic-closed-for-comments"
                               >
-                                {I18n.t("This topic is closed for comments.")}
+                                {I18n.t('This topic is closed for comments.')}
                               </Text>
                             )}
                             {props.discussionTopic.permissions?.reply && !expandedReply && (
@@ -500,24 +500,24 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                   </View>
                 </Flex.Item>
                 {props.isSummaryEnabled && (
-                <Flex.Item>
-                  <View
-                    as="div"
-                    borderWidth={responsiveProps?.border?.width}
-                    borderRadius={responsiveProps?.border?.radius}
-                    borderStyle="solid"
-                    borderColor="primary"
-                    padding="small"
-                    margin="0 0 small 0"
-                  >
-                    <Flex direction="column" padding={responsiveProps?.container?.padding}>
-                      <DiscussionSummary
-                        onDisableSummaryClick={() => props.setIsSummaryEnabled(false)}
-                        showButtonText={!matches.includes('mobile')}
-                      />
-                    </Flex>
-                  </View>
-                </Flex.Item>
+                  <Flex.Item>
+                    <View
+                      as="div"
+                      borderWidth={responsiveProps?.border?.width}
+                      borderRadius={responsiveProps?.border?.radius}
+                      borderStyle="solid"
+                      borderColor="primary"
+                      padding="small"
+                      margin="0 0 small 0"
+                    >
+                      <Flex direction="column" padding={responsiveProps?.container?.padding}>
+                        <DiscussionSummary
+                          onDisableSummaryClick={() => props.setIsSummaryEnabled(false)}
+                          showButtonText={!matches.includes('mobile')}
+                        />
+                      </Flex>
+                    </View>
+                  </Flex.Item>
                 )}
               </Flex>
             </Highlight>

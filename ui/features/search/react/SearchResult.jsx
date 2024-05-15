@@ -24,7 +24,13 @@ import {ProgressBar} from '@instructure/ui-progress'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
-import {IconLikeLine, IconAssignmentLine, IconDocumentLine, IconAnnouncementLine, IconDiscussionLine} from '@instructure/ui-icons'
+import {
+  IconLikeLine,
+  IconAssignmentLine,
+  IconDocumentLine,
+  IconAnnouncementLine,
+  IconDiscussionLine,
+} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('SmartSearch')
@@ -33,7 +39,7 @@ const preview = (body, maxLength = 512) => {
   const preview = []
   const words = body.match(/\p{L}+/gu)
 
-  if(words == null) {
+  if (words == null) {
     return ''
   }
 
@@ -72,7 +78,14 @@ export default function SearchResult({onExplain, onLike, onDislike, result}) {
             {title}
           </Heading>
 
-          <Link href={html_url} isWithinText={false} renderIcon={React.createElement(icon_class(content_type), {color: 'brand', size: 'x-small'})}>
+          <Link
+            href={html_url}
+            isWithinText={false}
+            renderIcon={React.createElement(icon_class(content_type), {
+              color: 'brand',
+              size: 'x-small',
+            })}
+          >
             {readable_type}
           </Link>
 

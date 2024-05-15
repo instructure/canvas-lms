@@ -101,14 +101,17 @@ const DifferentiatedModulesSection = ({
       setInitialState(state)
       // hasModuleOverrides and module assignees are only set once since they don't change
       setHasModuleOverrides(overrides.some(card => card.context_module_id))
-      const allModuleAssignees = overrides.filter(override => override.context_module_id)?.map(moduleOverride => {
-        if (moduleOverride.course_section_id) {
-          return `section-${moduleOverride.course_section_id}`
-        }
-        if (moduleOverride.student_ids) {
-          return moduleOverride.student_ids.map(id => `student-${id}`)
-        }
-      }).flat()
+      const allModuleAssignees = overrides
+        .filter(override => override.context_module_id)
+        ?.map(moduleOverride => {
+          if (moduleOverride.course_section_id) {
+            return `section-${moduleOverride.course_section_id}`
+          }
+          if (moduleOverride.student_ids) {
+            return moduleOverride.student_ids.map(id => `student-${id}`)
+          }
+        })
+        .flat()
       setModuleAssignees(allModuleAssignees)
       // checkPoint is set every time the user applies changes to the overrides
       setCheckPoint(state)

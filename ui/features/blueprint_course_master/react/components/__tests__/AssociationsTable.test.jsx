@@ -26,7 +26,6 @@ import getSampleData from './getSampleData'
 import sinon from 'sinon'
 
 describe('AssociationsTable component', () => {
-
   const focusManager = new FocusManager()
   focusManager.before = document.body
 
@@ -52,15 +51,21 @@ describe('AssociationsTable component', () => {
     const rows = tree.container.querySelectorAll('tr[data-testid="associations-course-row"]')
 
     expect(rows.length).toEqual(props.existingAssociations.length)
-    expect(rows[0].querySelectorAll('td')[0].textContent).toEqual(props.existingAssociations[0].name)
-    expect(rows[1].querySelectorAll('td')[0].textContent).toEqual(props.existingAssociations[1].name)
+    expect(rows[0].querySelectorAll('td')[0].textContent).toEqual(
+      props.existingAssociations[0].name
+    )
+    expect(rows[1].querySelectorAll('td')[0].textContent).toEqual(
+      props.existingAssociations[1].name
+    )
   })
 
   test('calls onRemoveAssociations when association remove button is clicked', async () => {
     const props = defaultProps()
     props.onRemoveAssociations = sinon.spy()
     const tree = render(<AssociationsTable {...props} />)
-    const button = tree.container.querySelectorAll('tr[data-testid="associations-course-row"] button')
+    const button = tree.container.querySelectorAll(
+      'tr[data-testid="associations-course-row"] button'
+    )
     await userEvent.click(button[0])
 
     expect(props.onRemoveAssociations.callCount).toEqual(1)

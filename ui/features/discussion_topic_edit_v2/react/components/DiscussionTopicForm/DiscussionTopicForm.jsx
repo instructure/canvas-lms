@@ -455,7 +455,7 @@ export default function DiscussionTopicForm({
         setTitleValidationMessages,
         setAvailabilityValidationMessages,
         shouldShowPostToSectionOption,
-        sectionIdsToPostTo,
+        sectionIdsToPostTo
       )
     ) {
       const payload = createSubmitPayload(shouldPublish)
@@ -758,7 +758,7 @@ export default function DiscussionTopicForm({
               </View>
               <Tooltip renderTip={checkpointsToolTipText} on={['hover', 'focus']} color="primary">
                 <div
-                  style={{display: "inline-block", marginLeft: theme.spacing.xxSmall}}
+                  style={{display: 'inline-block', marginLeft: theme.spacing.xxSmall}}
                   // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                   tabIndex="0"
                 >

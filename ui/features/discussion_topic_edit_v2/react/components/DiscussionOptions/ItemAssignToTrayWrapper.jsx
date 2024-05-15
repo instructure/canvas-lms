@@ -140,11 +140,16 @@ export const ItemAssignToTrayWrapper = () => {
       inputObj.student_ids.forEach(id => {
         outputObj.assignedList.push('user_' + id)
       })
-    } else if(inputObj.course_id) {
+    } else if (inputObj.course_id) {
       outputObj.assignedList.push('course_' + inputObj.course_id)
     }
 
-    if (!inputObj.course_section_id && !inputObj.course_id && !inputObj.student_ids && !inputObj.noop_id) {
+    if (
+      !inputObj.course_section_id &&
+      !inputObj.course_id &&
+      !inputObj.student_ids &&
+      !inputObj.noop_id
+    ) {
       outputObj.assignedList.push('everyone')
     }
 

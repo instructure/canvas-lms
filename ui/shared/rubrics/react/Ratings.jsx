@@ -62,7 +62,10 @@ export const Rating = props => {
     selected,
   } = props
 
-  const shaderStyle = selected && tierColor ? {borderBottom: `0.3em solid ${tierColor}`} : {backgroundColor: tierColor}
+  const shaderStyle =
+    selected && tierColor
+      ? {borderBottom: `0.3em solid ${tierColor}`}
+      : {backgroundColor: tierColor}
   const triangleStyle = {borderBottomColor: tierColor}
   const shaderClasses = classNames('shader', shaderClass)
 

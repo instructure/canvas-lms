@@ -74,7 +74,7 @@ export default function NewCourseModal({terms, children}) {
       return
     }
 
-    const successHandler = (createdCourse) => {
+    const successHandler = createdCourse => {
       closeModal()
       showFlashAlert({
         type: 'success',
@@ -88,7 +88,9 @@ export default function NewCourseModal({terms, children}) {
       })
     }
 
-    const errorHandler = showFlashError(I18n.t('Something went wrong creating the course. Please try again.'))
+    const errorHandler = showFlashError(
+      I18n.t('Something went wrong creating the course. Please try again.')
+    )
 
     CoursesStore.create({course: data}, successHandler, errorHandler)
   }

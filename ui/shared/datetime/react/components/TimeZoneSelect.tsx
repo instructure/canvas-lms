@@ -20,7 +20,7 @@ import React from 'react'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import type {CanvasSelectProps} from '@canvas/instui-bindings/react/Select'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import { captureException } from '@sentry/react'
+import {captureException} from '@sentry/react'
 
 const I18n = useI18nScope('edit_timezone')
 
