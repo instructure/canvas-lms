@@ -18,6 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {debounce} from 'lodash'
+import './datepicker'
 import * as tz from '../index'
 import fallbacks from 'translations/en.json'
 import datePickerFormat from '../datePickerFormat'
