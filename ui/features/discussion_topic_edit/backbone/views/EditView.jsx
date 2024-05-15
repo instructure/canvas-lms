@@ -47,6 +47,7 @@ import setUsageRights from '@canvas/files/util/setUsageRights'
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import 'jqueryui/tabs'
 import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('discussion_topics')
 
@@ -392,7 +393,7 @@ EditView.prototype.render = function () {
   if (this.showConditionalRelease()) {
     defer(this.loadConditionalRelease)
   }
-  this.$('.datetime_field').datetime_field()
+  renderDatetimeField(this.$('.datetime_field'))
   if (!this.model.get('locked')) {
     this.updateAllowComments()
   }

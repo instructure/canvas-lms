@@ -35,6 +35,7 @@ import enrollmentTemplate from '../jst/enrollment.handlebars'
 import sectionEnrollmentPresenter from '../sectionEnrollmentPresenter'
 import '@canvas/context-cards/react/StudentContextCardTrigger'
 import replaceTags from '@canvas/util/replaceTags'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('section')
 
@@ -110,7 +111,7 @@ $(document).ready(function () {
         },
       })
   })
-  $('.datetime_field').datetime_field()
+  renderDatetimeField($('.datetime_field'))
   $('.uncrosslist_link').click(event => {
     event.preventDefault()
     $('#uncrosslist_form').dialog({

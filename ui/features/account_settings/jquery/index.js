@@ -33,6 +33,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins' // confirmDelete, showIf
 import '@canvas/loading-image'
 import 'date-js' // Date.parse
 import 'jquery-scroll-to-visible/jquery.scrollTo'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('account_settings')
 
@@ -164,7 +165,7 @@ $(document).ready(function () {
     }
   })
 
-  $('.datetime_field').datetime_field({
+  renderDatetimeField($('.datetime_field'), {
     addHiddenInput: true,
   })
 
@@ -201,7 +202,7 @@ $(document).ready(function () {
           .then(req => req.text())
           .then(html => {
             $('#tab-reports').html(html)
-            $('#tab-reports .datetime_field').datetime_field()
+            renderDatetimeField($('#tab-reports .datetime_field'))
 
             $('.open_report_description_link').click(openReportDescriptionLink)
 

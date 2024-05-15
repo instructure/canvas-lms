@@ -38,6 +38,7 @@ import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '../../fcMomentHandlebarsHelpers'
 import {encodeQueryString} from '@canvas/query-string-encoding'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('calendar')
 
@@ -340,7 +341,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
 
   setupTimeAndDatePickers() {
     const $field = this.$el.find('.datetime_field')
-    return $field.datetime_field({
+    return renderDatetimeField($field, {
       datepicker: {
         dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday')),
       },

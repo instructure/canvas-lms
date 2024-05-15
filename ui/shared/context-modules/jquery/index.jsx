@@ -40,6 +40,7 @@ import axios from '@canvas/axios'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {dateString, datetimeString} from '@canvas/datetime/date-functions'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
@@ -2184,7 +2185,7 @@ $(document).ready(function () {
     Helper.externalUrlLinkClick(event, $(this))
   })
 
-  $('.datetime_field').datetime_field()
+  renderDatetimeField($('.datetime_field'))
 
   $(document).on('mouseover', '.context_module', function () {
     $('.context_module_hover').removeClass('context_module_hover')
