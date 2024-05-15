@@ -842,7 +842,7 @@ self.user,
   def notification_targets
     case path_type
     when "push"
-      user.notification_endpoints.pluck(:arn)
+      user.notification_endpoints.select("DISTINCT ON (token, arn) *").map(&:arn)
     when "twitter"
       twitter_service = user.user_services.where(service: "twitter").first
       return [] unless twitter_service
