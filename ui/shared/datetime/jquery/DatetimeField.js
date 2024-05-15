@@ -122,6 +122,18 @@ function computeDatepickerDefaults() {
   }
 }
 
+export function renderDatetimeField($fields, options) {
+  options = {...options}
+  $fields.each(function () {
+    const $field = $(this)
+    if (!$field.hasClass('datetime_field_enabled')) {
+      $field.addClass('datetime_field_enabled')
+      new DatetimeField($field, options)
+    }
+  })
+  return $fields
+}
+
 // adds datepicker and suggest functionality to the specified $field
 export default class DatetimeField {
   constructor($field, options = {}) {

@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import DatetimeField from './DatetimeField'
+import {renderDatetimeField} from './DatetimeField'
 import '@canvas/jquery-keycodes'
 import 'jqueryui/datepicker'
 import './datepicker'
@@ -25,26 +25,19 @@ import './datepicker'
 $.fn.date_field = function (options) {
   options = {...options}
   options.dateOnly = true
-  this.datetime_field(options)
+  renderDatetimeField(this, options)
   return this
 }
 
 $.fn.time_field = function (options) {
   options = {...options}
   options.timeOnly = true
-  this.datetime_field(options)
+  renderDatetimeField(this, options)
   return this
 }
 
 $.fn.datetime_field = function (options) {
-  options = {...options}
-  this.each(function () {
-    const $field = $(this)
-    if (!$field.hasClass('datetime_field_enabled')) {
-      $field.addClass('datetime_field_enabled')
-      new DatetimeField($field, options)
-    }
-  })
+  renderDatetimeField(this, options)
   return this
 }
 
