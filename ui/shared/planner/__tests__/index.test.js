@@ -17,7 +17,7 @@
  */
 
 import moxios from 'moxios'
-import {findByTestId, render} from '@testing-library/react'
+import {findByTestId, render, waitFor, getByTestId, act} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import {
   store,
@@ -126,11 +126,13 @@ describe('with mock api', () => {
     })
 
     it('renders into provided divs', async () => {
-      loadPlannerDashboard()
-      await findByTestId(document.body, 'PlannerApp')
-      await findByTestId(document.body, 'PlannerHeader')
-      expect(document.querySelector('.PlannerApp')).toBeTruthy()
-      expect(document.querySelector('.PlannerHeader')).toBeTruthy()
+      await act(async () => loadPlannerDashboard())
+      await waitFor(() => {
+        expect(getByTestId(document.body, 'PlannerApp')).toBeTruthy()
+        expect(getByTestId(document.body, 'PlannerHeader')).toBeTruthy()
+        expect(document.querySelector('.PlannerApp')).toBeTruthy()
+        expect(document.querySelector('.PlannerHeader')).toBeTruthy()
+      })
     })
 
     it('dispatches getPlannerItems and getInitialOpportunities', async () => {
