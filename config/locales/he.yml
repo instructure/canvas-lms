@@ -10950,6 +10950,9 @@ he:
       new_tab: "כלי זה יש לטעון בחלון חדש של דפדפן"
       new_tab_expired: "ה Session של כלי זה פג. יש לרענן את הדף כדי להכנס לכלי זה שוב"
       new_tab_loaded: "כלי זה נטען בהצלחה בחלון דפדפן חדש. יש לרענן את הדף כדי לחזור לכלי."
+    registrations: 
+      index: 
+        title: תוספות
   lti2: 
     register_tool: "רישום כלי"
   lti_2_reregistration_afabde25: "הרשמת LTI 2"
