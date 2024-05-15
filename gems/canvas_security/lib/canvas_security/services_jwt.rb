@@ -73,9 +73,18 @@ class CanvasSecurity::ServicesJwt
   end
 
   # Symmetric services JWTs are now deprecated
-  def self.generate(payload_data, base64 = true, symmetric: false)
+  def self.generate(payload_data, base64 = true, symmetric: false, encrypt: true)
+    raise ArgumentError, "Cannot generate a symmetric, non-encrypted JWT" if symmetric && !encrypt
+
     payload = create_payload(payload_data)
-    crypted_token = if symmetric
+    crypted_token = if !encrypt
+                      CanvasSecurity.create_jwt(
+                        payload,
+                        nil,
+                        CanvasSecurity::ServicesJwt::KeyStorage.present_key,
+                        :autodetect
+                      )
+                    elsif symmetric
                       CanvasSecurity.create_encrypted_jwt(payload, signing_secret, encryption_secret)
                     else
                       CanvasSecurity.create_encrypted_jwt(
