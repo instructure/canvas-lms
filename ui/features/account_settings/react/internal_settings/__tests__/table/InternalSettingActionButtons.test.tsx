@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
-import {InternalSettingActionButtons} from '../../table/InternalSettingActionButtons'
 import React from 'react'
-import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {InternalSettingActionButtons} from '../../table/InternalSettingActionButtons'
 
 const onSubmitChanges = jest.fn()
 const onClearChanges = jest.fn()
@@ -58,7 +58,7 @@ describe('InternalSettingActionButtons', () => {
   })
 
   it('buttons call the appropriate callbacks', async () => {
-    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
+    const user = userEvent.setup()
     const {getByText, rerender} = render(
       <InternalSettingActionButtons
         name="my_setting"
@@ -68,7 +68,7 @@ describe('InternalSettingActionButtons', () => {
       />
     )
 
-    await user.click(getByText('Delete "my_setting"'))
+    await user.click(getByText('Delete "my_setting"').closest('button') as HTMLElement)
     expect(onDelete).toHaveBeenCalled()
 
     rerender(
@@ -81,10 +81,10 @@ describe('InternalSettingActionButtons', () => {
       />
     )
 
-    await user.click(getByText('Save "my_setting"'))
+    await user.click(getByText('Save "my_setting"').closest('button') as HTMLElement)
     expect(onSubmitChanges).toHaveBeenCalled()
 
-    await user.click(getByText('Reset "my_setting"'))
+    await user.click(getByText('Reset "my_setting"').closest('button') as HTMLElement)
     expect(onClearChanges).toHaveBeenCalled()
   })
 
