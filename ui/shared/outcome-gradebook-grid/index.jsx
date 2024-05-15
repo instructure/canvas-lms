@@ -507,7 +507,7 @@ const Grid = {
         {
           grid,
           averageFn: Grid.averageFn,
-          redrawFn: Grid.View.redrawHeader
+          redrawFn: Grid.View.redrawHeader,
         },
         null
       )

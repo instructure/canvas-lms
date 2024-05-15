@@ -29,7 +29,6 @@ import {isValidDeepLinkingEvent} from '@canvas/deep-linking/DeepLinking'
 import processSingleContentItem from '@canvas/deep-linking/processors/processSingleContentItem'
 import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 
-
 const attachListeners = () => {
   // LTI 1.3 deep linking handler
   window.addEventListener('message', async event => {
@@ -54,9 +53,9 @@ const attachListeners = () => {
 
   // called by LTI 1.1 content item handler
   handleExternalContentMessages({
-    ready: (data) => {
+    ready: data => {
       store.dispatch(actions.externalContentReady(data))
-    }
+    },
   })
 }
 

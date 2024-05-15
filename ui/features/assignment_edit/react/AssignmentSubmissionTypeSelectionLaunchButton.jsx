@@ -28,7 +28,7 @@ export default function AssignmentSubmissionTypeSelectionLaunchButton(props) {
   const {title, description, icon_url: iconUrl} = tool
 
   return (
-      <BaseButton
+    <BaseButton
       id="assignment_submission_type_selection_launch_button"
       display="block"
       color="secondary"
@@ -37,19 +37,19 @@ export default function AssignmentSubmissionTypeSelectionLaunchButton(props) {
       withBorder={true}
       onClick={onClick}
       renderIcon={iconUrl ? <img src={iconUrl} width="28px" height="28px" /> : undefined}
-      >
-        <View>
-          <Text as="div" id="title_text">
-            {title}
+    >
+      <View>
+        <Text as="div" id="title_text">
+          {title}
+        </Text>
+        {description && (
+          <Text weight="light" size="small">
+            <TruncateText as="div" id="desc_text" maxLines={1}>
+              {description}
+            </TruncateText>
           </Text>
-          {description && (
-            <Text weight="light" size="small">
-              <TruncateText as="div" id="desc_text" maxLines={1}>
-                {description}
-              </TruncateText>
-            </Text>
-          )}
-        </View>
-      </BaseButton>
+        )}
+      </View>
+    </BaseButton>
   )
 }

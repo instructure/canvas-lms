@@ -23,7 +23,6 @@ import SyncHistoryItem from '../SyncHistoryItem'
 import getSampleData from './getSampleData'
 
 describe('SyncHistoryItem component', () => {
-
   const defaultProps = () => ({
     heading: null,
     migration: getSampleData().history[0],

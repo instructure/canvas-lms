@@ -25,7 +25,7 @@ describe('ContentTypeExternalToolTray', () => {
   const tool = {id: '1', base_url: 'https://one.lti.com/', title: 'First LTI'}
   const onDismiss = jest.fn()
   const onExternalContentReady = jest.fn()
-  const extraQueryParams = {param1: "value1", param2: "value2"}
+  const extraQueryParams = {param1: 'value1', param2: 'value2'}
 
   function renderTray(props) {
     return render(
@@ -56,13 +56,12 @@ describe('ContentTypeExternalToolTray', () => {
     expect(onDismiss.mock.calls.length).toBe(1)
   })
 
-  describe ('external content message handling', () => {
+  describe('external content message handling', () => {
     const origEnv = {...window.ENV}
     const origin = 'http://example.com'
-    beforeAll(() => window.ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = origin)
-    afterAll(() => window.ENV = origEnv)
-    const sendPostMessage = (data) =>
-      fireEvent(window, new MessageEvent('message', {data, origin}))
+    beforeAll(() => (window.ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = origin))
+    afterAll(() => (window.ENV = origEnv))
+    const sendPostMessage = data => fireEvent(window, new MessageEvent('message', {data, origin}))
 
     it('calls onExternalContentReady when it receives an externalContentReady postMessage', () => {
       renderTray()

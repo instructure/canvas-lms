@@ -69,7 +69,7 @@ test('state triggered', function () {
 })
 
 test('render', async function () {
-  const user = userEvent.setup({ delay: null })
+  const user = userEvent.setup({delay: null})
   const clock = sinon.useFakeTimers()
   sinon.stub(CourseEpubExportStore, 'create')
 

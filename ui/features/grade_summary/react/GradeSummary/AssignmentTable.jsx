@@ -209,17 +209,18 @@ const AssignmentTable = ({
                   )
                 : null
             })}
-        {!hideTotalRow && totalRow(
-          queryData,
-          calculateOnlyGradedAssignments,
-          getCurrentOrFinalGrade(
-            getGradingPeriodID() === '0',
+        {!hideTotalRow &&
+          totalRow(
+            queryData,
             calculateOnlyGradedAssignments,
-            courseGrades?.current,
-            courseGrades?.final,
-            activeWhatIfScores
-          )
-        )}
+            getCurrentOrFinalGrade(
+              getGradingPeriodID() === '0',
+              calculateOnlyGradedAssignments,
+              courseGrades?.current,
+              courseGrades?.final,
+              activeWhatIfScores
+            )
+          )}
       </Table.Body>
     </Table>
   )

@@ -38,15 +38,18 @@ class SectionInfo extends React.Component {
   }
 
   render() {
-    const sections = this.props.user.enrollments.map(e => {
-      return {...e.section, state: e.state }
-    }).filter(s => s != null)
+    const sections = this.props.user.enrollments
+      .map(e => {
+        return {...e.section, state: e.state}
+      })
+      .filter(s => s != null)
 
     if (sections.length > 0) {
       const sectionNames = sections
         .map(section => {
-          return section.state === 'inactive' ?
-            I18n.t('%{section_name} - Inactive', {section_name: section.name}) : section.name
+          return section.state === 'inactive'
+            ? I18n.t('%{section_name} - Inactive', {section_name: section.name})
+            : section.name
         })
         .sort()
       return (

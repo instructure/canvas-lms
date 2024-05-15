@@ -25,7 +25,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import AnnouncementRow from '@canvas/announcements/react/components/AnnouncementRow'
 import ready from '@instructure/ready'
-import { captureException } from '@sentry/react'
+import {captureException} from '@sentry/react'
 
 const I18n = useI18nScope('announcements_on_home_page')
 

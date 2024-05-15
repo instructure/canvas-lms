@@ -27,7 +27,7 @@ import {CookiePolicy} from '@microsoft/immersive-reader-sdk'
 import WithBreakpoints from '@canvas/with-breakpoints'
 import ContentChunker from './ContentChunker'
 import ContentUtils from './ContentUtils'
-import { captureException } from '@sentry/react'
+import {captureException} from '@sentry/react'
 
 const I18n = useI18nScope('ImmersiveReader')
 

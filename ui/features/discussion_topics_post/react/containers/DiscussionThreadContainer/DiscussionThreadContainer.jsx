@@ -83,7 +83,9 @@ export const DiscussionThreadContainer = props => {
   const {searchTerm, filter, allThreadsStatus, expandedThreads, setExpandedThreads} =
     useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const {replyFromId, setReplyFromId, usedThreadingToolbarChildRef} = useContext(DiscussionManagerUtilityContext)
+  const {replyFromId, setReplyFromId, usedThreadingToolbarChildRef} = useContext(
+    DiscussionManagerUtilityContext
+  )
   const [expandReplies, setExpandReplies] = useState(
     defaultExpandedReplies(props.discussionEntry._id)
   )
@@ -537,23 +539,22 @@ export const DiscussionThreadContainer = props => {
                                 }
                               : null
                           }
-                          onMarkThreadAsRead={readState => { 
-                              window['ENV'].discussions_deep_link = {
-                                root_entry_id: props.discussionEntry.rootEntryId,
-                                parent_id: props.discussionEntry.parentId,
-                                entry_id: props.discussionEntry._id
-                              }
-                              updateDiscussionThreadReadState({
-                                variables: {
-                                  discussionEntryId: props.discussionEntry.rootEntryId
-                                    ? props.discussionEntry.rootEntryId
-                                    : props.discussionEntry.id,
-                                  read: readState,
-                                },
-                              })
-                              props.setHighlightEntryId(props.discussionEntry._id)
+                          onMarkThreadAsRead={readState => {
+                            window['ENV'].discussions_deep_link = {
+                              root_entry_id: props.discussionEntry.rootEntryId,
+                              parent_id: props.discussionEntry.parentId,
+                              entry_id: props.discussionEntry._id,
                             }
-                          }
+                            updateDiscussionThreadReadState({
+                              variables: {
+                                discussionEntryId: props.discussionEntry.rootEntryId
+                                  ? props.discussionEntry.rootEntryId
+                                  : props.discussionEntry.id,
+                                read: readState,
+                              },
+                            })
+                            props.setHighlightEntryId(props.discussionEntry._id)
+                          }}
                         />
                       ) : null
                     }

@@ -167,7 +167,8 @@ function EditView() {
   this.handleGradingTypeChange = this.handleGradingTypeChange.bind(this)
   this.handleRestrictFileUploadsChange = this.handleRestrictFileUploadsChange.bind(this)
   this.renderDefaultExternalTool = this.renderDefaultExternalTool.bind(this)
-  this.renderAssignmentSubmissionTypeSelectionLaunchButton = this.renderAssignmentSubmissionTypeSelectionLaunchButton.bind(this)
+  this.renderAssignmentSubmissionTypeSelectionLaunchButton =
+    this.renderAssignmentSubmissionTypeSelectionLaunchButton.bind(this)
   this.defaultExternalToolName = this.defaultExternalToolName.bind(this)
   this.defaultExternalToolUrl = this.defaultExternalToolUrl.bind(this)
   this.defaultExternalToolEnabled = this.defaultExternalToolEnabled.bind(this)
@@ -1026,7 +1027,7 @@ EditView.prototype.handlePlacementExternalToolSelect = function (selection) {
     this.$externalToolsIframeHeight.val('')
   }
 
-    this.renderAssignmentSubmissionTypeSelectionLaunchButton()
+  this.renderAssignmentSubmissionTypeSelectionLaunchButton()
 }
 
 EditView.prototype.handleSubmissionTypeSelectionLaunch = function () {

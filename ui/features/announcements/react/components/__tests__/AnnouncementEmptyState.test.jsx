@@ -21,7 +21,6 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import AnnouncementEmptyState from '../AnnouncementEmptyState'
 
-
 const renderComponent = (props = {}) => {
   const defaultProps = {
     canCreate: true,

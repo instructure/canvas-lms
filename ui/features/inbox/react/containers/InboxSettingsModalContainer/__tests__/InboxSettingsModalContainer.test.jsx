@@ -19,7 +19,7 @@
 import React from 'react'
 import InboxSettingsModalContainer, {
   SAVE_SETTINGS_OK,
-  SAVE_SETTINGS_FAIL
+  SAVE_SETTINGS_FAIL,
 } from '../InboxSettingsModalContainer'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {within} from '@testing-library/dom'
@@ -84,15 +84,11 @@ describe('InboxSettingsModalContainer', () => {
     server.close()
   })
 
-  const setup = ({
-    onDismissWithAlert = onDismissWithAlertMock
-  } = {}) =>
+  const setup = ({onDismissWithAlert = onDismissWithAlertMock} = {}) =>
     render(
       <ApolloProvider client={mswClient}>
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
-          <InboxSettingsModalContainer
-            onDismissWithAlert={onDismissWithAlert}
-          />
+          <InboxSettingsModalContainer onDismissWithAlert={onDismissWithAlert} />
         </AlertManagerContext.Provider>
       </ApolloProvider>
     )
@@ -171,7 +167,7 @@ describe('InboxSettingsModalContainer', () => {
         fireEvent.click(getByText('15').closest('button'))
         fireEvent.click(getByLabelText(new RegExp('End Date')))
         fireEvent.click(getByText('16').closest('button'))
-        await waitFor(() => { 
+        await waitFor(() => {
           fireEvent.click(getByText('Save'))
           expect(getAllByText('Date cannot be in the past').length).toBe(2)
         })

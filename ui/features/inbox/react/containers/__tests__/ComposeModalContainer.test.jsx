@@ -84,7 +84,7 @@ describe('ComposeModalContainer', () => {
     conversation,
     selectedIds = ['1'],
     isSubmissionCommentsType = false,
-    inboxSettingsFeature = false
+    inboxSettingsFeature = false,
   } = {}) =>
     render(
       <ApolloProvider client={mswClient}>

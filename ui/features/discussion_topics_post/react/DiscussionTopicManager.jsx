@@ -341,7 +341,8 @@ const DiscussionTopicManager = props => {
         <Responsive
           match="media"
           query={responsiveQuerySizes({mobile: true, desktop: true})}
-          props={{mobile: {
+          props={{
+            mobile: {
               viewPortWidth: '100vw',
             },
             desktop: {

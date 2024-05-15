@@ -31,7 +31,10 @@ class IndexView extends PaginatedCollectionView {
   // needed to render the react component at the top of the page
   // in the right lifecycle method of backbone
   afterRender() {
-    return ReactDOM.render(<ProgressionModuleHeader bridge={this.collection} />, document.getElementById('progression-module-header-root'))
+    return ReactDOM.render(
+      <ProgressionModuleHeader bridge={this.collection} />,
+      document.getElementById('progression-module-header-root')
+    )
   }
 }
 
@@ -58,7 +61,7 @@ ready(() => {
     modules_url: ENV.MODULES_URL,
     autoFetch: true,
   })
- 
+
   if (!ENV.RESTRICTED_LIST) {
     // attach the view's scroll container once it's populated
     students.fetch({
@@ -73,7 +76,7 @@ ready(() => {
 
   // we need to have the backbone view in the dom before we can render the react component
   indexView.$el.appendTo($('#content'))
-  
+
   indexView.render()
 
   if (ENV.RESTRICTED_LIST && ENV.VISIBLE_STUDENTS.length === 1) {

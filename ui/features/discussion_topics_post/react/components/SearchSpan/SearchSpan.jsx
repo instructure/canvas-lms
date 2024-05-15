@@ -103,5 +103,5 @@ SearchSpan.propTypes = {
   /**
    * Language code if the span has been translated
    */
-  lang: PropTypes.string
+  lang: PropTypes.string,
 }

@@ -23,16 +23,15 @@ import SyncHistory from '../SyncHistory'
 import getSampleData from './getSampleData'
 
 describe('SyncHistory component', () => {
-
-const defaultProps = () => ({
-  loadHistory: () => {},
-  isLoadingHistory: false,
-  hasLoadedHistory: false,
-  loadAssociations: () => {},
-  isLoadingAssociations: false,
-  hasLoadedAssociations: false,
-  migrations: getSampleData().history,
-})
+  const defaultProps = () => ({
+    loadHistory: () => {},
+    isLoadingHistory: false,
+    hasLoadedHistory: false,
+    loadAssociations: () => {},
+    isLoadingAssociations: false,
+    hasLoadedAssociations: false,
+    migrations: getSampleData().history,
+  })
 
   test('renders the SyncHistory component', () => {
     const tree = shallow(<SyncHistory {...defaultProps()} />)

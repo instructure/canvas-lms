@@ -56,17 +56,16 @@ export default function SearchApp() {
   }, [])
 
   const checkIndexStatus = useCallback(() => {
-    fetch(`/api/v1/courses/${ENV.COURSE_ID}/smartsearch/index_status`)
-      .then(res => {
-        res.json().then(({status, progress}) => {
-          if (status === 'indexing') {
-            setIndexingProgress(progress)
-            setTimeout(checkIndexStatus, 2000)
-          } else {
-            setIndexingProgress(null)
-          }
-        })
+    fetch(`/api/v1/courses/${ENV.COURSE_ID}/smartsearch/index_status`).then(res => {
+      res.json().then(({status, progress}) => {
+        if (status === 'indexing') {
+          setIndexingProgress(progress)
+          setTimeout(checkIndexStatus, 2000)
+        } else {
+          setIndexingProgress(null)
+        }
       })
+    })
   }, [])
 
   useEffect(() => {
@@ -219,25 +218,22 @@ export default function SearchApp() {
         </fieldset>
       </form>
 
-      {
-        indexingProgress ? (
-          <IndexingProgress progress={indexingProgress} />
-        ) : isLoading ? (
-          <Flex justifyItems="center">
-            <Spinner renderTitle={I18n.t('Searching')} />
-          </Flex>
-        ) : (
-          <View display="block" className="searchResults" margin="small 0 0 0">
-            <SearchResults
-              onDislike={onDislike}
-              onExplain={onExplain}
-              onLike={onLike}
-              searchResults={searchResults}
-            />
-          </View>
-        )
-      }
-
+      {indexingProgress ? (
+        <IndexingProgress progress={indexingProgress} />
+      ) : isLoading ? (
+        <Flex justifyItems="center">
+          <Spinner renderTitle={I18n.t('Searching')} />
+        </Flex>
+      ) : (
+        <View display="block" className="searchResults" margin="small 0 0 0">
+          <SearchResults
+            onDislike={onDislike}
+            onExplain={onExplain}
+            onLike={onLike}
+            searchResults={searchResults}
+          />
+        </View>
+      )}
     </View>
   )
 }

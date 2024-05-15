@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
-import { captureException } from '@sentry/react'
+import {captureException} from '@sentry/react'
 
 const I18n = useI18nScope('external_toolsdeepLinking')
 

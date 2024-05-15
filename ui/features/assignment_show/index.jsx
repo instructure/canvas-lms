@@ -225,7 +225,7 @@ function renderItemAssignToTray(open, returnFocusTo, itemProps) {
   )
 }
 
-function renderDrawerLayout (tool, onDismiss) {
+function renderDrawerLayout(tool, onDismiss) {
   const mountPoint = document.getElementById('drawer-layout-mount-point')
   const pageContent = document.getElementById('application')
 
@@ -238,7 +238,7 @@ function renderDrawerLayout (tool, onDismiss) {
         pageContentTitle=""
         pageContentMinWidth="40rem"
         pageContentHeight={window.innerHeight}
-        acceptedResourceTypes={["assignment"]}
+        acceptedResourceTypes={['assignment']}
         targetResourceType="assignment"
         allowItemSelection={false}
         selectableItems={[]}
@@ -253,7 +253,9 @@ function renderDrawerLayout (tool, onDismiss) {
 }
 
 ready(() => {
-  if (!document.getElementById('drawer-layout-mount-point')) { return }
+  if (!document.getElementById('drawer-layout-mount-point')) {
+    return
+  }
 
   let tool = null
   const onDismiss = () => {

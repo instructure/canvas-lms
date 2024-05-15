@@ -169,11 +169,19 @@ describe('Dashboard Options Menu', () => {
     )
 
     dashboardMenu.handleColorOverlayOptionSelect(false)
-    expect(document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity).toEqual('0')
-    expect(document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity).toEqual('1')
+    expect(
+      document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity
+    ).toEqual('0')
+    expect(
+      document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity
+    ).toEqual('1')
 
     dashboardMenu.handleColorOverlayOptionSelect(true)
-    expect(document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity).toEqual('0.6')
-    expect(document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity).toEqual('0')
+    expect(
+      document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity
+    ).toEqual('0.6')
+    expect(
+      document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity
+    ).toEqual('0')
   })
 })

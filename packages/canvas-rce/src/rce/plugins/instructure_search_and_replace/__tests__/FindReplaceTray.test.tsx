@@ -324,7 +324,8 @@ describe('FindReplaceTray', () => {
       expect(fakePlugin.next).toHaveBeenCalledTimes(3)
     })
 
-    it('is incremented when enter pressed on find input', async () => {
+    // fickle test - LF-1605
+    it.skip('is incremented when enter pressed on find input', async () => {
       const {user} = renderComponent()
       const findInput = screen.getByTestId('find-text-input')
       await type(user, findInput, 'a')

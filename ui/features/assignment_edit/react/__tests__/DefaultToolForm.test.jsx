@@ -29,10 +29,9 @@ const renderComponent = (props = {}) => {
     courseId: 1,
     toolName: 'Awesome Tool',
     previouslySelected: false,
-  };
+  }
   return render(<DefaultToolForm {...defaultProps} {...props} />)
 }
-
 
 describe('DefaultToolForm', () => {
   beforeEach(() => {
@@ -41,13 +40,13 @@ describe('DefaultToolForm', () => {
 
   it('renders a button to launch the tool', () => {
     const wrapper = renderComponent()
-    expect(wrapper.getByRole('button', { name: 'Add Content' })).toBeInTheDocument()
+    expect(wrapper.getByRole('button', {name: 'Add Content'})).toBeInTheDocument()
   })
 
   it('launches the tool when the button is clicked', async () => {
     SelectContentDialog.Events.onContextExternalToolSelect = jest.fn()
     const wrapper = renderComponent()
-    await userEvent.click(wrapper.getByRole('button', { name: 'Add Content' }))
+    await userEvent.click(wrapper.getByRole('button', {name: 'Add Content'}))
     expect(SelectContentDialog.Events.onContextExternalToolSelect).toHaveBeenCalled()
     SelectContentDialog.Events.onContextExternalToolSelect.mockRestore()
   })
@@ -59,7 +58,7 @@ describe('DefaultToolForm', () => {
 
   it('sets the button text', () => {
     const wrapper = renderComponent({toolButtonText: 'Custom Button Text'})
-    expect(wrapper.getByRole('button', { name: 'Custom Button Text' })).toBeInTheDocument()
+    expect(wrapper.getByRole('button', {name: 'Custom Button Text'})).toBeInTheDocument()
   })
 
   it('renders the success message if previouslySelected is true', () => {
@@ -85,7 +84,11 @@ describe('DefaultToolForm', () => {
     it('renders an error message', async () => {
       const wrapper = renderComponent({previouslySelected: true})
 
-      await waitFor(() => expect(wrapper.getByText('The tool is not installed in the course or account')).toBeInTheDocument())
+      await waitFor(() =>
+        expect(
+          wrapper.getByText('The tool is not installed in the course or account')
+        ).toBeInTheDocument()
+      )
     })
   })
 })

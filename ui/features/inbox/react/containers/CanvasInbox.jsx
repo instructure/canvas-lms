@@ -53,7 +53,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import InboxSettingsModalContainer, {
   SAVE_SETTINGS_OK,
   SAVE_SETTINGS_FAIL,
-  LOAD_SETTINGS_FAIL
+  LOAD_SETTINGS_FAIL,
 } from './InboxSettingsModalContainer/InboxSettingsModalContainer'
 
 const I18n = useI18nScope('conversations_2')
@@ -732,7 +732,8 @@ const CanvasInbox = () => {
                         margin="none"
                         renderIcon={IconComposeLine}
                         onClick={() => {
-                          if (/#filter=type=submission_comments/.test(window.location.hash)) window.location.hash = '#filter=type=inbox'
+                          if (/#filter=type=submission_comments/.test(window.location.hash))
+                            window.location.hash = '#filter=type=inbox'
                           setComposeModal(true)
                         }}
                         testid="compose"
@@ -877,9 +878,7 @@ const CanvasInbox = () => {
             </Flex.Item>
           </Flex>
           {inboxSettingsFeature && inboxSettingsModal && (
-            <InboxSettingsModalContainer
-              onDismissWithAlert={handleDismissWithAlert}
-            />
+            <InboxSettingsModalContainer onDismissWithAlert={handleDismissWithAlert} />
           )}
           <ComposeModalManager
             conversation={selectedConversations[0]}

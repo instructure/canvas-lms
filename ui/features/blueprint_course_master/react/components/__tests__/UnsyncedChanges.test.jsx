@@ -92,7 +92,6 @@ function connect(props = {...defaultProps}) {
 }
 
 describe('UnsyncedChanges component', () => {
-
   test('renders the UnsyncedChanges component', () => {
     const tree = render(connect())
     let node = tree.container.querySelector('.bcs__unsynced-item__table')

@@ -131,7 +131,9 @@ class SearchResultsComponent extends Component {
         <Table.Head>
           <Table.Row>
             {colHeaders.map(header => (
-              <Table.ColHeader key={`${header}-column`} id={`${header}-column`}>{header}</Table.ColHeader>
+              <Table.ColHeader key={`${header}-column`} id={`${header}-column`}>
+                {header}
+              </Table.ColHeader>
             ))}
           </Table.Row>
         </Table.Head>

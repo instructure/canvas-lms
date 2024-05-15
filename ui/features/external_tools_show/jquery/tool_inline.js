@@ -161,9 +161,7 @@ ready(() => {
             // module item navigation from PLAT-1687
             const sequenceFooterHeight = $('#sequence_footer').outerHeight(true) || 0
             toolResizer.resize_tool_content_wrapper(
-              $window.height() -
-                canvas_chrome_height -
-                sequenceFooterHeight
+              $window.height() - canvas_chrome_height - sequenceFooterHeight
             )
           }
         }

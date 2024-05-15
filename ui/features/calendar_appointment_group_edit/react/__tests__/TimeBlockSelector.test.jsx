@@ -32,8 +32,8 @@ let props = {
         date: '2016-10-26',
         startTime: '10:00',
         endTime: '15:00',
-      }
-    }
+      },
+    },
   ],
   onChange() {},
 }
@@ -109,7 +109,9 @@ describe('TimeBlockSelector', () => {
     newRow.timeData.startTime = new Date('Oct 26 2016 11:00')
     newRow.timeData.endTime = new Date('Oct 26 2016 16:00')
     ref.current.handleSetData(ref.current.state.timeBlockRows[1].slotEventId, newRow)
-    expect(ref.current.state.timeBlockRows[0].timeData.endTime).toEqual(new Date('Oct 26 2016 16:00'))
+    expect(ref.current.state.timeBlockRows[0].timeData.endTime).toEqual(
+      new Date('Oct 26 2016 16:00')
+    )
   })
 
   test('calls onChange when there are modifications made', async () => {

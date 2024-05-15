@@ -22,7 +22,7 @@ import {render, fireEvent} from '@testing-library/react'
 import {isRTL} from '@canvas/i18n/rtlHelper'
 
 jest.mock('@canvas/i18n/rtlHelper', () => ({
-  isRTL: jest.fn()
+  isRTL: jest.fn(),
 }))
 
 describe('useResize', () => {

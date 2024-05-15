@@ -23,13 +23,13 @@ import AssignmentSubmissionTypeSelectionLaunchButton from '../AssignmentSubmissi
 const tool = {
   title: 'Tool Title',
   description: 'The tool description.',
-  icon_url: 'https://www.example.com/icon.png'
+  icon_url: 'https://www.example.com/icon.png',
 }
 
 describe('AssignmentSubmissionTypeSelectionLaunchButton', () => {
   it('renders a button to launch the tool', () => {
     const wrapper = render(<AssignmentSubmissionTypeSelectionLaunchButton tool={tool} />)
-    expect(wrapper.getByRole('button', { name: `${tool.title} ${tool.description}` })).toBeTruthy()
+    expect(wrapper.getByRole('button', {name: `${tool.title} ${tool.description}`})).toBeTruthy()
   })
 
   it('renders an icon, a title, description', () => {

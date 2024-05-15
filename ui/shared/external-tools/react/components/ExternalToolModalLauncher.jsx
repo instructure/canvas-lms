@@ -61,18 +61,17 @@ export default class ExternalToolModalLauncher extends React.Component {
   }
 
   componentDidMount() {
-    this.removeExternalContentListener =
-      handleExternalContentMessages({
-        ready: this.onExternalToolCompleted,
-        cancel: () => this.onExternalToolCompleted({}),
-      })
+    this.removeExternalContentListener = handleExternalContentMessages({
+      ready: this.onExternalToolCompleted,
+      cancel: () => this.onExternalToolCompleted({}),
+    })
   }
 
   componentWillUnmount() {
     this.removeExternalContentListener()
   }
 
-  onExternalToolCompleted = (data) => {
+  onExternalToolCompleted = data => {
     if (this.props.onExternalContentReady) {
       this.props.onExternalContentReady(data)
     }

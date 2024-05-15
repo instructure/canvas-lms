@@ -237,7 +237,6 @@ describe('GradebookGrid CompleteIncompleteGradeInput', () => {
         waitFor(() => expect(getGradeInfo().grade).toBe('complete'))
       })
 
-
       test('sets score to points possible when "Complete" is clicked', async () => {
         await openAndClick('Open Complete/Incomplete menu')
         waitFor(() => expect(getGradeInfo().score).toBe(10))
