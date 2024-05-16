@@ -114,10 +114,14 @@ $ic-tooltip-arrow-size: 0.375rem;
       }
     }
 
-    .ic-sidenav-tray:active:hover,
-    .ic-user-tray:active:hover {
-      color: var(--ic-brand-primary);
-      background-color: var(--ic-brand-global-nav-menu-item__text-color);
+    .ic-sidenav-tray[data-selected="true"]:hover,
+    .ic-user-tray[data-selected="true"]:hover {
+      color: var(--ic-brand-primary) !important;
+      background-color: var(--ic-brand-global-nav-menu-item__text-color) !important;
+    }
+
+    .ic-logo-tray:hover {
+      color: var(--ic-brand-global-nav-menu-item__text-color) !important;
     }
 
     .ic-canvas-logo {
@@ -484,10 +488,14 @@ body.primary-nav-expanded {
         }
       }
 
-      .ic-sidenav-tray:active:hover,
-      .ic-user-tray:active:hover {
-        color: var(--ic-brand-primary);
-        background-color: var(--ic-brand-global-nav-menu-item__text-color);
+      .ic-sidenav-tray[data-selected="true"]:hover,
+      .ic-user-tray[data-selected="true"]:hover {
+        color: var(--ic-brand-primary) !important;
+        background-color: var(--ic-brand-global-nav-menu-item__text-color) !important;
+      }
+
+      .ic-logo-tray:hover {
+        color: var(--ic-brand-global-nav-menu-item__text-color) !important;
       }
 
       .ic-canvas-logo {
