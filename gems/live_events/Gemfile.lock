@@ -70,7 +70,7 @@ GEM
     rake (13.2.1)
     rdoc (6.6.3.1)
       psych (>= 4.0.0)
-    reline (0.5.6)
+    reline (0.5.7)
       io-console (~> 0.5)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
