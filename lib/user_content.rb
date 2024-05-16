@@ -218,7 +218,7 @@ module UserContent
       doc = Nokogiri::HTML5::DocumentFragment.parse(html, nil, { max_tree_depth: 10_000 })
       attributes = %w[value href longdesc src srcset title]
 
-      doc.css("img, iframe, video, source, param, a").each do |e|
+      doc.css("img, iframe, video, audio, source, param, a").each do |e|
         attributes.each do |attr|
           attribute_value = e.attributes[attr]&.value
           if attribute_value&.match?(@toplevel_regex)
