@@ -209,6 +209,7 @@ const ItemAssignToTrayContent = ({
             isValid: true,
             hasAssignees: true,
             due_at: baseDates.due_at,
+            original_due_at: baseDates.due_at,
             unlock_at: baseDates.unlock_at,
             lock_at: baseDates.lock_at,
             selectedAssigneeIds: selectedOption,
@@ -265,6 +266,7 @@ const ItemAssignToTrayContent = ({
               isValid: true,
               hasAssignees: true,
               due_at: override.due_at,
+              original_due_at: override.due_at,
               unlock_at: override.unlock_at,
               lock_at: override.lock_at,
               selectedAssigneeIds: defaultOptions,
@@ -479,6 +481,7 @@ const ItemAssignToTrayContent = ({
             removeDueDateInput={removeDueDateInput}
             cardId={card.key}
             due_at={card.due_at}
+            original_due_at={card.original_due_at}
             unlock_at={card.unlock_at}
             lock_at={card.lock_at}
             onDelete={cardCount === 1 ? undefined : handleDeleteCard}

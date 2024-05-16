@@ -157,7 +157,12 @@ export default class DateValidator {
       })
     }
 
-    if (this.hasGradingPeriods && !this.userIsAdmin && data.persisted === false) {
+    if (
+      this.hasGradingPeriods &&
+      !this.userIsAdmin &&
+      data.persisted === false &&
+      data.skip_grading_periods !== true
+    ) {
       datetimesToValidate.push({
         date: dueAt,
         range: 'grading_period_range',
@@ -195,6 +200,13 @@ export default class DateValidator {
       }
     }
     return dateRange
+  }
+
+  isDateInClosedGradingPeriod(date) {
+    if (!date || !this.hasGradingPeriods || this.userIsAdmin) return false
+    const helper = new GradingPeriodsHelper(this.gradingPeriods)
+    const dueAt = date === null ? null : new Date(this._formatDatetime(date))
+    return helper.isDateInClosedGradingPeriod(dueAt)
   }
 
   _validateMultipleGradingPeriods(date, errs) {
