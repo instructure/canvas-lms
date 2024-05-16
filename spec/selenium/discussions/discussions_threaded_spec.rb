@@ -1153,5 +1153,32 @@ describe "threaded discussions" do
         expect(fj("span:contains('#{@topic.message}')")).to be_present
       end
     end
+
+    it "shows the correct entry counts for graded group discussions" do
+      topic = create_graded_discussion(@course)
+
+      group = @course.groups.create!(name: "Group 1")
+      group.add_user(@student)
+
+      topic.group_category = @course.group_categories.create!(name: "Group Category")
+      topic.save!
+
+      subtopic = topic.child_topics.build(title: "Subtopic 1", context: group)
+      subtopic_assignment = @course.assignments.build(submission_types: "discussion_topic", title: subtopic.title)
+      subtopic_assignment.infer_times
+      subtopic_assignment.saved_by = :discussion_topic
+      subtopic.assignment = subtopic_assignment
+      subtopic.group_category = topic.group_category
+      subtopic.save
+
+      root_entry = topic.discussion_entries.create!(user: @teacher, message: "root entry")
+      topic.discussion_entries.create!(user: @teacher, message: "sub entry", root_entry_id: root_entry.id, parent_id: root_entry.id)
+
+      user_session(@teacher)
+
+      get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+
+      expect(ff("div[data-testid='replies-counter']")[1]).to include_text("1 Reply")
+    end
   end
 end
