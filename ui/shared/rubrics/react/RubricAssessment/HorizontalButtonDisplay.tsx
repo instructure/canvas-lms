@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useRef} from 'react'
 import type {RubricRating} from '../types/rubric'
 import {colors} from '@instructure/canvas-theme'
 import {Flex} from '@instructure/ui-flex'
@@ -37,6 +37,7 @@ type HorizontalButtonDisplayProps = {
   selectedRatingId?: string
   onSelectRating: (rating: RubricRating) => void
   criterionUseRange: boolean
+  shouldFocusFirstRating?: boolean
 }
 export const HorizontalButtonDisplay = ({
   isPreviewMode,
@@ -46,10 +47,19 @@ export const HorizontalButtonDisplay = ({
   selectedRatingId,
   onSelectRating,
   criterionUseRange,
+  shouldFocusFirstRating = false,
 }: HorizontalButtonDisplayProps) => {
+  const firstRatingRef = useRef<Element | null>(null)
   const selectedRating = ratings.find(rating => rating.id && rating.id === selectedRatingId)
   const selectedRatingIndex = selectedRating ? ratings.indexOf(selectedRating) : -1
   const min = criterionUseRange ? rangingFrom(ratings, selectedRatingIndex) : undefined
+
+  useEffect(() => {
+    if (shouldFocusFirstRating && firstRatingRef.current) {
+      const button = firstRatingRef.current.getElementsByTagName('button')[0]
+      button?.focus()
+    }
+  }, [shouldFocusFirstRating])
 
   const getPossibleText = (points?: number) => {
     return min != null ? possibleStringRange(min, points) : possibleString(points)
@@ -99,6 +109,11 @@ export const HorizontalButtonDisplay = ({
               key={`${rating.id}-${buttonDisplay}`}
               data-testid={`rating-button-${rating.id}-${index}`}
               aria-label={buttonAriaLabel}
+              elementRef={ref => {
+                if (index === 0) {
+                  firstRatingRef.current = ref
+                }
+              }}
             >
               {isSelfAssessment ? (
                 <SelfAssessmentRatingButton
