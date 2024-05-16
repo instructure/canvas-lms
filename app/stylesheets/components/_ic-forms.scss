@@ -944,8 +944,9 @@ form.ic-Form-group { margin: 0; }
 
 .ic-Action-header__Heading {
   margin: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
   hyphens: auto;
-  word-break: break-all;
 }
 
 .ic-Action-header__Primary {
