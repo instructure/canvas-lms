@@ -372,7 +372,7 @@ class BigBlueButtonConference < WebConference
     additional_params = {}
 
     if config[:send_avatar]
-      additional_params[:avatarUrl] = user.avatar_url
+      additional_params[:avatarURL] = user.avatar_url
     end
 
     unless user.pronouns.nil?
