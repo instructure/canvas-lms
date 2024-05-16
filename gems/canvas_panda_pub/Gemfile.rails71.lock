@@ -181,7 +181,7 @@ GEM
       redis-cluster-client (>= 0.7.0)
     redis-scripting (1.0.1)
       redis (>= 3.0)
-    reline (0.5.6)
+    reline (0.5.7)
       io-console (~> 0.5)
     rexml (3.2.8)
       strscan (>= 3.0.9)
