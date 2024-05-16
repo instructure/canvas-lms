@@ -1240,6 +1240,32 @@ describe ContentMigration do
       expect(page_to.body).to eq(body % @copy_to.id.to_s)
     end
 
+    context "reusing ContentExport" do
+      before :once do
+        # the wiki and root folder need to exist or the export will update the course
+        @copy_from.wiki_pages.create! title: "one"
+        Folder.root_folders(@copy_from)
+      end
+
+      it "reuses the ContentExport if it's newer than the course" do
+        run_course_copy
+        @copy_to.wiki_pages.where(title: "one").delete_all
+        Timecop.travel(1.minute.from_now) do
+          expect { run_course_copy }.not_to change(ContentExport, :count)
+          expect(@copy_to.wiki_pages.where(title: "one")).to exist
+        end
+      end
+
+      it "creates a new ContentExport if the course has changed since the last export" do
+        run_course_copy
+        Timecop.travel(1.minute.from_now) do
+          @copy_from.wiki_pages.create! title: "two"
+          expect { run_course_copy }.to change(ContentExport, :count).by(1)
+          expect(@copy_to.wiki_pages.where(title: "two")).to exist
+        end
+      end
+    end
+
     context "with late policy" do
       it "copies if no selection is made" do
         @copy_from.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 15.0, late_submission_interval: "day")

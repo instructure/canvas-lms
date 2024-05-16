@@ -93,6 +93,7 @@ describe ContentMigration do
       quiz.save!
       quiz2.title = "edited unpublished quiz"
       quiz2.save!
+      @copy_from.reload
 
       # run again
       @cm = ContentMigration.new(
