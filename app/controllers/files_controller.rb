@@ -646,6 +646,7 @@ class FilesController < ApplicationController
 
   def create_pending
     @context = Context.find_by_asset_string(params[:attachment][:context_code])
+    return render json: "User was undefined, refresh and try again.", status: :unprocessable_entity if @context.nil?
     @asset = Context.find_asset_by_asset_string(params[:attachment][:asset_string], @context) if params[:attachment][:asset_string]
     @check_quota = true
     permission_object = nil
