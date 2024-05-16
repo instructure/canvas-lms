@@ -22,7 +22,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import '@instructure/canvas-theme'
 import CanvasSelect from '../shared/CanvasSelect'
 
@@ -36,10 +36,10 @@ function selectProps(override = {}) {
       USE_ARROWS: 'Use arrow keys to navigate options.',
       LIST_COLLAPSED: 'List collapsed.',
       LIST_EXPANDED: 'List expanded.',
-      OPTION_SELECTED: '{option} selected.'
+      OPTION_SELECTED: '{option} selected.',
     },
     liveRegion: () => liveRegion,
-    ...override
+    ...override,
   }
 }
 
@@ -53,7 +53,7 @@ function selectOpts() {
     </CanvasSelect.Option>,
     <CanvasSelect.Option key="3" id="3" value="three">
       Three
-    </CanvasSelect.Option>
+    </CanvasSelect.Option>,
   ]
 }
 
@@ -88,21 +88,21 @@ describe('CanvasSelect component', () => {
     expect(getByDisplayValue('Two')).toBeInTheDocument()
   })
 
-  it('calls onChange when selection changes', () => {
+  it('calls onChange when selection changes', async () => {
     const handleChange = jest.fn()
     const {getByText} = renderSelect({onChange: handleChange})
 
     const label = getByText('Choose one')
-    label.click()
+    await fireEvent.click(label)
 
     // the options list is open now
     const three = getByText('Three')
-    three.click()
+    await fireEvent.click(three)
 
     expect(handleChange).toHaveBeenCalled()
   })
 
-  it('forwards the isDisabled prop', () => {
+  it('forwards the isDisabled prop', async () => {
     const handleChange = jest.fn()
     const {getByText} = render(
       <CanvasSelect {...selectProps({onChange: handleChange})}>
@@ -112,60 +112,60 @@ describe('CanvasSelect component', () => {
         <CanvasSelect.Option key="2" id="2" value="two">
           Two
         </CanvasSelect.Option>
-        <CanvasSelect.Option key="3" id="3" value="three" isDisabled>
+        <CanvasSelect.Option key="3" id="3" value="three" isDisabled={true}>
           Three
         </CanvasSelect.Option>
       </CanvasSelect>
     )
-    const label = getByText('Choose one')
-    label.click()
 
-    // the options list is open now
+    const label = getByText('Choose one')
+    await fireEvent.click(label)
+
     const three = getByText('Three')
-    three.click()
+    await fireEvent.click(three)
 
     expect(handleChange).not.toHaveBeenCalled()
   })
 
-  it('filters out undefined options', () => {
+  it('filters out undefined options', async () => {
     const {getByText} = render(
       <CanvasSelect {...selectProps()}>
         <CanvasSelect.Option key="1" id="1" value="one">
           One
         </CanvasSelect.Option>
         undefined
-        <CanvasSelect.Option key="3" id="3" value="three" isDisabled>
+        <CanvasSelect.Option key="3" id="3" value="three" isDisabled={true}>
           Three
         </CanvasSelect.Option>
       </CanvasSelect>
     )
     const label = getByText('Choose one')
-    label.click()
+    await fireEvent.click(label)
 
     expect(getByText('One')).toBeInTheDocument()
     expect(getByText('Three')).toBeInTheDocument()
   })
 
-  it('handles no children', () => {
+  it('handles no children', async () => {
     const {getByText} = render(<CanvasSelect {...selectProps({noOptionsLabel: 'No Options'})} />)
     const label = getByText('Choose one')
-    label.click()
+    await fireEvent.click(label)
 
     expect(getByText('No Options')).toBeInTheDocument()
   })
 
-  it('handles no options', () => {
+  it('handles no options', async () => {
     const {getByText} = render(
       <CanvasSelect {...selectProps({noOptionsLabel: 'No Options'})}>what is this?</CanvasSelect>
     )
     const label = getByText('Choose one')
-    label.click()
+    await fireEvent.click(label)
 
     expect(getByText('No Options')).toBeInTheDocument()
   })
 
   describe('CanvasSelectGroups', () => {
-    it('renders enumerated groups and options', () => {
+    it('renders enumerated groups and options', async () => {
       const {getByText} = render(
         <CanvasSelect {...selectProps()}>
           <CanvasSelect.Group id="1" label="Group A">
@@ -194,7 +194,7 @@ describe('CanvasSelect component', () => {
       )
       expect(getByText('Choose one')).toBeInTheDocument()
       const label = getByText('Choose one')
-      label.click()
+      await fireEvent.click(label)
 
       expect(getByText('Group A')).toBeInTheDocument()
       expect(getByText('One')).toBeInTheDocument()
@@ -202,7 +202,7 @@ describe('CanvasSelect component', () => {
       expect(getByText('Four')).toBeInTheDocument()
     })
 
-    it('renders group with one option', () => {
+    it('renders group with one option', async () => {
       const {getByText} = render(
         <CanvasSelect {...selectProps()}>
           <CanvasSelect.Group id="1" label="Group A">
@@ -214,31 +214,31 @@ describe('CanvasSelect component', () => {
       )
       expect(getByText('Choose one')).toBeInTheDocument()
       const label = getByText('Choose one')
-      label.click()
+      await fireEvent.click(label)
 
       expect(getByText('Group A')).toBeInTheDocument()
       expect(getByText('One')).toBeInTheDocument()
     })
   })
 
-  it('renders generated groups and options', () => {
+  it('renders generated groups and options', async () => {
     const data = [
       {
         label: 'Group A',
         items: [
           {id: '1', value: 'one', label: 'One'},
           {id: '2', value: 'two', label: 'Two'},
-          {id: '3', value: 'three', label: 'Three'}
-        ]
+          {id: '3', value: 'three', label: 'Three'},
+        ],
       },
       {
         label: 'Group B',
         items: [
           {id: '4', value: 'four', label: 'Four'},
           {id: '5', value: 'five', label: 'Five'},
-          {id: '6', value: 'siz', label: 'Six'}
-        ]
-      }
+          {id: '6', value: 'siz', label: 'Six'},
+        ],
+      },
     ]
 
     let k = 0
@@ -261,7 +261,7 @@ describe('CanvasSelect component', () => {
 
     expect(getByText('Choose one')).toBeInTheDocument()
     const label = getByText('Choose one')
-    label.click()
+    await fireEvent.click(label)
 
     expect(getByText('Group A')).toBeInTheDocument()
     expect(getByText('One')).toBeInTheDocument()
