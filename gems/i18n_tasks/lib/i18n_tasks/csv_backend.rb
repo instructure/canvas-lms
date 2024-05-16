@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "csv"
+
 module I18nTasks
   module CsvBackend
     def load_csv(filename)
