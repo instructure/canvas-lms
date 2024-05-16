@@ -41,5 +41,9 @@ describe CanvasSlug do
     it "prepends a provided purpose" do
       expect(subject.generate("foobar")).to match(/\Afoobar-\w{4}\z/)
     end
+
+    it "avoids easily-confused characters" do
+      expect(subject.generate(nil, 2000)).not_to match(/[0Oo1Iil5Ssbdpqg]/)
+    end
   end
 end
