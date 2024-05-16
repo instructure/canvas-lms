@@ -50,7 +50,6 @@ DEPENDENCIES
   activerecord (>= 3.2)
   bundler (~> 2.2)
   rake
-  rspec (~> 3.12)
   workflow!
 
 RUBY VERSION
