@@ -63,6 +63,7 @@ $ic-tooltip-arrow-size: 0.375rem;
   background-color: var(--ic-brand-global-nav-bgd);
 
   nav {
+    overflow: hidden;
 
     /** New SideNav CSS */
     .ic-sidenav-tray,
@@ -435,6 +436,7 @@ body.primary-nav-expanded {
 
 
     nav {
+      overflow: hidden;
 
       /** New SideNav CSS */
       .ic-sidenav-tray,
