@@ -33,7 +33,7 @@ GEM
     irb (1.13.1)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    minitest (5.22.3)
+    minitest (5.23.0)
     mutex_m (0.2.0)
     psych (5.1.2)
       stringio

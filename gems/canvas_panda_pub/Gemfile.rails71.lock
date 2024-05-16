@@ -125,7 +125,7 @@ GEM
       mime-types-data (~> 3.2015)
     mime-types-data (3.2024.0507)
     mini_portile2 (2.8.6)
-    minitest (5.22.3)
+    minitest (5.23.0)
     mutex_m (0.2.0)
     net-http (0.4.1)
       uri
