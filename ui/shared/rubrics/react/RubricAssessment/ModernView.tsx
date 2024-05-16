@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
@@ -55,6 +55,7 @@ type ModernViewProps = {
   selectedViewMode: ModernViewModes
   rubricSavedComments?: Record<string, string[]>
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
+  validationErrors?: string[]
 }
 export const ModernView = ({
   criteria,
@@ -68,6 +69,7 @@ export const ModernView = ({
   selectedViewMode,
   rubricSavedComments,
   onUpdateAssessmentData,
+  validationErrors,
 }: ModernViewProps) => {
   return (
     <View as="div" margin="0" overflowX="hidden">
@@ -92,6 +94,7 @@ export const ModernView = ({
             rubricSavedComments={rubricSavedComments?.[criterion.id] ?? []}
             onUpdateAssessmentData={onUpdateAssessmentData}
             isFreeFormCriterionComments={isFreeFormCriterionComments}
+            validationErrors={validationErrors}
           />
         )
       })}
@@ -113,6 +116,7 @@ type CriterionRowProps = {
   selectedViewMode: ModernViewModes
   rubricSavedComments: string[]
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
+  validationErrors?: string[]
 }
 export const CriterionRow = ({
   criterion,
@@ -128,12 +132,18 @@ export const CriterionRow = ({
   selectedViewMode,
   rubricSavedComments,
   onUpdateAssessmentData,
+  validationErrors,
 }: CriterionRowProps) => {
   const {ratings} = criterion
+
+  const hasValidationError = validationErrors?.includes(criterion.id)
+  const hasScoreValidationError = hasValidationError && !hidePoints
+  const hasRatingValidationError = hasValidationError && hidePoints
 
   const [pointsInput, setPointsInput] = useState<string>()
   const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
   const [isSaveCommentChecked, setIsSaveCommentChecked] = useState(false)
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
   const selectedRatingId = findCriterionMatchingRatingId(
     criterion.ratings,
@@ -145,6 +155,17 @@ export const CriterionRow = ({
     setCommentText(criterionAssessment?.comments ?? '')
     setPointsInput((criterionAssessment?.points ?? '').toString())
   }, [criterionAssessment])
+
+  useEffect(() => {
+    if (
+      hasScoreValidationError &&
+      validationErrors &&
+      validationErrors[0] === criterion.id &&
+      inputRef.current
+    ) {
+      inputRef.current.focus()
+    }
+  }, [criterion.id, hasRatingValidationError, hasScoreValidationError, validationErrors])
 
   const updateAssessmentData = (params: Partial<UpdateAssessmentData>) => {
     const updatedCriterionAssessment: UpdateAssessmentData = {
@@ -194,6 +215,9 @@ export const CriterionRow = ({
           selectedRatingId={selectedRatingId}
           onSelectRating={selectRating}
           criterionUseRange={criterionUseRange}
+          shouldFocusFirstRating={
+            hasRatingValidationError && validationErrors?.[0] === criterion.id
+          }
         />
       )
     }
@@ -207,6 +231,7 @@ export const CriterionRow = ({
         selectedRatingId={selectedRatingId}
         onSelectRating={selectRating}
         criterionUseRange={criterionUseRange}
+        shouldFocusFirstRating={hasRatingValidationError && validationErrors?.[0] === criterion.id}
       />
     )
   }
@@ -218,66 +243,106 @@ export const CriterionRow = ({
     {pointsInputValue, totalPointsValue}
   )
 
+  const grabFailedValidationMessage = () => {
+    if (isFreeFormCriterionComments && hidePoints) {
+      return I18n.t('Please leave a comment')
+    } else if (isFreeFormCriterionComments) {
+      return I18n.t('Please select a score')
+    } else if (hidePoints) {
+      return I18n.t('Please select a rating')
+    } else {
+      return I18n.t('Please select a rating or enter a score')
+    }
+  }
+
   return (
-    <View as="div" margin="0 0 small 0">
-      {!hidePoints && (
-        <Flex data-testid="modern-view-out-of-points">
-          <Flex.Item shouldGrow={true}>
-            {criterion.learningOutcomeId && <OutcomeTag displayName={criterion.description} />}
-          </Flex.Item>
-          <Flex.Item margin={isPreviewMode ? '0 0 0 x-small' : '0'}>
-            {isPreviewMode ? (
-              <Text size="small" weight="bold" aria-label={instructorPointsText}>
-                {pointsInputValue}
+    <>
+      <View
+        as="div"
+        margin="0 0 small 0"
+        borderColor={hasScoreValidationError ? 'danger' : 'transparent'}
+        borderWidth={hasScoreValidationError ? 'medium' : 'none'}
+        padding={hasScoreValidationError ? 'small' : 'none'}
+        borderRadius="medium"
+      >
+        {!hidePoints && (
+          <Flex data-testid="modern-view-out-of-points">
+            <Flex.Item shouldGrow={true}>
+              {criterion.learningOutcomeId && <OutcomeTag displayName={criterion.description} />}
+            </Flex.Item>
+            <Flex.Item margin={isPreviewMode ? '0 0 0 x-small' : '0'}>
+              {isPreviewMode ? (
+                <Text size="small" weight="bold" aria-label={instructorPointsText}>
+                  {pointsInputValue}
+                </Text>
+              ) : criterion.ignoreForScoring ? (
+                <Text>--</Text>
+              ) : (
+                <TextInput
+                  autoComplete="off"
+                  renderLabel={<ScreenReaderContent>{instructorPointsText}</ScreenReaderContent>}
+                  placeholder="--"
+                  width="3.375rem"
+                  height="2.375rem"
+                  data-testid={`criterion-score-${criterion.id}`}
+                  value={pointsInputValue}
+                  onChange={e => setPointsInput(e.target.value)}
+                  onBlur={e => setPoints(e.target.value)}
+                  inputRef={ref => {
+                    inputRef.current = ref
+                  }}
+                />
+              )}
+            </Flex.Item>
+            <Flex.Item margin={isPreviewMode ? '0' : '0 0 0 x-small'}>
+              <Text size="small" weight="bold" aria-hidden={true}>
+                /{criterion.points}
               </Text>
-            ) : criterion.ignoreForScoring ? (
-              <Text>--</Text>
-            ) : (
-              <TextInput
-                autoComplete="off"
-                renderLabel={<ScreenReaderContent>{instructorPointsText}</ScreenReaderContent>}
-                placeholder="--"
-                width="3.375rem"
-                height="2.375rem"
-                data-testid={`criterion-score-${criterion.id}`}
-                value={pointsInputValue}
-                onChange={e => setPointsInput(e.target.value)}
-                onBlur={e => setPoints(e.target.value)}
-              />
-            )}
-          </Flex.Item>
-          <Flex.Item margin={isPreviewMode ? '0' : '0 0 0 x-small'}>
-            <Text size="small" weight="bold" aria-hidden={true}>
-              /{criterion.points}
-            </Text>
-          </Flex.Item>
-        </Flex>
-      )}
-      <View as="div">
-        <Text size="medium" weight="bold">
-          {criterion.outcome?.displayName || criterion.description}
-        </Text>
-      </View>
-      <View as="div" margin="xx-small 0 0 0" themeOverride={{marginXxSmall: '.25rem'}}>
-        <Text
-          size="small"
-          weight="normal"
-          themeOverride={{fontSizeXSmall: '0.875rem', paragraphMargin: 0}}
-          dangerouslySetInnerHTML={htmlEscapeCriteriaLongDescription(criterion)}
-        />
-      </View>
-      {criterion.learningOutcomeId && (
-        <View as="div" margin="xx-small 0 0 0">
-          <Text>
-            {I18n.t('Threshold: %{threshold}', {
-              threshold: possibleString(criterion.masteryPoints),
-            })}
+            </Flex.Item>
+          </Flex>
+        )}
+        <View as="div">
+          <Text size="medium" weight="bold">
+            {criterion.outcome?.displayName || criterion.description}
           </Text>
         </View>
-      )}
-      <View as="div" margin="small 0 0 0">
-        {!isFreeFormCriterionComments && renderButtonDisplay()}
+        <View as="div" margin="xx-small 0 0 0" themeOverride={{marginXxSmall: '.25rem'}}>
+          <Text
+            size="small"
+            weight="normal"
+            themeOverride={{fontSizeXSmall: '0.875rem', paragraphMargin: 0}}
+            dangerouslySetInnerHTML={htmlEscapeCriteriaLongDescription(criterion)}
+          />
+        </View>
+        {criterion.learningOutcomeId && (
+          <View as="div" margin="xx-small 0 0 0">
+            <Text>
+              {I18n.t('Threshold: %{threshold}', {
+                threshold: possibleString(criterion.masteryPoints),
+              })}
+            </Text>
+          </View>
+        )}
+        <View
+          as="div"
+          margin="small 0 0 0"
+          borderColor={
+            hasRatingValidationError && !isFreeFormCriterionComments ? 'danger' : 'transparent'
+          }
+          borderWidth={hasRatingValidationError && !isFreeFormCriterionComments ? 'medium' : 'none'}
+          padding={
+            hasRatingValidationError && !isFreeFormCriterionComments ? 'small 0 0 small' : 'none'
+          }
+          borderRadius="medium"
+        >
+          {!isFreeFormCriterionComments && renderButtonDisplay()}
+        </View>
       </View>
+      {hasValidationError && !(isFreeFormCriterionComments && hidePoints) ? (
+        <Text size="small" color="danger">
+          {grabFailedValidationMessage()}
+        </Text>
+      ) : null}
       <View as="div" margin="small 0 0 0" overflowX="hidden" overflowY="hidden">
         {isFreeFormCriterionComments ? (
           <Flex direction="column">
@@ -318,6 +383,16 @@ export const CriterionRow = ({
                   value={commentText}
                   onChange={e => setCommentText(e.target.value)}
                   onBlur={e => updateAssessmentData({comments: e.target.value})}
+                  messages={
+                    hasValidationError && hidePoints
+                      ? [
+                          {
+                            type: 'error',
+                            text: grabFailedValidationMessage(),
+                          },
+                        ]
+                      : []
+                  }
                 />
               )}
             </Flex.Item>
@@ -362,6 +437,6 @@ export const CriterionRow = ({
         )}
       </View>
       {displayHr && <View as="hr" margin="medium 0" aria-hidden={true} />}
-    </View>
+    </>
   )
 }

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useRef} from 'react'
 import type {RubricRating} from '../types/rubric'
 import {colors} from '@instructure/canvas-theme'
 import {Flex} from '@instructure/ui-flex'
@@ -37,6 +37,7 @@ type VerticalButtonDisplayProps = {
   selectedRatingId?: string
   onSelectRating: (rating: RubricRating) => void
   criterionUseRange: boolean
+  shouldFocusFirstRating?: boolean
 }
 export const VerticalButtonDisplay = ({
   isPreviewMode,
@@ -46,7 +47,17 @@ export const VerticalButtonDisplay = ({
   selectedRatingId,
   onSelectRating,
   criterionUseRange,
+  shouldFocusFirstRating = false,
 }: VerticalButtonDisplayProps) => {
+  const firstRatingRef = useRef<Element | null>(null)
+
+  useEffect(() => {
+    if (shouldFocusFirstRating && firstRatingRef.current) {
+      const button = firstRatingRef.current.getElementsByTagName('button')[0]
+      button?.focus()
+    }
+  }, [shouldFocusFirstRating])
+
   return (
     <Flex
       as="div"
@@ -74,6 +85,11 @@ export const VerticalButtonDisplay = ({
                 align={isSelected ? 'start' : 'center'}
                 data-testid={`rating-button-${rating.id}-${index}`}
                 aria-label={buttonAriaLabel}
+                elementRef={ref => {
+                  if (index === 0) {
+                    firstRatingRef.current = ref
+                  }
+                }}
               >
                 {isSelfAssessment ? (
                   <SelfAssessmentRatingButton

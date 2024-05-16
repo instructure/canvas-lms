@@ -88,6 +88,8 @@ export const RubricAssessmentContainer = ({
     0
   )
 
+  const [validationErrors, setValidationErrors] = useState<string[]>([])
+
   useEffect(() => {
     const updatedRubricAssessmentData = rubricAssessmentData.map(rubricAssessment => {
       const matchingCriteria = criteria?.find(c => c.id === rubricAssessment.criterionId)
@@ -101,6 +103,38 @@ export const RubricAssessmentContainer = ({
 
     setRubricAssessmentDraftData(updatedRubricAssessmentData)
   }, [rubricAssessmentData, criteria])
+
+  const preSubmitValidation = () => {
+    const errors = criteria.reduce((acc: string[], criterion: RubricCriterion) => {
+      const assessment = rubricAssessmentDraftData.find(data => data.criterionId === criterion.id)
+
+      const requiresComments = isFreeFormCriterionComments && hidePoints
+      const requiresPoints = !requiresComments
+
+      if (requiresComments && !assessment?.comments) {
+        acc.push(criterion.id)
+      }
+
+      if (requiresPoints && typeof assessment?.points !== 'number') {
+        acc.push(criterion.id)
+      }
+
+      return acc
+    }, [])
+
+    setValidationErrors(errors)
+    return errors.length === 0
+  }
+
+  const validateOnSubmit = (rubricAssessmentDraftData: RubricAssessmentData[]) => {
+    if (isPeerReview) {
+      if (preSubmitValidation()) {
+        onSubmit?.(rubricAssessmentDraftData)
+      }
+    } else {
+      onSubmit?.(rubricAssessmentDraftData)
+    }
+  }
 
   const renderViewContainer = () => {
     if (isTraditionalView && !isSelfAssessment) {
@@ -116,6 +150,7 @@ export const RubricAssessmentContainer = ({
           isPeerReview={isPeerReview}
           isFreeFormCriterionComments={isFreeFormCriterionComments}
           onUpdateAssessmentData={onUpdateAssessmentData}
+          validationErrors={validationErrors}
         />
       )
     }
@@ -133,6 +168,7 @@ export const RubricAssessmentContainer = ({
         selectedViewMode={viewMode as ModernViewModes}
         onUpdateAssessmentData={onUpdateAssessmentData}
         isFreeFormCriterionComments={isFreeFormCriterionComments}
+        validationErrors={validationErrors}
       />
     )
   }
@@ -229,7 +265,7 @@ export const RubricAssessmentContainer = ({
               isPreviewMode={isPreviewMode}
               isStandAloneContainer={isStandaloneContainer}
               onDismiss={onDismiss}
-              onSubmit={onSubmit ? () => onSubmit(rubricAssessmentDraftData) : undefined}
+              onSubmit={onSubmit ? () => validateOnSubmit(rubricAssessmentDraftData) : undefined}
             />
           </Flex.Item>
         )}
