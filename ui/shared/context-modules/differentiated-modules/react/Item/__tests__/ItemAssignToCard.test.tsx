@@ -28,6 +28,7 @@ const props: ItemAssignToCardProps = {
   onCardAssignmentChange: () => {},
   cardId: 'assign-to-card-001',
   due_at: null,
+  original_due_at: null,
   unlock_at: null,
   lock_at: null,
   onDelete: undefined,
@@ -37,6 +38,30 @@ const props: ItemAssignToCardProps = {
 
 const renderComponent = (overrides: Partial<ItemAssignToCardProps> = {}) =>
   render(<ItemAssignToCard {...props} {...overrides} />)
+
+const withWithGradingPeriodsMock = () => {
+  window.ENV.HAS_GRADING_PERIODS = true
+  window.ENV.active_grading_periods = [
+    {
+      id: '2',
+      start_date: '2024-05-02T00:00:00-06:00',
+      end_date: '2024-05-06T23:59:59-06:00',
+      title: 'period 2',
+      close_date: '2024-05-06T23:59:59-06:00',
+      is_last: false,
+      is_closed: true,
+    },
+    {
+      id: '1',
+      start_date: '2024-05-09T00:00:00-06:00',
+      end_date: '2024-05-22T23:59:59-06:00',
+      title: 'period 1',
+      close_date: '2024-05-22T23:59:59-06:00',
+      is_last: true,
+      is_closed: false,
+    },
+  ]
+}
 
 describe('ItemAssignToCard', () => {
   it('renders', () => {
@@ -230,6 +255,45 @@ describe('ItemAssignToCard', () => {
     await waitFor(async () => {
       expect(timeInput).toHaveValue('3:30 PM')
       expect(await getAllByText('Invalid date')[0]).toBeInTheDocument()
+    })
+  })
+
+  it('renders all disabled when date falls in a closed grading period for teacher', () => {
+    withWithGradingPeriodsMock()
+
+    const due_at = '2024-05-05T00:00:00-06:00'
+    const original_due_at = '2024-05-05T00:00:00-06:00'
+    const {getByLabelText} = renderComponent({due_at, original_due_at})
+    expect(getByLabelText('Due Date')).toHaveValue('May 5, 2024')
+    expect(getByLabelText('Due Date')).toBeDisabled()
+  })
+
+  it('renders all fields when date falls in a closed grading period for admin', () => {
+    withWithGradingPeriodsMock()
+    window.ENV.current_user_is_admin = true
+
+    const due_at = '2024-05-05T00:00:00-06:00'
+    const original_due_at = '2024-05-05T00:00:00-06:00'
+    const {getByLabelText} = renderComponent({due_at, original_due_at})
+    expect(getByLabelText('Due Date')).toHaveValue('May 5, 2024')
+    expect(getByLabelText('Due Date')).not.toBeDisabled()
+  })
+
+  it('renders error when date change to a closed grading period for teacher', async () => {
+    withWithGradingPeriodsMock()
+    window.ENV.current_user_is_admin = false
+
+    const due_at = '2024-05-17T00:00:00-06:00'
+    const original_due_at = '2024-05-17T00:00:00-06:00'
+    const {getByLabelText, getAllByText, getAllByRole} = renderComponent({due_at, original_due_at})
+
+    const dateInput = getByLabelText('Due Date')
+    fireEvent.change(dateInput, {target: {value: 'May 4, 2024'}})
+    getAllByRole('option', {name: '4 May 2024'})[0].click()
+
+    await waitFor(async () => {
+      expect(dateInput).toHaveValue('May 4, 2024')
+      expect(getAllByText(/Please enter a due date on or after/).length).toBeGreaterThanOrEqual(1)
     })
   })
 

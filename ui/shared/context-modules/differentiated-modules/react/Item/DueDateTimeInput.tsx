@@ -28,6 +28,7 @@ type DueDateTimeInputProps = CustomDateTimeInputProps & {
   dueDate: string | null
   setDueDate: (dueDate: string | null) => void
   handleDueDateChange: (_event: React.SyntheticEvent, value: string | undefined) => void
+  disabledWithGradingPeriod?: boolean
 }
 
 export function DueDateTimeInput({
@@ -40,6 +41,7 @@ export function DueDateTimeInput({
   dateInputRefs,
   timeInputRefs,
   handleBlur,
+  disabledWithGradingPeriod,
   ...otherProps
 }: DueDateTimeInputProps) {
   const key = 'due_at'
@@ -63,7 +65,7 @@ export function DueDateTimeInput({
   const dueDateProps = {
     key,
     id: key,
-    disabled: Boolean(blueprintDateLocks?.includes('due_dates')),
+    disabled: Boolean(blueprintDateLocks?.includes('due_dates')) || disabledWithGradingPeriod,
     description: I18n.t('Choose a due date and time'),
     dateRenderLabel: I18n.t('Due Date'),
     value: dueDate,
