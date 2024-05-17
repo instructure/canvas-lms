@@ -168,6 +168,10 @@ module CourseWikiPage
     get "/groups/#{group_id}/pages/#{page_title}/edit"
   end
 
+  def replace_wiki_page_name(text)
+    edit_page_title_input.send_keys([:control, "a"], :backspace, text)
+  end
+
   def publish_wiki_page
     publish_btn.click
     wait_for_ajaximations
