@@ -229,6 +229,7 @@ class ProfileController < ApplicationController
           NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT: show_tutorial_ff_to_user,
           CONTEXT_BASE_URL: "/users/#{@user.id}"
         )
+        page_has_instui_topnav
         render :profile
       end
       format.json do
