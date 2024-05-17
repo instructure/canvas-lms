@@ -662,6 +662,7 @@ QUnit.module('Gradebook Grading', () => {
     hooks.beforeEach(() => {
       gradebook = createGradebook()
       gradebook.students = {1101: {id: '1101', isConcluded: false}}
+      gradebook.assignments = {2301: {has_sub_assignments: false}}
       sinon
         .stub(gradebook.submissionStateMap, 'getSubmissionState')
         .returns({hideGrade: false, locked: false})
@@ -704,6 +705,11 @@ QUnit.module('Gradebook Grading', () => {
 
     test('returns false when the student is not loaded', () => {
       delete gradebook.students[1101]
+      strictEqual(gradebook.isGradeEditable('1101', '2301'), false)
+    })
+
+    test('returns false when the assignment has sub assignments', () => {
+      sinon.stub(gradebook, 'getAssignment').returns({has_sub_assignments: true})
       strictEqual(gradebook.isGradeEditable('1101', '2301'), false)
     })
   })
