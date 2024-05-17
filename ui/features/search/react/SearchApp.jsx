@@ -218,7 +218,7 @@ export default function SearchApp() {
         </fieldset>
       </form>
 
-      {indexingProgress ? (
+      {indexingProgress !== null ? (
         <IndexingProgress progress={indexingProgress} />
       ) : isLoading ? (
         <Flex justifyItems="center">
