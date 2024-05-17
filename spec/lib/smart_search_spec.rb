@@ -24,12 +24,12 @@ describe SmartSearch do
   describe "#index_course" do
     before do
       skip "not available" unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
-      allow(SmartSearch).to receive(:generate_embedding).and_return([1] * 1536)
+      allow(SmartSearch).to receive(:generate_embedding).and_return([1] * 1024)
     end
 
     before :once do
       course_factory
-      @course.wiki_pages.create! title: "red pandas", body: "foo " * 1025
+      @course.wiki_pages.create! title: "red pandas", body: "foo " * 400
       @course.assignments.create! name: "horse feathers", description: "..."
       @course.assignments.create! name: "hungry hippos", description: "..."
       @course.discussion_topics.create! title: "!!!", message: "..."
