@@ -22,6 +22,7 @@ import {ExtensionsSearchBar} from './ExtensionsSearchBar'
 
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {Flex} from '@instructure/ui-flex'
 import {Pagination} from '@instructure/ui-pagination'
@@ -31,6 +32,7 @@ import {ExtensionsTable} from './ExtensionsTable'
 import {MANAGE_EXTENSIONS_PAGE_LIMIT, mkUseManagePageState} from './ManagePageLoadingState'
 import {type ManageSearchParams, useManageSearchParams} from './ManageSearchParams'
 import {formatSearchParamErrorMessages} from '../../../common/lib/useZodParams/ParamsParseResult'
+import type {LtiRegistration} from '../../model/LtiRegistration'
 
 const SEARCH_DEBOUNCE_MS = 250
 
@@ -53,6 +55,16 @@ export const ManagePage = () => {
 type ManagePageInnerProps = {
   searchParams: ManageSearchParams
 }
+
+const confirmDeletion = (registration: LtiRegistration): Promise<boolean> =>
+  confirmDanger({
+    title: I18n.t('Delete App'),
+    confirmButtonLabel: I18n.t('Delete'),
+    heading: I18n.t('You are about to delete “%{appName}”.', {appName: registration.name}),
+    message: I18n.t(
+      'You are removing the app from the entire account. It will be removed from its placements and any resource links to it will stop working. To reestablish placements and links, you will need to reinstall the app.'
+    ),
+  })
 
 const useManagePageState = mkUseManagePageState(fetchRegistrations)
 
@@ -79,6 +91,12 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
     },
     [setStale, setManageSearchParams]
   )
+
+  const deleteApp = React.useCallback((app: LtiRegistration) => {
+    confirmDeletion(app)
+      .then(confirmed => confirmed && alert('TODO: actually delete here'))
+      .catch(() => alert('TODO toast error'))
+  }, [])
 
   /**
    * A debounced version of {@link updateSearchParam}
@@ -127,6 +145,7 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
                 sort={sort}
                 dir={dir}
                 updateSearchParams={updateSearchParams}
+                deleteApp={deleteApp}
               />
               <Pagination
                 as="nav"

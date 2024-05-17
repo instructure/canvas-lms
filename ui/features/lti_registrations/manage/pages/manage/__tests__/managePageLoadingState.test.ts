@@ -17,16 +17,12 @@
  */
 
 import {act, waitFor} from '@testing-library/react'
-import React from 'react'
 import {mkUseManagePageState, type ManagePageLoadingState} from '../ManagePageLoadingState'
 import type {FetchRegistrations} from 'features/lti_registrations/manage/api/registrations'
 import type {LtiRegistration} from 'features/lti_registrations/manage/model/LtiRegistration'
-import type {LtiRegistrationId} from 'features/lti_registrations/manage/model/LtiRegistrationId'
-import type {AccountId} from 'features/lti_registrations/manage/model/AccountId'
-import type {DeveloperKeyId} from 'features/lti_registrations/manage/model/DeveloperKeyId'
-import type {LtiRegistrationAccountBindingId} from 'features/lti_registrations/manage/model/LtiRegistrationAccountBinding'
-import type {UserId} from 'features/lti_registrations/manage/model/UserId'
 import {renderHook, type RenderResult} from '@testing-library/react-hooks/dom'
+import {mockPageOfRegistrations} from './helpers'
+import type {PaginatedList} from 'features/lti_registrations/manage/api/PaginatedList'
 
 // #region helpers
 const mockFetchRegistrations = (
@@ -44,7 +40,7 @@ const mockFetchRegistrations = (
 }
 
 const mockPromise = (
-  registrations: Array<LtiRegistration>
+  paginatedRegistrations: PaginatedList<LtiRegistration>
 ): {
   resolve: () => void
   reject: () => void
@@ -63,10 +59,7 @@ const mockPromise = (
       resolve &&
         resolve({
           _type: 'success',
-          data: {
-            data: registrations,
-            total: registrations.length,
-          },
+          data: paginatedRegistrations,
         })
     },
     reject: () => {
@@ -76,37 +69,6 @@ const mockPromise = (
       })
     },
   }
-}
-
-const mockRegistrations = (...names: Array<string>): Array<LtiRegistration> => {
-  return names.map((n, i) => {
-    const id = i.toString()
-    const date = new Date()
-    const common = {
-      account_id: id as AccountId,
-      created_at: date,
-      created_by: id as UserId,
-      updated_at: date,
-      updated_by: id as UserId,
-      workflow_state: 'on',
-    }
-    return {
-      id: id as LtiRegistrationId,
-      name: n,
-      ...common,
-      account_binding: {
-        id: id as LtiRegistrationAccountBindingId,
-        registration_id: id as unknown as LtiRegistrationId,
-        ...common,
-      },
-      developer_key_id: id as DeveloperKeyId,
-      internal_service: false,
-      ims_registration_id: id,
-      legacy_configuration_id: null,
-      manual_configuration_id: null,
-      admin_nickname: n,
-    }
-  })
 }
 
 const awaitState = async <K extends ManagePageLoadingState['_type']>(
@@ -132,8 +94,8 @@ const awaitState = async <K extends ManagePageLoadingState['_type']>(
  * @returns
  */
 const setup = () => {
-  const req1 = mockPromise(mockRegistrations('Foo', 'Bar', 'Baz'))
-  const req2 = mockPromise(mockRegistrations('Bar', 'Baz'))
+  const req1 = mockPromise(mockPageOfRegistrations('Foo', 'Bar', 'Baz'))
+  const req2 = mockPromise(mockPageOfRegistrations('Bar', 'Baz'))
 
   const useManagePageState = mkUseManagePageState(
     mockFetchRegistrations(req1.promise, req2.promise)
