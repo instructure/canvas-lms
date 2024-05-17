@@ -29,14 +29,22 @@ const I18n = useI18nScope('CoursesTray')
 const UNPUBLISHED = 'unpublished'
 
 export function CourseListItemContent({course}: {course: Course}) {
+  const subtexts = []
+  if (course.enrollment_term_id > 1) {
+    subtexts.push(course.term.name)
+  }
+  if (ENV.FEATURES?.courses_popout_sisid && course.sis_course_id) {
+    subtexts.push(course.sis_course_id)
+  }
+
   return (
     <>
       <Link isWithinText={false} href={`/courses/${course.id}`}>
         {course.name}
       </Link>
-      {course.enrollment_term_id > 1 && (
+      {subtexts.length > 0 && (
         <Text as="div" size="x-small" weight="light">
-          {course.term.name}
+          {subtexts.join(' - ')}
         </Text>
       )}
     </>

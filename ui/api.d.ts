@@ -602,6 +602,7 @@ export type Course = Readonly<{
     name: string
   }
   homeroom_course: boolean
+  sis_course_id: string | null
 }>
 
 // '/api/v1/users/self/tabs',

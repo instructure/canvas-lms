@@ -362,6 +362,7 @@ class ApplicationController < ActionController::Base
     platform_service_speedgrader
     instui_header
     rce_find_replace
+    courses_popout_sisid
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
