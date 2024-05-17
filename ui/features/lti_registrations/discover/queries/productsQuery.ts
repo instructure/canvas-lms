@@ -20,6 +20,8 @@
 import queryString from 'query-string'
 import getCookie from '@instructure/get-cookie'
 import type {Product} from '../model/Product'
+import type {FilterItem} from '../model/Filter'
+import {isEmpty} from 'lodash'
 
 // TODO: add actual type
 type Params = any
@@ -33,6 +35,11 @@ type ProductResponse = {
     per_page: number
   }
 }
+type ToolsByDisplayGroupResponse = Array<{
+  display_name: string
+  tag: FilterItem
+  tools: Array<Product>
+}>
 
 // TODO: remove when backend hooked up
 const mockProducts: Array<Product> = [
@@ -434,9 +441,20 @@ const mockProducts: Array<Product> = [
   },
 ]
 
+export const mockTags: Array<FilterItem> = [
+  {
+    id: '1',
+    name: '1EdTEch Trusted App Certified',
+  },
+  {
+    id: '2',
+    name: 'LTI 1.3 Supported',
+  },
+]
+
 export const fetchProducts = async (params: Params): Promise<ProductResponse> => {
   let tools = [...mockProducts]
-  if (params.filters.companies.length > 0) {
+  if (!isEmpty(params.filters.companies)) {
     tools = tools.filter(product =>
       params.filters.companies.map((c: {id: any}) => c.id).includes(product.company.id)
     )
@@ -448,12 +466,18 @@ export const fetchProducts = async (params: Params): Promise<ProductResponse> =>
     )
   }
 
+  if (params.page) {
+    const start = (params.page - 1) * (params.per_page || 3)
+    const end = start + (params.per_page || 3)
+    tools = tools.slice(start, end)
+  }
+
   const meta = {
     count: tools.length,
-    total_count: tools.length,
-    current_page: 1,
-    num_pages: 1,
-    per_page: 20,
+    total_count: mockProducts.length,
+    current_page: params.page || 1,
+    num_pages: 3,
+    per_page: 3,
   }
   return {tools, meta}
 
@@ -501,4 +525,25 @@ export const fetchProductDetails = async (id: String): Promise<Product | null> =
   // const {product} = await response.json()
 
   // return product
+}
+
+export const fetchToolsByDisplayGroups = async (): Promise<ToolsByDisplayGroupResponse> => {
+  return [
+    {
+      display_name: '1EdTEch Trusted App Certified',
+      tag: {
+        id: '1',
+        name: '1EdTEch Trusted App Certified',
+      },
+      tools: mockProducts.slice(0, 3),
+    },
+    {
+      display_name: 'LTI 1.3 Supported',
+      tag: {
+        id: '2',
+        name: 'LTI 1.3 Supported',
+      },
+      tools: mockProducts.slice(3, 6),
+    },
+  ]
 }
