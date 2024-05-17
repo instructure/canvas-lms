@@ -132,4 +132,16 @@ describe "wiki pages edit page assign to" do
     expect(element_exists?(editing_roles_input_selector)).to be_truthy
     expect(element_exists?(assign_to_link_selector)).to be_falsey
   end
+
+  it "updates tray when form information changes" do
+    visit_wiki_edit_page(@course.id, @page.title)
+    replace_wiki_page_name("new page title")
+
+    assign_to_link.click
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    expect(tray_header.text).to eq("new page title")
+  end
 end

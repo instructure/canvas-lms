@@ -47,6 +47,8 @@ const AssignToOption = (props: Props) => {
   const [disabledOptionIds, setDisabledOptionIds] = useState<string[]>([])
   const [showPendingChangesPill, setShowPendingChangesPill] = useState(false)
   const linkRef = useRef<Link | null>(null)
+  const itemName =
+    (document.getElementById('wikipage-title-input') as HTMLInputElement)?.value ?? props.pageName
 
   const handleOpen = () => setOpen(true)
 
@@ -116,7 +118,7 @@ const AssignToOption = (props: Props) => {
         onClose={handleClose}
         onDismiss={handleDismiss}
         courseId={ENV.COURSE_ID}
-        itemName={props.pageName}
+        itemName={itemName}
         itemType="page"
         iconType="page"
         itemContentId={props.pageId}
