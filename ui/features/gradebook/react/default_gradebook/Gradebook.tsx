@@ -3962,7 +3962,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   isGradeEditable = (studentId: string, assignmentId: string) => {
-    if (!this.isStudentGradeable(studentId)) {
+    const assignment = this.getAssignment(assignmentId)
+    if (assignment.has_sub_assignments || !this.isStudentGradeable(studentId)) {
       return false
     }
     const submissionState = this.submissionStateMap.getSubmissionState({
