@@ -159,5 +159,9 @@ class ConditionalReleaseObjects
     def assignment_exists_in_scoring_range?(ordered_range, assignment_name)
       element_exists?("//*[@class = 'cr-scoring-range' and position() = #{ordered_range}]//div[@aria-label = '#{assignment_name}']", true)
     end
+
+    def assignment_selection_modal
+      f(".cr-assignment-modal")
+    end
   end
 end
