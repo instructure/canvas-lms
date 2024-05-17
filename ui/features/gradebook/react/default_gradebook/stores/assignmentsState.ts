@@ -141,6 +141,7 @@ export default (
       'assignments',
       'grades_published',
       'post_manually',
+      'checkpoints',
     ]
 
     if (get().hasModules) {
