@@ -410,7 +410,7 @@ export const RubricForm = ({rootOutcomeGroup}: RubricFormComponentProp) => {
           </View>
         </Flex.Item>
 
-        <Flex.Item shouldGrow={true} shouldShrink={true} as="main">
+        <Flex.Item shouldGrow={true} shouldShrink={true} as="main" padding="xx-small">
           <View as="div" margin="0 0 small 0">
             <DragAndDrop onDragEnd={handleDragEnd}>
               <Droppable droppableId="droppable-id">
