@@ -30,10 +30,13 @@ import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import replaceTags from '@canvas/util/replaceTags'
+import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
 const I18n = useI18nScope('sub_accounts')
 
 ready(() => {
+  initializeTopNavPortal(document.getElementById('react-instui-topnav'))
+
   $('.add_sub_account_link').click(function () {
     $("<li class='sub_account'/>")
       .append($('#account_blank').clone(true).attr('id', 'account_new').show())

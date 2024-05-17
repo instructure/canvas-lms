@@ -20,6 +20,7 @@ import React from 'react'
 import {Portal} from '@instructure/ui-portal'
 import TopNav from './TopNav'
 import {QueryProvider} from '@canvas/query'
+import ReactDOM from 'react-dom'
 
 const TopNavPortal = () => {
   const mountPoint: HTMLElement | null = document.getElementById('react-instui-topnav')
@@ -34,6 +35,11 @@ const TopNavPortal = () => {
       </QueryProvider>
     </Portal>
   )
+}
+export const initializeTopNavPortal = (mountPoint: ReactDOM.Container): void => {
+  if (mountPoint) {
+    ReactDOM.render(<TopNavPortal />, mountPoint)
+  }
 }
 
 export default TopNavPortal
