@@ -71,7 +71,7 @@ module SmartSearchable
   end
 
   def generate_embeddings
-    delete_embeddings
+    delete_embeddings(version: SmartSearch::EMBEDDING_VERSION)
     chunk_content(SmartSearch::CHUNK_MAX_LENGTH) do |chunk|
       embedding = SmartSearch.generate_embedding(chunk)
       embeddings.create!(embedding:, version: SmartSearch::EMBEDDING_VERSION)
@@ -107,14 +107,16 @@ module SmartSearchable
     html_to_text(attributes[self.class.search_body_column])
   end
 
-  def delete_embeddings
+  def delete_embeddings(version: nil)
     return unless ActiveRecord::Base.connection.table_exists?(self.class.embedding_class.table_name)
 
     # TODO: delete via the association once pgvector is available everywhere
     # (without :dependent, that would try to nullify the fk in violation of the constraint
     #  but with :dependent, instances without pgvector would try to access the nonexistent table when a page is deleted)
     shard.activate do
-      self.class.embedding_class.where(self.class.embedding_foreign_key => self).delete_all
+      scope = self.class.embedding_class.where(self.class.embedding_foreign_key => self)
+      scope = scope.where(version:) if version
+      scope.delete_all
     end
   end
 end
