@@ -346,7 +346,7 @@ describe CanvasCache::Redis do
       end
 
       let(:raw_client) do
-        router = client.instance_variable_get(:@router)
+        router = client.send(:router)
         router.find_node(router.find_node_key(""))
       end
 
