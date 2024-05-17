@@ -712,19 +712,19 @@
         </div>
       </div>
       <% if can_manage %>
-        <div class="form-row">
-          <div colspan="4">
+        <footer class="sticky-footer">
+          <div>
             <% if Setting.get('cross_root_account_course_moves', 'false') == 'true' &&
               Account.site_admin.grants_any_right?(@current_user, :manage_courses, :manage_courses_admin) && Account.root_accounts.length > 1 %>
                 <a href="#" class="move_course_link btn"><i class="icon-arrow-right"></i> <%= t('links.move_course', %{Move To Another Account}) %></a>
             <% end %>
-            <span class="course_form">
-              <div class="form-actions">
-                <button type="submit" class="btn btn-primary"><%= t('buttons.update_course', %{Update Course Details}) %></button>
-              </div>
-            </span>
+              <span class="course_form">
+                <div class="form-actions-sticky-footer">
+                  <button type="submit" class="btn btn-primary"><%= t('buttons.update_course', %{Update Course Details}) %></button>
+                </div>
+              </span>
           </div>
-        </div>
+        </footer>
       <% end %>
     </div>
     <% end %>

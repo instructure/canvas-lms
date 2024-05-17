@@ -415,7 +415,22 @@ This is the standard form actions button bar at the bottom of every content form
   @include clearfix(); // Adding clearfix to allow for .pull-right button containers
 }
 
+.sticky-footer {
+  background: #F5F5F5;
+  position: fixed;
+  z-index: 999;
+  right: 0;
+  left: 270px;
+  bottom: 0;
+  padding: 0;
+}
 
+.form-actions-sticky-footer {
+  text-align: direction(right);
+  padding: 10px 10px 11px;
+  border-top: 1px solid #C7CDD1;
+  @include clearfix(); // Adding clearfix to allow for .pull-right button containers
+}
 
 // HELP TEXT
 // ---------
