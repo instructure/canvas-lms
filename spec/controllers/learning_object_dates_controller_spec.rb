@@ -854,6 +854,50 @@ describe LearningObjectDatesController do
 
       include_examples "learning object updates", false
       include_examples "learning objects without due dates"
+
+      it "creates an assignment if noop override is included and conditional release is enabled" do
+        @course.conditional_release = true
+        @course.save!
+        expect(learning_object.assignment).to be_nil
+        put :update, params: { **default_params, only_visible_to_overrides: true, assignment_overrides: [{ noop_id: 1 }] }
+        expect(response).to be_no_content
+        learning_object.reload
+        expect(learning_object.assignment).to be_present
+        expect(learning_object.assignment.title).to eq "My Page"
+        expect(learning_object.assignment.only_visible_to_overrides).to be true
+        expect(learning_object.assignment.assignment_overrides.active.pluck(:set_type)).to eq ["Noop"]
+      end
+
+      it "does not create an assignment if noop override is included and conditional release is disabled" do
+        expect(learning_object.assignment).to be_nil
+        put :update, params: { **default_params, only_visible_to_overrides: false, assignment_overrides: [{ noop_id: 1 }] }
+        expect(response).to be_no_content
+        learning_object.reload
+        expect(learning_object.assignment).to be_nil
+        expect(learning_object.only_visible_to_overrides).to be false
+      end
+
+      it "does not create an assignment if noop override is not included" do
+        @course.conditional_release = true
+        @course.save!
+        put :update, params: { **default_params, assignment_overrides: [{ course_section_id: @course.default_section.id }] }
+        expect(response).to be_no_content
+        expect(learning_object.reload.assignment).to be_nil
+      end
+
+      it "creates multiple overrides and sets base dates on the new assignment while adding the Noop override" do
+        @course.conditional_release = true
+        @course.save!
+        expect(learning_object.assignment).to be_nil
+        unlock_at = "2021-07-28T16:34:07Z"
+        assignment_overrides = [{ course_section_id: @course.default_section.id }, { noop_id: 1 }]
+        put :update, params: { **default_params, only_visible_to_overrides: false, unlock_at:, assignment_overrides: }
+        expect(response).to be_no_content
+        learning_object.reload
+        expect(learning_object.assignment.unlock_at.iso8601).to eq unlock_at
+        expect(learning_object.assignment.only_visible_to_overrides).to be false
+        expect(learning_object.assignment.assignment_overrides.active.pluck(:set_type)).to contain_exactly("Noop", "CourseSection")
+      end
     end
 
     context "pages with an assignment" do
@@ -880,6 +924,27 @@ describe LearningObjectDatesController do
       end
 
       include_examples "learning object updates", false
+
+      it "does not remove the assignment if a noop override is removed" do
+        @course.conditional_release = true
+        @course.save!
+        differentiable.assignment_overrides.create!(set_type: "Noop", set_id: 1)
+        put :update, params: { **default_params, assignment_overrides: [] }
+        expect(response).to be_no_content
+        expect(learning_object.reload.assignment).to be_present
+        expect(differentiable.reload.assignment_overrides.active.count).to eq 0
+      end
+
+      it "does not create a new assignment if a noop override is included" do
+        @course.conditional_release = true
+        @course.save!
+        assignment = learning_object.assignment
+        expect(assignment).to be_present
+        put :update, params: { **default_params, assignment_overrides: [{ noop_id: 1 }] }
+        expect(response).to be_no_content
+        expect(learning_object.reload.assignment).to eq assignment
+        expect(differentiable.reload.assignment_overrides.active.pluck(:set_type)).to eq ["Noop"]
+      end
     end
 
     context "files" do

@@ -84,6 +84,7 @@ class LearningObjectDatesController < ApplicationController
   include Api::V1::LearningObjectDates
   include Api::V1::Assignment
   include Api::V1::AssignmentOverride
+  include SubmittableHelper
 
   OBJECTS_WITH_ASSIGNMENTS = %w[DiscussionTopic WikiPage].freeze
 
@@ -142,7 +143,8 @@ class LearningObjectDatesController < ApplicationController
   #   an ID and will be updated if needed. New overrides will be created for overrides in the list
   #   without an ID. Overrides not included in the list will be deleted. Providing an empty list
   #   will delete all of the object's overrides. Keys for each override object can include: 'id',
-  #   'title', 'student_ids', and 'course_section_id'.
+  #   'title', 'due_at', 'unlock_at', 'lock_at', 'student_ids', and 'course_section_id', 'course_id',
+  #   'noop_id', and 'unassign_item'.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/assignments/:assignment_id/date_details \
@@ -179,7 +181,9 @@ class LearningObjectDatesController < ApplicationController
         prefer_assignment_availability_dates(asset, overridable)
       end
     when "WikiPage"
-      if asset == overridable
+      if wiki_page_needs_assignment?
+        apply_assignment_parameters(object_update_params.merge(set_assignment: true), asset)
+      elsif asset == overridable
         update_ungraded_object(asset, object_update_params)
       else
         update_assignment(overridable, object_update_params)
@@ -288,6 +292,13 @@ class LearningObjectDatesController < ApplicationController
 
   def caches_availability?
     asset.is_a?(Assignment) || asset.is_a?(Quizzes::Quiz) || asset.is_a?(DiscussionTopic) || asset.is_a?(WikiPage)
+  end
+
+  def wiki_page_needs_assignment?
+    asset.is_a?(WikiPage) &&
+      asset.assignment.nil? &&
+      @context.conditional_release? &&
+      params[:assignment_overrides]&.any? { |override| override[:noop_id].present? }
   end
 
   def object_update_params

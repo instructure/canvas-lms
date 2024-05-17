@@ -62,15 +62,17 @@
           {{/if}}
         {{/if}}
         {{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED}}
-          <div class="controls-section">
-            <label class="checkbox" for="conditional_content">
-              {{checkbox "assignment.set_assignment"
-                id="conditional_content"
-                class="element_toggler"
-                checked=set_assignment}}
-              {{#t}}Allow in mastery paths{{/t}}
-            </label>
-          </div>
+          {{#unless ENV.FEATURES.differentiated_modules}}
+            <div class="controls-section">
+              <label class="checkbox" for="conditional_content">
+                {{checkbox "assignment.set_assignment"
+                  id="conditional_content"
+                  class="element_toggler"
+                  checked=set_assignment}}
+                {{#t}}Allow in mastery paths{{/t}}
+              </label>
+            </div>
+          {{/unless}}
         {{/if}}
       </div>
     </div>
