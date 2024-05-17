@@ -48,6 +48,7 @@ import {getUnreadCount} from './queries/unreadCountQuery'
 import {getActiveItem, getTrayLabel, getTrayPortal} from './utils'
 import type {ActiveTray, ExternalTool} from './utils'
 import {getSetting, setSetting} from '@canvas/settings-query/react/settingsQuery'
+import {SVGIcon} from '@instructure/ui-svg-images'
 
 const I18n = useI18nScope('sidenav')
 
@@ -153,9 +154,9 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
   const helpIcon = window.ENV.help_link_icon
 
   const navItemThemeOverride = {
-    iconSize: '1.5675rem',
+    iconSize: '26px',
     iconColor: 'white',
-    contentPadding: '0.1rem',
+    contentPadding: '7px 0',
     backgroundColor: 'transparent',
     hoverBackgroundColor: 'transparent',
     fontWeight: 400,
@@ -250,7 +251,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
       document.querySelector('#calendar-tray'),
       document.querySelector('#inbox-tray'),
       document.querySelector('#history-tray'),
-      document.querySelector('#external-tool-tray'),
+      ...document.querySelectorAll('#external-tool-tray'),
       document.querySelector('#help-tray'),
     ]
     if (Array.isArray(sideNavTrays))
@@ -263,6 +264,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
         document.querySelector('#external-tool-tray')?.classList.add(svgImgClassName)
       )
 
+    document.querySelector('#logo-tray')?.classList.add('ic-logo-tray')
     document.querySelector('#user-tray')?.classList.add('ic-user-tray')
     document.querySelector('#canvas-logo')?.classList.add('ic-canvas-logo')
     document.querySelector('#brand-logo')?.classList.add('ic-brand-logo')
@@ -314,6 +316,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
         }}
       >
         <SideNavBar.Item
+          id="logo-tray"
           elementRef={el => (logoRef.current = el)}
           icon={
             !logoUrl ? (
@@ -366,7 +369,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
               <Avatar
                 id="user-avatar"
                 name={window.ENV.current_user.display_name}
-                size="x-small"
+                size={collapseGlobalNav ? 'x-small' : 'small'}
                 src={window.ENV.current_user.avatar_image_url}
                 data-testid="sidenav-user-avatar"
                 showBorder="always"
@@ -374,8 +377,8 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
                 themeOverride={{
                   background: 'transparent',
                   borderColor: '#ffffff',
-                  borderWidthSmall: '0.2em',
-                  borderWidthMedium: '0.2rem',
+                  borderWidthSmall: '0.15em',
+                  borderWidthMedium: '0.15rem',
                 }}
               />
             </Badge>
@@ -491,20 +494,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
               elementRef={el => (externalTool.current = el)}
               icon={
                 'svgPath' in tool ? (
-                  <svg
-                    id="svg-external-tool"
-                    version="1.1"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlnsXlink="http://www.w3.org/1999/xlink"
-                    viewBox="0 0 26 26"
-                    dangerouslySetInnerHTML={{__html: tool.svgPath ?? ''}}
-                    width="26px"
-                    height="26px"
-                    aria-hidden="true"
-                    role="presentation"
-                    focusable="false"
-                    style={{fill: 'currentColor', fontSize: 26}}
-                  />
+                  <SVGIcon viewBox="0 0 64 64" src={tool.svgPath} title="svg-external-tool" />
                 ) : (
                   <img id="img-external-tool" width="26px" height="26px" src={tool.imgSrc} alt="" />
                 )
