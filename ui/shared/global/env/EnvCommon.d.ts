@@ -234,6 +234,7 @@ export type SiteAdminFeatureId =
   | 'render_both_to_do_lists'
   | 'instui_header'
   | 'lti_registrations_discover_page'
+  | 'courses_popout_sisid'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
