@@ -56,7 +56,14 @@ MissingDateDialogView.prototype.render = function () {
   if (this.invalidFields === true) {
     return false
   } else {
-    this.invalidSectionNames = this.invalidFields.map(this.labelFn)
+    const mappedSectionNames = this.invalidFields.map((index, input) => this.labelFn(index, input))
+
+    // Convert to array if jquery object
+    if (this.invalidFields.jquery) {
+      this.invalidSectionNames = mappedSectionNames.get()
+    } else {
+      this.invalidSectionNames = mappedSectionNames
+    }
     this.showDialog()
     return this
   }

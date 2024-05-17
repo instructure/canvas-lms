@@ -495,7 +495,7 @@ export default class EditCalendarEventView extends Backbone.View {
             return true
           }
         },
-        labelFn(input) {
+        labelFn(_index, input) {
           return $(input).parents('.date_start_end_row').prev('label').text()
         },
         success: $dialog => {
