@@ -17,14 +17,14 @@
  */
 
 import React from 'react'
-import type {Product, Company} from '../../model/Product'
-
-import {Link as DetailLink, useSearchParams} from 'react-router-dom'
+import type {Product} from '../../model/Product'
+import {Link as DetailLink} from 'react-router-dom'
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
+import {Tag} from '@instructure/ui-tag'
 
 type ProductCardProps = {
   product: Product
@@ -33,54 +33,48 @@ type ProductCardProps = {
 const ProductCard = (props: ProductCardProps) => {
   const {product} = props
 
-  const [searchParams, setSearchParams] = useSearchParams()
-
-  const setCompany = (company: Company) => {
-    const queryParams = searchParams.get('filter')
-    const params = queryParams
-      ? JSON.parse(queryParams)
-      : {companies: [], versions: [], audience: []}
-
-    if (!params.companies.some((c: {id: string}) => c.id === company.id)) {
-      setSearchParams({
-        filter: JSON.stringify({...params, companies: [...params.companies, company]}),
-      })
-    }
-  }
-
   return (
     <Flex.Item>
       <View
         key={product.id}
         as="div"
         width={340}
-        height={200}
+        height="100%"
         borderColor="primary"
-        borderRadius="small"
-        borderWidth="medium"
+        borderRadius="medium"
+        borderWidth="small"
         padding="medium"
       >
-        <Flex gap="small" margin="0 0 medium 0">
-          <div style={{borderRadius: '50%', overflow: 'hidden'}}>
-            <Img src={product.logo_url} width={48} height={48} />
-          </div>
-          <div>
-            <Text weight="bold" size="large">
-              <DetailLink to={`/product_detail/${product.id}`}>{product.name}</DetailLink>
-            </Text>
-            <div>
-              by{' '}
-              <Text weight="bold" color="secondary">
-                {product.company.name}
-              </Text>
+        <Flex direction="column" height="100%">
+          <Flex gap="small" margin="0 0 medium 0">
+            <div style={{borderRadius: '50%', overflow: 'hidden'}}>
+              <Img src={product.logo_url} width={48} height={48} />
             </div>
-          </div>
+            <div>
+              <Text weight="bold" size="large">
+                <DetailLink to={`/product_detail/${product.id}`}>{product.name}</DetailLink>
+              </Text>
+              <div>
+                by{' '}
+                <Text weight="bold" color="secondary">
+                  {product.company.name}
+                </Text>
+              </div>
+            </div>
+          </Flex>
+          <View margin="0 0 medium 0">
+            <Text>
+              <TruncateText maxLines={3} ellipsis=" (...)">
+                {product.tagline}
+              </TruncateText>
+            </Text>
+          </View>
+          <View as="div" margin="auto 0 0 0">
+            {product.badges.map(badge => (
+              <Tag key={badge.name} text={badge.name} size="small" margin="0 xx-small 0 0" />
+            ))}
+          </View>
         </Flex>
-        <Text>
-          <TruncateText maxLines={3} ellipsis=" (...)">
-            {product.tagline}
-          </TruncateText>
-        </Text>
       </View>
     </Flex.Item>
   )
