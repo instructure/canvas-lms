@@ -1073,11 +1073,29 @@ describe ContentTag do
       expect(@quiz.assignment.submissions.length).to eq 1
     end
 
+    it "graded discussion topic is added to a module" do
+      adhoc_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override.assignment_override_students.create!(user: @student1)
+
+      discussion = @course.discussion_topics.create!
+      assignment = @course.assignments.create!(title: "some discussion assignment", only_visible_to_overrides: true)
+      assignment.submission_types = "discussion_topic"
+      assignment.save!
+      discussion.assignment_id = @assignment.id
+      discussion.save!
+
+      expect(discussion.assignment.submissions.length).to eq 2
+
+      @context_module.add_item(id: discussion.id, type: "discussion_topic")
+      discussion.assignment.submissions.reload
+      expect(discussion.assignment.submissions.length).to eq 1
+    end
+
     it "assignment is removed from a module" do
       adhoc_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
       adhoc_override.assignment_override_students.create!(user: @student1)
 
-      @context_module.update_assignment_submissions(@context_module.current_assignments_and_quizzes)
+      @context_module.update_assignment_submissions(@context_module.current_items_with_assignment)
       @assignment.submissions.reload
       expect(@assignment.submissions.length).to eq 1
 
@@ -1094,7 +1112,7 @@ describe ContentTag do
       adhoc_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
       adhoc_override.assignment_override_students.create!(user: @student1)
 
-      @context_module.update_assignment_submissions(@context_module.current_assignments_and_quizzes)
+      @context_module.update_assignment_submissions(@context_module.current_items_with_assignment)
       @quiz.assignment.submissions.reload
       expect(@quiz.assignment.submissions.length).to eq 1
 
@@ -1103,12 +1121,35 @@ describe ContentTag do
       expect(@quiz.assignment.submissions.length).to eq 2
     end
 
+    it "discussion topic is removed from a module" do
+      discussion = @course.discussion_topics.create!
+      assignment = @course.assignments.create!
+      assignment.submission_types = "discussion_topic"
+      assignment.save!
+      discussion.assignment_id = assignment.id
+      discussion.save!
+
+      @context_module.add_item(id: discussion.id, type: "discussion_topic")
+      topic_tag = @context_module.content_tags.last
+
+      adhoc_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override.assignment_override_students.create!(user: @student1)
+
+      @context_module.update_assignment_submissions(@context_module.current_items_with_assignment)
+      discussion.assignment.submissions.reload
+      expect(discussion.assignment.submissions.length).to eq 1
+
+      topic_tag.destroy
+      discussion.assignment.submissions.reload
+      expect(discussion.assignment.submissions.length).to eq 2
+    end
+
     it "assignment is moved from one module to another" do
       adhoc_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
       adhoc_override.assignment_override_students.create!(user: @student1)
       @context_module2 = @course.context_modules.create!
 
-      @context_module.update_assignment_submissions(@context_module.current_assignments_and_quizzes)
+      @context_module.update_assignment_submissions(@context_module.current_items_with_assignment)
       @assignment.submissions.reload
       expect(@assignment.submissions.length).to eq 1
 

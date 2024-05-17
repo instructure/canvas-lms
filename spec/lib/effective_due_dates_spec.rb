@@ -739,6 +739,32 @@ describe Course do
             expect(result).to eq expected
           end
 
+          it "applies an assignment's discussion topics's context module overrides" do
+            module2 = @test_course.context_modules.create!(name: "Module 2")
+            module2_override = module2.assignment_overrides.create!
+            module2_override.assignment_override_students.create!(user: @student1)
+
+            @discussion = @test_course.discussion_topics.create!
+            @discussion.assignment = @assignment2
+            @discussion.save!
+            @discussion.context_module_tags.create! context_module: module2, context: @test_course, tag_type: "context_module"
+
+            edd = EffectiveDueDates.for_course(@test_course, @discussion.assignment)
+            result = edd.to_hash
+            expected = {
+              @assignment2.id => {
+                @student1.id => {
+                  due_at: @assignment2.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: module2_override.id,
+                  override_source: "ADHOC"
+                }
+              }
+            }
+            expect(result).to eq expected
+          end
+
           it "applies correct context module overrides for multiple assignments and modules" do
             module2 = @test_course.context_modules.create!(name: "Module 2")
             module2_override = module2.assignment_overrides.create!
