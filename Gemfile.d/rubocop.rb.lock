@@ -43,9 +43,9 @@ GEM
     crass (1.0.6)
     csv (3.3.0)
     erubi (1.12.0)
-    gergich (2.1.4)
+    gergich (2.1.5)
       httparty (~> 0.17)
-      sqlite3 (~> 1.4)
+      sqlite3 (>= 1.4, < 3.0)
     httparty (0.22.0)
       csv
       mini_mime (>= 1.0.0)
