@@ -81,7 +81,7 @@ module Factories
           { weight: 0, text: "C", comments: "", id: 7051 }
         ],
         question_type: "multiple_choice_question"
-      }
+      }.with_indifferent_access
     ]
   end
 
