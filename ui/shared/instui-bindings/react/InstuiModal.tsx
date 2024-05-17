@@ -36,7 +36,7 @@ Use this whenever you don't want to do anything custom with your header or your 
 You should be able to use it exactly like you'd use an instUi Modal by changing:
 import {Modal} from '@instructure/ui-overlays'
 to
-import Modal from '../shared/components/InstuiModal'
+import Modal from '@canvas/instui-bindings/react/InstuiModal'
 
 <Modal
   open={this.state.open}

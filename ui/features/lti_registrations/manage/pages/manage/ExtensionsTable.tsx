@@ -34,6 +34,9 @@ import type {PaginatedList} from '../../api/PaginatedList'
 import type {ExtensionsSortDirection, ExtensionsSortProperty} from '../../api/registrations'
 import type {LtiRegistration} from '../../model/LtiRegistration'
 import {useManageSearchParams, type ManageSearchParams} from './ManageSearchParams'
+import {colors} from '@instructure/canvas-theme'
+
+type CallbackWithRegistration = (registration: LtiRegistration) => void
 
 export type ExtensionsTableProps = {
   extensions: PaginatedList<LtiRegistration>
@@ -41,6 +44,7 @@ export type ExtensionsTableProps = {
   dir: ExtensionsSortDirection
   stale: boolean
   updateSearchParams: ReturnType<typeof useManageSearchParams>[1]
+  deleteApp: CallbackWithRegistration
 }
 
 const I18n = useI18nScope('lti_registrations')
@@ -51,7 +55,10 @@ type Column = {
   width: string
   textAlign?: 'start' | 'center' | 'end'
   sortable?: boolean
-  render: (registration: LtiRegistration) => React.ReactNode
+  render: (
+    registration: LtiRegistration,
+    callbacks: {deleteApp: CallbackWithRegistration}
+  ) => React.ReactNode
 }
 
 const Columns: ReadonlyArray<Column> = [
@@ -122,8 +129,8 @@ const Columns: ReadonlyArray<Column> = [
   },
   {
     id: 'actions',
-    width: '5%',
-    render: () => (
+    width: '62px',
+    render: (r, {deleteApp}) => (
       <Menu
         trigger={
           <IconButton
@@ -136,12 +143,10 @@ const Columns: ReadonlyArray<Column> = [
         }
       >
         <Menu.Item
-          onClick={() => {
-            // todo: make this an instui component
-            window.alert('delete')
-          }}
+          themeOverride={{labelColor: colors.textDanger, activeBackground: colors.backgroundDanger}}
+          onClick={() => deleteApp(r)}
         >
-          {I18n.t('Delete')}
+          {I18n.t('Delete App')}
         </Menu.Item>
       </Menu>
     ),
@@ -186,7 +191,7 @@ const renderHeaderRow = (props: {
 )
 
 export const ExtensionsTable = (extensionsTableProps: ExtensionsTableProps) => {
-  const {extensions, sort, dir, stale, updateSearchParams} = extensionsTableProps
+  const {extensions, stale, ...restOfProps} = extensionsTableProps
   return (
     <div
       style={{
@@ -194,12 +199,7 @@ export const ExtensionsTable = (extensionsTableProps: ExtensionsTableProps) => {
       }}
     >
       {extensions.data.length > 0 ? (
-        <ExtensionsTableResponsiveWrapper
-          extensions={extensions}
-          sort={sort}
-          dir={dir}
-          updateSearchParams={updateSearchParams}
-        />
+        <ExtensionsTableResponsiveWrapper extensions={extensions} {...restOfProps} />
       ) : (
         <Flex direction="column" alignItems="center" padding="large 0">
           <IconSearchLine size="medium" color="secondary" />
@@ -246,18 +246,19 @@ type ExtensionsTableInnerProps = {
   tableProps: Omit<ExtensionsTableProps, 'stale' | 'page' | 'pageCount' | 'updatePage'>
 }
 
-const ExtensionsTableInner = React.memo((props: ExtensionsTableInnerProps) => {
+export const ExtensionsTableInner = React.memo((props: ExtensionsTableInnerProps) => {
   const rows = React.useMemo(() => {
     return props.tableProps.extensions.data.map(row => (
       <Table.Row key={row.id}>
         {Columns.map(({id, render, textAlign}) => (
           <Table.Cell key={id} textAlign={textAlign}>
-            {render(row)}
+            {render(row, {deleteApp: props.tableProps.deleteApp})}
           </Table.Cell>
         ))}
       </Table.Row>
     ))
-  }, [props.tableProps.extensions])
+  }, [props.tableProps.extensions, props.tableProps.deleteApp])
+
   return (
     <>
       <Table
