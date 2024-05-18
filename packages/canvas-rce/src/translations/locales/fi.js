@@ -195,6 +195,9 @@ const locale = {
   "congruent_5a244acd": { "message": "Yhdenmukainen" },
   "contains_311f37b7": { "message": "Sisältää" },
   "content_1440204b": { "message": "Sisältö" },
+  "content_in_the_editor_will_be_changed_press_cancel_d5bf3357": {
+    "message": "Sisältö muokkaustoiminnossa vaihdetaan Pidä alkuperäinen sisältö painamalla Peruuta."
+  },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "Sisältöä ladataan yhä, jos jatkat, sitä ei upoteta kunnolla."
   },
@@ -807,6 +810,9 @@ const locale = {
   "precedes_196b9aef": { "message": "Edeltää" },
   "precedes_equal_20701e84": { "message": "Edeltää yhtä suurta" },
   "preformatted_d0670862": { "message": "Esimuotoiltu" },
+  "prepend_findtext_append_8e0e769a": {
+    "message": "{ prepend }{ findText }{ append }"
+  },
   "prev_f82cbc48": { "message": "Edellinen" },
   "preview_53003fd2": { "message": "Esikatsele" },
   "preview_a3f8f854": { "message": "ESIKATSELU" },
@@ -862,6 +868,7 @@ const locale = {
   "restore_auto_save_deccd84b": {
     "message": "Palautetetaanko automaattinen tallennus?"
   },
+  "result_index_of_max_7db5ad8b": { "message": "Tulos { index } / { max }." },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Kääntöportti (ei anna periksi)"
   },

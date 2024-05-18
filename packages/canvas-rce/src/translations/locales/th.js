@@ -183,6 +183,9 @@ const locale = {
   "congruent_5a244acd": { "message": "สอดคล้อง" },
   "contains_311f37b7": { "message": "ประกอบด้วย" },
   "content_1440204b": { "message": "ข้อมูล" },
+  "content_in_the_editor_will_be_changed_press_cancel_d5bf3357": {
+    "message": "เนื้อหาในโปรแกรมแก้ไขจะมีการเปลี่ยนแปลง กด ยกเลิก (Cancel) เพื่อเก็บเนื้อหาเดิมไว้"
+  },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "เนื้อหายังอัพโหลดอยู่ หากคุณดำเนินการต่อ ข้อมูลจะไม่ถูกผนวกอย่างถูกต้อง"
   },
@@ -763,6 +766,9 @@ const locale = {
   "precedes_196b9aef": { "message": "นำหน้า" },
   "precedes_equal_20701e84": { "message": "นำหน้าเท่ากับ" },
   "preformatted_d0670862": { "message": "กำหนดรูปแบบไว้ล่วงหน้า" },
+  "prepend_findtext_append_8e0e769a": {
+    "message": "{ prepend }{ findText }{ append }"
+  },
   "prev_f82cbc48": { "message": "ก่อนหน้า" },
   "preview_53003fd2": { "message": "แสดงตัวอย่าง" },
   "preview_a3f8f854": { "message": "แสดงตัวอย่าง" },
@@ -817,6 +823,9 @@ const locale = {
   "resize_ec83d538": { "message": "ปรับขนาด" },
   "restore_auto_save_deccd84b": {
     "message": "กู้คืนที่บันทึกอัตโนมัติหรือไม่"
+  },
+  "result_index_of_max_7db5ad8b": {
+    "message": "ผลลัพธ์ { index } จาก { max }"
   },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Reverse Turnstile (มีเกิดผลลัพธ์)"
