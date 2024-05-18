@@ -359,6 +359,9 @@
     "content_1440204b": {
         "message": "Inhalt"
     },
+    "content_in_the_editor_will_be_changed_press_cancel_d5bf3357": {
+        "message": "Inhalt im Editor wird geändert Klicken Sie auf „Abbrechen“, um den originlaen Inhalt beizubehalten."
+    },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "Der Inhalt wird noch hochgeladen, wenn Sie fortfahren, wird er nicht richtig eingebettet."
     },
@@ -1706,6 +1709,9 @@
     "preformatted_d0670862": {
         "message": "Vorformatiert"
     },
+    "prepend_findtext_append_8e0e769a": {
+        "message": "{ prepend }{ findText }{ append }"
+    },
     "prev_f82cbc48": {
         "message": "Vorher"
     },
@@ -1828,6 +1834,9 @@
     },
     "restore_auto_save_deccd84b": {
         "message": "Automatisches Speichern wiederherstellen"
+    },
+    "result_index_of_max_7db5ad8b": {
+        "message": "Ergebnis { index } von { max }"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Reverses Drehkreuz (kein Ergebnis)"

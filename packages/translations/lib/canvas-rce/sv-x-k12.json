@@ -170,6 +170,9 @@
   "congruent_5a244acd": { "message": "Kongruent" },
   "contains_311f37b7": { "message": "Innehåller" },
   "content_1440204b": { "message": "Innehåll" },
+  "content_in_the_editor_will_be_changed_press_cancel_d5bf3357": {
+    "message": "Innehåll i redigeraren kommer att ändras. Tryck på Avbryt för att behålla det ursprungliga innehållet."
+  },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "Innehåll laddas fortfarande upp, om du fortsätter kommer det inte att bäddas in korrekt."
   },
@@ -774,6 +777,9 @@
   "precedes_196b9aef": { "message": "Föregår" },
   "precedes_equal_20701e84": { "message": "Föregår lika med" },
   "preformatted_d0670862": { "message": "Förformaterad" },
+  "prepend_findtext_append_8e0e769a": {
+    "message": "{ prepend }{ findText }{ append }"
+  },
   "prev_f82cbc48": { "message": "Föregående" },
   "preview_53003fd2": { "message": "Förhandsgranska" },
   "preview_a3f8f854": { "message": "FÖRHANDSGRANSKA" },
@@ -828,6 +834,9 @@
   "resize_ec83d538": { "message": "Ändra storlek" },
   "restore_auto_save_deccd84b": {
     "message": "Vill du återställa funktionen Spara automatiskt?"
+  },
+  "result_index_of_max_7db5ad8b": {
+    "message": "Resultat { index } av { max }."
   },
   "reverse_turnstile_does_not_yield_7558be06": { "message": "Vändkors" },
   "rho_a0244a36": { "message": "Rho" },

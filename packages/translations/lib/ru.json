@@ -359,6 +359,9 @@
     "content_1440204b": {
         "message": "Содержимое"
     },
+    "content_in_the_editor_will_be_changed_press_cancel_d5bf3357": {
+        "message": "Содержимое в редакторе будет изменено. Нажмите \"Отмена\", чтобы сохранить исходное содержимое."
+    },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "Выгрузка контента еще не завершена, в случае продолжения вами данного действия он не будет внедрен правильно."
     },
@@ -1706,6 +1709,9 @@
     "preformatted_d0670862": {
         "message": "Предварительно форматированный"
     },
+    "prepend_findtext_append_8e0e769a": {
+        "message": "{ prepend }{ findText }{ append }"
+    },
     "prev_f82cbc48": {
         "message": "Назад"
     },
@@ -1828,6 +1834,9 @@
     },
     "restore_auto_save_deccd84b": {
         "message": "Восстановить автосохранение?"
+    },
+    "result_index_of_max_7db5ad8b": {
+        "message": "Результат { index } из { max }."
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Перевернутый турникет (не возвращает значение)"
