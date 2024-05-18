@@ -189,6 +189,9 @@ const locale = {
   "congruent_5a244acd": { "message": "Kongruent" },
   "contains_311f37b7": { "message": "Indeholder" },
   "content_1440204b": { "message": "Indhold" },
+  "content_in_the_editor_will_be_changed_press_cancel_d5bf3357": {
+    "message": "Indholdet i editoren vil blive ændret. Tryk på Annuller for at beholde det originale indhold."
+  },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "Indhold er stadig ved at blive uploadet. Hvis du fortsætter, bliver det ikke integreret korrekt."
   },
@@ -789,6 +792,9 @@ const locale = {
   "precedes_196b9aef": { "message": "Kommer før" },
   "precedes_equal_20701e84": { "message": "Kommer før lig med" },
   "preformatted_d0670862": { "message": "Præformatteret" },
+  "prepend_findtext_append_8e0e769a": {
+    "message": "{ prepend }{ findText }{ append }"
+  },
   "prev_f82cbc48": { "message": "Forrige" },
   "preview_53003fd2": { "message": "Eksempel" },
   "preview_a3f8f854": { "message": "FORHÅNDSVISNING" },
@@ -843,6 +849,9 @@ const locale = {
   "resize_ec83d538": { "message": "Tilpas størrelse" },
   "restore_auto_save_deccd84b": {
     "message": "Gendan automatisk gemt indhold?"
+  },
+  "result_index_of_max_7db5ad8b": {
+    "message": "Resultat { index } af { max }."
   },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Omvendt drejekors (giver ikke efter)"
