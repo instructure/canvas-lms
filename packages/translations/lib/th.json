@@ -359,6 +359,9 @@
     "content_1440204b": {
         "message": "ข้อมูล"
     },
+    "content_in_the_editor_will_be_changed_press_cancel_d5bf3357": {
+        "message": "เนื้อหาในโปรแกรมแก้ไขจะมีการเปลี่ยนแปลง กด ยกเลิก (Cancel) เพื่อเก็บเนื้อหาเดิมไว้"
+    },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "เนื้อหายังอัพโหลดอยู่ หากคุณดำเนินการต่อ ข้อมูลจะไม่ถูกผนวกอย่างถูกต้อง"
     },
@@ -1706,6 +1709,9 @@
     "preformatted_d0670862": {
         "message": "กำหนดรูปแบบไว้ล่วงหน้า"
     },
+    "prepend_findtext_append_8e0e769a": {
+        "message": "{ prepend }{ findText }{ append }"
+    },
     "prev_f82cbc48": {
         "message": "ก่อนหน้า"
     },
@@ -1828,6 +1834,9 @@
     },
     "restore_auto_save_deccd84b": {
         "message": "กู้คืนที่บันทึกอัตโนมัติหรือไม่"
+    },
+    "result_index_of_max_7db5ad8b": {
+        "message": "ผลลัพธ์ { index } จาก { max }"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Reverse Turnstile (มีเกิดผลลัพธ์)"

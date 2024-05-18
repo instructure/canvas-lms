@@ -170,6 +170,9 @@
   "congruent_5a244acd": { "message": "Kongruen" },
   "contains_311f37b7": { "message": "Mengandungi" },
   "content_1440204b": { "message": "Kandungan" },
+  "content_in_the_editor_will_be_changed_press_cancel_d5bf3357": {
+    "message": "Kandungan dalam editor akan diubah. Tekan Batal untuk menyimpan kandungan asal."
+  },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "Kandungan masih lagi sedang dimuat naik, sekiranya anda meneruskan kandungan tidak akan terbenam dengan betul."
   },
@@ -762,6 +765,9 @@
   "precedes_196b9aef": { "message": "Mendahului" },
   "precedes_equal_20701e84": { "message": "Mendahului Sama Dengan" },
   "preformatted_d0670862": { "message": "Sedia Terformat" },
+  "prepend_findtext_append_8e0e769a": {
+    "message": "{ prepend }{ findText }{ append }"
+  },
   "prev_f82cbc48": { "message": "Sebelumnya" },
   "preview_53003fd2": { "message": "Pratonton" },
   "preview_a3f8f854": { "message": "PRATONTON" },
@@ -816,6 +822,9 @@
   "resize_ec83d538": { "message": "Saiz Semula" },
   "restore_auto_save_deccd84b": {
     "message": "Pulihkan penyimpanan automatik?"
+  },
+  "result_index_of_max_7db5ad8b": {
+    "message": "Keputusan { index } daripada { max }."
   },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Paku Kiri (Tiada Keluaran)"
