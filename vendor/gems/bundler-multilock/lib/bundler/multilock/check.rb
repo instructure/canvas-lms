@@ -88,7 +88,7 @@ module Bundler
 
       # this checks for mismatches between the parent lockfile and the given lockfile,
       # and for pinned dependencies in lockfiles requiring them
-      def deep_check(lockfile_definition)
+      def deep_check(lockfile_definition, conflicts: nil)
         lockfile_name = lockfile_definition[:lockfile]
         @cache.deep_check(lockfile_name) do
           success = true
@@ -120,7 +120,7 @@ module Bundler
 
           # check for conflicting requirements (and build list of pins, in the same loop)
           parser.specs.each do |spec|
-            parent_spec = @cache.specs(parent_lockfile_name)[[spec.name, spec.platform]]
+            parent_spec = @cache.find_matching_spec(parent_lockfile_name, spec)
 
             if lockfile_definition[:enforce_pinned_additional_dependencies]
               # look through what this spec depends on, and keep track of all pinned requirements
@@ -156,6 +156,7 @@ module Bundler
                              "does not match the parent lockfile's version " \
                              "(@#{parent_spec.version}#{parent_spec.git_version}); " \
                              "this may be due to a conflicting requirement, which would require manual resolution.")
+            conflicts&.add(spec.name)
             success = false
           end
 
