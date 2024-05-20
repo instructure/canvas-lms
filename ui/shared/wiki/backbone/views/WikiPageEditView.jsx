@@ -27,6 +27,7 @@ import WikiPageReloadView from './WikiPageReloadView'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
 import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import renderWikiPageTitle from '../../react/renderWikiPageTitle'
 import {renderAssignToTray} from '../../react/renderAssignToTray'
 import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
@@ -243,8 +244,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       if (this.model.get('published')) {
         publishAtInput.prop('disabled', true)
       } else {
-        publishAtInput
-          .datetime_field()
+        renderDatetimeField(publishAtInput)
           .change(e => {
             $('.save_and_publish').prop('disabled', e.target.value.length > 0)
           })
