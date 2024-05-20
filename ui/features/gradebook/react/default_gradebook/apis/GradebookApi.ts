@@ -53,14 +53,16 @@ function updateSubmission(
   assignmentId: string,
   userId: string,
   submission,
-  enterGradesAs?: string
+  enterGradesAs?: string,
+  subAssignmentTag?: string
 ) {
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${userId}`
   return axios.put(url, {
     submission: underscoreProperties(submission),
-    include: ['visibility'],
+    include: ['visibility', 'sub_assignment_submissions'],
     prefer_points_over_scheme: enterGradesAs === 'points',
     originator: 'gradebook',
+    ...(subAssignmentTag ? {sub_assignment_tag: subAssignmentTag} : {}),
   })
 }
 

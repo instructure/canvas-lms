@@ -280,6 +280,7 @@ export type GradeResult = {
   late_policy_status: null | LatePolicyStatus
   score: null | number
   valid: boolean
+  subAssignmentTag?: string
 }
 
 export type AssignmentGroupGradeMap = {
