@@ -397,6 +397,17 @@ describe Lti::Messages::ResourceLinkRequest do
     end
 
     it_behaves_like "assignment resource link id check"
+
+    context "the resource link has a blank title but the assignment has a title" do
+      before do
+        expected_assignment_line_item.resource_link.update!(title: "")
+        assignment.update!(title: "foo")
+      end
+
+      it "uses the assignment title for the resource link title" do
+        expect(jws.dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq assignment.title
+      end
+    end
   end
 
   def jwt_message
