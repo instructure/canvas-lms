@@ -23,7 +23,6 @@ import {responsiveQuerySizes} from '../../utils'
 
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Link} from '@instructure/ui-link'
-import {IconEditLine} from '@instructure/ui-icons'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -32,7 +31,7 @@ const I18n = useI18nScope('discussion_posts')
 
 export function Reply({...props}) {
   let replyButtonText = I18n.t('Reply')
-  if (props.isIsolatedView) replyButtonText = I18n.t('Quote')
+  if (props.isSplitView) replyButtonText = I18n.t('Quote')
   return (
     <Responsive
       match="media"
@@ -61,11 +60,6 @@ export function Reply({...props}) {
               alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}
             >
               <Text weight="bold" size={responsiveProps.textSize}>
-                {props.hasDraftEntry && (
-                  <View margin="0 small 0 0">
-                    <IconEditLine size="x-small" />
-                  </View>
-                )}
                 {replyButtonText}
               </Text>
             </AccessibleContent>
@@ -78,7 +72,7 @@ export function Reply({...props}) {
 
 Reply.defaultProps = {
   withBackground: false,
-  isIsolatedView: false,
+  isSplitView: false,
 }
 
 Reply.propTypes = {
@@ -104,9 +98,8 @@ Reply.propTypes = {
    */
   isReadOnly: PropTypes.bool,
   /**
-   * True if rendered in isolated view
+   * True if rendered in split view
    */
-  isIsolatedView: PropTypes.bool,
-  hasDraftEntry: PropTypes.bool,
+  isSplitView: PropTypes.bool,
   replyButtonRef: PropTypes.any,
 }

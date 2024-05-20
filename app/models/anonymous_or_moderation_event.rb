@@ -65,7 +65,7 @@ class AnonymousOrModerationEvent < ApplicationRecord
   ].freeze
   SUBMISSION_ID_REQUIRED_EVENT_TYPES = (EVENT_TYPES - SUBMISSION_ID_EXCLUDED_EVENT_TYPES).freeze
 
-  belongs_to :assignment
+  belongs_to :assignment, class_name: "AbstractAssignment"
   belongs_to :user, optional: true
   belongs_to :submission
   belongs_to :canvadoc
@@ -121,7 +121,7 @@ class AnonymousOrModerationEvent < ApplicationRecord
   private
 
   %w[id student_id annotation_body].each do |key|
-    define_method "payload_#{key}_present" do
+    define_method :"payload_#{key}_present" do
       if payload[key].blank?
         errors.add(:payload, "#{key} can't be blank")
       end

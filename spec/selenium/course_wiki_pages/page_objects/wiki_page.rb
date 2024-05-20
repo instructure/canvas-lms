@@ -45,6 +45,18 @@ module CourseWikiPage
     ".delete_pages"
   end
 
+  def assign_to_btn_selector
+    ".assign-to-button"
+  end
+
+  def assign_to_link_selector
+    "[data-testid='manage-assign-to']"
+  end
+
+  def pending_changes_pill_selector
+    "[data-testid='pending_changes_pill']"
+  end
+
   #------------------------------ Elements ------------------------------
   def publish_btn
     f(publish_btn_selector)
@@ -114,6 +126,22 @@ module CourseWikiPage
     fj("a:contains('Home')")
   end
 
+  def assign_to_btn
+    f(assign_to_btn_selector)
+  end
+
+  def assign_to_link
+    f(assign_to_link_selector)
+  end
+
+  def pending_changes_pill
+    f(pending_changes_pill_selector)
+  end
+
+  def page_save_button
+    find_button("Save")
+  end
+
   #------------------------------ Actions -------------------------------
 
   def visit_wiki_page_view(course_id, page_title)
@@ -147,5 +175,13 @@ module CourseWikiPage
   def confirm_delete_pages
     confirm_delete_wiki_pages_btn.click
     wait_for_ajaximations
+  end
+
+  def pending_changes_pill_exists?
+    element_exists?(pending_changes_pill_selector)
+  end
+
+  def save_wiki_page
+    page_save_button.click
   end
 end

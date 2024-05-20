@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 class Course < ActiveRecord::Base
   include Context
   include Workflow
@@ -29,10 +27,11 @@ class Course < ActiveRecord::Base
   include ContentLicenses
   include TurnitinID
   include Courses::ItemVisibilityHelper
+  include Courses::ExportWarnings
   include OutcomeImportContext
   include MaterialChanges
 
-  attr_accessor :teacher_names, :master_course, :primary_enrollment_role
+  attr_accessor :teacher_names, :master_course, :primary_enrollment_role, :saved_by
   attr_writer :student_count, :teacher_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :master_migration
 
   time_zone_attribute :time_zone
@@ -47,7 +46,7 @@ class Course < ActiveRecord::Base
   end
 
   serialize :tab_configuration
-  serialize :settings, Hash
+  serialize :settings, type: Hash
   belongs_to :root_account, class_name: "Account"
   belongs_to :abstract_course
   belongs_to :enrollment_term
@@ -224,7 +223,6 @@ class Course < ActiveRecord::Base
   has_many :appointment_group_contexts, as: :context, inverse_of: :context
   has_many :appointment_groups, through: :appointment_group_contexts
   has_many :appointment_participants, -> { where("workflow_state = 'locked' AND parent_calendar_event_id IS NOT NULL") }, class_name: "CalendarEvent", foreign_key: :effective_context_code, primary_key: :asset_string
-  attr_accessor :import_source
 
   has_many :content_participation_counts, as: :context, inverse_of: :context, dependent: :destroy
   has_many :poll_sessions, class_name: "Polling::PollSession", dependent: :destroy
@@ -374,6 +372,12 @@ class Course < ActiveRecord::Base
     (attr.to_s == "asset_string") ? asset_string : super
   end
 
+  def grade_statuses
+    statuses = %w[late missing none excused]
+    statuses << "extended" if root_account.feature_enabled?(:extended_submission_state)
+    statuses
+  end
+
   def events_for(user)
     if user
       CalendarEvent
@@ -490,17 +494,12 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def modules_visible_to(user, array_is_okay: false)
-    if grants_right?(user, :view_unpublished_items)
-      if array_is_okay && association(:context_modules).loaded?
-        context_modules.reject(&:deleted?)
-      else
-        context_modules.not_deleted
-      end
-    elsif array_is_okay && association(:context_modules).loaded?
-      context_modules.select(&:active?)
+  def modules_visible_to(user)
+    scope = grants_right?(user, :view_unpublished_items) ? context_modules.not_deleted : context_modules.active
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      DifferentiableAssignment.scope_filter(scope, user, self)
     else
-      context_modules.active
+      scope
     end
   end
 
@@ -1463,7 +1462,6 @@ class Course < ActiveRecord::Base
                             admin_visible_student_enrollments.pluck(:user_id)
                           end
 
-    Rails.logger.debug "GRADES: recomputing scores in course=#{global_id} students=#{visible_student_ids.inspect}"
     Enrollment.recompute_final_score(
       visible_student_ids,
       id,
@@ -1720,13 +1718,12 @@ class Course < ActiveRecord::Base
   end
 
   def to_atom
-    Atom::Entry.new do |entry|
-      entry.title     = self.name
-      entry.updated   = updated_at
-      entry.published = created_at
-      entry.links << Atom::Link.new(rel: "alternate",
-                                    href: "/#{context_url_prefix}/courses/#{id}")
-    end
+    {
+      title: self.name,
+      updated: updated_at,
+      published: created_at,
+      link: "/#{context_url_prefix}/courses/#{id}"
+    }
   end
 
   def unenrolled_user_can_read?(user, setting)
@@ -2898,10 +2895,11 @@ class Course < ActiveRecord::Base
   end
 
   def all_dates
-    (calendar_events.active + assignments.active).each_with_object([]) do |e, list|
-      list << e.end_at if e.end_at
-      list << e.start_at if e.start_at
-    end.compact.flatten.map(&:to_date).uniq rescue []
+    [
+      calendar_events.active.pluck(:start_at, :end_at),
+      assignments.active.pluck(:due_at),
+      context_modules.not_deleted.pluck(:unlock_at)
+    ].flatten.compact.map(&:to_date).uniq
   end
 
   def real_end_date
@@ -3039,7 +3037,8 @@ class Course < ActiveRecord::Base
                                            user,
                                            visibilities,
                                            visibility,
-                                           enrollment_state: opts[:enrollment_state])
+                                           enrollment_state: opts[:enrollment_state],
+                                           exclude_enrollment_state: opts[:exclude_enrollment_state])
   end
 
   def enrollments_visible_to(user, opts = {})
@@ -3050,8 +3049,12 @@ class Course < ActiveRecord::Base
     apply_enrollment_visibilities_internal(enrollment_scope.except(:preload), user, visibilities, visibility)
   end
 
-  def apply_enrollment_visibilities_internal(scope, user, visibilities, visibility, enrollment_state: nil)
-    scope = scope.where(enrollments: { workflow_state: enrollment_state }) if enrollment_state
+  def apply_enrollment_visibilities_internal(scope, user, visibilities, visibility, enrollment_state: nil, exclude_enrollment_state: nil)
+    if enrollment_state
+      scope = scope.where(enrollments: { workflow_state: enrollment_state })
+    elsif exclude_enrollment_state
+      scope = scope.where.not(enrollments: { workflow_state: exclude_enrollment_state })
+    end
     # See also MessageableUsers (same logic used to get users across multiple courses) (should refactor)
     case visibility
     when :full then scope
@@ -3363,7 +3366,7 @@ class Course < ActiveRecord::Base
                      Course.default_tabs
                    end
 
-    if OpenAi.smart_search_available?(root_account)
+    if SmartSearch.smart_search_available?(self)
       default_tabs.insert(1,
                           {
                             id: TAB_SEARCH,
@@ -3635,11 +3638,11 @@ class Course < ActiveRecord::Base
         end
       end
     RUBY
-    alias_method "#{setting}?", setting if opts[:boolean]
+    alias_method :"#{setting}?", setting if opts[:boolean]
     if opts[:alias]
       alias_method opts[:alias], setting
-      alias_method "#{opts[:alias]}=", "#{setting}="
-      alias_method "#{opts[:alias]}?", "#{setting}?"
+      alias_method :"#{opts[:alias]}=", :"#{setting}="
+      alias_method :"#{opts[:alias]}?", :"#{setting}?"
     end
   end
 
@@ -3690,6 +3693,7 @@ class Course < ActiveRecord::Base
 
   add_setting :default_due_time, inherited: true
   add_setting :conditional_release, default: false, boolean: true, inherited: true
+  add_setting :search_embedding_version, arbitrary: true
 
   def elementary_enabled?
     account.enable_as_k5_account?
@@ -4410,12 +4414,12 @@ class Course < ActiveRecord::Base
       case event.to_s
       when "publish"
         context_module.publish unless context_module.active?
-        unless Account.site_admin.feature_enabled?(:module_publish_menu) && skip_content_tags
+        unless skip_content_tags
           context_module.publish_items!(progress:)
         end
       when "unpublish"
         context_module.unpublish unless context_module.unpublished?
-        if Account.site_admin.feature_enabled?(:module_publish_menu) && !skip_content_tags
+        unless skip_content_tags
           context_module.unpublish_items!(progress:)
         end
       when "delete"
@@ -4425,6 +4429,14 @@ class Course < ActiveRecord::Base
       completed_ids << context_module.id
     end
     completed_ids
+  end
+
+  # fix for appointment_participants using asset_string as primary key, even though it's
+  # not a real column
+  def _read_attribute(attr_name)
+    return asset_string if attr_name == "asset_string"
+
+    super
   end
 
   private
@@ -4458,13 +4470,18 @@ class Course < ActiveRecord::Base
       content_migration.copy_options = { everything: true }
       content_migration.migration_settings[:migration_ids_to_import] = { copy: { everything: true } }
       content_migration.workflow_state = "importing"
+      priority = Delayed::LOW_PRIORITY
+      if saved_by == :sis_import
+        priority += 5
+        content_migration.strand = "sis_import_course_templates"
+      end
       content_migration.save!
-      content_migration.queue_migration
+      content_migration.queue_migration(priority:)
     end
   end
 
   def set_restrict_quantitative_data_when_needed
-    if account.feature_enabled?(:restrict_quantitative_data) &&
+    if root_account.feature_enabled?(:restrict_quantitative_data) &&
        account.restrict_quantitative_data[:value] == true &&
        account.restrict_quantitative_data[:locked] == true
       self.restrict_quantitative_data = true

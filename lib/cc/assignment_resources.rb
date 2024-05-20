@@ -23,6 +23,10 @@ module CC
       # @user is nil if it's kicked off by the system, like a course template
       relation = @user ? Assignments::ScopedToUser.new(@course, @user).scope : @course.active_assignments
       relation.no_submittables.each do |assignment|
+        next if @course.assignments.where(id: assignment.id).type_quiz_lti.present? &&
+                Account.site_admin.feature_enabled?(:new_quizzes_common_cartridge) &&
+                @manifest.exporter.common_cartridge?
+
         next unless export_object?(assignment)
         next if @user && assignment.locked_for?(@user, check_policies: true)
 
@@ -189,6 +193,7 @@ module CC
     def self.create_canvas_assignment(node, assignment, manifest = nil)
       key_generator = manifest || CCHelper
       node.title assignment.title
+      node.time_zone_edited assignment.time_zone_edited unless assignment.time_zone_edited.blank?
       node.due_at CCHelper.ims_datetime(assignment.due_at, nil)
       node.lock_at CCHelper.ims_datetime(assignment.lock_at, nil)
       node.unlock_at CCHelper.ims_datetime(assignment.unlock_at, nil)
@@ -198,7 +203,7 @@ module CC
       node.all_day_date CCHelper.ims_date(assignment.all_day_date) if assignment.all_day_date
       node.peer_reviews_due_at CCHelper.ims_datetime(assignment.peer_reviews_due_at) if assignment.peer_reviews_due_at
       node.assignment_group_identifierref key_generator.create_key(assignment.assignment_group) if assignment.assignment_group && (!manifest || manifest.export_object?(assignment.assignment_group))
-      if assignment.grading_standard
+      if assignment.grading_standard && !(Account.site_admin.feature_enabled?(:archived_grading_schemes) && !assignment.grading_standard.active?)
         if assignment.grading_standard.context == assignment.context
           node.grading_standard_identifierref key_generator.create_key(assignment.grading_standard) if !manifest || manifest.export_object?(assignment.grading_standard)
         else
@@ -231,7 +236,7 @@ module CC
         assignment.assignment_overrides.active.where(set_type: "Noop", quiz_id: nil).each do |o|
           override_attrs = o.slice(:set_type, :set_id, :title)
           AssignmentOverride.overridden_dates.each do |field|
-            next unless o.send("#{field}_overridden")
+            next unless o.send(:"#{field}_overridden")
 
             override_attrs[field] = o[field]
           end

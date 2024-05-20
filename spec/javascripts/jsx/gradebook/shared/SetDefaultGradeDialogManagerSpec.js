@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 
 import SetDefaultGradeDialog from '@canvas/grading/jquery/SetDefaultGradeDialog'
 import SetDefaultGradeDialogManager from 'ui/features/gradebook/react/shared/SetDefaultGradeDialogManager'

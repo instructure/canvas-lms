@@ -42,7 +42,7 @@
 ---
 */
 
-import React, {ReactElement, ChangeEvent, SyntheticEvent} from 'react'
+import React, {type ReactElement, type ChangeEvent, type SyntheticEvent} from 'react'
 import {compact, castArray, isEqual} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Select} from '@instructure/ui-select'
@@ -219,7 +219,12 @@ class CanvasSelect extends React.Component<CanvasSelectProps, State> {
 
   renderNoOptionsOption(): ReactElement {
     return (
-      <SelectOption id={noOptionsOptionId} isHighlighted={false} isSelected={false}>
+      <SelectOption
+        id={noOptionsOptionId}
+        key={noOptionsOptionId}
+        isHighlighted={false}
+        isSelected={false}
+      >
         {this.props.noOptionsLabel}
       </SelectOption>
     )

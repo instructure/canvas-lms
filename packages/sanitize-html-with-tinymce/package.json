@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
+  "owner": "VICE",
   "main": "./index.js",
   "dependencies": {
     "tinymce": "^5"

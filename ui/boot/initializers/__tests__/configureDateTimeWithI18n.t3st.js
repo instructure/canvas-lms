@@ -39,7 +39,9 @@ import '../../../ext/custom_moment_locales/mi_nz'
 import '../../../ext/custom_moment_locales/hy_am'
 import '../../../ext/custom_moment_locales/sl'
 
-import $ from '@canvas/datetime'
+import $ from 'jquery'
+import '@canvas/datetime/jquery'
+import {parse, format, hasMeridiem} from '@canvas/datetime'
 import * as configureDateTime from '../configureDateTime'
 import * as configureDateTimeMomentParser from '../configureDateTimeMomentParser'
 // eslint-disable-next-line import/no-nodejs-modules
@@ -48,7 +50,6 @@ import I18n, {useTranslations} from '@canvas/i18n'
 // eslint-disable-next-line import/no-nodejs-modules
 import path from 'path'
 import YAML from 'yaml'
-import {parse, format, hasMeridiem} from 'datetime'
 
 import defaultTZLocaleData from 'timezone/locales'
 import ar_SA from '../../../ext/custom_timezone_locales/ar_SA'

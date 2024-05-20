@@ -137,15 +137,17 @@ module AccountReports
     end
 
     def user_query
-      root_account.pseudonyms.except(:preload).joins(:user).select(
-        "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id, pseudonyms.sis_batch_id,
-         pseudonyms.integration_id,pseudonyms.authentication_provider_id,pseudonyms.unique_id,
-         pseudonyms.workflow_state, users.sortable_name,users.updated_at AS user_updated_at,
-         users.name, users.short_name, users.pronouns AS db_pronouns"
-      ).where("NOT EXISTS (SELECT user_id
-                           FROM #{Enrollment.quoted_table_name} e
-                           WHERE e.type = 'StudentViewEnrollment'
-                           AND e.user_id = pseudonyms.user_id)")
+      root_account.shard.activate do
+        root_account.pseudonyms.except(:preload).joins(:user).select(
+          "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id, pseudonyms.sis_batch_id,
+           pseudonyms.integration_id,pseudonyms.authentication_provider_id,pseudonyms.unique_id,
+           pseudonyms.workflow_state, users.sortable_name,users.updated_at AS user_updated_at,
+           users.name, users.short_name, users.pronouns AS db_pronouns"
+        ).where("NOT EXISTS (SELECT user_id
+                             FROM #{Enrollment.quoted_table_name} e
+                             WHERE e.type = 'StudentViewEnrollment'
+                             AND e.user_id = pseudonyms.user_id)")
+      end
     end
 
     def user_query_options(users)
@@ -307,11 +309,14 @@ module AccountReports
             sub_data = MasterCourses::ChildSubscription.active.where(child_course_id: batch).pluck(:child_course_id, :master_template_id).to_h
             template_data = MasterCourses::MasterTemplate.active.for_full_course.where(id: sub_data.values).pluck(:id, :course_id).to_h if sub_data.present?
             course_sis_data = Course.where(id: template_data.values).where.not(sis_source_id: nil).pluck(:id, :sis_source_id).to_h if template_data.present?
-            if course_sis_data.present?
-              sub_data.each do |child_course_id, template_id|
-                sis_id = course_sis_data[template_data[template_id]]
-                blueprint_map[child_course_id] = sis_id if sis_id
-              end
+
+            sub_data.each do |child_course_id, template_id|
+              blueprint_canvas_id = template_data[template_id]
+              blueprint_sis_id = course_sis_data[blueprint_canvas_id]
+              blueprint_map[child_course_id] = {
+                id: blueprint_canvas_id,
+                sis_id: blueprint_sis_id,
+              }
             end
           end
 
@@ -351,6 +356,7 @@ module AccountReports
         headers << "start_date"
         headers << "end_date"
         headers << "course_format"
+        headers << "canvas_blueprint_course_id"
         headers << "blueprint_course_id"
         headers << "created_by_sis"
       end
@@ -407,7 +413,8 @@ module AccountReports
         row << nil
       end
       row << c.course_format
-      row << blueprint_map[c.id]
+      row << blueprint_map[c.id]&.[](:id) unless @sis_format
+      row << blueprint_map[c.id]&.[](:sis_id)
       row << c.sis_batch_id? unless @sis_format
       row
     end
@@ -508,6 +515,7 @@ module AccountReports
     end
 
     def enrollments
+      @temp_enroll_feature_enabled = root_account.feature_enabled?(:temporary_enrollments)
       include_other_roots = root_account.trust_exists?
       headers = enrollment_headers(include_other_roots)
       enrol = enrollment_query
@@ -527,6 +535,11 @@ module AccountReports
         enrol.preload(:root_account, :sis_pseudonym, :role).find_in_batches(strategy: :id) do |batch|
           users = batch.filter_map { |e| User.new(id: e.user_id) }
           users += batch.filter_map { |e| User.new(id: e.associated_user_id) unless e.associated_user_id.nil? }
+          if @temp_enroll_feature_enabled
+            users += batch.filter_map do |e|
+              User.new(id: e.temporary_enrollment_source_user_id) unless e.temporary_enrollment_source_user_id.nil?
+            end
+          end
           users.uniq!
           users_by_id = users.index_by(&:id)
           pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
@@ -538,37 +551,43 @@ module AccountReports
                                  enrollment: e)
             next unless p
 
-            p2 = nil
-            row = enrollment_row(e, include_other_roots, p, p2, pseudonyms, users_by_id)
+            row = enrollment_row(e, include_other_roots, p, pseudonyms, users_by_id)
             csv << row
           end
         end
       end
     end
 
-    def enrollment_row(e, include_other_roots, p, p2, pseudonyms, users_by_id)
+    def enrollment_row(enrollment, include_other_roots, pseud, pseudonyms, users_by_id)
+      associated_user_pseudonym = nil
+      temporary_enrollment_provider_pseudonym = nil
+
       row = []
-      row << e.course_id unless @sis_format
-      row << e.course_sis_id
-      row << e.user_id unless @sis_format
-      row << p.sis_user_id
-      row << e.sis_role
-      row << e.role_id
-      row << e.course_section_id unless @sis_format
-      row << e.course_section_sis_id
-      row << e.enroll_state
-      row << e.associated_user_id unless @sis_format
-      unless e.associated_user_id.nil?
-        p2 = loaded_pseudonym(pseudonyms,
-                              users_by_id[e.associated_user_id],
-                              include_deleted: @include_deleted)
+      row << enrollment.course_id unless @sis_format
+      row << enrollment.course_sis_id
+      row << enrollment.user_id unless @sis_format
+      row << pseud.sis_user_id
+      row << enrollment.sis_role
+      row << enrollment.role_id
+      row << enrollment.course_section_id unless @sis_format
+      row << enrollment.course_section_sis_id
+      row << enrollment.enroll_state
+      row << enrollment.associated_user_id unless @sis_format
+      unless enrollment.associated_user_id.nil?
+        associated_user_pseudonym =
+          loaded_pseudonym(pseudonyms, users_by_id[enrollment.associated_user_id], include_deleted: @include_deleted)
       end
-      row << p2&.sis_user_id
-      row << e.sis_batch_id? unless @sis_format
-      row << e.type unless @sis_format
-      row << e.limit_privileges_to_course_section
-      row << e.id unless @sis_format
-      row << HostUrl.context_host(p.account) if include_other_roots
+      row << associated_user_pseudonym&.sis_user_id
+      row << enrollment.sis_batch_id? unless @sis_format
+      row << enrollment.type unless @sis_format
+      row << enrollment.limit_privileges_to_course_section
+      row << enrollment.id unless @sis_format
+      row << enrollment.temporary_enrollment_source_user_id if @temp_enroll_feature_enabled && !@sis_format
+      unless enrollment.temporary_enrollment_source_user_id.nil?
+        temporary_enrollment_provider_pseudonym = loaded_pseudonym(pseudonyms, users_by_id[enrollment.temporary_enrollment_source_user_id], include_deleted: @include_deleted)
+      end
+      row << temporary_enrollment_provider_pseudonym&.sis_user_id if @temp_enroll_feature_enabled
+      row << HostUrl.context_host(pseud.account) if include_other_roots
       row
     end
 
@@ -626,6 +645,7 @@ module AccountReports
                      status
                      associated_user_id
                      limit_section_privileges]
+        headers << "temporary_enrollment_source_user_id" if @temp_enroll_feature_enabled
       else
         headers = []
         headers << "canvas_course_id"
@@ -644,6 +664,8 @@ module AccountReports
         headers << "limit_section_privileges"
         headers << "canvas_enrollment_id"
       end
+      headers << "canvas_temporary_enrollment_source_user_id" if @temp_enroll_feature_enabled
+      headers << "temporary_enrollment_source_user_id" if @temp_enroll_feature_enabled
       headers << "root_account" if include_other_roots
       headers
     end

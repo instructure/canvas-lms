@@ -23,3 +23,5 @@ if (document.getElementById('instui_content_migrations')) {
 } else {
   import('./setup')
 }
+
+export default () => {}

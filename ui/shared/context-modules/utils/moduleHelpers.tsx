@@ -18,14 +18,19 @@
 
 import ReactDOM from 'react-dom'
 import React from 'react'
-import {Mathml} from '@canvas/rce/canvas-rce'
+import {Mathml} from '@instructure/canvas-rce/es/enhance-user-content/mathml'
 import ModuleFileDrop from '@canvas/context-module-file-drop/react'
 import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
 import $, * as JQuery from 'jquery'
 import {renderContextModulesPublishIcon} from './publishOneModuleHelper'
 import setupContentIds from '../jquery/setupContentIds'
-import {initPublishButton, overrideModel, setExpandAllButton} from '../jquery/utils'
-import RelockModulesDialog from '../backbone/views/RelockModulesDialog'
+import {
+  initPublishButton,
+  overrideModel,
+  setExpandAllButton,
+  setExpandAllButtonVisible,
+} from '../jquery/utils'
+import RelockModulesDialog from '@canvas/relock-modules-dialog'
 
 export function addModuleElement(
   data: Record<string, any>,
@@ -59,7 +64,7 @@ export function addModuleElement(
   }
 
   $('#no_context_modules_message').slideUp()
-  $('#expand_collapse_all').show()
+  setExpandAllButtonVisible(true)
   setExpandAllButton()
   const published = data.context_module.workflow_state === 'active'
   const $publishIcon = $module.find('.publish-icon')
@@ -86,19 +91,17 @@ export function addModuleElement(
     }
     overrideModel(moduleItems, relockModulesDialog, view.model, view)
   }
-  if (window.ENV?.FEATURES?.module_publish_menu) {
-    const isPublishing =
-      document.querySelector<Element & {dataset: Record<string, string>}>(
-        '#context-modules-publish-menu'
-      )?.dataset['data-progress-id'] !== undefined
-    updatePublishMenuDisabledState(isPublishing)
-    renderContextModulesPublishIcon(
-      data.context_module.context_id,
-      data.context_module.id,
-      published,
-      isPublishing
-    )
-  }
+  const isPublishing =
+    document.querySelector<Element & {dataset: Record<string, string>}>(
+      '#context-modules-publish-menu'
+    )?.dataset['data-progress-id'] !== undefined
+  updatePublishMenuDisabledState(isPublishing)
+  renderContextModulesPublishIcon(
+    data.context_module.context_id,
+    data.context_module.id,
+    published,
+    isPublishing
+  )
   relockModulesDialog.renderIfNeeded(data.context_module)
   $module.triggerHandler('update', data)
   const module_dnd = $module.find('.module_dnd')[0]

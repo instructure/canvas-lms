@@ -30,7 +30,7 @@ export const getContext = isMobileView => {
   const friendlyDescriptionFF = ENV.OUTCOMES_FRIENDLY_DESCRIPTION
   const canManage = ENV.PERMISSIONS?.manage_outcomes
   const canImport = ENV.PERMISSIONS?.import_outcomes
-  const isAdmin = ENV.current_user_roles?.includes('admin')
+  const isAdmin = ENV.current_user_is_admin
   const isStudent = ENV.current_user_is_student
   const globalRootId = ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID?.toString()
   const treeBrowserRootGroupId = ROOT_GROUP_ID
@@ -39,6 +39,7 @@ export const getContext = isMobileView => {
   const accountLevelMasteryScalesFF = ENV.ACCOUNT_LEVEL_MASTERY_SCALES
   const outcomeAllowAverageCalculationFF = ENV.OUTCOME_AVERAGE_CALCULATION
   const menuOptionForOutcomeDetailsPageFF = ENV.MENU_OPTION_FOR_OUTCOME_DETAILS_PAGE
+  const archiveOutcomesFF = ENV.ARCHIVE_OUTCOMES
 
   return {
     env: {
@@ -58,6 +59,7 @@ export const getContext = isMobileView => {
       accountLevelMasteryScalesFF,
       outcomeAllowAverageCalculationFF,
       menuOptionForOutcomeDetailsPageFF,
+      archiveOutcomesFF,
     },
   }
 }

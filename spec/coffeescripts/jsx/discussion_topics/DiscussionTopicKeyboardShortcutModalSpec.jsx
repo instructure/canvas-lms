@@ -18,7 +18,7 @@
 
 import DiscussionTopicKeyboardShortcutModal from 'ui/features/discussion_topic/react/DiscussionTopicKeyboardShortcutModal'
 import React from 'react'
-import {mount} from 'enzyme'
+import {render} from '@testing-library/react'
 
 const SHORTCUTS = [
   {
@@ -50,7 +50,7 @@ const SHORTCUTS = [
 QUnit.module('DiscussionTopicKeyboardShortcutModal#render')
 
 test('renders shortcuts', async function () {
-  const wrapper = mount(<DiscussionTopicKeyboardShortcutModal />)
+  const wrapper = render(<DiscussionTopicKeyboardShortcutModal />)
 
   // open the modal by pressing "ALT + f8"
   const e = new Event('keydown')

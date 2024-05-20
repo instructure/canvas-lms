@@ -1,0 +1,7 @@
+{
+  "name": "jquery",
+  "private": true,
+  "version": "3.7.1",
+  "author": "neme",
+  "main": "./jquery.js"
+}

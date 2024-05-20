@@ -28,7 +28,7 @@ RSpec.shared_context "microsoft_sync_graph_service_endpoints" do
     }
   end
 
-  before :once do
+  before do
     @url_logger = MicrosoftSync::GraphService::SpecHelper::UrlLogger.new
 
     WebMock.after_request do |request, response|
@@ -36,7 +36,7 @@ RSpec.shared_context "microsoft_sync_graph_service_endpoints" do
     end
   end
 
-  after :all do
+  after do
     @url_logger.verify_responses
     # Uncomment below when mock responses are actually valid. I plan to do those
     # in a later commit.

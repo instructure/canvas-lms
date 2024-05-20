@@ -174,12 +174,13 @@ class CutyCapt
     img_file
   end
 
-  def self.snapshot_attachment_for_url(url)
+  def self.snapshot_attachment_for_url(url, **attachment_opts)
     attachment = nil
     snapshot_url(url) do |file_path|
       # this is a really odd way to get Attachment the data it needs, which
       # should probably be remedied at some point
-      attachment = Attachment.new(uploaded_data: Rack::Test::UploadedFile.new(file_path, "image/png"))
+      attachment = Attachment.create!(uploaded_data: Canvas::UploadedFile.new(file_path, "image/png"),
+                                      **attachment_opts)
     end
     attachment
   end

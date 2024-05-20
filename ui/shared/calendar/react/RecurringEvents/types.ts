@@ -44,6 +44,7 @@ export type MonthlyModeValue = 'BYMONTHDATE' | 'BYMONTHDAY' | 'BYLASTMONTHDAY'
 export type RRULEDayValue = 'SU' | 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA'
 export type SelectedDaysArray = RRULEDayValue[]
 export const AllRRULEDayValues: SelectedDaysArray = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA']
+export const RRULEWeekDayValues = ['MO', 'TU', 'WE', 'TH', 'FR']
 
 export type FrequencyOptionValue =
   | 'not-repeat'

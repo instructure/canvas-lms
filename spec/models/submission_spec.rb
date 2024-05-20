@@ -113,6 +113,26 @@ describe Submission do
           end
 
           it { is_expected.to eq Submission.workflow_states.pending_review }
+
+          context "and the submission was manually given a late policy status of missing" do
+            before do
+              submission.grader_id = @teacher.id
+              submission.cached_quiz_lti = true
+              submission.late_policy_status = "missing"
+            end
+
+            it { is_expected.to eq Submission.workflow_states.pending_review }
+          end
+
+          context "and the submission was manually given a late policy status of late" do
+            before do
+              submission.grader_id = @teacher.id
+              submission.cached_quiz_lti = true
+              submission.late_policy_status = "late"
+            end
+
+            it { is_expected.to eq Submission.workflow_states.pending_review }
+          end
         end
       end
 
@@ -1722,7 +1742,7 @@ describe Submission do
 
   it "is versioned" do
     submission_spec_model
-    expect(@submission).to be_respond_to(:versions)
+    expect(@submission).to respond_to(:versions)
   end
 
   it "does not save new versions by default" do
@@ -1771,6 +1791,34 @@ describe Submission do
       expect do
         ActiveRecord::Associations.preload([version].map(&:model), :originality_reports)
       end.not_to raise_error
+    end
+
+    it "retries if there is a conflict with an existing version number" do
+      submission_spec_model
+      version = Version.find_by(versionable: @submission)
+
+      allow(@submission.versions).to receive(:create).and_call_original
+      called_times = 0
+      expect(@submission.versions).to receive(:create) { |attributes|
+        called_times += 1
+        # This is a hacky way of mimicing a bug where two responses, received very quickly,
+        # would create a RecordNotUnique error when the tried to increment the version
+        # number at the same time.
+        v = Version.create(
+          **attributes,
+          versionable_id: version.versionable_id,
+          versionable_type: version.versionable_type
+        )
+        v.update_attribute(:number, version.number) if called_times == 1
+        v
+      }.twice
+
+      submission_versions = @submission.versions.count
+      @submission.with_versioning(explicit: true) do
+        @submission.broadcast_group_submission
+      end
+
+      expect(@submission.versions.count).to eq(submission_versions + 1)
     end
   end
 
@@ -1930,7 +1978,7 @@ describe Submission do
   context "broadcast policy" do
     context "Submission Notifications" do
       before :once do
-        Notification.create(name: "Assignment Submitted")
+        Notification.create(name: "Assignment Submitted", category: "TestImmediately")
         Notification.create(name: "Assignment Resubmitted")
         Notification.create(name: "Assignment Submitted Late")
         Notification.create(name: "Group Assignment Submitted Late")
@@ -1957,16 +2005,15 @@ describe Submission do
         normal_ta = user_factory(active_all: true, active_cc: true)
         @course.enroll_user(normal_ta, "TaEnrollment", enrollment_state: "active")
 
-        n = Notification.where(name: "Assignment Submitted").first
-        n.update(category: "TestImmediately")
-        [limited_ta, normal_ta].each do |ta|
-          NotificationPolicy.create(notification: n, communication_channel: ta.communication_channel, frequency: "immediately")
-        end
+        Notification.where(name: "Assignment Submitted").first
+
         @assignment.workflow_state = "published"
         @assignment.update(due_at: Time.now + 1000)
 
         submission_spec_model(user: @student, submit_homework: true)
-        expect(@submission.messages_sent["Assignment Submitted"].map(&:user)).to eq [normal_ta]
+
+        expect(@submission.messages_sent["Assignment Submitted"].map(&:user)).not_to include(limited_ta)
+        expect(@submission.messages_sent["Assignment Submitted"].map(&:user)).to include(normal_ta)
       end
 
       it "sends the correct message when an assignment is turned in late" do
@@ -3263,7 +3310,6 @@ describe Submission do
         setup_account_for_turnitin(@assignment.context.account)
         @assignment.submission_types = "online_upload,online_text_entry"
         @assignment.turnitin_enabled = true
-        @assignment.turnitin_settings = @assignment.turnitin_settings
         @assignment.save!
         @submission = @assignment.submit_homework(@user, { body: "hello there", submission_type: "online_text_entry" })
       end
@@ -3410,7 +3456,7 @@ describe Submission do
       before :once do
         @assignment.submission_types = "online_upload,online_text_entry"
         @assignment.turnitin_enabled = true
-        @assignment.turnitin_settings = @assignment.turnitin_settings
+        @assignment.turnitin_settings = @assignment.turnitin_settings # rubocop:disable Lint/SelfAssignment
         @assignment.save!
         @submission = @assignment.submit_homework(@user, { body: "hello there", submission_type: "online_text_entry" })
         @submission.turnitin_data = {
@@ -5244,7 +5290,7 @@ describe Submission do
     it "does not blow up if web snapshotting fails" do
       sub = submission_spec_model
       expect(CutyCapt).to receive(:enabled?).and_return(true)
-      expect(CutyCapt).to receive(:snapshot_attachment_for_url).with(sub.url).and_return(nil)
+      expect(CutyCapt).to receive(:snapshot_attachment_for_url).with(sub.url, context: sub).and_return(nil)
       sub.get_web_snapshot
     end
   end
@@ -6601,6 +6647,12 @@ describe Submission do
       @submission.update!(attempt: 4)
       comment = @submission.add_comment(author: @teacher, comment: "42", attempt: 3)
       expect(comment.attempt).to eq 3
+    end
+
+    it "sets the attempt to latest submission attempt when an attempt option is not specified" do
+      @submission.update!(attempt: 5, workflow_state: "graded")
+      comment = @submission.add_comment(author: @teacher, comment: "42")
+      expect(comment.attempt).to eq 5
     end
 
     it "sets comment hidden to false if comment causes posting" do
@@ -8838,6 +8890,19 @@ describe Submission do
     end
 
     describe "#handle_posted_at_changed" do
+      describe "when an studen that is also admin posts an submission" do
+        it "unmutes the assignment if all submissions are now posted" do
+          admin = account_admin_user(account: @account, name: "default admin")
+          @course.enroll_student(admin)
+          assignment = @course.assignments.create!(
+            title: "some assignment",
+            workflow_state: "published"
+          )
+          submission_model(user: admin, assignment:, body: "first student submission text")
+          expect { assignment.reload }.not_to raise_error
+        end
+      end
+
       context "when posting an individual submission" do
         context "when post policies are enabled" do
           it "unmutes the assignment if all submissions are now posted" do
@@ -8933,6 +8998,11 @@ describe Submission do
   describe "word_count" do
     it "returns the word count" do
       submission.update(body: "test submission")
+      expect(submission.word_count).to eq 2
+    end
+
+    it "returns the word count if body is split up by <br> tags" do
+      submission.update(body: "test<br>submission")
       expect(submission.word_count).to eq 2
     end
 
@@ -9183,9 +9253,9 @@ describe Submission do
   describe "checkpoint submissions" do
     before(:once) do
       course = course_model
+      student = student_in_course(course:, active_all: true).user
       course.root_account.enable_feature!(:discussion_checkpoints)
-      student = student_in_course(course: @course, active_all: true).user
-      topic = @course.discussion_topics.create!(title: "graded topic")
+      topic = DiscussionTopic.create_graded_topic!(course:, title: "graded topic")
       topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
       @checkpoint_submission = topic.reply_to_topic_checkpoint.submissions.find_by(user: student)
       @parent_submission = topic.assignment.submissions.find_by(user: student)

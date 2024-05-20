@@ -78,6 +78,8 @@ export default class MessageParticipantsDialog {
       close() {
         $(this).remove()
       },
+      modal: true,
+      zIndex: 1000,
     })
     return this.loadParticipants()
   }
@@ -126,10 +128,10 @@ export default class MessageParticipantsDialog {
     const data = this.$form.getFormData()
     if (!data['recipients[]'] || !data.body) return
 
-    if (data['recipients[]'].length > ENV.CALENDAR.MAX_GROUP_CONVERSATION_SIZE) {
-      data.group_conversation = true
-      data.bulk_message = true
-    }
+    // Setting bulk_message will always send individual messages regardless of group_conversation setting.
+    // We're still setting group_conversation because that is required when there's more than 100 recipients.
+    data.group_conversation = true
+    data.bulk_message = true
 
     if (this.group) {
       data.tags = this.group.context_codes

@@ -47,6 +47,13 @@ describe User do
     end
   end
 
+  context "relationships" do
+    subject { User.new }
+
+    it { is_expected.to have_many(:created_lti_registrations).class_name("Lti::Registration").with_foreign_key("created_by_id") }
+    it { is_expected.to have_many(:updated_lti_registrations).class_name("Lti::Registration").with_foreign_key("updated_by_id") }
+  end
+
   describe "notifications" do
     describe "#daily_notification_time" do
       it "returns the users 6pm local time" do
@@ -1674,7 +1681,7 @@ describe User do
       expect(tool.has_placement?(:user_navigation)).to be false
       user_model
       tabs = @user.profile.tabs_available(@user, root_account: Account.default)
-      expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).not_to include(tool.asset_string)
     end
 
     it "includes configured external tools" do
@@ -1684,7 +1691,7 @@ describe User do
       expect(tool.has_placement?(:user_navigation)).to be true
       user_model
       tabs = @user.profile.tabs_available(@user, root_account: Account.default)
-      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to include(tool.asset_string)
       tab = tabs.detect { |t| t[:id] == tool.asset_string }
       expect(tab[:href]).to eq :user_external_tool_path
       expect(tab[:args]).to eq [@user.id, tool.id]
@@ -1784,21 +1791,42 @@ describe User do
       expect(User.avatar_fallback_url("http://somedomain:3000/path")).to eq(
         "http://somedomain:3000/path"
       )
-      expect(User.avatar_fallback_url(nil, OpenObject.new(host: "foo", protocol: "http://"))).to eq(
-        "http://foo/images/messages/avatar-50.png"
-      )
-      expect(User.avatar_fallback_url("/somepath", OpenObject.new(host: "bar", protocol: "https://"))).to eq(
-        "https://bar/somepath"
-      )
-      expect(User.avatar_fallback_url("//somedomain/path", OpenObject.new(host: "bar", protocol: "https://"))).to eq(
-        "https://somedomain/path"
-      )
-      expect(User.avatar_fallback_url("http://somedomain/path", OpenObject.new(host: "bar", protocol: "https://"))).to eq(
-        "http://somedomain/path"
-      )
-      expect(User.avatar_fallback_url("http://localhost/path", OpenObject.new(host: "bar", protocol: "https://"))).to eq(
-        "https://bar/path"
-      )
+      expect(User.avatar_fallback_url(nil, instance_double("ActionDispatch::Request",
+                                                           host: "foo",
+                                                           protocol: "http://",
+                                                           port: 80,
+                                                           scheme: "http"))).to eq(
+                                                             "http://foo/images/messages/avatar-50.png"
+                                                           )
+      expect(User.avatar_fallback_url("/somepath", instance_double("ActionDispatch::Request",
+                                                                   host:
+                                                                         "bar",
+                                                                   protocol: "https://",
+                                                                   port: 443,
+                                                                   scheme: "https"))).to eq(
+                                                                     "https://bar/somepath"
+                                                                   )
+      expect(User.avatar_fallback_url("//somedomain/path", instance_double("ActionDispatch::Request",
+                                                                           host: "bar",
+                                                                           protocol: "https://",
+                                                                           port: 443,
+                                                                           scheme: "https"))).to eq(
+                                                                             "https://somedomain/path"
+                                                                           )
+      expect(User.avatar_fallback_url("http://somedomain/path", instance_double("ActionDispatch::Request",
+                                                                                host: "bar",
+                                                                                protocol: "https://",
+                                                                                port: 443,
+                                                                                scheme: "https"))).to eq(
+                                                                                  "http://somedomain/path"
+                                                                                )
+      expect(User.avatar_fallback_url("http://localhost/path", instance_double("ActionDispatch::Request",
+                                                                               host: "bar",
+                                                                               protocol: "https://",
+                                                                               port: 443,
+                                                                               scheme: "https"))).to eq(
+                                                                                 "https://bar/path"
+                                                                               )
     end
 
     describe "#clear_avatar_image_url_with_uuid" do
@@ -3245,7 +3273,7 @@ describe User do
       specs_require_sharding
 
       it "checks for associated accounts on shards the user shares with the seeker" do
-        # create target user on defualt shard
+        # create target user on default shard
         target = user_factory
         # create account on another shard
         account = @shard1.activate { Account.create! }
@@ -3631,6 +3659,12 @@ describe User do
       expect(@user.roles(@account)).to eq %w[user admin root_admin]
     end
 
+    it "does not include 'root_admin' if the user's root account admin user record is deleted" do
+      au = @account.account_users.create!(user: @user, role: admin_role)
+      au.destroy
+      expect(@user.roles(@account)).to eq %w[user]
+    end
+
     it "caches results" do
       enable_cache do
         sub_account = @account.sub_accounts.create!
@@ -3672,6 +3706,12 @@ describe User do
     it "returns true if the user an admin in a root account" do
       @account.account_users.create!(user: @user, role: admin_role)
       expect(@user.root_admin_for?(@account)).to be true
+    end
+
+    it "returns false if the user *was* an admin in a root account" do
+      au = @account.account_users.create!(user: @user, role: admin_role)
+      au.destroy
+      expect(@user.root_admin_for?(@account)).to be false
     end
   end
 
@@ -3722,33 +3762,6 @@ describe User do
       f.submission_context_code = @course.asset_string
       f.save!
       expect(@user.submissions_folder(@course)).to eq f
-    end
-  end
-
-  describe "submittable_attachments" do
-    before(:once) do
-      student_in_course
-      group_model
-      @other_group = @group
-      group_model
-      @group.add_user @student
-      @a1 = attachment_with_context(@student)
-      @a2 = attachment_with_context(@group)
-      @a3 = attachment_with_context(@other_group)
-    end
-
-    it "matches non-deleted attachments in user or group context" do
-      expect(@student.submittable_attachments.pluck(:id)).to match_array [@a1, @a2].map(&:id)
-    end
-
-    it "excludes deleted files" do
-      @a1.destroy
-      expect(@student.submittable_attachments.pluck(:id)).to eq [@a2.id]
-    end
-
-    it "excludes deleted group memberships" do
-      @student.group_memberships.where(group_id: @group.id).take.destroy
-      expect(@student.submittable_attachments.pluck(:id)).to eq [@a1.id]
     end
   end
 

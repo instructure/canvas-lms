@@ -47,7 +47,7 @@ class Loaders::CourseOutcomeAlignmentStatsLoader < GraphQL::Batch::Loader
 
       total_artifacts = Assignment.active.where(context: course)
 
-      total_artifacts_sub = Assignment
+      total_artifacts_sub = AbstractAssignment
                             .select("COUNT(*) as total_artifacts")
                             .from("(#{total_artifacts.to_sql}) AS s3")
 

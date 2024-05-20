@@ -28,11 +28,11 @@ import userSettings from '@canvas/user-settings'
 import {GradebookSortOrder} from '../../../types/gradebook.d'
 import * as ReactRouterDom from 'react-router-dom'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {executeApiRequest} from '@canvas/util/apiRequest'
+import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 
 jest.mock('axios') // mock axios for final grade override helper API call
 jest.mock('@canvas/do-fetch-api-effect', () => jest.fn()) // mock doFetchApi for final grade override helper API call
-jest.mock('@canvas/util/apiRequest', () => ({
+jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
   executeApiRequest: jest.fn(),
 }))
 const mockedAxios = axios as jest.Mocked<typeof axios>

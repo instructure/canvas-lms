@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
@@ -78,6 +78,7 @@ $(document).ready(function () {
         width: 600,
         resizable: false,
         modal: true,
+        zIndex: 1000,
       })
     if ($(this).hasClass('add_contact_link')) {
       $('#communication_channels').tabs('select', '#register_sms_number')
@@ -109,7 +110,7 @@ $(document).ready(function () {
     if (useEmail) {
       $form.find('.sms_email_group').show()
       let email = $form.find('.carrier').val()
-      $form.find('.sms_email').attr('disabled', email !== 'other')
+      $form.find('.sms_email').prop('disabled', email !== 'other')
       if (email === 'other') {
         return
       }

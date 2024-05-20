@@ -133,7 +133,7 @@ describe SIS::CSV::EnrollmentImporter do
       "test_1,user_7,teacher,S001,active,,1985-08-24,2011-08-29"
     )
     course = @account.courses.where(sis_source_id: "test_1").first
-    expect(course.teachers.map(&:name)).to be_include("User Uno")
+    expect(course.teachers.map(&:name)).to include("User Uno")
     expect(course.students.first.name).to eq "User Dos"
     expect(course.tas.first.name).to eq "User Tres"
     expect(course.observers.first.name).to eq "User Quatro"
@@ -603,6 +603,43 @@ describe SIS::CSV::EnrollmentImporter do
     e = @observer.enrollments.first
     expect(e.workflow_state).to eq "completed"
     expect(e.completed_at).to be_present
+  end
+
+  it "enrolls observers when observer is added before restoring enrollment" do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,status",
+      "tc101,TC 101,Test Course 101,active"
+    )
+
+    process_csv_data_cleanly(
+      "user_id,login_id,full_name,email,status",
+      "user1,user1,User One,user1@example.com,active",
+      "user2,user2,User Two,user2@example.com,active"
+    )
+
+    process_csv_data_cleanly(
+      "course_id,user_id,role,status",
+      "tc101,user1,student,deleted_last_completed"
+    )
+
+    process_csv_data_cleanly(
+      "observer_id,student_id,status",
+      "user2,user1,active"
+    )
+
+    process_csv_data_cleanly(
+      "course_id,user_id,role,status",
+      "tc101,user1,student,active"
+    )
+
+    course = Course.where(sis_source_id: "tc101").first
+    student = Pseudonym.where(unique_id: "user1").first.user
+    observer = Pseudonym.where(unique_id: "user2").first.user
+    observations = observer.observer_enrollments
+
+    expect(observations.count).to eq 1
+    expect(observations.first.course).to eq course
+    expect(observations.first.associated_user).to eq student
   end
 
   it "only queues up one SubmissionLifecycleManager job per course" do
@@ -1229,8 +1266,8 @@ describe SIS::CSV::EnrollmentImporter do
     a2 = @account.sub_accounts.find_by(sis_source_id: "a2")
     u1 = @account.pseudonyms.active.find_by(sis_user_id: "u1").user
     v1 = @account.pseudonyms.active.find_by(sis_user_id: "v1").user
-    expect(u1.associated_accounts).not_to be_include(a2)
-    expect(v1.associated_accounts).not_to be_include(a1)
+    expect(u1.associated_accounts).not_to include(a2)
+    expect(v1.associated_accounts).not_to include(a1)
   end
 
   it "does not enroll students in blueprint courses" do

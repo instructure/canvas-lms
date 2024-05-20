@@ -23,7 +23,7 @@ module CommunicationChannelsHelper
     if @current_user && pseudonym.user_id == @current_user.id
       registration_confirmation_path(@nonce, enrollment: @enrollment.try(:uuid), confirm: 1)
     else
-      login_url(host: HostUrl.context_host(pseudonym.account, @request.try(:host_with_port)), confirm: @nonce, enrollment: @enrollment.try(:uuid), pseudonym_session: { unique_id: pseudonym.unique_id }, expected_user_id: pseudonym.user_id)
+      login_url(host: HostUrl.context_host(pseudonym.account, request.try(:host_with_port)), confirm: @nonce, enrollment: @enrollment.try(:uuid), pseudonym_session: { unique_id: pseudonym.unique_id }, expected_user_id: pseudonym.user_id)
     end
   end
 

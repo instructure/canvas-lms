@@ -22,7 +22,7 @@ import {func, node, string} from 'prop-types'
 import {TimeSelect} from '@instructure/ui-time-select'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import DateInput from './DateInput'
-import {utcTimeOffset, utcDateOffset} from '@canvas/datetime/changeTimezone'
+import {utcTimeOffset, utcDateOffset} from '../../changeTimezone'
 
 const I18n = useI18nScope('date_time_input')
 
@@ -169,9 +169,9 @@ function DateTimeInput(props) {
 
   return (
     <FormFieldGroup
-      colSpacing={props.colSpacing || "medium"}
+      colSpacing={props.colSpacing || 'medium'}
       vAlign="top"
-      layout={props.layout || "stacked"}
+      layout={props.layout || 'stacked'}
       rowSpacing="small"
       messages={goodMessage(formatDateTime(inputValue))}
       description={props.description}

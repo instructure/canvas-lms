@@ -165,7 +165,7 @@ export default function PermissionsIndex(props) {
                 name="permission_search"
               />
             </Flex.Item>
-            <Flex.Item shouldShrink shouldGrow padding="0 small">
+            <Flex.Item shouldShrink={true} shouldGrow={true} padding="0 small">
               <CanvasMultiSelect
                 id="permissions-role-filter"
                 label={I18n.t('Permission role filter')}
@@ -178,7 +178,7 @@ export default function PermissionsIndex(props) {
                 {optionsToRender()}
               </CanvasMultiSelect>
             </Flex.Item>
-            <Flex.Item shouldShrink justifyItems="end">
+            <Flex.Item shouldShrink={true} justifyItems="end">
               <Flex justifyItems="end">
                 <Flex.Item>
                   <Button id="add_role" color="primary" onClick={props.setAndOpenAddTray}>
@@ -229,6 +229,7 @@ PermissionsIndex.propTypes = {
   filterRoles: func.isRequired,
   roles: arrayOf(propTypes.role).isRequired,
   searchPermissions: func.isRequired,
+  setAndOpenAddTray: func.isRequired,
   tabChanged: func.isRequired,
   selectedRoles: arrayOf(propTypes.filteredRole).isRequired,
 }

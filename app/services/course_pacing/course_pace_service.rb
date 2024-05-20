@@ -17,20 +17,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class CoursePacing::CoursePaceService < CoursePacing::PaceServiceInterface
-  def self.paces_in_course(course)
-    course.course_paces.primary
-  end
+class CoursePacing::CoursePaceService < CoursePacing::PaceService
+  class << self
+    def paces_in_course(course)
+      course.course_paces.primary
+    end
 
-  def self.pace_in_context(course)
-    paces_in_course(course).first!
-  end
+    def pace_in_context(course)
+      paces_in_course(course).first
+    end
 
-  def self.template_pace_for(_)
-    nil
-  end
+    def template_pace_for(_)
+      nil
+    end
 
-  def self.course_for(course)
-    course
+    def course_for(course)
+      course
+    end
   end
 end

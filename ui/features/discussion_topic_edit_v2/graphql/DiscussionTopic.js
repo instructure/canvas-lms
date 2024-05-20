@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, bool, shape, string} from 'prop-types'
+import {arrayOf, bool, shape, string, number} from 'prop-types'
 import {Section} from './Section'
 import gql from 'graphql-tag'
 import {Attachment} from './Attachment'
 import {GroupSet} from './GroupSet'
+import {Assignment} from './Assignment'
 
 export const DiscussionTopic = {
   fragment: gql`
@@ -42,6 +43,8 @@ export const DiscussionTopic = {
       lockAt
       locked
       published
+      canGroup
+      replyToEntryRequiredCount
       courseSections {
         ...Section
       }
@@ -51,8 +54,12 @@ export const DiscussionTopic = {
       attachment {
         ...Attachment
       }
+      assignment {
+        ...Assignment
+      }
     }
     ${Attachment.fragment}
+    ${Assignment.fragment}
     ${Section.fragment}
     ${GroupSet.fragment}
   `,
@@ -74,9 +81,12 @@ export const DiscussionTopic = {
     delayedPostAt: string,
     lockAt: string,
     published: bool,
+    replyToEntryRequiredCount: number,
     courseSections: arrayOf(Section.shape),
     groupSet: GroupSet.shape,
     attachment: Attachment.shape,
+    assignment: Assignment.shape,
+    canGroup: bool,
   }),
 
   mock: ({
@@ -96,9 +106,12 @@ export const DiscussionTopic = {
     delayedPostAt = null,
     lockAt = null,
     published = true,
+    replyToEntryRequiredCount = 1,
     courseSections = [Section.mock()],
     groupSet = GroupSet.mock(),
     attachment = Attachment.mock(),
+    assignment = null,
+    canGroup = false,
   } = {}) => ({
     _id,
     id,
@@ -116,9 +129,12 @@ export const DiscussionTopic = {
     delayedPostAt,
     lockAt,
     published,
+    replyToEntryRequiredCount,
     courseSections,
     groupSet,
     attachment,
+    assignment,
+    canGroup,
     __typename: 'Discussion',
   }),
 }

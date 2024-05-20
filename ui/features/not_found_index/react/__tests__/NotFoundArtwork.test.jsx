@@ -17,24 +17,27 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render} from '@testing-library/react'
 import NotFoundArtwork from '../NotFoundArtwork'
 
-const defaultProps = () => {}
+const renderNotFoundArtwork = () => render(<NotFoundArtwork />)
 
-test('renders the NotFoundArtwork component', () => {
-  const tree = mount(<NotFoundArtwork {...defaultProps()} />)
-  expect(tree.exists()).toBe(true)
-})
+describe('NotFoundArtwork', () => {
+  it('renders the NotFoundArtwork component', () => {
+    const wrapper = renderNotFoundArtwork()
 
-test('renders the NotFoundArtwork renders correct header', () => {
-  const tree = mount(<NotFoundArtwork {...defaultProps()} />)
-  const node = tree.find('Heading').at(0)
-  expect(node.text()).toBe('Whoops... Looks like nothing is here!')
-})
+    expect(wrapper.container).toBeInTheDocument()
+  })
 
-test('renders the NotFoundArtwork component help description', () => {
-  const tree = mount(<NotFoundArtwork {...defaultProps()} />)
-  const node = tree.find('Text').at(0)
-  expect(node.text()).toBe("We couldn't find that page!")
+  it('renders the NotFoundArtwork renders correct header', () => {
+    const wrapper = renderNotFoundArtwork()
+
+    expect(wrapper.getByText('Whoops... Looks like nothing is here!')).toBeInTheDocument()
+  })
+
+  it('renders the NotFoundArtwork component help description', () => {
+    const wrapper = renderNotFoundArtwork()
+
+    expect(wrapper.getByText("We couldn't find that page!")).toBeInTheDocument()
+  })
 })

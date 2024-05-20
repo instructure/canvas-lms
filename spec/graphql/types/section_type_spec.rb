@@ -59,6 +59,23 @@ describe Types::SectionType do
     end
   end
 
+  context "grades_posted field" do
+    let(:course_student) { User.create! }
+    let(:course_teacher) { User.create! }
+    let(:section_1) { course.course_sections.create! }
+    let(:section_type) { GraphQLTypeTester.new(section_1, current_user: @teacher) }
+    let(:assignment) { course.assignments.create(points_possible: 100) }
+
+    it "returns expected state before and after grading" do
+      course.enroll_student(course_student, enrollment_state: "active", section: section_1)
+      course.enroll_teacher(course_teacher, enrollment_state: "active", section: section_1)
+      assignment.submit_homework(course_student, body: "here is a submission")
+      expect(section_type.resolve("gradesPosted(assignmentId: #{assignment.id})")).to be false
+      assignment.grade_student(course_student, grade: 100, grader: course_teacher)
+      expect(section_type.resolve("gradesPosted(assignmentId: #{assignment.id})")).to be true
+    end
+  end
+
   context "sis field" do
     let(:manage_admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false }) }
     let(:read_admin) { account_admin_user_with_role_changes(role_changes: { manage_sis: false }) }
@@ -76,6 +93,30 @@ describe Types::SectionType do
     it "doesn't return sis_id if you don't have read_sis or management_sis permissions" do
       tester = GraphQLTypeTester.new(section, current_user: @student)
       expect(tester.resolve("sisId")).to be_nil
+    end
+  end
+
+  context "students connection" do
+    let(:course) do
+      course_with_student(active_all: true)
+      @course
+    end
+    let(:section) { course.course_sections.create! name: "Whatever" }
+    let(:section_type) { GraphQLTypeTester.new(section, current_user: @teacher) }
+    let(:student) { User.create! }
+    let(:student2) { User.create! }
+
+    before do
+      course.enroll_student(student, enrollment_state: "active", section:)
+      course.enroll_student(student2, enrollment_state: "active", section:)
+    end
+
+    it "returns students in the section" do
+      expect(section_type.resolve("students { nodes { _id }}")).to contain_exactly(student.id.to_s, student2.id.to_s)
+    end
+
+    it "requires read permission" do
+      expect(section_type.resolve("students { nodes { _id }}", current_user: @student)).to be_nil
     end
   end
 end

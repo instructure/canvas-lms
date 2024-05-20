@@ -21,20 +21,24 @@ module Lti
   class ToolConfigurationSerializer
     include Api::V1::DeveloperKey
 
-    def initialize(tool_configuration)
+    def initialize(tool_configuration, include_warnings: false)
       @tool_configuration = tool_configuration
+      @include_warnings = include_warnings
     end
 
     def as_json
       key = @tool_configuration.developer_key
-      @tool_configuration.as_json.merge({
-                                          developer_key: developer_key_json(
-                                            key,
-                                            nil,
-                                            nil,
-                                            key.owner_account
-                                          )
-                                        })
+      json = @tool_configuration.as_json.merge({
+                                                 developer_key: developer_key_json(
+                                                   key,
+                                                   nil,
+                                                   nil,
+                                                   key.owner_account
+                                                 ),
+                                               })
+
+      json[:warning_message] = @tool_configuration.verify_placements if @include_warnings
+      json
     end
   end
 end

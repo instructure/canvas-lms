@@ -20,10 +20,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
+import 'jquery-migrate'
 import GradingPeriodCollection from 'ui/features/course_grading_standards/react/gradingPeriodCollection'
 import fakeENV from 'helpers/fakeENV'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
-import '@canvas/rails-flash-notifications'
 
 QUnit.module('GradingPeriodCollection', {
   setup() {
@@ -448,7 +448,6 @@ test('renderSaveButton does not render a button if the user cannot update any of
   notOk(this.gradingPeriodCollection.renderSaveButton())
   Object.assign(uneditable, {
     permissions: {
-      delete: false,
       delete: true,
     },
   })

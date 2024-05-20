@@ -25,8 +25,6 @@ const I18n = useI18nScope('external_toolsModalLauncher')
  * Provide an iframe for launching an LTI tool directly from the frontend.
  * Works just like all existing usages of the LTI \<iframe\> element, including
  * extracting a ref of the \<iframe\> directly and setting things on it later.
- * Also renders an invisible iframe used for postMessage forwarding when the
- * lti_platform_storage flag is enabled.
  *
  * TODO: include more common usages in this instead of in callers, including:
  * - allow: iframeAllowances

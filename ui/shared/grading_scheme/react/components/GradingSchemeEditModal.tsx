@@ -18,55 +18,61 @@
 import React, {useRef} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
-import {GradingScheme, GradingSchemeTemplate} from '@canvas/grading_scheme/gradingSchemeApiModel'
+import type {GradingScheme, GradingSchemeTemplate} from '../../gradingSchemeApiModel'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {
-  GradingSchemeEditableData,
+  type GradingSchemeEditableData,
   GradingSchemeInput,
-  GradingSchemeInputHandle,
+  type GradingSchemeInputHandle,
 } from './form/GradingSchemeInput'
+import {Alert} from '@instructure/ui-alerts'
 
 const I18n = useI18nScope('GradingSchemeViewModal')
 
-type Props = {
+export type GradingSchemeEditModalProps = {
   open: boolean
   gradingScheme?: GradingScheme
   handleCancelEdit: (gradingSchemeId: string) => void
-  handleGradingSchemeDelete: (gradingSchemeId: string) => void
+  openDeleteModal: (gradingScheme: GradingScheme) => void
   handleUpdateScheme: (
     gradingSchemeFormInput: GradingSchemeEditableData,
     gradingSchemeId: string
   ) => void
   defaultGradingSchemeTemplate: GradingScheme
   defaultPointsGradingScheme: GradingSchemeTemplate
-  pointsBasedGradingSchemesEnabled: boolean
-  archivedGradingSchemesEnabled: boolean
+  viewingFromAccountManagementPage?: boolean
+  isCourseDefault?: boolean
 }
 const GradingSchemeEditModal = ({
   open,
   gradingScheme,
   handleCancelEdit,
-  handleGradingSchemeDelete,
+  openDeleteModal,
   handleUpdateScheme,
-  pointsBasedGradingSchemesEnabled,
-  archivedGradingSchemesEnabled,
   defaultGradingSchemeTemplate,
   defaultPointsGradingScheme,
-}: Props) => {
+  viewingFromAccountManagementPage,
+  isCourseDefault,
+}: GradingSchemeEditModalProps) => {
   const gradingSchemeUpdateRef = useRef<GradingSchemeInputHandle>(null)
   if (!gradingScheme) {
     return <></>
   }
 
+  const editSchemeDataDisabled =
+    (!viewingFromAccountManagementPage && gradingScheme.context_type === 'Account') ||
+    gradingScheme.assessed_assignment ||
+    isCourseDefault
   return (
     <Modal
       as="form"
       open={open}
       onDismiss={() => handleCancelEdit(gradingScheme.id)}
-      label={gradingScheme.title}
+      label={I18n.t('Edit Grading Scheme')}
       size="small"
+      data-testid="grading-scheme-edit-modal"
     >
       <Modal.Header>
         <CloseButton
@@ -74,10 +80,31 @@ const GradingSchemeEditModal = ({
           placement="end"
           offset="small"
           onClick={() => handleCancelEdit(gradingScheme.id)}
+          data-testid="grading-scheme-edit-modal-close-button"
         />
-        <Heading>{gradingScheme.title}</Heading>
+        <Heading data-testid="grading-scheme-edit-modal-title">{gradingScheme.title}</Heading>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body padding="medium medium x-small">
+        {gradingScheme.id !== '' && editSchemeDataDisabled && (
+          <Alert
+            variant="info"
+            margin="0 0 medium 0"
+            hasShadow={false}
+            renderCloseButtonLabel="Close"
+          >
+            {!viewingFromAccountManagementPage && gradingScheme.context_type === 'Account'
+              ? I18n.t(
+                  "Percentages and points can't be edited because it is an account level grading scheme."
+                )
+              : isCourseDefault
+              ? I18n.t(
+                  "Percentages and points can't be edited because it is being used as the default grading scheme."
+                )
+              : I18n.t(
+                  "Percentages and points can't be edited because it is currently being used."
+                )}
+          </Alert>
+        )}
         <GradingSchemeInput
           schemeInputType={gradingScheme.points_based ? 'points' : 'percentage'}
           initialFormDataByInputType={{
@@ -101,23 +128,32 @@ const GradingSchemeEditModal = ({
             },
           }}
           ref={gradingSchemeUpdateRef}
-          pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesEnabled}
-          archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
-          onSave={modifiedGradingScheme =>
+          onSave={modifiedGradingScheme => {
             handleUpdateScheme(modifiedGradingScheme, gradingScheme.id)
-          }
+          }}
+          editSchemeDataDisabled={editSchemeDataDisabled}
         />
       </Modal.Body>
       <Modal.Footer>
         <Flex justifyItems="end">
           <Flex.Item>
-            <Button onClick={() => handleGradingSchemeDelete(gradingScheme.id)}>
+            <Button
+              onClick={() => openDeleteModal(gradingScheme)}
+              disabled={editSchemeDataDisabled}
+              data-testid="grading-scheme-edit-modal-delete-button"
+            >
               {I18n.t('Delete')}
             </Button>
             <Button onClick={() => handleCancelEdit(gradingScheme.id)} margin="0 x-small 0 x-small">
               {I18n.t('Cancel')}
             </Button>
-            <Button onClick={() => gradingSchemeUpdateRef.current?.savePressed()} color="primary">
+            <Button
+              onClick={() => {
+                gradingSchemeUpdateRef.current?.savePressed()
+              }}
+              color="primary"
+              data-testid="grading-scheme-edit-modal-update-button"
+            >
               {I18n.t('Save')}
             </Button>
           </Flex.Item>

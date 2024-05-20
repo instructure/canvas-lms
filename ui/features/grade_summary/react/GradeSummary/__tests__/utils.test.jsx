@@ -18,6 +18,7 @@
 
 import React from 'react'
 
+import DateHelper from '@canvas/datetime/dateHelper'
 import {IconCheckLine, IconXLine} from '@instructure/ui-icons'
 import {Pill} from '@instructure/ui-pill'
 
@@ -635,6 +636,17 @@ describe('util', () => {
 
       const expectedOutput = <Pill color="primary">Not Submitted</Pill>
       expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
+    })
+
+    it('should return "Submitted" status when submission has been submitted', () => {
+      const submittedAt = (new Date()).toISOString()
+      const assignment = {
+        dueAt: getTime(false),
+        submissionsConnection: {
+          nodes: [Submission.mock({state: 'submitted', submittedAt, gradingStatus: 'needs_grading'})],
+        },
+      }
+      expect(getDisplayStatus(assignment)).toEqual(DateHelper.formatDatetimeForDisplay(submittedAt))
     })
   })
 

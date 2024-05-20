@@ -1,5 +1,6 @@
 {
   "name": "@canvas-features/lti_collaborations",
   "private": true,
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "owner": "INTEROP"
 }

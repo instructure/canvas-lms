@@ -171,6 +171,7 @@ class ModuleAssignmentOverridesController < ApplicationController
       delete_existing_overrides(override_ids_to_delete)
       update_existing_overrides(overrides_to_update)
       create_new_overrides(overrides_to_create)
+      @context_module.update_assignment_submissions
     end
   end
 

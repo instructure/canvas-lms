@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import createStore from '@canvas/util/createStore'
+import createStore from '@canvas/backbone/createStore'
 import CourseHomeDialog from '@canvas/course-homepage/react/Dialog'
 
 const xhrs = []

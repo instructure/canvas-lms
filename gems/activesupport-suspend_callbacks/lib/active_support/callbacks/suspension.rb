@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "active_support/callbacks/suspension/registry"
-require "active_support/core_ext/array" # extract_options!
 require "active_support/version"
 
 module ActiveSupport::Callbacks
@@ -49,10 +48,9 @@ module ActiveSupport::Callbacks
     #
     # suspend_callbacks(:validate, kind: :save, type: :before) { ... }
     #   before save callbacks to validate ignored
-    def suspend_callbacks(*callbacks)
-      options = callbacks.extract_options!
-      kinds = Array(options[:kind])
-      types = Array(options[:type])
+    def suspend_callbacks(*callbacks, kind: nil, type: nil)
+      kinds = Array(kind)
+      types = Array(type)
       delta = suspended_callbacks.update(callbacks, kinds, types)
       yield
     ensure
@@ -151,7 +149,7 @@ module ActiveSupport::Callbacks
           yield if block_given?
         else
           env = Filters::Environment.new(self, false, nil)
-          next_sequence = callbacks.compile
+          next_sequence = (ActiveSupport.version < Gem::Version.new("7.1")) ? callbacks.compile : callbacks.compile(nil)
 
           invoke_sequence = proc do
             skipped = nil

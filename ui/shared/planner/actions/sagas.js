@@ -17,7 +17,7 @@
  */
 
 import axios from 'axios'
-import parseLinkHeader from 'parse-link-header'
+import parseLinkHeader from '@canvas/parse-link-header'
 import {put, select, call, all, takeEvery} from 'redux-saga/effects'
 import {getFirstLoadedMoment, getLastLoadedMoment} from '../utilities/dateUtils'
 import {

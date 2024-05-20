@@ -38,7 +38,7 @@ export default class OutlierScoreHelper {
 
   pointsPossible: number
 
-  constructor(score: number | null, pointsPossible: number) {
+  constructor(score?: number | null, pointsPossible: number) {
     this.score = score
     this.pointsPossible = pointsPossible
   }

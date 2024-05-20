@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import CommonEvent from './CommonEvent'
 import fcUtil from '../fcUtil'
 import {extend} from '@canvas/util/legacyCoffeesScriptHelpers'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import replaceTags from '@canvas/util/replaceTags'
 

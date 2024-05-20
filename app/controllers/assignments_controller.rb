@@ -83,7 +83,8 @@ class AssignmentsController < ApplicationController
             newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
             show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
           },
-          grading_scheme: @context.grading_standard_or_default.data
+          grading_scheme: @context.grading_standard_or_default.data,
+          points_based: @context.grading_standard_or_default.points_based?,
         }
 
         set_default_tool_env!(@context, hash)
@@ -103,8 +104,7 @@ class AssignmentsController < ApplicationController
 
   def render_a2_student_view?
     @current_user.present? && @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
-      (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2])) &&
-      (!@context_enrollment&.observer? || Setting.get("assignments_2_observer_view", "false") == "true")
+      (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
   end
 
   def a2_active_student_and_enrollment
@@ -123,6 +123,9 @@ class AssignmentsController < ApplicationController
   end
 
   def render_a2_student_view(student:)
+    if @context.root_account.feature_enabled?(:instui_nav)
+      add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
+    end
     current_user_submission = @assignment.submissions.find_by(user: student)
     submission = if @context.feature_enabled?(:peer_reviews_for_a2)
                    if params[:reviewee_id].present? && !@assignment.anonymous_peer_reviews?
@@ -146,7 +149,8 @@ class AssignmentsController < ApplicationController
              peer_display_name: @assignment.anonymous_peer_reviews? ? I18n.t("Anonymous student") : submission&.user&.name,
              originality_reports_for_a2_enabled: Account.site_admin.feature_enabled?(:originality_reports_for_a2),
              restrict_quantitative_data: @assignment.restrict_quantitative_data?(@current_user),
-             grading_scheme: @context.grading_standard_or_default.data
+             grading_scheme: @context.grading_standard_or_default.data,
+             points_based: @context.grading_standard_or_default.points_based?,
            })
 
     if peer_review_mode_enabled
@@ -154,7 +158,7 @@ class AssignmentsController < ApplicationController
       if current_user_submission
         graphql_reviewer_submission_id = CanvasSchema.id_from_object(
           current_user_submission,
-          CanvasSchema.resolve_type(nil, current_user_submission, nil),
+          CanvasSchema.resolve_type(nil, current_user_submission, nil)[0],
           nil
         )
       end
@@ -169,7 +173,7 @@ class AssignmentsController < ApplicationController
     if submission
       graphql_submission_id = CanvasSchema.id_from_object(
         submission,
-        CanvasSchema.resolve_type(nil, submission, nil),
+        CanvasSchema.resolve_type(nil, submission, nil)[0],
         nil
       )
     end
@@ -249,6 +253,8 @@ class AssignmentsController < ApplicationController
     GuardRail.activate(:secondary) do
       @assignment ||= @context.assignments.find(params[:id])
 
+      js_env({ ASSIGNMENT_POINTS_POSSIBLE: nil })
+
       if @assignment.deleted?
         flash[:notice] = t "notices.assignment_delete", "This assignment has been deleted"
         redirect_to named_context_url(@context, :context_assignments_url)
@@ -271,10 +277,14 @@ class AssignmentsController < ApplicationController
         @locked = @assignment.locked_for?(@current_user, check_policies: true, deep_check_if_needed: true)
         @unlocked = !@locked || @assignment.grants_right?(@current_user, session, :update)
 
-        if @assignment.submission_types == "external_tool" && Account.site_admin.feature_enabled?(:external_tools_for_a2) && @unlocked
+        if @assignment.external_tool? && Account.site_admin.feature_enabled?(:external_tools_for_a2) && @unlocked
           @tool = ContextExternalTool.from_assignment(@assignment)
 
           js_env({ LTI_TOOL: "true" })
+        end
+
+        if @assignment.external_tool?
+          js_env({ ASSIGNMENT_POINTS_POSSIBLE: @assignment.points_possible })
         end
 
         unless @assignment.new_record? || (@locked && !@locked[:can_view])
@@ -299,15 +309,13 @@ class AssignmentsController < ApplicationController
         log_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
         if render_a2_student_view?
-          if Setting.get("assignments_2_observer_view", "false") == "true"
-            js_env({ OBSERVER_OPTIONS: {
-                     OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
-                     CAN_ADD_OBSERVEE: @current_user
-                                       .profile
-                                       .tabs_available(@current_user, root_account: @domain_root_account)
-                                       .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
-                   } })
-          end
+          js_env({ OBSERVER_OPTIONS: {
+                   OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
+                   CAN_ADD_OBSERVEE: @current_user
+                                      .profile
+                                      .tabs_available(@current_user, root_account: @domain_root_account)
+                                      .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                 } })
 
           student_to_view, active_enrollment = a2_active_student_and_enrollment
           if student_to_view.present?
@@ -321,7 +329,7 @@ class AssignmentsController < ApplicationController
             return
           else
             # This should not be reachable but leaving in place until we remove the old view
-            flash[:notice] = t "No student is being observed. To select a student, return to the dashboard."
+            flash[:notice] = t "No student is being observed."
           end
         end
 
@@ -568,21 +576,72 @@ class AssignmentsController < ApplicationController
     end
   end
 
+  def filter_by_assigned_assessment(submissions, search_term)
+    cleaned_search_term = User.clean_name(search_term, /[\s,]+/)
+
+    assessments = AssessmentRequest
+                  .where(asset_id: submissions.map(&:id))
+                  .for_active_users(@context)
+                  .for_active_assessors(@context)
+                  .preload(:assessor, :user)
+
+    unique_assessors_set = Set.new
+    assessments.each do |assessment|
+      assessment_user = assessment.user
+      cleaned_first_name_last = User.clean_name(assessment_user.name, /\s+/)
+      cleaned_last_name_first = User.clean_name(assessment_user.sortable_name, /[\s,]+/)
+      if cleaned_first_name_last.include?(cleaned_search_term) || cleaned_last_name_first.include?(cleaned_search_term)
+        unique_assessors_set << assessment.assessor
+      end
+    end
+
+    unique_assessors_set.to_a
+  end
+
+  def filter_by_all(student_list, submissions, search_term)
+    filter_by_reviewer_list = filter_by_assessor(student_list, search_term)
+    filter_by_assigned_assessment_list = filter_by_assigned_assessment(submissions, search_term)
+    (filter_by_reviewer_list + filter_by_assigned_assessment_list).uniq
+  end
+
+  def filter_by_assessor(student_list, search_term)
+    student_list.name_like(search_term, "peer_review")
+  end
+
+  def filter_by_selected_option(student_list, submissions, search_term, selected_option)
+    case selected_option
+    when "all"
+      filter_by_all(student_list, submissions, search_term)
+    when "student"
+      filter_by_assigned_assessment(submissions, search_term)
+    when "reviewer"
+      filter_by_assessor(student_list, search_term)
+    end
+  end
+
   def peer_reviews
     @assignment = @context.assignments.active.find(params[:assignment_id])
+    js_env({
+             ASSIGNMENT_ID: @assignment.id,
+             COURSE_ID: @context.id
+           })
     if authorized_action(@assignment, @current_user, :grade)
       unless @assignment.has_peer_reviews?
         redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
         return
       end
 
+      if @context.root_account.feature_enabled?(:instui_nav)
+        add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
+        add_crumb(t("Peer Reviews"))
+      end
+
       visible_students = @context.students_visible_to(@current_user).not_fake_student
       visible_students_assigned_to_assignment = visible_students.joins(:submissions).where(submissions: { assignment: @assignment }).merge(Submission.active)
-
-      @students_dropdown_list = visible_students_assigned_to_assignment.distinct.order_by_sortable_name
-      @students = params[:search_term].present? ? @students_dropdown_list.name_like(params[:search_term], search_pseudonyms: false) : @students_dropdown_list
-      @students = @students.paginate(page: params[:page], per_page: 10)
       @submissions = @assignment.submissions.include_assessment_requests
+      @students_dropdown_list = visible_students_assigned_to_assignment.distinct.order_by_sortable_name
+      @students = params[:search_term].present? ? filter_by_selected_option(@students_dropdown_list, @submissions, params[:search_term], params[:selected_option]) : @students_dropdown_list
+      @students = @students.paginate(page: params[:page], per_page: 10)
     end
   end
 
@@ -746,7 +805,8 @@ class AssignmentsController < ApplicationController
         ASSIGNMENT_INDEX_URL: polymorphic_url([@context, :assignments]),
         ASSIGNMENT_OVERRIDES: assignment_overrides_json(
           @assignment.overrides_for(@current_user, ensure_set_not_empty: true),
-          @current_user
+          @current_user,
+          include_names: true
         ),
         AVAILABLE_MODERATORS: @assignment.available_moderators.map { |user| { name: user.name, id: user.id } },
         COURSE_ID: @context.id,
@@ -773,13 +833,23 @@ class AssignmentsController < ApplicationController
           Account.site_admin.feature_enabled?(:hide_zero_point_quizzes_option),
         GRADING_SCHEME_UPDATES_ENABLED:
           Account.site_admin.feature_enabled?(:grading_scheme_updates),
-        POINTS_BASED_GRADING_SCHEMES_ENABLED:
-          Account.site_admin.feature_enabled?(:points_based_grading_schemes),
+        ARCHIVED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:archived_grading_schemes),
         OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION:
-          @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
+          @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
+        UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED:
+          Account.site_admin.feature_enabled?(:update_assignment_submission_type_launch_button)
       }
 
-      add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?
+      if @context.root_account.feature_enabled?(:instui_nav)
+        if on_quizzes_page? && params.key?(:quiz_lti)
+          add_crumb(t("Edit Quiz")) unless @assignment.new_record?
+        else
+          add_crumb(t("Edit Assignment")) unless @assignment.new_record?
+        end
+      else
+        add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?
+      end
+
       hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @assignment.new_record?
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
       hash[:ASSIGNMENT][:has_submitted_submissions] = @assignment.has_submitted_submissions?
@@ -1071,7 +1141,7 @@ class AssignmentsController < ApplicationController
 
   def filter_speed_grader_by_student_group?
     # Group assignments only need to filter if they show individual students
-    return false if @assignment.group_category? && !@assignment.grade_group_students_individually?
+    return false if @assignment.group_category_id && !@assignment.grade_group_students_individually?
 
     @context.filter_speed_grader_by_student_group?
   end
@@ -1081,11 +1151,13 @@ class AssignmentsController < ApplicationController
 
     if on_quizzes_page? && params.key?(:quiz_lti)
       add_crumb(t("#crumbs.quizzes", "Quizzes"), course_quizzes_path(@context))
+      add_crumb(t("Create Quiz")) if new_quiz && @context.root_account.feature_enabled?(:instui_nav)
     else
       add_crumb(t("#crumbs.assignments", "Assignments"), course_assignments_path(@context))
+      add_crumb(t("Create New Assignment")) if new_quiz && @context.root_account.feature_enabled?(:instui_nav)
     end
 
-    add_crumb(t("Create new")) if new_quiz
+    add_crumb(t("Create new")) if new_quiz && !@context.root_account.feature_enabled?(:instui_nav)
   end
 
   def setup_active_tab(controller)

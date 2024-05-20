@@ -132,6 +132,7 @@ describe "dashboard" do
         expect(fj('.fake-link:contains("Unnamed")')).to be_present
       end
 
+      # EVAL-3711 Remove this test when instui_nav feature flag is removed
       it "does not show an unpublished assignment under recent activity under dashboard", priority: "2" do
         # manually creating assignment as assignment created through backend are published by default
         get "/courses/#{@course.id}/assignments"
@@ -139,6 +140,28 @@ describe "dashboard" do
 
         # create assignment
         f(".new_assignment").click
+        wait_for_ajaximations
+        f("#assignment_name").send_keys("unpublished assignment")
+        f("input[type=checkbox][id=assignment_text_entry]").click
+        f(".datePickerDateField[data-date-type='due_at']").send_keys(1.day.from_now)
+
+        expect_new_page_load { f(".btn-primary[type=submit]").click }
+        wait_for_ajaximations
+
+        get "/"
+        f("#DashboardOptionsMenu_Container button").click
+        fj('span[role="menuitemradio"]:contains("Recent Activity")').click
+        expect(f(".no_recent_messages")).to be_truthy
+      end
+
+      it "does not show an unpublished assignment under recent activity under dashboard with the instui nav feature flag on", priority: "2" do
+        @course.root_account.enable_feature!(:instui_nav)
+        # manually creating assignment as assignment created through backend are published by default
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        # create assignment
+        f("[data-testid='new_assignment_button']").click
         wait_for_ajaximations
         f("#assignment_name").send_keys("unpublished assignment")
         f("input[type=checkbox][id=assignment_text_entry]").click

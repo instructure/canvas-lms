@@ -17,6 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
+import {find, map} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
@@ -24,8 +25,7 @@ import template from '../../jst/messageStudentsDialog.handlebars'
 import wrapperTemplate from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import ConversationCreator from '../models/ConversationCreator'
 import recipientListTemplate from '../../jst/_messageStudentsWhoRecipientList.handlebars'
-import _ from 'underscore'
-import '@canvas/forms/jquery/serializeForm'
+import '@canvas/serialize-form'
 
 const I18n = useI18nScope('viewsMessageStudentsDialog')
 
@@ -69,11 +69,12 @@ MessageStudentsDialog.prototype.els = {
   '[name=body]': '$messageBody',
 }
 
-MessageStudentsDialog.prototype.events = _.extend({}, DialogFormView.prototype.events, {
+MessageStudentsDialog.prototype.events = {
+  ...DialogFormView.prototype.events,
   'change [name=recipientGroupName]': 'updateListOfRecipients',
   'click .dialog_closer': 'close',
   dialogclose: 'close',
-})
+}
 
 MessageStudentsDialog.prototype.initialize = function (_opts) {
   MessageStudentsDialog.__super__.initialize.apply(this, arguments)
@@ -115,7 +116,7 @@ MessageStudentsDialog.prototype.validateBeforeSave = function (data, errors) {
 }
 
 MessageStudentsDialog.prototype._findRecipientGroupByName = function (name) {
-  return _.detect(this.recipientGroups, function (grp) {
+  return find(this.recipientGroups, function (grp) {
     return grp.name === name
   })
 }
@@ -127,7 +128,7 @@ MessageStudentsDialog.prototype.getFormData = function () {
   const recipients = this._findRecipientGroupByName(recipientGroupName).recipients
   return {
     body,
-    recipients: _.pluck(recipients, 'id'),
+    recipients: map(recipients, 'id'),
   }
 }
 

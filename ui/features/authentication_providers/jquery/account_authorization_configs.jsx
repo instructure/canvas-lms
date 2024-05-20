@@ -17,15 +17,16 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import AuthTypePicker from '../react/AuthTypePicker'
 import authenticationProviders from './index'
 import $ from 'jquery'
 import ready from '@instructure/ready'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit */
-import '@canvas/keycodes'
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit */
+import '@canvas/datetime/jquery'
+import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 
 const I18n = useI18nScope('authentication_providers')
@@ -129,7 +130,7 @@ $('.jit_provisioning_checkbox').click(function () {
   const $provisioning_elements = $(this)
     .closest('.authentication_provider_form')
     .find('.provisioning_only_column')
-  if ($(this).attr('checked')) {
+  if ($(this).prop('checked')) {
     $provisioning_elements.show()
   } else {
     $provisioning_elements.hide()

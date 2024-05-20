@@ -418,7 +418,7 @@ class SubmissionsApiController < ApplicationController
       end
     end
 
-    if student_ids.is_a?(Array) && student_ids.length > Api.max_per_page
+    if student_ids.is_a?(Array) && student_ids.length > Api::MAX_PER_PAGE
       return render json: { error: "too many students" }, status: :bad_request
     end
 
@@ -870,8 +870,8 @@ class SubmissionsApiController < ApplicationController
           submission[:sticker] = params[:submission].delete(:sticker)
         end
 
-        if params.key?(:checkpoint_label) && @domain_root_account&.feature_enabled?(:discussion_checkpoints)
-          submission[:checkpoint_label] = params.delete(:checkpoint_label)
+        if params.key?(:sub_assignment_tag) && @domain_root_account&.feature_enabled?(:discussion_checkpoints)
+          submission[:sub_assignment_tag] = params.delete(:sub_assignment_tag)
         end
 
         submission[:provisional] = value_to_boolean(params[:submission][:provisional])

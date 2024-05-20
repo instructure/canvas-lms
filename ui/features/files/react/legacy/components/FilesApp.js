@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {sortedUniqBy} from 'lodash'
 import MultiselectableMixin from '../mixins/MultiselectableMixin'
 import dndMixin from '../mixins/dndMixin'
 
@@ -77,7 +77,7 @@ export default {
   },
 
   onMove(modelsToMove) {
-    const updatedModels = _.uniq(this.state.updatedModels.concat(modelsToMove), 'id')
+    const updatedModels = sortedUniqBy(this.state.updatedModels.concat(modelsToMove), 'id')
     this.setState({updatedModels})
   },
 

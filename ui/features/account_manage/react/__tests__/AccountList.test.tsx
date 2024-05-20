@@ -41,4 +41,15 @@ describe('AccountLists', () => {
     const {queryAllByText} = render(<AccountList {...props} pageIndex={1} />)
     await waitFor(() => expect(queryAllByText('Accounts could not be found')).toBeTruthy())
   })
+
+  it('renders when the API does not return the last page', async () => {
+    fetchMock.get('/api/v1/accounts?per_page=100&page=1', {
+      body: [{id: '1', name: 'acc1'}],
+      headers: {
+        link: '</api/v1/accounts?page=1&per_page=100>; rel="current"',
+      },
+    })
+    const {queryAllByText} = render(<AccountList {...props} pageIndex={1} />)
+    await waitFor(() => expect(queryAllByText('acc1')).toBeTruthy())
+  })
 })

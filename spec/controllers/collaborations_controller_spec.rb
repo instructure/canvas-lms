@@ -108,9 +108,31 @@ describe CollaborationsController do
         user: @student
       ).tap { |c| c.update_attribute :url, "http://www.example.com" }
 
-      get "index", params: { course_id: @course.id }
+      gc = group_category
 
-      expect(assigns[:collaborations]).to eq [collab2]
+      valid_group = gc.groups.create!(context: @course, name: "valid")
+      valid_group.add_user(@student, "accepted")
+      valid_collab = @course.collaborations.create!(
+        title: "valid",
+        user: @teacher
+      ).tap do |c|
+        c.update_attribute :url, "http://www.example.com"
+        c.update_members([], [valid_group.id])
+      end
+
+      invalid_group = gc.groups.create!(context: @course, name: "invalid")
+      invalid_group.add_user(@student, "deleted")
+      invalid_collab = @course.collaborations.create!(
+        title: "invalid",
+        user: @teacher
+      ).tap do |c|
+        c.update_attribute :url, "http://www.example.com"
+        c.update_members([], [invalid_group.id])
+      end
+
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:collaborations]).to match_array [collab2, valid_collab]
+      expect(assigns[:collaborations]).not_to include invalid_collab
     end
   end
 
@@ -197,6 +219,12 @@ describe CollaborationsController do
       ).tap { |c| c.update_attribute :url, "http://www.example.com" }
     end
 
+    let(:url) { "http://www.example.com/launch" }
+    let(:domain) { "example.com" }
+    let(:developer_key) { dev_key_model_1_3(account: @course.account) }
+    let(:new_tool) { external_tool_1_3_model(context: @course, developer_key:, opts: { url:, name: "1.3 tool" }) }
+    let(:old_tool) { external_tool_model(context: @course, opts: { url:, domain: }) }
+
     context "when the collaboration includes a resource_link_lookup_uuid" do
       subject { get "show", params: { course_id: @course.id, id: collaboration.id } }
 
@@ -211,7 +239,10 @@ describe CollaborationsController do
         )
       end
 
-      before { user_session(@teacher) }
+      before do
+        user_session(@teacher)
+        new_tool
+      end
 
       it "adds the lookup ID to the redirect URL" do
         url = CGI.escape(collaboration[:url])
@@ -221,9 +252,32 @@ describe CollaborationsController do
       end
     end
 
+    context "when the original tool is 1.1 and there is a 1.3 tool" do
+      let(:collaboration) do
+        ExternalToolCollaboration.create!(
+          title: "my collab",
+          user: @teacher,
+          url:,
+          context: @course
+        )
+      end
+
+      before do
+        user_session(@teacher)
+        old_tool
+        new_tool
+      end
+
+      it "migrates the collaboration to 1.3" do
+        get "show", params: { course_id: @course.id, id: collaboration.id }
+        expect(collaboration.reload.resource_link_lookup_uuid).to eq(Lti::ResourceLink.last.lookup_uuid)
+      end
+    end
+
     it "redirects to the lti launch url for ExternalToolCollaborations" do
       course_with_teacher(active_all: true)
       user_session(@teacher)
+      old_tool
       collab = ExternalToolCollaboration.new(
         title: "my collab",
         user: @teacher,

@@ -50,7 +50,8 @@ module GradebookSetup
     {
       title: "GP Closed",
       start_date: 3.weeks.ago(now),
-      end_date: 2.weeks.ago(now)
+      end_date: 2.weeks.ago(now),
+      close_date: 2.weeks.ago(now)
     }
   end
 
@@ -67,7 +68,8 @@ module GradebookSetup
     {
       title: "GP Current",
       start_date: 1.day.ago(now),
-      end_date: 2.weeks.from_now
+      end_date: 2.weeks.from_now,
+      close_date: 2.weeks.from_now
     }
   end
 

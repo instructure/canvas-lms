@@ -17,7 +17,8 @@
  */
 
 import $ from 'jquery'
-import '@canvas/util/toJSON'
+import 'jquery-migrate'
+import '@canvas/jquery/jquery.toJSON'
 
 // TODO: share code with 'unflatten' module
 

@@ -1,23 +1,38 @@
 {{#if name}}
   <h1 class="screenreader-only">{{name}}</h1>
 {{else}}
-  <h1 class="screenreader-only">{{#t}}New Assignment{{/t}}</h1>
+  {{!-- EVAL-3711 Remove ICE feature flag --}}
+  {{#if instui_nav}}
+    <h1 class="screenreader-only">{{#t}}{{renderHeaderTitle}}{{/t}}</h1>
+  {{else}}
+    <h1 class="screenreader-only">{{#t}}New Assignment{{/t}}</h1>
+  {{/if}}
 {{/if}}
 
-<div class="header-bar assignment-edit-header">
-    <div class="header-bar-right">
-      <div class="header-group-left">
-        {{#if published}}
-          <span id='assignment-draft-state' class='published-status published'>
-            <i class="icon-publish icon-Solid"></i>
-            {{#t}}Published{{/t}}
-          </span>
-        {{else}}
-          <span id='assignment-draft-state' class='published-status unpublished'>
-            <i class="icon-unpublished"></i>
-            {{#t}}Not Published{{/t}}
-          </span>
-        {{/if}}
+<div class="header-bar assignment-edit-header" style="align-items: flex-start;">
+    {{!-- EVAL-3711 Remove ICE feature flag --}}
+    {{#if instui_nav}}
+      <div class="header-bar-left">
+          <h1 class='assignment-edit-header-title'>{{#t}}{{renderHeaderTitle}}{{/t}}</h1>
+          <div class="published-assignment-container" style="margin-top:0.75rem"></div>
+      </div>
+    {{/if}}
+    <div class="header-bar-right assignment-edit-header-right">
+      <div class="header-group-left assignment-edit-header-group-left">
+        {{!-- EVAL-3711 Remove ICE feature flag --}}
+        {{#unless instui_nav}}
+          {{#if published}}
+            <span id='assignment-draft-state' class='published-status published'>
+              <i class="icon-publish icon-Solid"></i>
+              {{#t}}Published{{/t}}
+            </span>
+          {{else}}
+            <span id='assignment-draft-state' class='published-status unpublished'>
+              <i class="icon-unpublished"></i>
+              {{#t}}Not Published{{/t}}
+            </span>
+          {{/if}}
+        {{/unless}}
       </div>
       <div class="header-group-right">
         <div class="admin-links">

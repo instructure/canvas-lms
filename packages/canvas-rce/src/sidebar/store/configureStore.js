@@ -19,14 +19,14 @@
 import {createStore, applyMiddleware} from 'redux'
 import rootReducer from '../reducers'
 import initialState from './initialState'
-import thunkMiddleware from 'redux-thunk'
+import {thunk} from 'redux-thunk'
 import {batch, batching} from 'redux-batch-middleware'
 
 export default function (props, state) {
   const store = createStore(
     batching(rootReducer),
     state || initialState(props),
-    applyMiddleware(thunkMiddleware, batch)
+    applyMiddleware(thunk, batch)
   )
 
   return store

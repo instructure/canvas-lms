@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, screen} from '@testing-library/react'
 import DeveloperKeyScope from '../Scope'
 
 const scope = {
@@ -27,68 +27,49 @@ const scope = {
   scope: 'url:GET|/api/v1/accounts/search',
 }
 
-it('checks the checkbox if the checked prop is true', () => {
-  const props = {
-    onChange: jest.fn(),
-    checked: true,
-    scope,
-  }
-
-  const wrapper = mount(<DeveloperKeyScope {...props} />)
-  expect(wrapper.find('input[type="checkbox"]').props().checked).toBe(true)
+const defaultProps = props => ({
+  onChange: jest.fn(),
+  checked: false,
+  scope,
+  ...props,
 })
 
-it('does not check the checkbox if the checked prop is false', () => {
-  const props = {
-    onChange: jest.fn(),
-    checked: false,
-    scope,
-  }
+const renderDeveloperKeyScope = props => render(<DeveloperKeyScope {...defaultProps(props)} />)
 
-  const wrapper = mount(<DeveloperKeyScope {...props} />)
-  expect(wrapper.find('input[type="checkbox"]').props().checked).toBe(false)
-})
+describe('DeveloperKeyScope', () => {
+  it('checks the checkbox if the checked prop is true', () => {
+    renderDeveloperKeyScope({
+      checked: true,
+    })
 
-it('renders Enable Scope if not checked', () => {
-  const props = {
-    onChange: jest.fn(),
-    checked: false,
-    scope,
-  }
+    expect(
+      screen.getByRole('checkbox', {
+        name: /disable scope/i,
+      })
+    ).toBeChecked()
+  })
 
-  const wrapper = mount(<DeveloperKeyScope {...props} />)
-  expect(wrapper.find('Checkbox').at(2).text()).toContain('Enable scope')
-})
+  it('does not check the checkbox if the checked prop is false', () => {
+    renderDeveloperKeyScope()
 
-it('renders Disable Scope if checked', () => {
-  const props = {
-    onChange: jest.fn(),
-    checked: true,
-    scope,
-  }
+    expect(
+      screen.getByRole('checkbox', {
+        name: /enable scope/i,
+      })
+    ).not.toBeChecked()
+  })
 
-  const wrapper = mount(<DeveloperKeyScope {...props} />)
-  expect(wrapper.find('Checkbox').at(2).text()).toContain('Disable scope')
-})
+  it('renders scope', () => {
+    renderDeveloperKeyScope({
+      checked: true,
+    })
 
-it('renders scope', () => {
-  const props = {
-    onChange: jest.fn(),
-    checked: true,
-    scope,
-  }
+    expect(screen.getByText(scope.scope)).toBeInTheDocument()
+  })
 
-  const wrapper = mount(<DeveloperKeyScope {...props} />)
-  expect(wrapper.find('Item').at(2).text()).toContain(scope.scope)
-})
+  it('renders the scope verb', () => {
+    renderDeveloperKeyScope()
 
-it('renders the scope verb', () => {
-  const props = {
-    onChange: jest.fn(),
-    checked: false,
-    scope,
-  }
-
-  const wrapper = mount(<DeveloperKeyScope {...props} />)
-  expect(wrapper.find('Item').at(2).text()).toContain(scope.verb)
+    expect(screen.getByText(scope.verb)).toBeInTheDocument()
+  })
 })

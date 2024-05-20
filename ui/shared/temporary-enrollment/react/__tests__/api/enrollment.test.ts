@@ -18,12 +18,13 @@
 
 import {
   createEnrollment,
-  deleteEnrollment,
   createTemporaryEnrollmentPairing,
+  deleteEnrollment,
   fetchTemporaryEnrollments,
+  getTemporaryEnrollmentPairing,
 } from '../../api/enrollment'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {Enrollment, ITEMS_PER_PAGE, User} from '../../types'
+import {type Enrollment, ITEMS_PER_PAGE, type User} from '../../types'
 
 // Mock the API call
 jest.mock('@canvas/do-fetch-api-effect')
@@ -52,6 +53,7 @@ const mockEnrollment: Enrollment = {
   role_id: '5',
   user: mockSomeUser,
   enrollment_state: 'active',
+  limit_privileges_to_course_section: false,
   temporary_enrollment_pairing_id: 2,
   temporary_enrollment_source_user_id: 3,
   type: 'TeacherEnrollment',
@@ -144,7 +146,7 @@ describe('enrollment api', () => {
           json: Promise.resolve({error: statusText}),
         })
         await expect(fetchTemporaryEnrollments('1', true)).rejects.toThrow(
-          new Error(`Failed to fetch recipients data. Status: ${status}`)
+          new Error(`Failed to get temporary enrollments for recipient`)
         )
       })
 
@@ -216,7 +218,7 @@ describe('enrollment api', () => {
           await deleteEnrollment(courseId, enrollmentId)
         } catch (error) {
           if (error instanceof Error) {
-            expect(error.message).toBe(`Failed to delete enrollment: ${mockError.message}`)
+            expect(error.message).toBe(`Failed to delete temporary enrollment`)
           } else {
             expect(error).toBeInstanceOf(Error)
           }
@@ -238,17 +240,20 @@ describe('enrollment api', () => {
         const mockResponse = {
           json: {
             temporary_enrollment_pairing: {
-              id: 10,
-              root_account_id: 2,
+              id: '143',
+              root_account_id: '2',
               workflow_state: 'active',
-              created_at: '2023-11-14T03:56:42Z',
-              updated_at: '2023-11-14T03:56:42Z',
+              created_at: '2024-01-12T20:02:47Z',
+              updated_at: '2024-01-12T20:02:47Z',
+              created_by_id: '1',
+              deleted_by_id: null,
+              ending_enrollment_state: 'completed',
             },
           },
         }
         ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
         const rootAccountId = '2'
-        const result = await createTemporaryEnrollmentPairing(rootAccountId)
+        const result = await createTemporaryEnrollmentPairing(rootAccountId, 'completed')
         expect(result).toEqual(mockResponse.json.temporary_enrollment_pairing)
       })
 
@@ -257,12 +262,10 @@ describe('enrollment api', () => {
         ;(doFetchApi as jest.Mock).mockRejectedValue(mockError)
         const rootAccountId = '2'
         try {
-          await createTemporaryEnrollmentPairing(rootAccountId)
+          await createTemporaryEnrollmentPairing(rootAccountId, 'completed')
         } catch (error) {
           if (error instanceof Error) {
-            expect(error.message).toBe(
-              `Failed to fetch temporary enrollment pairing: ${mockError.message}`
-            )
+            expect(error.message).toBe(`Failed to create temporary enrollment pairing`)
           } else {
             expect(error).toBeInstanceOf(Error)
           }
@@ -270,12 +273,67 @@ describe('enrollment api', () => {
       })
     })
 
+    describe('getTemporaryEnrollmentPairing', () => {
+      it('retrieves temporary enrollment pairing successfully', async () => {
+        const accountId = '2'
+        const pairingId = 143
+        const mockResponse = {
+          json: {
+            temporary_enrollment_pairing: {
+              id: '143',
+              root_account_id: '2',
+              workflow_state: 'active',
+              created_at: '2024-01-12T20:02:47Z',
+              updated_at: '2024-01-12T20:02:47Z',
+              created_by_id: '1',
+              deleted_by_id: null,
+              ending_enrollment_state: 'completed',
+            },
+          },
+        }
+        ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+        const result = await getTemporaryEnrollmentPairing(accountId, pairingId)
+        expect(result).toEqual(mockResponse.json.temporary_enrollment_pairing)
+      })
+
+      it('throws a specific error message on failure', async () => {
+        const accountId = '2'
+        const pairingId = 143
+        const mockError: Error = new Error('Network error occurred')
+        ;(doFetchApi as jest.Mock).mockRejectedValue(mockError)
+        try {
+          await getTemporaryEnrollmentPairing(accountId, pairingId)
+        } catch (error) {
+          if (error instanceof Error) {
+            expect(error.message).toBe('Failed to retrieve temporary enrollment pairing')
+          } else {
+            expect(error).toBeInstanceOf(Error)
+          }
+        }
+      })
+
+      it('throws an unknown error message when the error is not an instance of Error', async () => {
+        const accountId = '2'
+        const pairingId = 143
+        const mockError = 'Some non-Error value'
+        ;(doFetchApi as jest.Mock).mockRejectedValue(mockError)
+        try {
+          await getTemporaryEnrollmentPairing(accountId, pairingId)
+        } catch (error: any) {
+          expect(error.message).toBe(
+            'Failed to retrieve temporary enrollment pairing due to an unknown error'
+          )
+        }
+      })
+    })
+
     describe('createEnrollment', () => {
-      const mockParams: [string, string, string, string, Date, Date, string] = [
+      const mockParams: [string, string, string, string, boolean, Date, Date, string] = [
         '1',
         '1',
         '2',
         '1',
+        false,
         new Date('2022-01-01'),
         new Date('2022-06-01'),
         '1',
@@ -291,6 +349,7 @@ describe('enrollment api', () => {
               user_id: '1',
               temporary_enrollment_source_user_id: '2',
               temporary_enrollment_pairing_id: '1',
+              limit_privileges_to_course_section: false,
               start_at: '2022-01-01T00:00:00.000Z',
               end_at: '2022-06-01T00:00:00.000Z',
               role_id: '1',
@@ -299,6 +358,60 @@ describe('enrollment api', () => {
           method: 'POST',
         })
         expect(mockConsoleError).not.toHaveBeenCalled()
+      })
+
+      it('handles JSON parsing error', async () => {
+        ;(doFetchApi as jest.Mock).mockRejectedValueOnce({
+          response: {
+            status: 400,
+            text: async () => {
+              throw new Error('Invalid JSON data')
+            },
+          },
+        })
+        await expect(async () => {
+          try {
+            await createEnrollment(...mockParams)
+          } catch (error: any) {
+            expect(error.message).toBe('Unable to process your request, please try again later')
+            throw error
+          }
+        }).rejects.toThrow()
+      })
+
+      // server-side error messages found here: app/controllers/enrollments_api_controller.rb
+      describe('user-facing doFetchApi server error message string translations', () => {
+        it.each([
+          {
+            // concluded_course
+            apiMessage: "Can't add an enrollment to a concluded course.",
+            translatedMessage: 'Cannot add a temporary enrollment to a concluded course',
+          },
+          {
+            // inactive_role
+            apiMessage: 'Cannot create an enrollment with this role because it is inactive.',
+            translatedMessage: 'Cannot create a temporary enrollment with an inactive role',
+          },
+          {
+            // base_type_mismatch
+            apiMessage: 'The specified type must match the base type for the role',
+            translatedMessage: 'The specified type must match the base type for the role',
+          },
+          {
+            // default
+            apiMessage: 'Some other error message',
+            translatedMessage: 'Failed to create temporary enrollment, please try again later',
+          },
+        ])('Translate API error message', async ({apiMessage, translatedMessage}) => {
+          const mockJsonFunction = jest.fn().mockResolvedValue({message: apiMessage})
+          ;(doFetchApi as jest.Mock).mockRejectedValueOnce({
+            response: {
+              json: mockJsonFunction,
+              status: 500,
+            },
+          })
+          await expect(createEnrollment(...mockParams)).rejects.toThrow(translatedMessage)
+        })
       })
     })
   })

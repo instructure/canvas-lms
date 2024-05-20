@@ -140,10 +140,10 @@ describe Group do
       group3 = Group.create!(name: "group3", group_category:, context:)
       group4 = Group.create!(name: "group4", group_category: other_category, context:)
       expect(group1.peer_groups.length).to eq 2
-      expect(group1.peer_groups).to be_include(group2)
-      expect(group1.peer_groups).to be_include(group3)
-      expect(group1.peer_groups).not_to be_include(group1)
-      expect(group1.peer_groups).not_to be_include(group4)
+      expect(group1.peer_groups).to include(group2)
+      expect(group1.peer_groups).to include(group3)
+      expect(group1.peer_groups).not_to include(group1)
+      expect(group1.peer_groups).not_to include(group4)
     end
 
     it "does not find peer groups for student organized groups" do
@@ -158,11 +158,11 @@ describe Group do
   context "atom" do
     it "has an atom name as it's own name" do
       group_model(name: "some unique name")
-      expect(@group.to_atom.title).to eql("some unique name")
+      expect(@group.to_atom[:title]).to eql("some unique name")
     end
 
     it "has a link to itself" do
-      link = @group.to_atom.links.first.to_s
+      link = @group.to_atom[:link]
       expect(link).to eql("/groups/#{@group.id}")
     end
   end
@@ -172,18 +172,18 @@ describe Group do
       user_model
       pseudonym_model(user_id: @user.id)
       @group.add_user(@user)
-      expect(@group.users).to be_include(@user)
+      expect(@group.users).to include(@user)
     end
 
     it "is not able to add a person to the group twice" do
       user_model
       pseudonym_model(user_id: @user.id)
       @group.add_user(@user)
-      expect(@group.users).to be_include(@user)
+      expect(@group.users).to include(@user)
       expect(@group.users.count).to eq 1
       @group.add_user(@user)
       @group.reload
-      expect(@group.users).to be_include(@user)
+      expect(@group.users).to include(@user)
       expect(@group.users.count).to eq 1
     end
 
@@ -195,12 +195,12 @@ describe Group do
       user_model
       pseudonym_model(user_id: @user.id)
       group1.add_user(@user)
-      expect(group1.users).to be_include(@user)
+      expect(group1.users).to include(@user)
 
       group2.add_user(@user)
-      expect(group2.users).to be_include(@user)
+      expect(group2.users).to include(@user)
       group1.reload
-      expect(group1.users).not_to be_include(@user)
+      expect(group1.users).not_to include(@user)
     end
 
     it "adds a user at the right workflow_state by default" do
@@ -587,21 +587,6 @@ describe Group do
     expect(hash["group"]["group_category"]).to eq "Something"
   end
 
-  it "maintains the deprecated category attribute" do
-    course = course_model
-    group = course.groups.create
-    default_category = GroupCategory.student_organized_for(course)
-    expect(group.read_attribute(:category)).to eql(default_category.name)
-    group.group_category = group.context.group_categories.create(name: "my category")
-    group.save
-    group.reload
-    expect(group.read_attribute(:category)).to eql("my category")
-    group.group_category = nil
-    group.save
-    group.reload
-    expect(group.read_attribute(:category)).to eql(default_category.name)
-  end
-
   context "has_common_section?" do
     it "is false for accounts" do
       account = Account.default
@@ -923,6 +908,32 @@ describe Group do
       } }
       group = group_model(context: account)
       expect(group.usage_rights_required?).to be true
+    end
+  end
+
+  describe ".ids_by_student_by_assignment" do
+    it "returns a hash of assignment_id => user_id => group_id" do
+      first_student = @course.enroll_student(user_model, enrollment_state: "active").user
+      second_student = @course.enroll_student(user_model, enrollment_state: "active").user
+
+      first_group = @group
+      group_category = first_group.group_category
+      first_group.add_user(first_student)
+      second_group = @course.groups.create!(group_category:)
+      second_group.add_user(second_student)
+      assignment = @course.assignments.create!(group_category:)
+
+      aggregate_failures do
+        map = Group.ids_by_student_by_assignment([first_student.id], [assignment.id])
+        expect(map.dig(assignment.id, first_student.id)).to eq first_group.id
+        expect(map.fetch(assignment.id)).not_to have_key(second_student.id)
+
+        map = Group.ids_by_student_by_assignment([first_student.id, second_student.id], [assignment.id])
+        expect(map.dig(assignment.id, first_student.id)).to eq first_group.id
+        expect(map.dig(assignment.id, second_student.id)).to eq second_group.id
+
+        expect(Group.ids_by_student_by_assignment([first_student.id], [])).to be_empty
+      end
     end
   end
 end

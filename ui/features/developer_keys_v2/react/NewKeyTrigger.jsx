@@ -18,11 +18,10 @@
 
 import {View} from '@instructure/ui-view'
 
-import {Flex} from '@instructure/ui-flex'
-import {Menu} from '@instructure/ui-menu'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconPlusLine} from '@instructure/ui-icons'
+import {NewKeyButtons} from './NewKeyButtons'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
@@ -38,23 +37,6 @@ export default class DeveloperKeyModalTrigger extends React.Component {
   showCreateLtiKey = () => {
     this.props.store.dispatch(this.props.actions.ltiKeysSetLtiKey(true))
     this.props.store.dispatch(this.props.actions.developerKeysModalOpen('lti'))
-  }
-
-  developerKeyMenuItem(title, onClick) {
-    const buttonIdTitle = title.toLowerCase().replace(' ', '-')
-    return (
-      <Menu.Item onClick={onClick} type="button" id={`add-${buttonIdTitle}-button`}>
-        <Flex>
-          <Flex.Item padding="0 x-small 0 0" margin="0 0 xxx-small 0">
-            <IconPlusLine />
-          </Flex.Item>
-          <Flex.Item>
-            <ScreenReaderContent>{I18n.t('Create an')}</ScreenReaderContent>
-            {title}
-          </Flex.Item>
-        </Flex>
-      </Menu.Item>
-    )
   }
 
   triggerButton() {
@@ -73,16 +55,17 @@ export default class DeveloperKeyModalTrigger extends React.Component {
 
   developerKeyTrigger() {
     return (
-      <Menu placement="bottom" trigger={this.triggerButton()} shouldHideOnSelect={true}>
-        {this.developerKeyMenuItem(I18n.t('API Key'), this.showCreateDeveloperKey)}
-        {this.developerKeyMenuItem(I18n.t('LTI Key'), this.showCreateLtiKey)}
-      </Menu>
+      <NewKeyButtons
+        triggerButton={this.triggerButton()}
+        showCreateDeveloperKey={this.showCreateDeveloperKey}
+        showCreateLtiKey={this.showCreateLtiKey}
+      />
     )
   }
 
   render() {
     return (
-      <View as="div" margin="0 0 small 0" padding="none" textAlign="end">
+      <View as="div" padding="small" textAlign="end">
         {this.developerKeyTrigger()}
       </View>
     )

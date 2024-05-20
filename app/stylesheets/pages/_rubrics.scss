@@ -42,3 +42,30 @@
   font-size: 0.7em;
   margin-#{direction(left)}: 20px;
 }
+.rubric-header {
+  flex-wrap: wrap;
+  display: flex;
+  gap: 12px;
+  margin-bottom: $ic-sp * 3;
+  @include breakpoint(desktop) {
+    flex-wrap: nowrap;
+    gap: 36px;
+  }
+}
+.rubric-header-left {
+  flex: 1;
+}
+.rubric-header-right{
+  font-size: 0;
+  flex-basis: 100%;
+  @include breakpoint(desktop) {
+    flex-basis: auto
+  }
+}
+.rubric-title {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.05;
+  font-size: 2.375rem;
+  word-break: break-word
+}

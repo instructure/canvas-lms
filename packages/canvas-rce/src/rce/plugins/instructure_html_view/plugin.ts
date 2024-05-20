@@ -19,7 +19,6 @@
 import formatMessage from '../../../format-message'
 import clickCallback from './clickCallback'
 import tinymce from 'tinymce'
-import {TsMigrationAny} from '../../../types/ts-migration'
 
 // Register plugin
 tinymce.PluginManager.add('instructure_html_view', function (ed) {

@@ -17,12 +17,12 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import _ from 'underscore'
+import {extend as lodashExtend} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import wrapperTemplate from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import template from '../../jst/groupCategoryEdit.handlebars'
-import h from 'html-escape'
+import h from '@instructure/html-escape'
 
 const I18n = useI18nScope('groups')
 
@@ -54,7 +54,7 @@ GroupCategoryEditView.prototype.els = {
   '.auto-group-leader-controls': '$autoGroupLeaderControls',
 }
 
-GroupCategoryEditView.prototype.events = _.extend({}, DialogFormView.prototype.events, {
+GroupCategoryEditView.prototype.events = lodashExtend({}, DialogFormView.prototype.events, {
   'click .dialog_closer': 'close',
   'click .self-signup-toggle': 'toggleSelfSignup',
   'click .auto-group-leader-toggle': 'toggleAutoGroupLeader',
@@ -118,7 +118,7 @@ GroupCategoryEditView.prototype.validateFormData = function (_data, _errors) {
 GroupCategoryEditView.prototype.toJSON = function () {
   const json = this.model.present()
   let ref
-  return _.extend(
+  return lodashExtend(
     {},
     {
       ENV,

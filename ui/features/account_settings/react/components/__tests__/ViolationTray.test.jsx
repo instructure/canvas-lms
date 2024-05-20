@@ -19,13 +19,11 @@
 import React from 'react'
 import ViolationTray from '../ViolationTray'
 import {render} from '@testing-library/react'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
+import fetchMock from 'fetch-mock' // import fetch-mock
 
 describe('Violation Tray', () => {
   beforeEach(() => {
-    fetch.resetMocks()
+    fetchMock.restore() // Reset mocks
   })
 
   const getProps = overrides => ({
@@ -35,26 +33,26 @@ describe('Violation Tray', () => {
   })
 
   it('displays a spinner when loading data', async () => {
-    fetch.mockResponse(JSON.stringify([]))
+    fetchMock.mock('*', JSON.stringify([])) // Mock fetch
     const {findByText} = render(<ViolationTray {...getProps()} />)
-    // Even though there isn't an expect here... it's functionally the same,
-    // if it doesn't find it... the test will fail :)
     await findByText('Loading')
   })
+
   it('displays an error alert when an error loading occurs', async () => {
-    fetch.mockReject(new Error('fail'))
+    fetchMock.mock('*', {throws: new Error('fail')}) // Mock fetch with error
     const {findByText} = render(<ViolationTray {...getProps()} />)
     expect(await findByText(/Something went wrong loading/)).toBeInTheDocument()
   })
 
   it('displays an info alert when there are no violations', async () => {
-    fetch.mockResponse(JSON.stringify([]))
+    fetchMock.mock('*', JSON.stringify([])) // Mock fetch
     const {findByText} = render(<ViolationTray {...getProps()} />)
     expect(await findByText(/No violations/)).toBeInTheDocument()
   })
 
   it('displays the violation table when there are violations', async () => {
-    fetch.mockResponse(
+    fetchMock.mock(
+      '*',
       JSON.stringify([
         {
           uri: 'http://example.com',
@@ -67,7 +65,7 @@ describe('Violation Tray', () => {
           count: 2,
         },
       ])
-    )
+    ) // Mock fetch with data
     const {findByText} = render(<ViolationTray {...getProps()} />)
     await findByText(/CSP Violations/)
   })

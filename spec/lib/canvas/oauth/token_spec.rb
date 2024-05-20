@@ -154,6 +154,34 @@ module Canvas::OAuth
       end
     end
 
+    describe ".find_access_token" do
+      specs_require_sharding
+      let_once(:scopes) { ["url:POST|/api/v1/inst_access_tokens"] }
+      let_once(:purpose) { "inst_access_tokens" }
+
+      before do
+        Shard.default.activate do
+          @dev_key = DeveloperKey.create!(scopes:)
+        end
+        @shard1.activate do
+          @user = User.create!
+          Shard.default.activate { user.save_shadow_record }
+          @user.access_tokens.create!(developer_key_id: @dev_key.global_id, scopes:, purpose:)
+        end
+      end
+
+      it "finds the user's access token" do
+        access_token = token.class.find_access_token(@user, @dev_key, scopes, purpose)
+        expect(access_token).to be_a AccessToken
+      end
+
+      it "returns nil if token isn't found" do
+        @user.access_tokens.destroy_all
+        access_token = token.class.find_access_token(@user, @dev_key.reload, scopes, purpose)
+        expect(access_token).to be_nil
+      end
+    end
+
     describe "#as_json" do
       let(:json) { token.as_json }
 
@@ -252,16 +280,6 @@ module Canvas::OAuth
         code_data = { user: 1, real_user: 2, client_id: 3, scopes: nil, purpose: nil, remember_access: nil }
         # should have 10 min (in seconds) ttl passed as second param
         expect(redis).to receive(:setex).with("oauth2:brand_new_code", 600, code_data.to_json)
-        allow(Canvas).to receive_messages(redis:)
-        Token.generate_code_for(1, 2, 3)
-      end
-
-      it "sets the new data hash into redis with 10 sec ttl" do
-        redis = Object.new
-        code_data = { user: 1, real_user: 2, client_id: 3, scopes: nil, purpose: nil, remember_access: nil }
-        # should have 10 sec ttl passed as second param with setting
-        Setting.set("oath_token_request_timeout", "10")
-        expect(redis).to receive(:setex).with("oauth2:brand_new_code", 10, code_data.to_json)
         allow(Canvas).to receive_messages(redis:)
         Token.generate_code_for(1, 2, 3)
       end

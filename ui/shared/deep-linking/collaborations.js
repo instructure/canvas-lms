@@ -35,12 +35,12 @@ export const addDeepLinkingListener = () => {
  * LTI Advantage handleDeepLinking handler and the
  * LTI 1.1 content item handler.
  */
-export function onExternalContentReady(e, data) {
-  const contentItem = {contentItems: JSON.stringify(data.contentItems)}
-  if (data.service_id) {
-    updateCollaboration(contentItem, data.service_id, data.tool_id)
+export function onExternalContentReady({contentItems, service_id, tool_id}) {
+  const contentItem = {contentItems: JSON.stringify(contentItems)}
+  if (service_id) {
+    updateCollaboration(contentItem, service_id, tool_id)
   } else {
-    createCollaboration(contentItem, data.tool_id)
+    createCollaboration(contentItem, tool_id)
   }
 }
 
@@ -55,7 +55,7 @@ export const handleDeepLinking = async event => {
     if (typeof item !== 'object') {
       $.flashError(I18n.t('Error retrieving content from tool (bad content item)'))
     } else {
-      onExternalContentReady(event, {
+      onExternalContentReady({
         service_id: event.data?.service_id,
         tool_id: event.data?.tool_id,
         contentItems: [item],

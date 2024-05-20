@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {intersection} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -39,7 +39,7 @@ class VisibleContextManager {
     this.$holder = $holder
     const fragmentData = (() => {
       try {
-        return $.parseJSON(decodeFromHex(window.location.hash.substring(1))) || {}
+        return JSON.parse(decodeFromHex(window.location.hash.substring(1))) || {}
       } catch (e) {
         return {}
       }
@@ -59,7 +59,7 @@ class VisibleContextManager {
 
     this.enabledAccounts = contexts.filter(c => c.type === 'account').map(dC => dC.asset_string)
 
-    this.contexts = _.intersection(this.contexts, availableContexts)
+    this.contexts = intersection(this.contexts, availableContexts)
     this.contexts = this.contexts.slice(0, ENV.CALENDAR.VISIBLE_CONTEXTS_LIMIT)
 
     this.notify()
@@ -182,6 +182,7 @@ function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
       {
         autoOpen: false,
         modal: true,
+        zIndex: 1000,
         create: (e, _ui) => {
           e.target.parentElement.setAttribute(
             'aria-labelledby',

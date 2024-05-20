@@ -17,7 +17,7 @@
  */
 
 import fullCalendar from 'fullcalendar'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 
 // set up a custom view for the agendaWeek day/date header row
 const _originalHeadCellHtml = fullCalendar.Grid.prototype.headCellHtml

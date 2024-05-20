@@ -743,7 +743,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def create_attachment
-    context = (@current_user || @context)
+    context = @current_user || @context
     attachment_params = {}
     if @topic.for_assignment?
       attachment_params[:folder_id] = @current_user.submissions_folder(@context)

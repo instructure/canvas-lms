@@ -305,7 +305,7 @@ m4v: video/mp4
 mab: application/x-markaby
 man: application/x-troff-man
 mcd: application/vnd.mcd
-md: application/x-genesis-rom
+md: text/markdown
 mdb: application/vnd.ms-access
 mdi: image/vnd.ms-modi
 me: text/x-troff-me

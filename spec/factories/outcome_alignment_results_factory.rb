@@ -81,6 +81,7 @@ module Factories
       user:,
       context: @course,
       alignment: @alignment,
+      association_id: association_object.id,
       association_type: "RubricAssociation",
       title:,
       score:,

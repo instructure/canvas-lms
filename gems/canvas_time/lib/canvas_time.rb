@@ -31,9 +31,9 @@ module CanvasTime
 
   # set to 11:59pm if it's 12:00am
   def self.fancy_midnight(time)
-    return time if time.nil? || time.hour != 0 || time.min != 0
+    return time if time.nil?
 
-    time.end_of_day
+    (time == time.beginning_of_day) ? time.end_of_day : time
   end
 
   def self.is_fancy_midnight?(time)

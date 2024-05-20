@@ -24,34 +24,29 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   plugin_settings :application_id, application_secret: :application_secret_dec
 
   SENSITIVE_PARAMS = [:application_secret].freeze
+  MICROSOFT_TENANT = "9188040d-6c67-4c5b-b112-36a304b66dad"
 
   def self.singleton?
     false
   end
 
-  # Rename db fields
-  alias_attribute :application_id, :client_id
-  alias_attribute :application_secret, :client_secret
+  alias_attribute :application_id, :entity_id
+  alias_attribute :tenant, :auth_filter
+  alias_method :application_secret, :client_secret
+  alias_method :application_secret=, :client_secret=
 
   def client_id
-    self.class.globally_configured? ? application_id : super
+    application_id
   end
 
+  # see {Facebooke#client_secret} for the reasoning here
   def client_secret
-    self.class.globally_configured? ? application_secret : super
-  end
-
-  def tenant=(val)
-    self.auth_filter = val
-  end
-
-  def tenant
-    auth_filter
+    application_secret
   end
 
   def self.recognized_params
     # need to filter out OpenIDConnect params, but still call super to get mfa_required
-    super - open_id_connect_params + %i[tenant login_attribute jit_provisioning].freeze
+    super - open_id_connect_params + %i[tenant login_attribute jit_provisioning allowed_tenants].freeze
   end
 
   def self.login_attributes
@@ -73,6 +68,38 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     super || "id"
   end
 
+  def unique_id(token)
+    id_token = claims(token)
+    settings["known_tenants"] ||= []
+    (settings["known_tenants"] << id_token["tid"]).uniq!
+    allowed_tenants = allowed_tenants_value
+    if allowed_tenants.include?("common")
+      # allow anyone
+    elsif allowed_tenants.include?("guests")
+      # just check the issuer
+      unless id_token["iss"] == "https://login.microsoftonline.com/#{tenant_value}/v2.0"
+        raise OAuthValidationError, t("User is from unacceptable issuer %{issuer}.", issuer: id_token["iss"].inspect)
+      end
+    elsif !allowed_tenants.empty? && !allowed_tenants.include?(id_token["tid"])
+      raise OAuthValidationError, t("User is from unacceptable tenant %{tenant}.", tenant: id_token["tid"].inspect)
+    end
+
+    settings["known_idps"] ||= []
+    idp = id_token["idp"] || id_token["iss"]
+    (settings["known_idps"] << idp).uniq!
+    save! if changed?
+    id_token[login_attribute]
+  end
+
+  def allowed_tenants=(value)
+    value = value.split(",") if value.is_a?(String)
+    settings["allowed_tenants"] = value.map(&:strip).uniq
+  end
+
+  def allowed_tenants
+    settings["allowed_tenants"] || []
+  end
+
   protected
 
   def authorize_url
@@ -92,6 +119,12 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   end
 
   def tenant_value
+    return MICROSOFT_TENANT if tenant == "microsoft"
+
     tenant.presence || "common"
+  end
+
+  def allowed_tenants_value
+    ([tenant_value.presence] + allowed_tenants).compact.uniq
   end
 end

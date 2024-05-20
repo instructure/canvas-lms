@@ -27,7 +27,7 @@ import Quiz from '@canvas/quizzes/backbone/models/Quiz'
 import PublishButtonView from '@canvas/publish-button-view'
 import QuizLogAuditingEventDumper from '@canvas/quiz-log-auditing/jquery/dump_events'
 import CyoeStats from '@canvas/conditional-release-stats/react/index'
-import '@canvas/datetime' /* dateString, time_field, datetime_field */
+import '@canvas/datetime/jquery' /* dateString, time_field, datetime_field */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/rails-flash-notifications'
@@ -37,6 +37,7 @@ import '@canvas/message-students-dialog/jquery/message_students' /* messageStude
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
+import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 
 const I18n = useI18nScope('quizzes.show')
 
@@ -232,6 +233,7 @@ $(document).ready(function () {
             .submit()
         },
       },
+      zIndex: 1000,
     })
 
     $lock_at.datetime_field()
@@ -252,13 +254,51 @@ $(document).ready(function () {
     beforeSubmit(_data) {
       $(this)
         .find('button')
-        .attr('disabled', true)
+        .prop('disabled', true)
         .text(I18n.t('buttons.publishing', 'Publishing...'))
     },
     success(_data) {
       $(this).find('button').text(I18n.t('buttons.already_published', 'Published!'))
       window.location.reload()
     },
+  })
+
+  function renderItemAssignToTray(open, returnFocusTo, itemProps) {
+    ReactDOM.render(
+      <ItemAssignToTray
+        open={open}
+        onClose={() => {
+          ReactDOM.unmountComponentAtNode(document.getElementById('assign-to-mount-point'))
+        }}
+        onDismiss={() => {
+          renderItemAssignToTray(false, returnFocusTo, itemProps)
+          returnFocusTo.focus()
+        }}
+        itemType="quiz"
+        iconType="quiz"
+        locale={ENV.LOCALE || 'en'}
+        timezone={ENV.TIMEZONE || 'UTC'}
+        {...itemProps}
+      />,
+      document.getElementById('assign-to-mount-point')
+    )
+  }
+
+  $('.assign-to-link').on('click keyclick', function (event) {
+    event.preventDefault()
+    const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
+
+    const courseId = event.target.getAttribute('data-quiz-context-id')
+    const itemName = event.target.getAttribute('data-quiz-name')
+    const itemContentId = event.target.getAttribute('data-quiz-id')
+    const pointsString = event.target.getAttribute('data-quiz-points-possible')
+    const pointsPossible = pointsString ? parseFloat(pointsString) : undefined
+    renderItemAssignToTray(true, returnFocusTo, {
+      courseId,
+      itemName,
+      itemContentId,
+      pointsPossible,
+    })
   })
 
   const $el = $('#quiz-publish-link')

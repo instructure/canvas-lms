@@ -32,6 +32,7 @@ export interface EnvAccountsAdminTools {
     can_manage_groups: boolean
     can_read_roster: boolean
     can_view_temporary_enrollments: boolean
+    manage_grading_schemes: boolean
     logging:
       | false
       | {

@@ -19,6 +19,7 @@
 import Backbone from '@canvas/backbone'
 import ExternalContentFileSubmissionView from 'ui/features/submit_assignment/backbone/views/ExternalContentFileSubmissionView'
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 import axios from '@canvas/axios'
 

@@ -18,23 +18,26 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData'
+import ready from '@instructure/ready'
 
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 
 const I18n = useI18nScope('user_name')
 
-$(document).ready(function () {
-  $('#name_and_email').delegate('.edit_user_link', 'click', event => {
+ready(function () {
+  $('#name_and_email').on('click', '.edit_user_link', event => {
     event.preventDefault()
     $('#edit_student_dialog').dialog({
       width: 450,
+      modal: true,
+      zIndex: 1000,
     })
     $('#edit_student_form :text:visible:first').focus().select()
   })
@@ -42,14 +45,14 @@ $(document).ready(function () {
     beforeSubmit(_data) {
       $(this)
         .find('button')
-        .attr('disabled', true)
+        .prop('disabled', true)
         .filter('.submit_button')
         .text(I18n.t('messages.updating_user_details', 'Updating User Details...'))
     },
     success(data) {
       $(this)
         .find('button')
-        .attr('disabled', false)
+        .prop('disabled', false)
         .filter('.submit_button')
         .text(I18n.t('buttons.update_user', 'Update User'))
       $('#name_and_email .user_details').fillTemplateData({data})
@@ -58,7 +61,7 @@ $(document).ready(function () {
     error(_data) {
       $(this)
         .find('button')
-        .attr('disabled', false)
+        .prop('disabled', false)
         .filter('.submit_button')
         .text(
           I18n.t(
@@ -68,10 +71,10 @@ $(document).ready(function () {
         )
     },
   })
-  $('#edit_student_dialog .cancel_button').click(() => {
+  $('#edit_student_dialog .cancel_button').on('click', () => {
     $('#edit_student_dialog').dialog('close')
   })
-  $('.remove_avatar_picture_link').click(async function (event) {
+  $('.remove_avatar_picture_link').on('click', async function (event) {
     event.preventDefault()
     const $link = $(this)
     const result = await showConfirmationDialog({
@@ -100,7 +103,7 @@ $(document).ready(function () {
       }
     )
   })
-  $('.report_avatar_picture_link').click(function (event) {
+  $('.report_avatar_picture_link').on('click', function (event) {
     event.preventDefault()
     event.preventDefault()
     const $link = $(this)
@@ -120,7 +123,7 @@ $(document).ready(function () {
       }
     )
   })
-  $('.clear_user_cache_link').click(function (event) {
+  $('.clear_user_cache_link').on('click', function (event) {
     event.preventDefault()
     const $link = $(this)
     $.ajaxJSON(
@@ -135,11 +138,13 @@ $(document).ready(function () {
       }
     )
   })
-  $('.destroy_user_link').click(async function (event) {
+  $('.destroy_user_link').on('click', async function (event) {
     event.preventDefault()
     const result = await showConfirmationDialog({
       label: I18n.t('Confirm Deletion'),
-      body: I18n.t('Are you sure you want to permanently remove the user from ALL accounts'),
+      body: I18n.t(
+        'Are you sure you want to remove this user from ALL accounts? The user will not only be deleted, but will be marked for PERMANENT deletion.'
+      ),
     })
     if (!result) {
       return
@@ -148,7 +153,7 @@ $(document).ready(function () {
     $.ajaxJSON(
       $link.attr('href'),
       'DELETE',
-      {},
+      {delete_me_frd: true},
       _data => {
         $.flashMessage(I18n.t('User removed successfully'))
       },

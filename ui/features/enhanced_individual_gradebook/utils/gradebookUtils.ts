@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
-import {
+import {uniq, sortBy} from 'lodash'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+import type {
   AssignmentGroupCriteriaMap,
   CamelizedGradingPeriodSet,
   SubmissionGradeCriteria,
-} from '@canvas/grading/grading'
+} from '@canvas/grading/grading.d'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
-import tz from '@canvas/timezone'
+import * as tz from '@canvas/datetime'
 import userSettings from '@canvas/user-settings'
 
-import {
-  ApiCallStatus,
+import {ApiCallStatus, GradebookSortOrder} from '../types'
+import type {
   AssignmentConnection,
   AssignmentDetailCalculationText,
   AssignmentGradingPeriodMap,
@@ -38,7 +38,6 @@ import {
   AssignmentSubmissionsMap,
   EnrollmentConnection,
   GradebookOptions,
-  GradebookSortOrder,
   GradebookStudentDetails,
   GradebookUserSubmissionDetails,
   SortableAssignment,
@@ -46,11 +45,11 @@ import {
   SubmissionConnection,
   SubmissionGradeChange,
 } from '../types'
-import {GradingPeriodSet, Submission, WorkflowState} from '../../../api.d'
+import type {GradingPeriodSet, Submission, WorkflowState} from '../../../api.d'
 import DateHelper from '@canvas/datetime/dateHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {scopeToUser, updateWithSubmissions} from '@canvas/grading/EffectiveDueDates'
-import {scoreToGrade, GradingStandard} from '@instructure/grading-utils'
+import {scoreToGrade, type GradingStandard} from '@instructure/grading-utils'
 import {divide, toNumber} from '@canvas/grading/GradeCalculationHelper'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
@@ -125,7 +124,7 @@ export function mapAssignmentGroupQueryResults(
         integration_data: {},
         sis_source_id: curr.sisId,
         invalid: totalGroupPoints === 0,
-        gradingPeriodsIds: _.uniq(assignmentGroupGradingPeriods),
+        gradingPeriodsIds: uniq(assignmentGroupGradingPeriods),
       }
 
       return prev
@@ -189,11 +188,11 @@ export function sortAssignments(
 ): SortableAssignment[] {
   switch (sortOrder) {
     case GradebookSortOrder.Alphabetical:
-      return _.sortBy(assignments, 'sortableName')
+      return sortBy(assignments, 'sortableName')
     case GradebookSortOrder.DueDate:
-      return _.sortBy(assignments, ['sortableDueDate', 'sortableName'])
+      return sortBy(assignments, ['sortableDueDate', 'sortableName'])
     case GradebookSortOrder.AssignmentGroup:
-      return _.sortBy(assignments, ['assignmentGroupPosition', 'sortableName'])
+      return sortBy(assignments, ['assignmentGroupPosition', 'sortableName'])
     default:
       return assignments
   }
@@ -347,7 +346,6 @@ export function gradebookOptionsSetup(env: GlobalEnv) {
     groupWeightingScheme: env.GRADEBOOK_OPTIONS?.group_weighting_scheme,
     lastGeneratedCsvAttachmentUrl: env.GRADEBOOK_OPTIONS?.attachment_url,
     messageAttachmentUploadFolderId: env.GRADEBOOK_OPTIONS?.message_attachment_upload_folder_id,
-    pointsBasedGradingSchemesFeatureEnabled: !!env.POINTS_BASED_GRADING_SCHEMES_ENABLED,
     proxySubmissionEnabled: !!env.GRADEBOOK_OPTIONS?.proxy_submissions_allowed,
     publishToSisEnabled: env.GRADEBOOK_OPTIONS?.publish_to_sis_enabled,
     publishToSisUrl: env.GRADEBOOK_OPTIONS?.publish_to_sis_url,
@@ -408,14 +406,15 @@ export function scoreToScaledPoints(score: number, pointsPossible: number, scali
 export function getLetterGrade(
   possible?: number,
   score?: number,
-  gradingStadards?: GradingStandard[] | null
+  gradingStandards?: GradingStandard[] | null,
+  pointsBased?: boolean
 ) {
-  if (!gradingStadards || !gradingStadards.length || !possible || !score) {
+  if (!gradingStandards || !gradingStandards.length || !possible || !score) {
     return '-'
   }
   const rawPercentage = scoreToPercentage(score, possible)
   const percentage = parseFloat(Number(rawPercentage).toPrecision(4))
-  return scoreToGrade(percentage, gradingStadards)
+  return scoreToGrade(percentage, gradingStandards, pointsBased)
 }
 
 type CalculateGradesForUserProps = {
@@ -497,6 +496,7 @@ function mapToSortableAssignment(
   gradingPeriodId?: string | null
 ): SortableAssignment {
   // Used sort date logic from screenreader_gradebook_controller.js
+  // @ts-expect-error
   const sortableDueDate = assignment.dueAt ? +tz.parse(assignment.dueAt) / 1000 : Number.MAX_VALUE
   return {
     ...assignment,
@@ -508,7 +508,7 @@ function mapToSortableAssignment(
 }
 
 export function isInPastGradingPeriodAndNotAdmin(assignment: AssignmentConnection): boolean {
-  return (assignment.inClosedGradingPeriod ?? false) && !ENV.current_user_roles?.includes('admin')
+  return (assignment.inClosedGradingPeriod ?? false) && !ENV.current_user_is_admin
 }
 
 export function disableGrading(

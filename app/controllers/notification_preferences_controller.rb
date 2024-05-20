@@ -117,10 +117,9 @@ class NotificationPreferencesController < ApplicationController
   def update_all
     return render_unauthorized_action unless @user == @current_user
 
-    policies = []
     preferences = convert_hash_to_jsonapi_array(params[:notification_preferences], :notification)
-    preferences.each do |preference|
-      policies << NotificationPolicy.find_or_update_for(@cc, preference[:notification], preference[:frequency])
+    policies = preferences.map do |preference|
+      NotificationPolicy.find_or_update_for(@cc, preference[:notification], preference[:frequency])
     end
     render json: { notification_preferences: policies.map { |p| notification_policy_json(p, @current_user, session) } }
   end

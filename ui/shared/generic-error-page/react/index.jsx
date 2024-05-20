@@ -43,6 +43,7 @@ export default class GenericErrorPage extends React.Component {
   static propTypes = {
     errorSubject: string,
     errorCategory: string,
+    errorMessage: string,
     imageUrl: string.isRequired,
     stack: string,
   }
@@ -50,6 +51,7 @@ export default class GenericErrorPage extends React.Component {
   static defaultProps = {
     errorSubject: 'No Error Subject',
     errorCategory: 'No Error Category',
+    errorMessage: 'No Error Message',
   }
 
   state = {
@@ -81,6 +83,7 @@ export default class GenericErrorPage extends React.Component {
       error: {
         subject: this.props.errorSubject,
         category: this.props.errorCategory,
+        message: this.props.errorMessage,
         url: window.location.href,
         comments: this.state.textAreaComment,
         email: this.state.email,

@@ -63,11 +63,11 @@ class Profile < ActiveRecord::Base
     define_method(field) do
       data.key?(field) ? data[field] : data[field] = options[:default]
     end
-    define_method("#{field}=") do |value|
+    define_method(:"#{field}=") do |value|
       data_before_type_cast[field] = value
       data[field] = sanitize_data(value, options)
     end
-    define_method("#{field}_before_type_cast") do
+    define_method(:"#{field}_before_type_cast") do
       data_before_type_cast[field]
     end
   end
@@ -92,7 +92,7 @@ class Profile < ActiveRecord::Base
   self.inheritance_column = :context_type
 
   def self.find_sti_class(type_name)
-    Object.const_get("#{type_name}Profile", false)
+    Object.const_get(:"#{type_name}Profile", false)
   end
 
   module Association
@@ -102,7 +102,7 @@ class Profile < ActiveRecord::Base
 
     def profile
       super || begin
-        profile = Object.const_get("#{self.class.name}Profile", false).new(context: self)
+        profile = Object.const_get(:"#{self.class.name}Profile", false).new(context: self)
         profile.root_account = root_account
         profile.title = name
         profile.visibility = "private"

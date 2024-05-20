@@ -39,7 +39,7 @@ module Quizzes
     end
 
     def recipient_messages(target_group)
-      recipients = @finder.send("#{target_group}_students")
+      recipients = @finder.send(:"#{target_group}_students")
       recipients.map(&:all_conversations).sum(&:size)
     end
   end

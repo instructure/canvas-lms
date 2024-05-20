@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import DateTimeHelpers from '@canvas/quiz-legacy-client-apps/util/date_time_helpers'
+import * as DateTimeHelpers from '@canvas/quiz-legacy-client-apps/util/date_time_helpers'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('quiz_reports')

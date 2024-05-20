@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ChangeEvent} from 'react'
+import type {ChangeEvent} from 'react'
 
 export type TextInputChangeHandler = (event: ChangeEvent<HTMLInputElement>, value: string) => void
 

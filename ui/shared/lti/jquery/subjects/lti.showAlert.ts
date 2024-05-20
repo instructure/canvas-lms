@@ -18,7 +18,7 @@
 
 import $ from '@canvas/rails-flash-notifications'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {LtiMessageHandler} from '../lti_message_handler'
+import type {LtiMessageHandler} from '../lti_message_handler'
 
 const I18n = useI18nScope('ltiMessages')
 

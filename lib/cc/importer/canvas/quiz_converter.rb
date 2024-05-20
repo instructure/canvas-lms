@@ -74,7 +74,7 @@ module CC::Importer::Canvas
       quizzes = {}
       begin
         manifest_file = File.join(@dest_dir_2_1, Qti::Converter::MANIFEST_FILE)
-        quizzes[:assessments] = Qti.convert_assessments(manifest_file, flavor: Qti::Flavors::CANVAS)
+        quizzes[:assessments] = Qti.convert_assessments(manifest_file, { flavor: Qti::Flavors::CANVAS, package_root: @package_root })
       rescue
         quizzes[:qti_error] = "#{$!}: #{$!.backtrace.join("\n")}"
       end

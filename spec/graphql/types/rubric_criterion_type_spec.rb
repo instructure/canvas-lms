@@ -80,5 +80,14 @@ describe Types::RubricCriterionType do
         rubric_type.resolve("criteria { ratings { _id }}")
       ).to eq(rubric.criteria.map { |c| c[:ratings].map { |r| r[:id].to_s } })
     end
+
+    it "learning_outcome_id" do
+      rubric.criteria[0][:learning_outcome_id] = learning_outcome.id
+      rubric.save!
+
+      expect(
+        rubric_type.resolve("criteria { learningOutcomeId }")
+      ).to eq rubric.criteria.pluck(:learning_outcome_id).map(&:to_s)
+    end
   end
 end

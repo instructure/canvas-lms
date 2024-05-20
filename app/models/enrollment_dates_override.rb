@@ -27,6 +27,9 @@ class EnrollmentDatesOverride < ActiveRecord::Base
 
   after_save :update_courses_and_states_if_necessary
 
+  include StickySisFields
+  are_sis_sticky :start_at, :end_at
+
   def infer_root_account
     return if root_account_id.present?
 

@@ -19,7 +19,7 @@
 import EditConferenceView from 'ui/features/conferences/backbone/views/EditConferenceView'
 import Conference from 'ui/features/conferences/backbone/models/Conference'
 import timezone from 'timezone'
-import tzInTest from '@canvas/timezone/specHelpers'
+import tzInTest from '@canvas/datetime/specHelpers'
 import french from 'timezone/fr_FR'
 import fakeENV from 'helpers/fakeENV'
 
@@ -84,7 +84,7 @@ test('#show sets the proper title for new conferences', function () {
 })
 
 test('#show sets the proper title for editing conferences', function () {
-  const expectedTitle = 'Edit &quot;InstructureCon&quot;'
+  const expectedTitle = 'Edit InstructureCon'
   const attributes = {
     title: 'InstructureCon',
     recordings: [],

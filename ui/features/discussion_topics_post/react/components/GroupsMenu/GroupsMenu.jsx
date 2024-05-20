@@ -20,11 +20,13 @@ import {Button} from '@instructure/ui-buttons'
 import {ChildTopic} from '../../../graphql/ChildTopic'
 import {getGroupDiscussionUrl} from '../../utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Flex} from '@instructure/ui-flex'
 import {IconGroupLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import PropTypes from 'prop-types'
 import React, {useMemo} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('discussion_posts')
 
@@ -36,7 +38,14 @@ export const GroupsMenu = ({...props}) => {
           href={getGroupDiscussionUrl(childTopic.contextId, childTopic._id)}
           key={childTopic._id}
         >
-          {childTopic.contextName}
+          <Flex direction="row" gap="medium" justifyItems="space-between" alignItems="center">
+            <Flex.Item>{childTopic.contextName}</Flex.Item>
+            <Flex.Item>
+              <Text weight="light">
+                {I18n.t('%{unreadCount} Unread', {unreadCount: childTopic.entryCounts.unreadCount})}
+              </Text>
+            </Flex.Item>
+          </Flex>
         </Menu.Item>
       )),
     [props.childTopics]

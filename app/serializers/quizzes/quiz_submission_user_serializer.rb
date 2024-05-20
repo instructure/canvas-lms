@@ -51,7 +51,7 @@ module Quizzes
 
       # For Api::V1::User#user_json
       LEGACY_INSTANCE_VARIABLES.each do |ivar|
-        instance_variable_set "@#{ivar}", @controller.instance_variable_get("@#{ivar}")
+        instance_variable_set :"@#{ivar}", @controller.instance_variable_get(:"@#{ivar}")
       end
     end
 

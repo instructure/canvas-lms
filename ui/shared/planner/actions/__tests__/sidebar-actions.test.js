@@ -22,7 +22,7 @@
 import moxios from 'moxios'
 import moment from 'moment-timezone'
 import MockDate from 'mockdate'
-import {moxiosRespond} from 'jest-moxios-utils'
+import {moxiosRespond} from '@canvas/jest-moxios-utils'
 import {initialize} from '../../utilities/alertUtils'
 
 import * as Actions from '../sidebar-actions'

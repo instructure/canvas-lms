@@ -165,6 +165,8 @@ export class UploadMediaModal extends React.Component {
         this.uploadFile(this.state.computerFile)
         break
       case PANELS.RECORD:
+        const button = document.getElementById('media_capture_save_button')
+        if (button) button.disabled = true
         this.uploadFile(this.state.recordedFile)
         break
       default:
@@ -232,7 +234,9 @@ export class UploadMediaModal extends React.Component {
         onUploadComplete?.(ex, null)
       }
     }
-    onDismiss?.()
+      onDismiss?.()
+      const button = document.getElementById('media_capture_save_button')
+      if (button) button.disabled = false
   }
 
   componentDidMount() {

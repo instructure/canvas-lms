@@ -201,10 +201,8 @@ class ContentParticipation < ActiveRecord::Base
     missing_subs_with_comments = subs_with_comments - (grouped_cp_items["comment"] || [])
     missing_subs_with_assessments = subs_with_assessments - (grouped_cp_items["rubric"] || [])
 
-    new_content_participations = []
-
-    missing_subs_with_grades.each do |content_id|
-      new_content_participations << create_read_item(user_id:, content_id:, content_item: "grade")
+    new_content_participations = missing_subs_with_grades.map do |content_id|
+      create_read_item(user_id:, content_id:, content_item: "grade")
     end
     missing_subs_with_comments.each do |content_id|
       new_content_participations << create_read_item(user_id:, content_id:, content_item: "comment")

@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import DragFeedback from '../../components/DragFeedback'
 import moveStuff from '../util/moveStuff'
 import $ from 'jquery'
-import _ from 'underscore'
+import {isArray} from 'lodash'
 
 export default {
   itemsToDrag() {
@@ -52,7 +52,7 @@ export default {
       // make it so you can drag stuff to other apps and it will at least copy a list of urls
       // see: https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Recommended_Drag_Types#link
       const itemsToDrag = this.itemsToDrag()
-      if (itemsToDrag.length && _.isArray(itemsToDrag)) {
+      if (itemsToDrag.length && isArray(itemsToDrag)) {
         event.dataTransfer.setData(
           'text/uri-list',
           itemsToDrag.map(item => item.get('url')).join('\n')

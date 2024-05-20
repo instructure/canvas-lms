@@ -84,6 +84,7 @@ module CC::Exporter::Epub::Converters
                                       else
                                         get_node_val(item_node, "identifierref")
                                       end
+          item[:identifier] = item[:linked_resource_id]
           item[:text] = page_content[get_node_val(item_node, "identifierref")] if item.value?("WikiPage")
           item[:for_syllabus] = item.value?("Assignment") || item.value?("Quizzes::Quiz")
           item[:href] = "#{mod[:identifier]}.xhtml##{item[:linked_resource_id]}"

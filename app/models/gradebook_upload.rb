@@ -24,7 +24,7 @@ class GradebookUpload < ActiveRecord::Base
   belongs_to :progress
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
 
-  serialize :gradebook, JSON
+  serialize :gradebook, coder: JSON
 
   def self.queue_from(course, user, attachment_data)
     progress = Progress.create!(context: course, tag: "gradebook_upload") do |p|

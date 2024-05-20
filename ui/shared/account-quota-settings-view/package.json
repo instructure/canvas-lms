@@ -3,5 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./backbone/views/QuotasView.js"
+  "main": "./backbone/views/QuotasView.js",
+  "owner": "FOO"
 }

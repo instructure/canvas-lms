@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {intersection} from 'lodash'
 import Animation from '../animation'
 import {daysToItems} from '../../utilities/daysUtils'
 import {isNewActivityItem} from '../../utilities/statusUtils'
@@ -39,7 +39,7 @@ export class ScrollToLastLoadedNewActivity extends Animation {
       newActivityItemIds
     )
     // only want groups in the day that have new activity items
-    newActivityDayComponentIds = _.intersection(newActivityDayComponentIds, newActivityItemIds)
+    newActivityDayComponentIds = intersection(newActivityDayComponentIds, newActivityItemIds)
 
     const {component: newActivityIndicator} = this.registry().getLastComponent(
       'new-activity-indicator',

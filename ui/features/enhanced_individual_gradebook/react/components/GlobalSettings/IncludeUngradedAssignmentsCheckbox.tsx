@@ -20,7 +20,7 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import userSettings from '@canvas/user-settings'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {HandleCheckboxChange} from '../../../types'
+import type {HandleCheckboxChange} from '../../../types'
 import CheckboxTemplate from './CheckboxTemplate'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')

@@ -15,15 +15,14 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import $ from 'jquery'
-import _ from 'underscore'
-import h from 'html-escape'
+import {chain, values, pick, includes, clone} from 'lodash'
+import h, {raw} from '@instructure/html-escape'
 import listWithOthers from './listWithOthers'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 
 function prepare(context, filters) {
-  context = _.clone(context)
-  context.activeFilter = _.includes(filters, `${context.type}_${context.id}`)
+  context = clone(context)
+  context.activeFilter = includes(filters, `${context.type}_${context.id}`)
   context.sortBy = `${context.activeFilter ? 0 : 1}_${context.name.toLowerCase()}`
   return context
 }
@@ -36,7 +35,7 @@ function format(context, linkToContexts) {
   if (linkToContexts && context.type === 'course') {
     html = `<a href='${h(context.url)}'>${html}</a>`
   }
-  return $.raw(html)
+  return raw(html)
 }
 
 // given a map of ids by type (e.g. {courses: [1, 2], groups: ...})
@@ -48,9 +47,9 @@ export default function contextList(contextMap, allContexts, options = {}) {
   let contexts = []
   for (const type in contextMap) {
     const ids = contextMap[type]
-    contexts = contexts.concat(_.values(_.pick(allContexts[type], ids)))
+    contexts = contexts.concat(values(pick(allContexts[type], ids)))
   }
-  contexts = _.chain(contexts)
+  contexts = chain(contexts)
     .map(context => prepare(context, filters))
     .sortBy('sortBy')
     .map(context => format(context, options.linkToContexts))

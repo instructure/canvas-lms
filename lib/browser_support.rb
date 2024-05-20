@@ -25,7 +25,7 @@ BrowserSupport = Struct.new(:browser, :version) do
       browser = Browser.new(user_agent)
       return true if respondus? browser
       return true if chrome_os_lts? browser
-      return false if minimum_browsers.any? { |min| browser.send("#{min.browser}?", "<#{min.version}") }
+      return false if minimum_browsers.any? { |min| browser.send(:"#{min.browser}?", "<#{min.version}") }
 
       true # if we don't recognize it (e.g. Android), be nice
     end

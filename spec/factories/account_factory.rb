@@ -26,9 +26,7 @@ module Factories
     # make sure this is loaded first
     allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
     allow(DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).and_return(
-      DynamicSettings::FallbackProxy.new(
-        "app-host": ENV["RCE_HOST"] || "http://localhost:3001"
-      )
+      DynamicSettings::FallbackProxy.new({ "app-host": ENV["RCE_HOST"] || "http://localhost:3001" })
     )
 
     allow(Rails.application.credentials).to receive(:dig).and_call_original

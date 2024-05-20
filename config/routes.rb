@@ -340,6 +340,7 @@ CanvasRails::Application.routes.draw do
     end
 
     resources :grading_standards, only: %i[index create update destroy]
+
     resources :assignment_groups do
       post "reorder" => "assignment_groups#reorder_assignments", :as => :reorder_assignments
       collection do
@@ -473,6 +474,7 @@ CanvasRails::Application.routes.draw do
     resources :content_exports, only: %i[create index destroy show]
     get "offline_web_exports" => "courses#offline_web_exports"
     post "start_offline_web_export" => "courses#start_offline_web_export"
+    get "start_offline_web_export" => "courses#start_offline_web_export"
     get "modules/items/assignment_info" => "context_modules#content_tag_assignment_data", :as => :context_modules_assignment_info
     get "modules/items/master_course_info" => "context_modules#content_tag_master_course_data", :as => :context_modules_master_course_info
     get "modules/items/:id" => "context_modules#item_redirect", :as => :context_modules_item_redirect
@@ -503,6 +505,8 @@ CanvasRails::Application.routes.draw do
     get "grading_schemes" => "grading_schemes_json#detail_list"
     get "grading_scheme_summaries" => "grading_schemes_json#summary_list"
     post "grading_schemes" => "grading_schemes_json#create"
+    post "grading_schemes/:id/archive" => "grading_schemes_json#archive"
+    post "grading_schemes/:id/unarchive" => "grading_schemes_json#unarchive"
     delete "grading_schemes/:id" => "grading_schemes_json#destroy"
     put "grading_schemes/:id" => "grading_schemes_json#update"
     get "grading_schemes/default" => "grading_schemes_json#show_default_grading_scheme"
@@ -656,6 +660,10 @@ CanvasRails::Application.routes.draw do
     end
     get "calendar_settings", action: :account_calendar_settings, as: :calendar_settings
 
+    scope(controller: :analytics_hub) do
+      get "analytics_hub", action: :show, as: :analytics_hub
+    end
+
     scope(controller: :brand_configs) do
       get "theme_editor", action: :new, as: :theme_editor
       get "brand_configs", action: :index
@@ -692,10 +700,13 @@ CanvasRails::Application.routes.draw do
     resources :account_notifications, only: %i[create update destroy]
     concerns :announcements
     resources :submissions
-    delete "authentication_providers" => "authentication_providers#destroy_all", :as => :remove_all_authentication_providers
+
     put "sso_settings" => "authentication_providers#update_sso_settings",
         :as => :update_sso_settings
-
+    delete "authentication_providers" => "authentication_providers#destroy_all", :as => :remove_all_authentication_providers
+    resources :authentication_providers, only: %i[show] do
+      get :refresh_metadata, action: :refresh_saml_metadata
+    end
     resources :authentication_providers, only: %i[index create update destroy] do
       get :debugging, action: :debug_data
       put :debugging, action: :start_debugging
@@ -777,6 +788,11 @@ CanvasRails::Application.routes.draw do
       get :statistics
     end
     resources :developer_keys, only: :index
+    get "/developer_keys/:key_id", controller: :developer_keys, action: :index, as: "account_developer_key_view"
+
+    get "extensions", controller: :lti_registrations, action: :index, as: "lti_registrations"
+    get "extensions/*path", controller: :lti_registrations, action: :index
+    get "extensions/manage", controller: :lti_registrations, action: :index, as: "lti_manage_registrations"
 
     get "release_notes" => "release_notes#manage", :as => :release_notes_manage
 
@@ -784,9 +800,14 @@ CanvasRails::Application.routes.draw do
 
     get "grading_schemes" => "grading_schemes_json#detail_list"
     get "grading_scheme_summaries" => "grading_schemes_json#summary_list"
+    get "grading_scheme_grouped" => "grading_schemes_json#grouped_list"
+    post "grading_schemes/:id/archive" => "grading_schemes_json#archive"
+    post "grading_schemes/:id/unarchive" => "grading_schemes_json#unarchive"
     post "grading_schemes" => "grading_schemes_json#create"
     delete "grading_schemes/:id" => "grading_schemes_json#destroy"
     put "grading_schemes/:id" => "grading_schemes_json#update"
+    get "grading_schemes/:id/used_locations" => "grading_schemes_json#used_locations", :as => :grading_schemes_used_locations
+    get "grading_schemes/default_used_locations" => "grading_schemes_json#default_used_locations", :as => :grading_schemes_default_used_locations
     get "grading_schemes/default" => "grading_schemes_json#show_default_grading_scheme"
     get "grading_schemes/:id" => "grading_schemes_json#show"
 
@@ -913,6 +934,7 @@ CanvasRails::Application.routes.draw do
 
   resources :users, only: [:passport] do
     get "passport" => "learner_passport#index"
+
     get "passport/data/achievements" => "learner_passport#achievements_index"
 
     get "passport/data/portfolios" => "learner_passport#portfolios_index"
@@ -920,9 +942,26 @@ CanvasRails::Application.routes.draw do
     post "passport/data/portfolios/:portfolio_id" => "learner_passport#portfolio_update"
     get "passport/data/portfolios/show/:portfolio_id" => "learner_passport#portfolio_show"
     put "passport/data/portfolios/duplicate" => "learner_passport#portfolio_duplicate"
-    get "passport/data/portfolios/reset" => "learner_passport#portfolio_reset"
+    put "passport/data/portfolios/delete" => "learner_passport#portfolio_delete"
+
+    get "passport/data/projects" => "learner_passport#projects_index"
+    put "passport/data/projects/create" => "learner_passport#project_create"
+    post "passport/data/projects/:project_id" => "learner_passport#project_update"
+    get "passport/data/projects/show/:project_id" => "learner_passport#project_show"
+    put "passport/data/projects/duplicate" => "learner_passport#project_duplicate"
+    put "passport/data/projects/delete" => "learner_passport#project_delete"
+
+    get "passport/data/pathways" => "learner_passport#pathways_index"
+    get "passport/data/pathways/badges" => "learner_passport#pathway_badges_index"
+    get "passport/data/pathways/learner_groups" => "learner_passport#pathway_learner_groups_index"
+    get "passport/data/pathways/canvas_requirements" => "learner_passport#pathway_canvas_requirements_index"
+    put "passport/data/pathways/create" => "learner_passport#pathway_create"
+    post "passport/data/pathways/:pathway_id" => "learner_passport#pathway_update"
+    get "passport/data/pathways/show/:pathway_id" => "learner_passport#pathway_show"
+    get "passport/data/pathways/share_users" => "learner_passport#pathway_share_users"
 
     get "passport/data/skills" => "learner_passport#skills_index"
+    get "passport/data/reset" => "learner_passport#reset"
 
     get "passport/*path" => "learner_passport#index"
   end
@@ -1157,6 +1196,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :accounts) do
       get "terms_of_service_custom_content", action: :terms_of_service_custom_content
+      get "settings/environment", action: :environment
     end
 
     scope(controller: :tabs) do
@@ -1290,6 +1330,7 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/assignments", action: :create
       put "courses/:course_id/assignments/:id", action: :update
       post "courses/:course_id/assignments/:assignment_id/duplicate", action: :duplicate
+      post "courses/:course_id/assignments/:assignment_id/retry_alignment_clone", action: :retry_alignment_clone
       delete "courses/:course_id/assignments/:id", action: :destroy, controller: :assignments
     end
 
@@ -1563,6 +1604,7 @@ CanvasRails::Application.routes.draw do
 
       get "users/:id", action: :api_show
       put "users/:id", action: :update
+      delete "users/mobile_sessions", action: :expire_mobile_sessions
       delete "users/:id", action: :destroy, as: "destroy_user"
       delete "users/:id/sessions", action: :terminate_sessions
 
@@ -1612,11 +1654,17 @@ CanvasRails::Application.routes.draw do
       end
 
       scope(controller: :learning_object_dates) do
+        get "courses/:course_id/modules/:context_module_id/date_details", action: :show, as: "course_context_module_date_details"
         get "courses/:course_id/assignments/:assignment_id/date_details", action: :show, as: "course_assignment_date_details"
         get "courses/:course_id/quizzes/:quiz_id/date_details", action: :show, as: "course_quizzes_quiz_date_details"
-        get "courses/:course_id/modules/:context_module_id/date_details", action: :show, as: "course_context_module_date_details"
+        get "courses/:course_id/discussion_topics/:discussion_topic_id/date_details", action: :show, as: "course_discussion_topic_date_details"
+        get "courses/:course_id/pages/:page_id/date_details", action: :show, as: "course_wiki_page_date_details"
+        get "courses/:course_id/files/:attachment_id/date_details", action: :show, as: "course_attachment_date_details"
         put "courses/:course_id/assignments/:assignment_id/date_details", action: :update
         put "courses/:course_id/quizzes/:quiz_id/date_details", action: :update
+        put "courses/:course_id/discussion_topics/:discussion_topic_id/date_details", action: :update
+        put "courses/:course_id/pages/:page_id/date_details", action: :update
+        put "courses/:course_id/files/:attachment_id/date_details", action: :update
       end
 
       scope(controller: :login) do
@@ -2187,6 +2235,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :outcome_results) do
       get "courses/:course_id/outcome_rollups", action: :rollups, as: "course_outcome_rollups"
       get "courses/:course_id/outcome_results", action: :index, as: "course_outcome_results"
+      post "courses/:course_id/assign_outcome_order", action: :outcome_order, as: "course_outcomes_order"
     end
 
     scope(controller: :outcomes_academic_benchmark_import_api) do
@@ -2277,6 +2326,7 @@ CanvasRails::Application.routes.draw do
         put "#{prefix}/:id/fail", action: :fail
       end
       get "courses/:course_id/content_list", action: :content_list, as: "course_content_list"
+      put "courses/:course_id/content_exports/:id", action: :update
     end
 
     scope(controller: :epub_exports) do
@@ -2402,6 +2452,8 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/rubrics/:id", action: :show
       get "courses/:course_id/rubrics", action: :index, as: :course_rubrics
       get "courses/:course_id/rubrics/:id", action: :show
+      get "courses/:course_id/rubrics/:id/used_locations", action: "used_locations", as: "rubrics_course_used_locations"
+      get "accounts/:account_id/rubrics/:id/used_locations", action: "used_locations", as: "rubrics_account_used_locations"
       post "courses/:course_id/rubrics", controller: :rubrics, action: :create
       put "courses/:course_id/rubrics/:id", controller: :rubrics, action: :update
       delete "courses/:course_id/rubrics/:id", controller: :rubrics, action: :destroy
@@ -2583,7 +2635,13 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "smart_search") do
       get "courses/:course_id/smartsearch", action: :search, as: :course_smart_search_query
+      get "courses/:course_id/smartsearch/log", action: :log
+      get "courses/:course_id/smartsearch/index_status", action: :index_status
       # TODO: add account level search
+    end
+
+    scope(controller: "user_notes") do
+      put "users/:user_id/user_notes/suppress_deprecation_notice", action: :suppress_deprecation_notice
     end
   end
 
@@ -2631,6 +2689,8 @@ CanvasRails::Application.routes.draw do
   get "login/oauth2/jwks" => "security#jwks", :as => :oauth2_jwks
 
   get "post_message_forwarding", controller: "lti/platform_storage", action: :post_message_forwarding, as: :lti_post_message_forwarding
+
+  get "lti/tool_default_icon" => "lti/tool_default_icon#show"
 
   ApiRouteSet.draw(self, "/api/lti/v1") do
     post "tools/:tool_id/grade_passback", controller: :lti_api, action: :grade_passback, as: "lti_grade_passback_api"
@@ -2754,8 +2814,11 @@ CanvasRails::Application.routes.draw do
 
     # Dynamic Registration Service
     scope(controller: "lti/ims/dynamic_registration") do
-      get "register", action: :redirect_to_tool_registration
-      post "registrations", action: :create
+      get "accounts/:account_id/registration_token", action: :registration_token
+      get "accounts/:account_id/registrations/uuid/:registration_uuid", action: :registration_by_uuid
+      put "accounts/:account_id/registrations/:registration_id/overlay", action: :update_registration_overlay
+      get "registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config
+      post "registrations", action: :create, as: :create_lti_registration
     end
 
     # Public JWK Service
@@ -2794,7 +2857,7 @@ CanvasRails::Application.routes.draw do
 
     # Security
     scope(controller: "security") do
-      get "security/jwks", action: :jwks, as: :jwks_show
+      get "security/jwks", action: :jwks, as: :lti_jwks
       get "security/openid-configuration", action: :openid_configuration, as: :openid_configuration
     end
 

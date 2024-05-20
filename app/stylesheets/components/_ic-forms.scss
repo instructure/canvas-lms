@@ -616,7 +616,6 @@ form.ic-Form-group { margin: 0; }
   .ic-Label {
     margin: 0;
     position: relative;
-    z-index: 1;
     padding: direction-sides(math.div($ic-sp, 3) 0 math.div($ic-sp, 3) $ic-radio-checkbox-left-offset);
     font-weight: normal;
     display: inline-block;
@@ -763,7 +762,6 @@ form.ic-Form-group { margin: 0; }
   .ic-Label {
     margin-bottom: 0;
     position: relative;
-    z-index: 1;
     padding: direction-sides(math.div($ic-sp, 3) 0 math.div($ic-sp, 3) $ic-radio-checkbox-left-offset);
     font-weight: normal;
     display: inline-block;
@@ -952,6 +950,20 @@ form.ic-Form-group { margin: 0; }
 
 .ic-Action-header__Primary {
   margin-bottom: $ic-sp*0.5;
+}
+
+.ic-Action-header-title {
+  font-weight: 700;
+  line-height: 1.05;
+  font-size: 2.375rem;
+  margin: 0;
+}
+
+.ic-Action-header-secondary-title {
+  font-size: 1.375rem;
+  font-weight: 400;
+  line-height: 1.25;
+  margin: 0;
 }
 
 .ic-Form-action-box {

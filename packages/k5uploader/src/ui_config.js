@@ -23,11 +23,11 @@ function UiConfig(params) {
   this.maxTotalSize = params.maxTotalSize
 }
 
-UiConfig.prototype.addFileFilter = function(fileFilter) {
+UiConfig.prototype.addFileFilter = function (fileFilter) {
   this.fileFilters.push(fileFilter)
 }
 
-UiConfig.prototype.filterFor = function(fileName) {
+UiConfig.prototype.filterFor = function (fileName) {
   let filter, f
   const extension = fileName.split('.').pop()
   for (let i = 0, len = this.fileFilters.length; i < len; i++) {
@@ -40,16 +40,16 @@ UiConfig.prototype.filterFor = function(fileName) {
   return filter
 }
 
-UiConfig.prototype.asEntryParams = function(fileName) {
+UiConfig.prototype.asEntryParams = function (fileName) {
   const currentFilter = this.filterFor(fileName)
   return currentFilter.toParams()
 }
 
-UiConfig.prototype.acceptableFileSize = function(fileSize) {
+UiConfig.prototype.acceptableFileSize = function (fileSize) {
   return this.maxFileSize * 1024 * 1024 > fileSize
 }
 
-UiConfig.prototype.acceptableFileType = function(fileName, types) {
+UiConfig.prototype.acceptableFileType = function (fileName, types) {
   const currentFilter = this.filterFor(fileName)
   if (!currentFilter) {
     return false
@@ -57,7 +57,7 @@ UiConfig.prototype.acceptableFileType = function(fileName, types) {
   return types.indexOf(currentFilter.id) !== -1
 }
 
-UiConfig.prototype.acceptableFile = function(file, types) {
+UiConfig.prototype.acceptableFile = function (file, types) {
   const type = this.acceptableFileType(file.name, types)
   const size = this.acceptableFileSize(file.size)
   return type && size

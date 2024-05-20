@@ -16,8 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Enrollment, ITEMS_PER_PAGE, TemporaryEnrollmentPairing} from '../types'
+import type {Enrollment, TemporaryEnrollmentPairing} from '../types'
+import {ITEMS_PER_PAGE} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('temporary_enrollment')
 
 /**
  * Fetches temporary enrollment data for a user
@@ -36,7 +40,6 @@ export async function fetchTemporaryEnrollments(
   userId: string,
   isRecipient: boolean
 ): Promise<Enrollment[]> {
-  const entityType = isRecipient ? 'recipients' : 'providers'
   const params: Record<string, any> = {
     state: ['current_and_future'],
     per_page: ITEMS_PER_PAGE,
@@ -57,7 +60,10 @@ export async function fetchTemporaryEnrollments(
   if (response.status === 204) {
     return []
   } else if (!response.ok) {
-    throw new Error(`Failed to fetch ${entityType} data. Status: ${response.status}`)
+    const errorMessage = isRecipient
+      ? I18n.t('Failed to get temporary enrollments for recipient')
+      : I18n.t('Failed to get temporary enrollments for provider')
+    throw new Error(errorMessage)
   }
 
   return json
@@ -66,23 +72,59 @@ export async function fetchTemporaryEnrollments(
 /**
  * Creates a temporary enrollment pairing object
  *
- * @param {string} rootAccountId Root account ID
+ * @param {string} accountId ID of the account
+ * @param {string} endingEnrollmentState Ending enrollment state (e.g., “deleted”, “completed”, “inactive”)
  * @returns {Promise<TemporaryEnrollmentPairing>} Resolves to a temporary enrollment pairing object
  */
 export async function createTemporaryEnrollmentPairing(
-  rootAccountId: string
+  accountId: string,
+  endingEnrollmentState: string
 ): Promise<TemporaryEnrollmentPairing> {
   try {
     const response = await doFetchApi({
-      path: `/api/v1/accounts/${rootAccountId}/temporary_enrollment_pairings`,
+      path: `/api/v1/accounts/${accountId}/temporary_enrollment_pairings`,
       method: 'POST',
+      params: {
+        ending_enrollment_state: endingEnrollmentState,
+      },
     })
     return response.json.temporary_enrollment_pairing
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(`Failed to fetch temporary enrollment pairing: ${error.message}`)
+      throw new Error(I18n.t('Failed to create temporary enrollment pairing'))
     } else {
-      throw new Error('Failed to fetch temporary enrollment pairing due to an unknown error')
+      throw new Error(
+        I18n.t('Failed to create temporary enrollment pairing due to an unknown error')
+      )
+    }
+  }
+}
+
+/**
+ * Retrieves a single temporary enrollment pairing object, by its ID
+ *
+ * @param {string} accountId ID of the account
+ * @param {number} pairingId ID of the temporary enrollment pairing to retrieve
+ * @returns {Promise<TemporaryEnrollmentPairing>} Resolves to the temporary enrollment pairing object
+ */
+export async function getTemporaryEnrollmentPairing(
+  accountId: string,
+  pairingId: number
+): Promise<TemporaryEnrollmentPairing> {
+  try {
+    const response = await doFetchApi({
+      path: `/api/v1/accounts/${accountId}/temporary_enrollment_pairings/${pairingId}`,
+      method: 'GET',
+    })
+
+    return response.json.temporary_enrollment_pairing
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(I18n.t('Failed to retrieve temporary enrollment pairing'))
+    } else {
+      throw new Error(
+        I18n.t('Failed to retrieve temporary enrollment pairing due to an unknown error')
+      )
     }
   }
 }
@@ -96,7 +138,7 @@ export async function createTemporaryEnrollmentPairing(
  */
 export async function deleteEnrollment(courseId: string, enrollmentId: string): Promise<void> {
   try {
-    return await doFetchApi({
+    await doFetchApi({
       path: `/api/v1/courses/${courseId}/enrollments/${enrollmentId}`,
       params: {
         task: 'delete',
@@ -105,42 +147,46 @@ export async function deleteEnrollment(courseId: string, enrollmentId: string): 
     })
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(`Failed to delete enrollment: ${error.message}`)
+      throw new Error(I18n.t('Failed to delete temporary enrollment'))
     } else {
-      throw new Error('Failed to delete enrollment due to an unknown error')
+      throw new Error(I18n.t('Failed to delete temporary enrollment due to an unknown error'))
     }
   }
 }
 
 /**
- * Updates or creates an enrollment
+ * Creates a temporary enrollment
  *
- * @param sectionId
- * @param enrollmentUserId
- * @param userId
- * @param pairingId
- * @param startDate
- * @param endDate
- * @param roleId
- * @returns {Promise<any>} API response
+ * @param {string} sectionId ID of the section
+ * @param {string} enrollmentUserId ID of the recipient user
+ * @param {string} userId ID of the provider user
+ * @param {string} pairingId ID of the pairing
+ * @param {Date} startDate Start date of the temporary enrollment
+ * @param {Date} endDate End date of the temporary enrollment
+ * @param {string} roleId ID of the role
+ * @returns {Promise<void>} Promise that resolves when the temporary enrollment
+ *                          is successfully created
+ * @throws {Error} If an error occurs while creating the temporary enrollment
  */
 export async function createEnrollment(
   sectionId: string,
   enrollmentUserId: string,
   userId: string,
   pairingId: string,
+  enrollmentLimitPrivilegesToSection: boolean,
   startDate: Date,
   endDate: Date,
   roleId: string
 ): Promise<void> {
   try {
-    return await doFetchApi({
+    await doFetchApi({
       path: `/api/v1/sections/${sectionId}/enrollments`,
       params: {
         enrollment: {
           user_id: enrollmentUserId,
           temporary_enrollment_source_user_id: userId,
           temporary_enrollment_pairing_id: pairingId,
+          limit_privileges_to_course_section: enrollmentLimitPrivilegesToSection,
           start_at: startDate.toISOString(),
           end_at: endDate.toISOString(),
           role_id: roleId,
@@ -149,10 +195,23 @@ export async function createEnrollment(
       method: 'POST',
     })
   } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Failed to create enrollment:`, error)
-    } else {
-      throw new Error(`Failed to create enrollment due to an unknown error`)
+    const defaultErrorMessage = I18n.t(
+      'Failed to create temporary enrollment, please try again later'
+    )
+    // @ts-expect-error because doFetchApi is not type safe (yet)
+    const serverErrorMessage: string = (await error.response?.json())?.message || ''
+    const serverErrorTranslations: {[key: string]: string} = {
+      "Can't add an enrollment to a concluded course.": I18n.t(
+        'Cannot add a temporary enrollment to a concluded course'
+      ),
+      'Cannot create an enrollment with this role because it is inactive.': I18n.t(
+        'Cannot create a temporary enrollment with an inactive role'
+      ),
+      'The specified type must match the base type for the role': I18n.t(
+        'The specified type must match the base type for the role'
+      ),
     }
+    const errorMessage = serverErrorTranslations[serverErrorMessage] || defaultErrorMessage
+    throw new Error(errorMessage)
   }
 }

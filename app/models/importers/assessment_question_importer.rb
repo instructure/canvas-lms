@@ -205,7 +205,7 @@ module Importers
       end
 
       %i[correct_comments incorrect_comments neutral_comments more_comments].each do |field|
-        html_field = "#{field}_html".to_sym
+        html_field = :"#{field}_html"
         if hash[field].present? && hash[field] == hash[html_field]
           hash.delete(html_field)
         end

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shape, arrayOf, string, func} from 'prop-types'
-import {debounce} from 'underscore'
+import {debounce} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import CoursesStore from '../store/CoursesStore'

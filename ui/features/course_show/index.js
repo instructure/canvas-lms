@@ -18,7 +18,7 @@
 import $ from 'jquery'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import './react/show'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
@@ -33,7 +33,11 @@ $(document).ready(() => {
   const $selfUnenrollmentDialog = $('#self_unenrollment_dialog')
   $('.self_unenrollment_link').click(_event =>
     $selfUnenrollmentDialog
-      .dialog({title: I18n.t('titles.drop_course', 'Drop this Course')})
+      .dialog({
+        title: I18n.t('titles.drop_course', 'Drop this Course'),
+        modal: true,
+        zIndex: 1000,
+      })
       .fixDialogButtons()
   )
 

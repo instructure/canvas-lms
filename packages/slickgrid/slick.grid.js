@@ -1,3 +1,23 @@
+/* eslint-disable linebreak-style */
+/* eslint-disable no-loop-func */
+/* eslint-disable eslint-comments/no-duplicate-disable */
+/* eslint-disable no-eval */
+/* eslint-disable linebreak-style */
+/* eslint-disable no-empty */
+/* eslint-disable @typescript-eslint/no-redeclare */
+/* eslint-disable no-useless-concat */
+/* eslint-disable no-bitwise */
+/* eslint-disable radix */
+/* eslint-disable linebreak-style */
+/* eslint-disable no-func-assign */
+/* eslint-disable no-undef */
+/* eslint-disable block-scoped-var */
+/* eslint-disable no-var */
+/* eslint-disable prettier/prettier */
+/* eslint-disable no-throw-literal */
+/* eslint-disable linebreak-style */
+/* eslint-disable vars-on-top */
+/* eslint-disable  no-constant-condition */
 /*
  * Copyright (c) 2010 Michael Leibman, http://github.com/mleibman/slickgrid
  *
@@ -21,7 +41,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import jQuery from 'jquery'
+import $ from 'jquery'
 import './slick.core'
 import './jquery.event.drag-2.2'
 import {isRTL} from '@canvas/i18n/rtlHelper'
@@ -34,7 +54,6 @@ import 'jqueryui/sortable'
  * source as possible but still want it to tell us about the important stuff.
  */
 
-/* eslint-disable notice/notice, no-var, vars-on-top, prefer-template, object-shorthand, no-use-before-define, max-len, eqeqeq, no-multi-assign, no-cond-assign, one-var */
 /* eslint linebreak-style: ["error", "windows"] */
 
 /**
@@ -56,17 +75,16 @@ import 'jqueryui/sortable'
  */
 
 // make sure required JavaScript modules are loaded
-if (typeof jQuery === 'undefined') {
+if (typeof $ === 'undefined') {
   throw 'SlickGrid requires jquery module to be loaded'
 }
-if (!jQuery.fn.drag) {
+if (!$.fn.drag) {
   throw 'SlickGrid requires jquery.event.drag module to be loaded'
 }
 if (typeof Slick === 'undefined') {
   throw 'slick.core.js not loaded'
 }
 
-;(function ($) {
   // Slick.Grid
   $.extend(true, window, {
     Slick: {
@@ -122,7 +140,7 @@ if (typeof Slick === 'undefined') {
       dataItemColumnValueExtractor: null,
       fullWidthRows: false,
       multiColumnSort: false,
-      defaultFormatter: defaultFormatter,
+      defaultFormatter,
       forceSyncScrolling: false,
       numberOfColumnsToFreeze: 0, // Number of left-most columns to freeze from scrolling
     }
@@ -284,8 +302,8 @@ if (typeof Slick === 'undefined') {
       }
 
       editController = {
-        commitCurrentEdit: commitCurrentEdit,
-        cancelCurrentEdit: cancelCurrentEdit,
+        commitCurrentEdit,
+        cancelCurrentEdit,
       }
 
       $outerContainer
@@ -498,8 +516,8 @@ if (typeof Slick === 'undefined') {
         $headerScroller_1
           .bind('contextmenu', handleHeaderContextMenu)
           .bind('click', handleHeaderClick)
-          .delegate('.slick-header-column', 'mouseenter', handleHeaderMouseEnter)
-          .delegate('.slick-header-column', 'mouseleave', handleHeaderMouseLeave)
+          .on('mouseenter', '.slick-header-column', handleHeaderMouseEnter)
+          .on('mouseleave', '.slick-header-column', handleHeaderMouseLeave)
         $headerRowScroller_1.bind('scroll', handleHeaderRowScroll)
         $focusSink.add($focusSink2).bind('keydown', handleKeyDown)
         $canvas_1
@@ -511,8 +529,8 @@ if (typeof Slick === 'undefined') {
           .bind('dragstart', {distance: 3}, handleDragStart)
           .bind('drag', handleDrag)
           .bind('dragend', handleDragEnd)
-          .delegate('.slick-cell', 'mouseenter', handleMouseEnter)
-          .delegate('.slick-cell', 'mouseleave', handleMouseLeave)
+          .on('mouseenter', '.slick-cell', handleMouseEnter)
+          .on('mouseleave', '.slick-cell', handleMouseLeave)
 
         if (options.numberOfColumnsToFreeze > 0) {
           $container_0.bind('resize.slickgrid', resizeCanvas)
@@ -522,13 +540,13 @@ if (typeof Slick === 'undefined') {
             if (newScrollTop < 0) {
               newScrollTop = 0
             }
-            handleScroll({wheelDelta: wheelDelta, scrollTop: newScrollTop})
+            handleScroll({wheelDelta, scrollTop: newScrollTop})
           })
           $headerScroller_0
             .bind('contextmenu', handleHeaderContextMenu)
             .bind('click', handleHeaderClick)
-            .delegate('.slick-header-column', 'mouseenter', handleHeaderMouseEnter)
-            .delegate('.slick-header-column', 'mouseleave', handleHeaderMouseLeave)
+            .on('mouseenter', '.slick-header-column', handleHeaderMouseEnter)
+            .on('mouseleave', '.slick-header-column', handleHeaderMouseLeave)
           $headerRowScroller_0.bind('scroll', handleHeaderRowScroll)
           $canvas_0
             .bind('keydown', handleKeyDown)
@@ -539,8 +557,8 @@ if (typeof Slick === 'undefined') {
             .bind('dragstart', {distance: 3}, handleDragStart)
             .bind('drag', handleDrag)
             .bind('dragend', handleDragEnd)
-            .delegate('.slick-cell', 'mouseenter', handleMouseEnter)
-            .delegate('.slick-cell', 'mouseleave', handleMouseLeave)
+            .on('mouseenter', '.slick-cell', handleMouseEnter)
+            .on('mouseleave', '.slick-cell', handleMouseLeave)
         }
       }
     }
@@ -1005,14 +1023,14 @@ if (typeof Slick === 'undefined') {
           helper: 'clone',
           placeholder: 'slick-sortable-placeholder ui-state-default slick-header-column',
           forcePlaceholderSize: true,
-          start: function (e, ui) {
+          start (e, ui) {
             ui.placeholder.width(ui.helper.outerWidth() - headerColumnWidthDiff)
             $(ui.helper).addClass('slick-header-column-active')
           },
-          beforeStop: function (e, ui) {
+          beforeStop (e, ui) {
             $(ui.helper).removeClass('slick-header-column-active')
           },
-          stop: function (e) {
+          stop (e) {
             if (!getEditorLock().commitCurrentEdit()) {
               $(this).sortable('cancel')
               return
@@ -1077,7 +1095,8 @@ if (typeof Slick === 'undefined') {
           $col = $(e)
           $("<div class='slick-resizable-handle' />")
             .appendTo(e)
-            .bind('dragstart', function (e, dd) {
+            .on('dragstart', function (e, dd) {
+              setTimeout(() => {
               isFrozenColumn = isPartOfAFrozenColumn(this)
               columnElements = getColumnElements(this)
               if (!getEditorLock().commitCurrentEdit()) {
@@ -1150,66 +1169,21 @@ if (typeof Slick === 'undefined') {
                 maxPageX = pageX + Math.min(shrinkLeewayOnFront, stretchLeewayOnRear)
                 minPageX = pageX - Math.min(shrinkLeewayOnRear, stretchLeewayOnFront)
               }
+              }, 0)
             })
-            .bind('drag', function (e, dd) {
-              isFrozenColumn = isPartOfAFrozenColumn(this)
-              columnElements = getColumnElements(this)
-              var actualMinWidth, d, x
-              d = rtl
-                ? Math.max(maxPageX, Math.min(minPageX, e.pageX)) - pageX
-                : Math.min(maxPageX, Math.max(minPageX, e.pageX)) - pageX
-              var isShrink = (d < 0 && !rtl) || (d > 0 && rtl)
-              if (isShrink) {
-                // shrink column
-                x = d * (rtl ? -1 : 1)
-                for (j = i; j >= 0; j--) {
-                  c = columns[getIndexOffset(isFrozenColumn, j)]
-                  if (c.resizable) {
-                    actualMinWidth = Math.max(c.minWidth || 0, absoluteColumnMinWidth)
-                    if (x && c.previousWidth + x < actualMinWidth) {
-                      x += c.previousWidth - actualMinWidth
-                      c.width = actualMinWidth
-                    } else {
-                      c.width = c.previousWidth + x
-                      x = 0
-                    }
-                  }
-                }
-
-                if (options.forceFitColumns) {
-                  x = -d * (rtl ? -1 : 1)
-                  for (j = i + 1; j < columnElements.length; j++) {
-                    c = columns[getIndexOffset(isFrozenColumn, j)]
-                    if (c.resizable) {
-                      if (x && c.maxWidth && c.maxWidth - c.previousWidth < x) {
-                        x -= c.maxWidth - c.previousWidth
-                        c.width = c.maxWidth
-                      } else {
-                        c.width = c.previousWidth + x
-                        x = 0
-                      }
-                    }
-                  }
-                }
-              } else {
-                // stretch column
-                x = d * (rtl ? -1 : 1)
-                for (j = i; j >= 0; j--) {
-                  c = columns[getIndexOffset(isFrozenColumn, j)]
-                  if (c.resizable) {
-                    if (x && c.maxWidth && c.maxWidth - c.previousWidth < x) {
-                      x -= c.maxWidth - c.previousWidth
-                      c.width = c.maxWidth
-                    } else {
-                      c.width = c.previousWidth + x
-                      x = 0
-                    }
-                  }
-                }
-
-                if (options.forceFitColumns) {
-                  x = -d * (rtl ? -1 : 1)
-                  for (j = i + 1; j < columnElements.length; j++) {
+            .on('drag', function (e, dd) {
+              setTimeout(() => {
+                isFrozenColumn = isPartOfAFrozenColumn(this)
+                columnElements = getColumnElements(this)
+                var actualMinWidth, d, x
+                d = rtl
+                  ? Math.max(maxPageX, Math.min(minPageX, e.pageX)) - pageX
+                  : Math.min(maxPageX, Math.max(minPageX, e.pageX)) - pageX
+                var isShrink = (d < 0 && !rtl) || (d > 0 && rtl)
+                if (isShrink) {
+                  // shrink column
+                  x = d * (rtl ? -1 : 1)
+                  for (j = i; j >= 0; j--) {
                     c = columns[getIndexOffset(isFrozenColumn, j)]
                     if (c.resizable) {
                       actualMinWidth = Math.max(c.minWidth || 0, absoluteColumnMinWidth)
@@ -1222,33 +1196,83 @@ if (typeof Slick === 'undefined') {
                       }
                     }
                   }
-                }
-              }
-              applyColumnHeaderWidths()
-              if (options.numberOfColumnsToFreeze > 0) {
-                updateCanvasWidth(true)
-              }
-              if (options.syncColumnCellResize) {
-                applyColumnWidths()
-              }
-            })
-            .bind('dragend', function (e, dd) {
-              isFrozenColumn = isPartOfAFrozenColumn(this)
-              columnElements = getColumnElements(this)
-              var newWidth
-              $(this).parent().removeClass('slick-header-column-active')
-              for (var j = 0; j < columnElements.length; j++) {
-                c = columns[getIndexOffset(isFrozenColumn, j)]
-                newWidth = $(columnElements[j]).outerWidth()
-                if (c.previousWidth !== newWidth) {
-                  if (c.rerenderOnResize) {
-                    invalidateAllRows()
+
+                  if (options.forceFitColumns) {
+                    x = -d * (rtl ? -1 : 1)
+                    for (j = i + 1; j < columnElements.length; j++) {
+                      c = columns[getIndexOffset(isFrozenColumn, j)]
+                      if (c.resizable) {
+                        if (x && c.maxWidth && c.maxWidth - c.previousWidth < x) {
+                          x -= c.maxWidth - c.previousWidth
+                          c.width = c.maxWidth
+                        } else {
+                          c.width = c.previousWidth + x
+                          x = 0
+                        }
+                      }
+                    }
+                  }
+                } else {
+                  // stretch column
+                  x = d * (rtl ? -1 : 1)
+                  for (j = i; j >= 0; j--) {
+                    c = columns[getIndexOffset(isFrozenColumn, j)]
+                    if (c.resizable) {
+                      if (x && c.maxWidth && c.maxWidth - c.previousWidth < x) {
+                        x -= c.maxWidth - c.previousWidth
+                        c.width = c.maxWidth
+                      } else {
+                        c.width = c.previousWidth + x
+                        x = 0
+                      }
+                    }
+                  }
+
+                  if (options.forceFitColumns) {
+                    x = -d * (rtl ? -1 : 1)
+                    for (j = i + 1; j < columnElements.length; j++) {
+                      c = columns[getIndexOffset(isFrozenColumn, j)]
+                      if (c.resizable) {
+                        actualMinWidth = Math.max(c.minWidth || 0, absoluteColumnMinWidth)
+                        if (x && c.previousWidth + x < actualMinWidth) {
+                          x += c.previousWidth - actualMinWidth
+                          c.width = actualMinWidth
+                        } else {
+                          c.width = c.previousWidth + x
+                          x = 0
+                        }
+                      }
+                    }
                   }
                 }
-              }
-              updateCanvasWidth(true)
-              render()
-              trigger(self.onColumnsResized, {})
+                applyColumnHeaderWidths()
+                if (options.numberOfColumnsToFreeze > 0) {
+                  updateCanvasWidth(true)
+                }
+                if (options.syncColumnCellResize) {
+                  applyColumnWidths()
+                }
+              }, 0)
+            })
+            .on('dragend', function (e, dd) {
+              setTimeout(() => {
+                isFrozenColumn = isPartOfAFrozenColumn(this)
+                columnElements = getColumnElements(this)
+                var newWidth
+                $(this).parent().removeClass('slick-header-column-active')
+                for (var j = 0; j < columnElements.length; j++) {
+                  c = columns[getIndexOffset(isFrozenColumn, j)]
+                  newWidth = $(columnElements[j]).outerWidth()
+                  if (c.previousWidth !== newWidth) {
+                    if (c.rerenderOnResize) {
+                      invalidateAllRows()
+                    }
+                  }
+                }
+                updateCanvasWidth(true)
+                render()
+                trigger(self.onColumnsResized, {})
+              }, 0)
             })
         })
       }
@@ -1586,7 +1610,7 @@ if (typeof Slick === 'undefined') {
     }
 
     function setSortColumn(columnId, ascending) {
-      setSortColumns([{columnId: columnId, sortAsc: ascending}])
+      setSortColumns([{columnId, sortAsc: ascending}])
     }
 
     function setSortColumns(cols) {
@@ -2659,7 +2683,7 @@ if (typeof Slick === 'undefined') {
         }
       }
 
-      trigger(self.onScroll, {scrollLeft: scrollLeft, scrollTop: scrollTop})
+      trigger(self.onScroll, {scrollLeft, scrollTop})
     }
 
     function asyncPostProcessRows() {
@@ -2735,7 +2759,7 @@ if (typeof Slick === 'undefined') {
       cellCssClasses[key] = hash
       updateCellCssStylesOnRenderedRows(hash, null)
 
-      trigger(self.onCellCssStylesChanged, {key: key, hash: hash})
+      trigger(self.onCellCssStylesChanged, {key, hash})
     }
 
     function removeCellCssStyles(key) {
@@ -2746,7 +2770,7 @@ if (typeof Slick === 'undefined') {
       updateCellCssStylesOnRenderedRows(null, cellCssClasses[key])
       delete cellCssClasses[key]
 
-      trigger(self.onCellCssStylesChanged, {key: key, hash: null})
+      trigger(self.onCellCssStylesChanged, {key, hash: null})
     }
 
     function setCellCssStyles(key, hash) {
@@ -2755,7 +2779,7 @@ if (typeof Slick === 'undefined') {
       cellCssClasses[key] = hash
       updateCellCssStylesOnRenderedRows(hash, prevHash)
 
-      trigger(self.onCellCssStylesChanged, {key: key, hash: hash})
+      trigger(self.onCellCssStylesChanged, {key, hash})
     }
 
     function getCellCssStyles(key) {
@@ -2975,14 +2999,14 @@ if (typeof Slick === 'undefined') {
     function handleHeaderContextMenu(e) {
       var $header = $(e.target).closest('.slick-header-column', '.slick-header-columns')
       var column = $header && $header.data('column')
-      trigger(self.onHeaderContextMenu, {column: column}, e)
+      trigger(self.onHeaderContextMenu, {column}, e)
     }
 
     function handleHeaderClick(e) {
       var $header = $(e.target).closest('.slick-header-column', '.slick-header-columns')
       var column = $header && $header.data('column')
       if (column) {
-        trigger(self.onHeaderClick, {column: column}, e)
+        trigger(self.onHeaderClick, {column}, e)
       }
     }
 
@@ -3012,7 +3036,7 @@ if (typeof Slick === 'undefined') {
         cell = 0
       }
 
-      return {row: row, cell: cell - 1}
+      return {row, cell: cell - 1}
     }
 
     function getCellFromNode(cellNode) {
@@ -3036,7 +3060,7 @@ if (typeof Slick === 'undefined') {
     }
 
     function getCanvasFromEvent(e) {
-      return jQuery(e.target).closest('.grid-canvas')
+      return $(e.target).closest('.grid-canvas')
     }
 
     function getCellFromEvent(e) {
@@ -3053,8 +3077,8 @@ if (typeof Slick === 'undefined') {
         return null
       } else {
         return {
-          row: row,
-          cell: cell,
+          row,
+          cell,
         }
       }
     }
@@ -3254,7 +3278,7 @@ if (typeof Slick === 'undefined') {
         trigger(self.onBeforeEditCell, {
           row: activeRow,
           cell: activeCell,
-          item: item,
+          item,
           column: columnDef,
         }) === false
       ) {
@@ -3544,8 +3568,8 @@ if (typeof Slick === 'undefined') {
 
       if (cell < columns.length) {
         return {
-          row: row,
-          cell: cell,
+          row,
+          cell,
           posX: cell,
         }
       }
@@ -3563,7 +3587,7 @@ if (typeof Slick === 'undefined') {
       }
 
       var prev = {
-        row: row,
+        row,
         cell: firstFocusableCell,
         posX: firstFocusableCell,
       }
@@ -3598,9 +3622,9 @@ if (typeof Slick === 'undefined') {
 
         if (canCellBeActive(row, prevCell)) {
           return {
-            row: row,
+            row,
             cell: prevCell,
-            posX: posX,
+            posX,
           }
         }
       }
@@ -3621,9 +3645,9 @@ if (typeof Slick === 'undefined') {
 
         if (canCellBeActive(row, prevCell)) {
           return {
-            row: row,
+            row,
             cell: prevCell,
-            posX: posX,
+            posX,
           }
         }
       }
@@ -3634,8 +3658,8 @@ if (typeof Slick === 'undefined') {
         row = cell = posX = 0
         if (canCellBeActive(row, cell)) {
           return {
-            row: row,
-            cell: cell,
+            row,
+            cell,
             posX: cell,
           }
         }
@@ -3651,7 +3675,7 @@ if (typeof Slick === 'undefined') {
         firstFocusableCell = findFirstFocusableCell(row)
         if (firstFocusableCell !== null) {
           return {
-            row: row,
+            row,
             cell: firstFocusableCell,
             posX: firstFocusableCell,
           }
@@ -3666,8 +3690,8 @@ if (typeof Slick === 'undefined') {
         cell = posX = columns.length - 1
         if (canCellBeActive(row, cell)) {
           return {
-            row: row,
-            cell: cell,
+            row,
+            cell,
             posX: cell,
           }
         }
@@ -3688,7 +3712,7 @@ if (typeof Slick === 'undefined') {
         lastSelectableCell = findLastFocusableCell(row)
         if (lastSelectableCell !== null) {
           pos = {
-            row: row,
+            row,
             cell: lastSelectableCell,
             posX: lastSelectableCell,
           }
@@ -3908,11 +3932,11 @@ if (typeof Slick === 'undefined') {
                 editor: currentEditor,
                 serializedValue: currentEditor.serializeValue(),
                 prevSerializedValue: serializedEditorValue,
-                execute: function () {
+                execute () {
                   this.editor.applyValue(item, this.serializedValue)
                   updateRow(this.row)
                 },
-                undo: function () {
+                undo () {
                   this.editor.applyValue(item, this.prevSerializedValue)
                   updateRow(this.row)
                 },
@@ -3929,14 +3953,14 @@ if (typeof Slick === 'undefined') {
               trigger(self.onCellChange, {
                 row: activeRow,
                 cell: activeCell,
-                column: column,
-                item: item,
+                column,
+                item,
               })
             } else {
               var newItem = {}
               currentEditor.applyValue(newItem, currentEditor.serializeValue())
               makeActiveCellNormal()
-              trigger(self.onAddNewRow, {item: newItem, column: column})
+              trigger(self.onAddNewRow, {item: newItem, column})
             }
 
             // check whether the lock has been re-acquired by event handlers
@@ -3950,10 +3974,10 @@ if (typeof Slick === 'undefined') {
             trigger(self.onValidationError, {
               editor: currentEditor,
               cellNode: activeCellNode,
-              validationResults: validationResults,
+              validationResults,
               row: activeRow,
               cell: activeCell,
-              column: column,
+              column,
             })
 
             currentEditor.focus()
@@ -4064,90 +4088,89 @@ if (typeof Slick === 'undefined') {
       onCellCssStylesChanged: new Slick.Event(),
 
       // Methods
-      registerPlugin: registerPlugin,
-      unregisterPlugin: unregisterPlugin,
-      getColumns: getColumns,
-      setColumns: setColumns,
-      getColumnIndex: getColumnIndex,
-      updateColumnHeader: updateColumnHeader,
-      setNumberOfColumnsToFreeze: setNumberOfColumnsToFreeze,
-      setSortColumn: setSortColumn,
-      setSortColumns: setSortColumns,
-      getSortColumns: getSortColumns,
-      autosizeColumns: autosizeColumns,
-      getOptions: getOptions,
-      setOptions: setOptions,
-      getData: getData,
-      getDataLength: getDataLength,
-      getDataItem: getDataItem,
-      setData: setData,
-      getSelectionModel: getSelectionModel,
-      setSelectionModel: setSelectionModel,
-      getSelectedRows: getSelectedRows,
-      setSelectedRows: setSelectedRows,
-      getContainerNode: getContainerNode,
+      registerPlugin,
+      unregisterPlugin,
+      getColumns,
+      setColumns,
+      getColumnIndex,
+      updateColumnHeader,
+      setNumberOfColumnsToFreeze,
+      setSortColumn,
+      setSortColumns,
+      getSortColumns,
+      autosizeColumns,
+      getOptions,
+      setOptions,
+      getData,
+      getDataLength,
+      getDataItem,
+      setData,
+      getSelectionModel,
+      setSelectionModel,
+      getSelectedRows,
+      setSelectedRows,
+      getContainerNode,
 
-      render: render,
-      invalidate: invalidate,
-      invalidateRow: invalidateRow,
-      invalidateRows: invalidateRows,
-      invalidateAllRows: invalidateAllRows,
-      updateCell: updateCell,
-      updateRow: updateRow,
+      render,
+      invalidate,
+      invalidateRow,
+      invalidateRows,
+      invalidateAllRows,
+      updateCell,
+      updateRow,
       getViewport: getVisibleRange,
-      getRenderedRange: getRenderedRange,
-      resizeCanvas: resizeCanvas,
-      updateRowCount: updateRowCount,
-      scrollRowIntoView: scrollRowIntoView,
-      scrollRowToTop: scrollRowToTop,
-      scrollCellIntoView: scrollCellIntoView,
-      getCanvasNode: getCanvasNode,
+      getRenderedRange,
+      resizeCanvas,
+      updateRowCount,
+      scrollRowIntoView,
+      scrollRowToTop,
+      scrollCellIntoView,
+      getCanvasNode,
       focus: setFocus,
 
-      getCellFromPoint: getCellFromPoint,
-      getCellFromEvent: getCellFromEvent,
-      getActiveCell: getActiveCell,
-      setActiveCell: setActiveCell,
-      getActiveCellNode: getActiveCellNode,
-      getActiveCellPosition: getActiveCellPosition,
-      resetActiveCell: resetActiveCell,
+      getCellFromPoint,
+      getCellFromEvent,
+      getActiveCell,
+      setActiveCell,
+      getActiveCellNode,
+      getActiveCellPosition,
+      resetActiveCell,
       editActiveCell: makeActiveCellEditable,
-      getCellEditor: getCellEditor,
-      getCellNode: getCellNode,
-      getCellNodeBox: getCellNodeBox,
-      canCellBeSelected: canCellBeSelected,
-      canCellBeActive: canCellBeActive,
-      navigatePrev: navigatePrev,
-      navigateNext: navigateNext,
-      navigateUp: navigateUp,
-      navigateDown: navigateDown,
-      navigateLeft: navigateLeft,
-      navigateRight: navigateRight,
-      navigatePageUp: navigatePageUp,
-      navigatePageDown: navigatePageDown,
-      gotoCell: gotoCell,
-      getTopPanel: getTopPanel,
-      setTopPanelVisibility: setTopPanelVisibility,
-      setHeaderRowVisibility: setHeaderRowVisibility,
-      getHeaderRow: getHeaderRow,
-      getHeaderRowColumn: getHeaderRowColumn,
-      getColumnHeaderNode: getColumnHeaderNode,
-      getGridPosition: getGridPosition,
-      flashCell: flashCell,
-      addCellCssStyles: addCellCssStyles,
-      setCellCssStyles: setCellCssStyles,
-      removeCellCssStyles: removeCellCssStyles,
-      getCellCssStyles: getCellCssStyles,
-      getUID: getUID,
+      getCellEditor,
+      getCellNode,
+      getCellNodeBox,
+      canCellBeSelected,
+      canCellBeActive,
+      navigatePrev,
+      navigateNext,
+      navigateUp,
+      navigateDown,
+      navigateLeft,
+      navigateRight,
+      navigatePageUp,
+      navigatePageDown,
+      gotoCell,
+      getTopPanel,
+      setTopPanelVisibility,
+      setHeaderRowVisibility,
+      getHeaderRow,
+      getHeaderRowColumn,
+      getColumnHeaderNode,
+      getGridPosition,
+      flashCell,
+      addCellCssStyles,
+      setCellCssStyles,
+      removeCellCssStyles,
+      getCellCssStyles,
+      getUID,
 
       init: finishInitialization,
-      destroy: destroy,
+      destroy,
 
       // IEditor implementation
-      getEditorLock: getEditorLock,
-      getEditController: getEditController,
+      getEditorLock,
+      getEditController,
     })
 
     init()
   }
-})(jQuery)

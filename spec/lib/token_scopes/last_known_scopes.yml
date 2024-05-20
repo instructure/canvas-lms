@@ -112,6 +112,8 @@
 - verb: GET
   path: "/api/v1/terms_of_service_custom_content"
 - verb: GET
+  path: "/api/v1/settings/environment"
+- verb: GET
   path: "/api/v1/accounts/:account_id/tabs"
 - verb: GET
   path: "/api/v1/courses/:course_id/tabs"
@@ -775,6 +777,8 @@
   path: "/api/v1/show_k5_dashboard"
 - verb: POST
   path: "/api/v1/users/:id/clear_cache"
+- verb: DELETE
+  path: "/api/v1/users/mobile_sessions"
 - verb: GET
   path: "/api/v1/users/:user_id/observers"
 - verb: GET
@@ -1689,6 +1693,8 @@
   path: "/api/v1/users/:user_id/content_exports/:id"
 - verb: PUT
   path: "/api/v1/users/:user_id/content_exports/:id/fail"
+- verb: PUT
+  path: "/api/v1/courses/:course_id/content_exports/:id"
 - verb: GET
   path: "/api/v1/courses/:course_id/content_list"
 - verb: GET
@@ -1820,9 +1826,13 @@
 - verb: GET
   path: "/api/v1/accounts/:account_id/rubrics/:id"
 - verb: GET
+  path: "/api/v1/accounts/:account_id/rubrics/:id/used_locations"
+- verb: GET
   path: "/api/v1/courses/:course_id/rubrics"
 - verb: GET
   path: "/api/v1/courses/:course_id/rubrics/:id"
+- verb: GET
+  path: "/api/v1/courses/:course_id/rubrics/:id/used_locations"
 - verb: POST
   path: "/api/v1/courses/:course_id/rubrics"
 - verb: PUT
@@ -2149,11 +2159,33 @@
   path: "/api/v1/courses/:course_id/quizzes/:quiz_id/date_details"
 - verb: GET
   path: "/api/v1/courses/:course_id/modules/:context_module_id/date_details"
+- verb: GET
+  path: "/api/v1/courses/:course_id/discussion_topics/:discussion_topic_id/date_details"
+- verb: GET
+  path: "/api/v1/courses/:course_id/pages/:page_id/date_details"
+- verb: GET
+  path: "/api/v1/courses/:course_id/files/:attachment_id/date_details"
 - verb: PUT
   path: "/api/v1/courses/:course_id/assignments/:assignment_id/date_details"
 - verb: PUT
   path: "/api/v1/courses/:course_id/quizzes/:quiz_id/date_details"
+- verb: PUT
+  path: "/api/v1/courses/:course_id/discussion_topics/:discussion_topic_id/date_details"
+- verb: PUT
+  path: "/api/v1/courses/:course_id/pages/:page_id/date_details"
+- verb: PUT
+  path: "/api/v1/courses/:course_id/files/:attachment_id/date_details"
 - verb: GET
   path: "/api/v1/accounts/:account_id/admins/self"
 - verb: GET
   path: "/api/v1/courses/:course_id/smartsearch"
+- verb: GET
+  path: "/api/v1/courses/:course_id/smartsearch/log"
+- verb: GET
+  path: "/api/v1/courses/:course_id/smartsearch/index_status"
+- verb: POST
+  path: "/api/v1/courses/:course_id/assignments/:assignment_id/retry_alignment_clone"
+- verb: POST
+  path: "/api/v1/courses/:course_id/assign_outcome_order"
+- verb: PUT
+  path: "/api/v1/users/:user_id/user_notes/suppress_deprecation_notice"

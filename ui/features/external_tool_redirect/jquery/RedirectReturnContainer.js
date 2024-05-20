@@ -17,21 +17,25 @@
 
 import $ from 'jquery'
 
+import {handleExternalContentMessages} from '@canvas/external-tools/messages'
+
 export default class RedirectReturnContainer {
   attachLtiEvents() {
-    $(window).on('externalContentReady', this._contentReady)
-    $(window).on('externalContentCancel', this._contentCancel)
+    handleExternalContentMessages({
+      ready: this._contentReady,
+      cancel: this._contentCancel,
+    })
   }
 
-  _contentReady = (event, data) => {
+  _contentReady = data => {
     if (data && data.return_type === 'file') {
-      return this.createMigration(data.url)
+      this.createMigration(data.url)
     } else {
-      return this.redirectToSuccessUrl()
+      this.redirectToSuccessUrl()
     }
   }
 
-  _contentCancel = (_event, _data) => {
+  _contentCancel = () => {
     window.location.href = this.cancelUrl
   }
 

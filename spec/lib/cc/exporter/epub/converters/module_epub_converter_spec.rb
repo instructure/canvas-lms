@@ -44,5 +44,13 @@ describe "ModuleEpubConverter" do
       page = module_b[:items].find { |i| i[:title] == "Wiki Page 2" }
       expect(page[:text]).to match("The dangers of fighting on the wing of moving airplanes")
     end
+
+    it "page identifiers are present" do
+      test_instance.unzip_archive
+
+      module_b = test_instance.convert_modules.find { |m| m[:title] == "Module B" }
+      page = module_b[:items].find { |i| i[:title] == "Wiki Page 2" }
+      expect(page[:identifier]).to eq("wiki-page-2")
+    end
   end
 end

@@ -318,7 +318,7 @@ class UserList
         address.delete :user_id
         ((@addresses.find { |a| a[:address].casecmp?(address[:address]) }) ? @duplicate_addresses : @addresses) << address
       else
-        @errors << { address: address[:address], type: address[:type], details: (address[:details] || :not_found) }
+        @errors << { address: address[:address], type: address[:type], details: address[:details] || :not_found }
       end
     end
   end

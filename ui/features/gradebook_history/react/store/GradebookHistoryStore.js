@@ -17,9 +17,9 @@
  */
 
 import {createStore, applyMiddleware} from 'redux'
-import thunkMiddleware from 'redux-thunk'
+import {thunk} from 'redux-thunk'
 import gradebookHistory from '../reducers/Reducer'
 
-const GradebookHistoryStore = createStore(gradebookHistory, applyMiddleware(thunkMiddleware))
+const GradebookHistoryStore = createStore(gradebookHistory, applyMiddleware(thunk))
 
 export default GradebookHistoryStore

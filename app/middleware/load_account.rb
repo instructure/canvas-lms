@@ -25,9 +25,17 @@ class LoadAccount
       @schema_cache_loaded = true
       MultiCache.fetch("schema_cache", expires_in: 1.week) do
         conn = ActiveRecord::Base.connection
-        conn.schema_cache.clear!
-        conn.data_sources.each { |table| conn.schema_cache.add(table) }
-        conn.schema_cache
+        if $canvas_rails == "7.1"
+          reflection = ActiveRecord::Base.connection_pool.schema_reflection
+          cache = reflection.send(:empty_cache)
+          cache.add_all(conn)
+          reflection.set_schema_cache(cache)
+          cache
+        else
+          conn.schema_cache.clear!
+          conn.data_sources.each { |table| conn.schema_cache.add(table) }
+          conn.schema_cache
+        end
       end
     end
 
@@ -63,7 +71,7 @@ class LoadAccount
   end
 
   def self.clear_shard_cache
-    @timed_cache ||= TimedCache.new(-> { Setting.get("shard_cache_time", 60).to_i.seconds.ago }) do
+    @timed_cache ||= TimedCache.new(-> { 60.seconds.ago }) do
       Shard.clear_cache
     end
     @timed_cache.clear

@@ -33,7 +33,7 @@ describe WikiPage do
     expect(p.messages_sent).not_to be_empty
     expect(p.messages_sent["Updated Wiki Page"]).not_to be_nil
     expect(p.messages_sent["Updated Wiki Page"]).not_to be_empty
-    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to be_include(@user)
+    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to include(@user)
   end
 
   it "sends page updated notifications to students if active" do
@@ -45,7 +45,7 @@ describe WikiPage do
     p.notify_of_update = true
     p.save!
     p.update(body: "Awgawg")
-    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to be_include(@student)
+    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to include(@student)
   end
 
   it "does not send page updated notifications to students if not active" do
@@ -58,7 +58,7 @@ describe WikiPage do
     p.notify_of_update = true
     p.save!
     p.update(body: "Awgawg")
-    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to_not be_include(@student)
+    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to_not include(@student)
   end
 
   describe "duplicate manages titles properly" do
@@ -432,6 +432,30 @@ describe WikiPage do
       expect(page.can_edit_page?(student)).to be_truthy
     end
 
+    it "is true for members who are in the course" do
+      course_with_designer(active_all: true)
+      page = @course.wiki_pages.create(title: "some page", editing_roles: "members")
+      expect(page.can_edit_page?(@designer)).to be_truthy
+    end
+
+    it "is not true for members who are in the course but not active" do
+      course_with_student(active_all: true)
+      page = @course.wiki_pages.create(title: "some page", editing_roles: "members")
+      student = @course.students.first
+      @course.enrollments.update!(workflow_state: "invited")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "creation_pending")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "deleted")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "rejected")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "completed")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "inactive")
+      expect(page.can_edit_page?(student)).to be_falsey
+    end
+
     it "is not true for users who are not in the course (if it is not public)" do
       course_factory(active_all: true)
       page = @course.wiki_pages.create(title: "some page", editing_roles: "public")
@@ -439,13 +463,31 @@ describe WikiPage do
       expect(page.can_edit_page?(@user)).to be_falsey
     end
 
-    it "is true for users who are not in the course (if it is public)" do
+    it "is not true for users who are not in the course (if it is public)" do
       course_factory(active_all: true)
       @course.is_public = true
       @course.save!
       page = @course.wiki_pages.create(title: "some page", editing_roles: "public")
       user_factory(active_all: true)
-      expect(page.can_edit_page?(@user)).to be_truthy
+      expect(page.can_edit_page?(@user)).to be_falsey
+    end
+
+    it "is not true for users who are in the course but not active" do
+      course_with_student(active_all: true)
+      page = @course.wiki_pages.create(title: "some page", editing_roles: "public")
+      student = @course.students.first
+      @course.enrollments.update!(workflow_state: "invited")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "creation_pending")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "deleted")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "rejected")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "completed")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "inactive")
+      expect(page.can_edit_page?(student)).to be_falsey
     end
 
     context "when the page's course is concluded" do
@@ -491,6 +533,14 @@ describe WikiPage do
           expect(subject).to be false
         end
       end
+
+      context "with 'teachers,students,members' as the editing role" do
+        let(:editing_roles) { "teachers,students,members" }
+
+        it "returns false for a teacher" do
+          expect(subject).to be false
+        end
+      end
     end
 
     context "when the context is a Group" do
@@ -524,6 +574,22 @@ describe WikiPage do
         let(:current_user) { teacher }
 
         it { is_expected.to be false }
+      end
+
+      context "with 'members' as the editing role" do
+        let(:editing_roles) { "members" }
+
+        it "returns false for a teacher" do
+          expect(subject).to be false
+        end
+      end
+
+      context "with 'members,public' as the editing role" do
+        let(:editing_roles) { "members,public" }
+
+        it "returns false for a teacher" do
+          expect(subject).to be false
+        end
       end
     end
   end
@@ -1099,59 +1165,89 @@ describe WikiPage do
     end
   end
 
-  describe "#generate_embeddings" do
-    before do
-      skip "not available" unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
-
-      expect(OpenAi).to receive(:smart_search_available?).at_least(:once).and_return(true)
-      allow(OpenAi).to receive(:generate_embedding).and_return([[1] * 1536])
-    end
-
+  describe "visible_ids_by_user" do
     before :once do
-      course_factory
+      @course1 = course_factory(active_all: true)
+      @page1 = @course1.wiki_pages.create!(title: "page1")
+      @page2 = @course1.wiki_pages.create!(title: "page2")
+      @assignment = @course1.assignments.create!(title: "assignment", only_visible_to_overrides: true)
+      @page2.update!(assignment_id: @assignment.id)
+      @student1 = student_in_course(active_all: true).user
+      @student2 = student_in_course(active_all: true).user
     end
 
-    it "generates an embedding when creating a page" do
-      wiki_page_model(title: "test", body: "foo")
-      run_jobs
-      expect(@page.reload.wiki_page_embeddings.count).to eq 1
+    let(:visible_ids) { WikiPage.visible_ids_by_user({ user_id: [@student1.id, @student2.id], course_id: [@course1.id] }) }
+
+    it "includes pages with no assignment by default" do
+      expect(visible_ids[@student1.id]).to contain_exactly(@page1.id)
+      expect(visible_ids[@student2.id]).to contain_exactly(@page1.id)
     end
 
-    it "replaces an embedding if it already exists" do
-      wiki_page_model(title: "test", body: "foo")
-      run_jobs
-      @page.update body: "bar"
-      run_jobs
-      expect(@page.reload.wiki_page_embeddings.count).to eq 1
+    it "includes pages with assignment if the user has an override" do
+      override = @assignment.assignment_overrides.create!
+      override.assignment_override_students.create!(user: @student1)
+      expect(visible_ids[@student1.id]).to contain_exactly(@page1.id, @page2.id)
+      expect(visible_ids[@student2.id]).to contain_exactly(@page1.id)
     end
 
-    it "strips HTML from the body before indexing" do
-      wiki_page_model(title: "test", body: "<ul><li>foo</li></ul>")
-      expect(OpenAi).to receive(:generate_embedding).with("* foo")
-      run_jobs
+    it "includes pages with an assignment if the assignment has only_visible_to_overrides set to false" do
+      @assignment.update!(only_visible_to_overrides: false)
+      expect(visible_ids[@student1.id]).to contain_exactly(@page1.id, @page2.id)
+      expect(visible_ids[@student2.id]).to contain_exactly(@page1.id, @page2.id)
     end
 
-    it "deletes embeddings when a page is deleted (and regenerates them when undeleted)" do
-      wiki_page_model(title: "test", body: "foo")
-      run_jobs
-      @page.destroy
-      expect(@page.reload.wiki_page_embeddings.count).to eq 0
-
-      @page.restore
-      run_jobs
-      expect(@page.reload.wiki_page_embeddings.count).to eq 1
+    it "does not include pages from another course" do
+      course2 = course_factory(active_all: true)
+      course2.wiki_pages.create!(title: "page3")
+      student_in_course(course: course2, user: @student1, active_all: true)
+      expect(visible_ids[@student1.id]).to contain_exactly(@page1.id)
     end
 
-    it "generates multiple embeddings for a page with long content" do
-      wiki_page_model(title: "test", body: "foo" * 2000)
-      run_jobs
-      expect(@page.reload.wiki_page_embeddings.count).to eq 2
+    context "with differentiated_modules disabled" do
+      it "does not consider WikiPageStudentVisibility" do
+        @page1.update!(only_visible_to_overrides: true)
+        expect(visible_ids[@student1.id]).to contain_exactly(@page1.id)
+      end
     end
 
-    it "generates multiple embeddings and doesn't split words" do
-      wiki_page_model(title: "test", body: "supercalifragilisticexpialidocious " * 228)
-      run_jobs
-      expect(@page.reload.wiki_page_embeddings.count).to eq 3
+    context "with differentiated_modules enabled" do
+      before :once do
+        Account.site_admin.enable_feature!(:differentiated_modules)
+      end
+
+      it "does not include pages if the page does not have an assignment but has only_visible_to_overrides set to true" do
+        @page1.update!(only_visible_to_overrides: true)
+        expect(visible_ids[@student1.id]).to eq []
+        expect(visible_ids[@student2.id]).to eq []
+      end
+
+      it "includes pages if the page does not have an assignment but the user has an override" do
+        @page1.update!(only_visible_to_overrides: true)
+        override = @page1.assignment_overrides.create!
+        override.assignment_override_students.create!(user: @student1)
+        expect(visible_ids[@student1.id]).to contain_exactly(@page1.id)
+        expect(visible_ids[@student2.id]).to eq []
+      end
+
+      it "includes all pages where the user has an override" do
+        @page1.update!(only_visible_to_overrides: true)
+        page_override = @page1.assignment_overrides.create!
+        page_override.assignment_override_students.create!(user: @student1)
+        page_override.assignment_override_students.create!(user: @student2)
+        assignment_override = @assignment.assignment_overrides.create!
+        assignment_override.assignment_override_students.create!(user: @student1)
+        expect(visible_ids[@student1.id]).to contain_exactly(@page1.id, @page2.id)
+        expect(visible_ids[@student2.id]).to contain_exactly(@page1.id)
+      end
+
+      it "does not include pages where the user has a page override if the page has an assignment" do
+        page_override = @page1.assignment_overrides.create!
+        page_override.assignment_override_students.create!(user: @student1)
+        assignment = @course1.assignments.create!(title: "assignment", only_visible_to_overrides: true)
+        @page1.update!(assignment_id: assignment.id)
+        expect(visible_ids[@student1.id]).to eq []
+        expect(visible_ids[@student2.id]).to eq []
+      end
     end
   end
 end

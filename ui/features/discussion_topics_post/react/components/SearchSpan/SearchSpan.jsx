@@ -21,9 +21,9 @@ import PropTypes from 'prop-types'
 
 // add highlighting and remove HTML from all incoming text
 // with the exception of anything within the <iframe></iframe> HTML tag
-const addSearchHighlighting = (searchTerm, searchArea, isIsolatedView) => {
+const addSearchHighlighting = (searchTerm, searchArea, isSplitView) => {
   // Check for conditions where highlighting should not be applied
-  if (!searchArea || !searchTerm || isIsolatedView) {
+  if (!searchArea || !searchTerm || isSplitView) {
     return searchArea
   }
 
@@ -52,9 +52,11 @@ const addSearchHighlighting = (searchTerm, searchArea, isIsolatedView) => {
 
 // Highlight the search term and remove HTML
 const highlightText = (text, searchTerm) => {
-  const searchExpression = new RegExp(`(${searchTerm})`, 'gi')
+  const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const searchExpression = new RegExp(`(${escapedSearchTerm})`, 'gi')
+
   return text
-    .replace(/<[^>]*>?/gm, '')
+    .replace(/<[^>]*>/gm, '')
     .replace(
       searchExpression,
       '<span data-testid="highlighted-search-item" style="background-color: rgba(0,142,226,0.2); border-radius: .25rem; padding-bottom: 3px; padding-top: 1px;">$1</span>'
@@ -62,11 +64,23 @@ const highlightText = (text, searchTerm) => {
 }
 
 export function SearchSpan({...props}) {
+  const resourceType = () => {
+    if (props.isAnnouncement == null || props.isTopic == null) {
+      return undefined
+    }
+
+    return `${props.isAnnouncement ? 'announcement' : 'discussion_topic'}.${
+      props.isTopic ? 'body' : 'reply'
+    }`
+  }
+
   return (
     <span
       className="user_content"
+      data-resource-type={resourceType()}
+      data-resource-id={props.resourceId}
       dangerouslySetInnerHTML={{
-        __html: addSearchHighlighting(props.searchTerm, props.text, props.isIsolatedView),
+        __html: addSearchHighlighting(props.searchTerm, props.text, props.isSplitView),
       }}
     />
   )
@@ -81,5 +95,8 @@ SearchSpan.propTypes = {
    * String containing displayable message
    */
   text: PropTypes.string.isRequired,
-  isIsolatedView: PropTypes.bool,
+  isSplitView: PropTypes.bool,
+  isAnnouncement: PropTypes.bool,
+  isTopic: PropTypes.bool,
+  resourceId: PropTypes.string,
 }

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Mathml, {mathImageHelper, MathJaxDirective} from '../mathml'
+import {Mathml, mathImageHelper, MathJaxDirective} from '../mathml'
 
 let stub = null
 describe('MathML and MathJax it', () => {

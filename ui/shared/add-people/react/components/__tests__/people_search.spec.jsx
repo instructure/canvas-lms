@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {mount} from 'enzyme'
 import React from 'react'
 import PeopleSearch from '../people_search'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+import {render} from '@testing-library/react'
 
 injectGlobalAlertContainers()
 
@@ -36,18 +36,17 @@ describe('PeopleSearch', () => {
   }
 
   test('displays Email Address as default label', () => {
-    const wrapper = mount(<PeopleSearch {...props} />)
-    expect(wrapper.find('TextArea').exists()).toBeTruthy()
-    expect(wrapper.text().includes('Email Addresses (required)')).toBeTruthy()
+    const wrapper = render(<PeopleSearch {...props} />)
+    expect(wrapper.queryByText('Email Addresses (required)')).toBeInTheDocument()
   })
 
   test('displays proper label for sis searchType', () => {
-    const wrapper = mount(<PeopleSearch {...props} searchType="sis_user_id" />)
-    expect(wrapper.text().includes('SIS IDs (required)')).toBeTruthy()
+    const wrapper = render(<PeopleSearch {...props} searchType="sis_user_id" />)
+    expect(wrapper.queryByText('SIS IDs (required)')).toBeInTheDocument()
   })
 
   test('displays proper label for unique_id searchType', () => {
-    const wrapper = mount(<PeopleSearch {...props} searchType="unique_id" />)
-    expect(wrapper.text().includes('Login IDs (required)')).toBeTruthy()
+    const wrapper = render(<PeopleSearch {...props} searchType="unique_id" />)
+    expect(wrapper.queryByText('Login IDs (required)')).toBeInTheDocument()
   })
 })

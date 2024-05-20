@@ -19,7 +19,7 @@
 import {arrayOf, func} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {itemShape, moveOptionsType} from './propTypes'
-import {positions} from '../positions'
+import {positions} from '@canvas/positions'
 import SelectPosition, {RenderSelect} from '@canvas/select-position'
 import React from 'react'
 

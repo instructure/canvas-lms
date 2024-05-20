@@ -239,6 +239,7 @@ describe "quizzes question banks" do
         @bank.assessment_questions.create!(
           question_data: {
             question_name: "test question #{idx}",
+            question_text: "test question #{idx}",
             answers: [
               { id: 1 },
               { id: 2 }

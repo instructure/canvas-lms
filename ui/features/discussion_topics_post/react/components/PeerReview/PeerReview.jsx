@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {responsiveQuerySizes} from '../../utils'
-import DateHelper from '../../../../../shared/datetime/dateHelper'
+import DateHelper from '@canvas/datetime/dateHelper'
 
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
@@ -41,7 +41,11 @@ export const PeerReview = props => {
           textNotCompleted: props.dueAtDisplayText
             ? I18n.t('Peer review due %{dueAtText}', {
                 name: props.revieweeName,
-                dueAtText: DateHelper.formatDateForDisplay(props.dueAtDisplayText, 'short'),
+                dueAtText: DateHelper.formatDateForDisplay(
+                  props.dueAtDisplayText,
+                  'short',
+                  ENV.TIMEZONE
+                ),
               })
             : I18n.t('Peer review due', {name: props.revieweeName}),
           textSize: 'x-small',

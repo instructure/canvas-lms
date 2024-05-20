@@ -61,7 +61,10 @@ describe('Should load <AddressBookContainer> normally', () => {
   }
 
   describe('With Context Selection enabled', () => {
-    const contextSelectionDefaultProps = {hasSelectAllFilterOption: true, includeCommonCourses: true}
+    const contextSelectionDefaultProps = {
+      hasSelectAllFilterOption: true,
+      includeCommonCourses: true,
+    }
 
     describe('Rendering', () => {
       it('Does not show context select in initial menu', async () => {

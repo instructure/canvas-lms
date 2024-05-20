@@ -28,18 +28,18 @@ const getDefaultProps = overrides => ({
     title: 'Introduction to Board Games',
     course_id: null,
     date: moment('2017-07-15T20:00:00-0600'),
-    ...overrides
+    ...overrides,
   },
   courses: [
     {
       id: '1',
-      shortName: 'BGG 101'
+      shortName: 'BGG 101',
     },
     {
       id: '2',
-      shortName: 'BGG 201'
-    }
-  ]
+      shortName: 'BGG 201',
+    },
+  ],
 })
 
 it('renders assignment icon for assignments', () => {
@@ -135,7 +135,7 @@ it('calls the handleDismissClick prop when the dismiss X is clicked', () => {
   expect(handleDismissClick).toHaveBeenCalledWith(
     expect.objectContaining({
       type: 'Assignment',
-      title: 'Introduction to Board Games'
+      title: 'Introduction to Board Games',
     })
   )
 })

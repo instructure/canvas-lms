@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import axios from '@canvas/axios'
-import {GetState, SetState} from 'zustand'
+import type {GetState, SetState} from 'zustand'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import type {CustomColumn, CustomColumnData, ColumnOrderSettings} from '../gradebook.d'

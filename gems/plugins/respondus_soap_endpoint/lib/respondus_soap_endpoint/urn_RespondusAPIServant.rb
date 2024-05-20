@@ -146,7 +146,7 @@ module RespondusSoapEndpoint
       Rails.logger.debug "Parameters: #{([userName, "[FILTERED]", context] + log_args).inspect}"
       load_user(method, userName, password)
       load_session(context)
-      return_args = send("_#{method}", userName, password, context, *args) || []
+      return_args = send(:"_#{method}", userName, password, context, *args) || []
       ["Success", "", dump_session] + return_args
     rescue => e
       case e
@@ -173,7 +173,7 @@ module RespondusSoapEndpoint
 
       def wrap_api_call(*methods)
         methods.each do |method|
-          alias_method "_#{method}", method
+          alias_method :"_#{method}", method
           class_eval(<<~RUBY, __FILE__, __LINE__ + 1)
             def #{method}(userName, password, context, *args)
               ret = nil
@@ -602,22 +602,7 @@ Implemented for: Canvas LMS)]
       session["pending_migration_id"] = migration.id
       session["pending_migration_itemType"] = itemType
 
-      if Setting.get("respondus_endpoint.polling_api", "true") == "false"
-        # Deprecated in-line waiting for the migration. We've worked with Respondus
-        # to implement an asynchronous, polling solution now.
-        Timeout.timeout(5.minutes.to_i) do
-          loop do
-            ret = poll_for_completion
-            if ret == ["pending"]
-              sleep(Setting.get("respondus_endpoint.polling_time", "2").to_f) # rubocop:disable Lint/NoSleep
-            else
-              return ret
-            end
-          end
-        end
-      else
-        poll_for_completion
-      end
+      poll_for_completion
     end
 
     def poll_for_completion

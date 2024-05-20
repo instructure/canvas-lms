@@ -18,8 +18,8 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {useEffect, useState} from 'react'
-import {ApiCallStatus, CustomColumnDatum} from '../../types'
-import {executeApiRequest} from '@canvas/util/apiRequest'
+import {ApiCallStatus, type CustomColumnDatum} from '../../types'
+import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 
 const I18n = useI18nScope('enhanced_individual_gradebook_submit_score')
 

@@ -30,8 +30,8 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     true
   end
 
-  serialize :participants_array, Array
-  serialize :entry_ids_array, Array
+  serialize :participants_array, type: Array
+  serialize :entry_ids_array, type: Array
 
   belongs_to :discussion_topic
 

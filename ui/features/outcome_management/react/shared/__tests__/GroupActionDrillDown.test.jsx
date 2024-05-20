@@ -19,14 +19,18 @@
 import React from 'react'
 import {render as rtlRender, fireEvent} from '@testing-library/react'
 import GroupActionDrillDown from '../GroupActionDrillDown'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import OutcomesContext, {
   ACCOUNT_GROUP_ID,
   ROOT_GROUP_ID,
 } from '@canvas/outcomes/react/contexts/OutcomesContext'
 
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+}))
+
 describe('GroupActionDrillDown', () => {
-  let onCollectionClick, showFlashAlertSpy, setShowOutcomesView
+  let onCollectionClick, setShowOutcomesView
 
   const collections = {
     [ROOT_GROUP_ID]: {
@@ -74,7 +78,6 @@ describe('GroupActionDrillDown', () => {
   })
 
   beforeEach(() => {
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     onCollectionClick = jest.fn()
     setShowOutcomesView = jest.fn()
   })
@@ -117,10 +120,10 @@ describe('GroupActionDrillDown', () => {
     fireEvent.click(getByText('Groups'))
     fireEvent.click(getByText('Account folder'))
     fireEvent.click(getByText('Back'))
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'Group "Root folder" entered.',
-      srOnly: true,
       type: 'info',
+      srOnly: true,
     })
   })
 

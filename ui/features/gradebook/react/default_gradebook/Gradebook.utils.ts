@@ -24,12 +24,13 @@ import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDi
 import getTextWidth from '../shared/helpers/TextMeasure'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'lodash'
-import htmlEscape, {unescape} from 'html-escape'
+import htmlEscape, {unescape} from '@instructure/html-escape'
 import filterTypes from './constants/filterTypes'
 import type {
   ColumnSizeSettings,
   CustomColumn,
   CustomStatusIdString,
+  EnrollmentFilter,
   Filter,
   FilterPreset,
   FilterType,
@@ -59,15 +60,18 @@ import type {
 import type {GridColumn, SlickGridKeyboardEvent} from './grid'
 import {columnWidths} from './initialState'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
-import {GradeStatus} from '@canvas/grading/accountGradingStatus'
+import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')
 
-const dateTimeFormatter = Intl.DateTimeFormat(I18n.currentLocale(), {
-  year: 'numeric',
-  month: 'numeric',
-  day: 'numeric',
-})
+const createDateTimeFormatter = (timeZone: string) => {
+  return Intl.DateTimeFormat(I18n.currentLocale(), {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    timeZone,
+  })
+}
 
 const ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
 
@@ -132,6 +136,10 @@ export function getGradeAsPercent(grade: {score?: number | null; possible: numbe
 
 export function getStudentGradeForColumn(student: GradebookStudent, field: string) {
   return student[field] || {score: null, possible: 0}
+}
+
+export function idArraysEqual(idArray1: string[], idArray2: string[]): boolean {
+  return [...idArray1].sort().join() === [...idArray2].sort().join()
 }
 
 export function htmlDecode(input?: string): string | null {
@@ -354,7 +362,10 @@ export const getLabelForFilter = (
     return assignmentGroups.find(a => a.id === filter.value)?.name || I18n.t('Assignment Group')
   } else if (filter.type === 'grading-period') {
     if (filter.value === '0') return I18n.t('All Grading Periods')
-    return gradingPeriods.find(g => g.id === filter.value)?.title || I18n.t('Grading Period')
+    return (
+      formatGradingPeriodTitleForDisplay(gradingPeriods.find(g => g.id === filter.value)) ||
+      I18n.t('Grading Period')
+    )
   } else if (filter.type === 'student-group') {
     const studentGroups: StudentGroup[] = Object.values(studentGroupCategories)
       .map((c: StudentGroupCategory) => c.groups)
@@ -387,11 +398,11 @@ export const getLabelForFilter = (
     }
   } else if (filter.type === 'start-date') {
     if (typeof filter.value !== 'string') throw new Error('invalid start-date value')
-    const value = dateTimeFormatter.format(new Date(filter.value))
+    const value = createDateTimeFormatter(ENV.TIMEZONE).format(new Date(filter.value))
     return I18n.t('Start Date %{value}', {value})
   } else if (filter.type === 'end-date') {
     if (typeof filter.value !== 'string') throw new Error('invalid end-date value')
-    const value = dateTimeFormatter.format(new Date(filter.value))
+    const value = createDateTimeFormatter(ENV.TIMEZONE).format(new Date(filter.value))
     return I18n.t('End Date %{value}', {value})
   }
 
@@ -444,9 +455,14 @@ export function buildStudentColumn(
   gradebookColumnSizeSetting: string,
   defaultWidth: number
 ): GridColumn {
-  const studentColumnWidth = gradebookColumnSizeSetting
+  let studentColumnWidth = gradebookColumnSizeSetting
     ? parseInt(gradebookColumnSizeSetting, 10)
     : defaultWidth
+  if (Number.isNaN(studentColumnWidth)) {
+    studentColumnWidth = defaultWidth
+    // eslint-disable-next-line no-console
+    console.warn('invalid student column width')
+  }
   return {
     cssClass: 'meta-cell primary-column student',
     headerCssClass: 'primary-column student',
@@ -572,8 +588,13 @@ export function escapeStudentContent(student: Student) {
   const unescapedFirstName = student.first_name
   const unescapedLastName = student.last_name
 
-  // TODO: selectively escape fields
-  const escapedStudent: Student = htmlEscape<Student>(student)
+  for (const key in student) {
+    if (Object.prototype.hasOwnProperty.call(student, key)) {
+      ;(student as any)[key] = htmlEscape((student as any)[key])
+    }
+  }
+  const escapedStudent: Student = student
+
   escapedStudent.name = unescapedName
   escapedStudent.sortable_name = unescapedSortableName
   escapedStudent.first_name = unescapedFirstName
@@ -604,23 +625,34 @@ export const categorizeFilters = (appliedFilters: Filter[], customStatuses: Grad
     appliedFilters
   ) as SubmissionFilterValue[]
   const customStatusIds = getCustomStatusIdStrings(customStatuses)
-  const filtersNeedingSome: SubmissionFilterValue[] = submissionFilters.filter(filter =>
-    [
-      'dropped',
-      'excused',
-      'extended',
-      'has-submissions',
-      'has-ungraded-submissions',
-      'has-unposted-grades',
-      'late',
-      'missing',
-      'resubmitted',
-      ...customStatusIds,
-    ].includes(filter)
-  )
 
-  const filtersNeedingEvery = submissionFilters.filter(filter =>
-    ['has-no-submissions'].includes(filter)
+  const possibleSomeFilters = [
+    'dropped',
+    'excused',
+    'extended',
+    'has-submissions',
+    'has-ungraded-submissions',
+    'has-unposted-grades',
+    'late',
+    'missing',
+    'resubmitted',
+    ...customStatusIds,
+  ]
+
+  let filtersNeedingEvery: SubmissionFilterValue[] = []
+
+  const {multiselect_gradebook_filters_enabled} = ENV.GRADEBOOK_OPTIONS ?? {}
+
+  if (multiselect_gradebook_filters_enabled) {
+    possibleSomeFilters.push('has-no-submissions')
+  } else {
+    filtersNeedingEvery = submissionFilters.filter(filter =>
+      ['has-no-submissions'].includes(filter)
+    )
+  }
+
+  const filtersNeedingSome: SubmissionFilterValue[] = submissionFilters.filter(filter =>
+    possibleSomeFilters.includes(filter)
   )
 
   return {filtersNeedingSome, filtersNeedingEvery}
@@ -635,7 +667,11 @@ export function filterSubmission(
     return true
   }
   const customStatusIds = getCustomStatusIdStrings(customStatuses)
-  return filters.every(filter => {
+
+  const {multiselect_gradebook_filters_enabled} = ENV.GRADEBOOK_OPTIONS ?? {}
+  const filterOperation = multiselect_gradebook_filters_enabled ? 'some' : 'every'
+
+  return filters[filterOperation](filter => {
     if (filter === 'has-ungraded-submissions') {
       return doesSubmissionNeedGrading(submission)
     } else if (filter === 'has-submissions') {
@@ -707,9 +743,49 @@ export const filterStudentBySubmissionFn = (
   }
 }
 
+const getIncludedEnrollmentStates = (enrollmentFilter: EnrollmentFilter) => {
+  const enrollmentStates = ['active', 'invited']
+  if (enrollmentFilter.inactive) {
+    enrollmentStates.push('inactive')
+  }
+  if (enrollmentFilter.concluded) {
+    enrollmentStates.push('completed')
+  }
+  return enrollmentStates
+}
+
+export const filterStudentBySectionFn = (
+  appliedFilters: Filter[],
+  enrollmentFilter: EnrollmentFilter
+) => {
+  const sectionFilters = findFilterValuesOfType(
+    'section',
+    appliedFilters
+  ) as SubmissionFilterValue[]
+
+  return (student: Student) => {
+    if (sectionFilters.length === 0) {
+      return true
+    }
+    const {multiselect_gradebook_filters_enabled} = ENV.GRADEBOOK_OPTIONS ?? {}
+    const includedEnrollmentStates = getIncludedEnrollmentStates(enrollmentFilter)
+    const sectionFiltersToApply = multiselect_gradebook_filters_enabled
+      ? sectionFilters
+      : [sectionFilters[0]]
+    const enrollmentStates = student.enrollments
+      .filter(e => sectionFiltersToApply.includes(e.course_section_id as SubmissionFilterValue))
+      .map(enrollment => enrollment.enrollment_state)
+    return student.sections
+      ? enrollmentStates.length > 0 &&
+          _.intersection(enrollmentStates, includedEnrollmentStates).length > 0
+      : false
+  }
+}
+
 export const filterAssignmentsBySubmissionsFn = (
   appliedFilters: Filter[],
   submissionStateMap: SubmissionStateMap,
+  searchFilteredStudentIds: string[],
   customStatuses: GradeStatus[]
 ) => {
   const {filtersNeedingSome, filtersNeedingEvery} = categorizeFilters(
@@ -722,7 +798,13 @@ export const filterAssignmentsBySubmissionsFn = (
       return true
     }
 
-    const submissions = submissionStateMap.getSubmissionsByAssignment(assignment.id)
+    let submissions = submissionStateMap.getSubmissionsByAssignment(assignment.id)
+
+    if (searchFilteredStudentIds.length > 0) {
+      submissions = submissions.filter(submission =>
+        searchFilteredStudentIds.includes(submission.user_id)
+      )
+    }
 
     const result = filterSubmissionsByCategorizedFilters(
       filtersNeedingSome,
@@ -732,4 +814,29 @@ export const filterAssignmentsBySubmissionsFn = (
     )
     return result
   }
+}
+export function formatGradingPeriodTitleForDisplay(
+  gradingPeriod: GradingPeriod | undefined | null
+) {
+  if (!gradingPeriod) return null
+
+  let title = gradingPeriod.title
+
+  if (ENV.GRADEBOOK_OPTIONS?.grading_periods_filter_dates_enabled) {
+    const formatter = Intl.DateTimeFormat(I18n.currentLocale(), {
+      year: '2-digit',
+      month: 'numeric',
+      day: 'numeric',
+      timezone: ENV.TIMEZONE,
+    })
+
+    title = I18n.t('%{title}: %{start} - %{end} | %{closed}', {
+      title: gradingPeriod.title,
+      start: formatter.format(gradingPeriod.startDate),
+      end: formatter.format(gradingPeriod.endDate),
+      closed: formatter.format(gradingPeriod.closeDate),
+    })
+  }
+
+  return title
 }

@@ -27,28 +27,37 @@ module BroadcastPolicies
     end
 
     def should_dispatch_assignment_due_date_changed?
+      return false if assignment.checkpoints_parent?
+
       accepting_messages? &&
         assignment.changed_in_state(:published, fields: :due_at) &&
         !just_published? &&
-        !AssignmentPolicy.due_dates_equal?(assignment.due_at, assignment.due_at_before_last_save)
+        !AssignmentPolicy.due_dates_equal?(assignment.due_at, assignment.due_at_before_last_save) &&
+        !checkpoint_reply_to_entry?
     end
 
     def should_dispatch_assignment_changed?
+      return false if assignment.checkpoints_parent?
+
       accepting_messages? &&
         assignment.published? &&
         !assignment.muted? &&
         !just_published? &&
-        (assignment.saved_change_to_points_possible? || assignment.assignment_changed)
+        (assignment.saved_change_to_points_possible? || assignment.assignment_changed) &&
+        !checkpoint_reply_to_entry?
     end
 
     def should_dispatch_assignment_created?
+      return false if assignment.checkpoints_parent?
       return false unless context_sendable?
 
-      published_on_create? || just_published?
+      (published_on_create? || just_published?) && !checkpoint_reply_to_entry?
     end
 
     def should_dispatch_submissions_posted?
-      context_sendable? && assignment.posting_params_for_notifications.present?
+      return false if assignment.checkpoints_parent?
+
+      context_sendable? && assignment.posting_params_for_notifications.present? && !checkpoint_reply_to_entry?
     end
 
     private
@@ -73,6 +82,12 @@ module BroadcastPolicies
 
     def just_published?
       assignment.saved_change_to_workflow_state? && assignment.published?
+    end
+
+    def checkpoint_reply_to_entry?
+      return true if assignment.checkpoint? && assignment.sub_assignment_tag == CheckpointLabels::REPLY_TO_ENTRY
+
+      false
     end
   end
 end

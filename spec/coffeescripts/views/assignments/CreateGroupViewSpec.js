@@ -23,9 +23,10 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import Course from '@canvas/courses/backbone/models/Course'
 import CreateGroupView from 'ui/features/assignment_index/backbone/views/CreateGroupView'
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 
 const group = (opts = {}) =>
   new AssignmentGroup({
@@ -55,6 +56,7 @@ QUnit.module('CreateGroupView', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('should be accessible', assert => {
   const view = createView()
   const done = assert.async()

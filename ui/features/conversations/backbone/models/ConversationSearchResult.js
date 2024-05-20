@@ -17,8 +17,8 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import _ from 'underscore'
 import {Model} from '@canvas/backbone'
+import {extend as lodashExtend} from 'lodash'
 
 extend(ConversationSearchResult, Model)
 
@@ -27,7 +27,7 @@ function ConversationSearchResult() {
 }
 
 ConversationSearchResult.prototype.parse = function (data) {
-  return _.extend(data, {
+  return lodashExtend(data, {
     isContext: data.type === 'context',
   })
 }

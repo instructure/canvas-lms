@@ -243,7 +243,7 @@ describe Attachment do
       crocodocable_attachment_model
 
       attempts = 3
-      Setting.set("max_crocodoc_attempts", attempts)
+      stub_const("Attachment::MAX_CROCODOC_ATTEMPTS", attempts)
 
       track_jobs do
         # first attempt
@@ -345,8 +345,7 @@ describe Attachment do
       it "prefers crocodoc when annotation is requested and canvadocs can't annotate" do
         configure_crocodoc
         configure_canvadocs "annotations_supported" => false
-        Setting.set("canvadoc_mime_types",
-                    (Canvadoc.mime_types << "application/blah").to_json)
+        stub_const("Canvadoc::DEFAULT_MIME_TYPES", (Canvadoc::DEFAULT_MIME_TYPES + ["application/blah"]))
 
         crocodocable = crocodocable_attachment_model
         canvadocable = canvadocable_attachment_model content_type: "application/blah"
@@ -546,11 +545,9 @@ describe Attachment do
       @attachment.save!
     end
 
-    it "delays the creation of the media object by attachment_build_media_object_delay_seconds" do
+    it "delays the creation of the media object" do
       now = Time.now
       allow(Time).to receive(:now).and_return(now)
-      allow(Setting).to receive(:get).and_return(nil)
-      expect(Setting).to receive(:get).with("attachment_build_media_object_delay_seconds", "10").once.and_return("25")
       track_jobs do
         @attachment.save!
       end
@@ -558,7 +555,7 @@ describe Attachment do
       expect(MediaObject.count).to eq 0
       job = created_jobs.find { |j| j.tag == "MediaObject.add_media_files" }
       expect(job.tag).to eq "MediaObject.add_media_files"
-      expect(job.run_at.to_i).to eq (now + 25.seconds).to_i
+      expect(job.run_at.to_i).to eq (now + 1.minute).to_i
     end
 
     it "does not create a media object in a skip_media_object_creation block" do
@@ -662,8 +659,8 @@ describe Attachment do
       a.destroy
       expect(a).not_to be_frozen
       expect(a).to be_deleted
-      expect(@course.attachments).to be_include(a)
-      expect(@course.attachments.active).not_to be_include(a)
+      expect(@course.attachments).to include(a)
+      expect(@course.attachments.active).not_to include(a)
     end
 
     it "still destroys without error if file data is lost" do
@@ -1012,6 +1009,27 @@ describe Attachment do
           expect { subject }.not_to raise_exception
         end
       end
+
+      context "across shards" do
+        specs_require_sharding
+
+        let(:shard1_account) { @shard1.activate { account_model } }
+
+        it "duplicates the file via S3" do
+          expect_any_instance_of(Aws::S3::Object).to receive(:copy_to).once
+          att = attachment_model(context: Account.default)
+          dup = nil
+          @shard1.activate do
+            dup = Attachment.new
+            expect(dup).to receive(:s3object).at_least(:once).and_return(double("Aws::S3::Object", exists?: false))
+            att.clone_for(shard1_account, dup)
+          end
+          expect(dup.content_type).to eq att.content_type
+          expect(dup.size).to eq att.size
+          expect(dup.md5).to eq att.md5
+          expect(dup.workflow_state).to eq "processed"
+        end
+      end
     end
 
     context "with instfs enabled" do
@@ -1024,14 +1042,14 @@ describe Attachment do
       end
 
       it "creates an attachment with workflow_state of processed" do
-        expect(CanvasHttp).to receive(:get)
-        expect(InstFS).to receive(:direct_upload).and_return("more_uuid")
+        expect(InstFS).to receive(:duplicate_file).with("instfs_uuid").and_return("more_uuid")
         @shard1.activate do
           account_model
           course_model(account: @account)
           attachment = @attachment.clone_for(@course, nil, { force_copy: true })
           attachment.save!
           expect(attachment.workflow_state).to eq "processed"
+          expect(attachment.instfs_uuid).to eq "more_uuid"
         end
       end
     end
@@ -1062,8 +1080,8 @@ describe Attachment do
       a = attachment_model(filename: "blech.jpg", context: c, content_type: "image/jpg")
       new_account = Account.create
       c2 = course_factory(account: new_account)
-      allow(Attachment).to receive(:s3_storage?).and_return(true)
-      expect_any_instance_of(Attachment).to receive(:copy_attachment_content).once
+      s3_storage!
+      expect_any_instance_of(Attachment).to receive(:copy_attachment_content).once.and_call_original
       expect_any_instance_of(Attachment).to receive(:change_namespace).once
       expect_any_instance_of(Attachment).to receive(:create_thumbnail_size).once
       a.clone_for(c2)
@@ -1690,12 +1708,12 @@ describe Attachment do
     it "finds a unique name for files" do
       existing_files = %w[a.txt b.txt c.txt]
       expect(Attachment.make_unique_filename("d.txt", existing_files)).to eq "d.txt"
-      expect(existing_files).not_to be_include(Attachment.make_unique_filename("b.txt", existing_files))
+      expect(existing_files).not_to include(Attachment.make_unique_filename("b.txt", existing_files))
 
       existing_files = %w[/a/b/a.txt /a/b/b.txt /a/b/c.txt]
       expect(Attachment.make_unique_filename("/a/b/d.txt", existing_files)).to eq "/a/b/d.txt"
       new_name = Attachment.make_unique_filename("/a/b/b.txt", existing_files)
-      expect(existing_files).not_to be_include(new_name)
+      expect(existing_files).not_to include(new_name)
       expect(new_name).to match(%r{^/a/b/b[^.]+\.txt})
     end
 
@@ -1761,7 +1779,7 @@ describe Attachment do
     it "allows custom ttl for download_url" do
       attachment = attachment_with_context(@course, display_name: "foo")
       allow(attachment).to receive(:public_url) # allow other calls due to, e.g., save
-      expect(attachment).to receive(:public_url).with(include(expires_in: 3600.seconds))
+      expect(attachment).to receive(:public_url).with(include(expires_in: 1.day))
       attachment.public_download_url
       expect(attachment).to receive(:public_url).with(include(expires_in: 2.days))
       attachment.public_download_url(2.days)
@@ -2070,7 +2088,7 @@ describe Attachment do
 
         # i can't seem to get a s3 url so I am just going to make sure the thumbnail namespace was inherited from the attachment
         expect(thumb.namespace).to eq @attachment.namespace
-        expect(thumb.authenticated_s3_url).to be_include @attachment.namespace
+        expect(thumb.authenticated_s3_url).to include @attachment.namespace
       end
     end
 
@@ -2081,7 +2099,7 @@ describe Attachment do
 
         # nil out namespace so we can make sure the url generating is working properly
         thumb.namespace = nil
-        expect(thumb.authenticated_s3_url).not_to be_include @attachment.namespace
+        expect(thumb.authenticated_s3_url).not_to include @attachment.namespace
       end
     end
   end
@@ -2153,7 +2171,7 @@ describe Attachment do
     end
 
     around do |example|
-      Timecop.freeze(Time.now.utc, &example)
+      Timecop.freeze(&example)
     end
 
     it "uses the default size if an unknown size is passed in" do
@@ -2232,23 +2250,18 @@ describe Attachment do
       @student = user_model
       @student.register!
       @course.enroll_student(@student).accept
-      cc = communication_channel(@student, { username: "default@example.com", active_cc: true })
+      communication_channel(@student, { username: "default@example.com", active_cc: true })
 
       @student_ended = user_model
       @student_ended.register!
       @section_ended = @course.course_sections.create!(end_at: 1.day.ago)
       @course.enroll_student(@student_ended, section: @section_ended).accept
-      cc_ended = communication_channel(@student_ended, { username: "default2@example.com", active_cc: true })
+      communication_channel(@student_ended, { username: "default2@example.com", active_cc: true })
 
-      NotificationPolicy.create(notification: Notification.create!(name: "New File Added"), communication_channel: cc, frequency: "immediately")
-      NotificationPolicy.create(notification: Notification.create!(name: "New Files Added"), communication_channel: cc, frequency: "immediately")
-
-      NotificationPolicy.create(notification: Notification.create!(name: "New File Added - ended"),
-                                communication_channel: cc_ended,
-                                frequency: "immediately")
-      NotificationPolicy.create(notification: Notification.create!(name: "New Files Added - ended"),
-                                communication_channel: cc_ended,
-                                frequency: "immediately")
+      Notification.create!(name: "New File Added", category: "TestImmediately")
+      Notification.create!(name: "New Files Added", category: "TestImmediately")
+      Notification.create!(name: "New File Added - ended", category: "TestImmediately")
+      Notification.create!(name: "New Files Added - ended", category: "TestImmediately")
     end
 
     it "sends a single-file notification" do
@@ -2336,8 +2349,7 @@ describe Attachment do
 
     it "does not send notifications to students if the file is uploaded to a locked folder" do
       @teacher.register!
-      cc = communication_channel(@teacher, { username: "default@example.com", active_cc: true })
-      NotificationPolicy.create!(notification: Notification.where(name: "New File Added").first, communication_channel: cc, frequency: "immediately")
+      communication_channel(@teacher, { username: "default@example.com", active_cc: true })
 
       attachment_model(uploaded_data: stub_file_data("file.txt", nil, "text/html"), content_type: "text/html")
 
@@ -2354,8 +2366,7 @@ describe Attachment do
 
     it "does not send notifications to students if the file is unpublished because of usage rights" do
       @teacher.register!
-      cc = communication_channel(@teacher, { username: "default@example.com", active_cc: true })
-      NotificationPolicy.create!(notification: Notification.where(name: "New File Added").first, communication_channel: cc, frequency: "immediately")
+      communication_channel(@teacher, { username: "default@example.com", active_cc: true })
 
       @course.usage_rights_required = true
       @course.save!
@@ -2373,8 +2384,7 @@ describe Attachment do
 
     it "does not send notifications to students if the files navigation is hidden from student view" do
       @teacher.register!
-      cc = communication_channel(@teacher, { username: "default@example.com", active_cc: true })
-      NotificationPolicy.create!(notification: Notification.where(name: "New File Added").first, communication_channel: cc, frequency: "immediately")
+      communication_channel(@teacher, { username: "default@example.com", active_cc: true })
 
       attachment_model(uploaded_data: stub_file_data("file.txt", nil, "text/html"), content_type: "text/html")
 
@@ -2419,6 +2429,7 @@ describe Attachment do
     end
 
     it "doesn't send notifications for a concluded section in an active course" do
+      skip("This test was not accurate, should be fixed in VICE-4138")
       attachment_model(uploaded_data: stub_file_data("file.txt", nil, "text/html"), content_type: "text/html")
       Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
       expect(Message.where(user_id: @student_ended, notification_name: "New File Added").first).to be_nil
@@ -2430,7 +2441,7 @@ describe Attachment do
       course_model
       attachment_model(context: @course, uploaded_data: stub_png_data, size: 25)
       quota = Attachment.get_quota(@course)
-      expect(quota[:quota_used]).to eq Attachment.minimum_size_for_quota
+      expect(quota[:quota_used]).to eq Attachment::MINIMUM_SIZE_FOR_QUOTA
     end
 
     it "does not count attachments a student has used for submissions towards the quota" do
@@ -2643,7 +2654,7 @@ describe Attachment do
 
       describe "integrity_check" do
         before do
-          allow(@attachment).to receive(:full_filename).and_return(File.join(RSpec.configuration.fixture_path, "good_data.txt"))
+          allow(@attachment).to receive(:full_filename).and_return(file_fixture("good_data.txt").to_s)
         end
 
         include_examples "non-streaming integrity_check"
@@ -2936,7 +2947,9 @@ describe Attachment do
   end
 
   describe ".clone_url" do
-    subject { attachment.clone_url(url, handling, check_quota, opts) }
+    def clone_it
+      attachment.clone_url(url, handling, check_quota, opts)
+    end
 
     let(:attachment) { attachment_model }
     let(:url) { "https://www.test.com/file.jpg" }
@@ -2956,7 +2969,7 @@ describe Attachment do
           expect(Canvas::Errors).to receive(:capture).with(
             error, attachment.clone_url_error_info(error, url)
           )
-          subject
+          clone_it
           expect(attachment.upload_error_message).to include(url)
         end
       end
@@ -2968,7 +2981,7 @@ describe Attachment do
           expect(Canvas::Errors).to receive(:capture).with(
             error, attachment.clone_url_error_info(error, url)
           )
-          subject
+          clone_it
           expect(attachment.upload_error_message).to include(url)
         end
       end

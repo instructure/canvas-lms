@@ -15,9 +15,10 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import {encodeQueryString} from '@canvas/query-string-encoding'
 import $ from 'jquery'
-import _ from 'underscore'
 import 'jquery.cookie'
+import {clone, throttle} from 'lodash'
 
 // A class to setup kaltura analytics listeners on a mediaElement player
 // for a specific video being played
@@ -45,13 +46,13 @@ class KalturaAnalytics {
 
   // Builds the url to send the analytic event and adds it to the processing queue
   queueAnalyticEvent = eventId => {
-    const data = _.clone(this.defaultData)
+    const data = clone(this.defaultData)
     data['event:eventType'] = eventId
     data['event:duration'] = this.mediaElement.duration
     data['event:currentPoint'] = parseInt(this.mediaElement.currentTime * 1000, 10)
     data['event:eventTimestamp'] = new Date().getTime()
 
-    return this.queueApiCall(this.apiUrl + $.param(data))
+    return this.queueApiCall(this.apiUrl + encodeQueryString(data))
   }
 
   // kaltura expects a persistent analytic session token for the user
@@ -101,7 +102,7 @@ class KalturaAnalytics {
             return (iframe_.src = url)
           }
         })(iframe, queue)
-      this.iframes[i] = {iframe, queue, pinger: _.throttle(f, 4000)}
+      this.iframes[i] = {iframe, queue, pinger: throttle(f, 4000)}
     }
     return this.iframes
   }

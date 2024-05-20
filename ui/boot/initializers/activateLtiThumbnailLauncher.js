@@ -27,7 +27,7 @@ function handleLaunch(event) {
 
 class LtiThumbnailLauncher {
   constructor() {
-    $(document.body).delegate(selector, 'click', handleLaunch)
+    $(document.body).on('click', selector, handleLaunch)
   }
 
   launch(element) {

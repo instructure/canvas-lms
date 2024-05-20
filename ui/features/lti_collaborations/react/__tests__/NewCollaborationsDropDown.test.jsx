@@ -23,29 +23,29 @@ import NewCollaborationsDropDown from '../NewCollaborationsDropDown'
 describe('NewCollaborationsDropDown', () => {
   const ltiCollaborators = [
     {
-      'id': '1',
-      'collaboration': {
-        'enabled': true,
-        'text': "expected title from 'text' field",
-        'icon_url': 'https://static.thenounproject.com/png/131630-200.png',
-        'placement': 'collaboration',
-        'message_type': 'LtiDeepLinkingRequest',
-        'target_link_uri': 'http://lti13testtool.docker/launch?placement=collaboration',
-        'canvas_icon_class': 'icon-lti',
-        'label': "expected title from 'text' field",
+      id: '1',
+      collaboration: {
+        enabled: true,
+        text: "expected title from 'text' field",
+        icon_url: 'https://static.thenounproject.com/png/131630-200.png',
+        placement: 'collaboration',
+        message_type: 'LtiDeepLinkingRequest',
+        target_link_uri: 'http://lti13testtool.docker/launch?placement=collaboration',
+        canvas_icon_class: 'icon-lti',
+        label: "expected title from 'text' field",
       },
     },
     {
-      'id': '2',
-      'collaboration': {
-        'enabled': true,
-        'text': "expected title from 'text' field 2",
-        'icon_url': 'https://static.thenounproject.com/png/131630-200.png',
-        'placement': 'collaboration',
-        'message_type': 'LtiDeepLinkingRequest',
-        'target_link_uri': 'http://lti13testtool.docker/launch?placement=collaboration',
-        'canvas_icon_class': 'icon-lti',
-        'label': "expected title from 'text' field 2",
+      id: '2',
+      collaboration: {
+        enabled: true,
+        text: "expected title from 'text' field 2",
+        icon_url: 'https://static.thenounproject.com/png/131630-200.png',
+        placement: 'collaboration',
+        message_type: 'LtiDeepLinkingRequest',
+        target_link_uri: 'http://lti13testtool.docker/launch?placement=collaboration',
+        canvas_icon_class: 'icon-lti',
+        label: "expected title from 'text' field 2",
       },
     },
   ]

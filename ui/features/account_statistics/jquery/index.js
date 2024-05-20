@@ -32,6 +32,8 @@ function populateDialog(data_points, axis, $link) {
     close: () => {
       $link.focus()
     },
+    modal: true,
+    zIndex: 1000,
   })
 
   // google dependencies declared in views/acccounts/statistics since google.load uses document.write :(

@@ -22,15 +22,16 @@ import Backbone from '@canvas/backbone'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import DueDateOverride from '@canvas/assignments/jst/DueDateOverride.handlebars'
-import DateValidator from '@canvas/datetime/DateValidator'
+import DateValidator from '@canvas/grading/DateValidator'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DueDates from '../../react/DueDates'
 import CoursePacingNotice from '../../react/CoursePacingNotice'
 import StudentGroupStore from '../../react/StudentGroupStore'
+import DifferentiatedModulesSection from '../../react/DifferentiatedModulesSection'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
-import tz from '@canvas/timezone'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import * as tz from '@canvas/datetime'
+import '@canvas/jquery/jquery.instructure_forms'
 
 const I18n = useI18nScope('DueDateOverrideView')
 
@@ -69,28 +70,47 @@ DueDateOverrideView.prototype.render = function () {
   if (!div) {
     return
   }
-  const DueDatesElement =
-    this.options && this.options.inPacedCourse && this.options.isModuleItem
-      ? React.createElement(CoursePacingNotice, {
-          courseId: this.options.courseId,
-        })
-      : React.createElement(DueDates, {
-          overrides: this.model.overrides.models,
-          syncWithBackbone: this.setNewOverridesCollection,
-          sections: this.model.sections.models,
-          defaultSectionId: this.model.defaultDueDateSectionId,
-          selectedGroupSetId: this.model.assignment.get('group_category_id'),
-          gradingPeriods: this.gradingPeriods,
-          hasGradingPeriods: this.hasGradingPeriods,
-          isOnlyVisibleToOverrides: this.model.assignment.isOnlyVisibleToOverrides(),
-          dueAt: tz.parse(this.model.assignment.get('due_at')),
-          dueDatesReadonly: this.options.dueDatesReadonly,
-          availabilityDatesReadonly: this.options.availabilityDatesReadonly,
-          importantDates: this.model.assignment.get('important_dates'),
-          defaultDueTime: ENV.DEFAULT_DUE_TIME,
-        })
+  if (this.options && this.options.inPacedCourse && this.options.isModuleItem) {
+    return ReactDOM.render(
+      React.createElement(CoursePacingNotice, {
+        courseId: this.options.courseId,
+      }),
+      div
+    )
+  }
+
+  const assignToSection = ENV.FEATURES?.differentiated_modules
+    ? React.createElement(DifferentiatedModulesSection, {
+        onSync: this.setNewOverridesCollection,
+        defaultSectionId: this.model.defaultDueDateSectionId,
+        overrides: this.model.overrides.models.map(model => model.toJSON().assignment_override),
+        assignmentId: this.model.assignment.get('id'),
+        assignmentName: this.model.assignment.get('name') || this.model.assignment.get('title'),
+        isOnlyVisibleToOverrides: this.model.assignment.isOnlyVisibleToOverrides(),
+        pointsPossible: this.model.assignment.get('points_possible'),
+        type: this.model.assignment.objectType().toLowerCase(),
+        importantDates: this.model.assignment.get('important_dates'),
+        onTrayOpen: () => this.trigger('tray:open'),
+        onTrayClose: () => this.trigger('tray:close'),
+      })
+    : React.createElement(DueDates, {
+        overrides: this.model.overrides.models,
+        syncWithBackbone: this.setNewOverridesCollection,
+        sections: this.model.sections.models,
+        defaultSectionId: this.model.defaultDueDateSectionId,
+        selectedGroupSetId: this.model.assignment.get('group_category_id'),
+        gradingPeriods: this.gradingPeriods,
+        hasGradingPeriods: this.hasGradingPeriods,
+        isOnlyVisibleToOverrides: this.model.assignment.isOnlyVisibleToOverrides(),
+        dueAt: tz.parse(this.model.assignment.get('due_at')),
+        dueDatesReadonly: this.options.dueDatesReadonly,
+        availabilityDatesReadonly: this.options.availabilityDatesReadonly,
+        importantDates: this.model.assignment.get('important_dates'),
+        defaultDueTime: ENV.DEFAULT_DUE_TIME,
+      })
+
   // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(DueDatesElement, div)
+  return ReactDOM.render(assignToSection, div)
 }
 
 DueDateOverrideView.prototype.gradingPeriods = GradingPeriodsAPI.deserializePeriods(
@@ -146,7 +166,7 @@ DueDateOverrideView.prototype.validateDatetimes = function (data, errors) {
     date_range: {...ENV.VALID_DATE_RANGE},
     hasGradingPeriods: this.hasGradingPeriods,
     gradingPeriods: this.gradingPeriods,
-    userIsAdmin: (ENV.current_user_roles || []).includes('admin'),
+    userIsAdmin: ENV.current_user_is_admin,
     postToSIS: this.postToSIS(data),
   })
   // Don't validate duplicates
@@ -268,9 +288,11 @@ DueDateOverrideView.prototype.showError = function (element, message) {
 // ==============================
 
 DueDateOverrideView.prototype.setNewOverridesCollection = function (newOverrides, importantDates) {
-  this.model.overrides.reset(newOverrides)
-  const onlyVisibleToOverrides = !this.model.overrides.containsDefaultDueDate()
-  this.model.assignment.isOnlyVisibleToOverrides(onlyVisibleToOverrides)
+  if (newOverrides !== undefined) {
+    this.model.overrides.reset(newOverrides)
+    const onlyVisibleToOverrides = !this.model.overrides.containsDefaultDueDate()
+    this.model.assignment.isOnlyVisibleToOverrides(onlyVisibleToOverrides)
+  }
   return this.model.assignment.importantDates(importantDates)
 }
 

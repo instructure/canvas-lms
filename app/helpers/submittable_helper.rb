@@ -28,7 +28,7 @@ module SubmittableHelper
       respond_to do |format|
         flash[:error] = t "You do not have access to the requested resource."
         name = submittable.class.name.underscore.pluralize
-        format.html { redirect_to named_context_url(@context, "context_#{name}_url".to_sym) }
+        format.html { redirect_to named_context_url(@context, :"context_#{name}_url") }
       end
       return false
     end
@@ -44,7 +44,7 @@ module SubmittableHelper
           assignment = submittable.assignment
           submittable.assignment = nil
           submittable.save!
-          assignment.send("#{submittable.class.name.underscore}=", nil)
+          assignment.send(:"#{submittable.class.name.underscore}=", nil)
           assignment.destroy
         end
 

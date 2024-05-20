@@ -19,7 +19,7 @@
 #
 class PostPolicy < ActiveRecord::Base
   belongs_to :course, optional: false, inverse_of: :post_policies
-  belongs_to :assignment, optional: true, touch: true, inverse_of: :post_policy
+  belongs_to :assignment, optional: true, touch: true, inverse_of: :post_policy, class_name: "AbstractAssignment"
 
   validates :post_manually, inclusion: [true, false]
 

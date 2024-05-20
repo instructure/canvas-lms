@@ -18,6 +18,7 @@
  */
 
 import React from 'react'
+import {type PartialStudent} from '@canvas/grading/grading'
 import {bool, func, shape, string} from 'prop-types'
 import {IconMoreSolid} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
@@ -29,6 +30,8 @@ import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import ColumnHeader from './ColumnHeader'
+import {showMessageStudentsWithObserversModal} from '../../../shared/MessageStudentsWithObserversModal'
+import {MSWLaunchContext} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
 const I18n = useI18nScope('gradebook')
 
@@ -89,6 +92,12 @@ type Props = {
   position: any
   sortBySetting: any
   viewUngradedAsZero: any
+  allStudents: PartialStudent[]
+  courseId: string
+  messageAttachmentUploadFolderId: string
+  userId: string
+  showMessageStudentsWithObserversDialog: boolean
+  onSendMessageStudentsWho: (args: {recipientsIds: string[]; subject: string; body: string}) => void
 }
 
 type State = {
@@ -124,6 +133,7 @@ export default class TotalGradeColumnHeader extends ColumnHeader<Props, State> {
     onApplyScoreToUngraded: func,
     onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
     grabFocus: bool,
+    pointsBasedGradingScheme: bool.isRequired,
     viewUngradedAsZero: bool.isRequired,
     isRunningScoreToUngraded: bool,
     ...ColumnHeader.propTypes,
@@ -149,12 +159,42 @@ export default class TotalGradeColumnHeader extends ColumnHeader<Props, State> {
     }
   }
 
+  handleSendMessageStudentsWho = (args: {
+    recipientsIds: string[]
+    subject: string
+    body: string
+  }): void => {
+    this.props.onSendMessageStudentsWho(args)
+  }
+
+  showMessageStudentsWhoDialog(students, courseId) {
+    // @ts-expect-error
+    this.state.skipFocusOnClose = true
+    this.setState({skipFocusOnClose: true})
+
+    const props = {
+      assignment: null,
+      launchContext: MSWLaunchContext.TOTAL_COURSE_GRADE_CONTEXT,
+      students: students.filter(student => !student.isInactive && !student.isTestStudent),
+      courseId,
+      onClose: () => {},
+      onSend: this.handleSendMessageStudentsWho,
+      messageAttachmentUploadFolderId: this.props.messageAttachmentUploadFolderId,
+      userId: this.props.userId,
+      pointsBasedGradingScheme: this.props.pointsBasedGradingScheme,
+    }
+
+    showMessageStudentsWithObserversModal(props, this.focusAtEnd)
+  }
+
   render() {
     const {sortBySetting, gradeDisplay, position, viewUngradedAsZero} = this.props
     const selectedSortSetting = sortBySetting.isSortColumn && sortBySetting.settingKey
     const displayAsPoints = gradeDisplay.currentDisplay === 'points'
     const showSeparator = !gradeDisplay.hidden
     const menuShown = this.state.menuShown
+    const allStudents = this.props.allStudents
+    const courseId = this.props.courseId
     const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`
 
     return (
@@ -243,6 +283,16 @@ export default class TotalGradeColumnHeader extends ColumnHeader<Props, State> {
                       <MenuItem onSelect={position.onMoveToBack}>
                         <span data-menu-item-id="total-grade-move-to-back">
                           {I18n.t('Move to End')}
+                        </span>
+                      </MenuItem>
+                    )}
+
+                    {this.props.showMessageStudentsWithObserversDialog && (
+                      <MenuItem
+                        onSelect={() => this.showMessageStudentsWhoDialog(allStudents, courseId)}
+                      >
+                        <span data-menu-item-id="total-message-students-who">
+                          {I18n.t('Message Students Who')}
                         </span>
                       </MenuItem>
                     )}

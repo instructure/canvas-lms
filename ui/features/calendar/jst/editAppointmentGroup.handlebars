@@ -13,10 +13,14 @@
       <button class="btn ag_contexts_selector"></button>
       <div class="ag-menu-container"></div>
     </div>
-    <p>
+    <div>
       {{checkbox "use_group_signup" id="group-signup-checkbox" uniqid=true class="group-signup-checkbox"}}
-      <label for="group-signup-checkbox-{{uniqid}}">{{#t "group_signup"}}Have students sign up in groups.{{/t}}</label>
-    </p>
+      <label for="group-signup-checkbox-{{uniqid}}">{{#t}}Have students sign up in groups{{/t}}</label>
+    </div>
+    <div id="observer-signup-option">
+      {{checkbox "allow_observer_signup" id="observer-signup-checkbox" uniqid=true}}
+      <label for="observer-signup-checkbox-{{uniqid}}">{{#t}}Allow observers to sign-up{{/t}}</label>
+    </div>
     <div class="group-signup" style="display: none">
       <label for="edit-appointment-group-cat-{{uniqid}}"><b>{{#t "group_category"}}Group Category{{/t}}</b></label><br />
       <div class="group_select">

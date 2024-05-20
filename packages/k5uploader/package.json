@@ -1,12 +1,12 @@
 {
   "name": "@instructure/k5uploader",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "html 5 kaltura uploader",
-  "main": "lib/k5uploader.js",
-  "module": "es/k5uploader.js",
+  "main": "src/k5uploader.js",
+  "module": "src/k5uploader.js",
   "scripts": {
-    "test": "echo \"if we want tests, we should go to https://github.com/knomedia/k5uploader/blob/master/package.json#L7 and copy/paste back in the testem stuff\"",
-    "build:canvas": "babel -d es src & babel --config-file=./babel.config.cjs.js -d lib src"
+    "test": "vitest run --color",
+    "testem": "echo \"if we want tests, we should go to https://github.com/knomedia/k5uploader/blob/master/package.json#L7 and copy/paste back in the testem stuff\""
   },
   "repository": {
     "type": "git",
@@ -17,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/instructure/canvas-lms/issues"
   },
-  "homepage": "https://github.com/instructure/canvas-lms#readme"
+  "homepage": "https://github.com/instructure/canvas-lms#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "vitest": "^1.2.1"
+  }
 }

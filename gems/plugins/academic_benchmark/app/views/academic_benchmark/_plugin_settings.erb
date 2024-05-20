@@ -1,4 +1,4 @@
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
@@ -8,13 +8,13 @@
     <tr>
       <td><%= f.blabel :partner_id, :en => "Partner ID" %></td>
       <td>
-        <%= f.text_field :partner_id, :size => "90" %>
+        <%= f.text_field :partner_id, :size => "90", value: settings[:partner_id] %>
       </td>
     </tr>
     <tr>
       <td><%= f.blabel :partner_key, :en => "Partner Key" %></td>
       <td>
-        <%= f.text_field :partner_key %>
+        <%= f.text_field :partner_key, value: settings[:partner_key] %>
       </td>
     </tr>
   </table>

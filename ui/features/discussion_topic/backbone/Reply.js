@@ -16,16 +16,16 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
+import {extend} from 'lodash'
 import Entry from './models/Entry'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import replyAttachmentTemplate from '../jst/_reply_attachment.handlebars'
 import preventDefault from '@canvas/util/preventDefault'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
-import {send} from '@canvas/rce/RceCommandShim'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import {send} from '@canvas/rce-command-shim'
+import '@canvas/jquery/jquery.instructure_forms'
 
 const stripTags = str => {
   const div = document.createElement('div')
@@ -70,7 +70,7 @@ class Reply {
       // todo: replace .andSelf with .addBack when JQuery is upgraded.
       return $(e.currentTarget).siblings('a').andSelf().toggle()
     })
-    this.form.delegate('.alert .close', 'click', preventDefault(this.hideNotification))
+    this.form.on('click', '.alert .close', preventDefault(this.hideNotification))
     this.form.on('change', 'ul.discussion-reply-attachments input[type=file]', e => {
       this.form.find('ul.discussion-reply-attachments input[type=file]').focus()
       if (e.target.files.length > 0) {
@@ -262,6 +262,6 @@ class Reply {
   }
 }
 
-_.extend(Reply.prototype, Backbone.Events)
+extend(Reply.prototype, Backbone.Events)
 
 export default Reply

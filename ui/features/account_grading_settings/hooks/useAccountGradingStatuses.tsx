@@ -26,12 +26,12 @@ import {
   UPSERT_STANDARD_GRADING_STATUS_MUTATION,
 } from '../graphql/mutations/GradingStatusMutations'
 import {ACCOUNT_GRADING_STATUS_QUERY} from '../graphql/queries/GradingStatusQueries'
-import {
+import type {
   CustomGradingStatusDeleteResponse,
   CustomGradingStatusUpsertResponse,
   StandardGradingStatusUpsertResponse,
 } from '../types/accountStatusMutations'
-import {AccountGradingStatusQueryResults} from '../types/accountStatusQueries'
+import type {AccountGradingStatusQueryResults} from '../types/accountStatusQueries'
 import {
   mapCustomStatusQueryResults,
   mapStandardStatusQueryResults,

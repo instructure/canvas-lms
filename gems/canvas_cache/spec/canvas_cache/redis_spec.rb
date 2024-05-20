@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "redis/cluster"
 require "spec_helper"
 require "timecop"
 
@@ -113,7 +114,7 @@ describe CanvasCache::Redis do
         let(:cache) { ActiveSupport::Cache::RedisCacheStore.new(url: "redis://localhost:1234", circuit_breaker: { error_threshold: 1, error_timeout: 2 }) }
 
         before do
-          expect(RedisClient::RubyConnection).to receive(:new).and_raise(RedisClient::TimeoutError)
+          allow(RedisClient::RubyConnection).to receive(:new).and_raise(RedisClient::TimeoutError)
         end
 
         it "does not fail cache.read" do
@@ -200,41 +201,38 @@ describe CanvasCache::Redis do
         end
 
         it "logs the cache fetch block generation time" do
-          Timecop.safe_mode = false
-          Timecop.freeze
-          log_lines = capture_log_messages do
-            # make sure this works with fetching nested fetches
-            cache.fetch(key, force: true) do
-              val = +"a1"
-              val << cache.fetch(key2, force: true) do
-                Timecop.travel(Time.now.utc + 1.second)
+          Timecop.freeze do
+            log_lines = capture_log_messages do
+              # make sure this works with fetching nested fetches
+              cache.fetch(key, force: true) do
+                val = +"a1"
+                val << cache.fetch(key2, force: true) do
+                  Timecop.travel(Time.now.utc + 1.second)
+                  # Cheat to cover the missing ActiveSupport::Notifications.subscription in config/inititalizers/cache_store.rb
+                  # TODO: remove this hack when initializer is ported to gem and incorporated
+                  Thread.current[:last_cache_generate] = 1
+                  "b1"
+                end
+                Timecop.travel(Time.now.utc + 2.seconds)
                 # Cheat to cover the missing ActiveSupport::Notifications.subscription in config/inititalizers/cache_store.rb
                 # TODO: remove this hack when initializer is ported to gem and incorporated
-                Thread.current[:last_cache_generate] = 1
-                "b1"
+                Thread.current[:last_cache_generate] = 3
+                val << "a2"
               end
-              Timecop.travel(Time.now.utc + 2.seconds)
-              # Cheat to cover the missing ActiveSupport::Notifications.subscription in config/inititalizers/cache_store.rb
-              # TODO: remove this hack when initializer is ported to gem and incorporated
-              Thread.current[:last_cache_generate] = 3
-              val << "a2"
             end
-          end
-          outer_message = JSON.parse(log_lines.pop)
-          expect(outer_message["command"]).to eq("set")
-          expect(outer_message["key"]).to end_with(key)
-          expect(outer_message["request_time_ms"]).to be_a(Float)
-          # 3000 (3s) == 2s outer fetch + 1s inner fetch
-          expect(outer_message["generate_time_ms"]).to be_within(500).of(3000)
+            outer_message = JSON.parse(log_lines.pop)
+            expect(outer_message["command"]).to eq("set")
+            expect(outer_message["key"]).to end_with(key)
+            expect(outer_message["request_time_ms"]).to be_a(Float)
+            # 3000 (3s) == 2s outer fetch + 1s inner fetch
+            expect(outer_message["generate_time_ms"]).to be_within(500).of(3000)
 
-          inner_message = JSON.parse(log_lines.pop)
-          expect(inner_message["command"]).to eq("set")
-          expect(inner_message["key"]).to end_with(key2)
-          expect(inner_message["request_time_ms"]).to be_a(Float)
-          expect(inner_message["generate_time_ms"]).to be_within(500).of(1000)
-        ensure
-          Timecop.return
-          Timecop.safe_mode = true
+            inner_message = JSON.parse(log_lines.pop)
+            expect(inner_message["command"]).to eq("set")
+            expect(inner_message["key"]).to end_with(key2)
+            expect(inner_message["request_time_ms"]).to be_a(Float)
+            expect(inner_message["generate_time_ms"]).to be_within(500).of(1000)
+          end
         end
 
         it "logs zero response size on cache miss" do
@@ -285,7 +283,7 @@ describe CanvasCache::Redis do
       end
 
       it "uses the circuit breaker properly" do
-        expect(ConfigFile).to receive(:load).with("redis").and_return(url: ["redis://redis-test-node-42:9999/"])
+        expect(ConfigFile).to receive(:load).with("redis").and_return(url: ["redis://redis-test-node-42:9999/"], reconnect_attempts: 0)
         expect(RedisClient::RubyConnection).to receive(:new).and_raise(RedisClient::TimeoutError, "intentional failure").twice
 
         now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -304,6 +302,55 @@ describe CanvasCache::Redis do
         client = Redis::Distributed.new([redis_client.id])
         expect(client.pipelined("key", failsafe: 2) { raise Redis::CannotConnectError }).to eq(2)
       end
+    end
+  end
+
+  describe "#disconnect_if_idle" do
+    let(:redis) { CanvasCache::Redis.redis }
+    let(:client) { redis._client }
+    let(:raw_client) { client }
+
+    shared_examples "disconnect_if_idle" do
+      it "closes the connection if no command was ever received" do
+        expect(raw_client).to receive(:close)
+        client.disconnect_if_idle(Process.clock_gettime(Process::CLOCK_MONOTONIC))
+      end
+
+      it "does not close the connection if a commmand was recently received" do
+        redis.get("key")
+        expect(raw_client).not_to receive(:close)
+        client.disconnect_if_idle(Process.clock_gettime(Process::CLOCK_MONOTONIC) - 10)
+      end
+
+      it "closes the connection if a commmand was received, but not recently" do
+        redis.get("key")
+        expect(raw_client).to receive(:close)
+        client.disconnect_if_idle(Process.clock_gettime(Process::CLOCK_MONOTONIC) + 10)
+      end
+    end
+
+    include_examples "disconnect_if_idle"
+
+    context "with a cluster" do
+      let(:redis) do
+        allow_any_instance_of(RedisClient::Cluster::Node).to receive(:refetch_node_info_list).and_return(
+          [RedisClient::Cluster::Node::Info.new(
+            id: "id",
+            node_key: "#{CanvasCache::Redis.redis._client.host}:#{CanvasCache::Redis.redis._client.port}",
+            role: "master",
+            primary_id: "-",
+            slots: [[0, 16_383]]
+          )]
+        )
+        Redis::Cluster.new(nodes: [CanvasCache::Redis.redis.id], connect_with_original_config: true)
+      end
+
+      let(:raw_client) do
+        router = client.instance_variable_get(:@router)
+        router.find_node(router.find_node_key(""))
+      end
+
+      include_examples "disconnect_if_idle"
     end
   end
 end

@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
 require "icalendar"
 
 Icalendar::Event.optional_property :x_alt_desc
@@ -30,8 +29,6 @@ class CalendarEvent < ActiveRecord::Base
   include Plannable
 
   include MasterCourses::Restrictor
-
-  self.ignored_columns += %i[series_id]
 
   restrict_columns :content, [:title, :description]
   restrict_columns :settings, %i[location_name location_address start_at end_at all_day all_day_date series_uuid rrule]
@@ -69,7 +66,7 @@ class CalendarEvent < ActiveRecord::Base
              polymorphic_prefix: true
   belongs_to :user
   belongs_to :parent_event, class_name: "CalendarEvent", foreign_key: :parent_calendar_event_id, inverse_of: :child_events
-  has_many :child_events, -> { where("calendar_events.workflow_state <> 'deleted'") }, class_name: "CalendarEvent", foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
+  has_many :child_events, -> { where.not(workflow_state: "deleted") }, class_name: "CalendarEvent", foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
   belongs_to :web_conference, autosave: true
   belongs_to :root_account, class_name: "Account"
 
@@ -298,14 +295,14 @@ class CalendarEvent < ActiveRecord::Base
   def populate_appointment_group_defaults
     self.effective_context_code = context.appointment_group_contexts.map(&:context_code).join(",")
     if new_record?
-      AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send("#{attr}=", context.send(attr)) }
+      AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send(:"#{attr}=", context.send(attr)) }
       if locked?
         self.start_at = start_at_was if !new_record? && start_at_changed?
         self.end_at   = end_at_was   if !new_record? && end_at_changed?
       end
     else
       # we only allow changing the description
-      (AppointmentGroup::EVENT_ATTRIBUTES - [:description]).each { |attr| send("#{attr}=", send("#{attr}_was")) if send("#{attr}_changed?") }
+      (AppointmentGroup::EVENT_ATTRIBUTES - [:description]).each { |attr| send(:"#{attr}=", send(:"#{attr}_was")) if send(:"#{attr}_changed?") }
     end
   end
   protected :populate_appointment_group_defaults
@@ -316,7 +313,7 @@ class CalendarEvent < ActiveRecord::Base
                                   else # e.g. section-level event
                                     parent_event.context_code
                                   end
-    (locked? ? LOCKED_ATTRIBUTES : CASCADED_ATTRIBUTES).each { |attr| send("#{attr}=", parent_event.send(attr)) }
+    (locked? ? LOCKED_ATTRIBUTES : CASCADED_ATTRIBUTES).each { |attr| send(:"#{attr}=", parent_event.send(attr)) }
   end
   protected :populate_with_parent_event
 
@@ -649,17 +646,19 @@ class CalendarEvent < ActiveRecord::Base
 
   def to_atom(opts = {})
     extend ApplicationHelper
-    Atom::Entry.new do |entry|
-      entry.title     = t(:feed_item_title, "Calendar Event: %{event_title}", event_title: self.title) unless opts[:include_context]
-      entry.title     = t(:feed_item_title_with_context, "Calendar Event, %{course_or_account_name}: %{event_title}", course_or_account_name: context.name, event_title: self.title) if opts[:include_context]
-      entry.authors << Atom::Person.new(name: context.name)
-      entry.updated   = updated_at.utc
-      entry.published = created_at.utc
-      entry.links << Atom::Link.new(rel: "alternate",
-                                    href: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/calendar?month=#{self.start_at.strftime("%m") rescue ""}&year=#{self.start_at.strftime("%Y") rescue ""}#calendar_event_#{id}")
-      entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/calendar_events/#{feed_code}_#{self.start_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}_#{self.end_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
-      entry.content   = Atom::Content::Html.new("#{datetime_string(self.start_at, self.end_at)}<br/>#{description}")
-    end
+
+    title = t(:feed_item_title, "Calendar Event: %{event_title}", event_title: self.title) unless opts[:include_context]
+    title = t(:feed_item_title_with_context, "Calendar Event, %{course_or_account_name}: %{event_title}", course_or_account_name: context.name, event_title: self.title) if opts[:include_context]
+
+    {
+      title:,
+      author: context.name,
+      updated: updated_at.utc,
+      published: created_at.utc,
+      link: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/calendar?month=#{self.start_at.strftime("%m") rescue ""}&year=#{self.start_at.strftime("%Y") rescue ""}#calendar_event_#{id}",
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/calendar_events/#{feed_code}_#{self.start_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}_#{self.end_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}",
+      content: "#{datetime_string(self.start_at, self.end_at)}<br/>#{description}"
+    }
   end
 
   def to_ics(in_own_calendar: true, preloaded_attachments: {}, user: nil, user_events: [])

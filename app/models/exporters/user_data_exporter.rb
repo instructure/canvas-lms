@@ -45,7 +45,7 @@ module Exporters
           Exporters::SubmissionExporter.export_user_submissions(user, folder_name, zipfile, files_in_zip)
         end
 
-        uploaded_data = Rack::Test::UploadedFile.new(zip_name, "application/zip")
+        uploaded_data = Canvas::UploadedFile.new(zip_name, "application/zip")
         Attachments::Storage.store_for_attachment(attachment, uploaded_data)
         attachment.workflow_state = "zipped"
         attachment.file_state = "available"

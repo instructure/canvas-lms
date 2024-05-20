@@ -775,7 +775,10 @@ describe MicrosoftSync::SyncerSteps do
       )
     end
 
-    before { group.update! ms_group_id: "mygroup" }
+    before do
+      group.update! ms_group_id: "mygroup"
+      allow(syncer_steps.send(:debug_info_tracker)).to receive(:record_diff_stats).with(diff)
+    end
 
     it_behaves_like "a step that executes a diff" do
       it_behaves_like "a step that returns retry on intermittent error",

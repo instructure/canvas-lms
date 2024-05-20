@@ -26,26 +26,25 @@
   eg:
 
   require([
-    'underscore',
     'jquery',
     'https://code.jquery.com/color/jquery.color.js'
   ], function(_, $) {
     console.log('got', $, _, $.Color.names)
   })
-  should log: underscore, jquery and the colors
+  should log: jquery and the colors
 */
-import jQuery from 'jquery'
+import $ from 'jquery'
+import {captureException} from '@sentry/browser'
 
 if (!('require' in window)) {
   const getDefaultExport = m => m.default
 
   const thingsWeStillAllowThemToRequire = {
-    jquery: () => jQuery,
+    jquery: () => $,
     // load these asynchronously so they are not downloaded unless asked for
     i18nObj: () =>
       import(/* webpackChunkName: "[request]" */ '@canvas/i18n').then(getDefaultExport),
 
-    underscore: () => import('underscore').then(getDefaultExport),
     'jsx/course_wizard/ListItems': () =>
       import('../../features/course_wizard/react/ListItems').then(getDefaultExport),
   }
@@ -55,7 +54,7 @@ if (!('require' in window)) {
       return thingsWeStillAllowThemToRequire[module]()
     } else if (/^(https?:)?\/\//.test(module)) {
       // starts with 'http://', 'https://' or '//'
-      return jQuery.getScript(module)
+      return $.getScript(module)
     } else {
       throw new Error(
         `Cannot load ${module}, use your own RequireJS or something else to load this script`
@@ -70,9 +69,8 @@ if (!('require' in window)) {
         'JavaScript that uses it continues to work.'
     )
     if (deps.includes('jquery')) {
-      console.error(
-        "You don't need to `require(['jquery...`, just use the global `$` variable directly."
-      )
+      console.error("Support for require('jquery') is deprecated and will be removed.")
+      captureException(new Error('require("jquery")'))
     }
     Promise.all(deps.map(getModule)).then(modules => {
       if (callback) callback(...modules)

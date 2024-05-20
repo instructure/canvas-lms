@@ -31,7 +31,7 @@ import BulkEditTable from './BulkEditTable'
 import MoveDatesModal from './MoveDatesModal'
 import useSaveAssignments from './hooks/useSaveAssignments'
 import useMonitorJobCompletion from './hooks/useMonitorJobCompletion'
-import DateValidator from '@canvas/datetime/DateValidator'
+import DateValidator from '@canvas/grading/DateValidator'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import {originalDateField, canEditAll} from './utils'
 
@@ -58,7 +58,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
         },
         hasGradingPeriods: !!ENV.HAS_GRADING_PERIODS,
         gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods || []),
-        userIsAdmin: (ENV.current_user_roles || []).includes('admin'),
+        userIsAdmin: ENV.current_user_is_admin,
       }),
     []
   )

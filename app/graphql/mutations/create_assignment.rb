@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Mutations::CreateAssignment < Mutations::AssignmentBase
+class Mutations::CreateAssignment < Mutations::AssignmentBase::Mutation
   graphql_name "CreateAssignment"
 
   argument :course_id, ID, required: true
   argument :name, String, required: true
   # most arguments inherited from AssignmentBase
 
-  def resolve(input:)
+  def resolve(input:, submittable: nil)
     course_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:course_id], "Course")
 
     @course = Course.find_by(id: course_id)
@@ -48,7 +48,16 @@ class Mutations::CreateAssignment < Mutations::AssignmentBase
       end
     end
 
+    if submittable
+      submittable.assignment = @working_assignment
+    end
+
     api_proxy = ApiProxy.new(context[:request], @working_assignment, context[:session], current_user)
+
+    validate_for_checkpoints(input_hash)
+    if input_hash[:for_checkpoints]
+      @working_assignment.has_sub_assignments = true
+    end
 
     # modifies input_hash
     prepare_input_params!(input_hash, api_proxy)

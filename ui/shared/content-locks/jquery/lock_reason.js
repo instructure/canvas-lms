@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@canvas/datetime' /* datetimeString */
+import '@canvas/datetime/jquery' /* datetimeString */
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape, {raw} from '@instructure/html-escape'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('content_locks')
@@ -132,7 +132,7 @@ INST.lockExplanation = function (data, type) {
       )
       html += '</a>'
     }
-    return $.raw(html)
+    return raw(html)
   } else {
     switch (type) {
       case 'quiz':

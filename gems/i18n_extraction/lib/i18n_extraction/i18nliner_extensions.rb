@@ -108,7 +108,7 @@ module I18nExtraction::Extensions
       return false unless ALL_CALLS.include?(method)
       return false if ALL_CALLS.include?(current_defn)
 
-      (receiver.nil? || receiver == :I18n || LABEL_CALLS.include?(method))
+      receiver.nil? || receiver == :I18n || LABEL_CALLS.include?(method)
     end
 
     # add support for:

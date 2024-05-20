@@ -70,8 +70,7 @@ describe Reporting::CountsReport do
       end
 
       it "does not count users who haven't recently logged in" do
-        Setting.set("recently_logged_in_timespan", 1.day.to_s)
-        @pseudonym.last_request_at = 2.days.ago
+        @pseudonym.last_request_at = 2.months.ago
         @pseudonym.save!
 
         Reporting::CountsReport.process_shard

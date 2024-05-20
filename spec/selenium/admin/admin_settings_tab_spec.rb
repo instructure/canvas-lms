@@ -317,7 +317,7 @@ describe "admin settings tab" do
     end
 
     it "clicks on the google help dialog" do
-      fj("label['for'='account_services_google_docs_previews'] .icon-question").click
+      f("label[for='account_services_google_docs_previews'] .icon-question").click
       expect(fj(".ui-dialog-title:visible")).to include_text("About Google Docs Previews")
     end
 

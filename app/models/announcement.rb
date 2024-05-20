@@ -37,15 +37,15 @@ class Announcement < DiscussionTopic
   acts_as_list scope: { context: self, type: "Announcement" }
 
   scope :between, lambda { |start_date, end_date|
-    where("COALESCE(delayed_post_at, posted_at, created_at) BETWEEN ? AND ?", start_date, end_date)
+    where("COALESCE(unlock_at, delayed_post_at, posted_at, created_at) BETWEEN ? AND ?", start_date, end_date)
   }
 
   scope :ordered_between, lambda { |start_date, end_date|
-    between(start_date, end_date).order(Arel.sql("COALESCE(delayed_post_at, posted_at, created_at) DESC"))
+    between(start_date, end_date).order(Arel.sql("COALESCE(unlock_at, delayed_post_at, posted_at, created_at) DESC"))
   }
 
   scope :ordered_between_by_context, lambda { |start_date, end_date|
-    between(start_date, end_date).order(Arel.sql("context_id, COALESCE(delayed_post_at, posted_at, created_at) DESC"))
+    between(start_date, end_date).order(Arel.sql("context_id, COALESCE(unlock_at, delayed_post_at, posted_at, created_at) DESC"))
   }
 
   def validate_draft_state_change
@@ -97,7 +97,10 @@ class Announcement < DiscussionTopic
 
   set_policy do
     given { |user| self.user.present? && self.user == user }
-    can :update and can :reply and can :read
+    can :update and can :read
+
+    given { |user| self.user.present? && self.user == user && !comments_disabled? }
+    can :reply
 
     given { |user| self.user.present? && self.user == user && discussion_entries.active.empty? }
     can :delete
@@ -115,14 +118,17 @@ class Announcement < DiscussionTopic
     given { |user, session| context.grants_right?(user, session, :read_announcements) && visible_for?(user) }
     can :read
 
-    given { |user, session| context.grants_right?(user, session, :post_to_forum) && !locked? }
+    given { |user, session| context.grants_right?(user, session, :post_to_forum) && !locked? && !comments_disabled? }
     can :reply
 
     given { |user, session| context.is_a?(Group) && context.grants_right?(user, session, :create_forum) }
     can :create
 
-    given { |user, session| context.grants_all_rights?(user, session, :read_announcements, :moderate_forum) } # admins.include?(user) }
-    can :update and can :read_as_admin and can :delete and can :reply and can :create and can :read and can :attach
+    given { |user, session| context.grants_all_rights?(user, session, :read_announcements, :moderate_forum) }
+    can :update and can :read_as_admin and can :delete and can :create and can :read and can :attach
+
+    given { |user, session| context.grants_all_rights?(user, session, :read_announcements, :moderate_forum) && !comments_disabled? }
+    can :reply
 
     given do |user, session|
       allow_rating && (!only_graders_can_rate ||

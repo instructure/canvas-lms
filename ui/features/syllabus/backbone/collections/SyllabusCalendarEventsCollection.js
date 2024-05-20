@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import _ from 'underscore'
+import {each} from 'lodash'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 
 export default class SyllabusCalendarEventsCollection extends PaginatedCollection {
@@ -53,7 +53,7 @@ export default class SyllabusCalendarEventsCollection extends PaginatedCollectio
           ev.related_id = ev.id
 
           let overridden = false
-          _.each(ev.assignment_overrides != null ? ev.assignment_overrides : [], override => {
+          each(ev.assignment_overrides != null ? ev.assignment_overrides : [], override => {
             if (!overridden) {
               ev.id = `${ev.id}_override_${override.id}`
               return (overridden = true)
@@ -75,7 +75,7 @@ export default class SyllabusCalendarEventsCollection extends PaginatedCollectio
     }
 
     const result = []
-    _.each(super.parse(...args), ev => {
+    each(super.parse(...args), ev => {
       if (!ev.hidden) result.push(normalize(ev))
     })
     return result

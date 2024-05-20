@@ -95,7 +95,7 @@ export default function SpeedGraderStatusMenu(props) {
               </IconButton>
             }
           >
-            <Menu.Group  label={<ScreenReaderContent>{I18n.t('Menu options')}</ScreenReaderContent>}>
+            <Menu.Group label={<ScreenReaderContent>{I18n.t('Menu options')}</ScreenReaderContent>}>
               {menuOptions}
             </Menu.Group>
           </Menu>

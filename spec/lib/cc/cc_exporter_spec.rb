@@ -248,6 +248,22 @@ describe "Common Cartridge exporting" do
       expect(@manifest_doc.at_css("resource[identifier=#{alt_mig_id2}][type=\"#{CC::CCHelper::LOR}\"]")).not_to be_nil
     end
 
+    it "selectively creates a quizzes-only export" do
+      @q1 = @course.quizzes.create!(title: "quiz1")
+      @q2 = @course.quizzes.create!(title: "quiz2")
+
+      @ce.export_type = ContentExport::QTI
+      @ce.selected_content = {
+        quizzes: { mig_id(@q1) => "1" },
+      }
+      @ce.save!
+
+      run_export
+
+      check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
+      check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE, false)
+    end
+
     it "exports quizzes with groups that point to external banks" do
       orig_course = @course
       course_with_teacher(user: @user)
@@ -279,23 +295,41 @@ describe "Common Cartridge exporting" do
       expect(selections[1].at_css("selection_extension sourcebank_context").text).to eq bank2.context.asset_string
     end
 
-    it "selectively creates a quizzes-only export" do
-      @q1 = @course.quizzes.create!(title: "quiz1")
-      @q2 = @course.quizzes.create!(title: "quiz2")
+    it "includes files referenced in question bank questions" do
+      attachment_model(uploaded_data: stub_png_data)
+      assessment_question_bank_model
+      question_data = {
+        "name" => "test question",
+        "points_possible" => 10,
+        "answers" => [{ "id" => 1 }, { "id" => 2 }],
+      }
+      question = @bank.assessment_questions.create!(question_data:)
+      question.question_data = question_data.merge("question_text" => %(<p><img src="/courses/#{@course.id}/files/#{@attachment.id}/download"></p>))
+      question.save!
+      att = question.attachments.take
+      quiz_model(course: @course)
+      @quiz.add_assessment_questions([question])
 
       @ce.export_type = ContentExport::QTI
       @ce.selected_content = {
-        quizzes: { mig_id(@q1) => "1" },
+        all_quizzes: "1",
       }
       @ce.save!
 
       run_export
 
-      check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
-      check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE, false)
+      check_resource_node(@quiz, CC::CCHelper::QTI_ASSESSMENT_TYPE)
+
+      doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@quiz)}/#{mig_id(@quiz)}.xml"))
+      expect(doc.at_css("presentation material mattext").text).to match %r{assessment_questions/test%20my%20file\?%20hai!&amp;.png}
+      check_resource_node(att, CC::CCHelper::WEBCONTENT)
+
+      path = @manifest_doc.at_css("resource[identifier=#{mig_id(att)}]")["href"]
+      expect(path).to eq "assessment_questions#{att.full_display_path}"
+      expect(@zip_file.find_entry(path)).not_to be_nil
     end
 
-    it "includes any files referenced in html" do
+    it "includes any files referenced in html for QTI export" do
       @att = Attachment.create!(filename: "first.png", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@course), context: @course)
       @att2 = Attachment.create!(filename: "second.jpg", uploaded_data: StringIO.new("ohais"), folder: Folder.unfiled_folder(@course), context: @course)
       @q1 = @course.quizzes.create(title: "quiz1")
@@ -342,12 +376,73 @@ describe "Common Cartridge exporting" do
       expect(@zip_file.find_entry(path)).not_to be_nil
     end
 
+    it "includes any files referenced in html for course export" do
+      att1 = Attachment.create!(filename: "first.png", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@course), context: @course)
+      quiz = @course.quizzes.create(title: "quiz1")
+
+      qq = quiz.quiz_questions.create!
+      data = { correct_comments: "",
+               question_type: "multiple_choice_question",
+               question_bank_name: "Quiz",
+               assessment_question_id: "9270",
+               migration_id: "QUE_1014",
+               incorrect_comments: "",
+               question_name: "test fun",
+               name: "test fun",
+               points_possible: 1,
+               question_text: %(Image yo: <img src="/courses/#{@course.id}/files/#{att1.id}/preview">),
+               answers: [{ migration_id: "QUE_1016_A1", text: "True", weight: 100, id: 8080 },
+                         { migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279 }] }.with_indifferent_access
+      qq.write_attribute(:question_data, data)
+      qq.save!
+
+      attachment_model(uploaded_data: stub_png_data)
+      assessment_question_bank_model
+      question_data = {
+        name: "test question",
+        points_possible: 10,
+        question_type: "true_false_question",
+        answers: [{ "migration_id" => "QUE_1018_A1", "text" => "True" }, { "migration_id" => "QUE_1019_A2", "text" => "False" }],
+        question_text: %(<img src="/courses/#{@course.id}/files/#{@attachment.id}/download">)
+      }
+      question = @bank.assessment_questions.create!(question_data:)
+      question.question_data = question_data
+      question.save!
+      quiz.add_assessment_questions([question])
+      att2 = question.attachments.take
+
+      @ce.export_type = ContentExport::COMMON_CARTRIDGE
+      @ce.selected_content = {
+        all_quizzes: "1",
+      }
+      @ce.save!
+
+      run_export
+
+      check_resource_node(quiz, CC::CCHelper::ASSESSMENT_TYPE)
+
+      doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(quiz)}/assessment_qti.xml"))
+      expect(doc.at_css("presentation material mattext").text).to eq %(<div>Image yo: <img src="$IMS-CC-FILEBASE$/unfiled/first.png"></div>)
+      expect(doc.at_css("section").children[3].at_css("presentation material mattext").text).to eq %(<div><img src="$IMS-CC-FILEBASE$/assessment_questions/test%20my%20file?%20hai!&amp;.png?canvas_download=1"></div>)
+
+      check_resource_node(att1, CC::CCHelper::WEBCONTENT)
+      check_resource_node(att2, CC::CCHelper::WEBCONTENT)
+
+      path = @manifest_doc.at_css("resource[identifier=#{mig_id(att1)}]")["href"]
+      expect(@zip_file.find_entry(path)).not_to be_nil
+      path = @manifest_doc.at_css("resource[identifier=#{mig_id(att2)}]")["href"]
+      expect(@zip_file.find_entry(path)).not_to be_nil
+
+      file_meta = Nokogiri::XML.parse(@zip_file.read("course_settings/files_meta.xml"))
+      expect(file_meta.at_css("folders folder[path=assessment_questions] hidden").text).to eq "true"
+    end
+
     describe "hidden folders" do
       before :once do
         folder = Folder.create!(name: "hidden", context: @course, hidden: true, parent_folder: Folder.root_folders(@course).first)
-        linked_att = Attachment.create!(filename: "linked.png", uploaded_data: StringIO.new("1"), folder:, context: @course)
+        @linked_att = Attachment.create!(filename: "linked.png", uploaded_data: StringIO.new("1"), folder:, context: @course)
         Attachment.create!(filename: "not-linked.jpg", uploaded_data: StringIO.new("2"), folder:, context: @course)
-        @course.wiki_pages.create!(title: "paeg", body: "Image yo: <img src=\"/courses/#{@course.id}/files/#{linked_att.id}/preview\">")
+        @course.wiki_pages.create!(title: "paeg", body: "Image yo: <img src=\"/courses/#{@course.id}/files/#{@linked_att.id}/preview\">")
         @ce.export_type = ContentExport::COMMON_CARTRIDGE
         @ce.save!
       end
@@ -357,6 +452,17 @@ describe "Common Cartridge exporting" do
 
         expect(@zip_file.find_entry("web_resources/hidden/linked.png")).not_to be_nil
         expect(@zip_file.find_entry("web_resources/hidden/not-linked.jpg")).not_to be_nil
+      end
+
+      it "does not export hidden folders on selective exports" do
+        @ce.selected_content = { attachments: { @linked_att.migration_id.to_s => "1" } }
+        run_export
+
+        expect(@zip_file.read("course_settings/files_meta.xml").split("\n")).to eq([
+                                                                                     '<?xml version="1.0" encoding="UTF-8"?>',
+                                                                                     '<fileMeta xmlns="http://canvas.instructure.com/xsd/cccv1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 https://canvas.instructure.com/xsd/cccv1p0.xsd">',
+                                                                                     "</fileMeta>"
+                                                                                   ])
       end
 
       it "excludes unlinked files for student export" do
@@ -370,13 +476,20 @@ describe "Common Cartridge exporting" do
     end
 
     it "includes media objects" do
-      skip "PHO-360 (9/17/2020)"
-
       @q1 = @course.quizzes.create(title: "quiz1")
+      folder = Folder.create!(name: "hidden", context: @course, hidden: true, parent_folder: Folder.root_folders(@course).first)
+      att = Attachment.create!(context: @course, folder:, media_entry_id: "some-kaltura-id", display_name: "test.mp4", filename: "test.mp4", uploaded_data: StringIO.new("media"))
       @media_object = @course.media_objects.create!(
         media_id: "some-kaltura-id",
-        media_type: "video"
+        media_type: "video",
+        attachment: att
       )
+
+      question_text = <<~HTML
+        <p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{att.id}?embedded=true&type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"></iframe></p>
+        <p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/some-kaltura-id?embedded=true&type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"></iframe></p>
+        <p><a id="media_comment_some-kaltura-id" class="instructure_inline_media_comment video_comment" href="/media_objects/some-kaltura-id"></a></p>
+      HTML
 
       qq = @q1.quiz_questions.create!
       data = {
@@ -389,7 +502,7 @@ describe "Common Cartridge exporting" do
         question_name: "test fun",
         name: "test fun",
         points_possible: 1,
-        question_text: "<p><a id=\"media_comment_some-kaltura-id\" class=\"instructure_inline_media_comment video_comment\" href=\"/media_objects/some-kaltura-id\"></a></p>",
+        question_text:,
         answers: [{
           migration_id: "QUE_1016_A1", text: "True", weight: 100, id: 8080
         },
@@ -422,9 +535,14 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/#{mig_id(@q1)}.xml"))
-      expect(doc.at_css("presentation material mattext").text).to eq "<div><p><a id=\"media_comment_some-kaltura-id\" class=\"instructure_inline_media_comment video_comment\" href=\"$IMS-CC-FILEBASE$/media_objects/some-kaltura-id\"></a></p></div>"
+      export_html = <<~HTML.strip
+        <div><p><video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"><source src="$IMS-CC-FILEBASE$/hidden/test.mp4?canvas_=1&amp;canvas_qs_embedded=true&amp;canvas_qs_type=video" data-media-id="some-kaltura-id" data-media-type="video"></video></p>
+        <p><video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"><source src="$IMS-CC-FILEBASE$/media_objects/some-kaltura-id" data-media-id="some-kaltura-id" data-media-type="video"></video></p>
+        <p><a id="media_comment_some-kaltura-id" class="instructure_inline_media_comment video_comment" href="$IMS-CC-FILEBASE$/media_objects/some-kaltura-id"></a></p></div>
+      HTML
+      expect(doc.at_css("presentation material mattext").text).to match_ignoring_whitespace export_html
 
-      resource_node = @manifest_doc.at_css("resource[identifier=#{mig_id(@media_object)}]")
+      resource_node = @manifest_doc.at_css("resource[identifier=#{mig_id(att)}]")
       expect(resource_node).to_not be_nil
       path = resource_node["href"]
       expect(@zip_file.find_entry(path)).not_to be_nil
@@ -741,7 +859,7 @@ describe "Common Cartridge exporting" do
       expect(variant_tag.name).to eq "variant"
       expect(variant_tag.attribute("identifierref").value).to eql assignment_id
       expect(variant_tag.next_element.name).to eq "file"
-      expect(@zip_file.read("#{assignment_id}/test-assignment.html")).to be_include "what?"
+      expect(@zip_file.read("#{assignment_id}/test-assignment.html")).to include "what?"
     end
 
     context "LTI 1.3 Assignments" do
@@ -1155,6 +1273,89 @@ describe "Common Cartridge exporting" do
         check_resource_node(@visible, CC::CCHelper::WEBCONTENT)
         check_resource_node(@hidden, CC::CCHelper::WEBCONTENT, false)
         check_resource_node(@locked, CC::CCHelper::WEBCONTENT, false)
+      end
+    end
+
+    describe "New Quizzes Common Cartridge" do
+      context "with new_quizzes_common_cartridge feature flag disabled" do
+        before do
+          @course.enable_feature!(:quizzes_next)
+          assignment_model(submission_types: "external_tool", course: @course)
+          tool = @c.context_external_tools.create!(
+            name: "Quizzes.Next",
+            consumer_key: "test_key",
+            shared_secret: "test_secret",
+            tool_id: "Quizzes 2",
+            url: "http://example.com/launch"
+          )
+          @a.external_tool_tag_attributes = { content: tool }
+          @a.save!
+
+          @course.root_account.settings[:provision] = { "lti" => "lti url" }
+          @course.root_account.save!
+          assignment = @course.assignments.last
+          assignment.title = "NewQuizzes"
+          assignment.save!
+
+          @ce.export_type = ContentExport::COMMON_CARTRIDGE
+          @ce.save!
+        end
+
+        it "should include the assignments settings and description html" do
+          run_export
+
+          assignment_id = @manifest_doc.at_css("resource[href*='newquizzes.html']").attr("href").chomp("/newquizzes.html")
+
+          doc = Nokogiri::XML.parse(@zip_file.read("#{assignment_id}/assignment_settings.xml"))
+          expect(doc).to_not be_nil
+        end
+      end
+
+      context "with new_quizzes_common_cartridge feature flag enabled" do
+        before do
+          Account.site_admin.enable_feature!(:new_quizzes_common_cartridge)
+
+          @course.enable_feature!(:quizzes_next)
+          assignment_model(submission_types: "external_tool", course: @course)
+          tool = @c.context_external_tools.create!(
+            name: "Quizzes.Next",
+            consumer_key: "test_key",
+            shared_secret: "test_secret",
+            tool_id: "Quizzes 2",
+            url: "http://example.com/launch"
+          )
+          @a.external_tool_tag_attributes = { content: tool }
+          @a.save!
+
+          @course.root_account.settings[:provision] = { "lti" => "lti url" }
+          @course.root_account.save!
+          assignment = @course.assignments.last
+          assignment.title = "NewQuizzes"
+          assignment.save!
+        end
+
+        it "should not include the assignments settings and description html" do
+          @ce.export_type = ContentExport::COMMON_CARTRIDGE
+          @ce.save!
+          run_export
+
+          assignment_id = @manifest_doc.at_css("resource[href*='newquizzes.html']")&.attr("href")&.chomp("/newquizzes.html")
+
+          expect(assignment_id).to be_nil
+        end
+
+        context "ContentExport::COURSE_COPY" do
+          it "should include the assignments settings and description html" do
+            @ce.export_type = ContentExport::COURSE_COPY
+            @ce.save!
+            run_export
+
+            assignment_id = @manifest_doc.at_css("resource[href*='newquizzes.html']").attr("href").chomp("/newquizzes.html")
+
+            doc = Nokogiri::XML.parse(@zip_file.read("#{assignment_id}/assignment_settings.xml"))
+            expect(doc).to_not be_nil
+          end
+        end
       end
     end
   end

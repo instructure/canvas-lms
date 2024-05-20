@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from '@instructure/lodash-underscore'
-
-const extend = _.extend
+import {assignIn} from 'lodash'
 
 const Store = function (key, proto, Dispatcher) {
   const emitChange = this.emitChange.bind(this)
 
-  extend(this, proto || {})
+  assignIn(this, proto || {})
 
   this._key = key
   this.__reset__()
@@ -53,7 +51,7 @@ const Store = function (key, proto, Dispatcher) {
   return this
 }
 
-extend(Store.prototype, {
+assignIn(Store.prototype, {
   actions: {},
   addChangeListener(callback) {
     this._callbacks.push(callback)
@@ -91,7 +89,7 @@ extend(Store.prototype, {
   },
 
   setState(newState) {
-    extend(this.state, newState)
+    assignIn(this.state, newState)
     this.emitChange()
   },
 })

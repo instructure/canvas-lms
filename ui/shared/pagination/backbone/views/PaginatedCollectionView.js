@@ -20,7 +20,6 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import _ from 'underscore'
 import CollectionView from '@canvas/backbone-collection-view'
 import template from '../../jst/paginatedCollection.handlebars'
 
@@ -55,9 +54,10 @@ PaginatedCollectionView.prototype.defaults = {
 }
 
 // Adds a loading indicator element
-PaginatedCollectionView.prototype.els = _.extend({}, CollectionView.prototype.els, {
+PaginatedCollectionView.prototype.els = {
+  ...CollectionView.prototype.els,
   '.paginatedLoadingIndicator': '$loadingIndicator',
-})
+}
 
 PaginatedCollectionView.optionProperty('scrollableElement')
 

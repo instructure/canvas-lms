@@ -34,7 +34,7 @@ describe "master courses - settings" do
 
   it "blueprint course selected in settings", priority: "1" do
     get "/courses/#{@test_course.id}/settings"
-    expect(is_checked("input[type=checkbox][name=course[blueprint]]")).to be_truthy
+    expect(is_checked("input[type=checkbox][name='course[blueprint]']")).to be_truthy
   end
 
   it "blueprint course un-selected in settings", priority: "1" do
@@ -43,7 +43,7 @@ describe "master courses - settings" do
     wait_for_ajaximations
     wait_for_new_page_load { submit_form("#course_form") }
     expect(MasterCourses::MasterTemplate).not_to be_is_master_course @course
-    expect(is_checked("input[type=checkbox][name=course[blueprint]]")).not_to be_truthy
+    expect(is_checked("input[type=checkbox][name='course[blueprint]']")).not_to be_truthy
   end
 
   it "leaves box unchecked for non-blueprint course", priority: "1" do

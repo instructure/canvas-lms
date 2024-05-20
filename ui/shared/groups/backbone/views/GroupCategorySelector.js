@@ -21,7 +21,7 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
+import {isEmpty, find, chain, includes} from 'lodash'
 import template from '../../jst/GroupCategorySelector.handlebars'
 import '@canvas/assignments/jquery/toggleAccessibly'
 import awaitElement from '@canvas/await-element'
@@ -96,11 +96,11 @@ GroupCategorySelector.optionProperty('inClosedGradingPeriod')
 
 GroupCategorySelector.prototype.render = function () {
   const selectedID = this.parentModel.groupCategoryId()
-  if (_.isEmpty(this.groupCategories)) {
+  if (isEmpty(this.groupCategories)) {
     StudentGroupStore.setSelectedGroupSet(null)
   } else if (
     selectedID == null ||
-    _.findWhere(this.groupCategories, {
+    find(this.groupCategories, {
       id: selectedID.toString(),
     }) == null
   ) {
@@ -109,7 +109,7 @@ GroupCategorySelector.prototype.render = function () {
     StudentGroupStore.setSelectedGroupSet(selectedID)
   }
   GroupCategorySelector.__super__.render.apply(this, arguments)
-  return this.$groupCategory.toggleAccessibly(!_.isEmpty(this.groupCategories))
+  return this.$groupCategory.toggleAccessibly(!isEmpty(this.groupCategories))
 }
 
 GroupCategorySelector.prototype.groupCategorySelected = function () {
@@ -165,7 +165,7 @@ GroupCategorySelector.prototype.toggleGroupCategoryOptions = function () {
   this.$groupCategoryOptions.toggleAccessibly(isGrouped)
   const selectedGroupSetId = isGrouped ? this.$groupCategoryID.val() : null
   StudentGroupStore.setSelectedGroupSet(selectedGroupSetId)
-  if (isGrouped && _.isEmpty(this.groupCategories) && this.canManageGroups()) {
+  if (isGrouped && isEmpty(this.groupCategories) && this.canManageGroups()) {
     this.showGroupCategoryCreateDialog()
   }
   if (this.renderSectionsAutocomplete != null) {
@@ -179,7 +179,7 @@ GroupCategorySelector.prototype.toJSON = function () {
     (typeof (base = this.parentModel).frozenAttributes === 'function'
       ? base.frozenAttributes()
       : void 0) || []
-  const groupCategoryFrozen = _.includes(frozenAttributes, 'group_category_id')
+  const groupCategoryFrozen = includes(frozenAttributes, 'group_category_id')
   const groupCategoryLocked = !this.parentModel.canGroup()
   return {
     isGroupAssignment:
@@ -189,11 +189,11 @@ GroupCategorySelector.prototype.toJSON = function () {
     groupCategoryUnselected:
       !this.parentModel.groupCategoryId() ||
       this.parentModel.groupCategoryId() === 'blank' ||
-      (!_.chain(this.groupCategories)
-        .pluck('id')
-        .contains(this.parentModel.groupCategoryId())
+      (!chain(this.groupCategories)
+        .map('id')
+        .includes(this.parentModel.groupCategoryId())
         .value() &&
-        !_.isEmpty(this.groupCategories)),
+        !isEmpty(this.groupCategories)),
     hideGradeIndividually: this.hideGradeIndividually,
     gradeGroupStudentsIndividually:
       !this.hideGradeIndividually && this.parentModel.gradeGroupStudentsIndividually(),
@@ -236,7 +236,7 @@ GroupCategorySelector.prototype.validateBeforeSave = function (data, errors) {
 GroupCategorySelector.prototype._validateGroupCategoryID = function (data, errors) {
   const gcid = this.nested ? data.assignment.groupCategoryId() : data.group_category_id
   if (gcid === 'blank') {
-    if (_.isEmpty(this.groupCategories)) {
+    if (isEmpty(this.groupCategories)) {
       if (this.canManageGroups()) {
         errors.newGroupCategory = [
           {

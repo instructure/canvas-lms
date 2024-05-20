@@ -33,9 +33,6 @@ exports.instUIWorkaround =
     type: 'javascript/auto',
     include: [
       resolve(canvasDir, 'node_modules/@instructure'),
-      resolve(canvasDir, 'packages/canvas-media/node_modules/@instructure'),
-      resolve(canvasDir, 'packages/canvas-planner/node_modules/@instructure'),
-      resolve(canvasDir, 'packages/canvas-rce/node_modules/@instructure'),
       ...globPlugins('/node_modules/@instructure'),
     ],
   }
@@ -58,24 +55,20 @@ exports.webpack5Workaround =
   {
     test: /\.m?js$/,
     type: 'javascript/auto',
-    include: [
-      resolve(canvasDir, 'node_modules/graphql'),
-      resolve(canvasDir, 'packages/datetime-moment-parser/index.js'),
-      resolve(canvasDir, 'packages/datetime/index.js'),
-    ],
+    include: [resolve(canvasDir, 'node_modules/graphql')],
     resolve: {
       fullySpecified: false,
     },
   }
 
 exports.css = {
-  test: /\.css$/,
-  use: ['style-loader', 'css-loader'],
+  test: /\.css$/i,
+  type: 'css',
 }
 
 exports.images = {
-  test: /\.(png|svg|gif)$/,
-  loader: 'file-loader',
+  test: /\.(png|jpe?g|svg|gif)$/i,
+  type: 'asset/resource',
 }
 
 exports.fonts = {
@@ -83,76 +76,73 @@ exports.fonts = {
   use: 'file-loader',
 }
 
-exports.babel = {
-  test: /\.(js|ts|jsx|tsx)$/,
-  include: [
-    resolve(canvasDir, 'ui'),
-    resolve(canvasDir, 'packages/jquery-kyle-menu'),
-    resolve(canvasDir, 'packages/jquery-popover'),
-    resolve(canvasDir, 'packages/canvas-planner'),
-    resolve(canvasDir, 'packages/jquery-selectmenu'),
-    resolve(canvasDir, 'packages/convert-case'),
-    resolve(canvasDir, 'packages/slickgrid'),
-    resolve(canvasDir, 'packages/with-breakpoints'),
-    resolve(canvasDir, 'spec/javascripts/jsx'),
-    resolve(canvasDir, 'spec/coffeescripts'),
-    ...globPlugins('app/{jsx,coffeescripts}/'),
-  ],
-  exclude: [/node_modules/],
-  parser: {
-    requireInclude: 'allow',
-  },
-  use: {
-    loader: 'babel-loader',
-    options: {
-      configFile: false,
-      cacheDirectory: process.env.NODE_ENV !== 'production',
-      assumptions: {
-        setPublicClassFields: true,
-      },
-      env: {
-        development: {
-          plugins: ['babel-plugin-typescript-to-proptypes'],
-        },
-        production: {
-          plugins: [
-            [
-              '@babel/plugin-transform-runtime',
-              {
-                helpers: true,
-                corejs: 3,
-                useESModules: true,
-              },
-            ],
-            'transform-react-remove-prop-types',
-            '@babel/plugin-transform-react-inline-elements',
-            '@babel/plugin-transform-react-constant-elements',
-          ],
-        },
-      },
-      presets: [
-        ['@babel/preset-typescript'],
-        [
-          '@babel/preset-env',
-          {
-            useBuiltIns: 'entry',
-            corejs: '3.20',
-            modules: false,
-            // This is needed to fix a Safari < 16 bug
-            // https://github.com/babel/babel/issues/14289
-            // https://bugs.webkit.org/show_bug.cgi?id=236843
-            include: ['@babel/plugin-proposal-class-properties'],
+const browserTargets = {
+  browsers: 'last 2 versions',
+}
+
+const isCrystalballEnabled = process.env.CRYSTALBALL_MAP === '1'
+
+exports.swc = [
+  {
+    test: /\.(j|t)s$/,
+    include: [resolve(canvasDir, 'ui'), ...globPlugins('app/{jsx,coffeescripts}/')],
+    exclude: /(node_modules)/,
+    use: {
+      // we can use rspack's builtin:swc-loader later when it supports SWC plugins
+      loader: isCrystalballEnabled ? 'swc-loader' : 'builtin:swc-loader',
+      options: {
+        parseMap: true,
+        sourceMaps: true,
+        jsc: {
+          externalHelpers: true,
+          parser: {
+            syntax: 'typescript',
           },
-        ],
-        ['@babel/preset-react', {useBuiltIns: true}],
-      ],
-      targets: {
-        browsers: 'last 2 versions',
-        esmodules: true,
+          ...(isCrystalballEnabled
+            ? {
+                experimental: {
+                  plugins: [['swc-plugin-coverage-instrument', {}]].filter(Boolean),
+                },
+              }
+            : undefined),
+        },
+        env: {
+          targets: browserTargets,
+        },
       },
     },
   },
-}
+  {
+    test: /\.(j|t)sx$/,
+    include: [resolve(canvasDir, 'ui'), ...globPlugins('app/{jsx,coffeescripts}/')],
+    exclude: /(node_modules)/,
+    use: {
+      // we can use rspack's builtin:swc-loader later when it supports SWC plugins
+      loader: isCrystalballEnabled ? 'swc-loader' : 'builtin:swc-loader',
+      options: {
+        parseMap: true,
+        sourceMaps: true,
+        jsc: {
+          externalHelpers: true,
+          parser: {
+            syntax: 'typescript',
+            tsx: true,
+          },
+          ...(isCrystalballEnabled
+            ? {
+                experimental: {
+                  plugins: [['swc-plugin-coverage-instrument', {}]].filter(Boolean),
+                },
+              }
+            : undefined),
+        },
+        env: {
+          targets: browserTargets,
+        },
+      },
+    },
+  },
+]
 
 exports.handlebars = {
   test: /\.handlebars$/,
@@ -178,15 +168,9 @@ exports.emberHandlebars = {
 // only use it when generating crystalball map
 // i.e. process.env.CRYSTALBALL_MAP === '1'
 exports.istanbul = {
-  test: /\.(js|ts|tsx)$/,
+  test: /\.(js|jsx|ts|tsx)$/,
   include: [
     resolve(canvasDir, 'ui'),
-    resolve(canvasDir, 'packages/jquery-kyle-menu'),
-    resolve(canvasDir, 'packages/jquery-popover'),
-    resolve(canvasDir, 'packages/canvas-planner'),
-    resolve(canvasDir, 'packages/jquery-selectmenu'),
-    resolve(canvasDir, 'packages/slickgrid'),
-    resolve(canvasDir, 'packages/with-breakpoints'),
     resolve(canvasDir, 'spec/javascripts/jsx'),
     resolve(canvasDir, 'spec/coffeescripts'),
     ...globPlugins('app/{jsx,coffeescripts}/'),

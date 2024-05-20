@@ -64,7 +64,7 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisCacheStore
 
   def validate_consul_event
     key = SecureRandom.uuid
-    patience = Setting.get("ha_store_validate_consul_event_patience", 15).to_f
+    patience = 15
     write(key, 1, expires_in: patience * 2)
     delete(key, skip_local: true)
     # yes, really, a sleep. we need to run on the same node because we only wrote

@@ -23,12 +23,10 @@ class Purgatory < ActiveRecord::Base
 
   scope :active, -> { where(workflow_state: "active") }
 
-  def self.days_until_expiration
-    Setting.get("purgatory_days_until_expiration", "30").to_i
-  end
+  TIME_TO_EXPIRE = 30.days
 
   def self.expire_old_purgatories
-    Purgatory.active.where("updated_at < ?", days_until_expiration.days.ago).find_in_batches do |batch|
+    Purgatory.active.where("updated_at < ?", TIME_TO_EXPIRE.ago).find_in_batches do |batch|
       batch.each do |p|
         next unless p.new_instfs_uuid
 

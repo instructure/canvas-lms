@@ -24,7 +24,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {IconXSolid} from '@instructure/ui-icons'
 import coupleTimeFields from '@canvas/calendar/jquery/coupleTimeFields'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 
 const I18n = useI18nScope('appointment_groups')
 
@@ -45,9 +45,9 @@ const timeToString = (dateObj, format) => {
 class TimeBlockSelectorRow extends React.Component {
   static propTypes = {
     timeData: PropTypes.shape({
-      date: PropTypes.date,
-      startTime: PropTypes.date,
-      endTime: PropTypes.date,
+      date: PropTypes.any,
+      startTime: PropTypes.any,
+      endTime: PropTypes.any,
     }).isRequired,
     slotEventId: PropTypes.string,
     readOnly: PropTypes.bool,

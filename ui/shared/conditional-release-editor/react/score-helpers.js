@@ -161,7 +161,7 @@ const letterGradeToPercent = (score, assignment) => {
   if (score === '') {
     return ''
   }
-  const percent = assignment.getIn(['grading_scheme', score.toString().toUpperCase()])
+  const percent = assignment.getIn(['grading_scheme', score.toString()])
   if (percent === 0) {
     return '0'
   }

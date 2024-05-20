@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Assignment} from 'api'
+import type {Assignment} from 'api'
 import type {ReactElement} from 'react'
 
 export type GraphQLAssesmentRequest = {

@@ -33,13 +33,10 @@ export const Course = {
           ...AssignmentGroup
         }
       }
-      enrollmentsConnection(filter: {states: active, types: StudentEnrollment}) {
+      usersConnection(filter: {enrollmentTypes: StudentEnrollment, enrollmentStates: active}) {
         nodes {
-          user {
-            _id
-            name
-            courseRoles(roleTypes: "StudentEnrollment")
-          }
+          _id
+          name
         }
       }
       groupSetsConnection {
@@ -64,11 +61,10 @@ export const Course = {
     assignmentGroupsConnection: shape({
       nodes: arrayOf(AssignmentGroup.shape),
     }),
-    enrollmentsConnection: shape({
+    usersConnection: shape({
       nodes: arrayOf({
         user: {
           name: string,
-          courseRoles: arrayOf(string),
         },
       }),
     }),
@@ -86,12 +82,11 @@ export const Course = {
     assignmentGroupsConnection: shape({
       nodes: [AssignmentGroup.mock()],
     }),
-    enrollmentsConnection: shape({
+    usersConnection: shape({
       nodes: [
         {
           user: {
             name: 'Albert Einstein',
-            courseRoles: ['StudentEnrollment'],
           },
         },
       ],

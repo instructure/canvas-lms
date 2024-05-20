@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import mime from 'mime-types'
+import mime from 'mime/lite'
 
 export const extensionFromString = string => {
   const ext = string?.split('.')?.pop()?.split('?')?.shift()
-  return mime?.types[ext] != null ? ext : null
+  return mime.getType(ext) != null ? ext : null
 }
 
 export const findContentExtension = contentItem =>
-  (contentItem?.mediaType && mime.extension(contentItem.mediaType)) ||
+  (contentItem?.mediaType && mime.getExtension(contentItem.mediaType)) ||
   extensionFromString(contentItem.url) ||
   extensionFromString(contentItem.title) ||
   extensionFromString(contentItem.text)

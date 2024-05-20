@@ -18,7 +18,7 @@
 
 /* eslint-disable object-shorthand */
 
-import _ from 'underscore'
+import {some} from 'lodash'
 
 // Mixin to make your (Paginated)CollectionView filterable on the client
 // side. Just put an <input class="filterable> in your template, mix in
@@ -89,7 +89,7 @@ export default {
       return false
     }
     if (
-      _.some(
+      some(
         this.options.filterColumns,
         (function (_this) {
           return function (col) {

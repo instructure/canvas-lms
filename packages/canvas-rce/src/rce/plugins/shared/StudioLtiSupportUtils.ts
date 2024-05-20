@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {bool, shape, InferType} from 'prop-types'
+import {bool, shape} from 'prop-types'
 import {EditorEvent, Events} from 'tinymce'
 
 /**
@@ -42,7 +42,10 @@ export const parsedStudioOptionsPropType = shape({
   convertibleToLink: bool.isRequired,
 })
 
-export type ParsedStudioOptions = InferType<typeof parsedStudioOptionsPropType>
+export type ParsedStudioOptions = {
+  resizable: boolean
+  convertibleToLink: boolean
+}
 
 export function isStudioContentItemCustomJson(input: any): input is StudioContentItemCustomJson {
   return typeof input === 'object' && input.source === 'studio'

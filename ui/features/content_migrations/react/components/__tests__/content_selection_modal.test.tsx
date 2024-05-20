@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import userEvent from '@testing-library/user-event'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import {ContentSelectionModal} from '../content_selection_modal'
 
 jest.mock('@canvas/do-fetch-api-effect')
@@ -32,8 +32,24 @@ const selectiveData: any[] = [
   },
 ]
 
+const migration = {
+  id: '2',
+  migration_type: 'course_copy_importer',
+  migration_type_title: 'Copy a Canvas Course',
+  progress_url: 'http://mock.progress.url',
+  settings: {
+    source_course_id: '456',
+    source_course_name: 'Other course',
+    source_course_html_url: 'http://mock.other-course.url',
+  },
+  workflow_state: 'waiting_for_select',
+  migration_issues_count: 0,
+  migration_issues_url: 'http://mock.issues.url',
+  created_at: 'Apr 15 at 9:11pm',
+}
+
 const renderComponent = (overrideProps?: any) =>
-  render(<ContentSelectionModal courseId="1" migrationId="2" {...overrideProps} />)
+  render(<ContentSelectionModal courseId="1" migration={migration} {...overrideProps} />)
 
 describe('ContentSelectionModal', () => {
   afterEach(() => jest.clearAllMocks())
@@ -46,17 +62,17 @@ describe('ContentSelectionModal', () => {
   describe('modal', () => {
     beforeEach(() => doFetchApi.mockImplementation(() => Promise.resolve({json: selectiveData})))
 
-    it('opens on click', () => {
+    it('opens on click', async () => {
       renderComponent()
       const button = screen.getByRole('button', {name: 'Select content'})
-      userEvent.click(button)
+      await userEvent.click(button)
       expect(screen.getByRole('heading', {name: 'Select Content for Import'})).toBeInTheDocument()
     })
 
-    it('fetch content selection data', () => {
+    it('fetch content selection data', async () => {
       renderComponent()
       const button = screen.getByRole('button', {name: 'Select content'})
-      userEvent.click(button)
+      await userEvent.click(button)
       expect(doFetchApi).toHaveBeenCalledWith({
         path: '/api/v1/courses/1/content_migrations/2/selective_data',
         method: 'GET',
@@ -66,7 +82,7 @@ describe('ContentSelectionModal', () => {
     it('shows content selection data', async () => {
       renderComponent()
       const button = screen.getByRole('button', {name: 'Select content'})
-      userEvent.click(button)
+      await userEvent.click(button)
       await waitFor(() => expect(screen.getAllByText('Course Settings')[0]).toBeInTheDocument())
     })
 
@@ -74,12 +90,12 @@ describe('ContentSelectionModal', () => {
       window.ENV.current_user_id = '3'
       renderComponent()
       const button = screen.getByRole('button', {name: 'Select content'})
-      userEvent.click(button)
+      await userEvent.click(button)
       await waitFor(() => expect(screen.getByRole('checkbox')).toBeInTheDocument())
       const checkbox = screen.getByRole('checkbox')
-      userEvent.click(checkbox)
+      await userEvent.click(checkbox)
       const submitButton = screen.getByRole('button', {name: 'Select Content'})
-      userEvent.click(submitButton)
+      await userEvent.click(submitButton)
 
       expect(doFetchApi).toHaveBeenCalledWith({
         path: '/api/v1/courses/1/content_migrations/2',
@@ -95,22 +111,22 @@ describe('ContentSelectionModal', () => {
       })
     })
 
-    it('calls onSubmit', async () => {
+    it('calls updateMigrationItem', async () => {
       window.ENV.current_user_id = '3'
-      const onSubmit = jest.fn()
-      renderComponent({onSubmit})
-      expect(onSubmit).not.toHaveBeenCalled()
+      const updateMigrationItem = jest.fn()
+      renderComponent({updateMigrationItem})
+      expect(updateMigrationItem).not.toHaveBeenCalled()
 
       const button = screen.getByRole('button', {name: 'Select content'})
-      userEvent.click(button)
+      await userEvent.click(button)
       await waitFor(() => expect(screen.getByRole('checkbox')).toBeInTheDocument())
       const checkbox = screen.getByRole('checkbox')
-      userEvent.click(checkbox)
+      await userEvent.click(checkbox)
       const submitButton = screen.getByRole('button', {name: 'Select Content'})
-      userEvent.click(submitButton)
+      await userEvent.click(submitButton)
 
       await waitFor(() => {
-        expect(onSubmit).toHaveBeenCalled()
+        expect(updateMigrationItem).toHaveBeenCalled()
       })
     })
 
@@ -118,38 +134,40 @@ describe('ContentSelectionModal', () => {
       doFetchApi.mockImplementation(() => Promise.reject())
       renderComponent()
       const button = screen.getByRole('button', {name: 'Select content'})
-      userEvent.click(button)
+      await userEvent.click(button)
       await waitFor(() => {
         expect(screen.getByText('Failed to fetch content for import.')).toBeInTheDocument()
       })
     })
 
-    it('shows spinner when loading', () => {
+    it('shows spinner when loading', async () => {
       doFetchApi.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 5000)))
       renderComponent()
       const button = screen.getByRole('button', {name: 'Select content'})
-      userEvent.click(button)
+      await userEvent.click(button)
       expect(screen.getByText('Loading content for import.')).toBeInTheDocument()
     })
 
-    it('closes with x button', () => {
+    it('closes with x button', async () => {
+      const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
       renderComponent()
       const button = screen.getByRole('button', {name: 'Select content'})
-      userEvent.click(button)
+      await user.click(button)
       const xButton = screen.getByText('Close')
-      userEvent.click(xButton)
+      await user.click(xButton)
 
       expect(
         screen.queryByRole('heading', {name: 'Select Content for Import'})
       ).not.toBeInTheDocument()
     })
 
-    it('closes with cancel button', () => {
+    it('closes with cancel button', async () => {
+      const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
       renderComponent()
       const button = screen.getByRole('button', {name: 'Select content'})
-      userEvent.click(button)
+      await user.click(button)
       const cancelButton = screen.getByText('Cancel')
-      userEvent.click(cancelButton)
+      await user.click(cancelButton)
 
       expect(
         screen.queryByRole('heading', {name: 'Select Content for Import'})

@@ -17,15 +17,16 @@
  */
 
 import $ from 'jquery'
-import tz from '@canvas/timezone'
-import tzInTest from '@canvas/timezone/specHelpers'
+import 'jquery-migrate'
+import * as tz from '@canvas/datetime'
+import tzInTest from '@canvas/datetime/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
 import kolkata from 'timezone/Asia/Kolkata'
 import portuguese from 'timezone/pt_PT'
 import I18nStubber from 'helpers/I18nStubber'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
 
 QUnit.module('fudgeDateForProfileTimezone', {

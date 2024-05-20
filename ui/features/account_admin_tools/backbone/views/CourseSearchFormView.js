@@ -20,7 +20,7 @@ import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import template from '../../jst/CourseSearchForm.handlebars'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 
 const I18n = useI18nScope('course_search')
 
@@ -32,7 +32,7 @@ export default class CourseSearchFormView extends Backbone.View {
 
     this.prototype.events = {submit: 'search'}
 
-    this.prototype.els = {'#courseSearchField': '$courseSearchField'}
+    this.prototype.els = {'#courseSearchField': '$searchField'}
   }
 
   initialize() {
@@ -52,9 +52,9 @@ export default class CourseSearchFormView extends Backbone.View {
   search(event) {
     event.preventDefault()
 
-    const query = $.trim(this.$courseSearchField.val())
+    const query = $.trim(this.$searchField.val())
     if (query === '') {
-      return this.$courseSearchField.errorBox(I18n.t('cant_be_blank', "Can't be blank"))
+      return this.$searchField.errorBox(I18n.t('cant_be_blank', "Can't be blank"))
     } else {
       const dfd = this.model.search($.trim(query))
       return this.$el.disableWhileLoading(dfd)

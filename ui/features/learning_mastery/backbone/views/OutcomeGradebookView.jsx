@@ -21,8 +21,8 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
 import React from 'react'
+import {filter, uniq, reject, range, extend as lodashExtend} from 'lodash'
 import ReactDOM from 'react-dom'
 import {View} from '@canvas/backbone'
 import Slick from 'slickgrid'
@@ -100,6 +100,7 @@ function OutcomeGradebookView(options) {
   this._toggleStudentsWithInactiveEnrollments =
     this._toggleStudentsWithInactiveEnrollments.bind(this)
   this._toggleStudentsWithNoResults = this._toggleStudentsWithNoResults.bind(this)
+  this.setOutcomeOrder = this.setOutcomeOrder.bind(this)
   let ref
   OutcomeGradebookView.__super__.constructor.apply(this, arguments)
   this._validateOptions(options)
@@ -213,7 +214,7 @@ OutcomeGradebookView.prototype._toggleOutcomesWithNoResults = function (enabled)
   this._setFilterSetting('outcomes_no_results', enabled)
   if (enabled) {
     const columns = [this.columns[0]].concat(
-      _.filter(
+      filter(
         this.columns,
         (function (_this) {
           return function (c) {
@@ -282,6 +283,7 @@ OutcomeGradebookView.prototype._toggleSort = function (e, arg) {
 OutcomeGradebookView.prototype._attachGridEvents = function () {
   this.grid.onHeaderRowCellRendered.subscribe(Grid.Events.headerRowCellRendered)
   this.grid.onHeaderCellRendered.subscribe(Grid.Events.headerCellRendered)
+  this.grid.onColumnsReordered.subscribe(this.setOutcomeOrder)
   return this.grid.onSort.subscribe(this._toggleSort)
 }
 
@@ -289,7 +291,7 @@ OutcomeGradebookView.prototype._attachGridEvents = function () {
 //
 // Returns an object.
 OutcomeGradebookView.prototype.toJSON = function () {
-  return _.extend(
+  return lodashExtend(
     {},
     {
       checkboxes: this.checkboxes,
@@ -333,8 +335,8 @@ OutcomeGradebookView.prototype.focusFilterKebabIfNeeded = function () {
 //
 // Returns nothing.
 OutcomeGradebookView.prototype.renderGrid = function (response) {
-  Grid.filter = _.filter(
-    _.range(this.checkboxes.length),
+  Grid.filter = filter(
+    range(this.checkboxes.length),
     (function (_this) {
       return function (i) {
         return _this.checkboxes[i].checked
@@ -358,7 +360,7 @@ OutcomeGradebookView.prototype.renderGrid = function (response) {
   this.columns = columns
   if (this.$('#no_results_outcomes:checkbox:checked').length === 1) {
     columns = [columns[0]].concat(
-      _.filter(
+      filter(
         columns,
         (function (_this) {
           return function (c) {
@@ -481,6 +483,40 @@ OutcomeGradebookView.prototype._rollupsUrl = function (course, exclude, page) {
   )
 }
 
+// Public: Set ordering for outcome columns in gradebook grid
+//
+// Returns nothing.
+OutcomeGradebookView.prototype.setOutcomeOrder = function () {
+  const course_id = ENV.context_asset_string.split('_')[1]
+  const columns = this.grid.getColumns().slice()
+
+  // save ordering of columns to grid for frontend state
+  this.columns = columns.slice()
+
+  // Need to remove first column because it is the student column
+  columns.shift()
+
+  const outcomes = columns.map((c, index) => {
+    return {
+      outcome_id: parseInt(c.outcome.id, 10),
+      position: index + 1,
+    }
+  })
+
+  $.ajax({
+    url: this._assignOrderUrl(course_id),
+    type: 'POST',
+    data: JSON.stringify(outcomes),
+    contentType: 'application/json; charset=utf-8'
+  })
+
+  return Grid.View.redrawHeader(this.grid, Grid.averageFn)
+}
+
+OutcomeGradebookView.prototype._assignOrderUrl = function (course) {
+  return `/api/v1/courses/${course}/assign_outcome_order`
+}
+
 OutcomeGradebookView.prototype._loadOutcomes = function (page) {
   if (page == null) {
     page = 1
@@ -552,7 +588,7 @@ OutcomeGradebookView.prototype._mergeResponses = function (a, b) {
     return b
   }
   const response = {}
-  response.meta = _.extend({}, a.meta, b.meta)
+  response.meta = lodashExtend({}, a.meta, b.meta)
   response.linked = {
     outcomes: a.linked.outcomes,
     outcome_paths: a.linked.outcome_paths,
@@ -571,8 +607,8 @@ OutcomeGradebookView.prototype._createFilter = function (name) {
   return (function (_this) {
     return function (isChecked) {
       Grid.filter = isChecked
-        ? _.uniq(Grid.filter.concat([name]))
-        : _.reject(Grid.filter, function (o) {
+        ? uniq(Grid.filter.concat([name]))
+        : reject(Grid.filter, function (o) {
             return o === name
           })
       return _this.grid.invalidate()

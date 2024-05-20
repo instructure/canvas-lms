@@ -29,6 +29,7 @@ import {
   IconAdminLine,
   IconCalendarMonthLine,
   IconCanvasLogoSolid,
+  IconClockLine,
   IconCoursesLine,
   IconDashboardLine,
   IconFolderLine,
@@ -44,9 +45,9 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {useQuery} from '@canvas/query'
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {getUnreadCount} from './queries/unreadCountQuery'
-import {getSetting, setSetting} from './queries/settingsQuery'
 import {getActiveItem, getTrayLabel, getTrayPortal} from './utils'
-import type {ActiveTray} from './utils'
+import type {ActiveTray, ExternalTool} from './utils'
+import {getSetting, setSetting} from '@canvas/settings-query/react/settingsQuery'
 
 const I18n = useI18nScope('sidenav')
 
@@ -66,41 +67,27 @@ export const InformationIconEnum = {
 
 const defaultActiveItem = getActiveItem()
 
-const SideNav = () => {
+const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [activeTray, setActiveTray] = useState<ActiveTray | null>(null)
   const [selectedNavItem, setSelectedNavItem] = useState<ActiveTray | ''>(defaultActiveItem)
   const sideNavRef = useRef<HTMLDivElement | null>(null)
+  const logoRef = useRef<Element | null>(null)
   const accountRef = useRef<Element | null>(null)
+  const adminRef = useRef<Element | null>(null)
   const dashboardRef = useRef<Element | null>(null)
   const coursesRef = useRef<Element | null>(null)
-  const adminRef = useRef<Element | null>(null)
   const calendarRef = useRef<Element | null>(null)
   const inboxRef = useRef<Element | null>(null)
+  const historyRef = useRef<Element | null>(null)
+  const externalTool = useRef<Element | null>(null)
   const helpRef = useRef<Element | null>(null)
-  const avatarRef = useRef<Element | null>(null)
-  const canvasLogo = useRef<Element | null>(null)
-  const brandLogo = useRef<Element | null>(null)
-
-  if (avatarRef.current instanceof HTMLElement)
-    avatarRef.current.setAttribute('user-avatar', 'true')
-
-  if (canvasLogo.current instanceof HTMLElement)
-    canvasLogo.current.setAttribute('canvas-logo', 'true')
-
-  if (dashboardRef.current instanceof HTMLElement)
-    dashboardRef.current.setAttribute('dashboard-tray', 'true')
-
-  if (coursesRef.current instanceof HTMLElement)
-    coursesRef.current.setAttribute('courses-tray', 'true')
-
-  if (brandLogo.current instanceof HTMLElement) brandLogo.current.setAttribute('brand-logo', 'true')
 
   // after tray is closed, eventually set activeTray to null
   // we don't do this immediately in order to maintain animation of closing tray
   useEffect(() => {
     if (!isTrayOpen) {
-      setTimeout(() => setActiveTray(null), 150)
+      setTimeout(() => setActiveTray(null), 100)
     }
   }, [isTrayOpen])
 
@@ -129,13 +116,11 @@ const SideNav = () => {
           accountRef.current.dataset.selected = 'true'
         }
         break
-
       case 'accounts':
         if (adminRef.current instanceof HTMLElement) {
           adminRef.current.dataset.selected = 'true'
         }
         break
-
       case 'dashboard':
         if (dashboardRef.current instanceof HTMLElement) {
           dashboardRef.current.dataset.selected = 'true'
@@ -173,6 +158,8 @@ const SideNav = () => {
     contentPadding: '0.1rem',
     backgroundColor: 'transparent',
     hoverBackgroundColor: 'transparent',
+    fontWeight: 400,
+    linkTextDecoration: 'inherit',
   }
 
   const getHelpIcon = (): JSX.Element => {
@@ -192,11 +179,11 @@ const SideNav = () => {
   const countsEnabled = Boolean(
     window.ENV.current_user_id && !window.ENV.current_user?.fake_student
   )
+
   const brandConfig =
     (window.ENV.active_brand_config as {
       variables: {'ic-brand-header-image': string}
     }) ?? null
-
   if (brandConfig) {
     const variables = brandConfig.variables
     logoUrl = variables['ic-brand-header-image']
@@ -255,15 +242,43 @@ const SideNav = () => {
   }
 
   useLayoutEffect(() => {
+    /** New SideNav CSS  */
+    const sideNavTrays = [
+      document.querySelector('#admin-tray'),
+      document.querySelector('#dashboard-tray'),
+      document.querySelector('#courses-tray'),
+      document.querySelector('#calendar-tray'),
+      document.querySelector('#inbox-tray'),
+      document.querySelector('#history-tray'),
+      document.querySelector('#external-tool-tray'),
+      document.querySelector('#help-tray'),
+    ]
+    if (Array.isArray(sideNavTrays))
+      sideNavTrays.forEach(sideNavTray => sideNavTray?.classList.add('ic-sidenav-tray'))
+
+    const externalToolsSvgImg = ['ic-svg-external-tool', 'ic-img-external-tool']
+
+    if (Array.isArray(externalToolsSvgImg))
+      externalToolsSvgImg.forEach(svgImgClassName =>
+        document.querySelector('#external-tool-tray')?.classList.add(svgImgClassName)
+      )
+
+    document.querySelector('#user-tray')?.classList.add('ic-user-tray')
+    document.querySelector('#canvas-logo')?.classList.add('ic-canvas-logo')
+    document.querySelector('#brand-logo')?.classList.add('ic-brand-logo')
+    document.querySelector('#user-avatar')?.classList.add('ic-user-avatar')
+
     const collapseDiv = document.querySelectorAll('[aria-label="Main navigation"]')[0]
       .childNodes[1] as HTMLElement
-    collapseDiv.setAttribute('collapse-div', 'true')
-
     const collapseButton = collapseDiv.childNodes[0] as HTMLElement
-    collapseButton.setAttribute('collapse-button', 'true')
+    collapseDiv.classList.add('ic-collapse-div')
+    collapseButton.classList.add('ic-collapse-button')
+    collapseButton.id = 'sidenav-toggle'
 
     if (collapseGlobalNav) document.body.classList.remove('primary-nav-expanded')
     else document.body.classList.add('primary-nav-expanded')
+
+    /** New SideNav CSS  */
   }, [collapseGlobalNav])
 
   return (
@@ -274,78 +289,16 @@ const SideNav = () => {
       data-testid="sidenav-container"
     >
       <style>{`
-        .sidenav-container a {
-          padding: ${!collapseGlobalNav ? '0.4735rem' : '0.4375rem'} 0;
-          font-weight: 400;
-          transition: background-color 0.3s;
+        ${
+          !collapseGlobalNav
+            ? `
+        .sidenav-container a[logo-tray="true"] {
+          height: 85px !important;
         }
-        .sidenav-container a:hover {
-          text-decoration: inherit;
-          color: white !important;
-          background-color: rgba(0, 0, 0, 0.2);
-        }
-        .sidenav-container a > div:first-child {
-          display: flex;
-          justify-content: center;
-        }
-        .sidenav-container a > div:nth-child(2) {
-          margin: 3px 0 0;
-        }
-        .sidenav-container a[data-selected="true"] > div:first-child {
-          > svg {
-            width: ${!collapseGlobalNav ? '1.75rem' : '1.75rem'} !important;
-            height: ${!collapseGlobalNav ? '1.75rem' : '1.75rem'} !important;
-          }
-        }
-        .sidenav-container a[data-selected="true"]:hover {
-          color: var(--ic-brand-primary) !important;
-          background-color: var(--ic-brand-global-nav-menu-item__text-color);
-        }
-        .sidenav-container div[canvas-logo="true"] {
-          margin: ${!collapseGlobalNav ? '0.825rem' : '0.5395rem'} 0 ${
-        !collapseGlobalNav ? '0.535rem' : '0.4rem'
-      } 0;
-        }
-        .sidenav-container div[canvas-logo="true"] > svg {
-          width: ${!collapseGlobalNav ? '2.63rem' : '1.695rem'} !important;
-          height: ${!collapseGlobalNav ? '2.63rem' : '1.695rem'} !important;
-        }
-        .sidenav-container div[brand-logo="true"] {
-          margin: ${!collapseGlobalNav ? '-0.4rem' : '0.275rem'} 0 ${
-        !collapseGlobalNav ? '-0.905rem' : '-0.275rem'
-      } 0;
-        }
-        .sidenav-container span[user-avatar="true"] {
-          width: ${!collapseGlobalNav ? '2.25rem' : '1.875rem'};
-          height: ${!collapseGlobalNav ? '2.25rem' : '1.875rem'};
-          border: 2px solid var(--ic-brand-global-nav-avatar-border) !important;
-        }
-        .sidenav-container div[collapse-div="true"] {
-          display: flex;
-          align-items: end;
-          overflow: auto;
-          width: 100%;
-          height: 100%;
-        }
-        .sidenav-container button[collapse-button="true"] {
-          width: 100%;
-          padding: 0.75rem !important;
-        }
-
-        .sidenav-container a[dashboard-tray="true"] > div:first-child {
-          > svg {
-            width: ${!collapseGlobalNav ? '1.605rem' : '1.25rem'} !important;
-            height: ${!collapseGlobalNav ? '1.605rem' : '1.25rem'} !important;
-            margin-bottom: -5px !important;
-          }
-        }
-
-        .sidenav-container a[courses-tray="true"] > div:first-child {
-          > svg {
-            width: ${!collapseGlobalNav ? '1.495rem' : '1.25rem'} !important;
-            height: ${!collapseGlobalNav ? '1.495rem' : '1.25rem'} !important;
-            margin-bottom: -1px !important;
-          }
+        .sidenav-container a[account-tray="true"] {
+          height: 72.59px !important;
+        }`
+            : ''
         }
       `}</style>
       <SideNavBar
@@ -361,13 +314,14 @@ const SideNav = () => {
         }}
       >
         <SideNavBar.Item
+          elementRef={el => (logoRef.current = el)}
           icon={
             !logoUrl ? (
-              <div ref={el => (canvasLogo.current = el)}>
+              <div id="canvas-logo">
                 <IconCanvasLogoSolid data-testid="sidenav-canvas-logo" />
               </div>
             ) : (
-              <div ref={el => (brandLogo.current = el)}>
+              <div id="brand-logo">
                 <Img
                   display="inline-block"
                   alt="sidenav-brand-logomark"
@@ -383,9 +337,11 @@ const SideNav = () => {
             ...navItemThemeOverride,
             contentPadding: '0',
           }}
+          minimized={collapseGlobalNav}
           data-testid="sidenav-header-logo"
         />
         <SideNavBar.Item
+          id="user-tray"
           icon={
             <Badge
               count={unreadContentSharesCount}
@@ -408,13 +364,18 @@ const SideNav = () => {
               }
             >
               <Avatar
-                elementRef={el => (avatarRef.current = el)}
+                id="user-avatar"
                 name={window.ENV.current_user.display_name}
                 size="x-small"
                 src={window.ENV.current_user.avatar_image_url}
                 data-testid="sidenav-user-avatar"
+                showBorder="always"
+                frameBorder={4}
                 themeOverride={{
                   background: 'transparent',
+                  borderColor: '#ffffff',
+                  borderWidthSmall: '0.2em',
+                  borderWidthMedium: '0.2rem',
                 }}
               />
             </Badge>
@@ -428,8 +389,10 @@ const SideNav = () => {
           }}
           selected={selectedNavItem === 'profile'}
           themeOverride={navItemThemeOverride}
+          minimized={collapseGlobalNav}
         />
         <SideNavBar.Item
+          id="admin-tray"
           elementRef={el => (adminRef.current = el)}
           icon={<IconAdminLine />}
           label={I18n.t('Admin')}
@@ -440,18 +403,22 @@ const SideNav = () => {
           }}
           selected={selectedNavItem === 'accounts'}
           themeOverride={navItemThemeOverride}
+          minimized={collapseGlobalNav}
         />
         <SideNavBar.Item
+          id="dashboard-tray"
           elementRef={el => (dashboardRef.current = el)}
           icon={isK5User ? <IconHomeLine data-testid="K5HomeIcon" /> : <IconDashboardLine />}
           label={isK5User ? I18n.t('Home') : I18n.t('Dashboard')}
           href="/"
-          themeOverride={navItemThemeOverride}
           selected={selectedNavItem === 'dashboard'}
+          themeOverride={navItemThemeOverride}
+          minimized={collapseGlobalNav}
         />
         <SideNavBar.Item
+          id="courses-tray"
+          // id={selectedNavItem === 'courses' ? 'active-courses' : ''}
           elementRef={el => (coursesRef.current = el)}
-          id={selectedNavItem === 'courses' ? 'active-courses' : ''}
           icon={<IconCoursesLine />}
           label={isK5User ? I18n.t('Subjects') : I18n.t('Courses')}
           href="/courses"
@@ -461,16 +428,20 @@ const SideNav = () => {
           }}
           selected={selectedNavItem === 'courses'}
           themeOverride={navItemThemeOverride}
+          minimized={collapseGlobalNav}
         />
         <SideNavBar.Item
+          id="calendar-tray"
           elementRef={el => (calendarRef.current = el)}
           icon={<IconCalendarMonthLine />}
           label={I18n.t('Calendar')}
           href="/calendar"
-          themeOverride={navItemThemeOverride}
           selected={selectedNavItem === 'calendar'}
+          themeOverride={navItemThemeOverride}
+          minimized={collapseGlobalNav}
         />
         <SideNavBar.Item
+          id="inbox-tray"
           icon={
             <Badge
               count={unreadConversationsCount}
@@ -500,8 +471,53 @@ const SideNav = () => {
           href="/conversations"
           selected={selectedNavItem === 'conversations'}
           themeOverride={navItemThemeOverride}
+          minimized={collapseGlobalNav}
         />
         <SideNavBar.Item
+          id="history-tray"
+          elementRef={el => (historyRef.current = el)}
+          icon={<IconClockLine />}
+          label={I18n.t('History')}
+          href={window.ENV.page_view_update_url}
+          selected={selectedNavItem === 'history'}
+          themeOverride={navItemThemeOverride}
+          minimized={collapseGlobalNav}
+        />
+        {externalTools &&
+          externalTools.map(tool => (
+            <SideNavBar.Item
+              key={tool.href}
+              id="external-tool-tray"
+              elementRef={el => (externalTool.current = el)}
+              icon={
+                'svgPath' in tool ? (
+                  <svg
+                    id="svg-external-tool"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlnsXlink="http://www.w3.org/1999/xlink"
+                    viewBox="0 0 26 26"
+                    dangerouslySetInnerHTML={{__html: tool.svgPath ?? ''}}
+                    width="26px"
+                    height="26px"
+                    aria-hidden="true"
+                    role="presentation"
+                    focusable="false"
+                    style={{fill: 'currentColor', fontSize: 26}}
+                  />
+                ) : (
+                  <img id="img-external-tool" width="26px" height="26px" src={tool.imgSrc} alt="" />
+                )
+              }
+              label={tool.label}
+              href={tool.href?.toString()}
+              selected={tool.isActive}
+              themeOverride={navItemThemeOverride}
+              minimized={collapseGlobalNav}
+            />
+          ))}
+        <SideNavBar.Item
+          id="help-tray"
           icon={
             <Badge
               count={unreadReleaseNotesCount}
@@ -535,6 +551,7 @@ const SideNav = () => {
           }}
           selected={selectedNavItem === 'help'}
           themeOverride={navItemThemeOverride}
+          minimized={collapseGlobalNav}
         />
       </SideNavBar>
       <Tray

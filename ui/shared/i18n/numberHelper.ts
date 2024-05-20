@@ -40,7 +40,7 @@ const helper = {
     }
 
     // final fallback to old parseFloat - this allows us to still support scientific 'e' notation
-    if (input.toString().match(/e/) && Number.isNaN(Number(num))) {
+    if (Number.isNaN(Number(num)) && helper.isScientific(input.toString())) {
       num = parseFloat(input)
     }
 
@@ -49,6 +49,11 @@ const helper = {
 
   validate(input: number | string) {
     return !Number.isNaN(Number(helper.parse(input)))
+  },
+
+  isScientific(inputString: string) {
+    const scientificPattern = /^[+-]?\d+(\.\d*)?([eE][+-]?\d+)$/
+    return inputString.match(scientificPattern)
   },
 }
 

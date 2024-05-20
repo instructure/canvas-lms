@@ -30,7 +30,6 @@ ready(() => {
   // page style modifiers
   document.querySelector('body')?.classList.add('full-width')
   document.querySelector('div.ic-Layout-contentMain')?.classList.remove('ic-Layout-contentMain')
-  document.querySelector('#content')?.setAttribute('style', 'padding: 0 0 24px 24px')
   document
     .querySelector('.ic-app-nav-toggle-and-crumbs.no-print')
     ?.setAttribute('style', 'margin: 0 0 0 24px')
@@ -41,7 +40,7 @@ if (ENV.SEQUENCE != null && !urlParams.get('embed')) {
   // eslint-disable-next-line promise/catch-or-return
   import('@canvas/module-sequence-footer').then(() => {
     $(() => {
-      $('<div id="module_sequence_footer" style="margin-top: 30px" />')
+      $('<div id="module_sequence_footer" style="margin: 0 16px" />')
         .appendTo('#content')
         .moduleSequenceFooter({
           assetType: 'Discussion',

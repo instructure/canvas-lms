@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
+import {map, reject, includes, filter} from 'lodash'
 import '@canvas/jquery/jquery.disableWhileLoading'
 
 const I18n = useI18nScope('RosterDialogMixin')
@@ -31,10 +31,10 @@ const RosterDialogMixin = {
   updateEnrollments(addEnrollments, removeEnrollments) {
     let enrollments = this.model.get('enrollments')
     enrollments = enrollments.concat(addEnrollments)
-    const removeIds = _.pluck(removeEnrollments, 'id')
-    enrollments = _.reject(enrollments, en => _.includes(removeIds, en.id))
-    const sectionIds = _.pluck(enrollments, 'course_section_id')
-    const sections = _.filter(ENV.SECTIONS, s => _.includes(sectionIds, s.id))
+    const removeIds = map(removeEnrollments, 'id')
+    enrollments = reject(enrollments, en => includes(removeIds, en.id))
+    const sectionIds = map(enrollments, 'course_section_id')
+    const sections = filter(ENV.SECTIONS, s => includes(sectionIds, s.id))
     return this.model.set({enrollments, sections})
   },
 }

@@ -17,16 +17,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import round from '@canvas/round'
+import {escape as lodashEscape} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {scoreToGrade} from '@instructure/grading-utils'
 import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import listFormatterPolyfill from '@canvas/util/listFormatter'
 import type Gradebook from '../../Gradebook'
 import type {Assignment} from '../../../../../../api.d'
-import type {DeprecatedGradingScheme} from '@canvas/grading/grading'
+import type {DeprecatedGradingScheme} from '@canvas/grading/grading.d'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 const I18n = useI18nScope('gradebook')
@@ -110,7 +110,7 @@ function render(options) {
   }
 
   if (options.letterGrade) {
-    const escapedGrade = _.escape(options.letterGrade)
+    const escapedGrade = lodashEscape(options.letterGrade)
 
     // xsslint safeString.identifier escapedGrade
     letterGrade = `<span class="letter-grade-points">${escapedGrade}</span>`
@@ -138,7 +138,6 @@ type Getters = {
   listInvalidAssignmentGroups(): ReturnType<Gradebook['listInvalidAssignmentGroups']>
   listHiddenAssignments(studentId: string): Assignment[]
   shouldShowPoints(): boolean
-  pointsBasedGradingSchemesFeatureEnabled(): boolean
 }
 
 export default class TotalGradeCellFormatter {
@@ -146,9 +145,6 @@ export default class TotalGradeCellFormatter {
 
   constructor(gradebook: Gradebook) {
     this.options = {
-      pointsBasedGradingSchemesFeatureEnabled(): boolean {
-        return gradebook.pointsBasedGradingSchemesFeatureEnabled()
-      },
       getTotalPointsPossible() {
         return gradebook.getTotalPointsPossible()
       },
@@ -182,26 +178,26 @@ export default class TotalGradeCellFormatter {
     let letterGrade
     const scheme = this.options.getGradingStandard()
     if (grade.possible && scheme) {
-      letterGrade = GradeFormatHelper.replaceDashWithMinus(scoreToGrade(percentage, scheme.data))
+      letterGrade = GradeFormatHelper.replaceDashWithMinus(
+        scoreToGrade(percentage, scheme.data, scheme.pointsBased)
+      )
     }
 
     let displayAsScaledPoints = false
     let scaledScore = NaN
     let scaledPossible = NaN
 
-    if (this.options.pointsBasedGradingSchemesFeatureEnabled()) {
-      if (scheme) {
-        displayAsScaledPoints = scheme.pointsBased
-        const scalingFactor = scheme.scalingFactor
+    if (scheme) {
+      displayAsScaledPoints = scheme.pointsBased
+      const scalingFactor = scheme.scalingFactor
 
-        if (displayAsScaledPoints && grade.possible) {
-          scaledPossible = I18n.n(scalingFactor, {
-            precision: 1,
-          })
-          scaledScore = I18n.n(scoreToScaledPoints(grade.score, grade.possible, scalingFactor), {
-            precision: 1,
-          })
-        }
+      if (displayAsScaledPoints && grade.possible) {
+        scaledPossible = I18n.n(scalingFactor, {
+          precision: 1,
+        })
+        scaledScore = I18n.n(scoreToScaledPoints(grade.score, grade.possible, scalingFactor), {
+          precision: 1,
+        })
       }
     }
 

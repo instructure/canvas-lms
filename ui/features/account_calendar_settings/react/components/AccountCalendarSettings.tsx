@@ -32,7 +32,7 @@ import {AccountList} from './AccountList'
 import {AccountTree} from './AccountTree'
 import {FilterControls, FilterType} from './FilterControls'
 import {Footer} from './Footer'
-import {
+import type {
   VisibilityChange,
   SubscriptionChange,
   ExpandedAccounts,

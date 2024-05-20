@@ -76,7 +76,7 @@ describe Lti::IMS::NamesAndRolesController do
 
     context "when the page size parameter is too large" do
       let(:rqst_page_size) { 4_611_686_018_427_387_903 }
-      let(:effective_page_size) { 50 } # system max
+      let(:effective_page_size) { Lti::IMS::Providers::MembershipsProvider::MAX_PAGE_SIZE } # system max
       let(:rsp_page_size) { total_items }
 
       it "defaults to the system maximum page size" do
@@ -264,10 +264,10 @@ describe Lti::IMS::NamesAndRolesController do
                 "person_name_family" => "Perkins",
                 "person_name_given" => "Marta",
                 "user_image" => "http://school.edu/image/url.png",
-                "user_id" => user.id,
-                "canvas_user_id" => user.id,
+                "user_id" => user.id.to_s,
+                "canvas_user_id" => user.id.to_s,
                 "vnd_instructure_user_uuid" => user.uuid,
-                "canvas_user_globalid" => user.global_id,
+                "canvas_user_globalid" => user.global_id.to_s,
                 "canvas_user_sissourceid" => @cc_pseud.sis_user_id,
                 "person_sourced_id" => @cc_pseud.sis_user_id,
                 "message_locale" => "de",
@@ -351,26 +351,12 @@ describe Lti::IMS::NamesAndRolesController do
     # debug as compared to multi-enrollment tests
 
     describe "id field" do
-      context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
-        it "uses the Account#domain in the line item id" do
-          course.root_account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-          expect_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
-          send_request
-          expect(json[:id]).to eq(
-            "http://canonical.host/api/lti/courses/#{course.id}/names_and_roles"
-          )
-        end
-      end
-
-      context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
-        it "uses the host domain in the line item id" do
-          course.root_account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-          allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
-          send_request
-          expect(json[:id]).to eq(
-            "http://test.host/api/lti/courses/#{course.id}/names_and_roles"
-          )
-        end
+      it "uses the Account#domain in the line item id" do
+        expect_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
+        send_request
+        expect(json[:id]).to eq(
+          "http://canonical.host/api/lti/courses/#{course.id}/names_and_roles"
+        )
       end
     end
 

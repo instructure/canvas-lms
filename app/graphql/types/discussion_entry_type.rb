@@ -33,11 +33,6 @@ module Types
     field :rating_count, Integer, null: true
     field :rating_sum, Integer, null: true
 
-    field :isolated_entry_id, ID, null: true
-    def isolated_entry_id
-      object.legacy? ? object.parent_id : object.root_entry_id
-    end
-
     field :message, String, null: true
     def message
       if object.deleted?
@@ -82,6 +77,9 @@ module Types
     end
     def author(course_id: nil, role_types: nil, built_in_only: false)
       load_association(:discussion_topic).then do |topic|
+        course_id = topic&.course&.id if course_id.nil?
+        # Set the graphql context so it can be used downstream
+        context[:course_id] = course_id
         if topic.anonymous? && object.is_anonymous_author
           nil
         else
@@ -89,7 +87,6 @@ module Types
             if !topic.anonymous? || !user
               user
             else
-              course_id = topic.course.id if course_id.nil?
               Loaders::CourseRoleLoader.for(course_id:, role_types:, built_in_only:).load(user).then do |roles|
                 if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment") || (topic.anonymous_state == "partial_anonymity" && !object.is_anonymous_author)
                   user
@@ -132,6 +129,9 @@ module Types
     end
     def editor(course_id: nil, role_types: nil, built_in_only: false)
       load_association(:discussion_topic).then do |topic|
+        course_id = topic&.course&.id if course_id.nil?
+        # Set the graphql context so it can be used downstream
+        context[:course_id] = course_id
         if topic.anonymous? && !course_id
           nil
         else
@@ -206,9 +206,6 @@ module Types
 
     field :subentries_count, Integer, null: true
     def subentries_count
-      # don't try to count subentries if isolated view is active
-      return nil if Account.site_admin.feature_enabled?(:isolated_view)
-
       Loaders::AssociationCountLoader.for(DiscussionEntry, :discussion_subentries).load(object)
     end
 

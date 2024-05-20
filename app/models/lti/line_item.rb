@@ -34,7 +34,8 @@ class Lti::LineItem < ApplicationRecord
              foreign_key: :lti_resource_link_id,
              class_name: "Lti::ResourceLink"
   belongs_to :assignment,
-             inverse_of: :line_items
+             inverse_of: :line_items,
+             class_name: "AbstractAssignment"
   belongs_to :root_account,
              class_name: "Account"
   has_many :results,
@@ -57,11 +58,9 @@ class Lti::LineItem < ApplicationRecord
     assignment.line_items.order(:created_at).first.id == id
   end
 
-  alias_method :original_undestroy, :undestroy
-  private :original_undestroy
   def undestroy
     results.find_each(&:undestroy)
-    original_undestroy
+    super
   end
 
   def launch_url_extension
@@ -75,7 +74,8 @@ class Lti::LineItem < ApplicationRecord
         name: params[:label],
         points_possible: params[:score_maximum],
         submission_types: "none",
-        due_at: params[:end_date_time]
+        due_at: params[:end_date_time],
+        unlock_at: params[:start_date_time]
       }
 
       submission_type = params[AGS_EXT_SUBMISSION_TYPE]

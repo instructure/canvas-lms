@@ -239,6 +239,19 @@ describe Rubric do
       expect(@rubric.errors.to_a[0]).to eql("This rubric has Outcomes aligned more than once")
     end
 
+    it "prevents an aligned outcome from being removed if it was assessed" do
+      user = user_factory(active_all: true)
+      @course.enroll_student(user)
+      a = @rubric.associate_with(@assignment, @course, purpose: "grading")
+      @submission = @assignment.grade_student(user, grade: "10", grader: @teacher).first
+      a.assess(assessment_data({ points: 2 }))
+      @rubric.data[0][:learning_outcome_id] = nil
+      @rubric.save
+
+      expect(@rubric).not_to be_valid
+      expect(@rubric.errors.to_a[0]).to eql("This rubric removes criterions that have learning outcome results")
+    end
+
     it "creates outcome results when outcome-aligned rubrics are assessed" do
       expect(@rubric).not_to be_new_record
       expect(@rubric.learning_outcome_alignments.reload).not_to be_empty
@@ -266,6 +279,8 @@ describe Rubric do
       expect(result.possible).to be(3.0)
       expect(result.original_score).to be(2.0)
       expect(result.mastery).to be_truthy
+      expect(@rubric.learning_outcome_results).to eq([result])
+      expect(@rubric.learning_outcome_ids_from_results).to eq([result.learning_outcome_id])
     end
 
     it "destroys an outcome link after the assignment using it is destroyed (if it's not used anywhere else)" do
@@ -343,6 +358,7 @@ describe Rubric do
   end
 
   it "changes workflow state properly when archiving when enhanced_rubrics FF enabled" do
+    Account.site_admin.enable_feature!(:enhanced_rubrics)
     course_with_teacher
     rubric = rubric_model({ context: @course })
     rubric.archive
@@ -350,6 +366,7 @@ describe Rubric do
   end
 
   it "changes workflow state propertly when unarchiving when enhanced_rubrics FF enabled" do
+    Account.site_admin.enable_feature!(:enhanced_rubrics)
     course_with_teacher
     rubric = rubric_model({ context: @course })
     rubric.archive

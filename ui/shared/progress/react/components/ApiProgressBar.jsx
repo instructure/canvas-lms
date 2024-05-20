@@ -18,9 +18,9 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import _ from 'underscore'
 import ProgressStore from '../../stores/ProgressStore'
 import ProgressBar from './ProgressBar'
+import {isObject} from 'lodash'
 
 class ApiProgressBar extends React.Component {
   static displayName = 'ProgressBar'
@@ -91,7 +91,7 @@ class ApiProgressBar extends React.Component {
   handleStoreChange = () => {
     const progress = ProgressStore.getState()[this.props.progress_id]
 
-    if (_.isObject(progress)) {
+    if (isObject(progress)) {
       this.setState({
         completion: progress.completion,
         workflow_state: progress.workflow_state,

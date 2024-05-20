@@ -1,6 +1,8 @@
 {
-    "recommendations": [
-        "github.copilot",
-        "ms-vscode-remote.remote-containers"
-    ]
+  "recommendations": [
+    "github.copilot",
+    "ms-vscode-remote.remote-containers",
+    "esbenp.prettier-vscode",
+    "Shopify.ruby-lsp"
+  ]
 }

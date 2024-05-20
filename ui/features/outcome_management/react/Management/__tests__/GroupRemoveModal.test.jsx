@@ -21,9 +21,13 @@ import {render as rawRender, fireEvent, waitFor} from '@testing-library/react'
 import GroupRemoveModal from '../GroupRemoveModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {removeOutcomeGroup} from '@canvas/outcomes/graphql/Management'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/outcomes/graphql/Management')
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+}))
 
 class CustomError extends Error {
   constructor(message) {
@@ -113,7 +117,6 @@ describe('GroupRemoveModal', () => {
   })
 
   it('displays flash confirmation with proper message and calls onSuccess if delete request succeeds', async () => {
-    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     removeOutcomeGroup.mockReturnValue(
       Promise.resolve({status: 200, data: {id: 2, parent_outcome_group: {id: 1}}})
     )
@@ -122,7 +125,7 @@ describe('GroupRemoveModal', () => {
     expect(removeOutcomeGroup).toHaveBeenCalledWith('Account', '1', '123')
     await waitFor(() => {
       expect(onSuccessMock).toHaveBeenCalled()
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'This group was successfully removed.',
         type: 'success',
       })
@@ -130,13 +133,12 @@ describe('GroupRemoveModal', () => {
   })
 
   it('displays flash error if delete request fails', async () => {
-    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     removeOutcomeGroup.mockReturnValue(Promise.reject(new Error('Network error')))
     const {getByText} = render(<GroupRemoveModal {...defaultProps()} />)
     fireEvent.click(getByText('Remove Group'))
     expect(removeOutcomeGroup).toHaveBeenCalledWith('Account', '1', '123')
     await waitFor(() => {
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while removing this group. Please try again.',
         type: 'error',
       })
@@ -144,7 +146,6 @@ describe('GroupRemoveModal', () => {
   })
 
   it('displays proper flash error message if delete request fails due to aligned outcome', async () => {
-    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     removeOutcomeGroup.mockReturnValue(
       Promise.reject(new CustomError('cannot be deleted because it is aligned to contents'))
     )
@@ -152,7 +153,7 @@ describe('GroupRemoveModal', () => {
     fireEvent.click(getByText('Remove Group'))
     expect(removeOutcomeGroup).toHaveBeenCalledWith('Account', '1', '123')
     await waitFor(() => {
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message:
           'An error occurred while removing this group: "Fancy group" contains one or more Outcomes that are currently aligned to content.',
         type: 'error',

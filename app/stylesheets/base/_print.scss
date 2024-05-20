@@ -110,5 +110,49 @@
       }
     }
   }
-
+  .rating-tier.selected {
+    position: relative;
+    padding-bottom: 1em;
+    .shader {
+      width: 100%;
+      height: 0.3em;
+      position: absolute;
+      bottom: 0;
+      #{direction(left)}: 0;
+      .triangle {
+        width: 0;
+        height: 0;
+        border-#{direction(left)}: 0.5em solid transparent;
+        border-#{direction(right)}: 0.5em solid transparent;
+        border-bottom: 0.8em solid;
+        position: relative;
+        margin: 0 auto;
+        bottom: 0.4em;
+      }
+    }
+    .exceedsMasteryShader {
+      border-bottom: 0.3em solid #127A1B;
+      .triangle {
+        color: #127A1B;
+      }
+    }
+    .meetsMasteryShader {
+      border-bottom: 0.3em solid $shamrock;
+      .triangle {
+         color: $shamrock;
+      }
+    }
+    .nearMasteryShader {
+      border-bottom: 0.3em solid $fire;
+      .triangle {
+        color: $fire;
+      }
+    }
+    .wellBelowMasteryShader {
+      border-bottom: 0.3em solid #E0061F;
+      .triangle {
+        color: #E0061F;
+      }
+    }
+  }
 }

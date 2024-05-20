@@ -63,6 +63,7 @@ ready(() => {
         isMasterCourse={ENV.BLUEPRINT_COURSES_DATA?.isMasterCourse}
         showImmersiveReader={ENV.SHOW_IMMERSIVE_READER}
         gradingScheme={ENV.GRADING_SCHEME}
+        pointsBasedGradingScheme={ENV.POINTS_BASED}
         restrictQuantitativeData={ENV.RESTRICT_QUANTITATIVE_DATA}
       />,
       courseContainer

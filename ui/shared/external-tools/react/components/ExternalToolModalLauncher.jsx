@@ -23,7 +23,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import ToolLaunchIframe from './ToolLaunchIframe'
-
+import {handleExternalContentMessages} from '../../messages'
 const I18n = useI18nScope('external_toolsModalLauncher')
 
 export default class ExternalToolModalLauncher extends React.Component {
@@ -61,16 +61,18 @@ export default class ExternalToolModalLauncher extends React.Component {
   }
 
   componentDidMount() {
-    $(window).on('externalContentReady', this.onExternalToolCompleted)
-    $(window).on('externalContentCancel', this.onExternalToolCompleted)
+    this.removeExternalContentListener =
+      handleExternalContentMessages({
+        ready: this.onExternalToolCompleted,
+        cancel: () => this.onExternalToolCompleted({}),
+      })
   }
 
   componentWillUnmount() {
-    $(window).off('externalContentReady', this.onExternalToolCompleted)
-    $(window).off('externalContentCancel', this.onExternalToolCompleted)
+    this.removeExternalContentListener()
   }
 
-  onExternalToolCompleted = (ev, data) => {
+  onExternalToolCompleted = (data) => {
     if (this.props.onExternalContentReady) {
       this.props.onExternalContentReady(data)
     }

@@ -21,13 +21,13 @@ import React, {useState} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
-import moment from 'moment'
 import {MomentInput} from 'moment-timezone'
 import type {Moment} from 'moment-timezone'
-import tz from '@canvas/timezone'
+import * as tz from '@canvas/datetime'
 import {View} from '@instructure/ui-view'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {isoDateFromInput} from '../../../util/DateUtils'
 
 const I18n = useI18nScope('gradebook')
 
@@ -108,7 +108,7 @@ export default function FilterNavDateModal({
             messages={startDateMessages}
             onSelectedDateChange={(inputObj: MomentInput) => {
               if (inputObj instanceof Date) {
-                const startDate_ = moment(inputObj).toISOString()
+                const startDate_ = isoDateFromInput('start-date', inputObj)
                 if (endDateValue && startDate_ > endDateValue) {
                   setStartDateMessages([
                     {
@@ -142,7 +142,7 @@ export default function FilterNavDateModal({
             messages={endDateMessages}
             onSelectedDateChange={(inputObj: MomentInput) => {
               if (inputObj instanceof Date) {
-                const endDate_ = moment(inputObj).toISOString()
+                const endDate_ = isoDateFromInput('end-date', inputObj)
                 if (startDateValue && endDate_ < startDateValue) {
                   setEndDateMessages([
                     {

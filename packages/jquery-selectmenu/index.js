@@ -1,3 +1,8 @@
+/* eslint-disable  no-useless-concat */
+/* eslint-disable  vars-on-top */
+/* eslint-disable  no-var */
+/* eslint-disable  block-scoped-var */
+/* eslint-disable  no-restricted-globals */
 /*
  * jQuery UI selectmenu dev version
  *
@@ -25,7 +30,7 @@ $.widget('ui.selectmenu', {
     positionOptions: {
       my: 'left top',
       at: 'left bottom',
-      offset: null
+      offset: null,
     },
     width: null,
     menuWidth: null,
@@ -34,7 +39,7 @@ $.widget('ui.selectmenu', {
     icons: null,
     format: null,
     escapeHtml: false,
-    bgImage() {}
+    bgImage() {},
   },
 
   _create() {
@@ -59,9 +64,9 @@ $.widget('ui.selectmenu', {
       id: this.ids[1],
       role: 'button',
       href: '#nogo',
-      tabindex: this.element.attr('disabled') ? 1 : 0,
+      tabindex: this.element.prop('disabled') ? 1 : 0,
       'aria-haspopup': true,
-      'aria-owns': this.ids[2]
+      'aria-owns': this.ids[2],
     })
     this.newelementWrap = $('<span />').append(this.newelement).insertAfter(this.element)
 
@@ -87,7 +92,7 @@ $.widget('ui.selectmenu', {
       'click.selectmenu': function (event) {
         self.newelement.focus()
         event.preventDefault()
-      }
+      },
     })
 
     // click toggle for menu visibility
@@ -222,10 +227,10 @@ $.widget('ui.selectmenu', {
       'aria-hidden': true,
       role: 'listbox',
       'aria-labelledby': this.ids[1],
-      id: this.ids[2]
+      id: this.ids[2],
     })
     this.listWrap = $('<div />', {
-      class: self.widgetBaseClass + '-menu'
+      class: self.widgetBaseClass + '-menu',
     })
       .append(this.list)
       .appendTo(o.appendTo)
@@ -311,12 +316,12 @@ $.widget('ui.selectmenu', {
       selectOptionData.push({
         value: opt.attr('value'),
         text: self._formatText(opt.text()),
-        selected: opt.attr('selected'),
-        disabled: opt.attr('disabled'),
+        selected: opt.prop('selected'),
+        disabled: opt.prop('disabled'),
         classes: opt.attr('class'),
         typeahead: opt.attr('typeahead'),
         parentOptGroup: opt.parent('optgroup'),
-        bgImage: o.bgImage.call(opt)
+        bgImage: o.bgImage.call(opt),
       })
     })
 
@@ -338,7 +343,7 @@ $.widget('ui.selectmenu', {
           href: '#nogo',
           tabindex: -1,
           role: 'option',
-          'aria-selected': false
+          'aria-selected': false,
         }
         if (selectOptionData[i].disabled) {
           thisAAttr['aria-disabled'] = selectOptionData[i].disabled
@@ -392,7 +397,7 @@ $.widget('ui.selectmenu', {
             }
           })
           .bind('mouseout.selectmenu blur.selectmenu', function () {
-            if ($(this).is(self._selectedOptionLi().selector)) {
+            if ($(this).is(self._selectedOptionLi())) {
               $(this).addClass(activeClass)
             }
             $(this).removeClass(self.widgetBaseClass + '-item-focus ui-state-hover')
@@ -412,7 +417,7 @@ $.widget('ui.selectmenu', {
                 self.widgetBaseClass +
                 '-group ' +
                 optGroupName +
-                (selectOptionData[i].parentOptGroup.attr('disabled')
+                (selectOptionData[i].parentOptGroup.prop('disabled')
                   ? ' ' + this.namespace + '-state-disabled" aria-disabled="true"'
                   : '"') +
                 '><span class="' +
@@ -504,7 +509,7 @@ $.widget('ui.selectmenu', {
     this._optionLis = this.list.find('li:not(.' + self.widgetBaseClass + '-group)')
 
     // transfer disabled state
-    if (this.element.attr('disabled')) {
+    if (this.element.prop('disabled')) {
       this.disable()
     } else {
       this.enable()
@@ -632,7 +637,7 @@ $.widget('ui.selectmenu', {
     return {
       index,
       option: $('option', this.element).get(index),
-      value: this.element[0].value
+      value: this.element[0].value,
     }
   },
 
@@ -880,7 +885,7 @@ $.widget('ui.selectmenu', {
         .addClass(this.namespace + '-state-disabled')
         .find('a')
         .attr('aria-disabled', true)
-      this.element.find('option').eq(index).attr('disabled', 'disabled')
+      this.element.find('option').eq(index).prop('disabled', true)
     }
   },
 
@@ -899,7 +904,7 @@ $.widget('ui.selectmenu', {
     const optGroupElem = this.list.find('li.' + this.widgetBaseClass + '-group-' + index)
     if (optGroupElem) {
       optGroupElem.addClass(this.namespace + '-state-disabled').attr('aria-disabled', true)
-      this.element.find('optgroup').eq(index).attr('disabled', 'disabled')
+      this.element.find('optgroup').eq(index).prop('disabled', true)
     }
   },
 
@@ -984,7 +989,7 @@ $.widget('ui.selectmenu', {
       my: o.positionOptions.my,
       at: o.positionOptions.at,
       offset: o.positionOptions.offset || _offset,
-      collision: o.positionOptions.collision || o.style == 'popup' ? 'fit' : 'flip'
+      collision: o.positionOptions.collision || o.style == 'popup' ? 'fit' : 'flip',
     })
   },
 
@@ -1019,5 +1024,5 @@ $.widget('ui.selectmenu', {
       }
     }
     return -1
-  }
+  },
 })

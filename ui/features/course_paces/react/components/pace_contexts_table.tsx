@@ -18,9 +18,11 @@
 
 import React, {useEffect, useState, useRef} from 'react'
 import $ from 'jquery'
+import '@canvas/jquery/jquery.simulate'
+import '@canvas/rails-flash-notifications'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
-import {
+import type {
   PaceContext,
   APIPaceContextTypes,
   ResponsiveSizes,

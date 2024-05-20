@@ -20,6 +20,6 @@
 
 describe TeacherEnrollment do
   it "subclasses Enrollment" do
-    expect(TeacherEnrollment.ancestors).to be_include(Enrollment)
+    expect(TeacherEnrollment.ancestors).to include(Enrollment)
   end
 end

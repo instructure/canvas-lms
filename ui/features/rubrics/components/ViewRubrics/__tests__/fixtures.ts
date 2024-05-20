@@ -17,31 +17,187 @@
  */
 
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
-import {RubricQueryResponse} from 'features/rubrics/types/Rubric'
+import type {RubricQueryResponse} from 'features/rubrics/types/Rubric'
 
 export const RUBRICS_DATA: Rubric[] = [
   {
     id: '1',
     title: 'Rubric 1',
-    criteriaCount: 5,
+    criteriaCount: 1,
+    criteria: [
+      {
+        id: '1',
+        points: 5,
+        description: 'Criterion 1',
+        longDescription: 'Long description for criterion 1',
+        ignoreForScoring: false,
+        masteryPoints: 3,
+        criterionUseRange: false,
+        ratings: [
+          {
+            id: '1',
+            description: 'Rating 1',
+            longDescription: 'Long description for rating 1',
+            points: 5,
+          },
+          {
+            id: '2',
+            description: 'Rating 2',
+            longDescription: 'Long description for rating 2',
+            points: 0,
+          },
+        ],
+      },
+    ],
+    hidePoints: false,
+    hasRubricAssociations: false,
+    pointsPossible: 5,
+    ratingOrder: 'ascending',
+    buttonDisplay: 'points',
     locations: [],
-    pointsPossible: 10,
     workflowState: 'active',
   },
   {
     id: '2',
     title: 'Rubric 2',
-    criteriaCount: 3,
+    criteriaCount: 2,
+    criteria: [
+      {
+        id: '1',
+        points: 5,
+        description: 'Criterion 1',
+        longDescription: 'Long description for criterion 1',
+        ignoreForScoring: false,
+        masteryPoints: 3,
+        criterionUseRange: false,
+        ratings: [
+          {
+            id: '1',
+            description: 'Rating 1',
+            longDescription: 'Long description for rating 1',
+            points: 5,
+          },
+          {
+            id: '2',
+            description: 'Rating 2',
+            longDescription: 'Long description for rating 2',
+            points: 0,
+          },
+        ],
+      },
+      {
+        id: '2',
+        points: 5,
+        description: 'Criterion 2',
+        longDescription: 'Long description for criterion 2',
+        ignoreForScoring: false,
+        masteryPoints: 3,
+        criterionUseRange: false,
+        ratings: [
+          {
+            id: '1',
+            description: 'Rating 1',
+            longDescription: 'Long description for rating 1',
+            points: 5,
+          },
+          {
+            id: '2',
+            description: 'Rating 2',
+            longDescription: 'Long description for rating 2',
+            points: 0,
+          },
+        ],
+      },
+    ],
+    hidePoints: false,
+    hasRubricAssociations: false,
+    pointsPossible: 10,
+    ratingOrder: 'ascending',
+    buttonDisplay: 'points',
     locations: [],
-    pointsPossible: 30,
     workflowState: 'archived',
   },
   {
     id: '3',
     title: 'Rubric 3',
-    criteriaCount: 5,
+    criteriaCount: 3,
+    criteria: [
+      {
+        id: '1',
+        points: 5,
+        description: 'Criterion 1',
+        longDescription: 'Long description for criterion 1',
+        ignoreForScoring: false,
+        masteryPoints: 3,
+        criterionUseRange: false,
+        ratings: [
+          {
+            id: '1',
+            description: 'Rating 1',
+            longDescription: 'Long description for rating 1',
+            points: 5,
+          },
+          {
+            id: '2',
+            description: 'Rating 2',
+            longDescription: 'Long description for rating 2',
+            points: 0,
+          },
+        ],
+      },
+      {
+        id: '2',
+        points: 5,
+        description: 'Criterion 2',
+        longDescription: 'Long description for criterion 2',
+        ignoreForScoring: false,
+        masteryPoints: 3,
+        criterionUseRange: false,
+        ratings: [
+          {
+            id: '1',
+            description: 'Rating 1',
+            longDescription: 'Long description for rating 1',
+            points: 5,
+          },
+          {
+            id: '2',
+            description: 'Rating 2',
+            longDescription: 'Long description for rating 2',
+            points: 0,
+          },
+        ],
+      },
+      {
+        id: '3',
+        points: 5,
+        description: 'Criterion 3',
+        longDescription: 'Long description for criterion 3',
+        ignoreForScoring: false,
+        masteryPoints: 3,
+        criterionUseRange: false,
+        ratings: [
+          {
+            id: '1',
+            description: 'Rating 1',
+            longDescription: 'Long description for rating 1',
+            points: 5,
+          },
+          {
+            id: '2',
+            description: 'Rating 2',
+            longDescription: 'Long description for rating 2',
+            points: 0,
+          },
+        ],
+      },
+    ],
+    hidePoints: false,
+    hasRubricAssociations: true,
+    pointsPossible: 15,
+    ratingOrder: 'ascending',
+    buttonDisplay: 'points',
     locations: [],
-    pointsPossible: 20,
     workflowState: 'active',
   },
 ]
@@ -50,4 +206,10 @@ export const RUBRICS_QUERY_RESPONSE: RubricQueryResponse = {
   rubricsConnection: {
     nodes: RUBRICS_DATA,
   },
+}
+
+export const RUBRIC_PREVIEW_QUERY_RESPONSE: Pick<Rubric, 'criteria' | 'title' | 'ratingOrder'> = {
+  criteria: RUBRICS_DATA[0].criteria,
+  title: RUBRICS_DATA[0].title,
+  ratingOrder: RUBRICS_DATA[0].ratingOrder,
 }

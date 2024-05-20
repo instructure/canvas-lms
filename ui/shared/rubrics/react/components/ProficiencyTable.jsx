@@ -32,8 +32,8 @@ import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
 import ProficiencyRating from './ProficiencyRating'
-import uuid from 'uuid/v1'
-import _ from 'underscore'
+import {v1 as uuid} from 'uuid'
+import {memoize} from 'lodash'
 import {fromJS, List} from 'immutable'
 import {fetchProficiency, saveProficiency} from '../api'
 import NumberHelper from '@canvas/i18n/numberHelper'
@@ -145,11 +145,11 @@ export default class ProficiencyTable extends React.Component {
     $.screenReaderFlashMessage(I18n.t('Added new proficiency rating'))
   }
 
-  handleMasteryChange = _.memoize(index => () => {
+  handleMasteryChange = memoize(index => () => {
     this.setState({masteryIndex: index})
   })
 
-  handleDescriptionChange = _.memoize(index => value => {
+  handleDescriptionChange = memoize(index => value => {
     this.setState(oldState => {
       let rows = oldState.rows
       if (!this.invalidDescription(value)) {
@@ -160,7 +160,7 @@ export default class ProficiencyTable extends React.Component {
     })
   })
 
-  handlePointsChange = _.memoize(index => value => {
+  handlePointsChange = memoize(index => value => {
     const parsed = NumberHelper.parse(value)
     this.setState(oldState => {
       let rows = oldState.rows
@@ -172,14 +172,14 @@ export default class ProficiencyTable extends React.Component {
     })
   })
 
-  handleColorChange = _.memoize(index => value => {
+  handleColorChange = memoize(index => value => {
     this.setState(oldState => {
       const rows = oldState.rows.update(index, row => row.set('color', unformatColor(value)))
       return {rows}
     })
   })
 
-  handleDelete = _.memoize(index => () => {
+  handleDelete = memoize(index => () => {
     const masteryIndex = this.state.masteryIndex
     const rows = this.state.rows.delete(index)
     if (masteryIndex >= index && masteryIndex > 0) {

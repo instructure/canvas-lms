@@ -530,6 +530,27 @@ describe InstFS do
           InstFS.direct_upload(file_name: "a.png", file_object: File.open("public/images/a.png"))
         end.to raise_error(InstFS::ServiceError)
       end
+
+      it "retries timeouts, resending lost data" do
+        first_run = true
+        uploaded_data = nil
+        allow(CanvasHttp).to receive(:post) do |_, opts|
+          stream = opts[:form_data]["foo.txt"]
+          if first_run
+            first_run = false
+            stream.read(500)
+            raise Timeout::Error
+          else
+            uploaded_data = stream.read
+            instance_double("Net::HTTPCreated",
+                            code: "201",
+                            body: { instfs_uuid: "new uuid" }.to_json)
+          end
+        end
+        new_uuid = InstFS.direct_upload(file_name: "foo.txt", file_object: StringIO.new("a" * 1000))
+        expect(new_uuid).to eq "new uuid"
+        expect(uploaded_data.size).to eq 1000
+      end
     end
 
     context "duplicate" do

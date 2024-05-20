@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import React from 'react'
 import RCELoader from '@canvas/rce/serviceRCELoader'
 import SectionCollection from '@canvas/sections/backbone/collections/SectionCollection'
@@ -32,7 +33,7 @@ import PeerReviewsSelector from '@canvas/assignments/backbone/views/PeerReviewsS
 import fakeENV from 'helpers/fakeENV'
 import userSettings from '@canvas/user-settings'
 import assertions from 'helpers/assertions'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 
 const s_params = 'some super secure params'
@@ -471,6 +472,7 @@ test('does not follow a cross-origin return_to', function () {
 })
 
 test('disables fields when inClosedGradingPeriod', function () {
+  ENV.current_user_is_admin = false
   const view = this.editView({in_closed_grading_period: true})
   view.$el.appendTo($('#fixtures'))
 
@@ -523,7 +525,7 @@ test('does not disable post to sis when inClosedGradingPeriod', function () {
   ENV.POST_TO_SIS = true
   const view = this.editView({in_closed_grading_period: true})
   view.$el.appendTo($('#fixtures'))
-  notOk(view.$el.find('#assignment_post_to_sis').attr('disabled'))
+  notOk(view.$el.find('#assignment_post_to_sis').prop('disabled'))
 })
 
 test('disableCheckbox is called for a disabled checkbox', function () {
@@ -1370,23 +1372,23 @@ test('it is hidden if submission type is not online with a file upload', functio
   equal(view.$('#similarity_detection_tools').css('display'), 'none')
 
   view.$('#assignment_submission_type').val('online')
-  view.$('#assignment_online_upload').attr('checked', false)
+  view.$('#assignment_online_upload').prop('checked', false)
   view.handleSubmissionTypeChange()
   equal(view.$('#similarity_detection_tools').css('display'), 'none')
 
   view.$('#assignment_submission_type').val('online')
-  view.$('#assignment_online_upload').attr('checked', true)
+  view.$('#assignment_online_upload').prop('checked', true)
   view.handleSubmissionTypeChange()
   equal(view.$('#similarity_detection_tools').css('display'), 'block')
 
   view.$('#assignment_submission_type').val('online')
-  view.$('#assignment_text_entry').attr('checked', false)
-  view.$('#assignment_online_upload').attr('checked', false)
+  view.$('#assignment_text_entry').prop('checked', false)
+  view.$('#assignment_online_upload').prop('checked', false)
   view.handleSubmissionTypeChange()
   equal(view.$('#similarity_detection_tools').css('display'), 'none')
 
   view.$('#assignment_submission_type').val('online')
-  view.$('#assignment_text_entry').attr('checked', true)
+  view.$('#assignment_text_entry').prop('checked', true)
   view.handleSubmissionTypeChange()
   equal(view.$('#similarity_detection_tools').css('display'), 'block')
 })
@@ -1395,7 +1397,7 @@ test('it is hidden if the plagiarism_detection_platform flag is disabled', funct
   ENV.PLAGIARISM_DETECTION_PLATFORM = false
   const view = this.editView()
   view.$('#assignment_submission_type').val('online')
-  view.$('#assignment_online_upload').attr('checked', true)
+  view.$('#assignment_online_upload').prop('checked', true)
   view.handleSubmissionTypeChange()
   equal(view.$('#similarity_detection_tools').css('display'), 'none')
 })
@@ -1753,21 +1755,6 @@ QUnit.module('EditView: anonymous grading', hooks => {
     const view = editView()
     strictEqual(view.toJSON().anonymousGradingEnabled, true)
     strictEqual(view.$el.find('input#assignment_anonymous_grading').length, 1)
-  })
-
-  test('shows warning text under checkbox when assignment is Quiz LTI', () => {
-    ENV.NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED = true
-    ENV.ANONYMOUS_GRADING_ENABLED = true
-    const view = editView({is_quiz_lti_assignment: true})
-    strictEqual(view.toJSON().anonymousGradingEnabled, true)
-    strictEqual(view.$el.find('#anonymous-lti-text').length, 1)
-  })
-
-  test('hides the anonymous grading box if ENV.NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED if off', () => {
-    ENV.ANONYMOUS_GRADING_ENABLED = true
-    const view = editView({is_quiz_lti_assignment: true})
-    strictEqual(view.toJSON().anonymousGradingEnabled, false)
-    strictEqual(view.$el.find('#anonymous-lti-text').length, 0)
   })
 
   test('is disabled when group assignment is enabled', () => {
@@ -2203,6 +2190,88 @@ QUnit.module('EditView#handleModeratedGradingChanged', hooks => {
     view.handleModeratedGradingChanged(false)
     strictEqual(view.uncheckAndHideGraderAnonymousToGraders.callCount, 1)
     view.uncheckAndHideGraderAnonymousToGraders.restore()
+  })
+})
+
+QUnit.module('EditView#handleMessageEvent', hooks => {
+  let server
+  let view
+
+  hooks.beforeEach(() => {
+    fixtures.innerHTML = `
+      <span id="editor_tabs"></span>
+      <span data-component="ModeratedGradingFormFieldGroup"></span>
+    `
+    fakeENV.setup({
+      AVAILABLE_MODERATORS: [],
+      current_user_roles: ['teacher'],
+      HAS_GRADED_SUBMISSIONS: false,
+      LOCALE: 'en',
+      MODERATED_GRADING_ENABLED: true,
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      VALID_DATE_RANGE: {},
+      COURSE_ID: 1,
+    })
+    server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
+    view = editView()
+  })
+
+  hooks.afterEach(() => {
+    server.restore()
+    fakeENV.teardown()
+    fixtures.innerHTML = ''
+  })
+
+  test('handleMessageEvent sets ab_guid when subject is assignment.set_ab_guid and the ab_guid is formatted correctly', () => {
+    const mockEvent = {
+      data: {
+        subject: 'assignment.set_ab_guid',
+        data: ['1E20776E-7053-11DF-8EBF-BE719DFF4B22', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+      },
+    }
+
+    view.handleMessageEvent(mockEvent)
+
+    deepEqual(
+      view.assignment.get('ab_guid'),
+      ['1E20776E-7053-11DF-8EBF-BE719DFF4B22', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+      'ab_guid should be set correctly'
+    )
+  })
+
+  test('handleMessageEvent does not set ab_guid when subject is not assignment.set_ab_guid', () => {
+    const mockEvent = {
+      data: {
+        subject: 'some.other.subject',
+        data: ['1E20776E-7053-11DF-8EBF-BE719DFF4B22', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+      },
+    }
+
+    view.handleMessageEvent(mockEvent)
+
+    notDeepEqual(
+      view.assignment.has('ab_guid'),
+      ['1E20776E-7053-11DF-8EBF-BE719DFF4B22', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+      'ab_guid should not be set'
+    )
+  })
+
+  test('handleMessageEvent does not set ab_guid when the ab_guid is not formatted correctly', function () {
+    const mockEvent = {
+      data: {
+        subject: 'assignment.set_ab_guid',
+        data: ['not_an_ab_guid', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+      },
+    }
+
+    view.handleMessageEvent(mockEvent)
+
+    notDeepEqual(
+      view.assignment.has('ab_guid'),
+      ['not_an_ab_guid', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+      'ab_guid should not be set'
+    )
   })
 })
 

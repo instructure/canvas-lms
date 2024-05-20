@@ -26,6 +26,8 @@ export const User = {
       _id
       avatarUrl
       displayName: shortName
+      htmlUrl
+      courseRoles
       pronouns
     }
   `,
@@ -35,6 +37,7 @@ export const User = {
     _id: string,
     avatarUrl: string,
     displayName: string,
+    htmlUrl: string,
     courseRoles: arrayOf(string),
     pronouns: string,
   }),
@@ -44,6 +47,7 @@ export const User = {
     _id = '2',
     avatarUrl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
     displayName = 'Hank Mccoy',
+    htmlUrl = '',
     courseRoles = [],
     pronouns = null,
   } = {}) => ({
@@ -51,6 +55,7 @@ export const User = {
     _id,
     avatarUrl,
     displayName,
+    htmlUrl,
     courseRoles,
     pronouns,
     __typename: 'User',
@@ -62,6 +67,7 @@ export const DefaultMocks = {
     _id: '1',
     avatarUrl: 'someFakeUrl',
     displayName: 'Turd Ferguson',
+    htmlUrl: '',
     courseRoles: [],
     pronouns: null,
   }),

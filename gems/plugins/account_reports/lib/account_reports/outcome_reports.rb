@@ -559,13 +559,11 @@ module AccountReports
       end
     end
 
-    def canvas_next?(canvas_scope, canvas_index, os_scope, os_index)
-      return false if canvas_index >= canvas_scope.length
+    def canvas_next?(canvas, os_scope, os_index)
       return true if os_index >= os_scope.length
 
       order = map_order_to_columns(outcome_order)
 
-      canvas = canvas_scope[canvas_index]
       os = os_scope[os_index]
       order.each do |column|
         if canvas[column] != os[column]
@@ -582,24 +580,12 @@ module AccountReports
       config_options[:new_quizzes_scope] ||= []
       host = root_account.domain
       enable_i18n_features = true
+      @account_level_mastery_scales_enabled = @account_report.account.root_account.feature_enabled?(:account_level_mastery_scales)
 
       os_scope = config_options[:new_quizzes_scope]
 
       write_report headers, enable_i18n_features do |csv|
-        total = canvas_scope.length + os_scope.length
-        GuardRail.activate(:primary) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
-
-        canvas_index = 0
-        os_index = 0
-        while canvas_index < canvas_scope.length || os_index < os_scope.length
-          if canvas_next?(canvas_scope, canvas_index, os_scope, os_index)
-            row = canvas_scope[canvas_index].attributes.dup
-            canvas_index += 1
-          else
-            row = os_scope[os_index]
-            os_index += 1
-          end
-
+        write_row = lambda do |row|
           row["assignment url"] = "https://#{host}" \
                                   "/courses/#{row["course id"]}" \
                                   "/assignments/#{row["assignment id"]}"
@@ -607,6 +593,24 @@ module AccountReports
           add_outcomes_data(row)
           csv << headers.map { |h| row[h] }
         end
+
+        total = os_scope.length + canvas_scope.except(:select).count
+        GuardRail.activate(:primary) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
+
+        os_index = 0
+        canvas_scope.find_each do |canvas_row|
+          until canvas_next?(canvas_row, os_scope, os_index)
+            write_row.call(os_scope[os_index])
+            os_index += 1
+          end
+          write_row.call(canvas_row.attributes)
+        end
+
+        while os_index < os_scope.length
+          write_row.call(os_scope[os_index])
+          os_index += 1
+        end
+
         csv << [config_options[:empty_scope_message]] if total == 0
       end
     end
@@ -665,13 +669,22 @@ module AccountReports
       row["learning outcome mastery score"] = nil
     end
 
+    COURSE_CACHE_SIZE = 32
+    def find_cached_course(id)
+      @course_cache ||= {}
+      @course_cache[id] ||= begin
+        @course_cache.delete(@course_cache.keys.first) if @course_cache.size >= COURSE_CACHE_SIZE
+        Course.find(id)
+      end
+    end
+
     def add_outcomes_data(row)
       row["learning outcome mastered"] = unless row["learning outcome mastered"].nil?
                                            row["learning outcome mastered"] ? 1 : 0
                                          end
 
-      course = Course.find(row["course id"])
-      outcome_data = if @account_report.account.root_account.feature_enabled?(:account_level_mastery_scales) && course.resolved_outcome_proficiency.present?
+      outcome_data = if @account_level_mastery_scales_enabled &&
+                        (course = find_cached_course(row["course id"])).resolved_outcome_proficiency.present?
                        proficiency(course)
                      elsif row["learning outcome data"].present?
                        YAML.safe_load(row["learning outcome data"])[:rubric_criterion]
@@ -681,7 +694,7 @@ module AccountReports
       row["learning outcome mastery score"] = outcome_data[:mastery_points]
       score = set_score(row, outcome_data)
       rating = set_rating(row, score, outcome_data) if score.present?
-      if row["assessment type"] != "quiz" && @account_report.account.root_account.feature_enabled?(:account_level_mastery_scales)
+      if row["assessment type"] != "quiz" && @account_level_mastery_scales_enabled
         row["learning outcome points possible"] = outcome_data[:points_possible]
       end
       if row["learning outcome points hidden"]

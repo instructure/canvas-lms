@@ -55,20 +55,19 @@
         .sort {|a, b| a <=> b }
         .map {|cid|  "course_ids%5B%5D=#{cid}" }
         .join('&')
-        observed_context_codes = observed_course_ids.gsub('course_ids%5B%5D=', 'context_codes%5B%5D=course_')
 
 if k5_user?
       %>
         <%= prefetch_xhr("/api/v1/dashboard/dashboard_cards?observed_user_id=#{@cards_prefetch_observed_param}") %>
-        <%= prefetch_xhr("/api/v1/planner/items?start_date=#{last_year}&include%5B%5D=account_calendars&order=asc&per_page=1&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
-        <%= prefetch_xhr("/api/v1/planner/items?end_date=#{next_year}&include%5B%5D=account_calendars&order=desc&per_page=1&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
-        <%= prefetch_xhr("/api/v1/planner/items?start_date=#{beginning_of_week}&end_date=#{end_of_week}&include%5B%5D=account_calendars&per_page=100&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
+        <%= prefetch_xhr("/api/v1/planner/items?start_date=#{last_year}&include%5B%5D=account_calendars&include%5B%5D=all_courses&order=asc&per_page=1&observed_user_id=#{@cards_prefetch_observed_param}") %>
+        <%= prefetch_xhr("/api/v1/planner/items?end_date=#{next_year}&include%5B%5D=account_calendars&include%5B%5D=all_courses&order=desc&per_page=1&observed_user_id=#{@cards_prefetch_observed_param}") %>
+        <%= prefetch_xhr("/api/v1/planner/items?start_date=#{beginning_of_week}&end_date=#{end_of_week}&include%5B%5D=account_calendars&include%5B%5D=all_courses&per_page=100&observed_user_id=#{@cards_prefetch_observed_param}") %>
         <%= prefetch_xhr("/api/v1/users/self/missing_submissions?include%5B%5D=planner_overrides&filter%5B%5D=current_grading_period&filter%5B%5D=submittable&per_page=100&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_course_ids}") %>
       <% else %>
         <%= prefetch_xhr("/api/v1/dashboard/dashboard_cards?observed_user_id=#{@cards_prefetch_observed_param}") %>
-        <%= prefetch_xhr("/api/v1/planner/items?start_date=#{six_months_ago}&include%5B%5D=account_calendars&filter=new_activity&order=asc&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
-        <%= prefetch_xhr("/api/v1/planner/items?end_date=#{beginning_of_day}&include%5B%5D=account_calendars&order=desc&per_page=1&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
-        <%= prefetch_xhr("/api/v1/planner/items?start_date=#{beginning_of_day}&include%5B%5D=account_calendars&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
+        <%= prefetch_xhr("/api/v1/planner/items?start_date=#{six_months_ago}&include%5B%5D=account_calendars&include%5B%5D=all_courses&filter=new_activity&order=asc&observed_user_id=#{@cards_prefetch_observed_param}") %>
+        <%= prefetch_xhr("/api/v1/planner/items?end_date=#{beginning_of_day}&include%5B%5D=account_calendars&include%5B%5D=all_courses&order=desc&per_page=1&observed_user_id=#{@cards_prefetch_observed_param}") %>
+        <%= prefetch_xhr("/api/v1/planner/items?start_date=#{beginning_of_day}&include%5B%5D=account_calendars&include%5B%5D=all_courses&observed_user_id=#{@cards_prefetch_observed_param}") %>
         <%= prefetch_xhr("/api/v1/users/self/missing_submissions?include%5B%5D=planner_overrides&filter%5B%5D=current_grading_period&filter%5B%5D=submittable&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_course_ids}") %>
       <% end %>
     <% end%>
@@ -87,11 +86,22 @@ if k5_user?
   <% if k5_user? %>
     <div id="dashboard-app-container"></div>
   <% else %>
-    <div id="dashboard_header_container" class="ic-Dashboard-header">
-      <div class="ic-Dashboard-header__title hidden-phone">
-        <%= dashboard_title %>
-      </div>
-    </div>
+    <% if Account.site_admin.feature_enabled?(:instui_header) 
+      dashboard_header_container_props = {
+        startNewCourseVisible: show_user_create_course_button(@current_user) || (@current_user.alternate_account_for_course_creation && @domain_root_account.feature_enabled?(:create_course_subaccount_picker)),
+        viewGradesUrl: grades_path,
+      }
+    %>
+      <%if dashboard_header_container_props[:startNewCourseVisible] %>
+        <% if @domain_root_account.feature_enabled?(:create_course_subaccount_picker) %>
+          <div id="create_course_modal_container"></div>
+        <% else %>
+          <%= render :partial => 'shared/new_course_form' %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <div id="dashboard_header_container" class="ic-Dashboard-header" data-props="<%=dashboard_header_container_props.to_json%>"></div>
     <% if planner_enabled? %>
       <div id="dashboard-planner" class="StudentPlanner__Container" style="display: <%= show_planner? ? 'block' : 'none' %>"></div>
     <% end %>

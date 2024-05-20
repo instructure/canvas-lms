@@ -16,8 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import _ from 'underscore'
-
+import {each} from 'lodash'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 
 export default class SyllabusAppointmentGroupsCollection extends PaginatedCollection {
@@ -43,7 +42,7 @@ export default class SyllabusAppointmentGroupsCollection extends PaginatedCollec
   // Overridden to make the id unique when aggregated in
   // a collection with other models
   parse(resp) {
-    _.each(super.parse(...arguments), ev => (ev.related_id = ev.id = `appointment_group_${ev.id}`))
+    each(super.parse(...arguments), ev => (ev.related_id = ev.id = `appointment_group_${ev.id}`))
     return resp
   }
 }

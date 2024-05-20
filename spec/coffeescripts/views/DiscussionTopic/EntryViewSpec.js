@@ -1,3 +1,4 @@
+/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2015 - present Instructure, Inc.
  *
@@ -17,9 +18,9 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import Entry from 'ui/features/discussion_topic/backbone/models/Entry'
 import EntryView from 'ui/features/discussion_topic/backbone/views/EntryView'
-import Reply from 'ui/features/discussion_topic/backbone/Reply'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 
@@ -66,6 +67,28 @@ test('renders', () => {
   })
   view.render()
   ok(view)
+})
+
+test('should only count non deleted replies', () => {
+  const entry = new Entry({
+    id: 1,
+    message: 'hi',
+    replies: [
+      {
+        id: 2,
+        message: 'hi',
+        deleted: true,
+      },
+      {
+        id: 3,
+        message: 'hi',
+      },
+    ],
+  })
+  const view = new EntryView({model: entry})
+  const stats = view.countPosterity()
+  equal(stats.total, 1)
+  equal(stats.unread, 0)
 })
 
 test('should listen on model change:replies', () => {

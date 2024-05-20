@@ -22,7 +22,7 @@ class BookmarkedCollection::CompositeCollection < BookmarkedCollection::Collecti
   attr_reader :bookmarks
 
   def initialize(depth, labels)
-    super nil
+    super(nil)
     @depth = depth
     @labels = labels
     @bookmarks = []

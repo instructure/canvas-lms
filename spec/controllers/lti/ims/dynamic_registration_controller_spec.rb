@@ -39,68 +39,16 @@ describe Lti::IMS::DynamicRegistrationController do
   end
 
   after do
-    return unless request && response
-
-    verifier.verify(request, response)
+    verifier.verify(request, response) if response.sent?
   end
 
   it "has openapi documentation for each of our controller routes" do
     controller_routes.each do |route|
       route_path = route.path.spec.to_s.gsub("(.:format)", "")
+      if openapi_spec.dig("paths", route_path, route.verb.downcase).nil?
+        throw "No openapi documentation for #{route_path} #{route.verb.downcase}, please add it to #{openapi_location}"
+      end
       expect(openapi_spec["paths"][route_path][route.verb.downcase]).not_to be_nil
-    end
-  end
-
-  describe "#redirect_to_tool_registration" do
-    subject { get :redirect_to_tool_registration, params: { registration_url: "https://example.com" } }
-
-    before do
-      account_admin_user
-      user_session(@admin)
-    end
-
-    context "with the lti_dynamic_registration flag disabled" do
-      it "returns a 404" do
-        @admin.account.disable_feature! :lti_dynamic_registration
-        subject
-        expect(response).to have_http_status(:not_found)
-      end
-    end
-
-    context "with a valid registration url" do
-      it "redirects to the registration_url" do
-        subject
-        parsed_redirect_uri = Addressable::URI.parse(response.headers["Location"])
-        expect(parsed_redirect_uri.omit(:query).to_s).to eq("https://example.com")
-        expect(response).to have_http_status(:found)
-      end
-
-      it "gives the oidc url in the response" do
-        subject
-        parsed_redirect_uri = Addressable::URI.parse(response.headers["Location"])
-        oidc_url = parsed_redirect_uri.query_values["openid_configuration"]
-        expect(oidc_url).to eq("https://canvas.instructure.com/api/lti/security/openid-configuration")
-      end
-
-      it "supports multiple subdomains in the oidc url" do
-        @request.host = "sub.test.host"
-        allow(Canvas::Security).to receive(:config).and_return({ "lti_iss" => "https://sub.test.host" })
-        subject
-        parsed_redirect_uri = Addressable::URI.parse(response.headers["Location"])
-        oidc_url = parsed_redirect_uri.query_values["openid_configuration"]
-        expect(oidc_url).to eq("https://sub.test.host/api/lti/security/openid-configuration")
-      end
-
-      it "sets user id, root account id, and date in the JWT" do
-        subject
-        parsed_redirect_uri = Addressable::URI.parse(response.headers["Location"])
-        jwt = parsed_redirect_uri.query_values["registration_token"]
-        jwt_hash = Canvas::Security.decode_jwt(jwt)
-
-        expect(Time.parse(jwt_hash["initiated_at"])).to be_within(1.minute).of(Time.now)
-        expect(jwt_hash["user_id"]).to eq(@admin.id)
-        expect(jwt_hash["root_account_global_id"]).to eq(@admin.account.root_account.global_id)
-      end
     end
   end
 
@@ -123,6 +71,7 @@ describe Lti::IMS::DynamicRegistrationController do
         "jwks_uri" => "https://example.com/api/jwks",
         "token_endpoint_auth_method" => "private_key_jwt",
         "scope" => scopes.join(" "),
+        "logo_uri" => "https://example.com/logo.jpg",
         "https://purl.imsglobal.org/spec/lti-tool-configuration" => {
           "domain" => "example.com",
           "messages" => [{
@@ -139,8 +88,12 @@ describe Lti::IMS::DynamicRegistrationController do
             ],
             "icon_uri" => "https://example.com/icon.jpg"
           }],
+          "custom_parameters" => {
+            "global_foo" => "global_bar"
+          },
           "claims" => ["iss", "sub"],
           "target_link_uri" => "https://example.com/launch",
+          "https://canvas.instructure.com/lti/privacy_level" => "email_only",
         },
       }
     end
@@ -150,7 +103,8 @@ describe Lti::IMS::DynamicRegistrationController do
         {
           user_id: User.create!.id,
           initiated_at: 1.minute.ago,
-          root_account_global_id: Account.first.root_account_id,
+          root_account_global_id: Account.default.global_id,
+          uuid: SecureRandom.uuid,
         }
       end
       let(:valid_token) do
@@ -158,7 +112,10 @@ describe Lti::IMS::DynamicRegistrationController do
       end
 
       context "and with valid registration params" do
-        subject { post :create, params: { registration_token: valid_token, **registration_params } }
+        subject do
+          request.headers["Authorization"] = "Bearer #{valid_token}"
+          post :create, params: { **registration_params }
+        end
 
         it "accepts valid params and creates a registration model" do
           subject
@@ -168,6 +125,7 @@ describe Lti::IMS::DynamicRegistrationController do
             "grant_types" => registration_params["grant_types"],
             "initiate_login_uri" => registration_params["initiate_login_uri"],
             "redirect_uris" => registration_params["redirect_uris"],
+            "logo_uri" => registration_params["logo_uri"],
             "response_types" => registration_params["response_types"],
             "client_name" => registration_params["client_name"],
             "jwks_uri" => registration_params["jwks_uri"],
@@ -178,7 +136,10 @@ describe Lti::IMS::DynamicRegistrationController do
           expect(parsed_body).to include(expected_response_keys)
           expect(parsed_body["client_id"]).to eq DeveloperKey.last.global_id.to_s
           created_registration = Lti::IMS::Registration.last
+          expect(created_registration.privacy_level).to eq("email_only")
           expect(created_registration).not_to be_nil
+          expect(parsed_body["https://purl.imsglobal.org/spec/lti-tool-configuration"]["https://canvas.instructure.com/lti/registration_config_url"]).to eq "http://test.host/api/lti/registrations/#{created_registration.global_id}/view"
+          expect(created_registration.canvas_configuration["custom_fields"]).to eq({ "global_foo" => "global_bar" })
         end
 
         it "fills in values on the developer key" do
@@ -186,16 +147,20 @@ describe Lti::IMS::DynamicRegistrationController do
           dk = DeveloperKey.last
           expect(dk.name).to eq(registration_params["client_name"])
           expect(dk.scopes).to eq(scopes)
-          expect(dk.account.id).to eq(token_hash[:root_account_global_id])
+          expect(dk.account.global_id).to eq(token_hash[:root_account_global_id])
           expect(dk.redirect_uris).to eq(registration_params["redirect_uris"])
           expect(dk.public_jwk_url).to eq(registration_params["jwks_uri"])
           expect(dk.is_lti_key).to be(true)
+          expect(dk.icon_url).to eq("https://example.com/logo.jpg")
           expect(dk.oidc_initiation_url).to eq(registration_params["initiate_login_uri"])
         end
       end
 
       context "and with invalid registration params" do
-        subject { post :create, params: { registration_token: valid_token, **invalid_registration_params } }
+        subject do
+          request.headers["Authorization"] = "Bearer #{valid_token}"
+          post :create, params: invalid_registration_params
+        end
 
         let(:invalid_registration_params) do
           wrong_grant_types = registration_params
@@ -218,11 +183,14 @@ describe Lti::IMS::DynamicRegistrationController do
     end
 
     context "with an invalid token" do
-      subject { post :create, params: { registration_token: invalid_token, **registration_params } }
+      subject do
+        request.headers["Authorization"] = "Bearer #{invalid_token}"
+        post :create, params: registration_params
+      end
 
-      context "from more than an hour ago" do
+      context "that has no uuid" do
         let(:invalid_token) do
-          initiation_time = 62.minutes.ago # this should be too long ago to be accepted
+          initiation_time = 1.minute.ago
           token_hash = {
             user_id: User.create!.id,
             initiated_at: initiation_time,
@@ -234,6 +202,78 @@ describe Lti::IMS::DynamicRegistrationController do
         it "returns a 401" do
           subject
           expect(response).to have_http_status(:unauthorized)
+        end
+      end
+
+      context "from more than an hour ago" do
+        let(:invalid_token) do
+          initiation_time = 62.minutes.ago # this should be too long ago to be accepted
+          token_hash = {
+            user_id: User.create!.id,
+            initiated_at: initiation_time,
+            root_account_global_id: Account.first.root_account_id,
+            uuid: SecureRandom.uuid,
+          }
+          Canvas::Security.create_jwt(token_hash, initiation_time)
+        end
+
+        it "returns a 401" do
+          subject
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
+    end
+  end
+
+  describe "#registration_token" do
+    subject do
+      get :registration_token, params: { account_id: Account.default.id }
+    end
+
+    before do
+      account_admin_user(account: Account.default)
+      user_session(@admin)
+    end
+
+    it "returns a 200" do
+      subject
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "uses iss domain in config url" do
+      subject
+      expect(response.parsed_body["oidc_configuration_url"]).to include(Canvas::Security.config["lti_iss"])
+    end
+
+    context "in local dev" do
+      before do
+        allow(Rails.env).to receive(:development?).and_return true
+      end
+
+      it "uses local domain instead of iss" do
+        subject
+        expect(response.parsed_body["oidc_configuration_url"]).to include("localhost")
+      end
+
+      context "when request scheme is http" do
+        before do
+          allow_any_instance_of(ActionController::TestRequest).to receive(:scheme).and_return("http")
+        end
+
+        it "uses http for config url" do
+          subject
+          expect(response.parsed_body["oidc_configuration_url"]).to include("http://")
+        end
+      end
+
+      context "when request scheme is https" do
+        before do
+          allow_any_instance_of(ActionController::TestRequest).to receive(:scheme).and_return("https")
+        end
+
+        it "uses https for config url" do
+          subject
+          expect(response.parsed_body["oidc_configuration_url"]).to include("https://")
         end
       end
     end

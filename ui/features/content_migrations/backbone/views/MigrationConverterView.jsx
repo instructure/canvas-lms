@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import _ from 'underscore'
+import {extend as lodashExtend, defer} from 'lodash'
 import template from '../../jst/MigrationConverter.handlebars'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -58,10 +58,14 @@ MigrationConverterView.prototype.els = {
   '#overwrite-warning': '$overwriteWarning',
 }
 
-MigrationConverterView.prototype.events = _.extend({}, MigrationConverterView.prototype.events, {
-  'change #chooseMigrationConverter': 'selectConverter',
-  'click .cancelBtn': 'resetForm',
-})
+MigrationConverterView.prototype.events = lodashExtend(
+  {},
+  MigrationConverterView.prototype.events,
+  {
+    'change #chooseMigrationConverter': 'selectConverter',
+    'click .cancelBtn': 'resetForm',
+  }
+)
 
 MigrationConverterView.prototype.toJSON = function (json) {
   json = MigrationConverterView.__super__.toJSON.apply(this, arguments)
@@ -76,7 +80,7 @@ MigrationConverterView.prototype.toJSON = function (json) {
 
 MigrationConverterView.prototype.renderConverter = function (converter) {
   if (converter) {
-    return _.defer(
+    return defer(
       (function (_this) {
         return function () {
           _this.$converter.html(converter.render().$el)
@@ -194,7 +198,7 @@ MigrationConverterView.prototype.afterRender = function () {
     hasShadow: false,
     margin: '0 0 medium 0',
   })
-  if(this.$overwriteWarning[0]){
+  if (this.$overwriteWarning[0]) {
     return ReactDOM.render(alert, this.$overwriteWarning[0])
   }
 }

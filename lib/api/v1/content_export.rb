@@ -28,13 +28,18 @@ module Api::V1::ContentExport
   def content_export_json(export, current_user, session, includes = [])
     json = api_json(export, current_user, session, only: %w[id user_id created_at workflow_state export_type])
     json["course_id"] = export.context_id if export.context_type == "Course"
+
     if export.attachment && !export.for_course_copy? && !export.expired?
       json[:attachment] = attachment_json(export.attachment, current_user, {}, { can_view_hidden_files: true })
     end
+
     if export.job_progress
       json["progress_url"] = polymorphic_url([:api_v1, export.job_progress])
     end
+
     export_quizzes_next(export, current_user, session, includes, json) if request_quiz_json?(includes)
+    include_new_quizzes_export_settings(export, json) if request_new_quizzes_export_settings?(includes)
+
     json
   end
 
@@ -42,6 +47,10 @@ module Api::V1::ContentExport
 
   def request_quiz_json?(includes)
     includes.include?("migrated_quiz") || includes.include?("migrated_assignment")
+  end
+
+  def request_new_quizzes_export_settings?(includes)
+    includes.include?("new_quizzes_export_settings")
   end
 
   def export_quizzes_next(export, current_user, session, includes, json)
@@ -58,6 +67,11 @@ module Api::V1::ContentExport
       json_assignment["new_positions"] = assignment_positions(assignment)
       json["migrated_assignment"] = [json_assignment]
     end
+  end
+
+  def include_new_quizzes_export_settings(export, json)
+    json["new_quizzes_export_url"] = export.settings&.dig("new_quizzes_export_url")
+    json["new_quizzes_export_state"] = export.settings&.dig("new_quizzes_export_state")
   end
 
   def assignment_positions(assignment)

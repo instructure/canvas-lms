@@ -33,6 +33,7 @@ module AccountReports
                    context_id
                    account_name
                    course_name
+                   tool_id
                    tool_type_name
                    tool_type_id
                    tool_created_at
@@ -80,6 +81,7 @@ module AccountReports
           row << t.context_id
           row << t.account_name
           row << t.course_name
+          row << t.id
           row << t.name
           row << t.tool_id
           row << t.created_at

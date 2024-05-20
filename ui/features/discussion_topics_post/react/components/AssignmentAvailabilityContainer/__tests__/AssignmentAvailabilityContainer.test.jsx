@@ -53,6 +53,25 @@ const mockOverrides = [
   },
 ]
 
+const mockSubAssignmentSubmissions = [
+  {
+    id: 'BXMzaWdebTVubC0x',
+    _id: '4',
+    cachedDueDate: null,
+    submissionStatus: 'submitted',
+    submittedAt: '2024-04-16T14:05:16-06:00',
+    subAssignmentTag: 'reply_to_topic',
+  },
+  {
+    id: 'BXMzaWdebTVubC0j',
+    _id: '3',
+    cachedDueDate: null,
+    submissionStatus: 'submitted',
+    submittedAt: '2024-04-18T14:05:16-06:00',
+    subAssignmentTag: 'reply_to_entry',
+  },
+]
+
 beforeAll(() => {
   window.matchMedia = jest.fn().mockImplementation(() => {
     return {
@@ -91,19 +110,19 @@ describe('AssignmentAvailabilityContainer', () => {
       expect(queryByText('Available from Mar 24, 2021 until Apr 4, 2021')).toBeTruthy()
     })
 
-    it('displays "Show due dates" button when there are overrides', () => {
+    it('displays "View Due Dates" button when there are overrides', () => {
       const {getByText} = setup({
         assignmentOverrides: {nodes: mockOverrides},
       })
-      expect(getByText('Show Due Dates (4)')).toBeTruthy()
+      expect(getByText('View Due Dates')).toBeTruthy()
     })
 
     it('displays tray and correctly formatted dates', async () => {
       const {queryByText, findByText, findAllByTestId} = setup({
         assignmentOverrides: {nodes: mockOverrides},
       })
-      expect(queryByText('Show Due Dates (4)')).toBeTruthy()
-      fireEvent.click(queryByText('Show Due Dates (4)'))
+      expect(queryByText('View Due Dates')).toBeTruthy()
+      fireEvent.click(queryByText('View Due Dates'))
       expect(await findAllByTestId('assignment-override-row')).toBeTruthy()
       expect(await findByText('Sep 4, 2021 5:59am')).toBeTruthy()
     })
@@ -115,8 +134,8 @@ describe('AssignmentAvailabilityContainer', () => {
       const {queryByText, findByText} = setup({
         assignmentOverrides: {nodes: mockOverrides},
       })
-      expect(queryByText('Show Due Dates (4)')).toBeTruthy()
-      fireEvent.click(queryByText('Show Due Dates (4)'))
+      expect(queryByText('View Due Dates')).toBeTruthy()
+      fireEvent.click(queryByText('View Due Dates'))
       expect(await findByText('No Due Date')).toBeTruthy()
       expect(await findByText('No Start Date')).toBeTruthy()
       expect(await findByText('No End Date')).toBeTruthy()
@@ -130,11 +149,11 @@ describe('AssignmentAvailabilityContainer', () => {
       }))
     })
 
-    it('displays "Show due dates" button when there are overrides', () => {
+    it('displays "View Due Dates" button when there are overrides', () => {
       const {queryByText} = setup({
         assignmentOverrides: {nodes: mockOverrides},
       })
-      expect(queryByText('Due Dates (4)')).toBeTruthy()
+      expect(queryByText('Due Dates')).toBeTruthy()
     })
 
     it('displays due date when there are no overrides', () => {
@@ -164,7 +183,7 @@ describe('AssignmentAvailabilityContainer', () => {
       expect(getByTestId('assignment-override-row')).toBeTruthy()
     })
 
-    it("due date tray doesn't show assignment context when not admin", () => {
+    it("due date tray doesn't show assignment context when not admin and no subAssignmentSubmissions", () => {
       const {queryByText, getByText, queryByTestId} = setup({
         assignmentOverrides: {nodes: []},
         isAdmin: false,
@@ -188,7 +207,7 @@ describe('AssignmentAvailabilityContainer', () => {
         />
       )
       act(() => {
-        getByRole('button', {name: 'Show Due Dates (1)'}).click()
+        getByRole('button', {name: 'View Due Dates'}).click()
       })
 
       expect(await findByTestId('CoursePacingNotice')).toBeInTheDocument()
@@ -207,7 +226,7 @@ describe('AssignmentAvailabilityContainer', () => {
         />
       )
       act(() => {
-        getByRole('button', {name: 'Show Due Dates (4)'}).click()
+        getByRole('button', {name: 'View Due Dates'}).click()
       })
 
       expect(await findByTestId('CoursePacingNotice')).toBeInTheDocument()

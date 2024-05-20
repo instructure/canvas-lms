@@ -21,7 +21,7 @@ import {IconDownloadSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
-import DownloadSubmissionsDialog from '@canvas/util/downloadSubmissionsDialog'
+import DownloadSubmissionsDialog from './downloadSubmissionsDialog'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 

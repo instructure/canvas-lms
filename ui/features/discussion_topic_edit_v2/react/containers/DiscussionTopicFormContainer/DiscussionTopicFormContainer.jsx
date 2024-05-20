@@ -33,6 +33,7 @@ const I18n = useI18nScope('discussion_create')
 export default function DiscussionTopicFormContainer({apolloClient}) {
   const {setOnFailure} = useContext(AlertManagerContext)
   const [usageRightData, setUsageRightData] = useState()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const contextType = ENV.context_is_not_group ? 'Course' : 'Group'
   const {contextQueryToUse, contextQueryVariables} = getContextQuery(contextType)
 
@@ -58,11 +59,9 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
       const usageRights = {
         use_justification: usageData?.useJustification,
         legal_copyright: usageData?.legalCopyright || '',
+        license: usageData?.license || '',
       }
 
-      if (usageData.license) {
-        usageRights.license = usageData?.license
-      }
       // Run API if a usageRight option is provided and there is a file/folder to update
       if (basicFileSystemData.length !== 0 && usageData?.useJustification) {
         await setUsageRights(basicFileSystemData, usageRights, ENV.context_id, contextType)
@@ -83,78 +82,13 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
   }
 
   const handleFormSubmit = formData => {
-    const {
-      title,
-      message,
-      sectionIdsToPostTo,
-      shouldPublish,
-      requireInitialPost,
-      discussionAnonymousState,
-      availableFrom,
-      availableUntil,
-      anonymousAuthorState,
-      allowLiking,
-      onlyGradersCanLike,
-      addToTodo,
-      todoDate,
-      enablePodcastFeed,
-      includeRepliesInFeed,
-      locked,
-      isAnnouncement,
-      groupCategoryId,
-      assignment,
-      attachment,
-      usageRightsData,
-    } = formData
-
+    const {usageRightsData, ...formDataWithoutUsageRights} = formData
     setUsageRightData(usageRightsData)
+
     if (isEditing) {
-      updateDiscussionTopic({
-        variables: {
-          discussionTopicId: currentDiscussionTopicId,
-          title,
-          message,
-          specificSections: sectionIdsToPostTo.join(),
-          published: shouldPublish,
-          requireInitialPost,
-          delayedPostAt: availableFrom,
-          lockAt: availableUntil,
-          allowRating: allowLiking,
-          onlyGradersCanRate: onlyGradersCanLike,
-          todoDate: addToTodo ? todoDate : null,
-          podcastEnabled: enablePodcastFeed,
-          podcastHasStudentPosts: includeRepliesInFeed,
-          locked,
-          fileId: attachment?._id,
-          removeAttachment: !attachment?._id,
-        },
-      })
+      updateDiscussionTopic({variables: formDataWithoutUsageRights})
     } else {
-      createDiscussionTopic({
-        variables: {
-          contextId: ENV.context_id,
-          contextType: ENV.context_is_not_group ? 'Course' : 'Group',
-          title,
-          message,
-          specificSections: sectionIdsToPostTo.join(),
-          published: shouldPublish,
-          requireInitialPost,
-          anonymousState: discussionAnonymousState,
-          delayedPostAt: availableFrom,
-          lockAt: availableUntil,
-          isAnonymousAuthor: anonymousAuthorState,
-          allowRating: allowLiking,
-          onlyGradersCanRate: onlyGradersCanLike,
-          todoDate: addToTodo ? todoDate : null,
-          podcastEnabled: enablePodcastFeed,
-          podcastHasStudentPosts: includeRepliesInFeed,
-          locked,
-          isAnnouncement,
-          groupCategoryId: groupCategoryId || null,
-          assignment,
-          fileId: attachment?._id,
-        },
-      })
+      createDiscussionTopic({variables: formDataWithoutUsageRights})
     }
   }
 
@@ -163,7 +97,9 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
 
     if (discussionTopicId && discussionContextType) {
       try {
-        await saveUsageRights(usageRightData, attachment)
+        if (ENV?.USAGE_RIGHTS_REQUIRED) {
+          await saveUsageRights(usageRightData, attachment)
+        }
       } catch (error) {
         // Handle error on saving usage rights
         setOnFailure(error)
@@ -172,19 +108,28 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
         navigateToDiscussionTopic(discussionContextType, discussionTopicId)
       }
     } else {
+      setIsSubmitting(false)
       setOnFailure(I18n.t('Error with discussion topic'))
     }
   }
 
   const [createDiscussionTopic] = useMutation(CREATE_DISCUSSION_TOPIC, {
     onCompleted: completionData => {
-      const new_discussion_topic = completionData?.createDiscussionTopic?.discussionTopic
+      const newDiscussionTopic = completionData?.createDiscussionTopic?.discussionTopic
+      const errors = completionData?.createDiscussionTopic?.errors
 
-      handleDiscussionTopicMutationCompletion(new_discussion_topic).catch(() => {
+      if (errors) {
+        setIsSubmitting(false)
+        setOnFailure(errors.map(error => error.message).join(', '))
+        return
+      }
+
+      handleDiscussionTopicMutationCompletion(newDiscussionTopic).catch(() => {
         setOnFailure(I18n.t('Error updating file usage rights'))
       })
     },
     onError: () => {
+      setIsSubmitting(false)
       setOnFailure(I18n.t('Error creating discussion topic'))
     },
   })
@@ -198,6 +143,7 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
       })
     },
     onError: () => {
+      setIsSubmitting(false)
       setOnFailure(I18n.t('Error updating discussion topic'))
     },
   })
@@ -213,11 +159,13 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
       currentDiscussionTopic={currentDiscussionTopic}
       isStudent={ENV.current_user_is_student}
       assignmentGroups={currentContext?.assignmentGroupsConnection?.nodes}
-      sections={currentContext?.sectionsConnection?.nodes}
+      sections={ENV.SECTION_LIST}
       groupCategories={currentContext?.groupSetsConnection?.nodes}
-      studentEnrollments={currentContext?.enrollmentsConnection?.nodes}
+      studentEnrollments={currentContext?.usersConnection?.nodes}
       apolloClient={apolloClient}
       onSubmit={handleFormSubmit}
+      isSubmitting={isSubmitting}
+      setIsSubmitting={setIsSubmitting}
     />
   )
 }

@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import classnames from 'classnames'
-import _ from 'underscore'
+import {isEmpty, isObject} from 'lodash'
 import CourseEpubExportStore from './CourseStore'
 
 const I18n = useI18nScope('epub_exports')
@@ -43,8 +43,8 @@ class GenerateLink extends React.Component {
   epubExport = () => this.props.course.epub_export || {}
 
   showGenerateLink = () =>
-    _.isEmpty(this.epubExport()) ||
-    (_.isObject(this.epubExport().permissions) && this.epubExport().permissions.regenerate)
+    isEmpty(this.epubExport()) ||
+    (isObject(this.epubExport().permissions) && this.epubExport().permissions.regenerate)
 
   //
   // Rendering
@@ -56,9 +56,9 @@ class GenerateLink extends React.Component {
     if (!this.showGenerateLink() && !this.state.triggered) return null
 
     text[I18n.t('Regenerate ePub')] =
-      _.isObject(this.props.course.epub_export) && !this.state.triggered
+      isObject(this.props.course.epub_export) && !this.state.triggered
     text[I18n.t('Generate ePub')] =
-      !_.isObject(this.props.course.epub_export) && !this.state.triggered
+      !isObject(this.props.course.epub_export) && !this.state.triggered
     text[I18n.t('Generating...')] = this.state.triggered
 
     if (this.state.triggered) {

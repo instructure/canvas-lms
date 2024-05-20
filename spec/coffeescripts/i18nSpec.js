@@ -19,10 +19,9 @@
 // note: most of these tests are now redundant w/ i18nliner-js, leaving them
 // for a little bit though
 
-import $ from 'jquery'
 import I18n, {useScope} from '@canvas/i18n'
 import I18nStubber from 'helpers/I18nStubber'
-import '@canvas/jquery/jquery.instructure_misc_helpers' // for $.raw
+import {raw} from '@instructure/html-escape'
 
 const scope = useScope('foo')
 const t = (...args) => scope.t(...Array.from(args || []))
@@ -55,7 +54,7 @@ test('html safety: should html-escape translations and interpolations if any int
   equal(
     t('bar', "only one of these won't get escaped: <input>, %{a}, %{b} & %{c}", {
       a: '<img>',
-      b: $.raw('<br>'),
+      b: raw('<br>'),
       c: '<hr>',
     }),
     'only one of these won&#39;t get escaped: &lt;input&gt;, &lt;img&gt;, <br> &amp; &lt;hr&gt;'
@@ -68,7 +67,7 @@ test('wrappers: should auto-html-escape', () => {
 
 test('wrappers: should not escape already-escaped text', () => {
   equal(
-    t('bar', '*%{input}* > 1', {input: $.raw('<input>'), wrapper: '<b>$1</b>'}),
+    t('bar', '*%{input}* > 1', {input: raw('<input>'), wrapper: '<b>$1</b>'}),
     '<b><input></b> &gt; 1'
   )
 })

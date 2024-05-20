@@ -21,6 +21,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -39,9 +40,10 @@ export type QuestionBankSettings = {
 
 type QuestionBankSelectorProps = {
   onChange: (settings: QuestionBankSettings | null) => void
+  questionBankError: boolean
 }
 
-const QuestionBankSelector = ({onChange}: QuestionBankSelectorProps) => {
+const QuestionBankSelector = ({onChange, questionBankError}: QuestionBankSelectorProps) => {
   const [showQuestionInput, setShowQuestionInput] = useState<boolean>(false)
   const questionBanks = ENV.QUESTION_BANKS || []
 
@@ -86,6 +88,20 @@ const QuestionBankSelector = ({onChange}: QuestionBankSelectorProps) => {
       {showQuestionInput && (
         <View as="div" maxWidth="22.5rem">
           <TextInput
+            messages={
+              questionBankError
+                ? [
+                    {
+                      text: (
+                        <Text color="danger">
+                          {I18n.t('You must enter a name for the new question bank')}
+                        </Text>
+                      ),
+                      type: 'error',
+                    },
+                  ]
+                : []
+            }
             renderLabel={<></>}
             placeholder={I18n.t('New question bank')}
             onChange={(_, value) => onChange({question_bank_name: value})}

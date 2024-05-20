@@ -20,8 +20,8 @@ import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
-import {ApiCallStatus} from '@canvas/util/apiRequest'
-import {TotalGradeOverrideTray, TotalGradeOverrideTrayProps} from '../TotalGradeOverrideTray'
+import {ApiCallStatus} from '@canvas/do-fetch-api-effect/apiRequest'
+import {TotalGradeOverrideTray, type TotalGradeOverrideTrayProps} from '../TotalGradeOverrideTray'
 import useStore from '../../stores'
 import * as FinalGradeOverrideHooks from '../../hooks/useFinalGradeOverrideCustomStatus'
 
@@ -42,7 +42,6 @@ describe('TotalGradeOverrideTray Tests', () => {
       selectedGradingPeriodId: '0',
       navigateDown,
       navigateUp,
-      pointsBasedGradingSchemesFeatureEnabled: true,
       ...props,
     }
 
@@ -52,7 +51,6 @@ describe('TotalGradeOverrideTray Tests', () => {
   beforeEach(() => {
     const gradeEntry = new GradeOverrideEntry({
       gradingScheme: null,
-      pointsBasedGradingSchemesFeatureEnabled: true,
     })
 
     useStore.setState({
@@ -146,7 +144,8 @@ describe('TotalGradeOverrideTray Tests', () => {
     })
   })
 
-  describe('radio input tests', () => {
+  // EVAL-3907 - remove or rewrite to remove spies on imports
+  describe.skip('radio input tests', () => {
     it('renders each radio input', () => {
       const {getByLabelText} = getComponent()
       const noneRadio = getByLabelText('None')
@@ -326,6 +325,41 @@ describe('TotalGradeOverrideTray Tests', () => {
 
       expect(handleDismiss).toHaveBeenCalledWith(true)
     })
+
+    it('disables a radio input when custom status allow_final_grade_value is false and there is an override score', () => {
+      const {getByLabelText} = getComponent({
+        customGradeStatuses: [
+          {
+            id: '1',
+            color: '#000000',
+            name: 'Custom Status 1',
+            allow_final_grade_value: false,
+          },
+        ],
+      })
+      const radio = getByLabelText('Custom Status 1')
+
+      expect(radio).toBeDisabled()
+    })
+
+    it('does not disable a radio input when custom status allow_final_grade_value is false and there is no override score', () => {
+      useStore.setState({
+        finalGradeOverrides: {},
+      })
+      const {getByLabelText} = getComponent({
+        customGradeStatuses: [
+          {
+            id: '1',
+            color: '#000000',
+            name: 'Custom Status 1',
+            allow_final_grade_value: false,
+          },
+        ],
+      })
+      const radio = getByLabelText('Custom Status 1')
+
+      expect(radio).not.toBeDisabled()
+    })
   })
 
   describe('grade override textbox tests', () => {
@@ -348,6 +382,57 @@ describe('TotalGradeOverrideTray Tests', () => {
       const [studentId, gradeChanges] = args
       expect(studentId).toEqual('1')
       expect(gradeChanges.grade.percentage).toEqual(0.6)
+    })
+
+    it('disables textbox when selected custom status allow_final_grade_value is false', () => {
+      const {getByRole} = getComponent({
+        customGradeStatuses: [
+          {
+            id: '1',
+            color: '#000000',
+            name: 'Custom Status 1',
+            allow_final_grade_value: false,
+          },
+        ],
+      })
+      const textbox = getByRole('textbox')
+
+      expect(textbox).toBeDisabled()
+    })
+
+    it('does not disable textbox when selected custom status allow_final_grade_value is false and there is no override score', () => {
+      useStore.setState({
+        finalGradeOverrides: {},
+      })
+      const {getByRole} = getComponent({
+        customGradeStatuses: [
+          {
+            id: '1',
+            color: '#000000',
+            name: 'Custom Status 1',
+            allow_final_grade_value: false,
+          },
+        ],
+      })
+      const textbox = getByRole('textbox')
+
+      expect(textbox).not.toBeDisabled()
+    })
+
+    it('does not disabled textbox when selected custom status allow_final_grade_value is true', () => {
+      const {getByRole} = getComponent({
+        customGradeStatuses: [
+          {
+            id: '1',
+            color: '#000000',
+            name: 'Custom Status 1',
+            allow_final_grade_value: true,
+          },
+        ],
+      })
+      const textbox = getByRole('textbox')
+
+      expect(textbox).not.toBeDisabled()
     })
   })
 })

@@ -82,6 +82,8 @@ module Canvas::Security
     end
 
     def self.recently_logged_in?(pseudonym)
+      return false unless Canvas.redis_enabled? && pseudonym
+
       attempts_allowed = Setting.get("succesful_logins_allowed", "5").to_i
       recent_attempts = redis.hget(succesful_logins_key(pseudonym), "count", failsafe: nil).to_i
       recent_attempts > attempts_allowed

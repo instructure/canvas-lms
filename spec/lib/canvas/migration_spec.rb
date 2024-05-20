@@ -86,8 +86,8 @@ describe "Migration package importers" do
 
       mig = Canvas::Migration::Migrator.new({ archive_file: file, content_migration: cm }, "test")
       mig.unzip_archive
-      expect(File).to be_exist(mig.package_root.item_path("messaging/why oh why.txt"))
-      expect(File).to be_exist(mig.package_root.item_path("res00175/SR_Epilogue_Frequently_Asked_Questions.html"))
+      expect(File).to exist(mig.package_root.item_path("messaging/why oh why.txt"))
+      expect(File).to exist(mig.package_root.item_path("res00175/SR_Epilogue_Frequently_Asked_Questions.html"))
     end
 
     it "creates overview assignments for graded discussion topics and quizzes and pages" do

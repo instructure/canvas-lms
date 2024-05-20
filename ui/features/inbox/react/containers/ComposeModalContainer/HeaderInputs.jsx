@@ -168,7 +168,9 @@ const HeaderInputs = props => {
           <ComposeInputWrapper
             title={
               <PresentationContent>
-                <Text size="small">{I18n.t('To')}</Text>
+                <Text id="address-book-form" size="small">
+                  {I18n.t('To')}
+                </Text>
               </PresentationContent>
             }
             input={
@@ -186,6 +188,7 @@ const HeaderInputs = props => {
                 addressBookMessages={props.addressBookMessages}
                 courseContextCode={props.selectedContext?.contextID || ''}
                 placeholder={I18n.t('Insert or Select Names')}
+                addressBookLabel={I18n.t('To')}
               />
             }
             shouldGrow={true}
@@ -220,6 +223,7 @@ const HeaderInputs = props => {
                   renderTitle={I18n.t('Getting recipients observers')}
                   size="x-small"
                   margin="none none none x-small"
+                  delay={300}
                 />
               </div>
             )}

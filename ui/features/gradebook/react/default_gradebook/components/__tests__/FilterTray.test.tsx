@@ -23,10 +23,12 @@ import store from '../../stores/index'
 import type {FilterTrayProps} from '../FilterTray'
 import type {FilterPreset, Filter} from '../../gradebook.d'
 import {render} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import '@testing-library/jest-dom/extend-expect'
 
 const originalState = store.getState()
+
+const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never}
 
 const defaultFilterPresets: FilterPreset[] = [
   {
@@ -103,11 +105,12 @@ describe('FilterTray', () => {
     expect(getByText('Saved Filter Presets', {selector: 'h3'})).toBeInTheDocument()
   })
 
-  it('Pressing close button triggers setIsTrayOpen', () => {
+  it('Pressing close button triggers setIsTrayOpen', async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
     const setIsTrayOpen = jest.fn()
     const {getByText} = render(<FilterTray {...defaultProps} setIsTrayOpen={setIsTrayOpen} />)
     expect(getByText('Saved Filter Presets', {selector: 'h3'})).toBeVisible()
-    userEvent.click(getByText('Close', {selector: 'span'}))
+    await user.click(getByText('Close', {selector: 'span'}))
     expect(setIsTrayOpen).toHaveBeenCalledWith(false)
   })
 
@@ -116,12 +119,13 @@ describe('FilterTray', () => {
     expect(getByText('Toggle Create Filter Preset')).toBeVisible()
   })
 
-  it('Pressing expand toggles open/close a filter', () => {
+  it('Pressing expand toggles open/close a filter', async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {getByText, queryByText} = render(<FilterTray {...defaultProps} />)
     expect(queryByText('Filter preset name', {selector: 'span'})).toBeNull()
-    userEvent.click(getByText('Toggle Filter Preset 1', {selector: 'span'})) // button
+    await user.click(getByText('Toggle Filter Preset 1', {selector: 'span'})) // button
     expect(queryByText('Filter preset name', {selector: 'span'})).toBeVisible()
-    userEvent.click(getByText('Toggle Filter Preset 1', {selector: 'span'})) // button
+    await user.click(getByText('Toggle Filter Preset 1', {selector: 'span'})) // button
     expect(queryByText('Filter preset name', {selector: 'span'})).toBeNull()
   })
 
@@ -130,29 +134,31 @@ describe('FilterTray', () => {
     expect(getByText('2 Filters', {selector: 'span'})).toBeInTheDocument()
   })
 
-  it('Pressing tab from the first date input field will allow the user to reach the delete filter preset button when all fields are empty', () => {
+  it('Pressing tab from the first date input field will allow the user to reach the delete filter preset button when all fields are empty', async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {getByText, getByTestId} = render(<FilterTray {...defaultProps} />)
-    userEvent.click(getByText('Toggle Create Filter Preset'))
+    await user.click(getByText('Toggle Create Filter Preset'))
     const startDate = getByTestId('start-date-input')
-    userEvent.click(startDate)
-    userEvent.tab()
+    await user.click(startDate)
+    await user.tab()
     const endDate = getByTestId('end-date-input')
     expect(endDate).toHaveFocus()
-    userEvent.tab()
+    await user.tab()
     expect(getByTestId('delete-filter-preset-button')).toHaveFocus()
   })
 
-  it('Pressing tab from the first date input field with a date will allow the user to reach the delete filter preset button', () => {
+  it('Pressing tab from the first date input field with a date will allow the user to reach the delete filter preset button', async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {getByText, getAllByText, getByTestId} = render(<FilterTray {...defaultProps} />)
-    userEvent.click(getByText('Toggle Create Filter Preset'))
+    await user.click(getByText('Toggle Create Filter Preset'))
     const startDate = getByTestId('start-date-input')
-    userEvent.click(startDate)
+    await user.click(startDate)
     const button = getAllByText('1')[0]
-    userEvent.click(button)
-    userEvent.tab()
+    await user.click(button)
+    await user.tab()
     const endDate = getByTestId('end-date-input')
     expect(endDate).toHaveFocus()
-    userEvent.tab()
+    await user.tab()
     expect(getByTestId('delete-filter-preset-button')).toHaveFocus()
   })
 })

@@ -31,7 +31,7 @@ class EpubExport < ActiveRecord::Base
   has_one :job_progress, as: :context, inverse_of: :context, class_name: "Progress"
   validates :course_id, :workflow_state, presence: true
   has_a_broadcast_policy
-  alias_attribute :context, :course # context is needed for the content export notification
+  alias_method :context, :course # context is needed for the content export notification
 
   PERCENTAGE_COMPLETE = {
     created: 0,
@@ -162,7 +162,7 @@ class EpubExport < ActiveRecord::Base
   end
 
   def self.fail_stuck_epub_exports(exports)
-    cutoff = Setting.get("epub_generation_expiration_minutes", "120").to_i.minutes.ago
+    cutoff = 2.hours.ago
     exports.select { |e| (e.generating? || e.exporting?) && e.updated_at < cutoff }.each(&:mark_as_failed)
   end
 

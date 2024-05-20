@@ -20,7 +20,7 @@
 
 module Factories
   def quiz_model(opts = {})
-    @context ||= opts.delete(:course) || course_model(reusable: true)
+    @context = opts.delete(:course) || @context || course_model(reusable: true)
     @quiz = @context.quizzes.build(valid_quiz_attributes.merge(opts))
     @quiz.published_at = Time.zone.now
     @quiz.workflow_state = "available"

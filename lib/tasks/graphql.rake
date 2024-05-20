@@ -3,9 +3,9 @@
 namespace :graphql do
   desc "Dump GraphQL schema and fragment types"
   task schema: :environment do
-    GraphQLPostgresTimeout.do_not_wrap = true
-
     Rails.root.join("schema.graphql").open("w") do |f|
+      # The front-end library in use doesn't support @specifiedBy until v15.1.0 - remove it for now
+      # and match the behaviour of the previous schema dump
       f.puts CanvasSchema.to_definition
     end
 
@@ -30,7 +30,7 @@ namespace :graphql do
 
   namespace :subgraph do
     def load_config(require_keys:)
-      config = ConfigFile.load("subgraph_registry")
+      config = Rails.application.credentials.subgraph_registry&.with_indifferent_access || {}
       abort "Canvas is not configured to publish its subgraph schema" if config.blank?
 
       require_keys.each do |config_key|

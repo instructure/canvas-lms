@@ -24,12 +24,12 @@ module Types
 
     field :name, String, null: true
 
-    field :label,
+    field :tag,
           String,
-          "the label of the checkpoint",
+          "the tag of the checkpoint",
           null: false
-    def label
-      checkpoint.checkpoint_label
+    def tag
+      checkpoint.sub_assignment_tag
     end
 
     field :points_possible,
@@ -46,5 +46,10 @@ module Types
           Boolean,
           "specifies that this checkpoint is only assigned to students for whom an override applies",
           null: false
+
+    field :assignment_overrides, AssignmentOverrideType.connection_type, null: true
+    def assignment_overrides
+      AssignmentOverrideApplicator.overrides_for_assignment_and_user(checkpoint, current_user)
+    end
   end
 end

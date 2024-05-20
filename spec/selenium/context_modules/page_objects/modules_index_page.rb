@@ -25,8 +25,16 @@ module ModulesIndexPage
     "#context_module_#{module_id}"
   end
 
-  def manage_module_item_assign_to_selector
-    ".module-item-assign-to-link"
+  def delete_card_button_selector
+    "[data-testid = 'delete-card-button']"
+  end
+
+  def manage_module_item_assign_to_selector(module_item_id)
+    "#context_module_item_#{module_item_id} .module-item-assign-to-link"
+  end
+
+  def manage_module_item_indent_selector(module_item_id)
+    "#context_module_item_#{module_item_id} .indent_item_link"
   end
 
   def module_create_button_selector
@@ -41,6 +49,10 @@ module ModulesIndexPage
     ".add_module_link"
   end
 
+  def no_context_modules_message_selector
+    "#no_context_modules_message"
+  end
+
   def pill_message_selector(module_id)
     "#context_module_#{module_id} .requirements_message li"
   end
@@ -50,7 +62,35 @@ module ModulesIndexPage
   end
 
   def unlock_details_selector(module_id)
-    "context_module_content_#{module_id} .unlock_details"
+    "#context_module_content_#{module_id} .unlock_details"
+  end
+
+  def module_publish_button_selector(module_id)
+    "#context_module_#{module_id} div.module-publish-icon button"
+  end
+
+  def publish_module_and_items_option_selector
+    "button:contains('Publish module and all items')"
+  end
+
+  def unpublish_module_and_items_option_selector
+    "button:contains('Unpublish module and all items')"
+  end
+
+  def published_module_icon_selector(module_id)
+    "#context_module_#{module_id} .module_header_items svg[name='IconPublish']"
+  end
+
+  def unpublished_module_icon_selector(module_id)
+    "#context_module_#{module_id} .module_header_items svg[name='IconUnpublished']"
+  end
+
+  def all_modules_selector
+    "#context_modules .context_module"
+  end
+
+  def duplicate_module_button_selector(context_module)
+    "#context_module_#{context_module.id} a.duplicate_module_link"
   end
 
   #------------------------------ Elements ------------------------------
@@ -58,8 +98,16 @@ module ModulesIndexPage
     f(context_module_selector(module_id))
   end
 
-  def manage_module_item_assign_to
-    f(manage_module_item_assign_to_selector)
+  def delete_card_button
+    ff(delete_card_button_selector)
+  end
+
+  def manage_module_item_assign_to(module_item_id)
+    f(manage_module_item_assign_to_selector(module_item_id))
+  end
+
+  def manage_module_item_indent(module_item_id)
+    f(manage_module_item_indent_selector(module_item_id))
   end
 
   def modules_index_settings_button
@@ -94,6 +142,10 @@ module ModulesIndexPage
     f(new_module_link_selector)
   end
 
+  def no_context_modules_message
+    f(no_context_modules_message_selector)
+  end
+
   def pill_message(module_id)
     f(pill_message_selector(module_id))
   end
@@ -111,7 +163,7 @@ module ModulesIndexPage
   end
 
   def tool_dialog_iframe
-    tool_dialog.find_element(:css, "iframe")
+    f(".tool_launch")
   end
 
   def view_assign
@@ -130,8 +182,36 @@ module ModulesIndexPage
     f("#context_module_#{context_module.id} .add_module_item_link")
   end
 
+  def duplicate_module_button(context_module)
+    f(duplicate_module_button_selector(context_module))
+  end
+
   def unlock_details(module_id)
     f(unlock_details_selector(module_id))
+  end
+
+  def module_publish_button(module_id)
+    f(module_publish_button_selector(module_id))
+  end
+
+  def publish_module_and_items_option
+    fj(publish_module_and_items_option_selector)
+  end
+
+  def unpublish_module_and_items_option
+    fj(unpublish_module_and_items_option_selector)
+  end
+
+  def published_module_icon(module_id)
+    f(published_module_icon_selector(module_id))
+  end
+
+  def unpublished_module_icon(module_id)
+    f(unpublished_module_icon_selector(module_id))
+  end
+
+  def all_modules
+    ff(all_modules_selector)
   end
 
   #------------------------------ Actions ------------------------------
@@ -149,8 +229,16 @@ module ModulesIndexPage
     wait_for_ajax_requests
   end
 
-  def click_manage_module_item_assign_to
-    manage_module_item_assign_to.click
+  def click_delete_card_button(button_number)
+    delete_card_button[button_number].click
+  end
+
+  def click_manage_module_item_assign_to(module_item)
+    manage_module_item_assign_to(module_item.id).click
+  end
+
+  def click_manage_module_item_indent(module_item)
+    manage_module_item_indent(module_item.id).click
   end
 
   def click_module_create_button
@@ -175,5 +263,17 @@ module ModulesIndexPage
 
   def scroll_to_module(module_name)
     scroll_to(f("[aria-label='Manage #{module_name}']"))
+  end
+
+  def publish_module_and_items(module_id)
+    module_publish_button(module_id).click
+    publish_module_and_items_option.click
+    wait_for_ajax_requests
+  end
+
+  def unpublish_module_and_items(module_id)
+    module_publish_button(module_id).click
+    unpublish_module_and_items_option.click
+    wait_for_ajax_requests
   end
 end

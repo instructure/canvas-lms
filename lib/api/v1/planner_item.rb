@@ -249,28 +249,32 @@ module Api::V1::PlannerItem
     if item.is_a?(DiscussionTopic) || item.try(:discussion_topic)
       topic = item.try(:discussion_topic) || item
       unread_count, read_state = opts.dig(:topics_status, topic.id)
-      return (read_state == "unread" || unread_count > 0) if unread_count && read_state
-      return (topic.unread?(user) || topic.unread_count(user) > 0) if topic
+      return read_state == "unread" || unread_count > 0 if unread_count && read_state
+      return topic.unread?(user) || topic.unread_count(user) > 0 if topic
     end
     false
   end
 
   private
 
-  def assignment_feedback_url(assignment, user, submission_info)
+  def assignment_feedback_url(assignment, user, submission_info, type)
     return nil unless assignment
     return nil unless submission_info
     return nil unless submission_info[:submitted] || submission_info[:graded] || submission_info[:has_feedback]
 
-    context_url(assignment.context, :context_assignment_submission_url, assignment.id, user.id)
+    if type == :assignment && assignment.context.feature_enabled?(:assignments_2_student)
+      named_context_url(assignment.context, :context_assignment_url, assignment.id)
+    else
+      context_url(assignment.context, :context_assignment_submission_url, assignment.id, user.id)
+    end
   end
 
   def assignment_html_url(assignment, user, submission_info)
-    assignment_feedback_url(assignment, user, submission_info) || named_context_url(assignment.context, :context_assignment_url, assignment.id)
+    assignment_feedback_url(assignment, user, submission_info, :assignment) || named_context_url(assignment.context, :context_assignment_url, assignment.id)
   end
 
   def discussion_topic_html_url(topic, user, submission_info)
-    assignment_feedback_url(topic.assignment, user, submission_info) || named_context_url(topic.context, :context_discussion_topic_url, topic.id)
+    assignment_feedback_url(topic.assignment, user, submission_info, :discussion) || named_context_url(topic.context, :context_discussion_topic_url, topic.id)
   end
 
   def online_meeting_url(event_description, event_location)

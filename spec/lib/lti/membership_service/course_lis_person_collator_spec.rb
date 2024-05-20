@@ -30,7 +30,7 @@ module Lti::MembershipService
           collator = CourseLisPersonCollator.new(@course, @teacher)
 
           expect(collator.role).to be_nil
-          expect(collator.per_page).to eq(Api.per_page)
+          expect(collator.per_page).to eq(Api::PER_PAGE)
           expect(collator.page).to eq(1)
         end
 
@@ -49,16 +49,16 @@ module Lti::MembershipService
           }
           collator = CourseLisPersonCollator.new(@course, @teacher, opts)
 
-          expect(collator.per_page).to eq(Api.per_page)
+          expect(collator.per_page).to eq(Api::PER_PAGE)
         end
 
         it "handles values for :per_page option that exceed per page max" do
           opts = {
-            per_page: Api.max_per_page + 1
+            per_page: Api::MAX_PER_PAGE + 1
           }
           collator = CourseLisPersonCollator.new(@course, @teacher, opts)
 
-          expect(collator.per_page).to eq(Api.max_per_page)
+          expect(collator.per_page).to eq(Api::MAX_PER_PAGE)
         end
 
         it "generates a list of ::IMS::LTI::Models::Membership objects" do

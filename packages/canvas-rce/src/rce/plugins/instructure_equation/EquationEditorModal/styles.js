@@ -18,7 +18,9 @@
 
 import {StyleSheet} from 'aphrodite'
 
-const cssRules = require('./mathjax.override.css').template()
+const cssRules = `#MathJax_MenuFrame {
+  z-index: 10000 !important;
+}`
 
 // Applying z-index for MathJax menu inside config shows the element but doesn't user interact with it.
 // Manually adding z-index as head style

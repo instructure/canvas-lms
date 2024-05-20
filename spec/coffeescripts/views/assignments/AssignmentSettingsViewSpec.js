@@ -22,9 +22,10 @@ import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup
 import AssignmentSettingsView from 'ui/features/assignment_index/backbone/views/AssignmentSettingsView'
 import AssignmentGroupWeightsView from 'ui/features/assignment_index/backbone/views/AssignmentGroupWeightsView'
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 
 const group = (opts = {}) => new AssignmentGroup({group_weight: 50, ...opts})
 
@@ -54,6 +55,7 @@ QUnit.module('AssignmentSettingsView', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('should be accessible', assert => {
   const view = createView({weighted: true})
   const done = assert.async()
@@ -144,7 +146,7 @@ test('disables the checkbox', () => {
   ok(view.$('#apply_assignment_group_weights').hasClass('disabled'))
   ok(view.$('#ag_weights_wrapper').is(':visible'))
   ok(view.$('#apply_assignment_group_weights').prop('checked'))
-  view.$('#apply_assignment_group_weights').click()
+  view.$('#apply_assignment_group_weights').simulate('click')
   ok(view.$('#ag_weights_wrapper').is(':visible'))
   ok(view.$('#apply_assignment_group_weights').prop('checked'))
   view.remove()
@@ -174,7 +176,7 @@ test('does not change the apply_assignment_group_weights flag', () => {
     weighted: true,
     assignmentGroups: groups,
   })
-  view.$('#apply_assignment_group_weights').click()
+  view.$('#apply_assignment_group_weights').simulate('click')
   const attributes = view.getFormData()
   equal(attributes.apply_assignment_group_weights, '1')
   view.remove()

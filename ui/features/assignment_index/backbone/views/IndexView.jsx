@@ -19,46 +19,28 @@
 /* eslint-disable no-void */
 
 import {extend} from '@canvas/backbone/utils'
-
+import {debounce} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
-
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
-
 import keyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'
-
 import $ from 'jquery'
-
-import _ from 'underscore'
-
 import Backbone from '@canvas/backbone'
-
 import React from 'react'
-
 import ReactDOM from 'react-dom'
-
 import template from '../../jst/IndexView.handlebars'
-
 import NoAssignments from '../../jst/NoAssignmentsSearch.handlebars'
-
 import AssignmentKeyBindingsMixin from '../mixins/AssignmentKeyBindingsMixin'
-
 import userSettings from '@canvas/user-settings'
-
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
-
 import IndexMenu from '../../react/IndexMenu'
-
 import configureIndexMenuStore from '../../react/stores/indexMenuStore'
-
 import BulkEditIndex from '../../react/bulk_edit/BulkEditIndex'
-
 import '@canvas/rails-flash-notifications'
-
 import easy_student_view from '@canvas/easy-student-view'
-
 import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import IndexCreate from '../../react/IndexCreate'
 
 const I18n = useI18nScope('assignmentsIndexView')
 
@@ -103,6 +85,7 @@ IndexView.prototype.els = {
   '#addGroup': '$addGroupButton',
   '#assignmentSettingsCog': '$assignmentSettingsButton',
   '#settingsMountPoint': '$settingsMountPoint',
+  '#indexCreateMountPoint': '$indexCreateMountPoint',
   '#bulkEditRoot': '$bulkEditRoot',
 }
 
@@ -163,6 +146,16 @@ IndexView.prototype.afterRender = function () {
       )
     }
   }
+  if (this.$indexCreateMountPoint.length) {
+    ReactDOM.render(
+      React.createElement(IndexCreate, {
+        newAssignmentUrl: ENV.URLS.new_assignment_url,
+        quizLtiEnabled: ENV.QUIZ_LTI_ENABLED,
+        manageAssignmentAddPermission: ENV.PERMISSIONS.manage_assignments_add,
+      }),
+      this.$indexCreateMountPoint[0]
+    )
+  }
   if (this.bulkEditMode && this.$bulkEditRoot.length) {
     ReactDOM.render(
       React.createElement(BulkEditIndex, {
@@ -194,7 +187,8 @@ IndexView.prototype.afterRender = function () {
       display="inline-block"
       type="text"
       data-testid="assignment-search-input"
-      placeholder={I18n.t('Search for Assignment')}
+      placeholder={I18n.t('Search...')}
+      width="16rem"
       renderLabel={
         <ScreenReaderContent>
           {I18n.t(
@@ -210,6 +204,10 @@ IndexView.prototype.afterRender = function () {
 }
 
 IndexView.prototype.requestBulkEdit = function () {
+  if (window.ENV.FEATURES.instui_nav) {
+    const bulkEditCrumb = $('<li>').text('Edit Assignment Dates')
+    $('#breadcrumbs ul').append(bulkEditCrumb)
+  }
   easy_student_view.hide()
   this.bulkEditMode = true
   return this.render()
@@ -220,6 +218,10 @@ IndexView.prototype.handleBulkEditSaved = function () {
 }
 
 IndexView.prototype.cancelBulkEdit = function () {
+  if (window.ENV.FEATURES.instui_nav) {
+    const lastCrumb = $('#breadcrumbs ul').children().last()
+    lastCrumb.remove()
+  }
   easy_student_view.show()
   if (this.bulkEditSaved) {
     return window.location.reload()
@@ -238,7 +240,7 @@ IndexView.prototype.clearSearch = function () {
   return this.filterResults()
 }
 
-IndexView.prototype.search = _.debounce(function () {
+IndexView.prototype.search = debounce(function () {
   return this.filterResults()
 }, 200)
 

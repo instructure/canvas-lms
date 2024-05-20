@@ -22,6 +22,9 @@ Bundler:
 Capybara:
   Enabled: false # we don't use capybara (it's automatically included by rubocop-rspec until they hit 3.0)
 
+FactoryBot:
+  Severity: error
+
 Gemspec:
   Severity: error
 Gemspec/RequireMFA:
@@ -217,13 +220,6 @@ Style/WordArray:
 # them to the section above)
 # auto-correct needs to be disabled for any that support it in the meantime
 
-FactoryBot/ConsistentParenthesesStyle:
-  AutoCorrect: false
-FactoryBot/CreateList:
-  AutoCorrect: false
-FactoryBot/SyntaxMethods:
-  AutoCorrect: false
-
 GraphQL/FieldMethod:
   AutoCorrect: false
 GraphQL/FieldName:
@@ -240,9 +236,6 @@ GraphQL/UnusedArgument:
 Layout/LineLength:
   Enabled: false
   AutoCorrect: false
-
-Lint/UriEscapeUnescape:
-  Severity: warning
 
 Naming/AccessorMethodName:
   Severity: convention
@@ -290,10 +283,6 @@ Rails/ApplicationMailer:
 Rails/BelongsTo:
   Severity: convention
   AutoCorrect: false
-Rails/BulkChangeTable:
-  Severity: convention
-Rails/CreateTableWithTimestamps:
-  Severity: convention
 Rails/Date:
   Enabled: false
   AutoCorrect: false
@@ -320,8 +309,6 @@ Rails/InverseOf:
   Severity: convention
 Rails/LexicallyScopedActionFilter:
   Severity: convention
-Rails/NotNullColumn:
-  Severity: convention
 Rails/Output:
   Severity: convention
   AutoCorrect: false
@@ -339,8 +326,6 @@ Rails/RakeEnvironment:
 Rails/ReadWriteAttribute:
   Enabled: false # accessors are often defined in terms of read_attribute
   AutoCorrect: false
-Rails/ReversibleMigration:
-  Severity: convention
 Rails/TimeZone:
   Enabled: false
   AutoCorrect: false

@@ -23,13 +23,13 @@ final SYNC_IMAGES = [
     platforms: ['linux/amd64', 'linux/arm64'],
     target: 'starlord.inscloudgate.net/jenkins/dockerfile:1.5.2',
   ],
-  'selenium/hub:4.6': [
+  'selenium/hub:4.16': [
     platforms: ['linux/amd64'],
-    target: 'starlord.inscloudgate.net/jenkins/selenium-hub:4.6'
+    target: 'starlord.inscloudgate.net/jenkins/selenium-hub:4.16'
   ],
-  'selenium/node-chrome:107.0': [
+  'selenium/node-chrome:120.0': [
     platforms: ['linux/amd64'],
-    target: 'starlord.inscloudgate.net/jenkins/selenium-node-chrome:107.0'
+    target: 'starlord.inscloudgate.net/jenkins/selenium-node-chrome:120.0'
   ]
 ]
 

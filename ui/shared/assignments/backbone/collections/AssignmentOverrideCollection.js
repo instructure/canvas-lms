@@ -18,11 +18,8 @@
 
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
-
-import _ from 'underscore'
-
+import {map, difference} from 'lodash'
 import AssignmentOverride from '../models/AssignmentOverride'
-
 import Section from '@canvas/sections/backbone/models/Section'
 
 extend(AssignmentOverrideCollection, Backbone.Collection)
@@ -70,7 +67,7 @@ AssignmentOverrideCollection.prototype.toJSON = function () {
   const json = this.reject(function (override) {
     return override.representsDefaultDueDate()
   })
-  return _.map(json, function (override) {
+  return map(json, function (override) {
     return override.toJSON().assignment_override
   })
 }
@@ -82,7 +79,7 @@ AssignmentOverrideCollection.prototype.datesJSON = function () {
 }
 
 AssignmentOverrideCollection.prototype.isSimple = function () {
-  return _.difference(this.courseSectionIDs(), [Section.defaultDueDateSectionID]).length === 0
+  return difference(this.courseSectionIDs(), [Section.defaultDueDateSectionID]).length === 0
 }
 
 export default AssignmentOverrideCollection

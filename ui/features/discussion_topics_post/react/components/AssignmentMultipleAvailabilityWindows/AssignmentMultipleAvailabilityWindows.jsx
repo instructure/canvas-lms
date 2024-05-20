@@ -44,15 +44,11 @@ export function AssignmentMultipleAvailabilityWindows({...props}) {
           query={responsiveQuerySizes({tablet: true, desktop: true})}
           props={{
             tablet: {
-              text: I18n.t('Due Dates (%{dueDateCount})', {
-                dueDateCount: props.assignmentOverrides.length,
-              }),
+              text: I18n.t('Due Dates'),
               textSize: 'x-small',
             },
             desktop: {
-              text: I18n.t('Show Due Dates (%{dueDateCount})', {
-                dueDateCount: props.assignmentOverrides.length,
-              }),
+              text: I18n.t('View Due Dates'),
               textSize: 'small',
             },
           }}

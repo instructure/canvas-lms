@@ -17,7 +17,6 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import _ from 'underscore'
 import Backbone from '@canvas/backbone'
 import DaySubstitution from '../models/DaySubstitution'
 
@@ -44,7 +43,7 @@ DaySubstitutionCollection.prototype.toJSON = function () {
   return this.reduce(
     (function (_this) {
       return function (memo, daySub) {
-        return _.extend(memo, daySub.attributes)
+        return {...memo, ...daySub.attributes}
       }
     })(this),
     {}

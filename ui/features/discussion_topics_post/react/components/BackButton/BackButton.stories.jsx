@@ -20,7 +20,7 @@ import {BackButton} from './BackButton'
 import React from 'react'
 
 export default {
-  title: 'Examples/Discussion Posts/Components/IsolatedView/BackButton',
+  title: 'Examples/Discussion Posts/Components/SplitScreenView/BackButton',
   component: BackButton,
   argTypes: {
     onClick: {action: 'On Click'},

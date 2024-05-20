@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {
@@ -559,9 +560,12 @@ QUnit.module('Gradebook#executeApplyScoreToUngraded', hooks => {
   test('updates total and assignment group columns', async () => {
     gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders = sinon.stub()
     await gradebook.executeApplyScoreToUngraded({value: 50.0})
-    ok(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.calledWith(
-      ['assignment_group_10', 'total_grade']
-    ))
+    ok(
+      gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.calledWith([
+        'assignment_group_10',
+        'total_grade',
+      ])
+    )
   })
 
   test('only updates total column when assignment groups are hidden', async () => {
@@ -569,6 +573,17 @@ QUnit.module('Gradebook#executeApplyScoreToUngraded', hooks => {
     gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders = sinon.stub()
     await gradebook.executeApplyScoreToUngraded({value: 50.0})
     ok(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.calledWith(['total_grade']))
+  })
+
+  test('only updates assignment group columns when the total column is hidden', async () => {
+    gradebook.gridDisplaySettings.hideTotal = true
+    gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders = sinon.stub()
+    await gradebook.executeApplyScoreToUngraded({value: 50.0})
+    ok(
+      gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.calledWith([
+        'assignment_group_10',
+      ])
+    )
   })
 
   test('calls the startProcess method with the course ID as the first argument', async () => {
@@ -875,7 +890,7 @@ QUnit.module('Gradebook Grading', () => {
 
     hooks.beforeEach(() => {
       fakeENV.setup({
-        GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true}
+        GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true},
       })
       const defaultGradingScheme = [
         ['A', 0.9],
@@ -950,7 +965,7 @@ QUnit.module('Gradebook Grading', () => {
         excused: false,
         grade: null,
         score: null,
-        valid: true
+        valid: true,
       }
       gradebook.gradeSubmission(submission, gradeInfo)
       return apiPromise.then(() => {

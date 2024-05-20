@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import _ from 'underscore'
+import {each, isEmpty, extend as lodashExtend} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import MarkAsReadWatcher from '../MarkAsReadWatcher'
 import walk from '../../array-walk'
@@ -29,7 +29,7 @@ import entryWithRepliesTemplate from '../../jst/entry_with_replies.handlebars'
 import entryStatsTemplate from '../../jst/entryStats.handlebars'
 import Reply from '../Reply'
 import EntryEditor from '../EntryEditor'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import {publish} from 'jquery-tinypubsub'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import {isRTL} from '@canvas/i18n/rtlHelper'
@@ -54,24 +54,24 @@ function EntryView() {
 EntryView.instances = {}
 
 EntryView.collapseRootEntries = function () {
-  return _.each(this.instances, function (view) {
+  each(this.instances, function (view) {
     if (!view.model.get('parent')) {
-      return view.collapse()
+      view.collapse()
     }
   })
 }
 
 EntryView.expandRootEntries = function () {
-  return _.each(this.instances, function (view) {
+  each(this.instances, function (view) {
     if (!view.model.get('parent')) {
-      return view.expand()
+      view.expand()
     }
   })
 }
 
 EntryView.setAllReadState = function (newReadState) {
-  return _.each(this.instances, function (view) {
-    return view.model.set('read_state', newReadState)
+  each(this.instances, function (view) {
+    view.model.set('read_state', newReadState)
   })
 }
 
@@ -127,7 +127,7 @@ EntryView.prototype.initialize = function () {
     (function (_this) {
       return function (model, value) {
         _this.$el.toggleClass('no-replies', !_this.model.hasActiveReplies())
-        if (_.isEmpty(value)) {
+        if (isEmpty(value)) {
           return delete _this.treeView
         } else {
           return _this.renderTree()
@@ -176,6 +176,10 @@ EntryView.prototype.bypass = function (event) {
 
 EntryView.prototype.toJSON = function () {
   const json = this.model.attributes
+  // for discussion entries, do not make the avatar a link
+  if (json.author) {
+    json.author.no_avatar_link = true
+  }
   json.edited_at = $.datetimeString(json.updated_at)
   if (json.editor) {
     json.editor_name = json.editor.display_name
@@ -326,10 +330,12 @@ EntryView.prototype.countPosterity = function () {
     return stats
   }
   walk(this.model.attributes.replies, 'replies', function (entry) {
-    if (entry.read_state === 'unread') {
-      stats.unread++
+    if (!entry.deleted) {
+      if (entry.read_state === 'unread') {
+        stats.unread++
+      }
+      return stats.total++
     }
-    return stats.total++
   })
   return stats
 }
@@ -464,4 +470,4 @@ EntryView.prototype.handleKeyDown = function (e) {
   return e.stopPropagation()
 }
 
-export default _.extend(EntryView, Backbone.Events)
+export default lodashExtend(EntryView, Backbone.Events)

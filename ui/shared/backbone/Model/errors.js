@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'underscore'
 import Backbone from 'backbone'
+import {isFunction} from 'lodash'
 
 // normalize (i.e. I18n) and filter errors we get from the API
 Backbone.Model.prototype.normalizeErrors = function (errors, validationPolicy) {
   const result = {}
   let errorMap = this.errorMap || this.constructor.prototype.errorMap || {}
-  if (_.isFunction(errorMap)) errorMap = errorMap(validationPolicy)
+  if (isFunction(errorMap)) errorMap = errorMap(validationPolicy)
 
   if (errors) {
     for (const attr in errors) {

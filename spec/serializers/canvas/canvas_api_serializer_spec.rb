@@ -45,7 +45,7 @@ describe Canvas::APISerializer do
 
     expect(FooSerializer.new({}, options).foo).to eq({})
   ensure
-    Object.send(:remove_const, :FooSerializer)
+    Object.send(:remove_const, :FooSerializer) # rubocop:disable RSpec/RemoveConst
   end
 
   describe "#serializable object" do
@@ -62,8 +62,10 @@ describe Canvas::APISerializer do
     end
 
     after do
+      # rubocop:disable RSpec/RemoveConst
       Object.send(:remove_const, :Foo)
       Object.send(:remove_const, :FooSerializer)
+      # rubocop:enable RSpec/RemoveConst
     end
 
     it "uses ActiveModel::serializer's implementation if not stringify_ids? returns false" do
@@ -114,7 +116,7 @@ describe Canvas::APISerializer do
       serializer = FooSerializer.new(object, { root: nil, controller: con })
       expect(serializer.as_json(root: nil)["links"]["bar"]).to eq "1"
     ensure
-      Object.send(:remove_const, :BarSerializer)
+      Object.send(:remove_const, :BarSerializer) # rubocop:disable RSpec/RemoveConst
     end
 
     context "embedding objects in root" do
@@ -138,8 +140,10 @@ describe Canvas::APISerializer do
       end
 
       after do
+        # rubocop:disable RSpec/RemoveConst
         Object.send(:remove_const, :Bar)
         Object.send(:remove_const, :BarSerializer)
+        # rubocop:enable RSpec/RemoveConst
       end
 
       let :object do

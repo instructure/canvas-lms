@@ -19,7 +19,11 @@
 import React from 'react'
 import {render, fireEvent, waitFor, within} from '@testing-library/react'
 import ProficiencyTable from '../ProficiencyTable'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+}))
 
 const defaultProps = (props = {}) => ({
   update: () => Promise.resolve(),
@@ -28,11 +32,6 @@ const defaultProps = (props = {}) => ({
 })
 
 describe('default proficiency', () => {
-  let showFlashAlertSpy
-  beforeEach(() => {
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-  })
-
   afterEach(() => {
     jest.clearAllMocks()
   })
@@ -63,7 +62,7 @@ describe('default proficiency', () => {
     const {getByText} = render(<ProficiencyTable {...defaultProps()} />)
     const button = getByText(/Add Mastery Level/)
     fireEvent.click(button)
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'Added mastery level',
       type: 'success',
       srOnly: true,
@@ -74,7 +73,7 @@ describe('default proficiency', () => {
     const {getAllByText, getByText} = render(<ProficiencyTable {...defaultProps()} />)
     fireEvent.click(getAllByText(/Delete mastery level/)[0])
     fireEvent.click(getByText(/Confirm/))
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'Mastery level deleted',
       type: 'success',
       srOnly: true,
@@ -154,7 +153,7 @@ describe('default proficiency', () => {
     fireEvent.click(getByText('Save'))
     await waitFor(() => {
       expect(updateSpy).toHaveBeenCalled()
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Mastery scale saved',
         type: 'success',
       })

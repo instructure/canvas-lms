@@ -23,12 +23,12 @@ import {Attachment} from './Attachment'
 export const CREATE_DISCUSSION_TOPIC = gql`
   mutation CreateDiscussionTopic(
     $contextId: ID!
-    $contextType: String!
+    $contextType: DiscussionTopicContextType!
     $title: String
     $message: String
     $published: Boolean
     $requireInitialPost: Boolean
-    $anonymousState: String
+    $anonymousState: DiscussionTopicAnonymousStateType
     $delayedPostAt: DateTime
     $lockAt: DateTime
     $isAnonymousAuthor: Boolean
@@ -42,6 +42,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $specificSections: String
     $groupCategoryId: ID
     $assignment: AssignmentCreate
+    $checkpoints: [DiscussionCheckpoints!]
     $fileId: ID
   ) {
     createDiscussionTopic(
@@ -66,6 +67,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         specificSections: $specificSections
         groupCategoryId: $groupCategoryId
         assignment: $assignment
+        checkpoints: $checkpoints
         fileId: $fileId
       }
     ) {
@@ -86,6 +88,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         podcastEnabled
         podcastHasStudentPosts
         isAnnouncement
+        replyToEntryRequiredCount
         assignment {
           _id
           name
@@ -108,6 +111,13 @@ export const CREATE_DISCUSSION_TOPIC = gql`
             count
             dueAt
             enabled
+          }
+          checkpoints {
+            dueAt
+            name
+            onlyVisibleToOverrides
+            pointsPossible
+            tag
           }
         }
         attachment {
@@ -140,7 +150,11 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
     $locked: Boolean
     $specificSections: String
     $fileId: ID
+    $groupCategoryId: ID
     $removeAttachment: Boolean
+    $assignment: AssignmentUpdate
+    $checkpoints: [DiscussionCheckpoints!]
+    $setCheckpoints: Boolean
   ) {
     updateDiscussionTopic(
       input: {
@@ -158,8 +172,12 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         podcastHasStudentPosts: $podcastHasStudentPosts
         locked: $locked
         specificSections: $specificSections
+        groupCategoryId: $groupCategoryId
         fileId: $fileId
         removeAttachment: $removeAttachment
+        assignment: $assignment
+        checkpoints: $checkpoints
+        setCheckpoints: $setCheckpoints
       }
     ) {
       discussionTopic {
@@ -179,8 +197,40 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         podcastEnabled
         podcastHasStudentPosts
         isAnnouncement
+        replyToEntryRequiredCount
         attachment {
           ...Attachment
+        }
+        assignment {
+          _id
+          name
+          pointsPossible
+          gradingType
+          assignmentGroupId
+          canDuplicate
+          canUnpublish
+          courseId
+          description
+          dueAt
+          groupCategoryId
+          id
+          published
+          restrictQuantitativeData
+          sisId
+          state
+          peerReviews {
+            automaticReviews
+            count
+            dueAt
+            enabled
+          }
+          checkpoints {
+            dueAt
+            name
+            onlyVisibleToOverrides
+            pointsPossible
+            tag
+          }
         }
       }
       errors {

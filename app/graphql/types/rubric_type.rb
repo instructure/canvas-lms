@@ -48,6 +48,25 @@ module Types
       !!object.hide_score_total
     end
 
+    field :unassessed, Boolean, null: false
+    def unassessed
+      if object.workflow_state == "draft"
+        return true
+      end
+
+      Rubric.active.unassessed.where(id: object.id).exists?
+    end
+
+    field :has_rubric_associations, Boolean, null: false, resolver_method: :rubric_assignment_associations?
+    def rubric_assignment_associations?
+      load_association(:rubric_associations).then do
+        object.rubric_assignment_associations?
+      end
+    end
+
+    field :button_display, String, null: false
+    field :hide_points, Boolean, null: true
+    field :rating_order, String, null: false
     field :points_possible, Float, null: true
     field :title, String, null: true
     field :workflow_state, String, null: false

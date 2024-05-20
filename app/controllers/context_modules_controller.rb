@@ -67,7 +67,7 @@ class ContextModulesController < ApplicationController
     end
 
     def load_modules
-      @modules = @context.modules_visible_to(@current_user).limit(Setting.get("course_module_limit", "1000").to_i)
+      @modules = @context.modules_visible_to(@current_user).limit(1000)
       @modules.each(&:check_for_stale_cache_after_unlocking!)
       @collapsed_modules = ContextModuleProgression.for_user(@current_user)
                                                    .for_modules(@modules)
@@ -125,6 +125,9 @@ class ContextModulesController < ApplicationController
       if @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
         module_file_details = load_module_file_details
       end
+
+      @allow_menu_tools = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add) &&
+                          (@menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present?)
 
       hash = {
         course_id: @context.id,
@@ -198,13 +201,11 @@ class ContextModulesController < ApplicationController
 
       set_tutorial_js_env
 
-      if Account.site_admin.feature_enabled?(:module_publish_menu)
-        @progress = Progress.find_by(
-          context: @context,
-          tag: "context_module_batch_update",
-          workflow_state: ["queued", "running"]
-        )
-      end
+      @progress = Progress.find_by(
+        context: @context,
+        tag: "context_module_batch_update",
+        workflow_state: ["queued", "running"]
+      )
 
       if @is_student
         return unless tab_enabled?(@context.class::TAB_MODULES)
@@ -842,7 +843,7 @@ class ContextModulesController < ApplicationController
     # find the assignments/quizzes with too many active overrides and mark them as such
     if assignments_or_quizzes.any?
       ids = AssignmentOverride.active.where(override_column => assignments_or_quizzes)
-                              .group(override_column).having("COUNT(*) > ?", Setting.get("assignment_all_dates_too_many_threshold", "25").to_i)
+                              .group(override_column).having("COUNT(*) > ?", Api::V1::Assignment::ALL_DATES_LIMIT)
                               .active.pluck(override_column)
 
       if ids.any?

@@ -21,15 +21,16 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
-import tz from '@canvas/timezone'
+import {each, filter, intersection, includes, without} from 'lodash'
+import * as tz from '@canvas/datetime'
 import DialogBaseView from '@canvas/dialog-base-view'
 import deparam from 'deparam'
 import template from '../../jst/editConferenceForm.handlebars'
 import userSettingOptionsTemplate from '../../jst/userSettingOptions.handlebars'
 import authenticity_token from '@canvas/authenticity-token'
 import numberHelper from '@canvas/i18n/numberHelper'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
+import {encodeQueryString} from '@canvas/query-string-encoding'
 
 const I18n = useI18nScope('conferences')
 
@@ -68,7 +69,7 @@ EditConferenceView.prototype.render = function () {
     object_name: 'web_conference',
     beforeSubmit: (function (_this) {
       return function (data) {
-        data = deparam($.param(data)).web_conference
+        data = deparam(encodeQueryString(data)).web_conference
         _this.model.set(data)
         return _this.model.trigger('startSync')
       }
@@ -106,7 +107,7 @@ EditConferenceView.prototype.show = function (model, opts) {
   this.model = model
   this.render()
   if (opts.isEditing) {
-    newTitle = I18n.t('Edit "%{conference_title}"', {
+    newTitle = I18n.t('Edit %{conference_title}', {
       conference_title: model.get('title'),
     })
     this.$el.dialog('option', 'title', newTitle)
@@ -180,8 +181,8 @@ EditConferenceView.prototype.updateConferenceUserSettingDetailsForConference = f
   conferenceData
 ) {
   // make handlebars comparisons easy
-  _.each(ENV.conference_type_details, function (conferenceInfo) {
-    _.each(conferenceInfo.settings, function (optionObj) {
+  each(ENV.conference_type_details, function (conferenceInfo) {
+    each(conferenceInfo.settings, function (optionObj) {
       let currentVal
       currentVal = conferenceData.user_settings[optionObj.field]
       if (currentVal === void 0) {
@@ -216,7 +217,7 @@ EditConferenceView.prototype.renderConferenceFormUserSettings = function () {
   const conferenceData = this.toJSON()
   const selectedConferenceType = $('#web_conference_conference_type').val()
   // Grab the selected entry to pass in for rendering the appropriate user setting options
-  let selected = _.select(ENV.conference_type_details, function (conference_settings) {
+  let selected = filter(ENV.conference_type_details, function (conference_settings) {
     return conference_settings.type === selectedConferenceType
   })
   if (selected.length > 0) {
@@ -267,39 +268,39 @@ EditConferenceView.prototype.toggleAllUsers = function () {
 }
 
 EditConferenceView.prototype.markInvitedUsers = function () {
-  return _.each(this.model.get('user_ids'), function (id) {
+  each(this.model.get('user_ids'), function (id) {
     const el = $('#members_list .member.user_' + id).find(':checkbox')
-    el.attr('checked', true)
-    return el.attr('disabled', true)
+    el.prop('checked', true)
+    return el.prop('disabled', true)
   })
 }
 
 EditConferenceView.prototype.markInvitedSectionsAndGroups = function () {
-  _.each(
+  each(
     ENV.sections,
     (function (_this) {
       return function (section) {
         const section_user_ids = ENV.section_user_ids_map[section.id]
-        const intersection = _.intersection(section_user_ids, _this.model.get('user_ids'))
-        if (intersection.length === section_user_ids.length) {
+        const intersection_ = intersection(section_user_ids, _this.model.get('user_ids'))
+        if (intersection_.length === section_user_ids.length) {
           const el = $('#members_list .member.section_' + section.id).find(':checkbox')
-          el.attr('checked', true)
-          return el.attr('disabled', true)
+          el.prop('checked', true)
+          return el.prop('disabled', true)
         }
       }
     })(this)
   )
-  return _.each(
+  each(
     ENV.groups,
     (function (_this) {
       return function (group) {
         let el
         const group_user_ids = ENV.group_user_ids_map[group.id]
-        const intersection = _.intersection(group_user_ids, _this.model.get('user_ids'))
-        if (intersection.length === group_user_ids.length) {
+        const intersection_ = intersection(group_user_ids, _this.model.get('user_ids'))
+        if (intersection_.length === group_user_ids.length) {
           el = $('#members_list .member.group_' + group.id).find(':checkbox')
-          el.attr('checked', true)
-          return el.attr('disabled', true)
+          el.prop('checked', true)
+          return el.prop('disabled', true)
         }
       }
     })(this)
@@ -321,25 +322,22 @@ EditConferenceView.prototype.setupGroupAndSectionEventListeners = function () {
   let selectedByGroup = []
   const toggleMember = function (id, checked) {
     const memberEl = $('#members_list .member.user_' + id).find(':checkbox')
-    memberEl.attr('checked', checked)
-    return memberEl.attr('disabled', checked)
+    memberEl.prop('checked', checked)
+    return memberEl.prop('disabled', checked)
   }
-  _.each(
+  each(
     ENV.groups,
     (function (_this) {
       return function (group) {
         const el = $('#members_list .member.group_' + group.id)
         return el.on('change', function (e) {
-          return _.each(ENV.group_user_ids_map[group.id], function (id) {
+          each(ENV.group_user_ids_map[group.id], function (id) {
             if (e.target.checked) {
               selectedByGroup.push(id)
               return toggleMember(id, e.target.checked)
             } else {
-              selectedByGroup = _.without(selectedByGroup, id)
-              if (
-                !_.contains(selectedBySection, id) &&
-                !_.contains(_this.model.get('user_ids'), id)
-              ) {
+              selectedByGroup = without(selectedByGroup, id)
+              if (!includes(selectedBySection, id) && !includes(_this.model.get('user_ids'), id)) {
                 return toggleMember(id, e.target.checked)
               }
             }
@@ -348,22 +346,19 @@ EditConferenceView.prototype.setupGroupAndSectionEventListeners = function () {
       }
     })(this)
   )
-  return _.each(
+  each(
     ENV.sections,
     (function (_this) {
       return function (section) {
         const el = $('#members_list .member.section_' + section.id)
         return el.on('change', function (e) {
-          return _.each(ENV.section_user_ids_map[section.id], function (id) {
+          each(ENV.section_user_ids_map[section.id], function (id) {
             if (e.target.checked) {
               selectedBySection.push(id)
               return toggleMember(id, e.target.checked)
             } else {
-              selectedBySection = _.without(selectedBySection, id)
-              if (
-                !_.contains(selectedByGroup, id) &&
-                !_.contains(_this.model.get('user_ids'), id)
-              ) {
+              selectedBySection = without(selectedBySection, id)
+              if (!includes(selectedByGroup, id) && !includes(_this.model.get('user_ids'), id)) {
                 return toggleMember(id, e.target.checked)
               }
             }

@@ -18,9 +18,7 @@
 
 import CourseActivitySummaryStore from '../CourseActivitySummaryStore'
 import wait from 'waait'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
+import fetchMock from 'fetch-mock'
 
 describe('CourseActivitySummaryStore', () => {
   const stream = [

@@ -1,3 +1,4 @@
+/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -19,6 +20,7 @@
 import SpeedgraderLinkView from 'ui/features/assignment_show/backbone/views/SpeedgraderLinkView'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import $ from 'jquery'
+import 'jquery-migrate'
 import assertions from 'helpers/assertions'
 
 QUnit.module('SpeedgraderLinkView', {

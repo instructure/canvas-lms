@@ -429,7 +429,7 @@ module Api::V1::Submission
     if attachment
       stale = (attachment.locked != anonymous)
       stale ||=
-        (attachment.created_at < Setting.get("submission_zip_ttl_minutes", "60").to_i.minutes.ago)
+        (attachment.created_at < 1.day.ago)
       stale ||=
         attachment.created_at <
         (updated_at || assignment.submissions.maximum(:submitted_at) || attachment.created_at)

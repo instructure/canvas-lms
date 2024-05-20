@@ -19,7 +19,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import 'jquery.cookie'
 
 const I18n = useI18nScope('shared.flash_notices')
@@ -93,21 +93,23 @@ class RailsFlashNotificationsHelper {
 
   generateNodeHTML(type, content) {
     const icon = this.getIconType(type)
+    const escapedType = htmlEscape(type)
+    const escapedIcon = htmlEscape(icon)
+    const escapedContent = this.escapeContent(content)
+    const closeButtonLabel = htmlEscape(I18n.t('Close'))
 
-    // See generateScreenreaderNodeHtml for SR features
+    // see generateScreenreaderNodeHtml() for SR features
     return `
-        <div class="ic-flash-${htmlEscape(type)} flash-message-container" aria-hidden="true">
-          <div class="ic-flash__icon">
-            <i class="icon-${htmlEscape(icon)}"></i>
-          </div>
-          ${this.escapeContent(content)}
-          <button type="button" class="Button Button--icon-action close_link" aria-label="${htmlEscape(
-            I18n.t('Close')
-          )}">
-            <i class="icon-x"></i>
-          </button>
+      <div class="ic-flash-${escapedType} flash-message-container" aria-hidden="true">
+        <div class="ic-flash__icon">
+          <i class="icon-${escapedIcon}"></i>
         </div>
-      `
+        ${escapedContent}
+        <button type="button" class="Button Button--icon-action close_link" aria-label="${closeButtonLabel}">
+          <i class="icon-x"></i>
+        </button>
+      </div>
+    `.trim()
   }
 
   getIconType(type) {
@@ -193,12 +195,7 @@ class RailsFlashNotificationsHelper {
       closeContent = ''
     }
 
-    return `
-        <span>
-          ${this.escapeContent(content)}
-          ${htmlEscape(closeContent)}
-        </span>
-      `
+    return `<span>${this.escapeContent(content)}${htmlEscape(closeContent)}</span>`
   }
 
   /*

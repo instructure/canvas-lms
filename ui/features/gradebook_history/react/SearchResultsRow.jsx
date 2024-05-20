@@ -19,7 +19,7 @@
 import React from 'react'
 import {bool, shape, string} from 'prop-types'
 import $ from 'jquery'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import environment from './environment'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import NumberHelper from '@canvas/i18n/numberHelper'

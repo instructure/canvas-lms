@@ -18,6 +18,7 @@
  */
 
 import React from 'react'
+import {type PartialStudent} from '@canvas/grading/grading'
 import {bool, func, number, shape, string} from 'prop-types'
 import {IconMoreSolid} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
@@ -27,6 +28,8 @@ import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import ColumnHeader from './ColumnHeader'
+import {showMessageStudentsWithObserversModal} from '../../../shared/MessageStudentsWithObserversModal'
+import {MSWLaunchContext} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
 const I18n = useI18nScope('gradebook')
 
@@ -109,6 +112,12 @@ type Props = {
   viewUngradedAsZero: any
   weightedGroups: any
   onMenuDismiss: any
+  allStudents: PartialStudent[]
+  courseId: string
+  messageAttachmentUploadFolderId: string
+  userId: string
+  showMessageStudentsWithObserversDialog: boolean
+  onSendMessageStudentsWho: (args: {recipientsIds: string[]; subject: string; body: string}) => void
 }
 
 type State = {
@@ -132,6 +141,7 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader<Props, Sta
       settingKey: string.isRequired,
     }).isRequired,
     onApplyScoreToUngraded: func,
+    pointsBasedGradingScheme: bool.isRequired,
     viewUngradedAsZero: bool.isRequired,
     weightedGroups: bool.isRequired,
     onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
@@ -143,9 +153,40 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader<Props, Sta
     ...ColumnHeader.defaultProps,
   }
 
+  handleSendMessageStudentsWho = (args: {
+    recipientsIds: string[]
+    subject: string
+    body: string
+  }): void => {
+    this.props.onSendMessageStudentsWho(args)
+  }
+
+  async showMessageStudentsWhoDialog(students, courseId) {
+    // @ts-expect-error
+    this.state.skipFocusOnClose = true
+    this.setState({skipFocusOnClose: true})
+
+    const props = {
+      assignment: null,
+      launchContext: MSWLaunchContext.ASSIGNMENT_GROUP_CONTEXT,
+      assignmentGroupName: this.props.assignmentGroup.name,
+      students: students.filter(student => !student.isInactive && !student.isTestStudent),
+      courseId,
+      onClose: () => {},
+      onSend: this.handleSendMessageStudentsWho,
+      messageAttachmentUploadFolderId: this.props.messageAttachmentUploadFolderId,
+      userId: this.props.userId,
+      pointsBasedGradingScheme: this.props.pointsBasedGradingScheme,
+    }
+
+    showMessageStudentsWithObserversModal(props, this.focusAtEnd)
+  }
+
   render() {
     const {assignmentGroup, sortBySetting, viewUngradedAsZero, weightedGroups} = this.props
     const selectedSortSetting = sortBySetting.isSortColumn && sortBySetting.settingKey
+    const allStudents = this.props.allStudents
+    const courseId = this.props.courseId
     const classes = `Gradebook__ColumnHeaderAction ${this.state.menuShown ? 'menuShown' : ''}`
 
     return (
@@ -208,6 +249,16 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader<Props, Sta
                         </Menu.Item>
                       </Menu.Group>
                     </Menu>
+
+                    {this.props.showMessageStudentsWithObserversDialog && (
+                      <Menu.Item
+                        onSelect={() => this.showMessageStudentsWhoDialog(allStudents, courseId)}
+                      >
+                        <span data-menu-item-id="assignment-group-total-message-students-who">
+                          {I18n.t('Message Students Who')}
+                        </span>
+                      </Menu.Item>
+                    )}
 
                     {this.props.onApplyScoreToUngraded != null && <Menu.Separator />}
 

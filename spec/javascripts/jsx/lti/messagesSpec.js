@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import sinon from 'sinon'
 import {ltiMessageHandler} from '@canvas/lti/jquery/messages'
 
@@ -96,7 +97,7 @@ QUnit.module('Messages', suiteHooks => {
     const iframe = $('iframe')
 
     equal(toolContentWrapper.height(), 100)
-    await ltiMessageHandler(postMessageEvent(resizeMessage), iframe[0].contentWindow)
+    await ltiMessageHandler(postMessageEvent(resizeMessage, iframe[0].contentWindow))
     equal(toolContentWrapper.height(), finalHeight)
   })
 
@@ -123,8 +124,8 @@ QUnit.module('Messages', suiteHooks => {
         </div>
       </div>
     `)
-    const iframeDoc = $('iframe')[0].contentWindow.document;
-    iframeDoc.open();
+    const iframeDoc = $('iframe')[0].contentWindow.document
+    iframeDoc.open()
     iframeDoc.write(`
       <html>
         <body>
@@ -134,15 +135,13 @@ QUnit.module('Messages', suiteHooks => {
         </body>
       </html>
     `)
-    iframeDoc.close();
+    iframeDoc.close()
     const innerIframe = $('iframe', iframeDoc)
 
     equal(innerIframe.height(), 100)
     await ltiMessageHandler(postMessageEvent(resizeMessage, innerIframe[0].contentWindow))
     equal(innerIframe.height(), finalHeight)
   })
-
-
 
   test('returns the height and width of the page along with the iframe offset', async () => {
     ltiToolWrapperFixture.append(`
@@ -173,7 +172,7 @@ QUnit.module('Messages', suiteHooks => {
   test('sets the unload message', async () => {
     sinon.spy(window, 'addEventListener')
     notOk(window.addEventListener.calledOnce)
-    await ltiMessageHandler(postMessageEvent(unloadMessage("unload message")))
+    await ltiMessageHandler(postMessageEvent(unloadMessage('unload message')))
     ok(window.addEventListener.calledOnce)
   })
 
@@ -186,7 +185,7 @@ QUnit.module('Messages', suiteHooks => {
     const handler = window.addEventListener.getCall(0).args[1]
     const event = {}
     handler(event)
-    ok(event.returnValue);
+    ok(event.returnValue)
   })
 
   test('hide the right side wrapper', async () => {

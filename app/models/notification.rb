@@ -21,11 +21,10 @@
 class Notification < Switchman::UnshardedRecord
   include TextHelper
 
-  self.ignored_columns += %i[workflow_state]
-
   TYPES_TO_SHOW_IN_FEED = [
     # Assignment
     "Assignment Created",
+    "Checkpoints Created",
     "Assignment Changed",
     "Assignment Due Date Changed",
     "Assignment Due Date Override Changed",
@@ -213,7 +212,7 @@ class Notification < Switchman::UnshardedRecord
     NotificationMessageCreator.new(self, asset, options.merge(to_list:)).create_message
   end
 
-  TYPES_TO_PRELOAD_CONTEXT_ROLES = ["Assignment Created", "Assignment Due Date Changed"].freeze
+  TYPES_TO_PRELOAD_CONTEXT_ROLES = ["Assignment Created", "Checkpoints Created", "Assignment Due Date Changed"].freeze
   def preload_asset_roles_if_needed(asset)
     if TYPES_TO_PRELOAD_CONTEXT_ROLES.include?(name)
       case asset
@@ -376,6 +375,7 @@ class Notification < Switchman::UnshardedRecord
     t "Annotation Teacher Notification"
     t "names.assignment_changed", "Assignment Changed"
     t "names.assignment_created", "Assignment Created"
+    t "names.checkpoints_created", "Checkpoints Created"
     t "names.assignment_due_date_changed", "Assignment Due Date Changed"
     t "names.assignment_due_date_override_changed", "Assignment Due Date Override Changed"
     t "names.assignment_graded", "Assignment Graded"

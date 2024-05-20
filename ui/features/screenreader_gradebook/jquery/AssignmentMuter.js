@@ -90,6 +90,8 @@ export default class AssignmentMuter {
       close: () => this.$dialog.remove(),
       resizable: false,
       width: 400,
+      modal: true,
+      zIndex: 1000,
     })
     this.$dialog.on('dialogclose', onClose)
   }
@@ -147,6 +149,8 @@ export default class AssignmentMuter {
         resizable: false,
         title: I18n.t('unmute_assignment', 'Unmute Assignment'),
         width: 400,
+        modal: true,
+        zIndex: 1000,
       })
   }
 }

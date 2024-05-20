@@ -655,7 +655,7 @@ describe "Accounts API", type: :request do
                    {},
                    { expected_status: 400 })
           account.reload
-          expected_settings.each do |key, _|
+          expected_settings.each_key do |key|
             expect(account.settings[key]).to be_nil
           end
         end
@@ -735,7 +735,7 @@ describe "Accounts API", type: :request do
                              {},
                              { expected_result: 401 })
             account.reload
-            expected_settings.each do |key, _|
+            expected_settings.each_key do |key|
               expect(account.settings[key]).to be_nil
             end
           end
@@ -931,38 +931,6 @@ describe "Accounts API", type: :request do
       end
     end
 
-    describe "privacy settings" do
-      let(:account) { @a1 }
-      let(:site_admin) { site_admin_user }
-      let(:payload) do
-        {
-          account: {
-            settings: {
-              enable_fullstory: false,
-            }
-          }
-        }
-      end
-
-      it "ignores changes made through the API" do
-        user_session(site_admin)
-
-        expect do
-          api_call(:put,
-                   "/api/v1/accounts/#{account.to_param}",
-                   {
-                     controller: "accounts",
-                     action: "update",
-                     id: account.to_param,
-                     format: "json"
-                   },
-                   payload)
-        end.to change { response&.status }.to(200).and not_change {
-          account.reload.settings.fetch(:enable_fullstory, true)
-        }
-      end
-    end
-
     context "with course_template_id" do
       before do
         @a2.root_account.enable_feature!(:course_templates)
@@ -1030,6 +998,26 @@ describe "Accounts API", type: :request do
                  { controller: "accounts", action: "update", id: @a2.to_param, format: "json" },
                  { account: { course_template_id: 0 } })
       end
+    end
+  end
+
+  describe "environment" do
+    it "lists cached_js_env_account_settings" do
+      expect_any_instance_of(ApplicationController).to receive(:cached_js_env_account_settings)
+        .and_return({ calendar_contexts_limit: true })
+      json = api_call(:get,
+                      "/api/v1/settings/environment",
+                      { controller: "accounts", action: "environment", format: "json" },
+                      {},
+                      {},
+                      { expected_status: 200 })
+      expect(json).to eq({ "calendar_contexts_limit" => true })
+    end
+
+    it "requires user session" do
+      request_path = "https://www.example.com/api/v1/settings/environment"
+      __send__(:get, request_path, params: { controller: "accounts", action: "environment", format: "json" })
+      expect(response).to have_http_status(:unauthorized)
     end
   end
 
@@ -1324,7 +1312,7 @@ describe "Accounts API", type: :request do
       before :once do
         @me = @user
         %i[c1 c2 c3 c4].each do |course|
-          instance_variable_set("@#{course}".to_sym, course_model(name: course.to_s, account: @a1))
+          instance_variable_set(:"@#{course}", course_model(name: course.to_s, account: @a1))
         end
         @c2.destroy
         Course.where(id: @c1).update_all(workflow_state: "claimed")
@@ -1430,7 +1418,7 @@ describe "Accounts API", type: :request do
       before :once do
         @me = @user
         [:c1, :c2].each do |course|
-          instance_variable_set("@#{course}".to_sym, course_model(name: course.to_s, account: @a1))
+          instance_variable_set(:"@#{course}", course_model(name: course.to_s, account: @a1))
         end
         @c1.offer!
         @user = @me
@@ -1473,7 +1461,7 @@ describe "Accounts API", type: :request do
       before :once do
         @me = @user
         %i[c1 c2 c3 c4 c5].each do |course|
-          instance_variable_set("@#{course}".to_sym, course_model(name: course.to_s, account: @a1, conclude_at: 2.days.from_now))
+          instance_variable_set(:"@#{course}", course_model(name: course.to_s, account: @a1, conclude_at: 2.days.from_now))
         end
 
         # c2 -- condluded
@@ -1546,7 +1534,7 @@ describe "Accounts API", type: :request do
       before :once do
         @me = @user
         %i[c1 c2 c3 c4].each do |course|
-          instance_variable_set("@#{course}".to_sym, course_model(name: course.to_s, account: @a1, start_at: 2.days.ago))
+          instance_variable_set(:"@#{course}", course_model(name: course.to_s, account: @a1, start_at: 2.days.ago))
         end
 
         @c2.start_at = 1.week.ago
@@ -1604,7 +1592,7 @@ describe "Accounts API", type: :request do
       before :once do
         @me = @user
         %i[c1 c2 c3 c4].each do |course|
-          instance_variable_set("@#{course}".to_sym, course_model(name: course.to_s, account: @a1, conclude_at: 2.days.from_now))
+          instance_variable_set(:"@#{course}", course_model(name: course.to_s, account: @a1, conclude_at: 2.days.from_now))
         end
 
         @c2.conclude_at = 1.week.from_now
@@ -1801,7 +1789,7 @@ describe "Accounts API", type: :request do
     end
 
     it "limits the maximum per-page returned" do
-      create_courses(15, account: @a1, account_associations: true)
+      create_courses(110, account: @a1, account_associations: true)
       expect(api_call(:get,
                       "/api/v1/accounts/#{@a1.id}/courses?per_page=12",
                       controller: "accounts",
@@ -1809,14 +1797,13 @@ describe "Accounts API", type: :request do
                       account_id: @a1.to_param,
                       format: "json",
                       per_page: "12").size).to eq 12
-      Setting.set("api_max_per_page", "5")
       expect(api_call(:get,
-                      "/api/v1/accounts/#{@a1.id}/courses?per_page=12",
+                      "/api/v1/accounts/#{@a1.id}/courses?per_page=105",
                       controller: "accounts",
                       action: "courses_api",
                       account_id: @a1.to_param,
                       format: "json",
-                      per_page: "12").size).to eq 5
+                      per_page: "105").size).to eq 100
     end
 
     it "returns courses filtered search term" do

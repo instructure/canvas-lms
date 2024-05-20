@@ -35,6 +35,7 @@ describe "profile faculty journal" do
       note: "#{@student.name} is an excellent student"
     )
     Account.site_admin.disable_feature!(:deprecate_faculty_journal)
+    @teacher.set_preference(:suppress_faculty_journal_deprecation_notice, true)
   end
 
   it "checks the Journal messages for correct info" do
@@ -65,5 +66,18 @@ describe "profile faculty journal" do
     wait_for_ajaximations
     expect(UserNote.last.title).to eq("FJ Title 2")
     expect(UserNote.last.note).to eq("FJ Body text 2")
+  end
+
+  it "shows a deprecation alert and modal until suppressed" do
+    @teacher.set_preference(:suppress_faculty_journal_deprecation_notice, false)
+    get "/users/#{@student.id}/user_notes"
+    expect(f("body")).to include_text("Faculty Journal has been deprecated!")
+    f("input[type=checkbox] + label").click
+    fj("button:contains('I Understand')").click
+    expect(f("body")).not_to include_text("Faculty Journal has been deprecated!")
+    expect(f("body")).to include_text("Faculty Journal will be discontinued on June 15, 2024.")
+    driver.navigate.refresh
+    expect(f("body")).to include_text("Faculty Journal will be discontinued on June 15, 2024.")
+    expect(f("body")).not_to include_text("Faculty Journal has been deprecated!")
   end
 end

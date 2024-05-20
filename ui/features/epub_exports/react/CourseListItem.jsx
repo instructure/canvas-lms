@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import _ from 'underscore'
+import {isEmpty} from 'lodash'
 import GenerateLink from './GenerateLink'
 import DownloadLink from './DownloadLink'
 import ApiProgressBar from '@canvas/progress/react/components/ApiProgressBar'
@@ -45,7 +45,7 @@ class CourseListItem extends React.Component {
   getDisplayState = () => {
     let state
 
-    if (_.isEmpty(this.epubExport())) {
+    if (isEmpty(this.epubExport())) {
       return null
     }
 
@@ -63,7 +63,7 @@ class CourseListItem extends React.Component {
   }
 
   getDisplayTimestamp = () => {
-    if (_.isEmpty(this.epubExport())) {
+    if (isEmpty(this.epubExport())) {
       return null
     }
     const timestamp = this.epubExport().updated_at
@@ -76,7 +76,7 @@ class CourseListItem extends React.Component {
       classes = {
         'ig-row': true,
       }
-    classes[this.epubExport().workflow_state] = !_.isEmpty(this.epubExport())
+    classes[this.epubExport().workflow_state] = !isEmpty(this.epubExport())
 
     return (
       <li>

@@ -19,11 +19,10 @@
 import $ from 'jquery'
 import ready from '@instructure/ready'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
-// @ts-expect-error
-import signupDialog from '@canvas/signup-dialog'
+import htmlEscape from '@instructure/html-escape'
+import {loadSignupDialog} from '@canvas/signup-dialog'
 import 'jquery-fancy-placeholder' /* fancyPlaceholder */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 
@@ -33,8 +32,13 @@ $('#coenrollment_link').click(function (event) {
   event.preventDefault()
   const template = $(this).data('template')
   const path = $(this).data('path')
-  // @ts-expect-error
-  signupDialog(template, I18n.t('parent_signup', 'Parent Signup'), path)
+  loadSignupDialog
+    .then(signupDialog => {
+      signupDialog(template, I18n.t('parent_signup', 'Parent Signup'), path)
+    })
+    .catch(error => {
+      throw new Error('Failed to load signup dialog', error)
+    })
 })
 
 $('.field-with-fancyplaceholder input').fancyPlaceholder()
@@ -114,5 +118,8 @@ ready(() => {
     $loginForm.find('input:visible:first').focus()
   })
 
-  sessionStorage.clear()
+  // do not clear session storage if previewing via the theme editor
+  if (!document.querySelector('.ic-Login--previewing')) {
+    sessionStorage.clear()
+  }
 })

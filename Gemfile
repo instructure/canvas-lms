@@ -15,7 +15,7 @@ source "https://rubygems.org/"
 Plugin.uninstall(["bundler_lockfile_extensions"], {}) if Plugin.installed?("bundler_lockfile_extensions")
 
 # vendored until https://github.com/rubygems/rubygems/pull/6957 is merged and released
-plugin "bundler-multilock", "1.2.0", path: "vendor/gems/bundler-multilock"
+plugin "bundler-multilock", "1.3.1", path: "vendor/gems/bundler-multilock"
 # the extra check here is in case `bundle check` or `bundle exec` gets run before `bundle install`,
 # and is also fixed by the same PR
 raise GemNotFound, "bundler-multilock plugin is not installed" if !is_a?(Bundler::Plugin::DSL) && !Plugin.installed?("bundler-multilock")
@@ -23,7 +23,20 @@ return unless Plugin.installed?("bundler-multilock")
 
 Plugin.send(:load_plugin, "bundler-multilock")
 
+return if is_a?(Bundler::Plugin::DSL)
+
+gemfile_root.glob("gems/plugins/*/Gemfile.d/_before.rb") do |file|
+  eval_gemfile(file)
+end
+
+unless dependencies.empty?
+  Bundler.ui.error("_before.rb from plugins should only modify the Gemfile logic, not introduce gem dependencies")
+  exit 1
+end
+
 require_relative "config/canvas_rails_switcher"
+
+gem "bundler", "~> 2.2"
 
 if Bundler.default_gemfile == gemfile
   SUPPORTED_RAILS_VERSIONS.product([nil, true]).each do |rails_version, include_plugins|
@@ -31,7 +44,7 @@ if Bundler.default_gemfile == gemfile
     if rails_version == SUPPORTED_RAILS_VERSIONS.first
       lockfile = nil unless include_plugins
     elsif include_plugins
-      parent = "rails#{rails_versions.delete(".")}"
+      parent = "rails#{rails_version.delete(".")}"
     end
 
     active = rails_version == $canvas_rails && !!include_plugins
@@ -45,9 +58,13 @@ if Bundler.default_gemfile == gemfile
     end
   end
 
-  (gemfile_root.glob("Gemfile.d/*.lock") + gemfile_root.glob("gems/*/Gemfile.lock")).each do |gem_lockfile_name|
+  (gemfile_root.glob("Gemfile.d/*.lock") + gemfile_root.glob("gems/*/*.lock")).each do |gem_lockfile_name|
+    parent = gem_lockfile_name.basename
+    parent = nil unless parent.to_s.match?(/\.rails\d+\.lock$/)
+    gemfile = gem_lockfile_name.to_s.sub(/(?:.rails\d+)?\.lock$/, "")
     return unless lockfile(gem_lockfile_name,
-                           gemfile: gem_lockfile_name.to_s.sub(/\.lock$/, ""))
+                           gemfile:,
+                           parent:)
   end
 end
 
@@ -74,12 +91,6 @@ module GemOverride
   end
 end
 Bundler::Dsl.prepend(GemOverride)
-
-if @include_plugins
-  gemfile_root.glob("gems/plugins/*/Gemfile.d/_before.rb") do |file|
-    eval_gemfile(file)
-  end
-end
 
 gemfile_root.glob("Gemfile.d/*.rb").each do |file|
   eval_gemfile(file)

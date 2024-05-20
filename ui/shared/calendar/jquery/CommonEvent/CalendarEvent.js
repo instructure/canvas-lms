@@ -22,7 +22,7 @@ import semanticDateRange from '@canvas/datetime/semanticDateRange'
 import CommonEvent from './CommonEvent'
 import natcompare from '@canvas/util/natcompare'
 import {extend} from '@canvas/util/legacyCoffeesScriptHelpers'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import replaceTags from '@canvas/util/replaceTags'
 
@@ -59,6 +59,12 @@ Object.assign(CalendarEvent.prototype, {
     this.description = data.description
     // in some rare cases, this.contextCode returns a comma separated list
     const contexts = this.contextCode()?.split(',')
+    // when editing events we need to remove the old context class names
+    this.className.forEach(c => {
+      if (c.startsWith('group_')) {
+        this.removeClass(c)
+      }
+    })
     contexts?.forEach(c => {
       this.addClass(`group_${c}`)
     })

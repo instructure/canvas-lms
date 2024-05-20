@@ -26,7 +26,7 @@ import DaySubstitutionCollection from '@canvas/day-substitution/backbone/collect
 import CollectionView from '@canvas/backbone-collection-view'
 import template from '@canvas/day-substitution/jst/DaySubstitutionCollection.handlebars'
 import ContentMigration from '@canvas/content-migrations/backbone/models/ContentMigration'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 
 const I18n = useI18nScope('content_migrations')
 
@@ -73,10 +73,10 @@ ready(() => {
     const endAt = $end.data('unfudged-date')
 
     if (startAt && endAt && endAt < startAt) {
-      $('button[type=submit]').attr('disabled', true)
+      $('button[type=submit]').prop('disabled', true)
       return $end.errorBox(I18n.t('End date cannot be before start date'))
     }
-    $('button[type=submit]').attr('disabled', false)
+    $('button[type=submit]').prop('disabled', false)
     return $('#copy_course_form').hideErrors()
   }
 

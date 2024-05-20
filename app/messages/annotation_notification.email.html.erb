@@ -12,6 +12,10 @@
   </a>
 <% end %>
 
-<p><%= t :body, "A new annotation has been made by %{author} on the assignment %{assignment_name}.",
-         author: data.author_name, assignment_name: asset.assignment.name %></p>
-
+<% if asset.assignment.anonymous_instructor_annotations %>
+  <p><%= t "A new annotation has been made on the assignment %{assignment_name}.",
+           assignment_name: asset.assignment.name %></p>
+<% else %>
+  <p><%= t "A new annotation has been made by %{author} on the assignment %{assignment_name}.",
+           author: data.author_name, assignment_name: asset.assignment.name %></p>
+<% end %>

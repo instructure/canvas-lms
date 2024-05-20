@@ -91,7 +91,7 @@ describe MoodleImporter::Converter do
     it "converts Moodle Quiz module to a quiz" do
       quiz = @course.quizzes.where(title: "Quiz Name").first
       expect(quiz.description).to match(/Quiz Description/)
-      expect(quiz.quiz_questions.count).to eq 11
+      expect(quiz.quiz_questions.count).to eq 12
     end
 
     it "converts Moodle Questionnaire module to a quiz" do
@@ -99,6 +99,13 @@ describe MoodleImporter::Converter do
       expect(quiz.description).to match(/Sumary/)
       expect(quiz.quiz_type).to eq "survey"
       expect(quiz.quiz_questions.count).to eq 10
+    end
+
+    it "allows the link replacer to map random question instances" do
+      aq1 = @course.assessment_questions.where(name: "1234").first.question_data["question_text"]
+      aq2 = @course.assessment_questions.where(name: "1234").last.question_data["question_text"]
+      expect(aq1.include?("LINK.PLACEHOLDER")).to be false
+      expect(aq2.include?("LINK.PLACEHOLDER")).to be false
     end
   end
 

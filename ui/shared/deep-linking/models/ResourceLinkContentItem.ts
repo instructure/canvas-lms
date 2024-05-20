@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {anchorTag, ContentItemIframe, iframeTag, linkBody, safeUrl} from './helpers'
+import {anchorTag, type ContentItemIframe, iframeTag, linkBody, safeUrl} from './helpers'
 
 export type ResourceLinkContentItem = {
   type: 'ltiResourceLink'

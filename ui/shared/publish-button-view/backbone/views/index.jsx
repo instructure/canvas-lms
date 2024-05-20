@@ -22,9 +22,9 @@ import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import htmlEscape from 'html-escape'
-import '@canvas/forms/jquery/jquery.instructure_forms'
-import tz from '@canvas/timezone'
+import htmlEscape from '@instructure/html-escape'
+import '@canvas/jquery/jquery.instructure_forms'
+import * as tz from '@canvas/datetime'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import DelayedPublishDialog from '../../react/components/DelayedPublishDialog'
@@ -66,7 +66,8 @@ export default (function (superClass) {
 
   PublishButton.prototype.events = {
     click: 'click',
-    hover: 'hover',
+    mouseenter: 'handleMouseEnter',
+    mouseleave: 'handleMouseLeave',
   }
 
   PublishButton.prototype.els = {
@@ -100,22 +101,24 @@ export default (function (superClass) {
   }
 
   // events
-  PublishButton.prototype.hover = function (arg) {
-    const type = arg.type
+  PublishButton.prototype.handleMouseEnter = function () {
     if (this.isDelayedPublish()) {
       return
     }
-    if (type === 'mouseenter') {
-      if (this.keepState || this.isPublish() || this.isDisabled()) {
-        return
-      }
-      this.renderUnpublish()
-      return (this.keepState = true)
-    } else {
-      this.keepState = false
-      if (!(this.isPublish() || this.isDisabled())) {
-        return this.renderPublished()
-      }
+    if (this.keepState || this.isPublish() || this.isDisabled()) {
+      return
+    }
+    this.renderUnpublish()
+    this.keepState = true
+  }
+
+  PublishButton.prototype.handleMouseLeave = function () {
+    if (this.isDelayedPublish()) {
+      return
+    }
+    this.keepState = false
+    if (!(this.isPublish() || this.isDisabled())) {
+      this.renderPublished()
     }
   }
 

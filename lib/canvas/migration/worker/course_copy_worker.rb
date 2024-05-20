@@ -52,8 +52,8 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
         cm.migration_settings[:migration_ids_to_import][:copy][:everything] = true
         # set any attachments referenced in html to be copied
         ce.selected_content["attachments"] ||= {}
-        ce.referenced_files.each_value do |att_mig_id|
-          ce.selected_content["attachments"][att_mig_id] = true
+        ce.referenced_files.each_value do |att|
+          ce.selected_content["attachments"][att.export_id] = true
         end
         ce.save
 
@@ -79,7 +79,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
         cm.migration_settings[:last_error] = "ContentExport failed to export course."
         cm.save
       end
-    rescue InstFS::ServiceError, ActiveRecord::RecordInvalid => e
+    rescue InstFS::ServiceError, ::ActiveRecord::RecordInvalid => e
       Canvas::Errors.capture_exception(:course_copy, e, :warn)
       cm.fail_with_error!(e)
       raise Delayed::RetriableError, e.message

@@ -33,7 +33,7 @@ tinymce.create('tinymce.plugins.AccessibilityChecker', {
   init(ed) {
     ed.addCommand(
       'openAccessibilityChecker',
-      function (ui, {done, config, additionalRules, mountNode, onFixError}) {
+      function (ui, {done, config, additionalRules, mountNode, triggerElementId, onFixError}) {
         if (!isCheckerOpen) {
           ReactDOM.render(
             <Checker
@@ -41,7 +41,13 @@ tinymce.create('tinymce.plugins.AccessibilityChecker', {
               editor={ed}
               additionalRules={additionalRules}
               mountNode={mountNode}
-              onClose={() => (isCheckerOpen = false)}
+              onClose={() => {
+                isCheckerOpen = false;
+                if(triggerElementId){
+                    const button = document.querySelectorAll(`[data-btn-id=${triggerElementId}]`);
+                    button[0]?.focus();
+                }
+              }}
               onFixError={onFixError}
             />,
             container,

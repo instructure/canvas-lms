@@ -976,7 +976,7 @@ describe SpeedGrader::Assignment do
       end
 
       it "doesn't include quiz_submissions when there are too many attempts" do
-        Setting.set("too_many_quiz_submission_versions", 3)
+        stub_const("AbstractAssignment::QUIZ_SUBMISSION_VERSIONS_LIMIT", 3)
         3.times do
           @quiz_submission.versions.create!
         end

@@ -27,6 +27,72 @@ describe OutcomeResultsController do
     @outcome_group.add_outcome(@outcome)
   end
 
+  def create_outcomes(context, num_outcomes)
+    @outcome_group = context.root_outcome_group
+    @outcomes = []
+    outcome_ids = []
+    (1..num_outcomes).each do |i|
+      title = "outcome #{i}"
+      outcome = context.created_learning_outcomes.create!(title:)
+      @outcome_group.add_outcome(outcome)
+      @outcomes.append(outcome)
+      outcome_ids.append(outcome["id"])
+    end
+
+    # Return a list of outcome id's for convenience
+    outcome_ids
+  end
+
+  def create_outcome_groups_with_one_outcome(context, num_groups)
+    content_tags = []
+    root_learning_outcome_group_id = context.root_outcome_group.id
+    root_account_id = context.root_account_id
+
+    # Make outcomes
+    outcomes = (1..num_groups).map do |i|
+      {
+        context_id: context.id,
+        context_type: "Course",
+        short_description: "Outcome #{i}",
+        workflow_state: "active",
+        root_account_ids: [root_account_id]
+      }
+    end
+    outcome_ids = LearningOutcome.upsert_all(outcomes).rows.flatten
+
+    # Make outcome groups
+    outcome_groups = (1..num_groups).map do |i|
+      {
+        context_id: context.id,
+        context_type: "Course",
+        title: "Group #{i}",
+        workflow_state: "active",
+        root_learning_outcome_group_id:,
+        root_account_id:
+      }
+    end
+    group_ids = LearningOutcomeGroup.upsert_all(outcome_groups).rows.flatten
+
+    # Create content tags to link outcomes to outcome groups
+    group_ids.each_with_index do |group_id, index|
+      content_tags.append({
+                            context_id: context.id,
+                            context_type: "Course",
+                            tag_type: "learning_outcome_association",
+                            content_id: outcome_ids[index],
+                            content_type: "LearningOutcome",
+                            associated_asset_id: group_id,
+                            associated_asset_type: "LearningOutcomeGroup",
+                            workflow_state: "active",
+                            root_account_id:
+                          })
+    end
+    content_tag_ids = ContentTag.upsert_all(content_tags).rows.flatten
+
+    # Return all id arrays for test use
+    [outcome_ids, group_ids, content_tag_ids]
+  end
+
   before :once do
     @account = Account.default
     account_admin_user
@@ -116,8 +182,8 @@ describe OutcomeResultsController do
       assessor: outcome_teacher,
       artifact: submission,
       assessment: {
-        :assessment_type => "grading",
-        "criterion_#{criterion[:id]}".to_sym => {
+        assessment_type: "grading",
+        "criterion_#{criterion[:id]}": {
           points:
         }
       }
@@ -242,11 +308,7 @@ describe OutcomeResultsController do
   end
 
   def get_linked_users(rollups)
-    users = []
-    rollups.each do |r|
-      users.append(r["links"])
-    end
-    users
+    rollups.pluck("links")
   end
 
   describe "retrieving outcome results" do
@@ -440,6 +502,195 @@ describe OutcomeResultsController do
 
       # the pagination count should be 1 for the one student with a rollup
       expect(json["meta"]["pagination"]["count"]).to be 1
+    end
+
+    context "user lmgb outcome orderings" do
+      def get_response_ordering(outcomes)
+        outcomes.pluck("id")
+      end
+
+      def set_lmgb_outcome_order(root_account_id, user_id, course_id, outcome_ids)
+        outcome_position_map = create_outcome_position_map(outcome_ids)
+        UserLmgbOutcomeOrderings.set_lmgb_outcome_ordering(root_account_id, user_id, course_id, outcome_position_map)
+      end
+
+      def create_outcome_position_map(outcome_ids)
+        entries = []
+        outcome_ids.each_with_index do |id, index|
+          entry = { "outcome_id" => id, "position" => index }
+          entries.append(entry)
+        end
+        entries
+      end
+
+      it "set ordering through API endpoint" do
+        user_session(@teacher)
+        outcome_ids = create_outcomes(@course, 3)
+        outcome_ids.unshift(@outcome.id)
+        outcome_position_map = create_outcome_position_map(outcome_ids)
+
+        post "outcome_order",
+             params: { course_id: @course.id, },
+             body: outcome_position_map.to_json,
+             as: :json
+
+        get "rollups",
+            params: { context_id: @course.id,
+                      course_id: @course.id,
+                      context_type: "Course",
+                      user_outcome_ordering: "true",
+                      include: ["outcomes"] },
+            format: "json"
+        json = response.parsed_body
+        response_outcomes = json["linked"]["outcomes"]
+        response_outcomes_ordering = get_response_ordering(response_outcomes)
+        expect(response_outcomes_ordering).to eq(outcome_ids)
+      end
+
+      it "ordering request is rejected without manage_grade rights" do
+        user_session(@student)
+        outcome_ids = create_outcomes(@course, 3)
+        outcome_ids.unshift(@outcome.id)
+        outcome_position_map = create_outcome_position_map(outcome_ids)
+
+        post "outcome_order",
+             params: { course_id: @course.id, },
+             body: outcome_position_map.to_json,
+             as: :json
+
+        json = response.parsed_body
+        expect(json["status"]).to eq("forbidden")
+        expect(json["message"]).to eq("users not specified and no access to all grades")
+      end
+
+      it "ordering request is rejected if user is not enrolled in course or site admin" do
+        second_course = course_factory
+
+        user_session(@teacher)
+        outcome_position_map = create_outcome_position_map([1, 2, 3, 4])
+
+        # Second teacher is trying to reorder outcomes for a course they do not belong to
+        post "outcome_order",
+             params: { course_id: second_course.id, },
+             body: outcome_position_map.to_json,
+             as: :json
+
+        json = response.parsed_body
+        expect(json["status"]).to eq("forbidden")
+        expect(json["message"]).to eq("users not specified and no access to all grades")
+      end
+
+      it "outcomes ordered correctly when loading rollups" do
+        user_session(@teacher)
+        outcome_ids = create_outcomes(@course, 3)
+        outcome_ids.unshift(@outcome.id)
+        set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, outcome_ids)
+
+        get "rollups",
+            params: { context_id: @course.id,
+                      course_id: @course.id,
+                      context_type: "Course",
+                      user_outcome_ordering: "true",
+                      include: ["outcomes"] },
+            format: "json"
+        json = response.parsed_body
+        response_outcomes = json["linked"]["outcomes"]
+        response_outcomes_ordering = get_response_ordering(response_outcomes)
+        expect(response_outcomes_ordering).to eq(outcome_ids)
+      end
+
+      it "outcomes ordered correctly when reordered before loading rollups" do
+        user_session(@teacher)
+        outcome_ids = create_outcomes(@course, 3)
+        outcome_ids.unshift(@outcome.id)
+
+        # Reorder two outcomes in list and save
+        outcome_ids[1], outcome_ids[2] = outcome_ids[2], outcome_ids[1]
+        set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, outcome_ids)
+
+        get "rollups",
+            params: { context_id: @course.id,
+                      course_id: @course.id,
+                      context_type: "Course",
+                      user_outcome_ordering: "true",
+                      include: ["outcomes"] },
+            format: "json"
+        json = response.parsed_body
+        response_outcomes = json["linked"]["outcomes"]
+        response_outcomes_ordering = get_response_ordering(response_outcomes)
+        expect(response_outcomes_ordering).to eq(outcome_ids)
+      end
+
+      it "outcomes ordered correctly when an outcome is deleted before loading rollups" do
+        user_session(@teacher)
+        outcome_ids = create_outcomes(@course, 3)
+        outcome_ids.unshift(@outcome.id)
+
+        # Save outcome ordering and then delete an outcome
+        set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, outcome_ids)
+        outcome_ids = outcome_ids.reject { |o| o == @outcomes[0]["id"] }
+        @outcomes[0].destroy!
+
+        get "rollups",
+            params: { context_id: @course.id,
+                      course_id: @course.id,
+                      context_type: "Course",
+                      user_outcome_ordering: "true",
+                      include: ["outcomes"] },
+            format: "json"
+        json = response.parsed_body
+        response_outcomes = json["linked"]["outcomes"]
+        response_outcomes_ordering = get_response_ordering(response_outcomes)
+        expect(response_outcomes_ordering).to eq(outcome_ids)
+      end
+
+      it "outcomes ordered correctly when an outcome is added before loading rollups" do
+        user_session(@teacher)
+        outcome_ids = create_outcomes(@course, 3)
+        outcome_ids.unshift(@outcome.id)
+
+        # Save outcome ordering and then add an outcome
+        set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, outcome_ids)
+        outcome = @course.created_learning_outcomes.create!(title: "outcome after lmgb order set")
+        @outcome_group.add_outcome(outcome)
+        outcome_ids.append(outcome["id"])
+
+        get "rollups",
+            params: { context_id: @course.id,
+                      course_id: @course.id,
+                      context_type: "Course",
+                      user_outcome_ordering: "true",
+                      include: ["outcomes"] },
+            format: "json"
+        json = response.parsed_body
+        response_outcomes = json["linked"]["outcomes"]
+        response_outcomes_ordering = get_response_ordering(response_outcomes)
+        expect(response_outcomes_ordering).to eq(outcome_ids)
+      end
+
+      context "with multiple outcome groups" do
+        it "outcomes ordered correctly with large number of outcome groups" do
+          user_session(@teacher)
+          outcome_ids = create_outcome_groups_with_one_outcome(@course, 101)[0]
+          outcome_ids.unshift(@outcome.id)
+
+          # Swap the first and last outcomes
+          outcome_ids[0], outcome_ids[101] = outcome_ids[101], outcome_ids[0]
+          set_lmgb_outcome_order(@course.root_account_id, @teacher.id, @course.id, outcome_ids)
+
+          get "rollups",
+              params: { context_id: @course.id,
+                        course_id: @course.id,
+                        context_type: "Course",
+                        user_outcome_ordering: "true",
+                        include: ["outcomes"] },
+              format: "json"
+          json = response.parsed_body
+          response_outcomes = json["linked"]["outcomes"]
+          response_outcomes_ordering = get_response_ordering(response_outcomes)
+          expect(response_outcomes_ordering).to eq(outcome_ids)
+        end
+      end
     end
 
     context "with outcome_service_results_to_canvas FF" do

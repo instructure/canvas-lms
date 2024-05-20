@@ -26,7 +26,7 @@ module Lti::RedisMessageClient
     return unless Canvas.redis_enabled?
 
     verifier = SecureRandom.hex(64)
-    Canvas.redis.setex("#{context.class.name}:#{prefix}#{verifier}", 5.minutes, launch.to_json)
+    Canvas.redis.setex("#{context.class.name}:#{prefix}#{verifier}", TTL, launch.to_json)
     verifier
   end
 

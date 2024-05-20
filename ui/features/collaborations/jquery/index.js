@@ -18,13 +18,14 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* fillFormData, getFormData, errorBox */
+import '@canvas/jquery/jquery.instructure_forms' /* fillFormData, getFormData, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */
 import '@canvas/util/templateData' /* getTemplateData */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/rails-flash-notifications'
 import {addDeepLinkingListener, onExternalContentReady} from '@canvas/deep-linking/collaborations'
+import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 
 const I18n = useI18nScope('collaborations')
 
@@ -69,7 +70,7 @@ CollaborationsPage.Events = {
       'white-space: nowrap; text-align: left; display: block;',
     ])
     addDeepLinkingListener()
-    $(window).on('externalContentReady', onExternalContentReady.bind(this))
+    handleExternalContentMessages({ready: onExternalContentReady})
     $('.before_external_content_info_alert, .after_external_content_info_alert')
       .on('focus', function (_e) {
         $(this).removeClass('screenreader-only')

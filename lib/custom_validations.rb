@@ -24,7 +24,7 @@ module CustomValidations
       validates_each(fields, allow_nil: true) do |record, attr, value|
         value, = CanvasHttp.validate_url(value, allowed_schemes:)
 
-        record.send("#{attr}=", value)
+        record.send(:"#{attr}=", value)
       rescue CanvasHttp::Error, URI::Error, ArgumentError
         record.errors.add attr, "is not a valid URL"
       end
@@ -32,7 +32,7 @@ module CustomValidations
 
     def validates_as_readonly(*fields)
       validates_each(fields) do |record, attr, _value|
-        if !record.new_record? && record.send("#{attr}_changed?")
+        if !record.new_record? && record.send(:"#{attr}_changed?")
           record.errors.add attr, "cannot be changed"
         end
       end
@@ -42,8 +42,8 @@ module CustomValidations
     # on update, only those transitions will be allowed for the given field
     def validates_allowed_transitions(field, alloweds)
       validates_each(field) do |record, attr, value|
-        if !record.new_record? && record.send("#{attr}_changed?")
-          old_val = record.send("#{attr}_was")
+        if !record.new_record? && record.send(:"#{attr}_changed?")
+          old_val = record.send(:"#{attr}_was")
           unless alloweds.any? { |old, news| old_val == old && Array(news).include?(value) }
             record.errors.add attr, "cannot be changed to that value"
           end

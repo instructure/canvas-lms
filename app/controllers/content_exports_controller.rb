@@ -34,6 +34,7 @@ class ContentExportsController < ApplicationController
     scope = @context.content_exports_visible_to(@current_user).without_epub
     @exports = scope.active.not_for_copy.order("content_exports.created_at DESC")
     @current_export_id = scope.running.first.try(:id)
+    @warning_messages = @context.export_warnings if @context.is_a?(Course)
   end
 
   def show
@@ -61,6 +62,8 @@ class ContentExportsController < ApplicationController
           export.selected_content = params[:copy].to_unsafe_h
         else
           export.export_type = ContentExport::COMMON_CARTRIDGE
+          export.set_contains_new_quizzes_settings
+          export.mark_waiting_for_external_tool if export.contains_new_quizzes?
           export.selected_content = { everything: true }
         end
       when User
@@ -69,7 +72,7 @@ class ContentExportsController < ApplicationController
 
       export.progress = 0
       if export.save
-        export.export
+        export.export unless export.waiting_for_external_tool?
         render_export(export)
       else
         render json: { error_message: t("errors.couldnt_create", "Couldn't create content export.") }

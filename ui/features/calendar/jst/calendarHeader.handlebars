@@ -1,10 +1,11 @@
+{{#if ENV.FEATURES.instui_header}}
+<span id="calendar_header_component"></span>
+{{else}}
 <div class="header-bar-outer-container calendar_header">
     <div class="sticky-toolbar" data-sticky>
         <div class="header-bar flex-container">
             <div class="header-bar-left header-left-flex">
                 <div class="calendar_navigator"></div>
-                <h2 class="appointment_group_title">{{#t "my_appointment_groups"}}My Appointment Groups{{/t}}</h2>
-                <button class="btn scheduler_done_button">{{#t "done_go_back_to_list"}}Done, Go Back To List{{/t}}</button>
             </div>
 
             <div class="header-bar-right header-right-flex">
@@ -33,3 +34,4 @@
         </div>
     </div>
 </div>
+{{/if}}

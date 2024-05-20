@@ -19,7 +19,11 @@
 import React from 'react'
 import useResize from '../useResize'
 import {render, fireEvent} from '@testing-library/react'
-import * as rtlHelper from '@canvas/i18n/rtlHelper'
+import {isRTL} from '@canvas/i18n/rtlHelper'
+
+jest.mock('@canvas/i18n/rtlHelper', () => ({
+  isRTL: jest.fn()
+}))
 
 describe('useResize', () => {
   const mockContainer = {
@@ -32,6 +36,7 @@ describe('useResize', () => {
     right: 1000,
     bottom: 500,
   }
+
   const mockDelimiter = {
     x: 250,
     left: 250,
@@ -42,6 +47,7 @@ describe('useResize', () => {
     right: 260,
     bottom: 500,
   }
+
   const mockElement = () => {
     Element.prototype.getBoundingClientRect = jest
       .fn()
@@ -87,6 +93,7 @@ describe('useResize', () => {
 
   beforeEach(() => {
     mockElement()
+    isRTL.mockImplementation(() => false)
   })
 
   describe('With Mouse Navigation', () => {
@@ -131,7 +138,7 @@ describe('useResize', () => {
     })
 
     it('resizes the panes properly when RTL', () => {
-      jest.spyOn(rtlHelper, 'isRTL').mockImplementation(() => true)
+      isRTL.mockImplementation(() => true)
       const {getByTestId} = render(<TestComponent />)
       const leftColumn = getByTestId('leftColumn')
       const rightColumn = getByTestId('rightColumn')
@@ -197,7 +204,7 @@ describe('useResize', () => {
     })
 
     it('resizes the panes properly when RTL', () => {
-      jest.spyOn(rtlHelper, 'isRTL').mockImplementation(() => true)
+      isRTL.mockImplementation(() => true)
       const {getByTestId} = render(<TestComponent />)
       expect(getByTestId('leftColumn')).toHaveStyle('width: 25%')
       expect(getByTestId('rightColumn')).toHaveStyle('width: 74%')
@@ -207,6 +214,13 @@ describe('useResize', () => {
       })
       expect(getByTestId('leftColumn')).toHaveStyle('width: 743px')
       expect(getByTestId('rightColumn')).toHaveStyle('width: 245px')
+    })
+  })
+
+  describe('Delimiter attributes', () => {
+    it('has aria-valuenow', () => {
+      const {getByTestId} = render(<TestComponent />)
+      expect(getByTestId('delimiter')).toHaveAttribute('aria-valuenow')
     })
   })
 })

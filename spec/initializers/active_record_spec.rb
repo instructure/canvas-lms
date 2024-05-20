@@ -19,6 +19,20 @@
 
 module ActiveRecord
   describe Base do
+    describe ".serializable_hash" do
+      let(:account) { Account.create! }
+
+      it "returns a hash with indifferent access when the root is included" do
+        hash = account.serializable_hash(include_root: true)
+        expect(hash).to be_a ActiveSupport::HashWithIndifferentAccess
+      end
+
+      it "returns a hash with indifferent access when the root is excluded" do
+        hash = account.serializable_hash(include_root: false)
+        expect(hash).to be_a ActiveSupport::HashWithIndifferentAccess
+      end
+    end
+
     describe ".wildcard" do
       it "produces a useful wildcard sql string" do
         sql = Base.wildcard("users.name", "users.short_name", "Sinatra, Frank", delimiter: ",")
@@ -242,7 +256,7 @@ module ActiveRecord
           "created_at" => DateTime.now.utc
         }
         attrs_2 = attrs_1.merge({
-                                  "created_at" => 40.days.ago
+                                  "created_at" => 1.month.from_now
                                 })
         ar_type = Auditors::ActiveRecord::AuthenticationRecord
         expect { ar_type.bulk_insert([attrs_1, attrs_2]) }.to_not raise_error
@@ -271,6 +285,27 @@ module ActiveRecord
           end.to_not raise_error
         end
       end
+
+      describe "update_all" do
+        context "with shard_value" do
+          specs_require_sharding
+
+          it "iterates all shards" do
+            u1 = u2 = nil
+            @shard1.activate do
+              u1 = User.create!(name: "u1")
+              u1.communication_channels.create!(path: "email@domain.com")
+            end
+            @shard2.activate do
+              u2 = User.create!(name: "u2")
+              u2.communication_channels.create!(path: "email@domain.com")
+            end
+            User.joins(:communication_channel).shard([@shard1, @shard2]).update_all(name: "changed")
+            expect(u1.reload.name).to eql "changed"
+            expect(u2.reload.name).to eql "changed"
+          end
+        end
+      end
     end
 
     describe "update_all with limit" do
@@ -282,6 +317,18 @@ module ActiveRecord
         Eportfolio.joins(:user).order(:id).limit(1).update_all(name: "changed")
         expect(e1.reload.name).to eq "changed"
         expect(e2.reload.name).not_to eq "changed"
+      end
+
+      context "with shard_value" do
+        specs_require_sharding
+
+        it "iterates all shards" do
+          u1 = @shard1.activate { User.create!(name: "u1") }
+          u2 = @shard2.activate { User.create!(name: "u2") }
+          User.shard([@shard1, @shard2]).limit(10).update_all(name: "changed")
+          expect(u1.reload.name).to eql "changed"
+          expect(u2.reload.name).to eql "changed"
+        end
       end
     end
 
@@ -351,8 +398,8 @@ module ActiveRecord
       end
 
       after do
-        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store).and_call_original
-        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns_disabled", tree: :store).and_call_original
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store, ignore_fallback_overrides: true).and_call_original
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns_disabled", tree: :store, ignore_fallback_overrides: true).and_call_original
 
         reset_cache!
         User.create!(name: "user u2")
@@ -364,12 +411,12 @@ module ActiveRecord
       end
 
       def set_ignored_columns_state!(columns, enabled)
-        allow(DynamicSettings).to receive(:find).with("activerecord", tree: :store).and_return(
-          DynamicSettings::FallbackProxy.new({ "ignored_columns_disabled" => !enabled })
+        allow(DynamicSettings).to receive(:find).with("activerecord", tree: :store, ignore_fallback_overrides: true).and_return(
+          DynamicSettings::FallbackProxy.new({ "ignored_columns_disabled" => !enabled }, ignore_fallback_overrides: true)
         )
 
-        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store).and_return(
-          DynamicSettings::FallbackProxy.new({ "users" => columns })
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store, ignore_fallback_overrides: true).and_return(
+          DynamicSettings::FallbackProxy.new({ "users" => columns }, ignore_fallback_overrides: true)
         )
 
         reset_cache!
@@ -445,7 +492,7 @@ module ActiveRecord
       let(:scope) { User.active }
 
       it "uses FOR UPDATE on a normal exclusive lock" do
-        expect(scope.lock(true).lock_value).to be true
+        expect(scope.lock(true).lock_value).to eq "FOR UPDATE"
       end
 
       it "substitutes 'FOR NO KEY UPDATE' if specified" do
@@ -656,144 +703,6 @@ module ActiveRecord
   end
 end
 
-describe ActiveRecord::ConnectionAdapters::SchemaStatements do
-  describe ".add_replica_identity" do
-    subject { test_adapter_instance.add_replica_identity model_name, field_name, new_default_column_value }
-
-    let(:model_name) { "Example" }
-    let(:field_name) { :test_field }
-    let(:existing_default_column_value) { nil }
-    let(:new_default_column_value) { "test default value" }
-
-    let(:example_model) do
-      Class.new(ActiveRecord::Base) do
-        self.table_name = "examples"
-
-        def self.exists?; end
-      end
-    end
-
-    let(:example_column) do
-      Class.new(ActiveRecord::ConnectionAdapters::Column)
-    end
-
-    let(:test_adapter) do
-      Class.new do
-        include ActiveRecord::ConnectionAdapters::SchemaStatements
-
-        @column_definitions = Hash.new { |h, k| h[k] = {} }
-        class << self
-          attr_reader :column_definitions
-        end
-
-        def initialize
-          super
-          @column_definitions = self.class.column_definitions
-        end
-
-        def self.define_column(table_name, field, column)
-          @column_definitions[table_name][field] = column
-        end
-
-        def column_definitions(table_name)
-          @column_definitions[table_name].keys
-        end
-
-        def new_column_from_field(table_name, field)
-          @column_definitions[table_name][field]
-        end
-
-        def change_column_null(*args); end
-
-        def add_index(*args); end
-
-        # rubocop:disable Naming/AccessorMethodName we're implementing a module method here
-        def set_replica_identity(*args); end
-        # rubocop:enable Naming/AccessorMethodName
-      end
-    end
-
-    let(:test_adapter_instance) { test_adapter.new }
-
-    before do
-      stub_const(model_name, example_model)
-      stub_const("TestColumn", example_column)
-
-      existing_column = TestColumn.new(field_name.to_s, existing_default_column_value)
-      test_adapter.define_column(Example.table_name, field_name, existing_column)
-
-      allow(DataFixup::BackfillNulls).to receive(:run)
-    end
-
-    it "adds an index" do
-      index_name = "index_#{Example.table_name}_replica_identity"
-      expect(test_adapter_instance).to receive(:add_index) do |table_name, column_name, **options|
-        raise "incorrect table name #{table_name}" unless table_name == Example.table_name
-        raise "incorrect column name #{column_name}" unless column_name == [field_name, Example.primary_key]
-        raise "index isn't unique" unless options[:unique]
-        raise "incorrect index name #{options[:name]}" unless options[:name] == index_name
-      end
-      subject
-    end
-
-    it "sets the replica identity" do
-      index_name = "index_#{Example.table_name}_replica_identity"
-      expect(test_adapter_instance).to receive(:set_replica_identity).with(Example.table_name, index_name)
-      subject
-    end
-
-    context "when the column is nullable" do
-      it "backfills nulls with the new default value" do
-        expect(DataFixup::BackfillNulls).to receive(:run).with(Example, field_name, default_value: new_default_column_value)
-        subject
-      end
-
-      it "sets the field to not be nullable" do
-        expect(test_adapter_instance).to receive(:change_column_null).with(Example.table_name, field_name, false)
-        subject
-      end
-    end
-
-    context "when the column is not nullable" do
-      before do
-        existing_column = TestColumn.new(field_name.to_s, existing_default_column_value, nil, false)
-        test_adapter.define_column(Example.table_name, field_name, existing_column)
-      end
-
-      it "does not run a backfill of null values" do
-        expect(DataFixup::BackfillNulls).not_to receive(:run)
-        subject
-      end
-    end
-
-    context "on an existing table" do
-      before do
-        allow(Example).to receive(:exists?).and_return(true)
-      end
-
-      it "adds the index with algorithm: concurrently" do
-        expect(test_adapter_instance).to receive(:add_index) do |_table_name, _field_name, **options|
-          raise "didn't add index with algorithm: :concurrently" unless options[:algorithm] == :concurrently
-        end
-        subject
-      end
-    end
-
-    context "on a new table" do
-      before do
-        allow(Example).to receive(:exists?).and_return(false)
-      end
-
-      it "does not require the migration run outside of a transaction" do
-        expect(test_adapter_instance).to receive(:add_index) do |_table_name, _field_name, **options|
-          raise "added index with algorithm: :concurrently" if options[:algorithm] == :concurrently
-        end
-        subject
-      end
-    end
-  end
-end
-
 describe ActiveRecord::Migration::CommandRecorder do
   it "reverses if_exists/if_not_exists" do
     recorder = ActiveRecord::Migration::CommandRecorder.new
@@ -801,7 +710,7 @@ describe ActiveRecord::Migration::CommandRecorder do
     recorder.revert do
       r.add_column :accounts, :course_template_id, :integer, limit: 8, if_not_exists: true
       r.add_foreign_key :accounts, :courses, column: :course_template_id, if_not_exists: true
-      r.add_index :accounts, :course_template_id, algorithm: :concurrently, if_not_exists: true
+      r.add_index :accounts, :course_template_id, algorithm: :concurrently, if_not_exists: true # rubocop:disable Migration/NonTransactional
 
       r.remove_column :courses, :id, :integer, limit: 8, if_exists: true
       r.remove_foreign_key :enrollments, :users, if_exists: true

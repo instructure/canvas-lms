@@ -116,18 +116,6 @@ enhanced_course_creation_account_fetching:
   display_name: 'Use a new endpoint for fetching course creation accounts'
   description: Use new improved logic to fetch all accounts a user can create courses in.
 
-calendar_series:
-  applies_to: SiteAdmin
-  state: hidden
-  display_name: Calendar Series
-  description: |-
-    This flag allows calendar event series to be created from the Canvas Calendar.
-  environments:
-    ci:
-      state: allowed_on
-    development:
-      state: allowed_on
-
 account_level_blackout_dates:
   applies_to: SiteAdmin
   state: hidden
@@ -165,12 +153,6 @@ deprecate_faculty_journal:
     development:
       state: allowed_on
 
-module_publish_menu:
-  state: hidden
-  display_name: 'Module Publish Menu'
-  description: Enable the module publish menus to make mass publishing and unpublishing easier.
-  applies_to: SiteAdmin
-
 blueprint_line_item_support:
   state: hidden
   display_name: 'Blueprint Resource ID Support'
@@ -199,12 +181,6 @@ content_migration_asset_map_v2:
   state: hidden
   display_name: Content Migration Asset Map v2
   description: Adds Additional Fields to the Content Migration Asset Map
-  applies_to: SiteAdmin
-
-gem_migration_links:
-  state: hidden
-  display_name: Course Import HTML Using Gem
-  description: Use gem during course import to update Canvas resource links
   applies_to: SiteAdmin
 
 instui_for_import_page:
@@ -236,4 +212,39 @@ precise_link_replacements:
   description: |-
     Apply link replacement logic to a select list of
     elements only, as opposed to all texts
+  applies_to: SiteAdmin
+
+observer_appointment_groups:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Allow observers to schedule appointments in the calendar
+  description: |-
+    When enabled, teachers can choose to allow observers to schedule appointments
+    when creating appointment groups in the calendar.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+block_editor:
+  applies_to: Account
+  state: hidden
+  display_name: Block Editor
+  description: |-
+    Enable the new block editor for the rich content editor.
+  beta: true
+
+instui_header:
+  state: hidden
+  display_name: Use InstUI new headers
+  description: |-
+    If enabled, pages will use the new InstUI headers
+  applies_to: SiteAdmin
+
+rce_find_replace:
+  state: hidden
+  display_name: Find and Replace RCE Plugin
+  description: |-
+    Enable a plugin which can find and replace content when editing in an RCE
   applies_to: SiteAdmin

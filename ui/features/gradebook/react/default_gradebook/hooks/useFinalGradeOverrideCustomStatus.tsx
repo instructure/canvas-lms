@@ -19,7 +19,7 @@
 import {useState} from 'react'
 import {useMutation} from 'react-apollo'
 import gql from 'graphql-tag'
-import {ApiCallStatus} from '@canvas/util/apiRequest'
+import {ApiCallStatus} from '@canvas/do-fetch-api-effect/apiRequest'
 
 const SET_OVERRIDE_STATUS_MUTATION = gql`
   mutation SetOverrideStatusMutation(

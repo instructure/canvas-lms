@@ -187,6 +187,6 @@ module Canvas::ICU
     end
     return unless collation
 
-    ActiveRecord::ConnectionAdapters::PostgreSQL::Name.new(schema, collation).quoted
+    ::ActiveRecord::ConnectionAdapters::PostgreSQL::Name.new(schema, collation).quoted
   end
 end

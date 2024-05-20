@@ -19,9 +19,10 @@
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import _ from 'underscore'
+import {each, isEmpty, extend as lodashExtend} from 'lodash'
 import CollectionView from '@canvas/backbone-collection-view'
 import 'jqueryui/sortable'
+import '@canvas/jquery/jquery.simulate'
 
 extend(DraggableCollectionView, CollectionView)
 
@@ -89,7 +90,7 @@ DraggableCollectionView.prototype.initSort = function (opts) {
   }
   this.$list
     .sortable(
-      _.extend({}, this.sortOptions, opts, {
+      lodashExtend({}, this.sortOptions, opts, {
         scope: this.cid,
       })
     )
@@ -185,7 +186,7 @@ DraggableCollectionView.prototype._removeFromGroup = function (model) {
   old_children.remove(model, {
     silent: true,
   })
-  return (this.empty = _.isEmpty(old_children.models))
+  return (this.empty = isEmpty(old_children.models))
 }
 
 DraggableCollectionView.prototype._addToGroup = function (model) {
@@ -257,7 +258,7 @@ DraggableCollectionView.prototype.updateModels = function (model, new_index, inV
   // eslint-disable-next-line prefer-spread
   const models_to_update = this.collection.slice.apply(this.collection, slice_args)
   // update the position on just these models
-  return _.each(models_to_update, function (m) {
+  each(models_to_update, function (m) {
     // if the model gets sliced in here, don't update its
     // position as we'll update it later
     if (m.id !== model.id) {

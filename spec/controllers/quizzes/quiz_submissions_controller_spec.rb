@@ -91,7 +91,7 @@ describe Quizzes::QuizSubmissionsController do
                                validation_token: @submission.validation_token,
                                attempt: 1 }
       events = Quizzes::QuizSubmissionEvent.where(quiz_submission_id: @submission.id)
-      expect(events.size).to be_equal(1)
+      expect(events.size).to equal(1)
     end
   end
 

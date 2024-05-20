@@ -19,9 +19,9 @@
 /* eslint-disable no-void */
 
 import $ from 'jquery'
-import _ from 'underscore'
-import htmlEscape from 'html-escape'
-import '@canvas/util/toJSON'
+import {without} from 'lodash'
+import htmlEscape, {raw} from '@instructure/html-escape'
+import '@canvas/jquery/jquery.toJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '../../jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
@@ -120,7 +120,7 @@ export default {
         }
           .call(this)
           .join('</p><p>')
-      if ((ref = $input.errorBox($.raw('' + html))) != null) {
+      if ((ref = $input.errorBox(raw('' + html))) != null) {
         if ((ref1 = ref.css('z-index', '1100')) != null) {
           ref1.attr('role', 'alert')
         }
@@ -133,7 +133,7 @@ export default {
   },
   attachErrorDescription($input, message) {
     const errorDescriptionField = this.findOrCreateDescriptionField($input)
-    errorDescriptionField.description.text($.raw('' + message))
+    errorDescriptionField.description.text(raw('' + message))
     return $input.attr(
       'aria-describedby',
       errorDescriptionField.description.attr('id') +
@@ -161,6 +161,6 @@ export default {
   getExistingDescriptionIds($input, id) {
     const descriptionIds = $input.attr('aria-describedby')
     const idArray = descriptionIds ? descriptionIds.split(' ') : []
-    return _.without(idArray, id + '_sr_description')
+    return without(idArray, id + '_sr_description')
   },
 }

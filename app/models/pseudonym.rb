@@ -96,8 +96,23 @@ class Pseudonym < ActiveRecord::Base
             presence: true,
             if: :require_password?
 
+  class << self
+    # we know these fields, and don't want authlogic to connect to the db at boot
+    # to try and infer them
+    def db_setup?
+      true
+    end
+
+    def login_field
+      :unique_id
+    end
+
+    def crypted_password_field
+      :crypted_password
+    end
+  end
+
   acts_as_authentic do |config|
-    config.login_field :unique_id
     config.perishable_token_valid_for = 30.minutes
     # if changing this to a new provider, add the _new_ provider to the transition
     # list for a full deploy first before moving it to primary, so that

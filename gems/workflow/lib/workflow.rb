@@ -89,7 +89,7 @@ module Workflow
 
     def initialize(msg = nil)
       @halted_because = msg
-      super msg
+      super(msg)
     end
   end
 
@@ -134,7 +134,7 @@ module Workflow
       self.workflow_spec.states.each_value do |state|
         state_name = state.name
         workflow_methods.module_eval do
-          define_method "#{state_name}?" do
+          define_method :"#{state_name}?" do
             state_name == current_state.name
           end
         end
@@ -142,7 +142,7 @@ module Workflow
         state.events.each_value do |event|
           event_name = event.name
           workflow_methods.module_eval do
-            define_method "#{event_name}!".to_sym do |*args|
+            define_method :"#{event_name}!" do |*args|
               process_event!(event_name, *args)
             end
             # INSTRUCTURE:

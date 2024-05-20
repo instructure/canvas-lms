@@ -20,7 +20,7 @@
 class BookmarkedCollection::TransformedCollection < BookmarkedCollection::Collection
   def initialize(bookmarker)
     @bookmarks = []
-    super bookmarker
+    super(bookmarker)
   end
 
   def add(item, bookmark)

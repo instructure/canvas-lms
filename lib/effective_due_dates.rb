@@ -95,7 +95,7 @@ class EffectiveDueDates
   # This iterates through a single assignment's EffectiveDueDate hash to see
   # if any students in them are in a closed grading period.
   def in_closed_grading_period?(assignment_id, student_or_student_id = nil)
-    assignment_id = assignment_id.id if assignment_id.is_a?(Assignment)
+    assignment_id = assignment_id.id if assignment_id.is_a?(AbstractAssignment)
     return false if assignment_id.nil?
 
     # false if there aren't even grading periods set up
@@ -161,15 +161,31 @@ class EffectiveDueDates
   def context_module_overrides
     if Account.site_admin.feature_enabled?(:differentiated_modules)
       "/* fetch all module overrides for this assignment */
+      tags AS (
+        SELECT
+          t.id,
+          t.context_module_id,
+          t.content_id,
+          qt.context_module_id as quiz_context_module_id,
+          q.assignment_id as quiz_assignment_id
+        FROM
+          models a
+        LEFT JOIN #{ContentTag.quoted_table_name} t ON t.content_id = a.id AND t.content_type = 'Assignment'
+        LEFT JOIN #{Quizzes::Quiz.quoted_table_name} q ON q.assignment_id = a.id
+        LEFT JOIN #{ContentTag.quoted_table_name} qt ON qt.content_id = q.id AND qt.content_type = 'Quizzes::Quiz'
+        WHERE
+          COALESCE(t.tag_type, qt.tag_type) = 'context_module'
+          AND COALESCE(t.workflow_state, qt.workflow_state) <> 'deleted'
+      ),
+
       modules AS (
         SELECT
           m.id
         FROM
-          models a
-        INNER JOIN #{ContentTag.quoted_table_name} t ON t.content_id = a.id AND t.content_type = 'Assignment'
-        INNER JOIN #{ContextModule.quoted_table_name} m ON m.id = t.context_module_id
+          tags t
+        INNER JOIN #{ContextModule.quoted_table_name} m ON m.id = COALESCE(t.context_module_id, t.quiz_context_module_id)
         WHERE
-          m.workflow_state = 'active' AND t.tag_type='context_module' AND t.workflow_state<>'deleted'
+          m.workflow_state <>'deleted'
       ),
 
       module_overrides AS (
@@ -182,10 +198,13 @@ class EffectiveDueDates
           a.due_at,
           o.unassign_item
         FROM
-          models a, modules m
-        INNER JOIN #{AssignmentOverride.quoted_table_name} o on o.context_module_id = m.id
+          models a,
+          tags t,
+          modules m
+            INNER JOIN #{AssignmentOverride.quoted_table_name} o on o.context_module_id = m.id
         WHERE
-           o.workflow_state = 'active'
+           o.workflow_state = 'active' AND m.id = COALESCE(t.context_module_id, t.quiz_context_module_id) AND
+           a.id = COALESCE(t.content_id, t.quiz_assignment_id)
       ),"
     else
       ""
@@ -198,10 +217,13 @@ class EffectiveDueDates
         SELECT
           *
         FROM
+          tags t,
           modules m
         LEFT JOIN #{AssignmentOverride.quoted_table_name} o on o.context_module_id = m.id AND o.workflow_state = 'active'
         WHERE
           o.context_module_id IS NULL
+          AND a.id = COALESCE(t.content_id, t.quiz_assignment_id)
+          AND m.id = COALESCE(t.context_module_id, t.quiz_context_module_id)
         )
       )"
     else
@@ -298,10 +320,10 @@ class EffectiveDueDates
       else
         # otherwise, map through the array as necessary to get id's
         assignment_collection.flatten!
-        assignment_collection.map! { |assignment| assignment.try(:id) } if assignment_collection.first.is_a?(Assignment)
+        assignment_collection.map! { |assignment| assignment.try(:id) } if assignment_collection.first.is_a?(AbstractAssignment)
         assignment_collection.compact!
-        if assignment_collection.any? { |id| Assignment.global_id?(id) }
-          assignment_collection = Assignment.where(id: assignment_collection).pluck(:id)
+        if assignment_collection.any? { |id| AbstractAssignment.global_id?(id) }
+          assignment_collection = AbstractAssignment.where(id: assignment_collection).pluck(:id)
         end
         assignment_collection = assignment_collection.join(",")
       end
@@ -313,7 +335,7 @@ class EffectiveDueDates
           /* fetch the assignment itself */
           WITH models AS (
             SELECT *
-            FROM #{Assignment.quoted_table_name}
+            FROM #{AbstractAssignment.quoted_table_name}
             WHERE
               id IN (#{assignment_collection}) AND
               workflow_state <> 'deleted' AND

@@ -18,7 +18,7 @@
 import moxios from 'moxios'
 import moment from 'moment-timezone'
 import MockDate from 'mockdate'
-import {moxiosWait, moxiosRespond} from 'jest-moxios-utils'
+import {moxiosWait, moxiosRespond} from '@canvas/jest-moxios-utils'
 import * as Actions from '../loading-actions'
 import {initialize as alertInitialize} from '../../utilities/alertUtils'
 import configureStore from '../../store/configureStore'
@@ -518,7 +518,7 @@ describe('api actions', () => {
       expect(moxios.requests.at(2).url).toMatch(expectedContextCodes)
     })
 
-    it('adds observee id, account calendars flag and context codes to request if state contains selected observee', async () => {
+    it('adds observee id, account calendars flag and all_courses flag to request if state contains selected observee', async () => {
       const today = moment.tz('UTC').startOf('day')
       moxios.stubRequest(/\/api\/v1\/planner\/items/, {
         status: 200,
@@ -545,11 +545,11 @@ describe('api actions', () => {
       await store.dispatch(Actions.getWeeklyPlannerItems(today))
 
       const expectedParams =
-        /include%5B%5D=account_calendars&per_page=100&observed_user_id=35&context_codes%5B%5D=course_11&context_codes%5B%5D=course_12/
+        /include%5B%5D=account_calendars&include%5B%5D=all_courses&per_page=100&observed_user_id=35/
       const expectedParamsPastRequest =
-        /include%5B%5D=account_calendars&order=asc&per_page=1&observed_user_id=35&context_codes%5B%5D=course_11&context_codes%5B%5D=course_12/
+        /include%5B%5D=account_calendars&include%5B%5D=all_courses&order=asc&per_page=1&observed_user_id=35/
       const expectedParamsFutureRequest =
-        /include%5B%5D=account_calendars&order=desc&per_page=1&observed_user_id=35&context_codes%5B%5D=course_11&context_codes%5B%5D=course_12/
+        /include%5B%5D=account_calendars&include%5B%5D=all_courses&order=desc&per_page=1&observed_user_id=35/
       // For multi-course mode, fetching current week, far future date, and far past date should all have observee id
       // , account calendars flag and context codes
       expect(moxios.requests.count()).toBe(4)

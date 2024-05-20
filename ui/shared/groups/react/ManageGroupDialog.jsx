@@ -17,14 +17,14 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
 import $ from 'jquery'
+import {without} from 'lodash'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import BackboneState from './mixins/BackboneState'
 import PaginatedUserCheckList from './PaginatedUserCheckList'
 import InfiniteScroll from './mixins/InfiniteScroll'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 
 const I18n = useI18nScope('student_groups')
 
@@ -66,7 +66,7 @@ const ManageGroupDialog = createReactClass({
     this.setState({
       checked: isChecked
         ? this.state.checked.concat(user.id)
-        : _.without(this.state.checked, user.id),
+        : without(this.state.checked, user.id),
     })
   },
 

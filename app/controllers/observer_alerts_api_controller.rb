@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 class ObserverAlertsApiController < ApplicationController
   include Api::V1::ObserverAlert
 

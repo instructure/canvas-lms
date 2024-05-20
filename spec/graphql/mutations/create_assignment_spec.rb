@@ -282,7 +282,7 @@ describe Mutations::CreateAssignment do
           dueAt: "#{due2.iso8601}"
         },
         {
-          sectionId: #{@course.default_section.to_param}
+          courseSectionId: #{@course.default_section.to_param}
           dueAt: "#{due3.iso8601}"
         }
       ]
@@ -302,6 +302,28 @@ describe Mutations::CreateAssignment do
     section_override = assignment.assignment_overrides.where(set_type: "CourseSection").first
     expect(section_override.set_id).to eq @course.default_section.id
     expect(section_override.due_at).to eq due3
+  end
+
+  it "creates an assignment with a mastery path override" do
+    # .round to avoid round-trip truncation errors, .change(min: 1) to avoid fancy midnight timebombs
+    result = execute_with_input <<~GQL
+      name: "assignment with overrides"
+      courseId: "#{@course.to_param}"
+      onlyVisibleToOverrides: true
+      assignmentOverrides: [
+        {
+          noopId: "1",
+          title: "Mastery Paths"
+        }
+      ]
+    GQL
+
+    assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+    expect(assignment).to be_only_visible_to_overrides
+
+    noop_override = assignment.assignment_overrides.where(set_type: "Noop").first
+    expect(noop_override.set_id).to eq 1
+    expect(noop_override.title).to eq "Mastery Paths"
   end
 
   it "sets lock_at_overridden" do
@@ -377,5 +399,61 @@ describe Mutations::CreateAssignment do
     errors = result["errors"]
     expect(errors).to_not be_nil
     expect(errors[0]["message"]).to include "invalid course"
+  end
+
+  it "gets an error when trying to set a restricted params (pointsPossible) and forCheckpoints is true" do
+    result = execute_with_input <<~GQL
+      name: "Parent Assignment for Checkpoints"
+      courseId: "#{@course.to_param}"
+      pointsPossible: 100
+      forCheckpoints: true
+    GQL
+    errors = result["errors"]
+
+    expect(errors[0]["message"]).to eq "Cannot set points_possible in the parent assignment for checkpoints."
+  end
+
+  it "allows to set a restricted params (pointsPossible) and forCheckpoints is undefined thus false" do
+    result = execute_with_input <<~GQL
+      name: "Regular Assignment"
+      courseId: "#{@course.to_param}"
+      pointsPossible: 100
+    GQL
+    errors = result["errors"]
+
+    expect(errors).to be_nil
+  end
+
+  it "gets an error when trying to set assignmentOverrides and forCheckpoints is true" do
+    result = execute_with_input <<~GQL
+      name: "Parent Assignment for Checkpoints"
+      courseId: "#{@course.to_param}"
+      assignmentOverrides: [
+        {
+          noopId: "1",
+          title: "Mastery Paths"
+        }
+      ]
+      forCheckpoints: true
+    GQL
+    errors = result["errors"]
+
+    expect(errors[0]["message"]).to eq "Assignment overrides are not allowed in the parent assignment for checkpoints."
+  end
+
+  it "allows to set assignmentOverrides and forCheckpoints is undefined thus false" do
+    result = execute_with_input <<~GQL
+      name: "Regular Assignment"
+      courseId: "#{@course.to_param}"
+      assignmentOverrides: [
+        {
+          noopId: "1",
+          title: "Mastery Paths"
+        }
+      ]
+    GQL
+    errors = result["errors"]
+
+    expect(errors).to be_nil
   end
 end

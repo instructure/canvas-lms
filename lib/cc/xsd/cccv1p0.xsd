@@ -53,6 +53,7 @@
     <xs:complexType>
       <xs:all minOccurs="0" maxOccurs="1">
         <xs:element name="title" type="xs:string" minOccurs="1"/>
+        <xs:element name="time_zone_edited" type="xs:string" minOccurs="0"/>
         <xs:element name="course_code" type="xs:string" minOccurs="0"/>
         <xs:element name="start_at" type="optional_dateTime" minOccurs="0"/>
         <xs:element name="conclude_at" type="optional_dateTime" minOccurs="0"/>

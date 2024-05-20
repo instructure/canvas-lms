@@ -1,3 +1,6 @@
+/* eslint-disable eslint-comments/no-unlimited-disable */
+/* eslint-disable */
+
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -27,14 +30,14 @@ function KalturaRequestBuilder() {
 
 KalturaRequestBuilder.id = 1
 
-KalturaRequestBuilder.prototype.createRequest = function() {
+KalturaRequestBuilder.prototype.createRequest = function () {
   const xhr = new XMLHttpRequest()
   xhr.open('POST', this.createUrl())
-  xhr.responseType = 'xml'
+  xhr.responseType = 'text'
   return xhr
 }
 
-KalturaRequestBuilder.prototype.createFormData = function() {
+KalturaRequestBuilder.prototype.createFormData = function () {
   const formData = new FormData()
   formData.append('Filename', this.file.name)
   formData.append('Filedata', this.file)
@@ -42,35 +45,35 @@ KalturaRequestBuilder.prototype.createFormData = function() {
   return formData
 }
 
-KalturaRequestBuilder.prototype.createFileId = function() {
+KalturaRequestBuilder.prototype.createFileId = function () {
   KalturaRequestBuilder.id += 1
   return Date.now().toString() + KalturaRequestBuilder.id.toString()
 }
 
 // flash uploader sends these as GET query params
 // and file data as POST
-KalturaRequestBuilder.prototype.createUrl = function() {
+KalturaRequestBuilder.prototype.createUrl = function () {
   const config = this.settings.getSession()
   config.filename = this.createFileId()
   config.kalsig = this.createSignature()
   return k5Options.uploadUrl + urlParams(config)
 }
 
-KalturaRequestBuilder.prototype.createSignature = function() {
+KalturaRequestBuilder.prototype.createSignature = function () {
   return signatureBuilder(this.settings.getSession())
 }
 
-KalturaRequestBuilder.prototype.buildRequest = function(settings, file) {
+KalturaRequestBuilder.prototype.buildRequest = function (settings, file) {
   this.settings = settings
   this.file = file
   return this.createRequest()
 }
 
-KalturaRequestBuilder.prototype.getFile = function() {
+KalturaRequestBuilder.prototype.getFile = function () {
   return this.file
 }
 
-KalturaRequestBuilder.prototype.getSettings = function() {
+KalturaRequestBuilder.prototype.getSettings = function () {
   return this.settings
 }
 

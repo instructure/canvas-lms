@@ -30,22 +30,24 @@ const I18n = useI18nScope('discussion_posts')
 
 export function AssignmentAvailabilityWindow({...props}) {
   let availabilityWindow = null
+  const timezone = ENV.TIMEZONE
+
   const dateFormat = props.showDateWithTime
     ? DateHelper.formatDatetimeForDiscussions
     : DateHelper.formatDateForDisplay
 
   if (props.availableDate && props.untilDate) {
     availabilityWindow = I18n.t('Available from %{availableDate} until %{untilDate}', {
-      availableDate: dateFormat(props.availableDate, 'short'),
-      untilDate: dateFormat(props.untilDate, 'short'),
+      availableDate: dateFormat(props.availableDate, 'short', timezone),
+      untilDate: dateFormat(props.untilDate, 'short', timezone),
     })
   } else if (props.availableDate) {
     availabilityWindow = I18n.t('Available from %{availableDate}', {
-      availableDate: dateFormat(props.availableDate, 'short'),
+      availableDate: dateFormat(props.availableDate, 'short', timezone),
     })
   } else if (props.untilDate) {
     availabilityWindow = I18n.t('Available until %{untilDate}', {
-      untilDate: dateFormat(props.untilDate, 'short'),
+      untilDate: dateFormat(props.untilDate, 'short', timezone),
     })
   }
 

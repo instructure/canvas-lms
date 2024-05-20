@@ -76,22 +76,6 @@ describe DynamicSettings do
     end
   end
 
-  describe ".fallback_data =" do
-    it "must provide indifferent access on resulting proxy" do
-      DynamicSettings.fallback_data = { foo: "bar" }
-      proxy = DynamicSettings.root_fallback_proxy
-      expect(proxy["foo"]).to eq "bar"
-      expect(proxy[:foo]).to eq "bar"
-    end
-
-    it "must clear the fallback when passed nil" do
-      DynamicSettings.fallback_data = { foo: "bar" }
-      DynamicSettings.fallback_data = nil
-      proxy = DynamicSettings.root_fallback_proxy
-      expect(proxy["foo"]).to be_nil
-    end
-  end
-
   describe ".find" do
     context "when consul is configured" do
       before do

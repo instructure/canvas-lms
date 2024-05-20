@@ -16,18 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {mount} from 'enzyme'
 import React from 'react'
 import ApiError from '../api_error'
+import {render} from '@testing-library/react'
 
 describe('ApiError', () => {
   test('renders error when passed as a string', () => {
-    const wrapper = mount(<ApiError error="show me" />)
-    expect(wrapper.text()).toBe('show me')
+    const wrapper = render(<ApiError error="show me" />)
+    expect(wrapper.queryByText('show me')).toBeInTheDocument()
   })
 
   test('renders error when passed as an array of strings', () => {
-    const wrapper = mount(<ApiError error={['first', 'second']} />)
-    expect(wrapper.text()).toBe('The following users could not be created.firstsecond')
+    const wrapper = render(<ApiError error={['first', 'second']} />)
+    expect(wrapper.queryByText('The following users could not be created.')).toBeInTheDocument()
+    expect(wrapper.queryByText('first')).toBeInTheDocument()
+    expect(wrapper.queryByText('second')).toBeInTheDocument()
   })
 })

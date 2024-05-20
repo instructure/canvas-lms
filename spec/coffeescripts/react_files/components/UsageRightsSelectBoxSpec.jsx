@@ -17,8 +17,10 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {render} from '@testing-library/react'
+import {shallow} from 'enzyme'
 import UsageRightsSelectBox from '@canvas/files/react/components/UsageRightsSelectBox'
 
 QUnit.module('UsageRightsSelectBox', {
@@ -42,7 +44,8 @@ test('shows alert message if nothing is chosen and component is setup for a mess
 
 test('fetches license options when component mounts', () => {
   const server = sinon.fakeServer.create()
-  const wrapper = mount(<UsageRightsSelectBox showMessage={false} />)
+  const ref = React.createRef()
+  render(<UsageRightsSelectBox showMessage={false} ref={ref} />)
   server.respond('GET', '', [
     200,
     {'Content-Type': 'application/json'},
@@ -53,7 +56,7 @@ test('fetches license options when component mounts', () => {
       },
     ]),
   ])
-  equal(wrapper.instance().state.licenseOptions[0].id, 'cc_some_option', 'sets data just fine')
+  equal(ref.current.state.licenseOptions[0].id, 'cc_some_option', 'sets data just fine')
   server.restore()
 })
 
@@ -70,7 +73,8 @@ test('shows creative commons options when set up', () => {
     use_justification: 'creative_commons',
     cc_value: 'helloooo_nurse',
   }
-  const wrapper = mount(<UsageRightsSelectBox {...props} />)
+  const ref = React.createRef()
+  render(<UsageRightsSelectBox {...props} ref={ref} />)
   server.respond('GET', '', [
     200,
     {'Content-Type': 'application/json'},
@@ -82,6 +86,6 @@ test('shows creative commons options when set up', () => {
     ]),
   ])
 
-  equal(wrapper.instance().creativeCommons.value, 'cc_some_option', 'shows creative commons option')
+  equal(ref.current.creativeCommons.value, 'cc_some_option', 'shows creative commons option')
   server.restore()
 })

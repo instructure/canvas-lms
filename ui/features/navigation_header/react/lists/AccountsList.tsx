@@ -42,21 +42,21 @@ export default function CoursesList() {
         </List.Item>
       )}
       {isSuccess &&
-        data
-          .map(account => (
+        [
+          <List.Item key="all">
+            <Link href="/accounts" isWithinText={false} display="block">
+              {I18n.t('All Accounts')}
+            </Link>
+          </List.Item>,
+        ].concat(
+          data.map(account => (
             <List.Item key={account.id}>
               <Link href={`/accounts/${account.id}`} isWithinText={false} display="block">
                 <ActiveText url={`/accounts/${account.id}`}>{account.name}</ActiveText>
               </Link>
             </List.Item>
           ))
-          .concat([
-            <List.Item key="all">
-              <Link href="/accounts" isWithinText={false} display="block">
-                {I18n.t('All Accounts')}
-              </Link>
-            </List.Item>,
-          ])}
+        )}
     </List>
   )
 }

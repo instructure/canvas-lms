@@ -206,7 +206,7 @@ module AccountReports
         users_by_id = users.index_by(&:id)
         pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
         students_by_course = student_chunk.group_by(&:course_id)
-        students_by_course.each do |_course_id, course_students|
+        students_by_course.each_value do |course_students|
           scores = indexed_scores(course_students, grading_periods)
           course_students.each_with_index do |student, i|
             p = loaded_pseudonym(pseudonyms,

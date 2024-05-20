@@ -793,6 +793,30 @@ describe CoursesController, type: :request do
         expect(course_ids.length).to eq 2
       end
 
+      it "returns courses for a user scoped to specified account" do
+        json = api_call(:get,
+                        "/api/v1/users/#{@me.id}/courses",
+                        { user_id: @me.id,
+                          account_id: @course1.account.id.to_s,
+                          controller: "courses",
+                          action: "user_index",
+                          format: "json" })
+        course_ids = json.select { |c| c["id"] }
+        expect(course_ids.length).to eq 2
+      end
+
+      it "does not return courses if not associated to specified account" do
+        json = api_call(:get,
+                        "/api/v1/users/#{@me.id}/courses",
+                        { user_id: @me.id,
+                          account_id: Account.site_admin.id,
+                          controller: "courses",
+                          action: "user_index",
+                          format: "json" })
+        course_ids = json.select { |c| c["id"] }
+        expect(course_ids.length).to eq 0
+      end
+
       it "returns courses for self" do
         json = api_call_as_user(@me,
                                 :get,
@@ -1749,12 +1773,6 @@ describe CoursesController, type: :request do
           expect(@course.reload.grade_passback_setting).to eq "disabled"
         end
 
-        it "updates the grade_passback_setting to custom setting" do
-          Setting.set("valid_grade_passback_settings", "one,two,three")
-          api_call(:put, @path, @params, course: { grade_passback_setting: "one" })
-          expect(@course.reload.grade_passback_setting).to eq "one"
-        end
-
         it "removes the grade_passback_setting" do
           @course.update_attribute(:grade_passback_setting, "nightly_sync")
           api_call(:put, @path, @params, course: { grade_passback_setting: "" })
@@ -2381,8 +2399,8 @@ describe CoursesController, type: :request do
           expect(@course1.reload).to be_available
           progress = Progress.find(json["id"])
           expect(progress).to be_completed
-          expect(progress.message).to be_include "1 course processed"
-          expect(progress.message).to be_include "The course was not found: #{@course2.id}"
+          expect(progress.message).to include "1 course processed"
+          expect(progress.message).to include "The course was not found: #{@course2.id}"
         end
 
         it "does not update courses in another account" do
@@ -2397,8 +2415,8 @@ describe CoursesController, type: :request do
           expect(@course1.reload).to be_available
           progress = Progress.find(json["id"])
           expect(progress).to be_completed
-          expect(progress.message).to be_include "1 course processed"
-          expect(progress.message).to be_include "The course was not found: #{otherCourse.id}"
+          expect(progress.message).to include "1 course processed"
+          expect(progress.message).to include "The course was not found: #{otherCourse.id}"
         end
 
         it "succeeds when publishing already published courses" do
@@ -2407,7 +2425,7 @@ describe CoursesController, type: :request do
           json = api_call(:put, @path, @params, { event: "offer", course_ids: })
           run_jobs
           progress = Progress.find(json["id"])
-          expect(progress.message).to be_include "3 courses processed"
+          expect(progress.message).to include "3 courses processed"
           [@course1, @course2, @course3].each { |c| expect(c.reload).to be_available }
         end
 
@@ -2418,7 +2436,7 @@ describe CoursesController, type: :request do
           json = api_call(:put, @path, @params, { event: "conclude", course_ids: })
           run_jobs
           progress = Progress.find(json["id"])
-          expect(progress.message).to be_include "3 courses processed"
+          expect(progress.message).to include "3 courses processed"
           [@course1, @course2, @course3].each { |c| expect(c.reload).to be_completed }
         end
 
@@ -2429,7 +2447,7 @@ describe CoursesController, type: :request do
           json = api_call(:put, @path, @params, { event: "offer", course_ids: })
           run_jobs
           progress = Progress.find(json["id"])
-          expect(progress.message).to be_include "3 courses processed"
+          expect(progress.message).to include "3 courses processed"
           [@course1, @course2, @course3].each { |c| expect(c.reload).to be_available }
         end
 
@@ -2444,8 +2462,8 @@ describe CoursesController, type: :request do
           run_jobs
           progress = Progress.find(json["id"])
           expect(progress).to be_failed
-          expect(progress.message).to be_include "0 courses processed"
-          expect(progress.message).to be_include "The course was not found: #{@course2.id}"
+          expect(progress.message).to include "0 courses processed"
+          expect(progress.message).to include "The course was not found: #{@course2.id}"
         end
 
         it "reports a failure if an exception is raised outside course update" do
@@ -2456,7 +2474,7 @@ describe CoursesController, type: :request do
           run_jobs
           progress = Progress.find(json["id"])
           expect(progress).to be_failed
-          expect(progress.message).to be_include "crazy exception"
+          expect(progress.message).to include "crazy exception"
         end
       end
 
@@ -2504,6 +2522,11 @@ describe CoursesController, type: :request do
     it "includes account if requested" do
       json = api_call(:get, "/api/v1/courses.json", { controller: "courses", action: "index", format: "json" }, { include: ["account"] })
       expect(json.first.dig("account", "name")).to eq "Default Account"
+    end
+
+    it "includes subaccount_id if requested for backwards compatibility" do
+      json = api_call(:get, "/api/v1/courses.json", { controller: "courses", action: "index", format: "json" }, { include: ["subaccount"] })
+      expect(json.first["subaccount_id"]).to eq @course1.account.id
     end
 
     it "includes subaccount_name if requested for backwards compatibility" do

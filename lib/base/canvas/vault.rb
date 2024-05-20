@@ -35,7 +35,7 @@ module Canvas::Vault
 
       # we're going to override this anyway, just want it to use the fetch path.
       default_expiry = 30.minutes
-      default_race_condition_ttl = Setting.get("vault_cache_race_condition_ttl", 60).to_i.seconds
+      default_race_condition_ttl = 60.seconds
       cache_key = CACHE_KEY_PREFIX + path
       fetched_lease_value = nil
       cached_data = LocalCache.fetch(cache_key, expires_in: default_expiry, race_condition_ttl: default_race_condition_ttl) do

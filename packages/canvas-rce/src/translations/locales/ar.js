@@ -318,6 +318,8 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "أدخل 3 أحرف على الأقل للبحث"
   },
+  "enter_replacement_text_17631bbc": { "message": "أدخل نص استبدال" },
+  "enter_search_text_26cb4459": { "message": "أدخل نص البحث" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (متغير)" },
   "equals_sign_c51bdc58": { "message": "علامة يساوي" },
@@ -358,6 +360,8 @@ const locale = {
   "filename_text_preview_e41ca2d8": { "message": "معاينة النص { filename }" },
   "files_c300e900": { "message": "الملفات" },
   "files_index_af7c662b": { "message": "فهرس الملفات" },
+  "find_8d605019": { "message": "بحث" },
+  "find_and_replace_6e345933": { "message": "بحث واستبدال" },
   "finish_bc343002": { "message": "إنهاء" },
   "fix_heading_hierarchy_f60884c4": { "message": "إصلاح هيكل العنوان" },
   "flat_music_76d5a5c3": { "message": "Flat (موسيقى)" },
@@ -476,6 +480,7 @@ const locale = {
   "in_element_of_19ca2f33": { "message": "In (Element Of)" },
   "increase_indent_6af90f7c": { "message": "زيادة المسافة البادئة" },
   "indefinite_integral_6623307e": { "message": "قيمة التكامل غير المحدد" },
+  "index_of_max_80dcf7a5": { "message": "{ index } من { max }" },
   "indigo_2035fc55": { "message": "نيلي" },
   "inference_fed5c960": { "message": "الاستنتاج" },
   "infinity_7a10f206": { "message": "ما لا نهاية" },
@@ -680,6 +685,7 @@ const locale = {
     "message": "لم يتم العثور على اختبارات موجزة."
   },
   "no_results_940393cf": { "message": "لا توجد نتائج." },
+  "no_results_found_58717065": { "message": "لم يتم العثور على نتائج" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "لم يتم العثور على نتائج لـ { filterTerm }"
   },
@@ -769,6 +775,7 @@ const locale = {
   "preview_a3f8f854": { "message": "معاينة" },
   "preview_in_overlay_ed772c46": { "message": "المعاينة بشكل متراكب" },
   "preview_inline_9787330": { "message": "معاينة مضمّنة" },
+  "previous_bd2ac015": { "message": "السابق" },
   "prime_917ea60e": { "message": "Prime" },
   "prime_numbers_13464f61": { "message": "Prime Numbers" },
   "product_39cf144f": { "message": "منتج" },
@@ -797,7 +804,9 @@ const locale = {
   "religion_icon_246e0be1": { "message": "أيقونة الدين" },
   "remove_heading_style_5fdc8855": { "message": "إزالة نمط العنوان" },
   "remove_link_d1f2f4d0": { "message": "إزالة الارتباط" },
+  "replace_all_d3d68b3": { "message": "استبدال الكل" },
   "replace_e61834a7": { "message": "استبدال" },
+  "replace_with_eeff01ad": { "message": "استبدال بـ" },
   "reset_95a81614": { "message": "إعادة التعيين" },
   "resize_ec83d538": { "message": "تغيير الحجم" },
   "restore_auto_save_deccd84b": { "message": "استعادة الحفظ التلقائي؟" },

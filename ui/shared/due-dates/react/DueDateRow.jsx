@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {groupBy, map, reduce, union} from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
 import DueDateTokenWrapper from './DueDateTokenWrapper'
@@ -59,7 +59,7 @@ class DueDateRow extends React.Component {
   // 1 group override => 1 token for the group
 
   tokenizedOverrides = () => {
-    const {sectionOverrides, groupOverrides, adhocOverrides, noopOverrides} = _.groupBy(
+    const {sectionOverrides, groupOverrides, adhocOverrides, noopOverrides} = groupBy(
       this.props.overrides,
       ov => {
         if (ov.get('course_section_id')) {
@@ -74,7 +74,7 @@ class DueDateRow extends React.Component {
       }
     )
 
-    return _.union(
+    return union(
       this.tokenizedSections(sectionOverrides),
       this.tokenizedGroups(groupOverrides),
       this.tokenizedAdhoc(adhocOverrides),
@@ -84,7 +84,7 @@ class DueDateRow extends React.Component {
 
   tokenizedSections = sectionOverrides => {
     sectionOverrides = sectionOverrides || []
-    return _.map(sectionOverrides, (override, index) => ({
+    return map(sectionOverrides, (override, index) => ({
       id: `section-key-${index}`,
       type: 'section',
       course_section_id: override.get('course_section_id'),
@@ -94,7 +94,7 @@ class DueDateRow extends React.Component {
 
   tokenizedGroups = groupOverrides => {
     groupOverrides = groupOverrides || []
-    return _.map(groupOverrides, (override, index) => ({
+    return map(groupOverrides, (override, index) => ({
       id: `group-key-${index}`,
       type: 'group',
       group_id: override.get('group_id'),
@@ -104,10 +104,10 @@ class DueDateRow extends React.Component {
 
   tokenizedAdhoc = adhocOverrides => {
     adhocOverrides = adhocOverrides || []
-    return _.reduce(
+    return reduce(
       adhocOverrides,
       (overrideTokens, ov) => {
-        const tokensForStudents = _.map(ov.get('student_ids'), this.tokenFromStudentId.bind(this))
+        const tokensForStudents = map(ov.get('student_ids'), this.tokenFromStudentId.bind(this))
         return overrideTokens.concat(tokensForStudents)
       },
       []
@@ -116,7 +116,7 @@ class DueDateRow extends React.Component {
 
   tokenizedNoop = noopOverrides => {
     noopOverrides = noopOverrides || []
-    return _.map(noopOverrides, (override, index) => ({
+    return map(noopOverrides, (override, index) => ({
       id: `noop-key-${index}`,
       noop_id: override.get('noop_id'),
       name: override.get('title'),

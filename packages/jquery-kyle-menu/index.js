@@ -67,25 +67,25 @@ export default class KyleMenu {
             if (e.shiftKey) {
               tabKey = {
                 which: $.ui.keyCode.TAB,
-                shiftKey: true
+                shiftKey: true,
               }
             } else {
               tabKey = {
-                which: $.ui.keyCode.TAB
+                which: $.ui.keyCode.TAB,
               }
             }
 
             const pressTab = $.Event('keydown', tabKey)
             this.$trigger.focus().trigger(pressTab)
           }
-        }
+        },
       })
 
       const popupInstance = this.$menu.data('popup')
       const _open = popupInstance.open
       const self = this
       // monkey patch just this plugin instance not $.ui.popup.prototype.open
-      popupInstance.open = function() {
+      popupInstance.open = function () {
         self.$menu.appendTo(self.opts.appendMenuTo)
         return _open.apply(this, arguments)
       }
@@ -105,7 +105,7 @@ export default class KyleMenu {
     this.$menu.on({
       menuselect: this.select,
       popupopen: this.onOpen,
-      popupclose: this.onClose
+      popupclose: this.onClose,
     })
   }
 
@@ -198,18 +198,18 @@ export default class KyleMenu {
         at: 'center bottom',
         offset: '0 10px',
         within: '#main',
-        collision: 'flipfit'
-      }
+        collision: 'flipfit',
+      },
     },
     buttonOpts: {
-      addDropArrow: true
-    }
+      addDropArrow: true,
+    },
   }
 }
 
 // expose jQuery plugin
-$.fn.kyleMenu = function(options) {
-  return this.each(function() {
+$.fn.kyleMenu = function (options) {
+  return this.each(function () {
     if (!$(this).data().kyleMenu) new KyleMenu(this, options)
   })
 }

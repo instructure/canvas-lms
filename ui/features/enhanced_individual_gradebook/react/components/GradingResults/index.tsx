@@ -26,14 +26,14 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {
   ApiCallStatus,
-  AssignmentConnection,
-  GradebookOptions,
-  GradebookStudentDetails,
-  GradebookUserSubmissionDetails,
+  type AssignmentConnection,
+  type GradebookOptions,
+  type GradebookStudentDetails,
+  type GradebookUserSubmissionDetails,
 } from '../../../types'
 import {useSubmitScore} from '../../hooks/useSubmitScore'
 import {useGetComments} from '../../hooks/useComments'
-import SubmissionDetailModal, {GradeChangeApiUpdate} from './SubmissionDetailModal'
+import SubmissionDetailModal, {type GradeChangeApiUpdate} from './SubmissionDetailModal'
 import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
 import {
   submitterPreviewText,

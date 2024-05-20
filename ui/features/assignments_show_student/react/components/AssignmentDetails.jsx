@@ -18,43 +18,133 @@
 
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
-import {Heading} from '@instructure/ui-heading'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {TruncateText} from '@instructure/ui-truncate-text'
 import {Text} from '@instructure/ui-text'
+import StudentViewContext from './Context'
+import SubmissionStatusPill, {
+  isStatusPillPresent,
+} from '@canvas/assignments/react/SubmissionStatusPill'
+import {Submission} from '@canvas/assignments/graphql/student/Submission'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
+import {Pill} from '@instructure/ui-pill'
+import AvailabilityDates from '@canvas/assignments/react/AvailabilityDates'
+import {totalAllowedAttempts} from '../helpers/SubmissionHelpers'
 
 const I18n = useI18nScope('assignments_2_student_header_date_title')
 
-export default function AssignmentDetails({assignment}) {
+export function renderPipe(item) {
+  return item && <View margin="0 xx-small 0 xx-small">|</View>
+}
+
+function renderAvailability(assignment) {
   return (
     <>
-      <Heading margin="0" as="h2" data-testid="title" themeOverride={{h2FontWeight: 300}}>
-        <TruncateText maxLines={1} truncate="character">
-          {assignment.name}
-        </TruncateText>
-      </Heading>
-      {(assignment.env.peerReviewModeEnabled || assignment.dueAt) && (
-        <Text size="small" weight="bold" data-testid="assignment-sub-header">
-          {assignment.env.peerReviewModeEnabled &&
-            `${I18n.t('Peer:')} ${assignment.env.peerDisplayName}`}
-          {assignment.dueAt && (
+      <Text size="small" color="secondary">
+        {(assignment.unlockAt || assignment.lockAt) && renderPipe(assignment.dueAt)}
+        <AvailabilityDates assignment={assignment} formatStyle="long" />
+      </Text>
+    </>
+  )
+}
+
+function renderAttempts(assignment) {
+  return (
+    <StudentViewContext.Consumer>
+      {context => (
+        <>
+          {assignment.expectsSubmission && (
             <>
-              {assignment.env.peerReviewModeEnabled && ' | '}
-              <FriendlyDatetime
-                data-testid="due-date"
-                prefix={I18n.t('Due:')}
-                format={I18n.t('#date.formats.full_with_weekday')}
-                dateTime={assignment.dueAt}
-              />
+              <Pill>
+                {I18n.t(
+                  {
+                    zero: 'Unlimited Attempts',
+                    one: '1 Attempt',
+                    other: '%{count} Attempts',
+                  },
+                  {count: totalAllowedAttempts(assignment, context.latestSubmission) || 0}
+                )}
+              </Pill>
             </>
           )}
-        </Text>
+        </>
       )}
+    </StudentViewContext.Consumer>
+  )
+}
+
+export default function AssignmentDetails({assignment, submission}) {
+  return (
+    <>
+      <Flex direction="column">
+        <div style={{lineHeight: 1.05}}>
+          <Flex.Item padding={window.ENV.FEATURES.instui_nav ? '0' : 'xxx-small 0 0'}>
+            {window.ENV.FEATURES.instui_nav ? (
+              <Text weight="bold" size="xx-large" wrap="break-word" data-testid="title">
+                {assignment.name}
+              </Text>
+            ) : (
+              <Text size="x-large" wrap="break-word" data-testid="title" weight="light">
+                {assignment.name}
+              </Text>
+            )}
+          </Flex.Item>
+        </div>
+        {(assignment.dueAt ||
+          assignment.lockAt ||
+          assignment.unlockAt ||
+          assignment.env.peerReviewModeEnabled) && (
+          <Flex.Item
+            margin={window.ENV.FEATURES.instui_nav ? 'small 0 0 0' : '0'}
+            themeOverride={{lineHeight: 1}}
+          >
+            <div style={{lineHeight: 1}}>
+              <Text
+                size="small"
+                color={window.ENV.FEATURES.instui_nav ? 'secondary' : null}
+                weight={window.ENV.FEATURES.instui_nav ? null : 'bold'}
+                data-testid="assignment-sub-header"
+              >
+                {assignment.env.peerReviewModeEnabled &&
+                  `${I18n.t('Peer:')} ${assignment.env.peerDisplayName}`}
+                {assignment.dueAt && (
+                  <>
+                    {renderPipe(assignment.env.peerReviewModeEnabled)}
+                    <FriendlyDatetime
+                      data-testid="due-date"
+                      prefix={I18n.t('Due:')}
+                      format={I18n.t('#date.formats.full_with_weekday')}
+                      dateTime={assignment.dueAt}
+                    />
+                  </>
+                )}
+              </Text>
+              {window.ENV.FEATURES.instui_nav &&
+                !assignment.env.peerReviewModeEnabled &&
+                renderAvailability(assignment)}
+            </div>
+          </Flex.Item>
+        )}
+        {window.ENV.FEATURES.instui_nav && !assignment.env.peerReviewModeEnabled && (
+          <Flex margin="small 0 0 0">
+            <Flex.Item>
+              <SubmissionStatusPill
+                submissionStatus={submission?.submissionStatus}
+                customGradeStatus={submission?.customGradeStatus}
+              />
+            </Flex.Item>
+            <Flex.Item margin={isStatusPillPresent(submission) ? '0 0 0 small' : '0'}>
+              {renderAttempts(assignment)}
+            </Flex.Item>
+          </Flex>
+        )}
+      </Flex>
     </>
   )
 }
 
 AssignmentDetails.propTypes = {
   assignment: Assignment.shape,
+  submission: Submission.shape,
 }

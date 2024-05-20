@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import RCELoader from '@canvas/rce/serviceRCELoader'
 import editorUtils from 'helpers/editorUtils'
 import fakeENV from 'helpers/fakeENV'
@@ -67,7 +68,9 @@ QUnit.module('loadOnTarget', {
     fakeENV.setup()
     ENV.context_asset_string = 'courses_1'
     fixtures.setup()
-    this.$div = fixtures.create('<div><textarea id="theTarget" name="elementName" /></div>')
+    this.$div = fixtures.create(
+      '<div><textarea id="theTarget" name="elementName"></textarea></div>'
+    )
     this.$textarea = fixtures.find('#theTarget')
     this.editor = {
       mceInstance() {

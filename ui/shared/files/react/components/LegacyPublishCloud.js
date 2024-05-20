@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import customPropTypes from '../modules/customPropTypes'
 import '@canvas/rails-flash-notifications'
-import '@canvas/datetime' // $.datetimeString
+import '@canvas/datetime/jquery' // $.datetimeString
 
 const I18n = useI18nScope('broccoli_cloud')
 

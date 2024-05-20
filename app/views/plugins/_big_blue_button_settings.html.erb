@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
@@ -26,7 +26,7 @@
     <tr>
       <td><%= f.blabel :domain, :en => "Domain" %></td>
       <td>
-        <%= f.text_field :domain %><br>
+        <%= f.text_field :domain, value: settings[:domain] %><br>
         <%= mt :domain_description, "**hostname** or **ip address** of your BigBlueButton installation (e.g. bigbluebutton.mycompany.com)" %>
       </td>
     </tr>
@@ -40,25 +40,33 @@
     <tr>
       <td></td>
       <td>
-        <%= f.check_box :recording_enabled %> <%= f.label :recording_enabled, :en => "Allow conferences to be recorded." %>
+        <%= f.check_box :recording_enabled, checked: Canvas::Plugin.value_to_boolean(settings[:recording_enabled]) %> <%= f.label :recording_enabled, :en => "Allow conferences to be recorded." %>
       </td>
     </tr>
     <tr>
       <td></td>
       <td>
-        <%= f.check_box :free_trial %> <%= f.label :free_trial, :en => "Mark this BigBlueButton instance as a free trial" %>
+        <%= f.check_box :free_trial, checked: Canvas::Plugin.value_to_boolean(settings[:free_trial]) %> <%= f.label :free_trial, :en => "Mark this BigBlueButton instance as a free trial" %>
+      </td>
+    </tr>
+    <% if @domain_root_account.feature_enabled?(:bbb_avatar) && !@domain_root_account.site_admin? %>
+    <tr>
+      <td></td>
+      <td>
+        <%= f.check_box :send_avatar, checked: Canvas::Plugin.value_to_boolean(settings[:send_avatar]) %> <%= f.label :send_avatar, :en => "Send user avatar to BigBlueButton on join" %>
+      </td>
+    </tr>
+    <% end %>
+    <tr>
+      <td></td>
+      <td>
+        <%= f.check_box :replace_with_alternatives, checked: Canvas::Plugin.value_to_boolean(settings[:replace_with_alternatives]) %> <%= f.label :replace_with_alternatives, :en => "Disable BigBlueButton conferences; show a list of alternatives instead" %>
       </td>
     </tr>
     <tr>
       <td></td>
       <td>
-        <%= f.check_box :replace_with_alternatives %> <%= f.label :replace_with_alternatives, :en => "Disable BigBlueButton conferences; show a list of alternatives instead" %>
-      </td>
-    </tr>
-    <tr>
-      <td></td>
-      <td>
-        <%= f.check_box :use_fallback %> <%= f.label :use_fallback, :en => "Use BigBlueButton Fallback Plugin settings to look for recordings for conferences that weren't hosted by the currently configured BBB instance." %>
+        <%= f.check_box :use_fallback, checked: Canvas::Plugin.value_to_boolean(settings[:use_fallback]) %> <%= f.label :use_fallback, :en => "Use BigBlueButton Fallback Plugin settings to look for recordings for conferences that weren't hosted by the currently configured BBB instance." %>
       </td>
     </tr>
   </table>

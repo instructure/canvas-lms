@@ -32,7 +32,7 @@ module UserSearch
       @include_integration = @include_sis
 
       context.shard.activate do
-        users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments))
+        users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments, :include_deleted_users))
         users_scope = users_scope.from("(#{conditions_statement(search_term, context.root_account, users_scope)}) AS users")
         users_scope = order_scope(users_scope, context, options.slice(:order, :sort))
         roles_scope(users_scope, context, options.slice(:enrollment_type,
@@ -49,8 +49,7 @@ module UserSearch
     end
 
     def like_string_for(search_term)
-      pattern_type = (gist_search_enabled? ? :full : :right)
-      wildcard_pattern(search_term, type: pattern_type, case_sensitive: false)
+      wildcard_pattern(search_term, type: :full, case_sensitive: false)
     end
 
     def like_condition(value)
@@ -61,7 +60,8 @@ module UserSearch
       users_scope = context_scope(context, searcher, options.slice(:enrollment_state,
                                                                    :include_inactive_enrollments,
                                                                    :enrollment_role_id,
-                                                                   :ui_invoked))
+                                                                   :ui_invoked,
+                                                                   :include_deleted_users))
       users_scope = roles_scope(users_scope, context, options.slice(:enrollment_role,
                                                                     :enrollment_role_id,
                                                                     :enrollment_type,
@@ -78,7 +78,9 @@ module UserSearch
       include_inactive_enrollments = !!options[:include_inactive_enrollments]
       case context
       when Account
-        User.of_account(context).active
+        users = User.of_account(context).active
+        users = users.union(context.deleted_users) if options[:include_deleted_users]
+        users
       when Course
         context.users_visible_to(searcher,
                                  include_prior_enrollments,
@@ -174,11 +176,11 @@ module UserSearch
       end
 
       if context.is_a?(Account) && !enrollment_types && context.root_account&.feature_enabled?(:temporary_enrollments)
-        recipients = options[:temporary_enrollment_recipients]
-        providers = options[:temporary_enrollment_providers]
+        recipients = value_to_boolean(options[:temporary_enrollment_recipients])
+        providers = value_to_boolean(options[:temporary_enrollment_providers])
 
-        recipient_scope = Enrollment.current_and_future.temporary_enrollment_recipients_for_provider(users_scope) if recipients
-        provider_scope = Enrollment.current_and_future.temporary_enrollments_for_recipient(users_scope) if providers
+        recipient_scope = Enrollment.active_or_pending_by_date.temporary_enrollment_recipients_for_provider(users_scope) if recipients
+        provider_scope = Enrollment.active_or_pending_by_date.temporary_enrollments_for_recipient(users_scope) if providers
 
         users_scope =
           if recipients && providers
@@ -197,22 +199,24 @@ module UserSearch
 
     private
 
+    def value_to_boolean(value)
+      Canvas::Plugin.value_to_boolean(value)
+    end
+
     def complex_sql(users_scope, params)
       users_scope = users_scope.group(:id)
       queries = [name_sql(users_scope, params)]
-      if complex_search_enabled?
-        queries << id_sql(users_scope, params) if @is_id
-        queries << ids_sql(users_scope, params)
-        queries << login_sql(users_scope, params) if @include_login
-        queries << sis_sql(users_scope, params) if @include_sis
-        queries << integration_sql(users_scope, params) if @include_integration
-        queries << email_sql(users_scope, params) if @include_email
-      end
+      queries << id_sql(users_scope, params) if @is_id
+      queries << ids_sql(users_scope, params)
+      queries << login_sql(users_scope, params) if @include_login
+      queries << sis_sql(users_scope, params) if @include_sis
+      queries << integration_sql(users_scope, params) if @include_integration
+      queries << email_sql(users_scope, params) if @include_email
       queries.compact.map(&:to_sql).join("\nUNION\n")
     end
 
     def id_sql(users_scope, params)
-      users_scope.select("users.*, MAX(current_login_at) as last_login")
+      users_scope.select("users.*, MAX(pseudonyms.current_login_at) as last_login")
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
           AND pseudonyms.workflow_state = 'active'")
@@ -224,7 +228,7 @@ module UserSearch
       ids = specific_ids(params)
       return nil unless ids.length.positive?
 
-      users_scope.select("users.*, MAX(current_login_at) as last_login")
+      users_scope.select("users.*, MAX(pseudonyms.current_login_at) as last_login")
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
           AND pseudonyms.workflow_state = 'active'")
@@ -237,7 +241,7 @@ module UserSearch
     end
 
     def name_sql(users_scope, params)
-      users_scope.select("users.*, MAX(current_login_at) as last_login")
+      users_scope.select("users.*, MAX(pseudonyms.current_login_at) as last_login")
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
           AND pseudonyms.workflow_state = 'active'")
@@ -275,21 +279,13 @@ module UserSearch
     end
 
     def email_sql(users_scope, params)
-      users_scope.select("users.*, MAX(current_login_at) as last_login")
+      users_scope.select("users.*, MAX(pseudonyms.current_login_at) as last_login")
                  .joins(:communication_channels)
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
           AND pseudonyms.workflow_state = 'active'")
                  .where(communication_channels: { workflow_state: ["active", "unconfirmed"], path_type: params[:path_type] })
                  .where(like_condition("communication_channels.path"), pattern: params[:pattern])
-    end
-
-    def gist_search_enabled?
-      Setting.get("user_search_with_gist", "true") == "true"
-    end
-
-    def complex_search_enabled?
-      Setting.get("user_search_with_full_complexity", "true") == "true"
     end
 
     def wildcard_pattern(value, **options)

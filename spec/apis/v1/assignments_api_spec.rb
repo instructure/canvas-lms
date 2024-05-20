@@ -85,24 +85,36 @@ describe AssignmentsApiController, type: :request do
       before do
         @course.root_account.enable_feature!(:discussion_checkpoints)
 
-        assignment = @course.assignments.create!(title: "Assignment 1", checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
-        @c1 = assignment.checkpoint_assignments.create!(context: assignment.context, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
-        @c2 = assignment.checkpoint_assignments.create!(context: assignment.context, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+        assignment = @course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
+        @c1 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        @c2 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+
+        user = user_factory(active_all: true)
+        @course.enroll_student(user).accept!
+        @students = [user]
+
+        create_adhoc_override_for_assignment(@c2, @students, due_at: 2.days.from_now)
       end
 
       it "returns the assignments list with API-formatted Checkpoint data" do
         json = api_get_assignments_index_from_course(@course, include: ["checkpoints"])
         assignment = json.first
         checkpoints = assignment["checkpoints"]
+        first_checkpoint = checkpoints.find { |c| c["tag"] == CheckpointLabels::REPLY_TO_TOPIC }
+        second_checkpoint = checkpoints.find { |c| c["tag"] == CheckpointLabels::REPLY_TO_ENTRY }
 
-        expect(assignment["checkpointed"]).to be_truthy
+        expect(assignment["has_sub_assignments"]).to be_truthy
 
         expect(checkpoints.length).to eq 2
         expect(checkpoints.pluck("name")).to match_array [@c1.name, @c2.name]
-        expect(checkpoints.pluck("label")).to match_array [@c1.checkpoint_label, @c2.checkpoint_label]
+        expect(checkpoints.pluck("tag")).to match_array [@c1.sub_assignment_tag, @c2.sub_assignment_tag]
         expect(checkpoints.pluck("points_possible")).to match_array [@c1.points_possible, @c2.points_possible]
         expect(checkpoints.pluck("due_at")).to match_array [@c1.due_at.iso8601, @c2.due_at.iso8601]
         expect(checkpoints.pluck("only_visible_to_overrides")).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]
+        expect(first_checkpoint["overrides"].length).to eq 0
+        expect(second_checkpoint["overrides"].length).to eq 1
+        expect(second_checkpoint["overrides"].first["assignment_id"]).to eq @c2.id
+        expect(second_checkpoint["overrides"].first["student_ids"]).to match_array @students.map(&:id)
       end
     end
 
@@ -122,6 +134,39 @@ describe AssignmentsApiController, type: :request do
                {},
                {},
                { expected_status: 401 })
+    end
+
+    context "when the 'new_quizzes' query param is set" do
+      subject do
+        api_get_assignments_index_from_course(course, { new_quizzes: true })
+      end
+
+      let!(:new_quizzes_assignment) do
+        a = assignment_model(submission_types: "external_tool", course:, title: "New Quizzes")
+        a.external_tool_tag_attributes = { content: tool }
+        a.save!
+        a
+      end
+
+      let(:course) { @course }
+      let(:tool) do
+        course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+      end
+
+      before do
+        course.assignments.create!(title: "Non Quiz Assignment")
+      end
+
+      it "only includes the New Quizzes assignments" do
+        expect(subject.count).to eq 1
+        expect(subject.first["id"]).to eq new_quizzes_assignment.id
+      end
     end
 
     it "includes in_closed_grading_period in returned json" do
@@ -490,7 +535,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "fails if given too many assignment_ids" do
-      all_ids = (1...(Api.max_per_page + 10)).map(&:to_s)
+      all_ids = (1...(Api::MAX_PER_PAGE + 10)).map(&:to_s)
       query_string = all_ids.map { |id| "assignment_ids[]=#{id}" }.join("&")
       api_call(:get,
                "/api/v1/courses/#{@course.id}/assignments.json?#{query_string}",
@@ -1461,7 +1506,7 @@ describe AssignmentsApiController, type: :request do
       o1 = assignment_override_model(assignment: a)
       o1.assignment_override_students.create!(user: s1)
 
-      Setting.set("assignment_all_dates_too_many_threshold", "2")
+      stub_const("Api::V1::Assignment::ALL_DATES_LIMIT", 2)
 
       @user = @teacher
       json = api_call(:get,
@@ -1580,9 +1625,9 @@ describe AssignmentsApiController, type: :request do
         course_with_teacher(active_all: true)
         @course.root_account.enable_feature!(:discussion_checkpoints)
 
-        assignment = @course.assignments.create!(title: "Assignment 1", checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
-        @c1 = assignment.checkpoint_assignments.create!(context: assignment.context, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
-        @c2 = assignment.checkpoint_assignments.create!(context: assignment.context, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+        assignment = @course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
+        @c1 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        @c2 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
       end
 
       it "returns the assignments list with API-formatted Checkpoint data" do
@@ -1590,11 +1635,11 @@ describe AssignmentsApiController, type: :request do
         assignment = json.first
         checkpoints = assignment["checkpoints"]
 
-        expect(assignment["checkpointed"]).to be_truthy
+        expect(assignment["has_sub_assignments"]).to be_truthy
 
         expect(checkpoints.length).to eq 2
         expect(checkpoints.pluck("name")).to match_array [@c1.name, @c2.name]
-        expect(checkpoints.pluck("label")).to match_array [@c1.checkpoint_label, @c2.checkpoint_label]
+        expect(checkpoints.pluck("tag")).to match_array [@c1.sub_assignment_tag, @c2.sub_assignment_tag]
         expect(checkpoints.pluck("points_possible")).to match_array [@c1.points_possible, @c2.points_possible]
         expect(checkpoints.pluck("due_at")).to match_array [@c1.due_at.iso8601, @c2.due_at.iso8601]
         expect(checkpoints.pluck("only_visible_to_overrides")).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]
@@ -2133,6 +2178,56 @@ describe AssignmentsApiController, type: :request do
           expect(Assignment.find(failed_blueprint_assignment.id).migration_id).to be_nil
         end
       end
+    end
+  end
+
+  describe "POST retry_alignment_clone" do
+    before :once do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+    end
+
+    it "retries the alignment cloning process successfully" do
+      assignment = @course.assignments.create(
+        title: "some assignment",
+        assignment_group: @group,
+        due_at: 1.week.from_now
+      )
+      assignment.update_attribute(:workflow_state, "failed_to_clone_outcome_alignment")
+      api_call_as_user(@user,
+                       :post,
+                       "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/retry_alignment_clone",
+                       { controller: "assignments_api",
+                         action: "retry_alignment_clone",
+                         format: "json",
+                         course_id: @course.id.to_s,
+                         assignment_id: assignment.id.to_s,
+                         target_course_id: @course.id.to_s,
+                         target_assignment_id: assignment.id.to_s },
+                       {},
+                       {},
+                       { expected_status: 200 })
+    end
+
+    it "returns 400 when the state is incorrect" do
+      assignment = @course.assignments.create(
+        title: "some assignment",
+        assignment_group: @group,
+        due_at: 1.week.from_now
+      )
+      api_call_as_user(@user,
+                       :post,
+                       "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/retry_alignment_clone",
+                       { controller: "assignments_api",
+                         action: "retry_alignment_clone",
+                         format: "json",
+                         course_id: @course.id.to_s,
+                         assignment_id: assignment.id.to_s,
+                         target_course_id: @course.id.to_s,
+                         target_assignment_id: assignment.id.to_s },
+                       {},
+                       {},
+                       { expected_status: 400 })
     end
   end
 
@@ -3086,20 +3181,16 @@ describe AssignmentsApiController, type: :request do
         course_with_ta(course: @course, active_enrollment: true)
         @course.course_sections.create!
 
-        @notification = Notification.create! name: "Assignment Created"
+        @notification = Notification.create!(name: "Assignment Created", category: "TestImmediately")
 
         @student.register!
         @student.communication_channels.create(path: "student@instructure.com").confirm!
-        @student.email_channel.notification_policies.create!(notification: @notification,
-                                                             frequency: "immediately")
       end
 
       it "takes overrides into account in the assignment-created notification " \
          "for assignments created with overrides" do
         @ta.register!
         @ta.communication_channels.create(path: "ta@instructure.com").confirm!
-        @ta.email_channel.notification_policies.create!(notification: @notification,
-                                                        frequency: "immediately")
 
         @override_due_at = Time.parse("2002 Jun 22 12:00:00")
 
@@ -3125,15 +3216,14 @@ describe AssignmentsApiController, type: :request do
         assignment.publish if assignment.unpublished?
 
         expect(@student.messages.detect { |m| m.notification_id == @notification.id }.body)
-          .to be_include "Jun 22"
+          .to include "Jun 22"
         expect(@ta.messages.detect { |m| m.notification_id == @notification.id }.body)
-          .to be_include "Multiple Dates"
+          .to include "Multiple Dates"
       end
 
       it "only notifies students with visibility on creation" do
         section2 = @course.course_sections.create!
         student2 = student_in_section(section2, user: user_with_communication_channel(active_all: true))
-        student2.email_channel.notification_policies.create!(notification: @notification, frequency: "immediately")
 
         @user = @teacher
         api_call(:post,
@@ -3221,7 +3311,6 @@ describe AssignmentsApiController, type: :request do
 
         section2 = @course.course_sections.create!
         student2 = student_in_section(section2, user: user_with_communication_channel(active_all: true))
-        student2.email_channel.notification_policies.create!(notification: @notification, frequency: "immediately")
 
         @user = @teacher
         api_call(:put,
@@ -4739,11 +4828,10 @@ describe AssignmentsApiController, type: :request do
 
     context "broadcasting while updating overrides" do
       before :once do
-        @notification = Notification.create! name: "Assignment Changed"
+        @notification = Notification.create!(name: "Assignment Changed", category: "TestImmediately")
         student_in_course(course: @course, active_all: true)
         @student.communication_channels.create(path: "student@instructure.com").confirm!
-        @student.email_channel.notification_policies.create!(notification: @notification,
-                                                             frequency: "immediately")
+
         @assignment = @course.assignments.create!
         @assignment.unmute!
         Assignment.where(id: @assignment).update_all(created_at: 1.day.ago)
@@ -5789,20 +5877,20 @@ describe AssignmentsApiController, type: :request do
       before do
         @course.root_account.enable_feature!(:discussion_checkpoints)
 
-        @assignment = @course.assignments.create!(title: "Assignment 1", checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
-        @c1 = @assignment.checkpoint_assignments.create!(context: @assignment.context, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
-        @c2 = @assignment.checkpoint_assignments.create!(context: @assignment.context, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+        @assignment = @course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
+        @c1 = @assignment.sub_assignments.create!(context: @assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        @c2 = @assignment.sub_assignments.create!(context: @assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
       end
 
       it "returns the assignment with API-formatted Checkpoint data" do
         assignment = api_get_assignment_in_course(@assignment, @course, include: ["checkpoints"])
         checkpoints = assignment["checkpoints"]
 
-        expect(assignment["checkpointed"]).to be_truthy
+        expect(assignment["has_sub_assignments"]).to be_truthy
 
         expect(checkpoints.length).to eq 2
         expect(checkpoints.pluck("name")).to match_array [@c1.name, @c2.name]
-        expect(checkpoints.pluck("label")).to match_array [@c1.checkpoint_label, @c2.checkpoint_label]
+        expect(checkpoints.pluck("tag")).to match_array [@c1.sub_assignment_tag, @c2.sub_assignment_tag]
         expect(checkpoints.pluck("points_possible")).to match_array [@c1.points_possible, @c2.points_possible]
         expect(checkpoints.pluck("due_at")).to match_array [@c1.due_at.iso8601, @c2.due_at.iso8601]
         expect(checkpoints.pluck("only_visible_to_overrides")).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]

@@ -366,7 +366,7 @@ describe "student planner" do
       date_input = ff("input", @modal)[1]
 
       keep_trying_until(10) do
-        date_input.send_keys([:control, "a"], :backspace, day)
+        replace_content(date_input, day)
         expect(element_value_for_attr(date_input, "value")).to eq(day)
       end
 
@@ -480,9 +480,17 @@ describe "student planner" do
     end
 
     it "links opportunity to the correct assignment page.", priority: "1" do
+      # Adding this today assignment only so that an alert doesn't come up saying Nothing is Due Today
+      # It interferes with the dropdown in Jenkins
+      @course.assignments.create!(name: "assignment due today",
+                                  description: "we need this so we dont get the popup",
+                                  submission_types: "online_text_entry",
+                                  due_at: Time.zone.now)
       go_to_list_view
       open_opportunities_dropdown
-      expect(fj(".Opportunity-styles__points:contains('132')")).to be_present
+
+      expect(flnpt(@assignment_opportunity.name, opportunities_parent)).to be_present
+
       click_opportunity(@assignment_opportunity.name)
 
       expect(driver.current_url).to include "courses/#{@course.id}/assignments/#{@assignment_opportunity.id}"
@@ -505,13 +513,25 @@ describe "student planner" do
     end
 
     it "dismisses assignment from opportunity dropdown.", priority: "1" do
+      # Adding this today assignment only so that an alert doesn't come up saying Nothing is Due Today
+      # It interferes with the dropdown in Jenkins
+      @course.assignments.create!(name: "assignment due today",
+                                  description: "we need this so we dont get the popup",
+                                  submission_types: "online_text_entry",
+                                  due_at: Time.zone.now)
+
       go_to_list_view
       open_opportunities_dropdown
-      dismiss_opportunity_button(@assignment_opportunity.name).click
 
-      expect(opportunities_parent).to contain_jqcss(no_new_opportunity_msg_selector)
-      expect(opportunities_parent).not_to contain_jqcss(opportunity_item_selector(@assignment_opportunity.name))
-      expect(opportunities_parent).not_to contain_jqcss(dismiss_opportunity_button_selector(@assignment_opportunity.name))
+      # There is some latency when clicking dismissing an opportunity.  This makes sure the buttons are clicked and we
+      # waiting for the items to be available.  There is a warning on this one, but example provided instead does not
+      # work in this circumstance.
+
+      keep_trying_for_attempt_times(attempts: 5, sleep_interval: 0.5) do
+        dismiss_opportunity_button(@assignment_opportunity.name).click
+        wait_for_no_such_element { opportunity_item_selector(@assignment_opportunity.name) }
+        expect(opportunities_parent).not_to contain_jqcss(dismiss_opportunity_button_selector(@assignment_opportunity.name))
+      end
     end
 
     it "shows missing pill in the opportunities dropdown.", priority: "1" do

@@ -1337,13 +1337,29 @@ describe Canvas::LiveEvents do
     end
   end
 
-  describe ".quiz_export_complete" do
+  describe "ContentExport" do
     let(:export_class) do
       Class.new do
         attr_accessor :context
 
         def initialize(context)
           @context = context
+        end
+
+        def export_type
+          :new_quizzes
+        end
+
+        def created_at
+          003_003_2033
+        end
+
+        def context_id
+          @context.global_id
+        end
+
+        def context_type
+          "Course"
         end
 
         def global_id
@@ -1360,24 +1376,53 @@ describe Canvas::LiveEvents do
         end
       end
     end
-    let(:content_export) { export_class.new(course_model) }
 
-    it "triggers a live event with content export settings and amended context details" do
-      fake_export_context = { key1: "val1", key2: "val2", content_export_id: "content-export-123456789" }
+    describe ".quiz_export_complete" do
+      let(:content_export) { export_class.new(course_model) }
 
-      expect_event(
-        "quiz_export_complete",
-        fake_export_context,
-        hash_including({
-                         context_type: "Course",
-                         context_id: content_export.context.global_id.to_s,
-                         root_account_id: content_export.context.root_account.global_id.to_s,
-                         root_account_uuid: content_export.context.root_account.uuid,
-                         root_account_lti_guid: content_export.context.root_account.lti_guid.to_s,
-                       })
-      ).once
+      it "triggers a live event with content export settings and amended context details" do
+        fake_export_context = { key1: "val1", key2: "val2", content_export_id: "content-export-123456789" }
 
-      Canvas::LiveEvents.quiz_export_complete(content_export)
+        expect_event(
+          "quiz_export_complete",
+          fake_export_context,
+          hash_including({
+                           context_type: "Course",
+                           context_id: content_export.context.global_id.to_s,
+                           root_account_id: content_export.context.root_account.global_id.to_s,
+                           root_account_uuid: content_export.context.root_account.uuid,
+                           root_account_lti_guid: content_export.context.root_account.lti_guid.to_s
+                         })
+        ).once
+
+        Canvas::LiveEvents.quiz_export_complete(content_export)
+      end
+    end
+
+    describe ".content_export_created" do
+      before do
+        @context = course_model
+      end
+
+      let(:content_export) { export_class.new(@context) }
+
+      let(:event_data) do
+        {
+          content_export_id: 123_456_789.to_s,
+          export_type: content_export.export_type,
+          created_at: content_export.created_at,
+          context_id: content_export.context_id.to_s,
+          context_uuid: content_export.context.uuid,
+          context_type: content_export.context_type,
+          settings: content_export.settings
+        }
+      end
+
+      it "triggers a live event with content export settings and context details" do
+        expect_event("content_export_created", event_data).once
+
+        Canvas::LiveEvents.content_export_created(content_export)
+      end
     end
   end
 
@@ -1810,14 +1855,14 @@ describe Canvas::LiveEvents do
 
   describe ".learning_outcome_result" do
     let_once :quiz do
-      quiz_model(assignment: assignment_model)
+      quiz_with_graded_submission([])
     end
 
     let :result do
-      create_and_associate_lor(quiz)
+      create_and_associate_lor(@quiz, @quiz_submission, @quiz)
     end
 
-    def create_and_associate_lor(association_object, associated_asset = nil)
+    def create_and_associate_lor(association_object, artifact_object, associated_asset = nil)
       assignment_model
       outcome = @course.created_learning_outcomes.create!(title: "outcome")
       student = @course.enroll_student(User.create!, active_all: true).user
@@ -1831,9 +1876,46 @@ describe Canvas::LiveEvents do
         user: student
       ).tap do |lor|
         lor.association_object = association_object
+        lor.artifact = artifact_object
         lor.context = @course
-        lor.associated_asset = associated_asset || association_object
+        lor.associated_asset = associated_asset
         lor.save!
+      end
+    end
+
+    context "learning_outcome_result_associated_asset" do
+      it "updates associated_asset info to the assignment if the artifact is a RubricAssessment" do
+        assignment_model
+        outcome_model
+        outcome_with_rubric(outcome: @outcome, context: Account.default)
+        course_with_student
+        association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+        rubric_assessment = rubric_assessment_model(rubric: @rubric, user: @student, assessment_type: "graded")
+
+        create_and_associate_lor(association, rubric_assessment, nil)
+
+        expect_event("learning_outcome_result_created", {
+          learning_outcome_id: result.learning_outcome_id.to_s,
+          learning_outcome_context_uuid: @course.uuid,
+          mastery: result.mastery,
+          score: result.score,
+          created_at: result.created_at,
+          attempt: result.attempt,
+          possible: result.possible,
+          original_score: result.original_score,
+          original_possible: result.original_possible,
+          original_mastery: result.original_mastery,
+          assessed_at: result.assessed_at,
+          percent: result.percent,
+          workflow_state: result.workflow_state,
+          user_uuid: result.user_uuid,
+          associated_asset_id: result.associated_asset_id.to_s,
+          associated_asset_type: result.associated_asset_type,
+          artifact_id: result.artifact_id.to_s,
+          artifact_type: result.artifact_type
+        }.compact!).once
+
+        Canvas::LiveEvents.learning_outcome_result_created(result)
       end
     end
 
@@ -1851,9 +1933,13 @@ describe Canvas::LiveEvents do
           original_possible: result.original_possible,
           original_mastery: result.original_mastery,
           assessed_at: result.assessed_at,
-          title: result.title,
           percent: result.percent,
-          workflow_state: result.workflow_state
+          workflow_state: result.workflow_state,
+          user_uuid: result.user_uuid,
+          associated_asset_id: result.associated_asset_id.to_s,
+          associated_asset_type: result.associated_asset_type,
+          artifact_id: result.artifact_id.to_s,
+          artifact_type: result.artifact_type
         }.compact!).once
 
         Canvas::LiveEvents.learning_outcome_result_created(result)
@@ -1876,9 +1962,13 @@ describe Canvas::LiveEvents do
           original_possible: result.original_possible,
           original_mastery: result.original_mastery,
           assessed_at: result.assessed_at,
-          title: result.title,
           percent: result.percent,
-          workflow_state: result.workflow_state
+          workflow_state: result.workflow_state,
+          user_uuid: result.user_uuid,
+          associated_asset_id: result.associated_asset_id.to_s,
+          associated_asset_type: result.associated_asset_type,
+          artifact_id: result.artifact_id.to_s,
+          artifact_type: result.artifact_type
         }.compact!).once
 
         Canvas::LiveEvents.learning_outcome_result_updated(result)
@@ -1900,9 +1990,13 @@ describe Canvas::LiveEvents do
           original_possible: result.original_possible,
           original_mastery: result.original_mastery,
           assessed_at: result.assessed_at,
-          title: result.title,
           percent: result.percent,
-          workflow_state: result.workflow_state
+          workflow_state: result.workflow_state,
+          user_uuid: result.user_uuid,
+          associated_asset_id: result.associated_asset_id.to_s,
+          associated_asset_type: result.associated_asset_type,
+          artifact_id: result.artifact_id.to_s,
+          artifact_type: result.artifact_type
         }.compact!).once
 
         Canvas::LiveEvents.learning_outcome_result_updated(result)
@@ -2706,38 +2800,132 @@ describe Canvas::LiveEvents do
 
   describe "rubric_assessed" do
     before(:once) do
+      assignment_model
       outcome_model
       outcome_with_rubric(outcome: @outcome, context: Account.default)
       course_with_student
+      @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
       @rubric_assessment = rubric_assessment_model(rubric: @rubric, user: @student, assessment_type: "graded")
+    end
+
+    context "rubric_assessment_submitted_at" do
+      it "returns rubric assessment updated_at if the assignment is not submitted" do
+        submitted_at = Canvas::LiveEvents.rubric_assessment_submitted_at(@rubric_assessment)
+        expect(submitted_at).to eq @rubric_assessment.updated_at
+      end
+
+      it "returns submission submitted_at date if the rubric aligned assignment is a submission and is submitted" do
+        submitted_at_date = Time.zone.now
+        # submission type needs to be present for submitted_at date to be returned
+        @rubric_assessment.artifact.update!(submitted_at: submitted_at_date, submission_type: "online_text")
+        @rubric_assessment.artifact.reload
+        submitted_at = Canvas::LiveEvents.rubric_assessment_submitted_at(@rubric_assessment)
+        expect(submitted_at).to eq @rubric_assessment.artifact.submitted_at
+      end
+
+      it "returns rubric assessment updated_at if the rubric aligned assignment is not a Submission object" do
+        @assignment.update!(moderated_grading: true, grader_count: 1)
+        outcome_with_rubric
+        assignment_model
+        @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+        submission = @assignment.find_or_create_submission(@student)
+        provisional_grade = submission.find_or_create_provisional_grade!(@teacher, grade: 3)
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
+        assessment = @association.assess({
+                                           user: @student,
+                                           assessor: @student,
+                                           artifact: provisional_grade,
+                                           assessment: {
+                                             :assessment_type => "grading",
+                                             criterion_id => {
+                                               points: "3"
+                                             }
+                                           }
+                                         })
+        submitted_at = Canvas::LiveEvents.rubric_assessment_submitted_at(assessment)
+        expect(submitted_at).to eq assessment.updated_at
+      end
+    end
+
+    context "rubric_assessment_attempt" do
+      it "return nil if the assignment is not submitted" do
+        attempt = Canvas::LiveEvents.rubric_assessment_attempt(@rubric_assessment)
+        expect(attempt).to be_nil
+      end
+
+      it "returns submission attempt if the rubric aligned assignment is a Submission object and is submitted" do
+        submitted_at_date = Time.zone.now
+        # submission type needs to be present for submitted_at date to be returned
+        @rubric_assessment.artifact.update!(submitted_at: submitted_at_date, submission_type: "online_text")
+        @rubric_assessment.artifact.reload
+        attempt = Canvas::LiveEvents.rubric_assessment_attempt(@rubric_assessment)
+        expect(attempt).to eq @rubric_assessment.artifact.attempt
+      end
+
+      it "returns nil if the rubric aligned artifact is not a Submission" do
+        assignment_model
+        @assignment.update!(moderated_grading: true, grader_count: 1)
+        outcome_with_rubric
+        @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+        submission = @assignment.find_or_create_submission(@student)
+        provisional_grade = submission.find_or_create_provisional_grade!(@teacher, grade: 3)
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
+        assessment = @association.assess({
+                                           user: @student,
+                                           assessor: @student,
+                                           artifact: provisional_grade,
+                                           assessment: {
+                                             :assessment_type => "grading",
+                                             criterion_id => {
+                                               points: "3"
+                                             }
+                                           }
+                                         })
+        attempt = Canvas::LiveEvents.rubric_assessment_attempt(assessment)
+        expect(attempt).to be_nil
+      end
     end
 
     context "triggers a live event" do
       it "successfully with context uuid" do
+        attempt = Canvas::LiveEvents.rubric_assessment_attempt(@rubric_assessment)
+        expect(attempt).to be_nil
+        submitted_at = Canvas::LiveEvents.rubric_assessment_submitted_at(@rubric_assessment)
+
         assessment_data = {
           id: @rubric_assessment.id.to_s,
           aligned_to_outcomes: @rubric_assessment.aligned_outcome_ids.count.positive?,
           artifact_id: @rubric_assessment.artifact_id.to_s,
           artifact_type: @rubric_assessment.artifact_type,
           assessment_type: @rubric_assessment.assessment_type,
-          context_uuid: @rubric_assessment.rubric_association.context.uuid
+          context_uuid: @rubric_assessment.rubric_association.context.uuid,
+          submitted_at:,
+          created_at: @rubric_assessment.created_at,
+          updated_at: @rubric_assessment.updated_at
         }
         expect_event("rubric_assessed", assessment_data)
         Canvas::LiveEvents.rubric_assessed(@rubric_assessment)
       end
 
-      it "context uuid is not present event data when nil" do
+      it "when context uuid is not present event data will be nil" do
         context = @rubric_assessment.rubric_association.context
         allow_any_instance_of(Course).to receive(:assign_uuid).and_return(true)
         context.uuid = nil
         context.save
+
+        attempt = Canvas::LiveEvents.rubric_assessment_attempt(@rubric_assessment)
+        expect(attempt).to be_nil
+        submitted_at = Canvas::LiveEvents.rubric_assessment_submitted_at(@rubric_assessment)
 
         assessment_data = {
           id: @rubric_assessment.id.to_s,
           aligned_to_outcomes: @rubric_assessment.aligned_outcome_ids.count.positive?,
           artifact_id: @rubric_assessment.artifact_id.to_s,
           artifact_type: @rubric_assessment.artifact_type,
-          assessment_type: @rubric_assessment.assessment_type
+          assessment_type: @rubric_assessment.assessment_type,
+          submitted_at:,
+          created_at: @rubric_assessment.created_at,
+          updated_at: @rubric_assessment.updated_at,
         }
         expect_event("rubric_assessed", assessment_data)
         Canvas::LiveEvents.rubric_assessed(@rubric_assessment)

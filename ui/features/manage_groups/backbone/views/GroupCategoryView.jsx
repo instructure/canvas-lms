@@ -18,7 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {View} from '@canvas/backbone'
-import _ from 'underscore'
+import {debounce} from 'lodash'
 import GroupCategoryDetailView from './GroupCategoryDetailView'
 import GroupsView from './GroupsView'
 import UnassignedUsersView from './UnassignedUsersView'
@@ -128,7 +128,7 @@ export default class GroupCategoryView extends View {
     super.cacheEls(...arguments)
 
     if (!this.attachedFilter) {
-      this.$filterUnassignedUsers.on('keyup', _.debounce(this.filterChange.bind(this), 300))
+      this.$filterUnassignedUsers.on('keyup', debounce(this.filterChange.bind(this), 300))
       this.attachedFilter = true
     }
 

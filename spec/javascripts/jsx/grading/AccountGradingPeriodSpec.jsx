@@ -21,7 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import axios from '@canvas/axios'
-import _ from 'lodash'
+import {defaults} from 'lodash'
 import GradingPeriod from 'ui/features/account_grading_standards/react/AccountGradingPeriod'
 
 const wrapper = document.getElementById('fixtures')
@@ -47,7 +47,7 @@ const defaultProps = {
 
 QUnit.module('AccountGradingPeriod', {
   renderComponent(props = {}) {
-    const attrs = _.defaults(props, defaultProps)
+    const attrs = defaults(props, defaultProps)
     attrs.onDelete = sinon.stub()
     const element = React.createElement(GradingPeriod, attrs)
     return ReactDOM.render(element, wrapper)

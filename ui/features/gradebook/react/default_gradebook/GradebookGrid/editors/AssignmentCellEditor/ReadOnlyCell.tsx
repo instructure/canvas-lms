@@ -36,11 +36,18 @@ const componentOverrides = {
   },
 }
 
-function formatGrade(submission, assignment, gradingScheme, enterGradesAs) {
+function formatGrade(
+  submission,
+  assignment,
+  gradingScheme,
+  pointsBasedGradingScheme,
+  enterGradesAs
+) {
   const formatOptions = {
     defaultValue: '–',
     formatType: enterGradesAs,
     gradingScheme,
+    pointsBasedGradingScheme,
     pointsPossible: assignment.pointsPossible,
     version: 'final',
   }
@@ -83,6 +90,7 @@ export default class ReadOnlyCell extends Component {
     enterGradesAs: oneOf(['gradingScheme', 'passFail', 'percent', 'points']).isRequired,
     gradeIsVisible: bool.isRequired,
     gradingScheme: instanceOf(Array).isRequired,
+    pointsBasedGradingScheme: bool,
     onToggleSubmissionTrayOpen: func.isRequired,
     student: shape({
       id: string.isRequired,
@@ -141,14 +149,29 @@ export default class ReadOnlyCell extends Component {
   }
 
   render() {
-    const {assignment, enterGradesAs, gradeIsVisible, gradingScheme, submission} = this.props
+    const {
+      assignment,
+      enterGradesAs,
+      gradeIsVisible,
+      gradingScheme,
+      pointsBasedGradingScheme,
+      submission,
+    } = this.props
 
     let content = ''
     if (gradeIsVisible) {
       if (enterGradesAs === 'passFail' && !submission.excused) {
         content = renderCompleteIncompleteGrade(submission.rawGrade)
       } else {
-        content = renderTextGrade(formatGrade(submission, assignment, gradingScheme, enterGradesAs))
+        content = renderTextGrade(
+          formatGrade(
+            submission,
+            assignment,
+            gradingScheme,
+            pointsBasedGradingScheme,
+            enterGradesAs
+          )
+        )
       }
     }
 

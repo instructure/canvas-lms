@@ -139,6 +139,12 @@ module BlueprintCourseCommon
     expect(f(".bcs__modal-content-wrapper")).to be_displayed  # the modal is open
   end
 
+  def close_associations
+    f("[data-testid=\"instui-modal-close\"]").click
+    expect(f("body")).not_to contain_css("[aria-label=\"Associations\"]")
+    expect(f(".bcs__content")).to be_displayed
+  end
+
   # open the course list behind the toggle on the associations modal
   # and make sure the data has arrived
   # this turned out to be messier than one would think

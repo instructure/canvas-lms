@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import {raw} from '@instructure/html-escape'
 
 $(document).ready(() => {
   const $start_debugging = $('.start_debugging'),
@@ -44,7 +45,7 @@ $(document).ready(() => {
       if (data) {
         if (data.debugging) {
           debug_data = $link.closest('div.debugging').find('.debug_data')
-          debug_data.html($.raw(data.debug_data))
+          debug_data.html(raw(data.debug_data))
           debug_data.show()
         } else {
           stop_debugging()

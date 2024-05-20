@@ -17,7 +17,7 @@
  */
 
 import {createStore, applyMiddleware} from 'redux'
-import ReduxThunk from 'redux-thunk'
+import {withExtraArgument} from 'redux-thunk'
 import rootReducer from './reducers'
 
 export const defaultState = {
@@ -35,7 +35,7 @@ export const defaultState = {
 
 export function configStore(initialState, api, options = {}) {
   const middleware = [
-    ReduxThunk.withExtraArgument({axios: api}),
+    withExtraArgument({axios: api}),
     process.env.NODE_ENV !== 'production' &&
       process.env.NODE_ENV !== 'test' &&
       !options.disableLogger &&

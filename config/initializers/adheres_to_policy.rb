@@ -22,19 +22,6 @@ require "adheres_to_policy"
 ActiveRecord::Base.singleton_class.include(AdheresToPolicy::ClassMethods)
 
 AdheresToPolicy.configure do |config|
-  config.blacklist = lambda do
-    Setting.get("permissions_cache_blacklist", "").split(",").map(&:strip)
-  end
-
-  config.cache_related_permissions = lambda do
-    Canvas::Plugin.value_to_boolean(Setting.get("permissions_cache_related", "true"))
-  end
-
-  config.cache_intermediate_permissions = lambda do
-    Canvas::Plugin.value_to_boolean(Setting.get("permissions_cache_intermediate", "true"))
-  end
-
-  config.cache_permissions = lambda do
-    Canvas::Plugin.value_to_boolean(Setting.get("permissions_cache_enabled", "true"))
-  end
+  config.cache_related_permissions = false
+  config.blacklist = ["discussion_entry.reply"]
 end

@@ -27,6 +27,7 @@ import IntegrationRow from './IntegrationRow'
 import MicrosoftSync from './microsoft_sync/MicrosoftSync'
 import useMicrosoftSettings from './microsoft_sync/useSettings'
 import MicrosoftSyncButton from './microsoft_sync/MicrosoftSyncButton'
+import MicrosoftSyncDebugInfo from './microsoft_sync/MicrosoftSyncDebugInfo'
 
 const I18n = useI18nScope('course_settings')
 
@@ -94,6 +95,7 @@ const Integrations = () => {
             onSuccess={setMSGroup}
           />
         </MicrosoftSync>
+        {msGroup.debug_info && <MicrosoftSyncDebugInfo debugInfo={msGroup.debug_info} />}
       </IntegrationRow>
     </>
   )

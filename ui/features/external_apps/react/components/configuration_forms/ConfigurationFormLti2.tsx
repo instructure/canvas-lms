@@ -19,8 +19,8 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {TextInput} from '@instructure/ui-text-input'
-import {FormMessage} from '@instructure/ui-form-field'
-import {TextInputChangeHandler} from './types'
+import type {FormMessage} from '@instructure/ui-form-field'
+import type {TextInputChangeHandler} from './types'
 
 const I18n = useI18nScope('external_tools')
 

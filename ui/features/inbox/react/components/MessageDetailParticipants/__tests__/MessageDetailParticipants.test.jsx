@@ -26,8 +26,11 @@ describe('MessageDetailParticipants', () => {
   it('renders with provided data', () => {
     const props = {
       conversationMessage: {
-        author: {name: 'Tom Thompson', shortName: 'Tom Thompson',},
-        recipients: [{name: 'Tom Thompson', shortName: 'Tom Thompson',}, {name: 'Billy Harris', shortName: 'Billy Harris'}],
+        author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+        recipients: [
+          {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+          {name: 'Billy Harris', shortName: 'Billy Harris'},
+        ],
       },
     }
 

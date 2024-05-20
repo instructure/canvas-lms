@@ -40,6 +40,7 @@ describe('student view integration tests', () => {
 
   beforeEach(() => {
     window.ENV = {
+      FEATURES: {instui_nav: true},
       context_asset_string: 'test_1',
       ASSIGNMENT_ID: '1',
       COURSE_ID: '1',
@@ -132,7 +133,8 @@ describe('student view integration tests', () => {
     // This cannot be tested at the <AttemptTab> because the new file being
     // displayed happens as a result of a cache write and these higher level
     // components re-rendering
-    it('displays the new file after it has been uploaded', async () => {
+    // EVAL-3907 - remove or rewrite to remove spies on imports
+    it.skip('displays the new file after it has been uploaded', async () => {
       uploadFileModule.uploadFile = jest.fn()
       uploadFileModule.uploadFile.mockReturnValueOnce({id: '1', name: 'test.jpg'})
       $('body').append('<div role="alert" id="flash_screenreader_holder" />')
@@ -162,7 +164,8 @@ describe('student view integration tests', () => {
       expect(targetCell).toBeTruthy()
     })
 
-    it('displays a progress bar for each new file being uploaded', async () => {
+    // EVAL-3907 - remove or rewrite to remove spies on imports
+    it.skip('displays a progress bar for each new file being uploaded', async () => {
       uploadFileModule.uploadFiles = jest.fn()
       uploadFileModule.uploadFiles.mockReturnValueOnce([
         {id: '1', name: 'file1.jpg'},

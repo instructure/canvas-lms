@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tz from '@canvas/timezone'
-import tzInTest from '@canvas/timezone/specHelpers'
+import * as tz from '@canvas/datetime'
+import tzInTest from '@canvas/datetime/specHelpers'
 
 tz.snapshot = () => {}
 tz.restore = tzInTest.restore

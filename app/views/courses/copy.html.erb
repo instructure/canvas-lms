@@ -18,6 +18,9 @@
 
 <% provide :page_title, t('titles.copy_course', 'Copy Course') %>
 <% add_crumb t('#crumbs.copy_course', 'Copy Course') %>
+<div id="warning_messages_modal_container"></div>
+<% js_bundle :copy_warnings_modal %>
+
 
 <h1><%= t'headings.copy_course', 'Copy %{course}', :course => @context.name %></h1>
 <p>

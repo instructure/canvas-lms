@@ -1,3 +1,4 @@
+/* eslint-disable no-console, @typescript-eslint/no-shadow, eqeqeq, no-alert */
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -22,16 +23,16 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
 import autoBlurActiveInput from './behaviors/autoBlurActiveInput'
-import _ from 'underscore'
+import {isEqual, clone} from 'lodash'
 import LDBLoginPopup from '../backbone/views/LDBLoginPopup'
 import quizTakingPolice from './quiz_taking_police'
 import QuizLogAuditing from '@canvas/quiz-log-auditing'
 import QuizLogAuditingEventDumper from '@canvas/quiz-log-auditing/jquery/dump_events'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/util/toJSON'
-import '@canvas/datetime' /* friendlyDatetime, friendlyDate */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* getFormData, errorBox */
+import '@canvas/jquery/jquery.toJSON'
+import '@canvas/datetime/jquery' /* friendlyDatetime, friendlyDate */
+import '@canvas/jquery/jquery.instructure_forms' /* getFormData, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/rails-flash-notifications'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
@@ -132,13 +133,13 @@ const quizSubmission = (function () {
       const url = $('.backup_quiz_submission_url').attr('href')
       ;(function (submissionData) {
         // Need a shallow clone of the data here because $.ajaxJSON modifies in place
-        const thisSubmissionData = _.clone(submissionData)
+        const thisSubmissionData = clone(submissionData)
         // If this is a timeout-based submission and the data is the same as last time,
         // palliate the server by skipping the data submission
         if (
           !quizSubmission.inBackground &&
           repeat &&
-          _.isEqual(submissionData, lastSuccessfulSubmissionData)
+          isEqual(submissionData, lastSuccessfulSubmissionData)
         ) {
           $lastSaved.text(
             I18n.t('saving_not_needed', 'No new data to save. Last checked at %{t}', {
@@ -421,6 +422,7 @@ const quizSubmission = (function () {
               quizSubmission.submitQuiz()
             }
           },
+          zIndex: 1000,
         })
     },
 
@@ -603,19 +605,15 @@ $(function () {
       false
     )
 
-    $(document).delegate('a', 'click', function (event) {
-      if ($(this).closest('.ui-dialog,.mceToolbar,.ui-selectmenu').length > 0) {
-        return
-      }
+    $(document).on('click', 'a', function (event) {
+      if ($(this).closest('.ui-dialog,.mceToolbar,.ui-selectmenu').length > 0) return
 
       if ($(this).hasClass('no-warning')) {
         quizSubmission.alreadyAcceptedNavigatingAway = true
         return
       }
 
-      if ($(this).hasClass('file_preview_link')) {
-        return
-      }
+      if ($(this).hasClass('file_preview_link')) return
 
       if (!event.isDefaultPrevented()) {
         const url = $(this).attr('href') || ''
@@ -623,9 +621,7 @@ $(function () {
         if (hashStripped.indexOf('#')) {
           hashStripped = hashStripped.substring(0, hashStripped.indexOf('#'))
         }
-        if (url.indexOf('#') == 0 || url.indexOf(hashStripped + '#') == 0) {
-          return
-        }
+        if (url.indexOf('#') == 0 || url.indexOf(hashStripped + '#') === 0) return
         const result = window.confirm(
           I18n.t(
             'confirms.navigate_away',
@@ -642,7 +638,7 @@ $(function () {
   }
   const $questions = $('#questions')
   $('#question_list')
-    .delegate('.jump_to_question_link', 'click', function (event) {
+    .on('click', '.jump_to_question_link', function (event) {
       event.preventDefault()
       const $obj = $($(this).attr('href'))
       const scrollableSelector = ENV.MOBILE_UI ? '#content' : 'html,body'
@@ -698,7 +694,7 @@ $(function () {
   })
 
   $questions
-    .delegate(':checkbox,:radio', 'change', function (_event) {
+    .on('change', ':checkbox,:radio', function (_event) {
       const $answer = $(this).parents('.answer')
       setTimeout(() => {
         const $math = $answer.find('.math_equation_latex script')
@@ -710,10 +706,10 @@ $(function () {
         quizSubmission.updateSubmission()
       }
     })
-    .delegate('label.upload-label', 'mouseup', _event => {
+    .on('mouseup', 'label.upload-label', _event => {
       quizSubmission.updateSubmission()
     })
-    .delegate(':text,textarea,select', 'change', function (event, update) {
+    .on('change', ':text,textarea,select', function (event, update) {
       const $this = $(this)
       if ($this.hasClass('numerical_question_input')) {
         const val = numberHelper.parse($this.val())
@@ -738,24 +734,20 @@ $(function () {
         quizSubmission.updateSubmission()
       }
     })
-    .delegate('.numerical_question_input', {
-      keyup(_event) {
-        const $this = $(this)
-        const val = $this.val() + ''
-        const $errorBox = $this.data('associated_error_box')
+    .on('keyup', '.numerical_question_input', function (_event) {
+      const $this = $(this)
+      const val = $this.val() + ''
+      const $errorBox = $this.data('associated_error_box')
 
-        if (val.match(/^$|^-$/) || numberHelper.validate(val)) {
-          if ($errorBox) {
-            $this.triggerHandler('click')
-          }
-        } else if (!$errorBox) {
-          $this.errorBox(
-            I18n.t('errors.only_numerical_values', 'only numerical values are accepted')
-          )
+      if (val.match(/^$|^-$/) || numberHelper.validate(val)) {
+        if ($errorBox) {
+          $this.triggerHandler('click')
         }
-      },
+      } else if (!$errorBox) {
+        $this.errorBox(I18n.t('errors.only_numerical_values', 'only numerical values are accepted'))
+      }
     })
-    .delegate('.flag_question', 'click', function (e) {
+    .on('click', '.flag_question', function (e) {
       e.preventDefault()
       const $question = $(this).parents('.question')
       $question.toggleClass('marked')
@@ -777,7 +769,7 @@ $(function () {
 
       quizSubmission.updateSubmission()
     })
-    .delegate('.question_input', 'change', function (event, update, changedMap) {
+    .on('change', '.question_input', function (event, update, changedMap) {
       const $this = $(this)
       const tagName = this.tagName.toUpperCase()
       const id = $this.parents('.question').attr('id')
@@ -813,7 +805,7 @@ $(function () {
           .parents('.question')
           .find('.question_input')
           .each(function () {
-            if ($(this).attr('checked') || $(this).attr('selected')) {
+            if ($(this).prop('checked') || $(this).prop('selected')) {
               val = true
             }
           })
@@ -1000,6 +992,7 @@ showDeauthorizedDialog = function () {
         },
       },
     ],
+    zIndex: 1000,
   })
 }
 

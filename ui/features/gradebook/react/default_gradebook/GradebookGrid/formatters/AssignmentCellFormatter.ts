@@ -19,7 +19,7 @@
 // xsslint safeString.method I18n.t
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import {extractDataTurnitin} from '@canvas/grading/Turnitin'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {extractSimilarityInfo, isPostable, similarityIcon} from '@canvas/grading/SubmissionHelper'
@@ -27,7 +27,7 @@ import {classNamesForAssignmentCell} from './CellStyles'
 import type Gradebook from '../../Gradebook'
 import type {PendingGradeInfo} from '../../gradebook.d'
 import type {SubmissionData, SubmissionWithOriginalityReport} from '@canvas/grading/grading.d'
-import {GradingStandard} from '@instructure/grading-utils'
+import type {GradingStandard} from '@instructure/grading-utils'
 import type {Assignment, Student, Submission} from '../../../../../../api.d'
 
 const I18n = useI18nScope('gradebook')
@@ -47,6 +47,7 @@ type Getters = {
   getAssignment(assignmentId: string): ReturnType<Gradebook['getAssignment']>
   getEnterGradesAsSetting(assignmentId: string): ReturnType<Gradebook['getEnterGradesAsSetting']>
   getGradingSchemeData(assignmentId: string): undefined | GradingStandard[]
+  getPointsBasedGradingScheme(assignmentId: string): undefined | boolean
   getPendingGradeInfo(submission: {
     assignmentId: string
     userId: string
@@ -88,6 +89,7 @@ function formatGrade(submissionData: SubmissionData, assignment: Assignment, opt
   const formatOptions = {
     formatType: options.getEnterGradesAsSetting(assignment.id),
     gradingScheme: options.getGradingSchemeData(assignment.id),
+    pointsBasedGradingScheme: options.getPointsBasedGradingScheme(assignment.id),
     pointsPossible: assignment.points_possible,
     version: 'final',
   }
@@ -169,6 +171,9 @@ export default class AssignmentCellFormatter {
       },
       getGradingSchemeData(assignmentId: string): undefined | GradingStandard[] {
         return gradebook.getAssignmentGradingScheme(assignmentId)?.data
+      },
+      getPointsBasedGradingScheme(assignmentId: string): undefined | boolean {
+        return gradebook.getAssignmentGradingScheme(assignmentId)?.pointsBased
       },
       getPendingGradeInfo(submission: {assignmentId: string; userId: string}) {
         return gradebook.getPendingGradeInfo(submission)

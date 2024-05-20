@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {find} from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -72,7 +72,7 @@ class InfoFrame extends React.Component {
   }
 
   getWizardItem = key => {
-    const item = _.findWhere(ListItems, {key})
+    const item = find(ListItems, {key})
 
     this.setState(
       {

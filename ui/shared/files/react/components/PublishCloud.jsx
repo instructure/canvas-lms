@@ -39,6 +39,8 @@ PublishCloud.openRestrictedDialog = function () {
       ReactDOM.unmountComponentAtNode(this)
       $(this).remove()
     },
+    modal: true,
+    zIndex: 1000,
   })
 
   import('./RestrictedDialogForm').then(({default: RestrictedDialogForm}) => {

@@ -108,12 +108,6 @@ module FeatureFlags
       end
     end
 
-    def self.smart_search_after_state_change_hook(_user, context, old_state, new_state)
-      if %w[off allowed].include?(old_state) && %w[on allowed_on].include?(new_state) && !context.site_admin?
-        OpenAi.index_account(context)
-      end
-    end
-
     def self.differentiated_modules_setting_hook(_user, _context, _old_state, new_state)
       # this is a temporary hook to allow us to check the flag's state when booting
       # canvas. The setting will be checked in app/models/quiz_student_visibility and
@@ -137,6 +131,13 @@ module FeatureFlags
                                   "archive_outcomes",
                                   new_state == "on"
                                 )
+      end
+    end
+
+    def self.lti_registrations_discover_page_hook(_user, context, _from_state, transitions)
+      unless context.feature_enabled?(:lti_registrations_page)
+        transitions["on"] ||= {}
+        transitions["on"]["message"] = I18n.t("The LTI Extensions Discover page won't be accessible unless the LTI Registrations page is enabled")
       end
     end
   end

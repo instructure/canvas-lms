@@ -17,8 +17,6 @@
  */
 
 import _ from 'lodash'
-
-import tz from '@canvas/timezone'
 import AssignmentOverrideHelper from '@canvas/due-dates/AssignmentOverrideHelper'
 
 const defaultStudents = [

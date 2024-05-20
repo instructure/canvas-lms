@@ -140,6 +140,95 @@ describe "assignments" do
       expect(f("#speed-grader-link-container").attribute("class")).to include("hidden")
     end
 
+    context "archived grading schemes enabled" do
+      before do
+        Account.site_admin.enable_feature!(:grading_scheme_updates)
+        Account.site_admin.enable_feature!(:archived_grading_schemes)
+        @account = @course.account
+        @active_grading_standard = @course.grading_standards.create!(title: "Active Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "active")
+        @archived_grading_standard = @course.grading_standards.create!(title: "Archived Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+        @account_grading_standard = @account.grading_standards.create!(title: "Account Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "active")
+        assignment_name = "first test assignment"
+        due_date = Time.now.utc + 2.days
+        group = @course.assignment_groups.create!(name: "default")
+        @course.assignment_groups.create!(name: "second default")
+        @assignment = @course.assignments.create!(
+          name: assignment_name,
+          due_at: due_date,
+          assignment_group: group,
+          unlock_at: due_date - 1.day,
+          grading_type: "letter_grade"
+        )
+      end
+
+      it "shows archived grading scheme if it is the course default twice, once to follow course default scheme and once to choose that scheme to use" do
+        @course.update!(grading_standard_id: @archived_grading_standard.id)
+        @course.reload
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+        wait_for_ajaximations
+        expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@archived_grading_standard.title + " (course default)")
+        f("[data-testid='grading-schemes-selector-dropdown']").click
+        expect(f("[data-testid='grading-schemes-selector-option-#{@course.grading_standard.id}']")).to include_text(@course.grading_standard.title)
+      end
+
+      it "shows archived grading scheme if it is the current assignment grading standard" do
+        @assignment.update!(grading_standard_id: @archived_grading_standard.id)
+        @assignment.reload
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+        wait_for_ajaximations
+        expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@archived_grading_standard.title)
+      end
+
+      it "removes grading schemes from dropdown after archiving them but still shows them upon reopening the modal" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+        wait_for_ajaximations
+        f("[data-testid='grading-schemes-selector-dropdown']").click
+        expect(f("[data-testid='grading-schemes-selector-option-#{@active_grading_standard.id}']")).to be_present
+        f("[data-testid='manage-all-grading-schemes-button']").click
+        wait_for_ajaximations
+        f("[data-testid='grading-scheme-#{@active_grading_standard.id}-archive-button']").click
+        wait_for_ajaximations
+        f("[data-testid='manage-all-grading-schemes-close-button']").click
+        wait_for_ajaximations
+        f("[data-testid='grading-schemes-selector-dropdown']").click
+        expect(f("[data-testid='grading-schemes-selector-dropdown-form']")).not_to contain_css("[data-testid='grading-schemes-selector-option-#{@active_grading_standard.id}']")
+        f("[data-testid='manage-all-grading-schemes-button']").click
+        wait_for_ajaximations
+        expect(f("[data-testid='grading-scheme-row-#{@active_grading_standard.id}']").text).to be_present
+      end
+
+      it "shows all archived schemes in the manage grading schemes modal" do
+        archived_gs1 = @course.grading_standards.create!(title: "Archived Grading Scheme 1", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+        archived_gs2 = @course.grading_standards.create!(title: "Archived Grading Scheme 2", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+        archived_gs3 = @course.grading_standards.create!(title: "Archived Grading Scheme 3", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+        wait_for_ajaximations
+        f("[data-testid='manage-all-grading-schemes-button']").click
+        wait_for_ajaximations
+        expect(f("[data-testid='grading-scheme-#{archived_gs1.id}-name']")).to include_text(archived_gs1.title)
+        expect(f("[data-testid='grading-scheme-#{archived_gs2.id}-name']")).to include_text(archived_gs2.title)
+        expect(f("[data-testid='grading-scheme-#{archived_gs3.id}-name']")).to include_text(archived_gs3.title)
+      end
+
+      it "will still show the assignment grading scheme if you archive it on the edit page in the management modal and persist on reload" do
+        @assignment.update!(grading_standard_id: @active_grading_standard.id)
+        @assignment.reload
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+        wait_for_ajaximations
+        expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@active_grading_standard.title)
+        f("[data-testid='manage-all-grading-schemes-button']").click
+        wait_for_ajaximations
+        f("[data-testid='grading-scheme-#{@active_grading_standard.id}-archive-button']").click
+        wait_for_ajaximations
+        f("[data-testid='manage-all-grading-schemes-close-button']").click
+        wait_for_ajaximations
+        expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@active_grading_standard.title)
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+        wait_for_ajaximations
+        expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@active_grading_standard.title)
+      end
+    end
+
     it "edits an assignment", priority: "1" do
       assignment_name = "first test assignment"
       due_date = Time.now.utc + 2.days
@@ -186,6 +275,7 @@ describe "assignments" do
       expect(driver.title).to include(assignment_name + " edit")
     end
 
+    # EVAL-3711 Remove this test when instui_nav feature flag is removed
     it "creates an assignment using main add button", :xbrowser, priority: "1" do
       assignment_name = "first assignment"
       # freeze for a certain time, so we don't get unexpected ui complications
@@ -196,6 +286,36 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments"
         # create assignment
         wait_for_new_page_load { f(".new_assignment").click }
+        f("#assignment_name").send_keys(assignment_name)
+        replace_content(f("#assignment_points_possible"), "10")
+        click_option("#assignment_submission_type", "Online")
+        ["#assignment_text_entry", "#assignment_online_url", "#assignment_online_upload"].each do |element|
+          f(element).click
+        end
+        replace_content(f(".DueDateInput"), due_at)
+
+        submit_assignment_form
+        wait_for_ajaximations
+        # confirm all our settings were saved and are now displayed
+        expect(f("h1.title")).to include_text(assignment_name)
+        expect(f("#assignment_show .points_possible")).to include_text("10")
+        expect(f("#assignment_show fieldset")).to include_text("a text entry box, a website url, or a file upload")
+
+        expect(f(".assignment_dates")).to include_text(due_at)
+      end
+    end
+
+    it "creates an assignment using main add button with the instui nav feature flag on", :xbrowser, priority: "1" do
+      @course.root_account.enable_feature!(:instui_nav)
+      assignment_name = "first assignment"
+      # freeze for a certain time, so we don't get unexpected ui complications
+      time = DateTime.new(Time.now.year, 1, 7, 2, 13)
+      Timecop.freeze(time) do
+        due_at = format_time_for_view(time)
+
+        get "/courses/#{@course.id}/assignments"
+        # create assignment
+        wait_for_new_page_load { f("[data-testid='new_assignment_button']").click }
         f("#assignment_name").send_keys(assignment_name)
         replace_content(f("#assignment_points_possible"), "10")
         click_option("#assignment_submission_type", "Online")
@@ -286,7 +406,7 @@ describe "assignments" do
           expect_new_page_load { f(".more_options").click }
           expect(f("#assignment_name").attribute(:value)).to include(expected_text)
           expect(f("#assignment_points_possible").attribute(:value)).to include(points)
-          due_at_field = fj(".date_field:first[data-date-type='due_at']")
+          due_at_field = fj(".date_field[data-date-type='due_at']:first")
           expect(due_at_field).to have_value due_at
           click_option("#assignment_submission_type", "No Submission")
           submit_assignment_form
@@ -449,10 +569,42 @@ describe "assignments" do
         @assignment = @course.assignments.create(name: "Student Annotation", submission_types: "student_annotation,online_text_entry", annotatable_attachment_id: attachment.id)
       end
 
+      # EVAL-3711 Remove this test when instui_nav feature flag is removed
       it "creates a student annotation assignment with annotatable attachment with usage rights" do
         get "/courses/#{@course.id}/assignments"
-
         wait_for_new_page_load { f(".new_assignment").click }
+        f("#assignment_name").send_keys("Annotated Test")
+
+        replace_content(f("#assignment_points_possible"), "10")
+        click_option("#assignment_submission_type", "Online")
+
+        ["#assignment_annotated_document", "#assignment_text_entry"].each do |element|
+          f(element).click
+        end
+
+        wait_for_ajaximations
+
+        expect(f("#assignment_annotated_document_info")).to be_displayed
+
+        # select attachment from file explorer
+        fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/button').click
+        fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/ul/li/button').click
+
+        # set usage rights
+        f("#usageRightSelector").click
+        fxpath('//*[@id="usageRightSelector"]/option[2]').click
+        f("#copyrightHolder").send_keys("Me")
+
+        submit_assignment_form
+        wait_for_ajaximations
+
+        expect(f("#assignment_show fieldset")).to include_text("a text entry box or a student annotation")
+      end
+
+      it "creates a student annotation assignment with annotatable attachment with usage rights with the instui nav feature flag on" do
+        @course.root_account.enable_feature!(:instui_nav)
+        get "/courses/#{@course.id}/assignments"
+        wait_for_new_page_load { f("[data-testid='new_assignment_button']").click }
         f("#assignment_name").send_keys("Annotated Test")
 
         replace_content(f("#assignment_points_possible"), "10")
@@ -772,11 +924,20 @@ describe "assignments" do
       end
     end
 
+    # EVAL-3711 Remove this test when instui_nav feature flag is removed
     it "goes to the assignment index page from left nav", priority: "1" do
       get "/courses/#{@course.id}"
       f("#wrapper .assignments").click
       wait_for_ajaximations
       expect(f(".header-bar-right .new_assignment")).to include_text("Assignment")
+    end
+
+    it "goes to the assignment index page from left nav with the instui nav feature flag on", priority: "1" do
+      @course.root_account.enable_feature!(:instui_nav)
+      get "/courses/#{@course.id}"
+      f("#wrapper .assignments").click
+      wait_for_ajaximations
+      expect(f("[data-testid='new_assignment_button']")).to include_text("Assignment")
     end
   end
 
@@ -864,7 +1025,7 @@ describe "assignments" do
     end
 
     it "cancels adding new assignment group via the x button", priority: "2" do
-      fj("button.ui-dialog-titlebar-close:visible").click
+      fj(".ui-dialog-titlebar-close:visible").click
       wait_for_ajaximations
 
       expect(f("#assignment_group_id")).not_to include_text(@new_group)
@@ -1160,6 +1321,21 @@ describe "assignments" do
 
           expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "A"
           expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: A"
+        end
+
+        it "shows the course scheme letter grade if letter grade type, pointsPossible is > 0 and score is less than pointsPossible" do
+          @course_standard = @course.grading_standards.create!(title: "course standard", standard_data: { f: { name: "F", value: "" } })
+          @assignment = @course.assignments.create! context: @course, title: "to publish", grading_standard_id: @course_standard.id
+          @assignment.update(points_possible: 100, grading_type: "letter_grade")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: 90, grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "F"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: F"
         end
       end
 

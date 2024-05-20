@@ -43,8 +43,8 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   before_create :set_root_account_id
 
-  serialize :export_results, Hash
-  serialize :migration_settings, Hash
+  serialize :export_results, type: Hash
+  serialize :migration_settings, type: Hash
 
   has_a_broadcast_policy
 
@@ -214,7 +214,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     ce.master_migration = self # don't need to reload
     ce.export_course(export_opts)
     if type == :selective && ce.referenced_files.present?
-      ce.settings[:referenced_file_migration_ids] = ce.referenced_files.values
+      ce.settings[:referenced_file_migration_ids] = ce.referenced_files.values.map(&:export_id)
       ce.save!
     end
     if ce.exported_for_course_copy? && is_primary

@@ -19,10 +19,13 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import ProficiencyRating from '../ProficiencyRating'
-import * as SVGUrl from '../icons'
+import {svgUrl} from '../icons'
+
+jest.mock('../icons', () => ({
+  svgUrl: jest.fn(() => 'http://test.com'),
+}))
 
 describe('ProficiencyRating', () => {
-  let svgUrlSpy
   const defaultProps = (props = {}) => {
     return {
       points: 5,
@@ -34,18 +37,10 @@ describe('ProficiencyRating', () => {
     }
   }
 
-  beforeEach(() => {
-    svgUrlSpy = jest.spyOn(SVGUrl, 'svgUrl')
-  })
-
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
   it('calls svgUrl to find the right icon', () => {
     const {points, masteryAt} = defaultProps()
     render(<ProficiencyRating {...defaultProps()} />)
-    expect(svgUrlSpy).toHaveBeenCalledWith(points, masteryAt)
+    expect(svgUrl).toHaveBeenCalledWith(points, masteryAt)
   })
 
   it('shows a enabled_filter SVG only when the rating is enabled', () => {

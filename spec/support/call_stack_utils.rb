@@ -26,7 +26,7 @@ module CallStackUtils
 
   # (re-)raise the exception while preserving its backtrace
   def self.raise(exception)
-    super exception.class, exception.message, exception.backtrace
+    super(exception.class, exception.message, exception.backtrace)
   end
 
   APP_IGNORE_REGEX = %r{/spec/(support|selenium/test_setup/)}
@@ -55,6 +55,6 @@ module CallStackUtils
 end
 
 ignore_regex = RSpec::CallerFilter::IGNORE_REGEX
-RSpec::CallerFilter.send :remove_const, :IGNORE_REGEX
+RSpec::CallerFilter.send :remove_const, :IGNORE_REGEX # rubocop:disable RSpec/RemoveConst
 RSpec::CallerFilter::IGNORE_REGEX = Regexp.union(ignore_regex, CallStackUtils::APP_IGNORE_REGEX)
 RSpec::Core::Formatters::ExceptionPresenter.prepend CallStackUtils::ExceptionPresenter

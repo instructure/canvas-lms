@@ -1,15 +1,20 @@
-// INSTRUCTURE modified
-(function (factory) { // UMD wrapper
-  if (typeof module === 'object' && module.exports) {
-    factory(require('jquery'))
-  } else if (typeof define === 'function' && define.amd) {
-    define(['jquery'], factory)
-  } else {
-    factory(jQuery)
-  }
-})(function ($) {
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable eqeqeq */
+/* eslint-disable @typescript-eslint/semi */
+/* eslint-disable prettier/prettier */
+/* eslint-disable prefer-spread */
+/* eslint-disable no-unneeded-ternary */
+/* eslint-disable no-useless-concat */
+/* eslint-disable radix */
+/* eslint-disable vars-on-top */
+/* eslint-disable object-shorthand */
+/* eslint-disable no-var */
+/* eslint-disable spaced-comment */
+/* eslint-disable notice/notice */
 
-  "use strict";
+// INSTRUCTURE modified
+
+import $ from 'jquery'
 
   var Selectpicker = function(element, options, e) {
       if (e) {
@@ -693,4 +698,3 @@
   $(document)
       .data('keycount', 0)
       .on('keydown', '[data-toggle=dropdown], [role=menu]' , Selectpicker.prototype.keydown)
-});

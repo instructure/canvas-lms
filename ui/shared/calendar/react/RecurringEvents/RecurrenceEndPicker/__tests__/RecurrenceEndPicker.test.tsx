@@ -17,53 +17,23 @@
  */
 
 import React from 'react'
-import {render, act, fireEvent, screen, waitFor} from '@testing-library/react'
+import {render, act, fireEvent} from '@testing-library/react'
 import moment from 'moment-timezone'
-import {UnknownSubset, FrequencyValue} from '../../types'
+import type {UnknownSubset, FrequencyValue} from '../../types'
 import RecurrenceEndPicker, {
-  RecurrenceEndPickerProps,
+  type RecurrenceEndPickerProps,
   CountValidator,
   UntilValidator,
-  InstuiMessage,
-  ModeValues,
+  type InstuiMessage,
+  type ModeValues,
 } from '../RecurrenceEndPicker'
 import {MAX_COUNT} from '../../RRuleHelper'
+import {formatDate, changeUntilDate, makeSimpleIsoDate} from './utils'
 
 const defaultTZ = 'Asia/Tokyo'
 const today = moment().tz(defaultTZ)
 
 type messageSpy = jest.SpyInstance<InstuiMessage[], []>
-
-export function formatDate(date: Date, locale: string, timezone: string) {
-  return new Intl.DateTimeFormat('en', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-    timeZone: timezone,
-  }).format(date)
-}
-
-export function makeSimpleIsoDate(date: moment.Moment): string {
-  return date.format('YYYY-MM-DDTHH:mm:ssZ')
-}
-
-export async function changeUntilDate(
-  enddate: moment.Moment,
-  newenddate: moment.Moment,
-  locale: string,
-  timezone: string
-) {
-  const displayedUntil = formatDate(enddate.toDate(), locale, timezone)
-  const dateinput = screen.getByDisplayValue(displayedUntil)
-  const newEndDateStr = formatDate(newenddate.toDate(), locale, timezone)
-  act(() => {
-    fireEvent.change(dateinput, {target: {value: newEndDateStr}})
-  })
-  await waitFor(() => screen.getByDisplayValue(newEndDateStr))
-  act(() => {
-    fireEvent.blur(dateinput)
-  })
-}
 
 const defaultProps = (
   overrides: UnknownSubset<RecurrenceEndPickerProps> = {}

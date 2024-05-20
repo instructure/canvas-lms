@@ -31,7 +31,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {NumberInput} from '@instructure/ui-number-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import CalculationMethodContent from '@canvas/grade-summary/backbone/models/CalculationMethodContent'
+import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
 import ConfirmMasteryModal from '../ConfirmMasteryModal'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 

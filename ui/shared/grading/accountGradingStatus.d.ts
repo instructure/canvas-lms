@@ -23,6 +23,18 @@ export type GradeStatus = {
   name: string
   color: string
   isNew?: boolean
+  appliesToSubmissions?: boolean
+  appliesToFinalGrade?: boolean
+  allowFinalGradeValue?: boolean
+}
+
+export type GradeStatusUnderscore = {
+  id: string
+  name: string
+  color: string
+  applies_to_submissions?: boolean
+  applies_to_final_grade?: boolean
+  allow_final_grade_value?: boolean
 }
 
 export type StandardStatusAllowedName =

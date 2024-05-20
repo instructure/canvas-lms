@@ -123,8 +123,8 @@ describe FoldersController do
       expect(assigns[:folder]).not_to be_frozen
       expect(assigns[:folder]).to be_deleted
       @course.reload
-      expect(@course.folders).to be_include(@folder)
-      expect(@course.folders.active).not_to be_include(@folder)
+      expect(@course.folders).to include(@folder)
+      expect(@course.folders.active).not_to include(@folder)
     end
 
     it "deletes folder" do

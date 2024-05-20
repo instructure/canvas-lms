@@ -434,7 +434,7 @@ describe "BookmarkedCollection" do
 
     it "uses proc to calculate key" do
       BookmarkedCollection.best_unicode_collation_key_proc = lambda do |col|
-        return "lower(#{col})"
+        "lower(#{col})"
       end
 
       expect(BookmarkedCollection.best_unicode_collation_key("key_name")).to eq("lower(key_name)")

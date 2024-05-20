@@ -131,6 +131,7 @@ describe "Module Items API", type: :request do
           "indent" => 0,
           "completion_requirement" => { "type" => "must_submit" },
           "published" => false,
+          "unpublishable" => true,
           "module_id" => @module1.id,
           "quiz_lti" => false
         },
@@ -145,6 +146,7 @@ describe "Module Items API", type: :request do
           "indent" => 0,
           "completion_requirement" => { "type" => "min_score", "min_score" => 10.0 },
           "published" => true,
+          "unpublishable" => true,
           "module_id" => @module1.id,
           "quiz_lti" => false
         },
@@ -159,6 +161,7 @@ describe "Module Items API", type: :request do
           "indent" => 0,
           "completion_requirement" => { "type" => "must_contribute" },
           "published" => true,
+          "unpublishable" => true,
           "module_id" => @module1.id,
           "quiz_lti" => false
         },
@@ -169,6 +172,7 @@ describe "Module Items API", type: :request do
           "title" => @subheader_tag.title,
           "indent" => 0,
           "published" => true,
+          "unpublishable" => true,
           "module_id" => @module1.id,
           "quiz_lti" => false
         },
@@ -182,6 +186,7 @@ describe "Module Items API", type: :request do
           "indent" => 1,
           "completion_requirement" => { "type" => "must_view" },
           "published" => true,
+          "unpublishable" => true,
           "module_id" => @module1.id,
           "new_tab" => nil,
           "quiz_lti" => false
@@ -302,6 +307,7 @@ describe "Module Items API", type: :request do
                            "page_url" => @wiki_page.url,
                            "published" => true,
                            "publish_at" => nil,
+                           "unpublishable" => true,
                            "module_id" => @module2.id,
                            "quiz_lti" => false
                          })
@@ -325,6 +331,7 @@ describe "Module Items API", type: :request do
                            "indent" => 0,
                            "url" => "http://www.example.com/api/v1/courses/#{@course.id}/files/#{@attachment.id}",
                            "published" => false,
+                           "unpublishable" => false,
                            "module_id" => @module2.id,
                            "quiz_lti" => false
                          })
@@ -1142,7 +1149,7 @@ describe "Module Items API", type: :request do
                      id: @wiki_page_tag.id.to_s },
                    { module_item: { module_id: @module3.id } })
 
-          expect(@module2.reload.content_tags.map(&:id)).not_to be_include @wiki_page_tag.id
+          expect(@module2.reload.content_tags.map(&:id)).not_to include @wiki_page_tag.id
           expect(@module2.updated_at).to be > old_updated_ats[0]
           expect(@module3.reload.content_tags.map(&:id)).to eq [@wiki_page_tag.id]
           expect(@module3.updated_at).to be > old_updated_ats[1]
@@ -1166,7 +1173,7 @@ describe "Module Items API", type: :request do
                      id: @assignment_tag.id.to_s },
                    { module_item: { module_id: @module2.id } })
 
-          expect(@module1.reload.content_tags.map(&:id)).not_to be_include @assignment_tag.id
+          expect(@module1.reload.content_tags.map(&:id)).not_to include @assignment_tag.id
           expect(@module1.updated_at).to be > old_updated_ats[0]
           expect(@module1.completion_requirements.size).to eq 3
           expect(@module1.completion_requirements.detect { |req| req[:id] == @assignment_tag.id }).to be_nil
@@ -1193,7 +1200,7 @@ describe "Module Items API", type: :request do
                      id: @assignment_tag.id.to_s },
                    { module_item: { module_id: @module2.id, position: 2 } })
 
-          expect(@module1.reload.content_tags.map(&:id)).not_to be_include @assignment_tag.id
+          expect(@module1.reload.content_tags.map(&:id)).not_to include @assignment_tag.id
           expect(@module1.updated_at).to be > old_updated_ats[0]
           expect(@module1.completion_requirements.size).to eq 3
           expect(@module1.completion_requirements.detect { |req| req[:id] == @assignment_tag.id }).to be_nil
@@ -1405,6 +1412,23 @@ describe "Module Items API", type: :request do
                         asset_id: @wiki_page.to_param)
         expect(json["items"].size).to be 0
         expect(json["modules"].size).to be 0
+      end
+
+      it "finds a (non-deleted) wiki page by old slug" do
+        @wiki_page.wiki_page_lookups.create!(slug: "an-old-url")
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Page&asset_id=an-old-url",
+                        controller: "context_module_items_api",
+                        action: "item_sequence",
+                        format: "json",
+                        course_id: @course.to_param,
+                        asset_type: "Page",
+                        asset_id: "an-old-url")
+        expect(json["items"].size).to be 1
+        expect(json["items"][0]["prev"]["id"]).to eq @external_url_tag.id
+        expect(json["items"][0]["current"]["id"]).to eq @wiki_page_tag.id
+        expect(json["items"][0]["next"]["id"]).to eq @attachment_tag.id
+        expect(json["modules"].pluck("id").sort).to eq [@module1.id, @module2.id].sort
       end
 
       it "skips a deleted module" do

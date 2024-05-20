@@ -197,7 +197,7 @@ module AccountReports
       end
     end
     if filename
-      data = Rack::Test::UploadedFile.new(filepath, filetype, true)
+      data = Canvas::UploadedFile.new(filepath, filetype)
       # have to branch here because calling the uploaded_data= method on attachment
       # (done in the Attachments::Storage method) triggers an attachment_fu save
       # callback which is handled differently than creating the attachment using

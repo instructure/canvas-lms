@@ -35,12 +35,13 @@ module Lti
     validate :validate_placements
     validate :validate_oidc_initiation_urls
 
-    attr_accessor :configuration_url, :settings_url
+    attr_accessor :settings_url
 
     # settings* was an unfortunate naming choice as there is a settings hash per placement that
     # made it confusing, as well as this being a configuration, not a settings, hash
     alias_attribute :configuration, :settings
-    alias_attribute :configuration_url, :settings_url
+    alias_method :configuration_url, :settings_url
+    alias_method :configuration_url=, :settings_url=
 
     def new_external_tool(context, existing_tool: nil)
       # disabled tools should stay disabled while getting updated
@@ -112,6 +113,25 @@ module Lti
       configuration["extensions"]&.find { |e| e["platform"] == CANVAS_EXTENSION_LABEL }&.dig("settings", "placements")&.deep_dup || []
     end
 
+    def domain
+      return [] if configuration.blank?
+
+      configuration["extensions"]&.find { |e| e["platform"] == CANVAS_EXTENSION_LABEL }&.dig("domain") || ""
+    end
+
+    # @return [String | nil] A warning message about any disallowed placements
+    def verify_placements
+      return unless placements.any? { |p| p["placement"] == "submission_type_selection" }
+      return unless Account.site_admin.feature_enabled?(:lti_placement_restrictions)
+
+      # This is a candidate for a deduplication with the same logic in app/models/context_external_tool.rb#placement_allowed?
+      allowed_domains = Setting.get("submission_type_selection_allowed_launch_domains", "").split(",").map(&:strip).reject(&:empty?)
+      allowed_dev_keys = Setting.get("submission_type_selection_allowed_dev_keys", "").split(",").map(&:strip).reject(&:empty?)
+      return if allowed_domains.include?(domain) || allowed_dev_keys.include?(Shard.global_id_for(developer_key_id).to_s)
+
+      t("Warning: the submission_type_selection placement is only allowed for Instructure approved LTI tools. If you believe you have received this message in error, please contact your support team.")
+    end
+
     private
 
     def self.retrieve_and_extract_configuration(url)
@@ -160,6 +180,12 @@ module Lti
     end
 
     def validate_placements
+      placements.each do |p|
+        unless Lti::ResourcePlacement.supported_message_type?(p["placement"], p["message_type"])
+          errors.add(:placements, "Placement #{p["placement"]} does not support message type #{p["message_type"]}")
+        end
+      end
+
       return if disabled_placements.blank?
 
       invalid = disabled_placements.reject { |p| Lti::ResourcePlacement::PLACEMENTS.include?(p.to_sym) }

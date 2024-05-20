@@ -208,6 +208,7 @@ export const ConversationListHolder = ({
 
   // Render individual menu items
   const renderMenuItem = (conversation, isLast) => {
+    if (!conversation?.messages?.length) return null
     return (
       <ConversationListItem
         id={conversation._id}
@@ -234,12 +235,7 @@ export const ConversationListHolder = ({
       <View as="div" padding="xx-small" data-testid="menu-loading-spinner">
         <Flex width="100%" margin="xxx-small none xxx-small xxx-small">
           <Flex.Item align="start" margin="0 small 0 0">
-            <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
-          </Flex.Item>
-          <Flex.Item align="center" shouldGrow={true} shouldShrink={true}>
-            <View>
-              <Text>{I18n.t('Loading')}</Text>
-            </View>
+            <Spinner renderTitle={I18n.t('Loading')} size="x-small" delay={300} />
           </Flex.Item>
         </Flex>
       </View>
@@ -256,9 +252,13 @@ export const ConversationListHolder = ({
       return renderLoading()
     }
 
-    return menuData.map(conversation => {
-      return renderMenuItem(conversation, conversation?.isLast)
-    })
+    const conversationListItems = menuData
+      .map(conversation => {
+        return renderMenuItem(conversation, conversation?.isLast)
+      })
+      .filter(item => item !== null)
+
+    return conversationListItems.length ? conversationListItems : renderNoResultsFound()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuData])
 

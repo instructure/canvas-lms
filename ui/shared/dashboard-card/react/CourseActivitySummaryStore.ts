@@ -17,7 +17,7 @@
  */
 
 import {defaultFetchOptions, asJson} from '@canvas/util/xhr'
-import createStore, {CanvasStore} from '@canvas/util/createStore'
+import createStore, {type CanvasStore} from '@canvas/backbone/createStore'
 
 type Stream = unknown[]
 
@@ -44,7 +44,7 @@ CourseActivitySummaryStore.getStateForCourse = function (courseId?: string) {
 CourseActivitySummaryStore._fetchForCourse = function (courseId: string) {
   // @ts-expect-error
   return asJson(
-    window.fetch(`/api/v1/courses/${courseId}/activity_stream/summary`, defaultFetchOptions)
+    window.fetch(`/api/v1/courses/${courseId}/activity_stream/summary`, defaultFetchOptions())
   ).then((stream: Stream) => {
     const state = CourseActivitySummaryStore.getState()
     state.streams[courseId] = {stream}

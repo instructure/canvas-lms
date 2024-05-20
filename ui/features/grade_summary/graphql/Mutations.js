@@ -35,6 +35,21 @@ export const UPDATE_SUBMISSIONS_READ_STATE = gql`
   ${Error.fragment}
 `
 
+export const UPDATE_RUBRIC_ASSESSMENT_READ_STATE = gql`
+  mutation UpdateRubricAssessmentReadState($submissionIds: [ID!]!) {
+    updateRubricAssessmentReadState(input: {submissionIds: $submissionIds}) {
+      submissions {
+        _id
+        hasUnreadRubricAssessment
+      }
+      errors {
+        ...Error
+      }
+    }
+  }
+  ${Error.fragment}
+`
+
 export const UPDATE_SUBMISSION_STUDENT_ENTERED_SCORE = gql`
   mutation UpdateSubmissionStudentEnteredScore(
     $submissionId: ID!

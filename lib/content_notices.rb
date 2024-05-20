@@ -37,7 +37,7 @@ module ContentNotices
     def define_content_notice(tag, opts)
       notice = ContentNotice.new
       NOTICE_ATTRIBUTES.each do |attr|
-        notice.instance_variable_set "@#{attr}", opts[attr] if opts.include?(attr)
+        notice.instance_variable_set :"@#{attr}", opts[attr] if opts.include?(attr)
       end
       notice.tag ||= tag
       @content_notices ||= {}

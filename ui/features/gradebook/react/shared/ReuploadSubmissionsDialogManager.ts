@@ -76,6 +76,7 @@ class ReuploadSubmissionsDialogManager {
           cb()
         }
       },
+      zIndex: 1000,
     })
 
     setupSubmitHandler(this.userAssetString)

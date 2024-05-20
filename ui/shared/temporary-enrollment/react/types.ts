@@ -21,6 +21,10 @@ export const MODULE_NAME = 'TempEnroll'
 export const ITEMS_PER_PAGE = 100
 export const MAX_ALLOWED_COURSES_PER_PAGE = 50
 
+export const TOOLTIP_MAX_WIDTH: string = '15rem'
+export const ENROLLMENT_TREE_SPACING: string = '1.75rem'
+export const ENROLLMENT_TREE_ICON_OFFSET: string = '-.25em'
+
 export interface Course {
   id: string
   name: string
@@ -39,7 +43,7 @@ export interface Section {
 
 export interface Role {
   id: string
-  role?: string
+  name: string
   label: string
   base_role_name: string
 }
@@ -50,6 +54,7 @@ export interface RoleChoice {
 }
 
 export interface Enrollment {
+  limit_privileges_to_course_section: boolean
   id: string
   user_id?: string
   course_id: string
@@ -72,11 +77,36 @@ export type EnrollmentType = typeof PROVIDER | typeof RECIPIENT | null
 
 export interface User {
   email?: string | null
+  primary_email?: string | null
   login_id?: string | null
   avatar_url?: string
   id: string
   name: string
   sis_user_id?: string | null
+  user_id?: string
+}
+
+export interface DuplicateUser {
+  address?: string
+  account_name?: string
+  email?: string
+  user_id: string
+  user_name: string
+  login_id?: string
+  sis_user_id?: string
+}
+
+export interface NodeStructure {
+  children: NodeStructure[]
+  enrollId?: string
+  id: string
+  isCheck: boolean
+  isMismatch?: boolean
+  isMixed: boolean
+  isToggle?: boolean
+  label: string
+  parent?: NodeStructure
+  workflowState?: string
 }
 
 export const EMPTY_USER: User = {
@@ -103,10 +133,11 @@ export interface Permissions {
 }
 
 export interface SelectedEnrollment {
-  course: string
   section: string
+  limit_privileges_to_course_section: boolean
 }
 
 export interface TemporaryEnrollmentPairing {
   id: string
+  ending_enrollment_state: string
 }

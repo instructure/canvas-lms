@@ -194,7 +194,9 @@ export const GradeRow = ({
           renderTitleCell()
         )}
       </Table.Cell>
-      <Table.Cell themeOverride={cellTheme}>{dueDate && <Text>{dateFormatter(dueDate)}</Text>}</Table.Cell>
+      <Table.Cell themeOverride={cellTheme}>
+        {dueDate && <Text>{dateFormatter(dueDate)}</Text>}
+      </Table.Cell>
       <Table.Cell themeOverride={cellTheme}>
         <Text>{assignmentGroupName}</Text>
       </Table.Cell>

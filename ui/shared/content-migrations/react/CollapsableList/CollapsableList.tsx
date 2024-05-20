@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Fragment, ComponentClass, useState, useEffect, useRef, useCallback} from 'react'
+import React, {Fragment, type ComponentClass, useState, useEffect, useRef, useCallback} from 'react'
 import {Flex} from '@instructure/ui-flex'
 // @ts-ignore
 import {Checkbox} from '@instructure/ui-checkbox'

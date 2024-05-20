@@ -2,8 +2,5 @@
   "name": "@canvas/pagination",
   "private": true,
   "version": "1.0.0",
-  "author": "neme",
-  "canvas": {
-    "component": "core"
-  }
+  "author": "neme"
 }

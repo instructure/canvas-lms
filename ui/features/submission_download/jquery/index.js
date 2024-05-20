@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape, {raw} from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
 import 'jqueryui/progressbar'
@@ -40,6 +40,8 @@ INST.downloadSubmissions = function (url, onClose) {
       close() {
         cancelled = true
       },
+      modal: true,
+      zIndex: 1000,
     })
     .on('dialogclose', onClose)
   $('#download_submissions_dialog .progress').progressbar({value: 0})
@@ -67,9 +69,7 @@ INST.downloadSubmissions = function (url, onClose) {
             })
             const link = `<a href="${htmlEscape(url)}"><b>${htmlEscape(linkText)}</b></a>`
 
-            $('#download_submissions_dialog .status').html(
-              `${htmlEscape(message)}<br>${$.raw(link)}`
-            )
+            $('#download_submissions_dialog .status').html(`${htmlEscape(message)}<br>${raw(link)}`)
             $('#download_submissions_dialog .status_loader').css('visibility', 'hidden')
 
             window.location.href = url

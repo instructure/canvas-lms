@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {act, render as rtlRender, fireEvent, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/react-testing'
 import {createCache} from '@canvas/apollo'
 import {within} from '@testing-library/dom'
@@ -31,12 +31,18 @@ import {
   createLearningOutcomeMock,
   createOutcomeGroupMocks,
 } from '@canvas/outcomes/mocks/Management'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 
 injectGlobalAlertContainers()
 
 jest.useFakeTimers()
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+}))
+
+const USER_EVENT_OPTIONS = {delay: null, pointerEventsCheck: PointerEventsCheckLevel.Never}
 
 describe('CreateOutcomeModal', () => {
   let onCloseHandlerMock
@@ -111,14 +117,16 @@ describe('CreateOutcomeModal', () => {
       })
 
       it('calls onCloseHandler on Cancel button click', async () => {
+        const user = userEvent.setup(USER_EVENT_OPTIONS)
         const {getByText} = render(<CreateOutcomeModal {...getProps()} />)
-        userEvent.click(getByText('Cancel'))
+        await user.click(getByText('Cancel'))
         expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
       })
 
       it('calls onCloseHandler on Close (X) button click', async () => {
+        const user = userEvent.setup(USER_EVENT_OPTIONS)
         const {getByRole} = render(<CreateOutcomeModal {...getProps()} />)
-        userEvent.click(within(getByRole('dialog')).getByText('Close'))
+        await user.click(within(getByRole('dialog')).getByText('Close'))
         expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
       })
 
@@ -158,6 +166,7 @@ describe('CreateOutcomeModal', () => {
       })
 
       it('shows error message if friendly description > 255 characters', async () => {
+        const user = userEvent.setup(USER_EVENT_OPTIONS)
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [...smallOutcomeTree()],
         })
@@ -167,17 +176,18 @@ describe('CreateOutcomeModal', () => {
         fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
           target: {value: 'a'.repeat(256)},
         })
-        userEvent.click(getByText('Root account folder'))
+        await user.click(getByText('Root account folder'))
         expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
       })
 
       it('calls onCloseHandler & onSuccess on Create button click', async () => {
+        const user = userEvent.setup(USER_EVENT_OPTIONS)
         const {getByLabelText, getByText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [...smallOutcomeTree()],
         })
         await act(async () => jest.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
-        userEvent.click(getByText('Create'))
+        await user.click(getByText('Create'))
         await act(async () => jest.runOnlyPendingTimers())
         expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
       })
@@ -205,6 +215,7 @@ describe('CreateOutcomeModal', () => {
       })
 
       it('calls onSuccess if create request succeeds', async () => {
+        const user = userEvent.setup(USER_EVENT_OPTIONS)
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [
             ...smallOutcomeTree('Account'),
@@ -225,8 +236,8 @@ describe('CreateOutcomeModal', () => {
         fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
           target: {value: 'Friendly Description value'},
         })
-        userEvent.click(getByText('Account folder 0'))
-        userEvent.click(getByText('Create'))
+        await user.click(getByText('Account folder 0'))
+        await user.click(getByText('Create'))
         await act(async () => jest.runOnlyPendingTimers())
         await waitFor(() => {
           expect(onSuccessMock).toHaveBeenCalledTimes(1)
@@ -237,7 +248,7 @@ describe('CreateOutcomeModal', () => {
       })
 
       it('displays flash confirmation with proper message if create request succeeds', async () => {
-        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+        const user = userEvent.setup(USER_EVENT_OPTIONS)
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [
             ...smallOutcomeTree(),
@@ -258,10 +269,10 @@ describe('CreateOutcomeModal', () => {
         fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
           target: {value: 'Friendly Description value'},
         })
-        userEvent.click(getByText('Create'))
+        await user.click(getByText('Create'))
         await act(async () => jest.runOnlyPendingTimers())
         await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+          expect(showFlashAlert).toHaveBeenCalledWith({
             message: '"Outcome 123" was successfully created.',
             type: 'success',
           })
@@ -269,7 +280,7 @@ describe('CreateOutcomeModal', () => {
       })
 
       it('displays flash error if create request fails', async () => {
-        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+        const user = userEvent.setup(USER_EVENT_OPTIONS)
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [
             ...smallOutcomeTree(),
@@ -285,9 +296,9 @@ describe('CreateOutcomeModal', () => {
         await act(async () => jest.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
-        userEvent.click(getByText('Create'))
+        await user.click(getByText('Create'))
         await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+          expect(showFlashAlert).toHaveBeenCalledWith({
             message: 'An error occurred while creating this outcome. Please try again.',
             type: 'error',
           })
@@ -295,7 +306,7 @@ describe('CreateOutcomeModal', () => {
       })
 
       it('displays flash error if create mutation fails', async () => {
-        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+        const user = userEvent.setup(USER_EVENT_OPTIONS)
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [
             ...smallOutcomeTree(),
@@ -311,10 +322,10 @@ describe('CreateOutcomeModal', () => {
         await act(async () => jest.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
-        userEvent.click(getByText('Create'))
+        await user.click(getByText('Create'))
         await act(async () => jest.runOnlyPendingTimers())
         await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+          expect(showFlashAlert).toHaveBeenCalledWith({
             message: 'An error occurred while creating this outcome. Please try again.',
             type: 'error',
           })
@@ -322,7 +333,7 @@ describe('CreateOutcomeModal', () => {
       })
 
       it('handles create outcome failure due to friendly description', async () => {
-        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+        const user = userEvent.setup(USER_EVENT_OPTIONS)
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [
             ...smallOutcomeTree(),
@@ -344,10 +355,10 @@ describe('CreateOutcomeModal', () => {
         fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
           target: {value: 'Friendly description'},
         })
-        userEvent.click(getByText('Create'))
+        await user.click(getByText('Create'))
         await act(async () => jest.runOnlyPendingTimers())
         await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+          expect(showFlashAlert).toHaveBeenCalledWith({
             message: 'An error occurred while creating this outcome. Please try again.',
             type: 'error',
           })
@@ -375,7 +386,7 @@ describe('CreateOutcomeModal', () => {
       })
 
       it('does not throw error if friendly description mutation succeeds', async () => {
-        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+        const user = userEvent.setup(USER_EVENT_OPTIONS)
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [
             ...smallOutcomeTree(),
@@ -396,11 +407,11 @@ describe('CreateOutcomeModal', () => {
         fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
           target: {value: 'Friendly description'},
         })
-        userEvent.click(getByText('Root account folder'))
-        userEvent.click(getByText('Create'))
+        await user.click(getByText('Root account folder'))
+        await user.click(getByText('Create'))
         await act(async () => jest.runOnlyPendingTimers())
         await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+          expect(showFlashAlert).toHaveBeenCalledWith({
             message: '"Outcome 123" was successfully created.',
             type: 'success',
           })
@@ -408,17 +419,19 @@ describe('CreateOutcomeModal', () => {
       })
 
       it('does not submit form if error in form and click on Create button', async () => {
+        const user = userEvent.setup(USER_EVENT_OPTIONS)
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />)
         await act(async () => jest.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         const friendlyName = getByLabelText('Friendly Name')
         fireEvent.change(friendlyName, {target: {value: 'a'.repeat(256)}})
         expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
-        userEvent.click(getByText('Create'))
+        await user.click(getByText('Create'))
         expect(onCloseHandlerMock).not.toHaveBeenCalled()
       })
 
       it('sets focus on first field with error if multiple errors in form and click on Create button', async () => {
+        const user = userEvent.setup(USER_EVENT_OPTIONS)
         const {getByText, getByLabelText, queryAllByText} = render(
           <CreateOutcomeModal {...defaultProps()} />
         )
@@ -432,14 +445,14 @@ describe('CreateOutcomeModal', () => {
         fireEvent.change(friendlyName, {target: {value: 'b'.repeat(256)}})
         fireEvent.change(friendlyDescription, {target: {value: 'c'.repeat(256)}})
         expect(queryAllByText('Must be 255 characters or less').length).toBe(3)
-        userEvent.click(getByText('Create'))
+        await user.click(getByText('Create'))
         expect(friendlyDescription).not.toBe(document.activeElement)
         expect(friendlyName).not.toBe(document.activeElement)
         expect(name).toBe(document.activeElement)
       })
 
       it('sets focus on create button after creation of a new group', async () => {
-        jest.spyOn(FlashAlert, 'showFlashAlert')
+        const user = userEvent.setup(USER_EVENT_OPTIONS)
         const {getByText, getByLabelText, getByTestId} = render(
           <CreateOutcomeModal {...defaultProps()} />,
           {
@@ -454,9 +467,9 @@ describe('CreateOutcomeModal', () => {
           }
         )
         await act(async () => jest.runOnlyPendingTimers())
-        userEvent.click(getByText('Create New Group'))
+        await user.click(getByText('Create New Group'))
         fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'test'}})
-        userEvent.click(getByText('Create new group'))
+        await user.click(getByText('Create new group'))
         await act(async () => jest.runOnlyPendingTimers())
         expect(getByTestId('create-button')).toHaveFocus()
       })
@@ -473,7 +486,7 @@ describe('CreateOutcomeModal', () => {
         })
 
         it('does not call friendly description mutation when creating outcome', async () => {
-          const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+          const user = userEvent.setup(USER_EVENT_OPTIONS)
           const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
             friendlyDescriptionFF: false,
             mocks: [
@@ -489,11 +502,11 @@ describe('CreateOutcomeModal', () => {
           await act(async () => jest.runOnlyPendingTimers())
           fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
           fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
-          userEvent.click(getByText('Create'))
+          await user.click(getByText('Create'))
           await act(async () => jest.runOnlyPendingTimers())
           // if setFriendlyDescription mutation is called the expectation below will fail
           await waitFor(() => {
-            expect(showFlashAlertSpy).toHaveBeenCalledWith({
+            expect(showFlashAlert).toHaveBeenCalledWith({
               message: '"Outcome 123" was successfully created.',
               type: 'success',
             })
@@ -519,8 +532,12 @@ describe('CreateOutcomeModal', () => {
             expect(getByTestId('outcome-management-ratings')).toBeInTheDocument()
           })
 
-          it.skip('creates outcome with calculation method and proficiency ratings (flaky)', async () => {
-            const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+          /*
+            Since the InstUI 8 upgrade, this test takes an average of 5.6 seconds to complete.
+            For now, the timeout interval is increased to 7.5 seconds.
+          */
+          it('creates outcome with calculation method and proficiency ratings (flaky)', async () => {
+            const user = userEvent.setup(USER_EVENT_OPTIONS)
             const {getByText, getByLabelText, getByDisplayValue} = render(
               <CreateOutcomeModal {...defaultProps()} />,
               {
@@ -545,17 +562,17 @@ describe('CreateOutcomeModal', () => {
             fireEvent.change(getByLabelText('Friendly Name'), {
               target: {value: 'Display name'},
             })
-            userEvent.click(getByDisplayValue('Decaying Average'))
-            userEvent.click(getByText('n Number of Times'))
-            userEvent.click(getByText('Create'))
+            await user.click(getByDisplayValue('Decaying Average'))
+            await user.click(getByText('n Number of Times'))
+            await user.click(getByText('Create'))
             await act(async () => jest.runOnlyPendingTimers())
             await waitFor(() => {
-              expect(showFlashAlertSpy).toHaveBeenCalledWith({
+              expect(showFlashAlert).toHaveBeenCalledWith({
                 message: '"Outcome 123" was successfully created.',
                 type: 'success',
               })
             })
-          })
+          }, 7500) // Allow test to run for 7.5 seconds
 
           it('displays horizontal divider between ratings and calculation method which is hidden from screen readers', async () => {
             const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
@@ -565,7 +582,8 @@ describe('CreateOutcomeModal', () => {
             expect(getByTestId('outcome-create-modal-horizontal-divider')).toBeInTheDocument()
           })
 
-          it('sets focus on rating description if error in both description and points and click on Create button', () => {
+          it('sets focus on rating description if error in both description and points and click on Create button', async () => {
+            const user = userEvent.setup(USER_EVENT_OPTIONS)
             const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
               accountLevelMasteryScalesFF: false,
             })
@@ -576,12 +594,13 @@ describe('CreateOutcomeModal', () => {
             fireEvent.change(ratingPoints, {target: {value: '-1'}})
             expect(getByText('Missing required description')).toBeInTheDocument()
             expect(getByText('Negative points')).toBeInTheDocument()
-            userEvent.click(getByText('Create'))
+            await user.click(getByText('Create'))
             expect(ratingPoints).not.toBe(document.activeElement)
             expect(ratingDescription).toBe(document.activeElement)
           })
 
-          it('sets focus on mastery points if error in mastery points and calculation method and click on Create button', () => {
+          it('sets focus on mastery points if error in mastery points and calculation method and click on Create button', async () => {
+            const user = userEvent.setup(USER_EVENT_OPTIONS)
             const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
               accountLevelMasteryScalesFF: false,
             })
@@ -592,7 +611,7 @@ describe('CreateOutcomeModal', () => {
             fireEvent.change(calcInt, {target: {value: '999'}})
             expect(getByText('Negative points')).toBeInTheDocument()
             expect(getByText('Must be between 1 and 99')).not.toBeNull()
-            userEvent.click(getByText('Create'))
+            await user.click(getByText('Create'))
             expect(calcInt).not.toBe(document.activeElement)
             expect(masteryPoints).toBe(document.activeElement)
           })

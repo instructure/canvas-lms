@@ -16,9 +16,9 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from 'backbone'
-import _ from 'underscore'
+import {map, each, extend} from 'lodash'
 
-_.extend(Backbone.Model.prototype, {
+extend(Backbone.Model.prototype, {
   initialize() {
     if (this.computedAttributes != null) {
       return this._configureComputedAttributes()
@@ -65,13 +65,13 @@ _.extend(Backbone.Model.prototype, {
   _configureComputedAttributes() {
     const set = methodName => this.set(methodName, this[methodName]())
 
-    _.each(this.computedAttributes, methodName => {
+    each(this.computedAttributes, methodName => {
       if (typeof methodName === 'string') {
         return set(methodName)
       } else {
         // config object
         set(methodName.name)
-        const eventName = _.map(methodName.deps, name => `change:${name}`).join(' ')
+        const eventName = map(methodName.deps, name => `change:${name}`).join(' ')
         return this.bind(eventName, () => set(methodName.name))
       }
     })

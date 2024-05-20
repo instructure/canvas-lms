@@ -19,7 +19,6 @@
 /* eslint-disable no-void */
 
 import {extend} from '@canvas/backbone/utils'
-import _ from 'underscore'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/PaginatedView.handlebars'
@@ -32,7 +31,8 @@ function PaginatedView() {
 
 PaginatedView.prototype.paginationLoaderTemplate = template
 
-PaginatedView.prototype.paginationScrollContainer = window
+// set default scroll container to window.document.body, because as of jquery 2.0, $(window).is(':visible') is no longer supported, see https://bugs.jquery.com/ticket/14709/
+PaginatedView.prototype.paginationScrollContainer = window.document.body
 
 PaginatedView.prototype.distanceTillFetchNextPage = 100
 
@@ -111,14 +111,10 @@ PaginatedView.prototype.fetchNextPageIfNeeded = function () {
         const shouldFetchNextPage =
           _this.distanceToBottom() < _this.distanceTillFetchNextPage || !_this.collection.length
         if ($(_this.paginationScrollContainer).is(':visible') && shouldFetchNextPage) {
-          return _this.collection.fetch(
-            _.extend(
-              {
-                page: 'next',
-              },
-              _this.fetchOptions
-            )
-          )
+          return _this.collection.fetch({
+            page: 'next',
+            ..._this.fetchOptions,
+          })
         }
       }
     })(this),

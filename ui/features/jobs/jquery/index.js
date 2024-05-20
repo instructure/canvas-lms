@@ -532,6 +532,7 @@ $(document).ready(() => {
           width: 900,
           height: 700,
           modal: true,
+          zIndex: 1000,
         })
     )
     return false
@@ -546,6 +547,7 @@ $(document).ready(() => {
           width: 900,
           height: 700,
           modal: true,
+          zIndex: 1000,
         })
     )
     return false

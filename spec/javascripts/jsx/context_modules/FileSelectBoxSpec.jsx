@@ -15,6 +15,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import FileSelectBox from '@canvas/select-content-dialog/react/components/FileSelectBox'

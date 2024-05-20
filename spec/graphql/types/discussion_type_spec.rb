@@ -77,9 +77,9 @@ RSpec.shared_context "DiscussionTypeContext" do
         allowed: lambda do |user|
           permission = !discussion.assignment.context.large_roster? && discussion.assignment_id && discussion.assignment.published?
           if discussion.assignment.context.concluded?
-            return permission && discussion.assignment.context.grants_right?(user, :read_as_admin)
+            permission && discussion.assignment.context.grants_right?(user, :read_as_admin)
           else
-            return permission && discussion.assignment.context.grants_any_right?(user, :manage_grades, :view_all_grades)
+            permission && discussion.assignment.context.grants_any_right?(user, :manage_grades, :view_all_grades)
           end
         end
       },
@@ -214,6 +214,7 @@ RSpec.shared_examples "DiscussionType" do
     expect(discussion_type.resolve("delayedPostAt")).to eq discussion.delayed_post_at
     expect(discussion_type.resolve("lockAt")).to eq discussion.lock_at
     expect(discussion_type.resolve("userCount")).to eq discussion.course.users.count
+    expect(discussion_type.resolve("replyToEntryRequiredCount")).to eq discussion.reply_to_entry_required_count
   end
 
   it "orders root_entries by last_reply_at" do
@@ -411,8 +412,8 @@ RSpec.shared_examples "DiscussionType" do
       )
     end
 
-    it "author is nil" do
-      expect(@anon_discussion_type.resolve("author { shortName }")).to be_nil
+    it "teacher author is not nil" do
+      expect(@anon_discussion_type.resolve("author { shortName }")).to eq @teacher.short_name
     end
 
     it "editor is nil" do
@@ -692,6 +693,16 @@ describe Types::DiscussionType do
       expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("availableForUser")).to be true
     end
 
+    it "returns the correct data for a discussion that is closed for comments" do
+      discussion.lock!
+      course_with_student(course: discussion.context)
+      allow_any_instantiation_of(discussion).to receive(:locked_for?)
+        .with(@student, check_policies: true)
+        .and_return({ can_view: true })
+
+      expect(GraphQLTypeTester.new(discussion, current_user: @student).resolve("message")).to eq discussion.message
+    end
+
     describe "delayed post" do
       before do
         @delayed_discussion = DiscussionTopic.create!(title: "Welcome whoever you are",
@@ -724,8 +735,8 @@ describe Types::DiscussionType do
         expect(@delayed_type_with_teacher.resolve("title")).to eq @delayed_discussion.title
       end
 
-      it "returns nil for message and emtpy entries array for student" do
-        expect(@delayed_type_with_student.resolve("message")).to be_nil
+      it "returns lock_reason for message and emtpy entries array for student" do
+        expect(@delayed_type_with_student.resolve("message")).not_to eq @delayed_discussion.message
         expect(@delayed_type_with_student.resolve("discussionEntriesConnection { nodes { message } }")).to eq []
       end
 
@@ -745,6 +756,35 @@ describe Types::DiscussionType do
         expect(@past_delayed_type_with_student.resolve("discussionEntriesConnection { nodes { message } }").count).to eq 1
       end
     end
+
+    describe "discussion user roles" do
+      before do
+        authored_discussion = DiscussionTopic.create!(title: "Welcome whoever you are",
+                                                      message: "authored",
+                                                      context: @course,
+                                                      user: @teacher,
+                                                      editor: @teacher)
+        @discusion_teacher_author = GraphQLTypeTester.new(authored_discussion, current_user: @teacher, request: ActionDispatch::TestRequest.create)
+      end
+
+      it "finds author course roles without extra variables" do
+        expect(@discusion_teacher_author.resolve("author { courseRoles }")).to eq(["TeacherEnrollment"])
+      end
+
+      it "finds editor course roles without extra variables" do
+        expect(@discusion_teacher_author.resolve("editor { courseRoles }")).to eq(["TeacherEnrollment"])
+      end
+
+      it "finds the author htmlUrl without extra variables" do
+        expected_url = "http://test.host/courses/#{@course.id}/users/#{@teacher.id}"
+        expect(@discusion_teacher_author.resolve("author { htmlUrl }")).to eq(expected_url)
+      end
+
+      it "finds the editor htmlUrl without extra variables" do
+        expected_url = "http://test.host/courses/#{@course.id}/users/#{@teacher.id}"
+        expect(@discusion_teacher_author.resolve("editor { htmlUrl }")).to eq(expected_url)
+      end
+    end
   end
 
   context "group discussion" do
@@ -756,6 +796,14 @@ describe Types::DiscussionType do
         expect(discussion_type.resolve("mentionableUsersConnection { nodes { _id } }")).to eq(discussion.context.participating_users_in_context.map { |u| u.id.to_s })
       end
     end
+
+    it "returns can_group correctly" do
+      student_in_course(active_all: true)
+      expect(discussion_type.resolve("canGroup")).to be true
+
+      discussion.discussion_entries.create!(message: "other student entry", user: @student)
+      expect(discussion_type.resolve("canGroup")).to be false
+    end
   end
 
   context "group discussion with deleted group" do
@@ -764,6 +812,65 @@ describe Types::DiscussionType do
 
     it "doesn't show child topic associated to a deleted group" do
       expect(discussion_type.resolve("childTopics { contextName }")).to match_array(["group 1", "group 2"])
+    end
+  end
+
+  context "discussion within modules" do
+    before do
+      student_in_course(active_all: true)
+      @topic = @course.discussion_topics.create!(
+        title: "Ya Ya Ding Dong",
+        user: @teacher,
+        message: "By Will Ferrell and My Marianne",
+        workflow_state: "published"
+      )
+      @context_module = @course.context_modules.create!(name: "some module")
+      @context_module.unlock_at = Time.now + 1.day
+      @context_module.add_item(type: "discussion_topic", id: @topic.id)
+      @context_module.save!
+    end
+
+    it "returns module lock information" do
+      type_with_student = GraphQLTypeTester.new(@topic, current_user: @student)
+      resolved_message = type_with_student.resolve("message")
+
+      canvaslms_url = resolved_message.match(/x-canvaslms-trusted-url='([^']+)'/)
+      expect(canvaslms_url[1]).to include("/courses/#{@course.id}/modules/#{@context_module.id}/prerequisites/discussion_topic_#{@topic.id}")
+      expect(resolved_message).to include("id='module_prerequisites_lookup_link'")
+    end
+
+    it "does not return locked module information when you are the teacher" do
+      teacher_type = GraphQLTypeTester.new(@topic, current_user: @teacher)
+      expect(teacher_type.resolve("message")).to eq @topic.message
+    end
+  end
+
+  context "editing group category id" do
+    it "changing group category id returns only group new group child topics" do
+      course = @course || course_factory(active_all: true)
+
+      discussion = course.discussion_topics.build(title: "topic")
+      discussion.save!
+
+      group_category_a = course.group_categories.create(name: "category_a", context: course, context_type: "Course", account: course.account)
+      group_category_a.groups.create!(name: "group 1a", context: course, context_type: "Course", account: course.account)
+      group_category_a.groups.create!(name: "group 2a", context: course, context_type: "Course", account: course.account)
+
+      group_category_b = course.group_categories.create(name: "category_b", context: course, context_type: "Course", account: course.account)
+      group_category_b.groups.create!(name: "group 1b", context: course, context_type: "Course", account: course.account)
+      group_category_b.groups.create!(name: "group 2b", context: course, context_type: "Course", account: course.account)
+
+      discussion.group_category = group_category_a
+      discussion.save!
+
+      discussion_type = GraphQLTypeTester.new(discussion, current_user: @teacher)
+
+      expect(discussion_type.resolve("childTopics { contextName }")).to match_array(["group 1a", "group 2a"])
+
+      discussion.group_category = group_category_b
+      discussion.save!
+
+      expect(discussion_type.resolve("childTopics { contextName }")).to match_array(["group 1b", "group 2b"])
     end
   end
 

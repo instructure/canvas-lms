@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
 require "rrule"
 
 # @API Calendar Events
@@ -187,19 +186,19 @@ require "rrule"
 #           "type": "boolean"
 #         },
 #         "series_uuid": {
-#           "description": "Identifies the recurring event series this event may belong to",
+#           "description": "Identifies the recurring event series this event may belong to.",
 #           "type": "uuid"
 #         },
 #         "rrule": {
-#           "description": "An iCalendar RRULE for defining how events in a recurring event series repeat. Valid if the calendar_series flag is enabled",
+#           "description": "An iCalendar RRULE for defining how events in a recurring event series repeat.",
 #           "type": "string"
 #         },
 #         "series_head": {
-#            "description": "Boolean indicating if is the first event in the series of recurring events. Valid if the calendar_series flag is enabled",
+#            "description": "Boolean indicating if is the first event in the series of recurring events.",
 #            "type": "boolean"
 #         },
 #         "series_natural_language": {
-#            "description": "A natural language expression of how events occur in the series. Valid if the calendar_series flag is enabled",
+#            "description": "A natural language expression of how events occur in the series.",
 #            "type": "string",
 #            "example": "Daily 5 times"
 #         },
@@ -301,16 +300,16 @@ require "rrule"
 #           "type": "boolean"
 #         },
 #         "rrule": {
-#           "description": "An iCalendar RRULE for defining how events in a recurring event series repeat. Valid if the calendar_series flag is enabled",
+#           "description": "An iCalendar RRULE for defining how events in a recurring event series repeat.",
 #           "type": "string",
 #           "example": "FREQ=DAILY;INTERVAL=1;COUNT=5"
 #         },
 #         "series_head": {
-#            "description": "Trueif this is the first event in the series of recurring events. Valid if the calendar_series flag is enabled",
+#            "description": "Trueif this is the first event in the series of recurring events.",
 #            "type": "boolean"
 #         },
 #         "series_natural_language": {
-#            "description": "A natural language expression of how events occur in the series. Valid if the calendar_series flag is enabled",
+#            "description": "A natural language expression of how events occur in the series.",
 #            "type": "string",
 #            "example": "Daily 5 times"
 #         }
@@ -359,7 +358,7 @@ class CalendarEventsApiController < ApplicationController
   # @argument excludes[] [Array]
   #   Array of attributes to exclude. Possible values are "description", "child_events" and "assignment"
   # @argument includes[] [Array]
-  #   Array of optional attributes to include. Possible values are "web_conference" and if calendar_series flag is on, "series_natural_language"
+  #   Array of optional attributes to include. Possible values are "web_conference" and "series_natural_language"
   # @argument important_dates [Boolean]
   #   Defaults to false.
   #   If true, only events with important dates set to true will be returned.
@@ -408,7 +407,7 @@ class CalendarEventsApiController < ApplicationController
   #   When type is "assignment", specifies the submission types to be excluded from the returned
   #   assignments. Ignored if type is not "assignment".
   # @argument includes[] [Array]
-  #   Array of optional attributes to include. Possible values are "web_conference" and if the calendar_series flag is on, "series_natural_language"
+  #   Array of optional attributes to include. Possible values are "web_conference" and "series_natural_language"
   # @argument important_dates [Boolean]
   #   Defaults to false
   #   If true, only events with important dates set to true will be returned.
@@ -523,9 +522,7 @@ class CalendarEventsApiController < ApplicationController
   #   Defaults to false.  If set to `true`, an increasing counter number will be appended to the event title
   #   when the event is duplicated.  (e.g. Event 1, Event 2, Event 3, etc)
   # @argument calendar_event[rrule] [string]
-  #   If the calendar_series flag is enabled,
-  #   this parameter replaces the calendar_event's duplicate parameter to
-  #   create a series of recurring events.
+  #   The recurrence rule to create a series of recurring events.
   #   Its value is the {https://icalendar.org/iCalendar-RFC-5545/3-8-5-3-recurrence-rule.html iCalendar RRULE}
   #   defining how the event repeats. Unending series not supported.
   # @argument calendar_event[blackout_date] [Boolean]
@@ -567,7 +564,7 @@ class CalendarEventsApiController < ApplicationController
       event_type_tag = nil
       rrule = params_for_create[:rrule]
       # Create multiple events if necessary
-      if rrule.present? && Account.site_admin.feature_enabled?(:calendar_series)
+      if rrule.present?
         start_at = Time.parse(params_for_create[:start_at]) if params_for_create[:start_at]
         rr = validate_and_parse_rrule(
           rrule,
@@ -734,13 +731,11 @@ class CalendarEventsApiController < ApplicationController
   # @argument calendar_event[child_event_data][X][context_code] [String]
   #   Context code(s) corresponding to the section-level start and end time(s).
   # @argument calendar_event[rrule] [Optional, String]
-  #   Valid if the calendar_series feature is enabled and the event whose
-  #   ID is in the URL is part of a series.
+  #   Valid if the event whose ID is in the URL is part of a series.
   #   This defines the shape of the recurring event series after it's updated.
   #   Its value is the iCalendar RRULE. Unending series are not supported.
   # @argument which [Optional, String, "one"|"all"|"following"]
-  #   Valid if the calendar_series feature is enabled and the event whose
-  #   ID is in the URL is part of a series.
+  #   Valid if the event whose ID is in the URL is part of a series.
   #   Update just the event whose ID is in in the URL, all events
   #   in the series, or the given event and all those following.
   #   Some updates may create a new series. For example, changing the start time
@@ -798,13 +793,11 @@ class CalendarEventsApiController < ApplicationController
         params_for_update[:web_conference] = web_conference
       end
 
-      if Account.site_admin.feature_enabled?(:calendar_series)
-        if @event[:series_uuid].nil? && params_for_update[:rrule].present?
-          series_event = change_to_series_event(@event, params_for_update)
-          return update_from_series(series_event, params_for_update, "all")
-        elsif @event[:series_uuid].present?
-          return update_from_series(@event, params_for_update, params[:which])
-        end
+      if @event[:series_uuid].nil? && params_for_update[:rrule].present?
+        series_event = change_to_series_event(@event, params_for_update)
+        return update_from_series(series_event, params_for_update, "all")
+      elsif @event[:series_uuid].present?
+        return update_from_series(@event, params_for_update, params[:which])
       end
 
       if @event.update(params_for_update)
@@ -822,8 +815,7 @@ class CalendarEventsApiController < ApplicationController
   # @argument cancel_reason [String]
   #   Reason for deleting/canceling the event.
   # @argument which [Optional, String, "one"|"all"|"following"]
-  #   Valid if the calendar_series feature is enabled and the
-  #   event whose ID is in the URL is part of a series.
+  #   Valid if the event whose ID is in the URL is part of a series.
   #   Delete just the event whose ID is in in the URL, all events
   #   in the series, or the given event and all those following.
   #
@@ -836,7 +828,7 @@ class CalendarEventsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def destroy
     get_event
-    if @event.series_uuid.present? && Account.site_admin.feature_enabled?(:calendar_series)
+    if @event.series_uuid.present?
       destroy_from_series
       return
     end
@@ -949,9 +941,11 @@ class CalendarEventsApiController < ApplicationController
   #
   def update_from_series(target_event, params_for_update, which)
     which ||= "one"
-    params_for_update[:rrule] ||= target_event.rrule
-    rrule = params_for_update[:rrule]
+    rrule = params_for_update.key?(:rrule) ? params_for_update[:rrule] : target_event.rrule
     rrule_changed = rrule != target_event[:rrule]
+    # If a nil RRULE is explicitly passed in params and the event had a valid RRULE the series will be converted to a single event
+    change_to_single_event = rrule_changed && params_for_update.key?(:rrule) && params_for_update[:rrule].blank?
+    params_for_update[:rrule] ||= rrule
     params_for_update[:series_uuid] ||= target_event.series_uuid
     params_for_update[:start_at] ||= target_event.start_at.iso8601
     params_for_update[:end_at] ||= target_event.end_at.iso8601
@@ -973,7 +967,7 @@ class CalendarEventsApiController < ApplicationController
       end
     end
 
-    if which == "one"
+    if which == "one" && !change_to_single_event
       if target_event.workflow_state == "locked"
         render json: { message: t("You may not update a locked event") }, status: :bad_request
         return
@@ -1008,12 +1002,16 @@ class CalendarEventsApiController < ApplicationController
     end
     duration = first_end_at - first_start_at
 
-    rr = validate_and_parse_rrule(
-      rrule,
-      dtstart: first_start_at,
-      tzid: tz&.tzinfo&.name || "UTC"
-    )
-    return false if rr.nil?
+    # An RRULE is not present if the series will be converted to a single event
+    rr = nil
+    if rrule.present?
+      rr = validate_and_parse_rrule(
+        rrule,
+        dtstart: first_start_at,
+        tzid: tz&.tzinfo&.name || "UTC"
+      )
+      return false if rr.nil?
+    end
 
     params_for_update_front_half = nil
     front_half_events = []
@@ -1037,8 +1035,8 @@ class CalendarEventsApiController < ApplicationController
     error = nil
     CalendarEvent.skip_touch_context
     CalendarEvent.transaction do
-      dtstart_list = rr.all(limit: update_limit)
-      if events.length > dtstart_list.length
+      dtstart_list = rr.present? ? rr.all(limit: update_limit) : []
+      if rr.present? && events.length > dtstart_list.length
         # truncate the list of events we're updating to how many
         # we'll end up with given the (possible updated) rrule
         events.drop(dtstart_list.length).each do |event|
@@ -1086,6 +1084,30 @@ class CalendarEventsApiController < ApplicationController
             raise ActiveRecord::Rollback
           end
         end
+      end
+
+      # For convert series to single event, all the series event will be removed except the target event
+      if change_to_single_event
+        params_for_update[:series_head] = false
+        params_for_update[:series_uuid] = nil
+        params_for_update[:rrule] = nil
+        unless target_event.update(params_for_update)
+          error = { message: t("Failed updating an event in the series, update not saved") }
+          raise ActiveRecord::Rollback
+        end
+
+        (events - [target_event]).each do |event|
+          unless event.grants_any_right?(@current_user, session, :delete)
+            error = { message: t("Failed deleting an event from the series, update not saved"), status: :unauthorized }
+            raise ActiveRecord::Rollback
+          end
+
+          unless event.destroy
+            error = { message: t("Failed deleting an event from the series, update not saved") }
+            raise ActiveRecord::Rollback
+          end
+        end
+        events = [target_event]
       end
 
       # if we updated this-and-all-following, we had to update the front half's rrule
@@ -1164,8 +1186,8 @@ class CalendarEventsApiController < ApplicationController
       # if the feed url included the information on the requesting user,
       # we can properly filter calendar events to the user's course sections
       @type = :feed
-      @start_date = Setting.get("calendar_feed_previous_days", "30").to_i.days.ago
-      @end_date = Setting.get("calendar_feed_upcoming_days", "366").to_i.days.from_now
+      @start_date = 30.days.ago
+      @end_date = 366.days.from_now
 
       get_options(nil)
 
@@ -1266,16 +1288,14 @@ class CalendarEventsApiController < ApplicationController
         render plain: calendar.to_ical
       end
       format.atom do
-        feed = Atom::Feed.new do |f|
-          f.title = t :feed_title, "%{course_or_group_name} Calendar Feed", course_or_group_name: @context.name
-          f.links << Atom::Link.new(href: calendar_url_for(@context), rel: "self")
-          f.updated = Time.now
-          f.id = calendar_url_for(@context)
+        title = t :feed_title, "%{course_or_group_name} Calendar Feed", course_or_group_name: @context.name
+        link = calendar_url_for(@context)
+
+        feed_xml = AtomFeedHelper.render_xml(title:, link:, entries: @events) do |e|
+          { exclude_description: !!e.try(:locked_for?, @current_user) }
         end
-        @events.each do |e|
-          feed.entries << e.to_atom(exclude_description: !!e.try(:locked_for?, @current_user))
-        end
-        render plain: feed.to_xml
+
+        render plain: feed_xml
       end
     end
   end
@@ -1293,7 +1313,9 @@ class CalendarEventsApiController < ApplicationController
         name: context.nickname_for(@current_user),
         asset_string: context.asset_string,
         color: @current_user.custom_colors[context.asset_string],
-        selected: selected_contexts.include?(context.asset_string)
+        selected: selected_contexts.include?(context.asset_string),
+        allow_observers_in_appointment_groups: context.is_a?(Course) && context.account.allow_observers_in_appointment_groups?,
+        can_create_appointment_groups: context.is_a?(Course) && context.grants_right?(@current_user, session, :manage_calendar)
       }
 
       if context.is_a?(Course)
@@ -1303,6 +1325,7 @@ class CalendarEventsApiController < ApplicationController
             name: section.name,
             asset_string: section.asset_string,
             selected: selected_contexts.include?(section.asset_string),
+            can_create_appointment_groups: section.grants_right?(@current_user, session, :manage_calendar)
           }
         end
       end
@@ -1873,9 +1896,8 @@ class CalendarEventsApiController < ApplicationController
   end
 
   ###### recurring event series #######
-  # once the calendar_series flag is turned on in prod
-  # the above code for duplicate events can be removed
-  # along with the flag
+  # once duplicate events are implemented for section events,
+  # the above code can be removed
   #####################################
   def create_event_series(event_attributes, rrule)
     @context ||= @current_user

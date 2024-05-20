@@ -28,23 +28,18 @@ describe OutcomesServiceAlignmentsHelper do
     course_model
     @outcome1 = outcome_model(context: @course, title: "outcome 1 aligned in OS")
     @outcome2 = outcome_model(context: @course, title: "outcome 2 aligned in OS")
-    @account_outcome = outcome_model(context: @course.account, title: "account outcome aligned to Item Bank")
     @new_quiz1 = @course.assignments.create!(title: "new quiz 1 - aligned in OS", submission_types: "external_tool")
     @new_quiz2 = @course.assignments.create!(title: "new quiz 2 - aligned in OS", submission_types: "external_tool")
   end
 
   let(:account) { @course.account }
-  let(:response_with_outcomes) { mock_aligned_outcomes_response([@outcome1, @outcome2], [@new_quiz1, @new_quiz2], []) }
-  let(:response_with_account_outcome) { mock_aligned_outcomes_response([@account_outcome], [@new_quiz1], []) }
-  let(:response_no_outcomes) { mock_aligned_outcomes_response([], [], []) }
-  let(:response_for_item_banks) { mock_aligned_outcomes_response([@account_outcome], [], [1]) }
+  let(:response_with_outcomes) { mock_aligned_outcomes_response([@outcome1, @outcome2], [@new_quiz1, @new_quiz2]) }
+  let(:response_no_outcomes) { mock_aligned_outcomes_response([], []) }
   let(:minified_response_with_outcomes) { mock_minified_aligned_outcomes_response(response_with_outcomes) }
   let(:minified_response_no_outcomes) { mock_minified_aligned_outcomes_response(response_no_outcomes) }
-  let(:minified_response_for_item_banks) { mock_minified_aligned_outcomes_response(response_for_item_banks) }
-  let(:minified_response_with_account_outcome) { mock_minified_aligned_outcomes_response(response_with_account_outcome) }
   let(:cache_key) { [:os_aligned_outcomes, :account_uuid, account.uuid, :context_uuid, @course.uuid, :context_id, @course.id] }
-  let(:minified_response_with_active_outcomes) { mock_minified_aligned_outcomes_response(mock_aligned_outcomes_response([@outcome1], [@new_quiz1, @new_quiz2], [])) }
-  let(:minified_response_with_active_quizzes) { mock_minified_aligned_outcomes_response(mock_aligned_outcomes_response([@outcome1, @outcome2], [@new_quiz1], [])) }
+  let(:minified_response_with_active_outcomes) { mock_minified_aligned_outcomes_response(mock_aligned_outcomes_response([@outcome1], [@new_quiz1, @new_quiz2])) }
+  let(:minified_response_with_active_quizzes) { mock_minified_aligned_outcomes_response(mock_aligned_outcomes_response([@outcome1, @outcome2], [@new_quiz1])) }
   let(:first_page_results_with_outcomes) { { results: minified_response_with_outcomes, total_pages: 2 } }
   let(:first_page_results_without_outcomes) { { results: minified_response_no_outcomes, total_pages: 1 } }
   let(:context) { @course }
@@ -66,29 +61,7 @@ describe OutcomesServiceAlignmentsHelper do
             })
   end
 
-  def mock_aligned_outcomes_response(outcomes, quizzes, banks)
-    quiz_alignments = (quizzes || []).map.with_index do |q, ind|
-      {
-        artifact_type: "quizzes.quiz",
-        artifact_id: (ind + 1).to_s,
-        associated_asset_type: "canvas.assignment.quizzes",
-        associated_asset_id: q.id.to_s,
-        title: ""
-      }
-    end
-
-    bank_alignments = (banks || []).map do |bank_id|
-      {
-        artifact_type: "quizzes.item",
-        artifact_id: bank_id,
-        associated_asset_type: nil,
-        associated_asset_id: nil,
-        title: ""
-      }
-    end
-
-    alignments = quiz_alignments + bank_alignments
-
+  def mock_aligned_outcomes_response(outcomes, quizzes)
     [[
       :outcomes,
       (outcomes || [])
@@ -98,7 +71,15 @@ describe OutcomesServiceAlignmentsHelper do
             id: idx + 1,
             external_id: o.id.to_s,
             title: o.short_description,
-            alignments:
+            alignments: (quizzes || []).map.with_index do |q, ind|
+                          {
+                            artifact_type: "quizzes.quiz",
+                            artifact_id: (ind + 1).to_s,
+                            associated_asset_type: "canvas.assignment.quizzes",
+                            associated_asset_id: q.id.to_s,
+                            title: ""
+                          }
+                        end
           }
         end
     ]].to_h
@@ -147,10 +128,10 @@ describe OutcomesServiceAlignmentsHelper do
         it "returns all results when multiple pages of results" do
           outcomes = (1..60).map { |num| outcome_model(context: @course, title: "outcome #{num} aligned in OS") }
 
-          mocked_response = mock_aligned_outcomes_response(outcomes, [@new_quiz1, @new_quiz2], [])
-          mocked_response_1 = mock_aligned_outcomes_response(outcomes.slice(0, 25), [@new_quiz1, @new_quiz2], [])
-          mocked_response_2 = mock_aligned_outcomes_response(outcomes.slice(25, 25), [@new_quiz1, @new_quiz2], [])
-          mocked_response_3 = mock_aligned_outcomes_response(outcomes.slice(50, 10), [@new_quiz1, @new_quiz2], [])
+          mocked_response = mock_aligned_outcomes_response(outcomes, [@new_quiz1, @new_quiz2])
+          mocked_response_1 = mock_aligned_outcomes_response(outcomes.slice(0, 25), [@new_quiz1, @new_quiz2])
+          mocked_response_2 = mock_aligned_outcomes_response(outcomes.slice(25, 25), [@new_quiz1, @new_quiz2])
+          mocked_response_3 = mock_aligned_outcomes_response(outcomes.slice(50, 10), [@new_quiz1, @new_quiz2])
           mocked_minified_response = mock_minified_aligned_outcomes_response(mocked_response)
 
           stub_get_aligned_outcomes.to_return(status: 200, body: mocked_response_1.to_json, headers: { "Total-Pages": 3 })
@@ -276,71 +257,6 @@ describe OutcomesServiceAlignmentsHelper do
         stub_get_aligned_outcomes(page: 2).to_return(status: [500, "Internal Server Error"])
         expect { subject.make_paginated_request(context:, scope:, endpoint:, params:) }
           .to raise_error(CanvasOutcomesHelper::OSFetchError)
-      end
-    end
-  end
-
-  describe "#can_unlink?" do
-    it "returns false if can_manage is false" do
-      out_link = ContentTag.find_by(content_id: @outcome1.id, content_type: "LearningOutcome", context_id: @course.id, context_type: "Course")
-      expect(subject.can_unlink?(out_link, can_manage: false)).to be false
-    end
-
-    it "returns false if can_destroy? is false" do
-      allow_any_instance_of(ContentTag).to receive(:can_destroy?).and_return(false)
-      out_link = ContentTag.find_by(content_id: @outcome1.id, content_type: "LearningOutcome", context_id: @course.id, context_type: "Course")
-      expect(subject.can_unlink?(out_link)).to be false
-    end
-
-    context "checks OS for active alignments in a course context" do
-      before do
-        allow_any_instance_of(ContentTag).to receive(:can_destroy?).and_return(true)
-      end
-
-      it "returns false if there are active alignments in OS" do
-        allow_any_instance_of(OutcomesServiceAlignmentsHelper)
-          .to receive(:get_os_aligned_outcomes)
-          .and_return(minified_response_with_outcomes)
-        out_link = ContentTag.find_by(content_id: @outcome1.id, content_type: "LearningOutcome", context_id: @course.id, context_type: "Course")
-        expect(subject.can_unlink?(out_link)).to be false
-      end
-
-      it "returns true if there are no active alignments in OS" do
-        allow_any_instance_of(OutcomesServiceAlignmentsHelper)
-          .to receive(:get_os_aligned_outcomes)
-          .and_return(minified_response_no_outcomes)
-        out_link = ContentTag.find_by(content_id: @outcome1.id, content_type: "LearningOutcome", context_id: @course.id, context_type: "Course")
-        expect(subject.can_unlink?(out_link)).to be true
-      end
-
-      it "returns true if there are only alignments to an Item Bank that is not used in a quiz" do
-        allow_any_instance_of(OutcomesServiceAlignmentsHelper)
-          .to receive(:get_os_aligned_outcomes)
-          .and_return(minified_response_for_item_banks)
-        @course.root_outcome_group.add_outcome(@account_outcome)
-        out_link = ContentTag.find_by(content_id: @account_outcome.id, content_type: "LearningOutcome", context_id: @course.id, context_type: "Course")
-        expect(subject.can_unlink?(out_link)).to be true
-      end
-
-      it "returns true if the alignment returned is to a deleted quiz" do
-        allow_any_instance_of(OutcomesServiceAlignmentsHelper)
-          .to receive(:get_os_aligned_outcomes)
-          .and_return(minified_response_with_account_outcome)
-        @course.root_outcome_group.add_outcome(@account_outcome)
-        out_link = ContentTag.find_by(content_id: @account_outcome.id, content_type: "LearningOutcome", context_id: @course.id, context_type: "Course")
-        @new_quiz1.destroy
-        expect(subject.can_unlink?(out_link)).to be true
-      end
-    end
-
-    context "checks OS for active alignments in an account context" do
-      it "returns false if there are alignments to Item Banks at the account level" do
-        allow_any_instance_of(ContentTag).to receive(:can_destroy?).and_return(true)
-        allow_any_instance_of(OutcomesServiceAlignmentsHelper)
-          .to receive(:get_os_aligned_outcomes)
-          .and_return(minified_response_for_item_banks)
-        out_link = ContentTag.find_by(content_id: @account_outcome.id, content_type: "LearningOutcome", context_id: @course.account.id, context_type: "Account")
-        expect(subject.can_unlink?(out_link)).to be false
       end
     end
   end

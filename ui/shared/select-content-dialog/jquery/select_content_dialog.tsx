@@ -27,27 +27,28 @@ import splitAssetString from '@canvas/util/splitAssetString'
 import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
 import BaseUploader from '@canvas/files/react/modules/BaseUploader'
 import UploadQueue from '@canvas/files/react/modules/UploadQueue'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import SelectContent from '../select_content'
 import setDefaultToolValues from '../setDefaultToolValues'
 import {findLinkForService, getUserServices} from '@canvas/services/findLinkForService'
-import '@canvas/datetime' /* datetime_field */
+import '@canvas/datetime/jquery' /* datetime_field */
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, ajaxJSONFiles, getFormData, errorBox */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, ajaxJSONFiles, getFormData, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
-import '@canvas/keycodes'
+import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
-import {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
+import type {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
 import {contentItemProcessorPrechecks} from '@canvas/deep-linking/ContentItemProcessor'
-import {ResourceLinkContentItem} from '@canvas/deep-linking/models/ResourceLinkContentItem'
-import {EnvContextModules} from '@canvas/global/env/EnvContextModules'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {ResourceLinkContentItem} from '@canvas/deep-linking/models/ResourceLinkContentItem'
+import type {EnvContextModules} from '@canvas/global/env/EnvContextModules'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import replaceTags from '@canvas/util/replaceTags'
+import {EXTERNAL_CONTENT_READY, EXTERNAL_CONTENT_CANCEL} from '@canvas/external-tools/messages'
 
 // @ts-expect-error
 if (!('INST' in window)) window.INST = {}
@@ -193,9 +194,9 @@ export const ltiPostMessageHandler = (tool: LtiLaunchDefinition) => (event: Mess
   if (event.origin === ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN && event.data) {
     if (event.data.subject === 'LtiDeepLinkingResponse') {
       deepLinkingResponseHandler(event)
-    } else if (event.data.subject === 'externalContentReady') {
+    } else if (event.data.subject === EXTERNAL_CONTENT_READY) {
       externalContentReadyHandler(event, tool)
-    } else if (event.data.subject === 'externalContentCancel') {
+    } else if (event.data.subject === EXTERNAL_CONTENT_CANCEL) {
       $('#resource_selection_dialog').dialog('close')
     }
   }
@@ -418,6 +419,8 @@ export const Events = {
               window.addEventListener('message', ltiPostMessageHandlerForTool)
             },
             title: I18n.t('link_from_external_tool', 'Link Resource from External Tool'),
+            modal: true,
+            zIndex: 1000,
           })
           .bind('dialogresize', function () {
             $(this)
@@ -465,6 +468,7 @@ export const Events = {
       url = url + '?placement=' + placement_type + '&secure_params=' + $('#secure_params').val()
       if ($('#select_context_content_dialog').data('context_module_id')) {
         url += '&context_module_id=' + $('#select_context_content_dialog').data('context_module_id')
+        url += '&com_instructure_course_canvas_resource_type=context_module.external_tool'
       }
       $dialog.find('#resource_selection_iframe').attr({src: url, title: tool.name})
       $(window).on('beforeunload', beforeUnloadHandler)
@@ -501,7 +505,7 @@ export function extractContextExternalToolItemData() {
   return {
     'item[type]': tool_type,
     'item[id]': tool_id,
-    'item[new_tab]': $('#external_tool_create_new_tab').attr('checked') ? '1' : '0',
+    'item[new_tab]': $('#external_tool_create_new_tab').prop('checked') ? '1' : '0',
     'item[indent]': $('#content_tag_indent').val(),
     'item[url]': $('#external_tool_create_url').val(),
     'item[title]': $('#external_tool_create_title').val(),
@@ -601,6 +605,8 @@ export const selectContentDialog = function (options?: SelectContentDialogOption
         }
         upload_form?.onClose()
       },
+      modal: true,
+      zIndex: 1000,
     })
     .fixDialogButtons()
 
@@ -657,7 +663,7 @@ $(document).ready(function () {
         'item[id]': $(
           '#select_context_content_dialog .module_item_option:visible:first .module_item_select'
         ).val(),
-        'item[new_tab]': $('#external_url_create_new_tab').attr('checked') ? '1' : '0',
+        'item[new_tab]': $('#external_url_create_new_tab').prop('checked') ? '1' : '0',
         'item[indent]': $('#content_tag_indent').val(),
       }
 

@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import registrationErrors from '@canvas/normalize-registration-errors'
 import preventDefault from '@canvas/util/preventDefault'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* getFormData, formErrors */
+import '@canvas/jquery/jquery.instructure_forms' /* getFormData, formErrors */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 import '@canvas/user-sortable-name'
 
@@ -45,7 +45,7 @@ $(() => {
   })
 
   $('input:radio[name="pseudonym_select"]').change(() =>
-    $merge_link.attr('href', $('input:radio[name="pseudonym_select"]:checked').attr('value'))
+    $merge_link.attr('href', $('input:radio[name="pseudonym_select"]:checked').prop('value'))
   )
 
   const $where_to_log_in = $('#where_to_log_in')

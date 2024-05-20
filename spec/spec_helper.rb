@@ -31,6 +31,7 @@ rescue LoadError
 end
 
 require "crystalball"
+require "rspec/openapi"
 
 ENV["RAILS_ENV"] = "test"
 
@@ -106,6 +107,7 @@ require "sharding_spec_helper"
 # let/before/example
 TestDatabaseUtils.reset_database! unless ENV["DB_VALIDITY_ENSURED"] == "1"
 TestDatabaseUtils.check_migrations! unless ENV["DB_VALIDITY_ENSURED"] == "1"
+Setting.reset_cache!
 BlankSlateProtection.install!
 GreatExpectations.install!
 
@@ -416,7 +418,11 @@ RSpec.configure do |config|
   config.fail_if_no_examples = true
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures = false
-  config.fixture_path = Rails.root.join("spec/fixtures")
+  if $canvas_rails == "7.0"
+    config.fixture_path = Rails.root.join("spec/fixtures")
+  else
+    config.fixture_paths = [Rails.root.join("spec/fixtures")]
+  end
   config.infer_spec_type_from_file_location!
   config.raise_errors_for_deprecations!
   config.color = true
@@ -451,11 +457,29 @@ RSpec.configure do |config|
     end
   end
 
+  if ENV["OPENAPI"]
+    config.define_derived_metadata(file_path: %r{spec/controllers}) do |metadata|
+      metadata[:attempt_openapi_generation] = true
+    end
+
+    config.after(:example, :attempt_openapi_generation) do |example|
+      OpenApiGenerator.generate(self, example)
+    end
+
+    config.after(:suite) do
+      result_recorder = RSpec::OpenAPI::ResultRecorder.new(RSpec::OpenAPI.path_records)
+      result_recorder.record_results!
+      if result_recorder.errors?
+        error_message = result_recorder.error_message
+        colorizer = RSpec::Core::Formatters::ConsoleCodes
+        RSpec.configuration.reporter.message colorizer.wrap(error_message, :failure)
+      end
+    end
+  end
+
   config.around do |example|
     Rails.logger.info "STARTING SPEC #{example.full_description}"
-    SpecTimeLimit.enforce(example) do
-      example.run
-    end
+    SpecTimeLimit.enforce(example, &example)
   end
 
   def reset_all_the_things!
@@ -613,7 +637,7 @@ RSpec.configure do |config|
   end
 
   def fixture_file_upload(path, mime_type = nil, binary = false)
-    Rack::Test::UploadedFile.new(File.join(RSpec.configuration.fixture_path, path), mime_type, binary)
+    Rack::Test::UploadedFile.new(file_fixture(path), mime_type, binary)
   end
 
   def default_uploaded_data

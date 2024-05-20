@@ -56,11 +56,11 @@ describe('SearchSpan', () => {
     expect(queryAllByTestId('highlighted-search-item').length).toBe(2)
   })
 
-  it('should not highlight when in isolated view', () => {
+  it('should not highlight when in split screen view', () => {
     const {queryAllByTestId} = setup({
       searchTerm: 'here',
       text: 'here and HeRe',
-      isIsolatedView: true,
+      isSplitView: true,
     })
     expect(queryAllByTestId('highlighted-search-item').length).toBe(0)
   })
@@ -89,5 +89,13 @@ describe('SearchSpan', () => {
     expect(container.queryAllByTestId('highlighted-search-item').length).toBe(1)
     // The iframe html tag wasn't removed
     expect(container.container.innerHTML).toContain('<iframe')
+  })
+
+  it('should handle special characters in searchTerm', () => {
+    const {queryAllByTestId} = setup({
+      searchTerm: '(',
+      text: 'This is a (here) test with (here) special characters',
+    })
+    expect(queryAllByTestId('highlighted-search-item').length).toBe(2)
   })
 })

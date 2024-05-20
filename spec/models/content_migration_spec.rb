@@ -759,12 +759,13 @@ describe ContentMigration do
 
     expect(cm.migration_issues).to be_empty
     quiz = @course.quizzes.available.first
+    att_to = @course.attachments.find_by(filename: "m-5U5Jww6HL7zG35CgyaYGyA5bhzsremxY.flv")
     expect(quiz.quiz_data).to be_present
-    expect(quiz.quiz_data.to_yaml).to include("/media_objects/m-5U5Jww6HL7zG35CgyaYGyA5bhzsremxY")
+    expect(quiz.quiz_data.to_yaml).to include("/media_attachments_iframe/#{att_to.id}")
 
     qq = quiz.quiz_questions.first
     expect(qq.question_data).to be_present
-    expect(qq.question_data.to_yaml).to include("/media_objects/m-5U5Jww6HL7zG35CgyaYGyA5bhzsremxY")
+    expect(qq.question_data.to_yaml).to include("/media_attachments_iframe/#{att_to.id}")
   end
 
   context "migrations with skip_job_progress enabled" do
@@ -842,7 +843,7 @@ describe ContentMigration do
 
   it "delays queueing imports if one in course is already running" do
     cms = []
-    Timecop.freeze(Time.zone.now) do
+    Timecop.freeze do
       2.times do
         cm = ContentMigration.new(context: @course, user: @teacher)
         cm.migration_type = "common_cartridge_importer"
@@ -940,6 +941,131 @@ describe ContentMigration do
         .to receive(:new).and_return(importer)
       expect(importer).to receive(:import_content)
       @cm.import!({})
+    end
+  end
+
+  context "common_cartridge_qti_new_quizzes_import" do
+    let(:importer) { double }
+
+    before do
+      allow(importer)
+        .to receive(:import_content)
+        .with(any_args)
+        .and_return(true)
+      allow(@cm.migration_settings)
+        .to receive(:[])
+        .with("migration_type")
+        .and_return("common_cartridge_importer")
+      allow(QuizzesNext::Importers::CourseContentImporter)
+        .to receive(:new)
+        .with(any_args)
+        .and_return(importer)
+    end
+
+    context "FF enabled" do
+      before do
+        allow(NewQuizzesFeaturesHelper)
+          .to receive(:common_cartridge_qti_new_quizzes_import_enabled?)
+          .with(instance_of(Course))
+          .and_return(true)
+      end
+
+      describe "not Quizzes.Next CC import" do
+        before do
+          allow(@cm.migration_settings)
+            .to receive(:[])
+            .with(:import_quizzes_next)
+            .and_return(false)
+        end
+
+        it "calls QuizzesNext::Importers" do
+          expect(@cm.migration_settings)
+            .to receive(:[])
+            .with(:migration_ids_to_import)
+          expect(Importers).not_to receive(:content_importer_for)
+          expect(QuizzesNext::Importers::CourseContentImporter)
+            .to receive(:new).and_return(importer)
+          expect(importer).to receive(:import_content)
+          @cm.import!({})
+        end
+      end
+
+      describe "Quizzes.Next CC import" do
+        before do
+          allow(@cm.migration_settings)
+            .to receive(:[])
+            .with(:import_quizzes_next)
+            .and_return(true)
+        end
+
+        it "calls QuizzesNext::Importers" do
+          expect(@cm.migration_settings)
+            .to receive(:[])
+            .with(:migration_ids_to_import)
+          expect(Importers).not_to receive(:content_importer_for)
+          expect(QuizzesNext::Importers::CourseContentImporter)
+            .to receive(:new).and_return(importer)
+          expect(importer).to receive(:import_content)
+          @cm.import!({})
+        end
+      end
+    end
+
+    context "FF disabled" do
+      before do
+        allow(NewQuizzesFeaturesHelper)
+          .to receive(:common_cartridge_qti_new_quizzes_import_enabled?)
+          .with(instance_of(Course))
+          .and_return(false)
+        allow(Importers)
+          .to receive(:content_importer_for)
+          .with("Course")
+          .and_return(importer)
+      end
+
+      describe "not Quizzes.Next CC import" do
+        before do
+          allow(@cm.migration_settings)
+            .to receive(:[])
+            .with(:import_quizzes_next)
+            .and_return(false)
+        end
+
+        it "does not call QuizzesNext::Importers" do
+          expect(@cm.migration_settings)
+            .to receive(:[])
+            .with(:migration_ids_to_import)
+          expect(Importers).to receive(:content_importer_for)
+          expect(QuizzesNext::Importers::CourseContentImporter)
+            .not_to receive(:new)
+          expect(importer).to receive(:import_content)
+          @cm.import!({})
+        end
+      end
+
+      describe "Quizzes.Next CC import" do
+        before do
+          allow(@cm.context)
+            .to receive(:feature_enabled?)
+            .with(:quizzes_next)
+            .and_return(true)
+          allow(@cm.migration_settings)
+            .to receive(:[])
+            .with(:import_quizzes_next)
+            .and_return(true)
+        end
+
+        it "calls QuizzesNext::Importers" do
+          expect(@cm.migration_settings)
+            .to receive(:[])
+            .with(:migration_ids_to_import)
+          expect(Importers).not_to receive(:content_importer_for)
+          expect(QuizzesNext::Importers::CourseContentImporter)
+            .to receive(:new).and_return(importer)
+          expect(importer).to receive(:import_content)
+          @cm.import!({})
+        end
+      end
     end
   end
 
@@ -1800,7 +1926,7 @@ describe ContentMigration do
             mig_id = mig_id(@outcome_from)
             @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id).first
             @outcome_from.destroy!
-            allow_any_instance_of(ContentMigration).to receive(:can_unlink?).and_return false
+            allow_any_instance_of(ContentMigration).to receive(:outcome_has_alignments?).and_return true
             run_migration
             expect(@outcome_from.reload).to be_deleted
             expect(@outcome_to.reload).not_to be_deleted
@@ -1872,7 +1998,7 @@ describe ContentMigration do
             @ct_to = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_to.id)
             mig_id = @ct_to.migration_id
             @ct_from.destroy!
-            allow_any_instance_of(ContentMigration).to receive(:can_unlink?).and_return false
+            allow_any_instance_of(ContentMigration).to receive(:outcome_has_alignments?).and_return true
             run_migration
             expect(@ct_from.reload).to be_deleted
             expect(@ct_to.reload).not_to be_deleted

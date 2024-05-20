@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {map, find, filter} from 'lodash'
 import Backbone from '@canvas/backbone'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
@@ -55,7 +55,9 @@ export default class Quiz extends Backbone.Model {
     this.objectType = this.objectType.bind(this)
     this.isDuplicating = this.isDuplicating.bind(this)
     this.isMigrating = this.isMigrating.bind(this)
+    this.isImporting = this.isImporting.bind(this)
     this.importantDates = this.importantDates.bind(this)
+    this.isCloningAlignment = this.isCloningAlignment.bind(this)
 
     super.initialize(...arguments)
     this.initId()
@@ -230,8 +232,16 @@ export default class Quiz extends Backbone.Model {
     return this.get('workflow_state') === 'duplicating'
   }
 
+  isCloningAlignment() {
+    return this.get('workflow_state') === 'outcome_alignment_cloning'
+  }
+
   isMigrating() {
     return this.get('workflow_state') === 'migrating'
+  }
+
+  isImporting() {
+    return this.get('workflow_state') === 'importing'
   }
 
   name(newName) {
@@ -294,6 +304,24 @@ export default class Quiz extends Backbone.Model {
     )
   }
 
+  alignment_clone_failed(callback) {
+    const target_course_id = this.get('course_id')
+    const target_assignment_id = this.get('id')
+    const original_course_id = this.get('original_course_id')
+    const original_assignment_id = this.get('original_assignment_id')
+    let query_string = `?target_assignment_id=${target_assignment_id}`
+    if (original_course_id !== target_course_id) {
+      // when it's a course copy failure
+      query_string += `&target_course_id=${target_course_id}`
+    }
+    $.ajaxJSON(
+      `/api/v1/courses/${original_course_id}/assignments/${original_assignment_id}/retry_alignment_clone${query_string}`,
+      'POST',
+      {},
+      callback
+    )
+  }
+
   // caller is failed migrated assignment
   retry_migration(callback) {
     const course_id = this.get('course_id')
@@ -312,6 +340,12 @@ export default class Quiz extends Backbone.Model {
     }
     if (this.isMigrating()) {
       this.pollUntilFinished(interval, this.isMigrating)
+    }
+    if (this.isCloningAlignment()) {
+      this.pollUntilFinished(interval, this.isCloningAlignment)
+    }
+    if (this.isImporting()) {
+      this.pollUntilFinished(interval, this.isImporting)
     }
   }
 
@@ -339,22 +373,27 @@ export default class Quiz extends Backbone.Model {
   nonBaseDates() {
     const dateGroups = this.get('all_dates')
     if (!dateGroups) return false
-    const withouBase = _.filter(dateGroups, dateGroup => dateGroup && !dateGroup.get('base'))
+    const withouBase = filter(dateGroups, dateGroup => dateGroup && !dateGroup.get('base'))
     return withouBase.length > 0
   }
 
   allDates() {
     const groups = this.get('all_dates')
     const models = (groups && groups.models) || []
-    return _.map(models, group => group.toJSON())
+    return map(models, group => group.toJSON())
   }
 
   singleSectionDueDate() {
-    return __guard__(_.find(this.allDates(), 'dueAt'), x => x.dueAt.toISOString()) || this.dueAt()
+    return __guard__(find(this.allDates(), 'dueAt'), x => x.dueAt.toISOString()) || this.dueAt()
   }
 
   isOnlyVisibleToOverrides(overrideFlag) {
-    if (!(arguments.length > 0)) return this.get('only_visible_to_overrides') || false
+    if (!(arguments.length > 0)) {
+      if (ENV.FEATURES?.differentiated_modules && this.get('visible_to_everyone') != null) {
+        return !this.get('visible_to_everyone')
+      }
+      return this.get('only_visible_to_overrides') || false
+    }
     return this.set('only_visible_to_overrides', overrideFlag)
   }
 

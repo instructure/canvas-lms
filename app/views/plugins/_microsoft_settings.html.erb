@@ -16,11 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 600px;" class="formtable">
     <tr>
-      <td colspan="2"><%= mt(:description, <<~TEXT, ms_app_url: "https://apps.dev.microsoft.com/", callback_url: oauth2_login_callback_url)
-You will need to register a [new app with Microsoft](%{ms_app_url}).
+      <td colspan="2"><%= mt(:description, <<~TEXT, ms_app_url: "https://portal.azure.com/", callback_url: oauth2_login_callback_url, wrappers: { "*" => "<code>\\1</code>" })
+You will need to register a [new app with Microsoft](%{ms_app_url}) under *App registrations*.
 You should configure %{callback_url} as the Redirect URI.
 After you save your app, make a note of the Application ID and Secret, and enter them here.
 TEXT
@@ -29,7 +29,7 @@ TEXT
     <tr>
       <td><%= f.blabel :application_id, en: "Application ID" %></td>
       <td>
-        <%= f.text_field :application_id %>
+        <%= f.text_field :application_id, value: settings[:application_id] %>
       </td>
     </tr>
     <tr>

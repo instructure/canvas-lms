@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {FilterType} from '../gradebook.d'
+import type {FilterType} from '../gradebook.d'
 
 const conditionTypes: FilterType[] = [
   'section',

@@ -132,9 +132,10 @@ module Lti
 
         context "when only creating resource links" do
           let(:launch_url) { "http://tool.url/launch" }
+          let(:title) { "Item 1" }
           let(:content_items) do
             [
-              { type: "ltiResourceLink", url: launch_url, title: "Item 1" },
+              { type: "ltiResourceLink", url: launch_url, title: },
               { type: "link", url: "http://too.url/sample", title: "Item 2" }
             ]
           end
@@ -159,6 +160,7 @@ module Lti
               expect(context.lti_resource_links.size).to eq 1
               expect(context.lti_resource_links.first.current_external_tool(context)).to eq tool
               expect(context.lti_resource_links.first.context).to eq context
+              expect(context.lti_resource_links.first.title).to eq title
             end
 
             it "sends resource link uuid in content item response" do
@@ -199,8 +201,9 @@ module Lti
           it { is_expected.to be_bad_request }
 
           it "reports error metric" do
-            expect(InstStatsd::Statsd).to receive(:increment).with("canvas.deep_linking_controller.request_error", tags: { code: 400 })
+            allow(InstStatsd::Statsd).to receive(:increment).and_call_original
             subject
+            expect(InstStatsd::Statsd).to have_received(:increment).with("canvas.deep_linking_controller.request_error", tags: { code: 400 })
           end
 
           it "responds with an error" do

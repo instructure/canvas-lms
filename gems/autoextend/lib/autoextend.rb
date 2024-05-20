@@ -18,39 +18,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "autoextend/extension"
-require_relative "autoextend/railtie" if defined?(Rails::Railtie)
 
 module Autoextend
-  class << self
-    def const_added(const, source:, recursive: false)
-      const_name = const.is_a?(String) ? const : const.name
-      return [] unless const_name
+  @trace = TracePoint.trace(:end) do |tp|
+    const = tp.binding.receiver
+    next unless const.name
 
-      extensions_list = extensions_hash.fetch(const_name.to_sym, [])
-      ret = sorted_extensions(extensions_list).each do |extension|
-        if const == const_name
-          const = Object.const_get(const_name, false)
-        end
-        extension.extend(const, source:)
+    TracePoint.allow_reentry do
+      extensions_list = extensions_hash.fetch(const.name.to_sym, [])
+      sorted_extensions(extensions_list).each do |extension|
+        extension.extend(const)
       end
-
-      if recursive
-        const.constants(false).each do |child|
-          # If the constant is set to autoload, don't accidentally autoload it
-          # If we are processing a constant's parent while processing the child
-          # the constant will be return by constants, but not defined, so just skip it
-          next if const.autoload?(child) || !const.const_defined?(child, false)
-
-          child_const = const.const_get(child, false)
-          next unless child_const.is_a?(Module)
-
-          const_added(child_const, source:, recursive: true)
-        end
-      end
-
-      ret
     end
+  end
 
+  class << self
     # Add a hook to automatically extend a class or module with a module,
     # or by calling a block, when it is extended (module or class)
     # or defined (class only).
@@ -67,16 +49,6 @@ module Autoextend
     # the MyUserExtension module into it. It then sets up a hook
     # to automatically include in User if it becomes defined again
     # (like from ActiveSupport reloading).
-    #
-    # Note that this hook happens before any methods have been
-    # added to it, so you cannot directly modify anything you
-    # expect to exist in the class. If you want to do that, you can
-    # specify `after_load: true`, but this will only be compatible with
-    # classes loaded via ActiveSupport's autoloading.
-    #
-    # Instead you should either use prepend with super, or
-    # set up additional hooks to automatically modify methods
-    # as they are added (if you use :include as your method)
     #
     # You can make an extension optional, which is for information only,
     # so that if you have a spec that checks if all extensions were used
@@ -98,7 +70,6 @@ module Autoextend
                                 method,
                                 block,
                                 singleton,
-                                after_load,
                                 optional,
                                 Array(before),
                                 Array(after))
@@ -137,18 +108,6 @@ module Autoextend
       extensions_hash.values.flatten
     end
 
-    def inject_into_zetwerk
-      return unless Object.const_defined?(:Rails)
-
-      Rails.autoloaders.each do |loader|
-        loader.on_load do |_cpath, value, _abspath|
-          next unless value.is_a?(Module)
-
-          Autoextend.const_added(value, source: :Zeitwerk, recursive: true)
-        end
-      end
-    end
-
     private
 
     def sorted_extensions(extensions_list)
@@ -181,31 +140,3 @@ module Autoextend
     end
   end
 end
-
-module Autoextend::ClassMethods
-  def inherited(klass)
-    Autoextend.const_added(klass, source: :inherited)
-    super
-  end
-end
-
-# NOTE: Autoextend can't detect a module being defined,
-# only when it gets included into a class.
-module Autoextend::ModuleMethods
-  def prepended(klass)
-    Autoextend.const_added(self, source: :prepended).each do |extension|
-      extension.extend(klass, source: :prepended)
-    end
-    super
-  end
-
-  def included(klass)
-    Autoextend.const_added(self, source: :included).each do |extension|
-      extension.extend(klass, source: :included)
-    end
-    super
-  end
-end
-
-Module.prepend(Autoextend::ModuleMethods)
-Class.prepend(Autoextend::ClassMethods)

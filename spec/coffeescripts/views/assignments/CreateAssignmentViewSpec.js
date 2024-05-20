@@ -1,3 +1,7 @@
+/* eslint-disable qunit/resolve-async */
+/* eslint-disable qunit/no-ok-equality */
+/* eslint-disable qunit/no-identical-names */
+
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -22,15 +26,15 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import CreateAssignmentView from 'ui/features/assignment_index/backbone/views/CreateAssignmentView'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import $ from 'jquery'
-import tz from '@canvas/timezone'
-import tzInTest from '@canvas/timezone/specHelpers'
+import 'jquery-migrate'
+import tzInTest from '@canvas/datetime/specHelpers'
 import timezone from 'timezone'
 import juneau from 'timezone/America/Juneau'
 import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 import '../../../../ui/boot/initializers/activateTooltips'
 
 function buildAssignment1() {

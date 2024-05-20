@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {captureException} from '@sentry/browser'
+
 export function buildReducer(handlers, initialState) {
   function reducer(state, action) {
     if (handlers[action.type]) {
@@ -28,6 +30,7 @@ export function buildReducer(handlers, initialState) {
         // If the handling function throws an error, it must be caught.
         // Otherwise, the application can crash without a chance to recover.
         console.error(e) // eslint-disable-line no-console
+        captureException(e)
       }
     }
 

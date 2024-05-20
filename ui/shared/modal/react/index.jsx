@@ -18,9 +18,10 @@
 
 import React from 'react'
 import $ from 'jquery'
-import _ from 'underscore'
+import {isFunction} from 'lodash'
 import preventDefault from '@canvas/util/preventDefault'
 import ReactModal from '@canvas/react-modal'
+
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ModalContent from './content'
 import ModalButtons from './buttons'
@@ -74,7 +75,7 @@ export default class Modal extends React.Component {
   }
 
   closeWithX = () => {
-    if (_.isFunction(this.props.closeWithX)) this.props.closeWithX()
+    if (isFunction(this.props.closeWithX)) this.props.closeWithX()
     this.closeModal()
   }
 

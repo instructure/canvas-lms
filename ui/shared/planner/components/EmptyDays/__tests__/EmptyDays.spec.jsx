@@ -31,7 +31,7 @@ const getDefaultProps = (overrides = {}) => {
     timeZone: TZ,
     registerAnimatable: () => {},
     deregisterAnimatable: () => {},
-    ...overrides
+    ...overrides,
   }
 }
 

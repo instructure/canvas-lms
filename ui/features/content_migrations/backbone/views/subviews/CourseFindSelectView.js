@@ -19,14 +19,16 @@
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
+import _, {map, find} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import template from '../../../jst/subviews/CourseFindSelect.handlebars'
 import autocompleteItemTemplate from '../../../jst/autocomplete_item.handlebars'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
+import 'jqueryui/menu'
 import 'jqueryui/autocomplete'
+import {encodeQueryString} from '@canvas/query-string-encoding'
 
 const I18n = useI18nScope('content_migrations')
 
@@ -151,7 +153,7 @@ CourseFindSelectView.prototype.toggleConcludedCourses = function () {
 CourseFindSelectView.prototype.manageableCourseUrl = function () {
   let params
   if (this.includeConcludedCourses) {
-    params = $.param({
+    params = encodeQueryString({
       'include[]': 'concluded',
     })
   }
@@ -167,7 +169,7 @@ CourseFindSelectView.prototype.manageableCourseUrl = function () {
 //   {label: 'Plant Science', value: 'Plant Science', id: '42'}
 // @api private
 CourseFindSelectView.prototype.autocompleteCourses = function () {
-  return _.map(this.courses, function (course) {
+  return map(this.courses, function (course) {
     return {
       label: course.label,
       id: course.id,
@@ -197,7 +199,7 @@ CourseFindSelectView.prototype.updateSearch = function (event) {
   const value = event.target.value && String(event.target.value)
   this.setSourceCourseId(value)
   const courses = this.autocompleteCourses()
-  const courseObj = _.find(
+  const courseObj = find(
     courses,
     (function (_this) {
       return function (course) {
@@ -224,7 +226,7 @@ CourseFindSelectView.prototype.setSourceCourseId = function (id) {
   settings.source_course_id = id
   this.model.set('settings', settings)
   if (
-    (course = _.find(this.courses, function (c) {
+    (course = find(this.courses, function (c) {
       return c.id === id
     }))
   ) {

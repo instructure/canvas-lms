@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {map, includes, filter} from 'lodash'
 import Backbone from '@canvas/backbone'
 import MessageCollection from './backbone/collections/MessageCollection'
 import MessageListView from './backbone/views/MessageListView'
@@ -33,7 +33,7 @@ import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection
 import '@canvas/jquery/jquery.disableWhileLoading'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {decodeQueryString} from '@canvas/query-string-encoding'
+import {decodeQueryString, encodeQueryString} from '@canvas/query-string-encoding'
 import ConversationStatusFilter from './react/ConversationStatusFilter'
 import ready from '@instructure/ready'
 
@@ -95,7 +95,7 @@ const ConversationsRouter = Backbone.Router.extend({
   //
   // Returns an array of impacted message IDs.
   batchUpdate(event, fn = $.noop) {
-    const messages = _.map(this.list.selectedMessages, message => {
+    const messages = map(this.list.selectedMessages, message => {
       fn.call(this, message)
       return message.get('id')
     })
@@ -307,11 +307,11 @@ const ConversationsRouter = Backbone.Router.extend({
       model.handleMessages()
       model.set(
         'messages',
-        _.filter(
+        filter(
           model.get('messages'),
           m =>
             m.id === message.id ||
-            (_.includes(m.participating_user_ids, message.author_id) &&
+            (includes(m.participating_user_ids, message.author_id) &&
               m.created_at < message.created_at)
         )
       )
@@ -335,7 +335,10 @@ const ConversationsRouter = Backbone.Router.extend({
     // process of loading the page if so, and we wouldn't want to create a
     // spurious history entry by not doing so.
     const existingHash = window.location.hash && window.location.hash.substring(1)
-    return this.navigate(`filter=${$.param(filters)}`, {trigger: true, replace: !existingHash})
+    return this.navigate(`filter=${encodeQueryString(filters)}`, {
+      trigger: true,
+      replace: !existingHash,
+    })
   },
 
   onCourse(course) {

@@ -17,8 +17,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import React from 'react'
+import {filter, each} from 'lodash'
 import assignmentUtils from './assignmentUtils'
 import PostGradesDialogCorrectionsPage from './PostGradesDialogCorrectionsPage'
 import PostGradesDialogNeedsGradingPage from './PostGradesDialogNeedsGradingPage'
@@ -74,7 +74,7 @@ class PostGradesDialog extends React.Component<Props> {
   }
 
   validMultipleOverride = a => {
-    const invalid_overrides = _.filter(a.overrides, o => o == null)
+    const invalid_overrides = filter(a.overrides, o => o == null)
     if (
       invalid_overrides.length === 0 &&
       a.due_at == null &&
@@ -91,7 +91,7 @@ class PostGradesDialog extends React.Component<Props> {
   invalidAssignments = (assignments, store) => {
     const original_error_assignments = assignmentUtils.withOriginalErrors(assignments)
     const invalid_assignments: AssignmentWithOverride[] = []
-    _.each(assignments, a => {
+    each(assignments, a => {
       // override for a section is valid but the 'Everyone Else' scenario is still invalid
       if (this.validOverrideForSelection(store, a)) {
         return

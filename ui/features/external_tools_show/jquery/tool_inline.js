@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/module-sequence-footer'
 import MarkAsDone from '@canvas/util/jquery/markAsDone'
 import ToolLaunchResizer from '@canvas/lti/jquery/tool_launch_resizer'
@@ -40,11 +41,11 @@ ready(() => {
     $toolForm.show()
 
     // Firefox remembers disabled state after page reloads
-    $button.attr('disabled', false)
+    $button.prop('disabled', false)
     setTimeout(() => {
       // LTI links have a time component in the signature and will
       // expire after a few minutes.
-      $button.attr('disabled', true).text($button.data('expired_message'))
+      $button.prop('disabled', true).text($button.data('expired_message'))
     }, 60 * 2.5 * 1000)
 
     if (formSubmissionDelay) {
@@ -127,7 +128,8 @@ ready(() => {
   const is_full_screen = $('body').hasClass('ic-full-screen-lti-tool')
 
   if (!is_full_screen) {
-    canvas_chrome_height = $tool_content_wrapper.offset().top + $('#footer').outerHeight(true)
+    const footerHeight = $('#footer').outerHeight(true) || 0
+    canvas_chrome_height = $tool_content_wrapper.offset().top + footerHeight
   }
 
   if ($tool_content_wrapper.length) {
@@ -156,11 +158,12 @@ ready(() => {
 
             toolResizer.resize_tool_content_wrapper(tool_height, $tool_content_wrapper, true)
           } else {
+            // module item navigation from PLAT-1687
+            const sequenceFooterHeight = $('#sequence_footer').outerHeight(true) || 0
             toolResizer.resize_tool_content_wrapper(
               $window.height() -
                 canvas_chrome_height -
-                // module item navigation from PLAT-1687
-                $('#sequence_footer').outerHeight(true)
+                sequenceFooterHeight
             )
           }
         }

@@ -28,7 +28,6 @@
     <div class="image-block-image profile-avatar-wrapper">
       <% if @user_data[:can_edit_avatar] %>
         <%= avatar(@user_data[:id], size: 128, url: '#', edit: true, class: "profile-link",
-            title: t('titles.click_to_change_profile_pic', "Click to change profile pic"),
             sr_content: t('Click to change profile picture for %{display_name}', :display_name => @user.short_name)) %>
       <% else %>
         <%= avatar(@user_data[:id], size: 128, url: nil) %>
@@ -39,7 +38,7 @@
       <% if @user_data[:can_edit_name] %>
         <h2 class="hide-if-editing"><%= @user_data[:short_name] %> <% if @user_data[:pronouns] %><i>(<%= @user_data[:pronouns] %>)</i><% end %></h2>
         <label class="show-if-editing ic-Label"><%= t('name', 'Name') %>:<span aria-hidden="true" title="<%= t('is_required', 'This field is required') %>">*</span>
-          <input id="name_input" class="ic-Input" type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>" required>
+          <input id="name_input" class="ic-Input" type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>" required oninvalid="this.setCustomValidity('<%= t('Name is Required') %>')" oninput="setCustomValidity('')" title="<%= t('Name is Required') %>">
         </label>
         <%# even if @domain_root_account.settings[:can_add_pronouns] is false, we still want to let someone that has pronouns set to see this so they can unset them  %>
         <% if @user.pronouns || @domain_root_account.settings[:can_add_pronouns] %>

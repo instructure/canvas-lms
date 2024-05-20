@@ -1335,6 +1335,11 @@ describe PlannerController do
         assert_unauthorized
       end
 
+      it "does not require context_codes if all visible courses are requested" do
+        get :index, params: { observed_user_id: @student.to_param, include: %w[all_courses] }
+        expect(response).to be_successful
+      end
+
       it "allows an observer to query their observed user's planner items for valid context_codes" do
         get :index, params: { observed_user_id: @student.to_param, context_codes: [@course.asset_string] }
         expect(response).to be_successful

@@ -33,7 +33,7 @@
 // thing.cache.set 'key', 'value'
 // thing.cache.get 'key'
 
-import _ from 'underscore'
+import {flattenDeep} from 'lodash'
 
 export default {
   cache: {
@@ -69,7 +69,7 @@ export default {
     toKey(...key) {
       return (
         this.prefix +
-        _.flatten(key)
+        flattenDeep(key)
           .map(arg => JSON.stringify(arg))
           .join('|')
       )

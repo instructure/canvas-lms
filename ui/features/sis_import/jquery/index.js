@@ -18,9 +18,9 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape, {raw} from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf, disableIf */
 import 'jqueryui/progressbar'
 
@@ -31,8 +31,8 @@ $(document).ready(function (_event) {
 
   $('#batch_mode')
     .change(function (__event) {
-      $('#batch_mode_term_id_label').showIf($(this).attr('checked'))
-      $('#batch_mode_term_id').showIf($(this).attr('checked'))
+      $('#batch_mode_term_id_label').showIf($(this).prop('checked'))
+      $('#batch_mode_term_id').showIf($(this).prop('checked'))
     })
     .change()
 
@@ -42,10 +42,10 @@ $(document).ready(function (_event) {
   const $add_sis_stickiness_container = $('#add_sis_stickiness_container')
   const $clear_sis_stickiness_container = $('#clear_sis_stickiness_container')
   function updateSisCheckboxes(__event) {
-    $add_sis_stickiness_container.showIf($override_sis_stickiness.attr('checked'))
-    $clear_sis_stickiness_container.showIf($override_sis_stickiness.attr('checked'))
-    $add_sis_stickiness.disableIf($clear_sis_stickiness.attr('checked'))
-    $clear_sis_stickiness.disableIf($add_sis_stickiness.attr('checked'))
+    $add_sis_stickiness_container.showIf($override_sis_stickiness.prop('checked'))
+    $clear_sis_stickiness_container.showIf($override_sis_stickiness.prop('checked'))
+    $add_sis_stickiness.disableIf($clear_sis_stickiness.prop('checked'))
+    $clear_sis_stickiness.disableIf($add_sis_stickiness.prop('checked'))
   }
 
   $override_sis_stickiness.change(updateSisCheckboxes)
@@ -205,7 +205,7 @@ $(document).ready(function (_event) {
           htmlEscape(I18n.t('notices.processing_takes_awhile', 'this may take a bit...')) +
           '</div>'
       )
-      .attr('disabled', true)
+      .prop('disabled', true)
     $('.instruction').hide()
     $('.progress_bar_holder').slideDown()
     $('.copy_progress').progressbar()
@@ -248,7 +248,7 @@ $(document).ready(function (_event) {
             $('#sis_importer').hide()
             $('.copy_progress').progressbar('option', 'value', 100)
             $('.progress_message').html(
-              $.raw(
+              raw(
                 htmlEscape(
                   I18n.t(
                     'messages.import_complete_success',
@@ -278,7 +278,7 @@ $(document).ready(function (_event) {
                 I18n.t('errors.import_failed_messages', 'The import failed with these messages:')
               )
               message += createMessageHtml(sis_batch)
-              $('.sis_messages .sis_error_message').html($.raw(message))
+              $('.sis_messages .sis_error_message').html(raw(message))
             }
             $('.sis_messages').show()
           } else if (sis_batch.workflow_state === 'imported_with_messages') {
@@ -293,7 +293,7 @@ $(document).ready(function (_event) {
               )
               message += createMessageHtml(sis_batch)
               message += createCountsHtml(sis_batch)
-              $('.sis_messages').show().html($.raw(message))
+              $('.sis_messages').show().html(raw(message))
             }
           } else {
             if (progress == lastProgress) {
@@ -331,7 +331,7 @@ $(document).ready(function (_event) {
     error(data) {
       $(this)
         .find('.submit_button')
-        .attr('disabled', false)
+        .prop('disabled', false)
         .text(I18n.t('buttons.process_data', 'Process Data'))
       $(this).formErrors(data)
     },

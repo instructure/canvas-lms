@@ -76,7 +76,7 @@ describe PseudonymsController do
     it "accepts a non-expired password-change token" do
       Setting.set("password_reset_token_expiration_minutes", "60")
       @cc.forgot_password!
-      expect(@cc.confirmation_code_expires_at).to be_between(58.minutes.from_now, 62.minutes.from_now)
+      expect(@cc.confirmation_code_expires_at).to be_between(118.minutes.from_now, 122.minutes.from_now)
       post "change_password", params: { pseudonym_id: @pseudonym.id, nonce: @cc.confirmation_code, pseudonym: { password: "12341234", password_confirmation: "12341234" } }
       expect(response).to be_successful
     end

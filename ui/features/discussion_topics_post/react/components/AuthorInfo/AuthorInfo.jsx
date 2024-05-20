@@ -33,15 +33,17 @@ import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {DiscussionEntryVersion} from '../../../graphql/DiscussionEntryVersion'
 import {DiscussionEntryVersionHistory} from '../DiscussionEntryVersionHistory/DiscussionEntryVersionHistory'
 import {ReportsSummaryBadge} from '../ReportsSummaryBadge/ReportsSummaryBadge'
+import theme from '@instructure/canvas-theme'
 
 const I18n = useI18nScope('discussion_posts')
 
 export const AuthorInfo = props => {
-  const {searchTerm, filter} = useContext(SearchContext)
+  const {searchTerm} = useContext(SearchContext)
 
   const hasAuthor = Boolean(props.author || props.anonymousAuthor)
   const avatarUrl = isAnonymous(props) ? null : props.author?.avatarUrl
@@ -87,7 +89,7 @@ export const AuthorInfo = props => {
       render={responsiveProps => (
         <Flex>
           <Flex.Item align="start">
-            {props.isUnread && filter !== 'drafts' && (
+            {props.isUnread && (
               <div
                 style={{
                   float: 'left',
@@ -141,27 +143,17 @@ export const AuthorInfo = props => {
                         {isAnonymous(props) ? (
                           getDisplayName(props)
                         ) : (
-                          <>
-                            <SearchSpan
-                              isIsolatedView={props.isIsolatedView}
-                              searchTerm={searchTerm}
-                              text={getDisplayName(props)}
-                            />
-                            {props.author?.pronouns && (
-                              <Text
-                                lineHeight="condensed"
-                                size={responsiveProps.authorNameTextSize}
-                                fontStyle="italic"
-                                data-testid="author-pronouns"
-                              >
-                                &nbsp;({props.author?.pronouns})
-                              </Text>
-                            )}
-                          </>
+                          <NameLink
+                            userType="author"
+                            user={props.author}
+                            responsiveProps={responsiveProps}
+                            searchTerm={searchTerm}
+                            discussionEntryProps={props}
+                          />
                         )}
                       </Text>
                     </Flex.Item>
-                    <Flex.Item overflowY="hidden">
+                    <Flex.Item margin="0 0 0 xx-small" overflowY="hidden">
                       <RolePillContainer
                         discussionRoles={resolveAuthorRoles(
                           props.isTopicAuthor,
@@ -176,10 +168,12 @@ export const AuthorInfo = props => {
                   </Flex>
                 </Flex.Item>
               )}
-              <Flex.Item overflowX="hidden" padding="xx-small 0 0 xx-small">
+              <Flex.Item overflowX="hidden" padding="0 0 0 xx-small">
                 <Timestamps
                   author={props.author}
                   editor={props.editor}
+                  createdAt={props.createdAt}
+                  updatedAt={props.updatedAt}
                   timingDisplay={props.timingDisplay}
                   editedTimingDisplay={props.editedTimingDisplay}
                   lastReplyAtDisplay={props.lastReplyAtDisplay}
@@ -224,9 +218,10 @@ AuthorInfo.propTypes = {
    */
   isForcedRead: PropTypes.bool,
   /**
-   * Boolean to determine if we are in the isolated view
+   * Boolean to determine if we are in the split view
    */
-  isIsolatedView: PropTypes.bool,
+  createdAt: PropTypes.string,
+  updatedAt: PropTypes.string,
   /**
    * Display text for the relative time information. This prop is expected
    * to be provided as a string of the exact text to be displayed, not a
@@ -260,31 +255,39 @@ AuthorInfo.propTypes = {
 
 const Timestamps = props => {
   const editText = useMemo(() => {
-    if (!props.editedTimingDisplay || props.editedTimingDisplay === props.timingDisplay) {
+    if (!props.editedTimingDisplay || props.createdAt === props.updatedAt) {
       return null
     }
 
     if (props.editor && props.editor?._id !== props.author?._id) {
-      return I18n.t('Edited by %{editorName} %{editedTimingDisplay}', {
-        editorName: props.editor.displayName,
-        editedTimingDisplay: props.editedTimingDisplay,
-      })
+      return (
+        <span data-testid="editedByText">
+          {I18n.t('Edited by')} <NameLink userType="editor" user={props.editor} />{' '}
+          {I18n.t('%{editedTimingDisplay}', {
+            editedTimingDisplay: props.editedTimingDisplay,
+          })}
+        </span>
+      )
     } else {
       return I18n.t('Edited %{editedTimingDisplay}', {
         editedTimingDisplay: props.editedTimingDisplay,
       })
     }
-  }, [props.editedTimingDisplay, props.timingDisplay, props.editor, props.author])
+  }, [props.editedTimingDisplay, props.createdAt, props.updatedAt, props.editor, props.author])
 
   return (
     <Flex wrap="wrap">
       {(!props.showCreatedAsTooltip || !editText) && (
-        <Flex.Item overflowX="hidden" padding="0 xx-small 0 0">
+        <Flex.Item overflowX="hidden" padding="xx-small xx-small xx-small 0">
           <Text size={props.timestampTextSize}>{props.timingDisplay}</Text>
         </Flex.Item>
       )}
       {editText && props.showCreatedAsTooltip && (
-        <Flex.Item data-testid="created-tooltip" overflowX="hidden" padding="0 xx-small 0 0">
+        <Flex.Item
+          data-testid="created-tooltip"
+          overflowX="hidden"
+          padding="xx-small xx-small xx-small 0"
+        >
           <Tooltip
             renderTip={I18n.t('Created %{timingDisplay}', {timingDisplay: props.timingDisplay})}
           >
@@ -296,7 +299,7 @@ const Timestamps = props => {
         </Flex.Item>
       )}
       {editText && !props.showCreatedAsTooltip && (
-        <Flex.Item overflowX="hidden" padding="0 xx-small 0 0">
+        <Flex.Item overflowX="hidden" padding="xx-small xx-small xx-small 0">
           <Text size={props.timestampTextSize}>{editText}</Text>
         </Flex.Item>
       )}
@@ -316,9 +319,66 @@ const Timestamps = props => {
 Timestamps.propTypes = {
   author: User.shape,
   editor: User.shape,
+  createdAt: PropTypes.string,
+  updatedAt: PropTypes.string,
   timingDisplay: PropTypes.string,
   editedTimingDisplay: PropTypes.string,
   lastReplyAtDisplay: PropTypes.string,
   showCreatedAsTooltip: PropTypes.bool,
   timestampTextSize: PropTypes.string,
+}
+
+const NameLink = props => {
+  return (
+    <div
+      className={
+        props.user?.courseRoles?.includes('StudentEnrollment') ? 'student_context_card_trigger' : ''
+      }
+      style={
+        props.userType === 'author'
+          ? {
+              marginBottom: '0.3rem',
+              marginTop: theme.variables.spacing.xxSmall,
+              marginLeft: theme.variables.spacing.xxSmall,
+              display: 'inline-block',
+            }
+          : {display: 'inline'}
+      }
+      data-testid={`student_context_card_trigger_container_${props.userType}`}
+      data-student_id={props.user?._id}
+      data-course_id={ENV.course_id}
+    >
+      <Link href={props.user?.htmlUrl} isWithinText={false}>
+        {props.userType === 'author' ? (
+          <>
+            <SearchSpan
+              isSplitView={props.discussionEntryProps?.isSplitView}
+              searchTerm={props.searchTerm}
+              text={getDisplayName(props.discussionEntryProps)}
+            />
+            {props.user?.pronouns && (
+              <Text
+                lineHeight="condensed"
+                size={props.responsiveProps.authorNameTextSize}
+                fontStyle="italic"
+                data-testid="author-pronouns"
+              >
+                &nbsp;({props.user?.pronouns})
+              </Text>
+            )}
+          </>
+        ) : (
+          props.user?.displayName
+        )}
+      </Link>
+    </div>
+  )
+}
+
+NameLink.propTypes = {
+  userType: PropTypes.string,
+  user: User.shape,
+  responsiveProps: PropTypes.object,
+  searchTerm: PropTypes.string,
+  discussionEntryProps: PropTypes.object,
 }

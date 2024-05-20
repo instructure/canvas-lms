@@ -565,12 +565,16 @@ body .disabled_link {
 }
 
 #submission_preview {
-  margin: 20px auto;
+  background-color: white;
+  padding: 4rem 6rem;
+  margin: 8px auto;
+  box-sizing: content-box;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  line-height: 1.5rem;
   &.paper {
     min-width: 400px;
   }
   &.plain_text {
-    width: 90%;
     font-family: courier, monospace;
   }
 }

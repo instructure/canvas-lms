@@ -34,6 +34,7 @@ class DeveloperKey < ActiveRecord::Base
   belongs_to :account
   belongs_to :root_account, class_name: "Account"
   belongs_to :service_user, class_name: "User"
+  belongs_to :lti_registration, class_name: "Lti::Registration", inverse_of: :developer_key, dependent: :destroy
 
   has_many :page_views
   has_many :access_tokens, -> { where(workflow_state: "active") }
@@ -42,8 +43,8 @@ class DeveloperKey < ActiveRecord::Base
 
   has_one :tool_consumer_profile, class_name: "Lti::ToolConsumerProfile", inverse_of: :developer_key
   has_one :tool_configuration, class_name: "Lti::ToolConfiguration", dependent: :destroy, inverse_of: :developer_key
-  has_one :lti_registration, class_name: "Lti::IMS::Registration", dependent: :destroy, inverse_of: :developer_key
-  serialize :scopes, Array
+  has_one :ims_registration, class_name: "Lti::IMS::Registration", dependent: :destroy, inverse_of: :developer_key
+  serialize :scopes, type: Array
 
   before_validation :normalize_public_jwk_url
   before_validation :normalize_scopes
@@ -96,8 +97,6 @@ class DeveloperKey < ActiveRecord::Base
     state :deleted
   end
 
-  self.ignored_columns += %i[oidc_login_uri tool_id]
-
   # https://stackoverflow.com/a/2500819
   alias_method :referenced_tool_configuration, :tool_configuration
 
@@ -125,6 +124,10 @@ class DeveloperKey < ActiveRecord::Base
   def redirect_uris=(value)
     value = value.split if value.is_a?(String)
     super(value)
+  end
+
+  def ims_registration?
+    ims_registration.present?
   end
 
   def validate_redirect_uris
@@ -222,6 +225,13 @@ class DeveloperKey < ActiveRecord::Base
         DeveloperKey.shard([Shard.current, Account.site_admin.shard].uniq).where(vendor_code:).to_a
       end
     end
+
+    def mobile_app_keys(active: true)
+      GuardRail.activate(:secondary) do
+        keys = shard(Shard.default).where.not(sns_arn: nil)
+        active ? keys.nondeleted : keys
+      end
+    end
   end
 
   def clear_cache
@@ -243,8 +253,14 @@ class DeveloperKey < ActiveRecord::Base
     return true if account_id.blank?
     return true if target_account.id == account_id
 
-    # Include the federated parent unless we are the federated parent
-    target_account.account_chain_ids(include_federated_parent_id: !target_account.primary_settings_root_account?).include?(account_id)
+    include_federated_parent_id =
+      if target_account.feature_enabled?(:developer_key_consortia_fix_inheritance_logic)
+        !target_account.root_account.primary_settings_root_account?
+      else
+        !target_account.primary_settings_root_account?
+      end
+
+    target_account.account_chain_ids(include_federated_parent_id:).include?(account_id)
   end
 
   def account_name
@@ -287,7 +303,13 @@ class DeveloperKey < ActiveRecord::Base
 
     # Search for bindings in the account chain starting with the highest account,
     # and include consortium parent if necessary
-    accounts = binding_account.account_chain(include_federated_parent: !binding_account.primary_settings_root_account?).reverse
+    include_federated_parent =
+      if binding_account.root_account.feature_enabled?(:developer_key_consortia_fix_inheritance_logic)
+        !binding_account.root_account.primary_settings_root_account?
+      else
+        !binding_account.primary_settings_root_account?
+      end
+    accounts = binding_account.account_chain(include_federated_parent:).reverse
     binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, self)
 
     # If no explicity set bindings were found check for 'allow' bindings
@@ -387,7 +409,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def tool_configuration
-    (lti_registration.presence || referenced_tool_configuration)
+    ims_registration.presence || referenced_tool_configuration
   end
 
   private

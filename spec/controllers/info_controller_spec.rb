@@ -80,10 +80,10 @@ describe InfoController do
 
   describe "GET 'readiness'" do
     before do
-      allow(Account.connection).to receive(:active?).and_return(true)
+      allow(Account.connection).to receive(:verify!).and_return(true)
       allow(MultiCache.cache).to receive(:fetch).and_call_original
       allow(MultiCache.cache).to receive(:fetch).with("readiness").and_return(nil)
-      allow(Delayed::Job.connection).to receive(:active?).and_return(true)
+      allow(Delayed::Job.connection).to receive(:verify!).and_return(true)
     end
 
     it "responds with 200 if all system components are alive and serving" do
@@ -94,7 +94,7 @@ describe InfoController do
     end
 
     it "responds with 503 if a system component is considered down" do
-      allow(Delayed::Job.connection).to receive(:active?).and_return(false)
+      allow(Delayed::Job.connection).to receive(:verify!).and_raise(PG::UnableToSend)
       get "readiness"
       expect(response).to have_http_status :service_unavailable
       json = response.parsed_body
@@ -105,7 +105,7 @@ describe InfoController do
       let(:secondary_connection) { GuardRail.activate(:secondary) { Account.connection } }
 
       it "responds with 503" do
-        allow(secondary_connection).to receive(:active?) do
+        allow(secondary_connection).to receive(:verify!) do
           raise ActiveRecord::ConnectionNotEstablished if GuardRail.current == :secondary # double check, in case we're sharing connections
 
           true
@@ -160,11 +160,11 @@ describe InfoController do
     let(:success_response) { Net::HTTPSuccess.new(Net::HTTPOK, "200", "OK") }
 
     before do
-      allow(Account.connection).to receive(:active?).and_return(true)
+      allow(Account.connection).to receive(:verify!).and_return(true)
       allow(MultiCache.cache).to receive(:fetch).and_call_original
       allow(MultiCache.cache).to receive(:fetch).with("readiness").and_return(nil)
-      allow(Delayed::Job.connection).to receive(:active?).and_return(true)
-      allow(Shard.connection).to receive(:active?).and_return(true)
+      allow(Delayed::Job.connection).to receive(:verify!).and_return(true)
+      allow(Shard.connection).to receive(:verify!).and_return(true)
       allow(Canvadocs).to receive_messages(enabled?: true, config: { "base_url" => "https://canvadocs.instructure.com/" })
       allow(PageView).to receive(:pv4?).and_return(true)
       allow(ConfigFile).to receive(:load).and_call_original
@@ -173,7 +173,7 @@ describe InfoController do
       allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
       allow(DynamicSettings).to receive(:find)
         .with("rich-content-service")
-        .and_return(DynamicSettings::FallbackProxy.new("app-host" => "rce.instructure.com"))
+        .and_return(DynamicSettings::FallbackProxy.new({ "app-host" => "rce.instructure.com" }))
       allow(CanvasHttp).to receive(:get).with(any_args).and_return(success_response)
       allow(IncomingMailProcessor::IncomingMessageProcessor).to receive_messages(run_periodically: true, healthy?: true)
     end
@@ -197,7 +197,7 @@ describe InfoController do
     end
 
     it "responds with 503 if a readiness system component is considered down" do
-      allow(Delayed::Job.connection).to receive(:active?).and_return(false)
+      allow(Delayed::Job.connection).to receive(:verify!).and_raise(PG::UnableToSend)
       get "deep"
       expect(response).to have_http_status :service_unavailable
       json = response.parsed_body
@@ -205,7 +205,7 @@ describe InfoController do
     end
 
     it "returns 503 if critical dependency check fails and readiness response is 200" do
-      allow(Shard.connection).to receive(:active?).and_return(false)
+      allow(Shard.connection).to receive(:verify!).and_raise(PG::UnableToSend)
       get "deep"
       expect(response).to have_http_status :service_unavailable
       json = response.parsed_body

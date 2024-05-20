@@ -28,11 +28,10 @@ XSSLint.configure({
   'jqueryObject.identifier': [/^\$/],
   'jqueryObject.property': [/^\$/],
   'safeString.identifier': [/(_html|Html|View|Template)$/, 'html', 'id'],
-  'safeString.function': ['h', 'htmlEscape', 'template', /(Template|View|Dialog)$/],
+  'safeString.function': ['h', 'raw', 'htmlEscape', 'template', /(Template|View|Dialog)$/],
   'safeString.property': ['template', 'id', 'height', 'width', /_id$/],
   'safeString.method': [
     'escapeContent',
-    '$.raw',
     'template',
     /(Template|Html)$/,
     'toISOString',

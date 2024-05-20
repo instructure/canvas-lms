@@ -69,7 +69,7 @@ class AssignmentExternalTools extends React.Component {
     const url = encodeURI(`${this.getDefinitionsUrl()}?placements[]=${this.props.placement}`)
 
     try {
-      const request = getPrefetchedXHR(url) || fetch(url, defaultFetchOptions)
+      const request = getPrefetchedXHR(url) || fetch(url, defaultFetchOptions())
       const tools = await asJson(request)
       tools.forEach(t => (t.launch = this.getLaunch(t)))
       this.setState({tools})

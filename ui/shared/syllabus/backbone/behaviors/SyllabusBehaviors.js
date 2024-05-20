@@ -19,14 +19,15 @@
 import $ from 'jquery'
 import {changeMonth} from '../../jquery/calendar_move' // calendarMonths
 import RichContentEditor from '@canvas/rce/RichContentEditor'
-import '@canvas/datetime' // dateString, datepicker
-import '@canvas/forms/jquery/jquery.instructure_forms' // formSubmit, formErrors
+import '@canvas/datetime/jquery' // dateString, datepicker
+import '@canvas/jquery/jquery.instructure_forms' // formSubmit, formErrors
 import '@canvas/jquery/jquery.instructure_misc_plugins' // ifExists, showIf
 import '@canvas/loading-image'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/datepicker'
 import easy_student_view from '@canvas/easy-student-view'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
+import {escape} from 'lodash'
 
 RichContentEditor.preloadRemoteModule()
 
@@ -140,7 +141,8 @@ function bindToMiniCalendar() {
     changeMonth($mini_month, `${month}/${day}/${year}`)
     highlightDaysWithEvents()
     selectDate(date)
-    $(`.events_${date}`).ifExists($events => setTimeout(() => selectRow($events), 0)) // focus race condition hack. why do you do this to me, IE?
+    const eventSelector = escape(`.events_${date}`)
+    $(eventSelector).ifExists($events => setTimeout(() => selectRow($events), 0)) // focus race condition hack. why do you do this to me, IE?
   }
 
   $mini_month.on('keypress', '.day_wrapper', ev => {
@@ -216,6 +218,7 @@ const bindToEditSyllabus = function (course_summary_enabled) {
     RichContentEditor.loadNewEditor($course_syllabus_body, {
       focus: true,
       manageParent: true,
+      resourceType: 'syllabus.body',
     })
 
     $('.jump_to_today_link').focus()

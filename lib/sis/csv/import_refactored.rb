@@ -32,6 +32,7 @@ module SIS
                     :clear_sis_stickiness,
                     :logger
 
+      MAX_TRIES = 3
       IGNORE_FILES = /__macosx|desktop d[bf]|\A\..*/i
 
       # The order of this array is important:
@@ -183,7 +184,7 @@ module SIS
       def create_batch_attachment(path)
         return if File.stat(path).size == 0
 
-        data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+        data = Canvas::UploadedFile.new(path, Attachment.mimetype(path))
         Attachment.create_data_attachment(@batch, data, File.basename(path))
       end
 
@@ -250,7 +251,7 @@ module SIS
           ensure_later = true
           parallel_importer.write_attribute(:workflow_state, "retry")
           run_parallel_importer(parallel_importer, attempt:)
-        elsif attempt < Setting.get("number_of_tries_before_failing", 5).to_i
+        elsif attempt < MAX_TRIES
           ensure_later = true
           parallel_importer.write_attribute(:workflow_state, "queued")
           attempt += 1

@@ -57,6 +57,110 @@ describe SubmissionSearch do
     expect(results.preload(:user).map(&:user)).to eq students
   end
 
+  it "excludes rejected students by default" do
+    course.enrollments.find_by(user: jonah).reject
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }]).search
+    expect(results.where(user: jonah).exists?).to be false
+  end
+
+  it "excludes deactivated students by default" do
+    course.enrollments.find_by(user: jonah).deactivate
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }]).search
+    expect(results.where(user: jonah).exists?).to be false
+  end
+
+  it "optionally includes deactivated students" do
+    course.enrollments.find_by(user: jonah).deactivate
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }], include_deactivated: true).search
+    expect(results.where(user: jonah).exists?).to be true
+  end
+
+  it "excludes rejected students when including deactivated students" do
+    course.enrollments.find_by(user: jonah).reject
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }], include_deactivated: true).search
+    expect(results.where(user: jonah).exists?).to be false
+  end
+
+  it "excludes concluded students by default" do
+    course.enrollments.find_by(user: jonah).conclude
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }]).search
+    expect(results.where(user: jonah).exists?).to be false
+  end
+
+  it "optionally includes concluded students" do
+    course.enrollments.find_by(user: jonah).conclude
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }], include_concluded: true).search
+    expect(results.where(user: jonah).exists?).to be true
+  end
+
+  it "excludes rejected students when including concluded students" do
+    course.enrollments.find_by(user: jonah).reject
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }], include_concluded: true).search
+    expect(results.where(user: jonah).exists?).to be false
+  end
+
+  it "optionally includes deactivated students via gradebook settings" do
+    course.enrollments.find_by(user: jonah).deactivate
+    teacher.preferences[:gradebook_settings] = {
+      course.global_id => {
+        "show_inactive_enrollments" => "true"
+      }
+    }
+    teacher.save!
+    results = SubmissionSearch.new(
+      assignment,
+      teacher,
+      nil,
+      order_by: [{ field: "username" }],
+      apply_gradebook_enrollment_filters: true
+    ).search
+    expect(results.where(user: jonah).exists?).to be true
+  end
+
+  it "optionally includes concluded students via gradebook settings" do
+    course.enrollments.find_by(user: jonah).conclude
+    teacher.preferences[:gradebook_settings] = {
+      course.global_id => {
+        "show_concluded_enrollments" => "true"
+      }
+    }
+    teacher.save!
+    results = SubmissionSearch.new(
+      assignment,
+      teacher,
+      nil,
+      order_by: [{ field: "username" }],
+      apply_gradebook_enrollment_filters: true
+    ).search
+    expect(results.where(user: jonah).exists?).to be true
+  end
+
+  it "ignores include_concluded and include_deactivated when apply_gradebook_enrollment_filters is true" do
+    course.enrollments.find_by(user: amanda).deactivate
+    course.enrollments.find_by(user: jonah).conclude
+    teacher.preferences[:gradebook_settings] = {
+      course.global_id => {
+        "show_concluded_enrollments" => "false",
+        "show_inactive_enrollments" => "false"
+      }
+    }
+    teacher.save!
+    results = SubmissionSearch.new(
+      assignment,
+      teacher,
+      nil,
+      order_by: [{ field: "username" }],
+      apply_gradebook_enrollment_filters: true,
+      include_concluded: true,
+      include_deactivated: true
+    ).search
+
+    aggregate_failures do
+      expect(results.where(user: amanda).exists?).to be false
+      expect(results.where(user: jonah).exists?).to be false
+    end
+  end
+
   it "finds submissions with user name search" do
     results = SubmissionSearch.new(assignment,
                                    teacher,
@@ -198,6 +302,49 @@ describe SubmissionSearch do
                                      { field: "username", direction: "ascending" }
                                    ]).search
     expect(results.preload(:user).map(&:user)).to eq [james, amanda, peter]
+  end
+
+  context "group assignments" do
+    before(:once) do
+      group_category = course.group_categories.create!(name: "My Category")
+      @group = group_category.groups.create!(name: "My Group", context: course)
+      students.each { |student| @group.add_user(student) }
+      assignment.update!(group_category:)
+    end
+
+    describe "user_id" do
+      it "returns the group rep's submission when provided with the group rep's ID" do
+        results = SubmissionSearch.new(assignment, teacher, nil, user_id: jonah.id).search
+        aggregate_failures do
+          expect(results.count).to eq 1
+          expect(results.first.user_id).to eq jonah.id
+        end
+      end
+
+      it "returns the group rep's submission when provided with a different group member's ID" do
+        results = SubmissionSearch.new(assignment, teacher, nil, user_id: amanda.id).search
+        aggregate_failures do
+          expect(results.count).to eq 1
+          expect(results.first.user.id).to eq jonah.id
+        end
+      end
+    end
+
+    describe "representatives_only" do
+      it "returns a submission for each user in the group by default" do
+        results = SubmissionSearch.new(assignment, teacher, nil, {}).search
+        expect(results.count).to eq students.count
+      end
+
+      it "optionally returns only the group rep's submission" do
+        results = SubmissionSearch.new(assignment, teacher, nil, representatives_only: true).search
+
+        aggregate_failures do
+          expect(results.count).to eq 1
+          expect(results.first.user.id).to eq jonah.id
+        end
+      end
+    end
   end
 
   # TODO: implement

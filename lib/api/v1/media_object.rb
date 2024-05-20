@@ -43,7 +43,7 @@ module Api::V1::MediaObject
   def media_attachment_api_json(attachment, media_object, current_user, session, exclude = [], verifier: nil)
     api_json(media_object, current_user, session, API_MEDIA_OBJECT_JSON_OPTS).tap do |json|
       json["title"] = media_object.guaranteed_title
-      json["can_add_captions"] = attachment.grants_right?(current_user, session, :update) && media_object.grants_right?(current_user, session, :add_captions)
+      json["can_add_captions"] = attachment.grants_right?(current_user, session, :update)
       json["media_sources"] = media_sources_json(media_object, attachment:, verifier:) unless exclude.include?("sources")
       json["embedded_iframe_url"] = media_attachment_iframe_url(attachment.id)
 

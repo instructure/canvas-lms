@@ -74,7 +74,7 @@ module Quizzes::LogAuditing
       optimizer = Quizzes::LogAuditing::QuestionAnsweredEventOptimizer.new
 
       quiz_submission_events = events.group_by(&:quiz_submission_id)
-      quiz_submission_events.each do |_id, set|
+      quiz_submission_events.each_value do |set|
         set.sort_by!(&:created_at)
         set.each_with_index do |event, index|
           if index > 0

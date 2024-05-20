@@ -70,12 +70,13 @@ function getAssignmentEnvVariables() {
   return env
 }
 
-const ErrorPage = () => {
+const ErrorPage = ({error}) => {
   return (
     <GenericErrorPage
       imageUrl={errorShipUrl}
       errorSubject={I18n.t('Assignments 2 Student initial query error')}
       errorCategory={I18n.t('Assignments 2 Student Error Page')}
+      errorMessage={error.message}
     />
   )
 }
@@ -94,7 +95,7 @@ const LoggedInStudentViewQuery = props => {
   })
 
   if (loading) return <LoadingIndicator />
-  if (error) return <ErrorPage />
+  if (error) return <ErrorPage error={error} />
 
   document.title = data.assignment.name
   const dataWithEnv = JSON.parse(JSON.stringify(data))

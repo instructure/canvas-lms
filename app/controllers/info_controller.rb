@@ -53,10 +53,10 @@ class InfoController < ApplicationController
 
   def health_check
     # This action should perform checks on various subsystems, and raise an exception on failure.
-    Account.connection.active?
+    Account.connection.verify!
     if Delayed::Job == Delayed::Backend::ActiveRecord::Job &&
        Account.connection != Delayed::Job.connection
-      Delayed::Job.connection.active?
+      Delayed::Job.connection.verify!
     end
     Tempfile.open("heartbeat", ENV["TMPDIR"] || Dir.tmpdir) do |f|
       f.write("heartbeat")
@@ -64,7 +64,7 @@ class InfoController < ApplicationController
     end
     # consul works; we don't really care about the result, but it should not error trying to
     # get the result
-    DynamicSettings.find(tree: :private)["enable_rack_brotli"]
+    DynamicSettings.find(tree: :private)["enable_rack_brotli", failsafe: true]
     # vault works; asserting a hash is returned that is not null
     !Canvas::Vault.read("#{Canvas::Vault.kv_mount}/data/secrets").nil? if Canvas::Vault
 

@@ -79,11 +79,11 @@ class CourseGroups
     end
 
     def group_user_action_button(student_id)
-      fj(".group-user-actions[data-user-id=user_#{student_id}]")
+      fj("[data-testid=groupUserMenu][data-userid=#{student_id}]")
     end
 
-    def edit_user_group(student_id)
-      fj(".edit-group-assignment[data-user-id=user_#{student_id}]")
+    def edit_user_group
+      f("[data-testid=moveTo]")
     end
 
     def move_to_group_option
@@ -120,7 +120,7 @@ class CourseGroups
     def move_student_to_different_group(student_id, curr_group_name, dest_group_name)
       toggle_group_detail_view(curr_group_name)
       group_user_action_button(student_id).click
-      edit_user_group(student_id).click
+      edit_user_group.click
       wait_for_ajaximations
       move_to_group_option.click
       select_group_option_from_dropdown(dest_group_name).click

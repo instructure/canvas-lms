@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import registrationErrors from '@canvas/normalize-registration-errors'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 export default class SelfEnrollmentForm extends Backbone.View {

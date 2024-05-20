@@ -17,14 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# If this is not a clustered environment, don't worry about providing
-# this global variable
-
 Rails.configuration.to_prepare do
-  # rubocop:disable Style/GlobalVars
-  Canvas::Apm.canvas_cluster = $canvas_cluster if $canvas_cluster.present?
-  # rubocop:enable Style/GlobalVars
-
   # set this to "true" in your docker-compose override file or in your .env
   # or whatever you use in order to see logging output containing all the
   # APM traces.

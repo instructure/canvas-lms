@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {chain, difference, forEach, isEmpty, isEqual, keyBy, map, reduce, union} from 'lodash'
 import _ from 'underscore'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -31,6 +32,12 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
 import {Checkbox} from '@instructure/ui-checkbox'
 import '@canvas/rails-flash-notifications'
+import {
+  sortedRowKeys,
+  rowsFromOverrides,
+  getAllOverrides,
+  datesFromOverride,
+} from '../util/overridesUtils'
 
 const I18n = useI18nScope('due_datesDueDates')
 
@@ -80,7 +87,7 @@ export default class DueDates extends React.Component {
   componentDidMount() {
     this.setState(
       {
-        rows: this.rowsFromOverrides(this.props.overrides),
+        rows: rowsFromOverrides(this.props.overrides),
         sections: this.formattedSectionHash(this.props.sections),
         groups: {},
         selectedGroupSetId: this.props.selectedGroupSetId,
@@ -122,7 +129,7 @@ export default class DueDates extends React.Component {
 
   // always keep React Overrides in sync with Backbone Collection
   UNSAFE_componentWillUpdate(nextProps, nextState) {
-    const updatedOverrides = this.getAllOverrides(nextState.rows)
+    const updatedOverrides = getAllOverrides(nextState.rows)
     this.props.syncWithBackbone(updatedOverrides, nextState.importantDates)
   }
 
@@ -130,13 +137,11 @@ export default class DueDates extends React.Component {
   //        State Change
   // --------------------------
 
-  replaceRow = (rowKey, newOverrides, rowDates) => {
-    const tmp = {}
-    const dates = rowDates || this.datesFromOverride(newOverrides[0])
-    tmp[rowKey] = {overrides: newOverrides, dates, persisted: false}
-
-    const newRows = _.extend(this.state.rows, tmp)
-    this.setState({rows: newRows})
+  replaceRow = (rowKey, overrides, rowDates) => {
+    const dates = rowDates || datesFromOverride(overrides[0])
+    this.setState(oldState => ({
+      rows: {...oldState.rows, [rowKey]: {overrides, dates, persisted: false}},
+    }))
   }
 
   // -------------------
@@ -144,53 +149,32 @@ export default class DueDates extends React.Component {
   // -------------------
 
   formattedSectionHash = unformattedSections => {
-    const formattedSections = _.map(unformattedSections, this.formatSection)
-    return _.keyBy(formattedSections, 'id')
+    const formattedSections = map(unformattedSections, this.formatSection)
+    return keyBy(formattedSections, 'id')
   }
 
-  formatSection = section => _.extend(section.attributes, {course_section_id: section.id})
+  formatSection = section => ({...section.attributes, course_section_id: section.id})
 
   formattedGroupHash = unformattedGroups => {
-    const formattedGroups = _.map(unformattedGroups, this.formatGroup)
-    return _.keyBy(formattedGroups, 'id')
+    const formattedGroups = map(unformattedGroups, this.formatGroup)
+    return keyBy(formattedGroups, 'id')
   }
 
-  formatGroup = group => _.extend(group, {group_id: group.id})
+  formatGroup = group => ({...group, group_id: group.id})
 
-  getAllOverrides = givenRows => {
-    const rows = givenRows || this.state.rows
-    return _.chain(rows)
-      .values()
-      .map(row =>
-        _.map(row.overrides, override => {
-          override.attributes.persisted = row.persisted
-          return override
-        })
-      )
-      .flatten()
-      .compact()
-      .value()
-  }
-
-  adhocOverrides = () => _.filter(this.getAllOverrides(), ov => ov.get('student_ids'))
+  adhocOverrides = () => _.filter(getAllOverrides(this.state.rows), ov => ov.get('student_ids'))
 
   adhocOverrideStudentIDs = () =>
-    _.chain(this.adhocOverrides())
+    chain(this.adhocOverrides())
       .map(ov => ov.get('student_ids'))
       .flatten()
       .uniq()
       .value()
 
-  datesFromOverride = override => ({
-    due_at: override ? override.get('due_at') : null,
-    lock_at: override ? override.get('lock_at') : null,
-    unlock_at: override ? override.get('unlock_at') : null,
-  })
-
   groupsForSelectedSet = () => {
     const allGroups = this.state.groups
     const setId = this.state.selectedGroupSetId
-    return _.chain(allGroups)
+    return chain(allGroups)
       .filter(value => value.group_category_id === setId)
       .keyBy('id')
       .value()
@@ -199,30 +183,6 @@ export default class DueDates extends React.Component {
   // -------------------
   //      Row Setup
   // -------------------
-
-  rowsFromOverrides = overrides => {
-    const overridesByKey = _.groupBy(overrides, override => {
-      override.set('rowKey', override.combinedDates())
-      return override.get('rowKey')
-    })
-
-    return _.chain(overridesByKey)
-      .map((overrides, key) => {
-        const datesForGroup = this.datesFromOverride(overrides[0])
-        return [key, {overrides, dates: datesForGroup, persisted: true}]
-      })
-      .object()
-      .value()
-  }
-
-  sortedRowKeys = () => {
-    const {datedKeys, numberedKeys} = _.chain(this.state.rows)
-      .keys()
-      .groupBy(key => (key.length > 11 ? 'datedKeys' : 'numberedKeys'))
-      .value()
-
-    return _.chain([datedKeys, numberedKeys]).flatten().compact().value()
-  }
 
   rowRef = rowKey => `due_date_row-${rowKey}`
 
@@ -241,16 +201,16 @@ export default class DueDates extends React.Component {
   removeRow = rowToRemoveKey => {
     if (!this.canRemoveRow()) return
 
-    const previousIndex = _.indexOf(this.sortedRowKeys(), rowToRemoveKey)
+    const previousIndex = _.indexOf(sortedRowKeys(this.state.rows), rowToRemoveKey)
     const newRows = _.omit(this.state.rows, rowToRemoveKey)
     this.setState({rows: newRows}, function () {
-      const ks = this.sortedRowKeys()
+      const ks = sortedRowKeys(this.state.rows)
       const previousRowKey = ks[previousIndex] || ks[ks.length - 1]
       this.focusRow(previousRowKey)
     })
   }
 
-  canRemoveRow = () => this.sortedRowKeys().length > 1
+  canRemoveRow = () => sortedRowKeys(this.state.rows).length > 1
 
   focusRow = rowKey => {
     ReactDOM.findDOMNode(this.refs[this.rowRef(rowKey)]).querySelector('input').focus()
@@ -263,7 +223,6 @@ export default class DueDates extends React.Component {
   changeRowToken = (addOrRemoveFunction, rowKey, changedToken) => {
     if (!changedToken) return
     const row = this.state.rows[rowKey]
-
     const newOverridesForRow = addOrRemoveFunction.call(
       TokenActions,
       changedToken,
@@ -291,14 +250,12 @@ export default class DueDates extends React.Component {
     const oldOverrides = this.state.rows[rowKey].overrides
     const oldDates = this.state.rows[rowKey].dates
 
-    const newOverrides = _.map(oldOverrides, override => {
+    const newOverrides = map(oldOverrides, override => {
       override.set(dateType, newDate)
       return override
     })
 
-    const tmp = {}
-    tmp[dateType] = newDate
-    const newDates = _.extend(oldDates, tmp)
+    const newDates = {...oldDates, [dateType]: newDate}
 
     this.replaceRow(rowKey, newOverrides, newDates)
   }
@@ -310,11 +267,11 @@ export default class DueDates extends React.Component {
   defaultSectionNamer = sectionID => {
     if (sectionID !== this.props.defaultSectionId) return null
 
-    const onlyDefaultSectionChosen = _.isEqual(this.chosenSectionIds(), [sectionID])
-    const noSectionsChosen = _.isEmpty(this.chosenSectionIds())
+    const onlyDefaultSectionChosen = isEqual(this.chosenSectionIds(), [sectionID])
+    const noSectionsChosen = isEmpty(this.chosenSectionIds())
 
-    const noGroupsChosen = _.isEmpty(this.chosenGroupIds())
-    const noStudentsChosen = _.isEmpty(this.chosenStudentIds())
+    const noGroupsChosen = isEmpty(this.chosenGroupIds())
+    const noStudentsChosen = isEmpty(this.chosenStudentIds())
 
     const defaultSectionOrNoSectionChosen = onlyDefaultSectionChosen || noSectionsChosen
 
@@ -335,10 +292,10 @@ export default class DueDates extends React.Component {
   }
 
   studentsInClosedPeriods = () => {
-    const allStudents = _.values(this.state.students)
-    if (_.isEmpty(allStudents)) return allStudents
+    const allStudents = Object.values(this.state.students || {})
+    if (isEmpty(allStudents)) return allStudents
 
-    const overrides = _.map(this.props.overrides, override => override.attributes)
+    const overrides = map(this.props.overrides, override => override.attributes)
     const assignment = {
       due_at: this.props.dueAt,
       only_visible_to_overrides: this.props.isOnlyVisibleToOverrides,
@@ -350,7 +307,7 @@ export default class DueDates extends React.Component {
       allStudents
     )
     const gradingPeriodsHelper = new GradingPeriodsHelper(this.props.gradingPeriods)
-    return _.reduce(
+    return reduce(
       effectiveDueDates,
       this.addStudentIfInClosedPeriod.bind(this, gradingPeriodsHelper),
       []
@@ -380,7 +337,7 @@ export default class DueDates extends React.Component {
       object: this.state.noops,
       keysToOmit: this.chosenNoops(),
     })
-    if (this.props.hasGradingPeriods && !_.includes(ENV.current_user_roles, 'admin')) {
+    if (this.props.hasGradingPeriods && !ENV.current_user_is_admin) {
       ;({validStudents, validGroups, validSections} =
         this.filterDropdownOptionsForMultipleGradingPeriods(
           validStudents,
@@ -389,14 +346,14 @@ export default class DueDates extends React.Component {
         ))
     }
 
-    return _.union(validStudents, validSections, validGroups, validNoops)
+    return union(validStudents, validSections, validGroups, validNoops)
   }
 
   extractGroupsAndSectionsFromStudent = (groups, toOmit, student) => {
-    _.each(student.group_ids, groupID => {
+    forEach(student.group_ids, groupID => {
       toOmit.groupsToOmit[groupID] = toOmit.groupsToOmit[groupID] || groups[groupID]
     })
-    _.each(student.sections, sectionID => {
+    forEach(student.sections, sectionID => {
       toOmit.sectionsToOmit[sectionID] =
         toOmit.sectionsToOmit[sectionID] || this.state.sections[sectionID]
     })
@@ -405,52 +362,52 @@ export default class DueDates extends React.Component {
 
   groupsAndSectionsInClosedPeriods = studentsToOmit => {
     const groups = this.groupsForSelectedSet()
-    const omitted = _.reduce(
+    const omitted = reduce(
       studentsToOmit,
       this.extractGroupsAndSectionsFromStudent.bind(this, groups),
       {groupsToOmit: {}, sectionsToOmit: {}}
     )
 
     return {
-      groupsToOmit: _.values(omitted.groupsToOmit),
-      sectionsToOmit: _.values(omitted.sectionsToOmit),
+      groupsToOmit: Object.values(omitted.groupsToOmit || {}),
+      sectionsToOmit: Object.values(omitted.sectionsToOmit || {}),
     }
   }
 
   filterDropdownOptionsForMultipleGradingPeriods = (students, groups, sections) => {
     const studentsToOmit = this.studentsInClosedPeriods()
 
-    if (_.isEmpty(studentsToOmit)) {
+    if (isEmpty(studentsToOmit)) {
       return {validStudents: students, validGroups: groups, validSections: sections}
     } else {
       const {groupsToOmit, sectionsToOmit} = this.groupsAndSectionsInClosedPeriods(studentsToOmit)
 
       return {
-        validStudents: _.difference(students, studentsToOmit),
-        validGroups: _.difference(groups, groupsToOmit),
-        validSections: _.difference(sections, sectionsToOmit),
+        validStudents: difference(students, studentsToOmit),
+        validGroups: difference(groups, groupsToOmit),
+        validSections: difference(sections, sectionsToOmit),
       }
     }
   }
 
   chosenIds = idType =>
-    _.chain(this.getAllOverrides())
+    _.chain(getAllOverrides(this.state.rows))
       .map(ov => ov.get(idType))
       .compact()
       .value()
 
   chosenSectionIds = () => this.chosenIds('course_section_id')
 
-  chosenStudentIds = () => _.flatten(this.chosenIds('student_ids'))
+  chosenStudentIds = () => (this.chosenIds('student_ids') || []).flat(Infinity)
 
   chosenGroupIds = () => this.chosenIds('group_id')
 
   chosenNoops = () => this.chosenIds('noop_id')
 
-  valuesWithOmission = args => _.chain(args.object).omit(args.keysToOmit).values().value()
+  valuesWithOmission = args => chain(args.object).omit(args.keysToOmit).values().value()
 
   disableInputs = row => {
-    const rowIsNewOrUserIsAdmin = !row.persisted || _.includes(ENV.current_user_roles, 'admin')
+    const rowIsNewOrUserIsAdmin = !row.persisted || ENV.current_user_is_admin
     if (!this.props.hasGradingPeriods || rowIsNewOrUserIsAdmin) {
       return false
     }
@@ -471,7 +428,7 @@ export default class DueDates extends React.Component {
   // -------------------
 
   rowsToRender = () =>
-    _.map(this.sortedRowKeys(), rowKey => {
+    map(sortedRowKeys(this.state.rows), rowKey => {
       const row = this.state.rows[rowKey]
       const overrides = row.overrides || []
       const dates = row.dates || {}

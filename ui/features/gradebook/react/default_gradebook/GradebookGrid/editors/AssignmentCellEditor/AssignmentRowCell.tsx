@@ -58,6 +58,8 @@ type Props = {
 
   gradingScheme: [name: string, value: number][]
 
+  pointsBasedGradingScheme: boolean
+
   onGradeSubmission: (submission: Submission, grade: string) => void
 
   onToggleSubmissionTrayOpen: (assignmentId: string, userId: string) => void
@@ -228,6 +230,7 @@ export default class AssignmentRowCell extends Component<Props> {
               enterGradesAs={this.props.enterGradesAs}
               disabled={this.props.submissionIsUpdating}
               gradingScheme={this.props.gradingScheme}
+              pointsBasedGradingScheme={this.props.pointsBasedGradingScheme}
               pendingGradeInfo={this.props.pendingGradeInfo}
               ref={this.bindGradeInput}
               submission={this.props.submission}

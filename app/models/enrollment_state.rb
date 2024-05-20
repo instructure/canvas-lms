@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class EnrollmentState < ActiveRecord::Base
+  PENDING_STATES = %w[pending_active pending_invited creation_pending].freeze
   # a 1-1 table with enrollments
   # that was really only a separate table because enrollments had a billion columns already
   # and the data here was going to have a lot of churn too
@@ -103,7 +104,7 @@ class EnrollmentState < ActiveRecord::Base
   end
 
   def pending?
-    %w[pending_active pending_invited creation_pending].include?(state)
+    PENDING_STATES.include?(state)
   end
 
   def recalculate_state
@@ -166,8 +167,17 @@ class EnrollmentState < ActiveRecord::Base
         self.state = wf_state
       elsif global_start_at < now
         if enrollment.temporary_enrollment?
-          # special case for temporary enrollments, mark them deleted once we're past the end date
-          enrollment.destroy
+          ending_enrollment_state = enrollment.temporary_enrollment_pairing&.ending_enrollment_state
+          case ending_enrollment_state
+          when "completed"
+            enrollment.conclude
+            self.state = "completed"
+          when "inactive"
+            enrollment.deactivate
+            self.state = "inactive"
+          when "deleted", nil
+            enrollment.destroy
+          end
         else
           # we've past the end date so no matter what the state was, we're "completed" now
           self.state = "completed"

@@ -27,6 +27,8 @@ module Api::V1::Assignment
   include SubmittablesGradingPeriodProtection
   include Api::V1::PlannerOverride
 
+  ALL_DATES_LIMIT = 25
+
   PRELOADS = %i[external_tool_tag
                 duplicate_of
                 rubric
@@ -169,8 +171,8 @@ module Api::V1::Assignment
     hash["graded_submissions_exist"] = assignment.graded_submissions_exist?
 
     if opts[:include_checkpoints] && assignment.root_account.feature_enabled?(:discussion_checkpoints)
-      hash["checkpointed"] = assignment.checkpointed?
-      hash["checkpoints"] = assignment.checkpoint_assignments.map { |checkpoint| Checkpoint.new(checkpoint).as_json }
+      hash["has_sub_assignments"] = assignment.has_sub_assignments?
+      hash["checkpoints"] = assignment.sub_assignments.map { |sub_assignment| Checkpoint.new(sub_assignment, user).as_json }
     end
 
     if opts[:overrides].present?
@@ -357,7 +359,7 @@ module Api::V1::Assignment
                        else
                          assignment.assignment_overrides.active.count
                        end
-      if override_count < Setting.get("assignment_all_dates_too_many_threshold", "25").to_i
+      if override_count < ALL_DATES_LIMIT
         hash["all_dates"] = assignment.dates_hash_visible_to(user)
       else
         hash["all_dates_count"] = override_count
@@ -393,6 +395,7 @@ module Api::V1::Assignment
     end
 
     hash["only_visible_to_overrides"] = value_to_boolean(assignment.only_visible_to_overrides)
+    hash["visible_to_everyone"] = assignment.visible_to_everyone
 
     if opts[:include_visibility]
       hash["assignment_visibility"] = (opts[:assignment_visibilities] || assignment.students_with_visibility.pluck(:id).uniq).map(&:to_s)
@@ -644,7 +647,7 @@ module Api::V1::Assignment
           initiated_source: :new_quizzes
         )
 
-        data.each do |key, _|
+        data.each_key do |key|
           import_object = Context.find_asset_by_url(key)
 
           next unless import_object.respond_to?(:context) && import_object.context.is_a?(Course)
@@ -925,6 +928,14 @@ module Api::V1::Assignment
       end
     end
 
+    if assignment_params.key?("alignment_cloned_successfully") && assignment.root_account.feature_enabled?(:course_copy_alignments)
+      if value_to_boolean(assignment_params[:alignment_cloned_successfully])
+        assignment.finish_alignment_cloning
+      else
+        assignment.fail_to_clone_alignment
+      end
+    end
+
     if assignment_params.key?("migrated_successfully")
       if value_to_boolean(assignment_params[:migrated_successfully])
         assignment.finish_migrating
@@ -1096,6 +1107,10 @@ module Api::V1::Assignment
 
     if external_tool_tag_attributes&.include?(:url)
       assignment.lti_resource_link_url = external_tool_tag_attributes[:url]
+    end
+
+    if external_tool_tag_attributes&.include?(:title)
+      assignment.lti_resource_link_title = external_tool_tag_attributes[:title]
     end
 
     if assignment.external_tool?

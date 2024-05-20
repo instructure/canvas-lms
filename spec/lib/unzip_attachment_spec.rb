@@ -146,10 +146,8 @@ describe UnzipAttachment do
       let(:filename) { fixture_filename("huge_zip.zip") }
 
       it "errors when the number of files in the zip exceed the configured limit" do
-        current_setting = Setting.get("max_zip_file_count", "100000")
-        Setting.set("max_zip_file_count", "9")
+        stub_const("ZipFileStats::MAX_FILE_COUNT", 9)
         expect { unzipper.process }.to raise_error(ArgumentError, "Zip File cannot have more than 9 entries")
-        Setting.set("max_zip_file_count", current_setting)
       end
 
       it "errors when the file quotas push the context over its quota" do

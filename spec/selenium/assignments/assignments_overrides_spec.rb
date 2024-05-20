@@ -81,7 +81,7 @@ describe "assignment groups" do
       assign = @course.assignments.create!(title: "due tomorrow", due_at: 2.days.from_now)
       get "/courses/#{@course.id}/assignments/#{assign.id}/edit"
 
-      fj(".date_field:first[data-date-type='due_at']").clear
+      fj(".date_field[data-date-type='due_at']:first").clear
       expect_new_page_load { submit_form("#edit_assignment_form") }
 
       expect(assign.reload.due_at).to be_nil

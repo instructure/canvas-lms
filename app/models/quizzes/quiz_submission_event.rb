@@ -31,7 +31,7 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
   belongs_to :quiz_submission, class_name: "Quizzes::QuizSubmission"
   resolves_root_account through: :quiz_submission
 
-  serialize :event_data, JSON
+  serialize :event_data, coder: JSON
 
   # for a more meaningful API when dealing with EVT_QUESTION_ANSWERED events:
   alias_attribute :answers, :event_data

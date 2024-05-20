@@ -702,9 +702,7 @@ class SisImportsApiController < ApplicationController
         end
       end
 
-      unless Setting.get("skip_sis_jobs_account_ids", "").split(",").include?(@account.global_id.to_s)
-        batch.process
-      end
+      batch.process
 
       unless api_request?
         @account.current_sis_batch_id = batch.id

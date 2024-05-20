@@ -21,7 +21,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {createStore, applyMiddleware} from 'redux'
 import {Provider} from 'react-redux'
-import ReduxThunk from 'redux-thunk'
+import {thunk} from 'redux-thunk'
 
 import {DEFAULT_STORE_STATE} from './fixtures'
 import {StoreState} from '../types'
@@ -34,4 +34,4 @@ export const renderConnected = (
 
 // We need to use a middleware to mock async actions
 const withMiddleware = (rootReducer, initialState) =>
-  applyMiddleware(ReduxThunk)(createStore)(rootReducer, initialState)
+  applyMiddleware(thunk)(createStore)(rootReducer, initialState)

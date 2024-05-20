@@ -76,8 +76,7 @@ describe "publishing a quiz" do
           it "shows updated options", priority: "1" do
             f(".header-group-right button.al-trigger").click
             items = ff("ul#toolbar-1 li.ui-menu-item")
-            items_text = []
-            items.each { |i| items_text << i.text.split("\n")[0] }
+            items_text = items.map { |i| i.text.split("\n")[0] }
 
             expect(items_text).to include "Show Rubric"
             expect(items_text).to include "Preview"

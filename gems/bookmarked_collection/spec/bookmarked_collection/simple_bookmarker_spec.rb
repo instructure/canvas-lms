@@ -27,7 +27,7 @@ describe BookmarkedCollection::SimpleBookmarker do
     end
 
     BookmarkedCollection.best_unicode_collation_key_proc = lambda do |col|
-      return "lower(#{col})"
+      "lower(#{col})"
     end
 
     @bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class, :name, :id)
@@ -45,7 +45,7 @@ describe BookmarkedCollection::SimpleBookmarker do
 
   context "#bookmark_for" do
     it "is comparable" do
-      expect(@bookmarker.bookmark_for(@bob)).to be_respond_to(:<=>)
+      expect(@bookmarker.bookmark_for(@bob)).to respond_to(:<=>)
     end
 
     it "matches the columns, in order" do

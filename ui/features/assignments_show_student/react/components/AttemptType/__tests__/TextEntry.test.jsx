@@ -23,19 +23,23 @@ import React from 'react'
 import TextEntry from '../TextEntry'
 import StudentViewContext from '../../Context'
 
-jest.mock('@canvas/tinymce-external-tools/TinyMCEContentItem', () => ({
-  fromJSON: contentItem => ({
-    codePayload: `<a href="${contentItem.url}" title="${contentItem.title}" target="${contentItem.linkTarget}">${contentItem.title}</a>`,
-  }),
-}))
+jest.mock(
+  '@instructure/canvas-rce/es/rce/plugins/instructure_rce_external_tools/lti11-content-items/RceLti11ContentItem',
+  () => ({
+    RceLti11ContentItem: {
+      fromJSON: contentItem => ({
+        codePayload: `<a href="${contentItem.url}" title="${contentItem.title}" target="${contentItem.linkTarget}">${contentItem.title}</a>`,
+      }),
+    },
+  })
+)
 
 async function makeProps(opts = {}) {
   const mockedSubmission =
     opts.submission ||
     (await mockSubmission({
-      Submission: {
-        submissionDraft: {body: 'words'},
-      },
+      Submission: {submissionDraft: {}},
+      SubmissionDraft: {body: 'words'},
     }))
 
   return {
@@ -353,10 +357,11 @@ describe('TextEntry', () => {
     })
 
     it('calls onContentsChanged when the user types', async () => {
+      const user = userEvent.setup({delay: null})
       const props = await makeProps()
       await renderEditor(props)
       props.onContentsChanged.mockClear()
-      userEvent.type(document.getElementById('textentry_text'), '!')
+      await user.type(document.getElementById('textentry_text'), '!')
       expect(props.onContentsChanged).toHaveBeenCalled()
     })
   })

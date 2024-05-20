@@ -17,21 +17,24 @@
  */
 
 import DatetimeField, {
-  TIME_FORMAT_OPTIONS,
   DATE_FORMAT_OPTIONS,
   DATETIME_FORMAT_OPTIONS,
+  TIME_FORMAT_OPTIONS,
+  PARSE_RESULTS,
 } from '@canvas/datetime/jquery/DatetimeField'
+import '@canvas/datetime/jquery'
 import $ from 'jquery'
-import tz from '@canvas/timezone'
-import tzInTest from '@canvas/timezone/specHelpers'
+import 'jquery-migrate'
+import * as tz from '@canvas/datetime'
+import tzInTest from '@canvas/datetime/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
 import fakeENV from 'helpers/fakeENV'
 import moment from 'moment'
 
-const moonwalk = new Date('1969-07-21T02:56:00Z')
-const john_glenn = new Date('1962-02-20T14:47:39')
+const challenger = new Date('1986-01-28T16:39:00Z')
+const columbia = new Date('2003-02-01T13:59:00Z')
 
 QUnit.module('processTimeOptions', {
   setup() {
@@ -186,18 +189,24 @@ test('should not add datepicker when timeOnly', function () {
 })
 
 test('should place suggest outside wrapper when adding datepicker', function () {
+  const $wrapper = $('<div></div>').appendTo('body')
+  this.$field.appendTo($wrapper)
   const field = new DatetimeField(this.$field, {})
   equal(this.$field.parent().next()[0], field.$suggest[0], 'wrapper and suggest are siblings')
+  $wrapper.remove()
 })
 
 test('should place suggest next to field when not adding datepicker', function () {
+  const $wrapper = $('<div></div>').appendTo('body')
+  this.$field.appendTo($wrapper)
   const field = new DatetimeField(this.$field, {timeOnly: true})
   equal(this.$field.next()[0], field.$suggest[0], 'field and suggest are siblings')
+  $wrapper.remove()
 })
 
 test('should set the button to disabled when given the option to do so', function () {
   new DatetimeField(this.$field, {disableButton: true})
-  ok(this.$field.next().attr('disabled'))
+  ok(this.$field.next().prop('disabled'))
 })
 
 test('should not add hidden input by default', function () {
@@ -214,9 +223,9 @@ test('should add hidden input when requested', function () {
 })
 
 test('should initialize from the inputdate data', function () {
-  this.$field.data('inputdate', '1969-07-21T02:56:00Z')
+  this.$field.data('inputdate', '1986-01-28T16:39:00Z')
   const field = new DatetimeField(this.$field, {})
-  equal(field.$suggest.text(), 'Sun, Jul 20, 1969, 9:56 PM')
+  equal(field.$suggest.text(), 'Tue, Jan 28, 1986, 11:39 AM')
 })
 
 test('should initialize from the initial value attribute if present, and then remove it', function () {
@@ -231,8 +240,8 @@ test('should initialize from the initial value attribute if present, and then re
 test('should tie it to update on keyup only', function () {
   const field = new DatetimeField(this.$field, {})
 
-  this.$field.val('Jul 21, 1969 5:56am').trigger('keyup')
-  equal(field.$suggest.text(), 'Mon, Jul 21, 1969, 5:56 AM')
+  this.$field.val('Jan 28, 1986 5:56am').trigger('keyup')
+  equal(field.$suggest.text(), 'Tue, Jan 28, 1986, 5:56 AM')
 })
 
 QUnit.module('setFromValue', {
@@ -261,9 +270,9 @@ test('should set data fields', function () {
 })
 
 test('should set suggest text', function () {
-  this.$field.val('Jul 21, 1969 at 2:56am')
+  this.$field.val('Jan 28, 1986 at 2:56am')
   this.field.setFromValue()
-  equal(this.field.$suggest.text(), 'Mon, Jul 21, 1969, 2:56 AM')
+  equal(this.field.$suggest.text(), 'Tue, Jan 28, 1986, 2:56 AM')
 })
 
 QUnit.module('parseValue', {
@@ -274,15 +283,15 @@ QUnit.module('parseValue', {
 })
 
 test('sets @fudged according to browser (fudged) timezone', function () {
-  this.$field.val(tz.format(moonwalk, '%b %-e, %Y at %-l:%M%P')).change()
+  this.$field.val(tz.format(challenger, '%b %-e, %Y at %-l:%M%P')).change()
   this.field.parseValue()
-  equal(+this.field.fudged, +$.fudgeDateForProfileTimezone(moonwalk))
+  equal(+this.field.fudged, +$.fudgeDateForProfileTimezone(challenger))
 })
 
 test('sets @datetime according to profile timezone', function () {
-  this.$field.val(tz.format(moonwalk, '%b %-e, %Y at %-l:%M%P')).change()
+  this.$field.val(tz.format(challenger, '%b %-e, %Y at %-l:%M%P')).change()
   this.field.parseValue()
-  equal(+this.field.datetime, +moonwalk)
+  equal(+this.field.datetime, +challenger)
 })
 
 test('sets @showTime true by default', function () {
@@ -292,14 +301,14 @@ test('sets @showTime true by default', function () {
 })
 
 test('sets @showTime false when value is midnight in profile timezone', function () {
-  this.$field.val('Jan 1, 1970 at 12:00am').change()
+  this.$field.val('Jan 1, 1990 at 12:00am').change()
   this.field.parseValue()
   equal(this.field.showTime, false)
 })
 
 test('sets @showTime true for midnight if @alwaysShowTime', function () {
   this.field.alwaysShowTime = true
-  this.$field.val('Jan 1, 1970 at 12:00am').change()
+  this.$field.val('Jan 1, 1990 at 12:00am').change()
   this.field.parseValue()
   equal(this.field.showTime, true)
 })
@@ -312,17 +321,17 @@ test('sets @showTime false for non-midnight if not @allowTime', function () {
 })
 
 test('sets not @blank and not @invalid on valid input', function () {
-  this.$field.val('Jan 1, 1970 at 12:00am').change()
+  this.$field.val('Jan 1, 1990 at 12:00am').change()
   this.field.parseValue()
   equal(this.field.blank, false)
-  equal(this.field.invalid, false)
+  equal(this.field.valid, PARSE_RESULTS.VALID)
 })
 
 test('sets @blank and not @invalid and null dates when no input', function () {
   this.$field.val('').change()
   this.field.parseValue()
   equal(this.field.blank, true)
-  equal(this.field.invalid, false)
+  equal(this.field.valid, PARSE_RESULTS.VALID)
   equal(this.field.datetime, null)
   equal(this.field.fudged, null)
 })
@@ -331,7 +340,7 @@ test('sets @invalid and not @blank and null dates when invalid input', function 
   this.$field.val('invalid').change()
   this.field.parseValue()
   equal(this.field.blank, false)
-  equal(this.field.invalid, true)
+  equal(this.field.valid, PARSE_RESULTS.ERROR)
   equal(this.field.datetime, null)
   equal(this.field.fudged, null)
 })
@@ -355,18 +364,18 @@ test('interprets bare numbers >= 8 in time-only fields as 24-hour', function () 
 
 test('interprets time-only fields as occurring on implicit date if set', function () {
   this.field.showDate = false
-  this.field.setDate(moonwalk)
+  this.field.setDate(challenger)
   this.$field.val('12PM').change()
   this.field.parseValue()
-  equal(tz.format(this.field.datetime, '%F %T'), `${tz.format(moonwalk, '%F ')}12:00:00`)
+  equal(tz.format(this.field.datetime, '%F %T'), `${tz.format(challenger, '%F ')}12:00:00`)
 })
 
 test('setDate changes the date of an existing time field', function () {
   this.field.showDate = false
-  this.field.setDate(moonwalk)
+  this.field.setDate(challenger)
   this.$field.val('12PM').change()
-  this.field.setDate(john_glenn)
-  equal(tz.format(this.field.datetime, '%F %T'), `${tz.format(john_glenn, '%F ')}12:00:00`)
+  this.field.setDate(columbia)
+  equal(tz.format(this.field.datetime, '%F %T'), `${tz.format(columbia, '%F ')}12:00:00`)
 })
 
 QUnit.module('updateData', {
@@ -380,10 +389,10 @@ QUnit.module('updateData', {
     fakeENV.setup({TIMEZONE: 'America/Detroit'})
 
     this.$field = $('<input type="text" name="due_at">')
-    this.$field.val('Jan 1, 1970 at 12:01am')
+    this.$field.val('Jan 1, 1990 at 12:01am')
     this.field = new DatetimeField(this.$field, {})
-    this.field.datetime = moonwalk
-    this.field.fudged = $.fudgeDateForProfileTimezone(moonwalk)
+    this.field.datetime = challenger
+    this.field.fudged = $.fudgeDateForProfileTimezone(challenger)
   },
 
   teardown() {
@@ -399,7 +408,7 @@ test('sets date field to fudged time', function () {
 
 test('sets unfudged-date field to actual time', function () {
   this.field.updateData()
-  equal(+this.$field.data('unfudged-date'), +moonwalk)
+  equal(+this.$field.data('unfudged-date'), +challenger)
 })
 
 test('sets invalid field', function () {
@@ -420,16 +429,16 @@ test('sets value of hiddenInput, if present, to fudged time as ISO8601', functio
 
 test('sets time-* to fudged, 12-hour values', function () {
   this.field.updateData()
-  equal(this.$field.data('time-hour'), '9')
-  equal(this.$field.data('time-minute'), '56')
-  equal(this.$field.data('time-ampm'), 'PM')
+  equal(this.$field.data('time-hour'), '11')
+  equal(this.$field.data('time-minute'), '39')
+  equal(this.$field.data('time-ampm'), 'AM')
 })
 
 test('sets time-* to fudged, 24-hour values', function () {
   ENV.LOCALE = 'pt-BR'
   this.field.updateData()
-  equal(this.$field.data('time-hour'), '21')
-  equal(this.$field.data('time-minute'), '56')
+  equal(this.$field.data('time-hour'), '11')
+  equal(this.$field.data('time-minute'), '39')
   equal(this.$field.data('time-ampm'), null)
 })
 
@@ -450,7 +459,7 @@ test('clear time-* to null if blank', function () {
 })
 
 test('clear time-* to null if invalid', function () {
-  this.field.invalid = true
+  this.field.valid = PARSE_RESULTS.ERROR
   this.field.updateData()
   equal(this.$field.data('time-hour'), null)
 })
@@ -502,7 +511,7 @@ test('omits course suggest text if formatSuggestContext is empty', function () {
 test('adds invalid_datetime class to suggest if invalid', function () {
   this.field.updateSuggest()
   ok(!this.field.$suggest.hasClass('invalid_datetime'))
-  this.field.invalid = true
+  this.field.valid = PARSE_RESULTS.ERROR
   this.field.updateSuggest()
   ok(this.field.$suggest.hasClass('invalid_datetime'))
 })
@@ -523,6 +532,12 @@ test('should alert screenreader on an invalid parse no matter what', function ()
   this.$field.val('invalid')
   this.$field.change()
   ok(this.field.debouncedSRFME.withArgs("That's not a date!").called)
+})
+
+test('should alert on an impossible year entered', function () {
+  this.$field.val('Jul 19 1964')
+  this.$field.change()
+  ok(this.field.debouncedSRFME.withArgs('Year is too far in the past.').called)
 })
 
 test('flashes suggest text to screenreader on typed input', function () {
@@ -565,7 +580,7 @@ QUnit.module('formatSuggest', {
     })
     fakeENV.setup({TIMEZONE: 'America/Detroit'})
     this.$field = $('<input type="text" name="due_at">')
-    this.$field.val('Jul 20, 1969 at 9:56pm')
+    this.$field.val('Jan 28, 1986 at 11:39am')
     this.field = new DatetimeField(this.$field, {})
   },
 
@@ -576,7 +591,7 @@ QUnit.module('formatSuggest', {
 })
 
 test('returns result formatted in profile timezone', function () {
-  equal(this.field.formatSuggest(), 'Sun, Jul 20, 1969, 9:56 PM')
+  equal(this.field.formatSuggest(), 'Tue, Jan 28, 1986, 11:39 AM')
 })
 
 test('returns "" if @blank', function () {
@@ -585,23 +600,23 @@ test('returns "" if @blank', function () {
 })
 
 test('returns error message if @invalid', function () {
-  this.field.invalid = true
+  this.field.valid = PARSE_RESULTS.ERROR
   equal(this.field.formatSuggest(), this.field.parseError)
 })
 
 test('returns date only if @showTime false', function () {
   this.field.showTime = false
-  equal(this.field.formatSuggest(), 'Sun, Jul 20, 1969')
+  equal(this.field.formatSuggest(), 'Tue, Jan 28, 1986')
 })
 
 test('returns time only if @showDate false', function () {
   this.field.showDate = false
-  equal(this.field.formatSuggest(), '9:56 PM')
+  equal(this.field.formatSuggest(), '11:39 AM')
 })
 
 test('localizes formatting of dates and times', function () {
   ENV.LOCALE = 'pt-BR'
-  equal(this.field.formatSuggest(), 'dom., 20 de jul. de 1969 21:56')
+  equal(this.field.formatSuggest(), 'ter., 28 de jan. de 1986, 11:39')
 })
 
 QUnit.module('formatSuggestContext', {
@@ -615,7 +630,7 @@ QUnit.module('formatSuggestContext', {
     })
     fakeENV.setup({TIMEZONE: 'America/Detroit', CONTEXT_TIMEZONE: 'America/Juneau'})
     this.$field = $('<input type="text" name="due_at">')
-    this.$field.val('Jul 20, 1969 at 9:56pm')
+    this.$field.val('Jan 28, 1986 at 11:39am')
     this.field = new DatetimeField(this.$field, {})
   },
 
@@ -626,7 +641,7 @@ QUnit.module('formatSuggestContext', {
 })
 
 test('returns result formatted in course timezone', function () {
-  equal(this.field.formatSuggestContext(), 'Sun, Jul 20, 1969, 7:56 PM')
+  equal(this.field.formatSuggestContext(), 'Tue, Jan 28, 1986, 7:39 AM')
 })
 
 test('returns "" if @blank', function () {
@@ -635,7 +650,7 @@ test('returns "" if @blank', function () {
 })
 
 test('returns "" if @invalid', function () {
-  this.field.invalid = true
+  this.field.valid = PARSE_RESULTS.ERROR
   equal(this.field.formatSuggestContext(), '')
 })
 
@@ -646,7 +661,7 @@ test('returns "" if @showTime false', function () {
 
 test('returns time only if @showDate false', function () {
   this.field.showDate = false
-  equal(this.field.formatSuggestContext(), '7:56 PM')
+  equal(this.field.formatSuggestContext(), '7:39 AM')
 })
 
 QUnit.module('normalizeValue', {
@@ -732,30 +747,30 @@ test('sets to blank with null value', function () {
   equal(this.field.datetime, null)
   equal(this.field.fudged, null)
   equal(this.field.blank, true)
-  equal(this.field.invalid, false)
+  equal(this.field.valid, PARSE_RESULTS.VALID)
   equal(this.$field.val(), '')
 })
 
 test('treats value as unfudged', function () {
-  this.field.setFormattedDatetime(moonwalk, DATETIME_FORMAT_OPTIONS)
-  equal(+this.field.datetime, +moonwalk)
-  equal(+this.field.fudged, +$.fudgeDateForProfileTimezone(moonwalk))
+  this.field.setFormattedDatetime(challenger, DATETIME_FORMAT_OPTIONS)
+  equal(+this.field.datetime, +challenger)
+  equal(+this.field.fudged, +$.fudgeDateForProfileTimezone(challenger))
   equal(this.field.blank, false)
-  equal(this.field.invalid, false)
-  equal(this.$field.val(), 'Sun, Jul 20, 1969, 9:56 PM')
+  equal(this.field.valid, PARSE_RESULTS.VALID)
+  equal(this.$field.val(), 'Tue, Jan 28, 1986, 11:39 AM')
 })
 
 test('formats value into val() according to date/time requests', function () {
-  this.field.setFormattedDatetime(moonwalk, DATE_FORMAT_OPTIONS)
-  equal(this.$field.val(), 'Sun, Jul 20, 1969')
-  this.field.setFormattedDatetime(moonwalk, TIME_FORMAT_OPTIONS)
-  equal(this.$field.val(), '9:56 PM')
+  this.field.setFormattedDatetime(challenger, DATE_FORMAT_OPTIONS)
+  equal(this.$field.val(), 'Tue, Jan 28, 1986')
+  this.field.setFormattedDatetime(challenger, TIME_FORMAT_OPTIONS)
+  equal(this.$field.val(), '11:39 AM')
 })
 
 test('localizes value', function () {
   ENV.LOCALE = 'de'
-  this.field.setFormattedDatetime(moonwalk, DATETIME_FORMAT_OPTIONS)
-  equal(this.$field.val(), 'So., 20. Juli 1969, 21:56')
+  this.field.setFormattedDatetime(challenger, DATETIME_FORMAT_OPTIONS)
+  equal(this.$field.val(), 'Di., 28. Jan. 1986, 11:39')
 })
 
 QUnit.module('setDate/setTime/setDatetime', {
@@ -778,16 +793,16 @@ QUnit.module('setDate/setTime/setDatetime', {
 })
 
 test('setDate formats into val() with just date', function () {
-  this.field.setDate(moonwalk)
-  equal(this.$field.val(), 'Sun, Jul 20, 1969')
+  this.field.setDate(challenger)
+  equal(this.$field.val(), 'Tue, Jan 28, 1986')
 })
 
 test('setTime formats into val() with just time', function () {
-  this.field.setTime(moonwalk)
-  equal(this.$field.val(), '9:56 PM')
+  this.field.setTime(challenger)
+  equal(this.$field.val(), '11:39 AM')
 })
 
 test('setDatetime formats into val() with full date and time', function () {
-  this.field.setDatetime(moonwalk)
-  equal(this.$field.val(), 'Sun, Jul 20, 1969, 9:56 PM')
+  this.field.setDatetime(challenger)
+  equal(this.$field.val(), 'Tue, Jan 28, 1986, 11:39 AM')
 })

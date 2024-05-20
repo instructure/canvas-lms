@@ -23,8 +23,15 @@ require_relative "messages_helper"
 describe "new_announcement" do
   include MessagesCommon
 
-  before do
-    announcement_model
+  before :once do
+    course_with_teacher(active_course: true, active_enrollment: true)
+    course_with_student(course: @course, active_enrollment: true)
+
+    @a = @course.announcements.create!(
+      title: "new announcement",
+      message: "In the cafe!",
+      user: @teacher
+    )
   end
 
   let(:notification_name) { :new_announcement }
@@ -34,19 +41,30 @@ describe "new_announcement" do
     let(:path_type) { :email }
 
     it "renders for course" do
-      generate_message(notification_name, path_type, asset)
-      expect(@message.subject).to eq "value for title: value for name"
+      generate_message(notification_name, path_type, asset, user: @student)
+
+      expect(@message.subject).to eq "#{asset.title}: #{@course.name}"
       expect(@message.url).to match(%r{/courses/\d+/announcements/\d+})
       expect(@message.body).to match(%r{/courses/\d+/announcements/\d+})
       expect(@message.html_body).to include "Replies to this email will be posted as a reply to the announcement, which will be seen by everyone in the course."
+    end
+
+    it "does not show reply helper if the user does not have a reply permissions" do
+      @course.root_account.role_overrides.create!(permission: "post_to_forum", role: student_role, enabled: false)
+      generate_message(notification_name, path_type, asset, user: @student)
+
+      expect(@message.subject).to eq "#{asset.title}: #{@course.name}"
+      expect(@message.url).to match(%r{/courses/\d+/announcements/\d+})
+      expect(@message.body).to match(%r{/courses/\d+/announcements/\d+})
+      expect(@message.html_body).not_to include "Replies to this email will be posted as a reply to the announcement, which will be seen by everyone in the course."
     end
 
     it "does not show announcement reply helper if announcement is locked" do
       @a.locked = true
       @a.save!
 
-      generate_message(notification_name, path_type, asset)
-      expect(@message.subject).to eq "value for title: value for name"
+      generate_message(notification_name, path_type, asset, user: @student)
+      expect(@message.subject).to eq "#{asset.title}: #{@course.name}"
       expect(@message.url).to match(%r{/courses/\d+/announcements/\d+})
       expect(@message.body).to match(%r{/courses/\d+/announcements/\d+})
       expect(@message.html_body).not_to include "Replies to this email will be posted as a reply to the announcement, which will be seen by everyone in the course."
@@ -61,7 +79,7 @@ describe "new_announcement" do
         message: "Group",
         user: @teacher
       )
-      generate_message(notification_name, path_type, group_announcement)
+      generate_message(notification_name, path_type, group_announcement, user: @teacher)
       expect(@message.subject).to eq "Group Announcement: My Group"
       expect(@message.url).to match(%r{/groups/\d+/announcements/\d+})
       expect(@message.body).to match(%r{/groups/\d+/announcements/\d+})
@@ -82,9 +100,9 @@ describe "new_announcement" do
 
     it "renders" do
       generate_message(notification_name, path_type, asset)
-      expect(@message.subject).to eq "value for title: value for name"
+      expect(@message.subject).to eq "#{asset.title}: #{@course.name}"
       expect(@message.url).to match(%r{/courses/\d+/announcements/\d+})
-      expect(@message.body.strip).to eq "value for message"
+      expect(@message.body.strip).to eq asset.message
     end
   end
 
@@ -95,7 +113,7 @@ describe "new_announcement" do
       generate_message(notification_name, path_type, asset)
       expect(@message.subject).to eq "Canvas Alert"
       expect(@message.url).to match(%r{/courses/\d+/announcements/\d+})
-      expect(@message.body).to include("Canvas Alert - Announcement: value for title")
+      expect(@message.body).to include("Canvas Alert - Announcement: #{asset.title}")
     end
   end
 end

@@ -537,6 +537,14 @@ describe('RCEWrapper', () => {
     })
   })
 
+  describe('getResourceIdentifiers', () => {
+    it('returns resourceType and resourceId', () => {
+      createMountedElement({resourceType: 'assignment.body', resourceId: '156'})
+      expect(rce.getResourceIdentifiers().resourceType).toEqual('assignment.body')
+      expect(rce.getResourceIdentifiers().resourceId).toEqual('156')
+    })
+  })
+
   describe('onRemove', () => {
     beforeEach(() => {
       jest.spyOn(Bridge, 'detachEditor')
@@ -955,7 +963,7 @@ describe('RCEWrapper', () => {
     })
   })
 
-  describe('lti tool favorites', () => {
+  describe('lti tools for toolbar', () => {
     it('extracts favorites', () => {
       const element = createBasicElement({
         ltiTools: [
@@ -1001,6 +1009,49 @@ describe('RCEWrapper', () => {
       expect(element.ltiToolFavorites).toStrictEqual([
         'instructure_external_button_1',
         'instructure_external_button_3',
+      ])
+    })
+
+    it('extracts always_on tools', () => {
+      const element = createBasicElement({
+        ltiTools: [
+          {
+            canvas_icon_class: null,
+            description: 'first',
+            favorite: false,
+            height: 160,
+            width: 340,
+            id: 1,
+            name: 'An Always On Tool',
+            always_on: true,
+          },
+          {
+            canvas_icon_class: null,
+            description: 'the thing',
+            favorite: true,
+            height: 160,
+            id: 2,
+            name: 'A Tool',
+            width: 340,
+            always_on: false,
+          },
+          {
+            canvas_icon_class: null,
+            description: 'other thing',
+            favorite: true,
+            height: 160,
+            id: 3,
+            name: 'A Tool',
+            always_on: true,
+          },
+        ],
+      })
+
+      // The order here is important, as the always on tools should be at the beginning!
+      expect(element.ltiToolFavorites).toStrictEqual([
+        'instructure_external_button_1',
+        'instructure_external_button_3',
+        'instructure_external_button_2',
       ])
     })
   })

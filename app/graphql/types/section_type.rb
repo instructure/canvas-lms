@@ -43,5 +43,17 @@ module Types
         section.sis_source_id if course.grants_any_right?(current_user, :read_sis, :manage_sis)
       end
     end
+
+    field :grades_posted, Boolean, null: false do
+      argument :assignment_id, ID, required: false
+    end
+    def grades_posted(assignment_id:)
+      Loaders::SectionGradePostedState.for(assignment_id, object.root_account_id).load(object).then do |is_posted|
+        is_posted
+      end
+    end
+
+    field :students, UserType.connection_type, null: true
+    delegate :students, to: :object
   end
 end

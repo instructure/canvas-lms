@@ -23,12 +23,17 @@ import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import SpeedGraderSettingsMenu from '../react/SpeedGraderSettingsMenu'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import {Pill} from '@instructure/ui-pill'
 import * as Alerts from '@instructure/ui-alerts'
-import type {Assignment, Submission} from '../../../api.d'
 import type {RubricAssessment} from '@canvas/grading/grading.d'
-import type {GradingError, SpeedGrader, StudentWithSubmission} from './speed_grader.d'
+import type {
+  Enrollment,
+  GradingError,
+  SpeedGrader,
+  Submission,
+  StudentWithSubmission,
+} from './speed_grader.d'
 import SpeedGraderPostGradesMenu from '../react/SpeedGraderPostGradesMenu'
 import {isGraded, isPostable} from '@canvas/grading/SubmissionHelper'
 import JQuerySelectorCache from '../JQuerySelectorCache'
@@ -266,7 +271,7 @@ export function tearDownAssessmentAuditTray(EG: SpeedGrader) {
   EG.assessmentAuditTray = null
 }
 
-export function unexcuseSubmission(grade: string, submission: Submission, assignment: Assignment) {
+export function unexcuseSubmission(grade: string, submission: Submission, assignment: unknown) {
   return grade === '' && submission.excused && assignment.grading_type === 'pass_fail'
 }
 
@@ -306,12 +311,6 @@ export function renderPostGradesMenu(EG: SpeedGrader) {
   ReactDOM.render(
     <SpeedGraderPostGradesMenu {...props} />,
     document.getElementById(SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT)
-  )
-}
-
-export function getStatusPills() {
-  return document.querySelectorAll(
-    '.submission-missing-pill, .submission-late-pill, .submission-excused-pill, .submission-extended-pill, [class^="submission-custom-grade-status-pill-"]'
   )
 }
 
@@ -497,4 +496,23 @@ export function rubricAssessmentToPopulate(EG) {
   }
 
   return assessment
+}
+
+export function isStudentConcluded(studentMap: any, student: string, sectionId: string | null) {
+  if (!studentMap) {
+    return false
+  }
+
+  // If we're in a section specific mode, we'll look to see if there are any concluded enrollments in this section. If
+  // we're in the all sections mode, we only look concluded when ALL enrollments are concluded.
+  if (sectionId) {
+    return studentMap[student].enrollments.some(
+      (enrollment: Enrollment) =>
+        enrollment.workflow_state === 'completed' && enrollment.course_section_id === sectionId
+    )
+  } else {
+    return studentMap[student].enrollments.every(
+      (enrollment: Enrollment) => enrollment.workflow_state === 'completed'
+    )
+  }
 }

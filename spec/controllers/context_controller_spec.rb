@@ -121,6 +121,21 @@ describe ContextController do
       expect(flash[:notice]).to match(/That page has been disabled/)
     end
 
+    context "granular enrollment permissions" do
+      it "teacher and student permissions are excluded from active_granular_enrollment_permissions when not enabled" do
+        @course.root_account.enable_feature!(:granular_permissions_manage_users)
+        %w[add_student_to_course add_teacher_to_course].each do |perm|
+          RoleOverride.create!(context: Account.default, permission: perm, role: teacher_role, enabled: false)
+        end
+        %w[add_designer_to_course add_observer_to_course add_ta_to_course].each do |perm|
+          RoleOverride.create!(context: Account.default, permission: perm, role: teacher_role, enabled: true)
+        end
+        user_session(@teacher)
+        get :roster, params: { course_id: @course.id }
+        expect(assigns[:js_env][:permissions][:active_granular_enrollment_permissions]).to eq(%w[TaEnrollment DesignerEnrollment ObserverEnrollment])
+      end
+    end
+
     context "student context cards" do
       it "is always enabled for teachers" do
         %w[manage_students manage_admin_users].each do |perm|

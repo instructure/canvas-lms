@@ -21,9 +21,10 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {
   GradebookSortOrder,
-  GradebookUserSubmissionDetails,
-  SortableAssignment,
-  SortableStudent,
+  type GradebookUserSubmissionDetails,
+  type SortableAssignment,
+  type SortableStudent,
+  type Outcome,
 } from '../../types'
 import {filterAssignmentsByStudent, sortAssignments} from '../../utils/gradebookUtils'
 
@@ -38,9 +39,11 @@ type DropDownOption<T> = {
 
 type StudentDropdownOption = DropDownOption<SortableStudent>[]
 type AssignmentDropdownOption = DropDownOption<SortableAssignment>[]
+type OutcomeDropdownOption = DropDownOption<Outcome>[]
 
 const DEFAULT_STUDENT_DROPDOWN_TEXT = I18n.t('No Student Selected')
 const DEFAULT_ASSIGNMENT_DROPDOWN_TEXT = I18n.t('No Assignment Selected')
+const DEFAULT_OUTCOME_DROPDOWN_TEXT = I18n.t('No Outcome Selected')
 
 const defaultStudentDropdownOptions = {
   id: '-1',
@@ -51,6 +54,11 @@ const defaultAssignmentDropdownOptions = {
   id: '-1',
   name: DEFAULT_ASSIGNMENT_DROPDOWN_TEXT,
   sortableName: DEFAULT_ASSIGNMENT_DROPDOWN_TEXT,
+}
+const defaultOutcomeDropdownOptions = {
+  id: '-1',
+  name: DEFAULT_OUTCOME_DROPDOWN_TEXT,
+  sortableName: DEFAULT_OUTCOME_DROPDOWN_TEXT,
 }
 
 const defaultAllowedEnrollmentStates = ['active', 'invited']
@@ -163,4 +171,40 @@ export const useAssignmentDropdownOptions = ({
   ])
 
   return {assignmentDropdownOptions}
+}
+
+type OutcomeDropdownProps = {
+  outcomes?: Outcome[]
+  selectedOutcomeId?: string | null
+}
+
+type OutcomeDropdownResponse = {
+  outcomeDropdownOptions?: OutcomeDropdownOption
+}
+
+export const useOutcomeDropdownOptions = ({
+  outcomes,
+  selectedOutcomeId,
+}: OutcomeDropdownProps): OutcomeDropdownResponse => {
+  const [outcomeDropdownOptions, setOutcomeDropdownOptions] = useState<OutcomeDropdownOption>()
+
+  useEffect(() => {
+    if (!outcomes) {
+      return
+    }
+
+    const outcomeOptions: OutcomeDropdownOption = [
+      defaultOutcomeDropdownOptions,
+      ...outcomes.map(outcome => ({
+        id: outcome.id,
+        name: outcome.title,
+        data: outcome,
+        sortableName: outcome.id,
+      })),
+    ]
+
+    setOutcomeDropdownOptions(outcomeOptions)
+  }, [outcomes, selectedOutcomeId, setOutcomeDropdownOptions])
+
+  return {outcomeDropdownOptions}
 }

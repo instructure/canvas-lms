@@ -445,7 +445,7 @@ describe CalendarEvent do
         end
 
         it "sends to participants", priority: "1" do
-          expect(@event1.messages_sent).to be_include("New Event Created")
+          expect(@event1.messages_sent).to include("New Event Created")
           expect(@users).to include(@student.id)
         end
 
@@ -475,7 +475,7 @@ describe CalendarEvent do
           end
 
           it "sends to participants", priority: "1" do
-            expect(@event1.messages_sent).to be_include("Event Date Changed")
+            expect(@event1.messages_sent).to include("Event Date Changed")
             expect(@users).to include(@student.id)
           end
 
@@ -605,7 +605,7 @@ describe CalendarEvent do
 
       it "notifies admins and observers when a user reserves a group appointment" do
         reservation = @appointment2.reserve_for(@group, @student1)
-        expect(reservation.messages_sent).to be_include("Appointment Reserved By User")
+        expect(reservation.messages_sent).to include("Appointment Reserved By User")
         expect(reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq).to eql (@course.instructors.map(&:id) + [@observer.id]).sort
       end
 
@@ -613,7 +613,7 @@ describe CalendarEvent do
         reservation = @appointment.reserve_for(@student1, @student1)
         reservation.updating_user = @student1
         reservation.destroy
-        expect(reservation.messages_sent).to be_include("Appointment Canceled By User")
+        expect(reservation.messages_sent).to include("Appointment Canceled By User")
         expect(reservation.messages_sent["Appointment Canceled By User"].map(&:user_id).sort.uniq).to eql (@course.instructors.map(&:id) + [@observer.id]).sort
       end
     end

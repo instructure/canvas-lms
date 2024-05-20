@@ -26,7 +26,8 @@ const setup = (onAddItem = jest.fn()) => {
   return render(<FileAttachmentUpload onAddItem={onAddItem} />)
 }
 
-describe('FileAttachmentUpload', () => {
+// VICE-4065 - remove or rewrite to remove spies on uploadFileModule import
+describe.skip('FileAttachmentUpload', () => {
   beforeEach(() => {
     uploadFileModule.uploadFiles = jest.fn().mockResolvedValue([])
   })

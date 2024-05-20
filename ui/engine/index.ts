@@ -16,5 +16,5 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export {default as up} from '@instructure/updown';
-export * as Capabilities from './capabilities';
+export {default as up} from '@instructure/updown'
+export * as Capabilities from './capabilities'

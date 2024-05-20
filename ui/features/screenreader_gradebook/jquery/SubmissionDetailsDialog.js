@@ -27,7 +27,7 @@ import '../jst/_submission_detail.handlebars' // a partial needed by the Submiss
 import '@canvas/grading/jst/_turnitinScore.handlebars' // a partial needed by the submission_detail partial
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
@@ -68,6 +68,8 @@ export default class SubmissionDetailsDialog {
       title: this.student.name,
       width: 600,
       resizable: false,
+      modal: true,
+      zIndex: 1000,
     })
 
     this.dialog.on('dialogclose', this.options.onClose)
@@ -76,12 +78,12 @@ export default class SubmissionDetailsDialog {
       this.$el.remove()
     })
     this.dialog
-      .delegate('select[id="submission_to_view"]', 'change', event =>
+      .on('change', 'select[id="submission_to_view"]', event =>
         this.dialog.find('.submission_detail').each(function (index) {
           $(this).showIf(index === event.currentTarget.selectedIndex)
         })
       )
-      .delegate('.submission_details_grade_form', 'submit', event => {
+      .on('submit', '.submission_details_grade_form', event => {
         event.preventDefault()
         let formData = $(event.currentTarget).getFormData()
         const rawGrade = formData['submission[posted_grade]']
@@ -107,7 +109,7 @@ export default class SubmissionDetailsDialog {
           })
         )
       })
-      .delegate('.submission_details_add_comment_form', 'submit', event => {
+      .on('submit', '.submission_details_add_comment_form', event => {
         event.preventDefault()
         $(event.currentTarget).disableWhileLoading(
           $.ajaxJSON(this.url, 'PUT', $(event.currentTarget).getFormData(), data => {

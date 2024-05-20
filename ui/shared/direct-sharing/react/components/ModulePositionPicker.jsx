@@ -22,7 +22,7 @@ import {func, string} from 'prop-types'
 
 import {useCourseModuleItemApi} from '../effects/useModuleCourseSearchApi'
 import SelectPosition from '@canvas/select-position'
-import {positions} from '@canvas/move-item-tray/positions'
+import {positions} from '@canvas/positions'
 
 const I18n = useI18nScope('module_position_picker')
 

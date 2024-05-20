@@ -20,7 +20,7 @@
 
 # @API Communication Channels
 #
-# API for accessing users' email addresses, SMS phone numbers, and Twitter
+# API for accessing users' email addresses, SMS phone numbers, and X.com
 # communication channels.
 #
 # In this API, the `:user_id` parameter can always be replaced with `self` if
@@ -63,6 +63,16 @@
 #           "description": "The ID of the user that owns this communication channel.",
 #           "example": 1,
 #           "type": "integer"
+#         },
+#         "bounce_count": {
+#           "description": "The number of bounces the channel has experienced. This is reset if the channel sends successfully.",
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "last_bounce_at": {
+#           "description": "The time the last bounce occurred.",
+#           "example": "2012-05-30T17:00:00Z",
+#           "type": "datetime"
 #         },
 #         "workflow_state": {
 #           "description": "The current state of the communication channel. Possible values are: 'unconfirmed' or 'active'.",
@@ -431,7 +441,6 @@ class CommunicationChannelsController < ApplicationController
             failed = true
           end
         else
-          @request = request
           return # render
         end
       end

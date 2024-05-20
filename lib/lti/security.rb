@@ -125,7 +125,7 @@ module Lti
     #  |---nonce_age---Time.now---timestamp---| INVALID
     #
     def self.check_and_store_nonce(cache_key, timestamp, nonce_age)
-      allowed_future_skew = Setting.get("oauth.allowed_timestamp_future_skew", 1.minute.to_s).to_i.seconds
+      allowed_future_skew = 1.minute
       valid = timestamp.to_i > nonce_age.ago.to_i
       valid &&= timestamp.to_i <= (Time.zone.now + allowed_future_skew).to_i
       valid &&= !Rails.cache.exist?(cache_key)

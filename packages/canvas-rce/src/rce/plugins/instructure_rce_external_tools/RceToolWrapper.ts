@@ -31,6 +31,38 @@ export interface ExternalToolMenuItem {
   onAction: () => void
 }
 
+interface ExternalToolData {
+  id: string;
+  always_on?: boolean | null;
+  favorite?: boolean | null;
+}
+
+export function externalToolsForToolbar<T extends ExternalToolData>(tools: T[]): T[] {
+  const favorited = tools.filter(it => it.favorite).slice(0, 2) || []
+  // There's no limit to always on apps, but in practice there shouldn't be more than 2 as well.
+  const alwaysOn = tools.filter(it => it.always_on) || []
+
+  const set = new Map<string, T>()
+
+  // Remove possible overlaps between favorited and alwaysOn, otherwise
+  // we'd have duplicate buttons in the toolbar.
+  for (const toolInfo of favorited.concat(alwaysOn)) {
+    set.set(toolInfo.id, toolInfo)
+  }
+
+  return Array.from(set.values()).sort((a, b) => {
+    if (a.always_on && !b.always_on) {
+      return -1;
+    } else if (!a.always_on && b.always_on) {
+      return 1;
+    } else {
+      // This *should* always be a string, but there might be cases where it isn't,
+      // especially when this method is used outside of TypeScript files.
+      return a.id.toString().localeCompare(b.id.toString(), undefined, {numeric: true})
+    }
+  })
+}
+
 /**
  * Helper class for the connection between an external tool registration and a particular TinyMCE instance.
  */
@@ -90,6 +122,10 @@ export class RceToolWrapper {
 
   get use_tray(): boolean | null | undefined {
     return this.toolInfo.use_tray
+  }
+
+  get always_on() {
+    return this.toolInfo.always_on
   }
 
   asToolbarButton() {

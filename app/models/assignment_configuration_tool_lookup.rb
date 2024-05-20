@@ -23,7 +23,7 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
   validates :context_type, presence: true
 
   belongs_to :tool, polymorphic: [:context_external_tool, message_handler: "Lti::MessageHandler"]
-  belongs_to :assignment
+  belongs_to :assignment, inverse_of: :assignment_configuration_tool_lookups, class_name: "AbstractAssignment"
   # Do not add before_destroy or after_destroy, these records are "delete_all"ed
 
   class << self

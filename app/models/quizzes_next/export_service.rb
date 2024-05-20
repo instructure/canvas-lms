@@ -93,7 +93,8 @@ module QuizzesNext
               new_course_name: new_course.name,
               created_on_blueprint_sync: is_blueprint_sync,
               resource_map_url: content_migration.asset_map_url(generate_if_needed: true),
-              remove_alignments:
+              remove_alignments:,
+              status: "duplicating"
             }
           )
         end

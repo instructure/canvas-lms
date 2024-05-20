@@ -27,6 +27,14 @@ const openModerateStudentDialog = ($dialog, dialogWidth) => {
     .dialog({
       title: I18n.t('Student Extensions'),
       width: dialogWidth,
+      modal: true,
+      zIndex: 1000,
+      open() {
+        const titleClose = $dialog.parent().find('.ui-dialog-titlebar-close')
+        if (titleClose.length) {
+          titleClose.trigger('focus')
+        }
+      },
     })
     .fixDialogButtons()
 

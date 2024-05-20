@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import SubscriptionDropDown, {ComponentProps} from '../SubscriptionDropDown'
+import SubscriptionDropDown, {type ComponentProps} from '../SubscriptionDropDown'
 
 const defaultProps: ComponentProps = {
   accountId: 1,

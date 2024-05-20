@@ -23,6 +23,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -165,69 +166,73 @@ class SelectMenuGroup extends React.Component {
   render() {
     const isVertical = !this.props.breakpoints.miniTablet
     return (
-      <Flex
-        alignItems={isVertical ? 'start' : 'end'}
-        wrap="wrap"
-        margin="0 0 small 0"
-        direction={isVertical ? 'column' : 'row'}
-      >
+      <Flex alignItems={isVertical ? 'start' : 'end'} gap="small" wrap="wrap" margin="0 0 small 0">
         <Flex.Item>
-          {this.props.students.length > 1 && (
-            <SelectMenu
-              defaultValue={this.props.selectedStudentID}
-              disabled={this.anySelectMenuChanged(['courseID'])}
-              id="student_select_menu"
-              label={I18n.t('Student')}
-              onChange={this.onSelectStudent}
-              options={this.props.students}
-              textAttribute="name"
-              valueAttribute="id"
-            />
-          )}
+          <Flex gap="small" wrap="wrap">
+            {this.props.students.length > 1 && (
+              <Flex.Item>
+                <SelectMenu
+                  defaultValue={this.props.selectedStudentID}
+                  disabled={this.anySelectMenuChanged(['courseID'])}
+                  id="student_select_menu"
+                  label={I18n.t('Student')}
+                  onChange={this.onSelectStudent}
+                  options={this.props.students}
+                  textAttribute="name"
+                  valueAttribute="id"
+                />
+              </Flex.Item>
+            )}
 
-          {this.props.gradingPeriods.length > 0 && (
-            <SelectMenu
-              defaultValue={this.props.selectedGradingPeriodID}
-              disabled={this.anySelectMenuChanged(['courseID'])}
-              id="grading_period_select_menu"
-              label={I18n.t('Grading Period')}
-              onChange={this.onSelectGradingPeriod}
-              options={this.gradingPeriodOptions()}
-              textAttribute="title"
-              valueAttribute="id"
-            />
-          )}
+            {this.props.gradingPeriods.length > 0 && (
+              <Flex.Item>
+                <SelectMenu
+                  defaultValue={this.props.selectedGradingPeriodID}
+                  disabled={this.anySelectMenuChanged(['courseID'])}
+                  id="grading_period_select_menu"
+                  label={I18n.t('Grading Period')}
+                  onChange={this.onSelectGradingPeriod}
+                  options={this.gradingPeriodOptions()}
+                  textAttribute="title"
+                  valueAttribute="id"
+                />
+              </Flex.Item>
+            )}
 
-          {this.props.courses.length > 1 && (
-            <SelectMenu
-              defaultValue={this.props.selectedCourseID}
-              disabled={this.anySelectMenuChanged([
-                'studentID',
-                'gradingPeriodID',
-                'assignmentSortOrder',
-              ])}
-              id="course_select_menu"
-              label={I18n.t('Course')}
-              onChange={this.onSelectCourse}
-              options={this.props.courses}
-              textAttribute="nickname"
-              valueAttribute="id"
-            />
-          )}
-
-          <SelectMenu
-            defaultValue={this.props.selectedAssignmentSortOrder}
-            disabled={this.anySelectMenuChanged(['courseID'])}
-            id="assignment_sort_order_select_menu"
-            label={I18n.t('Arrange By')}
-            onChange={this.onSelectAssignmentSortOrder}
-            options={this.props.assignmentSortOptions}
-            textAttribute={0}
-            valueAttribute={1}
-          />
+            {this.props.courses.length > 1 && (
+              <Flex.Item>
+                <SelectMenu
+                  defaultValue={this.props.selectedCourseID}
+                  disabled={this.anySelectMenuChanged([
+                    'studentID',
+                    'gradingPeriodID',
+                    'assignmentSortOrder',
+                  ])}
+                  id="course_select_menu"
+                  label={I18n.t('Course')}
+                  onChange={this.onSelectCourse}
+                  options={this.props.courses}
+                  textAttribute="nickname"
+                  valueAttribute="id"
+                />
+              </Flex.Item>
+            )}
+            <Flex.Item>
+              <SelectMenu
+                defaultValue={this.props.selectedAssignmentSortOrder}
+                disabled={this.anySelectMenuChanged(['courseID'])}
+                id="assignment_sort_order_select_menu"
+                label={I18n.t('Arrange By')}
+                onChange={this.onSelectAssignmentSortOrder}
+                options={this.props.assignmentSortOptions}
+                textAttribute={0}
+                valueAttribute={1}
+              />
+            </Flex.Item>
+          </Flex>
         </Flex.Item>
 
-        <Flex.Item margin={isVertical ? 'small 0 0 0' : '0 0 0 small'}>
+        <Flex.Item>
           <Button
             disabled={this.state.processing || this.noSelectMenuChanged()}
             id="apply_select_menus"

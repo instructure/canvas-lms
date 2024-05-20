@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import TimeBlockListManager from '@canvas/calendar/TimeBlockListManager'
 import moment from 'moment'
 

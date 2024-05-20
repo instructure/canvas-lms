@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Errors, ErrorsProps} from '../errors'
+import {Errors, type ErrorsProps} from '../errors'
 import {act, render} from '@testing-library/react'
 import React from 'react'
 import userEvent from '@testing-library/user-event'
@@ -53,10 +53,10 @@ describe('Errors', () => {
     }
   })
 
-  it('triggers a re-publish when the retry button is clicked', () => {
+  it('triggers a re-publish when the retry button is clicked', async () => {
     const {getByRole} = render(<Errors {...defaultProps} />)
 
-    act(() => userEvent.click(getByRole('button', {name: 'Retry'})))
+    await userEvent.click(getByRole('button', {name: 'Retry'}))
     expect(syncUnpublishedChanges).toHaveBeenCalled()
   })
 })

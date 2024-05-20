@@ -60,7 +60,7 @@ describe Lti::LtiAdvantageAdapter do
       shared_secret: "secret",
       url: "http://www.example.com/basic_lti"
     )
-    tool.course_navigation = { enabled: true, message_type: "ResourceLinkRequest" }
+    tool.course_navigation = { enabled: true, message_type: "LtiResourceLinkRequest" }
     tool.use_1_3 = true
     tool.developer_key = DeveloperKey.create!
     tool.save!
@@ -82,6 +82,15 @@ describe Lti::LtiAdvantageAdapter do
     @course
   end
 
+  describe "#generate_post_payload_for_student_context_card" do
+    let(:login_message) { adapter.generate_post_payload_for_student_context_card(student_id:) }
+    let(:student_id) { "123" }
+
+    it "includes extension lti_student_id claim in the id_token" do
+      expect(params["https://www.instructure.com/lti_student_id"]).to eq(student_id)
+    end
+  end
+
   describe "#generate_post_payload" do
     context 'when the message type is "LtiDeepLinkingRequest"' do
       let(:opts) { { resource_type: "editor_button", domain: "test.com" } }
@@ -97,6 +106,26 @@ describe Lti::LtiAdvantageAdapter do
 
       it "caches a deep linking request" do
         expect(params["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiDeepLinkingRequest"
+      end
+
+      context "and the placement does not support LtiDeepLinkingRequest" do
+        let(:opts) { { resource_type: "course_navigation", domain: "test.com" } }
+
+        before do
+          tool.course_navigation = {
+            enabled: true,
+            message_type: LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE,
+          }
+          tool.save!
+        end
+
+        it "raises an Lti::InvalidMessageTypeForPlacementError and tags with the dev_key_id" do
+          expect(CanvasErrors).to receive(:capture)
+            .with(an_instance_of(Lti::InvalidMessageTypeForPlacementError),
+                  { tags: { developer_key_id: tool.global_developer_key_id } },
+                  :error)
+          expect { login_message }.to raise_error(Lti::InvalidMessageTypeForPlacementError)
+        end
       end
     end
 
@@ -123,7 +152,7 @@ describe Lti::LtiAdvantageAdapter do
       end
     end
 
-    it "generates a resource link request if the tool's resource type setting is 'ResourceLinkRequest'" do
+    it "generates a resource link request if the tool's resource type setting is 'LtiResourceLinkRequest'" do
       expect(params["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
     end
 
@@ -212,10 +241,6 @@ describe Lti::LtiAdvantageAdapter do
       end
     end
 
-    it "accepts a student_id parameter" do
-      expect(adapter.generate_post_payload(student_id: 123).keys).to include("iss")
-    end
-
     context "when no i18n locale is set in the request" do
       it "sets the canvas_locale in the message hint to the default i18n locale" do
         expect(Canvas::Security.decode_jwt(login_message["lti_message_hint"])["canvas_locale"]).to eq "en"
@@ -296,7 +321,7 @@ describe Lti::LtiAdvantageAdapter do
     it "returns the resource-specific launch URL if set" do
       tool.course_navigation = {
         enabled: true,
-        message_type: "ResourceLinkRequest",
+        message_type: "LtiResourceLinkRequest",
         target_link_uri: "https://www.launch.com/course-navigation"
       }
       tool.save!

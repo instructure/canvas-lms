@@ -106,6 +106,8 @@ Object.assign(CourseLoggingContentView.prototype, {
       title: 'Event Details',
       width: 600,
       resizable: true,
+      modal: true,
+      zIndex: 1000,
     }
     return this.dialog.dialog(config)
   },

@@ -173,7 +173,7 @@ module Lti
           developer_key.update(vendor_code:)
           Lti::OAuth2::AccessToken.create_jwt(aud:, sub: developer_key.global_id, reg_key: "reg_key")
         end
-        let(:request_headers) { { Authorization: "Bearer #{access_token}" } }
+        let(:request_headers) { { "Authorization" => "Bearer #{access_token}", "Content-Type" => "application/json" } }
 
         it "accepts valid JWT access tokens" do
           course_with_teacher_logged_in(active_all: true)

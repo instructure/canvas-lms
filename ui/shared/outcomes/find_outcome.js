@@ -130,6 +130,7 @@ const find_outcome = (function () {
         title: I18n.t('titles.find_outcome', 'Find Outcome'),
         width: 700,
         height: 400,
+        zIndex: 1000,
       })
     },
   }

@@ -106,59 +106,78 @@ class Canvadoc < ActiveRecord::Base
     application/excel
     application/msword
     application/pdf
+    application/postscript
+    application/rtf
+    application/mspowerpoint
     application/vnd.ms-excel
     application/vnd.ms-powerpoint
     application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
     application/vnd.openxmlformats-officedocument.presentationml.presentation
     application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    application/vnd.openxmlformats-officedocument.spreadsheetml.template
+    application/vnd.openxmlformats-officedocument.presentationml.slideshow
+    application/vnd.openxmlformats-officedocument.presentationml.template
+    application/vnd.openxmlformats-officedocument.wordprocessingml.template
     application/vnd.oasis.opendocument.graphics
     application/vnd.oasis.opendocument.formula
+    application/vnd.oasis.opendocument.presentation
+    application/vnd.oasis.opendocument.spreadsheet
+    application/vnd.oasis.opendocument.text
+    application/vnd.sun.xml.writer
+    application/vnd.sun.xml.impress
+    application/vnd.sun.xml.calc
+    text/rtf
+    text/plain
   ].freeze
 
   DEFAULT_SUBMISSION_MIME_TYPES = %w[
     application/excel
     application/msword
     application/pdf
+    application/postscript
+    application/rtf
+    application/mspowerpoint
     application/vnd.ms-excel
     application/vnd.ms-powerpoint
     application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
     application/vnd.openxmlformats-officedocument.presentationml.presentation
     application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    application/vnd.openxmlformats-officedocument.spreadsheetml.template
+    application/vnd.openxmlformats-officedocument.presentationml.slideshow
+    application/vnd.openxmlformats-officedocument.presentationml.template
+    application/vnd.openxmlformats-officedocument.wordprocessingml.template
     application/vnd.oasis.opendocument.graphics
     application/vnd.oasis.opendocument.formula
+    application/vnd.oasis.opendocument.presentation
+    application/vnd.oasis.opendocument.spreadsheet
+    application/vnd.oasis.opendocument.text
+    application/vnd.sun.xml.writer
+    application/vnd.sun.xml.impress
+    application/vnd.sun.xml.calc
     image/bmp
     image/jpeg
     image/jpg
     image/png
     image/tif
     image/tiff
+    text/rtf
+    text/plain
   ].freeze
 
-  # NOTE: the Setting.get('canvadoc_mime_types', ...) and the
-  # Setting.get('canvadoc_submission_mime_types', ...) will
-  # pull from the database first. the second parameter is there
-  # as a default in case the settings are not located in the
-  # db. this means that for instructure production canvas,
-  # we need to update the beta and prod databases with any
-  # mime_types we want to add/remove.
-  # TODO: find out if opensource users need the second param
-  # to the Setting.get(...,...) calls and if not, then remove
-  # them entirely from the codebase (since intructure prod
-  # does not need them)
   def self.mime_types
-    types = JSON.parse Setting.get("canvadoc_mime_types", DEFAULT_MIME_TYPES.to_json)
-
-    types.concat(IWORK_MIME_TYPES) if Account.current_domain_root_account&.feature_enabled?(:docviewer_enable_iwork_files)
-
-    types
+    if Account.current_domain_root_account&.feature_enabled?(:docviewer_enable_iwork_files)
+      DEFAULT_MIME_TYPES + IWORK_MIME_TYPES
+    else
+      DEFAULT_MIME_TYPES
+    end
   end
 
   def self.submission_mime_types
-    types = JSON.parse Setting.get("canvadoc_submission_mime_types", DEFAULT_SUBMISSION_MIME_TYPES.to_json)
-
-    types.concat(IWORK_MIME_TYPES) if Account.current_domain_root_account&.feature_enabled?(:docviewer_enable_iwork_files)
-
-    types
+    if Account.current_domain_root_account&.feature_enabled?(:docviewer_enable_iwork_files)
+      DEFAULT_SUBMISSION_MIME_TYPES + IWORK_MIME_TYPES
+    else
+      DEFAULT_SUBMISSION_MIME_TYPES
+    end
   end
 
   def self.canvadocs_api

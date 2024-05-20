@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /*
  * Copyright (C) 2015 - present Instructure, Inc.
  *
@@ -18,6 +19,7 @@
 
 import $ from 'jquery'
 import 'jqueryui/dialog'
+import {raw} from '@instructure/html-escape'
 
 export default function (ed) {
   let $box = $('#equella_dialog')
@@ -35,14 +37,12 @@ export default function (ed) {
   if (!$box.length) {
     const boxHtml = '<div id="equella_dialog" style="padding: 0; overflow-y: hidden;"/>'
     const teaserAndIframeHtml =
-      $.raw(
-        "<div class='teaser' style='width: 800px; margin-bottom: 10px; display: none;'></div>"
-      ) +
-      $.raw(
+      raw("<div class='teaser' style='width: 800px; margin-bottom: 10px; display: none;'></div>") +
+      raw(
         "<iframe style='background: url(/images/ajax-loader-medium-444.gif) no-repeat left top; width: 800px; height: "
       ) +
-      $.raw(frameHeight) +
-      $.raw("px; border: 0;' src='about:blank' borderstyle='0'/>")
+      raw(frameHeight) +
+      raw("px; border: 0;' src='about:blank' borderstyle='0'/>")
     $box = $(boxHtml)
       .hide()
       .html(teaserAndIframeHtml)
@@ -81,6 +81,8 @@ export default function (ed) {
           $box.find('iframe').attr('src', 'about:blank')
         },
         title: 'Embed content from Equella',
+        modal: true,
+        zIndex: 1000,
       })
       .bind('equella_ready', (event, data) => {
         const selectedContent = ed.selection.getContent()

@@ -15,7 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {anchorTag, ContentItemIframe, ContentItemThumbnail, iframeTag, linkBody} from './helpers'
+import {
+  anchorTag,
+  type ContentItemIframe,
+  type ContentItemThumbnail,
+  iframeTag,
+  linkBody,
+} from './helpers'
 
 export type LinkContentItem = {
   type: 'link'

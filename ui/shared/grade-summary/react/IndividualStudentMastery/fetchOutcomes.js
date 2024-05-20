@@ -18,7 +18,7 @@
 
 import _ from 'lodash'
 import uuid from 'uuid'
-import parseLinkHeader from 'parse-link-header'
+import parseLinkHeader from '@canvas/parse-link-header'
 import NaiveFetchDispatch from './NaiveFetchDispatch'
 import makePromisePool from '@canvas/make-promise-pool'
 

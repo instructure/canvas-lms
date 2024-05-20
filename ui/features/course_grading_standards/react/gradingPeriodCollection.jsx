@@ -21,7 +21,7 @@ import update from 'immutability-helper'
 import GradingPeriod from './gradingPeriod'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
+import {map, isEmpty, every, find, reject, some} from 'lodash'
 import {camelizeProperties} from '@canvas/convert-case'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
@@ -53,7 +53,7 @@ class GradingPeriodCollection extends React.Component {
           periods: self.deserializePeriods(periods),
           readOnly: periods.grading_periods_read_only,
           disabled: false,
-          saveDisabled: _.isEmpty(periods.grading_periods),
+          saveDisabled: isEmpty(periods.grading_periods),
         })
       })
       .error(() => {
@@ -62,7 +62,7 @@ class GradingPeriodCollection extends React.Component {
   }
 
   deserializePeriods = periods =>
-    _.map(periods.grading_periods, period => {
+    map(periods.grading_periods, period => {
       const newPeriod = camelizeProperties(period)
       newPeriod.startDate = new Date(period.start_date)
       newPeriod.endDate = new Date(period.end_date)
@@ -96,14 +96,14 @@ class GradingPeriodCollection extends React.Component {
   lastRemainingPeriod = () => this.state.periods.length === 1
 
   removeDeletedGradingPeriod = id => {
-    const newPeriods = _.reject(this.state.periods, period => period.id === id)
+    const newPeriods = reject(this.state.periods, period => period.id === id)
     this.setState({periods: newPeriods})
   }
 
-  getPeriodById = id => _.find(this.state.periods, period => period.id === id)
+  getPeriodById = id => find(this.state.periods, period => period.id === id)
 
   areGradingPeriodsValid = () =>
-    _.every(
+    every(
       this.state.periods,
       period =>
         this.isTitleCompleted(period) &&
@@ -114,9 +114,9 @@ class GradingPeriodCollection extends React.Component {
 
   areDatesOverlapping = targetPeriod => {
     const target = this.getPeriodById(targetPeriod.id)
-    const otherPeriods = _.reject(this.state.periods, p => p.id === target.id)
-    if (_.isEmpty(otherPeriods)) return false
-    return _.some(
+    const otherPeriods = reject(this.state.periods, p => p.id === target.id)
+    if (isEmpty(otherPeriods)) return false
+    return some(
       otherPeriods,
       period =>
         // http://c2.com/cgi/wiki?TestIfDateRangesOverlap
@@ -174,7 +174,7 @@ class GradingPeriodCollection extends React.Component {
   }
 
   serializeDataForSubmission = () => {
-    const periods = _.map(this.state.periods, period => ({
+    const periods = map(this.state.periods, period => ({
       id: period.id,
       title: period.title,
       start_date: period.startDate,
@@ -212,7 +212,7 @@ class GradingPeriodCollection extends React.Component {
     if (
       periodsAreLoaded(this.state) &&
       !this.state.readOnly &&
-      _.every(this.state.periods, period => period.permissions.update)
+      every(this.state.periods, period => period.permissions.update)
     ) {
       return (
         <div className="form-actions">
@@ -232,7 +232,7 @@ class GradingPeriodCollection extends React.Component {
 
   renderGradingPeriods = () => {
     if (!this.state.periods) return null
-    return _.map(this.state.periods, period => (
+    return map(this.state.periods, period => (
       <GradingPeriod
         key={period.id}
         ref={`grading_period_${period.id}`}

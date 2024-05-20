@@ -12,6 +12,7 @@
 .bundle/
 .env
 .mutagen
+.swc
 /.yardoc/
 /.ruby-version
 /app/views/info/styleguide.html.erb
@@ -24,6 +25,7 @@
 !/config/crystalball.yml
 /config/environments/*-local.rb
 /config/locales/generated/
+/config/saml/*
 /config/RAILS_VERSION
 /coverage/
 /coverage-js/
@@ -36,7 +38,7 @@ docker-compose.override.yml
 !/log/.keep
 !/log/parallel-runtime-rspec.log
 mkmf.log
-/node_modules
+node_modules
 npm-debug.log
 /public/dist/
 /public/doc/api/
@@ -73,10 +75,8 @@ docker-compose/api-gateway.override.yml
 /packages/*/node_modules
 /packages/*/es
 /packages/*/lib
-!/packages/babel-plugin-themeable-styles/lib
 /packages/*/coverage/
 /packages/*/coverage-js/
-/packages/canvas-planner/.babel-cache
 
 # pact artifacts
 /reports/

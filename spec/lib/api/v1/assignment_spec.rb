@@ -212,9 +212,9 @@ describe "Api::V1::Assignment" do
 
     context "checkpoints" do
       context "not in-place" do
-        it "json does not have checkpointed and checkpoints when FF is turned off" do
+        it "json does not have has_sub_assignments and checkpoints when FF is turned off" do
           json = api.assignment_json(assignment, user, session, { include_checkpoints: true })
-          expect(json).not_to have_key "checkpointed"
+          expect(json).not_to have_key "has_sub_assignments"
           expect(json).not_to have_key "checkpoints"
         end
       end
@@ -224,9 +224,9 @@ describe "Api::V1::Assignment" do
           assignment.root_account.enable_feature!(:discussion_checkpoints)
         end
 
-        it "returns false for the checkpointed attribute and [] for the checkpoints attribute" do
+        it "returns false for the has_sub_assignments attribute and [] for the checkpoints attribute" do
           json = api.assignment_json(assignment, user, session, { include_checkpoints: true })
-          expect(json["checkpointed"]).to be_falsey
+          expect(json["has_sub_assignments"]).to be_falsey
           expect(json["checkpoints"]).to eq []
         end
       end
@@ -235,24 +235,34 @@ describe "Api::V1::Assignment" do
         before do
           assignment.root_account.enable_feature!(:discussion_checkpoints)
 
-          assignment.update_attribute(:checkpointed, true)
-          assignment.update_attribute(:checkpoint_label, CheckpointLabels::PARENT)
+          assignment.update_attribute(:has_sub_assignments, true)
 
-          @c1 = assignment.checkpoint_assignments.create!(context: assignment.context, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 2.days.from_now)
-          @c2 = assignment.checkpoint_assignments.create!(context: assignment.context, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 5, due_at: 5.days.from_now)
+          @c1 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 2.days.from_now)
+          @c2 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 5, due_at: 5.days.from_now)
+
+          @student = @assignment.course.enroll_student(User.create!, enrollment_state: "active").user
+          @students = [@student]
+
+          create_adhoc_override_for_assignment(@c2, @students, due_at: 2.days.from_now)
         end
 
         it "returns the checkpoints attribute with the correct values" do
-          json = api.assignment_json(assignment, user, session, { include_checkpoints: true })
+          json = api.assignment_json(assignment, @student, session, { include_checkpoints: true })
           checkpoints = json["checkpoints"]
+          first_checkpoint = checkpoints.find { |c| c[:tag] == CheckpointLabels::REPLY_TO_TOPIC }
+          second_checkpoint = checkpoints.find { |c| c[:tag] == CheckpointLabels::REPLY_TO_ENTRY }
 
-          expect(json["checkpointed"]).to be_truthy
+          expect(json["has_sub_assignments"]).to be_truthy
 
           expect(checkpoints).to be_present
-          expect(checkpoints.pluck(:label)).to match_array [@c1.checkpoint_label, @c2.checkpoint_label]
+          expect(checkpoints.pluck(:tag)).to match_array [@c1.sub_assignment_tag, @c2.sub_assignment_tag]
           expect(checkpoints.pluck(:points_possible)).to match_array [@c1.points_possible, @c2.points_possible]
           expect(checkpoints.pluck(:due_at)).to match_array [@c1.due_at, @c2.due_at]
           expect(checkpoints.pluck(:only_visible_to_overrides)).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]
+          expect(first_checkpoint[:overrides].length).to eq 0
+          expect(second_checkpoint[:overrides].length).to eq 1
+          expect(second_checkpoint[:overrides].first[:assignment_id]).to eq @c2.id
+          expect(second_checkpoint[:overrides].first[:student_ids]).to match_array @students.map(&:id)
         end
       end
     end
@@ -871,11 +881,23 @@ describe "Api::V1::Assignment" do
       end
     end
 
+    shared_examples "sets workflow_state to outcome_alignment_cloning" do
+      let(:original_assignment) { assignment_model }
+      it "goes from duplicating to outcome_alignment_cloning when flag is active" do
+        assignment.update!(workflow_state: "duplicating")
+        assignment.root_account.enable_feature!(:course_copy_alignments)
+        expect do
+          api.update_api_assignment(assignment, assignment_update_params, user)
+        end.to change { assignment.workflow_state }.to("outcome_alignment_cloning")
+      end
+    end
+
     context "when workflow_state is 'duplicating'" do
       let(:workflow_state) { "duplicating" }
 
       include_examples "retains the original publication state"
       include_examples "falls back to 'unpublished' state"
+      include_examples "sets workflow_state to outcome_alignment_cloning"
     end
 
     context "when workflow_state is 'failed_to_duplicate'" do
@@ -910,6 +932,27 @@ describe "Api::V1::Assignment" do
         expect(assignment.duplicate_of.workflow_state).to eq "unpublished"
         expect(assignment.workflow_state).to eq "published"
       end
+    end
+  end
+
+  describe "when updating with 'alignment_cloned_successfully'" do
+    let(:original_assignment) { assignment_model(workflow_state: "published") }
+    let(:assignment) { assignment_model(workflow_state: "outcome_alignment_cloning", duplicate_of: original_assignment) }
+
+    it "updates the state to the original state" do
+      params =  ActionController::Parameters.new(alignment_cloned_successfully: true)
+      assignment.root_account.enable_feature!(:course_copy_alignments)
+      api.update_api_assignment(assignment, params, user_model)
+
+      expect(assignment.workflow_state).to eq original_assignment.workflow_state
+    end
+
+    it "updates the state to 'failed_to_clone_outcome_alignment'" do
+      params =  ActionController::Parameters.new(alignment_cloned_successfully: false)
+      assignment.root_account.enable_feature!(:course_copy_alignments)
+      api.update_api_assignment(assignment, params, user_model)
+
+      expect(assignment.workflow_state).to eq "failed_to_clone_outcome_alignment"
     end
   end
 

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 # @API Groups
 #
 # Groups serve as the data for a few different ideas in Canvas.  The first is
@@ -357,10 +355,10 @@ class GroupsController < ApplicationController
 
       format.atom { render xml: @groups.map(&:to_atom).to_xml }
       format.json do
-        path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
+        path = send(:"api_v1_#{@context.class.to_s.downcase}_user_groups_url")
 
         if value_to_boolean(params[:only_own_groups]) || !tab_enabled?(Course::TAB_PEOPLE, no_render: true)
-          all_groups = all_groups.merge(@current_user.current_groups)
+          all_groups = all_groups.merge(@current_user.current_groups.shard(@current_user))
         end
         @paginated_groups = Api.paginate(all_groups, self, path)
         render json: @paginated_groups.map { |g|
@@ -835,12 +833,9 @@ class GroupsController < ApplicationController
   def public_feed
     return unless get_feed_context(only: [:group])
 
-    feed = Atom::Feed.new do |f|
-      f.title = t(:feed_title, "%{course_or_account_name} Feed", course_or_account_name: @context.full_name)
-      f.links << Atom::Link.new(href: group_url(@context), rel: "self")
-      f.updated = Time.now
-      f.id = group_url(@context)
-    end
+    title = t(:feed_title, "%{course_or_account_name} Feed", course_or_account_name: @context.full_name)
+    link = group_url(@context)
+
     @entries = []
     @entries.concat @context.calendar_events.active
     @entries.concat(DiscussionTopic::ScopedToUser.new(@context, @current_user, @context.discussion_topics.published).scope.reject do |dt|
@@ -848,11 +843,9 @@ class GroupsController < ApplicationController
     end)
     @entries.concat WikiPages::ScopedToUser.new(@context, @current_user, @context.wiki_pages.published).scope
     @entries = @entries.sort_by(&:updated_at)
-    @entries.each do |entry|
-      feed.entries << entry.to_atom(context: @context)
-    end
+
     respond_to do |format|
-      format.atom { render plain: feed.to_xml }
+      format.atom { render plain: AtomFeedHelper.render_xml(title:, link:, entries: @entries, context: @context) }
     end
   end
 

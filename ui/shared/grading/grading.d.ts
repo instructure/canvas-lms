@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {z} from 'zod'
 import type {
   Assignment,
   AssignmentGroup,
@@ -52,6 +53,7 @@ export type PartialStudent = {
     submittedAt: null | Date
     workflowState: WorkflowState
   }
+  currentScore?: string
 }
 
 // TODO: remove the need for this type
@@ -185,14 +187,27 @@ export type CamelizedAssignment = {
   submissionTypes: string[]
 }
 
-export type SubmissionOriginalityData = {
-  status: string
-  provider: string
-  similarity_score: number
-  state?: string
-  public_error_message?: string
-  report_url?: string
-}
+export const ZSubmissionOriginalityData = z
+  .object({
+    error_message: z.string().optional(),
+    status: z.string().optional(),
+    provider: z.string().optional(),
+    similarity_score: z.number().optional(),
+    state: z.string().optional(),
+    public_error_message: z.string().optional(),
+    report_url: z.string().optional(),
+  })
+  .extend(z.record(z.unknown()).shape) // TODO: expand
+
+export type SubmissionOriginalityData = z.infer<typeof ZSubmissionOriginalityData>
+
+export const ZVericiteOriginalityData = ZSubmissionOriginalityData.extend(
+  z.object({
+    provider: z.literal('vericite'),
+  }).shape
+)
+
+export type VericiteOriginalityData = z.infer<typeof ZVericiteOriginalityData>
 
 export type SimilarityEntry = {
   id: string
@@ -323,9 +338,10 @@ export type FormatGradeOptions = {
   delocalize?: boolean
   precision?: number
   pointsPossible?: number
-  score?: number
+  score?: number | null
   restrict_quantitative_data?: boolean
   grading_scheme?: DeprecatedGradingScheme[]
+  points_based_grading_scheme?: boolean
 }
 
 /**
@@ -341,7 +357,6 @@ export type DeprecatedGradingScheme = {
 
 export type GradeEntryOptions = {
   gradingScheme?: {data: GradingStandard[]; pointsBased: boolean; scalingFactor: number} | null
-  pointsBasedGradingSchemesFeatureEnabled: boolean
 }
 
 export type ProvisionalGrade = {

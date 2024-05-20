@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
-import createStore from '@canvas/util/createStore'
+import {filter, keyBy, map} from 'lodash'
+import createStore from '@canvas/backbone/createStore'
 import $ from 'jquery'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
@@ -42,7 +42,7 @@ const OverrideStudentStore = createStore($.extend(true, {}, initialStoreState))
 // -------------------
 
 function studentEnrollments(student) {
-  return _.filter(
+  return filter(
     student.enrollments,
     enrollment =>
       enrollment.type === 'StudentEnrollment' || enrollment.type === 'StudentViewEnrollment'
@@ -50,7 +50,7 @@ function studentEnrollments(student) {
 }
 
 function sectionIDs(enrollments) {
-  return _.map(enrollments, enrollment => enrollment.course_section_id)
+  return map(enrollments, enrollment => enrollment.course_section_id)
 }
 
 // -------------------
@@ -192,11 +192,11 @@ OverrideStudentStore.addStudents = function (newlyFetchedStudents) {
 
   const allStudents = Object.values({
     ...this.getState().students,
-    ..._.keyBy(newlyFetchedStudents, student => student.id),
+    ...keyBy(newlyFetchedStudents, student => student.id),
   })
 
   AssignmentOverrideHelper.setStudentDisplayNames(allStudents)
-  this.setState({students: _.keyBy(allStudents, student => student.id)})
+  this.setState({students: keyBy(allStudents, student => student.id)})
 }
 
 OverrideStudentStore.doneSearching = function () {
@@ -231,7 +231,7 @@ OverrideStudentStore.alreadySearchedForName = function (name) {
 }
 
 OverrideStudentStore.alreadySearchingForName = function (name) {
-  return _.includes(this.getState().activeNameSearches, name)
+  return (this.getState().activeNameSearches || []).includes(name)
 }
 
 OverrideStudentStore.markNameSearched = function (name) {

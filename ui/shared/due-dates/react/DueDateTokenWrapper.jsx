@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {chain, debounce, find, map, groupBy, isEmpty, some, union} from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
 import OverrideStudentStore from './OverrideStudentStore'
@@ -101,6 +101,7 @@ class DueDateTokenWrapper extends React.Component {
     try {
       this.setState({currentlyTyping: false})
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('tried to set state in unmounted DueDateTokenWrapper', error)
     }
     if (
@@ -111,7 +112,7 @@ class DueDateTokenWrapper extends React.Component {
     }
   }
 
-  safeFetchStudents = _.debounce(this.fetchStudents, DueDateWrapperConsts.MS_TO_DEBOUNCE_SEARCH)
+  safeFetchStudents = debounce(this.fetchStudents, DueDateWrapperConsts.MS_TO_DEBOUNCE_SEARCH)
 
   handleTokenAdd = (value, option) => {
     if (this.props.disabled) return
@@ -147,7 +148,7 @@ class DueDateTokenWrapper extends React.Component {
   findMatchingOption = (name, option) => {
     if (option) {
       // Selection was made from dropdown, find by unique attributes
-      return _.findWhere(this.props.potentialOptions, option.props.set_props)
+      return find(this.props.potentialOptions, option.props.set_props)
     } else {
       // Search for best matching name
       return this.sortedMatches(name)[0]
@@ -155,7 +156,7 @@ class DueDateTokenWrapper extends React.Component {
   }
 
   sortedMatches = userInput => {
-    const optsByMatch = _.groupBy(this.props.potentialOptions, dropdownObj => {
+    const optsByMatch = groupBy(this.props.potentialOptions, dropdownObj => {
       if (SearchHelpers.exactMatchRegex(userInput).test(dropdownObj.name)) {
         return 'exact'
       }
@@ -166,7 +167,7 @@ class DueDateTokenWrapper extends React.Component {
         return 'substring'
       }
     })
-    return _.union(optsByMatch.exact, optsByMatch.start, optsByMatch.substring)
+    return union(optsByMatch.exact, optsByMatch.start, optsByMatch.substring)
   }
 
   filteredTags = () => {
@@ -180,7 +181,7 @@ class DueDateTokenWrapper extends React.Component {
   }
 
   groupByTagType = options =>
-    _.groupBy(options, opt => {
+    groupBy(options, opt => {
       if (opt.course_section_id) {
         return 'course_section'
       } else if (opt.group_id) {
@@ -213,13 +214,13 @@ class DueDateTokenWrapper extends React.Component {
 
   optionsForMenu = () => {
     const options = this.promptText()
-      ? _.union([this.promptOption()], this.optionsForAllTypes())
+      ? union([this.promptOption()], this.optionsForAllTypes())
       : this.optionsForAllTypes()
     return options
   }
 
   optionsForAllTypes = () =>
-    _.union(
+    union(
       this.conditionalReleaseOptions(),
       this.sectionOptions(),
       this.groupOptions(),
@@ -235,14 +236,14 @@ class DueDateTokenWrapper extends React.Component {
   conditionalReleaseOptions = () => {
     if (!ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) return []
 
-    const selectable = _.includes(this.filteredTagsForType('noop'), Override.conditionalRelease)
+    const selectable = this.filteredTagsForType('noop').includes(Override.conditionalRelease)
     return selectable ? [this.headerOption('conditional_release', Override.conditionalRelease)] : []
   }
 
   optionsForType = optionType => {
     const header = this.headerOption(optionType)
     const options = this.selectableOptions(optionType)
-    return _.some(options) ? _.union([header], options) : []
+    return some(options) ? union([header], options) : []
   }
 
   headerOption = (heading, set) => {
@@ -283,7 +284,7 @@ class DueDateTokenWrapper extends React.Component {
         group: this.MAXIMUM_GROUPS_TO_SHOW,
       }[type] || 0
 
-    return _.chain(this.filteredTagsForType(type))
+    return chain(this.filteredTagsForType(type))
       .take(numberToShow)
       .map((set, index) => this.selectableOption(set, index))
       .value()
@@ -322,7 +323,7 @@ class DueDateTokenWrapper extends React.Component {
       return I18n.t('Continue typing to find additional sections or students.')
     }
 
-    if (_.isEmpty(this.filteredTags())) {
+    if (isEmpty(this.filteredTags())) {
       return I18n.t('No results found')
     }
   }
@@ -349,7 +350,8 @@ class DueDateTokenWrapper extends React.Component {
   renderTokenInput = () => {
     if (this.props.disabled) {
       return (
-        <DisabledTokenInput tokens={_.pluck(this.props.tokens, 'name')} ref="DisabledTokenInput" />
+        // eslint-disable-next-line react/no-string-refs
+        <DisabledTokenInput tokens={map(this.props.tokens, 'name')} ref="DisabledTokenInput" />
       )
     }
     const ariaLabel = I18n.t(
@@ -375,6 +377,7 @@ class DueDateTokenWrapper extends React.Component {
           combobox-aria-label={ariaLabel}
           value={true}
           showListOnFocus={!this.props.disabled}
+          // eslint-disable-next-line react/no-string-refs
           ref="TokenInput"
         />
       </div>

@@ -17,10 +17,9 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {CanvasId, CanvasProgress} from './types'
+import type {CanvasId, CanvasProgress} from './types'
 import {
-  IconMiniArrowDownLine,
-  IconPublishLine,
+  IconArrowOpenDownLine,
   IconPublishSolid,
   IconUnpublishedLine,
   // @ts-ignore
@@ -92,7 +91,7 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
     if (isPublishing) {
       return <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
     } else {
-      return <IconPublishLine size="x-small" color="success" />
+      return <IconPublishSolid size="x-small" color="success" />
     }
   }
 
@@ -267,6 +266,12 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
     setIsModalOpen(true)
   }
 
+  const unpublishModuleOnly = () => {
+    setShouldPublishModules(false)
+    setShouldSkipModuleItems(true)
+    setIsModalOpen(true)
+  }
+
   const modalTitle = () => {
     if (shouldPublishModules) {
       if (shouldSkipModuleItems) {
@@ -274,6 +279,8 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
       } else {
         return I18n.t('Publish all modules and items')
       }
+    } else if (shouldSkipModuleItems) {
+      return I18n.t('Unpublish modules only')
     } else {
       return I18n.t('Unpublish all modules and items')
     }
@@ -297,7 +304,7 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
         placement="bottom"
         trigger={
           <Button renderIcon={statusIcon}>
-            {I18n.t('Publish All')} <IconMiniArrowDownLine size="x-small" />
+            {I18n.t('Publish All')} <IconArrowOpenDownLine size="x-small" />
           </Button>
         }
         show={isPublishing ? false : undefined}
@@ -311,6 +318,9 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
         </MenuItem>
         <MenuItem onClick={unpublishAll} id="unpublish_all_menu_item">
           <IconUnpublishedLine /> {I18n.t('Unpublish all modules and items')}
+        </MenuItem>
+        <MenuItem onClick={unpublishModuleOnly} id="unpublish_module_only_menu_item">
+          <IconUnpublishedLine /> {I18n.t('Unpublish modules only')}
         </MenuItem>
       </Menu>
       {isModalOpen && (

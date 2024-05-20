@@ -19,8 +19,8 @@
 import React from 'react'
 import moment from 'moment-timezone'
 import {render, fireEvent} from '@testing-library/react'
-import {UnknownSubset} from '../../types'
-import CustomRecurrenceModal, {CustomRecurrenceModalProps} from '../CustomRecurrenceModal'
+import type {UnknownSubset} from '../../types'
+import CustomRecurrenceModal, {type CustomRecurrenceModalProps} from '../CustomRecurrenceModal'
 
 const defaultTZ = 'Asia/Tokyo'
 

@@ -21,7 +21,7 @@ class BrandConfig < ActiveRecord::Base
   include BrandableCSS
 
   self.primary_key = "md5"
-  serialize :variables, Hash
+  serialize :variables, type: Hash
 
   OVERRIDE_TYPES = %i[js_overrides css_overrides mobile_js_overrides mobile_css_overrides].freeze
   ATTRS_TO_INCLUDE_IN_MD5 = ([:variables, :parent_md5] + OVERRIDE_TYPES).freeze

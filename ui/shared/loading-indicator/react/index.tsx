@@ -22,10 +22,13 @@ import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('courses')
 
-export default function LoadingIndicator() {
+type LoadingIndicatorProps = {
+  delay?: number
+}
+export default function LoadingIndicator({delay}: LoadingIndicatorProps) {
   return (
     <View as="div" height="100%" width="100%" textAlign="center">
-      <Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />
+      <Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" delay={delay} />
     </View>
   )
 }

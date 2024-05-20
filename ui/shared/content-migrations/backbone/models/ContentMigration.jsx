@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import _ from 'underscore'
+import {forEach} from 'lodash'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import {completeUpload} from '@canvas/upload-file'
@@ -25,7 +25,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {ProgressBar} from '@instructure/ui-progress'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 
 const I18n = useI18nScope('content_migrations')
 
@@ -79,7 +79,7 @@ ContentMigration.prototype.resetModel = function () {
 // @api private
 
 ContentMigration.prototype.resetDynamicDefaultCollections = function () {
-  return _.each(this.dynamicDefaults, function (value, _key, _list) {
+  forEach(this.dynamicDefaults, function (value, _key, _list) {
     let collection, models
     if (value instanceof Backbone.Collection) {
       collection = value
@@ -89,11 +89,11 @@ ContentMigration.prototype.resetDynamicDefaultCollections = function () {
       models = collection.map(function (model) {
         return model
       })
-      return _.each(models, function (model) {
-        return collection.remove(model)
-      })
+      forEach(models, model => collection.remove(model))
+      return models
     }
   })
+  return this.dynamicDefaults
 }
 
 // Handles two cases. Migration with a file and without a file.
@@ -137,7 +137,8 @@ ContentMigration.prototype.save = function () {
   const fileElement = this.get('pre_attachment').fileElement
   delete this.get('pre_attachment').fileElement
   const file = fileElement.files[0]
-  ContentMigration.__super__.save.call(this, _.omit(arguments[0], 'file'), {
+  const {file: _omittedFile, ...args} = arguments[0]
+  ContentMigration.__super__.save.call(this, args, {
     error: (function (_this) {
       return function (xhr) {
         return reject(xhr.responseText)

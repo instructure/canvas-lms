@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {reduce, pick} from 'lodash'
 import editorOptions from './editorOptions'
 import loadEventListeners from './loadEventListeners'
 import polyfill from './polyfill'
@@ -121,7 +121,7 @@ const RCELoader = {
    */
   _attrsToMirror(textarea) {
     const validAttrs = ['name']
-    const attrs = _.reduce(
+    const attrs = reduce(
       textarea.attributes,
       (memo, attr) => {
         memo[attr.name] = attr.value
@@ -130,7 +130,7 @@ const RCELoader = {
       {}
     )
 
-    return _.pick(attrs, validAttrs)
+    return pick(attrs, validAttrs)
   },
 
   /**
@@ -181,6 +181,8 @@ const RCELoader = {
       timezone: ENV?.TIMEZONE,
       userCacheKey: ENV?.user_cache_key,
       canvasOrigin: ENV?.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin || '',
+      resourceType: tinyMCEInitOptions.resourceType,
+      resourceId: tinyMCEInitOptions.resourceId,
       externalToolsConfig: {
         ltiIframeAllowances: window.ENV?.LTI_LAUNCH_FRAME_ALLOWANCES,
         isA2StudentView: window.ENV?.a2_student_view,

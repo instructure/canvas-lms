@@ -16,27 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable import/no-extraneous-dependencies */
-
-const {EnvironmentPlugin, DefinePlugin, IgnorePlugin} = require('webpack')
-const {sync} = require('glob')
-const {join, resolve} = require('path')
+const {IgnorePlugin} = require('webpack')
+const {
+  DefinePlugin,
+  ProvidePlugin,
+  EnvironmentPlugin,
+  SwcJsMinimizerRspackPlugin,
+} = require('@rspack/core')
+const {resolve} = require('path')
 const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin')
-const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer')
-const EsmacPlugin = require('webpack-esmac-plugin')
-const {WebpackManifestPlugin} = require('webpack-manifest-plugin')
+const {WebpackManifestPlugin} = require('rspack-manifest-plugin')
 const {RetryChunkLoadPlugin} = require('webpack-retry-chunk-load-plugin')
-// keep this in sync with webpack's dep version
-// uses terser to minify JavaScript
-const TerserPlugin = require('terser-webpack-plugin')
-
-const SourceFileExtensionsPlugin = require('./SourceFileExtensionsPlugin')
+const {
+  container: {ModuleFederationPlugin},
+} = require('@rspack/core')
 const WebpackHooks = require('./webpackHooks')
+const {fetchSpeedGraderLibrary, fetchAnalyticsHub} = require('./remotes')
 
 // determines which folder public assets are compiled to
 const webpackPublicPath = require('./webpackPublicPath')
 
 const {canvasDir} = require('../params')
+
+exports.provideJQuery = new ProvidePlugin({
+  $: 'jquery',
+  jQuery: 'jquery',
+})
 
 // sets these environment variables in compiled code.
 // process.env.NODE_ENV will make it so react and others are much smaller and don't run their
@@ -54,17 +59,6 @@ exports.timezoneData = new MomentTimezoneDataPlugin({
   endYear: new Date().getFullYear() + 15,
 })
 
-// allow plugins to extend source files
-// TODO: remove dependency of Canvas plugins on this extension:
-//   - instructure_misc_plugin
-//   - multiple_root_accounts
-//   - migration_tool
-exports.customSourceFileExtensions = new SourceFileExtensionsPlugin({
-  context: canvasDir,
-  include: sync(join(canvasDir, 'gems/plugins/*/package.json'), {absolute: true}),
-  tmpDir: join(canvasDir, 'tmp/webpack-source-file-extensions'),
-})
-
 // hooks for webpack lifecycle (start, fail, done)
 // requires process.env.ENABLE_CANVAS_WEBPACK_HOOKS
 // write your own custom commands for:
@@ -73,25 +67,6 @@ exports.customSourceFileExtensions = new SourceFileExtensionsPlugin({
 //   CANVAS_WEBPACK_DONE_HOOK
 // cf. ui-build/webpack/webpackHooks/macNotifications.sh
 exports.webpackHooks = new WebpackHooks()
-
-// controls access between modules; enforces where you can import from
-//   i.e. can't import features into packages, or ui/shared into packages
-exports.controlAccessBetweenModules = new EsmacPlugin({
-  test: /\.[tj]sx?$/,
-  include: [
-    resolve(canvasDir, 'ui'),
-    resolve(canvasDir, 'packages'),
-    resolve(canvasDir, 'public/javascripts'),
-    resolve(canvasDir, 'gems/plugins'),
-  ],
-  exclude: [/\/node_modules\//],
-  formatter: require('./esmac/ErrorFormatter'),
-  rules: require('./esmac/moduleAccessRules'),
-  permit:
-    process.env.WEBPACK_ENCAPSULATION_DEBUG === '1'
-      ? []
-      : require('./esmac/errorsPendingRemoval.json'),
-})
 
 exports.setMoreEnvVars = new DefinePlugin({
   CANVAS_WEBPACK_PUBLIC_PATH: JSON.stringify(webpackPublicPath),
@@ -135,18 +110,6 @@ exports.failOnWebpackWarnings = function (compiler) {
   })
 }
 
-exports.analyzeBundles = new BundleAnalyzerPlugin({
-  analyzerMode: 'static',
-  reportFilename: process.env.WEBPACK_ANALYSIS_FILE
-    ? resolve(process.env.WEBPACK_ANALYSIS_FILE)
-    : resolve(canvasDir, 'tmp/webpack-bundle-analysis.html'),
-  openAnalyzer: false,
-  generateStatsFile: false,
-  statsOptions: {
-    source: false,
-  },
-})
-
 // don't include any of the moment locales in the common bundle
 // (otherwise it is huge!) we load them explicitly onto the page in
 // include_js_bundles from rails.
@@ -165,66 +128,47 @@ exports.webpackManifest = new WebpackManifestPlugin({
   useEntryKeys: true,
 })
 
-exports.minimizeCode = new TerserPlugin({
-  parallel: true,
-  terserOptions: {
-    compress: {
-      sequences: false, // prevents it from combining a bunch of statements with ","s so it is easier to set breakpoints
-
-      // these are all things that terser does by default but we turn
-      // them off because they don't reduce file size enough to justify the
-      // time they take, especially after gzip:
-      // see: https://slack.engineering/keep-webpack-fast-a-field-guide-for-better-build-performance-f56a5995e8f1
-      booleans: false,
-      collapse_vars: false,
-      comparisons: false,
-      computed_props: false,
-      hoist_props: false,
-      if_return: false,
-      join_vars: false,
-      keep_infinity: true,
-      loops: false,
-      negate_iife: false,
-      properties: false,
-      reduce_funcs: false,
-      reduce_vars: false,
-      typeofs: false,
-    },
-    output: {
-      comments: false,
-      semicolons: false, // prevents everything being on one line so it's easier to view in devtools
-    },
+exports.minimizeCode = new SwcJsMinimizerRspackPlugin({
+  compress: {
+    sequences: false, // prevents it from combining a bunch of statements with ","s so it is easier to set breakpoints
+    // these are all things that terser does by default but we turn
+    // them off because they don't reduce file size enough to justify the
+    // time they take, especially after gzip:
+    // see: https://slack.engineering/keep-webpack-fast-a-field-guide-for-better-build-performance-f56a5995e8f1
+    booleans: false,
+    collapse_vars: false,
+    comparisons: false,
+    computed_props: false,
+    hoist_props: false,
+    if_return: false,
+    join_vars: false,
+    keep_infinity: true,
+    loops: false,
+    negate_iife: false,
+    properties: false,
+    reduce_funcs: false,
+    reduce_vars: false,
+    typeofs: false,
+  },
+  output: {
+    comments: false,
+    semicolons: false, // prevents everything being on one line so it's easier to view in devtools
   },
 })
 
 exports.buildCacheOptions = {
-  cache: {
-    type: 'filesystem',
-    allowCollectingMemory: false,
-    buildDependencies: {config: []},
-    compression: 'gzip',
-  },
   snapshot: {
-    buildDependencies: {hash: true, timestamp: false},
     module: {hash: true, timestamp: false},
     resolve: {hash: true, timestamp: false},
-    resolveBuildDependencies: {hash: true, timestamp: false},
   },
 }
 
-// style of source mapping to enhance the debugging process
-// https://webpack.js.org/configuration/devtool/
-exports.getDevtool = function (skipSourcemaps) {
-  let devtool
-  if (skipSourcemaps) {
-    // Fast
-    devtool = false
-  } else if (process.env.NODE_ENV === 'production' || process.env.COVERAGE === '1') {
-    // Slow. "Recommended choice for production builds with high quality SourceMaps.""
-    devtool = 'source-map'
-  } else {
-    // "Recommended choice for development builds with maximum performance"
-    devtool = 'eval'
-  }
-  return devtool
-}
+exports.moduleFederation = new ModuleFederationPlugin({
+  name: 'canvas',
+  remotes: {
+    analyticshub: `promise new Promise(${fetchAnalyticsHub.toString()})`,
+    speedgrader: `promise new Promise(${fetchSpeedGraderLibrary.toString()})`,
+  },
+  exposes: {},
+  shared: {},
+})

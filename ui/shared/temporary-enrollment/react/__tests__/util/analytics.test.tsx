@@ -17,11 +17,11 @@
  */
 
 import {
-  AnalyticProps,
   createAnalyticPropsGenerator,
   DATA_ANALYTICS_ATTRIBUTE,
   setAnalyticPropsOnRef,
 } from '../../util/analytics'
+import type {AnalyticProps} from '../../util/analytics'
 
 const ANALYTICS_PREFIX = 'testPrefix'
 const ANALYTICS_TEST_VALUE = 'testValue'

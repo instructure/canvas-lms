@@ -51,7 +51,7 @@ export default function CourseImportPanel({contentShare, onClose, onImport}) {
             insert_into_module_id: selectedModule?.id || null,
             insert_into_module_type: contentShare.content_type,
             insert_into_module_position: selectedPosition,
-            importer_skips: ['all_course_settings'],
+            importer_skips: ['all_course_settings', 'folders'],
           },
         },
       })

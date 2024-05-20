@@ -16,8 +16,8 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
+import {some} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import GroupCategoryCloneView from './GroupCategoryCloneView'
 import template from '../../jst/randomlyAssignMembers.handlebars'
@@ -51,7 +51,7 @@ export default class RandomlyAssignMembersView extends DialogFormView {
   openAgain() {
     super.openAgain(...arguments)
     const groups = this.model.groups().models
-    if (_.some(groups, group => group.usersCount() > 0 || !!group.get('max_membership'))) {
+    if (some(groups, group => group.usersCount() > 0 || !!group.get('max_membership'))) {
       return this.disableCheckbox(
         this.$group_by_section,
         I18n.t('Cannot restrict by section unless groups are empty and not limited in size')

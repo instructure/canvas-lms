@@ -39,7 +39,7 @@ export default class QuizRegradeView extends DialogBaseView {
   render() {
     this.$el.parent().find('a').first().focus()
     if (!this.regradeOption) {
-      this.$el.parent().find('.btn-primary').attr('disabled', true)
+      this.$el.parent().find('.btn-primary').prop('disabled', true)
     }
     return super.render(...arguments)
   }
@@ -58,7 +58,7 @@ export default class QuizRegradeView extends DialogBaseView {
   }
 
   enableUpdate() {
-    return this.$el.parent().find('.btn-primary').attr('disabled', false)
+    return this.$el.parent().find('.btn-primary').prop('disabled', false)
   }
 }
 QuizRegradeView.initClass()

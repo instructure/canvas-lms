@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {debounce} from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
@@ -81,7 +81,7 @@ export default class BlueprintAssociations extends React.Component {
     }
 
     if (this.props.isSavingAssociations && !nextProps.isSavingAssociations) {
-      $.screenReaderFlashMessageExclusive(I18n.t('Saving associations complete'))
+      $.screenReaderFlashMessage(I18n.t('Saving associations complete'))
 
       // when saving is done, reload courses in course picker
       // this will remove courses we just associated from the picker
@@ -147,7 +147,7 @@ export default class BlueprintAssociations extends React.Component {
             courses={this.props.courses}
             terms={this.props.terms}
             subAccounts={this.props.subAccounts}
-            loadCourses={_.debounce(this.props.loadCourses, 200)}
+            loadCourses={debounce(this.props.loadCourses, 200)}
             isLoadingCourses={this.props.isLoadingCourses}
             selectedCourses={this.props.addedAssociations.map(course => course.id)}
             onSelectedChanged={this.onSelectedChanged}

@@ -15,12 +15,19 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+
 module DynamicSettings
   class FallbackProxy
+    PERSISTENCE_FLAG = "dynamic_settings:"
+    PERSISTED_TREE = "store"
+
     attr_reader :data
 
-    def initialize(data = nil)
+    def initialize(data = nil, path = nil, ignore_fallback_overrides: false)
       @data = (data || {}).with_indifferent_access
+      @path = path
+      @ignore_fallback_overrides = ignore_fallback_overrides
+      load_fallback_overrides if load_overrides?
     end
 
     def fetch(key, **_)
@@ -38,10 +45,47 @@ module DynamicSettings
     # @return [Hash]
     def set_keys(kvs, global: nil)
       @data.merge!(kvs)
+      if overridable?
+        kvs.each do |k, v|
+          Setting.set(PERSISTENCE_FLAG + append_path(k), v)
+        end
+      end
     end
 
     def for_prefix(prefix_extension, **_)
-      self.class.new(@data[prefix_extension])
+      self.class.new(
+        @data[prefix_extension],
+        append_path(prefix_extension),
+        ignore_fallback_overrides: @ignore_fallback_overrides
+      )
+    end
+
+    private
+
+    def load_overrides?
+      !@ignore_fallback_overrides && @path == PERSISTED_TREE
+    end
+
+    def overridable?
+      !@ignore_fallback_overrides && @path&.starts_with?(PERSISTED_TREE)
+    end
+
+    def load_fallback_overrides
+      overrides = Setting.where("name LIKE ?", "#{PERSISTENCE_FLAG + @path}%")
+      overrides.each do |setting|
+        _tree, *segments, key = setting.name.delete_prefix(PERSISTENCE_FLAG).split("/")
+        prefix = @data
+        segments.each do |part|
+          prefix[part] ||= {}
+          prefix = prefix[part]
+        end
+        prefix[key] = setting.value
+      end
+    end
+
+    def append_path(prefix)
+      prefix_string = prefix.to_s
+      @path.nil? ? prefix_string : @path + "/" + prefix_string
     end
   end
 end

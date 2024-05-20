@@ -24,11 +24,12 @@ describe "external tool assignments" do
 
   before do
     course_with_teacher_logged_in
-    @t1 = factory_with_protected_attributes(@course.context_external_tools, url: "http://www.justanexamplenotarealwebsite.com/tool1", shared_secret: "test123", consumer_key: "test123", name: "tool 1")
-    @t2 = factory_with_protected_attributes(@course.context_external_tools, url: "http://www.justanexamplenotarealwebsite.com/tool2", shared_secret: "test123", consumer_key: "test123", name: "tool 2")
+    @t1 = factory_with_protected_attributes(@course.context_external_tools, url: "http://www.justanexamplenotarealwebsite.com/tool1", domain: "justanexamplenotarealwebsite.com", shared_secret: "test123", consumer_key: "test123", name: "tool 1")
+    @t2 = factory_with_protected_attributes(@course.context_external_tools, url: "http://www.justanexamplenotarealwebsite.com/tool2", domain: "justanexamplenotarealwebsite.com", shared_secret: "test123", consumer_key: "test123", name: "tool 2")
   end
 
   it "allows creating through index", priority: "2" do
+    @course.root_account.enable_feature!(:instui_nav)
     get "/courses/#{@course.id}/assignments"
     expect_no_flash_message :error
     # create assignment
@@ -133,13 +134,18 @@ describe "external tool assignments" do
         tool.submission_type_selection = { text: "link to #{tool.name} or whatever" }
         tool.save!
       end
+      Setting.set("submission_type_selection_allowed_launch_domains", "justanexamplenotarealwebsite.com")
+    end
+
+    after do
+      Setting.remove("submission_type_selection_allowed_launch_domains")
     end
 
     it "is able to select the tool directly from the submission type drop-down" do
       get "/courses/#{@course.id}/assignments/new"
 
       click_option("#assignment_submission_type", @t1.name) # should use the tool name for drop-down
-      button = f("#assignment_submission_type_selection_tool_launch_container .btn-primary")
+      button = f("#assignment_submission_type_selection_launch_button")
 
       expect(button).to be_displayed
       expect(button.text).to include("link to #{@t1.name} or whatever") # the launch button uses the placement text
@@ -163,7 +169,7 @@ describe "external tool assignments" do
       get "/courses/#{@course.id}/assignments/#{assmt.id}/edit"
       selected = first_selected_option(f("#assignment_submission_type"))
       expect(selected.text.strip).to eq @t1.name
-      button = f("#assignment_submission_type_selection_tool_launch_container .btn-primary")
+      button = f("#assignment_submission_type_selection_launch_button")
       expect(button).to be_displayed
       expect(button.text).to include("link to #{@t1.name} or whatever") # the launch button uses the placement text
     end
@@ -197,7 +203,7 @@ describe "external tool assignments" do
     it "is bring up modal when submission type link is clicked" do
       get "/courses/#{@course.id}/assignments/new"
       click_option("#assignment_submission_type", @t1.name) # should use the tool name for drop-down
-      f("#assignment_submission_type_selection_tool_launch_container .btn-primary").click
+      f("#assignment_submission_type_selection_launch_button").click
       expect(fxpath("//span[@aria-label = 'Launch External Tool']//h2").text).to include("link to #{@t1.name} or whatever")
 
       close_button_selector = "//span[@aria-label = 'Launch External Tool']//button[//*[text() = 'Close']]"

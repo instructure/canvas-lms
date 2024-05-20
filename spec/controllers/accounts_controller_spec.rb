@@ -136,24 +136,22 @@ describe AccountsController do
 
   context "restore_user" do
     before(:once) do
-      @site_admin = site_admin_user
       account_with_admin
       @deleted_user = user_with_pseudonym(account: @account)
       @deleted_user.destroy
     end
 
-    before { user_session(@site_admin) }
+    before { user_session(@admin) }
 
-    it "allows site-admins to restore deleted users" do
+    it "allows admins to restore deleted users" do
       put "restore_user", params: { account_id: @account.id, user_id: @deleted_user.id }
       expect(@deleted_user.reload.workflow_state).to eq "registered"
       expect(@deleted_user.pseudonyms.take.workflow_state).to eq "active"
       expect(@deleted_user.user_account_associations.find_by(account: @account)).not_to be_nil
     end
 
-    it "does not allow standard admins to restore deleted users" do
-      # probably fine if someone wants to allow regular admins to do this at some point
-      user_session(@admin)
+    it "does not allow users without login permissions to restore deleted users" do
+      account_admin_user_with_role_changes(user: @admin, role_changes: { manage_user_logins: false })
       put "restore_user", params: { account_id: @account.id, user_id: @deleted_user.id }, format: "json"
       expect(response).to be_unauthorized
     end
@@ -199,7 +197,7 @@ describe AccountsController do
       new_admin = CommunicationChannel.where(path: "testadmin@example.com").first.user
       expect(new_admin).not_to be_nil
       @account.reload
-      expect(@account.account_users.map(&:user)).to be_include(new_admin)
+      expect(@account.account_users.map(&:user)).to include(new_admin)
     end
 
     it "allows adding a new custom account admin" do
@@ -210,7 +208,7 @@ describe AccountsController do
       new_admin = CommunicationChannel.find_by(path: "testadmin@example.com").user
       expect(new_admin).to_not be_nil
       @account.reload
-      expect(@account.account_users.map(&:user)).to be_include(new_admin)
+      expect(@account.account_users.map(&:user)).to include(new_admin)
       expect(@account.account_users.find_by(role_id: role.id).user).to eq new_admin
     end
 
@@ -228,8 +226,8 @@ describe AccountsController do
       @subaccount.account_users.create!(user_id: @usr.id, role_id: admin_role.id).destroy
       post "add_account_user", params: { account_id: @subaccount.id, role_id: admin_role.id, user_list: "usr@instructure.com" }
       expect(response).to be_successful
-      expect(@subaccount.account_users.map(&:user)).to be_include(@usr)
-      expect(@usr.user_account_associations.map(&:account)).to be_include(@subaccount)
+      expect(@subaccount.account_users.map(&:user)).to include(@usr)
+      expect(@usr.user_account_associations.map(&:account)).to include(@subaccount)
     end
   end
 
@@ -856,61 +854,6 @@ describe AccountsController do
       end
     end
 
-    describe "privacy settings" do
-      let(:account) { account_model }
-      let(:sub_account) { account_model(root_account: account) }
-      let(:site_admin) { site_admin_user }
-      let(:payload) do
-        {
-          account: {
-            settings: {
-              enable_fullstory: "0",
-            }
-          }
-        }
-      end
-
-      it "accepts changes made by a siteadmin to a root account" do
-        user_session(site_admin)
-
-        expect do
-          post "update", format: "json", params: { id: account.id, **payload }
-        end.to change {
-          account.reload.settings.fetch(:enable_fullstory, true)
-        }.from(true).to(false)
-      end
-
-      it "ignores changes made to the site_admin account" do
-        user_session(site_admin)
-
-        expect do
-          post "update", format: "json", params: { id: Account.site_admin.id, **payload }
-        end.to not_change {
-          account.reload.settings.fetch(:enable_fullstory, true)
-        }
-      end
-
-      it "ignores changes to sub accounts" do
-        user_session(site_admin)
-
-        expect do
-          post "update", format: "json", params: { id: sub_account.id, **payload }
-        end.to not_change {
-          account.reload.settings.fetch(:enable_fullstory, true)
-        }
-      end
-
-      it "ignores changes from regular admins" do
-        user_session(account_admin_user(account:))
-
-        expect do
-          post "update", format: "json", params: { id: account.id, **payload }
-        end.to not_change {
-          account.reload.settings.fetch(:enable_fullstory, true)
-        }
-      end
-    end
-
     it "is set and unset outgoing email name" do
       account_with_admin_logged_in
       post "update", params: { id: @account.id,
@@ -1407,7 +1350,7 @@ describe AccountsController do
       get "courses_api", params: { account_id: @account.id, per_page: 1 }
 
       expect(response).to be_successful
-      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
+      expect(response.headers.to_a.find { |a| a.first.downcase == "link" }.last).to_not include("last")
     end
 
     it "sets pagination total_pages/last page link if includes ui_invoked is set" do
@@ -1416,7 +1359,7 @@ describe AccountsController do
       get "courses_api", params: { account_id: @account.id, per_page: 1, include: ["ui_invoked"] }
 
       expect(response).to be_successful
-      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to include("last")
+      expect(response.headers.to_a.find { |a| a.first.downcase == "link" }.last).to include("last")
     end
 
     it "properly removes sections from includes" do
@@ -1910,8 +1853,8 @@ describe AccountsController do
     end
 
     context "pagination" do
-      before(:once) do
-        Setting.set("eportfolio_moderation_results_per_page", 2)
+      before do
+        stub_const("AccountsController::EPORTFOLIO_MODERATION_PER_PAGE", 2)
       end
 
       it "does not return more than the specified results per page" do

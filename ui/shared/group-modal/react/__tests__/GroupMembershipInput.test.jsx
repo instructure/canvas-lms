@@ -25,23 +25,23 @@ describe('GroupMembershipInput', () => {
     const {getByLabelText} = render(<GroupMembershipInput onChange={onChange} value="" />)
     const input = getByLabelText(/Group Membership/i)
     fireEvent.input(input, {target: {value: '5'}})
-    expect(onChange).toHaveBeenNthCalledWith(2, 5)
+    expect(onChange).toHaveBeenNthCalledWith(1, 5)
   })
 
-  it('handles incrementing the number input', () => {
+  it('handles incrementing the number input', async () => {
     const onChange = jest.fn()
     const {container} = render(<GroupMembershipInput onChange={onChange} value="" />)
     const upArrow = container.querySelector("svg[name='IconArrowOpenUp']").parentElement
-    userEvent.click(upArrow)
-    expect(onChange).toHaveBeenNthCalledWith(2, 1)
+    await userEvent.click(upArrow)
+    expect(onChange).toHaveBeenNthCalledWith(1, 1)
   })
 
-  it('handles decrementing the number input', () => {
+  it('handles decrementing the number input', async () => {
     const onChange = jest.fn()
     const {container} = render(<GroupMembershipInput onChange={onChange} value="3" />)
     const downArrow = container.querySelector("svg[name='IconArrowOpenDown']").parentElement
-    userEvent.click(downArrow)
-    expect(onChange).toHaveBeenNthCalledWith(2, 2)
+    await userEvent.click(downArrow)
+    expect(onChange).toHaveBeenNthCalledWith(1, 2)
   })
 
   it('allows deletion of input if value is less than 10', () => {
@@ -50,14 +50,14 @@ describe('GroupMembershipInput', () => {
     const input = getByPlaceholderText('Number')
     fireEvent.input(input, {target: {value: '9'}})
     fireEvent.keyDown(input, {key: 'Backspace', code: 8})
-    expect(onChange).toHaveBeenNthCalledWith(4, '')
+    expect(onChange).toHaveBeenNthCalledWith(2, '')
   })
 
   it('allows deletion of prior input if value is less than 10', () => {
     const onChange = jest.fn()
     const {getByPlaceholderText} = render(<GroupMembershipInput onChange={onChange} value="2" />)
     fireEvent.keyDown(getByPlaceholderText('Number'), {key: 'Backspace', code: 8})
-    expect(onChange).toHaveBeenNthCalledWith(2, '')
+    expect(onChange).toHaveBeenNthCalledWith(1, '')
   })
 
   describe('errors', () => {

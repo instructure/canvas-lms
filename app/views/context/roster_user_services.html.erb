@@ -86,7 +86,7 @@
 </p>
 <% if @current_user && @current_user.user_services.select{|s| feature_and_service_enabled?(s.service)}.empty? %>
   <p>
-    <%= t 'help.no_services', %{You haven't linked your user profile to any external services.  You can link your Canvas account to services like Twitter.} %>
+    <%= t 'help.no_services', %{You haven't linked your user profile to any external services.  You can link your Canvas account to services like X.com.} %>
   </p>
   <p>
     <a href="<%= settings_profile_path %>#registered_web_services" class="btn btn-primary"><i class="icon-link"></i> <%= t('links.link_service', %{Link web services to my account}) %></a>
@@ -129,6 +129,6 @@
 </ul>
 <% end %>
 
-<script async src="http://download.skype.com/share/skypebuttons/js/skypeCheck.js"></script>
+<script async src="//download.skype.com/share/skypebuttons/js/skypeCheck.js"></script>
 
 <% js_bundle 'context_roster_user_services' %>

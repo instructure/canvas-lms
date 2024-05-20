@@ -234,6 +234,35 @@ describe ContextModule do
     end
   end
 
+  describe "update_assignment_submissions" do
+    before :once do
+      Account.site_admin.enable_feature!(:differentiated_modules)
+      course_module
+      @student1 = student_in_course(active_all: true, name: "Student 1").user
+      @assignment = @course.assignments.create!(title: "some assignment")
+      @quiz = @course.quizzes.create!(title: "some quiz", quiz_type: "assignment")
+      @module.add_item({ id: @assignment.id, type: "assignment" })
+      @module.add_item({ id: @quiz.id, type: "quiz" })
+    end
+
+    it "correctly updates submissions after delete" do
+      adhoc_override = @module.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override.assignment_override_students.create!(user: @student1)
+
+      @module.update_assignment_submissions(@module.current_assignments_and_quizzes)
+      @assignment.submissions.reload
+      @quiz.assignment.submissions.reload
+      expect(@assignment.submissions.length).to eq 1
+      expect(@quiz.assignment.submissions.length).to eq 1
+
+      @module.destroy!
+      @assignment.submissions.reload
+      @quiz.assignment.submissions.reload
+      expect(@assignment.submissions.length).to eq 2
+      expect(@quiz.assignment.submissions.length).to eq 2
+    end
+  end
+
   describe "prerequisites=" do
     it "assigns prerequisites" do
       course_module
@@ -337,7 +366,7 @@ describe ContextModule do
       @tag = @module.add_item({ id: @assignment.id, type: "assignment" }) # @assignment)
 
       expect(@tag.content).to eql(@assignment)
-      expect(@module.content_tags).to be_include(@tag)
+      expect(@module.content_tags).to include(@tag)
     end
 
     it "does not add an invalid assignment" do
@@ -362,7 +391,7 @@ describe ContextModule do
       @tag = @module.add_item({ id: @page.id, type: "wiki_page" }) # @page)
 
       expect(@tag.content).to eql(@page)
-      expect(@module.content_tags).to be_include(@tag)
+      expect(@module.content_tags).to include(@tag)
     end
 
     it "does not add invalid wiki pages" do
@@ -378,7 +407,7 @@ describe ContextModule do
       @tag = @module.add_item({ id: @file.id, type: "attachment" }) # @file)
 
       expect(@tag.content).to eql(@file)
-      expect(@module.content_tags).to be_include(@tag)
+      expect(@module.content_tags).to include(@tag)
     end
 
     it "allows adding items more than once" do
@@ -386,8 +415,8 @@ describe ContextModule do
       @tag1 = @module.add_item(id: @assignment.id, type: "assignment")
       @tag2 = @module.add_item(id: @assignment.id, type: "assignment")
       expect(@tag1).not_to eq @tag2
-      expect(@module.content_tags).to be_include(@tag1)
-      expect(@module.content_tags).to be_include(@tag2)
+      expect(@module.content_tags).to include(@tag1)
+      expect(@module.content_tags).to include(@tag2)
 
       @mod2 = @course.context_modules.create!(name: "mod2")
       @tag3 = @mod2.add_item(id: @assignment.id, type: "assignment")
@@ -412,7 +441,7 @@ describe ContextModule do
       @module.workflow_state = "published"
       @module.save!
 
-      expect(@module.content_tags).to be_include(@tag)
+      expect(@module.content_tags).to include(@tag)
     end
 
     describe "when adding an LTI 1.3 external tool" do
@@ -444,7 +473,7 @@ describe ContextModule do
         @module.workflow_state = "published"
         @module.save!
 
-        expect(@module.content_tags).to be_include(@tag)
+        expect(@module.content_tags).to include(@tag)
         expect(@tag.associated_asset).to be_a(Lti::ResourceLink)
         expect(@tag.associated_asset.custom).to eq("foo" => "bar")
       end
@@ -693,8 +722,8 @@ describe ContextModule do
 
       tehmod.update_for(@student, :read, tag)
       mods_with_progressions = @student.context_module_progressions.collect(&:context_module_id)
-      expect(mods_with_progressions).not_to be_include othermods[1].id
-      expect(mods_with_progressions).not_to be_include othermods[2].id
+      expect(mods_with_progressions).not_to include othermods[1].id
+      expect(mods_with_progressions).not_to include othermods[2].id
     end
 
     it "does not remove completed contribution requirements when viewed" do
@@ -1419,7 +1448,7 @@ describe ContextModule do
       @submission = @quiz.generate_submission(@student)
       @submission.workflow_state = "complete"
       @submission.save!
-      expect(@module.evaluate_for(@student).requirements_met).to be_include({ id: @tag.id, type: "must_submit" })
+      expect(@module.evaluate_for(@student).requirements_met).to include({ id: @tag.id, type: "must_submit" })
     end
 
     context "with conditional release" do
@@ -1851,5 +1880,26 @@ describe ContextModule do
     expect(ContextModuleProgressions::Finder).to receive(:find_or_create_for_context_and_user).once.and_call_original
 
     m2.evaluate_for(@student)
+  end
+
+  describe "only_visible_to_overrides" do
+    before :once do
+      course_factory
+      @module = @course.context_modules.create!
+    end
+
+    it "returns true if the module has active overrides" do
+      @module.assignment_overrides.create!
+      expect(@module.only_visible_to_overrides).to be true
+    end
+
+    it "returns false if the module has no overrides" do
+      expect(@module.only_visible_to_overrides).to be false
+    end
+
+    it "returns false if the module has only deleted overrides" do
+      @module.assignment_overrides.create!(workflow_state: "deleted")
+      expect(@module.only_visible_to_overrides).to be false
+    end
   end
 end

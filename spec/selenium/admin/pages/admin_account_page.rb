@@ -48,6 +48,10 @@ module AdminSettingsPage
     fj("li title:contains('Loading')")
   end
 
+  def allow_observers_in_appointments_checkbox
+    f("#account_settings_allow_observers_in_appointment_groups_value")
+  end
+
   # ---------------------- Actions -----------------------
 
   def visit_admin_settings_tab(account_id)

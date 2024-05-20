@@ -19,8 +19,6 @@
 
 module Lti::Concerns
   module SessionlessLaunches
-    extend ActiveSupport::Concern
-
     class UnauthorizedClient < StandardError
     end
 
@@ -101,14 +99,14 @@ module Lti::Concerns
     def sessionless_launch_link(options, context, tool, session_token)
       if options[:assignment].present?
         assignment = options[:assignment]
-        assignment.prepare_for_ags_if_needed!(tool)
+        assignment.migrate_to_1_3_if_needed!(tool)
         assignment_launch_link(assignment, session_token)
       elsif options[:module_item].present?
         module_item_link(options[:module_item], session_token)
       elsif (options[:launch_url] || options[:lookup_id]) && options[:id].blank? && options[:launch_type].blank?
         retrieve_launch_link(context, session_token, options[:launch_url], options[:lookup_id])
       else
-        course_or_account_launch_link(context, tool, session_token, options[:launch_url])
+        course_or_account_launch_link(context, tool, session_token, options[:launch_url], options[:launch_type])
       end
     end
 
@@ -134,7 +132,7 @@ module Lti::Concerns
       context_type = context.class.to_s.downcase
 
       send(
-        "retrieve_#{context_type}_external_tools_url",
+        :"retrieve_#{context_type}_external_tools_url",
         context.id,
         url: launch_url,
         display: :borderless,
@@ -143,15 +141,16 @@ module Lti::Concerns
       )
     end
 
-    def course_or_account_launch_link(context, tool, session_token, launch_url)
+    def course_or_account_launch_link(context, tool, session_token, launch_url, launch_type)
       context_type = context.class.to_s.downcase
       send(
-        "#{context_type}_external_tool_url",
+        :"#{context_type}_external_tool_url",
         context.id,
         id: tool.id,
         display: :borderless,
         session_token:,
-        launch_url:
+        launch_url:,
+        launch_type:
       )
     end
   end

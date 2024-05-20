@@ -17,11 +17,12 @@
 
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {postMessageExternalContentCancel} from '@canvas/external-tools/messages'
 
 const I18n = useI18nScope('external_content.cancel')
 
 const parentWindow = window.opener || window.parent
-parentWindow.postMessage({subject: 'externalContentCancel'}, ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN)
+postMessageExternalContentCancel(parentWindow)
 setTimeout(
   () =>
     $('#dialog_message').text(

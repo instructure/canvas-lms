@@ -20,12 +20,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import _ from '@instructure/lodash-underscore'
+import {extend, omit} from 'lodash'
 import 'jquery-qtip'
 import ScreenReaderContent from '@canvas/quiz-legacy-client-apps/react/components/screen_reader_content'
 
-const omit = _.omit
-const merge = _.extend
 const POPUP_PROPS = [
   'content',
   'popupOptions',
@@ -183,13 +181,12 @@ class Popup extends React.Component {
   componentDidMount() {
     const $this = $(this.node)
     const $container = $('<div class="popup-content" />')
-    let options
 
     if (!this.props.content) {
       throw new Error("You must provide a 'content' component for a popup!")
     }
 
-    options = this.qTipOptions($this, $container)
+    const options = this.qTipOptions($this, $container)
     this.qTip = $this.qtip(options).qtip('api')
     this.__disableInherentAccessibilityLayer(this.qTip)
 
@@ -316,7 +313,7 @@ class Popup extends React.Component {
    * The content (or content element) of the popup.
    */
   qTipOptions($buttons, $content) {
-    const options = merge(
+    const options = extend(
       {},
       {
         overwrite: false,

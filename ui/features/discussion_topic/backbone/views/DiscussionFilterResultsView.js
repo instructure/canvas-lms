@@ -17,7 +17,7 @@
 
 import noResultsTemplate from '../../jst/noResults.handlebars'
 import $ from 'jquery'
-import _ from 'underscore'
+import {filter} from 'lodash'
 import FilterEntryView from './FilterEntryView'
 import EntryCollectionView from './EntryCollectionView'
 import EntryCollection from '../collections/EntryCollection'
@@ -128,7 +128,7 @@ export default class DiscussionFilterResultsView extends EntryCollectionView {
 
   unreadFilter(unread, results) {
     if (!unread) return results
-    unread = _.filter(results, entry => entry.read_state === 'unread')
+    unread = filter(results, entry => entry.read_state === 'unread')
     return unread.sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at))
   }
 
@@ -138,7 +138,7 @@ export default class DiscussionFilterResultsView extends EntryCollectionView {
       .split(/\s+/g)
       .map(word => new RegExp(rEscape(word), 'i'))
     if (!regexps.length) return results
-    return _.filter(results, entry => {
+    return filter(results, entry => {
       if (entry.deleted) return false
       const concat = `\
 ${entry.message}

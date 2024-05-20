@@ -61,6 +61,18 @@ describe Progress do
       expect(progress.reload).to be_failed
     end
 
+    it "cancels other queued progresses with the same delayed_job_id" do
+      job1 = progress.process_job(Jerbs, :succeed, { singleton: "test_singleton", on_conflict: :overwrite }, :flag)
+      expect(progress.reload).to be_queued
+      expect(job1.enqueue_result).to be :inserted
+      progress2 = Progress.create!(tag: "test", context: @user)
+      job2 = progress2.process_job(Jerbs, :succeed, { singleton: "test_singleton", on_conflict: :overwrite }, :flag)
+      expect(progress2.reload).to be_queued
+      expect(progress.reload).to be_canceled
+      expect(job1.id).to be job2.id
+      expect(job2.enqueue_result).to be :updated
+    end
+
     it "defaults to low priority" do
       job = progress.process_job(Jerbs, :succeed, {}, :flag)
       expect(job.priority).to eq Delayed::LOW_PRIORITY

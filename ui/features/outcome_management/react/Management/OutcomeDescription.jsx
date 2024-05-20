@@ -70,12 +70,14 @@ const OutcomeDescription = ({
   return (
     <View>
       {truncated && truncatedDescription && (
-        <View as="div" padding="0 small 0 0" data-testid="description-truncated" className={isEnhanced ? "user_content": "user_content unenhanced"}>
+        <View
+          as="div"
+          padding="0 small 0 0"
+          data-testid="description-truncated"
+          className={isEnhanced ? 'user_content' : 'user_content unenhanced'}
+        >
           <PresentationContent>
-            <TruncateText
-              data-testid="description-truncated-content"
-              onUpdate={onUpdateHandler}
-            >
+            <TruncateText data-testid="description-truncated-content" onUpdate={onUpdateHandler}>
               {truncatedDescription}
             </TruncateText>
           </PresentationContent>
@@ -116,7 +118,12 @@ const OutcomeDescription = ({
       )}
 
       {!truncated && fullDescription && fullDescriptionIsFriendlyDescription && (
-        <View as="div" padding="0 small 0 0" data-testid="description-expanded" className="user_content">
+        <View
+          as="div"
+          padding="0 small 0 0"
+          data-testid="description-expanded"
+          className="user_content"
+        >
           <Text wrap="break-word">{fullDescription}</Text>
         </View>
       )}
@@ -156,7 +163,7 @@ OutcomeDescription.propTypes = {
   friendlyDescription: PropTypes.string,
   truncated: PropTypes.bool.isRequired,
   setShouldExpand: PropTypes.func.isRequired,
-  isEnhanced: PropTypes.bool
+  isEnhanced: PropTypes.bool,
 }
 
 export default OutcomeDescription

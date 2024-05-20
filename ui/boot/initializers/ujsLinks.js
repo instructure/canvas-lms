@@ -19,7 +19,7 @@
 // https://github.com/rails/jquery-ujs
 
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import authenticityToken from '@canvas/authenticity-token'
 
 // #
@@ -51,7 +51,7 @@ function allowAction(element) {
   return window.confirm(message)
 }
 
-$(document).delegate('a[data-confirm], a[data-method], a[data-remove]', 'click', function (_event) {
+$(document).on('click', 'a[data-confirm], a[data-method], a[data-remove]', function (_event) {
   const $link = $(this)
 
   if ($link.data('handled') || !allowAction($link)) return false

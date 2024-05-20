@@ -40,7 +40,13 @@ function eatEvent(event) {
 
 function AddName({address, namePrompt, onClick, themeOverride}) {
   return (
-    <Link data-address={address} isWithinText={false} as="button" onClick={onClick} themeOverride={themeOverride}>
+    <Link
+      data-address={address}
+      isWithinText={false}
+      as="button"
+      onClick={onClick}
+      themeOverride={themeOverride}
+    >
       <Text>{namePrompt}</Text>
     </Link>
   )

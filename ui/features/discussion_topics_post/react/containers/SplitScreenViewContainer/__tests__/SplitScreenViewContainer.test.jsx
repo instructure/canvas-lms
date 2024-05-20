@@ -43,12 +43,12 @@ describe('SplitScreenViewContainer', () => {
   const onClose = jest.fn()
 
   const per_page = 20
-  const isolated_view_initial_page_size = 5
+  const split_screen_view_initial_page_size = 5
 
   beforeAll(() => {
     window.ENV = {
       per_page,
-      isolated_view_initial_page_size,
+      split_screen_view_initial_page_size,
       discussion_topic_id: 'Discussion-default-mock',
       manual_mark_as_read: false,
       current_user: {
@@ -103,11 +103,10 @@ describe('SplitScreenViewContainer', () => {
 
   it('should render a back button', async () => {
     const mocks = getDiscussionSubentriesQueryMock({
-      last: isolated_view_initial_page_size,
+      last: split_screen_view_initial_page_size,
       includeRelativeEntry: false,
     })
     mocks[0].result.data.legacyNode.parentId = '77'
-    mocks[0].result.data.legacyNode.isolatedEntryId = '77'
     const {findByTestId} = setup(defaultProps(), mocks)
 
     const backButton = await findByTestId('back-button')
@@ -122,7 +121,7 @@ describe('SplitScreenViewContainer', () => {
     const {findAllByTestId, findByText} = setup(
       defaultProps(),
       getDiscussionSubentriesQueryMock({
-        last: isolated_view_initial_page_size,
+        last: split_screen_view_initial_page_size,
         includeRelativeEntry: false,
       })
     )
@@ -142,7 +141,7 @@ describe('SplitScreenViewContainer', () => {
     const {findAllByTestId, findByText} = setup(
       defaultProps(),
       getDiscussionSubentriesQueryMock({
-        last: isolated_view_initial_page_size,
+        last: split_screen_view_initial_page_size,
         includeRelativeEntry: false,
       })
     )
@@ -162,7 +161,7 @@ describe('SplitScreenViewContainer', () => {
     const {findAllByTestId, findByText} = setup(
       defaultProps(),
       getDiscussionSubentriesQueryMock({
-        last: isolated_view_initial_page_size,
+        last: split_screen_view_initial_page_size,
         includeRelativeEntry: false,
       })
     )
@@ -192,7 +191,7 @@ describe('SplitScreenViewContainer', () => {
       const {findAllByTestId, findByTestId} = setup(
         defaultProps(),
         getDiscussionSubentriesQueryMock({
-          last: isolated_view_initial_page_size,
+          last: split_screen_view_initial_page_size,
           includeRelativeEntry: false,
         })
       )
@@ -213,7 +212,7 @@ describe('SplitScreenViewContainer', () => {
     const {findByText, queryByTestId} = setup(
       defaultProps(),
       getDiscussionSubentriesQueryMock({
-        last: isolated_view_initial_page_size,
+        last: split_screen_view_initial_page_size,
         includeRelativeEntry: false,
       })
     )
@@ -224,7 +223,7 @@ describe('SplitScreenViewContainer', () => {
   it('allows fetching older discussion entries', async () => {
     const mocks = [
       ...getDiscussionSubentriesQueryMock({
-        last: isolated_view_initial_page_size,
+        last: split_screen_view_initial_page_size,
         includeRelativeEntry: false,
       }),
       ...getDiscussionSubentriesQueryMock({
@@ -262,7 +261,7 @@ describe('SplitScreenViewContainer', () => {
   it('allows fetching newer discussion entries', async () => {
     const mocks = [
       ...getDiscussionSubentriesQueryMock({
-        last: isolated_view_initial_page_size,
+        last: split_screen_view_initial_page_size,
         includeRelativeEntry: true,
         relativeEntryId: '10',
       }),
@@ -308,7 +307,7 @@ describe('SplitScreenViewContainer', () => {
 
   it('should not show "Show older replies" button initially if hasPreviousPage is false', async () => {
     const mocks = getDiscussionSubentriesQueryMock({
-      last: isolated_view_initial_page_size,
+      last: split_screen_view_initial_page_size,
       includeRelativeEntry: false,
     })
     mocks[0].result.data.legacyNode.discussionSubentriesConnection.pageInfo = PageInfo.mock({
@@ -324,7 +323,7 @@ describe('SplitScreenViewContainer', () => {
   it('should call query with relative id params', async () => {
     const mocks = [
       ...getDiscussionSubentriesQueryMock({
-        last: isolated_view_initial_page_size,
+        last: split_screen_view_initial_page_size,
         includeRelativeEntry: true,
         relativeEntryId: '10',
       }),
@@ -343,7 +342,7 @@ describe('SplitScreenViewContainer', () => {
   it('show newer button should be visible when relativeEntryId is present', async () => {
     const mocks = [
       ...getDiscussionSubentriesQueryMock({
-        last: isolated_view_initial_page_size,
+        last: split_screen_view_initial_page_size,
         includeRelativeEntry: true,
         relativeEntryId: '10',
       }),
@@ -362,7 +361,7 @@ describe('SplitScreenViewContainer', () => {
     const {queryByText} = setup(
       defaultProps({relativeEntryId: null}),
       getDiscussionSubentriesQueryMock({
-        last: isolated_view_initial_page_size,
+        last: split_screen_view_initial_page_size,
         includeRelativeEntry: false,
       })
     )
@@ -373,7 +372,7 @@ describe('SplitScreenViewContainer', () => {
     const {findByText} = setup(
       defaultProps(),
       getDiscussionSubentriesQueryMock({
-        last: isolated_view_initial_page_size,
+        last: split_screen_view_initial_page_size,
         includeRelativeEntry: false,
       })
     )
@@ -388,7 +387,7 @@ describe('SplitScreenViewContainer', () => {
     const {findAllByText} = setup(
       defaultProps(),
       getDiscussionSubentriesQueryMock({
-        last: isolated_view_initial_page_size,
+        last: split_screen_view_initial_page_size,
         includeRelativeEntry: false,
       })
     )
@@ -407,7 +406,7 @@ describe('SplitScreenViewContainer', () => {
         const {queryByTestId} = setup(
           props,
           getDiscussionSubentriesQueryMock({
-            last: isolated_view_initial_page_size,
+            last: split_screen_view_initial_page_size,
             includeRelativeEntry: false,
           })
         )
@@ -422,7 +421,7 @@ describe('SplitScreenViewContainer', () => {
         const {findByTestId} = setup(
           props,
           getDiscussionSubentriesQueryMock({
-            last: isolated_view_initial_page_size,
+            last: split_screen_view_initial_page_size,
             includeRelativeEntry: false,
           })
         )
@@ -436,7 +435,7 @@ describe('SplitScreenViewContainer', () => {
     const {findByTestId} = setup(
       defaultProps({RCEOpen: true, setRCEOpen}),
       getDiscussionSubentriesQueryMock({
-        last: isolated_view_initial_page_size,
+        last: split_screen_view_initial_page_size,
         includeRelativeEntry: false,
       })
     )
@@ -452,7 +451,7 @@ describe('SplitScreenViewContainer', () => {
     const {findAllByTestId, queryByTestId} = setup(
       defaultProps({RCEOpen: false, setRCEOpen}),
       getDiscussionSubentriesQueryMock({
-        last: isolated_view_initial_page_size,
+        last: split_screen_view_initial_page_size,
         includeRelativeEntry: false,
       })
     )
@@ -469,7 +468,7 @@ describe('SplitScreenViewContainer', () => {
     const {findByTestId} = setup(
       defaultProps({RCEOpen: true, setRCEOpen}),
       getDiscussionSubentriesQueryMock({
-        last: isolated_view_initial_page_size,
+        last: split_screen_view_initial_page_size,
         includeRelativeEntry: false,
       })
     )
@@ -483,7 +482,7 @@ describe('SplitScreenViewContainer', () => {
     const {findAllByTestId} = setup(
       defaultProps({RCEOpen: false, setRCEOpen}),
       getDiscussionSubentriesQueryMock({
-        last: isolated_view_initial_page_size,
+        last: split_screen_view_initial_page_size,
         includeRelativeEntry: false,
       })
     )
@@ -497,7 +496,7 @@ describe('SplitScreenViewContainer', () => {
     const {findByTestId} = setup(
       defaultProps({highlightEntryId: '104'}),
       getDiscussionSubentriesQueryMock({
-        last: isolated_view_initial_page_size,
+        last: split_screen_view_initial_page_size,
         includeRelativeEntry: false,
       })
     )
@@ -510,7 +509,7 @@ describe('SplitScreenViewContainer', () => {
       const container = setup(
         defaultProps({highlightEntryId: '104'}),
         getDiscussionSubentriesQueryMock({
-          last: isolated_view_initial_page_size,
+          last: split_screen_view_initial_page_size,
           includeRelativeEntry: false,
           shouldError: true,
         })

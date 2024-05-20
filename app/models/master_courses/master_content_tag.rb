@@ -50,7 +50,7 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
   validates_with MasterCourses::TagValidator
 
-  serialize :restrictions, Hash
+  serialize :restrictions, type: Hash
   validate :require_valid_restrictions
 
   before_create :set_migration_id

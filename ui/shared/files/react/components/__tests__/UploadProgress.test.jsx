@@ -20,7 +20,9 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import UploadProgress from '../UploadProgress'
 import FileUploader from '../../modules/FileUploader'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+jest.mock('@canvas/alerts/react/FlashAlert')
 
 function makeUploader(name) {
   const uploader = new FileUploader({file: new File(['foo'], name, {type: 'text/plain'})})
@@ -38,7 +40,6 @@ describe('UploadProgress', () => {
   })
 
   it('announces upload progress to screen reader when queue changes', function () {
-    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     const uploader = makeUploader('foo.txt')
     const {container, rerender} = render(<UploadProgress uploader={uploader} />)
 
@@ -46,7 +47,7 @@ describe('UploadProgress', () => {
     rerender(<UploadProgress uploader={uploader} />)
     expect(container.querySelector('[aria-valuenow="35"]')).toBeInTheDocument()
 
-    expect(showFlashAlertSpy).toHaveBeenLastCalledWith(
+    expect(showFlashAlert).toHaveBeenLastCalledWith(
       makeFlashAlertMessage('foo.txt - 35 percent uploaded')
     )
 
@@ -54,7 +55,7 @@ describe('UploadProgress', () => {
     uploader.trackProgress({loaded: 75, total: 100})
     rerender(<UploadProgress uploader={uploader} />)
     expect(container.querySelector('[aria-valuenow="75"]')).toBeInTheDocument()
-    expect(showFlashAlertSpy).toHaveBeenLastCalledWith(
+    expect(showFlashAlert).toHaveBeenLastCalledWith(
       makeFlashAlertMessage('foo.txt - 75 percent uploaded')
     )
 
@@ -62,13 +63,14 @@ describe('UploadProgress', () => {
     uploader.trackProgress({loaded: 100, total: 100})
     rerender(<UploadProgress uploader={uploader} />)
     expect(container.querySelector('[aria-valuenow="100"]')).toBeInTheDocument()
-    expect(showFlashAlertSpy).toHaveBeenLastCalledWith(
+    expect(showFlashAlert).toHaveBeenLastCalledWith(
       makeFlashAlertMessage('foo.txt uploaded successfully!')
     )
   })
 
   it('does not announce upload progress to screen reader if progress has not changed', function () {
-    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    showFlashAlert.mockClear()
+
     const uploader = makeUploader('foo.txt')
 
     const {rerender} = render(<UploadProgress uploader={uploader} />)
@@ -79,6 +81,6 @@ describe('UploadProgress', () => {
     uploader.trackProgress({loaded: 35, total: 100})
     rerender(<UploadProgress uploader={uploader} />)
 
-    expect(showFlashAlertSpy).toHaveBeenCalledTimes(1)
+    expect(showFlashAlert).toHaveBeenCalledTimes(1)
   })
 })

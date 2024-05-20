@@ -24,7 +24,7 @@ import {
 } from '../TempEnrollEdit'
 import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
-import {Enrollment, PROVIDER, RECIPIENT, User} from '../types'
+import {type Enrollment, PROVIDER, RECIPIENT, type User} from '../types'
 
 describe('TempEnrollEdit component', () => {
   let props: any
@@ -253,6 +253,7 @@ describe('TempEnrollEdit component', () => {
       enrollment_state: '',
       temporary_enrollment_source_user_id: 0,
       type: '',
+      limit_privileges_to_course_section: false,
       user: mockRecipientUser,
       temporary_enrollment_provider: mockProviderUser,
       temporary_enrollment_pairing_id: 1,

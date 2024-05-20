@@ -109,6 +109,7 @@ module Importers
 
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
+
       item ||= context.assignments.temp_record # new(:context => context)
 
       item.updating_user = migration.user
@@ -119,10 +120,12 @@ module Importers
 
       item.title = hash[:title]
       item.title = I18n.t("untitled assignment") if item.title.blank?
+      item.time_zone_edited = hash[:time_zone_edited] if hash.key?(:time_zone_edited)
       item.migration_id = hash[:migration_id]
       if new_record || item.deleted? || master_migration
+        restore_lti_models(item) if item.deleted?
         item.workflow_state = if item.can_unpublish?
-                                (hash[:workflow_state] || "published")
+                                hash[:workflow_state] || "published"
                               else
                                 "published"
                               end
@@ -250,7 +253,7 @@ module Importers
           AssignmentOverride.overridden_dates.each do |field|
             next unless o.key?(field)
 
-            override.send "override_#{field}", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(o[field])
+            override.send :"override_#{field}", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(o[field])
           end
           override.save!
           added_overrides = true
@@ -293,7 +296,7 @@ module Importers
       hash[:due_at] ||= hash[:due_date] if hash.key?(:due_date)
       %i[due_at lock_at unlock_at peer_reviews_due_at].each do |key|
         if hash.key?(key) && (master_migration || hash[key].present?)
-          item.send "#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key])
+          item.send :"#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key])
         end
       end
 
@@ -324,7 +327,7 @@ module Importers
          graders_anonymous_to_graders
          grader_names_visible_to_final_grader
          anonymous_instructor_annotations].each do |prop|
-        item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
+        item.send(:"#{prop}=", hash[prop]) unless hash[prop].nil?
       end
 
       # Only set post_to_sis if this is a new assignment or if the content is locked
@@ -343,8 +346,8 @@ module Importers
       end
 
       [:turnitin_enabled, :vericite_enabled].each do |prop|
-        if !hash[prop].nil? && context.send("#{prop}?")
-          item.send("#{prop}=", hash[prop])
+        if !hash[prop].nil? && context.send(:"#{prop}?")
+          item.send(:"#{prop}=", hash[prop])
         end
       end
 
@@ -536,6 +539,13 @@ module Importers
           end
         end
       end
+    end
+
+    # Restore any deleted LTI models (Lti::ResourceLink, Lti::LineItem, ContentTag)
+    # for an existing assignment, if necessary.
+    def self.restore_lti_models(item)
+      item.lti_resource_links.find_each(&:undestroy)
+      item.external_tool_tag&.workflow_state = "active"
     end
 
     def self.set_annotatable_attachment(assignment, hash, context)

@@ -24,12 +24,92 @@ describe ContentExportsController do
   include K5Common
 
   describe "POST 'create'" do
-    it "exports everything explicitly" do
+    before do
       course_with_teacher_logged_in(active_all: true)
+      allow_any_instance_of(Course).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
+    end
+
+    it "exports everything explicitly" do
       post "create", params: { course_id: @course.id }
       expect(response).to be_successful
 
       expect(ContentExport.last.selected_content[:everything]).to be_present
+    end
+
+    context "new_quizzes_common_cartridge FF is disabled" do
+      before do
+        allow(@course).to receive(:feature_enabled?).and_call_original
+        Account.site_admin.disable_feature!(:new_quizzes_common_cartridge)
+      end
+
+      context "common cartridge export type" do
+        before do
+          assignment_model(submission_types: "external_tool", course: @course)
+          tool = @c.context_external_tools.create!(
+            name: "Quizzes.Next",
+            consumer_key: "test_key",
+            shared_secret: "test_secret",
+            tool_id: "Quizzes 2",
+            url: "http://example.com/launch"
+          )
+          @a.external_tool_tag_attributes = { content: tool }
+          @a.save!
+        end
+
+        it "sets worflow_state to waiting_for_external_tool" do
+          post "create", params: { course_id: @course.id, export_type: "common_cartridge" }
+          expect(response).to be_successful
+
+          expect(ContentExport.last.workflow_state).to eq "created"
+        end
+      end
+
+      context "any other export type" do
+        it "does not interfere with other export types" do
+          post "create", params: { course_id: @course.id }
+          expect(response).to be_successful
+
+          expect(ContentExport.last.workflow_state).to eq "created"
+        end
+      end
+    end
+
+    context "new_quizzes_common_cartridge FF is enabled" do
+      before do
+        allow(@course).to receive(:feature_enabled?).and_call_original
+        Account.site_admin.enable_feature!(:new_quizzes_common_cartridge)
+      end
+
+      context "common cartridge export type" do
+        before do
+          assignment_model(submission_types: "external_tool", course: @course)
+          tool = @c.context_external_tools.create!(
+            name: "Quizzes.Next",
+            consumer_key: "test_key",
+            shared_secret: "test_secret",
+            tool_id: "Quizzes 2",
+            url: "http://example.com/launch"
+          )
+          @a.external_tool_tag_attributes = { content: tool }
+          @a.save!
+        end
+
+        it "sets worflow_state to waiting_for_external_tool" do
+          post "create", params: { course_id: @course.id, export_type: "common_cartridge" }
+          expect(response).to be_successful
+
+          expect(ContentExport.last.workflow_state).to eq "waiting_for_external_tool"
+        end
+      end
+
+      context "any other export type" do
+        it "does not interfere with other export types" do
+          post "create", params: { course_id: @course.id }
+          expect(response).to be_successful
+
+          expect(ContentExport.last.workflow_state).to eq "created"
+        end
+      end
     end
   end
 

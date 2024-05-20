@@ -16,14 +16,14 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from 'backbone'
-import _ from 'underscore'
+import {each} from 'lodash'
 
 const _parse = Backbone.Model.prototype.parse
 
 Backbone.Model.prototype.parse = function () {
   const res = _parse.apply(this, arguments)
 
-  _.each(this.dateAttributes, attr => {
+  each(this.dateAttributes, attr => {
     if (res[attr]) res[attr] = Date.parse(res[attr])
   })
   return res

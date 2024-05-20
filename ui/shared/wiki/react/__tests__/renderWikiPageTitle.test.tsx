@@ -19,7 +19,8 @@
 import {fireEvent, render} from '@testing-library/react'
 import WikiPage from '../../backbone/models/WikiPage'
 import WikiPageEditView from '../../backbone/views/WikiPageEditView'
-import renderWikiPageTitle, {Props as ComponentProps} from '../renderWikiPageTitle'
+import renderWikiPageTitle from '../renderWikiPageTitle'
+import type {Props as ComponentProps} from '../renderWikiPageTitle'
 import type JQuery from 'jquery'
 import {checkForTitleConflictDebounced} from '../../utils/titleConflicts'
 

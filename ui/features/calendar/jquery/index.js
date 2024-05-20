@@ -22,8 +22,9 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
-import tz from '@canvas/timezone'
+import {map, defaults, filter, omit, each, has, last, includes} from 'lodash'
+import * as tz from '@canvas/datetime'
+import {encodeQueryString} from '@canvas/query-string-encoding'
 import moment from 'moment'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import decodeFromHex from '@canvas/util/decodeFromHex'
@@ -35,16 +36,15 @@ import calendarAppTemplate from '../jst/calendarApp.handlebars'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import ShowEventDetailsDialog from './ShowEventDetailsDialog'
 import EditEventDetailsDialog from './EditEventDetailsDialog'
-import CalendarNavigator from '../backbone/views/CalendarNavigator'
 import AgendaView from '../backbone/views/AgendaView'
 import calendarDefaults from '../CalendarDefaults'
 import ContextColorer from '@canvas/util/contextColorer'
 import deparam from 'deparam'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import calendarEventFilter from '../CalendarEventFilter'
 import schedulerActions from '../react/scheduler/actions'
 import 'fullcalendar'
-import '../ext/patches-to-fullcalendar'
+// import '../ext/patches-to-fullcalendar'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-tinypubsub'
@@ -90,13 +90,6 @@ export default class Calendar {
     }
 
     this.el = $(selector).html(calendarAppTemplate())
-
-    // In theory this is no longer necessary, but it performs some function that
-    // another file depends on or perhaps even this one. Whatever the dependency
-    // is it is not clear, without more research, what effect this has on the
-    // calendar system
-    this.schedulerNavigator = new CalendarNavigator({el: $('.scheduler_navigator')})
-    this.schedulerNavigator.hide()
 
     this.agenda = new AgendaView({
       el: $('.agenda-wrapper'),
@@ -157,7 +150,6 @@ export default class Calendar {
     }
 
     this.connectHeaderEvents()
-    this.connectSchedulerNavigatorEvents()
     this.connectAgendaEvents()
     $('#flash_message_holder').on('click', '.gotoDate_link', event =>
       this.gotoDate(fcUtil.wrap($(event.target).data('date')))
@@ -211,14 +203,6 @@ export default class Calendar {
     this.header.on('agenda', () => this.loadView('agenda'))
     this.header.on('createNewEvent', this.addEventClick)
     this.header.on('refreshCalendar', this.reloadClick)
-    this.header.on('done', this.schedulerSingleDoneClick)
-  }
-
-  connectSchedulerNavigatorEvents() {
-    this.schedulerNavigator.on('navigatePrev', () => this.handleArrow('prev'))
-    this.schedulerNavigator.on('navigateToday', this.today)
-    this.schedulerNavigator.on('navigateNext', () => this.handleArrow('next'))
-    this.schedulerNavigator.on('navigateDate', this.navigateDate)
   }
 
   connectAgendaEvents() {
@@ -226,7 +210,7 @@ export default class Calendar {
   }
 
   initializeFullCalendarParams() {
-    return _.defaults(
+    return defaults(
       {
         header: false,
         editable: true,
@@ -568,8 +552,8 @@ export default class Calendar {
 
   activeContexts() {
     const allowedContexts =
-      userSettings.get('checked_calendar_codes') || _.pluck(this.contexts, 'asset_string')
-    return _.filter(this.contexts, c => _.includes(allowedContexts, c.asset_string))
+      userSettings.get('checked_calendar_codes') || map(this.contexts, 'asset_string')
+    return filter(this.contexts, c => includes(allowedContexts, c.asset_string))
   }
 
   addEventClick = (event, _jsEvent, _view) => {
@@ -636,7 +620,7 @@ export default class Calendar {
 
   updateFragment(opts) {
     const replaceState = !!opts.replaceState
-    opts = _.omit(opts, 'replaceState')
+    opts = omit(opts, 'replaceState')
     const data = this.dataFromDocumentHash()
     let changed = false
     for (const k in opts) {
@@ -649,7 +633,7 @@ export default class Calendar {
       }
     }
     if (changed) {
-      const fragment = '#' + $.param(data, this)
+      const fragment = '#' + encodeQueryString(data, this)
       if (replaceState || window.location.hash === '') {
         return window.history.replaceState(null, '', fragment)
       } else {
@@ -707,8 +691,7 @@ export default class Calendar {
   }
 
   setDateTitle = title => {
-    this.header.setHeaderText(title)
-    return this.schedulerNavigator.setTitle(title)
+    return this.header.setHeaderText(title)
   }
 
   // event triggered by items being dropped from outside the calendar
@@ -806,7 +789,7 @@ export default class Calendar {
   filterEventsWithSeriesIdAndWhich = (selectedEvent, which) => {
     const seriesId = selectedEvent.calendarEvent.series_uuid
     const eventSeries = this.calendar
-      .fullCalendar('getEventCache')
+      .fullCalendar('clientEvents')
       .filter(c => c.eventType === 'calendar_event' && c.calendarEvent.series_uuid === seriesId)
 
     let candidateEvents
@@ -965,7 +948,7 @@ export default class Calendar {
   // When we delete an event + all following from a series
   // the remaining events get updated with a new rrule
   eventsUpdatedFromSeries = ({updatedEvents}) => {
-    const candidateEventsInCalendar = this.calendar.fullCalendar('getEventCache').filter(c => {
+    const candidateEventsInCalendar = this.calendar.fullCalendar('clientEvents').filter(c => {
       if (c.eventType === 'calendar_event') {
         const updatedEventIndex = updatedEvents.findIndex(e => c.calendarEvent.id === e.id)
         if (updatedEventIndex >= 0) {
@@ -975,41 +958,25 @@ export default class Calendar {
       }
       return false
     })
-
-    // events got created
-    if (candidateEventsInCalendar.length < updatedEvents.length) {
-      this.dataSource.clearCache()
-    }
-
-    // if you change the start time of an event+following, it will create a new
-    // series for those events plus update those to the left with a new rrule
-    const updatedEventIds = candidateEventsInCalendar.map(e => e.calendarEvent.id)
-    const otherEventsInSeries = this.calendar.fullCalendar('getEventCache').filter(c => {
-      return (
-        c.calendarEvent?.series_uuid === updatedEvents[0].series_uuid &&
-        !updatedEventIds.includes(c.calendarEvent.id)
-      )
-    })
-
-    if (otherEventsInSeries.length !== 0) {
-      this.dataSource.clearCache()
-    }
+    // with the jquery and fullcalendar version update, editing events in a series
+    // would not update the contextInfo of the event the user initiated the change in
+    // resulting in the wrong info being shown in the detail dialog when clicking on an event.
+    // I cannot figure out where the contextInfo is failing to get updated. This fixes it.
+    // This change also means we don't need to look for special cases where we need to clear
+    // the cache, since it's always happening now.
+    this.dataSource.resetContexts()
 
     candidateEventsInCalendar.forEach(e => {
       this.updateEvent(e)
     })
     $.publish('CommonEvent/eventsSavedFromSeries', {seriesEvents: candidateEventsInCalendar})
 
-    // I don't understand why, but it we don't take a beat the
-    // events' coloring doesn't get updated.
-    window.setTimeout(() => {
-      this.calendar.fullCalendar('refetchEvents')
-    }, 0)
+    this.calendar.fullCalendar('refetchEvents')
   }
 
   // When an assignment event is updated, update its related overrides.
   updateOverrides = event => {
-    _.each(this.dataSource.cache.contexts[event.contextCode()].events, (override, key) => {
+    each(this.dataSource.cache.contexts[event.contextCode()].events, (override, key) => {
       if (key.match(/override/) && event.assignment.id === override.assignment.id) {
         override.updateAssignmentTitle(event.title)
       }
@@ -1102,7 +1069,7 @@ export default class Calendar {
   setCurrentView(view) {
     this.updateFragment({
       view_name: view,
-      replaceState: !_.has(this.dataFromDocumentHash(), 'view_name'),
+      replaceState: !has(this.dataFromDocumentHash(), 'view_name'),
     }) // use replaceState if view_name wasn't set before
 
     this.currentView = view
@@ -1149,7 +1116,6 @@ export default class Calendar {
       this.displayAppointmentEvents = null
       this.header.showAgendaRecommendation()
       this.calendar.show()
-      this.schedulerNavigator.hide()
       this.calendar.fullCalendar('refetchEvents')
       this.calendar.fullCalendar('changeView', view === 'week' ? 'agendaWeek' : 'month')
       this.calendar.fullCalendar('render')
@@ -1205,18 +1171,6 @@ export default class Calendar {
         })
       )
     }, 500)
-  }
-
-  showSchedulerSingle(group) {
-    this.agenda.viewingGroup = group
-    this.loadAgendaView()
-    return this.header.showDoneButton()
-  }
-
-  schedulerSingleDoneClick = () => {
-    this.agenda.viewingGroup = null
-    this.header.showSchedulerTitle()
-    return this.schedulerNavigator.hide()
   }
 
   syncNewContexts = additionalContexts => {
@@ -1277,7 +1231,7 @@ export default class Calendar {
         data = deparam(window.location.hash.substring(1)) || {}
       } else {
         // legacy
-        data = $.parseJSON(decodeFromHex(window.location.hash.substring(1))) || {}
+        data = JSON.parse(decodeFromHex(window.location.hash.substring(1))) || {}
       }
     } catch (e) {
       data = {}
@@ -1340,13 +1294,15 @@ export default class Calendar {
     //    !event.calendarEvent.reserved && event.calendarEvent.available_slots > 0
 
     // find the next reservable appointment and report its date
-    const group_ids = _.map(this.findAppointmentModeGroups(), asset_string =>
-      _.last(asset_string.split('_'))
+    const group_ids = map(this.findAppointmentModeGroups(), asset_string =>
+      last(asset_string.split('_'))
     )
     if (!(group_ids.length > 0)) return
 
     return $.getJSON(
-      `/api/v1/appointment_groups/next_appointment?${$.param({appointment_group_ids: group_ids})}`,
+      `/api/v1/appointment_groups/next_appointment?${encodeQueryString({
+        appointment_group_ids: group_ids,
+      })}`,
       data => {
         if (data.length > 0) {
           const nextDate = Date.parse(data[0].start_at)

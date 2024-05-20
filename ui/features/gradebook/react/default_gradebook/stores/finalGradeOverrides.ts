@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GetState, SetState} from 'zustand'
+import type {GetState, SetState} from 'zustand'
 import {getFinalGradeOverrides} from '@canvas/grading/FinalGradeOverrideApi'
 import type {GradebookStore} from './index'
 import type {FinalGradeOverrideMap} from '@canvas/grading/grading.d'

@@ -207,7 +207,7 @@ class SectionsController < ApplicationController
     # cross-listing should only be allowed within the same root account
     @new_course = @section.root_account.all_courses.not_deleted.where(id: course_id).first if Api::ID_REGEX.match?(course_id)
     @new_course ||= @section.root_account.all_courses.not_deleted.where(sis_source_id: course_id).first if course_id.present?
-    allowed = @new_course && @section.grants_right?(@current_user, session, :update) && @new_course.grants_right?(@current_user, session, :manage)
+    allowed = @new_course && !MasterCourses::MasterTemplate.find_by(course_id: params[:new_course_id]) && @section.grants_right?(@current_user, session, :update) && @new_course.grants_right?(@current_user, session, :manage)
     res = { allowed: !!allowed }
     if allowed
       @account = @new_course.account
@@ -233,6 +233,8 @@ class SectionsController < ApplicationController
     if params[:override_sis_stickiness] && !value_to_boolean(params[:override_sis_stickiness])
       return render json: (api_request? ? section_json(@section, @current_user, session, []) : @section)
     end
+
+    return render json: { error: "cannot crosslist into blueprint courses" }, status: :forbidden if MasterCourses::MasterTemplate.find_by(course_id: params[:new_course_id])
 
     if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage)
       @section.crosslist_to_course(@new_course, updating_user: @current_user)

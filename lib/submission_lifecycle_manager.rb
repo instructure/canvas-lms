@@ -22,6 +22,8 @@ require "anonymity"
 class SubmissionLifecycleManager
   include Moderation
 
+  MAX_RUNNING_JOBS = 10
+
   thread_mattr_accessor :executing_users, instance_accessor: false
 
   # These methods allow the caller to specify a user to whom due date
@@ -124,7 +126,7 @@ class SubmissionLifecycleManager
     inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}:UpdateGrades:#{update_grades ? 1 : 0}" if assignments.nil?
     inst_jobs_opts[:strand] ||= "cached_due_date:calculator:Course:#{course.global_id}"
 
-    assignments_to_recompute = assignments || Assignment.active.where(context: course).pluck(:id)
+    assignments_to_recompute = assignments || AbstractAssignment.active.where(context: course).pluck(:id)
     return if assignments_to_recompute.empty?
 
     executing_user ||= current_executing_user
@@ -146,7 +148,7 @@ class SubmissionLifecycleManager
     if opts[:require_singleton]
       inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}:Users:#{Digest::SHA256.hexdigest(user_ids.sort.join(":"))}:UpdateGrades:#{update_grades ? 1 : 0}"
     end
-    assignments ||= Assignment.active.where(context: course).pluck(:id)
+    assignments ||= AbstractAssignment.active.where(context: course).pluck(:id)
     return if assignments.empty?
 
     current_caller = caller(1..1).first
@@ -154,13 +156,12 @@ class SubmissionLifecycleManager
 
     if opts[:sis_import]
       running_jobs_count = Delayed::Job.running.where(shard_id: course.shard.id, tag: "SubmissionLifecycleManager#recompute_for_sis_import").count
-      max_jobs = Setting.get("SubmissionLifecycleManager#recompute_for_sis_import_num_strands", "10").to_i
 
-      if running_jobs_count >= max_jobs
+      if running_jobs_count >= MAX_RUNNING_JOBS
         # there are too many sis recompute jobs running concurrently now. let's check again in a bit to see if we can run.
         return delay_if_production(
           **inst_jobs_opts,
-          run_at: Setting.get("SubmissionLifecycleManager#recompute_for_sis_import_requeue_delay", "10").to_i.seconds.from_now
+          run_at: 10.seconds.from_now
         ).recompute_users_for_course(user_ids, course, assignments, opts)
       else
         submission_lifecycle_manager = new(course, assignments, user_ids, update_grades:, original_caller: current_caller, executing_user:)
@@ -174,16 +175,16 @@ class SubmissionLifecycleManager
 
   def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: caller(1..1).first, executing_user: nil, skip_late_policy_applicator: false)
     @course = course
-    @assignment_ids = Array(assignments).map { |a| a.is_a?(Assignment) ? a.id : a }
+    @assignment_ids = Array(assignments).map { |a| a.is_a?(AbstractAssignment) ? a.id : a }
 
     # ensure we're dealing with local IDs to avoid headaches downstream
     if @assignment_ids.present?
       @course.shard.activate do
-        if @assignment_ids.any? { |id| Assignment.global_id?(id) }
-          @assignment_ids = Assignment.where(id: @assignment_ids).pluck(:id)
+        if @assignment_ids.any? { |id| AbstractAssignment.global_id?(id) }
+          @assignment_ids = AbstractAssignment.where(id: @assignment_ids).pluck(:id)
         end
 
-        @assignments_auditable_by_id = Set.new(Assignment.auditable.where(id: @assignment_ids).pluck(:id))
+        @assignments_auditable_by_id = Set.new(AbstractAssignment.auditable.where(id: @assignment_ids).pluck(:id))
       end
     else
       @assignments_auditable_by_id = Set.new
@@ -214,7 +215,7 @@ class SubmissionLifecycleManager
     @course.shard.activate do
       values = []
 
-      assignments_by_id = Assignment.find(@assignment_ids).index_by(&:id)
+      assignments_by_id = AbstractAssignment.find(@assignment_ids).index_by(&:id)
 
       effective_due_dates.to_hash.each do |assignment_id, student_due_dates|
         existing_anonymous_ids = existing_anonymous_ids_by_assignment_id[assignment_id]
@@ -308,11 +309,11 @@ class SubmissionLifecycleManager
     end
 
     if @assignment_ids.size == 1 && !@skip_late_policy_applicator
-      # Only changes to LatePolicy or (sometimes) Assignment records can result in a re-calculation
+      # Only changes to LatePolicy or (sometimes) AbstractAssignment records can result in a re-calculation
       # of student scores.  No changes to the Course record can trigger such re-calculations so
       # let's ensure this is triggered only when SubmissionLifecycleManager is called for a Assignment-level
       # changes and not for Course-level changes
-      assignment = @course.shard.activate { Assignment.find(@assignment_ids.first) }
+      assignment = @course.shard.activate { AbstractAssignment.find(@assignment_ids.first) }
 
       LatePolicyApplicator.for_assignment(assignment)
     end
@@ -473,7 +474,7 @@ class SubmissionLifecycleManager
           vals.root_account_id
         FROM (VALUES #{batch_values.join(",")})
           AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)
-        INNER JOIN #{Assignment.quoted_table_name} assignments
+        INNER JOIN #{AbstractAssignment.quoted_table_name} assignments
           ON assignments.id = vals.assignment_id
         LEFT OUTER JOIN #{Submission.quoted_table_name} submissions
           ON submissions.assignment_id = assignments.id

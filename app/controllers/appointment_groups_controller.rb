@@ -99,6 +99,11 @@
 #           "type": "array",
 #           "items": {"$ref": "Appointment"}
 #         },
+#         "allow_observer_signup": {
+#           "description": "Boolean indicating whether observer users should be able to sign-up for an appointment",
+#           "example": false,
+#           "type": "boolean"
+#         },
 #         "context_codes": {
 #           "description": "The context codes (i.e. courses) this appointment group belongs to. Only people in these courses will be eligible to sign up.",
 #           "example": ["course_123"],
@@ -326,6 +331,9 @@ class AppointmentGroupsController < ApplicationController
   #   "protected":: participants can see who has signed up.  Defaults to
   #                 "private".
   #
+  # @argument appointment_group[allow_observer_signup] [Boolean]
+  #   Whether observer users can sign-up for an appointment. Defaults to false.
+  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/appointment_groups.json' \
@@ -350,6 +358,11 @@ class AppointmentGroupsController < ApplicationController
     if contexts.any?(&:concluded?)
       return render json: { error: t("cannot create an appointment group for a concluded course") },
                     status: :bad_request
+    end
+
+    if value_to_boolean(params[:appointment_group][:allow_observer_signup]) && contexts.any? { |c| !c.is_a?(Course) || !c.account.allow_observers_in_appointment_groups? }
+      return render json: { error: "cannot allow observers to sign up for appointment groups in this course" },
+                    status: :forbidden
     end
 
     raise ActiveRecord::RecordNotFound unless contexts.present?
@@ -467,6 +480,9 @@ class AppointmentGroupsController < ApplicationController
   #               time slot
   #   "protected":: participants can see who has signed up. Defaults to "private".
   #
+  # @argument appointment_group[allow_observer_signup] [Boolean]
+  #   Whether observer users can sign-up for an appointment.
+  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/appointment_groups/543.json' \
@@ -574,7 +590,7 @@ class AppointmentGroupsController < ApplicationController
       render json: Api.paginate(
         @group.possible_participants(registration_status: params[:registration_status]),
         self,
-        send("api_v1_appointment_group_#{params[:action]}_url", @group)
+        send(:"api_v1_appointment_group_#{params[:action]}_url", @group)
       ).map(&)
     end
   end
@@ -604,6 +620,7 @@ class AppointmentGroupsController < ApplicationController
                                               :max_appointments_per_participant,
                                               :participant_visibility,
                                               :cancel_reason,
+                                              :allow_observer_signup,
                                               sub_context_codes: [],
                                               new_appointments: strong_anything)
   end
@@ -621,9 +638,9 @@ class AppointmentGroupsController < ApplicationController
     student_course_id = @group.contexts_for_user(@current_user).first.id
     # If they are a student and they do not have an appointment, we should enter find appointment mode.
     # Otherwise the appointment group will not be visible to student.
-    needs_appointment = (!params[:event_id] && student_course_id &&
-                         !@group.appointments_participants.pluck(:user_id).include?(@current_user.id) &&
-                         !@group.users_with_reservations_through_group.include?(@current_user.id))
+    needs_appointment = !params[:event_id] && student_course_id &&
+                        !@group.appointments_participants.pluck(:user_id).include?(@current_user.id) &&
+                        !@group.users_with_reservations_through_group.include?(@current_user.id)
     anchor = if needs_appointment
                # start at the appointment group; enter find-appointment mode for a relevant course
                args[:view_start] = @group.start_at.strftime("%Y-%m-%d")

@@ -17,6 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require_relative "../common"
+require_relative "../helpers/context_modules_common"
+require_relative "../helpers/items_assign_to_tray"
+require_relative "pages/discussion_page"
 
 describe "Discussion Topic Show" do
   include_context "in-process server selenium tests"
@@ -79,7 +82,6 @@ describe "Discussion Topic Show" do
     it "displays properly for a teacher" do
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       expect(f("input[placeholder='Search entries or author...']")).to be_present
-      expect(fj("span:contains('Jul 9, 2017')")).to be_present
       expect(fj("span[data-testid='author_name']:contains('teacher')")).to be_present
       expect(ff("ul[data-testid='pill-container'] li").collect(&:text)).to eq ["AUTHOR", "TEACHER"]
       f("button[data-testid='discussion-post-menu-trigger']").click
@@ -96,7 +98,9 @@ describe "Discussion Topic Show" do
         @group_discussion_topic = group_discussion_assignment
         get "/courses/#{@course.id}/discussion_topics/#{@group_discussion_topic.id}"
         f("button[data-testid='groups-menu-btn']").click
-        fj("a:contains('group 1')").click
+
+        # NOTE: this is not 10 Unread, it's 2 sibling elements, 1 is group 1, the other is 0 Unread
+        fj("a:contains('group 10 Unread')").click
         wait_for_ajaximations
         expect(fj("h1:contains('topic - group 1')")).to be_present
         expect_no_flash_message :error
@@ -134,51 +138,25 @@ describe "Discussion Topic Show" do
       expect(f("a[aria-label='Previous Module Item']")).to be_present
     end
 
-    context "isolated view" do
-      before :once do
-        Account.site_admin.enable_feature!(:isolated_view)
-      end
+    it "displays module prerequisites" do
+      student_in_course(active_all: true)
+      user_session(@student)
+      module1 = @course.context_modules.create!(name: "module1")
+      module1.unlock_at = Time.now + 1.day
 
-      it "loads older replies" do
-        parent_reply = @topic.discussion_entries.create!(
-          user: @teacher, message: "I am the parent entry"
-        )
-        (1..6).each do |number|
-          @topic.discussion_entries.create!(
-            user: @teacher,
-            message: "child reply number #{number}",
-            parent_entry: parent_reply
-          )
-        end
+      topic = @course.discussion_topics.create!(
+        title: "Ya Ya Ding Dong",
+        user: @teacher,
+        message: "By Will Ferrell and My Marianne",
+        workflow_state: "published"
+      )
+      module1.add_item(type: "discussion_topic", id: topic.id)
+      module1.save!
 
-        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-        fj("button:contains('6 Replies')").click
-        wait_for_ajaximations
-        fj("button:contains('Show older replies')").click
-        wait_for_ajaximations
-        expect(fj("span:contains('child reply number 1')")).to be_present
-      end
+      get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+      wait_for_ajaximations
 
-      it "can mention users in the reply" do
-        student_in_course(course: @course, name: "Jeff", active_all: true).user
-        student_in_course(course: @course, name: "Jefferson", active_all: true).user
-        student_in_course(course: @course, name: "Jeffrey", active_all: true).user
-        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-        f("button[data-testid='discussion-topic-reply']").click
-        wait_for_ajaximations
-        %w[Jeff Jefferson Jeffrey].each do |name|
-          type_in_tiny "textarea", "@"
-          wait_for_ajaximations
-          fj("li:contains('#{name}')").click
-        end
-        wait_for_ajaximations
-        driver.action.send_keys("HI!").perform
-        wait_for_ajaximations
-        fj("button:contains('Reply')").click
-        wait_for_ajaximations
-        expect(fj("p:contains('@Jeff@Jefferson@JeffreyHI!')")).to be_present
-        expect(ff(".user_content p").count).to eq 1
-      end
+      expect(fj("span:contains('This topic is part of the module #{module1.name}, which is locked')")).to be_present
     end
 
     it "open Find Outcome dialog when adding a rubric" do
@@ -219,6 +197,140 @@ describe "Discussion Topic Show" do
       fj("button:contains('Reply')").click
       wait_for_ajaximations
       expect(fj("p:contains('Test Reply')")).to be_present
+    end
+
+    context "checkpoints" do
+      before :once do
+        Account.default.enable_feature!(:discussion_checkpoints)
+        student_in_course(active_all: true)
+
+        @due_at = 2.days.from_now
+        @replies_required = 5
+        @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: @due_at }],
+          points_possible: 6
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: @due_at }],
+          points_possible: 7,
+          replies_required: @replies_required
+        )
+      end
+
+      it "lets students see the checkpoints tray" do
+        user_session(@student)
+        get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
+
+        fj("button:contains('View Due Dates')").click
+        wait_for_ajaximations
+        expect(fj("span:contains('Due Dates')")).to be_present
+        reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
+        expect(reply_to_topic_contents).to include("Reply to Topic")
+        expect(reply_to_topic_contents).to include(format_date_for_view(@due_at))
+
+        reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
+        expect(reply_to_entry_contents).to include("Additional Replies Required: #{@replies_required}")
+        expect(reply_to_entry_contents).to include(format_date_for_view(@due_at))
+      end
+
+      it "lets teachers see checkpoints tray" do
+        user_session(@teacher)
+        get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
+
+        fj("button:contains('View Due Dates')").click
+        wait_for_ajaximations
+        expect(fj("span:contains('Due Dates')")).to be_present
+        reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
+        expect(reply_to_topic_contents).to include("Reply to Topic")
+        expect(reply_to_topic_contents).to include(format_date_for_view(@due_at))
+
+        reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
+        expect(reply_to_entry_contents).to include("Additional Replies Required: #{@replies_required}")
+        expect(reply_to_entry_contents).to include(format_date_for_view(@due_at))
+      end
+    end
+
+    context "Assign To option" do
+      include ItemsAssignToTray
+      include ContextModulesCommon
+
+      before :once do
+        differentiated_modules_on
+        @discussion = @course.discussion_topics.create!(
+          title: "Discussion 1",
+          discussion_type: "threaded",
+          posted_at: "2017-07-09 16:32:34",
+          user: @teacher
+        )
+      end
+
+      it "renders Assign To option" do
+        get "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
+
+        Discussion.click_assign_to_button
+        expect(icon_type_exists?("Discussion")).to be true
+        expect(tray_header.text).to eq("Discussion 1")
+      end
+
+      it "saves and shows override updates when tray reaccessed" do
+        get "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
+
+        Discussion.click_assign_to_button
+        wait_for_assign_to_tray_spinner
+
+        keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+        update_available_date(0, "12/27/2024")
+        update_available_time(0, "8:00 AM")
+
+        click_save_button
+        keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+        Discussion.click_assign_to_button
+        wait_for_assign_to_tray_spinner
+
+        keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+        expect(assign_to_available_from_date(0).attribute("value")).to eq("Dec 27, 2024")
+        expect(assign_to_available_from_time(0).attribute("value")).to eq("8:00 AM")
+      end
+
+      it "does not show due date inputs on ungraded discussion" do
+        dt = @course.discussion_topics.create!(
+          title: "Ungraded Discussion",
+          discussion_type: "threaded",
+          posted_at: "2024-02-09 16:32:34",
+          user: @teacher
+        )
+        get "/courses/#{@course.id}/discussion_topics/#{dt.id}"
+        Discussion.click_assign_to_button
+        wait_for_assign_to_tray_spinner
+        expect(module_item_assign_to_card.last).not_to contain_css(due_date_input_selector)
+      end
+
+      it "shows due date inputs on graded discussion" do
+        assignment = @course.assignments.create!(
+          name: "Assignment",
+          submission_types: ["online_text_entry"],
+          points_possible: 20
+        )
+        dt = @course.discussion_topics.create!(
+          title: "Graded Discussion",
+          discussion_type: "threaded",
+          posted_at: "2017-07-09 16:32:34",
+          user: @teacher,
+          assignment:
+        )
+        get "/courses/#{@course.id}/discussion_topics/#{dt.id}"
+        Discussion.click_assign_to_button
+        wait_for_assign_to_tray_spinner
+        expect(module_item_assign_to_card.last).to contain_css(due_date_input_selector)
+      end
     end
   end
 end

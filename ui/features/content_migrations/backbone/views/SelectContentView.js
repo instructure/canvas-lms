@@ -20,7 +20,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import _ from 'underscore'
+import {isEmpty, pick} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/SelectContent.handlebars'
 import wrapperTemplate from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
@@ -64,7 +64,7 @@ SelectContentView.prototype.wrapperTemplate = wrapperTemplate
 //
 // @api private
 SelectContentView.prototype.submit = function (event) {
-  const attr = _.pick(this.model.attributes, 'id', 'workflow_state', 'user_id')
+  const attr = pick(this.model.attributes, 'id', 'workflow_state', 'user_id')
   this.model.clear({
     silent: true,
   })
@@ -80,7 +80,7 @@ SelectContentView.prototype.submit = function (event) {
       })
     }
   })
-  if (_.isEmpty(this.getFormData())) {
+  if (isEmpty(this.getFormData())) {
     event.preventDefault()
     alert(I18n.t('no_content_selected', 'You have not selected any content to import.'))
     return false

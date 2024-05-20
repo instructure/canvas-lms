@@ -50,6 +50,7 @@ export function Expansion({...props}) {
             data-testid="expand-button"
             interaction={props.isReadOnly ? 'disabled' : 'enabled'}
             aria-expanded={props.isExpanded}
+            ref={props.expansionButtonRef}
           >
             <ScreenReaderContent
               data-testid={
@@ -103,6 +104,7 @@ Expansion.propTypes = {
    * Disable/Enable for the button
    */
   isReadOnly: PropTypes.bool,
+  expansionButtonRef: PropTypes.any,
 }
 
 Expansion.defaultPropTypes = {

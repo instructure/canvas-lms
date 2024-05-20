@@ -19,7 +19,7 @@
 import {DiscussionEdit} from '../DiscussionEdit/DiscussionEdit'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
-import React, {useContext} from 'react'
+import React, {useContext, useEffect} from 'react'
 import {getDisplayName, responsiveQuerySizes} from '../../utils'
 import {SearchContext} from '../../utils/constants'
 import {SearchSpan} from '../SearchSpan/SearchSpan'
@@ -34,6 +34,15 @@ const I18n = useI18nScope('discussion_posts')
 
 export function PostMessage({...props}) {
   const {searchTerm} = useContext(SearchContext)
+
+  useEffect(() => {
+    if (ENV.SEQUENCE !== undefined && props.isTopic) {
+      // eslint-disable-next-line promise/catch-or-return
+      import('@canvas/modules/jquery/prerequisites_lookup').then(() => {
+        INST.lookupPrerequisites()
+      })
+    }
+  }, [props.isTopic])
 
   let heading = 'h2'
 
@@ -52,12 +61,17 @@ export function PostMessage({...props}) {
           titleTextSize: 'small',
           titleTextWeight: 'bold',
           messageTextSize: 'fontSizeXSmall',
+          messageLeftPadding: undefined,
         },
         desktop: {
           titleMargin: props.threadMode ? '0' : '0 0 small 0',
           titleTextSize: props.threadMode ? 'medium' : 'x-large',
           titleTextWeight: props.threadMode ? 'bold' : 'normal',
           messageTextSize: props.threadMode ? 'fontSizeSmall' : 'fontSizeMedium',
+          messageLeftPadding:
+            props.discussionEntry && props.discussionEntry.depth === 1 && !props.threadMode
+              ? theme.variables.spacing.xxSmall
+              : undefined,
         },
       }}
       render={responsiveProps => (
@@ -92,30 +106,32 @@ export function PostMessage({...props}) {
                 discussionAnonymousState={props.discussionAnonymousState}
                 canReplyAnonymously={props.canReplyAnonymously}
                 onCancel={props.onCancel}
-                value={props.draftMessage || props.message}
+                value={props.message}
                 attachment={props.attachment}
                 onSubmit={props.onSave}
                 isEdit={true}
-                onSetDraftSaved={props.onSetDraftSaved}
-                draftSaved={props.draftSaved}
-                updateDraft={newDraftMessage => {
-                  props.onCreateDiscussionEntryDraft(newDraftMessage)
-                }}
+                isAnnouncement={props.discussionTopic?.isAnnouncement}
               />
             </View>
           ) : (
             <>
-              <span
+              <div
                 style={{
+                  marginLeft: responsiveProps.messageLeftPadding,
                   fontSize: theme.variables.typography[responsiveProps.messageTextSize],
                 }}
               >
                 <SearchSpan
-                  isIsolatedView={props.isIsolatedView}
+                  isSplitView={props.isSplitView}
                   searchTerm={searchTerm}
                   text={props.message}
+                  isAnnouncement={props.discussionTopic?.isAnnouncement}
+                  isTopic={props.isTopic}
+                  resourceId={
+                    props.isTopic ? props.discussionTopic?._id : props.discussionEntry?._id
+                  }
                 />
-              </span>
+              </div>
               <View display="block">{props.children}</View>
             </>
           )}
@@ -158,19 +174,16 @@ PostMessage.propTypes = {
    * Callback for when Editor Cancel button is pressed
    */
   onCancel: PropTypes.func,
-  isIsolatedView: PropTypes.bool,
-  onCreateDiscussionEntryDraft: PropTypes.func,
-  draftMessage: PropTypes.string,
-  onSetDraftSaved: PropTypes.func,
+  isSplitView: PropTypes.bool,
   discussionAnonymousState: PropTypes.string,
   canReplyAnonymously: PropTypes.bool,
-  draftSaved: PropTypes.bool,
   threadMode: PropTypes.bool,
   isTopic: PropTypes.bool,
+  discussionTopic: PropTypes.object,
 }
 
 PostMessage.defaultProps = {
-  isIsolatedView: false,
+  isSplitView: false,
 }
 
 export default PostMessage

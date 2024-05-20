@@ -19,7 +19,6 @@
 #
 
 module CheckpointLabels
-  PARENT = "parent"
   REPLY_TO_TOPIC = "reply_to_topic"
   REPLY_TO_ENTRY = "reply_to_entry"
 end

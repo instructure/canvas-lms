@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/relock-modules-dialog",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "./RelockModulesDialog.js"
+}

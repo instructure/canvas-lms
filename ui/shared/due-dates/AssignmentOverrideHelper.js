@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
-import tz from '@canvas/timezone'
+import {forEach, reduce} from 'lodash'
+import * as tz from '@canvas/datetime'
 
 function addStudentID(student, collection = []) {
   return collection.concat([student.id])
@@ -27,12 +27,15 @@ function studentIDCollections(students) {
   const sections = {}
   const groups = {}
 
-  _.each(students, student => {
-    _.each(
+  forEach(students, student => {
+    forEach(
       student.sections,
       sectionID => (sections[sectionID] = addStudentID(student, sections[sectionID]))
     )
-    _.each(student.group_ids, groupID => (groups[groupID] = addStudentID(student, groups[groupID])))
+    forEach(
+      student.group_ids,
+      groupID => (groups[groupID] = addStudentID(student, groups[groupID]))
+    )
   })
 
   return {studentIDsInSections: sections, studentIDsInGroups: groups}
@@ -68,7 +71,7 @@ function effectiveDueDatesOnOverride(
 ) {
   const studentIDs = studentIDsOnOverride(override, studentIDsInSections, studentIDsInGroups)
 
-  _.each(studentIDs, studentID => {
+  studentIDs.forEach(studentID => {
     const existingDate = studentDueDateMap[studentID]
     const newDate = tz.parse(override.due_at)
     studentDueDateMap[studentID] = getLatestDefinedDate(newDate, existingDate)
@@ -80,13 +83,13 @@ function effectiveDueDatesOnOverride(
 function effectiveDueDatesForAssignment(assignment, overrides, students) {
   const {studentIDsInSections, studentIDsInGroups} = studentIDCollections(students)
 
-  const dates = _.reduce(
+  const dates = reduce(
     overrides,
     effectiveDueDatesOnOverride.bind(this, studentIDsInSections, studentIDsInGroups),
     {}
   )
 
-  _.each(students, student => {
+  students.forEach(student => {
     if (dates[student.id] === undefined && !assignment.only_visible_to_overrides) {
       dates[student.id] = tz.parse(assignment.due_at)
     }

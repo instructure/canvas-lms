@@ -19,11 +19,12 @@
 
 require_relative "../common"
 require_relative "../helpers/calendar2_common"
+require_relative "pages/scheduler_page"
 
 describe "scheduler" do
   include Calendar2Common
+  include SchedulerPage
   include_context "in-process server selenium tests"
-  include Calendar2Common
 
   context "as a teacher" do
     before(:once) do
@@ -62,7 +63,7 @@ describe "scheduler" do
 
       calendar_create_event_button.click
       wait_for_ajax_requests
-      f(".edit_appointment_group_option").click
+      appointment_group_tab_button.click
 
       set_value(f('input[name="title"]'), title)
       set_value(f('input[name="location"]'), location)
@@ -120,6 +121,71 @@ describe "scheduler" do
       expect(f(".event-detail-overflow a")).to have_attribute("href", "http://google.com/submit")
       calendar_edit_event_link.click
       expect(f("#edit_appt_calendar_event_form textarea")).to include_text(description)
+    end
+
+    it "lets teachers allow observers to sign up only when selected contexts allow it" do
+      course1 = @course
+      course1.account.settings[:allow_observers_in_appointment_groups] = { value: true }
+      course1.account.save!
+      account2 = Account.default.sub_accounts.create!
+      account2.settings[:allow_observers_in_appointment_groups] = { value: false }
+      account2.settings[:show_scheduler] = true
+      account2.save!
+      course2 = course_factory(account: account2, active_all: true, name: "Course 2")
+      course2.enroll_teacher(@user, enrollment_state: "active")
+      get "/calendar"
+
+      calendar_create_event_button.click
+      wait_for_ajax_requests
+      appointment_group_tab_button.click
+
+      expect(allow_observer_signup_checkbox).not_to be_displayed
+      select_context_in_context_selector(course1.id)
+      expect(allow_observer_signup_checkbox).to be_displayed
+      select_context_in_context_selector(course2.id)
+      expect(allow_observer_signup_checkbox).not_to be_displayed
+    end
+
+    it "lets teachers edit appointment groups even if a context is concluded", :ignore_js_errors do
+      course1 = @course
+      course2 = course_factory(active_all: true, name: "Course 2")
+      teacher_in_course(course: course2, user: @user, active_all: true)
+      create_appointment_group(contexts: [course1, course2])
+      course1.conclude_at = 1.week.ago
+      course1.restrict_enrollments_to_course_dates = true
+      course1.save!
+      ag = AppointmentGroup.last
+
+      get "/appointment_groups/#{ag.id}/edit"
+      wait_for_ajaximations
+      location = "office"
+      location_input.send_keys(location)
+      click_save_button
+      expect(ag.reload.location_name).to eq(location)
+    end
+
+    context "Message Students" do
+      it "sends individual messages to students who have not signed up", :ignore_js_errors do
+        create_appointment_group(contexts: [@course])
+        student1 = student_in_course(active_all: true, name: "Student 1").user
+        student2 = student_in_course(active_all: true, name: "Student 2").user
+        ag = AppointmentGroup.last
+
+        get "/appointment_groups/#{ag.id}/edit"
+        click_message_students_button
+        wait_for_ajax_requests
+        body = "Please sign up for this appointment group"
+        message_body_textarea.send_keys(body)
+        click_send_message_button
+        messages = ConversationMessage.last(2)
+        expect(messages.count).to be 2
+        messages.each do |m|
+          expect(m.body).to eq body
+          expect(m.recipients.count).to be 1
+        end
+        recipient_ids = messages.map { |m| m.recipients.first.id }
+        expect(recipient_ids).to contain_exactly(student1.id, student2.id)
+      end
     end
   end
 end

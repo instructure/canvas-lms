@@ -18,7 +18,7 @@
 
 import NavigationForTree from 'ui/features/content_migrations/backbone/views/NavigationForTree'
 import $ from 'jquery'
-import fakeENV from 'helpers/fakeENV'
+import 'jquery-migrate'
 
 QUnit.module('Navigation: Click Tests', {
   setup() {

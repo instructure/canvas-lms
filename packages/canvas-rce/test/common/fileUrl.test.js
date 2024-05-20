@@ -115,7 +115,7 @@ describe('Common file url utils', () => {
       it('transforms urls if from the specified canvas origin', () => {
         fileInfo.href = 'http://instructure.com/files/17/download?download_frd=1'
         const result = fixupFileUrl('course', 2, fileInfo, 'http://instructure.com')
-        strictEqual(result.href, 'http://instructure.com/courses/2/files/17?wrap=1&verifier=xyzzy')
+        strictEqual(result.href, 'http://instructure.com/courses/2/files/17?wrap=1')
       })
 
       it('transforms course file urls', () => {

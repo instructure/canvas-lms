@@ -22,7 +22,6 @@ import EventBuffer from './event_buffer'
 import {ajax, when as jWhen} from 'jquery'
 import eraseFromArray from '@canvas/array-erase'
 import debugConsole from './util/debugConsole'
-import {extend} from 'underscore'
 
 const JSON_HEADERS = {
   Accept: 'application/json; charset=UTF-8',
@@ -31,7 +30,7 @@ const JSON_HEADERS = {
 
 export default class EventManager {
   constructor(options = {}) {
-    this.options = extend({}, EventManager.options, options)
+    this.options = {...EventManager.options, ...options}
     this._trackerFactories = []
     this._state = {
       trackers: [],

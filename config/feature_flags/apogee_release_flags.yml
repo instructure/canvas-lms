@@ -251,11 +251,6 @@ grading_scheme_updates:
   applies_to: SiteAdmin
   display_name: Improve Letter Grading Scheme Usability
   description: Teachers and Account Managers will be able to more easily manage letter grading schemes for accounts, courses, and assignments.
-points_based_grading_schemes:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Points Based Letter Grading Schemes
-  description: Teachers and Account Managers will be able to create letter grading schemes that use points instead of percentages for grade book entry and display.
 custom_gradebook_statuses:
   state: hidden
   applies_to: SiteAdmin
@@ -323,6 +318,56 @@ enhanced_rubrics:
   description: This feature provides visual and functional enhancements to rubrics across Canvas.
   environments:
     ci:
+      state: allowed
+    development:
+      state: allowed
+multiselect_gradebook_filters:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Multi-select Gradebook Filters
+  description: This feature enables multi-select filters in the Gradebook.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
+customizable_default_due_time:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Customizable Default Due Date
+  description: Users can now set the default due date for a course to be in minutes
+  environments:
+    ci:
       state: allowed_on
     development:
       state: allowed_on
+platform_service_speedgrader:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: "SpeedGrader 2: Steel Thread"
+  description: This feature provides a new SpeedGrader platform experience.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
+grading_periods_filter_dates:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Add dates to Gradebook Grading Period Filter
+  description: This feature adds the start, end, and close dates of grading periods to the grading period filter.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+speedgrader_studio_media_capture:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: SpeedGrader Studio Media Capture
+  description: This feature provides the ability to capture media in SpeedGrader using Studio Screen Capture.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed

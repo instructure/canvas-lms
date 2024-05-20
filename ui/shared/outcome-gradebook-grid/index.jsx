@@ -18,8 +18,29 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
-import HeaderFilterView from './backbone/views/HeaderFilterView'
+import {
+  uniq,
+  reduce,
+  groupBy,
+  includes,
+  isObject,
+  reject,
+  chain,
+  some,
+  isNumber,
+  pick,
+  isNull,
+  isEmpty,
+  find,
+  partial,
+  keys,
+  map,
+  each,
+  zip,
+  extend as lodashExtend,
+  escape as lodashEscape,
+} from 'lodash'
+import HeaderFilterView from './react/HeaderFilterView'
 import OutcomeFilterView from './react/OutcomeFilterView'
 import OutcomeColumnView from './backbone/views/OutcomeColumnView'
 import listFormatterPolyfill from '@canvas/util/listFormatter'
@@ -76,7 +97,7 @@ const Grid = {
     init() {
       const headers = $('.outcome-gradebook-wrapper .slick-header')
       const headerRows = $('.outcome-gradebook-wrapper .slick-headerrow')
-      return _.each(_.zip(headers, headerRows), function ([header, headerRow]) {
+      each(zip(headers, headerRows), function ([header, headerRow]) {
         return $(headerRow).insertBefore($(header))
       })
     },
@@ -111,18 +132,18 @@ const Grid = {
 
     // Returns an array of columns.
     toColumns(outcomes, rollups, options = {}) {
-      options = _.extend({}, Grid.Util.COLUMN_OPTIONS, options)
-      const columns = _.map(outcomes, function (outcome) {
-        return _.extend(
+      options = lodashExtend({}, Grid.Util.COLUMN_OPTIONS, options)
+      const columns = map(outcomes, function (outcome) {
+        return lodashExtend(
           {
             id: `outcome_${outcome.id}`,
           },
           {
-            name: _.escape(outcome.title),
+            name: lodashEscape(outcome.title),
             field: `outcome_${outcome.id}`,
             cssClass: 'outcome-result-cell',
-            hasResults: _.some(rollups, r => {
-              return _.find(r.scores, s => {
+            hasResults: some(rollups, r => {
+              return find(r.scores, s => {
                 return s.links.outcome === outcome.id
               })
             }),
@@ -141,7 +162,7 @@ const Grid = {
       const studentOptions = {
         width: 231,
       }
-      return _.extend(
+      return lodashExtend(
         {
           id: 'student',
           name: I18n.t('learning_outcome', 'Learning Outcome'),
@@ -150,7 +171,7 @@ const Grid = {
           headerCssClass: 'outcome-student-header-cell',
           formatter: Grid.View.studentCell,
         },
-        _.extend({}, Grid.Util.COLUMN_OPTIONS, studentOptions)
+        lodashExtend({}, Grid.Util.COLUMN_OPTIONS, studentOptions)
       )
     },
     // Public: Translate an array of rollup data to rows that can be passed to SlickGrid.
@@ -159,22 +180,22 @@ const Grid = {
 
     // Returns an array of rows.
     toRows(rollups, _options = {}) {
-      const user_ids = _.uniq(
-        _.map(rollups, function (r) {
+      const user_ids = uniq(
+        map(rollups, function (r) {
           return r.links.user
         })
       )
-      const filtered_rollups = _.groupBy(rollups, function (rollup) {
+      const filtered_rollups = groupBy(rollups, function (rollup) {
         return rollup.links.user
       })
-      const ordered_rollups = _.map(user_ids, function (u) {
+      const ordered_rollups = map(user_ids, function (u) {
         return filtered_rollups[u]
       })
-      return _.reject(
-        _.map(ordered_rollups, function (rollup) {
+      return reject(
+        map(ordered_rollups, function (rollup) {
           return Grid.Util._toRow(rollup)
         }),
-        _.isNull
+        isNull
       )
     },
     // Internal: Translate an outcome result to a SlickGrid row.
@@ -184,7 +205,7 @@ const Grid = {
     // Returns an object.
     _toRow(rollup) {
       const user = rollup[0].links.user
-      const section_list = _.map(rollup, function (rollup2) {
+      const section_list = map(rollup, function (rollup2) {
         return rollup2.links.section
       })
       const section_enrollment_status = () => {
@@ -195,29 +216,29 @@ const Grid = {
           ? I18n.t('inactive')
           : ''
       }
-      if (_.isEmpty(section_list)) {
+      if (isEmpty(section_list)) {
         return null
       }
       const student = Grid.Util.lookupStudent(user)
       const sections = Grid.Util.lookupSection(section_list)
       const section_name = listFormatter.format(
-        _.pluck(sections, 'name')
+        map(sections, 'name')
           .filter(x => x)
           .sort()
       )
       const courseID = ENV.context_asset_string.split('_')[1]
       const row = {
-        student: _.extend(
+        student: lodashExtend(
           {
             grades_html_url: `/courses/${courseID}/grades/${user}#tab-outcomes`,
-            section_name: _.keys(Grid.sections).length > 1 ? section_name : null,
+            section_name: keys(Grid.sections).length > 1 ? section_name : null,
             enrollment_status: section_enrollment_status(),
           },
           student
         ),
       }
-      _.each(rollup[0].scores, function (score) {
-        return (row[`outcome_${score.links.outcome}`] = _.pick(score, 'score', 'hide_points'))
+      each(rollup[0].scores, function (score) {
+        return (row[`outcome_${score.links.outcome}`] = pick(score, 'score', 'hide_points'))
       })
       return row
     },
@@ -229,7 +250,7 @@ const Grid = {
     saveOutcomes(outcomes) {
       const [type, id] = ENV.context_asset_string.split('_')
       const url = `/${type}s/${id}/outcomes`
-      return (Grid.outcomes = _.reduce(
+      return (Grid.outcomes = reduce(
         outcomes,
         function (result, outcome) {
           outcome.url = url
@@ -241,7 +262,7 @@ const Grid = {
     },
     saveOutcomePaths(outcomePaths) {
       return outcomePaths.forEach(function (path) {
-        const pathString = _.pluck(path.parts, 'name').join(' > ')
+        const pathString = map(path.parts, 'name').join(' > ')
         return (Grid.outcomes[`outcome_${path.id}`].path = pathString)
       })
     },
@@ -259,7 +280,7 @@ const Grid = {
 
     // Returns nothing.
     saveStudents(students) {
-      return (Grid.students = _.reduce(
+      return (Grid.students = reduce(
         students,
         function (result, student) {
           result[student.id] = student
@@ -282,7 +303,7 @@ const Grid = {
 
     // Returns nothing.
     saveSections(sections) {
-      return (Grid.sections = _.reduce(
+      return (Grid.sections = reduce(
         sections,
         function (result, section) {
           result[section.id] = section
@@ -297,12 +318,12 @@ const Grid = {
 
     // Returns a section or null.
     lookupSection(id_or_ids) {
-      return _.pick(Grid.sections, id_or_ids)
+      return pick(Grid.sections, id_or_ids)
     },
   },
   Math: {
     mean(values, round = false) {
-      const total = _.reduce(
+      const total = reduce(
         values,
         function (a, b) {
           return a + b
@@ -350,11 +371,11 @@ const Grid = {
     // Returns cell HTML
     cellHtml(score, hide_points, columnDef, shouldFilter) {
       const outcome = Grid.Util.lookupOutcome(columnDef.field)
-      if (!(outcome && _.isNumber(score))) {
+      if (!(outcome && isNumber(score))) {
         return
       }
       const [className, color, description] = Grid.View.masteryDetails(score, outcome)
-      if (shouldFilter && !_.includes(Grid.filter, className)) {
+      if (shouldFilter && !includes(Grid.filter, className)) {
         return ''
       }
       const cssColor = color ? `background-color:${color};` : ''
@@ -376,7 +397,7 @@ const Grid = {
     // This only renders student rows, not column headers
     studentCell(_row, _cell, value, _columnDef, _dataContext) {
       return studentCellTemplate(
-        _.extend(value, {
+        lodashExtend(value, {
           course_id: ENV.GRADEBOOK_OPTIONS.context_id,
         })
       )
@@ -420,7 +441,7 @@ const Grid = {
       return ['rating_3', '#E0061F', I18n.t('Well Below Mastery')]
     },
     getColumnResults(data, column) {
-      return _.chain(data).pluck(column.field).filter(_.isObject).value()
+      return chain(data).map(column.field).filter(isObject).value()
     },
     headerRowCell({node, column, grid}, score) {
       if (column.field === 'student') {
@@ -446,10 +467,10 @@ const Grid = {
       })
       return dfd.then((response, _status, _xhr) => {
         // do for each column
-        return _.each(cols, function (col) {
+        each(cols, function (col) {
           const header = grid.getHeaderRowColumn(col.id)
           const score = col.outcome
-            ? _.find(response.rollups[0].scores, function (s) {
+            ? find(response.rollups[0].scores, function (s) {
                 return s.links.outcome === col.outcome.id
               })
             : undefined
@@ -481,13 +502,16 @@ const Grid = {
       ReactDOM.render(menu, node)
     },
     studentHeaderRowCell(node, _column, grid) {
-      $(node).addClass('average-filter')
-      const view = new HeaderFilterView({
-        grid,
-        redrawFn: Grid.View.redrawHeader,
-      })
-      view.render()
-      return $(node).append(view.$el)
+      const menu = React.createElement(
+        HeaderFilterView,
+        {
+          grid,
+          averageFn: Grid.averageFn,
+          redrawFn: Grid.View.redrawHeader
+        },
+        null
+      )
+      ReactDOM.render(menu, node)
     },
     headerCell({node, column, grid}, _fn = Grid.averageFn) {
       if (column.field === 'student') {
@@ -495,7 +519,7 @@ const Grid = {
         this.addEnrollmentFilters(node)
         return
       }
-      const totalsFn = _.partial(Grid.View.calculateRatingsTotals, grid, column)
+      const totalsFn = partial(Grid.View.calculateRatingsTotals, grid, column)
       const view = new OutcomeColumnView({
         el: node,
         attributes: column.outcome,

@@ -1,9 +1,0 @@
-{
-  "name": "old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock",
-  "version": "1.0.0",
-  "description": "we have this here because the analytics plugin is still using react 0.14.9 and if it is checked out it would create a different yarn.lock than for people that don't have it checked out. normally, you'd use a 'resolutions' entry in package.json for something like this but doing that messes up yarn and causes it not to share the same copy of react 16 for everything else. we can delete this when analytics no longer uses it's own version of react",
-  "scripts": { "test": "echo \"no test specified\""},
-  "dependencies": {
-    "react": "0.14.9"
-  }
-}

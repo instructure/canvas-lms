@@ -206,7 +206,7 @@ module CC
 
     class HtmlContentExporter
       attr_reader :course, :user, :media_object_flavor, :media_object_infos
-      attr_accessor :referenced_files
+      attr_accessor :referenced_files, :referenced_assessment_question_files
 
       def initialize(course, user, opts = {})
         @media_object_flavor = opts[:media_object_flavor]
@@ -220,6 +220,7 @@ module CC
         @for_epub_export = opts[:for_epub_export]
         @key_generator = opts[:key_generator] || CC::CCHelper
         @referenced_files = {}
+        @referenced_assessment_question_files = {}
         @disable_content_rewriting = !!opts[:disable_content_rewriting] || false
 
         @rewriter.set_handler("file_contents") do |match|
@@ -247,35 +248,38 @@ module CC
               "#{COURSE_TOKEN}/files"
             end
           else
-            obj = if @course && match.obj_class == Attachment
-                    @course.attachments.find_by(id: match.obj_id)
+            context = @course
+            current_referenced_files = @referenced_files
+            if match.context_type == "assessment_questions" && !@for_course_copy
+              context = match.context_type.classify.constantize.find_by(id: match.context_id)
+              current_referenced_files = @referenced_assessment_question_files
+            end
+
+            obj = if context && match.obj_class == Attachment
+                    context.attachments.find_by(id: match.obj_id)
                   else
                     match.obj_class.where(id: match.obj_id).first
                   end
             next(match.url) unless obj && (@rewriter.user_can_view_content?(obj) || @for_epub_export)
 
-            @referenced_files[obj.id] = @key_generator.create_key(obj) if @track_referenced_files && !@referenced_files[obj.id]
+            obj.export_id = @key_generator.create_key(obj)
+            current_referenced_files[obj.id] = obj if @track_referenced_files && !current_referenced_files[obj.id]
 
-            url = if @for_course_copy
-                    "#{COURSE_TOKEN}/file_ref/#{@key_generator.create_key(obj)}#{match.rest}"
-                  else
-                    # for files in exports, turn it into a relative link by path, rather than by file id
-                    # we retain the file query string parameters
-                    folder = obj.folder.full_name.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
-                    folder = folder.split("/").map { |part| URI::DEFAULT_PARSER.escape(part) }.join("/")
-                    path = "#{folder}/#{URI::DEFAULT_PARSER.escape(obj.display_name)}"
-                    path = HtmlTextHelper.escape_html(path)
-                    "#{path}#{CCHelper.file_query_string(match.rest)}"
-                  end
-            # when media attachments is stable on production and media objects export code is removed,
-            # this block should be removed (after LF-197 is complete)
-            uri = Addressable::URI.parse(url)
-            if match.type == "media_attachments_iframe"
-              query_values = uri.query_values || {}
-              query_values["media_attachment"] = true
-              uri.query_values = query_values
+            if @for_course_copy
+              "#{COURSE_TOKEN}/file_ref/#{obj.export_id}#{match.rest}"
+            else
+              # for files in exports, turn it into a relative link by path, rather than by file id
+              # we retain the file query string parameters
+              folder = if match.context_type == "assessment_questions"
+                         "#{WEB_CONTENT_TOKEN}/assessment_questions"
+                       else
+                         obj.folder&.full_name&.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
+                       end
+              folder = folder.split("/").map { |part| URI::DEFAULT_PARSER.escape(part) }.join("/")
+              path = "#{folder}/#{URI::DEFAULT_PARSER.escape(obj.display_name)}"
+              path = HtmlTextHelper.escape_html(path)
+              "#{path}#{CCHelper.file_query_string(match.rest)}"
             end
-            uri.to_s
           end
         end
         @rewriter.set_handler("files", &file_handler)
@@ -384,18 +388,23 @@ module CC
         iframe
       end
 
+      def media_object_export_path(media_id)
+        obj = MediaObject.active.by_media_id(media_id).take
+        return unless obj && @key_generator.create_key(obj)
+
+        @used_media_objects << obj
+        info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
+        @media_object_infos[obj.id] = info
+        File.join(WEB_CONTENT_TOKEN, info[:path])
+      end
+
       def html_content(html)
-        return html if @disable_content_rewriting
+        return html if @disable_content_rewriting || html.blank?
 
         html = @rewriter.translate_content(html)
         return html if html.blank?
 
         doc = Nokogiri::HTML5.fragment(html)
-        doc.css("iframe[src*=media_attachment]").each do |iframe|
-          replace_media_iframe(iframe)
-        end
-        return doc.to_s if @for_course_copy
-
         # keep track of found media comments, and translate them into links into the files tree
         # if imported back into canvas, they'll get uploaded to the media server
         # and translated back into media comments
@@ -403,33 +412,24 @@ module CC
           next unless anchor["id"]
 
           media_id = anchor["id"].gsub(/^media_comment_/, "")
-          obj = MediaObject.active.by_media_id(media_id).first
-          next unless obj && @key_generator.create_key(obj)
-
-          @used_media_objects << obj
-          info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
-          @media_object_infos[obj.id] = info
-          anchor["href"] = File.join(WEB_CONTENT_TOKEN, info[:path])
+          path = media_object_export_path(media_id)
+          anchor["href"] = path if path
         end
 
-        # process new RCE media iframes too
+        # process RCE media object iframes
         doc.css("iframe[data-media-id]").each do |iframe|
-          next if iframe["src"].include?("/media_attachments_iframe/")
+          next if iframe["src"].include?("/media_attachments_iframe/") || iframe["src"].include?(WEB_CONTENT_TOKEN)
 
           media_id = iframe["data-media-id"]
-          obj = MediaObject.active.by_media_id(media_id).take
-          next unless obj && @key_generator.create_key(obj)
-
-          @used_media_objects << obj
-          info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
-          @media_object_infos[obj.id] = info
-
-          iframe["src"] = File.join(WEB_CONTENT_TOKEN, info[:path])
+          path = media_object_export_path(media_id)
+          iframe["src"] = path if path
         end
 
         doc.css("iframe[data-media-type]").each do |iframe|
           replace_media_iframe(iframe)
         end
+
+        return doc.to_html if @for_course_copy
 
         # prepend the Canvas domain to remaining absolute paths that are missing the host
         # (those in the course are already "$CANVAS_COURSE_REFERENCE$/...", but links
@@ -499,6 +499,8 @@ module CC
         end
 
         Rack::Utils.parse_query(uri.query).each do |k, v|
+          next if k == "verifier" || v.nil?
+
           qs << "canvas_qs_#{Rack::Utils.escape(k)}=#{Rack::Utils.escape(v)}"
         end
       rescue URI::Error

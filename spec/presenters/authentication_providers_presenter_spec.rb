@@ -158,49 +158,6 @@ describe AuthenticationProvidersPresenter do
     end
   end
 
-  describe "ip_configuration" do
-    def stub_setting(val)
-      allow(Setting).to receive(:get)
-        .with("account_authorization_config_ip_addresses", nil)
-        .and_return(val)
-    end
-
-    describe "#ips_configured?" do
-      it "is true if there is anything in the ip addresses setting" do
-        stub_setting("127.0.0.1")
-        presenter = described_class.new(double)
-        expect(presenter.ips_configured?).to be(true)
-      end
-
-      it "is false without ip addresses" do
-        stub_setting(nil)
-        presenter = described_class.new(double)
-        expect(presenter.ips_configured?).to be(false)
-      end
-    end
-
-    describe "#ip_list" do
-      it "just returns the one for one ip address" do
-        stub_setting("127.0.0.1")
-        presenter = described_class.new(double)
-        expect(presenter.ip_list).to eq("127.0.0.1")
-      end
-
-      it "combines many ips into a newline delimited block" do
-        stub_setting("127.0.0.1,2.2.2.2, 4.4.4.4,  6.6.6.6")
-        presenter = described_class.new(double)
-        list_output = "127.0.0.1\n2.2.2.2\n4.4.4.4\n6.6.6.6"
-        expect(presenter.ip_list).to eq(list_output)
-      end
-
-      it "is an empty string for no ips" do
-        stub_setting(nil)
-        presenter = described_class.new(double)
-        expect(presenter.ip_list).to eq("")
-      end
-    end
-  end
-
   describe "#login_placeholder" do
     it "wraps AAC.default_delegated_login_handle_name" do
       expect(described_class.new(double).login_placeholder).to eq(
@@ -305,7 +262,7 @@ describe AuthenticationProvidersPresenter do
       allow(AuthenticationProvider::Facebook).to receive(:enabled?).and_return(true)
       Account.default.authentication_providers.create!(auth_type: "facebook")
       presenter = described_class.new(Account.default)
-      expect(presenter.new_auth_types).not_to be_include(AuthenticationProvider::Facebook)
+      expect(presenter.new_auth_types).not_to include(AuthenticationProvider::Facebook)
     end
   end
 end

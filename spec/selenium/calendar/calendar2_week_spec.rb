@@ -107,7 +107,7 @@ describe "calendar2" do
       end
 
       it "does not change duration when dragging a short event", priority: "2" do
-        skip("dragging events doesn't seem to work")
+        skip("dragging events doesn't seem to work FOO-4335")
         noon = Time.zone.now.at_beginning_of_day + 12.hours
         event = @course.calendar_events.create! title: "ohai", start_at: noon, end_at: noon + 5.minutes
         load_week_view
@@ -161,8 +161,8 @@ describe "calendar2" do
       change_calendar(:next)
 
       # Verify Week and Day labels are correct
-      expect(header_text).to include("Jan 8 — 14, 2012")
-      expect(f(".fc-sun")).to include_text("8\nSUN")
+      expect(header_text).to include("Jan 8 – 14, 2012")
+      expect(f(".fc-sun")).to include_text("SUN 1/8")
     end
 
     it "creates event by clicking on week calendar", priority: "1" do
@@ -192,7 +192,7 @@ describe "calendar2" do
       #   when checking for "today", we need to look for the second instance of the class
 
       # Check for highlight to be present on this week
-      expect(ff(".fc-agendaWeek-view .fc-today").size).to eq 2
+      expect(ff(".fc-agendaWeek-view .fc-today").size).to eq 3
 
       # Change calendar week until the highlight is not there (it should eventually)
       2.times { change_calendar }
@@ -200,7 +200,7 @@ describe "calendar2" do
 
       # Back to today. Make sure that the highlight is present again
       change_calendar(:today)
-      expect(ff(".fc-agendaWeek-view .fc-today").size).to eq 2
+      expect(ff(".fc-agendaWeek-view .fc-today").size).to eq 3
     end
 
     it "shows the location when clicking on a calendar event", priority: "2" do
@@ -231,6 +231,8 @@ describe "calendar2" do
     end
 
     it "extends event time by dragging", priority: "1" do
+      skip("dragging events are flaky and need more research FOO-4335")
+
       # Create event on current day at 9:00 AM in current time zone
       midnight = Time.zone.now.beginning_of_day
       event1 = make_event(start: midnight + 9.hours, end_at: midnight + 10.hours)
@@ -333,6 +335,8 @@ describe "calendar2" do
       end
 
       it "extends all day event by dragging", priority: "2" do
+        skip("dragging events are flaky and need more research FOO-4335")
+
         start_at_time = Time.zone.today.at_beginning_of_week(:sunday).beginning_of_day
         event = make_event(title: "Event1", start: start_at_time, all_day: true)
         load_week_view

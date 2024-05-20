@@ -59,7 +59,7 @@ describe PageViewsController do
     it "orders rows by created_at in DESC order" do
       pv2 = page_view(@user, "/somewhere/in/app", created_at: 2.days.ago) # 2nd day
       pv1 = page_view(@user, "/somewhere/in/app/1", created_at: 1.day.ago) # 1st day
-      pv3 = page_view(@user, "/somewhere/in/app/2", created_at: 3.days.ago)  # 3rd day
+      pv3 = page_view(@user, "/somewhere/in/app/2", created_at: 3.days.ago) # 3rd day
       get "index", params: { user_id: @user.id }, format: "csv"
       expect(response).to be_successful
       dates = CSV.parse(response.body, headers: true).pluck("created_at")

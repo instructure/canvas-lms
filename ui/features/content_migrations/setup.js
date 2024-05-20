@@ -47,6 +47,7 @@ import ExternalContentReturnView from '@canvas/external-tools/backbone/views/Ext
 import ExternalTool from '@canvas/external-tools/backbone/models/ExternalTool'
 import OverwriteAssessmentContentView from '@canvas/content-migrations/backbone/views/subviews/OverwriteAssessmentContentView'
 import ImportQuizzesNextView from '@canvas/content-migrations/backbone/views/ImportQuizzesNextView'
+import extensions from '@canvas/bundles/extensions'
 import processMigrationContentItem from './processMigrationContentItem'
 import {subscribe} from 'jquery-tinypubsub'
 
@@ -323,4 +324,13 @@ function __guard__(value, transform) {
   return typeof value !== 'undefined' && value !== null ? transform(value) : undefined
 }
 
-export default Array.from(ENV.EXTERNAL_TOOLS).map(et => registerExternalTool(et))
+Array.from(ENV.EXTERNAL_TOOLS).forEach(et => registerExternalTool(et))
+
+const loadExtension = extensions['ui/features/content_migrations/setup.js']?.()
+if (loadExtension) {
+  loadExtension
+    .then(extension => extension.default())
+    .catch(error => {
+      throw new Error(`Error loading extension for ui/features/content_migrations/setup.js`, error)
+    })
+}

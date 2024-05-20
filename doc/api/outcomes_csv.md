@@ -81,7 +81,8 @@ indicates this is a learning outcome group</td>
 <td>friendly_description</td>
 <td>text</td>
 <td></td>
-<td>Learning outcome display description in "friendly" language for students and parents (optional, defaults to blank).</td>
+<td>Learning outcome display description in "friendly" language for students and parents (optional, defaults to blank). This value must be
+less than 255 characters in length.</td>
 </tr>
 <tr>
 <td>display_name</td>
@@ -98,7 +99,7 @@ This value does not apply to learning outcome groups.</td>
 This field must be blank for learning outcome groups. If not provided and this
 is a learning outcome, then the calculation method defaults to "decaying_average". If the Account and Course Level Outcome Mastery Scales flag is enabled, the calculation_method field does not need to be defined in the imported .csv. The calculation_method field will be determined by the account and course settings.
 If Outcomes New Decaying Average Calculation Method feature flag is enabled then
-we will have one more calculation method "weighted_average" and it would be 
+we will have one more calculation method "weighted_average" and it would be
 the default calculation method.
 </td>
 </tr>

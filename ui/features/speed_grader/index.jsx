@@ -22,27 +22,95 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
 import speedGrader from './jquery/speed_grader'
+import {getCurrentTheme} from '@instructure/theme-registry'
+import {captureException} from '@sentry/browser'
+import {getAssignment} from './queries/assignmentQuery'
+import {getCourse} from './queries/courseQuery'
+import {getSectionsByAssignment} from './queries/sectionsByAssignmentQuery'
+import {getSubmission} from './queries/submissionQuery'
+import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
+import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
+import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
+import {hideAssignmentGradesForSections} from './mutations/hideAssignmentGradesForSectionsMutation'
+import {postAssignmentGradesForSections} from './mutations/postAssignmentGradesForSectionsMutation'
+import GenericErrorPage from '@canvas/generic-error-page'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
 const I18n = useI18nScope('speed_grader')
 
-const mountPoint = document.getElementById('speed_grader_loading')
+ready(() => {
+  // The feature must be enabled AND we must be handed the speedgrader platform URL
+  if (window.ENV.FEATURES.platform_service_speedgrader && window.REMOTES?.speedgrader) {
+    const theme = getCurrentTheme()
+    const mountPoint = document.querySelector('#react-router-portals')
+    const params = new URLSearchParams(window.location.search)
 
-ReactDOM.render(
-  <div
-    style={{
-      position: 'fixed',
-      left: 0,
-      top: 0,
-      right: 0,
-      bottom: 0,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}
-  >
-    <Spinner renderTitle={I18n.t('Loading')} margin="large auto 0 auto" />
-  </div>,
-  mountPoint
-)
+    import('speedgrader/appInjector')
+      .then(module => {
+        module.render(mountPoint, {
+          theme,
+          queries: {
+            getCourse,
+            getAssignment,
+            getSubmission,
+            getSubmissionsByAssignment,
+            getSectionsByAssignment,
+          },
+          mutations: {
+            updateSubmissionGrade,
+            createSubmissionComment,
+            hideAssignmentGradesForSections,
+            postAssignmentGradesForSections,
+          },
+          context: {
+            courseId: window.ENV.course_id,
+            assignmentId: params.get('assignment_id'),
+            studentId: params.get('student_id'),
+            hrefs: {
+              heroIcon: `/courses/${window.ENV.course_id}/gradebook`,
+            },
+            features: {
+              extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
+            },
+          },
+        })
+      })
+      .catch(error => {
+        // eslint-disable-next-line no-console
+        console.error('Failed to load SpeedGrader', error)
+        captureException(error)
+        ReactDOM.render(
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            errorSubject={I18n.t('SpeedGrader loading error')}
+            errorCategory={I18n.t('SpeedGrader Error Page')}
+          />,
+          mountPoint
+        )
+      })
+  } else {
+    // touch punch simulates mouse events for touch devices
+    require("./touch_punch.js")
 
-ready(() => speedGrader.setup())
+    const mountPoint = document.getElementById('speed_grader_loading')
+
+    ReactDOM.render(
+      <div
+        style={{
+          position: 'fixed',
+          left: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Spinner renderTitle={I18n.t('Loading')} margin="large auto 0 auto" />
+      </div>,
+      mountPoint
+    )
+    speedGrader.setup()
+  }
+})

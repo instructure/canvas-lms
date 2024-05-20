@@ -20,9 +20,7 @@
 class SimplyVersioned::Partitioner
   cattr_accessor :logger
 
-  def self.precreate_tables
-    Setting.get("versions_precreate_tables", 2).to_i
-  end
+  PRECREATE_TABLES = 2
 
   def self.process
     Shard.current.database_server.unguard do
@@ -32,7 +30,7 @@ class SimplyVersioned::Partitioner
 
         partman = CanvasPartman::PartitionManager.create(Version)
 
-        partman.ensure_partitions(precreate_tables)
+        partman.ensure_partitions(PRECREATE_TABLES)
 
         log "Done. Bye!"
         log "*" * 80
@@ -49,6 +47,6 @@ class SimplyVersioned::Partitioner
 
   def self.processed?
     partman = CanvasPartman::PartitionManager.create(Version)
-    partman.partitions_created?(precreate_tables - 1)
+    partman.partitions_created?(PRECREATE_TABLES - 1)
   end
 end

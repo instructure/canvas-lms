@@ -82,8 +82,8 @@ module Canvas::Migration::Helpers
         data["learning_outcomes"] ||= data["outcomes"]
 
         # skip auto generated quiz question banks for canvas imports
-        data["assessment_question_banks"]&.select! do |item|
-          !(item["for_quiz"] && @migration && (@migration.for_course_copy? || (@migration.migration_type == "canvas_cartridge_importer")))
+        data["assessment_question_banks"]&.reject! do |item|
+          item["for_quiz"] && @migration && (@migration.for_course_copy? || (@migration.migration_type == "canvas_cartridge_importer"))
         end
 
         att.close

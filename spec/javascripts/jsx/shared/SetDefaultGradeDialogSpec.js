@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 
 import SetDefaultGradeDialog from '@canvas/grading/jquery/SetDefaultGradeDialog'
 
@@ -38,9 +39,7 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
   }
 
   function closeDialog() {
-    Array.from(getDialog().querySelectorAll('button'))
-      .find(node => node.innerText === 'close')
-      .click()
+    getDialog().querySelector('.ui-dialog-titlebar-close').click()
   }
 
   test('#gradeIsExcused returns true if grade is EX', () => {
@@ -106,7 +105,8 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
       sandbox.stub($, 'publish')
     })
 
-    test('submit reports number of students scored', async () => {
+    test('submit reports number of students scored', async assert => {
+      const done = assert.async()
       const payload = [
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
         {submission: {id: '22', assignment_id: '2', user_id: '4'}},
@@ -122,15 +122,18 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
       })
       dialog.show()
       clickSetDefaultGrade()
+      await awhile()
       const {
         firstCall: {
           args: [message],
         },
       } = alert
       strictEqual(message, '2 student scores updated')
+      done()
     })
 
-    test('submit reports number of students marked as missing', async () => {
+    test('submit reports number of students marked as missing', async assert => {
+      const done = assert.async()
       const payload = [
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
         {submission: {id: '22', assignment_id: '2', user_id: '4'}},
@@ -147,15 +150,18 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
       dialog.show()
       document.querySelector('input[name="default_grade"]').value = 'mi'
       clickSetDefaultGrade()
+      await awhile()
       const {
         firstCall: {
           args: [message],
         },
       } = alert
       strictEqual(message, '2 students marked as missing')
+      done()
     })
 
-    test('submit ignores the missing shortcut when the shortcut feature flag is disabled', async () => {
+    test('submit ignores the missing shortcut when the shortcut feature flag is disabled', async assert => {
+      const done = assert.async()
       const payload = [
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
         {submission: {id: '22', assignment_id: '2', user_id: '4'}},
@@ -172,15 +178,18 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
       dialog.show()
       document.querySelector('input[name="default_grade"]').value = 'mi'
       clickSetDefaultGrade()
+      await awhile()
       const {
         firstCall: {
           args: [message],
         },
       } = alert
       strictEqual(message, '2 student scores updated')
+      done()
     })
 
-    test('submit reports number of students when api includes duplicates due to group assignments', async () => {
+    test('submit reports number of students when api includes duplicates due to group assignments', async assert => {
+      const done = assert.async()
       const payload = [
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
         {submission: {id: '22', assignment_id: '2', user_id: '4'}},
@@ -200,12 +209,16 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
       })
       dialog.show()
       clickSetDefaultGrade()
+      await awhile()
       const {
         firstCall: {
           args: [message],
         },
       } = alert
       strictEqual(message, '4 student scores updated')
+      done()
     })
   })
 })
+
+const awhile = () => new Promise(resolve => setTimeout(resolve, 2))

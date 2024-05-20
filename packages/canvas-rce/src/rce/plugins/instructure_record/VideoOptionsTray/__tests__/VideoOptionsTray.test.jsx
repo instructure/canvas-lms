@@ -37,6 +37,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       onRequestClose: jest.fn(),
       onSave: jest.fn(),
       open: true,
+      requestSubtitlesFromIframe: jest.fn(),
       videoOptions: {
         $element: null,
         appliedHeight: 180,
@@ -199,6 +200,19 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         tray.setDisplayAs('link')
         expect(tray.doneButtonDisabled).toEqual(false)
       })
+    })
+  })
+
+  describe('requestSubtitlesFromIframe', () => {
+    it('is not called when subtitles are present', () => {
+      renderComponent()
+      expect(props.requestSubtitlesFromIframe).not.toHaveBeenCalled()
+    })
+
+    it('is called when no subtitles present', () => {
+      props.videoOptions.tracks = null
+      renderComponent()
+      expect(props.requestSubtitlesFromIframe).toHaveBeenCalledTimes(1)
     })
   })
 

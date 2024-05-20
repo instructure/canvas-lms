@@ -26,6 +26,7 @@ module MasterCourses
   ALLOWED_CONTENT_TYPES = %w[
     Announcement
     AssessmentQuestionBank
+    AbstractAssignment
     Assignment
     AssignmentGroup
     Attachment

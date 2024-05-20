@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'underscore'
 import {Model} from '@canvas/backbone'
 
 export default class Conference extends Model {
@@ -56,7 +55,7 @@ export default class Conference extends Model {
   toJSON() {
     const json = super.toJSON(...arguments)
     for (const attr of ['special_urls', 'recordings_data', 'schedule_data', 'permissions_data']) {
-      _.extend(json, this[attr]())
+      Object.assign(json, this[attr]())
     }
     json.isAdobeConnect = json.conference_type === 'AdobeConnect'
     return json

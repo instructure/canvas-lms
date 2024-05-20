@@ -17,8 +17,8 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {CoursePaceItem} from '../types'
-import {BlackoutDate} from '../shared/types'
+import type {CoursePaceItem} from '../types'
+import type {BlackoutDate} from '../shared/types'
 
 const I18n = useI18nScope('course_paces_change_tracking')
 

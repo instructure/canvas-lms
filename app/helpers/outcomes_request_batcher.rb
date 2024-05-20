@@ -104,7 +104,7 @@ class OutcomesRequestBatcher
     # test_cluster? and test_cluster_name are true and not nil for nonprod environments,
     # like beta or test
     if ApplicationController.test_cluster?
-      "#{ApplicationController.test_cluster_name}_domain".to_sym
+      :"#{ApplicationController.test_cluster_name}_domain"
     else
       :domain
     end

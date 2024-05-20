@@ -66,8 +66,10 @@ const AssignmentTable = ({
   queryData,
   layout,
   handleReadStateChange,
+  handleRubricReadStateChange,
   setSubmissionAssignmentId,
   submissionAssignmentId,
+  hideTotalRow = false,
 }) => {
   const {assignmentSortBy} = React.useContext(GradeSummaryContext)
   const [calculateOnlyGradedAssignments, setCalculateOnlyGradedAssignments] = useState(true)
@@ -160,6 +162,7 @@ const AssignmentTable = ({
                 queryData,
                 setShowTray,
                 handleReadStateChange,
+                handleRubricReadStateChange,
                 setOpenAssignmentDetailIds,
                 openAssignmentDetailIds,
                 setSubmissionAssignmentId,
@@ -206,7 +209,7 @@ const AssignmentTable = ({
                   )
                 : null
             })}
-        {totalRow(
+        {!hideTotalRow && totalRow(
           queryData,
           calculateOnlyGradedAssignments,
           getCurrentOrFinalGrade(

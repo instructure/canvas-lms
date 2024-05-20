@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
+import commonEventFactory from '../index'
 
 describe('isCompleted()', () => {
   let data, contexts

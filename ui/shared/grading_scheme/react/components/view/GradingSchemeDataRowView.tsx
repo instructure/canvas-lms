@@ -20,7 +20,7 @@ import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Table} from '@instructure/ui-table'
-import {GradingSchemeDataRow} from '@instructure/grading-utils'
+import type {GradingSchemeDataRow} from '@instructure/grading-utils'
 import {roundToTwoDecimalPlaces} from '../../helpers/roundDecimalPlaces'
 
 const I18n = useI18nScope('GradingSchemeManagement')

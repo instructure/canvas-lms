@@ -18,9 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "pages/discussions_index_page"
+require_relative "../helpers/discussions_common"
+require_relative "../helpers/context_modules_common"
+require_relative "../helpers/items_assign_to_tray"
 
 describe "discussions index" do
   include_context "in-process server selenium tests"
+  include ContextModulesCommon
+  include ItemsAssignToTray
+  include DiscussionsCommon
 
   context "as a teacher" do
     discussion1_title = "Meaning of life"
@@ -224,6 +230,89 @@ describe "discussions index" do
       wait_for_stale_element(".discussion-settings-v2-spinner-container")
       @course.reload
       expect(@course.allow_student_discussion_topics).to be false
+    end
+
+    context "differentiated modules assignToTray" do
+      # Since the itemAssignTo Tray contains all of the logic for setting
+      # assignment values. We only need to test that the correct overrides are
+      # Displayed from the index page
+
+      before do
+        differentiated_modules_on
+        @student1 = student_in_course(course: @course, active_all: true).user
+        @student2 = student_in_course(course: @course, active_all: true).user
+        @course_section = @course.course_sections.create!(name: "section alpha")
+        @course_section_2 = @course.course_sections.create!(name: "section Beta")
+      end
+
+      it "displays module_override correctly" do
+        graded_discussion = create_graded_discussion(@course)
+        module1 = @course.context_modules.create!(name: "Module 1")
+        graded_discussion.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+        override = module1.assignment_overrides.create!
+        override.assignment_override_students.create!(user: @student1)
+
+        login_and_visit_course(@teacher, @course)
+        DiscussionsIndex.click_assign_to_menu_option(graded_discussion.title)
+
+        expect(module_item_assign_to_card.count).to eq 1
+        expect(module_item_assign_to_card[0].find_all(assignee_selected_option_selector).map(&:text)).to eq ["User"]
+        expect(inherited_from.last.text).to eq("Inherited from #{module1.name}")
+      end
+
+      it "displays ungraded availability correctly" do
+        available_from_date = "Tue, 23 Apr 2024 18:28:42.003452000 UTC +00:00"
+
+        @ungraded_discussion_with_dates = @course.discussion_topics.create!(
+          title: "ungraded overrides",
+          message: "Could it be 43?",
+          user: @teacher,
+          delayed_post_at: available_from_date
+        )
+        login_and_visit_course(@teacher, @course)
+        DiscussionsIndex.click_assign_to_menu_option(@ungraded_discussion_with_dates.title)
+
+        expect(item_tray_exists?).to be_truthy
+        expect(module_item_assign_to_card.count).to eq 1
+        expect(selected_assignee_options.first.find("span").text).to eq "Everyone"
+        expect(assign_to_due_date(0).attribute("value")).to eq("Apr 23, 2024")
+        expect(assign_to_due_time(0).attribute("value")).to eq("6:28 PM")
+
+        expect(assign_to_available_from_date(0).attribute("value")).to eq("")
+        expect(assign_to_available_from_time(0).attribute("value")).to eq("")
+      end
+
+      it "displays graded discussion overrides correctly" do
+        graded_discussion = create_graded_discussion(@course)
+
+        # Create overrides
+        # Card 1 = ["Everyone else"], Set by: only_visible_to_overrides: false
+
+        # Card 2
+        graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: @course_section.id)
+
+        # Card 3
+        graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: @course_section_2.id)
+
+        # Card 4
+        graded_discussion.assignment.assignment_overrides.create!(set_type: "ADHOC")
+        graded_discussion.assignment.assignment_overrides.last.assignment_override_students.create!(user: @student1)
+        graded_discussion.assignment.assignment_overrides.last.assignment_override_students.create!(user: @student2)
+
+        login_and_visit_course(@teacher, @course)
+        DiscussionsIndex.click_assign_to_menu_option(graded_discussion.title)
+
+        # Check that displayed cards and overrides are correct
+        expect(module_item_assign_to_card.count).to eq 4
+
+        displayed_overrides = module_item_assign_to_card.map do |card|
+          card.find_all(assignee_selected_option_selector).map(&:text)
+        end
+
+        expected_overrides = generate_expected_overrides(graded_discussion.assignment)
+        expect(displayed_overrides).to match_array(expected_overrides)
+      end
     end
   end
 end

@@ -49,6 +49,7 @@ class CommunicationChannel < ActiveRecord::Base
   after_commit :check_if_bouncing_changed
   after_save :clear_user_email_cache, if: -> { workflow_state_before_last_save != workflow_state }
   after_save :after_save_flag_old_microsoft_sync_user_mappings
+  after_save :consider_building_notification_policies, if: -> { workflow_state_before_last_save != "active" && workflow_state == "active" }
 
   acts_as_list scope: :user
 
@@ -69,6 +70,20 @@ class CommunicationChannel < ActiveRecord::Base
 
   RETIRE_THRESHOLD = 1
 
+  MAX_CCS_PER_USER = 100
+
+  RESEND_PASSWORD_RESET_TIME = 30.minutes
+  MAX_SHARDS_FOR_BOUNCES = 50
+  MERGE_CANDIDATE_SEARCH_LIMIT = 10
+
+  # Notification polcies are required for a user to start recieving notifications from an
+  # active communication channel. This code will create these policies if they don't already exist.
+  def consider_building_notification_policies
+    if notification_policies.empty?
+      NotificationPolicy.build_policies_for_channel(self)
+    end
+  end
+
   # Generally, "TYPE_PERSONAL_EMAIL" should be treated exactly the same
   # as TYPE_EMAIL.  It is just kept distinct for the purposes of customers
   # querying records in Canvas Data.
@@ -80,8 +95,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def under_user_cc_limit
-    max_ccs = Setting.get("max_ccs_per_user", "100").to_i
-    if user.communication_channels.limit(max_ccs + 1).count > max_ccs
+    if user.communication_channels.limit(MAX_CCS_PER_USER + 1).count > MAX_CCS_PER_USER
       errors.add(:user_id, "user communication_channels limit exceeded")
     end
   end
@@ -276,14 +290,20 @@ class CommunicationChannel < ActiveRecord::Base
     errors.add(:workflow_state, "Can't remove a user's SMS that is used for one time passwords") if id == user.otp_communication_channel_id
   end
 
-  # Public: Build the url where this record can be confirmed.
+  # Public: Provides base components for an email confirmation URL.
   #
+  # Constructs and returns a hash of components necessary to build a
+  # confirmation URL for email type communication channels.
   #
-  # Returns a string.
-  def confirmation_url
-    return "" unless path_type == TYPE_EMAIL
+  # Returns a hash with :context, and :confirmation_code if the path type is
+  # email; returns nil otherwise.
+  def confirmation_url_data
+    return nil unless path_type == TYPE_EMAIL
 
-    "#{HostUrl.protocol}://#{HostUrl.context_host(context)}/register/#{confirmation_code}"
+    {
+      context:,
+      confirmation_code:
+    }
   end
 
   def context
@@ -304,7 +324,7 @@ class CommunicationChannel < ActiveRecord::Base
     case path_type
     when TYPE_TWITTER
       res = user.user_services.for_service(TYPE_TWITTER).first.service_user_name rescue nil
-      res ||= t :default_twitter_handle, "Twitter Handle"
+      res ||= t :default_twitter_handle, "X.com Handle"
       res
     when TYPE_PUSH
       t "For All Devices"
@@ -317,8 +337,8 @@ class CommunicationChannel < ActiveRecord::Base
     return if Rails.cache.read(["recent_password_reset", global_id].cache_key) == true
 
     @request_password = true
-    Rails.cache.write(["recent_password_reset", global_id].cache_key, true, expires_in: Setting.get("resend_password_reset_time", 5).to_f.minutes)
-    set_confirmation_code(true, Setting.get("password_reset_token_expiration_minutes", "120").to_i.minutes.from_now)
+    Rails.cache.write(["recent_password_reset", global_id].cache_key, true, expires_in: RESEND_PASSWORD_RESET_TIME)
+    set_confirmation_code(true, 2.hours.from_now)
     save!
     @request_password = false
   end
@@ -532,9 +552,8 @@ class CommunicationChannel < ActiveRecord::Base
     Shard.with_each_shard(shards) do
       scope = scope.shard(Shard.current).where("user_id<>?", user_id)
 
-      limit = Setting.get("merge_candidate_search_limit", "100").to_i
-      ccs = scope.preload(:user).limit(limit + 1).to_a
-      return [] if ccs.count > limit # just bail if things are getting out of hand
+      ccs = scope.preload(:user).limit(MERGE_CANDIDATE_SEARCH_LIMIT + 1).to_a
+      return [] if ccs.count > MERGE_CANDIDATE_SEARCH_LIMIT # just bail if things are getting out of hand
 
       ccs.map(&:user).select do |u|
         result = merge_candidates.fetch(u.global_id) do
@@ -585,7 +604,7 @@ class CommunicationChannel < ActiveRecord::Base
     # if there is a bounce on a channel that is associated to more than a few
     # shards there is no reason to bother updating the channel with the bounce
     # information, because its not a real user.
-    return if !permanent_bounce && CommunicationChannel.associated_shards(path).count > Setting.get("comm_channel_shard_count_too_high", "50").to_i
+    return if !permanent_bounce && CommunicationChannel.associated_shards(path).count > MAX_SHARDS_FOR_BOUNCES
 
     Shard.with_each_shard(CommunicationChannel.associated_shards(path)) do
       cc_scope = CommunicationChannel.unretired.email.by_path(path).where("bounce_count<?", RETIRE_THRESHOLD)
@@ -594,7 +613,7 @@ class CommunicationChannel < ActiveRecord::Base
       # try to capture only the newly created communication channels for this path,
       # or the ones that have NOT been bounced in the last hour, to make sure
       # we aren't doing un-helpful overwork.
-      debounce_window = Setting.get("comm_channel_bounce_debounce_window_in_min", "60").to_i
+      debounce_window = 1.hour
       bounce_field = if suppression_bounce
                        "last_suppression_bounce_at"
                      elsif permanent_bounce
@@ -602,7 +621,7 @@ class CommunicationChannel < ActiveRecord::Base
                      else
                        "last_transient_bounce_at"
                      end
-      bouncable_scope = cc_scope.where("#{bounce_field} IS NULL OR updated_at < ?", debounce_window.minutes.ago)
+      bouncable_scope = cc_scope.where("#{bounce_field} IS NULL OR updated_at < ?", debounce_window.ago)
       bouncable_scope.find_in_batches do |batch|
         update = if suppression_bounce
                    { last_suppression_bounce_at: timestamp, updated_at: Time.zone.now }

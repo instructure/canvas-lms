@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {each, without} from 'lodash'
 import $ from 'jquery'
 
 const linkedResourceTypes = ['assignments', 'quizzes', 'discussion_topics', 'wiki_pages']
@@ -100,8 +100,8 @@ ExpandCollapseContentSelectTreeItems.prototype.triggerTreeItemFetches = function
 ExpandCollapseContentSelectTreeItems.prototype.triggerLinkedResourcesCheckboxes = function (
   excludedType
 ) {
-  const types = _.without(linkedResourceTypes, excludedType)
-  return _.each(
+  const types = without(linkedResourceTypes, excludedType)
+  each(
     types,
     (function (_this) {
       return function (type) {

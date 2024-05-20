@@ -37,6 +37,12 @@ export const DiscussionEntry = {
       ratingCount
       ratingSum
       subentriesCount
+      editor {
+        ...User
+      }
+      author {
+        ...User
+      }
       attachment {
         ...Attachment
       }
@@ -57,7 +63,6 @@ export const DiscussionEntry = {
         ...DiscussionEntryPermissions
       }
       rootEntryId
-      isolatedEntryId
       parentId
       quotedEntry {
         _id
@@ -90,6 +95,7 @@ export const DiscussionEntry = {
       }
       depth
     }
+    ${User.fragment}
     ${Attachment.fragment}
     ${DiscussionEntryPermissions.fragment}
     ${DiscussionEntryVersion.fragment}
@@ -124,7 +130,6 @@ export const DiscussionEntry = {
     }),
     permissions: DiscussionEntryPermissions.shape,
     rootEntryId: string,
-    isolatedEntryId: string,
     parentId: string,
     quotedEntry: shape({
       createdAt: string,
@@ -189,7 +194,6 @@ export const DiscussionEntry = {
       __typename: 'DiscussionSubentriesConnection',
     },
     rootEntryId = null,
-    isolatedEntryId = null,
     parentId = null,
     quotedEntry = null,
     discussionEntryVersionsConnection = {
@@ -228,7 +232,6 @@ export const DiscussionEntry = {
     permissions,
     discussionSubentriesConnection,
     rootEntryId,
-    isolatedEntryId,
     parentId,
     quotedEntry,
     discussionEntryVersionsConnection,

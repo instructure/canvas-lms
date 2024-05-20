@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'lodash'
+import {reject, maxBy, isEmpty, partition, minBy} from 'lodash'
 import fcUtil from './fcUtil'
 import commonEventFactory from './CommonEvent/index'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -112,6 +112,12 @@ export default class EventDataSource {
       participants: {},
       fetchedAppointmentGroups: null,
     }
+    this.resetContexts()
+  }
+
+  // clear the calendar event cache w/o clearing appointment group data
+  resetContexts() {
+    this.cache.contexts = {}
     this.contexts.forEach(contextInfo => {
       this.cache.contexts[contextInfo.asset_string] = {
         events: {},
@@ -136,7 +142,7 @@ export default class EventDataSource {
   removeCachedReservation(event) {
     const cached_ag = this.cache.appointmentGroups[event.appointment_group_id]
     if (cached_ag) {
-      cached_ag.reserved_times = _.reject(
+      cached_ag.reserved_times = reject(
         cached_ag.reserved_times,
         reservation => reservation.id === event.id
       )
@@ -179,7 +185,7 @@ export default class EventDataSource {
 
   addEventToCache(event) {
     if (event.old_context_code) {
-      delete this.cache.contexts[event.old_context_code].events[event.id]
+      delete this.cache.contexts[event.old_context_code]?.events[event.id]
       delete event.old_context_code
     }
     // Split by comma, for the odd case where #contextCode() returns a comma seprated list
@@ -488,12 +494,12 @@ export default class EventDataSource {
           }
         })
 
-        if (!_.isEmpty(dates)) {
-          upperBounds.push(_.max(dates))
+        if (!isEmpty(dates)) {
+          upperBounds.push(maxBy(dates))
         }
       }
-      if (!_.isEmpty(upperBounds)) {
-        nextPageDate = fcUtil.clone(_.min(upperBounds))
+      if (!isEmpty(upperBounds)) {
+        nextPageDate = fcUtil.clone(minBy(upperBounds))
         end = fcUtil.unwrap(nextPageDate)
       }
       contexts.forEach(context => {
@@ -531,7 +537,7 @@ export default class EventDataSource {
     if (ENV.STUDENT_PLANNER_ENABLED) {
       eventDataSources.push(['/api/v1/planner_notes', params])
     }
-    const [admin_contexts, student_contexts] = _.partition(
+    const [admin_contexts, student_contexts] = partition(
       params.context_codes,
       cc => ENV.CALENDAR?.MANAGE_CONTEXTS?.indexOf(cc) >= 0
     )
@@ -579,7 +585,7 @@ export default class EventDataSource {
       params.context_codes = ENV.CALENDAR.CONTEXTS.filter(
         context =>
           params.context_codes.includes(context.asset_string) &&
-          (!context.course_pacing_enabled || context.can_make_reservation)
+          (!context.course_pacing_enabled || context.user_is_student)
       ).map(context => context.asset_string)
     }
     return {type: 'assignment', ...params}

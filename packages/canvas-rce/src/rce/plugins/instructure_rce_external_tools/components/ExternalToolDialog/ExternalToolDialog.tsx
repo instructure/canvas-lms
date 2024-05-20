@@ -25,7 +25,6 @@ import ToolLaunchIframe from '../util/ToolLaunchIframe'
 import processEditorContentItems from '../../lti13-content-items/processEditorContentItems'
 import {RceLti11ContentItem} from '../../lti11-content-items/RceLti11ContentItem'
 import formatMessage from '../../../../../format-message'
-import {TsMigrationAny} from '../../../../../types/ts-migration'
 import {ExternalToolsEnv} from '../../ExternalToolsEnv'
 import {RceToolWrapper} from '../../RceToolWrapper'
 import {instuiPopupMountNode} from '../../../../../util/fullscreenHelpers'
@@ -118,7 +117,7 @@ export default class ExternalToolDialog extends React.Component<
   }
 
   handleBeforeUnload = (ev: Event) =>
-    ((ev as TsMigrationAny).returnValue = formatMessage('Changes you made may not be saved.'))
+    ((ev as any).returnValue = formatMessage('Changes you made may not be saved.'))
 
   private handleExternalContentReady = (data: {
     contentItems: Array<{
@@ -177,6 +176,9 @@ export default class ExternalToolDialog extends React.Component<
       if (data?.subject === 'LtiDeepLinkingResponse') {
         processEditorContentItems(ev, this.props.env, this)
       } else if (data?.subject === 'externalContentReady') {
+        // 'externalContentReady' is EXTERNAL_CONTENT_READY in
+        // ui/shared/external-tools/externalContentEvents.ts
+        // where events are also described/used
         this.handleExternalContentReady(ev.data)
       }
     }
@@ -223,9 +225,11 @@ export default class ExternalToolDialog extends React.Component<
           target="external_tool_launch"
           style={{margin: 0}}
         >
-          <input type="hidden" name="editor" value="1" />
-          <input type="hidden" name="selection" value={state.form.selection} />
-          <input type="hidden" name="editor_contents" value={state.form.contents} />
+          <input type="hidden" name="editor" value="1"/>
+          <input type="hidden" name="selection" value={state.form.selection}/>
+          <input type="hidden" name="editor_contents" value={state.form.contents}/>
+          <input type="hidden" name="com_instructure_course_canvas_resource_type" value={props.env.rceWrapper?.getResourceIdentifiers().resourceType} />
+          <input type="hidden" name="com_instructure_course_canvas_resource_id" value={props.env.rceWrapper?.getResourceIdentifiers().resourceId} />
           {state.form.parent_frame_context != null && (
             <input
               type="hidden"

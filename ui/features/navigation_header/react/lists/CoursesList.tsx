@@ -46,8 +46,14 @@ export default function CoursesList() {
         </List.Item>
       )}
       {isSuccess &&
-        data
-          .map(course => (
+        [
+          <List.Item key="all">
+            <Link href="/courses" isWithinText={false} display="block">
+              {k5User ? I18n.t('All Subjects') : I18n.t('All Courses')}
+            </Link>
+          </List.Item>,
+        ].concat(
+          data.map(course => (
             <List.Item key={course.id}>
               <Link href={`/courses/${course.id}`} isWithinText={false} display="block">
                 <ActiveText url={`/courses/${course.id}`}>
@@ -61,13 +67,7 @@ export default function CoursesList() {
               </Link>
             </List.Item>
           ))
-          .concat([
-            <List.Item key="all">
-              <Link href="/courses" isWithinText={false} display="block">
-                {k5User ? I18n.t('All Subjects') : I18n.t('All Courses')}
-              </Link>
-            </List.Item>,
-          ])}
+        )}
     </List>
   )
 }

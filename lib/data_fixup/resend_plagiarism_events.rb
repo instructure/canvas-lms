@@ -37,16 +37,16 @@ module DataFixup
   # retriggered.
   class ResendPlagiarismEvents
     EVENT_NAME = "plagiarism_resubmit"
+    RESUBMIT_LIMIT = 100
+    RESUBMIT_WAIT_TIME = 3.minutes
 
     def self.run(start_time: 3.months.ago, end_time: Time.zone.now, only_errors: false)
-      limit, = Setting.get("trigger_plagiarism_resubmit", "100,180").split(",").map(&:to_i)
-
       # We're going to create all of the jobs that need to run with some far future run date
       # (so we know what they all are and we won't run them all at once and overwhelm our partners) and
       # then we're going to start the first one.
       batch_end_time = end_time
       loop do
-        batch_start_time = resend_scope(start_time, batch_end_time, limit:, only_errors:)
+        batch_start_time = resend_scope(start_time, batch_end_time, limit: RESUBMIT_LIMIT, only_errors:)
                            .pluck(:submitted_at)&.last
         break if batch_start_time.nil?
 
@@ -108,9 +108,8 @@ module DataFixup
     end
 
     def self.schedule_next_job
-      _, wait_time = Setting.get("trigger_plagiarism_resubmit", "100,180").split(",").map(&:to_i)
       Delayed::Job.where(strand: "plagiarism_event_resend", locked_at: nil)
-                  .order(:id).first&.update(run_at: wait_time.seconds.from_now)
+                  .order(:id).first&.update(run_at: RESUBMIT_WAIT_TIME.from_now)
     end
 
     # Retriggers the plagiarism resubmit event for the given

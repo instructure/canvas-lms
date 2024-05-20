@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import 'jqueryui/dialog'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
@@ -168,7 +168,7 @@ class DeveloperKey extends React.Component {
                   onHideContent={this.handleShowKey}
                   screenReaderLabel={I18n.t('Key')}
                   renderTrigger={
-                    <Button onClick={this.handleShowKey} size="small">
+                    <Button data-testid="show-key" onClick={this.handleShowKey} size="small">
                       {this.state.showKey ? I18n.t('Hide Key') : I18n.t('Show Key')}
                       <ScreenReaderContent>{this.getToolName()}</ScreenReaderContent>
                     </Button>
@@ -235,6 +235,7 @@ class DeveloperKey extends React.Component {
           <Table.Cell>
             <DeveloperKeyActionButtons
               ref={this.refActionButtons}
+              contextId={this.props.ctx.params.contextId}
               dispatch={this.props.store.dispatch}
               {...this.props.actions}
               developerKey={this.props.developerKey}

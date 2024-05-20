@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {graphql} from 'msw'
+import {graphql, HttpResponse} from 'msw'
 import {Discussion} from './Discussion'
 import {DiscussionEntry} from './DiscussionEntry'
 import {PageInfo} from './PageInfo'
-import {User} from './User'
 
 // helper function that filters out undefined values in objects before assigning
 const mswAssign = (target, ...objects) => {
@@ -35,10 +34,10 @@ const mswAssign = (target, ...objects) => {
 }
 
 export const handlers = [
-  graphql.query('GetDiscussionQuery', (req, res, ctx) => {
-    if (req.body.variables.filter === 'unread') {
-      return res(
-        ctx.data({
+  graphql.query('GetDiscussionQuery', ({variables}) => {
+    if (variables.filter === 'unread') {
+      return HttpResponse.json({
+        data: {
           legacyNode: Discussion.mock({
             discussionEntriesConnection: {
               nodes: [
@@ -52,12 +51,12 @@ export const handlers = [
               __typename: 'DiscussionSubentriesConnection',
             },
           }),
-        })
-      )
+        },
+      })
     }
-    if (req.body.variables.sort === 'asc') {
-      return res(
-        ctx.data({
+    if (variables.sort === 'asc') {
+      return HttpResponse.json({
+        data: {
           legacyNode: Discussion.mock({
             discussionEntriesConnection: {
               nodes: [
@@ -71,31 +70,17 @@ export const handlers = [
               __typename: 'DiscussionSubentriesConnection',
             },
           }),
-        })
-      )
-    }
-    if (req.body.variables.courseID > 0) {
-      return res(
-        ctx.data({
-          legacyNode: Discussion.mock({
-            author: User.mock({
-              courseRoles: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'],
-              id: 'role-user',
-            }),
-          }),
-        })
-      )
-    }
-    return res(
-      ctx.data({
-        legacyNode: Discussion.mock(),
+        },
       })
-    )
+    }
+    return HttpResponse.json({
+      data: {legacyNode: Discussion.mock()},
+    })
   }),
-  graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
-    if (req.body.variables.includeRelativeEntry) {
-      return res(
-        ctx.data({
+  graphql.query('GetDiscussionSubentriesQuery', ({variables}) => {
+    if (variables.includeRelativeEntry) {
+      return HttpResponse.json({
+        data: {
           legacyNode: DiscussionEntry.mock({
             discussionSubentriesConnection: {
               nodes: [
@@ -109,14 +94,13 @@ export const handlers = [
               __typename: 'DiscussionSubentriesConnection',
             },
           }),
-        })
-      )
+        },
+      })
     }
-    if (req.body.variables.sort === 'asc') {
-      return res(
-        ctx.data({
+    if (variables.sort === 'asc') {
+      return HttpResponse.json({
+        data: {
           legacyNode: DiscussionEntry.mock({
-            isolatedEntryId: '77',
             parentId: '77',
             discussionSubentriesConnection: {
               nodes: [
@@ -124,18 +108,17 @@ export const handlers = [
                   _id: '50',
                   id: '50',
                   message: '<p>This is the child reply asc</p>',
-                  isolatedEntryId: '77',
                 }),
               ],
               pageInfo: PageInfo.mock(),
               __typename: 'DiscussionSubentriesConnection',
             },
           }),
-        })
-      )
+        },
+      })
     }
-    return res(
-      ctx.data({
+    return HttpResponse.json({
+      data: {
         legacyNode: DiscussionEntry.mock({
           rootEntry: DiscussionEntry.mock({_id: 32}),
           discussionSubentriesConnection: {
@@ -150,31 +133,31 @@ export const handlers = [
             __typename: 'DiscussionSubentriesConnection',
           },
         }),
-      })
-    )
+      },
+    })
   }),
-  graphql.mutation('UpdateDiscussionEntryParticipant', (req, res, ctx) => {
-    return res(
-      ctx.data({
+  graphql.mutation('UpdateDiscussionEntryParticipant', ({variables}) => {
+    return HttpResponse.json({
+      data: {
         updateDiscussionEntryParticipant: {
           discussionEntry: mswAssign(
             {...DiscussionEntry.mock()},
             {
-              id: req.body.variables.discussionEntryId,
-              read: req.body.variables.read,
-              rating: req.body.variables.rating === 'liked',
-              ratingSum: req.body.variables.rating === 'liked' ? 1 : 0,
-              forcedReadState: req.body.variables.forcedReadState,
+              id: variables.discussionEntryId,
+              read: variables.read,
+              rating: variables.rating === 'liked',
+              ratingSum: variables.rating === 'liked' ? 1 : 0,
+              forcedReadState: variables.forcedReadState,
             }
           ),
           __typename: 'UpdateDiscussionEntryParticipantPayload',
         },
-      })
-    )
+      },
+    })
   }),
-  graphql.mutation('DeleteDiscussionEntry', (req, res, ctx) => {
-    return res(
-      ctx.data({
+  graphql.mutation('DeleteDiscussionEntry', () => {
+    return HttpResponse.json({
+      data: {
         deleteDiscussionEntry: {
           discussionEntry: mswAssign(
             {...DiscussionEntry.mock()},
@@ -186,112 +169,112 @@ export const handlers = [
           errors: null,
           __typename: 'DeleteDiscussionEntryPayload',
         },
-      })
-    )
+      },
+    })
   }),
-  graphql.mutation('updateDiscussionTopic', (req, res, ctx) => {
-    return res(
-      ctx.data({
+  graphql.mutation('updateDiscussionTopic', ({variables}) => {
+    return HttpResponse.json({
+      data: {
         updateDiscussionTopic: {
           discussionTopic: mswAssign(
             {...Discussion.mock()},
             {
               id: 'RGlzY3Vzc2lvbi0x',
-              published: req.body.variables.published,
+              published: variables.published,
               __typename: 'Discussion',
             }
           ),
           __typename: 'UpdateDiscussionTopicPayload',
         },
-      })
-    )
+      },
+    })
   }),
-  graphql.mutation('subscribeToDiscussionTopic', (req, res, ctx) => {
-    return res(
-      ctx.data({
+  graphql.mutation('subscribeToDiscussionTopic', ({variables}) => {
+    return HttpResponse.json({
+      data: {
         subscribeToDiscussionTopic: {
           discussionTopic: mswAssign(
             {...Discussion.mock()},
             {
               id: 'RGlzY3Vzc2lvbi0x',
-              subscribed: req.body.variables.subscribed,
+              subscribed: variables.subscribed,
               __typename: 'Discussion',
             }
           ),
           __typename: 'SubscribeToDiscussionTopicPayload',
         },
-      })
-    )
+      },
+    })
   }),
-  graphql.mutation('DeleteDiscussionTopic', (req, res, ctx) => {
-    return res(
-      ctx.data({
+  graphql.mutation('DeleteDiscussionTopic', ({variables}) => {
+    return HttpResponse.json({
+      data: {
         deleteDiscussionTopic: {
-          discussionTopicId: req.variables.id,
+          discussionTopicId: variables.id,
           errors: null,
           __typename: 'DeleteDiscussionTopicPayload',
         },
-      })
-    )
+      },
+    })
   }),
-  graphql.mutation('CreateDiscussionEntry', (req, res, ctx) => {
-    return res(
-      ctx.data({
+  graphql.mutation('CreateDiscussionEntry', ({variables}) => {
+    return HttpResponse.json({
+      data: {
         createDiscussionEntry: {
           discussionEntry: mswAssign(
             {...DiscussionEntry.mock()},
             {
-              id: req.body.variables.discussionTopicId,
-              message: req.body.variables.message,
+              id: variables.discussionTopicId,
+              message: variables.message,
             }
           ),
           errors: null,
           __typename: 'CreateDiscussionEntryPayload',
         },
-      })
-    )
+      },
+    })
   }),
-  graphql.mutation('UpdateDiscussionEntry', (req, res, ctx) => {
-    return res(
-      ctx.data({
+  graphql.mutation('UpdateDiscussionEntry', ({variables}) => {
+    return HttpResponse.json({
+      data: {
         updateDiscussionEntry: {
           discussionEntry: mswAssign(
             {...DiscussionEntry.mock()},
             {
-              id: req.body.variables.discussionEntryId,
-              message: req.body.variables.message,
+              id: variables.discussionEntryId,
+              message: variables.message,
             }
           ),
           errors: null,
           __typename: 'UpdateDiscussionEntryPayload',
         },
-      })
-    )
+      },
+    })
   }),
-  graphql.mutation('UpdateDiscussionEntriesReadState', (req, res, ctx) => {
-    const discussionEntries = req.variables.discussionEntryIds.map(id => ({
+  graphql.mutation('UpdateDiscussionEntriesReadState', ({variables}) => {
+    const discussionEntries = variables.discussionEntryIds.map(id => ({
       ...DiscussionEntry.mock(),
       id,
-      read: req.variables.read,
+      read: variables.read,
     }))
 
-    return res(
-      ctx.data({
+    return HttpResponse.json({
+      data: {
         updateDiscussionEntriesReadState: {
           discussionEntries,
           __typename: 'UpdateDiscussionEntriesReadState',
         },
-      })
-    )
+      },
+    })
   }),
-  graphql.mutation('UpdateDiscussionReadState', (req, res, ctx) => {
-    return res(
-      ctx.data({
+  graphql.mutation('UpdateDiscussionReadState', () => {
+    return HttpResponse.json({
+      data: {
         updateDiscussionReadState: {
           discussionTopic: Discussion.mock(),
           __typename: 'UpdateDiscussionReadStatePayload',
         },
-      })
-    )
+      },
+    })
   }),
 ]

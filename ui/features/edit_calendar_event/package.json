@@ -1,5 +1,6 @@
 {
   "name": "@canvas-features/edit_calendar_event",
   "private": true,
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "owner": "LF"
 }

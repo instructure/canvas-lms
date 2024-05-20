@@ -18,13 +18,13 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import tz from '@canvas/timezone'
-import htmlEscape from 'html-escape'
+import * as tz from '../index'
+import htmlEscape from '@instructure/html-escape'
 import * as dateFunctions from '../date-functions'
 import {changeTimezone} from '../changeTimezone'
 import DatetimeField from './DatetimeField'
 import renderDatepickerTime from '../react/components/render-datepicker-time'
-import '@canvas/keycodes'
+import '@canvas/jquery-keycodes'
 import 'jqueryui/datepicker'
 
 const I18n = useI18nScope('instructure_date_and_time')
@@ -123,7 +123,7 @@ $.fn.datepicker = function (options) {
       let numericHr = parseInt(hr || '0', 10)
       const numericMin = parseInt(min || '0', 10)
 
-      if (tz.hasMeridian()) {
+      if (tz.hasMeridiem()) {
         let isPM = numericHr > 12 // definitely PM if the hour value is past noon
         numericHr %= 12
 
@@ -151,7 +151,7 @@ $.fn.datepicker = function (options) {
     $input.val(formatter.format(inputdate)).change()
   }
   if (!$.fn.datepicker.timepicker_initialized) {
-    $(document).delegate('.ui-datepicker-ok', 'click', () => {
+    $(document).on('click', '.ui-datepicker-ok', () => {
       const cur = $.datepicker._curInst
       const inst = cur
       const sel = $(
@@ -167,7 +167,7 @@ $.fn.datepicker = function (options) {
       }
     })
     $(document)
-      .delegate('.ui-datepicker-time-hour', 'change keypress focus blur', function (event) {
+      .on('change keypress focus blur', '.ui-datepicker-time-hour', function (event) {
         const cur = $.datepicker._curInst
         if (cur) {
           const $this = $(this)
@@ -188,30 +188,30 @@ $.fn.datepicker = function (options) {
           cur.input.data('time-hour', val)
         }
       })
-      .delegate('.ui-datepicker-time-minute', 'change keypress focus blur', function () {
+      .on('change keypress focus blur', '.ui-datepicker-time-minute', function () {
         const cur = $.datepicker._curInst
         if (cur) {
           const val = $(this).val()
           cur.input.data('time-minute', val)
         }
       })
-      .delegate('.ui-datepicker-time-ampm', 'change keypress focus blur', function () {
+      .on('change keypress focus blur', '.ui-datepicker-time-ampm', function () {
         const cur = $.datepicker._curInst
         if (cur) {
           const val = $(this).val()
           cur.input.data('time-ampm', val)
         }
       })
-    $(document).delegate(
-      '.ui-datepicker-time-hour,.ui-datepicker-time-minute,.ui-datepicker-time-ampm',
+    $(document).on(
       'mousedown',
+      '.ui-datepicker-time-hour,.ui-datepicker-time-minute,.ui-datepicker-time-ampm',
       function () {
         $(this).focus()
       }
     )
-    $(document).delegate(
-      '.ui-datepicker-time-hour,.ui-datepicker-time-minute,.ui-datepicker-time-ampm',
+    $(document).on(
       'change keypress focus blur',
+      '.ui-datepicker-time-hour,.ui-datepicker-time-minute,.ui-datepicker-time-ampm',
       event => {
         if (event.keyCode && event.keyCode === 13) {
           const cur = $.datepicker._curInst

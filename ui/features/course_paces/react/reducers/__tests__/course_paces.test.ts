@@ -17,8 +17,8 @@
  */
 
 import moment from 'moment-timezone'
-import {CoursePace} from '../../types'
-import {BlackoutDate} from '../../shared/types'
+import type {CoursePace} from '../../types'
+import type {BlackoutDate} from '../../shared/types'
 import {
   getBlackoutDateChanges,
   getPaceName,

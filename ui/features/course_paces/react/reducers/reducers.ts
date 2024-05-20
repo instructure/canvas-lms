@@ -18,7 +18,7 @@
 
 import {combineReducers} from 'redux'
 
-import {StoreState} from '../types'
+import type {StoreState} from '../types'
 import coursePacesReducer from './course_paces'
 import {courseReducer} from './course'
 import {sectionsReducer} from './sections'

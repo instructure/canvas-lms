@@ -22,13 +22,13 @@ import userEvent from '@testing-library/user-event'
 import {DEFAULT_SETTINGS} from '../../../svg/constants'
 import {TextSection} from '../TextSection'
 
-function selectOption(button, option) {
-  userEvent.click(
+const selectOption = async (button, option) => {
+  await userEvent.click(
     screen.getByRole('combobox', {
       name: button,
     })
   )
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('option', {
       name: option,
     })
@@ -74,10 +74,10 @@ describe('<TextSection />', () => {
     )
   })
 
-  it('changes the icon text size', () => {
+  it('changes the icon text size', async () => {
     const onChange = jest.fn()
     render(<TextSection settings={{...DEFAULT_SETTINGS}} onChange={onChange} />)
-    selectOption(/text size/i, /medium/i)
+    await selectOption(/text size/i, /medium/i)
     expect(onChange).toHaveBeenCalledWith({textSize: 'medium'})
   })
 
@@ -97,10 +97,10 @@ describe('<TextSection />', () => {
     expect(onChange).toHaveBeenCalledWith({textBackgroundColor: '#0f0'})
   })
 
-  it('changes the icon text position', () => {
+  it('changes the icon text position', async () => {
     const onChange = jest.fn()
     render(<TextSection settings={{...DEFAULT_SETTINGS}} onChange={onChange} />)
-    selectOption(/text position/i, /bottom third/i)
+    await selectOption(/text position/i, /bottom third/i)
     expect(onChange).toHaveBeenCalledWith({textPosition: 'bottom-third'})
   })
 })

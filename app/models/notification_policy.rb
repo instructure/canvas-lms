@@ -139,12 +139,7 @@ class NotificationPolicy < ActiveRecord::Base
         np = communication_channel.notification_policies.where(notification_id: notification).first
         unless np
           np = communication_channel.notification_policies.build(notification:)
-          frequency ||= if communication_channel == communication_channel.user.communication_channel
-                          notification.default_frequency(communication_channel.user)
-                        else
-                          "never"
-                        end
-
+          frequency ||= notification.default_frequency(communication_channel.user) || "never"
         end
         if frequency
           np.frequency = frequency
@@ -169,26 +164,40 @@ class NotificationPolicy < ActiveRecord::Base
           end
           next
         end
-        np = nil
-        NotificationPolicy.transaction(requires_new: true) do
-          np = communication_channel.notification_policies.build(notification:)
-          np.frequency = if frequencies[notification]
-                           frequencies[notification]
-                         elsif communication_channel == communication_channel.user.communication_channel
-                           notification.default_frequency(communication_channel.user)
-                         else
-                           "never"
-                         end
-          np.save!
-        rescue ActiveRecord::RecordNotUnique, ActiveRecord::InvalidForeignKey
-          np = nil
-          raise ActiveRecord::Rollback
-        end
-        np ||= communication_channel.notification_policies.where(notification_id: notification).first
-        policies << np
+        np = create_notification_policies_for_channel(communication_channel, notification, frequencies)
+        policies << np if np
       end
       policies = policies.select { |np| np.notification&.is_course_type? } if context_type == "Course"
       policies
     end
+  end
+
+  # frequencies is an optional hash; key is notification_name (underscore)
+  def self.build_policies_for_channel(communication_channel, frequencies = {})
+    # If a communication channel already has notification_policies, return them.
+    return communication_channel.notification_policies if communication_channel.notification_policies.exists?
+
+    policies = []
+
+    # Fetch all notifications and create policies for them.
+    Notification.all_cached.each do |notification|
+      np = create_notification_policies_for_channel(communication_channel, notification, frequencies)
+      policies << np if np
+    end
+    policies
+  end
+
+  def self.create_notification_policies_for_channel(communication_channel, notification, frequencies)
+    np = nil
+    NotificationPolicy.transaction(requires_new: true) do
+      np = communication_channel.notification_policies.build(notification:)
+      np.frequency = (frequencies[notification] || notification.default_frequency(communication_channel.user) || "never")
+      np.save!
+    rescue ActiveRecord::RecordNotUnique, ActiveRecord::InvalidForeignKey
+      np = nil
+      raise ActiveRecord::Rollback
+    end
+    np ||= communication_channel.notification_policies.where(notification_id: notification).first
+    np
   end
 end

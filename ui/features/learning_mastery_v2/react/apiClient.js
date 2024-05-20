@@ -31,3 +31,13 @@ export const loadRollups = (courseId, gradebookFilters, needDefaults = false, pa
   }
   return axios.get(`/api/v1/courses/${courseId}/outcome_rollups`, params)
 }
+
+export const exportCSV = (courseId, gradebookFilters) => {
+  const params = {
+    params: {
+      exclude: gradebookFilters,
+    },
+  }
+
+  return axios.get(`/courses/${courseId}/outcome_rollups.csv`, params)
+}

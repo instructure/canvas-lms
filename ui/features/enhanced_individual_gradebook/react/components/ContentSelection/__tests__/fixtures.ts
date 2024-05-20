@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {SortableAssignment} from 'features/enhanced_individual_gradebook/types'
-import {ContentSelectionComponentProps} from '..'
+import type {SortableAssignment} from 'features/enhanced_individual_gradebook/types'
+import type {ContentSelectionComponentProps} from '..'
 import {defaultGradebookOptions} from '../../__tests__/fixtures'
 
 export const defaultContentSelectionProps: ContentSelectionComponentProps = {

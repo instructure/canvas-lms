@@ -20,7 +20,7 @@ import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/commMessagesContentPane.handlebars'
 import overviewTemplate from '../../jst/commMessagesSearchOverview.handlebars'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 
 const I18n = useI18nScope('comm_messages')
 

@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
-import {ExportProgressBar, ExportProgressBarProps} from '../ExportProgressBar'
+import {ExportProgressBar, type ExportProgressBarProps} from '../ExportProgressBar'
 import {render, fireEvent} from '@testing-library/react'
 import GradebookExportManager from '../../../shared/GradebookExportManager'
 

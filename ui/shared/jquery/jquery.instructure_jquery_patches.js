@@ -17,7 +17,10 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import getCookie from '@instructure/get-cookie'
+
+$.migrateMute = true
 
 // this is a patch so you can set the "method" atribute on rails' REST-ful forms.
 $.attrHooks.method = $.extend($.attrHooks.method, {

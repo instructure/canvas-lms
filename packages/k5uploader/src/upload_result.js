@@ -16,37 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import XmlParser from './xml_parser'
-
 function UploadResult() {
   this.xml = undefined
   this.isError = true
   this.token = undefined
   this.filename = ''
   this.fileId = -1
-  this.xmlParser = new XmlParser()
 }
 
-UploadResult.prototype.parseXML = function(xml) {
-  const $xml = this.xmlParser.parseXML(xml)
-  this.isError = this.xmlParser.isError
-  if (!this.xmlParser.isError) {
+UploadResult.prototype.parseXML = function (xml) {
+  const parser = new DOMParser()
+  this.xml = parser.parseFromString(xml, 'application/xml')
+  this.isError = !!(this.xml.querySelector('error') && this.xml.querySelector('error').children && this.xml.querySelector('error').children.length)
+  if (!this.isError) {
     this.pullData()
   }
 }
 
-UploadResult.prototype.pullData = function() {
-  const $resultOk = this.xmlParser.find('result_ok')
-  this.token = this.xmlParser.nodeText('token', $resultOk, true)
-  this.fileId = this.xmlParser.nodeText('filename', $resultOk, true)
-  this.filename = this.xmlParser.nodeText('origFilename', $resultOk)
+UploadResult.prototype.pullData = function () {
+  const resultOk = this.xml.querySelector('result_ok')
+  if (resultOk) {
+    this.token = resultOk.querySelector('token') && resultOk.querySelector('token').textContent
+    this.fileId = resultOk.querySelector('filename') && resultOk.querySelector('filename').textContent
+    this.filename = resultOk.querySelector('origFilename') && resultOk.querySelector('origFilename').textContent
+  }
 }
 
-UploadResult.prototype.asEntryParams = function() {
+UploadResult.prototype.asEntryParams = function () {
   return {
     entry1_name: this.filename,
     entry1_filename: this.fileId,
-    entry1_realFilename: this.filename
+    entry1_realFilename: this.filename,
   }
 }
 

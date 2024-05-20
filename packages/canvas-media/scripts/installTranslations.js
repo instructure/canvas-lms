@@ -26,7 +26,7 @@
  * The output from this script gets checked in.
  */
 
-/* eslint-disable import/no-extraneous-dependencies, no-console */
+/* eslint-disable no-console */
 
 const fs = require('fs')
 const path = require('path')

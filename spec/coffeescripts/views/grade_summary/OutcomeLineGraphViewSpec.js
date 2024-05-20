@@ -17,11 +17,12 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import {isUndefined} from 'lodash'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
 import OutcomeResultCollection from 'ui/features/grade_summary/backbone/collections/OutcomeResultCollection'
 import OutcomeLineGraphView from 'ui/features/grade_summary/backbone/views/OutcomeLineGraphView'
-import tz from '@canvas/timezone'
+import * as tz from '@canvas/datetime'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('OutcomeLineGraphViewSpec', {
@@ -68,14 +69,22 @@ test('#initialize', function () {
     this.outcomeLineGraphView.collection instanceof OutcomeResultCollection,
     'should have an OutcomeResultCollection'
   )
-  ok(!this.outcomeLineGraphView.deferred.isResolved(), 'should have unresolved promise')
+  notStrictEqual(
+    this.outcomeLineGraphView.deferred.state(),
+    'resolved',
+    'should have unresolved promise'
+  )
   this.outcomeLineGraphView.collection.trigger('fetched:last')
-  ok(this.outcomeLineGraphView.deferred.isResolved(), 'should resolve promise on fetched:last')
+  strictEqual(
+    this.outcomeLineGraphView.deferred.state(),
+    'resolved',
+    'should resolve promise on fetched:last'
+  )
 })
 
 test('render', function () {
   const renderSpy = sandbox.spy(this.outcomeLineGraphView, 'render')
-  ok(!this.outcomeLineGraphView.deferred.isResolved(), 'precondition')
+  notStrictEqual(this.outcomeLineGraphView.deferred.state(), 'resolved', 'precondition')
   ok(this.outcomeLineGraphView.render())
   ok(isUndefined(this.outcomeLineGraphView.svg), 'should not render svg if promise is unresolved')
   this.outcomeLineGraphView.collection.trigger('fetched:last')

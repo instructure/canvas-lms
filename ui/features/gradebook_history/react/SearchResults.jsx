@@ -20,7 +20,7 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {arrayOf, bool, func, node, shape, string} from 'prop-types'
 import $ from 'jquery'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -131,7 +131,7 @@ class SearchResultsComponent extends Component {
         <Table.Head>
           <Table.Row>
             {colHeaders.map(header => (
-              <Table.ColHeader key={`${header}-column`}>{header}</Table.ColHeader>
+              <Table.ColHeader key={`${header}-column`} id={`${header}-column`}>{header}</Table.ColHeader>
             ))}
           </Table.Row>
         </Table.Head>

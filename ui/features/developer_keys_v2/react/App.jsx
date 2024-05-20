@@ -31,9 +31,9 @@ import AdminTable from './AdminTable'
 import InheritedTable from './InheritedTable'
 import DeveloperKey from './DeveloperKey'
 import NewKeyModal from './NewKeyModal'
-import DeveloperKeyModalTrigger from './NewKeyTrigger'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import DateHelper from '@canvas/datetime/dateHelper'
+import {DynamicRegistrationModal} from './dynamic_registration/DynamicRegistrationModal'
 
 const I18n = useI18nScope('react_developer_keys')
 /**
@@ -63,16 +63,8 @@ class DeveloperKeysApp extends React.Component {
     this.inheritedTableRef = node
   }
 
-  setAddKeyButtonRef = node => {
-    this.addDevKeyButton = node
-  }
-
   setInheritedTabRef = node => {
     this.inheritedTab = node
-  }
-
-  focusDevKeyButton = () => {
-    this.addDevKeyButton.focus()
   }
 
   focusInheritedTab = () => {
@@ -136,67 +128,6 @@ class DeveloperKeysApp extends React.Component {
     this.setState({selectedTab: id})
   }
 
-  buildDevKeyOIDCText(_features) {
-    const today = new Date()
-    const changeDate = new Date(1692460800000) // August 19, 2023 at 16:00:00 UTC
-    const formattedDate = DateHelper.formatDateForDisplay(changeDate)
-    const footer = I18n.t(
-      '*This Canvas Community article* details the reasoning behind this change, its scope, exact directions for what to change, and further clarification for both Canvas admins and LTI 1.3 tool developers.',
-      {
-        wrappers: [
-          `<a href="https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677">$1</a>`,
-        ],
-      }
-    )
-    const makeAlertMsg = (testid, paragraphs) => {
-      return (
-        <div data-testid={testid}>
-          {paragraphs.map(paragraph => (
-            <View as="div" margin="small" key={paragraph.toString().slice(0, 10)}>
-              <Text dangerouslySetInnerHTML={{__html: paragraph}} />
-            </View>
-          ))}
-        </div>
-      )
-    }
-
-    const boldMarkup = '<strong>$1</strong>'
-    if (changeDate > today) {
-      const firstParagraph = I18n.t(
-        'On %{date}, the LTI 1.3 Platform Storage specification will be fully supported by Canvas. Tools wishing to implement this must change the OIDC Auth endpoint they store for Canvas from *https://canvas.instructure.com/api/lti/authorize_redirect* to *https://sso.canvaslms.com/api/lti/authorize_redirect*. The OIDC Auth endpoint recommended for new 1.3 tool installations will also change on that day, and we recommend that all 1.3 tools switch their configuration to use this new endpoint as soon as they can.',
-        {
-          date: formattedDate,
-          wrappers: [boldMarkup, boldMarkup],
-        }
-      )
-
-      const secondParagraph = I18n.t(
-        'This is *not* a breaking change. All LTI 1.3 tool behavior will remain the same regardless of the endpoint used, with the exception of the newly-supported Platform Storage spec. This also does **not** need to be completed before %{date}. Enforcement of this change will happen on a later, unspecified date.',
-        {
-          date: formattedDate,
-          wrappers: [boldMarkup, boldMarkup],
-        }
-      )
-
-      return makeAlertMsg('preFlipText', [firstParagraph, secondParagraph, footer])
-    } else {
-      const firstParagraph = I18n.t(
-        'As of %{date}, the LTI 1.3 Platform Storage specification is fully supported by Canvas. Tools wishing to implement this must change the OIDC Auth endpoint they store for Canvas from *https://canvas.instructure.com/api/lti/authorize_redirect* to *https://sso.canvaslms.com/api/lti/authorize_redirect*. The OIDC Auth endpoint recommended for new 1.3 tool installations has also changed, and we recommend that all 1.3 tools switch their configuration to use this new endpoint as soon as they can.',
-        {
-          date: formattedDate,
-          wrappers: [boldMarkup, boldMarkup],
-        }
-      )
-
-      const secondParagraph = I18n.t(
-        'This is *not* a breaking change. All LTI 1.3 tool behavior will remain the same regardless of the endpoint used, with the exception of the newly-supported Platform Storage spec. Enforcement of this change will happen on a later, unspecified date.',
-        {wrappers: [boldMarkup, boldMarkup]}
-      )
-
-      return makeAlertMsg('postFlipText', [firstParagraph, secondParagraph, footer])
-    }
-  }
-
   /**
    * Due to some annoying accessibility issues related to modal focus
    * returning and screenreader issues, we have to use a setTimeout here
@@ -208,9 +139,15 @@ class DeveloperKeysApp extends React.Component {
    * workaround and do it.
    * @todo Find a better way to avoid modal-focus-screenreader-bulldozing so
    * this isn't necessary.
+   * @param {string} warningMessage - A warning message to show to the user.
    */
-  developerKeySaveSuccessfulHandler() {
-    setTimeout(showFlashSuccess(I18n.t('Save successful.')), ALERT_WAIT_TIME)
+  developerKeySaveSuccessfulHandler(warningMessage) {
+    setTimeout(() => {
+      showFlashSuccess(I18n.t('Save successful.'))()
+      if (warningMessage) {
+        showFlashAlert({message: warningMessage, type: 'warning'})
+      }
+    }, ALERT_WAIT_TIME)
   }
 
   render() {
@@ -240,13 +177,6 @@ class DeveloperKeysApp extends React.Component {
         <View as="div" margin="0 0 small 0" padding="none">
           <Heading level="h1">{I18n.t('Developer Keys')}</Heading>
         </View>
-        {ENV?.FEATURES?.dev_key_oidc_alert && (
-          <div data-testid="OIDC_alert">
-            <Alert variant="info" margin="small">
-              {this.buildDevKeyOIDCText(ENV.FEATURES)}
-            </Alert>
-          </div>
-        )}
         <Tabs
           onRequestTabChange={this.changeTab.bind(this)}
           shouldFocusOnRender={this.state.focusTab}
@@ -256,11 +186,6 @@ class DeveloperKeysApp extends React.Component {
             id="tab-panel-account"
             isSelected={tab === 'tab-panel-account'}
           >
-            <DeveloperKeyModalTrigger
-              store={store}
-              actions={actions}
-              setAddKeyButtonRef={this.setAddKeyButtonRef}
-            />
             <NewKeyModal
               store={store}
               actions={actions}
@@ -271,6 +196,7 @@ class DeveloperKeysApp extends React.Component {
               ctx={ctx}
               handleSuccessfulSave={this.developerKeySaveSuccessfulHandler}
             />
+            <DynamicRegistrationModal contextId={this.props.ctx.params.contextId} store={store} />
             <AdminTable
               ref={this.setMainTableRef}
               store={store}

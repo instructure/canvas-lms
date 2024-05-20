@@ -39,14 +39,15 @@ describe DataFixup::ResendPlagiarismEvents do
   describe "#run" do
     context "when only_errors is not provided" do
       it "sends events for submissions with no originality report and pending originality reports" do
-        Setting.set("trigger_plagiarism_resubmit", "1,10")
+        stub_const("DataFixup::ResendPlagiarismEvents::RESUBMIT_LIMIT", 1)
+
         Timecop.freeze do
           DataFixup::ResendPlagiarismEvents.run
           djs = Delayed::Job.where(tag: "DataFixup::ResendPlagiarismEvents.trigger_plagiarism_resubmit_by_time").order(:id)
           expect(djs.count).to eq 2
           expect(djs.map { |j| j.payload_object.args }).to eq([[@submission_two.submitted_at, Time.zone.now, false],
                                                                [@submission.submitted_at, @submission_two.submitted_at, false]])
-          expect(djs.map(&:run_at)).to eq([10.seconds.from_now, 1.year.from_now])
+          expect(djs.map(&:run_at)).to eq([3.minutes.from_now, 1.year.from_now])
         end
       end
     end
@@ -80,7 +81,8 @@ describe DataFixup::ResendPlagiarismEvents do
 
   describe "#trigger_plagiarism_resubmit_by_id" do
     it "triggers the next job in the batch after it finishes" do
-      Setting.set("trigger_plagiarism_resubmit", "1,10")
+      stub_const("DataFixup::ResendPlagiarismEvents::RESUBMIT_LIMIT", 1)
+      stub_const("DataFixup::ResendPlagiarismEvents::RESUBMIT_WAIT_TIME", 10.seconds)
       dj = Delayed::Job.create(strand: "plagiarism_event_resend", locked_at: nil, run_at: 1.year.from_now)
       expect(Canvas::LiveEvents).to receive(:post_event_stringified).twice.with("plagiarism_resubmit", anything, anything)
       DataFixup::ResendPlagiarismEvents.trigger_plagiarism_resubmit_by_time(1.month.ago, Time.zone.now)

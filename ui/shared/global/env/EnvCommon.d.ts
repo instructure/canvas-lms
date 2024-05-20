@@ -41,6 +41,20 @@ type Role = {
   plural_label: string
 }
 
+export type GroupOutcome = {
+  id: string
+  title: string
+  vendor_guid: string
+  url: string
+  subgroups_url: string
+  outcomes_url: string
+  can_edit: boolean
+  import_url: string
+  context_id: string
+  context_type: string
+  description: string
+}
+
 export interface EnvCommon {
   ASSET_HOST: string
   active_brand_config_json_url: string
@@ -66,6 +80,7 @@ export interface EnvCommon {
   COURSE_ROLES: Role[]
   current_user_roles: string[]
   current_user_is_student: boolean
+  current_user_is_admin: boolean
   current_user_types: string[]
   current_user_disabled_inbox: boolean
   current_user_visited_tabs: null | string[]
@@ -75,8 +90,10 @@ export interface EnvCommon {
     id: string
     label: string
   }[]
+  ACCOUNT_ID: string
   DOMAIN_ROOT_ACCOUNT_ID: string
   ROOT_ACCOUNT_ID: string
+  ROOT_OUTCOME_GROUP: GroupOutcome
   k12: false
   help_link_name: string
   help_link_icon: string
@@ -85,14 +102,14 @@ export interface EnvCommon {
   disable_celebrations: boolean
   disable_keyboard_shortcuts: boolean
   LTI_LAUNCH_FRAME_ALLOWANCES: string[]
+  LTI_TOOL_SCOPES?: {[key: string]: string[]}
   DEEP_LINKING_POST_MESSAGE_ORIGIN: string
-  DEEP_LINKING_LOGGING: null | unknown
   comment_library_suggestions_enabled: boolean
   INCOMPLETE_REGISTRATION: boolean
   SETTINGS: Record<Setting, boolean>
-  FULL_STORY_ENABLED: boolean
   RAILS_ENVIRONMENT: 'development' | 'CD' | 'Beta' | 'Production' | string
   IN_PACED_COURSE: boolean
+  PARSE_LINK_HEADER_THROW_ON_MAXLEN_EXCEEDED?: boolean
   PREFERENCES?: {
     hide_dashcard_color_overlays: boolean
     custom_colors: unknown
@@ -133,7 +150,6 @@ export interface EnvCommon {
     revision: string
   }
 
-  API_GATEWAY_URI?: string
   DATA_COLLECTION_ENDPOINT?: string
 
   /**
@@ -192,49 +208,51 @@ export interface EnvCommon {
     type?: string
     classes?: string
   }>
+  breadcrumbs: {name: string; url: string}[]
 }
 
 /**
  * From ApplicationController#JS_ENV_SITE_ADMIN_FEATURES
  */
 export type SiteAdminFeatureId =
-  | 'featured_help_links'
-  | 'lti_platform_storage'
-  | 'calendar_series'
-  | 'account_level_blackout_dates'
   | 'account_calendar_events'
-  | 'instui_nav'
-  | 'render_both_to_do_lists'
-  | 'course_paces_redesign'
+  | 'account_level_blackout_dates'
   | 'course_paces_for_students'
-  | 'module_publish_menu'
-  | 'explicit_latex_typesetting'
-  | 'dev_key_oidc_alert'
-  | 'media_links_use_attachment_id'
-  | 'permanent_page_links'
+  | 'course_paces_redesign'
   | 'differentiated_modules'
   | 'enhanced_course_creation_account_fetching'
-  | 'instui_for_import_page'
   | 'enhanced_rubrics'
+  | 'explicit_latex_typesetting'
+  | 'featured_help_links'
+  | 'instui_for_import_page'
+  | 'instui_nav'
+  | 'media_links_use_attachment_id'
+  | 'multiselect_gradebook_filters'
+  | 'permanent_page_links'
+  | 'platform_service_speedgrader'
+  | 'render_both_to_do_lists'
+  | 'instui_header'
+  | 'lti_registrations_discover_page'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
  */
 export type RootAccountFeatureId =
-  | 'product_tours'
-  | 'usage_rights_discussion_topics'
-  | 'granular_permissions_manage_users'
+  | 'buttons_and_icons_root_account'
   | 'create_course_subaccount_picker'
+  | 'extended_submission_state'
+  | 'granular_permissions_manage_users'
+  | 'instui_nav'
   | 'lti_deep_linking_module_index_menu_modal'
+  | 'lti_dynamic_registration'
   | 'lti_multiple_assignment_deep_linking'
   | 'lti_overwrite_user_url_input_select_content_dialog'
-  | 'buttons_and_icons_root_account'
-  | 'extended_submission_state'
+  | 'mobile_offline_mode'
+  | 'product_tours'
+  | 'rce_transform_loaded_content'
   | 'scheduled_page_publication'
   | 'send_usage_metrics'
-  | 'rce_transform_loaded_content'
-  | 'mobile_offline_mode'
-  | 'instui_nav'
+  | 'usage_rights_discussion_topics'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES

@@ -18,30 +18,22 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useEffect, useState} from 'react'
-import {debounce, groupBy} from 'lodash'
+import {groupBy} from 'lodash'
 
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-import {TextInput} from '@instructure/ui-text-input'
-import {SimpleSelect} from '@instructure/ui-simple-select'
-import {IconSearchLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Flex} from '@instructure/ui-flex'
-import {Button} from '@instructure/ui-buttons'
 
 import useFetchApi from '@canvas/use-fetch-api-hook'
+import FilterBar from '@canvas/filter-bar'
 import FeatureFlagTable from './FeatureFlagTable'
 import * as flagUtils from './util'
 
 const I18n = useI18nScope('feature_flags')
 
-const SEARCH_DELAY = 350
-
 export default function FeatureFlags({hiddenFlags, disableDefaults}) {
   const [isLoading, setLoading] = useState(false)
   const [features, setFeatures] = useState([])
   const [groupedFeatures, setGroupedFeatures] = useState()
-  const [searchInput, setSearchInput] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [stateFilter, setStateFilter] = useState('all')
 
@@ -112,71 +104,22 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
     },
   ]
 
-  const updateSearchQuery = debounce(setSearchQuery, SEARCH_DELAY, {
-    leading: false,
-    trailing: true,
-  })
-
-  const acceptSearchInput = (_e, val) => {
-    setSearchInput(val)
-    if (val !== searchInput && val.length > 2) {
-      updateSearchQuery(val)
-    } else if (val.length === 0) {
-      updateSearchQuery('')
-    }
-  }
-
-  const updateStateFilter = (_e, val) => setStateFilter(val.value)
-
-  const clearFilters = () => {
-    setSearchQuery('')
-    setSearchInput('')
-    setStateFilter('all')
-  }
-
   return (
     <View as="div">
       {isLoading ? (
         <Spinner renderTitle={I18n.t('Loading feature options')} />
       ) : (
         <>
-          <Flex justifyItems="start">
-            <Flex.Item padding="small">
-              <SimpleSelect
-                assistiveText={I18n.t('Use arrow keys to navigate options.')}
-                renderLabel={<ScreenReaderContent>{I18n.t('Filter by')}</ScreenReaderContent>}
-                onChange={updateStateFilter}
-                width="10rem"
-                value={stateFilter}
-              >
-                <SimpleSelect.Option id="All" value="all">
-                  {I18n.t('All')}
-                </SimpleSelect.Option>
-                <SimpleSelect.Option id="Enabled" value="enabled">
-                  {I18n.t('Enabled')}
-                </SimpleSelect.Option>
-                <SimpleSelect.Option id="Disabled" value="disabled">
-                  {I18n.t('Disabled')}
-                </SimpleSelect.Option>
-              </SimpleSelect>
-            </Flex.Item>
-            <Flex.Item padding="small">
-              <TextInput
-                renderLabel={<ScreenReaderContent>{I18n.t('Search Features')}</ScreenReaderContent>}
-                placeholder={I18n.t('Search by name or id')}
-                type="search"
-                value={searchInput}
-                onChange={acceptSearchInput}
-                renderBeforeInput={<IconSearchLine inline={false} />}
-                display="inline-block"
-              />
-            </Flex.Item>
-            <Flex.Item padding="small">
-              <Button color="primary" onClick={clearFilters}>
-                {I18n.t('Clear')}
-              </Button>
-            </Flex.Item>
-          </Flex>
+          <FilterBar
+            filterOptions={[
+              {value: 'enabled', text: I18n.t('Enabled')},
+              {value: 'disabled', text: I18n.t('Disabled')},
+            ]}
+            onFilter={setStateFilter}
+            onSearch={setSearchQuery}
+            searchPlaceholder={I18n.t('Search by name or id')}
+            searchScreenReaderLabel={I18n.t('Search Features')}
+          />
 
           {categories.map(cat => {
             if (!groupedFeatures?.[cat.id]?.length) {

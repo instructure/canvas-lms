@@ -87,7 +87,7 @@ class Login::SamlController < ApplicationController
 
     assertion = response.assertions.first
     # yes, they could be _that_ busted that we put a dangling rescue here.
-    provider_attributes = assertion&.attribute_statements&.first&.to_h || {} rescue {}
+    provider_attributes = assertion&.attribute_statements&.first.to_h rescue {}
     subject_name_id = assertion&.subject&.name_id
     unique_id = if aac.login_attribute == "NameID"
                   subject_name_id&.id

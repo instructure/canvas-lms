@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from '@instructure/lodash-underscore'
+import {find} from 'lodash'
 
-const find = _.find
 const RE_EXTRACT_LINK = /<([^>]+)>; rel="([^"]+)",?\s*/g
 const RE_EXTRACT_PP = /per_page=(\d+)/
 

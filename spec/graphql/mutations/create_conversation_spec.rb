@@ -212,6 +212,92 @@ RSpec.describe Mutations::CreateConversation do
     ).to eq "Unable to send messages to users in #{@course.name}"
   end
 
+  context "soft-concluded course with with active enrollment overrides" do
+    before do
+      course_with_student(active_all: true)
+      @course.enrollment_term.start_at = 2.days.ago
+      @course.enrollment_term.end_at = 1.day.ago
+      @course.restrict_student_future_view = true
+      @course.restrict_student_past_view = true
+      @course.enrollment_term.set_overrides(Account.default, "TeacherEnrollment" => { start_at: 1.day.ago, end_at: 2.days.from_now })
+      @course.enrollment_term.set_overrides(Account.default, "StudentEnrollment" => { start_at: 1.day.ago, end_at: 2.days.from_now })
+      @course.save!
+      @course.enrollment_term.save!
+    end
+
+    it "allows a student to create a new conversation in soft_concluded course if enrollment override is active" do
+      expect(@course.soft_concluded?).to be_truthy
+      result = run_mutation(recipients: [@teacher.id.to_s], body: "yo", context_code: @course.asset_string)
+      expect(result.dig("data", "createConversation", "errors")).to be_nil
+      expect(
+        result.dig("data", "createConversation", "conversations", 0, "conversation", "conversationMessagesConnection", "nodes", 0, "body")
+      ).to eq "yo"
+    end
+
+    it "allows a teacher to create a new conversation in soft_concluded course if enrollment override is active" do
+      expect(@course.soft_concluded?).to be_truthy
+      result = run_mutation({ recipients: [@student.id.to_s], body: "yo", context_code: @course.asset_string }, @teacher)
+      expect(result.dig("data", "createConversation", "errors")).to be_nil
+      expect(
+        result.dig("data", "createConversation", "conversations", 0, "conversation", "conversationMessagesConnection", "nodes", 0, "body")
+      ).to eq "yo"
+    end
+  end
+
+  context "soft concluded course with non-concluded section override" do
+    before do
+      @student1 = course_with_student(active_all: true).user
+      @student2 = course_with_student(active_all: true).user
+      @course.start_at = 2.days.ago
+      @course.conclude_at = 1.day.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+
+      @my_section = @course.course_sections.create!(name: "test section")
+      @my_section.start_at = 1.day.ago
+      @my_section.end_at = 5.days.from_now
+      @my_section.restrict_enrollments_to_section_dates = true
+      @my_section.save!
+
+      @course.enroll_student(@student1,
+                             allow_multiple_enrollments: true,
+                             enrollment_state: "active",
+                             section: @my_section)
+
+      @course.enroll_teacher(@teacher,
+                             allow_multiple_enrollments: true,
+                             enrollment_state: "active",
+                             section: @my_section)
+    end
+
+    it "allows a student to create a new conversation in soft_concluded course if section override is active" do
+      expect(@course.soft_concluded?).to be_truthy
+      result = run_mutation({ recipients: [@teacher.id.to_s], body: "yo", context_code: @course.asset_string }, @student1)
+      expect(result.dig("data", "createConversation", "errors")).to be_nil
+      expect(
+        result.dig("data", "createConversation", "conversations", 0, "conversation", "conversationMessagesConnection", "nodes", 0, "body")
+      ).to eq "yo"
+    end
+
+    it "allows a teacher to create a new conversation in soft_concluded course if section override is active" do
+      expect(@course.soft_concluded?).to be_truthy
+      result = run_mutation({ recipients: [@student1.id.to_s], body: "yo", context_code: @course.asset_string }, @teacher)
+      expect(result.dig("data", "createConversation", "errors")).to be_nil
+      expect(
+        result.dig("data", "createConversation", "conversations", 0, "conversation", "conversationMessagesConnection", "nodes", 0, "body")
+      ).to eq "yo"
+    end
+
+    it "does not allow a student that is not part of the section override to send messages" do
+      expect(@course.soft_concluded?).to be_truthy
+      result = run_mutation({ recipients: [@student.id.to_s], body: "yo", context_code: @course.asset_string }, @student2)
+      expect(result.dig("data", "createConversation", "conversations")).to be_nil
+      expect(
+        result.dig("data", "createConversation", "errors", 0, "message")
+      ).to eq "Unable to send messages to users in #{@course.name}"
+    end
+  end
+
   it "does not allow creating conversations in soft concluded courses for students" do
     @course.soft_conclude!
     @course.save

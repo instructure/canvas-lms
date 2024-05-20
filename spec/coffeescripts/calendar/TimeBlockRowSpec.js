@@ -17,11 +17,12 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import TimeBlockList from 'ui/features/calendar/jquery/TimeBlockList'
 import TimeBlockRow from 'ui/features/calendar/jquery/TimeBlockRow'
-import tz from '@canvas/timezone'
-import tzInTest from '@canvas/timezone/specHelpers'
+import * as tz from '@canvas/datetime'
+import tzInTest from '@canvas/datetime/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'

@@ -161,6 +161,22 @@ export default class TrayController {
     this._editor = null
   }
 
+  requestSubtitlesFromIframe(cb) {
+    if (!bridge.canvasOrigin) return
+
+    this._subtitleListener = new AbortController()
+    window.addEventListener('message', (event) => {
+      if (event?.data?.subject === "media_tracks_response") {
+        cb(event?.data?.payload)
+      }
+    }, {signal: this._subtitleListener.signal})
+
+    this.$videoContainer?.contentWindow?.postMessage(
+      {subject: 'media_tracks_request'},
+      bridge.canvasOrigin
+    )
+  }
+
   _renderTray(trayProps) {
     let vo = {}
 
@@ -185,6 +201,7 @@ export default class TrayController {
         onExited={() => {
           bridge.focusActiveEditor(false)
           this._isOpen = false
+          this._subtitleListener?.abort()
         }}
         onSave={videoOptions => {
           this._applyVideoOptions(videoOptions)
@@ -197,6 +214,7 @@ export default class TrayController {
             ? parseStudioOptions(this.$videoContainer)
             : null
         }
+        requestSubtitlesFromIframe={(cb) => this.requestSubtitlesFromIframe(cb)}
       />
     )
     ReactDOM.render(element, this.$container)

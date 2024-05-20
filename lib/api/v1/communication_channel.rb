@@ -45,6 +45,7 @@ module Api::V1::CommunicationChannel
     # If the user is super special, show them this channel's bounce details
     if channel.grants_right?(current_user, :read_bounce_details)
       only += %w[
+        bounce_count
         last_bounce_at
         last_transient_bounce_at
         last_suppression_bounce_at

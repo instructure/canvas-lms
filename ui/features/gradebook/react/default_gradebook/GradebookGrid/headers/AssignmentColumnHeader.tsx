@@ -18,7 +18,6 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconMoreSolid, IconOffLine} from '@instructure/ui-icons'
@@ -26,8 +25,6 @@ import {Grid} from '@instructure/ui-grid'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {Menu} from '@instructure/ui-menu'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {ApolloProvider} from 'react-apollo'
-import {createClient} from '@canvas/apollo'
 import {isPostable} from '@canvas/grading/SubmissionHelper'
 import AsyncComponents from '../../AsyncComponents'
 import ColumnHeader from './ColumnHeader'
@@ -35,6 +32,8 @@ import SecondaryDetailLine from './SecondaryDetailLine'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import type {CamelizedAssignment, PartialStudent} from '@canvas/grading/grading.d'
+import {showMessageStudentsWithObserversModal} from '../../../shared/MessageStudentsWithObserversModal'
+import {MSWLaunchContext} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
 const {Separator: MenuSeparator, Item: MenuItem, Group: MenuGroup} = Menu as any
 
@@ -236,31 +235,19 @@ export default class AssignmentColumnHeader extends ColumnHeader<
     }
 
     if (this.props.showMessageStudentsWithObserversDialog) {
-      const mountPoint = document.querySelector(
-        "[data-component='MessageStudentsWithObserversModal']"
-      )
-      if (mountPoint != null) {
-        const MessageStudentsWhoDialog =
-          await AsyncComponents.loadMessageStudentsWithObserversDialog()
-
-        const props = {
-          ...options,
-          onClose: () => {
-            ReactDOM.unmountComponentAtNode(mountPoint)
-            this.focusAtEnd()
-          },
-          onSend: this.handleSendMessageStudentsWho,
-          messageAttachmentUploadFolderId: this.props.messageAttachmentUploadFolderId,
-          userId: this.props.userId,
-        }
-
-        ReactDOM.render(
-          <ApolloProvider client={createClient()}>
-            <MessageStudentsWhoDialog {...props} />
-          </ApolloProvider>,
-          mountPoint
-        )
+      const props = {
+        assignment: options.assignment,
+        launchContext: MSWLaunchContext.ASSIGNMENT_CONTEXT,
+        students: options.students,
+        courseId: options.assignment.courseId,
+        onClose: () => {},
+        onSend: this.handleSendMessageStudentsWho,
+        messageAttachmentUploadFolderId: this.props.messageAttachmentUploadFolderId,
+        userId: this.props.userId,
+        pointsBasedGradingScheme: this.props.pointsBasedGradingScheme,
       }
+
+      showMessageStudentsWithObserversModal(props, this.focusAtEnd)
     } else {
       const MessageStudentsWhoDialog = await AsyncComponents.loadMessageStudentsWhoDialog()
 

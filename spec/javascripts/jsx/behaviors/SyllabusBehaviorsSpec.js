@@ -21,6 +21,7 @@ import Sidebar from '@canvas/rce/Sidebar'
 import editorUtils from 'helpers/editorUtils'
 import fixtures from 'helpers/fixtures'
 import $ from 'jquery'
+import 'jquery-migrate'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 
 QUnit.module('SyllabusBehaviors.bindToEditSyllabus', {
@@ -188,4 +189,26 @@ test('jumps to most recent past event when there are only past events and user c
   $('#testLink').trigger('click')
   ok(!$('#test1').hasClass('selected'))
   ok($('#test2').hasClass('selected'))
+})
+
+test('escapes selector when jumping to event', () => {
+  const restoreFn = $.fn.ifExists
+  const spy = sinon.spy()
+  $.fn.ifExists = spy
+  fixtures.create(
+    // eslint-disable-next-line no-template-curly-in-string
+    '<div class="mini_month"><div class="day_wrapper" id="mini_day_2023_10_31_1"><div class="mini_calendar_day" id="mini_day_2023_10_31_1, id=[<img src=x onerror=\'alert(`${document.domain}:${document.cookie}`)\' />]">Click me to trigger XSS</div></div></div>'
+  )
+  SyllabusBehaviors.bindToMiniCalendar()
+  try {
+    $('.mini_calendar_day').trigger('click')
+  } catch (error) {
+    equal(
+      error?.message,
+      // eslint-disable-next-line no-template-curly-in-string
+      "Syntax error, unrecognized expression: #mini_day_2023_10_31_1, id=[<img src=x onerror='alert(`${document.domain}:${document.cookie}`)' />]",
+      'Expected syntax error for malformed selector in jQuery >= 1.8'
+    )
+  }
+  $.fn.ifExists = restoreFn
 })

@@ -320,9 +320,7 @@ export class WeeklyPlannerHeader extends Component {
               ref={this.todayButtonRef}
               tabIndex={this.getButtonTabIndex('today')}
             >
-              <AccessibleContent alt={I18n.t('Jump to Today')}>
-                {I18n.t('Today')}
-              </AccessibleContent>
+              <AccessibleContent alt={I18n.t('Jump to Today')}>{I18n.t('Today')}</AccessibleContent>
             </Button>
             <IconButton
               data-testid="view-next-week-button"

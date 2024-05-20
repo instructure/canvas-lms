@@ -29,7 +29,6 @@ import PropTypes from 'prop-types'
 const I18n = useI18nScope('learning_mastery_gradebook')
 
 const StudentHeader = ({gradebookFilters, gradebookFilterHandler}) => {
-
   const toggleStudentsWithoutAssessments = () => gradebookFilterHandler('missing_user_rollups')
   const toggleInactiveEnrollments = () => gradebookFilterHandler('inactive_enrollments')
   const toggleConcludedEnrollments = () => gradebookFilterHandler('concluded_enrollments')
@@ -58,9 +57,24 @@ const StudentHeader = ({gradebookFilters, gradebookFilterHandler}) => {
             <Menu.Item>{I18n.t('Display as')}</Menu.Item>
             <Menu.Item>{I18n.t('Secondary info')}</Menu.Item>
             <Menu.Group label={I18n.t('Show')} allowMultiple={true}>
-              <Menu.Item selected={!gradebookFilters.includes('missing_user_rollups')} onSelect={toggleStudentsWithoutAssessments}>{I18n.t('Students without assessments')}</Menu.Item>
-              <Menu.Item selected={!gradebookFilters.includes('inactive_enrollments')} onSelect={toggleInactiveEnrollments}>{I18n.t('Inactive Enrollments')}</Menu.Item>
-              <Menu.Item selected={!gradebookFilters.includes('concluded_enrollments')} onSelect={toggleConcludedEnrollments}>{I18n.t('Concluded Enrollments')}</Menu.Item>
+              <Menu.Item
+                selected={!gradebookFilters.includes('missing_user_rollups')}
+                onSelect={toggleStudentsWithoutAssessments}
+              >
+                {I18n.t('Students without assessments')}
+              </Menu.Item>
+              <Menu.Item
+                selected={!gradebookFilters.includes('inactive_enrollments')}
+                onSelect={toggleInactiveEnrollments}
+              >
+                {I18n.t('Inactive Enrollments')}
+              </Menu.Item>
+              <Menu.Item
+                selected={!gradebookFilters.includes('concluded_enrollments')}
+                onSelect={toggleConcludedEnrollments}
+              >
+                {I18n.t('Concluded Enrollments')}
+              </Menu.Item>
             </Menu.Group>
           </Menu>
         </Flex.Item>

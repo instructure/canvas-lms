@@ -17,6 +17,7 @@
 //
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import TokenInput from 'ui/features/roster/jquery/TokenInput'
 
 test('allows the browse link to receive focus', () => {

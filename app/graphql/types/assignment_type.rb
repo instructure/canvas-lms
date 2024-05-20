@@ -41,9 +41,9 @@ module Types
       value "fail_to_import"
       value "migrating"
       value "failed_to_migrate"
+      value "outcome_alignment_cloning"
+      value "failed_to_clone_outcome_alignment"
     end
-
-    GRADING_TYPES = Assignment::ALLOWED_GRADING_TYPES.zip(Assignment::ALLOWED_GRADING_TYPES).to_h
 
     class AssignmentGradingType < Types::BaseEnum
       graphql_name "GradingType"
@@ -265,6 +265,7 @@ module Types
     field :expects_external_submission, Boolean, method: :expects_external_submission?, null: true
     field :non_digital_submission, Boolean, method: :non_digital_submission?, null: true
     field :allow_google_docs_submission, Boolean, method: :allow_google_docs_submission?, null: true
+    field :important_dates, Boolean, null: true
 
     field :due_date_required, Boolean, method: :due_date_required?, null: true
     field :can_unpublish, Boolean, method: :can_unpublish?, null: true
@@ -376,7 +377,9 @@ module Types
 
     field :grading_type, AssignmentGradingType, null: true
     def grading_type
-      GRADING_TYPES[assignment.grading_type]
+      return nil unless Assignment::ALLOWED_GRADING_TYPES.include?(assignment.grading_type)
+
+      assignment.grading_type
     end
 
     field :grading_period_id, String, null: true
@@ -437,6 +440,10 @@ module Types
           "specifies that this assignment is only assigned to students for whom an
        `AssignmentOverride` applies.",
           null: false
+    field :visible_to_everyone,
+          Boolean,
+          "specifies all other variables that can determine visiblity.",
+          null: false
 
     field :assignment_overrides, AssignmentOverrideType.connection_type, null: true
     def assignment_overrides
@@ -446,6 +453,18 @@ module Types
       # ¯\_(ツ)_/¯
       AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, current_user)
     end
+
+    field :has_group_category,
+          Boolean,
+          "specifies that this assignment is a group assignment",
+          method: :has_group_category?,
+          null: false
+
+    field :grade_as_group,
+          Boolean,
+          "specifies that students are being graded as a group (as opposed to being graded individually).",
+          method: :grade_as_group?,
+          null: false
 
     field :group_set, GroupSetType, null: true
     def group_set
@@ -468,6 +487,15 @@ module Types
       SubmissionSearch.new(assignment, current_user, session, filter).search
     end
 
+    field :my_sub_assignment_submissions_connection, SubmissionType.connection_type, null: true
+    def my_sub_assignment_submissions_connection
+      return nil if current_user.nil?
+
+      load_association(:sub_assignment_submissions).then do |submissions|
+        submissions.active.where(user_id: current_user)
+      end
+    end
+
     field :grading_standard, GradingStandardType, null: true
     def grading_standard
       load_association(:grading_standard)
@@ -479,13 +507,9 @@ module Types
       argument :order_by, [SubmissionSearchOrderInputType], required: false
     end
     def group_submissions_connection(filter: nil, order_by: nil)
-      return nil if current_user.nil? || assignment.group_category_id.nil?
+      return nil if assignment.group_category_id.nil?
 
-      filter = filter.to_h
-      order_by ||= []
-      filter[:states] ||= DEFAULT_SUBMISSION_STATES
-      filter[:order_by] = order_by.map(&:to_h)
-      scope = SubmissionSearch.new(assignment, current_user, session, filter).search
+      scope = submissions_connection(filter:, order_by:)
       Promise.all([
                     Loaders::AssociationLoader.for(Assignment, :submissions).load(assignment),
                     Loaders::AssociationLoader.for(Assignment, :context).load(assignment)
@@ -522,14 +546,14 @@ module Types
       end
     end
 
-    field :checkpointed, Boolean, null: false
+    field :has_sub_assignments, Boolean, null: false
 
     field :checkpoints, [CheckpointType], null: true
     def checkpoints
       load_association(:context).then do |course|
-        return nil unless course.root_account&.feature_enabled?(:discussion_checkpoints)
-
-        load_association(:checkpoint_assignments)
+        if course.root_account&.feature_enabled?(:discussion_checkpoints)
+          load_association(:sub_assignments)
+        end
       end
     end
   end

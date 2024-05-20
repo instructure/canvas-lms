@@ -26,6 +26,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import { captureException } from '@sentry/react'
 
 const I18n = useI18nScope('groups')
 
@@ -52,6 +53,7 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
       .then(res => notifyDidSave(res))
       .catch(err => {
         console.error(err) // eslint-disable-line no-console
+        captureException(err)
         if (err.response) console.error(err.response) // eslint-disable-line no-console
         setStatus('error')
       })

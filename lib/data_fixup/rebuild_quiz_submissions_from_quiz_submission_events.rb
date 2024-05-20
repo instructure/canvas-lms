@@ -116,7 +116,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
       qs.questions.each do |q|
         user_answer = Quizzes::SubmissionGrader.score_question(q, submission_data)
         user_answers << user_answer
-        tally += (user_answer[:points] || 0) if user_answer[:correct]
+        tally += user_answer[:points] || 0 if user_answer[:correct]
       end
       qs.score = tally
       qs.score = qs.quiz.points_possible if qs.quiz && qs.quiz.quiz_type == "graded_survey"
@@ -173,13 +173,12 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
     # seen.
     def aggregate_quiz_data_from_events(qs, events)
       question_events = events.select { |e| %w[question_answered question_viewed question_flagged].include?(e.event_type) }
-      seen_question_ids = []
-      question_events.each do |event|
-        seen_question_ids << if event.event_type == "question_viewed"
-                               event.answers
-                             else
-                               event.answers.flatten.pluck("quiz_question_id")
-                             end
+      seen_question_ids = question_events.map do |event|
+        if event.event_type == "question_viewed"
+          event.answers
+        else
+          event.answers.flatten.pluck("quiz_question_id")
+        end
       end
       seen_question_ids = seen_question_ids.flatten.uniq
 

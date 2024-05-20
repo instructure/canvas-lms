@@ -30,8 +30,8 @@ export function notifier(WrappedComponent) {
     static contextTypes = {
       dynamicUiManager: shape({
         triggerUpdates: func,
-        preTriggerUpdates: func
-      })
+        preTriggerUpdates: func,
+      }),
     }
 
     preTriggerUpdates = (...args) => {

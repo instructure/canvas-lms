@@ -297,7 +297,7 @@ describe "gradebook - logged in as a student" do
         wait_for_ajaximations
 
         # Verify that the correct assignments are being dropped
-        dropped_assignments = ffj("tr[data-testid='assignment-row']::contains('Dropped')")
+        dropped_assignments = ffj("tr[data-testid='assignment-row']:contains('Dropped')")
         expect(dropped_assignments.length).to eq 2
         dropped_assignments_text = dropped_assignments.map(&:text)
         expect(dropped_assignments_text.any? { |str| str.include?(@assignment_3.title) }).to be true
@@ -338,7 +338,7 @@ describe "gradebook - logged in as a student" do
         wait_for_ajaximations
 
         # Verify that the correct assignments are being dropped
-        dropped_assignments = ffj("tr[data-testid='assignment-row']::contains('Dropped')")
+        dropped_assignments = ffj("tr[data-testid='assignment-row']:contains('Dropped')")
         expect(dropped_assignments.length).to eq 2
         dropped_assignments_text = dropped_assignments.map(&:text)
         expect(dropped_assignments_text.any? { |str| str.include?(@assignment_8.title) }).to be true

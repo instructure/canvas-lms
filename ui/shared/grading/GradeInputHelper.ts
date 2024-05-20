@@ -23,7 +23,7 @@ import {scoreToGrade} from '@instructure/grading-utils'
 import numberHelper from '@canvas/i18n/numberHelper'
 import type {GradeInput, GradeResult} from './grading.d'
 import {EnvGradebookCommon} from '@canvas/global/env/EnvGradebook'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
 // Allow unchecked access to ENV variables that should exist in this context
 declare const ENV: GlobalEnv & EnvGradebookCommon
@@ -74,7 +74,7 @@ function parseAsGradingScheme(value: number, options): null | GradeInput {
     enteredAs: 'gradingScheme',
     percent: options.pointsPossible ? percentage : 0,
     points: options.pointsPossible ? pointsFromPercentage(percentage, options.pointsPossible) : 0,
-    schemeKey: scoreToGrade(percentage, options.gradingScheme),
+    schemeKey: scoreToGrade(percentage, options.gradingScheme, options.pointsBasedGradingScheme),
   }
 }
 
@@ -99,7 +99,7 @@ function parseAsPercent(value: string, options): null | GradeInput {
     enteredAs: 'percent',
     percent,
     points,
-    schemeKey: scoreToGrade(percent, options.gradingScheme),
+    schemeKey: scoreToGrade(percent, options.gradingScheme, options.pointsBasedGradingScheme),
   }
 }
 
@@ -115,7 +115,7 @@ function parseAsPoints(value: string, options): null | GradeInput {
     enteredAs: 'points',
     percent: null,
     points,
-    schemeKey: scoreToGrade(percent, options.gradingScheme),
+    schemeKey: scoreToGrade(percent, options.gradingScheme, options.pointsBasedGradingScheme),
   }
 }
 

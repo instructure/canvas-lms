@@ -18,7 +18,9 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
-import CanvasAsyncSelect, {CanvasAsyncSelectProps} from '@canvas/instui-bindings/react/AsyncSelect'
+import CanvasAsyncSelect, {
+  type CanvasAsyncSelectProps,
+} from '@canvas/instui-bindings/react/AsyncSelect'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 import useContentShareUserSearchApi from '../effects/useContentShareUserSearchApi'
 import UserSearchSelectorItem from './UserSearchSelectorItem'

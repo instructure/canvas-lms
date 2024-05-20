@@ -27,7 +27,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
-import { debounce } from '@instructure/debounce'
+import {debounce} from '@instructure/debounce'
 import UserCollection from '@canvas/users/backbone/collections/UserCollection'
 import ContextGroupCollection from '../backbone/collections/ContextGroupCollection'
 import BackboneState from './mixins/BackboneState'
@@ -62,7 +62,7 @@ const StudentView = createReactClass({
   openManageGroupDialog(group) {
     const $dialog = $('<div>').dialog({
       id: 'manage_group_form',
-      title: 'Manage Student Group',
+      title: I18n.t('Manage Student Group'),
       height: 500,
       width: 700,
       'fix-dialog-buttons': false,
@@ -71,6 +71,8 @@ const StudentView = createReactClass({
         ReactDOM.unmountComponentAtNode($dialog[0])
         $(this).remove()
       },
+      modal: true,
+      zIndex: 1000,
     })
 
     const closeDialog = e => {
@@ -248,8 +250,7 @@ const StudentView = createReactClass({
   render() {
     const groups = this.state.groupCollection.toJSON()
     const {groupCollection} = this.state
-    const loading =
-      groupCollection.fetchingNextPage || !groupCollection.loadedAll
+    const loading = groupCollection.fetchingNextPage || !groupCollection.loadedAll
 
     let newGroupButton = null
     if (ENV.STUDENT_CAN_ORGANIZE_GROUPS_FOR_COURSE) {

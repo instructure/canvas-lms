@@ -24,9 +24,9 @@ class CustomData < ActiveRecord::Base
 
     def initialize(opts = {})
       opts.each do |k, v|
-        instance_variable_set("@#{k}", v)
+        instance_variable_set(:"@#{k}", v)
       end
-      super "write conflict for custom_data hash"
+      super("write conflict for custom_data hash")
     end
 
     def as_json
@@ -42,7 +42,7 @@ class CustomData < ActiveRecord::Base
 
   belongs_to :user
 
-  serialize :data, Hash
+  serialize :data, type: Hash
 
   validates :user, :namespace, presence: true
 

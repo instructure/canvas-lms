@@ -42,7 +42,7 @@ module NewQuizzesFeaturesHelper
   module_function
 
   def new_quizzes_enabled?(context = @context)
-    context.feature_enabled?(:quizzes_next) && context.quiz_lti_tool.present? && !new_quizzes_require_migration?(context)
+    context.feature_enabled?(:quizzes_next) && context.quiz_lti_tool.present?
   end
 
   def new_quizzes_require_migration?(context = @context)
@@ -55,5 +55,13 @@ module NewQuizzesFeaturesHelper
 
   def disable_content_rewriting?(context = @context)
     context.feature_enabled?(:quizzes_next) && Account.site_admin.feature_enabled?(:new_quizzes_migrate_without_content_rewrite)
+  end
+
+  def new_quizzes_common_cartridge_enabled?(context = @context)
+    context.feature_enabled?(:quizzes_next) && Account.site_admin.feature_enabled?(:new_quizzes_common_cartridge)
+  end
+
+  def common_cartridge_qti_new_quizzes_import_enabled?(context = @context)
+    context.feature_enabled?(:quizzes_next) && context.root_account.feature_enabled?(:new_quizzes_migration) && Account.site_admin.feature_enabled?(:common_cartridge_qti_new_quizzes_import)
   end
 end

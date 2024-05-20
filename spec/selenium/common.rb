@@ -75,12 +75,6 @@ shared_context "in-process server selenium tests" do
   # set up so you can use rails urls helpers in your selenium tests
   include Rails.application.routes.url_helpers
 
-  prepend_before :all do
-    # building the schema is currently very slow.
-    # this ensures the schema is built before specs are run to avoid timeouts
-    CanvasSchema.graphql_definition
-  end
-
   prepend_before do
     resize_screen_to_standard
     SeleniumDriverSetup.allow_requests!
@@ -191,6 +185,9 @@ shared_context "in-process server selenium tests" do
         "Deprecated use of magic jQueryUI widget markup detected",
         "Uncaught SG: Did not receive drive#about kind when fetching import",
         "Failed prop type",
+        "Warning: Failed propType",
+        "Warning: React.render is deprecated",
+        "Warning: ReactDOMComponent: Do not access .getDOMNode()",
         "Please either add a 'report-uri' directive, or deliver the policy via the 'Content-Security-Policy' header.",
         "isMounted is deprecated. Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks",
         "https://www.gstatic.com/_/apps-viewer/_/js/k=apps-viewer.standalone.en_US",
@@ -217,7 +214,8 @@ shared_context "in-process server selenium tests" do
         # Is fixed in Chrome 109, remove this once upgraded to or above Chrome 109 https://bugs.chromium.org/p/chromium/issues/detail?id=1307772
         "Found a 'popup' attribute. If you are testing the popup API, you must enable Experimental Web Platform Features.",
         "Uncaught DOMException: play() failed because the user didn't interact with the document first.",
-        "security - Refused to frame 'https://drive.google.com/' because an ancestor violates the following Content Security Policy directive: \"frame-ancestors https://docs.google.com\"."
+        "security - Refused to frame 'https://drive.google.com/' because an ancestor violates the following Content Security Policy directive: \"frame-ancestors https://docs.google.com\".",
+        "This file should be served over HTTPS." # tests are not run over https, this error is expected
       ].freeze
 
       javascript_errors = browser_logs.select do |e|

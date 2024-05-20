@@ -29,7 +29,7 @@
 //   else
 //     errors = $form.data 'errors'
 import $ from 'jquery'
-import _ from 'underscore'
+import {size} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('validate')
@@ -50,7 +50,7 @@ export default $.fn.validate = function () {
     }
   })
 
-  const hasErrors = _.size(errors) > 0
+  const hasErrors = size(errors) > 0
   if (hasErrors) {
     this.data('errors', errors)
     return false

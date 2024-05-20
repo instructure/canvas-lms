@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
+ <% js_env :context_rubric_associations_url => context_url(@context, :context_rubric_associations_url) rescue nil %>
 
 <%
   provide :page_title, join_title( t(:topic, "Topic"), @topic.title)
@@ -201,7 +202,7 @@
           <%= render :partial => 'group_discussion', :locals => {show_da_note: (@topic.for_assignment? && @topic.assignment.only_visible_to_overrides)} %>
         <% end %>
         <header class="discussion-section clearfix">
-          <%= avatar((@topic.user), context_code: @context.asset_string) if @topic.user %>
+          <%= avatar((@topic.user), context_code: @context.asset_string, skip_url: true) if @topic.user %>
           <div class="discussion-header-content right-of-avatar">
             <div class="pull-left">
               <h1 class="discussion-title"><%= @topic.title %></h1>
@@ -360,7 +361,9 @@
 
   </div>
 
-  <%= prefetch_assignment_external_tools %>
+  <% unless @topic.is_announcement && Account.site_admin.feature_enabled?(:assignment_edit_placement_not_on_announcements) %>
+    <%= prefetch_assignment_external_tools %>
+  <% end %>
 
   <div id="direct-share-mount-point"></div>
 

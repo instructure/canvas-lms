@@ -17,7 +17,7 @@
  */
 
 import {
-  AssignmentPeerReview,
+  type AssignmentPeerReview,
   StudentViewPeerReviews,
 } from '@canvas/student_view_peer_reviews/react/StudentViewPeerReviews'
 import ready from '@instructure/ready'

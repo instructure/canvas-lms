@@ -32,7 +32,7 @@ describe AssignmentGroup do
   end
 
   it "acts as list" do
-    expect(AssignmentGroup).to be_respond_to(:acts_as_list)
+    expect(AssignmentGroup).to respond_to(:acts_as_list)
   end
 
   it "converts NaN group weight values to 0 on save" do

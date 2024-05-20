@@ -14,7 +14,7 @@ function bundle_config_and_install() {
 
 function yarn_install() {
   echo "Running yarn install..."
-  yarn install --ignore-optional || yarn install --ignore-optional --network-concurrency 1
+  yarn install || yarn install --network-concurrency 1
 }
 
 function compile_assets() {

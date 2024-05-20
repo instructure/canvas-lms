@@ -34,9 +34,10 @@ import RichContentEditor from '@canvas/rce/RichContentEditor'
 import MoveToDialog from '../react/MoveToDialog'
 import {fetchContent} from './eportfolio_section'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
+import {raw} from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.tree' /* instTree */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/rails-flash-notifications' /* $.screenReaderFlashMessageExclusive */
@@ -272,6 +273,8 @@ $(document).ready(function () {
       .dialog({
         width: 'auto',
         title: I18n.t('eportfolio_settings', 'ePortfolio Settings'),
+        modal: true,
+        zIndex: 1000,
       })
       .fixDialogButtons()
   })
@@ -343,7 +346,7 @@ $(document).ready(function () {
   $('#edit_page_form')
     .find('.allow_comments')
     .change(function () {
-      $('#edit_page_form .show_comments_box').showIf($(this).attr('checked'))
+      $('#edit_page_form .show_comments_box').showIf($(this).prop('checked'))
     })
     .change()
   $('#edit_page_sidebar .submit_button').click(() => {
@@ -371,7 +374,7 @@ $(document).ready(function () {
           const $richText = $section.find('.edit_section')
           const editorContent = RichContentEditor.callOnRCE($richText, 'get_code')
           if (editorContent) {
-            $preview.html($.raw(editorContent))
+            $preview.html(raw(editorContent))
           }
           $section.find('.section_content').after($preview)
         }
@@ -410,12 +413,12 @@ $(document).ready(function () {
             const $richText = $section.find('.edit_section')
             const editorContent = RichContentEditor.callOnRCE($richText, 'get_code')
             if (editorContent) {
-              $section.find('.section_content').html($.raw(editorContent))
+              $section.find('.section_content').html(raw(editorContent))
             }
             RichContentEditor.destroyRCE($richText)
           } else {
             const code = sanitizeHtml($section.find('.edit_section').val())
-            $section.find('.section_content').html($.raw(code))
+            $section.find('.section_content').html(raw(code))
           }
         } else if (!$section.hasClass('read_only')) {
           $section.remove()
@@ -507,7 +510,7 @@ $(document).ready(function () {
       }
     })
   })
-  $('.delete_page_section_link').click(function (event) {
+  $('.delete_page_section_link').on('click', function (event) {
     event.preventDefault()
     $(this)
       .parents('.section')
@@ -539,7 +542,7 @@ $(document).ready(function () {
     },
   })
   $('#page_content')
-    .delegate('.cancel_content_button', 'click', function (event) {
+    .on('click', '.cancel_content_button', function (event) {
       event.preventDefault()
       $(this)
         .parents('.section')
@@ -547,7 +550,7 @@ $(document).ready(function () {
           $(this).remove()
         })
     })
-    .delegate('.select_submission_button', 'click', function (event) {
+    .on('click', '.select_submission_button', function (event) {
       event.preventDefault()
       const $section = $(this).parents('.section')
       const $selection = $section.find('.submission_list li.active-leaf:first')
@@ -567,9 +570,9 @@ $(document).ready(function () {
       $sectionContent.append($frame)
       $section.addClass('read_only')
       $(this).focus()
-      $.screenReaderFlashMessageExclusive(I18n.t('submission added: %{title}', {title}))
+      $.screenReaderFlashMessage(I18n.t('submission added: %{title}', {title}))
     })
-    .delegate('.upload_file_button', 'click', function (event) {
+    .on('click', '.upload_file_button', function (event) {
       event.preventDefault()
       event.stopPropagation()
       const $section = $(this).parents('.section')
@@ -701,6 +704,8 @@ $(document).ready(function () {
             $(this).find(':text:visible:first').val(assignment).focus().select()
             $(document).triggerHandler('submission_dialog_opened')
           },
+          modal: true,
+          zIndex: 1000,
         })
         .fixDialogButtons()
     }
@@ -861,7 +866,7 @@ $(document).ready(function () {
       $('#section_pages').addClass('editing')
     }
   })
-  $('#page_list').delegate('.edit_page_link', 'click', function (event) {
+  $('#page_list').on('click', '.edit_page_link', function (event) {
     if ($(this).parents('li').hasClass('unsaved')) {
       event.preventDefault()
     }
@@ -1145,7 +1150,7 @@ $(document).ready(function () {
     }
     showMoveDialog(source, destinations, triggerElement, dialogLabel, onMove)
   })
-  $('#section_list').delegate('.edit_section_link', 'click', function (event) {
+  $('#section_list').on('click', '.edit_section_link', function (event) {
     if ($(this).parents('li').hasClass('unsaved')) {
       event.preventDefault()
     }
@@ -1256,6 +1261,8 @@ $(document).ready(function () {
   $('.download_eportfolio_link').click(() => {
     $('#downloading_eportfolio_dialog').dialog({
       title: I18n.t('titles.download_eportfolio', 'Download ePortfolio'),
+      modal: true,
+      zIndex: 1000,
     })
   })
 })

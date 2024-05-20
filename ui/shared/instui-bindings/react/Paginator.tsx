@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {ReactElement} from 'react'
+import React, {type ReactElement} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Pagination} from '@instructure/ui-pagination'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'

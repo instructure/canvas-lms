@@ -21,7 +21,6 @@
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
 
 const indexOf = [].indexOf
 const slice = [].slice
@@ -53,12 +52,9 @@ PaginatedCollection.prototype.initialize = function () {
   return (this.urls = {})
 }
 
-PaginatedCollection.prototype.fetch = function (options) {
+PaginatedCollection.prototype.fetch = function (opts) {
   let ref
-  if (options == null) {
-    options = {}
-  }
-  options = _.clone(options)
+  const options = {...opts}
   this.loadedAll = false
   const exclusionFlag = 'fetching' + capitalize(options.page) + 'Page'
   this[exclusionFlag] = true
@@ -172,23 +168,16 @@ PaginatedCollection.prototype._setStateAfterFetch = function (xhr, options) {
 }
 
 PaginatedCollection.prototype._parsePageLinks = function (xhr) {
-  let ref
-  let linkHeader = (ref = xhr.getResponseHeader('link')) != null ? ref.split(',') : void 0
-  if (linkHeader == null) {
-    linkHeader = []
-  }
-  return _.reduce(
-    linkHeader,
-    (function (_this) {
-      return function (links, link) {
-        const key = link.match(_this.nameRegex)[1]
-        const val = link.match(_this.linkRegex)[1]
-        links[key] = val
-        return links
-      }
-    })(this),
-    {}
-  )
+  const linkHeader = xhr.getResponseHeader('link')
+  if (!linkHeader) return {}
+
+  const links = linkHeader.split(',')
+  return links.reduce((result, link) => {
+    const key = link.match(this.nameRegex)[1]
+    const val = link.match(this.linkRegex)[1]
+    result[key] = val
+    return result
+  }, {})
 }
 
 export default PaginatedCollection

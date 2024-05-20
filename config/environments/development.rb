@@ -26,7 +26,7 @@ class HostUrlContainer
   end
 end
 
-environment_configuration(defined?(config) && config) do |config|
+Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb
 
   # In the development environment your application's code is reloaded on
@@ -48,12 +48,14 @@ environment_configuration(defined?(config) && config) do |config|
   if RUBY_ENGINE == "ruby"
     require "debug/prelude"
     if ENV["REMOTE_DEBUGGING_ENABLED"]
+      # rubocop:disable Lint/Debugger
       if defined?(PhusionPassenger)
         # only initialize in forked child process (to prevent EADDRINUSE)
         PhusionPassenger.on_event(:starting_worker_process) { require "debug/open_nonstop" }
       else
         require "debug/open_nonstop"
       end
+      # rubocop:enable Lint/Debugger
     end
   end
 

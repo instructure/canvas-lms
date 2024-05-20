@@ -1,5 +1,4 @@
 import React from 'react'
-import {ApplyTheme} from '@instructure/ui-themeable'
 import {ApplyTextDirection} from '@instructure/ui-i18n'
 import I18n from 'i18n-js'
 import i18nLolcalize from '@canvas/i18n/i18nLolcalize'
@@ -10,15 +9,15 @@ window.ENV = window.ENV || {
   FEATURES: {},
   // the RCE won't load w/o these yet
   context_asset_string: 'course_1',
-  current_user_id: 2
+  current_user_id: 2,
 }
 
 window.INST = window.INST || {
-  editorButtons: []
+  editorButtons: [],
 }
 
 export const parameters = {
-  actions: {argTypesRegex: '^on[A-Z].*'}
+  actions: {argTypesRegex: '^on[A-Z].*'},
 }
 
 export const globalTypes = {
@@ -28,8 +27,8 @@ export const globalTypes = {
     defaultValue: 'canvas',
     toolbar: {
       icon: 'accessibility',
-      items: ['canvas', 'canvas-high-contrast']
-    }
+      items: ['canvas', 'canvas-high-contrast'],
+    },
   },
   bidirectional: {
     name: 'Bidirectional',
@@ -37,8 +36,8 @@ export const globalTypes = {
     defaultValue: 'ltr',
     toolbar: {
       icon: 'transfer',
-      items: ['ltr', 'rtl']
-    }
+      items: ['ltr', 'rtl'],
+    },
   },
   lolcalize: {
     name: 'LOLcalize',
@@ -46,18 +45,14 @@ export const globalTypes = {
     defaultValue: 'disable',
     toolbar: {
       icon: 'facehappy',
-      items: ['enable', 'disable']
-    }
-  }
+      items: ['enable', 'disable'],
+    },
+  },
 }
 
 const canvasThemeProvider = (Story, context) => {
   const canvasTheme = context.globals.canvasTheme
-  return (
-    <ApplyTheme theme={ApplyTheme.generateTheme(canvasTheme)}>
-      <Story {...context} />
-    </ApplyTheme>
-  )
+  return <Story {...context} />
 }
 
 const bidirectionalProvider = (Story, context) => {

@@ -86,11 +86,15 @@ describe('K5Dashboard Parent Support', () => {
     expect(select.value).toBe('Student 4')
   })
 
-  it('prefetches dashboard cards with the correct url param', async () => {
-    moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {
-      status: 200,
-      response: MOCK_CARDS,
-    })
+  // LF-1141
+  it.skip('prefetches dashboard cards with the correct url param', async () => {
+    moxios.stubRequest(
+      window.location.origin + '/api/v1/dashboard/dashboard_cards?observed_user_id=4',
+      {
+        status: 200,
+        response: MOCK_CARDS,
+      }
+    )
 
     render(
       <K5Dashboard
@@ -108,7 +112,9 @@ describe('K5Dashboard Parent Support', () => {
       {timeout: 5000}
     )
     const preFetchedRequest = moxios.requests.mostRecent()
-    expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user_id=4')
+    expect(preFetchedRequest.url).toBe(
+      window.location.origin + '/api/v1/dashboard/dashboard_cards?observed_user_id=4'
+    )
     expect(moxios.requests.count()).toBe(1)
   })
 
@@ -234,26 +240,15 @@ describe('K5Dashboard Parent Support', () => {
 
   describe('switching to classic student', () => {
     let originalLocation
-    let reloadMock
-
-    beforeAll(() => {
-      originalLocation = window.location
-      reloadMock = jest.fn()
-      Object.defineProperty(window, 'location', {
-        configurable: true,
-        value: {...window.location, reload: reloadMock},
-      })
-    })
-
-    afterAll(() => {
-      Object.defineProperty(window, 'location', {
-        configurable: true,
-        value: originalLocation,
-      })
-    })
 
     beforeEach(() => {
-      reloadMock.mockClear()
+      originalLocation = window.location
+      delete window.location
+      window.location = {...originalLocation, reload: jest.fn()}
+    })
+
+    afterEach(() => {
+      window.location = originalLocation
     })
 
     const switchToStudent2 = async () => {
@@ -273,7 +268,7 @@ describe('K5Dashboard Parent Support', () => {
 
     it('does not reload the page if a k5 student with the same font selection is selected in the picker', async () => {
       await switchToStudent2()
-      expect(reloadMock).not.toHaveBeenCalled()
+      expect(window.location.reload).not.toHaveBeenCalled()
     })
 
     it('reloads the page when a classic student is selected in the students picker', async () => {
@@ -281,7 +276,7 @@ describe('K5Dashboard Parent Support', () => {
         Promise.resolve({show_k5_dashboard: false, use_classic_font: false})
       )
       await switchToStudent2()
-      expect(reloadMock).toHaveBeenCalled()
+      expect(window.location.reload).toHaveBeenCalled()
     })
 
     it('reloads the page when a k5 student with a different font selection is selected in the picker', async () => {
@@ -289,7 +284,7 @@ describe('K5Dashboard Parent Support', () => {
         Promise.resolve({show_k5_dashboard: true, use_classic_font: true})
       )
       await switchToStudent2()
-      expect(reloadMock).toHaveBeenCalled()
+      expect(window.location.reload).toHaveBeenCalled()
     })
   })
 

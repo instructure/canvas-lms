@@ -86,14 +86,18 @@ describe "Stuff related to how we load stuff from CDN and use brandable_css" do
 
   it "has the right urls for script tag and stylesheets on the login page" do
     expect(Canvas::Cdn.config).to receive(:host).at_least(:once).and_return(app_url)
+    Account.default.update!(default_locale: "ca")
+
     get "/login/canvas"
 
     ["bundles/common", "bundles/login"].each { |bundle| check_css(bundle) }
     ["images/favicon-yellow.ico", "images/apple-touch-icon.png"].each { |i| check_asset("link", i) }
 
     check_asset("script", "/timezone/Etc/UTC.js")
-    check_asset("script", "/timezone/en_US.js")
+    check_asset("script", "/timezone/ca_ES.js")
     Canvas::Cdn.registry.scripts_for("main").each { |c| check_asset("script", c, true) }
-    Canvas::Cdn.registry.scripts_for("login").each { |c| check_asset("link", c, true) }
+
+    expect(element_exists?("head script[src*='/moment/locale/ca']")).to be true
+    expect(element_exists?("head script[src^='/javascripts']")).to be false
   end
 end

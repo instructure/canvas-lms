@@ -238,7 +238,7 @@ class FilesController < ApplicationController
       session["file_access_user_id"] = access_verifier[:user].global_id
       session["file_access_real_user_id"] = access_verifier[:real_user]&.global_id
       session["file_access_developer_key_id"] = access_verifier[:developer_key]&.global_id
-      session["file_access_root_acocunt_id"] = access_verifier[:root_account]&.global_id
+      session["file_access_root_account_id"] = access_verifier[:root_account]&.global_id
       session["file_access_oauth_host"] = access_verifier[:oauth_host]
       session["file_access_expiration"] = 1.hour.from_now.to_i
       session.file_access_user = access_verifier[:user]
@@ -348,7 +348,7 @@ class FilesController < ApplicationController
                        else
                          Attachment.display_name_order_by_clause("attachments")
                        end
-        order_clause += " DESC" if params[:order] == "desc"
+        order_clause = "#{order_clause} DESC" if params[:order] == "desc"
         scope = scope.order(Arel.sql(order_clause)).order(id: (params[:order] == "desc") ? :desc : :asc)
 
         if params[:content_types].present?
@@ -831,7 +831,7 @@ class FilesController < ApplicationController
       # request to get the data.
       # Protect ourselves against reading huge files into memory -- if the
       # attachment is too big, don't return it.
-      if @attachment.size > Setting.get("attachment_json_response_max_size", 1.megabyte.to_s).to_i
+      if @attachment.size > 1.megabyte
         render json: { error: t("errors.too_large", "The file is too large to edit") }
         return
       end
@@ -890,7 +890,10 @@ class FilesController < ApplicationController
       # despite name, this is really just asking if the assignment expects an
       # upload
       # The discussion_topic check is to allow attachments to graded discussions to not count against the user's quota.
-      if asset.allow_google_docs_submission? || asset.submission_types == "discussion_topic"
+      if asset.submission_types == "discussion_topic"
+        any_entry = asset.discussion_topic.discussion_entries.temp_record
+        authorized_action(any_entry, @current_user, :attach)
+      elsif asset.allow_google_docs_submission?
         authorized_action(asset, @current_user, :submit)
       else
         authorized_action(asset, @current_user, :nothing)
@@ -951,12 +954,23 @@ class FilesController < ApplicationController
     @asset = Context.find_asset_by_asset_string(params[:attachment][:asset_string], @context) if params[:attachment][:asset_string]
     intent = params[:attachment][:intent]
 
+    # Discussions Redesign is now using this endpoint and this is how we make it work for them.
+    # We need to find the asset if it's a discussion topic and the asset_string is provided.
+    # This only applies when the intent is "submit" and the asset.submission_types is a "discussion_topic".
+    if params[:attachment][:asset_string] && @asset.nil? && intent == "submit"
+      asset = Context.find_asset_by_asset_string(params[:attachment][:asset_string])
+
+      if asset.is_a?(Assignment) && asset.submission_types == "discussion_topic"
+        @asset = asset
+      end
+    end
+
     # correct context for assignment-related attachments
     if @asset.is_a?(Assignment) && intent == "comment"
       # attachments that are comments on an assignment "belong" to the
       # assignment, even if another context was nominally provided
       @context = @asset
-    elsif @asset.is_a?(Assignment) && intent == "submit"
+    elsif @asset.is_a?(Assignment) && intent == "submit" && @asset.submission_types != "discussion_topic"
       # assignment submissions belong to either the group (if it's a group
       # assignment) or the user, even if another context was nominally provided
       group = @asset.group_category.group_for(@current_user) if @asset.has_group_category?
@@ -1046,6 +1060,7 @@ class FilesController < ApplicationController
     model = Object.const_get(params[:context_type])
     @context = model.where(id: params[:context_id]).first
 
+    overwritten_instfs_uuid = nil
     @attachment = if params.key?(:precreated_attachment_id)
                     att = Attachment.where(id: params[:precreated_attachment_id]).take
                     if att.nil?
@@ -1055,7 +1070,18 @@ class FilesController < ApplicationController
                       att
                     end
                   else
-                    @context.shard.activate { Attachment.where(context: @context).build }
+                    @context.shard.activate do
+                      # avoid creating an identical Attachment
+                      unless params[:on_duplicate] == "rename"
+                        att = Attachment.active.find_by(context: @context,
+                                                        folder_id: params[:folder_id],
+                                                        display_name: params[:display_name] || params[:name],
+                                                        size: params[:size],
+                                                        md5: params[:sha512])
+                        overwritten_instfs_uuid = att.instfs_uuid if att
+                      end
+                      att || Attachment.where(context: @context).build
+                    end
                   end
 
     # service metadata
@@ -1090,7 +1116,11 @@ class FilesController < ApplicationController
     @attachment.save!
 
     # apply duplicate handling
-    @attachment.handle_duplicates(params[:on_duplicate])
+    if overwritten_instfs_uuid
+      @attachment.delay_if_production.safe_delete_overwritten_instfs_uuid(overwritten_instfs_uuid)
+    else
+      @attachment.handle_duplicates(params[:on_duplicate])
+    end
 
     # trigger upload success callbacks
     if @context.respond_to?(:file_upload_success_callback)

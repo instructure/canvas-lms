@@ -46,7 +46,7 @@ describe('ResourceLinkContentItem', () => {
   describe('constructor', () => {
     it('sets the url to the canvas launch endpoint', () => {
       expect(resourceLinkContentItem({}, {ltiEndpoint: endpoint}).buildUrl()).toEqual(
-        `${endpoint}?display=in_rce&resource_link_lookup_uuid=0b8fbc86-fdd7-4950-852d-ffa789b37ff2`
+        `${endpoint}?display=borderless&resource_link_lookup_uuid=0b8fbc86-fdd7-4950-852d-ffa789b37ff2`
       )
     })
 
@@ -57,7 +57,7 @@ describe('ResourceLinkContentItem', () => {
           {ltiEndpoint: endpoint, containingCanvasLtiToolId: 'sometool'}
         ).buildUrl()
       ).toEqual(
-        `${endpoint}?display=in_rce&resource_link_lookup_uuid=0b8fbc86-fdd7-4950-852d-ffa789b37ff2&parent_frame_context=sometool`
+        `${endpoint}?display=borderless&resource_link_lookup_uuid=0b8fbc86-fdd7-4950-852d-ffa789b37ff2&parent_frame_context=sometool`
       )
     })
   })

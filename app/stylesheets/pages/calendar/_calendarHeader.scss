@@ -75,7 +75,7 @@
   bottom: 3px;
 }
 
-.navigation_title, .appointment_group_title {
+.navigation_title {
   display: inline;
   line-height: 38px;
   padding-#{direction(left)}: 5px;
@@ -98,9 +98,18 @@
   }
 }
 
+.navigation_title_text.blue {
+  color: var(--ic-link-color);
+  text-decoration: none;
+}
+
 #create_new_event_link {
   color: #444444;
   margin-#{direction(left)}: 5px;
+}
+
+.add_event_button_responsive #create_new_event_link {
+  margin-#{direction(left)}: 0px;
 }
 
 .whats-new {

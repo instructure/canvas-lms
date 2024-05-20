@@ -18,7 +18,7 @@
 import {View} from '@canvas/backbone'
 import template from '../../jst/fileUploadQuestionState.handlebars'
 import uploadedOrRemovedTemplate from '../../jst/fileUploadedOrRemoved.handlebars'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.disableWhileLoading'
 
 export default class FileUploadQuestion extends View {

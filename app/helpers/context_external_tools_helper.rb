@@ -22,6 +22,8 @@ module ContextExternalToolsHelper
     markup = tools.map do |tool|
       external_tool_menu_item_tag(tool, options)
     end
+    return markup if options[:raw_output]
+
     raw(markup.join)
   end
 
@@ -29,7 +31,8 @@ module ContextExternalToolsHelper
     defaults = {
       show_icon: true,
       in_list: false,
-      url_params: {}
+      url_params: {},
+      raw_output: false,
     }
 
     options = defaults.merge(options)
@@ -48,7 +51,8 @@ module ContextExternalToolsHelper
     link_attrs = {
       :href => tool[:base_url],
       "data-tool-id" => tool[:id],
-      "data-tool-launch-type" => options[:settings_key]
+      "data-tool-launch-type" => options[:settings_key],
+      "data-tool-launch-method" => tool.fetch(:launch_method, ""),
     }
 
     link_attrs[:class] = options[:link_class] if options[:link_class]
@@ -56,6 +60,13 @@ module ContextExternalToolsHelper
       rendered_icon = render(partial: "external_tools/helpers/icon", locals: { tool: })
       rendered_icon = sanitize(rendered_icon.squish) if options[:remove_space_between_icon_and_text]
     end
+
+    if options[:raw_output]
+      link_attrs[:icon] = rendered_icon if rendered_icon
+      link_attrs[:title] = tool[:title]
+      return link_attrs
+    end
+
     link = content_tag(:a, link_attrs) do
       concat(rendered_icon) if rendered_icon
       concat(tool[:title])
@@ -70,5 +81,17 @@ module ContextExternalToolsHelper
     end
 
     raw(link)
+  end
+
+  def external_tools_menu_items_raw_with_modules(tools, modules = [])
+    return [] if tools.blank?
+
+    modules.map do |mod|
+      external_tools_menu_items(tools[mod], {
+                                  link_class: "menu_tray_tool_link",
+                                  settings_key: mod,
+                                  raw_output: true
+                                })
+    end.flatten
   end
 end

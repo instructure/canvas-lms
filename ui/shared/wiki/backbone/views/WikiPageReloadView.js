@@ -16,8 +16,9 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {extend, pick} from 'lodash'
 import Backbone from '@canvas/backbone'
+import {raw} from '@instructure/html-escape'
 
 const pageReloadOptions = ['reloadMessage', 'warning', 'interval']
 
@@ -34,14 +35,14 @@ export default class WikiPageReloadView extends Backbone.View {
   }
 
   template() {
-    return `<div class='alert alert-${$.raw(
+    return `<div class='alert alert-${raw(
       this.options.warning ? 'warning' : 'info'
-    )} reload-changed-page'>${$.raw(this.reloadMessage)}</div>`
+    )} reload-changed-page'>${raw(this.reloadMessage)}</div>`
   }
 
   initialize(options) {
     super.initialize(...arguments)
-    return _.extend(this, _.pick(options || {}, pageReloadOptions))
+    return extend(this, pick(options || {}, pageReloadOptions))
   }
 
   pollForChanges() {
@@ -72,7 +73,7 @@ export default class WikiPageReloadView extends Backbone.View {
     if (ev != null) {
       ev.preventDefault()
     }
-    this.model.set(_.pick(this.latestRevision.attributes, this.options.modelAttributes))
+    this.model.set(pick(this.latestRevision.attributes, this.options.modelAttributes))
     this.trigger('reload')
     return this.latestRevision.startPolling()
   }

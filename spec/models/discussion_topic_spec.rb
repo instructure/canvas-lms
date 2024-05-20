@@ -46,6 +46,34 @@ describe DiscussionTopic do
       )
   end
 
+  describe ".create_graded_topic!" do
+    it "returns a discussion topic with an attached assignment" do
+      topic = DiscussionTopic.create_graded_topic!(course: @course, title: "My Graded Topic")
+      aggregate_failures do
+        expect(topic).to be_a DiscussionTopic
+        expect(topic.assignment.submission_types).to eq "discussion_topic"
+      end
+    end
+
+    it "sets the title on both the assignment and discussion topic" do
+      title = "My Graded Topic"
+      topic = DiscussionTopic.create_graded_topic!(course: @course, title:)
+      aggregate_failures do
+        expect(topic.title).to eq title
+        expect(topic.assignment.title).to eq title
+      end
+    end
+
+    it "optionally accepts a user to be assigned to the discussion topic" do
+      topic = DiscussionTopic.create_graded_topic!(course: @course, title: "My Graded Topic", user: @teacher)
+      expect(topic.user).to eq @teacher
+    end
+
+    it "raises an error when the assignment is invalid" do
+      expect { DiscussionTopic.create_graded_topic!(course: nil, title: "My Graded Topic") }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
+
   describe ".preload_subentry_counts" do
     it "preloads the discussion subentry count" do
       topic1 = @course.discussion_topics.create!
@@ -1862,11 +1890,11 @@ describe DiscussionTopic do
       return unless user
 
       if read
-        expect(DiscussionTopic.read_for(user)).to be_include @topic
-        expect(DiscussionTopic.unread_for(user)).not_to be_include @topic
+        expect(DiscussionTopic.read_for(user)).to include @topic
+        expect(DiscussionTopic.unread_for(user)).not_to include @topic
       else
-        expect(DiscussionTopic.read_for(user)).not_to be_include @topic
-        expect(DiscussionTopic.unread_for(user)).to be_include @topic
+        expect(DiscussionTopic.read_for(user)).not_to include @topic
+        expect(DiscussionTopic.unread_for(user)).to include @topic
       end
     end
 
@@ -2337,7 +2365,7 @@ describe DiscussionTopic do
     it "does not allow replies from students to topics locked based on date" do
       course_with_teacher(active_all: true)
       discussion_topic_model(context: @course)
-      @topic.unlock_at = 1.day.from_now
+      @topic.delayed_post_at = 1.day.from_now
       @topic.save!
       @topic.reply_from(user: @teacher, text: "reply") # should not raise error
       student_in_course(course: @course).accept!
@@ -2737,7 +2765,7 @@ describe DiscussionTopic do
     it "sends a message for a published course" do
       @course.offer!
       topic = @course.discussion_topics.create!(title: "title")
-      expect(topic.messages_sent["New Discussion Topic"].map(&:user)).to be_include(@user)
+      expect(topic.messages_sent["New Discussion Topic"].map(&:user)).to include(@user)
       expect(topic.messages_sent["New Discussion Topic"].first.from_name).to eq @course.name
     end
 
@@ -2755,7 +2783,7 @@ describe DiscussionTopic do
       it "sends a message for a group discussion in a published course" do
         @course.offer!
         topic = @group.discussion_topics.create!(title: "title")
-        expect(topic.messages_sent["New Discussion Topic"].map(&:user)).to be_include(@user)
+        expect(topic.messages_sent["New Discussion Topic"].map(&:user)).to include(@user)
       end
 
       it "does not send a message for a group discussion in an unpublished course" do
@@ -2976,27 +3004,28 @@ describe DiscussionTopic do
 
   describe "checkpoints" do
     before do
-      @topic = @course.discussion_topics.create!(title: "Discussion Topic Title", user: @teacher)
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Discussion Topic Title", user: @teacher)
     end
 
     it "not in place in the topic" do
       expect(@topic.checkpoints?).to be false
-      expect(@topic.checkpoint_assignments.length).to eq 0
+      expect(@topic.sub_assignments.length).to eq 0
       expect(@topic.reply_to_topic_checkpoint).to be_nil
       expect(@topic.reply_to_entry_checkpoint).to be_nil
       expect(@topic.reply_to_entry_required_count).to eq 0
     end
 
     it "does not allow setting the reply_to_entry_required_count to more than 10" do
-      @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 11)
-
-      expect(@topic).to_not be_valid
+      expect do
+        @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 11)
+      end.to raise_error(ActiveRecord::RecordInvalid)
     end
 
-    it "does not allow setting the reply_to_entry_required_count to 0 when checkpoints are there" do
-      @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 0)
-
-      expect(@topic).to_not be_valid
+    it "does not create a discussion topic per-checkpoint (instead, checkpoints belong to the topic through the parent)" do
+      expect do
+        @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 0)
+      end.not_to change { DiscussionTopic.count }.from(1)
     end
 
     describe "in place" do
@@ -3008,10 +3037,9 @@ describe DiscussionTopic do
 
       it "in the topic" do
         expect(@topic.checkpoints?).to be true
-        expect(@topic.checkpoint_assignments.length).to eq 2
-        expect(@topic.assignment.checkpoint_label).to eq CheckpointLabels::PARENT
-        expect(@topic.reply_to_topic_checkpoint.checkpoint_label).to eq CheckpointLabels::REPLY_TO_TOPIC
-        expect(@topic.reply_to_entry_checkpoint.checkpoint_label).to eq CheckpointLabels::REPLY_TO_ENTRY
+        expect(@topic.sub_assignments.length).to eq 2
+        expect(@topic.reply_to_topic_checkpoint.sub_assignment_tag).to eq CheckpointLabels::REPLY_TO_TOPIC
+        expect(@topic.reply_to_entry_checkpoint.sub_assignment_tag).to eq CheckpointLabels::REPLY_TO_ENTRY
       end
 
       it "correctly marks the reply to topic checkpoint submission as submitted when the student replies to topic" do
@@ -3035,10 +3063,11 @@ describe DiscussionTopic do
 
       it "correctly leaves the reply to entry checkpoint submission as unsubmitted when the student has not replied to an entry 5 times" do
         entry = @topic.discussion_entries.create!(user: @teacher, message: "reply to topic")
+        @topic.discussion_entries.create!(user: @student, message: "reply to topic by student")
         @topic.discussion_entries.create!(user: @student, message: "reply to entry", root_entry_id: entry.id, parent_id: entry.id)
 
         expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
-        expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
         expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
       end
 
@@ -3049,9 +3078,7 @@ describe DiscussionTopic do
           @topic.discussion_entries.create!(user: @student, message: "reply to entry by student", root_entry_id: entry_by_teacher.id, parent_id: entry_by_teacher.id)
         end
 
-        # TODO: When all the children submissions are marked as submitted, the parent submission should be marked as submitted too.
-        # This will be done in a subsequent ticket.
-        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "submitted"
         expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
         expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
       end
@@ -3059,6 +3086,178 @@ describe DiscussionTopic do
       it "has the correct reply_to_entry_required_count and is valid" do
         expect(@topic.reply_to_entry_required_count).to eq 5
         expect(@topic).to be_valid
+      end
+    end
+  end
+
+  describe "unlock_at and delayed_post_at" do
+    before do
+      @topic = @course.discussion_topics.create!(title: "topic", user: @teacher)
+    end
+
+    it "prefers unlock_at to delayed_post_at" do
+      @topic[:delayed_post_at] = Time.now + 5.days
+      @topic[:unlock_at] = Time.now
+      expect(@topic.delayed_post_at).to equal @topic[:unlock_at]
+      expect(@topic.unlock_at).to equal @topic[:unlock_at]
+    end
+
+    it "defaults to delayed_post_at if unlock_at is nil" do
+      @topic[:delayed_post_at] = Time.now + 5.days
+      @topic[:unlock_at] = nil
+      expect(@topic.delayed_post_at).to equal @topic[:delayed_post_at]
+      expect(@topic.unlock_at).to equal @topic[:delayed_post_at]
+    end
+
+    it "always updates unlock_at and sets delayed_post_at to the same value" do
+      @topic.delayed_post_at = nil
+      expect(@topic[:delayed_post_at]).to be_nil
+      expect(@topic[:unlock_at]).to eq @topic.delayed_post_at
+      expect(@topic.delayed_post_at).to eq @topic.unlock_at
+
+      @topic[:delayed_post_at] = Time.now + 5.days
+      @topic[:unlock_at] = nil
+      @topic.unlock_at = Time.now + 1.day
+      expect(@topic[:delayed_post_at]).to eq @topic[:unlock_at]
+      expect(@topic[:unlock_at]).to eq @topic.delayed_post_at
+      expect(@topic.delayed_post_at).to eq @topic.unlock_at
+    end
+  end
+
+  describe "visible_ids_by_user" do
+    describe "differentiated topics" do
+      def discussion_and_assignment(opts = {})
+        assignment = @course.assignments.create!({
+          title: "some discussion assignment",
+          submission_types: "discussion_topic"
+        }.merge(opts))
+        [assignment.discussion_topic, assignment]
+      end
+
+      before :once do
+        @course = course_factory(active_course: true)
+
+        @item_without_assignment = discussion_topic_model(user: @teacher)
+        @item_with_assignment_and_only_vis, @assignment = discussion_and_assignment(only_visible_to_overrides: true)
+        @item_with_assignment_and_visible_to_all, @assignment2 = discussion_and_assignment(only_visible_to_overrides: false)
+        @item_with_override_for_section_with_no_students, @assignment3 = discussion_and_assignment(only_visible_to_overrides: true)
+        @item_with_no_override, @assignment4 = discussion_and_assignment(only_visible_to_overrides: true)
+
+        @course_section = @course.course_sections.create
+        @student1, @student2, @student3 = create_users(3, return_type: :record)
+        @course.enroll_student(@student2, enrollment_state: "active")
+        @section = @course.course_sections.create!(name: "test section")
+        @section2 = @course.course_sections.create!(name: "second test section")
+        student_in_section(@section, user: @student1)
+        create_section_override_for_assignment(@assignment, { course_section: @section })
+        create_section_override_for_assignment(@assignment3, { course_section: @section2 })
+        @course.reload
+        @vis_hash = DiscussionTopic.visible_ids_by_user(course_id: @course.id, user_id: [@student1, @student2, @student3].map(&:id))
+      end
+
+      it "returns both topics for a student with an override" do
+        expect(@vis_hash[@student1.id].sort).to eq [
+          @item_without_assignment.id,
+          @item_with_assignment_and_only_vis.id,
+          @item_with_assignment_and_visible_to_all.id
+        ].sort
+      end
+
+      it "does not return differentiated topics to a student with no overrides" do
+        expect(@vis_hash[@student2.id].sort).to eq [
+          @item_without_assignment.id,
+          @item_with_assignment_and_visible_to_all.id
+        ].sort
+      end
+    end
+
+    describe "section specific topic" do
+      def add_section_to_topic(topic, section)
+        topic.is_section_specific = true
+        topic.discussion_topic_section_visibilities <<
+          DiscussionTopicSectionVisibility.new(
+            discussion_topic: topic,
+            course_section: section,
+            workflow_state: "active"
+          )
+        topic.save!
+      end
+
+      it "filters section specific topics properly" do
+        course = course_factory(active_course: true)
+        section1 = course.course_sections.create!(name: "test section")
+        section2 = course.course_sections.create!(name: "second test section")
+        section_specific_topic1 = course.discussion_topics.create!(title: "section specific topic 1")
+        section_specific_topic2 = course.discussion_topics.create!(title: "section specific topic 2")
+        add_section_to_topic(section_specific_topic1, section1)
+        add_section_to_topic(section_specific_topic2, section2)
+        student = create_users(1, return_type: :record).first
+        course.enroll_student(student, section: section1)
+        course.reload
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
+        expect(vis_hash[student.id].length).to eq(1)
+        expect(vis_hash[student.id].first).to eq(section_specific_topic1.id)
+      end
+
+      it "filters section specific topics properly for multiple users" do
+        course = course_factory(active_all: true)
+        section1 = course.course_sections.create!(name: "section 1")
+        section2 = course.course_sections.create!(name: "section 2")
+        topic1 = course.discussion_topics.create!(title: "topic 1 (for section 1)")
+        topic2 = course.discussion_topics.create!(title: "topic 2 (for section 2)")
+        topic3 = course.discussion_topics.create!(title: "topic 3 (for all sections)")
+        topic4 = course.discussion_topics.create!(title: "topic 4 (for section 2)")
+        add_section_to_topic(topic1, section1)
+        add_section_to_topic(topic2, section2)
+        add_section_to_topic(topic4, section2)
+        student = user_factory(active_all: true)
+        teacher = user_factory(active_all: true)
+        course.enroll_student(student, section: section2)
+        course.enroll_teacher(teacher, section: section1)
+        course.reload
+
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id, teacher.id], item_type: :discussion)
+        expect(vis_hash[student.id]).to contain_exactly(topic2.id, topic3.id, topic4.id)
+        expect(vis_hash[teacher.id]).to contain_exactly(topic1.id, topic3.id)
+      end
+
+      it "properly filters section specific topics for deleted section visibilities" do
+        course = course_factory(active_course: true)
+        section1 = course.course_sections.create!(name: "section for student")
+        section_specific_topic1 = course.discussion_topics.create!(title: "section specific topic 1")
+        add_section_to_topic(section_specific_topic1, section1)
+        student = create_users(1, return_type: :record).first
+        course.enroll_student(student, section: section1)
+        course.reload
+        section_specific_topic1.destroy
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
+        expect(vis_hash[student.id].length).to eq(0)
+      end
+
+      it "handles sections that don't have any discussion topics" do
+        course = course_factory(active_all: true)
+        section1 = course.course_sections.create!(name: "section 1")
+        section2 = course.course_sections.create!(name: "section 2")
+        topic1 = course.discussion_topics.create!(title: "topic 1 (for section 1)")
+        add_section_to_topic(topic1, section1)
+        student = user_factory(active_all: true)
+        course.enroll_student(student, section: section2)
+        course.reload
+
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
+        expect(vis_hash[student.id].length).to be(0)
+      end
+
+      it "handles user not enrolled in any sections" do
+        course = course_factory(active_all: true)
+        section1 = course.course_sections.create!(name: "section 1")
+        topic1 = course.discussion_topics.create!(title: "topic 1 (for section 1)")
+        add_section_to_topic(topic1, section1)
+        student = user_factory(active_all: true)
+        course.reload
+
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
+        expect(vis_hash[student.id].length).to be(0)
       end
     end
   end

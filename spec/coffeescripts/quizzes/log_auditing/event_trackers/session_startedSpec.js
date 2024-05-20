@@ -18,7 +18,6 @@
 
 import Subject from '@canvas/quiz-log-auditing/jquery/event_trackers/session_started'
 import K from '@canvas/quiz-log-auditing/jquery/constants'
-import $ from 'jquery'
 
 QUnit.module('Quizzes::LogAuditing::EventTrackers::SessionStarted')
 

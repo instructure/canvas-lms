@@ -336,6 +336,9 @@
             "name": "GradingPeriodGroup"
           },
           {
+            "name": "GradingStandard"
+          },
+          {
             "name": "Group"
           },
           {
@@ -517,6 +520,9 @@
           },
           {
             "name": "GroupMembership"
+          },
+          {
+            "name": "InboxSettings"
           },
           {
             "name": "InternalSetting"

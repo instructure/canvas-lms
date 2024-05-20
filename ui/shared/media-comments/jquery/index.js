@@ -17,17 +17,17 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
-import pubsub from 'jquery-tinypubsub'
+import * as pubsub from 'jquery-tinypubsub'
 import $ from 'jquery'
 import fileSize from '@canvas/util/fileSize'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import './mediaComment'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.h/ */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */
 import 'jqueryui/progressbar'
+import {each} from 'lodash'
 
 const I18n = useI18nScope('media_comments_publicjs')
 
@@ -191,7 +191,7 @@ $.mediaComment.upload_delegate = {
     }
     $('#media_upload_progress').css('visibility', 'visible').progressbar({value: 1})
     $('#media_upload_submit')
-      .attr('disabled', true)
+      .prop('disabled', true)
       .text(I18n.t('messages.submitting', 'Submitting Media File...'))
     $('#' + type + '_upload')[0].upload()
   },
@@ -210,7 +210,7 @@ $.mediaComment.upload_delegate = {
     const file = $('#' + type + '_upload')[0].getFiles()[0]
     $('#media_upload_settings .icon').attr('src', '/images/file-' + type + '.png')
     $('#media_upload_submit').show()
-    $('#media_upload_submit').attr('disabled', !file)
+    $('#media_upload_submit').prop('disabled', !file)
     $('#media_upload_settings').css('visibility', file ? 'visible' : 'hidden')
     $('#media_upload_title').val(file.title)
     $('#media_upload_display_title').text(file.title)
@@ -288,11 +288,8 @@ $.mediaComment.upload_delegate = {
 let reset_selectors = false
 let lastInit = null
 $.mediaComment.init = function (mediaType, opts) {
-  require.ensure(
-    [],
-    () => {
-      const swfobject = require('swfobject')
-
+  import('swfobject')
+    .then(swfobject => {
       lastInit = lastInit || new Date()
       mediaType = mediaType || 'any'
       opts = opts || {}
@@ -318,6 +315,7 @@ $.mediaComment.init = function (mediaType, opts) {
           width: 560,
           height: 475,
           modal: true,
+          zIndex: 1000,
         })
         $dialog.dialog('option', 'close', () => {
           $('#audio_record').before("<div id='audio_record'/>").remove()
@@ -620,6 +618,7 @@ $.mediaComment.init = function (mediaType, opts) {
           width: 470,
           height: 300,
           modal: true,
+          zIndex: 1000,
         })
 
         // **********************************************************************
@@ -677,9 +676,10 @@ $.mediaComment.init = function (mediaType, opts) {
         // only call mediaCommentReady if we are not doing js uploader
         mediaCommentReady()
       }
-    },
-    'mediaCommentRecordAsyncChunk'
-  )
+    })
+    .catch(() => {
+      throw new Error('Failed to load swfobject')
+    })
 } // End of init function
 
 $(document).ready(function () {
@@ -700,7 +700,7 @@ $(document).ready(function () {
       .removeClass('with_volume')
     $('#media_upload_submit')
       .text(I18n.t('buttons.submit', 'Submit Media File'))
-      .attr('disabled', true)
+      .prop('disabled', true)
     $('#media_upload_settings').css('visibility', 'hidden')
     $('#media_upload_progress')
       .css('visibility', 'hidden')
@@ -766,7 +766,7 @@ $(document).bind('media_recording_error', () => {
 })
 
 window.mediaCommentCallback = function (results) {
-  _.each(results, addEntry)
+  each(results, addEntry)
   $('#media_comment_create_dialog').empty().dialog('close')
 }
 

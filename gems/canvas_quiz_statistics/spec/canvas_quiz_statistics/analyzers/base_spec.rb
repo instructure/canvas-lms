@@ -29,7 +29,7 @@ describe CanvasQuizStatistics::Analyzers::Base do
   describe "DSL" do
     def unset(*klasses)
       klasses.each do |klass|
-        Object.send(:remove_const, klass.name.demodulize)
+        Object.send(:remove_const, klass.name.demodulize) # rubocop:disable RSpec/RemoveConst
         Base.metrics[klass.question_type] = []
       end
     end

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import ConfirmationModal, {ComponentProps} from '../ConfirmationModal'
+import ConfirmationModal, {type ComponentProps} from '../ConfirmationModal'
 
 const defaultProps: ComponentProps = {
   isOpen: true,

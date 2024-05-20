@@ -72,7 +72,6 @@ describe('SplitScreenParent', () => {
     onSuccessStub.mockClear()
   })
 
-
   it('should render the reply preview', () => {
     const quotedEntry = {
       quotedEntry: {
@@ -179,7 +178,6 @@ describe('SplitScreenParent', () => {
     const {queryByText} = setup(
       defaultProps({
         discussionEntryOverrides: {
-          isolatedEntryId: '77',
           parentId: '77',
           depth: 4,
         },
@@ -201,7 +199,6 @@ describe('SplitScreenParent', () => {
     const {queryByText} = setup(
       defaultProps({
         discussionEntryOverrides: {
-          isolatedEntryId: '77',
           parentId: '77',
           depth: 3,
         },

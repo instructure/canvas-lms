@@ -29,9 +29,7 @@ module Auditors::ActiveRecord
       PseudonymRecord
     ].freeze
 
-    def self.precreate_tables
-      Setting.get("auditors_precreate_tables", 2).to_i
-    end
+    PRECREATE_TABLES = 2
 
     def self.process(prune: false)
       Shard.current.database_server.unguard do
@@ -42,7 +40,7 @@ module Auditors::ActiveRecord
 
             partman = CanvasPartman::PartitionManager.create(auditor_cls)
 
-            partman.ensure_partitions(precreate_tables)
+            partman.ensure_partitions(PRECREATE_TABLES)
 
             if prune
               Shard.current.database_server.unguard do

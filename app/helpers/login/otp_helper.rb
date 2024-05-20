@@ -23,5 +23,19 @@ module Login
     def configuring?
       !!session[:pending_otp_secret_key]
     end
+
+    def otp_via_sms?
+      @otp_via_sms ||= if @current_pseudonym.authentication_provider.present?
+                         @current_pseudonym.authentication_provider.otp_via_sms?
+                       elsif @current_pseudonym.account.canvas_authentication?
+                         @current_pseudonym.account.canvas_authentication_provider.otp_via_sms?
+                       else
+                         false
+                       end
+    end
+
+    def otp_via_sms_message
+      otp_via_sms? ? t("This can be a device that can generate verification codes, or a phone that can receive text messages.") : ""
+    end
   end
 end

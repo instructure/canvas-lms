@@ -84,6 +84,7 @@ const rceMock = createDeepMockProxy<RCEWrapper>(
         contextType: 'course',
       },
     }, // satisfies Partial<RCEWrapperProps> as any,
+    getResourceIdentifiers: () => ({resourceType: 'assignment.body', resourceId: '132'}),
   }
 )
 
@@ -204,6 +205,26 @@ describe('ExternalToolDialog', () => {
       expect(
         (container?.querySelector('input[name="editor_contents"]') as HTMLInputElement)?.value
       ).toBe(contents)
+      await waitFor(() => expect(submit).toHaveBeenCalled())
+    })
+
+    it('includes resource type and id in form', async () => {
+      const instance = await getInstance(container)
+      instance.open(toolHelper(1))
+      expect(
+        (
+          container?.querySelector(
+            'input[name="com_instructure_course_canvas_resource_type"]'
+          ) as HTMLInputElement
+        )?.value
+      ).toBe('assignment.body')
+      expect(
+        (
+          container?.querySelector(
+            'input[name="com_instructure_course_canvas_resource_id"]'
+          ) as HTMLInputElement
+        )?.value
+      ).toBe('132')
       await waitFor(() => expect(submit).toHaveBeenCalled())
     })
 

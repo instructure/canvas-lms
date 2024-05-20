@@ -23,7 +23,7 @@
  */
 
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
+import {extend as lodashExtend} from 'lodash'
 import Section from '@canvas/sections/backbone/models/Section'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
@@ -91,7 +91,7 @@ export default AssignmentOverride = (function () {
       if (options == null) {
         options = {}
       }
-      const opts = _.extend(options, {course_section_id: Section.defaultDueDateSectionID})
+      const opts = lodashExtend(options, {course_section_id: Section.defaultDueDateSectionID})
       return new AssignmentOverride(opts)
     }
 

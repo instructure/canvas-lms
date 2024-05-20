@@ -73,11 +73,7 @@ export default class LoadingFutureIndicator extends Component {
     if (this.props.loadingFuture && !this.props.allFutureItemsLoaded) {
       return (
         <View>
-          <Spinner
-            size="small"
-            margin="0 x-small 0 0"
-            renderTitle={() => I18n.t('Loading...')}
-          />
+          <Spinner size="small" margin="0 x-small 0 0" renderTitle={() => I18n.t('Loading...')} />
           <Text size="small" color="secondary">
             {I18n.t('Loading...')}
           </Text>

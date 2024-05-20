@@ -45,7 +45,7 @@ export const CanvasInboxApp = () => {
   }, [])
 
   if (loading) {
-    return <LoadingIndicator />
+    return <LoadingIndicator delay={300} />
   }
 
   return (

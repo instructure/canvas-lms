@@ -53,8 +53,8 @@ describe('Reply', () => {
     expect(getByText('Reply to post from Nikita')).toBeTruthy()
   })
 
-  it('renders quote when in isolated view', () => {
-    const {getByText} = setup({isIsolatedView: true})
+  it('renders quote when in split screen view', () => {
+    const {getByText} = setup({isSplitView: true})
     expect(getByText('Quote')).toBeTruthy()
   })
 

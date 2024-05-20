@@ -93,6 +93,7 @@ describe('ViewManager', () => {
   const originalEnv = JSON.parse(JSON.stringify(window.ENV))
   beforeEach(() => {
     window.ENV = {
+      FEATURES: {instui_nav: true},
       context_asset_string: 'test_1',
       COURSE_ID: '1',
       current_user: {display_name: 'bob', avatar_url: 'awesome.avatar.url'},

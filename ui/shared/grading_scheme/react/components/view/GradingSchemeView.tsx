@@ -29,26 +29,26 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {calculateHighRangeForDataRow} from '../../helpers/calculateHighRangeForDataRow'
 import {GradingSchemeDataRowView} from './GradingSchemeDataRowView'
 import {Heading} from '@instructure/ui-heading'
-import {GradingScheme} from '@canvas/grading-scheme'
+import type {GradingScheme} from '../../../index'
 
 const I18n = useI18nScope('GradingSchemes')
 
 interface ComponentProps {
   gradingScheme: GradingScheme
-  pointsBasedGradingSchemesEnabled: boolean
   archivedGradingSchemesEnabled: boolean
-  disableEdit: boolean
   disableDelete: boolean
   onEditRequested?: () => any
   onDeleteRequested?: () => any
+  disableEdit?: boolean
+  archivedGradingSchemesDisableEdit?: boolean
 }
 
 export const GradingSchemeView: React.FC<ComponentProps> = ({
   gradingScheme,
-  pointsBasedGradingSchemesEnabled,
   archivedGradingSchemesEnabled,
   disableEdit = false,
   disableDelete = false,
+  archivedGradingSchemesDisableEdit = false,
   onEditRequested,
   onDeleteRequested,
 }) => {
@@ -95,32 +95,30 @@ export const GradingSchemeView: React.FC<ComponentProps> = ({
         </Flex>
       )}
       <View>
-        {pointsBasedGradingSchemesEnabled ? (
-          <View as="div" padding="none none small none" withVisualDebug={false}>
-            <Flex justifyItems="space-between" alignItems="start">
+        <View as="div" padding="none none medium none" withVisualDebug={false}>
+          <Flex justifyItems="space-between" alignItems="start">
+            <Flex.Item>
+              <Heading level="h4" style={{margin: '0px 0px 4px', lineHeight: '24px'}}>
+                {I18n.t('Grade By')}
+              </Heading>
+              {gradingScheme.points_based ? I18n.t('Points') : I18n.t('Percentage')}
+            </Flex.Item>
+            {archivedGradingSchemesEnabled && gradingScheme.id !== '' ? (
               <Flex.Item>
-                <Heading level="h4" margin="0 0 x-small">
-                  {I18n.t('Grade By')}
-                </Heading>
-                {gradingScheme.points_based ? I18n.t('Points') : I18n.t('Percentage')}
+                <IconButton
+                  screenReaderLabel={I18n.t('Edit Grading Scheme')}
+                  onClick={onEditRequested}
+                  data-testid={`grading-scheme-${gradingScheme.id}-edit-button`}
+                  disabled={archivedGradingSchemesDisableEdit}
+                >
+                  <IconEditLine />
+                </IconButton>
               </Flex.Item>
-              {archivedGradingSchemesEnabled && gradingScheme.id !== '' ? (
-                <Flex.Item>
-                  <IconButton
-                    screenReaderLabel={I18n.t('Edit Grading Scheme')}
-                    onClick={onEditRequested}
-                  >
-                    <IconEditLine />
-                  </IconButton>
-                </Flex.Item>
-              ) : (
-                <></>
-              )}
-            </Flex>
-          </View>
-        ) : (
-          <></>
-        )}
+            ) : (
+              <></>
+            )}
+          </Flex>
+        </View>
       </View>
       <Flex>
         <Flex.Item>
@@ -133,15 +131,10 @@ export const GradingSchemeView: React.FC<ComponentProps> = ({
           >
             <Table.Head>
               <Table.Row themeOverride={{borderColor: 'transparent'}}>
-                <Table.ColHeader themeOverride={{padding: '0.5rem 0'}} id="1" width="30%">
+                <Table.ColHeader themeOverride={{padding: '0'}} id="1" width="30%">
                   {I18n.t('Letter Grade')}
                 </Table.ColHeader>
-                <Table.ColHeader
-                  themeOverride={{padding: '0.5rem 0'}}
-                  id="2"
-                  width="70%"
-                  colSpan={2}
-                >
+                <Table.ColHeader themeOverride={{padding: '0'}} id="2" width="70%" colSpan={2}>
                   {I18n.t('Range')}
                 </Table.ColHeader>
               </Table.Row>
@@ -153,9 +146,7 @@ export const GradingSchemeView: React.FC<ComponentProps> = ({
                   dataRow={dataRow}
                   highRange={calculateHighRangeForDataRow(idx, array)}
                   isFirstRow={idx === 0}
-                  schemeScaleFactor={
-                    pointsBasedGradingSchemesEnabled ? gradingScheme.scaling_factor : 1.0
-                  }
+                  schemeScaleFactor={gradingScheme.scaling_factor}
                   viewAsPercentage={!gradingScheme.points_based}
                 />
               ))}

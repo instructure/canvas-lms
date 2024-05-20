@@ -38,8 +38,7 @@ ready(() => {
   //  `http://canvas.example.com/media_attachments_iframe/12345678
   let media_id = window.location.pathname.split('media_objects_iframe/').pop()
   // This covers a timing issue between canvas/RCE when the media_links_use_attachment flag is flipped off
-  if (media_id?.includes('media_attachments_iframe') && ENV?.media_object?.media_id) 
-  {
+  if (media_id?.includes('media_attachments_iframe') && ENV?.media_object?.media_id) {
     media_id = ENV.media_object.media_id
   }
   const attachment_id = ENV.attachment_id
@@ -63,11 +62,33 @@ ready(() => {
     }
   }
 
+  const mediaTracks = media_object?.media_tracks?.map(track => {
+    return {
+      id: track.id,
+      src: track.url,
+      label: captionLanguageForLocale(track.locale),
+      type: track.kind,
+      language: track.locale,
+      inherited: track.inherited,
+    }
+  })
+
   window.addEventListener(
     'message',
     event => {
       if (event?.data?.subject === 'reload_media' && media_id === event?.data?.media_object_id) {
         document.getElementsByTagName('video')[0].load()
+      } else if (event?.data?.subject === 'media_tracks_request') {
+        const tracks = mediaTracks?.map(t => ({
+          locale: t.language,
+          language: t.label,
+          inherited: t.inherited,
+        }))
+        if (tracks)
+          event.source.postMessage(
+            {subject: 'media_tracks_response', payload: tracks},
+            event.origin
+          )
       }
     },
     false
@@ -87,17 +108,6 @@ ready(() => {
       div.setAttribute('style', 'width: 320px; height: 14.25rem; margin: 1rem auto;')
     }
   }
-
-  const mediaTracks = media_object?.media_tracks?.map(track => {
-    return {
-      id: track.id,
-      src: track.url,
-      label: captionLanguageForLocale(track.locale),
-      type: track.kind,
-      language: track.locale,
-      inherited: track.inherited,
-    }
-  })
 
   const aria_label = !media_object.title ? undefined : media_object.title
   ReactDOM.render(

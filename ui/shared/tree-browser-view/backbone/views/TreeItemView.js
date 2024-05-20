@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
+import {uniqueId} from 'lodash'
 import template from '../../jst/TreeItem.handlebars'
 
 extend(TreeItemView, Backbone.View)
@@ -36,7 +36,7 @@ TreeItemView.optionProperty('nestingLevel')
 TreeItemView.prototype.attributes = function () {
   return {
     role: 'treeitem',
-    id: _.uniqueId('treenode-'),
+    id: uniqueId('treenode-'),
   }
 }
 

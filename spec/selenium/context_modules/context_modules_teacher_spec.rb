@@ -327,7 +327,7 @@ describe "context modules" do
     end
 
     it "validates locking a module item display functionality with differentiated modules" do
-      Account.site_admin.enable_feature! :differentiated_modules
+      differentiated_modules_on
       m1 = @course.context_modules.create!(name: "module 1")
 
       go_to_modules
@@ -614,6 +614,22 @@ describe "context modules" do
       expect(f("#context_module_item_#{tag.id}")).to contain_css(".item_link")
     end
 
+    it "duplicates a module" do
+      module1 = @course.context_modules.create(name: "My Module")
+      get "/courses/#{@course.id}/modules"
+
+      expect(all_modules.length).to eq 1
+      manage_module_button(module1).click
+      duplicate_module_button(module1).click
+      wait_for_ajaximations
+      expect(all_modules.length).to eq 2
+      expect(f("#flash_screenreader_holder")).not_to include_text("Error")
+      # test that the duplicated module's buttons are functional
+      module2 = @course.context_modules.reload.last
+      add_module_item_button(module2).click
+      expect(f("body")).to contain_jqcss('.ui-dialog:contains("Add Item to"):visible')
+    end
+
     context "expanding/collapsing modules" do
       before do
         @mod = create_modules(2, true)
@@ -747,6 +763,19 @@ describe "context modules" do
 
       it "creates a new quiz by default when new_quizzes_by_default is enabled" do
         @course.enable_feature! :new_quizzes_by_default
+        get "/courses/#{@course.id}/modules"
+
+        add_new_module_item_and_yield("#quizs_select", "Quiz", "[ Create Quiz ]", "A New Quiz") do
+          expect(f("#quizs_select")).not_to contain_css("input[name=quiz_engine_selection]")
+          expect(f("#quizs_select .new")).not_to include_text("New Quizzes")
+          expect(f("#quizs_select .new")).not_to include_text("Classic Quizzes")
+        end
+        expect(ContentTag.last.content.is_a?(Assignment)).to be_truthy
+      end
+
+      it "creates a new quiz by default when both new_quizzes_by_default and require_migration is enabled" do
+        @course.enable_feature! :new_quizzes_by_default
+        @course.root_account.enable_feature! :require_migration_to_new_quizzes
         get "/courses/#{@course.id}/modules"
 
         add_new_module_item_and_yield("#quizs_select", "Quiz", "[ Create Quiz ]", "A New Quiz") do

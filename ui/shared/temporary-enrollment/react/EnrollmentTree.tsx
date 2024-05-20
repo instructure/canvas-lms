@@ -19,31 +19,19 @@
 import React, {useEffect, useState} from 'react'
 import {EnrollmentTreeGroup} from './EnrollmentTreeGroup'
 import {Spinner} from '@instructure/ui-spinner'
-import {Course, Enrollment, Role, RoleChoice, Section} from './types'
+import type {Course, Enrollment, NodeStructure, Role, RoleChoice, Section} from './types'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import cloneDeep from 'lodash/cloneDeep'
 
 const I18n = useI18nScope('temporary_enrollment')
 
 export interface Props {
-  enrollmentsByCourse: Course[] | any
-  roles: Role[] | any
+  enrollmentsByCourse: Course[]
+  roles: Role[]
   selectedRole: RoleChoice
   createEnroll?: Function
   tempEnrollmentsPairing?: Enrollment[] | null
-}
-
-export interface NodeStructure {
-  children: NodeStructure[]
-  enrollId?: string
-  id: string
-  isCheck: boolean
-  isMismatch?: boolean
-  isMixed: boolean
-  isToggle?: boolean
-  label: string
-  parent?: NodeStructure
-  workflowState?: string
 }
 
 export function EnrollmentTree(props: Props) {
@@ -87,34 +75,28 @@ export function EnrollmentTree(props: Props) {
   }, [props.createEnroll])
 
   useEffect(() => {
-    if (!loading) {
-      if (props.selectedRole.name !== '') {
-        for (const roles in tree) {
-          if (tree[roles].label.toLowerCase() === props.selectedRole.name.toLowerCase()) {
-            tree[roles].isToggle = true
-
-            // set mismatch for all sections and courses with role
-            for (const course of tree[roles].children) {
-              course.isMismatch = false
-
-              for (const section of course.children) {
-                section.isMismatch = false
-              }
-            }
-          } else {
-            for (const course of tree[roles].children) {
-              course.isMismatch = course.isCheck
-
-              for (const section of course.children) {
-                section.isMismatch = section.isCheck
-              }
-            }
-          }
-        }
-      }
+    if (loading) return
+    // update `isMismatch` of a course based on the `isCheck` status of its sections
+    const updateCourseMismatch = (course: NodeStructure) => {
+      course.isMismatch = course.children.some(section => section.isCheck)
     }
-
-    setTree([...tree])
+    // use a deep copy of `tree` to avoid direct state mutation and ensure proper React state updates
+    const treeCopy = cloneDeep(tree)
+    treeCopy.forEach((role: NodeStructure) => {
+      if (role.label.toLowerCase() === props.selectedRole.name.toLowerCase()) {
+        role.isToggle = true
+        role.children.forEach((course: NodeStructure) => {
+          course.isMismatch = false
+          course.children.forEach(section => (section.isMismatch = false))
+        })
+      } else {
+        role.children.forEach((course: NodeStructure) => {
+          course.children.forEach(section => (section.isMismatch = section.isCheck))
+          updateCourseMismatch(course)
+        })
+      }
+    })
+    setTree(treeCopy)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.selectedRole.name, loading])
 
@@ -146,7 +128,7 @@ export function EnrollmentTree(props: Props) {
         } else {
           roleCheck = false
         }
-        let roleNode = {
+        let roleNode: NodeStructure = {
           id: roleId,
           label: roleData?.label,
           // eslint-disable-next-line no-array-constructor
@@ -159,7 +141,7 @@ export function EnrollmentTree(props: Props) {
         const courseId = course.id
         const cId = 'c' + courseId
         const childArray: NodeStructure[] = []
-        let courseNode = {
+        let courseNode: NodeStructure = {
           isMismatch: false,
           id: cId,
           label: course.name,
@@ -207,19 +189,12 @@ export function EnrollmentTree(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.tempEnrollmentsPairing, props.enrollmentsByCourse])
 
-  const findOrAppendNewNode = (currentNode: any, parentNode: any) => {
-    let found = false
-    parentNode.find((node: NodeStructure) => {
-      if (node.label === currentNode.label) {
-        currentNode = node
-        found = true
-      }
-      return found
-    })
-    if (!found) {
+  const findOrAppendNewNode = (currentNode: NodeStructure, parentNode: NodeStructure[]) => {
+    const matchingNode = parentNode.find((node: NodeStructure) => node.id === currentNode.id)
+    if (!matchingNode) {
       parentNode.push(currentNode)
     }
-    return currentNode
+    return matchingNode || currentNode
   }
 
   const locateNode = (node: NodeStructure) => {
@@ -328,30 +303,33 @@ export function EnrollmentTree(props: Props) {
     const roleElements = []
     for (const role in tree) {
       roleElements.push(
-        <EnrollmentTreeGroup
-          key={tree[role].id}
-          id={tree[role].id}
-          label={tree[role].label}
-          indent="0"
-          updateCheck={handleUpdateTreeCheck}
-          updateToggle={handleUpdateTreeToggle}
-          isCheck={tree[role].isCheck}
-          isToggle={tree[role].isToggle}
-          isMixed={tree[role].isMixed}
-        >
-          {[...tree[role].children]}
-        </EnrollmentTreeGroup>
+        <Flex.Item key={tree[role].id} shouldGrow={true} overflowY="visible">
+          <EnrollmentTreeGroup
+            id={tree[role].id}
+            label={tree[role].label}
+            indent="0"
+            updateCheck={handleUpdateTreeCheck}
+            updateToggle={handleUpdateTreeToggle}
+            isCheck={tree[role].isCheck}
+            isToggle={tree[role].isToggle}
+            isMixed={tree[role].isMixed}
+          >
+            {[...tree[role].children]}
+          </EnrollmentTreeGroup>
+        </Flex.Item>
       )
     }
-    return <>{roleElements}</>
+    return (
+      <Flex gap="medium" direction="column">
+        {roleElements}
+      </Flex>
+    )
   }
 
   if (loading) {
     return (
       <Flex justifyItems="center" alignItems="center">
-        <Flex.Item shouldGrow={true}>
-          <Spinner renderTitle={I18n.t('Loading enrollments')} />
-        </Flex.Item>
+        <Spinner renderTitle={I18n.t('Loading enrollments')} />
       </Flex>
     )
   } else {

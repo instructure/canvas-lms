@@ -17,7 +17,7 @@
  */
 
 import type {ProgressData, DeprecatedGradingScheme} from '@canvas/grading/grading.d'
-import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
+import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 import StudentDatastore from './stores/StudentDatastore'
 import type {StatusColors} from './constants/colors'
 import type {
@@ -46,15 +46,20 @@ export type GradebookSettings = {
   enter_grades_as: any
   filter_columns_by: {
     assignment_group_id: string | null
+    assignment_group_ids?: string[] | null
     grading_period_id: string | null
     context_module_id: string | null
+    context_module_ids?: string[] | null
     end_date: string | null
     start_date: string | null
     submissions: SubmissionFilterValue | null // affects rows too
+    submission_filters?: SubmissionFilterValue[] | null
   }
   filter_rows_by: {
     section_id: string | null
+    section_ids?: string[] | null
     student_group_id: string | null
+    student_group_ids?: string[] | null
   }
   hide_assignment_group_totals: 'false' | 'true'
   hide_total: 'false' | 'true'
@@ -110,7 +115,7 @@ export type GradebookOptions = {
   custom_column_datum_url: string
   custom_column_url: string
   custom_columns_url: string
-  custom_grade_statuses: GradeStatus[]
+  custom_grade_statuses: GradeStatusUnderscore[]
   custom_grade_statuses_enabled: boolean
   default_grading_standard: GradingStandard[]
   download_assignment_submissions_url: string
@@ -143,6 +148,7 @@ export type GradebookOptions = {
   late_policy: LatePolicy | null
   login_handle_name: null | string
   message_attachment_upload_folder_id: string
+  multiselect_gradebook_filters_enabled: boolean
   outcome_gradebook_enabled: boolean
   performance_controls: PerformanceControlValues
   post_grades_feature: boolean
@@ -291,6 +297,11 @@ export type Filter = {
   type?: FilterType
   value?: string | null
   created_at: string
+}
+
+export type EnrollmentFilter = {
+  concluded: boolean
+  inactive: boolean
 }
 
 export type CustomStatusIdString = `custom-status-${string}`

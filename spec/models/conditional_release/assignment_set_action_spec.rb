@@ -25,21 +25,21 @@ module ConditionalRelease
     it_behaves_like "a soft-deletable model"
 
     it "must have student_id and actor_id" do
-      set = create :assignment_set
+      set = create(:assignment_set)
       [:student_id, :actor_id].each do |attr|
-        action = build :assignment_set_action, assignment_set: set
-        action.send("#{attr}=", nil)
+        action = build(:assignment_set_action, assignment_set: set)
+        action.send(:"#{attr}=", nil)
         expect(action.valid?).to be false
-        action.send("#{attr}=", "")
+        action.send(:"#{attr}=", "")
         expect(action.valid?).to be false
-        action.send("#{attr}=", "person")
+        action.send(:"#{attr}=", "person")
         expect(action.valid?).to be true
       end
     end
 
     it "must have action" do
-      set = create :assignment_set
-      action = build :assignment_set_action, assignment_set: set
+      set = create(:assignment_set)
+      action = build(:assignment_set_action, assignment_set: set)
       action.action = nil
       expect(action.valid?).to be false
       action.action = ""
@@ -49,8 +49,8 @@ module ConditionalRelease
     end
 
     it "must have source" do
-      set = create :assignment_set
-      action = build :assignment_set_action, assignment_set: set
+      set = create(:assignment_set)
+      action = build(:assignment_set_action, assignment_set: set)
       action.source = nil
       expect(action.valid?).to be false
       action.source = ""
@@ -60,8 +60,8 @@ module ConditionalRelease
     end
 
     it "must have an assignment_set_id" do
-      set = create :assignment_set
-      action = build :assignment_set_action
+      set = create(:assignment_set)
+      action = build(:assignment_set_action)
       action.assignment_set_id = nil
       expect(action.valid?).to be false
       action.assignment_set_id = set.id
@@ -69,7 +69,7 @@ module ConditionalRelease
     end
 
     it "is valid when assignment_set does not exist" do
-      action = create :assignment_set_action
+      action = create(:assignment_set_action)
       set_id = action.assignment_set.id
       action.assignment_set.destroy!
       expect(action.reload.valid?).to be true
@@ -77,20 +77,20 @@ module ConditionalRelease
     end
 
     describe "self.latest" do
-      it "selects only the most recent Action for each Set and user_id" do
+      it "selects only the most recently updated Action for each Set and user_id" do
         actions = []
         actions << create(:assignment_set_action, student_id: 2, assignment_set: create(:assignment_set))
-        set = create :assignment_set
+        set = create(:assignment_set)
         actions << create(:assignment_set_action, student_id: 1, assignment_set: set)
-        actions.concat Array.new(2) { create :assignment_set_action, student_id: 2, assignment_set: set }
-        actions.last.update_attribute(:created_at, 1.hour.ago)
+        actions.concat create_list(:assignment_set_action, 2, student_id: 2, assignment_set: set)
+        actions.last.update_attribute(:updated_at, 1.hour.ago)
         expect(AssignmentSetAction.latest).to eq actions[0..2]
       end
     end
 
     describe "self.current_assignments" do
       it "selects only actions that have not been unassigned" do
-        set = create :assignment_set
+        set = create(:assignment_set)
         create(:assignment_set_action, action: "assign", student_id: 1, assignment_set: set, created_at: 1.hour.ago)
         create(:assignment_set_action, action: "unassign", student_id: 1, assignment_set: set)
         expect(AssignmentSetAction.current_assignments("user")).to eq []
@@ -99,7 +99,7 @@ module ConditionalRelease
       end
 
       it "selects only actions for the specified sets" do
-        actions = Array.new(3) { create(:assignment_set_action, student_id: 1) }
+        actions = create_list(:assignment_set_action, 3, student_id: 1)
         selected_sets = actions[1..2].map(&:assignment_set)
         expect(AssignmentSetAction.current_assignments(1, selected_sets).order(:id)).to eq actions[1..2]
       end
@@ -107,7 +107,7 @@ module ConditionalRelease
 
     describe "self.create_from_sets" do
       it "creates records" do
-        range = create :scoring_range_with_assignments, assignment_set_count: 4
+        range = create(:scoring_range_with_assignments, assignment_set_count: 4)
         assigned = range.assignment_sets[0..1]
         unassigned = range.assignment_sets[2..3]
         audit_opts = { student_id: 1, actor_id: 2, source: "grade_change" }

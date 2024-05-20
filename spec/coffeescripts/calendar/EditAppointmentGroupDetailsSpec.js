@@ -17,12 +17,10 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import EditAppointmentGroupDetails from 'ui/features/calendar/jquery/EditAppointmentGroupDetails'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
-import tz from '@canvas/timezone'
-import detroit from 'timezone/America/Detroit'
-import french from 'timezone/fr_FR'
-import I18nStubber from 'helpers/I18nStubber'
+import * as tz from '@canvas/datetime'
 
 QUnit.module('EditAppointmentGroupDetails', {
   setup() {
@@ -76,6 +74,6 @@ test('disable context and group controls when editing an existing appointment', 
     this.contexts,
     null
   )
-  equal(instance.form.find('#option_course_1').attr('disabled'), 'disabled')
-  equal(instance.form.find('.group-signup-checkbox').attr('disabled'), 'disabled')
+  equal(instance.form.find('#option_course_1').prop('disabled'), true)
+  equal(instance.form.find('.group-signup-checkbox').prop('disabled'), true)
 })

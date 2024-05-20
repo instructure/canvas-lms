@@ -17,10 +17,10 @@
 
 // copied from: https://gist.github.com/1998897
 
-import _ from 'underscore'
+import {isElement, isEmpty, uniqueId, isArray, each, map, flatten} from 'lodash'
 import $ from 'jquery'
 import authenticity_token from '@canvas/authenticity-token'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 /*
 xsslint safeString.identifier iframeId httpMethod
 xsslint jqueryObject.identifier el
@@ -30,7 +30,7 @@ export function patch(Backbone) {
   Backbone.syncWithoutMultipart = Backbone.sync
   Backbone.syncWithMultipart = function (method, model, options) {
     // Create a hidden iframe
-    const iframeId = _.uniqueId('file_upload_iframe_')
+    const iframeId = uniqueId('file_upload_iframe_')
     const $iframe = $(`<iframe id="${iframeId}" name="${iframeId}"></iframe>`).hide()
     const dfd = new $.Deferred()
 
@@ -43,16 +43,16 @@ export function patch(Backbone) {
     }[method]
 
     function toForm(object, nested, asArray) {
-      const inputs = _.map(object, (attr, key) => {
+      const inputs = map(object, (attr, key) => {
         if (nested) key = `${nested}[${asArray ? '' : key}]`
 
-        if (_.isElement(attr)) {
+        if (isElement(attr)) {
           // leave a copy in the original form, since we're moving it
           const $orig = $(attr)
           $orig.after($orig.clone(true))
           return attr
-        } else if (!_.isEmpty(attr) && (_.isArray(attr) || typeof attr === 'object')) {
-          return toForm(attr, key, _.isArray(attr))
+        } else if (!isEmpty(attr) && (isArray(attr) || typeof attr === 'object')) {
+          return toForm(attr, key, isArray(attr))
         } else if (!`${key}`.match(/^_/) && attr != null && attr instanceof Date) {
           return $('<input/>', {
             name: key,
@@ -70,7 +70,7 @@ export function patch(Backbone) {
           })[0]
         }
       })
-      return _.flatten(inputs)
+      return flatten(inputs)
     }
 
     const $form = $(
@@ -93,7 +93,7 @@ export function patch(Backbone) {
       )
     }
 
-    _.each(toForm(model.toJSON()), el => {
+    each(toForm(model.toJSON()), el => {
       if (!el) return
       // s3 expects the file param last
       $form[el.name === 'file' ? 'append' : 'prepend'](el)
@@ -104,7 +104,7 @@ export function patch(Backbone) {
     function callback() {
       const iframeBody = $iframe[0].contentDocument && $iframe[0].contentDocument.body
 
-      let response = $.parseJSON($(iframeBody).text())
+      let response = JSON.parse($(iframeBody).text())
       // in case the form redirects after receiving the upload (API uploads),
       // prevent trying to work with an empty response
       if (!response) return

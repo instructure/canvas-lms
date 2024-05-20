@@ -26,7 +26,6 @@ import doFileUpload, {DoFileUploadResult} from '../shared/Upload/doFileUpload'
 import formatMessage from '../../../format-message'
 import {isAudioOrVideo, isImage} from '../shared/fileTypeUtils'
 import {showFlashAlert} from '../../../common/FlashAlert'
-import {TsMigrationAny} from '../../../types/ts-migration'
 import {
   isMicrosoftWordContentInEvent,
   RCEClipOrDragEvent,
@@ -38,9 +37,9 @@ import RCEWrapper from '../../RCEWrapper'
 // assume that if there are multiple RCEs on the page,
 // they all talk to the same canvas
 const config = {
-  store: null as TsMigrationAny,
-  session: null as TsMigrationAny, // null: we haven't gotten it yet, false: we don't need it
-  sessionPromise: null as TsMigrationAny,
+  store: null as any,
+  session: null as any, // null: we haven't gotten it yet, false: we don't need it
+  sessionPromise: null as any,
 }
 
 // when UploadFile renders
@@ -101,7 +100,7 @@ tinymce.PluginManager.add(
             'If Usage Rights are required, the file will not publish until enabled in the Files page.'
           ),
           type: 'info',
-        } as TsMigrationAny)
+        } as any)
       }
 
       // even though usage rights might be required by the course, canvas has no place

@@ -56,7 +56,7 @@ class MissingPolicyApplicator
 
     GuardRail.activate(:primary) do
       plucked_submissions = submissions.pluck(:user_id, :id, :course_id)
-      submissions = Submission.active.where(id: submissions)
+      submissions = Submission.active.missing.where(id: submissions)
 
       submissions.update_all(
         score:,

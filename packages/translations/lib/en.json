@@ -686,6 +686,12 @@
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Enter at least 3 characters to search"
   },
+  "enter_replacement_text_17631bbc": {
+    "message": "enter replacement text"
+  },
+  "enter_search_text_26cb4459": {
+    "message": "enter search text"
+  },
   "epsilon_54bb8afa": {
     "message": "Epsilon"
   },
@@ -781,6 +787,12 @@
   },
   "filipino_33339264": {
     "message": "Filipino"
+  },
+  "find_8d605019": {
+    "message": "Find"
+  },
+  "find_and_replace_6e345933": {
+    "message": "Find and Replace"
   },
   "finish_bc343002": {
     "message": "Finish"
@@ -1057,6 +1069,9 @@
   },
   "indefinite_integral_6623307e": {
     "message": "Indefinite Integral"
+  },
+  "index_of_max_80dcf7a5": {
+    "message": "{ index } of { max }"
   },
   "indigo_2035fc55": {
     "message": "Indigo"
@@ -1431,6 +1446,9 @@
   "next_40e12421": {
     "message": "Next"
   },
+  "next_findtext_9d69f0fe": {
+    "message": "Next { findText }"
+  },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "No accessibility issues were detected."
   },
@@ -1487,6 +1505,9 @@
   },
   "no_results_940393cf": {
     "message": "No results."
+  },
+  "no_results_found_58717065": {
+    "message": "No results found"
   },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "No results found for { filterTerm }"
@@ -1686,6 +1707,9 @@
   "preformatted_d0670862": {
     "message": "Preformatted"
   },
+  "prepend_findtext_append_8e0e769a": {
+    "message": "{ prepend }{ findText }{ append }"
+  },
   "prev_f82cbc48": {
     "message": "Prev"
   },
@@ -1700,6 +1724,12 @@
   },
   "preview_inline_9787330": {
     "message": "Preview inline"
+  },
+  "previous_bd2ac015": {
+    "message": "Previous"
+  },
+  "previous_findtext_8dfbfd30": {
+    "message": "Previous { findText }"
   },
   "prime_917ea60e": {
     "message": "Prime"
@@ -1773,8 +1803,26 @@
   "remove_link_d1f2f4d0": {
     "message": "Remove Link"
   },
+  "replace_all_d3d68b3": {
+    "message": "Replace All"
+  },
+  "replace_all_findtext_with_replacetext_da574b32": {
+    "message": "Replace all { findText } with { replaceText }"
+  },
   "replace_e61834a7": {
     "message": "Replace"
+  },
+  "replace_findtext_with_replacetext_7b5c7fb3": {
+    "message": "Replace { findText } with { replaceText }"
+  },
+  "replace_with_eeff01ad": {
+    "message": "Replace with"
+  },
+  "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+    "message": "Replaced { alertFindText } with { alertReplaceText }"
+  },
+  "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+    "message": "Replaced all { alertFindText } with { alertReplaceText }"
   },
   "reset_95a81614": {
     "message": "Reset"
@@ -1784,6 +1832,9 @@
   },
   "restore_auto_save_deccd84b": {
     "message": "Restore auto-save?"
+  },
+  "result_index_of_max_7db5ad8b": {
+    "message": "Result { index } of { max }."
   },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Reverse Turnstile (Does Not Yield)"

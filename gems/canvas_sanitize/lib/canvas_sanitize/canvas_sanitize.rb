@@ -47,6 +47,13 @@ module CanvasSanitize # :nodoc:
   end
 
   DEFAULT_PROTOCOLS = ["http", "https", :relative].freeze
+
+  remove_spaces_from_ids = lambda do |env|
+    return unless env[:node]&.element? && env[:node][:id] && env[:node][:id].match?(/\s/)
+
+    env[:node][:id] = env[:node][:id].gsub(/\s+/, "")
+  end
+
   SANITIZE = {
     elements: [
       "a",
@@ -262,7 +269,7 @@ module CanvasSanitize # :nodoc:
       "ul" => ["type"].freeze,
       "param" => ["name", "value"].freeze,
       "object" => %w[width height style data type classid codebase].freeze,
-      "source" => %w[media sizes src srcset type].freeze,
+      "source" => %w[media width height sizes src srcset type].freeze,
       "embed" => %w[name
                     src
                     type
@@ -272,9 +279,9 @@ module CanvasSanitize # :nodoc:
                     allowscriptaccess
                     width
                     height].freeze,
-      "video" => %w[name src allowfullscreen muted poster width height controls playsinline].freeze,
+      "video" => %w[name src allowfullscreen allow muted poster width height controls playsinline].freeze,
       "track" => %w[default kind label src srclang].freeze,
-      "audio" => %w[name src muted controls].freeze,
+      "audio" => %w[name src allowfullscreen allow muted poster width height controls playsinline].freeze,
       "font" => %w[face color size].freeze,
       # MathML
       "annotation" => %w[href xref definitionURL encoding cd name src].freeze,
@@ -712,7 +719,9 @@ module CanvasSanitize # :nodoc:
       %w[bottom left right top].map { |i| "padding-#{i}" }
                   ).to_set.freeze,
       protocols: DEFAULT_PROTOCOLS
-    }
+    },
+
+    transformers: remove_spaces_from_ids
   }.freeze
 
   # Any allowed elements for which we don't explicitly declare a

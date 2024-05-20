@@ -29,10 +29,10 @@ import {useGradingSchemeDelete} from '../hooks/useGradingSchemeDelete'
 import {useGradingScheme} from '../hooks/useGradingScheme'
 import {
   GradingSchemeInput,
-  GradingSchemeEditableData,
-  GradingSchemeInputHandle,
+  type GradingSchemeEditableData,
+  type GradingSchemeInputHandle,
 } from './form/GradingSchemeInput'
-import {
+import type {
   GradingScheme,
   GradingSchemeSummary,
   GradingSchemeTemplate,
@@ -47,7 +47,6 @@ export interface GradingSchemeViewEditModalProps {
   contextType: 'Account' | 'Course'
   contextId: string
   gradingSchemeId: string
-  pointsBasedGradingSchemesEnabled: boolean
   archivedGradingSchemesEnabled: boolean
   onUpdate?: (gradingSchemeSummary: GradingSchemeSummary) => any
   onCancel: () => any
@@ -58,7 +57,6 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
   contextType,
   contextId,
   gradingSchemeId,
-  pointsBasedGradingSchemesEnabled,
   archivedGradingSchemesEnabled,
   onUpdate,
   onCancel,
@@ -121,7 +119,11 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
       setGradingScheme(updatedGradingScheme)
       if (onUpdate) {
         // if parent supplied a callback method, inform parent that grading standard was updated
-        onUpdate({title: updatedGradingScheme.title, id: updatedGradingScheme.id})
+        onUpdate({
+          title: updatedGradingScheme.title,
+          id: updatedGradingScheme.id,
+          context_type: updatedGradingScheme.context_type,
+        })
       }
     } catch (error) {
       showFlashError(I18n.t('There was an error while updating the grading scheme'))(error as Error)
@@ -218,11 +220,9 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
                     },
                   }}
                   onSave={modifiedGradingScheme => handleUpdateScheme(modifiedGradingScheme)}
-                  pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesEnabled}
                 />
               ) : (
                 <GradingSchemeView
-                  pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
                   archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
                   disableEdit={!canManageScheme(gradingScheme)}
                   disableDelete={!canManageScheme(gradingScheme)}

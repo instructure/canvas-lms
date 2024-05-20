@@ -425,30 +425,14 @@ describe ApplicationHelper do
           it "justs include domain root account's when there is no context or @current_user" do
             output = helper.include_account_js
             expect(output).to have_tag "script"
-            expect(output).to eq("<script>
-//<![CDATA[
-
-      ;[\"https://example.com/root/account.js\"].forEach(function(src) {
-        var s = document.createElement('script'); s.src = src; s.async = false;
-        document.head.appendChild(s)
-      });
-//]]>
-</script>")
+            expect(output).to eq("<script src=\"https://example.com/root/account.js\" defer=\"defer\"></script>")
           end
 
           it "loads custom js even for high contrast users" do
             @current_user = user_factory
             user_factory.enable_feature!(:high_contrast)
             output = helper.include_account_js
-            expect(output).to eq("<script>
-//<![CDATA[
-
-      ;[\"https://example.com/root/account.js\"].forEach(function(src) {
-        var s = document.createElement('script'); s.src = src; s.async = false;
-        document.head.appendChild(s)
-      });
-//]]>
-</script>")
+            expect(output).to eq("<script src=\"https://example.com/root/account.js\" defer=\"defer\"></script>")
           end
 
           it "includes granchild, child, and root when viewing the grandchild or any course or group in it" do
@@ -456,15 +440,7 @@ describe ApplicationHelper do
             group = course.groups.create!
             [@grandchild_account, course, group].each do |context|
               @context = context
-              expect(helper.include_account_js).to eq("<script>
-//<![CDATA[
-
-      ;[\"https://example.com/root/account.js\", \"https://example.com/child/account.js\", \"https://example.com/grandchild/account.js\"].forEach(function(src) {
-        var s = document.createElement('script'); s.src = src; s.async = false;
-        document.head.appendChild(s)
-      });
-//]]>
-</script>")
+              expect(helper.include_account_js).to eq("<script src=\"https://example.com/root/account.js\" defer=\"defer\"></script>\n  <script src=\"https://example.com/child/account.js\" defer=\"defer\"></script>\n  <script src=\"https://example.com/grandchild/account.js\" defer=\"defer\"></script>")
             end
           end
         end
@@ -476,6 +452,11 @@ describe ApplicationHelper do
     it "configures the help link to display the dialog by default" do
       expect(helper.help_link_url).to eq "#"
       expect(helper.help_link_classes).to eq "help_dialog_trigger"
+    end
+
+    it "returns the default_support_url setting if set" do
+      Setting.set("default_support_url", "http://help.example.com")
+      expect(helper.help_link_url).to eq "http://help.example.com"
     end
 
     it "overrides default help link with the configured support url" do
@@ -607,6 +588,7 @@ describe ApplicationHelper do
                                      width: 800,
                                      height: 400,
                                      use_tray: false,
+                                     always_on: false,
                                      description: "<p>the description.</p>\n",
                                      favorite: false
                                    }])
@@ -629,6 +611,7 @@ describe ApplicationHelper do
                                      width: 800,
                                      height: 400,
                                      use_tray: false,
+                                     always_on: false,
                                      description: "",
                                      favorite: false
                                    }])
@@ -648,6 +631,20 @@ describe ApplicationHelper do
       @context = @admin
 
       expect(editor_buttons).to be_empty
+    end
+
+    it "passes in the base url for use with default tool icons" do
+      @course = course_model
+      @context = @course
+
+      expect(ContextExternalTool).to receive(:editor_button_json).with(
+        an_instance_of(Array),
+        anything,
+        anything,
+        anything,
+        "http://test.host"
+      )
+      editor_buttons
     end
   end
 
@@ -1409,6 +1406,24 @@ describe ApplicationHelper do
         expect(js_env).to have_key :IMPROVED_OUTCOMES_MANAGEMENT
         expect(js_env[:IMPROVED_OUTCOMES_MANAGEMENT]).to be(false)
       end
+    end
+  end
+
+  describe "context_user_name" do
+    before :once do
+      user_factory(short_name: "User Name")
+    end
+
+    it "accepts a user" do
+      expect(context_user_name(Account.default, @user)).to eq "User Name"
+    end
+
+    it "accepts a user_id" do
+      expect(context_user_name(Account.default, @user.id)).to eq "User Name"
+    end
+
+    it "returns nil if supplied the id of a nonexistent user" do
+      expect(context_user_name(Account.default, 0)).to be_nil
     end
   end
 end

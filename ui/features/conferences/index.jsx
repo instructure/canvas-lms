@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {clone} from 'lodash'
 import Backbone from '@canvas/backbone'
 import CollectionView from '@canvas/backbone-collection-view'
 import ConferenceCollection from './backbone/collections/ConferenceCollection'
@@ -27,14 +27,14 @@ import ConferenceView from './backbone/views/ConferenceView'
 import ConcludedConferenceView from './backbone/views/ConcludedConferenceView'
 import EditConferenceView from './backbone/views/EditConferenceView'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
-import '@canvas/keycodes'
+import '@canvas/datetime/jquery'
+import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData'
-import '@canvas/datetime'
 import renderConferenceAlternatives from './react/renderAlternatives'
 import ready from '@instructure/ready'
 import React from 'react'
@@ -111,7 +111,7 @@ const ConferencesRouter = Backbone.Router.extend({
   },
 
   create() {
-    const conference = new Conference(_.clone(ENV.default_conference))
+    const conference = new Conference(clone(ENV.default_conference))
     conference.once('startSync', () => this.currentConferences.unshift(conference))
     if (conference.get('permissions').create) {
       if (ENV.bbb_modal_update) {

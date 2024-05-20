@@ -19,7 +19,7 @@
 /* eslint-disable no-void */
 
 import {extend} from '@canvas/backbone/utils'
-import _ from 'underscore'
+import {compact} from 'lodash'
 import Backbone from '@canvas/backbone'
 import UniqueDropdownCollection from './UniqueDropdownCollection'
 
@@ -77,7 +77,7 @@ NeverDropCollection.prototype.toAssignments = function (include_id) {
     })(this)
   )
   // compact results because we're mapping assignments :(
-  return _.compact(models)
+  return compact(models)
 }
 
 NeverDropCollection.prototype.parse = function (resp, _opts) {

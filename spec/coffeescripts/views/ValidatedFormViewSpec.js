@@ -1,3 +1,6 @@
+/* eslint-disable qunit/no-test-expect-argument */
+/* eslint-disable qunit/literal-compare-order */
+/* eslint-disable qunit/no-ok-equality */
 /*
  * Copyright (C) 2012 - present Instructure, Inc.
  *
@@ -17,6 +20,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import {Model} from '@canvas/backbone'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 
@@ -38,26 +42,28 @@ QUnit.module('ValidatedFormView', {
   },
 })
 
-function sendFail(server, response) {
+function sendFail(server, clock, response) {
   if (response == null) {
     response = ''
   }
-  return server.respond('POST', '/fail', [
+  server.respond('POST', '/fail', [
     400,
     {'Content-Type': 'application/json'},
     JSON.stringify(response),
   ])
+  clock.tick(1)
 }
 
-function sendSuccess(server, response) {
+function sendSuccess(server, clock, response) {
   if (response == null) {
     response = ''
   }
-  return server.respond('POST', '/success', [
+  server.respond('POST', '/success', [
     200,
     {'Content-Type': 'application/json'},
     JSON.stringify(response),
   ])
+  clock.tick(1)
 }
 
 // #
@@ -108,7 +114,7 @@ test('displays errors when validation fails and remove them on click', 4, functi
 
   this.form.submit()
 
-  sendFail(this.server, {
+  sendFail(this.server, this.clock, {
     errors: {
       first_name: [
         {
@@ -135,7 +141,7 @@ test('triggers success, submit events', 3, function () {
     equal('ok', resp, 'passes response in')
   })
   this.form.submit()
-  sendSuccess(this.server, 'ok')
+  sendSuccess(this.server, this.clock, 'ok')
 })
 
 test('triggers fail, submit events', 6, function () {
@@ -149,7 +155,7 @@ test('triggers fail, submit events', 6, function () {
     equal(statusText, 'Bad Request', 'passes statusText in')
   })
   this.form.submit()
-  sendFail(this.server, {
+  sendFail(this.server, this.clock, {
     errors: {
       first_name: [
         {
@@ -173,7 +179,7 @@ test('disables inputs while loading', 2, function () {
     equal(this.form.$(':disabled').length, 3)
   })
   this.form.submit()
-  sendSuccess(this.server)
+  sendSuccess(this.server, this.clock)
 })
 
 test('submit delegates to saveFormData', 1, function () {

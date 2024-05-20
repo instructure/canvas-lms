@@ -30,6 +30,7 @@ import {
   IconSearchLine,
   IconImportLine,
   IconOutcomesLine,
+  IconArchiveLine,
 } from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
@@ -44,8 +45,9 @@ const OutcomeKebabMenu = ({
   canDestroy,
   isGroup,
   groupDescription,
+  canArchive,
 }) => {
-  const {menuOptionForOutcomeDetailsPageFF} = useCanvasContext()
+  const {menuOptionForOutcomeDetailsPageFF, archiveOutcomesFF} = useCanvasContext()
   const hasDescription =
     typeof groupDescription === 'string' &&
     stripHtmlTags(groupDescription).replace(/[\n\r\t\s(&nbsp;)]+/g, '')
@@ -99,6 +101,21 @@ const OutcomeKebabMenu = ({
           {I18n.t('Remove')}
         </View>
       </Menu.Item>
+      {archiveOutcomesFF && (
+        <Menu.Item disabled={isGroup ? false : !canArchive} value="archive">
+          <IconArchiveLine size="x-small" />
+          <View
+            padding="0 small"
+            data-testid={
+              isGroup || canArchive
+                ? 'outcome-kebab-menu-archive'
+                : 'outcome-kebab-menu-archive-disabled'
+            }
+          >
+            {I18n.t('Archive')}
+          </View>
+        </Menu.Item>
+      )}
       {isGroup && <Menu.Separator />}
       {isGroup && (
         <Menu.Item value="description" disabled={!hasDescription}>
@@ -117,12 +134,14 @@ OutcomeKebabMenu.propTypes = {
   groupDescription: PropTypes.string,
   isGroup: PropTypes.bool,
   canEdit: PropTypes.bool,
+  canArchive: PropTypes.bool,
 }
 
 OutcomeKebabMenu.defaultProps = {
   menuTitle: '',
   canEdit: true,
   isGroup: false,
+  canArchive: false,
 }
 
 export default OutcomeKebabMenu

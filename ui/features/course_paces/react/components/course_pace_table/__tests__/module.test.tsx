@@ -24,7 +24,7 @@ import {PACE_MODULE_1, PRIMARY_PACE} from '../../../__tests__/fixtures'
 import {renderConnected} from '../../../__tests__/utils'
 
 import {Module} from '../module'
-import {ModuleWithDueDates, CoursePaceItemWithDate} from '../../../types'
+import type {ModuleWithDueDates, CoursePaceItemWithDate} from '../../../types'
 
 const dueDates = ['2022-03-18T00:00:00-06:00', '2022-03-22T00:00:00-06:00']
 const module1: ModuleWithDueDates = {...(PACE_MODULE_1 as unknown as ModuleWithDueDates)}

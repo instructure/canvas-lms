@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq, no-alert */
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -21,8 +22,8 @@ import $ from 'jquery'
 import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym'
 import AvatarWidget from '@canvas/avatar-dialog-view'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime' /* datetimeString, time_field, datetime_field */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, formErrors, errorBox */
+import '@canvas/datetime/jquery' /* datetimeString, time_field, datetime_field */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */
@@ -62,21 +63,21 @@ $profile_table.find('.cancel_button').click(() => {
     .hide()
     .end()
     .find('#change_password_checkbox')
-    .attr('checked', false)
+    .prop('checked', false)
   return false
 })
 
 $profile_table
   .find('#change_password_checkbox')
   .change(function () {
-    if (!$(this).attr('checked')) {
+    if (!$(this).prop('checked')) {
       $profile_table.find('.change_password_row').hide().find(':password').val('')
     } else {
       $(this).addClass('showing')
       $profile_table.find('.change_password_row').show().find('#old_password').focus().select()
     }
   })
-  .attr('checked', false)
+  .prop('checked', false)
   .change()
 
 $update_profile_form
@@ -287,14 +288,14 @@ $('#access_token_form').formSubmit({
   beforeSubmit() {
     $(this)
       .find('button')
-      .attr('disabled', true)
+      .prop('disabled', true)
       .filter('.submit_button')
       .text(I18n.t('buttons.generating_token', 'Generating Token...'))
   },
   success(data) {
     $(this)
       .find('button')
-      .attr('disabled', false)
+      .prop('disabled', false)
       .filter('.submit_button')
       .text(I18n.t('buttons.generate_token', 'Generate Token'))
     $('#add_access_token_dialog').dialog('close')
@@ -316,7 +317,7 @@ $('#access_token_form').formSubmit({
   error() {
     $(this)
       .find('button')
-      .attr('disabled', false)
+      .prop('disabled', false)
       .filter('.submit_button')
       .text(I18n.t('errors.generating_token_failed', 'Generating Token Failed'))
   },
@@ -336,7 +337,7 @@ $('#token_details_dialog .regenerate_token').click(function () {
   const $token = $dialog.data('token')
   const url = $dialog.data('token_url')
   const $button = $(this)
-  $button.text(I18n.t('buttons.regenerating_token', 'Regenerating token...')).attr('disabled', true)
+  $button.text(I18n.t('buttons.regenerating_token', 'Regenerating token...')).prop('disabled', true)
   $.ajaxJSON(
     url,
     'PUT',
@@ -352,12 +353,12 @@ $('#token_details_dialog .regenerate_token').click(function () {
         .find('.full_token_warning')
         .showIf(data.visible_token.length > 10)
       $token.data('token', data)
-      $button.text(I18n.t('buttons.regenerate_token', 'Regenerate Token')).attr('disabled', false)
+      $button.text(I18n.t('buttons.regenerate_token', 'Regenerate Token')).prop('disabled', false)
     },
     () => {
       $button
         .text(I18n.t('errors.regenerating_token_failed', 'Regenerating Token Failed'))
-        .attr('disabled', false)
+        .prop('disabled', false)
     }
   )
 })
@@ -367,6 +368,8 @@ $('.show_token_link').click(function (event) {
   const url = $(this).attr('rel')
   $dialog.dialog({
     width: 700,
+    modal: true,
+    zIndex: 1000,
   })
   const $token = $(this).parents('.access_token')
   $dialog.data('token', $token)
@@ -379,7 +382,7 @@ $('.show_token_link').click(function (event) {
       .showIf(token.visible_token && token.visible_token !== 'protected')
       .find('.regenerate_token')
       .text(I18n.t('buttons.regenerate_token', 'Regenerate Token'))
-      .attr('disabled', false)
+      .prop('disabled', false)
     $dialog
       .find('.loading_message,.error_loading_message')
       .hide()
@@ -418,7 +421,7 @@ $('.add_access_token_link').click(function (event) {
   event.preventDefault()
   $('#access_token_form')
     .find('button')
-    .attr('disabled', false)
+    .prop('disabled', false)
     .filter('.submit_button')
     .text(I18n.t('buttons.generate_token', 'Generate Token'))
   $('#add_access_token_dialog')
@@ -430,6 +433,8 @@ $('.add_access_token_link').click(function (event) {
       open() {
         $(this).closest('.ui-dialog').focus()
       },
+      modal: true,
+      zIndex: 1000,
     })
     .fixDialogButtons()
 })

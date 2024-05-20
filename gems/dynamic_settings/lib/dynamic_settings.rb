@@ -34,8 +34,8 @@ module DynamicSettings
   CACHE_KEY_PREFIX = "dynamic_settings/"
 
   class << self
-    attr_accessor :environment
-    attr_reader :fallback_data, :use_consul, :config
+    attr_accessor :environment, :fallback_data
+    attr_reader :use_consul, :config
     attr_writer :fallback_recovery_lambda, :retry_lambda, :cache, :request_cache, :logger
 
     def config=(conf_hash)
@@ -91,23 +91,18 @@ module DynamicSettings
     end
 
     def on_reload!
-      @root_fallback_proxy = nil
       reset_cache!
     end
 
-    # Set the fallback data to use in leiu of Consul
+    # The fallback data to use in leiu of Consul
     #
     # This isn't really meant for use in production, but as a convenience for
     # development where most won't want to run a consul agent/server.
-    def fallback_data=(value)
-      @fallback_data = value
-      @root_fallback_proxy = if @fallback_data
-                               FallbackProxy.new(@fallback_data.with_indifferent_access)
-                             end
-    end
+    def config_data
+      # fallback_data is only relevant when set via accessor in specs
+      return @fallback_data if @fallback_data
 
-    def root_fallback_proxy
-      @root_fallback_proxy ||= FallbackProxy.new(ConfigFile.load("dynamic_settings").dup)
+      @config_data ||= ConfigFile.load("dynamic_settings")
     end
 
     # Build an object used to interacting with consul for the given
@@ -130,7 +125,8 @@ module DynamicSettings
              service: nil,
              cluster: nil,
              default_ttl: PrefixProxy::DEFAULT_TTL,
-             data_center: nil)
+             data_center: nil,
+             ignore_fallback_overrides: false)
       service ||= @default_service || :canvas
       if use_consul
         PrefixProxy.new(
@@ -147,7 +143,7 @@ module DynamicSettings
           circuit_breaker: @config.fetch("circuit_breaker", nil)
         )
       else
-        proxy = root_fallback_proxy
+        proxy = FallbackProxy.new(config_data.deep_dup, ignore_fallback_overrides:)
         proxy = proxy.for_prefix(tree)
         proxy = proxy.for_prefix(service)
         proxy = proxy.for_prefix(prefix) if prefix

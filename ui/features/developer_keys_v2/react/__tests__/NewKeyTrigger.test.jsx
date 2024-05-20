@@ -17,8 +17,9 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, screen} from '@testing-library/react'
 import DeveloperKeyModalTrigger from '../NewKeyTrigger'
+import userEvent from '@testing-library/user-event'
 
 const store = {
   dispatch: () => {},
@@ -29,28 +30,47 @@ const actions = {
   ltiKeysSetLtiKey: jest.fn(),
 }
 
-let wrapper = 'empty wrapper'
+const renderDeveloperKeyModalTrigger = () =>
+  render(<DeveloperKeyModalTrigger store={store} actions={actions} setAddKeyButtonRef={() => {}} />)
 
-beforeEach(() => {
-  wrapper = mount(
-    <DeveloperKeyModalTrigger store={store} actions={actions} setAddKeyButtonRef={() => {}} />
-  )
+describe('DeveloperKeyModalTrigger', () => {
+  beforeEach(async () => {
+    window.ENV = {
+      FEATURES: {
+        lti_dynamic_registration: true,
+      },
+    }
+    renderDeveloperKeyModalTrigger()
 
-  wrapper.find('Menu').first().find('Button').first().simulate('click')
-})
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: /create a developer key/i,
+      })
+    )
+  })
 
-afterEach(() => {
-  window.ENV = {}
-  wrapper.unmount()
-})
+  afterEach(() => {
+    window.ENV = {}
+  })
 
-it('it opens the API key modal when API key button is clicked', () => {
-  wrapper.find('li button').at(0).getDOMNode().click()
-  expect(actions.developerKeysModalOpen).toHaveBeenCalled()
-})
+  it('it opens the API key modal when API key button is clicked', async () => {
+    await userEvent.click(
+      screen.getByRole('menuitem', {
+        name: /create an api key/i,
+      })
+    )
 
-it('it opens the LTI key modal when LTI key button is clicked', () => {
-  wrapper.find('li button').at(1).getDOMNode().click()
-  expect(actions.ltiKeysSetLtiKey).toHaveBeenCalled()
-  expect(actions.developerKeysModalOpen).toHaveBeenCalled()
+    expect(actions.developerKeysModalOpen).toHaveBeenCalled()
+  })
+
+  it('it opens the LTI key modal when LTI key button is clicked', async () => {
+    await userEvent.click(
+      screen.getByRole('menuitem', {
+        name: /create an lti key/i,
+      })
+    )
+
+    expect(actions.ltiKeysSetLtiKey).toHaveBeenCalled()
+    expect(actions.developerKeysModalOpen).toHaveBeenCalled()
+  })
 })

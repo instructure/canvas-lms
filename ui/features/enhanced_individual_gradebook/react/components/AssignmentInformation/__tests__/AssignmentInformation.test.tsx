@@ -18,7 +18,8 @@
 import $ from 'jquery'
 import React from 'react'
 import {render} from '@testing-library/react'
-import AssignmentInformation, {AssignmentInformationComponentProps} from '..'
+import AssignmentInformation from '../index'
+import type {AssignmentInformationComponentProps} from '../index'
 import {assignmentInfoDefaultProps, defaultAssignment} from './fixtures'
 
 describe('Assignment Information Tests', () => {
@@ -112,6 +113,7 @@ describe('Assignment Information Tests', () => {
     })
 
     it('displays warning for default grade and curve grades when assignment is in a closed grading period and user is not an admin', () => {
+      ENV.current_user_is_admin = false
       ENV.current_user_roles = ['teacher']
       const {queryByTestId} = renderAssignmentInformation(props)
       expect(queryByTestId('default-grade-warning')).not.toBeNull()
@@ -119,6 +121,7 @@ describe('Assignment Information Tests', () => {
     })
 
     it('does not display warning and disables buttons for default grade and curve grades when assignment is in a closed grading period and user is an admin', () => {
+      ENV.current_user_is_admin = true
       ENV.current_user_roles = ['admin']
       const {queryByTestId} = renderAssignmentInformation(props)
       expect(queryByTestId('default-grade-warning')).toBeNull()
@@ -126,6 +129,7 @@ describe('Assignment Information Tests', () => {
     })
 
     it('disables buttons for default grade and curve grades when assignment is in a closed grading period and user is not an admin', () => {
+      ENV.current_user_is_admin = false
       ENV.current_user_roles = ['teacher']
       const {getByTestId} = renderAssignmentInformation(props)
       const defaultButton = getByTestId('default-grade-button')
@@ -134,7 +138,8 @@ describe('Assignment Information Tests', () => {
       expect(curveButton).toBeDisabled()
     })
 
-    it('does not disable buttons for default grade and curve grades when assignment is in a closed grading period and user is not an admin', () => {
+    it('does not disable buttons for default grade and curve grades when assignment is in a closed grading period and user is an admin', () => {
+      ENV.current_user_is_admin = true
       ENV.current_user_roles = ['admin']
       const {getByTestId} = renderAssignmentInformation(props)
       const defaultButton = getByTestId('default-grade-button')

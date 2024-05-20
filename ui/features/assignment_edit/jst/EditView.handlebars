@@ -14,7 +14,7 @@
   <div class="control-group">
     {{#if lockedItems.content}}
       <h1 id="assignment_name" class="title">{{name}}</h1>
-      <input type="hidden" name="name" value="{{name}}"/>
+      <input type="hidden" name="name" value="{{name}}"></input>
     {{else}}
       <div>
         <label for="assignment_name">{{#t}}Assignment Name{{/t}}</label>
@@ -29,7 +29,7 @@
             readonly
           {{/if}}
           {{disabledIfIncludes frozenAttributes "title"}}
-          autofocus/>
+          autofocus></input>
       </div>
     {{/if}}
   </div>
@@ -75,7 +75,7 @@
           readonly
         {{/ifAny}}
         {{disabledIfIncludes frozenAttributes "points_possible"}}
-      />
+      ></input>
       {{#unless lockedItems.points}}
         <div aria-live="polite" role="alert">
           <div id=point_change_warning class="alert">
@@ -153,7 +153,7 @@
         </div>
         <div class="form-column-right">
           <div class="border border-trbl border-round">
-            <div id="allowed-attempts-target" />
+            <div id="allowed-attempts-target"></div>
           </div>
         </div>
       </div>
@@ -207,9 +207,6 @@
                 name="anonymous_grading"
               }}
               {{#t}}Graders cannot view student names{{/t}}
-              <div id="anonymous-lti-text" style="{{hiddenUnless isQuizLTIAssignment}};font-size: 0.9em">
-                {{#t}}Once enabled for New Quizzes, anonymous grading will not be able to be toggled off.{{/t}}
-              </div>
             </label>
 
             <label class="checkbox" for="assignment_graders_anonymous_to_graders" style="{{hiddenUnless showGradersAnonymousToGradersCheckbox}}">
@@ -254,7 +251,11 @@
     <div class="form-column-left">
       <legend id="assignment_overrides">
         <label for="assignment_overrides">
-          {{#t}}Assign{{/t}}
+          {{#if differentiatedModulesEnabled}}
+            {{#t}}Assign Access{{/t}}
+          {{else}}
+            {{#t}}Assign{{/t}}
+          {{/if}}
         </label>
       </legend>
     </div>
@@ -265,15 +266,15 @@
 
 {{#if conditionalReleaseServiceEnabled}}
 <div id="mastery-paths-editor" style="display: none">
-  <div id="conditional_release_target" />
+  <div id="conditional_release_target"></div>
 </div>
 {{/if}}
 
 {{#if isQuizLTIAssignment}}
-  <input type="hidden" name="quiz_lti" value="1" />
+  <input type="hidden" name="quiz_lti" value="1"></input>
 {{/if}}
 
-<input type='hidden' id="secure_params" name="secure_params" value="{{secureParams}}" />
+<input type='hidden' id="secure_params" name="secure_params" value="{{secureParams}}"></input>
 
 <div id="assignment_external_tools"></div>
 

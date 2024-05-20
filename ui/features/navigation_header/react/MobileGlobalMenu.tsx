@@ -65,7 +65,9 @@ export default function MobileGlobalMenu(props: Props) {
     window.ENV.current_user_id && !window.ENV.current_user?.fake_student
   )
   const k5User = window.ENV.K5_USER
-  const showAdmin = window.ENV.current_user_roles && window.ENV.current_user_roles.includes('admin')
+  const showAdmin =
+    window.ENV.current_user_is_admin ||
+    (window.ENV.current_user_roles && window.ENV.current_user_roles.includes('admin'))
   const current_user: {
     display_name: string
     avatar_image_url: string
@@ -130,7 +132,7 @@ export default function MobileGlobalMenu(props: Props) {
               iconPosition="end"
               fluidWidth={true}
               summary={
-                <Flex padding="xx-small small">
+                <Flex>
                   <Flex.Item width="3rem">
                     <Avatar
                       name={current_user.display_name}
@@ -167,7 +169,7 @@ export default function MobileGlobalMenu(props: Props) {
               iconPosition="end"
               fluidWidth={true}
               summary={
-                <Flex padding="xx-small small">
+                <Flex>
                   <Flex.Item width="3rem">
                     <IconAdminLine inline={false} size="small" color="brand" />
                   </Flex.Item>
@@ -187,7 +189,7 @@ export default function MobileGlobalMenu(props: Props) {
             iconPosition="end"
             fluidWidth={true}
             summary={
-              <Flex padding="xx-small small">
+              <Flex>
                 <Flex.Item width="3rem">
                   <IconCoursesLine inline={false} size="small" color="brand" />
                 </Flex.Item>
@@ -207,7 +209,7 @@ export default function MobileGlobalMenu(props: Props) {
               iconPosition="end"
               fluidWidth={true}
               summary={
-                <Flex padding="xx-small small">
+                <Flex>
                   <Flex.Item width="3rem">
                     <IconGroupLine inline={false} size="small" color="brand" />
                   </Flex.Item>
@@ -262,7 +264,7 @@ export default function MobileGlobalMenu(props: Props) {
                       xmlns="http://www.w3.org/2000/svg"
                       xmlnsXlink="http://www.w3.org/1999/xlink"
                       viewBox="0 0 64 64"
-                      dangerouslySetInnerHTML={{__html: tool.svgPath}}
+                      dangerouslySetInnerHTML={{__html: tool.svgPath ?? ''}}
                       width="1em"
                       height="1em"
                       aria-hidden="true"
@@ -287,7 +289,7 @@ export default function MobileGlobalMenu(props: Props) {
             iconPosition="end"
             fluidWidth={true}
             summary={
-              <Flex padding="xx-small small">
+              <Flex>
                 <Flex.Item width="3rem">
                   <IconClockLine inline={false} size="small" color="brand" />
                 </Flex.Item>
@@ -308,7 +310,7 @@ export default function MobileGlobalMenu(props: Props) {
             iconPosition="end"
             fluidWidth={true}
             summary={
-              <Flex padding="xx-small small">
+              <Flex>
                 <Flex.Item width="3rem">
                   <IconQuestionLine inline={false} size="small" color="brand" />
                 </Flex.Item>

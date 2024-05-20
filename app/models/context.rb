@@ -144,7 +144,7 @@ module Context
     raise ArgumentError, "only_check is either an empty array or you are aking for invalid types" if types_to_check.empty?
 
     base_cache_key = "active_record_types3"
-    cache_key = [base_cache_key, (only_check.presence || "everything"), self].cache_key
+    cache_key = [base_cache_key, only_check.presence || "everything", self].cache_key
 
     # if it exists in redis, return that
     if (cached = Rails.cache.read(cache_key))
@@ -323,6 +323,31 @@ module Context
       "pages"
     else
       klass.table_name
+    end
+  end
+
+  def self.translated_content_type(content_type)
+    case content_type
+    when "Announcement"
+      I18n.t("Announcement")
+    when "Assignment"
+      I18n.t("Assignment")
+    when "Attachment"
+      I18n.t("Attachment")
+    when "ContextExternalTool"
+      I18n.t("External Tool")
+    when "ContextModuleSubHeader"
+      I18n.t("Context Module Sub Header")
+    when "DiscussionTopic"
+      I18n.t("Discussion Topic")
+    when "ExternalUrl"
+      I18n.t("External Url")
+    when "Quizzes::Quiz", "Quiz"
+      I18n.t("Quiz")
+    when "WikiPage"
+      I18n.t("Page")
+    else
+      I18n.t("Unknown Content Type")
     end
   end
 

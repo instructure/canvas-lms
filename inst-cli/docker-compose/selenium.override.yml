@@ -10,11 +10,13 @@ services:
 
 ## Chrome
   selenium-hub:
-    image: selenium/standalone-chrome
+    image: selenium/standalone-chrome:4.16
     # Use the seleniarm (not selenium) image on ARM architectures
     # image: seleniarm/standalone-chromium
+    # or
+    # image: seleniarm/standalone-chromium:4.16
     depends_on:
-      - canvas-web
+      - web
     environment:
       SE_NODE_GRID_URL: selenium-hub:4444/wd/hub
     init: true

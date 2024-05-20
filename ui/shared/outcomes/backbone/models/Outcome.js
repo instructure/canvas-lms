@@ -20,9 +20,9 @@
 
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
+import {map, find, extend as lodashExtend} from 'lodash'
 import Backbone from '@canvas/backbone'
-import CalculationMethodContent from '@canvas/grade-summary/backbone/models/CalculationMethodContent'
+import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
 
 const I18n = useI18nScope('modelsOutcome')
 
@@ -55,7 +55,7 @@ Outcome.prototype.setMasteryScales = function () {
   const ratings = ENV.MASTERY_SCALE.outcome_proficiency.ratings
   return this.set({
     ratings,
-    mastery_points: _.find(
+    mastery_points: find(
       ratings,
       (function (_this) {
         return function (r) {
@@ -66,7 +66,7 @@ Outcome.prototype.setMasteryScales = function () {
     // eslint-disable-next-line prefer-spread
     points_possible: Math.max.apply(
       Math,
-      _.map(ratings, function (r) {
+      map(ratings, function (r) {
         return r.points
       })
     ),
@@ -136,11 +136,11 @@ Outcome.prototype.canManage = function () {
 }
 
 Outcome.prototype.canManageInContext = function () {
-  let ref, ref1, ref2
+  let ref, ref1
   return (
     ((ref = ENV.ROOT_OUTCOME_GROUP) != null ? ref.context_type : void 0) === 'Course' &&
     ((ref1 = ENV.PERMISSIONS) != null ? ref1.manage_outcomes : void 0) &&
-    ((ref2 = ENV.current_user_roles) != null ? ref2.includes('admin') : void 0)
+    ENV.current_user_is_admin
   )
 }
 
@@ -167,7 +167,7 @@ Outcome.prototype.parse = function (resp) {
 }
 
 Outcome.prototype.present = function () {
-  return _.extend({}, this.toJSON(), this.calculationMethodContent().present())
+  return lodashExtend({}, this.toJSON(), this.calculationMethodContent().present())
 }
 
 Outcome.prototype.setUrlTo = function (action) {

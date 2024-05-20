@@ -30,8 +30,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
-import tz from '@canvas/timezone'
-import $ from 'jquery'
+import * as tz from '@canvas/datetime'
+import {encodeQueryString} from '@canvas/query-string-encoding'
 
 const I18n = useI18nScope('bounced_emails')
 
@@ -126,7 +126,9 @@ export default function BouncedEmailsView({accountId}) {
     }
     setLoading(true)
     setCsvReportPath(
-      `/api/v1/accounts/${accountId}/bounced_communication_channels.csv?${$.param(params)}`
+      `/api/v1/accounts/${accountId}/bounced_communication_channels.csv?${encodeQueryString(
+        params
+      )}`
     )
     doFetchApi({path, params}).then(onFetch).catch(onError)
   }, [accountId, searchTerm, onFetch, onError, before, after])

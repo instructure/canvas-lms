@@ -75,6 +75,7 @@ module CC
         end
 
         generate_banks(assessment_question_bank_ids)
+        generate_new_quizzes if include_new_quizzes_in_export?
       end
 
       def generate_quiz(quiz, for_cc = true)
@@ -198,6 +199,15 @@ module CC
         end
       end
 
+      def generate_new_quizzes
+        new_quizzes_generator = NewQuizzesGenerator.new(@manifest, @resources_node)
+        new_quizzes_generator.generate_qti
+      end
+
+      def include_new_quizzes_in_export?
+        @manifest.exporter.include_new_quizzes_in_export?
+      end
+
       def generate_assessment_meta(doc, quiz, migration_id)
         doc.instruct!
         doc.quiz("identifier" => migration_id,
@@ -249,7 +259,7 @@ module CC
             quiz.assignment_overrides.active.where(set_type: "Noop").each do |o|
               override_attrs = o.slice(:set_type, :set_id, :title)
               AssignmentOverride.overridden_dates.each do |field|
-                next unless o.send("#{field}_overridden")
+                next unless o.send(:"#{field}_overridden")
 
                 override_attrs[field] = o[field]
               end

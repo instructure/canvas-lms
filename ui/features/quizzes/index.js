@@ -22,6 +22,7 @@ import QuizArrowApplicator from '@canvas/quizzes/jquery/quiz_arrows'
 import './jquery/quizzes'
 import './jquery/supercalc'
 import '@canvas/quizzes/jquery/quiz_rubric'
+import '@canvas/jquery/jquery.simulate'
 
 ready(() => {
   $('#show_question_details').on('click', function () {

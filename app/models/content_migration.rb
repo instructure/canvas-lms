@@ -22,7 +22,7 @@ class ContentMigration < ActiveRecord::Base
   include Workflow
   include HtmlTextHelper
   include Rails.application.routes.url_helpers
-  include OutcomesServiceAlignmentsHelper
+  include CanvasOutcomesHelper
 
   belongs_to :context, polymorphic: [:course, :account, :group, { context_user: "User" }]
   validate :valid_date_shift_options
@@ -37,7 +37,7 @@ class ContentMigration < ActiveRecord::Base
   has_many :migration_issues, dependent: :destroy
   has_many :quiz_migration_alerts, as: :migration, inverse_of: :migration, dependent: :destroy
   has_one :job_progress, class_name: "Progress", as: :context, inverse_of: :context
-  serialize :migration_settings
+  serialize :migration_settings, yaml: { permitted_classes: [Symbol, Class] }
   cattr_accessor :export_file_path
   before_save :assign_quiz_migration_limitation_alert
   before_save :set_started_at_and_finished_at
@@ -118,7 +118,7 @@ class ContentMigration < ActiveRecord::Base
       if pre_processing? || exporting? || importing?
         self.started_at ||= Time.now.utc
       end
-      if failed? || imported? || exported?
+      if failed? || imported?
         self.finished_at ||= Time.now.utc
       end
     end
@@ -667,7 +667,7 @@ class ContentMigration < ActiveRecord::Base
   alias_method :import_content_without_send_later, :import_content
 
   def import!(data)
-    return import_quizzes_next!(data) if quizzes_next_migration?
+    return import_quizzes_next!(data) if cc_qti_migration? || quizzes_next_migration?
 
     Importers.content_importer_for(context_type)
              .import_content(
@@ -678,10 +678,20 @@ class ContentMigration < ActiveRecord::Base
              )
   end
 
+  def cc_qti_migration?
+    context.instance_of?(Course) &&
+      NewQuizzesFeaturesHelper.common_cartridge_qti_new_quizzes_import_enabled?(context) &&
+      for_common_cartridge?
+  end
+
+  def import_quizzes_next?
+    !!migration_settings[:import_quizzes_next]
+  end
+
   def quizzes_next_migration?
     context.instance_of?(Course) &&
       context.feature_enabled?(:quizzes_next) &&
-      migration_settings[:import_quizzes_next]
+      import_quizzes_next?
   end
 
   def quizzes_next_banks_migration?
@@ -730,6 +740,10 @@ class ContentMigration < ActiveRecord::Base
     migration_type == "course_copy_importer" || for_master_course_import?
   end
 
+  def for_common_cartridge?
+    migration_type == "common_cartridge_importer"
+  end
+
   def should_skip_import?(content_importer)
     migration_settings[:importer_skips]&.include?(content_importer)
   end
@@ -773,7 +787,7 @@ class ContentMigration < ActiveRecord::Base
         elsif content_is_outcome && outcome_has_results?(outcome, context)
           Rails.logger.debug { "skipping deletion sync for #{content.asset_string} due to there are Learning Outcomes Results" }
           add_skipped_item(child_tag)
-        elsif content_is_outcome && !can_unlink?(link)
+        elsif content_is_outcome && outcome_has_active_alignments?(link, outcome, context)
           Rails.logger.debug { "skipping deletion sync for #{content.asset_string} due to there are active Alignments to Content" }
           add_skipped_item(child_tag)
         else
@@ -797,6 +811,10 @@ class ContentMigration < ActiveRecord::Base
       outcome = LearningOutcome.find_by(id: content.content_id, context_type: "Account")
     end
     [outcome, link]
+  end
+
+  def outcome_has_active_alignments?(link, outcome, context)
+    !link.can_destroy? || outcome_has_alignments?(outcome, context)
   end
 
   def outcome_has_results?(outcome, context)

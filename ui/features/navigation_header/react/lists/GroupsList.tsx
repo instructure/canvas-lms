@@ -42,8 +42,14 @@ export default function CoursesList() {
         </List.Item>
       )}
       {isSuccess &&
-        data
-          .map(group => (
+        [
+          <List.Item key="all">
+            <Link margin="0 0 0 xx-small" href="/groups" isWithinText={false} display="block">
+              {I18n.t('All Groups')}
+            </Link>
+          </List.Item>,
+        ].concat(
+          data.map(group => (
             <List.Item key={group.id}>
               <Link
                 margin="0 0 0 xx-small"
@@ -55,13 +61,7 @@ export default function CoursesList() {
               </Link>
             </List.Item>
           ))
-          .concat([
-            <List.Item key="all">
-              <Link margin="0 0 0 xx-small" href="/groups" isWithinText={false} display="block">
-                {I18n.t('All Groups')}
-              </Link>
-            </List.Item>,
-          ])}
+        )}
     </List>
   )
 }

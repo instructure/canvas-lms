@@ -31,7 +31,12 @@ const I18n = useI18nScope('discussion_posts')
 
 export function TrayDisplayer({...props}) {
   return (
-    <Tray open={props.isTrayOpen} size="large" placement="end" label={props.trayTitle}>
+    <Tray
+      open={props.isTrayOpen}
+      size={props.size || 'large'}
+      placement="end"
+      label={props.trayTitle}
+    >
       <View as="div" padding="medium">
         <Flex direction="column">
           <Flex.Item>
@@ -58,6 +63,7 @@ export function TrayDisplayer({...props}) {
 }
 
 TrayDisplayer.propTypes = {
+  size: PropTypes.string,
   setTrayOpen: PropTypes.func,
   trayTitle: PropTypes.string,
   trayComponent: PropTypes.any,

@@ -18,7 +18,7 @@
 import $ from 'jquery'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import '@canvas/util/templateData'
 import 'jquery-pageless'
 
@@ -33,7 +33,7 @@ $(() => {
     scrape(data) {
       if (typeof data === 'string') {
         try {
-          data = $.parseJSON(data)
+          data = JSON.parse(data)
         } catch (e) {
           data = []
         }

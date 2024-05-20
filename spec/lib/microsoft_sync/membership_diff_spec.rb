@@ -213,6 +213,14 @@ describe MicrosoftSync::MembershipDiff do
     end
   end
 
+  describe "#local_owners_or_members" do
+    it "returns the local owners and members" do
+      set_local_members "student", [2, 3], owner_enrollment_type
+      set_local_members "teacher", [2, 4], owner_enrollment_type
+      expect(subject.local_owners_or_members).to eq(Set.new(%w[student2 student3 teacher2 teacher4]))
+    end
+  end
+
   describe "max_enrollment_members_reached?" do
     let(:half) { max / 2 }
     let(:max) { MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS }

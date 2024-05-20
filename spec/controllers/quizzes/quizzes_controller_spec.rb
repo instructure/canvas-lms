@@ -363,7 +363,7 @@ describe Quizzes::QuizzesController do
             expect(controller.js_env[:QUIZZES][:options]).not_to be_nil
             expect(controller.js_env[:QUIZZES][:options].count).to eq(4)
 
-            controller.js_env[:QUIZZES][:options].each do |_, assignment_options|
+            controller.js_env[:QUIZZES][:options].each_value do |assignment_options|
               expect(assignment_options[:can_unpublish]).to be true
             end
           end
@@ -378,7 +378,7 @@ describe Quizzes::QuizzesController do
             expect(controller.js_env[:QUIZZES][:options]).not_to be_nil
             expect(controller.js_env[:QUIZZES][:options].count).to eq(4)
 
-            controller.js_env[:QUIZZES][:options].each do |_, assignment_options|
+            controller.js_env[:QUIZZES][:options].each_value do |assignment_options|
               expect(assignment_options[:can_unpublish]).to be false
             end
           end
@@ -1064,6 +1064,7 @@ describe Quizzes::QuizzesController do
       end
 
       before do
+        allow(RequestContext::Generator).to receive(:request_id).and_return(SecureRandom.uuid)
         user_session(@teacher)
       end
 
@@ -2180,13 +2181,11 @@ describe Quizzes::QuizzesController do
 
     context "notifications" do
       before :once do
-        @notification = Notification.create(name: "Assignment Due Date Changed")
+        @notification = Notification.create(name: "Assignment Due Date Changed", category: "TestImmediately")
 
         @section = @course.course_sections.create!
 
         communication_channel(@student, { username: "student@instructure.com", active_cc: true })
-        @student.email_channel.notification_policies.create!(notification: @notification,
-                                                             frequency: "immediately")
 
         course_quiz
         @quiz.generate_quiz_data

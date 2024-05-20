@@ -102,7 +102,7 @@ describe FeatureFlags do
       feature = double(
         "Feature double",
         feature: "some_feature",
-        visible_on: ->(_) { return false },
+        visible_on: ->(_) { false },
         state: "allowed",
         shadow?: false
       )
@@ -398,14 +398,14 @@ describe FeatureFlags do
     it "caches an object's feature flag" do
       enable_cache do
         t_root_account.feature_flag("course_feature")
-        expect(Rails.cache).to be_exist(t_cache_key)
+        expect(Rails.cache).to exist(t_cache_key)
       end
     end
 
     it "caches a nil result" do
       enable_cache do
         t_root_account.feature_flag("course_feature2")
-        expect(Rails.cache).to be_exist(t_root_account.feature_flag_cache_key("course_feature2"))
+        expect(Rails.cache).to exist(t_root_account.feature_flag_cache_key("course_feature2"))
         expect(FeatureFlag).not_to receive(:where)
         t_root_account.reload.feature_flag("course_feature2")
       end
@@ -415,7 +415,7 @@ describe FeatureFlags do
       enable_cache do
         t_root_account.feature_flag("course_feature")
         t_root_account.feature_flags.where(feature: "course_feature").first.update_attribute(:state, "on")
-        expect(Rails.cache).not_to be_exist(t_cache_key)
+        expect(Rails.cache).not_to exist(t_cache_key)
       end
     end
 
@@ -423,7 +423,7 @@ describe FeatureFlags do
       enable_cache do
         t_root_account.feature_flag("course_feature")
         t_root_account.feature_flags.where(feature: "course_feature").first.destroy
-        expect(Rails.cache).not_to be_exist(t_cache_key)
+        expect(Rails.cache).not_to exist(t_cache_key)
       end
     end
 

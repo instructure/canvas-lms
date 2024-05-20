@@ -24,6 +24,12 @@ describe ContentExport do
     @ce = @course.content_exports.create!
   end
 
+  def create_content_export(opts = {})
+    course = course_model
+    allow(course).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
+    ContentExport.new({ context: course }.merge(opts))
+  end
+
   it "records the job id" do
     allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
     @ce.export(synchronous: true)
@@ -407,12 +413,6 @@ describe ContentExport do
   describe "#disable_content_rewriting?" do
     subject { content_export.disable_content_rewriting? }
 
-    def create_content_export(opts = {})
-      course = course_model
-      allow(course).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
-      ContentExport.new({ context: course }.merge(opts))
-    end
-
     context "quizzes_next export" do
       let(:content_export) { create_content_export(export_type: ContentExport::QUIZZES2, settings: { quizzes2: {} }) }
 
@@ -450,6 +450,137 @@ describe ContentExport do
         end
 
         it { is_expected.to be false }
+      end
+    end
+  end
+
+  describe "common_cartridge" do
+    before :once do
+      assignment_model(submission_types: "external_tool", course: @course)
+      tool = @c.context_external_tools.create!(
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
+      )
+      @a.external_tool_tag_attributes = { content: tool }
+      @a.save!
+
+      @course.root_account.settings[:provision] = { "lti" => "lti url" }
+      @course.root_account.save!
+      @ce = @course.content_exports.create!
+    end
+
+    context "with feature flags enabled" do
+      before do
+        allow(NewQuizzesFeaturesHelper).to receive(:new_quizzes_common_cartridge_enabled?).and_return(true)
+      end
+
+      it "should not have :contains_new_quizzes in the settings" do
+        expect(@ce.settings[:contains_new_quizzes]).to be_nil
+      end
+
+      context "when setting the contains_new_quizzes" do
+        before do
+          @ce.set_contains_new_quizzes_settings
+        end
+
+        context "when the course has New Quizzes assignments" do
+          it "the settings to contains_new_quizzes should be set to true" do
+            expect(@ce.settings[:contains_new_quizzes]).to be true
+          end
+        end
+
+        context "when the course does not have New Quizzes assignments" do
+          before do
+            @another_course = course_model
+            @ce = @another_course.content_exports.create!
+            @ce.set_contains_new_quizzes_settings
+          end
+
+          it "the settings to contains_new_quizzes should be set to false" do
+            expect(@ce.settings[:contains_new_quizzes]).to be false
+          end
+        end
+      end
+    end
+
+    context "with feature flags disabled" do
+      before do
+        @ce.set_contains_new_quizzes_settings
+      end
+
+      context "when the course has New Quizzes assignments" do
+        it "does not contain new quizzes in the export" do
+          expect(@ce.settings[:contains_new_quizzes]).to be false
+        end
+      end
+
+      context "when the course does not have New Quizzes assignments" do
+        before do
+          @another_course = course_model
+          @ce = @another_course.content_exports.create!
+          @ce.set_contains_new_quizzes_settings
+        end
+
+        it "should not contain a New Quiz in the export" do
+          expect(@ce.settings[:contains_new_quizzes]).to be false
+        end
+      end
+    end
+  end
+
+  describe "#mark_waiting_for_external_tool" do
+    let(:content_export) do
+      create_content_export(export_type: ContentExport::COURSE_COPY, workflow_state: "created")
+    end
+
+    it "transitions to waiting_for_external_tool" do
+      expect { content_export.mark_waiting_for_external_tool }.to change { content_export.workflow_state }
+        .from("created").to("waiting_for_external_tool")
+    end
+  end
+
+  describe "set new quizzes export settings on save" do
+    context "when the export_type is 'common_cartridge'" do
+      let(:content_export) { create_content_export(export_type: ContentExport::COMMON_CARTRIDGE, settings: {}) }
+
+      context "and is updated with new quizzes export settings" do
+        it "sets appropriate settings" do
+          content_export.update!(new_quizzes_export_url: "https://some.url", new_quizzes_export_state: "completed")
+          expect(content_export.settings[:new_quizzes_export_url]).to eq("https://some.url")
+          expect(content_export.settings[:new_quizzes_export_state]).to eq("completed")
+        end
+      end
+
+      context "and new_quizzes_export_state is not provided on update" do
+        it "does not set new quizzes export settings" do
+          content_export.update!(new_quizzes_export_url: "https://some.url")
+          expect(content_export.settings[:new_quizzes_export_url]).to be_nil
+          expect(content_export.settings[:new_quizzes_export_state]).to be_nil
+        end
+      end
+
+      context "and new_quizzes_export_state is provided on update" do
+        it "sets appropriate settings even with new_quizzes_export_url set as nil" do
+          content_export.update!(new_quizzes_export_state: "failed")
+
+          expect(content_export.settings[:new_quizzes_export_state]).to eq "failed"
+          expect(content_export.settings[:new_quizzes_export_url]).to be_nil
+        end
+      end
+    end
+
+    context "when the export_type is not 'common_cartridge'" do
+      let(:content_export) { create_content_export(export_type: ContentExport::COURSE_COPY, settings: {}) }
+
+      context "and is updated with new quizzes export settings" do
+        it "does not set new quizzes export settings" do
+          content_export.update!(new_quizzes_export_url: "https://some.url", new_quizzes_export_state: "completed")
+          expect(content_export.settings[:new_quizzes_export_url]).to be_nil
+          expect(content_export.settings[:new_quizzes_export_state]).to be_nil
+        end
       end
     end
   end

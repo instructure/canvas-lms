@@ -17,8 +17,8 @@
  */
 
 import {useEffect, useState} from 'react'
-import {CustomColumn} from '../../types'
-import {executeApiRequest} from '@canvas/util/apiRequest'
+import type {CustomColumn} from '../../types'
+import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 
 export const useCustomColumns = (getCustomColumnsUrl?: string | null) => {
   const [customColumns, setCustomColumns] = useState<CustomColumn[] | null>(null)

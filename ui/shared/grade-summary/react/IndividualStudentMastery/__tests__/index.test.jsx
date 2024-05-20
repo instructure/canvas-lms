@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
 import {render, within} from '@testing-library/react'
 import {Set} from 'immutable'
 import IndividualStudentMastery from '../index'
@@ -113,51 +112,55 @@ describe('expand and contract', () => {
     expect(within(groups[3]).getByText('ZZ Top Albums')).not.toBeNull()
   })
 
-  // legacy enzyme tests
   it('toggles elements to expanded when event fired', async () => {
-    const wrapper = mount(<IndividualStudentMastery {...props} />)
-    await wrapper.instance().componentDidMount()
-    wrapper.instance().onElementExpansionChange('outcome', 100, true)
-    expect(wrapper.state('expandedOutcomes').equals(Set.of(100))).toBe(true)
-    wrapper.instance().onElementExpansionChange('outcome', 100, false)
-    expect(wrapper.state('expandedOutcomes').equals(Set())).toBe(true)
+    const ref = React.createRef()
+    render(<IndividualStudentMastery {...props} ref={ref} />)
+    await ref.current.componentDidMount()
+    ref.current.onElementExpansionChange('outcome', 100, true)
+    expect(ref.current.state.expandedOutcomes.equals(Set.of(100))).toBe(true)
+    ref.current.onElementExpansionChange('outcome', 100, false)
+    expect(ref.current.state.expandedOutcomes.equals(Set())).toBe(true)
   })
 
   it('contracts child outcomes when a group is contracted', async () => {
-    const wrapper = mount(<IndividualStudentMastery {...props} />)
-    await wrapper.instance().componentDidMount()
-    wrapper.setState({expandedGroups: Set.of(1), expandedOutcomes: Set.of(100)}, () => {
-      wrapper.instance().onElementExpansionChange('group', 1, false)
+    const ref = React.createRef()
+    render(<IndividualStudentMastery {...props} ref={ref} />)
+    await ref.current.componentDidMount()
+    ref.current.setState({expandedGroups: Set.of(1), expandedOutcomes: Set.of(100)}, () => {
+      ref.current.onElementExpansionChange('group', 1, false)
     })
-    expect(wrapper.state('expandedOutcomes').equals(Set())).toBe(true)
+    expect(ref.current.state.expandedOutcomes.equals(Set())).toBe(true)
   })
 
   it('expands all when expand() is called', async () => {
-    const wrapper = mount(<IndividualStudentMastery {...props} />)
-    await wrapper.instance().componentDidMount()
-    wrapper.instance().expand()
-    expect(wrapper.state('expandedGroups').equals(Set.of(1))).toBe(true)
-    expect(wrapper.state('expandedOutcomes').equals(Set.of(100))).toBe(true)
+    const ref = React.createRef()
+    render(<IndividualStudentMastery {...props} ref={ref} />)
+    await ref.current.componentDidMount()
+    ref.current.expand()
+    expect(ref.current.state.expandedGroups.equals(Set.of(1))).toBe(true)
+    expect(ref.current.state.expandedOutcomes.equals(Set.of(100))).toBe(true)
   })
 
   it('contracts all when contract() is called', async () => {
-    const wrapper = mount(<IndividualStudentMastery {...props} />)
-    await wrapper.instance().componentDidMount()
-    wrapper.setState({expandedOutcomes: Set.of(100), expandedGroups: Set.of(1)}, () => {
-      wrapper.instance().contract()
+    const ref = React.createRef()
+    render(<IndividualStudentMastery {...props} ref={ref} />)
+    await ref.current.componentDidMount()
+    ref.current.setState({expandedOutcomes: Set.of(100), expandedGroups: Set.of(1)}, () => {
+      ref.current.contract()
     })
-    expect(wrapper.state('expandedGroups').equals(Set())).toBe(true)
-    expect(wrapper.state('expandedOutcomes').equals(Set())).toBe(true)
+    expect(ref.current.state.expandedGroups.equals(Set())).toBe(true)
+    expect(ref.current.state.expandedOutcomes.equals(Set())).toBe(true)
   })
 
   it('notifies when expansion is changed', async () => {
-    const wrapper = mount(<IndividualStudentMastery {...props} />)
-    await wrapper.instance().componentDidMount()
-    wrapper.instance().onElementExpansionChange('outcome', 100, true)
+    const ref = React.createRef()
+    render(<IndividualStudentMastery {...props} ref={ref} />)
+    await ref.current.componentDidMount()
+    ref.current.onElementExpansionChange('outcome', 100, true)
     expect(props.onExpansionChange).toHaveBeenLastCalledWith(true, true)
-    wrapper.instance().onElementExpansionChange('group', 1, true)
+    ref.current.onElementExpansionChange('group', 1, true)
     expect(props.onExpansionChange).toHaveBeenLastCalledWith(true, false)
-    wrapper.instance().contract()
+    ref.current.contract()
     expect(props.onExpansionChange).toHaveBeenLastCalledWith(false, true)
   })
 })

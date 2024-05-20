@@ -155,7 +155,6 @@ class Group extends React.Component {
           ref={c => (this.memberListRef = c)}
           className="student-group-list clearfix"
           aria-label={I18n.t('group members')}
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
           role="list"
         >
           {this.props.group.users.map(u => {
@@ -163,7 +162,7 @@ class Group extends React.Component {
             const name = u.name || u.display_name
             const leaderBadge = isLeader ? <i className="icon-user" aria-hidden="true" /> : null
             return (
-              // eslint-disable-next-line jsx-a11y/no-redundant-roles, jsx-a11y/no-noninteractive-tabindex
+              // eslint-disable-next-line jsx-a11y/no-redundant-roles
               <li role="listitem" key={u.id}>
                 <span className="screenreader-only">
                   {isLeader ? I18n.t('group leader %{user_name}', {user_name: name}) : name}

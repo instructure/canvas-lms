@@ -941,7 +941,9 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
     })
 
     test('uses the grading scheme key (with trailing dashes replaced with minus) for each grading scheme option', () => {
-      const expectedLabels = props.gradingScheme.map(([key]) => GradeFormatHelper.replaceDashWithMinus(key)) // ['A+', 'A', …, 'F']
+      const expectedLabels = props.gradingScheme.map(([key]) =>
+        GradeFormatHelper.replaceDashWithMinus(key)
+      ) // ['A+', 'A', …, 'F']
       mountComponent()
       return clickToOpen().then(() => {
         const optionsText = getRenderedOptions().map($option => $option.textContent)

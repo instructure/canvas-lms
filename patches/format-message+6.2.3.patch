@@ -1,0 +1,10 @@
+diff --git a/node_modules/format-message/index.js b/node_modules/format-message/index.js
+index 5a6f141..ae5b9fa 100644
+--- a/node_modules/format-message/index.js
++++ b/node_modules/format-message/index.js
+@@ -222,4 +222,4 @@ function namespace ()/*: FormatMessage */ {
+   return formatMessage
+ }
+ 
+-module.exports = exports = namespace()
++module.exports = namespace()

@@ -491,9 +491,56 @@ describe "Files API", type: :request do
                base_params.merge(controller: "files", action: "api_capture", format: "json"))
       existing.reload
       attachment = Attachment.where(instfs_uuid:).first
+      expect(attachment).not_to eq(existing)
       expect(attachment.display_name).to eq params[:name]
       expect(existing).to be_deleted
       expect(existing.replacement_attachment).to eq attachment
+    end
+
+    describe "re-uploading a file" do
+      before :once do
+        @existing = Attachment.create!(
+          context: @course,
+          folder:,
+          uploaded_data: StringIO.new("a file"),
+          filename: base_params[:name],
+          display_name: base_params[:name],
+          instfs_uuid: "old-instfs-uuid"
+        )
+        @capture_params = base_params.merge(controller: "files",
+                                            action: "api_capture",
+                                            format: "json",
+                                            size: @existing.size,
+                                            sha512: @existing.md5,
+                                            instfs_uuid: "new-instfs-uuid",
+                                            on_duplicate: "overwrite")
+      end
+
+      it "reuses the Attachment if a file is re-uploaded to the same folder" do
+        expect(InstFS).to receive(:delete_file).with("old-instfs-uuid")
+        json = api_call(:post, "/api/v1/files/capture?#{@capture_params.to_query}", @capture_params)
+        expect(json["id"]).to eq @existing.id
+        expect(@existing.reload.instfs_uuid).to eq "new-instfs-uuid"
+      end
+
+      it "does not delete the old instfs file if it is in use by other Attachments" do
+        other_course = course_factory
+        other_file = @existing.clone_for(other_course)
+        other_file.save!
+        expect(InstFS).not_to receive(:delete_file)
+        json = api_call(:post, "/api/v1/files/capture?#{@capture_params.to_query}", @capture_params)
+        expect(json["id"]).to eq @existing.id
+        expect(@existing.reload.instfs_uuid).to eq "new-instfs-uuid"
+        expect(@existing.cloned_item_id).to be_nil
+        expect(other_file.reload.instfs_uuid).to eq "old-instfs-uuid"
+      end
+
+      it "does not reuse a deleted Attachment" do
+        @existing.destroy
+        expect(InstFS).not_to receive(:delete_file)
+        json = api_call(:post, "/api/v1/files/capture?#{@capture_params.to_query}", @capture_params)
+        expect(json["id"]).not_to eq @existing.id
+      end
     end
 
     it "redirect has preview_url include if requested" do
@@ -1555,13 +1602,7 @@ describe "Files API", type: :request do
             end
           end
 
-          @original_net_http = Net.send(:remove_const, :HTTP)
-          Net.send(:const_set, :HTTP, mocked_http)
-        end
-
-        after do
-          Net.send(:remove_const, :HTTP)
-          Net.send(:const_set, :HTTP, @original_net_http)
+          stub_const("Net::HTTP", mocked_http)
         end
 
         it "only downloads data until the end of the metadata tag" do

@@ -1,3 +1,36 @@
-<form id="courseSearchForm"></form>
+<label class="control-label" for="restoreType">
+  <h2>{{#t}}Select a type to restore{{/t}}</h2>
+</label>
+
+<div class="controls">
+  <select id="restoreType">
+    <option value="default">{{#t "select_default"}}Select a restore type{{/t}}</option>
+    {{#if restore_course}}
+    <option value='#courseRestore'>
+      {{#t}}Courses{{/t}}
+    </option>
+    {{/if}}
+    {{#if restore_user}}
+    <option value='#userRestore'>
+      {{#t}}Users{{/t}}
+    </option>
+    {{/if}}
+  </select>
+</div>
 <hr aria-hidden="true"/>
-<div id="courseSearchResults"></div>
+
+{{#if restore_course}}
+<div id="courseRestore" class="restoreTypeContent">
+  <form id="courseSearchForm"></form>
+  <hr aria-hidden="true"/>
+  <div id="courseSearchResults"></div>
+</div>
+{{/if}}
+
+{{#if restore_user}}
+<div id="userRestore" class="restoreTypeContent">
+  <form id="userSearchForm"></form>
+  <hr aria-hidden="true"/>
+  <div id="userSearchResults"></div>
+</div>
+{{/if}}

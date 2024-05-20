@@ -26,6 +26,7 @@ class DelayedMessage < ActiveRecord::Base
     [
       :discussion_entry,
       :assignment,
+      :sub_assignment,
       :submission_comment,
       :submission,
       :conversation_message,
@@ -85,7 +86,7 @@ class DelayedMessage < ActiveRecord::Base
     when CommunicationChannel
       where(communication_channel_id: context)
     else
-      where(context_id: context, context_type: context.class.base_class.to_s)
+      where(context:)
     end
   }
 

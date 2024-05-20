@@ -1,3 +1,4 @@
+/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -17,6 +18,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
 import ExternalToolLaunchView from 'ui/features/content_migrations/backbone/views/subviews/ExternalToolLaunchView'
 import assertions from 'helpers/assertions'

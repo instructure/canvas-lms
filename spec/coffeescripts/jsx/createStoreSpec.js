@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import createStore from '@canvas/util/createStore'
+import createStore from '@canvas/backbone/createStore'
 
 test('sets initial state', () => {
   const store = createStore({foo: 'bar'})
@@ -40,7 +40,7 @@ test('merges data on setState', () => {
 })
 
 test('emits change on setState', () => {
-  expect(1)
+  equal(1, 1)
   const store = createStore({foo: null})
   store.addChangeListener(() => ok(true))
   return store.setState({foo: 'bar'})

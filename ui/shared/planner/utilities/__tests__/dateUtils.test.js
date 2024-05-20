@@ -30,6 +30,7 @@ import {
   isThisWeek,
   isToday,
   timeString,
+  isInMomentRange,
 } from '../dateUtils'
 
 const TZ = 'Asia/Tokyo'
@@ -235,5 +236,26 @@ describe('isThisWeek', () => {
     // eslint-disable-next-line new-cap
     const lastFriday = new moment().startOf('week').add(-2, 'days')
     expect(isThisWeek(lastFriday)).toEqual(false)
+  })
+})
+
+describe('isInMomentRange', () => {
+  it('returns true when the date is within the range', () => {
+    const date = moment()
+    const start = date.clone().subtract(1, 'days')
+    const end = date.clone().add(1, 'days')
+    expect(isInMomentRange(date, start, end)).toBeTruthy()
+  })
+  it('returns false when the date is out of range', () => {
+    const date = moment()
+    const start = date.clone().add(2, 'days')
+    const end = date.clone().add(4, 'days')
+    expect(isInMomentRange(date, start, end)).toEqual(false)
+  })
+  it('returns true when the date is in range but end date is nil', () => {
+    const date = moment()
+    const start = date.clone().subtract(1, 'days')
+    const end = null
+    expect(isInMomentRange(date, start, end)).toBeTruthy()
   })
 })

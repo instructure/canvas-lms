@@ -138,6 +138,13 @@ module Interfaces::SubmissionInterface
       end
   end
 
+  field :has_unread_rubric_assessment, Boolean, null: false
+  def has_unread_rubric_assessment
+    load_association(:content_participations).then do
+      submission.content_participations.where(workflow_state: "unread", content_item: "rubric").exists?
+    end
+  end
+
   field :user, Types::UserType, null: true
   def user
     load_association(:user)
@@ -412,4 +419,34 @@ module Interfaces::SubmissionInterface
   end
 
   field :assignment_id, ID, null: false
+
+  field :group_id, ID, null: true
+  def group_id
+    # Unfortunately, we can't use submissions.group_id, since that value is
+    # only set once the group has submitted, but not before then. So we have
+    # to jump through some hoops to load the correct group ID for a submission.
+    Loaders::SubmissionGroupIdLoader.load(object).then { |group_id| group_id }
+  end
+
+  field :preview_url, String, null: true
+  def preview_url
+    Loaders::SubmissionVersionNumberLoader.load(object).then do |version_number|
+      GraphQLHelpers::UrlHelpers.course_assignment_submission_url(
+        object.course_id,
+        object.assignment_id,
+        object.user_id,
+        host: context[:request].host_with_port,
+        preview: 1,
+        version: version_number
+      )
+    end
+  end
+
+  field :submission_comment_download_url, String, null: true
+  def submission_comment_download_url
+    "/submissions/#{object.id}/comments.pdf"
+  end
+
+  field :word_count, Float, null: true
+  delegate :word_count, to: :object
 end

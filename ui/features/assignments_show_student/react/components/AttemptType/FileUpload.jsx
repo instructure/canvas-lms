@@ -315,7 +315,7 @@ class FileUpload extends Component {
                       allowWebcamUploads ? this.handleWebcamPhotoUpload : null
                     }
                     renderCanvasFiles={true}
-                    userID={this.props.assignment.env.currentUser.id}
+                    userID={this.props.assignment.env.currentUser?.id}
                   />
                 </Flex.Item>
               )}
@@ -367,7 +367,9 @@ class FileUpload extends Component {
             </>
           )}
         </Table.Cell>
-        <Table.Cell themeOverride={cellTheme}>{file.isLoading && this.renderFileProgress(file)}</Table.Cell>
+        <Table.Cell themeOverride={cellTheme}>
+          {file.isLoading && this.renderFileProgress(file)}
+        </Table.Cell>
         <Table.Cell themeOverride={cellTheme}>
           {!file.isLoading && <IconCompleteSolid color="success" />}
         </Table.Cell>

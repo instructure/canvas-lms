@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {mount} from 'enzyme'
 import $ from 'jquery'
 import PublishButton from '../PublishButton'
 import * as apiClient from '@canvas/courses/courseAPIClient'
 import {waitFor} from '@testing-library/dom'
+import {render} from '@testing-library/react'
 
 jest.mock('@canvas/courses/courseAPIClient')
 
@@ -46,36 +46,36 @@ describe('PublishButton', () => {
 
   describe('when defaultView is modules', () => {
     it('fetches modules and renders the prompt if there are no modules', async () => {
-      const wrapper = mount(<PublishButton {...createMockProps()} />)
-      expect(wrapper.find('HomePagePromptContainer')).toHaveLength(0)
+      const ref = React.createRef()
+      const wrapper = render(<PublishButton {...createMockProps()} ref={ref} />)
+      expect(wrapper.queryByText('Choose Course Home Page')).toBeNull()
       apiClient.getModules.mockReturnValue(Promise.resolve({data: []}))
-      await wrapper.find('button').simulate('click')
+      await wrapper.getByText('Publish').click()
       expect(apiClient.getModules).toHaveBeenCalledWith({courseId: '0'})
-      wrapper.update()
-      expect(wrapper.instance().state.showModal).toBe(true)
-      expect(wrapper.find('HomePagePromptContainer')).toHaveLength(1)
+      expect(ref.current.state.showModal).toBe(true)
+      expect(wrapper.queryByText('Choose Course Home Page')).toBeInTheDocument()
     })
 
     it('publishes when modules do exist', async () => {
-      const wrapper = mount(<PublishButton {...createMockProps()} />)
+      const wrapper = render(<PublishButton {...createMockProps()} />)
       apiClient.getModules.mockReturnValue(Promise.resolve({data: ['module1']}))
-      await wrapper.find('button').simulate('click')
+      await wrapper.getByText('Publish').click()
       expect(apiClient.publishCourse).toHaveBeenCalledWith({courseId: '0', onSuccess: null})
     })
 
     it('publishes when modules do exist calling onSuccess callback', async () => {
       const onSuccess = jest.fn()
-      const wrapper = mount(<PublishButton {...createMockProps({onSuccess})} />)
+      const wrapper = render(<PublishButton {...createMockProps({onSuccess})} />)
       apiClient.getModules.mockReturnValue(Promise.resolve({data: ['module1']}))
-      await wrapper.find('button').simulate('click')
+      await wrapper.getByText('Publish').click()
       expect(apiClient.publishCourse).toHaveBeenCalledWith({courseId: '0', onSuccess})
     })
 
     it('flashes an error when getModules fails', async () => {
       apiClient.getModules.mockRejectedValue(Promise.resolve())
-      const wrapper = mount(<PublishButton {...createMockProps()} />)
+      const wrapper = render(<PublishButton {...createMockProps()} />)
 
-      await wrapper.find('button').simulate('click')
+      await wrapper.getByText('Publish').click()
       await waitFor(() => {
         expect($.flashError).toHaveBeenCalledWith(
           'An error ocurred while fetching course details. Please try again.'
@@ -85,27 +85,26 @@ describe('PublishButton', () => {
   })
 
   describe('when defaultView is not modules', () => {
-    it('calls publishCourse immediately', () => {
-      const wrapper = mount(<PublishButton {...createMockProps({defaultView: 'assignments'})} />)
-      wrapper.find('button').simulate('click')
+    it('calls publishCourse immediately', async () => {
+      const wrapper = render(<PublishButton {...createMockProps({defaultView: 'assignments'})} />)
+      await wrapper.getByText('Publish').click()
       expect(apiClient.getModules).not.toHaveBeenCalled()
       expect(apiClient.publishCourse).toHaveBeenCalledWith({courseId: '0', onSuccess: null})
     })
 
-    it('calls publishCourse immediately with onSuccess callback', () => {
+    it('calls publishCourse immediately with onSuccess callback', async () => {
       const onSuccess = jest.fn()
-      const wrapper = mount(
+      const wrapper = render(
         <PublishButton {...createMockProps({defaultView: 'assignments', onSuccess})} />
       )
-      wrapper.find('button').simulate('click')
+      await wrapper.getByText('Publish').click()
       expect(apiClient.getModules).not.toHaveBeenCalled()
       expect(apiClient.publishCourse).toHaveBeenCalledWith({courseId: '0', onSuccess})
     })
   })
 
   it('renders SR content correctly', () => {
-    const wrapper = mount(<PublishButton {...createMockProps({defaultView: 'assignments'})} />)
-    const screenReaderNode = wrapper.find('ScreenReaderContent').first()
-    expect(screenReaderNode.text()).toBe('nickname')
+    const wrapper = render(<PublishButton {...createMockProps({defaultView: 'assignments'})} />)
+    expect(wrapper.queryByText('nickname')).toBeInTheDocument()
   })
 })

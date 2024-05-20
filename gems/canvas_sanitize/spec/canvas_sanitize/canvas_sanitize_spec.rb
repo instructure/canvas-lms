@@ -202,6 +202,24 @@ describe CanvasSanitize do
     expect(res).to eq str
   end
 
+  it "strips spaces from ids" do
+    str = %(<div class="mini_month"><div class="day_wrapper" id="mini_day_2023_10_31_1"><div class="mini_calendar_day" id="mini_day_2023_10_31_1, id=[<img src=x onerror='alert(`${document.domain}:${document.cookie}`)' />]">Click me to trigger XSS</div></div></div>)
+    res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
+    expect(res).to eq(%(<div class="mini_month"><div class="day_wrapper" id="mini_day_2023_10_31_1"><div class="mini_calendar_day" id="mini_day_2023_10_31_1,id=[<imgsrc=xonerror='alert(`${document.domain}:${document.cookie}`)'/>]">Click me to trigger XSS</div></div></div>))
+  end
+
+  it "strips tabs and long whitespace from ids" do
+    str = %(<div id="my id    with      tabs    and  spaces"></div>)
+    res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
+    expect(res).to eq %(<div id="myidwithtabsandspaces"></div>)
+  end
+
+  it "does not affect ids without whitespace" do
+    str = %(<div id="my-id-5"></div>)
+    res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
+    expect(res).to eq str
+  end
+
   Dir.glob(File.expand_path(File.join(__FILE__, "..", "..", "fixtures", "xss", "*.xss"))) do |filename|
     name = File.split(filename).last
     it "sanitizes xss attempts for #{name}" do

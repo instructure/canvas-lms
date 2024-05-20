@@ -43,8 +43,8 @@ module CanvasCrummy
           url_value = instance.send url_value if url_value.is_a? Symbol
           name_value = name
           name_value = instance.instance_eval(&name_value) if name_value.is_a? Proc
-          name_value = instance.instance_variable_get("@#{name_value}") if name_value.is_a? Symbol
-          record = instance.instance_variable_get("@#{name_value}") unless url_value || block_given?
+          name_value = instance.instance_variable_get(:"@#{name_value}") if name_value.is_a? Symbol
+          record = instance.instance_variable_get(:"@#{name_value}") unless url_value || block_given?
           if record
             name_value, url_value = record.to_s, instance.url_for(record)
           end

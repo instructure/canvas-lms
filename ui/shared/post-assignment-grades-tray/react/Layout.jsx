@@ -64,7 +64,7 @@ export default function Layout({
       {gradesPublished && anonymousGrading && (
         <Alert margin="x-small" variant="info">
           {I18n.t(
-            'When posting grades for anonymous assignments, grades will be posted for everyone in the course. Anonymity will be removed.'
+            'When posting grades for this anonymous assignment, grades will be posted for everyone assigned this item. Anonymity will be removed.'
           )}
         </Alert>
       )}

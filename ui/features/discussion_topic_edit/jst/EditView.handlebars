@@ -39,7 +39,7 @@
         <label for="discussion-title">
           {{#t "topic_title"}}Topic Title{{/t}}
         </label>
-        <input type="text" id="discussion-title" name="title" placeholder="{{#t " topic_title"}}Topic Title{{/t}}"
+        <input type="text" id="discussion-title" name="title" placeholder="{{#t "topic_title"}}Topic Title{{/t}}"
           value="{{title}}" maxlength="254" class="input-block-level">
         {{/if}}
       </div>
@@ -94,8 +94,8 @@
           {{#t}}Set usage rights{{/t}}
         </div>
         <div class="controls">
-          <div id="usage_rights_control" />
-          <div id="usage_rights_modal" />
+          <div id="usage_rights_control"></div>
+          <div id="usage_rights_modal"></div>
         </div>
       </div>
       {{/if}}
@@ -120,7 +120,7 @@
           {{#if react_discussions_post}}
           {{#if context_is_not_group}}
           {{#ifAny canModerate allow_student_anonymous_discussion_topics}}
-          <h4 id="anonymous_section_header">Anonymous Discussion</h4>
+          <h4 id="anonymous_section_header">{{#t}}Anonymous Discussion{{/t}}</h4>
           <div style="margin: 0 0 20px 0;">
             <label class="radio" style="display: block;">
               <input type="radio" name="anonymous_state" value=null {{checkedIfNullOrUndef anonymousState}} {{#if
@@ -195,12 +195,13 @@
               {{checkbox "podcast_enabled"
               checked=podcast_url
               class="element_toggler"
+              aria-expanded=podcast_url
               aria-controls="podcast_has_student_posts_container"}}
               {{#t "enable_podcast_feed"}}Enable podcast feed{{/t}}
             </label></div>
 
           {{#if contextIsCourse}}
-          <div><label id="podcast_has_student_posts_container" style="{{hiddenUnless podcast_url}}"
+          <div><label id="podcast_has_student_posts_container" style="{{hiddenUnless podcast_url}}; margin-left: 20px;"
               class="checkbox short-label" for="podcast_has_student_posts">
               {{checkbox "podcast_has_student_posts"}}
               {{#t "include_replies_in_podcast_feed"}}Include student replies in podcast feed{{/t}}
@@ -225,6 +226,7 @@
               id="allow_rating"
               class="element_toggler"
               checked=allow_rating
+              aria-expanded=allow_rating
               aria-controls="rating_settings_container"}}
               {{#t "allow_liking"}}Allow liking{{/t}}
             </label></div>
@@ -249,7 +251,7 @@
                 aria-controls="todo_date_input"}}
                 {{#t}}Add to student to-do{{/t}}
               </label></div>
-            <div id="todo_date_input" style="{{hiddenUnless allow_todo_date}}; margin-left: 20px;" />
+            <div id="todo_date_input" style="{{hiddenUnless allow_todo_date}}; margin-left: 20px;"></div>
           </div>
           {{/if}}
           {{/if}}
@@ -353,13 +355,17 @@
   {{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED }}
   {{#unless isAnnouncement }}
   <div id="mastery-paths-editor">
-    <div id="conditional-release-target" />
+    <div id="conditional-release-target"></div>
   </div>
   {{/unless}}
   {{/if}}
 </div>
 
-<div id="assignment_external_tools"></div>
+{{#ifAll isAnnouncement ENV.FEATURES.assignment_edit_placement_not_on_announcements }}
+  <div id="assignment_external_tools" style="display: none"></div>
+  {{else}}
+  <div id="assignment_external_tools"></div>
+{{/ifAll}}
 
 <div id="edit_discussion_form_buttons" class="form-actions flush" style="padding-left: 0px; margin-right: -0.75em">
   <button type="button" class="btn cancel_button">

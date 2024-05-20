@@ -511,6 +511,10 @@ module Calendar2Common
     f("#FindAppointmentButton")
   end
 
+  def appointment_group_tab_button
+    f(".edit_appointment_group_option")
+  end
+
   # return the parent of the <input> since you can't click the input
   def event_series_this_event
     f("[name='which'][value='one']").find_element(xpath: "./..")
@@ -626,5 +630,27 @@ module Calendar2Common
 
   def calendar_flash_alert_message_button
     f(".flashalert-message button")
+  end
+
+  def context_selector_button
+    f(".select-calendar-container .ag_contexts_selector")
+  end
+
+  def context_checkbox(course_id)
+    f(".ag-contexts input[id='option_course_#{course_id}']")
+  end
+
+  def close_context_selector_button
+    f(".ag_contexts_done")
+  end
+
+  def select_context_in_context_selector(course_id)
+    context_selector_button.click
+    context_checkbox(course_id).click
+    close_context_selector_button.click
+  end
+
+  def allow_observer_signup_checkbox
+    f("#observer-signup-option")
   end
 end

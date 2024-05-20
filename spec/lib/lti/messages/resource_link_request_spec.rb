@@ -83,10 +83,30 @@ describe Lti::Messages::ResourceLinkRequest do
       context "when link-level custom params are given in resource_link" do
         it "merges them in with tool/placement parameters" do
           expect(jws["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
-            "link_has_expansion2" => assignment.id,
-            "has_expansion" => user.id,
+            "link_has_expansion2" => assignment.id.to_s,
+            "has_expansion" => user.id.to_s,
             "no_expansion" => "overrides tool param!"
           )
+        end
+      end
+
+      context "when resource_link has a title" do
+        let(:title) { "ResourceLink Title" }
+        let(:resource_link) do
+          Lti::ResourceLink.create!(
+            context_external_tool: tool_override || tool,
+            context: course,
+            custom: {
+              link_has_expansion2: "$Canvas.assignment.id",
+              no_expansion: "overrides tool param!"
+            },
+            url: "http://www.example.com/launch",
+            title:
+          )
+        end
+
+        it "uses title for rlid title" do
+          expect(jws.dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq title
         end
       end
     end
@@ -131,8 +151,8 @@ describe Lti::Messages::ResourceLinkRequest do
             }
           )
           expect(jws["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
-            "link_has_expansion" => assignment.id,
-            "has_expansion" => user.id,
+            "link_has_expansion" => assignment.id.to_s,
+            "has_expansion" => user.id.to_s,
             "no_expansion" => "overrides tool param"
           )
         end
@@ -145,7 +165,7 @@ describe Lti::Messages::ResourceLinkRequest do
           )
 
           expect(jws["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
-            "has_expansion" => user.id,
+            "has_expansion" => user.id.to_s,
             "no_expansion" => "foo"
           )
         end
@@ -163,8 +183,7 @@ describe Lti::Messages::ResourceLinkRequest do
       end
 
       let(:line_items_url_params) do
-        # When we remove the feature flag we'll need to add "host: any" to this
-        { course_id: course.id }
+        { course_id: course.id, host: "test.host" }
       end
 
       before do
@@ -177,6 +196,9 @@ describe Lti::Messages::ResourceLinkRequest do
             id: expected_assignment_line_item.id
           )
         ).and_return("lti_line_item_show_url")
+
+        allow_any_instance_of(Account).to receive(:environment_specific_domain)
+          .and_return("test.host")
       end
 
       shared_examples_for "an authorized launch" do
@@ -204,36 +226,14 @@ describe Lti::Messages::ResourceLinkRequest do
             allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical-account-domain")
           end
 
-          context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
-            # NOTE: when we remove the feature flag we'll have to modify the let(:line_items_url_params) above
+          let(:line_items_url_params) { { host: "canonical-account-domain", course_id: course.id } }
 
-            before do
-              course.account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-            end
-
-            it "uses the current domain in the line_items URL" do
-              expect_assignment_and_grade_line_items_url(jws)
-            end
-
-            it "uses the current domain in the line_item URL" do
-              expect_assignment_and_grade_line_item_url(jws)
-            end
+          it "uses the Account#domain in the line_items URL" do
+            expect_assignment_and_grade_line_items_url(jws)
           end
 
-          context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
-            let(:line_items_url_params) { { host: "canonical-account-domain", course_id: course.id } }
-
-            before do
-              course.account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-            end
-
-            it "uses the Account#domain in the line_items URL" do
-              expect_assignment_and_grade_line_items_url(jws)
-            end
-
-            it "uses the Account#domain in the line_item URL" do
-              expect_assignment_and_grade_line_item_url(jws)
-            end
+          it "uses the Account#domain in the line_item URL" do
+            expect_assignment_and_grade_line_item_url(jws)
           end
         end
       end
@@ -317,13 +317,13 @@ describe Lti::Messages::ResourceLinkRequest do
 
     context "lti1p1 claims" do
       let(:lti1p1_claim) { "https://purl.imsglobal.org/spec/lti/claim/lti1p1" }
+      let(:message_lti1p1) { jws[lti1p1_claim] }
+      let(:message_resource_link_id) { jws.dig(lti1p1_claim, "resource_link_id") }
 
       context "resource_link_id claim" do
         context "the LTI 1.1 resource_link_id is the same as the LTI 1.3 resource_link_id" do
-          let(:message_lti1p1) { jws[lti1p1_claim] }
-
           before do
-            allow(expected_assignment_line_item.resource_link).to receive(:resource_link_uuid).and_return(assignment.lti_resource_link_id)
+            allow(expected_assignment_line_item.resource_link).to receive(:lti_1_1_id).and_return(expected_assignment_line_item.resource_link.resource_link_uuid)
           end
 
           it "doesn't include the resource_link_id property" do
@@ -332,12 +332,21 @@ describe Lti::Messages::ResourceLinkRequest do
         end
 
         context "the LTI 1.1 resource_link_id is different from the LTI 1.3 resource_link_id" do
-          let(:message_resource_link_id) { jws.dig(lti1p1_claim, "resource_link_id") }
+          before do
+            expected_assignment_line_item.resource_link.update!(lti_1_1_id: assignment.lti_resource_link_id)
+          end
 
-          # LTI 1.1 and LTI 1.3 resource links are always different by default, as LTI 1.3 uses UUIDs
-          # and LTI 1.1 used hashes, so no setup necessary!
           it "includes the resource_link_id property with the different lti_context_id" do
             expect(message_resource_link_id).to eq assignment.lti_resource_link_id
+          end
+
+          context "when user is not present" do
+            let(:user) { nil }
+
+            it "does not crash and returns a sane empty value for lti1p1 user_id" do
+              expect(message_lti1p1).to include "user_id"
+              expect(message_lti1p1["user_id"]).to be_nil
+            end
           end
         end
       end

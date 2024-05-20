@@ -74,7 +74,7 @@ describe('AssignmentRow', () => {
     getByRole('link', {name: defaultProps.coursePaceItem.assignment_title})
   })
 
-  it('renders an input that updates the duration for that module item', () => {
+  it('renders an input that updates the duration for that module item', async () => {
     const {getByRole} = renderConnected(renderRow(<AssignmentRow {...defaultProps} />))
     const daysInput = getByRole('textbox', {
       name: 'Duration for assignment Basic encryption/decryption',
@@ -82,8 +82,8 @@ describe('AssignmentRow', () => {
     expect(daysInput).toBeInTheDocument()
     expect(daysInput.value).toBe('2')
 
-    userEvent.type(daysInput, '{selectall}{backspace}4')
-    act(() => daysInput.blur())
+    await userEvent.type(daysInput, '{selectall}{backspace}4')
+    await userEvent.tab()
 
     expect(setPaceItemDuration).toHaveBeenCalled()
     expect(setPaceItemDuration).toHaveBeenCalledWith('60', 4)
@@ -175,7 +175,7 @@ describe('AssignmentRow', () => {
       window.ENV.FEATURES.course_paces_for_students = true
     })
 
-    it('renders an input for student paces that updates the duration for that module item', () => {
+    it('renders an input for student paces that updates the duration for that module item', async () => {
       const {getByRole} = renderConnected(
         renderRow(
           <AssignmentRow {...defaultProps} coursePace={STUDENT_PACE} isStudentPace={true} />
@@ -187,8 +187,8 @@ describe('AssignmentRow', () => {
       expect(daysInput).toBeInTheDocument()
       expect(daysInput.value).toBe('2')
 
-      userEvent.type(daysInput, '{selectall}{backspace}4')
-      act(() => daysInput.blur())
+      await userEvent.type(daysInput, '{selectall}{backspace}4')
+      await userEvent.tab()
 
       expect(setPaceItemDuration).toHaveBeenCalled()
       expect(setPaceItemDuration).toHaveBeenCalledWith('60', 4)

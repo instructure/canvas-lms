@@ -693,7 +693,6 @@ describe ContentMigration do
       end
 
       it "retains reference to points based account grading standard" do
-        Account.site_admin.enable_feature!(:points_based_grading_schemes)
         gs = make_grading_standard(@copy_from.root_account, { points_based: true, scaling_factor: 4.0 })
         @copy_from.grading_standard = gs
         @copy_from.grading_standard_enabled = true

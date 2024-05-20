@@ -144,7 +144,7 @@ module CanvasQuizStatistics::Analyzers
     end
 
     def answer_key(id)
-      "answer_#{id}".to_sym
+      :"answer_#{id}"
     end
 
     def answer_present?(response, id)

@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DeprecatedGradingScheme, ProgressData} from '@canvas/grading/grading'
+import {DeprecatedGradingScheme, ProgressData} from '@canvas/grading/grading.d'
 import {GradingStandard} from '@instructure/grading-utils'
 import {
   AssignmentConnection,
   UserConnection,
   GradebookUserSubmissionDetails,
   SubmissionConnection,
-} from './queries'
+} from './queries.d'
 import {GradingPeriod, GradingPeriodSet} from '../../../api.d'
 
 export enum GradebookSortOrder {
@@ -91,7 +91,6 @@ export type GradebookOptions = {
   gradingStandardPointsBased: boolean
   groupWeightingScheme?: string | null
   finalGradeOverrideEnabled?: boolean | null
-  pointsBasedGradingSchemesFeatureEnabled: boolean
   proxySubmissionEnabled: boolean
   publishToSisEnabled?: boolean | null
   publishToSisUrl?: string | null

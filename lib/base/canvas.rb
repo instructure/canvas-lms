@@ -60,6 +60,11 @@ module Canvas
       store = nil
       config[:error_handler] = lambda do |method:, returning:, exception:| # rubocop:disable Lint/UnusedBlockArgument
         redis_name = store.redis.respond_to?(:id) ? store.redis.id : cluster
+        if exception.cause.is_a?(RedisClient::CircuitBreaker::OpenCircuitError)
+          Rails.logger.warn("  [REDIS] Short circuiting due to recent redis failure (#{redis_name})")
+          next
+        end
+
         Rails.logger.error("  [REDIS] Query failure #{exception.inspect} (#{redis_name})")
         InstStatsd::Statsd.increment("redis.errors.all")
         InstStatsd::Statsd.increment("redis.errors.#{InstStatsd::Statsd.escape(redis_name)}",
@@ -165,7 +170,7 @@ module Canvas
   # all the configurable params have service-specific Settings with fallback to
   # generic Settings.
   def self.timeout_protection(service_name, options = {}, &)
-    timeout = (Setting.get("service_#{service_name}_timeout", nil) || options[:fallback_timeout_length] || Setting.get("service_generic_timeout", 15.seconds.to_s)).to_f
+    timeout = (Setting.get("service_#{service_name}_timeout", nil) || options[:fallback_timeout_length] || 15).to_f
 
     if Canvas.redis_enabled?
       if timeout_protection_method(service_name) == "percentage"

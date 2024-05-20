@@ -23,7 +23,7 @@ module Types
     graphql_name "MessageableUser"
 
     implements GraphQL::Types::Relay::Node
-    global_id_field :id  # this is a relay-style "global" identifier
+    global_id_field :id # this is a relay-style "global" identifier
     field :_id, ID, "legacy canvas id", method: :id, null: false
 
     field :name, String, null: false

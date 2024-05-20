@@ -363,7 +363,7 @@ describe "quizzes" do
 
     def file_upload_submission_data
       @quiz.reload.quiz_submissions.first
-           .submission_data["question_#{@question.id}".to_sym]
+           .submission_data[:"question_#{@question.id}"]
     end
 
     def file_upload_attachment

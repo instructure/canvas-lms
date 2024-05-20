@@ -37,7 +37,7 @@ module Lti
           label: tool.label_for(placement, locale),
           css_class: asset_string_relative_to_context,
           visibility: tool.extension_setting(placement, :visibility),
-          href: "#{context.class.to_s.downcase}_external_tool_path".to_sym,
+          href: :"#{context.class.to_s.downcase}_external_tool_path",
           external: true,
           hidden: tool.extension_setting(placement, :default) == "disabled",
           args: [context.id, tool.id]

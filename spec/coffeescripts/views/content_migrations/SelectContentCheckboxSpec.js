@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import ContentMigration from '@canvas/content-migrations/backbone/models/ContentMigration'
 import SelectContentCheckbox from '@canvas/content-migrations/backbone/views/subviews/SelectContentCheckboxView'
 

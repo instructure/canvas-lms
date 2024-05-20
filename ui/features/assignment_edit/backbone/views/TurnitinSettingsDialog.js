@@ -18,15 +18,10 @@
 
 import {extend} from '@canvas/backbone/utils'
 import turnitinSettingsDialog from '../../jst/TurnitinSettingsDialog.handlebars'
-
+import {extend as lodashExtend} from 'lodash'
 import vericiteSettingsDialog from '../../jst/VeriCiteSettingsDialog.handlebars'
-
 import {View} from '@canvas/backbone'
-
-import _ from 'underscore'
-
-import htmlEscape from 'html-escape'
-
+import htmlEscape from '@instructure/html-escape'
 import '@canvas/util/jquery/fixDialogButtons'
 
 const EXCLUDE_SMALL_MATCHES_OPTIONS = '.js-exclude-small-matches-options'
@@ -76,7 +71,7 @@ TurnitinSettingsDialog.prototype.toggleExcludeOptions = function () {
 
 TurnitinSettingsDialog.prototype.toJSON = function () {
   const json = TurnitinSettingsDialog.__super__.toJSON.apply(this, arguments)
-  return _.extend(json, {
+  return lodashExtend(json, {
     wordsInput:
       '<input class="span1" id="exclude_small_matches_words_value" name="words" value="' +
       htmlEscape(json.words) +
@@ -100,6 +95,7 @@ TurnitinSettingsDialog.prototype.renderEl = function () {
     .dialog({
       width: 'auto',
       modal: true,
+      zIndex: 1000,
     })
     .fixDialogButtons()
 }

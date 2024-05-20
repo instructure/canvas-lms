@@ -140,9 +140,7 @@ export default class ToDoItem extends React.Component {
         {title}
       </Link>
     ) : (
-      <Text aria-label={getAriaLabel(this.props.item.type, this.props.item.title)}>
-        {title}
-      </Text>
+      <Text aria-label={getAriaLabel(this.props.item.type, this.props.item.title)}>{title}</Text>
     )
 
     return (

@@ -1,3 +1,4 @@
+/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -17,6 +18,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import ProfileShow from 'ui/features/profile_show/backbone/views/ProfileShow'
 import assertions from 'helpers/assertions'
 
@@ -108,5 +110,24 @@ test('validates no spaces in URL', function () {
   }
   this.view.validateForm(event)
   ok(event.preventDefault.called)
+  this.fixtures.innerHTML = oldInnerHTML
+})
+
+test('profile update successful text is shown when the success container is present', function () {
+  const oldInnerHTML = this.fixtures.innerHTML
+  this.fixtures.innerHTML = "<div id='profile_alert_holder_success'></div>"
+  this.view = new ProfileShow()
+  strictEqual(
+    this.view.$('#profile_alert_holder_success').text(),
+    'Profile has been saved successfully'
+  )
+  this.fixtures.innerHTML = oldInnerHTML
+})
+
+test('profile update failed text is shown when the failed container is present', function () {
+  const oldInnerHTML = this.fixtures.innerHTML
+  this.fixtures.innerHTML = "<div id='profile_alert_holder_failed'></div>"
+  this.view = new ProfileShow()
+  strictEqual(this.view.$('#profile_alert_holder_failed').text(), 'Profile save was unsuccessful')
   this.fixtures.innerHTML = oldInnerHTML
 })

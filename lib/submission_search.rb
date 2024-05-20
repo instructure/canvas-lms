@@ -57,7 +57,7 @@ class SubmissionSearch
 
     if @options[:user_id]
       # Since user_id requires an ID and not just a partial name, the user_search_scope is not needed and the 3 characters limit is not applied
-      search_scope = search_scope.where(user_id: @options[:user_id])
+      search_scope = search_scope.where(user_id: representative_id(@options[:user_id]))
     end
 
     if @options[:enrollment_types].present?
@@ -68,8 +68,7 @@ class SubmissionSearch
     search_scope = if @course.grants_any_right?(@searcher, @session, :manage_grades, :view_all_grades) || @course.participating_observers.map(&:id).include?(@searcher.id)
                      # a user with manage_grades, view_all_grades, or an observer can see other users' submissions
                      # TODO: may want to add a preloader for this
-                     allowed_user_ids = @course.users_visible_to(@searcher)
-                     search_scope.where(user_id: allowed_user_ids)
+                     search_scope.where(user_id: allowed_users)
                    elsif @course.grants_right?(@searcher, @session, :read_grades)
                      # a user can see their own submission
                      search_scope.where(user_id: @searcher.id)
@@ -124,5 +123,59 @@ class SubmissionSearch
         end
     end
     search_scope.order(:user_id)
+  end
+
+  private
+
+  def allowed_users
+    users = if @options[:apply_gradebook_enrollment_filters]
+              @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
+            elsif @options[:include_concluded] || @options[:include_deactivated]
+              @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_filters)
+            else
+              @course.users_visible_to(@searcher)
+            end
+
+    if @options[:representatives_only] && @assignment.grade_as_group?
+      rep_ids = representatives.map { |rep, _members| rep.id }
+      users = users.where(id: rep_ids)
+    end
+
+    users
+  end
+
+  def representative_id(user_id)
+    user_id_str = user_id.to_s
+    return user_id_str unless @assignment.grade_as_group?
+
+    rep, = representatives.find do |(rep, members)|
+      rep.id.to_s == user_id_str || members.any? { |member| member.id.to_s == user_id_str }
+    end
+
+    rep&.id&.to_s || user_id_str
+  end
+
+  def representatives
+    @representatives ||= @assignment.representatives(user: @searcher, ignore_student_visibility: true, include_others: true)
+  end
+
+  def excluded_enrollment_states_from_gradebook_settings
+    settings = @searcher.get_preference(:gradebook_settings, @course.global_id) || {}
+    excluded_enrollment_states(
+      completed: settings["show_concluded_enrollments"] != "true",
+      inactive: settings["show_inactive_enrollments"] != "true"
+    )
+  end
+
+  def excluded_enrollment_states_from_filters
+    excluded_enrollment_states(
+      completed: !@options[:include_concluded],
+      inactive: !@options[:include_deactivated]
+    )
+  end
+
+  def excluded_enrollment_states(states)
+    excluded_states = states.filter_map { |state, excluded| state if excluded }
+    excluded_states << :rejected
   end
 end

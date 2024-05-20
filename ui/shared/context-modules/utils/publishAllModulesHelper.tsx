@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {
+import type {
   CanvasProgress,
   CanvasProgressAPIResult,
   DoFetchModuleWithItemsResponse,

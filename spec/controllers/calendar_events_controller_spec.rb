@@ -292,8 +292,8 @@ describe CalendarEventsController do
       expect(assigns[:event]).not_to be_frozen
       expect(assigns[:event]).to be_deleted
       @course.reload
-      expect(@course.calendar_events).to be_include(@event)
-      expect(@course.calendar_events.active).not_to be_include(@event)
+      expect(@course.calendar_events).to include(@event)
+      expect(@course.calendar_events.active).not_to include(@event)
     end
   end
 end

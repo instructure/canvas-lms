@@ -39,9 +39,9 @@ unless $canvas_tasks_loaded
       write_brand_configs = ENV["COMPILE_ASSETS_BRAND_CONFIGS"] != "0"
       build_prod_js = ENV["RAILS_ENV"] == "production" || ENV["USE_OPTIMIZED_JS"] == "true" || ENV["USE_OPTIMIZED_JS"] == "True"
       # build dev bundles even in prod mode so you can debug with ?optimized_js=0
-      # query string (except for on jenkins where we set JS_BUILD_NO_UGLIFY anyway
+      # query string (except for on jenkins where we set SKIP_SOURCEMAPS anyway
       # so there's no need for an unminified fallback)
-      build_dev_js = ENV["JS_BUILD_NO_FALLBACK"] != "1" && (!build_prod_js || ENV["JS_BUILD_NO_UGLIFY"] != "1")
+      build_dev_js = ENV["JS_BUILD_NO_FALLBACK"] != "1" && (!build_prod_js || ENV["SKIP_SOURCEMAPS"] != "1")
 
       batches = Rake::TaskGraph.draw do
         task "brand_configs:write" => ["js:gulp_rev"] if write_brand_configs
@@ -161,7 +161,12 @@ unless $canvas_tasks_loaded
     desc "Shows pending db migrations."
     task pending_migrations: :environment do
       migrations = ActiveRecord::Base.connection.migration_context.migrations
-      pending_migrations = ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).pending_migrations
+      args = [:up, migrations, ActiveRecord::Base.connection.schema_migration]
+      if $canvas_rails == "7.1"
+        internal_metadata = ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection)
+        args << internal_metadata
+      end
+      pending_migrations = ActiveRecord::Migrator.new(*args).pending_migrations
       pending_migrations.each do |pending_migration|
         tags = pending_migration.tags
         tags = " (#{tags.join(", ")})" unless tags.empty?
@@ -172,7 +177,12 @@ unless $canvas_tasks_loaded
     desc "Shows skipped db migrations."
     task skipped_migrations: :environment do
       migrations = ActiveRecord::Base.connection.migration_context.migrations
-      skipped_migrations = ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).skipped_migrations
+      args = [:up, migrations, ActiveRecord::Base.connection.schema_migration]
+      if $canvas_rails == "7.1"
+        internal_metadata = ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection)
+        args << internal_metadata
+      end
+      skipped_migrations = ActiveRecord::Migrator.new(*args).skipped_migrations
       skipped_migrations.each do |skipped_migration|
         tags = skipped_migration.tags
         tags = " (#{tags.join(", ")})" unless tags.empty?
@@ -189,7 +199,12 @@ unless $canvas_tasks_loaded
       task predeploy: [:environment, :load_config] do
         migrations = ActiveRecord::Base.connection.migration_context.migrations
         migrations = migrations.select { |m| m.tags.include?(:predeploy) }
-        ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).migrate
+        args = [:up, migrations, ActiveRecord::Base.connection.schema_migration]
+        if $canvas_rails == "7.1"
+          internal_metadata = ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection)
+          args << internal_metadata
+        end
+        ActiveRecord::Migrator.new(*args).migrate
       end
     end
 
@@ -202,6 +217,7 @@ unless $canvas_tasks_loaded
         queue = config.configuration_hash[:queue]
         ActiveRecord::Tasks::DatabaseTasks.drop(queue) if queue rescue nil
         ActiveRecord::Tasks::DatabaseTasks.drop(config) rescue nil
+        ActiveRecord::Base.connection_handler.clear_all_connections!
         Shard.default(reload: true) # make sure we know that sharding isn't set up yet
         CanvasCassandra::DatabaseBuilder.config_names.each do |cass_config|
           db = CanvasCassandra::DatabaseBuilder.from_config(cass_config)

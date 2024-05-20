@@ -65,10 +65,12 @@ describe('DiscussionEntryContainer', () => {
     isEditing = false,
     onSave = () => {},
     onCancel = () => {},
-    isIsolatedView = false,
+    isSplitView = false,
     editor = User.mock({_id: '5', displayName: 'George Weasley'}),
     isUnread = false,
     isForcedRead = false,
+    createdAt = '2021-01-01T13:00:00-07:00',
+    updatedAt = '2021-02-02T14:00:00-07:00',
     timingDisplay = 'Jan 1 1:00pm',
     editedTimingDisplay = 'Feb 2 2:00pm',
     lastReplyAtDisplay = null,
@@ -84,10 +86,12 @@ describe('DiscussionEntryContainer', () => {
     isEditing,
     onSave,
     onCancel,
-    isIsolatedView,
+    isSplitView,
     editor,
     isUnread,
     isForcedRead,
+    createdAt,
+    updatedAt,
     timingDisplay,
     editedTimingDisplay,
     lastReplyAtDisplay,
@@ -132,7 +136,8 @@ describe('DiscussionEntryContainer', () => {
 
     it('should render the edited timestamp', () => {
       const container = setup(defaultProps())
-      expect(container.getByText('Edited by George Weasley Feb 2 2:00pm')).toBeInTheDocument()
+      const editedByTextElement = container.getByTestId('editedByText')
+      expect(editedByTextElement.textContent).toEqual('Edited by George Weasley Feb 2 2:00pm')
     })
 
     it('should render the reply preview', () => {

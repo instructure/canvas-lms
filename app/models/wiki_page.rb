@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 class WikiPage < ActiveRecord::Base
   attr_readonly :wiki_id
   attr_accessor :saved_by
@@ -37,6 +35,7 @@ class WikiPage < ActiveRecord::Base
   include SearchTermHelper
   include LockedFor
   include HtmlTextHelper
+  include DatesOverridable
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:body, :title]
@@ -44,6 +43,12 @@ class WikiPage < ActiveRecord::Base
   restrict_assignment_columns
   restrict_columns :state, [:workflow_state]
   restrict_columns :availability_dates, [:publish_at]
+
+  include SmartSearchable
+  use_smart_search title_column: :title,
+                   body_column: :body,
+                   index_scope: ->(course) { course.wiki_pages.not_deleted },
+                   search_scope: ->(course, user) { WikiPages::ScopedToUser.new(course, user, course.wiki_pages.not_deleted).scope }
 
   after_update :post_to_pandapub_when_revised
 
@@ -55,9 +60,10 @@ class WikiPage < ActiveRecord::Base
 
   belongs_to :current_lookup, class_name: "WikiPageLookup"
   has_many :wiki_page_lookups, inverse_of: :wiki_page
-  has_many :wiki_page_embeddings, inverse_of: :wiki_page
+  has_many :wiki_page_student_visibilities
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :wiki_page
-
+  has_one :block_editor, as: :context, dependent: :destroy
+  accepts_nested_attributes_for :block_editor, allow_destroy: true
   acts_as_url :title, sync_url: true
 
   validate :validate_front_page_visibility
@@ -75,8 +81,20 @@ class WikiPage < ActiveRecord::Base
               if: proc { context.try(:conditional_release?) }
   after_save :create_lookup, if: :should_create_lookup?
   after_save :delete_lookups, if: -> { !Account.site_admin.feature_enabled?(:permanent_page_links) && saved_change_to_workflow_state? && deleted? }
-  after_save :generate_embeddings, if: :should_generate_embeddings?
-  after_save :delete_embeddings, if: -> { deleted? && saved_change_to_workflow_state? }
+
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      # no assignment -> visible if wiki_page_student_visibilities has row
+      # assignment -> visible if assignment_student_visibilities has row
+      without_assignment_in_course(course_ids)
+        .joins(:wiki_page_student_visibilities)
+        .where(wiki_page_student_visibilities: { user_id: user_ids, course_id: course_ids })
+        .union(joins_assignment_student_visibilities(user_ids, course_ids))
+    else
+      without_assignment_in_course(course_ids)
+        .union(joins_assignment_student_visibilities(user_ids, course_ids))
+    end
+  }
 
   scope :starting_with_title, lambda { |title|
     where("title ILIKE ?", "#{title}%")
@@ -100,66 +118,8 @@ class WikiPage < ActiveRecord::Base
   TITLE_LENGTH = 255
   SIMPLY_VERSIONED_EXCLUDE_FIELDS = %i[workflow_state editing_roles notify_of_update].freeze
 
-  self.ignored_columns += %i[view_count]
-
   def ensure_wiki_and_context
-    self.wiki_id ||= (context.wiki_id || context.wiki.id)
-  end
-
-  def should_generate_embeddings?
-    return false if deleted?
-    return false unless OpenAi.smart_search_available?(root_account)
-
-    saved_change_to_body? ||
-      saved_change_to_title? ||
-      (saved_change_to_workflow_state? && workflow_state_before_last_save == "deleted")
-  end
-
-  def chunk_content(max_character_length = 4000)
-    if body_text.length > max_character_length
-      # Chunk
-      # Hard split on character length, back up to the nearest word boundary
-      remaining_text = body_text
-      while remaining_text
-        # Find the last space before the max length
-        last_space = remaining_text.rindex(/\b/, max_character_length)
-        if last_space.nil?
-          # No space found, just split at max length
-          last_space = max_character_length
-        end
-        yield title + "\n" + remaining_text[0..last_space]
-        remaining_text = remaining_text[(last_space + 1)..]
-      end
-    else
-      # No need for chunking
-      yield title + "\n" + body_text
-    end
-  end
-
-  def body_text
-    html_to_text(body)
-  end
-
-  def generate_embeddings
-    return unless OpenAi.smart_search_available?(root_account)
-
-    delete_embeddings
-    chunk_content do |chunk|
-      embedding = OpenAi.generate_embedding(chunk)
-      wiki_page_embeddings.create!(embedding:)
-    end
-  end
-  handle_asynchronously :generate_embeddings, priority: Delayed::LOW_PRIORITY
-
-  def delete_embeddings
-    return unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
-
-    # TODO: delete via the association once pgvector is available everywhere
-    # (without :dependent, that would try to nullify the fk in violation of the constraint
-    #  but with :dependent, instances without pgvector would try to access the nonexistent table when a page is deleted)
-    shard.activate do
-      WikiPageEmbedding.where(wiki_page_id: self).delete_all
-    end
+    self.wiki_id ||= context.wiki_id || context.wiki.id
   end
 
   def context
@@ -394,11 +354,11 @@ class WikiPage < ActiveRecord::Base
   end
 
   def context_module_tag_for(context)
-    @context_module_tag_for ||= context_module_tags.where(context_id: context, context_type: context.class.base_class.name).first
+    @context_module_tag_for ||= context_module_tags.where(context:).first
   end
 
   def context_module_action(user, context, action)
-    context_module_tags.where(context_id: context, context_type: context.class.base_class.name).each do |tag|
+    context_module_tags.where(context:).each do |tag|
       tag.context_module_action(user, action)
     end
   end
@@ -440,8 +400,14 @@ class WikiPage < ActiveRecord::Base
     # the page must be available for users of the following roles
     return false unless available_for?(user, session)
     return true if roles.include?("students") && context.respond_to?(:students) && context.includes_student?(user)
-    return true if roles.include?("members") && context.respond_to?(:users) && context.users.include?(user)
-    return true if roles.include?("public")
+
+    if roles.include?("members") || roles.include?("public")
+      if context.is_a?(Course)
+        return true if context.active_users.include?(user)
+      elsif context.respond_to?(:users) && context.users.include?(user)
+        return true
+      end
+    end
 
     false
   end
@@ -502,16 +468,16 @@ class WikiPage < ActiveRecord::Base
 
   def to_atom(opts = {})
     context = opts[:context]
-    Atom::Entry.new do |entry|
-      entry.title = t(:atom_entry_title, "Wiki Page, %{course_or_group_name}: %{page_title}", course_or_group_name: context.name, page_title: self.title)
-      entry.authors << Atom::Person.new(name: t(:atom_author, "Wiki Page"))
-      entry.updated   = updated_at
-      entry.published = created_at
-      entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/wiki_pages/#{feed_code}_#{updated_at.strftime("%Y-%m-%d")}"
-      entry.links << Atom::Link.new(rel: "alternate",
-                                    href: "http://#{HostUrl.context_host(context)}/#{self.context.class.to_s.downcase.pluralize}/#{self.context.id}/pages/#{url}")
-      entry.content = Atom::Content::Html.new(body || t("defaults.no_content", "no content"))
-    end
+
+    {
+      title: t(:atom_entry_title, "Wiki Page, %{course_or_group_name}: %{page_title}", course_or_group_name: context.name, page_title: self.title),
+      author: t(:atom_author, "Wiki Page"),
+      updated: updated_at,
+      published: created_at,
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/wiki_pages/#{feed_code}_#{updated_at.strftime("%Y-%m-%d")}",
+      link: "http://#{HostUrl.context_host(context)}/#{self.context.class.to_s.downcase.pluralize}/#{self.context.id}/pages/#{url}",
+      content: body || t("defaults.no_content", "no content")
+    }
   end
 
   def user_name
@@ -652,5 +618,30 @@ class WikiPage < ActiveRecord::Base
 
   def set_root_account_id
     self.root_account_id = context&.root_account_id unless root_account_id
+  end
+
+  def self.visible_ids_by_user(opts)
+    assignment_page_visibilities = joins_assignment_student_visibilities(opts[:user_id], opts[:course_id])
+                                   .pluck("wiki_pages.id", "assignment_student_visibilities.user_id")
+                                   .group_by { |_, user_id| user_id }
+    no_assignment_page_visibilities = without_assignment_in_course(opts[:course_id])
+    no_assignment_page_visibilities = if Account.site_admin.feature_enabled?(:differentiated_modules)
+                                        no_assignment_page_visibilities
+                                          .joins(:wiki_page_student_visibilities)
+                                          .where(wiki_page_student_visibilities: opts)
+                                          .pluck("wiki_pages.id", "wiki_page_student_visibilities.user_id").group_by { |_, user_id| user_id }
+                                      else
+                                        no_assignment_page_visibilities.pluck(:id)
+                                      end
+
+    opts[:user_id].index_with do |user_id|
+      page_ids_with_assignment = (assignment_page_visibilities[user_id] || []).map { |page_id, _| page_id }
+      page_ids_no_assignment = if Account.site_admin.feature_enabled?(:differentiated_modules)
+                                 (no_assignment_page_visibilities[user_id] || []).map { |page_id, _| page_id }
+                               else
+                                 no_assignment_page_visibilities
+                               end
+      page_ids_with_assignment.concat(page_ids_no_assignment)
+    end
   end
 end

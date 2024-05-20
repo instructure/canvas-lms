@@ -18,12 +18,38 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "report_spec_helper"
+
 module AccountReports
   class TestReport
     include ReportHelper
 
-    def initialize(account_report)
+    def initialize(account_report, items = [])
       @account_report = account_report
+      @items = items
+    end
+
+    def test_report
+      create_report_runners(@items, @items.size, min: 1)
+      write_report_in_batches(["item"])
+    end
+
+    def test_report_runner(runner)
+      runner.batch_items.each_with_index do |item, i|
+        raise "fail" if item == "fail"
+
+        add_report_row(row: [item], row_number: i, report_runner: runner)
+      end
+    end
+  end
+
+  module Default
+    def self.test_report(account_report)
+      TestReport.new(account_report, account_report.parameters[:items]).test_report
+    end
+
+    def self.parallel_test_report(account_report, runner)
+      TestReport.new(account_report).test_report_runner(runner)
     end
   end
 end
@@ -69,6 +95,31 @@ describe "report helper" do
   it "fails when no csv" do
     AccountReports.finalize_report(account_report, "hi", nil)
     expect(account_report.parameters["extra_text"]).to eq "Failed, the report failed to generate a file. Please try again."
+  end
+
+  describe "parallel run" do
+    include ReportSpecHelper
+
+    before :once do
+      AccountReports.configure_account_report "Default", {
+        "test_report" => {
+          title: -> { "Test Report" },
+        }
+      }
+      @account = Account.default
+    end
+
+    it "assembles rows from each runner" do
+      result = read_report("test_report", params: { items: (1..6).to_a }, order: "skip")
+      expect(result).to match_array([["1"], ["2"], ["3"], ["4"], ["5"], ["6"]])
+    end
+
+    it "handles errors appropriately" do
+      ar = run_report("test_report", params: { items: [1, 2, "fail", 4, 5, 6] })
+      expect(ar).to be_error
+      expect(ar.account_report_runners.group(:workflow_state).count).to eq("completed" => 2, "error" => 1, "aborted" => 3)
+      expect(ErrorReport.last.message).to eq "fail"
+    end
   end
 
   describe "load pseudonyms" do

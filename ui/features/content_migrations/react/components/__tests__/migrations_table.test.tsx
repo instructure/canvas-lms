@@ -20,7 +20,7 @@ import React from 'react'
 import {render, waitFor, screen} from '@testing-library/react'
 import ContentMigrationsTable from '../migrations_table'
 import fetchMock from 'fetch-mock'
-import {ContentMigrationItem} from '../types'
+import type {ContentMigrationItem} from '../types'
 
 const migrations: ContentMigrationItem[] = [
   {
@@ -50,6 +50,10 @@ const renderComponent = () => {
 describe('ContentMigrationTable', () => {
   // This is used to mock the result INST-UI Responsive component for rendering
   const originalMediaResult = window.matchMedia('(min-width: 768px)')
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
 
   beforeAll(() => {
     setMigrationsMock = jest.fn(() => {})
@@ -97,7 +101,7 @@ describe('ContentMigrationTable', () => {
 
       expect(fetchMock.called('/api/v1/courses/0/content_migrations?per_page=25', 'GET')).toBe(true)
       await waitFor(() => {
-        expect(setMigrationsMock).toHaveBeenCalledWith(['api_return'])
+        expect(setMigrationsMock).toHaveBeenCalledWith(expect.any(Function))
       })
     })
   })
@@ -130,7 +134,7 @@ describe('ContentMigrationTable', () => {
 
       expect(fetchMock.called('/api/v1/courses/0/content_migrations?per_page=25', 'GET')).toBe(true)
       await waitFor(() => {
-        expect(setMigrationsMock).toHaveBeenCalledWith(['api_return'])
+        expect(setMigrationsMock).toHaveBeenCalledWith(expect.any(Function))
       })
     })
   })

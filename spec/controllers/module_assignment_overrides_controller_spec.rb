@@ -233,6 +233,19 @@ describe ModuleAssignmentOverridesController do
       expect(@module1.assignment_override_students.reload.to_a).to eq students
     end
 
+    it "updates the module's assignment submissions" do
+      assignment = @course.assignments.create!(title: "Assignment", points_possible: 10)
+      @module1.add_item(assignment)
+      @module1.update_assignment_submissions
+      expect(assignment.submissions.reload.pluck(:user_id)).to contain_exactly(@student1.id, @student2.id, @student3.id)
+
+      put :bulk_update, params: { course_id: @course.id,
+                                  context_module_id: @module1.id,
+                                  overrides: [{ "id" => @adhoc_override2.id, "student_ids" => [@student3.id] }] }
+      expect(response).to have_http_status :no_content
+      expect(assignment.submissions.reload.pluck(:user_id)).to contain_exactly(@student3.id)
+    end
+
     it "returns 400 if the overrides parameter is not a list" do
       put :bulk_update, params: { course_id: @course.id, context_module_id: @module1.id, overrides: "hello" }
       expect(response).to be_bad_request

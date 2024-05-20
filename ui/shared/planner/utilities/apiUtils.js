@@ -17,7 +17,7 @@
  */
 import moment from 'moment-timezone'
 import _ from 'lodash'
-import parseLinkHeader from 'parse-link-header'
+import parseLinkHeader from '@canvas/parse-link-header'
 
 const getItemDetailsFromPlannable = apiResponse => {
   const {plannable, plannable_type, planner_override} = apiResponse

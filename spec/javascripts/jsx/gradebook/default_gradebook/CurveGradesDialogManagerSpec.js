@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import CurveGradesDialog from '@canvas/grading/jquery/CurveGradesDialog'
 import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents'
 import CurveGradesDialogManager from 'ui/features/gradebook/react/default_gradebook/CurveGradesDialogManager'

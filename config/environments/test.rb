@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-environment_configuration(defined?(config) && config) do |config|
+Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb
 
   # The test environment is used exclusively to run your application's
@@ -53,7 +53,7 @@ environment_configuration(defined?(config) && config) do |config|
   config.cache_store = :null_store
 
   # Raise exceptions instead of rendering exception templates
-  config.action_dispatch.show_exceptions = true
+  config.action_dispatch.show_exceptions = ($canvas_rails == "7.1") ? :all : true
 
   # Print deprecation notices to both stderr and the log
   config.active_support.deprecation = [:stderr, :log]

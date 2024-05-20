@@ -15,21 +15,21 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'underscore'
+import {each} from 'lodash'
 import rgb2hex from './rgb2hex'
 import {defaultFetchOptions} from './xhr'
 
 export default {
   persistContextColors(colorsByContext, userId) {
-    _.each(colorsByContext, (color, contextCode) => {
+    each(colorsByContext, (color, contextCode) => {
       const hexcode = (color.match(/rgb/) ? rgb2hex(color) : color).replace(/^#/, '')
 
       // I don't know why, but when the hexcode was in the body, it failed to
       // work from selenium
-      const url = `/api/v1/users/${userId}/colors/${contextCode}?hexcode=${hexcode}`
+      const url = `${window.location.origin}/api/v1/users/${userId}/colors/${contextCode}?hexcode=${hexcode}`
       fetch(url, {
         method: 'PUT',
-        ...defaultFetchOptions,
+        ...defaultFetchOptions(),
       })
     })
   },

@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
+import {map, each, isEmpty, compact} from 'lodash'
 import $ from 'jquery'
 import React from 'react'
 import createReactClass from 'create-react-class'
@@ -104,9 +104,9 @@ export default createReactClass({
   },
 
   validateConfig() {
-    const invalidFields = _.compact(
-      _.map(this.state.fields, (v, k) => {
-        if (v.required && _.isEmpty(v.value)) {
+    const invalidFields = compact(
+      map(this.state.fields, (v, k) => {
+        if (v.required && isEmpty(v.value)) {
           return k
         }
       })
@@ -132,7 +132,7 @@ export default createReactClass({
 
   configSettings() {
     const queryParams = {}
-    _.map(this.state.fields, (v, k) => {
+    each(this.state.fields, (v, k) => {
       if (v.type === 'checkbox') {
         if (!v.value) return
         queryParams[k] = '1'
@@ -148,11 +148,9 @@ export default createReactClass({
     const newTool = new ExternalTool()
     newTool.on('sync', this.onSaveSuccess, this)
     newTool.on('error', this.onSaveFail, this)
-    if (!_.isEmpty(this.state.invalidFields)) {
+    if (!isEmpty(this.state.invalidFields)) {
       const fields = this.state.fields
-      const invalidFieldNames = _.map(this.state.invalidFields, k => fields[k].description).join(
-        ', '
-      )
+      const invalidFieldNames = map(this.state.invalidFields, k => fields[k].description).join(', ')
       this.setState({
         errorMessage: I18n.t('The following fields are invalid: %{fields}', {
           fields: invalidFieldNames,
@@ -173,7 +171,7 @@ export default createReactClass({
     newTool.set('app_center_id', this.props.app.short_name)
     newTool.set('config_settings', this.configSettings())
 
-    $(e.target).attr('disabled', 'disabled')
+    $(e.target).prop('disabled', true)
 
     newTool.save()
   },
@@ -193,7 +191,7 @@ export default createReactClass({
   },
 
   configOptions() {
-    return _.map(this.state.fields, (v, k) => (
+    return map(this.state.fields, (v, k) => (
       <ConfigOptionField
         name={k}
         type={v.type}

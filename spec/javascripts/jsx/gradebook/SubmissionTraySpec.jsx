@@ -20,6 +20,7 @@ import moxios from 'moxios'
 import fakeENV from 'helpers/fakeENV'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
+import 'jquery-migrate'
 import {
   createGradebook,
   setFixtureHtml,

@@ -17,7 +17,7 @@
  */
 
 import {combineReducers} from 'redux'
-import parseLinkHeader from 'parse-link-header'
+import parseLinkHeader from '@canvas/parse-link-header'
 import initialState from '../store/initialState'
 
 const emailRegex = /([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})/i

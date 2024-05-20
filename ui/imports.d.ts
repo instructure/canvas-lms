@@ -36,13 +36,6 @@ declare module 'convert-case' {
   export function underscore<T>(props: {[key: string]: unknown}): T
 }
 
-declare module 'html-escape' {
-  type Escapeable = string | number | {[key: string]: Escapeable}
-  export function escape<T>(strOrObject: Escapeable): T
-  export function htmlEscape(str: string): string
-  export function unescape(str: string): string
-}
-
 // Global scope declarations are only allowed in module contexts, so we
 // need this to make Typescript think this is a module. 🙄
 export {}

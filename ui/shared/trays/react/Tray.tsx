@@ -27,7 +27,6 @@ import {Tray} from '@instructure/ui-tray'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
-// @ts-expect-error
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
 const I18n = useI18nScope('tray')

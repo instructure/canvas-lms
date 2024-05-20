@@ -15,9 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape, {raw} from '@instructure/html-escape'
 import authenticity_token from '@canvas/authenticity-token'
 import './jquery.ajaxJSON'
 import 'jqueryui/dialog'
@@ -38,7 +39,7 @@ $.fn.setOptions = function (prompt, options) {
     result += '<option value="' + optHtml + '">' + optHtml + '</option>'
   })
 
-  return this.html($.raw(result))
+  return this.html(raw(result))
 }
 
 // this function is to prevent you from doing all kinds of expesive operations on a
@@ -69,11 +70,22 @@ $.fn.scrollbarWidth = function () {
   return w1 - w2
 }
 
-// Simple animation for dimming an element's opacity
+/**
+ * jQuery plugin to animate an element by reducing its opacity to create a dimming effect.
+ *
+ * @param {number} speed - The duration of the animation in milliseconds.
+ * @returns {jQuery} - The jQuery object for chaining.
+ */
 $.fn.dim = function (speed) {
   return this.animate({opacity: 0.4}, speed)
 }
 
+/**
+ * jQuery plugin to animate an element by increasing its opacity to remove a dimming effect.
+ *
+ * @param {number} speed - The duration of the animation in milliseconds.
+ * @returns {jQuery} - The jQuery object for chaining.
+ */
 $.fn.undim = function (speed) {
   return this.animate({opacity: 1.0}, speed)
 }
@@ -171,6 +183,7 @@ $.fn.confirmDelete = function (options) {
                 },
               },
             ],
+            zIndex: 1000,
           },
           dialog_options
         )
@@ -257,8 +270,12 @@ $.fn.clickLink = function () {
   }
 }
 
-// jQuery supposedly has this built-in, but I haven't
-// had much success with it.
+/**
+ * jQuery plugin to conditionally show or hide elements based on a boolean value or function.
+ *
+ * @param {boolean|Function} bool - The condition to determine whether to show or hide the elements.
+ * @returns {jQuery} - The jQuery object for chaining.
+ */
 $.fn.showIf = function (bool) {
   if ($.isFunction(bool)) {
     return this.each(function (_index) {
@@ -273,6 +290,12 @@ $.fn.showIf = function (bool) {
   return this
 }
 
+/**
+ * jQuery plugin to conditionally disable or enable elements based on a boolean value or function.
+ *
+ * @param {boolean|Function} bool - The condition to determine whether to disable or enable the elements.
+ * @returns {jQuery} - The jQuery object for chaining.
+ */
 $.fn.disableIf = function (bool) {
   if ($.isFunction(bool)) {
     bool = bool.call(this)
@@ -281,6 +304,15 @@ $.fn.disableIf = function (bool) {
   return this
 }
 
+/**
+ * jQuery plugin to create and manipulate indicators for elements.
+ *
+ * @param {Object|string} options - Options for configuring the indicator behavior or 'remove' to remove existing indicators.
+ * @param {Object} options.offset - The offset of the indicator relative to the element.
+ * @param {Object} options.container - The container for the indicator.
+ * @param {boolean} options.singleFlash - Whether to have a single flash effect on the indicator.
+ * @param {boolean} options.scroll - Whether to scroll to make the indicator visible.
+ */
 $.fn.indicate = function (options) {
   options = options || {}
   let $indicator
@@ -351,6 +383,11 @@ $.fn.indicate = function (options) {
   }
 }
 
+/**
+ * jQuery plugin to check if the first element in the collection has a vertical scrollbar.
+ *
+ * @returns {boolean} - `true` if the element has a vertical scrollbar, `false` otherwise.
+ */
 $.fn.hasScrollbar = function () {
   return this.length && this[0].clientHeight < this[0].scrollHeight
 }
@@ -391,6 +428,15 @@ $.fn.fillWindowWithMe = function (options) {
   return this
 }
 
+/**
+ * jQuery plugin to automatically resize input elements based on their content.
+ *
+ * @param {Object} o - An options object for configuring the behavior.
+ * @param {number} o.maxWidth - The maximum width of the input element (default: 1000).
+ * @param {number} o.minWidth - The minimum width of the input element (default: 0).
+ * @param {number} o.comfortZone - The comfort zone for resizing (default: 70).
+ * @returns {jQuery} - The jQuery object for chaining.
+ */
 $.fn.autoGrowInput = function (o) {
   o = $.extend(
     {

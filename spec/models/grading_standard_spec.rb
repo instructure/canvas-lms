@@ -193,6 +193,22 @@ describe GradingStandard do
       expect(standards.length).to eq 1
       expect(standards[0].id).to eq @standard.id
     end
+
+    it "only includes active schemes when include_archived is false" do
+      grading_standard_for @course
+      @standard.archive!
+      standards = GradingStandard.for(@course)
+      expect(standards.length).to eq 0
+    end
+
+    it "includes archived when the parameter is true for archived grading schemes" do
+      Account.site_admin.enable_feature!(:archived_grading_schemes)
+      grading_standard_for @course
+      @standard.archive!
+      standards = GradingStandard.for(@course, include_archived: true)
+      expect(standards.length).to eq 1
+      expect(standards[0].id).to eq @standard.id
+    end
   end
 
   context "sorted" do
@@ -248,6 +264,17 @@ describe GradingStandard do
       expect(standard.score_to_grade(50)).to eql("M")
       expect(standard.score_to_grade(0)).to eql("M")
       expect(standard.score_to_grade(-100)).to eql("M")
+    end
+
+    it "computes correct grades for points based grading scemes" do
+      input = [["A", 0.8667], ["B", 0.6667], ["C", 0.4667], ["D", 0]]
+      standard = GradingStandard.new
+      standard.data = input
+      standard.points_based = true
+      expect(standard.score_to_grade(86.66666666667)).to eql("A")
+      expect(standard.score_to_grade(66.66666666667)).to eql("B")
+      expect(standard.score_to_grade(46.66666666667)).to eql("C")
+      expect(standard.score_to_grade(0)).to eql("D")
     end
 
     it "assigns the lowest grade to below-scale scores" do
@@ -602,6 +629,52 @@ describe GradingStandard do
 
         expect { grading_standard.destroy }.to change { subaccount.reload.grading_standard_id }.from(grading_standard.id).to(nil)
       end
+    end
+  end
+
+  describe "#unarchive!" do
+    let_once(:data) { [["A", 94], ["F", 0]] }
+    let(:grading_standard) { GradingStandard.create(context: Account.default, workflow_state: "archived", data:) }
+
+    it "let to unarchive" do
+      expect { grading_standard.unarchive! }.to change { grading_standard.workflow_state }.from("archived").to("active")
+      expect(grading_standard.halted?)
+        .to be(false)
+      expect(grading_standard.halted_because)
+        .to be_nil
+    end
+
+    it "does not change workflow_state to active if the current workflow_state is deleted" do
+      grading_standard.update(workflow_state: "deleted")
+      grading_standard.unarchive!
+      expect(grading_standard.workflow_state).to eq("deleted")
+      expect(grading_standard.halted?)
+        .to be(true)
+      expect(grading_standard.halted_because)
+        .to_not be_nil
+    end
+  end
+
+  describe "#archive!" do
+    let_once(:data) { [["A", 94], ["F", 0]] }
+    let(:grading_standard) { GradingStandard.create(context: Account.default, workflow_state: "active", data:) }
+
+    it "let to archive" do
+      expect { grading_standard.archive! }.to change { grading_standard.workflow_state }.from("active").to("archived")
+      expect(grading_standard.halted?)
+        .to be(false)
+      expect(grading_standard.halted_because)
+        .to be_nil
+    end
+
+    it "does not change workflow_state to archive if the current workflow_state is deleted" do
+      grading_standard.update(workflow_state: "deleted")
+      grading_standard.archive!
+      expect(grading_standard.workflow_state).to eq("deleted")
+      expect(grading_standard.halted?)
+        .to be(true)
+      expect(grading_standard.halted_because)
+        .to_not be_nil
     end
   end
 end

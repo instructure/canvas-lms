@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "feedjira"
 require_relative "../lti_1_3_spec_helper"
 require_relative "../helpers/k5_common"
 
@@ -62,17 +63,10 @@ describe UsersController do
     end
 
     context "ENV.LTI_TOOL_FORM_ID" do
-      it "with the lti_unique_tool_form_ids flag on, sets a random id" do
-        account.enable_feature!(:lti_unique_tool_form_ids)
+      it "sets a random id" do
         expect(controller).to receive(:random_lti_tool_form_id).and_return("1")
         allow(controller).to receive(:js_env).with(anything).and_call_original
         expect(controller).to receive(:js_env).with(LTI_TOOL_FORM_ID: "1")
-        get :external_tool, params: { id: tool.id, user_id: user.id }
-      end
-
-      it "with the lti_unique_tool_form_ids flag off, does not set a random it" do
-        account.disable_feature!(:lti_unique_tool_form_ids)
-        expect(controller).not_to receive(:js_env).with(LTI_TOOL_FORM_ID: anything)
         get :external_tool, params: { id: tool.id, user_id: user.id }
       end
     end
@@ -109,7 +103,6 @@ describe UsersController do
 
       before do
         allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
-        Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
         tool.settings[:environments] = {
           launch_url: override_url
@@ -777,7 +770,7 @@ describe UsersController do
         expect(p.user.communication_channels.length).to eq 1
         expect(p.user.communication_channels.first).to be_unconfirmed
         expect(p.user.communication_channels.first.path).to eq "jacob@instructure.com"
-        expect([cc1, cc2, cc3]).not_to be_include(p.user.communication_channels.first)
+        expect([cc1, cc2, cc3]).not_to include(p.user.communication_channels.first)
       end
 
       it "re-uses 'conflicting' unique_ids if it hasn't been fully registered yet" do
@@ -1991,8 +1984,8 @@ describe UsersController do
       teacher_enrollments = assigns[:presenter].teacher_enrollments
       expect(teacher_enrollments).not_to be_nil
       teachers = teacher_enrollments.map(&:user)
-      expect(teachers).to be_include(@teacher)
-      expect(teachers).not_to be_include(@designer)
+      expect(teachers).to include(@teacher)
+      expect(teachers).not_to include(@designer)
     end
 
     it "does not redirect to an observer enrollment with no observee" do
@@ -2104,23 +2097,22 @@ describe UsersController do
 
     it "includes absolute path for rel='self' link" do
       get "public_feed", params: { feed_code: @user.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed).not_to be_nil
-      expect(feed.links.first.rel).to match(/self/)
-      expect(feed.links.first.href).to match(%r{http://})
+      expect(feed.feed_url).to match(%r{http://})
     end
 
     it "includes an author for each entry" do
       get "public_feed", params: { feed_code: @user.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
-      expect(feed.entries.all? { |e| e.authors.present? }).to be_truthy
+      expect(feed.entries.all? { |e| e.author.present? }).to be_truthy
     end
 
     it "excludes unpublished things" do
       get "public_feed", params: { feed_code: @user.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed.entries.size).to eq 3
 
       @as.unpublish
@@ -2128,7 +2120,7 @@ describe UsersController do
       @dt.unpublish! # yes, you really have to shout to unpublish a discussion topic :(
 
       get "public_feed", params: { feed_code: @user.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed.entries.size).to eq 0
     end
 
@@ -2141,13 +2133,13 @@ describe UsersController do
       @topic.assignment.update_attribute :only_visible_to_overrides, true
 
       get "public_feed", params: { feed_code: @user.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed.entries.map(&:id).join(" ")).not_to include @as2.asset_string
       expect(feed.entries.map(&:id).join(" ")).not_to include @topic.asset_string
 
       @course.enroll_student(@student, section: @other_section, enrollment_state: "active", allow_multiple_enrollments: true)
       get "public_feed", params: { feed_code: @user.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed.entries.map(&:id).join(" ")).to include @as2.asset_string
       expect(feed.entries.map(&:id).join(" ")).to include @topic.asset_string
     end
@@ -2299,6 +2291,18 @@ describe UsersController do
       expect(response).to render_template("users/show")
     end
 
+    it "404s, but still shows, on a deleted user for admins" do
+      course_with_teacher(active_all: 1, user: user_with_pseudonym)
+
+      account_admin_user
+      user_session(@admin)
+      @teacher.destroy
+
+      get "show", params: { id: @teacher.id }
+      expect(response).to have_http_status :not_found
+      expect(response).to render_template("users/show")
+    end
+
     it "responds to JSON request" do
       account = Account.create!
       course_with_student(active_all: true, account:)
@@ -2337,6 +2341,54 @@ describe UsersController do
       user_session(@user)
       get "show", params: { id: @user.id }
       expect(response).to have_http_status :ok
+    end
+
+    it "shows a deleted user from the account context if they have a deleted pseudonym for that account" do
+      course_with_teacher(active_all: 1, user: user_with_pseudonym)
+      account_admin_user(active_all: true)
+      user_session(@admin)
+      @teacher.remove_from_root_account(Account.default)
+
+      get "show", params: { account_id: Account.default.id, id: @teacher.id }
+      expect(response).to have_http_status :ok
+    end
+
+    context "cross-shard deleted users" do
+      specs_require_sharding
+
+      before do
+        @shard1.activate do
+          course_with_teacher(active_all: 1, user: user_with_pseudonym)
+        end
+        Account.default.pseudonyms.create!(user: @teacher, unique_id: "teacher-shard1")
+        user_with_pseudonym
+        account_admin_user(user: @user, active_all: true)
+        user_session(@admin)
+        @teacher.remove_from_root_account(Account.default)
+      end
+
+      it "shows a deleted user from the account context if they have a deleted pseudonym for that account" do
+        get "show", params: { account_id: Account.default.id, id: @teacher.id }
+
+        expect(response).to have_http_status :ok
+      end
+
+      it "does not give login ID for another account in json format" do
+        get "show", params: { account_id: Account.default.id, id: @teacher.id, format: :json }
+
+        expect(response).to have_http_status :ok
+        expect(response.parsed_body["login_id"]).to be_nil
+      end
+    end
+
+    it "does not show a deleted user from an account the user doesn't have access to" do
+      course_with_teacher(active_all: 1, user: user_with_pseudonym)
+      account_admin_user(active_all: true, account: account_model)
+      user_session(@admin)
+      @teacher.remove_from_root_account(@course.root_account)
+
+      get "show", params: { account_id: @course.root_account.id, id: @teacher.id }
+      expect(response).to have_http_status :unauthorized
     end
   end
 
@@ -2383,7 +2435,7 @@ describe UsersController do
         post "masquerade", params: { user_id: user2.id }
         expect(response).to be_redirect
 
-        expect(admin.associated_shards(:shadow)).to be_include(@shard1)
+        expect(admin.associated_shards(:shadow)).to include(@shard1)
       end
     end
 
@@ -2399,7 +2451,7 @@ describe UsersController do
         post "masquerade", params: { user_id: user2.id }
         expect(response).not_to be_redirect
 
-        expect(admin.associated_shards(:shadow)).not_to be_include(@shard1)
+        expect(admin.associated_shards(:shadow)).not_to include(@shard1)
       end
     end
 
@@ -2415,7 +2467,7 @@ describe UsersController do
         post "masquerade", params: { user_id: user2.id }
         expect(response).to be_redirect
 
-        expect(admin.associated_shards(:shadow)).not_to be_include(@shard1)
+        expect(admin.associated_shards(:shadow)).not_to include(@shard1)
       end
     end
   end
@@ -3078,13 +3130,173 @@ describe UsersController do
   end
 
   describe "#pandata_events_token" do
-    it "returns bad_request if called without an access token" do
-      user_factory(active_all: true)
-      user_session(@user)
-      get "pandata_events_token"
-      assert_status(400)
-      json = response.parsed_body
-      expect(json["message"]).to eq "Access token required"
+    subject do
+      @request.env["HTTP_AUTHORIZATION"] = "Bearer #{access_token.full_token}"
+      get "pandata_events_token", params: { app_key: }
+    end
+
+    let(:user) do
+      user_with_pseudonym(active_user: true, username: "test1@example.com", password: "test1234")
+      @user
+    end
+    let(:developer_key) { DeveloperKey.create! }
+    let(:access_token) { user.access_tokens.create!(developer_key:) }
+    let(:endpoint) { "https://example.com" }
+    let(:app_key) { "VALID" }
+    let(:credentials) do
+      {
+        valid_key: "VALID",
+        valid_secret: "secret",
+        valid_secret_alg: :HS256,
+        invalid_key: "INVALID",
+        invalid_secret: "secret"
+      }.with_indifferent_access
+    end
+
+    before do
+      enable_developer_key_account_binding!(developer_key)
+      allow(Setting).to receive(:get).and_call_original
+      allow(Setting).to receive(:get).with("pandata_events_token_allowed_developer_key_ids", "").and_return(developer_key.global_id.to_s)
+      allow(Setting).to receive(:get).with("pandata_events_token_prefixes", "ios,android").and_return("valid")
+      allow(PandataEvents).to receive_messages(credentials:, endpoint:)
+    end
+
+    context "with logged-in user but no access token" do
+      subject { get "pandata_events_token" }
+
+      before do
+        user_session(user)
+      end
+
+      it "returns bad_request" do
+        subject
+        assert_status(400)
+        json = response.parsed_body
+        expect(json["message"]).to eq "Access token required"
+      end
+    end
+
+    context "with wrong developer key" do
+      before do
+        allow(Setting).to receive(:get).with("pandata_events_token_allowed_developer_key_ids", "").and_return("")
+      end
+
+      it "returns forbidden" do
+        subject
+        assert_status(403)
+        json = response.parsed_body
+        expect(json["message"]).to eq "Developer key not authorized"
+      end
+    end
+
+    context "with invalid app key" do
+      let(:app_key) { "INVALID" }
+
+      it "returns bad request" do
+        subject
+        assert_status(400)
+        json = response.parsed_body
+        expect(json["message"]).to eq "Invalid app key"
+      end
+    end
+
+    it "succeeds" do
+      subject
+      assert_status(200)
+    end
+
+    it "returns the PandataEvents endpoint" do
+      subject
+      expect(response.parsed_body["url"]).to eq endpoint
+    end
+
+    context "auth token" do
+      let(:token) { CanvasSecurity.decode_jwt(response.parsed_body["auth_token"], ["secret"]) }
+
+      it "contains the app key as iss" do
+        subject
+        expect(token["iss"]).to eq app_key
+      end
+
+      it "contains the user id as sub" do
+        subject
+        expect(token["sub"]).to eq user.global_id
+      end
+
+      it "has exp that matches expires_at" do
+        subject
+        exp = DateTime.strptime(token["exp"].to_s, "%s")
+        expires_at = DateTime.strptime(response.parsed_body["expires_at"].to_s, "%Q")
+        expect(exp.to_s).to eq expires_at.to_s
+      end
+    end
+
+    context "props token" do
+      let(:token) { CanvasSecurity.decode_jwt(response.parsed_body["props_token"], ["secret"]) }
+
+      it "contains the user id" do
+        subject
+        expect(token["user_id"]).to eq user.global_id
+      end
+
+      it "contains the shard id" do
+        subject
+        expect(token["shard"]).to eq Shard.current.id
+      end
+
+      it "contains the root account id" do
+        subject
+        expect(token["root_account_id"]).to eq Account.default.id
+      end
+
+      it "contains the root account uuid" do
+        subject
+        expect(token["root_account_uuid"]).to eq Account.default.uuid
+      end
+    end
+
+    context "expires_at" do
+      it "is an epoch timestamp in ms" do
+        subject
+        expires_at = response.parsed_body["expires_at"]
+        expect(expires_at).to be_a Float
+        expires_at_date = DateTime.strptime(expires_at.to_s, "%Q")
+        expect(expires_at_date).to be_a DateTime
+      end
+
+      it "is ~1 day from now" do
+        subject
+        expires_at = response.parsed_body["expires_at"]
+        expect(DateTime.strptime(expires_at.to_s, "%Q").utc).to be_within(1.minute).of(1.day.from_now)
+      end
+    end
+
+    context "after multiple requests" do
+      specs_require_cache(:redis_cache_store)
+
+      it "still has exp that matches expires_at" do
+        expires_at = nil
+        Timecop.travel(5.minutes.ago) do
+          @request.env["HTTP_AUTHORIZATION"] = "Bearer #{access_token.full_token}"
+          get "pandata_events_token", params: { app_key: }
+
+          token = CanvasSecurity.decode_jwt(response.parsed_body["auth_token"], ["secret"])
+          exp = DateTime.strptime(token["exp"].to_s, "%s").to_s
+          expires_at = DateTime.strptime(response.parsed_body["expires_at"].to_s, "%Q").to_s
+
+          expect(exp).to eq expires_at
+        end
+
+        @request.env["HTTP_AUTHORIZATION"] = "Bearer #{access_token.full_token}"
+        get "pandata_events_token", params: { app_key: }
+
+        token = CanvasSecurity.decode_jwt(response.parsed_body["auth_token"], ["secret"])
+        exp2 = DateTime.strptime(token["exp"].to_s, "%s").to_s
+        expires_at2 = DateTime.strptime(response.parsed_body["expires_at"].to_s, "%Q").to_s
+
+        expect(expires_at).not_to eq expires_at2
+        expect(exp2).to eq expires_at2
+      end
     end
   end
 
@@ -3122,6 +3334,11 @@ describe UsersController do
 
     before do
       user.access_tokens.create!
+
+      @sns_client = double
+      allow(DeveloperKey).to receive(:sns).and_return(@sns_client)
+      expect(@sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
+      user.access_tokens.each_with_index { |ac, i| ac.notification_endpoints.create!(token: "token #{i}") }
     end
 
     it "rejects unauthenticated users" do
@@ -3144,6 +3361,29 @@ describe UsersController do
 
       expect(user.reload.last_logged_out).not_to be_nil
       expect(user.access_tokens.take.permanent_expires_at).to be <= Time.zone.now
+    end
+
+    it "allows admin to expire mobile sessions" do
+      user_session(admin)
+      starting_notification_endpoints_count = user.notification_endpoints.count
+      expect(starting_notification_endpoints_count).to be > 0
+      delete "expire_mobile_sessions", format: :json
+
+      expect(response).to have_http_status :ok
+      expect(user.reload.access_tokens.take.permanent_expires_at).to be <= Time.zone.now
+      expect(user.reload.notification_endpoints.count).to be < starting_notification_endpoints_count
+    end
+
+    it "only expires access tokens associated to mobile app developer keys" do
+      dev_key = DeveloperKey.create!
+      user2.access_tokens.create!(developer_key: dev_key)
+
+      user_session(admin)
+      delete "expire_mobile_sessions", format: :json
+
+      expect(response).to have_http_status :ok
+      expect(user.reload.access_tokens.take.permanent_expires_at).to be <= Time.zone.now
+      expect(user2.reload.access_tokens.take.permanent_expires_at).to be_nil
     end
   end
 

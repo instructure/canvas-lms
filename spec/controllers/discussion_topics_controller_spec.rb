@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require "feedjira"
 require_relative "../spec_helper"
 
 describe DiscussionTopicsController do
@@ -518,6 +520,7 @@ describe DiscussionTopicsController do
     end
 
     it "logs an asset_user_access on show" do
+      allow(@course).to receive(:feature_enabled?).and_call_original
       allow(@course).to receive(:feature_enabled?).with("react_discussions_post").and_return(true)
       user_session @student
       @discussion = @course.discussion_topics.create!(user: @teacher, message: "hello")
@@ -1012,6 +1015,28 @@ describe DiscussionTopicsController do
         expect(response).to redirect_to redirect_path
       end
 
+      it "redirects to groups with module_item_id, embed, display, session_timezome, and session_locale query params when :react_discussions_post is ON" do
+        Account.default.enable_feature! :react_discussions_post
+        user_session(@student)
+        get "show", params: {
+          course_id: @course.id,
+          id: @topic.id,
+          embed: true,
+          display: "borderless",
+          session_timezone: "America/Los_Angeles",
+          session_locale: "en",
+          module_item_id: 789
+        }
+
+        expect(response).to be_redirect
+        expect(response.location).to include "/groups/#{@group1.id}/discussion_topics?"
+        expect(response.location).to include "module_item_id=789"
+        expect(response.location).to include "embed=true"
+        expect(response.location).to include "display=borderless"
+        expect(response.location).to include "session_timezone=America%2FLos_Angeles"
+        expect(response.location).to include "session_locale=en"
+      end
+
       it "does not change the name of the child topic when navigating to it" do
         user_session(@student)
 
@@ -1381,6 +1406,13 @@ describe DiscussionTopicsController do
       get :new, params: { course_id: @course.id }
       expect(assigns[:js_bundles].first).to include(:discussion_topic_edit_v2)
     end
+
+    it "js_env DISCUSSION_CHECKPOINTS_ENABLED is set to true when creating a discussion and discussion checkpoints ff is on" do
+      user_session(@teacher)
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      get :new, params: { course_id: @course.id }
+      expect(assigns[:js_env][:DISCUSSION_CHECKPOINTS_ENABLED]).to be_truthy
+    end
   end
 
   describe "GET 'edit'" do
@@ -1511,6 +1543,13 @@ describe DiscussionTopicsController do
       @course.save!
       get :edit, params: { course_id: @course.id, id: @topic.id }
       expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to be true
+    end
+
+    it "js_env DISCUSSION_CHECKPOINTS_ENABLED is set to true when editing a discussion and discussion checkpoints ff is on" do
+      user_session(@teacher)
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      get :edit, params: { course_id: @course.id, id: @topic.id }
+      expect(assigns[:js_env][:DISCUSSION_CHECKPOINTS_ENABLED]).to be_truthy
     end
 
     context "conditional-release" do
@@ -1682,25 +1721,24 @@ describe DiscussionTopicsController do
 
     it "includes absolute path for rel='self' link" do
       get "public_feed", params: { feed_code: @course.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body) rescue nil
       expect(feed).not_to be_nil
-      expect(feed.links.first.rel).to match(/self/)
-      expect(feed.links.first.href).to match(%r{http://})
+      expect(feed.feed_url).to match(%r{http://})
     end
 
     it "does not include entries in an anonymous feed" do
       get "public_feed", params: { feed_code: @course.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.entries).to be_empty
     end
 
     it "includes an author for each entry with an enrollment feed" do
       get "public_feed", params: { feed_code: @course.teacher_enrollments.first.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
-      expect(feed.entries.all? { |e| e.authors.present? }).to be_truthy
+      expect(feed.entries.all? { |e| e.author.present? }).to be_truthy
     end
   end
 
@@ -2407,7 +2445,7 @@ describe DiscussionTopicsController do
     it "deletes attachments" do
       attachment = @topic.attachment = attachment_model(context: @course)
       @topic.lock_at = Time.now + 1.week
-      @topic.unlock_at = Time.now - 1.week
+      @topic.delayed_post_at = Time.now - 1.week
       @topic.save!
       @topic.unlock!
       put("update", params: { course_id: @course.id, topic_id: @topic.id, remove_attachment: "1" }, format: "json")

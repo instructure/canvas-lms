@@ -18,10 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# pre-build the graphql schema (which is expensive and slow) so that the first
-# request is not slow and terrible
-CanvasSchema.graphql_definition
-
 class GraphQLController < ApplicationController
   include Api::V1
 
@@ -72,8 +68,7 @@ class GraphQLController < ApplicationController
       ]
     }
 
-    overall_timeout = Setting.get("graphql_overall_timeout", "60").to_i.seconds
-    Timeout.timeout(overall_timeout) do
+    Timeout.timeout(1.minute) do
       schema.execute(query, variables:, context:)
     end
   end

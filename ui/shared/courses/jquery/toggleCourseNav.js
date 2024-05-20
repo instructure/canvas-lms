@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {debounce} from 'lodash'
 import $ from 'jquery'
 import updateSubnavMenuToggle from './updateSubnavMenuToggle'
 
@@ -57,10 +57,10 @@ const initialize = () => {
   const $stickyFrame = $('#left-side #sticky-container').get(0)
   if ($stickyFrame) {
     $(resizeStickyFrame)
-    $(window).on('resize', _.debounce(resizeStickyFrame, 20))
+    $(window).on('resize', debounce(resizeStickyFrame, 20))
   }
   $(resetMenuItemTabIndexes)
-  $(window).on('resize', _.debounce(resetMenuItemTabIndexes, 50))
+  $(window).on('resize', debounce(resetMenuItemTabIndexes, 50))
   $('body').on(
     'click',
     '#courseMenuToggle',

@@ -18,7 +18,7 @@
 import {createActions, createAction} from 'redux-actions'
 import axios from 'axios'
 import {asAxios, getPrefetchedXHR} from '@canvas/util/xhr'
-import parseLinkHeader from 'parse-link-header'
+import parseLinkHeader from '@canvas/parse-link-header'
 import configureAxios from '../utilities/configureAxios'
 import {alert} from '../utilities/alertUtils'
 import {useScope as useI18nScope} from '@canvas/i18n'

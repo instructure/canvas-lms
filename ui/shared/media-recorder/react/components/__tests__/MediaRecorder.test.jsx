@@ -16,55 +16,55 @@
 //  * with this program. If not, see <http://www.gnu.org/licenses/>.
 //  */
 
-import { fileWithExtension } from "../MediaRecorder";
+import {fileWithExtension} from '../MediaRecorder'
 
 describe('fileWithExtension', () => {
-    it('returns same file if it already has extension', () => {
-        const file = new File(['bits'], 'dummy-video.mp4')
-        const newFile = fileWithExtension(file);
-        expect(newFile).toBe(file)
-    })
+  it('returns same file if it already has extension', () => {
+    const file = new File(['bits'], 'dummy-video.mp4')
+    const newFile = fileWithExtension(file)
+    expect(newFile).toBe(file)
+  })
 
-    it('adds extension by mime type', () => {
-        const file = new File(['bits'], 'dummy-video', {
-            type: 'video/mp4'
-        })
-        const newFile = fileWithExtension(file)
-        expect(newFile.name).toBe('dummy-video.mp4')
+  it('adds extension by mime type', () => {
+    const file = new File(['bits'], 'dummy-video', {
+      type: 'video/mp4',
     })
+    const newFile = fileWithExtension(file)
+    expect(newFile.name).toBe('dummy-video.mp4')
+  })
 
-    it('adds default extension if no mime type', () => {
-        const file = new File(['bits'], 'dummy-video')
-        const newFile = fileWithExtension(file)
-        expect(newFile.name).toBe('dummy-video.webm')
+  it('adds default extension if no mime type', () => {
+    const file = new File(['bits'], 'dummy-video')
+    const newFile = fileWithExtension(file)
+    expect(newFile.name).toBe('dummy-video.webm')
+  })
+
+  it('retains properties', () => {
+    const file = new File(['bits'], 'dummy-audio', {
+      type: 'audio/mpeg',
+      lastModified: 123456,
     })
+    const newFile = fileWithExtension(file)
+    expect(newFile.name).toBe('dummy-audio.mp3')
+    expect(newFile.lastModified).toBe(123456)
+    expect(newFile.type).toBe('audio/mpeg')
+  })
 
-    it('retains properties', () => {
-        const file = new File(['bits'], 'dummy-audio', {
-            type: 'audio/mpeg',
-            lastModified: 123456
-        })
-        const newFile = fileWithExtension(file)
-        expect(newFile.name).toBe('dummy-audio.mp3')
-        expect(newFile.lastModified).toBe(123456)
-        expect(newFile.type).toBe('audio/mpeg')
+  it('handles files that end with a period', () => {
+    const file = new File(['bits'], 'dummy-audio.', {
+      type: 'audio/mpeg',
+      lastModified: 123456,
     })
+    const newFile = fileWithExtension(file)
+    expect(newFile.name).toBe('dummy-audio.mp3')
+  })
 
-    it('handles files that end with a period', () => {
-        const file = new File(['bits'], 'dummy-audio.', {
-            type: 'audio/mpeg',
-            lastModified: 123456
-        })
-        const newFile = fileWithExtension(file)
-        expect(newFile.name).toBe('dummy-audio.mp3')
+  it('converts mime type to extension', () => {
+    const file = new File(['bits'], 'dummy-media.', {
+      type: 'video/quicktime',
+      lastModified: 123456,
     })
-
-    it('converts mime type to extension', () => {
-        const file = new File(['bits'], 'dummy-media.', {
-            type: 'video/quicktime',
-            lastModified: 123456
-        })
-        const newFile = fileWithExtension(file)
-        expect(newFile.name).toBe('dummy-media.mov')
-      })
+    const newFile = fileWithExtension(file)
+    expect(newFile.name).toBe('dummy-media.mov')
+  })
 })

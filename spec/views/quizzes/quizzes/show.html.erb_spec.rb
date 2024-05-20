@@ -72,6 +72,27 @@ describe "quizzes/quizzes/show" do
     expect(response).to have_tag "#quiz-publish-link"
   end
 
+  it "shows assign to button if flag is on" do
+    Account.site_admin.enable_feature!(:differentiated_modules)
+    course_with_teacher(active_all: true)
+    assign(:quiz, @course.quizzes.create!)
+
+    view_context
+    render "quizzes/quizzes/show"
+
+    expect(response).to have_tag ".assign-to-link"
+  end
+
+  it "does not show assign to button if flag is off" do
+    course_with_teacher(active_all: true)
+    assign(:quiz, @course.quizzes.create!)
+
+    view_context
+    render "quizzes/quizzes/show"
+
+    expect(response).not_to have_tag ".assign-to-link"
+  end
+
   it "shows unpublished quiz changes to instructors" do
     course_with_teacher(active_all: true)
     @quiz = @course.quizzes.create!

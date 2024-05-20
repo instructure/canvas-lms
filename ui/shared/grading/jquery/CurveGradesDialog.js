@@ -20,9 +20,9 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
 import curveGradesDialogTemplate from '../jst/CurveGradesDialog.handlebars'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.disableWhileLoading'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/util/jquery/fixDialogButtons'
@@ -139,6 +139,7 @@ export default (function () {
             return _this.$dialog.remove()
           }
         })(this),
+        zIndex: 1000,
       })
       .fixDialogButtons()
     this.$dialog.on('dialogclose', onClose)

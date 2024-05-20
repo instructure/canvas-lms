@@ -451,6 +451,7 @@ export function K5Course({
   isMasterCourse,
   showImmersiveReader,
   gradingScheme,
+  pointsBasedGradingScheme,
   restrictQuantitativeData,
 }) {
   const initialObservedId = observedUsersList.find(o => o.id === savedObservedId(currentUser.id))
@@ -667,6 +668,7 @@ export function K5Course({
             outcomeProficiency={outcomeProficiency}
             observedUserId={showObserverOptions ? observedUserId : null}
             gradingScheme={gradingScheme}
+            pointsBasedGradingScheme={pointsBasedGradingScheme}
             restrictQuantitativeData={restrictQuantitativeData}
           />
         )}
@@ -732,6 +734,7 @@ K5Course.propTypes = {
   isMasterCourse: PropTypes.bool.isRequired,
   showImmersiveReader: PropTypes.bool.isRequired,
   gradingScheme: PropTypes.array,
+  pointsBasedGradingScheme: PropTypes.bool,
   restrictQuantitativeData: PropTypes.bool,
 }
 

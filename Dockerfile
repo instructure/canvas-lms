@@ -20,7 +20,6 @@ ARG CANVAS_RAILS=7.0
 ENV CANVAS_RAILS=${CANVAS_RAILS}
 
 ENV NODE_MAJOR 18
-ENV NODE_OPTIONS=--openssl-legacy-provider
 ENV YARN_VERSION 1.19.1-1
 ENV GEM_HOME /home/docker/.gem/$RUBY
 ENV PATH ${APP_HOME}bin:$GEM_HOME/bin:$PATH
@@ -64,7 +63,7 @@ RUN mkdir -p /etc/apt/keyrings \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 
-RUN gem install bundler --no-document -v 2.4.20 \
+RUN gem install bundler --no-document -v 2.5.9 \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 RUN npm install -g npm@9.8.1 && npm cache clean --force
 
@@ -78,15 +77,9 @@ RUN set -eux; \
     config/locales/generated \
     log \
     node_modules \
-    packages/canvas-planner/node_modules \
-    packages/jest-moxios-utils/node_modules \
     packages/js-utils/es \
     packages/js-utils/lib \
     packages/js-utils/node_modules \
-    packages/k5uploader/es \
-    packages/k5uploader/lib \
-    packages/k5uploader/node_modules \
-    packages/old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock/node_modules \
     pacts \
     public/dist \
     public/doc/api \

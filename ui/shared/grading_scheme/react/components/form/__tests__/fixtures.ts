@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GradingSchemeEditableData} from '../GradingSchemeInput'
+import type {GradingSchemeEditableData} from '../GradingSchemeInput'
 
 export const VALID_FORM_INPUT: GradingSchemeEditableData = {
   data: [

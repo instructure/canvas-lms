@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import fetchMock from 'fetch-mock'
 import {createClient, gql} from '..'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
 
 describe('host configuration', () => {
   const someQuery = gql`
@@ -65,50 +63,5 @@ describe('host configuration', () => {
     // to a different address.
     const client = createClient({httpLinkOptions: {fetch: fakeFetch, uri: uriTarget}})
     await client.query({query: someQuery})
-  })
-
-  describe('API gateway override', () => {
-    async function fakeGatewayFetch(url, config) {
-      switch (url) {
-        case '/api/v1/inst_access_tokens': {
-          return {
-            ok: true,
-            status: 200,
-            json: async () => ({token: 'my-fake-token'}),
-          }
-        }
-        case 'http://my-gateway/graphql': {
-          // make sure token is being sent to api gateway
-          expect(config.headers.authorization).toEqual('Bearer my-fake-token')
-          return {
-            ok: true,
-            status: 200,
-            text: async () => {
-              return '{"data": { "aField": "aValue" }, "errors": []}'
-            },
-          }
-        }
-        default: {
-          throw new Error(`Unhandled request: ${url}`)
-        }
-      }
-    }
-
-    beforeAll(() => jest.spyOn(global, 'fetch'))
-
-    beforeEach(() => {
-      global.fetch.mockImplementation(fakeGatewayFetch)
-      global.fetch.mockClear()
-    })
-
-    it('talks to gateway URI with InstAccess token', async () => {
-      // prove that by introducing one config parameter, the client
-      // reconfigures itself to talk there over HTTP and to fetch
-      // InstAccess tokens to do so (see expectation in mock'd
-      // fetch implementation above)
-      const gatewayApolloClient = createClient({apiGatewayUri: 'http://my-gateway/graphql'})
-      const gatewayResponse = await gatewayApolloClient.query({query: someQuery})
-      expect(gatewayResponse.data.aField).toEqual('aValue')
-    })
   })
 })

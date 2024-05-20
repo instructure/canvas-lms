@@ -17,10 +17,11 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import EditAssignmentDetails from 'ui/features/calendar/backbone/views/EditAssignmentDetails'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import timezone from 'timezone'
-import tzInTest from '@canvas/timezone/specHelpers'
+import tzInTest from '@canvas/datetime/specHelpers'
 import detroit from 'timezone/America/Detroit'
 import french from 'timezone/fr_FR'
 import fakeENV from 'helpers/fakeENV'
@@ -258,5 +259,6 @@ test('Should disable changing the date if course pacing is enabled', function ()
   this.event.contextInfo = {course_pacing_enabled: true}
   const view = createView(commonEvent(), this.event)
   view.setContext('course_3')
-  equal(view.$('#assignment_due_at').css('disabled'), '')
+  view.contextChange({target: '#assignment_context'}, false)
+  equal(view.$('#assignment_due_at').prop('disabled'), true)
 })

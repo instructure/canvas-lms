@@ -29,8 +29,8 @@ class ScoreStatisticsGenerator
     # not run this potentially expensive query constantly.
     # The random part of the delay is to make it not run for all courses in a
     # term or all courses in a grading period at the same time.
-    min = Setting.get("minimum_seconds_wait_for_grade_statistics", 10).to_i
-    max = Setting.get("maximum_seconds_wait_for_grade_statistics", 130).to_i
+    min = 10
+    max = 130
     delay_if_production(singleton: "ScoreStatisticsGenerator:#{course_global_id}",
                         n_strand: ["ScoreStatisticsGenerator", global_root_account_id],
                         run_at: rand(min..max).seconds.from_now,

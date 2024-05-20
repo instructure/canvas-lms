@@ -19,19 +19,21 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import jQuery from 'jquery'
+import $ from 'jquery'
+import ready from '@instructure/ready'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData */
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
-import '@canvas/keycodes'
+import '@canvas/datetime/jquery'
+import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('sub_accounts')
 
-jQuery(function ($) {
+ready(() => {
   $('.add_sub_account_link').click(function () {
     $("<li class='sub_account'/>")
       .append($('#account_blank').clone(true).attr('id', 'account_new').show())

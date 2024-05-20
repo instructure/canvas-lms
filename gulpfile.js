@@ -26,7 +26,8 @@ const DIST = 'public/dist'
 const STUFF_TO_REV = [
   'public/fonts/**/*.{eot,otf,svg,ttf,woff,woff2}',
   'public/images/**/*',
-  'public/javascripts/translations/*.json'
+  'public/javascripts/translations/*.json',
+  'public/javascripts/lti_post_message_forwarding.js',
 ]
 
 gulp.task('rev', () => {
@@ -42,7 +43,7 @@ gulp.task('rev', () => {
     'fr_CA.js',
     'he_IL.js',
     'pl_PL.js',
-    '**/index.js'
+    '**/index.js',
   ].map(f => `!./node_modules/timezone/${f}`)
 
   const timezoneFileGlobs = ['./node_modules/timezone/**/*.js'].concat(timezonefilesToIgnore)
@@ -60,15 +61,15 @@ gulp.task('rev', () => {
     customTimezoneStream,
     gulp.src(STUFF_TO_REV, {
       base: 'public', // tell it to use the 'public' folder as the base of all paths
-      follow: true // follow symlinks, so it picks up on images inside plugins and stuff
+      follow: true, // follow symlinks, so it picks up on images inside plugins and stuff
     }),
     gulp.src(['node_modules/tinymce/skins/lightgray/**/*'], {
-      base: '.'
+      base: '.',
     })
   ).pipe(gulpPlugins.rev())
 
   if (
-    process.env.JS_BUILD_NO_UGLIFY !== '1' &&
+    process.env.SKIP_SOURCEMAPS !== '1' &&
     (process.env.NODE_ENV === 'production' || process.env.RAILS_ENV === 'production')
   ) {
     const jsFilter = gulpPlugins.filter('**/*.js', {restore: true})
@@ -86,10 +87,10 @@ gulp.task('rev', () => {
         './node_modules/@formatjs/intl-datetimeformat/add-all-tz.js',
         './node_modules/@formatjs/intl-datetimeformat/locale-data/*.js',
         './node_modules/@formatjs/intl-numberformat/locale-data/*.js',
-        './node_modules/@formatjs/intl-relativetimeformat/locale-data/*.js'
+        './node_modules/@formatjs/intl-relativetimeformat/locale-data/*.js',
       ],
       {
-        base: './node_modules'
+        base: './node_modules',
       }
     )
   )
@@ -101,7 +102,7 @@ gulp.task('rev', () => {
     .pipe(
       gulp
         .src(['packages/slickgrid/images/*.gif'], {
-          base: 'packages/slickgrid/images'
+          base: 'packages/slickgrid/images',
         })
         .pipe(gulp.dest(`${DIST}/images/slickgrid`))
     )

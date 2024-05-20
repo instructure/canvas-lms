@@ -244,7 +244,8 @@ module CustomSeleniumActions
   end
 
   def get_value(selector)
-    driver.execute_script("return $(#{selector.inspect}).val()")
+    script = "return document.querySelector(arguments[0]).value;"
+    driver.execute_script(script, selector)
   end
 
   def get_options(selector, scope = nil)
@@ -416,6 +417,11 @@ module CustomSeleniumActions
     driver.execute_script("$(#{element_jquery_finder.to_s.to_json}).click()")
   end
 
+  def force_click_native(element_finder)
+    f(element_finder)
+    driver.execute_script("document.querySelector(#{element_finder.to_s.to_json}).click();")
+  end
+
   def hover(element)
     element.with_stale_element_protection { driver.action.move_to(element).perform }
   end
@@ -577,21 +583,10 @@ module CustomSeleniumActions
     dialog.find_elements(:css, submit_button_css).last.click
   end
 
-  ##
-  # load the simulate plugin to simulate a drag events (among other things)
-  # will only load it once even if its called multiple times
-  def load_simulate_js
-    @load_simulate_js ||= begin
-      js = File.read("spec/selenium/helpers/jquery.simulate.js")
-      driver.execute_script js
-    end
-  end
-
   # when selenium fails you, reach for .simulate
   # takes a CSS selector for jQuery to find the element you want to drag
   # and then the change in x and y you want to drag
   def drag_with_js(selector, x, y)
-    load_simulate_js
     driver.execute_script "$('#{selector}').simulate('drag', { dx: #{x}, dy: #{y} })"
   end
 

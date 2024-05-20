@@ -17,8 +17,8 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
+import {extend as lodashExtend} from 'lodash'
 import $ from 'jquery'
-import _ from 'underscore'
 import SortableCollectionView from './SortableCollectionView'
 import AssignmentGroupListItemView from './AssignmentGroupListItemView'
 import template from '../../jst/AssignmentGroupList.handlebars'
@@ -110,7 +110,7 @@ AssignmentGroupListView.prototype.renderOnReset = function () {
 
 AssignmentGroupListView.prototype.toJSON = function () {
   const data = AssignmentGroupListView.__super__.toJSON.apply(this, arguments)
-  return _.extend({}, data, {
+  return lodashExtend({}, data, {
     firstResetLanded: this.firstResetLanded,
   })
 }

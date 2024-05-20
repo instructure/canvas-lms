@@ -49,6 +49,8 @@ ExternalToolLaunchView.prototype.launchExternalTool = function (event) {
   return this.contentReturnView.render()
 }
 
+// data is ExternalContentReady event data or other object with contentItems
+// (grep codebase for "trigger..ready")
 ExternalToolLaunchView.prototype.setUrl = function (data) {
   const item = data.contentItems[0]
   this.$fileName.text(item.text)

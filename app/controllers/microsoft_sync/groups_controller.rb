@@ -79,7 +79,19 @@
 #            "description": "The time the MicrosoftSync::Group was updated",
 #            "type": "datetime",
 #            "example": "2012-07-20T15:00:00-06:00"
-#         }
+#         },
+#         "debug_info": {
+#           "description": "List of strings with debugging info (localized). Only returned for site admins.",
+#           "type": "array",
+#           "items": {"type": "object"}
+#           "example": [
+#             {
+#               "timestamp": "2024-01-03T11:50:07Z",
+#               "msg": "2 Canvas users without corresponding Microsoft user:",
+#               "user_ids": [1, 3]
+#             }
+#           ]
+#         ]
 #       }
 #     }
 class MicrosoftSync::GroupsController < ApplicationController
@@ -234,10 +246,18 @@ class MicrosoftSync::GroupsController < ApplicationController
   def group_json(grp = nil)
     excludes = [:job_state]
     unless Account.site_admin.grants_right?(@current_user, :view_error_reports)
-      excludes << :last_error_report_id
+      excludes += %i[last_error_report_id debug_info]
     end
     json = (grp || group).as_json(include_root: false, except: excludes)
     json[:last_error] = MicrosoftSync::Errors.deserialize_and_localize(json[:last_error])
+    json[:debug_info] =
+      begin
+        MicrosoftSync::DebugInfoTracker.localize_debug_info(json[:debug_info])
+      rescue => e
+        # This data is a nice to have, don't let it actually break anything
+        Canvas::Errors.capture(e)
+        nil
+      end
     json
   end
 end

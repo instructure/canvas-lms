@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {filter} from 'lodash'
 import CollectionView from '@canvas/backbone-collection-view'
 import template from '../../jst/QuizItemGroupView.handlebars'
 import QuizItemView from './QuizItemView'
@@ -58,7 +58,7 @@ export default class ItemGroupView extends CollectionView {
   }
 
   matchingCount(term) {
-    return _.filter(this.collection.models, m => {
+    return filter(this.collection.models, m => {
       return this.filter(m, term)
     }).length
   }

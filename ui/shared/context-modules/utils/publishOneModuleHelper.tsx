@@ -23,8 +23,8 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import ContextModulesPublishIcon from '../react/ContextModulesPublishIcon'
 import {updateModuleItem, itemContentKey} from '../jquery/utils'
-import RelockModulesDialog from '../backbone/views/RelockModulesDialog'
-import {
+import RelockModulesDialog from '@canvas/relock-modules-dialog'
+import type {
   CanvasId,
   DoFetchModuleResponse,
   DoFetchModuleItemsResponse,
@@ -54,14 +54,18 @@ export function publishModule(courseId: CanvasId, moduleId: CanvasId, skipItems:
   )
 }
 
-export function unpublishModule(courseId: CanvasId, moduleId: CanvasId) {
-  const loadingMessage = I18n.t('Unpublishing module and items')
-  const successMessage = I18n.t('Module and items unpublished')
+export function unpublishModule(courseId: CanvasId, moduleId: CanvasId, skipItems: boolean) {
+  const loadingMessage = skipItems
+    ? I18n.t('Unpublishing module')
+    : I18n.t('Unpublishing module and items')
+  const successMessage = skipItems
+    ? I18n.t('Module unpublished')
+    : I18n.t('Module and items unpublished')
   exportFuncs.batchUpdateOneModuleApiCall(
     courseId,
     moduleId,
     false,
-    false,
+    skipItems,
     loadingMessage,
     successMessage
   )

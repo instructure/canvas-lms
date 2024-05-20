@@ -686,6 +686,12 @@
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Ingresar al menos 3 caracteres para buscar"
     },
+    "enter_replacement_text_17631bbc": {
+        "message": "ingresar texto de reemplazo"
+    },
+    "enter_search_text_26cb4459": {
+        "message": "ingresar texto de búsqueda"
+    },
     "epsilon_54bb8afa": {
         "message": "Épsilon"
     },
@@ -781,6 +787,12 @@
     },
     "filipino_33339264": {
         "message": "Filipino"
+    },
+    "find_8d605019": {
+        "message": "Encontrar"
+    },
+    "find_and_replace_6e345933": {
+        "message": "Buscar y reemplazar"
     },
     "finish_bc343002": {
         "message": "Terminar"
@@ -1057,6 +1069,9 @@
     },
     "indefinite_integral_6623307e": {
         "message": "Integral indefinida"
+    },
+    "index_of_max_80dcf7a5": {
+        "message": "{ index } de { max }"
     },
     "indigo_2035fc55": {
         "message": "Índigo"
@@ -1487,6 +1502,9 @@
     "no_results_940393cf": {
         "message": "No hay resultados."
     },
+    "no_results_found_58717065": {
+        "message": "No se encontraron resultados"
+    },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "No se encontraron resultados para { filterTerm }"
     },
@@ -1700,6 +1718,9 @@
     "preview_inline_9787330": {
         "message": "Vista previa en línea"
     },
+    "previous_bd2ac015": {
+        "message": "Anterior"
+    },
     "prime_917ea60e": {
         "message": "Primo"
     },
@@ -1772,8 +1793,14 @@
     "remove_link_d1f2f4d0": {
         "message": "Eliminar enlace"
     },
+    "replace_all_d3d68b3": {
+        "message": "Reemplazar todo"
+    },
     "replace_e61834a7": {
         "message": "Reemplazar"
+    },
+    "replace_with_eeff01ad": {
+        "message": "Reemplazar por"
     },
     "reset_95a81614": {
         "message": "Restablecer"

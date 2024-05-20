@@ -18,61 +18,57 @@
 
 import axios from '@canvas/axios'
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import DefaultToolForm from '../DefaultToolForm'
 import * as SelectContentDialog from '@canvas/select-content-dialog'
 
-const newProps = (overrides = {}) => ({
-  ...{
+const renderComponent = (props = {}) => {
+  const defaultProps = {
     toolUrl: 'https://www.default-tool.com/blti',
     courseId: 1,
     toolName: 'Awesome Tool',
     previouslySelected: false,
-  },
-  ...overrides,
-})
+  };
+  return render(<DefaultToolForm {...defaultProps} {...props} />)
+}
 
-beforeEach(() => {
-  jest.spyOn(axios, 'get').mockResolvedValue({data: []})
-})
 
 describe('DefaultToolForm', () => {
-  let wrapper = 'empty wrapper'
-
-  afterEach(() => {
-    wrapper.unmount()
+  beforeEach(() => {
+    jest.spyOn(axios, 'get').mockResolvedValue({data: []})
   })
 
   it('renders a button to launch the tool', () => {
-    wrapper = mount(<DefaultToolForm {...newProps()} />)
-    expect(wrapper.find('#default-tool-launch-button')).toBeTruthy()
+    const wrapper = renderComponent()
+    expect(wrapper.getByRole('button', { name: 'Add Content' })).toBeInTheDocument()
   })
 
-  it('launches the tool when the button is clicked', () => {
+  it('launches the tool when the button is clicked', async () => {
     SelectContentDialog.Events.onContextExternalToolSelect = jest.fn()
-    wrapper = mount(<DefaultToolForm {...newProps()} />)
-    wrapper.find('#default-tool-launch-button').first().simulate('click')
+    const wrapper = renderComponent()
+    await userEvent.click(wrapper.getByRole('button', { name: 'Add Content' }))
     expect(SelectContentDialog.Events.onContextExternalToolSelect).toHaveBeenCalled()
     SelectContentDialog.Events.onContextExternalToolSelect.mockRestore()
   })
 
-  it('renders the information mesage', () => {
-    wrapper = mount(<DefaultToolForm {...newProps()} />)
-    expect(wrapper.find('Alert').first().html()).toContain('Click the button above to add content')
+  it('renders the information message', () => {
+    const wrapper = renderComponent()
+    expect(wrapper.getByText('Click the button above to add content')).toBeInTheDocument()
   })
 
   it('sets the button text', () => {
-    wrapper = mount(<DefaultToolForm {...newProps()} />)
-    expect(wrapper.find('Button').first().html()).toContain('Add Content')
+    const wrapper = renderComponent({toolButtonText: 'Custom Button Text'})
+    expect(wrapper.getByRole('button', { name: 'Custom Button Text' })).toBeInTheDocument()
   })
 
   it('renders the success message if previouslySelected is true', () => {
-    wrapper = mount(<DefaultToolForm {...newProps({previouslySelected: true})} />)
-    expect(wrapper.find('Alert').first().html()).toContain('Successfully Added')
+    const wrapper = renderComponent({previouslySelected: true})
+    expect(wrapper.getByText('Successfully Added')).toBeInTheDocument()
   })
 
   describe('when the configured tool is not installed', () => {
-    beforeAll(() => {
+    beforeEach(() => {
       axios.get.mockResolvedValue({
         data: [
           {
@@ -86,9 +82,10 @@ describe('DefaultToolForm', () => {
       })
     })
 
-    it('renders an error message', () => {
-      wrapper = mount(<DefaultToolForm {...newProps({previouslySelected: true})} />)
-      expect(wrapper.find('Alert').exists()).toEqual(true)
+    it('renders an error message', async () => {
+      const wrapper = renderComponent({previouslySelected: true})
+
+      await waitFor(() => expect(wrapper.getByText('The tool is not installed in the course or account')).toBeInTheDocument())
     })
   })
 })

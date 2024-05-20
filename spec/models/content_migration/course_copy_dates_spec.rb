@@ -27,218 +27,298 @@ describe ContentMigration do
       before :once do
         @old_start = Time.zone.parse("01 Jul 2012 06:00:00 UTC +00:00")
         @new_start = Time.zone.parse("05 Aug 2012 06:00:00 UTC +00:00")
-
-        @copy_from.require_assignment_group
-        @copy_from.assignments.create!(due_at: @old_start + 1.day,
-                                       unlock_at: @old_start - 2.days,
-                                       lock_at: @old_start + 3.days,
-                                       peer_reviews_due_at: @old_start + 4.days)
-
-        att = Attachment.create!(context: @copy_from,
-                                 filename: "hi.txt",
-                                 uploaded_data: StringIO.new("stuff"),
-                                 folder: Folder.unfiled_folder(@copy_from))
-        att.unlock_at = @old_start - 2.days
-        att.lock_at = @old_start + 3.days
-        att.save!
-
-        folder = @copy_from.folders.create!(name: "shifty",
-                                            unlock_at: @old_start - 3.days,
-                                            lock_at: @old_start + 2.days)
-        @copy_from.attachments.create!(filename: "blah",
-                                       uploaded_data: StringIO.new("blah"),
-                                       folder:)
-
-        @copy_from.quizzes.create!(due_at: "05 Jul 2012 06:00:00 UTC +00:00",
-                                   unlock_at: @old_start + 1.day,
-                                   lock_at: @old_start + 5.days,
-                                   show_correct_answers_at: @old_start + 6.days,
-                                   hide_correct_answers_at: @old_start + 7.days)
-        @copy_from.discussion_topics.create!(title: "some topic",
-                                             message: "<p>some text</p>",
-                                             delayed_post_at: @old_start + 3.days,
-                                             lock_at: @old_start + 7.days)
-        @copy_from.announcements.create!(title: "hear ye",
-                                         message: "<p>grades will henceforth be in Cyrillic letters</p>",
-                                         delayed_post_at: @old_start + 10.days)
-        @copy_from.calendar_events.create!(title: "an event",
-                                           start_at: @old_start + 4.days,
-                                           end_at: @old_start + 4.days + 1.hour)
-        @copy_from.wiki_pages.create!(title: "a page",
-                                      workflow_state: "unpublished",
-                                      todo_date: @old_start + 7.days,
-                                      publish_at: @old_start + 3.days)
-        cm = @copy_from.context_modules.build(name: "some module", unlock_at: @old_start + 1.day)
-        cm.save!
-
-        cm2 = @copy_from.context_modules.build(name: "some module", unlock_at: @old_start + 1.day)
-        cm2.save!
       end
 
-      it "shifts dates" do
-        skip unless Qti.qti_enabled?
-        options = {
-          everything: true,
-          shift_dates: true,
-          old_start_date: "Jul 1, 2012",
-          old_end_date: "Jul 11, 2012",
-          new_start_date: "Aug 5, 2012",
-          new_end_date: "Aug 15, 2012"
-        }
-        @cm.copy_options = options
-        @cm.save!
+      context "when source and target course have start and end dates" do
+        before :once do
+          @copy_from.require_assignment_group
+          @copy_from.assignments.create!(due_at: @old_start + 1.day,
+                                         unlock_at: @old_start - 2.days,
+                                         lock_at: @old_start + 3.days,
+                                         peer_reviews_due_at: @old_start + 4.days)
 
-        run_course_copy
+          att = Attachment.create!(context: @copy_from,
+                                   filename: "hi.txt",
+                                   uploaded_data: StringIO.new("stuff"),
+                                   folder: Folder.unfiled_folder(@copy_from))
+          att.unlock_at = @old_start - 2.days
+          att.lock_at = @old_start + 3.days
+          att.save!
 
-        new_asmnt = @copy_to.assignments.first
-        expect(new_asmnt.due_at.to_i).to eq (@new_start + 1.day).to_i
-        expect(new_asmnt.unlock_at.to_i).to eq (@new_start - 2.days).to_i
-        expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.days).to_i
-        expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.days).to_i
+          folder = @copy_from.folders.create!(name: "shifty",
+                                              unlock_at: @old_start - 3.days,
+                                              lock_at: @old_start + 2.days)
+          @copy_from.attachments.create!(filename: "blah",
+                                         uploaded_data: StringIO.new("blah"),
+                                         folder:)
 
-        new_att = @copy_to.attachments.where(display_name: "hi.txt").first
-        expect(new_att.unlock_at.to_i).to eq (@new_start - 2.days).to_i
-        expect(new_att.lock_at.to_i).to eq (@new_start + 3.days).to_i
+          @copy_from.quizzes.create!(due_at: "05 Jul 2012 06:00:00 UTC +00:00",
+                                     unlock_at: @old_start + 1.day,
+                                     lock_at: @old_start + 5.days,
+                                     show_correct_answers_at: @old_start + 6.days,
+                                     hide_correct_answers_at: @old_start + 7.days)
+          @copy_from.discussion_topics.create!(title: "some topic",
+                                               message: "<p>some text</p>",
+                                               delayed_post_at: @old_start + 3.days,
+                                               lock_at: @old_start + 7.days)
+          @copy_from.announcements.create!(title: "hear ye",
+                                           message: "<p>grades will henceforth be in Cyrillic letters</p>",
+                                           delayed_post_at: @old_start + 10.days)
+          @copy_from.calendar_events.create!(title: "an event",
+                                             start_at: @old_start + 4.days,
+                                             end_at: @old_start + 4.days + 1.hour)
+          @copy_from.wiki_pages.create!(title: "a page",
+                                        workflow_state: "unpublished",
+                                        todo_date: @old_start + 7.days,
+                                        publish_at: @old_start + 3.days)
+          cm = @copy_from.context_modules.build(name: "some module", unlock_at: @old_start + 1.day)
+          cm.save!
 
-        new_folder = @copy_to.folders.where(name: "shifty").first
-        expect(new_folder.unlock_at.to_i).to eq (@new_start - 3.days).to_i
-        expect(new_folder.lock_at.to_i).to eq (@new_start + 2.days).to_i
+          cm2 = @copy_from.context_modules.build(name: "some module", unlock_at: @old_start + 1.day)
+          cm2.save!
+        end
 
-        new_quiz = @copy_to.quizzes.first
-        expect(new_quiz.due_at.to_i).to eq (@new_start + 4.days).to_i
-        expect(new_quiz.unlock_at.to_i).to eq (@new_start + 1.day).to_i
-        expect(new_quiz.lock_at.to_i).to eq (@new_start + 5.days).to_i
-        expect(new_quiz.show_correct_answers_at.to_i).to eq (@new_start + 6.days).to_i
-        expect(new_quiz.hide_correct_answers_at.to_i).to eq (@new_start + 7.days).to_i
+        it "shifts dates" do
+          skip unless Qti.qti_enabled?
+          options = {
+            everything: true,
+            shift_dates: true,
+            old_start_date: "Jul 1, 2012",
+            old_end_date: "Jul 11, 2012",
+            new_start_date: "Aug 5, 2012",
+            new_end_date: "Aug 15, 2012"
+          }
+          @cm.copy_options = options
+          @cm.save!
 
-        new_disc = @copy_to.discussion_topics.first
-        expect(new_disc.delayed_post_at.to_i).to eq (@new_start + 3.days).to_i
-        expect(new_disc.lock_at.to_i).to eq (@new_start + 7.days).to_i
+          run_course_copy
 
-        new_ann = @copy_to.announcements.first
-        expect(new_ann.delayed_post_at.to_i).to eq (@new_start + 10.days).to_i
+          new_asmnt = @copy_to.assignments.first
+          expect(new_asmnt.due_at.to_i).to eq (@new_start + 1.day).to_i
+          expect(new_asmnt.unlock_at.to_i).to eq (@new_start - 2.days).to_i
+          expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.days).to_i
+          expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.days).to_i
 
-        new_event = @copy_to.calendar_events.first
-        expect(new_event.start_at.to_i).to eq (@new_start + 4.days).to_i
-        expect(new_event.end_at.to_i).to eq (@new_start + 4.days + 1.hour).to_i
+          new_att = @copy_to.attachments.where(display_name: "hi.txt").first
+          expect(new_att.unlock_at.to_i).to eq (@new_start - 2.days).to_i
+          expect(new_att.lock_at.to_i).to eq (@new_start + 3.days).to_i
 
-        new_page = @copy_to.wiki_pages.first
-        expect(new_page.todo_date.to_i).to eq (@new_start + 7.days).to_i
-        expect(new_page.publish_at.to_i).to eq (@new_start + 3.days).to_i
+          new_folder = @copy_to.folders.where(name: "shifty").first
+          expect(new_folder.unlock_at.to_i).to eq (@new_start - 3.days).to_i
+          expect(new_folder.lock_at.to_i).to eq (@new_start + 2.days).to_i
 
-        new_mod = @copy_to.context_modules.first
-        expect(new_mod.unlock_at.to_i).to eq (@new_start + 1.day).to_i
+          new_quiz = @copy_to.quizzes.first
+          expect(new_quiz.due_at.to_i).to eq (@new_start + 4.days).to_i
+          expect(new_quiz.unlock_at.to_i).to eq (@new_start + 1.day).to_i
+          expect(new_quiz.lock_at.to_i).to eq (@new_start + 5.days).to_i
+          expect(new_quiz.show_correct_answers_at.to_i).to eq (@new_start + 6.days).to_i
+          expect(new_quiz.hide_correct_answers_at.to_i).to eq (@new_start + 7.days).to_i
 
-        newer_mod = @copy_to.context_modules.last
-        expect(newer_mod.unlock_at.to_i).to eq (@new_start + 1.day).to_i
+          new_disc = @copy_to.discussion_topics.first
+          expect(new_disc.delayed_post_at.to_i).to eq (@new_start + 3.days).to_i
+          expect(new_disc.lock_at.to_i).to eq (@new_start + 7.days).to_i
+
+          new_ann = @copy_to.announcements.first
+          expect(new_ann.delayed_post_at.to_i).to eq (@new_start + 10.days).to_i
+
+          new_event = @copy_to.calendar_events.first
+          expect(new_event.start_at.to_i).to eq (@new_start + 4.days).to_i
+          expect(new_event.end_at.to_i).to eq (@new_start + 4.days + 1.hour).to_i
+
+          new_page = @copy_to.wiki_pages.first
+          expect(new_page.todo_date.to_i).to eq (@new_start + 7.days).to_i
+          expect(new_page.publish_at.to_i).to eq (@new_start + 3.days).to_i
+
+          new_mod = @copy_to.context_modules.first
+          expect(new_mod.unlock_at.to_i).to eq (@new_start + 1.day).to_i
+
+          newer_mod = @copy_to.context_modules.last
+          expect(newer_mod.unlock_at.to_i).to eq (@new_start + 1.day).to_i
+        end
+
+        it "removes dates" do
+          skip unless Qti.qti_enabled?
+          options = {
+            everything: true,
+            remove_dates: true,
+          }
+          @cm.copy_options = options
+          @cm.save!
+
+          run_course_copy
+
+          new_asmnt = @copy_to.assignments.first
+          expect(new_asmnt.due_at).to be_nil
+          expect(new_asmnt.unlock_at).to be_nil
+          expect(new_asmnt.lock_at).to be_nil
+          expect(new_asmnt.peer_reviews_due_at).to be_nil
+
+          new_att = @copy_to.attachments.first
+          expect(new_att.unlock_at).to be_nil
+          expect(new_att.lock_at).to be_nil
+
+          new_folder = @copy_to.folders.where(name: "shifty").first
+          expect(new_folder.unlock_at).to be_nil
+          expect(new_folder.lock_at).to be_nil
+
+          new_quiz = @copy_to.quizzes.first
+          expect(new_quiz.due_at).to be_nil
+          expect(new_quiz.unlock_at).to be_nil
+          expect(new_quiz.lock_at).to be_nil
+          expect(new_quiz.show_correct_answers_at).to be_nil
+          expect(new_quiz.hide_correct_answers_at).to be_nil
+
+          new_disc = @copy_to.discussion_topics.first
+          expect(new_disc.delayed_post_at).to be_nil
+          expect(new_disc.lock_at).to be_nil
+          expect(new_disc.locked).to be_falsey
+
+          new_ann = @copy_to.announcements.first
+          expect(new_ann.delayed_post_at).to be_nil
+
+          new_event = @copy_to.calendar_events.first
+          expect(new_event.start_at).to be_nil
+          expect(new_event.end_at).to be_nil
+
+          new_mod = @copy_to.context_modules.first
+          expect(new_mod.unlock_at).to be_nil
+
+          newer_mod = @copy_to.context_modules.last
+          expect(newer_mod.unlock_at).to be_nil
+        end
+
+        it "does not create broken assignments from unpublished quizzes" do
+          options = {
+            everything: true,
+            remove_dates: true,
+          }
+          @cm.copy_options = options
+          @cm.save!
+
+          run_course_copy
+
+          expect(@copy_to.assignments.count).to eq 1
+        end
       end
 
-      it "infers a sensible end date if not provided" do
-        skip unless Qti.qti_enabled?
-        options = {
-          everything: true,
-          shift_dates: true,
-          old_start_date: "Jul 1, 2012",
-          old_end_date: nil,
-          new_start_date: "Aug 5, 2012",
-          new_end_date: nil
-        }
-        @cm.copy_options = options
-        @cm.save!
+      context "when source or target course have missing end dates" do
+        subject do
+          skip unless Qti.qti_enabled?
+          @cm.copy_options = options
+          @cm.save!
 
-        run_course_copy
+          run_course_copy
+          @copy_to
+        end
 
-        new_asmnt = @copy_to.assignments.first
-        expect(new_asmnt.due_at.to_i).to eq (@new_start + 1.day).to_i
-        expect(new_asmnt.unlock_at.to_i).to eq (@new_start - 2.days).to_i
-        expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.days).to_i
-        expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.days).to_i
-      end
+        context "when there are usable dates on model to figure out the end date" do
+          let(:options) do
+            {
+              everything: true,
+              shift_dates: true,
+              old_start_date: "Jul 1, 2012",
+              old_end_date: nil,
+              new_start_date: "Aug 5, 2012",
+              new_end_date: nil
+            }
+          end
 
-      it "ignores a bad end date" do
-        skip unless Qti.qti_enabled?
-        options = {
-          everything: true,
-          shift_dates: true,
-          old_start_date: "Jul 1, 2012",
-          old_end_date: nil,
-          new_start_date: "Aug 5, 2012",
-          new_end_date: "Jul 4, 2012"
-        }
-        @cm.copy_options = options
-        @cm.save!
+          context "when only assignment due date is provided" do
+            subject { super().assignments.first }
 
-        run_course_copy
+            before do
+              @copy_from.assignments.create!(due_at: @old_start + 1.day,
+                                             unlock_at: @old_start - 2.days,
+                                             lock_at: @old_start + 3.days,
+                                             peer_reviews_due_at: @old_start + 4.days)
+            end
 
-        new_asmnt = @copy_to.assignments.first
-        expect(new_asmnt.due_at.to_i).to eq (@new_start + 1.day).to_i
-        expect(new_asmnt.unlock_at.to_i).to eq (@new_start - 2.days).to_i
-        expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.days).to_i
-        expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.days).to_i
-      end
+            it "should shift due_at" do
+              expect(subject.due_at.to_i).to eq (@new_start + 1.day).to_i
+            end
 
-      it "removes dates" do
-        skip unless Qti.qti_enabled?
-        options = {
-          everything: true,
-          remove_dates: true,
-        }
-        @cm.copy_options = options
-        @cm.save!
+            it "should shift unlock_at" do
+              expect(subject.unlock_at.to_i).to eq (@new_start - 2.days).to_i
+            end
 
-        run_course_copy
+            it "should shift lock_at" do
+              expect(subject.lock_at.to_i).to eq (@new_start + 3.days).to_i
+            end
 
-        new_asmnt = @copy_to.assignments.first
-        expect(new_asmnt.due_at).to be_nil
-        expect(new_asmnt.unlock_at).to be_nil
-        expect(new_asmnt.lock_at).to be_nil
-        expect(new_asmnt.peer_reviews_due_at).to be_nil
+            it "should shift peer_reviews_due_at" do
+              expect(subject.peer_reviews_due_at.to_i).to eq (@new_start + 4.days).to_i
+            end
+          end
 
-        new_att = @copy_to.attachments.first
-        expect(new_att.unlock_at).to be_nil
-        expect(new_att.lock_at).to be_nil
+          context "when only calendar event start/end dates are provided" do
+            subject { super().calendar_events.first }
 
-        new_folder = @copy_to.folders.where(name: "shifty").first
-        expect(new_folder.unlock_at).to be_nil
-        expect(new_folder.lock_at).to be_nil
+            before do
+              @copy_from.calendar_events.create!(title: "an event",
+                                                 start_at: @old_start + 4.days,
+                                                 end_at: @old_start + 4.days + 1.hour)
+            end
 
-        new_quiz = @copy_to.quizzes.first
-        expect(new_quiz.due_at).to be_nil
-        expect(new_quiz.unlock_at).to be_nil
-        expect(new_quiz.lock_at).to be_nil
-        expect(new_quiz.show_correct_answers_at).to be_nil
-        expect(new_quiz.hide_correct_answers_at).to be_nil
+            it "should shift start_at" do
+              expect(subject.start_at.to_i).to eq (@new_start + 4.days).to_i
+            end
 
-        new_disc = @copy_to.discussion_topics.first
-        expect(new_disc.delayed_post_at).to be_nil
-        expect(new_disc.lock_at).to be_nil
-        expect(new_disc.locked).to be_falsey
+            it "should shift end_at" do
+              expect(subject.end_at.to_i).to eq (@new_start + 4.days + 1.hour).to_i
+            end
+          end
 
-        new_ann = @copy_to.announcements.first
-        expect(new_ann.delayed_post_at).to be_nil
+          context "when only context module unlock date is provided" do
+            subject { super().context_modules.last }
 
-        new_event = @copy_to.calendar_events.first
-        expect(new_event.start_at).to be_nil
-        expect(new_event.end_at).to be_nil
+            before do
+              cm = @copy_from.context_modules.build(name: "some module", unlock_at: @old_start + 1.day)
+              cm.save!
+            end
 
-        new_mod = @copy_to.context_modules.first
-        expect(new_mod.unlock_at).to be_nil
+            it "should shift end_at" do
+              expect(subject.unlock_at.to_i).to eq (@new_start + 1.day).to_i
+            end
+          end
+        end
 
-        newer_mod = @copy_to.context_modules.last
-        expect(newer_mod.unlock_at).to be_nil
-      end
+        context "when ignores bad end date" do
+          subject { super().assignments.first }
 
-      it "does not create broken assignments from unpublished quizzes" do
-        options = {
-          everything: true,
-          remove_dates: true,
-        }
-        @cm.copy_options = options
-        @cm.save!
+          let(:options) do
+            {
+              everything: true,
+              shift_dates: true,
+              old_start_date: "Jul 1, 2012",
+              old_end_date: nil,
+              new_start_date: "Aug 5, 2012",
+              new_end_date: "Jul 4, 2012"
+            }
+          end
 
-        run_course_copy
+          before do
+            @copy_from.assignments.create!(due_at: @old_start + 1.day,
+                                           unlock_at: @old_start - 2.days,
+                                           lock_at: @old_start + 3.days,
+                                           peer_reviews_due_at: @old_start + 4.days)
+          end
 
-        expect(@copy_to.assignments.count).to eq 1
+          it "should shift due_at" do
+            expect(subject.due_at.to_i).to eq (@new_start + 1.day).to_i
+          end
+
+          it "should shift unlock_at" do
+            expect(subject.unlock_at.to_i).to eq (@new_start - 2.days).to_i
+          end
+
+          it "should shift lock_at" do
+            expect(subject.lock_at.to_i).to eq (@new_start + 3.days).to_i
+          end
+
+          it "should shift peer_reviews_due_at" do
+            expect(subject.peer_reviews_due_at.to_i).to eq (@new_start + 4.days).to_i
+          end
+        end
       end
     end
 

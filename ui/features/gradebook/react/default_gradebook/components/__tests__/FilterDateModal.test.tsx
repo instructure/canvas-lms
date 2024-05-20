@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, render} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import FilterDateModal from '../FilterDateModal'
 
@@ -37,10 +37,10 @@ describe('FilterDateModal', () => {
     expect(getByLabelText('End Date')).toBeInTheDocument()
   })
 
-  it('renders valid date options', () => {
+  it('renders valid date options', async () => {
     const startDate = '2023-03-09T20:40:10.882Z'
     const endDate = '2023-03-12T20:40:10.882Z'
-    const {getByText, getByLabelText} = render(
+    const {getByText, getByLabelText, findByText} = render(
       <FilterDateModal
         endDate={endDate}
         isOpen={true}
@@ -51,10 +51,8 @@ describe('FilterDateModal', () => {
     )
     const startDateInput = getByLabelText('Start Date') as HTMLInputElement
 
-    act(() => {
-      userEvent.click(startDateInput)
-    })
-    expect(getByText('9')).toBeInTheDocument()
+    await userEvent.setup({delay: null}).click(startDateInput)
+    expect(await findByText('9')).toBeInTheDocument()
     expect(getByText('10')).toBeInTheDocument()
     expect(getByText('11')).toBeInTheDocument()
   })

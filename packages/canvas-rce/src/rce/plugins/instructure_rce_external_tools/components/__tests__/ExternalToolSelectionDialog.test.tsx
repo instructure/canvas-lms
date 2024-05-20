@@ -135,6 +135,9 @@ describe('ExternalToolSelectionDialog', () => {
         containingCanvasLtiToolId: null,
         editorSelection: null,
         editorContent: null,
+        rceWrapper: {
+          getResourceIdentifiers: () => ({}),
+        },
       }),
       [
         {

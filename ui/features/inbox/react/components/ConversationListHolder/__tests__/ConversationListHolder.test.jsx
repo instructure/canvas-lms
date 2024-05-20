@@ -266,4 +266,27 @@ describe('ConversationListHolder', () => {
     const noMessages = await findByTestId('conversation-list-no-messages')
     expect(noMessages).toBeTruthy()
   })
+
+  it('Should show No Conversations to Show Panda SVG when there are no messages', async () => {
+    const updatedProps = {
+      ...props,
+      conversations: [
+        {
+          _id: '1',
+          workflowState: 'unread',
+          subject: 'undefined - undefined',
+          lastMessageCreatedAt: 'November 5, 2020 at 2:25pm',
+          lastMessageContent: undefined,
+          participantString: undefined,
+          messages: [],
+          count: 0,
+          participants: [],
+        },
+      ],
+    }
+
+    const {findByTestId} = render(<ConversationListHolder {...updatedProps} />)
+    const noMessages = await findByTestId('conversation-list-no-messages')
+    expect(noMessages).toBeTruthy()
+  })
 })

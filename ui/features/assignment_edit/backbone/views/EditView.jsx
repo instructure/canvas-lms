@@ -23,7 +23,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
-import _ from 'underscore'
+import _, {each, find, keys, includes, forEach, filter} from 'lodash'
 import $, {param} from 'jquery'
 import pluralize from '@canvas/util/stringPluralize'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -45,6 +45,7 @@ import SisValidationHelper from '@canvas/sis/SisValidationHelper'
 import SimilarityDetectionTools from '../../react/AssignmentConfigurationTools'
 import ModeratedGradingFormFieldGroup from '../../react/ModeratedGradingFormFieldGroup'
 import AllowedAttemptsWithState from '../../react/allowed_attempts/AllowedAttemptsWithState'
+import AssignmentSubmissionTypeSelectionLaunchButton from '../../react/AssignmentSubmissionTypeSelectionLaunchButton'
 import DefaultToolForm from '../../react/DefaultToolForm'
 import UsageRightsSelectBox from '@canvas/files/react/components/UsageRightsSelectBox'
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
@@ -52,13 +53,12 @@ import ExternalToolModalLauncher from '@canvas/external-tools/react/components/E
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import setUsageRights from '@canvas/files/util/setUsageRights'
 import 'jqueryui/dialog'
-import '@canvas/util/toJSON'
+import '@canvas/jquery/jquery.toJSON'
 import '@canvas/rails-flash-notifications'
 import '../../../../boot/initializers/activateTooltips'
 import {AnnotatedDocumentSelector} from '../../react/EditAssignment'
 import {selectContentDialog} from '@canvas/select-content-dialog'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
-import {ResourceLinkContentItem} from '@canvas/deep-linking/models/ResourceLinkContentItem'
 
 const I18n = useI18nScope('assignment_editview')
 
@@ -87,14 +87,13 @@ const EXTERNAL_TOOL_SETTINGS_NEW_TAB = '#external_tool_new_tab_container'
 const DEFAULT_EXTERNAL_TOOL_CONTAINER = '#default_external_tool_container'
 const EXTERNAL_TOOL_PLACEMENT_LAUNCH_CONTAINER =
   '#assignment_submission_type_selection_tool_launch_container'
-const EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON = '#assignment_submission_type_selection_launch_button'
-const EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON_TEXT =
-  '#assignment_submission_type_selection_launch_button_text'
+
 const EXTERNAL_TOOL_DATA = '#assignment_submission_type_external_data'
 const ALLOWED_ATTEMPTS_CONTAINER = '#allowed_attempts_fields'
 const GROUP_CATEGORY_SELECTOR = '#group_category_selector'
 const PEER_REVIEWS_FIELDS = '#assignment_peer_reviews_fields'
 const EXTERNAL_TOOLS_URL = '#assignment_external_tool_tag_attributes_url'
+const EXTERNAL_TOOLS_TITLE = '#assignment_external_tool_tag_attributes_title'
 const EXTERNAL_TOOLS_CONTENT_TYPE = '#assignment_external_tool_tag_attributes_content_type'
 const EXTERNAL_TOOLS_CONTENT_ID = '#assignment_external_tool_tag_attributes_content_id'
 const EXTERNAL_TOOLS_NEW_TAB = '#assignment_external_tool_tag_attributes_new_tab'
@@ -168,6 +167,7 @@ function EditView() {
   this.handleGradingTypeChange = this.handleGradingTypeChange.bind(this)
   this.handleRestrictFileUploadsChange = this.handleRestrictFileUploadsChange.bind(this)
   this.renderDefaultExternalTool = this.renderDefaultExternalTool.bind(this)
+  this.renderAssignmentSubmissionTypeSelectionLaunchButton = this.renderAssignmentSubmissionTypeSelectionLaunchButton.bind(this)
   this.defaultExternalToolName = this.defaultExternalToolName.bind(this)
   this.defaultExternalToolUrl = this.defaultExternalToolUrl.bind(this)
   this.defaultExternalToolEnabled = this.defaultExternalToolEnabled.bind(this)
@@ -198,6 +198,8 @@ function EditView() {
   this.handlePointsChange = this.handlePointsChange.bind(this)
   this.settingsToCache = this.settingsToCache.bind(this)
   this.handleCancel = this.handleCancel.bind(this)
+  this.handleMessageEvent = this.handleMessageEvent.bind(this)
+  window.addEventListener('message', this.handleMessageEvent.bind(this))
 
   return EditView.__super__.constructor.apply(this, arguments)
 }
@@ -205,10 +207,9 @@ EditView.prototype.template = EditViewTemplate
 
 EditView.prototype.dontRenableAfterSaveSuccess = true
 
-EditView.prototype.els = _.extend(
-  {},
-  EditView.prototype.els,
-  (function () {
+EditView.prototype.els = {
+  ...EditView.prototype.els,
+  ...(function () {
     const els = {}
     els['' + ASSIGNMENT_GROUP_SELECTOR] = '$assignmentGroupSelector'
     els['' + DESCRIPTION] = '$description'
@@ -231,6 +232,7 @@ EditView.prototype.els = _.extend(
     els['' + GROUP_CATEGORY_SELECTOR] = '$groupCategorySelector'
     els['' + PEER_REVIEWS_FIELDS] = '$peerReviewsFields'
     els['' + EXTERNAL_TOOLS_URL] = '$externalToolsUrl'
+    els['' + EXTERNAL_TOOLS_TITLE] = '$externalToolsTitle'
     els['' + EXTERNAL_TOOLS_NEW_TAB] = '$externalToolsNewTab'
     els['' + EXTERNAL_TOOLS_IFRAME_WIDTH] = '$externalToolsIframeWidth'
     els['' + EXTERNAL_TOOLS_IFRAME_HEIGHT] = '$externalToolsIframeHeight'
@@ -242,8 +244,6 @@ EditView.prototype.els = _.extend(
     els['' + EXTERNAL_TOOL_SETTINGS_NEW_TAB] = '$externalToolNewTabContainer'
     els['' + DEFAULT_EXTERNAL_TOOL_CONTAINER] = '$defaultExternalToolContainer'
     els['' + EXTERNAL_TOOL_PLACEMENT_LAUNCH_CONTAINER] = '$externalToolPlacementLaunchContainer'
-    els['' + EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON] = '$externalToolPlacementLaunchButton'
-    els['' + EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON_TEXT] = '$externalToolPlacementLaunchButtonText'
     els['' + ALLOWED_ATTEMPTS_CONTAINER] = '$allowedAttemptsContainer'
     els['' + ASSIGNMENT_POINTS_POSSIBLE] = '$assignmentPointsPossible'
     els['' + ASSIGNMENT_POINTS_CHANGE_WARN] = '$pointsChangeWarning'
@@ -256,13 +256,12 @@ EditView.prototype.els = _.extend(
     els['' + HIDE_ZERO_POINT_QUIZZES_OPTION] = '$hideZeroPointQuizzesOption'
     els['' + OMIT_FROM_FINAL_GRADE_BOX] = '$omitFromFinalGradeBox'
     return els
-  })()
-)
+  })(),
+}
 
-EditView.prototype.events = _.extend(
-  {},
-  EditView.prototype.events,
-  (function () {
+EditView.prototype.events = {
+  ...EditView.prototype.events,
+  ...(function () {
     const events = {}
     events['click .cancel_button'] = 'handleCancel'
     events['click .save_and_publish'] = 'saveAndPublish'
@@ -285,8 +284,8 @@ EditView.prototype.events = _.extend(
       events.change = 'onChange'
     }
     return events
-  })()
-)
+  })(),
+}
 
 EditView.child('assignmentGroupSelector', '' + ASSIGNMENT_GROUP_SELECTOR)
 
@@ -301,6 +300,22 @@ EditView.prototype.initialize = function (options) {
   this.assignment = this.model
   this.setDefaultsIfNew()
   this.dueDateOverrideView = options.views['js-assignment-overrides']
+  if (ENV.FEATURES?.differentiated_modules) {
+    this.listenTo(this.dueDateOverrideView, 'tray:open', () =>
+      // Disables all Save, Save & Publish and Build buttons
+      this.$el
+        .find('.assignment__action-buttons button:not(".cancel_button")')
+        .prop('disabled', true)
+    )
+
+    this.listenTo(this.dueDateOverrideView, 'tray:close', () =>
+      // Enables all Save, Save & Publish and Build buttons
+      this.$el
+        .find('.assignment__action-buttons button:not(".cancel_button")')
+        .prop('disabled', false)
+    )
+  }
+
   this.on(
     'success',
     (function (_this) {
@@ -526,7 +541,7 @@ EditView.prototype.togglePeerReviewsAndGroupCategoryEnabled = function () {
 EditView.prototype.setDefaultsIfNew = function () {
   if (this.assignment.isNew()) {
     if (userSettings.contextGet('new_assignment_settings')) {
-      _.each(
+      each(
         this.settingsToCache(),
         (function (_this) {
           return function (setting) {
@@ -628,6 +643,7 @@ EditView.prototype.handleContentItem = function (item) {
   this.$externalToolsContentType.val(item.type)
   this.$externalToolsContentId.val(item.id || this.selectedTool?.id)
   this.$externalToolsUrl.val(item.url)
+  this.$externalToolsTitle.val(item.title)
   this.$externalToolsNewTab.prop('checked', item.window?.targetName === '_blank')
   this.$externalToolsIframeWidth.val(item.iframe?.width)
   this.$externalToolsIframeHeight.val(item.iframe?.height)
@@ -885,6 +901,18 @@ EditView.prototype.toggleAdvancedTurnitinSettings = function (ev) {
   )
 }
 
+EditView.prototype.renderAssignmentSubmissionTypeSelectionLaunchButton = function () {
+  const tool = this.selectedTool
+  const props = {
+    tool,
+    onClick: this.handleSubmissionTypeSelectionLaunch,
+  }
+  return ReactDOM.render(
+    React.createElement(AssignmentSubmissionTypeSelectionLaunchButton, props),
+    document.querySelector('[data-component="AssignmentSubmissionTypeSelectionLaunchButton"]')
+  )
+}
+
 EditView.prototype.defaultExternalToolEnabled = function () {
   return !!this.defaultExternalToolUrl()
 }
@@ -947,11 +975,37 @@ EditView.prototype.handleSubmissionTypeChange = function (_ev) {
   return this.$externalToolNewTabContainer.toggleAccessibly(subVal.includes('external_tool'))
 }
 
+EditView.prototype.validateGuidData = function (event) {
+  const data = event.data.data
+
+  // If data is a string, convert it to an array for consistent processing
+  const dataArray = Array.isArray(data) ? data : [data]
+  const regexPattern =
+    /^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/
+
+  for (const str of dataArray) {
+    if (!regexPattern.test(str)) {
+      return false
+    }
+  }
+  return dataArray
+}
+
+EditView.prototype.handleMessageEvent = function (event) {
+  if (event?.data?.subject !== 'assignment.set_ab_guid') {
+    return
+  }
+  const abGuid = this.validateGuidData(event)
+  if (abGuid) {
+    this.assignment.set('ab_guid', abGuid)
+  }
+}
+
 EditView.prototype.handlePlacementExternalToolSelect = function (selection) {
   const toolId = selection.replace('external_tool_placement_', '')
   this.$externalToolsContentId.val(toolId)
   this.$externalToolsContentType.val('context_external_tool')
-  this.selectedTool = _.find(this.model.submissionTypeSelectionTools(), function (tool) {
+  this.selectedTool = find(this.model.submissionTypeSelectionTools(), function (tool) {
     return toolId === tool.id
   })
 
@@ -972,14 +1026,7 @@ EditView.prototype.handlePlacementExternalToolSelect = function (selection) {
     this.$externalToolsIframeHeight.val('')
   }
 
-  this.$externalToolPlacementLaunchButtonText.text(this.selectedTool.title)
-  return this.$externalToolPlacementLaunchButton.click(
-    (function (_this) {
-      return function () {
-        return _this.handleSubmissionTypeSelectionLaunch()
-      }
-    })(this)
-  )
+    this.renderAssignmentSubmissionTypeSelectionLaunchButton()
 }
 
 EditView.prototype.handleSubmissionTypeSelectionLaunch = function () {
@@ -1034,6 +1081,7 @@ EditView.prototype.handleExternalContentReady = function (data) {
   let student_count_text
   const item = data.contentItems[0]
   this.$externalToolsUrl.val(item.url)
+  this.$externalToolsTitle.val(item.title)
   if (item.title) {
     this.$name.val(item.title)
   }
@@ -1067,8 +1115,8 @@ EditView.prototype.handleExternalContentReady = function (data) {
 
 EditView.prototype.handleOnlineSubmissionTypeChange = function (_env) {
   const showConfigTools =
-    this.$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).attr('checked') ||
-    this.$onlineSubmissionTypes.find(ALLOW_TEXT_ENTRY).attr('checked')
+    this.$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).prop('checked') ||
+    this.$onlineSubmissionTypes.find(ALLOW_TEXT_ENTRY).prop('checked')
   return this.$similarityDetectionTools.toggleAccessibly(
     showConfigTools && ENV.PLAGIARISM_DETECTION_PLATFORM
   )
@@ -1142,7 +1190,7 @@ EditView.prototype.afterRender = function () {
 
 EditView.prototype.toJSON = function () {
   const data = this.assignment.toView()
-  return _.extend(data, {
+  return Object.assign(data, {
     assignment_attempts:
       typeof ENV !== 'undefined' && ENV !== null ? ENV.assignment_attempts_enabled : void 0,
     kalturaEnabled:
@@ -1168,6 +1216,7 @@ EditView.prototype.toJSON = function () {
       (typeof ENV !== 'undefined' && ENV !== null
         ? ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED
         : void 0) || false,
+    differentiatedModulesEnabled: ENV.FEATURES.differentiated_modules,
   })
 }
 
@@ -1178,6 +1227,8 @@ EditView.prototype._attachEditorToDescription = function () {
   return RichContentEditor.loadNewEditor(this.$description, {
     focus: true,
     manageParent: true,
+    resourceType: 'assignment.body',
+    resourceId: this.assignment.id,
   })
 }
 
@@ -1219,6 +1270,7 @@ EditView.prototype.getFormData = function () {
   data = this._inferSubmissionTypes(data)
   data = this._filterAllowedExtensions(data)
   data = this._unsetGroupsIfExternalTool(data)
+  data.ab_guid = this.assignment.get('ab_guid')
   if (!(typeof ENV !== 'undefined' && ENV !== null ? ENV.IS_LARGE_ROSTER : void 0)) {
     data = this.groupCategorySelector.filterFormData(data)
   }
@@ -1352,7 +1404,7 @@ EditView.prototype._inferSubmissionTypes = function (assignmentData) {
   if (assignmentData.grading_type === 'not_graded') {
     assignmentData.submission_types = ['not_graded']
   } else if (assignmentData.submission_type === 'online') {
-    types = _.select(_.keys(assignmentData.online_submission_types), function (k) {
+    types = filter(keys(assignmentData.online_submission_types), function (k) {
       return assignmentData.online_submission_types[k] === '1'
     })
     assignmentData.submission_types = types
@@ -1368,7 +1420,7 @@ EditView.prototype._filterAllowedExtensions = function (data) {
   const restrictFileExtensions = data.restrict_file_extensions
   delete data.restrict_file_extensions
   if (restrictFileExtensions === '1') {
-    data.allowed_extensions = _.select(data.allowed_extensions.split(','), function (ext) {
+    data.allowed_extensions = filter(data.allowed_extensions.split(','), function (ext) {
       return $.trim(ext.toString()).length > 0
     })
   } else {
@@ -1385,7 +1437,7 @@ EditView.prototype._unsetGroupsIfExternalTool = function (data) {
 }
 
 // Pre-Save Validations
-EditView.prototype.fieldSelectors = _.extend(
+EditView.prototype.fieldSelectors = Object.assign(
   AssignmentGroupSelector.prototype.fieldSelectors,
   GroupCategorySelector.prototype.fieldSelectors,
   {
@@ -1484,7 +1536,7 @@ EditView.prototype.validateGraderCount = function (data) {
 
 EditView.prototype._validateTitle = function (data, errors) {
   let max_name_length
-  if (_.includes(this.model.frozenAttributes(), 'title')) {
+  if (includes(this.model.frozenAttributes(), 'title')) {
     return errors
   }
   const post_to_sis = data.post_to_sis === '1'
@@ -1533,11 +1585,11 @@ EditView.prototype._validateSubmissionTypes = function (data, errors) {
     ]
   } else if (data.submission_type === 'online' && data.vericite_enabled === '1') {
     allow_vericite = true
-    _.select(_.keys(data.submission_types), function (k) {
-      return (allow_vericite =
+    forEach(keys(data.submission_types), function (k) {
+      allow_vericite =
         allow_vericite &&
         (data.submission_types[k] === 'online_upload' ||
-          data.submission_types[k] === 'online_text_entry'))
+          data.submission_types[k] === 'online_text_entry')
     })
     if (!allow_vericite) {
       errors['online_submission_types[online_text_entry]'] = [
@@ -1578,7 +1630,7 @@ EditView.prototype._validateSubmissionTypes = function (data, errors) {
 EditView.prototype._validateAllowedExtensions = function (data, errors) {
   if (
     data.allowed_extensions &&
-    _.includes(data.submission_types, 'online_upload') &&
+    includes(data.submission_types, 'online_upload') &&
     data.allowed_extensions.length === 0
   ) {
     errors.allowed_extensions = [
@@ -1591,7 +1643,7 @@ EditView.prototype._validateAllowedExtensions = function (data, errors) {
 }
 
 EditView.prototype._validatePointsPossible = function (data, errors) {
-  if (_.includes(this.model.frozenAttributes(), 'points_possible')) {
+  if (includes(this.model.frozenAttributes(), 'points_possible')) {
     return errors
   }
   if (this.lockedItems.points) {

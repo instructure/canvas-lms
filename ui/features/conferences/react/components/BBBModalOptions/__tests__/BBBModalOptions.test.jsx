@@ -96,12 +96,12 @@ describe('BBBModalOptions', () => {
   })
 
   it('should render with default props', () => {
-    const container = setup(defaultProps)
-    expect(container.getByLabelText('Name')).toHaveValue(defaultProps.name)
-    expect(container.getByLabelText('Duration in Minutes')).toHaveValue('')
-    expect(container.getByLabelText('Enable recording for this conference').checked).toBeTruthy()
-    expect(container.getByLabelText('Enable recording for this conference').disabled).toBeFalsy()
-    expect(container.getByLabelText('Description')).toHaveValue(defaultProps.description)
+    const {getByLabelText, getAllByLabelText} = setup(defaultProps)
+    expect(getByLabelText('Name')).toHaveValue(defaultProps.name)
+    expect(getAllByLabelText('Duration in Minutes')[0]).toHaveValue('')
+    expect(getByLabelText('Enable recording for this conference').checked).toBeTruthy()
+    expect(getByLabelText('Enable recording for this conference').disabled).toBeFalsy()
+    expect(getByLabelText('Description')).toHaveValue(defaultProps.description)
   })
 
   it('should render attendees tab', () => {

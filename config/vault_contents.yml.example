@@ -21,6 +21,10 @@ development:
         signing_secret: "astringthatisactually32byteslong"
       lti_platform_storage:
         signing_secret: "astringthatisactually32byteslong"
+#     pandata_creds:
+#       canvas_key: 'INTERNAL_TEST'
+#       canvas_secret: 'internaltest'
+#       canvas_secret_alg: 'HS256'
 #      canvas_cdn_creds:
 #        aws_access_key_id: <access_key_id>
 #        aws_secret_access_key: <secret_access_key>
@@ -41,6 +45,9 @@ development:
 #      linked_in_creds:
 #        api_key: <api_key>
 #        secret_key: <secret_key>
+#      microsoft_sync:
+#        client_id: some_client_id
+#        client_secret: some_client_secret
 #      notification_service_creds:
 #        access_key_id: <access_key_id>
 #        secret_access_key: <secret_access_key>

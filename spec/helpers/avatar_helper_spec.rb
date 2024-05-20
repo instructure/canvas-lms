@@ -66,6 +66,13 @@ describe AvatarHelper do
         expect(html).not_to match(/href/)
       end
 
+      it "leaves off the href and creates a span if skip_url = true" do
+        html = avatar(user, url: "/test_url", skip_url: true)
+        expect(html).not_to match(/<a/)
+        expect(html).to match(/<span/)
+        expect(html).not_to match(/href/)
+      end
+
       it "sets the href to the given url" do
         expect(avatar(user, url: "/test_url")).to match(%r{href="/test_url"})
       end
@@ -103,28 +110,49 @@ describe AvatarHelper do
       end
 
       it "returns a fallback avatar if the user doesn't have one" do
-        request = OpenObject.new(host: "somedomain", protocol: "http://")
+        request = instance_double("ActionDispatch::Request",
+                                  host: "somedomain",
+                                  protocol: "http://",
+                                  port: 80,
+                                  params: {})
         expect(AvatarHelper.avatar_url_for_user(user, request)).to eql "http://somedomain/images/messages/avatar-50.png"
       end
 
       it "returns null if use_fallback is false" do
-        request = OpenObject.new(host: "somedomain", protocol: "http://")
+        request = instance_double("ActionDispatch::Request",
+                                  host: "somedomain",
+                                  protocol: "http://",
+                                  port: 80,
+                                  params: {})
         expect(AvatarHelper.avatar_url_for_user(user, request, use_fallback: false)).to be_nil
       end
 
       it "returns null if params[no_avatar_fallback] is set" do
-        request = OpenObject.new(host: "somedomain", protocol: "http://", params: { no_avatar_fallback: 1 })
+        request = instance_double("ActionDispatch::Request",
+                                  host: "somedomain",
+                                  protocol: "http://",
+                                  port: 80,
+                                  params: { no_avatar_fallback: 1 })
         expect(AvatarHelper.avatar_url_for_user(user, request)).to be_nil
       end
 
       it "returns a frd avatar url if one exists" do
-        request = OpenObject.new(host: "somedomain", protocol: "http://", params: { no_avatar_fallback: 1 })
+        request = instance_double("ActionDispatch::Request",
+                                  host: "somedomain",
+                                  protocol: "http://",
+                                  port: 80,
+                                  params: { no_avatar_fallback: 1 })
         user_with_avatar = user_model(avatar_image_url: "http://somedomain/avatar-frd.png")
         expect(AvatarHelper.avatar_url_for_user(user_with_avatar, request, use_fallback: false)).to eq "http://somedomain/avatar-frd.png"
       end
 
       it "does not prepend the request base if avatar url is an empty string" do
-        request = OpenObject.new(host: "somedomain", protocol: "http://", base_url: "http://somedomain")
+        request = instance_double("ActionDispatch::Request",
+                                  host: "somedomain",
+                                  protocol: "http://",
+                                  port: 80,
+                                  params: {},
+                                  base_url: "http://somedomain")
         user = user_model(avatar_image_url: "")
         expect(AvatarHelper.avatar_url_for_user(user, request)).to eq ""
       end

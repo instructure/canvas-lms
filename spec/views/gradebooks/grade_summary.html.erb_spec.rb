@@ -122,7 +122,6 @@ describe "gradebooks/grade_summary" do
     context "when the assignment enhancements flag is enabled" do
       before do
         @course.enable_feature!(:assignments_2_student)
-        Setting.set("assignments_2_observer_view", "true")
       end
 
       it "takes the submitting student to A2 flow" do
@@ -697,6 +696,58 @@ describe "gradebooks/grade_summary" do
     end
   end
 
+  describe "display due value" do
+    let(:course) { Course.create! }
+    let(:student) { course.enroll_student(User.create!, active_all: true).user }
+    let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
+    let(:presenter) { GradeSummaryPresenter.new(course, student, student.id) }
+
+    before do
+      view_context(course, student)
+      assign(:presenter, presenter)
+    end
+
+    it "due is not shown" do
+      render "gradebooks/grade_summary"
+      expect(response).not_to have_tag("#grades_summary .due")
+    end
+
+    it "renders \"due\" when there is a submission" do
+      assignment1 = course.assignments.create!(points_possible: 10)
+      assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey"
+      assignment1.grade_student(student, score: 10, grader: teacher)
+
+      render "gradebooks/grade_summary"
+      expect(response).to have_tag("#grades_summary .due")
+    end
+  end
+
+  describe "display submitted value" do
+    let(:course) { Course.create! }
+    let(:student) { course.enroll_student(User.create!, active_all: true).user }
+    let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
+    let(:presenter) { GradeSummaryPresenter.new(course, student, student.id) }
+
+    before do
+      view_context(course, student)
+      assign(:presenter, presenter)
+    end
+
+    it "submitted is not shown" do
+      render "gradebooks/grade_summary"
+      expect(response).not_to have_tag("#grades_summary .submitted")
+    end
+
+    it "renders \"submitted\" when there is a submission" do
+      assignment1 = course.assignments.create!(points_possible: 10)
+      assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey"
+      assignment1.grade_student(student, score: 10, grader: teacher)
+
+      render "gradebooks/grade_summary"
+      expect(response).to have_tag("#grades_summary .submitted")
+    end
+  end
+
   describe "display out of value" do
     let(:course) { Course.create! }
     let(:student) { course.enroll_student(User.create!, active_all: true).user }
@@ -746,16 +797,14 @@ describe "gradebooks/grade_summary" do
       assignment1.grade_student(student, grade: "90%", grader: teacher)
 
       group = course.assignment_groups.create!(name: "a group")
-      group_assignment = OpenObject.build("assignment",
-                                          id: "group-#{group.id}",
-                                          rules: group.rules,
-                                          title: group.name,
-                                          points_possible: 10,
-                                          hard_coded: true,
-                                          special_class: "group_total",
-                                          assignment_group_id: group.id,
-                                          group_weight: group.group_weight,
-                                          asset_string: "group_total_#{group.id}")
+      group_assignment = Assignment::HardCoded.new(id: "group-#{group.id}",
+                                                   rules: group.rules,
+                                                   title: group.name,
+                                                   points_possible: 10,
+                                                   special_class: "group_total",
+                                                   assignment_group_id: group.id,
+                                                   group_weight: group.group_weight,
+                                                   asset_string: "group_total_#{group.id}")
       presenter.groups_assignments = [group_assignment]
 
       render "gradebooks/grade_summary"

@@ -2,7 +2,5 @@
   "name": "@canvas-features/past_global_alert",
   "private": true,
   "version": "1.0.0",
-  "canvas": {
-    "component": "announcements"
-  }
+  "owner": "FOO"
 }

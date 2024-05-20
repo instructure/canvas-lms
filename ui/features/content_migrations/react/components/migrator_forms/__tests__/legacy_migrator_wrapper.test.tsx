@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import LegacyMigratorWrapper from '../legacy_migrator_wrapper'
 import ConverterViewControl from '@canvas/content-migrations/backbone/views/ConverterViewControl'
 
-const converterViewControlMock = () => {
+jest.mock('@canvas/content-migrations/backbone/views/ConverterViewControl', () => {
   const el = window.document.createElement('div')
   el.innerHTML = '<input name="file" type="file" />'
   const view = {
@@ -40,11 +40,7 @@ const converterViewControlMock = () => {
       .fn()
       .mockImplementation(({_, migrationConverter}) => migrationConverter.renderConverter(view)),
   }
-}
-
-jest.mock('@canvas/content-migrations/backbone/views/ConverterViewControl', () =>
-  converterViewControlMock()
-)
+})
 
 const onSubmit = jest.fn()
 const onCancel = jest.fn()
@@ -93,13 +89,13 @@ describe('LegacyMigratorWrapper', () => {
     `)
   })
 
-  it('calls onSubmit', () => {
+  it('calls onSubmit', async () => {
     renderComponent()
 
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
-    userEvent.upload(document.querySelector('input[type="file"]') as HTMLInputElement, file)
+    await userEvent.upload(document.querySelector('input[type="file"]') as HTMLInputElement, file)
 
-    userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+    await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
     expect(onSubmit).toHaveBeenCalledWith(
       {
         date_shift_options: {},
@@ -116,10 +112,10 @@ describe('LegacyMigratorWrapper', () => {
     )
   })
 
-  it('calls onCancel', () => {
+  it('calls onCancel', async () => {
     renderComponent()
 
-    userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
+    await userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
     expect(onCancel).toHaveBeenCalled()
   })
 })

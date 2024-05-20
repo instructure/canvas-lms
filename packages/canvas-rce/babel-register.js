@@ -22,13 +22,6 @@ require('@babel/register')({
   presets: [['@babel/preset-env'], ['@babel/preset-react', {}]],
   plugins: [
     ['@babel/plugin-proposal-decorators', {legacy: true}],
-    [
-      '@instructure/babel-plugin-themeable-styles',
-      {
-        postcssrc: require('@instructure/ui-postcss-config')()(),
-        themeablerc: {},
-      },
-    ],
   ],
   targets: {
     node: 'current',

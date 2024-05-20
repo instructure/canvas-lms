@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "feedjira"
 require_relative "../helpers/k5_common"
 
 describe CoursesController do
@@ -777,7 +778,8 @@ describe CoursesController do
   describe "observer_pairing_codes" do
     before :once do
       course_with_teacher(active_all: true)
-      student_in_course(course: @course, active_all: true)
+      student = user_with_pseudonym(name: "Bob Jones", sis_user_id: "bobjones1")
+      student_in_course(course: @course, user: student, active_all: true)
       @teacher.name = "teacher"
       @teacher.save!
     end
@@ -806,8 +808,10 @@ describe CoursesController do
       get :observer_pairing_codes_csv, params: { course_id: @course.id }
       expect(response).to be_successful
       expect(response.header["Content-Type"]).to eql("text/csv")
-      expect(response.body.split(",").last.strip).to eql(ObserverPairingCode.last.expires_at.to_s)
-      expect(response.body.split(",")[-2]).to include(ObserverPairingCode.last.code)
+      headings = response.body.split("\n").first.split(",")
+      row = response.body.split("\n").second.split(",")
+      expect(headings).to eq(["Last Name", "First Name", "SIS ID", "Pairing Code", "Expires At"])
+      expect(row).to eq(["Jones", "Bob", "bobjones1", "\"=\"\"#{ObserverPairingCode.last.code}\"\"\"", ObserverPairingCode.last.expires_at.to_s])
     end
 
     it "generates observer pairing codes only for students" do
@@ -817,7 +821,7 @@ describe CoursesController do
       get :observer_pairing_codes_csv, params: { course_id: @course.id }
       expect(response).to be_successful
       expect(response.header["Content-Type"]).to eql("text/csv")
-      expect(response.body).to include(@student.name)
+      expect(response.body).to include(@student.first_name)
       expect(response.body.include?(@teacher.name)).to be_falsey
       expect(response.body.split(",").last.strip).to eql(ObserverPairingCode.last.expires_at.to_s)
       expect(response.body.split(",")[-2]).to include(ObserverPairingCode.last.code)
@@ -1670,86 +1674,60 @@ describe CoursesController do
         @student1 = @student
       end
 
-      context "with 'Assignments 2 Observer View'" do
+      context "as a student" do
         before do
-          Setting.set("assignments_2_observer_view", "true")
+          user_session(@student1)
         end
 
-        context "as a student" do
-          before do
-            user_session(@student1)
-          end
-
-          it "redirects to the xlisted course when there's no enrollment in the requested course" do
-            @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
-            get "show", params: { id: @course1.id }
-            expect(response).to redirect_to(course_url(@course2))
-          end
-
-          it "does not redirect to the xlisted course when there's an enrollment in the requested course" do
-            section2 = @course1.course_sections.create!(name: "section2")
-            @course1.enroll_student(@student1, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
-            @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
-            get "show", params: { id: @course1.id }
-            expect(response).not_to be_redirect
-          end
+        it "redirects to the xlisted course when there's no enrollment in the requested course" do
+          @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
+          get "show", params: { id: @course1.id }
+          expect(response).to redirect_to(course_url(@course2))
         end
 
-        context "as an observer" do
-          before do
-            @observer = course_with_observer(course: @course1, associated_user_id: @student1.id, active_all: true).user
-            user_session(@observer)
-          end
-
-          it "redirects to the xlisted course when there's no enrollment in the requested course" do
-            @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
-            get "show", params: { id: @course1.id }
-            expect(response).to redirect_to(course_url(@course2))
-          end
-
-          it "does not redirect to the xlisted course when there's an unlinked enrollment in the requested course" do
-            section2 = @course1.course_sections.create!(name: "section2")
-            @course1.enroll_user(@observer, "ObserverEnrollment", section: section2, enrollment_state: :active)
-            @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
-            get "show", params: { id: @course1.id }
-            expect(response).not_to be_redirect
-          end
-
-          it "does not redirect to the xlisted course when there's a linked enrollment in the requested course" do
-            section2 = @course1.course_sections.create!(name: "section2")
-            student2 = student_in_course(course: @course1, section: section2, active_all: true).user
-            course_with_observer(
-              user: @observer,
-              course: @course1,
-              section: section2,
-              associated_user_id: student2.id,
-              active_all: true,
-              allow_multiple_enrollments: true
-            )
-            @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
-            get "show", params: { id: @course1.id }
-            expect(response).not_to be_redirect
-          end
+        it "does not redirect to the xlisted course when there's an enrollment in the requested course" do
+          section2 = @course1.course_sections.create!(name: "section2")
+          @course1.enroll_student(@student1, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
+          @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
+          get "show", params: { id: @course1.id }
+          expect(response).not_to be_redirect
         end
       end
 
-      context "without 'Assignments 2 Observer View'" do
-        it "redirects to the xlisted course" do
-          user_session(@student1)
-          @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
-
-          get "show", params: { id: @course1.id }
-          expect(response).to be_redirect
-          expect(response.location).to match(%r{/courses/#{@course2.id}})
+      context "as an observer" do
+        before do
+          @observer = course_with_observer(course: @course1, associated_user_id: @student1.id, active_all: true).user
+          user_session(@observer)
         end
 
-        it "does not redirect to the xlisted course if the enrollment is deleted" do
-          user_session(@student1)
+        it "redirects to the xlisted course when there's no enrollment in the requested course" do
           @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
-          @user.enrollments.destroy_all
-
           get "show", params: { id: @course1.id }
-          expect(response).to have_http_status :unauthorized
+          expect(response).to redirect_to(course_url(@course2))
+        end
+
+        it "does not redirect to the xlisted course when there's an unlinked enrollment in the requested course" do
+          section2 = @course1.course_sections.create!(name: "section2")
+          @course1.enroll_user(@observer, "ObserverEnrollment", section: section2, enrollment_state: :active)
+          @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
+          get "show", params: { id: @course1.id }
+          expect(response).not_to be_redirect
+        end
+
+        it "does not redirect to the xlisted course when there's a linked enrollment in the requested course" do
+          section2 = @course1.course_sections.create!(name: "section2")
+          student2 = student_in_course(course: @course1, section: section2, active_all: true).user
+          course_with_observer(
+            user: @observer,
+            course: @course1,
+            section: section2,
+            associated_user_id: student2.id,
+            active_all: true,
+            allow_multiple_enrollments: true
+          )
+          @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
+          get "show", params: { id: @course1.id }
+          expect(response).not_to be_redirect
         end
       end
     end
@@ -2129,34 +2107,20 @@ describe CoursesController do
         user_session(@observer)
       end
 
-      it "sets context_enrollment using first enrollment" do
+      it "sets context_enrollment using selected observed user" do
+        cookies["#{ObserverEnrollmentsHelper::OBSERVER_COOKIE_PREFIX}#{@observer.id}"] = @student2.id
         get :show, params: { id: @course.id }
         enrollment = assigns[:context_enrollment]
         expect(enrollment.is_a?(ObserverEnrollment)).to be true
         expect(enrollment.user_id).to eq @observer.id
-        expect(enrollment.associated_user_id).to eq @student.id
+        expect(enrollment.associated_user_id).to eq @student2.id
       end
 
-      context "when a2 observer view is enabled" do
-        before do
-          Setting.set("assignments_2_observer_view", "true")
-        end
-
-        it "sets context_enrollment using selected observed user" do
-          cookies["#{ObserverEnrollmentsHelper::OBSERVER_COOKIE_PREFIX}#{@observer.id}"] = @student2.id
-          get :show, params: { id: @course.id }
-          enrollment = assigns[:context_enrollment]
-          expect(enrollment.is_a?(ObserverEnrollment)).to be true
-          expect(enrollment.user_id).to eq @observer.id
-          expect(enrollment.associated_user_id).to eq @student2.id
-        end
-
-        it "sets js_env variables" do
-          get :show, params: { id: @course.id }
-          expect(assigns[:js_env]).to have_key(:OBSERVER_OPTIONS)
-          expect(assigns[:js_env][:OBSERVER_OPTIONS][:OBSERVED_USERS_LIST].is_a?(Array)).to be true
-          expect(assigns[:js_env][:OBSERVER_OPTIONS][:CAN_ADD_OBSERVEE]).to be false
-        end
+      it "sets js_env variables" do
+        get :show, params: { id: @course.id }
+        expect(assigns[:js_env]).to have_key(:OBSERVER_OPTIONS)
+        expect(assigns[:js_env][:OBSERVER_OPTIONS][:OBSERVED_USERS_LIST].is_a?(Array)).to be true
+        expect(assigns[:js_env][:OBSERVER_OPTIONS][:CAN_ADD_OBSERVEE]).to be false
       end
     end
   end
@@ -2184,7 +2148,7 @@ describe CoursesController do
       post "unenroll_user", params: { course_id: @course.id, id: @enrollment.id }
       @course.reload
       expect(response).to be_successful
-      expect(@course.enrollments.map(&:user)).not_to be_include(@student)
+      expect(@course.enrollments.map(&:user)).not_to include(@student)
     end
 
     it "does not allow teachers to unenroll themselves" do
@@ -2199,7 +2163,7 @@ describe CoursesController do
       post "unenroll_user", params: { course_id: @course.id, id: @teacher_enrollment.id }
       @course.reload
       expect(response).to be_successful
-      expect(@course.enrollments.map(&:user)).not_to be_include(@teacher)
+      expect(@course.enrollments.map(&:user)).not_to include(@teacher)
     end
   end
 
@@ -2228,8 +2192,8 @@ describe CoursesController do
       post "enroll_users", params: { course_id: @course.id, user_list: "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>" }
       expect(response).to be_successful
       @course.reload
-      expect(@course.students.map(&:name)).to be_include("Sam")
-      expect(@course.students.map(&:name)).to be_include("Fred")
+      expect(@course.students.map(&:name)).to include("Sam")
+      expect(@course.students.map(&:name)).to include("Fred")
     end
 
     it "does not enroll people in hard-concluded courses" do
@@ -2238,8 +2202,8 @@ describe CoursesController do
       post "enroll_users", params: { course_id: @course.id, user_list: "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>" }
       expect(response).not_to be_successful
       @course.reload
-      expect(@course.students.map(&:name)).not_to be_include("Sam")
-      expect(@course.students.map(&:name)).not_to be_include("Fred")
+      expect(@course.students.map(&:name)).not_to include("Sam")
+      expect(@course.students.map(&:name)).not_to include("Fred")
     end
 
     it "does not enroll people in soft-concluded courses" do
@@ -2251,8 +2215,8 @@ describe CoursesController do
       post "enroll_users", params: { course_id: @course.id, user_list: "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>" }
       expect(response).not_to be_successful
       @course.reload
-      expect(@course.students.map(&:name)).not_to be_include("Sam")
-      expect(@course.students.map(&:name)).not_to be_include("Fred")
+      expect(@course.students.map(&:name)).not_to include("Sam")
+      expect(@course.students.map(&:name)).not_to include("Fred")
     end
 
     it "records initial_enrollment_type on new users" do
@@ -2283,8 +2247,8 @@ describe CoursesController do
       expect(response).to be_successful
       @course.reload
       expect(@course.students).to be_empty
-      expect(@course.observers.map(&:name)).to be_include("Sam")
-      expect(@course.observers.map(&:name)).to be_include("Fred")
+      expect(@course.observers.map(&:name)).to include("Sam")
+      expect(@course.observers.map(&:name)).to include("Fred")
       expect(@course.observer_enrollments.map(&:workflow_state)).to eql(["invited", "invited"])
     end
 
@@ -3729,19 +3693,18 @@ describe CoursesController do
 
     it "includes absolute path for rel='self' link" do
       get "public_feed", params: { feed_code: @enrollment.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
-      expect(feed.links.first.rel).to match(/self/)
-      expect(feed.links.first.href).to match(%r{http://})
+      expect(feed.feed_url).to match(%r{http://})
     end
 
     it "includes an author for each entry" do
       get "public_feed", params: { feed_code: @enrollment.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
-      expect(feed.entries.all? { |e| e.authors.present? }).to be_truthy
+      expect(feed.entries.all? { |e| e.author.present? }).to be_truthy
     end
 
     it "does not include unpublished assignments or discussions or pages" do
@@ -3750,7 +3713,7 @@ describe CoursesController do
       @topic.unpublish!
       @course.wiki_pages.create! title: "unpublished", workflow_state: "unpublished"
       get "public_feed", params: { feed_code: @enrollment.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed).not_to be_nil
       expect(feed.entries).to be_empty
     end
@@ -3762,7 +3725,7 @@ describe CoursesController do
       @topic.assignment.update_attribute :only_visible_to_overrides, true
 
       get "public_feed", params: { feed_code: @enrollment.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed).not_to be_nil
       expect(feed.entries.map(&:id).join(" ")).not_to include @a0.asset_string
       expect(feed.entries.map(&:id).join(" ")).not_to include @topic.asset_string
@@ -3771,7 +3734,7 @@ describe CoursesController do
       assignment_override_model assignment: @topic.assignment, set: @enrollment.course_section
 
       get "public_feed", params: { feed_code: @enrollment.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed).not_to be_nil
       expect(feed.entries.map(&:id).join(" ")).to include @a0.asset_string
       expect(feed.entries.map(&:id).join(" ")).to include @topic.asset_string
@@ -4207,6 +4170,19 @@ describe CoursesController do
     end
   end
 
+  describe "GET start_offline_web_export" do
+    it "starts a web zip export" do
+      course_with_student_logged_in(active_all: true)
+      @course.root_account.settings[:enable_offline_web_export] = true
+      @course.root_account.save!
+      @course.update_attribute(:enable_offline_web_export, true)
+      @course.save!
+      expect { get "start_offline_web_export", params: { course_id: @course.id } }
+        .to change { @course.reload.web_zip_exports.count }.by(1)
+      expect(response).to be_redirect
+    end
+  end
+
   describe "#users" do
     let(:course) { Course.create! }
 
@@ -4245,7 +4221,7 @@ describe CoursesController do
         per_page: 1
       }
       expect(response).to be_successful
-      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
+      expect(response.headers.to_a.find { |a| a.first.downcase == "link" }.last).to_not include("last")
     end
 
     it "only returns group_ids for active group memberships when requested" do

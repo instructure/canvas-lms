@@ -1,3 +1,6 @@
+/* eslint-disable eslint-comments/no-unlimited-disable */
+/* eslint-disable */
+
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -19,20 +22,17 @@
 import signatureBuilder from './signature_builder'
 import urlParams from './url_params'
 import mBus from './message_bus'
-import XmlParser from './xml_parser'
 import objectMerge from './object_merge'
 import k5Options from './k5_options'
 
-function EntryService() {
-  this.xmlParser = new XmlParser()
-}
+function EntryService() {}
 
-EntryService.prototype.addEntry = function(allParams) {
+EntryService.prototype.addEntry = function (allParams) {
   this.formData = objectMerge(allParams)
   this.createEntryRequest()
 }
 
-EntryService.prototype.createEntryRequest = function() {
+EntryService.prototype.createEntryRequest = function () {
   const data = this.formData
   data.kalsig = signatureBuilder(data)
 
@@ -43,20 +43,29 @@ EntryService.prototype.createEntryRequest = function() {
   this.xhr.send(data)
 }
 
-EntryService.prototype.onEntryRequestLoaded = function(e) {
-  this.xmlParser.parseXML(this.xhr.response)
-  var ent = this.xmlParser.findRecursive('result:entries:entry1_')
+EntryService.prototype.parseRequest = function (xml) {
+  const parser = new DOMParser()
+  const parsedXml = parser.parseFromString(xml, "application/xml")
+  const ent = parsedXml.querySelector("result > entries > entry1_")
   if (ent) {
-    var ent = {
-      id: ent.find('id').text(),
-      type: ent.find('type').text(),
-      title: ent.find('name').text(),
-      context_code: ent.find('partnerData').text(),
-      mediaType: ent.find('mediatype').text(),
-      entryId: ent.find('id').text(),
-      userTitle: undefined
+    var entry = {
+      id: ent.querySelector('id') && ent.querySelector('id').textContent,
+      type: ent.querySelector('type') && ent.querySelector('type').textContent,
+      title: ent.querySelector('name') && ent.querySelector('name').textContent,
+      context_code: ent.querySelector('partnerData') && ent.querySelector('partnerData').textContent,
+      mediaType: ent.querySelector('mediatype') && ent.querySelector('mediatype').textContent,
+      entryId: ent.querySelector('id') && ent.querySelector('id').textContent,
+      userTitle: undefined,
     }
-    mBus.dispatchEvent('Entry.success', ent, this)
+    return entry
+  }
+  return null
+}
+
+EntryService.prototype.onEntryRequestLoaded = function (e) {
+  const entry = this.parseRequest(this.xhr.response)
+  if (entry) {
+    mBus.dispatchEvent('Entry.success', entry, this)
   } else {
     mBus.dispatchEvent('Entry.fail', this.xhr.response, this)
   }

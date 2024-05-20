@@ -17,7 +17,7 @@
  */
 
 import {createStore, applyMiddleware} from 'redux'
-import thunkMiddleware from 'redux-thunk'
+import {thunk} from 'redux-thunk'
 import {batch, batching} from 'redux-batch-middleware'
 import sinon from 'sinon'
 
@@ -39,7 +39,7 @@ export function spiedReducer() {
 // the reducer is also hung off the returned store
 export function spiedStore(state) {
   const reducer = spiedReducer()
-  const store = createStore(batching(reducer), state, applyMiddleware(thunkMiddleware, batch))
+  const store = createStore(batching(reducer), state, applyMiddleware(thunk, batch))
   store.spy = reducer.spy
   return store
 }

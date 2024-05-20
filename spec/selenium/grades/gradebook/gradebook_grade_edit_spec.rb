@@ -96,16 +96,16 @@ describe "Gradebook editing grades" do
     expect(sub.score).to eq 0.0
   end
 
-  it "does not update default grades for users not in this section", priority: "1" do
-    # create new user and section
-
+  it "loads archived schemes properly and uses them for assignments", priority: "1" do
+    grading_standard = @course.grading_standards.create!(title: "Test Grading Standard", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+    assignment_model(course: @course, grading_type: "letter_grade", points_possible: 100, title: "no-points")
+    @assignment.update!(grading_standard_id: grading_standard.id)
+    @assignment.grade_student(@student_1, grade: 89, grader: @teacher)
+    puts(@student_1.name)
     Gradebook.visit(@course)
-    switch_to_section(@other_section)
-
-    Gradebook.click_assignment_header_menu(@third_assignment.id)
-    set_default_grade(13)
-    @other_section.users.each { |u| expect(u.submissions.map(&:grade)).to include "13" }
-    @course.default_section.users.each { |u| expect(u.submissions.map(&:grade)).not_to include "13" }
+    expect(f("#gradebook_grid .container_1 .slick-row:nth-child(1) .b4")).to include_text("F")
+    edit_grade("#gradebook_grid .container_1 .slick-row:nth-child(1) .b4", "90")
+    expect(f("#gradebook_grid .container_1 .slick-row:nth-child(1) .b4")).to include_text("A")
   end
 
   it "tab sets focus on the options menu trigger when editing a grade", priority: "1" do

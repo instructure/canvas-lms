@@ -26,56 +26,12 @@ class OpenStruct
   end
 end
 
-class OpenObject < OpenStruct
-  attr_accessor :object_type
-
-  def self.build(type, data = {})
-    res = OpenObject.new(data)
-    res.object_type = type
-    res
-  end
-
-  def id
-    table[:id]
-  end
-
-  def asset_string
-    return table[:asset_string] if table[:asset_string]
-    return nil unless type && id
-
-    "#{type.underscore}_#{id}"
-  end
-
-  def as_json(options = {})
-    object_type ? { object_type => super } : super
-  end
-
-  def self.process(pre = {})
-    pre = pre.dup
-    if pre.is_a? Array
-      new_list = []
-      pre.each do |obj|
-        new_list << OpenObject.process(obj)
-      end
-      new_list
-    elsif pre
-      pre.each do |name, value|
-        case value
-        when Array
-          new_list = []
-          value.each do |obj|
-            new_list << if obj.is_a? Hash
-                          OpenObject.process(obj)
-                        else
-                          obj
-                        end
-          end
-          pre[name] = new_list
-        when Hash
-          pre[name] = OpenObject.process(value)
-        end
-      end
-      OpenObject.new(pre)
+class OpenObject < OpenStruct # rubocop:disable Style/OpenStructUse
+  def initialize(*args, in_specs: false)
+    unless in_specs
+      raise "Do not use OpenObject except for testing backwards compatibility with prior OpenObject usage"
     end
+
+    super(*args)
   end
 end

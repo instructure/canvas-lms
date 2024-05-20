@@ -17,7 +17,7 @@
  */
 
 import config from '../config'
-import delegate from '../delegate'
+import * as delegate from '../delegate'
 
 export const configure = delegate.configure
 export const mount = delegate.mount

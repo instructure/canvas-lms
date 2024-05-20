@@ -25,7 +25,7 @@ class RedisClient
     SET_COMMANDS = %w[set setex].freeze
 
     def call(request, config)
-      start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      client.last_command_at = start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       response = super
     ensure
       log_style = CanvasCache::Redis.log_style

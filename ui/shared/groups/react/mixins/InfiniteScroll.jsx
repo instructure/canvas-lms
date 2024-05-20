@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {throttle} from 'lodash'
 import ReactDOM from 'react-dom'
 
 const InfiniteScroll = {
@@ -27,7 +27,7 @@ const InfiniteScroll = {
     return el.offsetTop + this.topPosition(el.offsetParent)
   },
 
-  loadMoreIfNeeded: _.throttle(function () {
+  loadMoreIfNeeded: throttle(function () {
     if (this.detached) return
 
     let atBottom = false

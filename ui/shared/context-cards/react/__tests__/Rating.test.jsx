@@ -17,39 +17,40 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
-import Rating from '@canvas/context-cards/react/Rating'
-import {Rating as InstUIRating} from '@instructure/ui-rating'
+import Rating from '../Rating'
+import {render} from '@testing-library/react'
 
 describe('StudentContextTray/Rating', () => {
-  let subject
   const participationsLevel = 2
 
   describe('formatValueText', () => {
+    const ref = React.createRef()
     beforeEach(() => {
-      subject = mount(<Rating label="whatever" metric={{level: 1}} />)
+      render(<Rating label="whatever" metric={{level: 1}} ref={ref} />)
     })
 
     const valueText = ['None', 'Low', 'Moderate', 'High']
     valueText.forEach((v, i) => {
       it(`returns value ${v} for rating ${i}`, () => {
-        expect(subject.instance().formatValueText(i, 3)).toEqual(v)
+        expect(ref.current.formatValueText(i, 3)).toEqual(v)
       })
     })
   })
 
   describe('render', () => {
     it('delegates to InstUIRating', () => {
-      subject = mount(
+      const label = 'Participation'
+      const formatedValueText = 'Moderate'
+
+      const wrapper = render(
         <Rating
-          label="Participation"
+          label={label}
           metric={{
             level: participationsLevel,
           }}
         />
       )
-      const instUIRating = subject.find(InstUIRating)
-      expect(instUIRating.props().label).toEqual(subject.props().label)
+      expect(wrapper.queryByText(`${label} ${formatedValueText}`)).toBeInTheDocument()
     })
   })
 })

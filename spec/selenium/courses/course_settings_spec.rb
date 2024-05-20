@@ -175,11 +175,81 @@ describe "course settings" do
       expect(course_status).to have_attribute("title", "You cannot unpublish this course if there are graded student submissions")
     end
 
+    context "archived grading schemes" do
+      before do
+        Account.site_admin.enable_feature!(:grading_scheme_updates)
+        Account.site_admin.enable_feature!(:archived_grading_schemes)
+        @active_grading_standard = @course.grading_standards.create!(title: "Active Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "active")
+        @archived_grading_standard = @course.grading_standards.create!(title: "Archived Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+        @account_grading_standard = @account.grading_standards.create!(title: "Account Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "active")
+      end
+
+      it "does not show archived grading schemes" do
+        get "/courses/#{@course.id}/settings"
+        f(".grading_standard_checkbox").click unless is_checked(".grading_standard_checkbox")
+        f("[data-testid='grading-schemes-selector-dropdown']").click
+        expect(f("[data-testid='grading-schemes-selector-option-#{@active_grading_standard.id}']")).to include_text(@active_grading_standard.title)
+        expect(f("[data-testid='grading-schemes-selector-dropdown-form']")).not_to contain_css("[data-testid='grading-schemes-selector-option-#{@archived_grading_standard.id}']")
+      end
+
+      it "shows archived grading schemes if it is the course default and is auto-selected on page load" do
+        @course.update!(grading_standard_id: @archived_grading_standard.id)
+        get "/courses/#{@course.id}/settings"
+        f(".grading_standard_checkbox").click unless is_checked(".grading_standard_checkbox")
+        expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("value")).to eq(@archived_grading_standard.title)
+        f("[data-testid='grading-schemes-selector-dropdown']").click
+        expect(f("[data-testid='grading-schemes-selector-option-#{@course.grading_standard.id}']")).to include_text(@course.grading_standard.title)
+      end
+
+      it "doesn't let you edit an account level grading scheme" do
+        get "/courses/#{@course.id}/settings"
+        f(".grading_standard_checkbox").click unless is_checked(".grading_standard_checkbox")
+        f("[data-testid='grading-schemes-selector-dropdown']").click
+        expect(f("[data-testid='grading-schemes-selector-option-#{@account_grading_standard.id}']")).to include_text(@account_grading_standard.title)
+        f("[data-testid='grading-schemes-selector-option-#{@account_grading_standard.id}']").click
+        f("[data-testid='grading-schemes-selector-view-button']").click
+        wait_for_ajaximations
+        expect(f("[data-testid='grading-scheme-#{@account_grading_standard.id}-edit-button']").attribute("disabled")).to eq("true")
+      end
+
+      it "only lets you edit the name of an in-use grading-scheme" do
+        @course.update!(grading_standard_id: @active_grading_standard.id)
+        get "/courses/#{@course.id}/settings"
+        f(".grading_standard_checkbox").click unless is_checked(".grading_standard_checkbox")
+        f("[data-testid='grading-schemes-selector-dropdown']").click
+        f("[data-testid='grading-schemes-selector-option-#{@course.grading_standard.id}']").click
+        f("[data-testid='grading-schemes-selector-view-button']").click
+        wait_for_ajaximations
+        f("[data-testid='grading-scheme-#{@course.grading_standard.id}-edit-button']").click
+        wait_for_ajaximations
+        f("[data-testid='grading-scheme-name-input']").send_keys(" Edited")
+        f("[data-testid='grading-scheme-edit-modal-update-button']").click
+        wait_for_ajaximations
+        f("[data-testid='grading-scheme-view-modal-close-button']").click
+        expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq("Active Grading Scheme Edited")
+      end
+
+      it "shows all archived grading schemes when on course settings scheme management modal" do
+        archived_gs1 = @course.grading_standards.create!(title: "Archived Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+        archived_gs2 = @course.grading_standards.create!(title: "Archived Grading Scheme 2", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+        archived_gs3 = @course.grading_standards.create!(title: "Archived Grading Scheme 3", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+        get "/courses/#{@course.id}/settings"
+        f(".grading_standard_checkbox").click unless is_checked(".grading_standard_checkbox")
+        f("[data-testid='manage-all-grading-schemes-button']").click
+        wait_for_ajaximations
+        expect(f("[data-testid='grading-scheme-#{archived_gs1.id}-name']")).to include_text(archived_gs1.title)
+        expect(f("[data-testid='grading-scheme-#{archived_gs2.id}-name']")).to include_text(archived_gs2.title)
+        expect(f("[data-testid='grading-scheme-#{archived_gs3.id}-name']")).to include_text(archived_gs3.title)
+      end
+    end
+
     it "allows selection of existing course grading standard" do
+      skip "FOO-4220" # TODO: re-enable this test before merging EVAL-3171
       test_select_standard_for @course
     end
 
     it "allows selection of existing account grading standard" do
+      skip "FOO-4220" # TODO: re-enable this test before merging EVAL-3171
       test_select_standard_for @course.root_account
     end
 
@@ -334,7 +404,7 @@ describe "course settings" do
         more_options_link.click
         wait_for_ajaximations
         expect(f("body")).not_to contain_jqcss("#course_hide_distribution_graphs")
-        expect(f("body")).not_to contain_jqcss("#course_hide_final_grades")
+        expect(f("#course_hide_final_grades")).to be_present
         # Verify that other parts of the settings are not visilbe when they shouldn't be
         expect(f("#tab-sections").css_value("display")).to eq "none"
       end

@@ -74,6 +74,7 @@ module Lti::Messages
       add_lti11_legacy_user_id!
       add_lti1p1_claims! if include_lti1p1_claims?
       add_extension("placement", @opts[:resource_type])
+      add_extension("lti_student_id", @opts[:student_id].to_s) if @opts[:student_id].present?
 
       @expander.expand_variables!(@message.extensions)
       @message.validate! if validate_launch
@@ -90,7 +91,7 @@ module Lti::Messages
       @message.aud = @tool.developer_key.global_id.to_s
       @message.azp = @tool.developer_key.global_id.to_s
       @message.deployment_id = @tool.deployment_id
-      @message.exp = Setting.get("lti.oauth2.access_token.exp", 1.hour).to_i.seconds.from_now.to_i
+      @message.exp = 1.hour.from_now.to_i
       @message.iat = Time.zone.now.to_i
       @message.iss = Canvas::Security.config["lti_iss"]
       @message.nonce = SecureRandom.uuid
@@ -204,13 +205,9 @@ module Lti::Messages
       @message.assignment_and_grade_service.scope = @tool.developer_key.scopes & TokenScopes::LTI_AGS_SCOPES
 
       @message.assignment_and_grade_service.lineitems =
-        if @context.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
-          @expander.controller.lti_line_item_index_url(
-            host: @context.root_account.environment_specific_domain, course_id: course_id_for_ags_url
-          )
-        else
-          @expander.controller.lti_line_item_index_url(course_id: course_id_for_ags_url)
-        end
+        @expander.controller.lti_line_item_index_url(
+          host: @context.root_account.environment_specific_domain, course_id: course_id_for_ags_url
+        )
     end
 
     def associated_1_1_tool
@@ -233,14 +230,10 @@ module Lti::Messages
 
     def add_names_and_roles_service_claims!
       @message.names_and_roles_service.context_memberships_url =
-        if @context.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
-          @expander.controller.polymorphic_url(
-            [@context, :names_and_roles],
-            host: @context.root_account.environment_specific_domain
-          )
-        else
-          @expander.controller.polymorphic_url([@context, :names_and_roles])
-        end
+        @expander.controller.polymorphic_url(
+          [@context, :names_and_roles],
+          host: @context.root_account.environment_specific_domain
+        )
       @message.names_and_roles_service.service_versions = ["2.0"]
     end
 

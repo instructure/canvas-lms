@@ -58,9 +58,16 @@ describe "outcome gradebook" do
       wait_for_ajaximations
     end
 
+    def mean_values
+      f("button[data-testid='lmgb-course-calc-dropdown']").click
+      fj("[role=\"menuitemradio\"]:contains(\"Course average\")").click
+      wait_for_ajax_requests
+      selected_values
+    end
+
     def median_values
-      f(".al-trigger").click
-      ff(".al-options .ui-menu-item").second.click
+      f("button[data-testid='lmgb-course-calc-dropdown']").click
+      fj("[role=\"menuitemradio\"]:contains(\"Course median\")").click
       wait_for_ajax_requests
       selected_values
     end
@@ -189,6 +196,18 @@ describe "outcome gradebook" do
         expect(f("#no_results_outcomes").selected?).to be true
       end
 
+      it "outcomes popover renders when hovering over outcome column header" do
+        get "/courses/#{@course.id}/gradebook"
+        select_learning_mastery
+        wait_for_ajax_requests
+
+        # Make the popover appear by selecting first outcome column header
+        column_header = ff(".slick-column-name")[0]
+        driver.action.move_to(column_header).perform
+
+        expect(f(".outcome-details")).not_to be_nil
+      end
+
       def result(user, alignment, score, opts = {})
         LearningOutcomeResult.create!(user:, alignment:, score:, context: @course, **opts)
       end
@@ -253,6 +272,48 @@ describe "outcome gradebook" do
           # should remain on second section, with mean
           means = selected_values
           expect(means).to contain_exactly("2", "3")
+        end
+
+        # test added because of OUT-6176
+        # Changing from "mean" -> "median" -> "mean" would result in a 404 page
+        # This tests makes sure no errors happen when doing this
+        it "can alternate from mean to median and back to mean" do
+          get "/courses/#{@course.id}/gradebook"
+          select_learning_mastery
+          wait_for_ajax_requests
+
+          # Confirm that "mean" values are shown
+          averages = selected_values
+          expect(averages).to contain_exactly("2.33", "2.67")
+
+          # Switch to "median" values
+          medians = median_values
+          expect(medians).to contain_exactly("2", "3")
+
+          averages = mean_values
+          expect(averages).to contain_exactly("2.33", "2.67")
+        end
+
+        it "outcome ordering persists accross page refresh" do
+          get "/courses/#{@course.id}/gradebook"
+          select_learning_mastery
+          wait_for_ajax_requests
+          column_headers = ff(".slick-column-name")
+
+          expect(column_headers.map(&:text)).to eq ["outcome1", "outcome2"]
+          expect(ff(".headerRow_1 .outcome-score").map(&:text)).to eq ["2.67", "2.33"]
+
+          # Reorder the column headers
+          driver.action.drag_and_drop(column_headers[1], column_headers[0]).perform
+          outcomes = ff(".slick-column-name").map(&:text)
+          expect(outcomes).to eq ["outcome2", "outcome1"]
+          expect(ff(".headerRow_1 .outcome-score").map(&:text)).to eq ["2.33", "2.67"]
+
+          refresh_page
+
+          outcomes = ff(".slick-column-name").map(&:text)
+          expect(outcomes).to eq ["outcome2", "outcome1"]
+          expect(ff(".headerRow_1 .outcome-score").map(&:text)).to eq ["2.33", "2.67"]
         end
 
         context "outcome with average calculation method" do

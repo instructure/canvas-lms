@@ -21,7 +21,7 @@ import React from 'react'
 import {act, render, waitFor} from '@testing-library/react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import ContextModulesPublishMenu from '../ContextModulesPublishMenu'
-import publishAllModulesHelperModule from '../../utils/publishAllModulesHelper'
+import {updateModulePendingPublishedStates} from '../../utils/publishAllModulesHelper'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('../../utils/publishAllModulesHelper', () => {
@@ -29,6 +29,7 @@ jest.mock('../../utils/publishAllModulesHelper', () => {
   return {
     __esmodule: true,
     ...originalModule,
+    updateModulePendingPublishedStates: jest.fn(),
   }
 })
 
@@ -84,11 +85,10 @@ describe('ContextModulesPublishMenu', () => {
           workflow_state: 'completed',
         },
       })
-      const spy = jest.spyOn(publishAllModulesHelperModule, 'updateModulePendingPublishedStates')
       render(<ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />)
-      expect(spy).not.toHaveBeenCalled()
+      expect(updateModulePendingPublishedStates).not.toHaveBeenCalled()
       window.dispatchEvent(new Event('module-publish-models-ready'))
-      await waitFor(() => expect(spy).toHaveBeenCalled())
+      await waitFor(() => expect(updateModulePendingPublishedStates).toHaveBeenCalled())
     })
 
     describe('progress', () => {
@@ -176,6 +176,7 @@ describe('ContextModulesPublishMenu', () => {
       expect(getByText('Publish all modules and items')).toBeInTheDocument()
       expect(getByText('Publish modules only')).toBeInTheDocument()
       expect(getByText('Unpublish all modules and items')).toBeInTheDocument()
+      expect(getByText('Unpublish modules only')).toBeInTheDocument()
     })
 
     it('calls publishAll when clicked publish all menu item is clicked', () => {
@@ -205,6 +206,16 @@ describe('ContextModulesPublishMenu', () => {
       const publishButton = getByText('Unpublish all modules and items')
       act(() => publishButton.click())
       const modalTitle = getByRole('heading', {name: 'Unpublish all modules and items'})
+      expect(modalTitle).toBeInTheDocument()
+    })
+
+    it('calls unpublishModuleOnly when unpublish modules only is clicked', () => {
+      const {getByRole, getByText} = render(<ContextModulesPublishMenu {...defaultProps} />)
+      const menuButton = getByRole('button')
+      act(() => menuButton.click())
+      const publishButton = getByText('Unpublish modules only')
+      act(() => publishButton.click())
+      const modalTitle = getByRole('heading', {name: 'Unpublish modules only'})
       expect(modalTitle).toBeInTheDocument()
     })
   })

@@ -416,7 +416,7 @@ describe RubricAssessment do
         outcome_with_rubric
         @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
         @course.enroll_student(@student, enrollment_state: :active)
-        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
         assessment = @association.assess({
                                            user: @student,
                                            assessor: @teacher,
@@ -436,7 +436,7 @@ describe RubricAssessment do
         rubric_model
         @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
         @course.enroll_student(@student, enrollment_state: :active)
-        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
         assessment = @association.assess({
                                            user: @student,
                                            assessor: @teacher,
@@ -463,7 +463,7 @@ describe RubricAssessment do
       it "assessing a rubric with outcome criterion should increment datadog counter" do
         allow(InstStatsd::Statsd).to receive(:increment)
         @outcome.update!(data: nil)
-        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
         @association.assess({
                               user: @student,
                               assessor: @teacher,
@@ -481,7 +481,7 @@ describe RubricAssessment do
 
       it "uses default ratings for scoring" do
         @outcome.update!(data: nil)
-        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
         assessment = @association.assess({
                                            user: @student,
                                            assessor: @teacher,
@@ -498,7 +498,7 @@ describe RubricAssessment do
       end
 
       it "does not allow points to exceed max points possible" do
-        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
         assessment = @association.assess({
                                            user: @student,
                                            assessor: @teacher,
@@ -516,7 +516,7 @@ describe RubricAssessment do
 
       it "allows points to exceed max points possible if Allow Outcome Extra Credit feature is enabled" do
         @course.enable_feature!(:outcome_extra_credit)
-        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
         assessment = @association.assess({
                                            user: @student,
                                            assessor: @teacher,
@@ -534,7 +534,7 @@ describe RubricAssessment do
 
       it "propagates hide_points value" do
         @association.update!(hide_points: true)
-        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
         assessment = @association.assess({
                                            user: @student,
                                            assessor: @teacher,
@@ -552,7 +552,7 @@ describe RubricAssessment do
 
       it "truncates the learning outcome result title to 250 characters" do
         @association.update!(title: "a" * 255)
-        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
         @association.assess({
                               user: @student,
                               assessor: @teacher,
@@ -569,7 +569,7 @@ describe RubricAssessment do
 
       it "propagates hide_outcome_results value" do
         @association.update!(hide_outcome_results: true)
-        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
         @association.assess({
                               user: @student,
                               assessor: @teacher,
@@ -585,7 +585,7 @@ describe RubricAssessment do
       end
 
       it "restores a deleted result" do
-        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
         @association.assess({
                               user: @student,
                               assessor: @teacher,
@@ -615,7 +615,7 @@ describe RubricAssessment do
       end
 
       it "does not update outcomes on a peer assessment" do
-        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
         expect do
           @association.assess({
                                 user: @student,
@@ -632,7 +632,7 @@ describe RubricAssessment do
       end
 
       it "does not update outcomes on a provisional grade" do
-        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
         expect do
           submission = @assignment.find_or_create_submission(@student)
           provisional_grade = submission.find_or_create_provisional_grade!(@teacher, grade: 3)
@@ -701,7 +701,7 @@ describe RubricAssessment do
 
     describe "when saving comments is requested" do
       it "saves comments normally" do
-        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
         @association.assess({
                               user: @student,
                               assessor: @student,
@@ -719,7 +719,7 @@ describe RubricAssessment do
       end
 
       it "does not save comments for peer assessments" do
-        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
         @association.assess({
                               user: @student,
                               assessor: @student,

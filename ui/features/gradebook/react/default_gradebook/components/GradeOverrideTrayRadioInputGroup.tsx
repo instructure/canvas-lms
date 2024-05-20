@@ -18,7 +18,7 @@
 
 import React from 'react'
 import classnames from 'classnames'
-import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
+import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {RadioInput} from '@instructure/ui-radio-input'
@@ -31,8 +31,9 @@ export type PendingUpdateData = {
 }
 
 export type SubmissionTrayRadioInputGroupProps = {
-  customGradeStatuses?: GradeStatus[]
+  customGradeStatuses?: GradeStatusUnderscore[]
   disabled: boolean
+  hasOverrideScore?: boolean
   selectedCustomStatusId?: string | null
   handleRadioInputChanged: (status: string | null) => void
 }
@@ -42,10 +43,12 @@ type RadioInputOption = {
   color?: string
   key: string
   name: string
+  disabled?: boolean
 }
 
 export default function GradeOverrideTrayRadioInputGroup({
   disabled,
+  hasOverrideScore,
   customGradeStatuses = [],
   selectedCustomStatusId,
   handleRadioInputChanged,
@@ -61,6 +64,7 @@ export default function GradeOverrideTrayRadioInputGroup({
       checked: selectedCustomStatusId === status.id,
       color: status.color,
       key: status.id,
+      disabled: status.allow_final_grade_value === false && hasOverrideScore,
     }))
 
     return [noneOption, ...customGradingStatusOptions]
@@ -100,7 +104,7 @@ export default function GradeOverrideTrayRadioInputGroup({
         >
           <RadioInput
             checked={status.checked}
-            disabled={disabled}
+            disabled={disabled || status.disabled}
             name="GradeOverrideTrayRadioInput"
             label={status.name}
             onChange={onRadioInputChanged}

@@ -136,12 +136,17 @@ export default register(
           this.dialogOptions = {
             title: 'Download Assignment Submissions',
             resizable: false,
+            modal: true,
+            zIndex: 1000,
           }
         }
         if (this.$dialog == null) {
           this.$dialog = $('#submissions_download_dialog form').dialog(this.dialogOptions)
         }
-        this.$dialog.dialog()
+        this.$dialog.dialog({
+          modal: true,
+          zIndex: 1000,
+        })
         return this.checkForChange()
       },
 

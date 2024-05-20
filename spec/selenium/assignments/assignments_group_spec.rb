@@ -57,11 +57,27 @@ describe "assignment groups" do
     @course.assignments.create(name: "test", assignment_group: @assignment_group)
   end
 
+  # EVAL-3711 Remove this test when instui_nav feature flag is removed
   it "creates a new assignment group", priority: "1" do
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
 
     f("#addGroup").click
+    wait_for_ajaximations
+
+    replace_content(f("#ag_new_name"), "Second AG")
+    fj(".create_group:visible").click
+    wait_for_ajaximations
+
+    expect(ff(".assignment_group .ig-header h2").map(&:text)).to include("Second AG")
+  end
+
+  it "creates a new assignment group with the instui nav feature flag on", priority: "1" do
+    @course.root_account.enable_feature!(:instui_nav)
+    get "/courses/#{@course.id}/assignments"
+    wait_for_ajaximations
+
+    f("[data-testid='new_group_button']").click
     wait_for_ajaximations
 
     replace_content(f("#ag_new_name"), "Second AG")

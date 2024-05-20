@@ -19,7 +19,7 @@
 import React, {useEffect, useRef} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/rails-flash-notifications'
 
 const I18n = useI18nScope('createTicketForm')

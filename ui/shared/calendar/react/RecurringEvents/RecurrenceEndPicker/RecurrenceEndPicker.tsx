@@ -27,7 +27,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {DEFAULT_COUNT, MAX_COUNT} from '../RRuleHelper'
-import {FrequencyValue} from '../types'
+import type {FrequencyValue} from '../types'
 
 import {useScope} from '@canvas/i18n'
 

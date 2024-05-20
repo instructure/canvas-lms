@@ -209,7 +209,7 @@ describe SIS::CSV::GroupCategoryImporter do
       expect(course.group_categories.count).to eq 1
       expect(course.groups.count).to eq 1
       expect(course.groups.count do |g|
-        g.category == "Group Category 1"
+        g.group_category.name == "Group Category 1"
       end).to eq 1
 
       group_categories = GroupCategory.where(context_id: course_sis_id)
@@ -236,7 +236,7 @@ describe SIS::CSV::GroupCategoryImporter do
       expect(course.group_categories.count).to eq 1
       expect(course.groups.count).to eq 1
       expect(course.groups.count do |g|
-        g.category == "Group Category 1"
+        g.group_category.name == "Group Category 1"
       end).to eq 1
 
       group_categories.each do |gc|
@@ -259,7 +259,7 @@ describe SIS::CSV::GroupCategoryImporter do
       expect(course.group_categories.count).to eq 1
       expect(course.groups.count).to eq 1
       expect(course.groups.count do |g|
-        g.category == "Group Category 1"
+        g.group_category.name == "Group Category 1"
       end).to eq 1
 
       group_categories.each do |gc|

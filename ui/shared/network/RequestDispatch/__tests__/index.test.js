@@ -126,6 +126,7 @@ describe('Shared > Network > RequestDispatch', () => {
     })
 
     it('resolves when flooded with requests', async () => {
+      const clock = sinon.useFakeTimers()
       const requests = rangeOfLength(4).map(() => getJSON())
       for await (const [index] of requests.entries()) {
         // Get the next request
@@ -135,8 +136,10 @@ describe('Shared > Network > RequestDispatch', () => {
         // Respond
         request.response.setJson({requestIndex: index})
         request.response.send()
+        clock.tick(1)
       }
       expect(await Promise.all(requests)).toHaveLength(4)
+      clock.restore()
     })
   })
 
@@ -232,12 +235,14 @@ describe('Shared > Network > RequestDispatch', () => {
 
     describe('when each page responds', () => {
       async function resolvePages() {
+        const clock = sinon.useFakeTimers()
         await network.allRequestsReady()
 
         const [request1] = network.getRequests()
         setPaginationLinkHeader(request1.response, {last: 3})
         request1.response.setJson([{dataForPage: 1}])
         request1.response.send()
+        clock.tick(1)
 
         await network.allRequestsReady()
         const [, request2, request3] = network.getRequests()
@@ -245,10 +250,13 @@ describe('Shared > Network > RequestDispatch', () => {
         setPaginationLinkHeader(request2.response, {last: 3})
         request2.response.setJson([{dataForPage: 2}])
         request2.response.send()
+        clock.tick(1)
 
         setPaginationLinkHeader(request3.response, {last: 3})
         request3.response.setJson([{dataForPage: 3}])
         request3.response.send()
+        clock.tick(1)
+        clock.restore()
       }
 
       it('calls the page callback for each page', async () => {
@@ -293,6 +301,7 @@ describe('Shared > Network > RequestDispatch', () => {
     })
 
     it('resolves when flooded with requests', async () => {
+      const clock = sinon.useFakeTimers()
       const depaginatedRequestCount = 4
       const pagesPerResource = 3
       const totalRequestCount = depaginatedRequestCount * pagesPerResource
@@ -309,9 +318,11 @@ describe('Shared > Network > RequestDispatch', () => {
         setPaginationLinkHeader(request.response, {last: pagesPerResource})
         request.response.setJson([{requestIndex: index}])
         request.response.send()
+        clock.tick(1)
       }
 
       expect(await Promise.all(requests)).toHaveLength(depaginatedRequestCount)
+      clock.restore()
     })
 
     describe('when only one page of data is available', () => {

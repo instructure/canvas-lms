@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import {FinalGradeOverrideTextBox, FinalGradeOverrideTextBoxProps} from '../react'
+import {FinalGradeOverrideTextBox, type FinalGradeOverrideTextBoxProps} from '../react'
 import {fireEvent, render} from '@testing-library/react'
-import {DeprecatedGradingScheme} from '@canvas/grading/grading'
+import type {DeprecatedGradingScheme} from '@canvas/grading/grading.d'
 
 const gradingScheme: DeprecatedGradingScheme = {
   data: [
@@ -54,7 +54,6 @@ const renderTextBox = (props: Partial<FinalGradeOverrideTextBoxProps> = {}) => {
     gradingScheme,
     finalGradeOverride: finalGradeOverrides,
     onGradeChange: mockedOnGradeChange,
-    pointsBasedGradingSchemesFeatureEnabled: false,
   }
   return render(<FinalGradeOverrideTextBox {...defaultProps} {...props} />)
 }

@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
-import _ from 'lodash'
+import {defaults} from 'lodash'
 import GradingPeriod from 'ui/features/course_grading_standards/react/gradingPeriodTemplate'
 
 const defaultProps = {
@@ -50,7 +50,7 @@ QUnit.module('GradingPeriod with read-only permissions', {
         delete: false,
       },
     }
-    const props = _.defaults(opts, readOnlyProps, defaultProps)
+    const props = defaults(opts, readOnlyProps, defaultProps)
     const GradingPeriodElement = <GradingPeriod {...props} />
     return ReactDOM.render(GradingPeriodElement, wrapper)
   },
@@ -107,7 +107,7 @@ test('displays weight only when weighted is true', function () {
 QUnit.module("GradingPeriod with 'readOnly' set to true", {
   renderComponent(opts = {}) {
     const readOnlyProps = {readOnly: true}
-    const props = _.defaults(opts, readOnlyProps, defaultProps)
+    const props = defaults(opts, readOnlyProps, defaultProps)
     const GradingPeriodElement = <GradingPeriod {...props} />
     return ReactDOM.render(GradingPeriodElement, wrapper)
   },
@@ -159,7 +159,7 @@ test('uses the end date when close date is not defined', function () {
 
 QUnit.module('editable GradingPeriod', {
   renderComponent(opts = {}) {
-    const props = _.defaults(opts, defaultProps)
+    const props = defaults(opts, defaultProps)
     const GradingPeriodElement = <GradingPeriod {...props} />
     return ReactDOM.render(GradingPeriodElement, wrapper)
   },
@@ -213,7 +213,7 @@ test("ignores clicks on 'delete grading period' when disabled", function () {
 
 QUnit.module('custom prop validation for editable periods', {
   renderComponent(opts = {}) {
-    const props = _.defaults(opts, defaultProps)
+    const props = defaults(opts, defaultProps)
     const GradingPeriodElement = <GradingPeriod {...props} />
     return ReactDOM.render(GradingPeriodElement, wrapper)
   },

@@ -18,11 +18,12 @@
 
 import $ from 'jquery'
 import preventDefault from '@canvas/util/preventDefault'
-import signupDialog from '@canvas/signup-dialog'
+import {loadSignupDialog} from '@canvas/signup-dialog'
 import loginForm from '../jst/login.handlebars'
 import authenticity_token from '@canvas/authenticity-token'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import extensions from '@canvas/bundles/extensions'
 
 const I18n = useI18nScope('registration')
 
@@ -30,7 +31,13 @@ let $loginForm = null
 
 $('.signup_link').click(
   preventDefault(function () {
-    return signupDialog($(this).data('template'), $(this).prop('title'), $(this).data('path'))
+    loadSignupDialog
+      .then(signupDialog => {
+        signupDialog($(this).data('template'), $(this).prop('title'), $(this).data('path'))
+      })
+      .catch(error => {
+        throw new Error('Error loading signup dialog: ', error)
+      })
   })
 )
 
@@ -51,6 +58,7 @@ $('#registration_video a').click(
       close() {
         return $(this).remove()
       },
+      zIndex: 1000,
     })
   })
 )
@@ -61,6 +69,20 @@ $('body').click(function (e) {
     return $loginForm != null ? $loginForm.hide() : void 0
   }
 })
+
+const loadExtension = extensions['ui/features/registration/jquery/index.js']?.()
+if (loadExtension) {
+  loadExtension
+    .then(extension => {
+      extension.default()
+    })
+    .catch(error => {
+      throw new Error(
+        'Error loading extension for ui/features/registration/jquery/index.js: ',
+        error
+      )
+    })
+}
 
 export default $('#registration_login').on(
   'click',

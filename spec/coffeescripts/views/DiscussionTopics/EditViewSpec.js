@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import {extend, defer} from 'lodash'
 import RCELoader from '@canvas/rce/serviceRCELoader'
 import SectionCollection from '@canvas/sections/backbone/collections/SectionCollection'
@@ -29,7 +30,7 @@ import EditView from 'ui/features/discussion_topic_edit/backbone/views/EditView'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 
 const currentOrigin = window.location.origin
 
@@ -222,9 +223,10 @@ test('shows todo checkbox', function () {
 test('shows todo input when todo checkbox is selected', function () {
   ENV.STUDENT_PLANNER_ENABLED = true
   const view = this.editView()
+  equal(view.$el.find('#todo_date_input')[0].style.display, 'none')
   view.$el.find('#allow_todo_date').prop('checked', true)
   view.$el.find('#allow_todo_date').trigger('change')
-  equal(view.$el.find('#todo_date_input')[0].style.display, 'block')
+  notStrictEqual(view.$el.find('#todo_date_input')[0].style.display, 'none')
 })
 
 test('shows todo input with date when given date', function () {
@@ -232,7 +234,7 @@ test('shows todo input with date when given date', function () {
   ENV.TIMEZONE = 'America/Chicago'
   const view = this.editView({}, {todo_date: '2017-01-03'})
   equal(view.$el.find('#allow_todo_date').prop('checked'), true)
-  equal(view.$el.find('input[name="todo_date"').val(), 'Jan 2, 2017, 6:00 PM')
+  equal(view.$el.find('input[name="todo_date"]').val(), 'Jan 2, 2017, 6:00 PM')
 })
 
 test('renders announcement page when planner enabled', function () {
@@ -271,8 +273,8 @@ test('does save todo date if allow_todo_date is checked and discussion is not gr
   view.renderGroupCategoryOptions()
   view.$el.find('#allow_todo_date').prop('checked', true)
   view.$el.find('#allow_todo_date').trigger('change')
-  view.$el.find('input[name="todo_date"').val(todo_date.toISOString())
-  view.$el.find('input[name="todo_date"').trigger('change')
+  view.$el.find('input[name="todo_date"]').val(todo_date.toISOString())
+  view.$el.find('input[name="todo_date"]').trigger('change')
   const formData = view.getFormData()
   equal(formData.todo_date.toString(), todo_date.toString())
 })
@@ -359,6 +361,69 @@ test("renders 'points' as readonly when user has grade-edit permissions", functi
     withAssignment: true,
   })
   ok(view.$el.find('#discussion_topic_assignment_points_possible').attr('readonly'))
+})
+
+test('handleMessageEvent sets ab_guid when subject is assignment.set_ab_guid and the ab_guid is formatted correctly', function () {
+  const view = this.editView({
+    withAssignment: true,
+  })
+
+  const mockEvent = {
+    data: {
+      subject: 'assignment.set_ab_guid',
+      data: ['1E20776E-7053-11DF-8EBF-BE719DFF4B22', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+    },
+  }
+
+  view.handleMessageEvent(mockEvent)
+
+  deepEqual(
+    view.assignment.get('ab_guid'),
+    ['1E20776E-7053-11DF-8EBF-BE719DFF4B22', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+    'ab_guid should be set correctly'
+  )
+})
+
+test('handleMessageEvent does not set ab_guid when subject is not assignment.set_ab_guid', function () {
+  const view = this.editView({
+    withAssignment: true,
+  })
+
+  const mockEvent = {
+    data: {
+      subject: 'some.other.subject',
+      data: ['1E20776E-7053-11DF-8EBF-BE719DFF4B22', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+    },
+  }
+
+  view.handleMessageEvent(mockEvent)
+
+  notDeepEqual(
+    view.assignment.has('ab_guid'),
+    ['not_an_ab_guid', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+    'ab_guid should not be set'
+  )
+})
+
+test('handleMessageEvent does not set ab_guid when the ab_guid is not formatted correctly', function () {
+  const view = this.editView({
+    withAssignment: true,
+  })
+
+  const mockEvent = {
+    data: {
+      subject: 'assignment.set_ab_guid',
+      data: ['not_an_ab_guid', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+    },
+  }
+
+  view.handleMessageEvent(mockEvent)
+
+  notDeepEqual(
+    view.assignment.has('ab_guid'),
+    ['not_an_ab_guid', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+    'ab_guid should not be set'
+  )
 })
 
 QUnit.module(
@@ -539,7 +604,7 @@ test('has an error when a title is 257 chars', function () {
   equal(errors.title[0].message, 'Title is too long, must be under 257 characters')
 })
 
-test('allows dicussion to save when a title is 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true', function () {
+test('allows discussion to save when a title is 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true', function () {
   const view = this.editView({withAssignment: true})
   const errors = nameLengthHelper(view, 256, false, 30, '1')
   equal(errors.length, 0)
@@ -682,5 +747,15 @@ test('it attaches assignment external tools component in course context', functi
 test('it does not attach assignment external tools component in group context', function () {
   ENV.context_asset_string = 'group_1'
   const view = this.editView()
+  equal(view.$AssignmentExternalTools.children().size(), 0)
+})
+
+test('it renders assignment external tools on announcements page when assignment_edit_placement_not_on_announcements flag is on', function () {
+  const view = this.editView({isAnnouncement: true})
+  equal(view.$AssignmentExternalTools.children().size(), 0)
+})
+
+test('it does not render assignment external tools on announcements page when assignment_edit_placement_not_on_announcements flag is off', function () {
+  const view = this.editView({isAnnouncement: false})
   equal(view.$AssignmentExternalTools.children().size(), 0)
 })

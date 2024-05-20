@@ -223,9 +223,9 @@ module Importers
       ].each do |attr|
         attr = attr.to_sym
         if hash.key?(attr)
-          item.send("#{attr}=", hash[attr])
+          item.send(:"#{attr}=", hash[attr])
         elsif master_migration
-          item.send("#{attr}=", nil)
+          item.send(:"#{attr}=", nil)
         end
       end
 
@@ -243,6 +243,10 @@ module Importers
         item.assignment = nil if item.assignment&.quiz && item.assignment.quiz.id != item.id
         item.assignment ||= context.assignments.temp_record
         item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, migration, item.assignment, item)
+        if migration.cc_qti_migration? && (migration.import_quizzes_next? || !!hash[:qti_new_quiz])
+          item.assignment.mark_as_ready_to_migrate_to_quiz_next
+          item.save!
+        end
       elsif !item.assignment && (grading = hash[:grading])
         item.quiz_type = "assignment"
         hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id]
@@ -263,7 +267,7 @@ module Importers
           AssignmentOverride.overridden_dates.each do |field|
             next unless o.key?(field)
 
-            override.send "override_#{field}", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(o[field])
+            override.send :"override_#{field}", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(o[field])
           end
           override.save!
           added_overrides = true

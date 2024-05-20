@@ -876,6 +876,7 @@ describe AssignmentsController do
     describe "assignments_2_student" do
       before do
         @course.enable_feature!(:assignments_2_student)
+        @course.root_account.enable_feature!(:instui_nav)
         @course.save!
       end
 
@@ -895,6 +896,12 @@ describe AssignmentsController do
       context "when logged in as a student" do
         before do
           user_session(@student)
+        end
+
+        it "sets crumb to the assignment title" do
+          get "show", params: { course_id: @course.id, id: @assignment.id }
+          expect(assigns[:_crumbs][3][1]).to include("/courses/#{@course.id}/assignments/#{@assignment.id}")
+          expect(assigns[:_crumbs][3][0]).to include(@assignment.title)
         end
 
         it "does not render the 'old' assignment page layout" do
@@ -959,12 +966,12 @@ describe AssignmentsController do
 
             @reviewee_submission_id = CanvasSchema.id_from_object(
               @reviewee_submission,
-              CanvasSchema.resolve_type(nil, @reviewee_submission, nil),
+              CanvasSchema.resolve_type(nil, @reviewee_submission, nil)[0],
               nil
             )
             @student_submission_id = CanvasSchema.id_from_object(
               @student_submission,
-              CanvasSchema.resolve_type(nil, @student_submission, nil),
+              CanvasSchema.resolve_type(nil, @student_submission, nil)[0],
               nil
             )
 
@@ -1131,79 +1138,70 @@ describe AssignmentsController do
           user_session(observer)
         end
 
-        it "shows the old assignments page if the assignments_2_observer_view setting is off" do
+        before { request.cookies["k5_observed_user_for_#{observer.id}"] = @student.id }
+
+        it "shows data for the first observed student, by sortable name when no cookie" do
+          allow(CanvasSchema).to receive(:id_from_object) { |submission| submission.user_id.to_s }
+
+          @student.update!(name: "Zzzzz")
+
+          prior_student = User.create!(name: "Aaaaa")
+          @course.enroll_student(prior_student, enrollment_state: "active")
+          @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "pending", associated_user_id: prior_student.id)
+
+          request.cookies.delete("k5_observed_user_for_#{observer.id}")
           get "show", params: { course_id: @course.id, id: @assignment.id }
+
+          aggregate_failures do
+            expect(assigns[:js_env][:SUBMISSION_ID]).to eq prior_student.id.to_s
+            expect(assigns[:js_env][:enrollment_state]).to eq :invited
+          end
+        end
+
+        it "shows data for the selected observed student from cookie" do
+          allow(CanvasSchema).to receive(:id_from_object) { |submission| submission.user_id.to_s }
+
+          @student.update!(name: "Zzzzz")
+
+          prior_student = User.create!(name: "Aaaaa")
+          @course.enroll_student(prior_student, enrollment_state: "active")
+          @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "pending", associated_user_id: prior_student.id)
+
+          get "show", params: { course_id: @course.id, id: @assignment.id }
+
+          aggregate_failures do
+            expect(assigns[:js_env][:SUBMISSION_ID]).to eq @student.id.to_s
+            expect(assigns[:js_env][:enrollment_state]).to eq :active
+          end
+        end
+
+        it "shows data for the observer when viewing their own enrollment" do
+          allow(CanvasSchema).to receive(:id_from_object) { |submission| submission.user_id.to_s }
+
+          @course.enroll_student(observer, enrollment_state: "active")
+
+          get "show", params: { course_id: @course.id, id: @assignment.id }
+
+          aggregate_failures do
+            expect(assigns[:js_env][:SUBMISSION_ID]).to eq observer.id.to_s
+            expect(assigns[:js_env][:enrollment_state]).to eq :active
+            expect(flash[:notice]).to be_nil
+          end
+        end
+
+        it "shows the old assignments page if this user is not observing any students" do
+          observer.observer_enrollments.first.update!(associated_user: nil)
+
+          get "show", params: { course_id: @course.id, id: @assignment.id }
+          expect(flash[:notice]).to match("No student is being observed.")
           expect(assigns[:js_env]).not_to have_key(:SUBMISSION_ID)
         end
 
-        context "when the assignments_2_observer_view setting is on" do
-          before { Setting.set("assignments_2_observer_view", "true") }
-
-          before { request.cookies["k5_observed_user_for_#{observer.id}"] = @student.id }
-
-          it "shows data for the first observed student, by sortable name when no cookie" do
-            allow(CanvasSchema).to receive(:id_from_object) { |submission| submission.user_id.to_s }
-
-            @student.update!(name: "Zzzzz")
-
-            prior_student = User.create!(name: "Aaaaa")
-            @course.enroll_student(prior_student, enrollment_state: "active")
-            @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "pending", associated_user_id: prior_student.id)
-
-            request.cookies.delete("k5_observed_user_for_#{observer.id}")
-            get "show", params: { course_id: @course.id, id: @assignment.id }
-
-            aggregate_failures do
-              expect(assigns[:js_env][:SUBMISSION_ID]).to eq prior_student.id.to_s
-              expect(assigns[:js_env][:enrollment_state]).to eq :invited
-            end
-          end
-
-          it "shows data for the selected observed student from cookie" do
-            allow(CanvasSchema).to receive(:id_from_object) { |submission| submission.user_id.to_s }
-
-            @student.update!(name: "Zzzzz")
-
-            prior_student = User.create!(name: "Aaaaa")
-            @course.enroll_student(prior_student, enrollment_state: "active")
-            @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "pending", associated_user_id: prior_student.id)
-
-            get "show", params: { course_id: @course.id, id: @assignment.id }
-
-            aggregate_failures do
-              expect(assigns[:js_env][:SUBMISSION_ID]).to eq @student.id.to_s
-              expect(assigns[:js_env][:enrollment_state]).to eq :active
-            end
-          end
-
-          it "shows data for the observer when viewing their own enrollment" do
-            allow(CanvasSchema).to receive(:id_from_object) { |submission| submission.user_id.to_s }
-
-            @course.enroll_student(observer, enrollment_state: "active")
-
-            get "show", params: { course_id: @course.id, id: @assignment.id }
-
-            aggregate_failures do
-              expect(assigns[:js_env][:SUBMISSION_ID]).to eq observer.id.to_s
-              expect(assigns[:js_env][:enrollment_state]).to eq :active
-              expect(flash[:notice]).to be_nil
-            end
-          end
-
-          it "shows the old assignments page if this user is not observing any students" do
-            observer.observer_enrollments.first.update!(associated_user: nil)
-
-            get "show", params: { course_id: @course.id, id: @assignment.id }
-            expect(flash[:notice]).to match(/^No student is being observed.*return to the dashboard\.$/)
-            expect(assigns[:js_env]).not_to have_key(:SUBMISSION_ID)
-          end
-
-          it "sets js_env variables" do
-            get :show, params: { course_id: @course.id, id: @assignment.id }
-            expect(assigns[:js_env]).to have_key(:OBSERVER_OPTIONS)
-            expect(assigns[:js_env][:OBSERVER_OPTIONS][:OBSERVED_USERS_LIST].is_a?(Array)).to be true
-            expect(assigns[:js_env][:OBSERVER_OPTIONS][:CAN_ADD_OBSERVEE]).to be false
-          end
+        it "sets js_env variables" do
+          get :show, params: { course_id: @course.id, id: @assignment.id }
+          expect(assigns[:js_env]).to have_key(:OBSERVER_OPTIONS)
+          expect(assigns[:js_env][:OBSERVER_OPTIONS][:OBSERVED_USERS_LIST].is_a?(Array)).to be true
+          expect(assigns[:js_env][:OBSERVER_OPTIONS][:CAN_ADD_OBSERVEE]).to be false
         end
       end
     end
@@ -1535,11 +1533,6 @@ describe AssignmentsController do
           course.enable_feature!(:assignments_2_student)
           assignment.update!(submission_types: "online_upload")
           user_session(student)
-
-          # stub this call because for some reason the invocation in
-          # render_a2_student_view takes long enough that it causes
-          # requests to time out
-          allow(CanvasSchema).to receive(:resolve_type).and_return(Types::SubmissionType)
         end
 
         describe "CONTEXT_MODULE_ITEM" do
@@ -1961,6 +1954,7 @@ describe AssignmentsController do
         @course.root_account.save!
         @course.root_account.enable_feature! :quizzes_next
         @course.root_account.enable_feature! :newquizzes_on_quiz_page
+        @course.root_account.enable_feature! :instui_nav
       end
 
       it "sets active tab to quizzes for new quizzes" do
@@ -1973,6 +1967,30 @@ describe AssignmentsController do
         user_session(@teacher)
         get "new", params: { course_id: @course.id, quiz_lti: true }
         expect(assigns[:_crumbs]).to include(["Quizzes", "/courses/#{@course.id}/quizzes", {}])
+      end
+
+      it "sets crumb to Create Quiz for new quizzes" do
+        user_session(@teacher)
+        get "new", params: { course_id: @course.id, quiz_lti: true }
+        expect(assigns[:_crumbs]).to include(["Create Quiz", nil, {}])
+      end
+
+      it "sets crumb to Create Assignment for new assignments" do
+        user_session(@teacher)
+        get "new", params: { course_id: @course.id }
+        expect(assigns[:_crumbs]).to include(["Create New Assignment", nil, {}])
+      end
+
+      it "sets crumb to Edit Quiz for new quizzes" do
+        user_session(@teacher)
+        post "edit", params: { course_id: @course.id, id: @assignment.id, quiz_lti: true }
+        expect(assigns[:_crumbs]).to include(["Edit Quiz", nil, {}])
+      end
+
+      it "sets crumb to Edit Assignment for new assignments" do
+        user_session(@teacher)
+        post "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:_crumbs]).to include(["Edit Assignment", nil, {}])
       end
 
       it "sets active tab to quizzes for editing quizzes" do
@@ -2232,40 +2250,68 @@ describe AssignmentsController do
     end
 
     context "when the root account does not have a default tool url set" do
+      subject { get :edit, params: { course_id: course.id, id: @assignment.id } }
+
       let(:course) { @course }
       let(:root_account) { course.root_account }
 
       before do
         user_session(@teacher)
-        get :edit, params: { course_id: course.id, id: @assignment.id }
       end
 
-      it "js_env SUBMISSION_TYPE_SELECTION_TOOLS is correctly set for submission type tools" do
-        tool_settings = {
-          base_title: "my title",
-          external_url: "https://tool.launch.url",
-          selection_width: 750,
-          selection_height: 480,
-          icon_url: nil,
-        }
+      context "js_env SUBMISSION_TYPE_SELECTION_TOOLS" do
+        let(:tool_settings) do
+          {
+            base_title: "my title",
+            external_url: "https://tool.launch.url",
+            selection_width: 750,
+            selection_height: 480,
+            icon_url: nil,
+          }
+        end
 
-        @tool = factory_with_protected_attributes(@course.context_external_tools,
-                                                  url: "http://www.justanexamplenotarealwebsite.com/tool1",
-                                                  shared_secret: "test123",
-                                                  consumer_key: "test123",
-                                                  name: tool_settings[:base_title],
-                                                  settings: {
-                                                    submission_type_selection: tool_settings
-                                                  })
-        user_session(@teacher)
+        let(:domain) { "justanexamplenotarealwebsite.com" }
 
-        get :edit, params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0]).to include(
-          base_title: tool_settings[:base_title],
-          title: tool_settings[:base_title],
-          selection_width: tool_settings[:selection_width],
-          selection_height: tool_settings[:selection_height]
-        )
+        let(:tool) do
+          factory_with_protected_attributes(@course.context_external_tools,
+                                            domain:,
+                                            url: "http://www.justanexamplenotarealwebsite.com/tool1",
+                                            shared_secret: "test123",
+                                            consumer_key: "test123",
+                                            name: tool_settings[:base_title],
+                                            settings: {
+                                              submission_type_selection: tool_settings
+                                            })
+        end
+
+        it "is correctly set" do
+          tool
+          Setting.set("submission_type_selection_allowed_launch_domains", domain)
+          subject
+          expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0]).to include(
+            base_title: tool_settings[:base_title],
+            title: tool_settings[:base_title],
+            selection_width: tool_settings[:selection_width],
+            selection_height: tool_settings[:selection_height]
+          )
+        end
+
+        context "the tool includes a description propery" do
+          let(:description) { "This is a description" }
+          let(:tool_settings) do
+            res = super()
+            res[:description] = description
+            res
+          end
+
+          it "includes the launch points" do
+            tool
+            Setting.set("submission_type_selection_allowed_launch_domains", domain)
+            subject
+            expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0])
+              .to include(description:)
+          end
+        end
       end
 
       it 'does not set "DEFAULT_ASSIGNMENT_TOOL_URL"' do
@@ -2510,6 +2556,22 @@ describe AssignmentsController do
       end
     end
 
+    describe "js_env UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED" do
+      it "sets UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED in js_env as true if enabled" do
+        user_session(@teacher)
+        Account.site_admin.enable_feature!(:update_assignment_submission_type_launch_button)
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED]).to be(true)
+      end
+
+      it "sets UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED in js_env as false if disabled" do
+        user_session(@teacher)
+        Account.site_admin.disable_feature!(:update_assignment_submission_type_launch_button)
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED]).to be(false)
+      end
+    end
+
     describe "js_env HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED" do
       it "sets HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED in js_env as true if enabled" do
         user_session(@teacher)
@@ -2625,27 +2687,70 @@ describe AssignmentsController do
       user_session(@teacher)
       @assignment = @course.assignments.create(title: "Peer Review Assignment", workflow_state: "published")
       @assignment.update!(peer_reviews: true, submission_types: "text_entry")
-      @student2 = User.create!(name: "Sam")
-      @student3 = User.create!(name: "Samantha")
-      @student4 = User.create!(name: "Jim")
+      @student2 = User.create!(name: "Bob Travis")
+      @student3 = User.create!(name: "Samantha Lee")
+      @student4 = User.create!(name: "Jim Carey")
       @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
       @course.enroll_user(@student3, "StudentEnrollment", enrollment_state: "active")
       @course.enroll_user(@student4, "StudentEnrollment", enrollment_state: "active")
-    end
-
-    it "students instance variable contains students who match the search term parameter" do
-      get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Sa" }
-      expect(assigns[:students]).to include(have_attributes(name: "Sam"), have_attributes(name: "Samantha"))
-    end
-
-    it "students intance variable has no students when search term parameter does not match any student names" do
-      get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Hello World" }
-      expect(assigns[:students].length).to eq(0)
+      @assignment.assign_peer_review(@student2, @student3)
+      @assignment.assign_peer_review(@student3, @student4)
     end
 
     it "all visible students are listed in the assign peer review dropdown" do
       get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Sa" }
       expect(assigns[:students_dropdown_list].length).to eq(4)
+    end
+
+    context "when Search By Reviewer option is selected" do
+      it "students instance variable contains the assessors who match the search term" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Sa", selected_option: "reviewer" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+
+      it "students instance variable contains the assessors who match the search term parameter when search term has extraneous spaces" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: " Samantha   Lee ", selected_option: "reviewer" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+
+      it "students instance variable contains the assessors who match the search term parameter when search term has the users last name first" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Lee, Samantha", selected_option: "reviewer" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+
+      it "students instance variable has no assessors when search term does not match any assessor names" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Hello World", selected_option: "reviewer" }
+        expect(assigns[:students].length).to eq(0)
+      end
+    end
+
+    context "when Search By Peer Review option is selected" do
+      it "students instance variable contains assessor whose assigned assessments contains the student matching the search term" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Jim Carey", selected_option: "student" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+
+      it "students instance variable contains assessor whose assigned assessments contains the student matching the search term when search term has extraneous spaces" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: " Jim  Carey  ", selected_option: "student" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+
+      it "students instance variable contains assessor whose assigned assessments contains the student matching the search term when search term is last name first" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Carey, Jim", selected_option: "student" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+    end
+
+    context "when All option is selected" do
+      it "students instance variable contains both the assessor and asset that contain the search term" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "sa", selected_option: "all" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"), have_attributes(name: "Bob Travis"))
+      end
+
+      it "students instance variable contains the assessor when there are no peer reviews assigned to the assessor" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "ji", selected_option: "all" }
+        expect(assigns[:students]).to include(have_attributes(name: "Jim Carey"))
+      end
     end
   end
 end

@@ -252,6 +252,22 @@ class OutcomeResultsController < ApplicationController
     render json:
   end
 
+  # @API Set outcome ordering for LMGB
+  #
+  # Saves the ordering of outcomes in LMGB for a user
+  def outcome_order
+    outcome_position_map = JSON.parse(request.body.read)
+
+    # Validate outcomes belong to this course
+    course_outcome_ids = @outcomes.pluck(:id).to_set
+    outcome_position_map.each do |outcome|
+      reject! "Outcomes do not belong to Course" unless course_outcome_ids.include?(outcome["outcome_id"])
+    end
+
+    # Save Lmgb Outcome Ordering
+    UserLmgbOutcomeOrderings.set_lmgb_outcome_ordering(@context.root_account_id, @current_user.id, @context.id, outcome_position_map)
+  end
+
   # @API Get outcome result rollups
   #
   # Gets the outcome rollups for the users and outcomes in the specified
@@ -730,8 +746,19 @@ class OutcomeResultsController < ApplicationController
       reject! "can only include id's of outcomes in the outcome context" if @outcomes.count != outcome_ids.count
     else
       outcome_group_ids.each_slice(100) do |outcome_group_ids_slice|
-        @outcome_links += ContentTag.learning_outcome_links.active.where(associated_asset_id: outcome_group_ids_slice)
+        @outcome_links += ContentTag.learning_outcome_links.active
+                                    .where(associated_asset_id: outcome_group_ids_slice)
+                                    .joins("LEFT OUTER JOIN #{UserLmgbOutcomeOrderings.quoted_table_name} as u
+                                              ON u.learning_outcome_id = content_tags.content_id
+                                              AND u.user_id = #{@current_user.id}
+                                              AND u.course_id = #{@context.id}")
+                                    .select("#{ContentTag.quoted_table_name}.*, u.position")
       end
+
+      # Sort outcomes by lmgb_position
+      # If there is no lmgb_position for an outcome, then place it at the end
+      @outcome_links.sort_by! { |link| link[:position] || link[:id] }
+
       associations = [:learning_outcome_content]
       if Api.value_to_array(params[:include]).include? "outcome_paths"
         associations << { associated_asset: :learning_outcome_group }

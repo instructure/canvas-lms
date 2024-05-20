@@ -18,7 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {each, extend} from 'lodash'
 import Backbone from '@canvas/backbone'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import PublishIconView from '@canvas/publish-icon-view'
@@ -33,6 +33,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
+import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 
 const I18n = useI18nScope('quizzes.index')
 
@@ -61,6 +62,9 @@ export default class ItemView extends Backbone.View {
       'click .duplicate-failed-cancel': 'onDuplicateOrImportFailedCancel',
       'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel',
       'click .migrate-failed-cancel': 'onDuplicateOrImportFailedCancel',
+      'click .alignment-clone-failed-retry': 'onAlignmentCloneFailedRetry',
+      'click .alignment-clone-failed-cancel': 'onDuplicateOrImportFailedCancel',
+      'click .assign-to-link': 'onAssign',
     }
 
     this.prototype.messages = {
@@ -169,6 +173,44 @@ export default class ItemView extends Backbone.View {
     }
   }
 
+  renderItemAssignToTray(open, returnFocusTo, itemProps) {
+    ReactDOM.render(
+      <ItemAssignToTray
+        open={open}
+        onClose={() => {
+          ReactDOM.unmountComponentAtNode(document.getElementById('assign-to-mount-point'))
+        }}
+        onDismiss={() => {
+          this.renderItemAssignToTray(false, returnFocusTo, itemProps)
+          returnFocusTo.focus()
+        }}
+        itemType="assignment"
+        locale={ENV.LOCALE || 'en'}
+        timezone={ENV.TIMEZONE || 'UTC'}
+        {...itemProps}
+      />,
+      document.getElementById('assign-to-mount-point')
+    )
+  }
+
+  onAssign(e) {
+    e.preventDefault()
+    const returnFocusTo = $(e.target).closest('ul').prev('.al-trigger')
+
+    const courseId = e.target.getAttribute('data-quiz-context-id')
+    const itemName = e.target.getAttribute('data-quiz-name')
+    const itemContentId = e.target.getAttribute('data-quiz-id')
+    const iconType = e.target.getAttribute('data-is-lti-quiz') ? 'lti-quiz' : 'quiz'
+    const pointsPossible = this.model.get('points_possible')
+    this.renderItemAssignToTray(true, returnFocusTo, {
+      courseId,
+      itemName,
+      itemContentId,
+      pointsPossible,
+      iconType,
+    })
+  }
+
   canDelete() {
     return this.model.get('permissions').delete
   }
@@ -269,7 +311,7 @@ export default class ItemView extends Backbone.View {
   }
 
   canDuplicate() {
-    const userIsAdmin = _.includes(ENV.current_user_roles, 'admin')
+    const userIsAdmin = ENV.current_user_is_admin
     const canDuplicate = this.model.get('can_duplicate')
     return (userIsAdmin || this.canCreate()) && canDuplicate
   }
@@ -314,6 +356,20 @@ export default class ItemView extends Backbone.View {
       })
   }
 
+  onAlignmentCloneFailedRetry(e) {
+    e.preventDefault()
+    const button = $(e.target)
+    button.prop('disabled', true)
+    this.model
+      .alignment_clone_failed(response => {
+        this.addQuizToList(response)
+        this.delete({silent: true})
+      })
+      .always(() => {
+        button.prop('disabled', false)
+      })
+  }
+
   onMigrateFailedRetry(e) {
     e.preventDefault()
     const button = $(e.target)
@@ -329,9 +385,9 @@ export default class ItemView extends Backbone.View {
   }
 
   toJSON() {
-    const base = _.extend(this.model.toJSON(), this.options)
+    const base = extend(this.model.toJSON(), this.options)
     base.quiz_menu_tools = ENV.quiz_menu_tools
-    _.each(base.quiz_menu_tools, tool => {
+    each(base.quiz_menu_tools, tool => {
       tool.url = tool.base_url + `&quizzes[]=${this.model.get('id')}`
     })
 
@@ -349,6 +405,8 @@ export default class ItemView extends Backbone.View {
     base.isDuplicating = this.model.get('workflow_state') === 'duplicating'
     base.failedToDuplicate = this.model.get('workflow_state') === 'failed_to_duplicate'
     base.isMigrating = this.model.get('workflow_state') === 'migrating'
+    base.isImporting = this.model.get('workflow_state') === 'importing'
+    base.failedToImport = this.model.get('workflow_state') === 'fail_to_import'
     base.isMasterCourseChildContent = this.model.isMasterCourseChildContent()
     base.failedToMigrate = this.model.get('workflow_state') === 'failed_to_migrate'
     base.showAvailability =
@@ -377,6 +435,7 @@ export default class ItemView extends Backbone.View {
       this.model.get('restricted_by_master_course')
 
     base.courseId = ENV.context_asset_string.split('_')[1]
+    base.differentiatedModulesFlag = ENV.FEATURES?.differentiated_modules
     base.showSpeedGraderLinkFlag = ENV.FLAGS?.show_additional_speed_grader_link
     base.showSpeedGraderLink = ENV.SHOW_SPEED_GRADER_LINK
 

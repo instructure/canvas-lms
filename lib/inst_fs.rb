@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module InstFS
+  LONG_JWT_EXPIRATION = 10.minutes
+  SHORT_JWT_EXPIRATION = 5.minutes
   class << self
     def enabled?
       # true if plugin is enabled AND all settings values are set
@@ -56,7 +58,7 @@ module InstFS
     end
 
     def bearer_token(options)
-      expires_in = options[:expires_in] || Setting.get("instfs.session_token.expiration_minutes", "5").to_i.minutes
+      expires_in = options[:expires_in] || 5.minutes
       claims = {
         iat: Time.now.utc.to_i,
         user_id: options[:user]&.global_id&.to_s
@@ -184,8 +186,11 @@ module InstFS
         retries ||= 0
         response = CanvasHttp.post(url, form_data: data, multipart: true, streaming: true)
       rescue Timeout::Error
-        retry if (retries += 1) < 2
-        raise InstFS::ServiceError, "unable to communicate with instfs"
+        if file_object.respond_to?(:rewind) && (retries += 1) < 2
+          file_object.rewind
+          retry
+        end
+        raise InstFS::ServiceError, "timed out communicating with instfs"
       rescue CanvasHttp::CircuitBreakerError
         raise InstFS::ServiceError, "unable to communicate with instfs"
       end
@@ -379,8 +384,8 @@ module InstFS
     end
 
     def access_jwt(resource, options = {})
-      expires_in = options[:expires_in] || Setting.get("instfs.access_jwt.expiration_hours", "24").to_i.hours
-      iat = if (expires_in >= 1.hour.to_i) && Setting.get("instfs.access_jwt.use_consistent_iat", "true") == "true"
+      expires_in = options[:expires_in] || 1.day
+      iat = if expires_in >= 1.hour.to_i
               consistent_iat(resource, expires_in)
             else
               Time.now.utc.to_i
@@ -406,7 +411,6 @@ module InstFS
     end
 
     def upload_jwt(user:, acting_as:, access_token:, root_account:, capture_url:, capture_params:)
-      expires_in = Setting.get("instfs.upload_jwt.expiration_minutes", "10").to_i.minutes
       claims = {
         iat: Time.now.utc.to_i,
         user_id: user.global_id.to_s,
@@ -418,66 +422,60 @@ module InstFS
         claims[:acting_as_user_id] = acting_as.global_id.to_s
       end
       amend_claims_for_access_token(claims, access_token, root_account)
-      service_jwt(claims, expires_in)
+      service_jwt(claims, LONG_JWT_EXPIRATION)
     end
 
     def direct_upload_jwt
-      expires_in = Setting.get("instfs.upload_jwt.expiration_minutes", "10").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
                     user_id: nil,
                     host: "canvas",
                     resource: "/files",
                   },
-                  expires_in)
+                  LONG_JWT_EXPIRATION)
     end
 
     def session_jwt(user, host)
-      expires_in = Setting.get("instfs.session_jwt.expiration_minutes", "5").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
                     user_id: user.global_id&.to_s,
                     host:,
                     resource: "/session/ensure"
                   },
-                  expires_in)
+                  SHORT_JWT_EXPIRATION)
     end
 
     def logout_jwt(user)
-      expires_in = Setting.get("instfs.logout_jwt.expiration_minutes", "5").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
                     user_id: user.global_id&.to_s,
                     resource: "/session"
                   },
-                  expires_in)
+                  SHORT_JWT_EXPIRATION)
     end
 
     def export_references_jwt
-      expires_in = Setting.get("instfs.logout_jwt.expiration_minutes", "5").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
                     resource: "/references"
                   },
-                  expires_in)
+                  SHORT_JWT_EXPIRATION)
     end
 
     def duplicate_file_jwt(instfs_uuid)
-      expires_in = Setting.get("instfs.duplicate_file_jwt.expiration_minutes", "5").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
                     resource: "/files/#{instfs_uuid}/duplicate"
                   },
-                  expires_in)
+                  SHORT_JWT_EXPIRATION)
     end
 
     def delete_file_jwt(instfs_uuid)
-      expires_in = Setting.get("instfs.delete_file_jwt.expiration_minutes", "5").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
                     resource: "/files/#{instfs_uuid}"
                   },
-                  expires_in)
+                  SHORT_JWT_EXPIRATION)
     end
 
     def parse_original_url(url)

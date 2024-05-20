@@ -95,8 +95,8 @@ function waitForMenu(input) {
   })
 }
 
-function clickAndWaitForMenu(input) {
-  userEvent.click(input, {bubbles: true, cancelable: true})
+const clickAndWaitForMenu = async input => {
+  await userEvent.click(input, {bubbles: true, cancelable: true})
   return waitForMenu(input)
 }
 
@@ -189,7 +189,7 @@ describe('GradeSummary::GradeSelect', () => {
     it('does not call the onSelect prop when the input was changed', async () => {
       const onSelect = jest.fn()
       const {input} = await mountAndClick({...props, onSelect})
-      userEvent.type(input, '7.9')
+      await userEvent.type(input, '7.9')
       await clickOffAndWaitForMenu(input)
       expect(onSelect).not.toHaveBeenCalled()
     })
@@ -205,7 +205,7 @@ describe('GradeSummary::GradeSelect', () => {
     it('resets the input to the selected option', async () => {
       props.grades.robin.selected = true
       const {input} = await mountAndClick(props)
-      userEvent.type(input, 'gibberish')
+      await userEvent.type(input, 'gibberish')
       await clickOffAndWaitForMenu(input)
       expect(input.value).toBe(labelForGrader('robin'))
     })
@@ -223,7 +223,7 @@ describe('GradeSummary::GradeSelect', () => {
       }
 
       const {input} = await mountAndClick(props)
-      userEvent.type(input, 'gibberish')
+      await userEvent.type(input, 'gibberish')
       await clickOffAndWaitForMenu(input)
       expect(input.value).toBe(customLabel(score))
     })
@@ -237,14 +237,14 @@ describe('GradeSummary::GradeSelect', () => {
 
     it('resets the input to the "no selection" option when some text has been entered', async () => {
       const {input} = await mountAndClick(props)
-      userEvent.type(input, '10')
+      await userEvent.type(input, '10')
       await clickOffAndWaitForMenu(input)
       expect(input.value).toBe(NO_SELECTION_LABEL)
     })
 
     it('restores the full list of options for subsequent selection', async () => {
       const {input} = await mountAndClick(props)
-      userEvent.type(input, '7.9') // this is Mr. Feeny's grade
+      await userEvent.type(input, '{selectall}{backspace}7.9') // this is Mr. Feeny's grade
       await clickOffAndWaitForMenu(input)
       const menu = await clickAndWaitForMenu(input)
       const labels = optionsInList(menu).map(opt => opt.textContent.trim())
@@ -272,7 +272,7 @@ describe('GradeSummary::GradeSelect', () => {
       const onSelect = jest.fn()
       const {input, menu} = await mountAndClick({...props, onSelect})
       const opt = findOption(menu, labelForGrader('frizz'))
-      userEvent.click(opt)
+      await userEvent.click(opt)
       await waitForMenuClosed(input)
       expect(onSelect).toHaveBeenCalledTimes(1)
     })
@@ -281,7 +281,7 @@ describe('GradeSummary::GradeSelect', () => {
       const onSelect = jest.fn()
       const {input, menu} = await mountAndClick({...props, onSelect})
       const opt = findOption(menu, labelForGrader('frizz'))
-      userEvent.click(opt)
+      await userEvent.click(opt)
       await waitForMenuClosed(input)
       expect(onSelect).toHaveBeenCalledWith(props.grades.frizz)
     })
@@ -291,7 +291,7 @@ describe('GradeSummary::GradeSelect', () => {
       const onSelect = jest.fn()
       const {input, menu} = await mountAndClick({...props, onSelect})
       const opt = findOption(menu, labelForGrader('robin'))
-      userEvent.click(opt)
+      await userEvent.click(opt)
       await waitForMenuClosed(input)
       expect(onSelect).not.toHaveBeenCalled()
     })
@@ -340,7 +340,7 @@ describe('GradeSummary::GradeSelect', () => {
         const onSelect = jest.fn()
         const {input, menu} = await mountAndClick({...props, onSelect})
         const opt = findOption(menu, customLabel(score))
-        userEvent.click(opt)
+        await userEvent.click(opt)
         await waitForMenuClosed(input)
         expect(onSelect).not.toHaveBeenCalled()
       })
@@ -349,7 +349,7 @@ describe('GradeSummary::GradeSelect', () => {
         const onSelect = jest.fn()
         const {input, menu} = await mountAndClick({...props, onSelect})
         const opt = findOption(menu, customLabel(score))
-        userEvent.click(opt)
+        await userEvent.click(opt)
         await waitForMenuClosed(input)
         expect(onSelect).toHaveBeenCalledTimes(1)
       })
@@ -358,7 +358,7 @@ describe('GradeSummary::GradeSelect', () => {
         const onSelect = jest.fn()
         const {input, menu} = await mountAndClick({...props, onSelect})
         const opt = findOption(menu, customLabel(score))
-        userEvent.click(opt)
+        await userEvent.click(opt)
         await waitForMenuClosed(input)
         expect(onSelect).toHaveBeenCalledWith(props.grades.teach)
       })
@@ -405,7 +405,7 @@ describe('GradeSummary::GradeSelect', () => {
       const onSelect = jest.fn()
       const {input, menu} = await mountAndClick({...props, onSelect, finalGrader: null})
       const opt = findOption(menu, labelForGrader('robin'))
-      userEvent.click(opt)
+      await userEvent.click(opt)
       await waitForMenuClosed(input)
       expect(onSelect).toHaveBeenCalledWith(props.grades.robin)
     })
@@ -453,7 +453,7 @@ describe('GradeSummary::GradeSelect', () => {
       const onSelect = jest.fn()
       const {input, menu} = await mountAndClick({...props, disabledCustomGrade: true, onSelect})
       const opt = findOption(menu, labelForGrader('robin'))
-      userEvent.click(opt)
+      await userEvent.click(opt)
       await waitForMenuClosed(input)
       expect(onSelect).toHaveBeenCalledWith(props.grades.robin)
     })

@@ -18,7 +18,7 @@
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
-import {GradingScheme} from '@canvas/grading_scheme/gradingSchemeApiModel'
+import type {GradingScheme} from '../../gradingSchemeApiModel'
 import {Heading} from '@instructure/ui-heading'
 import {GradingSchemeView} from './view/GradingSchemeView'
 import {CloseButton, Button} from '@instructure/ui-buttons'
@@ -26,34 +26,41 @@ import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('GradingSchemeViewModal')
 
-type Props = {
+export type GradingSchemeViewModalProps = {
   open: boolean
   gradingScheme?: GradingScheme
+  isCourseDefault?: boolean
+  viewingFromAccountManagementPage?: boolean
   handleClose: () => void
-  handleGradingSchemeDelete: (gradingSchemeId: string) => void
+  openDeleteModal: (gradingScheme: GradingScheme) => void
   editGradingScheme: (gradingSchemeId: string) => void
-  pointsBasedGradingSchemesEnabled: boolean
   canManageScheme: (gradingScheme: GradingScheme) => boolean
 }
 const GradingSchemeViewModal = ({
   open,
   gradingScheme,
+  isCourseDefault = false,
+  viewingFromAccountManagementPage = false,
   handleClose,
-  handleGradingSchemeDelete,
+  openDeleteModal,
   editGradingScheme,
-  pointsBasedGradingSchemesEnabled,
   canManageScheme,
-}: Props) => {
+}: GradingSchemeViewModalProps) => {
   if (!gradingScheme) {
     return <></>
   }
+  const archivedGradingSchemesDisableEdit =
+    !viewingFromAccountManagementPage && gradingScheme.context_type === 'Account'
+  const disableEditSchemeData =
+    archivedGradingSchemesDisableEdit || gradingScheme.assessed_assignment || isCourseDefault
   return (
     <Modal
       as="form"
       open={open}
       onDismiss={handleClose}
-      label={I18n.t('Edit Grading Scheme')}
+      label={gradingScheme.title}
       size="small"
+      data-testid="grading-scheme-view-modal"
     >
       <Modal.Header>
         <CloseButton
@@ -61,26 +68,25 @@ const GradingSchemeViewModal = ({
           placement="end"
           offset="small"
           onClick={handleClose}
+          data-testid="grading-scheme-view-modal-close-button"
         />
-        <Heading>{gradingScheme.title}</Heading>
+        <Heading data-testid="grading-scheme-view-modal-title">{gradingScheme.title}</Heading>
       </Modal.Header>
       <Modal.Body>
         <GradingSchemeView
           gradingScheme={gradingScheme}
-          pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
           archivedGradingSchemesEnabled={true}
-          disableDelete={!canManageScheme(gradingScheme)}
-          disableEdit={!canManageScheme(gradingScheme)}
-          onDeleteRequested={() => handleGradingSchemeDelete(gradingScheme.id)}
+          disableDelete={!canManageScheme(gradingScheme) || (disableEditSchemeData ?? false)}
+          disableEdit={!canManageScheme(gradingScheme) || (disableEditSchemeData ?? false)}
+          archivedGradingSchemesDisableEdit={archivedGradingSchemesDisableEdit}
+          onDeleteRequested={() => openDeleteModal(gradingScheme)}
           onEditRequested={() => editGradingScheme(gradingScheme.id)}
         />
       </Modal.Body>
       <Modal.Footer>
         <Flex justifyItems="end">
           <Flex.Item>
-            <Button onClick={handleClose} margin="0 x-small 0 x-small">
-              {I18n.t('Cancel')}
-            </Button>
+            <Button onClick={handleClose}>{I18n.t('Cancel')}</Button>
           </Flex.Item>
         </Flex>
       </Modal.Footer>

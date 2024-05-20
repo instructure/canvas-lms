@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Children, useEffect, useState} from 'react'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Select} from '@instructure/ui-select'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'

@@ -48,24 +48,54 @@ export type ContentMigrationItem = {
   progress_url: string
   settings: ContentMigrationItemSettings
   attachment?: ContentMigrationItemAttachment
+  completion?: number
   workflow_state: ContentMigrationWorkflowState
   migration_issues_count: number
   migration_issues_url: string
   created_at: string
 }
 
+export type AdjustDates = {
+  enabled: boolean
+  operation: 'shift_dates' | 'remove_dates'
+}
+
+export type DaySub = {
+  to: number
+  from: number
+  id: number
+}
+
+export type DateShifts = {
+  substitutions: {}
+  old_start_date: string | false
+  new_start_date: string | false
+  old_end_date: string | false
+  new_end_date: string | false
+  day_substitutions: DaySub[]
+}
+
+export type DateAdjustmentConfig = {
+  adjust_dates: AdjustDates
+  date_shift_options: DateShifts
+}
+
+export type submitMigrationFormData = {
+  errored?: boolean
+  adjust_dates: AdjustDates
+  selective_import: boolean
+  date_shift_options: DateShifts
+  settings: {[key: string]: any}
+  daySubCollection?: object
+  pre_attachment?: {
+    name: string
+    size: number
+    no_redirect: boolean
+  }
+}
+
 export type onSubmitMigrationFormCallback = (
-  formData: {
-    selective_import: boolean
-    date_shift_options: boolean
-    settings: {[key: string]: any}
-    daySubCollection?: object
-    pre_attachment?: {
-      name: string
-      size: number
-      no_redirect: boolean
-    }
-  },
+  formData: submitMigrationFormData,
   preAttachmentFile?: File
 ) => void
 

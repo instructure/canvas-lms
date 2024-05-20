@@ -21,15 +21,19 @@ require_relative "../spec_helper"
 require_relative "../../config/initializers/canvas_http"
 
 describe "CanvasHttp Configuration" do
+  before do
+    CanvasHttp.blocked_ip_ranges = []
+  end
+
   after do
     CanvasHttpInitializer.configure_circuit_breaker!
+    CanvasHttp.blocked_ip_ranges = nil
   end
 
   it "has a circuit breaker mechamism" do
     CanvasHttp::CircuitBreaker.redis = -> { Canvas.redis }
-    CanvasHttp::CircuitBreaker.threshold = ->(_) { 0 }
-    CanvasHttp::CircuitBreaker.interval = ->(_) { 1 }
-    Setting.set("http_blocked_ip_ranges", "")
+    stub_const("CanvasHttp::CircuitBreaker::THRESHOLD", 0)
+    stub_const("CanvasHttp::CircuitBreaker::INTERVAL", 1)
     allow(CanvasHttp).to receive(:connection_for_uri).and_raise(Net::OpenTimeout)
     begin
       CanvasHttp.get("some.url.com")

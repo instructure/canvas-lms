@@ -100,9 +100,7 @@ export default class GradesDisplay extends Component {
   renderError = () => {
     if (this.props.loadingError) {
       return (
-        <ErrorAlert error={this.props.loadingError}>
-          {I18n.t('Error loading grades')}
-        </ErrorAlert>
+        <ErrorAlert error={this.props.loadingError}>{I18n.t('Error loading grades')}</ErrorAlert>
       )
     }
   }

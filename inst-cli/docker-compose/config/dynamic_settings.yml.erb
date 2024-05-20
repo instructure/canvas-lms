@@ -13,12 +13,6 @@ development:
       address-book:
         app-host: "http://address-book.docker"
         secret: "opensesame"
-      live_events.yml: |-
-        aws_endpoint: http://quiz-api-kinesis.<%= Inst::Config.domain %>:4567
-        kinesis_stream_name: canvas-live-events
-        aws_access_key_id: fake-key-id
-        aws_secret_access_key_dec: toomanysecrets
-        aws_region: us-east-1
       live-events-subscription-service:
         app-host: "http://les.docker"
         sad-panda: null
@@ -47,6 +41,10 @@ development:
       ios-pandata-secret: teamrocketblastoffatthespeedoflight
       android-pandata-key: ANDROID_pandata_key
       android-pandata-secret: surrendernoworpreparetofight
+  # Key/value pairs in the store tree can have overrides
+  # persisted in Settings. They are included by default but
+  # can be ignored by passing 'ignore_fallback_overrides: true'
+  # to your DynamicSettings.find call.
   store:
     canvas:
       lti-keys:
@@ -68,8 +66,12 @@ development:
         oauth_client_id: <%= ENV['CANVAS_CLIENT_ID'] %>
         prod_oauth_client_id: <%= ENV['CANVAS_CLIENT_ID'] %>
         nonprod_oauth_client_id: <%= ENV['CANVAS_CLIENT_ID'] %>
-      # api_gateway_enabled: 'true'
-      # api_gateway_uri: 'http://inst-gateway.docker/graphql'
+      live_events.yml: |-
+        aws_endpoint: http://quiz-api-kinesis.<%= Inst::Config.domain %>:4567
+        kinesis_stream_name: canvas-live-events
+        aws_access_key_id: fake-key-id
+        aws_secret_access_key_dec: toomanysecrets
+        aws_region: us-east-1
       auditors.yml: |
         write_paths:
           - active_record

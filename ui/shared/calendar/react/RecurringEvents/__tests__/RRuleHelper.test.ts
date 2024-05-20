@@ -17,7 +17,7 @@
  */
 
 import RRuleHelper, {
-  RRuleHelperSpec,
+  type RRuleHelperSpec,
   RruleValidationError,
   ISODateToIcalDate,
   icalDateToISODate,

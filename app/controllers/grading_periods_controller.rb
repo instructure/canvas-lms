@@ -205,7 +205,7 @@ class GradingPeriodsController < ApplicationController
   def batch_update
     if authorized_action(@context, @current_user, :manage_grades)
       SubmissionLifecycleManager.with_executing_user(@current_user) do
-        method("#{@context.class.to_s.downcase}_batch_update").call
+        method(:"#{@context.class.to_s.downcase}_batch_update").call
       end
     end
   end

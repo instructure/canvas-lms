@@ -19,7 +19,7 @@
 import {useState, useCallback} from 'react'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {GradingSchemeTemplate, GradingScheme} from '../../gradingSchemeApiModel'
+import type {GradingSchemeTemplate, GradingScheme} from '../../gradingSchemeApiModel'
 import {ApiCallStatus} from './ApiCallStatus'
 import {buildContextPath} from './buildContextPath'
 
@@ -29,9 +29,9 @@ export const useGradingSchemeCreate = (): {
     contextId: string,
     gradingSchemeTemplate: GradingSchemeTemplate
   ) => Promise<GradingScheme>
-  createGradingSchemeStatus: string
+  createGradingSchemeStatus: ApiCallStatus
 } => {
-  const [createGradingSchemeStatus, setCreateGradingSchemeStatus] = useState(
+  const [createGradingSchemeStatus, setCreateGradingSchemeStatus] = useState<ApiCallStatus>(
     ApiCallStatus.NOT_STARTED
   )
 

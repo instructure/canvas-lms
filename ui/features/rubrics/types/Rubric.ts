@@ -23,3 +23,18 @@ export type RubricQueryResponse = {
     nodes: Rubric[]
   }
 }
+
+export type DeleteRubricQueryResponse = Pick<
+  Rubric,
+  'id' | 'title' | 'criteria' | 'hidePoints' | 'pointsPossible'
+>
+
+export type DuplicateRubricQueryResponse = Pick<
+  Rubric,
+  'id' | 'title' | 'criteria' | 'hidePoints' | 'pointsPossible'
+>
+
+export type archiveRubricResponse = {
+  _id: string
+  workflowState: string
+}

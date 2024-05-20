@@ -17,7 +17,7 @@
  */
 
 import {AssignmentOverride} from '../../../graphql/AssignmentOverride'
-import DateHelper from '../../../../../shared/datetime/dateHelper'
+import DateHelper from '@canvas/datetime/dateHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'

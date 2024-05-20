@@ -18,7 +18,8 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Pill, PillProps} from '@instructure/ui-pill'
+import {Pill} from '@instructure/ui-pill'
+import type {PillProps} from '@instructure/ui-pill'
 
 export const renderFrontPagePill = (el: HTMLElement, props?: PillProps) => {
   const frontPageContainer = el.querySelector('.front-page')

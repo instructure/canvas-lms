@@ -20,7 +20,6 @@ import {shallow} from 'enzyme'
 import LoadingPastIndicator from '../index'
 
 jest.mock('../../../utilities/scrollUtils')
-import {animateSlideDown} from '../../../utilities/scrollUtils' // eslint-disable-line import/first
 
 it('renders very little', () => {
   const wrapper = shallow(<LoadingPastIndicator />)

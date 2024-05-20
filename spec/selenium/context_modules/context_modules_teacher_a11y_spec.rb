@@ -92,6 +92,7 @@ describe "context modules" do
             close_button = div.find_element(:css, ".ui-dialog-titlebar-close.ui-corner-all")
           end
         end
+
         check_element_has_focus(close_button)
       end
     end
@@ -121,8 +122,7 @@ describe "context modules" do
     end
 
     it "retains focus when deleting prerequisites with different modules" do
-      skip("LF-960 Waiting for updates to a11y issues found for new tray")
-      Account.site_admin.enable_feature! :differentiated_modules
+      differentiated_modules_on
       modules = create_modules(3)
       go_to_modules
       manage_module_button(modules[2]).click
@@ -138,7 +138,7 @@ describe "context modules" do
       check_element_has_focus(remove_prerequisite_button[0])
       click_remove_prerequisite_button(0)
 
-      check_element_has_focus(add_prerequisite_button)
+      check_element_has_focus(add_prerequisites_button)
     end
 
     it "adds a title attribute to the text header" do
@@ -315,7 +315,7 @@ describe "context modules" do
 
     context "Specific Keyboard Accessibility with differentiated modules", priority: "1" do
       before :once do
-        Account.site_admin.enable_feature! :differentiated_modules
+        differentiated_modules_on
         modules = create_modules(2, true)
         modules[0].add_item({ id: @assignment.id, type: "assignment" })
         modules[0].add_item({ id: @assignment2.id, type: "assignment" })

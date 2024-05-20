@@ -1081,10 +1081,10 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user1@example.com,active"
     )
     user1 = Pseudonym.by_unique_id("user1").first.user
-    expect([u1, u2]).not_to be_include(user1)
+    expect([u1, u2]).not_to include(user1)
     expect(user1.communication_channels.length).to eq 1
     expect(user1.email).to eq "user1@example.com"
-    expect([cc1, cc2]).not_to be_include(user1.email_channel)
+    expect([cc1, cc2]).not_to include(user1.email_channel)
     expect(Message.where(communication_channel_id: user1.email_channel, notification_id: notification).first).to be_nil
   end
 

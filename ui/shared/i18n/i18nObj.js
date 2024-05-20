@@ -25,7 +25,7 @@ import {
   normalizeDefault,
 } from '@instructure/i18nliner-runtime'
 import logEagerLookupViolations from './logEagerLookupViolations'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 
 activateI18nliner(I18n, {
   // this is what we use elsewhere in canvas, so make i18nliner use it too

@@ -43,4 +43,34 @@ describe AccountReport do
       expect(AccountReportRow.where(id: a_row_2.id).count).to eq(0)
     end
   end
+
+  describe "stopping parallelized reports" do
+    before :once do
+      @account = account_model
+      @report = AccountReport.create!(account: @account, user: account_admin_user, workflow_state: "running")
+      @runners = [@report.account_report_runners.create!(workflow_state: "completed"),
+                  @report.account_report_runners.create!(workflow_state: "running"),
+                  @report.account_report_runners.create!(workflow_state: "created")]
+    end
+
+    it "aborts runners when errored" do
+      @report.mark_as_errored
+      expect(@runners.map { |r| r.reload.workflow_state }).to eq %w[completed aborted aborted]
+    end
+
+    it "aborts runners when deleted" do
+      @report.destroy
+      expect(@runners.map { |r| r.reload.workflow_state }).to eq %w[completed aborted aborted]
+    end
+
+    it "aborts runners when aborted" do
+      @report.update! workflow_state: "aborted"
+      expect(@runners.map { |r| r.reload.workflow_state }).to eq %w[completed aborted aborted]
+    end
+
+    it "leaves runners alone when completed" do
+      @report.update! workflow_state: "completed"
+      expect(@runners.map { |r| r.reload.workflow_state }).to eq %w[completed running created]
+    end
+  end
 end

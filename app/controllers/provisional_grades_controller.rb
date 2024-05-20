@@ -260,9 +260,11 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
       end
 
       # We still don't have a provisional grade.  Let's pick up the first blank provisional grade
-      # for this submission if it exists.  This will happen as a result of commenting on a
-      # submission without grading it
-      selected_provisional_grade ||= submission.provisional_grades.detect { |pg| pg.graded_at.nil? }
+      # for this submission if it exists and there are not graded provisional grades.  This will
+      # happen as a result of commenting on a submission without grading it
+      if !selected_provisional_grade && submission.provisional_grades.graded.none?
+        selected_provisional_grade = submission.provisional_grades.detect { |pg| pg.graded_at.nil? }
+      end
 
       unless selected_provisional_grade
         return render json: { message: "All submissions must have a selected grade" },

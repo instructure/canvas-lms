@@ -21,24 +21,25 @@
 # from conditional_release and workflow_state kind of sucks anyway
 module ConditionalRelease
   module Deletion
-    extend ActiveSupport::Concern
+    def self.included(klass)
+      super
 
-    included do
-      scope :active, -> { where(deleted_at: nil) }
+      klass.scope :active, -> { where(deleted_at: nil) }
 
-      alias_method :destroy_permanently!, :destroy
-      def destroy
-        return true if deleted_at.present?
+      klass.alias_method :destroy_permanently!, :destroy
+    end
 
-        self.deleted_at = Time.now.utc
-        run_callbacks(:destroy) { save(validate: false) }
-      end
+    def destroy
+      return true if deleted_at.present?
 
-      def restore
-        self.deleted_at = nil
-        save!
-        true
-      end
+      self.deleted_at = Time.now.utc
+      run_callbacks(:destroy) { save(validate: false) }
+    end
+
+    def restore
+      self.deleted_at = nil
+      save!
+      true
     end
   end
 end

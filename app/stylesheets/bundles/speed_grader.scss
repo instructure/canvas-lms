@@ -318,7 +318,7 @@ $icon-size: 1.4rem;
   bottom: 0;
   #{direction(left)}: 0;
   background: #bbb url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%;
-  cursor: pointer;
+  cursor: ew-resize;
   width: 7px;
   border-#{direction(right)}: 1px solid #838383;
   z-index: 2;
@@ -411,16 +411,13 @@ $icon-size: 1.4rem;
     display: none;
   }
 
-  .submission-status-pill {
-    display: none;
-  }
-
-  .submission-late-pill,
-  .submission-missing-pill,
+  .submission-status-pill,
   .submission-excused-pill,
-  .submission-extended-pill {
-    display: inline;
+  [class*='submission-custom-grade-status-pill-'] {
     font-size: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    flex: 1;
     padding-left: 10px;
     padding-right: 10px;
   }
@@ -986,6 +983,52 @@ figure {
   margin: 0;
 }
 
+.transparent-bg {
+  background: transparent;
+}
+
+.borderless {
+  border: none;
+}
+
+#new-studio-media-indicator {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 2px 8px;
+  gap: 6px;
+  background: #DDECF5;
+  border-radius: 4px;
+  flex: 0 0;
+  margin-right: 4px;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.speech-recognition {
+  display: flex;
+  align-items: center;
+}
+
+#new-studio-media-indicator-wrapper {
+  display: flex;
+  align-items: center;
+  button {
+    flex: 1 0;
+    width: 37px;
+  }
+}
+
+.m-left-auto {
+  margin-#{direction(left)}: auto;
+}
+
+.r-margin-0 {
+  margin-#{direction(right)}: 0 !important;
+}
+
 // even though we show no headers in speed grader, we want the
 // masquerade bar to always show if someone is masquerading
 // (#masquerade_bar is set to 'display: none !important' for
@@ -995,4 +1038,12 @@ body.no-headers {
   #masquerade_bar {
     display: flex !important
   }
+}
+
+#enhanced-rubric-assessment-tray {
+  margin-top: 50px;
+}
+
+#enhanced-rubric-assessment-tray div[class*="-tray__content"] {
+  min-height: calc(100vh - 50px) !important;
 }

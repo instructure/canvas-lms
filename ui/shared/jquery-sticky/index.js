@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'underscore'
+import {debounce, reject} from 'lodash'
 import $ from 'jquery'
 
 export default class Sticky {
@@ -26,7 +26,7 @@ export default class Sticky {
   static $container = $(window)
 
   static initialize() {
-    this.$container.on('scroll', _.debounce(this.checkInstances, 10))
+    this.$container.on('scroll', debounce(this.checkInstances, 10))
     this.initialized = true
   }
 
@@ -38,7 +38,7 @@ export default class Sticky {
 
   static removeInstance(instance) {
     if (!this.initialized) this.initialize()
-    this.instances = _.reject(this.instances, i => i === instance)
+    this.instances = reject(this.instances, i => i === instance)
     this.checkInstances()
   }
 

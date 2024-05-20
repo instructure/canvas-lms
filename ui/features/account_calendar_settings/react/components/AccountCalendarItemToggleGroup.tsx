@@ -26,7 +26,13 @@ import {InstUISettingsProvider} from '@instructure/emotion'
 import {accountListTheme} from '../theme'
 
 import {AccountCalendarItem} from './AccountCalendarItem'
-import {Account, VisibilityChange, Collection, SubscriptionChange, ExpandedAccounts} from '../types'
+import type {
+  Account,
+  VisibilityChange,
+  Collection,
+  SubscriptionChange,
+  ExpandedAccounts,
+} from '../types'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 

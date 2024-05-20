@@ -18,7 +18,7 @@
 import Backbone from '@canvas/backbone'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {has} from 'lodash'
 import ExternalContentReturnView from '@canvas/external-tools/backbone/views/ExternalContentReturnView'
 import ExternalToolCollection from './collections/ExternalToolCollection'
 import ExternalContentFileSubmissionView from './views/ExternalContentFileSubmissionView'
@@ -87,7 +87,7 @@ export default class HomeworkSubmissionLtiContainer {
   // private methods below ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   cleanupViewsForTool(tool) {
-    if (_.has(this.renderedViews, tool.get('id'))) {
+    if (has(this.renderedViews, tool.get('id'))) {
       const views = this.renderedViews[tool.get('id')]
       views.forEach(v => v.remove())
     }
@@ -125,7 +125,7 @@ export default class HomeworkSubmissionLtiContainer {
 
           // Disable submit button if the file does not match the required type
           if (!isValidFileSubmission(homeworkSubmissionView.model.attributes)) {
-            $('.external-tool-submission button[type=submit]').attr('disabled', true)
+            $('.external-tool-submission button[type=submit]').prop('disabled', true)
             $.flashError(I18n.t('Invalid submission file type'))
           }
 

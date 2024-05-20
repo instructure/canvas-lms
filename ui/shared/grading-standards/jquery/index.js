@@ -21,7 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* fillFormData, getFormData */
+import '@canvas/jquery/jquery.instructure_forms' /* fillFormData, getFormData */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* ifExists, .dim, undim, confirmDelete */
 import '@canvas/rails-flash-notifications'
@@ -56,6 +56,8 @@ $(document).ready(() => {
       close() {
         $(event.target).focus()
       },
+      modal: true,
+      zIndex: 1000,
     })
   })
   $('.grading_standard .delete_grading_standard_link').click(function (event) {
@@ -117,13 +119,13 @@ $(document).ready(() => {
     function removed() {
       $('#edit_assignment_form .grading_standard_id').val('')
       $('#assignment_grading_type').val('points').change()
-      $('#course_course_grading_standard_enabled').attr('checked', false).change()
+      $('#course_course_grading_standard_enabled').prop('checked', false).change()
       $('#course_form .grading_scheme_set').text(I18n.t('grading_scheme_not_set', 'Not Set'))
       $standard.addClass('editing')
       $standard
         .find('.update_grading_standard_url')
         .attr('href', $('#update_grading_standard_url').attr('href'))
-      const data = $.parseJSON($('#default_grading_standard_data').val())
+      const data = JSON.parse($('#default_grading_standard_data').val())
       const standard = {title: '', id: null, data}
       $standard
         .fillTemplateData({
@@ -428,7 +430,7 @@ $(document).ready(() => {
     })
     $standard
       .find('button')
-      .attr('disabled', true)
+      .prop('disabled', true)
       .filter('.save_button')
       .text(I18n.t('status.saving', 'Saving...'))
     $.ajaxJSON(
@@ -439,7 +441,7 @@ $(document).ready(() => {
         const standard = data_.grading_standard
         $standard
           .find('button')
-          .attr('disabled', false)
+          .prop('disabled', false)
           .filter('.save_button')
           .text(I18n.t('buttons.save', 'Save'))
         $standard.triggerHandler('grading_standard_updated', standard)
@@ -447,7 +449,7 @@ $(document).ready(() => {
       () => {
         $standard
           .find('button')
-          .attr('disabled', false)
+          .prop('disabled', false)
           .filter('.save_button')
           .text(I18n.t('errors.save_failed', 'Save Failed'))
       }

@@ -73,6 +73,8 @@ KeyboardNavDialog.prototype.bindOpenKeys = function () {
                   return $(activeElement).focus()
                 }
               },
+              modal: true,
+              zIndex: 1000,
             })
           }
         }

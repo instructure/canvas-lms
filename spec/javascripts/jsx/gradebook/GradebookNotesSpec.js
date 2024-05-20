@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import GradebookApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookApi'
 

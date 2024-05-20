@@ -44,7 +44,7 @@ class Checkpoints::SubmissionAggregatorService < Checkpoints::AggregatorService
     return false unless checkpoint_aggregation_supported?(@assignment)
 
     parent_submission = @assignment.submissions.find_by(user: @student)
-    submissions = @assignment.checkpoint_submissions.where(user: @student).order(updated_at: :desc).to_a
+    submissions = @assignment.sub_assignment_submissions.where(user: @student).order(updated_at: :desc).to_a
     return false if parent_submission.nil? || submissions.empty?
 
     aggregate_submission = build_aggregate_submission(submissions)

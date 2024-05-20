@@ -27,7 +27,7 @@ import {recordEulaAgreement, verifyPledgeIsChecked} from './helper'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.tree'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* ajaxJSONPreparedFiles, getFormData */
+import '@canvas/jquery/jquery.instructure_forms' /* ajaxJSONPreparedFiles, getFormData */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* fragmentChange, showIf, /\.log\(/ */
 import '@canvas/util/templateData'
@@ -41,6 +41,8 @@ import {ProgressCircle} from '@instructure/ui-progress'
 import {Alert} from '@instructure/ui-alerts'
 import Attachment from '../react/Attachment'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
+import {captureException} from '@sentry/react'
+import ready from '@instructure/ready'
 
 const I18n = useI18nScope('submit_assignment')
 
@@ -51,10 +53,10 @@ RichContentEditor.preloadRemoteModule()
 function insertEmoji(emoji) {
   const $textarea = $(this).find('.submission_comment_textarea')
   $textarea.val((_i, text) => text + emoji.native)
-  $textarea.focus()
+  $textarea.trigger('focus')
 }
 
-$(document).ready(function () {
+ready(function () {
   let submitting = false
   const submissionForm = $('.submit_assignment_form')
 
@@ -75,7 +77,7 @@ $(document).ready(function () {
     )
   }
 
-  submissionForm.delegate('.textarea-emoji-container', 'focus', function (_e) {
+  submissionForm.on('focus', '.textarea-emoji-container', function (_e) {
     const $container = $(this)
     const box = $container.find('.submission_comment_textarea')
     if (box.length && !box.hasClass('focus_or_content')) {
@@ -141,7 +143,7 @@ $(document).ready(function () {
     $(this)
       .find("button[type='submit']")
       .text(I18n.t('messages.submitting', 'Submitting...'))
-      .attr('disabled', true)
+      .prop('disabled', true)
 
     if ($(this).attr('id') === 'submit_online_upload_form') {
       event.preventDefault() && event.stopPropagation()
@@ -277,7 +279,7 @@ $(document).ready(function () {
           submissionForm
             .find("button[type='submit']")
             .text(I18n.t('messages.submit_failed', 'Submit Failed, please try again'))
-          submissionForm.find('button').attr('disabled', false)
+          submissionForm.find('button').prop('disabled', false)
         },
       })
     } else {
@@ -296,7 +298,7 @@ $(document).ready(function () {
   })
 
   $(document).fragmentChange((event, hash) => {
-    if (hash && hash.indexOf('#submit') == 0) {
+    if (hash && hash.indexOf('#submit') === 0) {
       $('.submit_assignment_link').triggerHandler('click', true)
     }
   })
@@ -319,6 +321,7 @@ $(document).ready(function () {
     if (late && !skipConfirmation) {
       let result
       if ($('.resubmit_link').length > 0) {
+        // eslint-disable-next-line no-alert
         result = window.confirm(
           I18n.t(
             'messages.now_overdue',
@@ -326,6 +329,7 @@ $(document).ready(function () {
           )
         )
       } else {
+        // eslint-disable-next-line no-alert
         result = window.confirm(
           I18n.t('messages.overdue', 'This assignment is overdue.  Do you still want to submit it?')
         )
@@ -355,8 +359,9 @@ $(document).ready(function () {
     $('#submit_assignment_tabs').tabs({
       beforeActivate(event, ui) {
         // determine if this is an external tool
-        if (ui.newTab.context.classList.contains('external-tool')) {
-          const externalToolId = $(ui.newTab.context).data('id')
+        const $tabLink = ui.newTab.children('a:first-child')
+        if ($tabLink.hasClass('external-tool')) {
+          const externalToolId = $tabLink.data('id')
           homeworkSubmissionLtiContainer.embedLtiLaunch(externalToolId)
         }
       },
@@ -364,19 +369,26 @@ $(document).ready(function () {
         if (ui.newTab.find('a').hasClass('submit_online_text_entry_option')) {
           const $el = $('#submit_online_text_entry_form textarea:first')
           if (!RichContentEditor.callOnRCE($el, 'exists?')) {
-            RichContentEditor.loadNewEditor($el, {manageParent: true})
+            RichContentEditor.loadNewEditor($el, {
+              manageParent: true,
+              resourceType: 'assignment.submission',
+            })
           }
         }
 
-        if (ui.newTab.context.classList[0] === 'external-tool') {
-          ui.newTab.find('a').click()
+        const $tabLink = ui.newTab.children('a:first-child')
+        if ($tabLink.hasClass('external-tool')) {
+          $tabLink.trigger('click')
         }
       },
       create(event, ui) {
         if (ui.tab.find('a').hasClass('submit_online_text_entry_option')) {
           const $el = $('#submit_online_text_entry_form textarea:first')
           if (!RichContentEditor.callOnRCE($el, 'exists?')) {
-            RichContentEditor.loadNewEditor($el, {manageParent: true})
+            RichContentEditor.loadNewEditor($el, {
+              manageParent: true,
+              resourceType: 'assignment.submission',
+            })
           }
         }
       },
@@ -453,7 +465,9 @@ $(document).ready(function () {
         window.opener.location.toString()
       )
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error(e)
+      captureException(e)
     }
   }
 
@@ -465,7 +479,7 @@ $(document).ready(function () {
   }
   function checkAllowUploadSubmit() {
     // disable the submit button if any extensions are bad
-    $('#submit_online_upload_form button[type=submit]').attr(
+    $('#submit_online_upload_form button[type=submit]').prop(
       'disabled',
       !!$('.bad_ext_msg:visible').length
     )
@@ -527,21 +541,21 @@ $(document).ready(function () {
   }
 })
 
-$(document).ready(() => {
+ready(() => {
   $('#submit_media_recording_form .submit_button')
-    .attr('disabled', true)
+    .prop('disabled', true)
     .text(I18n.t('messages.record_before_submitting', 'Record Before Submitting'))
   $('#media_media_recording_submission_holder .record_media_comment_link').click(event => {
     event.preventDefault()
     $('#media_media_recording_submission').mediaComment('create', 'any', (id, type) => {
       $('#submit_media_recording_form .submit_button')
-        .attr('disabled', false)
+        .prop('disabled', false)
         .text(I18n.t('buttons.submit_assignment', 'Submit Assignment'))
       $('#submit_media_recording_form .media_comment_id').val(id)
       $('#submit_media_recording_form .media_comment_type').val(type)
       $('#media_media_recording_submission_holder').children().hide()
       $('#media_media_recording_ready').show()
-      $('#media_comment_submit_button').attr('disabled', false)
+      $('#media_comment_submit_button').prop('disabled', false)
       $('#media_media_recording_thumbnail').attr('id', 'media_comment_' + id)
     })
   })

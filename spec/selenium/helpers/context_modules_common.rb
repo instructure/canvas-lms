@@ -34,18 +34,8 @@ module ContextModulesCommon
     modules
   end
 
-  def publish_module
-    fj("#context_modules .publish-icon-publish").click
-    wait_for_ajaximations
-  end
-
-  def unpublish_module
-    fj("#context_modules .publish-icon-published").click
-    wait_for_ajaximations
-  end
-
   def module_setup(course = @course)
-    @module = course.context_modules.create!(name: "Module 1")
+    @module = course.context_modules.create!(name: "Module 1", workflow_state: "unpublished")
 
     # create module items
     # add first and last module items to get previous and next displayed
@@ -99,8 +89,11 @@ module ContextModulesCommon
   end
 
   def ignore_relock
-    expect(element_exists?("#relock_modules_dialog")).to be_truthy
-    fj(".ui-dialog:visible .ui-button:nth-child(2)").click
+    scroll_to_the_top_of_modules_page
+    continue_button_selector = "//*[contains(@class, 'ui-dialog') and not(contains(@style, 'display: none')) and ./*[@id = 'relock_modules_dialog']]//button[. = 'Continue']"
+    if element_exists?(continue_button_selector, true)
+      fxpath(continue_button_selector).click
+    end
   end
 
   def relock_modules
@@ -406,6 +399,13 @@ module ContextModulesCommon
 
   def lock_check_click
     move_to_click("label[for=unlock_module_at]")
+  end
+
+  def differentiated_modules_on
+    Account.site_admin.enable_feature!(:differentiated_modules)
+    Setting.set("differentiated_modules_setting", "true")
+    AssignmentStudentVisibility.reset_table_name
+    Quizzes::QuizStudentVisibility.reset_table_name
   end
 
   # Ugly page retrieval for when footer doesn't show up in flakey_spec_catcher mode

@@ -29,6 +29,10 @@
   <div class="ig-row__layout">
     {{>ui/shared/spinner/jst/_spinner.handlebars}} {{#t}}Making a copy of "{{original_assignment_name}}"{{/t}}
   </div>
+{{else}} {{#if isCloningAlignment}}
+  <div class="ig-row__layout">
+    {{>ui/shared/spinner/jst/_spinner.handlebars}} {{#t}}Cloning Alignments of "{{original_assignment_name}}"{{/t}}
+  </div
 {{else}} {{#if failedToDuplicate}}
   <span aria-live="polite" role="alert" aria-atomic="true">{{#t}}Oops! Something went wrong with making a copy of "{{original_assignment_name}}"{{/t}}</span>
   <div class="duplicate-failed-actions">
@@ -39,6 +43,20 @@
     {{#unless isMasterCourseChildContent}}
     <button class="duplicate-failed-cancel btn">
       <span class="screenreader-only">{{#t}}Cancel duplicating "{{original_assignment_name}}"{{/t}}</span>
+      <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
+    </button>
+    {{/unless}}
+  </div>
+{{else}} {{#if failedToCloneAlignment}}
+  <span aria-live="polite" role="alert" aria-atomic="true">{{#t}}Oops! Something went wrong with cloning alignments of "{{original_assignment_name}}"{{/t}}</span>
+  <div class="alignment-clone-failed-actions">
+    <button class="alignment-clone-failed-retry btn btn-primary">
+      <span class="screenreader-only">{{#t}}Retry cloning "{{original_assignment_name}}"{{/t}}</span>
+      <span aria-hidden="true">{{#t}}Retry{{/t}}</span>
+    </button>
+    {{#unless isMasterCourseChildContent}}
+    <button class="alignment-clone-failed-cancel btn">
+      <span class="screenreader-only">{{#t}}Cancel cloning "{{original_assignment_name}}"{{/t}}</span>
       <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
     </button>
     {{/unless}}
@@ -136,6 +154,24 @@
                 >{{#t}}Duplicate{{/t}}</a>
               </li>
               {{/if}}
+              {{#if can_update}}
+                {{#if differentiatedModulesFlag}}
+                  <li>
+                    <a
+                      class="assign-to-link icon-permissions"
+                      id="assign_to_{{id}}_link"
+                      href="{{id}}%>"
+                      data-quiz-name="{{name}}"
+                      data-quiz-context-id="{{courseId}}"
+                      data-quiz-id="{{assignment_id}}"
+                      data-is-lti-quiz="{{isQuizzesNext}}"
+                      title="<%= {{#t}}Assign this Quiz{{/t}} %>"
+                      aria-label="{{#t}}Assign To...{{/t}}"
+                      data-focus-returns-to="assign_{{id}}_manage_link"
+                    >{{#t}}Assign To...{{/t}}</a>
+                  </li>
+                {{/if}}
+              {{/if}}
               {{#unless is_locked}}
                 <li role="presentation">
                 {{#if permissions.delete}}
@@ -210,6 +246,24 @@
                 >{{#t}}Duplicate{{/t}}</a>
               </li>
               {{/if}}
+              {{#if can_update}}
+                {{#if differentiatedModulesFlag}}
+                  <li>
+                    <a
+                      class="assign-to-link icon-permissions"
+                      id="assign_to_{{id}}_link"
+                      href="{{id}}%>"
+                      data-quiz-name="{{name}}"
+                      data-quiz-context-id="{{courseId}}"
+                      data-quiz-id="{{assignment_id}}"
+                      data-is-lti-quiz="{{isQuizzesNext}}"
+                      title="<%= {{#t}}Assign this Quiz{{/t}} %>"
+                      aria-label="{{#t}}Assign To...{{/t}}"
+                      data-focus-returns-to="assign_{{id}}_manage_link"
+                    >{{#t}}Assign To...{{/t}}</a>
+                  </li>
+                {{/if}}
+              {{/if}}
               {{#ifAll can_update cyoe.isCyoeAble}}
               <li role="presentation">
                   <a href="{{edit_url}}?return_to={{return_to}}#mastery-paths-editor" class="icon-mastery-path" tabindex="-1" role="menuitem" title="{{#t}}Edit Mastery Paths for {{title_label}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
@@ -244,5 +298,6 @@
       {{/if}}
     {{/if}}
   </div>
-{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}
+{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}
+<div id="assign-to-mount-point"></div>
 </div>

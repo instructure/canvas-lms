@@ -1036,6 +1036,103 @@ describe ContentTag do
     end
   end
 
+  describe "#update_module_item_submissions" do
+    before do
+      Account.site_admin.enable_feature!(:differentiated_modules)
+      course_factory
+      @student1 = student_in_course(active_all: true, name: "Student 1").user
+      @student2 = student_in_course(active_all: true, name: "Student 2").user
+      @context_module = @course.context_modules.create!
+
+      @assignment = @course.assignments.create!
+      @context_module.add_item(id: @assignment.id, type: "assignment")
+      @tag = @context_module.content_tags.first
+    end
+
+    it "assignment is added to a module" do
+      adhoc_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override.assignment_override_students.create!(user: @student1)
+
+      @assignment2 = @course.assignments.create!
+      expect(@assignment2.submissions.length).to eq 2
+
+      @context_module.add_item(id: @assignment2.id, type: "assignment")
+      @assignment2.submissions.reload
+      expect(@assignment2.submissions.length).to eq 1
+    end
+
+    it "quiz is added to a module" do
+      adhoc_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override.assignment_override_students.create!(user: @student1)
+
+      @quiz = @course.quizzes.create!(quiz_type: "assignment")
+      expect(@quiz.assignment.submissions.length).to eq 2
+
+      @context_module.add_item(id: @quiz.id, type: "quiz")
+      @quiz.assignment.submissions.reload
+      expect(@quiz.assignment.submissions.length).to eq 1
+    end
+
+    it "assignment is removed from a module" do
+      adhoc_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override.assignment_override_students.create!(user: @student1)
+
+      @context_module.update_assignment_submissions(@context_module.current_assignments_and_quizzes)
+      @assignment.submissions.reload
+      expect(@assignment.submissions.length).to eq 1
+
+      @tag.destroy
+      @assignment.submissions.reload
+      expect(@assignment.submissions.length).to eq 2
+    end
+
+    it "quiz is removed from a module" do
+      @quiz = @course.quizzes.create!(quiz_type: "assignment")
+      @context_module.add_item(id: @quiz.id, type: "quiz")
+      quiz_tag = @context_module.content_tags.last
+
+      adhoc_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override.assignment_override_students.create!(user: @student1)
+
+      @context_module.update_assignment_submissions(@context_module.current_assignments_and_quizzes)
+      @quiz.assignment.submissions.reload
+      expect(@quiz.assignment.submissions.length).to eq 1
+
+      quiz_tag.destroy
+      @quiz.assignment.submissions.reload
+      expect(@quiz.assignment.submissions.length).to eq 2
+    end
+
+    it "assignment is moved from one module to another" do
+      adhoc_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override.assignment_override_students.create!(user: @student1)
+      @context_module2 = @course.context_modules.create!
+
+      @context_module.update_assignment_submissions(@context_module.current_assignments_and_quizzes)
+      @assignment.submissions.reload
+      expect(@assignment.submissions.length).to eq 1
+
+      @tag.context_module_id = @context_module2.id
+      @tag.save!
+      @assignment.submissions.reload
+      expect(@assignment.submissions.length).to eq 2
+    end
+
+    it "assignment is moved from module with no overrides to module with overrides" do
+      @context_module2 = @course.context_modules.create!
+      adhoc_override2 = @context_module2.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override2.assignment_override_students.create!(user: @student1)
+
+      @assignment.submissions.reload
+      expect(@assignment.submissions.length).to eq 2
+
+      @tag.context_module_id = @context_module2.id
+      @tag.save!
+      @assignment.submissions.reload
+      expect(@assignment.submissions.length).to eq 1
+    end
+  end
+
   describe "#trigger_publish!" do
     it "publishes the tag if it is unpublished" do
       course_factory
@@ -1081,6 +1178,198 @@ describe ContentTag do
       expect(tag.published?).to be(true)
       tag.trigger_unpublish!
       expect(tag.reload.published?).to be(true)
+    end
+  end
+
+  describe "Lti::Migratable" do
+    let(:tag_type) { "context_module" }
+    let(:url) { "http://www.example.com" }
+    let(:account) { account_model }
+    let(:course) { course_model(account:) }
+    let(:tool) { external_tool_model(context: course, opts: { url: }) }
+    let(:tool_1_3) { external_tool_1_3_model(context: course, opts: { url: }) }
+    let(:direct_tag) { ContentTag.create!(context: course, content: tool, url:, context_module:, tag_type:) }
+    let(:unpublished_direct) do
+      ct = direct_tag.dup
+      ct.update!(workflow_state: "unpublished")
+      ct
+    end
+    let(:indirect_tag) do
+      ct = ContentTag.create!(context: course, url:, context_module:, tag_type:)
+      # To work around a before_save that associates tools. Yay for old data in Canvas.
+      ct.update_column(:content_id, nil)
+      ct
+    end
+    let(:unpublished_indirect) do
+      ct = indirect_tag.dup
+      ct.update!(workflow_state: "unpublished")
+      ct.update_column(:content_id, nil)
+      ct
+    end
+    let(:context_module) { ContextModule.create!(context: course, name: "first") }
+
+    describe "#migrate_to_1_3_if_needed!" do
+      it "doesn't migrate tags when given a 1.1 tool" do
+        tag = ContentTag.create!(content: tool, context: course, context_module:, url:, tag_type:)
+        expect { tag.migrate_to_1_3_if_needed!(tool) }
+          .not_to change { tag.reload.associated_asset_lti_resource_link.present? }
+      end
+
+      it "doesn't migrate tags that have already been migrated" do
+        tag = ContentTag.create!(content: tool_1_3, context: course, url:, context_module:, tag_type:)
+        tag.associated_asset_lti_resource_link = Lti::ResourceLink.create_with(course, tool_1_3, lti_1_1_id: tool.opaque_identifier_for(tag))
+        tag.save!
+        expect { tag.migrate_to_1_3_if_needed!(tool_1_3) }
+          .not_to change { tag.reload.associated_asset_lti_resource_link.lti_1_1_id }
+      end
+
+      it "doesn't migrate content tags that aren't part of context modules" do
+        tag = ContentTag.create!(content: tool_1_3, context: course, url:, tag_type:)
+        expect { tag.migrate_to_1_3_if_needed!(tool_1_3) }
+          .not_to change { tag.reload.associated_asset_lti_resource_link.present? }
+      end
+
+      it "doesn't migrate content tags who's content is not an external tool" do
+        tag = ContentTag.create!(content: assignment_model, context: course, tag_type: "assignment")
+        expect { tag.migrate_to_1_3_if_needed!(tool_1_3) }
+          .not_to change { tag.reload.associated_asset_lti_resource_link.present? }
+      end
+
+      it "migrates tags associated with 1.3 tools" do
+        tag = ContentTag.create!(content: tool_1_3, context: course, url:, context_module:, tag_type:)
+        tag.associated_asset_lti_resource_link = Lti::ResourceLink.create_with(course, tool_1_3)
+        tag.save!
+        expect { tag.migrate_to_1_3_if_needed!(tool_1_3) }
+          .to change { tag.reload.associated_asset_lti_resource_link.lti_1_1_id }
+          .from(nil).to(tool.opaque_identifier_for(tag))
+      end
+
+      it "migrates tags associated with 1.1 tools" do
+        tag = ContentTag.create!(content: tool, context: course, url:, context_module:, tag_type:)
+        expect { tag.migrate_to_1_3_if_needed!(tool_1_3) }
+          .to change { tag.reload.associated_asset_lti_resource_link&.lti_1_1_id }
+          .from(nil).to(tool.opaque_identifier_for(tag))
+          .and change { tag.reload.content }.from(tool).to(tool_1_3)
+      end
+    end
+
+    context "finding items" do
+      def create_misc_content_tags
+        # Same course, just deleted
+        ct = direct_tag.dup
+        ct.update!(workflow_state: "deleted")
+        ct = indirect_tag.dup
+        ct.update!(workflow_state: "deleted")
+
+        new_course = course_model(account: account_model)
+
+        # Different account
+        cm = ContextModule.create!(context: new_course, name: "third")
+        cm.content_tags.create!(content: tool, context: new_course, tag_type:)
+      end
+
+      describe "#directly_associated_items" do
+        subject { ContentTag.scope_to_context(ContentTag.directly_associated_items(tool.id), context) }
+
+        context "in course" do
+          let(:context) { course }
+
+          it "finds all active directly associated items within a course" do
+            create_misc_content_tags
+            indirect_tag
+            direct_tag
+
+            expect(subject).to contain_exactly(direct_tag, unpublished_direct)
+          end
+        end
+
+        context "in account" do
+          let(:context) { account }
+
+          it "finds all active directly associated items within an account" do
+            create_misc_content_tags
+            direct_tag
+            indirect_tag
+            course = course_model(account:)
+            context_module = course.context_modules.create!(name: "other module")
+            other_direct_tag = ContentTag.create!(context: course, content: tool, context_module:, tag_type:)
+
+            expect(subject).to contain_exactly(direct_tag, other_direct_tag, unpublished_direct)
+          end
+        end
+      end
+
+      describe "#indirectly_associated_items" do
+        subject { ContentTag.scope_to_context(ContentTag.indirectly_associated_items(tool.id), context) }
+
+        context "in course" do
+          let(:context) { course }
+
+          it "finds all active indirectly associated items only within a course" do
+            create_misc_content_tags
+            indirect_tag
+            direct_tag
+
+            expect(subject).to contain_exactly(indirect_tag, unpublished_indirect)
+          end
+        end
+
+        context "in account" do
+          let(:context) { account }
+
+          it "finds all active indirectly associated items only within an account" do
+            create_misc_content_tags
+            indirect_tag
+            direct_tag
+            course = course_model(account:)
+            context_module = course.context_modules.create!(name: "other module")
+            other_indirect_tag = ContentTag.create!(context: course, context_module:, url:, tag_type:)
+
+            expect(subject).to contain_exactly(indirect_tag, other_indirect_tag, unpublished_indirect)
+          end
+        end
+
+        context "in subaccount" do
+          let(:context) { account_model(parent_account: account) }
+
+          it "finds all active items in the current account" do
+            create_misc_content_tags
+            indirect_tag
+            direct_tag
+            course = course_model(account: context)
+            context_module = course.context_modules.create!(name: "other module")
+            other_indirect_tag = ContentTag.create!(context: course, context_module:, url:, tag_type:)
+
+            expect(subject).to contain_exactly(other_indirect_tag)
+          end
+
+          it "does not find items outside of the account" do
+            create_misc_content_tags
+            indirect_tag
+            direct_tag
+
+            expect(subject).to be_empty
+          end
+        end
+      end
+    end
+
+    describe "#fetch_direct_batch" do
+      it "fetches only the ids it's given" do
+        direct_tag
+        indirect_tag
+        expect(ContentTag.fetch_direct_batch([direct_tag.id]).to_a)
+          .to contain_exactly(direct_tag)
+      end
+    end
+
+    describe "#fetch_indirect_batch" do
+      it "ignores tags that can't be associated with the tool being migrated" do
+        diff_url = ContentTag.create!(context: course, url: "http://notreallythere.com")
+        tags = []
+        ContentTag.fetch_indirect_batch(tool.id, tool_1_3.id, [indirect_tag, diff_url].pluck(:id)) { |tag| tags << tag }
+        expect(tags).to contain_exactly(indirect_tag)
+      end
     end
   end
 end

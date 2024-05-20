@@ -17,11 +17,12 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 
-import OutcomeContentBase from '@canvas/outcome-content-view/backbone/views/OutcomeContentBase'
+import OutcomeContentBase from '@canvas/outcomes/content-view/backbone/views/OutcomeContentBase'
 import Outcome from '@canvas/outcomes/backbone/models/Outcome'
-import OutcomeView from '@canvas/outcome-content-view/backbone/views/OutcomeView'
+import OutcomeView from '@canvas/outcomes/content-view/backbone/views/OutcomeView'
 import I18nStubber from 'helpers/I18nStubber'
 
 // stub function that creates the RCE to avoid
@@ -121,7 +122,7 @@ function commonTests() {
       state: 'show',
     })
     ok(view.$('.delete_button').length > 0)
-    ok(view.$('.delete_button').attr('disabled'))
+    ok(view.$('.delete_button').prop('disabled'))
     view.remove()
   })
 
@@ -142,7 +143,7 @@ function commonTests() {
       state: 'show',
     })
     ok(view.$('.delete_button').length > 0)
-    notOk(view.$('.delete_button').attr('disabled'))
+    notOk(view.$('.delete_button').prop('disabled'))
     view.remove()
   })
 
@@ -163,7 +164,7 @@ function commonTests() {
       state: 'show',
     })
     ok(view.$('.edit_button').length > 0)
-    notOk(view.$('.edit_button').attr('disabled'))
+    notOk(view.$('.edit_button').prop('disabled'))
     view.remove()
   })
 
@@ -215,6 +216,7 @@ function commonTests() {
   test('move and delete buttons are not available for an account outcome if a user is a teacher', () => {
     ENV.ROOT_OUTCOME_GROUP = {context_type: 'Course'}
     ENV.current_user_roles = ['teacher']
+    ENV.current_user_is_admin = false
     const view = createView({
       model: newOutcome(
         {
@@ -315,7 +317,7 @@ function commonTests() {
       state: 'show',
     })
     ok(view.$el.find('.delete_button').length > 0)
-    ok(view.$el.find('.delete_button').attr('disabled'))
+    ok(view.$el.find('.delete_button').prop('disabled'))
     view.remove()
   })
 
@@ -336,7 +338,7 @@ function commonTests() {
       state: 'show',
     })
     ok(view.$el.find('.delete_button').length > 0)
-    ok(!view.$el.find('.delete_button').attr('disabled'))
+    ok(!view.$el.find('.delete_button').prop('disabled'))
     view.remove()
   })
 

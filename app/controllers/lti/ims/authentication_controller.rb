@@ -51,16 +51,7 @@ module Lti
       # domain in the authentication requests rather than keeping
       # track of institution-specific domain.
       def authorize_redirect
-        if Setting.get("interop_8200_session_token_redirect", nil) == "true" ||
-           Setting.get("interop_8200_session_token_redirect/#{canvas_domain}", nil) == "true"
-          csp_frame_ancestors << canvas_domain
-          render template: "shared/html_redirect",
-                 layout: false,
-                 formats: :html,
-                 locals: {
-                   url: authorize_redirect_url
-                 }
-        else
+        Utils::InstStatsdUtils::Timing.track "lti.authorize_redirect" do
           redirect_to authorize_redirect_url
         end
       end
@@ -83,21 +74,47 @@ module Lti
       # For more details on how the cached ID token is generated,
       # please refer to the inline documentation of "app/models/lti/lti_advantage_adapter.rb"
       def authorize
-        validate_oidc_params!
-        validate_current_user!
-        validate_client_id!
-        validate_launch_eligibility!
-        set_extra_csp_frame_ancestor! unless @oidc_error
+        Utils::InstStatsdUtils::Timing.track "lti.authorize" do
+          validate_oidc_params!
+          validate_current_user!
+          validate_client_id!
+          validate_launch_eligibility!
+          set_extra_csp_frame_ancestor! unless @oidc_error
 
-        render(
-          "lti/ims/authentication/authorize",
-          formats: :html,
-          layout: "borderless_lti",
-          locals: {
-            redirect_uri:,
-            parameters: @oidc_error || launch_parameters
-          }
-        )
+          # This was added as a resolution to the INTEROP-8200 saga. Essentially, for a reason that no one was able to
+          # determine, during the second step of the LTI 1.3 launch, the browser would not send cookies. This meant that
+          # we had no user information and the launch would fail. Previously, we were forwarding this error along
+          # to tools. However, there wasn't really anything the tool was able to do. Luckily, the issue is easily fixed
+          # by just relaunching the tool. We *believe* that the issue was only present in Safari and that it was caused
+          # by ITP (Intelligent Tracking Prevention). We added this error screen to give the user and the tool a better
+          # overall experience, rather than just getting an obscure "login_required" error message.
+          # Unless you have tracked down the root cause of the issue and are sure that it is fixed,
+          # do not remove this error screen.
+          if @current_user.blank? && !public_course? && decoded_jwt.present? && Account.site_admin.feature_enabled?(:lti_login_required_error_page)
+            if context.is_a?(Account)
+              account = context
+            elsif context.respond_to?(:account)
+              account = context.account
+            end
+
+            InstStatsd::Statsd.increment("lti.oidc_login_required_error", tags: {
+                                           account: account&.global_id,
+                                           client_id: oidc_params[:client_id],
+                                         })
+            render("lti/ims/authentication/login_required_error_screen", status: :unauthorized, layout: "borderless_lti", formats: :html)
+            return
+          end
+
+          render(
+            "lti/ims/authentication/authorize",
+            formats: :html,
+            layout: "borderless_lti",
+            locals: {
+              redirect_uri:,
+              parameters: @oidc_error || launch_parameters
+            }
+          )
+        end
       end
 
       private
@@ -114,31 +131,8 @@ module Lti
         return if public_course? && @current_user.blank?
 
         if !@current_user || Lti::Asset.opaque_identifier_for(@current_user, context:) != oidc_params[:login_hint]
-          report_oidc_invalid_user_metric(@current_user)
           set_oidc_error!("login_required", "Must have an active user session")
         end
-      end
-
-      def report_oidc_invalid_user_metric(user)
-        dynamic_settings_tree = DynamicSettings.find(tree: :private)
-        if dynamic_settings_tree["frontend_data_collection_endpoint"]
-          data_collection_endpoint = dynamic_settings_tree["frontend_data_collection_endpoint"]
-          session_cookie_present = !request.cookies[Rails.application.config.session_options[:key]].nil?
-          current_user_is_nil = user.nil?
-          put_body = [{
-            id: SecureRandom.uuid,
-            type: "oidc_error_invalid_user",
-            session_cookie_present:,
-            current_user_is_nil:,
-            user_agent: request.user_agent,
-            host: request.host,
-            referer: request.referer,
-            request_id: Thread.current[:context].try(:[], :request_id)
-          }]
-          CanvasHttp.put(data_collection_endpoint, {}, body: put_body.to_json, content_type: "application/json")
-        end
-      rescue
-        Rails.logger.warn("Couldn't send OIDC invalid user metric")
       end
 
       def validate_oidc_params!
@@ -210,7 +204,7 @@ module Lti
       def lti_storage_target
         return nil unless decoded_jwt["include_storage_target"]
 
-        Lti::PlatformStorage.lti_storage_target
+        Lti::PlatformStorage::FORWARDING_TARGET
       end
 
       def id_token

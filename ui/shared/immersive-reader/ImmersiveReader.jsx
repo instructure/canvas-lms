@@ -27,6 +27,7 @@ import {CookiePolicy} from '@microsoft/immersive-reader-sdk'
 import WithBreakpoints from '@canvas/with-breakpoints'
 import ContentChunker from './ContentChunker'
 import ContentUtils from './ContentUtils'
+import { captureException } from '@sentry/react'
 
 const I18n = useI18nScope('ImmersiveReader')
 
@@ -52,7 +53,7 @@ const LOGO = `
 function handleClick({title, content}, readerSDK) {
   ;(readerSDK || import('@microsoft/immersive-reader-sdk'))
     .then(({launchAsync}) => {
-      fetch('/api/v1/immersive_reader/authenticate', defaultFetchOptions)
+      fetch('/api/v1/immersive_reader/authenticate', defaultFetchOptions())
         .then(response => response.json())
         .then(({token, subdomain}) => {
           let htmlPayload = content()
@@ -79,12 +80,14 @@ function handleClick({title, content}, readerSDK) {
         .catch(e => {
           // eslint-disable-next-line no-console
           console.error('Getting authentication details failed', e)
+          captureException(e)
           showFlashError(I18n.t('Immersive Reader Failed to Load'))()
         })
     })
     .catch(e => {
       // eslint-disable-next-line no-console
       console.error('Loading the Immersive Reader SDK failed', e)
+      captureException(e)
       showFlashError(I18n.t('Immersive Reader Failed to Load'))()
     })
 }

@@ -38,8 +38,8 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   belongs_to :active_migration, class_name: "MasterCourses::MasterMigration"
 
-  serialize :default_restrictions, Hash
-  serialize :default_restrictions_by_type, Hash
+  serialize :default_restrictions, type: Hash
+  serialize :default_restrictions_by_type, type: Hash
   validate :require_valid_restrictions
 
   attr_accessor :child_course_count
@@ -308,7 +308,9 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
       if object.is_a?(Assignment) && (submittable = object.submittable_object)
         object = submittable
       end
-      default_restrictions_by_type[object.class.base_class.name] || {}
+      default_restrictions_by_type[object.class.base_class.name] ||
+        default_restrictions_by_type[object.class.name] ||
+        {}
     else
       default_restrictions
     end
@@ -365,7 +367,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
         MasterCourses::MasterMigration.start_new_migration!(template,
                                                             migrating_user,
                                                             retry_later: true,
-                                                            priority: Setting.get("sis_blueprint_sync_priority", "25").to_i)
+                                                            priority: Delayed::LOW_PRIORITY + 5)
       end
     end
   end

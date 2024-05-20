@@ -46,7 +46,7 @@ class AppCenterController < ApplicationController
   def index
     per_page = Api.per_page_for(self, default: 72, max: 72)
     endpoint_scope = (@context.is_a?(Account) ? "account" : "course")
-    base_url = send("api_v1_#{endpoint_scope}_app_center_apps_url")
+    base_url = send(:"api_v1_#{endpoint_scope}_app_center_apps_url")
     response = app_api.get_apps(page, per_page) || {}
     if response["lti_apps"]
       collection = PaginatedCollection.build do |pager|

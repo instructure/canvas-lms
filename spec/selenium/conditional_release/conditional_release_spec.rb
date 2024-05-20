@@ -217,21 +217,21 @@ describe "native canvas conditional release" do
     before do
       @trigger_assmt = @course.assignments.create!(points_possible: 10, submission_types: "online_text_entry")
       ranges = [
-        FactoryBot.create(
+        create(
           :scoring_range_with_assignments,
           assignment_set_count: 1,
           assignment_count: 1,
           lower_bound: 0.7,
           upper_bound: 1.0
         ),
-        FactoryBot.create(
+        create(
           :scoring_range_with_assignments,
           assignment_set_count: 1,
           assignment_count: 2,
           lower_bound: 0.4,
           upper_bound: 0.7
         ),
-        FactoryBot.create(
+        create(
           :scoring_range_with_assignments,
           assignment_set_count: 2,
           assignment_count: 2,

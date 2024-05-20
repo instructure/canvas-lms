@@ -28,6 +28,8 @@
 class NotificationMessageCreator
   include LocaleSelection
 
+  PENDING_DUPLICATE_MESSAGE_WINDOW = 6.hours
+
   attr_accessor :notification, :asset, :to_user_channels, :message_data
   attr_reader :courses, :account
 
@@ -354,7 +356,7 @@ class NotificationMessageCreator
   end
 
   def cancel_pending_duplicate_messages
-    first_start_time = start_time = Setting.get("pending_duplicate_message_window_hours", "6").to_i.hours.ago
+    first_start_time = start_time = PENDING_DUPLICATE_MESSAGE_WINDOW.ago
     final_end_time = Time.now.utc
     first_partition = Message.infer_partition_table_name("created_at" => first_start_time)
 

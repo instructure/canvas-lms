@@ -20,6 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import $ from 'jquery'
+import 'jquery-migrate'
 import RestrictedRadioButtons from '@canvas/files/react/components/RestrictedRadioButtons'
 import Folder from '@canvas/files/backbone/models/Folder'
 

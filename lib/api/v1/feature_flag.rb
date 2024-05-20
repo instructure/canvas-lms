@@ -68,7 +68,7 @@ module Api::V1::FeatureFlag
   private
 
   def add_localized_attr(hash, feature, attr_name)
-    if (attr = feature.instance_variable_get("@#{attr_name}"))
+    if (attr = feature.instance_variable_get(:"@#{attr_name}"))
       hash[attr_name] = attr.is_a?(Proc) ? attr.call : attr.to_s
     end
   end

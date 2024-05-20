@@ -92,12 +92,11 @@ export function fixupFileUrl(contextType, contextId, fileInfo, canvasOrigin) {
     parsed = changeDownloadToWrapParams(parsed)
     parsed = addContext(parsed, contextType, contextId)
     // if this is a user file, add the verifier
-    if (
-      fileInfo.uuid &&
-      (contextType.includes('user') || (!!canvasOrigin && canvasOrigin !== window.location.origin))
-    ) {
+    if (fileInfo.uuid && contextType.includes('user')) {
       delete parsed.search
       parsed.query.verifier = fileInfo.uuid
+    } else {
+      delete parsed.query.verifier
     }
     fileInfo[key] = format(parsed)
   }

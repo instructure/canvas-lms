@@ -50,19 +50,19 @@ describe('CourseColorSelector', () => {
     expect(colorPreview.style.getPropertyValue('background-color')).toBe('rgb(187, 170, 221)')
   })
 
-  it('rejects typed non-hex code characters and supplies a starting # if none is typed', () => {
+  it('rejects typed non-hex code characters and supplies a starting # if none is typed', async () => {
     const {getByLabelText} = render(<CourseColorSelector />)
     const textBox = getByLabelText('Set course color to a custom hexadecimal code')
 
-    userEvent.type(textBox, '1.?g-5*typo9Ae!@#lqb98765432')
+    await userEvent.type(textBox, '1.?g-5*typo9Ae!@#lqb98765432')
     expect(textBox.value).toBe('#159Aeb')
   })
 
-  it('allows the leading pound sign to be deleted', () => {
+  it('allows the leading pound sign to be deleted', async () => {
     const {getByLabelText} = render(<CourseColorSelector />)
     const textBox = getByLabelText('Set course color to a custom hexadecimal code')
 
-    userEvent.type(textBox, 'abc{backspace}{backspace}{backspace}{backspace}')
+    await userEvent.type(textBox, 'abc{backspace}{backspace}{backspace}{backspace}')
     expect(textBox.value).toBe('')
   })
 
@@ -102,23 +102,23 @@ describe('CourseColorSelector', () => {
       expect(selectedIcon).not.toBeInTheDocument()
     })
 
-    it('only allows tab navigation to the selected preset or last focused preset', () => {
+    it('only allows tab navigation to the selected preset or last focused preset', async () => {
       render(<CourseColorSelector courseColor="#CC7D2D" />)
 
       // Focus should move to the selected color
-      userEvent.tab()
+      await userEvent.tab()
       expect(document.activeElement.id).toBe('color-#CC7D2D')
 
       // Then should skip the remaining colors and go directly to the input text box
-      userEvent.tab()
+      await userEvent.tab()
       expect(document.activeElement.tagName).toBe('INPUT')
     })
 
-    it('allows navigating presets with left and right arrow keys when one is focused', () => {
+    it('allows navigating presets with left and right arrow keys when one is focused', async () => {
       render(<CourseColorSelector courseColor="#bad" />)
 
       // Focus should start at the first preset if none are selected
-      userEvent.tab()
+      await userEvent.tab()
       expect(document.activeElement.id).toBe(`color-${COLOR_OPTIONS[0]}`)
 
       // Focus should wrap to the last preset if the user navigates left from the first
@@ -136,9 +136,9 @@ describe('CourseColorSelector', () => {
       expect(document.activeElement.id).toBe(`color-${COLOR_OPTIONS[3]}`)
 
       // Focus should return to the last focused preset when tabbing back and forth
-      userEvent.tab()
+      await userEvent.tab()
       expect(document.activeElement.tagName).toBe('INPUT')
-      userEvent.tab({shift: true})
+      await userEvent.tab({shift: true})
       expect(document.activeElement.id).toBe(`color-${COLOR_OPTIONS[3]}`)
     })
   })

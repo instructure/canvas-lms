@@ -27,13 +27,13 @@ import {View} from '@instructure/ui-view'
 import DefaultGradeInput from './DefaultGradeInput'
 import {
   ApiCallStatus,
-  AssignmentConnection,
-  GradebookOptions,
-  SubmissionConnection,
-  SubmissionGradeChange,
+  type AssignmentConnection,
+  type GradebookOptions,
+  type SubmissionConnection,
+  type SubmissionGradeChange,
 } from '../../../types'
 import {isExcused} from '@canvas/grading/GradeInputHelper'
-import {useDefaultGrade, DefaultGradeSubmissionParams} from '../../hooks/useDefaultGrade'
+import {useDefaultGrade, type DefaultGradeSubmissionParams} from '../../hooks/useDefaultGrade'
 
 const {Header: ModalHeader, Body: ModalBody} = Modal as any
 const I18n = useI18nScope('enhanced_individual_gradebook')

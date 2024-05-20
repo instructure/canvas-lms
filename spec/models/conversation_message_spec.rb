@@ -63,22 +63,22 @@ describe ConversationMessage do
 
     it "creates appropriate notifications on new message", priority: "1" do
       message = add_message
-      expect(message.messages_sent).to be_include("Conversation Message")
-      expect(message.messages_sent).not_to be_include("Added To Conversation")
+      expect(message.messages_sent).to include("Conversation Message")
+      expect(message.messages_sent).not_to include("Added To Conversation")
     end
 
     it "creates appropriate notifications on added participants" do
       event = add_last_student
-      expect(event.messages_sent).not_to be_include("Conversation Message")
-      expect(event.messages_sent).to be_include("Added To Conversation")
+      expect(event.messages_sent).not_to include("Conversation Message")
+      expect(event.messages_sent).to include("Added To Conversation")
     end
 
     it "does not notify the author" do
       message = add_message
-      expect(message.messages_sent["Conversation Message"].map(&:user_id)).not_to be_include(@teacher.id)
+      expect(message.messages_sent["Conversation Message"].map(&:user_id)).not_to include(@teacher.id)
 
       event = add_last_student
-      expect(event.messages_sent["Added To Conversation"].map(&:user_id)).not_to be_include(@teacher.id)
+      expect(event.messages_sent["Added To Conversation"].map(&:user_id)).not_to include(@teacher.id)
     end
 
     it "does not notify unsubscribed participants" do
@@ -87,12 +87,12 @@ describe ConversationMessage do
       student_view.save
 
       message = add_message
-      expect(message.messages_sent["Conversation Message"].map(&:user_id)).not_to be_include(@first_student.id)
+      expect(message.messages_sent["Conversation Message"].map(&:user_id)).not_to include(@first_student.id)
     end
 
     it "notifies subscribed participants on new message" do
       message = add_message
-      expect(message.messages_sent["Conversation Message"].map(&:user_id)).to be_include(@first_student.id)
+      expect(message.messages_sent["Conversation Message"].map(&:user_id)).to include(@first_student.id)
     end
 
     it "limits notifications to message recipients, still excluding the author" do
@@ -107,12 +107,12 @@ describe ConversationMessage do
 
     it "notifies new participants" do
       event = add_last_student
-      expect(event.messages_sent["Added To Conversation"].map(&:user_id)).to be_include(@last_student.id)
+      expect(event.messages_sent["Added To Conversation"].map(&:user_id)).to include(@last_student.id)
     end
 
     it "does not notify existing participants on added participant" do
       event = add_last_student
-      expect(event.messages_sent["Added To Conversation"].map(&:user_id)).not_to be_include(@first_student.id)
+      expect(event.messages_sent["Added To Conversation"].map(&:user_id)).not_to include(@first_student.id)
     end
 
     it "adds a new message when a user replies to a notification" do
@@ -313,6 +313,30 @@ describe ConversationMessage do
 
         @shard1.activate do
           expect(m.conversation.reload.conversation_messages.first.media_comment).to eq(@mc)
+        end
+      end
+
+      it "returns correct recipients for cross-shard users" do
+        @shard1.activate do
+          @account_1 = Account.create
+          @student = user_with_pseudonym(active_all: true, account: @account_1)
+        end
+        @shard2.activate do
+          @account_2 = Account.create
+          course_with_teacher(active_all: true)
+          @teacher_1 = @teacher
+          @course_1 = @course
+          @course_1.enroll_student(@student).accept!
+
+          @cp = @teacher_1.initiate_conversation([@student])
+          @convo = @cp.conversation
+          @m1 = @cp.add_message("Hi from shard 2", root_account_id: @account_2)
+        end
+
+        @shard1.activate do
+          @m2 = @convo.add_message(@student, "replying from shard 1", only_users: [@teacher_1], root_account_id: @account_1)
+          @m2 = ConversationMessage.find(@m2.id)
+          expect(@m2.recipients).to include(@teacher_1)
         end
       end
     end

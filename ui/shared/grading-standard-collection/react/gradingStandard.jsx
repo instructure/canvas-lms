@@ -23,7 +23,7 @@ import update from 'immutability-helper'
 import DataRow from './dataRow'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
+import {chain, map, some} from 'lodash'
 import splitAssetString from '@canvas/util/splitAssetString'
 
 const I18n = useI18nScope('gradinggradingStandard')
@@ -48,12 +48,12 @@ class GradingStandard extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.justAdded) ReactDOM.findDOMNode(this.refs.title).focus()
+    if (this.props.justAdded) ReactDOM.findDOMNode(this.titleRef).focus()
   }
 
   componentDidUpdate(prevProps, _prevState) {
     if (this.props.editing !== prevProps.editing) {
-      ReactDOM.findDOMNode(this.refs.title).focus()
+      ReactDOM.findDOMNode(this.titleRef).focus()
       this.setState({editingStandard: $.extend(true, {}, this.props.standard)})
     }
   }
@@ -76,7 +76,7 @@ class GradingStandard extends React.Component {
       })
     } else {
       this.setState({showAlert: true}, function () {
-        ReactDOM.findDOMNode(this.refs.invalidStandardAlert).focus()
+        ReactDOM.findDOMNode(this.invalidStandardAlertRef).focus()
       })
     }
   }
@@ -122,7 +122,7 @@ class GradingStandard extends React.Component {
 
   hideAlert = () => {
     this.setState({showAlert: false}, function () {
-      ReactDOM.findDOMNode(this.refs.title).focus()
+      ReactDOM.findDOMNode(this.titleRef).focus()
     })
   }
 
@@ -130,10 +130,10 @@ class GradingStandard extends React.Component {
 
   rowDataIsValid = () => {
     if (this.state.editingStandard.data.length <= 1) return true
-    const rowValues = _.map(this.state.editingStandard.data, dataRow => String(dataRow[1]).trim())
-    const sanitizedRowValues = _.chain(rowValues).compact().uniq().value()
+    const rowValues = map(this.state.editingStandard.data, dataRow => String(dataRow[1]).trim())
+    const sanitizedRowValues = chain(rowValues).compact().uniq().value()
     const inputsAreUniqueAndNonEmpty = sanitizedRowValues.length === rowValues.length
-    const valuesDoNotOverlap = !_.some(this.state.editingStandard.data, (element, index, list) => {
+    const valuesDoNotOverlap = !some(this.state.editingStandard.data, (element, index, list) => {
       if (index < 1) return false
       const thisMinScore = this.props.round(element[1])
       const aboveMinScore = this.props.round(list[index - 1][1])
@@ -144,8 +144,8 @@ class GradingStandard extends React.Component {
   }
 
   rowNamesAreValid = () => {
-    const rowNames = _.map(this.state.editingStandard.data, dataRow => dataRow[0].trim())
-    const sanitizedRowNames = _.chain(rowNames).compact().uniq().value()
+    const rowNames = map(this.state.editingStandard.data, dataRow => dataRow[0].trim())
+    const sanitizedRowNames = chain(rowNames).compact().uniq().value()
     return sanitizedRowNames.length === rowNames.length
   }
 
@@ -153,7 +153,7 @@ class GradingStandard extends React.Component {
     if (this.props.permissions.manage && this.props.othersEditing) return null
     if (this.props.standard.context_name) {
       return (
-        <div ref="cannotManageMessage">
+        <div>
           {I18n.t('(%{context}: %{contextName})', {
             context: this.props.standard.context_type.toLowerCase(),
             contextName: this.props.standard.context_name,
@@ -162,7 +162,7 @@ class GradingStandard extends React.Component {
       )
     }
     return (
-      <div ref="cannotManageMessage">
+      <div>
         {I18n.t('(%{context} level)', {context: this.props.standard.context_type.toLowerCase()})}
       </div>
     )
@@ -184,14 +184,21 @@ class GradingStandard extends React.Component {
             className="scheme_name"
             title={I18n.t('Grading standard title')}
             value={this.state.editingStandard.title}
-            ref="title"
+            ref={ref => {
+              this.titleRef = ref
+            }}
           />
         </div>
       )
     }
     return (
       <div className="pull-left">
-        <div className="title" ref="title">
+        <div
+          className="title"
+          ref={ref => {
+            this.titleRef = ref
+          }}
+        >
           <span className="screenreader-only">{I18n.t('Grading standard title')}</span>
           {this.props.standard.title}
         </div>
@@ -224,12 +231,7 @@ class GradingStandard extends React.Component {
   renderSaveButton = () => {
     if (this.state.saving) {
       return (
-        <button
-          type="button"
-          ref="saveButton"
-          className="btn btn-primary save_button"
-          disabled={true}
-        >
+        <button type="button" className="btn btn-primary save_button" disabled={true}>
           {I18n.t('Saving...')}
         </button>
       )
@@ -237,7 +239,6 @@ class GradingStandard extends React.Component {
     return (
       <button
         type="button"
-        ref="saveButton"
         onClick={this.triggerSaveGradingStandard}
         className="btn btn-primary save_button"
       >
@@ -252,7 +253,6 @@ class GradingStandard extends React.Component {
         <div className="form-actions">
           <button
             type="button"
-            ref="cancelButton"
             onClick={this.triggerStopEditingGradingStandard}
             className="btn cancel_button"
           >
@@ -272,7 +272,6 @@ class GradingStandard extends React.Component {
       return (
         <div>
           <button
-            ref="editButton"
             className={`Button Button--icon-action edit_grading_standard_button ${
               this.assessedAssignment() ? 'read_only' : ''
             }`}
@@ -306,7 +305,7 @@ class GradingStandard extends React.Component {
       this.props.permissions.manage &&
       !this.props.othersEditing &&
       (!this.props.standard.context_code ||
-        this.props.standard.context_code == ENV.context_asset_string)
+        this.props.standard.context_code === ENV.context_asset_string)
     ) {
       return (
         <div>
@@ -330,7 +329,7 @@ class GradingStandard extends React.Component {
     if (
       this.props.permissions.manage &&
       this.props.standard.context_code &&
-      this.props.standard.context_code != ENV.context_asset_string
+      this.props.standard.context_code !== ENV.context_asset_string
     ) {
       const url = `/${splitAssetString(this.props.standard.context_code).join(
         '/'
@@ -352,7 +351,7 @@ class GradingStandard extends React.Component {
       )
     } else {
       return (
-        <div className="disabled-buttons" ref="disabledButtons">
+        <div className="disabled-buttons">
           <i className="icon-edit" />
           <i className="icon-trash" />
         </div>
@@ -373,7 +372,9 @@ class GradingStandard extends React.Component {
         id={`invalid_standard_message_${this.props.uniqueId}`}
         className="alert-message"
         tabIndex="-1"
-        ref="invalidStandardAlert"
+        ref={ref => {
+          this.invalidStandardAlertRef = ref
+        }}
       >
         {I18n.t('%{message}', {message})}
       </div>

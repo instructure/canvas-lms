@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {SubmissionAttemptsComments} from 'api'
+import type {SubmissionAttemptsComments} from 'api'
 import create from 'zustand'
 
 export type GradeSummaryStore = {

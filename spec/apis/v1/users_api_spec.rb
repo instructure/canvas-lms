@@ -773,7 +773,7 @@ describe "Users API", type: :request do
       end
 
       it "returns page view history" do
-        Setting.set("api_max_per_page", "2")
+        stub_const("Api::MAX_PER_PAGE", 2)
         json = api_call(:get,
                         "/api/v1/users/#{@student.id}/page_views?per_page=1000",
                         { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", per_page: "1000" })
@@ -797,7 +797,7 @@ describe "Users API", type: :request do
       end
 
       it "recognizes start_time parameter" do
-        Setting.set("api_max_per_page", "3")
+        stub_const("Api::MAX_PER_PAGE", 3)
         start_time = @timestamp.iso8601
         json = api_call(:get,
                         "/api/v1/users/#{@student.id}/page_views?start_time=#{start_time}",
@@ -807,7 +807,7 @@ describe "Users API", type: :request do
       end
 
       it "recognizes end_time parameter" do
-        Setting.set("api_max_per_page", "3")
+        stub_const("Api::MAX_PER_PAGE", 3)
         end_time = @timestamp.iso8601
         json = api_call(:get,
                         "/api/v1/users/#{@student.id}/page_views?end_time=#{end_time}",
@@ -990,7 +990,7 @@ describe "Users API", type: :request do
                         { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
                         {},
                         expected_status: 404)
-        expect(json.keys).to eq ["errors"]
+        expect(json.keys).to include("id")
       end
 
       it "404s but still returns the user on a deleted user for a site admin" do
@@ -1001,7 +1001,7 @@ describe "Users API", type: :request do
                         { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
                         {},
                         expected_status: 404)
-        expect(json.keys).not_to be_include("errors")
+        expect(json.keys).not_to include("errors")
       end
 
       it "404s but still returns the user on a deleted user, including merge info, for a site admin" do
@@ -1013,7 +1013,7 @@ describe "Users API", type: :request do
                         { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
                         {},
                         expected_status: 404)
-        expect(json.keys).not_to be_include("errors")
+        expect(json.keys).not_to include("errors")
         expect(json["merged_into_user_id"]).to eq u3.id
       end
     end
@@ -1098,7 +1098,7 @@ describe "Users API", type: :request do
         user.pseudonyms.create!(unique_id: "u#{n}@example.com", account: @account)
       end
       expect(api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=2", controller: "users", action: "api_index", account_id: @account.id.to_param, format: "json", per_page: "2").size).to eq 2
-      Setting.set("api_max_per_page", "1")
+      stub_const("Api::MAX_PER_PAGE", 1)
       expect(api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=2", controller: "users", action: "api_index", account_id: @account.id.to_param, format: "json", per_page: "2").size).to eq 1
     end
 
@@ -1180,8 +1180,6 @@ describe "Users API", type: :request do
     end
 
     context "includes ui_invoked" do
-      before(:once) { Setting.set("ui_invoked_count_pages", "true") }
-
       let(:root_account) { Account.default }
 
       it "sets pagination total_pages/last page link" do
@@ -1370,8 +1368,8 @@ describe "Users API", type: :request do
             expect(json.pluck("name").sort).to eq [temporary_enrollment_provider.name, temporary_enrollment_recipient.name].sort
           end
 
-          it "returns only current and future enrollments" do
-            temp_enrollment.update!(workflow_state: "deleted")
+          it "returns only active or pending by date enrollments" do
+            temp_enrollment.enrollment_state.update!(state: "completed")
             json = api_call_as_user(
               subject,
               :get,
@@ -1550,6 +1548,14 @@ describe "Users API", type: :request do
         users = User.where(name: "Test User").to_a
         expect(users.length).to be 1
         user = users.first
+
+        # setup communication channel
+        communication_channel = user.communication_channels.email.first
+        expect(communication_channel).not_to be_nil
+        # create presenter with a mock request
+        request = instance_double("ActionDispatch::Request", host_with_port: "example.com")
+        presenter = CommunicationChannelPresenter.new(communication_channel, request)
+
         expect(user.name).to eql "Test User"
         expect(user.short_name).to eql "Test"
         expect(user.sortable_name).to eql "User, T."
@@ -1561,20 +1567,21 @@ describe "Users API", type: :request do
         expect(pseudonym.unique_id).to eql "test@example.com"
         expect(pseudonym.sis_user_id).to eql "12345"
 
-        expect(JSON.parse(response.body)).to eq({
-                                                  "name" => "Test User",
-                                                  "short_name" => "Test",
-                                                  "sortable_name" => "User, T.",
-                                                  "id" => user.id,
-                                                  "created_at" => user.created_at.iso8601,
-                                                  "sis_user_id" => "12345",
-                                                  "sis_import_id" => user.pseudonym.sis_batch_id,
-                                                  "login_id" => "test@example.com",
-                                                  "integration_id" => nil,
-                                                  "locale" => "en",
-                                                  "confirmation_url" => user.communication_channels.email.first.confirmation_url,
-                                                  "uuid" => user.uuid
-                                                })
+        expected_response = {
+          "name" => "Test User",
+          "short_name" => "Test",
+          "sortable_name" => "User, T.",
+          "id" => user.id,
+          "created_at" => user.created_at.iso8601,
+          "sis_user_id" => "12345",
+          "sis_import_id" => user.pseudonym.sis_batch_id,
+          "login_id" => "test@example.com",
+          "integration_id" => nil,
+          "locale" => "en",
+          "confirmation_url" => presenter.confirmation_url,
+          "uuid" => user.uuid
+        }
+        expect(JSON.parse(response.body)).to eq(expected_response)
       end
 
       it "accepts a valid destination param" do
@@ -2639,6 +2646,25 @@ describe "Users API", type: :request do
     end
   end
 
+  describe "DELETE expire_mobile_sessions" do
+    let_once(:user) { user_with_pseudonym(active_all: true)  }
+    let_once(:admin) { account_admin_user(active_all: true)  }
+    let_once(:path) { "/api/v1/users/mobile_sessions" }
+    let_once(:path_options) { { controller: "users", action: "expire_mobile_sessions", format: "json" } }
+
+    before do
+      user.access_tokens.create!
+    end
+
+    it "allows admin to expire mobile sessions" do
+      user_session(admin)
+      raw_api_call(:delete, path, path_options)
+
+      expect(response).to have_http_status :ok
+      expect(user.reload.access_tokens.take.permanent_expires_at).to be <= Time.zone.now
+    end
+  end
+
   context "user files" do
     before do
       @context = @user
@@ -3324,13 +3350,13 @@ describe "Users API", type: :request do
       a = @course.assignments.create!(due_at: 2.days.ago, workflow_state: "published", submission_types: "online_text_entry")
       a.destroy
       json = api_call(:get, @path, @params)
-      expect(json.pluck("id")).not_to be_include a.id
+      expect(json.pluck("id")).not_to include a.id
     end
 
     it "does not show unpublished assignments" do
       a = @course.assignments.create!(due_at: 2.days.ago, workflow_state: "unpublished", submission_types: "online_text_entry")
       json = api_call(:get, @path, @params)
-      expect(json.pluck("id")).not_to be_include a.id
+      expect(json.pluck("id")).not_to include a.id
     end
 
     context "current_grading_period filter" do
@@ -3504,11 +3530,7 @@ describe "Users API", type: :request do
   end
 
   describe "POST pandata_events_token" do
-    let(:fake_settings) do
-      {
-        "url" => "https://example.com/pandata/events",
-      }
-    end
+    let(:fake_url) { "https://example.com/pandata/events" }
 
     let(:fake_secrets) do
       {
@@ -3516,16 +3538,11 @@ describe "Users API", type: :request do
         "ios_secret" => "LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1JSGJBZ0VCQkVFemZx\nZStiTjhEN2VRY0tKa3hHSlJpd0dqaHE0eXBsdFJ3aXNMUkx6ZXpBSmQ4QTlL\nRTdNY2YKbkorK0ptNGpwcjNUaFpybHRyN2dXQ2VJWWdvZDZPSmhzS0FIQmdV\ncmdRUUFJNkdCaVFPQmhnQUVBSmV5NCszeAp0UGlja2h1RFQ3QWFsTW1BWVdz\neU5IMnlEejRxRjhCamhHZzgwVkE2QWJPMHQ2YVE4TGQyaktMVEFrU1U5SFFW\nClkrMlVVeUp0Q3FTWEg4dVlBTEI0ZmFwbGhwVWNoQ1pSa3pMMXcrZzVDUUJY\nMlhFS25PdXJabU5ieEVSRzJneGoKb3hsbmxub0pwQjR5YUkvbWNpWkJOYlVz\nL0hTSGJtRzRFUFVxeVViQgotLS0tLUVORCBFQyBQUklWQVRFIEtFWS0tLS0t\nCg==\n",
         "android_key" => "ANDROID_key",
         "android_secret" => "surrendernoworpreparetofight"
-      }
+      }.with_indifferent_access
     end
 
     before do
-      allow(DynamicSettings).to receive(:find)
-        .with(any_args).and_call_original
-      allow(DynamicSettings).to receive(:find)
-        .with("pandata/events", service: "canvas").and_return(fake_settings)
-
-      allow(Rails.application.credentials).to receive(:pandata_creds).and_return(fake_secrets)
+      allow(PandataEvents).to receive_messages(endpoint: fake_url, credentials: fake_secrets)
     end
 
     it "returns token and expiration" do

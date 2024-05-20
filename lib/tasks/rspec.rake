@@ -59,7 +59,7 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?("gems") }
       N_PROCESSES = [ENV["IN_MEMORY_DB"].to_i, 1].max
       spec_files = spec_files.map { |x| Dir[x + "/[^selenium]**/*_spec.rb"] }.flatten.sort.in_groups_of(N_PROCESSES)
       processes = []
-      Signal.trap "SIGINT", (-> { Process.kill "-KILL", Process.getpgid(0) })
+      Signal.trap "SIGINT", -> { Process.kill "-KILL", Process.getpgid(0) }
       child = false
       N_PROCESSES.times do |j|
         pid = Process.fork

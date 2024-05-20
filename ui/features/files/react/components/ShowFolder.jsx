@@ -18,7 +18,7 @@
 
 import React from 'react'
 import createReactClass from 'create-react-class'
-import _ from 'underscore'
+import {indexOf} from 'lodash'
 import classnames from 'classnames'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ShowFolder from '../legacy/components/ShowFolder'
@@ -78,7 +78,7 @@ ShowFolder.renderFolderChildOrEmptyContainer = function () {
       <FolderChild
         key={child.cid}
         model={child}
-        isSelected={_.indexOf(this.props.selectedItems, child) >= 0}
+        isSelected={indexOf(this.props.selectedItems, child) >= 0}
         toggleSelected={this.props.toggleItemSelected.bind(null, child)}
         userCanEditFilesForContext={this.props.userCanEditFilesForContext}
         userCanDeleteFilesForContext={this.props.userCanDeleteFilesForContext}

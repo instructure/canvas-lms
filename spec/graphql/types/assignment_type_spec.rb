@@ -61,11 +61,42 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("moderatedGradingEnabled")).to eq assignment.moderated_grading?
     expect(assignment_type.resolve("postManually")).to eq assignment.post_manually?
     expect(assignment_type.resolve("published")).to eq assignment.published?
+    expect(assignment_type.resolve("importantDates")).to eq assignment.important_dates
   end
 
   it_behaves_like "types with enumerable workflow states" do
     let(:enum_class) { Types::AssignmentType::AssignmentStateType }
     let(:model_class) { Assignment }
+  end
+
+  describe "hasGroupCategory" do
+    it "returns true for group assignments" do
+      assignment.update!(group_category: course.group_categories.create!(name: "My Category"))
+      expect(assignment_type.resolve("hasGroupCategory")).to be true
+    end
+
+    it "returns false for non-group assignments" do
+      expect(assignment_type.resolve("hasGroupCategory")).to be false
+    end
+  end
+
+  describe "gradeAsGroup" do
+    it "returns true for group assignments being graded as group" do
+      assignment.update!(group_category: course.group_categories.create!(name: "My Category"))
+      expect(assignment_type.resolve("gradeAsGroup")).to be true
+    end
+
+    it "returns false for group assignments being graded individually" do
+      assignment.update!(
+        group_category: course.group_categories.create!(name: "My Category"),
+        grade_group_students_individually: true
+      )
+      expect(assignment_type.resolve("gradeAsGroup")).to be false
+    end
+
+    it "returns false for non-group assignments" do
+      expect(assignment_type.resolve("gradeAsGroup")).to be false
+    end
   end
 
   context "top-level permissions" do
@@ -844,9 +875,9 @@ describe Types::AssignmentType do
 
   describe "checkpoints" do
     describe "when feature flag is disabled" do
-      it "checkpoints is nil and checkpointed is false" do
-        expect(assignment_type.resolve("checkpoints {label}")).to be_nil
-        expect(assignment_type.resolve("checkpointed")).to be_falsey
+      it "checkpoints is nil and hasSubAssignments is false" do
+        expect(assignment_type.resolve("checkpoints {tag}")).to be_nil
+        expect(assignment_type.resolve("hasSubAssignments")).to be_falsey
       end
     end
 
@@ -855,24 +886,24 @@ describe Types::AssignmentType do
         course.root_account.enable_feature!(:discussion_checkpoints)
       end
 
-      it "checkpoints is [] and checkpointed is false" do
-        expect(assignment_type.resolve("checkpoints {label}")).to eq []
-        expect(assignment_type.resolve("checkpointed")).to be_falsey
+      it "checkpoints is [] and hasSubAssignments is false" do
+        expect(assignment_type.resolve("checkpoints {tag}")).to eq []
+        expect(assignment_type.resolve("hasSubAssignments")).to be_falsey
       end
 
       describe "when assignment has checkpoint assignments" do
         before do
-          assignment.update!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
-          @c1 = assignment.checkpoint_assignments.create!(context: course, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
-          @c2 = assignment.checkpoint_assignments.create!(context: course, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+          assignment.update!(has_sub_assignments: true)
+          @c1 = assignment.sub_assignments.create!(context: course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+          @c2 = assignment.sub_assignments.create!(context: course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
         end
 
-        it "checkpoints returns the correct labels" do
-          expect(assignment_type.resolve("checkpoints {label}")).to match_array [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY]
+        it "checkpoints returns the correct tags" do
+          expect(assignment_type.resolve("checkpoints {tag}")).to match_array [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY]
         end
 
-        it "checkpointed is true" do
-          expect(assignment_type.resolve("checkpointed")).to be_truthy
+        it "hasSubAssignments is true" do
+          expect(assignment_type.resolve("hasSubAssignments")).to be_truthy
         end
 
         it "checkpoints returns the points possible" do
@@ -886,6 +917,79 @@ describe Types::AssignmentType do
         it "checkpoints returns the onlyVisibleToOverrides as false" do
           expect(assignment_type.resolve("checkpoints {onlyVisibleToOverrides}")).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]
         end
+      end
+
+      describe "when assignment has checkpoints with overrides" do
+        before do
+          @everyone_due_at = 2.days.from_now
+          @section_due_at = 3.days.from_now
+
+          @topic = DiscussionTopic.create_graded_topic!(course:, title: "Checkpointed Discussion")
+          @c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: [
+              { type: "everyone", due_at: @everyone_due_at },
+              { type: "override", set_type: "CourseSection", set_id: @topic.course.default_section.id, due_at: @section_due_at }
+            ],
+            points_possible: 10
+          )
+        end
+
+        it "returns assignment overrides for checkpoints" do
+          query = GraphQLTypeTester.new(@topic.assignment, current_user: student)
+
+          expect(query.resolve("checkpoints {pointsPossible}")).to eq [10]
+          expect(query.resolve("checkpoints {dueAt}")).to eq [@everyone_due_at.iso8601]
+          expect(query.resolve("checkpoints {assignmentOverrides {nodes {dueAt}}}")).to eq [[@section_due_at.iso8601]]
+        end
+      end
+    end
+  end
+
+  describe "mySubAssignmentSubmissionsConnection" do
+    context "when feature flag is enabled" do
+      before do
+        course.root_account.enable_feature!(:discussion_checkpoints)
+        @topic = DiscussionTopic.create_graded_topic!(course:, title: "Checkpointed Discussion")
+        @topic.reply_to_entry_required_count = 2
+        @topic.save!
+        @assignment = @topic.assignment
+        @assignment.update!(has_sub_assignments: true)
+        @assignment.sub_assignments.create!(context: course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        @assignment.sub_assignments.create!(context: course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+        @other_student = student_in_course(course:, active_all: true).user
+      end
+
+      it "returns the correct sub assignment submissions" do
+        root_entry = @topic.discussion_entries.create!(user: student, message: "my reply to topic")
+        2.times { |i| @topic.discussion_entries.create!(user: student, message: "my child reply #{i}", parent_entry: root_entry) }
+        @topic.discussion_entries.create!(user: @other_student, message: "other student reply to topic")
+
+        query = GraphQLTypeTester.new(@assignment, current_user: student)
+
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {userId}}")).to match_array [student.id.to_s, student.id.to_s]
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {subAssignmentTag}}")).to match_array [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY]
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {submissionStatus}}")).to match_array ["submitted", "submitted"]
+      end
+
+      it "does not mark REPLY_TO_ENTRY as submitted if user has not met minimum count" do
+        root_entry = @topic.discussion_entries.create!(user: student, message: "my reply to topic")
+        @topic.discussion_entries.create!(user: student, message: "my child reply", parent_entry: root_entry)
+
+        query = GraphQLTypeTester.new(@assignment, current_user: student)
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {userId}}")).to match_array [student.id.to_s, student.id.to_s]
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {subAssignmentTag}}")).to match_array [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY]
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {submissionStatus}}")).to match_array ["submitted", "unsubmitted"]
+      end
+
+      it "does not mark REPLY_TO_TOPIC as submitted if user has only replied to entries (but not enough)" do
+        root_entry = @topic.discussion_entries.create!(user: @other_student, message: "my reply to topic")
+        @topic.discussion_entries.create!(user: student, message: "my child reply", parent_entry: root_entry)
+        query = GraphQLTypeTester.new(@assignment, current_user: student)
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {userId}}")).to match_array [student.id.to_s, student.id.to_s]
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {subAssignmentTag}}")).to match_array [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY]
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {submissionStatus}}")).to match_array ["unsubmitted", "unsubmitted"]
       end
     end
   end

@@ -18,6 +18,25 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+ADDITIONAL_ALLOWED_CLASSES = [
+  ActiveSupport::HashWithIndifferentAccess,
+  ActiveSupport::SafeBuffer,
+  ActiveSupport::TimeWithZone,
+  ActiveSupport::TimeZone,
+  ActionController::Parameters,
+  BigDecimal,
+  Date,
+  DateTime,
+  Mime::Type,
+  Mime::NullType,
+  OpenObject,
+  OpenStruct,
+  Symbol,
+  Time,
+  URI::HTTP,
+  URI::HTTPS
+].freeze
+
 # SafeYAML-like interface, but vanilla Psych
 module SafeYAML
   class << self
@@ -29,23 +48,7 @@ module SafeYAML
   end
 
   self.permitted_classes = []
-  whitelist_class!(
-    ActiveSupport::HashWithIndifferentAccess,
-    ActiveSupport::TimeWithZone,
-    ActiveSupport::TimeZone,
-    ActionController::Parameters,
-    BigDecimal,
-    Date,
-    DateTime,
-    Mime::Type,
-    Mime::NullType,
-    OpenObject,
-    OpenStruct,
-    Symbol,
-    Time,
-    URI::HTTP,
-    URI::HTTPS
-  )
+  whitelist_class!(*ADDITIONAL_ALLOWED_CLASSES)
 
   module Psych
     if ::Psych::VERSION < "4"
@@ -73,6 +76,8 @@ module SafeYAML
   end
 end
 Psych.singleton_class.prepend(SafeYAML::Psych)
+
+ActiveRecord.yaml_column_permitted_classes = ADDITIONAL_ALLOWED_CLASSES
 
 module ScalarScannerFix
   # in rubies < 2.7, Psych uses a regex to identify an integer, then strips commas and underscores,

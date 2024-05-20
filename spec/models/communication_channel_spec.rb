@@ -130,6 +130,16 @@ describe CommunicationChannel do
     expect(@cc.state).to be(:active)
   end
 
+  it "creates notification policies when confirmed if there are Notifications" do
+    Notification.create!(name: "Confirm Email Communication Channel", category: "Registration")
+    communication_channel_model
+    expect(@cc.state).to be(:unconfirmed)
+    expect(@cc.notification_policies).to be_empty
+
+    @cc.confirm
+    expect(@cc.notification_policies).not_to be_empty
+  end
+
   it "resets the bounce count when being reactivated" do
     communication_channel_model
     @cc.confirm
@@ -220,7 +230,9 @@ describe CommunicationChannel do
     expect(HostUrl).to receive(:context_host).and_return("test.canvas.com")
     expect(CanvasSlug).to receive(:generate).and_return("abc123")
     communication_channel_model
-    expect(@cc.confirmation_url).to eql("https://test.canvas.com/register/abc123")
+    mock_request = instance_double("ActionDispatch::Request", host_with_port: "test.canvas.com")
+    presenter = CommunicationChannelPresenter.new(@cc, mock_request)
+    expect(presenter.confirmation_url).to eql("https://test.canvas.com/register/abc123")
   end
 
   it "only allows email, or sms as path types" do
@@ -245,13 +257,13 @@ describe CommunicationChannel do
   end
 
   it "limits quantity of channels a user can have" do
-    Setting.set("max_ccs_per_user", "3")
+    stub_const("CommunicationChannel::MAX_CCS_PER_USER", 3)
     user = User.create!(name: "jim halpert")
     expect { 5.times { |i| communication_channel(user, username: "user_#{user.id}_#{i}@example.com") } }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
   it "acts as list" do
-    expect(CommunicationChannel).to be_respond_to(:acts_as_list)
+    expect(CommunicationChannel).to respond_to(:acts_as_list)
   end
 
   it "scopes the list to the user" do
@@ -588,6 +600,7 @@ describe CommunicationChannel do
           set_confirmation_code
           set_root_account_ids
           after_save_flag_old_microsoft_sync_user_mappings
+          consider_building_notification_policies
         ]
         expect(CommunicationChannel._save_callbacks.collect(&:filter).select { |k| k.is_a? Symbol } - accounted_for_callbacks).to eq []
       end

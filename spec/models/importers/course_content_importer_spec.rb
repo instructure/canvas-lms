@@ -196,7 +196,7 @@ describe Course do
       # files
       expect(@course.attachments.length).to eq(4)
       @course.attachments.each do |f|
-        expect(File).to be_exist(f.full_filename)
+        expect(File).to exist(f.full_filename)
       end
       file = @course.attachments.where(migration_id: "1865116044002").first
       expect(file).not_to be_nil
@@ -526,6 +526,20 @@ describe Course do
   end
 
   describe "import_settings_from_migration" do
+    shared_examples "setting set correctly" do |param|
+      it "should set #{param} when data exist" do
+        data = { course: { param => true } }
+        Importers::CourseContentImporter.import_settings_from_migration(@course, data, @cm)
+        expect(@course.settings[param]).to be_truthy
+      end
+
+      it "should not set #{param} when data not exist" do
+        data = { course: {} }
+        Importers::CourseContentImporter.import_settings_from_migration(@course, data, @cm)
+        expect(@course.settings).not_to have_key(param)
+      end
+    end
+
     before :once do
       course_with_teacher
       @course.storage_quota = 1
@@ -565,6 +579,14 @@ describe Course do
         Importers::CourseContentImporter.import_settings_from_migration(@course, { course: { storage_quota: 4 } }, @cm)
         expect(@course.storage_quota).to eq 4
       end
+    end
+
+    context "with allow_student_discussion_reporting" do
+      include_examples "setting set correctly", :allow_student_discussion_reporting
+    end
+
+    context "with allow_student_anonymous_discussion_topics" do
+      include_examples "setting set correctly", :allow_student_anonymous_discussion_topics
     end
   end
 

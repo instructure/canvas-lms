@@ -28,6 +28,7 @@ module Api::V1::SearchResult
     hash = {}
     hash["content_id"] = object.id
     hash["content_type"] = object.class.name
+    hash["readable_type"] = Context.translated_content_type(object.class.name)
     hash["title"] = Context.asset_name(object)
     hash["body"] = html_to_text(Context.asset_body(object))
     hash["html_url"] = polymorphic_url([object.context, object])

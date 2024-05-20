@@ -28,11 +28,11 @@ Quizzes::QuizQuestion::UserAnswer = Struct.new(:question_id, :points_possible, :
   end
 
   def [](k)
-    @answer_data["question_#{question_id}_#{k}".to_sym]
+    @answer_data[:"question_#{question_id}_#{k}"]
   end
 
   def answer_text
-    @answer_data["question_#{question_id}".to_sym]
+    @answer_data[:"question_#{question_id}"]
   end
 
   def score

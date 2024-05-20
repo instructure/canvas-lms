@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {ArrayProxy, ObjectProxy, Route} from 'ember'
-import _ from 'underscore'
+import {flattenDeep} from 'lodash'
 import fetchAllPages from '../helpers/xhr/fetch_all_pages'
 import {getFinalGradeOverrides} from '@canvas/grading/FinalGradeOverrideApi'
 
@@ -53,7 +53,7 @@ const ScreenreaderGradebookRoute = Route.extend({
       })
       model.outcome_rollups = fetchAllPages(ENV.GRADEBOOK_OPTIONS.outcome_rollups_url, {
         process(response) {
-          return _.flatten(
+          return flattenDeep(
             response.rollups.map(row =>
               row.scores.map(cell => ({
                 user_id: row.links.user,

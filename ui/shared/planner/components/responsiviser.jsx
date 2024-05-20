@@ -140,7 +140,7 @@ function responsiviser() {
   return function (ComposedComponent) {
     class ResponsiveComponent extends React.Component {
       static propTypes = {
-        ...ComposedComponent.propTypes
+        ...ComposedComponent.propTypes,
       }
 
       static defaultProps = ComposedComponent.defaultProps
@@ -152,7 +152,7 @@ function responsiviser() {
 
         const size = responsiviser.mqwatcher.add(this)
         this.state = {
-          size
+          size,
         }
       }
 

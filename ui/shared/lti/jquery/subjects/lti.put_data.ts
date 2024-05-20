@@ -17,7 +17,7 @@
  */
 
 import {clearData, putData} from '../platform_storage'
-import {LtiMessageHandler} from '../lti_message_handler'
+import type {LtiMessageHandler} from '../lti_message_handler'
 import {getKey} from '../util'
 
 const handler: LtiMessageHandler<{

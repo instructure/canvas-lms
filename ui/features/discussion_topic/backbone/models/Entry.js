@@ -21,7 +21,7 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {isArray, pick, some} from 'lodash'
 import Backbone from '@canvas/backbone'
 import '@canvas/jquery/jquery.ajaxJSON'
 
@@ -140,7 +140,7 @@ Entry.prototype.sync = function (method, model, options) {
 }
 
 Entry.prototype.parse = function (data) {
-  if (_.isArray(data)) {
+  if (isArray(data)) {
     return data[0]
   } else {
     return data
@@ -149,7 +149,7 @@ Entry.prototype.parse = function (data) {
 
 Entry.prototype.toJSON = function () {
   const json = Entry.__super__.toJSON.apply(this, arguments)
-  return _.pick(
+  return pick(
     json,
     'id',
     'parent_id',
@@ -328,14 +328,14 @@ Entry.prototype.toggleLike = function () {
 
 Entry.prototype._hasActiveReplies = function (replies) {
   if (
-    _.some(replies, function (reply) {
+    some(replies, function (reply) {
       return !reply.deleted
     })
   ) {
     return true
   }
   if (
-    _.some(
+    some(
       replies,
       (function (_this) {
         return function (reply) {

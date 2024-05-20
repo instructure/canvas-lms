@@ -32,6 +32,16 @@
     <p><%= friendly_message %></p>
   <% end %>
 
+  <% if @warning_messages.present? %>
+    <div class="export_messages">
+      <div class="alert">
+        <% @warning_messages.each do |warning| %>
+        <p><%= warning %></p>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
   <div class="export_messages" style="<%= hidden %>">
     <div class="alert-error error_message"></div>
   </div>

@@ -23,7 +23,8 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import Submission from '@canvas/assignments/backbone/models/Submission'
 import AssignmentListItemView from 'ui/features/assignment_index/backbone/views/AssignmentListItemView'
 import $ from 'jquery'
-import tzInTest from '@canvas/timezone/specHelpers'
+import 'jquery-migrate'
+import tzInTest from '@canvas/datetime/specHelpers'
 import timezone from 'timezone'
 import juneau from 'timezone/America/Juneau'
 import french from 'timezone/fr_FR'
@@ -31,7 +32,7 @@ import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import assertions from 'helpers/assertions'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 
 let screenreaderText = null
 let nonScreenreaderText = null
@@ -134,6 +135,7 @@ const createView = function (model, options) {
     newquizzes_on_quiz_page: options.newquizzes_on_quiz_page,
   }
   ENV.SHOW_SPEED_GRADER_LINK = options.show_additional_speed_grader_link
+  ENV.FEATURES.differentiated_modules = options.differentiated_modules
 
   const view = new AssignmentListItemView({
     model,
@@ -153,6 +155,7 @@ const genModules = function (count) {
 const genSetup = function (model = assignment1()) {
   fakeENV.setup({
     current_user_roles: ['teacher'],
+    current_user_is_admin: false,
     PERMISSIONS: {manage: false},
     URLS: {assignment_sort_base_url: 'test'},
   })
@@ -174,6 +177,7 @@ QUnit.module('AssignmentListItemViewSpec', {
     fakeENV.setup({
       current_user_roles: ['teacher'],
       URLS: {assignment_sort_base_url: 'test'},
+      current_user_is_admin: false,
     })
     genSetup.call(this)
     return I18nStubber.pushFrame()
@@ -822,7 +826,7 @@ test('does not display cancel button when assignment failed to duplicate is blue
     title: 'Foo Copy',
     original_assignment_name: 'Foo',
     workflow_state: 'failed_to_duplicate',
-    is_master_course_child_content: true
+    is_master_course_child_content: true,
   })
   const view = createView(model)
   strictEqual(view.$('button.duplicate-failed-cancel.btn').length, 0)
@@ -833,10 +837,34 @@ test('displays cancel button when assignment failed to duplicate is not blueprin
     id: 2,
     title: 'Foo Copy',
     original_assignment_name: 'Foo',
-    workflow_state: 'failed_to_duplicate'
+    workflow_state: 'failed_to_duplicate',
   })
   const view = createView(model)
   ok(view.$('button.duplicate-failed-cancel.btn').text().includes('Cancel'))
+})
+
+test('can assign assignment if flag is on and has edit permissions', function () {
+  const view = createView(this.model, {
+    canManage: true,
+    differentiated_modules: true,
+  })
+  equal(view.$('.assign-to-link').length, 1)
+})
+
+test('canot assign assignment if no edit permissions', function () {
+  const view = createView(this.model, {
+    canManage: false,
+    differentiated_modules: true,
+  })
+  equal(view.$('.assign-to-link').length, 0)
+})
+
+test('cannot assign assignment if flag is off', function () {
+  const view = createView(this.model, {
+    canManage: true,
+    differentiated_modules: false,
+  })
+  equal(view.$('.assign-to-link').length, 0)
 })
 
 test('can move when userIsAdmin is true', function () {
@@ -908,6 +936,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function (hooks
     fakeENV.setup({
       current_user_roles: ['teacher'],
       URLS: {assignment_sort_base_url: 'test'},
+      current_user__is_admin: false,
     })
 
     genSetup.call(this)

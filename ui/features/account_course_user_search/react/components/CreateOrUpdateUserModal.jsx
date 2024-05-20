@@ -39,7 +39,7 @@ import preventDefault from '@canvas/util/preventDefault'
 import unflatten from 'obj-unflatten'
 import registrationErrors from '@canvas/normalize-registration-errors'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import TimeZoneSelect from '@canvas/timezone/TimeZoneSelect'
+import TimeZoneSelect from '@canvas/datetime/react/components/TimeZoneSelect'
 
 const I18n = useI18nScope('account_course_user_search')
 
@@ -253,7 +253,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
                   renderLabel={renderLabel}
                   label={label}
                   data-testid={label ?? renderLabel}
-                  value={get(this.state.data, name) ?? ''}
+                  value={get(this.state.data, name)?.toString() ?? ''}
                   checked={get(this.state.data, name) ?? false}
                   onChange={e =>
                     this.onChange(

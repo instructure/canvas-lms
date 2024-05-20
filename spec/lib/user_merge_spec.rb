@@ -73,7 +73,7 @@ describe UserMerge do
       user2.reload
       expect(user2.pseudonyms).to be_empty
       user1.reload
-      expect(user1.pseudonyms.map(&:unique_id)).to be_include("sam@yahoo.com")
+      expect(user1.pseudonyms.map(&:unique_id)).to include("sam@yahoo.com")
     end
 
     it "moves lti_id to the new users" do
@@ -262,7 +262,7 @@ describe UserMerge do
         UserMerge.from(user2).into(user1)
         expect(user2.reload.submissions.length).to be(0)
         expect(user1.reload.submissions.length).to be(1)
-        expect(user1.submissions.map(&:id)).to be_include(submission.id)
+        expect(user1.submissions.map(&:id)).to include(submission.id)
       end
 
       it "ignores scored unsubmitted submission belonging to from user" do
@@ -291,8 +291,8 @@ describe UserMerge do
         UserMerge.from(user2).into(user1)
         expect(user2.reload.submissions.length).to be(0)
         expect(user1.reload.submissions.length).to be(2)
-        expect(user1.submissions.map(&:id)).to be_include(submission.id)
-        expect(user1.submissions.map(&:id)).not_to be_include(submission2.id)
+        expect(user1.submissions.map(&:id)).to include(submission.id)
+        expect(user1.submissions.map(&:id)).not_to include(submission2.id)
       end
     end
 
@@ -316,8 +316,8 @@ describe UserMerge do
       expect(user2.submissions.length).to be(1)
       expect(user2.submissions.first.id).to eql(s2.id)
       expect(user1.submissions.length).to be(2)
-      expect(user1.submissions.map(&:id)).to be_include(s1.id)
-      expect(user1.submissions.map(&:id)).to be_include(s3.id)
+      expect(user1.submissions.map(&:id)).to include(s1.id)
+      expect(user1.submissions.map(&:id)).to include(s3.id)
     end
 
     it "does not move or delete submission when both users have submissions" do
@@ -388,8 +388,8 @@ describe UserMerge do
       expect(qs2.reload.submission_id).to eq sub.id
 
       expect(user1.quiz_submissions.length).to be(2)
-      expect(user1.quiz_submissions.map(&:id)).to be_include(qs2.id)
-      expect(user1.quiz_submissions.map(&:id)).to be_include(qs3.id)
+      expect(user1.quiz_submissions.map(&:id)).to include(qs2.id)
+      expect(user1.quiz_submissions.map(&:id)).to include(qs3.id)
     end
 
     it "moves ccs to the new user (but only if they don't already exist)" do
@@ -963,22 +963,7 @@ describe UserMerge do
       end
     end
 
-    it "moves prefs over with old format" do
-      @shard1.activate do
-        @user2 = user_model
-        account = Account.create!
-        @shard_course = course_factory(account:)
-        @user2.preferences[:custom_colors] = { "course_#{@course.id}" => "#254284" }
-      end
-      course = course_factory
-      user1 = user_model
-      @user2.preferences[:custom_colors]["course_#{course.global_id}"] = "#346543"
-      @user2.save!
-      UserMerge.from(@user2).into(user1)
-      expect(user1.reload.preferences[:custom_colors].keys).to eq ["course_#{@shard_course.global_id}", "course_#{course.id}"]
-    end
-
-    it "moves prefs over with new format" do
+    it "moves prefs over" do
       @shard1.activate do
         @user2 = user_model
         account = Account.create!
@@ -994,22 +979,7 @@ describe UserMerge do
       )
     end
 
-    it "moves nicknames with old format" do
-      @shard1.activate do
-        @user2 = user_model
-        account = Account.create!
-        @shard_course = course_factory(account:)
-        @user2.preferences[:course_nicknames] = { @shard_course.id => "Marketing" }
-      end
-      course = course_factory
-      user1 = user_model
-      @user2.preferences[:course_nicknames][course.global_id] = "Math"
-      @user2.save!
-      UserMerge.from(@user2).into(user1)
-      expect(user1.reload.preferences[:course_nicknames].keys).to eq [@shard_course.global_id, course.id]
-    end
-
-    it "moves nicknames with new format" do
+    it "moves nicknames" do
       @shard1.activate do
         @user2 = user_model
         account = Account.create!
@@ -1110,6 +1080,23 @@ describe UserMerge do
       expect(@user2.communication_channels.to_a.map(&:path).sort).to eq ["user1@example.com", "user2@example.com"]
       expect(@user2.all_pseudonyms).to eq [p1, @p2]
       expect(@user2.associated_shards).to eq [@shard1, Shard.default]
+    end
+
+    it "handles conflicting notification policies" do
+      user1 = user_with_pseudonym(username: "user1@example.com", active_all: 1)
+      p1 = @pseudonym
+      cc1 = @cc
+      notification_policy_model(notification: notification_model, communication_channel: cc1)
+
+      @shard1.activate { @user2 = user_model }
+
+      UserMerge.from(user1).into(@user2)
+
+      expect(user1).to be_deleted
+      expect(p1.reload.user).to eq @user2
+      expect(cc1.reload).to be_retired
+      @user2.reload
+      expect(@user2.communication_channels.to_a.map(&:path).sort).to eq ["user1@example.com"]
     end
 
     it "handles root_account_ids on ccs" do

@@ -26,6 +26,34 @@ class Discussion
     def course_pacing_notice_selector
       "[data-testid='CoursePacingNotice']"
     end
+
+    def assign_to_button_selector
+      "button[data-testid='manage-assign-to']"
+    end
+
+    def grade_checkbox_selector
+      "input[type=checkbox][value='graded']"
+    end
+
+    def topic_input_selector
+      "input[placeholder='Topic Title']"
+    end
+
+    def points_possible_input_selector
+      "input[data-testid='points-possible-input']"
+    end
+
+    def save_and_publish_button_selector
+      "button[data-testid='save-and-publish-button']"
+    end
+
+    def save_selector
+      "[data-testid='save-button']"
+    end
+
+    def section_warning_continue_selector
+      "button[data-testid='continue-button']"
+    end
     # ---------------------- Elements ----------------------
 
     def discussion_page_body
@@ -68,6 +96,31 @@ class Discussion
       f(course_pacing_notice_selector)
     end
 
+    def assign_to_button
+      f(assign_to_button_selector)
+    end
+    # ---------------------- Actions ----------------------
+
+    def topic_title_input
+      f(topic_input_selector)
+    end
+
+    def points_possible_input
+      f(points_possible_input_selector)
+    end
+
+    def save_and_publish_button
+      f(save_and_publish_button_selector)
+    end
+
+    def save_button
+      f(save_selector)
+    end
+
+    def section_warning_continue_button
+      f(section_warning_continue_selector)
+    end
+
     # ---------------------- Actions ----------------------
     def visit(course, discussion)
       get("/courses/#{course.id}/discussion_topics/#{discussion.id}")
@@ -80,6 +133,22 @@ class Discussion
     def start_reply_with_media
       create_reply_button.click
       add_media_button.click
+    end
+
+    def click_assign_to_button
+      assign_to_button.click
+    end
+
+    def start_new_discussion(course_id)
+      get "/courses/#{course_id}/discussion_topics/new"
+    end
+
+    def update_discussion_topic_title(title = "Default Discussion Title")
+      topic_title_input.send_keys title
+    end
+
+    def update_discussion_message(message = "Default Discussion Message")
+      type_in_tiny("textarea", message)
     end
   end
 end

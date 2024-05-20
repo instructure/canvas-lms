@@ -65,7 +65,7 @@ describe PageView::Pv4Client do
       expect(pv.session_id).to eq "c73d248f3e4cec530261c95232ba63fg"
       expect(pv.context_id).to eq 120_000_000_000_002
       expect(pv.context_type).to eq "Account"
-      expect(pv.user_agent).to be_include("Safari")
+      expect(pv.user_agent).to include("Safari")
       expect(pv.account_id).to eq 120_000_000_000_002
       expect(pv.user_id).to eq 31_410_000_000_000_028
       expect(pv.remote_ip).to eq "192.168.0.1"

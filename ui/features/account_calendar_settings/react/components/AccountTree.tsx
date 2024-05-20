@@ -28,7 +28,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 import {addAccountsToTree} from '../utils'
 import {AccountCalendarItemToggleGroup} from './AccountCalendarItemToggleGroup'
-import {
+import type {
   Account,
   Collection,
   AccountData,

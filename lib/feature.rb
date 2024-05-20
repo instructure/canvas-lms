@@ -42,7 +42,7 @@ class Feature
       next unless ATTRS.include?(key)
       next if key == :state && !%w[hidden off allowed on allowed_on].include?(val)
 
-      instance_variable_set "@#{key}", val
+      instance_variable_set :"@#{key}", val
     end
     # for RootAccount features, "allowed" state is redundant; show "off" instead
     @root_opt_in = true if @applies_to == "RootAccount"
@@ -236,8 +236,8 @@ class Feature
     valid_states = [STATE_OFF, STATE_ON]
     valid_states += [STATE_DEFAULT_OFF, STATE_DEFAULT_ON] if context.is_a?(Account)
     (valid_states - [orig_state]).index_with do |state|
-      { "locked" => ([STATE_DEFAULT_OFF, STATE_DEFAULT_ON].include?(state) && ((@applies_to == "RootAccount" &&
-        context.is_a?(Account) && context.root_account? && !context.site_admin?) || @applies_to == "SiteAdmin")) }
+      { "locked" => [STATE_DEFAULT_OFF, STATE_DEFAULT_ON].include?(state) && ((@applies_to == "RootAccount" &&
+        context.is_a?(Account) && context.root_account? && !context.site_admin?) || @applies_to == "SiteAdmin") }
     end
   end
 
@@ -258,7 +258,7 @@ class Feature
 
   def self.remove_obsolete_flags
     valid_features = definitions.keys
-    cutoff = Setting.get("obsolete_feature_flag_cutoff_days", 60).to_i.days.ago
+    cutoff = 60.days.ago
     delete_scope = FeatureFlag.where("updated_at<?", cutoff).where.not(feature: valid_features)
     delete_scope.in_batches.delete_all
   end

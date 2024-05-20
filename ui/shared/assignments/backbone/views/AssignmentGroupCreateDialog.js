@@ -21,8 +21,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@canvas/backbone'
 import $ from 'jquery'
 import template from '../../jst/AssignmentGroupCreateDialog.handlebars'
-import '@canvas/util/toJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.toJSON'
+import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/jquery/fixDialogButtons'
@@ -53,6 +53,7 @@ AssignmentGroupCreateDialog.prototype.render = function () {
       title: I18n.t('titles.add_assignment_group', 'Add Assignment Group'),
       width: 'auto',
       modal: true,
+      zIndex: 1000,
     })
     .fixDialogButtons()
   this.$el

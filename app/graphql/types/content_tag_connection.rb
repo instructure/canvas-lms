@@ -24,7 +24,6 @@ module Types
   end
 
   class ContentTagType < GraphQL::Types::Relay::BaseEdge
-    include OutcomesServiceAlignmentsHelper
     node_type(Types::ContentTagContentType)
 
     implements GraphQL::Types::Relay::Node
@@ -41,7 +40,7 @@ module Types
     def can_unlink
       if learning_outcome_link?
         can_manage = (object.context_type == "LearningOutcomeGroup") ? can_manage_global_outcomes : can_manage_context_outcomes
-        can_unlink?(object, can_manage:)
+        can_manage && object.can_destroy?
       end
     end
 

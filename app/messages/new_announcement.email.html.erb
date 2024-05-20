@@ -30,7 +30,7 @@
 </div>
 <% end %>
 
-<% if !asset.locked? %>
+<% if asset.grants_right?(user, :reply) %>
 <p>
   <% if asset.context.is_a? Course %>
     <%= t :announcement_info_course, "Replies to this email will be posted as a reply to the announcement, which will be seen by everyone in the course." %>

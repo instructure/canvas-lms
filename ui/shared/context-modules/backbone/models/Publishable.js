@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
+import {clone} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('publishable')
@@ -43,7 +43,7 @@ export default class Publishable extends Backbone.Model {
 
   toJSON() {
     const json = {}
-    json[this._root] = _.clone(this.attributes)
+    json[this._root] = clone(this.attributes)
     return json
   }
 }

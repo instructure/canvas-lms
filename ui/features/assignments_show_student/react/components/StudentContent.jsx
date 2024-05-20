@@ -18,9 +18,11 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
+import AttemptInformation from './AttemptInformation'
 import AssignmentToggleDetails from '../AssignmentToggleDetails'
 import AvailabilityDates from '@canvas/assignments/react/AvailabilityDates'
 import SubmissionSticker from '@canvas/submission-sticker'
+import StudentViewContext from './Context'
 import ContentTabs from './ContentTabs'
 import Header from './Header'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -29,11 +31,9 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import MissingPrereqs from './MissingPrereqs'
 import DateLocked from '../DateLocked'
 import React, {Suspense, lazy, useContext, useEffect, useState} from 'react'
-import PropTypes from 'prop-types'
 import {Spinner} from '@instructure/ui-spinner'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import StudentFooter from './StudentFooter'
-import StudentViewContext from './Context'
 import {Text} from '@instructure/ui-text'
 import {totalAllowedAttempts} from '../helpers/SubmissionHelpers'
 import {View} from '@instructure/ui-view'
@@ -43,6 +43,7 @@ import VisualOnFocusMessage from './VisualOnFocusMessage'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {Flex} from '@instructure/ui-flex'
+import {arrayOf, func} from 'prop-types'
 
 const I18n = useI18nScope('assignments_2_student_content')
 
@@ -104,7 +105,7 @@ function renderAttemptsAndAvailability(assignment) {
   return (
     <StudentViewContext.Consumer>
       {context => (
-        <View as="div" margin="medium 0">
+        <View as="div" margin="0 0 medium 0">
           {assignment.expectsSubmission && (
             <Text as="div" weight="bold">
               {I18n.t(
@@ -141,9 +142,12 @@ function renderContentBaseOnAvailability(
     return <UnavailablePeerReview />
   } else if (submission == null) {
     // NOTE: handles case where user is not logged in, or the course hasn't started yet
+    // EVAL-3711 Remove ICE Feature Flag
     return (
       <>
-        {!assignment.env.peerReviewModeEnabled && renderAttemptsAndAvailability(assignment)}
+        {!window.ENV.FEATURES.instui_nav &&
+          !assignment.env.peerReviewModeEnabled &&
+          renderAttemptsAndAvailability(assignment)}
         <AssignmentToggleDetails description={assignment.description} />
         <Suspense
           fallback={<Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />}
@@ -160,9 +164,12 @@ function renderContentBaseOnAvailability(
 
     return (
       <>
-        <Flex alignItems="start">
+        <Flex margin="medium 0 0 0" alignItems="start">
           <div style={{flexGrow: 1}}>
-            {!assignment.env.peerReviewModeEnabled && renderAttemptsAndAvailability(assignment)}
+            {/* EVAL-3711 Remove ICE Feature Flag */}
+            {!window.ENV.FEATURES.instui_nav &&
+              !assignment.env.peerReviewModeEnabled &&
+              renderAttemptsAndAvailability(assignment)}
             {assignment.submissionTypes.includes('student_annotation') && (
               <VisualOnFocusMessage
                 message={I18n.t(
@@ -190,7 +197,6 @@ function renderContentBaseOnAvailability(
             </View>
           )}
         </Flex>
-
         {assignment.expectsSubmission ? (
           <ContentTabs
             assignment={assignment}
@@ -201,7 +207,6 @@ function renderContentBaseOnAvailability(
         ) : (
           <SubmissionlessFooter onMarkAsDoneError={onMarkAsDoneError} />
         )}
-
         {ENV.LTI_TOOL === 'true' && (
           <ToolLaunchIframe
             allow={iframeAllowances()}
@@ -218,7 +223,13 @@ function renderContentBaseOnAvailability(
 
 function StudentContent(props) {
   const alertContext = useContext(AlertManagerContext)
-  const [assignedAssessments, setAssignedAssessments] = useState([])
+  const [, setAssignedAssessments] = useState([])
+  const initialCommentTrayState =
+    !!props.submission?.unreadCommentCount ||
+    (!!props.assignment.env.peerReviewModeEnabled &&
+      props.assignment.env.peerReviewAvailable &&
+      !props.assignment.rubric)
+  const [commentTrayStatus, setCommentTrayStatus] = useState(initialCommentTrayState)
 
   const {description, name} = props.assignment
   useEffect(() => {
@@ -250,34 +261,59 @@ function StudentContent(props) {
     setUpImmersiveReader()
   }, [description, name])
 
-  const onSuccessfulPeerReview = (assignedAssessments) => {
+  const onSuccessfulPeerReview = assignedAssessments => {
     setAssignedAssessments(assignedAssessments)
+  }
+
+  const openCommentTray = () => {
+    setCommentTrayStatus(true)
+  }
+
+  const closeCommentTray = () => {
+    setCommentTrayStatus(false)
   }
 
   // TODO: Move the button provider up one level
   return (
-    <div data-testid="assignments-2-student-view">
-      <Header
-        allSubmissions={props.allSubmissions}
-        assignment={props.assignment}
-        onChangeSubmission={props.onChangeSubmission}
-        scrollThreshold={150}
-        submission={props.submission}
-        reviewerSubmission={props.reviewerSubmission}
-        onSuccessfulPeerReview={onSuccessfulPeerReview}
-      />
+    <div data-testid="assignments-2-student-view" style={{marginTop: '-36px'}}>
+      <View 
+        as='div' 
+        position='sticky' 
+        stacking='above'
+        background="primary"
+        style={{top: 0}}
+        padding="large 0 0 0"
+        themeOverride={{paddingLarge: '36px'}}
+      >
+        <Header
+          assignment={props.assignment}
+          scrollThreshold={150}
+          submission={props.submission}
+          reviewerSubmission={props.reviewerSubmission}
+        />
+        <AttemptInformation
+          assignment={props.assignment}
+          submission={props.submission}
+          reviewerSubmission={props.reviewerSubmission}
+          onChangeSubmission={props.onChangeSubmission}
+          allSubmissions={props.allSubmissions}
+          openCommentTray={openCommentTray}
+          closeCommentTray={closeCommentTray}
+          commentTrayStatus={commentTrayStatus}
+          onSuccessfulPeerReview={onSuccessfulPeerReview}
+        />
+      </View>
       {renderContentBaseOnAvailability(props, alertContext, onSuccessfulPeerReview)}
     </div>
   )
 }
 
 StudentContent.propTypes = {
-  allSubmissions: PropTypes.arrayOf(Submission.shape),
   assignment: Assignment.shape,
-  onChangeSubmission: PropTypes.func.isRequired,
   submission: Submission.shape,
   reviewerSubmission: Submission.shape,
-  onSuccessfulPeerReview: PropTypes.func,
+  onChangeSubmission: func,
+  allSubmissions: arrayOf(Submission.shape),
 }
 
 StudentContent.defaultProps = {

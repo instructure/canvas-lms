@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import _ from 'underscore'
+import {map} from 'lodash'
 import PaginatedView from '@canvas/pagination/backbone/views/PaginatedView'
 import pageViewTemplate from '../../jst/PageView.handlebars'
 
@@ -34,7 +34,7 @@ export default class PageViewView extends PaginatedView {
   //
   // Returns nothing.
   render() {
-    const html = _.map(this.collection.models, this.renderPageView).join('')
+    const html = map(this.collection.models, this.renderPageView).join('')
     this.$el.append(html)
     return super.render(...arguments)
   }

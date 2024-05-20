@@ -60,7 +60,9 @@ describe Types::DiscussionEntryType do
     expect(type.resolve("ratingCount")).to eq parent_entry.rating_count
     expect(type.resolve("deleted")).to eq parent_entry.deleted?
     expect(type.resolve("author { _id }")).to eq parent_entry.user_id.to_s
+    expect(type.resolve("author { courseRoles }")).to eq ["TeacherEnrollment"]
     expect(type.resolve("editor { _id }")).to eq parent_entry.editor_id.to_s
+    expect(type.resolve("editor { courseRoles }")).to eq ["TeacherEnrollment"]
     expect(type.resolve("discussionTopic { _id }")).to eq parent_entry.discussion_topic.id.to_s
     expect(type.resolve("depth")).to eq parent_entry.depth
   end
@@ -89,12 +91,6 @@ describe Types::DiscussionEntryType do
 
     expect(discussion_entry_type.resolve("attachment { _id }")).to eq discussion_entry.attachment.id.to_s
     expect(discussion_entry_type.resolve("attachment { displayName }")).to eq discussion_entry.attachment.display_name
-  end
-
-  it "queries the isolated entry id" do
-    expect(discussion_sub_entry_type.resolve("isolatedEntryId")).to eq sub_entry.parent_id.to_s
-    sub_entry.update!(legacy: false)
-    expect(discussion_sub_entry_type.resolve("isolatedEntryId")).to eq sub_entry.root_entry_id.to_s
   end
 
   describe "converts anchor tag to video tag" do
@@ -288,49 +284,20 @@ describe Types::DiscussionEntryType do
       let(:anon_discussion_student_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting student", parent_id: @anon_student_discussion_entry.id, user: @student, quoted_entry_id: @anon_student_discussion_entry.id) }
       let(:anon_student_quoted_type) { GraphQLTypeTester.new(anon_discussion_student_quoted, current_user: @teacher) }
 
-      context "split screen view flag" do
-        before do
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:split_screen_view).and_return(true)
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(false)
-        end
-
-        it "returns the author information of a teacher post" do
-          expect(anon_teacher_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_teacher_discussion_entry.user.short_name
-        end
-
-        it "returns the author information of a ta post" do
-          expect(anon_ta_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_ta_discussion_entry.user.short_name
-        end
-
-        it "returns the author information of a designer post" do
-          expect(anon_designer_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_designer_discussion_entry.user.short_name
-        end
-
-        it "does not return author of anonymous student" do
-          expect(anon_student_quoted_type.resolve("quotedEntry { author { shortName } }")).to be_nil
-        end
+      it "returns the author information of a teacher post" do
+        expect(anon_teacher_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_teacher_discussion_entry.user.short_name
       end
 
-      context "isolated view flag" do
-        before do
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(true)
-        end
+      it "returns the author information of a ta post" do
+        expect(anon_ta_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_ta_discussion_entry.user.short_name
+      end
 
-        it "returns the author information of a teacher post" do
-          expect(anon_teacher_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_teacher_discussion_entry.user.short_name
-        end
+      it "returns the author information of a designer post" do
+        expect(anon_designer_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_designer_discussion_entry.user.short_name
+      end
 
-        it "returns the author information of a ta post" do
-          expect(anon_ta_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_ta_discussion_entry.user.short_name
-        end
-
-        it "returns the author information of a designer post" do
-          expect(anon_designer_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_designer_discussion_entry.user.short_name
-        end
-
-        it "does not return author of anonymous student" do
-          expect(anon_student_quoted_type.resolve("quotedEntry { author { shortName } }")).to be_nil
-        end
+      it "does not return author of anonymous student" do
+        expect(anon_student_quoted_type.resolve("quotedEntry { author { shortName } }")).to be_nil
       end
     end
 
@@ -369,18 +336,8 @@ describe Types::DiscussionEntryType do
     end
   end
 
-  context "isolated view" do
-    it "returns nil for subentries count on non root entries" do
-      Account.site_admin.enable_feature!(:isolated_view)
-      sub_entry
-      DiscussionEntry.where(id: parent).update_all(legacy: false)
-      expect(GraphQLTypeTester.new(parent, current_user: @teacher).resolve("subentriesCount")).to be_nil
-    end
-  end
-
   context "split screen view" do
     it "returns count for subentries count on non root entries" do
-      Account.site_admin.enable_feature!(:split_screen_view)
       sub_entry
       DiscussionEntry.where(id: parent).update_all(legacy: false)
       expect(GraphQLTypeTester.new(parent, current_user: @teacher).resolve("subentriesCount")).to be 1

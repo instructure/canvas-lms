@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -20,7 +21,7 @@ import $ from 'jquery'
 import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import GradingResults, {GradingResultsComponentProps} from '..'
+import GradingResults, {type GradingResultsComponentProps} from '..'
 import {
   defaultStudentSubmissions,
   defaultAssignment,
@@ -29,13 +30,13 @@ import {
 } from './fixtures'
 import {GRADEBOOK_SUBMISSION_COMMENTS} from '../../../../queries/Queries'
 import {MockedProvider} from '@apollo/react-testing'
-import {executeApiRequest} from '@canvas/util/apiRequest'
-import {
+import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
+import type {
   AssignmentConnection,
   GradebookUserSubmissionDetails,
 } from 'features/enhanced_individual_gradebook/types'
 
-jest.mock('@canvas/util/apiRequest', () => ({
+jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
   executeApiRequest: jest.fn(),
 }))
 
@@ -282,7 +283,7 @@ describe('Grading Results Tests', () => {
       expect(queryByTestId('proxy-submission-button')).not.toBeInTheDocument()
     })
 
-    it('renders the proxy submit modal when the submit for student button is clicked', () => {
+    it('renders the proxy submit modal when the submit for student button is clicked', async () => {
       const modifiedProps = {
         ...gradingResultsDefaultProps,
         assignment: {
@@ -294,7 +295,7 @@ describe('Grading Results Tests', () => {
         },
       }
       const {getByTestId} = renderGradingResults(modifiedProps)
-      userEvent.click(getByTestId('proxy-submission-button'))
+      await userEvent.click(getByTestId('proxy-submission-button'))
       expect(getByTestId('proxyInputFileDrop')).toBeInTheDocument()
     })
 
@@ -324,7 +325,7 @@ describe('Grading Results Tests', () => {
       expect(getByTestId('student_and_assignment_grade_input')).not.toBeDisabled()
     })
 
-    it('disables the submission details grade input and update grade button when moderated assignment grades have not been posted', () => {
+    it('disables the submission details grade input and update grade button when moderated assignment grades have not been posted', async () => {
       const modifiedProps = {
         ...gradingResultsDefaultProps,
         assignment: {
@@ -334,12 +335,12 @@ describe('Grading Results Tests', () => {
         },
       }
       const {getByTestId} = renderGradingResults(modifiedProps)
-      userEvent.click(getByTestId('submission-details-button'))
+      await userEvent.click(getByTestId('submission-details-button'))
       expect(getByTestId('submission_details_grade_input')).toBeDisabled()
       expect(getByTestId('submission-details-submit-button')).toBeDisabled()
     })
 
-    it('enables the submission details grade input and update grade button when moderated assignment grades have been posted', () => {
+    it('enables the submission details grade input and update grade button when moderated assignment grades have been posted', async () => {
       const modifiedProps = {
         ...gradingResultsDefaultProps,
         assignment: {
@@ -349,7 +350,7 @@ describe('Grading Results Tests', () => {
         },
       }
       const {getByTestId} = renderGradingResults(modifiedProps)
-      userEvent.click(getByTestId('submission-details-button'))
+      await userEvent.click(getByTestId('submission-details-button'))
       expect(getByTestId('submission_details_grade_input')).not.toBeDisabled()
       expect(getByTestId('submission-details-submit-button')).not.toBeDisabled()
     })
@@ -392,7 +393,7 @@ describe('Grading Results Tests', () => {
       }
     })
 
-    it('renders minus grades with the en-dash character replaced with the minus character', () => {
+    it('renders minus grades with the en-dash character replaced with the minus character', async () => {
       const props = {
         ...gradingResultsDefaultProps,
         studentSubmissions: [modifiedDefaultStudentSubmission],
@@ -401,7 +402,7 @@ describe('Grading Results Tests', () => {
       const {getByTestId} = renderGradingResults(props)
       expect(getByTestId('student_and_assignment_grade_input')).toHaveValue('A−')
 
-      userEvent.click(getByTestId('submission-details-button'))
+      await userEvent.click(getByTestId('submission-details-button'))
       expect(getByTestId('submission_details_grade_input')).toHaveValue('A−')
     })
   })
@@ -414,7 +415,7 @@ describe('Grading Results Tests', () => {
         ...defaultStudentSubmissions,
         enteredGrade: null,
         enteredScore: null,
-        score: null,
+        score: 0,
         grade: null,
       }
       modifiedDefaultAssignments = {
@@ -422,7 +423,7 @@ describe('Grading Results Tests', () => {
         gradingType: 'pass_fail',
       }
     })
-    it('renders Ungraded in both the submission detail modal and main page drop downs and a dash in the Out of Text', () => {
+    it('renders Ungraded in both the submission detail modal and main page drop downs and a dash in the Out of Text', async () => {
       const props = {
         ...gradingResultsDefaultProps,
         studentSubmissions: [modifiedDefaultStudentSubmissions],
@@ -433,12 +434,12 @@ describe('Grading Results Tests', () => {
       expect(getByTestId('student_and_assignment_grade_out_of_text')).toHaveTextContent(
         '- out of 10'
       )
-      userEvent.click(getByTestId('submission-details-button'))
+      await userEvent.click(getByTestId('submission-details-button'))
       expect(getByTestId('submission_details_grade_select')).toHaveValue('Ungraded')
       expect(getByTestId('submission_details_grade_out_of_text')).toHaveTextContent('- out of 10')
     })
 
-    it('renders Complete in both the submission detail modal and main page drop downs and sets the max score in the Out of Text', () => {
+    it('renders Complete in both the submission detail modal and main page drop downs and sets the max score in the Out of Text', async () => {
       const props = {
         ...gradingResultsDefaultProps,
         studentSubmissions: [
@@ -457,11 +458,11 @@ describe('Grading Results Tests', () => {
       expect(getByTestId('student_and_assignment_grade_out_of_text')).toHaveTextContent(
         '10 out of 10'
       )
-      userEvent.click(getByTestId('submission-details-button'))
+      await userEvent.click(getByTestId('submission-details-button'))
       expect(getByTestId('submission_details_grade_select')).toHaveValue('Complete')
       expect(getByTestId('submission_details_grade_out_of_text')).toHaveTextContent('10 out of 10')
     })
-    it('renders Incomplete in both the submission detail modal and main page drop downs and sets 0 in the Out of Text', () => {
+    it('renders Incomplete in both the submission detail modal and main page drop downs and sets 0 in the Out of Text', async () => {
       const props = {
         ...gradingResultsDefaultProps,
         studentSubmissions: [
@@ -469,7 +470,7 @@ describe('Grading Results Tests', () => {
             ...modifiedDefaultStudentSubmissions,
             enteredGrade: 'incomplete',
             enteredScore: 0,
-            score: 0,
+            score: null,
             grade: 'incomplete',
           },
         ],
@@ -480,11 +481,11 @@ describe('Grading Results Tests', () => {
       expect(getByTestId('student_and_assignment_grade_out_of_text')).toHaveTextContent(
         '0 out of 10'
       )
-      userEvent.click(getByTestId('submission-details-button'))
+      await userEvent.click(getByTestId('submission-details-button'))
       expect(getByTestId('submission_details_grade_select')).toHaveValue('Incomplete')
       expect(getByTestId('submission_details_grade_out_of_text')).toHaveTextContent('0 out of 10')
     })
-    it('renders Excused in both the submission detail modal and main page drop downs and sets the text Excused in the Out of Text', () => {
+    it('renders Excused in both the submission detail modal and main page drop downs and sets the text Excused in the Out of Text', async () => {
       const props = {
         ...gradingResultsDefaultProps,
         studentSubmissions: [
@@ -498,7 +499,7 @@ describe('Grading Results Tests', () => {
       const {getByTestId} = renderGradingResults(props)
       expect(getByTestId('student_and_assignment_grade_select')).toHaveValue('Excused')
       expect(getByTestId('student_and_assignment_grade_out_of_text')).toHaveTextContent('Excused')
-      userEvent.click(getByTestId('submission-details-button'))
+      await userEvent.click(getByTestId('submission-details-button'))
       expect(getByTestId('submission_details_grade_select')).toHaveValue('Excused')
       expect(getByTestId('submission_details_grade_out_of_text')).toHaveTextContent('Excused')
     })
@@ -510,9 +511,9 @@ describe('Grading Results Tests', () => {
       }
       const {getByTestId, getByText} = renderGradingResults(props)
       const gradeSelector = getByTestId('student_and_assignment_grade_select')
-      userEvent.click(gradeSelector)
-      userEvent.click(getByText('Complete'))
-      userEvent.tab()
+      await userEvent.click(gradeSelector)
+      await userEvent.click(getByText('Complete'))
+      await userEvent.tab()
       expect(executeApiRequest).toHaveBeenCalledWith({
         body: {
           originator: 'individual_gradebook',
@@ -531,10 +532,10 @@ describe('Grading Results Tests', () => {
         assignment: modifiedDefaultAssignments,
       }
       const {getByTestId, getByText} = renderGradingResults(props)
-      userEvent.click(getByTestId('submission-details-button'))
-      userEvent.click(getByTestId('submission_details_grade_select'))
-      userEvent.click(getByText('Complete'))
-      userEvent.click(getByTestId('submission-details-submit-button'))
+      await userEvent.click(getByTestId('submission-details-button'))
+      await userEvent.click(getByTestId('submission_details_grade_select'))
+      await userEvent.click(getByText('Complete'))
+      await userEvent.click(getByTestId('submission-details-submit-button'))
       expect(executeApiRequest).toHaveBeenCalledWith({
         body: {
           originator: 'individual_gradebook',
@@ -574,27 +575,31 @@ describe('Grading Results Tests', () => {
     })
     it('grade input and excuse checkbox are disabled when assignment is in a closed grading period and user is not an admin', () => {
       ENV.current_user_roles = ['teacher']
+      ENV.current_user_is_admin = false
       const {getByTestId} = renderGradingResults(props)
       expect(getByTestId('student_and_assignment_grade_input')).toBeDisabled()
       expect(getByTestId('excuse_assignment_checkbox')).toBeDisabled()
     })
     it('grade input is not disabled when assignment is in a closed grading period and user is an admin', () => {
       ENV.current_user_roles = ['admin']
+      ENV.current_user_is_admin = true
       const {getByTestId} = renderGradingResults(props)
       expect(getByTestId('student_and_assignment_grade_input')).toBeEnabled()
       expect(getByTestId('excuse_assignment_checkbox')).toBeEnabled()
     })
-    it('submission details grade input and update grade button are disabled when assignment is in a closed grading period and user is not an admin', () => {
+    it('submission details grade input and update grade button are disabled when assignment is in a closed grading period and user is not an admin', async () => {
       ENV.current_user_roles = ['teacher']
+      ENV.current_user_is_admin = false
       const {getByTestId} = renderGradingResults(props)
-      userEvent.click(getByTestId('submission-details-button'))
+      await userEvent.click(getByTestId('submission-details-button'))
       expect(getByTestId('submission-details-submit-button')).toBeDisabled()
       expect(getByTestId('submission_details_grade_input')).toBeDisabled()
     })
-    it('submission details grade input and update grade button are not disabled when assignment is in a closed grading period and user is an admin', () => {
+    it('submission details grade input and update grade button are not disabled when assignment is in a closed grading period and user is an admin', async () => {
       ENV.current_user_roles = ['admin']
+      ENV.current_user_is_admin = true
       const {getByTestId} = renderGradingResults(props)
-      userEvent.click(getByTestId('submission-details-button'))
+      await userEvent.click(getByTestId('submission-details-button'))
       expect(getByTestId('submission-details-submit-button')).toBeEnabled()
       expect(getByTestId('submission_details_grade_input')).not.toBeDisabled()
     })

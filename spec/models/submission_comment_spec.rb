@@ -239,21 +239,21 @@ RSpec.describe SubmissionComment do
     it "does not send notifications to users in concluded sections" do
       @submission_ended = @assignment.submit_homework(@student_ended)
       @comment = @submission_ended.add_comment(author: @teacher, comment: "some comment")
-      expect(@comment.messages_sent.keys).not_to be_include("Submission Comment")
+      expect(@comment.messages_sent.keys).not_to include("Submission Comment")
     end
 
     it "does not dispatch notification on create if course is unpublished" do
       @course.complete
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
       expect(@course).to_not be_available
-      expect(@comment.messages_sent.keys).to_not be_include("Submission Comment")
+      expect(@comment.messages_sent.keys).to_not include("Submission Comment")
     end
 
     it "does not dispatch notification on create if student is inactive" do
       @student.enrollments.first.deactivate
 
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
-      expect(@comment.messages_sent.keys).to_not be_include("Submission Comment")
+      expect(@comment.messages_sent.keys).to_not include("Submission Comment")
     end
 
     it "does not dispatch notification on create for provisional comments" do
@@ -266,7 +266,7 @@ RSpec.describe SubmissionComment do
       @submission = @assignment.find_or_create_submission(@student)
       @comment = @submission.add_comment(author: @student, comment: "some comment")
       expect(@submission).to be_unsubmitted
-      expect(@comment.messages_sent).to be_include("Submission Comment For Teacher")
+      expect(@comment.messages_sent).to include("Submission Comment For Teacher")
     end
 
     it "doesn't dispatch notifications on create for manually posted assignments" do
@@ -302,6 +302,8 @@ RSpec.describe SubmissionComment do
     @comment.reload
     @comment.update(attachments: [a])
     expect(@comment.attachment_ids).to eql(a.id.to_s)
+    expect(@comment.cached_attachments.first).to be_an(Attachment)
+    expect(@comment.cached_attachments).to eql [a]
   end
 
   it "rejects invalid attachments" do
@@ -310,6 +312,16 @@ RSpec.describe SubmissionComment do
     @comment = @submission.submission_comments.create!(valid_attributes)
     @comment.update(attachments: [a])
     expect(@comment.attachment_ids).to eql("")
+  end
+
+  it "handles legacy OpenObject attachments" do
+    a = Attachment.create!(context: @assignment, uploaded_data: default_uploaded_data)
+    a.recently_created = false
+    @comment = @submission.submission_comments.create!(valid_attributes)
+    @comment.update(attachments: [a])
+    @comment.cached_attachments = [OpenObject.new(a.attributes, in_specs: true)]
+    expect(@comment.cached_attachments.first).to be_an(Attachment)
+    expect(@comment.cached_attachments).to eql [a]
   end
 
   it "renders formatted_body correctly" do

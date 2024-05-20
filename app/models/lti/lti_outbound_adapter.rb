@@ -86,12 +86,11 @@ module Lti
       self
     end
 
-    def generate_post_payload(assignment: nil, student_id: nil)
+    def generate_post_payload(assignment: nil)
       raise("Called generate_post_payload before calling prepare_tool_launch") unless @tool_launch
 
       hash = @tool_launch.generate(@overrides)
       hash[:ext_lti_assignment_id] = assignment&.lti_context_id if assignment&.lti_context_id.present?
-      hash[:ext_lti_student_id] = student_id if student_id
       begin
         Lti::Security.signed_post_params(
           hash,
@@ -118,6 +117,13 @@ module Lti
 
       lti_assignment = Lti::LtiAssignmentCreator.new(assignment).convert
       @tool_launch.for_homework_submission!(lti_assignment)
+      generate_post_payload
+    end
+
+    def generate_post_payload_for_student_context_card(student_id:)
+      raise("Called generate_post_payload_for_student_context_card before calling prepare_tool_launch") unless @tool_launch
+
+      @overrides[:lti_student_id] = student_id
       generate_post_payload
     end
 

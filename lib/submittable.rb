@@ -19,14 +19,9 @@
 
 module Submittable
   def self.included(klass)
-    klass.belongs_to :assignment, inverse_of: klass.table_name.singularize
+    klass.belongs_to :assignment, inverse_of: klass.table_name.singularize, class_name: "Assignment"
     klass.belongs_to :old_assignment, class_name: "Assignment"
     klass.has_many :assignment_student_visibilities, through: :assignment
-
-    klass.scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-      without_assignment_in_course(course_ids)
-        .union(joins_assignment_student_visibilities(user_ids, course_ids))
-    }
 
     klass.scope :without_assignment_in_course, lambda { |course_ids|
       where(context_id: course_ids, context_type: "Course").where(assignment_id: nil)
@@ -38,59 +33,6 @@ module Submittable
     }
 
     klass.extend ClassMethods
-  end
-
-  module ClassMethods
-    def visible_ids_by_user(opts)
-      # Items with an assignment: pluck id, assignment_id, and user_id from items joined with the SQL view
-      plucked_visibilities = pluck_visibilities(opts).group_by { |_, _, user_id| user_id }
-
-      # Assignment-less items are *normally* visible to all -- the exception is
-      # section-specific discussions, so here get the ones visible to everyone in the
-      # course, and below get the ones that are visible to the right section.
-      ids_visible_to_all = if opts[:item_type] == :discussion
-                             without_assignment_in_course(opts[:course_id]).where(is_section_specific: false).pluck(:id)
-                           else
-                             without_assignment_in_course(opts[:course_id]).pluck(:id)
-                           end
-
-      # Now get the section-specific discussions that are in the proper sections.
-      ids_visible_to_sections = if opts[:item_type] == :discussion
-                                  # build hash of user_ids to array of section ids
-                                  sections_per_user = {}
-                                  Enrollment.active.where(course_id: opts[:course_id], user_id: opts[:user_id])
-                                            .pluck(:user_id, :course_section_id)
-                                            .each { |user_id, section_id| (sections_per_user[user_id] ||= Set.new) << section_id }
-
-                                  # build hash of section_ids to array of visible topic ids
-                                  all_section_ids = sections_per_user.values.reduce([]) { |all_ids, section_ids| all_ids.concat(section_ids.to_a) }
-                                  topic_ids_per_section = {}
-                                  DiscussionTopicSectionVisibility.active.where(course_section_id: all_section_ids)
-                                                                  .pluck(:course_section_id, :discussion_topic_id)
-                                                                  .each { |section_id, topic_id| (topic_ids_per_section[section_id] ||= Set.new) << topic_id }
-                                  topic_ids_per_section.each { |section_id, topic_ids| topic_ids_per_section[section_id] = topic_ids.to_a }
-
-                                  # finally, build hash of user_ids to array of visible topic ids
-                                  topic_ids_per_user = {}
-                                  opts[:user_id].each { |user_id| topic_ids_per_user[user_id] = sections_per_user[user_id]&.map { |section_id| topic_ids_per_section[section_id] }&.flatten&.uniq&.compact }
-                                  topic_ids_per_user
-                                else
-                                  []
-                                end
-
-      # build map of user_ids to array of item ids {1 => [2,3,4], 2 => [2,4]}
-      opts[:user_id].index_with do |student_id|
-        assignment_item_ids = (plucked_visibilities[student_id] || []).map { |id, _, _| id }
-        section_specific_ids = ids_visible_to_sections[student_id] || []
-        assignment_item_ids.concat(ids_visible_to_all).concat(section_specific_ids)
-      end
-    end
-
-    def pluck_visibilities(opts)
-      name = self.name.underscore.pluralize
-      joins_assignment_student_visibilities(opts[:user_id], opts[:course_id])
-        .pluck("#{name}.id", "#{name}.assignment_id", "assignment_student_visibilities.user_id")
-    end
   end
 
   def sync_assignment

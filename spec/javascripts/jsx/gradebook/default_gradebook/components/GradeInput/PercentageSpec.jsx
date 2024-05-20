@@ -31,7 +31,7 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
 
   suiteHooks.beforeEach(() => {
     fakeENV.setup({
-      GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true}
+      GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true},
     })
     const assignment = {
       anonymizeStudents: false,

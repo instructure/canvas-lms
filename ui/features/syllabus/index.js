@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {map} from 'lodash'
 import SyllabusBehaviors from '@canvas/syllabus/backbone/behaviors/SyllabusBehaviors'
 import SyllabusCollection from './backbone/collections/SyllabusCollection'
 import SyllabusCalendarEventsCollection from './backbone/collections/SyllabusCalendarEventsCollection'
@@ -59,7 +59,7 @@ if (!(ENV.IN_PACED_COURSE && !ENV.current_user_is_student) && showCourseSummary)
 
   // Perform a fetch on each collection
   //   The fetch continues fetching until no next link is returned
-  deferreds = _.map(collections, collection => {
+  deferreds = map(collections, collection => {
     const deferred = $.Deferred()
 
     const error = () => deferred.reject()

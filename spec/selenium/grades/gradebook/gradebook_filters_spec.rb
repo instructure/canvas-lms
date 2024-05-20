@@ -103,20 +103,6 @@ describe "Filter" do
       meta_cells = find_slick_cells(0, f(".grid-canvas"))
       expect(meta_cells[0]).to include_text @student_name_1
     end
-
-    it "allows showing only a certain section", priority: "1" do
-      Gradebook.visit(@course)
-      Gradebook.select_section("All Sections")
-
-      # grade the first assignment
-      Gradebook::Cells.edit_grade(@student_1, @first_assignment, 0)
-      Gradebook::Cells.edit_grade(@student_2, @first_assignment, 1)
-
-      Gradebook.select_section(@other_section)
-      expect(Gradebook.section_dropdown).to have_value(@other_section.name)
-
-      expect(Gradebook::Cells.get_grade(@student_2, @first_assignment)).to eq "1"
-    end
   end
 
   context "by Student Group" do

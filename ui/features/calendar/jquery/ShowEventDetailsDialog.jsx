@@ -20,8 +20,9 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import Popover from 'jquery-popover'
+import _, {find, every} from 'lodash'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import {renderDeleteCalendarEventDialog} from '@canvas/calendar/react/RecurringEvents/DeleteCalendarEventDialog'
@@ -31,8 +32,8 @@ import deleteItemTemplate from '../jst/deleteItem.handlebars'
 import reservationOverLimitDialog from '../jst/reservationOverLimitDialog.handlebars'
 import MessageParticipantsDialog from '@canvas/calendar/jquery/MessageParticipantsDialog'
 import preventDefault from '@canvas/util/preventDefault'
-import _ from 'underscore'
 import axios from '@canvas/axios'
+import {encodeQueryString} from '@canvas/query-string-encoding'
 import {publish} from 'jquery-tinypubsub'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
@@ -60,7 +61,7 @@ export default class ShowEventDetailsDialog {
     new EditEventDetailsDialog(this.event).show()
   }
 
-  deleteEvent = (event, opts = {}) => {
+  deleteEvent = (event, _opts = {}) => {
     $('.event-details').attr('aria-hidden', true)
     if (event == null) event = this.event
 
@@ -74,58 +75,37 @@ export default class ShowEventDetailsDialog {
       url = replaceTags(this.event.deleteURL, 'id', this.event.object.id)
     }
 
-    if (ENV.FEATURES.calendar_series) {
-      let delModalContainer = document.getElementById('delete_modal_container')
-      if (!delModalContainer) {
-        delModalContainer = document.createElement('div')
-        delModalContainer.id = 'delete_modal_container'
-        document.body.appendChild(delModalContainer)
-      }
-      renderDeleteCalendarEventDialog(delModalContainer, {
-        isOpen: true,
-        onCancel: () => ReactDOM.unmountComponentAtNode(delModalContainer),
-        onDeleting: which => {
-          if (which === 'one') {
-            publish('CommonEvent/eventDeleting', event)
-          } else {
-            publish('CommonEvent/eventsDeletingFromSeries', {selectedEvent: event, which})
-          }
-        },
-        onDeleted: deletedEvents => {
-          ReactDOM.unmountComponentAtNode(delModalContainer)
-          if (!Array.isArray(deletedEvents) || deletedEvents.length === 1) {
-            publish('CommonEvent/eventDeleted', event)
-          } else {
-            publish('CommonEvent/eventsDeletedFromSeries', {deletedEvents})
-          }
-        },
-        onUpdated: updatedEvents => {
-          $.publish('CommonEvent/eventsUpdatedFromSeries', {updatedEvents})
-        },
-        delUrl: url,
-        isRepeating: !!event.calendarEvent?.series_uuid,
-        isSeriesHead: !!event.calendarEvent?.series_head,
-      })
-    } else {
-      return $('<div />').confirmDelete({
-        url,
-        message: $(
-          deleteItemTemplate({
-            message: opts.message || event.deleteConfirmation,
-            hide_reason: event.object.workflow_state !== 'locked',
-          })
-        ),
-        dialog: {title: opts.dialogTitle || I18n.t('Confirm Deletion')},
-        prepareData: $dialog => ({cancel_reason: $dialog.find('#cancel_reason').val()}),
-        confirmed: () => {
-          this.popover.hide()
-          publish('CommonEvent/eventDeleting', event)
-        },
-        success: () => {
-          publish('CommonEvent/eventDeleted', event)
-        },
-      })
+    let delModalContainer = document.getElementById('delete_modal_container')
+    if (!delModalContainer) {
+      delModalContainer = document.createElement('div')
+      delModalContainer.id = 'delete_modal_container'
+      document.body.appendChild(delModalContainer)
     }
+    renderDeleteCalendarEventDialog(delModalContainer, {
+      isOpen: true,
+      onCancel: () => ReactDOM.unmountComponentAtNode(delModalContainer),
+      onDeleting: which => {
+        if (which === 'one') {
+          publish('CommonEvent/eventDeleting', event)
+        } else {
+          publish('CommonEvent/eventsDeletingFromSeries', {selectedEvent: event, which})
+        }
+      },
+      onDeleted: deletedEvents => {
+        ReactDOM.unmountComponentAtNode(delModalContainer)
+        if (!Array.isArray(deletedEvents) || deletedEvents.length === 1) {
+          publish('CommonEvent/eventDeleted', event)
+        } else {
+          publish('CommonEvent/eventsDeletedFromSeries', {deletedEvents})
+        }
+      },
+      onUpdated: updatedEvents => {
+        $.publish('CommonEvent/eventsUpdatedFromSeries', {updatedEvents})
+      },
+      delUrl: url,
+      isRepeating: !!event.calendarEvent?.series_uuid,
+      isSeriesHead: !!event.calendarEvent?.series_head,
+    })
   }
 
   reserveErrorCB = (data, request, ...otherArgs) => {
@@ -134,7 +114,7 @@ export default class ShowEventDetailsDialog {
     data.forEach(error => {
       if (error.message === 'participant has met per-participant limit') {
         errorHandled = true
-        error.past_appointments = _.every(
+        error.past_appointments = every(
           error.reservations,
           res => fcUtil.wrap(res.end_at) < fcUtil.now()
         )
@@ -142,6 +122,8 @@ export default class ShowEventDetailsDialog {
         const $dialog = $(reservationOverLimitDialog(error)).dialog({
           resizable: false,
           width: 450,
+          modal: true,
+          zIndex: 1000,
           buttons: error.reschedulable
             ? [
                 {
@@ -254,7 +236,7 @@ export default class ShowEventDetailsDialog {
 
   cancelAppointment = $appt => {
     const url = $appt.data('url')
-    const event = _.find(this.event.calendarEvent.child_events, e => e.url === url)
+    const event = find(this.event.calendarEvent.child_events, e => e.url === url)
     $('<div/>').confirmDelete({
       url,
       message: $(
@@ -295,7 +277,13 @@ export default class ShowEventDetailsDialog {
     })
 
     // For now used to eliminate the ability of teachers and tas seeing the excess reserveration link
-    if (!this.event.contextInfo.can_make_reservation) {
+    if (
+      !this.event.contextInfo.user_is_student &&
+      !(
+        this.event.contextInfo.user_is_observer &&
+        this.event.contextInfo.allow_observers_in_appointment_groups
+      )
+    ) {
       params.can_reserve = false
     }
 
@@ -466,7 +454,7 @@ export default class ShowEventDetailsDialog {
 
   openShowPage = jsEvent => {
     const pieces = $(jsEvent.target).attr('href').split('#')
-    pieces[0] += `?${$.param({return_to: window.location.href})}`
+    pieces[0] += `?${encodeQueryString({return_to: window.location.href})}`
     window.location.href = pieces.join('#')
   }
 }

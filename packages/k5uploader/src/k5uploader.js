@@ -17,7 +17,6 @@
  */
 
 import Uploader from './uploader'
-import SessionManager from './session_manager'
 import KalturaSession from './kaltura_session'
 import mBus from './message_bus'
 import Messenger from './messenger'
@@ -36,20 +35,20 @@ function K5Uploader(options) {
   this.loadUiConf()
 }
 
-K5Uploader.prototype.destroy = function() {
+K5Uploader.prototype.destroy = function () {
   mBus.destroy()
   this.session = undefined
   this.entryService = undefined
   this.uiconfService = undefined
 }
 
-K5Uploader.prototype.buildDependencies = function() {
+K5Uploader.prototype.buildDependencies = function () {
   this.session = new KalturaSession()
   this.entryService = new EntryService()
   this.uiconfService = new UiconfService()
 }
 
-K5Uploader.prototype.addListeners = function() {
+K5Uploader.prototype.addListeners = function () {
   mBus.addEventListener('UiConf.error', this.onUiConfError.bind(this))
   mBus.addEventListener('UiConf.complete', this.onUiConfComplete.bind(this))
   mBus.addEventListener('Uploader.error', this.onUploadError.bind(this))
@@ -60,21 +59,21 @@ K5Uploader.prototype.addListeners = function() {
   mBus.addEventListener('Entry.fail', this.onEntryFail.bind(this))
 }
 
-K5Uploader.prototype.onSessionLoaded = function(data) {
+K5Uploader.prototype.onSessionLoaded = function (data) {
   this.session = data
   this.loadUiConf()
 }
 
-K5Uploader.prototype.loadUiConf = function() {
+K5Uploader.prototype.loadUiConf = function () {
   this.uiconfService.load(this.session)
 }
 
-K5Uploader.prototype.onUiConfComplete = function(result) {
+K5Uploader.prototype.onUiConfComplete = function (result) {
   this.uiconfig = result
   this.dispatchEvent('K5.ready', {}, this)
 }
 
-K5Uploader.prototype.uploadFile = function(file) {
+K5Uploader.prototype.uploadFile = function (file) {
   this.file = file
   if (!file) {
     return
@@ -90,40 +89,40 @@ K5Uploader.prototype.uploadFile = function(file) {
     const details = {
       maxFileSize: this.uiconfig.maxFileSize,
       file,
-      allowedMediaTypes: k5Options.allowedMediaTypes
+      allowedMediaTypes: k5Options.allowedMediaTypes,
     }
     this.dispatchEvent('K5.fileError', details, this)
   }
 }
 
-K5Uploader.prototype.onUploadSuccess = function(result) {
+K5Uploader.prototype.onUploadSuccess = function (result) {
   // combine all needed data and add an entry to kaltura
   const allParams = [
     this.session.asEntryParams(),
     result.asEntryParams(),
-    k5Options.asEntryParams()
+    k5Options.asEntryParams(),
   ]
   this.entryService.addEntry(allParams)
 }
 
 // Delegate to publicly available K5 events
-K5Uploader.prototype.onProgress = function(e) {
+K5Uploader.prototype.onProgress = function (e) {
   this.dispatchEvent('K5.progress', e, this)
 }
 
-K5Uploader.prototype.onUploadError = function(result) {
+K5Uploader.prototype.onUploadError = function (result) {
   this.dispatchEvent('K5.error', result, this)
 }
 
-K5Uploader.prototype.onEntrySuccess = function(data) {
+K5Uploader.prototype.onEntrySuccess = function (data) {
   this.dispatchEvent('K5.complete', data, this)
 }
 
-K5Uploader.prototype.onEntryFail = function(data) {
+K5Uploader.prototype.onEntryFail = function (data) {
   this.dispatchEvent('K5.error', data, this)
 }
 
-K5Uploader.prototype.onUiConfError = function(result) {
+K5Uploader.prototype.onUiConfError = function (result) {
   this.dispatchEvent('K5.uiconfError', result, this)
 }
 

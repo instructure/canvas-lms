@@ -22,6 +22,58 @@ require_relative "../../import_helper"
 require_relative "../../lti2_spec_helper"
 
 describe "Importing assignments" do
+  let(:migration_id) { "ib4834d160d180e2e91572e8b9e3b1bc6" }
+  let(:default_input_assignment_hash) do
+    {
+      "migration_id" => migration_id,
+      "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
+      "grading_standard_migration_id" => nil,
+      "rubric_migration_id" => nil,
+      "rubric_id" => nil,
+      "quiz_migration_id" => nil,
+      "workflow_state" => "published",
+      "title" => "",
+      "grading_type" => "points",
+      "submission_types" => "none",
+      "peer_reviews" => false,
+      "automatic_peer_reviews" => false,
+      "muted" => false,
+      "due_at" => 1_401_947_999_000,
+      "peer_reviews_due_at" => 1_401_947_999_000,
+      "position" => 6,
+      "peer_review_count" => 0
+    }
+  end
+
+  describe "assignment field setting" do
+    describe "time_zone_edited" do
+      context "when time_zone_edited provided" do
+        let(:expected_time_zone_edited) { "Mountain Time (US & Canada)" }
+        let(:input_hash) { { **default_input_assignment_hash, time_zone_edited: expected_time_zone_edited } }
+
+        it "should set time_zone_edited" do
+          course_model
+          migration = @course.content_migrations.create!
+          Importers::AssignmentImporter.import_from_migration(input_hash, @course, migration)
+          assignment = @course.assignments.where(migration_id:).first
+          expect(assignment.time_zone_edited).to eq expected_time_zone_edited
+        end
+      end
+
+      context "when time_zone_edited is missing" do
+        let(:input_hash) { { **default_input_assignment_hash } }
+
+        it "should set time_zone_edited" do
+          course_model
+          migration = @course.content_migrations.create!
+          Importers::AssignmentImporter.import_from_migration(input_hash, @course, migration)
+          assignment = @course.assignments.where(migration_id:).first
+          expect(assignment.time_zone_edited).to be_blank
+        end
+      end
+    end
+  end
+
   SYSTEMS.each do |system|
     next unless import_data_exists? system, "assignment"
 
@@ -101,27 +153,8 @@ describe "Importing assignments" do
   it "infers the default name when importing a nameless assignment" do
     course_model
     migration = @course.content_migrations.create!
-    nameless_assignment_hash = {
-      "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
-      "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
-      "grading_standard_migration_id" => nil,
-      "rubric_migration_id" => nil,
-      "rubric_id" => nil,
-      "quiz_migration_id" => nil,
-      "workflow_state" => "published",
-      "title" => "",
-      "grading_type" => "points",
-      "submission_types" => "none",
-      "peer_reviews" => false,
-      "automatic_peer_reviews" => false,
-      "muted" => false,
-      "due_at" => 1_401_947_999_000,
-      "peer_reviews_due_at" => 1_401_947_999_000,
-      "position" => 6,
-      "peer_review_count" => 0
-    }
-    Importers::AssignmentImporter.import_from_migration(nameless_assignment_hash, @course, migration)
-    assignment = @course.assignments.where(migration_id: "ib4834d160d180e2e91572e8b9e3b1bc6").first
+    Importers::AssignmentImporter.import_from_migration(default_input_assignment_hash, @course, migration)
+    assignment = @course.assignments.where(migration_id:).first
     expect(assignment.title).to eq "untitled assignment"
   end
 
@@ -129,7 +162,7 @@ describe "Importing assignments" do
     course_model
     migration = @course.content_migrations.create!
     assign_hash = {
-      "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
+      "migration_id" => migration_id,
       "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
       "workflow_state" => "published",
       "title" => "auto peer review assignment",
@@ -148,7 +181,7 @@ describe "Importing assignments" do
   it "does not schedule auto peer reviews if dates are shifted (it'll be scheduled later)" do
     course_model
     assign_hash = {
-      "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
+      "migration_id" => migration_id,
       "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
       "workflow_state" => "published",
       "title" => "auto peer review assignment",
@@ -171,7 +204,7 @@ describe "Importing assignments" do
     expect(@course).to receive(:turnitin_enabled?).at_least(1).and_return(true)
     migration = @course.content_migrations.create!
     nameless_assignment_hash = {
-      "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
+      "migration_id" => migration_id,
       "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
       "grading_standard_migration_id" => nil,
       "rubric_migration_id" => nil,
@@ -192,7 +225,7 @@ describe "Importing assignments" do
       "turnitin_settings" => "{\"originality_report_visibility\":\"after_due_date\",\"s_paper_check\":\"1\",\"internet_check\":\"0\",\"journal_check\":\"1\",\"exclude_biblio\":\"1\",\"exclude_quoted\":\"0\",\"exclude_type\":\"1\",\"exclude_value\":\"5\",\"submit_papers_to\":\"1\",\"s_view_report\":\"1\"}"
     }
     Importers::AssignmentImporter.import_from_migration(nameless_assignment_hash, @course, migration)
-    assignment = @course.assignments.where(migration_id: "ib4834d160d180e2e91572e8b9e3b1bc6").first
+    assignment = @course.assignments.where(migration_id:).first
     expect(assignment.turnitin_enabled).to be true
     settings = assignment.turnitin_settings
     expect(settings["originality_report_visibility"]).to eq("after_due_date")
@@ -210,7 +243,7 @@ describe "Importing assignments" do
   it "does not explode if it tries to import negative points possible" do
     course_model
     assign_hash = {
-      "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
+      "migration_id" => migration_id,
       "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
       "workflow_state" => "published",
       "title" => "weird negative assignment",
@@ -221,14 +254,14 @@ describe "Importing assignments" do
     migration = @course.content_migrations.create!
     allow(migration).to receive(:date_shift_options).and_return(true)
     Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
-    assignment = @course.assignments.where(migration_id: "ib4834d160d180e2e91572e8b9e3b1bc6").first
+    assignment = @course.assignments.where(migration_id:).first
     expect(assignment.points_possible).to eq 0
   end
 
   it "does not clear dates if these are null in the source hash" do
     course_model
     assign_hash = {
-      "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
+      "migration_id" => migration_id,
       "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
       "workflow_state" => "published",
       "title" => "date clobber or not",
@@ -259,6 +292,37 @@ describe "Importing assignments" do
     expect(AnonymousOrModerationEvent.last.user).to eq migration.user
   end
 
+  context "when assignments are new quizzes/quiz lti" do
+    subject do
+      new_quiz
+      Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+      new_quiz.reload
+    end
+
+    let(:course) { course_model }
+    let(:migration) { course.content_migrations.create! }
+    let(:new_quiz) do
+      new_quizzes_assignment(course:, title: "Some New Quiz", migration_id:)
+    end
+    let(:assignment_hash) do
+      {
+        migration_id:,
+        workflow_state: "published",
+        title: "Tool Assignment",
+        submission_types: "external_tool",
+      }
+    end
+
+    it "sets the content tag workflow state back to active when a previously deleted quiz lti assignment is re-imported back into the course" do
+      subject
+      new_quiz.destroy
+      new_quiz.save!
+      Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+      new_quiz.reload
+      expect(new_quiz.external_tool_tag).to be_active
+    end
+  end
+
   context "when assignments use an LTI tool" do
     subject do
       assignment # trigger create
@@ -276,7 +340,7 @@ describe "Importing assignments" do
         unlock_at: 1.day.ago,
         lock_at: 1.day.from_now,
         peer_reviews_due_at: 2.days.from_now,
-        migration_id: "ib4834d160d180e2e91572e8b9e3b1bc6",
+        migration_id:,
         submission_types: "external_tool",
         external_tool_tag_attributes: { url: tool.url, content: tool },
         points_possible: 10
@@ -285,7 +349,7 @@ describe "Importing assignments" do
 
     let(:assignment_hash) do
       {
-        "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
+        "migration_id" => migration_id,
         "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
         "workflow_state" => "published",
         "title" => "Tool Assignment",
@@ -323,6 +387,26 @@ describe "Importing assignments" do
       end
     end
 
+    context "when previously deleted LTI assignment is re-imported" do
+      let(:tool) { external_tool_model(context: course.root_account) }
+      let(:tool_id) { tool.id }
+      let(:tool_url) { tool.url }
+
+      before do
+        assignment
+        Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+        assignment.reload
+        assignment.destroy
+        assignment.save!
+      end
+
+      it "un-deletes content tag" do
+        expect(assignment.external_tool_tag).to be_deleted
+        subject
+        expect(assignment.external_tool_tag).to be_active
+      end
+    end
+
     context "and the tool uses LTI 1.3" do
       let(:tool_id) { tool.id }
       let(:tool_url) { tool.url }
@@ -345,7 +429,7 @@ describe "Importing assignments" do
           unlock_at: 1.day.ago,
           lock_at: 1.day.from_now,
           peer_reviews_due_at: 2.days.from_now,
-          migration_id: "ib4834d160d180e2e91572e8b9e3b1bc6"
+          migration_id:
         )
       end
 
@@ -370,7 +454,6 @@ describe "Importing assignments" do
       end
 
       describe "line item creation" do
-        let(:migration_id) { "ib4834d160d180e2e91572e8b9e3b1bc6" }
         let(:course) { Course.create! }
         let(:migration) { course.content_migrations.create! }
         let(:assignment) do
@@ -581,6 +664,31 @@ describe "Importing assignments" do
           end
         end
       end
+
+      context "when previously deleted LTI assignment is re-imported" do
+        let(:line_item) { assignment.line_items.first }
+        let(:resource_link) { assignment.lti_resource_links.first }
+
+        before do
+          assignment
+          Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+          assignment.reload
+          assignment.destroy
+          assignment.save!
+        end
+
+        it "un-deletes resource links" do
+          expect(line_item).to be_deleted
+          subject
+          expect(line_item.reload).to be_active
+        end
+
+        it "un-deletes line items" do
+          expect(resource_link).to be_deleted
+          subject
+          expect(resource_link.reload).to be_active
+        end
+      end
     end
   end
 
@@ -672,7 +780,6 @@ describe "Importing assignments" do
   describe "similarity_detection_tool" do
     include_context "lti2_spec_helper"
 
-    let(:migration_id) { "ib4834d160d180e2e91572e8b9e3b1bc6" }
     let(:resource_type_code) { "123" }
     let(:vendor_code) { "abc" }
     let(:product_code) { "qrx" }
@@ -804,7 +911,6 @@ describe "Importing assignments" do
   end
 
   describe "post_policy" do
-    let(:migration_id) { "ib4834d160d180e2e91572e8b9e3b1bc6" }
     let(:course) { Course.create! }
     let(:migration) { course.content_migrations.create! }
     let(:assignment_hash) do
@@ -853,7 +959,6 @@ describe "Importing assignments" do
   end
 
   describe "post_to_sis" do
-    let(:migration_id) { "ib4834d160d180e2e91572e8b9e3b1bc6" }
     let(:course) { Course.create! }
     let(:account) { course.account }
     let(:migration) { course.content_migrations.create! }

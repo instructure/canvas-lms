@@ -19,9 +19,9 @@
 /* eslint-disable no-void */
 
 import {extend} from '@canvas/backbone/utils'
+import {includes} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
 import $ from 'jquery'
 import template from '../../jst/GradingTypeSelector.handlebars'
 import '../../jquery/toggleAccessibly'
@@ -104,6 +104,8 @@ GradingTypeSelector.prototype.showGpaDialog = function (ev) {
     close() {
       return $(ev.target).focus()
     },
+    modal: true,
+    zIndex: 1000,
   })
 }
 
@@ -120,6 +122,8 @@ GradingTypeSelector.prototype.showGradingSchemeDialog = function (ev) {
       close() {
         return $(ev.target).focus()
       },
+      modal: true,
+      zIndex: 1000,
     })
     .fixDialogButtons()
 }
@@ -152,7 +156,7 @@ GradingTypeSelector.prototype.toJSON = function () {
       this.preventNotGraded ||
       (((ref = this.lockedItems) != null ? ref.points : void 0) && !this.parentModel.isNotGraded()),
     freezeGradingType:
-      _.includes(this.parentModel.frozenAttributes(), 'grading_type') ||
+      includes(this.parentModel.frozenAttributes(), 'grading_type') ||
       this.parentModel.inClosedGradingPeriod() ||
       (((ref1 = this.lockedItems) != null ? ref1.points : void 0) &&
         this.parentModel.isNotGraded()) ||
@@ -187,8 +191,8 @@ GradingTypeSelector.prototype.renderGradingSchemeSelector = function () {
     onChange: this.handleGradingStandardIdChanged,
     contextId: ENV.COURSE_ID,
     contextType: 'Course',
-    // TODO: remove after grading_scheme_updates feature flag is turned on globally
-    pointsBasedGradingSchemesEnabled: !!ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED,
+    archivedGradingSchemesEnabled: ENV.ARCHIVED_GRADING_SCHEMES_ENABLED,
+    assignmentId: ENV.ASSIGNMENT?.id ?? ENV.ASSIGNMENT_ID ?? this.parentModel.id ? String(this.parentModel.id) : undefined,
   }
   const mountPoint = document.querySelector('#grading_scheme_selector-target')
   // eslint-disable-next-line react/no-render-return-value

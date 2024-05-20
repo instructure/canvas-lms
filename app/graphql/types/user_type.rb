@@ -67,11 +67,14 @@ module Types
     end
 
     field :html_url, UrlType, null: true do
-      argument :course_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
     end
-    def html_url(course_id:)
+    def html_url(course_id: nil)
+      resolved_course_id = course_id.nil? ? context[:course_id] : course_id
+      return if resolved_course_id.nil?
+
       GraphQLHelpers::UrlHelpers.course_user_url(
-        course_id:,
+        course_id: resolved_course_id,
         id: object.id,
         host: context[:request].host_with_port
       )
@@ -435,8 +438,8 @@ module Types
         submissions += Submission.where(id: submission_ids)
       end
       InstStatsd::Statsd.increment("inbox.visit.scope.submission_comments.pages_loaded.react")
-      # if .last_comment_at is nil check the last created submission comment
-      submissions.sort_by { |t| t.last_comment_at || t.submission_comments.last.created_at }.reverse
+      # on FE we use newest submission comment to render date so use that first.
+      submissions.sort_by { |t| t.submission_comments.last.created_at || t.last_comment_at }.reverse
     rescue
       []
     end
@@ -470,13 +473,11 @@ module Types
       argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
     end
     def course_roles(course_id: nil, role_types: nil, built_in_only: true)
-      # The discussion only role "Author" will be handled with a front-end check because graphql
-      # currently does not support type inheritance. If graphql starts supporting type inheritance
-      # this field can be replaced by a discussionAuthor type that inherits from User type and
-      # contains a discussionRoles field
-      return if course_id.nil?
+      # This graphql execution context can be used to set course_id if you are calling course_role from a nested query
+      resolved_course_id = course_id.nil? ? context[:course_id] : course_id
+      return if resolved_course_id.nil?
 
-      Loaders::CourseRoleLoader.for(course_id:, role_types:, built_in_only:).load(object)
+      Loaders::CourseRoleLoader.for(course_id: resolved_course_id, role_types:, built_in_only:).load(object)
     end
 
     field :inbox_labels, [String], null: true
@@ -504,7 +505,7 @@ module Loaders
 
       scope = scope.where.not(enrollments: { workflow_state: "completed" }) if exclude_concluded
 
-      scope = scope.active_by_date_or_completed if exclude_pending_enrollments
+      scope = scope.excluding_pending if exclude_pending_enrollments
 
       order_by.each { |o| scope = scope.order(o) }
 

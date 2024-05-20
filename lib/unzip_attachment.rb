@@ -199,7 +199,7 @@ class UnzipAttachment
   end
 
   def last_position
-    @last_position ||= (@context.attachments.active.filter_map(&:position).last || 0)
+    @last_position ||= @context.attachments.active.filter_map(&:position).last || 0
   end
 
   def should_skip?(entry)
@@ -262,6 +262,7 @@ end
 # since it's such an integral part of the unzipping
 # process
 class ZipFileStats
+  MAX_FILE_COUNT = 250_000
   attr_reader :file_count, :total_size, :paths, :filename, :quota_remaining
 
   def initialize(filename)
@@ -274,9 +275,8 @@ class ZipFileStats
   end
 
   def validate_against(context)
-    max = Setting.get("max_zip_file_count", "100000").to_i
-    if file_count > max
-      raise ArgumentError, "Zip File cannot have more than #{max} entries"
+    if file_count > MAX_FILE_COUNT
+      raise ArgumentError, "Zip File cannot have more than #{MAX_FILE_COUNT} entries"
     end
 
     # check whether the nominal size of the zip's contents would exceed
@@ -317,7 +317,7 @@ class ZipFileStats
   def process!
     CanvasUnzip.extract_archive(filename) do |entry|
       @file_count += 1
-      @total_size += [entry.size, Attachment.minimum_size_for_quota].max
+      @total_size += [entry.size, Attachment::MINIMUM_SIZE_FOR_QUOTA].max
       @paths << entry.name
     end
     @file_count = 1 if @file_count == 0

@@ -32,7 +32,7 @@ module Canvas::Security
       @require_iss = require_iss
       @jwt.sub = override_sub if override_sub.present?
       @skip_jti_check = skip_jti_check
-      @max_iat_age = max_iat_age || Setting.get("jwt_iat_ago_in_seconds", 5.minutes.to_s).to_i.seconds
+      @max_iat_age = max_iat_age || 5.minutes
     end
 
     def error_message
@@ -74,7 +74,7 @@ module Canvas::Security
       return if errors?
 
       iat_time = Time.zone.at(@jwt.iat)
-      iat_future_buffer = Setting.get("oauth2_jwt_iat_future_buffer", 30.seconds.to_s).to_i.seconds
+      iat_future_buffer = 30.seconds
       errors.add(:base, "the 'iat' must be less than #{@max_iat_age} seconds old") if iat_time < @max_iat_age.ago
       errors.add(:base, "the 'iat' must not be in the future") if iat_time > Time.zone.now + iat_future_buffer
     end

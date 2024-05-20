@@ -16,10 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import _ from '@instructure/lodash-underscore'
-
-const extend = _.extend
+import {encodeQueryString} from '@canvas/query-string-encoding'
 
 /**
  * @class Common.Core.Environment
@@ -79,12 +76,12 @@ const Environment = {
    *
    */
   updateQueryString(params) {
-    this.query = extend({}, this.query, params)
+    this.query = {...this.query, ...params}
 
     window.history.pushState(
       '',
       '',
-      [window.location.pathname, decodeURIComponent($.param(this.query))].join('?')
+      [window.location.pathname, decodeURIComponent(encodeQueryString(this.query))].join('?')
     )
   },
 

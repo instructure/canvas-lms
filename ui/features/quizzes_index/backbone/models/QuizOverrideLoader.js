@@ -19,7 +19,7 @@
 /* eslint-disable no-void */
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {some, isNull, isUndefined, first, last, chain} from 'lodash'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 
 export default {
@@ -53,32 +53,32 @@ export default {
   },
   _chooseLatest(dates, type) {
     if (
-      _.some(dates, function (d) {
-        return _.isNull(d[type]) || _.isUndefined(d[type])
+      some(dates, function (d) {
+        return isNull(d[type]) || isUndefined(d[type])
       })
     ) {
       return null
     }
     const sortedDates = this._sortedDatesOfType(dates, type)
-    if (_.some(sortedDates)) {
-      return _.last(sortedDates)
+    if (some(sortedDates)) {
+      return last(sortedDates)
     }
   },
   _chooseEarliest(dates, type) {
     if (
-      _.some(dates, function (d) {
-        return _.isNull(d[type]) || _.isUndefined(d[type])
+      some(dates, function (d) {
+        return isNull(d[type]) || isUndefined(d[type])
       })
     ) {
       return null
     }
     const sortedDates = this._sortedDatesOfType(dates, type)
-    if (_.some(sortedDates)) {
-      return _.first(sortedDates)
+    if (some(sortedDates)) {
+      return first(sortedDates)
     }
   },
   _sortedDatesOfType(dates, type) {
-    return _.chain(dates)
+    return chain(dates)
       .map(function (d) {
         return d[type]
       })

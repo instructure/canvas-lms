@@ -16,11 +16,10 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-
 import {useScope as useI18nScope} from '@canvas/i18n'
 import swfobject from 'swfobject'
 import 'jqueryui/dialog'
-import '@canvas/doc-previews'
+import {loadDocPreview} from '@instructure/canvas-rce/es/enhance-user-content/doc_previews'
 
 const I18n = useI18nScope('submissions.show_preview')
 
@@ -42,15 +41,16 @@ $(document).ready(() => {
 
   $(document).on('click', '.modal_preview_link', function () {
     // overflow:hidden is because of some weird thing where the google doc preview gets double scrollbars
-    $('<div style="padding:0; overflow:hidden;">')
-      .dialog({
-        title: I18n.t('preview_title', 'Preview of %{title}', {
-          title: $(this).data('dialog-title'),
-        }),
-        width: $(document).width() * 0.95,
-        height: $(document).height() * 0.75,
-      })
-      .loadDocPreview($.extend({height: '100%'}, $(this).data()))
+    const dialog = $('<div style="padding:0; overflow:hidden;">').dialog({
+      title: I18n.t('preview_title', 'Preview of %{title}', {
+        title: $(this).data('dialog-title'),
+      }),
+      width: $(document).width() * 0.95,
+      height: $(document).height() * 0.75,
+      modal: true,
+      zIndex: 1000,
+    })
+    loadDocPreview(dialog[0], $.extend({height: '100%'}, $(this).data()))
     $('.submission_annotation.unread_indicator').hide()
     $('.file-upload-submission-attachment .modal_preview_link').attr(
       'title',

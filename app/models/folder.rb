@@ -19,8 +19,6 @@
 #
 
 class Folder < ActiveRecord::Base
-  self.ignored_columns += %i[last_lock_at last_unlock_at]
-
   def self.name_order_by_clause(table = nil)
     col = table ? "#{table}.name" : "name"
     best_unicode_collation_key(col)
@@ -297,7 +295,7 @@ class Folder < ActiveRecord::Base
     dup ||= Folder.new
     dup = existing if existing && options[:overwrite]
     attributes.except("id", "full_name", "parent_folder_id").each do |key, val|
-      dup.send("#{key}=", val)
+      dup.send(:"#{key}=", val)
     end
     if unique_type && context.folders.active.where(unique_type:).exists?
       dup.unique_type = nil # we'll just copy the folder as a normal one and leave the existing unique_type'd one alone

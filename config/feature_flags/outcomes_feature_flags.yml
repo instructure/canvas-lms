@@ -83,7 +83,7 @@ outcome_average_calculation:
   state: allowed_on
   applies_to: RootAccount
   display_name: Outcome Average Calculation Method
-  description: Allows users to use average as a calulcation method for a given outcome.
+  description: Allows users to use average as a calculation method for a given outcome.
 outcome_alignment_summary_with_new_quizzes:
   state: hidden
   applies_to: Course
@@ -93,10 +93,20 @@ outcomes_new_decaying_average_calculation:
   state: hidden
   applies_to: RootAccount
   display_name: Outcomes New Decaying Average Calculation Method
-  description: Allows users to use new decaying average as a calulcation method for a given outcome.
+  description: Allows users to use new decaying average as a calculation method for a given outcome.
 archive_outcomes:
   state: hidden
   applies_to: SiteAdmin
   display_name: Archive Outcomes
   description: Allows users to archive outcomes and outcome groups no longer in use.
   after_state_change_proc: archive_outcomes_after_change_hook
+course_copy_alignments:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Copy Alignments Clone
+  description: Allow to clone alignments after the course copy process
+prevent_deletion_outcomes_with_os_alignments:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Prevent deletion of outcomes with alignments in OS
+  description: This FF is for development purposes only and should not be adjusted without first consulting product and engineering. This flag will prevent deletion of outcomes that have alignments within the outcomes service, which is used for New Quizzes.

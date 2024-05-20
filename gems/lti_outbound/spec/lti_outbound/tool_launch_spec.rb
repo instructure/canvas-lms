@@ -166,6 +166,12 @@ describe LtiOutbound::ToolLaunch do
       expect(hash["resource_link_title"]).to eq "new tool name"
     end
 
+    it "includes ext_lti_student_id when provided in overrides" do
+      lti_student_id = "123"
+      hash = tool_launch.generate(lti_student_id:)
+      expect(hash["ext_lti_student_id"]).to eq lti_student_id
+    end
+
     describe "selected_html" do
       it "gets escaped and assigned to the key text if passed in" do
         tool_launch = LtiOutbound::ToolLaunch.new(url: "http://www.yahoo.com",

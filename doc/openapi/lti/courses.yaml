@@ -1,0 +1,1002 @@
+---
+openapi: 3.0.3
+info:
+  title: app
+  version: 1.0.0
+servers: []
+paths:
+  "/api/lti/courses/{course_id}/line_items":
+    get:
+      summary: index
+      tags:
+      - Lti::IMS::LineItem
+      parameters:
+      - name: course_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 880330
+      - name: endDateTime
+        in: query
+        required: false
+        schema:
+          type: string
+        example: '2023-12-15T05:40:07Z'
+      - name: https://canvas.instructure.com/lti/submission_type
+        in: query
+        required: false
+        schema:
+          type: object
+          properties:
+            external_tool_url:
+              type: string
+            type:
+              type: string
+          required:
+          - external_tool_url
+          - type
+        example:
+          external_tool_url: http://www.tool.com/launch
+          type: external_tool
+      - name: label
+        in: query
+        required: false
+        schema:
+          type: string
+        example: Originality Score
+      - name: resourceId
+        in: query
+        required: false
+        schema:
+          type: string
+        example: orig-123
+      - name: resourceLinkId
+        in: query
+        required: false
+        schema:
+          type: string
+        example: d46ef8af-a2ce-486d-8891-d3115bff947e
+      - name: scoreMaximum
+        in: query
+        required: false
+        schema:
+          type: integer
+        example: 50
+      - name: tag
+        in: query
+        required: false
+        schema:
+          type: string
+        example: some_tag
+      - name: resource_id
+        in: query
+        required: false
+        schema:
+          type: string
+        example: orig-123
+      responses:
+        '401':
+          description: returns 401 unauthorized and complains about missing tool
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      message:
+                        type: string
+                    required:
+                    - type
+                    - message
+                required:
+                - errors
+              example:
+                errors:
+                  type: unauthorized
+                  message: Access Token not linked to a Tool associated with this
+                    Context
+        '201':
+          description: properly formats the response
+          content:
+            application/vnd.ims.lis.v2.lineitem+json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  scoreMaximum:
+                    type: number
+                    format: float
+                  label:
+                    type: string
+                  resourceId:
+                    type: string
+                  tag:
+                    type: string
+                  endDateTime:
+                    type: string
+                  https://canvas.instructure.com/lti/submission_type:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      external_tool_url:
+                        type: string
+                    required:
+                    - type
+                    - external_tool_url
+                  resourceLinkId:
+                    type: string
+                required:
+                - id
+                - scoreMaximum
+                - label
+                - resourceId
+                - tag
+                - endDateTime
+                - resourceLinkId
+                - https://canvas.instructure.com/lti/submission_type
+              example:
+                id: http://test.host/api/lti/courses/880189/line_items/1017691
+                scoreMaximum: 50.0
+                label: Originality Score
+                resourceId: orig-123
+                tag: some_tag
+                endDateTime: '2023-12-15T05:40:07Z'
+                https://canvas.instructure.com/lti/submission_type:
+                  type: external_tool
+                  external_tool_url: http://www.google.com
+                resourceLinkId: 57427bfe-cb04-412a-9d7c-171bc8111073
+        '200':
+          description: allows querying by multiple valid fields at the same time
+          content:
+            application/vnd.ims.lis.v2.lineitemcontainer+json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    scoreMaximum:
+                      type: number
+                      format: float
+                    label:
+                      type: string
+                    resourceId:
+                      type: string
+                    tag:
+                      type: string
+                    endDateTime:
+                      type: string
+                    resourceLinkId:
+                      type: string
+                  required:
+                  - id
+                  - scoreMaximum
+                  - label
+                  - resourceId
+                  - tag
+                  - endDateTime
+                  - resourceLinkId
+              example:
+              - id: http://test.host/api/lti/courses/880203/line_items/1017695
+                scoreMaximum: 10.0
+                label: Test Line Item
+                resourceId: orig-123
+                tag: some_tag
+              - id: http://test.host/api/lti/courses/880193/line_items/1017688
+                scoreMaximum: 1.5
+                label: value for title
+                endDateTime: '2023-12-15T05:40:04Z'
+                resourceLinkId: 1a70e093-9f90-4b1d-ba9b-ac4911a624b0
+              - id: http://test.host/api/lti/courses/880193/line_items/1017689
+                scoreMaximum: 10.0
+                label: Test Line Item
+                tag: some_tag
+              - id: http://test.host/api/lti/courses/880193/line_items/1017690
+                scoreMaximum: 10.0
+                label: Test Line Item
+                resourceId: orig-123
+              - id: http://test.host/api/lti/courses/880193/line_items/1017691
+                scoreMaximum: 10.0
+                label: Test Line Item
+                resourceLinkId: 1a70e093-9f90-4b1d-ba9b-ac4911a624b0
+              - id: http://test.host/api/lti/courses/880184/line_items/1017688
+                scoreMaximum: 1.5
+                label: value for title
+                endDateTime: '2023-12-15T05:40:04Z'
+                resourceLinkId: 59677abf-4041-496e-8a4c-58f628995348
+              - id: http://test.host/api/lti/courses/880184/line_items/1017689
+                scoreMaximum: 10.0
+                label: Test Line Item
+                tag: some_tag
+              - id: http://test.host/api/lti/courses/880184/line_items/1017690
+                scoreMaximum: 10.0
+                label: Test Line Item
+                resourceId: orig-123
+              - id: http://test.host/api/lti/courses/880184/line_items/1017691
+                scoreMaximum: 10.0
+                label: Test Line Item
+                resourceLinkId: 59677abf-4041-496e-8a4c-58f628995348
+              - id: http://test.host/api/lti/courses/880226/line_items/1017689
+                scoreMaximum: 10.0
+                label: Test Line Item
+                tag: some_tag
+              - id: http://test.host/api/lti/courses/880204/line_items/1017689
+                scoreMaximum: 1.5
+                label: value for title
+                endDateTime: '2023-12-15T05:40:03Z'
+                resourceLinkId: b040ebc7-b383-4b85-a65b-fe53e84a002e
+              - id: http://test.host/api/lti/courses/880204/line_items/1017690
+                scoreMaximum: 10.0
+                label: Test Line Item
+                tag: some_tag
+              - id: http://test.host/api/lti/courses/880204/line_items/1017691
+                scoreMaximum: 10.0
+                label: Test Line Item
+                resourceId: orig-123
+              - id: http://test.host/api/lti/courses/880204/line_items/1017692
+                scoreMaximum: 10.0
+                label: Test Line Item
+                resourceLinkId: b040ebc7-b383-4b85-a65b-fe53e84a002e
+              - id: http://test.host/api/lti/courses/880235/line_items/1017689
+                scoreMaximum: 1.5
+                label: value for title
+                endDateTime: '2023-12-15T05:40:05Z'
+                resourceLinkId: 7ebd45a3-2c52-4d0b-9a99-6e2002add3c3
+              - id: http://test.host/api/lti/courses/880235/line_items/1017690
+                scoreMaximum: 10.0
+                label: Test Line Item
+                tag: some_tag
+              - id: http://test.host/api/lti/courses/880235/line_items/1017691
+                scoreMaximum: 10.0
+                label: Test Line Item
+                resourceId: orig-123
+              - id: http://test.host/api/lti/courses/880235/line_items/1017692
+                scoreMaximum: 10.0
+                label: Test Line Item
+                resourceLinkId: 7ebd45a3-2c52-4d0b-9a99-6e2002add3c3
+              - id: http://test.host/api/lti/courses/880187/line_items/1017689
+                scoreMaximum: 1.5
+                label: value for title
+                endDateTime: '2023-12-15T05:40:00Z'
+                resourceLinkId: 660e0172-c157-4fc4-88f2-2208e1f58fae
+              - id: http://test.host/api/lti/courses/880187/line_items/1017690
+                scoreMaximum: 10.0
+                label: Test Line Item
+                tag: some_tag
+              - id: http://test.host/api/lti/courses/880187/line_items/1017691
+                scoreMaximum: 10.0
+                label: Test Line Item
+                resourceId: orig-123
+              - id: http://test.host/api/lti/courses/880187/line_items/1017692
+                scoreMaximum: 10.0
+                label: Test Line Item
+                resourceLinkId: 660e0172-c157-4fc4-88f2-2208e1f58fae
+        '500':
+          description: returns 500 not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                        error_code:
+                          type: string
+                      required:
+                      - message
+                      - error_code
+                  error_report_id:
+                    type: integer
+                required:
+                - errors
+                - error_report_id
+              example:
+                errors:
+                - message: An error occurred.
+                  error_code: internal_server_error
+                error_report_id: 127856
+        '404':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+                required:
+                - errors
+              example: {}
+  "/api/lti/courses/{course_id}/names_and_roles":
+    get:
+      summary: course_index
+      tags:
+      - Lti::IMS::NamesAndRole
+      parameters:
+      - name: course_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 880160
+      - name: rlid
+        in: query
+        required: false
+        schema:
+          type: string
+        example: 4301c27b219f264f9dca9566f96a4095
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+        example: 2
+      - name: pass
+        in: query
+        required: false
+        schema:
+          type: string
+        example: thru
+      - name: role
+        in: query
+        required: false
+        schema:
+          type: string
+        example: http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor
+      - name: per_page
+        in: query
+        required: false
+        schema:
+          type: integer
+        example: 2
+      responses:
+        '200':
+          description: behaves just like a 'normal' NRPS course membership lookup
+          content:
+            application/vnd.ims.lti-nrps.v2.membershipcontainer+json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  context:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      label:
+                        type: string
+                      title:
+                        type: string
+                    required:
+                    - id
+                    - label
+                    - title
+                  members:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        name:
+                          type: string
+                        picture:
+                          type: string
+                        given_name:
+                          type: string
+                        family_name:
+                          type: string
+                        user_id:
+                          type: string
+                        lti11_legacy_user_id:
+                          type: string
+                        roles:
+                          type: array
+                          items:
+                            type: string
+                        message:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              https://purl.imsglobal.org/spec/lti/claim/message_type:
+                                type: string
+                              locale:
+                                type: string
+                              https://purl.imsglobal.org/spec/lti/claim/custom:
+                                type: object
+                                properties:
+                                  person_name_full:
+                                    type: string
+                                  person_name_display:
+                                    type: string
+                                  person_name_family:
+                                    type: string
+                                  person_name_given:
+                                    type: string
+                                  user_image:
+                                    type: string
+                                  user_id:
+                                    type: integer
+                                  canvas_user_id:
+                                    type: integer
+                                  vnd_instructure_user_uuid:
+                                    type: string
+                                  canvas_user_globalid:
+                                    type: integer
+                                  canvas_user_sissourceid:
+                                    type: string
+                                  person_sourced_id:
+                                    type: string
+                                  message_locale:
+                                    type: string
+                                  vnd_canvas_person_email_sis:
+                                    type: string
+                                  person_email_primary:
+                                    type: string
+                                  person_address_timezone:
+                                    type: string
+                                  user_username:
+                                    type: string
+                                  canvas_user_sisintegrationid:
+                                    type: string
+                                  canvas_user_loginid:
+                                    type: string
+                                  canvas_xapi_url:
+                                    type: string
+                                  caliper_url:
+                                    type: string
+                                  unsupported_param_1:
+                                    type: string
+                                  unsupported_param_2:
+                                    type: string
+                              https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id:
+                                type: string
+                              https://purl.imsglobal.org/spec/lti/claim/lti1p1:
+                                type: object
+                                properties:
+                                  user_id:
+                                    type: string
+                                required:
+                                - user_id
+                            required:
+                            - https://purl.imsglobal.org/spec/lti/claim/message_type
+                            - locale
+                            - https://purl.imsglobal.org/spec/lti/claim/custom
+                            - https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id
+                            - https://purl.imsglobal.org/spec/lti/claim/lti1p1
+                        email:
+                          type: string
+                        lis_person_sourcedid:
+                          type: string
+                      required:
+                      - status
+                      - name
+                      - picture
+                      - given_name
+                      - family_name
+                      - user_id
+                      - lti11_legacy_user_id
+                      - roles
+                      - message
+                required:
+                - id
+                - context
+                - members
+              example:
+                id: http://test.host/api/lti/courses/880213/names_and_roles?rlid=f282bbe38e6d83524012bb96e0af2f9af9590547
+                context:
+                  id: f282bbe38e6d83524012bb96e0af2f9af9590547
+                  label: Unnamed
+                  title: Unnamed Course
+                members:
+                - status: Active
+                  name: Marta Perkins
+                  picture: http://school.edu/image/url.png
+                  given_name: Marta
+                  family_name: Perkins
+                  email: marta.perkins@school.edu
+                  lis_person_sourcedid: user-1-sis-user-id-1
+                  user_id: 27446e34-fd89-42f6-ae6c-bcb32bfa8b9e
+                  lti11_legacy_user_id: ea1a3f1f43b49387e308f437b811af5857232c1c
+                  roles:
+                  - http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor
+                  message:
+                  - https://purl.imsglobal.org/spec/lti/claim/message_type: LtiResourceLinkRequest
+                    locale: de
+                    https://purl.imsglobal.org/spec/lti/claim/custom:
+                      person_name_full: Marta Perkins
+                      person_name_display: Marta Perkins
+                      person_name_family: Perkins
+                      person_name_given: Marta
+                      user_image: http://school.edu/image/url.png
+                      user_id: 196739
+                      canvas_user_id: 196739
+                      vnd_instructure_user_uuid: PeD59XLw7mJSXyDSYDdUZrZP2mFljDAQxYqdZnUX
+                      canvas_user_globalid: 196739
+                      canvas_user_sissourceid: user-1-sis-user-id-1
+                      person_sourced_id: user-1-sis-user-id-1
+                      message_locale: de
+                      vnd_canvas_person_email_sis: sis@example.com
+                      person_email_primary: marta.perkins@school.edu
+                      person_address_timezone: Europe/Berlin
+                      user_username: sis@example.com
+                      canvas_user_sisintegrationid: user-1-sis-integration-id-1
+                      canvas_user_loginid: sis@example.com
+                      canvas_xapi_url: http://test.host/api/lti/v1/xapi/407087-196739-880184-1702618795-03e11960d048169a-3e3b02fa846a9c5cfdf8ec15c8e4ff52d490b34c
+                      caliper_url: http://test.host/api/lti/v1/caliper/407087-196739-880184-1702618795-2d66bc36035c9368-0e14a40cb616910c2d888c1efe4085b3475b1a92
+                      unsupported_param_1: "$unsupported.param.1"
+                      unsupported_param_2: "$unsupported.param.2"
+                    https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id: ea1a3f1f43b49387e308f437b811af5857232c1c
+                    https://purl.imsglobal.org/spec/lti/claim/lti1p1:
+                      user_id: ea1a3f1f43b49387e308f437b811af5857232c1c
+                - status: Active
+                  name: User
+                  picture: http://localhost/images/messages/avatar-50.png
+                  given_name: User
+                  family_name: ''
+                  user_id: a06077c2-97ad-43e3-b46e-3efa38677e55
+                  lti11_legacy_user_id: 0db0a6bb6567a1305d293e9b456793167fceccbc
+                  roles:
+                  - http://purl.imsglobal.org/vocab/lis/v2/membership#Learner
+                  message:
+                  - https://purl.imsglobal.org/spec/lti/claim/message_type: LtiResourceLinkRequest
+                    locale: en
+                    https://purl.imsglobal.org/spec/lti/claim/custom: {}
+                    https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id: 0db0a6bb6567a1305d293e9b456793167fceccbc
+                    https://purl.imsglobal.org/spec/lti/claim/lti1p1:
+                      user_id: 0db0a6bb6567a1305d293e9b456793167fceccbc
+        '401':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      message:
+                        type: string
+                    required:
+                    - type
+                    - message
+                required:
+                - errors
+              example:
+                errors:
+                  type: unauthorized
+                  message: Access Token not linked to a Tool associated with this
+                    Context
+        '500':
+          description: returns 500 not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+                required:
+                - errors
+                - error_report_id
+              example: {}
+        '404':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+                required:
+                - errors
+              example: {}
+  "/api/lti/courses/{course_id}/line_items/{line_item_id}/results":
+    get:
+      summary: index
+      tags:
+      - Lti::IMS::Result
+      parameters:
+      - name: course_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 880181
+      - name: line_item_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1017686
+      - name: user_id
+        in: query
+        required: false
+        schema:
+          type: string
+        example: d527abb3-294a-4afa-a204-9737e00aab3e
+      responses:
+        '200':
+          description: returns 200 and finds the tool associated with the access token's
+            developer key, ignoring other the other developer key and its tool
+          content:
+            application/vnd.ims.lis.v2.resultcontainer+json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    scoreOf:
+                      type: string
+                    userId:
+                      type: string
+                    resultScore:
+                      type: number
+                      format: float
+                    resultMaximum:
+                      type: number
+                      format: float
+                  required:
+                  - id
+                  - scoreOf
+                  - userId
+                  - resultScore
+                  - resultMaximum
+              example:
+              - id: http://test.host/api/lti/courses/880195/line_items/1017686/results/1012373
+                scoreOf: http://test.host/api/lti/courses/880195/line_items/1017686
+                userId: c5ce1e03-a139-4ef4-b772-f5a940e31baf
+                resultScore: 0.5
+                resultMaximum: 1.0
+              - id: http://test.host/api/lti/courses/880195/line_items/1017686/results/1012374
+                scoreOf: http://test.host/api/lti/courses/880195/line_items/1017686
+                userId: 0f1250ca-b41c-42a3-a37c-4eff05e1dacb
+                resultScore: 0.5
+                resultMaximum: 1.0
+              - id: http://test.host/api/lti/courses/880195/line_items/1017686/results/1012375
+                scoreOf: http://test.host/api/lti/courses/880195/line_items/1017686
+                userId: 43238a77-2ecb-4fd4-a87a-e0d18f84af48
+                resultScore: 0.5
+                resultMaximum: 1.0
+              - id: http://test.host/api/lti/courses/880195/line_items/1017686/results/1012376
+                scoreOf: http://test.host/api/lti/courses/880195/line_items/1017686
+                userId: 0233ca3d-809c-4511-a243-94cee32fcef1
+                resultScore: 0.5
+                resultMaximum: 1.0
+              - id: http://test.host/api/lti/courses/880205/line_items/1017686/results/1012373
+                scoreOf: http://test.host/api/lti/courses/880205/line_items/1017686
+                userId: fa27312e-3ae7-4934-9ec4-f7df8f6bffc2
+                resultScore: 0.5
+                resultMaximum: 1.0
+              - id: http://test.host/api/lti/courses/880205/line_items/1017686/results/1012374
+                scoreOf: http://test.host/api/lti/courses/880205/line_items/1017686
+                userId: b294717b-5aa3-413b-a4e2-179a1bc7ee96
+                resultScore: 0.5
+                resultMaximum: 1.0
+              - id: http://test.host/api/lti/courses/880205/line_items/1017686/results/1012375
+                scoreOf: http://test.host/api/lti/courses/880205/line_items/1017686
+                userId: 9821aa6b-231c-4c93-8ff0-bb2379fcc7e7
+                resultScore: 0.5
+                resultMaximum: 1.0
+              - id: http://test.host/api/lti/courses/880205/line_items/1017686/results/1012376
+                scoreOf: http://test.host/api/lti/courses/880205/line_items/1017686
+                userId: babbc1a9-b2f6-464d-9c6a-ab664179c1bb
+                resultScore: 0.5
+                resultMaximum: 1.0
+              - id: http://test.host/api/lti/courses/880146/line_items/1017686/results/1012373
+                scoreOf: http://test.host/api/lti/courses/880146/line_items/1017686
+                userId: d527abb3-294a-4afa-a204-9737e00aab3e
+                resultScore: 0.5
+                resultMaximum: 1.0
+        '401':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      message:
+                        type: string
+                    required:
+                    - type
+                    - message
+                required:
+                - errors
+              example:
+                errors:
+                  type: unauthorized
+                  message: Unknown or inactive Developer Key
+        '404':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                      required:
+                      - message
+                    properties:
+                      type:
+                        type: string
+                      message:
+                        type: string
+                    required:
+                    - type
+                    - message
+                required:
+                - errors
+              example:
+                errors:
+                - message: The specified resource does not exist.
+  "/api/lti/courses/{course_id}/line_items/{id}":
+    get:
+      summary: show
+      tags:
+      - Lti::IMS::LineItem
+      parameters:
+      - name: course_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 880199
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1017689
+      responses:
+        '401':
+          description: does not return ims mime_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      message:
+                        type: string
+                    required:
+                    - type
+                    - message
+                required:
+                - errors
+              example:
+                errors:
+                  type: unauthorized
+                  message: Access Token not linked to a Tool associated with this
+                    Context
+        '200':
+          description: updates the assignment points_possible
+          content:
+            application/vnd.ims.lis.v2.lineitem+json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  scoreMaximum:
+                    type: number
+                    format: float
+                  label:
+                    type: string
+                  endDateTime:
+                    type: string
+                  resourceLinkId:
+                    type: string
+                  tag:
+                    type: string
+                required:
+                - id
+                - scoreMaximum
+                - label
+                - endDateTime
+                - resourceLinkId
+              example:
+                id: http://test.host/api/lti/courses/880239/line_items/1017694
+                scoreMaximum: 88.2
+                label: value for title
+                endDateTime: '2023-12-15T05:40:07Z'
+                resourceLinkId: 0d5efeae-6f80-4d75-bb26-d2998fb105e9
+                tag: some_tag
+        '404':
+          description: responds with 404 if the course does not exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                      required:
+                      - message
+                required:
+                - errors
+              example:
+                errors:
+                - message: The specified resource does not exist.
+        '412':
+          description: returns a precondition_failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+                required:
+                - errors
+              example: {}
+  "/api/lti/courses/{course_id}/line_items/{line_item_id}/results/{id}":
+    get:
+      summary: show
+      tags:
+      - Lti::IMS::Result
+      parameters:
+      - name: course_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 880250
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1012374
+      - name: line_item_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1017690
+      responses:
+        '401':
+          description: returns 401 unauthorized and complains about an incorrect signature
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      message:
+                        type: string
+                    required:
+                    - type
+                    - message
+                required:
+                - errors
+              example:
+                errors:
+                  type: unauthorized
+                  message: Access token invalid - signature likely incorrect
+        '200':
+          description: returns 200 success
+          content:
+            application/vnd.ims.lis.v2.resultcontainer+json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  scoreOf:
+                    type: string
+                  userId:
+                    type: string
+                  resultScore:
+                    type: number
+                    format: float
+                  resultMaximum:
+                    type: number
+                    format: float
+                required:
+                - id
+                - scoreOf
+                - userId
+                - resultScore
+                - resultMaximum
+              example:
+                id: http://test.host/api/lti/courses/880227/line_items/1017687/results/1012374
+                scoreOf: http://test.host/api/lti/courses/880227/line_items/1017687
+                userId: b03618a7-7b58-461d-a894-7e69c6951270
+                resultScore: 0.5
+                resultMaximum: 1.0
+  "/api/lti/courses/{course_id}/jwt_token":
+    get:
+      summary: jwt_token
+      tags:
+      - ExternalTool
+      parameters:
+      - name: course_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 880104
+      - name: tool_id
+        in: query
+        required: false
+        schema:
+          type: integer
+        example: 407124
+      - name: tool_launch_url
+        in: query
+        required: false
+        schema:
+          type: string
+        example: http://www.example.com/basic_lti
+      responses:
+        '404':
+          description: sets status code to 404 if the requested tool id does not exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                      required:
+                      - message
+                required:
+                - errors
+              example:
+                errors:
+                - message: The specified resource does not exist.
+        '200':
+          description: returns the correct JWT token when given using the tool_id
+            param
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jwt_token:
+                    type: string
+                required:
+                - jwt_token
+              example:
+                jwt_token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjb250ZXh0X2lkIjoiZjUwZGE2OTA1YWI3MzBkMzUyMzZlYTgxMDBiY2I2NzQzNGNmMzM3MCIsImNvbnRleHRfbGFiZWwiOiJVbm5hbWVkIiwiY29udGV4dF90aXRsZSI6IkNvdXJzZSBOYW1lIiwiY3VzdG9tX2NhbnZhc19hcGlfZG9tYWluIjoibG9jYWxob3N0IiwiY3VzdG9tX2NhbnZhc19jb3Vyc2VfaWQiOiI4ODAxMDQiLCJjdXN0b21fY2FudmFzX2Vucm9sbG1lbnRfc3RhdGUiOiJhY3RpdmUiLCJjdXN0b21fY2FudmFzX3VzZXJfaWQiOiIxOTY0OTAiLCJjdXN0b21fY2FudmFzX3VzZXJfbG9naW5faWQiOiIkQ2FudmFzLnVzZXIubG9naW5JZCIsImN1c3RvbV9jYW52YXNfd29ya2Zsb3dfc3RhdGUiOiJhdmFpbGFibGUiLCJleHRfcm9sZXMiOiJ1cm46bHRpOmluc3Ryb2xlOmltcy9saXMvSW5zdHJ1Y3Rvcix1cm46bHRpOnJvbGU6aW1zL2xpcy9JbnN0cnVjdG9yLHVybjpsdGk6c3lzcm9sZTppbXMvbGlzL1VzZXIiLCJsYXVuY2hfcHJlc2VudGF0aW9uX2RvY3VtZW50X3RhcmdldCI6ImlmcmFtZSIsImxhdW5jaF9wcmVzZW50YXRpb25fbG9jYWxlIjoiZW4iLCJsYXVuY2hfcHJlc2VudGF0aW9uX3JldHVybl91cmwiOiJodHRwOi8vdGVzdC5ob3N0L2NvdXJzZXMvODgwMTA0IiwibGlzX3BlcnNvbl9jb250YWN0X2VtYWlsX3ByaW1hcnkiOm51bGwsImxpc19wZXJzb25fbmFtZV9mYW1pbHkiOm51bGwsImxpc19wZXJzb25fbmFtZV9mdWxsIjoiVXNlciIsImxpc19wZXJzb25fbmFtZV9naXZlbiI6IlVzZXIiLCJsdGlfbWVzc2FnZV90eXBlIjoiYmFzaWMtbHRpLWxhdW5jaC1yZXF1ZXN0IiwibHRpX3ZlcnNpb24iOiJMVEktMXAwIiwicmVzb3VyY2VfbGlua19pZCI6ImY1MGRhNjkwNWFiNzMwZDM1MjM2ZWE4MTAwYmNiNjc0MzRjZjMzNzAiLCJyZXNvdXJjZV9saW5rX3RpdGxlIjoiYm9iIiwicm9sZXMiOiJJbnN0cnVjdG9yIiwidG9vbF9jb25zdW1lcl9pbmZvX3Byb2R1Y3RfZmFtaWx5X2NvZGUiOiJjYW52YXMiLCJ0b29sX2NvbnN1bWVyX2luZm9fdmVyc2lvbiI6ImNsb3VkIiwidG9vbF9jb25zdW1lcl9pbnN0YW5jZV9jb250YWN0X2VtYWlsIjoibm90aWZpY2F0aW9uc0B1bmtub3duZG9tYWluLmV4YW1wbGUuY29tIiwidG9vbF9jb25zdW1lcl9pbnN0YW5jZV9ndWlkIjoicHVmOFVrdjlWOU5yOXVMR2trdUk5VEFNNFB1Z2dzMTNZdE5la0FFQjpjYW52YXMtbG1zIiwidG9vbF9jb25zdW1lcl9pbnN0YW5jZV9uYW1lIjoiRGVmYXVsdCBBY2NvdW50IiwidXNlcl9pZCI6ImFiOTEyNzZjZTEyOWI0YjAyMTEyZmQwNzQ4YjA1M2MxZTRiZDZlYmQiLCJ1c2VyX2ltYWdlIjoiaHR0cDovL2xvY2FsaG9zdC9pbWFnZXMvbWVzc2FnZXMvYXZhdGFyLTUwLnBuZyIsImNvbnN1bWVyX2tleSI6ImJvYiIsImlhdCI6MTcwMjYxODU2N30.DuT4WnFME5owv8totVjlU307cYsW6zohT81lZt38GS0

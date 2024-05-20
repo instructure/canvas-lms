@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow, mount} from 'enzyme'
-import {render, screen} from '@testing-library/react'
+import {shallow} from 'enzyme'
+import {fireEvent, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import moment from 'moment-timezone'
 import sinon from 'sinon'
@@ -117,23 +117,22 @@ it('renders the base component correctly with buttons and trays', () => {
 })
 
 it('does not render the Add To Do option when isObserving', () => {
-  const wrapper = mount(<PlannerHeader {...defaultProps()} isObserving={true} />)
-  const AddToDoButton = wrapper.findWhere(node => {
-    return node.type() === 'button' && node.text() === 'Add To Do'
-  })
-  expect(AddToDoButton.exists()).toBeFalsy()
+  const {queryByText} = render(<PlannerHeader {...defaultProps()} isObserving={true} />)
+  const addToDoButton = queryByText('Add To Do')
+
+  expect(addToDoButton).toBeNull()
 })
 
-it('toggles the new item tray', () => {
+it('toggles the new item tray', async () => {
   const mockCancel = jest.fn()
   const {getByTestId} = render(
     <PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel} />
   )
   const button = getByTestId('add-to-do-button')
-  userEvent.click(button)
+  await userEvent.click(button)
   const heading1 = screen.getByRole('heading', {name: /Add To Do/i})
   expect(heading1).toBeInTheDocument()
-  userEvent.click(button)
+  await userEvent.click(button)
   const heading2 = screen.queryByRole('heading', {name: /Add To Do/i})
   expect(heading2).not.toBeInTheDocument()
   expect(mockCancel).toHaveBeenCalled()
@@ -141,9 +140,10 @@ it('toggles the new item tray', () => {
 
 it('sends focus back to the add new item button', () => {
   const mockCancel = jest.fn()
-  const wrapper = mount(<PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel} />)
-  wrapper.instance().handleToggleTray() // simulate clicking the + button
-  wrapper.instance().handleCloseTray() // simulate cancelling
+  const ref = React.createRef()
+  render(<PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel} ref={ref} />)
+  ref.current.handleToggleTray() // simulate clicking the + button
+  ref.current.handleCloseTray() // simulate cancelling
   expect(mockCancel).toHaveBeenCalled()
 })
 
@@ -152,37 +152,37 @@ describe('when component is mounted', () => {
     const tempProps = defaultProps()
     tempProps.getNextOpportunities = jest.fn()
     tempProps.loading.allOpportunitiesLoaded = false
-    mount(<PlannerHeader {...tempProps} />)
+    render(<PlannerHeader {...tempProps} />)
     expect(tempProps.getNextOpportunities).toHaveBeenCalled()
   })
 
   it("doesn't call getNextOpportunities if all opportunities have already been loaded", () => {
     const tempProps = defaultProps()
     tempProps.getNextOpportunities = jest.fn()
-    mount(<PlannerHeader {...tempProps} />)
+    render(<PlannerHeader {...tempProps} />)
     expect(tempProps.getNextOpportunities).not.toHaveBeenCalled()
   })
 })
 
 it('toggles aria-hidden on the ariaHideElement when opening the opportunities popover', () => {
   const fakeElement = document.createElement('div')
-  const wrapper = mount(<PlannerHeader {...defaultProps()} ariaHideElement={fakeElement} />)
-  const button = wrapper.find('Popover').first().find('IconButton').first()
-  button.simulate('click')
+  const wrapper = render(<PlannerHeader {...defaultProps()} ariaHideElement={fakeElement} />)
+  const button = wrapper.getByText('opportunities popup')
+  fireEvent.click(button)
   expect(fakeElement.getAttribute('aria-hidden')).toBe('true')
-  button.simulate('click')
+  fireEvent.click(button)
   expect(fakeElement.getAttribute('aria-hidden')).toBe(null)
 })
 
 it('toggles aria-hidden on the ariaHideElement when opening the add to do item tray', () => {
   const fakeElement = document.createElement('div')
-  const wrapper = mount(<PlannerHeader {...defaultProps()} ariaHideElement={fakeElement} />)
+  const wrapper = render(<PlannerHeader {...defaultProps()} ariaHideElement={fakeElement} />)
 
-  const button = wrapper.find('IconPlusLine').closest('button')
+  const button = wrapper.getByTestId('add-to-do-button')
 
-  button.simulate('click')
+  fireEvent.click(button)
   expect(fakeElement.getAttribute('aria-hidden')).toBe('true')
-  button.simulate('click')
+  fireEvent.click(button)
   expect(fakeElement.getAttribute('aria-hidden')).toBe(null)
 })
 
@@ -613,15 +613,10 @@ it('shows all opportunities on badge even when we have over 10 items', () => {
     allOpportunitiesLoaded: true,
   }
 
-  const fakeElement = document.createElement('div')
-  const wrapper = mount(<PlannerHeader {...props} ariaHideElement={fakeElement} />)
+  const {getAllByText} = render(<PlannerHeader {...props} />)
+  const badge = getAllByText(`${props.opportunities.items.length}`)[0] // Assuming you have a test ID for the badge
 
-  wrapper.setProps(props)
-  expect(
-    wrapper.find('Badge').filterWhere(item => {
-      return item.prop('count') === props.opportunities.items.length // src undefined
-    }).length
-  ).toEqual(3)
+  expect(badge.textContent).toBe(String(props.opportunities.items.length))
 })
 
 it('edits new item in open tray', () => {
@@ -670,16 +665,16 @@ it('opens the tray when it gets an updateTodoItem prop', () => {
   expect(findEditTray(wrapper).prop('open')).toBe(true)
 })
 
-it('toggles the grades tray', () => {
+it('toggles the grades tray', async () => {
   const {getByTestId} = render(<PlannerHeader {...defaultProps()} />)
 
   const button = getByTestId('show-my-grades-button')
-  userEvent.click(button)
+  await userEvent.click(button)
 
   const heading1 = screen.getByRole('heading', {name: /My Grades/i})
   expect(heading1).toBeInTheDocument()
 
-  userEvent.click(button)
+  await userEvent.click(button)
 
   const heading2 = screen.queryByRole('heading', {name: /My Grades/i})
   expect(heading2).not.toBeInTheDocument()

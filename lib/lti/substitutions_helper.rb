@@ -246,6 +246,10 @@ module Lti
       sis_ps.sis_communication_channel&.path || sis_ps.communication_channels.ordered.active.first&.path if sis_ps
     end
 
+    def tag_from_resource_link(resource_link)
+      ContentTag.find_by(associated_asset: resource_link) if resource_link
+    end
+
     def email
       # we are using sis_email for lti2 tools, or if the 'prefer_sis_email' extension is set for LTI 1
       # accept the setting as a boolean or string for backwards-compatibility

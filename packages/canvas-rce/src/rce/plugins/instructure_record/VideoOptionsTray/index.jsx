@@ -56,6 +56,7 @@ export default function VideoOptionsTray({
   onSave,
   open,
   trayProps,
+  requestSubtitlesFromIframe = () => {},
   onEntered = null,
   onExited = null,
   id = 'video-options-tray',
@@ -95,6 +96,10 @@ export default function VideoOptionsTray({
         })
     }
   }, [videoOptions.attachmentId])
+
+  useEffect(() => {
+    if (subtitles.length === 0) requestSubtitlesFromIframe(setSubtitles)
+  }, [])
 
   function handleTitleTextChange(event) {
     setTitleText(event.target.value)
@@ -374,4 +379,5 @@ VideoOptionsTray.propTypes = {
   }),
   id: string,
   studioOptions: parsedStudioOptionsPropType,
+  requestSubtitlesFromIframe: func
 }

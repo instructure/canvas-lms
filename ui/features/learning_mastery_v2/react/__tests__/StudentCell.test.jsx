@@ -53,7 +53,7 @@ describe('StudentCell', () => {
   })
 
   describe('student status', () => {
-    const getTestStudent = (status) => ({
+    const getTestStudent = status => ({
       status: status,
       name: 'Student Test',
       display_name: 'Student Test',
@@ -63,17 +63,23 @@ describe('StudentCell', () => {
     })
 
     it('does not render student status label when student active', () => {
-      const {queryByTestId} = render(<StudentCell {...defaultProps({student: getTestStudent('active')})} />)
+      const {queryByTestId} = render(
+        <StudentCell {...defaultProps({student: getTestStudent('active')})} />
+      )
       expect(queryByTestId('student-status')).not.toBeInTheDocument()
     })
 
     it('renders student status label when student is inactive', () => {
-      const {getByTestId} = render(<StudentCell {...defaultProps({student: getTestStudent('inactive')})} />)
+      const {getByTestId} = render(
+        <StudentCell {...defaultProps({student: getTestStudent('inactive')})} />
+      )
       expect(getByTestId('student-status')).toBeInTheDocument()
     })
 
     it('renders student status label when student is concluded', () => {
-      const {getByTestId} = render(<StudentCell {...defaultProps({student: getTestStudent('concluded')})} />)
+      const {getByTestId} = render(
+        <StudentCell {...defaultProps({student: getTestStudent('concluded')})} />
+      )
       expect(getByTestId('student-status')).toBeInTheDocument()
     })
   })

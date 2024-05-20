@@ -94,7 +94,11 @@ const ManagementHeader = ({
           ) : (
             <>
               {canImport && (
-                <Button onClick={showImportModal} renderIcon={IconImportLine} margin="x-small xx-small x-small">
+                <Button
+                  onClick={showImportModal}
+                  renderIcon={IconImportLine}
+                  margin="x-small xx-small x-small"
+                >
                   {I18n.t('Import')}
                 </Button>
               )}

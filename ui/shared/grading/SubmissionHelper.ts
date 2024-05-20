@@ -23,7 +23,7 @@ import type {
   SubmissionOriginalityData,
   SimilarityEntry,
   CamelizedSubmissionWithOriginalityReport,
-} from '@canvas/grading/grading.d'
+} from './grading.d'
 
 export function isGraded(submission) {
   // TODO: remove when we no longer camelize data in Gradebook

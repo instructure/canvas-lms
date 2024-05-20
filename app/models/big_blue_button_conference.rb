@@ -188,11 +188,17 @@ class BigBlueButtonConference < WebConference
       :voiceBridge => format("%020d", global_id),
       :attendeePW => settings[:user_key],
       :moderatorPW => settings[:admin_key],
-      :logoutURL => (settings[:default_return_url] || "http://www.instructure.com"),
+      :logoutURL => settings[:default_return_url] || "http://www.instructure.com",
       :record => settings[:record] ? true : false,
       "meta_canvas-recording-ready-user" => recording_ready_user,
       "meta_canvas-recording-ready-url" => recording_ready_url(current_host)
     }
+
+    if context.is_a?(Course)
+      req_params[:bbbCanvasCourseName] = context.name
+      req_params[:bbbCanvasCourseCode] = context.course_code
+    end
+
     if Account.site_admin.feature_enabled? :bbb_modal_update
       req_params.merge!({
                           lockSettingsDisableCam: settings[:share_webcam] ? false : true,
@@ -326,8 +332,7 @@ class BigBlueButtonConference < WebConference
 
   def self.fetch_and_preload_recordings(conferences, use_fallback_config: false)
     # have a limit so we don't send a ridiculously long URL over
-    limit = Setting.get("big_blue_button_preloaded_recordings_limit", "50").to_i
-    conferences.each_slice(limit) do |sliced_conferences|
+    conferences.each_slice(50) do |sliced_conferences|
       meeting_ids = sliced_conferences.map(&:conference_key).join(",")
       response = send_request(:getRecordings,
                               { meetingID: meeting_ids },
@@ -364,12 +369,23 @@ class BigBlueButtonConference < WebConference
   end
 
   def join_url(user, type = :user)
+    additional_params = {}
+
+    if config[:send_avatar]
+      additional_params[:avatarUrl] = user.avatar_url
+    end
+
+    unless user.pronouns.nil?
+      additional_params[:userdataPronouns] = user.pronouns
+    end
+
     generate_request :join,
                      fullName: user.short_name,
                      meetingID: conference_key,
                      password: settings[((type == :user) ? :user_key : :admin_key)],
                      userID: user.id,
-                     createTime: settings[:create_time]
+                     createTime: settings[:create_time],
+                     **additional_params
   end
 
   def end_meeting

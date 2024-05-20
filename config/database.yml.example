@@ -7,6 +7,8 @@ test:
   username: canvas
   password: your_password
   timeout: 5000
+  shard1: canvas_test_shard_1
+  shard2: canvas_test_shard_2
 
 development:
   adapter: postgresql

@@ -33,7 +33,7 @@ module Lti
       end
     end
 
-    describe "valid_placements" do
+    describe ".valid_placements" do
       it "does not include conference_selection when FF disabled" do
         expect(described_class.valid_placements(Account.default)).not_to include(:conference_selection)
       end
@@ -45,6 +45,67 @@ module Lti
 
       it "includes submission_type_selection when FF enabled" do
         expect(described_class.valid_placements(Account.default)).to include(:submission_type_selection)
+      end
+    end
+
+    describe ".public_placements" do
+      it "does not include submission_type_selection" do
+        expect(described_class.public_placements(Account.default)).not_to include(:submission_type_selection)
+      end
+
+      it "contains common placements" do
+        expect(described_class.public_placements(Account.default)).to include(:assignment_selection, :course_navigation, :link_selection)
+      end
+
+      context "when the feature remove_submission_type_selection_from_dev_keys_edit_page flag is disabled" do
+        it "includes submission_type_selection" do
+          Account.default.disable_feature! :remove_submission_type_selection_from_dev_keys_edit_page
+          expect(described_class.public_placements(Account.default)).to include(:submission_type_selection)
+        end
+      end
+    end
+
+    describe ".supported_message_type?" do
+      subject do
+        described_class.method(:supported_message_type?)
+      end
+
+      it "returns false when no placement is passed in" do
+        expect(subject.call(nil, "message_type")).to be false
+      end
+
+      it "returns true when no message_type is passed in" do
+        expect(subject.call(Lti::ResourcePlacement::PLACEMENTS.first, nil)).to be true
+      end
+
+      it "returns false if an invalid placement is passed in" do
+        expect(subject.call("invalid_placement", LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE)).to be false
+      end
+
+      it "returns false if a valid placement but unsupported message_type is passed in" do
+        expect(subject.call(:course_navigation, LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE)).to be false
+      end
+
+      it "returns true if a valid placement is passed in" do
+        expect(subject.call(:assignment_selection, LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE)).to be true
+      end
+
+      it "works with strings and symbols for the placement" do
+        expect(subject.call("assignment_selection", LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE)).to be true
+        expect(subject.call(:assignment_selection, LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE)).to be true
+      end
+
+      it "works with strings and symbols for the message_type" do
+        expect(subject.call(:assignment_selection, LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE)).to be true
+        expect(subject.call(:assignment_selection, LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE.to_sym)).to be true
+      end
+
+      Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE.each do |message_type, placements|
+        placements.each do |placement|
+          it "returns true for #{placement} and #{message_type}" do
+            expect(subject.call(placement, message_type)).to be true
+          end
+        end
       end
     end
 

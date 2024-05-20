@@ -10,7 +10,7 @@
     <div class="border border-trbl border-round">
 
       {{!-- Submission type accepted --}}
-      <select id="assignment_submission_type" name="submission_type" style="margin-left: 0;"
+      <select id="assignment_submission_type" name="submission_type" style="margin-left: 0;{{fullWidthIf isUpdateAssignmentSubmissionTypeLaunchButtonEnabled}}"
         aria-controls="assignment_online_submission_types,assignment_external_tool_settings,assignment_group_selector,assignment_peer_reviews_fields"
         {{disabledIfIncludes frozenAttributes "submission_types"}}>
         {{#if defaultToolName}}
@@ -203,33 +203,27 @@
       --}}
       <div id="assignment_submission_type_selection_tool_launch_container"
         style="{{hiddenUnless selectedSubmissionTypeToolId}}">
-        <div class="pad-box">
-          <div class="ic-Form-control">
-            <button class="Button btn-primary" type="button" id="assignment_submission_type_selection_launch_button">
-              <i class="icon-link sr-hide" />
-              <span id="assignment_submission_type_selection_launch_button_text"></span>
-            </button>
-          </div>
 
-          <input type="hidden" id="assignment_submission_type_external_data" name="external_tool_tag_attributes[external_data]"
-            value="{{externalToolDataStringified}}" />
-          {{!-- this is very specific to Mastery Connect currently. We could potentially make this a dynamic partial
-          based on the type of external data --}}
-          <div>
-            <h2>
-              <span id="mc_external_data_assessment">{{name}}</span>
-            </h2>
-            <div id="mc_external_data_points">{{externalToolData.points}} {{#if externalToolData.points}}
-              {{#t}}Points{{/t}} {{/if}}</div>
-            <div id="mc_external_data_objectives">{{externalToolData.objectives}}</div>
-            <div> </div>
-            <h3>
-              <span id="mc_external_data_tracker">{{externalToolData.trackerName}}</span>
-            </h3>
-            <div id="mc_external_data_tracker_alignment">{{externalToolData.trackerAlignment}}</div>
-            <div id="mc_external_data_students">{{externalToolData.studentCount}} {{externalToolDataStudentLabelText}}
-            </div>
-          </div>
+        <div data-component="AssignmentSubmissionTypeSelectionLaunchButton"></div>
+
+
+        <input type="hidden" id="assignment_submission_type_external_data" name="external_tool_tag_attributes[external_data]"
+          value="{{externalToolDataStringified}}" />
+        {{!-- this is very specific to Mastery Connect currently. We could potentially make this a dynamic partial
+        based on the type of external data --}}
+        <div>
+          <h2>
+            <span id="mc_external_data_assessment">{{name}}</span>
+          </h2>
+          <div id="mc_external_data_points">{{externalToolData.points}} {{#if externalToolData.points}}
+            {{#t}}Points{{/t}} {{/if}}</div>
+          <div id="mc_external_data_objectives">{{externalToolData.objectives}}</div>
+          <div> </div>
+          <h3>
+            <span id="mc_external_data_tracker">{{externalToolData.trackerName}}</span>
+          </h3>
+          <div id="mc_external_data_tracker_alignment">{{externalToolData.trackerAlignment}}</div>
+          <div id="mc_external_data_students">{{externalToolData.studentCount}} {{externalToolDataStudentLabelText}}</div>
         </div>
       </div>
       <div id="assignment_submission_type_selection_tool_dialog"></div>
@@ -256,6 +250,10 @@
                    name="external_tool_tag_attributes[custom_params]"
                    type="hidden"
                    value="{{externalToolCustomParamsStringified}}" />
+            <input id="assignment_external_tool_tag_attributes_title"
+                   name="external_tool_tag_attributes[title]"
+                   type="hidden"
+                   value="{{externalToolDataTitle}}" />
             <input id="assignment_external_tool_tag_attributes_line_item"
                    name="external_tool_tag_attributes[line_item]"
                    type="hidden"

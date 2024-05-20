@@ -23,8 +23,9 @@
 //        time around.
 
 import serviceRCELoader from './serviceRCELoader'
-import {RCELOADED_EVENT_NAME, send, destroy, focus} from './RceCommandShim'
+import {RCELOADED_EVENT_NAME, send, destroy, focus} from '@canvas/rce-command-shim/RceCommandShim'
 import $ from 'jquery'
+import {escape} from 'lodash'
 
 function loadServiceRCE(target, tinyMCEInitOptions, callback) {
   target.css('display', 'none')
@@ -54,7 +55,7 @@ function establishParentNode(target) {
   // if we rendered a new editor into the textarea parent
   // element, so this is some helper functionality to create/reuse
   // a parent element if that's the case
-  const targetId = $target.attr('id')
+  const targetId = escape($target.attr('id'))
   // xsslint safeString.identifier targetId parentId
   const parentId = `tinymce-parent-of-${targetId}`
   if ($target.parent().attr('id') === parentId) {

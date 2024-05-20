@@ -26,7 +26,7 @@ function convertManageableCoursesToApi(courses) {
 }
 
 export function isSearchableTerm(value) {
-  if (ENV?.current_user_roles?.includes('admin')) {
+  if (ENV.current_user_is_admin) {
     return value.length >= MINIMUM_SEARCH_LENGTH
   } else {
     return value.length === 0 || value.length >= MINIMUM_SEARCH_LENGTH
@@ -36,6 +36,9 @@ export function isSearchableTerm(value) {
 export default function useManagedCourseSearchApi(fetchApiOpts = {}) {
   if (!fetchApiOpts.params) {
     fetchApiOpts.params = {}
+  }
+  if (!fetchApiOpts.success) {
+    fetchApiOpts.success = () => {}
   }
 
   const searchTerm = fetchApiOpts.params.term || ''

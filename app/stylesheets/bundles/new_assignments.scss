@@ -216,13 +216,6 @@
   }
 }
 
-.new_quiz_lti_wrapper {
-  display: inline-block;
-  margin-#{direction(right)}: 6px;
-  padding-#{direction(right)}: 10px;
-  border-#{direction(right)}: 1px solid $ic-color-medium-lighter;
-}
-
 /* support for master class locked input fields */
 form[data-view='edit-assignment'] {
   h3 {
@@ -251,5 +244,39 @@ form[data-view='edit-assignment'] {
 
   form {
     margin: 0;
+  }
+}
+
+#grading_period_selector{
+  flex: 0 0;
+  margin-right: 0.75rem;
+}
+
+.assignment_index_header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2.25rem;
+  flex-wrap: wrap;
+  gap: 2.25rem;
+  font-size: 0;
+
+  .assignment_index_header_title {
+    font-weight: 700;
+    line-height: 1.05;
+    font-size: 2.375rem;
+    margin: 0;
+  }
+  .assignment_index_header_right {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-left:0;
+    a {
+      text-decoration: none;
+    }
+  }
+  .assignment_index_header_left {
+    flex: 1;
+    margin-right: 0;
   }
 }

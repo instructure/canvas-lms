@@ -1,0 +1,85 @@
+---
+openapi: 3.0.3
+info:
+  title: app
+  version: 1.0.0
+servers: []
+paths:
+  "/api/lti/authorize_redirect":
+    post:
+      summary: authorize_redirect
+      tags:
+      - Lti::IMS::Authentication
+      responses:
+        '400':
+          description: has a descriptive error message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                required:
+                - status
+                - message
+              example:
+                status: bad_request
+                message: Invalid lti_message_hint
+        '302':
+          description: adds authredir=1
+          content:
+            text/html:
+              schema:
+                type: string
+              example: <html><body>You are being <a href="http://redirect.instructure.com/api/lti/authorize?client_id=142150&amp;login_hint=795eecefbd528f358ed095770c84f55f898835fa&amp;lti_message_hint=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ2ZXJpZmllciI6IjYwNGM4YjgyZWYxNzU2ODNmNmFjNTk3MDg0MjE4MzIxNmNjYThjZGIzYTk2ODE5NGQ2YjY4MWYwNWNkNmZjNmJhYzU3NTdiMDEwZmQ0NmNkMWZkMDhiMDQ5MjM2NzdhMTI4ZjQzZWE4ODhhMzE1ZDEzZjViNjBjNjU0MGE0NzA4IiwiY2FudmFzX2RvbWFpbiI6InJlZGlyZWN0Lmluc3RydWN0dXJlLmNvbSIsImNvbnRleHRfaWQiOjgwNTAsImNvbnRleHRfdHlwZSI6IkFjY291bnQiLCJpbmNsdWRlX3N0b3JhZ2VfdGFyZ2V0Ijp0cnVlLCJleHAiOjE3MzQyNDEwMDJ9.gGrGKpiStWPviezA8u-RoOEgUEQImpDNEhp395hXe1I&amp;nonce=9755a712-da0f-49b5-bb8a-e2c9734d5809&amp;prompt=none&amp;redirect_uri=https%3A%2F%2Fredirect.tool.com%3Ffoo%3Dbar&amp;response_mode=form_post&amp;response_type=id_token&amp;scope=openid&amp;state=260c4430-5641-4a2f-b1be-75e0ca6c1ff9&amp;authredir=1">redirected</a>.</body></html>
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                client_id:
+                  type: string
+                login_hint:
+                  type: string
+                lti_message_hint:
+                  type: string
+                nonce:
+                  type: string
+                prompt:
+                  type: string
+                redirect_uri:
+                  type: string
+                response_mode:
+                  type: string
+                response_type:
+                  type: string
+                scope:
+                  type: string
+                state:
+                  type: string
+              required:
+              - client_id
+              - login_hint
+              - lti_message_hint
+              - nonce
+              - prompt
+              - redirect_uri
+              - response_mode
+              - response_type
+              - scope
+              - state
+            example:
+              client_id: '142150'
+              login_hint: 795eecefbd528f358ed095770c84f55f898835fa
+              lti_message_hint: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ2ZXJpZmllciI6IjYwNGM4YjgyZWYxNzU2ODNmNmFjNTk3MDg0MjE4MzIxNmNjYThjZGIzYTk2ODE5NGQ2YjY4MWYwNWNkNmZjNmJhYzU3NTdiMDEwZmQ0NmNkMWZkMDhiMDQ5MjM2NzdhMTI4ZjQzZWE4ODhhMzE1ZDEzZjViNjBjNjU0MGE0NzA4IiwiY2FudmFzX2RvbWFpbiI6InJlZGlyZWN0Lmluc3RydWN0dXJlLmNvbSIsImNvbnRleHRfaWQiOjgwNTAsImNvbnRleHRfdHlwZSI6IkFjY291bnQiLCJpbmNsdWRlX3N0b3JhZ2VfdGFyZ2V0Ijp0cnVlLCJleHAiOjE3MzQyNDEwMDJ9.gGrGKpiStWPviezA8u-RoOEgUEQImpDNEhp395hXe1I
+              nonce: 9755a712-da0f-49b5-bb8a-e2c9734d5809
+              prompt: none
+              redirect_uri: https://redirect.tool.com?foo=bar
+              response_mode: form_post
+              response_type: id_token
+              scope: openid
+              state: 260c4430-5641-4a2f-b1be-75e0ca6c1ff9

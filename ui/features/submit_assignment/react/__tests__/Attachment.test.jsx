@@ -23,7 +23,8 @@ import Attachment from '../Attachment'
 
 jest.useFakeTimers()
 
-describe('Attachment', () => {
+// EVAL-3907 - remove or rewrite to remove spies on imports
+describe.skip('Attachment', () => {
   beforeEach(() => {
     mediaUtils.hasMediaFeature = jest.fn(() => true)
     mediaUtils.getUserMedia = jest.fn(() => Promise.resolve())

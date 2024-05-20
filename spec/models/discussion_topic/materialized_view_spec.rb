@@ -53,14 +53,14 @@ describe DiscussionTopic::MaterializedView do
       Delayed::Job.find_available(100).each(&:destroy)
       json, _participants, entries = DiscussionTopic::MaterializedView.materialized_view_for(@topic)
       expect(json).to be_present
-      expect(entries).not_to be_include(reply.id)
+      expect(entries).not_to include(reply.id)
       # since the view was out of date, it's returned but a job is queued
       expect(Delayed::Job.where(singleton: "materialized_discussion:#{@topic.id}").count).to eq 1
       # after updating, the view should include the new entry
       @view.update_materialized_view(synchronous: true)
       json, _participants, entries = DiscussionTopic::MaterializedView.materialized_view_for(@topic)
       expect(json).to be_present
-      expect(entries).to be_include(reply.id)
+      expect(entries).to include(reply.id)
     end
   end
 

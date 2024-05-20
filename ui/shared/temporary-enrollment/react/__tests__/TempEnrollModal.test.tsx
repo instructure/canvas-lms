@@ -22,12 +22,12 @@ import {generateModalTitle, TempEnrollModal} from '../TempEnrollModal'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
 import {
-  EnrollmentType,
+  type EnrollmentType,
   ITEMS_PER_PAGE,
   MAX_ALLOWED_COURSES_PER_PAGE,
   PROVIDER,
   RECIPIENT,
-  User,
+  type User,
 } from '../types'
 
 // Temporary Enrollment Provider
@@ -65,6 +65,7 @@ const modalProps = {
     {
       base_role_name: 'TeacherEnrollment',
       id: '234',
+      name: 'TeacherEnrollment',
       role: 'TeacherEnrollment',
       label: 'Teacher',
     },
@@ -94,6 +95,7 @@ const enrollmentsByCourse = [
     id: '1',
     name: 'Apple Music',
     workflow_state: 'available',
+    account_id: '1',
     enrollments: [
       {
         role_id: '2',
@@ -110,7 +112,7 @@ const enrollmentsByCourse = [
 ]
 
 const ENROLLMENTS_URI = encodeURI(
-  `/api/v1/users/${modalProps.user.id}/courses?enrollment_state[]=active&enrollment_state[]=completed&include[]=sections&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}`
+  `/api/v1/users/${modalProps.user.id}/courses?enrollment_state=active&include[]=sections&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}&account_id=${enrollmentsByCourse[0].account_id}`
 )
 
 const userListsData = {
@@ -122,6 +124,9 @@ const userListsParams = Object.entries(userListsData)
   .map(([key, value]) => `${key}=${value}`)
   .join('&')
 
+const userDetailsUriMock = (userId: string, response: object) =>
+  fetchMock.get(`/api/v1/users/${userId}/profile`, response)
+
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashSuccess: jest.fn(() => jest.fn(() => {})),
 }))
@@ -129,7 +134,7 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 describe('TempEnrollModal', () => {
   beforeAll(() => {
     // @ts-expect-error
-    window.ENV = {ROOT_ACCOUNT_ID: '1'}
+    window.ENV = {ACCOUNT_ID: '1'}
   })
 
   beforeEach(() => {
@@ -149,7 +154,7 @@ describe('TempEnrollModal', () => {
     fetchMock.restore()
   })
 
-  it('displays the modal upon clicking the child element', () => {
+  it('displays the modal upon clicking the child element', async () => {
     render(
       <TempEnrollModal {...modalProps}>
         <p>child_element</p>
@@ -159,7 +164,7 @@ describe('TempEnrollModal', () => {
     expect(screen.queryByText('Find a recipient of Temporary Enrollments')).toBeNull()
 
     // trigger the modal to open and display the search screen (page 1)
-    userEvent.click(screen.getByText('child_element'))
+    await userEvent.click(screen.getByText('child_element'))
 
     expect(screen.getByText('Find a recipient of Temporary Enrollments')).toBeInTheDocument()
   })
@@ -188,7 +193,7 @@ describe('TempEnrollModal', () => {
       expect(cancel).not.toBeDisabled()
     })
 
-    userEvent.click(cancel)
+    await userEvent.click(cancel)
 
     // wait for the modal to close (including animation)
     await waitFor(() => {
@@ -200,7 +205,7 @@ describe('TempEnrollModal', () => {
 
   it('closes modal when submission is successful', async () => {
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
-    fetchMock.get('/api/v1/users/2', userData.users[0])
+    userDetailsUriMock(recipientUser.id, userData.users[0])
     fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
 
     render(
@@ -215,77 +220,30 @@ describe('TempEnrollModal', () => {
     })
 
     // click next to go to the search results screen (page 2)
-    userEvent.click(next)
+    await userEvent.click(next)
     expect(
       await screen.findByText(/is ready to be assigned temporary enrollments/)
     ).toBeInTheDocument()
 
     // click next to go to the assign screen (page 3)
-    userEvent.click(next)
+    await userEvent.click(next)
     await waitFor(() => {
       expect(screen.queryByText('Back')).toBeInTheDocument()
       expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
     })
-
-    const role = screen.getByLabelText(/select role/i)
-    userEvent.click(role)
-    await waitFor(() => {
-      const option = document.getElementById('234')
-      if (!option) throw new Error('Option not yet available')
-    })
-    const option = document.getElementById('234')
-    userEvent.click(option!)
 
     const submit = await screen.findByRole('button', {name: 'Submit'})
     expect(submit).toBeInTheDocument()
     fireEvent.click(submit)
 
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
-    expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
-    expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
-  })
-
-  it('shows error and stays open if data is missing', async () => {
-    fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
-    fetchMock.get('/api/v1/users/2', userData.users[0])
-    fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
-
-    render(
-      <TempEnrollModal {...modalProps} defaultOpen={true}>
-        <p>child_element</p>
-      </TempEnrollModal>
-    )
-
-    const next = await screen.findByRole('button', {name: 'Next'})
-    await waitFor(() => {
-      expect(next).not.toBeDisabled()
-    })
-
-    // click next to go to the search results screen (page 2)
-    userEvent.click(next)
-    expect(
-      await screen.findByText(/is ready to be assigned temporary enrollments/)
-    ).toBeInTheDocument()
-
-    // click next to go to the assign screen (page 3)
-    userEvent.click(next)
-    // NO PROVIDER BASE ROLE SELECTED!
-    await waitFor(() => {
-      expect(screen.queryByText('Back')).toBeInTheDocument()
-      expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
-    })
-
-    userEvent.click(await screen.findByRole('button', {name: 'Submit'}))
-    expect(await screen.findByText(/please select a role before submitting/i)).toBeInTheDocument()
-
-    expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
-    expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
+    expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
     expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
   })
 
   it('starts over when start over button is clicked', async () => {
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
-    fetchMock.get('/api/v1/users/2', userData.users[0])
+    userDetailsUriMock(recipientUser.id, userData.users[0])
 
     render(
       <TempEnrollModal {...modalProps} defaultOpen={true}>
@@ -299,12 +257,12 @@ describe('TempEnrollModal', () => {
     })
 
     // click next to go to the search results screen (page 2)
-    userEvent.click(next)
+    await userEvent.click(next)
     expect(
       await screen.findByText(/is ready to be assigned temporary enrollments/)
     ).toBeInTheDocument()
 
-    userEvent.click(await screen.findByRole('button', {name: 'Start Over'}))
+    await userEvent.click(await screen.findByRole('button', {name: 'Start Over'}))
     // modal is back on the search screen (page 1)
     await waitFor(() => {
       expect(screen.queryByText('Start Over')).toBeNull()
@@ -312,12 +270,12 @@ describe('TempEnrollModal', () => {
     })
 
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
-    expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
+    expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
   })
 
   it('goes back when the assign screen (page 3) back button is clicked', async () => {
     fetchMock.post(`/accounts/1/user_lists.json?${userListsParams}`, userData)
-    fetchMock.get('/api/v1/users/2', userData.users[0])
+    userDetailsUriMock(recipientUser.id, userData.users[0])
     fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
 
     render(
@@ -332,19 +290,19 @@ describe('TempEnrollModal', () => {
     })
 
     // click next to go to the search results screen (page 2)
-    userEvent.click(next)
+    await userEvent.click(next)
     expect(
       await screen.findByText(/is ready to be assigned temporary enrollments/)
     ).toBeInTheDocument()
 
     // click next to go to the assign screen (page 3)
-    userEvent.click(next)
+    await userEvent.click(next)
     await waitFor(() => {
       expect(screen.queryByText('Back')).toBeInTheDocument()
       expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
     })
 
-    userEvent.click(await screen.findByRole('button', {name: 'Back'}))
+    await userEvent.click(await screen.findByRole('button', {name: 'Back'}))
     // modal is back on the search results screen (page 2)
     await waitFor(() => {
       expect(screen.queryByText('Back')).toBeNull()
@@ -354,7 +312,7 @@ describe('TempEnrollModal', () => {
     })
 
     expect(fetchMock.calls(`/accounts/1/user_lists.json?${userListsParams}`).length).toBe(1)
-    expect(fetchMock.calls('/api/v1/users/2').length).toBe(1)
+    expect(fetchMock.calls('/api/v1/users/2/profile').length).toBe(1)
     expect(fetchMock.calls(ENROLLMENTS_URI).length).toBe(1)
   })
 
@@ -445,12 +403,12 @@ describe('TempEnrollModal', () => {
     describe('edit mode titles', () => {
       it('should return provider’s recipients title when in edit mode and type is provider', () => {
         const title = generateModalTitle(providerUser, PROVIDER, true, 1, null)
-        expect(title).toBe(`${providerUser.name}’s Temporary Enrollment Recipients`)
+        expect(title).toBe(`Temporary Enrollment Recipients for ${providerUser.name}`)
       })
 
       it('should return recipient’s providers title when in edit mode and type is recipient', () => {
         const title = generateModalTitle(recipientUser, RECIPIENT, true, 1, null)
-        expect(title).toBe(`${recipientUser.name}’s Temporary Enrollment Providers`)
+        expect(title).toBe(`Temporary Enrollment Providers for ${recipientUser.name}`)
       })
     })
 

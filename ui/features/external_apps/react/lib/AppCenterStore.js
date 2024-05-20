@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {find, sortBy, filter as lodashFilter} from 'lodash'
 import createStore from './createStoreJestCompatible'
 import ExternalAppsStore from './ExternalAppsStore'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
@@ -27,7 +27,7 @@ const PER_PAGE = 250
 
 const sort = function (apps) {
   if (apps) {
-    return _.sortBy(apps, app => {
+    return sortBy(apps, app => {
       if (app.name) {
         return app.name.toUpperCase()
       } else {
@@ -72,7 +72,7 @@ store.filteredApps = function (toFilter = this.getState().apps) {
   const filter = this.getState().filter
   const filterText = new RegExp(this.getState().filterText, 'i')
 
-  return _.filter(toFilter, app => {
+  return lodashFilter(toFilter, app => {
     if (!app.name) {
       return false
     }
@@ -92,11 +92,12 @@ store.filteredApps = function (toFilter = this.getState().apps) {
 }
 
 store.findAppByShortName = function (shortName) {
-  return _.find(this.getState().apps, app => app.short_name === shortName)
+  return find(this.getState().apps, app => app.short_name === shortName)
 }
 
 store.flagAppAsInstalled = function (shortName) {
-  _.find(this.getState().apps, app => {
+  // eslint-disable-next-line lodash/collection-return, , lodash/collection-method-value
+  find(this.getState().apps, app => {
     if (app.short_name === shortName) {
       app.is_installed = true
     }

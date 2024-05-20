@@ -44,6 +44,10 @@ Rails.application.config.after_initialize do
         return {} unless self.class.columns_hash.key?("settings")
 
         s = super
+        # Am not sure how this happens
+        if s.is_a?(String)
+          s = JSON.parse(s)
+        end
         if s.nil?
           self.settings = s = {}
         end

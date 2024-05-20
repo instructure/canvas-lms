@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'underscore'
+import _, {map, isBoolean, extend} from 'lodash'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import Markup from '../../jst/LDBLoginPopup.handlebars'
-import htmlEscape from 'html-escape'
-import '@canvas/util/toJSON'
+import htmlEscape from '@instructure/html-escape'
+import '@canvas/jquery/jquery.toJSON'
 
 // Consumes an event and stops it from propagating.
 function consume(e) {
@@ -95,10 +95,10 @@ export default class LDBLoginPopup extends Backbone.View {
     // captured.
     let $inputSink
 
-    _.extend(this.options, options)
+    extend(this.options, options)
 
-    const windowOptions = _.map(this.options.window, (v, k) =>
-      [k, _.isBoolean(v) ? (v ? 'yes' : 'no') : v].join('=')
+    const windowOptions = map(this.options.window, (v, k) =>
+      [k, isBoolean(v) ? (v ? 'yes' : 'no') : v].join('=')
     ).join(',')
 
     // @method on

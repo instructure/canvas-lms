@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {graphql} from 'msw'
+import {graphql, HttpResponse} from 'msw'
 
 export const MentionMockUsers = [
   {
@@ -82,9 +82,9 @@ export const MentionMockUsers = [
 ]
 
 export const handlers = [
-  graphql.query('GetMentionableUsers', (req, res, ctx) => {
-    return res(
-      ctx.data({
+  graphql.query('GetMentionableUsers', () => {
+    return HttpResponse.json({
+      data: {
         legacyNode: {
           id: 'Vxb',
           mentionableUsersConnection: {
@@ -93,7 +93,7 @@ export const handlers = [
           },
           __typename: 'Discussion',
         },
-      })
-    )
+      },
+    })
   }),
 ]

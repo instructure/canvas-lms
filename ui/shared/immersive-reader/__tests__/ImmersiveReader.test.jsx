@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -18,7 +19,7 @@
 import React from 'react'
 import {initializeReaderButton, ImmersiveReaderButton} from '../ImmersiveReader'
 import {render} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import {enableFetchMocks} from 'jest-fetch-mock'
 
 enableFetchMocks()
@@ -44,6 +45,7 @@ describe('#initializeReaderButton', () => {
       })
 
       it('calls to launch the Immersive Reader with the proper content', async () => {
+        const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
         expect.assertions(1)
         const fakeLaunchAsync = (...args) =>
           expect(args).toEqual([
@@ -69,7 +71,7 @@ describe('#initializeReaderButton', () => {
           <ImmersiveReaderButton content={fakeContent} readerSDK={fakeReaderLib} />
         )
         const button = await findByText(/Immersive Reader/)
-        userEvent.click(button)
+        await user.click(button)
       })
 
       describe('with MathML content', () => {
@@ -88,6 +90,7 @@ describe('#initializeReaderButton', () => {
         }
 
         it('sends the HTML and MathML as chunks', async () => {
+          const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
           expect.assertions(1)
 
           // This whitespace is meaningful for the snapshot so please don't remove it!
@@ -123,7 +126,7 @@ describe('#initializeReaderButton', () => {
           )
 
           const button = await findByText(/^Immersive Reader$/)
-          userEvent.click(button)
+          await user.click(button)
         })
       })
     })

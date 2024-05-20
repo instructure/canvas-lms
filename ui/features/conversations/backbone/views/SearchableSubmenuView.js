@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {debounce} from 'lodash'
 import {View} from '@canvas/backbone'
 
 const I18n = useI18nScope('SearchableSubmenuView')
@@ -37,7 +37,7 @@ export default class SearchableSubmenuView extends View {
           {content_type}
         ),
       })
-      .keyup(_.debounce(() => this.search(), 100))
+      .keyup(debounce(() => this.search(), 100))
       .keydown(e => this.handleDownArrow(e))
     this.$announce = $('<span class="screenreader-only" aria-live="polite"></span>')
     const $labelledField = $('<label>').append(this.$field).append(this.$announce)

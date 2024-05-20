@@ -22,6 +22,7 @@ import GroupCategory from '@canvas/groups/backbone/models/GroupCategory'
 import Group from '@canvas/groups/backbone/models/Group'
 import AddUnassignedMenu from 'ui/features/manage_groups/backbone/views/AddUnassignedMenu'
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 
 let clock = null

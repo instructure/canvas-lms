@@ -26,10 +26,8 @@
 # * You want to bucket by client_id but don't include this concern
 module Lti::IMS::Concerns
   module LtiServices
-    extend ActiveSupport::Concern
-
     # factories for array matchers typically returned by #scopes_matcher
-    class_methods do
+    module ClassMethods
       def all_of(*items)
         ->(match_in) { items.present? && (items - match_in).blank? }
       end
@@ -47,76 +45,79 @@ module Lti::IMS::Concerns
       end
     end
 
-    included do
-      skip_before_action :load_user
+    def self.included(klass)
+      super
 
-      before_action(
+      klass.extend(ClassMethods)
+      klass.skip_before_action :load_user, :verify_authenticity_token
+
+      klass.before_action(
         :verify_access_token,
         :verify_developer_key,
         :verify_access_scope
       )
+    end
 
-      def verify_access_token
-        if (e = Lti::IMS::AdvantageAccessTokenRequestHelper.token_error(request))
-          handled_error(e)
-          render_error(e.api_message, e.status_code)
-        elsif !access_token
-          render_error("Missing access token", :unauthorized)
-        end
+    def verify_access_token
+      if (e = Lti::IMS::AdvantageAccessTokenRequestHelper.token_error(request))
+        handled_error(e)
+        render_error(e.api_message, e.status_code)
+      elsif !access_token
+        render_error("Missing access token", :unauthorized)
       end
+    end
 
-      def verify_developer_key
-        unless developer_key&.active?
-          render_error("Unknown or inactive Developer Key", :unauthorized)
-        end
+    def verify_developer_key
+      unless developer_key&.active?
+        render_error("Unknown or inactive Developer Key", :unauthorized)
       end
+    end
 
-      def verify_access_scope
-        render_error("Insufficient permissions", :unauthorized) unless tool_permissions_granted?
+    def verify_access_scope
+      render_error("Insufficient permissions", :unauthorized) unless tool_permissions_granted?
+    end
+
+    def access_token
+      @_access_token ||= Lti::IMS::AdvantageAccessTokenRequestHelper.token(request)
+    end
+
+    def access_token_scopes
+      @_access_token_scopes ||= access_token&.claim("scopes")&.split.presence || []
+    end
+
+    def tool_permissions_granted?
+      scopes_matcher.call(access_token_scopes)
+    end
+
+    def scopes_matcher
+      raise "Abstract method"
+    end
+
+    def developer_key
+      @_developer_key ||= access_token && begin
+        DeveloperKey.find_cached(access_token.client_id)
+      rescue ActiveRecord::RecordNotFound
+        nil
       end
+    end
 
-      def access_token
-        @_access_token ||= Lti::IMS::AdvantageAccessTokenRequestHelper.token(request)
-      end
-
-      def access_token_scopes
-        @_access_token_scopes ||= (access_token&.claim("scopes")&.split(" ").presence || [])
-      end
-
-      def tool_permissions_granted?
-        scopes_matcher.call(access_token_scopes)
-      end
-
-      def scopes_matcher
-        raise "Abstract method"
-      end
-
-      def developer_key
-        @_developer_key ||= access_token && begin
-          DeveloperKey.find_cached(access_token.client_id)
-        rescue ActiveRecord::RecordNotFound
-          nil
-        end
-      end
-
-      def render_error(message, status = :precondition_failed)
-        error_response = {
-          errors: {
-            type: status,
-            message:
-          }
+    def render_error(message, status = :precondition_failed)
+      error_response = {
+        errors: {
+          type: status,
+          message:
         }
-        render json: error_response, status:
-      end
+      }
+      render json: error_response, status:
+    end
 
-      def handled_error(e)
-        unless Rails.env.production?
-          # These are all 'handled errors' so don't typically warrant logging in production envs, but in lower envs it
-          # can be very handy to see exactly what went wrong. This specific log mechanism is nice, too, b/c it logs
-          # backtraces from nested errors.
-          logger.error(e.message)
-          ErrorReport.log_exception(nil, e)
-        end
+    def handled_error(e)
+      unless Rails.env.production?
+        # These are all 'handled errors' so don't typically warrant logging in production envs, but in lower envs it
+        # can be very handy to see exactly what went wrong. This specific log mechanism is nice, too, b/c it logs
+        # backtraces from nested errors.
+        logger.error(e.message)
+        ErrorReport.log_exception(nil, e)
       end
     end
   end

@@ -17,7 +17,11 @@
     {{{body}}}
   {{else}}
     <label for="wiki_page_body" class="hidden-readable" aria-hidden="true">{{#t}}Raw HTML Editor{{/t}}</label>
-    <textarea id="wiki_page_body" rows="20" cols="40" name="body" class="body" aria-hidden="true"{{#unless PAGE_RIGHTS.update}} autofocus{{/unless}}>{{convertApiUserContent body forEditing=1}}</textarea>
+    {{#if ENV.BLOCK_EDITOR}}
+      <div id="block_editor"></div>
+    {{else}}
+      <textarea id="wiki_page_body" rows="20" cols="40" name="body" class="body" aria-hidden="true"{{#unless PAGE_RIGHTS.update}} autofocus{{/unless}}>{{convertApiUserContent body forEditing=1}}</textarea>
+    {{/if}}
   {{/if}}
 
   {{#if CAN.EDIT_ROLES}}
@@ -29,7 +33,8 @@
           {{#if SHOW.COURSE_ROLES}}
             <option value="teachers"{{#if IS.TEACHER_ROLE}} selected{{/if}}>{{#t "course_editing_roles.only_teachers"}}Only teachers{{/t}}</option>
             <option value="teachers,students"{{#if IS.STUDENT_ROLE}} selected{{/if}}>{{#t "course_editing_roles.teachers_and_students"}}Teachers and students{{/t}}</option>
-            <option value="teachers,students,public"{{#if IS.ANYONE_ROLE}} selected{{/if}}>{{#t "course_editing_roles.anyone"}}Anyone{{/t}}</option>
+            {{! Work-around for courses that still have "public" role, "public" acts as "members" for course}}
+            <option value="teachers,students,members"{{#if IS.ANYONE_ROLE}} selected{{/if}}{{#if IS.MEMBER_ROLE}} selected{{/if}}>{{#t "course_editing_roles.anyone"}}Anyone{{/t}}</option>
           {{else}}
             <option value="members"{{#if IS.MEMBER_ROLE}} selected{{/if}}>{{#t "editing_roles.only_members"}}Only members{{/t}}</option>
             <option value="members,public"{{#if IS.ANYONE_ROLE}} selected{{/if}}>{{#t "editing_roles.anyone"}}Anyone{{/t}}</option>
@@ -41,7 +46,7 @@
             <input value="1" type="checkbox" id="student_planner_checkbox" name="student_planner_checkbox" {{checkedIf todo_date}} />
               {{#t}}Add to student to-do{{/t}}
             </label>
-            <div id="todo_date_container" />
+            <div id="todo_date_container"></div>
           </div>
         {{/if}}
         {{#if CAN.PUBLISH}}
@@ -69,6 +74,14 @@
         {{/if}}
       </div>
     </div>
+    {{#if ENV.FEATURES.differentiated_modules}}
+    <div class="responsive-control-group options">
+      <label class="control-label"><strong>{{#t "assign_to_label"}}Assign Access{{/t}}</strong></label>
+      <div class="controls">
+        <div id="assign-to-mount-point-edit-page" />
+      </div>
+    </div>
+    {{/if}}
   {{/if}}
 </div>
 

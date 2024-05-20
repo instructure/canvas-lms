@@ -36,7 +36,11 @@ module Types
   class GradingStandardType < ApplicationObjectType
     graphql_name "GradingStandard"
 
+    implements GraphQL::Types::Relay::Node
+
     global_id_field :id
+    # This field _id allows null because the default gradingStandard has a nil id
+    field :_id, ID, "legacy canvas id", method: :id, null: true
 
     field :context_id, ID, null: true
     field :context_code, String, null: true

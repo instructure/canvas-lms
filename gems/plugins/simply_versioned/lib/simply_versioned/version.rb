@@ -93,7 +93,7 @@ module SimplyVersioned
       GuardRail.activate(:secondary) do
         Shard.partition_by_shard(versionables) do |shard_objs|
           shard_objs.each_slice(100) do |sliced_objs|
-            values = sliced_objs.map { |o| "(#{o.id}, '#{o.class.base_class.name}')" }.join(",")
+            values = sliced_objs.map { |o| "(#{o.id}, '#{o.class.polymorphic_name}')" }.join(",")
             query = "SELECT (SELECT max (vo.number) FROM #{Version.quoted_table_name} vo WHERE vo.versionable_id = v.versionable_id AND vo.versionable_type = v.versionable_type)
               AS maximum_number, v.versionable_type, v.versionable_id FROM (VALUES #{values}) AS v (versionable_id, versionable_type)"
 

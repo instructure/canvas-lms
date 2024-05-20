@@ -48,7 +48,7 @@ module Turnitin
           filename.tr!("/", "-")
           path = File.join(dirname, filename)
           File.binwrite(path, response.body)
-          attachment.uploaded_data = Rack::Test::UploadedFile.new(path, response.headers["content-type"], true)
+          attachment.uploaded_data = Canvas::UploadedFile.new(path, response.headers["content-type"])
           attachment.display_name = filename
           attachment.user ||= user
           attachment.save!

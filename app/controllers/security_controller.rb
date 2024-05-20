@@ -31,7 +31,7 @@
 #  }
 #
 class SecurityController < ApplicationController
-  include Lti::Oidc
+  skip_before_action :load_user
 
   # @API Show all available JWKs used by Canvas for signing.
   #
@@ -63,23 +63,29 @@ class SecurityController < ApplicationController
 
   # Schema is specified here: https://www.imsglobal.org/spec/lti-dr/v1p0#openid-configuration
   def openid_configuration
-    params.require(:registration_token)
-    token = Canvas::Security.decode_jwt(params[:registration_token])
+    access_token = params[:registration_token] # AuthenticationMethods.access_token(request)
+
+    unless access_token
+      render json: { error: "Access token missing (You must include the registration_token parameter)." }, status: :unauthorized
+      return
+    end
+
+    token = Canvas::Security.decode_jwt(access_token)
 
     account = Account.find_by(id: token["root_account_global_id"])
     unless account
-      render formats: :html, status: :not_found, template: "shared/errors/404_message"
+      render json: { error: "Account #{token["root_account_global_id"]} not found." }, status: :not_found
+      return
     end
 
     account_domain = HostUrl.context_host(account, ApplicationController.test_cluster_name)
 
     render json: {
       issuer: Canvas::Security.config["lti_iss"],
-      authorization_endpoint: lti_authorize_redirect_url(host: oidc_authorization_domain(account_domain)),
-      # TODO: use a path helper for this when this path gets created
-      registration_endpoint: "#{HostUrl.protocol}://#{account_domain}/api/lti/registrations",
-      jwks_uri: oauth2_jwks_url(host: oidc_authorization_domain(account_domain)),
-      token_endpoint: oauth2_token_url(host: oidc_authorization_domain(account_domain)),
+      authorization_endpoint: lti_authorize_redirect_url(host: Lti::Oidc.auth_domain(account_domain)),
+      registration_endpoint: create_lti_registration_url(host: account_domain),
+      jwks_uri: lti_jwks_url(host: Lti::Oidc.auth_domain(account_domain)),
+      token_endpoint: oauth2_token_url(host: Lti::Oidc.auth_domain(account_domain)),
       token_endpoint_auth_methods_supported: ["private_key_jwt"],
       token_endpoint_auth_signing_alg_values_supported: ["RS256"],
       scopes_supported: TokenScopes::LTI_SCOPES.keys,
@@ -88,7 +94,7 @@ class SecurityController < ApplicationController
       # TODO: this list can probably be dynamic, with admins choosing the scopes they want to admit to this tool
       claims_supported: %w[sub picture email name given_name family_name locale],
       subject_types_supported: ["public"],
-      authorization_server: oidc_authorization_domain(account_domain),
+      authorization_server: Lti::Oidc.auth_domain(account_domain),
       "https://purl.imsglobal.org/spec/lti-platform-configuration": lti_platform_configuration(account)
     }
   end
@@ -101,12 +107,13 @@ class SecurityController < ApplicationController
     {
       product_family_code: "canvas",
       version: canvas_ims_product_version,
-      messages_supported: Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE.keys.map do |message_type|
-        {
-          type: message_type,
-          placements: Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE[message_type]
-        }
-      end,
+      messages_supported: Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE.keys
+                                                                            .map do |message_type|
+                            {
+                              type: message_type,
+                              placements: Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE[message_type].reject { |p| p == :resource_selection }
+                            }
+                          end,
       variables: Lti::VariableExpander.expansion_keys,
       "https://canvas.instructure.com/lti/account_name": account.name,
       "https://canvas.instructure.com/lti/account_lti_guid": account.lti_guid

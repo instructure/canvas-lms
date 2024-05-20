@@ -71,7 +71,7 @@ describe SentryExtensions::Tracing::ActiveRecordSubscriber do
 
       span = transaction[:spans][0]
       expect(span[:op]).to eq("db.sql.active_record")
-      expect(span[:description]).to eq('SELECT "users".* FROM "public"."users"')
+      expect(span[:description]).to eq(User.all.to_sql)
       expect(span[:trace_id]).to eq(transaction.dig(:contexts, :trace, :trace_id))
     end
 
@@ -81,7 +81,7 @@ describe SentryExtensions::Tracing::ActiveRecordSubscriber do
       expect(transport.events.count).to eq(1)
 
       span = transport.events.first.to_hash[:spans][0]
-      expect(span[:description]).to eq('SELECT "users".* FROM "public"."users" WHERE "users"."name" = $1')
+      expect(span[:description]).to eq(User.where(name: "Taylor Swift").to_sql.gsub("'Taylor Swift'", "$1"))
     end
 
     it "provides fallback description when normalization fails" do

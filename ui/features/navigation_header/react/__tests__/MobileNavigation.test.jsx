@@ -29,7 +29,7 @@ describe('MobileNavigation', () => {
     hamburgerMenu.setAttribute('class', 'mobile-header-hamburger')
     document.body.appendChild(hamburgerMenu)
     const {findByText, queryByText} = render(<MobileNavigation />)
-    userEvent.click(hamburgerMenu)
+    await userEvent.click(hamburgerMenu)
     await waitFor(() => {
       expect(queryByText('Loading ...')).not.toBeInTheDocument()
     })

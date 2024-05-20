@@ -19,10 +19,13 @@
 
 module DifferentiableAssignment
   def differentiated_assignments_applies?
-    if is_a?(Assignment) || Quizzes::Quiz.class_names.include?(class_name)
+    if is_a?(AbstractAssignment) || Quizzes::Quiz.class_names.include?(class_name) || is_a?(ContextModule)
       only_visible_to_overrides
-    elsif assignment
+    elsif respond_to? :assignment
       assignment.only_visible_to_overrides
+    elsif is_a?(WikiPage) # rubocop:disable Lint/DuplicateBranch
+      # if the page has an assignment, look at the assignment's only_visible_to_overrides first, then look at the page's
+      only_visible_to_overrides
     else
       false
     end
@@ -47,11 +50,29 @@ module DifferentiableAssignment
   end
 
   def visibility_view
-    is_a?(Assignment) ? AssignmentStudentVisibility : Quizzes::QuizStudentVisibility
+    case class_name
+    when "Assignment"
+      AssignmentStudentVisibility
+    when "ContextModule"
+      ModuleStudentVisibility
+    when "WikiPage"
+      WikiPageStudentVisibility
+    else
+      Quizzes::QuizStudentVisibility
+    end
   end
 
   def column_name
-    is_a?(Assignment) ? :assignment_id : :quiz_id
+    case class_name
+    when "Assignment"
+      :assignment_id
+    when "ContextModule"
+      :context_module_id
+    when "WikiPage"
+      :wiki_page_id
+    else
+      :quiz_id
+    end
   end
 
   # will not filter the collection for teachers, will for non-observer students

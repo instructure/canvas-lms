@@ -63,9 +63,5 @@
     <span class="value"><%= render_score(@assignment.points_possible) || 0 %></span>
   </li>
 
-  <li>
-    <span class="title"><%= t("Questions") %></span>
-    <span class="value"><%= @question_count || 0 %></span>
-  </li>
   <%= render :partial => "shared/available_dates", :locals => {:association => @assignment} %>
 </ul>

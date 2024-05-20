@@ -581,7 +581,7 @@ describe LearningOutcomeResult do
       }
 
       attributes.each do |method_name, value|
-        learning_outcome_result.send("#{method_name}=".to_sym, value)
+        learning_outcome_result.send(:"#{method_name}=", value)
       end
       learning_outcome_result.save!
 

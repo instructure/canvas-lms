@@ -53,7 +53,7 @@ export default class TimeBlockRow {
     this.$start_time.time_field().change(this.validate)
     this.$end_time.time_field().change(this.validate)
 
-    if (this.locked) this.$row.find('button').attr('disabled', true)
+    if (this.locked) this.$row.find('button').prop('disabled', true)
 
     this.$row.find('.delete-block-link').click(this.remove)
   }

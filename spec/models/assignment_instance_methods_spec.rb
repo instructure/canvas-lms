@@ -19,6 +19,37 @@
 #
 
 describe Assignment do
+  describe "asset strings" do
+    it "can be found via asset string" do
+      course = Course.create!
+      assignment = course.assignments.create!
+      expect(ActiveRecord::Base.find_by_asset_string(assignment.asset_string)).to eq assignment
+    end
+  end
+
+  describe "serialization" do
+    before do
+      course = Course.create!
+      @assignment = course.assignments.create!
+    end
+
+    it "uses assignment as the root key for as_json" do
+      expect(@assignment.as_json).to have_key "assignment"
+    end
+
+    it "uses assignment as the root key for to_json" do
+      expect(JSON.parse(@assignment.to_json)).to have_key "assignment"
+    end
+  end
+
+  describe "validations" do
+    it "must have a blank sub_assignment_tag" do
+      assignment = Assignment.new(sub_assignment_tag: "my_tag")
+      assignment.validate
+      expect(assignment.errors.full_messages).to include "Sub assignment tag must be blank"
+    end
+  end
+
   describe "#anonymous_student_identities" do
     before(:once) do
       @course = Course.create!
@@ -95,10 +126,20 @@ describe Assignment do
         course_with_teacher(active_all: true)
         @student = student_in_course(active_all: true).user
         @course.root_account.enable_feature!(:discussion_checkpoints)
-        assignment = @course.assignments.create!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
-        assignment.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
-        assignment.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
-        @topic = @course.discussion_topics.create!(assignment:, reply_to_entry_required_count: 1)
+        @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now }],
+          points_possible: 4
+        )
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 3.days.from_now }],
+          points_possible: 7
+        )
       end
 
       let(:reply_to_topic_submission) do
@@ -109,65 +150,54 @@ describe Assignment do
         @topic.reply_to_entry_checkpoint.submissions.find_by(user: @student)
       end
 
+      let(:parent_submission) do
+        @topic.assignment.submissions.find_by(user: @student)
+      end
+
       it "supports grading checkpoints" do
-        @topic.assignment.grade_student(@student, grader: @teacher, score: 5, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
-        @topic.assignment.grade_student(@student, grader: @teacher, score: 2, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
-        expect(reply_to_topic_submission.score).to eq 5
-        expect(reply_to_entry_submission.score).to eq 2
+        @topic.assignment.grade_student(@student, grader: @teacher, score: 5, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+        @topic.assignment.grade_student(@student, grader: @teacher, score: 2, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+        aggregate_failures do
+          expect(reply_to_topic_submission.score).to eq 5
+          expect(reply_to_entry_submission.score).to eq 2
+          expect(parent_submission.score).to eq 7
+        end
+      end
+
+      it "incorporates the checkpointed discussion's score into the overall current grade upon all checkpoints having been posted" do
+        @topic.assignment.grade_student(@student, grader: @teacher, score: 5, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+        enrollment = @course.enrollments.find_by(user: @student)
+
+        expect do
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 2, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+        end.to change {
+          enrollment.reload.computed_current_score
+        }.from(nil).to(63.64) # (5 + 2) / 11 points possible => 63.64%
       end
 
       it "raises an error if no checkpoint label is provided" do
         expect do
           @topic.assignment.grade_student(@student, grader: @teacher, score: 5)
-        end.to raise_error(Assignment::GradeError, "Must provide a valid checkpoint label when grading checkpointed discussions")
+        end.to raise_error(Assignment::GradeError, "Must provide a valid sub assignment tag when grading checkpointed discussions")
       end
 
       it "raises an error if an invalid checkpoint label is provided" do
         expect do
-          @topic.assignment.grade_student(@student, grader: @teacher, score: 5, checkpoint_label: "potato")
-        end.to raise_error(Assignment::GradeError, "Must provide a valid checkpoint label when grading checkpointed discussions")
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 5, sub_assignment_tag: "potato")
+        end.to raise_error(Assignment::GradeError, "Must provide a valid sub assignment tag when grading checkpointed discussions")
       end
 
       it "returns the submissions for the 'parent' assignment" do
-        submissions = @topic.assignment.grade_student(@student, grader: @teacher, score: 5, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+        submissions = @topic.assignment.grade_student(@student, grader: @teacher, score: 5, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
         expect(submissions.map(&:assignment_id).uniq).to eq [@topic.assignment.id]
       end
 
       it "ignores checkpoints when the feature flag is disabled" do
         @course.root_account.disable_feature!(:discussion_checkpoints)
-        @topic.assignment.grade_student(@student, grader: @teacher, score: 5, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+        @topic.assignment.grade_student(@student, grader: @teacher, score: 5, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
         expect(reply_to_topic_submission.score).to be_nil
         expect(@topic.assignment.submissions.find_by(user: @student).score).to eq 5
       end
-    end
-  end
-
-  describe "checkpointed discussions" do
-    before(:once) do
-      course = course_model
-      course.root_account.enable_feature!(:discussion_checkpoints)
-      @topic = @course.discussion_topics.create!(title: "graded topic")
-      @topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
-      @checkpoint_assignment = @topic.reply_to_topic_checkpoint
-    end
-
-    it "updates the parent assignment when tracked attrs change on a checkpoint assignment" do
-      expect { @checkpoint_assignment.update!(points_possible: 4) }.to change {
-        @topic.assignment.reload.points_possible
-      }.from(10).to(11)
-    end
-
-    it "does not update the parent assignment when attrs that changed are not tracked" do
-      expect { @checkpoint_assignment.update!(title: "potato") }.not_to change {
-        @topic.assignment.reload.updated_at
-      }
-    end
-
-    it "does not update the parent assignment when the checkpoints flag is disabled" do
-      @topic.root_account.disable_feature!(:discussion_checkpoints)
-      expect { @checkpoint_assignment.update!(points_possible: 4) }.not_to change {
-        @topic.assignment.reload.points_possible
-      }
     end
   end
 
@@ -224,36 +254,72 @@ describe Assignment do
         subject
         expect(assignment.lti_resource_links.first).to be_active
       end
+
+      it "restores external tool tag" do
+        expect(assignment.external_tool_tag.reload).to be_deleted
+        subject
+        expect(assignment.external_tool_tag.reload).to be_active
+      end
     end
   end
 
-  def setup_assignment_without_submission
-    assignment_model(course: @course)
-    @assignment.reload
-  end
+  # TODO: move all these specs from old file to here
+  describe "Lti::Migratable" do
+    let(:url) { "http://www.example.com" }
+    let(:account) { account_model }
+    let(:course) { course_model(account:) }
+    let(:developer_key) { dev_key_model_1_3(account:) }
+    let(:old_tool) { external_tool_model(context: course, opts: { url: }) }
+    let(:new_tool) { external_tool_1_3_model(context: course, developer_key:, opts: { url:, name: "1.3 tool" }) }
+    let(:direct_assignment) do
+      assignment_model(
+        context: course,
+        name: "Direct Assignment",
+        submission_types: "external_tool",
+        external_tool_tag_attributes: { content: old_tool },
+        lti_context_id: SecureRandom.uuid
+      )
+    end
+    let(:unpublished_direct) do
+      a = direct_assignment.dup
+      a.update!(lti_context_id: SecureRandom.uuid, workflow_state: "unpublished", external_tool_tag_attributes: { content: old_tool })
+      a
+    end
+    let(:indirect_assignment) do
+      assign = assignment_model(
+        context: course,
+        name: "Indirect Assignment",
+        submission_types: "external_tool",
+        external_tool_tag_attributes: { url: },
+        lti_context_id: SecureRandom.uuid
+      )
+      # There's an before_save hook that looks up the appropriate tool
+      # based on the URL. Great for production, bad for testing :(
+      assign.external_tool_tag.update_column(:content_id, nil)
+      assign
+    end
+    let(:unpublished_indirect) do
+      a = indirect_assignment.dup
+      a.update!(lti_context_id: SecureRandom.uuid, workflow_state: "unpublished", external_tool_tag_attributes: { url: })
+      a.external_tool_tag.update_column(:content_id, nil)
+      a
+    end
 
-  def setup_assignment_with_homework
-    setup_assignment_without_submission
-    @assignment.submit_homework(@user, { submission_type: "online_text_entry", body: "blah" })
-    @assignment.reload
-  end
+    describe "#migrate_to_1_3_if_needed!" do
+      subject { direct_assignment.migrate_to_1_3_if_needed!(new_tool) }
+      # existing specs in spec/models/assignment_spec.rb:11448
 
-  it "queries to Assignment.versions consider the override_reflection_type_values method returns" do
-    course_with_teacher(active_all: true)
-    setup_assignment_with_homework
+      context "when the line item fails to save" do
+        before do
+          allow(direct_assignment.line_items).to receive(:create!).and_raise(ActiveRecord::RecordInvalid)
+        end
 
-    @assignment.update!(points_possible: 5)
-    @assignment.update!(points_possible: 8)
-    versions = Version.where(versionable_type: %w[Assignment AbstractAssignment], versionable_id: @assignment.id)
-    version_one = versions.first
-    version_two = versions.second
-    version_one.update_columns(versionable_type: "Assignment")
-    version_two.update_columns(versionable_type: "AbstractAssignment")
-
-    versions = @assignment.versions
-
-    expect(versions).to include version_one
-    expect(versions).to include version_two
-    expect(versions.length).to eq(3)
+        it "rolls back the resource link creation" do
+          expect { subject }.to raise_error(ActiveRecord::RecordInvalid)
+          expect(direct_assignment.lti_resource_links).to be_empty
+          expect(direct_assignment.line_items).to be_empty
+        end
+      end
+    end
   end
 end

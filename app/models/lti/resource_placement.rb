@@ -20,6 +20,8 @@
 require "lti_advantage"
 
 module Lti
+  class InvalidMessageTypeForPlacementError < StandardError; end
+
   class ResourcePlacement < ActiveRecord::Base
     ACCOUNT_NAVIGATION = "account_navigation"
     ASSIGNMENT_EDIT = "assignment_edit"
@@ -36,6 +38,9 @@ module Lti
 
     # Default placements for LTI 1 and LTI 2, ignored for LTI 1.3
     LEGACY_DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION].freeze
+
+    # Placements restricted so not advertised in the UI
+    NON_PUBLIC_PLACEMENTS = [:submission_type_selection].freeze
 
     PLACEMENTS_BY_MESSAGE_TYPE = {
       LtiAdvantage::Messages::ResourceLinkRequest::MESSAGE_TYPE => %i[
@@ -118,12 +123,27 @@ module Lti
       end
     end
 
+    def self.public_placements(root_account)
+      if root_account.feature_enabled?(:remove_submission_type_selection_from_dev_keys_edit_page)
+        valid_placements(root_account) - NON_PUBLIC_PLACEMENTS
+      else
+        valid_placements(root_account)
+      end
+    end
+
     def self.update_tabs_and_return_item_banks_tab(tabs, new_label = nil)
       item_banks_tab = tabs.find { |t| t[:label] == "Item Banks" }
       if item_banks_tab
         item_banks_tab[:label] = new_label || t("#tabs.item_banks", "Item Banks")
       end
       item_banks_tab
+    end
+
+    def self.supported_message_type?(placement, message_type)
+      return true if message_type.blank?
+      return false if placement.blank? || PLACEMENTS.exclude?(placement.to_sym)
+
+      PLACEMENTS_BY_MESSAGE_TYPE[message_type.to_s]&.include?(placement.to_sym)
     end
   end
 end

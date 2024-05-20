@@ -21,10 +21,8 @@
 module IncomingMailProcessor
   class Instrumentation
     def self.process
-      unreads = []
-
-      mailbox_accounts.each do |a|
-        unreads << IncomingMailProcessor::IncomingMessageProcessor.create_mailbox(a).unprocessed_message_count
+      unreads = mailbox_accounts.map do |a|
+        IncomingMailProcessor::IncomingMessageProcessor.create_mailbox(a).unprocessed_message_count
       end
 
       report_unreads(unreads)

@@ -32,6 +32,10 @@ module Bundler
         def locked_ruby_version
           ruby_version
         end
+
+        def locked_checksums
+          checksums
+        end
       end
 
       private_constant :LockfileAdapter

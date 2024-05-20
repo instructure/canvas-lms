@@ -1,12 +1,9 @@
-(function (factory) { // UMD wrapper
-  if (typeof module === 'object' && module.exports) {
-    factory(require('jquery'))
-  } else if (typeof define === 'function' && define.amd) {
-    define(['jquery'], factory)
-  } else {
-    factory(jQuery)
-  }
-})(function ($) {
+/* eslint-disable prettier/prettier */
+/* eslint-disable spaced-comment */
+/* eslint-disable vars-on-top */
+/* eslint-disable no-bitwise */
+/* eslint-disable object-shorthand */
+/* eslint-disable no-var */
 
 /* ============================================================
  * bootstrap-dropdown.js v2.3.2
@@ -30,7 +27,7 @@
 // INSTRUCTURE modified
 
 
-  "use strict"; // jshint ;_;
+import $ from 'jquery'
 
 
  /* DROPDOWN CLASS DEFINITION
@@ -75,14 +72,14 @@
         $parent.trigger("show.bs.dropdown")
 
         if ($parent.hasClass('open')){
-          $parentsParent.attr('role', 'application');
+          $parentsParent.attr('role', 'application')
         }
 
         // if this causes issues in the future, we should trackdown the event handler that is
         // stealing focus after the fact
         window.setTimeout(function (){$parent.find('>div.dropdown-menu>ul>li[rel=0]').focus()},0)
       } else {
-        $parentsParent.removeAttr('role');
+        $parentsParent.removeAttr('role')
         $parent.trigger("hide.bs.dropdown")
       }
 
@@ -164,7 +161,7 @@
         .eq(index)
         .focus()
       if((e.keyCode == 13 || e.keyCode == 32)) {
-        var parent = $($items.eq(index).closest('li'));
+        var parent = $($items.eq(index).closest('li'))
         if (parent.hasClass("dropdown-submenu") ){
           parent.find(".dropdown-menu input").focus()
         }
@@ -179,23 +176,23 @@
     }
 
     , blurSubmenu: function(e) {
-      var self = this;
+      var self = this
       setTimeout(function() {
-        if ($.contains(self, document.activeElement)) {return;}
+        if ($.contains(self, document.activeElement)) {return}
         $(self).removeAttr('role')
         $(self).removeClass('open').attr('aria-expanded', 'false')
       }, 0)
     }
 
     , clickSubmenu: function(e) {
-      var subMenu = $(e.target).closest('li');
+      var subMenu = $(e.target).closest('li')
       if (subMenu.hasClass('dropdown-submenu')){
-        subMenu.find(".dropdown-menu input").focus();
+        subMenu.find(".dropdown-menu input").focus()
       } else {
-        return;
+        return
       }
-      e.stopPropagation();
-      e.preventDefault();
+      e.stopPropagation()
+      e.preventDefault()
     }
   }
 
@@ -203,7 +200,7 @@
     // INSTRUCTURE--maintain focus
     var $list = $(document.activeElement).closest('.dropdown-menu')
     if ($list) {
-      $list.parent().prev().focus();
+      $list.parent().prev().focus()
     }
     $('.dropdown-backdrop').remove()
     $(toggle).each(function () {
@@ -238,7 +235,7 @@
   // It will return a button, rather than a parent div.
   function getProperParent($parent) {
     if ($parent.is('button')) {
-      return $parent;
+      return $parent
     } else {
       return $parent.children('button')
     }
@@ -255,7 +252,7 @@
       var $this = $(this)
         , data = $this.data('dropdown')
       if (!data) $this.data('dropdown', (data = new Dropdown(this)))
-      if (typeof option == 'string') data[option].call($this)
+      if (typeof option === 'string') data[option].call($this)
     })
   }
 
@@ -284,4 +281,3 @@
     .on('blur.dropdown.data-api', '.dropdown-submenu', Dropdown.prototype.blurSubmenu)
     .on('click.dropdown.data-api', '.dropdown-submenu', Dropdown.prototype.clickSubmenu)
 
-});

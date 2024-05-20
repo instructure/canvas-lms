@@ -45,6 +45,9 @@ const makeProps = (props = {}) =>
         locked: false,
         html_url: '',
         user_count: 10,
+        permissions: {
+          reply: true,
+        },
       },
       canManage: false,
       masterCourseData: {},
@@ -142,14 +145,18 @@ test('renders master course lock icon if masterCourseData is provided', assert =
   mount(<AnnouncementRow {...makeProps({masterCourseData, rowRef})} />)
 })
 
-test('renders reply button icon if is not locked', () => {
-  const tree = mount(<AnnouncementRow {...makeProps({announcement: {locked: false}})} />)
+test('renders reply button icon if user has reply permission', () => {
+  const tree = mount(
+    <AnnouncementRow {...makeProps({announcement: {permissions: {reply: true}}})} />
+  )
   const node = tree.find('IconReplyLine')
   ok(node.exists())
 })
 
-test('does not render reply button icon if is locked', () => {
-  const tree = mount(<AnnouncementRow {...makeProps({announcement: {locked: true}})} />)
+test('does not render reply button icon if user does not have reply permission', () => {
+  const tree = mount(
+    <AnnouncementRow {...makeProps({announcement: {permissions: {reply: false}}})} />
+  )
   const node = tree.find('IconReply')
   notOk(node.exists())
 })

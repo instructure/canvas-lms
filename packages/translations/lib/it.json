@@ -686,6 +686,12 @@
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Inserisci almeno 3 caratteri per la ricerca"
     },
+    "enter_replacement_text_17631bbc": {
+        "message": "inserisci testo di sostituzione"
+    },
+    "enter_search_text_26cb4459": {
+        "message": "inserisci testo di ricerca"
+    },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
     },
@@ -781,6 +787,12 @@
     },
     "filipino_33339264": {
         "message": "Filippino"
+    },
+    "find_8d605019": {
+        "message": "Trova"
+    },
+    "find_and_replace_6e345933": {
+        "message": "Trova e sostituisci"
     },
     "finish_bc343002": {
         "message": "Termina"
@@ -1057,6 +1069,9 @@
     },
     "indefinite_integral_6623307e": {
         "message": "Integrale indefinito"
+    },
+    "index_of_max_80dcf7a5": {
+        "message": "{ index } di { max }"
     },
     "indigo_2035fc55": {
         "message": "Indaco"
@@ -1487,6 +1502,9 @@
     "no_results_940393cf": {
         "message": "Nessun risultato."
     },
+    "no_results_found_58717065": {
+        "message": "Nessun risultato trovato"
+    },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "Nessun risultato trovato per { filterTerm }"
     },
@@ -1700,6 +1718,9 @@
     "preview_inline_9787330": {
         "message": "Anteprima inline"
     },
+    "previous_bd2ac015": {
+        "message": "Precedente"
+    },
     "prime_917ea60e": {
         "message": "Primo"
     },
@@ -1772,8 +1793,14 @@
     "remove_link_d1f2f4d0": {
         "message": "Rimuovi link"
     },
+    "replace_all_d3d68b3": {
+        "message": "Sostituisci tutto"
+    },
     "replace_e61834a7": {
         "message": "Sostituisci"
+    },
+    "replace_with_eeff01ad": {
+        "message": "Sostituisci con"
     },
     "reset_95a81614": {
         "message": "Reimposta"

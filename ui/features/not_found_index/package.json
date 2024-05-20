@@ -1,5 +1,6 @@
 {
   "name": "@canvas-features/not_found_index",
   "private": true,
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "owner": "FOO"
 }

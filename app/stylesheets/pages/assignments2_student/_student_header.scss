@@ -23,14 +23,22 @@
 
 .assignment-student-header {
   @include desktop-only {
-    position: sticky;
     top: 0px;
+    position: sticky;
   }
   padding-bottom: 12px;
   #{direction(right)}: 0px;
   background-color: white;
   z-index: 100;
-  border-bottom: 1px solid $ic-border-light;
+}
+
+#assignment-student-header-content {
+  flex-wrap: wrap;
+  gap: 12px;
+  @include breakpoint(desktop) {
+    flex-wrap: nowrap;
+    gap: 36px;
+  }
 }
 
 .steps-container {
@@ -38,7 +46,7 @@
 }
 
 .a2-toggle-details-container {
-  margin-bottom: 1.75rem;
+  margin-bottom: 1.5rem;
 }
 
 .points-text {

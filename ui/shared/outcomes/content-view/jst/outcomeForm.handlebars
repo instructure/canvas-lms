@@ -1,0 +1,69 @@
+<form action="{{url}}" class="learning_outcome" method="post">
+
+  <label class="span3" for="title">{{#t "title"}}Name this outcome{{/t}}:</label>
+  <input class="outcome_title span3" name="title" id=title size="50" type="text" value="{{title}}" placeholder="{{#t}}New Outcome{{/t}}">
+
+  <label class="span3" for="display_name">{{#t "display_name"}}Friendly name (optional){{/t}}:</label>
+  <input class="outcome_display_name span3" name="display_name" id=display_name size="50" type="text" value="{{display_name}}">
+
+  <label for="description">{{#t "description"}}Describe this outcome{{/t}}:</label>
+
+  <textarea cols="40" name="description" id=description rows="20" style="display: none; width: 100%; height: 150px;">{{description}}</textarea>
+
+  {{#unless hideMasteryScale}}
+    <label>
+      <div style="display: flex">
+        <div id='criterion_rating_label' style="margin-top: 0.65rem">{{#t "criterion"}}Criterion ratings{{/t}}:</div>
+        <div id="react-info-link"></div>
+      </div>
+    </label>
+    <table class="criterion" aria-labelledby='criterion_rating_label'>
+      <thead>
+        <tr>
+          {{#eachWithIndex ratings}}
+            {{> ui/shared/outcomes/content-view/jst/_criterionHeader.handlebars}}
+          {{/eachWithIndex}}
+          <th class="total" aria-label='{{#t}}Total Points{{/t}}'>
+            <h5 class="total">{{#t}}Total Points{{/t}}</h5>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          {{#eachWithIndex ratings}}
+            {{> ui/shared/outcomes/content-view/jst/_criterion.handlebars}}
+          {{/eachWithIndex}}
+        <td class="total">
+          <div class="points_possible">
+            {{#t}}{{n points_possible precision=2 strip_insignificant_zeros=true}} Points{{/t}}
+          </div>
+        </td>
+        </tr>
+      </tbody>
+    </table>
+    <div>
+      <label for="mastery_points" style="display: inline">{{#t "mastery"}}Mastery at{{/t}}:</label>
+      <input type="text" name="mastery_points" style="width: 20px;" class="mastery_points" id="mastery_points" value="{{n mastery_points precision=2 strip_insignificant_zeros=true}}">
+    </div>
+    <div>
+      <label for="calculation_method" style="display: inline">{{#t "calculation_method"}}Calculation Method{{/t}}:</label>
+      <select name="calculation_method" class="calculation_method" id="calculation_method" data-calculation-method="{{calculation_method}}" value="{{calculation_method}}">
+        {{#each calculationMethods}}
+          <option value="{{@key}}" {{ selectedIf @key ../calculation_method }}>
+            {{friendlyCalculationMethod}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+    <div class="content-box">
+      <div class="grid-row">
+        <!-- Hook for OutcomeCalculationMethodFormView -->
+        <div class="col-xs-12 outcome-calculation-method-form"></div>
+      </div>
+    </div>
+  {{/unless}}
+  <div class="align-right">
+    <button type="button" class="btn cancel_button">{{#t "#buttons.cancel"}}Cancel{{/t}}</button>
+    <button type="submit" class="btn btn-primary submit_button">{{#t "#buttons.save"}}Save{{/t}}</button>
+  </div>
+</form>

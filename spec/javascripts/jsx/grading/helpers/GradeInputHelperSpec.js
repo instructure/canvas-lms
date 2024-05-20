@@ -25,7 +25,7 @@ import fakeENV from 'helpers/fakeENV'
 QUnit.module('GradeInputHelper', suiteHooks => {
   suiteHooks.beforeEach(() => {
     fakeENV.setup({
-      GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true}
+      GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true},
     })
   })
 
@@ -144,7 +144,7 @@ QUnit.module('GradeInputHelper', suiteHooks => {
         enteredScore: 10,
         excused: false,
         grade: 'B',
-        late_policy_status: null
+        late_policy_status: null,
       }
     })
 
@@ -170,7 +170,7 @@ QUnit.module('GradeInputHelper', suiteHooks => {
         enteredScore: null,
         excused: false,
         late_policy_status: null,
-        grade: null
+        grade: null,
       }
       strictEqual(hasGradeChanged(), true)
     })
@@ -182,7 +182,7 @@ QUnit.module('GradeInputHelper', suiteHooks => {
         enteredScore: null,
         excused: false,
         late_policy_status: 'missing',
-        grade: null
+        grade: null,
       }
       strictEqual(hasGradeChanged(), false)
     })

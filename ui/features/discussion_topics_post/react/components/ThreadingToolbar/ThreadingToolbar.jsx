@@ -19,7 +19,6 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {IconEditLine} from '@instructure/ui-icons'
 import {InlineList} from '@instructure/ui-list'
 import {Reply} from './Reply'
 import {Like} from './Like'
@@ -48,40 +47,25 @@ export function ThreadingToolbar({...props}) {
         },
       }}
       render={(responsiveProps, matches) =>
-        (props.searchTerm || props.filter !== 'all') && !props.isIsolatedView ? (
+        (props.searchTerm || props.filter !== 'all') && !props.isSplitView ? (
           <Link
             as="button"
             isWithinText={false}
             data-testid="go-to-reply"
             onClick={() => {
-              const isolatedId = props.discussionEntry.isolatedEntryId
-                ? props.discussionEntry.isolatedEntryId
+              const parentId = props.discussionEntry.parentId
+                ? props.discussionEntry.parentId
                 : props.discussionEntry._id
               const relativeId = props.discussionEntry.rootEntryId
                 ? props.discussionEntry._id
                 : null
 
-              props.onOpenIsolatedView(
-                props.filter === 'drafts' ? props.discussionEntry.isolatedEntryId : isolatedId,
-                props.discussionEntry.isolatedEntryId,
-                props.filter === 'drafts',
-                props.filter === 'drafts' ? null : relativeId,
-                props.filter === 'drafts' ? undefined : props.discussionEntry._id
-              )
+              props.onOpenSplitView(parentId, false, relativeId, props.discussionEntry._id)
             }}
           >
-            {props.filter === 'drafts' ? (
-              <Text weight="bold" size={responsiveProps.textSize}>
-                <View as="span" margin="0 small 0 0">
-                  <IconEditLine color="primary" size="x-small" />
-                </View>
-                {I18n.t('Continue draft')}
-              </Text>
-            ) : (
-              <Text weight="bold" size={responsiveProps.textSize}>
-                {I18n.t('Go to Reply')}
-              </Text>
-            )}
+            <Text weight="bold" size={responsiveProps.textSize}>
+              {I18n.t('Go to Reply')}
+            </Text>
           </Link>
         ) : (
           <InlineList delimiter="pipe" display="inline-flex">
@@ -109,9 +93,9 @@ ThreadingToolbar.propTypes = {
   children: PropTypes.arrayOf(PropTypes.node),
   searchTerm: PropTypes.string,
   filter: PropTypes.string,
-  onOpenIsolatedView: PropTypes.func,
+  onOpenSplitView: PropTypes.func,
   discussionEntry: PropTypes.object,
-  isIsolatedView: PropTypes.bool,
+  isSplitView: PropTypes.bool,
 }
 
 ThreadingToolbar.Reply = Reply

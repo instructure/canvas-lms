@@ -92,20 +92,7 @@ describe('DiscussionPostToolbar', () => {
   })
 
   describe('Splitscreen Button', () => {
-    it('should not render if split_screen_view ff is off', async () => {
-      window.ENV.split_screen_view = false
-      const {queryByTestId} = setup(
-        {
-          setUserSplitScreenPreference: jest.fn(),
-          userSplitScreenPreference: false,
-        },
-        updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true})
-      )
-
-      expect(queryByTestId('splitscreenButton')).toBeNull()
-    })
     it('should call updateUserDiscussionsSplitscreenView mutation when clicked', async () => {
-      window.ENV.split_screen_view = true
       const {getByTestId} = setup(
         {
           setUserSplitScreenPreference: jest.fn(),
@@ -147,16 +134,6 @@ describe('DiscussionPostToolbar', () => {
       expect(onViewFilterMock.mock.calls.length).toBe(1)
       expect(onViewFilterMock.mock.calls[0][1].id).toBe('unread')
     })
-
-    it('"My Drafts" filter should be visible', () => {
-      window.ENV.draft_discussions = true
-
-      const onViewFilterMock = jest.fn()
-      const {getByText, getByLabelText} = setup({onViewFilter: onViewFilterMock})
-      const simpleSelect = getByLabelText('Filter by')
-      fireEvent.click(simpleSelect)
-      expect(getByText('My Drafts')).toBeTruthy()
-    })
   })
 
   describe('Sort control', () => {
@@ -188,18 +165,28 @@ describe('DiscussionPostToolbar', () => {
   })
 
   describe('Groups Menu Button', () => {
-    it('should not render when there are no child topics', () => {
+    it('should not render when there are no child topics and the user is an admin', () => {
       const container = setup({
         childTopics: [],
+        isAdmin: true,
       })
       expect(container.queryByTestId('groups-menu-button')).toBeNull()
     })
 
-    it('should render when there are child topics', () => {
+    it('should render when there are child topics and the user is an admin', () => {
       const container = setup({
         childTopics: [ChildTopic.mock()],
+        isAdmin: true,
       })
       expect(container.queryByTestId('groups-menu-button')).toBeTruthy()
+    })
+
+    it('should not render when the user is not an admin', () => {
+      const container = setup({
+        childTopics: [ChildTopic.mock()],
+        isAdmin: false,
+      })
+      expect(container.queryByTestId('groups-menu-button')).toBeNull()
     })
   })
 
@@ -222,6 +209,28 @@ describe('DiscussionPostToolbar', () => {
         })
         expect(container.queryByTestId('anonymous_avatar')).toBeNull()
       })
+    })
+  })
+
+  describe('Assign To', () => {
+    beforeAll(()=>{
+      ENV.FEATURES = {
+        differentiated_modules: true
+      }
+    })
+
+    it('renders the Assign To button if user can edit', ()=>{
+      const {getByRole} = setup({
+        canEdit: true
+      })
+      expect(getByRole('button', {name: 'Assign To'})).toBeInTheDocument()
+    })
+
+    it('does not render the Assign To button if user can not edit', ()=>{
+      const {queryByRole} = setup({
+        canEdit: false
+      })
+      expect(queryByRole('button', {name: 'Assign To'})).not.toBeInTheDocument()
     })
   })
 })

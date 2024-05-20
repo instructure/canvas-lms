@@ -1,3 +1,5 @@
+/* eslint-disable qunit/resolve-async */
+/* eslint-disable  no-undef */
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -17,8 +19,8 @@
  */
 
 import $ from 'jquery'
-import Backbone from '@canvas/backbone'
-import ContentView from '@canvas/outcome-content-view'
+import 'jquery-migrate'
+import ContentView from '@canvas/outcomes/content-view/backbone/views/index'
 import fakeENV from 'helpers/fakeENV'
 import instructionsTemplate from 'ui/features/learning_outcomes/jst/mainInstructions.handlebars'
 import assertions from 'helpers/assertions'

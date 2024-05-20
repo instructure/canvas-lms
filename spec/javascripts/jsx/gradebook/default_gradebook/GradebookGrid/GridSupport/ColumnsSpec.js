@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import slickgrid from 'slickgrid'
 import GridSupport from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/GridSupport/index'
 import SlickGridSpecHelper from './SlickGridSpecHelper'
@@ -355,24 +356,28 @@ QUnit.module('GradebookGrid GridSupport Columns', suiteHooks => {
       })
     })
 
-    test('updates the width of a scaled-down column', () => {
+    // unskip in FOO-4349
+    QUnit.skip('updates the width of a scaled-down column', () => {
       const originalWidth = gridSpecHelper.getColumn('column4').width
       resizeHeader('column4', -20)
       strictEqual(gridSpecHelper.getColumn('column4').width, originalWidth - 20)
     })
 
-    test('includes the updated column in the onColumnsResized event callback', () => {
+    // unskip in FOO-4349
+    QUnit.skip('includes the updated column in the onColumnsResized event callback', () => {
       resizeHeader('column4', -20)
       deepEqual(resizedColumns, [gridSpecHelper.getColumn('column4')])
     })
 
-    test('updates the width of a scaled-up column', () => {
+    // unskip in FOO-4349
+    QUnit.skip('updates the width of a scaled-up column', () => {
       const originalWidth = gridSpecHelper.getColumn('column4').width
       resizeHeader('column4', 20)
       strictEqual(gridSpecHelper.getColumn('column4').width, originalWidth + 20)
     })
 
-    test('updates the widths of multiple columns when the minimum width is surpassed', () => {
+    // unskip in FOO-4349
+    QUnit.skip('updates the widths of multiple columns when the minimum width is surpassed', () => {
       resizeHeader('column4', -100)
       deepEqual(
         resizedColumns.map(column => column.id),
@@ -380,7 +385,8 @@ QUnit.module('GradebookGrid GridSupport Columns', suiteHooks => {
       )
     })
 
-    test('does not trigger onColumnsResized when column widths did not change', () => {
+    // unskip in FOO-4349
+    QUnit.skip('does not trigger onColumnsResized when column widths did not change', () => {
       resizeHeader('column4', 0)
       strictEqual(resizedColumns.length, 0)
     })

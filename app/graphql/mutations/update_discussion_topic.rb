@@ -23,7 +23,8 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
 
   argument :discussion_topic_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
   argument :remove_attachment, Boolean, required: false
-  argument :assignment, Mutations::AssignmentUpdate, required: false
+  argument :assignment, Mutations::AssignmentBase::AssignmentUpdate, required: false
+  argument :set_checkpoints, Boolean, required: false
 
   field :discussion_topic, Types::DiscussionType, null: false
   def resolve(input:)
@@ -56,7 +57,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
 
     # Take care of Assignment update information
     if input[:assignment]
-      assignment_id = (discussion_topic&.assignment&.id || discussion_topic.old_assignment_id)
+      assignment_id = discussion_topic&.assignment&.id || discussion_topic.old_assignment_id
 
       if assignment_id
         # If a current or old assignment exists already, then update it
@@ -97,6 +98,37 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
 
         discussion_topic.assignment = assignment_create_result[:assignment]
       end
+
+      # Assignment must be present to set checkpoints
+      if discussion_topic.assignment && input[:checkpoints]&.count == DiscussionTopic::REQUIRED_CHECKPOINT_COUNT
+        return validation_error(I18n.t("If checkpoints are defined, forCheckpoints: true must be provided to the discussion topic assignment.")) unless input.dig(:assignment, :for_checkpoints)
+
+        checkpoint_service = if discussion_topic.assignment.has_sub_assignments
+                               Checkpoints::DiscussionCheckpointUpdaterService
+                             else
+                               Checkpoints::DiscussionCheckpointCreatorService
+                             end
+
+        input[:checkpoints].each do |checkpoint|
+          dates = checkpoint[:dates]
+          checkpoint_service.call(
+            discussion_topic:,
+            checkpoint_label: checkpoint[:checkpoint_label],
+            points_possible: checkpoint[:points_possible],
+            dates:,
+            replies_required: checkpoint[:replies_required]
+          )
+        end
+      end
+    end
+
+    # Determine if the checkpoints are being deleted
+    is_deleting_checkpoints = input.key?(:set_checkpoints) && !input[:set_checkpoints]
+
+    if is_deleting_checkpoints
+      Checkpoints::DiscussionCheckpointDeleterService.call(
+        discussion_topic:
+      )
     end
 
     return errors_for(discussion_topic) unless discussion_topic.save!
@@ -108,6 +140,8 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
     }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "not found"
+  rescue ArgumentError
+    raise GraphQL::ExecutionError, "Assignment group category id and discussion topic group category id do not match"
   end
 end
 
@@ -117,6 +151,13 @@ def set_discussion_assignment_association(assignment_params, discussion_topic)
 
   if is_deleting_assignment && !discussion_topic&.assignment.nil?
     assignment = discussion_topic.assignment
+
+    if assignment.has_sub_assignments
+      Checkpoints::DiscussionCheckpointDeleterService.call(
+        discussion_topic:
+      )
+    end
+
     discussion_topic.assignment = nil
     assignment.discussion_topic = nil
     assignment.destroy
@@ -125,14 +166,27 @@ def set_discussion_assignment_association(assignment_params, discussion_topic)
     assignment_params[:state] = discussion_topic.published? ? "published" : "unpublished"
     assignment_params[:name] = discussion_topic.title
 
+    validate_and_remove_group_category_id(assignment_params, discussion_topic) if assignment_params.key?(:group_category_id)
+
     # If a topic doesn't have a group_category_id or has submissions, then the assignment group_category_id should be nil
     unless discussion_topic.try(:group_category_id) || assignment.has_submitted_submissions?
       assignment_params[:group_category_id] = nil
     end
+
     # Finalize assignment restoration
     discussion_topic.assignment = assignment
     discussion_topic.sync_assignment
     # This save is required to prevent an extra discussion_topic from being created in the updateAssignment
     assignment.save!
+  end
+end
+
+def validate_and_remove_group_category_id(assignment_params, discussion_topic)
+  if assignment_params[:group_category_id].present? && discussion_topic.group_category_id.present? && assignment_params[:group_category_id] != discussion_topic.group_category_id.to_s
+    raise ArgumentError, "Group category IDs do not match"
+  end
+
+  if assignment_params[:group_category_id].present?
+    assignment_params.delete(:group_category_id)
   end
 end

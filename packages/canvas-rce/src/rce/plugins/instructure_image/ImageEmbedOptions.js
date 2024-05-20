@@ -144,7 +144,7 @@ export function fromVideoEmbed($element) {
 
   if (RCEGlobals.getFeatures().media_links_use_attachment_id) {
     const source = $videoIframe.getAttribute('src')
-    const matches = source?.match(/^\/media_attachments_iframe\/(\d+)/)
+    const matches = source?.match(/\/media_attachments_iframe\/(\d+)/)
     if (matches) {
       videoOptions.attachmentId = matches[1]
     }

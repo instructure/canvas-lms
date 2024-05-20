@@ -25,10 +25,10 @@ module Services
       allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
       allow(DynamicSettings).to receive(:find)
         .with("rich-content-service", default_ttl: 5.minutes)
-        .and_return(DynamicSettings::FallbackProxy.new(
-                      "app-host" => "rce-app",
-                      "cdn-host" => "rce-cdn"
-                    ))
+        .and_return(DynamicSettings::FallbackProxy.new({
+                                                         "app-host" => "rce-app",
+                                                         "cdn-host" => "rce-cdn"
+                                                       }))
       allow(Setting).to receive(:get)
     end
 

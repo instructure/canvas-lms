@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class ContentTag < ActiveRecord::Base
+  include Lti::Migratable
+
   class LastLinkToOutcomeNotDestroyed < StandardError
   end
 
@@ -80,6 +82,7 @@ class ContentTag < ActiveRecord::Base
   after_save :send_items_to_stream
   after_save :clear_total_outcomes_cache
   after_save :update_course_pace_module_items
+  after_save :update_module_item_submissions
   after_create :update_outcome_contexts
 
   include CustomValidations
@@ -119,6 +122,7 @@ class ContentTag < ActiveRecord::Base
 
   scope :active, -> { where(workflow_state: "active") }
   scope :not_deleted, -> { where("content_tags.workflow_state<>'deleted'") }
+  scope :nondeleted, -> { not_deleted }
 
   attr_accessor :skip_touch
   attr_accessor :reassociate_external_tool
@@ -315,9 +319,8 @@ class ContentTag < ActiveRecord::Base
     end
   end
 
-  alias_method :old_content, :content
   def content
-    TABLELESS_CONTENT_TYPES.include?(content_type) ? nil : old_content
+    TABLELESS_CONTENT_TYPES.include?(content_type) ? nil : super
   end
 
   def content_or_self
@@ -445,6 +448,7 @@ class ContentTag < ActiveRecord::Base
     delete_outcome_friendly_description if content_type == "LearningOutcome"
 
     run_submission_lifecycle_manager_for_quizzes_next(force: true)
+    update_module_item_submissions(change_of_module: false)
 
     # after deleting the last native link to an unaligned outcome, delete the
     # outcome. we do this here instead of in LearningOutcome#destroy because
@@ -698,6 +702,67 @@ class ContentTag < ActiveRecord::Base
     eager_load(:learning_outcome_content).order(outcome_title_order_by_clause)
   end
 
+  # Used to either Just-In-Time migrate a ContentTag to fully support 1.3 or
+  # as part of a backfill job to migrate existing 1.3 ContentTags to fully
+  # support 1.3. Fully support in this case means the associated resource link
+  # has the LTI 1.1 resource_link_id stored on it. Will only migrate tags that
+  # are module items that are associated with ContextExternalTools.
+  # @see Lti::Migratable
+  def migrate_to_1_3_if_needed!(tool)
+    return if !tool&.use_1_3? || associated_asset_lti_resource_link&.lti_1_1_id.present?
+
+    return unless context_module_id.present? && content_type == ContextExternalTool.to_s
+
+    # Updating a 1.3 module item
+    if associated_asset_lti_resource_link.present? && content&.use_1_3?
+      associated_asset_lti_resource_link.update!(lti_1_1_id: tool.opaque_identifier_for(self))
+    # Migrating a 1.1 module item
+    elsif !content&.use_1_3?
+      rl = Lti::ResourceLink.create_with(context, tool, nil, url, lti_1_1_id: tool.opaque_identifier_for(self))
+      update!(associated_asset: rl, content: tool)
+    end
+  end
+
+  # filtered by context during migrate_content_to_1_3
+  # @see Lti::Migratable
+  def self.directly_associated_items(tool_id)
+    ContentTag.nondeleted.where(tag_type: :context_module, content_id: tool_id)
+  end
+
+  # filtered by context during migrate_content_to_1_3
+  # @see Lti::Migratable
+  def self.indirectly_associated_items(_tool_id)
+    # TODO: this does not account for content tags that _are_ linked to a
+    # tool and the tag has a content_id, but the content_id doesn't match
+    # the current tool
+    ContentTag.nondeleted.where(tag_type: :context_module, content_id: nil)
+  end
+
+  # @param [Array<Integer>] ids The IDs of the resources to fetch for this batch
+  # @see Lti::Migratable
+  def self.fetch_direct_batch(ids, &)
+    ContentTag
+      .where(id: ids)
+      .preload(:associated_asset, :context)
+      .find_each(&)
+  end
+
+  # @param [Integer] tool_id The ID of the LTI 1.1 tool that the resource is indirectly
+  # associated with
+  # @param [Array<Integer>] ids The IDs of the resources to fetch for this batch
+  # @see Lti::Migratable
+  def self.fetch_indirect_batch(tool_id, new_tool_id, ids)
+    ContentTag
+      .where(id: ids)
+      .preload(:associated_asset, :context)
+      .find_each do |item|
+      possible_tool = ContextExternalTool.find_external_tool(item.url, item.context, nil, new_tool_id)
+      next if possible_tool.nil? || possible_tool.id != tool_id
+
+      yield item
+    end
+  end
+
   def visible_to_user?(user, opts = nil, session = nil)
     return false unless context_module
 
@@ -789,6 +854,27 @@ class ContentTag < ActiveRecord::Base
 
       # Republish the course pace if changes were made
       course_pace.create_publish_progress if deleted? || cpmi.destroyed? || cpmi.saved_change_to_id? || saved_change_to_position?
+    end
+  end
+
+  def update_module_item_submissions(change_of_module: true)
+    return unless Account.site_admin.feature_enabled?(:differentiated_modules)
+
+    return unless tag_type == "context_module" && (content_type == "Assignment" || content_type == "Quizzes::Quiz")
+
+    if change_of_module
+      return unless saved_change_to_context_module_id? && AssignmentOverride.active.where(context_module_id: saved_change_to_context_module_id).exists?
+    else
+      return unless context_module.assignment_overrides.active.exists?
+    end
+
+    content.clear_cache_key(:availability)
+
+    if content_type == "Assignment"
+      SubmissionLifecycleManager.recompute(content, update_grades: true)
+    elsif content_type == "Quizzes::Quiz" && content.assignment
+      content.assignment.clear_cache_key(:availability)
+      SubmissionLifecycleManager.recompute(content.assignment, update_grades: true)
     end
   end
 

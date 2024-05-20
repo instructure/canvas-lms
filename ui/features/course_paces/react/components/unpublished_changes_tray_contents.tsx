@@ -69,9 +69,6 @@ function styleList() {
   document.head.appendChild(styl)
 }
 
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-// const {Item} = List as any
-
 interface StoreProps {
   readonly autoSaving: boolean
   readonly isSyncing: boolean

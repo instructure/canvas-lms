@@ -387,7 +387,7 @@ module Importers
               date = event.send(field)
               next unless date
 
-              event.send("#{field}=", shift_date(date, shift_options))
+              event.send(:"#{field}=", shift_date(date, shift_options))
             end
             event.save_without_broadcasting
           end
@@ -501,7 +501,7 @@ module Importers
       end
 
       settings.slice(*atts.map(&:to_s)).each do |key, val|
-        course.send("#{key}=", val)
+        course.send(:"#{key}=", val)
       end
       if settings.key?(:grading_standard_enabled)
         if settings[:grading_standard_enabled]
@@ -559,6 +559,14 @@ module Importers
 
       if settings.key?(:enable_course_paces) && course.account.feature_enabled?(:course_paces)
         course.enable_course_paces = settings[:enable_course_paces]
+      end
+
+      if settings.key?(:allow_student_discussion_reporting)
+        course.allow_student_discussion_reporting = settings[:allow_student_discussion_reporting]
+      end
+
+      if settings.key?(:allow_student_anonymous_discussion_topics)
+        course.allow_student_anonymous_discussion_topics = settings[:allow_student_anonymous_discussion_topics]
       end
     end
 

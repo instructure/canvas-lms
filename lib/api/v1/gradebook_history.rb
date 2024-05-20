@@ -117,11 +117,11 @@ module Api::V1
           if version[:score] &&
              (prior[:id].nil? || prior[:score] != version[:score])
             if prior[:id].nil? || prior[:graded_at].nil? || version[:graded_at].nil?
-              PREVIOUS_VERSION_ATTRS.each { |attr| version["previous_#{attr}".to_sym] = nil }
+              PREVIOUS_VERSION_ATTRS.each { |attr| version[:"previous_#{attr}"] = nil }
             elsif prior[:score] != version[:score]
-              PREVIOUS_VERSION_ATTRS.each { |attr| version["previous_#{attr}".to_sym] = prior[attr] }
+              PREVIOUS_VERSION_ATTRS.each { |attr| version[:"previous_#{attr}"] = prior[attr] }
             end
-            NEW_ATTRS.each { |attr| version["new_#{attr}".to_sym] = version[attr] }
+            NEW_ATTRS.each { |attr| version[:"new_#{attr}"] = version[attr] }
             new_array << version
           end
           prior.merge!(version.slice(:grade, :score, :graded_at, :grader, :id))

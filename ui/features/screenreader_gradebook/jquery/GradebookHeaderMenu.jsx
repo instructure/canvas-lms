@@ -26,7 +26,7 @@ import SetDefaultGradeDialog from '@canvas/grading/jquery/SetDefaultGradeDialog'
 import CurveGradesDialog from '@canvas/grading/jquery/CurveGradesDialog'
 import gradebookHeaderMenuTemplate from '../jst/GradebookHeaderMenu.handlebars'
 import re_upload_submissions_form from '@canvas/grading/jst/re_upload_submissions_form.handlebars'
-import _ from 'underscore'
+import {map, filter} from 'lodash'
 import authenticity_token from '@canvas/authenticity-token'
 import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 import React from 'react'
@@ -34,7 +34,7 @@ import ReactDOM from 'react-dom'
 import MessageStudentsWithObserversDialog from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 import {ApolloProvider} from 'react-apollo'
 import {createClient} from '@canvas/apollo'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
@@ -44,7 +44,7 @@ import replaceTags from '@canvas/util/replaceTags'
 const I18n = useI18nScope('gradebookHeaderMenu')
 
 const isAdmin = function () {
-  return ENV.current_user_roles.includes('admin')
+  return ENV.current_user_is_admin
 }
 
 export default class GradebookHeaderMenu {
@@ -77,7 +77,7 @@ export default class GradebookHeaderMenu {
     // need it to be a child of #gradebook_grid (not the header cell) to get over overflow:hidden obstacles.
     this.$menu
       .appendTo('#gradebook_grid')
-      .delegate('a', 'click', event => {
+      .on('click', 'a', event => {
         const action = this[$(event.target).data('action')]
         if (action) {
           action()
@@ -194,10 +194,10 @@ export default class GradebookHeaderMenu {
   ) {
     let {students} = opts
     const {assignment, messageAttachmentUploadFolderId} = opts
-    students = _.filter(students, student => {
+    students = filter(students, student => {
       return !student.isInactive && !student.isTestStudent
     })
-    students = _.map(students, student => {
+    students = map(students, student => {
       const sub = student[`assignment_${assignment.id}`]
       return {
         excused: sub.excused,
@@ -340,6 +340,7 @@ export default class GradebookHeaderMenu {
           modal: true,
           resizable: false,
           autoOpen: false,
+          zIndex: 1000,
         })
         .submit(function () {
           const data = $(this).getFormData()

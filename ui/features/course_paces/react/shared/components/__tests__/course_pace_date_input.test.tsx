@@ -21,7 +21,7 @@ import {fireEvent, render} from '@testing-library/react'
 
 import {COURSE, BLACKOUT_DATES} from '../../../__tests__/fixtures'
 
-import CoursePaceDateInput, {CoursePacesDateInputProps} from '../course_pace_date_input'
+import CoursePaceDateInput, {type CoursePacesDateInputProps} from '../course_pace_date_input'
 import moment from 'moment'
 
 beforeAll(() => {

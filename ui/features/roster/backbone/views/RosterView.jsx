@@ -128,7 +128,7 @@ export default class RosterView extends Backbone.View {
 
   onFail(xhr) {
     if (xhr.statusText === 'abort') return
-    const parsed = $.parseJSON(xhr.responseText)
+    const parsed = JSON.parse(xhr.responseText)
     const message =
       __guard__(parsed != null ? parsed.errors : undefined, x => x[0].message) ===
       '3 or more characters is required'

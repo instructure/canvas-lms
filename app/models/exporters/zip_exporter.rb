@@ -136,7 +136,7 @@ module Exporters
     def process_file(att)
       if att.grants_right?(@user, mock_session, :download)
         @file_list << att
-        @total_size += (att.size || 0)
+        @total_size += att.size || 0
       end
     end
 
@@ -172,7 +172,7 @@ module Exporters
 
     def attach_zip(zip_filename)
       attachment = @export.attachments.build
-      attachment.uploaded_data = Rack::Test::UploadedFile.new(zip_filename, "application/zip")
+      attachment.uploaded_data = Canvas::UploadedFile.new(zip_filename, "application/zip")
       attachment.workflow_state = "zipped"
       attachment.file_state = "available"
       attachment.save!

@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const path = require('path')
-// eslint-disable-next-line import/no-extraneous-dependencies
 const {sync} = require('glob')
 const {canvasDir} = require('../params')
 
@@ -28,21 +26,11 @@ exports.globPlugins = function (pattern) {
   })
 }
 
-// e.g. ['gradebook': 'ui/features/gradebook/index.tsx']
-exports.getAppFeatureBundles = function () {
-  const appFeatureBundlesPattern = path.join(canvasDir, 'ui/features/*/index.{js,jsx,ts,tsx}')
-  const appBundles = sync(appFeatureBundlesPattern, []).map(entryFilepath => [
-    path.basename(path.dirname(entryFilepath)),
-    entryFilepath,
-  ])
-  return appBundles
-}
-
 // e.g. ['foo-bar': 'gems/plugins/foo/app/coffeescripts/bundles/bar.js']
 exports.getPluginBundles = function () {
   // TODO: move plugin frontend code in app/{jsx,coffeescripts}/bundles to ui/features
-  const pluginBundlesPattern = `${canvasDir}/gems/plugins/*/app/{jsx,coffeescripts}/bundles/**/*.js`
-  const fileNameRegexp = /\/([^/]+)\.js/
+  const pluginBundlesPattern = `${canvasDir}/gems/plugins/*/app/{jsx,coffeescripts}/bundles/**/*.{js,jsx}`
+  const fileNameRegexp = /\/([^/]+)\.jsx?/
   const pluginNameRegexp = /plugins\/([^/]+)\/app/
   const pluginBundles = sync(pluginBundlesPattern, []).map(entryFilepath => {
     const pluginName = pluginNameRegexp.exec(entryFilepath)[1]

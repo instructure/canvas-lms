@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
@@ -31,19 +31,19 @@
     <tr>
       <td><%= f.blabel :base_url, :en => "Base URL" %></td>
       <td>
-        <%= f.text_field :base_url %>
+        <%= f.text_field :base_url, value: settings[:base_url] %>
       </td>
     </tr>
     <tr>
       <td><%= f.blabel :application_id, :en => "Application Id" %></td>
       <td>
-        <%= f.text_field :application_id %>
+        <%= f.text_field :application_id, value: settings[:application_id] %>
       </td>
     </tr>
     <tr>
       <td><%= f.blabel :key_id, :en => "Key ID" %></td>
       <td>
-        <%= f.text_field :key_id %>
+        <%= f.text_field :key_id, value: settings[:key_id] %>
       </td>
     </tr>
     <tr>

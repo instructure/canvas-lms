@@ -115,10 +115,10 @@ module IncomingMailProcessor
 
         config.symbolize_keys.each do |key, value|
           if IncomingMailProcessor::Settings.members.map(&:to_sym).include?(key)
-            settings.send("#{key}=", value)
+            settings.send(:"#{key}=", value)
           elsif IncomingMailProcessor::DeprecatedSettings.members.map(&:to_sym).include?(key)
             logger&.warn("deprecated setting sent to IncomingMessageProcessor: #{key}")
-            deprecated_settings.send("#{key}=", value)
+            deprecated_settings.send(:"#{key}=", value)
           else
             raise "unrecognized setting sent to IncomingMessageProcessor: #{key}"
           end

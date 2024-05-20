@@ -19,13 +19,13 @@
 import React from 'react'
 import page from 'page'
 import $ from 'jquery'
+import {each, find} from 'lodash'
 import classnames from 'classnames'
 import {Mask, Overlay} from '@instructure/ui-overlays'
 import FilePreviewInfoPanel from './FilePreviewInfoPanel'
 import CollectionHandler from '../../util/collectionHandler'
 import preventDefault from '@canvas/util/preventDefault'
 
-import _ from 'underscore'
 import PropTypes from 'prop-types'
 import customPropTypes from '../modules/customPropTypes'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -100,7 +100,7 @@ export default class FilePreview extends React.PureComponent {
       order: this.props.query.order || undefined,
     }
 
-    _.each(obj, (v, k) => {
+    each(obj, (v, k) => {
       if (
         !v ||
         (opts.except && opts.except.length && (opts.except === k || opts.except.includes(k)))
@@ -129,7 +129,7 @@ export default class FilePreview extends React.PureComponent {
       return onlyIdsToPreview.includes(file.id)
     })
 
-    const visibleFile = props.query.preview && _.findWhere(files, {id: props.query.preview})
+    const visibleFile = props.query.preview && find(files, {id: props.query.preview})
 
     if (!visibleFile) {
       const responseDataRequested = ['enhanced_preview_url']

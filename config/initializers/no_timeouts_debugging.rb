@@ -37,19 +37,20 @@ if Rails.env.test?
   #
   module NoRaiseTimeoutsWhileDebugging
     def raise(*args)
-      if defined?(SpecTimeLimit) && args.first == SpecTimeLimit::Error
-        have_ever_run_a_debugger = (
-          defined?(::DEBUGGER__::Session) ||
-          (defined?(Byebug) && Byebug.respond_to?(:started?)) ||
-          (defined?(Pry) && Pry::InputLock.input_locks.any?)
-        )
-        if have_ever_run_a_debugger
-          Rails.logger.warn "Ignoring timeout because we're debugging"
-          return
-        end
+      if defined?(SpecTimeLimit) && args.first == SpecTimeLimit::Error && ever_run_a_debugger?
+        Rails.logger.warn "Ignoring timeout because we're debugging"
+        return
       end
       super
     end
+
+    def ever_run_a_debugger?
+      defined?(::DEBUGGER__::Session) ||
+        (defined?(Byebug) && Byebug.respond_to?(:started?)) ||
+        (defined?(Pry) && Pry::InputLock.input_locks.any?)
+    end
+
+    module_function :ever_run_a_debugger?
   end
 
   Thread.prepend(NoRaiseTimeoutsWhileDebugging)

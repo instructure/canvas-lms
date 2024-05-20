@@ -35,7 +35,7 @@
         <tr class="login<%= ' blank' unless pseudonym %>" <%= raw %Q(style="display: none") unless pseudonym %>>
           <td class="sso-icon" <%= raw %Q(data-pseudonym-id="#{pseudonym.id}") if pseudonym %>>
             <% icon_file_path = Rails.root.join("app/views/shared/svg/_svg_icon_#{pseudonym.try(:authentication_provider).try(:auth_type)}.svg") %>
-            <% if File.exists?(icon_file_path) %>
+            <% if File.exist?(icon_file_path) %>
               <%= render(partial: "shared/svg/svg_icon_#{pseudonym.authentication_provider.auth_type}", formats: [:svg]) %>
               <span class="screenreader-only">
                 <%= t("This login is for %{provider}", provider: pseudonym.authentication_provider.class.display_name) %>
@@ -108,13 +108,14 @@
           <% end %>
         </tr>
       <% end %>
-      <% can_add_pseudonym = can_do(@user.pseudonyms.build(account: @domain_root_account), @current_user, :create) %>
+      <% new_pseudonym = @user.pseudonyms.build(account: @domain_root_account) %>
+      <% can_add_pseudonym = can_do(new_pseudonym, @current_user, :create) %>
       <% can_reset_mfa = @user.otp_secret_key && can_do(@user, @current_user, :reset_mfa) %>
       <% if can_add_pseudonym || can_reset_mfa %>
         <tr class="add_holder">
           <td colspan="5">
             <% if can_add_pseudonym %>
-              <a href="#" rel="<%= user_pseudonyms_url(@user.id) %>" class="add_pseudonym_link"><%= t('add_login', 'Add Login') %></a>
+              <a href="#" rel="<%= user_pseudonyms_url(@user.id) %>" data-can-manage-sis="<%= can_do(new_pseudonym, @current_user, :manage_sis) %>"  class="add_pseudonym_link"><%= t('add_login', 'Add Login') %></a>
             <% end %>
             <% if can_add_pseudonym && can_reset_mfa %> | <% end %>
             <% if can_reset_mfa %>

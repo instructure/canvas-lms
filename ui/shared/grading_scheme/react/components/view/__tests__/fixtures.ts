@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GradingScheme} from '../../../../gradingSchemeApiModel'
+import type {GradingScheme} from '../../../../gradingSchemeApiModel'
 
 export const MOCK_COURSE_GRADING_SCHEME: GradingScheme = {
   assessed_assignment: false,

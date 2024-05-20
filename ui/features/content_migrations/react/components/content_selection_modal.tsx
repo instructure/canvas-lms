@@ -44,11 +44,10 @@ import {
   IconStandardsLine,
   IconFolderLine,
   IconDocumentLine,
-  // @ts-ignore
 } from '@instructure/ui-icons'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {CollapsableList, Item} from '@canvas/content-migrations'
-import {ContentMigrationWorkflowState} from './types'
+import {CollapsableList, type Item} from '@canvas/content-migrations'
+import type {ContentMigrationItem, ContentMigrationWorkflowState} from './types'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -150,15 +149,15 @@ const generateSelectiveDataResponse = (
 }
 
 type ContentSelectionModalProps = {
-  courseId: string
-  migrationId: string
-  onSubmit?: () => void
+  courseId: string | undefined
+  migration: ContentMigrationItem
+  updateMigrationItem?: (migrationId: string) => void
 }
 
 export const ContentSelectionModal = ({
   courseId,
-  migrationId,
-  onSubmit,
+  migration,
+  updateMigrationItem,
 }: ContentSelectionModalProps) => {
   const [open, setOpen] = useState(false)
   const [selectedProperties, setSelectedProperties] = useState<Array<string>>([])
@@ -167,26 +166,28 @@ export const ContentSelectionModal = ({
 
   const handleEntered = useCallback(() => {
     doFetchApi({
-      path: `/api/v1/courses/${courseId}/content_migrations/${migrationId}/selective_data`,
+      path: `/api/v1/courses/${courseId}/content_migrations/${migration.id}/selective_data`,
       method: 'GET',
     })
       .then(({json}: {json: SelectiveDataResponse}) => mapSelectiveDataResponse(json))
       .then((mappedItems: Item[]) => setItems(mappedItems))
       .catch(() => setHasErrors(true))
-  }, [courseId, migrationId])
+  }, [courseId, migration.id])
 
   const handleSubmit = () => {
     doFetchApi({
-      path: `/api/v1/courses/${courseId}/content_migrations/${migrationId}`,
+      path: `/api/v1/courses/${courseId}/content_migrations/${migration.id}`,
       method: 'PUT',
-      body: generateSelectiveDataResponse(migrationId, ENV.current_user_id!, selectedProperties),
+      body: generateSelectiveDataResponse(migration.id, ENV.current_user_id!, selectedProperties),
     })
       .then(() => {
-        onSubmit?.()
+        updateMigrationItem?.(migration.id)
         setOpen(false)
       })
       .catch(() => setOpen(false))
   }
+
+  if (!courseId || migration.workflow_state !== 'waiting_for_select') return null
 
   let content
   if (items.length > 0 && !hasErrors) {

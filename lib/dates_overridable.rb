@@ -31,10 +31,10 @@ module DatesOverridable
   class NotOverriddenError < RuntimeError; end
 
   def self.included(base)
-    base.has_many :assignment_overrides, dependent: :destroy, inverse_of: base.table_name.singularize
-    base.has_many :active_assignment_overrides, -> { where(workflow_state: "active") }, class_name: "AssignmentOverride", inverse_of: base.table_name.singularize
-    base.has_many :assignment_override_students, -> { where(workflow_state: "active") }, dependent: :destroy
-    base.has_many :all_assignment_override_students, class_name: "AssignmentOverrideStudent", dependent: :destroy
+    base.has_many :assignment_overrides, dependent: :destroy, inverse_of: base.table_name.singularize, foreign_key: "#{base.table_name.singularize}_id"
+    base.has_many :active_assignment_overrides, -> { where(workflow_state: "active") }, class_name: "AssignmentOverride", inverse_of: base.table_name.singularize, foreign_key: "#{base.table_name.singularize}_id"
+    base.has_many :assignment_override_students, -> { where(workflow_state: "active") }, dependent: :destroy, foreign_key: "#{base.table_name.singularize}_id"
+    base.has_many :all_assignment_override_students, class_name: "AssignmentOverrideStudent", dependent: :destroy, foreign_key: "#{base.table_name.singularize}_id"
 
     base.validates_associated :active_assignment_overrides
 
@@ -46,6 +46,9 @@ module DatesOverridable
   end
 
   def overridden_for(user, skip_clone: false)
+    # TODO: support Attachment in AssignmentOverrideApplicator (LF-1458)
+    return self if is_a?(Attachment)
+
     AssignmentOverrideApplicator.assignment_overridden_for(self, user, skip_clone:)
   end
 
@@ -88,8 +91,36 @@ module DatesOverridable
     AssignmentOverride.active.where(context_module_id: assignment_context_modules.select(:id))
   end
 
+  def visible_to_everyone
+    if Account.site_admin.feature_enabled? :differentiated_modules
+      if is_a?(DiscussionTopic)
+        # need to check if is_section_specific for ungraded discussions
+        # this column will eventually be deprecated and then this can be removed
+        assignment_overrides.active.where(set_type: "Course").exists? || ((!only_visible_to_overrides && !is_section_specific) && (assignment_context_modules.empty? || (assignment_context_modules.any? && assignment_context_modules_without_overrides.any?)))
+      else
+        assignment_overrides.active.where(set_type: "Course").exists? || (!only_visible_to_overrides && (assignment_context_modules.empty? || (assignment_context_modules.any? && assignment_context_modules_without_overrides.any?)))
+      end
+    else
+      !only_visible_to_overrides
+    end
+  end
+
   def assignment_context_modules
-    ContextModule.active.where(id: context_module_tags.select(:context_module_id))
+    if is_a?(Assignment) && quiz.present?
+      # if it's another learning object's assignment, the context module content tags are attached to the learning object
+      ContextModule.not_deleted.where(id: quiz.context_module_tags.select(:context_module_id))
+    elsif is_a?(Assignment) && discussion_topic.present?
+      ContextModule.not_deleted.where(id: discussion_topic.context_module_tags.select(:context_module_id))
+    elsif is_a?(Assignment) && wiki_page.present? # wiki pages can have assignments through mastery paths
+      ContextModule.not_deleted.where(id: wiki_page.context_module_tags.select(:context_module_id))
+    else
+      ContextModule.not_deleted.where(id: context_module_tags.select(:context_module_id))
+    end
+  end
+
+  def assignment_context_modules_without_overrides
+    context_modules_with_overrides = context_module_overrides.select(:context_module_id)
+    assignment_context_modules.where.not(id: context_modules_with_overrides)
   end
 
   def multiple_due_dates?

@@ -146,7 +146,11 @@ const ConversationListContainer = ({
     return (
       <View as="div" style={{position: 'relative'}} height="100%">
         <Mask>
-          <Spinner renderTitle={() => I18n.t('Loading Message List')} variant="inverse" />
+          <Spinner
+            renderTitle={() => I18n.t('Loading Message List')}
+            variant="inverse"
+            delay={300}
+          />
         </Mask>
       </View>
     )

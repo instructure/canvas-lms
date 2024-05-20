@@ -20,12 +20,12 @@ import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import ValidatedMixin from './ValidatedMixin'
 import $ from 'jquery'
-import _ from 'underscore'
+import {map, forEach, isEqual, includes, clone, isObject, chain, keys} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import '@canvas/util/toJSON'
+import '@canvas/jquery/jquery.toJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '../../jquery/jquery.instructure_forms'
-import {send} from '@canvas/rce/RceCommandShim'
+import {send} from '@canvas/rce-command-shim'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 import sanitizeData from '../../sanitizeData'
 
@@ -119,8 +119,8 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
   }
   const data = this.getFormData()
   const errors = this.validateBeforeSave(data, {})
-  if (_.keys(errors).length === 0) {
-    disablingDfd = new $.Deferred()
+  if (keys(errors).length === 0) {
+    disablingDfd = this.disablingDfd ?? new $.Deferred()
     saveDfd = this.saveFormData(data)
     // eslint-disable-next-line promise/catch-or-return
     saveDfd.then(this.onSaveSuccess.bind(this), this.onSaveFail.bind(this))
@@ -153,7 +153,7 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
     return saveDfd
   } else {
     // focus on the first element with an error for accessibility
-    dateOverrideErrors = _.map(
+    dateOverrideErrors = map(
       $('[data-error-type]'),
       (function (_this) {
         return function (element) {
@@ -161,24 +161,18 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
         }
       })(this)
     )
-    assignmentFieldErrors = _.chain(_.keys(errors))
+    assignmentFieldErrors = chain(keys(errors))
       .reject(function (err) {
-        return _.includes(dateOverrideErrors, err)
+        return includes(dateOverrideErrors, err)
       })
       .value()
     first_error = assignmentFieldErrors[0] || dateOverrideErrors[0]
     this.findField(first_error).focus()
-    let errorsToShow = errors
-    if (this.constructor.name === 'WikiPageEditView' && window.ENV.FEATURES.permanent_page_links) {
-      // Let the IntsUI TextInput component show the title errors
-      const {title, ...newErrors} = errors
-      errorsToShow = newErrors
-    }
     // short timeout to ensure alerts are properly read after focus change
     return window.setTimeout(
       (function (_this) {
         return function () {
-          _this.showErrors(errorsToShow)
+          _this.showErrors(errors)
           return null
         }
       })(this),
@@ -303,7 +297,7 @@ ValidatedFormView.prototype.parseErrorResponse = function (response) {
     }
   } else {
     try {
-      return $.parseJSON(response.responseText).errors
+      return JSON.parse(response.responseText).errors
     } catch (error1) {
       return {}
     }
@@ -364,22 +358,22 @@ ValidatedFormView.prototype.findField = function (field) {
 }
 
 ValidatedFormView.prototype.castJSON = function (obj) {
-  if (!_.isObject(obj)) {
+  if (!isObject(obj)) {
     return obj
   }
   if (obj.toJSON != null) {
     return obj.toJSON()
   }
-  const clone = _.clone(obj)
-  _.each(
-    clone,
+  const clone_ = clone(obj)
+  forEach(
+    clone_,
     (function (_this) {
       return function (val, key) {
-        return (clone[key] = _this.castJSON(val))
+        return (clone_[key] = _this.castJSON(val))
       }
     })(this)
   )
-  return clone
+  return clone_
 }
 
 ValidatedFormView.prototype.original = null
@@ -396,7 +390,7 @@ ValidatedFormView.prototype.unwatchUnload = function () {
 
 ValidatedFormView.prototype.checkUnload = function () {
   const current = this.castJSON(this.getFormData())
-  if (!_.isEqual(this.original, current)) {
+  if (!isEqual(this.original, current)) {
     return this.translations.unsaved
   }
 }

@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
+import 'jquery-migrate'
 import React from 'react'
-import {mount} from 'enzyme'
+import {render} from '@testing-library/react'
 import File from '@canvas/files/backbone/models/File'
 import DragFeedback from 'ui/features/files/react/components/DragFeedback'
 
@@ -30,7 +30,7 @@ test('DF: shows a badge with number of items being dragged', () => {
   file.url = () => 'some_url'
   file2.url = () => 'some_url'
 
-  const dragFeedback = mount(<DragFeedback pageX={1} pageY={1} itemsToDrag={[file, file2]} />)
+  const dragFeedback = render(<DragFeedback pageX={1} pageY={1} itemsToDrag={[file, file2]} />)
 
-  equal(dragFeedback.find('.badge').instance().innerHTML, '2', 'has two items')
+  equal(dragFeedback.container.querySelector('.badge').innerHTML, '2', 'has two items')
 })

@@ -57,8 +57,10 @@ afterEach(() => {
 describe('AccountList', () => {
   it('shows a no results page', async () => {
     fetchMock.get(accountListUrl('elemen'), [])
-    const {findByText, getByText} = render(<AccountList {...defaultProps} />)
-    expect(await findByText('No results found')).toBeInTheDocument()
+    const {getByText} = render(<AccountList {...defaultProps} />)
+    await waitFor(async () => {
+      expect(getByText('No results found')).toBeInTheDocument()
+    })
     expect(
       getByText('Please try another search term, filter, or search with fewer characters')
     ).toBeInTheDocument()

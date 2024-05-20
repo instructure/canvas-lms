@@ -1,0 +1,34 @@
+---
+openapi: 3.0.3
+info:
+  title: app
+  version: 1.0.0
+servers: []
+paths:
+  "/api/lti/register":
+    get:
+      summary: redirect_to_tool_registration
+      tags:
+      - Lti::IMS::DynamicRegistration
+      parameters:
+      - name: registration_url
+        in: query
+        required: false
+        schema:
+          type: string
+        example: https://example.com
+      responses:
+        '302':
+          description: supports multiple subdomains in the oidc url
+          content:
+            text/html:
+              schema:
+                type: string
+              example: <html><body>You are being <a href="https://example.com?openid_configuration=https%3A%2F%2Fsub.test.host%2Fapi%2Flti%2Fsecurity%2Fopenid-configuration&amp;registration_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiYjA2YTNkMmItYWNkNS00OWNlLWEwZWEtNDFlMjU1NDRmYWJiIiwiaW5pdGlhdGVkX2F0IjoiMjAyMy0xMi0xNVQwMjo0MDozNCswMDowMCIsInVzZXJfaWQiOjE3NjMsInJvb3RfYWNjb3VudF9nbG9iYWxfaWQiOjI4OTEsImV4cCI6MTcwMjYxMTYzNH0.XT7yNB7fZ7pu2uwE_ysWsgv50KTzcujf3RJECbWS1Ho">redirected</a>.</body></html>
+        '404':
+          description: returns a 404
+          content:
+            text/html:
+              schema:
+                type: string
+              example: ''

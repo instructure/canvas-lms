@@ -29,7 +29,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import Layout from './Layout'
 import {setAssignmentPostPolicy} from './Api'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {CamelizedAssignment} from '@canvas/grading/grading'
+import type {CamelizedAssignment} from '@canvas/grading/grading.d'
 
 const I18n = useI18nScope('post_grades_tray')
 

@@ -25,7 +25,8 @@ RSpec.describe Lti::ResourceLink do
   let(:resource_link) do
     Lti::ResourceLink.create!(context_external_tool: tool,
                               context: assignment,
-                              url: "http://www.example.com/launch")
+                              url: "http://www.example.com/launch",
+                              title: "Resource Title")
   end
 
   context "relationships" do
@@ -34,33 +35,13 @@ RSpec.describe Lti::ResourceLink do
 
     it { is_expected.to have_many(:line_items) }
 
-    describe "when destroying" do
-      subject { resource_link.destroy }
-
-      let(:line_item) { line_item_model(resource_link:) }
-
-      it "destroys associated line items" do
-        expect(line_item).to be_active
-        subject
-        expect(line_item.reload).to be_deleted
-      end
-    end
-
-    describe "when undestroying" do
-      subject { resource_link.undestroy }
-
-      let(:line_item) { line_item_model(resource_link:) }
-
-      before do
-        line_item
-        resource_link.destroy
-      end
-
-      it "undestroys associated line items" do
-        expect(line_item.reload).to be_deleted
-        subject
-        expect(line_item.reload).to be_active
-      end
+    it "maintains associated line items when destroying and undestroying" do
+      line_item = line_item_model(resource_link:)
+      expect(line_item).to be_active
+      resource_link.destroy
+      expect(line_item.reload).to be_deleted
+      resource_link.reload.undestroy
+      expect(line_item.reload).to be_active
     end
   end
 
@@ -155,6 +136,42 @@ RSpec.describe Lti::ResourceLink do
         expect(course.lti_resource_links.count).to eq 2
         expect(course.lti_resource_links.first).to eq resource_link_1
         expect(course.lti_resource_links.last).to eq resource_link_2
+      end
+    end
+
+    context "with `title`" do
+      let(:title) { "Resource Title" }
+
+      it "create resource link" do
+        resource_link = described_class.create_with(course, tool, nil, nil, title)
+        expect(course.lti_resource_links.first).to eq resource_link
+        expect(course.lti_resource_links.first.title).to eq title
+      end
+    end
+
+    context "without `title`" do
+      it "create resource link with nil title" do
+        resource_link = described_class.create_with(course, tool)
+        expect(course.lti_resource_links.first).to eq resource_link
+        expect(course.lti_resource_links.first.title).to be_nil
+      end
+    end
+
+    context "with `lti_1_1_id`" do
+      let(:lti_1_1_id) { "1234" }
+
+      it "creates a resource link with the lti_1_1_id" do
+        resource_link = described_class.create_with(course, tool, lti_1_1_id:)
+        expect(course.lti_resource_links.first).to eq resource_link
+        expect(course.lti_resource_links.first.lti_1_1_id).to eq lti_1_1_id
+      end
+    end
+
+    context "without `lti_1_1_id`" do
+      it "creates a resource link with a nil lti_1_1_id" do
+        resource_link = described_class.create_with(course, tool)
+        expect(course.lti_resource_links.first).to eq resource_link
+        expect(course.lti_resource_links.first.lti_1_1_id).to be_nil
       end
     end
   end

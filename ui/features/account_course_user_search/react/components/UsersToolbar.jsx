@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {string, func, shape, arrayOf} from 'prop-types'
+import {bool, string, func, shape, arrayOf} from 'prop-types'
 import {IconGroupLine, IconMoreLine, IconPlusLine, IconStudentViewLine} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -35,6 +35,7 @@ const I18n = useI18nScope('account_course_user_search')
 export default function UsersToolbar(props) {
   const [recipientsFilterChecked, setRecipientFilterChecked] = useState(false)
   const [providersFilterChecked, setProvidersFilterChecked] = useState(false)
+  const [includeDeletedUsers, setIncludeDeletedUsers] = useState(false)
 
   function handleRoleSelect(event, value) {
     props.onUpdateFilters({role_filter_id: value})
@@ -103,9 +104,9 @@ export default function UsersToolbar(props) {
                     onBlur={() => props.toggleSRMessage(true)}
                     onFocus={() => props.toggleSRMessage(false)}
                     messages={
-                      !!props.errors.search_term && [
-                        {type: 'error', text: props.errors.search_term},
-                      ]
+                      props.errors.search_term
+                        ? [{type: 'error', text: props.errors.search_term}]
+                        : []
                     }
                   />
                 </Grid.Col>
@@ -129,6 +130,7 @@ export default function UsersToolbar(props) {
                 <Grid.Row>
                   <Grid.Col width="auto">
                     <Checkbox
+                      size="small"
                       checked={recipientsFilterChecked}
                       onChange={e => handleTemporaryEnrollmentsFilterChange('recipients', e)}
                       label={I18n.t('Show only temporary enrollment recipients')}
@@ -136,9 +138,25 @@ export default function UsersToolbar(props) {
                   </Grid.Col>
                   <Grid.Col width="auto">
                     <Checkbox
+                      size="small"
                       checked={providersFilterChecked}
                       onChange={e => handleTemporaryEnrollmentsFilterChange('providers', e)}
                       label={I18n.t('Show only temporary enrollment providers')}
+                    />
+                  </Grid.Col>
+                </Grid.Row>
+              )}
+              {window.ENV.PERMISSIONS.can_edit_users && (
+                <Grid.Row>
+                  <Grid.Col width="auto">
+                    <Checkbox
+                      size="small"
+                      checked={props.include_deleted_users}
+                      onChange={e =>
+                        // eslint-disable-next-line no-restricted-globals
+                        props.onUpdateFilters({include_deleted_users: event.target.checked})
+                      }
+                      label={I18n.t('Include deleted users in search results')}
                     />
                   </Grid.Col>
                 </Grid.Row>
@@ -188,6 +206,7 @@ UsersToolbar.propTypes = {
   onUpdateFilters: func.isRequired,
   onApplyFilters: func.isRequired,
   search_term: string,
+  include_deleted_users: bool,
   role_filter_id: string,
   errors: shape({search_term: string}),
   accountId: string,
@@ -201,6 +220,7 @@ UsersToolbar.propTypes = {
 
 UsersToolbar.defaultProps = {
   search_term: '',
+  include_deleted_users: false,
   role_filter_id: '',
   errors: {},
   accountId: '',

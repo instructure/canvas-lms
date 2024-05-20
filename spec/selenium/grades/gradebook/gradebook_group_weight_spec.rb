@@ -26,11 +26,7 @@ describe "Gradebook - group weights" do
 
   def student_totals
     totals = ff(".total-cell")
-    points = []
-    totals.each do |i|
-      points.push(i.text)
-    end
-    points
+    totals.map(&:text)
   end
 
   def toggle_group_weight

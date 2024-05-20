@@ -19,7 +19,8 @@
 import Backbone from '@canvas/backbone'
 import PublishIconView from '@canvas/publish-icon-view'
 import $ from 'jquery'
-import 'helpers/jquery.simulate'
+import 'jquery-migrate'
+import '@canvas/jquery/jquery.simulate'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('PublishIconView', {

@@ -19,7 +19,7 @@
 /* eslint-disable promise/catch-or-return */
 import moxios from 'moxios'
 import moment from 'moment-timezone'
-import {isPromise, moxiosWait, moxiosRespond} from 'jest-moxios-utils'
+import {isPromise, moxiosWait, moxiosRespond} from '@canvas/jest-moxios-utils'
 import * as SidebarActions from '../sidebar-actions'
 import * as Actions from '../index'
 import {initialize as alertInitialize} from '../../utilities/alertUtils'

@@ -17,7 +17,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {map, uniq, filter, every, includes, extend as lodashExtend} from 'lodash'
 import DialogBaseView from '@canvas/dialog-base-view'
 import RosterDialogMixin from './RosterDialogMixin'
 import template from '../../jst/editRolesView.handlebars'
@@ -36,13 +36,15 @@ export default class EditRolesView extends DialogBaseView {
       width: '300px',
       id: 'edit_roles',
       title: I18n.t('Edit Course Role'),
+      modal: true,
+      zIndex: 1000,
     }
   }
 
   toJSON() {
     const json = {}
 
-    const role_ids = _.uniq(_.map(this.model.enrollments(), en => en.role_id))
+    const role_ids = uniq(map(this.model.enrollments(), en => en.role_id))
     if (role_ids.length > 1) {
       json.has_multiple_roles = true
     } else {
@@ -66,7 +68,7 @@ export default class EditRolesView extends DialogBaseView {
     const enrollments = this.model.enrollments()
 
     // section ids that already have the new role
-    const existing_section_ids = _.filter(enrollments, en => en.role_id === new_role_id).map(
+    const existing_section_ids = filter(enrollments, en => en.role_id === new_role_id).map(
       en => en.course_section_id
     )
 
@@ -76,7 +78,7 @@ export default class EditRolesView extends DialogBaseView {
     const deferreds = []
 
     // limit to sections if all enrollments are limited
-    const section_limited = _.every(enrollments, en => en.limit_privileges_to_course_section)
+    const section_limited = every(enrollments, en => en.limit_privileges_to_course_section)
 
     for (const en of Array.from(enrollments)) {
       if (en.role_id !== new_role_id) {
@@ -85,7 +87,7 @@ export default class EditRolesView extends DialogBaseView {
         deleted_enrollments.push(en)
         deferreds.push($.ajaxJSON(`${ENV.COURSE_ROOT_URL}/unenroll/${en.id}`, 'DELETE')) // delete the enrollment
 
-        if (!_.includes(existing_section_ids, en.course_section_id)) {
+        if (!includes(existing_section_ids, en.course_section_id)) {
           // create a new enrollment unless there's alrady one with the new role and the same course section
           existing_section_ids.push(en.course_section_id)
           const data = {
@@ -102,7 +104,7 @@ export default class EditRolesView extends DialogBaseView {
               'POST',
               data,
               new_enrollment => {
-                _.extend(new_enrollment, {can_be_removed: true})
+                lodashExtend(new_enrollment, {can_be_removed: true})
                 return new_enrollments.push(new_enrollment)
               }
             )

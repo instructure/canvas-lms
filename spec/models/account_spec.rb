@@ -25,18 +25,12 @@ describe Account do
     it { is_expected.to have_many(:feature_flags) }
     it { is_expected.to have_one(:outcome_proficiency).dependent(:destroy) }
     it { is_expected.to have_many(:lti_resource_links).class_name("Lti::ResourceLink") }
+    it { is_expected.to have_many(:lti_registrations).class_name("Lti::Registration").dependent(:destroy) }
+    it { is_expected.to have_many(:lti_registration_account_bindings).class_name("Lti::RegistrationAccountBinding").dependent(:destroy) }
   end
 
   describe "validations" do
     it { is_expected.to validate_inclusion_of(:account_calendar_subscription_type).in_array(Account::CALENDAR_SUBSCRIPTION_TYPES) }
-  end
-
-  context "BASIC_COLUMNS_FOR_CALLBACKS" do
-    it "can save a minimal object" do
-      a = Account.select(*Account::BASIC_COLUMNS_FOR_CALLBACKS).find(Account.default.id)
-      a.name = "Changed"
-      expect { a.save! }.not_to raise_error
-    end
   end
 
   context "domain_method" do
@@ -277,8 +271,8 @@ describe Account do
       a = Account.new
       a.equella_endpoint = "http://oer.equella.com/signon.do"
       expect(a.equella_settings).not_to be_nil
-      expect(a.equella_settings.endpoint).to eql("http://oer.equella.com/signon.do")
-      expect(a.equella_settings.default_action).not_to be_nil
+      expect(a.equella_settings[:endpoint]).to eql("http://oer.equella.com/signon.do")
+      expect(a.equella_settings[:default_action]).not_to be_nil
     end
   end
 
@@ -312,177 +306,6 @@ describe Account do
       expect(account.settings[:pronouns]).to eq ["Dude/Guy", "she_her"]
       # it "translates" "she/her" when it reads it
       expect(account.pronouns).to eq ["Dude/Guy", "She/Her"]
-    end
-  end
-
-  context "course lists" do
-    before :once do
-      @account = Account.create!
-      process_csv_data_cleanly([
-                                 "user_id,login_id,first_name,last_name,email,status",
-                                 "U001,user1,User,One,user1@example.com,active",
-                                 "U002,user2,User,Two,user2@example.com,active",
-                                 "U003,user3,User,Three,user3@example.com,active",
-                                 "U004,user4,User,Four,user4@example.com,active",
-                                 "U005,user5,User,Five,user5@example.com,active",
-                                 "U006,user6,User,Six,user6@example.com,active",
-                                 "U007,user7,User,Seven,user7@example.com,active",
-                                 "U008,user8,User,Eight,user8@example.com,active",
-                                 "U009,user9,User,Nine,user9@example.com,active",
-                                 "U010,user10,User,Ten,user10@example.com,active",
-                                 "U011,user11,User,Eleven,user11@example.com,deleted"
-                               ])
-      process_csv_data_cleanly([
-                                 "term_id,name,status,start_date,end_date",
-                                 "T001,Term 1,active,,",
-                                 "T002,Term 2,active,,",
-                                 "T003,Term 3,active,,"
-                               ])
-      process_csv_data_cleanly([
-                                 "course_id,short_name,long_name,account_id,term_id,status",
-                                 "C001,C001,Test Course 1,,T001,active",
-                                 "C002,C002,Test Course 2,,T001,deleted",
-                                 "C003,C003,Test Course 3,,T002,deleted",
-                                 "C004,C004,Test Course 4,,T002,deleted",
-                                 "C005,C005,Test Course 5,,T003,active",
-                                 "C006,C006,Test Course 6,,T003,active",
-                                 "C007,C007,Test Course 7,,T003,active",
-                                 "C008,C008,Test Course 8,,T003,active",
-                                 "C009,C009,Test Course 9,,T003,active",
-                                 "C001S,C001S,Test search Course 1,,T001,active",
-                                 "C002S,C002S,Test search Course 2,,T001,deleted",
-                                 "C003S,C003S,Test search Course 3,,T002,deleted",
-                                 "C004S,C004S,Test search Course 4,,T002,deleted",
-                                 "C005S,C005S,Test search Course 5,,T003,active",
-                                 "C006S,C006S,Test search Course 6,,T003,active",
-                                 "C007S,C007S,Test search Course 7,,T003,active",
-                                 "C008S,C008S,Test search Course 8,,T003,active",
-                                 "C009S,C009S,Test search Course 9,,T003,active"
-                               ])
-      process_csv_data_cleanly([
-                                 "section_id,course_id,name,start_date,end_date,status",
-                                 "S001,C001,Sec1,,,active",
-                                 "S002,C002,Sec2,,,active",
-                                 "S003,C003,Sec3,,,active",
-                                 "S004,C004,Sec4,,,active",
-                                 "S005,C005,Sec5,,,active",
-                                 "S006,C006,Sec6,,,active",
-                                 "S007,C007,Sec7,,,active",
-                                 "S008,C001,Sec8,,,active",
-                                 "S009,C008,Sec9,,,active",
-                                 "S001S,C001S,Sec1,,,active",
-                                 "S002S,C002S,Sec2,,,active",
-                                 "S003S,C003S,Sec3,,,active",
-                                 "S004S,C004S,Sec4,,,active",
-                                 "S005S,C005S,Sec5,,,active",
-                                 "S006S,C006S,Sec6,,,active",
-                                 "S007S,C007S,Sec7,,,active",
-                                 "S008S,C001S,Sec8,,,active",
-                                 "S009S,C008S,Sec9,,,active"
-                               ])
-
-      process_csv_data_cleanly([
-                                 "course_id,user_id,role,section_id,status,associated_user_id",
-                                 ",U001,student,S001,active,",
-                                 ",U005,student,S005,active,",
-                                 ",U006,student,S006,deleted,",
-                                 ",U007,student,S007,active,",
-                                 ",U008,student,S008,active,",
-                                 ",U009,student,S005,deleted,",
-                                 ",U001,student,S001S,active,",
-                                 ",U005,student,S005S,active,",
-                                 ",U006,student,S006S,deleted,",
-                                 ",U007,student,S007S,active,",
-                                 ",U008,student,S008S,active,",
-                                 ",U009,student,S005S,deleted,"
-                               ])
-    end
-
-    context "fast list" do
-      it "lists associated courses" do
-        expect(@account.fast_all_courses.map(&:sis_source_id).sort).to eq %w[
-          C001
-          C005
-          C006
-          C007
-          C008
-          C009
-
-          C001S
-          C005S
-          C006S
-          C007S
-          C008S
-          C009S
-        ].sort
-      end
-
-      it "lists associated courses by term" do
-        expect(@account.fast_all_courses({ term: EnrollmentTerm.where(sis_source_id: "T001").first }).map(&:sis_source_id).sort).to eq ["C001", "C001S"]
-        expect(@account.fast_all_courses({ term: EnrollmentTerm.where(sis_source_id: "T002").first }).map(&:sis_source_id).sort).to eq []
-        expect(@account.fast_all_courses({ term: EnrollmentTerm.where(sis_source_id: "T003").first }).map(&:sis_source_id).sort).to eq %w[C005 C006 C007 C008 C009 C005S C006S C007S C008S C009S].sort
-      end
-
-      it "counting cross-listed courses only if requested" do
-        def check_account(account, include_crosslisted_courses, expected_length, expected_course_names)
-          actual_courses = account.fast_all_courses({ include_crosslisted_courses: })
-          expect(actual_courses.length).to eq expected_length
-          actual_course_names = actual_courses.pluck("name").sort!
-          expect(actual_course_names).to eq(expected_course_names.sort!)
-        end
-
-        root_account = Account.create!
-        account_a = Account.create!({ root_account: })
-        account_b = Account.create!({ root_account: })
-        course_a = course_factory({ account: account_a, course_name: "course_a" })
-        course_b = course_factory({ account: account_b, course_name: "course_b" })
-        course_b.course_sections.create!({ name: "section_b" })
-        course_b.course_sections.first.crosslist_to_course(course_a)
-        check_account(account_a, false, 1, ["course_a"])
-        check_account(account_a, true, 1, ["course_a"])
-        check_account(account_b, false, 1, ["course_b"])
-        check_account(account_b, true, 2, ["course_a", "course_b"])
-      end
-
-      it "lists associated nonenrollmentless courses" do
-        expect(@account.fast_all_courses({ hide_enrollmentless_courses: true }).map(&:sis_source_id).sort).to eq %w[C001 C005 C007 C001S C005S C007S].sort # C007 probably shouldn't be here, cause the enrollment section is deleted, but we kinda want to minimize database traffic
-      end
-
-      it "lists associated nonenrollmentless courses by term" do
-        expect(@account.fast_all_courses({ term: EnrollmentTerm.where(sis_source_id: "T001").first, hide_enrollmentless_courses: true }).map(&:sis_source_id).sort).to eq ["C001", "C001S"]
-        expect(@account.fast_all_courses({ term: EnrollmentTerm.where(sis_source_id: "T002").first, hide_enrollmentless_courses: true }).map(&:sis_source_id).sort).to eq []
-        expect(@account.fast_all_courses({ term: EnrollmentTerm.where(sis_source_id: "T003").first, hide_enrollmentless_courses: true }).map(&:sis_source_id).sort).to eq %w[C005 C007 C005S C007S].sort
-      end
-
-      it "orders list by specified parameter" do
-        order = "courses.created_at ASC"
-        expect(@account).to receive(:fast_course_base).with({ order: })
-        @account.fast_all_courses(order:)
-      end
-    end
-
-    context "name searching" do
-      it "lists associated courses" do
-        expect(@account.courses_name_like("search").map(&:sis_source_id).sort).to eq %w[
-          C001S C005S C006S C007S C008S C009S
-        ]
-      end
-
-      it "lists associated courses by term" do
-        expect(@account.courses_name_like("search", { term: EnrollmentTerm.where(sis_source_id: "T001").first }).map(&:sis_source_id).sort).to eq ["C001S"]
-        expect(@account.courses_name_like("search", { term: EnrollmentTerm.where(sis_source_id: "T002").first }).map(&:sis_source_id).sort).to eq []
-        expect(@account.courses_name_like("search", { term: EnrollmentTerm.where(sis_source_id: "T003").first }).map(&:sis_source_id).sort).to eq %w[C005S C006S C007S C008S C009S]
-      end
-
-      it "lists associated nonenrollmentless courses" do
-        expect(@account.courses_name_like("search", { hide_enrollmentless_courses: true }).map(&:sis_source_id).sort).to eq %w[C001S C005S C007S] # C007 probably shouldn't be here, cause the enrollment section is deleted, but we kinda want to minimize database traffic
-      end
-
-      it "lists associated nonenrollmentless courses by term" do
-        expect(@account.courses_name_like("search", { term: EnrollmentTerm.where(sis_source_id: "T001").first, hide_enrollmentless_courses: true }).map(&:sis_source_id).sort).to eq ["C001S"]
-        expect(@account.courses_name_like("search", { term: EnrollmentTerm.where(sis_source_id: "T002").first, hide_enrollmentless_courses: true }).map(&:sis_source_id).sort).to eq []
-        expect(@account.courses_name_like("search", { term: EnrollmentTerm.where(sis_source_id: "T003").first, hide_enrollmentless_courses: true }).map(&:sis_source_id).sort).to eq ["C005S", "C007S"]
-      end
     end
   end
 
@@ -574,9 +397,9 @@ describe Account do
                                            default: false,
                                            expose_to_ui_proc: proc { |user, account| user == user2 && account == Account.default },
                                          })
-        expect(Account.services_exposed_to_ui_hash(:setting).keys).not_to be_include(:myservice)
-        expect(Account.services_exposed_to_ui_hash(:setting, user1, Account.default).keys).not_to be_include(:myservice)
-        expect(Account.services_exposed_to_ui_hash(:setting, user2, Account.default).keys).to be_include(:myservice)
+        expect(Account.services_exposed_to_ui_hash(:setting).keys).not_to include(:myservice)
+        expect(Account.services_exposed_to_ui_hash(:setting, user1, Account.default).keys).not_to include(:myservice)
+        expect(Account.services_exposed_to_ui_hash(:setting, user2, Account.default).keys).to include(:myservice)
       end
     end
 
@@ -586,7 +409,7 @@ describe Account do
       end
 
       it "returns the service" do
-        expect(AccountServices.allowable_services.keys).to be_include(:myplugin)
+        expect(AccountServices.allowable_services.keys).to include(:myplugin)
       end
 
       it "allows setting the service" do
@@ -603,8 +426,8 @@ describe Account do
 
       describe "services_exposed_to_ui_hash" do
         it "returns services defined in a plugin" do
-          expect(Account.services_exposed_to_ui_hash.keys).to be_include(:myplugin)
-          expect(Account.services_exposed_to_ui_hash(:setting).keys).to be_include(:myplugin)
+          expect(Account.services_exposed_to_ui_hash.keys).to include(:myplugin)
+          expect(Account.services_exposed_to_ui_hash(:setting).keys).to include(:myplugin)
         end
       end
     end
@@ -789,7 +612,6 @@ describe Account do
       common_siteadmin_privileges += [:read_global_outcomes] if k == :site_admin
 
       admin_privileges = full_access + common_siteadmin_privileges
-      admin_privileges += [:manage_privacy_settings] if k == :root
 
       user_privileges = limited_access + common_siteadmin_privileges
       expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array admin_privileges
@@ -842,7 +664,6 @@ describe Account do
       account = v[:account]
       admin_privileges = full_access.clone
       admin_privileges += [:read_global_outcomes] if k == :site_admin
-      admin_privileges += [:manage_privacy_settings] if k == :root
       user_array = some_access + [:reset_any_mfa] +
                    ((k == :site_admin) ? [:read_global_outcomes] : [])
       expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array admin_privileges
@@ -1097,15 +918,15 @@ describe Account do
       group.add_user(@user1)
       users = @account.users_not_in_groups([group])
       expect(users.size).to eq 2
-      expect(users).not_to be_include(@user1)
+      expect(users).not_to include(@user1)
     end
 
     it "includes users otherwise" do
       group = @account.groups.create
       group.add_user(@user1)
       users = @account.users_not_in_groups([group])
-      expect(users).to be_include(@user2)
-      expect(users).to be_include(@user3)
+      expect(users).to include(@user2)
+      expect(users).to include(@user3)
     end
 
     it "allows ordering by user's sortable name" do
@@ -1128,28 +949,28 @@ describe Account do
     it "includes 'Developer Keys' for the authorized users of the site_admin account" do
       account_admin_user(account: Account.site_admin)
       tabs = Account.site_admin.tabs_available(@admin)
-      expect(tabs.pluck(:id)).to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).to include(Account::TAB_DEVELOPER_KEYS)
 
       tabs = Account.site_admin.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).not_to include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "includes 'Developer Keys' for the admin users of an account" do
       account = Account.create!
       account_admin_user(account:)
       tabs = account.tabs_available(@admin)
-      expect(tabs.pluck(:id)).to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).to include(Account::TAB_DEVELOPER_KEYS)
 
       tabs = account.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).not_to include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "does not include 'Developer Keys' for non-site_admin accounts" do
       tabs = @account.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).not_to include(Account::TAB_DEVELOPER_KEYS)
 
       tabs = @account.root_account.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).not_to include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "does not include external tools if not configured for account navigation" do
@@ -1158,7 +979,7 @@ describe Account do
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to be false
       tabs = @account.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).not_to include(tool.asset_string)
     end
 
     it "includes active external tools if configured on the account" do
@@ -1182,8 +1003,8 @@ describe Account do
 
       tabs = @account.tabs_available
       tab_ids = tabs.pluck(:id)
-      expect(tab_ids).to be_include(tool1.asset_string)
-      expect(tab_ids).not_to be_include(tool2.asset_string)
+      expect(tab_ids).to include(tool1.asset_string)
+      expect(tab_ids).not_to include(tool2.asset_string)
       tab = tabs.detect { |t| t[:id] == tool1.asset_string }
       expect(tab[:label]).to eq tool1.settings[:account_navigation][:text]
       expect(tab[:href]).to eq :account_external_tool_path
@@ -1196,7 +1017,7 @@ describe Account do
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to be true
       tabs = @account.tabs_available(nil)
-      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to include(tool.asset_string)
       tab = tabs.detect { |t| t[:id] == tool.asset_string }
       expect(tab[:label]).to eq tool.settings[:account_navigation][:text]
       expect(tab[:href]).to eq :account_external_tool_path
@@ -1220,11 +1041,11 @@ describe Account do
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to be true
       tabs = @account.tabs_available(@teacher)
-      expect(tabs.pluck(:id)).to_not be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to_not include(tool.asset_string)
 
       admin = account_admin_user(account: @account)
       tabs = @account.tabs_available(admin)
-      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to include(tool.asset_string)
     end
 
     it "uses localized labels" do
@@ -1268,7 +1089,7 @@ describe Account do
     it "uses :manage_assignments to determine question bank tab visibility" do
       account_admin_user_with_role_changes(account: @account, role_changes: { manage_assignments: true, manage_grades: false })
       tabs = @account.tabs_available(@admin)
-      expect(tabs.pluck(:id)).to be_include(Account::TAB_QUESTION_BANKS)
+      expect(tabs.pluck(:id)).to include(Account::TAB_QUESTION_BANKS)
     end
 
     describe "account calendars tab" do
@@ -1923,7 +1744,7 @@ describe Account do
         sub2.update(default_storage_quota: 10.megabytes)
 
         to_be_subaccount = sub1.sub_accounts.create!
-        expect(to_be_subaccount.default_storage_quota).to eq Account.default_storage_quota
+        expect(to_be_subaccount.default_storage_quota).to eq Account::DEFAULT_STORAGE_QUOTA
 
         # should clear caches
         Timecop.travel(1.second.from_now) do
@@ -2324,6 +2145,13 @@ describe Account do
             expect_id_chain_for_account(account1, [account1.global_id, Account.default.global_id])
           end
         end
+
+        it "returns correct global ids when used twice on different shards (doesn't cache across shards)" do
+          expect(account1.account_chain_ids).to eq([account1.id, Account.default.id])
+          @shard1.activate do
+            expect(account1.account_chain_ids).to eq([account1.id, Account.default.id])
+          end
+        end
       end
     end
   end
@@ -2518,6 +2346,23 @@ describe Account do
     end
   end
 
+  describe "allow_observers_in_appointment_groups?" do
+    before :once do
+      @account = Account.default
+      @account.settings[:allow_observers_in_appointment_groups] = { value: true }
+      @account.save!
+    end
+
+    it "returns true if the setting is enabled and the observer_appointment_groups flag is enabled" do
+      expect(@account.allow_observers_in_appointment_groups?).to be true
+    end
+
+    it "returns false if the observer_appointment_groups flag is disabled" do
+      Account.site_admin.disable_feature!(:observer_appointment_groups)
+      expect(@account.allow_observers_in_appointment_groups?).to be false
+    end
+  end
+
   describe "enable_as_k5_account setting" do
     it "enable_as_k5_account? helper returns false by default" do
       account = Account.create!
@@ -2550,13 +2395,9 @@ describe Account do
     end
 
     let_once(:level_two_sub_accounts) do
-      level_two_sub_accounts = []
-
-      root_account.sub_accounts.each do |sa|
-        level_two_sub_accounts << sa.sub_accounts.create!(name: "Level 2 - Sub account")
+      root_account.sub_accounts.map do |sa|
+        sa.sub_accounts.create!(name: "Level 2 - Sub account")
       end
-
-      level_two_sub_accounts
     end
 
     context "with empty parent account ids" do

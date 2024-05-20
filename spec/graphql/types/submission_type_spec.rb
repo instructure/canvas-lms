@@ -27,8 +27,8 @@ describe Types::SubmissionType do
     @submission = @assignment.grade_student(@student, score: 8, grader: @teacher, student_entered_score: 13).first
   end
 
-  let(:submission_type) { GraphQLTypeTester.new(@submission, current_user: @teacher) }
-  let(:submission_type_for_student) { GraphQLTypeTester.new(@submission, current_user: @student) }
+  let(:submission_type) { GraphQLTypeTester.new(@submission, current_user: @teacher, request: ActionDispatch::TestRequest.create) }
+  let(:submission_type_for_student) { GraphQLTypeTester.new(@submission, current_user: @student, request: ActionDispatch::TestRequest.create) }
 
   it "works" do
     expect(submission_type.resolve("user { _id }")).to eq @student.id.to_s
@@ -38,7 +38,9 @@ describe Types::SubmissionType do
     expect(submission_type.resolve("assignmentId")).to eq @assignment.id.to_s
     expect(submission_type.resolve("redoRequest")).to eq @submission.redo_request?
     expect(submission_type.resolve("cachedDueDate")).to eq @submission.cached_due_date
+    expect(submission_type.resolve("secondsLate")).to eq @submission.seconds_late
     expect(submission_type.resolve("studentEnteredScore")).to eq @submission.student_entered_score
+    expect(submission_type.resolve("submissionCommentDownloadUrl")).to eq "/submissions/#{@submission.id}/comments.pdf"
   end
 
   it "requires read permission" do
@@ -733,6 +735,57 @@ describe Types::SubmissionType do
     it "works" do
       result = submission_type.resolve("assignedAssessments { workflowState }")
       expect(result.count).to eq 1
+    end
+  end
+
+  describe "groupId" do
+    before(:once) do
+      @first_student = @student
+      @second_student = student_in_course(course: @course, active_all: true).user
+      group_category = @course.group_categories.create!(name: "My Category")
+      @course.groups.create!(name: "Group A", group_category:)
+      @group_b = @course.groups.create!(name: "Group B", group_category:)
+      @group_b.add_user(@first_student)
+      @group_b.save!
+      @assignment.update!(group_category:)
+    end
+
+    it "returns the group id associated with the submission" do
+      @assignment.submit_homework(@first_student, body: "help my legs are stuck under my desk!")
+      aggregate_failures do
+        expect(@assignment.submissions.find_by(user: @first_student).group_id).to eq @group_b.id
+        expect(submission_type.resolve("groupId")).to eq @group_b.id.to_s
+      end
+    end
+
+    it "works even when the submission's group_id is set to nil (which is the case before the group has submitted)" do
+      aggregate_failures do
+        expect(@assignment.submissions.find_by(user: @first_student).group_id).to be_nil
+        expect(submission_type.resolve("groupId")).to eq @group_b.id.to_s
+      end
+    end
+
+    it "returns nil for students not in groups" do
+      expect(submission_type.resolve("groupId", current_user: @second_student)).to be_nil
+    end
+
+    it "returns nil for non-group assignments" do
+      @assignment.update!(group_category: nil)
+      expect(submission_type.resolve("groupId")).to be_nil
+    end
+  end
+
+  describe "previewUrl" do
+    it "returns the preview URL" do
+      expected_url = "http://test.host/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?preview=1&version=1"
+      expect(submission_type.resolve("previewUrl")).to eq expected_url
+    end
+  end
+
+  describe "wordCount" do
+    it "returns the word count" do
+      @submission.update!(body: "word " * 100)
+      expect(submission_type.resolve("wordCount")).to eq 100
     end
   end
 end

@@ -1,3 +1,4 @@
+/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -17,6 +18,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import GroupCategory from '@canvas/groups/backbone/models/GroupCategory'
 import GroupCategoryEditView from '@canvas/groups/backbone/views/GroupCategoryEditView'
 import fakeENV from 'helpers/fakeENV'

@@ -20,7 +20,7 @@ import React from 'react'
 
 import ReactDOM from 'react-dom'
 import {findRenderedDOMComponentWithClass} from 'react-dom/test-utils'
-import _ from 'lodash'
+import {defaults, map} from 'lodash'
 import Input from 'ui/features/account_grading_standards/react/EnrollmentTermInput'
 
 const wrapper = document.getElementById('fixtures')
@@ -67,7 +67,7 @@ QUnit.module('EnrollmentTermInput', {
       setSelectedEnrollmentTermIDs() {},
     }
 
-    const element = React.createElement(Input, _.defaults(props, defaultProps))
+    const element = React.createElement(Input, defaults(props, defaultProps))
     return ReactDOM.render(element, wrapper)
   },
 
@@ -85,13 +85,13 @@ test("displays 'No unassigned terms' if there are no selectable terms", function
 
 test('selectedEnrollmentTerms uses the enrollment term display name', function () {
   const enrollmentTermInput = this.renderComponent()
-  const termNames = _.map(enrollmentTermInput.selectedEnrollmentTerms(), 'name')
+  const termNames = map(enrollmentTermInput.selectedEnrollmentTerms(), 'name')
   propEqual(termNames, ['Term created Oct 27, 2015'])
 })
 
 test('selectableOptions uses the enrollment term display name', function () {
   const enrollmentTermInput = this.renderComponent()
   const options = enrollmentTermInput.selectableOptions('active')
-  const termNames = _.map(options, option => option.props.children)
+  const termNames = map(options, option => option.props.children)
   propEqual(termNames, ['Term starting Jun 6, 2016'])
 })

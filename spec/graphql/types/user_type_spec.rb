@@ -302,6 +302,18 @@ describe Types::UserType do
       ).to eq []
     end
 
+    it "excludes deactivated enrollments when currentOnly is true" do
+      @student.enrollments.each(&:deactivate)
+      results = user_type.resolve("enrollments(currentOnly: true) { _id }")
+      expect(results).to be_empty
+    end
+
+    it "includes deactivated enrollments when currentOnly is false" do
+      @student.enrollments.each(&:deactivate)
+      results = user_type.resolve("enrollments(currentOnly: false) { _id }")
+      expect(results).not_to be_empty
+    end
+
     it "excludes concluded enrollments when excludeConcluded is true" do
       expect(user_type.resolve("enrollments(excludeConcluded: true) { _id }").length).to eq 1
       @student.enrollments.update_all workflow_state: "completed"
@@ -1197,6 +1209,23 @@ describe Types::UserType do
         student_submission_2.update_attribute(:last_comment_at, nil)
         @student_submission_1.update_attribute(:last_comment_at, nil)
 
+        query_result = teacher_type.resolve("viewableSubmissionsConnection { nodes { _id }  }")
+
+        expect(query_result.count).to eq 2
+        expect(query_result[0].to_i).to eq student_submission_2.id
+      end
+
+      it "gets submissions with comments in order of last submission comment over last_comment_at" do
+        student_submission_2 = @assignment2.submissions.find_by(user: @student)
+
+        @student_submission_1.submission_comments.last.update_attribute(:created_at, Time.new(2024, 2, 9, 4, 21, 0).utc)
+        @student_submission_1.update_attribute(:last_comment_at, nil)
+
+        student_submission_2.add_comment(author: @student, comment: "Fourth comment", created_at: Time.new(2024, 2, 8, 13, 17, 0).utc)
+        student_submission_2.add_comment(author: @teacher, comment: "Fifth comment", created_at: Time.new(2024, 2, 10, 5, 11, 0).utc)
+        student_submission_2.update_attribute(:last_comment_at, Time.new(2024, 2, 8, 13, 17, 0).utc)
+
+        # Notice: submission 2 is older, but submission 2 has newest submission_comment.
         query_result = teacher_type.resolve("viewableSubmissionsConnection { nodes { _id }  }")
 
         expect(query_result.count).to eq 2

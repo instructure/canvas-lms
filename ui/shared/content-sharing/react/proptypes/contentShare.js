@@ -37,7 +37,7 @@ const contentShareShape = shape({
   created_at: string.isRequired,
   updated_at: string.isRequired,
   read_state: string.isRequired,
-  sender: displayUser.isRequired,
+  sender: displayUser,
   content_export: contentExport,
 })
 

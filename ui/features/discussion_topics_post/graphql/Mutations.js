@@ -18,7 +18,6 @@
 
 import {AnonymousUser} from './AnonymousUser'
 import {DiscussionEntry} from './DiscussionEntry'
-import {DiscussionEntryDraft} from './DiscussionEntryDraft'
 import {Discussion} from './Discussion'
 import {Error} from '../../../shared/graphql/Error'
 import gql from 'graphql-tag'
@@ -55,16 +54,13 @@ export const UPDATE_DISCUSSION_ENTRY_PARTICIPANT = gql`
     ) {
       discussionEntry {
         ...DiscussionEntry
-        editor {
-          ...User
-        }
-        author {
-          ...User
+        anonymousAuthor {
+          ...AnonymousUser
         }
       }
     }
   }
-  ${User.fragment}
+  ${AnonymousUser.fragment}
   ${DiscussionEntry.fragment}
 `
 export const DELETE_DISCUSSION_ENTRY = gql`
@@ -72,11 +68,8 @@ export const DELETE_DISCUSSION_ENTRY = gql`
     deleteDiscussionEntry(input: {id: $id}) {
       discussionEntry {
         ...DiscussionEntry
-        editor {
-          ...User
-        }
-        author {
-          ...User
+        anonymousAuthor {
+          ...AnonymousUser
         }
       }
       errors {
@@ -84,9 +77,9 @@ export const DELETE_DISCUSSION_ENTRY = gql`
       }
     }
   }
-  ${User.fragment}
   ${DiscussionEntry.fragment}
   ${Error.fragment}
+  ${AnonymousUser.fragment}
 `
 export const UPDATE_DISCUSSION_TOPIC = gql`
   mutation updateDiscussionTopic($discussionTopicId: ID!, $published: Boolean, $locked: Boolean) {
@@ -95,16 +88,9 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
     ) {
       discussionTopic {
         ...Discussion
-        editor {
-          ...User
-        }
-        author {
-          ...User
-        }
       }
     }
   }
-  ${User.fragment}
   ${Discussion.fragment}
 `
 export const SUBSCRIBE_TO_DISCUSSION_TOPIC = gql`
@@ -114,16 +100,9 @@ export const SUBSCRIBE_TO_DISCUSSION_TOPIC = gql`
     ) {
       discussionTopic {
         ...Discussion
-        editor {
-          ...User
-        }
-        author {
-          ...User
-        }
       }
     }
   }
-  ${User.fragment}
   ${Discussion.fragment}
 `
 
@@ -134,7 +113,6 @@ export const CREATE_DISCUSSION_ENTRY = gql`
     $parentEntryId: ID
     $fileId: ID
     $isAnonymousAuthor: Boolean
-    $courseID: String
     $quotedEntryId: ID
   ) {
     createDiscussionEntry(
@@ -149,12 +127,6 @@ export const CREATE_DISCUSSION_ENTRY = gql`
     ) {
       discussionEntry {
         ...DiscussionEntry
-        editor(courseId: $courseID) {
-          ...User
-        }
-        author(courseId: $courseID) {
-          ...User
-        }
         anonymousAuthor {
           ...AnonymousUser
         }
@@ -165,7 +137,6 @@ export const CREATE_DISCUSSION_ENTRY = gql`
     }
   }
   ${AnonymousUser.fragment}
-  ${User.fragment}
   ${DiscussionEntry.fragment}
   ${Error.fragment}
 `
@@ -187,11 +158,8 @@ export const UPDATE_DISCUSSION_ENTRY = gql`
     ) {
       discussionEntry {
         ...DiscussionEntry
-        editor {
-          ...User
-        }
-        author {
-          ...User
+        anonymousAuthor {
+          ...AnonymousUser
         }
       }
       errors {
@@ -199,9 +167,9 @@ export const UPDATE_DISCUSSION_ENTRY = gql`
       }
     }
   }
-  ${User.fragment}
   ${DiscussionEntry.fragment}
   ${Error.fragment}
+  ${AnonymousUser.fragment}
 `
 
 export const UPDATE_DISCUSSION_ENTRIES_READ_STATE = gql`
@@ -211,16 +179,9 @@ export const UPDATE_DISCUSSION_ENTRIES_READ_STATE = gql`
     ) {
       discussionEntries {
         ...DiscussionEntry
-        editor {
-          ...User
-        }
-        author {
-          ...User
-        }
       }
     }
   }
-  ${User.fragment}
   ${DiscussionEntry.fragment}
 `
 
@@ -229,10 +190,14 @@ export const UPDATE_DISCUSSION_THREAD_READ_STATE = gql`
     updateDiscussionThreadReadState(input: {discussionEntryId: $discussionEntryId, read: $read}) {
       discussionEntry {
         ...DiscussionEntry
+        anonymousAuthor {
+          ...AnonymousUser
+        }
       }
     }
   }
   ${DiscussionEntry.fragment}
+  ${AnonymousUser.fragment}
 `
 
 export const UPDATE_DISCUSSION_READ_STATE = gql`
@@ -246,10 +211,10 @@ export const UPDATE_DISCUSSION_READ_STATE = gql`
   ${Discussion.fragment}
 `
 
-export const UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT = gql`
-  mutation UpdateIsolatedViewDeeplyNestedAlert($isolatedViewDeeplyNestedAlert: Boolean!) {
-    updateIsolatedViewDeeplyNestedAlert(
-      input: {isolatedViewDeeplyNestedAlert: $isolatedViewDeeplyNestedAlert}
+export const UPDATE_SPLIT_SCREEN_VIEW_DEEPLY_NESTED_ALERT = gql`
+  mutation UpdateSplitScreenViewDeeplyNestedAlert($splitScreenViewDeeplyNestedAlert: Boolean!) {
+    UpdateSplitScreenViewDeeplyNestedAlert(
+      input: {splitScreenViewDeeplyNestedAlert: $splitScreenViewDeeplyNestedAlert}
     ) {
       user {
         ...User
@@ -257,29 +222,6 @@ export const UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT = gql`
     }
   }
   ${User.fragment}
-`
-
-export const CREATE_DISCUSSION_ENTRY_DRAFT = gql`
-  mutation CreateDiscussionEntryDraft(
-    $discussionTopicId: ID!
-    $message: String!
-    $discussionEntryId: ID
-    $parentId: ID
-  ) {
-    createDiscussionEntryDraft(
-      input: {
-        discussionTopicId: $discussionTopicId
-        discussionEntryId: $discussionEntryId
-        message: $message
-        parentId: $parentId
-      }
-    ) {
-      discussionEntryDraft {
-        ...DiscussionEntryDraft
-      }
-    }
-  }
-  ${DiscussionEntryDraft.fragment}
 `
 
 export const UPDATE_USER_GRADE = gql`

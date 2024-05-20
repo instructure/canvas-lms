@@ -97,7 +97,10 @@ describe('SpeedGraderStatusMenu', () => {
   })
 
   it('renders custom statuses when they are present', () => {
-    props.customStatuses = [{id: '1', name: 'Custom Status 1'}, {id: '2', name: 'Custom Status 2'}]
+    props.customStatuses = [
+      {id: '1', name: 'Custom Status 1'},
+      {id: '2', name: 'Custom Status 2'},
+    ]
     const {getByRole, getByText} = renderComponent()
     const trigger = getByRole('button', {name: /Edit status/i})
     fireEvent.click(trigger)
@@ -106,7 +109,10 @@ describe('SpeedGraderStatusMenu', () => {
   })
 
   it('invokes updateSubmission prop callback with the custom status id when a custom status is selected', () => {
-    props.customStatuses = [{id: '14', name: 'Custom Status 1'}, {id: '23', name: 'Custom Status 2'}]
+    props.customStatuses = [
+      {id: '14', name: 'Custom Status 1'},
+      {id: '23', name: 'Custom Status 2'},
+    ]
     selectMenuItem('Custom Status 1')
     expect(props.updateSubmission).toHaveBeenLastCalledWith({customGradeStatusId: '14'})
   })

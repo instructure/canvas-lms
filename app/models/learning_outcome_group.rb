@@ -24,7 +24,6 @@ class LearningOutcomeGroup < ActiveRecord::Base
   extend RootAccountResolver
 
   restrict_columns :state, [:workflow_state]
-  self.ignored_columns += %i[migration_id_2 vendor_guid_2]
 
   belongs_to :learning_outcome_group
   belongs_to :source_outcome_group, class_name: "LearningOutcomeGroup", inverse_of: :destination_outcome_groups
@@ -50,6 +49,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
   workflow do
     state :active
+    state :archived
     state :deleted
   end
 
@@ -81,6 +81,8 @@ class LearningOutcomeGroup < ActiveRecord::Base
       migration_id:
     )
   end
+
+  OutcomeLink = Struct.new(:id, :content_id, :associated_asset_id, :context_id, :context_type, :workflow_state)
 
   def self.bulk_link_outcome(outcome, groups, root_account_id:)
     groups = groups.preload(:learning_outcome_group, :context)
@@ -114,10 +116,8 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
     tags = ContentTag.insert_all(new_tags, returning: %w[id content_id associated_asset_id context_id context_type workflow_state])
 
-    Struct.new("OutcomeLink", :id, :content_id, :associated_asset_id, :context_id, :context_type, :workflow_state)
-
     tags.rows.each do |tag|
-      link = Struct::OutcomeLink.new(tag[0], tag[1], tag[2], tag[3], tag[4], tag[5])
+      link = OutcomeLink.new(tag[0], tag[1], tag[2], tag[3], tag[4], tag[5])
       Canvas::LiveEvents.learning_outcome_link_created(link)
     rescue => e
       Canvas::Errors.capture_exception(:learning_outcome_link_creation, e, :error)
@@ -256,8 +256,31 @@ class LearningOutcomeGroup < ActiveRecord::Base
     end
   end
 
-  scope :active, -> { where("learning_outcome_groups.workflow_state<>'deleted'") }
+  def archive!
+    # Only active groups can be archived
+    if workflow_state == "active"
+      self.workflow_state = "archived"
+      self.archived_at = Time.now.utc
+      save!
+    elsif workflow_state == "deleted"
+      raise ActiveRecord::RecordNotSaved, "Cannot archive a deleted LearningOutcomeGroup"
+    end
+  end
+
+  def unarchive!
+    # Only archived groups can be unarchived
+    if workflow_state == "archived"
+      self.workflow_state = "active"
+      self.archived_at = nil
+      save!
+    elsif workflow_state == "deleted"
+      raise ActiveRecord::RecordNotSaved, "Cannot unarchive a deleted LearningOutcomeGroup"
+    end
+  end
+
+  scope :active, -> { where("learning_outcome_groups.workflow_state NOT IN ('deleted', 'archived')") }
   scope :active_first, -> { order(Arel.sql("CASE WHEN workflow_state = 'active' THEN 0 ELSE 1 END")) }
+  scope :archived, -> { where("learning_outcome_groups.workflow_state = 'archived' AND learning_outcome_groups.archived_at IS NOT NULL") }
 
   scope :global, -> { where(context_id: nil) }
 

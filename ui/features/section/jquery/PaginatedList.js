@@ -34,8 +34,8 @@
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Spinner from 'spin.js'
-import htmlEscape from 'html-escape'
-import parseLinkHeader from 'parse-link-header'
+import htmlEscape from '@instructure/html-escape'
+import parseLinkHeader from '@canvas/parse-link-header'
 
 const I18n = useI18nScope('paginated_list')
 
@@ -108,7 +108,7 @@ export default class PaginatedList {
   // attach events to DOM objects
   // @api private
   addEvents() {
-    this.el.wrapper.delegate('.view-more-link', 'click', this.getData.bind(this))
+    this.el.wrapper.on('click', '.view-more-link', this.getData.bind(this))
   }
 
   // #
@@ -166,7 +166,7 @@ export default class PaginatedList {
   animateInResults($results) {
     $results.css('display', 'none')
     this.el.list.append($results)
-    return $results.slideDown()
+    return $results.filter('*').slideDown()
   }
 
   // #

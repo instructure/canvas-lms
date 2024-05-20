@@ -19,7 +19,7 @@
 import {useScope} from '@canvas/i18n'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import React, {useCallback, useRef, useEffect, useState} from 'react'
-import moment, {Moment} from 'moment-timezone'
+import moment, {type Moment} from 'moment-timezone'
 import {
   generateFrequencyOptions,
   generateFrequencyRRULE,
@@ -27,7 +27,7 @@ import {
 } from './utils'
 import CustomRecurrenceModal from '../CustomRecurrenceModal/CustomRecurrenceModal'
 import {getSelectTextWidth} from '../utils'
-import {FrequencyOptionValue} from '../types'
+import type {FrequencyOptionValue} from '../types'
 
 const {Option} = SimpleSelect as any
 const I18n = useScope('calendar_frequency_picker')

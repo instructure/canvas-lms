@@ -26,11 +26,11 @@ describe "Gradebook" do
 
   before(:once) do
     gradebook_data_setup
-    @page_size = 5
-    Setting.set "api_max_per_page", @page_size
   end
 
   before do
+    @page_size = 5
+    stub_const("Api::MAX_PER_PAGE", @page_size)
     user_session(@teacher)
   end
 

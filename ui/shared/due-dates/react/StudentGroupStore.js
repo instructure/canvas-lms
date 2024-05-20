@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
-import createStore from '@canvas/util/createStore'
+import {filter, keyBy} from 'lodash'
+import createStore from '@canvas/backbone/createStore'
 import $ from 'jquery'
 import splitAssetString from '@canvas/util/splitAssetString'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
@@ -79,8 +79,8 @@ StudentGroupStore.getSelectedGroupSetId = function () {
 }
 
 StudentGroupStore.addGroups = function (newlyFetchedGroups) {
-  const newGroupsHash = _.keyBy(newlyFetchedGroups, 'id')
-  const newGroupsState = _.extend(newGroupsHash, this.getState().groups)
+  const newGroupsHash = keyBy(newlyFetchedGroups, 'id')
+  const newGroupsState = {...newGroupsHash, ...this.getState().groups}
   this.setState({
     groups: newGroupsState,
   })
@@ -120,7 +120,7 @@ StudentGroupStore.reset = function () {
 StudentGroupStore.groupsFilteredForSelectedSet = function () {
   const groups = this.getState().groups
   const setId = this.getState().selectedGroupSetId
-  return _.filter(groups, value => value.group_category_id === setId)
+  return filter(groups, value => value.group_category_id === setId)
 }
 
 // -------------------

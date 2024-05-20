@@ -39,7 +39,7 @@ class Quizzes::QuizQuestion::MatchingQuestion < Quizzes::QuizQuestion::Base
         end
       end
 
-      user_answer.answer_details["answer_#{answer[:id]}".to_sym] = answer_match
+      user_answer.answer_details[:"answer_#{answer[:id]}"] = answer_match
     end
 
     return nil if total_answers == 0
@@ -62,7 +62,7 @@ class Quizzes::QuizQuestion::MatchingQuestion < Quizzes::QuizQuestion::Base
         end
         match = {
           responses: 0,
-          text: (right[:right] || right[:text]),
+          text: right[:right] || right[:text],
           user_ids: [],
           id: match_answer ? match_answer[:id] : right[:match_id]
         }

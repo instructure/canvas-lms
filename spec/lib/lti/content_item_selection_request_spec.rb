@@ -73,7 +73,6 @@ describe Lti::ContentItemSelectionRequest do
 
       before do
         allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
-        Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
         tool.settings[:environments] = {
           domain:

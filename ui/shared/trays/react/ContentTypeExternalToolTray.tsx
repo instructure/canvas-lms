@@ -19,6 +19,7 @@ import React, {useEffect} from 'react'
 import CanvasTray from './Tray'
 import $ from 'jquery'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
+import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 
 type Tool = {
   id: string
@@ -54,6 +55,7 @@ type Props = {
   onDismiss: any
   onExternalContentReady: any
   open: boolean
+  extraQueryParams?: {}
 }
 
 export default function ContentTypeExternalToolTray({
@@ -66,6 +68,7 @@ export default function ContentTypeExternalToolTray({
   onDismiss,
   onExternalContentReady,
   open,
+  extraQueryParams = {},
 }: Props) {
   const queryParams = {
     com_instructure_course_accept_canvas_resource_types: acceptedResourceTypes,
@@ -74,23 +77,17 @@ export default function ContentTypeExternalToolTray({
     com_instructure_course_available_canvas_resources: selectableItems,
     display: 'borderless',
     placement,
+    ...extraQueryParams,
   }
   const prefix = tool?.base_url.indexOf('?') === -1 ? '?' : '&'
   const iframeUrl = `${tool?.base_url}${prefix}${$.param(queryParams)}`
   const title = tool ? tool.title : ''
 
-  useEffect(() => {
-    function handleLtiPostMessage(e: any): void {
-      if (onExternalContentReady) {
-        onExternalContentReady(e)
-      }
-    }
-    $(window).on('externalContentReady', handleLtiPostMessage)
-
-    return () => {
-      $(window).off('externalContentReady', handleLtiPostMessage)
-    }
-  }, [onExternalContentReady])
+  useEffect(
+    // returns cleanup function:
+    () => handleExternalContentMessages({ready: onExternalContentReady}),
+    [onExternalContentReady]
+  )
 
   return (
     <CanvasTray

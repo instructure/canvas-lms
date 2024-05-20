@@ -20,8 +20,7 @@
 module DataFixup::AddLtiIdToUsers
   def self.run
     User.where(lti_id: nil).find_ids_in_batches(batch_size: 10_000) do |batch|
-      updates = []
-      batch.each { |id| updates << [id, SecureRandom.uuid] }
+      updates = batch.map { |id| [id, SecureRandom.uuid] }
       sql_updates = updates.map { |v| "(#{v.first},'#{v.last}')" }.join(",")
 
       User.connection.select_values(update_sql(sql_updates))

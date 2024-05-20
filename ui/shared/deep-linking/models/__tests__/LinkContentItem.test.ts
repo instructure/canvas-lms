@@ -16,7 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {linkContentItem, linkContentItemToHtmlString, LinkContentItem} from '../LinkContentItem'
+import {
+  linkContentItem,
+  linkContentItemToHtmlString,
+  type LinkContentItem,
+} from '../LinkContentItem'
 
 const thumbnail = 'https://www.test.com/thumbnail'
 const json = linkContentItem({

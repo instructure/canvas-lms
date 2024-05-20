@@ -45,7 +45,7 @@ interface ComponentProps {
   onRowAddRequested: () => any
   pointsBased: boolean
   displayScalingFactor: number
-  archivedGradingSchemesEnabled: boolean
+  editSchemeDataDisabled: boolean
 }
 
 export const GradingSchemeDataRowInput = ({
@@ -63,22 +63,25 @@ export const GradingSchemeDataRowInput = ({
   onRowDeleteRequested,
   pointsBased,
   displayScalingFactor,
-  archivedGradingSchemesEnabled,
+  editSchemeDataDisabled,
 }: ComponentProps) => {
   const [lowRangeValid, setLowRangeValid] = useState<boolean>(true)
   const [highRangeValid, setHighRangeValid] = useState<boolean>(true)
+  const [letterGradeValid, setLetterGradeValid] = useState<boolean>(true)
   const [addButtonHovering, setAddButtonHovering] = useState<boolean>(false)
 
   const lowRangeInputRef = useRef<HTMLInputElement>()
   const highRangeInputRef = useRef<HTMLInputElement>()
 
   const validateLowRange = useCallback(
-    (lowRange: number) => {
+    (lowRange: number, highRange: number) => {
       if (Number.isNaN(lowRange)) {
         setLowRangeValid(false)
       } else if (lowRange > displayScalingFactor) {
         setLowRangeValid(false)
       } else if (lowRange < 0) {
+        setLowRangeValid(false)
+      } else if (lowRange >= highRange) {
         setLowRangeValid(false)
       } else {
         setLowRangeValid(true)
@@ -104,10 +107,11 @@ export const GradingSchemeDataRowInput = ({
       if (lowRangeDefaultDisplay !== lowRangeInputRef.current.value) {
         lowRangeInputRef.current.value = lowRangeDefaultDisplay
         const lowRange = numberHelper._parseNumber(lowRangeDefaultDisplay)
-        validateLowRange(lowRange)
+        const highRange = numberHelper._parseNumber(highRangeDefaultDisplay)
+        validateLowRange(lowRange, highRange)
       }
     }
-  }, [lowRangeDefaultDisplay, validateLowRange])
+  }, [highRangeDefaultDisplay, lowRangeDefaultDisplay, validateLowRange])
 
   useEffect(() => {
     if (highRangeInputRef.current) {
@@ -119,29 +123,28 @@ export const GradingSchemeDataRowInput = ({
     }
   }, [highRangeDefaultDisplay, validateHighRange])
 
-  // @ts-expect-error
-  const handleLetterGradeChange = event => {
+  const handleLetterGradeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onRowLetterGradeChange(event.target.value)
+    setLetterGradeValid(event.target.value !== '')
   }
 
-  // @ts-expect-error
-  const handleRowLowRangeChange = event => {
+  const handleRowLowRangeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const lowRangeInputAsString = event.target.value
     const lowRange = numberHelper._parseNumber(lowRangeInputAsString)
-    validateLowRange(lowRange)
+    const highRange = numberHelper._parseNumber(highRangeDefaultDisplay)
+    validateLowRange(lowRange, highRange)
     onLowRangeChange(lowRangeInputAsString)
   }
 
-  // @ts-expect-error
-  const handleLowRangeBlur = event => {
+  const handleLowRangeBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
     const lowRangeInputAsString = event.target.value
     const lowRange = numberHelper._parseNumber(lowRangeInputAsString)
-    validateLowRange(lowRange)
+    const highRange = numberHelper._parseNumber(highRangeDefaultDisplay)
+    validateLowRange(lowRange, highRange)
     onLowRangeBlur(lowRangeInputAsString)
   }
 
-  // @ts-expect-error
-  const handleRowHighRangeChange = event => {
+  const handleRowHighRangeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!isFirstRow) {
       throw Error('Only first row can set the (scheme) high range')
     }
@@ -154,8 +157,7 @@ export const GradingSchemeDataRowInput = ({
     onHighRangeChange(highRangeInputAsString)
   }
 
-  // @ts-expect-error
-  const handleHighRangeBlur = event => {
+  const handleHighRangeBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
     const highRangeInputAsString = event.target.value
     const highRange = numberHelper._parseNumber(highRangeInputAsString)
     validateHighRange(highRange)
@@ -165,9 +167,9 @@ export const GradingSchemeDataRowInput = ({
   return (
     <>
       <tr>
-        <td>
-          <Flex>
-            <Flex.Item margin="xxx-small 0 0 0">
+        <td style={{padding: '0px 0px 3px', verticalAlign: 'top'}}>
+          <Flex alignItems="start">
+            <Flex.Item align="start">
               <TextInput
                 isRequired={true}
                 renderLabel={<ScreenReaderContent>{I18n.t('Letter Grade')}</ScreenReaderContent>}
@@ -175,81 +177,111 @@ export const GradingSchemeDataRowInput = ({
                 width="6rem"
                 onChange={handleLetterGradeChange}
                 defaultValue={letterGrade}
-                messages={[{text: <></>, type: 'hint'}]}
+                messages={[
+                  letterGradeValid
+                    ? {text: <></>, type: 'hint'}
+                    : {text: I18n.t('Enter a letter grade'), type: 'error'},
+                ]}
+                style={{margin: '0'}}
+                disabled={editSchemeDataDisabled}
+                data-testid="grading-scheme-letter-grade-input"
               />
             </Flex.Item>
           </Flex>
         </td>
-        <td style={{width: '40%'}}>
-          <Flex justifyItems={archivedGradingSchemesEnabled ? 'end' : 'start'}>
-            <span aria-label={I18n.t('Upper limit of range')}>
-              <Flex.Item margin="xxx-small 0 0 0">
-                {isFirstRow && pointsBased ? (
-                  <>
-                    <TextInput
-                      elementRef={ref => {
-                        if (ref instanceof HTMLInputElement) {
-                          highRangeInputRef.current = ref
-                        }
-                      }}
-                      isRequired={true}
-                      renderLabel={
-                        <ScreenReaderContent>{I18n.t('Upper limit of range')}</ScreenReaderContent>
+        <td style={{width: '40%', padding: '0px 0px 3px', verticalAlign: 'top'}}>
+          <Flex justifyItems="start" alignItems="start">
+            <Flex.Item align="start" padding={isFirstRow && pointsBased ? '0' : 'x-small'}>
+              {isFirstRow && pointsBased ? (
+                <>
+                  <TextInput
+                    elementRef={ref => {
+                      if (ref instanceof HTMLInputElement) {
+                        highRangeInputRef.current = ref
                       }
-                      display="inline-block"
-                      width="4.5rem"
-                      htmlSize={3}
-                      onChange={handleRowHighRangeChange}
-                      onBlur={handleHighRangeBlur}
-                      defaultValue={highRangeDefaultDisplay}
-                      messages={[{text: <></>, type: highRangeValid ? 'hint' : 'error'}]}
-                    />
-                  </>
-                ) : (
-                  <>
-                    {isFirstRow ? '' : '< '}
-                    {highRangeDefaultDisplay}
-                  </>
-                )}
-                {pointsBased ? <></> : <>%</>}
-              </Flex.Item>
-            </span>
-            <Flex.Item padding="x-small">{I18n.t('to')} </Flex.Item>
-            <Flex.Item>
-              <span aria-label={I18n.t('Lower limit of range')}>
-                {isLastRow ? (
-                  <>0{pointsBased ? <></> : <>%</>}</>
-                ) : (
-                  <>
-                    <TextInput
-                      inputRef={ref => {
-                        if (ref instanceof HTMLInputElement) {
-                          lowRangeInputRef.current = ref
-                        }
-                      }}
-                      isRequired={true}
-                      renderLabel={
-                        <ScreenReaderContent>{I18n.t('Lower limit of range')}</ScreenReaderContent>
-                      }
-                      display="inline-block"
-                      width="4.5rem"
-                      htmlSize={3}
-                      onChange={handleRowLowRangeChange}
-                      onBlur={handleLowRangeBlur}
-                      defaultValue={lowRangeDefaultDisplay}
-                      messages={[{text: <></>, type: lowRangeValid ? 'hint' : 'error'}]}
-                    />
-                    <View padding="0 0 0 x-small">{pointsBased ? <></> : <>%</>}</View>
-                  </>
-                )}
-              </span>
+                    }}
+                    isRequired={true}
+                    renderLabel={
+                      <ScreenReaderContent>{I18n.t('Upper limit of range')}</ScreenReaderContent>
+                    }
+                    display="inline-block"
+                    width="4.5rem"
+                    htmlSize={3}
+                    onChange={handleRowHighRangeChange}
+                    onBlur={handleHighRangeBlur}
+                    defaultValue={highRangeDefaultDisplay}
+                    messages={[
+                      highRangeValid
+                        ? {text: <></>, type: 'hint'}
+                        : {text: I18n.t('Invalid entry'), type: 'error'},
+                    ]}
+                    disabled={editSchemeDataDisabled}
+                  />
+                </>
+              ) : (
+                <View as="span" aria-label={I18n.t('Upper limit of range')}>
+                  {`${isFirstRow ? '' : '< '}${highRangeDefaultDisplay}${pointsBased ? '' : '%'}`}
+                </View>
+              )}
             </Flex.Item>
+            <Flex.Item align="start" padding="x-small">
+              <div
+                style={{
+                  paddingLeft:
+                    !isFirstRow && pointsBased
+                      ? '46px'
+                      : isFirstRow && pointsBased
+                      ? '0.5rem'
+                      : 'none',
+                }}
+              >
+                {I18n.t('to')}
+              </div>
+            </Flex.Item>
+            {isLastRow ? (
+              <Flex.Item align="start" padding="x-small">
+                <View aria-label={I18n.t('Lower limit of range')} as="span">
+                  0{pointsBased ? <></> : <>%</>}
+                </View>
+              </Flex.Item>
+            ) : (
+              <>
+                <Flex.Item align="start">
+                  <TextInput
+                    inputRef={ref => {
+                      if (ref instanceof HTMLInputElement) {
+                        lowRangeInputRef.current = ref
+                      }
+                    }}
+                    isRequired={true}
+                    renderLabel={
+                      <ScreenReaderContent>{I18n.t('Lower limit of range')}</ScreenReaderContent>
+                    }
+                    display="inline-block"
+                    width="4.5rem"
+                    htmlSize={3}
+                    onChange={handleRowLowRangeChange}
+                    onBlur={handleLowRangeBlur}
+                    defaultValue={lowRangeDefaultDisplay}
+                    messages={[
+                      lowRangeValid
+                        ? {text: <></>, type: 'hint'}
+                        : {text: I18n.t('Invalid entry'), type: 'error'},
+                    ]}
+                    disabled={editSchemeDataDisabled}
+                  />
+                </Flex.Item>
+                <Flex.Item align="start" padding="x-small">
+                  {pointsBased ? <></> : <>%</>}
+                </Flex.Item>
+              </>
+            )}
           </Flex>
         </td>
 
-        <td style={{verticalAlign: 'top', width: '100%'}}>
+        <td style={{verticalAlign: 'top', width: '100%', padding: '0px 0px 3px'}}>
           <Flex justifyItems="end">
-            <Flex.Item>
+            <Flex.Item align="start">
               <Tooltip renderTip={I18n.t('add a letter grade')}>
                 <IconButton
                   screenReaderLabel={I18n.t(
@@ -264,6 +296,7 @@ export const GradingSchemeDataRowInput = ({
                     buttonRef.onmouseout = () => setAddButtonHovering(false)
                   }}
                   margin="0 small 0 0"
+                  disabled={editSchemeDataDisabled}
                 >
                   <IconPlusLine />
                 </IconButton>
@@ -271,6 +304,7 @@ export const GradingSchemeDataRowInput = ({
               <IconButton
                 screenReaderLabel={I18n.t('Remove letter grade row')}
                 onClick={onRowDeleteRequested}
+                disabled={editSchemeDataDisabled || (isLastRow && isFirstRow)}
               >
                 <IconTrashLine />
               </IconButton>

@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'cross-fetch/polyfill'
+import {TextDecoder, TextEncoder} from 'util'
 import CoreTranslations from '../public/javascripts/translations/en.json'
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
@@ -50,9 +52,15 @@ const ignoredErrors = [
   /Prop `children` should be supplied unless/, // https://instructure.atlassian.net/browse/FOO-3407
   /The above error occurred in the <.*> component/,
   /You seem to have overlapping act\(\) calls/,
+  /Warning: `value` prop on `%s` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.%s/,
+  /Warning: This synthetic event is reused for performance reasons/,
 ]
 const globalWarn = global.console.warn
-const ignoredWarnings = []
+const ignoredWarnings = [
+  /JQMIGRATE:/, // ignore warnings about jquery migrate; these are muted globally when not in a jest test
+  /componentWillReceiveProps/, // ignore warnings about componentWillReceiveProps; this method is deprecated and will be removed with react upgrades
+]
+
 global.console = {
   log: console.log,
   error: error => {
@@ -264,3 +272,20 @@ Document.prototype.createRange =
       },
     }
   }
+
+global.TextEncoder = TextEncoder
+global.TextDecoder = TextDecoder
+
+if (!('Worker' in window)) {
+  Object.defineProperty(window, 'Worker', {
+    value: class Worker {
+      constructor() {
+        this.postMessage = () => {}
+        this.terminate = () => {}
+        this.addEventListener = () => {}
+        this.removeEventListener = () => {}
+        this.dispatchEvent = () => {}
+      }
+    },
+  })
+}

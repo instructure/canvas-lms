@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import store from '../../lib/AppCenterStore'
 import AppFilters from '../AppFilters'
 
@@ -104,41 +105,40 @@ const defaultApps = () => [
   },
 ]
 
-let wrapper = 'empty wrapper'
+describe('AppFilters', () => {
+  beforeEach(() => {
+    store.setState({apps: defaultApps()})
+    userEvent.setup()
+  })
+  afterEach(() => {
+    store.reset()
+  })
 
-beforeEach(() => {
-  store.setState({apps: defaultApps()})
-})
+  it('changes the filter to not_installed on Not Installed tab click', async () => {
+    render(<AppFilters />)
 
-afterEach(() => {
-  wrapper.unmount()
-  store.reset()
-})
+    await userEvent.click(screen.getByText('Not Installed'))
+    const state = store.getState()
+    expect(state.filter).toEqual('not_installed')
+    expect(state.filterText).toEqual('')
+  })
 
-it('changes the filter to not_installed on Not Installed tab click', () => {
-  wrapper = mount(<AppFilters />)
+  it('changes the filter to installed on Installed tab click', async () => {
+    render(<AppFilters />)
 
-  wrapper.find('a[children="Not Installed"]').simulate('click')
-  const state = store.getState()
-  expect(state.filter).toEqual('not_installed')
-  expect(state.filterText).toEqual('')
-})
+    await userEvent.click(screen.getByText('Installed'))
+    const state = store.getState()
+    expect(state.filter).toEqual('installed')
+    expect(state.filterText).toEqual('')
+  })
 
-it('changes the filter to installed on Installed tab click', () => {
-  wrapper = mount(<AppFilters />)
+  it('changes the filter based on the search input when provided', async () => {
+    const searched = 'acclaim'
+    render(<AppFilters />)
 
-  wrapper.find('a[children="Installed"]').simulate('click')
-  const state = store.getState()
-  expect(state.filter).toEqual('installed')
-  expect(state.filterText).toEqual('')
-})
-
-it('changes the filter based on the search input when provided', () => {
-  const searched = 'acclaim'
-  wrapper = mount(<AppFilters />)
-
-  wrapper.find('input').simulate('change', {target: {value: searched}})
-  const state = store.getState()
-  expect(state.filterText).toEqual(searched)
-  expect(state.filter).toEqual('all')
+    await userEvent.type(screen.getByPlaceholderText(/Filter by name/i), searched)
+    const state = store.getState()
+    expect(state.filterText).toEqual(searched)
+    expect(state.filter).toEqual('all')
+  })
 })

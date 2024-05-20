@@ -1,11 +1,14 @@
+{{#if ENV.FEATURES.instui_header}}
+<span id="calendar_navigator_component"></span>
+{{else}}
 <button class="navigate_today btn">{{#t "today"}}Today{{/t}}</button>
 <span class="navigation_buttons">
   <button class="navigate_prev btn">
-    <i class="icon-arrow-left" aria-hidden="true"></i>
+    <i class="icon-arrow-left" style="vertical-align: middle" aria-hidden="true"></i>
     <span class="screenreader-only">{{#t "previous"}}Previous{{/t}}</span>
   </button>
   <button class="navigate_next btn">
-    <i class="icon-arrow-right" aria-hidden="true"></i>
+    <i class="icon-arrow-right" style="vertical-align: middle" aria-hidden="true"></i>
     <span class="screenreader-only">{{#t "next"}}Next{{/t}}</span>
   </button>
 </span>
@@ -20,3 +23,4 @@
            aria-labelledby="calendar_navigation_date_accessible_label"
            data-tooltip title="{{accessibleDateFormat 'date'}}"/>
 </span>
+{{/if}}

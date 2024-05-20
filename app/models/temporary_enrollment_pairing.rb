@@ -22,10 +22,12 @@ class TemporaryEnrollmentPairing < ActiveRecord::Base
   include Canvas::SoftDeletable
 
   belongs_to :root_account, class_name: "Account", inverse_of: :temporary_enrollment_pairings
+  belongs_to :created_by, class_name: "User"
+  belongs_to :deleted_by, class_name: "User"
 
   has_many :enrollments, inverse_of: :temporary_enrollment_pairing, dependent: :nullify
 
-  validates :root_account_id, presence: true
+  validates :root_account_id, :created_by, presence: true
 
   scope :active, -> { where.not(workflow_state: "deleted") }
 end

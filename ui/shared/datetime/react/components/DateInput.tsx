@@ -18,8 +18,8 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useRef, useCallback, useEffect, useState} from 'react'
-import moment, {Moment} from 'moment-timezone'
-import tz from '@canvas/timezone'
+import moment, {type Moment} from 'moment-timezone'
+import * as tz from '../../index'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Calendar} from '@instructure/ui-calendar'
 import {DateInput} from '@instructure/ui-date-input'
@@ -48,6 +48,8 @@ type Messages = DateInputProps['messages']
 type BlurReturn = SyntheticEvent<Element, Event> | KeyboardEvent<DateInputProps>
 
 const I18n = useI18nScope('app_shared_components_canvas_date_time')
+
+const EARLIEST_YEAR = 1980 // do not allow any manually entered year before this
 
 export type CanvasDateInputProps = {
   /**
@@ -197,8 +199,8 @@ export default function CanvasDateInput({
     const inputEmpty = inputValue?.length === 0
     return inputEmpty
       ? false
-      : internalMessages.filter(m => m.type === 'error').length > 0 || tz.parse(inputValue) === null
-  }, [inputValue, internalMessages])
+      : internalMessages.filter(m => m.type === 'error').length > 0 || !renderedMoment.isValid()
+  }, [inputValue, internalMessages, renderedMoment])
 
   const isDifferentMoment = useCallback(
     (firstMoment: Moment | null, secondMoment: Moment | null) => {
@@ -288,10 +290,22 @@ export default function CanvasDateInput({
     if (isShowingCalendar && withRunningValue) handleHideCalendar()
     const newDate = tz.parse(value, timezone)
     if (newDate) {
+      const year = newDate.getFullYear()
+      if (year < EARLIEST_YEAR) {
+        setInternalMessages([
+          {
+            type: 'error',
+            text: I18n.t('Year %{year} is too far in the past', {year: String(year)}),
+          },
+        ])
+        return
+      }
       const msgs: Messages = withRunningValue ? [{type: 'success', text: formatDate(newDate)}] : []
       setRenderedMoment(moment.tz(newDate, timezone))
       setInternalMessages(msgs)
-    } else if (value === '') {
+      return
+    }
+    if (value === '') {
       setInternalMessages([])
     } else {
       const text = invalidText(value)

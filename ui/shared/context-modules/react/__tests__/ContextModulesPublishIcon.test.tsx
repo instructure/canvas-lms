@@ -19,9 +19,9 @@
 import React from 'react'
 import {act, render, waitFor} from '@testing-library/react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {updateModuleItem} from '@canvas/context-modules/jquery/utils'
+import {updateModuleItem} from '../../jquery/utils'
 import ContextModulesPublishIcon from '../ContextModulesPublishIcon'
-import {initBody, makeModuleWithItems} from '@canvas/context-modules/__tests__/testHelpers'
+import {initBody, makeModuleWithItems} from '../../__tests__/testHelpers'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/context-modules/jquery/utils', () => {
@@ -99,6 +99,7 @@ describe('ContextModulesPublishIcon', () => {
     expect(getByText('Publish module and all items')).toBeInTheDocument()
     expect(getByText('Publish module only')).toBeInTheDocument()
     expect(getByText('Unpublish module and all items')).toBeInTheDocument()
+    expect(getByText('Unpublish module only')).toBeInTheDocument()
   })
 
   it('calls publishAll when clicked publish all menu item is clicked', async () => {
@@ -150,6 +151,23 @@ describe('ContextModulesPublishIcon', () => {
       })
     )
     expect(getByText('Module and items unpublished')).toBeInTheDocument()
+  })
+
+  it('calls unpublishModuleOnly when unpublish module only is clicked', async () => {
+    const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
+    const menuButton = getByRole('button', {name: 'Lesson 2 module publish options, published'})
+    act(() => menuButton.click())
+    const publishButton = getByText('Unpublish module only')
+    act(() => publishButton.click())
+    await waitFor(() => expect(getByText('Unpublishing module')).toBeInTheDocument())
+    expect(doFetchApi).toHaveBeenCalledWith(
+      expect.objectContaining({
+        method: 'PUT',
+        path: PUBLISH_URL,
+        body: {module: {published: false, skip_content_tags: true}},
+      })
+    )
+    expect(getByText('Module unpublished')).toBeInTheDocument()
   })
 
   it('calls updateModuleItem when publishing', async () => {

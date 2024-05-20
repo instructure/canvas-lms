@@ -55,7 +55,9 @@ class RubricsController < ApplicationController
     permission = @context.is_a?(User) ? :manage : [:manage_rubrics, :read_rubrics]
     return unless authorized_action(@context, @current_user, permission)
 
-    if params[:id].match?(Api::ID_REGEX)
+    is_enhanced_rubrics = Account.site_admin.feature_enabled?(:enhanced_rubrics)
+
+    if params[:id].match?(Api::ID_REGEX) || is_enhanced_rubrics
       js_env ROOT_OUTCOME_GROUP: get_root_outcome,
              PERMISSIONS: {
                manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)
@@ -63,7 +65,7 @@ class RubricsController < ApplicationController
              OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @domain_root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
       mastery_scales_js_env
 
-      if Account.site_admin.feature_enabled?(:enhanced_rubrics)
+      if is_enhanced_rubrics
         return show_rubrics_redesign
       end
 
@@ -77,6 +79,7 @@ class RubricsController < ApplicationController
   end
 
   def show_rubrics_redesign
+    css_bundle :learning_outcomes
     render html: "".html_safe, layout: true
   end
 
@@ -203,6 +206,7 @@ class RubricsController < ApplicationController
 
         @rubric = @association.rubric if @association
       end
+      @rubric.reconcile_criteria_models(@current_user)
       json_res = {}
       json_res[:rubric] = @rubric.as_json(methods: :criteria, include_root: false, permissions: { user: @current_user, session: }) if @rubric
       json_res[:rubric_association] = @association.as_json(include_root: false, include: [:assessment_requests], permissions: { user: @current_user, session: }) if @association

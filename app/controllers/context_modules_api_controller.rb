@@ -291,7 +291,7 @@ class ContextModulesApiController < ApplicationController
         module_ids: modules.pluck(:id),
         skip_content_tags: value_to_boolean(params[:skip_content_tags])
       }
-      if value_to_boolean(params[:async]) && Account.site_admin.feature_enabled?(:module_publish_menu)
+      if value_to_boolean(params[:async])
         progress = Progress.create!(context: @context, tag: "context_module_batch_update", user: @current_user)
         progress.process_job(
           @context,
@@ -421,13 +421,13 @@ class ContextModulesApiController < ApplicationController
       if params[:module].key?(:published)
         if value_to_boolean(params[:module][:published])
           @module.publish
-          unless Account.site_admin.feature_enabled?(:module_publish_menu) && value_to_boolean(params[:module][:skip_content_tags])
+          unless value_to_boolean(params[:module][:skip_content_tags])
             @module.publish_items!
             publish_warning = @module.content_tags.any?(&:unpublished?)
           end
         else
           @module.unpublish
-          if Account.site_admin.feature_enabled?(:module_publish_menu) && !value_to_boolean(params[:module][:skip_content_tags])
+          unless value_to_boolean(params[:module][:skip_content_tags])
             @module.unpublish_items!
           end
         end

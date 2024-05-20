@@ -2,7 +2,5 @@
   "name": "@canvas-features/admin_split",
   "private": true,
   "version": "1.0.0",
-  "canvas": {
-    "component": "user_split_merge"
-  }
+  "owner": "FOO"
 }

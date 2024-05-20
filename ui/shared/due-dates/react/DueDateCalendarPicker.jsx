@@ -21,9 +21,9 @@ import React, {useEffect, useRef} from 'react'
 import {string, func, bool, instanceOf, oneOfType} from 'prop-types'
 import accessibleDateFormat from '@canvas/datetime/accessibleDateFormat'
 import shortId from '@canvas/shortid'
-import tz from '@canvas/timezone'
+import * as tz from '@canvas/datetime'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import cx from 'classnames'
 
 function DueDateCalendarPicker(props) {

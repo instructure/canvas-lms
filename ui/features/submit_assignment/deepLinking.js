@@ -19,6 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
+import { captureException } from '@sentry/react'
 
 const I18n = useI18nScope('external_toolsdeepLinking')
 
@@ -29,7 +30,9 @@ export function handleContentItem(result, contentView, callback) {
 
 export function handleDeepLinkingError(e, contentView, reloadTool) {
   $.flashError(I18n.t('Error retrieving content'))
+  // eslint-disable-next-line no-console
   console.error(e)
+  captureException(e)
   reloadTool(contentView.model.id)
 }
 

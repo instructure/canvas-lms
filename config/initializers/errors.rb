@@ -38,8 +38,7 @@ Rails.configuration.to_prepare do
   # write a database record to our application DB capturing useful info for looking
   # at this error later
   CanvasErrors.register!(:error_report) do |exception, data, level|
-    setting = Setting.get("error_report_exception_handling", "true", skip_cache: data[:skip_setting_cache])
-    if setting == "true" && level == :error
+    if level == :error
       report = ErrorReport.log_exception_from_canvas_errors(exception, data)
       report.try(:global_id)
     end
@@ -50,8 +49,7 @@ Rails.configuration.to_prepare do
   # but if they spike we want to see that in a dashboard and maybe
   # even have a monitor fire)
   CanvasErrors.register!(:error_stats) do |exception, data, level|
-    setting = Setting.get("collect_error_statistics", "true", skip_cache: data[:skip_setting_cache])
-    Canvas::ErrorStats.capture(exception, data, level) if setting == "true"
+    Canvas::ErrorStats.capture(exception, data, level)
   end
 
   # output full error stack trace and context to log files

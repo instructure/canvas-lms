@@ -20,7 +20,6 @@
 
 module Api::V1::Outcome
   include Api::V1::Json
-  include OutcomesServiceAlignmentsHelper
 
   # style can be :full or :abbrev; anything unrecognized defaults to :full.
   # abbreviated includes only id, title, url, subgroups_url, outcomes_url, and can_edit. full expands on
@@ -73,7 +72,7 @@ module Api::V1::Outcome
       hash["has_updateable_rubrics"] = outcome.updateable_rubrics?
       unless opts[:outcome_style] == :abbrev
         hash["description"] = outcome.description
-        hash["friendly_description"] = opts.dig(:friendly_descriptions, outcome.id)
+        hash["friendly_description"] = opts.dig(:friendly_descriptions, outcome.id.to_s)
         context = opts[:context]
         mastery_scale_opts = mastery_scale_opts(context)
         if mastery_scale_opts.any?
@@ -178,7 +177,7 @@ module Api::V1::Outcome
                      else
                        Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
                      end
-        hash["can_unlink"] = can_unlink?(outcome_link, can_manage:)
+        hash["can_unlink"] = can_manage && outcome_link.can_destroy?
       end
 
       hash["assessed"] = if opts[:assessed_outcomes]

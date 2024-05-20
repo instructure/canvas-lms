@@ -71,7 +71,6 @@ describe GoogleDrive::Connection do
 
     describe "#authorized?" do
       it "returns false when there ConnectionException" do
-        allow(connection).to receive(:force_token_update)
         stub_request(:get, "https://www.googleapis.com/drive/v3/about?fields=user")
           .to_return(status: 500, body: "", headers: {})
 
@@ -85,7 +84,6 @@ describe GoogleDrive::Connection do
       end
 
       it "returns true when response is 200" do
-        allow(connection).to receive(:force_token_update)
         stub_request(:get, "https://www.googleapis.com/drive/v3/about?fields=user")
           .to_return(status: 200, body: "", headers: {})
 

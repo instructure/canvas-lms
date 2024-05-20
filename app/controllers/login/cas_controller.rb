@@ -44,15 +44,24 @@ class Login::CasController < ApplicationController
 
     st = CASClient::ServiceTicket.new(params[:ticket], cas_login_url)
     begin
-      default_timeout = Setting.get("cas_timelimit", 5.seconds.to_s).to_f
-
-      timeout_options = { raise_on_timeout: true, fallback_timeout_length: default_timeout }
+      timeout_options = { raise_on_timeout: true, fallback_timeout_length: 10.0 }
 
       Canvas.timeout_protection("cas:#{aac.global_id}", timeout_options) do
         client.validate_service_ticket(st)
       end
     rescue => e
       logger.warn "Failed to validate CAS ticket: #{e.inspect}"
+
+      if e.is_a?(Timeout::Error)
+        tags = { auth_type: aac.auth_type, auth_provider_id: aac.global_id }
+        if e.respond_to?(:error_count)
+          tags[:error_count] = e.error_count
+          InstStatsd::Statsd.increment(statsd_timeout_cutoff, tags:)
+        else
+          InstStatsd::Statsd.increment(statsd_timeout_error, tags:)
+        end
+      end
+
       aac.debug_set(:validate_service_ticket, t("Failed to validate CAS ticket: %{error}", error: e)) if debugging
       flash[:delegated_message] = t("There was a problem logging in at %{institution}",
                                     institution: @domain_root_account.display_name)

@@ -136,6 +136,7 @@ AssignmentGroupListItemView.prototype.render = function () {
   if (this.deleteGroupView) {
     this.deleteGroupView.remove()
   }
+  $('.ig-details').addClass('rendered')
   AssignmentGroupListItemView.__super__.render.call(this, this.canManage())
   if (this.model) {
     return (this.model.view = this)

@@ -19,9 +19,9 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms' // validateForm, formErrors, errorBox
+import '@canvas/jquery/jquery.instructure_forms' // validateForm, formErrors, errorBox
 import replaceTags from '@canvas/util/replaceTags'
 import 'jquery-tinypubsub' // /\.publish/
 import 'jqueryui/button'
@@ -35,7 +35,7 @@ $(function () {
     const criteria = []
     $alert.find('ul.criteria li').each(function () {
       criteria.push({
-        id: $(this).find('input[name="alert[criteria][][id]"]').attr('value'),
+        id: $(this).find('input[name="alert[criteria][][id]"]').prop('value'),
         criterion_type: $(this).data('value'),
         threshold: $(this).find('span').text(),
       })
@@ -44,9 +44,9 @@ $(function () {
     $alert.find('ul.recipients li').each(function () {
       recipients.push($(this).data('value'))
     })
-    let repetition = $alert.find('input[name="repetition"]:checked').attr('value')
+    let repetition = $alert.find('input[name="repetition"]:checked').prop('value')
     if (repetition === 'value') {
-      repetition = $alert.find('input[name="alert[repetition]"]').attr('value')
+      repetition = $alert.find('input[name="alert[repetition]"]').prop('value')
     } else {
       repetition = null
     }
@@ -66,14 +66,14 @@ $(function () {
     // see placeholder in _alerts.html.erb
     contentHtml = contentHtml.replace(
       '%{count}',
-      "<span class='displaying' /><input type='text' name='alert[criteria][][threshold]' class='editing' size='2' />"
+      "<span class='displaying'></span><input type='text' name='alert[criteria][][threshold]' class='editing' size='2'></input>"
     )
     $element.html(contentHtml)
     if (element === 'li') {
       $element.append(' ')
       $element.append($list.find('>.delete_item_link').clone().toggle())
     } else {
-      $element.attr('value', key)
+      $element.prop('value', key)
     }
     return $element
   }
@@ -83,7 +83,7 @@ $(function () {
     const $element = createElement(recipient, element, 'label', ENV.ALERTS.POSSIBLE_RECIPIENTS)
     if (element === 'li') {
       $element.prepend(
-        $("<input type='hidden' name='alert[recipients][]' />").attr('value', recipient)
+        $("<input type='hidden' name='alert[recipients][]' />").prop('value', recipient)
       )
     }
     return $element
@@ -111,17 +111,17 @@ $(function () {
       $element.find('span').text(threshold)
       $element
         .find('input')
-        .attr('value', threshold)
+        .prop('value', threshold)
         .attr('title', ENV.ALERTS.POSSIBLE_CRITERIA[criterion_type].title)
       $element.prepend(
-        $("<input type='hidden' name='alert[criteria][][criterion_type]' />").attr(
+        $("<input type='hidden' name='alert[criteria][][criterion_type]' />").prop(
           'value',
           criterion_type
         )
       )
       if (id) {
         $element.prepend(
-          $("<input type='hidden' name='alert[criteria][][id]' />").attr('value', id)
+          $("<input type='hidden' name='alert[criteria][][id]' />").prop('value', id)
         )
       }
     }
@@ -142,12 +142,12 @@ $(function () {
       }
     }
     if (data.repetition) {
-      $alert.find('input[name="repetition"][value="value"]').attr('checked', true)
-      $alert.find('input[name="alert[repetition]"]').attr('value', data.repetition)
+      $alert.find('input[name="repetition"][value="value"]').prop('checked', true)
+      $alert.find('input[name="alert[repetition]"]').prop('value', data.repetition)
       $alert.find('.repetition_group .no_repetition').toggle(false)
       $alert.find('.repetition_group .repetition').toggle(true).find('span').text(data.repetition)
     } else {
-      $alert.find('input[name="repetition"][value="none"]').attr('checked', true)
+      $alert.find('input[name="repetition"][value="none"]').prop('checked', true)
       $alert.find('.repetition_group .no_repetition').toggle(true)
       $alert.find('.repetition_group .repetition').toggle(false)
     }
@@ -181,7 +181,7 @@ $(function () {
   })
 
   $list
-    .delegate('.edit_link', 'click', function () {
+    .on('click', '.edit_link', function () {
       const $alert = $(this).parents('.alert')
       const data = getAlertData($alert)
       $alert.data('data', data)
@@ -226,10 +226,10 @@ $(function () {
       $alert.toggleClass('displaying')
       return false
     })
-    .delegate('.delete_link', 'click', function () {
+    .on('click', '.delete_link', function () {
       const $alert = $(this).parents('.alert')
       if (!$alert.hasClass('new')) {
-        $alert.find('input[name="_method"]').attr('value', 'DELETE')
+        $alert.find('input[name="_method"]').prop('value', 'DELETE')
         $.ajaxJSON($alert.attr('action'), 'POST', $alert.serialize(), _data => {
           $alert.slideUp(() => {
             $alert.remove()
@@ -248,7 +248,7 @@ $(function () {
       }
       return false
     })
-    .delegate('.cancel_button', 'click', function () {
+    .on('click', '.cancel_button', function () {
       $(this).parent().hideErrors()
       const $alert = $(this).parents('.alert')
       if ($alert.hasClass('new')) {
@@ -267,7 +267,7 @@ $(function () {
       }
       return false
     })
-    .delegate('.alert', 'submit', function () {
+    .on('submit', '.alert', function () {
       const $alert = $(this)
 
       // Validation (validateForm doesn't support arrays, and formErrors
@@ -280,7 +280,7 @@ $(function () {
         ])
       }
       $alert.find('.criteria input.editing').each(function () {
-        const val = $(this).attr('value')
+        const val = $(this).prop('value')
         if (!val || Number.isNaN(Number(val)) || parseFloat(val) < 0) {
           errors.push([
             $(this),
@@ -294,11 +294,11 @@ $(function () {
           I18n.t('errors.recipients_required', 'At least one recipient is required'),
         ])
       }
-      if ($alert.find('input[name="repetition"]:checked').attr('value') === 'none') {
-        $alert.find('input[name="alert[repetition]"]').attr('value', '')
+      if ($alert.find('input[name="repetition"]:checked').prop('value') === 'none') {
+        $alert.find('input[name="alert[repetition]"]').prop('value', '')
       } else {
         const $repetition = $alert.find('input[name="alert[repetition]"]')
-        const val = $repetition.attr('value')
+        const val = $repetition.prop('value')
         if (!val || Number.isNaN(Number(val)) || parseFloat(val) < 0) {
           errors.push([
             $repetition,
@@ -332,7 +332,7 @@ $(function () {
       )
       return false
     })
-    .delegate('.recipients .delete_item_link', 'click', function () {
+    .on('click', '.recipients .delete_item_link', function () {
       const $li = $(this).parents('li')
       const $add_link = $(this).parents('.alert').find('.add_recipient_link')
       addRecipientInOrder($add_link.prev(), createRecipient($li.data('value'), 'option'))
@@ -345,10 +345,10 @@ $(function () {
       })
       return false
     })
-    .delegate('.add_recipient_link', 'click', function () {
+    .on('click', '.add_recipient_link', function () {
       const $recipients = $(this).parents('.alert').find('.recipients')
       const $select = $(this).prev()
-      const recipient = $select.attr('value')
+      const recipient = $select.prop('value')
       addRecipientInOrder($recipients, createRecipient(recipient, 'li')).toggle().slideDown()
       const $errorBox = $select.data('associated_error_box')
       if ($errorBox) {
@@ -364,7 +364,7 @@ $(function () {
       }
       return false
     })
-    .delegate('.criteria .delete_item_link', 'click', function () {
+    .on('click', '.criteria .delete_item_link', function () {
       const $li = $(this).parents('li')
       const $add_link = $(this).parents('.alert').find('.add_criterion_link')
       addRecipientInOrder($add_link.prev(), createCriterion($li.data('value'), 'option'))
@@ -377,10 +377,10 @@ $(function () {
       })
       return false
     })
-    .delegate('.add_criterion_link', 'click', function () {
+    .on('click', '.add_criterion_link', function () {
       const $criteria = $(this).parents('.alert').find('.criteria')
       const $select = $(this).prev()
-      const criterion = $select.attr('value')
+      const criterion = $select.prop('value')
       addRecipientInOrder($criteria, createCriterion(criterion, 'li')).toggle().slideDown()
       const $errorBox = $select.data('associated_error_box')
       if ($errorBox) {
@@ -396,7 +396,7 @@ $(function () {
       }
       return false
     })
-    .delegate('input[name="repetition"]', 'click', function () {
+    .on('click', 'input[name="repetition"]', function () {
       const $error_box = $(this)
         .parents('.alert')
         .find('input[name="alert[repetition]"]')
@@ -407,7 +407,7 @@ $(function () {
         })
       }
     })
-    .delegate('label.repetition', 'click', function (event) {
+    .on('click', 'label.repetition', function (event) {
       event.preventDefault()
       $(this).parents('.alert').find('input[name="repetition"]').prop('checked', true)
     })

@@ -37,8 +37,6 @@ module.exports = {
         type: 'javascript/auto',
         include: [
           path.resolve(canvasDir, 'node_modules/graphql'),
-          path.resolve(canvasDir, 'packages/datetime-moment-parser/index.js'),
-          path.resolve(canvasDir, 'packages/datetime/index.js'),
         ],
         resolve: {
           fullySpecified: false
@@ -55,12 +53,6 @@ module.exports = {
         test: /\.(js|jsx|ts|tsx)$/,
         include: [
           path.resolve(canvasDir, 'ui'),
-          path.resolve(canvasDir, 'packages/jquery-kyle-menu'),
-          path.resolve(canvasDir, 'packages/jquery-popover'),
-          path.resolve(canvasDir, 'packages/canvas-planner'),
-          path.resolve(canvasDir, 'packages/jquery-selectmenu'),
-          path.resolve(canvasDir, 'packages/convert-case'),
-          path.resolve(canvasDir, 'packages/slickgrid'),
           path.resolve(canvasDir, 'spec/javascripts/jsx'),
           path.resolve(canvasDir, 'spec/coffeescripts'),
           path.resolve(canvasDir, '.storybook'),

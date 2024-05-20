@@ -459,7 +459,7 @@ describe('DiscussionTopicContainer', () => {
   it('Should find "Show Due Dates" link button', async () => {
     const props = {discussionTopic: Discussion.mock({})}
     const container = setup(props)
-    expect(await container.findByText('Show Due Dates (2)')).toBeTruthy()
+    expect(await container.findByText('View Due Dates')).toBeTruthy()
   })
 
   it('Should find due date text for "assignment override 3"', async () => {
@@ -653,7 +653,8 @@ describe('DiscussionTopicContainer', () => {
       }),
     }
     const container = setup(props)
-    expect(container.getByText(`Edited by Eddy Tor Apr 22, 2021 6:41pm`)).toBeInTheDocument()
+    const editedByTextElement = container.getByTestId('editedByText')
+    expect(editedByTextElement.textContent).toEqual('Edited by Eddy Tor Apr 22, 2021 6:41pm')
     expect(container.queryByTestId('created-tooltip')).toBeFalsy()
   })
 

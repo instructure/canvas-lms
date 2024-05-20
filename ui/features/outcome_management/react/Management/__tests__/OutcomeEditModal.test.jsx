@@ -22,7 +22,7 @@ import {MockedProvider} from '@apollo/react-testing'
 import {within} from '@testing-library/dom'
 import {pick} from 'lodash'
 import OutcomeEditModal from '../OutcomeEditModal'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {
   updateLearningOutcomeMocks,
@@ -35,9 +35,12 @@ injectGlobalAlertContainers()
 
 jest.useFakeTimers()
 
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+}))
+
 describe('OutcomeEditModal', () => {
   let onCloseHandlerMock
-  let showFlashAlertSpy
   let onEditLearningOutcomeHandlerMock
 
   const outcome = {
@@ -64,7 +67,10 @@ describe('OutcomeEditModal', () => {
   beforeEach(() => {
     onCloseHandlerMock = jest.fn()
     onEditLearningOutcomeHandlerMock = jest.fn()
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   const renderWithProvider = ({
@@ -220,7 +226,7 @@ describe('OutcomeEditModal', () => {
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(onEditLearningOutcomeHandlerMock).toHaveBeenCalled()
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: '"Updated name" was successfully updated.',
         type: 'success',
       })
@@ -243,7 +249,7 @@ describe('OutcomeEditModal', () => {
       fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Updated friendly name'}})
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: '"Outcome" was successfully updated.',
         type: 'success',
       })
@@ -267,7 +273,7 @@ describe('OutcomeEditModal', () => {
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(onEditLearningOutcomeHandlerMock).not.toHaveBeenCalled()
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while editing this outcome. Please try again.',
         type: 'error',
       })
@@ -283,7 +289,7 @@ describe('OutcomeEditModal', () => {
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(onEditLearningOutcomeHandlerMock).toHaveBeenCalled()
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: '"Outcome" was successfully updated.',
         type: 'success',
       })
@@ -297,7 +303,7 @@ describe('OutcomeEditModal', () => {
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(onEditLearningOutcomeHandlerMock).not.toHaveBeenCalled()
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while editing this outcome. Please try again.',
         type: 'error',
       })
@@ -325,10 +331,10 @@ describe('OutcomeEditModal', () => {
 
     it('does not call friendly description mutation when updating outcome', async () => {
       const mocks = updateLearningOutcomeMocks({
-        description: 'Updated description',
+        description: null,
         displayName: 'Updated friendly name',
       })
-      const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
+      const {getByText, getByLabelText} = renderWithProvider({
         mockOverrides: mocks,
         env: {contextType: 'Account', contextId: '1', friendlyDescriptionFF: false},
         // mock setFriendlyDescription mutation to throw an error
@@ -336,14 +342,11 @@ describe('OutcomeEditModal', () => {
       })
       await act(async () => jest.runOnlyPendingTimers())
       fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
-      fireEvent.change(getByDisplayValue('Outcome description'), {
-        target: {value: 'Updated description'},
-      })
       fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Updated friendly name'}})
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(onEditLearningOutcomeHandlerMock).toHaveBeenCalled()
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: '"Updated name" was successfully updated.',
         type: 'success',
       })
@@ -426,7 +429,7 @@ describe('OutcomeEditModal', () => {
         fireEvent.click(getByText('Most Recent Score'))
         fireEvent.click(getByText('Save'))
         await act(async () => jest.runOnlyPendingTimers())
-        expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        expect(showFlashAlert).toHaveBeenCalledWith({
           message: '"Updated name" was successfully updated.',
           type: 'success',
         })
@@ -461,7 +464,7 @@ describe('OutcomeEditModal', () => {
         fireEvent.click(getByText('Confirm'))
         fireEvent.click(getByText('Save'))
         await act(async () => jest.runOnlyPendingTimers())
-        expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        expect(showFlashAlert).toHaveBeenCalledWith({
           message: '"Updated name" was successfully updated.',
           type: 'success',
         })

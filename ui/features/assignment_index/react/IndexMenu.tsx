@@ -17,7 +17,11 @@
  */
 
 import React from 'react'
+import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Button} from '@instructure/ui-buttons'
+import {Flex, FlexItem} from '@instructure/ui-flex'
+import {IconAddSolid} from '@instructure/ui-icons'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import Actions from './actions/IndexMenuActions'
 import ReactDOM from 'react-dom'
@@ -39,7 +43,6 @@ type Props = {
   sisName: string
   postToSisDefault: boolean
   hasAssignments: boolean
-  currentWindow: Window
 }
 
 type State = {
@@ -88,6 +91,7 @@ export default class IndexMenu extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
+    this.clearExternalToolTray()
     this.unsubscribe()
   }
 
@@ -204,11 +208,19 @@ export default class IndexMenu extends React.Component<Props, State> {
         allowItemSelection={true}
         selectableItems={groupData}
         onDismiss={handleDismiss}
-        onExternalContentReady={() => (this.props.currentWindow || window).location.reload()}
+        onExternalContentReady={() => window.location.reload()}
         open={tool !== null}
       />,
       document.getElementById('external-tool-mount-point')
     )
+  }
+
+  clearExternalToolTray = () => {
+    // unmount tray component and clear its postMessage handler
+    const mountPointDomElement = document.getElementById('external-tool-mount-point')
+    if (mountPointDomElement) {
+      ReactDOM.unmountComponentAtNode(mountPointDomElement)
+    }
   }
 
   render() {
@@ -219,72 +231,74 @@ export default class IndexMenu extends React.Component<Props, State> {
           this.node = node
         }}
       >
-        <button
-          type="button"
-          className="al-trigger btn Button"
-          id="course_assignment_settings_link"
-          tabIndex={0}
-          title={I18n.t('Assignments Settings')}
-          aria-label={I18n.t('Assignments Settings')}
-        >
-          <i className="icon-more" aria-hidden="true" />
-          <span className="screenreader-only">{I18n.t('Assignment Options')}</span>
-        </button>
-        <ul className="al-options" role="menu">
-          {this.props.requestBulkEdit && (
+        <>
+          <button
+            type="button"
+            className="al-trigger btn Button"
+            id="course_assignment_settings_link"
+            tabIndex={0}
+            title={I18n.t('Assignments Settings')}
+            aria-label={I18n.t('Assignments Settings')}
+          >
+            <i className="icon-more" aria-hidden="true" />
+            <span className="screenreader-only">{I18n.t('Assignment Options')}</span>
+          </button>
+          <ul className="al-options" role="menu">
+            {this.props.requestBulkEdit && (
+              <li role="menuitem">
+                {/* TODO: use InstUI button */}
+                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                <a
+                  href="#"
+                  tabIndex={0}
+                  id="requestBulkEditMenuItem"
+                  className="requestBulkEditMenuItem"
+                  role="button"
+                  title={I18n.t('Edit Dates')}
+                  onClick={this.props.requestBulkEdit}
+                >
+                  <i className="icon-edit" />
+                  {I18n.t('Edit Assignment Dates')}
+                </a>
+              </li>
+            )}
             <li role="menuitem">
               {/* TODO: use InstUI button */}
               {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
               <a
+                ref={ref => {
+                  this.triggerRef = ref
+                }}
                 href="#"
-                tabIndex={0}
-                id="requestBulkEditMenuItem"
-                className="requestBulkEditMenuItem"
+                id="assignmentSettingsCog"
                 role="button"
-                title={I18n.t('Edit Dates')}
-                onClick={this.props.requestBulkEdit}
+                title={I18n.t('Assignment Groups Weight')}
+                data-focus-returns-to="course_assignment_settings_link"
+                aria-label={I18n.t('Assignment Groups Weight')}
               >
-                <i className="icon-edit" />
-                {I18n.t('Edit Assignment Dates')}
+                {this.renderWeightIcon()}
+                {I18n.t('Assignment Groups Weight')}
               </a>
             </li>
+            {this.renderDisablePostToSis()}
+            {this.renderTools()}
+            {this.renderTrayTools()}
+          </ul>
+          {this.state.modalIsOpen && (
+            <ExternalToolModalLauncher
+              tool={this.state.selectedTool}
+              isOpen={this.state.modalIsOpen}
+              onRequestClose={this.closeModal}
+              contextType={this.props.contextType}
+              contextId={this.props.contextId}
+              launchType="course_assignments_menu"
+              title={
+                this.state.selectedTool &&
+                this.state.selectedTool.placements.course_assignments_menu.title
+              }
+            />
           )}
-          <li role="menuitem">
-            {/* TODO: use InstUI button */}
-            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-            <a
-              ref={ref => {
-                this.triggerRef = ref
-              }}
-              href="#"
-              id="assignmentSettingsCog"
-              role="button"
-              title={I18n.t('Assignment Groups Weight')}
-              data-focus-returns-to="course_assignment_settings_link"
-              aria-label={I18n.t('Assignment Groups Weight')}
-            >
-              {this.renderWeightIcon()}
-              {I18n.t('Assignment Groups Weight')}
-            </a>
-          </li>
-          {this.renderDisablePostToSis()}
-          {this.renderTools()}
-          {this.renderTrayTools()}
-        </ul>
-        {this.state.modalIsOpen && (
-          <ExternalToolModalLauncher
-            tool={this.state.selectedTool}
-            isOpen={this.state.modalIsOpen}
-            onRequestClose={this.closeModal}
-            contextType={this.props.contextType}
-            contextId={this.props.contextId}
-            launchType="course_assignments_menu"
-            title={
-              this.state.selectedTool &&
-              this.state.selectedTool.placements.course_assignments_menu.title
-            }
-          />
-        )}
+        </>
       </div>
     )
   }

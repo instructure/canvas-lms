@@ -54,6 +54,7 @@ const discussionManagerUtilityContext = {
   setHighlightEntryId: () => {},
   isGradedDiscussion: false,
   setIsGradedDiscussion: () => {},
+  usedThreadingToolbarChildRef: null,
 }
 
 export const DiscussionManagerUtilityContext = React.createContext(discussionManagerUtilityContext)

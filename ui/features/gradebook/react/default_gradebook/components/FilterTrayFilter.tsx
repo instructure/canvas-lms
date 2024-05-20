@@ -20,9 +20,9 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
-import moment from 'moment'
-import {MomentInput} from 'moment-timezone'
-import tz from '@canvas/timezone'
+import type {MomentInput} from 'moment-timezone'
+import * as tz from '@canvas/datetime'
+import {isoDateFromInput} from '../../../util/DateUtils'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {Filter, FilterType, SubmissionFilterValue} from '../gradebook.d'
 import type {
@@ -185,7 +185,8 @@ export default function ({
           formatDate={formatDate}
           interaction="enabled"
           onSelectedDateChange={(value: MomentInput) => {
-            const newValue = value ? moment(value).toISOString() : undefined
+            const type = filter.type as 'start-date' | 'end-date'
+            const newValue = isoDateFromInput(type, value)
             if (filter.value !== newValue) {
               onChange({
                 ...filter,

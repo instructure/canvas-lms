@@ -231,6 +231,8 @@ DialogFormView.prototype.setupDialog = function () {
         return _this.trigger('open')
       }
     })(this),
+    modal: true,
+    zIndex: 1000,
   }
   opts.width = this.options.width
   opts.height = this.options.height
@@ -240,7 +242,7 @@ DialogFormView.prototype.setupDialog = function () {
   if (this.options.fixDialogButtons) {
     this.$el.fixDialogButtons()
   }
-  this.dialog = this.$el.data('dialog')
+  this.dialog = this.$el.data('ui-dialog')
   return $('.ui-resizable-handle').attr('aria-hidden', true)
 }
 

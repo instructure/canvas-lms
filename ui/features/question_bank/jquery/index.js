@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow, no-alert, eqeqeq */
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -18,15 +19,17 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
+import sanitizeHtml from 'sanitize-html-with-tinymce'
 import moveMultipleQuestionBanks from './moveMultipleQuestionBanks'
 import loadBanks from './loadBanks'
 import addBank from './addBank'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf, .dim */
-import '@canvas/keycodes'
+import '@canvas/datetime/jquery'
+import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import replaceTags from '@canvas/util/replaceTags'
@@ -36,7 +39,7 @@ const I18n = useI18nScope('question_bank')
 export function updateAlignments(alignments) {
   $('.add_outcome_text')
     .text(I18n.t('updating_outcomes', 'Updating Outcomes...'))
-    .attr('disabled', true)
+    .prop('disabled', true)
   const params = {}
   for (const idx in alignments) {
     const alignment = alignments[idx]
@@ -74,7 +77,7 @@ export function updateAlignments(alignments) {
       })
       $('.add_outcome_text')
         .text(I18n.t('align_outcomes', 'Align Outcomes'))
-        .attr('disabled', false)
+        .prop('disabled', false)
       const $outcomes = $('#aligned_outcomes_list')
       $outcomes.find('.outcome:not(.blank)').remove()
       const $template = $outcomes.find('.blank:first').clone(true).removeClass('blank')
@@ -95,13 +98,13 @@ export function updateAlignments(alignments) {
     _data => {
       $('.add_outcome_text')
         .text(I18n.t('update_outcomes_fail', 'Updating Outcomes Failed'))
-        .attr('disabled', false)
+        .prop('disabled', false)
     }
   )
 }
 
 export function attachPageEvents(_e) {
-  $('#aligned_outcomes_list').delegate('.delete_outcome_link', 'click', function (event) {
+  $('#aligned_outcomes_list').on('click', '.delete_outcome_link', function (event) {
     event.preventDefault()
     const result = window.confirm(
         I18n.t(
@@ -167,6 +170,9 @@ export function attachPageEvents(_e) {
         for (const idx in data.questions) {
           const question = data.questions[idx].assessment_question
           question.assessment_question_id = question.id
+          const question_data = question.question_data
+          question_data.question_text = sanitizeHtml(question_data.question_text || '')
+          question.question_data = question_data
           const $question = $('#question_teaser_blank').clone().removeAttr('id')
           $question.fillTemplateData({
             data: question,
@@ -174,7 +180,7 @@ export function attachPageEvents(_e) {
             hrefValues: ['id'],
           })
           $question.fillTemplateData({
-            data: question.question_data,
+            data: question_data,
             htmlValues: ['question_text'],
           })
           $question.data('question', question)
@@ -215,7 +221,7 @@ export function attachPageEvents(_e) {
       {},
       _data => {
         $link.find('.message').text(I18n.t('already_bookmarked', 'Already Bookmarked'))
-        $link.attr('disabled', true)
+        $link.prop('disabled', true)
       },
       () => {
         $link.find('.message').text(I18n.t('bookmark_failed', 'Bookmark Failed'))
@@ -260,14 +266,14 @@ export function attachPageEvents(_e) {
     },
   })
   $('#show_question_details')
-    .change(function () {
-      $('#questions').toggleClass('brief', !$(this).attr('checked'))
+    .on('change', function () {
+      $('#questions').toggleClass('brief', !$(this).prop('checked'))
     })
-    .change()
+    .trigger('change')
 
   moveMultipleQuestionBanks.addEvents()
 
-  $('#questions').delegate('.move_question_link', 'click', function (event) {
+  $('#questions').on('click', '.move_question_link', function (event) {
     event.preventDefault()
     const $dialog = $('#move_question_dialog')
     $dialog.find('.question_text').show().end().find('.questions').hide()
@@ -289,6 +295,8 @@ export function attachPageEvents(_e) {
     $dialog.dialog({
       width: 600,
       title: I18n.t('title.move_copy_questions', 'Move/Copy Questions'),
+      modal: true,
+      zIndex: 1000,
     })
     $dialog.parent().find('.ui-dialog-titlebar-close').focus()
   })
@@ -311,7 +319,7 @@ export function attachPageEvents(_e) {
         {count: multiple_questions ? 2 : 1}
       )
     }
-    $dialog.find('button').attr('disabled', true)
+    $dialog.find('button').prop('disabled', true)
     $dialog.find('.submit_button').text(submitText)
     const url = $('#bank_urls .move_questions_url').attr('href')
     data.move = move ? '1' : '0'
@@ -329,7 +337,7 @@ export function attachPageEvents(_e) {
         'POST',
         data,
         _data => {
-          $dialog.find('button').attr('disabled', false)
+          $dialog.find('button').prop('disabled', false)
           $dialog.find('.submit_button').text('Move/Copy Question')
           if (move) {
             if ($dialog.data('question')) {
@@ -347,7 +355,7 @@ export function attachPageEvents(_e) {
           $dialog.dialog('close')
         },
         _data => {
-          $dialog.find('button').attr('disabled', false)
+          $dialog.find('button').prop('disabled', false)
           let failedText = null
           if (move) {
             failedText = I18n.t(
@@ -385,7 +393,7 @@ export function attachPageEvents(_e) {
           save(data)
         },
         _data => {
-          $dialog.find('button').attr('disabled', false)
+          $dialog.find('button').prop('disabled', false)
           let submitAgainText = null
           if (move) {
             submitAgainText = I18n.t(
@@ -410,7 +418,7 @@ export function attachPageEvents(_e) {
   })
   $('#move_question_dialog :radio').change(function () {
     $('#move_question_dialog .new_question_bank_name').showIf(
-      $(this).attr('checked') && $(this).val() === 'new'
+      $(this).prop('checked') && $(this).val() === 'new'
     )
   })
 }

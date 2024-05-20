@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GradingType, WorkflowState} from '../../../api'
+import type {GradingType, WorkflowState} from '../../../api.d'
 
 export type UserConnection = {
   enrollments: {
@@ -86,6 +86,23 @@ export type SectionConnection = {
   name: string
 }
 
+export type Outcome = {
+  id: string
+  assessed?: boolean
+  calculationInt?: number | null
+  calculationMethod?: string | null
+  description?: string | null
+  displayName?: string | null
+  masteryPoints?: number | null
+  pointsPossible?: number | null
+  title: string
+  ratings: {
+    color: string | null
+    description?: string | null
+    mastery?: boolean | null
+    points?: number | null
+  }[]
+}
 export type SubmissionConnection = {
   assignmentId: string
   id: string
@@ -133,6 +150,11 @@ export type GradebookQueryResponse = {
     submissionsConnection: {
       nodes: SubmissionConnection[]
     }
+    rootOutcomeGroup: {
+      outcomes: {
+        nodes: Outcome[]
+      }
+    }
     assignmentGroupsConnection: {
       nodes: AssignmentGroupConnection[]
     }
@@ -155,27 +177,27 @@ export type GradebookStudentDetails = {
 }
 
 export type GradebookUserSubmissionDetails = {
-  grade: string | null
-  id: string
-  score: number | null
-  enteredScore?: number | null
   assignmentId: string
-  submissionType?: string | null
-  proxySubmitter?: string | null
-  submittedAt: Date | null
-  state: string
+  cachedDueDate: string | null
+  customGradeStatus?: string | null
+  deductedPoints: null | string | number
+  enteredGrade: string | null
+  enteredScore?: number | null
   excused: boolean
+  grade: string | null
+  gradeMatchesCurrentSubmission: boolean | null
+  gradingPeriodId?: string
+  id: string
   late: boolean
   latePolicyStatus?: string
   missing: boolean
-  userId: string
+  proxySubmitter?: string | null
   redoRequest: boolean
-  cachedDueDate: string | null
-  gradingPeriodId?: string
-  deductedPoints: null | string | number
-  enteredGrade: string | null
-  gradeMatchesCurrentSubmission: boolean | null
-  customGradeStatus?: string | null
+  score: null | number
+  state: string
+  submissionType?: string | null
+  submittedAt: Date | null
+  userId: string
 }
 
 export type GradebookStudentQueryResponse = {

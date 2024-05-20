@@ -17,7 +17,7 @@
  */
 
 import {createStore, applyMiddleware} from 'redux'
-import ReduxThunk from 'redux-thunk'
+import {thunk} from 'redux-thunk'
 import reducer from '../reducer'
 import initialState from './initialState'
 
@@ -28,7 +28,7 @@ const middleware = [
     process.env.NODE_ENV !== 'test' &&
     require('redux-logger').logger,
 
-  ReduxThunk,
+  thunk,
 ].filter(Boolean)
 
 const createStoreWithMiddleware = applyMiddleware(...middleware)(createStore)

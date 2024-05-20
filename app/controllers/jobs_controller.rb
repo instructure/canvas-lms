@@ -38,8 +38,8 @@ class JobsController < ApplicationController
     GuardRail.activate(:secondary) do
       respond_to do |format|
         format.html do
-          @running_jobs_refresh_seconds = Setting.get("running_jobs_refresh_seconds", 2.seconds.to_s).to_f
-          @job_tags_refresh_seconds = Setting.get("job_tags_refresh_seconds", 10.seconds.to_s).to_f
+          @running_jobs_refresh_seconds = 2.seconds
+          @job_tags_refresh_seconds = 10.seconds
         end
 
         format.json do

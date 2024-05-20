@@ -18,6 +18,7 @@
 
 import AssignmentMuter from 'ui/features/screenreader_gradebook/jquery/AssignmentMuter'
 import $ from 'jquery'
+import 'jquery-migrate'
 
 QUnit.module('AssignmentMuter', suiteHooks => {
   let assignment

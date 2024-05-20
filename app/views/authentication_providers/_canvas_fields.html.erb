@@ -30,10 +30,18 @@
     <%= f.radio_button :self_registration, 'observer', id: "self_registration_observers_#{presenter.id_suffix(aac)}", checked: aac.self_registration == 'observer' %>
     <%= f.label :self_registration, t('Observer Accounts Only'), for: "self_registration_observers_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
   </div>
-  <% if DynamicSettings.find(tree: :private)['recaptcha_server_key'] %>
-  <div class="ic-Form-control">
-    <%= f.check_box :enable_captcha, class: 'enable_captcha_checkbox', id: "enable_captcha_#{presenter.id_suffix(aac)}" %>
-    <%= f.label :enable_captcha, t('Require Captcha for Self Registration'), for: "enable_captcha_#{presenter.id_suffix(aac)}" %>
+  <div class="ic-Checkbox-group">
+    <% if DynamicSettings.find(tree: :private)['recaptcha_server_key'] %>
+    <div class="ic-Form-control ic-Form-control--checkbox">
+      <%= f.check_box :enable_captcha, class: 'enable_captcha_checkbox', id: "enable_captcha_#{presenter.id_suffix(aac)}" %>
+      <%= f.label :enable_captcha, t('Require Captcha for Self Registration'), for: "enable_captcha_#{presenter.id_suffix(aac)}", class: "ic-Label" %>
+    </div>
+    <% end %>
+    <% if aac.account.mfa_settings != :disabled %>
+    <div class="ic-Form-control ic-Form-control--checkbox">
+      <%= f.check_box :otp_via_sms, class: 'otp_via_sms_checkbox', id: "otp_via_sms_#{presenter.id_suffix(aac)}" %>
+      <%= f.label :otp_via_sms, t('Send one-time passcodes via SMS (US carriers only)'), for: "otp_via_sms_#{presenter.id_suffix(aac)}", class: "ic-Label" %>
+    </div>
+    <% end %>
   </div>
-  <% end %>
 </div>

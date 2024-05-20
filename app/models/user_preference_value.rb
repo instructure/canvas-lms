@@ -26,7 +26,7 @@
 class UserPreferenceValue < ActiveRecord::Base
   belongs_to :user
   serialize :value
-  serialize :sub_key, JSON # i'm too lazy to force a distinction between integer and string/symbol keys
+  serialize :sub_key, coder: JSON # i'm too lazy to force a distinction between integer and string/symbol keys
 
   # this means that the preference value is no longer stored on the user object
   # and is in it's own record in the db
@@ -49,7 +49,7 @@ class UserPreferenceValue < ActiveRecord::Base
   add_user_preference :gradebook_column_order, use_sub_keys: true
   add_user_preference :gradebook_column_size, use_sub_keys: true
   add_user_preference :gradebook_settings, use_sub_keys: true
-  add_user_preference :isolated_view_deeply_nested_alert
+  add_user_preference :split_screen_view_deeply_nested_alert
   add_user_preference :new_user_tutorial_statuses
   add_user_preference :selected_calendar_contexts
   add_user_preference :enabled_account_calendars
@@ -60,6 +60,7 @@ class UserPreferenceValue < ActiveRecord::Base
   add_user_preference :unread_rubric_comments, use_sub_keys: true
   add_user_preference :module_links_default_new_tab
   add_user_preference :viewed_auto_subscribed_account_calendars
+  add_user_preference :suppress_faculty_journal_deprecation_notice # remove when :deprecate_faculty_journal is removed
 
   def self.settings
     @preference_settings ||= {}
@@ -68,34 +69,6 @@ class UserPreferenceValue < ActiveRecord::Base
   end
 
   module UserMethods
-    # i could just stuff all this in user.rb directly but it's so full already
-    def needs_preference_migration?
-      preferences.any? do |key, value|
-        UserPreferenceValue.settings[key] && value.present? && value != EXTERNAL
-      end
-    end
-
-    # can remove these when all preferences have been migrated
-    def migrate_preferences_if_needed
-      return unless needs_preference_migration?
-
-      reorganize_gradebook_preferences # may as well while we're at it
-      UserPreferenceValue.settings.each do |key, settings|
-        value = preferences[key]
-        next unless value.present?
-        next if value == EXTERNAL
-
-        if settings[:use_sub_keys]
-          value.each do |sub_key, sub_value|
-            create_user_preference_value(key, sub_key, sub_value)
-          end
-        else
-          create_user_preference_value(key, nil, value)
-        end
-        preferences[key] = EXTERNAL
-      end
-    end
-
     def get_preference(key, sub_key = nil)
       value = preferences[key]
       if value == EXTERNAL
@@ -120,9 +93,6 @@ class UserPreferenceValue < ActiveRecord::Base
         raise "wrong number of arguments"
       end
       raise "invalid key `#{key}`" unless UserPreferenceValue.settings[key]
-
-      # don't bother trying to merge things in - just move everything over
-      migrate_preferences_if_needed
 
       if value.present? || sub_key
         if value.nil?

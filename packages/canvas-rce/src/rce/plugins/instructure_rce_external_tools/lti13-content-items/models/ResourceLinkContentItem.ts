@@ -40,8 +40,10 @@ export default class ResourceLinkContentItem extends BaseLinkContentItem<Resourc
   }
 
   override buildUrl() {
+    // iframed launches need canvas wrapped around them for postMessages to work
+    const display = this.iframe != null ? 'in_rce' : 'borderless'
     return addQueryParamsToUrl(this.context.ltiEndpoint, {
-      display: 'in_rce',
+      display,
       resource_link_lookup_uuid: this.lookup_uuid,
       [PARENT_FRAME_CONTEXT_PARAM]: this.context.containingCanvasLtiToolId,
     })

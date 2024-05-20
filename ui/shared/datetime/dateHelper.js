@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {isUndefined, each} from 'lodash'
 import $ from 'jquery'
-import tz from '@canvas/timezone'
+import * as tz from './index'
 import './jquery/index'
 
 const DateHelper = {
   parseDates(object, datesToParse) {
-    _.each(datesToParse, dateString => {
-      const propertyExists = !_.isUndefined(object[dateString])
+    each(datesToParse, dateString => {
+      const propertyExists = !isUndefined(object[dateString])
       if (propertyExists) object[dateString] = tz.parse(object[dateString])
     })
     return object
@@ -34,12 +34,12 @@ const DateHelper = {
     return $.datetimeString(date, {format, timezone: ENV.CONTEXT_TIMEZONE})
   },
 
-  formatDatetimeForDiscussions(datetime, format = '') {
-    return $.discussionsDatetimeString(datetime, {format, timezone: ENV.CONTEXT_TIMEZONE})
+  formatDatetimeForDiscussions(datetime, format = '', timezone = ENV.TIMEZONE) {
+    return $.discussionsDatetimeString(datetime, {format, timezone})
   },
 
-  formatDateForDisplay(date, format = 'medium') {
-    return $.dateString(date, {format, timezone: ENV.CONTEXT_TIMEZONE})
+  formatDateForDisplay(date, format = 'medium', timezone = ENV.CONTEXT_TIMEZONE) {
+    return $.dateString(date, {format, timezone})
   },
 
   isMidnight(date) {

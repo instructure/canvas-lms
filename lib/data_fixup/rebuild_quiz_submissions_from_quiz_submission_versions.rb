@@ -62,7 +62,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionVersions
       qs.questions.each do |q|
         user_answer = Quizzes::SubmissionGrader.score_question(q, submission_data)
         user_answers << user_answer
-        tally += (user_answer[:points] || 0) if user_answer[:correct]
+        tally += user_answer[:points] || 0 if user_answer[:correct]
       end
       qs.score = tally
       qs.score = qs.quiz.points_possible if qs.quiz && qs.quiz.quiz_type == "graded_survey"

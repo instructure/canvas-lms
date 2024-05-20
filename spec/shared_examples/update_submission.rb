@@ -304,8 +304,8 @@ RSpec.shared_examples "a submission update action" do |controller|
       expect(assigns[:submission].submission_comments.length).to be 1
       expect(assigns[:submission].submission_comments.first.comment).to eql("some comment")
       expect(assigns[:submission].submission_comments.first.attachments.length).to be 2
-      expect(assigns[:submission].submission_comments.first.attachments.map(&:display_name)).to be_include("doc.doc")
-      expect(assigns[:submission].submission_comments.first.attachments.map(&:display_name)).to be_include("txt.txt")
+      expect(assigns[:submission].submission_comments.first.attachments.map(&:display_name)).to include("doc.doc")
+      expect(assigns[:submission].submission_comments.first.attachments.map(&:display_name)).to include("txt.txt")
     end
 
     it "stores comment files in instfs if instfs is enabled" do

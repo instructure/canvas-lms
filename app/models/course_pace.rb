@@ -68,8 +68,6 @@ class CoursePace < ActiveRecord::Base
     can :read
   end
 
-  self.ignored_columns += %i[start_date]
-
   def asset_name
     I18n.t("Course Pace")
   end
@@ -275,12 +273,12 @@ class CoursePace < ActiveRecord::Base
       if user_id
         course.student_enrollments.where(user_id:)
       elsif course_section_id
-        student_course_pace_user_ids = course.course_paces.where.not(user_id: nil).pluck(:user_id)
+        student_course_pace_user_ids = course.course_paces.not_deleted.where.not(user_id: nil).pluck(:user_id)
         course_section.student_enrollments.where.not(user_id: student_course_pace_user_ids)
       else
-        student_course_pace_user_ids = course.course_paces.where.not(user_id: nil).pluck(:user_id)
+        student_course_pace_user_ids = course.course_paces.not_deleted.where.not(user_id: nil).pluck(:user_id)
         course_section_course_pace_section_ids =
-          course.course_paces.where.not(course_section: nil).pluck(:course_section_id)
+          course.course_paces.not_deleted.where.not(course_section: nil).pluck(:course_section_id)
         course
           .student_enrollments
           .where

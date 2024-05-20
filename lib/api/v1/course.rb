@@ -152,6 +152,7 @@ module Api::V1::Course
       hash["locale"] = course.locale unless course.locale.nil?
       hash["account"] = account_json(course.account, user, session, []) if includes.include?("account")
       # undocumented, but leaving for backwards compatibility.
+      hash["subaccount_id"] = course.account.id if includes.include?("subaccount")
       hash["subaccount_name"] = course.account.name if includes.include?("subaccount")
       add_helper_dependant_entries(hash, course, builder)
       apply_nickname(hash, course, user, prefer_friendly_name:)
@@ -168,6 +169,7 @@ module Api::V1::Course
       end
 
       hash["grading_scheme"] = course.grading_standard_or_default.data if includes.include?("grading_scheme")
+      hash["points_based_grading_scheme"] = course.grading_standard_or_default.points_based? if includes.include?("grading_scheme")
       hash["restrict_quantitative_data"] = course.restrict_quantitative_data?(user) if includes.include?("restrict_quantitative_data")
 
       # return hash from the block for additional processing in Api::V1::CourseJson

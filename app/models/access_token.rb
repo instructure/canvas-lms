@@ -30,12 +30,12 @@ class AccessToken < ActiveRecord::Base
   attr_reader :full_token
   attr_reader :plaintext_refresh_token
 
-  belongs_to :developer_key, counter_cache: :access_token_count
+  belongs_to :developer_key
   belongs_to :user, inverse_of: :access_tokens
   belongs_to :real_user, inverse_of: :masquerade_tokens, class_name: "User"
   has_one :account, through: :developer_key
 
-  serialize :scopes, Array
+  serialize :scopes, type: Array
 
   validates :purpose, length: { maximum: maximum_string_length }
   validate :must_only_include_valid_scopes, unless: :deleted?
@@ -65,15 +65,11 @@ class AccessToken < ActiveRecord::Base
   scope :not_deleted, -> { where(workflow_state: "active") }
 
   TOKEN_SIZE = 64
-  TOKEN_TYPES = OpenStruct.new(
-    {
-      crypted_token: :crypted_token,
-      crypted_refresh_token: :crypted_refresh_token
-    }
-  )
+  TOKEN_TYPES = [:crypted_token, :crypted_refresh_token].freeze
 
   before_create :generate_token
   before_create :generate_refresh_token
+  after_create :queue_developer_key_token_count_increment
 
   alias_method :destroy_permanently!, :destroy
   def destroy
@@ -90,7 +86,7 @@ class AccessToken < ActiveRecord::Base
     token = access_token || not_deleted.where(token_key => hashed_tokens).first
     if token && token.send(token_key) != hashed_tokens.first
       # we found the token but, its hashed using an old key. save the updated hash
-      token.send("#{token_key}=", hashed_tokens.first)
+      token.send(:"#{token_key}=", hashed_tokens.first)
       token.save!
     end
     token = nil unless token&.usable?(token_key)
@@ -147,12 +143,8 @@ class AccessToken < ActiveRecord::Base
     Shard.shard_for(global_developer_key_id).default?
   end
 
-  def record_last_used_threshold
-    Setting.get("access_token_last_used_threshold", 10.minutes).to_i
-  end
-
   def used!(at: nil)
-    return if last_used_at && last_used_at >= record_last_used_threshold.seconds.ago
+    return if last_used_at && last_used_at >= 10.minutes.ago
 
     at ||= Time.now.utc
 
@@ -302,5 +294,25 @@ class AccessToken < ActiveRecord::Base
 
   def manually_created?
     developer_key_id == DeveloperKey.default.id
+  end
+
+  def self.invalidate_mobile_tokens!(account)
+    return unless account.root_account?
+
+    developer_key_ids = DeveloperKey.mobile_app_keys.map do |app_key|
+      app_key.respond_to?(:global_id) ? app_key.global_id : app_key.id
+    end
+    user_ids = User.active.joins(:pseudonyms).where(pseudonyms: { account_id: account }).ids
+    tokens = active.where(developer_key_id: developer_key_ids, user_id: user_ids)
+
+    now = Time.zone.now
+    tokens.in_batches(of: 10_000).update_all(updated_at: now, permanent_expires_at: now)
+  end
+
+  def queue_developer_key_token_count_increment
+    developer_key&.shard&.activate do
+      strand = "developer_key_token_count_increment_#{developer_key.global_id}"
+      DeveloperKey.delay_if_production(strand:).increment_counter(:access_token_count, developer_key.id)
+    end
   end
 end

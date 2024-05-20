@@ -18,18 +18,26 @@
 
 <% title = join_title t("Upload Gradebook"), @context.name %>
 <% provide :page_title, title %>
+<% if @domain_root_account.feature_enabled?(:instui_nav) %>
+  <% add_crumb t('Grades'), context_url(@context, :context_grades_url ) %>
+  <% add_crumb t("Import") %>
+<% end %>
 
 <div class="grid-row">
   <div class="col-xs-12 col-md-8">
 
-    <div class="ic-Action-header">
+    <div class="ic-Action-header" style="margin-bottom: 2.25rem">
       <div class="ic-Action-header__Primary">
-        <h1 class="ic-Action-header__Heading"><%= title %></h1>
+    <% if @domain_root_account.feature_enabled?(:instui_nav) %>
+      <h1 class="ic-Action-header__Heading ic-Action-header-title"><%= t("Import") %></h1>
+    <% else %>
+      <h1 class="ic-Action-header__Heading"><%= title %></h1>
+    <% end %>
       </div>
     </div>
 
     <%= form_for [@context, GradebookUpload.new], html: { class: 'ic-Form-group', multipart: true, title: t("Choose a CSV file to upload:") } do |f| %>
-      <p>
+      <p style="margin-top: 0">
         <a class="icon-question" target="_blank" href="<%= t(:'#community.instructor_import_grades') %>"><%= t "What should the CSV file look like?" %></a>
       </p>
       <div class="ic-Form-control">

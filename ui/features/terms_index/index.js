@@ -18,8 +18,8 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import $ from 'jquery'
-import '@canvas/datetime'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/datetime/jquery'
+import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/util/templateData'
@@ -101,14 +101,14 @@ $(document).ready(() => {
 
     beforeSubmit(_data) {
       const $tr = $(this).parents('.term')
-      $tr.find('button').attr('disabled', true)
+      $tr.find('button').prop('disabled', true)
       return $tr.find('.submit_button').text(I18n.t('messages.submitting', 'Submitting...'))
     },
 
     success(data) {
       const term = data.enrollment_term
       const $tr = $(this).parents('.term')
-      $tr.find('button').attr('disabled', false)
+      $tr.find('button').prop('disabled', false)
       $tr.find('.submit_button').text(I18n.t('update_term', 'Update Term'))
       const url = replaceTags($('.term_url').attr('href'), 'id', term.id)
       $(this).attr('action', url)
@@ -155,7 +155,7 @@ $(document).ready(() => {
       let button_text
       const $term = $(this).closest('.term')
       const $tr = $(this).parents('.term')
-      $tr.find('button').attr('disabled', false)
+      $tr.find('button').prop('disabled', false)
       $(this).formErrors(data)
       if ($term.attr('id') === 'term_new') {
         button_text = I18n.t('add_term', 'Add Term')

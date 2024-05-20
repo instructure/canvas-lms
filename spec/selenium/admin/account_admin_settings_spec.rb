@@ -19,8 +19,11 @@
 
 require_relative "../common"
 require_relative "../helpers/basic/settings_specs"
+require_relative "pages/admin_account_page"
 
 describe "root account basic settings" do
+  include AdminSettingsPage
+
   let(:account) { Account.default }
   let(:account_settings_url) { "/accounts/#{account.id}/settings" }
   let(:reports_url) { "/accounts/#{account.id}/reports_tab" }
@@ -68,7 +71,7 @@ describe "root account basic settings" do
       # click then close restrict quantitative data helper dialog
       fj("button:contains('About restrict quantitative data')").click
       expect(fj("div.ui-dialog-titlebar:contains('Restrict Quantitative Data')")).to be_present
-      force_click("button.ui-dialog-titlebar-close")
+      force_click(".ui-dialog-titlebar-close")
 
       f("#account_settings_restrict_quantitative_data_value").click
       submit_form("#account_settings")
@@ -119,6 +122,18 @@ describe "root account basic settings" do
     driver.switch_to.alert.accept
     submit_form("#account_settings")
     expect(Account.default.reload.settings[:suppress_notifications]).to be true
+  end
+
+  it "updates the account's allow_observers_in_appointment_groups setting" do
+    expect(account.allow_observers_in_appointment_groups?).to be false
+
+    user_session(@admin)
+    get account_settings_url
+    expect(is_checked(allow_observers_in_appointments_checkbox)).to be false
+    allow_observers_in_appointments_checkbox.click
+    expect_new_page_load { submit_form("#account_settings") }
+    expect(is_checked(allow_observers_in_appointments_checkbox)).to be true
+    expect(account.reload.allow_observers_in_appointment_groups?).to be true
   end
 
   context "editing slack API key" do
@@ -243,6 +258,32 @@ describe "root account basic settings" do
     get account_settings_url + "#tab-reports"
     f("#configure_zero_activity_csv").click
     expect(f("#zero_activity_csv_form")).to contain_css(".ui-datepicker-trigger")
+  end
+
+  it "disables report options for provisioning report form when a report hasn't been selected" do
+    course_with_admin_logged_in
+    get account_settings_url + "#tab-reports"
+
+    f("#configure_provisioning_csv").click
+    expect(f("#provisioning_csv_form").find("#parameters_created_by_sis")).to be_disabled
+    expect(f("#provisioning_csv_form").find("#parameters_include_deleted")).to be_disabled
+
+    f("#provisioning_csv_form").find("#parameters_courses").click
+    expect(f("#provisioning_csv_form").find("#parameters_created_by_sis")).to_not be_disabled
+    expect(f("#provisioning_csv_form").find("#parameters_include_deleted")).to_not be_disabled
+  end
+
+  it "disables report options for SIS export report form when a report hasn't been selected" do
+    course_with_admin_logged_in
+    get account_settings_url + "#tab-reports"
+
+    f("#configure_sis_export_csv").click
+    expect(f("#sis_export_csv_form").find("#parameters_created_by_sis")).to be_disabled
+    expect(f("#sis_export_csv_form").find("#parameters_include_deleted")).to be_disabled
+
+    f("#sis_export_csv_form").find("#parameters_users").click
+    expect(f("#sis_export_csv_form").find("#parameters_created_by_sis")).to_not be_disabled
+    expect(f("#sis_export_csv_form").find("#parameters_include_deleted")).to_not be_disabled
   end
 
   it "changes the default user quota", priority: "1" do

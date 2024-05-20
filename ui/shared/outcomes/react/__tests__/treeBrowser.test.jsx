@@ -18,14 +18,18 @@
 
 import React from 'react'
 import {createCache} from '@canvas/apollo'
-import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import OutcomesContext from '../contexts/OutcomesContext'
 import {useManageOutcomes} from '../treeBrowser'
 import {smallOutcomeTree} from '../../mocks/Management'
 import {renderHook, act} from '@testing-library/react-hooks'
 import {MockedProvider} from '@apollo/react-testing'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 jest.useFakeTimers()
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+}))
 
 describe('useManageOutcomes', () => {
   let cache
@@ -73,13 +77,12 @@ describe('useManageOutcomes', () => {
   })
 
   it('should flash a screenreader only info message when a group is loading', async () => {
-    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     const {result} = renderHook(() => useManageOutcomes(), {wrapper})
     await act(async () => jest.runAllTimers())
 
     expect(result.current.collections['100']).toBeDefined()
     result.current.queryCollections({id: '100', parentGroupId: '1'})
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'Loading Account folder 0.',
       srOnly: true,
     })

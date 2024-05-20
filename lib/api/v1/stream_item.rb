@@ -51,10 +51,10 @@ module Api::V1::StreamItem
         hash["message"] = api_user_content(data.message, context)
         if stream_item.data.instance_of?(DiscussionTopic)
           hash["discussion_topic_id"] = stream_item.asset_id
-          hash["html_url"] = send("#{context_type}_discussion_topic_url", context_id, stream_item.asset_id)
+          hash["html_url"] = send(:"#{context_type}_discussion_topic_url", context_id, stream_item.asset_id)
         else
           hash["announcement_id"] = stream_item.asset_id
-          hash["html_url"] = send("#{context_type}_announcement_url", context_id, stream_item.asset_id)
+          hash["html_url"] = send(:"#{context_type}_announcement_url", context_id, stream_item.asset_id)
         end
         hash["total_root_discussion_entries"] = data.total_root_discussion_entries
         hash["require_initial_post"] = data.require_initial_post
@@ -102,13 +102,13 @@ module Api::V1::StreamItem
         hash["web_conference_id"] = stream_item.asset_id
         hash["type"] = "WebConference"
         hash["message"] = data.description
-        hash["html_url"] = send("#{context_type}_conference_url", context_id, stream_item.asset_id) if context_type
+        hash["html_url"] = send(:"#{context_type}_conference_url", context_id, stream_item.asset_id) if context_type
       when /Collaboration/
         hash["collaboration_id"] = stream_item.asset_id
         # TODO: this type isn't even shown on the web activity stream yet
         hash["message"] = data.description
         hash["type"] = "Collaboration"
-        hash["html_url"] = send("#{context_type}_collaboration_url", context_id, stream_item.asset_id) if context_type
+        hash["html_url"] = send(:"#{context_type}_collaboration_url", context_id, stream_item.asset_id) if context_type
       when /AssessmentRequest/
         assessment_request = stream_item.data
         assignment = assessment_request.asset.assignment

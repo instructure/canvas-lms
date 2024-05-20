@@ -240,8 +240,11 @@ const ComposeModalManager = props => {
     const success = errorMessage ? false : !!data
 
     if (success) {
-      props.onDismiss()
-      setOnSuccess(I18n.t('Message sent!'), false)
+      // before we do anything, let's allow some time for any ModalSpinner to truly go away
+      setTimeout(() => {
+        props.onDismiss()
+        setOnSuccess(I18n.t('Message sent!'), false)
+      }, 500)
     } else {
       if (errorMessage && errorMessage[0]?.message) {
         setModalError(errorMessage[0].message)
@@ -357,6 +360,7 @@ const ComposeModalManager = props => {
       setSendingMessage={setSendingMessage}
       onSelectedIdsChange={props.onSelectedIdsChange}
       selectedIds={props.selectedIds}
+      contextIdFromUrl={props.contextIdFromUrl}
       maxGroupRecipientsMet={props.maxGroupRecipientsMet}
       submissionCommentsHeader={isSubmissionCommentsType ? props?.conversation?.subject : null}
       modalError={modalError}
@@ -377,6 +381,7 @@ ComposeModalManager.propTypes = {
   conversationsQueryOption: PropTypes.object,
   onSelectedIdsChange: PropTypes.func,
   selectedIds: PropTypes.array,
+  contextIdFromUrl: PropTypes.string,
   maxGroupRecipientsMet: PropTypes.bool,
   currentCourseFilter: PropTypes.string,
 }

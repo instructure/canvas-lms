@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
 
 export const FETCH_HISTORY_START = 'FETCH_HISTORY_START'

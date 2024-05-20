@@ -73,11 +73,9 @@ export const updateDiscussionTopicEntryCounts = (
   }
 }
 
-export const updateDiscussionEntryRootEntryCounts = (cache, result, unreadCountChange) => {
+export const updateDiscussionEntryRootEntryCounts = (cache, discussionEntry, unreadCountChange) => {
   const discussionEntryOptions = {
-    id: btoa(
-      'DiscussionEntry-' + result.data.updateDiscussionEntryParticipant.discussionEntry.rootEntryId
-    ),
+    id: btoa('DiscussionEntry-' + discussionEntry.rootEntryId),
     fragment: DiscussionEntry.fragment,
     fragmentName: 'DiscussionEntry',
   }
@@ -121,12 +119,7 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
     // The writeQuery creates a subentry query shape using the data from the new discussion entry
     // Using that query object it tries to find the cached subentry query for that reply and add the new reply to the cache
     const parentEntryOptions = {
-      id: btoa(
-        'DiscussionEntry-' +
-          (ENV.split_screen_view || ENV.isolated_view
-            ? newDiscussionEntry.rootEntryId
-            : newDiscussionEntry.parentId)
-      ),
+      id: btoa('DiscussionEntry-' + newDiscussionEntry.rootEntryId),
       fragment: DiscussionEntry.fragment,
       fragmentName: 'DiscussionEntry',
     }
@@ -191,7 +184,6 @@ export const addReplyToAllRootEntries = (cache, newDiscussionEntry) => {
       query: DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY,
       variables: {
         discussionEntryID: newDiscussionEntry.rootEntryId,
-        courseID: window.ENV?.course_id,
       },
     }
     const rootEntry = JSON.parse(JSON.stringify(cache.readQuery(options)))
@@ -277,7 +269,6 @@ export const getOptimisticResponse = ({
   message = '',
   parentId = 'PLACEHOLDER',
   rootEntryId = null,
-  isolatedEntryId = null,
   quotedEntry = null,
   isAnonymous = false,
   depth = null,
@@ -328,6 +319,7 @@ export const getOptimisticResponse = ({
               id: 'USER_PLACEHOLDER',
               _id: ENV.current_user.id,
               avatarUrl: ENV.current_user.avatar_image_url,
+              htmlUrl: ENV.current_user.html_url,
               displayName: ENV.current_user.display_name,
               courseRoles: [],
               pronouns: null,
@@ -358,7 +350,6 @@ export const getOptimisticResponse = ({
         },
         parentId,
         rootEntryId,
-        isolatedEntryId,
         quotedEntry,
         attachment: attachment
           ? {...attachment, id: 'ATTACHMENT_PLACEHOLDER', __typename: 'File'}

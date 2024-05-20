@@ -31,12 +31,13 @@ import genericSelectOptionsTemplate from '../../jst/genericSelectOptions.handleb
 import datePickerFormat from '@canvas/datetime/datePickerFormat'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import withinMomentDates from '../../momentDateHelper'
-import tz from '@canvas/timezone'
+import * as tz from '@canvas/datetime'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
-import '@canvas/datetime'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/datetime/jquery'
+import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '../../fcMomentHandlebarsHelpers'
+import {encodeQueryString} from '@canvas/query-string-encoding'
 
 const I18n = useI18nScope('calendar')
 
@@ -138,7 +139,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
       params.assignment_group_id = data.assignment_group_id
     }
     params.return_to = window.location.href
-    pieces[0] += `?${$.param(params)}`
+    pieces[0] += `?${encodeQueryString(params)}`
     return (window.location.href = pieces.join('#'))
   }
 

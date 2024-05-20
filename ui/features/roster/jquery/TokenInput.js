@@ -16,9 +16,12 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import TokenSelector from './TokenSelector'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
+
+const I18n = useI18nScope('roster')
 
 export default class TokenInput {
   constructor($node, options) {
@@ -104,7 +107,8 @@ export default class TokenInput {
             return this.$fakeInput.addClass('browse')
           }
         }
-        $('<a href="#" class="browser">browse</a>')
+        $('<a href="#" class="browser"></a>')
+          .text(I18n.t('browse'))
           .click(e => {
             e.preventDefault()
             activateBrowse()

@@ -43,7 +43,7 @@ module Lti
 
     def self.register_expansion(name, permission_groups, expansion_proc, *guards, **kwargs)
       @expansions ||= {}
-      @expansions["$#{name}".to_sym] = VariableExpansion.new(
+      @expansions[:"$#{name}"] = VariableExpansion.new(
         name,
         permission_groups,
         expansion_proc,
@@ -53,7 +53,7 @@ module Lti
     end
 
     def self.deregister_expansion(name)
-      @expansions.delete "$#{name}".to_sym
+      @expansions.delete :"$#{name}"
     end
 
     def self.expansions
@@ -92,6 +92,7 @@ module Lti
         @context.enrollment_term.end_at
     end
     TERM_NAME_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term&.name }
+    TERM_ID_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term_id }
     USER_GUARD = -> { @current_user }
     SIS_USER_GUARD = -> { sis_pseudonym&.sis_user_id }
     PSEUDONYM_GUARD = -> { sis_pseudonym }
@@ -120,7 +121,7 @@ module Lti
       @context = context
       @controller = controller
       @request = controller.request if controller
-      opts.each { |opt, val| instance_variable_set("@#{opt}", val) }
+      opts.each { |opt, val| instance_variable_set(:"@#{opt}", val) }
 
       # This will provide the most accurate version of the actual launch
       # url used, whether directly provided from a resource link or
@@ -157,9 +158,7 @@ module Lti
                    v
                  end
 
-        if @root_account&.feature_enabled?(:variable_substitution_numeric_to_string) &&
-           @tool.is_a?(ContextExternalTool) && @tool.use_1_3? &&
-           output.is_a?(Numeric)
+        if @tool.is_a?(ContextExternalTool) && @tool.use_1_3? && output.is_a?(Numeric)
           output&.to_s
         else
           output
@@ -169,7 +168,7 @@ module Lti
 
     def enabled_capability_params(enabled_capabilities)
       enabled_capabilities.each_with_object({}) do |capability, hash|
-        if (expansion = capability.respond_to?(:to_sym) && self.class.expansions["$#{capability}".to_sym])
+        if (expansion = capability.respond_to?(:to_sym) && self.class.expansions[:"$#{capability}"])
           value = expansion.expand(self)
           hash[expansion.default_name] = value if expansion.default_name.present? && value != "$#{capability}"
         end
@@ -230,8 +229,8 @@ module Lti
     # Returns "$ResourceLink.title" otherwise
     register_expansion "ResourceLink.title",
                        [],
-                       -> { @assignment.title },
-                       -> { @assignment && @assignment.title.present? },
+                       -> { @resource_link&.title || @assignment&.title || lti_helper.tag_from_resource_link(@resource_link)&.title || @context.name },
+                       -> { @resource_link || (@assignment && @assignment.title.present?) },
                        default_name: "resourcelink_title"
 
     # LTI - Custom parameter substitution: ResourceLink.available.startDateTime
@@ -280,8 +279,9 @@ module Lti
     register_expansion "com.instructure.User.observees",
                        [],
                        lambda {
-                         observed_users = ObserverEnrollment.observed_students(@context, @current_user)
-                                                            .keys
+                         observed_users =
+                           ObserverEnrollment.observed_students(@context, @current_user)
+                                             .keys
                          if @tool.use_1_3?
                            observed_users.map { |u| u.lookup_lti_id(@context) }.join(",")
                          else
@@ -292,7 +292,8 @@ module Lti
                        default_name: "com_instructure_user_observees"
 
     # Returns an array of the section names in a JSON-escaped format that the user is enrolled in, if the
-    # context of the tool launch is within a course.
+    # context of the tool launch is within a course. The names are sorted by the course_section_id, so that
+    # they are useful in conjunction with the Canvas.course.sectionIds substitution.
     #
     # @example
     #   ```
@@ -300,7 +301,7 @@ module Lti
     #   ```
     register_expansion "com.instructure.User.sectionNames",
                        [],
-                       -> { @context.enrollments.active.joins(:course_section).where(user_id: @current_user.id).pluck(:name)&.to_json },
+                       -> { @context.enrollments.active.joins(:course_section).where(user_id: @current_user.id).order(:course_section_id).pluck(:name)&.to_json },
                        ENROLLMENT_GUARD,
                        default_name: "com_instructure_user_section_names"
 
@@ -317,8 +318,22 @@ module Lti
                        },
                        default_name: "com_instructure_rcs_app_host"
 
+    # Returns true if the user is launching from student view.
+    #
+    # @example
+    #   ```
+    #   "true"
+    #   "false"
+    #   ```
+    register_expansion "com.instructure.User.student_view",
+                       [],
+                       -> { @current_user.fake_student? || false },
+                       USER_GUARD,
+                       default_name: "com_instructure_user_student_view"
+
     # Returns the RCS Service JWT for the current user
     #
+    # @internal
     # @example
     #   ```
     #   "base64-encoded-service-jwt"
@@ -335,6 +350,7 @@ module Lti
 
     # Returns instui_nav release flag state
     #
+    # @internal
     # @example
     #   ```
     #   "true"
@@ -356,7 +372,7 @@ module Lti
                        [],
                        lambda {
                          observed_users = ObserverEnrollment.observed_students(@context, @current_user).keys
-                         observed_users&.collect { |user| find_sis_user_id_for(user) }&.compact&.join(",")
+                         observed_users&.filter_map { |user| find_sis_user_id_for(user) }&.join(",")
                        },
                        COURSE_GUARD,
                        default_name: "com_instructure_observee_sis_ids"
@@ -531,7 +547,7 @@ module Lti
                        -> { Lti::Asset.opaque_identifier_for(@context) },
                        default_name: "context_id"
 
-    # The Canvas global identifer for the launch context
+    # The Canvas global identifier for the launch context
     # @example
     #   ```
     #   10000000000070
@@ -539,6 +555,16 @@ module Lti
     register_expansion "com.instructure.Context.globalId",
                        [],
                        -> { @context&.global_id }
+
+    # The Canvas UUID for the launch context
+    # @example
+    #   ```
+    #   4TVeERS266frWLG5RVK0L8BbSC831mUZHaYpK4KP
+    #   ```
+    register_expansion "com.instructure.Context.uuid",
+                       [],
+                       -> { @context.uuid },
+                       -> { @context&.respond_to?(:uuid) }
 
     # If the context is a Course, returns sourced Id of the context
     # @example
@@ -946,6 +972,17 @@ module Lti
                        -> { @context.enrollment_term.name },
                        TERM_NAME_GUARD,
                        default_name: "canvas_term_name"
+
+    # returns the current course's term numerical id.
+    # @example
+    #   ```
+    #   123
+    #   ```
+    register_expansion "Canvas.term.id",
+                       [],
+                       -> { @context.enrollment_term_id },
+                       TERM_ID_GUARD,
+                       default_name: "canvas_term_id"
 
     # returns the current course sis source id
     # to return the section source id use Canvas.course.sectionIds
@@ -1454,17 +1491,29 @@ module Lti
                        -> { @controller.logged_in_user.id },
                        MASQUERADING_GUARD
 
-    # Returns the 40 character opaque user_id for masquerading user.
-    # This is the pseudonym the user is actually logged in as.
-    # It may not hold all the sis info needed in other launch substitutions.
+    # Returns the opaque user_id for the masquerading user. This is the
+    # pseudonym the user is actually logged in as. It may not hold all the sis
+    # info needed in other launch substitutions.
+    #
+    # For LTI 1.3 tools, the opaque user IDs are UUIDv4 values (also used in
+    # the "sub" claim in LTI 1.3 launches), while for other LTI versions, the
+    # user ID will be the user's 40 character opaque LTI id.
     #
     # @example
     #   ```
-    #   "da12345678cb37ba1e522fc7c5ef086b7704eff9"
+    #    LTI 1.3: "8b9f8327-aa32-fa90-9ea2-2fa8ef79e0f9",
+    #    All Others: "da12345678cb37ba1e522fc7c5ef086b7704eff9"
     #   ```
     register_expansion "Canvas.masqueradingUser.userId",
                        [],
-                       -> { @tool.opaque_identifier_for(@controller.logged_in_user, context: @context) },
+                       lambda {
+                         u = @controller.logged_in_user
+                         if lti_1_3?
+                           u.lookup_lti_id(@context)
+                         else
+                           @tool.opaque_identifier_for(u, context: @context)
+                         end
+                       },
                        MASQUERADING_GUARD
 
     # Returns the xapi url for the user.
@@ -1746,7 +1795,7 @@ module Lti
     #   ```
     register_expansion "Canvas.assignment.lockdownEnabled",
                        [],
-                       -> { @assignment.settings&.dig("lockdown_browser", "require_lockdown_browser") || false },
+                       -> { !!@controller && @current_user == @controller.logged_in_user && (@assignment.settings&.dig("lockdown_browser", "require_lockdown_browser") || false) },
                        ASSIGNMENT_GUARD
 
     # Returns the allowed number of submission attempts.
@@ -1941,6 +1990,18 @@ module Lti
     register_expansion "com.instructure.Course.canvas_resource_type",
                        [],
                        -> { @request.parameters["com_instructure_course_canvas_resource_type"] }
+
+    # Returns the target resource id for the current page, forwarded from the request. Only functional when
+    # `com_instructure_course_canvas_resource_type` is included as a query param. Currently, this is not
+    # supported generally, and is only implemented for specific use cases.
+    #
+    # @example
+    #   ```
+    #   123123
+    #   ```
+    register_expansion "com.instructure.Course.canvas_resource_id",
+                       [],
+                       -> { @request.parameters["com_instructure_course_canvas_resource_id"] }
 
     # Returns whether a content can be imported into a specific group on the page, forwarded from the request.
     # True for Modules page and Assignment Groups page. False for other content index pages.

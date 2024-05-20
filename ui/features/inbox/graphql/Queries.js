@@ -265,6 +265,8 @@ export const REPLY_CONVERSATION_QUERY = gql`
         id
         _id
         contextName
+        contextAssetString
+        contextType
         subject
         conversationMessagesConnection(
           participants: $participants

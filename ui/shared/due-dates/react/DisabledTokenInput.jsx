@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import _ from 'underscore'
+import {map} from 'lodash'
 
 const styles = {
   list: {
@@ -36,7 +36,7 @@ class DisabledTokenInput extends React.Component {
   }
 
   renderTokens() {
-    return _.map(this.props.tokens, (token, index) => (
+    return map(this.props.tokens, (token, index) => (
       <li key={`token-${index}`} className="ic-token inline-flex">
         <span className="ic-token-label" style={styles.label}>
           {token}

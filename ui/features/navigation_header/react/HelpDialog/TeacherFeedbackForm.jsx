@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/rails-flash-notifications'
 
 const I18n = useI18nScope('TeacherFeedbackForm')
@@ -57,6 +57,16 @@ class TeacherFeedbackForm extends React.Component {
       formErrors: false,
       disableWhileLoading: true,
       required: ['recipients[]', 'body'],
+      processData: data => {
+        const selectedCourseId = document.querySelector(
+          'select[name="recipients[]"] option:checked'
+        ).dataset.courseId
+        const subject = this.state.courses.find(c => c.id === selectedCourseId).name
+        const extraData = {
+          subject,
+        }
+        return {...data, ...extraData}
+      },
       success: () => {
         $.flashMessage(I18n.t('Message sent.'))
         this.props.onSubmit()
@@ -84,7 +94,7 @@ class TeacherFeedbackForm extends React.Component {
         const value = `course_${c.id}_admins`
 
         return (
-          <option key={value} value={value}>
+          <option key={value} value={value} data-course-id={c.id}>
             {c.name}
           </option>
         )

@@ -26,7 +26,7 @@ import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
 import {IconCalendarAddLine, IconCalendarReservedLine} from '@instructure/ui-icons'
 import $ from 'jquery'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 
 const I18n = useI18nScope('appointment_groups')
 

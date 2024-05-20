@@ -67,7 +67,7 @@ module Canvas::OAuth
 
       def key_for(client_id)
         DeveloperKey.find_cached(client_id)
-      rescue ActiveRecord::RecordNotFound
+      rescue ::ActiveRecord::RecordNotFound
         nil
       end
 

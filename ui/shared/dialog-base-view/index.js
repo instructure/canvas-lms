@@ -19,7 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {result} from 'lodash'
 import Backbone from '@canvas/backbone'
 import 'jqueryui/dialog'
 
@@ -56,33 +56,32 @@ DialogBaseView.prototype.defaultOptions = function () {
 }
 
 DialogBaseView.prototype.initDialog = function () {
-  const opts = _.extend(
-    {},
-    this.defaultOptions(),
-    {
-      buttons: [
-        {
-          text: I18n.t('#buttons.cancel', 'Cancel'),
-          class: 'cancel_button',
-          click: (function (_this) {
-            return function (e) {
-              return _this.cancel(e)
-            }
-          })(this),
-        },
-        {
-          text: I18n.t('#buttons.update', 'Update'),
-          class: 'btn-primary',
-          click: (function (_this) {
-            return function (e) {
-              return _this.update(e)
-            }
-          })(this),
-        },
-      ],
-    },
-    _.result(this, 'dialogOptions')
-  )
+  const opts = {
+    ...this.defaultOptions(),
+    buttons: [
+      {
+        text: I18n.t('#buttons.cancel', 'Cancel'),
+        class: 'cancel_button',
+        click: (function (_this) {
+          return function (e) {
+            return _this.cancel(e)
+          }
+        })(this),
+      },
+      {
+        text: I18n.t('#buttons.update', 'Update'),
+        class: 'btn-primary',
+        click: (function (_this) {
+          return function (e) {
+            return _this.update(e)
+          }
+        })(this),
+      },
+    ],
+    modal: true,
+    zIndex: 1000,
+    ...result(this, 'dialogOptions'),
+  }
   this.dialog = $('<div id="' + opts.id + '"></div>')
     .appendTo('body')
     .dialog(opts)

@@ -17,8 +17,9 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import FindFlickrImageView from '@canvas/rce/backbone/views/FindFlickrImageView'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 
 const searchTerm = 'bunnies'
 const photoData = [
@@ -75,7 +76,6 @@ QUnit.module('FindFlickrImage', {
 })
 
 test('render', function () {
-  expect(6)
   ok(this.form.length, 'flickr - form added to dom')
   ok(this.form.is(':visible'), 'flickr - form is visible')
   const input = $('input.flickrSearchTerm', this.form)
@@ -87,9 +87,7 @@ test('render', function () {
 })
 
 test('search', function () {
-  expect(13)
   const input = $('input.flickrSearchTerm', this.form)
-  const button = $('button[type=submit]', this.form)
   input.val(searchTerm)
   this.form.submit()
   this.server.respond()

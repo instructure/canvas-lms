@@ -44,6 +44,11 @@
   }
 }
 
+#ic-Dashboard-header__view_grades_button,
+#ic-Dashboard-header__view_grades_button:hover {
+  text-decoration: none;
+}
+
 .ic-Dashboard-Activity { padding: $ic-sp; }
 
 .ic-Dashboard-header__title {

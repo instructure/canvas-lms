@@ -1,7 +1,7 @@
 <div id="adminToolsTabs">
   <ul id="adminToolsTabNav">
-    {{#if courseRestore}}
-    <li><a href="#restoreContentPane">{{#t "tab_labels.restore_course"}}Restore Courses{{/t}}</a></li>
+    {{#if contentRestore}}
+    <li><a href="#restoreContentPane">{{#t}}Restore Content{{/t}}</a></li>
     {{/if}}
     {{#if viewMessages}}
     <li class="notifications"><a href="#commMessagesPane">{{#t "view_messages"}}View Notifications{{/t}}</a></li>
@@ -14,7 +14,7 @@
     {{/if}}
   </ul>
   <div id="adminToolsTabPanes">
-    {{#if courseRestore}}
+    {{#if contentRestore}}
     <div id="restoreContentPane"></div>
     {{/if}}
     {{#if viewMessages}}

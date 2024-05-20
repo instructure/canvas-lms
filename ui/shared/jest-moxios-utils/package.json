@@ -1,0 +1,6 @@
+{
+  "name": "@canvas/jest-moxios-utils",
+  "version": "1.0.0",
+  "main": "index.js",
+  "description": "Utilities useful in testing using moxios within jest"
+}

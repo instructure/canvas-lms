@@ -51,7 +51,7 @@ describe('ClearBadgeCountsButton', () => {
   it('disables the button and makes API call on click', async () => {
     const {getByRole} = render(<ClearBadgeCountsButton {...props} />)
     const button = getByRole('button', {name: 'Clear Badge Counts'})
-    userEvent.click(button)
+    await userEvent.click(button)
     expect(button).toBeInTheDocument()
     expect(button).toHaveAttribute('disabled')
     expect(axios.put).toHaveBeenCalledWith(
@@ -63,7 +63,7 @@ describe('ClearBadgeCountsButton', () => {
     ;(axios.put as jest.Mock).mockResolvedValue({status: 204})
     const {getByRole} = render(<ClearBadgeCountsButton {...props} />)
     const button = getByRole('button', {name: 'Clear Badge Counts'})
-    userEvent.click(button)
+    await userEvent.click(button)
     await waitFor(() => expect(showFlashSuccess).toHaveBeenCalledWith('Badge counts cleared!'))
   })
 
@@ -72,7 +72,7 @@ describe('ClearBadgeCountsButton', () => {
     ;(axios.put as jest.Mock).mockResolvedValue({status: 200})
     const {getByRole} = render(<ClearBadgeCountsButton {...props} />)
     const button = getByRole('button', {name: 'Clear Badge Counts'})
-    userEvent.click(button)
+    await userEvent.click(button)
     await waitFor(() => expect(showFlashError).toHaveBeenCalledWith(errorMessage))
   })
 
@@ -82,7 +82,7 @@ describe('ClearBadgeCountsButton', () => {
     ;(axios.put as jest.Mock).mockRejectedValue(err)
     const {getByRole} = render(<ClearBadgeCountsButton {...props} />)
     const button = getByRole('button', {name: 'Clear Badge Counts'})
-    userEvent.click(button)
+    await userEvent.click(button)
     await waitFor(() => expect(showFlashError).toHaveBeenCalledWith(errorMessage))
   })
 })

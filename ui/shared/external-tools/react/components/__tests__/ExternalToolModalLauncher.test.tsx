@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
+import {render, waitFor, fireEvent} from '@testing-library/react'
 import ExternalToolModalLauncher from '../ExternalToolModalLauncher'
 
 function generateProps(overrides = {}) {
@@ -63,28 +63,38 @@ describe('ExternalToolModalLauncher', () => {
     expect(iframe).toHaveStyle(`height: ${height}px`)
   })
 
-  test('invokes onRequestClose prop when window receives externalContentReady event', () => {
-    const onRequestCloseMock = jest.fn()
-    const props = generateProps({onRequestClose: onRequestCloseMock})
+  describe('handling external content events', () => {
+    const origEnv = {...window.ENV}
+    const origin = 'http://example.com'
+    beforeAll(() => (window.ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = origin))
+    afterAll(() => (window.ENV = origEnv))
+    const sendPostMessage = (data: any) =>
+      fireEvent(window, new MessageEvent('message', {data, origin}))
 
-    render(<ExternalToolModalLauncher {...props} />)
+    test('invokes onRequestClose prop when window receives externalContentReady event', async () => {
+      const onRequestCloseMock = jest.fn()
+      const props = generateProps({onRequestClose: onRequestCloseMock})
 
-    const event = new Event('externalContentReady')
-    window.dispatchEvent(event)
+      render(<ExternalToolModalLauncher {...props} />)
 
-    expect(onRequestCloseMock).toHaveBeenCalledTimes(1)
-  })
+      sendPostMessage({
+        subject: 'externalContentReady',
+        service: 'external_tool_redirect',
+        contentItems: [],
+      })
+      expect(onRequestCloseMock).toHaveBeenCalledTimes(1)
+    })
 
-  test('invokes onRequestClose prop when window receives externalContentCancel event', () => {
-    const onRequestCloseMock = jest.fn()
-    const props = generateProps({onRequestClose: onRequestCloseMock})
+    test('invokes onRequestClose prop when window receives externalContentCancel event', () => {
+      const onRequestCloseMock = jest.fn()
+      const props = generateProps({onRequestClose: onRequestCloseMock})
 
-    render(<ExternalToolModalLauncher {...props} />)
+      render(<ExternalToolModalLauncher {...props} />)
 
-    const event = new Event('externalContentCancel')
-    window.dispatchEvent(event)
+      sendPostMessage({subject: 'externalContentCancel'})
 
-    expect(onRequestCloseMock).toHaveBeenCalledTimes(1)
+      expect(onRequestCloseMock).toHaveBeenCalledTimes(1)
+    })
   })
 
   test('sets the iframe allowances', async () => {

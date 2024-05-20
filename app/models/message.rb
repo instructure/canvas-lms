@@ -204,7 +204,7 @@ class Message < ActiveRecord::Base
   end
 
   # Named scopes
-  scope :for, ->(context) { where(context_type: context.class.base_class.to_s, context_id: context) }
+  scope :for, ->(context) { where(context:) }
 
   scope :after, ->(date) { where("messages.created_at>?", date) }
   scope :more_recent_than, ->(date) { where("messages.created_at>? AND messages.dispatch_at>?", date, date) }
@@ -488,11 +488,37 @@ class Message < ActiveRecord::Base
     end
   end
 
-  class UnescapedBuffer < String # acts like safe buffer except for the actually being safe part
+  # acts like safe buffer except for the actually being safe part
+  class UnescapedBuffer
+    def initialize(buffer = "")
+      @raw_buffer = String.new(buffer)
+      @raw_buffer.encode!
+    end
+
+    delegate :concat, :<<, :length, :empty?, :blank?, :encoding, :encode!, :force_encoding, to: :@raw_buffer
+
+    def to_s
+      @raw_buffer.dup
+    end
+    alias_method :html_safe, :to_s
+    alias_method :to_str, :to_s
+
+    def html_safe?
+      true
+    end
+
     alias_method :append=, :<<
     alias_method :safe_concat, :concat
     alias_method :safe_append=, :concat
   end
+
+  module OutputBufferDeleteSuffix
+    def delete_suffix(str)
+      self.class.new(@raw_buffer.delete_suffix(str))
+    end
+  end
+  UnescapedBuffer.include(OutputBufferDeleteSuffix)
+  ActionView::OutputBuffer.include(OutputBufferDeleteSuffix) if $canvas_rails == "7.1"
 
   # Public: Store content in a message_content_... instance variable.
   #
@@ -503,7 +529,7 @@ class Message < ActiveRecord::Base
     if name == :subject || name == :user_name
       old_output_buffer, @output_buffer = [@output_buffer, UnescapedBuffer.new]
     else
-      old_output_buffer, @output_buffer = [@output_buffer, @output_buffer.dup.clear]
+      old_output_buffer, @output_buffer = [@output_buffer, @output_buffer.class.new]
     end
 
     yield
@@ -733,7 +759,7 @@ self.user,
     if check_acct.feature_enabled?(:notification_service)
       enqueue_to_sqs
     else
-      delivery_method = "deliver_via_#{path_type}".to_sym
+      delivery_method = :"deliver_via_#{path_type}"
       if !delivery_method || !respond_to?(delivery_method, true)
         logger.warn("Could not set delivery_method from #{path_type}")
         return nil
@@ -999,7 +1025,7 @@ self.user,
   def truncate_invalid_message
     [:body, :html_body].each do |attr|
       if send(attr) && send(attr).bytesize > self.class.maximum_text_length
-        send("#{attr}=", Message.unavailable_message)
+        send(:"#{attr}=", Message.unavailable_message)
       end
     end
   end
@@ -1147,7 +1173,19 @@ self.user,
 
   private
 
+  def outgoing_email_default_name_for_messages
+    if root_account && root_account.settings[:outgoing_email_default_name]
+      root_account.settings[:outgoing_email_default_name]
+    else
+      HostUrl.outgoing_email_default_name
+    end
+  end
+
   def infer_from_name
+    if notification_category == "Summaries"
+      return outgoing_email_default_name_for_messages
+    end
+
     if context.is_a?(DiscussionEntry) && context.discussion_topic.anonymous?
       return context.author_name
     end
@@ -1164,11 +1202,7 @@ self.user,
     end
     return context_context.nickname_for(user) if can_use_name_for_from?(context_context)
 
-    if root_account && root_account.settings[:outgoing_email_default_name]
-      return root_account.settings[:outgoing_email_default_name]
-    end
-
-    HostUrl.outgoing_email_default_name
+    outgoing_email_default_name_for_messages
   end
 
   def can_use_name_for_from?(c)

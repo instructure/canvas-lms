@@ -17,7 +17,7 @@
  */
 
 import {tabIdFromElement} from 'ui/features/course_settings/jquery/course_settings_helper'
-import $ from 'jquery'
+import 'jquery-migrate'
 
 QUnit.module(
   'course_settings_helper',

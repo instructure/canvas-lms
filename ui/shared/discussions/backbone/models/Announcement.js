@@ -18,7 +18,6 @@
 
 import {extend} from '@canvas/backbone/utils'
 import DiscussionTopic from './DiscussionTopic'
-import _ from 'underscore'
 
 extend(Announcement, DiscussionTopic)
 
@@ -31,7 +30,7 @@ function Announcement() {
 // discussionTopicsController#index to show announcements instead of discussion topics)
 // but remove it for create/show/update/delete
 Announcement.prototype.urlRoot = function () {
-  return _.result(this.collection, 'url').replace(this.collection._stringToAppendToURL, '')
+  return (this.collection.url || '').replace(this.collection._stringToAppendToURL, '')
 }
 
 Announcement.prototype.defaults = {

@@ -86,8 +86,7 @@ if Qti.migration_executable
                                                                       flavor: Qti::Flavors::ANGEL)
 
       # make sure the ids are correctly referencing each other
-      matches = []
-      hash[:matches].each { |m| matches << m[:match_id] }
+      matches = hash[:matches].pluck(:match_id)
       hash[:answers].each do |a|
         expect(matches.include?(a[:match_id])).to be_truthy
       end
@@ -106,8 +105,7 @@ if Qti.migration_executable
                                                                       interaction_type: "ordering_question",
                                                                       custom_type: "angel",
                                                                       flavor: Qti::Flavors::ANGEL)
-      matches = []
-      hash[:matches].each { |m| matches << m[:match_id] }
+      matches = hash[:matches].pluck(:match_id)
       hash[:answers].each do |a|
         expect(matches.include?(a[:match_id])).to be_truthy
       end

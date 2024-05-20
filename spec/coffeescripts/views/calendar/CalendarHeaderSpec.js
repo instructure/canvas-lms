@@ -1,3 +1,4 @@
+/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -17,6 +18,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import CalendarHeader from 'ui/features/calendar/backbone/views/CalendarHeader'
 import assertions from 'helpers/assertions'
 

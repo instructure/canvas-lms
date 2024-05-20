@@ -29,10 +29,10 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {useQuery} from '@canvas/query'
 import {useMutation, useQueryClient} from '@tanstack/react-query'
-import {getSetting, setSetting} from '../queries/settingsQuery'
 import releaseNotesQuery from '../queries/releaseNotesQuery'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {IconWarningSolid} from '@instructure/ui-icons'
+import {getSetting, setSetting} from '@canvas/settings-query/react/settingsQuery'
 
 const I18n = useI18nScope('Navigation')
 

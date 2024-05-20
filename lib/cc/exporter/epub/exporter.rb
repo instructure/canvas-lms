@@ -88,7 +88,7 @@ module CC::Exporter::Epub
     def get_item(resource_type, identifier)
       return {} unless cartridge_json[resource_type].present?
 
-      cartridge_json[resource_type].find(-> { return {} }) do |resource|
+      cartridge_json[resource_type].find(-> { {} }) do |resource|
         resource[:identifier] == identifier
       end
     end

@@ -16,15 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {executeApiRequest} from '@canvas/util/apiRequest'
+import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {useCallback, useState} from 'react'
 
-import {ApiCallStatus, AssignmentConnection, GradebookUserSubmissionDetails} from '../../types'
+import {
+  ApiCallStatus,
+  type AssignmentConnection,
+  type GradebookUserSubmissionDetails,
+} from '../../types'
 import {mapUnderscoreSubmission} from '../../utils/gradebookUtils'
-import {Submission} from '../../../../api.d'
+import type {Submission} from '../../../../api.d'
 
 const I18n = useI18nScope('enhanced_individual_gradebook_submit_score')
 

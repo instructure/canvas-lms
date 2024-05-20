@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-<% if @current_user_submission %>
+<% if @current_user_submission && !@assignment.quiz_lti? %>
 	<div id="sidebar_content">
 		<%= render :partial => "submission_sidebar" %>
 	</div>

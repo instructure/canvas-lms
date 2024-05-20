@@ -21,18 +21,18 @@ require_relative "../spec_helper"
 
 describe Folio do
   it "skips the count for a grouped query that takes a long time" do
+    stub_const("Folio::PAGINATION_COUNT_TIMEOUT", "5ms")
     User.create!
     User.create!
-    Setting.set("pagination_count_timeout", "5ms")
     result = User.group(:id).where("pg_sleep(0.1) IS NOT NULL").paginate(per_page: 1)
     expect(result.length).to eq 1
     expect(result.total_entries).to be_nil
   end
 
   it "skips the count for a regular query that takes a long time" do
+    stub_const("Folio::PAGINATION_COUNT_TIMEOUT", "5ms")
     User.create!
     User.create!
-    Setting.set("pagination_count_timeout", "5ms")
     result = User.where("pg_sleep(0.1) IS NOT NULL").paginate(per_page: 1)
     expect(result.length).to eq 1
     expect(result.total_entries).to be_nil

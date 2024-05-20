@@ -89,9 +89,10 @@ describe "student groups" do
         wait_for_animations
 
         # Sets user as group leader
-        f(".group-user-actions").click
+        f("[data-testid=groupUserMenu]").click
         wait_for_ajaximations
-        fj(".set-as-leader:visible").click
+
+        f("[data-testid=setAsLeader]").click
         wait_for_ajaximations
 
         # Looks for student to have a group leader icon

@@ -21,14 +21,14 @@ import ReactDOM from 'react-dom'
 import {View} from '@instructure/ui-view'
 import ready from '@instructure/ready'
 
-import {AlignmentButton} from '@instructure/outcomes-ui'
+import {AlignmentWidget} from '@instructure/outcomes-ui'
 
 ready(() => {
   const container = document.getElementById('canvas_outcomes_alignment_widget')
   if (ENV.canvas_outcomes && ENV.canvas_outcomes.host) {
     ReactDOM.render(
       <View as="div" borderWidth="small none none none" padding="medium none">
-        <AlignmentButton
+        <AlignmentWidget
           host={ENV.canvas_outcomes.host}
           jwt={ENV.canvas_outcomes.jwt}
           contextUuid={ENV.canvas_outcomes.context_uuid}

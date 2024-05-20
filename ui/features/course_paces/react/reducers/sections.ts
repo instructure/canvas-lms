@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Sections, Section, StoreState} from '../types'
+import type {Sections, Section, StoreState} from '../types'
 import {createSelector} from 'reselect'
 import natcompare from '@canvas/util/natcompare'
 

@@ -21,7 +21,6 @@ import identityMapMixin from '../../util/backboneIdentityMap'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 import FilesCollection from '../collections/FilesCollection'
 import natcompare from '@canvas/util/natcompare'
-import urlHelper from 'url-encoding'
 
 // `full_name` will be something like "course files/some folder/another".
 // For routing in the react app in the browser, we want something that will take that "course files"
@@ -152,7 +151,7 @@ class __Folder extends FilesystemObject {
 
   urlPath() {
     let relativePath = (this.get('full_name') || '').replace(EVERYTHING_BEFORE_THE_FIRST_SLASH, '')
-    relativePath = urlHelper.encodeSpecialChars(relativePath)
+    relativePath = relativePath.replace(/%/g, '&#37;')
     relativePath = relativePath
       .split('/')
       .map(component => encodeURIComponent(component))
@@ -215,7 +214,10 @@ class __Folder extends FilesystemObject {
   }
 }
 __Folder.resolvePath = function (contextType, contextId, folderPath) {
-  folderPath = urlHelper.decodeSpecialChars(folderPath)
+  folderPath = folderPath
+    .split('/')
+    .map(component => encodeURIComponent(decodeURIComponent(component).replace(/&#37;/, '%')))
+    .join('/')
 
   const url = `/api/v1/${contextType}/${contextId}/folders/by_path${folderPath}`
   return $.getJSON(url).pipe(folders =>

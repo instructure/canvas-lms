@@ -23,6 +23,7 @@ module Factories
   def dev_key_model(opts = {})
     @dev_key = factory_with_protected_attributes(DeveloperKey, dev_key_valid_attributes(opts).merge(opts))
   end
+  alias_method :developer_key_model, :dev_key_model
 
   def dev_key_valid_attributes(opts = {})
     account = opts[:account].presence

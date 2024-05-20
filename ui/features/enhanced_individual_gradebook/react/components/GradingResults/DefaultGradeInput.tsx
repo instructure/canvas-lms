@@ -23,7 +23,11 @@ import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {ApiCallStatus, AssignmentConnection, GradebookUserSubmissionDetails} from '../../../types'
+import {
+  ApiCallStatus,
+  type AssignmentConnection,
+  type GradebookUserSubmissionDetails,
+} from '../../../types'
 import type {Spacing} from '@instructure/emotion'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')

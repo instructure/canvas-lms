@@ -24,7 +24,6 @@ import {
   renderLinkedImage,
   renderVideo,
 } from './contentRendering'
-import scroll from '../common/scroll'
 import {
   cleanUrl,
   getAnchorElement,
@@ -66,7 +65,11 @@ export function insertContent(editor, content) {
     // insertion should reference the newly created node (or first of the newly
     // created nodes if there were multiple, unfortunately), because the cursor
     // itself stays just before the new content.
-    scroll.scrollIntoViewWDelay(editor.iframeElement, {})
+    setTimeout(() => {
+      if (editor.iframeElement) {
+        editor.iframeElement.scrollIntoView()
+      }
+    }, 100)
     // there's a bug in tinymce where insertContent calls execCommand('mceInsertContent'),
     // but doesn't correctly forward the second "args" argument. Let's go right for
     // execCommand

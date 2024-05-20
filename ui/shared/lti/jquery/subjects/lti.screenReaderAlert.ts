@@ -17,7 +17,7 @@
  */
 
 import $ from '@canvas/rails-flash-notifications'
-import {LtiMessageHandler} from '../lti_message_handler'
+import type {LtiMessageHandler} from '../lti_message_handler'
 
 const screenReaderAlert: LtiMessageHandler<{
   body: string | unknown

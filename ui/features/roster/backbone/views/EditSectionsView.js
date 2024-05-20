@@ -17,12 +17,12 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {map, reject, difference, filter, includes, extend as lodashExtend} from 'lodash'
 import DialogBaseView from '@canvas/dialog-base-view'
 import RosterDialogMixin from './RosterDialogMixin'
 import editSectionsViewTemplate from '../../jst/EditSectionsView.handlebars'
 import sectionTemplate from '../../jst/section.handlebars'
-import h from 'html-escape'
+import h from '@instructure/html-escape'
 import '../../jquery/ContextSearch'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
@@ -38,6 +38,8 @@ export default class EditSectionsView extends DialogBaseView {
     this.prototype.dialogOptions = {
       id: 'edit_sections',
       title: I18n.t('titles.section_enrollments', 'Section Enrollments'),
+      modal: true,
+      zIndex: 1000,
     }
   }
 
@@ -64,7 +66,7 @@ export default class EditSectionsView extends DialogBaseView {
         baseData: {
           type: 'section',
           context: `course_${ENV.course.id}_sections`,
-          exclude: _.map(
+          exclude: map(
             this.model.sectionEditableEnrollments(),
             e => `section_${e.course_section_id}`
           ).concat(ENV.CONCLUDED_SECTIONS),
@@ -133,9 +135,9 @@ export default class EditSectionsView extends DialogBaseView {
     e.preventDefault()
 
     const enrollment = this.model.findEnrollmentByRole(this.model.currentRole)
-    const currentIds = _.map(this.model.sectionEditableEnrollments(), en => en.course_section_id)
-    const sectionIds = _.map($('#user_sections').find('input'), i => $(i).val().split('_')[1])
-    const newSections = _.reject(sectionIds, i => _.includes(currentIds, i))
+    const currentIds = map(this.model.sectionEditableEnrollments(), en => en.course_section_id)
+    const sectionIds = map($('#user_sections').find('input'), i => $(i).val().split('_')[1])
+    const newSections = reject(sectionIds, i => includes(currentIds, i))
     const newEnrollments = []
     const deferreds = []
     // create new enrollments
@@ -156,16 +158,16 @@ export default class EditSectionsView extends DialogBaseView {
       }
       deferreds.push(
         $.ajaxJSON(url, 'POST', data, newEnrollment => {
-          _.extend(newEnrollment, {can_be_removed: true})
+          lodashExtend(newEnrollment, {can_be_removed: true})
           return newEnrollments.push(newEnrollment)
         })
       )
     }
 
     // delete old section enrollments
-    const sectionsToRemove = _.difference(currentIds, sectionIds)
-    const enrollmentsToRemove = _.filter(this.model.sectionEditableEnrollments(), en =>
-      _.includes(sectionsToRemove, en.course_section_id)
+    const sectionsToRemove = difference(currentIds, sectionIds)
+    const enrollmentsToRemove = filter(this.model.sectionEditableEnrollments(), en =>
+      includes(sectionsToRemove, en.course_section_id)
     )
     for (const en of Array.from(enrollmentsToRemove)) {
       url = `${ENV.COURSE_ROOT_URL}/unenroll/${en.id}`

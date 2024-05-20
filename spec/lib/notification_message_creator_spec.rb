@@ -26,11 +26,10 @@ def notification_set(opts = {})
   assignment_model
   notification_model({ subject: "<%= t :subject, 'This is 5!' %>", name: "Test Name" }.merge(notification_opts))
   user_model({ workflow_state: "registered" }.merge(user_opts))
-  communication_channel_model.confirm!
-  unless opts[:no_policy]
-    notification_policy_model(notification: @notification,
-                              communication_channel: @communication_channel)
-  end
+  cc = communication_channel_model
+  cc.confirm!
+
+  @notification_policy = cc.notification_policies.first
 
   @notification.reload
 end
@@ -45,14 +44,10 @@ describe NotificationMessageCreator do
       assignment_model
       notification_model
       u1 = user_model(workflow_state: "registered")
-      c1 = communication_channel_model(path: "user@example.com", workflow_state: "active")
+      communication_channel_model(path: "user@example.com", workflow_state: "active")
       u2 = user_model(workflow_state: "registered")
-      c2 = communication_channel_model
-      [c1, c2].each do |cc|
-        notification_policy_model(communication_channel: cc,
-                                  notification: @notification,
-                                  frequency: "immediately")
-      end
+      communication_channel_model
+
       messages = NotificationMessageCreator.new(@notification, @assignment, to_list: [u1, u2]).create_message
       expect(messages.length).to be(3)
       expect(messages.map(&:to).sort).to eq ["dashboard", "dashboard", "user@example.com"]
@@ -61,16 +56,12 @@ describe NotificationMessageCreator do
     it "only sends messages to active communication channels" do
       assignment_model
       user_model(workflow_state: "registered")
+      notification_model
       a = communication_channel_model(workflow_state: "active")
       b = communication_channel_model(workflow_state: "active", path: "path2@example.com")
       c = communication_channel_model(workflow_state: "active", path: "path3@example.com")
       d = communication_channel_model(path: "path4@example.com")
-      notification_model
-      [a, b, c, d].each do |channel|
-        notification_policy_model(communication_channel: channel,
-                                  notification: @notification,
-                                  frequency: "immediately")
-      end
+
       @user.reload
       messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user).create_message
       paths = messages.collect(&:to)
@@ -274,10 +265,9 @@ describe NotificationMessageCreator do
       notification_set
       NotificationPolicy.delete_all
       nps = (1..3).map do |i|
-        communication_channel_model(path: "user#{i}@example.com").confirm!
-        notification_policy_model(notification: @notification,
-                                  communication_channel: @communication_channel,
-                                  frequency: "immediately")
+        cc = communication_channel_model(path: "user#{i}@example.com")
+        cc.confirm!
+        cc.notification_policies.first
       end
 
       expect { NotificationMessageCreator.new(@notification, @assignment, to_list: @user).create_message }.not_to change(DelayedMessage, :count)
@@ -487,8 +477,7 @@ describe NotificationMessageCreator do
 
     it "does not use notification policies for unconfirmed communication channels" do
       notification_set
-      cc = communication_channel_model(workflow_state: "unconfirmed", path: "nope@example.com")
-      notification_policy_model(communication_channel_id: cc.id, notification_id: @notification.id)
+      communication_channel_model(workflow_state: "unconfirmed", path: "nope@example.com")
       messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user).create_message
       expect(messages.size).to eq 2
       expect(messages.map(&:to).sort).to eq ["dashboard", "valid@example.com"]
@@ -700,11 +689,11 @@ describe NotificationMessageCreator do
 
     it "properly finds the root account for cross-shard summary messages" do
       Canvas::MessageHelper.create_notification(name: "Summaries", category: "Summaries")
-      notification_model(name: "Assignment Created")
 
       @user = User.create!
       communication_channel(@user, { username: "user@example.com", active_cc: true })
 
+      notification_model(name: "Assignment Created")
       notification_policy_model(notification: @notification, communication_channel: @cc)
       @notification_policy.frequency = "daily"
       @notification_policy.save!
@@ -732,10 +721,6 @@ describe NotificationMessageCreator do
       @shard1.activate do
         @user = User.create!
         communication_channel(@user, { username: "user@example.com", active_cc: true })
-        @cc.notification_policies.create!(
-          notification: @notification,
-          frequency: @notification.default_frequency
-        )
       end
       allow_any_instance_of(Message).to receive(:get_template).and_return("template")
       expect(@cc.notification_policies.reload.count).to eq 1
@@ -822,15 +807,16 @@ describe NotificationMessageCreator do
 
       it "targets 3 partitions if it's really long" do
         now = Time.parse("2020-08-24 03:00:00UTC")
-        Setting.set("pending_duplicate_message_window_hours", (7 * 24) + 6)
+        duration = 1.week + 6.hours
+        stub_const("NotificationMessageCreator::PENDING_DUPLICATE_MESSAGE_WINDOW", duration)
         Timecop.freeze(now) do
-          set_up_stubs(now - ((7 * 24) + 6).hours, "created_at>=?", now - ((7 * 24) + 6).hours)
+          set_up_stubs(now - duration, "created_at>=?", now - duration)
           set_up_stubs(now - 6.hours)
           set_up_stubs(now, "created_at<=?", now)
           subject.send(:cancel_pending_duplicate_messages)
         end
         # now verify the in_partition calls will result in what we expect
-        expect(Message.infer_partition_table_name("created_at" => now - ((24 * 7) + 6).hours)).to eq "messages_2020_33"
+        expect(Message.infer_partition_table_name("created_at" => now - duration)).to eq "messages_2020_33"
         expect(Message.infer_partition_table_name("created_at" => now - 6.hours)).to eq "messages_2020_34"
         expect(Message.infer_partition_table_name("created_at" => now)).to eq "messages_2020_35"
       end
@@ -843,11 +829,7 @@ describe NotificationMessageCreator do
     notification_model
 
     user = user_model(workflow_state: "registered")
-    cc = communication_channel_model(path: "7871234567@txt.att.net", path_type: "sms", workflow_state: "active")
-
-    notification_policy_model(communication_channel: cc,
-                              notification: @notification,
-                              frequency: "immediately")
+    communication_channel_model(path: "7871234567@txt.att.net", path_type: "sms", workflow_state: "active")
 
     messages = NotificationMessageCreator.new(@notification, @assignment, to_list: [user]).create_message
 

@@ -96,7 +96,7 @@ module SIS
         end
         # no account_id, course_id, or group_category, use the group's existing context if present,
         # otherwise assign context to root_account
-        context ||= (group&.context || @root_account)
+        context ||= group&.context || @root_account
 
         if group&.group_memberships&.exists? &&
            !(context.id == group.context_id && context.class.base_class.name == group.context_type) &&

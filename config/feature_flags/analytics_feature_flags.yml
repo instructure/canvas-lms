@@ -1,0 +1,96 @@
+---
+# Course Analytics - Provided through K20 LTI App
+analytics_2:
+  state: hidden
+  applies_to: Course
+  display_name: New Course and User Analytics
+  description:
+    wrapper: <a href="https://community.canvaslms.com/t5/New-Analytics-Users/gh-p/analytics">\1</a>
+    new_analytics_description: Show new analytics for course and user data. Data
+      may take 24 hours to appear in New Analytics after setting this feature flag
+      to ON. For full details, please see the *New Analytics user group* in the Canvas
+      Community.
+  after_state_change_proc: analytics_2_after_state_change_hook
+  beta: false
+
+# Admin Analytics - Provided through K20 LTI App
+admin_analytics_view_permission:
+  state: hidden
+  applies_to: Account
+  display_name: Admin Analytics - View admin analytics permission
+  description:
+    admin_analytics_view_permission_description: Makes the new Admin Analytics permission visible.
+  root_opt_in: true
+  beta: true
+admin_analytics:
+  state: allowed
+  applies_to: Account
+  display_name: Admin Analytics
+  description:
+    wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
+    admin_analytics_description: Enables Analytics at the account-level. Admin Analytics dashboards provide
+      details on Canvas usage, Canvas course success, and student engagement.
+      Learn more in the *Admin Analytics Hub* in the Canvas community.
+  after_state_change_proc: analytics_2_after_state_change_hook
+  root_opt_in: true
+  beta: false
+admin_analytics_dap_model:
+  state: hidden
+  applies_to: Account
+  display_name: Admin Analytics DAP
+  description:
+    wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
+    admin_analytics_dap_model_description: Enables the use of DAP for Analytics at the account-level.
+  after_state_change_proc: analytics_2_after_state_change_hook
+  root_opt_in: true
+  beta: true
+  shadow: true
+
+# Advanced Analytics - Provided through K20 LTI App
+k20_course_readiness_alpha_testing:
+  state: hidden
+  applies_to: Account
+  display_name: K20 - Course Readiness Alpha Testing
+  description:
+    k20_course_readiness_alpha_testing_description: This flag is for institutions participating in Advanced Analytics Alpha testing. This flag enables the Course Readiness dashboard for these institutions.
+  root_opt_in: true
+  beta: true
+k20_course_readiness:
+  state: hidden
+  applies_to: Account
+  display_name: Advanced Analytics - Course Readiness Closed Alpha
+  description:
+    k20_course_readiness_description: Enables the Advanced Analytics Course Readiness Dashboard for Alpha testers.
+  root_opt_in: true
+  beta: true
+k20_beta:
+  state: hidden
+  applies_to: Account
+  display_name: Advanced Analytics - Course Readiness and Students in Need of Attention
+  description:
+    k20_beta_description: Enables the Course Readiness and Students in Need of Attention dashboards for closed beta customers.
+  root_opt_in: true
+  beta: true
+
+# Advanced Analytics - Provided through Ask Your Data LTI App
+advanced_analytics_ask_questions:
+  state: hidden
+  applies_to: Account
+  display_name: Advanced Analytics - Ask Your Data
+  description:
+    advanced_analytics_ask_questions: Enables the Advanced Analytics - Ask Your Data feature and accompanying permission.
+  root_opt_in: true
+  beta: true
+  shadow: true
+
+# Analytics Hub
+analytics_hub:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: "Analytics Hub"
+  description: This feature provides a new Analytics Hub platform experience.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on

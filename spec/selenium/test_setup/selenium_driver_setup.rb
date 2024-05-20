@@ -97,10 +97,7 @@ module SeleniumDriverSetup
 
     def shutdown
       server&.shutdown
-      if driver
-        driver.close
-        driver.quit
-      end
+      driver&.quit
     rescue
       nil
     end

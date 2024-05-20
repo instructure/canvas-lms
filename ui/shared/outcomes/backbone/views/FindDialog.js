@@ -21,8 +21,8 @@ import $ from 'jquery'
 import OutcomeGroup from '../models/OutcomeGroup'
 import Progress from '@canvas/progress/backbone/models/Progress'
 import DialogBaseView from '@canvas/dialog-base-view'
-import SidebarView from '@canvas/outcome-sidebar-view'
-import ContentView from '@canvas/outcome-content-view'
+import SidebarView from '../../sidebar-view/backbone/views/index'
+import ContentView from '../../content-view/backbone/views/index'
 import browserTemplate from '../../jst/browser.handlebars'
 import instructionsTemplate from '../../jst/findInstructions.handlebars'
 import '@canvas/rails-flash-notifications'
@@ -52,6 +52,8 @@ export default class FindDialog extends DialogBaseView {
           click: e => this.import(e),
         },
       ],
+      modal: true,
+      zIndex: 1000,
     }
   }
 
@@ -178,6 +180,10 @@ export default class FindDialog extends DialogBaseView {
       canShow = false
     }
     $('.ui-dialog-buttonpane .btn-primary').toggle(canShow)
+  }
+
+  cleanup() {
+    this.$el.remove()
   }
 
   confirmText(model) {

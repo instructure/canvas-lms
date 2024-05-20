@@ -141,7 +141,7 @@ export default function CanvasMediaPlayer(props) {
       let resp
       try {
         setMediaObjNetworkErr(null)
-        resp = await asJson(fetch(url, defaultFetchOptions))
+        resp = await asJson(fetch(url, defaultFetchOptions()))
       } catch (e) {
         // eslint-disable-next-line no-console
         console.warn(`Error getting ${url}`, e.message)
@@ -269,7 +269,15 @@ export default function CanvasMediaPlayer(props) {
           captionPosition="bottom"
           autoShowCaption={auto_cc_track}
           label={getAriaLabel()}
-        />
+        >
+          {/*
+            Adding this overlay gives us the right click menu
+            for the iFrame instead of the right click menu
+            for the media (which helps prevent people from
+            downloading media)
+          */}
+          <MediaPlayer.Overlay />
+        </MediaPlayer>
       ) : (
         renderNoPlayer()
       )}

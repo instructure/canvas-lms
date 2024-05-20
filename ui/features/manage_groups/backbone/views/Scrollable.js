@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'underscore'
+import {find, defer, reduce, throttle} from 'lodash'
 import $ from 'jquery'
 
 let $document, $window
@@ -33,7 +33,7 @@ export default {
     this.$el.css('overflowY', 'auto')
 
     this._initializeDragAndDropHandling()
-    _.defer(() => this._initializeAutoResize())
+    defer(() => this._initializeAutoResize())
 
     return (this._rendered = true)
   },
@@ -45,7 +45,7 @@ export default {
     // at least one, the #main div whose min-height is 450px.) The number 30
     // here is a weak way to skip over a more recent parent container whose
     // min-height is inexplicably set to 30px.
-    const minHeightParent = _.find(this.$el.parents(), el => p($(el).css('minHeight')) > 30)
+    const minHeightParent = find(this.$el.parents(), el => p($(el).css('minHeight')) > 30)
     if (!minHeightParent) return // bail out; probably in a test
     const $minHeightParent = $(minHeightParent)
     const oldMaxHeight = $minHeightParent.css('maxHeight')
@@ -54,14 +54,14 @@ export default {
     verticalOffset += p($minHeightParent.css('paddingTop'))
     this._minHeight = $minHeightParent.height() + verticalOffset
     $minHeightParent.css('maxHeight', oldMaxHeight)
-    $window.resize(_.throttle(() => this._resize(), 50))
+    $window.resize(throttle(() => this._resize(), 50))
     return this._resize()
   },
 
   _resize() {
     if (!$footer) $footer = $('#footer')
     if (!$document) $document = $(document)
-    const bottomSpacing = _.reduce(
+    const bottomSpacing = reduce(
       this.$el.parents(),
       (sum, el) => {
         const $el = $(el)

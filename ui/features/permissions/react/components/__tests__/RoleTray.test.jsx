@@ -117,13 +117,10 @@ it('deleterole calls deleterole prop', () => {
   const mockDeleteFunction = jest.fn()
   props.deleteRole = mockDeleteFunction
   const tree = shallow(<RoleTray {...props} />)
+  const hideTray = tree.instance().hideTray
   const hideDeleteAlert = tree.instance().hideDeleteAlert
-  const finishDeleteRole = tree.instance().finishDeleteRole
   tree.instance().deleteRole()
-  // Though deleteRole will temporarily flip this to true, it should clean up
-  // after itself after everything shakes out; verify this
-  expect(tree.state().roleDeleted).toEqual(false)
-  expect(mockDeleteFunction).toHaveBeenCalledWith(props.role, finishDeleteRole, hideDeleteAlert)
+  expect(mockDeleteFunction).toHaveBeenCalledWith(props.role, hideTray, hideDeleteAlert)
 })
 
 it('renders edit icon if editable is true', () => {
@@ -191,43 +188,51 @@ it('calls props.hideTray() and correctly sets state when hideTray is called', ()
     deleteAlertVisible: false,
     editBaseRoleAlertVisible: false,
     editTrayVisible: false,
+    lastTouchedRoleId: undefined,
     newTargetBaseRole: null,
     editRoleLabelInput: '',
     editRoleLabelErrorMessages: [],
-    roleDeleted: false,
   }
   expect(tree.state()).toEqual(expectedState)
   expect(hideTrayMock).toHaveBeenCalled()
 })
 
-it('renders the delete confirmation alert if deleteAlertVisible state is true', () => {
+it('renders the delete confirmation alert if deleteAlertVisible state is true', async () => {
   const props = makeDefaultProps()
   const tree = shallow(<RoleTray {...props} />)
   tree.setState({deleteAlertVisible: true})
-  const node = tree.find('.role-tray-delete-alert-confirm')
-  expect(node.exists()).toBeTruthy()
+  const node = tree.findWhere(
+    n => n.name() === 'Dialog' && n.children('.role-tray-delete-alert-confirm')
+  )
+  expect(node.at(0).props().open).toBe(true)
 })
 
-it('does not render the delete confirmation alert if deleteAlertVisible state is false', () => {
+it('does not render the delete confirmation alert if deleteAlertVisible state is false', async () => {
   const props = makeDefaultProps()
   const tree = shallow(<RoleTray {...props} />)
-  const node = tree.find('.role-tray-delete-alert-confirm')
-  expect(node.exists()).toBeFalsy()
+  const node = tree.findWhere(
+    n => n.name() === 'Dialog' && n.children('.role-tray-delete-alert-confirm')
+  )
+  expect(node.at(0).props().open).toBe(false)
 })
 
 it('renders the edit confirmation alert if editBaseRoleAlertVisible state is true', () => {
   const props = makeDefaultProps()
   const tree = shallow(<RoleTray {...props} />)
   tree.setState({editBaseRoleAlertVisible: true})
-  const node = tree.find('.role-tray-edit-base-role-confirm')
-  expect(node.exists()).toBeTruthy()
+  const node = tree.findWhere(
+    n => n.name() === 'Dialog' && n.children('.role-tray-edit-base-role-confirm')
+  )
+  expect(node.at(0).props().open).toBe(false)
 })
 
 it('does not render the edit confirmation alert if editBaseRoleAlertVisible state is false', () => {
   const props = makeDefaultProps()
   const tree = shallow(<RoleTray {...props} />)
-  const node = tree.find('.role-tray-edit-base-role-confirm')
-  expect(node.exists()).toBeFalsy()
+  const node = tree.findWhere(
+    n => n.name() === 'Dialog' && n.children('.role-tray-edit-base-role-confirm')
+  )
+  expect(node.at(0).props().open).toBe(false)
 })
 
 // API does not currently support this, but the code is in place for it

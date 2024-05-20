@@ -1,0 +1,7 @@
+{
+  "name": "@canvas-features/public_javascripts_lti_tests",
+  "description": "a place to put tests for the LTI (platform storage) script in public/javascripts (extremely rare that we need to put scripts there)",
+  "private": true,
+  "version": "1.0.0",
+  "owner": "INTEROP"
+}

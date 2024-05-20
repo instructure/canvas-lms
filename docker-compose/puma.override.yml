@@ -1,0 +1,23 @@
+# to use this add docker-compose/puma.override.yml to your COMPOSE_FILE var in .env and rebuilid your web container
+
+# When you use this container you can pass RUBY_DEBUG_OPEN=true or RUBY_DEBUG_START=true to a run of the container like:
+# docker compose run -e RUBY_DEBUG_OPEN=true -P --rm web
+#
+# Altenatively you can uncomment the environment variable below, but that can cause issues if you run commands that kick
+# off multiprocessing
+
+version: '2.3'
+services:
+  web:
+    build:
+      dockerfile: Dockerfile.puma
+    environment:
+      # RUBY_DEBUG_OPEN: true
+      RUBY_DEBUG_PORT: 12345
+      RUBY_DEBUG_HOST: 0.0.0.0
+      VIRTUAL_PORT: 80
+      PIDFILE: /tmp/pids/server.pid
+    ports:
+      - "12345:12345"
+    tmpfs:
+      - /tmp/pids:mode=1777

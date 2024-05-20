@@ -167,7 +167,12 @@ CancelAttemptButton.propTypes = {
   submission: PropTypes.object.isRequired,
 }
 
-const SubmissionManager = ({assignment, submission, reviewerSubmission, onSuccessfulPeerReview}) => {
+const SubmissionManager = ({
+  assignment,
+  submission,
+  reviewerSubmission,
+  onSuccessfulPeerReview,
+}) => {
   const [draftStatus, setDraftStatus] = useState(null)
   const [editingDraft, setEditingDraft] = useState(false)
   const [focusAttemptOnInit, setFocusAttemptOnInit] = useState(false)

@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/jquery-keycodes",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "./jquery.keycodes.js"
+}

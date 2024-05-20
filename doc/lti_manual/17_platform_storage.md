@@ -106,7 +106,7 @@ is `sso.canvaslms.com`.
 - frame added to every page: `app/views/lti/platform_storage/_forwarding_frame.html.erb`
 - controller that responds to this endpoint: `app/controllers/lti/platform_storage_controller.rb`
 - HTML page for this endpoint: `app/views/lti/platform_storage/post_message_forwarding.html.erb`
-- Javascript forwarder: `ui/features/post_message_forwarding/index.ts`
+- Javascript forwarder: `public/javascripts/lti_post_message_forwarding.js`
 
 #### non-Platform Storage Forwarding from the RCE
 

@@ -1434,7 +1434,7 @@ describe FilesController do
     end
 
     before do
-      @content = Rack::Test::UploadedFile.new(File.join(RSpec.configuration.fixture_path, "courses.yml"), "")
+      @content = Rack::Test::UploadedFile.new(file_fixture("a_file.txt"), "")
       request.env["CONTENT_TYPE"] = "multipart/form-data"
       enable_forgery_protection
     end
@@ -1447,7 +1447,7 @@ describe FilesController do
       @attachment.reload
       # the file is not available until the third api call is completed
       expect(@attachment.file_state).to eq "deleted"
-      expect(@attachment.open.read).to eq File.read(File.join(RSpec.configuration.fixture_path, "courses.yml"))
+      expect(@attachment.open.read).to eq file_fixture("a_file.txt").read
     end
 
     it "opens up cors headers" do

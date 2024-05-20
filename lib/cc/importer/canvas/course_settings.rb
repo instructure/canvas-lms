@@ -29,7 +29,7 @@ module CC::Importer::Canvas
     def settings_doc(file, html = false)
       path = @package_root.item_path(COURSE_SETTINGS_DIR, file)
       return nil unless File.exist? path
-      return nil if File.size(path) > Setting.get("course_settings_import_xml_threshold", 25.megabytes).to_i # totally arbitrary hack to keep some broken exports from killing things
+      return nil if File.size(path) > 25.megabytes.to_i # totally arbitrary hack to keep some broken exports from killing things
 
       if html
         open_file path
@@ -106,6 +106,8 @@ module CC::Importer::Canvas
          hide_distribution_graphs
          allow_student_discussion_topics
          allow_student_discussion_editing
+         allow_student_discussion_reporting
+         allow_student_anonymous_discussion_topics
          show_announcements_on_home_page
          usage_rights_required
          restrict_student_future_view

@@ -35,12 +35,12 @@ import {Flex} from '@instructure/ui-flex'
 import {useSubmitScore} from '../../hooks/useSubmitScore'
 import {
   ApiCallStatus,
-  AssignmentConnection,
-  Attachment,
-  CommentConnection,
-  GradebookOptions,
-  GradebookStudentDetails,
-  GradebookUserSubmissionDetails,
+  type AssignmentConnection,
+  type Attachment,
+  type CommentConnection,
+  type GradebookOptions,
+  type GradebookStudentDetails,
+  type GradebookUserSubmissionDetails,
 } from '../../../types'
 import {
   submitterPreviewText,

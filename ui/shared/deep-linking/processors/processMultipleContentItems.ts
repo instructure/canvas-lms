@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {contentItemProcessorPrechecks} from '../ContentItemProcessor'
-import {DeepLinkResponse} from '../DeepLinkResponse'
+import type {DeepLinkResponse} from '../DeepLinkResponse'
 
 export default function processMultipleContentItems(event: {data: DeepLinkResponse}) {
   contentItemProcessorPrechecks(event.data)

@@ -39,9 +39,23 @@ describe "quiz LTI assignments" do
     )
   end
 
+  # EVAL-3711 Remove this test when instui_nav feature flag is removed
   it "creates an LTI assignment", priority: "2" do
     get "/courses/#{@course.id}/assignments"
     f(".new_quiz_lti").click
+
+    f("#assignment_name").send_keys("LTI quiz")
+    submit_assignment_form
+
+    assignment = @course.assignments.last
+    expect(assignment).to be_present
+    expect(assignment.quiz_lti?).to be true
+  end
+
+  it "creates an LTI assignment with the Instui Nav feature flag on", priority: "2" do
+    @course.root_account.enable_feature!(:instui_nav)
+    get "/courses/#{@course.id}/assignments"
+    f("[data-testid='new_quiz_button']").click
 
     f("#assignment_name").send_keys("LTI quiz")
     submit_assignment_form

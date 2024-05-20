@@ -23,9 +23,9 @@ class SisBatch < ActiveRecord::Base
   include CaptureJobIds
   belongs_to :account
   serialize :data
-  serialize :options, Hash
-  serialize :processing_errors, Array
-  serialize :processing_warnings, Array
+  serialize :options, type: Hash
+  serialize :processing_errors, type: Array
+  serialize :processing_warnings, type: Array
   belongs_to :attachment
   belongs_to :errors_attachment, class_name: "Attachment"
   has_many :parallel_importers, inverse_of: :sis_batch
@@ -63,7 +63,7 @@ class SisBatch < ActiveRecord::Base
   # If you are going to change any settings on the batch before it's processed,
   # do it in the block passed into this method, so that the changes are saved
   # before the batch is marked created and eligible for processing.
-  def self.create_with_attachment(account, import_type, attachment, user = nil)
+  def self.create_with_attachment(account, import_type, file_obj, user = nil)
     account.shard.activate do
       batch = SisBatch.new
       batch.account = account
@@ -73,7 +73,7 @@ class SisBatch < ActiveRecord::Base
       batch.user = user
       batch.save
 
-      att = Attachment.create_data_attachment(batch, attachment)
+      att = Attachment.create_data_attachment(batch, file_obj, file_obj.original_filename)
       batch.attachment = att
 
       yield batch if block_given?
@@ -354,7 +354,7 @@ class SisBatch < ActiveRecord::Base
 
     self.generated_diff = Attachment.create_data_attachment(
       self,
-      Rack::Test::UploadedFile.new(diffed_data_file.path, "application/zip"),
+      Canvas::UploadedFile.new(diffed_data_file.path, "application/zip"),
       t(:diff_filename, "sis_upload_diffed_%{id}.zip", id:)
     )
     save!
@@ -782,7 +782,7 @@ class SisBatch < ActiveRecord::Base
     end
     self.errors_attachment = Attachment.create_data_attachment(
       self,
-      Rack::Test::UploadedFile.new(file, "csv", true),
+      Canvas::UploadedFile.new(file, "csv"),
       "sis_errors_attachment_#{id}.csv"
     )
     save! if Rails.env.production?

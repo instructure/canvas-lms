@@ -42,7 +42,7 @@ module Api::V1::CalendarEvent
     include = options[:include]
     include ||= excludes.include?("child_events") ? [] : ["child_events"]
 
-    context = (options[:context] || event.context)
+    context = options[:context] || event.context
     duplicates = options.delete(:duplicates) || []
     participant = nil
 
@@ -194,7 +194,7 @@ module Api::V1::CalendarEvent
     end
     hash["important_dates"] = event.important_dates
     hash["blackout_date"] = event.blackout_date
-    if event[:series_uuid] && event[:rrule] && Account.site_admin.feature_enabled?(:calendar_series)
+    if event[:series_uuid] && event[:rrule]
       hash["series_head"] = event.series_head?
       if include.include?("series_natural_language")
         series_nat_lang = rrule_to_natural_language(event[:rrule])
@@ -293,6 +293,7 @@ module Api::V1::CalendarEvent
     hash["participant_type"] = group.participant_type
     hash["url"] = api_v1_appointment_group_url(group)
     hash["html_url"] = appointment_group_url(hash["id"])
+    hash["allow_observer_signup"] = group.allow_observer_signup if Account.site_admin.feature_enabled?(:observer_appointment_groups)
     hash
   ensure
     @context = orig_context

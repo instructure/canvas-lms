@@ -19,9 +19,9 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import setDefaultGradeDialogTemplate from '../jst/SetDefaultGradeDialog.handlebars'
-import _ from 'underscore'
+import {isString, values, filter, chain, includes} from 'lodash'
 import '@canvas/jquery/jquery.disableWhileLoading'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-tinypubsub'
@@ -73,6 +73,8 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
     .dialog({
       resizable: false,
       width: 350,
+      modal: true,
+      zIndex: 1000,
     })
     .fixDialogButtons()
   this.$dialog.on(
@@ -111,9 +113,10 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
           }.call(_this)
           postDfds = pages.map(function (page) {
             const studentParams = getParams(page, formData.default_grade)
-            const params = _.extend({}, studentParams, {
+            const params = {
+              ...studentParams,
               dont_overwrite_grades: !formData.overwrite_existing_grades,
-            })
+            }
             return $.ajaxJSON($form.attr('action'), 'POST', params)
           })
           // eslint-disable-next-line prefer-spread
@@ -159,17 +162,17 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
   getStudents = (function (_this) {
     return function () {
       if (_this.selected_section) {
-        return _(_this.students).filter(function (s) {
-          return _.includes(s.sections, _this.selected_section)
+        return filter(_this.students, function (s) {
+          return includes(s.sections, _this.selected_section)
         })
       } else {
-        return _(_this.students).values()
+        return values(_this.students)
       }
     }
   })(this)
   getParams = (function (_this) {
     return function (page, grade) {
-      return _.chain(page)
+      return chain(page)
         .map(function (s) {
           const prefix = 'submissions[submission_' + s.id + ']'
           const params = [
@@ -184,8 +187,8 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
           }
           return params
         })
-        .flatten(true)
-        .object()
+        .flatten()
+        .fromPairs()
         .value()
     }
   })(this)
@@ -193,7 +196,7 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
   // # return all submission in a group assignment leading to duplicates
   return (getSubmissions = (function (_this) {
     return function (responses) {
-      return _.chain(responses)
+      return chain(responses)
         .map(function (arg) {
           let s
           const response = arg[0]
@@ -209,15 +212,15 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
             })(),
           ]
         })
-        .flatten()
-        .uniq('id')
+        .flattenDeep()
+        .uniqBy('id')
         .value()
     }
   })(this))
 }
 
 SetDefaultGradeDialog.prototype.gradeIsExcused = function (grade) {
-  return _.isString(grade) && grade.toUpperCase() === 'EX'
+  return isString(grade) && grade.toUpperCase() === 'EX'
 }
 
 SetDefaultGradeDialog.prototype.gradeIsMissingShortcut = function (grade) {

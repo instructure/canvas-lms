@@ -27,13 +27,13 @@
 module Factories
   def factory_with_protected_attributes(ar_klass, attrs, do_save = true)
     obj = ar_klass.respond_to?(:new) ? ar_klass.new : ar_klass.build
-    attrs.each { |k, v| obj.send("#{k}=", v) }
+    attrs.each { |k, v| obj.send(:"#{k}=", v) }
     obj.save! if do_save
     obj
   end
 
   def update_with_protected_attributes!(ar_instance, attrs)
-    attrs.each { |k, v| ar_instance.send("#{k}=", v) }
+    attrs.each { |k, v| ar_instance.send(:"#{k}=", v) }
     ar_instance.save!
   end
 

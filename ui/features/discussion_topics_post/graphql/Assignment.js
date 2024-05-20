@@ -22,6 +22,8 @@ import {arrayOf, bool, number, shape, string} from 'prop-types'
 import {AssignmentOverride} from './AssignmentOverride'
 import {AssessmentRequest} from './AssessmentRequest'
 import {PeerReviews} from './PeerReviews'
+import {Submission} from './Submission'
+import {Checkpoint} from './Checkpoint'
 
 export const Assignment = {
   fragment: gql`
@@ -39,6 +41,14 @@ export const Assignment = {
           ...AssignmentOverride
         }
       }
+      checkpoints {
+        ...Checkpoint
+      }
+      mySubAssignmentSubmissionsConnection {
+        nodes {
+          ...Submission
+        }
+      }
       assessmentRequestsForCurrentUser {
         ...AssessmentRequest
       }
@@ -47,6 +57,8 @@ export const Assignment = {
       }
     }
     ${AssignmentOverride.fragment}
+    ${Checkpoint.fragment}
+    ${Submission.fragment}
     ${AssessmentRequest.fragment}
     ${PeerReviews.fragment}
   `,
@@ -61,6 +73,8 @@ export const Assignment = {
     restrictQuantitativeData: bool,
     pointsPossible: number,
     assignmentOverrides: shape({nodes: arrayOf(AssignmentOverride.shape)}),
+    checkpoints: arrayOf(Checkpoint.shape),
+    mySubAssignmentSubmissionsConnection: shape({nodes: arrayOf(Submission.shape)}),
     assessmentRequest: arrayOf(AssessmentRequest.shape),
     peerReviews: PeerReviews.shape,
   }),
@@ -78,6 +92,11 @@ export const Assignment = {
       nodes: [AssignmentOverride.mock()],
       __typename: 'AssignmentOverrideConnection',
     },
+    checkpoints = [],
+    mySubAssignmentSubmissionsConnection = {
+      nodes: [],
+      __typename: 'mySubAssignmentSubmissionsConnection',
+    },
     assessmentRequestsForCurrentUser = [AssessmentRequest.mock()],
     peerReviews = PeerReviews.mock(),
   } = {}) => ({
@@ -89,6 +108,8 @@ export const Assignment = {
     onlyVisibleToOverrides,
     pointsPossible,
     assignmentOverrides,
+    checkpoints,
+    mySubAssignmentSubmissionsConnection,
     assessmentRequestsForCurrentUser,
     restrictQuantitativeData,
     peerReviews,
@@ -108,6 +129,11 @@ export const DefaultMocks = {
     assignmentOverrides: {
       nodes: [AssignmentOverride.mock()],
       __typename: 'AssignmentOverrideConnection',
+    },
+    checkpoints: [],
+    mySubAssignmentSubmissionsConnection: {
+      nodes: [],
+      __typename: 'mySubAssignmentSubmissionsConnection',
     },
   }),
 }

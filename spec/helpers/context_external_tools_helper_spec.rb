@@ -48,6 +48,21 @@ describe ContextExternalToolsHelper do
     end
   end
 
+  shared_examples "#external_tools_menu_items_raw" do
+    before do
+      @menu_item_options[:raw_output] = true
+      @items = helper.external_tools_menu_items(@mock_tools_hash, @menu_item_options)
+    end
+
+    it "returns the right number of tool links" do
+      expect(@items.count).to eq 3
+    end
+
+    it "returns the right object type" do
+      expect(@items[0]).to be_a Hash
+    end
+  end
+
   context "With hashes" do
     before :once do
       @mock_tools_hash = [
@@ -59,7 +74,8 @@ describe ContextExternalToolsHelper do
             id: 1,
             launch_type: :awesome_type
           },
-          canvas_icon_class: "icon-course_home_sub_navigation"
+          canvas_icon_class: "icon-course_home_sub_navigation",
+          launch_method: "tray"
         },
 
         {
@@ -87,7 +103,12 @@ describe ContextExternalToolsHelper do
       ]
     end
 
+    it "includes data-tool-launch-method" do
+      expect(@parsed_html.css("[data-tool-launch-method='tray']").count).to eq 1
+    end
+
     include_examples "#external_tools_menu_items"
+    include_examples "#external_tools_menu_items_raw"
   end
 
   context "With tools" do
@@ -154,5 +175,6 @@ describe ContextExternalToolsHelper do
     end
 
     include_examples "#external_tools_menu_items"
+    include_examples "#external_tools_menu_items_raw"
   end
 end

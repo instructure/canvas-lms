@@ -18,7 +18,7 @@
  */
 
 import getCookie from '@instructure/get-cookie'
-import parseLinkHeader from 'parse-link-header'
+import parseLinkHeader from '@canvas/parse-link-header'
 import {defaultFetchOptions} from '@canvas/util/xhr'
 import {toQueryString} from '@canvas/query-string-encoding'
 import type {QueryParameterRecord} from '@canvas/query-string-encoding'
@@ -66,7 +66,7 @@ export default async function doFetchApi<T = unknown>({
   body,
   fetchOpts = {},
 }: DoFetchApiOpts): Promise<DoFetchApiResults<T>> {
-  const finalFetchOptions = {...defaultFetchOptions}
+  const finalFetchOptions = {...defaultFetchOptions()}
   finalFetchOptions.headers['X-CSRF-Token'] = getCookie('_csrf_token')
 
   if (body && typeof body !== 'string') {

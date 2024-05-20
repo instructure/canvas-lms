@@ -24,7 +24,9 @@ import useLMGBContext from '../useLMGBContext'
 describe('useLMGBContext', () => {
   it('can return values if they are set', () => {
     const wrapper = ({children}) => (
-      <LMGBContext.Provider value={{env: {accountLevelMasteryScalesFF: true, outcomesFriendlyDescriptionFF: true}}}>
+      <LMGBContext.Provider
+        value={{env: {accountLevelMasteryScalesFF: true, outcomesFriendlyDescriptionFF: true}}}
+      >
         {children}
       </LMGBContext.Provider>
     )

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
@@ -26,13 +26,13 @@
     <tr>
       <td><%= f.blabel :domain, :en => "Domain" %></td>
       <td>
-        <%= f.text_field :domain %> <%= mt :domain_description, "(e.g. mycompany.wimba.com)" %>
+        <%= f.text_field :domain, value: settings[:domain] %> <%= mt :domain_description, "(e.g. mycompany.wimba.com)" %>
       </td>
     </tr>
     <tr>
       <td><%= f.blabel :user, :username, :en => "Username" %></td>
       <td>
-        <%= f.text_field :user %>
+        <%= f.text_field :user, value: settings[:user] %>
       </td>
     </tr>
     <tr>

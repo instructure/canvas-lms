@@ -28,7 +28,7 @@ describe "quizzes/quizzes/_display_answer" do
     answer = {}
     answer[:id] = 5
     answer[:weight] = 100
-    render partial: "quizzes/quizzes/display_answer", object: answer, locals: { question_type: OpenObject.new }
+    render partial: "quizzes/quizzes/display_answer", object: answer, locals: { question_type: QuizzesHelper::QuestionType.new }
     expect(response).not_to be_nil
   end
 end

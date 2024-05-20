@@ -47,7 +47,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   has_many :quiz_regrades, class_name: "Quizzes::QuizRegrade"
   has_many :quiz_student_visibilities
   belongs_to :context, polymorphic: [:course]
-  belongs_to :assignment
+  belongs_to :assignment, inverse_of: :quiz, class_name: "AbstractAssignment"
   belongs_to :assignment_group
   belongs_to :root_account, class_name: "Account"
   has_many :ignores, as: :asset
@@ -1246,7 +1246,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         SELECT CASE WHEN overrides.due_at_overridden THEN overrides.due_at ELSE q.due_at END as user_due_date, q.*
         FROM #{Quizzes::Quiz.quoted_table_name} q
         INNER JOIN overrides ON overrides.quiz_id = q.id) as quizzes")
-      .not_for_assignment
+      .select(arel.projections, "user_due_date").not_for_assignment
   }
 
   scope :ungraded_due_between_for_user, lambda { |start, ending, user|

@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import {each, reject} from 'underscore'
+import {each, reject} from 'lodash'
 import {View} from '@canvas/backbone'
 import CollaborationView from './CollaborationView'
 import CollaborationFormView from './CollaborationFormView'
@@ -74,7 +74,7 @@ CollaborationsPage.prototype.createViews = function () {
 
 CollaborationsPage.prototype.attachEvents = function () {
   this.addFormView.on('hide', this.onFormHide).on('error', this.onFormError)
-  return each(
+  each(
     this.collaborationViews,
     (function (_this) {
       return function (view) {

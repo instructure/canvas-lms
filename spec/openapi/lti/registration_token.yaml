@@ -1,0 +1,34 @@
+---
+openapi: 3.0.3
+info:
+  title: app
+  version: 1.0.0
+servers: []
+paths:
+  "/api/lti/registration_token":
+    get:
+      summary: registration_token
+      tags:
+      - Lti::IMS::DynamicRegistration
+      responses:
+        '200':
+          description: returns a 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                  oidc_configuration_url:
+                    type: string
+                  token:
+                    type: string
+                required:
+                - uuid
+                - oidc_configuration_url
+                - token
+              example:
+                uuid: a98d2e39-b22d-45f8-9479-ac1f7546363d
+                oidc_configuration_url: https://canvas.instructure.com/api/lti/security/openid-configuration?registration_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiYTk4ZDJlMzktYjIyZC00NWY4LTk0NzktYWMxZjc1NDYzNjNkIiwiaW5pdGlhdGVkX2F0IjoiMjAyNC0wMS0zMVQyMzoxNzowOSswMDowMCIsInVzZXJfaWQiOjE5MjAsInJvb3RfYWNjb3VudF9nbG9iYWxfaWQiOjIwMDAwMDAwMDAwMzE5MiwiZXhwIjoxNzA2NzQ2NjI5fQ.O4e4sWZWX1SEP-8n4jLxxmUbrOskgUa87OuRz6_hrdw
+                token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiYTk4ZDJlMzktYjIyZC00NWY4LTk0NzktYWMxZjc1NDYzNjNkIiwiaW5pdGlhdGVkX2F0IjoiMjAyNC0wMS0zMVQyMzoxNzowOSswMDowMCIsInVzZXJfaWQiOjE5MjAsInJvb3RfYWNjb3VudF9nbG9iYWxfaWQiOjIwMDAwMDAwMDAwMzE5MiwiZXhwIjoxNzA2NzQ2NjI5fQ.O4e4sWZWX1SEP-8n4jLxxmUbrOskgUa87OuRz6_hrdw

@@ -16,90 +16,227 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useEffect, useRef, useState, useCallback} from 'react'
+import {Alert} from '@instructure/ui-alerts'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
+import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
+import {IconSearchLine} from '@instructure/ui-icons'
+import {Modal} from '@instructure/ui-modal'
+import {Pill} from '@instructure/ui-pill'
+import {Spinner} from '@instructure/ui-spinner'
+import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
-import {IconSearchLine} from '@instructure/ui-icons'
-import {Spinner} from '@instructure/ui-spinner'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import useFetchApi from '@canvas/use-fetch-api-hook'
-import Paginator from '@canvas/instui-bindings/react/Paginator'
 import SearchResults from './SearchResults'
+import IndexingProgress from './IndexingProgress'
 
 const I18n = useI18nScope('SmartSearch')
 
 export default function SearchApp() {
-  const [searchResults, setSearchResults] = useState([]);
-  const [searchString, setSearchString] = useState('');
-  const [searching, setSearching] = useState(false);
-  const [textInput, setTextInput] = useState(null);
-  const [textInputValue, setTextInputValue] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageCount, setPageCount] = useState(1);
+  const [previousSearch, setPreviousSearch] = useState(null)
+  const searchInput = useRef(null)
+  const [error, setError] = useState(null)
+  const [feedback, setFeedback] = useState({
+    action: null,
+    comment: '',
+    objectId: null,
+    objectType: null,
+  })
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [searchResults, setSearchResults] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [indexingProgress, setIndexingProgress] = useState(null)
 
-  function handleChange(e, value) {
-    setTextInputValue(value)
-  }
-
-  function handleKey(event) {
-    if (event.key === 'Enter' && event.type === 'keydown') {
-      setPage(1)
-      setPageCount(1)
-      setSearchString(textInputValue)
+  useEffect(() => {
+    if (searchInput.current) {
+      searchInput.current.focus()
     }
+  }, [])
+
+  const checkIndexStatus = useCallback(() => {
+    fetch(`/api/v1/courses/${ENV.COURSE_ID}/smartsearch/index_status`)
+      .then(res => {
+        res.json().then(({status, progress}) => {
+          if (status === 'indexing') {
+            setIndexingProgress(progress)
+            setTimeout(checkIndexStatus, 2000)
+          } else {
+            setIndexingProgress(null)
+          }
+        })
+      })
+  }, [])
+
+  useEffect(() => {
+    checkIndexStatus()
+  }, [])
+
+  const onDislike = ({id, type}) => {
+    console.debug('dislike', id, type)
+
+    setFeedbackOpen(true)
+    setFeedback({...feedback, action: 'DISLIKE', objectId: id, objectType: type})
   }
 
-  useFetchApi(
-    {
-      path: `/api/v1/courses/${ENV.COURSE_ID}/smartsearch`,
-      params: {
-        q: searchString,
-        page: page
-      },
-      forceResult: searchString ? undefined : { results: [] },
-      loading: useCallback(isLoading => {
-        setSearching(isLoading)
-        if (isLoading) {
-          setSearchResults([])
-        }
-      }, []),
-      meta: useCallback(({link}) => {
-        setPageCount(parseInt(link.last?.page, 10) || 1)
-      }, []),
-      success: useCallback(json => {
-        setSearchResults(json.results)
-        textInput?.focus()
-      }, [textInput]),
-    },
-    [searchString, page]
-  )
+  const onExplain = ({id, type}) => {
+    console.debug('explain', id, type)
+  }
+
+  const onLike = ({id, type}) => {
+    console.debug('like', id, type)
+
+    setFeedbackOpen(true)
+    setFeedback({...feedback, action: 'LIKE', objectId: id, objectType: type})
+  }
+
+  const onCloseFeedback = () => {
+    setFeedback('')
+    setFeedbackOpen(false)
+  }
+
+  const onSubmitFeedback = e => {
+    e.preventDefault()
+    console.debug('submit feedback', feedback)
+
+    fetch(
+      `/api/v1/courses/${ENV.COURSE_ID}/smartsearch/log?q=${encodeURIComponent(previousSearch)}&a=${
+        feedback.action
+      }&oid=${feedback.objectId}&ot=${feedback.objectType}&c=${encodeURIComponent(
+        feedback.comment
+      )}`
+    )
+    setFeedback({action: null, comment: '', objectId: null, objectType: null})
+    setFeedbackOpen(false)
+  }
+
+  const onSearch = e => {
+    e.preventDefault()
+
+    if (searchTerm === '') return
+
+    setIsLoading(true)
+    setSearchResults([])
+    setPreviousSearch(searchTerm)
+
+    fetch(`/api/v1/courses/${ENV.COURSE_ID}/smartsearch?q=${searchTerm}`)
+      .then(res => {
+        res
+          .json()
+          .then(({results}) => {
+            setSearchResults(results)
+          })
+          .catch(err => {
+            console.error(err)
+            setError(err.message)
+          })
+      })
+      .catch(err => {
+        console.error(err)
+        setError(err.message)
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }
 
   return (
     <View>
-      <div onKeyDown={handleKey}>
-        <TextInput
-          renderLabel={<h1>{I18n.t('Search')}</h1>}
-          interaction={searching ? 'disabled' : 'enabled'}
-          ref={e => (setTextInput(e))}
-          onChange={handleChange}
-          value={textInputValue}
-          renderAfterInput={() => <IconSearchLine />}
-        />
-      </div>
+      <Modal
+        as="form"
+        label={I18n.t('Help us Improve!')}
+        open={feedbackOpen}
+        onDismiss={onCloseFeedback}
+        onSubmit={onSubmitFeedback}
+        shouldCloseOnDocumentClick={true}
+        size="medium"
+      >
+        <Modal.Header>
+          <CloseButton
+            onClick={onCloseFeedback}
+            offset="small"
+            placement="end"
+            screenReaderLabel={I18n.t('Close')}
+          />
+          <Heading level="h2">{I18n.t('Help us Improve!')}</Heading>
+        </Modal.Header>
+        <Modal.Body>
+          <TextArea
+            onChange={e => setFeedback({...feedback, comment: e.target.value})}
+            label={I18n.t('How do you feel about this search result?')}
+            value={feedback.comment}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button margin="0 small 0 0" type="button" onClick={onCloseFeedback}>
+            {I18n.t('Cancel')}
+          </Button>
+          <Button color="primary" type="submit">
+            {I18n.t('Submit')}
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
-      {searching ?
-        <Spinner renderTitle={I18n.t('Searching')} /> :
-        <SearchResults searchResults={searchResults} />
+      {error && (
+        <Alert
+          margin="medium 0"
+          onDismiss={_ => setError(null)}
+          renderCloseButtonLabel={I18n.t('Close')}
+          variant="error"
+        >
+          {error}
+        </Alert>
+      )}
+
+      <Heading level="h1" margin="0 0 medium 0">
+        {I18n.t('Smart Search')}
+        <Pill color="alert" margin="0 0 0 small" themeOverride={{background: 'alert'}}>
+          {I18n.t('Beta')}
+        </Pill>
+      </Heading>
+
+      <form action="#" method="get" onSubmit={onSearch}>
+        <fieldset>
+          <TextInput
+            inputRef={el => (searchInput.current = el)}
+            onChange={e => setSearchTerm(e.target.value)}
+            placeholder={I18n.t('Food that a panda eats')}
+            renderAfterInput={
+              <IconButton
+                interaction={indexingProgress ? 'disabled' : 'enabled'}
+                renderIcon={<IconSearchLine />}
+                withBackground={false}
+                withBorder={false}
+                screenReaderLabel={'Search'}
+                type="submit"
+              />
+            }
+            renderLabel=""
+          />
+        </fieldset>
+      </form>
+
+      {
+        indexingProgress ? (
+          <IndexingProgress progress={indexingProgress} />
+        ) : isLoading ? (
+          <Flex justifyItems="center">
+            <Spinner renderTitle={I18n.t('Searching')} />
+          </Flex>
+        ) : (
+          <View display="block" className="searchResults" margin="small 0 0 0">
+            <SearchResults
+              onDislike={onDislike}
+              onExplain={onExplain}
+              onLike={onLike}
+              searchResults={searchResults}
+            />
+          </View>
+        )
       }
 
-      {pageCount > 1 ? (
-        <Paginator
-          pageCount={pageCount}
-          page={page}
-          loadPage={p => setPage(p)}
-          margin="small"
-        />
-      ) : null}
     </View>
   )
 }

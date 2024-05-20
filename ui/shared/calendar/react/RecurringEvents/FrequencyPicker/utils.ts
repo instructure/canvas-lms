@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Moment} from 'moment-timezone'
+import type {Moment} from 'moment-timezone'
 import {useScope} from '@canvas/i18n'
-import RRuleHelper, {RRuleHelperSpec} from '../RRuleHelper'
-import {AllRRULEDayValues, FrequencyOptionValue} from '../types'
+import RRuleHelper, {type RRuleHelperSpec} from '../RRuleHelper'
+import {AllRRULEDayValues, RRULEWeekDayValues, type FrequencyOptionValue} from '../types'
 import {cardinalDayInMonth, weekdayInMonth} from '../utils'
 import RRuleToNaturalLanguage from '../RRuleNaturalLanguage'
-import {FrequencyOption} from './FrequencyPicker'
+import type {FrequencyOption} from './FrequencyPicker'
 
 const FrequencyCounts = {
   daily: 365, // days in a year
@@ -205,7 +205,7 @@ export const RRULEToFrequencyOptionValue = (
   if (
     spec.freq === 'WEEKLY' &&
     spec.count === FrequencyCounts['every-weekday'] &&
-    spec.weekdays?.toString() === ['MO', 'TU', 'WE', 'TH', 'FR'].toString()
+    spec.weekdays?.toString() === RRULEWeekDayValues.toString()
   ) {
     return 'every-weekday'
   }
@@ -236,7 +236,13 @@ export const updateRRuleForNewDate = (
       spec.weekdays = [AllRRULEDayValues[cdim.dayOfWeek]]
     }
   } else if (spec.freq === 'WEEKLY') {
-    if (spec.weekdays !== undefined) {
+    if (
+      spec.weekdays !== undefined &&
+      !(
+        spec.count === FrequencyCounts['every-weekday'] &&
+        spec.weekdays?.toString() === RRULEWeekDayValues.toString()
+      )
+    ) {
       spec.weekdays = [AllRRULEDayValues[newEventStart.weekday()]]
     }
   }

@@ -64,6 +64,8 @@ export default class AssignmentDetailsDialog {
       close() {
         $(this).remove()
       },
+      modal: true,
+      zIndex: 1000,
     })
   }
 

@@ -106,6 +106,11 @@ module GraphQLNodeLoader
       return nil unless Account.site_admin.grants_right?(ctx[:current_user], ctx[:session], :manage_internal_settings)
 
       Setting.where(name: id).take
+    when "MyInboxSettings"
+      return nil unless Account.site_admin.feature_enabled?(:inbox_settings)
+      return nil unless !id.nil? && !ctx[:domain_root_account].nil?
+
+      Inbox::InboxService.inbox_settings_for_user(user_id: id, root_account_id: ctx[:domain_root_account].id)
     when "MediaObject"
       Loaders::MediaObjectLoader.load(id)
     when "Module"
@@ -165,6 +170,9 @@ module GraphQLNodeLoader
       Loaders::IDLoader.for(Quizzes::Quiz).load(id).then(check_read_permission)
     when "Submission"
       Loaders::IDLoader.for(Submission).load(id).then(check_read_permission)
+    when "SubmissionByAssignmentAndUser"
+      submission = Submission.active.find_by(assignment_id: id.fetch(:assignment_id), user_id: id.fetch(:user_id))
+      check_read_permission.call(submission)
     when "Progress"
       Loaders::IDLoader.for(Progress).load(id).then do |progress|
         Loaders::AssociationLoader.for(Progress, :context).load(progress).then do

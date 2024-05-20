@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "atom"
-
 # @API Discussion Topics
 #
 # API for accessing and participating in discussion topics in groups and courses.
@@ -355,7 +353,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     if params[:only_announcements] && !@context.grants_any_right?(@current_user, :manage, :read_course_content)
-      scope = scope.active.where("delayed_post_at IS NULL OR delayed_post_at<?", Time.now.utc)
+      scope = scope.active.where("(unlock_at IS NULL AND delayed_post_at IS NULL) OR (unlock_at<? OR delayed_post_at<?)", Time.now.utc, Time.now.utc)
     end
 
     per_page = params[:per_page] || 100
@@ -402,7 +400,7 @@ class DiscussionTopicsController < ApplicationController
         }
         fetch_params[:include] = ["sections_user_count", "sections"] if @context.is_a?(Course)
 
-        discussion_topics_fetch_url = send("api_v1_#{@context.class.to_s.downcase}_discussion_topics_path", fetch_params)
+        discussion_topics_fetch_url = send(:"api_v1_#{@context.class.to_s.downcase}_discussion_topics_path", fetch_params)
         (scope.count / fetch_params[:per_page].to_f).ceil.times do |i|
           url = discussion_topics_fetch_url.gsub(fetch_params[:page], (i + 1).to_s)
           prefetch_xhr(url, id: "prefetched_discussion_topic_page_#{i}")
@@ -459,9 +457,9 @@ class DiscussionTopicsController < ApplicationController
       end
 
       InstStatsd::Statsd.increment("discussion_topic.index.visit")
-      InstStatsd::Statsd.count("discussion_topic.index.visit.pinned", @topics&.select(&:pinned)&.count)
+      InstStatsd::Statsd.count("discussion_topic.index.visit.pinned", @topics&.count(&:pinned))
       InstStatsd::Statsd.count("discussion_topic.index.visit.discussions", @topics&.length)
-      InstStatsd::Statsd.count("discussion_topic.index.visit.closed_for_comments", @topics&.select(&:locked)&.count)
+      InstStatsd::Statsd.count("discussion_topic.index.visit.closed_for_comments", @topics&.count(&:locked))
 
       format.json do
         log_api_asset_access(["topics", @context], "topics", "other")
@@ -601,6 +599,7 @@ class DiscussionTopicsController < ApplicationController
       end
 
     js_hash = {
+      ASSIGNMENT_ID: @topic.assignment_id,
       CONTEXT_ACTION_SOURCE: :discussion_topic,
       CONTEXT_ID: @context.id,
       DISCUSSION_TOPIC: hash,
@@ -621,7 +620,8 @@ class DiscussionTopicsController < ApplicationController
       allow_student_anonymous_discussion_topics: @context.allow_student_anonymous_discussion_topics,
       context_is_not_group: !@context.is_a?(Group),
       GRADING_SCHEME_UPDATES_ENABLED: Account.site_admin.feature_enabled?(:grading_scheme_updates),
-      POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes),
+      ARCHIVED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:archived_grading_schemes),
+      DISCUSSION_CHECKPOINTS_ENABLED: @context.root_account.feature_enabled?(:discussion_checkpoints)
     }
 
     post_to_sis = Assignment.sis_grade_export_enabled?(@context)
@@ -735,7 +735,7 @@ class DiscussionTopicsController < ApplicationController
       add_rss_links_to_content
     end
 
-    if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :manage)
+    if (@context.is_a?(Course) || @context.is_a?(Group)) && @context.grants_right?(@current_user, session, :manage)
       set_student_context_cards_js_env
     end
 
@@ -756,9 +756,10 @@ class DiscussionTopicsController < ApplicationController
     if @context.feature_enabled?(:react_discussions_post)
       env_hash = {
         per_page: 20,
-        isolated_view_initial_page_size: 5,
+        split_screen_view_initial_page_size: 5,
         current_page: 0
       }
+      env_hash[:context_rubric_associations_url] = context_url(@context, :context_rubric_associations_url) rescue nil
       if params[:entry_id]
         entry = @topic.discussion_entries.find(params[:entry_id])
         env_hash[:discussions_deep_link] = {
@@ -778,6 +779,8 @@ class DiscussionTopicsController < ApplicationController
       if topics && topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
         redirect_params = { root_discussion_topic_id: @topic.id }
         redirect_params[:module_item_id] = params[:module_item_id] if params[:module_item_id].present?
+        # add in query parameters from the url, we want them preserved
+        redirect_params.merge!(request.query_parameters) unless request.query_parameters.empty?
         redirect_to named_context_url(topics[0].context, :context_discussion_topics_url, redirect_params)
         return
       end
@@ -833,8 +836,6 @@ class DiscussionTopicsController < ApplicationController
                manual_mark_as_read: @current_user&.manual_mark_as_read?,
                discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
                rce_mentions_in_discussions: @context.feature_enabled?(:react_discussions_post) && !@topic.anonymous?,
-               isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
-               split_screen_view: Account.site_admin.feature_enabled?(:split_screen_view),
                discussion_grading_view: Account.site_admin.feature_enabled?(:discussion_grading_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),
@@ -1233,22 +1234,17 @@ class DiscussionTopicsController < ApplicationController
   def public_feed
     return unless get_feed_context
 
-    feed = Atom::Feed.new do |f|
-      f.title = t :discussion_feed_title, "%{title} Discussion Feed", title: @context.name
-      f.links << Atom::Link.new(href: polymorphic_url([@context, :discussion_topics]), rel: "self")
-      f.updated = Time.now
-      f.id = polymorphic_url([@context, :discussion_topics])
-    end
+    title = t :discussion_feed_title, "%{title} Discussion Feed", title: @context.name
+    link = polymorphic_url([@context, :discussion_topics])
+
     @entries = []
     @entries.concat(@context.discussion_topics
                             .select { |dt| dt.visible_for?(@current_user) })
     @entries.concat @context.discussion_entries.active
     @entries = @entries.sort_by(&:updated_at)
-    @entries.each do |entry|
-      feed.entries << entry.to_atom
-    end
+
     respond_to do |format|
-      format.atom { render plain: feed.to_xml }
+      format.atom { render plain: AtomFeedHelper.render_xml(title:, link:, entries: @entries) }
     end
   end
 
@@ -1276,8 +1272,9 @@ class DiscussionTopicsController < ApplicationController
   protected
 
   def cancel_redirect_url
+    query_params = request.query_parameters.empty? ? {} : request.query_parameters
     topic_type = @topic.is_announcement ? :announcements : :discussion_topics
-    @topic.new_record? ? polymorphic_url([@context, topic_type]) : polymorphic_url([@context, @topic])
+    @topic.new_record? ? polymorphic_url([@context, topic_type], query_params) : polymorphic_url([@context, @topic], query_params)
   end
 
   def pinned_topics
@@ -1639,7 +1636,7 @@ class DiscussionTopicsController < ApplicationController
     end
     @topic.lock_at = discussion_topic_hash[:lock_at] if params.key? :lock_at
 
-    if @topic.delayed_post_at_changed? || @topic.lock_at_changed?
+    if @topic.unlock_at_changed? || @topic.delayed_post_at_changed? || @topic.lock_at_changed?
       @topic.workflow_state = @topic.should_not_post_yet ? "post_delayed" : "active"
       if @topic.should_lock_yet
         @topic.lock(without_save: true)
@@ -1798,6 +1795,10 @@ class DiscussionTopicsController < ApplicationController
       )
     end
     extra_params[:module_item_id] = params[:module_item_id] if params[:module_item_id].present?
+    extra_params[:embed] = params[:embed] if params[:embed].present?
+    extra_params[:display] = params[:display] if params[:display].present?
+    extra_params[:session_timezone] = params[:session_timezone] if params[:session_timezone].present?
+    extra_params[:session_locale] = params[:session_locale] if params[:session_locale].present?
 
     @root_topic = @context.context.discussion_topics.find(params[:root_discussion_topic_id])
     @topic = @root_topic.ensure_child_topic_for(@context)

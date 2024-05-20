@@ -38,6 +38,7 @@ import {getRootFolder, uploadFile} from '@canvas/files/util/apiFileUtils'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import natcompare from '@canvas/util/natcompare'
+import { captureException } from '@sentry/react'
 
 const I18n = useI18nScope('react_files')
 
@@ -160,6 +161,7 @@ class FileBrowser extends React.Component {
         /* eslint-disable no-console */
         console.error('Error fetching data from API')
         console.error(error)
+        captureException(error)
         /* eslint-enable no-console */
       })
   }
@@ -272,6 +274,7 @@ class FileBrowser extends React.Component {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error)
+      captureException(error)
       return ids
     }
   }

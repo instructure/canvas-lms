@@ -51,8 +51,7 @@ class InputView extends View {
       return
     }
     this.collection.on('beforeFetch', () => this.$el.addClass('loading'))
-    this.collection.on('fetch', () => this.$el.removeClass('loading'))
-    return this.collection.on('fetch:fail', () => this.$el.removeClass('loading'))
+    return this.collection.on('fetch', () => this.$el.removeClass('loading'))
   }
 
   updateModel() {

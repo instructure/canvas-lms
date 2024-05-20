@@ -118,7 +118,7 @@ module Qti
       @doc.css("responseDeclaration").each do |res_node|
         res_id = res_node["identifier"]
         res_node.css("correctResponse value").each do |correct_id|
-          if (answer = (answer_hash[res_id] && answer_hash[res_id][correct_id.text]))
+          if (answer = answer_hash[res_id] && answer_hash[res_id][correct_id.text])
             answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
           end
         end

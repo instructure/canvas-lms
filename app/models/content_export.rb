@@ -34,12 +34,14 @@ class ContentExport < ActiveRecord::Base
   serialize :settings
 
   attr_writer :master_migration
+  attr_accessor :new_quizzes_export_url, :new_quizzes_export_state
 
   validates :context_id, :workflow_state, presence: true
 
   has_one :job_progress, class_name: "Progress", as: :context, inverse_of: :context
 
   before_save :assign_quiz_migration_limitation_alert
+  before_save :set_new_quizzes_export_settings
   before_create :set_global_identifiers
 
   # export types
@@ -54,6 +56,7 @@ class ContentExport < ActiveRecord::Base
 
   workflow do
     state :created
+    state :waiting_for_external_tool
     state :exporting
     state :exported
     state :exported_for_course_copy
@@ -167,6 +170,10 @@ class ContentExport < ActiveRecord::Base
   def reset_and_start_job_progress
     job_progress.try :reset!
     job_progress.try :start!
+  end
+
+  def mark_waiting_for_external_tool
+    self.workflow_state = "waiting_for_external_tool"
   end
 
   def mark_exporting
@@ -595,6 +602,24 @@ class ContentExport < ActiveRecord::Base
     end
   end
 
+  def set_contains_new_quizzes_settings
+    settings[:contains_new_quizzes] = contains_new_quizzes?
+  end
+
+  def contains_new_quizzes?
+    return false unless new_quizzes_common_cartridge_enabled?
+
+    context.assignments.active.type_quiz_lti.count.positive?
+  end
+
+  def include_new_quizzes_in_export?
+    return false unless new_quizzes_common_cartridge_enabled?
+    return false unless settings[:new_quizzes_export_state] == "completed"
+    return false unless settings[:new_quizzes_export_url].present?
+
+    true
+  end
+
   scope :active, -> { where("content_exports.workflow_state<>'deleted'") }
   scope :not_for_copy, -> { where.not(content_exports: { export_type: [COURSE_COPY, MASTER_COURSE_COPY] }) }
   scope :common_cartridge, -> { where(export_type: COMMON_CARTRIDGE) }
@@ -625,6 +650,21 @@ class ContentExport < ActiveRecord::Base
     end
   }
 
+  def set_new_quizzes_export_settings
+    return unless common_cartridge? && new_quizzes_export_state.present?
+
+    settings[:new_quizzes_export_url] = new_quizzes_export_url
+    settings[:new_quizzes_export_state] = new_quizzes_export_state
+  end
+
+  def new_quizzes_export_state_failed?
+    settings[:new_quizzes_export_state] == "failed"
+  end
+
+  def new_quizzes_export_state_completed?
+    settings[:new_quizzes_export_state] == "completed"
+  end
+
   private
 
   def is_set?(option)
@@ -633,5 +673,9 @@ class ContentExport < ActiveRecord::Base
 
   def new_quizzes_bank_migration_enabled?
     context_type == "Course" && NewQuizzesFeaturesHelper.new_quizzes_bank_migrations_enabled?(context)
+  end
+
+  def new_quizzes_common_cartridge_enabled?
+    context_type == "Course" && NewQuizzesFeaturesHelper.new_quizzes_common_cartridge_enabled?(context)
   end
 end

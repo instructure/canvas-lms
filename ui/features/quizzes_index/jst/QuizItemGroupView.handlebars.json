@@ -1,3 +1,4 @@
 {
+  "brandableCSSBundle": "jst/assignments/AssignmentGroupListItem",
   "i18nScope": "quizzes.quiz_item_group_view"
 }

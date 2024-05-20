@@ -17,7 +17,7 @@
  */
 
 import {
-  ResourceLinkContentItem,
+  type ResourceLinkContentItem,
   resourceLinkContentItem,
   resourceLinkContentItemToHtmlString,
 } from '../ResourceLinkContentItem'

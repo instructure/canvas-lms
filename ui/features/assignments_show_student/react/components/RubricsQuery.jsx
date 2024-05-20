@@ -67,6 +67,7 @@ export default function RubricsQuery(props) {
         imageUrl={errorShipUrl}
         errorSubject={I18n.t('Assignments 2 Student initial query error')}
         errorCategory={I18n.t('Assignments 2 Student Error Page')}
+        errorMessage={error.message}
       />
     )
   }

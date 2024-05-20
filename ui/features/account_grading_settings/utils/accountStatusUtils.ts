@@ -19,7 +19,7 @@
 import {defaultColors} from '@canvas/grading-status-list-item'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
-import {GradingStatusQueryResult} from '../types/accountStatusQueries'
+import type {GradingStatusQueryResult} from '../types/accountStatusQueries'
 
 const I18n = useI18nScope('account_grading_settings')
 

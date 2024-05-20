@@ -26,53 +26,29 @@ import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 import React from 'react'
 import NewKeyForm from './NewKeyForm'
-import type {DeveloperKey} from './NewKeyForm'
+import type {AvailableScope} from './reducers/listScopesReducer'
+import type {DeveloperKeyCreateOrEditState} from './reducers/createOrEditReducer'
+import actions from './actions/developerKeysActions'
+import type {AnyAction, Dispatch} from 'redux'
+import type {DeveloperKey} from '../model/api/DeveloperKey'
 
 const I18n = useI18nScope('react_developer_keys')
 
 type Props = {
-  createOrEditDeveloperKeyState: {
-    isLtiKey: boolean
-    developerKeyCreateOrEditSuccessful: boolean
-    developerKeyCreateOrEditFailed: boolean
-    developerKeyCreateOrEditPending: boolean
-    developerKeyModalOpen: boolean
-    developerKey: DeveloperKey
-    editing: boolean
-  }
-  availableScopes: {
-    [key: string]: Array<{
-      resource: string
-      scope: string
-    }>
-  }
+  createOrEditDeveloperKeyState: DeveloperKeyCreateOrEditState
+  availableScopes: Record<string, AvailableScope>
   availableScopesPending: boolean
   store: {
-    dispatch: (action: any) => Promise<any>
+    dispatch: Dispatch
   }
   ctx: {
     params: {
       contextId: string
     }
   }
-  actions: {
-    createOrEditDeveloperKey: (developerKey: any, url: string, method: string) => Promise<any>
-    developerKeysModalClose: () => void
-    editDeveloperKey: () => void
-    listDeveloperKeyScopesSet: (scopes: Array<string>) => void
-    saveLtiToolConfiguration: (toSave: any) => (dispatch: any) => Promise<any>
-    resetLtiState: () => void
-    updateLtiKey: (
-      developerKey: any,
-      scopes: Array<string>,
-      id: string,
-      settings: any,
-      custom_fields: any
-    ) => Promise<any>
-    listDeveloperKeysReplace: (developerKey: any) => void
-  }
+  actions: typeof actions
   selectedScopes: Array<string>
-  handleSuccessfulSave: () => void
+  handleSuccessfulSave: (warningMessage?: string) => void
 }
 
 type ConfigurationMethod = 'manual' | 'json' | 'url'
@@ -211,7 +187,11 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
     }
 
     return dispatch(
-      createOrEditDeveloperKey({developer_key: toSubmit}, this.developerKeyUrl(), method)
+      createOrEditDeveloperKey(
+        {developer_key: toSubmit},
+        this.developerKeyUrl(),
+        method
+      ) as unknown as AnyAction
     ).then(() => {
       if (this.keySavedSuccessfully) {
         this.props.handleSuccessfulSave()
@@ -225,7 +205,7 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       scopes?: any
       custom_fields?: any
     },
-    developerKey: string
+    developerKey: DeveloperKey
   ) {
     const {
       store: {dispatch},
@@ -236,10 +216,10 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       .updateLtiKey(developerKey, [], this.developerKey.id, settings, settings.custom_fields)
       .then(data => {
         this.setState({isSaving: false})
-        const {developer_key, tool_configuration} = data
+        const {developer_key, tool_configuration, warning_message} = data
         developer_key.tool_configuration = tool_configuration.settings
         dispatch(actions.listDeveloperKeysReplace(developer_key))
-        this.props.handleSuccessfulSave()
+        this.props.handleSuccessfulSave(warning_message)
         this.closeModal()
       })
       .catch(() => {
@@ -262,10 +242,15 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       return
     }
     let settings: {
-      scopes?: any
+      scopes?: unknown
     } = {}
     if (this.isJsonConfig) {
       if (!this.state.toolConfiguration) {
+        // TODO: I don't think this code is called as we initialize
+        // toolConfiguration to an empty object, which is truthy. Fixing this
+        // correctly with regards to invalid JSON is a bit more involved,
+        // though, and simply enabling this has the effect of doing nothing
+        // when the JSON is unchanged
         this.setState({submitted: true})
         return
       }
@@ -285,9 +270,9 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
     } else {
       const toSave: {
         account_id: string
-        developer_key: string
+        developer_key: DeveloperKey
         settings_url?: string
-        settings?: any
+        settings?: unknown
       } = {
         account_id: this.props.ctx.params.contextId,
         developer_key,
@@ -306,9 +291,9 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       return actions
         .saveLtiToolConfiguration(toSave)(dispatch)
         .then(
-          () => {
+          data => {
             this.setState({isSaving: false})
-            this.props.handleSuccessfulSave()
+            this.props.handleSuccessfulSave(data.warning_message)
             this.closeModal()
           },
           () => this.setState({isSaving: false})

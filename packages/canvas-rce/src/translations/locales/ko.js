@@ -65,6 +65,7 @@ const locale = {
   "external_tools_6e77821": { "message": "외부도구" },
   "files_c300e900": { "message": "파일" },
   "files_index_af7c662b": { "message": "파일 색인" },
+  "find_8d605019": { "message": "찾기" },
   "format_4247a9c5": { "message": "형식" },
   "grades_a61eba0a": { "message": "평점" },
   "greek_65c5b3f7": { "message": "그리스 문자" },
@@ -105,6 +106,7 @@ const locale = {
     "message": "아직 페이지를 만들지 않았습니다."
   },
   "no_results_940393cf": { "message": "No results." },
+  "no_results_found_58717065": { "message": "결과가 없음" },
   "none_3b5e34d2": { "message": "없음" },
   "operators_a2ef9a93": { "message": "연산자" },
   "page_50c4823d": { "message": "페이지" },
@@ -112,6 +114,7 @@ const locale = {
   "people_b4ebb13c": { "message": "사용자" },
   "percentage_34ab7c2c": { "message": "퍼센트" },
   "preview_53003fd2": { "message": "미리 보기" },
+  "previous_bd2ac015": { "message": "이전" },
   "quiz_e0dcce8f": { "message": "퀴즈" },
   "quizzes_7e598f57": { "message": "퀴즈" },
   "record_7c9448b": { "message": "녹음/녹화" },

@@ -33,44 +33,23 @@ import React from 'react'
 
 import Scopes from './Scopes'
 import ToolConfigurationForm from './ToolConfigurationForm'
+import type {AvailableScope} from './reducers/listScopesReducer'
+import type {DeveloperKey} from '../model/api/DeveloperKey'
 
-export type DeveloperKey = {
-  notes: string | null
-  icon_url: string | null
-  vendor_code: string | null
-  redirect_uri: string | null
-  redirect_uris?: string
-  public_jwk_url?: string
-  public_jwk?: string
-  email: string | null
-  name: string | null
-  require_scopes: boolean | null
-  tool_configuration: {
-    oidc_initiation_url: string
-  } | null
-  test_cluster_only?: boolean
-  client_credentials_audience: string | null
-}
-
-type Props = {
+export type NewKeyFormProps = {
   dispatch: Function
   listDeveloperKeyScopesSet: Function
-  isLtiKey: boolean
-  isRedirectUriRequired: boolean
+  isLtiKey: boolean | undefined
+  isRedirectUriRequired: boolean | undefined
   developerKey: DeveloperKey
-  availableScopes: {
-    [key: string]: Array<{
-      resource: string
-      scope: string
-    }>
-  }
+  availableScopes: Record<string, AvailableScope>
   availableScopesPending: boolean
   editing: boolean
   tool_configuration: {
     oidc_initiation_url?: string
   }
   showRequiredMessages: boolean
-  showMissingRedirectUrisMessage: boolean
+  showMissingRedirectUrisMessage: boolean | undefined
   updateToolConfiguration: (update: any, field?: string | null, sync?: boolean) => void
   updateToolConfigurationUrl: Function
   updateDeveloperKey: Function
@@ -92,14 +71,15 @@ const clientCredentialsAudienceTooltip = I18n.t(
   'Will credentials issued by this key be presented to Canvas or to a peer service (e.g. Canvas Data)?'
 )
 
-export default class NewKeyForm extends React.Component<Props> {
+export default class NewKeyForm extends React.Component<NewKeyFormProps> {
   keyFormRef: HTMLFormElement | null = null
 
   toolConfigRef: ToolConfigurationForm | null = null
 
   state = {
     invalidJson: null,
-    parsedJson: null,
+    jsonString: null,
+    canPrettify: false,
   }
 
   static defaultProps = {
@@ -134,10 +114,11 @@ export default class NewKeyForm extends React.Component<Props> {
     this.props.updateDeveloperKey('test_cluster_only', !this.props.developerKey.test_cluster_only)
   }
 
-  updatePastedJson = (value: string) => {
+  updatePastedJson = (value: string, prettify: boolean = false) => {
     try {
       const settings = JSON.parse(value)
-      this.setState({invalidJson: null, parsedJson: settings})
+      const jsonString = prettify ? JSON.stringify(settings, null, 2) : value
+      this.setState({invalidJson: null, jsonString, canPrettify: !prettify})
 
       if (!this.props.hasRedirectUris) {
         this.props.updateDeveloperKey('redirect_uris', settings.target_link_uri || '')
@@ -146,8 +127,14 @@ export default class NewKeyForm extends React.Component<Props> {
       this.updateToolConfiguration(settings)
     } catch (e) {
       if (e instanceof SyntaxError) {
-        this.setState({invalidJson: value})
+        this.setState({invalidJson: value, canPrettify: false})
       }
+    }
+  }
+
+  prettifyPastedJson = () => {
+    if (this.state.jsonString) {
+      this.updatePastedJson(this.state.jsonString, true)
     }
   }
 
@@ -243,7 +230,6 @@ export default class NewKeyForm extends React.Component<Props> {
                   onChange={e => updateDeveloperKey('notes', e.target.value)}
                   resize="both"
                 />
-                {/* @ts-expect-error */}
                 {ENV.enableTestClusterChecks && !isLtiKey ? (
                   <Checkbox
                     label={I18n.t('Test Cluster Only')}
@@ -298,13 +284,13 @@ export default class NewKeyForm extends React.Component<Props> {
                   toolConfigurationUrl={toolConfigurationUrl}
                   configurationMethod={this.props.configurationMethod}
                   updateConfigurationMethod={this.props.updateConfigurationMethod}
-                  // @ts-expect-error
                   validScopes={ENV.validLtiScopes}
-                  // @ts-expect-error
                   validPlacements={ENV.validLtiPlacements}
                   invalidJson={this.state.invalidJson}
-                  parsedJson={this.state.parsedJson}
+                  jsonString={this.state.jsonString}
                   updatePastedJson={this.updatePastedJson}
+                  canPrettify={this.state.canPrettify}
+                  prettifyPastedJson={this.prettifyPastedJson}
                 />
               ) : (
                 <Scopes

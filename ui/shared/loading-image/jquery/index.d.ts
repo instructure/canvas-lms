@@ -19,7 +19,7 @@
 import * as JQuery from 'jquery'
 
 export type LoadingImage = {
-  (options: 'hide' | 'remove' | 'remove_once'): JQuery<HTMLElement>
+  (options?: 'hide' | 'remove' | 'remove_once'): JQuery<HTMLElement>
   (
     options: 'register_image',
     image_size: 'normal' | 'small',

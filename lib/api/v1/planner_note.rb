@@ -55,7 +55,7 @@ module Api::V1::PlannerNote
     # avoid instantiating the WikiPage by creating an id link instead of a 'url' one
     asset_id = (klass == WikiPage) ? "page_id:#{note.linked_object_id}" : note.linked_object_id
     asset_path = klass.table_name.singularize
-    [public_send("api_v1_course_#{asset_path}_url", note.course_id, asset_id),
-     public_send("course_#{asset_path}_url", note.course_id, asset_id)]
+    [public_send(:"api_v1_course_#{asset_path}_url", note.course_id, asset_id),
+     public_send(:"course_#{asset_path}_url", note.course_id, asset_id)]
   end
 end

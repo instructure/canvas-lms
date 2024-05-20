@@ -17,7 +17,7 @@
  */
 
 export default function loadFullCalendarLocaleData(locale) {
-  // get it from node_modules/fullcalendar/dist/lang/
+  // get it from node_modules/fullcalendar/dist/locale/
   const FULLCALENDAR_LOCALES = [
     'ar',
     'ar-ma',
@@ -69,11 +69,13 @@ export default function loadFullCalendarLocaleData(locale) {
     'zh-tw',
   ]
 
-  if (!FULLCALENDAR_LOCALES.includes(locale)) {
+  if (locale === 'ga') {
+    return import('../../../ext/custom_fullcalendar_locales/ga')
+  } else if (!FULLCALENDAR_LOCALES.includes(locale)) {
     return Promise.resolve()
   }
 
-  return import(`fullcalendar/dist/lang/${locale}.js`).then(() => {
+  return import(`fullcalendar/dist/locale/${locale}.js`).then(() => {
     // fullcalendar's locale bundle configures moment's locales too and overrides
     // ours..
     //

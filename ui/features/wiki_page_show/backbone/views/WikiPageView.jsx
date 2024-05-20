@@ -19,8 +19,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import 'jquery-scroll-to-visible'
-import tz from '@canvas/timezone'
-import _ from 'underscore'
+import * as tz from '@canvas/datetime'
+import {clone, each} from 'lodash'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/WikiPage.handlebars'
 import StickyHeaderMixin from '@canvas/wiki/backbone/views/StickyHeaderMixin'
@@ -28,13 +28,15 @@ import WikiPageDeleteDialog from '@canvas/wiki/backbone/views/WikiPageDeleteDial
 import WikiPageReloadView from '@canvas/wiki/backbone/views/WikiPageReloadView'
 import PublishButtonView from '@canvas/publish-button-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import {publish} from 'jquery-tinypubsub'
+import ContentTypeExternalToolDrawer from '@canvas/trays/react/ContentTypeExternalToolDrawer'
 import '@canvas/modules/jquery/prerequisites_lookup'
 import '../../jquery/content_locks'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {renderFrontPagePill} from '@canvas/wiki/react/renderFrontPagePill'
+import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 
 const I18n = useI18nScope('pages')
 
@@ -56,7 +58,9 @@ export default class WikiPageView extends Backbone.View {
       'click .use-as-front-page-menu-item': 'useAsFrontPage',
       'click .unset-as-front-page-menu-item': 'unsetAsFrontPage',
       'click .direct-share-send-to-menu-item': 'openSendTo',
+      'click .menu_tool_link': 'launchToolDrawer',
       'click .direct-share-copy-to-menu-item': 'openCopyTo',
+      'click .assign-to-button': 'onAssign',
     }
 
     this.optionProperty('modules_path')
@@ -155,6 +159,8 @@ export default class WikiPageView extends Backbone.View {
         $(this).closest('p').addClass('lti-embed-container')
       })
     }
+
+    this.initializeToolDrawer()
 
     // attach/re-attach the sequence footer (if this is a course, but not the home page)
     if (!this.$sequenceFooter && !this.course_home && !!this.course_id) {
@@ -278,8 +284,100 @@ export default class WikiPageView extends Backbone.View {
     )
   }
 
+  onAssign(e) {
+    if (e) e.preventDefault()
+    this.renderItemAssignToTray(true)
+  }
+
+  renderItemAssignToTray(open) {
+    const returnFocusTo = document.querySelector('.assign-to-button')
+    const mountPoint = document.getElementById('assign-to-mount-point')
+    const onTrayClose = () => {
+      this.renderItemAssignToTray(false, returnFocusTo)
+      returnFocusTo.focus()
+    }
+    const onTrayExited = () => ReactDOM.unmountComponentAtNode(mountPoint)
+
+    ReactDOM.render(
+      <ItemAssignToTray
+        open={open}
+        onClose={onTrayClose}
+        onDismiss={onTrayClose}
+        onExited={onTrayExited}
+        iconType="page"
+        itemType="page"
+        locale={ENV.LOCALE || 'en'}
+        timezone={ENV.TIMEZONE || 'UTC'}
+        courseId={this.course_id}
+        itemName={this.model.get('title')}
+        itemContentId={this.model.get('page_id')}
+        removeDueDateInput={true}
+      />,
+      mountPoint
+    )
+  }
+
+  initializeToolDrawer() {
+    const mountPoint = document.getElementById('drawer-layout-mount-point')
+    const pageContent = document.getElementById('application')
+
+    if (!!mountPoint && !!pageContent) {
+      this.toolDrawer = {
+        open: false,
+        tool: null,
+        pageContent: pageContent,
+        mountPoint: mountPoint,
+      }
+      window.addEventListener('resize', this.renderExternalToolDrawer.bind(this));
+      this.renderExternalToolDrawer()
+    }
+  }
+
+  launchToolDrawer(ev) {
+    if (ev != null && !!this.toolDrawer && ev.target.dataset.launchMethod === 'tray') {
+      const tool = ENV.wiki_page_menu_tools.find(t => t.id === ev.target.dataset.toolId)
+      if (tool) {
+        ev.preventDefault()
+        this.toolDrawer.tool = tool
+        this.setToolDrawerOpen(true)
+      }
+    }
+  }
+
+  setToolDrawerOpen(open) {
+    this.toolDrawer.open = open
+    this.renderExternalToolDrawer()
+  }
+
+  renderExternalToolDrawer() {
+    if (!this.toolDrawer || !this.toolDrawer.pageContent || !this.toolDrawer.mountPoint) {
+      return
+    }
+
+    ReactDOM.render(
+      <ContentTypeExternalToolDrawer
+        tool={this.toolDrawer.tool}
+        trayPlacement="end"
+        pageContent={this.toolDrawer.pageContent}
+        pageContentTitle=""
+        pageContentMinWidth="40rem"
+        pageContentHeight={window.innerHeight}
+        acceptedResourceTypes={["page"]}
+        targetResourceType="page"
+        allowItemSelection={false}
+        selectableItems={[]}
+        onDismiss={() => {this.setToolDrawerOpen(false)}}
+        open={this.toolDrawer.open}
+        placement="wiki_page_menu"
+        extraQueryParams={{wiki_page_id: this.model.id}}
+      />,
+      this.toolDrawer.mountPoint
+    )
+  }
+
   toJSON() {
     const json = super.toJSON(...arguments)
+    json.page_id = this.model.get('page_id')
     json.modules_path = this.modules_path
     json.wiki_pages_path = this.wiki_pages_path
     json.wiki_page_edit_path = this.wiki_page_edit_path
@@ -294,9 +392,15 @@ export default class WikiPageView extends Backbone.View {
       UPDATE_CONTENT: !!this.PAGE_RIGHTS.update || !!this.PAGE_RIGHTS.update_content,
       DELETE: !!this.PAGE_RIGHTS.delete && !this.course_home,
       READ_REVISIONS: !!this.PAGE_RIGHTS.read_revisions,
+      UPDATE: !!this.WIKI_RIGHTS.update,
+      LAUNCH_MENU_TOOL: ENV.wiki_page_menu_tools?.length > 0,
     }
     json.CAN.DIRECT_SHARE = !!ENV.DIRECT_SHARE_ENABLED
-    json.CAN.ACCESS_GEAR_MENU = json.CAN.DELETE || json.CAN.READ_REVISIONS || json.CAN.DIRECT_SHARE
+    json.CAN.ACCESS_GEAR_MENU =
+      json.CAN.DELETE ||
+      json.CAN.READ_REVISIONS ||
+      json.CAN.DIRECT_SHARE ||
+      json.CAN.LAUNCH_MENU_TOOL
     json.CAN.VIEW_TOOLBAR =
       json.course_home ||
       json.CAN.VIEW_ALL_PAGES ||
@@ -305,9 +409,10 @@ export default class WikiPageView extends Backbone.View {
       json.CAN.ACCESS_GEAR_MENU
     json.recent_announcements_enabled = !!ENV.SHOW_ANNOUNCEMENTS
     json.explicit_latex_typesetting = !!ENV.FEATURES?.explicit_latex_typesetting
+    json.differentiated_modules = !!ENV.FEATURES.differentiated_modules
 
     if (json.lock_info) {
-      json.lock_info = _.clone(json.lock_info)
+      json.lock_info = clone(json.lock_info)
     }
     if (json.lock_info != null ? json.lock_info.unlock_at : undefined) {
       json.lock_info.unlock_at =
@@ -322,7 +427,7 @@ export default class WikiPageView extends Backbone.View {
     }
 
     json.wiki_page_menu_tools = ENV.wiki_page_menu_tools
-    _.each(json.wiki_page_menu_tools, tool => {
+    each(json.wiki_page_menu_tools, tool => {
       tool.url = `${tool.base_url}&pages[]=${this.model.get('page_id')}`
     })
     json.frontPageText = ENV.K5_SUBJECT_COURSE ? I18n.t('Subject Home') : I18n.t('Front Page')

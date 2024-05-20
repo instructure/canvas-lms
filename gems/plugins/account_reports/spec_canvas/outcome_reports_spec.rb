@@ -1406,4 +1406,33 @@ describe "Outcome Reports" do
       end
     end
   end
+
+  describe "common functionality" do
+    let_once(:account_report) { AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1) }
+    let_once(:outcome_reports) { AccountReports::OutcomeReports.new(account_report) }
+
+    it "doesn't load courses if account_level_mastery_scales feature is off" do
+      outcome_reports.instance_variable_set(:@account_level_mastery_scales_enabled, false)
+      row = { "course id" => @course1.id }
+      expect(Course).not_to receive(:find)
+      outcome_reports.send :add_outcomes_data, row
+    end
+
+    it "caches courses" do
+      outcome_reports.instance_variable_set(:@account_level_mastery_scales_enabled, true)
+      row = { "course id" => @course1.id }
+      expect(Course).to receive(:find).with(@course1.id).and_call_original
+      outcome_reports.send :add_outcomes_data, row
+      expect(Course).not_to receive(:find)
+      outcome_reports.send :add_outcomes_data, row
+    end
+
+    it "doesn't instantiate the entire scope" do
+      scope = outcome_reports.send(:student_assignment_outcome_map_scope)
+      expect(scope).not_to receive(:[])
+      outcome_reports.send(:write_outcomes_report,
+                           AccountReports::OutcomeReports.student_assignment_outcome_headers,
+                           scope)
+    end
+  end
 end

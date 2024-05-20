@@ -58,7 +58,7 @@ class PageView < ActiveRecord::Base
       p.export_columns.each do |c|
         v = p.send(c)
         if !v.nil? && v.respond_to?(:force_encoding)
-          p.send("#{c}=", v.force_encoding(Encoding::UTF_8))
+          p.send(:"#{c}=", v.force_encoding(Encoding::UTF_8))
         end
       end
     end

@@ -68,7 +68,7 @@ describe('Statuses Modal', () => {
     expect(getAllByRole('listitem').length).toBe(6)
   })
 
-  it('onClose is called when closed', () => {
+  it('onClose is called when closed', async () => {
     const onClose = jest.fn()
     const afterUpdateStatusColors = jest.fn()
 
@@ -82,7 +82,7 @@ describe('Statuses Modal', () => {
 
     const {getByRole} = within(document.body)
 
-    userEvent.click(getByRole('button', {name: /Close/i}))
+    await userEvent.click(getByRole('button', {name: /Close/i}))
     expect(onClose).toHaveBeenCalledTimes(1)
   })
 })

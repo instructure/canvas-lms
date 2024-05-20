@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
+import {isObject} from 'lodash'
 
 const I18n = useI18nScope('epub_exports')
 
@@ -33,14 +33,14 @@ class DownloadLink extends React.Component {
   epubExport = () => this.props.course.epub_export || {}
 
   showDownloadLink = () =>
-    _.isObject(this.epubExport().permissions) && this.epubExport().permissions.download
+    isObject(this.epubExport().permissions) && this.epubExport().permissions.download
 
   //
   // Rendering
   //
 
   downloadLink = (attachment, message) => {
-    if (_.isObject(attachment)) {
+    if (isObject(attachment)) {
       return (
         <a href={attachment.url} className="icon-download">
           {message}

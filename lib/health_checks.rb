@@ -60,15 +60,22 @@ module HealthChecks
         # ensures webpack worked; returns a string, treated as truthy
         common_js: -> { Canvas::Cdn.registry.scripts_available? },
         # returns a PrefixProxy instance, treated as truthy
-        consul: -> { DynamicSettings.find(tree: :private)[:readiness].nil? },
+        consul: -> { DynamicSettings.find(tree: :private)[:readiness, failsafe: nil].nil? },
         # returns the value of the block <integer>, treated as truthy
         filesystem: lambda do
           !!Tempfile.open("readiness", ENV["TMPDIR"] || Dir.tmpdir) { |f| f.write("readiness") }
         end,
         # returns a boolean
-        jobs: -> { Delayed::Job.connection.active? },
+        jobs: lambda do
+                Delayed::Job.connection.verify!
+                true
+              end,
         # returns a boolean
-        postgresql: -> { Account.connection.active? && GuardRail.activate(:secondary) { Account.connection.active? } },
+        postgresql: lambda do
+                      Account.connection.verify!
+                      GuardRail.activate(:secondary) { Account.connection.verify! }
+                      true
+                    end,
         # nil response treated as truthy
         ha_cache: -> { MultiCache.cache.fetch("readiness").nil? },
         # ensures `gulp rev` has ran; returns a string, treated as truthy
@@ -80,7 +87,10 @@ module HealthChecks
 
     def critical_checks
       ret = {
-        default_shard: -> { Shard.connection.active? }
+        default_shard: lambda do
+                         Shard.connection.verify!
+                         true
+                       end
       }
 
       if InstFS.enabled?
@@ -137,6 +147,14 @@ module HealthChecks
           ).nil?
         end
       end
+
+      if DynamicSettings.config.present?
+        ret[:consul] = lambda do
+          DynamicSettings.find(tree: :private)["health_check", ttl: 0.1]
+          true
+        end
+      end
+
       ret
     end
 
@@ -187,6 +205,7 @@ module HealthChecks
           IncomingMailProcessor::IncomingMessageProcessor.healthy?
         end
       end
+
       ret
     end
 

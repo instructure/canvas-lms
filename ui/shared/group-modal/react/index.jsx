@@ -49,9 +49,9 @@ GroupModal.propTypes = {
 }
 
 export default function GroupModal({groupCategory, group, onSave, requestMethod, ...modalProps}) {
-  const [name, setName] = useState('')
-  const [groupLimit, setGroupLimit] = useState('')
-  const [joinLevel, setJoinLevel] = useState('')
+  const [name, setName] = useState(group?.name || '')
+  const [groupLimit, setGroupLimit] = useState(group?.group_limit || '')
+  const [joinLevel, setJoinLevel] = useState(group?.join_level || '')
   const [status, setStatus] = useState(null)
 
   useEffect(() => {

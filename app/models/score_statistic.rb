@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class ScoreStatistic < ApplicationRecord
-  belongs_to :assignment
+  belongs_to :assignment, inverse_of: :score_statistic, class_name: "AbstractAssignment"
 
   validates :assignment, :maximum, :minimum, :mean, :count, :lower_q, :median, :upper_q, presence: true
   validates :maximum, :minimum, :mean, :count, :lower_q, :median, :upper_q, numericality: true

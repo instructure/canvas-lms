@@ -72,10 +72,9 @@ export default {
         searchFilter.search_term.trim().length >= minSearchLength ||
         searchFilter.search_term === ''
       ) {
+        const successHandler = (response, xhr) => dispatch(this.gotUserList(response, xhr))
         dispatch(this.loadingUsers())
-        store.load(searchFilter).then((response, _, xhr) => {
-          dispatch(this.gotUserList(response, xhr))
-        })
+        store.load(searchFilter, successHandler)
       } else {
         dispatch(this.displaySearchTermTooShortError(minSearchLength))
       }

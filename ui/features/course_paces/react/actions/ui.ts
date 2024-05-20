@@ -20,11 +20,11 @@
  * The actions in this file should encapsulate state variables that only effect the UI.
  */
 
-import {Action} from 'redux'
-import {ThunkAction} from 'redux-thunk'
+import type {Action} from 'redux'
+import type {ThunkAction} from 'redux-thunk'
 
-import {CoursePace, PaceContextTypes, ResponsiveSizes, StoreState} from '../types'
-import {createAction, ActionsUnion} from '../shared/types'
+import type {CoursePace, PaceContextTypes, ResponsiveSizes, StoreState} from '../types'
+import {createAction, type ActionsUnion} from '../shared/types'
 import {coursePaceActions} from './course_paces'
 
 export enum Constants {

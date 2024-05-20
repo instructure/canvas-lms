@@ -18,7 +18,7 @@
 
 import {Course} from '../../../features/course_paces/react/shared/types'
 import {CoursePace, PaceContextProgress, Progress} from '../../../features/course_paces/react/types'
-import {EnvDateRange} from '@canvas/global/DateRange'
+import {EnvDateRange} from '../DateRange'
 
 /**
  * Course Paces environment variables

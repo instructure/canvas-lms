@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import tz from '@canvas/timezone'
+import * as tz from '@canvas/datetime'
 import moment from 'moment'
 import React, {useState} from 'react'
 import {bool} from 'prop-types'
@@ -79,9 +79,9 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
 
   const formatDate = date => tz.format(date, 'date.formats.full')
 
-  const parseDate = (date, tz) => {
+  const parseDate = (date, originTZ) => {
     const dateObj = new Date(date)
-    const parsedDate = changeTimezone(dateObj, {originTZ: tz, desiredTZ: ENV.TIMEZONE})
+    const parsedDate = changeTimezone(dateObj, {originTZ, desiredTZ: ENV.TIMEZONE})
     return formatDate(parsedDate)
   }
 

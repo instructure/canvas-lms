@@ -26,7 +26,7 @@ module Lti::MembershipService
       per_page = opts[:per_page].to_i
       @next_page = true
       @role = opts[:role]
-      @per_page = [((per_page > 0) ? per_page : Api.per_page), Api.max_per_page].min
+      @per_page = [((per_page > 0) ? per_page : Api::PER_PAGE), Api::MAX_PER_PAGE].min
       @page = [opts[:page].to_i, 1].max
       @context = context
     end

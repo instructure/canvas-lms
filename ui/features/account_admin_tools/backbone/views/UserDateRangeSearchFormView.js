@@ -21,7 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/userDateRangeSearchForm.handlebars'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import 'jqueryui/dialog'
 import '@canvas/rails-flash-notifications'
 
@@ -115,6 +115,7 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
         height: 'auto',
         width: 400,
         modal: true,
+        zIndex: 1000,
         dialogClass: 'userDateRangeSearchModal',
         close() {
           return self.$el.find(`.roster_user_name[data-user-id=${id}]`).focus()

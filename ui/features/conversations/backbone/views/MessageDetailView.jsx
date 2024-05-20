@@ -17,7 +17,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {debounce} from 'lodash'
 import {View} from '@canvas/backbone'
 import MessageItemView from './MessageItemView'
 import template from '../../jst/messageDetail.handlebars'
@@ -137,7 +137,7 @@ export default class MessageDetailView extends View {
     if (this.model) {
       return this.model.on(
         'change:starred change:workflow_state',
-        _.debounce(this.updateLabels, 90),
+        debounce(this.updateLabels, 90),
         this
       )
     }

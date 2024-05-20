@@ -115,7 +115,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def unchangeable?
-    (!@summary.editable? || assignment.special_class)
+    !@summary.editable? || assignment.special_class
   end
 
   def has_comments?

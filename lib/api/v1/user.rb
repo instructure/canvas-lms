@@ -64,7 +64,8 @@ module Api::V1::User
         include_root_account = @domain_root_account.trust_exists?
         course_or_section = @context if @context.is_a?(Course) || @context.is_a?(CourseSection)
         sis_context = enrollment || course_or_section || @domain_root_account
-        pseudonym = SisPseudonym.for(user, sis_context, type: :implicit, require_sis: false, root_account: @domain_root_account, in_region: true)
+        type = includes.include?("deleted_pseudonyms") ? :exact : :implicit
+        pseudonym = SisPseudonym.for(user, sis_context, type:, require_sis: false, root_account: @domain_root_account, in_region: true)
         enrollment_json_opts[:sis_pseudonym] = pseudonym if pseudonym&.sis_user_id
         # the sis fields on pseudonym are poorly named -- sis_user_id is
         # the id in the SIS import data, where on every other table
@@ -130,7 +131,15 @@ module Api::V1::User
 
       json[:locale] = user.locale if includes.include?("locale")
       json[:effective_locale] = I18n.locale if includes.include?("effective_locale") && user == current_user
-      json[:confirmation_url] = user.communication_channels.email.first.try(:confirmation_url) if includes.include?("confirmation_url")
+
+      if includes.include?("confirmation_url")
+        email_channel = user.communication_channels.email.first
+        if email_channel.present?
+          presenter = CommunicationChannelPresenter.new(email_channel, request)
+          confirmation_url = presenter.confirmation_url
+          json[:confirmation_url] = confirmation_url if confirmation_url.present?
+        end
+      end
 
       if includes.include?("last_login")
         last_login = user.last_login || user.read_attribute(:last_login)

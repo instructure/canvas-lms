@@ -20,12 +20,16 @@ import $ from 'jquery'
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
-import {AssignmentConnection, SubmissionConnection, SubmissionGradeChange} from '../../../types'
+import type {
+  AssignmentConnection,
+  SubmissionConnection,
+  SubmissionGradeChange,
+} from '../../../types'
 import {
   mapToSubmissionGradeChange,
   isInPastGradingPeriodAndNotAdmin,
 } from '../../../utils/gradebookUtils'
-import {Submission} from '../../../../../api.d'
+import type {Submission} from '../../../../../api.d'
 
 async function loadCurveGradesDialog() {
   return (await import('@canvas/grading/jquery/CurveGradesDialog')).default

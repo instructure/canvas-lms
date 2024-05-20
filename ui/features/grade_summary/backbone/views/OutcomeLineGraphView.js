@@ -26,7 +26,7 @@ import {sumBy} from 'lodash'
 import Backbone from '@canvas/backbone'
 import I18n from '@canvas/i18n'
 import OutcomeResultCollection from '../collections/OutcomeResultCollection'
-import d3 from 'd3/d3'
+import d3 from 'd3'
 import accessibleTemplate from '../../jst/accessibleLineGraph.handlebars'
 
 const dateTimeFormatter = Intl.DateTimeFormat(I18n.currentLocale(), {
@@ -123,7 +123,7 @@ class OutcomeLineGraphView extends Backbone.View {
   }
 
   render() {
-    if (this.deferred.isResolved()) {
+    if (this.deferred.state() === 'resolved') {
       if (this.collection.isEmpty()) {
         return this
       }

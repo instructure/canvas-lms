@@ -59,7 +59,8 @@ shared_examples_for "a locked api item" do
   end
 
   it "unlocks using unlock_at" do
-    if locked_item.respond_to?(:unlock_at)
+    should_skip = locked_item.is_a?(WikiPage) && !Account.site_admin.feature_enabled?(:differentiated_modules)
+    if locked_item.respond_to?(:unlock_at) && !should_skip
       verify_unlocked
 
       locked_item.unlock_at = 1.day.from_now if locked_item.respond_to?(:unlock_at)
@@ -70,7 +71,8 @@ shared_examples_for "a locked api item" do
   end
 
   it "locks using lock_at" do
-    if locked_item.respond_to?(:lock_at)
+    should_skip = locked_item.is_a?(WikiPage) && !Account.site_admin.feature_enabled?(:differentiated_modules)
+    if locked_item.respond_to?(:lock_at) && !should_skip
       verify_unlocked
 
       locked_item.lock_at = 1.day.ago

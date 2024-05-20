@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import parseLinkHeader from 'parse-link-header'
+import parseLinkHeader from '@canvas/parse-link-header'
 import ajaxJSON from '@canvas/jquery/jquery.ajaxJSON'
-import createStore from '@canvas/util/createStore'
+import createStore from '@canvas/backbone/createStore'
 
 const getNextUrl = obj => obj && obj.links && obj.links.next && obj.links.next.url
 
@@ -62,22 +62,30 @@ export default function factory(spec) {
       /**
        * Load the first page of data for the given params
        */
-      load(params) {
+      load(params, successHandler = () => {}) {
         const key = this.getKey(params)
         this.lastParams = params
         const normalizedParams = this.normalizeParams(params)
         const url = this.getUrl()
 
-        return this._load(key, url, normalizedParams)
+        return this._load(key, url, normalizedParams, {successHandler})
       },
 
       /**
        * Create a record; since we're lazy, just blow away all the store
        * data, but reload the last thing we fetched
        */
-      create(params) {
+      create(params, successHandler = () => {}, errorHandler = () => {}) {
         const url = this.getUrl()
-        return ajaxJSON(url, 'POST', this.normalizeParams(params)).then(() => {
+        return ajaxJSON(
+          url,
+          'POST',
+          this.normalizeParams(params),
+          data => {
+            successHandler(data)
+          },
+          errorHandler
+        ).then(() => {
           this.clearState()
           if (this.lastParams) this.load(this.lastParams)
         })
@@ -136,6 +144,7 @@ export default function factory(spec) {
             if (this.jsonKey) data = data[this.jsonKey]
             if (options.wrap) data = [data]
             if (options.append) data = (this.getStateFor(key).data || []).concat(data)
+            if (options.successHandler) options.successHandler(data, xhr)
 
             const links = parseLinkHeader(xhr.getResponseHeader('Link'))
             this.mergeState(key, {data, links, loading: false})

@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 

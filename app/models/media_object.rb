@@ -81,26 +81,26 @@ class MediaObject < ActiveRecord::Base
   set_policy do
     #################### Begin legacy permission block #########################
     given do |user|
-      !context_root_account(user).feature_enabled?(:granular_permissions_manage_course_content) &&
+      !context_root_account(user)&.feature_enabled?(:granular_permissions_manage_course_content) &&
         ((self.user && self.user == user) || context&.grants_right?(user, :manage_content))
     end
     can :add_captions and can :delete_captions
 
     given do |user|
-      !context_root_account(user).feature_enabled?(:granular_permissions_manage_course_content) &&
+      !context_root_account(user)&.feature_enabled?(:granular_permissions_manage_course_content) &&
         Account.site_admin.feature_enabled?(:media_links_use_attachment_id) && attachment&.grants_right?(user, :update)
     end
     can :add_captions and can :delete_captions
     ##################### End legacy permission block ##########################
 
     given do |user|
-      context_root_account(user).feature_enabled?(:granular_permissions_manage_course_content) &&
+      context_root_account(user)&.feature_enabled?(:granular_permissions_manage_course_content) &&
         (attachment.present? ? attachment.grants_right?(user, :update) : (context&.grants_right?(user, :manage_course_content_add) || (self.user && self.user == user)))
     end
     can :add_captions
 
     given do |user|
-      context_root_account(user).feature_enabled?(:granular_permissions_manage_course_content) &&
+      context_root_account(user)&.feature_enabled?(:granular_permissions_manage_course_content) &&
         (attachment.present? ? attachment.grants_right?(user, :update) : (context&.grants_right?(user, :manage_course_content_delete) || (self.user && self.user == user)))
     end
     can :delete_captions
@@ -234,6 +234,7 @@ class MediaObject < ActiveRecord::Base
 
   def retrieve_details_ensure_codecs(attempt = 0)
     retrieve_details
+    request_captions
     if !transcoded_details && created_at > 6.hours.ago
       if attempt < 10
         delay(run_at: (5 * attempt).minutes.from_now).retrieve_details_ensure_codecs(attempt + 1)
@@ -333,6 +334,12 @@ class MediaObject < ActiveRecord::Base
     save!
   end
 
+  def request_captions
+    return unless Account.site_admin.feature_enabled?(:speedgrader_studio_media_capture)
+
+    VideoCaptionService.call(self)
+  end
+
   def data
     read_or_initialize_attribute(:data, {})
   end
@@ -355,7 +362,7 @@ class MediaObject < ActiveRecord::Base
     return unless %w[Account Course Group User].include?(context_type)
 
     self.attachment = Folder.media_folder(context).attachments
-                            .create(
+                            .create!(
                               context:,
                               display_name: guaranteed_title,
                               filename: guaranteed_title,

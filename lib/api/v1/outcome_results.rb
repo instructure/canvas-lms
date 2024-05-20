@@ -80,7 +80,7 @@ module Api::V1::OutcomeResults
       course = @context.is_a?(Course) ? @context : nil
 
       friendly_descriptions_array = outcomes.map(&:id).each_slice(100).flat_map do |outcome_ids|
-        resolve_friendly_descriptions(account, course, outcome_ids).map { |description| [description.learning_outcome_id, description.description] }
+        resolve_friendly_descriptions(account, course, outcome_ids).map { |description| [description.learning_outcome_id.to_s, description.description] }
       end
 
       friendly_descriptions = friendly_descriptions_array.to_h
@@ -96,6 +96,7 @@ module Api::V1::OutcomeResults
         context:,
         friendly_descriptions:
       )
+
       hash[:alignments] = alignment_asset_string_map[o.id]
       hash
     end

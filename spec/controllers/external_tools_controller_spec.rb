@@ -145,12 +145,14 @@ describe ExternalToolsController do
       end
 
       context "when current user is a teacher" do
+        subject { get :show, params: { course_id: @course.id, id: tool.id } }
+
         before do
           user_session(@teacher)
-          get :show, params: { course_id: @course.id, id: tool.id }
         end
 
         it "creates a login message" do
+          subject
           expect(assigns[:lti_launch].params.keys).to match_array %w[
             iss
             login_hint
@@ -165,16 +167,72 @@ describe ExternalToolsController do
         end
 
         it 'sets the "login_hint" to the current user lti id' do
+          subject
           expect(assigns[:lti_launch].params["login_hint"]).to eq Lti::Asset.opaque_identifier_for(@teacher)
         end
 
         it "caches the the LTI 1.3 launch" do
+          subject
           expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
         end
 
         it 'sets the "canvas_domain" to the request domain' do
+          subject
           message_hint = JSON::JWT.decode(assigns[:lti_launch].params["lti_message_hint"], :skip_verification)
           expect(message_hint["canvas_domain"]).to eq "localhost"
+        end
+
+        it "defaults placement to context navigation" do
+          subject
+          expect(cached_launch["https://www.instructure.com/placement"]).to eq "course_navigation"
+        end
+
+        context "in the student_context_card placement" do
+          subject { get :show, params: { course_id: @course.id, id: tool.id, placement: "student_context_card", student_id: }.compact }
+
+          let(:student_id) { raise "override" }
+
+          before do
+            tool.student_context_card = { enabled: true }
+            tool.save!
+          end
+
+          context "without student_id param" do
+            let(:student_id) { nil }
+
+            it "does not include lti_student_id in launch" do
+              subject
+              expect(cached_launch).not_to have_key("https://www.instructure.com/lti_student_id")
+            end
+          end
+
+          context "with non-existent student_id param" do
+            let(:student_id) { "wrong" }
+
+            it "returns a JSON error" do
+              subject
+              expect(response).to be_not_found
+            end
+          end
+
+          context "with non-student student_id param" do
+            let(:student_id) { @teacher.id.to_s }
+
+            it "returns a JSON error" do
+              subject
+              expect(response).to be_unauthorized
+            end
+          end
+
+          context "with valid student_id param" do
+            let(:student) { student_in_course(course: @course, active_all: true).user }
+            let(:student_id) { student.id }
+
+            it "includes lti_student_id in launch" do
+              subject
+              expect(cached_launch["https://www.instructure.com/lti_student_id"]).to eq(student.global_id.to_s)
+            end
+          end
         end
       end
 
@@ -290,7 +348,6 @@ describe ExternalToolsController do
 
         before do
           allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
-          Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
           tool.course_navigation = { enabled: true }
           tool.settings[:environments] = {
@@ -314,6 +371,21 @@ describe ExternalToolsController do
 
             expect(assigns[:lti_launch].resource_url).to eq override_launch_url
           end
+        end
+      end
+
+      context "in the student_context_card placement" do
+        before do
+          tool.student_context_card = { enabled: true }
+          tool.save!
+        end
+
+        let(:student) { student_in_course(course: @course, active_all: true).user }
+        let(:student_id) { student.id }
+
+        it "includes ext_lti_student_id in the launch" do
+          get :show, params: { course_id: @course.id, id: tool.id, student_id:, placement: :student_context_card }
+          expect(assigns[:lti_launch].params["ext_lti_student_id"]).to eq(student.global_id.to_s)
         end
       end
     end
@@ -541,7 +613,6 @@ describe ExternalToolsController do
 
         before do
           allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
-          Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
           @tool.settings[:environments] = {
             domain:
@@ -802,7 +873,6 @@ describe ExternalToolsController do
 
         before do
           allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
-          Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
           @tool.settings[:environments] = {
             domain:
@@ -898,16 +968,9 @@ describe ExternalToolsController do
       end
 
       context "ENV.LTI_TOOL_FORM_ID" do
-        it "with the lti_unique_tool_form_ids flag on, sets a random id" do
-          @course.account.enable_feature!(:lti_unique_tool_form_ids)
+        it "sets a random id" do
           expect(controller).to receive(:random_lti_tool_form_id).and_return("1")
           expect(controller).to receive(:js_env).with(LTI_TOOL_FORM_ID: "1")
-          get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/launch" }
-        end
-
-        it "with the lti_unique_tool_form_ids flag off, does not set a random it" do
-          @course.account.disable_feature!(:lti_unique_tool_form_ids)
-          expect(controller).not_to receive(:js_env).with(LTI_TOOL_FORM_ID: anything)
           get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/launch" }
         end
       end
@@ -942,11 +1005,33 @@ describe ExternalToolsController do
 
         let(:get_page) { get "retrieve", params: get_page_params }
 
+        context "when launch_type is not provided" do
+          it "does not include placement in launch" do
+            get_page
+            expect(launch_hash["https://www.instructure.com/placement"]).to be_nil
+          end
+        end
+
+        context "when launch_type is provided" do
+          let(:launch_type) { "homework_submission" }
+          let(:get_page_params) { super().merge(launch_type:) }
+
+          before do
+            lti_1_3_tool.homework_submission = { enabled: true }
+            lti_1_3_tool.save!
+          end
+
+          it "includes placement in launch" do
+            get_page
+            expect(launch_hash["https://www.instructure.com/placement"]).to eq launch_type
+          end
+        end
+
         it "sets the custom parameters in the launch hash" do
           get_page
           expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]).to include(
             "abc" => "def",
-            "expans" => @teacher.id
+            "expans" => @teacher.id.to_s
           )
         end
 
@@ -959,7 +1044,7 @@ describe ExternalToolsController do
 
           expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]).to include(
             "abc" => "def",
-            "expans" => @teacher.id
+            "expans" => @teacher.id.to_s
           )
         end
 
@@ -1035,7 +1120,7 @@ describe ExternalToolsController do
           get_page
           expect(
             launch_params["https://purl.imsglobal.org/spec/lti/claim/custom"]
-          ).to eq({ "abc" => "def", "expans" => @teacher.id })
+          ).to eq({ "abc" => "def", "expans" => @teacher.id.to_s })
         end
 
         it "if parent_frame_context is not given it does not include it in lti_message_hint" do
@@ -1148,6 +1233,45 @@ describe ExternalToolsController do
       assert_unauthorized
     end
 
+    context "logging" do
+      before do
+        allow(Lti::LogService).to receive(:new) do
+          double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+        end
+        user_session(@teacher)
+      end
+
+      context "when placement is provided" do
+        let(:placement) { "assignment_selection" }
+
+        it "logs launch with placement and indirect_link launch_type" do
+          expect(Lti::LogService).to receive(:new).with(
+            tool:,
+            context: @course,
+            user: @teacher,
+            placement:,
+            launch_type: :indirect_link
+          )
+
+          get "retrieve", params: { course_id: @course.id, url: tool.url, placement: }
+        end
+      end
+
+      context "when placement isn't provided (like rich content)" do
+        it "logs launch with no placement and content_item launch_type" do
+          expect(Lti::LogService).to receive(:new).with(
+            tool:,
+            context: @course,
+            user: @teacher,
+            placement: nil,
+            launch_type: :content_item
+          )
+
+          get "retrieve", params: { course_id: @course.id, url: tool.url }
+        end
+      end
+    end
+
     it "passes prefer_1_1=false to find_external_tool by default when looking up by URL" do
       user_session(@teacher)
       expect(ContextExternalTool).to receive(:find_external_tool).with(
@@ -1254,7 +1378,7 @@ describe ExternalToolsController do
       tool = new_valid_tool(@course)
       tool.settings[:course_navigation] = { "required_permissions" => "not-real-permissions,nor-this-one" }
       tool.save!
-      get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/basic_lti" }
+      get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/basic_lti", placement: :course_navigation }
       expect(response).to be_unauthorized
     end
 
@@ -1320,32 +1444,19 @@ describe ExternalToolsController do
         Account.site_admin.enable_feature!(:lti_rce_postmessage_support)
       end
 
-      context "with platform storage flag enabled" do
-        before { Account.site_admin.enable_feature!(:lti_platform_storage) }
-
-        it "renders the sibling forwarder frame once" do
-          subject
-          expect(response.body.scan('id="post_message_forwarding').count).to eq 1
-        end
-      end
-
-      context "with platform storage flag disabled" do
-        before { Account.site_admin.disable_feature!(:lti_platform_storage) }
-
-        it "does not render the sibling forwarder frame" do
-          subject
-          expect(response.body.scan('id="post_message_forwarding').count).to eq 0
-        end
+      it "renders the sibling forwarder frame once" do
+        subject
+        expect(response.body.scan('id="post_message_forwarding').count).to eq 1
       end
 
       it "renders the tool launch iframe" do
         subject
-        expect(response.body).to include("id=\"tool_content\"")
+        expect(response.body).to include("id=\"tool_content_")
       end
 
       it "includes post_message_forwarding JS for main frame" do
         subject
-        expect(response.body).to include(".push('post_message_forwarding')")
+        expect(response.body).to match %r{<script src="/dist/javascripts/lti_post_message_forwarding-[0-9a-z]+\.js">}
       end
 
       it "includes IN_RCE and IGNORE_LTI_POST_MESSAGES in the JS ENV" do
@@ -1627,6 +1738,25 @@ describe ExternalToolsController do
       assert_unauthorized
     end
 
+    it "logs the launch" do
+      allow(Lti::LogService).to receive(:new) do
+        double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+      end
+
+      user_session(@teacher)
+      tool = new_valid_tool(@course)
+
+      expect(Lti::LogService).to receive(:new).with(
+        tool:,
+        context: @course,
+        user: @teacher,
+        placement: "resource_selection",
+        launch_type: :resource_selection
+      )
+
+      get "resource_selection", params: { course_id: @course.id, external_tool_id: tool.id }
+    end
+
     it "is accessible by students" do
       user_session(@student)
       tool = new_valid_tool(@course)
@@ -1814,9 +1944,11 @@ describe ExternalToolsController do
         context "during a basic launch" do
           let(:message_type) { "LtiResourceLinkRequest" }
 
-          it_behaves_like "includes editor variables" do
-            let(:selection_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", "selection") }
-            let(:contents_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", "contents") }
+          it "doesn't launch, as LtiResourceLinkRequest is not supported in the RCE" do
+            allow(CanvasErrors).to receive(:capture)
+            subject
+            expect(response).not_to be_successful
+            expect(CanvasErrors).to have_received(:capture).with(an_instance_of(Lti::InvalidMessageTypeForPlacementError), hash_including({ tags: { developer_key_id: tool.global_developer_key_id } }), :error)
           end
         end
 
@@ -2553,6 +2685,7 @@ describe ExternalToolsController do
       expect(response).to be_successful
 
       expect(launch_settings["launch_url"]).to eq "http://www.example.com/basic_lti"
+      expect(launch_settings.dig("metadata", "launch_type")).to eq "direct_link"
       expect(launch_settings["tool_name"]).to eq "bob"
       expect(launch_settings["analytics_id"]).to eq "some_tool"
       expect(tool_settings["custom_canvas_course_id"]).to eq @course.id.to_s
@@ -2616,6 +2749,7 @@ describe ExternalToolsController do
         expect(response).to be_successful
 
         expect(launch_settings["launch_url"]).to eq "http://www.example.com/basic_lti"
+        expect(launch_settings.dig("metadata", "launch_type")).to eq "content_item"
         expect(launch_settings["tool_name"]).to eq "bob"
         expect(launch_settings["analytics_id"]).to eq "some_tool"
         expect(tool_settings["custom_canvas_course_id"]).to eq @course.id.to_s
@@ -2658,13 +2792,20 @@ describe ExternalToolsController do
       end
     end
 
+    context "with only launch url" do
+      it "is successful" do
+        get :generate_sessionless_launch, params: { course_id: @course.id, url: tool.url }
+        expect(response).to be_successful
+        expect(launch_settings.dig("metadata", "launch_type")).to eq "indirect_link"
+      end
+    end
+
     context "with environment-specific overrides" do
       let(:override_url) { "http://www.example-beta.com/basic_lti" }
       let(:domain) { "www.example-beta.com" }
 
       before do
         allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
-        Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
         user_session(account_admin_user)
 
         tool.settings[:environments] = {
@@ -2750,6 +2891,7 @@ describe ExternalToolsController do
 
       expect(launch_settings["tool_settings"]["resource_link_id"]).to eq opaque_id(@tg)
       expect(launch_settings["tool_settings"]["resource_link_title"]).to eq "my module item title"
+      expect(launch_settings.dig("metadata", "launch_type")).to eq "content_item"
     end
 
     it "makes the module item available for variable expansions" do
@@ -2817,7 +2959,7 @@ describe ExternalToolsController do
         expect(response).to be_successful
 
         expect(url.path).to eq("#{course_external_tools_path(@course)}/#{tool.id}")
-        expect(url.query).to match(/^display=borderless&session_token=[0-9a-zA-Z_-]+$/)
+        expect(url.query).to match(/session_token=[0-9a-zA-Z_-]+/)
         expect(session_token.pseudonym_id).to eq(login_pseudonym.global_id)
       end
 
@@ -3058,6 +3200,18 @@ describe ExternalToolsController do
   end
 
   describe "#sessionless_launch" do
+    let(:tool) do
+      new_valid_tool(@course).tap do |t|
+        t.course_navigation = { enabled: true }
+        t.save!
+      end
+    end
+    let(:verifier) do
+      get :generate_sessionless_launch, params: { course_id: @course.id, id: tool.id, launch_type: :course_navigation }
+      json = response.parsed_body
+      CGI.parse(URI.parse(json["url"]).query)["verifier"].first
+    end
+
     before do
       allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { "encryption-secret-5T14NjaTbcYjc4" }
       allow(BasicLTI::Sourcedid).to receive(:signing_secret) { "signing-secret-vp04BNqApwdwUYPUI" }
@@ -3065,17 +3219,24 @@ describe ExternalToolsController do
     end
 
     it "generates a sessionless launch" do
-      @tool = new_valid_tool(@course)
-
-      get :generate_sessionless_launch, params: { course_id: @course.id, id: @tool.id }
-
-      expect(response).to be_successful
-
-      json = response.parsed_body
-      verifier = CGI.parse(URI.parse(json["url"]).query)["verifier"].first
-
       expect(controller).to receive(:log_asset_access).once
       get :sessionless_launch, params: { course_id: @course.id, verifier: }
+    end
+
+    it "logs the launch" do
+      allow(Lti::LogService).to receive(:new) do
+        double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+      end
+
+      get :sessionless_launch, params: { course_id: @course.id, verifier: }
+
+      expect(Lti::LogService).to have_received(:new).with(
+        tool:,
+        context: @course,
+        user: @user,
+        placement: "course_navigation",
+        launch_type: :direct_link
+      )
     end
   end
 

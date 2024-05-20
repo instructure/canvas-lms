@@ -27,6 +27,8 @@
   friendly_description ||= ''
   range_rating_enabled = @domain_root_account.feature_enabled?(:rubric_criterion_range)
   learning_outcome_criterion = criterion.try(:learning_outcome_id)
+  learning_outcome_ids ||= rubric.learning_outcome_ids_from_results if learning_outcome_criterion && edit_view
+  should_show_delete = edit_view ? learning_outcome_ids.present? ? learning_outcome_ids.exclude?(learning_outcome_criterion) : true : false
   range_rating_visible = range_rating_enabled && !learning_outcome_criterion
 
   long_description_text = criterion.try(:long_description) || ''
@@ -41,7 +43,9 @@
         <% if !learning_outcome_criterion %>
           <a href="#" class="edit_criterion_link" role="button"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'Edit criterion description' %></span></a>
         <% end %>
-        <a href="#" class="delete_criterion_link" role="button"><i class="icon-trash standalone-icon"></i><span class="screenreader-only"><%= t 'Delete criterion row' %></span></a>
+        <% if should_show_delete || rubric == nil %>
+          <a href="#" class="delete_criterion_link" role="button"><i class="icon-trash standalone-icon"></i><span class="screenreader-only"><%= t 'Delete criterion row' %></span></a>
+        <% end %>
       </div>
       <div class="description_content">
         <span class="outcome_sr_content" aria-hidden="<%= learning_outcome_criterion.nil? %>">
@@ -97,18 +101,18 @@
     <% else %>
       <table class="ratings" style="<%= hidden if rubric && rubric.free_form_criterion_comments %>"><tr>
         <% ratings = (criterion.ratings rescue nil); ratings = nil if ratings && ratings.length < 2  %>
-        <% ratings ||= [OpenObject.new(:id => "blank", :description => t(:full_marks, "Full Marks"), :points => 5), OpenObject.new(:id => "blank_2", :description => t(:no_marks, "No Marks"), :points => 0)] %>
+        <% ratings ||= [Rubric::Rating.new(:id => "blank", :description => t(:full_marks, "Full Marks"), :points => 5), Rubric::Rating.new(:id => "blank_2", :description => t(:no_marks, "No Marks"), :points => 0)] %>
         <% ratings.each_index do |idx| %>
           <% rating = ratings[idx];
              last_rating = idx == ratings.length - 1
-             rating.edge = (idx == 0 || last_rating);
+             edge = (idx == 0 || last_rating);
              next_rating = ratings[idx+1];
              rating_min = (next_rating&.points || 0);
              rating_match = assessment_rating && assessment_rating[:points] == rating.points
              use_range = (criterion.try(:criterion_use_range) && rating_min.try(:to_f) != rating.points.try(:to_f) && range_rating_enabled);
              selected = rating_match || (assessment_rating && assessment_rating[:points] && use_range ? ((assessment_rating[:points] > rating_min && assessment_rating[:points] < rating.points)) : false)
           %>
-          <td class="rating <%= "edge_rating" if rating.edge %>
+          <td class="rating <%= "edge_rating" if edge %>
                 <%= "infinitesimal" if rating_min.try(:to_f) == rating.points.try(:to_f) %>
                 <%= "selected" if selected %>"
           >

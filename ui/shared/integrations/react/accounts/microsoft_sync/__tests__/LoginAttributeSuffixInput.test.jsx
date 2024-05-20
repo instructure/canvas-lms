@@ -33,12 +33,12 @@ describe('LoginAttributeSuffixInput', () => {
     expect(container.error).toBeFalsy()
   })
 
-  it('calls the provided input handler on input', () => {
+  it('calls the provided input handler on input', async () => {
     const handlerMock = jest.fn()
     const container = setup({
       suffixInputHandler: handlerMock,
     })
-    userEvent.type(
+    await userEvent.type(
       container.getByRole('textbox', {
         name: /login attribute suffix input area/i,
       }),

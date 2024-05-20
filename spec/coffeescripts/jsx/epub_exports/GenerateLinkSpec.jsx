@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
+import 'jquery-migrate'
 import React from 'react'
-import {mount} from 'enzyme'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import GenerateLink from 'ui/features/epub_exports/react/GenerateLink'
@@ -39,16 +40,17 @@ QUnit.module('GenerateLink', {
 })
 
 test('showGenerateLink', function () {
-  let wrapper = mount(<GenerateLink {...this.props} />)
-  ok(wrapper.instance().showGenerateLink(), 'should be true without epub_export object')
+  const ref = React.createRef()
+  render(<GenerateLink {...this.props} ref={ref} />)
+  ok(ref.current.showGenerateLink(), 'should be true without epub_export object')
 
   this.props.course.epub_export = {permissions: {regenerate: false}}
-  wrapper = mount(<GenerateLink {...this.props} />)
-  notOk(wrapper.instance().showGenerateLink(), 'should be false without permissions to rengenerate')
+  render(<GenerateLink {...this.props} ref={ref} />)
+  notOk(ref.current.showGenerateLink(), 'should be false without permissions to regenerate')
 
   this.props.course.epub_export = {permissions: {regenerate: true}}
-  wrapper = mount(<GenerateLink {...this.props} />)
-  ok(wrapper.instance().showGenerateLink(), 'should be true with permissions to rengenerate')
+  render(<GenerateLink {...this.props} ref={ref} />)
+  ok(ref.current.showGenerateLink(), 'should be true with permissions to regenerate')
 })
 
 test('state triggered', function () {
@@ -66,23 +68,27 @@ test('state triggered', function () {
   ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
-test('render', function () {
+test('render', async function () {
+  const user = userEvent.setup({ delay: null })
   const clock = sinon.useFakeTimers()
   sinon.stub(CourseEpubExportStore, 'create')
 
-  let wrapper = mount(<GenerateLink {...this.props} />)
-  equal(wrapper.children().type(), 'button', 'tag should be a button')
-  ok(wrapper.text().match(I18n.t('Generate ePub')), 'should show generate text')
+  const ref = React.createRef()
+  let wrapper = render(<GenerateLink {...this.props} ref={ref} />)
+  const button = wrapper.container.querySelector('button')
+  equal(button.type, 'button', 'tag should be a button')
+  ok(wrapper.getAllByText(I18n.t('Generate ePub')), 'should show generate text')
 
-  wrapper.simulate('click')
-  equal(wrapper.children().type(), 'span', 'tag should be span')
-  ok(wrapper.text().match(I18n.t('Generating...')), 'should show generating text')
+  await user.click(button)
+  const text = wrapper.getByText(I18n.t('Generating...'))
+  ok(text, 'should show generating text')
+  equal(text.tagName, 'SPAN', 'tag should be span')
 
   this.props.course.epub_export = {permissions: {regenerate: true}}
-  wrapper = mount(<GenerateLink {...this.props} />)
+  wrapper = render(<GenerateLink {...this.props} />)
   clock.tick(2000)
-  equal(wrapper.children().type(), 'button', 'tag should be a button')
-  ok(wrapper.text().match(I18n.t('Regenerate ePub')), 'should show regenerate text')
+  equal(wrapper.container.querySelector('button').type, 'button', 'tag should be a button')
+  ok(wrapper.getAllByText(I18n.t('Regenerate ePub')), 'should show regenerate text')
 
   clock.restore()
   CourseEpubExportStore.create.restore()

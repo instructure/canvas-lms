@@ -20,6 +20,7 @@
 import $ from 'jquery'
 import actions from '../actions'
 import router from '../router'
+import {fireEvent} from '@testing-library/react'
 
 const sleep = async ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -96,15 +97,24 @@ describe('router', () => {
     })
 
     describe('when LTI 1.1 message is received', () => {
+      const origEnv = {...window.ENV}
+      const origin = 'http://example.com'
+      beforeAll(() => (window.ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = origin))
+      afterAll(() => (window.ENV = origEnv))
+
+      const sendPostMessage = data => fireEvent(window, new MessageEvent('message', {data, origin}))
+
       it('sends externalContentReady action', async () => {
         const item = {service_id: 1, hello: 'world'}
-        $(window).trigger('externalContentReady', {
+        sendPostMessage({
+          subject: 'externalContentReady',
           contentItems: [item],
           service_id: item.service_id,
         })
-        await sleep(100)
 
         expect(actions.externalContentReady).toHaveBeenCalledWith({
+          // subject not required to be passed in, but comes from the event and doesn't hurt
+          subject: 'externalContentReady',
           service_id: item.service_id,
           contentItems: [item],
         })

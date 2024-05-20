@@ -17,8 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 class DiscussionTopic < ActiveRecord::Base
   include Workflow
   include SendToStream
@@ -33,6 +31,9 @@ class DiscussionTopic < ActiveRecord::Base
   include MasterCourses::Restrictor
   include DuplicatingObjects
   include LockedFor
+  include DatesOverridable
+
+  REQUIRED_CHECKPOINT_COUNT = 2
 
   restrict_columns :content, [:title, :message]
   restrict_columns :settings, %i[require_initial_post
@@ -45,7 +46,7 @@ class DiscussionTopic < ActiveRecord::Base
                                  sort_by_rating
                                  group_category_id]
   restrict_columns :state, [:workflow_state]
-  restrict_columns :availability_dates, [:delayed_post_at, :lock_at]
+  restrict_columns :availability_dates, %i[unlock_at delayed_post_at lock_at]
   restrict_assignment_columns
 
   attr_writer :can_unpublish, :preloaded_subentry_count, :sections_changed
@@ -74,6 +75,7 @@ class DiscussionTopic < ActiveRecord::Base
            },
            class_name: "DiscussionEntry"
   has_many :root_discussion_entries, -> { preload(:user).where("discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state<>'deleted'") }, class_name: "DiscussionEntry"
+  has_many :ungraded_discussion_student_visibilities
   has_one :external_feed_entry, as: :asset
   belongs_to :root_account, class_name: "Account"
   belongs_to :external_feed
@@ -82,7 +84,7 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :editor, class_name: "User"
   belongs_to :root_topic, class_name: "DiscussionTopic"
   belongs_to :group_category
-  has_many :checkpoint_assignments, through: :assignment
+  has_many :sub_assignments, through: :assignment
   has_many :child_topics, class_name: "DiscussionTopic", foreign_key: :root_topic_id, dependent: :destroy
   has_many :discussion_topic_participants, dependent: :destroy
   has_many :discussion_entry_participants, through: :discussion_entries
@@ -104,7 +106,7 @@ class DiscussionTopic < ActiveRecord::Base
   # For our users, when setting checkpoints, the value must be between 1 and 10.
   # But we also allow 0 when there are no checkpoints.
   validates :reply_to_entry_required_count, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 10 }
-  validates :reply_to_entry_required_count, numericality: { greater_than: 0 }, if: :checkpoints?
+  validates :reply_to_entry_required_count, numericality: { greater_than: 0 }, if: -> { reply_to_entry_checkpoint.present? }
   validate :validate_draft_state_change, if: :workflow_state_changed?
   validate :section_specific_topics_must_have_sections
   validate :only_course_topics_can_be_section_specific
@@ -129,6 +131,12 @@ class DiscussionTopic < ActiveRecord::Base
   after_update :clear_non_applicable_stream_items
   after_create :create_participant
   after_create :create_materialized_view
+
+  include SmartSearchable
+  use_smart_search title_column: :title,
+                   body_column: :message,
+                   index_scope: ->(course) { course.discussion_topics.active },
+                   search_scope: ->(course, user) { DiscussionTopic::ScopedToUser.new(course, user, course.discussion_topics.active).scope }
 
   def section_specific_topics_must_have_sections
     if !deleted? && is_section_specific && discussion_topic_section_visibilities.none?(&:active?)
@@ -252,7 +260,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def set_schedule_delayed_transitions
-    @delayed_post_at_changed = delayed_post_at_changed?
+    @delayed_post_at_changed = delayed_post_at_changed? || unlock_at_changed?
     if delayed_post_at? && @delayed_post_at_changed
       @should_schedule_delayed_post = true
       self.workflow_state = "post_delayed" if [:migration, :after_migration].include?(saved_by) && delayed_post_at > Time.now
@@ -733,6 +741,11 @@ class DiscussionTopic < ActiveRecord::Base
     topic_participant
   end
 
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
+    without_assignment_in_course(course_ids)
+      .union(joins_assignment_student_visibilities(user_ids, course_ids))
+  }
+
   scope :not_ignored_by, lambda { |user, purpose|
     where.not(Ignore.where(asset_type: "DiscussionTopic", user_id: user, purpose:)
       .where("asset_id=discussion_topics.id").arel.exists)
@@ -816,7 +829,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   scope :by_posted_at, lambda {
     order(Arel.sql(<<~SQL.squish))
-      COALESCE(discussion_topics.delayed_post_at, discussion_topics.posted_at, discussion_topics.created_at) DESC,
+      COALESCE(discussion_topics.unlock_at, discussion_topics.delayed_post_at, discussion_topics.posted_at, discussion_topics.created_at) DESC,
       discussion_topics.created_at DESC,
       discussion_topics.id DESC
     SQL
@@ -847,8 +860,25 @@ class DiscussionTopic < ActiveRecord::Base
   }
 
   alias_attribute :available_from, :delayed_post_at
-  alias_attribute :unlock_at, :delayed_post_at
   alias_attribute :available_until, :lock_at
+
+  def unlock_at
+    self[:unlock_at].nil? ? self[:delayed_post_at] : self[:unlock_at]
+  end
+
+  def delayed_post_at
+    self[:unlock_at].nil? ? self[:delayed_post_at] : self[:unlock_at]
+  end
+
+  def unlock_at=(value)
+    self[:delayed_post_at] = value
+    super
+  end
+
+  def delayed_post_at=(value)
+    self[:unlock_at] = value
+    super
+  end
 
   def should_lock_yet
     # not assignment or vdd aware! only use this to check the topic's own field!
@@ -922,9 +952,17 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def comments_disabled?
-    !!(is_a?(Announcement) &&
-      context.is_a?(Course) &&
-      context.lock_all_announcements)
+    return false unless is_announcement
+
+    if context.is_a?(Course)
+      context.lock_all_announcements
+    elsif context.context.is_a?(Course)
+      context.context.lock_all_announcements
+    elsif context.context.is_a?(Account)
+      context.context.lock_all_announcements[:value]
+    else
+      false
+    end
   end
 
   def lock(opts = {})
@@ -962,6 +1000,13 @@ class DiscussionTopic < ActiveRecord::Base
                          !discussion_entries.active.where(user_id: student_ids).exists?
                        end
                      end
+  end
+
+  def self.create_graded_topic!(course:, title:, user: nil)
+    raise ActiveRecord::RecordInvalid if course.nil?
+
+    assignment = course.assignments.create!(submission_types: "discussion_topic", updating_user: user, title:)
+    assignment.discussion_topic
   end
 
   def self.preload_can_unpublish(context, topics, assmnt_ids_with_subs = nil)
@@ -1042,7 +1087,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def should_clear_all_stream_items?
     (!published? && saved_change_to_attribute?(:workflow_state)) ||
-      (is_announcement && not_available_yet? && saved_change_to_attribute?(:delayed_post_at))
+      (is_announcement && not_available_yet? && (saved_change_to_attribute?(:delayed_post_at) || saved_change_to_attribute?(:unlock_at)))
   end
 
   def clear_non_applicable_stream_items
@@ -1210,7 +1255,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| grants_right?(user, :read) }
     can :read_replies
 
-    given { |user| self.user && self.user == user && visible_for?(user) && !locked_for?(user, check_policies: true) && can_participate_in_course?(user) }
+    given { |user| self.user && self.user == user && visible_for?(user) && !locked_for?(user, check_policies: true) && can_participate_in_course?(user) && !comments_disabled? }
     can :reply
 
     given { |user| self.user && self.user == user && available_for?(user) && context.user_can_manage_own_discussion_posts?(user) && context.grants_right?(user, :participate_as_student) }
@@ -1221,7 +1266,7 @@ class DiscussionTopic < ActiveRecord::Base
 
     given do |user, session|
       !locked_for?(user, check_policies: true) &&
-        context.grants_right?(user, session, :post_to_forum) && visible_for?(user) && can_participate_in_course?(user)
+        context.grants_right?(user, session, :post_to_forum) && visible_for?(user) && can_participate_in_course?(user) && !comments_disabled?
     end
     can :reply
 
@@ -1298,16 +1343,16 @@ class DiscussionTopic < ActiveRecord::Base
     author_name = user.present? ? user.name : t("#discussion_topic.atom_no_author", "No Author")
     prefix = [is_announcement ? t("#titles.announcement", "Announcement") : t("#titles.discussion", "Discussion")]
     prefix << context.name if opts[:include_context]
-    Atom::Entry.new do |entry|
-      entry.title = [before_label(prefix.to_sentence), title].join(" ")
-      entry.authors << Atom::Person.new(name: author_name)
-      entry.updated   = updated_at
-      entry.published = created_at
-      entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/discussion_topics/#{feed_code}"
-      entry.links << Atom::Link.new(rel: "alternate",
-                                    href: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/discussion_topics/#{id}")
-      entry.content   = Atom::Content::Html.new(message || "")
-    end
+
+    {
+      title: [before_label(prefix.to_sentence), title].join(" "),
+      author: author_name,
+      updated: updated_at,
+      published: created_at,
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/discussion_topics/#{feed_code}",
+      link: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/discussion_topics/#{id}",
+      content: message || ""
+    }
   end
 
   def context_prefix
@@ -1674,7 +1719,7 @@ class DiscussionTopic < ActiveRecord::Base
     media_object_ids = []
     messages_hash = {}
     messages.each do |message|
-      txt = (message.message || "")
+      txt = message.message || ""
       attachment_matches = txt.scan(%r{/#{context.class.to_s.pluralize.underscore}/#{context.id}/files/(\d+)/download})
       attachment_ids += (attachment_matches || []).pluck(0)
       media_object_matches = txt.scan(/media_comment_([\w-]+)/) + txt.scan(/data-media-id="([\w-]+)"/)
@@ -1803,28 +1848,75 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def checkpoints?
-    checkpoint_assignments.any?
+    sub_assignments.any?
   end
 
   def reply_to_topic_checkpoint
-    checkpoint_assignments.find_by(checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC)
+    sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
   end
 
   def reply_to_entry_checkpoint
-    checkpoint_assignments.find_by(checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY)
+    sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
   end
 
-  def create_checkpoints(reply_to_topic_points:, reply_to_entry_points:, reply_to_entry_required_count: 0)
+  def create_checkpoints(reply_to_topic_points:, reply_to_entry_points:, reply_to_entry_required_count: 1)
     return false if checkpoints?
     return false unless context.is_a?(Course)
+    return false unless assignment.present?
 
-    parent = context.assignments.create!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
-    parent.checkpoint_assignments.create!(context:, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, points_possible: reply_to_topic_points)
-    parent.checkpoint_assignments.create!(context:, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, points_possible: reply_to_entry_points)
-    self.assignment = parent
-    self.reply_to_entry_required_count = reply_to_entry_required_count
+    Checkpoints::DiscussionCheckpointCreatorService.call(
+      discussion_topic: self,
+      checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+      dates: [],
+      points_possible: reply_to_topic_points
+    )
 
-    save
+    Checkpoints::DiscussionCheckpointCreatorService.call(
+      discussion_topic: self,
+      checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+      dates: [],
+      points_possible: reply_to_entry_points,
+      replies_required: reply_to_entry_required_count
+    )
+  end
+
+  def self.visible_ids_by_user(opts)
+    # Discussions with an assignment: pluck id, assignment_id, and user_id from items joined with the SQL view
+    plucked_visibilities = joins_assignment_student_visibilities(opts[:user_id], opts[:course_id])
+                           .pluck("discussion_topics.id", "discussion_topics.assignment_id", "assignment_student_visibilities.user_id")
+                           .group_by { |_, _, user_id| user_id }
+
+    # Ungraded discussions are *normally* visible to all -- the exception is
+    # section-specific discussions, so here get the ones visible to everyone in the
+    # course, and below get the ones that are visible to the right section.
+    ids_visible_to_all = without_assignment_in_course(opts[:course_id]).where(is_section_specific: false).pluck(:id)
+
+    # Now get the section-specific discussions that are in the proper sections.
+    # build hash of user_ids to array of section ids
+    sections_per_user = {}
+    Enrollment.active.where(course_id: opts[:course_id], user_id: opts[:user_id])
+              .pluck(:user_id, :course_section_id)
+              .each { |user_id, section_id| (sections_per_user[user_id] ||= Set.new) << section_id }
+
+    # build hash of section_ids to array of visible topic ids
+    all_section_ids = sections_per_user.values.reduce([]) { |all_ids, section_ids| all_ids.concat(section_ids.to_a) }
+    topic_ids_per_section = {}
+    DiscussionTopicSectionVisibility.active.where(course_section_id: all_section_ids)
+                                    .pluck(:course_section_id, :discussion_topic_id)
+                                    .each { |section_id, topic_id| (topic_ids_per_section[section_id] ||= Set.new) << topic_id }
+    topic_ids_per_section.each { |section_id, topic_ids| topic_ids_per_section[section_id] = topic_ids.to_a }
+
+    # finally, build hash of user_ids to array of visible topic ids
+    topic_ids_per_user = {}
+    opts[:user_id].each { |user_id| topic_ids_per_user[user_id] = sections_per_user[user_id]&.map { |section_id| topic_ids_per_section[section_id] }&.flatten&.uniq&.compact }
+    ids_visible_to_sections = topic_ids_per_user
+
+    # build map of user_ids to array of item ids {1 => [2,3,4], 2 => [2,4]}
+    opts[:user_id].index_with do |student_id|
+      assignment_item_ids = (plucked_visibilities[student_id] || []).map { |id, _, _| id }
+      section_specific_ids = ids_visible_to_sections[student_id] || []
+      assignment_item_ids.concat(ids_visible_to_all).concat(section_specific_ids)
+    end
   end
 
   private

@@ -18,8 +18,8 @@
 // requires $.sameDate, $.dateString, $.timeString, $.datetimeString
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import tz from '@canvas/timezone'
-import htmlEscape from 'html-escape'
+import * as tz from './index'
+import htmlEscape from '@instructure/html-escape'
 import './jquery/index'
 
 const I18n = useI18nScope('dates')

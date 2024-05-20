@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MockedResponse} from '@apollo/react-testing'
+import type {MockedResponse} from '@apollo/react-testing'
 import {
   DELETE_CUSTOM_GRADING_STATUS_MUTATION,
   UPSERT_CUSTOM_GRADING_STATUS_MUTATION,
   UPSERT_STANDARD_GRADING_STATUS_MUTATION,
 } from '../../../graphql/mutations/GradingStatusMutations'
 import {ACCOUNT_GRADING_STATUS_QUERY} from '../../../graphql/queries/GradingStatusQueries'
-import {
+import type {
   CustomGradingStatusUpsertResponse,
   StandardGradingStatusUpsertResponse,
 } from '../../../types/accountStatusMutations'

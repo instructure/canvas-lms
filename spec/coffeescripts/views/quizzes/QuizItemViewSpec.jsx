@@ -20,10 +20,11 @@ import Quiz from '@canvas/quizzes/backbone/models/Quiz'
 import QuizItemView from 'ui/features/quizzes_index/backbone/views/QuizItemView'
 import PublishIconView from '@canvas/publish-icon-view'
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import assertions from 'helpers/assertions'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 import ReactDOM from 'react-dom'
 
 const createQuiz = function (options = {}) {
@@ -62,6 +63,7 @@ const createView = function (quiz, options = {}) {
 
   ENV.context_asset_string = 'course_1'
   ENV.SHOW_SPEED_GRADER_LINK = true
+  ENV.FEATURES.differentiated_modules = options.differentiated_modules
 
   const view = new QuizItemView({model: quiz, publishIconView: icon})
   view.$el.appendTo($('#fixtures'))
@@ -148,6 +150,33 @@ test('speed grader link is correct for new quizzes', () => {
       .$('.speed-grader-link')[0]
       .href.includes('/courses/1/gradebook/speed_grader?assignment_id=32')
   )
+})
+
+test('can assign assignment if flag is on and has edit permissions', function () {
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+  const view = createView(quiz, {
+    canManage: true,
+    differentiated_modules: true,
+  })
+  equal(view.$('.assign-to-link').length, 1)
+})
+
+test('cannot assign assignment if no edit permissions', function () {
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+  const view = createView(quiz, {
+    canManage: false,
+    differentiated_modules: true,
+  })
+  equal(view.$('.assign-to-link').length, 0)
+})
+
+test('cannot assign assignment if flag is off', function () {
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+  const view = createView(quiz, {
+    canManage: true,
+    differentiated_modules: false,
+  })
+  equal(view.$('.assign-to-link').length, 0)
 })
 
 test('renders Migrate Button if migrateQuizEnabled is true', () => {
@@ -613,7 +642,7 @@ test('does not display cancel button when quiz failed to duplicate is blueprint'
     title: 'Foo Copy',
     original_assignment_name: 'Foo',
     workflow_state: 'failed_to_duplicate',
-    migration_id: 'mastercourse_xxxxxxx'
+    migration_id: 'mastercourse_xxxxxxx',
   })
   const view = createView(quiz)
   strictEqual(view.$('button.duplicate-failed-cancel.btn').length, 0)
@@ -624,7 +653,7 @@ test('displays cancel button when quiz failed to duplicate is not blueprint', ()
     id: 2,
     title: 'Foo Copy',
     original_assignment_name: 'Foo',
-    workflow_state: 'failed_to_duplicate'
+    workflow_state: 'failed_to_duplicate',
   })
   const view = createView(quiz)
   ok(view.$('button.duplicate-failed-cancel.btn').text().includes('Cancel'))
