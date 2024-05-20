@@ -2187,7 +2187,7 @@ if (typeof Slick === 'undefined') {
         return
       }
       numberOfRows =
-        getDataLengthIncludingAddNew() + (options.leaveSpaceForNewRows ? numVisibleRows - 1 : 0)
+        getDataLengthIncludingAddNew() + (options.leaveSpaceForNewRows ? numVisibleRows - 1 : 0) + 1
 
       var oldViewportHasVScroll = viewportHasVScroll_1
       // with autoHeight, we do not need to accommodate the vertical scroll bar
