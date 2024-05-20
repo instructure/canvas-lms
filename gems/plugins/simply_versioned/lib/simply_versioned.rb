@@ -300,7 +300,7 @@ module SimplyVersioned
 
     # If the model instance has more versions than the limit specified, delete all excess older versions.
     def clean_old_versions(versions_to_keep)
-      where("number <= ?", maximum(:number) - versions_to_keep).each(&:destroy)
+      where(number: ..(maximum(:number) - versions_to_keep)).each(&:destroy)
     end
     alias_method :purge, :clean_old_versions
 
@@ -313,7 +313,7 @@ module SimplyVersioned
     # Return the Version for this model with the next lower version
     def previous_version(number = nil)
       versions = reorder("number DESC")
-      versions = versions.where("number <= ?", number) if number
+      versions = versions.where(number: ..number) if number
       versions = versions.limit(2).to_a
       populate_versionable versions.last if versions.length == 2
     end

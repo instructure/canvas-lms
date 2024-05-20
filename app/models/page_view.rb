@@ -316,8 +316,8 @@ class PageView < ActiveRecord::Base
         result
       else
         scope = where(user_id: user).order("created_at desc")
-        scope = scope.where("created_at >= ?", options[:oldest]) if options[:oldest]
-        scope = scope.where("created_at <= ?", options[:newest]) if options[:newest]
+        scope = scope.where(created_at: options[:oldest]..) if options[:oldest]
+        scope = scope.where(created_at: ..options[:newest]) if options[:newest]
         if viewer
           accounts = user.associated_accounts.shard(user).select { |a| a.grants_any_right?(viewer, :view_statistics, :manage_students) }
           accounts << nil

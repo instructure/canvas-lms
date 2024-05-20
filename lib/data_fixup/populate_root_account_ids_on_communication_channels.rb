@@ -24,12 +24,12 @@ module DataFixup::PopulateRootAccountIdsOnCommunicationChannels
 
       # First handle non-cross-shard users (code adapted from
       # PopulateRootAccountIdOnModels.populate_root_account_ids())
-      scope.where("user_id < ?", Shard::IDS_PER_SHARD)
+      scope.non_shadow
            .joins(:user)
            .update_all("root_account_ids = users.root_account_ids")
 
       # the root account ids
-      scope.where("user_id >= ?", Shard::IDS_PER_SHARD).joins(:user).find_each do |cc|
+      scope.shadow.joins(:user).find_each do |cc|
         cc.user.delay_if_production(max_attempts: User::MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS).update_root_account_ids
       end
     end

@@ -88,14 +88,14 @@ describe EventStream::Backend::ActiveRecord do
     end
 
     it "proxies calls through provided AR model" do
-      event_record = OpenStruct.new(field: "value", id: 2)
+      event_record = double(field: "value", id: 2)
       ar_backend = EventStream::Backend::ActiveRecord.new(stream)
       ar_backend.execute(:insert, event_record)
       expect(ar_type.written_recs.first).to eq(event_record)
     end
 
     it "only indexes items for which there is an entry" do
-      event_record = OpenStruct.new(field: "value", id: -2)
+      event_record = double(field: "value", id: -2)
       ar_backend = EventStream::Backend::ActiveRecord.new(stream)
       expect { ar_backend.execute(:insert, event_record) }.to_not raise_error
       expect(ar_type.written_recs.first).to eq(event_record)

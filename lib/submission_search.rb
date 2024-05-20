@@ -77,7 +77,7 @@ class SubmissionSearch
                    end
 
     if @options[:scored_less_than]
-      search_scope = search_scope.where("submissions.score < ?", @options[:scored_less_than])
+      search_scope = search_scope.where(submissions: { score: ...@options[:scored_less_than] })
     end
 
     if @options[:scored_more_than]

@@ -50,7 +50,7 @@ class GradingPeriod < ActiveRecord::Base
     )
   }
 
-  scope :closed, -> { where("grading_periods.close_date < ?", Time.zone.now) }
+  scope :closed, -> { where(grading_periods: { close_date: ...Time.zone.now }) }
   scope :open, -> { where("grading_periods.close_date IS NULL OR grading_periods.close_date >= ?", Time.zone.now) }
 
   scope :grading_periods_by, lambda { |context_with_ids|
