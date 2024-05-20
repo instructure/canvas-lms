@@ -25,6 +25,7 @@ import * as tz from '@canvas/datetime'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import '@canvas/jquery/jquery.instructure_forms'
 import cx from 'classnames'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 function DueDateCalendarPicker(props) {
   const dateInput = useRef(null)
@@ -34,21 +35,19 @@ function DueDateCalendarPicker(props) {
 
   useEffect(() => {
     const field = $(dateInput.current)
-    field
-      .data('inputdate', props.dateValue)
-      .datetime_field({contextLabel: props.contextLabel})
-      .change(e => {
-        const trimmedInput = $.trim(e.target.value)
+    field.data('inputdate', props.dateValue)
+    renderDatetimeField(field, {contextLabel: props.contextLabel}).change(e => {
+      const trimmedInput = $.trim(e.target.value)
 
-        let newDate = field.data('unfudged-date')
-        newDate = trimmedInput === '' ? null : newDate
-        newDate = applyDefaultTimeIfNeeded(newDate)
-        newDate = changeToFancyMidnightIfNeeded(newDate)
-        newDate = setToEndOfMinuteIfNeeded(newDate)
+      let newDate = field.data('unfudged-date')
+      newDate = trimmedInput === '' ? null : newDate
+      newDate = applyDefaultTimeIfNeeded(newDate)
+      newDate = changeToFancyMidnightIfNeeded(newDate)
+      newDate = setToEndOfMinuteIfNeeded(newDate)
 
-        field.data('inputdate', props.dateValue).val(formatDate(props.dateValue))
-        props.handleUpdate(newDate)
-      })
+      field.data('inputdate', props.dateValue).val(formatDate(props.dateValue))
+      props.handleUpdate(newDate)
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
