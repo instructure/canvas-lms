@@ -36,9 +36,4 @@ $.fn.time_field = function (options) {
   return this
 }
 
-$.fn.datetime_field = function (options) {
-  renderDatetimeField(this, options)
-  return this
-}
-
 export default $
