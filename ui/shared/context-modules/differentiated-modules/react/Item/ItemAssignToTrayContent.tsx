@@ -491,7 +491,8 @@ const ItemAssignToTrayContent = ({
     const cardCount = assignToCards.length
     return assignToCards.map((card, i) => {
       return (
-        <View key={card.key} as="div" margin="small 0 0 0">
+        // eslint-disable-next-line react/no-array-index-key
+        <View key={`${card.key}-${i}`} as="div" margin="small 0 0 0">
           <ItemAssignToCard
             ref={cardRef => {
               if (cardRef) cardsRefs.current[card.key] = cardRef
