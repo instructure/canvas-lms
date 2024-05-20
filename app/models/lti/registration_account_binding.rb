@@ -67,11 +67,21 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
   private
 
   def update_developer_key_account_binding
-    if @skip_lime_sync
-      @skip_lime_sync = false
+    if skip_lime_sync
+      self.skip_lime_sync = false
       return
     end
 
-    developer_key_account_binding&.update!(workflow_state:, skip_lime_sync: true)
+    if developer_key_account_binding
+      developer_key_account_binding.update!(workflow_state:, skip_lime_sync: true)
+    elsif registration.developer_key
+      DeveloperKeyAccountBinding.create!(
+        account:,
+        workflow_state:,
+        developer_key: registration.developer_key,
+        lti_registration_account_binding: self,
+        skip_lime_sync: true
+      )
+    end
   end
 end

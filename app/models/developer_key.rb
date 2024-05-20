@@ -56,12 +56,11 @@ class DeveloperKey < ActiveRecord::Base
   before_save :protect_default_key
   before_save :set_require_scopes
   before_save :set_root_account
+  after_create :create_lti_registration
+  after_create :create_default_account_binding
   after_save :clear_cache
   after_update :invalidate_access_tokens_if_scopes_removed!
   after_update :destroy_external_tools!, if: :destroy_external_tools?
-  after_create :create_default_account_binding
-
-  after_create :create_lti_registration
   after_update :update_lti_registration
 
   validates_as_url :redirect_uri, :oidc_initiation_url, :public_jwk_url, allowed_schemes: nil

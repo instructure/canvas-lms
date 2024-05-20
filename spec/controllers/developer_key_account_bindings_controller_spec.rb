@@ -76,6 +76,14 @@ RSpec.describe DeveloperKeyAccountBindingsController do
       expect(created_binding.workflow_state).to eq params.dig(:developer_key_account_binding, :workflow_state)
     end
 
+    it "creates a corresponding Lti::RegistrationAccountBinding" do
+      user_session(authorized_admin)
+      post(:create_or_update, params:)
+
+      new_lrab = Lti::RegistrationAccountBinding.last
+      expect(new_lrab.updated_by).to eq(authorized_admin)
+    end
+
     it "renders a properly formatted developer key account binding" do
       expected_keys = %w[id account_id developer_key_id workflow_state account_owns_binding]
       user_session(authorized_admin)
@@ -127,30 +135,11 @@ RSpec.describe DeveloperKeyAccountBindingsController do
       updated_binding.lti_registration_account_binding.reload
       expect(updated_binding.lti_registration_account_binding.workflow_state).to eq("allow")
       expect(updated_binding.lti_registration_account_binding.updated_by).to eq(authorized_admin)
-      expect(updated_binding.lti_registration_account_binding.created_by).to eq(root_account_admin)
     end
   end
 
   context "when the account is a parent account" do
     describe "POST #create_or_edit" do
-      before do
-        registration = Lti::Registration.create!(
-          account: root_account,
-          created_by: root_account_admin,
-          updated_by: root_account_admin,
-          name: "an lti tool",
-          admin_nickname: "an lti tool"
-        )
-        Lti::RegistrationAccountBinding.create!(
-          account: root_account,
-          developer_key_account_binding: root_account_developer_key.developer_key_account_bindings.first,
-          created_by: root_account_admin,
-          updated_by: root_account_admin,
-          registration:,
-          skip_lime_sync: true
-        )
-      end
-
       it_behaves_like "the developer key account binding create endpoint" do
         let(:authorized_admin) { root_account_admin }
         let(:unauthorized_admin) { sub_account_admin }
