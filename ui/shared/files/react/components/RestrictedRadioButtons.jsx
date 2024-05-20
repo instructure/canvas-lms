@@ -27,6 +27,7 @@ import '@canvas/datetime/jquery'
 import accessibleDateFormat from '@canvas/datetime/accessibleDateFormat'
 import filesEnv from '../modules/filesEnv'
 import {datetimeString} from '@canvas/datetime/date-functions'
+import { renderDatetimeField } from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('restrict_student_access')
 
@@ -110,7 +111,8 @@ class RestrictedRadioButtons extends React.Component {
   ]
 
   componentDidMount() {
-    return $([this.unlock_at, this.lock_at]).datetime_field()
+    renderDatetimeField($(this.unlock_at))
+    renderDatetimeField($(this.lock_at))
   }
 
   extractFormValues = () => {
