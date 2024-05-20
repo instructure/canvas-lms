@@ -84,6 +84,10 @@ const mockProducts: Array<Product> = [
         badge_url: 'https://www.cast.org/learn/credentials-certifications',
       },
     ],
+    screenshots: [
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+    ],
   },
   {
     id: '3ff',
@@ -123,6 +127,7 @@ const mockProducts: Array<Product> = [
         badge_url: 'https://www.cast.org/learn/credentials-certifications',
       },
     ],
+    screenshots: ['https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png'],
   },
   {
     id: '5a',
@@ -160,6 +165,14 @@ const mockProducts: Array<Product> = [
         image_url: 'https://api.badgr.io/public/badges/X4bcdw10TL6nEKSAuIS3aA/image',
         badge_url: 'https://digitalpromise.org/initiative/educator-micro-credentials/',
       },
+    ],
+    screenshots: [
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
     ],
   },
   {
@@ -202,6 +215,14 @@ const mockProducts: Array<Product> = [
         image_url: 'https://index.edsurge.com/images/udlProductCertification-badge_updated.png',
         badge_url: 'https://www.cast.org/learn/credentials-certifications',
       },
+    ],
+    screenshots: [
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
     ],
   },
   {
@@ -251,6 +272,14 @@ const mockProducts: Array<Product> = [
         badge_url: 'https://www.cast.org/learn/credentials-certifications',
       },
     ],
+    screenshots: [
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
+    ],
   },
   {
     id: '118a',
@@ -288,6 +317,14 @@ const mockProducts: Array<Product> = [
         image_url: 'https://index.edsurge.com/images/udlProductCertification-badge_updated.png',
         badge_url: 'https://www.cast.org/learn/credentials-certifications',
       },
+    ],
+    screenshots: [
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
     ],
   },
   {
@@ -330,6 +367,14 @@ const mockProducts: Array<Product> = [
         image_url: 'https://index.edsurge.com/images/udlProductCertification-badge_updated.png',
         badge_url: 'https://www.cast.org/learn/credentials-certifications',
       },
+    ],
+    screenshots: [
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
     ],
   },
   {
@@ -377,6 +422,14 @@ const mockProducts: Array<Product> = [
         image_url: 'https://index.edsurge.com/images/udlProductCertification-badge_updated.png',
         badge_url: 'https://www.cast.org/learn/credentials-certifications',
       },
+    ],
+    screenshots: [
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
     ],
   },
 ]

@@ -26,7 +26,6 @@ import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
 import {Pill} from '@instructure/ui-pill'
-import {View} from '@instructure/ui-view'
 import {
   IconExpandStartLine,
   IconArrowUpSolid,
@@ -35,6 +34,7 @@ import {
   IconA11yLine,
   IconMessageLine,
 } from '@instructure/ui-icons'
+import ImageCarousel from './ImageCarousel'
 
 import ProductCard from '../ProductCard/ProductCard'
 import type {Product} from '../../model/Product'
@@ -139,45 +139,7 @@ const ProductDetail = () => {
               <Pill>{product.lti.versions[1]}</Pill>
             </Flex.Item>
           </Flex>
-          <View
-            as="span"
-            display="inline-block"
-            maxWidth="10rem"
-            height={265}
-            minWidth={340}
-            margin="0 medium small 0"
-            padding="medium"
-            background="primary"
-            shadow="above"
-          >
-            placeholder
-          </View>
-          <View
-            as="span"
-            display="inline-block"
-            maxWidth="10rem"
-            height={265}
-            minWidth={340}
-            margin="0 medium small 0"
-            padding="medium"
-            background="primary"
-            shadow="above"
-          >
-            placeholder
-          </View>
-          <View
-            as="span"
-            display="inline-block"
-            maxWidth="10rem"
-            height={265}
-            minWidth={340}
-            margin="0 0 small 0"
-            padding="medium"
-            background="primary"
-            shadow="above"
-          >
-            placeholder
-          </View>
+          <ImageCarousel screenshots={product.screenshots} />
           <Flex margin="medium 0 0 0">
             <Flex.Item>
               <Text weight="bold" size="large">

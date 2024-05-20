@@ -29,6 +29,7 @@ export type Product = {
   lti?: Lti
   countries?: string[]
   badges: Badges[]
+  screenshots: string[]
 }
 
 export type Company = {
