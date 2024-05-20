@@ -1103,17 +1103,3 @@ $gradebook_checkbox_size: 16px;
 #anonymous-speed-grader-alert-container {
   min-width: 35rem;
 }
-
-.slick-viewport::-webkit-scrollbar {
-    height: 3px;
-    width: 3px;
-}
-
-.slick-viewport::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-.slick-viewport::-webkit-scrollbar-thumb {
-    background-color: darkgrey;
-    border-radius: 10px;
-}
