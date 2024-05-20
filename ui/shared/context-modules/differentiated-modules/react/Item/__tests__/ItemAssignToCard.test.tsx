@@ -384,4 +384,80 @@ describe('ItemAssignToCard', () => {
       expect(getAllByText('Course: Tue, Nov 10, 2020, 8:59 PM').length).toBeGreaterThanOrEqual(1)
     })
   })
+
+  describe('clear buttons', () => {
+    it('labels the clear buttons on cards with no pills', () => {
+      renderComponent()
+      const labels = [
+        'Clear due date/time',
+        'Clear available from date/time',
+        'Clear until date/time',
+      ]
+      labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
+    })
+
+    it('labels the clear buttons on cards with 1 pill', () => {
+      renderComponent({
+        customAllOptions: [{id: 'student-1', value: 'John'}],
+        selectedAssigneeIds: ['student-1'],
+      })
+      const labels = [
+        'Clear due date/time for John',
+        'Clear available from date/time for John',
+        'Clear until date/time for John',
+      ]
+      labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
+    })
+
+    it('labels the clear buttons on cards with 2 pills', () => {
+      renderComponent({
+        customAllOptions: [
+          {id: 'student-1', value: 'John'},
+          {id: 'student-2', value: 'Alice'},
+        ],
+        selectedAssigneeIds: ['student-1', 'student-2'],
+      })
+      const labels = [
+        'Clear due date/time for John and Alice',
+        'Clear available from date/time for John and Alice',
+        'Clear until date/time for John and Alice',
+      ]
+      labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
+    })
+
+    it('labels the clear buttons on cards with 3 pills', () => {
+      renderComponent({
+        customAllOptions: [
+          {id: 'student-1', value: 'John'},
+          {id: 'student-2', value: 'Alice'},
+          {id: 'student-3', value: 'Linda'},
+        ],
+        selectedAssigneeIds: ['student-1', 'student-2', 'student-3'],
+      })
+      const labels = [
+        'Clear due date/time for John, Alice, and Linda',
+        'Clear available from date/time for John, Alice, and Linda',
+        'Clear until date/time for John, Alice, and Linda',
+      ]
+      labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
+    })
+
+    it('labels the clear buttons on cards with more than 3 pills', () => {
+      renderComponent({
+        customAllOptions: [
+          {id: 'student-1', value: 'John'},
+          {id: 'student-2', value: 'Alice'},
+          {id: 'student-3', value: 'Linda'},
+          {id: 'student-4', value: 'Bob'},
+        ],
+        selectedAssigneeIds: ['student-1', 'student-2', 'student-3', 'student-4'],
+      })
+      const labels = [
+        'Clear due date/time for John, Alice, and 2 others',
+        'Clear available from date/time for John, Alice, and 2 others',
+        'Clear until date/time for John, Alice, and 2 others',
+      ]
+      labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
+    })
+  })
 })

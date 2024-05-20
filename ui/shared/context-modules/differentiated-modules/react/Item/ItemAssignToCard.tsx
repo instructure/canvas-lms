@@ -37,7 +37,13 @@ import AssigneeSelector, {type AssigneeOption} from '../AssigneeSelector'
 import type {FormMessage} from '@instructure/ui-form-field'
 import ContextModuleLink from './ContextModuleLink'
 import type {DateLockTypes} from './types'
-import {arrayEquals, generateWrapperStyleProps, setEquals, useDates} from './utils'
+import {
+  arrayEquals,
+  generateWrapperStyleProps,
+  setEquals,
+  useDates,
+  generateCardActionLabels,
+} from './utils'
 import {DueDateTimeInput} from './DueDateTimeInput'
 import {AvailableFromDateTimeInput} from './AvailableFromDateTimeInput'
 import {AvailableToDateTimeInput} from './AvailableToDateTimeInput'
@@ -147,42 +153,15 @@ export default forwardRef(function ItemAssignToCard(
     })
   )
 
-  const removeCardSRDescription = useMemo(() => {
-    let description
-    const selected =
-      customAllOptions
-        ?.filter(option => selectedAssigneeIds.includes(option.id))
-        .map(({value}) => value) ?? []
-    switch (selected?.length) {
-      case 0:
-        description = I18n.t('Remove card')
-        break
-      case 1:
-        description = I18n.t('Remove card for %{pillA}', {pillA: selected[0]})
-        break
-      case 2:
-        description = I18n.t('Remove card for %{pillA} and %{pillB}', {
-          pillA: selected[0],
-          pillB: selected[1],
-        })
-        break
-      case 3:
-        description = I18n.t('Remove card for %{pillA}, %{pillB} and %{pillC}', {
-          pillA: selected[0],
-          pillB: selected[1],
-          pillC: selected[2],
-        })
-        break
-      default:
-        description = I18n.t('Remove card for %{pillA}, %{pillB} and %{n} others', {
-          pillA: selected[0],
-          pillB: selected[1],
-          n: selected.length - 2,
-        })
-        break
-    }
-    return description
-  }, [customAllOptions, selectedAssigneeIds])
+  const cardActionLabels = useMemo(
+    () =>
+      generateCardActionLabels(
+        customAllOptions
+          ?.filter(option => selectedAssigneeIds.includes(option.id))
+          .map(({value}) => value) ?? []
+      ),
+    [customAllOptions, selectedAssigneeIds]
+  )
 
   const dueAtHasChanged = () => {
     // console.log('>> dates', original_due_at, dueDate)
@@ -339,7 +318,7 @@ export default forwardRef(function ItemAssignToCard(
             <IconButton
               data-testid="delete-card-button"
               color="danger"
-              screenReaderLabel={removeCardSRDescription}
+              screenReaderLabel={cardActionLabels.removeCard}
               size="small"
               withBackground={false}
               withBorder={false}
@@ -379,6 +358,7 @@ export default forwardRef(function ItemAssignToCard(
               dateInputRefs: dateInputRefs.current,
               timeInputRefs: timeInputRefs.current,
               handleBlur,
+              clearButtonAltLabel: cardActionLabels.clearDueAt,
             }}
             {...commonDateTimeInputProps}
             handleDueDateChange={handleDueDateChange(timeInputRefs.current.due_at?.value || '')}
@@ -395,6 +375,7 @@ export default forwardRef(function ItemAssignToCard(
             dateInputRefs: dateInputRefs.current,
             timeInputRefs: timeInputRefs.current,
             handleBlur,
+            clearButtonAltLabel: cardActionLabels.clearAvailableFrom,
           }}
           {...commonDateTimeInputProps}
           handleAvailableFromDateChange={handleAvailableFromDateChange(
@@ -412,6 +393,7 @@ export default forwardRef(function ItemAssignToCard(
             dateInputRefs: dateInputRefs.current,
             timeInputRefs: timeInputRefs.current,
             handleBlur,
+            clearButtonAltLabel: cardActionLabels.clearAvailableTo,
           }}
           {...commonDateTimeInputProps}
           handleAvailableToDateChange={handleAvailableToDateChange(
