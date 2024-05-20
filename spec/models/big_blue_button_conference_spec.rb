@@ -62,7 +62,7 @@ describe BigBlueButtonConference do
       params = {
         fullName: user_factory.name,
         meetingID: @conference.conference_key,
-        avatarUrl: user_factory.avatar_url,
+        avatarURL: user_factory.avatar_url,
         userID: user_factory.id,
         createTime: @conference.settings[:create_time]
       }
