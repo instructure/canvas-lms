@@ -58,7 +58,7 @@ module Lti
         tool_name: @tool.name,
         tool_version: @tool.lti_version,
         tool_client_id: @tool.global_developer_key_id.to_s,
-        account_id: @context.is_a?(Account) ? @context.id.to_s : @context.account_id.to_s,
+        account_id: account_for_context.id.to_s,
         root_account_uuid: @context.root_account.uuid,
         launch_type: @launch_type,
         message_type:,
@@ -95,7 +95,11 @@ module Lti
       relationships =
         case @context
         when Group
-          user_group_relationship(@context) + user_course_relationship(@context.context) + user_account_relationship(@context.context.account)
+          if @context.context.is_a?(Course)
+            user_group_relationship(@context) + user_course_relationship(@context.context) + user_account_relationship(@context.context.account)
+          else
+            user_group_relationship(@context) + user_account_relationship(@context.context)
+          end
         when Course
           user_course_relationship(@context) + user_account_relationship(@context.account)
         when Account
@@ -117,6 +121,21 @@ module Lti
 
     def user_account_relationship(account)
       account.account_users_for(@user).map(&:role).pluck(:name)
+    end
+
+    def account_for_context
+      case @context
+      when Account
+        @context
+      when Course
+        @context.account
+      when Group
+        if @context.context.is_a?(Course)
+          @context.context.account
+        else
+          @context.context
+        end
+      end
     end
   end
 end
