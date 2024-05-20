@@ -219,25 +219,22 @@ export default function SearchApp() {
         </fieldset>
       </form>
 
-      {
-        indexingProgress ? (
-          <IndexingProgress progress={indexingProgress} />
-        ) : isLoading ? (
-          <Flex justifyItems="center">
-            <Spinner renderTitle={I18n.t('Searching')} />
-          </Flex>
-        ) : (
-          <View display="block" className="searchResults" margin="small 0 0 0">
-            <SearchResults
-              onDislike={onDislike}
-              onExplain={onExplain}
-              onLike={onLike}
-              searchResults={searchResults}
-            />
-          </View>
-        )
-      }
-
+      {indexingProgress !== null ? (
+        <IndexingProgress progress={indexingProgress} />
+      ) : isLoading ? (
+        <Flex justifyItems="center">
+          <Spinner renderTitle={I18n.t('Searching')} />
+        </Flex>
+      ) : (
+        <View display="block" className="searchResults" margin="small 0 0 0">
+          <SearchResults
+            onDislike={onDislike}
+            onExplain={onExplain}
+            onLike={onLike}
+            searchResults={searchResults}
+          />
+        </View>
+      )}
     </View>
   )
 }
