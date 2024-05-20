@@ -121,13 +121,15 @@ const EditableContent = (props: Props) => {
 }
 
 const renderWikiPageTitle = (props: Props) => {
-  const readOnlyContent = (
-    <Heading data-testid="wikipage-readonly-title" level="h2">
-      {props.defaultValue}
-    </Heading>
-  )
+  const readOnlyContent = () => {
+    return (
+      <Heading data-testid="wikipage-readonly-title" level="h2">
+        {props.defaultValue}
+      </Heading>
+    )
+  }
 
-  const titleComponent = props.canEdit ? <EditableContent {...props} /> : readOnlyContent
+  const titleComponent = props.canEdit ? <EditableContent {...props} /> : readOnlyContent()
   const wikiPageTitleContainer = document.getElementById('edit_wikipage_title_container')
   if (wikiPageTitleContainer) {
     ReactDOM.render(titleComponent, wikiPageTitleContainer)
