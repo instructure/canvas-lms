@@ -159,6 +159,10 @@ module Gradebook
       f("#grade-detail-tray--grade-input")
     end
 
+    def self.grade_inputs
+      ff("#grade-detail-tray--grade-input")
+    end
+
     def self.hidden_pill_locator
       "//*[@id='SubmissionTray__Content']//span[text() = 'Hidden']/../../.."
     end
@@ -186,6 +190,10 @@ module Gradebook
     end
 
     def self.edit_grade(new_grade)
+      edit_grade_for_input(grade_input, new_grade)
+    end
+
+    def self.edit_grade_for_input(grade_input, new_grade)
       grade_input.click
       replace_content(grade_input, new_grade, tab_out: true)
       wait_for_ajax_requests

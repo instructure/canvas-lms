@@ -316,6 +316,13 @@ module GradebookCommon
       )
     end
 
+    def create_checkpoint_assignment
+      @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpointed Discussion")
+      @topic.create_checkpoints(reply_to_topic_points: 5, reply_to_entry_points: 15, reply_to_entry_required_count: 3)
+
+      @checkpoint_assignment = @topic.assignment
+    end
+
     def make_submissions
       # submit a1(late) and a3(on-time) so a2(missing)
       Timecop.freeze(now) do

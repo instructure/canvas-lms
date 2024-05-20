@@ -374,4 +374,40 @@ describe "Grade Detail Tray:" do
       expect { Gradebook::GradeDetailTray.change_status_to("Custom Status") }.to change { student_enrollment_score.reload.custom_grade_status }.from(nil).to(@custom_status)
     end
   end
+
+  context "checkpoints" do
+    before do
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+
+      create_checkpoint_assignment
+
+      user_session(@teacher)
+      Gradebook.visit(@course)
+    end
+
+    it "can be graded on Traditional Gradebook using the SubmissionTray" do
+      Gradebook::Cells.open_tray(@students[0], @checkpoint_assignment)
+
+      reply_to_topic_input = Gradebook::GradeDetailTray.grade_inputs[0]
+      required_replies_input = Gradebook::GradeDetailTray.grade_inputs[1]
+      current_total = Gradebook::GradeDetailTray.grade_inputs[2]
+
+      Gradebook::GradeDetailTray.edit_grade_for_input(reply_to_topic_input, 3)
+      Gradebook::GradeDetailTray.edit_grade_for_input(required_replies_input, 9)
+
+      expect(current_total).to have_attribute("disabled", "true")
+      expect(current_total).to have_value("12")
+
+      reply_to_topic_checkpoint = @checkpoint_assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_topic")
+      reply_to_entry_checkpoint = @checkpoint_assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_entry")
+
+      student0_reply_to_topic_submission = reply_to_topic_checkpoint.submissions.find_by(user_id: @students[0].id)
+      student0_reply_to_entry_submission = reply_to_entry_checkpoint.submissions.find_by(user_id: @students[0].id)
+      student0_parent_submission = @checkpoint_assignment.submissions.find_by(user_id: @students[0].id)
+
+      expect(student0_reply_to_topic_submission.score).to eq 3
+      expect(student0_reply_to_entry_submission.score).to eq 9
+      expect(student0_parent_submission.score).to eq 12
+    end
+  end
 end

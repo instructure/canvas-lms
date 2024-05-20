@@ -990,7 +990,7 @@ class SubmissionsApiController < ApplicationController
       bulk_load_attachments_and_previews([@submission])
 
       includes = %w[submission_comments]
-      includes.concat(Array.wrap(params[:include]) & ["visibility"])
+      includes.concat(Array.wrap(params[:include]) & %w[visibility sub_assignment_submissions])
       includes << "provisional_grades" if submission[:provisional]
 
       visiblity_included = includes.include?("visibility")
