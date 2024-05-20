@@ -22,6 +22,7 @@ import moment from 'moment'
 import PageViewCollection from './backbone/collections/PageViewCollection'
 import PageViewView from './backbone/views/PageViewView'
 import ready from '@instructure/ready'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 function renderTable(date) {
   const $container = $('#pageviews')
@@ -61,12 +62,12 @@ function renderTable(date) {
 
 ready(() => {
   let view = renderTable()
-  $('#page_view_date')
-    .datetime_field({dateOnly: true})
-    .change(event => {
-      const date = $(event.target).data('date')
-      view.stopPaginationListener()
-      $('#page_view_results').empty()
-      view = renderTable(date)
-    })
+  const input = $('#page_view_date')
+  renderDatetimeField(input, {dateOnly: true})
+  input.change(event => {
+    const date = $(event.target).data('date')
+    view.stopPaginationListener()
+    $('#page_view_results').empty()
+    view = renderTable(date)
+  })
 })
