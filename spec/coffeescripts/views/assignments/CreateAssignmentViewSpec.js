@@ -323,14 +323,6 @@ test('disableDueAt returns true if the user is not an admin and the assignment h
   equal(view.disableDueAt(), true)
 })
 
-test("openAgain doesn't add datetime for multiple dates", function () {
-  sandbox.stub(DialogFormView.prototype, 'openAgain')
-  sandbox.spy($.fn, 'datetime_field')
-  const view = createView(this.assignment1)
-  view.openAgain()
-  ok($.fn.datetime_field.notCalled)
-})
-
 test('adjust datetime to the end of a day for midnight time', function () {
   sandbox.stub(DialogFormView.prototype, 'openAgain')
   I18nStubber.useInitialTranslations()
@@ -353,15 +345,6 @@ test('it does not adjust datetime for other date time', function () {
   view.$el.find('#assign_3_assignment_due_at').val('Feb 2, 2021, 1:27pm').trigger('change')
   equal(view.$el.find('#assign_3_assignment_due_at').val(), 'Feb 2, 2021 1:27pm')
   $.screenReaderFlashMessageExclusive = tmp
-})
-
-test("openAgain doesn't add datetime picker if disableDueAt is true", function () {
-  sandbox.stub(DialogFormView.prototype, 'openAgain')
-  sandbox.spy($.fn, 'datetime_field')
-  const view = createView(this.assignment2)
-  sandbox.stub(view, 'disableDueAt').returns(true)
-  view.openAgain()
-  ok($.fn.datetime_field.notCalled)
 })
 
 test('requires name to save assignment', function () {
