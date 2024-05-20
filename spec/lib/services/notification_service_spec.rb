@@ -32,6 +32,7 @@ module Services
         @message.save!
         @message.to = "testing123"
         @at = AccessToken.create!(user: @user, developer_key: DeveloperKey.default)
+        @at2 = AccessToken.create!(user: @user, developer_key: DeveloperKey.default)
       end
 
       before do
@@ -87,7 +88,31 @@ module Services
         allow_any_instance_of(NotificationEndpoint).to receive(:sns_client).and_return(sns_client)
         @at.notification_endpoints.create!(token: "token")
         Message.where(id: @message.id).update_all(path_type: "push", notification_name: "Assignment Created")
-        @message.deliver
+        @message.reload.deliver
+        expect { @message.deliver }.not_to raise_error
+      end
+
+      it "sends only one message to duplicate arn and token combo" do
+        expect(@queue).to receive(:send_message).once
+        sns_client = double
+        allow(sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
+        allow_any_instance_of(NotificationEndpoint).to receive(:sns_client).and_return(sns_client)
+        @at.notification_endpoints.create!(token: "token")
+        @at2.notification_endpoints.create!(token: "token")
+        Message.where(id: @message.id).update_all(path_type: "push", notification_name: "Assignment Created")
+        @message.reload.deliver
+        expect { @message.deliver }.not_to raise_error
+      end
+
+      it "sends 2 only message to duplicate arns if token is different" do
+        expect(@queue).to receive(:send_message).twice
+        sns_client = double
+        allow(sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
+        allow_any_instance_of(NotificationEndpoint).to receive(:sns_client).and_return(sns_client)
+        @at.notification_endpoints.create!(token: "token")
+        @at2.notification_endpoints.create!(token: "token_2")
+        Message.where(id: @message.id).update_all(path_type: "push", notification_name: "Assignment Created")
+        @message.reload.deliver
         expect { @message.deliver }.not_to raise_error
       end
 
