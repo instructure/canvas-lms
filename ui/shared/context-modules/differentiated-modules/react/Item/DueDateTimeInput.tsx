@@ -29,6 +29,7 @@ type DueDateTimeInputProps = CustomDateTimeInputProps & {
   setDueDate: (dueDate: string | null) => void
   handleDueDateChange: (_event: React.SyntheticEvent, value: string | undefined) => void
   disabledWithGradingPeriod?: boolean
+  clearButtonAltLabel: string
 }
 
 export function DueDateTimeInput({
@@ -42,6 +43,7 @@ export function DueDateTimeInput({
   timeInputRefs,
   handleBlur,
   disabledWithGradingPeriod,
+  clearButtonAltLabel,
   ...otherProps
 }: DueDateTimeInputProps) {
   const key = 'due_at'
@@ -75,6 +77,7 @@ export function DueDateTimeInput({
     onBlur,
     dateInputRef,
     timeInputRef,
+    clearButtonAltLabel,
   }
 
   return <ClearableDateTimeInput {...dueDateProps} {...otherProps} />

@@ -29,6 +29,7 @@ type AvailableToDateTimeInputProps = CustomDateTimeInputProps & {
   setAvailableToDate: (availableToDate: string | null) => void
   handleAvailableToDateChange: (_event: React.SyntheticEvent, value: string | undefined) => void
   disabledWithGradingPeriod?: boolean
+  clearButtonAltLabel: string
 }
 
 export function AvailableToDateTimeInput({
@@ -42,6 +43,7 @@ export function AvailableToDateTimeInput({
   timeInputRefs,
   handleBlur,
   disabledWithGradingPeriod,
+  clearButtonAltLabel,
   ...otherProps
 }: AvailableToDateTimeInputProps) {
   const key = 'lock_at'
@@ -77,6 +79,7 @@ export function AvailableToDateTimeInput({
     onBlur,
     dateInputRef,
     timeInputRef,
+    clearButtonAltLabel,
   }
 
   return <ClearableDateTimeInput {...availableToDateProps} {...otherProps} />
