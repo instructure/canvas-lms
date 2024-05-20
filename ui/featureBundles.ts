@@ -156,6 +156,8 @@ const featureBundles: {
   outcome_alignments: () => import('./features/outcome_alignments/index'),
   outcome_management: () => import('./features/outcome_management/index'),
   page_views: () => import('./features/page_views/index'),
+  password_complexity_configuration: () =>
+    import('./features/password_complexity_configuration/index'),
   past_global_alert: () => import('./features/past_global_alert/index'),
   past_global_announcements: () => import('./features/past_global_announcements/index'),
   permissions: () => import('./features/permissions/index'),
