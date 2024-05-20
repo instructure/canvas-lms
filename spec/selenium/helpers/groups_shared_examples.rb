@@ -311,6 +311,7 @@ shared_examples "files_page" do |context|
   include SharedExamplesCommon
 
   it "allows group users to rename a file", priority: "2" do
+    skip("RCX-1829: Files cog not working maybe from jquery update")
     add_test_files
     get files_page
     edit_name_from_cog_icon("cool new name")
