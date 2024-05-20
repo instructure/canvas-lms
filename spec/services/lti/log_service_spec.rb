@@ -161,6 +161,15 @@ describe Lti::LogService do
         expect(subject[:account_id]).to eq(account.id.to_s)
         expect(subject[:root_account_uuid]).to eq(account.uuid)
       end
+
+      context "the group belongs to an account" do
+        let_once(:context) { group_model(context: account, root_account: account) }
+
+        it "includes the associated account id" do
+          expect(subject[:account_id]).to eq(account.id.to_s)
+          expect(subject[:root_account_uuid]).to eq(account.uuid)
+        end
+      end
     end
   end
 
@@ -183,10 +192,10 @@ describe Lti::LogService do
     end
 
     context "when context is a Group" do
-      let_once(:context) { group_model(context: course, root_account: account) }
-      let_once(:course) { course_model(root_account: account) }
+      let(:context) { group_model(context: course, root_account: account) }
+      let(:course) { course_model(root_account: account) }
 
-      before(:once) do
+      before do
         context.add_user(user)
         course.enroll_user(user, "StudentEnrollment")
         course.enroll_user(user, "TaEnrollment")
@@ -202,6 +211,14 @@ describe Lti::LogService do
 
       it "includes account roles for user" do
         expect(subject).to include("AccountAdmin")
+      end
+
+      context "the group belongs to an account" do
+        let(:context) { group_model(context: account, root_account: account) }
+
+        it "includes only account and group level roles for user" do
+          expect(subject.split(",")).to contain_exactly("AccountAdmin", "GroupMembership")
+        end
       end
     end
 
