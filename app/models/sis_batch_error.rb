@@ -22,7 +22,7 @@ class SisBatchError < ActiveRecord::Base
   belongs_to :parallel_importer, inverse_of: :sis_batch_errors
   belongs_to :root_account, class_name: "Account", inverse_of: :sis_batch_errors
 
-  scope :expired_errors, -> { where("created_at < ?", 30.days.ago) }
+  scope :expired_errors, -> { where(created_at: ...30.days.ago) }
   scope :failed, -> { where(failure: true) }
   scope :warnings, -> { where(failure: false) }
 

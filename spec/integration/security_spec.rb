@@ -65,7 +65,7 @@ describe "security" do
 
       post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                       "pseudonym_session[password]" => "asdfasdf" }
-      assert_response 302
+      assert_response :found
       lines = response["Set-Cookie"]
       lines = lines.lines if $canvas_rails == "7.0"
       c = lines.grep(/\A_normandy_session=/).first
@@ -77,7 +77,7 @@ describe "security" do
       post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                       "pseudonym_session[password]" => "asdfasdf",
                                       "pseudonym_session[remember_me]" => "1" }
-      assert_response 302
+      assert_response :found
       lines = response["Set-Cookie"]
       lines = lines.lines if $canvas_rails == "7.0"
       c = lines.grep(/\A_normandy_session=/).first
@@ -92,7 +92,7 @@ describe "security" do
       https!
       post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                       "pseudonym_session[password]" => "asdfasdf" }
-      assert_response 302
+      assert_response :found
       lines = response["Set-Cookie"]
       lines = lines.lines if $canvas_rails == "7.0"
       c1 = lines.grep(/\Apseudonym_credentials=/).first
@@ -184,7 +184,7 @@ describe "security" do
       post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                       "pseudonym_session[password]" => "asdfasdf",
                                       "pseudonym_session[remember_me]" => "1" }
-      assert_response 302
+      assert_response :found
       cookie = cookies["pseudonym_credentials"]
       expect(cookie).to be_present
       token = SessionPersistenceToken.find_by_pseudonym_credentials(CGI.unescape(cookie))
@@ -415,7 +415,7 @@ describe "security" do
       user_session(@admin, @admin.pseudonyms.first)
 
       get "/?become_user_id=#{@student.id}"
-      assert_response 302
+      assert_response :found
       expect(response.location).to match "/users/#{@student.id}/masquerade$"
       expect(session[:masquerade_return_to]).to eq "/"
       expect(session[:become_user_id]).to be_nil
@@ -423,18 +423,18 @@ describe "security" do
       expect(assigns["real_current_user"]).to be_nil
 
       follow_redirect!
-      assert_response 200
+      assert_response :ok
       expect(path).to eq "/users/#{@student.id}/masquerade"
       expect(session[:become_user_id]).to be_nil
       expect(assigns["current_user"].id).to eq @admin.id
       expect(assigns["real_current_user"]).to be_nil
 
       post "/users/#{@student.id}/masquerade"
-      assert_response 302
+      assert_response :found
       expect(session[:become_user_id]).to eq @student.id.to_s
 
       get "/"
-      assert_response 200
+      assert_response :ok
       expect(session[:become_user_id]).to eq @student.id.to_s
       expect(assigns["current_user"].id).to eq @student.id
       expect(assigns["current_pseudonym"]).to eq @student_pseudonym
@@ -445,7 +445,7 @@ describe "security" do
       user_session(@admin, @admin.pseudonyms.first)
 
       get "/?as_user_id=#{@student.id}"
-      assert_response 200
+      assert_response :ok
       expect(session[:become_user_id]).to be_nil
       expect(assigns["current_user"].id).to eq @admin.id
       expect(assigns["real_current_user"]).to be_nil
@@ -455,13 +455,13 @@ describe "security" do
       user_session(@student, @student.pseudonyms.first)
 
       get "/?become_user_id=#{@teacher.id}"
-      assert_response 200
+      assert_response :ok
       expect(session[:become_user_id]).to be_nil
       expect(assigns["current_user"].id).to eq @student.id
       expect(assigns["real_current_user"]).to be_nil
 
       post "/users/#{@teacher.id}/masquerade"
-      assert_response 401
+      assert_response :unauthorized
       expect(assigns["current_user"].id).to eq @student.id
       expect(session[:become_user_id]).to be_nil
     end
@@ -471,7 +471,7 @@ describe "security" do
       user_session(@admin, @admin.pseudonyms.first)
 
       get "/?become_user_id=#{@student.id}"
-      assert_response 302
+      assert_response :found
       expect(response.location).to match "/users/#{@student.id}/masquerade$"
       expect(session[:masquerade_return_to]).to eq "/"
       expect(session[:become_user_id]).to be_nil
@@ -479,7 +479,7 @@ describe "security" do
       expect(assigns["real_current_user"]).to be_nil
 
       follow_redirect!
-      assert_response 200
+      assert_response :ok
       expect(path).to eq "/users/#{@student.id}/masquerade"
       expect(session[:become_user_id]).to be_nil
       expect(assigns["current_user"].id).to eq @admin.id
@@ -489,11 +489,11 @@ describe "security" do
       expect(pv1.real_user_id).to be_nil
 
       post "/users/#{@student.id}/masquerade"
-      assert_response 302
+      assert_response :found
       expect(session[:become_user_id]).to eq @student.id.to_s
 
       get "/"
-      assert_response 200
+      assert_response :ok
       expect(session[:become_user_id]).to eq @student.id.to_s
       expect(assigns["current_user"].id).to eq @student.id
       expect(assigns["real_current_user"].id).to eq @admin.id

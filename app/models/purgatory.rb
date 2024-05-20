@@ -26,7 +26,7 @@ class Purgatory < ActiveRecord::Base
   TIME_TO_EXPIRE = 30.days
 
   def self.expire_old_purgatories
-    Purgatory.active.where("updated_at < ?", TIME_TO_EXPIRE.ago).find_in_batches do |batch|
+    Purgatory.active.where(updated_at: ...TIME_TO_EXPIRE.ago).find_in_batches do |batch|
       batch.each do |p|
         next unless p.new_instfs_uuid
 

@@ -70,7 +70,7 @@ describe EventStream::Backend::Cassandra do
   end
 
   let(:event_record) do
-    OpenStruct.new(field: "value", created_at: Time.zone.now, id: "big-uuid")
+    double(field: "value", created_at: Time.zone.now, id: "big-uuid", attributes: {})
   end
 
   describe "executing operations" do

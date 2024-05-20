@@ -981,7 +981,7 @@ class CalendarEventsApiController < ApplicationController
 
     all_events = find_which_series_events(target_event:, which: "all", for_update: true)
     adjusted_all_events = all_events.empty? ? [target_event] : all_events
-    events = (which == "following") ? adjusted_all_events.where("start_at >= ?", target_event.start_at) : adjusted_all_events
+    events = (which == "following") ? adjusted_all_events.where(start_at: target_event.start_at..) : adjusted_all_events
 
     tz = @current_user.time_zone || ActiveSupport::TimeZone.new("UTC")
     target_start = Time.parse(params_for_update[:start_at]).in_time_zone(tz)

@@ -456,7 +456,7 @@ class ContentMigration < ActiveRecord::Base
     running_cutoff = Setting.get("content_migration_job_block_hours", "4").to_i.hours.ago # at some point just let the jobs keep going
 
     if context && context.content_migrations
-                         .where(workflow_state: %w[created queued pre_processing pre_processed exporting importing]).where("id < ?", id)
+                         .where(workflow_state: %w[created queued pre_processing pre_processed exporting importing]).where(id: ...id)
                          .where("started_at > ?", running_cutoff).exists?
 
       # there's another job already going so punt
@@ -1385,7 +1385,7 @@ class ContentMigration < ActiveRecord::Base
 
   scope :expired, lambda {
     if ContentMigration.expire?
-      where("created_at < ?", ContentMigration.expire_days.days.ago)
+      where(created_at: ...ContentMigration.expire_days.days.ago)
     else
       none
     end

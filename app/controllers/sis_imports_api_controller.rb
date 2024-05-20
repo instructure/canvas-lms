@@ -406,7 +406,7 @@ class SisImportsApiController < ApplicationController
         scope = scope.where("created_at > ?", created_since)
       end
       if (created_before = CanvasTime.try_parse(params[:created_before]))
-        scope = scope.where("created_at < ?", created_before)
+        scope = scope.where(created_at: ...created_before)
       end
 
       state = Array(params[:workflow_state]) & %w[initializing

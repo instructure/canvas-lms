@@ -81,7 +81,7 @@ module Gradebook
                               .where(user: students)
                               .ungraded
                               .where("submissions.excused IS NOT TRUE")
-      submissions = submissions.where("cached_due_date < ?", Time.zone.now) if options.only_apply_to_past_due
+      submissions = submissions.where(cached_due_date: ...Time.zone.now) if options.only_apply_to_past_due
       submissions
     end
     private_class_method :matching_submissions_scope

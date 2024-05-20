@@ -144,7 +144,7 @@ class OriginalityReport < ActiveRecord::Base
     group_submissions.find_each do |s|
       same_or_later_report_exists =
         s.originality_reports.where(attachment_id:)
-         .where("updated_at >= ?", updated_at).exists?
+         .where(updated_at: updated_at..).exists?
       next if same_or_later_report_exists
 
       copy_of_report = dup
@@ -155,7 +155,7 @@ class OriginalityReport < ActiveRecord::Base
       # attachment/submission combo hanging around.
       s.originality_reports
        .where(attachment_id:)
-       .where("updated_at < ?", updated_at)
+       .where(updated_at: ...updated_at)
        .destroy_all
 
       copy_of_report.update!(submission: s, updated_at:)
