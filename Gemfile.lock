@@ -865,7 +865,7 @@ GEM
       nio4r (~> 2.0)
     pygments.rb (3.0.0)
     raabro (1.4.0)
-    racc (1.7.3)
+    racc (1.8.0)
     rack (2.2.9)
     rack-brotli (1.2.0)
       brotli (>= 0.1.7)
