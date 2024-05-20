@@ -23,7 +23,7 @@ class AssignmentPage
 
     # Selectors
     def assign_to_button
-      f(".assign-to-link")
+      f("button.assign-to-link")
     end
 
     def course_pacing_notice_selector

@@ -72,8 +72,7 @@
           class='btn <%= "published" if @assignment.published? %> <%= "disabled" unless assignment_publishing_enabled?(@assignment, @current_user) %>'>
         </button>
         <% if @context.grants_any_right?(@current_user, :manage_assignments_edit) && Account.site_admin.feature_enabled?(:differentiated_modules)%>
-          <a
-            href="#<%= @assignment.id %>"
+          <button
             class='btn assign-to-link'
             data-assignment-name="<%= @assignment.title %>"
             data-assignment-context-id="<%= @assignment.context_id %>"
@@ -81,7 +80,7 @@
             data-assignment-points-possible="<%= @assignment.points_possible %>"
           >
             <i class='icon-permissions'></i> <%= t('Assign To') %>
-          </a>
+          </button>
         <% end %>
         <% if @context.grants_any_right?(@current_user, :manage_assignments, :manage_assignments_edit) %>
           <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link<%= ' disabled' unless can_do(@assignment, @current_user, :update) %>'>
