@@ -122,14 +122,26 @@ class DeveloperKeyAccountBinding < ApplicationRecord
   private
 
   def update_lti_registration_account_binding
-    if @skip_lime_sync
-      @skip_lime_sync = false
+    if skip_lime_sync
+      self.skip_lime_sync = false
       return
     end
 
     if lti_registration_account_binding
-      updated_by = @current_user || lti_registration_account_binding.updated_by
+      updated_by = current_user || lti_registration_account_binding.updated_by
       lti_registration_account_binding.update!(workflow_state:, updated_by:, skip_lime_sync: true)
+    # Check if developer_key.lti registration is present; there may be a valid reason to
+    # not have one, e.g. if the dev key doesn't have a tool_configuration on it yet.
+    # If it doesn't have one, skip creating a Lti::RegistrationAccountBinding until it does.
+    elsif developer_key.lti_registration
+      Lti::RegistrationAccountBinding.create!(
+        account:,
+        registration: developer_key.lti_registration,
+        created_by: current_user,
+        updated_by: current_user,
+        developer_key_account_binding: self,
+        skip_lime_sync: true
+      )
     end
   end
 
