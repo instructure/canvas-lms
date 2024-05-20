@@ -18,12 +18,14 @@
 
 /* eslint-disable no-void */
 
+import $ from 'jquery'
 import {extend} from '@canvas/backbone/utils'
 import {includes} from 'lodash'
 import Backbone from '@canvas/backbone'
 import numberHelper from '@canvas/i18n/numberHelper'
 import template from '../../jst/PeerReviewsSelector.handlebars'
 import '../../jquery/toggleAccessibly'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 extend(PeerReviewsSelector, Backbone.View)
 
@@ -80,7 +82,8 @@ PeerReviewsSelector.prototype.handleAutomaticPeerReviewsChange = function () {
 }
 
 PeerReviewsSelector.prototype.afterRender = function () {
-  return this.$peerReviewsAssignAt.datetime_field()
+  renderDatetimeField($(this.$peerReviewsAssignAt))
+  return $(this.$peerReviewsAssignAt)
 }
 
 PeerReviewsSelector.prototype.toJSON = function () {
