@@ -567,14 +567,49 @@ class CoursesController < ApplicationController
       end
     end
 
-    @past_enrollments.sort_by! { |e| [e.course.published? ? 0 : 1, Canvas::ICU.collation_key(e.long_name)] }
-    [@current_enrollments, @future_enrollments].each do |list|
-      list.sort_by! do |e|
-        [e.course.published? ? 0 : 1, e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name)]
-      end
-    end
+    @current_enrollments = sort_enrollments(@current_enrollments, "current")
+    @past_enrollments = sort_enrollments(@past_enrollments, "past")
+    @future_enrollments = sort_enrollments(@future_enrollments, "future")
   end
   helper_method :load_enrollments_for_index
+
+  def sort_enrollments(enrollments, type)
+    sort_column = nil
+    order = nil
+    case type
+    when "current"
+      sort_column = params[:cc_sort]
+      order = params[:cc_order]
+    when "past"
+      sort_column = params[:pc_sort]
+      order = params[:pc_order]
+    when "future"
+      sort_column = params[:fc_sort]
+      order = params[:fc_order]
+    end
+    sorted_enrollments = enrollments.sort_by! do |e|
+      case sort_column
+      when "favorite"
+        @current_user.courses_with_primary_enrollment(:favorite_courses).map(&:id).include?(e.course_id) ? 0 : 1
+      when "course"
+        e.course.name
+      when "nickname"
+        nickname = e.course.nickname_for(@current_user, nil)
+        [nickname.nil? ? 1 : 0, nickname]
+      when "term"
+        [e.course.enrollment_term.default_term? ? 1 : 0, e.course.enrollment_term.name]
+      when "enrolled_as"
+        e.readable_role_name
+      else
+        if type == "past"
+          [e.course.published? ? 0 : 1, Canvas::ICU.collation_key(e.long_name)]
+        else
+          [e.course.published? ? 0 : 1, e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name)]
+        end
+      end
+    end
+    (order == "desc") ? sorted_enrollments.reverse : sorted_enrollments
+  end
 
   def enrollments_for_index(type)
     instance_variable_get(:"@#{type}_enrollments")

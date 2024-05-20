@@ -270,4 +270,64 @@ describe CoursesHelper do
       expect(format_course_section_date).to eq "(no date)"
     end
   end
+
+  describe "sortable user course list helpers" do
+    context "get_sorting_order" do
+      it "returns 'desc' if we are sorting on the current col that is in ascending order" do
+        expect(get_sorting_order("favorite", "favorite", nil)).to eq("desc")
+      end
+
+      it "returns 'desc' if the default col is being sorted on in ascending order" do
+        expect(get_sorting_order("published", nil, nil)).to eq("desc")
+      end
+
+      it "returns nil if we are not sorting on the current col" do
+        expect(get_sorting_order("enrolled_as", "favorite", nil)).to be_nil
+      end
+
+      it "returns nil if we are sorting on the current col that is in descending order" do
+        expect(get_sorting_order("favorite", "favorite", "desc")).to be_nil
+      end
+    end
+
+    context "get_sorting_icon" do
+      it "returns the double arrow icon if we are not sorting on the given column" do
+        expect(get_sorting_icon("favorite", "published", "desc")).to eq("icon-mini-arrow-double")
+      end
+
+      it "returns the upward arrow icon if we are sorting on the given column in ascending order" do
+        expect(get_sorting_icon("favorite", "favorite", nil)).to eq("icon-mini-arrow-up")
+      end
+
+      it "returns the downward arrow icon if we are sorting on the given column in descending order" do
+        expect(get_sorting_icon("favorite", "favorite", "desc")).to eq("icon-mini-arrow-down")
+      end
+    end
+
+    context "get_courses_params" do
+      it "returns the correct params for the given table" do
+        table = "cc"
+        column = "favorite"
+        old_params = ActionController::Parameters.new
+        new_params = ActionController::Parameters.new(cc_sort: column, cc_order: nil, focus: table)
+        expect(get_courses_params(table, column, old_params)).to eq(new_params.permit(:cc_sort, :cc_order, :focus))
+      end
+
+      it "returns the correct params for the given table and params for other tables" do
+        table = "cc"
+        column = "favorite"
+        old_params = ActionController::Parameters.new(pc_sort: "published")
+        new_params = ActionController::Parameters.new(cc_sort: column, cc_order: nil, focus: table, pc_sort: "published")
+        expect(get_courses_params(table, column, old_params)).to eq(new_params.permit(:cc_sort, :cc_order, :focus, :pc_sort))
+      end
+
+      it "only returns permitted params" do
+        table = "cc"
+        column = "favorite"
+        old_params = ActionController::Parameters.new(foo: "bar")
+        new_params = ActionController::Parameters.new(cc_sort: column, cc_order: nil, focus: table)
+        expect(get_courses_params(table, column, old_params)).to eq(new_params.permit(:cc_sort, :cc_order, :focus))
+      end
+    end
+  end
 end
