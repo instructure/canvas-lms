@@ -515,6 +515,7 @@ describe "discussions" do
 
           before do
             Account.site_admin.enable_feature! :react_discussions_post
+            @student = student_in_course(course: @course, active_all: true).user
           end
 
           it "able to save" do
@@ -535,6 +536,22 @@ describe "discussions" do
             f("input[type=radio][value=partial_anonymity]").click
             f("input#use_for_grading").click
             expect_new_page_load { f("button.save_and_publish").click }
+          end
+
+          it "allow to change the anonymity if there is no reply" do
+            get url
+
+            expect(f("input[value='full_anonymity']").selected?).to be_truthy
+
+            force_click_native("input[value='partial_anonymity']")
+            expect_new_page_load { f(".form-actions button[type=submit]").click }
+          end
+
+          it "should not allow to change the anonymity when there are replys" do
+            topic.reply_from({ user: @student, text: "I feel pretty" })
+            get url
+
+            expect(ff("input[name='anonymous_state'][disabled]").count).to eq 3
           end
         end
       end
@@ -661,8 +678,8 @@ describe "discussions" do
           f("input[data-testid='section-select']").click
           fj("li:contains('value for name')").click
 
-          # we cannot change anonymity on edit, so we just verify its disabled
-          expect(ffj("fieldset:contains('Anonymous Discussion') input[disabled]").count).to eq 3
+          # we can change anonymity on edit, if there is no reply
+          expect(ffj("fieldset:contains('Anonymous Discussion') input[type=radio]").count).to eq 3
 
           force_click_native("input[value='must-respond-before-viewing-replies']")
 

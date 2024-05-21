@@ -63,7 +63,7 @@ class DiscussionTopic < ActiveRecord::Base
     class LockBeforeDueDate < StandardError; end
   end
 
-  attr_readonly :context_id, :context_type, :user_id, :anonymous_state, :is_anonymous_author
+  attr_readonly :context_id, :context_type, :user_id, :is_anonymous_author
 
   has_many :discussion_entries, -> { order(:created_at) }, dependent: :destroy, inverse_of: :discussion_topic
   has_many :discussion_entry_drafts, dependent: :destroy, inverse_of: :discussion_topic
