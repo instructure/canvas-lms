@@ -23,8 +23,11 @@ module Importers
 
     def self.process_migration(hash, migration)
       lti_resource_links = hash.with_indifferent_access["lti_resource_links"]
-
       return false unless lti_resource_links
+
+      assignments = hash.with_indifferent_access["assignments"]
+      lti_resource_links = filter_by_assignment_context(lti_resource_links, assignments, migration)
+      return false if lti_resource_links.empty?
 
       # Recover all resource links recorded by Importers::AssignmentImporter to
       resource_links_from_assignments = imported_resource_links_from_assignments(migration)
@@ -41,6 +44,20 @@ module Importers
       end
 
       true
+    end
+
+    def self.filter_by_assignment_context(lti_resource_links = [], assignments = [], migration)
+      return lti_resource_links if migration.import_everything?
+      return lti_resource_links if lti_resource_links.empty? || assignments.empty?
+
+      assignments.each do |assignment|
+        lti_resource_links = lti_resource_links.reject do |lti_resource_link|
+          assignment["resource_link_lookup_uuid"] == lti_resource_link["lookup_uuid"] &&
+            !migration.import_object?("assignments", assignment["migration_id"])
+        end
+      end
+
+      lti_resource_links
     end
 
     def self.create_or_update_resource_link_for_a_course_context(lti_resource_link, migration)
