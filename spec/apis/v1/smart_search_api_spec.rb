@@ -76,6 +76,8 @@ describe "Smart Search API", type: :request do
       )
       distances = response["results"].pluck("distance")
       expect(distances).to eq(distances.sort)
+      relevances = response["results"].pluck("relevance")
+      expect(relevances).to all be_between(0, 100)
     end
 
     it "filters by type" do
