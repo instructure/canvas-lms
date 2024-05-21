@@ -23,6 +23,7 @@ import {IconAddLine} from '@instructure/ui-icons'
 import type {Module} from './types'
 import PrerequisiteSelector from './PrerequisiteSelector'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -111,7 +112,9 @@ export default function PrerequisiteForm({
           }}
           renderIcon={<IconAddLine />}
         >
-          {I18n.t('Prerequisite')}
+          <AccessibleContent alt={I18n.t('Add Prerequisite')}>
+            {I18n.t('Prerequisite')}
+          </AccessibleContent>
         </Button>
       )}
     </FormFieldGroup>

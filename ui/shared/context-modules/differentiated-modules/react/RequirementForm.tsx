@@ -24,6 +24,7 @@ import RequirementCountInput from './RequirementCountInput'
 import RequirementSelector from './RequirementSelector'
 import type {Requirement, ModuleItem} from './types'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -125,7 +126,9 @@ export default function RequirementForm({
           }}
           renderIcon={<IconAddLine />}
         >
-          {I18n.t('Requirement')}
+          <AccessibleContent alt={I18n.t('Add Requirement')}>
+            {I18n.t('Requirement')}
+          </AccessibleContent>
         </Button>
       )}
     </FormFieldGroup>
