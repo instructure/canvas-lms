@@ -320,7 +320,7 @@ describe "security" do
 
       it "is restrictive to pseudonym account's configured max attempts" do
         bad_login("5.5.5.5")
-        expect(response.body).to match(/Invalid username/)
+        expect(response.body).to match(/Please verify your username or password and try again/)
         bad_login("5.5.5.5")
         expect(response.body).to match(/Too many failed login attempts/)
         # should still fail
@@ -333,7 +333,7 @@ describe "security" do
 
       it "does not block other users" do
         bad_login("5.5.5.5")
-        expect(response.body).to match(/Invalid username/)
+        expect(response.body).to match(/Please verify your username or password and try again/)
         user_with_pseudonym(active_user: true, username: "second@example.com", password: "12341234").save!
         post "/login/canvas",
              params: { "pseudonym_session[unique_id]" => "second@example.com", "pseudonym_session[password]" => "12341234" },
@@ -350,9 +350,9 @@ describe "security" do
         @pseudonym.account.settings[:password_policy] = { max_attempts: 2 }
         @pseudonym.account.save!
         bad_login("5.5.5.5")
-        expect(response.body).to match(/Invalid username/)
+        expect(response.body).to match(/Please verify your username or password and try again/)
         bad_login("5.5.5.6") # different IP, so allowed
-        expect(response.body).to match(/Invalid username/)
+        expect(response.body).to match(/Please verify your username or password and try again/)
         bad_login("5.5.5.7") # different IP, but too many total failures
         expect(response.body).to match(/Too many failed login attempts/)
         # should still fail

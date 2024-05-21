@@ -1554,6 +1554,18 @@ class Account < ActiveRecord::Base
     Canvas::PasswordPolicy.default_policy.merge(settings[:password_policy] || {})
   end
 
+  def password_complexity_enabled?
+    return false unless root_account?
+
+    feature_enabled?(:password_complexity)
+  end
+
+  def allow_login_suspension?
+    return false unless password_complexity_enabled?
+
+    Canvas::Plugin.value_to_boolean(password_policy[:allow_login_suspension]) || false
+  end
+
   def delegated_authentication?
     authentication_providers.active.first.is_a?(AuthenticationProvider::Delegated)
   end

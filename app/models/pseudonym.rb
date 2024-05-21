@@ -387,6 +387,14 @@ class Pseudonym < ActiveRecord::Base
     state :active
     state :deleted
     state :suspended
+
+    state :active do
+      event :suspend!, transitions_to: :suspended
+    end
+
+    state :suspended do
+      event :unsuspend!, transitions_to: :active
+    end
   end
 
   set_policy do

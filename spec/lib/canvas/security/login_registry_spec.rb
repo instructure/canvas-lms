@@ -21,17 +21,19 @@
 describe Canvas::Security::LoginRegistry do
   let(:registry) { Canvas::Security::LoginRegistry }
 
+  before_once do
+    skip("requires redis config to run") unless Canvas.redis_enabled?
+    u = user_with_pseudonym active_user: true,
+                            username: "nobody@example.com",
+                            password: "asdfasdf"
+    u.save!
+    @p = u.pseudonym
+  end
+
   describe ".audit_login" do
     before do
-      skip("requires redis config to run") unless Canvas.redis_enabled?
-      u = user_with_pseudonym active_user: true,
-                              username: "nobody@example.com",
-                              password: "asdfasdf"
-      u.save!
-      @p = u.pseudonym
-      account = @p.account
-      account.settings[:password_policy] = { max_attempts: 2 }
-      account.save!
+      @p.account.settings[:password_policy] = { max_attempts: 2 }
+      @p.account.save!
     end
 
     it "returns nil to allow user through" do
@@ -84,6 +86,60 @@ describe Canvas::Security::LoginRegistry do
       registry.failed_login!(@p)
       expect(registry.time_until_login_allowed(@p)).to eq 0
       expect(registry.time_until_login_allowed(@p)).to be <= 5
+    end
+  end
+
+  describe ".allow_login_attempt?" do
+    subject { registry.allow_login_attempt?(@p) }
+
+    before do
+      @p.account.settings[:password_policy] = { max_attempts: 3 }
+      @p.account.save!
+    end
+
+    context "with login suspension enabled" do
+      before do
+        @p.account.enable_feature!(:password_complexity)
+        @p.account.settings[:password_policy] = { max_attempts: 3, allow_login_suspension: true }
+        @p.account.save!
+      end
+
+      it "returns :final_attempt when total is greater than max_attempts" do
+        4.times { registry.failed_login!(@p) }
+        expect(subject).to eq(:final_attempt)
+      end
+
+      it "returns :remaining_attempts_2 when total is less than max_attempts by 3" do
+        expect(registry.audit_login(@p, false)).to eq(:remaining_attempts_2)
+      end
+
+      it "returns :remaining_attempts_1 when total is less than max_attempts by 2" do
+        registry.audit_login(@p, false)
+        expect(registry.audit_login(@p, false)).to eq(:remaining_attempts_1)
+      end
+
+      it "returns :final_attempt when total is less than max_attempts by 1" do
+        2.times { registry.audit_login(@p, false) }
+        expect(registry.audit_login(@p, false)).to eq(:final_attempt)
+      end
+
+      it "suspends the user's login after the last failed login attempt" do
+        3.times { registry.audit_login(@p, false) }
+        expect(@p.reload.workflow_state).to eq "suspended"
+      end
+
+      it "allows up to max_attempts of failed login attempts before suspending the user" do
+        @p.account.settings[:password_policy] = { max_attempts: 10, allow_login_suspension: true }
+        @p.account.save!
+
+        7.times { registry.failed_login!(@p) }
+        expect(registry.audit_login(@p, false)).to eq(:remaining_attempts_2)
+        expect(@p.reload.workflow_state).to eq "active"
+        expect(registry.audit_login(@p, false)).to eq(:remaining_attempts_1)
+        expect(@p.reload.workflow_state).to eq "active"
+        expect(registry.audit_login(@p, false)).to eq(:final_attempt)
+        expect(@p.reload.workflow_state).to eq "suspended"
+      end
     end
   end
 end
