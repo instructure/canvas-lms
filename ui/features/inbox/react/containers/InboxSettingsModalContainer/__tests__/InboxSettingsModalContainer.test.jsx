@@ -44,6 +44,8 @@ describe('InboxSettingsModalContainer', () => {
   const oldLocale = moment.locale()
 
   const defaultProps = (props = {}) => ({
+    inboxSignatureBlock: true,
+    inboxAutoResponse: true,
     onDismissWithAlert: onDismissWithAlertMock,
     ...props,
   })
@@ -84,11 +86,19 @@ describe('InboxSettingsModalContainer', () => {
     server.close()
   })
 
-  const setup = ({onDismissWithAlert = onDismissWithAlertMock} = {}) =>
+  const setup = ({
+    inboxSignatureBlock = true,
+    inboxAutoResponse = true,
+    onDismissWithAlert = onDismissWithAlertMock
+  } = {}) =>
     render(
       <ApolloProvider client={mswClient}>
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
-          <InboxSettingsModalContainer onDismissWithAlert={onDismissWithAlert} />
+          <InboxSettingsModalContainer
+            inboxSignatureBlock={inboxSignatureBlock}
+            inboxAutoResponse={inboxAutoResponse}
+            onDismissWithAlert={onDismissWithAlert}
+          />
         </AlertManagerContext.Provider>
       </ApolloProvider>
     )
@@ -226,6 +236,36 @@ describe('InboxSettingsModalContainer', () => {
           expect(getByText('Date cannot be in the past')).toBeInTheDocument()
         })
       })
+    })
+  })
+
+  it('displays signature and auto response settings when inboxSignatureBlock and inboxAutoResponse props are true', async () => {
+    const {getByText} = setup({...defaultProps()})
+    await waitFor(() => {
+      expect(getByText('Add Signature*')).toBeInTheDocument()
+      expect(getByText('Out of Office')).toBeInTheDocument()
+    })
+  })
+
+  it('displays only signature settings when only inboxSignatureBlock prop is true', async () => {
+    const {getByText, queryByText} = setup({...defaultProps({
+      inboxSignatureBlock: true,
+      inboxAutoResponse: false
+    })})
+    await waitFor(() => {
+      expect(getByText('Add Signature*')).toBeInTheDocument()
+      expect(queryByText('Out of Office')).not.toBeInTheDocument()
+    })
+  })
+
+  it('displays only auto response settings when only inboxAutoResponse prop is true', async () => {
+    const {getByText, queryByText} = setup({...defaultProps({
+      inboxSignatureBlock: false,
+      inboxAutoResponse: true
+    })})
+    await waitFor(() => {
+      expect(queryByText('Add Signature*')).not.toBeInTheDocument()
+      expect(getByText('Out of Office')).toBeInTheDocument()
     })
   })
 })

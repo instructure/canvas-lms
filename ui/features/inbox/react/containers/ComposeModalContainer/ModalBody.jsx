@@ -46,7 +46,7 @@ const ModalBody = props => {
           <MessageBody
             onBodyChange={props.onBodyChange}
             messages={props.bodyMessages}
-            inboxSettingsFeature={props.inboxSettingsFeature}
+            inboxSignatureBlock={props.inboxSignatureBlock}
             signature={props.signature}
           />
           {shouldTranslate && <TranslationControls signature={props.signature} inboxSettingsFeature={props.inboxSettingsFeature} />}
@@ -99,7 +99,7 @@ ModalBody.propTypes = {
   modalError: PropTypes.string,
   mediaUploadFile: PropTypes.object,
   onRemoveMediaComment: PropTypes.func,
-  inboxSettingsFeature: PropTypes.bool,
+  inboxSignatureBlock: PropTypes.bool,
   signature: PropTypes.string,
 }
 

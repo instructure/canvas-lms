@@ -78,7 +78,7 @@ const ComposeModalContainer = props => {
       setOnFailure(I18n.t('There was an error while loading inbox settings'))
       dismiss()
     },
-    skip: !props.inboxSettingsFeature || !props.open,
+    skip: !props.inboxSignatureBlock || !props.open
   })
   // Translation features
   const [translating, setTranslating] = useState(false)
@@ -487,7 +487,7 @@ const ComposeModalContainer = props => {
                 mediaUploadFile={mediaUploadFile}
                 onRemoveMediaComment={onRemoveMedia}
                 signature={activeSignature}
-                inboxSettingsFeature={props.inboxSettingsFeature}
+                inboxSignatureBlock={props.inboxSignatureBlock}
               >
                 {isSubmissionCommentsType ? null : (
                   <HeaderInputs
@@ -596,5 +596,5 @@ ComposeModalContainer.propTypes = {
   modalError: PropTypes.string,
   isPrivateConversation: PropTypes.bool,
   currentCourseFilter: PropTypes.string,
-  inboxSettingsFeature: PropTypes.bool, // TODO: remove after inboxSettingsFeature flag is removed
+  inboxSignatureBlock: PropTypes.bool
 }

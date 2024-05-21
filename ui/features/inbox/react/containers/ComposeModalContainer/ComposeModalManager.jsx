@@ -330,7 +330,7 @@ const ComposeModalManager = props => {
 
   return (
     <ComposeModalContainer
-      inboxSettingsFeature={props.inboxSettingsFeature}
+      inboxSignatureBlock={props.inboxSignatureBlock}
       addConversationMessage={data => {
         addConversationMessage({
           variables: {
@@ -385,7 +385,7 @@ ComposeModalManager.propTypes = {
   contextIdFromUrl: PropTypes.string,
   maxGroupRecipientsMet: PropTypes.bool,
   currentCourseFilter: PropTypes.string,
-  inboxSettingsFeature: PropTypes.bool, // TODO: remove after inboxSettingsFeature flag is removed
+  inboxSignatureBlock: PropTypes.bool
 }
 
 export default ComposeModalManager
