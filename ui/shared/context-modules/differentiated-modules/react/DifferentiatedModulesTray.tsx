@@ -89,7 +89,7 @@ function Header({
           <IconModuleSolid size="x-small" />
         </Flex.Item>
         <Flex.Item margin="0 0 0 small">
-          <Heading data-testid="header-label" as="h3">
+          <Heading data-testid="header-label" level="h2">
             {headerLabel}
           </Heading>
         </Flex.Item>

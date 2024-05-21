@@ -102,7 +102,7 @@ module ItemsAssignToTray
   end
 
   def tray_header_selector
-    "[data-testid='module-item-edit-tray'] h3"
+    "[data-testid='module-item-edit-tray'] h2"
   end
 
   def close_button_selector
