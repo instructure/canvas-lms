@@ -21,6 +21,7 @@ import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
 import replaceTags from '@canvas/util/replaceTags'
+import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
 const I18n = useI18nScope('accounts.statistics')
 
@@ -61,6 +62,7 @@ function populateDialog(data_points, axis, $link) {
 }
 
 $(document).ready(() => {
+  initializeTopNavPortal(document.getElementById('react-instui-topnav'))
   $(document).on('click', '.over_time_link', function (event) {
     event.preventDefault()
     const $link = $(this)
