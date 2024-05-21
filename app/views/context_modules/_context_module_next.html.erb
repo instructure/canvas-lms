@@ -223,11 +223,11 @@
         <div class="view_assign">
           <% if context_module && @module_ids_with_overrides.include?(context_module.id) %>
             <i aria-hidden="true" class="icon-group"></i>
-            <a
-              href="#<%= context_module ? context_module.id : "{{ id }}" %>"
-              class="view_assign_link"
+            <button
+              class="btn view_assign_link"
+              aria-label="<%= t("View %{module_name} Assign To", {module_name: context_module.name} ) %>"
               title="<%= t('View Assign To') %>"><%= t('View Assign To') %>
-            </a>
+            </button>
           <% end %>
         </div>
       <% end %>
