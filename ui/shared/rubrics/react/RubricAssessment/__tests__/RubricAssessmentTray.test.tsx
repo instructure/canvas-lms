@@ -30,6 +30,7 @@ describe('RubricAssessmentTray Tests', () => {
         rubric={RUBRIC_DATA}
         rubricAssessmentData={[]}
         onDismiss={jest.fn()}
+        onSubmit={jest.fn()}
         {...props}
       />
     )
@@ -159,54 +160,9 @@ describe('RubricAssessmentTray Tests', () => {
       expect(getByTestId('traditional-criterion-2-ratings-0-selected')).toBeInTheDocument()
     })
 
-    it('should open the comments tray when the comments icon is clicked', () => {
-      const {getByTestId, queryByTestId} = renderComponent()
-      const commentsIcon = getByTestId('rubric-comment-button-1')
-      expect(queryByTestId('comment-text-area-1')).toBeNull()
-
-      fireEvent.click(commentsIcon)
-
-      expect(getByTestId('comment-text-area-1')).toBeInTheDocument()
-    })
-
-    it('should close the comments tray when the comments icon is clicked again', () => {
-      const {getByTestId, queryByTestId} = renderComponent()
-      const commentsIcon = getByTestId('rubric-comment-button-1')
-      fireEvent.click(commentsIcon)
-
-      expect(getByTestId('comment-text-area-1')).toBeInTheDocument()
-
-      fireEvent.click(commentsIcon)
-
-      expect(queryByTestId('comment-text-area-1')).toBeNull()
-    })
-
-    it('should disable the toggle comment button when there is existing comments for criteria', () => {
-      const rubricAssessmentData = [
-        {
-          criterionId: '1',
-          points: 4,
-          comments: 'existing comments',
-          id: '1',
-          commentsEnabled: true,
-          description: 'description',
-        },
-      ]
-      const {getByTestId} = renderComponent({rubricAssessmentData})
-      const commentsIcon = getByTestId('rubric-comment-button-1')
-      expect(commentsIcon).toBeDisabled()
-    })
-
-    it('should disable the toggle comment button after comments are added and blurred', () => {
+    it('should display the comments section', () => {
       const {getByTestId} = renderComponent()
-      const commentsIcon = getByTestId('rubric-comment-button-1')
-      fireEvent.click(commentsIcon)
-
-      const textArea = getByTestId('comment-text-area-1') as HTMLTextAreaElement
-      fireEvent.change(textArea, {target: {value: 'new comments'}})
-      fireEvent.blur(textArea)
-
-      expect(commentsIcon).toBeDisabled()
+      expect(getByTestId('comment-text-area-1')).toBeInTheDocument()
     })
 
     describe('Free Form Comments', () => {

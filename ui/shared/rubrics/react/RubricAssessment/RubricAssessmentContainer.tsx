@@ -177,7 +177,7 @@ export const RubricAssessmentContainer = ({
             {renderViewContainer()}
           </View>
         </Flex.Item>
-        {!isPreviewMode && (
+        {!isPreviewMode && onSubmit && (
           <Flex.Item as="footer">
             <AssessmentFooter onSubmit={onSubmit} />
           </Flex.Item>

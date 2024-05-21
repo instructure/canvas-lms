@@ -510,7 +510,7 @@ export const RubricForm = ({rootOutcomeGroup}: RubricFormComponentProp) => {
       />
       <RubricAssessmentTray
         isOpen={isPreviewTrayOpen}
-        isPreviewMode={true}
+        isPreviewMode={false}
         rubric={rubricForm}
         rubricAssessmentData={[]}
         onDismiss={() => setIsPreviewTrayOpen(false)}

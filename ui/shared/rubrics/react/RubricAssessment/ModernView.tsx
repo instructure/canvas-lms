@@ -29,6 +29,7 @@ import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '
 import {TextArea} from '@instructure/ui-text-area'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {CommentLibrary} from './CommentLibrary'
+import {CriteriaReadonlyComment} from './CriteriaReadonlyComment'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
@@ -59,7 +60,7 @@ export const ModernView = ({
   onUpdateAssessmentData,
 }: ModernViewProps) => {
   return (
-    <View as="div" margin="0">
+    <View as="div" margin="0" overflowX="hidden">
       {criteria.map((criterion, index) => {
         const criterionAssessment = rubricAssessmentData.find(
           data => data.criterionId === criterion.id
@@ -282,20 +283,19 @@ export const CriterionRow = ({
           </Flex>
         ) : (
           <Flex direction="column">
-            <Flex.Item>
-              <Text weight="bold">{I18n.t('Comment')}</Text>
-            </Flex.Item>
             <Flex.Item margin="x-small 0 0 0" shouldGrow={true}>
-              <TextArea
-                label={<ScreenReaderContent>{I18n.t('Criterion Comment')}</ScreenReaderContent>}
-                readOnly={isPreviewMode}
-                data-testid={`modern-comment-area-${criterion.id}`}
-                width="100%"
-                height="38px"
-                value={commentText}
-                onChange={e => setCommentText(e.target.value)}
-                onBlur={e => updateAssessmentData({comments: e.target.value})}
-              />
+              {isPreviewMode ? (
+                <CriteriaReadonlyComment commentText={commentText} />
+              ) : (
+                <TextArea
+                  label={I18n.t('Comment')}
+                  size="small"
+                  value={commentText}
+                  onChange={e => setCommentText(e.target.value)}
+                  onBlur={() => updateAssessmentData({comments: commentText})}
+                  placeholder={I18n.t('Leave a comment')}
+                />
+              )}
             </Flex.Item>
           </Flex>
         )}
