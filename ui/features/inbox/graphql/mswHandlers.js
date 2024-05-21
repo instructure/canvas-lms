@@ -784,3 +784,61 @@ export const handlers = [
     })
   }),
 ]
+
+export const inboxSettingsHandlers = version => [
+  graphql.query('GetMyInboxSettings', () => {
+    const VERSION_THAT_RETURNS_INBOX_SETTINGS_WITH_OOO_ENABLED = 2
+    const data = {
+      myInboxSettings: {
+        _id: '1',
+        useSignature: false,
+        signature: 'My signature',
+        useOutOfOffice: false,
+        outOfOfficeFirstDate: null,
+        outOfOfficeLastDate: null,
+        outOfOfficeSubject: 'OOO Subject',
+        outOfOfficeMessage: 'OOO Message',
+        __typename: 'InboxSettings',
+      },
+    }
+
+    if (version === VERSION_THAT_RETURNS_INBOX_SETTINGS_WITH_OOO_ENABLED) {
+      data.myInboxSettings.useOutOfOffice = true
+    }
+
+    return HttpResponse.json({data})
+  }),
+
+  graphql.mutation('UpdateMyInboxSettings', () => {
+    const VERSION_THAT_RETURNS_INBOX_SETTINGS_MUTATION_ERROR = 1
+    const data = {
+      updateMyInboxSettings: {
+        myInboxSettings: {
+          _id: '1',
+          useSignature: true,
+          signature: 'My signature updated',
+          useOutOfOffice: true,
+          outOfOfficeFirstDate: null,
+          outOfOfficeLastDate: null,
+          outOfOfficeSubject: 'OOO Subject',
+          outOfOfficeMessage: 'OOO Message',
+          __typename: 'InboxSettings',
+        },
+        errors: null,
+        __typename: 'UpdateMyInboxSettingsPayload',
+      },
+    }
+
+    if (version === VERSION_THAT_RETURNS_INBOX_SETTINGS_MUTATION_ERROR) {
+      data.updateMyInboxSettings.errors = [
+        {
+          attribute: 'message',
+          message: 'GraphQL Error',
+          __typename: 'NetworkError',
+        },
+      ]
+    }
+
+    return HttpResponse.json({data})
+  }),
+]
