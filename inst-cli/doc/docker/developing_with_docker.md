@@ -84,7 +84,7 @@ Running tests in Canvas works best after `inst canvas setup`.
 ### Running Ruby tests
 
 ```bash
-$ docker-compose exec canvas-web bundle exec rspec spec
+$ docker compose exec web bundle exec rspec spec
 ```
 
 ### Running javascript tests
@@ -92,14 +92,14 @@ $ docker-compose exec canvas-web bundle exec rspec spec
 First add `docker-compose/js-tests.override.yml` to your `COMPOSE_FILE` var in `.env`. Then prepare that container with:
 
 ```bash
-docker-compose run --rm js-tests yarn install
+docker compose run --rm js-tests yarn install
 ```
 
 If you run into issues with `yarn install`, either during initial setup or after updating master, try to fix it with a `nuke_node`:
 
 ```bash
-docker-compose run --rm js-tests ./script/nuke_node.sh
-docker-compose run --rm js-tests yarn install
+docker compose run --rm js-tests ./script/nuke_node.sh
+docker compose run --rm js-tests yarn install
 ```
 
 #### QUnit Karma Tests in Headless Chrome
@@ -107,20 +107,20 @@ docker-compose run --rm js-tests yarn install
 Run all QUnit tests in watch mode with:
 
 ```bash
-docker-compose up js-tests
+docker compose up js-tests
 ```
 
 Or, if you're iterating on something and want to just run a targeted test file in watch mode, set the `JSPEC_PATH` env var, e.g.:
 
 ```bash
 export JSPEC_PATH=spec/coffeescripts/util/deparamSpec.js
-docker-compose up js-tests
+docker compose up js-tests
 ```
 
 To run a targeted test without watch mode:
 
 ```bash
-docker-compose run --rm -e JSPEC_PATH=spec/coffeescripts/util/deparamSpec.js js-tests yarn test:karma:headless
+docker compose run --rm -e JSPEC_PATH=spec/coffeescripts/util/deparamSpec.js js-tests yarn test:karma:headless
 ```
 
 #### Jest Tests
@@ -128,19 +128,19 @@ docker-compose run --rm -e JSPEC_PATH=spec/coffeescripts/util/deparamSpec.js js-
 Run all Jest tests with:
 
 ```bash
-docker-compose run --rm js-tests yarn test:jest
+docker compose run --rm js-tests yarn test:jest
 ```
 
 Or run a targeted subset of tests:
 
 ```bash
-docker-compose run --rm js-tests yarn test:jest ui/features/speed_grader/react/__tests__/CommentArea.test.js
+docker compose run --rm js-tests yarn test:jest ui/features/speed_grader/react/__tests__/CommentArea.test.js
 ```
 
 To run a targeted subset of tests in watch mode, use `test:jest:watch` and specify the paths to the test files as one or more arguments, e.g.:
 
 ```bash
-docker-compose run --rm js-tests yarn test:jest:watch ui/features/speed_grader/react/__tests__/CommentArea.test.js
+docker compose run --rm js-tests yarn test:jest:watch ui/features/speed_grader/react/__tests__/CommentArea.test.js
 ```
 
 ### Selenium
@@ -153,10 +153,10 @@ For M1 Mac users using Chrome, the official selenium images are not ARM compatib
 image: seleniarm/standalone-chromium
 ```
 
-The container used to run the selenium browser is only started when spinning up all docker-compose containers, or when specified explicitly. The selenium container needs to be started before running any specs that require selenium. Select a browser to run in selenium through `config/selenium.yml` and then ensure that only the corresponding browser is configured in `docker-compose/selenium.override.yml`.
+The container used to run the selenium browser is only started when spinning up all docker compose containers, or when specified explicitly. The selenium container needs to be started before running any specs that require selenium. Select a browser to run in selenium through `config/selenium.yml` and then ensure that only the corresponding browser is configured in `docker-compose/selenium.override.yml`.
 
 ```bash
-docker-compose up -d selenium-hub
+docker compose up -d selenium-hub
 ```
 
 With the container running, you should be able to open a VNC session:
@@ -170,7 +170,7 @@ open vnc://secret:secret@localhost:5902   # (edge)
 Now just run your choice of selenium specs:
 
 ```bash
-docker-compose exec canvas-web bundle exec rspec spec/selenium/dashboard/dashboard_spec.rb
+docker compose exec web bundle exec rspec spec/selenium/dashboard/dashboard_spec.rb
 ```
 
 ### Capturing Rails Logs and Screenshots
@@ -181,7 +181,7 @@ Server Error`. To see the actual stack trace that led to the 500 response, you
 have to look at the rails logs. One way to do that is to just view
 `/usr/src/app/log/test.log` after the fact, or `tail -f` it during the run.
 Note that the log directory is a non-synchronized volume mount, so you need to
-actually view it from inside the `canvas-web` container rather than just on your
+actually view it from inside the `web` container rather than just on your
 native host.
 
 But here's a hot tip -- you can capture the portion of the rails log that
@@ -189,14 +189,14 @@ corresponds to each failed spec, plus a screenshot of the page at the time of
 the failure, by running your specs with the `spec/spec.opts` options like:
 
 ```sh
-docker-compose exec canvas-web bundle exec rspec --options spec/spec.opts spec/selenium/dashboard/dashboard_spec.rb
+docker compose exec web bundle exec rspec --options spec/spec.opts spec/selenium/dashboard/dashboard_spec.rb
 ```
 
 This will produce a `log/spec_failures` directory in the container, which you
 can then `docker cp` to your host to view in a browser:
 
 ```sh
-docker cp "$(docker-compose ps -q canvas-web | head -1)":/usr/src/app/log/spec_failures .
+docker cp "$(docker compose ps -q web | head -1)":/usr/src/app/log/spec_failures .
 open -a "Google Chrome" file:///"$(pwd)"/spec_failures
 ```
 
@@ -211,7 +211,7 @@ This feature is not yet supported.
 
 ### Mail Catcher
 
-To enable Mail Catcher: Add `docker-compose/mailcatcher.override.yml` to your `COMPOSE_FILE` var in `.env`. Then you can `docker-compose up mailcatcher`.
+To enable Mail Catcher: Add `docker-compose/mailcatcher.override.yml` to your `COMPOSE_FILE` var in `.env`. Then you can `docker compose up mailcatcher`.
 
 Email is often sent through background jobs in the jobs container. If you would like to test or preview any notifications, simply trigger the email through its normal actions, and it should immediately show up in the emulated webmail inbox available here: <http://mailcatcher.inseng.test>
 
@@ -258,32 +258,32 @@ Edit `.env`
 COMPOSE_FILE=<CURRENT_VALUE>:inst-cli/docker-compose/storybook.override.yml
 ```
 
-`inst proxy up` if you haven't already, then `docker-compose up storybook` and open <http://canvas-storybook.inseng.test> in your browser.
+`inst proxy up` if you haven't already, then `docker compose up storybook` and open <http://canvas-storybook.inseng.test> in your browser.
 
 ## Tips
 
-It will likely be helpful to alias the various docker-compose commands like `docker-compose run --rm canvas-web` because that can get tiring to type over and over. Here are some recommended aliases you can add to your `~/.bash_profile` and reload your Terminal.
+It will likely be helpful to alias the various docker compose commands like `docker compose run --rm web` because that can get tiring to type over and over. Here are some recommended aliases you can add to your `~/.bash_profile` and reload your Terminal.
 
 ```bash
-alias dc='docker-compose'
-alias dcu='docker-compose up'
-alias dce='docker-compose exec'
-alias dcex='docker-compose exec canvas-web bundle exec'
-alias dcr='docker-compose run --rm canvas-web'
-alias dcrx='docker-compose run --rm canvas-web bundle exec'
+alias dc='docker compose'
+alias dcu='docker compose up'
+alias dce='docker compose exec'
+alias dcex='docker compose exec web bundle exec'
+alias dcr='docker compose run --rm web'
+alias dcrx='docker compose run --rm web bundle exec'
 ```
 
 Now you can just run commands like `dcex rake db:migrate` or `dcr bundle install`
 
 ## Troubleshooting
 
-### Building the canvas-web Docker container
+### Building the web Docker container
 
 If you get an error about some gems requiring a newer ruby, you may have to change `2.4-xenial` to `2.5` in the `FROM` line in Dockerfile.
 
 ### Permissions
 
-If you are having trouble running the `canvas-web` container, make sure that permissions on the directory are permissive.  You can try the owner change (less disruptive):
+If you are having trouble running the Canvas `web` container, make sure that permissions on the directory are permissive.  You can try the owner change (less disruptive):
 
 ```bash
 chown -R 1000:1000 canvas-lms
@@ -321,14 +321,14 @@ SELINUX=disabled
 
 ### Performance
 
-If you are having performance or other issues with your canvas-web container starting up, you may try adding `DISABLE_SPRING: 1` to your `docker-compose.override.yml` file, like so:
+If you are having performance or other issues with your Canvas web container starting up, you may try adding `DISABLE_SPRING: 1` to your `docker-compose.override.yml` file, like so:
 
 ```bash
-canvas-web: &WEB
+web: &WEB
   environment:
     DISABLE_SPRING: 1
 ```
 
 Sometimes, very poor performance (or not loading at all) can be due to webpack problems. Running
-`docker-compose exec canvas-web bundle exec rake canvas:compile_assets` again, or
-`docker-compose exec canvas-web bundle exec rake js:webpack_development` again, may help.
+`docker compose exec web bundle exec rake canvas:compile_assets` again, or
+`docker compose exec web bundle exec rake js:webpack_development` again, may help.
