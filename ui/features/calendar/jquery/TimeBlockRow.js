@@ -22,6 +22,7 @@ import timeBlockRowTemplate from '../jst/TimeBlockRow.handlebars'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import datePickerFormat from '@canvas/datetime/datePickerFormat'
 import '../fcMomentHandlebarsHelpers' // make sure fcMomentToString and fcMomentToDateString are available to TimeBlockRow.handlebars
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('calendar')
 
@@ -46,12 +47,19 @@ export default class TimeBlockRow {
     this.$start_time = this.$row.find("input[name='start_time']")
     this.$end_time = this.$row.find("input[name='end_time']")
 
-    const $date_field = this.$date.date_field({
+    renderDatetimeField(this.$date, {
+      dateOnly: true,
       datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))},
     })
-    $date_field.change(this.validate)
-    this.$start_time.time_field().change(this.validate)
-    this.$end_time.time_field().change(this.validate)
+    this.$date.change(this.validate)
+    renderDatetimeField($(this.$start_time), {
+      timeOnly: true,
+    })
+    this.$start_time.change(this.validate)
+    renderDatetimeField($(this.$end_time), {
+      timeOnly: true,
+    })
+    this.$end_time.change(this.validate)
 
     if (this.locked) this.$row.find('button').prop('disabled', true)
 

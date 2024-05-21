@@ -25,6 +25,7 @@ import '@canvas/util/templateData'
 import replaceTags from '@canvas/util/replaceTags'
 import {underscoreString} from '@canvas/convert-case'
 import {dateString} from '@canvas/datetime/date-functions'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('terms.index')
 
@@ -40,12 +41,14 @@ $(document).ready(() => {
     event.preventDefault()
     $(this).parents('.term').addClass('editing_term')
     $(this).parents('.term').find(':text:visible:first').focus().select()
-    $(this)
+    const field = $(this)
       .parents('.term')
       .find('.date_field')
       .not('.already_has_date_field')
       .addClass('already_has_date_field')
-      .date_field()
+    renderDatetimeField(field, {
+      dateOnly: true,
+    })
   })
 
   $('.term .cancel_button').click(function () {

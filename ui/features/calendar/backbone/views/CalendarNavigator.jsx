@@ -24,6 +24,7 @@ import '@canvas/datetime/jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import CalendarNavigatorComponent from '../../react/CalendarNavigatorComponent'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 extend(CalendarNavigator, Backbone.View)
 
@@ -196,7 +197,8 @@ CalendarNavigator.prototype._onPickerClose = function () {
 CalendarNavigator.prototype._loadDateField = function () {
   // make sure our jquery key handler is called first
   this.$dateField.keydown(this._onDateFieldKey)
-  this.$dateField.date_field({
+  renderDatetimeField(this.$dateField, {
+    dateOnly: true,
     datepicker: {
       onClose: this._onPickerClose,
       onSelect: this._onPickerSelect,

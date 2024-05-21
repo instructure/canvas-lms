@@ -47,6 +47,7 @@ import {
 import {CommonEventShowError} from '@canvas/calendar/jquery/CommonEvent/CommonEvent'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import EditCalendarEventHeader from '../../react/components/EditCalendarEventHeader'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('calendar.edit')
 
@@ -345,10 +346,13 @@ export default class EditCalendarEventView extends Backbone.View {
 
   render() {
     super.render(...arguments)
-    this.$('.date_field').date_field({
+    renderDatetimeField(this.$('.date_field'), {
+      dateOnly: true,
       datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))},
     })
-    this.$('.time_field').time_field()
+    renderDatetimeField($('.time_field'), {
+      timeOnly: true,
+    })
     this.$('.date_start_end_row').each((_unused, row) => {
       const date = $('.start_date', row).first()
       const start = $('.start_time', row).first()
