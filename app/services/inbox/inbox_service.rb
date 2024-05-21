@@ -49,6 +49,14 @@ module Inbox
         )
       end
 
+      def inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+        Inbox::Repositories::InboxSettingsRepository.create_inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+      end
+
+      def users_out_of_office(user_ids:, root_account_id:, date:)
+        Inbox::Repositories::InboxSettingsRepository.get_users_out_of_office(user_ids:, root_account_id:, date:)
+      end
+
       private
 
       def create_default_inbox_settings_for_user(user_id:, root_account_id:)

@@ -313,6 +313,7 @@ class Conversation < ActiveRecord::Base
     message.author_id = current_user.id
     message.body = body
     message.generated = options[:generated] || false
+    message.automated = options[:automated] || false
     if options[:root_account_id]
       message.context_type = "Account"
       message.context_id = options[:root_account_id]
@@ -331,6 +332,12 @@ class Conversation < ActiveRecord::Base
       message.forwarded_message_ids = messages.map(&:id).join(",")
     end
     message.generate_user_note = true if options[:generate_user_note]
+
+    # Grab snapshot hash of user's inbox settings and save to message (If FF is enabled)
+    if Account.site_admin.feature_enabled?(:inbox_settings)
+      message.inbox_settings_ooo_snapshot = Inbox::InboxService.inbox_settings_ooo_snapshot(user_id: current_user.id, root_account_id: options[:root_account_id])
+    end
+
     message
   end
 

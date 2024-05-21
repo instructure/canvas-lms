@@ -133,4 +133,152 @@ describe Inbox::Repositories::InboxSettingsRepository do
       end
     end
   end
+
+  describe ".get_users_out_of_office" do
+    it "returns settings for user if they are out of office" do
+      user_settings = inbox_settings_repo.save_inbox_settings(
+        user_id:,
+        root_account_id:,
+        use_signature: true,
+        signature: "John Doe",
+        use_out_of_office: true,
+        out_of_office_first_date: Time.zone.today,
+        out_of_office_last_date: Time.zone.tomorrow,
+        out_of_office_subject: "OOO",
+        out_of_office_message: "Out of Office"
+      )
+      users_ooo = inbox_settings_repo.get_users_out_of_office(
+        user_ids: [user_id],
+        root_account_id:,
+        date: Time.zone.today
+      )
+      expect_entities_equal(user_settings, users_ooo.first)
+    end
+
+    it "returns nothing is user is not out of office" do
+      inbox_settings_repo.save_inbox_settings(
+        user_id:,
+        root_account_id:,
+        use_signature: true,
+        signature: "John Doe",
+        use_out_of_office: false,
+        out_of_office_first_date: Time.zone.today,
+        out_of_office_last_date: Time.zone.tomorrow,
+        out_of_office_subject: "OOO",
+        out_of_office_message: "Out of Office"
+      )
+      users_ooo = inbox_settings_repo.get_users_out_of_office(
+        user_ids: [user_id],
+        root_account_id:,
+        date: Time.zone.today
+      )
+      expect(users_ooo.empty?).to be_truthy
+    end
+
+    it "does not return users if current date is beyond OOO settings" do
+      inbox_settings_repo.save_inbox_settings(
+        user_id:,
+        root_account_id:,
+        use_signature: true,
+        signature: "John Doe",
+        use_out_of_office: true,
+        out_of_office_first_date: Time.zone.today,
+        out_of_office_last_date: Time.zone.tomorrow,
+        out_of_office_subject: "OOO",
+        out_of_office_message: "Out of Office"
+      )
+
+      # Move out of date range
+      Timecop.travel(3.days) do
+        users_ooo = inbox_settings_repo.get_users_out_of_office(
+          user_ids: [user_id],
+          root_account_id:,
+          date: Time.zone.today
+        )
+        expect(users_ooo.empty?).to be_truthy
+      end
+    end
+  end
+
+  describe ".create_inbox_setting_ooo_snapshot" do
+    it "hash snapshot is consistent" do
+      inbox_settings_repo.save_inbox_settings(
+        user_id:,
+        root_account_id:,
+        use_signature: true,
+        signature: "John Doe",
+        use_out_of_office: true,
+        out_of_office_first_date: Time.zone.today,
+        out_of_office_last_date: Time.zone.tomorrow,
+        out_of_office_subject: "OOO",
+        out_of_office_message: "Out of Office"
+      )
+      first_snapshot = inbox_settings_repo.create_inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+      second_snapshot = inbox_settings_repo.create_inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+
+      expect(first_snapshot == second_snapshot).to be_truthy
+    end
+
+    it "hash snapshot changes when editing relevant settings" do
+      inbox_settings_repo.save_inbox_settings(
+        user_id:,
+        root_account_id:,
+        use_signature: true,
+        signature: "John Doe",
+        use_out_of_office: true,
+        out_of_office_first_date: Time.zone.today,
+        out_of_office_last_date: Time.zone.tomorrow,
+        out_of_office_subject: "OOO",
+        out_of_office_message: "Out of Office"
+      )
+      first_snapshot = inbox_settings_repo.create_inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+
+      # Change a relevant field in the settings
+      inbox_settings_repo.save_inbox_settings(
+        user_id:,
+        root_account_id:,
+        use_signature: true,
+        signature: "John Doe",
+        use_out_of_office: true,
+        out_of_office_first_date: Time.zone.today,
+        out_of_office_last_date: Time.zone.tomorrow,
+        out_of_office_subject: "OOO - Updated",
+        out_of_office_message: "Out of Office"
+      )
+      second_snapshot = inbox_settings_repo.create_inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+
+      expect(first_snapshot != second_snapshot).to be_truthy
+    end
+
+    it "hash snapshot does not change when editing non-relevant settings" do
+      inbox_settings_repo.save_inbox_settings(
+        user_id:,
+        root_account_id:,
+        use_signature: true,
+        signature: "John Doe",
+        use_out_of_office: true,
+        out_of_office_first_date: Time.zone.today,
+        out_of_office_last_date: Time.zone.tomorrow,
+        out_of_office_subject: "OOO",
+        out_of_office_message: "Out of Office"
+      )
+      first_snapshot = inbox_settings_repo.create_inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+
+      # Change the signature (not relevant to OOO settings snapshot)
+      inbox_settings_repo.save_inbox_settings(
+        user_id:,
+        root_account_id:,
+        use_signature: true,
+        signature: "New Person",
+        use_out_of_office: true,
+        out_of_office_first_date: Time.zone.today,
+        out_of_office_last_date: Time.zone.tomorrow,
+        out_of_office_subject: "OOO",
+        out_of_office_message: "Out of Office"
+      )
+      second_snapshot = inbox_settings_repo.create_inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+
+      expect(first_snapshot == second_snapshot).to be_truthy
+    end
+  end
 end

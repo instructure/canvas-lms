@@ -21,6 +21,7 @@
 class ConversationMessage < ActiveRecord::Base
   include HtmlTextHelper
   include ConversationHelper
+  include ConversationsHelper
   include Rails.application.routes.url_helpers
   include SendToStream
   include SimpleTags::ReaderInstanceMethods
@@ -39,6 +40,7 @@ class ConversationMessage < ActiveRecord::Base
   before_create :set_root_account_ids
   after_create :generate_user_note!
   after_create :log_conversation_message_metrics
+  after_create :check_for_out_of_office_participants, unless: :automated_message?
   after_save :update_attachment_associations
 
   scope :human, -> { where("NOT generated") }
@@ -255,6 +257,22 @@ class ConversationMessage < ActiveRecord::Base
     InstStatsd::Statsd.increment(stat)
   end
 
+  def check_for_out_of_office_participants
+    if Account.site_admin.feature_enabled?(:inbox_settings) && context.enable_inbox_auto_response?
+      delay_if_production(
+        priority: Delayed::LOW_PRIORITY,
+        n_strand: ["inbox_auto_response", id]
+      ).trigger_out_of_office_auto_responses(
+        participants.map(&:id),
+        created_at,
+        author,
+        context_id,
+        context_type,
+        root_account_id.to_s
+      )
+    end
+  end
+
   attr_accessor :cc_author
 
   def author_short_name_with_shared_contexts(recipient)
@@ -315,6 +333,10 @@ class ConversationMessage < ActiveRecord::Base
 
   def forwardable?
     submission.nil?
+  end
+
+  def automated_message?
+    automated
   end
 
   def as_json(*)
