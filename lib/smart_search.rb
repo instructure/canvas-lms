@@ -148,6 +148,18 @@ module SmartSearch
       end
     end
 
+    def result_relevance(object)
+      version = object.context.try(:search_embeddings_version) || EMBEDDING_VERSION
+      case version
+      when 1
+        (100.0 * (1.0 - object.distance)).round
+      when 2
+        # this function stretches out the useful range of distances;
+        # otherwise everything would be 40-60% relevant using the old formula
+        (100.0 * ((2.0 / (1.0 + Math.exp(-18.0 * ((1.0 - object.distance)**3)))) - 1.0)).round
+      end
+    end
+
     # returns [ready, progress]
     # progress may be < 100 while ready if upgrading embeddings
     def check_course(course)
