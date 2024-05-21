@@ -1953,7 +1953,9 @@ class AccountsController < ApplicationController
                                    :students_can_create_courses_anywhere,
                                    { default_due_time: [:value] }.freeze,
                                    { conditional_release: [:value, :locked] }.freeze,
-                                   { allow_observers_in_appointment_groups: [:value] }.freeze,].freeze
+                                   { allow_observers_in_appointment_groups: [:value] }.freeze,
+                                   :enable_inbox_signature_block,
+                                   :enable_inbox_auto_response].freeze
 
   def permitted_account_attributes
     [:name,

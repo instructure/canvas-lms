@@ -84,7 +84,7 @@ describe('ComposeModalContainer', () => {
     conversation,
     selectedIds = ['1'],
     isSubmissionCommentsType = false,
-    inboxSettingsFeature = false,
+    inboxSignatureBlock = false
   } = {}) =>
     render(
       <ApolloProvider client={mswClient}>
@@ -99,7 +99,7 @@ describe('ComposeModalContainer', () => {
               conversation={conversation}
               onSelectedIdsChange={jest.fn()}
               selectedIds={selectedIds}
-              inboxSettingsFeature={inboxSettingsFeature}
+              inboxSignatureBlock={inboxSignatureBlock}
             />
           </ConversationContext.Provider>
         </AlertManagerContext.Provider>
@@ -515,8 +515,8 @@ describe('ComposeModalContainer', () => {
   })
 
   describe('Inbox Settings Loader', () => {
-    it('shows loader when inboxSettingsFeature flag is enabled', async () => {
-      const {getByText} = setup({inboxSettingsFeature: true})
+    it('shows loader when Inbox Signature Block Setting is enabled', async () => {
+      const {getByText} = setup({inboxSignatureBlock: true})
       await waitFor(() => {
         expect(getByText('Loading Inbox Settings')).toBeInTheDocument()
       })

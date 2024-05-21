@@ -32,19 +32,19 @@ type Message = {
 type Props = {
   onBodyChange: (body: string) => void
   messages: Message[]
-  inboxSettingsFeature: boolean
+  inboxSignatureBlock: boolean
   signature?: string
 }
 
 export const MessageBody = (props: Props) => {
   const signature =
-    (props.inboxSettingsFeature && props.signature && `${signatureSeparator}${props.signature}`) ||
+    (props.inboxSignatureBlock && props.signature && `${signatureSeparator}${props.signature}`) ||
     ''
 
   const {body, setBody, translating} = useContext(ModalBodyContext)
 
   useEffect(() => {
-    if (signature) setBody(body => body + signature)
+    if (signature) setBody((body: string) => body + signature)
   }, [setBody, signature])
 
   const handleBodyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
