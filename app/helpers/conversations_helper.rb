@@ -31,7 +31,8 @@ module ConversationsHelper
     domain_root_account_id:,
     media_comment_id:,
     media_comment_type:,
-    user_note:
+    user_note:,
+    automated: false
   )
     if conversation.conversation.replies_locked_for?(current_user, recipients)
       raise ConversationsHelper::RepliesLockedForUser.new(message: I18n.t("Unauthorized, unable to add messages to conversation"), status: :unauthorized, attribute: "workflow_state")
@@ -49,7 +50,8 @@ module ConversationsHelper
       recipients:,
       context_code:,
       conversation_id: conversation.conversation_id,
-      current_user:
+      current_user:,
+      session:
     )
 
     if recipients && !conversation.conversation.can_add_participants?(recipients)
@@ -75,7 +77,8 @@ module ConversationsHelper
       media_comment_id:,
       media_comment_type:,
       user_note:,
-      current_user:
+      current_user:,
+      automated:
     )
 
     if conversation.should_process_immediately?
@@ -125,7 +128,7 @@ module ConversationsHelper
     result
   end
 
-  def normalize_recipients(recipients: nil, context_code: nil, conversation_id: nil, current_user: @current_user)
+  def normalize_recipients(recipients: nil, context_code: nil, conversation_id: nil, current_user: @current_user, session: nil)
     if defined?(params)
       recipients ||= params[:recipients]
       context_code ||= params[:context_code]
@@ -224,7 +227,8 @@ module ConversationsHelper
     media_comment_id: nil,
     media_comment_type: nil,
     user_note: nil,
-    current_user: @current_user
+    current_user: @current_user,
+    automated: false
   )
     if defined?(params)
       body ||= params[:body]
@@ -241,6 +245,7 @@ module ConversationsHelper
       {
         attachment_ids:,
         forwarded_message_ids:,
+        automated:,
         root_account_id: domain_root_account_id,
         media_comment: infer_media_comment(media_comment_id, media_comment_type, domain_root_account_id, current_user),
         generate_user_note: user_note
@@ -332,6 +337,72 @@ module ConversationsHelper
         found_count += ConversationMessageParticipant.where(conversation_message_id: shard_message_ids, user_id: current_user).count
       end
       raise InvalidMessageParticipantError unless found_count == message_ids.count
+    end
+  end
+
+  def should_send_auto_response?(user, message)
+    return true if message.nil?
+
+    # Compare setting snapshots of message and current settings for user
+    # If they differ, then we need to send an automated response
+    message.inbox_settings_ooo_snapshot != Inbox::InboxService.inbox_settings_ooo_snapshot(user_id: user.id, root_account_id: message.root_account_id)
+  end
+
+  def trigger_out_of_office_auto_responses(participant_ids, date, author, context_id, context_type, root_account_id)
+    # Get inbox settings for participants that are Out of Office
+    ooo_inbox_settings = Inbox::InboxService.users_out_of_office(user_ids: participant_ids, root_account_id:, date:)
+
+    # If no one is out of office, then do not send anything
+    return if ooo_inbox_settings.empty?
+
+    ooo_inbox_settings.each do |settings|
+      ooo_message_author = User.find(settings.user_id)
+      ooo_message_recipient = author
+
+      # user should not send themselves an OOO message
+      next unless ooo_message_author.id != ooo_message_recipient.id
+
+      # Find the most recent ooo message to the recipient since ooo start date
+      last_sent_ooo_response = ConversationMessage
+                               .joins("JOIN #{ConversationParticipant.quoted_table_name} ON #{ConversationMessage.quoted_table_name}.conversation_id = #{ConversationMessage.quoted_table_name}.conversation_id")
+                               .where("automated = TRUE AND author_id = :author_id AND user_id = :user_id AND conversation_messages.root_account_ids = :root_account_ids AND created_at >= :start",
+                                      author_id: ooo_message_author.id,
+                                      user_id: ooo_message_recipient.id,
+                                      root_account_ids: root_account_ids.map(&:to_s),
+                                      start: settings.out_of_office_first_date).order("created_at DESC").limit(1).first
+
+      next unless should_send_auto_response?(ooo_message_author, last_sent_ooo_response)
+
+      conversation = ooo_message_author.initiate_conversation(
+        [author],
+        false,
+        subject: settings.out_of_office_subject,
+        context_id:,
+        context_type:
+      )
+
+      # If they have Inbox Signature enabled, then append it to message body
+      message_body = settings.out_of_office_message
+      if context.enable_inbox_signature_block? && settings.use_signature
+        message_body += ("\n\n---\n" + settings.signature)
+      end
+
+      process_response(
+        conversation:,
+        context: conversation.conversation.context,
+        current_user: ooo_message_author,
+        session: nil,
+        recipients: [ooo_message_recipient.id],
+        context_code: conversation.conversation.context&.asset_string,
+        message_ids: [],
+        body: message_body,
+        attachment_ids: [],
+        domain_root_account_id: root_account_id,
+        media_comment_id: nil,
+        media_comment_type: nil,
+        user_note: nil,
+        automated: true
+      )
     end
   end
 

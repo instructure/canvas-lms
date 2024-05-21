@@ -55,6 +55,29 @@ module Inbox
           as_entity settings
         end
 
+        def get_users_out_of_office(user_ids:, root_account_id:, date:)
+          user_ids = user_ids.map(&:to_s)
+          InboxSettingsRecord.where(
+            "user_id IN (:user_ids) AND root_account_id = :root_account_id AND use_out_of_office = TRUE AND out_of_office_first_date <= :date AND out_of_office_last_date >= :date",
+            root_account_id:,
+            date:,
+            user_ids:
+          )
+        end
+
+        def create_inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+          settings = InboxSettingsRecord.find_by(user_id:, root_account_id:)
+          # Grab specific settings to include in hash snapshot
+          ooo_first_date = settings&.out_of_office_first_date.present? ? settings.out_of_office_first_date.strftime("%FT%T%:z") : ""
+          ooo_last_date = settings&.out_of_office_last_date.present? ? settings.out_of_office_last_date.strftime("%FT%T%:z") : ""
+          ooo_subject = settings&.out_of_office_subject || ""
+          ooo_message = settings&.out_of_office_message || ""
+
+          hash_str = user_id.to_s + ooo_first_date + ooo_last_date + ooo_subject + ooo_message
+
+          hash_str.hash
+        end
+
         private
 
         def as_entity(settings)
