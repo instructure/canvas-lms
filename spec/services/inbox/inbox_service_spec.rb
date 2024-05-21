@@ -110,4 +110,49 @@ describe Inbox::InboxService do
       end
     end
   end
+
+  describe ".inbox_settings_ooo_shapshot" do
+    before do
+      Inbox::InboxService.update_inbox_settings_for_user(
+        user_id:,
+        root_account_id:,
+        use_signature: false,
+        signature: nil,
+        use_out_of_office: true,
+        out_of_office_first_date: Time.zone.today,
+        out_of_office_last_date: Time.zone.tomorrow,
+        out_of_office_subject: "OOO",
+        out_of_office_message: "Out of Office"
+      )
+    end
+
+    it "retrieves hash snaphsot of inbox settings for OOO" do
+      snapshot = Inbox::InboxService.inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+
+      expect(snapshot).not_to be_nil
+    end
+  end
+
+  describe ".users_out_of_office" do
+    it "retrieves users that are out of office" do
+      user_settings = Inbox::InboxService.update_inbox_settings_for_user(
+        user_id:,
+        root_account_id:,
+        use_signature: false,
+        signature: nil,
+        use_out_of_office: true,
+        out_of_office_first_date: Time.zone.today,
+        out_of_office_last_date: Time.zone.tomorrow,
+        out_of_office_subject: "OOO",
+        out_of_office_message: "Out of Office"
+      )
+      users_ooo = Inbox::InboxService.users_out_of_office(
+        user_ids: [user_id],
+        root_account_id:,
+        date: Time.zone.today
+      )
+
+      expect_entities_equal(user_settings, users_ooo.first)
+    end
+  end
 end
