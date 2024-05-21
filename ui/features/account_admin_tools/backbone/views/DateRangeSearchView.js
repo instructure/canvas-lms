@@ -18,7 +18,6 @@
 import Backbone from '@canvas/backbone'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/dateRangeSearch.handlebars'
-import '@canvas/datetime/jquery'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('user_date_range_search')

@@ -19,7 +19,6 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import * as tz from './index'
 import {sameDate, timeString, dateString, datetimeString} from './date-functions'
 import htmlEscape from '@instructure/html-escape'
-import './jquery/index'
 
 const I18n = useI18nScope('dates')
 

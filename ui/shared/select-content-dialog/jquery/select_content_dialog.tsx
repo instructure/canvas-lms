@@ -32,7 +32,6 @@ import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import SelectContent from '../select_content'
 import setDefaultToolValues from '../setDefaultToolValues'
 import {findLinkForService, getUserServices} from '@canvas/services/findLinkForService'
-import '@canvas/datetime/jquery' /* datetime_field */
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, ajaxJSONFiles, getFormData, errorBox */
 import 'jqueryui/dialog'

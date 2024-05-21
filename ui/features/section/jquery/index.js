@@ -20,7 +20,6 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime/jquery' /* time_field, datetime_field */
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */

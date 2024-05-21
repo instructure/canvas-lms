@@ -27,7 +27,6 @@ import Quiz from '@canvas/quizzes/backbone/models/Quiz'
 import PublishButtonView from '@canvas/publish-button-view'
 import QuizLogAuditingEventDumper from '@canvas/quiz-log-auditing/jquery/dump_events'
 import CyoeStats from '@canvas/conditional-release-stats/react/index'
-import '@canvas/datetime/jquery' /* dateString, time_field, datetime_field */
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
