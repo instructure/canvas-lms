@@ -24,6 +24,7 @@ import router from './react/router'
 import configureStore from './react/store/configureStore'
 import initialState from './react/store/initialState'
 import ready from '@instructure/ready'
+import { initializeTopNavPortal } from '@canvas/top-navigation/react/TopNavPortal'
 
 // eg: '/accounts/xxx' for anything like '/accounts/xxx/whatever`
 initialState.tabList.basePath = window.location.pathname.match(/.*accounts\/[^/]*/)[0]
@@ -60,6 +61,7 @@ function updateDocumentTitleBreadcrumbAndActiveTab(activeTab) {
   $('#breadcrumbs a:last span').text(activeTab.title)
 }
 ready(() => {
+  initializeTopNavPortal(document.getElementById('react-instui-topnav'))
   const content = document.getElementById('content')
   store.subscribe(() => {
     const tabState = store.getState().tabList
