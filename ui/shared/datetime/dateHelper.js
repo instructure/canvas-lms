@@ -18,7 +18,6 @@
 
 import {isUndefined, each} from 'lodash'
 import * as tz from './index'
-import './jquery/index'
 import {datetimeString, dateString, discussionsDatetimeString} from './date-functions'
 
 const DateHelper = {

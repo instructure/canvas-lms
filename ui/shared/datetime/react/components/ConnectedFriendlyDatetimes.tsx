@@ -24,7 +24,6 @@ import {
   datetimeString,
   friendlyDatetime,
 } from '@canvas/datetime/date-functions'
-import '../../jquery/index'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 type Props = {

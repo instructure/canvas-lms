@@ -22,7 +22,6 @@ import $ from 'jquery'
 import {tabIdFromElement} from './course_settings_helper'
 import * as tz from '@canvas/datetime'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime/jquery' /* datetimeString, date_field */
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'

@@ -21,7 +21,6 @@ import PropTypes from 'prop-types'
 import * as tz from '../../index'
 import {isDate, memoize} from 'lodash'
 import $ from 'jquery'
-import '../../jquery/index'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {
   fudgeDateForProfileTimezone,

@@ -23,7 +23,6 @@ import $ from 'jquery'
 import {each, isUndefined} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DateHelper from '@canvas/datetime/dateHelper'
-import '@canvas/datetime/jquery'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('gradingPeriodTemplate')

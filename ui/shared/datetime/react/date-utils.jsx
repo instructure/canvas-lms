@@ -18,8 +18,6 @@
 
 import moment from 'moment'
 import React from 'react'
-import '../jquery/index'
-
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {IconTimerLine} from '@instructure/ui-icons'
