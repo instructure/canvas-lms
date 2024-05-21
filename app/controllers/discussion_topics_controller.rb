@@ -696,7 +696,7 @@ class DiscussionTopicsController < ApplicationController
       @page_title = topic_page_title(@topic)
 
       js_bundle :discussion_topic_edit_v2
-      css_bundle :discussions_index, :learning_outcomes
+      css_bundle :discussions_index, :learning_outcomes, :conditional_release_editor
       render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
     else
       render :edit, layout: (params[:embed] == "true") ? "mobile_embed" : true
