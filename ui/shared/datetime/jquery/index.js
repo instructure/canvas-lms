@@ -17,23 +17,8 @@
  */
 
 import $ from 'jquery'
-import {renderDatetimeField} from './DatetimeField'
 import '@canvas/jquery-keycodes'
 import 'jqueryui/datepicker'
 import './datepicker'
-
-$.fn.date_field = function (options) {
-  options = {...options}
-  options.dateOnly = true
-  renderDatetimeField(this, options)
-  return this
-}
-
-$.fn.time_field = function (options) {
-  options = {...options}
-  options.timeOnly = true
-  renderDatetimeField(this, options)
-  return this
-}
 
 export default $

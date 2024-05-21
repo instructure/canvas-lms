@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import $ from 'jquery'
 import {shallow} from 'enzyme'
 import {render, screen} from '@testing-library/react'
 import {Spinner} from '@instructure/ui-spinner'
@@ -114,6 +115,7 @@ describe('SearchResults', () => {
   })
 
   test('shows a Spinner if requestingResults true', () => {
+    $.screenReaderFlashMessage = jest.fn()
     const wrapper = mountComponent({requestingResults: true})
     expect(wrapper.find(Spinner).exists()).toBeTruthy()
   })

@@ -146,7 +146,9 @@ export default class EditPlannerNoteDetails extends ValidatedFormView {
       },
       dateOnly: true,
     })
-    $time.time_field()
+    renderDatetimeField($time, {
+      timeOnly: true,
+    })
 
     // fill initial values of each field according to @event
     const due = fcUtil.unwrap(this.event.startDate())
