@@ -23,7 +23,7 @@ module Translation
     include Aws::SageMakerRuntime
 
     def sagemaker_client
-      settings = YAML.safe_load(DynamicSettings.find(tree: :private)["translation.yml"] || "{}")
+      settings = YAML.safe_load(DynamicSettings.find(tree: :private)["sagemaker.yml"] || "{}")
       config = {
         region: settings["translation_region"] || "us-west-2"
       }

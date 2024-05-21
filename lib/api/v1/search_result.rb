@@ -33,7 +33,7 @@ module Api::V1::SearchResult
     hash["body"] = html_to_text(Context.asset_body(object))
     hash["html_url"] = polymorphic_url([object.context, object])
     hash["distance"] = object.try(:distance)
-
+    hash["relevance"] = SmartSearch.result_relevance(object)
     hash
   end
 end

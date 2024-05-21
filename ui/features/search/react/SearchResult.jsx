@@ -44,10 +44,6 @@ const preview = (body, maxLength = 512) => {
   return preview.join(' ') + '...'
 }
 
-const relevance = distance => {
-  return Math.round(100.0 * (1.0 - distance))
-}
-
 const icon_class = content_type => {
   switch (content_type) {
     case 'Assignment':
@@ -62,7 +58,7 @@ const icon_class = content_type => {
 }
 
 export default function SearchResult({onExplain, onLike, onDislike, result}) {
-  const {body, content_id, content_type, distance, html_url, readable_type, title} = result
+  const {body, content_id, content_type, relevance, html_url, readable_type, title} = result
 
   return (
     <View as="li" borderColor="primary" borderWidth="small 0 0 0" padding="medium 0">
@@ -83,14 +79,14 @@ export default function SearchResult({onExplain, onLike, onDislike, result}) {
         <Flex.Item shouldShrink={true}>
           <Flex gap="small">
             <Flex.Item as="div">
-              <Text size={'small'} weight="bold">
-                {I18n.t('%{percent}% Relevance', {percent: relevance(distance)})}
+              <Text size="small" weight="bold">
+                {I18n.t('%{percent}% Relevance', {percent: relevance})}
               </Text>
               <ProgressBar
                 meterColor="success"
                 size={'x-small'}
                 screenReaderLabel={I18n.t('Relevance')}
-                valueNow={relevance(distance)}
+                valueNow={relevance}
                 valueMax={100}
                 width={'150px'}
               />
