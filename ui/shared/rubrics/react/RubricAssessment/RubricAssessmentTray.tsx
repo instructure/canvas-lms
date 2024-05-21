@@ -146,7 +146,7 @@ export const RubricAssessmentTray = ({
           selectedViewMode={viewMode}
           onAccessorChange={onAccessorChange}
           onDismiss={onDismiss}
-          onSubmit={() => onSubmit?.(rubricAssessmentDraftData)}
+          onSubmit={onSubmit ? () => onSubmit?.(rubricAssessmentDraftData) : undefined}
           onViewModeChange={mode => setViewMode(mode)}
           onUpdateAssessmentData={onUpdateAssessmentData}
         />

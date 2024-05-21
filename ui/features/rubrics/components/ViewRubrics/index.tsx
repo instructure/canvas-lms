@@ -298,10 +298,13 @@ export const ViewRubrics = () => {
       <RubricAssessmentTray
         isLoading={isLoadingPreview}
         isOpen={isPreviewTrayOpen}
-        isPreviewMode={true}
+        isPreviewMode={false}
         rubric={rubricPreview}
         rubricAssessmentData={[]}
-        onDismiss={() => setIsPreviewTrayOpen(false)}
+        onDismiss={() => {
+          setRubricIdForPreview(undefined)
+          setIsPreviewTrayOpen(false)
+        }}
       />
 
       <UsedLocationsModal

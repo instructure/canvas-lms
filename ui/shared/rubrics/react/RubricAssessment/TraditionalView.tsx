@@ -22,16 +22,16 @@ import {colors} from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {IconChatLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
-import {Link} from '@instructure/ui-link'
 import {possibleString} from '../Points'
 import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '../types/rubric'
 import {Grid} from '@instructure/ui-grid'
 import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {CommentLibrary} from './CommentLibrary'
+import {CriteriaReadonlyComment} from './CriteriaReadonlyComment'
+import {Button} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 const {licorice} = colors
@@ -165,7 +165,6 @@ const CriterionRow = ({
   rubricSavedComments,
 }: CriterionRowProps) => {
   const [hoveredRatingIndex, setHoveredRatingIndex] = useState<number>()
-  const [isCommentsOpen, setIsCommentsOpen] = useState(hidePoints)
   const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
   const [isSaveCommentChecked, setIsSaveCommentChecked] = useState(false)
 
@@ -183,12 +182,27 @@ const CriterionRow = ({
   }
 
   useEffect(() => {
-    if (criterionAssessment?.comments?.length && !isFreeFormCriterionComments) {
-      setIsCommentsOpen(true)
-    }
-
     setCommentText(criterionAssessment?.comments ?? '')
   }, [criterionAssessment, isFreeFormCriterionComments])
+
+  const setPoints = (value: string) => {
+    const points = Number(value)
+
+    if (!value.trim().length || Number.isNaN(points)) {
+      updateAssessmentData({points: undefined})
+      return
+    }
+
+    const selectedRating = criterion.ratings.find(rating => rating.points === points)
+
+    updateAssessmentData({
+      points,
+      description: selectedRating?.description,
+    })
+  }
+
+  const hideComments =
+    isFreeFormCriterionComments || (isPreviewMode && !criterionAssessment?.comments?.length)
 
   return (
     <View as="div" maxWidth="100%">
@@ -374,7 +388,6 @@ const CriterionRow = ({
                             </Flex.Item>
                           </Flex>
                         </View>
-                        {/* </Flex.Item> */}
                       </Grid.Col>
                     )
                   })}
@@ -392,88 +405,67 @@ const CriterionRow = ({
               height="13.75rem"
               overflowY="auto"
             >
-              {isFreeFormCriterionComments ? (
-                <Flex direction="column" height="100%">
-                  <div style={{display: 'flex', alignItems: 'center'}}>
-                    <Flex.Item margin="small 0 0 0">
-                      <TextInput
-                        renderLabel={
-                          <ScreenReaderContent>{I18n.t('Criterion Score')}</ScreenReaderContent>
-                        }
-                        readOnly={isPreviewMode}
-                        data-testid={`comment-score-${criterion.id}`}
-                        placeholder="--"
-                        width="2.688rem"
-                        height="2.375rem"
-                        value={criterionAssessment?.points?.toString() || ''}
-                        onChange={e => {
-                          e.target.value
-                            ? updateAssessmentData({points: Number(e.target.value)})
-                            : updateAssessmentData({points: undefined})
-                        }}
-                        onBlur={e => {
-                          e.target.value
-                            ? updateAssessmentData({points: Number(e.target.value)})
-                            : updateAssessmentData({points: undefined})
-                        }}
-                      />
-                    </Flex.Item>
-                    <Flex.Item margin="small 0 0 x-small">
-                      <Text>{'/' + possibleString(criterion.points)}</Text>
-                    </Flex.Item>
-                  </div>
-                </Flex>
-              ) : (
-                <Flex direction="column" height="100%">
-                  <Flex.Item shouldGrow={true}>
-                    <Text>{!hidePoints && possibleString(criterion.points)}</Text>
+              <Flex direction="column" height="100%">
+                <div style={{display: 'flex', alignItems: 'center'}}>
+                  <Flex.Item margin="small 0 0 0">
+                    <TextInput
+                      renderLabel={
+                        <ScreenReaderContent>{I18n.t('Criterion Score')}</ScreenReaderContent>
+                      }
+                      readOnly={isPreviewMode}
+                      data-testid={`comment-score-${criterion.id}`}
+                      placeholder="--"
+                      width="2.688rem"
+                      height="2.375rem"
+                      value={criterionAssessment?.points?.toString() || ''}
+                      onChange={e => setPoints(e.target.value)}
+                      onBlur={e => setPoints(e.target.value)}
+                    />
                   </Flex.Item>
-                  <Flex.Item>
-                    <View as="div" position="relative" padding="0 0 x-small 0">
-                      <Link
-                        forceButtonRole={true}
-                        isWithinText={false}
-                        disabled={(criterionAssessment?.comments?.length ?? 0) > 0}
-                        data-testid={`rubric-comment-button-${criterion.id}`}
-                        onClick={() => setIsCommentsOpen(!isCommentsOpen)}
-                      >
-                        <IconChatLine />
-                        <View as="span" margin="0 0 0 xx-small">
-                          <Text size="small">Comment</Text>
-                        </View>
-                      </Link>
-                    </View>
+                  <Flex.Item margin="small 0 0 x-small">
+                    <Text>{'/' + possibleString(criterion.points)}</Text>
                   </Flex.Item>
-                </Flex>
-              )}
+                </div>
+              </Flex>
             </View>
           </Flex.Item>
         )}
       </Flex>
-      {isCommentsOpen && !isFreeFormCriterionComments && (
+      {!hideComments && (
         <View
           as="div"
-          padding="small medium"
+          padding="small"
           width="100%"
           borderWidth="0 small small small"
           themeOverride={{paddingMedium: '1.125rem'}}
         >
-          <Flex>
-            <Flex.Item margin="0 small 0 0">
-              <IconChatLine size="small" themeOverride={{sizeSmall: '1.125rem'}} />
-            </Flex.Item>
-            <Flex.Item shouldGrow={true}>
-              <TextArea
-                label={<ScreenReaderContent>{I18n.t('Criterion Comment')}</ScreenReaderContent>}
-                placeholder={I18n.t('Comment')}
-                readOnly={isPreviewMode}
-                data-testid={`comment-text-area-${criterion.id}`}
-                width="100%"
-                value={commentText}
-                onChange={e => setCommentText(e.target.value)}
-                onBlur={e => updateAssessmentData({comments: e.target.value})}
-              />
-            </Flex.Item>
+          <Flex direction="row-reverse">
+            {isPreviewMode ? (
+              <Flex.Item shouldGrow={true}>
+                <CriteriaReadonlyComment commentText={commentText} />
+              </Flex.Item>
+            ) : (
+              <>
+                <Flex.Item>
+                  <View margin="0 0 0 small" themeOverride={{marginSmall: '1rem'}}>
+                    <Button color="secondary" onClick={() => setCommentText('')}>
+                      {I18n.t('Clear')}
+                    </Button>
+                  </View>
+                </Flex.Item>
+                <Flex.Item shouldGrow={true}>
+                  <TextArea
+                    label={I18n.t('Comment')}
+                    placeholder={I18n.t('Leave a comment')}
+                    data-testid={`comment-text-area-${criterion.id}`}
+                    width="100%"
+                    value={commentText}
+                    onChange={e => setCommentText(e.target.value)}
+                    onBlur={e => updateAssessmentData({comments: e.target.value})}
+                  />
+                </Flex.Item>
+              </>
+            )}
           </Flex>
         </View>
       )}
