@@ -123,18 +123,18 @@
           <h4 id="anonymous_section_header">{{#t}}Anonymous Discussion{{/t}}</h4>
           <div style="margin: 0 0 20px 0;">
             <label class="radio" style="display: block;">
-              <input type="radio" name="anonymous_state" value=null {{checkedIfNullOrUndef anonymousState}} {{#if
-                isEditing}}disabled{{/if}} />
+              <input type="radio" name="anonymous_state" value=null {{checkedIfNullOrUndef anonymousState}} {{#unless 
+                allowAnonymousEdit}}disabled{{/unless}} />
               {{#t}}Off: student names and profile pictures will be visible to other members of this course{{/t}}
             </label>
             <label class="radio" style="display: block;">
               <input type="radio" name="anonymous_state" value="partial_anonymity" {{checkedIf
-                anonymousState "partial_anonymity" }} {{#if isEditing}}disabled{{/if}} />
+                anonymousState "partial_anonymity" }} {{#unless allowAnonymousEdit}}disabled{{/unless}} />
               {{#t}}Partial: students can choose to reveal their name and profile picture{{/t}}
             </label>
             <label class="radio" style="display: block;">
               <input type="radio" name="anonymous_state" value="full_anonymity" {{checkedIf
-                anonymousState "full_anonymity" }} {{#if isEditing}}disabled{{/if}} />
+                anonymousState "full_anonymity" }} {{#unless allowAnonymousEdit}}disabled{{/unless}} />
               {{#t}}Full: student names and profile pictures will be hidden{{/t}}
             </label>
           </div>

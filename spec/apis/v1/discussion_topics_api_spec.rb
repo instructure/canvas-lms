@@ -510,23 +510,24 @@ describe DiscussionTopicsController, type: :request do
       expect(@topic["anonymous_state"]).to eq "full_anonymity"
     end
 
-    it "update to anonymous_state returns 403" do
+    it "update to anonymous_state returns 200 if there is no reply" do
       api_call(:put,
                "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
                { anonymous_state: nil },
                {},
-               { expected_status: 400 })
+               { expected_status: 200 })
     end
 
-    it "not able to update the anonymous state of an existing topic" do
+    it "able to update the anonymous state of an existing topic if there is no reply" do
       api_call(:put,
                "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
-               { anonymous_state: nil },
+               { anonymous_state: "partial_anonymity" },
                {},
-               { expected_status: 400 })
-      expect(@topic["anonymous_state"]).to eq "full_anonymity"
+               { expected_status: 200 })
+      @topic.reload
+      expect(@topic["anonymous_state"]).to eq "partial_anonymity"
     end
 
     context "student permissions" do
@@ -628,6 +629,22 @@ describe DiscussionTopicsController, type: :request do
                  } },
                {},
                { expected_status: 400 })
+    end
+
+    it "not able to update the anonymous state if there is at least 1 reply" do
+      @entry = create_entry(@topic, message: "top-level entry")
+      @reply = create_reply(@entry, message: "test reply")
+      @topic.anonymous_state = "full_anonymity"
+      @topic.save!
+      api_call(:put,
+               "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+               { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
+               { anonymous_state: nil },
+               {},
+               { expected_status: 400 })
+
+      @topic.reload
+      expect(@topic["anonymous_state"]).to eq "full_anonymity"
     end
   end
 
