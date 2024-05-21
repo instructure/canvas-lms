@@ -37,6 +37,7 @@ import type {
 import SpeedGraderPostGradesMenu from '../react/SpeedGraderPostGradesMenu'
 import {isGraded, isPostable} from '@canvas/grading/SubmissionHelper'
 import JQuerySelectorCache from '../JQuerySelectorCache'
+import '@canvas/jquery-keycodes'
 
 const selectors = new JQuerySelectorCache()
 

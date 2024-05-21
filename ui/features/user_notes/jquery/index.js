@@ -24,6 +24,7 @@ import '@canvas/loading-image'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-pageless'
+import '@canvas/jquery-keycodes'
 import {raw} from '@instructure/html-escape'
 
 const I18n = useI18nScope('user_notes')
