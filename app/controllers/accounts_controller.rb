@@ -299,7 +299,7 @@ class AccountsController < ApplicationController
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
-  before_action :page_has_instui_topnav, only: [:show, :users]
+  before_action :page_has_instui_topnav, only: %i[show users statistics]
 
   include Api::V1::Account
   include CustomSidebarLinksHelper
