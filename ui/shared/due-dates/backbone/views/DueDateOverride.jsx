@@ -84,7 +84,7 @@ DueDateOverrideView.prototype.render = function () {
       onSync: this.setNewOverridesCollection,
       defaultSectionId: this.model.defaultDueDateSectionId,
       overrides: this.model.overrides.models.map(model => model.toJSON().assignment_override),
-      assignmentId: this.model.assignment.get('i2d'),
+      assignmentId: this.model.assignment.get('id'),
       getAssignmentName: () => {
         const element = document.getElementById('assignment_name') ?? document.getElementById('quiz_title')
         return element?.value ?? this.model.assignment.get('name') ?? this.model.assignment.get('title')

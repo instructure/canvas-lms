@@ -28,6 +28,7 @@ import {setContainScrollBehavior} from '../utils/assignToHelper'
 import useFetchAssignees from '../utils/hooks/useFetchAssignees'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {AssigneeOption} from './Item/types'
 
 const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
 
@@ -52,15 +53,6 @@ interface Props {
   inputRef?: (inputElement: HTMLInputElement | null) => void
   onBlur?: () => void
   disabledWithGradingPeriod?: boolean
-}
-
-export interface AssigneeOption {
-  id: string
-  value: string
-  sisID?: string
-  groupCategoryId?: string
-  overrideId?: string
-  group?: string
 }
 
 const AssigneeSelector = ({
