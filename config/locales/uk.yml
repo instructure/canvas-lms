@@ -1821,6 +1821,7 @@ uk:
   add_people_7948b7da: "Додати людей"
   add_people_7ee4b2ec: "Додати людей"
   add_people_to_coursename_5ea234e1: "Додати людей до : %{courseName}"
+  add_prerequisite_6409bd9: "Додати умови"
   add_quiz_cebfa28b: "Додати контрольну роботу"
   add_quiz_ip_filter_c7b37dc5: "Додати IP-фільтри Quiz"
   add_rating_89d7fbde: "Додати рейтинг"

@@ -2266,6 +2266,7 @@ nn:
   add_people_7ee4b2ec: "Legg til personar"
   add_people_and_courses_to_canvas_5c4bfff9: "Legg til personar og emne på Canvas"
   add_people_to_coursename_5ea234e1: "Legg personar til %{courseName}"
+  add_prerequisite_6409bd9: "Legg til føresetnad"
   add_proficiency_rating_d819f6b8: "Legg til ferdigheitsnivå"
   add_quiz_cebfa28b: "Legg til ein quiz"
   add_quiz_ip_filter_c7b37dc5: "Legg til IP-filter for quizar"
