@@ -2007,6 +2007,7 @@ hu:
   add_people_7ee4b2ec: "Résztvevők hozzáadása"
   add_people_and_courses_to_canvas_5c4bfff9: "Résztvevők ék kurzusok hozzáadása a Canvashoz"
   add_people_to_coursename_5ea234e1: "Felhasználók hozzáadása a következő modulhoz:%{courseName}"
+  add_prerequisite_6409bd9: "Előfeltétel hozzáadása"
   add_proficiency_rating_d819f6b8: "Hozzáértés minősítések hozzáadása"
   add_quiz_cebfa28b: "Kvíz hozzáadása"
   add_quiz_ip_filter_c7b37dc5: "Kvíz IP szűrő hozzáadása"
