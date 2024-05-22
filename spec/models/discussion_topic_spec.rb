@@ -3253,15 +3253,39 @@ describe DiscussionTopic do
   end
 
   describe "visible_ids_by_user" do
-    describe "differentiated topics" do
-      def discussion_and_assignment(opts = {})
-        assignment = @course.assignments.create!({
-          title: "some discussion assignment",
-          submission_types: "discussion_topic"
-        }.merge(opts))
-        [assignment.discussion_topic, assignment]
-      end
+    def add_section_to_topic(topic, section)
+      topic.is_section_specific = true
+      topic.discussion_topic_section_visibilities <<
+        DiscussionTopicSectionVisibility.new(
+          discussion_topic: topic,
+          course_section: section,
+          workflow_state: "active"
+        )
+      topic.save!
+    end
 
+    def add_section_differentiation_to_topic(topic, section)
+      topic.update!(only_visible_to_overrides: true)
+      topic.assignment_overrides.create!(set: section)
+      topic.save!
+    end
+
+    def add_student_differentiation_to_topic(topic, student)
+      topic.update!(only_visible_to_overrides: true)
+      override = topic.assignment_overrides.create!
+      override.assignment_override_students.create!(user: student)
+      topic.save!
+    end
+
+    def discussion_and_assignment(opts = {})
+      assignment = @course.assignments.create!({
+        title: "some discussion assignment",
+        submission_types: "discussion_topic"
+      }.merge(opts))
+      [assignment.discussion_topic, assignment]
+    end
+
+    describe "differentiated topics" do
       before :once do
         @course = course_factory(active_course: true)
 
@@ -3300,17 +3324,6 @@ describe DiscussionTopic do
     end
 
     describe "section specific topic" do
-      def add_section_to_topic(topic, section)
-        topic.is_section_specific = true
-        topic.discussion_topic_section_visibilities <<
-          DiscussionTopicSectionVisibility.new(
-            discussion_topic: topic,
-            course_section: section,
-            workflow_state: "active"
-          )
-        topic.save!
-      end
-
       it "filters section specific topics properly" do
         course = course_factory(active_course: true)
         section1 = course.course_sections.create!(name: "test section")
@@ -3386,6 +3399,84 @@ describe DiscussionTopic do
 
         vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
         expect(vis_hash[student.id].length).to be(0)
+      end
+    end
+
+    describe "differentiated modules" do
+      before do
+        Account.site_admin.enable_feature! :differentiated_modules
+      end
+
+      it "filters based on adhoc overrides" do
+        course = course_factory(active_course: true)
+        student_specific_topic = course.discussion_topics.create!(title: "student specific topic 1")
+        student_specific_topic2 = course.discussion_topics.create!(title: "student specific topic 2")
+
+        student1 = create_users(1, return_type: :record).first
+        course.enroll_student(student1)
+        student2 = create_users(1, return_type: :record).first
+        course.enroll_student(student2)
+        course.reload
+
+        add_student_differentiation_to_topic(student_specific_topic, student1)
+        add_student_differentiation_to_topic(student_specific_topic2, student2)
+
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student1.id], item_type: :discussion)
+        expect(vis_hash[student1.id].length).to eq(1)
+        expect(vis_hash[student1.id].first).to eq(student_specific_topic.id)
+      end
+
+      it "filters based on section overrides" do
+        course = course_factory(active_course: true)
+        section1 = course.course_sections.create!(name: "test section")
+        section2 = course.course_sections.create!(name: "second test section")
+        section_specific_topic1 = course.discussion_topics.create!(title: "section specific topic 1")
+        section_specific_topic2 = course.discussion_topics.create!(title: "section specific topic 2")
+        add_section_differentiation_to_topic(section_specific_topic1, section1)
+        add_section_differentiation_to_topic(section_specific_topic2, section2)
+        student = create_users(1, return_type: :record).first
+        course.enroll_student(student, section: section1)
+        course.reload
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
+        expect(vis_hash[student.id].length).to eq(1)
+        expect(vis_hash[student.id].first).to eq(section_specific_topic1.id)
+      end
+
+      it "filters legacy section specific topics properly" do
+        course = course_factory(active_course: true)
+        section1 = course.course_sections.create!(name: "test section")
+        section2 = course.course_sections.create!(name: "second test section")
+        section_specific_topic1 = course.discussion_topics.create!(title: "section specific topic 1")
+        section_specific_topic2 = course.discussion_topics.create!(title: "section specific topic 2")
+        add_section_to_topic(section_specific_topic1, section1)
+        add_section_to_topic(section_specific_topic2, section2)
+        student = create_users(1, return_type: :record).first
+        course.enroll_student(student, section: section1)
+        course.reload
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
+        expect(vis_hash[student.id].length).to eq(1)
+        expect(vis_hash[student.id].first).to eq(section_specific_topic1.id)
+      end
+
+      it "filters graded discussions correctly" do
+        @course = course_factory(active_course: true)
+        section1 = @course.course_sections.create!(name: "Section 1")
+        section2 = @course.course_sections.create!(name: "Section 2")
+        student1 = user_factory(active_all: true)
+        student2 = user_factory(active_all: true)
+        @course.enroll_student(student1, section: section1)
+        @course.enroll_student(student2, section: section2)
+
+        # Create graded discussions with differentiation
+        discussion1 = discussion_and_assignment(only_visible_to_overrides: true).first
+        discussion2 = discussion_and_assignment(only_visible_to_overrides: true).first
+
+        create_section_override_for_assignment(discussion1.assignment, { course_section: section1 })
+        create_section_override_for_assignment(discussion2.assignment, { course_section: section2 })
+
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: @course.id, user_id: [student1.id, student2.id])
+        expect(vis_hash[student1.id]).to contain_exactly(discussion1.id)
+        expect(vis_hash[student2.id]).to contain_exactly(discussion2.id)
       end
     end
   end
