@@ -2054,4 +2054,76 @@ describe ContentMigration do
       expect(ContentMigration.find_most_recent_by_course_ids(@source_course.id, @other_course_a)&.id).to eq cm_to_a_more_recent.id
     end
   end
+
+  context "media catridge migration" do
+    include_context "course copy"
+
+    let(:success_response) { Net::HTTPSuccess.new(Net::HTTPOK, "200", "OK") }
+
+    def mig_id(obj)
+      CC::CCHelper.create_key(obj, global: true)
+    end
+
+    def og_asset(id)
+      {
+        isOriginal: 1,
+        containerFormat: "mp4",
+        fileExt: "mp4",
+        id:,
+        status: "2",
+        size: 15,
+      }
+    end
+
+    before do
+      @copy_to = @course
+      course_with_teacher(active_all: true)
+      @copy_from = @course
+      root = Folder.root_folders(@copy_from).first
+      uploaded_media_folder = root.sub_folders.create!(name: "Uploaded Media", context: @copy_from)
+      @att1 = Attachment.create!(filename: "first.webm", uploaded_data: stub_file_data("first.webm", "asdf", "video/mp4"), folder: uploaded_media_folder, context: @copy_from, media_entry_id: "m-media_id_1")
+      @att2 = Attachment.create!(filename: "second.webm", uploaded_data: stub_file_data("second.webm", "asdf", "video/mp4"), folder: uploaded_media_folder, context: @copy_from, media_entry_id: "m-media_id_2")
+      MediaObject.create!(attachment_id: @att1.id, media_id: "m-media_id_1")
+      MediaObject.create!(attachment_id: @att2.id, media_id: "m-media_id_2")
+      @copy_from.wiki_pages.create! title: "wp1", body: "<iframe data-media-type=\"audio\" data-media-id=\"#{@att1.media_entry_id}\" src=\"/media_attachments_iframe/#{@att1.id}?type=audio\"></iframe>"
+      @copy_from.wiki_pages.create! title: "wp2", body: "<iframe data-media-type=\"video\" data-media-id=\"#{@att2.media_entry_id}\" src=\"/media_attachments_iframe/#{@att2.id}?type=video\"></iframe>"
+      @kaltura = double("CanvasKaltura::ClientV3")
+      expect(CC::CCHelper).to receive(:kaltura_admin_session).and_return(@kaltura)
+      @kaltura_media_handler = instance_double("KalturaMediaFileHandler")
+      expect(@kaltura_media_handler).to receive(:add_media_files) do |_attachments, _wait_for_completion|
+        att3 = @copy_to.attachments.where(migration_id: mig_id(@att1)).first.id
+        att4 = @copy_to.attachments.where(migration_id: mig_id(@att2)).first.id
+        bulk_upload_response = {
+          entries: [
+            {
+              name: att3.filename,
+              originalId: att3.id,
+              entryId: "m-media_id_3"
+            },
+            {
+              name: att4.filename,
+              originalId: att4.id,
+              entryId: "m-media_id_4"
+            }
+          ]
+        }
+        MediaObject.build_media_objects(bulk_upload_response, @course.root_account_id)
+      end
+      expect(KalturaMediaFileHandler).to receive(:new).and_return(@kaltura_media_handler)
+      expect(CanvasKaltura::ClientV3).to receive(:config).twice.and_return({})
+    end
+
+    it "properly migrates webm embeds" do
+      run_export_and_import
+      destination_att1 = @copy_to.attachments.find_by(migration_id: mig_id(@att1))
+      destination_att2 = @copy_to.attachments.find_by(migration_id: mig_id(@att2))
+      expect(destination_att1.media_entry_id).to be_truthy
+      expect(destination_att2.media_entry_id).to be_truthy
+      @zip_file = Zip::File.open(@copy_from.content_exports.last.attachment.open.path)
+      expect(@copy_to.wiki_pages.first.body).to eq("<iframe data-media-type=\"audio\" data-media-id=\"#{destination_att1.media_entry_id}\" src=\"/media_attachments_iframe/#{destination_att1.id}?embedded=true&amp;type=audio\"></iframe>")
+      expect(@copy_to.wiki_pages.last.body).to eq("<iframe data-media-type=\"video\" data-media-id=\"#{destination_att2.media_entry_id}\" src=\"/media_attachments_iframe/#{destination_att2.id}?embedded=true&amp;type=video\"></iframe>")
+      expect(@zip_file.find_entry("web_resources/Uploaded Media/first.webm")).not_to be_nil
+      expect(@zip_file.find_entry("web_resources/Uploaded Media/second.webm")).not_to be_nil
+    end
+  end
 end
