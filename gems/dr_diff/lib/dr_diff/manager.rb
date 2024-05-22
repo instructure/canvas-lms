@@ -45,6 +45,10 @@ module DrDiff
     extend Forwardable
     def_delegators :@git, :wip?, :changes
 
+    def parsed_diff
+      @parsed_diff ||= DiffParser.new(git.diff, raw: true, campsite:)&.diff
+    end
+
     def files(regex = /./)
       all_files = git.files.split("\n")
 

@@ -6,7 +6,7 @@ module TatlTael
     class SeleniumSpecsLinter < BaseLinter
       attr_reader :comment
 
-      def initialize(config:, changes:, auto_correct: false)
+      def initialize(config:, changes:, auto_correct: false, diff: nil)
         super
         @comment = {
           message: config[:message],

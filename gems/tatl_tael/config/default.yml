@@ -193,3 +193,22 @@ Simple/NewErbLinter:
         css_bundle :any_css_bundles_you_want
         js_env({whatever: 'you need to put in window.ENV'})
         render :html => "".html_safe, :layout => true
+
+ByRoleLinter:
+  Severity: "warn"
+  Statuses:
+    - added
+    - modified
+  Precondition:
+    Include:
+      - "**/__tests__/*.js"
+      - "**/__tests__/*.jsx"
+      - "**/__tests__/*.ts"
+      - "**/__tests__/*.tsx"
+    Allowlist:
+      - "**/spec/**"
+  Message: |-
+    Use of byRole queries is discouraged due to performance issues.
+    Please consider using a different query such as byText or byLabelText.
+  Regexes:
+    ByRole: !ruby/regexp '/getByRole\(|findByRole\(|queryByRole\(|getAllByRole\(|findAllByRole\(|queryAllByRole\(/'
