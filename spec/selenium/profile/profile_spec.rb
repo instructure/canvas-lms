@@ -361,7 +361,9 @@ describe "profile" do
     it "saves admin profile pics setting", priority: "1" do
       site_admin_logged_in
       get "/accounts/#{Account.default.id}/settings"
-      f("#account_services_avatars").click
+      avatars = f("#account_services_avatars")
+      scroll_into_view(avatars)
+      avatars.click
       f('.Button.Button--primary[type="submit"]').click
       wait_for_ajaximations
       expect(is_checked("#account_services_avatars")).to be_truthy
