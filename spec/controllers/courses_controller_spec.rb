@@ -4683,4 +4683,21 @@ describe CoursesController do
       end
     end
   end
+
+  context "accept_enrollment" do
+    before do
+      allow(RequestCache).to receive(:clear).and_call_original
+    end
+
+    it "clears the RequestCache upon accepting an enrollment" do
+      student = user_with_pseudonym
+      course_with_teacher(active_all: true)
+      enrollment = @course.enroll_student(student)
+      user_session(student)
+
+      expect(RequestCache).to receive(:clear).exactly(3).times
+      post "enrollment_invitation", params: { course_id: @course.id, accept: "1", invitation: enrollment.uuid }
+      expect(response).to redirect_to(course_url(@course))
+    end
+  end
 end
