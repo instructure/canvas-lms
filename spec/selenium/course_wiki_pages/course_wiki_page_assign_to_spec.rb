@@ -170,32 +170,54 @@ describe "wiki pages show page assign to" do
       expect(element_exists?(assign_to_btn_selector)).to be_falsey
     end
 
-    it "shows page body for unlocked pages" do
-      @page.update!(unlock_at: 1.day.ago)
-      visit_wiki_page_view(@course.id, @page.title)
-      expect(wiki_page_body).to include_text("a very cool page body")
+    context "pages without an assignment" do
+      it "shows page body for unlocked pages" do
+        @page.update!(unlock_at: 1.day.ago)
+        visit_wiki_page_view(@course.id, @page.title)
+        expect(wiki_page_body).to include_text("a very cool page body")
+      end
+
+      it "shows lock indication for pages locked by page's unlock_at date" do
+        @page.update!(unlock_at: 1.day.from_now)
+        visit_wiki_page_view(@course.id, @page.title)
+        expect(wiki_page_body).to include_text("This page is locked until")
+        expect(wiki_page_body).not_to include_text("a very cool page body")
+      end
+
+      it "shows lock indication for pages locked by page's lock_at date" do
+        @page.update!(lock_at: 1.day.ago)
+        visit_wiki_page_view(@course.id, @page.title)
+        expect(wiki_page_body).to include_text("This page was locked")
+        expect(wiki_page_body).not_to include_text("a very cool page body")
+      end
+
+      it "shows lock indication for pages locked by student's override" do
+        ao = @page.assignment_overrides.create!(lock_at: 2.days.ago, lock_at_overridden: true)
+        ao.assignment_override_students.create!(user: @student)
+        visit_wiki_page_view(@course.id, @page.title)
+        expect(wiki_page_body).to include_text("This page was locked")
+        expect(wiki_page_body).not_to include_text("a very cool page body")
+      end
     end
 
-    it "shows lock indication for pages locked by page's unlock_at date" do
-      @page.update!(unlock_at: 1.day.from_now)
-      visit_wiki_page_view(@course.id, @page.title)
-      expect(wiki_page_body).to include_text("This page is locked until")
-      expect(wiki_page_body).not_to include_text("a very cool page body")
-    end
+    context "pages with an assignment" do
+      before :once do
+        @page.assignment = @course.assignments.create!(name: "My Page", submission_types: ["wiki_page"])
+        @page.save!
+      end
 
-    it "shows lock indication for pages locked by page's lock_at date" do
-      @page.update!(lock_at: 1.day.ago)
-      visit_wiki_page_view(@course.id, @page.title)
-      expect(wiki_page_body).to include_text("This page was locked")
-      expect(wiki_page_body).not_to include_text("a very cool page body")
-    end
+      it "shows page body for unlocked pages" do
+        @page.assignment.update!(unlock_at: 1.day.ago)
+        visit_wiki_page_view(@course.id, @page.title)
+        expect(wiki_page_body).to include_text("a very cool page body")
+      end
 
-    it "shows lock indication for pages locked by student's override" do
-      ao = @page.assignment_overrides.create!(lock_at: 2.days.ago, lock_at_overridden: true)
-      ao.assignment_override_students.create!(user: @student)
-      visit_wiki_page_view(@course.id, @page.title)
-      expect(wiki_page_body).to include_text("This page was locked")
-      expect(wiki_page_body).not_to include_text("a very cool page body")
+      it "shows lock indication for pages locked by page's assignment's unlock_at date" do
+        @page.assignment.update!(unlock_at: 1.day.from_now)
+        visit_wiki_page_view(@course.id, @page.title)
+        expect(wiki_page_body).to include_text("This page is locked until")
+        expect(wiki_page_body).not_to include_text("a very cool page body")
+      end
     end
   end
 end

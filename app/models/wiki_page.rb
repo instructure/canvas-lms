@@ -334,7 +334,7 @@ class WikiPage < ActiveRecord::Base
 
       RequestCache.cache(locked_request_cache_key(user)) do
         locked = false
-        page_for_user = overridden_for(user)
+        page_for_user = (assignment || self).overridden_for(user)
         if page_for_user.unlock_at && page_for_user.unlock_at > Time.zone.now
           locked = { object: page_for_user, unlock_at: page_for_user.unlock_at }
         elsif could_be_locked && (item = locked_by_module_item?(user, opts))
