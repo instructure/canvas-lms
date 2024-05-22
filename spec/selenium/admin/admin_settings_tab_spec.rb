@@ -70,9 +70,7 @@ describe "admin settings tab" do
     css_selectors.each do |selector|
       check_state = is_checked(selector)
       state_checker !checker, check_state
-      sel = f(selector)
-      scroll_into_view(sel)
-      sel.click
+      f(selector).click
     end
     click_submit
     if is_symbol == false
@@ -205,9 +203,7 @@ describe "admin settings tab" do
     end
 
     it "clicks on the quiz help link" do
-      link = f(".ip_help_link")
-      scroll_into_view(link)
-      link.click
+      f(".ip_help_link").click
       expect(f("#ip_filters_dialog")).to include_text "What are Quiz IP Filters?"
     end
 
@@ -217,9 +213,7 @@ describe "admin settings tab" do
 
     it "adds another quiz filter" do
       create_quiz_filter
-      link = f(".add_ip_filter_link")
-      scroll_into_view(link)
-      link.click
+      f(".add_ip_filter_link").click
       add_quiz_filter "www.canvas.instructure.com/tests", "129.186.127.12/4"
     end
 
@@ -238,9 +232,7 @@ describe "admin settings tab" do
 
     it "deletes a quiz filter" do
       filter_hash = add_quiz_filter
-      link = f("#ip_filters .delete_filter_link")
-      scroll_into_view(link)
-      link.click
+      f("#ip_filters .delete_filter_link").click
       click_submit
       expect(f("#account_settings")).not_to contain_css("#ip_filters .value[value='#{filter_hash.values.first}']")
       expect(f("#account_settings")).not_to contain_css("#ip_filters .name[value='#{filter_hash.keys.first}']")
@@ -285,9 +277,7 @@ describe "admin settings tab" do
       end
 
       before do
-        equella = f("#enable_equella")
-        scroll_into_view(equella)
-        equella.click
+        f("#enable_equella").click
       end
 
       it "adds an equella feature" do
@@ -327,9 +317,7 @@ describe "admin settings tab" do
     end
 
     it "clicks on the google help dialog" do
-      question = f("label[for='account_services_google_docs_previews'] .icon-question")
-      scroll_into_view(question)
-      question.click
+      f("label[for='account_services_google_docs_previews'] .icon-question").click
       expect(fj(".ui-dialog-title:visible")).to include_text("About Google Docs Previews")
     end
 
@@ -410,9 +398,7 @@ describe "admin settings tab" do
       get "/accounts/#{Account.default.id}/settings"
 
       set_value f(help_link_name_input), link_name
-      option = f(help_link_icon_option)
-      scroll_into_view(option)
-      option.click
+      f(help_link_icon_option).click
 
       click_submit
 
@@ -454,9 +440,7 @@ describe "admin settings tab" do
       get "/accounts/#{Account.default.id}/settings"
 
       top = f("#custom_help_link_settings .ic-Sortable-item")
-      last_button = top.find_elements(:css, "button").last
-      scroll_into_view(last_button)
-      last_button.click
+      top.find_elements(:css, "button").last.click
       wait_for_ajaximations
 
       click_submit
@@ -470,17 +454,13 @@ describe "admin settings tab" do
     it "adds a custom link" do
       Account.site_admin.enable_feature! :featured_help_links
       get "/accounts/#{Account.default.id}/settings"
-      help_options = f(".HelpMenuOptions__Container button")
-      scroll_into_view(help_options)
-      help_options.click
+      f(".HelpMenuOptions__Container button").click
       fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
       replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), "text"
       replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), "subtext"
       replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), "https://url.example.com"
       fj('#custom_help_link_settings fieldset .ic-Label:contains("Featured"):visible').click
-      link = f('#custom_help_link_settings button[type="submit"]')
-      scroll_into_view(link)
-      link.click
+      f('#custom_help_link_settings button[type="submit"]').click
       expect(fj(".ic-Sortable-item:first .ic-Sortable-item__Text")).to include_text("text")
       form = f("#account_settings")
       form.submit
@@ -501,17 +481,13 @@ describe "admin settings tab" do
     it "adds a custom link with New designation" do
       Account.site_admin.enable_feature! :featured_help_links
       get "/accounts/#{Account.default.id}/settings"
-      help_options = f(".HelpMenuOptions__Container button")
-      scroll_into_view(help_options)
-      help_options.click
+      f(".HelpMenuOptions__Container button").click
       fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
       replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), "text"
       replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), "subtext"
       replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), "https://newurl.example.com"
       fj('#custom_help_link_settings fieldset .ic-Label:contains("New"):visible').click
-      link = f('#custom_help_link_settings button[type="submit"]')
-      scroll_into_view(link)
-      link.click
+      f('#custom_help_link_settings button[type="submit"]').click
       form = f("#account_settings")
       form.submit
       cl = Account.default.help_links.detect { |hl| hl["url"] == "https://newurl.example.com" }
@@ -528,9 +504,7 @@ describe "admin settings tab" do
       a.settings[:custom_help_links] = [{ "text" => "custom-link-text-frd", "subtext" => "subtext", "url" => "https://url.example.com", "type" => "custom", "available_to" => %w[user student teacher admin] }]
       a.save!
       get "/accounts/#{Account.default.id}/settings"
-      link = fj('#custom_help_link_settings span:contains("Edit custom-link-text-frd")').find_element(:xpath, "..")
-      scroll_into_view(link)
-      link.click
+      fj('#custom_help_link_settings span:contains("Edit custom-link-text-frd")').find_element(:xpath, "..").click
       replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), "https://whatever.example.com"
       f('#custom_help_link_settings button[type="submit"]').click
       expect(fj(".ic-Sortable-item:last .ic-Sortable-item__Text")).to include_text("custom-link-text-frd")
@@ -544,9 +518,7 @@ describe "admin settings tab" do
       Setting.set("show_feedback_link", "true")
 
       get "/accounts/#{Account.default.id}/settings"
-      link = fj('#custom_help_link_settings span:contains("Edit Report a Problem")').find_element(:xpath, "..")
-      scroll_into_view(link)
-      link.click
+      fj('#custom_help_link_settings span:contains("Edit Report a Problem")').find_element(:xpath, "..").click
       url = fj('#custom_help_link_settings input[name$="[url]"]:visible')
       expect(url).to be_disabled
       fj('#custom_help_link_settings fieldset .ic-Label:contains("Teachers"):visible').click
@@ -653,9 +625,7 @@ describe "admin settings tab" do
       user_session(@admin)
       get "/accounts/#{@account.id}/settings"
       checkbox = "#account_settings_enable_as_k5_account_value"
-      box = f(checkbox)
-      scroll_into_view(box)
-      box.click
+      f(checkbox).click
       click_submit
       get "/accounts/#{@subaccount.id}/settings"
       expect(is_checked(checkbox)).to be_truthy
