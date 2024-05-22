@@ -89,7 +89,7 @@ GEM
       mime-types-data (~> 3.2015)
     mime-types-data (3.2024.0507)
     mini_portile2 (2.8.6)
-    minitest (5.23.0)
+    minitest (5.23.1)
     nokogiri (1.16.5)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)

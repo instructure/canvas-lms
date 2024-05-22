@@ -22,7 +22,7 @@ GEM
     i18n (1.14.5)
       concurrent-ruby (~> 1.0)
     mini_portile2 (2.8.6)
-    minitest (5.23.0)
+    minitest (5.23.1)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)

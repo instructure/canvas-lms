@@ -43,7 +43,7 @@ GEM
       bindata
       faraday (~> 2.0)
       faraday-follow_redirects
-    minitest (5.23.0)
+    minitest (5.23.1)
     mutex_m (0.2.0)
     net-http (0.4.1)
       uri
