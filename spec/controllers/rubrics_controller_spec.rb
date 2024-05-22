@@ -99,6 +99,16 @@ describe RubricsController do
 
         expect(response).to render_template("layouts/application")
       end
+
+      it "sets correct breadcrumbs" do
+        @course.root_account.enable_feature!(:enhanced_rubrics)
+        get "index", params: { course_id: @course.id }
+        expected_breadcrumbs = [
+          { name: "Unnamed", url: "/courses/#{@course.id}" },
+          { name: "Rubrics", url: "/courses/#{@course.id}/rubrics" },
+        ]
+        expect(assigns[:js_env][:breadcrumbs]).to eq(expected_breadcrumbs)
+      end
     end
   end
 

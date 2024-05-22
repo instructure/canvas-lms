@@ -19,16 +19,40 @@
 import React from 'react'
 import {Portal} from '@instructure/ui-portal'
 import {RubricForm} from '../components/RubricForm'
+import {RubricBreadcrumbs} from '../components/RubricBreadcrumbs'
 
 export const Component = () => {
+  const [breadcrumbMountPoint] = React.useState(
+    document.querySelector('.ic-app-crumbs-enhanced-rubrics')
+  )
+
+  React.useEffect(() => {
+    if (breadcrumbMountPoint) {
+      breadcrumbMountPoint.innerHTML = ''
+    }
+  }, [breadcrumbMountPoint])
+
+  const [rubricTitle, setRubricTitle] = React.useState('')
+
   const mountPoint: HTMLElement | null = document.querySelector('#content')
   if (!mountPoint) {
     return null
   }
 
+  const breadCrumbs = [...ENV.breadcrumbs]
+  breadCrumbs.push({name: rubricTitle, url: ''})
+
   return (
-    <Portal open={true} mountNode={mountPoint}>
-      <RubricForm rootOutcomeGroup={ENV.ROOT_OUTCOME_GROUP} />
-    </Portal>
+    <>
+      <Portal open={true} mountNode={breadcrumbMountPoint}>
+        <RubricBreadcrumbs breadcrumbs={breadCrumbs} />
+      </Portal>
+      <Portal open={true} mountNode={mountPoint}>
+        <RubricForm
+          rootOutcomeGroup={ENV.ROOT_OUTCOME_GROUP}
+          onLoadRubric={rubricTitle => setRubricTitle(rubricTitle)}
+        />
+      </Portal>
+    </>
   )
 }

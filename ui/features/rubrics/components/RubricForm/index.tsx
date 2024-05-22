@@ -100,9 +100,10 @@ const stripPTags = (htmlString: string) => {
 
 type RubricFormComponentProp = {
   rootOutcomeGroup: GroupOutcome
+  onLoadRubric?: (rubricTitle: string) => void
 }
 
-export const RubricForm = ({rootOutcomeGroup}: RubricFormComponentProp) => {
+export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponentProp) => {
   const {rubricId, accountId, courseId} = useParams()
   const navigate = useNavigate()
   const navigateUrl = accountId ? `/accounts/${accountId}/rubrics` : `/courses/${courseId}/rubrics`
@@ -284,11 +285,17 @@ export const RubricForm = ({rootOutcomeGroup}: RubricFormComponentProp) => {
   }, [outcomeDialog, outcomeDialogOpen, rootOutcomeGroup, rubricForm.criteria])
 
   useEffect(() => {
+    if (!rubricId) {
+      onLoadRubric?.(I18n.t('Create'))
+      return
+    }
+
     if (data) {
       const rubricFormData = translateRubricData(data)
       setRubricForm({...rubricFormData, accountId, courseId})
+      onLoadRubric?.(rubricFormData.title)
     }
-  }, [accountId, courseId, data])
+  }, [accountId, courseId, data, rubricId, onLoadRubric])
 
   useEffect(() => {
     if (saveSuccess) {
