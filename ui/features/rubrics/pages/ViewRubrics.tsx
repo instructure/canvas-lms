@@ -20,18 +20,34 @@ import React from 'react'
 import {Portal} from '@instructure/ui-portal'
 import {ViewRubrics} from '../components/ViewRubrics'
 import {ApolloProvider, createClient} from '@canvas/apollo'
+import {RubricBreadcrumbs} from '../components/RubricBreadcrumbs'
 
 export const Component = () => {
+  const [breadcrumbMountPoint] = React.useState(
+    document.querySelector('.ic-app-crumbs-enhanced-rubrics')
+  )
+
+  React.useEffect(() => {
+    if (breadcrumbMountPoint) {
+      breadcrumbMountPoint.innerHTML = ''
+    }
+  }, [breadcrumbMountPoint])
+
   const mountPoint: HTMLElement | null = document.querySelector('#content')
   if (!mountPoint) {
     return null
   }
 
   return (
-    <Portal open={true} mountNode={mountPoint}>
-      <ApolloProvider client={createClient()}>
-        <ViewRubrics />
-      </ApolloProvider>
-    </Portal>
+    <>
+      <Portal open={true} mountNode={breadcrumbMountPoint}>
+        <RubricBreadcrumbs breadcrumbs={ENV.breadcrumbs} />
+      </Portal>
+      <Portal open={true} mountNode={mountPoint}>
+        <ApolloProvider client={createClient()}>
+          <ViewRubrics />
+        </ApolloProvider>
+      </Portal>
+    </>
   )
 }

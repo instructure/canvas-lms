@@ -42,6 +42,8 @@ class RubricsController < ApplicationController
     set_tutorial_js_env
 
     if @domain_root_account.feature_enabled?(:enhanced_rubrics)
+      js_env breadcrumbs: rubric_breadcrumbs
+
       return show_rubrics_redesign
     end
 
@@ -66,6 +68,8 @@ class RubricsController < ApplicationController
       mastery_scales_js_env
 
       if is_enhanced_rubrics
+        js_env breadcrumbs: rubric_breadcrumbs
+
         return show_rubrics_redesign
       end
 
@@ -81,6 +85,11 @@ class RubricsController < ApplicationController
   def show_rubrics_redesign
     css_bundle :learning_outcomes
     render html: "".html_safe, layout: true
+  end
+
+  def rubric_breadcrumbs
+    breadcrumbs = crumbs[1..]&.map { |crumb| { name: crumb[0], url: crumb[1] } }
+    breadcrumbs << { name: t("Rubrics"), url: context_url(@context, :context_rubrics_url) }
   end
 
   # @API Create a single rubric
