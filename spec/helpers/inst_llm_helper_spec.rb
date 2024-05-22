@@ -18,19 +18,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe InstLLMHelper do
-  # TODO: rewrite tests for fetching credentials from the vault
   describe ".client" do
+    model_id = "model123"
     before do
       InstLLMHelper.instance_variable_set(:@clients, nil)
+
+      aws_credential_provider = double
+      allow(aws_credential_provider).to receive(:credentials).and_return(double(
+                                                                           access_key_id: "access_key_id",
+                                                                           secret_access_key: "secret_access_key",
+                                                                           session_token: "session_token"
+                                                                         ))
+      allow(Canvas::AwsCredentialProvider).to receive(:new).with("bedrock_creds", nil).and_return(aws_credential_provider)
     end
 
     it "creates a client for the given model_id" do
-      model_id = "model123"
-      expect(ENV).to receive(:[]).with("AWS_REGION").and_return("us-west-2")
-      expect(ENV).to receive(:[]).with("AWS_ACCESS_KEY_ID").and_return("access_key_id")
-      expect(ENV).to receive(:[]).with("AWS_SECRET_ACCESS_KEY").and_return("secret_access_key")
-      expect(ENV).to receive(:[]).with("AWS_SESSION_TOKEN").and_return("session_token")
-
       expect(InstLLM::Client).to receive(:new).with(
         model_id,
         region: "us-west-2",

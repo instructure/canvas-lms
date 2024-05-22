@@ -23,13 +23,19 @@ require "inst_llm"
 module InstLLMHelper
   def self.client(model_id)
     @clients ||= {}
-    # TODO: fetch the bedrock credentials from the vault
+    # For local dev, assume that we are using creds from inseng (us-west-2)
+    # Will load creds from vault (prod) or rails credential store (local / oss).
+    # Credentials stored in rails credential store in the `bedrock_creds` key
+    # with `aws_access_key_id` and `aws_secret_access_key` keys
+    settings = YAML.safe_load(DynamicSettings.find(tree: :private)["bedrock.yml"] || "{}")
+    credentials = Canvas::AwsCredentialProvider.new("bedrock_creds", settings["vault_credential_path"]).credentials
+
     @clients[model_id] ||= InstLLM::Client.new(
       model_id,
-      region: ENV["AWS_REGION"],
-      access_key_id: ENV["AWS_ACCESS_KEY_ID"],
-      secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"],
-      session_token: ENV["AWS_SESSION_TOKEN"]
+      region: settings["bedrock_region"] || "us-west-2",
+      access_key_id: credentials.access_key_id,
+      secret_access_key: credentials.secret_access_key,
+      session_token: credentials.session_token
     )
   end
 end
