@@ -153,7 +153,7 @@ function useFilterDropdownData({
     if (gradingPeriods.length > 0) {
       const gradingPeriodItems: FilterDrilldownMenuItem[] = gradingPeriods.map(a => ({
         id: a.id,
-        name: formatGradingPeriodTitleForDisplay(a),
+        name: formatGradingPeriodTitleForDisplay(a) as string,
         isSelected: appliedFilters.some(c => c.type === 'grading-period' && c.value === a.id),
         onToggle: () => {
           const filter: Filter = {

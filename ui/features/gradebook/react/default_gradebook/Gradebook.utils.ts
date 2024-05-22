@@ -46,7 +46,6 @@ import type {
 import type {
   Assignment,
   AssignmentGroup,
-  GradingPeriod,
   MissingSubmission,
   Module,
   Section,
@@ -61,6 +60,7 @@ import type {GridColumn, SlickGridKeyboardEvent} from './grid'
 import {columnWidths} from './initialState'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
+import type {CamelizedGradingPeriod} from '@canvas/grading/grading'
 
 const I18n = useI18nScope('gradebook')
 
@@ -342,7 +342,7 @@ export const getCustomStatusIdStrings = (customStatuses: GradeStatus[]): CustomS
 export const getLabelForFilter = (
   filter: Filter,
   assignmentGroups: Pick<AssignmentGroup, 'id' | 'name'>[],
-  gradingPeriods: Pick<GradingPeriod, 'id' | 'title'>[],
+  gradingPeriods: CamelizedGradingPeriod[],
   modules: Pick<Module, 'id' | 'name'>[],
   sections: Pick<Section, 'id' | 'name'>[],
   studentGroupCategories: StudentGroupCategoryMap,
@@ -816,7 +816,10 @@ export const filterAssignmentsBySubmissionsFn = (
   }
 }
 export function formatGradingPeriodTitleForDisplay(
-  gradingPeriod: GradingPeriod | undefined | null
+  gradingPeriod:
+    | Pick<CamelizedGradingPeriod, 'title' | 'startDate' | 'endDate' | 'closeDate'>
+    | undefined
+    | null
 ) {
   if (!gradingPeriod) return null
 
@@ -827,7 +830,7 @@ export function formatGradingPeriodTitleForDisplay(
       year: '2-digit',
       month: 'numeric',
       day: 'numeric',
-      timezone: ENV.TIMEZONE,
+      timeZone: ENV.TIMEZONE,
     })
 
     title = I18n.t('%{title}: %{start} - %{end} | %{closed}', {
