@@ -79,7 +79,11 @@ export const areCardsEqual = (preSavedCard, currentCard) => {
 
   current.overrides = current.overrides
     .filter(
-      override => override?.course_section_id || override?.student_ids || override?.noop_id === '1'
+      override =>
+        override?.course_section_id ||
+        override?.student_ids ||
+        override?.course_id ||
+        override?.noop_id === '1'
     )
     .map(override => {
       const {course_section_id, student_ids, due_at, lock_at, unlock_at, rowKey} = override

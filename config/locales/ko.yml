@@ -1375,7 +1375,9 @@ ko:
   add_feed_49ed1cb2: "피드 추가"
   add_group_c84f9e9d: "그룹 추가"
   add_group_set_f9809e11: "그룹 집합 추가"
+  add_message_10cc308c: "메시지 추가"
   add_module_5ad6fee2: "모듈 추가"
+  add_prerequisite_6409bd9: "필수 조건 추가"
   add_quiz_cebfa28b: "퀴즈 추가"
   add_students_to_the_course_874be8fb: "과목에 학생 추가"
   add_tas_to_the_course_2aac6e02: "과목에 조교 추가"
@@ -7458,6 +7460,9 @@ ko:
       new_tab: "이 도구는 새 브라우저 창에 로드해야 함"
       new_tab_expired: "이 도구의 세션이 만료되었습니다. 도구를 다시 액세스하려면 페이지를 다시 로드하십시오."
       new_tab_loaded: "이 도구를 새 브라우저 창에 성공적으로 로드했습니다. 도구를 다시 액세스하려면 페이지를 다시 로드하십시오."
+    registrations: 
+      index: 
+        title: 확장
   lti_registrations: 
     index: 
       title: 확장
@@ -14160,6 +14165,7 @@ ko:
     is_required: "이 필드가 필요함"
   validation_error_3b943100: "유효성 검사 오류"
   verification_code_5acd64ef: "인증 코드"
+  version_5599c321: 버전
   view_app_center_6c89a3fe: "앱 센터 보기"
   view_app_configurations_52b52441: "앱 구성 보기"
   view_edit_grading_scheme_238d3028: "평가 구성표 보기/편집"

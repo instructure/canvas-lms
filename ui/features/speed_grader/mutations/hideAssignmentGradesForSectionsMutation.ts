@@ -42,7 +42,7 @@ export async function hideAssignmentGradesForSections({
   assignmentId,
   sectionIds,
 }: HideAssignmentGradesForSectionsParams): Promise<any> {
-  const result = executeQuery<any>(HIDE_ASSIGNMENT_GRADES_FOR_SECTIONS, {
+  const result = await executeQuery<any>(HIDE_ASSIGNMENT_GRADES_FOR_SECTIONS, {
     assignmentId,
     sectionIds,
   })

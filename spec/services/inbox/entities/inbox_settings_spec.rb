@@ -19,37 +19,54 @@
 
 describe Inbox::Entities::InboxSettings do
   let(:user) { user_model }
+  let(:user_id) { user.id.to_s }
   let(:account) { account_model }
-  let(:inbox_settings) { Inbox::Entities::InboxSettings.new(user_id: user.id, use_signature: true, signature: "John Doe") }
-  let(:json_inbox_settings) do
-    {
-      userId: user.id,
-      useSignature: true,
-      signature: "John Doe",
-      useOutOfOffice: false,
-      outOfOfficeFirstDate: nil,
-      outOfOfficeLastDate: nil,
-      outOfOfficeMessage: nil,
-      outOfOfficeSubject: nil
-    }
-  end
+  let(:id) { 123 }
+  let(:root_account_id) { account.id }
+  let(:use_signature) { true }
+  let(:use_out_of_office) { true }
+  let(:signature) { "John Doe" }
+  let(:out_of_office_first_date) { "2024-04-10 00:00:00 UTC" }
+  let(:out_of_office_last_date) { "2024-04-11 00:00:00 UTC" }
+  let(:out_of_office_subject) { "Out of office" }
+  let(:out_of_office_message) { "Out of office for one week" }
 
   describe ".new" do
+    it "creates entity" do
+      entity = Inbox::Entities::InboxSettings.new(
+        id:,
+        user_id:,
+        root_account_id:,
+        use_signature:,
+        signature:,
+        use_out_of_office:,
+        out_of_office_first_date:,
+        out_of_office_last_date:,
+        out_of_office_subject:,
+        out_of_office_message:
+      )
+      expect(entity.id).to eq id
+      expect(entity.user_id).to eq user_id
+      expect(entity.root_account_id).to eq root_account_id
+      expect(entity.use_signature).to eq use_signature
+      expect(entity.signature).to eq signature
+      expect(entity.use_out_of_office).to eq use_out_of_office
+      expect(entity.out_of_office_first_date).to eq out_of_office_first_date
+      expect(entity.out_of_office_last_date).to eq out_of_office_last_date
+      expect(entity.out_of_office_subject).to eq out_of_office_subject
+      expect(entity.out_of_office_message).to eq out_of_office_message
+    end
+
+    it "throws an error if no id" do
+      expect { Inbox::Entities::InboxSettings.new(user_id:, root_account_id:) }.to raise_error(ArgumentError, "missing keyword: :id")
+    end
+
     it "throws an error if no user_id" do
-      expect { Inbox::Entities::InboxSettings.new }.to raise_error(ArgumentError, "missing keyword: :user_id")
+      expect { Inbox::Entities::InboxSettings.new(id:, root_account_id:) }.to raise_error(ArgumentError, "missing keyword: :user_id")
     end
-  end
 
-  describe ".as_json" do
-    it "returns json formatted inbox settings" do
-      expect(Inbox::Entities::InboxSettings.as_json(inbox_settings:)).to eq(json_inbox_settings)
-    end
-  end
-
-  describe ".from_json" do
-    it "returns inbox settings from json formatted settings" do
-      from_json_settings = Inbox::Entities::InboxSettings.from_json(json: json_inbox_settings.with_indifferent_access)
-      expect(from_json_settings.to_json).to eq(inbox_settings.to_json)
+    it "throws an error if no root_account_id" do
+      expect { Inbox::Entities::InboxSettings.new(id:, user_id:) }.to raise_error(ArgumentError, "missing keyword: :root_account_id")
     end
   end
 end

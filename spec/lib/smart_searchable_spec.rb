@@ -25,8 +25,8 @@ describe SmartSearchable do
     before do
       skip "not available" unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
 
-      allow(SmartSearch).to receive(:generate_embedding).and_return([1] * 1536)
-      expect(SmartSearch).to receive(:api_key).at_least(:once).and_return("fake_api_key")
+      allow(SmartSearch).to receive(:generate_embedding).and_return([1] * 1024)
+      expect(SmartSearch).to receive(:bedrock_client).at_least(:once).and_return(double)
     end
 
     before :once do
@@ -48,9 +48,18 @@ describe SmartSearchable do
       expect(@page.reload.embeddings.count).to eq 1
     end
 
+    it "doesn't delete old-version embeddings when creating new ones" do
+      wiki_page_model(title: "test", body: "foo")
+      run_jobs
+      @page.embeddings.first.update! version: 1
+      @page.update body: "bar"
+      run_jobs
+      expect(@page.reload.embeddings.count).to eq 2
+    end
+
     it "strips HTML from the body before indexing" do
       wiki_page_model(title: "test", body: "<ul><li>foo</li></ul>")
-      expect(SmartSearch).to receive(:generate_embedding).with("test\n* foo")
+      expect(SmartSearch).to receive(:generate_embedding).with("Page: test\n* foo")
       run_jobs
     end
 
@@ -66,15 +75,15 @@ describe SmartSearchable do
     end
 
     it "generates multiple embeddings for a page with long content" do
-      wiki_page_model(title: "test", body: "foo" * 2000)
+      wiki_page_model(title: "test", body: "foo" * 600)
       run_jobs
       expect(@page.reload.embeddings.count).to eq 2
     end
 
     it "generates multiple embeddings and doesn't split words" do
-      # 7997 bytes in total, would fit into two 4000-byte pages,
+      # 2997 bytes in total, would fit into two 1500-byte pages,
       # but word splitting will push it into 3
-      wiki_page_model(title: "test", body: "testing123 " * 727)
+      wiki_page_model(title: "test", body: "foo12345 " * 333)
       run_jobs
       expect(@page.reload.embeddings.count).to eq 3
     end

@@ -58,6 +58,7 @@ export const ASSIGNMENT_OVERRIDE_GRAPHQL_TYPENAMES = {
   ADHOC: 'AdhocStudents',
   SECTION: 'Section',
   GROUP: 'Group',
+  COURSE: 'Course',
 }
 
 export const minimumReplyToEntryRequiredCount = 1

@@ -254,7 +254,7 @@ describe "threaded discussions" do
 
       delete_me = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
       Discussion.visit(@course, @topic)
-      fj('label[for="showDeleted"]').click
+      f('label[for="showDeleted"]').click
 
       delete_entry(delete_me)
       expect(f("#entry-#{delete_me.id} .discussion-title").text).to match("Deleted by #{@teacher.name} on")
@@ -520,7 +520,7 @@ describe "threaded discussions" do
             expect(fj("div[data-testid='reply-preview']:contains('#{@third_reply.summary}')")).to be_present
             # Verify that the correct @mentions is created
             expect(new_reply.message).to include "<p><span class=\"mceNonEditable mention\""
-            expect(new_reply.message).to include "data-mention=\"#{@third_reply.user_id}\" data-reactroot=\"\">"
+            expect(new_reply.message).to include "data-mention=\"#{@third_reply.user_id}\""
             expect(new_reply.message).to include "@#{@third_reply.author_name}</span>quoting 3rd level reply</p>"
           end
 
@@ -1152,6 +1152,33 @@ describe "threaded discussions" do
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         expect(fj("span:contains('#{@topic.message}')")).to be_present
       end
+    end
+
+    it "shows the correct entry counts for graded group discussions" do
+      topic = create_graded_discussion(@course)
+
+      group = @course.groups.create!(name: "Group 1")
+      group.add_user(@student)
+
+      topic.group_category = @course.group_categories.create!(name: "Group Category")
+      topic.save!
+
+      subtopic = topic.child_topics.build(title: "Subtopic 1", context: group)
+      subtopic_assignment = @course.assignments.build(submission_types: "discussion_topic", title: subtopic.title)
+      subtopic_assignment.infer_times
+      subtopic_assignment.saved_by = :discussion_topic
+      subtopic.assignment = subtopic_assignment
+      subtopic.group_category = topic.group_category
+      subtopic.save
+
+      root_entry = topic.discussion_entries.create!(user: @teacher, message: "root entry")
+      topic.discussion_entries.create!(user: @teacher, message: "sub entry", root_entry_id: root_entry.id, parent_id: root_entry.id)
+
+      user_session(@teacher)
+
+      get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+
+      expect(ff("div[data-testid='replies-counter']")[1]).to include_text("1 Reply")
     end
   end
 end

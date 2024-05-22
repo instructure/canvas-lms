@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
-import {render} from '@testing-library/react'
+import {render, cleanup} from '@testing-library/react'
+import {userEvent} from '@testing-library/user-event'
 import SectionTooltip from '../index'
 
 const defaultProps = () => ({
@@ -26,67 +26,100 @@ const defaultProps = () => ({
   totalUserCount: 5,
 })
 
-test('renders the SectionTooltip component', () => {
-  const tree = mount(<SectionTooltip {...defaultProps()} />)
-  expect(tree.exists()).toBe(true)
-})
+const renderSectionTooltip = (props = {}) =>
+  render(<SectionTooltip {...defaultProps()} {...props} />)
 
-test('renders the correct section text', () => {
-  const tree = mount(<SectionTooltip {...defaultProps()} />)
-  const node = tree.find('Text')
-  expect(node.first().text()).toBe('1 Sectionsections name')
-  const screenReaderNode = tree.find('ScreenReaderContent').first()
-  expect(screenReaderNode.text()).toBe('sections name')
-})
+describe('SectionTooltip', () => {
+  afterEach(() => {
+    cleanup()
+  })
 
-test('renders prefix text when passed in', () => {
-  const props = defaultProps()
-  props.prefix = 'Anonymous Discussion | '
-  const tree = mount(<SectionTooltip {...props} />)
-  const node = tree.find('Text')
-  expect(node.first().text()).toBe('Anonymous Discussion | 1 Sectionsections name')
-})
+  it('renders the SectionTooltip component', () => {
+    const tree = renderSectionTooltip()
 
-test('uses textColor from props', () => {
-  const props = defaultProps()
-  props.textColor = 'secondary'
-  const tree = mount(<SectionTooltip {...props} />)
-  const node = tree.find('Text')
-  expect(node.first().props().color).toBe('secondary')
-})
+    expect(tree.container).toBeInTheDocument()
+  })
 
-test('renders all sections if no sections are given', () => {
-  const props = defaultProps()
-  props.sections = null
-  const {getByText} = render(<SectionTooltip {...props} />)
+  it('renders the correct section text', () => {
+    const tree = renderSectionTooltip()
+    const node = tree.getAllByText('1 Section')[0]
+    const screenReaderNode = tree.getAllByText('sections name')[0]
 
-  const allSectionsText = getByText('All Sections')
-  expect(allSectionsText).toBeInTheDocument()
-})
+    expect(node).toBeInTheDocument()
+    expect(screenReaderNode).toBeInTheDocument()
+  })
 
-test('renders tooltip text correcly with sections', () => {
-  const tree = shallow(<SectionTooltip {...defaultProps()} />)
-  const node = tree.find('Tooltip')
-  expect(mount(node.prop('renderTip')[0]).find('View Text').first().text()).toBe(
-    'sections name (4 Users)'
-  )
-})
+  it('renders prefix text when passed in', () => {
+    const props = {
+      ...defaultProps(),
+      prefix: 'Anonymous Discussion | ',
+    }
+    const tree = renderSectionTooltip(props)
+    const node = tree.getByText('Anonymous Discussion | 1 Section')
 
-test('renders multiple sections into tooltip', () => {
-  const props = defaultProps()
-  props.sections[1] = {id: 3, name: 'section other name', user_count: 8}
-  const tree = shallow(<SectionTooltip {...props} />)
-  const node = tree.find('Tooltip')
-  expect(node.prop('renderTip')).toHaveLength(2)
-  expect(mount(node.prop('renderTip')[1]).find('View Text').first().text()).toBe(
-    'section other name (8 Users)'
-  )
-})
+    expect(node).toBeInTheDocument()
+  })
 
-test('does not renders tooltip text when All Sections', () => {
-  const props = defaultProps()
-  props.sections = null
-  const tree = shallow(<SectionTooltip {...props} />)
-  const node = tree.find('Tooltip')
-  expect(node).toEqual({})
+  it('uses textColor from props', () => {
+    const props = {
+      ...defaultProps(),
+      textColor: 'secondary',
+    }
+    const tree = renderSectionTooltip(props)
+    const node = tree.container.querySelector('span[color="secondary"]')
+
+    expect(node).toBeInTheDocument()
+  })
+
+  it('renders all sections if no sections are given', () => {
+    const props = {
+      ...defaultProps(),
+      sections: null,
+    }
+    const tree = renderSectionTooltip(props)
+    const allSectionsText = tree.getByText('All Sections')
+
+    expect(allSectionsText).toBeInTheDocument()
+  })
+
+  it('renders tooltip text correcly with sections', async () => {
+    const tree = renderSectionTooltip()
+
+    await userEvent.hover(tree.container.querySelector('span[data-cid="Position Popover Tooltip"]'))
+
+    expect(document.querySelector('span[role="tooltip"]').textContent).toEqual(
+      'sections name (4 Users)'
+    )
+  })
+
+  it('renders multiple sections into tooltip', async () => {
+    const props = {
+      ...defaultProps(),
+      sections: [
+        {id: 2, name: 'sections name', user_count: 4},
+        {id: 3, name: 'section other name', user_count: 8},
+      ],
+    }
+    const tree = renderSectionTooltip(props)
+
+    await userEvent.hover(tree.container.querySelector('span[data-cid="Position Popover Tooltip"]'))
+
+    expect(document.querySelector('span[role="tooltip"]').textContent).toEqual(
+      'sections name (4 Users)section other name (8 Users)'
+    )
+  })
+
+  it('renders All Sections and default tooltip', async () => {
+    const props = {
+      ...defaultProps(),
+      sections: null,
+    }
+    const tree = renderSectionTooltip(props)
+    const allSectionsText = tree.getByText('All Sections')
+
+    await userEvent.hover(tree.container.querySelector('span[data-cid="Position Popover Tooltip"]'))
+
+    expect(allSectionsText).toBeInTheDocument()
+    expect(document.querySelector('span[role="tooltip"]').textContent).toEqual('(5 Users)')
+  })
 })

@@ -73,7 +73,7 @@ describe "Discussion Topic Show" do
 
       f("button[data-testid='discussion-post-menu-trigger']").click
       fj("span[role='menuitem']:contains('Show Rubric')").click
-      fj(".find_rubric_link").click
+      f(".find_rubric_link").click
 
       expect(fj(".select_rubric_link:contains(#{rubric.title})")).to be_present
       expect(ffj(".rubrics_dialog_rubric:visible").count).to eq 1
@@ -197,6 +197,79 @@ describe "Discussion Topic Show" do
       fj("button:contains('Reply')").click
       wait_for_ajaximations
       expect(fj("p:contains('Test Reply')")).to be_present
+    end
+
+    context "checkpoints" do
+      before :once do
+        Account.default.enable_feature!(:discussion_checkpoints)
+        student_in_course(active_all: true)
+
+        @due_at = 2.days.from_now
+        @replies_required = 2
+        @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: @due_at }],
+          points_possible: 6
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: @due_at }],
+          points_possible: 7,
+          replies_required: @replies_required
+        )
+      end
+
+      it "lets students see the checkpoints tray" do
+        user_session(@student)
+        get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
+
+        fj("button:contains('View Due Dates')").click
+        wait_for_ajaximations
+        expect(fj("span:contains('Due Dates')")).to be_present
+        reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
+        expect(reply_to_topic_contents).to include("Reply to Topic")
+        expect(reply_to_topic_contents).to include(format_date_for_view(@due_at))
+
+        reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
+        expect(reply_to_entry_contents).to include("Additional Replies Required: #{@replies_required}")
+        expect(reply_to_entry_contents).to include(format_date_for_view(@due_at))
+      end
+
+      it "lets students see the checkpoints tray with completed status" do
+        root_entry = @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to topic")
+
+        @replies_required.times { |i| @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to entry #{i}", parent_entry: root_entry) }
+
+        user_session(@student)
+        get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
+
+        fj("button:contains('View Due Dates')").click
+        wait_for_ajaximations
+        reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
+        expect(reply_to_topic_contents).to include("Completed #{format_date_for_view(root_entry.created_at)}")
+        reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
+        expect(reply_to_entry_contents).to include("Completed")
+        expect(reply_to_topic_contents).to include("Completed #{format_date_for_view(@checkpointed_discussion.discussion_entries.last.created_at)}")
+      end
+
+      it "lets teachers see checkpoints tray" do
+        user_session(@teacher)
+        get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
+
+        fj("button:contains('View Due Dates')").click
+        wait_for_ajaximations
+        expect(fj("span:contains('Due Dates')")).to be_present
+        reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
+        expect(reply_to_topic_contents).to include("Reply to Topic")
+        expect(reply_to_topic_contents).to include(format_date_for_view(@due_at))
+
+        reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
+        expect(reply_to_entry_contents).to include("Additional Replies Required: #{@replies_required}")
+        expect(reply_to_entry_contents).to include(format_date_for_view(@due_at))
+      end
     end
 
     context "Assign To option" do

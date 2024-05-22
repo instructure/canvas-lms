@@ -19,27 +19,53 @@
 
 module Inbox
   class InboxService
-    def initialize(user_id:, root_account_id:)
-      @user_id = user_id
-      @root_account_id = root_account_id
-    end
+    class << self
+      def inbox_settings_for_user(user_id:, root_account_id:)
+        Inbox::Repositories::InboxSettingsRepository.get_inbox_settings(user_id:, root_account_id:) ||
+          create_default_inbox_settings_for_user(user_id:, root_account_id:)
+      end
 
-    def user_settings
-      inbox_settings_repo.inbox_settings || default_inbox_settings
-    end
+      def update_inbox_settings_for_user(
+        user_id:,
+        root_account_id:,
+        use_signature:,
+        signature:,
+        use_out_of_office:,
+        out_of_office_first_date:,
+        out_of_office_last_date:,
+        out_of_office_subject:,
+        out_of_office_message:
+      )
+        Inbox::Repositories::InboxSettingsRepository.save_inbox_settings(
+          user_id:,
+          root_account_id:,
+          use_signature:,
+          signature:,
+          use_out_of_office:,
+          out_of_office_first_date:,
+          out_of_office_last_date:,
+          out_of_office_subject:,
+          out_of_office_message:
+        )
+      end
 
-    def update_user_settings(use_signature:, signature:, use_out_of_office:, out_of_office_first_date:, out_of_office_last_date:, out_of_office_subject:, out_of_office_message:)
-      inbox_settings_repo.save_inbox_settings(use_signature:, signature:, use_out_of_office:, out_of_office_first_date:, out_of_office_last_date:, out_of_office_subject:, out_of_office_message:)
-    end
+      private
 
-    private
-
-    def inbox_settings_repo
-      @inbox_settings_repo ||= Inbox::Repositories::InboxSettingsRepository.new(user_id: @user_id, root_account_id: @root_account_id)
-    end
-
-    def default_inbox_settings
-      Inbox::Entities::InboxSettings.new(user_id: @user_id)
+      def create_default_inbox_settings_for_user(user_id:, root_account_id:)
+        temp_id = SecureRandom.uuid
+        default_settings = Inbox::Entities::InboxSettings.new(id: temp_id, user_id:, root_account_id:)
+        update_inbox_settings_for_user(
+          user_id:,
+          root_account_id:,
+          use_signature: default_settings.use_signature,
+          signature: default_settings.signature,
+          use_out_of_office: default_settings.use_out_of_office,
+          out_of_office_first_date: default_settings.out_of_office_first_date,
+          out_of_office_last_date: default_settings.out_of_office_last_date,
+          out_of_office_subject: default_settings.out_of_office_subject,
+          out_of_office_message: default_settings.out_of_office_subject
+        )
+      end
     end
   end
 end

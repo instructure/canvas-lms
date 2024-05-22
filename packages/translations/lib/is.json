@@ -1445,6 +1445,9 @@
     "next_40e12421": {
         "message": "Næsti"
     },
+    "next_findtext_9d69f0fe": {
+        "message": "Næst { findText }"
+    },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Engin vandamál fundust varðandi aðgengileika."
     },
@@ -1721,6 +1724,9 @@
     "previous_bd2ac015": {
         "message": "Fyrri"
     },
+    "previous_findtext_8dfbfd30": {
+        "message": "Fyrri { findText }"
+    },
     "prime_917ea60e": {
         "message": "Frum"
     },
@@ -1796,11 +1802,23 @@
     "replace_all_d3d68b3": {
         "message": "Skipta um allt"
     },
+    "replace_all_findtext_with_replacetext_da574b32": {
+        "message": "Skipta út öllu { findText } fyrir { replaceText }"
+    },
     "replace_e61834a7": {
         "message": "Skipta út"
     },
+    "replace_findtext_with_replacetext_7b5c7fb3": {
+        "message": "Skipta út { findText } fyrir { replaceText }"
+    },
     "replace_with_eeff01ad": {
         "message": "Skipta um með"
+    },
+    "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+        "message": "Skipt út { alertFindText } fyrir { alertReplaceText }"
+    },
+    "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+        "message": "Skipt út öllu { alertFindText } fyrir { alertReplaceText }"
     },
     "reset_95a81614": {
         "message": "Endurstilla"

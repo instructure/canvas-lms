@@ -69,6 +69,11 @@ module CoursesHelper
     icon_data
   end
 
+  def format_course_section_date(date = nil)
+    # date ? date_string(date, :long) : t("(no date)")
+    date ? date_string(date, :long) : t("#courses.sections.no_date", "(no date)")
+  end
+
   def recent_event_url(recent_event)
     context = recent_event.context
     if recent_event.is_a?(Assignment)

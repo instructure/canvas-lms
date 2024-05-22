@@ -19,7 +19,6 @@ import gql from 'graphql-tag'
 
 import {Conversation} from './Conversation'
 import {ConversationMessage} from './ConversationMessage'
-import {ConversationParticipant} from './ConversationParticipant'
 import {Enrollment} from './Enrollment'
 import {Course} from './Course'
 import {Group} from './Group'
@@ -179,15 +178,42 @@ export const CONVERSATIONS_QUERY = gql`
           after: $afterConversation
         ) {
           nodes {
-            ...ConversationParticipant
+            _id
+            id
+            label
+            workflowState
             conversation {
-              ...Conversation
-              conversationMessagesConnection(first: 1) {
+              _id
+              id
+              subject
+              isPrivate
+              canReply
+              conversationMessagesCount
+              conversationParticipantsConnection(first: 10) {
                 nodes {
-                  ...ConversationMessage
+                  user {
+                    shortName
+                  }
                 }
               }
-              conversationMessagesCount
+              conversationMessagesConnection(first: 1) {
+                nodes {
+                  id
+                  body
+                  createdAt
+                  author {
+                    id
+                    _id
+                    name
+                    shortName
+                  }
+                  recipients {
+                    id
+                    _id
+                    name
+                  }
+                }
+              }
             }
           }
           pageInfo {
@@ -197,9 +223,6 @@ export const CONVERSATIONS_QUERY = gql`
       }
     }
   }
-  ${ConversationParticipant.fragment}
-  ${Conversation.fragment}
-  ${ConversationMessage.fragment}
   ${PageInfo.fragment}
 `
 
@@ -362,6 +385,21 @@ export const RECIPIENTS_OBSERVERS_QUERY = gql`
           }
         }
       }
+    }
+  }
+`
+
+export const INBOX_SETTINGS_QUERY = gql`
+  query GetMyInboxSettings {
+    myInboxSettings {
+      _id
+      useSignature
+      signature
+      useOutOfOffice
+      outOfOfficeFirstDate
+      outOfOfficeLastDate
+      outOfOfficeSubject
+      outOfOfficeMessage
     }
   }
 `

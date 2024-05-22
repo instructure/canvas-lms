@@ -20,7 +20,8 @@ module Bundler
             builder = new
             builder.eval_gemfile(gemfile, &Multilock.prepare_block) if Multilock.prepare_block
             builder.eval_gemfile(gemfile)
-            if (ruby_version_requirement = builder.instance_variable_get(:@ruby_version))
+            if (ruby_version_requirement = builder.instance_variable_get(:@ruby_version)) &&
+               Multilock.lockfile_definitions[lockfile]
               Multilock.lockfile_definitions[lockfile][:ruby_version_requirement] = ruby_version_requirement
             elsif (parent_lockfile = Multilock.lockfile_definitions.dig(lockfile, :parent)) &&
                   (parent_lockfile_definition = Multilock.lockfile_definitions[parent_lockfile]) &&

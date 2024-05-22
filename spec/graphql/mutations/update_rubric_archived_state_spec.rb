@@ -59,7 +59,7 @@ RSpec.describe Mutations::UpdateRubricArchivedState do
   end
 
   it "marks rubric as archived" do
-    Account.site_admin.enable_feature!(:enhanced_rubrics)
+    @course.account.root_account.enable_feature!(:enhanced_rubrics)
     expect(@rubric.workflow_state).to eq "active"
     result = run_mutation({ id: @rubric.id, archived: true })
     expect(result.dig("data", "updateRubricArchivedState", "errors")).to be_nil
@@ -67,7 +67,7 @@ RSpec.describe Mutations::UpdateRubricArchivedState do
   end
 
   it "marks rubric as active" do
-    Account.site_admin.enable_feature!(:enhanced_rubrics)
+    @course.account.root_account.enable_feature!(:enhanced_rubrics)
     @rubric.archive
     expect { run_mutation({ id: @rubric.id, archived: false }) }.to change { @rubric.reload.workflow_state }.from("archived").to("active")
   end

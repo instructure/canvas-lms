@@ -663,7 +663,7 @@ class DiscussionRow extends Component {
   renderDragHandleIfAppropriate = () => {
     if (this.props.draggable && this.props.connectDragSource) {
       return (
-        <div className="ic-item-row__drag-col">
+        <div className="ic-item-row__drag-col" data-testid="ic-drag-handle-icon-container">
           <span>
             <Text color="secondary" size="large">
               <IconDragHandleLine />
@@ -836,7 +836,11 @@ class DiscussionRow extends Component {
           {maybeRenderMasteryPathsLink}
           {maybeRenderPeerReviewIcon}
           {actionsContent}
-          <span ref={this.initializeMasterCourseIcon} className="ic-item-row__master-course-lock" />
+          <span
+            ref={this.initializeMasterCourseIcon}
+            data-testid="ic-master-course-icon-container"
+            className="ic-item-row__master-course-lock"
+          />
           {maybeDisplayManageMenu}
         </div>
       </div>
@@ -887,7 +891,11 @@ class DiscussionRow extends Component {
 
   renderBlueUnreadBadge() {
     if (this.props.discussion.read_state !== 'read') {
-      return <Badge margin="0 small x-small 0" standalone={true} type="notification" />
+      return (
+        <div data-testid="ic-blue-unread-badge">
+          <Badge margin="0 small x-small 0" standalone={true} type="notification" />
+        </div>
+      )
     } else {
       return (
         <View display="block" margin="0 small x-small 0">
@@ -955,7 +963,9 @@ const mapState = (state, ownProps) => {
       (state.DIRECT_SHARE_ENABLED && state.permissions.read_as_admin),
     displayPinMenuItem: state.permissions.moderate,
     displayDifferentiatedModulesTray:
-      ENV?.FEATURES?.differentiated_modules && discussion.permissions.update,
+      ENV?.FEATURES?.differentiated_modules &&
+      discussion.permissions.update &&
+      state.contextType === 'course',
     masterCourseData: state.masterCourseData,
     isMasterCourse: masterCourse,
     DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED,

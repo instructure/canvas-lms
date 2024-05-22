@@ -269,4 +269,65 @@ describe "Importing modules" do
     expect(mod.reload.content_tags.pluck(:position)).to eq([1, 2, 3, 4, 5])
     expect(mod.content_tags.pluck(:title)).to eq(%w[dogs birds pigs cats frogs])
   end
+
+  describe "imported items on content_migration" do
+    subject do
+      Importers::ContextModuleImporter.import_from_migration(context_module_hash, course_model, migration)
+      migration.imported_migration_items
+    end
+
+    let(:context_module_migration_id) { "context_module_migration_id" }
+    let(:migration) { ContentMigration.new }
+    let(:course) { course_model }
+    let(:base_context_module_hash) { { migration_id: context_module_migration_id, title: "Module 1" } }
+
+    def expect_item_by_id(item_id)
+      expect(subject.select { |item| item[:migration_id] == item_id }).to be_present
+    end
+
+    context "when context module hash is corrupted" do
+      let(:context_module_hash) { { migration_id: "id", modules_to_import: { migration_id: "id" } } }
+
+      it "should have an empty imported_migration_items" do
+        expect(subject).to be_empty
+      end
+    end
+
+    context "when context module hash is valid" do
+      let(:context_module_hash) { { **base_context_module_hash, items: [] } }
+
+      it "should contain 1 element" do
+        expect(subject.size).to eq 1
+      end
+
+      it "should contain the context module" do
+        expect_item_by_id(context_module_migration_id)
+      end
+
+      context "when there are content tags in context module hash" do
+        let(:content_tag_1_migration_id) { "content_tag_1_migration_id" }
+        let(:content_tag_2_migration_id) { "content_tag_2_migration_id" }
+        let(:base_content_tag_hash) { { type: "linked_resource", linked_resource_type: "Assignment" } }
+        let(:content_tag_hash_1) { { **base_content_tag_hash, item_migration_id: content_tag_1_migration_id } }
+        let(:content_tag_hash_2) { { **base_content_tag_hash, item_migration_id: content_tag_2_migration_id } }
+        let(:context_module_hash) { { **base_context_module_hash, items: [content_tag_hash_1, content_tag_hash_2] } }
+
+        it "should contain 3 element" do
+          expect(subject.size).to eq 3
+        end
+
+        it "should contain the context module" do
+          expect_item_by_id(context_module_migration_id)
+        end
+
+        it "should contain the first assignment content tag" do
+          expect_item_by_id(content_tag_1_migration_id)
+        end
+
+        it "should contain the second assignment content tag" do
+          expect_item_by_id(content_tag_2_migration_id)
+        end
+      end
+    end
+  end
 end

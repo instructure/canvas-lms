@@ -35,20 +35,24 @@ module CC
 
         Dir.mktmpdir do |tmpdir|
           CanvasUnzip.extract_archive(tmp_file.path, tmpdir)
+
+          migration_ids_map_path = File.join(tmpdir, "migration_ids_map.json")
+          migration_ids_map = File.exist?(migration_ids_map_path) ? JSON.parse(File.read(migration_ids_map_path)) : {}
+          migration_ids_replacer = CC::Qti::MigrationIdsReplacer.new(@manifest, migration_ids_map)
           Dir.glob(File.join(tmpdir, "{non_cc_assessments/*,**/assessment_meta.xml,**/assessment_qti.xml,Uploaded Media/*}")).map do |f|
-            file_path = f.sub("#{tmpdir}/", "")
+            file_path = migration_ids_replacer.replace_in_string(f.sub("#{tmpdir}/", ""))
             file_dir = file_path.split("/").first
             file_name = file_path.split("/").last
-
             dest_dir = File.join(export_dir, file_dir)
-            FileUtils.mkdir_p(dest_dir)
 
             file_content = File.read(f)
 
             if file_name.end_with?(".xml", ".qti")
               file_content = links_replacer.replace_links(file_content)
+              file_content = migration_ids_replacer.replace_in_xml(file_content)
             end
 
+            FileUtils.mkdir_p(dest_dir)
             File.binwrite(File.join(dest_dir, file_name), file_content)
             file_path
           end

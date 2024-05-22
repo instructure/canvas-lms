@@ -28,19 +28,19 @@ const I18n = useI18nScope('rubrics-assessment-tray')
 const {licorice, tiara} = colors
 type RatingButtonProps = {
   buttonDisplay: string
-  isPeerReview: boolean
+  isPreviewMode: boolean
   isSelected: boolean
   selectedArrowDirection: 'up' | 'right'
   onClick: () => void
 }
 export const RatingButton = ({
   buttonDisplay,
-  isPeerReview,
+  isPreviewMode,
   isSelected,
   selectedArrowDirection,
   onClick,
 }: RatingButtonProps) => {
-  const unselectedColor = isPeerReview ? tiara : licorice
+  const unselectedColor = isPreviewMode ? tiara : licorice
 
   return (
     <View
@@ -57,8 +57,8 @@ export const RatingButton = ({
           size="large"
           color="primary-inverse"
           onClick={onClick}
-          readOnly={isPeerReview}
-          cursor={isPeerReview ? 'not-allowed' : 'pointer'}
+          readOnly={isPreviewMode}
+          cursor={isPreviewMode ? 'not-allowed' : 'pointer'}
           themeOverride={{
             largeFontSize: '1rem',
             borderWidth: isSelected ? '3px' : '1px',

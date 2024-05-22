@@ -17,6 +17,9 @@
 
 import User from '@canvas/users/backbone/models/User'
 import secondsToTime from '../../util/secondsToTime'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('user')
 
 class RosterUser extends User {
   html_url() {
@@ -28,9 +31,17 @@ class RosterUser extends User {
     const {sections} = this.collection
     if (sections === null || typeof sections === 'undefined') return []
     const user_sections = []
-    for (const {course_section_id} of this.get('enrollments')) {
+    for (const {course_section_id, enrollment_state} of this.get('enrollments')) {
       const user_section = sections.get(course_section_id)
-      if (user_section) user_sections.push(user_section.attributes)
+      if (user_section) {
+        const section = {
+          ...user_section.attributes,
+        }
+        if (enrollment_state === 'inactive') {
+          section.name = I18n.t('%{section_name} - Inactive', {section_name: section.name})
+        }
+        user_sections.push(section)
+      }
     }
     return user_sections
   }

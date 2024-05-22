@@ -1,0 +1,13 @@
+---
+translation:
+  state: hidden
+  applies_to: Course
+  display_name: Enable AI Translation
+  description: AI-driven translation controls for courses
+  beta: true
+translate_compose_message:
+  state: hidden
+  applies_to: User
+  display_name: Enable Translation in Message Compose
+  description: Can include translated message when composing messages.
+  beta: true

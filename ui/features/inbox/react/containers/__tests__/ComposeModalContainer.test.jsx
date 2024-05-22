@@ -21,7 +21,7 @@ import {ApolloProvider} from 'react-apollo'
 import ComposeModalManager from '../ComposeModalContainer/ComposeModalManager'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
-import {handlers} from '../../../graphql/mswHandlers'
+import {handlers, inboxSettingsHandlers} from '../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
@@ -40,7 +40,7 @@ jest.mock('../../../util/utils', () => ({
 }))
 
 describe('ComposeModalContainer', () => {
-  const server = mswServer(handlers)
+  const server = mswServer(handlers.concat(inboxSettingsHandlers()))
   beforeAll(() => {
     server.listen()
 
@@ -84,6 +84,7 @@ describe('ComposeModalContainer', () => {
     conversation,
     selectedIds = ['1'],
     isSubmissionCommentsType = false,
+    inboxSettingsFeature = false
   } = {}) =>
     render(
       <ApolloProvider client={mswClient}>
@@ -98,6 +99,7 @@ describe('ComposeModalContainer', () => {
               conversation={conversation}
               onSelectedIdsChange={jest.fn()}
               selectedIds={selectedIds}
+              inboxSettingsFeature={inboxSettingsFeature}
             />
           </ConversationContext.Provider>
         </AlertManagerContext.Provider>
@@ -510,5 +512,14 @@ describe('ComposeModalContainer', () => {
     fireEvent.click(button)
 
     expect(component.findByText('Please select a course')).toBeTruthy()
+  })
+
+  describe('Inbox Settings Loader', () => {
+    it('shows loader when inboxSettingsFeature flag is enabled', async () => {
+      const {getByText} = setup({inboxSettingsFeature: true})
+      await waitFor(() => {
+        expect(getByText('Loading Inbox Settings')).toBeInTheDocument()
+      })
+    })
   })
 })

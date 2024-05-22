@@ -50,7 +50,7 @@ import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
 import '@canvas/context-cards/react/StudentContextCardTrigger'
 
-import assignmentRubricDialog from '../../../../discussion_topic/jquery/assignmentRubricDialog'
+import assignmentRubricDialog from '@canvas/discussions/jquery/assignmentRubricDialog'
 import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
 
 const I18n = useI18nScope('discussion_posts')

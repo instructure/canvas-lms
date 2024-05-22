@@ -37,12 +37,28 @@ class Loaders::DiscussionEntryCountsLoader < GraphQL::Batch::Loader
   end
 
   def perform(objects)
-    object_id = object_id_string(objects.first)
-    counts = DiscussionEntry.joins(DiscussionEntry.participant_join_sql(@current_user))
-                            .where(discussion_entries: object_specific_hash(objects))
-                            .group("discussion_entries.#{object_id}")
-                            .select(counts_sql(object_id)).index_by(&object_id.to_sym)
+    entries_objects = objects.select { |object| object.is_a?(DiscussionEntry) }
+    topics_objects = objects.select { |object| object.is_a?(DiscussionTopic) }
 
+    entries_counts = counts_for_objects(entries_objects)
+    topics_counts = counts_for_objects(topics_objects)
+
+    fulfill_objects(entries_objects, entries_counts)
+    fulfill_objects(topics_objects, topics_counts)
+  end
+
+  def counts_for_objects(objects)
+    return DiscussionEntry.none if objects.empty?
+
+    object_id = object_id_string(objects.first)
+
+    DiscussionEntry.joins(DiscussionEntry.participant_join_sql(@current_user))
+                   .where(discussion_entries: object_specific_hash(objects))
+                   .group("discussion_entries.#{object_id}")
+                   .select(counts_sql(object_id)).index_by(&object_id.to_sym)
+  end
+
+  def fulfill_objects(objects, counts)
     objects.each do |object|
       # if we are not a root_entry, we are not returning counts
       if object.is_a?(DiscussionEntry) && object.root_entry_id

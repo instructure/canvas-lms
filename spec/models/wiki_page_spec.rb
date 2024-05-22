@@ -1164,4 +1164,102 @@ describe WikiPage do
       end
     end
   end
+
+  describe "visible_ids_by_user and visible_to_user" do
+    before :once do
+      @course1 = course_factory(active_all: true)
+      @page1 = @course1.wiki_pages.create!(title: "page1")
+      @page2 = @course1.wiki_pages.create!(title: "page2")
+      @assignment = @course1.assignments.create!(title: "assignment", only_visible_to_overrides: true)
+      @page2.update!(assignment_id: @assignment.id)
+      @student1 = student_in_course(active_all: true).user
+      @student2 = student_in_course(active_all: true).user
+    end
+
+    def assert_visible(user, pages)
+      visible_ids_by_user = WikiPage.visible_ids_by_user({ user_id: [user.id], course_id: [@course1.id] })
+      visible_to_user = WikiPage.visible_to_user(user.id).pluck(:id)
+      expect(visible_ids_by_user[user.id]).to contain_exactly(*pages.map(&:id))
+      expect(visible_to_user).to contain_exactly(*pages.map(&:id))
+    end
+
+    it "includes pages with no assignment by default" do
+      assert_visible(@student1, [@page1])
+      assert_visible(@student2, [@page1])
+    end
+
+    it "includes pages with assignment if the user has an override" do
+      override = @assignment.assignment_overrides.create!
+      override.assignment_override_students.create!(user: @student1)
+      assert_visible(@student1, [@page1, @page2])
+      assert_visible(@student2, [@page1])
+    end
+
+    it "includes pages with an assignment if the assignment has only_visible_to_overrides set to false" do
+      @assignment.update!(only_visible_to_overrides: false)
+      assert_visible(@student1, [@page1, @page2])
+      assert_visible(@student2, [@page1, @page2])
+    end
+
+    it "does not include pages from another course" do
+      course2 = course_factory(active_all: true)
+      course2.wiki_pages.create!(title: "page3")
+      student_in_course(course: course2, user: @student1, active_all: true)
+      visible_ids_by_user = WikiPage.visible_ids_by_user({ user_id: [@student1.id], course_id: [@course1.id] })
+      expect(visible_ids_by_user[@student1.id]).to contain_exactly(@page1.id)
+    end
+
+    it "includes group pages" do
+      group = group_model(context: @course1)
+      group_page = group.wiki_pages.create!(title: "group page")
+      expect(WikiPage.visible_to_user(@student1.id)).to include(group_page)
+    end
+
+    context "with differentiated_modules disabled" do
+      it "does not consider WikiPageStudentVisibility" do
+        @page1.update!(only_visible_to_overrides: true)
+        assert_visible(@student1, [@page1])
+      end
+    end
+
+    context "with differentiated_modules enabled" do
+      before :once do
+        Account.site_admin.enable_feature!(:differentiated_modules)
+      end
+
+      it "does not include pages if the page does not have an assignment but has only_visible_to_overrides set to true" do
+        @page1.update!(only_visible_to_overrides: true)
+        assert_visible(@student1, [])
+        assert_visible(@student2, [])
+      end
+
+      it "includes pages if the page does not have an assignment but the user has an override" do
+        @page1.update!(only_visible_to_overrides: true)
+        override = @page1.assignment_overrides.create!
+        override.assignment_override_students.create!(user: @student1)
+        assert_visible(@student1, [@page1])
+        assert_visible(@student2, [])
+      end
+
+      it "includes all pages where the user has an override" do
+        @page1.update!(only_visible_to_overrides: true)
+        page_override = @page1.assignment_overrides.create!
+        page_override.assignment_override_students.create!(user: @student1)
+        page_override.assignment_override_students.create!(user: @student2)
+        assignment_override = @assignment.assignment_overrides.create!
+        assignment_override.assignment_override_students.create!(user: @student1)
+        assert_visible(@student1, [@page1, @page2])
+        assert_visible(@student2, [@page1])
+      end
+
+      it "does not include pages where the user has a page override if the page has an assignment" do
+        page_override = @page1.assignment_overrides.create!
+        page_override.assignment_override_students.create!(user: @student1)
+        assignment = @course1.assignments.create!(title: "assignment", only_visible_to_overrides: true)
+        @page1.update!(assignment_id: assignment.id)
+        assert_visible(@student1, [])
+        assert_visible(@student2, [])
+      end
+    end
+  end
 end

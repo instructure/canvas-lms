@@ -21,6 +21,7 @@ import type {RubricsStore} from '../../../assignments_show_student.d'
 
 const store = create<RubricsStore>(() => ({
   displayedAssessment: null,
+  isSavingRubricAssessment: false,
 }))
 
 export default store

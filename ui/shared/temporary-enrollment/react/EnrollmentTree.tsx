@@ -145,6 +145,7 @@ export function EnrollmentTree(props: Props) {
           isMismatch: false,
           id: cId,
           label: course.name,
+          termName: course.term?.name,
           parent: roleNode,
           isCheck: props.tempEnrollmentsPairing ? roleCheck : courseCheckedByDefault,
           children: childArray,

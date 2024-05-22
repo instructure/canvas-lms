@@ -513,25 +513,6 @@ $(document).ready(function () {
         $obj.focus().select()
       }
     })
-  $('.course_form_more_options_link').click(function (event) {
-    event.preventDefault()
-    const $moreOptions = $('.course_form_more_options')
-    const optionText = $moreOptions.is(':visible')
-      ? I18n.t('links.more_options', 'more options')
-      : I18n.t('links.fewer_options', 'fewer options')
-    $(this).text(optionText)
-    const csp = document.getElementById('csp_options')
-    if (csp) {
-      import('../react/renderCSPSelectionBox')
-        .then(({renderCSPSelectionBox}) => renderCSPSelectionBox(csp))
-        .catch(() => {
-          // We shouldn't get here, but if we do... do something.
-          const $message = $('<div />').text(I18n.t('Setting failed to load, try refreshing.'))
-          $(csp).append($message)
-        })
-    }
-    $moreOptions.slideToggle()
-  })
   $enrollment_dialog.find('.cancel_button').click(() => {
     $enrollment_dialog.dialog('close')
   })

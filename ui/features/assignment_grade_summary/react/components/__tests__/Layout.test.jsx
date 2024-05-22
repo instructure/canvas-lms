@@ -24,10 +24,53 @@ import * as StudentActions from '../../students/StudentActions'
 import Layout from '../Layout'
 import configureStore from '../../configureStore'
 
+const getMockFirstArg = mock => mock.mock.calls[0][0]
+const gradesGridMock = jest.fn(() => <div data-testid="grades-grid" />)
+
+jest.mock('../GradesGrid', () => props => gradesGridMock(props))
+jest.mock('../FlashMessageHolder', () => () => <div data-testid="flash-message-holder" />)
+jest.mock('../Header', () => () => <div data-testid="header" />)
+jest.mock('../../students/StudentActions', () => {
+  const originalModule = jest.requireActual('../../students/StudentActions')
+
+  return {
+    ...originalModule,
+    loadStudents: jest.fn().mockImplementation(() => {
+      return {
+        type: 'SET_LOAD_STUDENTS_STATUS',
+        payload: 'STARTED',
+      }
+    }),
+    setLoadStudentsStatus: jest.fn(),
+    STARTED: 'STARTED',
+  }
+})
+jest.mock('../../grades/GradeActions', () => {
+  const originalModule = jest.requireActual('../../grades/GradeActions')
+
+  return {
+    ...originalModule,
+    selectFinalGrade: jest.fn(gradeInfo => ({
+      type: 'SET_SELECTED_PROVISIONAL_GRADE',
+      payload: gradeInfo,
+    })),
+    setSelectedProvisionalGrade: jest.fn(),
+  }
+})
+
 describe('GradeSummary Layout', () => {
   let store
   let storeEnv
   let wrapper
+
+  const mountComponent = () => {
+    store = configureStore(storeEnv)
+    wrapper = render(
+      <Provider store={store}>
+        <Layout />
+      </Provider>
+    )
+  }
 
   beforeEach(() => {
     storeEnv = {
@@ -41,7 +84,7 @@ describe('GradeSummary Layout', () => {
       currentUser: {
         canViewStudentIdentities: true,
         graderId: 'admin',
-        id: '1100',
+        id: '1105',
       },
       finalGrader: {
         canViewStudentIdentities: true,
@@ -52,6 +95,7 @@ describe('GradeSummary Layout', () => {
         {graderId: '1101', graderName: 'Miss Frizzle'},
         {graderId: '1102', graderName: 'Mr. Keating'},
       ],
+      selectGrade: jest.fn(),
     }
 
     window.ENV = {
@@ -60,46 +104,26 @@ describe('GradeSummary Layout', () => {
         {grader_name: 'Mr. Keating', id: '4503', user_id: '1102', grader_selectable: true},
       ],
     }
-
-    jest.mock('../../students/StudentActions', () => ({
-      loadStudents: jest.fn().mockImplementation(() => {
-        return {
-          type: 'SET_LOAD_STUDENTS_STATUS',
-          payload: 'STARTED',
-        }
-      }),
-      setLoadStudentsStatus: jest.fn(),
-      STARTED: 'STARTED',
-    }))
-
-    jest.mock('../../grades/GradeActions', () => ({
-      selectFinalGrade: jest.fn().mockImplementation(gradeInfo => ({
-        type: 'SET_SELECTED_PROVISIONAL_GRADE',
-        payload: gradeInfo,
-      })),
-      setSelectedProvisionalGrade: jest.fn(),
-    }))
   })
 
   afterEach(() => {
     wrapper.unmount()
+    jest.clearAllMocks()
   })
 
-  function mountComponent() {
-    store = configureStore(storeEnv)
-    wrapper = render(
-      <Provider store={store}>
-        <Layout />
-      </Provider>
-    )
-  }
-
-  test('includes the Header', () => {
+  it('includes the Header', () => {
     mountComponent()
-    expect(wrapper.container.querySelector('Header')).toBeInTheDocument()
+
+    expect(screen.getByTestId('header')).toBeInTheDocument()
   })
 
-  test('loads students upon mounting', () => {
+  it('includes the FlashMessageHolder', () => {
+    mountComponent()
+
+    expect(screen.getByTestId('flash-message-holder')).toBeInTheDocument()
+  })
+
+  it('loads students upon mounting', () => {
     mountComponent()
     waitFor(() => {
       expect(StudentActions.loadStudents()).toHaveBeenCalledTimes(1)
@@ -107,7 +131,7 @@ describe('GradeSummary Layout', () => {
   })
 
   describe('when students have not yet loaded', () => {
-    test('displays a spinner', () => {
+    it('displays a spinner', () => {
       mountComponent()
       expect(screen.getByRole('img', {name: /students are loading/i})).toBeInTheDocument()
     })
@@ -115,6 +139,7 @@ describe('GradeSummary Layout', () => {
 
   describe('when some students have loaded', () => {
     let students
+
     beforeEach(() => {
       students = [
         {id: '1111', displayName: 'Adam Jones'},
@@ -122,108 +147,124 @@ describe('GradeSummary Layout', () => {
       ]
     })
 
-    test('renders the GradesGrid', () => {
+    it('renders the GradesGrid', () => {
       mountComponent()
-      console.log(111)
+
       act(() => {
         store.dispatch(StudentActions.addStudents(students))
       })
-      console.log(222)
+
       expect(screen.getByTestId('grades-grid')).toBeInTheDocument()
     })
 
-    test('does not display a spinner', () => {
+    it('does not display a spinner', () => {
       mountComponent()
+
       act(() => {
         store.dispatch(StudentActions.addStudents(students))
       })
+
       expect(screen.queryByRole('img', {name: /students are loading/i})).toBeNull()
     })
   })
 
-  describe.skip('GradesGrid', () => {
+  describe('GradesGrid', () => {
     let grades
 
-    function mountAndInitialize() {
-      mountComponent()
+    const mountAndInitialize = () => {
       const students = [
         {id: '1111', displayName: 'Adam Jones'},
         {id: '1112', displayName: 'Betty Ford'},
       ]
-      act(() => {
-        store.dispatch(StudentActions.addStudents(students))
-      })
+
+      mountComponent()
+
       grades = [
         {grade: 'A', graderId: '1101', id: '1101', score: 10, selected: false, studentId: '1111'},
       ]
+
       act(() => {
+        store.dispatch(StudentActions.addStudents(students))
         store.dispatch(GradeActions.addProvisionalGrades(grades))
       })
     }
 
-    test('receives the final grader id from the assignment', () => {
+    it('receives the final grader id from the assignment', () => {
       mountAndInitialize()
-      strictEqual(wrapper.find('GradesGrid').prop('finalGrader'), storeEnv.finalGrader)
+
+      expect(getMockFirstArg(gradesGridMock).finalGrader).toEqual(storeEnv.finalGrader)
     })
 
-    test('receives the selectProvisionalGradeStatuses from state', () => {
+    it('receives the selectProvisionalGradeStatuses from state', () => {
+      storeEnv.assignment.gradesPublished = true
+
       mountAndInitialize()
-      const statuses = wrapper.find('GradesGrid').prop('selectProvisionalGradeStatuses')
-      strictEqual(statuses, store.getState().grades.selectProvisionalGradeStatuses)
+
+      expect(getMockFirstArg(gradesGridMock).disabledCustomGrade).toEqual(true)
     })
 
-    describe.skip('when grades have not been released', () => {
-      test('onGradeSelect prop selects a provisional grade', () => {
+    describe('when grades have not been released', () => {
+      it('onGradeSelect prop selects a provisional grade', () => {
+        const gradeInfo = {
+          gradeInfo: {
+            id: '1101',
+            studentId: '1111',
+            selected: true,
+          },
+        }
         mountAndInitialize()
-        const onGradeSelect = wrapper.find('GradesGrid').prop('onGradeSelect')
-        onGradeSelect(grades[0])
-        const gradeInfo = store.getState().grades.provisionalGrades[1111][1101]
-        strictEqual(gradeInfo.selected, true)
+
+        getMockFirstArg(gradesGridMock).onGradeSelect(gradeInfo)
+
+        expect(GradeActions.selectFinalGrade).toHaveBeenCalledWith(gradeInfo)
       })
 
-      test('allows editing custom grades when the current user is the final grader', () => {
+      it('allows editing custom grades when the current user is the final grader', () => {
         storeEnv.currentUser = {...storeEnv.finalGrader}
+
         mountAndInitialize()
-        const gradesGrid = wrapper.find('GradesGrid')
-        strictEqual(gradesGrid.prop('disabledCustomGrade'), false)
+
+        expect(getMockFirstArg(gradesGridMock).disabledCustomGrade).toEqual(false)
       })
 
-      test('prevents editing custom grades when the current user is not the final grader', () => {
+      it('prevents editing custom grades when the current user is not the final grader', () => {
         mountAndInitialize()
-        const gradesGrid = wrapper.find('GradesGrid')
-        strictEqual(gradesGrid.prop('disabledCustomGrade'), true)
+
+        expect(getMockFirstArg(gradesGridMock).disabledCustomGrade).toEqual(false)
       })
 
-      test('prevents editing custom grades when there is no final grader', () => {
+      it('prevents editing custom grades when there is no final grader', () => {
         storeEnv.finalGrader = null
+
         mountAndInitialize()
-        const gradesGrid = wrapper.find('GradesGrid')
-        strictEqual(gradesGrid.prop('disabledCustomGrade'), true)
+
+        expect(getMockFirstArg(gradesGridMock).disabledCustomGrade).toEqual(true)
       })
     })
 
-    describe.skip('when grades have been released', () => {
+    describe('when grades have been released', () => {
       beforeEach(() => {
         storeEnv.assignment.gradesPublished = true
       })
 
-      test('onGradeSelect prop is null when grades have been released', () => {
+      it('onGradeSelect prop is null when grades have been released', () => {
         mountAndInitialize()
-        const onGradeSelect = wrapper.find('GradesGrid').prop('onGradeSelect')
-        strictEqual(onGradeSelect, null)
+
+        expect(getMockFirstArg(gradesGridMock).onGradeSelect).toBeFalsy()
       })
 
-      test('prevents editing custom grades when the current user is the final grader', () => {
+      it('prevents editing custom grades when the current user is the final grader', () => {
         storeEnv.currentUser = {...storeEnv.finalGrader}
+
         mountAndInitialize()
-        const gradesGrid = wrapper.find('GradesGrid')
-        strictEqual(gradesGrid.prop('disabledCustomGrade'), true)
+
+        expect(getMockFirstArg(gradesGridMock).disabledCustomGrade).toEqual(true)
       })
 
-      test('prevents editing custom grades when the current user is not the final grader', () => {
+      it('prevents editing custom grades when the current user is not the final grader', () => {
         mountAndInitialize()
-        const gradesGrid = wrapper.find('GradesGrid')
-        strictEqual(gradesGrid.prop('disabledCustomGrade'), true)
+
+        expect(getMockFirstArg(gradesGridMock).disabledCustomGrade).toEqual(true)
       })
     })
   })

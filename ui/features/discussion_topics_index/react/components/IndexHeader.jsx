@@ -170,7 +170,7 @@ export default class IndexHeader extends Component {
 
   render() {
     return (
-      <View display="block">
+      <View display="block" data-testid="discussions-index-container">
         <Flex wrap="wrap" justifyItems="end">
           <Flex.Item shouldGrow={true}>
             <FormField

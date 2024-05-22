@@ -334,6 +334,7 @@ en-GB:
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "A table that contains the grading scheme data. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "A table that contains the grading scheme data. First is a name of the grading scheme and buttons for editing and deleting the scheme. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row."
   a_timeout_occurred_contacting_external_authenticat_c064ea48: "A timeout occurred contacting external authentication service"
+  a_verification_code_has_been_sent_to_email_please__108f2713: "A verification code has been sent to %{email}. Please provide this code below:"
   a_wonderful_assignment_d3139d9b: "A wonderful assignment"
   a_yearly_rrule_must_include_byday_or_bymonthday_b56649f4: "A yearly RRULE must include BYDAY or BYMONTHDAY"
   a_z_243c3301: A–Z
@@ -417,6 +418,7 @@ en-GB:
     root_account_cant_have_sis_id: "SIS IDs cannot be set on root accounts"
     sis_id_in_use: "SIS ID \"%{sis_id}\" is already in use"
     tab_admin_tools: "Admin tools"
+    tab_analytics_hub: "Analytics Hub"
     tab_authentication: Authentication
     tab_brand_configs: Themes
     tab_courses: Courses
@@ -771,6 +773,8 @@ en-GB:
   account_user: 
     types: 
       account_admin: "Account admin"
+  account_verification_required_486c5ccd: "Account Verification Required"
+  account_verification_successful_b051223: "Account verification successful"
   accountname_accountcount_a6e2ba71: "%{accountName} (%{accountCount})"
   accountname_accountcount_accounts_e2c19840: "%{accountName}, %{accountCount} accounts"
   accountname_subaccountcount_960a41c: "%{accountName} (%{subaccountCount})"
@@ -2456,7 +2460,9 @@ en-GB:
   additional_occurrence_s_7b5b0173: "additional occurrence(s)"
   additional_options_7cefee79: "Additional Options"
   additional_outcomes_options_6df428f1: "Additional outcomes options"
+  additional_replies_reply_to_entry_required_count_a_35b998d4: "additional replies (%{reply_to_entry_required_count}): %{assignment_due_date_time}"
   additional_replies_required_13697d0a: "Additional Replies Required"
+  additional_replies_required_replytoentryrequiredco_489e8364: "Additional Replies Required: %{replyToEntryRequiredCount}"
   additional_settings_20362654: "Additional Settings"
   additional_settings_for_sis_syncing_f926973e: "Additional settings for SIS syncing"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Additional SIS sync assignment, quiz, and discussion settings"
@@ -2562,6 +2568,7 @@ en-GB:
   agenda_b010136d: Agenda
   ahead_21f22939: Ahead
   ai_driven_smart_search_feature_597dbd4f: "AI driven smart search feature."
+  ai_driven_translation_controls_for_courses_12eb6085: "AI-driven translation controls for courses"
   ajax_errors: 
     error_heading: "Ajax Error: %{status_code}"
     errors: 
@@ -2688,6 +2695,7 @@ en-GB:
   all_subjects_5a42cfdb: "All Subjects"
   all_submission_comments_have_been_marked_as_read_74c0683b: "All submission comments have been marked as read"
   all_submission_comments_have_been_marked_as_read_7595389d: "All submission comments have been marked as read."
+  all_submissions_3eedfb97: "All submissions"
   all_submissions_must_have_a_selected_grade_3a84e5a9: "All submissions must have a selected grade."
   all_terms_cd27b0fb: "All terms"
   all_timezones_5e8afa7b: "All Time zones"
@@ -3494,7 +3502,9 @@ en-GB:
       their name when it is shown in the user interface.
   allows_users_to_save_and_search_frequently_used_fe_806f8999: "Allows users to save and search frequently used feedback in a library of comments to be used in SpeedGrader."
   allows_users_to_see_quantitative_numeric_grading_d_c96924f0: "Allows users to see quantitative (numeric) grading data. Disabling this permission will limit assignment creation options for teachers. Users will only see qualitative data, which includes letter grades and comments."
+  allows_users_to_use_average_as_a_calculation_metho_874f4b25: "Allows users to use average as a calculation method for a given outcome."
   allows_users_to_use_average_as_a_calulcation_metho_e5031470: "Allows users to use average as a calculation method for a given outcome."
+  allows_users_to_use_new_decaying_average_as_a_calc_9c285038: "Allows users to use new decaying average as a calculation method for a given outcome."
   allows_users_to_use_new_decaying_average_as_a_calu_fe640f6d: "Allows users to use new decaying average as a calculation method for a given outcome."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Allows users with international phone numbers to receive text messages from Canvas."
   alphabetically_60ab47e4: Alphabetically
@@ -6276,6 +6286,7 @@ en-GB:
   can_list_external_tools_9132ad0f: "Can list external tools."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Can list subscriptions to data service data."
   can_lookup_account_information_13d69520: "Can lookup Account information"
+  can_replace_the_entire_contents_of_the_rce_c6c97cba: "Can replace the entire contents of the RCE."
   can_request_page_content_using_postmessage_api_df6686e: "Can request page content using postMessage API."
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Can retrieve user data associated with the context the tool is installed in."
   can_show_external_tools_bb4988c5: "Can show external tools."
@@ -6391,6 +6402,7 @@ en-GB:
         stream_name_required: "Kinesis stream name is required."
   canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
+  canvas_account_verification_44e5694: "Canvas Account Verification"
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "Canvas Alert - Anonymous Comment: %{assignment_title}, Student (%{user_id}), %{course_name}."
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "Canvas Alert - Anonymous Comment: Student (%{author_id}) for %{assignment_title}, Student (%{user_id}), %{course_name}."
   canvas_alert_anonymous_resubmission_assignment_tit_6df1cd32: "Canvas Alert - Anonymous Resubmission: %{assignment_title}"
@@ -6661,6 +6673,7 @@ en-GB:
   choose_your_default_skin_tone_f09bf0bd: "Choose your default skin tone"
   chosencolor_is_not_a_valid_color_5d542cc: "%{chosenColor}' is not a valid colour."
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' is not a valid colour. Enter a valid hexcode before saving."
+  claims_225ec8a4: Claims
   clark_county_gradebook_c5ea74bb: "Clark County Gradebook"
   classic_quizzes_dee3c7b7: "Classic Quizzes"
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Classic Quizzes Option for Timed Quizzes without Submission"
@@ -7009,7 +7022,7 @@ en-GB:
   communication_5255723c: Communication
   communication_channel: 
     body: "Your Canvas verification code is %{verification_code}"
-    default_twitter_handle: "Twitter handle"
+    default_twitter_handle: "X.com Handle"
     default_yo_name: "Yo Name"
   communication_channel_id_197ef6f9: "Communication channel ID"
   communication_channels: 
@@ -7209,6 +7222,7 @@ en-GB:
   completed_9b809e44: completed
   completed_icon_521596e4: "completed icon"
   completed_peer_reviews_c134676: "Completed Peer Reviews"
+  completed_submittedat_66f56614: "Completed %{submittedAt}"
   compose_a_new_message_db3a68ed: "Compose a new message"
   compose_message_8abd180a: "Compose message"
   compressing_f4a35c08: Compressing...
@@ -7747,7 +7761,7 @@ en-GB:
         user_services: "Registered web services"
       help: 
         list_services: "You haven't enabled your list of registered services. Enabling this list will let fellow course and group members more easily link up with you outside of class."
-        services: "You have not yet linked your user profile to any external services. You can link your Canvas account to services like Twitter. This makes it easier for fellow course and group members to link up with you outside of class."
+        services: "You haven't linked your user profile to any external services. You can link your Canvas account to services like X.com. This will make it easier for fellow course and group members to link up with you outside of class."
       labels: 
         public_list_services: "Let fellow course/group members see which services I've linked to my profile"
         user_privileges: Privileges
@@ -7786,7 +7800,7 @@ en-GB:
         registered_services: "Registered services"
         service_types: "Service types"
       help: 
-        no_services: "You have not yet linked your user profile to any external services. You can link your Canvas account to services like Twitter."
+        no_services: "You haven't linked your user profile to any external services. You can link your Canvas account to services like X.com."
         services_private: "You haven't enabled your list of registered services. Enabling this list will let fellow course and group members see which services you have linked to your Canvas account."
         user_services: "If other members choose, they can let you see which outside services they've linked to their Canvas account. This can make it easier to coordinate group projects and also link up outside of class."
       labels: 
@@ -9072,6 +9086,7 @@ en-GB:
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "Course SIS ID (SIS_ID:####) OR Canvas ID: (###)"
   course_start_date_daae16ae: "Course Start Date"
   course_start_date_on_before_a3a32883: "Course Start Date On/Before"
+  course_start_date_start_date_course_end_date_end_d_437726c: "Course Start Date: %{start_date} | Course End Date: %{end_date}"
   course_starts_at_3a01f9da: "Course commences at"
   course_state_manage_2edd46dc: "Course state - manage"
   course_statistics: 
@@ -9378,6 +9393,8 @@ en-GB:
       enrollment: 
         links: 
           unenroll_user: "Remove user from course"
+    sections: 
+      no_date: "(no date)"
     settings: 
       alerts_title: Alerts
       buttons: 
@@ -9986,6 +10003,7 @@ en-GB:
   current_grading_standard_for_this_assignment_64c5375e: "Current marking standard for this assignment"
   current_jobs_aa571ce4: "Current jobs"
   current_letter_grade_50f4ebb1: "Current Letter Grade"
+  current_mastery_score_c3f626c8: "Current Mastery Score"
   current_mastery_score_score_out_of_mastery_points_fedd343f: "Current Mastery Score: %{score} out of %{mastery_points}"
   current_of_totalsteps_19d7ee37: "%{current} of %{totalSteps}"
   current_provider_6c3f7f96: "Current Provider"
@@ -11371,6 +11389,7 @@ en-GB:
   due_no_due_date_2b226d2c: "Due: no due date"
   due_no_due_date_3c1d1651: "due: No due date"
   due_on_date_5ffb2182: "Due on date"
+  due_reply_to_topic_assignment_due_date_time_eec6a6f5: "due: reply to topic: %{assignment_due_date_time}"
   due_time_9acd6b69: "Due %{time}"
   due_to_the_size_of_your_course_you_must_select_a_s_f834ba66: "\n\
       \x20               Due to the size of your course you must select a student group before launching\n\
@@ -11677,6 +11696,7 @@ en-GB:
   enable_6f5d1328: Enable
   enable_a_plugin_which_can_find_and_replace_content_59c15164: "Enable a plugin which can find and replace content when editing in an RCE"
   enable_ability_to_alter_the_final_grade_for_the_en_e120f72d: "Enable ability to alter the final grade for the entire course without changing scores for assignments."
+  enable_ai_translation_4e5a644b: "Enable AI Translation"
   enable_all_read_only_scopes_3ddc2bb5: "Enable all read only scopes."
   enable_an_account_setting_which_toggles_push_notif_f3ccc7a1: "Enable an account setting which toggles push notifications for that account"
   enable_and_lock_e6099cc2: "Enable and lock"
@@ -11810,9 +11830,12 @@ en-GB:
     assignment_order_alpha: Alphabetically
     assignment_order_assignment_groups: "By Assignment Group and Position"
     assignment_order_due_date: "By due date"
+    avg_score: "Average score"
+    high_score: "High score"
     invalid_group_warning: 
       one: "Note: Score does not include assignments from the group %{list_of_group_names} because it has no points possible."
       other: "Note: Score does not include assignments from the groups %{list_of_group_names} because they have no points possible."
+    low_score: "Low score"
     notes: Notes
   enhanced_individual_gradebook_4e825077: "Enhanced Individual Gradebook"
   enhanced_rce_paste_from_clipboard_30ddb011: "Enhanced RCE paste from clipboard"
@@ -13203,6 +13226,7 @@ en-GB:
   final_score_26bcfc20: "Final Score"
   final_score_53278fd0: "Final Score:"
   final_score_61e15cf3: "final score"
+  final_score_e77dd324: "Final score"
   findLinkForService: 
     buttons: 
       search: Search
@@ -13247,6 +13271,7 @@ en-GB:
   find_your_classes_or_subjects_in_the_dashboard_72e1ed47: "Find your classes or subjects in the Dashboard..."
   finding_matched_jobs_f7cd0e6d: "Finding matched jobs"
   finish_bc343002: Finish
+  finish_recording_e0dd7520: "Finish Recording"
   finished_19aaf6f5: Finished
   finished_publishing_pace_597ffc4f: "Finished publishing pace"
   finished_publishing_plan_f443d416: "Finished publishing plan"
@@ -14149,6 +14174,7 @@ en-GB:
       page_header_title: SpeedGrader
       page_title: "%{assignment_name}, SpeedGrader, %{course_name}"
       sort_by: 
+        randomize: "randomise students"
         status: "by submission status (needs grading, not submitted, etc.)"
         student_name: "by student name (alphabetically)"
         submitted_at: "the date they submitted the assignment"
@@ -14208,6 +14234,7 @@ en-GB:
   graded_on_submission_60ac3010: "Graded on submission"
   graded_on_time_submissions_80a3c6b: "Graded on time submissions"
   graded_quiz_7fabdf1f: "Graded quiz"
+  graded_submissions_1363409e: "Graded submissions"
   graded_submissions_9c7068a2: "Graded submissions"
   graded_survey_c0f0c395: "Graded survey"
   grader_comments_visible_to_graders_turned_off_d2af5e9d: "Grader comments visible to graders turned off"
@@ -15207,6 +15234,7 @@ en-GB:
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Hide the Import Learning Outcomes button based on user permissions"
   hide_total_and_override_columns_6fde3e25: "Hide Total and Override Columns"
   hide_total_column_6911831e: "Hide Total Column"
+  hide_translate_text_1003ba9e: "Hide Translate Text"
   hide_unassessed_outcomes_a20aa7fd: "Hide Unassessed Outcomes"
   hide_zero_point_new_quizzes_from_the_student_and_t_b4c22d88: "Hide zero-point new quizzes from the student and teacher gradebooks"
   hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "Hides certain students and sections in the LMGB if the teacher only has access to a particular section"
@@ -15725,6 +15753,7 @@ en-GB:
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "If you change an assignment's points possible, you must grade the assignment again."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "If you change an assignment's points possible, you must grade any submissions again."
   if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "If you configure settings that prevent you from being able to log in, you can directly access regular Canvas login at %{url}"
+  if_you_did_not_try_to_log_into_canvas_please_disre_d2bbfb: "If you did not try to log into Canvas, please disregard this message."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "If you do not select usage rights now, this file will be unpublished after it's uploaded."
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: "If you enable this feature, ensure that your sales-force account has these custom fields added exactly with the names in the left column of the table"
   if_you_encountered_an_unexpected_error_please_crea_d4aca901: "If you encountered an unexpected error, please create support ticket:"
@@ -15905,6 +15934,7 @@ en-GB:
   inactive_enrollments_bd1831ea: "Inactive Enrolments"
   inappropriate_1930c574: Inappropriate
   inbox_bb245a60: Inbox
+  inbox_settings_feature_is_disabled_31bc4dce: "inbox settings feature is disabled"
   inbox_settings_qw_updates_a3eb954b: "Inbox Settings - QW Updates"
   include_a_download_link_next_to_each_file_link_in__481761de: "Include a download link next to each file link in the RCE"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Include a link to a screencast/screenshot using something like *Jing*."
@@ -15967,6 +15997,7 @@ en-GB:
   increase_indent_6af90f7c: "Increase indent"
   increase_indent_6d550a4a: "Increase indent"
   incremental_update_successfully_generated_against__db3f3f06: "Incremental update successfully generated against a previous SIS Import."
+  indexing_in_progress_6ce56f27: "Indexing in progress"
   india_8d982994: India
   india_91_6c290107: "India (+91)"
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: "Indicates the image is for decorative purposes only and should not be read by screen readers"
@@ -16283,6 +16314,7 @@ en-GB:
       Invalid request. SFTP name is invalid.
                                     Please reach out in #canvas-sre in Slack.
   invalid_restrictions_316cd740: "Invalid restrictions"
+  invalid_rubric_submission_b1c73f8d: "Invalid Rubric Submission"
   invalid_score_3d247da7: "Invalid score"
   invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: "Invalid sftp username. We were unable to determine the username to use due to no domain ending in .instructure.\n\
       \x20                             Please reach out in #canvas-sre in Slack.   "
@@ -16304,6 +16336,7 @@ en-GB:
   invalid_value_12ca12c2: "Invalid value"
   invalid_value_a1b45937: "invalid value"
   invalid_value_for_name_i_4a7c601a: "Invalid value for %{name}: \"%{i}\""
+  invalid_verification_code_16c22ba6: "Invalid verification code"
   invalid_xml_configuration_9c3f6bcf: "Invalid XML Configuration"
   invalid_xml_syntax: "invalid xml syntax"
   invitation_only_9a253f1d: "Invitation Only"
@@ -16352,6 +16385,7 @@ en-GB:
   item_incomplete_d6a16040: "(Item Incomplete)"
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} is not currently supported"
   item_past_due_dc6e776: "Item past due"
+  item_score_45eaaf87: "Item score"
   item_scores_9fbfe956: "Item Scores:"
   item_select_fe0f320a: "Item Select"
   item_type_assignment_13a1132e: "Item type: Assignment"
@@ -17744,6 +17778,10 @@ en-GB:
             You'll need to register with Canvas before you can participate as an account admin.  You can finish the registration process here: 
             %{url}
         username_info: "Username: %{username}"
+    account_verification: 
+      email: 
+        html: 
+          subject: "Canvas Account Verification"
     added_to_conversation: 
       email: 
         body: "%{user_name} just added you to a conversation in Canvas. To view the conversation, click the link below:"
@@ -18302,6 +18340,10 @@ en-GB:
         subject: "Blueprint Sync Finished: %{name}"
       twitter: 
         tweet: "Canvas Alert - Blueprint course changes synced from %{name}."
+    checkpoints_created: 
+      email: 
+        labels: 
+          click_to_see_assignment: "Click here to view the assignment"
     collaboration_invitation: 
       email: 
         body: |-
@@ -20403,6 +20445,7 @@ en-GB:
   next_module_item_9bb8a222: "Next module/item"
   next_month_749b1778: "Next Month"
   next_month_b55a387c: "Next month"
+  next_outcome_fe0a9299: "Next Outcome"
   next_page_d2a39853: "Next page"
   next_peer_review_3d05ef23: "Next Peer Review"
   next_question_f37bac25: "Next Question"
@@ -20515,6 +20558,7 @@ en-GB:
   no_more_results_17c4f108: "No more results"
   no_more_results_to_load_6774fb1c: "No more results to load."
   no_outcome_file_or_authority_given_c90f9c5f: "No outcome file or authority given"
+  no_outcome_selected_16d15753: "No Outcome Selected"
   no_password_was_given_472222e5: "No password was given"
   no_pending_changes_to_apply_b28f98cf: "No pending changes to apply"
   no_placements_enabled_f705f28: "No placements enabled"
@@ -20618,6 +20662,7 @@ en-GB:
   not_graded_e027c866: "Not graded"
   not_graded_e78bcd50: "Not graded"
   not_graded_on_time_submissions_54e6ec49: "Not graded on time submissions"
+  not_graded_submissions_cd209a7f: "Not graded submissions"
   not_graded_yet_82f63c67: "Not Graded Yet"
   not_installed_37a21a76: "Not Installed"
   not_mastered_5c2f9968: "Not mastered"
@@ -20658,9 +20703,14 @@ en-GB:
   note_students_have_submitted_work_for_these_assign_7bc34e28: "NOTE: Students have submitted work for these assignments that has not been graded. If you post these grades now, you will need to re-post their scores after grading their latest submissions."
   note_sub_account_themes_are_not_active_during_this_a5dd9da: "Note: sub-account themes are not active during this preview."
   note_syncing_is_triggered_by_changes_to_course_enr_4fa83ef3: "Note: Syncing is triggered by changes to course enrolments. The first time you enable Microsoft Sync, you may have to trigger a sync manually with the button below."
+  note_that_all_login_attributes_from_entra_id_login_8b0e3aa5: |-
+      Note that all login attributes from Entra ID logins are potentially modifiable with the exception of *tid* and *oid*.
+      To ensure user accounts cannot be compromised, you should only use an attribute besides *tid+oid* if you are certain
+      it cannot be changed by users in all of your allowed Entra ID tenants.
   note_that_as_long_as_this_option_is_enabled_studen_9ed99069: "Note that as long as this option is enabled, students can move themselves from one group to another."
   note_that_email_may_not_always_be_populated_in_the_bb4a1572: "Note that email might not always be populated in the user's profile at Microsoft. OID will not be populated for personal Microsoft accounts."
   note_that_some_attributes_may_not_be_populated_for_7c1f2854: "Note that some attributes might not be populated for all users at Clever."
+  note_this_code_will_expire_in_15_minutes_c743de99: "*NOTE*: This code will expire in 15 minutes."
   note_this_is_not_your_official_score_f2d4582f: "*NOTE*: This is NOT your official score."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Note: This login's account uses delegated authentication, but allows fallback Canvas password authentication. The password fields in this form update the fallback Canvas password, *not* the delegated authentication."
   note_this_will_attempt_to_undo_the_merge_as_fully__41c9c4e9: "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state."
@@ -20811,6 +20861,7 @@ en-GB:
       account_notification: "Account Notification"
       account_user_notification: "Account user notification"
       account_user_registration: "Account user registration"
+      account_verification: "Account verification"
       added_to_conversation: "Added to conversation"
       alert: Alert
       announcement_created_by_you: "Announcement created by you"
@@ -20832,6 +20883,7 @@ en-GB:
       assignment_submitted_late: "Assignment submitted late"
       blueprint_content_added: "Blueprint Content Added"
       blueprint_sync_complete: "Blueprint Sync Complete"
+      checkpoints_created: "Checkpoints Created"
       collaboration_invitation: "Collaboration invitation"
       confirm_email_communication_channel: "Confirm email communication channel"
       confirm_registration: "Confirm registration"
@@ -21384,6 +21436,7 @@ en-GB:
   outcome_guid_has_already_appeared_in_this_import_b9b8b34: "Outcome \"%{guid}\" has already appeared in this import"
   outcome_guid_not_in_visible_context_36269663: "Outcome \"%{guid}\" not in visible context"
   outcome_imports_c496a81f: "Outcome Imports"
+  outcome_information_936c59ef: "Outcome information"
   outcome_mastery_scales_8c3a814d: "Outcome Mastery Scales"
   outcome_mastery_scales_add_edit_171551c: "Outcome Mastery Scales - add / edit"
   outcome_menu_4fe5813: "Outcome Menu"
@@ -21969,9 +22022,11 @@ en-GB:
   please_try_another_search_term_filter_or_search_wi_d6c4046a: "Please try another search term, filter, or search with fewer characters"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Please try re-establishing the connection to the tool by re-selecting the tool in the assignment or module item interface and saving."
   please_upload_files_as_a_zip_5a2c799f: "Please upload files as a .zip"
+  please_use_the_following_code_to_complete_your_log_bd2eb58d: "Please use the following code to complete your login: *%{code}*"
   please_verify_that_this_is_the_case_and_then_click_56f1d0fe: "Please verify that this is the case, and then click the red button below to delete the bad settings."
   please_visit_your_modules_page_for_more_informatio_846c5e32: "Please visit your *modules page* for more information."
   please_wait_2b646bc2: "Please wait."
+  please_wait_a_moment_while_we_get_smart_search_rea_99a77351: "Please wait a moment while we get Smart Search ready for this course. This only needs to happen once."
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: "Please wait as we upload and process your file."
   please_wait_e6355980: "Please wait..."
   please_wait_while_we_upload_attachments_59544216: "Please wait while we upload attachments."
@@ -22317,7 +22372,7 @@ en-GB:
       description: "Microsoft login"
     microsoft_settings: 
       description: |-
-          You will need to register a [new app with Microsoft](%{ms_app_url}).* *
+          You will need to register a [new app with Microsoft](%{ms_app_url}) under *App registrations*.
           You should configure %{callback_url} as the Redirect URI.
           After you save your app, make a note of the Application ID and Secret, and enter them here.
       labels: 
@@ -22600,6 +22655,7 @@ en-GB:
   prev_month_34bd934c: "Prev month"
   prevent_deletion_of_outcomes_with_alignments_in_os_65020476: "Prevent deletion of outcomes with alignments in OS"
   prevent_non_cmc_consortium_parent_dev_key_from_aff_418efa1c: "Prevent non-CMC consortium parent dev key from affecting tools in children"
+  prevents_lti_tools_with_assignment_edit_placement__b4f4918e: "Prevents LTI tools with assignment_edit placement from being launched on Announcements page"
   prevents_students_from_leaving_annotations_in_assi_cb188d2: "Prevents students from leaving annotations in assignments. Does not apply to peer-reviewed assignments."
   preview_53003fd2: Preview
   preview_a3f8f854: PREVIEW
@@ -22628,6 +22684,7 @@ en-GB:
   previous_module_item_a9e57348: "Previous Module Item"
   previous_month_7adf1380: "Previous month"
   previous_month_bb1e3c84: "Previous month"
+  previous_outcome_e05a5c3: "Previous Outcome"
   previous_page_928fc112: "Previous page"
   previous_question_162c4048: "Previous Question"
   previous_snapshots_d8cd4820: "Previous snapshots"
@@ -22918,7 +22975,7 @@ en-GB:
       unconfirmed_click_to_confirm: "Unconfirmed.  Click to confirm"
     token_never_expires: never
     twitter_select: 
-      twitter: Twitter
+      twitter: X.com
     ways_to_contact: 
       bouncing_channel: "Canvas was unable to send messages to you using this contact method. Please ensure the contact information is correct to continue receiving messages from Canvas."
       bouncing_email: "Canvas was unable to send email to this address. Please ensure the address is correct to continue receiving email from Canvas."
@@ -25357,6 +25414,7 @@ en-GB:
   result_for_19482b14: "result for "
   result_s_filtered_by_c01428e4: "result(s) filtered by"
   results_filtered_by_186c4aaa: "results filtered by"
+  results_for_2bc07172: "Results for"
   results_for_331ce107: "results for "
   resume_quiz_afeceb87: "Resume quiz"
   resume_survey_58dce775: "Resume survey"
@@ -25815,6 +25873,7 @@ en-GB:
   scored_more_than_d1646bd5: "Scored more than"
   scored_more_than_score_on_assignmenttitle_2afa1d32: "Scored more than %{score} on %{assignmentTitle}"
   scoring_range_upperbound_to_lowerbound_c017669b: "Scoring range %{upperBound} to %{lowerBound}"
+  screen_recording_is_in_progress_6e3993ac: "Screen recording is in progress "
   screenreader_gradebook: 
     assignment_information: 
       actions: 
@@ -26054,6 +26113,7 @@ en-GB:
   section_name_b6d82574: "Section name"
   section_name_edb51b2: "section name"
   section_name_fa2b80d7: "Section Name:"
+  section_name_inactive_36edffe6: "%{section_name} - Inactive"
   section_pace_989d2856: "Section Pace"
   section_removed_2ac72a79: "%{section} removed"
   section_section_names_98f172e6: "Section: %{section_names}"
@@ -26155,6 +26215,7 @@ en-GB:
   select_a_location_4eb17e4b: "Select a location"
   select_a_log_type_to_search_247fc6b4: "Select a log type to search."
   select_a_module_optional_7edb5cb0: "Select a Module (optional)"
+  select_a_outcome_to_view_additional_information_61a282f: "Select an outcome to view additional information"
   select_a_predefined_color_c77ab2f5: "Select a predefined colour."
   select_a_provisional_grade_7106e3d5: "Select a provisional grade"
   select_a_question_bank_f346e5a0: "Select a question bank"
@@ -26162,6 +26223,7 @@ en-GB:
   select_a_section_37ac1694: "Select a section"
   select_a_student_adfcc348: "Select a student"
   select_a_student_and_an_assignment_to_view_and_edi_96fda3c1: "Select a student and an assignment to view and edit grades."
+  select_a_student_and_an_outcome_to_view_results_9b36b177: "Select a student and an outcome to view results."
   select_a_student_to_view_281d17b9: "Select a student to view"
   select_a_student_to_view_additional_information_he_c371e40c: "Select a student to view additional information here."
   select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: "Select a student to view. The page will refresh automatically."
@@ -26178,6 +26240,7 @@ en-GB:
   select_an_assignment_e52320d7: "Select an assignment"
   select_an_assignment_to_view_additional_informatio_de1370e1: "Select an assignment to view additional information here."
   select_an_edit_operation_ec1467d: "Select an edit operation"
+  select_an_outcome_37fb2096: "Select an outcome"
   select_an_outcome_group_6edb08a7: "Select an outcome group"
   select_another_group_24773e5f: "Select another group"
   select_assignment_available_from_date_203b323f: "Select Assignment Available From Date"
@@ -26765,7 +26828,7 @@ en-GB:
       facebook: Facebook
       privacy_policy: "Privacy Policy"
       terms_of_service: "Terms of service"
-      twitter: Twitter
+      twitter: X.com
     global_dialogs: 
       buttons: 
         install_video_plugin: "Install the video plugin"
@@ -27855,6 +27918,7 @@ en-GB:
   start_date_for_enroll_3c2e1f94: "Start Date for %{enroll}"
   start_date_from_20503757: "Start Date From:"
   start_date_must_be_before_end_date_a00be892: "Start date must be before end date"
+  start_date_start_date_end_date_end_date_a85cffa7: "Start Date: %{start_date} | End Date: %{end_date}"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} to %{end_time}"
   start_date_time_must_be_before_the_end_date_time_6be0c57f: "Start Date/Time must be before the End Date/Time"
   start_date_to_1e6e6bbe: "Start Date To:"
@@ -28133,6 +28197,7 @@ en-GB:
   students_with_no_submissions_title: "Students with no submissions"
   students_without_assessments_eb100e60: "Students without assessments"
   studentsperrangecount_out_of_totalstudentsenrolled_90cbfaf1: "%{studentsPerRangeCount} out of %{totalStudentsEnrolled} students"
+  studio_capture_a88ec4e: "Studio Capture"
   studio_media_options_in_rce_1118428b: "Studio Media Options in RCE"
   sub_account_daeadd0: Sub-Account
   sub_accounts: 
@@ -28710,6 +28775,7 @@ en-GB:
   tenant_missing_or_sync_disabled_check_the_microsof_7ac198e5: "Tenant missing or sync disabled. Check the Microsoft sync integration settings for the course and account."
   tenant_name_e174f404: "Tenant Name"
   tenant_name_input_area_283dfcde: "Tenant Name Input Area"
+  tenants_52798659: Tenants
   term_41f37cae: term
   term_42976f1c: "Term:"
   term_created_27d27c2b: "Term created "
@@ -28721,6 +28787,7 @@ en-GB:
   term_sis_bfe0ae01: "Term SIS"
   term_sis_id_4613e944: "term sis id"
   term_start_b8c2aad1: "term start"
+  term_start_date_start_date_term_end_date_end_date_dd895ab2: "Term Start Date: %{start_date} | Term End Date: %{end_date}"
   term_starting_5bd5e070: "Term starting "
   terms: 
     errors: 
@@ -28973,6 +29040,14 @@ en-GB:
                 can take awhile for large courses. You can leave this
                 page and you'll get a notification when the download
                 is complete.
+  the_email_address_email_was_used_to_log_into_canva_4ef05773: |-
+      The email address %{email} was used to log into Canvas at %{website}.
+      
+      Please use the following code to complete your login: %{code}
+      NOTE: This code will expire in 15 minutes.
+      
+      If you did not try to log into Canvas, please disregard this message.
+  the_email_address_email_was_used_to_log_into_canva_d76c2a77: "The email address %{email} was used to log into Canvas at %{website}."
   the_end_date_for_841d2ecd: "The end date for "
   the_end_date_for_default_to_end_of_yesterday_d8ebec31: "The end date for (default to end of yesterday)"
   the_end_date_for_discussion_entries_6ac1b0d9: "The end date for Discussion Entries"
@@ -30519,6 +30594,10 @@ en-GB:
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "To restrict to users from a specific Clever district, enter the district's Clever ID here. This is required for Clever Instant Login to work in a multi-tenant environment."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "To restrict users from specific Google Apps domain, enter the domain here."
   to_restrict_to_users_from_specific_google_apps_dom_72aec2d5: "To restrict to users from specific Google Apps domains, enter the domain(s) here as a comma separated list. To restrict to a Google Apps user in general, you can enter '*'."
+  to_restrict_to_users_of_specific_entra_id_instance_10fc0c41: |-
+      To restrict to users of specific Entra ID instances, enter the tenant GUID(s) here, separated by commas.
+      You can specify *microsoft* to allow personal Microsoft accounts.
+      If your Entra ID is configured to allow guest users from other tenants, you can specify *guests* to allow them without specifically naming their tenant.
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "To restrict to users of your Azure Active Directory, enter your tenant here."
   to_review_a_moderated_assignment_in_speedgrader_gr_33227412: "To review a moderated assignment in SpeedGrader, Grades - edit must also be enabled."
   to_search_and_view_notifications_for_a_user_users__becfb733: "To search and view notifications for a user, Users - view list must also be enabled."
@@ -30539,6 +30618,7 @@ en-GB:
   to_search_for_a_course_in_the_restore_courses_tab__a903343: "To search for a course in the Restore courses tab, Course content - view must also be enabled. To restore a deleted course in an account, Courses - add / edit / delete, Course Content - view, and Courses - undelete must all be enabled."
   to_search_grade_change_logs_grades_view_change_log_8d2f6d30: "To search grade change logs, Grades - view change logs​ must also be enabled."
   to_search_grade_change_logs_grades_view_change_log_d4d40cf2: "To search grade change logs, Grades - view change logs must also be enabled."
+  to_secure_your_account_you_must_validate_your_emai_fe32b66f: "To secure your account, you must validate your email before you can log in to Canvas."
   to_see_the_analytics_link_in_the_user_sidebar_from_6a8b20d9: "To see the analytics link in the user sidebar from the People page, Profiles must be disabled in your account."
   to_see_the_course_setup_checklist_option_on_the_co_41322a29: "To see the Course setup checklist option on the Course homepage, Manage (add / edit / delete) courses must also be enabled."
   to_see_the_course_setup_checklist_option_on_the_co_6c485483: "To see the Course Setup Checklist option on the Course Home Page, Manage - add / edit / delete courses must also be enabled."
@@ -30771,6 +30851,7 @@ en-GB:
   total_points_total_f41b2cff: "Total points: %{total}"
   total_points_total_out_of_possible_9056fdb4: "Total points: %{total} out of %{possible}"
   total_range_45c8549a: "Total Range"
+  total_results_b535018d: "Total results"
   total_results_outcomedetails_cnt_30ff1f8d: "Total results: %{outcomeDetails.cnt}"
   totalcount_total_replies_b6988c0a: "%{totalCount} total replies"
   totals_are_calculated_based_only_on_graded_assignm_7d1bbf55: "Totals are calculated based only on graded assignments."
@@ -30788,6 +30869,9 @@ en-GB:
   transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
       Transforms absolute URLs to relative URLs and removes extraneous attributes from RCE content on load.
       Needed for the RCE to function fully in New Quizzes.
+  translate_text_2c2a2af4: "Translate Text"
+  translating_fa26c47b: Translating
+  translating_text_f98e9e72: "Translating Text"
   travel_places_f461329c: "Travel & Places"
   treat_ungraded_as_0_d38c2b41: "Treat ungraded as 0"
   tree_browser: 
@@ -31469,6 +31553,8 @@ en-GB:
   user_inactivity_report_70cae434: "User Inactivity Report"
   user_information_6353d7e1: "User information"
   user_is_from_unacceptable_domain_domain_b4b6fd1b: "User is from unacceptable domain %{domain}."
+  user_is_from_unacceptable_issuer_issuer_6a87cafa: "User is from unacceptable issuer %{issuer}."
+  user_is_from_unacceptable_tenant_tenant_f4cb522: "User is from unacceptable tenant %{tenant}."
   user_is_now_group_leader_60ec9b98: "%{user} is now group leader"
   user_isn_t_allowed_to_edit_global_outcomes_a7eb4a87: "User isn't allowed to edit global outcomes"
   user_just_accepted_their_invitation_to_participate_7a4b2ce4: "%{user} just accepted invitation to participate in the course, %{course}. Course role: %{role_type}"
@@ -31638,7 +31724,7 @@ en-GB:
       google_drive: "Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations."
       linked_in: "LinkedIn is a resource for business networking.  Many of the relationships you build while in school can also be helpful once you enter the workplace."
       skype: "Skype is a free tool for online voice and video calls."
-      twitter: "Twitter is a great resource for out-of-class communication."
+      twitter: "X.com is a great resource for out-of-class communication."
       yo: "Yo is a single-tap zero-character communication tool."
   user_settings_785eed40: "User settings"
   user_sis_id_c017cb14: "user sis id"
@@ -31898,8 +31984,8 @@ en-GB:
         other: "submitted %{count} days ago"
         zero: "submitted less than 1 day ago"
       title: "Teacher Activity Report"
-    twitter_added: "Twitter access authorised!"
-    twitter_fail_whale: "Twitter authorisation failed. Please try again"
+    twitter_added: "X.com access authorised!"
+    twitter_fail_whale: "X.com authorisation failed. Please try again"
     user_atom_feed: "User Atom feed (All courses)"
     user_dashboard: 
       dashboard: Dashboard
@@ -31998,6 +32084,7 @@ en-GB:
       resubmit_to_vericite: "Resubmit to VeriCite"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite similarity score -- more information"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Similarity Score - See detailed report"
+  verification_code_5acd64ef: "Verification code"
   verify_ldap_tls_certificates_70241d8e: "Verify LDAP TLS certificates"
   verify_tls_certificate_9cfa26d1: "Verify TLS Certificate"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Verify TLS certificates presented by LDAP authentication providers."
@@ -32304,6 +32391,7 @@ en-GB:
   when_enabled_allows_the_tables_on_the_developer_ke_530070d: |-
       When enabled, allows the tables on the Developer Keys page to be
       sorted and filtered.
+  when_enabled_an_lti_tool_with_the_assignment_edit__37ecd98d: "When enabled, an LTI tool with the assignment_edit placement will not be launched on the Announcement page."
   when_enabled_an_lti_tool_with_the_assignment_edit__cd60b1a0: "When enabled, an LTI tool with the assignment_edit placement will be launched on the Announcement page."
   when_enabled_collect_internal_analytics_metrics_us_88e81ee5: "When enabled, collect internal analytics metrics using a distributed system."
   when_enabled_for_a_child_account_of_a_non_centrall_8b126bc0: |-
@@ -32752,6 +32840,7 @@ en-GB:
   you_can_fac644aa: "You can "
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "You can hide or show a course’s assignments by toggling them on or off."
   you_can_leave_the_page_and_you_will_get_a_notifica_fefe11e8: "You can leave the page and you will get a notification when the sync process is complete."
+  you_can_leave_this_page_and_come_back_and_we_will__e80e8204: "You can leave this page and come back, and we will keep working in the background."
   you_can_log_in_directly_with_this_provider_by_goin_467d7f66: "You can log in directly with this provider by going to %{url}"
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "You can now set regrade options for students who have already taken the quiz."
   you_can_only_hide_grades_for_everyone_when_the_ass_e29be786: "You can only hide grades for everyone when the assignment is anonymous."
@@ -32993,6 +33082,10 @@ en-GB:
       You will need to create a web application in the [Google Developer Console](%{google_url}).
       You should add %{callback_url} as a redirect URI.
       After you create your app, make a note of the Client ID and Client Secret, and enter them here.
+  you_will_need_to_register_a_new_app_with_microsoft_1b4dbf87: |-
+      You will need to register a [new app with Microsoft](%{ms_app_url}) under *App registrations*.
+      You should configure %{callback_url} as the Redirect URI.
+      After you save your app, make a note of the Application ID and Secret, and enter them here.
   you_will_need_to_register_a_new_app_with_microsoft_53e97ced: |-
       You will need to register a [new app with Microsoft](%{ms_app_url}).
       You should configure %{callback_url} as the Redirect URI.
@@ -33021,6 +33114,10 @@ en-GB:
       You will need to [register an application on Twitter](%{twitter_url}).
       You should configure %{callback_url} as the Callback URL, and set Access Level to
       Read, Write and Access direct messages
+      After you create your application, make a note of the Consumer Key and Consumer Secret, and enter them here.
+  you_will_need_to_register_an_application_on_x_com__599c558: |-
+      You will need to [register an application on X.com](%{twitter_url}).
+      You should configure %{callback_url} as the Callback URL.
       After you create your application, make a note of the Consumer Key and Consumer Secret, and enter them here.
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "You will not be able to preview your changes"
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "You will not receive any %{contextType} notifications at this time. To enable %{contextType} notifications, use the toggle above."

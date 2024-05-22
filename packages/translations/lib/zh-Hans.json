@@ -1445,6 +1445,9 @@
     "next_40e12421": {
         "message": "下一步"
     },
+    "next_findtext_9d69f0fe": {
+        "message": "下一步{ findText }"
+    },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "没有发现辅助功能问题。"
     },
@@ -1721,6 +1724,9 @@
     "previous_bd2ac015": {
         "message": "上一个"
     },
+    "previous_findtext_8dfbfd30": {
+        "message": "上一步{ findText }"
+    },
     "prime_917ea60e": {
         "message": "质"
     },
@@ -1796,11 +1802,23 @@
     "replace_all_d3d68b3": {
         "message": "全部替换"
     },
+    "replace_all_findtext_with_replacetext_da574b32": {
+        "message": "将所有{ findText }全部替换为{ replaceText }"
+    },
     "replace_e61834a7": {
         "message": "替换"
     },
+    "replace_findtext_with_replacetext_7b5c7fb3": {
+        "message": "将{ findText }替换为{ replaceText }"
+    },
     "replace_with_eeff01ad": {
         "message": "替换为"
+    },
+    "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+        "message": "将{ alertFindText }替换为{ alertReplaceText }"
+    },
+    "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+        "message": "将所有{ alertFindText }全部替换为{ alertReplaceText }"
     },
     "reset_95a81614": {
         "message": "重置"

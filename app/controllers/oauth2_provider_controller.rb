@@ -24,6 +24,8 @@ class OAuth2ProviderController < ApplicationController
   before_action :run_login_hooks, only: %i[token]
   skip_before_action :require_reacceptance_of_terms, only: %i[token destroy]
 
+  include Lti::Concerns::ParentFrame # allow_trusted_tools_to_embed_this_page!
+
   def auth
     if params[:code] || params[:error]
       # hopefully the user never sees this, since it's an oob response and the
@@ -104,6 +106,7 @@ class OAuth2ProviderController < ApplicationController
     if session[:oauth2]
       @provider = Canvas::OAuth::Provider.new(session[:oauth2][:client_id], session[:oauth2][:redirect_uri], session[:oauth2][:scopes], session[:oauth2][:purpose])
       @special_confirm_message = special_confirm_message(@provider)
+      allow_trusted_tools_to_embed_this_page!
 
       if mobile_device?
         render layout: "mobile_auth", action: "confirm_mobile"

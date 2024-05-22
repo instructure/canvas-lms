@@ -25,6 +25,7 @@ const prepareOverride = (
   overrideIds = {
     groupId: null,
     courseSectionId: null,
+    courseId: null,
     studentIds: null,
     noopId: null,
   },
@@ -36,6 +37,7 @@ const prepareOverride = (
     unlockAt: overrideAvailableFrom || null,
     groupId: overrideIds.groupIds || null,
     courseSectionId: overrideIds.courseSectionId || null,
+    courseId: overrideIds.courseId || null,
     studentIds: overrideIds.studentIds || null,
     noopId: overrideIds.noopId || null,
     title: overrideTitle || null,
@@ -59,6 +61,9 @@ const prepareAssignmentOverridesPayload = (
     const {assignedList, context_module_id: contextModuleId} = info
     const studentIds = assignedList.filter(assetCode => assetCode.includes('user'))
     const sectionIds = assignedList.filter(assetCode => assetCode.includes('section'))
+    const courseIds = assignedList.filter(
+      assetCode => assetCode.includes('course') && !assetCode.includes('section')
+    )
     const groupIds = assignedList.filter(assetCode => assetCode.includes('group'))
 
     // If the override is a module override, don't update it
@@ -93,6 +98,20 @@ const prepareAssignmentOverridesPayload = (
           )
         )
       })
+    }
+
+    // override for course ids
+    if (courseIds.length > 0) {
+      preparedOverrides.push(
+        prepareOverride(
+          info.dueDate || null,
+          info.availableUntil || null,
+          info.availableFrom || null,
+          {
+            courseId: 'everyone',
+          }
+        )
+      )
     }
 
     // override for group ids
@@ -192,10 +211,16 @@ export const prepareAssignmentPayload = (
   peerReviewDueDate,
   intraGroupPeerReviews,
   masteryPathsOption,
-  isCheckpoints
+  importantDates,
+  isCheckpoints,
+  existingAssignment
 ) => {
-  // Return null immediately if the assignment is not graded
-  if (!isGraded) return null
+  /*
+  Return null if the assignment is not graded and there is no existing assignment.
+  This is so that we can trigger the deletion of an existing assignment if the graded checkbox is unselected
+  since the endpoint looks for an assignment payload.
+  */
+  if (!isGraded && !existingAssignment) return null
 
   const everyoneOverride =
     assignedInfoList.find(
@@ -207,6 +232,7 @@ export const prepareAssignmentPayload = (
   let payload = {
     postToSis,
     gradingType: displayGradeAs,
+    importantDates,
     assignmentGroupId: assignmentGroup || null,
     peerReviews: preparePeerReviewPayload(
       isEditing,
@@ -232,6 +258,13 @@ export const prepareAssignmentPayload = (
       dueAt: everyoneOverride.dueDate || null,
       lockAt: everyoneOverride.availableUntil || null,
       unlockAt: everyoneOverride.availableFrom || null,
+    }
+  }
+  // Additional properties for editing of a graded assignment
+  if (isEditing) {
+    payload = {
+      ...payload,
+      setAssignment: isGraded,
     }
   }
   // Additional properties for creation of a graded assignment

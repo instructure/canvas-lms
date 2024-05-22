@@ -18,6 +18,7 @@
 
 import {enhanceUserContent} from '../enhance_user_content'
 import {Mathml} from '../mathml'
+import formatMessage from '../../format-message'
 
 jest.useFakeTimers()
 
@@ -229,6 +230,18 @@ describe('enhanceUserContent()', () => {
         enhanceUserContent()
         const aTag = document.querySelector('a')
         expect(aTag.classList.contains('file_preview_link')).toBeTruthy()
+        expect(aTag).toHaveAttribute('target')
+      })
+    })
+
+    describe('when the link has preview inline set', () => {
+      it('includes previewable in the class list', () => {
+        subject(
+          '<a class="instructure_file_link instructure_scribd_file" href="/courses/1/files/1" target="_blank" data-canvas-previewable="true">file</a>'
+        )
+        enhanceUserContent(document, {locale: 'es'})
+        const aTag = document.querySelector('a')
+        expect(aTag.classList.value).toEqual('file_preview_link previewable')
         expect(aTag).toHaveAttribute('target')
       })
     })

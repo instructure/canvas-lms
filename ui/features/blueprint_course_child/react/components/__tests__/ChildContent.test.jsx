@@ -20,7 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {shallow} from 'enzyme'
 import ChildContent from '../ChildContent'
-import getSampleData from '../../../../blueprint_course_master/react/components/__tests__/getSampleData'
+import getSampleData from '@canvas/blueprint-courses/getSampleData'
 import sinon from 'sinon'
 
 describe('ChildContent app', () => {

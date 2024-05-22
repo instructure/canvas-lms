@@ -785,46 +785,30 @@ describe Pseudonym do
     end
 
     it "finds a valid pseudonym" do
-      expect(Pseudonym.find_all_by_arbitrary_credentials(
-               { unique_id: "a", password: "abcdefgh" },
-               [Account.default.id],
-               "127.0.0.1"
-             )).to eq [p]
+      expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: "a", password: "abcdefgh" }, [Account.default.id])).to eq [p]
     end
 
     it "doesn't choke on if global lookups is down" do
       expect(GlobalLookups).to receive(:enabled?).and_return(true)
       expect(Pseudonym).to receive(:associated_shards).and_raise("an error")
-      expect(Pseudonym.find_all_by_arbitrary_credentials(
-               { unique_id: "a", password: "abcdefgh" },
-               [Account.default.id],
-               "127.0.0.1"
-             )).to eq [p]
+      expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: "a", password: "abcdefgh" }, [Account.default.id])).to eq [p]
     end
 
     it "throws an error if your credentials are absurd" do
       wat = " " * 3000
       unique_id = "asdf#{wat}asdf"
       creds = { unique_id:, password: "foobar" }
-      expect { Pseudonym.find_all_by_arbitrary_credentials(creds, [Account.default.id], "127.0.0.1") }.to raise_error(ImpossibleCredentialsError)
+      expect { Pseudonym.find_all_by_arbitrary_credentials(creds, [Account.default.id]) }.to raise_error(ImpossibleCredentialsError)
     end
 
     it "doesn't find deleted pseudonyms" do
       p.update!(workflow_state: "deleted")
-      expect(Pseudonym.find_all_by_arbitrary_credentials(
-               { unique_id: "a", password: "abcdefgh" },
-               [Account.default.id],
-               "127.0.0.1"
-             )).to eq []
+      expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: "a", password: "abcdefgh" }, [Account.default.id])).to eq []
     end
 
     it "doesn't find suspended pseudonyms" do
       p.update!(workflow_state: "suspended")
-      expect(Pseudonym.find_all_by_arbitrary_credentials(
-               { unique_id: "a", password: "abcdefgh" },
-               [Account.default.id],
-               "127.0.0.1"
-             )).to eq []
+      expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: "a", password: "abcdefgh" }, [Account.default.id])).to eq []
     end
   end
 

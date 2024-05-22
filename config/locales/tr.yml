@@ -2076,6 +2076,7 @@ tr:
   add_people_7948b7da: "Kullanıcı Ekle"
   add_people_7ee4b2ec: "Katılımcı Ekle"
   add_people_to_coursename_5ea234e1: "%{courseName}'e kişileri ekleyin"
+  add_prerequisite_6409bd9: "Ön Koşul Ekle"
   add_proficiency_rating_d819f6b8: "Yeterlik düzeyi ekle"
   add_quiz_cebfa28b: "Kısa Sınav Ekle"
   add_quiz_ip_filter_c7b37dc5: "Kısa Sınav IP Filtresi Ekle"
@@ -19868,6 +19869,7 @@ tr:
   venezuela_58_959d01f7: "Venezuella (+58)"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite benzerlik puanı -- daha fazla bilgi"
   verification_code_5acd64ef: "Doğrulama Kodu"
+  version_5599c321: Versiyon
   video_b9f27375: Video
   video_player_b371005: "Video Oynatıcı"
   vietnam_84_e50a2a44: "Viyetnam (+84)"

@@ -65,6 +65,50 @@ module Lti
       end
     end
 
+    describe ".supported_message_type?" do
+      subject do
+        described_class.method(:supported_message_type?)
+      end
+
+      it "returns false when no placement is passed in" do
+        expect(subject.call(nil, "message_type")).to be false
+      end
+
+      it "returns true when no message_type is passed in" do
+        expect(subject.call(Lti::ResourcePlacement::PLACEMENTS.first, nil)).to be true
+      end
+
+      it "returns false if an invalid placement is passed in" do
+        expect(subject.call("invalid_placement", LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE)).to be false
+      end
+
+      it "returns false if a valid placement but unsupported message_type is passed in" do
+        expect(subject.call(:course_navigation, LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE)).to be false
+      end
+
+      it "returns true if a valid placement is passed in" do
+        expect(subject.call(:assignment_selection, LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE)).to be true
+      end
+
+      it "works with strings and symbols for the placement" do
+        expect(subject.call("assignment_selection", LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE)).to be true
+        expect(subject.call(:assignment_selection, LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE)).to be true
+      end
+
+      it "works with strings and symbols for the message_type" do
+        expect(subject.call(:assignment_selection, LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE)).to be true
+        expect(subject.call(:assignment_selection, LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE.to_sym)).to be true
+      end
+
+      Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE.each do |message_type, placements|
+        placements.each do |placement|
+          it "returns true for #{placement} and #{message_type}" do
+            expect(subject.call(placement, message_type)).to be true
+          end
+        end
+      end
+    end
+
     describe "update_tabs_and_return_item_banks_tab" do
       let(:tabs_with_item_banks) do
         [

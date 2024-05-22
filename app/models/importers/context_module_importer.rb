@@ -204,10 +204,10 @@ module Importers
       existing_item ||= context_module.content_tags.where(migration_id: hash[:migration_id]).first if hash[:migration_id]
       existing_item ||= ContentTag.new(context_module:, context:)
 
+      existing_item.migration_id = hash[:migration_id]
       existing_item.mark_as_importing!(migration)
       migration.add_imported_item(existing_item)
 
-      existing_item.migration_id = hash[:migration_id]
       hash[:indent] = [hash[:indent] || 0, level].max
       resource_class = linked_resource_type_class(hash[:linked_resource_type])
       if resource_class == WikiPage

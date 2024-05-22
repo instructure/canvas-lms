@@ -1445,6 +1445,9 @@
     "next_40e12421": {
         "message": "ถัดไป"
     },
+    "next_findtext_9d69f0fe": {
+        "message": "{ findText } ถัดไป"
+    },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "ไม่พบปัญหาในการใช้งาน"
     },
@@ -1721,6 +1724,9 @@
     "previous_bd2ac015": {
         "message": "ก่อนหน้า"
     },
+    "previous_findtext_8dfbfd30": {
+        "message": "{ findText } ก่อนหน้า"
+    },
     "prime_917ea60e": {
         "message": "เฉพาะ"
     },
@@ -1796,11 +1802,23 @@
     "replace_all_d3d68b3": {
         "message": "แทนที่ทั้งหมด"
     },
+    "replace_all_findtext_with_replacetext_da574b32": {
+        "message": "แทนที่ { findText } ทั้งหมดด้วย { replaceText }"
+    },
     "replace_e61834a7": {
         "message": "แทนที่"
     },
+    "replace_findtext_with_replacetext_7b5c7fb3": {
+        "message": "แทนที่ { findText } ด้ววย { replaceText }"
+    },
     "replace_with_eeff01ad": {
         "message": "แทนที่ด้วย"
+    },
+    "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+        "message": "แทนที่ { alertFindText } ด้วย { alertReplaceText }"
+    },
+    "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+        "message": "แทนที่ { alertFindText } ทั้งหมดด้วย { alertReplaceText }"
     },
     "reset_95a81614": {
         "message": "รีเซ็ต"

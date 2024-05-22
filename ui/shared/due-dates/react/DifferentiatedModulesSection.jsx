@@ -73,6 +73,7 @@ const DifferentiatedModulesSection = ({
   const [showPendingChangesPill, setShowPendingChangesPill] = useState(false)
   const [disabledOptionIds, setDisabledOptionIds] = useState([])
   const [stagedImportantDates, setStagedImportantDates] = useState(importantDates)
+  const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
   const linkRef = useRef()
 
   useEffect(() => {
@@ -97,6 +98,8 @@ const DifferentiatedModulesSection = ({
       const state = cloneObject(uniqueOverrides)
       // initialState is set only 1 time to check if the overrides have pending changes
       setInitialState(state)
+      // hasModuleOverrides also is only set once since this value never changes
+      setHasModuleOverrides(overrides.some(card => card.context_module_id))
       // checkPoint is set every time the user applies changes to the overrides
       setCheckPoint(state)
     }
@@ -120,6 +123,9 @@ const DifferentiatedModulesSection = ({
           selectedOptionIds.push(...defaultOptions)
         } else if (override?.course_section_id === defaultSectionId) {
           card.index = 0
+          defaultOptions.push(everyoneOptionKey)
+          selectedOptionIds.push(...defaultOptions)
+        } else if (override?.course_id) {
           defaultOptions.push(everyoneOptionKey)
           selectedOptionIds.push(...defaultOptions)
         } else {
@@ -188,7 +194,7 @@ const DifferentiatedModulesSection = ({
     )
     const defaultState = getParsedOverrides(preSaved, checkPoint)
     const checkPointOverrides = getAllOverridesFromCards(defaultState).filter(
-      card => card.course_section_id || card.student_ids || card.noop_id
+      card => card.course_section_id || card.student_ids || card.noop_id || card.course_id
     )
     setStagedOverrides(checkPointOverrides)
     const newStagedCards = resetStagedCards(stagedCards, checkPoint, defaultState)
@@ -202,7 +208,7 @@ const DifferentiatedModulesSection = ({
     newCard.draft = true
     newCard.index = stagedOverrides.length + 1
     const oldOverrides = getAllOverridesFromCards(stagedCards).filter(
-      card => card.course_section_id || card.student_ids || card.noop_id
+      card => card.course_section_id || card.student_ids || card.noop_id || card.course_id
     )
     const newStageOverrides = [...oldOverrides, newCard]
     setStagedOverrides(newStageOverrides)
@@ -322,6 +328,7 @@ const DifferentiatedModulesSection = ({
       delete existingOverrideData.course_section_id
       delete existingOverrideData.group_id
       delete existingOverrideData.noop_id
+      delete existingOverrideData.course_id
       remainingCardOverrides = [existingOverrideData]
     }
 
@@ -338,7 +345,7 @@ const DifferentiatedModulesSection = ({
 
   const handleSave = () => {
     const newOverrides = getAllOverridesFromCards(stagedCards).filter(
-      card => card.course_section_id || card.student_ids || card.noop_id
+      card => card.course_section_id || card.student_ids || card.noop_id || card.course_id
     )
 
     const withoutModuleOverrides = processModuleOverrides(newOverrides, checkPoint)
@@ -402,7 +409,7 @@ const DifferentiatedModulesSection = ({
           </View>
         </Link>
       </View>
-      {type === 'assignment' && importantDatesCheckbox()}
+      {(type === 'assignment' || type === 'discussion') && importantDatesCheckbox()}
       <ItemAssignToTray
         open={open}
         onClose={handleClose}
@@ -412,6 +419,7 @@ const DifferentiatedModulesSection = ({
         itemType={type}
         iconType={type}
         itemContentId={assignmentId}
+        initHasModuleOverrides={hasModuleOverrides}
         pointsPossible={pointsPossible}
         useApplyButton={true}
         locale={ENV.LOCALE || 'en'}

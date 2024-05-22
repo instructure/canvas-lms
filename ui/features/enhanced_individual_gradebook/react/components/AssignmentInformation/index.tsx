@@ -41,6 +41,7 @@ import DefaultGradeModal from './DefaultGradeModal'
 import {CurveGradesModal} from './CurveGradesModal'
 import SubmissionDownloadModal from './SubmissionDownloadModal'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {MSWLaunchContext} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -275,6 +276,7 @@ function AssignmentActions({
           </Button>
           <MessageStudentsWhoModal
             assignment={assignment}
+            launchContext={MSWLaunchContext.ASSIGNMENT_CONTEXT}
             gradebookOptions={gradebookOptions}
             students={students}
             submissions={submissions}

@@ -18,6 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {QueryProvider} from '@canvas/query'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import EnhancedIndividualGradebookWrapper from './react/components/EnhancedIndividualGradebookWrapper'
 
@@ -25,10 +26,12 @@ const matches = window.location.pathname.match(/(.*\/gradebook)/)
 const baseUrl = (matches && matches[0]) || ''
 
 ReactDOM.render(
-  <BrowserRouter basename={baseUrl}>
-    <Routes>
-      <Route path="/" element={<EnhancedIndividualGradebookWrapper />} />
-    </Routes>
-  </BrowserRouter>,
+  <QueryProvider>
+    <BrowserRouter basename={baseUrl}>
+      <Routes>
+        <Route path="/" element={<EnhancedIndividualGradebookWrapper />} />
+      </Routes>
+    </BrowserRouter>
+  </QueryProvider>,
   document.getElementById('content')
 )

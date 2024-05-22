@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {fireEvent, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import {speedGraderUrl} from '../../assignment/AssignmentApi'
-import Grid from '../GradesGrid/Grid'
 import GradesGrid from '../GradesGrid/index'
+import {STARTED} from '../../grades/GradeActions'
 
 describe('GradeSummary GradesGrid', () => {
   let props
@@ -46,6 +46,14 @@ describe('GradeSummary GradesGrid', () => {
       ],
       grades: {
         1111: {
+          teach: {
+            grade: '55',
+            graderId: 'teach',
+            id: '4605',
+            score: 55,
+            selected: false,
+            studentId: '1111',
+          },
           1101: {
             grade: 'A',
             graderId: '1101',
@@ -84,7 +92,7 @@ describe('GradeSummary GradesGrid', () => {
           },
         },
       },
-      onGradeSelect() {},
+      onGradeSelect: jest.fn(),
       selectProvisionalGradeStatuses: {},
       students: [
         {id: '1111', displayName: 'Adam Jones'},
@@ -113,47 +121,98 @@ describe('GradeSummary GradesGrid', () => {
     return speedGraderUrl('1201', '2301', {anonymousStudents, studentId})
   }
 
-  test('displays the grader names in the column headers', () => {
+  it('displays the grader names in the column headers', () => {
     mountComponent()
     expect(getGraderNames()).toEqual(['Miss Frizzle', 'Mr. Keating'])
   })
 
-  test('includes a row for each student', () => {
+  it('includes a row for each student', () => {
     mountComponent()
     expect(wrapper.container.querySelectorAll('tr.GradesGrid__BodyRow').length).toBe(4)
   })
 
-  test.skip('sends disabledCustomGrade to the Grid', () => {
+  it('sends disabledCustomGrade to the Grid', () => {
+    props.disabledCustomGrade = true
+
     mountComponent()
-    const grid = wrapper.find(Grid)
-    strictEqual(grid.prop('disabledCustomGrade'), false)
+
+    fireEvent.change(
+      screen.getByRole('combobox', {
+        name: /grade for Adam Jones/i,
+      }),
+      {target: {value: '10'}}
+    )
+
+    expect(
+      screen.queryByRole('option', {
+        name: /10 \(custom\)/i,
+      })
+    ).not.toBeInTheDocument()
   })
 
-  test.skip('sends finalGrader to the Grid', () => {
+  it('sends finalGrader to the Grid', () => {
     mountComponent()
-    const grid = wrapper.find(Grid)
-    strictEqual(grid.prop('finalGrader'), props.finalGrader)
+
+    fireEvent.change(
+      screen.getByRole('combobox', {
+        name: /grade for Adam Jones/i,
+      }),
+      {target: {value: '55'}}
+    )
+
+    expect(
+      screen.queryByRole('option', {
+        name: /55 \(custom\)/i,
+      })
+    ).toBeInTheDocument()
   })
 
-  test.skip('sends graders to the Grid', () => {
+  it('sends graders to the Grid', () => {
     mountComponent()
-    const grid = wrapper.find(Grid)
-    strictEqual(grid.prop('graders'), props.graders)
+
+    props.graders.forEach(grader => expect(screen.getByText(grader.graderName)).toBeInTheDocument())
   })
 
-  test.skip('sends onGradeSelect to the Grid', () => {
+  it('sends onGradeSelect to the Grid', () => {
+    props.disabledCustomGrade = false
+
     mountComponent()
-    const grid = wrapper.find(Grid)
-    strictEqual(grid.prop('onGradeSelect'), props.onGradeSelect)
+
+    fireEvent.change(
+      screen.getByRole('combobox', {
+        name: /grade for Adam Jones/i,
+      }),
+      {target: {value: '10'}}
+    )
+    fireEvent.click(
+      screen.getByRole('option', {
+        name: /10 \(custom\)/i,
+      })
+    )
+
+    expect(props.onGradeSelect).toHaveBeenCalledWith({
+      grade: '55',
+      graderId: 'teach',
+      id: '4605',
+      score: 10,
+      selected: false,
+      studentId: '1111',
+    })
   })
 
-  test.skip('sends selectProvisionalGradeStatuses to the Grid', () => {
+  it('sends selectProvisionalGradeStatuses to the Grid', () => {
+    props.selectProvisionalGradeStatuses = {1111: STARTED}
+
     mountComponent()
-    const grid = wrapper.find(Grid)
-    strictEqual(grid.prop('selectProvisionalGradeStatuses'), props.selectProvisionalGradeStatuses)
+
+    expect(
+      screen.getByRole('combobox', {
+        name: /grade for Adam Jones/i,
+      })
+    ).toBeInTheDocument()
   })
 
-  test('adds rows as students are added', () => {
+  it('adds rows as students are added', () => {
     const {students} = props
     props.students = students.slice(0, 2)
     mountComponent()
@@ -162,19 +221,19 @@ describe('GradeSummary GradesGrid', () => {
     expect(wrapper.container.querySelectorAll('tr.GradesGrid__BodyRow').length).toBe(4)
   })
 
-  test('displays the student names in the row headers', () => {
+  it('displays the student names in the row headers', () => {
     mountComponent()
     expect(getStudentNames()).toEqual(['Adam Jones', 'Betty Ford', 'Charlie Xi', 'Dana Smith'])
   })
 
-  test('links the student names to SpeedGrader', () => {
+  it('links the student names to SpeedGrader', () => {
     mountComponent()
     const links = wrapper.container.querySelectorAll('th.GradesGrid__BodyRowHeader a')
     const expectedUrls = props.students.map(student => speedGraderUrlFor(student.id))
     expect([...links].map(link => link.getAttribute('href'))).toEqual(expectedUrls)
   })
 
-  test('enumerates students for names when students are anonymous', () => {
+  it('enumerates students for names when students are anonymous', () => {
     for (let i = 0; i < props.students.length; i++) {
       props.students[i].displayName = null
     }
@@ -182,7 +241,7 @@ describe('GradeSummary GradesGrid', () => {
     expect(getStudentNames()).toEqual(['Student 1', 'Student 2', 'Student 3', 'Student 4'])
   })
 
-  test('anonymizes student links to SpeedGrader when students are anonymous', () => {
+  it('anonymizes student links to SpeedGrader when students are anonymous', () => {
     props.anonymousStudents = true
     mountComponent()
     const links = wrapper.container.querySelectorAll('th.GradesGrid__BodyRowHeader a')
@@ -190,7 +249,7 @@ describe('GradeSummary GradesGrid', () => {
     expect([...links].map(link => link.getAttribute('href'))).toEqual(expectedUrls)
   })
 
-  test('sorts students by id when students are anonymous', () => {
+  it('sorts students by id when students are anonymous', () => {
     props.students = [
       {id: 'fp312', displayName: 'Adam Jones'},
       {id: 'BB811', displayName: 'Betty Ford'},
@@ -205,7 +264,7 @@ describe('GradeSummary GradesGrid', () => {
     expect([...links].map(link => link.getAttribute('href'))).toEqual(expectedUrls)
   })
 
-  test('enumerates additional students for names as they are added', () => {
+  it('enumerates additional students for names as they are added', () => {
     for (let i = 0; i < props.students.length; i++) {
       props.students[i].displayName = null
     }
@@ -217,7 +276,7 @@ describe('GradeSummary GradesGrid', () => {
     expect(getStudentNames()).toEqual(['Student 1', 'Student 2', 'Student 3', 'Student 4'])
   })
 
-  test('does not display page navigation when only one page of students is loaded', () => {
+  it('does not display page navigation when only one page of students is loaded', () => {
     mountComponent()
     expect(screen.queryByRole('navigation')).toBeNull()
   })
@@ -230,23 +289,23 @@ describe('GradeSummary GradesGrid', () => {
       }
     })
 
-    test('displays page navigation', () => {
+    it('displays page navigation', () => {
       mountComponent()
       expect(screen.getByRole('navigation')).toBeInTheDocument()
     })
 
-    test('displays only 20 rows on a page', () => {
+    it('displays only 20 rows on a page', () => {
       mountComponent()
       expect(wrapper.container.querySelectorAll('tr.GradesGrid__BodyRow').length).toBe(20)
     })
 
-    test('displays the first 20 students on the first page', () => {
+    it('displays the first 20 students on the first page', () => {
       mountComponent()
       const expectedNames = props.students.slice(0, 20).map(student => student.displayName)
       expect(getStudentNames()).toEqual(expectedNames)
     })
 
-    test('displays the next 20 students after navigating to the second page', async () => {
+    it('displays the next 20 students after navigating to the second page', async () => {
       const user = userEvent.setup({delay: null})
       mountComponent()
       await user.click(screen.getByRole('button', {name: /2/i}))
@@ -254,7 +313,7 @@ describe('GradeSummary GradesGrid', () => {
       expect(getStudentNames()).toEqual(expectedNames)
     })
 
-    test('updates the current page as students are added', async () => {
+    it('updates the current page as students are added', async () => {
       const user = userEvent.setup({delay: null})
       const {students} = props
       props.students = students.slice(0, 30) // page 2 has 10 students
@@ -266,7 +325,7 @@ describe('GradeSummary GradesGrid', () => {
       expect(getStudentNames()).toEqual(expectedNames)
     })
 
-    test('continues enumeration on students across pages', async () => {
+    it('continues enumeration on students across pages', async () => {
       const user = userEvent.setup({delay: null})
       const anonymousNames = []
       for (let i = 0; i < props.students.length; i++) {

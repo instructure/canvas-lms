@@ -26,11 +26,11 @@ import {
   IconArrowUpLine,
   IconSearchLine,
   IconTroubleLine,
-  IconPermissionsLine
+  IconPermissionsLine,
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
-import {CURRENT_USER} from '../../utils/constants'
-import React, {useState} from 'react'
+import {CURRENT_USER, DiscussionManagerUtilityContext} from '../../utils/constants'
+import React, { useContext, useState } from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -42,6 +42,7 @@ import {View} from '@instructure/ui-view'
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {ExpandCollapseThreadsButton} from './ExpandCollapseThreadsButton'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import { MoreMenuButton } from "./MoreMenuButton"
 
 const I18n = useI18nScope('discussions_posts')
 
@@ -77,6 +78,7 @@ const getClearButton = props => {
 
 export const DiscussionPostToolbar = props => {
   const [showAssignToTray, setShowAssignToTray] = useState(false)
+  const { translationLanguages } = useContext(DiscussionManagerUtilityContext)
 
   const clearButton = () => {
     return getClearButton({
@@ -91,7 +93,7 @@ export const DiscussionPostToolbar = props => {
     ? I18n.t('Search entries...')
     : I18n.t('Search entries or author...')
 
-    const handleClose = () => setShowAssignToTray(false)
+  const handleClose = () => setShowAssignToTray(false)
 
   return (
     <Responsive
@@ -274,6 +276,11 @@ export const DiscussionPostToolbar = props => {
                     <ExpandCollapseThreadsButton showText={!matches.includes('mobile')} />
                   </Flex.Item>
                 )}
+                {translationLanguages.current.length > 0 && (
+                  <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
+                    <MoreMenuButton />
+                  </Flex.Item>
+                )}
                 {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (
                   <Flex.Item shouldGrow={true}>
                     <Flex justifyItems="end">
@@ -287,31 +294,39 @@ export const DiscussionPostToolbar = props => {
                     </Flex>
                   </Flex.Item>
                 )}
-                {props.canEdit && ENV.FEATURES?.differentiated_modules && !props.isAnnouncement && (
-                <Flex.Item shouldGrow={true} textAlign="end">
-                  <Button
-                    data-testid="manage-assign-to"
-                    renderIcon={IconPermissionsLine}
-                    onClick={() => (setShowAssignToTray(!showAssignToTray))} >{I18n.t('Assign To')}</Button>
-                </Flex.Item>
-                )}
+                {props.canEdit &&
+                  ENV.FEATURES?.differentiated_modules &&
+                  !props.isAnnouncement &&
+                  props.contextType === 'Course' && (
+                    <Flex.Item shouldGrow={true} textAlign="end">
+                      <Button
+                        data-testid="manage-assign-to"
+                        renderIcon={IconPermissionsLine}
+                        onClick={() => setShowAssignToTray(!showAssignToTray)}
+                      >
+                        {I18n.t('Assign To')}
+                      </Button>
+                    </Flex.Item>
+                  )}
               </Flex>
             </Flex.Item>
           </Flex>
-          {showAssignToTray && <ItemAssignToTray
-            open={showAssignToTray}
-            onClose={handleClose}
-            onDismiss={handleClose}
-            courseId={ENV.course_id}
-            itemName={props.discussionTitle}
-            itemType={props.typeName}
-            iconType={props.typeName}
-            pointsPossible={props.pointsPossible}
-            itemContentId={props.discussionId}
-            locale={ENV.LOCALE || 'en'}
-            timezone={ENV.TIMEZONE || 'UTC'}
-            removeDueDateInput={!props.isGraded}
-          />}
+          {showAssignToTray && (
+            <ItemAssignToTray
+              open={showAssignToTray}
+              onClose={handleClose}
+              onDismiss={handleClose}
+              courseId={ENV.course_id}
+              itemName={props.discussionTitle}
+              itemType={props.typeName}
+              iconType={props.typeName}
+              pointsPossible={props.pointsPossible}
+              itemContentId={props.discussionId}
+              locale={ENV.LOCALE || 'en'}
+              timezone={ENV.TIMEZONE || 'UTC'}
+              removeDueDateInput={!props.isGraded}
+            />
+          )}
         </View>
       )}
     />
@@ -340,6 +355,7 @@ DiscussionPostToolbar.propTypes = {
   userSplitScreenPreference: PropTypes.bool,
   closeView: PropTypes.func,
   pointsPossible: PropTypes.number,
+  contextType: PropTypes.oneOf(['Course', 'Group']),
 }
 
 DiscussionPostToolbar.defaultProps = {

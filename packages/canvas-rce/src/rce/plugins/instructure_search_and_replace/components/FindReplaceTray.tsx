@@ -40,6 +40,7 @@ type FindReplaceTrayProps = {
   index: number
   max: number
   initialText?: string
+  selectionContext?: string[]
 }
 
 export default function FindReplaceTray({
@@ -51,6 +52,7 @@ export default function FindReplaceTray({
   index,
   max,
   initialText = '',
+  selectionContext = ['', ''],
 }: FindReplaceTrayProps) {
   const [findText, setFindText] = useState(initialText)
   const [replaceText, setReplaceText] = useState('')
@@ -60,6 +62,7 @@ export default function FindReplaceTray({
   const [alertReplaceText, setAlertReplaceText] = useState('')
   const trayRef = useRef<any>(null)
   const liveRegionKey = useRef(0)
+  const srDupKey = useRef(0)
   // moves RCE when tray opens/closes, copied from CanvasContentTray
   useEffect(() => {
     if (!hasOpened) return
@@ -93,6 +96,19 @@ export default function FindReplaceTray({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  function usePrevious(value: any) {
+    const ref = useRef()
+    useEffect(() => {
+      ref.current = value
+    }, [value])
+    return ref.current
+  }
+  const prepend = selectionContext[0]
+  const append = selectionContext[1]
+  const srContextMsg = formatMessage('{prepend}{findText}{append}', {prepend, findText, append})
+  const previousSrMsg = usePrevious(srContextMsg)
+  const previousFindText = usePrevious(findText)
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFindText(e.target.value)
@@ -185,10 +201,20 @@ export default function FindReplaceTray({
       )
     }
     const msg = formatMessage('{index} of {max}', {index, max})
+    const srResultMsg = formatMessage('Result {index} of {max}.', {index, max})
+
+    // necessary to force screen reader to read the same message while typing
+    if (srContextMsg === previousSrMsg && previousFindText != findText) {
+      srDupKey.current++
+    } else srDupKey.current = 0
     return (
       <>
-        <ScreenReaderContent aria-live="polite">{msg}</ScreenReaderContent>
-        <Text>{msg}</Text>
+        <View as="span" key={srDupKey.current} aria-live="polite" aria-atomic="true" role="alert">
+          <ScreenReaderContent>
+            {srResultMsg} {srContextMsg}
+          </ScreenReaderContent>
+        </View>
+        <Text aria-hidden="true">{msg}</Text>
       </>
     )
   }

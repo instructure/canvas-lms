@@ -67,25 +67,28 @@ export const generateAssignmentOverridesPayload = (
   return {overrides}
 }
 
-export const generateDateDetailsPayload = (cards: ItemAssignToCardSpec[]) => {
+export const generateDateDetailsPayload = (
+  cards: ItemAssignToCardSpec[],
+  hasModuleOverrides: boolean
+) => {
   const payload: DateDetailsPayload = {} as DateDetailsPayload
   const everyoneCard = cards.find(card => card.selectedAssigneeIds.includes('everyone'))
   const overrideCards = cards.filter(card => card.key !== 'everyone')
-  if (everyoneCard !== undefined) {
+  if (everyoneCard !== undefined && !hasModuleOverrides) {
     payload.due_at = everyoneCard.due_at || null
     payload.unlock_at = everyoneCard.unlock_at || null
     payload.lock_at = everyoneCard.lock_at || null
     payload.only_visible_to_overrides = false
-  } else {
+  } else if (!hasModuleOverrides) {
     payload.only_visible_to_overrides = true
   }
   payload.assignment_overrides = overrideCards
     .map(card => {
       const isUpdatedModuleOverride = card.contextModuleId !== undefined && card.isEdited
-      const isSectionOverride =
+      const isDefaultSectionOverride =
         card.defaultOptions?.[0]?.includes('section') &&
         card.overrideId !== everyoneCard?.overrideId
-      const shouldUpdate = isSectionOverride && !isUpdatedModuleOverride
+      const shouldUpdate = isDefaultSectionOverride && !isUpdatedModuleOverride
       const overrides: DateDetailsOverride[] = card.selectedAssigneeIds
         .filter(assignee => assignee.includes('section'))
         ?.map((section, index) => ({
@@ -98,16 +101,36 @@ export const generateDateDetailsPayload = (cards: ItemAssignToCardSpec[]) => {
       const isOverrideUsed = overrides.some(
         override => override.id === card.overrideId || everyoneCard?.overrideId === card.overrideId
       )
+
+      const isDefaultAdhocOverride = card.defaultOptions?.[0]?.includes('student')
       const studentIds = card.selectedAssigneeIds
         .filter(assignee => assignee.includes('student'))
         ?.map(id => id.split('-')[1])
       if (studentIds.length > 0) {
         overrides.push({
-          id: !isOverrideUsed && !isUpdatedModuleOverride ? card.overrideId : undefined,
+          id:
+            !isOverrideUsed && isDefaultAdhocOverride && !isUpdatedModuleOverride
+              ? card.overrideId
+              : undefined,
           student_ids: studentIds,
           due_at: card.due_at,
           unlock_at: card.unlock_at,
           lock_at: card.lock_at,
+        })
+      }
+
+      const isDefaultCourseOverride = card.defaultOptions?.[0]?.includes('everyone')
+      const courseOverrideCard = card.selectedAssigneeIds.includes('everyone')
+      if (courseOverrideCard && hasModuleOverrides) {
+        overrides.push({
+          id:
+            !isOverrideUsed && isDefaultCourseOverride && !isUpdatedModuleOverride
+              ? card.overrideId
+              : undefined,
+          due_at: card.due_at || null,
+          unlock_at: card.unlock_at || null,
+          lock_at: card.lock_at || null,
+          course_id: 'everyone',
         })
       }
       return overrides

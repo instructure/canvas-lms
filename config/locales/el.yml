@@ -1634,6 +1634,7 @@ el:
   add_new_set_of_due_dates_e8e240f: "Προσθέστε νέο σύνολο απο καταληκτικές ημερομηνίες"
   add_new_term_d2217c0d: "Προσθήκη Νέου Εξαμήνου"
   add_people_7ee4b2ec: "Προσθήκη Ατόμων"
+  add_prerequisite_6409bd9: "Προσθήκη Προαπαιτούμενου"
   add_quiz_cebfa28b: "Προσθήκη Κουίζ"
   add_quiz_ip_filter_c7b37dc5: "Πρόσθεση φίλτου IP Διεύθυνσης για Κουίζ"
   add_recipient_ff135ed7: "Προσθήκη Παραλήπτη"
@@ -15424,6 +15425,7 @@ el:
   validation_error_3b943100: "Λάθος στην Επικύρωση"
   vanity_url_76f93382: "Vanity URL"
   verification_code_5acd64ef: "Κωδικός Επιβεβαίωσης"
+  version_5599c321: Έκδοση
   video_b9f27375: "Αρχείο Βίντεο"
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Το περιεχόμενο του βίντεο δεν υποστηρίζεται από τη συσκευή ή την εφαρμογή σας."
   video_player_b371005: "Πρόγραμμα Αναπαραγωγής Βίντεο"

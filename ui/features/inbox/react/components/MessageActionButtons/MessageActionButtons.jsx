@@ -117,13 +117,15 @@ export const MessageActionButtons = props => {
     <Flex>
       <Flex.Item shouldGrow={true}>
         <View padding="0 medium 0 0">
-          <ActionButton
-            tip={I18n.t('Compose a new message')}
-            icon={IconComposeLine}
-            onClick={props.compose}
-            testid="compose"
-            ariaLabel={I18n.t('Compose a new message')}
-          />
+          {props.showComposeButton && (
+            <ActionButton
+              tip={I18n.t('Compose a new message')}
+              icon={IconComposeLine}
+              onClick={props.compose}
+              testid="compose"
+              ariaLabel={I18n.t('Compose a new message')}
+            />
+          )}
           {ENV?.react_inbox_labels && (
             <ActionButton
               tip={I18n.t('Manage labels')}
@@ -195,4 +197,5 @@ MessageActionButtons.propTypes = {
   shouldRenderMarkAsRead: PropTypes.bool,
   shouldRenderMarkAsUnread: PropTypes.bool,
   hasMultipleSelectedMessages: PropTypes.bool,
+  showComposeButton: PropTypes.bool,
 }

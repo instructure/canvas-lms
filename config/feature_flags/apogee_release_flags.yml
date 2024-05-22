@@ -1,9 +1,4 @@
 ---
-analytics2_api_access:
-  state: hidden
-  applies_to: RootAccount
-  display_name: New Analytics API Access
-  description: Enables new API endpoints for the course and user data provided by New Analytics.
 datadog_rum_js:
   state: hidden
   applies_to: SiteAdmin
@@ -96,18 +91,6 @@ submission_comment_emojis:
       state: allowed_on # enable for automated testings builds and local testing
     development:
       state: allowed_on # enable for local development
-updated_mastery_connect_icon:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Updated Mastery Connect Icon
-  description: If set, displays updated mastery connect icon
-  environments:
-    ci:
-      state: on # enable for automated testings builds and local testing
-    development:
-      state: on # enable for local development
-    test:
-      state: on # enable for the deployed 'test' environment
 peer_reviews_for_a2:
   state: hidden
   applies_to: Course
@@ -312,8 +295,10 @@ archived_grading_schemes:
     development:
       state: allowed_on
 enhanced_rubrics:
+  beta: true
   state: hidden
-  applies_to: SiteAdmin
+  applies_to: RootAccount
+  root_opt_in: true
   display_name: Rubric Enhancements
   description: This feature provides visual and functional enhancements to rubrics across Canvas.
   environments:

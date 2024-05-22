@@ -106,6 +106,7 @@
   </figure>
   <section id="full_width_container" style="display:none; flex: 1;">
     <div id="left_side" class="full_height">
+    <div id="screen-capture-indicator-mount-point"></div>
       <div id="left_side_inner">
         <div id="no_annotation_warning" class="alert speedgrader_alert">
           <a class="dismiss_alert close" href="#">×</a>
@@ -444,7 +445,8 @@
       <%= select_tag 'eg_sort_by', options_for_select([
         [t('sort_by.student_name', "by student name (alphabetically)"), "alphabetically"],
         [t('sort_by.submitted_at', "the date they submitted the assignment"), "submitted_at"],
-        [t('sort_by.status', "by submission status (needs grading, not submitted, etc)"), "submission_status"]], cookies[:eg_sort_by]) %>
+        [t('sort_by.status', "by submission status (needs grading, not submitted, etc)"), "submission_status"],
+        [t('sort_by.randomize', "randomize students"), "randomize"],], cookies[:eg_sort_by]) %>
     </p>
 
     <% unless @assignment.anonymous_grading? %>

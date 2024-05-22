@@ -149,4 +149,12 @@ describe "wiki pages show page assign to" do
 
     check_element_has_focus assign_to_btn
   end
+
+  it "does not show assign to button for group pages" do
+    group = @course.groups.create!(name: "Group 1")
+    page = group.wiki_pages.create!(title: "group-page")
+    visit_group_wiki_page_view(group.id, page.title)
+    expect(element_exists?(edit_btn_selector)).to be_truthy
+    expect(element_exists?(assign_to_btn_selector)).to be_falsey
+  end
 end

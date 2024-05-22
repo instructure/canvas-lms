@@ -37,4 +37,25 @@ describe Canvas::Vault::AwsCredentialProvider do
       Canvas::Vault::AwsCredentialProvider.new(cred_path).credentials
     end.to raise_error(Canvas::Vault::VaultConfigError)
   end
+
+  it "set? returns true if creds are set" do
+    allow(Rails.application.credentials).to receive(:send).with("translation").and_return({
+                                                                                            aws_access_key_id: "access-my-key",
+                                                                                            aws_secret_access_key: "access-my-secret-key"
+                                                                                          })
+    expect(Canvas::AwsCredentialProvider.new("translation", nil).set?).to be true
+  end
+
+  it "set? returns false if no creds" do
+    allow(Rails.application.credentials).to receive(:send).with("translation").and_return(nil)
+    expect(Canvas::AwsCredentialProvider.new("translation", nil).set?).to be false
+  end
+
+  it "set? returns false if not correct creds" do
+    allow(Rails.application.credentials).to receive(:send).with("translation").and_return({
+                                                                                            punk_access_key_id: "access-my-key",
+                                                                                            punk_secret_access_key: "access-my-secret-key"
+                                                                                          })
+    expect(Canvas::AwsCredentialProvider.new("translation", nil).set?).to be false
+  end
 end

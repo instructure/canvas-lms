@@ -101,7 +101,8 @@ Implemented for: Canvas LMS)
 
   if Canvas.redis_enabled?
     it "limits the max failed login attempts" do
-      Setting.set("login_attempts_total", "2")
+      @pseudonym.account.settings[:password_policy] = { max_attempts: 2 }
+      @pseudonym.account.save!
       soap_response = soap_request("ValidateAuth",
                                    "nobody@example.com",
                                    "hax0r",

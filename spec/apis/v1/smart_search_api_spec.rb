@@ -25,7 +25,7 @@ describe "Smart Search API", type: :request do
 
   def stub_smart_search
     allow(SmartSearch).to receive(:api_key).and_return("dummy")
-    allow(SmartSearch).to receive(:generate_embedding) { |chunk| chunk[0...3].chars.map(&:ord) }
+    allow(SmartSearch).to receive(:generate_embedding) { |chunk| chunk.split(": ").last[0...3].chars.map(&:ord) }
   end
 
   before :once do
@@ -76,6 +76,8 @@ describe "Smart Search API", type: :request do
       )
       distances = response["results"].pluck("distance")
       expect(distances).to eq(distances.sort)
+      relevances = response["results"].pluck("relevance")
+      expect(relevances).to all be_between(0, 100)
     end
 
     it "filters by type" do
@@ -93,6 +95,18 @@ describe "Smart Search API", type: :request do
 
       response = api_call(:get, @path + "?q=foo&filter[]=assignments", @params.merge(q: "foo", filter: ["assignments"]))
       expect(response["results"].pluck("content_type")).to match_array %w[Assignment]
+    end
+
+    it "indexes on demand" do
+      stub_smart_search
+
+      response = api_call(:get, @path + "?q=foo", @params.merge(q: "foo"))
+      expect(response["status"]).to eq("index_incomplete")
+      expect(response["indexing_progress"]).to eq 0
+
+      run_jobs
+      response = api_call(:get, @path + "/index_status", @params.merge(action: "index_status"))
+      expect(response["status"]).to eq("indexed")
     end
   end
 end

@@ -304,6 +304,7 @@ th:
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "ตารางที่มีข้อมูลรูปแบบการให้เกรด แต่ละแถวจะมีชื่อ เปอร์เซ็นต์สูงสุดและเปอร์เซ็นต์ต่ำสุด นอกจากนี้ แต่ละแถวจะมีปุ่มเพื่อเพิ่มแถวใหม่ไว้ด้านล่าง และปุ่มเพื่อลบแถวในปัจจุบัน"
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "ตารางที่มีข้อมูลรูปแบบการให้เกรด ชื่อคือชื่อของรูปแบบการให้เกรดและปุ่มสำหรับแก้ไขและลบรูปแบบ แต่ละแถวจะมีชื่อ เปอร์เซ็นต์สูงสุดและเปอร์เซ็นต์ต่ำสุด นอกจากนี้ แต่ละแถวจะมีปุ่มเพื่อเพิ่มแถวใหม่ไว้ด้านล่าง และปุ่มเพื่อลบแถวในปัจจุบัน"
   a_timeout_occurred_contacting_external_authenticat_c064ea48: เกินกำหนดเวลาทำรายการระหว่างติดต่อส่วนบริการตรวจรับรองจากภายนอก
+  a_verification_code_has_been_sent_to_email_please__108f2713: "รหัสยืนยันถูกจัดส่งไปยัง %{email} กรุณากรอกรหัสนี้ไว้ด้านล่าง:"
   a_wonderful_assignment_d3139d9b: ภารกิจที่น่าชื่นชม
   a_yearly_rrule_must_include_byday_or_bymonthday_b56649f4: "RRULE ประจำปีจะต้องประกอบไปด้วย BYDAY หรือ BYMONTHDAY"
   a_z_243c3301: A–Z
@@ -369,6 +370,7 @@ th:
     root_account_cant_have_sis_id: "SIS ID ไม่สามารถกำหนดได้ในบัญชีราก"
     sis_id_in_use: "SIS ID \"%{sis_id}\" ถูกใช้งานอยู่"
     tab_admin_tools: เครื่องมือสำหรับผู้ดูแลระบบ
+    tab_analytics_hub: ศูนย์ข้อมูลวิเคราะห์
     tab_authentication: การตรวจรับรอง
     tab_brand_configs: ลักษณะ
     tab_courses: บทเรียน
@@ -594,6 +596,8 @@ th:
   account_user: 
     types: 
       account_admin: ผู้ดูแลระบบบัญชี
+  account_verification_required_486c5ccd: ต้องมีการยืนยันบัญชีผู้ใช้
+  account_verification_successful_b051223: ยืนยันบัญชีผู้ใช้เสร็จสิ้น
   accountname_accountcount_a6e2ba71: "%{accountName} (%{accountCount})"
   accountname_accountcount_accounts_e2c19840: "บัญชีผู้ใช้ %{accountName}, %{accountCount}"
   accountname_subaccountcount_960a41c: "%{accountName} (%{subaccountCount})"
@@ -1998,7 +2002,9 @@ th:
   additional_considerations_f3801683: ข้อพิจารณาเพิ่มเติม
   additional_occurrence_s_7b5b0173: สถานการณ์เพิ่มเติม
   additional_options_7cefee79: ตัวเลือกเพิ่มเติม
+  additional_replies_reply_to_entry_required_count_a_35b998d4: "การตอบกลับเพิ่มเติม (%{reply_to_entry_required_count}): %{assignment_due_date_time}"
   additional_replies_required_13697d0a: ต้องมีการตอบกลับเพิ่มเติม
+  additional_replies_required_replytoentryrequiredco_489e8364: "ต้องมีการตอบกลับเพิ่มเติม: %{replyToEntryRequiredCount}"
   additional_settings_20362654: ค่าปรับตั้งเพิ่มเติม
   additional_settings_for_sis_syncing_f926973e: "ค่าปรับตั้งเพิ่มเติมสำหรับการซิงค์ SIS"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "ภารกิจการซิงค์ SIS แบบทดสอบและค่าปรับตั้งการพูดคุยเพิ่มเติม"
@@ -2081,6 +2087,7 @@ th:
   after_throttling_the_selected_jobs_the_newly_creat_44952b37: "หลังจากจัดส่งงานที่เลือกไว้ ชุดข้อมูลที่จัดทำใหม่จะถูกเลือก"
   agenda_b010136d: หัวข้อ
   ai_driven_smart_search_feature_597dbd4f: "ฟังก์ชั่นการค้นหาอัจฉริยะผ่าน AI"
+  ai_driven_translation_controls_for_courses_12eb6085: "ระบบควบคุมการแปลผ่าน AI สำหรับบทเรียน"
   ajax_errors: 
     error_heading: "ข้อผิดพลาด Ajax: %{status_code}"
     errors: 
@@ -2201,6 +2208,7 @@ th:
   all_subject_navigation_has_been_disabled_f06b0154: การสืบค้นวิชาทั้งหมดถูกปิดใช้งาน
   all_subjects_5a42cfdb: วิชาทั้งหมด
   all_submission_comments_have_been_marked_as_read_74c0683b: ความเห็นสำหรับผลงานจัดส่งทั้งหมดถูกกำกับว่าอ่านแล้ว
+  all_submissions_3eedfb97: ผลงานจัดส่งทั้งหมด
   all_submissions_must_have_a_selected_grade_3a84e5a9: ผลงานจัดส่งทั้งหมดจะต้องมีเกรดที่เลือกไว้
   all_terms_cd27b0fb: เทอมทั้งหมด
   all_timezones_5e8afa7b: ทุกเขตเวลา
@@ -2655,7 +2663,9 @@ th:
   allows_users_to_merge_multiple_accounts_together_g_e4ceeae6: "อนุญาตให้ผู้ใช้ผสานบัญชีหลายบัญชีเข้าด้วยกัน (จะต้องมีข้อมูลล็อกอินที่ถูกต้อง)"
   allows_users_to_save_and_search_frequently_used_fe_806f8999: "อนุญาตให้ผู้ใช้บันทึกและค้นหาข้อเสนอแนะที่ใช้บ่อยในไลบรารี่ความเห็นที่จะใช้ใน SpeedGrader"
   allows_users_to_see_quantitative_numeric_grading_d_c96924f0: "ผู้ใช้สามารถดูข้อมูลการให้เกรดเชิงปริมาณ (ตัวเลข) การปิดสิทธิ์อนุญาตนี้เป็นการจำกัดตัวเลือกในการจัดทำภารกิจสำหรับผู้สอน ผู้ใช้จะเห็นเฉพาะข้อมูลเชิงปริมาณ ซึ่งประกอบไปด้วยเกรดและความเห็นที่เป็นตัวอักษร"
+  allows_users_to_use_average_as_a_calculation_metho_874f4b25: ผู้ใช้สามารถใช้การคำนวณค่าเฉลี่ยสำหรับผลลัพธ์ที่ระบุ
   allows_users_to_use_average_as_a_calulcation_metho_e5031470: ผู้ใช้สามารถใช้การคำนวณค่าเฉลี่ยสำหรับผลลัพธ์ที่ระบุ
+  allows_users_to_use_new_decaying_average_as_a_calc_9c285038: "ผู้ใช้สามารถใช้ Decaying Average เป็นวิธีการคำนวณผลลัพธ์ที่กำหนด"
   allows_users_to_use_new_decaying_average_as_a_calu_fe640f6d: "ผู้ใช้สามารถใช้ Decaying Average เป็นวิธีการคำนวณผลลัพธ์ที่กำหนด"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "อนุญาตให้ผู้ใช้ที่มีหมายเลขโทรศัพท์ระหว่างประเทศรับข้อความจาก Canvas"
   alphabetically_60ab47e4: ตามลำดับตัวอักษร
@@ -4705,6 +4715,7 @@ th:
   can_list_external_tools_9132ad0f: สามารถแสดงรายการเครื่องมือจากภายนอก
   can_list_subscriptions_to_data_service_data_b52d5e37: สามารถแสดงรายการสมัครรับข้อมูลส่วนบริการข้อมูล
   can_lookup_account_information_13d69520: สามารถค้นหาข้อมูลทางบัญชี
+  can_replace_the_entire_contents_of_the_rce_c6c97cba: "สามารถแทนที่เนื้อหาทั้งหมดของ RCE"
   can_request_page_content_using_postmessage_api_df6686e: "สามารถแจ้งขอเนื้อหาเพจโดยใช้ postMessage API"
   can_retrieve_user_data_associated_with_the_context_c5ec482c: สามารถเรียกค้นข้อมูลผู้ใช้ที่เชื่อมโยงไว้กับเนื้อหาที่ติดตั้งเครื่องมือนี้
   can_show_external_tools_bb4988c5: สามารถแสดงเครื่องมือจากภายนอก
@@ -4808,6 +4819,7 @@ th:
         need_integer: กรุณากรอกจำนวนเต็มสำหรับเปิดแคชเพลย์ลิสต์
   canvas_3962b702: Canvas
   canvas_account_id_97b0471f: canvas_account_id
+  canvas_account_verification_44e5694: "การยืนยันบัญชีผู้ใช้ Canvas"
   canvas_alert_anonymous_comment_assignment_title_st_e7df7956: "การแจ้งเตือนจาก Canvas - ความเห็นที่ไม่แสดงตัว %{assignment_title}, ผู้เรียน (%{user_id}), %{course_name}"
   canvas_alert_anonymous_comment_student_author_id_f_a525b5eb: "การแจ้งเตือนจาก Canvas - ความเห็นที่ไม่แสดงตัว ผู้เรียน (%{author_id}) สำหรับ %{assignment_title}, ผู้เรียน (%{user_id}), %{course_name}"
   canvas_alert_anonymous_resubmission_assignment_tit_6df1cd32: "การแจ้งเตือนจาก Canvas - การจัดส่งใหม่แบบไม่แสดงตัว %{assignment_title}"
@@ -5041,6 +5053,7 @@ th:
   choose_your_default_skin_tone_f09bf0bd: เลือกสกินโทนเริ่มต้นของคุณ
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' ไม่ใช่สีที่ถูกต้อง"
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' ไม่ใช่สีที่ถูกต้อง กรอก hexcode ที่ถูกต้องก่อนทำการบันทึก"
+  claims_225ec8a4: ข้อกล่าวอ้าง
   clark_county_gradebook_c5ea74bb: "สมุดบันทึกเกรดของเขตพื้นที่ Clark"
   classic_quizzes_dee3c7b7: แบบทดสอบแบบคลาสสิค
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: ตัวเลือกแบบทดสอบแบบคลาสสิคสำหรับแบบทดสอบแบบมีกำหนดเวลาโดยไม่มีการจัดส่ง
@@ -5338,7 +5351,7 @@ th:
   communication_5255723c: การสื่อสาร
   communication_channel: 
     body: "รหัสยืนยัน Canvas ของคุณคือ %{verification_code}"
-    default_twitter_handle: "Twitter Handle"
+    default_twitter_handle: "ชื่อผู้ใช้ X.com"
   communication_channel_id_197ef6f9: "ID ช่องสัญญาณสื่อสาร"
   communication_channels: 
     confirm: 
@@ -5529,6 +5542,7 @@ th:
   completed_19711ce7: เสร็จสิ้นแล้ว
   completed_9b809e44: เสร็จสิ้นแล้ว
   completed_peer_reviews_c134676: ความคิดเห็นจากผู้เกี่ยวข้องที่ดำเนินการแล้ว
+  completed_submittedat_66f56614: "เสร็จสิ้น %{submittedAt}"
   compose_a_new_message_db3a68ed: เขียนข้อความใหม่
   compose_message_8abd180a: เขียนข้อความ
   compressing_f4a35c08: กำลังบีบอัดข้อมูล...
@@ -5987,7 +6001,7 @@ th:
         user_services: บริการทางเว็บที่ลงทะเบียนไว้
       help: 
         list_services: "คุณยังไม่ได้เปิดใช้รายการบริการที่ลงทะเบียน การเปิดใช้รายการนี้จะทำให้สมาชิกของบทเรียนและกลุ่มด้วยกันสามารถเชื่อมโยงกับคุณภายนอกชั้นเรียนได้ง่ายขึ้น"
-        services: "คุณยังไม่ได้เชื่อมโยงโพรไฟล์ผู้ใช้กับบริการจากภายนอกใด ๆ คุณสามารถเชื่อมโยงบัญชี Canvas ของคุณกับบริการ เช่น Twitter วิธีนี้จะทำให้สมาชิกบทเรียนและกลุ่มด้วยกันสามารถเชื่อมโยงกับคุณภายนอกชั้นเรียน"
+        services: "คุณยังไม่ได้เชื่อมโยงโพรไฟล์ผู้ใช้กับบริการจากภายนอกใด ๆ คุณสามารถเชื่อมโยงบัญชี Canvas ของคุณกับบริการ เช่น X.com วิธีนี้จะทำให้สมาชิกบทเรียนและกลุ่มด้วยกันสามารถเชื่อมโยงกับคุณภายนอกชั้นเรียน"
       labels: 
         public_list_services: ให้สมาชิกบทเรียน/กลุ่มด้วยกันสามารถดูได้ว่าบริการใดที่ฉันเชื่อมโยงไว้กับโพรไฟล์ของฉัน
         user_privileges: สิทธิพิเศษ
@@ -6023,7 +6037,7 @@ th:
         registered_services: บริการที่ลงทะเบียนไว้
         service_types: ประเภทบริการ
       help: 
-        no_services: "คุณยังไม่ได้เชื่อมโยงโพรไฟล์ผู้ใช้กับบริการจากภายนอกใด ๆ คุณสามารถเชื่อมโยงบัญชี Canvas ของคุณกับบริการ เช่น Twitter"
+        no_services: "คุณยังไม่ได้เชื่อมโยงโพรไฟล์ผู้ใช้กับบริการจากภายนอกใด ๆ คุณสามารถเชื่อมโยงบัญชี Canvas ของคุณกับบริการ เช่น X.com"
         services_private: "คุณยังไม่ได้เปิดใช้รายการบริการที่ลงทะเบียน การเปิดใช้รายการนี้จะทำให้สมาชิกบทเรียนและกลุ่มด้วยกันมองเห็นได้ว่าบริการใดที่คุณเชื่อมโยงไว้กับบัญชี Canvas ของคุณ"
         user_services: "หากสมาชิกคนอื่นต้องการ สามารถเปิดแสดงให้คุณเห็นว่าบริการภายนอกใดที่เชื่อมโยงไว้กับบัญชี Canvas ของตน ทั้งนี้เพื่อให้สะดวกในการประสานโครงการต่าง ๆ ของกลุ่มและเชื่อมโยงถึงกันภายนอกชั้นเรียน"
       labels: 
@@ -7039,6 +7053,7 @@ th:
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "SIS ID บทเรียน (SIS_ID:####) OR Canvas ID: (###)"
   course_start_date_daae16ae: วันที่เริ่มต้นบทเรียน
   course_start_date_on_before_a3a32883: "วันที่เริ่มต้นบทเรียน ณ/ก่อน"
+  course_start_date_start_date_course_end_date_end_d_437726c: "วันที่เริ่มต้นบทเรียน: %{start_date} | วันที่สิ้นสุดบทเรียน: %{end_date}"
   course_starts_at_3a01f9da: บทเรียนเริ่มต้นเมื่อ
   course_state_manage_2edd46dc: "สถานะบทเรียน - จัดการ"
   course_statistics: 
@@ -7223,6 +7238,8 @@ th:
         you_can_search_by: "คุณสามารถค้นหาจาก:"
       section: 
         remove_user_from_course_section: "ลบผู้ใช้จาก %{name}"
+    sections: 
+      no_date: (ไม่มีวันที่ระบุ)
     settings: 
       alerts_title: แจ้งเตือน
       buttons: 
@@ -7645,6 +7662,7 @@ th:
   current_grading_scheme_for_this_assignment_d525463e: รูปแบบการให้เกรดในปัจจุบันสำหรับภารกิจนี้
   current_jobs_aa571ce4: งานในปัจจุบัน
   current_letter_grade_50f4ebb1: เกรดแบบตัวอักษรในปัจจุบัน
+  current_mastery_score_c3f626c8: "คะแนนความเชี่ยวชาญในปัจจุบัน: "
   current_mastery_score_score_out_of_mastery_points_fedd343f: "คะแนนความเชี่ยวชาญในปัจจุบัน: %{score} จาก %{mastery_points}"
   current_of_totalsteps_19d7ee37: "%{current} จาก %{totalSteps}"
   current_provider_6c3f7f96: ผู้ให้บริการในปัจจุบัน
@@ -8690,6 +8708,7 @@ th:
   due_no_due_date_2b226d2c: "ครบกำหนด: ไม่มีวันครบกำหนด"
   due_no_due_date_3c1d1651: "ครบกำหนด: ไม่มีวันครบกำหนด"
   due_on_date_5ffb2182: ครบกำหนดวันที่
+  due_reply_to_topic_assignment_due_date_time_eec6a6f5: "ครบกำหนด: ตอบกลับไปยังหัวข้อ: %{assignment_due_date_time}"
   due_time_9acd6b69: "ครบกำหนด %{time}"
   due_to_the_size_of_your_course_you_must_select_a_s_f834ba66: "\n\
       \x20               เนื่องจากขนาดบทเรียนของคุณ คุณจะต้องเลือกกลุ่มผู้เรียนก่อนเปิดใช้\n\
@@ -8925,6 +8944,7 @@ th:
   enable_6f5d1328: เปิดใช้งาน
   enable_a_plugin_which_can_find_and_replace_content_59c15164: "เปิดใช้งานปลั๊กที่สามารถค้นหาและแทนที่เนื้อหาขณะแก้ไขใน RCE"
   enable_ability_to_alter_the_final_grade_for_the_en_e120f72d: เปิดใช้งานการแก้ไขเกรดสรุปสำหรับบทเรียนทั้งหมดโดยไม่ต้องแก้ไขคะแนนสำหรับภารกิจ
+  enable_ai_translation_4e5a644b: "เปิดใช้การแปลผ่าน AI"
   enable_all_read_only_scopes_3ddc2bb5: เปิดใช้งานขอบเขตอ่านอย่างเดียวทั้งหมด
   enable_an_account_setting_which_toggles_push_notif_f3ccc7a1: เปิดใช้งานค่าปรับตั้งทางบัญชีเพื่อเปิดปิดการแจ้งเตือนแบบพุชสำหรับบัญชีดังกล่าว
   enable_anonymous_grading_of_assignments_e18f75be: เปิดใช้งานการให้เกรดภารกิจแบบไม่เปิดเผยตัว
@@ -9025,9 +9045,12 @@ th:
     assignment_order_alpha: ตามลำดับตัวอักษร
     assignment_order_assignment_groups: ตามกลุ่มภารกิจและตำแหน่ง
     assignment_order_due_date: ตามวันครบกำหนด
+    avg_score: คะแนนเฉลี่ย
+    high_score: คะแนนสูง
     invalid_group_warning: 
       one: "หมายเหตุ: คะแนนไม่รวมภารกิจจากกลุ่ม %{list_of_group_names} เนื่องจากไม่มีคะแนนที่เป็นไปได้"
       other: "หมายเหตุ: คะแนนไม่รวมภารกิจจากกลุ่ม %{list_of_group_names} เนื่องจากไม่มีคะแนนที่เป็นไปได้"
+    low_score: คะแนนต่ำ
     notes: หมายเหตุ
   enhanced_individual_gradebook_4e825077: สมุดบันทึกเกรดแยกเฉพาะฉบับปรับปรุง
   enhanced_rce_paste_from_clipboard_30ddb011: "การวาง RCE แบบพิเศษจากคลิปบอร์ด"
@@ -10075,6 +10098,7 @@ th:
   final_score_26bcfc20: คะแนนสรุป
   final_score_53278fd0: "คะแนนสรุป:"
   final_score_61e15cf3: คะแนนสรุป
+  final_score_e77dd324: คะแนนสรุป
   findLinkForService: 
     buttons: 
       search: ค้นหา
@@ -10119,6 +10143,7 @@ th:
   find_your_classes_or_subjects_in_the_dashboard_72e1ed47: ค้นหาชั้นเรียนของคุณหรือวิชาในแผงข้อมูล...
   finding_matched_jobs_f7cd0e6d: กำลังค้นหางานที่ตรงกัน
   finish_bc343002: เสร็จสิ้น
+  finish_recording_e0dd7520: สิ้นสุดการบันทึก
   finished_19aaf6f5: เสร็จสิ้นแล้ว
   finished_publishing_pace_597ffc4f: สิ้นสุดการเผยแพร่ความก้าวหน้า
   finished_publishing_plan_f443d416: สิ้นสุดการเผยแพร่แผนแล้ว
@@ -10577,6 +10602,7 @@ th:
       page_header_title: SpeedGrader
       page_title: "%{assignment_name}, SpeedGrader, %{course_name}"
       sort_by: 
+        randomize: สุ่มผู้เรียน
         status: "ตามสถานะการจัดส่ง (ต้องมีการให้เกรด ไม่ได้จัดส่ง ฯลฯ)"
         student_name: "จากชื่อผู้เรียน (ตามตัวอักษร)"
         submitted_at: วันที่ที่จัดส่งภารกิจ
@@ -10611,6 +10637,7 @@ th:
   graded_discussion_submission_6ee4187e: ผลงานจัดส่งส่วนการพูดคุยแบบให้เกรด
   graded_on_time_submissions_80a3c6b: ผลงานจัดส่งตามเวลาที่ให้เกรดแล้ว
   graded_quiz_7fabdf1f: แบบทดสอบที่ลงเกรดแล้ว
+  graded_submissions_1363409e: ผลงานจัดส่งที่ให้เกรดแล้ว
   graded_submissions_9c7068a2: "การส่งเกรด:"
   graded_survey_c0f0c395: แบบสำรวจที่ลงเกรดแล้ว
   grader_comments_visible_to_graders_turned_off_d2af5e9d: ปิดความเห็นสำหรับผู้ให้เกรดที่แสดงกับผู้ให้เกรด
@@ -11257,6 +11284,7 @@ th:
   hide_sub_accounts_for_account_name_a6de98bd: "ซ่อนบัญชีย่อยสำหรับ %{account_name}"
   hide_total_and_override_columns_6fde3e25: "ซ่อนคอลัมน์ รวม (Total) และ บอกล้าง (Override)"
   hide_total_column_6911831e: ซ่อนคอลัมน์รวม
+  hide_translate_text_1003ba9e: ซ่อนข้อความแปล
   hide_unassessed_outcomes_a20aa7fd: ซ่อนผลลัพธ์ที่ไม่ผ่านการประเมิน
   hide_zero_point_new_quizzes_from_the_student_and_t_b4c22d88: ซ่อนแบบทดสอบใหม่แบบคะแนนเป็นศูนย์จากสมุดบันทึกเกรดของผู้เรียนและผู้สอน
   hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "ซ่อนผู้เรียนและกลุ่มย่อยบางส่วนใน LMGB หากผู้สอนสามารถเข้าไปยังกลุ่มย่อยบางกลุ่มเท่านั้น"
@@ -11640,6 +11668,7 @@ th:
   if_you_are_going_to_define_a_limit_group_members_i_655dd628: "หากคุณต้องการระบุรายละเอียดสมาชิกในกลุ่มแบบจำกัด ค่าจะต้องมากกว่า 1"
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "หากต้องการปรับคะแนนภารกิจ คุณจะต้องปรับเกรดภารกิจดังกล่าว"
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "หากต้องการแก้ไขคะแนนภารกิจ คุณจะต้องปรับเกรดผลงานจัดส่งต่าง ๆ"
+  if_you_did_not_try_to_log_into_canvas_please_disre_d2bbfb: "หากคุณไม่ได้ล็อกอินไปยัง Canvas ไม่ต้องใส่ใจข้อความนี้"
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "หากคุณไม่เลือกสิทธิ์การใช้งาน ไฟล์นี้จะถูกเลิกเผยแพร่หลังจากอัพโหลดแล้ว"
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: "หากคุณเปิดใช้งานคุณสมบัตินี้ บัญชี Salesforce ของคุณจะต้องเพิ่มฟิลด์กำหนดเองนี้ไว้พร้อมระบุชื่อให้ตรงกับในคอลัมน์ทางด้านซ้ายของตาราง"
   if_you_encountered_an_unexpected_error_please_crea_d4aca901: "หากคุณพบข้อผิดพลาดที่ไม่คาดคิด กรุณาจัดทำตั๋วแจ้งรับบริการ:"
@@ -11781,6 +11810,7 @@ th:
   inactive_enrollments_bd1831ea: การลงทะเบียนที่ไม่ใช้งาน
   inappropriate_1930c574: ไม่เหมาะสม
   inbox_bb245a60: กล่องจดหมาย
+  inbox_settings_feature_is_disabled_31bc4dce: ระบบตั้งค่ากล่องจดหมายถูกปิดใช้งาน
   inbox_settings_qw_updates_a3eb954b: "ค่าปรับตั้งกล่องจดหมาย - อัพเดต QW"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "ครอบคลุมลิงค์ไปยังระบบส่งภาพหน้าจอ/ภาพหน้าจอโดยอาศัยระบบต่าง ๆ เช่น *Jing*"
   include_assignment_description_36e6ed1b: รวมรายละเอียดภารกิจ
@@ -11830,6 +11860,7 @@ th:
   increase_indent_6af90f7c: เพิ่มการเยื้อง
   increase_indent_6d550a4a: เพิ่มการเยื้อง
   incremental_update_successfully_generated_against__db3f3f06: "การอัพเดตเฉพาะข้อมูลใหม่จัดทำเสร็จสิ้นเทียบกับส่วนข้อมูลนำเข้า SIS ก่อนหน้า"
+  indexing_in_progress_6ce56f27: กำลังจัดทำดัชนี
   india_91_6c290107: "อินเดีย (+91)"
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: "ระบุว่านี่เป็นภาพเพื่อความสวยงามเท่านั้น และไม่ควรอ่านโดยใช้ระบบอ่านหน้าจอ"
   indigo_2035fc55: คราม
@@ -12042,6 +12073,7 @@ th:
       คำขอไม่ถูกต้อง ชื่อ SFTP ไม่ถูกต้อง
                                     กรุณาติดต่อ #canvas-sre ใน Slack
   invalid_restrictions_316cd740: ข้อจำกัดไม่ถูกต้อง
+  invalid_rubric_submission_b1c73f8d: การจัดส่งเกณฑ์การให้คะแนนไม่ถูกต้อง
   invalid_score_3d247da7: คะแนนไม่ถูกต้อง
   invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: "ชื่อผู้ใช้ sftp ไม่ถูกต้อง เราไม่สามารถระบุชื่อผู้ใช้ที่จะใช้ได้เนื่องจากไม่มีโดเมนที่ลงท้ายด้วย .instructure\n\
       \x20                             กรุณาติดต่อใน #canvas-sre ใน Slack   "
@@ -12062,6 +12094,7 @@ th:
   invalid_utf_8_13c76a6: "UTF-8 ไม่ถูกต้อง"
   invalid_value_a1b45937: ค่าไม่ถูกต้อง
   invalid_value_for_name_i_4a7c601a: "ค่าไม่ถูกต้องสำหรับ %{name}: \"%{i}\""
+  invalid_verification_code_16c22ba6: รหัสยืนยันไม่ถูกต้อง
   invalid_xml_configuration_9c3f6bcf: "การกำหนดค่า XML ไม่ถูกต้อง"
   invalid_xml_syntax: "โครงสร้าง xml ไม่ถูกต้อง"
   invitation_only_9a253f1d: คำเชิญเท่านั้น
@@ -12103,6 +12136,7 @@ th:
   item_count_3c7bae0d: "รายการ %{count}"
   item_incomplete_d6a16040: (รายการที่ไม่เสร็จสมบูรณ์)
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} ไม่รองรับในปัจจุบัน"
+  item_score_45eaaf87: คะแนนรายการ
   item_scores_9fbfe956: "คะแนนรายการ:"
   item_select_fe0f320a: เลือกรายการ
   item_type_choice_aebcf2ef: "ประเภทรายการ: ตัวเลือก"
@@ -13297,6 +13331,10 @@ th:
             คุณจะต้องลงทะเบียนใน Canvas ก่อนสามารถเข้าร่วมเป็นผู้ดูแลบัญชีผู้ใช้  คุณสามารถสิ้นสุดกระบวนการลงทะเบียนได้ที่นี่: 
             %{url}
         username_info: "ชื่อผู้ใช้: %{username}"
+    account_verification: 
+      email: 
+        html: 
+          subject: "การยืนยันบัญชีผู้ใช้ Canvas"
     added_to_conversation: 
       email: 
         html: 
@@ -13758,6 +13796,10 @@ th:
         subject: "สิ้นสุดการซิงค์พิมพ์เขียวแล้ว: %{name}"
       twitter: 
         tweet: "การแจ้งเตือนจาก Canvas - การแก้ไขบทเรียนพิมพ์เขียวถูกซิงค์จาก %{name}"
+    checkpoints_created: 
+      email: 
+        labels: 
+          click_to_see_assignment: คลิกที่นี่เพื่อดูภารกิจ
     collaboration_invitation: 
       email: 
         body: |-
@@ -15478,6 +15520,7 @@ th:
   next_module_item_9bb8a222: หน่วยการเรียน/รายการถัดไป
   next_month_749b1778: เดือนถัดไป
   next_month_b55a387c: เดือนถัดไป
+  next_outcome_fe0a9299: ผลลัพธ์ถัดไป
   next_page_d2a39853: เพจถัดไป
   next_peer_review_3d05ef23: ความคิดเห็นจากผู้ที่เกี่ยวข้องถัดไป
   next_question_f37bac25: คำถามถัดไป
@@ -15578,6 +15621,7 @@ th:
   no_more_items_to_show_6a1333c6: ไม่มีรายการที่จะแสดง
   no_more_results_17c4f108: ไม่มีผลลัพธ์เพิ่มเติม
   no_more_results_to_load_6774fb1c: ไม่มีผลลัพธ์เพิ่มเติมที่จะโหลด
+  no_outcome_selected_16d15753: ไม่มีผลลัพธ์ที่เลือก
   no_password_was_given_472222e5: ไม่มีรหัสผ่านที่แจ้งไว้
   no_pending_changes_to_apply_b28f98cf: ไม่มีการเปลี่ยนแปลงที่รอปรับใช้
   no_placements_enabled_f705f28: "ไม่ได้เปิดใช้การจัดวางใด ๆ"
@@ -15674,6 +15718,7 @@ th:
   not_graded_e027c866: ไม่ได้ลงเกรด
   not_graded_e78bcd50: ไม่ได้ให้เกรด
   not_graded_on_time_submissions_54e6ec49: ผลงานจัดส่งตามเวลาที่ไม่ได้ให้เกรด
+  not_graded_submissions_cd209a7f: ผลงานจัดส่งที่ไม่ได้ให้เกรด
   not_graded_yet_82f63c67: ยังไม่ได้ให้เกรด
   not_installed_37a21a76: ไม่ได้ติดตั้ง
   not_mastered_5c2f9968: ไม่ได้ผ่านเกณฑ์ความเชี่ยวชาญ
@@ -15711,9 +15756,14 @@ th:
   note_students_have_submitted_work_for_these_assign_7bc34e28: "หมายเหตุ: ผู้เรียนจัดส่งผลงานสำหรับภารกิจนี้ที่ยังไม่ได้ให้เกรด หากคุณแจ้งเกรดเหล่านี้ในตอนนี้ คุณจะต้องแจ้งคะแนนใหม่หลังจากให้เกรดผลงานจัดส่งล่าสุดของบุคคลเหล่านี้"
   note_sub_account_themes_are_not_active_during_this_a5dd9da: "หมายเหตุ: ธีมบัญชีย่อยไม่ได้ใช้งานระหว่างการแสดงตัวอย่างนี้"
   note_syncing_is_triggered_by_changes_to_course_enr_4fa83ef3: "หมายเหตุ: การซิงค์ถูกเรียกใช้จากการเปลี่ยนแปลงไปยังส่วนการลงทะเบียนบทเรียน ในครั้งแรกที่คุณเปิดใช้งาน Microsoft Sync คุณอาจต้องทำการซิงค์ด้วยตัวเองโดยใช้ปุ่มด้านล่างนี้"
+  note_that_all_login_attributes_from_entra_id_login_8b0e3aa5: |-
+      คุณลักษณะในการล็อกอินทั้งหมดจากส่วนการล็อกอิน Entra ID อาจสามารถแก้ไขได้ยกเว้นในส่วนของ *tid* และ *oid*.
+      เพื่อให้แน่ใจว่าบัญชีผู้ใช้จะไม่ถูกละเมิด คุณควรใช้คุณลักษณะการใช้งานอื่นที่ไม่ใช่ *tid+oid* เฉพาะในกรณีที่คุณแน่ใจ
+      ข้อมูลจะไม่สามารถแก้ไขได้โดยผู้ใช้ใน Entra ID Tenant ทั้งหมดที่ได้รับอนุญาตของคุณ
   note_that_as_long_as_this_option_is_enabled_studen_9ed99069: "หากเปิดใช้ตัวเลือกนี้ไว้ ผู้เรียนจะสามารถย้ายตัวเองระหว่างกลุ่มได้"
   note_that_email_may_not_always_be_populated_in_the_bb4a1572: "อีเมลอาจไม่มีกรอกไว้ในโพรไฟล์ผู้ใช้ที่ Microsoft Oid จะไม่ถูกกรอกไว้สำหรับบัญชี Microsoft ส่วนบุคคล"
   note_that_some_attributes_may_not_be_populated_for_7c1f2854: "คุณลักษณะบางส่วนอาจไม่มีกรอกไว้สำหรับผู้ใช้ทั้งหมดใน Clever"
+  note_this_code_will_expire_in_15_minutes_c743de99: "*หมายเหตุ*: รหัสนี้จะหมดอายุภายใน 15 นาที"
   note_this_is_not_your_official_score_f2d4582f: "*หมายเหตุ*: นี่ไม่ใช่คะแนนทางการของคุณ"
   note_this_login_s_account_uses_delegated_authentic_89227914: "หมายเหตุ: บัญชีสำหรับข้อมูลล็อกอินนี้ใช้การตรวจรับรองที่ได้รับมอบหมาย แต่อนุญาตให้มีการตรวจรับรองด้วยรหัสผ่าน Canvas สำรองได้ ฟิลด์รหัสผ่านในแบบฟอร์มนี้จะอัพเดตรหัสผ่าน Canvas สำรอง *ไม่ใช่*การตรวจรับรองที่ได้รับมอบหมาย"
   note_this_will_attempt_to_undo_the_merge_as_fully__41c9c4e9: "หมายเหตุ: การดำเนินการนี้จะเป็นการยกเลิกการผสานให้สมบูรณ์มากที่สุด ทั้งนี้ผู้ใช้ที่ถูกผสานไปแล้วอาจไม่สามารถกู้คืนเป็นสถานะก่อนหน้าได้อย่างสมบุรณ์แบบ"
@@ -15857,6 +15907,7 @@ th:
       account_notification: การแจ้งข้อมูลทางบัญชี
       account_user_notification: การแจ้งข้อมูลผู้ใช้บัญชี
       account_user_registration: การลงทะเบียนผู้ใช้บัญชี
+      account_verification: การยืนยันบัญชีผู้ใช้
       added_to_conversation: เพิ่มไปยังการพูดคุยแล้ว
       alert: แจ้งเตือน
       announcement_created_by_you: ประกาศที่จัดทำโดยคุณ
@@ -15878,6 +15929,7 @@ th:
       assignment_submitted_late: จัดส่งภารกิจล่าช้า
       blueprint_content_added: เพิ่มเนื้อหาพิมพ์เขียวแล้ว
       blueprint_sync_complete: ซิงค์พิมพ์เขียวเสร็จสิ้น
+      checkpoints_created: จัดทำจุดตรวจสอบแล้ว
       collaboration_invitation: คำเชิญสู่ความร่วมมือ
       confirm_email_communication_channel: ยืนยันช่องทางสื่อสารทางอีเมล
       confirm_registration: ยืนยันการลงทะเบียน
@@ -16277,6 +16329,7 @@ th:
   other_incorrect_match_options_c1418af5: "ตัวเลือกเทียบเคียงที่ไม่ถูกต้องอื่น ๆ:"
   other_resources_fee3ddda: "ทรัพยากรข้อมูลอื่น ๆ"
   otherwise_please_follow_the_support_link_at_the_bo_ee7856a0: "ไม่เช่นนั้น กรุณาไปที่ลิงค์บริการรองรับด้านล่างของเพจ"
+  out_of_78a76f91: จาก
   out_of_formattedoutof_e08e90d5: "จาก %{formattedOutOf}"
   out_of_n_assignment_points_possible_3b026ea9: "จาก %{n_assignment.points_possible}"
   out_of_points_37a749d7: "(จาก %{points})"
@@ -16303,6 +16356,7 @@ th:
     account_group_description: กลุ่มผลลัพธ์ระดับบัญชี
   outcome_guid_has_already_appeared_in_this_import_b9b8b34: "ผลลัพธ์ \"%{guid}\" ปรากฏในผลงานนำเข้านี้อยู่แล้ว"
   outcome_imports_c496a81f: ข้อมูลนำเข้าผลลัพธ์
+  outcome_information_936c59ef: ข้อมูลผลลัพธ์
   outcome_mastery_scales_add_edit_171551c: "คะแนนความเชี่ยวชาญสำหรับผลลัพธ์ - เพิ่ม / แก้ไข"
   outcome_menu_4fe5813: เมนูผลลัพธ์
   outcome_outcome_id_is_not_available_in_context_con_2143db54: "ผลลัพธ์ %{outcome_id} ไม่พร้อมใช้งานในเนื้อหา %{context_type}#%{context_id}"
@@ -16771,8 +16825,10 @@ th:
   please_try_another_search_term_filter_or_search_wi_d6c4046a: "กรุณาลองคำค้นหาหรือตัวกรองอื่น หรือค้นหาโดยใช้ตัวอักษรน้อยกว่านี้"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "กรุณาลองทำการเชื่อมต่อใหม่กับเครื่องมือโดยการเลือกเครื่องมืออีกครั้งในภารกิจหรืออินเทอร์เฟซรายการหน่วยการเรียน แล้วบันทึกข้อมูล"
   please_upload_files_as_a_zip_5a2c799f: "กรุณาอัพโหลดไฟล์เป็น .zip"
+  please_use_the_following_code_to_complete_your_log_bd2eb58d: "กรุณาใช้รหัสต่อไปนี้เพื่อทำการล็อกอินให้เสร็จสิ้น *%{code}*"
   please_verify_that_this_is_the_case_and_then_click_56f1d0fe: "กรุณายืนยันว่าเป็นกรณีนี้ จากนั้นคลิกที่ปุ่มสีแดงด้านล่างเพื่อลบค่าปรับตั้งที่ไม่สมบูรณ์"
   please_visit_your_modules_page_for_more_informatio_846c5e32: กรุณาเข้าไปที่*เพจหน่วยการเรียน*ของคุณเพื่อดูรายละเอียดเพิ่มเติม
+  please_wait_a_moment_while_we_get_smart_search_rea_99a77351: "กรุณารอขณะที่เราเตรียมระบบค้นหาอัจฉริยะ (Smart Search) สำหรับบทเรียนนี้ ขั้นตอนนี้ดำเนินการเพียงครั้งเดียว"
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: กรุณารอขณะเราอัพโหลดและประมวลผลไฟล์ของคุณ
   please_wait_e6355980: กรุณารอสักครู่...
   please_wait_while_we_upload_attachments_59544216: กรุณารอขณะเราอัพโหลดเอกสารแนบ
@@ -17078,9 +17134,9 @@ th:
       description: "การล็อกอินสำหรับ Microsoft"
     microsoft_settings: 
       description: |-
-          คุณจะต้องลงทะเบียน [แอพใหม่กับ Microsoft](%{ms_app_url}).* *
-          คุณควรกำหนดค่า %{callback_url} เป็น URI เปลี่ยนเส้นทาง
-          หลังจากบันทึกแอพของคุณ ให้จด ID แอพพลิเคชั่นและข้อมูลลับไว้ แล้วกรอกข้อมูลไว้ที่นี่
+          คุณจะต้องลงทะเบียน [แอพใหม่กับ Microsoft](%{ms_app_url}) จาก *การลงทะเบียนแอพ (App registrations)*.
+          คุณควรกำหนดค่า %{callback_url} เป็น URI เปลี่ยนเส้นทาง (Redirect URI)
+          หลังจากบันทึกแอพของคุณ ให้จด ID แอพพลิเคชั่นและข้อมูลลับ (Application ID, Secret) ไว้แล้วกรอกข้อมูลไว้ที่นี่
       labels: 
         application_id: "ID แอพพลิเคชั่น"
         application_secret: ข้อมูลลับของแอพพลิเคชั่น
@@ -17322,6 +17378,7 @@ th:
   prev_month_34bd934c: เดือนก่อนหน้า
   prevent_deletion_of_outcomes_with_alignments_in_os_65020476: "ป้องกันการลบผลลัพธ์ที่มีการปรับประสานใน OS"
   prevent_non_cmc_consortium_parent_dev_key_from_aff_418efa1c: "ป้องกันไม่ให้คีย์ผู้พัฒนาต้นทางที่ไม่ใช่กลุ่ม CMC สร้างผลกระทบต่อเครื่องมือสำหรับเด็ก"
+  prevents_lti_tools_with_assignment_edit_placement__b4f4918e: "ป้องกันเครื่องมือ LTI ที่มีส่วนการจัดวาง assignment_edit จากการถูกเรียกใช้ในเพจ ประกาศ (Announcements)"
   prevents_students_from_leaving_annotations_in_assi_cb188d2: "ป้องกันไม่ให้ผู้เรียนทิ้งหมายเหตุกำกับไว้ในภารกิจ ไม่มีผลกับภารกิจแบบมีความคิดเห็นจากผู้เกี่ยวข้อง"
   preview_53003fd2: แสดงตัวอย่าง
   preview_a3f8f854: แสดงตัวอย่าง
@@ -17347,6 +17404,7 @@ th:
   previous_module_item_a9e57348: รายการหน่วยการเรียนก่อนหน้า
   previous_month_7adf1380: เดือนก่อนหน้า
   previous_month_bb1e3c84: เดือนก่อนหน้า
+  previous_outcome_e05a5c3: ผลลัพธ์ก่อนหน้า
   previous_page_928fc112: หน้าที่แล้ว
   previous_question_162c4048: คำถามก่อนหน้า
   previous_snapshots_d8cd4820: สแนปช็อตก่อนหน้า
@@ -17580,7 +17638,7 @@ th:
       unconfirmed_click_to_confirm: "ยังไม่ได้ยืนยัน  คลิกเพื่อยืนยัน"
     token_never_expires: ไม่เคย
     twitter_select: 
-      twitter: Twitter
+      twitter: X.com
     ways_to_contact: 
       bouncing_channel: "Canvas ไม่สามารถส่งข้อความไปถึงคุณโดยใช้วิธีการติดต่อนี้ กรุณาตรวจสอบว่าข้อมูลติดต่อถูกต้องเพื่อรับข้อความจาก Canvas ต่อไป"
       bouncing_email: "Canvas ไม่สามารถส่งอีเมลไปยังที่อยู่นี้ กรุณาตรวจสอบว่าที่อยู่ถูกต้องเพื่อรับอีเมลจากๅ Canvas ต่อไป"
@@ -19478,6 +19536,7 @@ th:
   result_for_19482b14: "ผลลัพธ์สำหรับ "
   result_s_filtered_by_c01428e4: กรองผลลัพธ์จาก
   results_filtered_by_186c4aaa: กรองผลลัพธ์จาก
+  results_for_2bc07172: ผลลัพธ์สำหรับ
   results_for_331ce107: "ผลลัพธ์สำหรับ "
   resume_quiz_afeceb87: ทำแบบทดสอบต่อ
   resume_survey_58dce775: ทำแบบสอบถามต่อ
@@ -19847,6 +19906,7 @@ th:
   scored_more_than_d1646bd5: ทำคะแนนได้มากกว่า
   scored_more_than_score_on_assignmenttitle_2afa1d32: "ทำคะแนนได้มากกว่า %{score} ใน %{assignmentTitle}"
   scoring_range_upperbound_to_lowerbound_c017669b: "ช่วงคะแนน %{upperBound} ถึง %{lowerBound}"
+  screen_recording_is_in_progress_6e3993ac: "กำลังบันทึกหน้าจอ "
   screenreader_gradebook: 
     assignment_information: 
       actions: 
@@ -20053,6 +20113,7 @@ th:
   section_name_b6d82574: ชื่อหัวข้อ
   section_name_edb51b2: ชื่อกลุ่มย่อย
   section_name_fa2b80d7: "ชื่อกลุ่มย่อย:"
+  section_name_inactive_36edffe6: "%{section_name} - ไม่มีการเคลื่อนไหว"
   section_pace_989d2856: ลำดับการเรียนรู้ของกลุ่มย่อย
   section_removed_2ac72a79: "ลบ %{section} แล้ว"
   section_section_names_98f172e6: "กลุ่มย่อย: %{section_names}"
@@ -20146,6 +20207,7 @@ th:
   select_a_location_4eb17e4b: เลือกตำแหน่ง
   select_a_log_type_to_search_247fc6b4: เลือกประเภทบันทึกประวัติที่จะค้นหา
   select_a_module_optional_7edb5cb0: "เลือกหน่วยการเรียน (เผื่อเลือก)"
+  select_a_outcome_to_view_additional_information_61a282f: เลือกผลลัพธ์เพื่อดูข้อมูลเพิ่มเติม
   select_a_predefined_color_c77ab2f5: เลือกสีกำหนดสำเร็จ
   select_a_provisional_grade_7106e3d5: เลือกเกรดภายใต้เงื่อนไข
   select_a_question_bank_f346e5a0: เลือกแถวคำถาม
@@ -20153,6 +20215,7 @@ th:
   select_a_section_37ac1694: เลือกกลุ่มย่อย
   select_a_student_adfcc348: เลือกผู้เรียน
   select_a_student_and_an_assignment_to_view_and_edi_96fda3c1: เลือกผู้เรียนและภารกิจที่จะดูและแก้ไขเกรด
+  select_a_student_and_an_outcome_to_view_results_9b36b177: เลือกผู้เรียนและผลลัพธ์เพื่อดูผลลัพธ์
   select_a_student_to_view_281d17b9: เลือกผู้เรียนที่จะดู
   select_a_student_to_view_additional_information_he_c371e40c: เลือกผู้เรียนเพื่อดูข้อมูลเพิ่มเติมได้ที่นี่
   select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: "เลือกผู้เรียนที่จะดู เพจนี้จะรีเฟรชอัตโนมัติ"
@@ -20167,6 +20230,7 @@ th:
   select_an_assignment_e52320d7: เลือกภารกิจ
   select_an_assignment_to_view_additional_informatio_de1370e1: เลือกภารกิจที่จะดูข้อมูลเพิ่มเติมได้ที่นี่
   select_an_edit_operation_ec1467d: เลือกการแก้ไข
+  select_an_outcome_37fb2096: เลือกผลลัพธ์
   select_an_outcome_group_6edb08a7: เลือกกลุ่มผลลัพธ์
   select_another_group_24773e5f: เลือกกลุ่มอื่น
   select_assignment_available_from_date_203b323f: เลือกภารกิจที่ใช้ได้จากวันที่
@@ -20606,7 +20670,7 @@ th:
       cookie_notice: ประกาศแจ้งเกี่ยวกับคุกกี้
       facebook: Facebook
       privacy_policy: นโยบายความเป็นส่วนตัว
-      twitter: Twitter
+      twitter: X.com
     global_dialogs: 
       buttons: 
         install_video_plugin: ติตดั้งปลั๊กอินวิดีโอ
@@ -21374,6 +21438,7 @@ th:
   start_date_for_enroll_3c2e1f94: "วันที่เริ่มต้นสำหรับ %{enroll}"
   start_date_from_20503757: "วันที่เริ่มต้น จาก:"
   start_date_must_be_before_end_date_a00be892: วันที่เริ่มต้นจะต้องอยู่ก่อนวันที่สิ้นสุด
+  start_date_start_date_end_date_end_date_a85cffa7: "วันที่เริ่มต้น: %{start_date} | วันที่สิ้นสุด: %{end_date}"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} ถึง %{end_time}"
   start_date_time_must_be_before_the_end_date_time_6be0c57f: "วันที่/เวลาเริ่มต้น (Start Date/Time) จะต้องอยู่ก่อนวันที่/เวลาสิ้นสุด (End Date/Time)"
   start_date_to_1e6e6bbe: "วันที่เริ่มต้น ถึง:"
@@ -21612,6 +21677,7 @@ th:
   students_will_be_able_to_see_that_the_grades_for_t_5421a866: ผู้เรียนจะทราบได้ว่าเกรดสำหรับภารกิจนี้ถูกซ่อนไว้
   students_with_no_submissions_title: ผู้เรียนไม่มีผลงานจัดส่ง
   students_without_assessments_eb100e60: ผู้เรียนที่ไม่มีการประเมิน
+  studio_capture_a88ec4e: "Studio Capture"
   studio_media_options_in_rce_1118428b: "ตัวเลือกมีเดียจาก Studio ใน RCE"
   sub_account_daeadd0: บัญชีย่อย
   sub_accounts: 
@@ -22106,6 +22172,7 @@ th:
   tenant_missing_or_sync_disabled_check_the_microsof_7ac198e5: "Tenant ไม่มีอยู่หรือปิดการซิงค์ไว้ ตรวจสอบค่าการผสานรวมของ Microsoft Sync สำหรับบทเรียนและบัญชีผู้ใช้"
   tenant_name_e174f404: "ชื่อ Tenant"
   tenant_name_input_area_283dfcde: "พื้นที่กรอกชื่อ Tenant"
+  tenants_52798659: Tenant
   term_41f37cae: เทอม
   term_42976f1c: "เทอม:"
   term_created_27d27c2b: "จัดทำเทอมแล้ว "
@@ -22117,6 +22184,7 @@ th:
   term_sis_bfe0ae01: "Sis เทอม"
   term_sis_id_4613e944: "Sis id เทอม"
   term_start_b8c2aad1: เริ่มเทอม
+  term_start_date_start_date_term_end_date_end_date_dd895ab2: "วันที่เริ่มเทอม: %{start_date} | วันสิ้นสุดเทอม: %{end_date}"
   term_starting_5bd5e070: "กำลังเริ่มเทอม "
   terms: 
     errors: 
@@ -22336,6 +22404,14 @@ th:
                 อาจต้องใช้เวลาสำหรับบทเรียนที่มีขนาดใหญ่ คุณสามารถออกจากเพจ
                 โดยจะได้รับแจ้งเตือนเมื่อการดาวน์โหลด
                 เสร็จสิ้น
+  the_email_address_email_was_used_to_log_into_canva_4ef05773: |-
+      อีเมลแอดเดรส %{email} ถูกใช้เพื่อล็อกอินไปยัง Canvas ที่ %{website}
+      
+      กรุณาใช้รหัสต่อไปนี้เพื่อทำการล็อกอินให้เสร็จสิ้น %{code}
+      หมายเหตุ: รหัสจะหมดอายุภายใน 15 นาที
+      
+      หากคุณไม่ได้ล็อกอินไปยัง Canvas ไม่ต้องใส่ใจข้อความนี้
+  the_email_address_email_was_used_to_log_into_canva_d76c2a77: "อีเมลแอดเดรส %{email} ถูกใช้เพื่อล็อกอินไปยัง Canvas ที่ %{website}"
   the_end_date_for_841d2ecd: "วันที่สิ้นสุดสำหรับ "
   the_end_date_for_default_to_end_of_yesterday_d8ebec31: "วันที่สิ้นสุดสำหรับ (ปรับค่าเริ่มต้นเป็นสิ้นสุดวันก่อนหน้า)"
   the_end_date_for_discussion_entries_6ac1b0d9: วันที่สิ้นสุดสำหรับรายการส่วนการพูดคุย
@@ -23478,6 +23554,10 @@ th:
   to_restore_a_deleted_course_in_an_account_manage_c_3ad933ee: "กู้คืนบทเรียนที่ถูกลบทิ้งในบัญชีผู้ใช้โดยจะต้องเปิดใช้งาน จัดการบทเรียน - ลบ และ เนื้อหาบทเรียน - ดู ไว้ด้วย"
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "จำกัดผู้ใช้จากเขตพื้นที่เฉพาะของ Clever โดยกรอก Clever ID ของเขตพื้นที่ได้ที่นี่ กรณีเช่นนี้จำเป็นสำหรับการล็อกอินในทันทีของ Clever เพื่อใช้ในระบบการทำงานแบบมี tenant หลายราย"
   to_restrict_to_users_from_specific_google_apps_dom_72aec2d5: "จำกัดผู้ใช้จากโดเมน Google Apps เฉพาะโดยกรอกโดเมนที่นี่เป็นรายการแบบคั่นด้วยจุลภาค จำกัดสำหรับผู้ใช้ Google Apps โดยทั่วไป โดยกรอก '*'"
+  to_restrict_to_users_of_specific_entra_id_instance_10fc0c41: |-
+      ตั้งเงื่อนไขห้ามผู้ใช้ที่มีส่วนทำรายการ Entra ID ที่กำหนดโดยกรอก tenant GUID(s) ที่นี่คั่นด้วยจุลภาค
+      คุณสามารถระบุเป็น *microsoft* เพื่อเปิดอนุญาตบัญชีผู้ใช้ Microsoft ส่วนบุคคล
+      หาก Entra ID ของคุณกำหนดค่าเพื่อให้อนุญาตผู้ใช้ที่เป็น guest จาก tenant อื่น คุณสามารถระบุเป็น *guests* เพื่อให้อนุญาตคนเหล่านี้โดยไม่ต้องระบุชื่อ tenant เป็นการเฉพาะ
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "จำกัดสำหรับผู้ใช้ Azure Active Directory โดยกรอก Tenant ของคุณที่นี่"
   to_review_a_moderated_assignment_in_speedgrader_gr_33227412: "พิจารณาภารกิจที่มีการควบคุมสน SpeedGrader โดยจะต้องเปิดใช้งาน เกรด - แก้ไข ไว้ด้วย"
   to_search_and_view_notifications_for_a_user_users__fab7293a: "ค้นหาและดูการแจ้งข้อมูลสำหรับผู้ใช้โดยจะต้องเปิดใช้งาน ผู้ใช้ - ดู ไว้ด้วย"
@@ -23486,6 +23566,7 @@ th:
   to_search_by_grader_or_student_id_users_view_must__4639a825: "ค้นหาจากผู้ให้เกรดหรือ ID ผู้เรียนโดยจะต้องเปิดใช้งาน ผู้ใช้ - ดู ไว้ด้วย"
   to_search_for_a_course_in_the_restore_courses_tab__93dffdd5: "ค้นหาบทเรียนในแท็บ กู้คืนบทเรียน โดยจะต้องเปิดใช้งาน เนื้อหาบทเรียน - ดู ไว้ด้วย"
   to_search_grade_change_logs_grades_view_change_log_d4d40cf2: "ค้นหาจากบันทึกประวัติการแก้ไขเกรดโดยจะต้องเปิดใช้งาน เกรด - ดูบันทึกประวัติการแก้ไข ไว้ด้วย"
+  to_secure_your_account_you_must_validate_your_emai_fe32b66f: "เพื่อดูแลความปลอดภัยสำหรับบัญชีผู้ใช้ของคุณ คุณจะต้องยืนยันอีเมลของคุณก่อนที่จะสามารถล็อกอินไปยัง Canvas"
   to_see_the_analytics_link_in_the_user_sidebar_from_6a8b20d9: "ดูลิงค์ข้อมูลวิเคราะห์ในแถวรายการด้านข้างสำหรับผู้ใช้จากเพจ บุคคล โดยจะต้องปิดใช้งาน โพรไฟล์ ในบัญชีผู้ใช้ของคุณ"
   to_send_a_message_to_an_individual_user_conversati_8d86a0da: "ส่งข้อความไปยังผู้ใช้เฉพาะรายโดยจะต้องเปิดใช้งาน การพูดคุย - ส่งข้อความไปยังสมาชิกในบทเรียนเฉพาะราย ไว้ด้วย"
   to_share_a_discussion_to_commons_course_content_ad_962c5e53: "แชร์การพูดคุยไปยัง Commons โดยจะต้องเปิดใช้งาน เนื้อหาบทเรียน - เพิ่ม / แก้ไข / ลบ ไว้ด้วย"
@@ -23607,6 +23688,7 @@ th:
   total_points_total_f41b2cff: "คะแนนรวม: %{total}"
   total_points_total_out_of_possible_9056fdb4: "คะแนนรวม: %{total} จาก %{possible}"
   total_range_45c8549a: ช่วงทั้งหมด
+  total_results_b535018d: ผลลัพธ์รวม
   total_results_outcomedetails_cnt_30ff1f8d: "ผลลัพธ์รวม: %{outcomeDetails.cnt}"
   totalcount_total_replies_b6988c0a: "%{totalCount} การตอบกลับทั้งหมด"
   totals_are_calculated_based_only_on_graded_assignm_7d1bbf55: ยอดรวมคำนวณจากภารกิจที่ให้เกรดแล้วเท่านั้น
@@ -23620,6 +23702,9 @@ th:
   transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
       ปรับเปลี่ยน URL สัมบูรณ์เป็น RUL สัมพัทธ์และลบคุณลักษณะส่วนเกินจากเนื้อหา RCE เมื่อโหลด
       จำเป็นเพื่อให้ RCE ทำงานได้อย่างสมบูรณ์แบบในแบบทดสอบใหม่ (New Quizzes)
+  translate_text_2c2a2af4: แปลข้อความ
+  translating_fa26c47b: กำลังแปล
+  translating_text_f98e9e72: กำลังแปลข้อความ
   travel_places_f461329c: การเดินทางและสถานที่
   trinidad_and_tobago_1_fc2d8d1c: "ตรินิแดดและโตเบโก (+1)"
   truncated_56b1a661: ตัดทอนแล้ว
@@ -24137,6 +24222,8 @@ th:
   user_inactivity_report_70cae434: รายงานการไม่ใช้งานของผู้ใช้
   user_information_6353d7e1: ข้อมูลผู้ใช้
   user_is_from_unacceptable_domain_domain_b4b6fd1b: "ผู้ใช้มาจากโดเมน %{domain} ที่ยอมรับไม่ได้"
+  user_is_from_unacceptable_issuer_issuer_6a87cafa: "ผู้ใช้มีที่มาจากผู้ออกรายชื่อผู้ใช้ %{issuer} ที่ยอมรับไม่ได้"
+  user_is_from_unacceptable_tenant_tenant_f4cb522: "ผู้ใช้มีที่มาจาก tenant %{tenant} ที่ยอมรับไม่ได้"
   user_is_now_group_leader_60ec9b98: "%{user} ปัจจุบันคือผู้นำกล่อง"
   user_just_accepted_their_invitation_to_participate_7a4b2ce4: "%{user} เพิ่งตอบรับคำเชิญของคนเหล่านี้เพื่อเข้าร่วมในบทเรียน %{course} บทบาทของบทเรียน: %{role_type}"
   user_just_updated_title_88074ab2: "%{user} เพิ่งอัพเดต %{title}"
@@ -24295,7 +24382,7 @@ th:
       diigo: "Diigo คือเครื่องมือแชร์ลิงค์เพื่อประสานความร่วมมือ  คุณสามารถทำหมายเหตุกำกับเพจใด ๆ ในอินเทอร์เน็ตเพื่อใช้อ้างอิงในภายหลัง  และยังสามารถเชื่อมโยงบัญชี Diigo อื่น ๆ ของผู้ใช้เพื่อแชร์ลิงค์ที่เป็นกลุ่มความสนใจร่วมกัน"
       google_drive: "ผู้เรียนสามารถใช้ Google Drive เพื่อร่วมมือกันในโปรเจคต์ของกลุ่ม  Google Drive ช่วยให้สามารถแก้ไขเอกสาร กระดาษคำนวณและผลงานนำเสนอร่วมกันแบบเรียลไทม์"
       skype: "Skype คือเครื่องมือสำหรับบริการสายโทรด้วยเสียงและภาพออนไลน์ฟรี"
-      twitter: "Twitter เป็นช่องทางที่สะดวกสำหรับการสื่อสารขณะไม่อยู่ในชั้นเรียน"
+      twitter: "X.com เป็นช่องทางที่สะดวกสำหรับการสื่อสารขณะไม่อยู่ในชั้นเรียน"
   user_settings_785eed40: ค่าปรับตั้งผู้ใช้
   user_sis_id_c017cb14: "SIS ID ผู้ใช้"
   user_sis_id_ce5d7a46: "SIS ID ผู้ใช้:"
@@ -24490,8 +24577,8 @@ th:
         other: "จัดส่ง %{count} วันที่ผ่านมา"
         zero: "จัดส่งไม่ถึง 1 วันที่ผ่านมา"
       title: รายงานกิจกรรมของผู้สอน
-    twitter_added: "อนุญาตการใช้งานสำหรับ Twitter แล้ว!"
-    twitter_fail_whale: "การรับรองของ Twitter ล้มเหลว! กรุณาลองใหม่อีกครั้ง"
+    twitter_added: "อนุญาตการใช้งานสำหรับ X.com แล้ว!"
+    twitter_fail_whale: "การรับรองของ X.com ล้มเหลว! กรุณาลองใหม่อีกครั้ง"
     user_atom_feed: "ฟีด Atom ของผู้ใช้ (บทเรียนทั้งหมด)"
     user_merge_fail: "ผสานผู้ใช้ล้มเหลว คุณจะต้องมีสิทธิ์อนุญาตที่ถูกต้องแล้วลองใหม่อีกครั้ง"
     user_merge_success: "ผสานผู้ใช้เสร็จสิ้น! %{first_user} และ %{second_user} เป็นรายการเดียวที่เหมือน ๆ กัน"
@@ -24573,6 +24660,7 @@ th:
       resubmit_to_vericite: "จัดส่งไปยัง VeriCite ใหม่"
   vericite_similarity_score_more_information_7df9ea5c: "คะแนนความใกล้เคียง VeriCite -- ข้อมูลเพิ่มเติม"
   vericite_similarity_score_see_detailed_report_390ab687: "คะแนนความใกล้เคียง VeriCite - ดูรายงานอย่างละเอียด"
+  verification_code_5acd64ef: รหัสยืนยัน
   verify_ldap_tls_certificates_70241d8e: "ตรวจสอบเอกสารรับรอง LDAP TLS"
   verify_tls_certificate_9cfa26d1: "ตรวจสอบเอกสารรับรอง TLS"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "ตรวจสอบเอกสารรับรอง TLS ที่นำเสนอโดยผู้ให้บริการตรวจรับรอง LDAP"
@@ -24840,6 +24928,7 @@ th:
   when_enabled_allows_the_tables_on_the_developer_ke_530070d: |-
       ขณะเปิดใช้งาน ตารางในหน้าคีย์สำหรับผู้พัฒนาจะสามารถ
       จัดเรียงและคัดกรองได้
+  when_enabled_an_lti_tool_with_the_assignment_edit__37ecd98d: "หากเปิดใช้งานไว้ เครื่องมือ LTI ที่มีการจัดวาง assignment_edit จะไม่ถูกเรียกใช้ในเพจ ประกาศ (Announcement)"
   when_enabled_an_lti_tool_with_the_assignment_edit__cd60b1a0: "หากเปิดใช้งานไว้ เครื่องมือ LTI ที่มีการจัดวาง assignment_edit จะถูกเรียกใช้ในเพจ ประกาศ (Announcement)"
   when_enabled_collect_internal_analytics_metrics_us_88e81ee5: "ขณะเปิดใช้งาน จะมีการรวบรวมเกณฑ์ชี้วัดเพื่อการวิเคราะห์ข้อมูลภายในโดยใช้ระบบแบบกระจายศูนย์"
   when_enabled_for_a_child_account_of_a_non_centrall_8b126bc0: |-
@@ -25208,6 +25297,7 @@ th:
                     แทนการรอให้ผู้สอนทำให้
   you_can_fac644aa: "คุณสามารถ "
   you_can_leave_the_page_and_you_will_get_a_notifica_fefe11e8: คุณสามารถออกจากเพจนี้และรับการแจ้งข้อมูลเมื่อกระบวนการซิงค์เสร็จสิ้น
+  you_can_leave_this_page_and_come_back_and_we_will__e80e8204: "คุณสามารถปล่อยเพจนี้ค้างไว้แล้วกลับมาทีหลัง เราจะจัดการให้อยู่เบื้องหลัง"
   you_can_log_in_directly_with_this_provider_by_goin_467d7f66: "คุณสามารถล็อกอินโดยตรงกับผู้ให้บริการนี้โดยไปที่ %{url}"
   you_can_provide_this_access_in_your_browser_settin_2b81a586: คุณสามารถจัดสรรการใช้งานนี้ในค่าปรับตั้งสำหรับเบราเซอร์ของคุณ
   you_can_replace_by_uploading_a_new_caption_file_6c88ce00: คุณสามารถแทนที่ได้โดยการอัพโหลดไฟล์คำบรรยายใหม่
@@ -25413,6 +25503,10 @@ th:
       คุณจะต้องจัดทำแอพพลิเคชั่นทางเว็บ [Google Developer Console](%{google_url})
       คุณควรเพิ่ม %{callback_url} เป็น URI เปลี่ยนเส้นทาง
       หลังจากจัดทำแอพของคุณ ให้จด ID ไคลเอนท์และข้อมูลลับของไคลเอนท์ไว้ แล้วกรอกไว้ที่นี่
+  you_will_need_to_register_a_new_app_with_microsoft_1b4dbf87: |-
+      คุณจะต้องลงทะเบียน [แอพใหม่กับ Microsoft](%{ms_app_url}) จาก *การลงทะเบียนแอพ (App registrations)*.
+      คุณควรกำหนดค่า %{callback_url} เป็น URI เปลี่ยนเส้นทาง (Redirect URI)
+      หลังจากบันทึกแอพของคุณ ให้จด ID แอพพลิเคชั่นและข้อมูลลับ (Application ID, Secret) ไว้แล้วกรอกข้อมูลไว้ที่นี่
   you_will_need_to_register_a_new_app_with_microsoft_53e97ced: |-
       คุณจะต้องลงทะเบียน [แอพใหม่กับ Microsoft](%{ms_app_url}).
       คุณควรกำหนดค่า %{callback_url} เป็น URI เปลี่ยนเส้นทาง
@@ -25442,6 +25536,10 @@ th:
       คุณควรกำหนดค่า %{callback_url} เป็น URL การติดต่อกลับ และกำหนดระดับการใช้งานเป็น
       อ่าน เขียนและสืบค้นข้อความโดยตรง
       หลังจากจัดทำแอพพลิเคชั่นของคุณ ให้จดคีย์ผู้บริโภคและข้อมูลลับผู้บริโภคไว้ แล้วกรอกไว้ที่นี่
+  you_will_need_to_register_an_application_on_x_com__599c558: |-
+      คุณจะต้อง [ลงทะเบียนแอพพลิเคชั่นใน X.com](%{twitter_url})
+      คุณควรกำหนดค่า %{callback_url} เป็น URL การติดต่อกลับ
+      หลังจากจัดทำแอพพลิเคชั่นของคุณ ให้จดคีย์ผู้บริโภคและข้อมูลลับของผู้บริโภคไว้ แล้วกรอกไว้ที่นี่
   you_will_not_be_able_to_preview_your_changes_f7b868fb: คุณจะไม่สามารถแสดงตัวอย่างการเปลี่ยนแปลงของคุณ
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "คุณจะไม่ได้รับการแจ้งข้อมูลบทเรียนใด ๆ ในตอนนี้ เปิดใช้งานการแจ้งข้อมูลบทเรียนโดยใช้ตัวเปิดปิดด้านบน"
   you_will_only_see_comments_written_by_you_f294cb9d: คุณจะเห็นเฉพาะความเห็นที่คุณเขียนเท่านั้น

@@ -2122,6 +2122,7 @@ fa:
   add_people_7ee4b2ec: "افزودن افراد"
   add_people_and_courses_to_canvas_5c4bfff9: "افراد و درس‌ها را به کانواس اضافه کنید"
   add_people_to_coursename_5ea234e1: "افزودن افراد به %{courseName}"
+  add_prerequisite_6409bd9: "افزودن پیش نیاز"
   add_proficiency_rating_d819f6b8: "رتبه مهارت را اضافه کنید"
   add_quiz_cebfa28b: "افزودن آزمون"
   add_quiz_ip_filter_c7b37dc5: "افزودن فیلتر آی پی آزمون"
@@ -13645,6 +13646,9 @@ fa:
       new_tab: "این ابزار باید در یک پنجره جدید مرورگر بارگذاری شود"
       new_tab_expired: "جلسه مربوط به این ابزار منقضی شده است. لطفا برای دسترسی دوباره به ابزار، صفحه را دوباره بارگذاری کنید"
       new_tab_loaded: "این ابزار به طور موفقیت آمیز در یک پنجره جدید مرورگر بارگذاری شد. برای دسترسی دوباره به این ابزار، صفحه را دوباره بارگذاری کنید."
+    registrations: 
+      index: 
+        title: پسوندها
   lti2: 
     register_tool: "ثبت ابزار"
   lti_1_3_configuration_c3534f3b: "پیکربندی LTI 1.3 "
@@ -25148,6 +25152,7 @@ fa:
   vericite_similarity_score_more_information_7df9ea5c: "نمره تشابه VeriCite -- اطلاعات بیشتر"
   vericite_similarity_score_see_detailed_report_390ab687: "نمره تشابه VeriCite - جزئیات گزارش را ببینید"
   verification_code_5acd64ef: "رمز تأیید"
+  version_5599c321: نسخه
   video_78335c71: ویدئو
   video_b9f27375: تصویر
   video_content_is_not_supported_by_your_device_or_a_25214f57: "محتوای فیلم تحت پشتیبانی دستگاه با برنامه شما نیست."

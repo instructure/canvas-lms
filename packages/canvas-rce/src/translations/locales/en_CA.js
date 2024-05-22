@@ -657,6 +657,7 @@ const locale = {
   "nested_less_than_27d17e58": { "message": "Nested Less Than" },
   "new_quiz_34aacba6": { "message": "New Quiz" },
   "next_40e12421": { "message": "Next" },
+  "next_findtext_9d69f0fe": { "message": "Next { findText }" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "No accessibility issues were detected."
   },
@@ -779,6 +780,7 @@ const locale = {
   "preview_in_overlay_ed772c46": { "message": "Preview in overlay" },
   "preview_inline_9787330": { "message": "Preview inline" },
   "previous_bd2ac015": { "message": "Previous" },
+  "previous_findtext_8dfbfd30": { "message": "Previous { findText }" },
   "prime_917ea60e": { "message": "Prime" },
   "prime_numbers_13464f61": { "message": "Prime Numbers" },
   "product_39cf144f": { "message": "Product" },
@@ -808,8 +810,20 @@ const locale = {
   "remove_heading_style_5fdc8855": { "message": "Remove heading style" },
   "remove_link_d1f2f4d0": { "message": "Remove Link" },
   "replace_all_d3d68b3": { "message": "Replace All" },
+  "replace_all_findtext_with_replacetext_da574b32": {
+    "message": "Replace all { findText } with { replaceText }"
+  },
   "replace_e61834a7": { "message": "Replace" },
+  "replace_findtext_with_replacetext_7b5c7fb3": {
+    "message": "Replace { findText } with { replaceText }"
+  },
   "replace_with_eeff01ad": { "message": "Replace with" },
+  "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+    "message": "Replaced { alertFindText } with { alertReplaceText }"
+  },
+  "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+    "message": "Replaced all { alertFindText } with { alertReplaceText }"
+  },
   "reset_95a81614": { "message": "Reset" },
   "resize_ec83d538": { "message": "Resize" },
   "restore_auto_save_deccd84b": { "message": "Restore auto-save?" },

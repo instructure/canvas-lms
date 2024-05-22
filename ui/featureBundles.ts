@@ -32,6 +32,7 @@ const featureBundles: {
   admin_split: () => import('./features/admin_split/index'),
   alerts: () => import('./features/alerts/index'),
   all_courses: () => import('./features/all_courses/index'),
+  analytics_hub: () => import('./features/analytics_hub/index'),
   announcements_on_home_page: () => import('./features/announcements_on_home_page/index'),
   announcements: () => import('./features/announcements/index'),
   assignment_edit: () => import('./features/assignment_edit/index'),

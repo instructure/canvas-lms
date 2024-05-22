@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import SRSearchMessage from '../SRSearchMessage'
+import {render} from '@testing-library/react'
 
 injectGlobalAlertContainers()
 
@@ -43,50 +43,39 @@ const getProps = () => ({
 it('returns noscript when the collection is loading', () => {
   const props = getProps()
   props.collection.loading = true
-  const wrapper = mount(<SRSearchMessage {...props} />)
-  expect(wrapper.find('noscript').exists()).toBe(true)
+  const wrapper = render(<SRSearchMessage {...props} />)
+  expect(wrapper.container.querySelector('noscript')).toBeInTheDocument()
 })
 
 it('returns the error message when collection has an error', () => {
   const props = getProps()
   props.collection.error = new Error('failure')
-  const wrapper = mount(<SRSearchMessage {...props} />)
-  expect(wrapper.find('Alert').exists()).toBe(true)
-  expect(document.getElementById('flash_screenreader_holder').textContent).toBe(
-    'There was an error with your query; please try a different search'
-  )
+  const wrapper = render(<SRSearchMessage {...props} />)
+  expect(
+    wrapper.getByText('There was an error with your query; please try a different search')
+  ).toBeInTheDocument()
 })
 it('returns the empty course message when the collection is empty and the dataType is Course', () => {
   const props = getProps()
   props.collection.data = []
-  const wrapper = mount(<SRSearchMessage {...props} />)
-  expect(wrapper.find('Alert').exists()).toBe(true)
-  expect(document.getElementById('flash_screenreader_holder').textContent).toBe('No courses found')
+  const wrapper = render(<SRSearchMessage {...props} />)
+  expect(wrapper.getByText('No courses found')).toBeInTheDocument()
 })
 it('returns the empty user message when the collection is empty and the dataType is User', () => {
   const props = getProps()
   props.collection.data = []
   props.dataType = 'User'
-  const wrapper = mount(<SRSearchMessage {...props} />)
-  expect(wrapper.find('Alert').exists()).toBe(true)
-  expect(document.getElementById('flash_screenreader_holder').textContent).toBe('No users found')
+  const wrapper = render(<SRSearchMessage {...props} />)
+  expect(wrapper.getByText('No users found')).toBeInTheDocument()
 })
 it('returns the course updated message when the dataType is Course', () => {
   const props = getProps()
-  const wrapper = mount(<SRSearchMessage {...props} />)
-  const alert = wrapper.find('Alert')
-  expect(alert.exists()).toBe(true)
-  expect(document.getElementById('flash_screenreader_holder').textContent).toBe(
-    'Course results updated.'
-  )
+  const wrapper = render(<SRSearchMessage {...props} />)
+  expect(wrapper.getByText('Course results updated.')).toBeInTheDocument()
 })
 it('returns the user updated message when the dataType is User', () => {
   const props = getProps()
   props.dataType = 'User'
-  const wrapper = mount(<SRSearchMessage {...props} />)
-  const alert = wrapper.find('Alert')
-  expect(alert.exists()).toBe(true)
-  expect(document.getElementById('flash_screenreader_holder').textContent).toBe(
-    'User results updated.'
-  )
+  const wrapper = render(<SRSearchMessage {...props} />)
+  expect(wrapper.getByText('User results updated.')).toBeInTheDocument()
 })

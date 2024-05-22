@@ -56,20 +56,24 @@ type RubricAssessmentTrayWrapperProps = {
   onSave: (assessmentData: any) => void
 }
 export default ({rubric, onAccessorChange, onSave}: RubricAssessmentTrayWrapperProps) => {
-  const {rubricAssessmentTrayOpen, studentAssessment, rubricAssessors} = useStore()
+  const {rubricAssessmentTrayOpen, studentAssessment, rubricAssessors, rubricHidePoints} =
+    useStore()
 
   const handleSubmit = (assessmentData: RubricAssessmentData[]) => {
     const data = convertSubmittedAssessment(assessmentData)
     onSave(data)
   }
 
-  const isPeerReview = studentAssessment?.assessor_id !== ENV.RUBRIC_ASSESSMENT?.assessor_id
+  const isPreviewPeerMode =
+    !!studentAssessment?.assessor_id &&
+    studentAssessment.assessor_id !== ENV.RUBRIC_ASSESSMENT?.assessor_id
 
   return (
     <RubricAssessmentTray
+      hidePoints={rubricHidePoints}
       isOpen={rubricAssessmentTrayOpen}
-      isPreviewMode={false}
-      isPeerReview={isPeerReview}
+      isPreviewMode={isPreviewPeerMode}
+      isPeerReview={isPreviewPeerMode}
       rubric={mapRubricUnderscoredKeysToCamelCase(rubric)}
       rubricAssessmentData={mapRubricAssessmentDataUnderscoredKeysToCamelCase(
         studentAssessment?.data ?? []

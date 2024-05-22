@@ -117,21 +117,6 @@ describe('AssignmentAvailabilityContainer', () => {
       expect(getByText('View Due Dates')).toBeTruthy()
     })
 
-    it('displays "View Due Dates" when there are subAssignmentSubmissions', () => {
-      const {getByText} = render(
-        <AssignmentAvailabilityContainer
-          assignment={Assignment.mock({
-            mySubAssignmentSubmissionsConnection: {nodes: mockSubAssignmentSubmissions},
-          })}
-          isAdmin={false}
-          inPacedCourse={false}
-          courseId="17"
-        />
-      )
-
-      expect(getByText('View Due Dates')).toBeTruthy()
-    })
-
     it('displays tray and correctly formatted dates', async () => {
       const {queryByText, findByText, findAllByTestId} = setup({
         assignmentOverrides: {nodes: mockOverrides},

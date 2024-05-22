@@ -83,7 +83,7 @@ outcome_average_calculation:
   state: allowed_on
   applies_to: RootAccount
   display_name: Outcome Average Calculation Method
-  description: Allows users to use average as a calulcation method for a given outcome.
+  description: Allows users to use average as a calculation method for a given outcome.
 outcome_alignment_summary_with_new_quizzes:
   state: hidden
   applies_to: Course
@@ -93,7 +93,7 @@ outcomes_new_decaying_average_calculation:
   state: hidden
   applies_to: RootAccount
   display_name: Outcomes New Decaying Average Calculation Method
-  description: Allows users to use new decaying average as a calulcation method for a given outcome.
+  description: Allows users to use new decaying average as a calculation method for a given outcome.
 archive_outcomes:
   state: hidden
   applies_to: SiteAdmin

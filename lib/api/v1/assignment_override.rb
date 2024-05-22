@@ -213,6 +213,11 @@ module Api::V1::AssignmentOverride
       override_data[:section] = section
     end
 
+    if !set_type && data.key?(:course_id) && data[:course_id].present?
+      set_type = "Course"
+      override_data[:course] = learning_object.context
+    end
+
     if !set_type && data.key?(:noop_id)
       set_type = "Noop"
       override_data[:noop_id] = data[:noop_id]
@@ -356,6 +361,10 @@ module Api::V1::AssignmentOverride
 
     if override_data.key?(:section)
       override.set = override_data[:section]
+    end
+
+    if override_data.key?(:course)
+      override.set = override_data[:course]
     end
 
     if override.set_type == "ADHOC"

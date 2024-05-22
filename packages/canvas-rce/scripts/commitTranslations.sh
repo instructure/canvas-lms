@@ -41,7 +41,7 @@ if [ ! -z "$OUTPUT" ]; then
     (
       aws --region us-east-1 sqs send-message \
         --queue-url https://sqs.us-east-1.amazonaws.com/636161780776/slack-lambda \
-        --message-body "{\"channel\":\"#learning-foundations\",\"username\":\"Package Translations\",\"text\":\"$SLACK_MESSAGE\"}"
+        --message-body "{\"channel\":\"#rcx-eng\",\"username\":\"Package Translations\",\"text\":\"$SLACK_MESSAGE\"}"
     ) || echo "Failed to send Slack message."
   fi
 fi

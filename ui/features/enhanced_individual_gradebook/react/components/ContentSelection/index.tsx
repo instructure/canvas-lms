@@ -92,7 +92,6 @@ export default function ContentSelection({
       if (studentIndex !== -1) {
         setSelectedStudentIndex(studentIndex)
       } else {
-        // if the student is not in the dropdown, reset the student dropdown
         setSelectedStudentIndex(0)
         onStudentChange(undefined)
       }
@@ -132,6 +131,7 @@ export default function ContentSelection({
     const selectedIndex = (event ? event.target.selectedIndex : newIndex) ?? 0
     setSelectedStudentIndex(selectedIndex)
     const selectedStudent = studentDropdownOptions[selectedIndex]?.data
+
     onStudentChange(selectedStudent?.id)
 
     if (selectedIndex <= 0) {

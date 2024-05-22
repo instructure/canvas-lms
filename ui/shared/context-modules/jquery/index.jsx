@@ -2504,6 +2504,9 @@ $(document).ready(function () {
     switch(itemProps.moduleItemType) {
       case 'discussion':
       case 'discussion_topic':
+        if(itemProps.moduleItemHasAssignment === 'true') {
+          return false
+        }else return true
       case 'page':
       case 'wiki_page':
         return true
@@ -2556,6 +2559,7 @@ $(document).ready(function () {
     const moduleItemType = event.target.getAttribute('data-item-type')
     const courseId = event.target.getAttribute('data-item-context-id')
     const moduleItemContentId = event.target.getAttribute('data-item-content-id')
+    const moduleItemHasAssignment = event.target.getAttribute('data-item-has-assignment')
     const itemProps = parseModuleItemElement(
       document.getElementById(`context_module_item_${moduleItemId}`)
     )
@@ -2564,6 +2568,7 @@ $(document).ready(function () {
       moduleItemName,
       moduleItemType,
       moduleItemContentId,
+      moduleItemHasAssignment,
       ...itemProps,
     })
   })

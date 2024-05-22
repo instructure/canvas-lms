@@ -672,10 +672,6 @@ class ContextExternalTool < ActiveRecord::Base
     settings[:oauth_compliant]
   end
 
-  def not_selectable
-    !!read_attribute(:not_selectable)
-  end
-
   def not_selectable=(bool)
     write_attribute(:not_selectable, Canvas::Plugin.value_to_boolean(bool))
   end
@@ -800,7 +796,11 @@ class ContextExternalTool < ActiveRecord::Base
     when :selection_height
       400
     when :message_type
-      if type == :resource_selection
+      if use_1_3? && type == :editor_button
+        LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE
+      elsif use_1_3?
+        LtiAdvantage::Messages::ResourceLinkRequest::MESSAGE_TYPE
+      elsif type == :resource_selection
         "resource_selection"
       else
         "basic-lti-launch-request"
@@ -1299,7 +1299,7 @@ class ContextExternalTool < ActiveRecord::Base
       # Default placements are only applicable to LTI 1.1
       if placements.map(&:to_s).intersect?(Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS)
         scope = ContextExternalTool
-                .where(lti_version: "1.1", not_selectable: [nil, false])
+                .where(lti_version: "1.1", not_selectable: false)
                 .merge(
                   ContextExternalTool.where("COALESCE(context_external_tools.url, '') <> ''")
                                      .or(ContextExternalTool.where("COALESCE(context_external_tools.domain, '') <> ''"))

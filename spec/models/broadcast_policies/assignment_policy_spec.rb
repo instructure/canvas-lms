@@ -39,7 +39,8 @@ module BroadcastPolicies
              saved_change_to_points_possible?: true,
              saved_change_to_workflow_state?: false,
              workflow_state_before_last_save: "published",
-             checkpoints_parent?: false)
+             checkpoints_parent?: false,
+             checkpoint?: false)
     end
 
     let(:policy) { AssignmentPolicy.new(assignment) }

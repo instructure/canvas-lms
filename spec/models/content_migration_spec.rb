@@ -944,6 +944,131 @@ describe ContentMigration do
     end
   end
 
+  context "common_cartridge_qti_new_quizzes_import" do
+    let(:importer) { double }
+
+    before do
+      allow(importer)
+        .to receive(:import_content)
+        .with(any_args)
+        .and_return(true)
+      allow(@cm.migration_settings)
+        .to receive(:[])
+        .with("migration_type")
+        .and_return("common_cartridge_importer")
+      allow(QuizzesNext::Importers::CourseContentImporter)
+        .to receive(:new)
+        .with(any_args)
+        .and_return(importer)
+    end
+
+    context "FF enabled" do
+      before do
+        allow(NewQuizzesFeaturesHelper)
+          .to receive(:common_cartridge_qti_new_quizzes_import_enabled?)
+          .with(instance_of(Course))
+          .and_return(true)
+      end
+
+      describe "not Quizzes.Next CC import" do
+        before do
+          allow(@cm.migration_settings)
+            .to receive(:[])
+            .with(:import_quizzes_next)
+            .and_return(false)
+        end
+
+        it "calls QuizzesNext::Importers" do
+          expect(@cm.migration_settings)
+            .to receive(:[])
+            .with(:migration_ids_to_import)
+          expect(Importers).not_to receive(:content_importer_for)
+          expect(QuizzesNext::Importers::CourseContentImporter)
+            .to receive(:new).and_return(importer)
+          expect(importer).to receive(:import_content)
+          @cm.import!({})
+        end
+      end
+
+      describe "Quizzes.Next CC import" do
+        before do
+          allow(@cm.migration_settings)
+            .to receive(:[])
+            .with(:import_quizzes_next)
+            .and_return(true)
+        end
+
+        it "calls QuizzesNext::Importers" do
+          expect(@cm.migration_settings)
+            .to receive(:[])
+            .with(:migration_ids_to_import)
+          expect(Importers).not_to receive(:content_importer_for)
+          expect(QuizzesNext::Importers::CourseContentImporter)
+            .to receive(:new).and_return(importer)
+          expect(importer).to receive(:import_content)
+          @cm.import!({})
+        end
+      end
+    end
+
+    context "FF disabled" do
+      before do
+        allow(NewQuizzesFeaturesHelper)
+          .to receive(:common_cartridge_qti_new_quizzes_import_enabled?)
+          .with(instance_of(Course))
+          .and_return(false)
+        allow(Importers)
+          .to receive(:content_importer_for)
+          .with("Course")
+          .and_return(importer)
+      end
+
+      describe "not Quizzes.Next CC import" do
+        before do
+          allow(@cm.migration_settings)
+            .to receive(:[])
+            .with(:import_quizzes_next)
+            .and_return(false)
+        end
+
+        it "does not call QuizzesNext::Importers" do
+          expect(@cm.migration_settings)
+            .to receive(:[])
+            .with(:migration_ids_to_import)
+          expect(Importers).to receive(:content_importer_for)
+          expect(QuizzesNext::Importers::CourseContentImporter)
+            .not_to receive(:new)
+          expect(importer).to receive(:import_content)
+          @cm.import!({})
+        end
+      end
+
+      describe "Quizzes.Next CC import" do
+        before do
+          allow(@cm.context)
+            .to receive(:feature_enabled?)
+            .with(:quizzes_next)
+            .and_return(true)
+          allow(@cm.migration_settings)
+            .to receive(:[])
+            .with(:import_quizzes_next)
+            .and_return(true)
+        end
+
+        it "calls QuizzesNext::Importers" do
+          expect(@cm.migration_settings)
+            .to receive(:[])
+            .with(:migration_ids_to_import)
+          expect(Importers).not_to receive(:content_importer_for)
+          expect(QuizzesNext::Importers::CourseContentImporter)
+            .to receive(:new).and_return(importer)
+          expect(importer).to receive(:import_content)
+          @cm.import!({})
+        end
+      end
+    end
+  end
+
   context "importing to NQ with the new_quizzes_bank_migrations FF enabled" do
     before do
       allow_any_instance_of(ContentMigration).to receive(:quizzes_next_banks_migration?).and_return(true)

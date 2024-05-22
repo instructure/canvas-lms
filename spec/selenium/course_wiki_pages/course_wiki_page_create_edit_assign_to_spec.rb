@@ -100,4 +100,36 @@ describe "wiki pages edit page assign to" do
 
     expect(@page.assignment_overrides.count).to eq(1)
   end
+
+  it "shows 'everyone' card when course overrides exist" do
+    @context_module = @course.context_modules.create! name: "Mod"
+    module_override = @context_module.assignment_overrides.build
+    module_override.course_section = @course.course_sections.first
+    module_override.save!
+    @context_module.add_item(type: "wiki_page", id: @page.id)
+
+    @page.assignment_overrides.create!(set: @course)
+    expect(@page.all_assignment_overrides.count).to eq(2)
+
+    visit_wiki_edit_page(@course.id, @page.title)
+
+    assign_to_link.click
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    expect(module_item_assign_to_card[0]).to be_displayed
+    expect(module_item_assign_to_card[1]).to be_displayed
+
+    expect(assign_to_in_tray("Remove Everyone else")[0]).to be_displayed
+    expect(assign_to_in_tray("Remove #{@course.course_sections.first.name}")[0]).to be_displayed
+  end
+
+  it "does not show Manage Assign To for group pages" do
+    group = @course.groups.create!(name: "Group 1")
+    page = group.wiki_pages.create!(title: "group-page")
+    visit_group_wiki_edit_page(group.id, page.title)
+    wait_for_ajaximations
+    expect(element_exists?(editing_roles_input_selector)).to be_truthy
+    expect(element_exists?(assign_to_link_selector)).to be_falsey
+  end
 end

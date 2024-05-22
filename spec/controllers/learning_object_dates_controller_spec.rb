@@ -265,7 +265,7 @@ describe LearningObjectDatesController do
                                })
     end
 
-    it "returns date details for a page" do
+    it "returns date details for a regular page" do
       wiki_page = @course.wiki_pages.create!(title: "My Page",
                                              unlock_at: "2022-01-05T00:00:00Z",
                                              lock_at: "2022-03-05T00:00:00Z")
@@ -287,6 +287,43 @@ describe LearningObjectDatesController do
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
                                    "unlock_at" => "2022-01-04T00:00:00Z"
+                                 }]
+                               })
+    end
+
+    it "returns date details for a page with an assignment" do
+      wiki_page = @course.wiki_pages.create!(title: "My Page",
+                                             # dummy params
+                                             unlock_at: "2022-01-04T00:00:00Z",
+                                             lock_at: "2022-03-04T00:00:00Z",
+                                             only_visible_to_overrides: false)
+      wiki_page.assignment = @course.assignments.create!(
+        name: "My Page",
+        submission_types: ["wiki_page"],
+        unlock_at: "2022-01-05T00:00:00Z",
+        lock_at: "2022-02-05T00:00:00Z",
+        only_visible_to_overrides: true
+      )
+      wiki_page.save!
+      override = wiki_page.assignment.assignment_overrides.create!(set: @course.default_section,
+                                                                   unlock_at: "2022-01-07T00:00:00Z",
+                                                                   unlock_at_overridden: true)
+      get :show, params: { course_id: @course.id, page_id: wiki_page.id }
+      expect(response).to be_successful
+      expect(json_parse).to eq({
+                                 "id" => wiki_page.id,
+                                 "due_at" => nil,
+                                 "unlock_at" => "2022-01-05T00:00:00Z",
+                                 "lock_at" => "2022-02-05T00:00:00Z",
+                                 "only_visible_to_overrides" => true,
+                                 "graded" => false,
+                                 "visible_to_everyone" => false,
+                                 "overrides" => [{
+                                   "id" => override.id,
+                                   "assignment_id" => wiki_page.assignment.id,
+                                   "title" => "Unnamed Course",
+                                   "course_section_id" => @course.default_section.id,
+                                   "unlock_at" => "2022-01-07T00:00:00Z"
                                  }]
                                })
     end
@@ -550,6 +587,18 @@ describe LearningObjectDatesController do
         expect(override2.lock_at_overridden).to be false
       end
 
+      it "allows creating an override for a student who's previously been deleted" do
+        student_in_course
+        ao = differentiable.assignment_overrides.create!
+        aos = ao.assignment_override_students.create!(user: @student)
+        aos.destroy
+        put :update, params: { **default_params, assignment_overrides: [{ student_ids: [@student.id] }] }
+        expect(response).to be_no_content
+        expect(differentiable.assignment_overrides.active.count).to eq 1
+        expect(differentiable.assignment_overrides.active.first.assignment_override_students.active.pluck(:user_id)).to eq [@student.id]
+        expect(aos.reload).to be_deleted
+      end
+
       it "returns bad_request if trying to create duplicate overrides" do
         put :update, params: { **default_params,
           assignment_overrides: [{ course_section_id: @course.default_section.id },
@@ -732,7 +781,7 @@ describe LearningObjectDatesController do
       end
     end
 
-    context "pages" do
+    context "regular pages" do
       let_once(:learning_object) do
         @course.wiki_pages.create!(title: "My Page", **default_availability_dates)
       end
@@ -750,6 +799,32 @@ describe LearningObjectDatesController do
 
       include_examples "learning object updates", false
       include_examples "learning objects without due dates"
+    end
+
+    context "pages with an assignment" do
+      let_once(:learning_object) do
+        page = @course.wiki_pages.create!(title: "My Page")
+        page.assignment = @course.assignments.create!(
+          name: "My Page",
+          submission_types: ["wiki_page"],
+          **default_availability_dates
+        )
+        page.save!
+        page
+      end
+
+      let_once(:differentiable) do
+        learning_object.assignment
+      end
+
+      let_once(:default_params) do
+        {
+          course_id: @course.id,
+          page_id: learning_object.id
+        }
+      end
+
+      include_examples "learning object updates", false
     end
 
     context "files" do
