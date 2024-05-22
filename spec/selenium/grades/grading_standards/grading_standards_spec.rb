@@ -175,9 +175,7 @@ describe "grading standards" do
     before do
       course_with_teacher_logged_in
       get "/courses/#{@course.id}/settings"
-      checkbox = f(".grading_standard_checkbox")
-      scroll_into_view(checkbox)
-      checkbox.click
+      f(".grading_standard_checkbox").click
       f(".edit_letter_grades_link").click
     end
 
