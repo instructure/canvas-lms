@@ -77,9 +77,14 @@ const doRequest = (
   })
     .then((response: {json: Record<string, any>}) => {
       onSuccess(response.json)
-      showFlashAlert({
-        type: 'success',
-        message: successMessage,
+      // add the alert in the next event cycle so that the alert is added to the DOM's aria-live
+      // region after focus changes, thus preventing the focus change from interrupting the alert
+      setTimeout(() => {
+        showFlashAlert({
+          type: 'success',
+          message: successMessage,
+          politeness: 'polite',
+        })
       })
     })
     .catch((e: Error) =>
@@ -243,6 +248,7 @@ export default function SettingsPanel({
           <TextInput
             data-testid="module-name-input"
             renderLabel={I18n.t('Module Name')}
+            isRequired={true}
             inputRef={el => (nameInputRef.current = el)}
             value={state.moduleName}
             messages={state.nameInputMessages}
