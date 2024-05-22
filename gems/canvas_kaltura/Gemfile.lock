@@ -138,7 +138,7 @@ GEM
     rake (13.2.1)
     redis (5.2.0)
       redis-client (>= 0.22.0)
-    redis-client (0.22.1)
+    redis-client (0.22.2)
       connection_pool
     redis-cluster-client (0.10.0)
       redis-client (~> 0.22)
