@@ -136,7 +136,7 @@ export const DuplicateRubricModal = ({
             onClick={() => mutate()}
             type="submit"
             color="primary"
-            data-testid="duplicate-rubric-button"
+            data-testid="duplicate-rubric-modal-button"
           >
             {I18n.t('Duplicate')}
           </Button>

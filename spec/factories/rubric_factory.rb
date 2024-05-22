@@ -61,6 +61,48 @@ module Factories
     ]
   end
 
+  def largest_rubric_data
+    [
+      { description: "small Crit1",
+        points: 10,
+        id: "crit3",
+        ratings: [
+          { description: "A", points: 10, id: "rat1", criterion_id: "crit3" },
+          { description: "B", points: 7, id: "rat2", criterion_id: "crit3" },
+          { description: "F", points: 0, id: "rat3", criterion_id: "crit3" }
+        ] },
+      { description: "samll Crit2",
+        points: 10,
+        id: "crit4",
+        ratings: [
+          { description: "A", points: 10, id: "rat1", criterion_id: "crit4" },
+          { description: "B", points: 7, id: "rat2", criterion_id: "crit4" },
+          { description: "F", points: 0, id: "rat3", criterion_id: "crit4" }
+        ] },
+      { description: "samll Crit2",
+        points: 10,
+        id: "crit5",
+        ratings: [
+          { description: "A", points: 10, id: "rat1", criterion_id: "crit5" },
+          { description: "B", points: 7, id: "rat2", criterion_id: "crit5" },
+          { description: "F", points: 0, id: "rat3", criterion_id: "crit5" }
+        ] },
+    ]
+  end
+
+  def smallest_rubric_data
+    [
+      { description: "smallest Crit1",
+        points: 10,
+        id: "crit5",
+        ratings: [
+          { description: "A", points: 10, id: "rat1", criterion_id: "crit8" },
+          { description: "B", points: 7, id: "rat2", criterion_id: "crit8" },
+          { description: "F", points: 0, id: "rat3", criterion_id: "crit8" }
+        ] },
+    ]
+  end
+
   def rubric_for_course
     @rubric = Rubric.new(title: "My Rubric", context: @course)
     @rubric.data = [

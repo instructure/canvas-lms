@@ -96,6 +96,7 @@ export const RubricTable = ({
             stackedSortByLabel={I18n.t('Rubric Name')}
             onRequestSort={() => handleSort('Title')}
             sortDirection={sortedColumn === 'Title' ? sortDirection : undefined}
+            data-testid="rubric-name-header"
           >
             {I18n.t('Rubric Name')}
           </ColHeader>
@@ -104,6 +105,7 @@ export const RubricTable = ({
             stackedSortByLabel={I18n.t('Total Points')}
             onRequestSort={() => handleSort('TotalPoints')}
             sortDirection={sortedColumn === 'TotalPoints' ? sortDirection : undefined}
+            data-testid="rubric-points-header"
           >
             {I18n.t('Total Points')}
           </ColHeader>
@@ -112,6 +114,7 @@ export const RubricTable = ({
             stackedSortByLabel={I18n.t('Criterion')}
             onRequestSort={() => handleSort('Criterion')}
             sortDirection={sortedColumn === 'Criterion' ? sortDirection : undefined}
+            data-testid="rubric-criterion-header"
           >
             {I18n.t('Criterion')}
           </ColHeader>
@@ -120,6 +123,7 @@ export const RubricTable = ({
             stackedSortByLabel={I18n.t('Location Used')}
             onRequestSort={() => handleSort('LocationUsed')}
             sortDirection={sortedColumn === 'LocationUsed' ? sortDirection : undefined}
+            data-testid="rubric-locations-header"
           >
             {I18n.t('Location Used')}
           </ColHeader>
