@@ -36,9 +36,7 @@ describe "root account basic settings" do
     user_session(@admin)
     get account_settings_url
 
-    avatars = f("#account_services_avatars")
-    avatars.location_once_scrolled_into_view
-    avatars.click
+    f("#account_services_avatars").click
     f("#account_settings_enable_gravatar").click
 
     submit_form("#account_settings")
@@ -52,9 +50,7 @@ describe "root account basic settings" do
 
     user_session(@admin)
     get account_settings_url
-    el = f("#account_settings_kill_joy")
-    el.location_once_scrolled_into_view
-    el.click
+    f("#account_settings_kill_joy").click
     submit_form("#account_settings")
     wait_for_ajaximations
     expect(Account.default.reload.settings[:kill_joy]).to be true
@@ -73,9 +69,7 @@ describe "root account basic settings" do
       get account_settings_url
 
       # click then close restrict quantitative data helper dialog
-      button = fj("button:contains('About restrict quantitative data')")
-      button.location_once_scrolled_into_view
-      button.click
+      fj("button:contains('About restrict quantitative data')").click
       expect(fj("div.ui-dialog-titlebar:contains('Restrict Quantitative Data')")).to be_present
       force_click(".ui-dialog-titlebar-close")
 
@@ -99,9 +93,7 @@ describe "root account basic settings" do
         expect(is_checked("#account_settings_restrict_quantitative_data_locked")).to be_falsey
 
         # restrict_quantitative_data true, then locked is enabled
-        el = f("#account_settings_restrict_quantitative_data_value")
-        el.location_once_scrolled_into_view
-        el.click
+        f("#account_settings_restrict_quantitative_data_value").click
         expect(f("#account_settings_restrict_quantitative_data_locked")).to be_enabled
         f("#account_settings_restrict_quantitative_data_locked").click
         expect(is_checked("#account_settings_restrict_quantitative_data_locked")).to be_truthy
@@ -126,9 +118,7 @@ describe "root account basic settings" do
 
     user_session(@admin)
     get account_settings_url
-    el = f("#account_settings_suppress_notifications")
-    el.location_once_scrolled_into_view
-    el.click
+    f("#account_settings_suppress_notifications").click
     driver.switch_to.alert.accept
     submit_form("#account_settings")
     expect(Account.default.reload.settings[:suppress_notifications]).to be true
@@ -140,7 +130,6 @@ describe "root account basic settings" do
     user_session(@admin)
     get account_settings_url
     expect(is_checked(allow_observers_in_appointments_checkbox)).to be false
-    allow_observers_in_appointments_checkbox.location_once_scrolled_into_view
     allow_observers_in_appointments_checkbox.click
     expect_new_page_load { submit_form("#account_settings") }
     expect(is_checked(allow_observers_in_appointments_checkbox)).to be true
@@ -337,9 +326,7 @@ describe "root account basic settings" do
     expect(account.settings[:ip_filters]).to be_present # should not have cleared them if we didn't do anything
 
     filter = ff(".ip_filter").detect(&:displayed?)
-    el = filter.find_element(:css, ".delete_filter_link")
-    el.location_once_scrolled_into_view
-    el.click
+    filter.find_element(:css, ".delete_filter_link").click
 
     expect_new_page_load { submit_form("#account_settings") }
 
@@ -389,20 +376,10 @@ describe "root account basic settings" do
         account.save!
 
         get account_settings_url
-        teacher = f("input[type='radio'][name='account[settings][teachers_can_create_courses_anywhere]'][value='1'] + label")
-        scroll_into_view(teacher)
-        teacher.click
-
-        student = f("input[type='checkbox'][name='account[settings][students_can_create_courses]'] + label")
-        scroll_into_view(student)
-        student.click
-
-        radio = f("input[type='radio'][name='account[settings][students_can_create_courses_anywhere]'][value='0'] + label")
-        scroll_into_view(radio)
-        radio.click
-        check = f("input[type='checkbox'][name='account[settings][no_enrollments_can_create_courses]'] + label")
-        scroll_into_view(check)
-        check.click
+        f("input[type='radio'][name='account[settings][teachers_can_create_courses_anywhere]'][value='1'] + label").click
+        f("input[type='checkbox'][name='account[settings][students_can_create_courses]'] + label").click
+        f("input[type='radio'][name='account[settings][students_can_create_courses_anywhere]'][value='0'] + label").click
+        f("input[type='checkbox'][name='account[settings][no_enrollments_can_create_courses]'] + label").click
         expect_new_page_load { submit_form("#account_settings") }
 
         account.reload
