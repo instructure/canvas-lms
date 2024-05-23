@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {mergeTimeAndDate as subject} from '..'
+import {mergeTimeAndDate as subject} from '@instructure/datetime'
 import {moonwalk, epoch} from '../specHelpers'
 
 test('mergeTimeAndDate() finds the given time of day on the given date.', () => {

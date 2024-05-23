@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/datetime'
 import tzInTest from '@canvas/datetime/specHelpers'
 
 tz.snapshot = () => {}

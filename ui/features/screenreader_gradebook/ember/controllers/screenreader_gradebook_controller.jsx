@@ -42,7 +42,7 @@ import {
   some,
   uniq,
 } from 'lodash'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/datetime'
 import AssignmentDetailsDialog from '../../jquery/AssignmentDetailsDialog'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {updateWithSubmissions, scopeToUser} from '@canvas/grading/EffectiveDueDates'

@@ -30,7 +30,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/datetime'
 import {encodeQueryString} from '@canvas/query-string-encoding'
 
 const I18n = useI18nScope('bounced_emails')

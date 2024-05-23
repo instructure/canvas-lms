@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
+import {unfudgeDateForProfileTimezone} from '@instructure/datetime'
 import moment from 'moment'
 import PageViewCollection from './backbone/collections/PageViewCollection'
 import PageViewView from './backbone/views/PageViewView'

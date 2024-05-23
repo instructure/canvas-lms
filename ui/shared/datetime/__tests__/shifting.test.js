@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {shift} from '../index'
+import {shift} from '@instructure/datetime'
 import {moonwalk, setup} from './helpers'
 
 setup(this)

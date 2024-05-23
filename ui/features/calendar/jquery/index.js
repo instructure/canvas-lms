@@ -23,7 +23,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {map, defaults, filter, omit, each, has, last, includes} from 'lodash'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/datetime'
 import {encodeQueryString} from '@canvas/query-string-encoding'
 import moment from 'moment'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'

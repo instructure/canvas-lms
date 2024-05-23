@@ -33,7 +33,7 @@ import {
   reject,
   some,
 } from 'lodash'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/datetime'
 import React, {Suspense} from 'react'
 import ReactDOM from 'react-dom'
 import GenericErrorPage from '@canvas/generic-error-page'

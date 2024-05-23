@@ -32,12 +32,8 @@ import round from '@canvas/round'
 import $ from 'jquery'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
-import {
-  dateString,
-  timeString,
-  unfudgeDateForProfileTimezone,
-} from '@canvas/datetime/date-functions'
-import * as tz from '@canvas/datetime'
+import {dateString, timeString, unfudgeDateForProfileTimezone} from '@instructure/datetime'
+import * as tz from '@instructure/datetime'
 import {encodeQueryString} from '@canvas/query-string-encoding'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 

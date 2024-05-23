@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import * as tz from '../../index'
+import * as tz from '@instructure/datetime'
 import React from 'react'
 import ReactDOM from 'react-dom'
 

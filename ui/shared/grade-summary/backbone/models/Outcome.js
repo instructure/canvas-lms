@@ -25,7 +25,7 @@ import {assignIn, isNumber} from 'lodash'
 
 import Outcome from '@canvas/outcomes/backbone/models/Outcome'
 
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/datetime'
 
 const I18n = useI18nScope('grade_summaryOutcome')
 

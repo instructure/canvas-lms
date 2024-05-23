@@ -17,8 +17,8 @@
 
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import * as tz from '../index'
-import {fudgeDateForProfileTimezone} from '../date-functions'
+import * as tz from '@instructure/datetime'
+import {fudgeDateForProfileTimezone} from '@instructure/datetime'
 import {changeTimezone} from '@instructure/moment-parser/changeTimezone'
 import 'jqueryui/datepicker'
 import '@canvas/jquery-keycodes'

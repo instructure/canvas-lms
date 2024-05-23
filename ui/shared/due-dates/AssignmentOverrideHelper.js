@@ -17,7 +17,7 @@
  */
 
 import {forEach, reduce} from 'lodash'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/datetime'
 
 function addStudentID(student, collection = []) {
   return collection.concat([student.id])

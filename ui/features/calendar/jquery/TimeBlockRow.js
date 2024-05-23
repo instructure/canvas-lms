@@ -20,7 +20,7 @@ import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import timeBlockRowTemplate from '../jst/TimeBlockRow.handlebars'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
-import datePickerFormat from '@canvas/datetime/datePickerFormat'
+import datePickerFormat from '@instructure/datetime/datePickerFormat'
 import '../fcMomentHandlebarsHelpers' // make sure fcMomentToString and fcMomentToDateString are available to TimeBlockRow.handlebars
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
