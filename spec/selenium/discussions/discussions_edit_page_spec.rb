@@ -27,6 +27,7 @@ require_relative "../common"
 require_relative "pages/discussion_page"
 require_relative "../assignments/page_objects/assignment_create_edit_page"
 require_relative "../discussions/discussion_helpers"
+require_relative "../../helpers/selective_release_common"
 
 describe "discussions" do
   include_context "in-process server selenium tests"
@@ -37,6 +38,7 @@ describe "discussions" do
   include K5DashboardCommonPageObject
   include K5Common
   include K5ImportantDatesSectionPageObject
+  include SelectiveReleaseCommon
 
   def create_graded_discussion(discussion_course, assignment_options = {})
     default_assignment_options = {
@@ -136,6 +138,7 @@ describe "discussions" do
           end
 
           it "allows editing the due dates", priority: "1" do
+            differentiated_modules_off
             get url
             wait_for_tiny(f("textarea[name=message]"))
 
@@ -627,8 +630,10 @@ describe "discussions" do
 
           # Just checking for a value. Formatting and TZ differences between front-end and back-end
           # makes an exact comparison too fragile.
-          expect(ff("input[placeholder='Select Date']")[0].attribute("value")).to be_truthy
-          expect(ff("input[placeholder='Select Date']")[1].attribute("value")).to be_truthy
+          unless Account.site_admin.feature_enabled?(:selective_release_ui_api)
+            expect(ff("input[placeholder='Select Date']")[0].attribute("value")).to be_truthy
+            expect(ff("input[placeholder='Select Date']")[1].attribute("value")).to be_truthy
+          end
         end
 
         it "does not display the grading and groups not supported in anonymous discussions message in the edit page" do
@@ -653,8 +658,10 @@ describe "discussions" do
 
           # Just checking for a value. Formatting and TZ differences between front-end and back-end
           # makes an exact comparison too fragile.
-          expect(ff("input[placeholder='Select Date']")[0].attribute("value")).to eq("")
-          expect(ff("input[placeholder='Select Date']")[1].attribute("value")).to eq("")
+          unless Account.site_admin.feature_enabled?(:selective_release_ui_api)
+            expect(ff("input[placeholder='Select Date']")[0].attribute("value")).to eq("")
+            expect(ff("input[placeholder='Select Date']")[1].attribute("value")).to eq("")
+          end
         end
 
         context "usage rights" do
@@ -696,9 +703,11 @@ describe "discussions" do
           _, fullpath, _data = get_file("testfile5.zip")
           f("[data-testid='attachment-input']").send_keys(fullpath)
 
-          f("button[title='Remove All Sections']").click
-          f("input[data-testid='section-select']").click
-          fj("li:contains('value for name')").click
+          unless Account.site_admin.feature_enabled?(:selective_release_ui_api)
+            f("button[title='Remove All Sections']").click
+            f("input[data-testid='section-select']").click
+            fj("li:contains('value for name')").click
+          end
 
           # we can change anonymity on edit, if there is no reply
           expect(ffj("fieldset:contains('Anonymous Discussion') input[type=radio]").count).to eq 3
@@ -719,7 +728,9 @@ describe "discussions" do
           expect(@topic_all_options.title).to eq "new title"
           expect(@topic_all_options.message).to include "new message"
           expect(@topic_all_options.attachment_id).to eq Attachment.last.id
-          expect(@topic_all_options.is_section_specific).to be_truthy
+          unless Account.site_admin.feature_enabled?(:selective_release_ui_api)
+            expect(@topic_all_options.is_section_specific).to be_truthy
+          end
           expect(@topic_all_options.require_initial_post).to be_falsey
           expect(@topic_all_options.podcast_enabled).to be_falsey
           expect(@topic_all_options.allow_rating).to be_falsey
@@ -1047,15 +1058,21 @@ describe "discussions" do
           # makes an exact comparison too fragile.
           expect(ff("input[placeholder='Select Date']")[0].attribute("value")).not_to be_empty
 
-          expect(f("span[data-testid='assign-to-select-span']").present?).to be_truthy
-          expect(fj("span:contains('#{course_section.name}')").present?).to be_truthy
+          if Account.site_admin.feature_enabled?(:selective_release_ui_api)
+            expect(Discussion.assign_to_button).to be_displayed
+            Discussion.assign_to_button.click
+            expect(assign_to_in_tray("Remove #{course_section.name}")[0]).to be_displayed
+          else
+            expect(f("span[data-testid='assign-to-select-span']").present?).to be_truthy
+            expect(fj("span:contains('#{course_section.name}')").present?).to be_truthy
 
-          # Verify that the only_visible_to_overrides field is being respected
-          expect(f("body")).not_to contain_jqcss("span:contains('Everyone')")
+            # Verify that the only_visible_to_overrides field is being respected
+            expect(f("body")).not_to contain_jqcss("span:contains('Everyone')")
 
-          # Just checking for a value. Formatting and TZ differences between front-end and back-end
-          # makes an exact comparison too fragile.
-          expect(f("input[placeholder='Select Assignment Due Date']").attribute("value")).not_to be_empty
+            # Just checking for a value. Formatting and TZ differences between front-end and back-end
+            # makes an exact comparison too fragile.
+            expect(f("input[placeholder='Select Assignment Due Date']").attribute("value")).not_to be_empty
+          end
         end
 
         it "allows settings a graded discussion to an ungraded discussion" do

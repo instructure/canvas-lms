@@ -23,11 +23,13 @@ require_relative "page_objects/assignment_page"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "../helpers/context_modules_common"
 require_relative "../helpers/groups_common"
+require_relative "../../helpers/selective_release_common"
 
 shared_examples_for "item assign to tray during assignment creation/update" do
   include AssignmentsIndexPage
   include ItemsAssignToTray
   include ContextModulesCommon
+  include SelectiveReleaseCommon
 
   it "brings up the assign to tray when selecting the Manage assign to link" do
     AssignmentCreateEditPage.replace_assignment_name("test assignment")
@@ -292,6 +294,7 @@ describe "override assignees" do
   include_context "in-process server selenium tests"
   include ItemsAssignToTray
   include ContextModulesCommon
+  include SelectiveReleaseCommon
 
   before :once do
     differentiated_modules_on
@@ -327,6 +330,7 @@ describe "group assignments", :ignore_js_errors do
   include ItemsAssignToTray
   include ContextModulesCommon
   include GroupsCommon
+  include SelectiveReleaseCommon
 
   before :once do
     differentiated_modules_on
@@ -399,6 +403,7 @@ describe "assignments show page assign to", :ignore_js_errors do
   include AssignmentsIndexPage
   include ItemsAssignToTray
   include ContextModulesCommon
+  include SelectiveReleaseCommon
 
   before :once do
     differentiated_modules_on

@@ -22,6 +22,7 @@ require_relative "../helpers/assignments_common"
 require_relative "../helpers/public_courses_context"
 require_relative "../helpers/files_common"
 require_relative "../helpers/admin_settings_common"
+require_relative "../../helpers/selective_release_common"
 
 describe "assignments sync to sis" do
   include_context "in-process server selenium tests"
@@ -30,11 +31,13 @@ describe "assignments sync to sis" do
   include AdminSettingsCommon
   include CustomScreenActions
   include CustomSeleniumActions
+  include SelectiveReleaseCommon
 
   # NOTE: due date testing can be found in assignments_overrides_spec
 
   context "as a teacher" do
     before(:once) do
+      differentiated_modules_off
       @teacher = user_with_pseudonym
       course_with_teacher({ user: @teacher, active_course: true, active_enrollment: true })
       @course.start_at = nil

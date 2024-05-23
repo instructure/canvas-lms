@@ -65,7 +65,9 @@ describe "assignments" do
         expect(f("#edit_assignment_header")).to be
         expect(f("#assignment_name").attribute(:value)).to include(@assignment_name)
         expect(f("#assignment_points_possible").attribute(:value)).to include(@assignment_points)
-        expect(f("input.date_field.datePickerDateField.DueDateInput.datetime_field_enabled.hasDatepicker").attribute(:value)).to include("Jul 31")
+        unless Account.site_admin.feature_enabled?(:selective_release_ui_api)
+          expect(f("input.date_field.datePickerDateField.DueDateInput.datetime_field_enabled.hasDatepicker").attribute(:value)).to include("Jul 31")
+        end
       end
 
       it "works for discussions and transfer values", priority: "1" do
@@ -75,7 +77,9 @@ describe "assignments" do
         expect(f(".discussion-edit-header")).to be
         expect(f("#discussion-title").attribute(:value)).to include(@assignment_name)
         expect(f("#discussion_topic_assignment_points_possible").attribute(:value)).to include(@assignment_points)
-        expect(f("input.date_field.datePickerDateField.DueDateInput.datetime_field_enabled.hasDatepicker").attribute(:value)).to include("Jul 31")
+        unless Account.site_admin.feature_enabled?(:selective_release_ui_api)
+          expect(f("input.date_field.datePickerDateField.DueDateInput.datetime_field_enabled.hasDatepicker").attribute(:value)).to include("Jul 31")
+        end
       end
 
       it "works for quizzes and transfer values", priority: "1" do
@@ -84,7 +88,9 @@ describe "assignments" do
 
         expect(f("#quiz_edit_wrapper")).to be
         expect(f("#quiz_title").attribute(:value)).to include(@assignment_name)
-        expect(f("input.date_field.datePickerDateField.DueDateInput.datetime_field_enabled.hasDatepicker").attribute(:value)).to include("Jul 31")
+        unless Account.site_admin.feature_enabled?(:selective_release_ui_api)
+          expect(f("input.date_field.datePickerDateField.DueDateInput.datetime_field_enabled.hasDatepicker").attribute(:value)).to include("Jul 31")
+        end
       end
     end
   end

@@ -26,6 +26,7 @@ require_relative "../../dashboard/pages/k5_dashboard_page"
 require_relative "../../dashboard/pages/k5_dashboard_common_page"
 require_relative "../../../helpers/k5_common"
 require_relative "../shared_examples/module_item_selective_release_assign_to_shared_examples"
+require_relative "../../../helpers/selective_release_common"
 
 describe "selective_release module item assign to tray" do
   include_context "in-process server selenium tests"
@@ -36,6 +37,7 @@ describe "selective_release module item assign to tray" do
   include K5DashboardPageObject
   include K5DashboardCommonPageObject
   include K5Common
+  include SelectiveReleaseCommon
 
   before(:once) do
     differentiated_modules_on

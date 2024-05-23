@@ -21,6 +21,7 @@ require_relative "../../spec_helper"
 require_relative "page_objects/quizzes_index_page"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "../helpers/context_modules_common"
+require_relative "../../helpers/selective_release_common"
 
 describe "quizzes selective_release assign to tray" do
   include_context "in-process server selenium tests"
@@ -28,6 +29,7 @@ describe "quizzes selective_release assign to tray" do
   include ItemsAssignToTray
   include QuizzesCommon
   include ContextModulesCommon
+  include SelectiveReleaseCommon
 
   before :once do
     differentiated_modules_on

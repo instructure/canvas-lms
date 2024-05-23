@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../helpers/blueprint_common"
+require_relative "../../helpers/selective_release_common"
 
 shared_context "blueprint courses assignment context" do
   def assignment_options
@@ -36,6 +37,7 @@ describe "blueprint courses assignments" do
   include_context "blueprint courses files context"
   include_context "blueprint courses assignment context"
   include BlueprintCourseCommon
+  include SelectiveReleaseCommon
 
   context "as a blueprint teacher" do
     before :once do
@@ -57,6 +59,7 @@ describe "blueprint courses assignments" do
     end
 
     it "can lock down associated course's assignment fields", priority: "1" do
+      differentiated_modules_off
       change_blueprint_settings(@master, points: true, due_dates: true, availability_dates: true)
       get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
       f(".bpc-lock-toggle button").click
@@ -144,6 +147,7 @@ describe "blueprint courses assignments" do
     end
 
     it "does not allow editing of restricted items" do
+      differentiated_modules_off
       # restrict everything
       @tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: true })
 

@@ -21,6 +21,7 @@ require_relative "../helpers/context_modules_common"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "page_objects/wiki_page"
 require_relative "../conditional_release/page_objects/conditional_release_objects"
+require_relative "../../helpers/selective_release_common"
 
 describe "wiki pages edit page assign to" do
   include_context "in-process server selenium tests"
@@ -28,6 +29,7 @@ describe "wiki pages edit page assign to" do
   include ContextModulesCommon
   include ItemsAssignToTray
   include CourseWikiPage
+  include SelectiveReleaseCommon
 
   before :once do
     differentiated_modules_on

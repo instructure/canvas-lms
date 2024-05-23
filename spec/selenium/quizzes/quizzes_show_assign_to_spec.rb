@@ -21,12 +21,14 @@ require_relative "../../spec_helper"
 require_relative "page_objects/quizzes_landing_page"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "../helpers/context_modules_common"
+require_relative "../../helpers/selective_release_common"
 
 describe "quiz show page assign to" do
   include_context "in-process server selenium tests"
   include QuizzesLandingPage
   include ItemsAssignToTray
   include ContextModulesCommon
+  include SelectiveReleaseCommon
 
   before :once do
     differentiated_modules_on
