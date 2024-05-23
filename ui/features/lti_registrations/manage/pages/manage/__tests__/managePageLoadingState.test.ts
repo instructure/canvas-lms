@@ -19,10 +19,9 @@
 import {act, waitFor} from '@testing-library/react'
 import {mkUseManagePageState, type ManagePageLoadingState} from '../ManagePageLoadingState'
 import type {FetchRegistrations} from 'features/lti_registrations/manage/api/registrations'
-import type {LtiRegistration} from 'features/lti_registrations/manage/model/LtiRegistration'
 import {renderHook, type RenderResult} from '@testing-library/react-hooks/dom'
-import {mockPageOfRegistrations} from './helpers'
-import type {PaginatedList} from 'features/lti_registrations/manage/api/PaginatedList'
+import {mockRegistration, mockPageOfRegistrations} from './helpers'
+import type {ApiResult} from 'features/lti_registrations/manage/api/ApiResult'
 
 // #region helpers
 const mockFetchRegistrations = (
@@ -39,17 +38,17 @@ const mockFetchRegistrations = (
   }
 }
 
-const mockPromise = (
-  paginatedRegistrations: PaginatedList<LtiRegistration>
+const mockPromise = <T>(
+  apiResultData: T
 ): {
   resolve: () => void
   reject: () => void
-  promise: ReturnType<FetchRegistrations>
+  promise: Promise<ApiResult<T>>
 } => {
-  let resolve: null | ((params: Awaited<ReturnType<FetchRegistrations>>) => void) = null
+  let resolve: null | ((params: ApiResult<T>) => void) = null
   let reject: any = null
   // eslint-disable-next-line promise/param-names
-  const p = new Promise<Awaited<ReturnType<FetchRegistrations>>>((res, rej) => {
+  const p = new Promise<ApiResult<T>>((res, rej) => {
     resolve = res
     reject = rej
   })
@@ -59,7 +58,7 @@ const mockPromise = (
       resolve &&
         resolve({
           _type: 'success',
-          data: paginatedRegistrations,
+          data: apiResultData,
         })
     },
     reject: () => {
@@ -96,9 +95,11 @@ const awaitState = async <K extends ManagePageLoadingState['_type']>(
 const setup = () => {
   const req1 = mockPromise(mockPageOfRegistrations('Foo', 'Bar', 'Baz'))
   const req2 = mockPromise(mockPageOfRegistrations('Bar', 'Baz'))
+  const deleteReq = mockPromise(undefined)
 
   const useManagePageState = mkUseManagePageState(
-    mockFetchRegistrations(req1.promise, req2.promise)
+    mockFetchRegistrations(req1.promise, req2.promise),
+    () => deleteReq.promise
   )
 
   const {result, rerender} = renderHook<
@@ -112,7 +113,7 @@ const setup = () => {
       sort: 'name',
     },
   })
-  return {result, rerender, req1, req2}
+  return {result, rerender, req1, req2, deleteReq}
 }
 // #endregion
 
@@ -301,5 +302,57 @@ test('it should reload results when the query is changed', async () => {
 
   await awaitState(result, 'loaded', state => {
     expect(state.items.data.length).toBe(2)
+  })
+})
+// TOOD flatten if you can to adhere to paul's style
+describe('deleteRegistration', () => {
+  it('should refresh the list after deleting succeeds', async () => {
+    // TODO dry?
+    const {req1, req2, result, deleteReq} = setup()
+
+    req1.resolve()
+
+    await awaitState(result, 'loaded', state => {
+      expect(state.items.data.length).toBe(3)
+    })
+
+    const deletionPromise = result.current[1].deleteRegistration(mockRegistration('Foo', 0))
+    deleteReq.resolve()
+
+    await awaitState(result, 'reloading', state => {
+      expect(state.items).toBeDefined()
+    })
+
+    req2.resolve()
+    expect(await deletionPromise).toEqual({
+      _type: 'success',
+    })
+  })
+
+  it('should refresh the list after deleting fails', async () => {
+    // TODO dry?
+    const {req1, req2, result, deleteReq} = setup()
+
+    act(() => {
+      req1.resolve()
+    })
+
+    await awaitState(result, 'loaded', state => {
+      expect(state.items.data.length).toBe(3)
+    })
+
+    const deletionPromise = result.current[1].deleteRegistration(mockRegistration('Foo', 0))
+
+    deleteReq.reject()
+
+    await awaitState(result, 'reloading', state => {
+      expect(state.items).toBeDefined()
+    })
+
+    req2.resolve()
+    expect(await deletionPromise).toEqual({
+      _type: 'error',
+      message: 'Error deleting app “Foo”',
+    })
   })
 })

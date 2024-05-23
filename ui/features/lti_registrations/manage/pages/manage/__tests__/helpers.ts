@@ -33,33 +33,34 @@ export const mockPageOfRegistrations = (
   }
 }
 
-const mockRegistrations = (...names: Array<string>): Array<LtiRegistration> => {
-  return names.map((n, i) => {
-    const id = i.toString()
-    const date = new Date()
-    const common = {
-      account_id: id as AccountId,
-      created_at: date,
-      created_by: id as UserId,
-      updated_at: date,
-      updated_by: id as UserId,
-      workflow_state: 'on',
-    }
-    return {
-      id: id as LtiRegistrationId,
-      name: n,
+const mockRegistrations = (...names: Array<string>): Array<LtiRegistration> =>
+  names.map(mockRegistration)
+
+export const mockRegistration = (n: string, i: number): LtiRegistration => {
+  const id = i.toString()
+  const date = new Date()
+  const common = {
+    account_id: id as AccountId,
+    created_at: date,
+    created_by: id as UserId,
+    updated_at: date,
+    updated_by: id as UserId,
+    workflow_state: 'on',
+  }
+  return {
+    id: id as LtiRegistrationId,
+    name: n,
+    ...common,
+    account_binding: {
+      id: id as LtiRegistrationAccountBindingId,
+      registration_id: id as unknown as LtiRegistrationId,
       ...common,
-      account_binding: {
-        id: id as LtiRegistrationAccountBindingId,
-        registration_id: id as unknown as LtiRegistrationId,
-        ...common,
-      },
-      developer_key_id: id as DeveloperKeyId,
-      internal_service: false,
-      ims_registration_id: id,
-      legacy_configuration_id: null,
-      manual_configuration_id: null,
-      admin_nickname: n,
-    }
-  })
+    },
+    developer_key_id: id as DeveloperKeyId,
+    internal_service: false,
+    ims_registration_id: id,
+    legacy_configuration_id: null,
+    manual_configuration_id: null,
+    admin_nickname: n,
+  }
 }

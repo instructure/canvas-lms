@@ -17,10 +17,10 @@
  */
 
 import {ZLtiRegistration, type LtiRegistration} from '../model/LtiRegistration'
-import {z} from 'zod'
 import {success, error, type ApiResult} from './ApiResult'
 import {ZPaginatedList, type PaginatedList} from './PaginatedList'
-import {mockFetchSampleLtiRegistrations} from './sampleLtiRegistrations'
+import {type LtiRegistrationId} from '../model/LtiRegistrationId'
+import {mockFetchSampleLtiRegistrations, mockDeleteRegistration} from './sampleLtiRegistrations'
 
 export type ExtensionsSortProperty =
   | 'name'
@@ -50,3 +50,9 @@ export const fetchRegistrations: FetchRegistrations = options => {
         : error(result.error.errors.map(e => e.message).join('\n\n'))
     })
 }
+
+export type DeleteRegistration = (id: LtiRegistrationId) => Promise<ApiResult<void>>
+
+// todo: implement this with the actual delete call
+export const deleteRegistration: DeleteRegistration = id =>
+  mockDeleteRegistration(id).then(() => success(undefined))
