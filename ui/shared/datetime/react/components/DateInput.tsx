@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useRef, useCallback, useEffect, useState} from 'react'
 import moment, {type Moment} from 'moment-timezone'
-import * as tz from '../../index'
+import * as tz from '@instructure/datetime'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Calendar} from '@instructure/ui-calendar'
 import {DateInput} from '@instructure/ui-date-input'

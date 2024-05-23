@@ -24,7 +24,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {IconXSolid} from '@instructure/ui-icons'
 import coupleTimeFields from '@canvas/calendar/jquery/coupleTimeFields'
-import {fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
+import {fudgeDateForProfileTimezone} from '@instructure/datetime'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('appointment_groups')

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import * as tz from '../../index'
+import * as tz from '@instructure/datetime'
 import _ from 'lodash'
 import {
   fudgeDateForProfileTimezone,

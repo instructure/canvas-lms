@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {configure} from '../index'
+import {configure} from '@instructure/datetime'
 
 export {moonwalk, epoch} from '../specHelpers'
 export function setup() {

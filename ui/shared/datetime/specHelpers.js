@@ -17,7 +17,7 @@
  */
 
 import timezone from 'timezone'
-import {configure} from './index'
+import {configure} from '@instructure/datetime'
 
 const snapshots = []
 

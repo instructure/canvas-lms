@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/datetime'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
 import {IconButton} from '@instructure/ui-buttons'

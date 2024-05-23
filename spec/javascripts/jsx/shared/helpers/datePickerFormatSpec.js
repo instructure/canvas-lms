@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import datePickerFormat from '@canvas/datetime/datePickerFormat'
+import datePickerFormat from '@instructure/datetime/datePickerFormat'
 
 const I18n = useI18nScope('calendar')
 

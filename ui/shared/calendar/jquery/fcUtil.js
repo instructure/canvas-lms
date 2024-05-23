@@ -17,12 +17,9 @@
  */
 
 import $ from 'jquery'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/datetime'
 import 'fullcalendar'
-import {
-  fudgeDateForProfileTimezone,
-  unfudgeDateForProfileTimezone,
-} from '@canvas/datetime/date-functions'
+import {fudgeDateForProfileTimezone, unfudgeDateForProfileTimezone} from '@instructure/datetime'
 
 // expects a date (unfudged), and returns a fullcalendar moment
 // (fudged) appropriate for passing to fullcalendar methods

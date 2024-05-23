@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/datetime'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {getAssignmentColumnId} from '../Gradebook.utils'

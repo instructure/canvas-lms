@@ -18,7 +18,7 @@
 
 import Backbone from '@canvas/backbone'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/datetime'
 
 const I18n = useI18nScope('models_DateGroup')
 

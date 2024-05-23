@@ -260,3 +260,91 @@ function localizeFormat(format) {
     .reverse()
     .join('')
 }
+
+// fudgeDateForProfileTimezone is used to apply an offset to the date which represents the
+// difference between the user's configured timezone in their profile, and the timezone
+// of the browser. We want to display times in the timezone of their profile. Use
+// unfudgeDateForProfileTimezone to remove the correction before sending dates back to the server.
+export function fudgeDateForProfileTimezone(date) {
+  date = parse(date)
+  if (!date) return null
+  let year = format(date, '%Y')
+  while (year.length < 4) year = '0' + year
+
+  const formatted = format(date, year + '-%m-%d %T')
+  let fudgedDate = new Date(formatted)
+
+  // In Safari, the return value from new Date(<string>) might be `Invalid Date`.
+  // this is because, according to this note on:
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#Timestamp_string
+  // "Support for RFC 2822 format strings is by convention only."
+  // So for those cases, we fall back on date.js's monkeypatched version of Date.parse,
+  // which is what this method has always historically used before the speed optimization of using new Date()
+  if (Number.isNaN(Number(fudgedDate))) {
+    // checking for isNaN(<date>) is how you check for `Invalid Date`
+    fudgedDate = Date.parse(formatted)
+  }
+
+  return fudgedDate
+}
+
+export function unfudgeDateForProfileTimezone(date) {
+  date = parse(date)
+  if (!date) return null
+  // format fudged date into browser timezone without tz-info, then parse in
+  // profile timezone. then, as desired:
+  // format(output, '%Y-%m-%d %H:%M:%S') == input.toString('yyyy-MM-dd hh:mm:ss')
+  return parse(date.toString('yyyy-MM-dd HH:mm:ss'))
+}
+
+// this batch of methods assumes *real* dates passed in (or, really, anything
+// parse() can recognize. so timestamps are cool, too. but not fudged dates).
+// use accordingly
+export function sameYear(d1, d2) {
+  return format(d1, '%Y') === format(d2, '%Y')
+}
+export function sameDate(d1, d2) {
+  return format(d1, '%F') === format(d2, '%F')
+}
+export function dateString(date, options) {
+  if (date == null) return ''
+  const timezone = options && options.timezone
+  let format_ = options && options.format
+
+  if (format_ === 'full') {
+    format_ = 'date.formats.full'
+  } else if (format_ !== 'medium' && sameYear(date, new Date())) {
+    format_ = 'date.formats.short'
+  } else {
+    format_ = 'date.formats.medium'
+  }
+
+  if (typeof timezone === 'string' || timezone instanceof String) {
+    return format(date, format_, timezone) || ''
+  } else {
+    return format(date, format_) || ''
+  }
+}
+
+export function timeString(date, options) {
+  if (date == null) return ''
+  const timezone = options && options.timezone
+
+  if (typeof timezone === 'string' || timezone instanceof String) {
+    // match ruby-side short format on the hour, e.g. `1pm`
+    // can't just check getMinutes, cuz not all timezone offsets are on the hour
+    const format_ =
+      hasMeridiem() && format(date, '%M', timezone) === '00'
+        ? 'time.formats.tiny_on_the_hour'
+        : 'time.formats.tiny'
+    return format(date, format_, timezone) || ''
+  }
+
+  // match ruby-side short format on the hour, e.g. `1pm`
+  // can't just check getMinutes, cuz not all timezone offsets are on the hour
+  const format_ =
+    hasMeridiem() && format(date, '%M') === '00'
+      ? 'time.formats.tiny_on_the_hour'
+      : 'time.formats.tiny'
+  return format(date, format_) || ''
+}

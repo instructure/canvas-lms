@@ -18,9 +18,8 @@
 
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import * as tz from '../../index'
+import * as tz from '@instructure/datetime'
 import {isDate, memoize} from 'lodash'
-import $ from 'jquery'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {
   fudgeDateForProfileTimezone,

@@ -30,7 +30,7 @@ import CoursePacingNotice from '../../react/CoursePacingNotice'
 import StudentGroupStore from '../../react/StudentGroupStore'
 import DifferentiatedModulesSection from '../../react/DifferentiatedModulesSection'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/datetime'
 import '@canvas/jquery/jquery.instructure_forms'
 
 const I18n = useI18nScope('DueDateOverrideView')

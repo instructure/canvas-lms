@@ -22,10 +22,10 @@ import DatetimeField, {
   TIME_FORMAT_OPTIONS,
   PARSE_RESULTS,
 } from '@canvas/datetime/jquery/DatetimeField'
-import {fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
+import {fudgeDateForProfileTimezone} from '@instructure/datetime'
 import $ from 'jquery'
 import 'jquery-migrate'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/datetime'
 import tzInTest from '@canvas/datetime/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'

@@ -18,10 +18,10 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/datetime'
 import htmlEscape from '@instructure/html-escape'
 import editPlannerNoteTemplate from '../../jst/editPlannerNote.handlebars'
-import datePickerFormat from '@canvas/datetime/datePickerFormat'
+import datePickerFormat from '@instructure/datetime/datePickerFormat'
 import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import 'date-js'
