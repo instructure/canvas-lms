@@ -19,7 +19,10 @@
 import moment from 'moment-timezone'
 import timezone from 'timezone'
 import en_US from 'timezone/en_US'
-import parseDateTimeWithMoment, {specifiesTimezone, toRFC3339WithoutTZ} from './moment-parser'
+import parseDateTimeWithMoment, {
+  specifiesTimezone,
+  toRFC3339WithoutTZ,
+} from '@instructure/moment-parser'
 
 export function isMidnight(date) {
   if (date === null) {
