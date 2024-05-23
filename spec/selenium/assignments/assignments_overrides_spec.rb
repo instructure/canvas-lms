@@ -20,10 +20,16 @@
 require_relative "../common"
 require_relative "../helpers/assignment_overrides"
 require_relative "page_objects/assignment_page"
+require_relative "../../helpers/selective_release_common"
 
 describe "assignment groups" do
   include AssignmentOverridesSeleniumHelper
+  include SelectiveReleaseCommon
   include_context "in-process server selenium tests"
+
+  before(:once) do
+    differentiated_modules_off
+  end
 
   context "as a teacher" do
     let(:due_at) { Time.zone.now }

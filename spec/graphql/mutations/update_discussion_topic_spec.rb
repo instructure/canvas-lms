@@ -19,8 +19,10 @@
 #
 
 require_relative "../graphql_spec_helper"
+require_relative "../../helpers/selective_release_common"
 
 RSpec.describe Mutations::UpdateDiscussionTopic do
+  include SelectiveReleaseCommon
   before(:once) do
     course_with_teacher(active_all: true)
     @attachment = attachment_with_context(@teacher)
@@ -555,6 +557,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     end
 
     it "can turn graded topic into ungraded section-specific topic in one edit" do
+      differentiated_modules_off
       section1 = @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
 

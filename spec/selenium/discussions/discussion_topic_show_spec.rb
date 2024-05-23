@@ -20,8 +20,10 @@ require_relative "../common"
 require_relative "../helpers/context_modules_common"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "pages/discussion_page"
+require_relative "../../helpers/selective_release_common"
 
 describe "Discussion Topic Show" do
+  include SelectiveReleaseCommon
   include_context "in-process server selenium tests"
 
   context "when Discussions Redesign feature flag is ON" do

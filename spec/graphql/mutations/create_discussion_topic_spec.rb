@@ -19,7 +19,9 @@
 #
 require "spec_helper"
 require_relative "../graphql_spec_helper"
+require_relative "../../helpers/selective_release_common"
 describe Mutations::CreateDiscussionTopic do
+  include SelectiveReleaseCommon
   before(:once) do
     course_with_teacher(active_all: true)
   end
@@ -682,6 +684,7 @@ describe Mutations::CreateDiscussionTopic do
     end
 
     it "successfully creates the discussion topic is_section_specific true" do
+      differentiated_modules_off
       context_type = "Course"
       title = "Test Title"
       message = "A message"
@@ -716,6 +719,7 @@ describe Mutations::CreateDiscussionTopic do
     end
 
     it "does not allow creation of disuccions to sections that are not visible to the user" do
+      differentiated_modules_off
       # This teacher does not have permission for section 2
       course2 =  course_factory(active_course: true)
       section1 = @course.course_sections.create!(name: "Section 1")

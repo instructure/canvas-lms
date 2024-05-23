@@ -246,7 +246,13 @@ describe "editing a quiz" do
         item = add_quiz_to_module
 
         get "/courses/#{@course.id}/quizzes/#{item.content_id}/edit"
-        expect(f(quiz_edit_form)).to contain_css(due_date_container)
+
+        if Account.site_admin.feature_enabled?(:selective_release_ui_api)
+          expect(manage_assign_to_button).to be_displayed
+        else
+          expect(f(quiz_edit_form)).to contain_css(due_date_container)
+        end
+
         expect(f(quiz_edit_form)).not_to contain_css(course_pacing_notice)
       end
     end
