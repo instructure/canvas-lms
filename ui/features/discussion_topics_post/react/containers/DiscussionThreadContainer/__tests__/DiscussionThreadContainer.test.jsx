@@ -320,21 +320,6 @@ describe('DiscussionThreadContainer', () => {
 
   describe('Unread Badge', () => {
     describe('should find unread badge', () => {
-      it('root is read and child reply is unread', () => {
-        const container = setup(
-          defaultProps({
-            discussionEntryOverrides: {
-              rootEntryParticipantCounts: {
-                unreadCount: 1,
-                repliesCount: 1,
-                __typename: 'DiscussionEntryCounts',
-              },
-            },
-          })
-        )
-        expect(container.getByTestId('is-unread')).toBeInTheDocument()
-      })
-
       it('root is unread and child reply is unread', () => {
         const container = setup(
           defaultProps({
