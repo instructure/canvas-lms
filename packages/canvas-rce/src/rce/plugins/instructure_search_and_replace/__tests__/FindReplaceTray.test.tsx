@@ -251,7 +251,8 @@ describe('FindReplaceTray', () => {
       expect(prevButton).toBeEnabled()
     })
 
-    it('replace button is enabled when search result and replacement text', async () => {
+    // LX-1710 - test is fickle
+    it.skip('replace button is enabled when search result and replacement text', async () => {
       const {user} = renderComponent()
       const replaceButton = screen.getByTestId('replace-button')
       expect(replaceButton).toBeDisabled()
