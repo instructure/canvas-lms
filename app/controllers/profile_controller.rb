@@ -375,7 +375,8 @@ class ProfileController < ApplicationController
                                 :locale,
                                 :bio,
                                 :birthdate,
-                                :pronouns)
+                                :pronouns,
+                                :pronunciation)
                     else
                       {}
                     end
@@ -457,7 +458,7 @@ class ProfileController < ApplicationController
     short_name = params[:user] && params[:user][:short_name]
     @user.short_name = short_name if short_name && @user.user_can_edit_name?
     if params[:user_profile] && @user.user_can_edit_profile?
-      user_profile_params = params[:user_profile].permit(:title, :bio)
+      user_profile_params = params[:user_profile].permit(:title, :pronunciation, :bio)
       user_profile_params.delete(:title) unless @user.user_can_edit_name?
       @profile.attributes = user_profile_params
     end

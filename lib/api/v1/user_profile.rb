@@ -42,6 +42,7 @@ module Api::V1::UserProfile
 
     json[:title] = profile.title
     json[:bio] = profile.bio
+    json[:pronunciation] = profile.pronunciation
     json[:primary_email] = user.email if user.grants_right?(current_user, :read_email_addresses)
     json[:login_id] ||= user.primary_pseudonym.try(:unique_id)
     json[:sis_user_id] ||= user.primary_pseudonym.try(:sis_user_id) if user.grants_right?(current_user, :read_sis)

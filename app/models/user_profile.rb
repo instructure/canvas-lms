@@ -35,6 +35,11 @@ class UserProfile < ActiveRecord::Base
               maximum: maximum_text_length, too_long: "%{count} characters is the maximum allowed"
             },
             allow_blank: true
+  validates :pronunciation,
+            length: {
+              maximum: maximum_string_length, too_long: "%{count} characters is the maximum allowed"
+            },
+            allow_blank: true
 
   TAB_PROFILE,
   TAB_COMMUNICATION_PREFERENCES,
