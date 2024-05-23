@@ -37,6 +37,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import ReactDOM from 'react-dom'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 
 const I18n = useI18nScope('discussions_v2')
 
@@ -84,8 +85,8 @@ export default class IndexHeader extends Component {
     this.setState({searchTerm: e.target.value}, this.filterDiscussions)
   }
 
-  onFilterChange = e => {
-    this.setState({filter: e.target.value}, this.filterDiscussions)
+  onFilterChange = (_e, data) => {
+    this.setState({filter: data.value}, this.filterDiscussions)
   }
 
   // This is needed to make the search results do not keep cutting each
@@ -177,21 +178,18 @@ export default class IndexHeader extends Component {
               id="discussion-filter"
               label={<ScreenReaderContent>{I18n.t('Discussion Filter')}</ScreenReaderContent>}
             >
-              <select
+              <SimpleSelect
+                renderLabel=""
                 id="discussion-filter"
                 name="filter-dropdown"
                 onChange={this.onFilterChange}
-                style={{
-                  margin: '0',
-                  width: '100%',
-                }}
               >
                 {Object.keys(filters).map(filter => (
-                  <option key={filter} value={filter}>
+                  <SimpleSelect.Option key={filter} id={filter} value={filter}>
                     {filters[filter]}
-                  </option>
+                  </SimpleSelect.Option>
                 ))}
-              </select>
+              </SimpleSelect>
             </FormField>
           </Flex.Item>
           <Flex.Item shouldGrow={true} margin="0 0 0 small">

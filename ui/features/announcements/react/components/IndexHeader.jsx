@@ -44,6 +44,7 @@ import ExternalFeedsTray from './ExternalFeedsTray'
 import propTypes from '../propTypes'
 import select from '@canvas/obj-select'
 import {showConfirmDelete} from './ConfirmDeleteModal'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Heading} from '@instructure/ui-heading'
 
 const I18n = useI18nScope('announcements_v2')
@@ -98,7 +99,7 @@ export default class IndexHeader extends Component {
 
     this.state = {
       selectedAnnouncementFilter: 'all',
-      announcementFilterOpened: false
+      announcementFilterOpened: false,
     }
   }
 
@@ -132,6 +133,7 @@ export default class IndexHeader extends Component {
         size="medium"
         margin="0 small 0 0"
         id="lock_announcements"
+        data-testid="lock_announcements"
         onClick={this.props.toggleSelectedAnnouncementsLock}
         renderIcon={icon}
       >
@@ -150,7 +152,8 @@ export default class IndexHeader extends Component {
             ? this.renderLockToggleButton(
                 <IconLockLine />,
                 I18n.t('Lock'),
-                I18n.t('Lock Selected Announcements'))
+                I18n.t('Lock Selected Announcements')
+              )
             : this.renderLockToggleButton(
                 <IconUnlockLine />,
                 I18n.t('Unlock'),
@@ -162,6 +165,7 @@ export default class IndexHeader extends Component {
             size="medium"
             margin="0 small 0 0"
             id="delete_announcements"
+            data-testid="delete-announcements-button"
             onClick={this.onDelete}
             renderIcon={<IconTrashLine />}
             ref={c => {
@@ -212,21 +216,20 @@ export default class IndexHeader extends Component {
                 id="announcement-filter"
                 label={<ScreenReaderContent>{I18n.t('Announcement Filter')}</ScreenReaderContent>}
               >
-                <select
+                <SimpleSelect
+                  renderLabel=""
                   id="announcement-filter"
                   name="filter-dropdown"
-                  onChange={e => this.props.searchAnnouncements({filter: e.target.value})}
-                  style={{
-                    margin: '0',
-                    width: '100%'
+                  onChange={(e, data) => {
+                    return this.props.searchAnnouncements({filter: data.value})
                   }}
                 >
                   {Object.keys(getFilters()).map(filter => (
-                    <option key={filter} value={filter}>
+                    <SimpleSelect.Option key={filter} id={filter} value={filter}>
                       {getFilters()[filter]}
-                    </option>
+                    </SimpleSelect.Option>
                   ))}
-                </select>
+                </SimpleSelect>
               </FormField>
             </Flex.Item>
             <Flex.Item shouldGrow={true} margin="0 0 0 small">
@@ -255,7 +258,9 @@ export default class IndexHeader extends Component {
             <Flex.Item shouldGrow={true} shouldShrink={false}>
               <Flex as="div" direction="row" justifyItems="start" alignItems="center">
                 <Flex.Item margin="0 x-small 0 0">
-                  <Heading level="h1">{getFilters()[this.state.selectedAnnouncementFilter]}  </Heading>
+                  <Heading level="h1">
+                    {getFilters()[this.state.selectedAnnouncementFilter]}
+                  </Heading>
                 </Flex.Item>
                 <Flex.Item>
                   <Menu
@@ -265,12 +270,20 @@ export default class IndexHeader extends Component {
                         withBackground={false}
                         withBorder={false}
                         renderIcon={
-                          this.state.announcementFilterOpened ? <IconArrowOpenUpLine /> : <IconArrowOpenDownLine />
+                          this.state.announcementFilterOpened ? (
+                            <IconArrowOpenUpLine />
+                          ) : (
+                            <IconArrowOpenDownLine />
+                          )
                         }
                         screenReaderLabel={I18n.t('Announcement Filter')}
                       />
                     }
-                    onToggle={ () => this.setState({announcementFilterOpened: !this.state.announcementFilterOpened})}
+                    onToggle={() =>
+                      this.setState({
+                        announcementFilterOpened: !this.state.announcementFilterOpened,
+                      })
+                    }
                   >
                     <Menu.Group
                       selected={[this.state.selectedAnnouncementFilter]}
@@ -290,7 +303,9 @@ export default class IndexHeader extends Component {
                 </Flex.Item>
               </Flex>
             </Flex.Item>
-            <Flex.Item overflowX="hidden" overflowY="hidden">{this.renderActionButtons()}</Flex.Item>
+            <Flex.Item overflowX="hidden" overflowY="hidden">
+              {this.renderActionButtons()}
+            </Flex.Item>
           </Flex>
         </Flex.Item>
         {this.renderSearchField()}

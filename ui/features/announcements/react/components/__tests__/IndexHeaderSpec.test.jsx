@@ -17,11 +17,9 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {shallow} from 'enzyme'
 import IndexHeader from '../IndexHeader'
-import sinon from 'sinon'
 
 function makeProps() {
   return {
@@ -44,160 +42,177 @@ function makeProps() {
   }
 }
 
-function waitForSpyToBeCalled(spy) {
-  return new Promise(resolve => {
-    const interval = setInterval(() => {
-      if (spy.callCount > 0) {
-        clearInterval(interval)
-        resolve(spy.lastCall.args)
-      }
-    }, 10)
-  })
-}
+// Making sure debounce is not making tests slow in CI, passed fn should fire instantly instead
+jest.mock('lodash/debounce', () => jest.fn(fn => fn))
 
 describe('"Add Announcement" button', () => {
   test('is present when the user has permission to create an announcement', () => {
     const props = makeProps()
-    const wrapper = shallow(<IndexHeader {...props} />)
-    const node = wrapper.find('#add_announcement')
-    expect(node.exists()).toBeTruthy()
+    render(<IndexHeader {...props} />)
+    expect(
+      screen.getByRole('link', {
+        name: /add announcement/i,
+      })
+    ).toBeInTheDocument()
   })
 
   test('is absent when the user does not have permission to create an announcement', () => {
     const props = makeProps()
     props.permissions.create = false
-    const wrapper = shallow(<IndexHeader {...props} />)
-    const node = wrapper.find('#add_announcement')
-    expect(node.exists()).toBeFalsy()
+    render(<IndexHeader {...props} />)
+    expect(
+      screen.queryByRole('link', {
+        name: /add announcement/i,
+      })
+    ).not.toBeInTheDocument()
   })
 })
 
 describe('searching announcements', () => {
   test('calls the searchAnnouncements prop with searchInput value after debounce timeout', async () => {
-    const spy = sinon.spy()
+    const spy = jest.fn()
     const props = makeProps()
     props.searchAnnouncements = spy
-    const wrapper = render(<IndexHeader {...props} />)
-    const input = wrapper.container.querySelector('input')
-    const user = userEvent.setup({delay: null})
-    await user.type(input, 'foo')
-    const searchOptions = await waitForSpyToBeCalled(spy)
-    expect(searchOptions[0]).toEqual({term: 'foo'})
-    wrapper.unmount()
+    render(<IndexHeader {...props} />)
+    const input = screen.getByRole('textbox')
+    await userEvent.type(input, 'foo')
+
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          term: 'foo',
+        })
+      )
+    })
   })
 })
 
 describe('"Announcement Filter" select', () => {
-  test('includes two options in the filter select component', () => {
+  test('includes two options in the filter select component', async () => {
     const props = makeProps()
-    const wrapper = shallow(<IndexHeader {...props} />)
-    const filtersText = wrapper.find('option').map(option => option.text())
-    expect(filtersText).toEqual(['All', 'Unread'])
+    render(<IndexHeader {...props} />)
+
+    const filterDDown = screen.getByRole('combobox', {name: 'Announcement Filter'})
+
+    await userEvent.click(filterDDown)
+
+    expect(screen.getByText(/All/i)).toBeInTheDocument()
+    expect(screen.getByText(/Unread/i)).toBeInTheDocument()
   })
 
-  test('calls the searchAnnouncements prop when selecting a filter option', () => {
-    const spy = sinon.spy()
+  test('calls the searchAnnouncements prop when selecting a filter option with the selected value', async () => {
+    const spy = jest.fn()
     const props = makeProps()
     props.searchAnnouncements = spy
-    const wrapper = shallow(<IndexHeader {...props} />)
-    const onChange = wrapper.find('select').prop('onChange')
-    onChange({target: {value: 'unread'}})
-    expect(spy.callCount).toEqual(1)
-  })
+    render(<IndexHeader {...props} />)
 
-  test('includes the filter value when calling the searchAnnouncements prop', () => {
-    const spy = sinon.spy()
-    const props = makeProps()
-    props.searchAnnouncements = spy
-    const wrapper = shallow(<IndexHeader {...props} />)
-    const onChange = wrapper.find('select').prop('onChange')
-    onChange({target: {value: 'unread'}})
-    const searchOptions = spy.lastCall.args[0]
-    expect(searchOptions).toEqual({filter: 'unread'})
+    const filterDDown = screen.getByRole('combobox', {name: 'Announcement Filter'})
+
+    await userEvent.click(filterDDown)
+
+    await userEvent.click(screen.getByText(/Unread/i))
+
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          filter: 'unread',
+        })
+      )
+    })
   })
 })
 
 describe('"Lock Selected Announcements" button', () => {
   test('is present when the user has permission to lock announcements', () => {
     const props = makeProps()
-    const wrapper = shallow(<IndexHeader {...props} />)
-    expect(wrapper.find('#lock_announcements').length).toEqual(1)
+    render(<IndexHeader {...props} />)
+
+    expect(screen.getByText(/unlock selected announcements/i)).toBeInTheDocument()
   })
 
   test('is absent when the user does not have permission to lock announcements', () => {
     const props = makeProps()
     props.permissions.manage_course_content_edit = false
-    const wrapper = shallow(<IndexHeader {...props} />)
-    expect(wrapper.find('#lock_announcements').length).toEqual(0)
+    render(<IndexHeader {...props} />)
+    expect(screen.queryByText(/unlock selected announcements/i)).not.toBeInTheDocument()
   })
 
   test('is absent when announcements are globally locked', () => {
     const props = makeProps()
     props.announcementsLocked = true
-    const wrapper = shallow(<IndexHeader {...props} />)
-    expect(wrapper.find('#lock_announcements').length).toEqual(0)
+    render(<IndexHeader {...props} />)
+    expect(screen.queryByText(/unlock selected announcements/i)).not.toBeInTheDocument()
   })
 
   test('is disabled when "isBusy" is true', () => {
     const props = makeProps()
     props.isBusy = true
-    const wrapper = shallow(<IndexHeader {...props} />)
-    expect(wrapper.find('#lock_announcements').is('[disabled]')).toBeTruthy()
+    render(<IndexHeader {...props} />)
+    expect(screen.getByTestId('lock_announcements')).toBeDisabled()
   })
 
   test('is disabled when "selectedCount" is 0', () => {
     const props = makeProps()
     props.selectedCount = 0
-    const wrapper = shallow(<IndexHeader {...props} />)
-    expect(wrapper.find('#lock_announcements').is('[disabled]')).toBeTruthy()
+    render(<IndexHeader {...props} />)
+    expect(screen.getByTestId('lock_announcements')).toBeDisabled()
   })
 
-  test('calls the toggleSelectedAnnouncementsLock prop when clicked', () => {
-    const spy = sinon.spy()
+  test('calls the toggleSelectedAnnouncementsLock prop when clicked', async () => {
+    const spy = jest.fn()
     const props = makeProps()
     props.toggleSelectedAnnouncementsLock = spy
     props.selectedCount = 1
-    const wrapper = shallow(<IndexHeader {...props} />)
-    wrapper.find('#lock_announcements').simulate('click')
-    expect(spy.callCount).toEqual(1)
+    render(<IndexHeader {...props} />)
+    await userEvent.click(screen.getByTestId('lock_announcements'))
+
+    waitFor(() => {
+      expect(spy).toHaveBeenCalled()
+      expect(spy.callCount).toEqual(1)
+    })
   })
 })
 
 describe('"Delete Selected Announcements" button', () => {
   test('is present when the user has permission to delete announcements', () => {
     const props = makeProps()
-    const wrapper = shallow(<IndexHeader {...props} />)
-    expect(wrapper.find('#delete_announcements').length).toEqual(1)
+    render(<IndexHeader {...props} />)
+    expect(screen.getByTestId('delete-announcements-button')).toBeInTheDocument()
   })
 
   test('is absent when the user does not have permission to delete announcements', () => {
     const props = makeProps()
     props.permissions.manage_course_content_delete = false
-    const wrapper = shallow(<IndexHeader {...props} />)
-    expect(wrapper.find('#delete_announcements').length).toEqual(0)
+    render(<IndexHeader {...props} />)
+    expect(screen.queryByTestId('delete-announcements-button')).not.toBeInTheDocument()
   })
 
   test('is disabled when "isBusy" is true', () => {
     const props = makeProps()
     props.isBusy = true
-    const wrapper = shallow(<IndexHeader {...props} />)
-    expect(wrapper.find('#delete_announcements').is('[disabled]')).toBeTruthy()
+    render(<IndexHeader {...props} />)
+    expect(screen.getByTestId('delete-announcements-button')).toBeDisabled()
   })
 
   test('is disabled when "selectedCount" is 0', () => {
     const props = makeProps()
     props.selectedCount = 0
-    const wrapper = shallow(<IndexHeader {...props} />)
-    expect(wrapper.find('#delete_announcements').is('[disabled]')).toBeTruthy()
+    render(<IndexHeader {...props} />)
+    expect(screen.getByTestId('delete-announcements-button')).toBeDisabled()
   })
 
   test('shows the "Confirm Delete" modal when clicked', async () => {
     const props = makeProps()
     props.selectedCount = 1
     const ref = React.createRef()
-    const wrapper = render(<IndexHeader {...props} ref={ref} />)
-    const delButton = wrapper.container.querySelector('#delete_announcements')
+    render(<IndexHeader {...props} ref={ref} />)
+    const delButton = screen.getByTestId('delete-announcements-button')
     await userEvent.click(delButton)
-    expect(ref.current.deleteModal).toBeTruthy()
+
+    expect(
+      screen.getByRole('heading', {
+        name: /confirm delete/i,
+      })
+    ).toBeInTheDocument()
   })
 })
