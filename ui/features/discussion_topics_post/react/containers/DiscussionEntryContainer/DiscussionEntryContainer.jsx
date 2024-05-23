@@ -137,6 +137,7 @@ export const DiscussionEntryContainer = props => {
                     }
                     reportTypeCounts={props.discussionEntry?.reportTypeCounts}
                     threadMode={threadMode}
+                    toggleUnread={props.toggleUnread}
                   />
                 </Flex.Item>
               )}
@@ -219,6 +220,7 @@ DiscussionEntryContainer.propTypes = {
   threadParent: PropTypes.bool,
   quotedEntry: PropTypes.object,
   attachment: Attachment.shape,
+  toggleUnread: PropTypes.func,
 }
 
 DiscussionEntryContainer.defaultProps = {
