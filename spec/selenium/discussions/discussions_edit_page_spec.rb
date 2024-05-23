@@ -1182,7 +1182,9 @@ describe "discussions" do
             wait_for_ajaximations
 
             assignment = Assignment.last
+            assignment.reload
             expect(assignment.assignment_overrides.active.count).to eq 0
+            expect(assignment.only_visible_to_overrides).to be_falsey
           end
 
           it "displays module overrides correctly" do
@@ -1274,11 +1276,12 @@ describe "discussions" do
             wait_for_ajaximations
 
             assignment = graded_discussion.assignment
-
+            assignment.reload
             # Expect the existing override to be the module override
             expect(assignment.assignment_overrides.active.count).to eq 1
             expect(assignment.all_assignment_overrides.active.count).to eq 2
             expect(assignment.assignment_overrides.first.set_type).to eq "Course"
+            expect(assignment.only_visible_to_overrides).to be_truthy
           end
 
           it "does not display module override if an unassigned override exists" do
@@ -1332,11 +1335,12 @@ describe "discussions" do
             wait_for_ajaximations
 
             assignment = graded_discussion.assignment
-
+            assignment.reload
             # Expect the existing override to be the module override
             expect(assignment.assignment_overrides.active.count).to eq 0
             expect(assignment.all_assignment_overrides.active.count).to eq 1
             expect(assignment.all_assignment_overrides.first.context_module_id).to eq module1.id
+            expect(assignment.only_visible_to_overrides).to be_falsey
           end
 
           it "displays highighted cards correctly" do

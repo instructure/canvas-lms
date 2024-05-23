@@ -91,6 +91,7 @@ describe('generateDateDetailsPayload', () => {
           unassign_item: false,
         },
       ] as unknown as DateDetailsOverride[],
+      only_visible_to_overrides: true,
     }
     expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
   })
@@ -116,6 +117,7 @@ describe('generateDateDetailsPayload', () => {
           unassign_item: false,
         },
       ] as unknown as DateDetailsOverride[],
+      only_visible_to_overrides: true,
     }
     expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
   })
@@ -142,6 +144,7 @@ describe('generateDateDetailsPayload', () => {
           unassign_item: false,
         },
       ] as unknown as DateDetailsOverride[],
+      only_visible_to_overrides: true,
     }
     expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
   })
@@ -184,9 +187,63 @@ describe('generateDateDetailsPayload', () => {
           unassign_item: true,
         },
       ] as unknown as DateDetailsOverride[],
+      only_visible_to_overrides: true,
     }
     expect(generateDateDetailsPayload(cards, true, ['section-2', 'student-1'])).toEqual(
       expectedPayload
     )
+  })
+
+  it('only_visible_to_overrides is false if there are only module overrides', () => {
+    const cards: ItemAssignToCardSpec[] = []
+    const expectedPayload = <DateDetailsPayload>{
+      assignment_overrides: [] as unknown as DateDetailsOverride[],
+      only_visible_to_overrides: false,
+    }
+    expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
+  })
+
+  it('only_visible_to_overrides is true if there are module overrides and no everyone card', () => {
+    const cards: ItemAssignToCardSpec[] = [
+      {
+        // Course override
+        overrideId: '1',
+        isValid: true,
+        hasAssignees: true,
+        selectedAssigneeIds: ['everyone'] as string[],
+        defaultOptions: ['everyone'],
+        due_at: '2021-01-01T00:00:00Z',
+      } as ItemAssignToCardSpec,
+      {
+        overrideId: '1',
+        isValid: true,
+        hasAssignees: true,
+        selectedAssigneeIds: ['section-1'] as string[],
+        defaultOptions: ['student-1'],
+        due_at: '2021-01-01T00:00:00Z',
+      } as ItemAssignToCardSpec,
+    ]
+    const expectedPayload = <DateDetailsPayload>{
+      assignment_overrides: [
+        {
+          due_at: '2021-01-01T00:00:00Z',
+          id: '1',
+          lock_at: null,
+          course_id: 'everyone',
+          unlock_at: null,
+          unassign_item: false,
+        },
+        {
+          due_at: '2021-01-01T00:00:00Z',
+          id: undefined,
+          lock_at: undefined,
+          course_section_id: '1',
+          unlock_at: undefined,
+          unassign_item: false,
+        },
+      ] as unknown as DateDetailsOverride[],
+      only_visible_to_overrides: true,
+    }
+    expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
   })
 })

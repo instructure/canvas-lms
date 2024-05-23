@@ -2268,7 +2268,7 @@ ready(function () {
       data.allowed_attempts = attempts
       data['quiz[allowed_attempts]'] = attempts
       let overrides = overrideView.getOverrides()
-      data['quiz[only_visible_to_overrides]'] = !overrideView.overridesContainDefault()
+      data['quiz[only_visible_to_overrides]'] = overrideView.setOnlyVisibleToOverrides()
       if (overrideView.containsSectionsWithoutOverrides() && !hasCheckedOverrides) {
         const sections = overrideView.sectionsWithoutOverrides()
         var missingDateView = new MissingDateDialog({

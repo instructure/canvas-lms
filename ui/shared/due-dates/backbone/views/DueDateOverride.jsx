@@ -45,6 +45,7 @@ function DueDateOverrideView() {
   this.getOverrides = this.getOverrides.bind(this)
   this.sectionsWithoutOverrides = this.sectionsWithoutOverrides.bind(this)
   this.overridesContainDefault = this.overridesContainDefault.bind(this)
+  this.setOnlyVisibleToOverrides = this.setOnlyVisibleToOverrides.bind(this)
   this.containsSectionsWithoutOverrides = this.containsSectionsWithoutOverrides.bind(this)
   this.getDefaultDueDate = this.getDefaultDueDate.bind(this)
   this.setNewOverridesCollection = this.setNewOverridesCollection.bind(this)
@@ -325,6 +326,12 @@ DueDateOverrideView.prototype.containsSectionsWithoutOverrides = function () {
 
 DueDateOverrideView.prototype.overridesContainDefault = function () {
   return this.model.overridesContainDefault()
+}
+
+DueDateOverrideView.prototype.setOnlyVisibleToOverrides = function () {
+  if(ENV.FEATURES?.differentiated_modules){
+    return !((this.model.overridesContainDefault()) || this.model.onlyContainsModuleOverrides())
+  }else return !this.model.overridesContainDefault()
 }
 
 DueDateOverrideView.prototype.sectionsWithoutOverrides = function () {

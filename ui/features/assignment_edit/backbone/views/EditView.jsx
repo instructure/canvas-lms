@@ -1309,7 +1309,7 @@ EditView.prototype.getFormData = function () {
     data.lock_at = null
     data.unlock_at = null
   }
-  data.only_visible_to_overrides = !this.dueDateOverrideView.overridesContainDefault()
+  data.only_visible_to_overrides = this.dueDateOverrideView.setOnlyVisibleToOverrides()
   data.assignment_overrides = this.dueDateOverrideView.getOverrides()
   if (this.shouldPublish) {
     data.published = true
