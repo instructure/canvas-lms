@@ -25,7 +25,7 @@ export default {
   component: BlockEditor,
 }
 
-const Template = args => {
+const Template = (args: JSX.IntrinsicAttributes) => {
   return (
     <>
       <BlockEditor {...args} />

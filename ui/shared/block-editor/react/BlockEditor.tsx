@@ -20,8 +20,11 @@ import React, {useRef} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import EditorJS from '@editorjs/editorjs'
 import Header from '@editorjs/header'
+// @ts-expect-error
 import NestedList from '@editorjs/nested-list'
+// @ts-expect-error
 import Paragraph from '@editorjs/paragraph'
+// @ts-expect-error // todo fix these type errors plz
 import Quote from '@editorjs/quote'
 
 import {View} from '@instructure/ui-view'
@@ -36,6 +39,7 @@ export default function BlockEditor() {
       holder: 'canvas-block-editor',
       tools: {
         header: {
+          // @ts-expect-error
           class: Header,
           inlineToolbar: true,
         },
