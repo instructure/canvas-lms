@@ -10,5 +10,8 @@
     "@editorjs/nested-list": "^1.3.0",
     "@editorjs/paragraph": "^2.11.3",
     "@editorjs/quote": "^2.5.0"
+  },
+  "devDependencies": {
+    "@types/editorjs__header": "^2.6.3"
   }
 }

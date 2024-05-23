@@ -22,6 +22,6 @@ import BlockEditor from './BlockEditor'
 
 export {BlockEditor}
 
-export default function renderBlockEditorApp(_, elt) {
+export default function renderBlockEditorApp(_: unknown, elt: ReactDOM.Container) {
   ReactDOM.render(<BlockEditor />, elt)
 }

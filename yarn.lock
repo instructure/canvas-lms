@@ -6477,6 +6477,11 @@
   resolved "https://registry.yarnpkg.com/@types/dagre/-/dagre-0.7.52.tgz#edbf0bca6922cd0ad1936a7486f9d03523d7565a"
   integrity sha512-XKJdy+OClLk3hketHi9Qg6gTfe1F3y+UFnHxKA2rn9Dw+oXa4Gb378Ztz9HlMgZKSxpPmn4BNVh9wgkpvrK1uw==
 
+"@types/editorjs__header@^2.6.3":
+  version "2.6.3"
+  resolved "https://registry.yarnpkg.com/@types/editorjs__header/-/editorjs__header-2.6.3.tgz#929de153c7676908320e19c55bb6a7d8b69c6639"
+  integrity sha512-Z6xroWfklSjsiJhaqZd/94lV7h31T2894GCvUjqB8C7UjOn/1yHfTnv1teBIyEjRxmGo5DB0nLyDwyRnhD587A==
+
 "@types/enzyme-adapter-react-16@^1.0.9":
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/@types/enzyme-adapter-react-16/-/enzyme-adapter-react-16-1.0.9.tgz#337d85f0e91be2654b246ec11701dcf75af30afc"
