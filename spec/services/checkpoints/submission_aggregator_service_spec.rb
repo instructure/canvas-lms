@@ -243,6 +243,53 @@ describe Checkpoints::SubmissionAggregatorService do
           expect(success).to be true
           expect(submission.grade).to eq "3"
         end
+
+        context "pass_fail" do
+          before(:once) do
+            @topic.assignment.update!(grading_type: "pass_fail")
+            @topic.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC).update!(grading_type: "pass_fail")
+            @topic.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY).update!(grading_type: "pass_fail")
+          end
+
+          it "sets the grade to 'complete' when both checkpoints are complete" do
+            Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+              @topic.assignment.grade_student(@student, grader: @teacher, grade: "complete", sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+              @topic.assignment.grade_student(@student, grader: @teacher, grade: "complete", sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+            end
+
+            success = service_call
+            expect(success).to be true
+            expect(submission.grade).to eq "complete"
+          end
+
+          it "sets the grade to 'incomplete' when the second checkpoint is incomplete" do
+            Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+              @topic.assignment.grade_student(@student, grader: @teacher, grade: "complete", sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+              @topic.assignment.grade_student(@student, grader: @teacher, grade: "incomplete", sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+            end
+
+            success = service_call
+            expect(success).to be true
+            expect(submission.grade).to eq "incomplete"
+          end
+
+          it "sets the grade to 'incomplete' when the first checkpoint is incomplete" do
+            Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+              @topic.assignment.grade_student(@student, grader: @teacher, grade: "incomplete", sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+              @topic.assignment.grade_student(@student, grader: @teacher, grade: "complete", sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+            end
+
+            success = service_call
+            expect(success).to be true
+            expect(submission.grade).to eq "incomplete"
+          end
+
+          it "sets the grade to nil when both checkpoints are nil" do
+            success = service_call
+            expect(success).to be true
+            expect(submission.grade).to be_nil
+          end
+        end
       end
 
       context "when the grade is displayed as letter grade" do
