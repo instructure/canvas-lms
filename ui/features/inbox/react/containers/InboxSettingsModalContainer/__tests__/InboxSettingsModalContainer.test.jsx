@@ -161,10 +161,10 @@ describe('InboxSettingsModalContainer', () => {
 
     describe('when useSignature gets enabled', () => {
       it('shows error if signature > 255 characters', async () => {
-        const {getByText, getByLabelText} = setup({...defaultProps()})
+        const {getByText, getByLabelText, getByTestId} = setup({...defaultProps()})
         await waitForApolloLoading()
         fireEvent.click(getByLabelText(new RegExp('Signature On')))
-        fireEvent.change(getByLabelText('Signature'), {target: {value: 'a'.repeat(256)}})
+        fireEvent.change(getByTestId('inbox-signature-input'), {target: {value: 'a'.repeat(256)}})
         expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
       })
     })
@@ -205,10 +205,10 @@ describe('InboxSettingsModalContainer', () => {
       })
 
       it('shows error if subject > 255 characters', async () => {
-        const {getByText, getByLabelText} = setup({...defaultProps()})
+        const {getByText, getByLabelText, getByTestId} = setup({...defaultProps()})
         await waitForApolloLoading()
         fireEvent.click(getByLabelText(new RegExp('Response On')))
-        fireEvent.change(getByLabelText('Subject*'), {target: {value: 'a'.repeat(256)}})
+        fireEvent.change(getByTestId('out-of-office-subject-input'), {target: {value: 'a'.repeat(256)}})
         expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
       })
     })
@@ -242,7 +242,7 @@ describe('InboxSettingsModalContainer', () => {
   it('displays signature and auto response settings when inboxSignatureBlock and inboxAutoResponse props are true', async () => {
     const {getByText} = setup({...defaultProps()})
     await waitFor(() => {
-      expect(getByText('Add Signature*')).toBeInTheDocument()
+      expect(getByText('Signature*')).toBeInTheDocument()
       expect(getByText('Out of Office')).toBeInTheDocument()
     })
   })
@@ -253,7 +253,7 @@ describe('InboxSettingsModalContainer', () => {
       inboxAutoResponse: false
     })})
     await waitFor(() => {
-      expect(getByText('Add Signature*')).toBeInTheDocument()
+      expect(getByText('Signature*')).toBeInTheDocument()
       expect(queryByText('Out of Office')).not.toBeInTheDocument()
     })
   })
