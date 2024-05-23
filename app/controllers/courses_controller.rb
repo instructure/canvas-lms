@@ -4041,6 +4041,7 @@ class CoursesController < ApplicationController
   end
 
   def offline_web_exports
+    page_has_instui_topnav
     return render status: :not_found, template: "shared/errors/404_message" unless allow_web_export_download?
 
     if authorized_action(WebZipExport.new(course: @context), @current_user, :create)
