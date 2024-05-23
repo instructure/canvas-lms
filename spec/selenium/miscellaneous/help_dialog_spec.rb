@@ -176,13 +176,17 @@ describe "help dialog" do
 
     it "has the default link at the top of the tray" do
       get "/accounts/#{Account.default.id}/settings"
-      f(".HelpMenuOptions__Container button").click
+      button = f(".HelpMenuOptions__Container button")
+      scroll_into_view(button)
+      button.click
       fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
       replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), "FEATURED LINK"
       replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), "FEATURED subtext"
       replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), "https://featuredurl.example.com"
       fj('#custom_help_link_settings fieldset .ic-Label:contains("Featured"):visible').click
-      f('#custom_help_link_settings button[type="submit"]').click
+      button = f('#custom_help_link_settings button[type="submit"]')
+      scroll_into_view(button)
+      button.click
       form = f("#account_settings")
       expect_new_page_load { form.submit }
       f("#global_nav_help_link").click
@@ -192,13 +196,17 @@ describe "help dialog" do
 
     it "has a New Link in the tray" do
       get "/accounts/#{Account.default.id}/settings"
-      f(".HelpMenuOptions__Container button").click
+      button = f(".HelpMenuOptions__Container button")
+      scroll_into_view(button)
+      button.click
       fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
       replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), "NEW LINK"
       replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), "NEW subtext"
       replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), "https://newurl.example.com"
       fj('#custom_help_link_settings fieldset .ic-Label:contains("New"):visible').click
-      f('#custom_help_link_settings button[type="submit"]').click
+      button = f('#custom_help_link_settings button[type="submit"]')
+      scroll_into_view(button)
+      button.click
       form = f("#account_settings")
       expect_new_page_load { form.submit }
       f("#global_nav_help_link").click

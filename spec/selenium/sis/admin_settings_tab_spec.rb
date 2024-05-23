@@ -41,6 +41,7 @@ describe "admin settings tab" do
     # Use this method for checkboxes that are hidden by their label (ic-Checkbox)
     checkbox = f(id)
     label = f("label[for=\"#{id[1..]}\"]")
+    scroll_into_view(label)
     label.click if is_checked(checkbox) != checked
   end
 
