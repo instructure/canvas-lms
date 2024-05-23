@@ -29,7 +29,7 @@ import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
 import {IconWarningSolid} from '@instructure/ui-icons'
-import {changeTimezone} from '@canvas/datetime/changeTimezone'
+import {changeTimezone} from '@instructure/moment-parser/changeTimezone'
 import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('CourseAvailabilityOptions')
