@@ -235,6 +235,7 @@ export type SiteAdminFeatureId =
   | 'instui_header'
   | 'lti_registrations_discover_page'
   | 'courses_popout_sisid'
+  | 'dashboard_graphql_integration'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
