@@ -700,6 +700,12 @@
                   <%= settings.label     :enable_inbox_auto_response, :en => "Enable Inbox Auto Response" %>
                 </div>
               <% end %>
+              <% if !@account.site_admin? && @account.root_account? %>
+                <div>
+                  <%= settings.check_box :enable_name_pronunciation, :checked => @account.enable_name_pronunciation? %>
+                  <%= settings.label :enable_name_pronunciation, :en => "Enable name pronunciation" %>
+                </div>
+              <% end %>
               <div>
                 <%= settings.check_box :users_can_edit_name, :checked => @account.users_can_edit_name? %>
                 <%= settings.label :users_can_edit_name, :en => "Users can edit their name" %>
