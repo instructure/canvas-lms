@@ -1007,9 +1007,11 @@ acknowledge that you have read and agreed to the
           </fieldset>
         <% end %>
 
-        <div class="button-container">
-          <button type="submit" class="Button Button--primary"><%= t(:update_settings_button, "Update Settings") %></button>
-        </div>
+        <footer class="sticky-footer">
+          <div class="form-actions-sticky-footer">
+              <button type="submit" class="Button Button--primary"><%= t(:update_settings_button, "Update Settings") %></button>
+          </div>
+        </footer>
       <% end %>
     </div>
   <% end %>
