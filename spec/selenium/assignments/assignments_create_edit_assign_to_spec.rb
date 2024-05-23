@@ -233,6 +233,16 @@ shared_examples_for "item assign to tray during assignment creation/update" do
       keep_trying_until { expect(item_tray_exists?).to be_truthy }
       expect(inherited_from.last.text).to eq("Inherited from #{@context_module.name}")
       expect(element_exists?(assign_to_in_tray_selector("Remove Everyone else"))).to be_falsey
+
+      click_save_button("Apply")
+
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      AssignmentCreateEditPage.save_assignment
+
+      assignment = Assignment.last
+      assignment.reload
+      expect(assignment.only_visible_to_overrides).to be_falsey
     end
 
     it "does not show module override if an unassigned override exists" do

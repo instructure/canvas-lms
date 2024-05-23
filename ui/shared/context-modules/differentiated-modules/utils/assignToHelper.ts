@@ -79,10 +79,17 @@ export const generateDateDetailsPayload = (
     payload.due_at = everyoneCard.due_at || null
     payload.unlock_at = everyoneCard.unlock_at || null
     payload.lock_at = everyoneCard.lock_at || null
+  }
+
+  if (
+    (everyoneCard !== undefined && !hasModuleOverrides) ||
+    (hasModuleOverrides && overrideCards.length === 0)
+  ) {
     payload.only_visible_to_overrides = false
-  } else if (!hasModuleOverrides) {
+  } else {
     payload.only_visible_to_overrides = true
   }
+
   payload.assignment_overrides = overrideCards
     .map(card => {
       const isUpdatedModuleOverride = card.contextModuleId !== undefined && card.isEdited

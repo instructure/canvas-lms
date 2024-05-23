@@ -177,6 +177,16 @@ const preparePeerReviewPayload = (
       }
 }
 
+const setOnlyVisibleToOverrides = (assignedInfoList, everyoneOverride) => {
+  const hasDefaultEveryone = !!Object.keys(everyoneOverride).length
+  if (ENV.FEATURES?.differentiated_modules) {
+    const contextModuleOverrides = assignedInfoList.filter(info => info.context_module_id != null)
+    return !(hasDefaultEveryone || contextModuleOverrides.length === assignedInfoList.length)
+  } else {
+    return !hasDefaultEveryone
+  }
+}
+
 export const prepareCheckpointsPayload = (
   pointsPossibleReplyToTopic,
   pointsPossibleReplyToEntry,
@@ -254,7 +264,7 @@ export const prepareAssignmentPayload = (
       defaultEveryoneOption,
       masteryPathsOption
     ),
-    onlyVisibleToOverrides: !Object.keys(everyoneOverride).length,
+    onlyVisibleToOverrides: setOnlyVisibleToOverrides(assignedInfoList, everyoneOverride),
     gradingStandardId: gradingSchemeId || null,
     forCheckpoints: isCheckpoints,
   }
