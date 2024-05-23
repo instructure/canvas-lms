@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 import type {PaginatedList} from './PaginatedList'
 import type {ExtensionsSortDirection, ExtensionsSortProperty} from './registrations'
 
@@ -137,6 +138,8 @@ export const sampleAppNames = [
   'ScheduleFrenzy!',
 ]
 
+const deletedIds: LtiRegistrationId[] = []
+
 const generateLtiRegistration = (id: string, name: string): any => ({
   id,
   account_id: id,
@@ -225,31 +228,33 @@ const getSampleRegistrationDb = async (options: {
 }): Promise<PaginatedList<any>> => {
   const registrations = SampleLtiRegistrations.filter(registration => {
     return registration.name.toLowerCase().includes(options.query.toLowerCase())
-  }).sort((a, b) => {
-    if (options.sort === 'name') {
-      return a.name.localeCompare(b.name) * (options.dir === 'asc' ? 1 : -1)
-    } else if (options.sort === 'nickname') {
-      return (
-        (a.admin_nickname || '').localeCompare(b.admin_nickname || '') *
-        (options.dir === 'asc' ? 1 : -1)
-      )
-    } else if (options.sort === 'lti_version') {
-      return (
-        a.legacy_configuration_id.localeCompare(b.legacy_configuration_id) *
-        (options.dir === 'asc' ? 1 : -1)
-      )
-    } else if (options.sort === 'installed') {
-      return (
-        a.account_binding.workflow_state.localeCompare(b.account_binding.workflow_state) *
-        (options.dir === 'asc' ? 1 : -1)
-      )
-    } else if (options.sort === 'installed_by') {
-      return a.created_by.localeCompare(b.created_by) * (options.dir === 'asc' ? 1 : -1)
-    } else if (options.sort === 'on') {
-      return a.created_at.localeCompare(b.created_at) * (options.dir === 'asc' ? 1 : -1)
-    }
-    return 0
   })
+    .filter(registration => !deletedIds.includes(registration.id))
+    .sort((a, b) => {
+      if (options.sort === 'name') {
+        return a.name.localeCompare(b.name) * (options.dir === 'asc' ? 1 : -1)
+      } else if (options.sort === 'nickname') {
+        return (
+          (a.admin_nickname || '').localeCompare(b.admin_nickname || '') *
+          (options.dir === 'asc' ? 1 : -1)
+        )
+      } else if (options.sort === 'lti_version') {
+        return (
+          a.legacy_configuration_id.localeCompare(b.legacy_configuration_id) *
+          (options.dir === 'asc' ? 1 : -1)
+        )
+      } else if (options.sort === 'installed') {
+        return (
+          a.account_binding.workflow_state.localeCompare(b.account_binding.workflow_state) *
+          (options.dir === 'asc' ? 1 : -1)
+        )
+      } else if (options.sort === 'installed_by') {
+        return a.created_by.localeCompare(b.created_by) * (options.dir === 'asc' ? 1 : -1)
+      } else if (options.sort === 'on') {
+        return a.created_at.localeCompare(b.created_at) * (options.dir === 'asc' ? 1 : -1)
+      }
+      return 0
+    })
   const pagedRegistrations = registrations.slice(options.offset, options.offset + options.limit)
   return {
     data: pagedRegistrations,
@@ -266,6 +271,15 @@ export const mockFetchSampleLtiRegistrations = async (options: {
 }): Promise<PaginatedList<any>> => {
   await wait(getRandomInt(1, 1) * 1000)
   return getSampleRegistrationDb(options)
+}
+
+export const mockDeleteRegistration = async (id: LtiRegistrationId): Promise<void> => {
+  await wait((1 + Math.random()) * 1000)
+  if (parseInt(id, 10) % 2 === 1) {
+    throw new Error('Mock Delete Registration failure')
+  } else {
+    deletedIds.push(id)
+  }
 }
 
 function wait(milliseconds: number) {
