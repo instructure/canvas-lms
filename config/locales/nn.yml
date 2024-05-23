@@ -2210,7 +2210,7 @@ nn:
   add_edit_and_delete_events_on_account_calendars_71bea006: "Legg til, rediger og slett hendingar på kontokalendarar"
   add_edit_delete_sections_d32c5b4d: "legg til / rediger / slett seksjonar"
   add_email_address_aef3b61: "Legg til e-postadresse"
-  add_event_9e21d0ff: "Legg til hendelse"
+  add_event_9e21d0ff: "Legg til hending"
   add_existing_content_7e36da66: "Legg til eksisterande innhald"
   add_external_feed_6d437a28: "Legg til ekstern straum"
   add_feed_49ed1cb2: "Legg til straum"
@@ -2332,7 +2332,7 @@ nn:
   additional_occurrence_s_7b5b0173: Tilleggsførekomst(ar)
   additional_options_7cefee79: "Fleire innstillingar"
   additional_outcomes_options_6df428f1: "Fleire læringsmålalternativ"
-  additional_replies_required_13697d0a: "Fleire svar er krevd"
+  additional_replies_required_13697d0a: "Fleire svar er påkrevd"
   additional_settings_20362654: "Fleire innstillingar"
   additional_settings_for_sis_syncing_f926973e: "Tilleggsinnstillingar for SIS-synkronisering"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Fleire alternativ for SIS-synkroniserte oppgåver, quizar og diskusjonar"
@@ -3582,7 +3582,7 @@ nn:
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Er du sikker på at du vil slette kunngjeringa?"
   are_you_sure_you_want_to_delete_this_assignment_88be6f5e: "Er du sikker på at du vil slette denne oppgåva?"
   are_you_sure_you_want_to_delete_this_comment_4ee386d: "Er du sikker på at du vil slette denne kommentaren?"
-  are_you_sure_you_want_to_delete_this_custom_status_487882ee: "Er du sikker på at du vil slette denne tilpassa statusen? Denne handlinga kan ikkje angrast. Alle innsendingar og poeng som for øyeblikket er merket med denne tilpassa statusen, vil få statusen fjerna."
+  are_you_sure_you_want_to_delete_this_custom_status_487882ee: "Er du sikker på at du vil slette denne tilpassa statusen? Denne handlinga kan ikkje angrast. Alle innsendingar og poeng som for augeblikket er merka med denne tilpassa statusen, vil få statusen fjerna."
   are_you_sure_you_want_to_delete_this_developer_key_9937481a: "Er du sikker på at du vil slette denne utviklarnøkkelen?"
   are_you_sure_you_want_to_delete_this_developer_key_ce246033: "Er du sikker på at du vil slette utviklarnøkkelen? Handlinga vil også slette andre verktøy som er forbundet med utviklarnøkkelen i denne konteksten."
   are_you_sure_you_want_to_delete_this_discussion_334554e0: "Er du sikker på at du vil slette denne diskusjonen?"
@@ -4534,7 +4534,7 @@ nn:
   assignmenttype_title_at_datetime_until_endtime_8d4c211a: "%{assignmentType}%{title}, den %{datetime}til %{endTime}"
   assignmenttype_title_due_datetime_c7eaaffb: "%{assignmentType}%{title}, frist %{datetime}"
   assignmenttype_title_has_a_to_do_time_at_datetime_dace2699: "%{assignmentType}%{title} har frist %{datetime}."
-  assignmenttype_title_is_marked_as_done_fbcc0bb: "%{assignmentType}%{title}er merka som fullført."
+  assignmenttype_title_is_marked_as_done_fbcc0bb: "%{assignmentType}%{title}er markert som fullført."
   assignmenttype_title_is_not_marked_as_done_9344572f: "%{assignmentType}%{title} er ikkje markert som fullført."
   assignmenttype_title_posted_datetime_e070c79: "%{assignmentType}%{title}publisert %{datetime}."
   assignmenttype_title_reminder_datetime_2f1e8dca: "%{assignmentType}%{title}, påminning%{datetime}."
@@ -5474,7 +5474,7 @@ nn:
     see_quiz: "Sjå %{quiz_name}"
     see_related_link: "Sjå relatert lenke"
   calendar_event_89aadc1c: Kalenderhending
-  calendar_event_itemtitle_812caedd: "Kalenderhendelse, %{itemTitle}"
+  calendar_event_itemtitle_812caedd: "Kalenderhending, %{itemTitle}"
   calendar_events: 
     crumbs: 
       new: "Ny kalenderhending"
