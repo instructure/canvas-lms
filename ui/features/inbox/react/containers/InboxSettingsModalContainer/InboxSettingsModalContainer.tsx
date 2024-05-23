@@ -29,6 +29,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
+import {Heading} from '@instructure/ui-heading'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import ModalSpinner from '../ComposeModalContainer/ModalSpinner'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
@@ -441,16 +442,20 @@ const InboxSettingsModalContainer = ({
                 {inboxAutoResponse && (
                   <>
                     <View as="div">
-                      <Text weight="bold">{I18n.t('Out of Office')}</Text>
+                      <Heading level="h3">
+                        <Text weight="bold">{I18n.t('Out of Office')}</Text>
+                      </Heading>
                     </View>
-                    <View as="div" padding="x-small 0 0">
-                      {I18n.t('Send automatic replies to incoming mail.')}
+                    <View as="div" padding="x-small 0">
+                      <Text size="small">{I18n.t('Send automatic replies to incoming mail.')}</Text>
                     </View>
                     <View as="div" padding="small 0 x-small 0">
                       <RadioInputGroup
                         name="response_toggle"
                         description={
-                          <ScreenReaderContent>{I18n.t('Response On/Off')}</ScreenReaderContent>
+                          <ScreenReaderContent>
+                            {I18n.t('Out of Office Response')}
+                          </ScreenReaderContent>
                         }
                         value={formState.useOutOfOffice ? 'true' : 'false'}
                         onChange={radioGroupInput =>
@@ -502,32 +507,37 @@ const InboxSettingsModalContainer = ({
                           onChange={(_e, value) => onOutOfOfficeSubjectChange(value)}
                           inputRef={setSubjectRef}
                           messages={subjectError}
+                          isRequired={formState.useOutOfOffice}
+                          data-testid="out-of-office-subject-input"
                         />
                       </View>
                       <View as="div" padding="small 0 x-small 0">
-                        <Text weight="bold">{I18n.t('Message')}</Text>
+                        <TextArea
+                          label={I18n.t('Message')}
+                          height="8rem"
+                          maxHeight="10rem"
+                          placeholder={I18n.t('Add Message')}
+                          value={formState.outOfOfficeMessage || ''}
+                          disabled={!formState.useOutOfOffice}
+                          onChange={e => onOutOfOfficeMessageChange(e.currentTarget.value)}
+                          textareaRef={setMessageRef}
+                          messages={messageError}
+                        />
                       </View>
-                      <TextArea
-                        label={<ScreenReaderContent>{I18n.t('Message')}</ScreenReaderContent>}
-                        height="8rem"
-                        maxHeight="10rem"
-                        placeholder={I18n.t('Add Message')}
-                        value={formState.outOfOfficeMessage || ''}
-                        disabled={!formState.useOutOfOffice}
-                        onChange={e => onOutOfOfficeMessageChange(e.currentTarget.value)}
-                        textareaRef={setMessageRef}
-                        messages={messageError}
-                      />
                     </View>
                   </>
                 )}
                 {inboxSignatureBlock && (
                   <>
                     <View as="div" padding={inboxAutoResponse ? 'large 0 0' : '0 0 0'}>
-                      <Text weight="bold">{I18n.t('Signature')}</Text>
+                      <Heading level="h3">
+                        <Text weight="bold">{I18n.t('Signature')}</Text>
+                      </Heading>
                     </View>
                     <View as="div" padding="x-small 0">
-                      {I18n.t('Signature will be added at the end of all messaging.')}
+                      <Text size="small">
+                        {I18n.t('Signature will be added at the end of all messaging.')}
+                      </Text>
                     </View>
                     <View as="div" padding="small 0 x-small 0">
                       <RadioInputGroup
@@ -544,12 +554,9 @@ const InboxSettingsModalContainer = ({
                         <RadioInput label={I18n.t('Signature On')} value="true" />
                       </RadioInputGroup>
                     </View>
-                    <View as="div">
-                      <View as="div" padding="small 0 x-small 0">
-                        <Text weight="bold">{I18n.t('Add Signature*')}</Text>
-                      </View>
+                    <View as="div" padding="small 0 x-small 0">
                       <TextArea
-                        label={<ScreenReaderContent>{I18n.t('Signature')}</ScreenReaderContent>}
+                        label={I18n.t('Signature*')}
                         height="8rem"
                         maxHeight="10rem"
                         placeholder={I18n.t('Add Signature')}
@@ -558,6 +565,8 @@ const InboxSettingsModalContainer = ({
                         onChange={e => onSignatureChange(e.currentTarget.value)}
                         textareaRef={setSignatureRef}
                         messages={signatureError}
+                        required={formState.useSignature}
+                        data-testid="inbox-signature-input"
                       />
                     </View>
                   </>
