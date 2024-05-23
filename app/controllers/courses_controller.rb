@@ -1623,6 +1623,9 @@ class CoursesController < ApplicationController
   # @API Update course settings
   # Can update the following course settings:
   #
+  # @argument allow_final_grade_override [Boolean]
+  #   Let student final grades for a grading period or the total grades for the course be overridden
+  #
   # @argument allow_student_discussion_topics [Boolean]
   #   Let students create discussion topics
   #
