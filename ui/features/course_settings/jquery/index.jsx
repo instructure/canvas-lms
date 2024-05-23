@@ -22,7 +22,6 @@ import $ from 'jquery'
 import {tabIdFromElement} from './course_settings_helper'
 import * as tz from '@canvas/datetime'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime/jquery' /* datetimeString, date_field */
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
@@ -397,7 +396,7 @@ $(document).ready(function () {
           initiallySelectedGradingSchemeId={selectedGradingSchemeId}
           onChange={gradingSchemeId => handleSelectedGradingSchemeIdChanged(gradingSchemeId)}
           archivedGradingSchemesEnabled={ENV.ARCHIVED_GRADING_SCHEMES_ENABLED}
-          shrinkSearchBar
+          shrinkSearchBar={true}
         />,
         grading_scheme_selector
       )
@@ -543,7 +542,6 @@ $(document).ready(function () {
       }
     )
   })
-  $('.date_entry').datetime_field({alwaysShowTime: true})
 
   const $default_edit_roles_select = $('#course_default_wiki_editing_roles')
   $default_edit_roles_select.data(

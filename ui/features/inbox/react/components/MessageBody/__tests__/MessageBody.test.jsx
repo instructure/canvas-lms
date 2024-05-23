@@ -73,7 +73,7 @@ describe('MessageBody', () => {
     it('renders signature when inboxSettingsFeature prop is true', async () => {
       const props = createProps({
         inboxSettingsFeature: true,
-        signature: 'My signature'
+        signature: 'My signature',
       })
 
       const mockContext = {
@@ -93,7 +93,7 @@ describe('MessageBody', () => {
     it('does not render signature when inboxSettingsFeature prop is false', () => {
       const props = createProps({
         inboxSettingsFeature: false,
-        signature: 'My signature'
+        signature: 'My signature',
       })
       render(<MessageBody {...props} />)
       const textArea = document.querySelectorAll('textarea')[0].value

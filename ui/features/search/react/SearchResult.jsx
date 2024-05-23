@@ -24,7 +24,13 @@ import {ProgressBar} from '@instructure/ui-progress'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
-import {IconLikeLine, IconAssignmentLine, IconDocumentLine, IconAnnouncementLine, IconDiscussionLine} from '@instructure/ui-icons'
+import {
+  IconLikeLine,
+  IconAssignmentLine,
+  IconDocumentLine,
+  IconAnnouncementLine,
+  IconDiscussionLine,
+} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('SmartSearch')
@@ -33,7 +39,7 @@ const preview = (body, maxLength = 512) => {
   const preview = []
   const words = body.match(/\p{L}+/gu)
 
-  if(words == null) {
+  if (words == null) {
     return ''
   }
 
@@ -62,13 +68,20 @@ export default function SearchResult({onExplain, onLike, onDislike, result}) {
 
   return (
     <View as="li" borderColor="primary" borderWidth="small 0 0 0" padding="medium 0">
-      <Flex alignItems={'start'} as="div" gap="large" justifyItems={'space-between'}>
+      <Flex alignItems="start" as="div" gap="large" justifyItems="space-between">
         <Flex.Item shouldShrink={true} size="60%">
-          <Heading as={'h2'} level={'h3'}>
+          <Heading as="h2" level="h3">
             {title}
           </Heading>
 
-          <Link href={html_url} isWithinText={false} renderIcon={React.createElement(icon_class(content_type), {color: 'brand', size: 'x-small'})}>
+          <Link
+            href={html_url}
+            isWithinText={false}
+            renderIcon={React.createElement(icon_class(content_type), {
+              color: 'brand',
+              size: 'x-small',
+            })}
+          >
             {readable_type}
           </Link>
 
@@ -84,11 +97,11 @@ export default function SearchResult({onExplain, onLike, onDislike, result}) {
               </Text>
               <ProgressBar
                 meterColor="success"
-                size={'x-small'}
+                size="x-small"
                 screenReaderLabel={I18n.t('Relevance')}
                 valueNow={relevance}
                 valueMax={100}
-                width={'150px'}
+                width="150px"
               />
               <span className="hidden">
                 <Text size="small">

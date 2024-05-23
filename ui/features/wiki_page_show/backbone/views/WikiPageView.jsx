@@ -20,6 +20,7 @@ import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import 'jquery-scroll-to-visible'
 import * as tz from '@canvas/datetime'
+import {datetimeString} from '@canvas/datetime/date-functions'
 import {clone, each} from 'lodash'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/WikiPage.handlebars'
@@ -329,10 +330,10 @@ export default class WikiPageView extends Backbone.View {
       this.toolDrawer = {
         open: false,
         tool: null,
-        pageContent: pageContent,
-        mountPoint: mountPoint,
+        pageContent,
+        mountPoint,
       }
-      window.addEventListener('resize', this.renderExternalToolDrawer.bind(this));
+      window.addEventListener('resize', this.renderExternalToolDrawer.bind(this))
       this.renderExternalToolDrawer()
     }
   }
@@ -366,11 +367,13 @@ export default class WikiPageView extends Backbone.View {
         pageContentTitle=""
         pageContentMinWidth="40rem"
         pageContentHeight={window.innerHeight}
-        acceptedResourceTypes={["page"]}
+        acceptedResourceTypes={['page']}
         targetResourceType="page"
         allowItemSelection={false}
         selectableItems={[]}
-        onDismiss={() => {this.setToolDrawerOpen(false)}}
+        onDismiss={() => {
+          this.setToolDrawerOpen(false)
+        }}
         open={this.toolDrawer.open}
         placement="wiki_page_menu"
         extraQueryParams={{wiki_page_id: this.model.id}}
@@ -422,7 +425,7 @@ export default class WikiPageView extends Backbone.View {
       json.lock_info.unlock_at =
         tz.parse(json.lock_info.unlock_at) < new Date()
           ? null
-          : $.datetimeString(json.lock_info.unlock_at)
+          : datetimeString(json.lock_info.unlock_at)
     }
 
     if (json.is_master_course_child_content && json.restricted_by_master_course) {

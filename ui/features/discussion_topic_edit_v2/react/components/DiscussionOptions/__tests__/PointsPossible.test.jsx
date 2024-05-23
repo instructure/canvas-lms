@@ -25,7 +25,7 @@ const defaultProps = {
   pointsPossible: 10,
   setPointsPossible: () => {},
   pointsPossibleLabel: 'Points Possible',
-  pointsPossibleDataTestId: 'points-possible-input'
+  pointsPossibleDataTestId: 'points-possible-input',
 }
 
 const renderPointsPossible = () => {
@@ -40,7 +40,12 @@ describe('PointsPossible', () => {
   it('does not allow negative values on decrement', () => {
     const mockSetPointsPossible = jest.fn()
     const {getByTestId} = render(
-    <PointsPossible {...defaultProps} pointsPossible={0} setPointsPossible={mockSetPointsPossible}/>)
+      <PointsPossible
+        {...defaultProps}
+        pointsPossible={0}
+        setPointsPossible={mockSetPointsPossible}
+      />
+    )
 
     // Assuming your decrement button has a test id of 'decrement-button', adjust if necessary
     const input = getByTestId('points-possible-input')

@@ -51,12 +51,14 @@ interface Props {
   showVisualLabel?: boolean
   inputRef?: (inputElement: HTMLInputElement | null) => void
   onBlur?: () => void
+  disabledWithGradingPeriod?: boolean
 }
 
 export interface AssigneeOption {
   id: string
   value: string
   sisID?: string
+  groupCategoryId?: string
   overrideId?: string
   group?: string
 }
@@ -79,6 +81,7 @@ const AssigneeSelector = ({
   showVisualLabel = true,
   inputRef,
   onBlur,
+  disabledWithGradingPeriod,
 }: Props) => {
   const listElementRef = useRef<HTMLElement | null>(null)
   const [options, setOptions] = useState<AssigneeOption[]>(defaultValues)
@@ -152,6 +155,7 @@ const AssigneeSelector = ({
   return (
     <>
       <CanvasMultiSelect
+        disabled={disabledWithGradingPeriod}
         data-testid="assignee_selector"
         messages={messages}
         label={showVisualLabel ? label : <ScreenReaderContent>{label}</ScreenReaderContent>}

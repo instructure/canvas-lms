@@ -2629,19 +2629,19 @@ describe AssignmentsController do
       end
     end
 
-    describe "js_env UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED" do
-      it "sets UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED in js_env as true if enabled" do
+    describe "js_env ASSIGNMENT_SUBMISSION_TYPE_CARD_ENABLED" do
+      it "sets ASSIGNMENT_SUBMISSION_TYPE_CARD_ENABLED in js_env as true if enabled" do
         user_session(@teacher)
-        Account.site_admin.enable_feature!(:update_assignment_submission_type_launch_button)
+        Account.site_admin.enable_feature!(:assignment_submission_type_card)
         get "edit", params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env][:UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED]).to be(true)
+        expect(assigns[:js_env][:ASSIGNMENT_SUBMISSION_TYPE_CARD_ENABLED]).to be(true)
       end
 
-      it "sets UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED in js_env as false if disabled" do
+      it "sets ASSIGNMENT_SUBMISSION_TYPE_CARD_ENABLED in js_env as false if disabled" do
         user_session(@teacher)
-        Account.site_admin.disable_feature!(:update_assignment_submission_type_launch_button)
+        Account.site_admin.disable_feature!(:assignment_submission_type_card)
         get "edit", params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env][:UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED]).to be(false)
+        expect(assigns[:js_env][:ASSIGNMENT_SUBMISSION_TYPE_CARD_ENABLED]).to be(false)
       end
     end
 

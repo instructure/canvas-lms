@@ -233,11 +233,11 @@ describe('CanvasInbox App Container', () => {
         ...window.ENV,
         CONVERSATIONS: {
           ...window.ENV.CONVERSATIONS,
-          INBOX_SETTINGS_ENABLED: true
-        }
+          INBOX_SETTINGS_ENABLED: true,
+        },
       }
       const {getByTestId} = setup()
-      expect(getByTestId("inbox-settings-in-header")).toBeInTheDocument()
+      expect(getByTestId('inbox-settings-in-header')).toBeInTheDocument()
     })
 
     it('should redirect to inbox when submission_comments and click on Compose button', async () => {
@@ -245,8 +245,8 @@ describe('CanvasInbox App Container', () => {
         ...window.ENV,
         CONVERSATIONS: {
           ...window.ENV.CONVERSATIONS,
-          INBOX_SETTINGS_ENABLED: true
-        }
+          INBOX_SETTINGS_ENABLED: true,
+        },
       }
       const container = setup()
       await waitForApolloLoading()

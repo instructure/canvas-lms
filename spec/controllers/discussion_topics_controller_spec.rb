@@ -741,6 +741,44 @@ describe DiscussionTopicsController do
         end
       end
 
+      context "summary" do
+        it "teacher cannot summarize when the feature is disabled" do
+          user_session(@teacher)
+          get "show", params: { course_id: @course.id, id: discussion.id }
+          expect(assigns.dig(:js_env, :user_can_summarize)).to be false
+        end
+
+        it "teacher can summarize when the feature is enabled" do
+          Account.site_admin.enable_feature! :discussion_summary
+
+          user_session(@teacher)
+          get "show", params: { course_id: @course.id, id: discussion.id }
+          expect(assigns.dig(:js_env, :user_can_summarize)).to be true
+        end
+
+        it "student cannot summarize when the feature is enabled" do
+          Account.site_admin.enable_feature! :discussion_summary
+
+          user_session(@student)
+          get "show", params: { course_id: @course.id, id: discussion.id }
+          expect(assigns.dig(:js_env, :user_can_summarize)).to be false
+        end
+
+        it "summary is not enabled on the topic" do
+          user_session(@teacher)
+          get "show", params: { course_id: @course.id, id: discussion.id }
+          expect(assigns.dig(:js_env, :discussion_summary_enabled)).to be false
+        end
+
+        it "summary is enabled on the topic" do
+          discussion.update!(summary_enabled: true)
+
+          user_session(@teacher)
+          get "show", params: { course_id: @course.id, id: discussion.id }
+          expect(assigns.dig(:js_env, :discussion_summary_enabled)).to be true
+        end
+      end
+
       context "podcast_enabled" do
         it "adds Discussion Podcast Feed to header" do
           discussion.podcast_enabled = true

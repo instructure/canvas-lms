@@ -82,17 +82,13 @@ module Bundler
           enforce_pinned_additional_dependencies: enforce_pinned_additional_dependencies
         })
 
-        if (defined?(CLI::Check) ||
-            defined?(CLI::Install) ||
-            defined?(CLI::Lock) ||
-            defined?(CLI::Update)) &&
-           !defined?(CLI::Cache) && !env_lockfile
+        # If they're using BUNDLE_LOCKFILE, then they really do want to
+        # use a particular lockfile, and it overrides whatever they
+        # dynamically set in their gemfile
+        if !env_lockfile && defined?(CLI) &&
+           %i[check install lock update].include?(CLI.instance&.current_command_chain&.first)
           # always use Gemfile.lock for `bundle check`, `bundle install`,
-          # `bundle lock`, and `bundle update`. `bundle cache` delegates to
-          # `bundle install`, but we want that to run as normal.
-          # If they're using BUNDLE_LOCKFILE, then they really do want to
-          # use a particular lockfile, and it overrides whatever they
-          # dynamically set in their gemfile
+          # `bundle lock`, and `bundle update`.
           active = lockfile == Bundler.default_lockfile(force_original: true)
         end
 
@@ -179,10 +175,11 @@ module Bundler
 
             # already up to date?
             up_to_date = false
+            conflicts = Set.new
             Bundler.settings.temporary(frozen: true) do
               Bundler.ui.silence do
                 up_to_date = checker.base_check(lockfile_definition, check_missing_deps: true) &&
-                             checker.deep_check(lockfile_definition)
+                             checker.deep_check(lockfile_definition, conflicts: conflicts)
               end
             end
             if up_to_date
@@ -206,7 +203,6 @@ module Bundler
               Bundler.ui.info("Syncing to #{relative_lockfile}...") if attempts == 1
               synced_any = true
 
-              specs = lockfile_name.exist? ? cache.specs(lockfile_name) : {}
               parent_lockfile_name = lockfile_definition[:parent]
               parent_root = parent_lockfile_name.dirname
               parent_specs = cache.specs(parent_lockfile_name)
@@ -222,7 +218,7 @@ module Bundler
                 end
 
               # add a source for the current gem
-              gem_spec = parent_specs[[File.basename(Bundler.root), "ruby"]]
+              gem_spec = parent_specs.dig(File.basename(Bundler.root), "ruby")
 
               if gem_spec
                 adjusted_parent_lockfile_contents += <<~TEXT
@@ -252,32 +248,22 @@ module Bundler
                   next :self if parent_spec.nil?
                   next spec_precedences[spec.name] if spec_precedences.key?(spec.name)
 
-                  precedence = :self if cache.conflicting_requirements?(lockfile_name,
-                                                                        parent_lockfile_name,
-                                                                        spec,
-                                                                        parent_spec)
-
-                  # look through all reverse dependencies; if any of them say it
-                  # has to come from self, due to conflicts, then this gem has
-                  # to come from self as well
-                  [cache.reverse_dependencies(lockfile_name),
-                   cache.reverse_dependencies(parent_lockfile_name)].each do |reverse_dependencies|
-                    break if precedence == :self
-
-                    reverse_dependencies[spec.name].each do |dep_name|
-                      precedence = check_precedence.call(specs[dep_name], parent_specs[dep_name])
-                      break if precedence == :self
-                    end
-                  end
+                  precedence = if !(cache.reverse_dependencies(lockfile_name)[spec.name] & conflicts).empty?
+                                 :parent
+                               elsif cache.conflicting_requirements?(lockfile_name,
+                                                                     parent_lockfile_name,
+                                                                     spec,
+                                                                     parent_spec)
+                                 :self
+                               end
 
                   spec_precedences[spec.name] = precedence || :parent
                 end
 
                 # replace any duplicate specs with what's in the parent lockfile
                 lockfile.specs.map! do |spec|
-                  parent_spec = parent_specs[[spec.name, spec.platform]]
+                  parent_spec = cache.find_matching_spec(parent_specs, spec)
                   next spec unless parent_spec
-
                   next spec if check_precedence.call(spec, parent_spec) == :self
 
                   dependency_changes ||= spec != parent_spec
@@ -577,25 +563,29 @@ end
 Bundler::LazySpecification.include(Bundler::MatchMetadata) if defined?(Bundler::MatchMetadata)
 Bundler::Multilock.inject_preamble unless Bundler::Multilock.loaded?
 
-# this is terrible, but we can't prepend into these modules because we only load
-# _inside_ of the CLI commands already running
-if defined?(Bundler::CLI::Check)
-  require_relative "multilock/check"
-  at_exit do
-    next unless $!.nil?
-    next if $!.is_a?(SystemExit) && !$!.success?
+if defined?(Bundler::CLI)
+  require_relative "multilock/ext/cli"
 
-    next if Bundler::Multilock::Check.run
+  # this is terrible, but we can't prepend into these modules because we only load
+  # _inside_ of the CLI commands already running
+  if Bundler::CLI.instance&.current_command_chain&.first == :check
+    require_relative "multilock/check"
+    at_exit do
+      next unless $!.nil?
+      next if $!.is_a?(SystemExit) && !$!.success?
 
-    Bundler.ui.warn("You can attempt to fix by running `bundle install`")
-    exit 1
+      next if Bundler::Multilock::Check.run
+
+      Bundler.ui.warn("You can attempt to fix by running `bundle install`")
+      exit 1
+    end
   end
-end
-if defined?(Bundler::CLI::Lock)
-  at_exit do
-    next unless $!.nil?
-    next if $!.is_a?(SystemExit) && !$!.success?
+  if Bundler::CLI.instance&.current_command_chain&.first == :lock
+    at_exit do
+      next unless $!.nil?
+      next if $!.is_a?(SystemExit) && !$!.success?
 
-    Bundler::Multilock.after_install_all(install: false)
+      Bundler::Multilock.after_install_all(install: false)
+    end
   end
 end

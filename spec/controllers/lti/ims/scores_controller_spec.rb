@@ -413,7 +413,7 @@ module Lti::IMS
 
             before do
               result.grading_progress = "PendingManual"
-              result.submission.workflow_state = Submission.workflow_states.pending_review
+              result.submission.workflow_state = "pending_review"
               result.save!
             end
 

@@ -373,14 +373,6 @@ describe('RubricTab', () => {
         window.ENV.FEATURES.enhanced_rubrics = false
       })
 
-      it('displays comments', async () => {
-        const {getByTestId} = render(<RubricTab {...props} />)
-        const assessmentData = props.assessments[0].data[0]
-        const commentSection = getByTestId(`comment-text-area-${assessmentData.criterion_id}`)
-        expect(commentSection).toHaveTextContent(assessmentData.comments)
-        expect(commentSection).toBeDisabled()
-      })
-
       it('displays the name of the assessor if present', async () => {
         const {findByLabelText, findByText} = render(<RubricTab {...props} />)
         fireEvent.click(await findByLabelText('Select Grader'))
@@ -391,8 +383,8 @@ describe('RubricTab', () => {
         const {getByTestId} = render(<RubricTab {...props} />)
         const assessmentData = props.assessments[0].data[0]
         const {criterion_id} = assessmentData
-        const commentSection = getByTestId(`comment-text-area-${criterion_id}`)
-        expect(commentSection).toBeDisabled()
+        const commentSection = getByTestId('comment-preview-text-area')
+        expect(commentSection).toHaveTextContent(assessmentData.comments)
         const ratingSection = getByTestId(`traditional-criterion-${criterion_id}-ratings-0`)
         expect(ratingSection).toBeDisabled()
       })

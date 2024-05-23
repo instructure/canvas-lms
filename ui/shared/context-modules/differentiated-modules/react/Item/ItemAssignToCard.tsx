@@ -37,10 +37,18 @@ import AssigneeSelector, {type AssigneeOption} from '../AssigneeSelector'
 import type {FormMessage} from '@instructure/ui-form-field'
 import ContextModuleLink from './ContextModuleLink'
 import type {DateLockTypes} from './types'
-import {arrayEquals, generateWrapperStyleProps, setEquals, useDates} from './utils'
+import {
+  arrayEquals,
+  generateWrapperStyleProps,
+  setEquals,
+  useDates,
+  generateCardActionLabels,
+} from './utils'
 import {DueDateTimeInput} from './DueDateTimeInput'
 import {AvailableFromDateTimeInput} from './AvailableFromDateTimeInput'
 import {AvailableToDateTimeInput} from './AvailableToDateTimeInput'
+import {Text} from '@instructure/ui-text'
+import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -51,6 +59,8 @@ export interface DateValidatorInputArgs {
   set_type?: string
   course_section_id?: string | null
   student_ids?: string[]
+  persisted?: boolean
+  skip_grading_periods?: boolean
 }
 
 export type ItemAssignToCardProps = {
@@ -59,6 +69,7 @@ export type ItemAssignToCardProps = {
   contextModuleId?: string | null
   contextModuleName?: string | null
   due_at: string | null
+  original_due_at: string | null
   unlock_at: string | null
   lock_at: string | null
   onDelete?: (cardId: string) => void
@@ -109,6 +120,7 @@ export default forwardRef(function ItemAssignToCard(
     highlightCard,
     blueprintDateLocks,
     removeDueDateInput,
+    original_due_at,
   } = props
   const [
     dueDate,
@@ -135,48 +147,33 @@ export default forwardRef(function ItemAssignToCard(
     new DateValidator({
       date_range: {...ENV.VALID_DATE_RANGE},
       hasGradingPeriods: ENV.HAS_GRADING_PERIODS,
-      gradingPeriods: ENV.active_grading_periods,
+      gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods),
       userIsAdmin: ENV.current_user_is_admin,
       postToSIS: ENV.POST_TO_SIS && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT,
     })
   )
 
-  const removeCardSRDescription = useMemo(() => {
-    let description
-    const selected =
-      customAllOptions
-        ?.filter(option => selectedAssigneeIds.includes(option.id))
-        .map(({value}) => value) ?? []
-    switch (selected?.length) {
-      case 0:
-        description = I18n.t('Remove card')
-        break
-      case 1:
-        description = I18n.t('Remove card for %{pillA}', {pillA: selected[0]})
-        break
-      case 2:
-        description = I18n.t('Remove card for %{pillA} and %{pillB}', {
-          pillA: selected[0],
-          pillB: selected[1],
-        })
-        break
-      case 3:
-        description = I18n.t('Remove card for %{pillA}, %{pillB} and %{pillC}', {
-          pillA: selected[0],
-          pillB: selected[1],
-          pillC: selected[2],
-        })
-        break
-      default:
-        description = I18n.t('Remove card for %{pillA}, %{pillB} and %{n} others', {
-          pillA: selected[0],
-          pillB: selected[1],
-          n: selected.length - 2,
-        })
-        break
-    }
-    return description
-  }, [customAllOptions, selectedAssigneeIds])
+  const cardActionLabels = useMemo(
+    () =>
+      generateCardActionLabels(
+        customAllOptions
+          ?.filter(option => selectedAssigneeIds.includes(option.id))
+          .map(({value}) => value) ?? []
+      ),
+    [customAllOptions, selectedAssigneeIds]
+  )
+
+  const dueAtHasChanged = () => {
+    // console.log('>> dates', original_due_at, dueDate)
+    const originalDueAt = new Date(original_due_at || 0)
+    const newDueAt = new Date(dueDate || 0)
+    // Since a user can't edit the seconds field in the UI and the form also
+    // thinks that the seconds is always set to 00, we compare by everything
+    // except seconds.
+    originalDueAt.setSeconds(0)
+    newDueAt.setSeconds(0)
+    return originalDueAt.getTime() !== newDueAt.getTime()
+  }
 
   useEffect(() => {
     onValidityChange?.(
@@ -195,6 +192,8 @@ export default forwardRef(function ItemAssignToCard(
       lock_at: availableToDate,
       student_ids: [],
       course_section_id: '2',
+      persisted: !dueAtHasChanged(),
+      skip_grading_periods: dueDate === null,
     }
     const newErrors = dateValidator.current.validateDatetimes(data)
     const newBadDates = Object.keys(newErrors)
@@ -285,6 +284,9 @@ export default forwardRef(function ItemAssignToCard(
 
   const wrapperProps = useMemo(() => generateWrapperStyleProps(highlightCard), [highlightCard])
 
+  const isInClosedGradingPeriod =
+    dateValidator.current.isDateInClosedGradingPeriod(dueDate) && !dueAtHasChanged()
+
   const commonDateTimeInputProps = {
     breakpoints: {},
     showMessages: false,
@@ -316,7 +318,7 @@ export default forwardRef(function ItemAssignToCard(
             <IconButton
               data-testid="delete-card-button"
               color="danger"
-              screenReaderLabel={removeCardSRDescription}
+              screenReaderLabel={cardActionLabels.removeCard}
               size="small"
               withBackground={false}
               withBorder={false}
@@ -343,6 +345,7 @@ export default forwardRef(function ItemAssignToCard(
           customSetSearchTerm={customSetSearchTerm}
           inputRef={el => (assigneeSelectorRef.current = el)}
           onBlur={() => setShowValidations(true)}
+          disabledWithGradingPeriod={isInClosedGradingPeriod}
         />
         {!removeDueDateInput && (
           <DueDateTimeInput
@@ -355,9 +358,11 @@ export default forwardRef(function ItemAssignToCard(
               dateInputRefs: dateInputRefs.current,
               timeInputRefs: timeInputRefs.current,
               handleBlur,
+              clearButtonAltLabel: cardActionLabels.clearDueAt,
             }}
             {...commonDateTimeInputProps}
             handleDueDateChange={handleDueDateChange(timeInputRefs.current.due_at?.value || '')}
+            disabledWithGradingPeriod={isInClosedGradingPeriod}
           />
         )}
         <AvailableFromDateTimeInput
@@ -370,11 +375,13 @@ export default forwardRef(function ItemAssignToCard(
             dateInputRefs: dateInputRefs.current,
             timeInputRefs: timeInputRefs.current,
             handleBlur,
+            clearButtonAltLabel: cardActionLabels.clearAvailableFrom,
           }}
           {...commonDateTimeInputProps}
           handleAvailableFromDateChange={handleAvailableFromDateChange(
             timeInputRefs.current.unlock_at?.value || ''
           )}
+          disabledWithGradingPeriod={isInClosedGradingPeriod}
         />
         <AvailableToDateTimeInput
           {...{
@@ -386,17 +393,22 @@ export default forwardRef(function ItemAssignToCard(
             dateInputRefs: dateInputRefs.current,
             timeInputRefs: timeInputRefs.current,
             handleBlur,
+            clearButtonAltLabel: cardActionLabels.clearAvailableTo,
           }}
           {...commonDateTimeInputProps}
           handleAvailableToDateChange={handleAvailableToDateChange(
             timeInputRefs.current.lock_at?.value || ''
           )}
+          disabledWithGradingPeriod={isInClosedGradingPeriod}
         />
         <ContextModuleLink
           courseId={courseId}
           contextModuleId={contextModuleId}
           contextModuleName={contextModuleName}
         />
+        {isInClosedGradingPeriod && (
+          <Text size="small">{I18n.t('Due date falls in a closed Grading Period.')}</Text>
+        )}
       </View>
     </View>
   )

@@ -20,7 +20,14 @@ import $ from 'jquery'
 import NotificationSettings from './react/index'
 import React from 'react'
 import ReactDom from 'react-dom'
+import TopNavPortal from '@canvas/top-navigation/react/TopNavPortal'
 
 $(() => {
-  ReactDom.render(<NotificationSettings />, $('#content')[0])
+  ReactDom.render(
+    <>
+      <TopNavPortal />
+      <NotificationSettings />
+    </>,
+    $('#content')[0]
+  )
 })

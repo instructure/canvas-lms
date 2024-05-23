@@ -32,8 +32,12 @@ type Props = {
   }
 }
 
+type State = {
+  attributes: any
+}
+
 const ProgressionModuleHeader = ({bridge}: Props) => {
-  const [state, setState] = useState()
+  const [state, setState] = useState<State | null>(null)
   bridge.on('selectionChanged', setState)
 
   const renderTitle = () => {

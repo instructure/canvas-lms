@@ -245,7 +245,7 @@ class ContentZipper
     # 2. we're doing this inside a course context export, and are bypassing
     # the user check (@check_user == false)
     attachments =
-      if !@check_user || folder.context.grants_any_right?(@user, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
+      if !@check_user || folder.context.grants_any_right?(@user, :read_as_admin, :manage_contents, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
         folder.active_file_attachments
       else
         folder.visible_file_attachments

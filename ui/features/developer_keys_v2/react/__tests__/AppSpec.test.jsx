@@ -74,7 +74,9 @@ describe('DevelopersKeyApp', () => {
             visible: true,
           },
         ],
-        list: list || [{id: '1', api_key: 'abc12345678', created_at: '2012-06-07T20:36:50Z', visible: true,}],
+        list: list || [
+          {id: '1', api_key: 'abc12345678', created_at: '2012-06-07T20:36:50Z', visible: true},
+        ],
         nextPage: 'http://...',
         inheritedNextPage: 'http://...',
       },
@@ -315,7 +317,9 @@ describe('DevelopersKeyApp', () => {
     const component = renderComponent()
     const componentNode = ReactDOM.findDOMNode(component)
 
-    expect(componentNode.querySelector('div[role="tab"][aria-selected="true"]').textContent).toEqual('Account')
+    expect(
+      componentNode.querySelector('div[role="tab"][aria-selected="true"]').textContent
+    ).toEqual('Account')
   })
 
   test('renders the inherited keys tab', () => {

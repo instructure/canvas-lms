@@ -26,7 +26,6 @@ import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
 const noop = () => {}
 
 describe('MigrationOptions component', () => {
-
   const defaultProps = {
     migrationStatus: MigrationStates.states.unknown,
     willSendNotification: false,

@@ -48,7 +48,7 @@ describe('GradeSummary AcceptGradesButton', () => {
       const sr_label = within(btn).getByText('Accept grades by Jackie Chan')
       const visible_label = within(btn).getByText('Accept')
       expect(sr_label.className.includes('screenReaderContent')).toBe(true)
-      expect(visible_label).toHaveAttribute('aria-hidden', 'true');
+      expect(visible_label).toHaveAttribute('aria-hidden', 'true')
     })
 
     test('is not disabled', () => {
@@ -110,7 +110,7 @@ describe('GradeSummary AcceptGradesButton', () => {
     })
 
     test('is labeled with "Accepted"', () => {
-      expect(screen.getByRole('button', { name: 'Accepted' })).toBeInTheDocument()
+      expect(screen.getByRole('button', {name: 'Accepted'})).toBeInTheDocument()
     })
 
     test('is disabled', () => {
@@ -134,7 +134,7 @@ describe('GradeSummary AcceptGradesButton', () => {
       const sr_label = within(btn).getByText('Accept grades by Jackie Chan')
       const visible_label = within(btn).getByText('Accept')
       expect(sr_label.className.includes('screenReaderContent')).toBe(true)
-      expect(visible_label).toHaveAttribute('aria-hidden', 'true');
+      expect(visible_label).toHaveAttribute('aria-hidden', 'true')
     })
 
     test('is not disabled', () => {
@@ -161,7 +161,7 @@ describe('GradeSummary AcceptGradesButton', () => {
       const sr_label = within(btn).getByText('Accept grades by Jackie Chan')
       const visible_label = within(btn).getByText('Accept')
       expect(sr_label.className.includes('screenReaderContent')).toBe(true)
-      expect(visible_label).toHaveAttribute('aria-hidden', 'true');
+      expect(visible_label).toHaveAttribute('aria-hidden', 'true')
     })
 
     test('is disabled', () => {

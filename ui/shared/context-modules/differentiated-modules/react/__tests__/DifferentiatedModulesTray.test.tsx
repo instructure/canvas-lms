@@ -21,6 +21,7 @@ import {render, waitFor} from '@testing-library/react'
 import DifferentiatedModulesTray, {
   type DifferentiatedModulesTrayProps,
 } from '../DifferentiatedModulesTray'
+import fetchMock from 'fetch-mock'
 
 describe('DifferentiatedModulesTray', () => {
   const props: DifferentiatedModulesTrayProps = {
@@ -33,6 +34,8 @@ describe('DifferentiatedModulesTray', () => {
 
   const renderComponent = (overrides = {}) =>
     render(<DifferentiatedModulesTray {...props} {...overrides} />)
+
+  const OVERRIDES_URL = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides`
 
   it('renders', () => {
     const {getByText} = renderComponent()
@@ -76,6 +79,32 @@ describe('DifferentiatedModulesTray', () => {
     it('does not render the "Assign To" tab', async () => {
       const {queryByRole} = renderComponent({moduleId: undefined})
       expect(queryByRole('tab', {name: /Assign To/})).not.toBeInTheDocument()
+    })
+  })
+
+  describe('In a paced course', () => {
+    beforeEach(() => {
+      ENV.IN_PACED_COURSE = true
+      fetchMock.getOnce(OVERRIDES_URL, [])
+    })
+
+    afterEach(() => {
+      fetchMock.restore()
+    })
+
+    it('shows the course pacing notice', () => {
+      const {getByTestId} = renderComponent()
+      expect(getByTestId('CoursePacingNotice')).toBeInTheDocument()
+    })
+
+    it('does not render the "Assign To" radio select', async () => {
+      const {queryByTestId} = renderComponent()
+      expect(queryByTestId('assign-to-panel-radio-group')).not.toBeInTheDocument()
+    })
+
+    it('does not fetch assignment overrides', () => {
+      renderComponent()
+      expect(fetchMock.calls(OVERRIDES_URL).length).toBe(0)
     })
   })
 })

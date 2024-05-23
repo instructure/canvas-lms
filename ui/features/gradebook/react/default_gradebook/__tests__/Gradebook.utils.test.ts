@@ -43,8 +43,9 @@ import {createGradebook} from './GradebookSpecHelper'
 import {fireEvent, screen, waitFor} from '@testing-library/dom'
 import type {FilterPreset, Filter} from '../gradebook.d'
 import type {SlickGridKeyboardEvent} from '../grid.d'
-import type {Submission, Student, Enrollment, GradingPeriod} from '../../../../../api.d'
+import type {Submission, Student, Enrollment} from '../../../../../api.d'
 import {enrollment, student, enrollmentFilter, appliedFilters, student2} from './fixtures'
+import type {CamelizedGradingPeriod} from '@canvas/grading/grading'
 
 const unsubmittedSubmission: Submission = {
   anonymous_id: 'dNq5T',
@@ -772,12 +773,15 @@ describe('filterStudentBySectionFn', () => {
 
 describe('formatGradingPeriodTitleForDisplay', () => {
   ENV.GRADEBOOK_OPTIONS = {grading_periods_filter_dates_enabled: true}
-  const gp: GradingPeriod = {
+  const gp: CamelizedGradingPeriod = {
     id: '1',
     title: 'GP1',
     startDate: new Date('2021-01-01'),
     endDate: new Date('2021-01-31'),
     closeDate: new Date('2021-02-01'),
+    isClosed: false,
+    isLast: false,
+    weight: 1,
   }
 
   it('returns null if handed a null grading period', () => {

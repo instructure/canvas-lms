@@ -51,6 +51,7 @@ describe LearningObjectDatesController do
                                  "unlock_at" => "2022-01-01T00:00:00Z",
                                  "lock_at" => "2022-01-03T01:00:00Z",
                                  "only_visible_to_overrides" => true,
+                                 "group_category_id" => nil,
                                  "graded" => true,
                                  "visible_to_everyone" => false,
                                  "overrides" => [{
@@ -60,7 +61,8 @@ describe LearningObjectDatesController do
                                    "course_section_id" => @course.default_section.id,
                                    "due_at" => "2022-02-01T01:00:00Z",
                                    "all_day" => false,
-                                   "all_day_date" => "2022-02-01"
+                                   "all_day_date" => "2022-02-01",
+                                   "unassign_item" => false
                                  }]
                                })
     end
@@ -80,6 +82,7 @@ describe LearningObjectDatesController do
                                  "lock_at" => nil,
                                  "only_visible_to_overrides" => false,
                                  "graded" => true,
+                                 "group_category_id" => nil,
                                  "visible_to_everyone" => true,
                                  "overrides" => [{
                                    "id" => @override.id,
@@ -88,7 +91,8 @@ describe LearningObjectDatesController do
                                    "course_section_id" => @course.default_section.id,
                                    "due_at" => "2022-02-01T01:00:00Z",
                                    "all_day" => false,
-                                   "all_day_date" => "2022-02-01"
+                                   "all_day_date" => "2022-02-01",
+                                   "unassign_item" => false
                                  }]
                                })
     end
@@ -114,7 +118,8 @@ describe LearningObjectDatesController do
                                    "course_section_id" => @course.default_section.id,
                                    "due_at" => "2022-02-01T01:00:00Z",
                                    "all_day" => false,
-                                   "all_day_date" => "2022-02-01"
+                                   "all_day_date" => "2022-02-01",
+                                   "unassign_item" => false
                                  }]
                                })
     end
@@ -141,6 +146,7 @@ describe LearningObjectDatesController do
                                  "lock_at" => "2022-05-07T12:00:00Z",
                                  "only_visible_to_overrides" => false,
                                  "graded" => true,
+                                 "group_category_id" => nil,
                                  "visible_to_everyone" => true,
                                  "overrides" => [{
                                    "id" => override.id,
@@ -151,7 +157,8 @@ describe LearningObjectDatesController do
                                    "unlock_at" => "2022-04-05T12:00:00Z",
                                    "lock_at" => "2022-04-07T12:00:00Z",
                                    "all_day" => false,
-                                   "all_day_date" => "2022-04-06"
+                                   "all_day_date" => "2022-04-06",
+                                   "unassign_item" => false
                                  }]
                                })
     end
@@ -171,13 +178,15 @@ describe LearningObjectDatesController do
                                  "lock_at" => "2022-03-05T12:00:00Z",
                                  "only_visible_to_overrides" => false,
                                  "graded" => false,
+                                 "group_category_id" => nil,
                                  "visible_to_everyone" => true,
                                  "overrides" => [{
                                    "id" => override.id,
                                    "discussion_topic_id" => discussion.id,
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
-                                   "lock_at" => "2022-01-04T12:00:00Z"
+                                   "lock_at" => "2022-01-04T12:00:00Z",
+                                   "unassign_item" => false
                                  }]
                                })
     end
@@ -202,12 +211,14 @@ describe LearningObjectDatesController do
                                  "lock_at" => "2022-03-05T12:00:00Z",
                                  "only_visible_to_overrides" => false,
                                  "graded" => false,
+                                 "group_category_id" => nil,
                                  "visible_to_everyone" => false,
                                  "overrides" => [{
                                    "discussion_topic_id" => discussion.id,
                                    "course_section_id" => @course.default_section.id,
                                    "unlock_at" => "2022-01-05T12:00:00Z",
-                                   "lock_at" => "2022-03-05T12:00:00Z"
+                                   "lock_at" => "2022-03-05T12:00:00Z",
+                                   "unassign_item" => false
                                  }]
                                })
     end
@@ -246,6 +257,7 @@ describe LearningObjectDatesController do
                                  "lock_at" => "2022-03-05T12:00:00Z",
                                  "only_visible_to_overrides" => false,
                                  "graded" => false,
+                                 "group_category_id" => nil,
                                  "visible_to_everyone" => false,
                                  "overrides" => [
                                    {
@@ -253,13 +265,15 @@ describe LearningObjectDatesController do
                                      "discussion_topic_id" => discussion.id,
                                      "title" => override.title,
                                      "course_section_id" => section1.id,
-                                     "lock_at" => "2022-01-04T12:00:00Z"
+                                     "lock_at" => "2022-01-04T12:00:00Z",
+                                     "unassign_item" => false
                                    },
                                    {
                                      "discussion_topic_id" => discussion.id,
                                      "course_section_id" => section2.id,
                                      "unlock_at" => "2022-01-05T12:00:00Z",
-                                     "lock_at" => "2022-03-05T12:00:00Z"
+                                     "lock_at" => "2022-03-05T12:00:00Z",
+                                     "unassign_item" => false
                                    }
                                  ]
                                })
@@ -286,7 +300,8 @@ describe LearningObjectDatesController do
                                    "wiki_page_id" => wiki_page.id,
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
-                                   "unlock_at" => "2022-01-04T00:00:00Z"
+                                   "unlock_at" => "2022-01-04T00:00:00Z",
+                                   "unassign_item" => false
                                  }]
                                })
     end
@@ -317,13 +332,15 @@ describe LearningObjectDatesController do
                                  "lock_at" => "2022-02-05T00:00:00Z",
                                  "only_visible_to_overrides" => true,
                                  "graded" => false,
+                                 "group_category_id" => nil,
                                  "visible_to_everyone" => false,
                                  "overrides" => [{
                                    "id" => override.id,
                                    "assignment_id" => wiki_page.assignment.id,
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
-                                   "unlock_at" => "2022-01-07T00:00:00Z"
+                                   "unlock_at" => "2022-01-07T00:00:00Z",
+                                   "unassign_item" => false
                                  }]
                                })
     end
@@ -350,7 +367,35 @@ describe LearningObjectDatesController do
                                    "attachment_id" => attachment.id,
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
-                                   "unlock_at" => "2022-01-04T00:00:00Z"
+                                   "unlock_at" => "2022-01-04T00:00:00Z",
+                                   "unassign_item" => false
+                                 }]
+                               })
+    end
+
+    it "includes an unassigned assignment override" do
+      @override.unassign_item = true
+      @override.save!
+      get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
+      expect(response).to be_successful
+      expect(json_parse).to eq({
+                                 "id" => @assignment.id,
+                                 "due_at" => "2022-01-02T00:00:00Z",
+                                 "unlock_at" => "2022-01-01T00:00:00Z",
+                                 "lock_at" => "2022-01-03T01:00:00Z",
+                                 "only_visible_to_overrides" => true,
+                                 "graded" => true,
+                                 "group_category_id" => nil,
+                                 "visible_to_everyone" => false,
+                                 "overrides" => [{
+                                   "id" => @override.id,
+                                   "assignment_id" => @assignment.id,
+                                   "title" => "Unnamed Course",
+                                   "course_section_id" => @course.default_section.id,
+                                   "due_at" => "2022-02-01T01:00:00Z",
+                                   "all_day" => false,
+                                   "all_day_date" => "2022-02-01",
+                                   "unassign_item" => true
                                  }]
                                })
     end
@@ -372,6 +417,16 @@ describe LearningObjectDatesController do
       expect(response).to be_successful
       overrides = json_parse["overrides"]
       expect(overrides.pluck("id")).to contain_exactly(@override.id, module1_override.id, module2_override.id)
+    end
+
+    it "includes group_category_id on a group assignment" do
+      category = @course.group_categories.create(name: "Student Groups")
+      @assignment.update!(group_category_id: category.id)
+
+      get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
+      expect(response).to be_successful
+      json = json_parse
+      expect(json["group_category_id"]).to eq category.id
     end
 
     it "paginates overrides" do
@@ -799,6 +854,50 @@ describe LearningObjectDatesController do
 
       include_examples "learning object updates", false
       include_examples "learning objects without due dates"
+
+      it "creates an assignment if noop override is included and conditional release is enabled" do
+        @course.conditional_release = true
+        @course.save!
+        expect(learning_object.assignment).to be_nil
+        put :update, params: { **default_params, only_visible_to_overrides: true, assignment_overrides: [{ noop_id: 1 }] }
+        expect(response).to be_no_content
+        learning_object.reload
+        expect(learning_object.assignment).to be_present
+        expect(learning_object.assignment.title).to eq "My Page"
+        expect(learning_object.assignment.only_visible_to_overrides).to be true
+        expect(learning_object.assignment.assignment_overrides.active.pluck(:set_type)).to eq ["Noop"]
+      end
+
+      it "does not create an assignment if noop override is included and conditional release is disabled" do
+        expect(learning_object.assignment).to be_nil
+        put :update, params: { **default_params, only_visible_to_overrides: false, assignment_overrides: [{ noop_id: 1 }] }
+        expect(response).to be_no_content
+        learning_object.reload
+        expect(learning_object.assignment).to be_nil
+        expect(learning_object.only_visible_to_overrides).to be false
+      end
+
+      it "does not create an assignment if noop override is not included" do
+        @course.conditional_release = true
+        @course.save!
+        put :update, params: { **default_params, assignment_overrides: [{ course_section_id: @course.default_section.id }] }
+        expect(response).to be_no_content
+        expect(learning_object.reload.assignment).to be_nil
+      end
+
+      it "creates multiple overrides and sets base dates on the new assignment while adding the Noop override" do
+        @course.conditional_release = true
+        @course.save!
+        expect(learning_object.assignment).to be_nil
+        unlock_at = "2021-07-28T16:34:07Z"
+        assignment_overrides = [{ course_section_id: @course.default_section.id }, { noop_id: 1 }]
+        put :update, params: { **default_params, only_visible_to_overrides: false, unlock_at:, assignment_overrides: }
+        expect(response).to be_no_content
+        learning_object.reload
+        expect(learning_object.assignment.unlock_at.iso8601).to eq unlock_at
+        expect(learning_object.assignment.only_visible_to_overrides).to be false
+        expect(learning_object.assignment.assignment_overrides.active.pluck(:set_type)).to contain_exactly("Noop", "CourseSection")
+      end
     end
 
     context "pages with an assignment" do
@@ -825,6 +924,27 @@ describe LearningObjectDatesController do
       end
 
       include_examples "learning object updates", false
+
+      it "does not remove the assignment if a noop override is removed" do
+        @course.conditional_release = true
+        @course.save!
+        differentiable.assignment_overrides.create!(set_type: "Noop", set_id: 1)
+        put :update, params: { **default_params, assignment_overrides: [] }
+        expect(response).to be_no_content
+        expect(learning_object.reload.assignment).to be_present
+        expect(differentiable.reload.assignment_overrides.active.count).to eq 0
+      end
+
+      it "does not create a new assignment if a noop override is included" do
+        @course.conditional_release = true
+        @course.save!
+        assignment = learning_object.assignment
+        expect(assignment).to be_present
+        put :update, params: { **default_params, assignment_overrides: [{ noop_id: 1 }] }
+        expect(response).to be_no_content
+        expect(learning_object.reload.assignment).to eq assignment
+        expect(differentiable.reload.assignment_overrides.active.pluck(:set_type)).to eq ["Noop"]
+      end
     end
 
     context "files" do

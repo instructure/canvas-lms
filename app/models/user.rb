@@ -1363,6 +1363,9 @@ class User < ActiveRecord::Base
     given { |user| user == self && user.user_can_edit_name? }
     can :rename
 
+    given { |user| user == self }
+    can :change_pronoun
+
     given { |user| courses.any? { |c| c.user_is_instructor?(user) } }
     can :read_profile
 

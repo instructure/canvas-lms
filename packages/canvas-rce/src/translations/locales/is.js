@@ -186,6 +186,9 @@ const locale = {
   "congruent_5a244acd": { "message": "Samræmt" },
   "contains_311f37b7": { "message": "Inniheldur" },
   "content_1440204b": { "message": "Efni" },
+  "content_in_the_editor_will_be_changed_press_cancel_d5bf3357": {
+    "message": "Efni í ritlinum verður breytt. Ýttu á Hætta við til að halda upprunalegu efni."
+  },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "Enn er verið að hlaða upp efninu, ef þú heldur áfram verður það ekki innfellt á réttan hátt."
   },
@@ -778,6 +781,9 @@ const locale = {
   "precedes_196b9aef": { "message": "Kemur á undan" },
   "precedes_equal_20701e84": { "message": "Kemur á undan jafnt" },
   "preformatted_d0670862": { "message": "Forsniðnir" },
+  "prepend_findtext_append_8e0e769a": {
+    "message": "{ prepend }{ findText }{ append }"
+  },
   "prev_f82cbc48": { "message": "Fyrri" },
   "preview_53003fd2": { "message": "Forskoðun" },
   "preview_a3f8f854": { "message": "FORSKOÐA" },
@@ -833,6 +839,9 @@ const locale = {
   "reset_95a81614": { "message": "Endurstilla" },
   "resize_ec83d538": { "message": "Breyta stærð" },
   "restore_auto_save_deccd84b": { "message": "Endurheimta sjálfvirka vistun?" },
+  "result_index_of_max_7db5ad8b": {
+    "message": "Niðurstaða { index } af { max }."
+  },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Afturkross (gefur ekki af sér)"
   },

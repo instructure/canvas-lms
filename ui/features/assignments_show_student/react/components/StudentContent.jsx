@@ -276,10 +276,10 @@ function StudentContent(props) {
   // TODO: Move the button provider up one level
   return (
     <div data-testid="assignments-2-student-view" style={{marginTop: '-36px'}}>
-      <View 
-        as='div' 
-        position='sticky' 
-        stacking='above'
+      <View
+        as="div"
+        position="sticky"
+        stacking="above"
         background="primary"
         style={{top: 0}}
         padding="large 0 0 0"

@@ -26,12 +26,14 @@ import DaySubstitutionCollection from '@canvas/day-substitution/backbone/collect
 import CollectionView from '@canvas/backbone-collection-view'
 import template from '@canvas/day-substitution/jst/DaySubstitutionCollection.handlebars'
 import ContentMigration from '@canvas/content-migrations/backbone/models/ContentMigration'
-import '@canvas/datetime/jquery'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('content_migrations')
 
 ready(() => {
-  $(document).ready(() => $('.datetime_field').datetime_field({addHiddenInput: true}))
+  $(document).ready(() => {
+    renderDatetimeField($('.datetime_field'), {addHiddenInput: true})
+  })
 
   const daySubCollection = new DaySubstitutionCollection()
   const daySubCollectionView = new CollectionView({

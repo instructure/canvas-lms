@@ -90,6 +90,7 @@ export type Student = {
   sortableName: string
   submittedAt: null | Date
   excused?: boolean
+  workflowState: string
 }
 
 export type Props = {
@@ -228,6 +229,10 @@ function observerCount(students, observers) {
   return students.reduce((acc, student) => acc + (observers[student.id]?.length || 0), 0)
 }
 
+function calculateObserverRecipientCount(selectedObservers) {
+  return Object.values(selectedObservers).reduce((acc: number, array: any) => acc + array.length, 0)
+}
+
 function filterStudents(criterion, students, cutoff) {
   const newfilteredStudents: Student[] = []
   for (const student of students) {
@@ -238,12 +243,12 @@ function filterStudents(criterion, students, cutoff) {
         }
         break
       case 'submitted_and_graded':
-        if (student.submittedAt && student.grade) {
+        if (student.submittedAt && student.grade && student.workflowState !== 'pending_review') {
           newfilteredStudents.push(student)
         }
         break
       case 'submitted_and_not_graded':
-        if (student.submittedAt && !student.grade) {
+        if (student.submittedAt && (!student.grade || student.workflowState === 'pending_review')) {
           newfilteredStudents.push(student)
         }
         break
@@ -258,7 +263,7 @@ function filterStudents(criterion, students, cutoff) {
         }
         break
       case 'ungraded':
-        if (!student.grade && !student.excused) {
+        if ((!student.grade && !student.excused) || student.workflowState === 'pending_review') {
           newfilteredStudents.push(student)
         }
         break
@@ -443,7 +448,8 @@ const MessageStudentsWhoDialog = ({
       assignmentGroupName
     )
   )
-  const [observersDisplayed, setObserversDisplayed] = useState(0.0)
+
+  const [observerRecipientCount, setObserverRecipientCount] = useState(0)
 
   useEffect(() => {
     const partialStudentSelection = isLengthBetweenBoundaries(
@@ -491,14 +497,17 @@ const MessageStudentsWhoDialog = ({
 
   useEffect(() => {
     if (!loading && data) {
-      setObserversDisplayed(
-        observerCount(
-          filterStudents(selectedCriterion, sortedStudents, cutoff),
-          observersByStudentID
-        )
-      )
+      setObserverRecipientCount(calculateObserverRecipientCount(selectedObservers))
     }
-  }, [loading, data, selectedCriterion, sortedStudents, cutoff, observersByStudentID])
+  }, [
+    loading,
+    data,
+    selectedCriterion,
+    sortedStudents,
+    cutoff,
+    observersByStudentID,
+    selectedObservers,
+  ])
 
   useEffect(() => {
     return () => {
@@ -517,9 +526,7 @@ const MessageStudentsWhoDialog = ({
     if (newCriterion != null) {
       setSelectedCriterion(newCriterion)
       setFilteredStudents(filterStudents(newCriterion, sortedStudents, cutoff))
-      setObserversDisplayed(
-        observerCount(filterStudents(newCriterion, sortedStudents, cutoff), observersByStudentID)
-      )
+      setObserverRecipientCount(calculateObserverRecipientCount(selectedObservers))
       setSubject(
         defaultSubject(
           newCriterion.value,
@@ -571,9 +578,7 @@ const MessageStudentsWhoDialog = ({
     const criterion = filterCriteria.find(c => c.value === value)
     if (criterion) {
       setFilteredStudents(filterStudents(criterion, sortedStudents, cutoff))
-      setObserversDisplayed(
-        observerCount(filterStudents(criterion, sortedStudents, cutoff), observersByStudentID)
-      )
+      setObserverRecipientCount(calculateObserverRecipientCount(selectedObservers))
       setSubject(
         defaultSubject(
           criterion.value,
@@ -592,9 +597,7 @@ const MessageStudentsWhoDialog = ({
     const criterion = filterCriteria.find(c => c.value === criteriaValue)
     if (criterion) {
       setFilteredStudents(filterStudents(criterion, sortedStudents, cutoff))
-      setObserversDisplayed(
-        observerCount(filterStudents(criterion, sortedStudents, cutoff), observersByStudentID)
-      )
+      setObserverRecipientCount(calculateObserverRecipientCount(selectedObservers))
     }
   }
 
@@ -803,9 +806,10 @@ const MessageStudentsWhoDialog = ({
                 onChange={onStudentsCheckboxChanged}
                 checked={isCheckedStudentsCheckbox}
                 defaultChecked={true}
+                data-testid="total-student-checkbox"
                 label={
                   <Text weight="bold">
-                    {I18n.t('%{studentCount} Students', {studentCount: filteredStudents.length})}
+                    {I18n.t('%{studentCount} Students', {studentCount: selectedStudents.length})}
                   </Text>
                 }
               />
@@ -816,10 +820,11 @@ const MessageStudentsWhoDialog = ({
                 disabled={isDisabledObserversCheckbox}
                 onChange={onObserversCheckboxChanged}
                 checked={isCheckedObserversCheckbox}
+                data-testid="total-observer-checkbox"
                 label={
                   <Text weight="bold">
                     {I18n.t('%{observerCount} Observers', {
-                      observerCount: observersDisplayed,
+                      observerCount: observerRecipientCount,
                     })}
                   </Text>
                 }

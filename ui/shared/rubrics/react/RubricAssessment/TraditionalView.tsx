@@ -22,13 +22,16 @@ import {colors} from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {IconChatLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
-import {Link} from '@instructure/ui-link'
 import {possibleString} from '../Points'
 import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '../types/rubric'
 import {Grid} from '@instructure/ui-grid'
+import {TextInput} from '@instructure/ui-text-input'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {CommentLibrary} from './CommentLibrary'
+import {CriteriaReadonlyComment} from './CriteriaReadonlyComment'
+import {Button} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 const {licorice} = colors
@@ -37,16 +40,22 @@ type TraditionalViewProps = {
   criteria: RubricCriterion[]
   hidePoints: boolean
   isPreviewMode: boolean
+  isPeerReview?: boolean
+  isFreeFormCriterionComments: boolean
   rubricAssessmentData: RubricAssessmentData[]
   rubricTitle: string
+  rubricSavedComments?: Record<string, string[]>
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
 }
 export const TraditionalView = ({
   criteria,
   hidePoints,
   isPreviewMode,
+  isPeerReview,
+  isFreeFormCriterionComments,
   rubricAssessmentData,
   rubricTitle,
+  rubricSavedComments,
   onUpdateAssessmentData,
 }: TraditionalViewProps) => {
   return (
@@ -76,6 +85,17 @@ export const TraditionalView = ({
           </View>
         </Flex.Item>
         <Flex.Item shouldGrow={true}>
+          <View
+            as="div"
+            background="secondary"
+            borderWidth="small 0"
+            height="2.375rem"
+            padding="x-small 0 0 small"
+          >
+            {isFreeFormCriterionComments && <Text weight="bold">{I18n.t('Comments')}</Text>}
+          </View>
+        </Flex.Item>
+        <Flex.Item width="8.875rem" height="2.375rem">
           <View
             as="div"
             background="secondary"
@@ -111,9 +131,12 @@ export const TraditionalView = ({
             key={`criterion-${criterion.id}-${index}`}
             criterion={criterion}
             criterionAssessment={criterionAssessment}
-            hidePoints={hidePoints}
+            rubricSavedComments={rubricSavedComments?.[criterion.id] ?? []}
             isPreviewMode={isPreviewMode}
+            isPeerReview={isPeerReview}
             onUpdateAssessmentData={onUpdateAssessmentData}
+            isFreeFormCriterionComments={isFreeFormCriterionComments}
+            hidePoints={hidePoints}
           />
         )
       })}
@@ -126,18 +149,24 @@ type CriterionRowProps = {
   criterionAssessment?: RubricAssessmentData
   hidePoints: boolean
   isPreviewMode: boolean
+  isPeerReview?: boolean
+  isFreeFormCriterionComments: boolean
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
+  rubricSavedComments: string[]
 }
 const CriterionRow = ({
   criterion,
   criterionAssessment,
   hidePoints,
   isPreviewMode,
+  isPeerReview,
+  isFreeFormCriterionComments,
   onUpdateAssessmentData,
+  rubricSavedComments,
 }: CriterionRowProps) => {
   const [hoveredRatingIndex, setHoveredRatingIndex] = useState<number>()
-  const [isCommentsOpen, setIsCommentsOpen] = useState(hidePoints)
   const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
+  const [isSaveCommentChecked, setIsSaveCommentChecked] = useState(false)
 
   const selectedRatingIndex = criterion.ratings.findIndex(
     rating => rating.points === criterionAssessment?.points
@@ -153,12 +182,27 @@ const CriterionRow = ({
   }
 
   useEffect(() => {
-    if (criterionAssessment?.comments?.length) {
-      setIsCommentsOpen(true)
+    setCommentText(criterionAssessment?.comments ?? '')
+  }, [criterionAssessment, isFreeFormCriterionComments])
+
+  const setPoints = (value: string) => {
+    const points = Number(value)
+
+    if (!value.trim().length || Number.isNaN(points)) {
+      updateAssessmentData({points: undefined})
+      return
     }
 
-    setCommentText(criterionAssessment?.comments ?? '')
-  }, [criterionAssessment])
+    const selectedRating = criterion.ratings.find(rating => rating.points === points)
+
+    updateAssessmentData({
+      points,
+      description: selectedRating?.description,
+    })
+  }
+
+  const hideComments =
+    isFreeFormCriterionComments || (isPreviewMode && !criterionAssessment?.comments?.length)
 
   return (
     <View as="div" maxWidth="100%">
@@ -174,112 +218,184 @@ const CriterionRow = ({
             <Text weight="bold">{criterion.description}</Text>
           </View>
         </Flex.Item>
-        <Flex.Item shouldGrow={true} shouldShrink={true} align="start">
-          <View height="13.75rem">
-            <Grid>
-              <Grid.Row colSpacing="none">
-                {criterion.ratings.map((rating, index) => {
-                  const border = '0 small small 0'
-                  const highlightedBorder = 'medium'
+        {isFreeFormCriterionComments ? (
+          <Flex.Item shouldGrow={true} shouldShrink={true} align="start">
+            <View height="13.75rem">
+              <Grid>
+                <Grid.Row colSpacing="none">
+                  <Grid.Col>
+                    <View
+                      as="div"
+                      height="13.75rem"
+                      padding="x-small small 0 small"
+                      borderWidth="0 small small 0"
+                      overflowY="auto"
+                    >
+                      <Flex direction="column">
+                        {!isPreviewMode && !isPeerReview && rubricSavedComments.length > 0 && (
+                          <>
+                            <Flex.Item>
+                              <Text weight="bold">{I18n.t('Comment Library')}</Text>
+                            </Flex.Item>
+                            <Flex.Item margin="x-small 0 0 0" shouldGrow={true}>
+                              <CommentLibrary
+                                rubricSavedComments={rubricSavedComments}
+                                criterionId={criterion.id}
+                                setCommentText={setCommentText}
+                                updateAssessmentData={updateAssessmentData}
+                              />
+                            </Flex.Item>
+                          </>
+                        )}
+                        <Flex.Item
+                          margin={rubricSavedComments.length > 0 ? 'medium 0 0 0' : '0 0 0 0'}
+                        >
+                          <Text weight="bold">{I18n.t('Comment')}</Text>
+                        </Flex.Item>
+                        <Flex.Item margin="x-small 0 0 0" shouldGrow={true}>
+                          <TextArea
+                            label={
+                              <ScreenReaderContent>
+                                {I18n.t('Criterion Comment')}
+                              </ScreenReaderContent>
+                            }
+                            readOnly={isPreviewMode}
+                            data-testid={`free-form-comment-area-${criterion.id}`}
+                            width="100%"
+                            height="38px"
+                            value={commentText}
+                            onChange={e => setCommentText(e.target.value)}
+                            onBlur={e => updateAssessmentData({comments: e.target.value})}
+                          />
+                        </Flex.Item>
+                        {!isPeerReview && !isPreviewMode && (
+                          <Flex.Item margin="medium 0 x-small 0" shouldGrow={true}>
+                            <Checkbox
+                              checked={isSaveCommentChecked}
+                              label={I18n.t('Save this comment for reuse')}
+                              size="small"
+                              data-testid={`save-comment-checkbox-${criterion.id}`}
+                              onChange={e => {
+                                updateAssessmentData({saveCommentsForLater: !!e.target.checked})
+                                setIsSaveCommentChecked(!!e.target.checked)
+                              }}
+                            />
+                          </Flex.Item>
+                        )}
+                      </Flex>
+                    </View>
+                  </Grid.Col>
+                </Grid.Row>
+              </Grid>
+            </View>
+          </Flex.Item>
+        ) : (
+          <Flex.Item shouldGrow={true} shouldShrink={true} align="start">
+            <View height="13.75rem">
+              <Grid>
+                <Grid.Row colSpacing="none">
+                  {criterion.ratings.map((rating, index) => {
+                    const highlightedBorder = 'medium'
 
-                  const isHovered = hoveredRatingIndex === index
-                  const isSelected = selectedRatingIndex === index
+                    const isHovered = hoveredRatingIndex === index
+                    const isSelected = selectedRatingIndex === index
 
-                  const borderWith = isHovered || isSelected ? highlightedBorder : border
-                  const borderColor = isHovered || isSelected ? 'brand' : 'primary'
+                    const borderWidth =
+                      isHovered || isSelected ? highlightedBorder : '0 small small 0'
+                    const borderColor = isHovered || isSelected ? 'brand' : 'primary'
 
-                  const onClickRating = (ratingIndex: number) => {
-                    if (selectedRatingIndex === ratingIndex) {
-                      updateAssessmentData({points: undefined})
-                    } else {
-                      updateAssessmentData({
-                        points: rating.points,
-                        description: rating.description,
-                      })
+                    const onClickRating = (ratingIndex: number) => {
+                      if (selectedRatingIndex === ratingIndex) {
+                        updateAssessmentData({points: undefined})
+                      } else {
+                        updateAssessmentData({
+                          points: rating.points,
+                          description: rating.description,
+                        })
+                      }
                     }
-                  }
 
-                  return (
-                    // we use the array index because rating may not have an id
-                    /* eslint-disable-next-line react/no-array-index-key */
-                    <Grid.Col key={`criterion-${criterion.id}-ratings-${index}`}>
-                      <View
-                        as="button"
-                        disabled={isPreviewMode}
-                        tabIndex={0}
-                        background="transparent"
-                        height="13.75rem"
-                        width="100%"
-                        borderWidth={borderWith}
-                        borderColor={borderColor}
-                        overflowY="auto"
-                        overflowX="hidden"
-                        cursor={isPreviewMode ? 'not-allowed' : 'pointer'}
-                        padding="xxx-small x-small 0 x-small"
-                        onMouseOver={() => setHoveredRatingIndex(isPreviewMode ? -1 : index)}
-                        onMouseOut={() => setHoveredRatingIndex(undefined)}
-                        onClick={() => onClickRating(index)}
-                        themeOverride={{
-                          borderWidthMedium: isSelected ? '0.188rem' : '0.125rem',
-                          borderColorBrand: licorice,
-                        }}
-                        data-testid={`traditional-criterion-${criterion.id}-ratings-${index}`}
-                      >
-                        <Flex direction="column" height="100%">
-                          <Flex.Item>
-                            <Text weight="bold">{rating.description}</Text>
-                          </Flex.Item>
-                          <Flex.Item margin="small 0 0 0" shouldGrow={true}>
-                            <Text size="small">{rating.longDescription}</Text>
-                          </Flex.Item>
-                          <Flex.Item>
-                            <View
-                              as="div"
-                              textAlign="end"
-                              position="relative"
-                              padding="0 0 x-small 0"
-                              overflowX="hidden"
-                              overflowY="hidden"
-                              minHeight="1.875rem"
-                            >
-                              <View>
-                                <Text
-                                  size="small"
-                                  weight="bold"
-                                  data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-points`}
-                                >
-                                  {!hidePoints && possibleString(rating.points)}
-                                </Text>
+                    return (
+                      // we use the array index because rating may not have an id
+                      /* eslint-disable-next-line react/no-array-index-key */
+                      <Grid.Col key={`criterion-${criterion.id}-ratings-${index}`}>
+                        <View
+                          as="button"
+                          disabled={isPreviewMode}
+                          tabIndex={0}
+                          background="transparent"
+                          height="13.75rem"
+                          width="100%"
+                          borderWidth={borderWidth}
+                          borderColor={borderColor}
+                          overflowY="auto"
+                          overflowX="hidden"
+                          cursor={isPreviewMode ? 'not-allowed' : 'pointer'}
+                          padding="xxx-small x-small 0 x-small"
+                          onMouseOver={() => setHoveredRatingIndex(isPreviewMode ? -1 : index)}
+                          onMouseOut={() => setHoveredRatingIndex(undefined)}
+                          onClick={() => onClickRating(index)}
+                          themeOverride={{
+                            borderWidthMedium: isSelected ? '0.188rem' : '0.125rem',
+                            borderColorBrand: licorice,
+                          }}
+                          data-testid={`traditional-criterion-${criterion.id}-ratings-${index}`}
+                        >
+                          <Flex direction="column" height="100%">
+                            <Flex.Item>
+                              <Text weight="bold">{rating.description}</Text>
+                            </Flex.Item>
+                            <Flex.Item margin="small 0 0 0" shouldGrow={true}>
+                              <Text size="small">{rating.longDescription}</Text>
+                            </Flex.Item>
+                            <Flex.Item>
+                              <View
+                                as="div"
+                                textAlign="end"
+                                position="relative"
+                                padding="0 0 x-small 0"
+                                overflowX="hidden"
+                                overflowY="hidden"
+                                minHeight="1.875rem"
+                              >
+                                <View>
+                                  <Text
+                                    size="small"
+                                    weight="bold"
+                                    data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-points`}
+                                  >
+                                    {!hidePoints && possibleString(rating.points)}
+                                  </Text>
+                                </View>
+
+                                {isSelected && (
+                                  <div
+                                    data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-selected`}
+                                    style={{
+                                      position: 'absolute',
+                                      bottom: '0',
+                                      height: '0',
+                                      width: '0',
+                                      left: '50%',
+                                      borderLeft: '12px solid transparent',
+                                      borderRight: '12px solid transparent',
+                                      borderBottom: `12px solid ${licorice}`,
+                                      transform: 'translateX(-50%)',
+                                    }}
+                                  />
+                                )}
                               </View>
-
-                              {isSelected && (
-                                <div
-                                  data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-selected`}
-                                  style={{
-                                    position: 'absolute',
-                                    bottom: '0',
-                                    height: '0',
-                                    width: '0',
-                                    left: '50%',
-                                    borderLeft: '12px solid transparent',
-                                    borderRight: '12px solid transparent',
-                                    borderBottom: `12px solid ${licorice}`,
-                                    transform: 'translateX(-50%)',
-                                  }}
-                                />
-                              )}
-                            </View>
-                          </Flex.Item>
-                        </Flex>
-                      </View>
-                      {/* </Flex.Item> */}
-                    </Grid.Col>
-                  )
-                })}
-              </Grid.Row>
-            </Grid>
-          </View>
-        </Flex.Item>
+                            </Flex.Item>
+                          </Flex>
+                        </View>
+                      </Grid.Col>
+                    )
+                  })}
+                </Grid.Row>
+              </Grid>
+            </View>
+          </Flex.Item>
+        )}
         {!hidePoints && (
           <Flex.Item width="8.875rem">
             <View
@@ -290,54 +406,66 @@ const CriterionRow = ({
               overflowY="auto"
             >
               <Flex direction="column" height="100%">
-                <Flex.Item shouldGrow={true}>
-                  <Text>{!hidePoints && possibleString(criterion.points)}</Text>
-                </Flex.Item>
-                <Flex.Item>
-                  <View as="div" position="relative" padding="0 0 x-small 0">
-                    <Link
-                      forceButtonRole={true}
-                      isWithinText={false}
-                      disabled={(criterionAssessment?.comments?.length ?? 0) > 0}
-                      data-testid={`rubric-comment-button-${criterion.id}`}
-                      onClick={() => setIsCommentsOpen(!isCommentsOpen)}
-                    >
-                      <IconChatLine />
-                      <View as="span" margin="0 0 0 xx-small">
-                        <Text size="small">Comment</Text>
-                      </View>
-                    </Link>
-                  </View>
-                </Flex.Item>
+                <div style={{display: 'flex', alignItems: 'center'}}>
+                  <Flex.Item margin="small 0 0 0">
+                    <TextInput
+                      renderLabel={
+                        <ScreenReaderContent>{I18n.t('Criterion Score')}</ScreenReaderContent>
+                      }
+                      readOnly={isPreviewMode}
+                      data-testid={`comment-score-${criterion.id}`}
+                      placeholder="--"
+                      width="2.688rem"
+                      height="2.375rem"
+                      value={criterionAssessment?.points?.toString() || ''}
+                      onChange={e => setPoints(e.target.value)}
+                      onBlur={e => setPoints(e.target.value)}
+                    />
+                  </Flex.Item>
+                  <Flex.Item margin="small 0 0 x-small">
+                    <Text>{'/' + possibleString(criterion.points)}</Text>
+                  </Flex.Item>
+                </div>
               </Flex>
             </View>
           </Flex.Item>
         )}
       </Flex>
-      {isCommentsOpen && (
+      {!hideComments && (
         <View
           as="div"
-          padding="small medium"
+          padding="small"
           width="100%"
           borderWidth="0 small small small"
           themeOverride={{paddingMedium: '1.125rem'}}
         >
-          <Flex>
-            <Flex.Item margin="0 small 0 0">
-              <IconChatLine size="small" themeOverride={{sizeSmall: '1.125rem'}} />
-            </Flex.Item>
-            <Flex.Item shouldGrow={true}>
-              <TextArea
-                label={<ScreenReaderContent>{I18n.t('Criterion Comment')}</ScreenReaderContent>}
-                placeholder={I18n.t('Comment')}
-                readOnly={isPreviewMode}
-                data-testid={`comment-text-area-${criterion.id}`}
-                width="100%"
-                value={commentText}
-                onChange={e => setCommentText(e.target.value)}
-                onBlur={e => updateAssessmentData({comments: e.target.value})}
-              />
-            </Flex.Item>
+          <Flex direction="row-reverse">
+            {isPreviewMode ? (
+              <Flex.Item shouldGrow={true}>
+                <CriteriaReadonlyComment commentText={commentText} />
+              </Flex.Item>
+            ) : (
+              <>
+                <Flex.Item>
+                  <View margin="0 0 0 small" themeOverride={{marginSmall: '1rem'}}>
+                    <Button color="secondary" onClick={() => setCommentText('')}>
+                      {I18n.t('Clear')}
+                    </Button>
+                  </View>
+                </Flex.Item>
+                <Flex.Item shouldGrow={true}>
+                  <TextArea
+                    label={I18n.t('Comment')}
+                    placeholder={I18n.t('Leave a comment')}
+                    data-testid={`comment-text-area-${criterion.id}`}
+                    width="100%"
+                    value={commentText}
+                    onChange={e => setCommentText(e.target.value)}
+                    onBlur={e => updateAssessmentData({comments: e.target.value})}
+                  />
+                </Flex.Item>
+              </>
+            )}
           </Flex>
         </View>
       )}

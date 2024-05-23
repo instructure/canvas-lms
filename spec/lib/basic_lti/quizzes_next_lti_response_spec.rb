@@ -331,7 +331,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
           BasicLTI::BasicOutcomes.process_request(tool, xml)
 
           submission = assignment.submissions.where(user_id: @user.id).first
-          expect(submission.workflow_state).to eq Submission.workflow_states.pending_review
+          expect(submission.workflow_state).to eq "pending_review"
         end
       end
 

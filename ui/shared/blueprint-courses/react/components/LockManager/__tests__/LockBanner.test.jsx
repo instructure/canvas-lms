@@ -21,7 +21,6 @@ import {render} from '@testing-library/react'
 import LockBanner from '../LockBanner'
 
 describe('LockBanner component', () => {
-
   const defaultProps = () => ({
     isLocked: true,
     itemLocks: {

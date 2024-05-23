@@ -102,7 +102,9 @@ describe('StudentContextTray/Progress', () => {
           excused: false,
           assignment: {points_possible: pointsPossible},
         }
-        expect(SubmissionProgressBars.displayGrade(submission)).toEqual(`${score}/${pointsPossible}`)
+        expect(SubmissionProgressBars.displayGrade(submission)).toEqual(
+          `${score}/${pointsPossible}`
+        )
       })
     })
 
@@ -118,7 +120,9 @@ describe('StudentContextTray/Progress', () => {
           excused: false,
           assignment: {points_possible: pointsPossible},
         }
-        expect(SubmissionProgressBars.displayGrade(submission)).toEqual(`${score}/${pointsPossible}`)
+        expect(SubmissionProgressBars.displayGrade(submission)).toEqual(
+          `${score}/${pointsPossible}`
+        )
       })
     })
   })
@@ -181,7 +185,9 @@ describe('StudentContextTray/Progress', () => {
           excused: false,
           assignment: {points_possible: pointsPossible},
         }
-        expect(SubmissionProgressBars.displayScreenreaderGrade(submission)).toEqual(`${score}/${pointsPossible}`)
+        expect(SubmissionProgressBars.displayScreenreaderGrade(submission)).toEqual(
+          `${score}/${pointsPossible}`
+        )
       })
     })
 
@@ -197,7 +203,9 @@ describe('StudentContextTray/Progress', () => {
           excused: false,
           assignment: {points_possible: pointsPossible},
         }
-        expect(SubmissionProgressBars.displayScreenreaderGrade(submission)).toEqual(`15.57/${pointsPossible}`)
+        expect(SubmissionProgressBars.displayScreenreaderGrade(submission)).toEqual(
+          `15.57/${pointsPossible}`
+        )
       })
     })
   })
@@ -271,7 +279,9 @@ describe('StudentContextTray/Progress', () => {
       ]
       const wrapper = render(<SubmissionProgressBars submissions={submissions} />)
 
-      const ProgressBarBars = wrapper.container.querySelectorAll(".StudentContextTray-Progress__Bar") // Assuming ProgressBar is the name of the component
+      const ProgressBarBars = wrapper.container.querySelectorAll(
+        '.StudentContextTray-Progress__Bar'
+      ) // Assuming ProgressBar is the name of the component
       expect(ProgressBarBars.length).toEqual(submissions.length)
     })
 

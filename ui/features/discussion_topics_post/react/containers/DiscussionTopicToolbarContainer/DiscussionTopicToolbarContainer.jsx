@@ -20,14 +20,18 @@ import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionPostToolbar} from '../../components/DiscussionPostToolbar/DiscussionPostToolbar'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
-import {DiscussionManagerUtilityContext, SEARCH_TERM_DEBOUNCE_DELAY, SearchContext} from '../../utils/constants'
+import {
+  DiscussionManagerUtilityContext,
+  SEARCH_TERM_DEBOUNCE_DELAY,
+  SearchContext,
+} from '../../utils/constants'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import { TranslationControls } from '../../components/TranslationControls/TranslationControls'
+import {TranslationControls} from '../../components/TranslationControls/TranslationControls'
 
 export const DiscussionTopicToolbarContainer = props => {
   const {searchTerm, filter, sort, setSearchTerm, setFilter, setSort} = useContext(SearchContext)
-  const {showTranslationControl} = useContext(DiscussionManagerUtilityContext);
+  const {showTranslationControl} = useContext(DiscussionManagerUtilityContext)
   const [currentSearchValue, setCurrentSearchValue] = useState(searchTerm || '')
 
   useEffect(() => {
@@ -46,6 +50,10 @@ export const DiscussionTopicToolbarContainer = props => {
 
   const onSortClick = () => {
     sort === 'asc' ? setSort('desc') : setSort('asc')
+  }
+
+  const onSummarizeClick = () => {
+    props.setIsSummaryEnabled(true)
   }
 
   const getGroupsMenuTopics = () => {
@@ -83,6 +91,8 @@ export const DiscussionTopicToolbarContainer = props => {
         canReplyAnonymously={props.discussionTopic.canReplyAnonymously}
         setUserSplitScreenPreference={props.setUserSplitScreenPreference}
         userSplitScreenPreference={props.userSplitScreenPreference}
+        onSummarizeClick={onSummarizeClick}
+        isSummaryEnabled={props.isSummaryEnabled}
         closeView={props.closeView}
         discussionId={props.discussionTopic._id}
         typeName={props.discussionTopic.__typename?.toLowerCase()}
@@ -101,6 +111,8 @@ DiscussionTopicToolbarContainer.propTypes = {
   discussionTopic: Discussion.shape,
   setUserSplitScreenPreference: PropTypes.func,
   userSplitScreenPreference: PropTypes.bool,
+  isSummaryEnabled: PropTypes.bool,
+  setIsSummaryEnabled: PropTypes.func,
   closeView: PropTypes.func,
 }
 

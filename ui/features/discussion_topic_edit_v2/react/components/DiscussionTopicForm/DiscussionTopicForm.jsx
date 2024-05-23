@@ -40,7 +40,6 @@ import CanvasMultiSelect from '@canvas/multi-select'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {Alert} from '@instructure/ui-alerts'
 import theme from '@instructure/canvas-theme'
-
 import {FormControlButtons} from './FormControlButtons'
 import {GradedDiscussionOptions} from '../DiscussionOptions/GradedDiscussionOptions'
 import {NonGradedDateOptions} from '../DiscussionOptions/NonGradedDateOptions'
@@ -64,6 +63,8 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {prepareAssignmentPayload, prepareCheckpointsPayload} from '../../util/payloadPreparations'
 import {validateTitle, validateFormFields} from '../../util/formValidation'
 
+import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
+
 import {
   addNewGroupCategoryToCache,
   buildAssignmentOverrides,
@@ -74,6 +75,29 @@ import {flushSync} from 'react-dom'
 import {SavingDiscussionTopicOverlay} from '../SavingDiscussionTopicOverlay/SavingDiscussionTopicOverlay'
 
 const I18n = useI18nScope('discussion_create')
+
+export const getAbGuidArray = event => {
+  const {data} = event.data
+
+  return Array.isArray(data) ? data : [data]
+}
+
+export const isGuidDataValid = event => {
+  if (event?.data?.subject !== 'assignment.set_ab_guid') {
+    return false
+  }
+
+  const abGuidArray = getAbGuidArray(event)
+
+  const regexPattern =
+    /^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/
+
+  if (abGuidArray.find(abGuid => !regexPattern.test(abGuid))) {
+    return false
+  }
+
+  return true
+}
 
 export default function DiscussionTopicForm({
   isEditing,
@@ -229,6 +253,8 @@ export default function DiscussionTopicForm({
     currentDiscussionTopic?.assignment?.importantDates || false
   )
 
+  const [abGuid, setAbGuid] = useState(null)
+
   // Checkpoints states
   const [isCheckpoints, setIsCheckpoints] = useState(
     currentDiscussionTopic?.assignment?.hasSubAssignments || false
@@ -319,6 +345,27 @@ export default function DiscussionTopicForm({
     if (!isGroupDiscussion) setGroupCategoryId(null)
   }, [isGroupDiscussion])
 
+  const setAbGuidPostMessageListener = event => {
+    const validatedAbGuid = isGuidDataValid(event)
+    if (validatedAbGuid) {
+      setAbGuid(getAbGuidArray(event))
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('message', setAbGuidPostMessageListener)
+
+    if (document.querySelector('#assignment_external_tools') && ENV.context_is_not_group) {
+      AssignmentExternalTools.attach(
+        document.querySelector('#assignment_external_tools'),
+        'assignment_edit',
+        parseInt(ENV.context_id, 10),
+        parseInt(currentDiscussionTopic?.assignment?._id, 10)
+      )
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const {
     shouldShowTodoSettings,
     shouldShowPostToSectionOption,
@@ -360,6 +407,7 @@ export default function DiscussionTopicForm({
       lockAt: availableUntil,
       // Conditional payload properties
       assignment: prepareAssignmentPayload(
+        abGuid,
         isEditing,
         title,
         pointsPossible,
@@ -455,7 +503,7 @@ export default function DiscussionTopicForm({
         setTitleValidationMessages,
         setAvailabilityValidationMessages,
         shouldShowPostToSectionOption,
-        sectionIdsToPostTo,
+        sectionIdsToPostTo
       )
     ) {
       const payload = createSubmitPayload(shouldPublish)
@@ -758,7 +806,7 @@ export default function DiscussionTopicForm({
               </View>
               <Tooltip renderTip={checkpointsToolTipText} on={['hover', 'focus']} color="primary">
                 <div
-                  style={{display: "inline-block", marginLeft: theme.spacing.xxSmall}}
+                  style={{display: 'inline-block', marginLeft: theme.spacing.xxSmall}}
                   // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                   tabIndex="0"
                 >
@@ -962,6 +1010,10 @@ export default function DiscussionTopicForm({
               }}
             />
           ))}
+        {(!isAnnouncement || !ENV.ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS) &&
+          ENV.context_is_not_group && (
+            <div id="assignment_external_tools" data-testid="assignment-external-tools" />
+          )}
         <FormControlButtons
           isAnnouncement={isAnnouncement}
           isEditing={isEditing}

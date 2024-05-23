@@ -955,6 +955,71 @@ describe WikiPage do
       mod.save!
       expect(page.reload.locked_for?(@student)).not_to have_key :unlock_at
     end
+
+    context "with differentiated_modules enabled" do
+      before(:once) do
+        Account.site_admin.enable_feature! :differentiated_modules
+        course_with_student(active_all: true)
+        @page = @course.wiki_pages.create!(title: "page")
+      end
+
+      it "is unlocked by default" do
+        expect(@page.locked_for?(@student)).to be_falsey
+      end
+
+      it "is unlocked for past unlock_at date" do
+        timestamp = 1.week.ago
+        @page.update(unlock_at: timestamp)
+        expect(@page.locked_for?(@student)).to be_falsey
+      end
+
+      it "is unlocked for future lock_at date" do
+        timestamp = 1.week.from_now
+        @page.update(lock_at: timestamp)
+        expect(@page.locked_for?(@student)).to be_falsey
+      end
+
+      it "is locked for future unlock_at date" do
+        timestamp = 1.week.from_now
+        @page.update(unlock_at: timestamp)
+        lock_info = @page.locked_for?(@student)
+        expect(lock_info).to be_truthy
+        expect(lock_info[:unlock_at]).to eq timestamp
+      end
+
+      it "is locked for past lock_at date" do
+        timestamp = 1.week.ago
+        @page.update(lock_at: timestamp)
+        lock_info = @page.locked_for?(@student)
+        expect(lock_info).to be_truthy
+        expect(lock_info[:lock_at]).to eq timestamp
+      end
+
+      it "locks for unpublished module" do
+        cm = @course.context_modules.create!(name: "module", workflow_state: "unpublished")
+        cm.add_item(type: "wiki_page", id: @page.id)
+        @page.update!(could_be_locked: true)
+        lock_info = @page.locked_for?(@student)
+        expect(lock_info).to be_truthy
+      end
+
+      it "locks for student with override" do
+        timestamp = 1.week.from_now
+        ao = @page.assignment_overrides.create!(unlock_at: timestamp, unlock_at_overridden: true)
+        ao.assignment_override_students.create!(user: @student)
+        lock_info = @page.locked_for?(@student)
+        expect(lock_info).to be_truthy
+        expect(lock_info[:unlock_at]).to eq timestamp
+      end
+
+      it "unlocks for student with override" do
+        @page.update(lock_at: 1.week.ago)
+        ao = @page.assignment_overrides.create!(lock_at: 1.week.from_now, lock_at_overridden: true)
+        ao.assignment_override_students.create!(user: @student)
+        lock_info = @page.locked_for?(@student)
+        expect(lock_info).to be_falsey
+      end
+    end
   end
 
   describe "revised_at" do

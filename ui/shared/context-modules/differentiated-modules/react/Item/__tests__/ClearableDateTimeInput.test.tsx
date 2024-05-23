@@ -29,6 +29,7 @@ describe('ClearableDateTimeInput', () => {
     onChange: jest.fn(),
     onClear: jest.fn(),
     breakpoints: {},
+    clearButtonAltLabel: 'Clear input for 2 students',
   }
 
   const renderComponent = (overrides = {}) =>
@@ -39,14 +40,19 @@ describe('ClearableDateTimeInput', () => {
   })
 
   it('renders', () => {
-    const {getByText, getByRole} = renderComponent()
+    const {getByText} = renderComponent()
     expect(getByText('Pick a date')).toBeInTheDocument()
-    expect(getByRole('button', {name: 'Clear'})).toBeInTheDocument()
+    expect(getByText('Clear')).toBeInTheDocument()
+  })
+
+  it('renders accessible label for clear button', () => {
+    const {getByText} = renderComponent()
+    expect(getByText('Clear input for 2 students')).toBeInTheDocument()
   })
 
   it('disables clear button if blueprint-locked', () => {
-    const {getByRole} = renderComponent({disabled: true})
-    expect(getByRole('button', {name: 'Clear'})).toBeDisabled()
+    const {getByText} = renderComponent({disabled: true})
+    expect(getByText('Clear').closest('button')).toBeDisabled()
   })
 
   it('calls onChange when date is changed', () => {
@@ -58,8 +64,8 @@ describe('ClearableDateTimeInput', () => {
   })
 
   it('calls onClear when clear button is clicked', () => {
-    const {getByRole} = renderComponent()
-    getByRole('button', {name: 'Clear'}).click()
+    const {getByText} = renderComponent()
+    getByText('Clear').click()
     expect(props.onClear).toHaveBeenCalled()
   })
 })

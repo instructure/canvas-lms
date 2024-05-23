@@ -40,39 +40,45 @@ describe('Footer', () => {
   })
 
   it('labels the update button from the prop', () => {
-    const {getByRole} = renderComponent({saveButtonLabel: 'Save'})
-    expect(getByRole('button', {name: 'Save'})).toBeInTheDocument()
+    const {getByTestId} = renderComponent({saveButtonLabel: 'Save'})
+    expect(getByTestId('differentiated_modules_save_button')).toBeInTheDocument()
   })
 
   it('calls onDismiss when cancel button is clicked', () => {
-    const {getByRole} = renderComponent()
-    getByRole('button', {name: /cancel/i}).click()
+    const {getByTestId} = renderComponent()
+    getByTestId('differentiated_modules_cancel_button').click()
     expect(props.onDismiss).toHaveBeenCalled()
   })
 
   it('calls onUpdate when update button is clicked', () => {
-    const {getByRole} = renderComponent()
-    getByRole('button', {name: 'Save'}).click()
+    const {getByTestId} = renderComponent()
+    getByTestId('differentiated_modules_save_button').click()
     expect(props.onUpdate).toHaveBeenCalled()
   })
 
   it('calls onUpdate when in-error', () => {
-    const {getByRole} = renderComponent({hasErrors: true})
-    getByRole('button', {name: 'Save'}).click()
+    const {getByTestId} = renderComponent({hasErrors: true})
+    getByTestId('differentiated_modules_save_button').click()
     expect(props.onUpdate).toHaveBeenCalled()
   })
 
   it('does not display the error tooltip when not in-error', () => {
-    const {getByRole, queryByText} = renderComponent()
-    const savebtn = getByRole('button', {name: 'Save'})
+    const {getByTestId, queryByText} = renderComponent()
+    const savebtn = getByTestId('differentiated_modules_save_button')
     savebtn.focus()
     expect(queryByText('Please fix errors before continuing')).not.toBeInTheDocument()
   })
 
   it('displays the error tooltip when in-error', () => {
-    const {getByRole, queryByText} = renderComponent({hasErrors: true})
-    const savebtn = getByRole('button', {name: 'Save'})
+    const {getByTestId, queryByText} = renderComponent({hasErrors: true})
+    const savebtn = getByTestId('differentiated_modules_save_button')
     savebtn.focus()
     expect(queryByText('Please fix errors before continuing')).toBeInTheDocument()
+  })
+
+  it('disables save when disableSave flag is set', () => {
+    const {getByTestId} = renderComponent({disableSave: true})
+    const savebtn = getByTestId('differentiated_modules_save_button')
+    expect(savebtn).toBeDisabled()
   })
 })

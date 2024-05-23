@@ -22,7 +22,8 @@ import $ from 'jquery'
 import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym'
 import AvatarWidget from '@canvas/avatar-dialog-view'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime/jquery' /* datetimeString, time_field, datetime_field */
+import {datetimeString} from '@canvas/datetime/date-functions'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
@@ -240,7 +241,7 @@ $('.delete_pseudonym_link').click(function (event) {
       message: I18n.t('confirms.delete_login', 'Are you sure you want to delete this login?'),
     })
 })
-$('.datetime_field').datetime_field()
+renderDatetimeField($('.datetime_field'))
 $('.expires_field').bind('change keyup', function () {
   $(this).closest('td').find('.hint').showIf(!$(this).val())
 })
@@ -302,9 +303,9 @@ $('#access_token_form').formSubmit({
     $('#no_approved_integrations').hide()
     $('#access_tokens_holder').show()
     const $token = $('.access_token.blank:first').clone(true).removeClass('blank')
-    data.created = $.datetimeString(data.created_at) || '--'
+    data.created = datetimeString(data.created_at) || '--'
     data.expires =
-      $.datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
+      datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
     data.used = '--'
     $token.fillTemplateData({
       data,
@@ -343,10 +344,10 @@ $('#token_details_dialog .regenerate_token').click(function () {
     'PUT',
     {'access_token[regenerate]': '1'},
     data => {
-      data.created = $.datetimeString(data.created_at) || '--'
+      data.created = datetimeString(data.created_at) || '--'
       data.expires =
-        $.datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
-      data.used = $.datetimeString(data.last_used_at) || '--'
+        datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
+      data.used = datetimeString(data.last_used_at) || '--'
       data.visible_token = data.visible_token || 'protected'
       $dialog
         .fillTemplateData({data})
@@ -403,10 +404,10 @@ $('.show_token_link').click(function (event) {
       'GET',
       {},
       data => {
-        data.created = $.datetimeString(data.created_at) || '--'
+        data.created = datetimeString(data.created_at) || '--'
         data.expires =
-          $.datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
-        data.used = $.datetimeString(data.last_used_at) || '--'
+          datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
+        data.used = datetimeString(data.last_used_at) || '--'
         data.visible_token = data.visible_token || 'protected'
         $token.data('token', data)
         tokenLoaded(data)

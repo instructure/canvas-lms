@@ -265,6 +265,11 @@ describe "Default Account Reports" do
     @section5.root_account_id = @account.id
     @section5.save!
     @section5.destroy
+
+    @section6 = CourseSection.new(name: "CS_01", course: @course4)
+    @section6.sis_source_id = "cs_section_1"
+    @section6.root_account_id = @account.id
+    @section6.save!
   end
 
   def create_some_enrolled_users
@@ -1009,9 +1014,21 @@ describe "Default Account Reports" do
         @section1.crosslist_to_course(@course2)
         parameters = {}
         parameters["sections"] = true
-        parsed = read_report("provisioning_csv", { params: parameters, order: 4 })
-        expect(parsed.length).to eq 4
-        expect(parsed).to match_array [[@section1.id.to_s,
+        parsed = read_report("provisioning_csv", { params: parameters, order: 5 })
+        expect(parsed.length).to eq 5
+        expect(parsed).to match_array [[@section6.id.to_s,
+                                        @section6.sis_source_id,
+                                        @course4.id.to_s,
+                                        nil,
+                                        nil,
+                                        @section6.name,
+                                        "active",
+                                        nil,
+                                        nil,
+                                        @account.id.to_s,
+                                        nil,
+                                        "false"],
+                                       [@section1.id.to_s,
                                         @section1.sis_source_id,
                                         @course2.id.to_s,
                                         @course2.sis_source_id,
@@ -1063,12 +1080,25 @@ describe "Default Account Reports" do
 
       it "runs the provisioning report with deleted sections" do
         @section1.destroy
+        @section6.destroy
         parameters = {}
         parameters["sections"] = true
         parameters["include_deleted"] = true
-        parsed = read_report("provisioning_csv", { params: parameters, order: 4 })
-        expect(parsed.length).to eq 4
-        expect(parsed).to match_array [[@section4.id.to_s,
+        parsed = read_report("provisioning_csv", { params: parameters, order: 5 })
+        expect(parsed.length).to eq 5
+        expect(parsed).to match_array [[@section6.id.to_s,
+                                        @section6.sis_source_id,
+                                        @course4.id.to_s,
+                                        nil,
+                                        nil,
+                                        @section6.name,
+                                        "deleted",
+                                        nil,
+                                        nil,
+                                        @account.id.to_s,
+                                        nil,
+                                        "false"],
+                                       [@section4.id.to_s,
                                         nil,
                                         @course2.id.to_s,
                                         "SIS_COURSE_ID_2",

@@ -18,29 +18,47 @@
 
 import '@instructure/canvas-theme'
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {render, screen} from '@testing-library/react'
 import StudentLastAttended from '../StudentLastAttended'
 
-const defaultProps = () => ({
+const defaultProps = (props = {}) => ({
   defaultDate: '2018-03-04T07:00:00.000Z',
   courseID: '1',
   studentID: '1',
+  ...props,
 })
 
-test('renders the StudentLastAttended component', () => {
-  const tree = mount(<StudentLastAttended {...defaultProps()} />)
-  expect(tree.exists()).toBe(true)
-})
+const renderStudentLastAttended = (props = {}) => {
+  const ref = React.createRef()
+  const wrapper = render(<StudentLastAttended {...defaultProps(props)} {...props} ref={ref} />)
 
-test('renders loading component when loading', () => {
-  const tree = shallow(<StudentLastAttended {...defaultProps()} />)
-  tree.setState({loading: true})
-  const node = tree.find('Spinner')
-  expect(node).toHaveLength(1)
-})
+  return {ref, ...wrapper}
+}
 
-test('onDateSubmit calls correct function', () => {
-  const tree = mount(<StudentLastAttended {...defaultProps()} />)
-  const node = tree.find('Text').at(0)
-  expect(node.text()).toBe('Last day attended')
+describe('StudentLastAttended', () => {
+  it('renders the StudentLastAttended component', () => {
+    renderStudentLastAttended()
+
+    expect(screen.getByText('Last day attended')).toBeInTheDocument()
+  })
+
+  it('renders loading component when loading', () => {
+    const {ref} = renderStudentLastAttended()
+
+    ref.current.setState({loading: true})
+
+    expect(screen.getByText('Loading last attended date')).toBeInTheDocument()
+  })
+
+  it('onDateSubmit posts date to the endpoint if it differs', () => {
+    const {ref} = renderStudentLastAttended()
+    const newDate = new Date('2018-03-05T07:00:00.000Z')
+
+    ref.current.state.selectedDate = new Date('2018-03-04T07:00:00.000Z')
+    jest.spyOn(ref.current, 'postDateToBackend')
+
+    ref.current.onDateSubmit(newDate)
+
+    expect(ref.current.postDateToBackend).toHaveBeenCalledWith(newDate.toISOString())
+  })
 })

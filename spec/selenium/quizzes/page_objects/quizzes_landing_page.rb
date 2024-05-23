@@ -24,7 +24,7 @@ require_relative "../../common"
 module QuizzesLandingPage
   #------------------------------ Selectors -----------------------------
   def quiz_assign_to_button_selector
-    ".assign-to-link"
+    "button.assign-to-link"
   end
 
   #------------------------------ Elements ------------------------------

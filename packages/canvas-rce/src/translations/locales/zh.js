@@ -169,6 +169,9 @@ const locale = {
   "congruent_5a244acd": { "message": "全等" },
   "contains_311f37b7": { "message": "包含" },
   "content_1440204b": { "message": "内容" },
+  "content_in_the_editor_will_be_changed_press_cancel_d5bf3357": {
+    "message": "编辑器中的内容将更改。按“取消”以保留原始内容。"
+  },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "内容仍在上传中，如果您继续，该内容将不会正确嵌入。"
   },
@@ -697,6 +700,9 @@ const locale = {
   "precedes_196b9aef": { "message": "先于" },
   "precedes_equal_20701e84": { "message": "先于等于" },
   "preformatted_d0670862": { "message": "预定义格式" },
+  "prepend_findtext_append_8e0e769a": {
+    "message": "{ prepend }{ findText }{ append }"
+  },
   "prev_f82cbc48": { "message": "上一个" },
   "preview_53003fd2": { "message": "预览" },
   "preview_a3f8f854": { "message": "预览" },
@@ -748,6 +754,7 @@ const locale = {
   "reset_95a81614": { "message": "重置" },
   "resize_ec83d538": { "message": "调整大小" },
   "restore_auto_save_deccd84b": { "message": "是否恢复自动保存？" },
+  "result_index_of_max_7db5ad8b": { "message": "结果 { index }/{ max }。" },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "反十字转门（不产生）"
   },

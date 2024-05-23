@@ -99,6 +99,7 @@ export const buildAssignmentOverrides = assignment => {
       dueDate: override.dueAt,
       availableFrom: override.unlockAt,
       availableUntil: override.lockAt,
+      unassignItem: override.unassignItem,
       ...(override.contextModule && {
         context_module_id: override.contextModule._id,
         context_module_name: override.contextModule.name,

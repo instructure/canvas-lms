@@ -63,12 +63,13 @@ export default function RequirementCountInput({
             value="all"
             label={<ScreenReaderContent>{I18n.t('Complete all')}</ScreenReaderContent>}
             onClick={() => onChangeRequirementCount('all')}
+            aria-describedby="complete-all-subtitle"
           />
         </Flex.Item>
         <Flex.Item>
           <Text>{I18n.t('Complete all')}</Text>
           <View as="div">
-            <Text color="secondary" size="small">
+            <Text color="secondary" size="small" id="complete-all-subtitle">
               {I18n.t('Students must complete all of these requirements.')}
             </Text>
           </View>
@@ -92,12 +93,13 @@ export default function RequirementCountInput({
             value="one"
             label={<ScreenReaderContent>{I18n.t('Complete one')}</ScreenReaderContent>}
             onClick={() => onChangeRequirementCount('one')}
+            aria-describedby="complete-one-subtitle"
           />
         </Flex.Item>
         <Flex.Item>
           <Text>{I18n.t('Complete one')}</Text>
           <View as="div">
-            <Text color="secondary" size="small">
+            <Text color="secondary" size="small" id="complete-one-subtitle">
               {I18n.t('Students must complete one of these requirements.')}
             </Text>
           </View>

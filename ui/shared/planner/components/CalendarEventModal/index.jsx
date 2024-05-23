@@ -114,7 +114,7 @@ export default class CalendarEventModal extends React.Component {
         size="small"
         open={this.props.open}
         onDismiss={this.props.requestClose}
-        shouldCloseOnDocumentClick
+        shouldCloseOnDocumentClick={true}
       >
         <Modal.Header>
           <Heading>
@@ -129,7 +129,7 @@ export default class CalendarEventModal extends React.Component {
           />
         </Modal.Header>
         <Modal.Body padding="medium">
-          <List isUnstyled itemSpacing="small">
+          <List isUnstyled={true} itemSpacing="small">
             {this.renderCalendarRow()}
             {this.renderDateTimeRow()}
             {this.renderLocationRow()}

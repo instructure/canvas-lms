@@ -91,7 +91,7 @@ describe('DiscussionRow', () => {
       props
     )
 
-  const openManageMenu = async (title) => {
+  const openManageMenu = async title => {
     const menu = screen.getByText(`Manage options for ${title}`)
     expect(menu).toBeInTheDocument()
     await user.click(menu)
@@ -126,7 +126,7 @@ describe('DiscussionRow', () => {
     const link = screen.getByTestId(`discussion-link-${discussion.id}`)
     expect(link.textContent.includes(discussion.title)).toBe(true)
     expect(link.tagName.toLowerCase()).toBe('a')
-    expect(link.getAttribute('href')).toBe('https://example.com');
+    expect(link.getAttribute('href')).toBe('https://example.com')
   })
 
   it('when feature flag is off, anonymous title is plain text ', () => {
@@ -162,7 +162,7 @@ describe('DiscussionRow', () => {
         successMessage: 'Lock discussion blerp succeeded',
         failMessage: 'Lock discussion blerp failed',
       }),
-      expect.anything(),
+      expect.anything()
     )
   })
 
@@ -191,7 +191,7 @@ describe('DiscussionRow', () => {
         successMessage: 'Unlock discussion blerp succeeded',
         failMessage: 'Unlock discussion blerp failed',
       }),
-      expect.anything(),
+      expect.anything()
     )
   })
 

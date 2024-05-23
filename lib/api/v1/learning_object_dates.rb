@@ -28,6 +28,7 @@ module Api::V1::LearningObjectDates
     lock_at
     only_visible_to_overrides
     visible_to_everyone
+    group_category_id
   ].freeze
   GRADED_MODELS = [Assignment, Quizzes::Quiz].freeze
   LOCKABLE_PSEUDO_COLUMNS = %i[due_dates availability_dates].freeze

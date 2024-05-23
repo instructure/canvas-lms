@@ -153,7 +153,9 @@ CalendarHeader.prototype._selectAgenda = function (_event) {
 
 CalendarHeader.prototype._triggerWeek = function (_event) {
   if (ENV.FEATURES?.instui_header) {
-    document.dispatchEvent(new CustomEvent('calendar:header:select_view', {detail: {viewName: 'week'}}))
+    document.dispatchEvent(
+      new CustomEvent('calendar:header:select_view', {detail: {viewName: 'week'}})
+    )
   }
 
   return this.trigger('week')
@@ -161,7 +163,9 @@ CalendarHeader.prototype._triggerWeek = function (_event) {
 
 CalendarHeader.prototype._triggerMonth = function (_event) {
   if (ENV.FEATURES?.instui_header) {
-    document.dispatchEvent(new CustomEvent('calendar:header:select_view', {detail: {viewName: 'month'}}))
+    document.dispatchEvent(
+      new CustomEvent('calendar:header:select_view', {detail: {viewName: 'month'}})
+    )
   }
 
   return this.trigger('month')
@@ -169,9 +173,11 @@ CalendarHeader.prototype._triggerMonth = function (_event) {
 
 CalendarHeader.prototype._triggerAgenda = function (_event) {
   if (ENV.FEATURES?.instui_header) {
-    document.dispatchEvent(new CustomEvent('calendar:header:select_view', {detail: {viewName: 'agenda'}}))
+    document.dispatchEvent(
+      new CustomEvent('calendar:header:select_view', {detail: {viewName: 'agenda'}})
+    )
   }
-  
+
   return this.trigger('agenda')
 }
 
@@ -199,7 +205,7 @@ CalendarHeader.prototype._handleKeyDownEvent = function (event) {
   }
 }
 
-CalendarHeader.prototype._loadObjects = function(options = null) {
+CalendarHeader.prototype._loadObjects = function (options = null) {
   this.navigator = new CalendarNavigator({
     el: this.$navigator,
     size: options?.size,
@@ -211,15 +217,15 @@ CalendarHeader.prototype._loadObjects = function(options = null) {
   this.connectEvents()
 }
 
-CalendarHeader.prototype.afterRender = function() {
+CalendarHeader.prototype.afterRender = function () {
   if (!ENV.FEATURES?.instui_header) {
     return this._loadObjects()
   }
 
   ReactDOM.render(
-    <CalendarHeaderComponent 
+    <CalendarHeaderComponent
       bridge={{
-        onLoadReady: (options) => {
+        onLoadReady: options => {
           if (this.navigator) return
 
           this.$calendarViewButtons = this.$el.find('.calendar_view_buttons')
@@ -230,8 +236,9 @@ CalendarHeader.prototype.afterRender = function() {
 
           this._loadObjects(options)
         },
-        onChangeSelectViewMode: (viewName) => this.selectView(viewName),
-      }} />, 
+        onChangeSelectViewMode: viewName => this.selectView(viewName),
+      }}
+    />,
     this.$el.find('#calendar_header_component')[0]
   )
 }

@@ -167,15 +167,19 @@ class EffectiveDueDates
           t.context_module_id,
           t.content_id,
           qt.context_module_id as quiz_context_module_id,
-          q.assignment_id as quiz_assignment_id
+          q.assignment_id as quiz_assignment_id,
+          dt.context_module_id as discussion_context_module_id,
+          d.assignment_id as discussion_assignment_id
         FROM
           models a
         LEFT JOIN #{ContentTag.quoted_table_name} t ON t.content_id = a.id AND t.content_type = 'Assignment'
         LEFT JOIN #{Quizzes::Quiz.quoted_table_name} q ON q.assignment_id = a.id
         LEFT JOIN #{ContentTag.quoted_table_name} qt ON qt.content_id = q.id AND qt.content_type = 'Quizzes::Quiz'
+        LEFT JOIN #{DiscussionTopic.quoted_table_name} d ON d.assignment_id = a.id
+        LEFT JOIN #{ContentTag.quoted_table_name} dt ON dt.content_id = d.id AND dt.content_type = 'DiscussionTopic'
         WHERE
-          COALESCE(t.tag_type, qt.tag_type) = 'context_module'
-          AND COALESCE(t.workflow_state, qt.workflow_state) <> 'deleted'
+          COALESCE(t.tag_type, qt.tag_type, dt.tag_type) = 'context_module'
+          AND COALESCE(t.workflow_state, qt.workflow_state, dt.workflow_state) <> 'deleted'
       ),
 
       modules AS (
@@ -183,7 +187,7 @@ class EffectiveDueDates
           m.id
         FROM
           tags t
-        INNER JOIN #{ContextModule.quoted_table_name} m ON m.id = COALESCE(t.context_module_id, t.quiz_context_module_id)
+        INNER JOIN #{ContextModule.quoted_table_name} m ON m.id = COALESCE(t.context_module_id, t.quiz_context_module_id, t.discussion_context_module_id)
         WHERE
           m.workflow_state <>'deleted'
       ),
@@ -203,8 +207,8 @@ class EffectiveDueDates
           modules m
             INNER JOIN #{AssignmentOverride.quoted_table_name} o on o.context_module_id = m.id
         WHERE
-           o.workflow_state = 'active' AND m.id = COALESCE(t.context_module_id, t.quiz_context_module_id) AND
-           a.id = COALESCE(t.content_id, t.quiz_assignment_id)
+           o.workflow_state = 'active' AND m.id = COALESCE(t.context_module_id, t.quiz_context_module_id, t.discussion_context_module_id) AND
+           a.id = COALESCE(t.content_id, t.quiz_assignment_id, t.discussion_assignment_id)
       ),"
     else
       ""
@@ -222,8 +226,8 @@ class EffectiveDueDates
         LEFT JOIN #{AssignmentOverride.quoted_table_name} o on o.context_module_id = m.id AND o.workflow_state = 'active'
         WHERE
           o.context_module_id IS NULL
-          AND a.id = COALESCE(t.content_id, t.quiz_assignment_id)
-          AND m.id = COALESCE(t.context_module_id, t.quiz_context_module_id)
+          AND a.id = COALESCE(t.content_id, t.quiz_assignment_id, t.discussion_assignment_id)
+          AND m.id = COALESCE(t.context_module_id, t.quiz_context_module_id, t.discussion_context_module_id)
         )
       )"
     else

@@ -22,7 +22,7 @@ import DatetimeField, {
   TIME_FORMAT_OPTIONS,
   PARSE_RESULTS,
 } from '@canvas/datetime/jquery/DatetimeField'
-import '@canvas/datetime/jquery'
+import {fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import $ from 'jquery'
 import 'jquery-migrate'
 import * as tz from '@canvas/datetime'
@@ -285,7 +285,7 @@ QUnit.module('parseValue', {
 test('sets @fudged according to browser (fudged) timezone', function () {
   this.$field.val(tz.format(challenger, '%b %-e, %Y at %-l:%M%P')).change()
   this.field.parseValue()
-  equal(+this.field.fudged, +$.fudgeDateForProfileTimezone(challenger))
+  equal(+this.field.fudged, +fudgeDateForProfileTimezone(challenger))
 })
 
 test('sets @datetime according to profile timezone', function () {
@@ -392,7 +392,7 @@ QUnit.module('updateData', {
     this.$field.val('Jan 1, 1990 at 12:01am')
     this.field = new DatetimeField(this.$field, {})
     this.field.datetime = challenger
-    this.field.fudged = $.fudgeDateForProfileTimezone(challenger)
+    this.field.fudged = fudgeDateForProfileTimezone(challenger)
   },
 
   teardown() {
@@ -754,7 +754,7 @@ test('sets to blank with null value', function () {
 test('treats value as unfudged', function () {
   this.field.setFormattedDatetime(challenger, DATETIME_FORMAT_OPTIONS)
   equal(+this.field.datetime, +challenger)
-  equal(+this.field.fudged, +$.fudgeDateForProfileTimezone(challenger))
+  equal(+this.field.fudged, +fudgeDateForProfileTimezone(challenger))
   equal(this.field.blank, false)
   equal(this.field.valid, PARSE_RESULTS.VALID)
   equal(this.$field.val(), 'Tue, Jan 28, 1986, 11:39 AM')

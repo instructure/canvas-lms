@@ -35,6 +35,7 @@
   # Collapse the course menu according to user preference, unless a certain action
   # requests that it default to collapsed for that page
   @collapse_course_menu ||= @current_user&.reload&.collapse_course_nav?
+  @enhanced_rubrics_enabled = !!@domain_root_account&.feature_enabled?(:enhanced_rubrics)
 
   if @collapse_course_menu
     subnav_menu_text = t('Show Navigation Menu')
@@ -119,7 +120,7 @@
             </button>
           <% end %>
 
-          <div class="ic-app-crumbs">
+          <div class="ic-app-crumbs <%= 'ic-app-crumbs-enhanced-rubrics' if @enhanced_rubrics_enabled %>">
             <% if @context&.is_a?(Course) && @context.elementary_subject_course? %>
               <%= link_to course_path(id: @context.id), :class => "btn k5-back-to-subject", :id => "back_to_subject" do %>
                 <i class="icon-arrow-open-left"></i> <%= t('Back to Subject') %>

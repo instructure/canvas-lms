@@ -23,7 +23,7 @@ import Avatar from '../Avatar'
 describe('StudentContextTray/Avatar', () => {
   test('renders no avatars by default', () => {
     const wrapper = render(<Avatar name="" user={{}} courseId="1" canMasquerade={true} />)
-    expect(wrapper.container.querySelector(".StudentContextTray__Avatar")).toBeFalsy()
+    expect(wrapper.container.querySelector('.StudentContextTray__Avatar')).toBeFalsy()
   })
 
   test('renders avatar with user object when provided', () => {
@@ -36,7 +36,7 @@ describe('StudentContextTray/Avatar', () => {
     }
 
     const wrapper = render(<Avatar name="" user={user} courseId="1" canMasquerade={true} />)
-    const avatar = wrapper.container.querySelector(".StudentContextTray__Avatar span")
+    const avatar = wrapper.container.querySelector('.StudentContextTray__Avatar span')
     expect(avatar.getAttribute('name')).toEqual(user.name)
     expect(avatar.getAttribute('src')).toEqual(user.avatar_url)
 

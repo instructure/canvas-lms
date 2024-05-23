@@ -57,6 +57,8 @@ ActiveSupport::TimeZone::MAPPING["Cuiaba"] = "America/Cuiaba"
 ActiveSupport::TimeZone::MAPPING["Eirunepe"] = "America/Eirunepe"
 # Additional Australian zones
 ActiveSupport::TimeZone::MAPPING["Norfolk Island"] = "Pacific/Norfolk"
+# Fix incorrect rails timezone mapping
+ActiveSupport::TimeZone::MAPPING["Astana"] = "Asia/Almaty"
 
 ActiveSupport::TimeZone.instance_variable_set(:@zones, nil)
 ActiveSupport::TimeZone.instance_variable_set(:@zones_map, nil)

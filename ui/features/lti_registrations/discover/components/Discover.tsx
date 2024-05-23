@@ -16,12 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {useSearchParams} from 'react-router-dom'
 import {useQuery} from '@tanstack/react-query'
-
-// TODO - remove this useSearch package and use our own solution
-import useSearch from '@canvas/outcomes/react/hooks/useSearch'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconEndSolid, IconFilterLine, IconSearchLine} from '@instructure/ui-icons'
@@ -30,46 +27,59 @@ import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
-import {Tag} from '@instructure/ui-tag'
-import {Heading} from '@instructure/ui-heading'
-
 import LtiFilterTray from './LtiFilterTray'
 import FilterTags from './FilterTags'
-import ProductCard from './ProductCard'
+import ProductCard from './ProductCard/ProductCard'
 
 import {fetchProducts} from '../queries/productsQuery'
-import type {Product, Company} from '../model/Product'
-import type {LtiFilter} from '../model/Filter'
+import type {Product} from '../model/Product'
+import type {FilterItem, LtiFilter} from '../model/Filter'
 
 // TODO: remove mock data
 const filterValues: LtiFilter = {
   companies: [
     {
-      id: 100,
-      name: 'Praxis',
+      id: '19a',
+      name: 'Vendor Test Company',
     },
     {
-      id: 200,
-      name: 'Khan Academy',
+      id: '9a',
+      name: 'Smart Sparrow',
+    },
+    {
+      id: '1a',
+      name: 'Khan11',
+    },
+    {
+      id: '6a',
+      name: 'Test',
+    },
+    {
+      id: '17a',
+      name: 'NEW COMPANY',
+    },
+    {
+      id: '101a',
+      name: "Tom's Education Company",
     },
   ],
   versions: [
     {
-      id: 9465,
+      id: '9465',
       name: 'LTI v1.1',
     },
     {
-      id: 9494,
+      id: '9494',
       name: 'LTI v1.3',
     },
   ],
   audience: [
     {
-      id: 387,
+      id: '387',
       name: 'HiEd',
     },
     {
-      id: 9495,
+      id: '9495',
       name: 'K-12',
     },
   ],
@@ -78,36 +88,33 @@ const filterValues: LtiFilter = {
 const I18n = useI18nScope('lti_registrations')
 
 export const Discover = () => {
-  const {search: searchString, onChangeHandler, onClearHandler} = useSearch()
   const [isTrayOpen, setIsTrayOpen] = useState(false)
-  const [searchParams, _] = useSearchParams()
-  const [filterIds, setFilterIds] = useState<number[]>([])
-  const [company, setCompany] = useState<Company | null>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [filters, setFilters] = useState<LtiFilter>({companies: [], versions: [], audience: []})
+  const searchString = useMemo(() => searchParams.get('search') ?? '', [searchParams])
 
   const params = () => {
     return {
-      company_id_eq: company?.id,
+      filters,
       name_cont: searchString,
     }
   }
 
   const {data, isLoading} = useQuery({
-    queryKey: ['lti_product_info', company],
+    queryKey: ['lti_product_info', filters, searchString],
     queryFn: () => fetchProducts(params()),
   })
 
   useEffect(() => {
-    onClearHandler()
     const queryParams = searchParams.get('filter')
-    const params = queryParams ? JSON.parse(queryParams) : []
-    const ids: number[] = Object.values(params) as number[]
-    setFilterIds(ids)
-  }, [onClearHandler, searchParams])
+    const params = queryParams
+      ? JSON.parse(queryParams)
+      : {companies: [], versions: [], audience: []}
+    setFilters(params as unknown as LtiFilter)
+  }, [searchParams])
 
   const renderProducts = () => {
-    return data?.tools.map((product: Product) => (
-      <ProductCard product={product} setCompany={setCompany} />
-    ))
+    return data?.tools.map((product: Product) => <ProductCard product={product} />)
   }
 
   return (
@@ -123,7 +130,12 @@ export const Discover = () => {
               }
               placeholder="Search by extension name & company name"
               value={searchString}
-              onChange={onChangeHandler}
+              onChange={event =>
+                setSearchParams({
+                  filter: searchParams.get('filter') ?? [],
+                  search: event.target.value,
+                })
+              }
               renderBeforeInput={<IconSearchLine inline={false} />}
               renderAfterInput={
                 searchString ? (
@@ -132,7 +144,9 @@ export const Discover = () => {
                     screenReaderLabel={I18n.t('Clear search field')}
                     withBackground={false}
                     withBorder={false}
-                    onClick={onClearHandler}
+                    onClick={() =>
+                      setSearchParams({filter: searchParams.get('filter') ?? [], search: ''})
+                    }
                   >
                     <IconEndSolid size="x-small" data-testid="clear-search-icon" />
                   </IconButton>
@@ -150,19 +164,14 @@ export const Discover = () => {
           {I18n.t('Filters')}
         </Button>
       </Flex>
-      <FilterTags filterValues={filterValues} />
-
-      {company && (
-        <>
-          <Heading level="h2">{I18n.t('Search Results')}</Heading>
-          <Flex gap="x-small" wrap="no-wrap" margin="0 0 medium 0">
-            <p>
-              {data?.meta.count ?? 0} {I18n.t('result(s) filtered by')}
-            </p>
-            <Tag dismissible={true} onClick={() => setCompany(null)} text={company.name} />
-          </Flex>
-        </>
+      {searchString && (
+        <p>
+          {data?.meta.count ?? 0} {I18n.t('results for')} &quot;{searchString}&quot;
+        </p>
       )}
+
+      <FilterTags numberOfResults={data?.meta.count ?? 0} />
+
       <Flex gap="medium" wrap="wrap">
         {isLoading ? <Spinner /> : renderProducts()}
       </Flex>
@@ -171,8 +180,6 @@ export const Discover = () => {
         isTrayOpen={isTrayOpen}
         setIsTrayOpen={setIsTrayOpen}
         filterValues={filterValues}
-        filterIds={filterIds}
-        setFilterIds={setFilterIds}
       />
     </div>
   )

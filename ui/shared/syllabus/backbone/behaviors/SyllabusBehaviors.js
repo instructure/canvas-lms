@@ -19,12 +19,11 @@
 import $ from 'jquery'
 import {changeMonth} from '../../jquery/calendar_move' // calendarMonths
 import RichContentEditor from '@canvas/rce/RichContentEditor'
-import '@canvas/datetime/jquery' // dateString, datepicker
 import '@canvas/jquery/jquery.instructure_forms' // formSubmit, formErrors
 import '@canvas/jquery/jquery.instructure_misc_plugins' // ifExists, showIf
 import '@canvas/loading-image'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
-import 'jqueryui/datepicker'
+import '@canvas/datetime/jquery/datepicker'
 import easy_student_view from '@canvas/easy-student-view'
 import htmlEscape from '@instructure/html-escape'
 import {escape} from 'lodash'

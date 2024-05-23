@@ -20,6 +20,7 @@ require_relative "../common"
 require_relative "../helpers/context_modules_common"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "page_objects/wiki_page"
+require_relative "../conditional_release/page_objects/conditional_release_objects"
 
 describe "wiki pages edit page assign to" do
   include_context "in-process server selenium tests"
@@ -80,6 +81,7 @@ describe "wiki pages edit page assign to" do
     visit_wiki_edit_page(@course.id, @page.title)
     assign_to_link.click
 
+    wait_for_assign_to_tray_spinner
     keep_trying_until { expect(item_tray_exists?).to be_truthy }
     click_add_assign_to_card
     select_module_item_assignee(1, @section1.name)
@@ -92,6 +94,7 @@ describe "wiki pages edit page assign to" do
 
     visit_wiki_edit_page(@course.id, @page.title)
     assign_to_link.click
+    wait_for_assign_to_tray_spinner
     keep_trying_until { expect(item_tray_exists?).to be_truthy }
     click_add_assign_to_card
     select_module_item_assignee(1, @section1.name)
@@ -131,5 +134,38 @@ describe "wiki pages edit page assign to" do
     wait_for_ajaximations
     expect(element_exists?(editing_roles_input_selector)).to be_truthy
     expect(element_exists?(assign_to_link_selector)).to be_falsey
+  end
+
+  it "updates tray when form information changes" do
+    visit_wiki_edit_page(@course.id, @page.title)
+    replace_wiki_page_name("new page title")
+
+    assign_to_link.click
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    expect(tray_header.text).to eq("new page title")
+  end
+
+  it "does not show the mastery paths checkbox but adds assignment to mastery paths if selected in the tray" do
+    @course.conditional_release = true
+    @course.save!
+    visit_wiki_edit_page(@course.id, @page.title)
+    wait_for_ajaximations
+    expect(ConditionalReleaseObjects.conditional_content_exists?).to be false
+    assign_to_link.click
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+    click_add_assign_to_card
+    select_module_item_assignee(1, "Mastery Paths")
+    click_save_button("Apply")
+    save_wiki_page
+
+    assignment = assignment_model(course: @course, points_possible: 100)
+    get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+    ConditionalReleaseObjects.conditional_release_link.click
+    ConditionalReleaseObjects.last_add_assignment_button.click
+    expect(ConditionalReleaseObjects.assignment_selection_modal).to include_text("new_page")
   end
 end

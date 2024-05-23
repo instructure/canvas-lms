@@ -20,15 +20,14 @@ import React from 'react'
 import moxios from 'moxios'
 import sinon from 'sinon'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-
 import {AnnotatedDocumentSelector} from '../EditAssignment'
 
-describe('AnnotatedDocumentSelector', function () {
-  describe('when attachment prop is present', function () {
+describe('AnnotatedDocumentSelector', () => {
+  describe('when attachment prop is present', () => {
     const filename = 'test.pdf'
     let props
 
-    beforeEach(function () {
+    beforeEach(() => {
       props = {
         attachment: {name: filename},
         onSelect() {},
@@ -36,17 +35,17 @@ describe('AnnotatedDocumentSelector', function () {
       }
     })
 
-    it('renders the attachment name', function () {
+    it('renders the attachment name', () => {
       const {queryByText} = render(<AnnotatedDocumentSelector {...props} />)
       expect(queryByText(filename)).toBeInTheDocument()
     })
 
-    it('renders a button for removing the attachment', function () {
+    it('renders a button for removing the attachment', () => {
       const {queryByText} = render(<AnnotatedDocumentSelector {...props} />)
       expect(queryByText('Remove selected attachment')).toBeInTheDocument()
     })
 
-    it('the button for removing the attachment calls onRemove', function () {
+    it('the button for removing the attachment calls onRemove', () => {
       props.onRemove = sinon.stub()
       const {queryByText} = render(<AnnotatedDocumentSelector {...props} />)
       const button = queryByText('Remove selected attachment')
@@ -55,7 +54,7 @@ describe('AnnotatedDocumentSelector', function () {
     })
   })
 
-  describe('when attachment prop is not present', function () {
+  describe('when attachment prop is not present', () => {
     let props
 
     const courseFolder = {
@@ -78,7 +77,7 @@ describe('AnnotatedDocumentSelector', function () {
       },
     ]
 
-    beforeEach(function () {
+    beforeEach(() => {
       props = {
         attachment: null,
         onSelect() {},
@@ -101,27 +100,31 @@ describe('AnnotatedDocumentSelector', function () {
       })
     })
 
-    afterEach(function () {
+    afterEach(() => {
       moxios.uninstall()
       window.ENV = {}
     })
 
-    it('renders a FileBrowser', async function () {
-      const {queryByText} = render(<AnnotatedDocumentSelector {...props} />)
+    describe('FileBrowser', () => {
+      it('renders a FileBrowser', () => {
+        const {getByText} = render(<AnnotatedDocumentSelector {...props} />)
 
-      await waitFor(function () {
-        expect(queryByText('Available folders')).toBeInTheDocument()
+        expect(getByText('Loading')).toBeInTheDocument()
+
+        waitFor(() => {
+          expect(getByText('Available folders')).toBeInTheDocument()
+        })
       })
-    })
 
-    it('selecting a file in the FileBrowser calls onSelect', async function () {
-      props.onSelect = sinon.stub()
-      const {queryByText} = render(<AnnotatedDocumentSelector {...props} />)
+      it('selecting a file in the FileBrowser calls onSelect', () => {
+        props.onSelect = sinon.stub()
+        const {queryByText} = render(<AnnotatedDocumentSelector {...props} />)
 
-      await waitFor(function () {
-        fireEvent.click(queryByText('Course files'))
-        fireEvent.click(queryByText('thumbnail.jpg'))
-        expect(props.onSelect.callCount).toBe(1)
+        waitFor(() => {
+          fireEvent.click(queryByText('Course files'))
+          fireEvent.click(queryByText('thumbnail.jpg'))
+          expect(props.onSelect.callCount).toBe(1)
+        })
       })
     })
   })

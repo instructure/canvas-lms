@@ -15,22 +15,17 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import React from 'react'
 import type {RouteObject} from 'react-router-dom'
-import {Manage} from './Manage'
+import {ManagePage} from './pages/manage/ManagePage'
 
-export const ManageRoute: RouteObject = {
-  path: 'manage',
-  element: <Manage />,
-  children: [
-    {
-      path: 'foo',
-      element: <div>Foo</div>,
-    },
-    {
-      path: 'bar',
-      element: <div>Bar</div>,
-    },
-  ],
-}
+export const ManageRoutes: ReadonlyArray<RouteObject> = [
+  {
+    path: 'manage',
+    element: <ManagePage />,
+  },
+  {
+    path: 'manage/:registration_id',
+    element: <div>TODO: registration detail</div>,
+  },
+]

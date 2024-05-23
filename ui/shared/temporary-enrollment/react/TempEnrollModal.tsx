@@ -99,7 +99,7 @@ export function TempEnrollModal(props: Props) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isModalOpenAnimationComplete, setIsModalOpenAnimationComplete] = useState(false)
   const [tempEnrollmentsPairing, setTempEnrollmentsPairing] = useState<Enrollment[] | null>(null)
-  const [title, setTitle] = useState('')
+  const [title, setTitle] = useState(' ')
 
   useEffect(() => {
     if (isFetchEnrollmentDataComplete && isModalOpenAnimationComplete) {

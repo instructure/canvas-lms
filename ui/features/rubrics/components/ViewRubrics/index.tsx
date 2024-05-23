@@ -139,6 +139,7 @@ export const ViewRubrics = () => {
               locations: [], // TODO: add locations once we have them
               ratingOrder: curr.ratingOrder,
               hidePoints: curr.hidePoints,
+              freeFormCriterionComments: curr.freeFormCriterionComments,
               workflowState: curr.workflowState,
               buttonDisplay: curr.buttonDisplay,
               criteria: curr.criteria ?? [],
@@ -297,10 +298,13 @@ export const ViewRubrics = () => {
       <RubricAssessmentTray
         isLoading={isLoadingPreview}
         isOpen={isPreviewTrayOpen}
-        isPreviewMode={true}
+        isPreviewMode={false}
         rubric={rubricPreview}
         rubricAssessmentData={[]}
-        onDismiss={() => setIsPreviewTrayOpen(false)}
+        onDismiss={() => {
+          setRubricIdForPreview(undefined)
+          setIsPreviewTrayOpen(false)
+        }}
       />
 
       <UsedLocationsModal

@@ -22,6 +22,7 @@ require_relative "page_objects/assignment_create_edit_page"
 require_relative "page_objects/assignment_page"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "../helpers/context_modules_common"
+require_relative "../helpers/groups_common"
 
 shared_examples_for "item assign to tray during assignment creation/update" do
   include AssignmentsIndexPage
@@ -201,6 +202,19 @@ shared_examples_for "item assign to tray during assignment creation/update" do
     check_element_has_focus close_button
   end
 
+  it "updates tray when form information changes" do
+    AssignmentCreateEditPage.replace_assignment_name("new assignment")
+    AssignmentCreateEditPage.enter_points_possible("100")
+
+    AssignmentCreateEditPage.click_manage_assign_to_button
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    expect(tray_header.text).to eq("new assignment")
+    expect(item_type_text.text).to include("100 pts")
+  end
+
   context "Module overrides" do
     before do
       @context_module = @course.context_modules.create! name: "Mod"
@@ -219,6 +233,17 @@ shared_examples_for "item assign to tray during assignment creation/update" do
       keep_trying_until { expect(item_tray_exists?).to be_truthy }
       expect(inherited_from.last.text).to eq("Inherited from #{@context_module.name}")
       expect(element_exists?(assign_to_in_tray_selector("Remove Everyone else"))).to be_falsey
+    end
+
+    it "does not show module override if an unassigned override exists" do
+      @assignment.assignment_overrides.create!(set: @course, unassign_item: false)
+      @assignment.assignment_overrides.create!(set: @course.course_sections.first, unassign_item: true)
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment.id)
+      AssignmentCreateEditPage.click_manage_assign_to_button
+
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+      expect(module_item_assign_to_card.last).not_to contain_css(inherited_from_selector)
     end
 
     it "shows everyone card if there are course overrides" do
@@ -250,6 +275,68 @@ shared_examples_for "item assign to tray during assignment creation/update" do
       keep_trying_until { expect(item_tray_exists?).to be_truthy }
       expect(module_item_assign_to_card.last).not_to contain_css(inherited_from_selector)
     end
+  end
+end
+
+describe "group assignments", :ignore_js_errors do
+  include_context "in-process server selenium tests"
+  include ItemsAssignToTray
+  include ContextModulesCommon
+  include GroupsCommon
+
+  before :once do
+    differentiated_modules_on
+    course_with_teacher(active_all: true)
+    group_test_setup(3, 3, 1, true)
+    @normal_assignment = Assignment.create!(context: @course, title: "Normal Assignment")
+    @group_assignment = Assignment.create!(context: @course, title: "Group Assignment", group_category_id: @group_category[0].id)
+    override = @group_assignment.assignment_overrides.build
+    override.set = @testgroup[0]
+    override.save!
+  end
+
+  before do
+    user_session(@teacher)
+  end
+
+  it "creates group assignment overrides" do
+    AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @normal_assignment.id)
+    AssignmentCreateEditPage.click_group_category_assignment_check
+    AssignmentCreateEditPage.select_assignment_group_category(-3)
+
+    AssignmentCreateEditPage.click_manage_assign_to_button
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    click_add_assign_to_card
+    select_module_item_assignee(1, @testgroup[0].name)
+    update_due_date(1, "12/31/2024")
+    click_save_button("Apply")
+    AssignmentCreateEditPage.save_assignment
+    expect(@normal_assignment.assignment_overrides.active.count).to eq(1)
+    expect(@normal_assignment.assignment_overrides.active.last.set_type).to eq("Group")
+    expect(@normal_assignment.assignment_overrides.active.last.title).to eq(@testgroup[0].name)
+  end
+
+  it "deletes existing group assignment overrides if the group set is changed" do
+    AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @group_assignment.id)
+
+    expect(@group_assignment.assignment_overrides.active.count).to eq(1)
+    expect(@group_assignment.assignment_overrides.active.last.title).to eq(@testgroup[0].name)
+
+    AssignmentCreateEditPage.select_assignment_group_category(-2)
+    AssignmentCreateEditPage.click_manage_assign_to_button
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+    click_add_assign_to_card
+    select_module_item_assignee(1, @testgroup[1].name)
+    update_due_date(1, "12/31/2024")
+    click_save_button("Apply")
+    AssignmentCreateEditPage.save_assignment
+
+    expect(@group_assignment.assignment_overrides.active.count).to eq(1)
+    expect(@group_assignment.assignment_overrides.active.last.title).to eq(@testgroup[1].name)
   end
 end
 

@@ -22,7 +22,6 @@ import {render} from '@testing-library/react'
 import LockToggle from '../LockToggle'
 
 describe('LockToggle component', () => {
-
   const defaultProps = () => ({
     isLocked: true,
     isToggleable: true,

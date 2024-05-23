@@ -57,6 +57,7 @@ export const ItemAssignToTrayWrapper = () => {
       all_day_date: null,
       unlock_at_overridden: true,
       lock_at_overridden: true,
+      unassign_item: inputObj.unassignItem || false,
       id: inputObj.dueDateId,
       noop_id: null,
       stagedOverrideId: inputObj.stagedOverrideId || null,
@@ -122,6 +123,7 @@ export const ItemAssignToTrayWrapper = () => {
       dueDate: inputObj.due_at ? inputObj.due_at : null,
       availableFrom: inputObj.unlock_at_overridden ? inputObj.unlock_at : null,
       availableUntil: inputObj.lock_at_overridden ? inputObj.lock_at : null,
+      unassignItem: inputObj.unassign_item || false,
       context_module_id: inputObj.context_module_id || null,
       context_module_name: inputObj.context_module_name || null,
       stagedOverrideId: inputObj.stagedOverrideId || null,
@@ -140,11 +142,16 @@ export const ItemAssignToTrayWrapper = () => {
       inputObj.student_ids.forEach(id => {
         outputObj.assignedList.push('user_' + id)
       })
-    } else if(inputObj.course_id) {
+    } else if (inputObj.course_id) {
       outputObj.assignedList.push('course_' + inputObj.course_id)
     }
 
-    if (!inputObj.course_section_id && !inputObj.course_id && !inputObj.student_ids && !inputObj.noop_id) {
+    if (
+      !inputObj.course_section_id &&
+      !inputObj.course_id &&
+      !inputObj.student_ids &&
+      !inputObj.noop_id
+    ) {
       outputObj.assignedList.push('everyone')
     }
 
@@ -174,8 +181,8 @@ export const ItemAssignToTrayWrapper = () => {
       onSync={onSync}
       overrides={overrides}
       assignmentId={assignmentID}
-      assignmentName={title}
-      pointsPossible={pointsPossible}
+      getAssignmentName={() => title}
+      getPointsPossible={() => pointsPossible}
       type="discussion"
       importantDates={importantDates}
       defaultSectionId={DEFAULT_SECTION_ID}

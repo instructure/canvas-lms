@@ -149,7 +149,7 @@ describe('CanvasMediaPlayer', () => {
           media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
         />
       )
-      const video = container.querySelector("video")
+      const video = container.querySelector('video')
       const overlay = video.parentElement.parentElement.parentElement.children[1].children[0]
       expect(overlay.children.length).toEqual(0)
     })

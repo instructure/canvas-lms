@@ -51,6 +51,7 @@ const COURSE_RUBRICS_QUERY = gql`
           }
           hasRubricAssociations
           hidePoints
+          freeFormCriterionComments
           pointsPossible
           ratingOrder
           title
@@ -82,6 +83,7 @@ const ACCOUNT_RUBRICS_QUERY = gql`
           }
           hasRubricAssociations
           hidePoints
+          freeFormCriterionComments
           pointsPossible
           ratingOrder
           title
@@ -109,6 +111,7 @@ const RUBRIC_PREVIEW_QUERY = gql`
       }
       title
       ratingOrder
+      freeFormCriterionComments
     }
   }
 `
@@ -143,7 +146,7 @@ type CourseRubricQueryResponse = {
 }
 
 type RubricPreviewQueryResponse = {
-  rubric: Pick<Rubric, 'criteria' | 'title' | 'ratingOrder'>
+  rubric: Pick<Rubric, 'criteria' | 'title' | 'ratingOrder' | 'freeFormCriterionComments'>
 }
 
 type AccountRubricQueryResponse = {
@@ -162,6 +165,7 @@ type DuplicateRubricProps = {
   courseId?: string
   title: string
   hidePoints?: boolean
+  freeFormCriterionComments?: boolean
   criteria?: RubricCriterion[]
   pointsPossible: number
   buttonDisplay?: string
@@ -285,6 +289,7 @@ export const deleteRubric = async ({
 export const duplicateRubric = async ({
   title,
   hidePoints,
+  freeFormCriterionComments,
   accountId,
   courseId,
   criteria,
@@ -322,6 +327,7 @@ export const duplicateRubric = async ({
       rubric: {
         title: title + ' Copy',
         hide_points: hidePoints,
+        free_form_criterion_comments: freeFormCriterionComments,
         criteria: duplicateCriteria,
         button_display: buttonDisplay,
         rating_order: ratingOrder,

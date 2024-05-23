@@ -354,6 +354,14 @@ describe ContentZipper do
         @attachment.context = folder.reload
       end
 
+      let(:visible_files) do
+        ["visible.png", "visible/sub-vis.png"].sort
+      end
+
+      let(:all_files) do
+        (visible_files + ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible/sub-locked.png", "locked.png"]).sort
+      end
+
       def zipped_files_for_user(user = nil, check_user = true)
         @attachment.user_id = user.id if user
         @attachment.save!
@@ -373,22 +381,30 @@ describe ContentZipper do
           @course.save
         end
 
-        it "gives logged in students some files" do
-          expect(zipped_files_for_user(@user)).to eq ["visible.png", "visible/sub-vis.png"].sort
+        it "gives logged in students visible files" do
+          expect(zipped_files_for_user(@user)).to eq visible_files
+        end
+
+        context("for a logged in teacher with a concluded enrollment") do
+          it "gives the teacher all files" do
+            concluded_teacher = User.create!
+            @course.enroll_teacher(concluded_teacher, enrollment_state: :completed)
+            expect(zipped_files_for_user(concluded_teacher)).to eq all_files
+          end
         end
 
         it "gives logged in teachers all files" do
-          expect(zipped_files_for_user(@teacher)).to eq ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
+          expect(zipped_files_for_user(@teacher)).to eq all_files
         end
       end
 
       context "in a private course" do
-        it "gives logged in students some files" do
-          expect(zipped_files_for_user(@user)).to eq ["visible.png", "visible/sub-vis.png"].sort
+        it "gives logged in students visible files" do
+          expect(zipped_files_for_user(@user)).to eq visible_files
         end
 
         it "gives logged in teachers all files" do
-          expect(zipped_files_for_user(@teacher)).to eq ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
+          expect(zipped_files_for_user(@teacher)).to eq all_files
         end
 
         it "gives logged out people no files" do
@@ -396,7 +412,7 @@ describe ContentZipper do
         end
 
         it "gives all files if check_user=false" do
-          expect(zipped_files_for_user(nil, false)).to eq ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
+          expect(zipped_files_for_user(nil, false)).to eq all_files
         end
       end
 
@@ -406,20 +422,20 @@ describe ContentZipper do
           @course.save!
         end
 
-        it "gives logged in students some files" do
-          expect(zipped_files_for_user(@user)).to eq ["visible.png", "visible/sub-vis.png"].sort
+        it "gives logged in students visible files" do
+          expect(zipped_files_for_user(@user)).to eq visible_files
         end
 
         it "gives logged in teachers all files" do
-          expect(zipped_files_for_user(@teacher)).to eq ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
+          expect(zipped_files_for_user(@teacher)).to eq all_files
         end
 
-        it "gives logged out people the same thing as students" do
-          expect(zipped_files_for_user(nil)).to eq ["visible.png", "visible/sub-vis.png"].sort
+        it "gives logged out people visible files" do
+          expect(zipped_files_for_user(nil)).to eq visible_files
         end
 
         it "gives all files if check_user=false" do
-          expect(zipped_files_for_user(nil, false)).to eq ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
+          expect(zipped_files_for_user(nil, false)).to eq all_files
         end
       end
     end

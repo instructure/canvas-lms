@@ -170,19 +170,19 @@ const createCollectionView = function (options) {
   assignmentGroupsView.render()
   return assignmentGroupsView
 }
-test('shows imported icon when integration_data is not empty', () => {
+test('shows imported icon when sis_source_id is not empty', () => {
   ENV.URLS = {sort_url: 'test'}
   const model = createAssignmentGroup()
-  model.set('integration_data', {property: 'value'})
+  model.set('sis_source_id', '1234')
   const view = createView(model)
   ok(view.$(`#assignment_group_${model.id} .ig-header-title .icon-sis-imported`).length)
 })
 
-test('shows imported icon with custom SIS_NAME when integration_data is not empty', () => {
+test('shows imported icon with custom SIS_NAME when sis_source_id is not empty', () => {
   ENV.SIS_NAME = 'PowerSchool'
   ENV.URLS = {sort_url: 'test'}
   const model = createAssignmentGroup()
-  model.set('integration_data', {property: 'value'})
+  model.set('sis_source_id', '1234')
   const view = createView(model)
   equal(
     view.$(`#assignment_group_${model.id} .ig-header-title .icon-sis-imported`)[0].title,
@@ -190,19 +190,31 @@ test('shows imported icon with custom SIS_NAME when integration_data is not empt
   )
 })
 
-test('does not show imported icon when integration_data is not set', () => {
+test('does not show imported icon when sis_source_id is not set', () => {
   ENV.URLS = {sort_url: 'test'}
   const model = createAssignmentGroup()
   const view = createView(model)
   ok(!view.$(`#assignment_group_${model.id} .ig-header-title .icon-sis-imported`).length)
 })
 
-test('does not show imported icon when integration_data is empty', () => {
+test('shows link icon when integration_data contains mapping', () => {
+  ENV.URLS = {sort_url: 'test'}
+  const model = createAssignmentGroup()
+  model.set('integration_data', {sistemic: {categoryMapping: {abc: {}}}})
+  const view = createView(model)
+  equal(
+    view.$(`#assignment_group_${model.id} .ig-header-title .icon-link`)[0].title,
+    'Grading category aligned with SIS'
+  )
+})
+
+
+test('does not show link icon when integration_data is empty', () => {
   ENV.URLS = {sort_url: 'test'}
   const model = createAssignmentGroup()
   model.set('integration_data', {})
   const view = createView(model)
-  ok(!view.$(`#assignment_group_${model.id} .ig-header-title .icon-sis-imported`).length)
+  ok(!view.$(`#assignment_group_${model.id} .ig-header-title .icon-link`).length)
 })
 
 QUnit.module('AssignmentGroupListItemView as a teacher', {

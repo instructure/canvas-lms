@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-// @ts-expect-error
 import {Provider} from 'react-redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GradebookMenu from '@canvas/gradebook-menu'

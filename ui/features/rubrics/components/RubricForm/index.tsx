@@ -61,6 +61,7 @@ const defaultRubricForm: RubricFormProps = {
   ratingOrder: 'descending',
   unassessed: true,
   workflowState: 'active',
+  freeFormCriterionComments: false,
 }
 
 const translateRubricData = (fields: RubricQueryResponse): RubricFormProps => {
@@ -75,6 +76,7 @@ const translateRubricData = (fields: RubricQueryResponse): RubricFormProps => {
     ratingOrder: fields.ratingOrder ?? 'descending',
     unassessed: fields.unassessed ?? true,
     workflowState: fields.workflowState ?? 'active',
+    freeFormCriterionComments: fields.freeFormCriterionComments ?? false, // Add the missing property here
   }
 }
 
@@ -98,9 +100,10 @@ const stripPTags = (htmlString: string) => {
 
 type RubricFormComponentProp = {
   rootOutcomeGroup: GroupOutcome
+  onLoadRubric?: (rubricTitle: string) => void
 }
 
-export const RubricForm = ({rootOutcomeGroup}: RubricFormComponentProp) => {
+export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponentProp) => {
   const {rubricId, accountId, courseId} = useParams()
   const navigate = useNavigate()
   const navigateUrl = accountId ? `/accounts/${accountId}/rubrics` : `/courses/${courseId}/rubrics`
@@ -282,11 +285,17 @@ export const RubricForm = ({rootOutcomeGroup}: RubricFormComponentProp) => {
   }, [outcomeDialog, outcomeDialogOpen, rootOutcomeGroup, rubricForm.criteria])
 
   useEffect(() => {
+    if (!rubricId) {
+      onLoadRubric?.(I18n.t('Create'))
+      return
+    }
+
     if (data) {
       const rubricFormData = translateRubricData(data)
       setRubricForm({...rubricFormData, accountId, courseId})
+      onLoadRubric?.(rubricFormData.title)
     }
-  }, [accountId, courseId, data])
+  }, [accountId, courseId, data, rubricId, onLoadRubric])
 
   useEffect(() => {
     if (saveSuccess) {
@@ -408,7 +417,7 @@ export const RubricForm = ({rootOutcomeGroup}: RubricFormComponentProp) => {
           </View>
         </Flex.Item>
 
-        <Flex.Item shouldGrow={true} shouldShrink={true} as="main">
+        <Flex.Item shouldGrow={true} shouldShrink={true} as="main" padding="xx-small">
           <View as="div" margin="0 0 small 0">
             <DragAndDrop onDragEnd={handleDragEnd}>
               <Droppable droppableId="droppable-id">
@@ -508,7 +517,7 @@ export const RubricForm = ({rootOutcomeGroup}: RubricFormComponentProp) => {
       />
       <RubricAssessmentTray
         isOpen={isPreviewTrayOpen}
-        isPreviewMode={true}
+        isPreviewMode={false}
         rubric={rubricForm}
         rubricAssessmentData={[]}
         onDismiss={() => setIsPreviewTrayOpen(false)}

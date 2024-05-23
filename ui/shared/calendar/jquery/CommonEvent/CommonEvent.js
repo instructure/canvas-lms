@@ -21,6 +21,7 @@ import $ from 'jquery'
 import fcUtil from '../fcUtil'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jquery-tinypubsub'
+import {datetimeString, dateString} from '@canvas/datetime/date-functions'
 import splitAssetString from '@canvas/util/splitAssetString'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
@@ -224,9 +225,9 @@ Object.assign(CommonEvent.prototype, {
     }
     datetime = fcUtil.unwrap(datetime)
     if (allDay) {
-      formattedHtml = $.dateString(datetime)
+      formattedHtml = dateString(datetime)
     } else {
-      formattedHtml = $.datetimeString(datetime)
+      formattedHtml = datetimeString(datetime)
     }
     return `<time datetime='${datetime.toISOString()}'>${formattedHtml}</time>`
   },

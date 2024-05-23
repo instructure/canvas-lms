@@ -47,6 +47,8 @@ const AssignToOption = (props: Props) => {
   const [disabledOptionIds, setDisabledOptionIds] = useState<string[]>([])
   const [showPendingChangesPill, setShowPendingChangesPill] = useState(false)
   const linkRef = useRef<Link | null>(null)
+  const itemName =
+    (document.getElementById('wikipage-title-input') as HTMLInputElement)?.value ?? props.pageName
 
   const handleOpen = () => setOpen(true)
 
@@ -64,7 +66,11 @@ const AssignToOption = (props: Props) => {
     }
   }, [props.pageId])
 
-  const handleSave = (assignToCards: ItemAssignToCardSpec[], hasModuleOverrides: boolean) => {
+  const handleSave = (
+    assignToCards: ItemAssignToCardSpec[],
+    hasModuleOverrides: boolean,
+    deletedModuleAssignees: string[]
+  ) => {
     const hasChanges =
       assignToCards.some(({highlightCard}) => highlightCard) ||
       (checkPoint !== undefined && assignToCards.length < Object.entries(checkPoint).length)
@@ -74,7 +80,11 @@ const AssignToOption = (props: Props) => {
         [null, undefined, ''].includes(card.contextModuleId) ||
         (card.contextModuleId !== null && card.isEdited)
     )
-    const overrides = generateDateDetailsPayload(filteredCards, hasModuleOverrides)
+    const overrides = generateDateDetailsPayload(
+      filteredCards,
+      hasModuleOverrides,
+      deletedModuleAssignees
+    )
     props.onSync(overrides)
     setCheckPoint(assignToCards)
     handleClose()
@@ -108,7 +118,7 @@ const AssignToOption = (props: Props) => {
         onClose={handleClose}
         onDismiss={handleDismiss}
         courseId={ENV.COURSE_ID}
-        itemName={props.pageName}
+        itemName={itemName}
         itemType="page"
         iconType="page"
         itemContentId={props.pageId}

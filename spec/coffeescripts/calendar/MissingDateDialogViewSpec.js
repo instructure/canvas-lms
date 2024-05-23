@@ -83,3 +83,17 @@ test('should run the success callback on on primary button press', function () {
   this.dialog.$dialog.find('.btn-primary').click()
   ok(this.dialog.options.success.calledOnce)
 })
+
+test('it displays the name for all invalid sections', function () {
+  $('#fixtures').append(
+    '<label for="date">Section two</label><input type="text" id="date-2" name="date" />'
+  )
+  $('#fixtures').append(
+    '<label for="date">Section three</label><input type="text" id="date-3" name="date" />'
+  )
+  this.dialog.render()
+  const dialogText = $('.ui-dialog').text()
+  ok(dialogText.match(/Section one/))
+  ok(dialogText.match(/Section two/))
+  ok(dialogText.match(/Section three/))
+})

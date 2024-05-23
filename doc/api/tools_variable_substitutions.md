@@ -603,7 +603,7 @@ returns the shard id for the current context.
 ```
 1234
 ```
-## Canvas.root_account.global_id [duplicates Canvas.user.globalId]
+## Canvas.root_account.global_id
 returns the root account's global id for the current context.
 
 **Availability**: *always*  
@@ -1047,7 +1047,7 @@ Same as "Canvas.xuser.allRoles", but uses roles formatted for LTI Advantage.
  "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
  "http://purl.imsglobal.org/vocab/lis/v2/system/person#User"
 ```
-## Canvas.user.globalId [duplicates Canvas.root_account.global_id]
+## Canvas.user.globalId
 Returns the Canvas global user_id of the launching user.
 
 **Availability**: *when launched by a logged in user*  

@@ -71,19 +71,19 @@ export type FiltersState = {
 
 export type InitialColumnFilterSettings = {
   assignment_group_id: null | string
-  assignment_group_ids?: string[]
+  assignment_group_ids?: string[] | null
   context_module_id: null | string
-  context_module_ids?: string[]
+  context_module_ids?: string[] | null
   grading_period_id: null | string
   submissions: null | SubmissionFilterValue
-  submission_filters?: SubmissionFilterValue[]
+  submission_filters?: SubmissionFilterValue[] | null
   start_date: null | string
   end_date: null | string
 }
 
 export type InitialRowFilterSettings = {
   section_id: null | string
-  section_ids?: string[]
+  section_ids?: string[] | null
   student_group_id: null | string
   student_group_ids?: null | string[]
 }

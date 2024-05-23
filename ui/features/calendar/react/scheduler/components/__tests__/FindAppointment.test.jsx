@@ -21,13 +21,11 @@ import {shallow} from 'enzyme'
 import {render} from '@testing-library/react'
 import FindAppointmentApp from '../FindAppointment'
 
-
 const courses = [
   {id: 1, name: 'testCourse1', asset_string: 'thing1'},
   {id: 2, name: 'testCourse2', asset_string: 'thing2'},
 ]
 describe('FindAppointmentApp', () => {
-
   test('renders the FindAppoint component', () => {
     const store = {
       getState() {

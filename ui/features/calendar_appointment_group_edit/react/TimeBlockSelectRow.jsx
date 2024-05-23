@@ -24,7 +24,8 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {IconXSolid} from '@instructure/ui-icons'
 import coupleTimeFields from '@canvas/calendar/jquery/coupleTimeFields'
-import '@canvas/datetime/jquery'
+import {fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('appointment_groups')
 
@@ -32,14 +33,14 @@ const dateToString = (dateObj, format) => {
   if (!dateObj) {
     return ''
   }
-  return I18n.l(`date.formats.${format}`, $.fudgeDateForProfileTimezone(dateObj))
+  return I18n.l(`date.formats.${format}`, fudgeDateForProfileTimezone(dateObj))
 }
 
 const timeToString = (dateObj, format) => {
   if (!dateObj) {
     return ''
   }
-  return I18n.l(`time.formats.${format}`, $.fudgeDateForProfileTimezone(dateObj))
+  return I18n.l(`time.formats.${format}`, fudgeDateForProfileTimezone(dateObj))
 }
 
 class TimeBlockSelectorRow extends React.Component {
@@ -66,9 +67,16 @@ class TimeBlockSelectorRow extends React.Component {
     if (this.props.readOnly) {
       options.disableButton = true
     }
-    $(this.date).date_field(options)
-    $(this.startTime).time_field()
-    $(this.endTime).time_field()
+    renderDatetimeField($(this.date), {
+      ...options,
+      dateOnly: true,
+    })
+    renderDatetimeField($(this.startTime), {
+      timeOnly: true,
+    })
+    renderDatetimeField($(this.endTime), {
+      timeOnly: true,
+    })
     coupleTimeFields($(this.startTime), $(this.endTime), $(this.date))
   }
 

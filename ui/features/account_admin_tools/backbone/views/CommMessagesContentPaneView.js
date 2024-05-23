@@ -20,7 +20,7 @@ import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/commMessagesContentPane.handlebars'
 import overviewTemplate from '../../jst/commMessagesSearchOverview.handlebars'
-import '@canvas/datetime/jquery'
+import {datetimeString, unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 
 const I18n = useI18nScope('comm_messages')
 
@@ -68,7 +68,7 @@ export default class CommMessagesContentPaneView extends Backbone.View {
 
   getDisplayDateText(dateInfo, fallbackText) {
     if (dateInfo) {
-      return $.datetimeString($.unfudgeDateForProfileTimezone(dateInfo))
+      return datetimeString(unfudgeDateForProfileTimezone(dateInfo))
     } else {
       return fallbackText
     }

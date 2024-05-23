@@ -30,7 +30,12 @@ import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import {formatMessage, truncateText} from '@canvas/util/TextHelper'
 import numberFormat from '@canvas/i18n/numberFormat'
 import listFormatterPolyfill from '@canvas/util/listFormatter'
-import '@canvas/datetime/jquery'
+import {
+  datetimeString,
+  friendlyDatetime as friendlyDatetime_,
+  fudgeDateForProfileTimezone,
+  unfudgeDateForProfileTimezone,
+} from '@canvas/datetime/date-functions'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
@@ -129,12 +134,12 @@ const object = {
 
   // expects: a Date object or an ISO string
   contextSensitiveDatetimeTitle(datetime, {hash: {justText}}) {
-    const localDatetime = $.datetimeString(datetime)
+    const localDatetime = datetimeString(datetime)
     let titleText = localDatetime
     if (ENV && ENV.CONTEXT_TIMEZONE && ENV.TIMEZONE !== ENV.CONTEXT_TIMEZONE) {
       const localText = I18n.t('#helpers.local', 'Local')
       const courseText = I18n.t('#helpers.course', 'Course')
-      const courseDatetime = $.datetimeString(datetime, {timezone: ENV.CONTEXT_TIMEZONE})
+      const courseDatetime = datetimeString(datetime, {timezone: ENV.CONTEXT_TIMEZONE})
       if (localDatetime !== courseDatetime) {
         titleText = `${htmlEscape(localText)}: ${htmlEscape(localDatetime)}<br>${htmlEscape(
           courseText
@@ -159,32 +164,44 @@ const object = {
     if (!isDate(datetime)) {
       datetime = tz.parse(datetime)
     }
-    const fudged = $.fudgeDateForProfileTimezone(tz.parse(datetime))
+    const fudged = fudgeDateForProfileTimezone(tz.parse(datetime))
     let timeTitleHtml = ''
     if (contextSensitive && ENV && ENV.CONTEXT_TIMEZONE) {
       timeTitleHtml = Handlebars.helpers.contextSensitiveDatetimeTitle(datetime, {
         hash: {justText: true},
       })
     } else {
-      timeTitleHtml = $.datetimeString(datetime)
+      timeTitleHtml = datetimeString(datetime)
     }
 
-    return new Handlebars.SafeString(`\
-<time data-tooltip data-html-tooltip-title='${htmlEscape(
-      timeTitleHtml
-    )}' datetime='${datetime.toISOString()}' ${raw(pubdate ? 'pubdate' : undefined)}>
-  <span aria-hidden='true'>${$.friendlyDatetime(fudged)}</span>
-  <span class='screenreader-only'>${timeTitleHtml}</span>
-</time>\
-`)
+    const timeElement = document.createElement('time')
+    timeElement.setAttribute('data-tooltip', '')
+    timeElement.setAttribute('data-html-tooltip-title', htmlEscape(timeTitleHtml))
+    timeElement.setAttribute('datetime', datetime.toISOString())
+    if (pubdate) {
+      timeElement.setAttribute('pubdate', '')
+    }
+
+    const spanVisual = document.createElement('span')
+    spanVisual.setAttribute('aria-hidden', 'true')
+    spanVisual.textContent = friendlyDatetime_(fudged)
+
+    const spanScreenReader = document.createElement('span')
+    spanScreenReader.className = 'screenreader-only'
+    spanScreenReader.textContent = timeTitleHtml
+
+    timeElement.appendChild(spanVisual)
+    timeElement.appendChild(spanScreenReader)
+
+    return new Handlebars.SafeString(timeElement.outerHTML)
   },
 
   fudge(datetime) {
-    return $.fudgeDateForProfileTimezone(datetime)
+    return fudgeDateForProfileTimezone(datetime)
   },
 
   unfudge(datetime) {
-    return $.unfudgeDateForProfileTimezone(datetime)
+    return unfudgeDateForProfileTimezone(datetime)
   },
 
   // expects: a Date object or an ISO string
@@ -195,13 +212,18 @@ const object = {
     if (!isDate(datetime)) {
       datetime = tz.parse(datetime)
     }
-    return new Handlebars.SafeString(
-      `<time data-tooltip title='${$.datetimeString(
-        datetime
-      )}' datetime='${datetime.toISOString()}' ${raw(pubdate ? 'pubdate' : undefined)}>${htmlEscape(
-        datetime.toString(format)
-      )}</time>`
-    )
+    const timeElement = document.createElement('time')
+    timeElement.setAttribute('data-tooltip', '')
+    timeElement.setAttribute('title', datetimeString(datetime))
+    timeElement.setAttribute('datetime', datetime.toISOString())
+    if (pubdate) {
+      timeElement.setAttribute('pubdate', '')
+    }
+
+    const textNode = document.createTextNode(htmlEscape(datetime.toString(format)))
+    timeElement.appendChild(textNode)
+
+    return new Handlebars.SafeString(timeElement.outerHTML)
   },
 
   // IMPORTANT: these next two handlebars helpers emit profile-timezone
@@ -210,9 +232,9 @@ const object = {
   // when sending to the server, instead using a machine-formatted value
   // stored elsewhere).
 
-  // expects: anything that $.datetimeString can handle
+  // expects: anything that datetimeString can handle
   datetimeFormatted(datetime, options) {
-    return $.datetimeString(datetime, options != null ? options.hash : undefined)
+    return datetimeString(datetime, options != null ? options.hash : undefined)
   },
 
   datetimeFormattedWithTz(datetime) {
@@ -289,7 +311,7 @@ const object = {
     if (!isDate(date)) {
       date = tz.parse(date)
     }
-    const fudged = $.fudgeDateForProfileTimezone(tz.parse(date))
+    const fudged = fudgeDateForProfileTimezone(tz.parse(date))
     return I18nObj.l(`date.formats.${i18n_format}`, fudged)
   },
 
@@ -304,7 +326,7 @@ const object = {
     if (!isDate(date)) {
       date = tz.parse(date)
     }
-    const fudged = $.fudgeDateForProfileTimezone(tz.parse(date))
+    const fudged = fudgeDateForProfileTimezone(tz.parse(date))
     return I18nObj.l(`time.formats.${i18n_format}`, fudged)
   },
 
@@ -722,12 +744,6 @@ const object = {
       return 'checked'
     } else {
       return ''
-    }
-  },
-
-  fullWidthIf(condition) {
-    if (condition) {
-      return ' width: 100%; '
     }
   },
 

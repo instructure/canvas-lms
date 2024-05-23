@@ -220,7 +220,8 @@ class ContextSelector extends React.Component {
   }
 
   renderSections(context) {
-    const filteredSections = context.sections?.filter(section => section.can_create_appointment_groups) ?? []
+    const filteredSections =
+      context.sections?.filter(section => section.can_create_appointment_groups) ?? []
     return (
       <div
         id={`${context.asset_string}_sections`}
@@ -265,10 +266,11 @@ class ContextSelector extends React.Component {
   }
 
   renderListItems() {
-    const filteredContexts = this.props.contexts.filter(context => context
-      .can_create_appointment_groups ||
-      context.sections?.some(section => section
-          .can_create_appointment_groups))
+    const filteredContexts = this.props.contexts.filter(
+      context =>
+        context.can_create_appointment_groups ||
+        context.sections?.some(section => section.can_create_appointment_groups)
+    )
     return (
       <div>
         {filteredContexts.map(context => {

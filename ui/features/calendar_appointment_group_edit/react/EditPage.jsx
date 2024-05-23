@@ -30,7 +30,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.instructure_forms'
-import '@canvas/datetime/jquery'
+import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import EventDataSource from '@canvas/calendar/jquery/EventDataSource'
 import MessageParticipantsDialog from '@canvas/calendar/jquery/MessageParticipantsDialog'
 import axios from '@canvas/axios'
@@ -238,8 +238,8 @@ class EditPage extends React.Component {
         new_appointments: formValues.timeblocks
           .filter(nullTimeFilter)
           .map(tb => [
-            $.unfudgeDateForProfileTimezone(tb.timeData.startTime),
-            $.unfudgeDateForProfileTimezone(tb.timeData.endTime),
+            unfudgeDateForProfileTimezone(tb.timeData.startTime),
+            unfudgeDateForProfileTimezone(tb.timeData.endTime),
           ]),
         context_codes: [...this.state.selectedContexts],
         sub_context_codes: [...this.state.selectedSubContexts],

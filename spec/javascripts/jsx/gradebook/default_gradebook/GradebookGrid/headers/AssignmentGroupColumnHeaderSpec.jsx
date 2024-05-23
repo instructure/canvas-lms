@@ -78,7 +78,10 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeader', suiteHooks => {
 
   function mountComponent(overrides) {
     // eslint-disable-next-line react/no-render-return-value
-    component = ReactDOM.render(<AssignmentGroupColumnHeader {...props} {...overrides} />, $container)
+    component = ReactDOM.render(
+      <AssignmentGroupColumnHeader {...props} {...overrides} />,
+      $container
+    )
   }
 
   function getOptionsMenuTrigger() {

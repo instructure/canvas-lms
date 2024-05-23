@@ -176,7 +176,7 @@ describe('Other Calendars modal ', () => {
     expect(fetchMock.calls(markAsSeenUrl)).toHaveLength(1)
   })
 
-  it('does not try to mark the feature as seen if it is already seen', async() => {
+  it('does not try to mark the feature as seen if it is already seen', async () => {
     const {getByTestId} = render(<AccountCalendarsModal {...getProps({featureSeen: true})} />)
     const addCalendarButton = getByTestId('add-other-calendars-button')
     await openModal(addCalendarButton)

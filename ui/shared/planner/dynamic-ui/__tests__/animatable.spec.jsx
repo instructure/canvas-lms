@@ -17,14 +17,14 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render} from '@testing-library/react'
 import {animatable} from '../animatable'
 import {DynamicUiProvider} from '../provider'
 
 // eslint-disable-next-line react/prefer-stateless-function
 class MockComponent extends React.Component {
   render() {
-    return <div />
+    return <div data-testid="mock-component" />
   }
 }
 
@@ -40,16 +40,16 @@ it('passes trigger property functions and forwards the calls to the dynamic ui m
     triggerUpdates: jest.fn(),
   }
 
-  const wrapper = mount(
+  const ref = React.createRef()
+  const wrapper = render(
     <DynamicUiProvider manager={mockManager}>
-      <Wrapped />
+      <Wrapped ref={ref} />
     </DynamicUiProvider>
   )
-  expect(wrapper).toMatchSnapshot()
+  expect(wrapper.getByTestId('mock-component')).toMatchSnapshot()
 
-  const mockComponentProps = wrapper.find('MockComponent').props()
-  mockComponentProps.registerAnimatable('type', 'component', 42, ['item'])
+  ref.current.registerAnimatable('type', 'component', 42, ['item'])
   expect(mockManager.registerAnimatable).toHaveBeenCalledWith('type', 'component', 42, ['item'])
-  mockComponentProps.deregisterAnimatable('type', 'component', ['item'])
+  ref.current.deregisterAnimatable('type', 'component', ['item'])
   expect(mockManager.deregisterAnimatable).toHaveBeenCalledWith('type', 'component', ['item'])
 })

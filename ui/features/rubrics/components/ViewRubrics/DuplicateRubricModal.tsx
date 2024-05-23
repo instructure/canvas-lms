@@ -42,6 +42,7 @@ export type DuplicateRubricModalProps = {
   pointsPossible: number
   buttonDisplay?: string
   ratingOrder?: string
+  freeFormCriterionComments?: boolean
   isOpen: boolean
   onDismiss: () => void
   setPopoverIsOpen: (isOpen: boolean) => void
@@ -56,6 +57,7 @@ export const DuplicateRubricModal = ({
   pointsPossible,
   buttonDisplay,
   ratingOrder,
+  freeFormCriterionComments,
   isOpen,
   onDismiss,
   setPopoverIsOpen,
@@ -76,6 +78,7 @@ export const DuplicateRubricModal = ({
         pointsPossible,
         buttonDisplay,
         ratingOrder,
+        freeFormCriterionComments,
       }),
     mutationKey: ['duplicate-rubric'],
     onSuccess: async () => {

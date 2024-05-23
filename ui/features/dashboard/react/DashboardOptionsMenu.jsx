@@ -87,7 +87,7 @@ export default class DashboardOptionsMenu extends React.Component {
       <Menu
         trigger={
           this.props.responsiveSize == 'small' ? (
-            <Button 
+            <Button
               elementRef={this.props.menuButtonRef}
               screenReaderLabel={I18n.t('Dashboard Options')}
               display="block"

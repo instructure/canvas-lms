@@ -49,7 +49,7 @@ const start = () => {
   initializeDelayed(header)
 }
 
-const initializeDelayed = (header) => {
+const initializeDelayed = header => {
   const calendar = new Calendar(
     '#calendar-app',
     ENV.CALENDAR.CONTEXTS,

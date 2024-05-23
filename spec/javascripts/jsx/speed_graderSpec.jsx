@@ -2767,12 +2767,18 @@ QUnit.module('SpeedGrader', rootHooks => {
               {course_section_id: '2001', user_id: '1102', workflow_state: 'active'},
               {course_section_id: '2001', user_id: '1103', workflow_state: 'active'},
               {course_section_id: '2001', user_id: '1104', workflow_state: 'active'},
+              {course_section_id: '2001', user_id: '1105', workflow_state: 'active'},
+              {course_section_id: '2001', user_id: '1106', workflow_state: 'active'},
+              {course_section_id: '2001', user_id: '1107', workflow_state: 'active'},
             ],
             students: [
               {id: '1101', sortable_name: 'Jones, Adam'},
               {id: '1102', sortable_name: 'Ford, Betty'},
               {id: '1103', sortable_name: 'Xi, Charlie'},
               {id: '1104', sortable_name: 'Smith, Dana'},
+              {id: '1105', sortable_name: 'Kord, Ted'},
+              {id: '1106', sortable_name: 'Carter, Michael'},
+              {id: '1107', sortable_name: 'Da Costa, Beatriz'},
             ],
           }
 
@@ -2820,6 +2826,39 @@ QUnit.module('SpeedGrader', rootHooks => {
               user_id: '1104',
               workflow_state: 'graded',
             },
+
+            {
+              grade: 'A',
+              grade_matches_current_submission: true,
+              id: '2505',
+              score: 10,
+              submission_history: [],
+              submitted_at: '2015-05-07T12:00:00Z',
+              user_id: '1105',
+              workflow_state: 'graded',
+            },
+
+            {
+              grade: 'A',
+              grade_matches_current_submission: true,
+              id: '2506',
+              score: 10,
+              submission_history: [],
+              submitted_at: '2015-05-08T12:00:00Z',
+              user_id: '1106',
+              workflow_state: 'graded',
+            },
+
+            {
+              grade: 'A',
+              grade_matches_current_submission: true,
+              id: '2507',
+              score: 10,
+              submission_history: [],
+              submitted_at: '2015-05-09T12:00:00Z',
+              user_id: '1107',
+              workflow_state: 'graded',
+            },
           ]
         })
 
@@ -2827,27 +2866,27 @@ QUnit.module('SpeedGrader', rootHooks => {
           window.jsonData.submissions.shift()
           SpeedGrader.EG.jsonReady()
           const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
-          deepEqual(ids, ['1102', '1103', '1104'])
+          deepEqual(ids, ['1102', '1103', '1104', '1105', '1106', '1107'])
         })
 
         test('preserves student order (from server) when sorting alphabetically', () => {
           SpeedGrader.EG.jsonReady()
           const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
-          deepEqual(ids, ['1101', '1102', '1103', '1104'])
+          deepEqual(ids, ['1101', '1102', '1103', '1104', '1105', '1106', '1107'])
         })
 
         test('preserves student order (from server) when no sorting preference is set', () => {
           userSettings.get.withArgs('eg_sort_by').returns(undefined)
           SpeedGrader.EG.jsonReady()
           const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
-          deepEqual(ids, ['1101', '1102', '1103', '1104'])
+          deepEqual(ids, ['1101', '1102', '1103', '1104', '1105', '1106', '1107'])
         })
 
         test('sorts students by submission "submitted_at" when sorting by submission date', () => {
           userSettings.get.withArgs('eg_sort_by').returns('submitted_at')
           SpeedGrader.EG.jsonReady()
           const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
-          deepEqual(ids, ['1104', '1101', '1103', '1102'])
+          deepEqual(ids, ['1104', '1101', '1103', '1105', '1106', '1107', '1102'])
         })
 
         test('sorts students by sortable_name when submission "submitted_at" dates match', () => {
@@ -2855,33 +2894,67 @@ QUnit.module('SpeedGrader', rootHooks => {
           userSettings.get.withArgs('eg_sort_by').returns('submitted_at')
           SpeedGrader.EG.jsonReady()
           const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
-          deepEqual(ids, ['1104', '1103', '1102', '1101'])
+          deepEqual(ids, ['1104', '1103', '1105', '1106', '1107', '1102', '1101'])
         })
 
         test('sorts students by submission status', () => {
           userSettings.get.withArgs('eg_sort_by').returns('submission_status')
           SpeedGrader.EG.jsonReady()
           const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
-          deepEqual(ids, ['1101', '1103', '1102', '1104'])
+          deepEqual(ids, ['1101', '1103', '1102', '1106', '1107', '1105', '1104'])
         })
+
         test('sorts students randomly', () => {
           userSettings.get.withArgs('eg_sort_by').returns('randomize')
           sandbox
             .stub(Math, 'random')
-            .onFirstCall().returns(0.3)
-            .onSecondCall().returns(0.1)
-            .onThirdCall().returns(0.4)
-            .onCall(3).returns(0.2)
+            .onFirstCall()
+            .returns(0.3)
+            .onSecondCall()
+            .returns(0.1)
+            .onThirdCall()
+            .returns(0.4)
+            .onCall(3)
+            .returns(0.2)
+            .onCall(4)
+            .returns(0.7)
+            .onCall(5)
+            .returns(0.5)
+            .onCall(6)
+            .returns(0.6)
           SpeedGrader.EG.jsonReady()
           const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
-          deepEqual(ids, ['1102', '1104', '1101', '1103'])
+          deepEqual(ids, ['1102', '1104', '1101', '1103', '1106', '1107', '1105'])
+        })
+
+        test('sorts by status then students randomly', () => {
+          userSettings.get.withArgs('eg_sort_by').returns('submission_status_randomize')
+          sandbox
+            .stub(Math, 'random')
+            .onFirstCall()
+            .returns(0.3)
+            .onSecondCall()
+            .returns(0.1)
+            .onThirdCall()
+            .returns(0.4)
+            .onCall(3)
+            .returns(0.2)
+            .onCall(4)
+            .returns(0.7)
+            .onCall(5)
+            .returns(0.5)
+            .onCall(6)
+            .returns(0.6)
+          SpeedGrader.EG.jsonReady()
+          const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
+          deepEqual(ids, ['1101', '1103', '1102', '1104', '1106', '1107', '1105'])
         })
 
         test('sorts students by their assigned index when names are hidden', () => {
           userSettings.get.withArgs('eg_hide_student_names').returns(true)
           SpeedGrader.EG.jsonReady()
           const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
-          deepEqual(ids, ['1101', '1102', '1103', '1104'])
+          deepEqual(ids, ['1101', '1102', '1103', '1104', '1105', '1106', '1107'])
         })
 
         test('sorts students by sortable_name when submission statuses match', () => {
@@ -2893,7 +2966,7 @@ QUnit.module('SpeedGrader', rootHooks => {
           userSettings.get.withArgs('eg_sort_by').returns('submission_status')
           SpeedGrader.EG.jsonReady()
           const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
-          deepEqual(ids, ['1102', '1101', '1103', '1104'])
+          deepEqual(ids, ['1102', '1101', '1103', '1106', '1107', '1105', '1104'])
         })
       })
 

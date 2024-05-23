@@ -59,160 +59,158 @@ const isStudent = function () {
 extend(Assignment, Model)
 
 function Assignment() {
-  this.abGuid = this.abGuid.bind(this)
-  this.quizzesRespondusEnabled = this.quizzesRespondusEnabled.bind(this)
-  this.showGradersAnonymousToGradersCheckbox = this.showGradersAnonymousToGradersCheckbox.bind(this)
-  this.pollUntilFinished = this.pollUntilFinished.bind(this)
-  this.pollUntilFinishedLoading = this.pollUntilFinishedLoading.bind(this)
-  this.pollUntilFinishedMigrating = this.pollUntilFinishedMigrating.bind(this)
-  this.pollUntilFinishedImporting = this.pollUntilFinishedImporting.bind(this)
-  this.pollUntilFinishedDuplicating = this.pollUntilFinishedDuplicating.bind(this)
-  this.retry_migration = this.retry_migration.bind(this)
-  this.duplicate_failed = this.duplicate_failed.bind(this)
-  this.duplicate = this.duplicate.bind(this)
-  this.setNullDates = this.setNullDates.bind(this)
   this._filterFrozenAttributes = this._filterFrozenAttributes.bind(this)
   this._getAssignmentType = this._getAssignmentType.bind(this)
   this._hasOnlyType = this._hasOnlyType.bind(this)
   this._submissionTypes = this._submissionTypes.bind(this)
-  this.toView = this.toView.bind(this)
-  this.submissionTypesFrozen = this.submissionTypesFrozen.bind(this)
-  this.failedToImport = this.failedToImport.bind(this)
-  this.isImporting = this.isImporting.bind(this)
-  this.isQuizLTIAssignment = this.isQuizLTIAssignment.bind(this)
-  this.is_quiz_assignment = this.is_quiz_assignment.bind(this)
-  this.originalAssignmentName = this.originalAssignmentName.bind(this)
-  this.originalAssignmentID = this.originalAssignmentID.bind(this)
-  this.originalQuizID = this.originalQuizID.bind(this)
-  this.originalCourseID = this.originalCourseID.bind(this)
-  this.failedToMigrate = this.failedToMigrate.bind(this)
-  this.failedToDuplicate = this.failedToDuplicate.bind(this)
-  this.isMigrating = this.isMigrating.bind(this)
-  this.isMasterCourseChildContent = this.isMasterCourseChildContent.bind(this)
-  this.isDuplicating = this.isDuplicating.bind(this)
-  this.canDuplicate = this.canDuplicate.bind(this)
-  this.singleSectionDueDate = this.singleSectionDueDate.bind(this)
-  this.singleSection = this.singleSection.bind(this)
+  this.abGuid = this.abGuid.bind(this)
+  this.acceptsAnnotatedDocument = this.acceptsAnnotatedDocument.bind(this)
+  this.acceptsMediaRecording = this.acceptsMediaRecording.bind(this)
+  this.acceptsOnlineTextEntries = this.acceptsOnlineTextEntries.bind(this)
+  this.acceptsOnlineUpload = this.acceptsOnlineUpload.bind(this)
+  this.acceptsOnlineURL = this.acceptsOnlineURL.bind(this)
+  this.alignment_clone_failed = this.alignment_clone_failed.bind(this)
   this.allDates = this.allDates.bind(this)
-  this.nonBaseDates = this.nonBaseDates.bind(this)
-  this.hasPointsPossible = this.hasPointsPossible.bind(this)
-  this.hasDueDate = this.hasDueDate.bind(this)
-  this.multipleDueDates = this.multipleDueDates.bind(this)
+  this.allowedExtensions = this.allowedExtensions.bind(this)
+  this.allowedToSubmit = this.allowedToSubmit.bind(this)
+  this.anonymousGrading = this.anonymousGrading.bind(this)
+  this.anonymousInstructorAnnotations = this.anonymousInstructorAnnotations.bind(this)
+  this.anonymousPeerReviews = this.anonymousPeerReviews.bind(this)
+  this.assignmentGroupId = this.assignmentGroupId.bind(this)
+  this.assignmentType = this.assignmentType.bind(this)
+  this.automaticPeerReviews = this.automaticPeerReviews.bind(this)
+  this.canDelete = this.canDelete.bind(this)
+  this.canDuplicate = this.canDuplicate.bind(this)
+  this.canFreeze = this.canFreeze.bind(this)
+  this.canMove = this.canMove.bind(this)
+  this.courseID = this.courseID.bind(this)
   this.defaultDates = this.defaultDates.bind(this)
-  this.showBuildButton = this.showBuildButton.bind(this)
-  this.newQuizzesAssignmentBuildButtonEnabled =
-    this.newQuizzesAssignmentBuildButtonEnabled.bind(this)
-  this.hideZeroPointQuizzesOptionEnabled = this.hideZeroPointQuizzesOptionEnabled.bind(this)
-  this.submissionTypeSelectionTools = this.submissionTypeSelectionTools.bind(this)
+  this.defaultToNone = this.defaultToNone.bind(this)
+  this.defaultToolName = this.defaultToolName.bind(this)
+  this.defaultToolSelected = this.defaultToolSelected.bind(this)
+  this.defaultToolUrl = this.defaultToolUrl.bind(this)
+  this.defaultToOnline = this.defaultToOnline.bind(this)
+  this.defaultToOnPaper = this.defaultToOnPaper.bind(this)
+  this.description = this.description.bind(this)
+  this.dueAt = this.dueAt.bind(this)
+  this.dueDateRequired = this.dueDateRequired.bind(this)
   this.dueDateRequiredForAccount = this.dueDateRequiredForAccount.bind(this)
-  this.maxNameLengthRequiredForAccount = this.maxNameLengthRequiredForAccount.bind(this)
-  this.maxNameLength = this.maxNameLength.bind(this)
-  this.sisIntegrationSettingsEnabled = this.sisIntegrationSettingsEnabled.bind(this)
-  this.postToSISName = this.postToSISName.bind(this)
-  this.postToSISEnabled = this.postToSISEnabled.bind(this)
-  this.labelId = this.labelId.bind(this)
+  this.duplicate = this.duplicate.bind(this)
+  this.duplicate_failed = this.duplicate_failed.bind(this)
+  this.expectsSubmission = this.expectsSubmission.bind(this)
+  this.externalToolCustomParams = this.externalToolCustomParams.bind(this)
+  this.externalToolCustomParamsStringified = this.externalToolCustomParamsStringified.bind(this)
+  this.externalToolData = this.externalToolData.bind(this)
+  this.externalToolDataStringified = this.externalToolDataStringified.bind(this)
+  this.externalToolDataStudentLabelText = this.externalToolDataStudentLabelText.bind(this)
+  this.externalToolIframeHeight = this.externalToolIframeHeight.bind(this)
+  this.externalToolIframeWidth = this.externalToolIframeWidth.bind(this)
+  this.externalToolNewTab = this.externalToolNewTab.bind(this)
+  this.externalToolUrl = this.externalToolUrl.bind(this)
+  this.failedToCloneAlignment = this.failedToCloneAlignment.bind(this)
+  this.failedToDuplicate = this.failedToDuplicate.bind(this)
+  this.failedToImport = this.failedToImport.bind(this)
+  this.failedToMigrate = this.failedToMigrate.bind(this)
+  this.freezeOnCopy = this.freezeOnCopy.bind(this)
+  this.frozen = this.frozen.bind(this)
+  this.frozenAttributes = this.frozenAttributes.bind(this)
+  this.gradedSubmissionsExist = this.gradedSubmissionsExist.bind(this)
+  this.gradeGroupStudentsIndividually = this.gradeGroupStudentsIndividually.bind(this)
+  this.graderCommentsVisibleToGraders = this.graderCommentsVisibleToGraders.bind(this)
+  this.gradersAnonymousToGraders = this.gradersAnonymousToGraders.bind(this)
+  this.gradingStandardId = this.gradingStandardId.bind(this)
+  this.gradingType = this.gradingType.bind(this)
+  this.groupCategoryId = this.groupCategoryId.bind(this)
+  this.hasDueDate = this.hasDueDate.bind(this)
+  this.hasPointsPossible = this.hasPointsPossible.bind(this)
+  this.hasSubmittedSubmissions = this.hasSubmittedSubmissions.bind(this)
+  this.hideInGradebook = this.hideInGradebook.bind(this)
+  this.hideZeroPointQuizzesOptionEnabled = this.hideZeroPointQuizzesOptionEnabled.bind(this)
   this.htmlBuildUrl = this.htmlBuildUrl.bind(this)
   this.htmlEditUrl = this.htmlEditUrl.bind(this)
   this.htmlUrl = this.htmlUrl.bind(this)
-  this.objectType = this.objectType.bind(this)
   this.iconType = this.iconType.bind(this)
-  this.useNewQuizIcon = this.useNewQuizIcon.bind(this)
-  this.published = this.published.bind(this)
-  this.isGpaScaled = this.isGpaScaled.bind(this)
-  this.isLetterGraded = this.isLetterGraded.bind(this)
-  this.isSimple = this.isSimple.bind(this)
-  this.externalToolNewTab = this.externalToolNewTab.bind(this)
-  this.externalToolDataStudentLabelText = this.externalToolDataStudentLabelText.bind(this)
-  this.isMasteryConnectTool = this.isMasteryConnectTool.bind(this)
-  this.externalToolCustomParamsStringified = this.externalToolCustomParamsStringified.bind(this)
-  this.externalToolCustomParams = this.externalToolCustomParams.bind(this)
-  this.externalToolDataStringified = this.externalToolDataStringified.bind(this)
-  this.externalToolData = this.externalToolData.bind(this)
-  this.externalToolIframeHeight = this.externalToolIframeHeight.bind(this)
-  this.externalToolIframeWidth = this.externalToolIframeWidth.bind(this)
-  this.externalToolUrl = this.externalToolUrl.bind(this)
-  this.gradingStandardId = this.gradingStandardId.bind(this)
-  this.groupCategoryId = this.groupCategoryId.bind(this)
-  this.vericiteEnabled = this.vericiteEnabled.bind(this)
-  this.turnitinEnabled = this.turnitinEnabled.bind(this)
-  this.gradeGroupStudentsIndividually = this.gradeGroupStudentsIndividually.bind(this)
-  this.vericiteAvailable = this.vericiteAvailable.bind(this)
-  this.turnitinAvailable = this.turnitinAvailable.bind(this)
-  this.allowedExtensions = this.allowedExtensions.bind(this)
-  this.restrictFileExtensions = this.restrictFileExtensions.bind(this)
-  this.notifyOfUpdate = this.notifyOfUpdate.bind(this)
-  this.peerReviewsAssignAt = this.peerReviewsAssignAt.bind(this)
-  this.peerReviewCount = this.peerReviewCount.bind(this)
-  this.automaticPeerReviews = this.automaticPeerReviews.bind(this)
-  this.anonymousPeerReviews = this.anonymousPeerReviews.bind(this)
-  this.peerReviews = this.peerReviews.bind(this)
-  this.graderCommentsVisibleToGraders = this.graderCommentsVisibleToGraders.bind(this)
-  this.gradersAnonymousToGraders = this.gradersAnonymousToGraders.bind(this)
-  this.anonymousGrading = this.anonymousGrading.bind(this)
-  this.anonymousInstructorAnnotations = this.anonymousInstructorAnnotations.bind(this)
-  this.moderatedGrading = this.moderatedGrading.bind(this)
-  this.postToSIS = this.postToSIS.bind(this)
-  this.isOnlineSubmission = this.isOnlineSubmission.bind(this)
-  this.acceptsOnlineTextEntries = this.acceptsOnlineTextEntries.bind(this)
-  this.acceptsMediaRecording = this.acceptsMediaRecording.bind(this)
-  this.acceptsOnlineURL = this.acceptsOnlineURL.bind(this)
-  this.acceptsAnnotatedDocument = this.acceptsAnnotatedDocument.bind(this)
-  this.acceptsOnlineUpload = this.acceptsOnlineUpload.bind(this)
-  this.withoutGradedSubmission = this.withoutGradedSubmission.bind(this)
-  this.hasSubmittedSubmissions = this.hasSubmittedSubmissions.bind(this)
-  this.allowedToSubmit = this.allowedToSubmit.bind(this)
-  this.expectsSubmission = this.expectsSubmission.bind(this)
-  this.submissionType = this.submissionType.bind(this)
-  this.selectedSubmissionTypeToolId = this.selectedSubmissionTypeToolId.bind(this)
-  this.isNonPlacementExternalTool = this.isNonPlacementExternalTool.bind(this)
-  this.isGenericExternalTool = this.isGenericExternalTool.bind(this)
-  this.defaultToolSelected = this.defaultToolSelected.bind(this)
-  this.isQuickCreateDefaultTool = this.isQuickCreateDefaultTool.bind(this)
-  this.defaultToOnPaper = this.defaultToOnPaper.bind(this)
-  this.defaultToOnline = this.defaultToOnline.bind(this)
-  this.defaultToNone = this.defaultToNone.bind(this)
-  this.isDefaultTool = this.isDefaultTool.bind(this)
-  this.shouldShowDefaultTool = this.shouldShowDefaultTool.bind(this)
-  this.isUpdateAssignmentSubmissionTypeLaunchButtonEnabled =
-    this.isUpdateAssignmentSubmissionTypeLaunchButtonEnabled.bind(this)
-  this.isNewAssignment = this.isNewAssignment.bind(this)
-  this.submissionTypes = this.submissionTypes.bind(this)
-  this.inPacedCourse = this.inPacedCourse.bind(this)
-  this.courseID = this.courseID.bind(this)
-  this.omitFromFinalGrade = this.omitFromFinalGrade.bind(this)
-  this.hideInGradebook = this.hideInGradebook.bind(this)
-  this.gradingType = this.gradingType.bind(this)
-  this.gradedSubmissionsExist = this.gradedSubmissionsExist.bind(this)
-  this.inClosedGradingPeriod = this.inClosedGradingPeriod.bind(this)
-  this.frozenAttributes = this.frozenAttributes.bind(this)
-  this.frozen = this.frozen.bind(this)
-  this.freezeOnCopy = this.freezeOnCopy.bind(this)
-  this.canMove = this.canMove.bind(this)
-  this.canDelete = this.canDelete.bind(this)
-  this.canFreeze = this.canFreeze.bind(this)
-  this.assignmentGroupId = this.assignmentGroupId.bind(this)
-  this.secureParams = this.secureParams.bind(this)
-  this.pointsPossible = this.pointsPossible.bind(this)
-  this.name = this.name.bind(this)
-  this.description = this.description.bind(this)
   this.importantDates = this.importantDates.bind(this)
-  this.dueDateRequired = this.dueDateRequired.bind(this)
-  this.lockAt = this.lockAt.bind(this)
-  this.unlockAt = this.unlockAt.bind(this)
-  this.dueAt = this.dueAt.bind(this)
-  this.assignmentType = this.assignmentType.bind(this)
-  this.isNotGraded = this.isNotGraded.bind(this)
-  this.defaultToolUrl = this.defaultToolUrl.bind(this)
-  this.defaultToolName = this.defaultToolName.bind(this)
-  this.isNonPlacementExternalTool = this.isNonPlacementExternalTool.bind(this)
-  this.isExternalTool = this.isExternalTool.bind(this)
-  this.isPage = this.isPage.bind(this)
-  this.isDiscussionTopic = this.isDiscussionTopic.bind(this)
-  this.isQuiz = this.isQuiz.bind(this)
+  this.inClosedGradingPeriod = this.inClosedGradingPeriod.bind(this)
+  this.inPacedCourse = this.inPacedCourse.bind(this)
+  this.is_quiz_assignment = this.is_quiz_assignment.bind(this)
   this.isCloningAlignment = this.isCloningAlignment.bind(this)
+  this.isDefaultTool = this.isDefaultTool.bind(this)
+  this.isDiscussionTopic = this.isDiscussionTopic.bind(this)
+  this.isDuplicating = this.isDuplicating.bind(this)
+  this.isExternalTool = this.isExternalTool.bind(this)
+  this.isGenericExternalTool = this.isGenericExternalTool.bind(this)
+  this.isGpaScaled = this.isGpaScaled.bind(this)
+  this.isImporting = this.isImporting.bind(this)
+  this.isLetterGraded = this.isLetterGraded.bind(this)
+  this.isMasterCourseChildContent = this.isMasterCourseChildContent.bind(this)
+  this.isMasteryConnectTool = this.isMasteryConnectTool.bind(this)
+  this.isMigrating = this.isMigrating.bind(this)
+  this.isNewAssignment = this.isNewAssignment.bind(this)
+  this.isNonPlacementExternalTool = this.isNonPlacementExternalTool.bind(this)
+  this.isNotGraded = this.isNotGraded.bind(this)
+  this.isOnlineSubmission = this.isOnlineSubmission.bind(this)
+  this.isPage = this.isPage.bind(this)
+  this.isQuickCreateDefaultTool = this.isQuickCreateDefaultTool.bind(this)
+  this.isQuiz = this.isQuiz.bind(this)
+  this.isQuizLTIAssignment = this.isQuizLTIAssignment.bind(this)
+  this.isSimple = this.isSimple.bind(this)
+  this.labelId = this.labelId.bind(this)
+  this.lockAt = this.lockAt.bind(this)
+  this.maxNameLength = this.maxNameLength.bind(this)
+  this.maxNameLengthRequiredForAccount = this.maxNameLengthRequiredForAccount.bind(this)
+  this.moderatedGrading = this.moderatedGrading.bind(this)
+  this.multipleDueDates = this.multipleDueDates.bind(this)
+  this.name = this.name.bind(this)
+  this.newQuizzesAssignmentBuildButtonEnabled =
+    this.newQuizzesAssignmentBuildButtonEnabled.bind(this)
+  this.nonBaseDates = this.nonBaseDates.bind(this)
+  this.notifyOfUpdate = this.notifyOfUpdate.bind(this)
+  this.objectType = this.objectType.bind(this)
+  this.omitFromFinalGrade = this.omitFromFinalGrade.bind(this)
+  this.originalAssignmentID = this.originalAssignmentID.bind(this)
+  this.originalAssignmentName = this.originalAssignmentName.bind(this)
+  this.originalCourseID = this.originalCourseID.bind(this)
+  this.originalQuizID = this.originalQuizID.bind(this)
+  this.peerReviewCount = this.peerReviewCount.bind(this)
+  this.peerReviews = this.peerReviews.bind(this)
+  this.peerReviewsAssignAt = this.peerReviewsAssignAt.bind(this)
+  this.pointsPossible = this.pointsPossible.bind(this)
+  this.pollUntilFinished = this.pollUntilFinished.bind(this)
   this.pollUntilFinishedCloningAlignment = this.pollUntilFinishedCloningAlignment.bind(this)
-  this.failedToCloneAlignment = this.failedToCloneAlignment.bind(this)
-  this.alignment_clone_failed = this.alignment_clone_failed.bind(this)
+  this.pollUntilFinishedDuplicating = this.pollUntilFinishedDuplicating.bind(this)
+  this.pollUntilFinishedImporting = this.pollUntilFinishedImporting.bind(this)
+  this.pollUntilFinishedLoading = this.pollUntilFinishedLoading.bind(this)
+  this.pollUntilFinishedMigrating = this.pollUntilFinishedMigrating.bind(this)
+  this.postToSIS = this.postToSIS.bind(this)
+  this.postToSISEnabled = this.postToSISEnabled.bind(this)
+  this.postToSISName = this.postToSISName.bind(this)
+  this.published = this.published.bind(this)
+  this.quizzesRespondusEnabled = this.quizzesRespondusEnabled.bind(this)
+  this.resourceLink = this.resourceLink.bind(this)
+  this.restrictFileExtensions = this.restrictFileExtensions.bind(this)
+  this.retry_migration = this.retry_migration.bind(this)
+  this.secureParams = this.secureParams.bind(this)
+  this.selectedSubmissionTypeToolId = this.selectedSubmissionTypeToolId.bind(this)
+  this.setNullDates = this.setNullDates.bind(this)
+  this.shouldShowDefaultTool = this.shouldShowDefaultTool.bind(this)
+  this.showBuildButton = this.showBuildButton.bind(this)
+  this.showGradersAnonymousToGradersCheckbox = this.showGradersAnonymousToGradersCheckbox.bind(this)
+  this.singleSection = this.singleSection.bind(this)
+  this.singleSectionDueDate = this.singleSectionDueDate.bind(this)
+  this.sisIntegrationSettingsEnabled = this.sisIntegrationSettingsEnabled.bind(this)
+  this.submissionType = this.submissionType.bind(this)
+  this.submissionTypes = this.submissionTypes.bind(this)
+  this.submissionTypeSelectionTools = this.submissionTypeSelectionTools.bind(this)
+  this.submissionTypesFrozen = this.submissionTypesFrozen.bind(this)
+  this.toView = this.toView.bind(this)
+  this.turnitinAvailable = this.turnitinAvailable.bind(this)
+  this.turnitinEnabled = this.turnitinEnabled.bind(this)
+  this.unlockAt = this.unlockAt.bind(this)
+  this.useNewQuizIcon = this.useNewQuizIcon.bind(this)
+  this.vericiteAvailable = this.vericiteAvailable.bind(this)
+  this.vericiteEnabled = this.vericiteEnabled.bind(this)
+  this.withoutGradedSubmission = this.withoutGradedSubmission.bind(this)
   return Assignment.__super__.constructor.apply(this, arguments)
 }
 
@@ -272,10 +270,6 @@ Assignment.prototype.isPage = function () {
 
 Assignment.prototype.isExternalTool = function () {
   return this._hasOnlyType('external_tool')
-}
-
-Assignment.prototype.isNonPlacementExternalTool = function () {
-  return this.isExternalTool
 }
 
 Assignment.prototype.defaultToolName = function () {
@@ -468,10 +462,6 @@ Assignment.prototype.shouldShowDefaultTool = function () {
 
 Assignment.prototype.isDefaultTool = function () {
   return this.submissionType() === 'external_tool' && this.shouldShowDefaultTool()
-}
-
-Assignment.prototype.isUpdateAssignmentSubmissionTypeLaunchButtonEnabled = function () {
-  return window.ENV.UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED
 }
 
 Assignment.prototype.defaultToNone = function () {
@@ -820,6 +810,14 @@ Assignment.prototype.externalToolData = function () {
 Assignment.prototype.externalToolDataTitle = function () {
   const data = this.get('external_tool_tag_attributes')
   return data?.title
+}
+
+Assignment.prototype.resourceLink = function () {
+  const data = this.get('external_tool_tag_attributes')
+  if (data?.resource_link_id) {
+    return {id: data.resource_link_id, title: data.resource_link_title}
+  }
+  return undefined
 }
 
 Assignment.prototype.externalToolDataStringified = function () {
@@ -1194,8 +1192,8 @@ Assignment.prototype.toView = function () {
     'acceptsAnnotatedDocument',
     'acceptsMediaRecording',
     'acceptsOnlineTextEntries',
-    'acceptsOnlineURL',
     'acceptsOnlineUpload',
+    'acceptsOnlineURL',
     'allDates',
     'allowedExtensions',
     'anonymousGrading',
@@ -1205,21 +1203,24 @@ Assignment.prototype.toView = function () {
     'automaticPeerReviews',
     'canFreeze',
     'defaultToNone',
-    'defaultToOnPaper',
-    'defaultToOnline',
     'defaultToolName',
+    'defaultToOnline',
+    'defaultToOnPaper',
     'description',
     'dueAt',
     'dueDateRequired',
     'externalToolCustomParams',
     'externalToolCustomParamsStringified',
     'externalToolData',
-    'externalToolLineItem',
-    'externalToolLineItemStringified',
     'externalToolDataStringified',
     'externalToolDataStudentLabelText',
+    'externalToolIframeHeight',
+    'externalToolIframeWidth',
+    'externalToolLineItem',
+    'externalToolLineItemStringified',
     'externalToolNewTab',
     'externalToolUrl',
+    'failedToCloneAlignment',
     'failedToDuplicate',
     'failedToImport',
     'failedToMigrate',
@@ -1234,11 +1235,15 @@ Assignment.prototype.toView = function () {
     'hasDueDate',
     'hasPointsPossible',
     'hideInGradebook',
-    'htmlEditUrl',
+    'hideZeroPointQuizzesOptionEnabled',
     'htmlBuildUrl',
+    'htmlEditUrl',
     'htmlUrl',
     'iconType',
+    'importantDates',
     'inClosedGradingPeriod',
+    'is_quiz_assignment',
+    'isCloningAlignment',
     'isDefaultTool',
     'isDuplicating',
     'isExternalTool',
@@ -1246,9 +1251,9 @@ Assignment.prototype.toView = function () {
     'isGpaScaled',
     'isImporting',
     'isLetterGraded',
+    'isMasterCourseChildContent',
     'isMasteryConnectTool',
     'isMigrating',
-    'isMasterCourseChildContent',
     'isNonPlacementExternalTool',
     'isNotGraded',
     'isOnlineSubmission',
@@ -1256,14 +1261,12 @@ Assignment.prototype.toView = function () {
     'isPlagiarismPlatformLocked',
     'isQuizLTIAssignment',
     'isSimple',
-    'is_quiz_assignment',
     'labelId',
     'lockAt',
     'moderatedGrading',
     'multipleDueDates',
     'name',
     'newQuizzesAssignmentBuildButtonEnabled',
-    'hideZeroPointQuizzesOptionEnabled',
     'nonBaseDates',
     'notifyOfUpdate',
     'objectTypeDisplayName',
@@ -1291,12 +1294,6 @@ Assignment.prototype.toView = function () {
     'unlockAt',
     'vericiteAvailable',
     'vericiteEnabled',
-    'importantDates',
-    'externalToolIframeWidth',
-    'externalToolIframeHeight',
-    'isCloningAlignment',
-    'failedToCloneAlignment',
-    'isUpdateAssignmentSubmissionTypeLaunchButtonEnabled',
   ]
   const hash = {
     id: this.get('id'),

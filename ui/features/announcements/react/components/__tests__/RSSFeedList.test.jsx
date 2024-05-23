@@ -19,7 +19,7 @@
 import '@instructure/canvas-theme'
 import React from 'react'
 import {render} from '@testing-library/react'
-import userEvent from '@testing-library/user-event';
+import userEvent from '@testing-library/user-event'
 import RSSFeedList from '../RSSFeedList'
 
 const defaultFeeds = () => [
@@ -68,18 +68,18 @@ const renderComponent = (props = {}) => {
 
 test('renders the RSSFeedList component', () => {
   const feeds = defaultFeeds()
-  const tree = renderComponent({ hasLoadedFeed: true, feeds })
+  const tree = renderComponent({hasLoadedFeed: true, feeds})
   expect(tree.getByText(feeds[0].display_name)).toBeInTheDocument()
 })
 
 test('renders the RSSFeedList component loading indicator when loading', () => {
-  const tree = renderComponent({ hasLoadedFeed: false })
+  const tree = renderComponent({hasLoadedFeed: false})
   expect(tree.getByText('Adding RSS Feed')).toBeInTheDocument()
 })
 
 test('renders the RSSFeedList component with 5 rows for 5 feeds', () => {
   const feeds = defaultFeeds()
-  const tree = renderComponent({ hasLoadedFeed: true, feeds })
+  const tree = renderComponent({hasLoadedFeed: true, feeds})
   feeds.forEach(feed => {
     expect(tree.getByText(feed.display_name)).toBeInTheDocument()
   })
@@ -90,7 +90,7 @@ test('calls getExternalFeeds when feed has not been loaded', () => {
   const mockGetExternalFeeds = jest.fn()
   renderComponent({
     hasLoadedFeed: false,
-    getExternalFeeds: mockGetExternalFeeds
+    getExternalFeeds: mockGetExternalFeeds,
   })
 
   expect(mockGetExternalFeeds).toHaveBeenCalledTimes(1)
@@ -100,7 +100,7 @@ test('does not call getExternalFeeds when feed has been loaded', () => {
   const mockGetExternalFeeds = jest.fn()
   renderComponent({
     hasLoadedFeed: true,
-    getExternalFeeds: mockGetExternalFeeds
+    getExternalFeeds: mockGetExternalFeeds,
   })
 
   expect(mockGetExternalFeeds).not.toHaveBeenCalled()

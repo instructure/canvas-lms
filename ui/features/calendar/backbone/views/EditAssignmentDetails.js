@@ -32,12 +32,13 @@ import datePickerFormat from '@canvas/datetime/datePickerFormat'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import withinMomentDates from '../../momentDateHelper'
 import * as tz from '@canvas/datetime'
+import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
-import '@canvas/datetime/jquery'
 import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '../../fcMomentHandlebarsHelpers'
 import {encodeQueryString} from '@canvas/query-string-encoding'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('calendar')
 
@@ -202,7 +203,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
   }
 
   unfudgedDate(date) {
-    const unfudged = $.unfudgeDateForProfileTimezone(date)
+    const unfudged = unfudgeDateForProfileTimezone(date)
     if (unfudged) {
       return unfudged.toISOString()
     } else {
@@ -340,7 +341,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
 
   setupTimeAndDatePickers() {
     const $field = this.$el.find('.datetime_field')
-    return $field.datetime_field({
+    return renderDatetimeField($field, {
       datepicker: {
         dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday')),
       },

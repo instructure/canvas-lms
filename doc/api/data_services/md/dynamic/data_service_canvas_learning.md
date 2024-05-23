@@ -357,10 +357,13 @@ Learning
     "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
   },
   "body": {
+    "id": "1",
     "assessed_at": "2019-08-09T21:35:05Z",
     "attempt": 1,
     "created_at": "2019-08-09T21:35:05Z",
     "learning_outcome_id": "1",
+    "learning_outcome_context_uuid": "9dewFPr6uKGaiVxchQSsqV6YZy5HBtlq8O2vqp45",
+    "result_context_uuid": "c3JwFPr6uKGaiVxchQSsqV6YZy5HBtlq8O2vqNNN",
     "mastery": true,
     "original_mastery": false,
     "original_possible": 5,
@@ -384,10 +387,13 @@ Learning
 
 | Field | Description |
 |-|-|
+| **id** | The local Canvas ID of the learning outcome result. |
 | **assessed_at** | The date when the outcome was last assessed. |
 | **attempt** | The submission attempt number. |
 | **created_at** | Time when the result was created. |
 | **learning_outcome_id** | The local Canvas ID of the learning outcome. |
+| **learning_outcome_context_uuid** | The uuid of the context associated with the learning outcome. |
+| **result_context_uuid** | The uuid of the context associated with the learning outcome result. |
 | **mastery** | True if student achieved mastery. |
 | **original_mastery** | True if student achieved mastery on the first attempt. |
 | **original_possible** | Possible points on the first attempt. |
@@ -427,10 +433,13 @@ Learning
     "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
   },
   "body": {
+    "id": "1",
     "assessed_at": "2019-08-09T21:35:05Z",
     "attempt": 1,
     "created_at": "2019-08-09T21:35:05Z",
     "learning_outcome_id": "1",
+    "learning_outcome_context_uuid": "9dewFPr6uKGaiVxchQSsqV6YZy5HBtlq8O2vqp45",
+    "result_context_uuid": "c3JwFPr6uKGaiVxchQSsqV6YZy5HBtlq8O2vqNNN",
     "mastery": true,
     "original_mastery": false,
     "original_possible": 5,
@@ -455,10 +464,13 @@ Learning
 
 | Field | Description |
 |-|-|
+| **id** | The local Canvas ID of the learning outcome result. |
 | **assessed_at** | The date when the outcome was last assessed. |
 | **attempt** | The submission attempt number. |
 | **created_at** | Time when the result was created. |
 | **learning_outcome_id** | The local Canvas ID of the learning outcome. |
+| **learning_outcome_context_uuid** | The uuid of the context associated with the learning outcome. |
+| **result_context_uuid** | The uuid of the context associated with the learning outcome result. |
 | **mastery** | True if student achieved mastery. |
 | **original_mastery** | True if student achieved mastery on the first attempt. |
 | **original_possible** | Possible points on the first attempt. |
@@ -467,7 +479,7 @@ Learning
 | **possible** | Total number of points possible. |
 | **score** | The student's score. |
 | **updated_at** | Time the learning outcome result was updated at. |
-| **user_uuid** | The unique identifier for the user that the outcome was assessed. |
+| **user_uuid** | The uuid of the user that the outcome was assessed. |
 | **artifact_id** | The id of the artifact that contains the outcome assessment. Value will be an string representation of an integer or nil. |
 | **artifact_type** | The type of artifact that contains the outcome assessment.  Value will be one of the following: RubricAssessment, Submission, Quizzes::QuizSubmission, or LiveAssessments::Submission. |
 | **associated_asset_id** | The id of the asset that the outcome is aligned to. Value will be an string representation of an integer or nil. |

@@ -21,9 +21,9 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/userDateRangeSearchForm.handlebars'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime/jquery'
 import 'jqueryui/dialog'
 import '@canvas/rails-flash-notifications'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('user_date_range_search')
 
@@ -64,8 +64,8 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
 
   // Setup the date inputs for javascript use.
   afterRender() {
-    this.$dateStartSearchField.datetime_field()
-    this.$dateEndSearchField.datetime_field()
+    renderDatetimeField(this.$dateStartSearchField)
+    renderDatetimeField(this.$dateEndSearchField)
     return this.$searchControls.hide()
   }
 

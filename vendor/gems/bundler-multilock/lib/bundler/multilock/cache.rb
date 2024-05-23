@@ -57,9 +57,25 @@ module Bundler
       end
 
       def specs(lockfile_name)
-        @specs[lockfile_name] ||= parser(lockfile_name).specs.to_h do |spec|
-          [[spec.name, spec.platform], spec]
+        @specs[lockfile_name] ||= begin
+          specs = {}
+          parser(lockfile_name).specs.each do |spec|
+            (specs[spec.name] ||= {})[spec.platform] = spec
+          end
+          specs
         end
+      end
+
+      # sometimes a gem changes platforms with a new version, such as from aarch64-linux
+      # to aarch64-linux-gnu. we need to still sync it
+      def find_matching_spec(specs, spec)
+        specs = self.specs(specs) unless specs.is_a?(Hash)
+        platform_specs = specs[spec.name]
+        return unless platform_specs
+
+        parent_spec = platform_specs[spec.platform]
+        parent_spec ||= platform_specs.find { |platform, _| platform =~ spec.platform }&.last
+        parent_spec || platform_specs.find { |platform, _| platform == "ruby" }&.last
       end
 
       # @param lockfile_name [Pathname]

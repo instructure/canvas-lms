@@ -182,7 +182,6 @@ import MultiSelectSearchInput from './components/MultiSelectSearchInput'
 import ApplyScoreToUngradedModal from './components/ApplyScoreToUngradedModal'
 import ScoreToUngradedManager from '../shared/ScoreToUngradedManager'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime/jquery'
 import 'jqueryui/dialog'
 import 'jqueryui/tooltip'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
@@ -3962,7 +3961,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   isGradeEditable = (studentId: string, assignmentId: string) => {
-    if (!this.isStudentGradeable(studentId)) {
+    const assignment = this.getAssignment(assignmentId)
+    if (assignment.has_sub_assignments || !this.isStudentGradeable(studentId)) {
       return false
     }
     const submissionState = this.submissionStateMap.getSubmissionState({

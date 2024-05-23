@@ -78,6 +78,7 @@ export interface EnvCommon {
   current_user_id: string | null
   current_user_global_id: string
   COURSE_ROLES: Role[]
+  COURSE_USERS_PATH?: string
   current_user_roles: string[]
   current_user_is_student: boolean
   current_user_is_admin: boolean

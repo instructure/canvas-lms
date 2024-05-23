@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
-import {MissingSectionsWarningModal} from "../MissingSectionsWarningModal";
+import {MissingSectionsWarningModal} from '../MissingSectionsWarningModal'
 
 const defaultProps = {
   sections: [

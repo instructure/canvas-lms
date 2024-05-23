@@ -62,7 +62,7 @@ const ExportCSVButton = ({courseId, gradebookFilters}) => {
         filename={`course-${courseId}-gradebook-export.csv`}
         data-testid="csv-link"
       >
-        <span ref={csvElementRef}/>
+        <span ref={csvElementRef} />
       </CSVLink>
     </>
   )

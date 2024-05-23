@@ -142,15 +142,13 @@ ready(() => {
     )
   }
 
-  const defaultDueTimeContainer = document.getElementById(
-    'default_due_time_container'
-  )
+  const defaultDueTimeContainer = document.getElementById('default_due_time_container')
   if (defaultDueTimeContainer) {
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
-        <CourseDefaultDueTime/>
+        <CourseDefaultDueTime />
       </Suspense>,
-        defaultDueTimeContainer
+      defaultDueTimeContainer
     )
   }
 

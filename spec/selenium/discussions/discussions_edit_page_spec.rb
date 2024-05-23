@@ -849,6 +849,29 @@ describe "discussions" do
           expect(DiscussionTopic.last.assignment).to be_nil
         end
 
+        it "sets the mark important dates checkbox for discussion edit when differentiated modules ff is off" do
+          feature_setup
+
+          graded_discussion = create_graded_discussion(course)
+
+          course_override_due_date = 5.days.from_now
+          course_section = course.course_sections.create!(name: "section alpha")
+          graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: course_section.id, due_at: course_override_due_date)
+
+          get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+
+          expect(mark_important_dates).to be_displayed
+          scroll_to_element(mark_important_dates)
+          click_mark_important_dates
+
+          Discussion.save_button.click
+          wait_for_ajaximations
+
+          assignment = Assignment.last
+
+          expect(assignment.important_dates).to be(true)
+        end
+
         context "with archived grading schemes enabled" do
           before do
             Account.site_admin.enable_feature!(:grading_scheme_updates)
@@ -1256,6 +1279,32 @@ describe "discussions" do
             expect(assignment.assignment_overrides.active.count).to eq 1
             expect(assignment.all_assignment_overrides.active.count).to eq 2
             expect(assignment.assignment_overrides.first.set_type).to eq "Course"
+          end
+
+          it "does not display module override if an unassigned override exists" do
+            graded_discussion = create_graded_discussion(course)
+            module1 = course.context_modules.create!(name: "Module 1")
+            graded_discussion.context_module_tags.create! context_module: module1, context: course, tag_type: "context_module"
+
+            override = module1.assignment_overrides.create!
+            override.assignment_override_students.create!(user: @student1)
+
+            unassigned_override = graded_discussion.assignment.assignment_overrides.create!
+            unassigned_override.assignment_override_students.create!(user: @student1)
+            unassigned_override.update(unassign_item: true)
+
+            assigned_override = graded_discussion.assignment.assignment_overrides.create!
+            assigned_override.assignment_override_students.create!(user: @student2)
+
+            # Open page and assignTo tray
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            # Verify the module override is not shown
+            expect(module_item_assign_to_card.count).to eq 1
+            expect(module_item_assign_to_card[0].find_all(assignee_selected_option_selector).map(&:text)).to eq ["User"]
+            expect(module_item_assign_to_card[0]).not_to contain_css(inherited_from_selector)
           end
 
           it "does not create an override if the modules override is not updated" do

@@ -28,6 +28,8 @@ type AvailableFromDateTimeInputProps = CustomDateTimeInputProps & {
   availableFromDate: string | null
   setAvailableFromDate: (availableFromDate: string | null) => void
   handleAvailableFromDateChange: (_event: React.SyntheticEvent, value: string | undefined) => void
+  disabledWithGradingPeriod?: boolean
+  clearButtonAltLabel: string
 }
 
 export function AvailableFromDateTimeInput({
@@ -40,6 +42,8 @@ export function AvailableFromDateTimeInput({
   dateInputRefs,
   timeInputRefs,
   handleBlur,
+  disabledWithGradingPeriod,
+  clearButtonAltLabel,
   ...otherProps
 }: AvailableFromDateTimeInputProps) {
   const key = 'unlock_at'
@@ -68,7 +72,8 @@ export function AvailableFromDateTimeInput({
   const availableFromDateProps = {
     key,
     id: key,
-    disabled: Boolean(blueprintDateLocks?.includes('availability_dates')),
+    disabled:
+      Boolean(blueprintDateLocks?.includes('availability_dates')) || disabledWithGradingPeriod,
     description: I18n.t('Choose an available from date and time'),
     dateRenderLabel: I18n.t('Available from'),
     value: availableFromDate,
@@ -78,6 +83,7 @@ export function AvailableFromDateTimeInput({
     onBlur,
     dateInputRef,
     timeInputRef,
+    clearButtonAltLabel,
   }
 
   return <ClearableDateTimeInput {...availableFromDateProps} {...otherProps} />

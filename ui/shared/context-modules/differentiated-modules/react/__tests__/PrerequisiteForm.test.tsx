@@ -58,12 +58,13 @@ describe('PrerequisiteForm', () => {
 
   it('calls onAddPrerequisite when the add button is clicked', () => {
     const {getByText} = renderComponent()
-    getByText('Prerequisite').click()
+    getByText('Add Prerequisite').click()
     expect(props.onAddPrerequisite).toHaveBeenCalled()
   })
 
   it('does not render the add button when all available modules have prerequisites', () => {
     const {queryByText} = renderComponent({prerequisites: [...props.availableModules]})
     expect(queryByText('Prerequisite')).not.toBeInTheDocument()
+    expect(queryByText('Add Prerequisite')).not.toBeInTheDocument()
   })
 })

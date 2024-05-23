@@ -123,6 +123,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     return "" unless assignment
 
     args = []
+    args << "abGuid: #{assignment[:abGuid]}" if assignment[:abGuid]
     args << "pointsPossible: #{assignment[:pointsPossible]}" if assignment[:pointsPossible]
     args << "postToSis: #{assignment[:postToSis]}" if assignment.key?(:postToSis)
     args << "assignmentGroupId: \"#{assignment[:assignmentGroupId]}\"" if assignment[:assignmentGroupId]
@@ -310,7 +311,8 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
         grading_type: "points",
         points_possible: 5,
         due_at: 3.months.from_now,
-        peer_reviews: false
+        peer_reviews: false,
+        ab_guid: ["1E20776E-7053-11DF-8EBF-BE719DFF4B22"]
       )
       @topic = @discussion_assignment.discussion_topic
     end
@@ -513,6 +515,18 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       @topic.update!(group_category: group_category_old)
       result = run_mutation(id: @topic.id, group_category_id: group_category_new.id, assignment: { groupCategoryId: group_category_old.id })
       expect(result["errors"][0]["message"]).to eq "Assignment group category id and discussion topic group category id do not match"
+    end
+
+    it "updates the ab_guid on the assignment" do
+      result = run_mutation(id: @topic.id, assignment: { abGuid: ["1E20776E-7053-11DF-8EBF-BE719DFF4B22", "1e20776e-7053-11df-8eBf-Be719dff4b22"] })
+      expect(result["errors"]).to be_nil
+      expect(Assignment.last.ab_guid).to eq(["1E20776E-7053-11DF-8EBF-BE719DFF4B22", "1e20776e-7053-11df-8eBf-Be719dff4b22"])
+    end
+
+    it "preserves the current ab_guid value on the assignment if abGuid is not passed in from the mutation" do
+      result = run_mutation(id: @topic.id, assignment: {})
+      expect(result["errors"]).to be_nil
+      expect(Assignment.last.ab_guid).to eq(["1E20776E-7053-11DF-8EBF-BE719DFF4B22"])
     end
   end
 

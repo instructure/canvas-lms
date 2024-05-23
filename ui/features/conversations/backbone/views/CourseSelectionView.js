@@ -21,7 +21,7 @@ import {debounce, bind, filter, each} from 'lodash'
 import {View} from '@canvas/backbone'
 import SearchableSubmenuView from './SearchableSubmenuView'
 import template from '../../jst/courseOptions.handlebars'
-import '@canvas/datetime/jquery'
+import {fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import 'bootstrap-dropdown'
 import 'bootstrap-select'
 
@@ -75,7 +75,7 @@ export default class CourseSelectionView extends View {
     super.render()
     const more = []
     const concluded = []
-    const now = $.fudgeDateForProfileTimezone(new Date())
+    const now = fudgeDateForProfileTimezone(new Date())
     this.options.courses.all.each(course => {
       if (this.options.courses.favorites.get(course.id)) return
       if (course.get('access_restricted_by_date')) return

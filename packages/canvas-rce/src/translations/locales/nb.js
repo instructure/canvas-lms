@@ -185,6 +185,9 @@ const locale = {
   "congruent_5a244acd": { "message": "Kongruent" },
   "contains_311f37b7": { "message": "Inneholder" },
   "content_1440204b": { "message": "Innhold" },
+  "content_in_the_editor_will_be_changed_press_cancel_d5bf3357": {
+    "message": "Innhold i redigeringsprogrammet vil bli endret. Trykk Avbryt for å beholde originalt innhold."
+  },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "Innhold blir fortsatt lastet opp, fortsetter du vil ikke innholdet bli innebygd riktig."
   },
@@ -789,6 +792,9 @@ const locale = {
   "precedes_196b9aef": { "message": "Forutgående" },
   "precedes_equal_20701e84": { "message": "Går foran lik" },
   "preformatted_d0670862": { "message": "Forhåndsformattert" },
+  "prepend_findtext_append_8e0e769a": {
+    "message": "{ prepend }{ findText }{ append }"
+  },
   "prev_f82cbc48": { "message": "Forrige" },
   "preview_53003fd2": { "message": "Forhåndsvisning" },
   "preview_a3f8f854": { "message": "FORHÅNDSVISNING" },
@@ -843,6 +849,9 @@ const locale = {
   "resize_ec83d538": { "message": "Endre størrelse" },
   "restore_auto_save_deccd84b": {
     "message": "Gjenopprette automatisk lagring?"
+  },
+  "result_index_of_max_7db5ad8b": {
+    "message": "Resultat { index } av { max }."
   },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Omvendt turnstile (gir ikke etter)"

@@ -41,44 +41,55 @@ admin_analytics_dap_model:
   description:
     wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
     admin_analytics_dap_model_description: Enables the use of DAP for Analytics at the account-level.
-  after_state_change_proc: analytics_2_after_state_change_hook
+  root_opt_in: true
+  beta: true
+  shadow: true
+course_analytics_dap_model:
+  state: hidden
+  applies_to: Account
+  display_name: New/Course Analytics DAP
+  description:
+    wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
+    admin_analytics_dap_model_description: Enables the use of DAP for Analytics at the account-level.
   root_opt_in: true
   beta: true
   shadow: true
 
-# Advanced Analytics - Provided through K20 LTI App
+# Intelligent Insights - Provided through K20 LTI App
 k20_course_readiness_alpha_testing:
   state: hidden
   applies_to: Account
   display_name: K20 - Course Readiness Alpha Testing
   description:
-    k20_course_readiness_alpha_testing_description: This flag is for institutions participating in Advanced Analytics Alpha testing. This flag enables the Course Readiness dashboard for these institutions.
+    k20_course_readiness_alpha_testing_description: This flag is for institutions participating in Intelligent Insights Alpha testing. This flag enables the Course Readiness dashboard for these institutions.
   root_opt_in: true
   beta: true
 k20_course_readiness:
   state: hidden
   applies_to: Account
-  display_name: Advanced Analytics - Course Readiness Closed Alpha
+  display_name: Intelligent Insights - Course Readiness
   description:
-    k20_course_readiness_description: Enables the Advanced Analytics Course Readiness Dashboard for Alpha testers.
+    k20_course_readiness: Enables the Course Readiness for closed beta customers.
   root_opt_in: true
   beta: true
-k20_beta:
+  shadow: true
+k20_students_in_need_of_attention:
   state: hidden
   applies_to: Account
-  display_name: Advanced Analytics - Course Readiness and Students in Need of Attention
+  display_name: Intelligent Insights - Students in Need of Attention
   description:
-    k20_beta_description: Enables the Course Readiness and Students in Need of Attention dashboards for closed beta customers.
+    k20_students_in_need_of_attention: Enables the Students in Need of Attention dashboards for closed beta customers.
   root_opt_in: true
   beta: true
+  shadow: true
 
-# Advanced Analytics - Provided through Ask Your Data LTI App
+# Intelligent Insights - Provided through Ask Your Data LTI App
 advanced_analytics_ask_questions:
   state: hidden
   applies_to: Account
-  display_name: Advanced Analytics - Ask Your Data
+  display_name: Intelligent Insights - Ask Your Data
   description:
-    advanced_analytics_ask_questions: Enables the Advanced Analytics - Ask Your Data feature and accompanying permission.
+    advanced_analytics_ask_questions: Enables the Intelligent Insights - Ask Your Data feature and accompanying permission.
   root_opt_in: true
   beta: true
   shadow: true
