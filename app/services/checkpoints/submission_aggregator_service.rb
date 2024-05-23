@@ -67,8 +67,8 @@ class Checkpoints::SubmissionAggregatorService < Checkpoints::AggregatorService
       submission.grader_id = most_recently_graded.grader_id
     end
 
-    submission.grade = grade(submission.score)
-    submission.published_grade = grade(submission.published_score)
+    submission.grade = grade(submissions, submission.score)
+    submission.published_grade = grade(submissions, submission.published_score)
     submission.grade_matches_current_submission = calculate_grade_matches_current_submission(submissions)
     submission.posted_at = max_if_all_present(submissions, :posted_at)
     submission.workflow_state = shared_attribute(submissions, :workflow_state, "unsubmitted")
@@ -81,7 +81,21 @@ class Checkpoints::SubmissionAggregatorService < Checkpoints::AggregatorService
     submissions.all?(&field_name) ? max(submissions, field_name) : nil
   end
 
-  def grade(score)
+  def all_nil?(submissions, field_name)
+    submissions.all? { |submission| submission.send(field_name).nil? }
+  end
+
+  def all_equal?(submissions, field_name, value)
+    submissions.all? { |submission| submission.send(field_name) == value }
+  end
+
+  def grade(submissions, score)
+    if @assignment.grading_type == "pass_fail"
+      return nil if all_nil?(submissions, :grade)
+
+      return all_equal?(submissions, :grade, "complete") ? "complete" : "incomplete"
+    end
+
     score ? @assignment.score_to_grade(score) : nil
   end
 
