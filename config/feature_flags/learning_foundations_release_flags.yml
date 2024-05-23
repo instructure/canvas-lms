@@ -248,3 +248,11 @@ rce_find_replace:
   description: |-
     Enable a plugin which can find and replace content when editing in an RCE
   applies_to: SiteAdmin
+
+dashboard_graphql_integration:
+  state: hidden
+  display_name: Dashboard GraphQL Integration
+  description: |-
+    Integrate GraphQL queries and mutations for the Dashboard to improve loading speed
+    and simplify data fetching logic.
+  applies_to: SiteAdmin
