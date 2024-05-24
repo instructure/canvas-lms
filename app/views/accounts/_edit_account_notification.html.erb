@@ -65,7 +65,7 @@
 
   <% if @account.root_account.trust_exists? %>
     <div class="ic-Form-control">
-      <%= f.check_box :domain_specific, :checked => announcement.domain_specific %>
+      <%= f.check_box :domain_specific, :checked => announcement.domain_specific, :id => "domain_specific_#{announcement.id}" %>
       <%= f.label :domain_specific, t("Only show announcement on current account domain") %>
     </div>
   <% end %>

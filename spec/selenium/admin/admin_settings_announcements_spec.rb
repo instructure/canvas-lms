@@ -113,6 +113,87 @@ describe "settings tabs" do
       expect(notification.end_at).not_to eq initial_notification_end
     end
 
+    it "copies and saves an announcement" do
+      notification = account_notification(user: @user)
+      get "/accounts/#{Account.default.id}/settings"
+      wait_for_ajaximations
+      f("#tab-announcements-link").click
+
+      # Setting up the content for copy
+      f("#notification_edit_#{notification.id}").click
+      force_click("label:contains('Student')")
+      force_click("label:contains('Teacher')")
+      ff(".edit_notification_form .ui-datepicker-trigger")[0].click
+      fln("5").click
+      ff(".edit_notification_form .ui-datepicker-trigger")[1].click
+      fln("15").click
+      f("#edit_notification_form_#{notification.id}").submit
+      notification.reload
+
+      # Checking if content saved properly
+      expect(notification.subject).to eq "this is a subject"
+      expect(notification.message).to eq "<p>hi there</p>"
+      expect(notification.icon).to eq "warning"
+      expect(notification.account_notification_roles.count).to eq 2
+      expect(notification.start_at.day).to eq 5
+      expect(notification.end_at.day).to eq 15
+
+      # Copy content
+      f("#notification_copy_#{notification.id}").click
+
+      # Checking if content copied properly
+      expect(element_value_for_attr(f("#account_notification_subject"), "value")).to eq "this is a subject"
+      expect(element_value_for_attr(f("#account_notification_message"), "value")).to eq "<p>hi there</p>"
+      expect(element_value_for_attr(f("#account_notification_icon"), "value")).to eq "warning"
+      expect(element_value_for_attr(ff("[id^=account_notification_role_]")[0], "checked")).to eq "true"
+      expect(element_value_for_attr(ff("[id^=account_notification_role_]")[1], "checked")).to eq "true"
+      expect(element_value_for_attr(ff("[id^=account_notification_role_]")[2], "checked")).to be_nil
+      expect(element_value_for_attr(f("#account_notification_start_at"), "value")).to include "5 at"
+      expect(element_value_for_attr(f("#account_notification_end_at"), "value")).to include "15 at"
+
+      # Saving copied content
+      submit_form("#add_notification_form")
+      wait_for_ajax_requests
+
+      # Checking if copied content has been saved as new item
+      expect(AccountNotification.count).to eq 2
+    end
+
+    it "resets form properly on new announcement" do
+      notification = account_notification(user: @user)
+      get "/accounts/#{Account.default.id}/settings"
+      wait_for_ajaximations
+      f("#tab-announcements-link").click
+
+      # Setting up the content for copy
+      f("#notification_edit_#{notification.id}").click
+      force_click("label:contains('Student')")
+      force_click("label:contains('Teacher')")
+      ff(".edit_notification_form .ui-datepicker-trigger")[0].click
+      fln("5").click
+      ff(".edit_notification_form .ui-datepicker-trigger")[1].click
+      fln("15").click
+      f("#edit_notification_form_#{notification.id}").submit
+      notification.reload
+
+      # Copy content
+      f("#notification_copy_#{notification.id}").click
+
+      # Close and reopen form
+      fj(".element_toggler:visible").click
+      fj(".element_toggler:visible").click
+
+      # Checking if form got reset
+      expect(element_value_for_attr(f("#account_notification_subject"), "value")).to eq ""
+      expect(element_value_for_attr(f("#account_notification_message"), "value")).to eq ""
+      expect(element_value_for_attr(f("#account_notification_icon"), "value")).to eq "information"
+      expect(element_value_for_attr(ff("[id^=account_notification_role_]")[0], "checked")).to be_nil
+      expect(element_value_for_attr(ff("[id^=account_notification_role_]")[1], "checked")).to be_nil
+      expect(element_value_for_attr(ff("[id^=account_notification_role_]")[2], "checked")).to be_nil
+      expect(element_value_for_attr(f("#account_notification_start_at"), "value")).to eq ""
+      expect(element_value_for_attr(f("#account_notification_end_at"), "value")).to eq ""
+    end
+
     context "messages" do
       it "lets you mark the checkbox to send messages for a new announcement" do
         get "/accounts/#{Account.default.id}/settings"
