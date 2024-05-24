@@ -87,6 +87,10 @@ module MasterCourses::Restrictor
 
     def mark_as_importing!(cm)
       @importing_migration = cm if cm&.master_course_subscription
+      # if we are doing a course copy and the source course has up-to-date search embeddings,
+      # we will copy those embeddings in batches instead of regenerating them
+      self.skip_embeddings = true if cm&.for_course_copy? && respond_to?(:skip_embeddings=) &&
+                                     SmartSearch.up_to_date?(cm.source_course)
     end
 
     def skip_downstream_changes!

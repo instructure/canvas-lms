@@ -644,6 +644,7 @@ class ContentMigration < ActiveRecord::Base
       import!(data)
 
       process_master_deletions(deletions.slice("LearningOutcome", "AssignmentGroup")) if deletions
+      SmartSearch.copy_embeddings(self) if for_master_course_import?
 
       unless import_immediately?
         update_import_progress(100)
@@ -1352,6 +1353,53 @@ class ContentMigration < ActiveRecord::Base
     Attachments::Storage.store_for_attachment(asset_map_attachment, StringIO.new(payload.to_json))
     asset_map_attachment.save!
     save!
+  end
+
+  # this is a much-simplified subset of asset_id_mapping that includes only ids,
+  # for only the items imported in this migration
+  def imported_asset_id_map
+    return nil unless imported? && for_course_copy?
+
+    mapping = {}
+    master_template = migration_type == "master_course_import" &&
+                      master_course_subscription&.master_template
+    global_ids = master_template.present? || use_global_identifiers?
+
+    migration_settings[:imported_assets].each do |asset_type, dest_ids|
+      klass = asset_type.constantize
+      next unless klass.column_names.include? "migration_id"
+
+      dest_ids = dest_ids.split(",").map(&:to_i)
+      mig_id_to_dest_id = context.shard.activate do
+        scope = klass.where(context:, id: dest_ids)
+        scope = scope.only_discussion_topics if asset_type == "DiscussionTopic"
+        scope.where.not(migration_id: nil)
+             .pluck(:migration_id, :id)
+             .to_h
+      end
+
+      mapping[asset_type] ||= {}
+      if master_template
+        master_template.master_content_tags
+                       .where(migration_id: mig_id_to_dest_id.keys)
+                       .pluck(:content_id, :migration_id)
+                       .each do |src_id, mig_id|
+          mapping[asset_type][src_id] = mig_id_to_dest_id[mig_id]
+        end
+      else
+        source_course.shard.activate do
+          src_ids = klass.where(context: source_course).pluck(:id)
+          src_ids.each do |src_id|
+            asset_string = klass.asset_string(src_id)
+            mig_id = CC::CCHelper.create_key(asset_string, global: global_ids)
+            dest_id = mig_id_to_dest_id[mig_id]
+            mapping[asset_type][src_id] = dest_id if dest_id
+          end
+        end
+      end
+    end
+
+    mapping
   end
 
   def destination_hosts
