@@ -40,8 +40,8 @@ new_quizzes_account_course_level_item_banks:
   state: hidden
 new_quizzes_by_default:
   state: allowed
-  display_name: Default to New Quizzes
-  description: Use New Quizzes as the default quizzing engine. Removes the ability to create classic quizzes.
+  display_name: Disable Classic Quiz Creation
+  description: Use New Quizzes as the default quizzing engine when creating a quiz. Removes the ability to create classic quizzes.
   applies_to: Course
   visible_on: quizzes_next_visible_on_hook
 new_quizzes_allow_service_jwt_refresh:
