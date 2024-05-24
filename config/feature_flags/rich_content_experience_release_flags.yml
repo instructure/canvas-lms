@@ -100,6 +100,20 @@ rce_find_replace:
     development:
       state: allowed_on
 
+rce_linked_file_urls:
+  state: hidden
+  display_name: Allow Rich Content from other sources to create file links
+  description: |-
+    New Quizzes (and eventually others) need a way to create file links that work more independently
+    of Canvas. This API allows creation of link locations so that we can track files linked in the rich
+    content of other tools and grant access to them from those locations.
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
 rce_transform_loaded_content:
   state: hidden
   display_name: Transform RCE Content on Load

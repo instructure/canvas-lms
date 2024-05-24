@@ -50,7 +50,7 @@ module AuthenticationMethods
     end
 
     # functionally encapsulates mapping an InstAccess token and a domain root account
-    # to a user/pseudonym.  This is out on it's own because there are some db-state
+    # to a user/pseudonym.  This is out on its own because there are some db-state
     # edge cases (like multiple users with the same UUID due to user merges, etc)
     # that are convenient to test close to the implementation.
     #
