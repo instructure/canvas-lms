@@ -3718,7 +3718,7 @@ is:
   anonymous_e1b8ad27: Nafnlaus
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Nafnlaus einkannagjöf ekki í boði fyrir hópverkefni"
   anonymous_grading_ccb5045c: "Nafnlaus einkunnagjöf"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Nafnlaus einkunnagjöf krefst þess að nöfn nemenda séu falin í SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Nafnlaus einkunnagjöf krefst þess að nöfn nemenda séu falin í SpeedGrader"
   anonymous_grading_with_new_quizzes_ba0391f3: "Nafnlaus einkunnagjöf með nýjum prófum"
   anonymous_id_2ef1c6d2: "Nafnlaus %{id}"
   anonymous_id_you_cf43ab76: "Nafnlaus %{id} (Þú)"
@@ -4409,7 +4409,7 @@ is:
       resubmission_count: 
         one: "1 ómetin endurskil"
         other: "%{count}ómetin endurskil"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Tengd atriði"
     grade_gpa_scale_screenreader: "Einkunn: %{grade}"
@@ -4583,7 +4583,7 @@ is:
       no_points: Enginn
       no_submission: Ekkert
       points: Punktar
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: Skráartegundir
       submitting: Skila
       turnitin: Turnitin
@@ -10301,7 +10301,7 @@ is:
       mark_all_as_unread: "Merkja allt sem ólesið"
       retrieved_from_feed: "Endurheimt frá %{feed}"
       show_rubric: "Sýna matskvarði"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Ekki hægt að fela ef svör nemenda eru til staðar"
       topic: Efni
@@ -22131,7 +22131,7 @@ is:
           quiz_instructions: Próffyrirmæli
           quiz_score: Einkunn
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "1 tilraunir til viðbótar heimiluð"
@@ -22253,7 +22253,7 @@ is:
           one: "Prófið hefur verið endurmetið; einkunnin þín breyttist."
           other: "Prófið hefur verið endurmetið; nýja einkunnin þín sýnir %{count} spurningar sem það hafði áhrif á."
         quiz_regraded_your_score_not_affected: "Prófið var endurmetið; einkunnin þín er óbreytt."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "1 nemandi hefur skilað til þessa"
           other: "%{count} nemendur hafa skilað til þessa"
@@ -25356,7 +25356,7 @@ is:
   speedgrader_settings_4195099b: "SpeedGrader Stillingar"
   speedgrader_settings_c9503705: "Stillingar Speedgrader"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studio föngun margmiðlunarefnis"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Skipta
   split_merged_users_6b81c595: "Skipta sameinuðum notendum"
   split_number_of_students_per_group_4a05f76f: "Skipta fjölda nemenda í hverjum hóp"
@@ -25890,7 +25890,7 @@ is:
       see_vericite_results: "Sjá VeriCite-niðurstöður"
       sent_to_whole_group: "Senda athugasemd til alls hópsins"
       show_rubric: "Sýna matskvarði"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Einkunnir eru ótiltækar því kennari er að vinna í þeim."
       submission_details: "Upplýsingar um skil"
       submitted_at: "skilað %{submit_date}"

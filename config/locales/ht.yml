@@ -3726,7 +3726,7 @@ ht:
   anonymous_e1b8ad27: Anomin
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Klasman anonim nan paka aktive pou afektasyon gwoup yo"
   anonymous_grading_ccb5045c: "Klasman Anomin"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Klasman anomin fòse non elèv yo pou yo kache nan SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Klasman anomin fòse non elèv yo pou yo kache nan SpeedGrader"
   anonymous_grading_with_new_quizzes_ba0391f3: "Notasyon Anonimak Nouvo Quiz yo"
   anonymous_id_2ef1c6d2: "Anonim %{id}"
   anonymous_id_you_cf43ab76: "Anonim %{id} (Ou menm)"
@@ -4425,7 +4425,7 @@ ht:
       resubmission_count: 
         one: "1 Re soumisyon San Klase"
         other: "%{count} Re soumisyon San Klase"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Atik ki gen Rapò"
     grade_gpa_scale_screenreader: "Klas: %{grade}"
@@ -4606,7 +4606,7 @@ ht:
       no_points: Okenn
       no_submission: Anyen
       points: Pwen
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: "Tip Fichye"
       submitting: Soumisyon...
       turnitin: Turnitin
@@ -10498,7 +10498,7 @@ ht:
       mark_all_as_unread: "Make Tout Ke yo Poko Li"
       retrieved_from_feed: "Rekipere de %{feed}"
       show_rubric: "Afiche Ribrik"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Ou paka pa pibliye si gen repons elèv"
       topic: Sijè
@@ -22526,7 +22526,7 @@ ht:
           quiz_instructions: "Enstriksyon Quiz"
           quiz_score: Nòt
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "1 Tantativ Anplis Disponib"
@@ -22648,7 +22648,7 @@ ht:
           one: "Quiz sa a regrade; nòt ou a te afekte."
           other: "Quiz sa a regrade; nouvo nòt ou a reflete %{count} kesyon ki te afekte yo."
         quiz_regraded_your_score_not_affected: "Quiz sa a regrade; nòt ou a pa t afekte."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "1 elèv soumèt jiska prezan"
           other: "%{count} elèv soumèt jiska prezan"
@@ -25784,7 +25784,7 @@ ht:
   speedgrader_settings_4195099b: "SpeedGrader Paramèt"
   speedgrader_settings_c9503705: "Paramèt SpeedGrader"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Kapti Medya Studio"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Separe
   split_merged_users_6b81c595: "Fizyon Itilizatè Divize"
   split_number_of_students_per_group_4a05f76f: "Divize kantite elèv yo pa gwoup"
@@ -26324,7 +26324,7 @@ ht:
       see_vericite_results: "Afiche VeriCite rezilta yo"
       sent_to_whole_group: "Voye kòmantè bay tout gwoup la"
       show_rubric: "Afiche Ribrik"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Nòt yo pa disponib paske enstriktè a ap travay ladan yo."
       submission_details: "Detay Soumisyon"
       submitted_at: "soumèt %{submit_date}"

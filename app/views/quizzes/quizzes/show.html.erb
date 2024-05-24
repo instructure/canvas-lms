@@ -87,7 +87,7 @@
 
         <% if (can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades)) && @quiz.available? &&
           @quiz.published? && !!@quiz.assignment&.can_view_speed_grader?(@current_user) %>
-          <% speed_grader_title = t(:speed_grader, "SpeedGrader™") %>
+          <% speed_grader_title = t(:speed_grader, "SpeedGrader") %>
           <li>
             <a target="_blank" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @quiz.assignment.id) %>">
               <i class="icon-speed-grader"><span class="screenreader-only"><%= speed_grader_title %></span></i> <%= speed_grader_title %>

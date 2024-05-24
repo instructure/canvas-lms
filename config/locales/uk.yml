@@ -2116,7 +2116,7 @@ uk:
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "Зробити анонімними всі коментарі, зроблені інструкторами, або подання на завдання у SpeedGrader"
   anonymous_e1b8ad27: Анонімний
   anonymous_grading_ccb5045c: "Анонімне оцінювання "
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Анонімне примусове оцінювання приховує імена студентів в SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Анонімне примусове оцінювання приховує імена студентів в SpeedGrader"
   anonymous_instructor_annotations_2b6c822: "Анонімні коментарі інструктора"
   anonymous_user: "Анонімний користувач"
   anonymous_user_d984b9ce: "Анонімний користувач"
@@ -2591,7 +2591,7 @@ uk:
         many: "%{count} неоцінених повторно завантажених робіт"
         one: "1 неоцінена повторно завантажена робота"
         other: "%{count} неоцінених повторно завантажених робіт"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Пов'язані елементи"
     grade_gpa_scale_screenreader: "Оцінка: %{grade}"
@@ -2753,7 +2753,7 @@ uk:
       no_points: Ні
       no_submission: Нічого
       points: Бали
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: "Типи файлів"
       submitting: Підтвердження
       turnitin: Turnitin
@@ -6626,7 +6626,7 @@ uk:
       mark_all_as_unread: "Позначити все як Непрочитане"
       retrieved_from_feed: "Витягнуто з %{feed}"
       show_rubric: "Показати рубрику"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Неможливо скасувати публікацію, якщо наявні відповіді студентів"
       topic: Тема
@@ -14370,7 +14370,7 @@ uk:
           quiz_instructions: "Інструкція контрольної роботи"
           quiz_score: Оцінка
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           few: "Ще %{count}доступних спроб"
@@ -14500,7 +14500,7 @@ uk:
           one: "Цю контрольну роботу було переоцінено; це вплинуло на ваш бал."
           other: "Цю контрольну роботу було переоцінено; ваш новий бал враховує %{count} питань, які зазнали впливу."
         quiz_regraded_your_score_not_affected: "Цю контрольну роботу було переоцінено; ваш рахунок не зазнав впливу."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           few: "Поки що подало%{count} студенти"
           many: "Поки що подало%{count} студентів"
@@ -16526,7 +16526,7 @@ uk:
       resubmitting: "Повторне надавання..."
   speedgrader_de0affa6: SpeedGrader
   speedgrader_settings_c9503705: "Налаштування Speedgrader"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   spreadsheet_6d622119: "Електронна таблиця"
   spring_grading_period_current_score_7083cf0d: "Поточний бал весіннього періоду оцінювання"
   spring_grading_period_final_score_386d92f7: "Підсумковий бал весіннього періоду оцінювання"
@@ -16826,7 +16826,7 @@ uk:
       see_vericite_results: "Побачити результати VeriCite "
       sent_to_whole_group: "Надіслати коментар всій групі"
       show_rubric: "Показати рубрику"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Оцінки недоступні, тому що інструктор ще працює над ними."
       submission_details: "Детальна інформація про відправлення"
       submitted_at: "відправлено: %{submit_date}"

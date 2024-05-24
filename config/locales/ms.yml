@@ -3521,7 +3521,7 @@ ms:
       no_points: Tiada
       no_submission: "Tiada apa-apa"
       points: Mata
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: "Jenis Fail"
       submitting: "Sedang menyerahkan"
       turnitin: Turnitin
@@ -8185,7 +8185,7 @@ ms:
       mark_all_as_unread: "Tandakan Semua sebagai Belum Dibaca"
       retrieved_from_feed: "Diambil semula daripada %{feed}"
       show_rubric: "Tunjuk Rubrik"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Tidak boleh menyahterbit jika terdapat balasan pelajar"
       topic: Topik
@@ -18035,7 +18035,7 @@ ms:
           quiz_instructions: "Arahan Kuiz"
           quiz_score: Skor
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "1 Lagi Percubaan tersedia"
@@ -18156,7 +18156,7 @@ ms:
           one: "Kuiz ini telah digredkan semula; skor anda terlibat."
           other: "Kuiz ini telah digredkan semula; skor baharu anda merupakan refleksi kepada %{count} soalan yang terlibat."
         quiz_regraded_your_score_not_affected: "Kuiz ini telah digredkan semula; skor anda tidak terlibat."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "1 pelajar membuat serahan setakat ini"
           other: "%{count} pelajar membuat serahan setakat ini"
@@ -20734,7 +20734,7 @@ ms:
   speedgrader_loading_error_235fd2e2: "Ralat memuatkan SpeedGrader"
   speedgrader_settings_4195099b: "Tetapan SpeedGrader"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Tangkapan Media Studio"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Split
   split_merged_users_6b81c595: "Split Pengguna Digabungkan"
   split_number_of_students_per_group_4a05f76f: "Split bilangan pelajar setiap kumpulan"
@@ -21221,7 +21221,7 @@ ms:
       see_vericite_results: "Lihat hasil VeriCite"
       sent_to_whole_group: "Hantar komen kepada seluruh kumpulan"
       show_rubric: "Tunjuk Rubrik"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Gred tidak tersedia kerana pengajar sedang menyiapkannya."
       submission_details: "Butiran Serahan"
       submitted_at: "diserahkan pada %{submit_date}"
