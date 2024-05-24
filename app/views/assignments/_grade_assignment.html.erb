@@ -30,8 +30,7 @@
         <%= render :partial => 'submissions/submission_download' %>
         <a href="<%= context_url(@context, :context_assignment_submissions_url, @assignment.id, :zip => 1) %>"
           id="download_submission_button"
-          class="download_submissions_link icon-download">
-          <%= t 'links.download_submissions', "Download Submissions" %>
+          class="download_submissions_link icon-download"><%= t 'links.download_submissions', "Download Submissions" %>
         </a>
 
         <% if @can_grade %>
