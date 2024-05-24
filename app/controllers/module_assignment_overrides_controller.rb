@@ -172,6 +172,7 @@ class ModuleAssignmentOverridesController < ApplicationController
       update_existing_overrides(overrides_to_update)
       create_new_overrides(overrides_to_create)
       @context_module.update_assignment_submissions
+      @context_module.touch_context
     end
   end
 

@@ -987,10 +987,10 @@ class ContextModule < ActiveRecord::Base
     assignment_overrides
   end
 
-  def update_assignment_submissions(module_assignments_quizzes = current_items_with_assignment)
+  def update_assignment_submissions(module_assignments = current_items_with_assignment)
     if Account.site_admin.feature_enabled?(:differentiated_modules)
-      module_assignments_quizzes.clear_cache_keys(:availability)
-      SubmissionLifecycleManager.recompute_course(context, assignments: module_assignments_quizzes, update_grades: true)
+      module_assignments.clear_cache_keys(:availability)
+      SubmissionLifecycleManager.recompute_course(context, assignments: module_assignments, update_grades: true)
     end
   end
 
