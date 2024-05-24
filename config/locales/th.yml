@@ -3595,7 +3595,7 @@ th:
       no_points: ไม่มี
       no_submission: ไม่มีอะไร
       points: คะแนน
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: ประเภทไฟล์
       submitting: กำลังจัดส่ง
       turnitin: Turnitin
@@ -8409,7 +8409,7 @@ th:
       mark_all_as_unread: กำกับทั้งหมดว่ายังไม่ได้อ่าน
       retrieved_from_feed: "เรียกค้นจาก %{feed}"
       show_rubric: แสดงเกณฑ์การให้คะแนน
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: ไม่สามารถยกเลิกการเผยแพร่หากมีการตอบกลับของผู้เรียน
       topic: หัวข้อ
@@ -18598,7 +18598,7 @@ th:
           quiz_instructions: คำแนะนำสำหรับแบบทดสอบ
           quiz_score: คะแนน
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "ใช้ได้อีก 1 ครั้ง"
@@ -18719,7 +18719,7 @@ th:
           one: "แบบทดสอบนี้ได้รับการปรับเกรดแล้ว คะแนนของคุณอาจมีการเปลี่ยนแปลง"
           other: "แบบทดสอบนี้ได้รับการปรับเกรดแล้ว คะแนนใหม่ของคุณเชื่อมโยงกับคำถาม %{count} ข้อ"
         quiz_regraded_your_score_not_affected: "แบบทดสอบนี้ได้รับการปรับเกรดแล้ว คะแนนของคุณจะไม่ได้รับผลกระทบใด ๆ"
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "จัดส่ง 1 ผู้เรียนจนถึงปัจจุบัน"
           other: "จัดส่ง %{count} ผู้เรียนจนถึงปัจจุบัน"
@@ -21363,7 +21363,7 @@ th:
   speedgrader_loading_error_235fd2e2: "ข้อผิดพลาดในการโหลด SpeedGrader"
   speedgrader_settings_4195099b: "ค่าปรับตั้ง SpeedGrader"
   speedgrader_studio_media_capture_3fd8aa93: "การบันทึกมีเดียของ SpeedGrader Studio"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: แยก
   split_merged_users_6b81c595: แยกผู้ใช้ที่ผสานแล้ว
   split_number_of_students_per_group_4a05f76f: แยกจำนวนผู้เรียนต่อกลุ่ม
@@ -21859,7 +21859,7 @@ th:
       see_vericite_results: "ดูผลลัพธ์ VeriCite"
       sent_to_whole_group: ส่งความเห็นให้กับกลุ่มทั้งหมด
       show_rubric: แสดงเกณฑ์การให้คะแนน
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: เกรดไม่พร้อมใช้งานเนื่องจากผู้สอนกำลังดำเนินการอยู่
       submission_details: รายละเอียดผลงานจัดส่ง
       submitted_at: "จัดส่งเมื่อ %{submit_date}"

@@ -3821,7 +3821,7 @@ pt-BR:
   anonymous_e1b8ad27: Anônimo
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Avaliação anônima não pode ser ativada por tarefas em grupo"
   anonymous_grading_ccb5045c: "Avaliação Anônima"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Classificação anônima força os nomes de alunos a serem escondidos no SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Classificação anônima força os nomes de alunos a serem escondidos no SpeedGrader"
   anonymous_grading_with_new_quizzes_ba0391f3: "Avaliação anônima com novos testes"
   anonymous_id_2ef1c6d2: "Anônimo %{id}"
   anonymous_id_you_cf43ab76: "Anônimo %{id} (Você)"
@@ -4600,7 +4600,7 @@ pt-BR:
           Alunos verão os arquivos modificados nos seus comentários para a submissão.
           
           *Certifique-se de que você não altere os nomes dos arquivos de submissão, para que possamos reconhecê-los.*
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Itens relacionados"
     grade_gpa_scale_screenreader: "Nota: %{grade}"
@@ -4806,7 +4806,7 @@ pt-BR:
       no_points: Nenhum
       no_submission: Nada
       points: Pontos
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: "Tipos de arquivo"
       submitting: Enviando
       turnitin: Turnitin
@@ -10986,7 +10986,7 @@ pt-BR:
       reply_to_topic: "Responder ao tópico"
       retrieved_from_feed: "Recuperado de %{feed}"
       show_rubric: "Exibir rubrica"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Não é possível despublicar, se houver respostas dos alunos"
       topic: Assunto
@@ -24229,7 +24229,7 @@ pt-BR:
           quiz_instructions: "Instruções do teste"
           quiz_score: Pontuação
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "Mais 1 tentativa disponível"
@@ -24376,7 +24376,7 @@ pt-BR:
           one: "Este teste foi reavaliado; sua pontuação foi afetada."
           other: "Este teste foi reavaliado; sua nova pontuação reflete %{count} perguntas que foram afetadas."
         quiz_regraded_your_score_not_affected: "O teste foi reavaliado; sua pontuação não foi afetada."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "1 alunos enviou até o momento"
           other: "%{count} alunos enviaram até o momento"
@@ -27771,7 +27771,7 @@ pt-BR:
   speedgrader_settings_4195099b: "SpeedGrader Configurações"
   speedgrader_settings_c9503705: "Configurações do SpeedGrader"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Captura de Mídia do Studio"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Dividir
   split_merged_users_6b81c595: "Dividir usuários mesclados"
   split_number_of_students_per_group_4a05f76f: "Dividir o número de alunos por grupo"
@@ -28330,7 +28330,7 @@ pt-BR:
       see_vericite_results: "Ver resultados do VeriCite"
       sent_to_whole_group: "Enviar comentário para o grupo inteiro"
       show_rubric: "Exibir rubrica"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Notas não estão disponíveis porque o instrutor está trabalhando nelas."
       submission_details: "Detalhes do envio"
       submitted_at: "enviada %{submit_date}"

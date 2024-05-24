@@ -3610,7 +3610,7 @@ sv-x-k12:
   anonymous_e1b8ad27: Anonym
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Anonym bedömning kan inte aktiveras för gruppuppgifter"
   anonymous_grading_ccb5045c: "Anonym bedömning"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym bedömning döljer elevnamnet i SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym bedömning döljer elevnamnet i SpeedGrader"
   anonymous_grading_with_new_quizzes_ba0391f3: "Anonym bedömning med New Quizzes"
   anonymous_id_2ef1c6d2: "Anonym %{id}"
   anonymous_id_you_cf43ab76: "Anonym %{id} (Du)"
@@ -4286,7 +4286,7 @@ sv-x-k12:
       resubmission_count: 
         one: "1 icke-bedömd återinlämning"
         other: "%{count} icke-bedömda återinlämningar"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Relaterade objekt"
     grade_gpa_scale_screenreader: "Bedömning: %{grade}"
@@ -4451,7 +4451,7 @@ sv-x-k12:
       no_points: Ingen
       no_submission: Inget
       points: Poäng
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: Filtyper
       submitting: "Lämnar in"
       turnitin: Tunitin
@@ -10034,7 +10034,7 @@ sv-x-k12:
       mark_all_as_unread: "Markera alla som olästa"
       retrieved_from_feed: "Hämtat från %{feed}"
       show_rubric: "Visa matris"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Det går inte att avpublicera om det finns svar från elever"
       topic: Ämne
@@ -21616,7 +21616,7 @@ sv-x-k12:
           quiz_instructions: "Instruktioner för quiz"
           quiz_score: Poäng
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "1 försök tillgängligt"
@@ -21738,7 +21738,7 @@ sv-x-k12:
           one: "Detta Quiz har ombedömts; ditt resultat påverkades."
           other: "Detta Quiz har ombedömts; ditt nya resultat innehåller %{count} påverkade frågor."
         quiz_regraded_your_score_not_affected: "Detta Quiz ombedömdes; ditt resultat påverkades inte."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "1 elev har lämnat in än så länge"
           other: "%{count} elever har lämnat in än så länge"
@@ -24755,7 +24755,7 @@ sv-x-k12:
   speedgrader_settings_4195099b: "SpeedGrader inställningar"
   speedgrader_settings_c9503705: "Speedgrader inställningar"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studio Media-inspelning"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Dela
   split_merged_users_6b81c595: "Dela sammanfogade användare"
   split_number_of_students_per_group_4a05f76f: "Dela antal elever per grupp"
@@ -25274,7 +25274,7 @@ sv-x-k12:
       see_vericite_results: "Se VeriCite resultat"
       sent_to_whole_group: "Skicka kommentar till hela gruppen"
       show_rubric: "Visa matris"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Omdömen är inte tillgängliga eftersom läraren arbetar på dem."
       submission_details: Inlämningsdetaljer
       submitted_at: "inlämnad %{submit_date}"

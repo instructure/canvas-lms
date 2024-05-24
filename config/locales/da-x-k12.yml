@@ -3613,7 +3613,7 @@ da-x-k12:
   anonymous_e1b8ad27: Anonym
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Anonym vurdering kan ikke aktiveres til gruppeopgaver"
   anonymous_grading_ccb5045c: "Anonym vurdering"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym vurdering forcerer, at elevernes navne bliver skjult i SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym vurdering forcerer, at elevernes navne bliver skjult i SpeedGrader"
   anonymous_grading_with_new_quizzes_ba0391f3: "Anonym vurdering med New Quizzes"
   anonymous_id_2ef1c6d2: "Anonym %{id}"
   anonymous_id_you_cf43ab76: "Anonym %{id} (Dig)"
@@ -4289,7 +4289,7 @@ da-x-k12:
       resubmission_count: 
         one: "1 ikke-bedømt genaflevering"
         other: "%{count} ikke-bedømte genafleveringer"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Tilknyttede elementer"
     grade_gpa_scale_screenreader: "Vurdering: %{grade}"
@@ -10040,7 +10040,7 @@ da-x-k12:
       mark_all_as_unread: "Markér alle som ulæste"
       retrieved_from_feed: "Hentet fra %{feed}"
       show_rubric: "Vis vurderingskriterium"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Kan ikke annullere offentliggørelsen, hvis der findes svar fra elever"
       topic: Emne
@@ -21751,7 +21751,7 @@ da-x-k12:
           one: "Denne quiz er blevet ombedømt. Dit resultat blev påvirket."
           other: "Denne quiz er blevet ombedømt. Dit nye resultat afspejler %{count} spørgsmål, som blev påvirket."
         quiz_regraded_your_score_not_affected: "Denne quiz er blevet ombedømt. Dit resultat blev ikke påvirket."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "1 elev har afleveret indtil videre"
           other: "%{count} elever har afleveret indtil videre"
@@ -25283,7 +25283,7 @@ da-x-k12:
       see_vericite_results: "Se VeriCite-resultater"
       sent_to_whole_group: "Send kommentar til hele gruppen"
       show_rubric: "Vis vurderingskriterium"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Vurderinger er ikke tilgængelige, fordi instruktøren arbejder på dem."
       submission_details: Afleveringsdetaljer
       submitted_at: "afleveret %{submit_date}"

@@ -28,7 +28,7 @@ function renderLink(anchorProps) {
   // <Tooltip /> and disabled <Link /> currently do not work together.
   return (
     <a rel="noopener noreferrer" target="_blank" {...anchorProps}>
-      {I18n.t('SpeedGrader™')}
+      {I18n.t('SpeedGrader')}
     </a>
   )
 }

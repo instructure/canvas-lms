@@ -4674,7 +4674,7 @@ pl:
            Uczestnicy będą widzieć zmodyfikowane pliki w komentarzach do przesłanego zadania. 
           
           *Upewnij się, że nazwy plików nie zostały zmienione, gdyż system może ich nie rozpoznać.*
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Powiązane elementy"
     grade_gpa_scale_screenreader: "Ocena: %{grade}"
@@ -4887,7 +4887,7 @@ pl:
       no_points: Brak
       no_submission: Brak
       points: Punkty
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: "Typy plików"
       submitting: Przesyłanie
       turnitin: Turnitin
@@ -11299,7 +11299,7 @@ pl:
       reply_to_topic: "Odpowiedz na temat"
       retrieved_from_feed: "Pobrano z kanału %{feed}"
       show_rubric: "Wyświetl kryteria ocen"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Nie można cofnąć publikacji, jeśli są odpowiedzi uczestników"
       topic: Temat
@@ -24775,7 +24775,7 @@ pl:
           quiz_instructions: "Instrukcje do testu"
           quiz_score: "Wynik punktowy"
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           few: " Pozostały jeszcze %{count} próby"
@@ -24933,7 +24933,7 @@ pl:
           one: "Test został oceniony ponownie; nowy wynik odzwierciedla 1 pytanie, które zostało zmienione."
           other: "Test został oceniony ponownie; nowy wynik odzwierciedla %{count} pytań, które zostały zmienione."
         quiz_regraded_your_score_not_affected: "Test został ponownie oceniony; wynik nie został zmieniony."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           few: "%{count} uczestników wysłało dotychczas"
           many: "%{count} uczestników wysłało dotychczas"
@@ -28413,7 +28413,7 @@ pl:
   speedgrader_settings_4195099b: "SpeedGrader Ustawienia"
   speedgrader_settings_c9503705: "Ustawienia programu Speedgrader"
   speedgrader_studio_media_capture_3fd8aa93: "Rejestrowanie ekranu Studio w narzędziu SpeedGrader"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Dziel
   split_merged_users_6b81c595: "Dziel scalonych użytkowników"
   split_number_of_students_per_group_4a05f76f: "Podziel liczbę uczestników w grupie"
@@ -28992,7 +28992,7 @@ pl:
       see_vericite_results: "Patrz wyniki VeriCite"
       sent_to_whole_group: "Wyślij komentarz do całej grupy"
       show_rubric: "Wyświetl kryteria ocen"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Oceny są niedostępne, ponieważ instruktor właśnie je wystawia."
       submission_details: "Szczegółowe informacje dot. przesłanego zadania"
       submitted_at: "przesłano %{submit_date}"

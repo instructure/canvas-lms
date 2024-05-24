@@ -2430,7 +2430,7 @@ tr:
   anonymize_all_instructor_comments_and_annotations__713924c9: "DocViewer'daki tüm eğitmen yorumlarını ve ek açıklamalarını anonimleştirir."
   anonymous_e1b8ad27: Anonim
   anonymous_grading_ccb5045c: "İsimsiz Notlandırma"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "İsimsiz notlandırma, SpeedGrader™ da öğrencilerin isimlerini gizler"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "İsimsiz notlandırma, SpeedGrader da öğrencilerin isimlerini gizler"
   anonymous_instructor_annotations_2b6c822: "İsimsiz Öğretmen Ek açıklamaları"
   anonymous_moderated_marking_801bbb65: "İsimsiz Modere Edilmiş Notlandırma"
   anonymous_user: "İsimsiz Kullanıcı"
@@ -2995,7 +2995,7 @@ tr:
           bu düzenlenmiş dosyayı görecekler 
           
           *Gönderilen dosyaların adlarını değiştirmeyin ki sistem bu dosyaları tanımlayabilsin.*
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "İlişkili Öğeler"
     grade_gpa_scale_screenreader: "Not: %{grade}"
@@ -3193,7 +3193,7 @@ tr:
       no_points: Yok
       no_submission: Hiç
       points: Puanlar
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: "Dosya Tipleri"
       submitting: Gönderiliyor
       turnitin: Turnitin
@@ -7513,7 +7513,7 @@ tr:
       reply_to_topic: "Konuya Cevap yaz"
       retrieved_from_feed: "%{feed}'den Alındı"
       show_rubric: "Değerlendirme Listesini Göster"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Öğrenciler cevaplamışsa yayından kaldırılmaz"
       topic: Konu
@@ -16100,7 +16100,7 @@ tr:
           quiz_instructions: "Kısa Sınav Yönergeleri"
           quiz_score: Puan
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "1 Giriş Hakkınız daha var"
@@ -16247,7 +16247,7 @@ tr:
           one: "Bu kısa sınav tekrar değerlendirildi; yeni puanınız etkilendi."
           other: "Bu kısa sınav tekrar değerlendirildi; yeni puanınız %{count} sorudan etkilendi."
         quiz_regraded_your_score_not_affected: "Bu kısa sınav tekrar değerlendirildi; puanınız değişmedi."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "Şimdiye kadar 1 öğrenci gönderdi"
           other: "Şimdiye kadar %{count} öğrenci gönderdi"
@@ -18317,7 +18317,7 @@ tr:
       resubmitting: "Yeniden gönderiliyor..."
   speedgrader_d9a6fa90: Speedgrader
   speedgrader_de0affa6: SpeedGrader
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   spreadsheet_6d622119: "Elektronik Tablo"
   sr_gradebook: 
     all_grading_periods: "Tüm Notlandırma Periyotları"
@@ -18602,7 +18602,7 @@ tr:
       see_vericite_results: "VeriCite sonuçlarına bak"
       sent_to_whole_group: "Tüm gruba yorum gönder"
       show_rubric: "Değerlendirme Listesini Göster"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Öğretim elemanı üzerinde çalıştığı için notlar görüntülenemez."
       submission_details: "Ödev Gönderme Ayrıntıları"
       submitted_at: "%{submit_date} tarihinde gönderildi"

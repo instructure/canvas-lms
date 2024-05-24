@@ -3669,7 +3669,7 @@ en-CA:
   anonymous_e1b8ad27: Anonymous
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Anonymous grading cannot be enabled for group assignments"
   anonymous_grading_ccb5045c: "Anonymous Grading"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonymous grading forces student names to be hidden in SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonymous grading forces student names to be hidden in SpeedGrader"
   anonymous_grading_with_new_quizzes_ba0391f3: "Anonymous Grading with New Quizzes"
   anonymous_id_2ef1c6d2: "Anonymous %{id}"
   anonymous_id_you_cf43ab76: "Anonymous %{id} (You)"
@@ -4359,7 +4359,7 @@ en-CA:
       resubmission_count: 
         one: "1 Ungraded Re-submission"
         other: "%{count} Ungraded Re-submissions"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Related Items"
     grade_gpa_scale_screenreader: "Grade: %{grade}"
@@ -4532,7 +4532,7 @@ en-CA:
       no_points: None
       no_submission: Nothing
       points: Points
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: "File Types"
       submitting: Submitting
       turnitin: Turnitin
@@ -10238,7 +10238,7 @@ en-CA:
       mark_all_as_unread: "Mark All as Unread"
       retrieved_from_feed: "Retrieved from %{feed}"
       show_rubric: "Show Rubric"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Can't unpublish if there are student replies"
       topic: Topic
@@ -22018,7 +22018,7 @@ en-CA:
           quiz_instructions: "Quiz Instructions"
           quiz_score: Score
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "1 More Attempt available"
@@ -22140,7 +22140,7 @@ en-CA:
           one: "This quiz has been regraded; your score was affected."
           other: "This quiz has been regraded; your new score reflects %{count} questions that were affected."
         quiz_regraded_your_score_not_affected: "This quiz has been regraded; your score was not affected."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "1 student submitted so far"
           other: "%{count} students submitted so far"
@@ -25229,7 +25229,7 @@ en-CA:
   speedgrader_settings_4195099b: "SpeedGrader Settings"
   speedgrader_settings_c9503705: "Speedgrader Settings"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studio Media Capture"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Split
   split_merged_users_6b81c595: "Split Merged Users"
   split_number_of_students_per_group_4a05f76f: "Split number of students per group"
@@ -25762,7 +25762,7 @@ en-CA:
       see_vericite_results: "See VeriCite results"
       sent_to_whole_group: "Send comment to the whole group"
       show_rubric: "Show Rubric"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Grades are unavailable because the instructor is working on them."
       submission_details: "Submission Details"
       submitted_at: "submitted %{submit_date}"
