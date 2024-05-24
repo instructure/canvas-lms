@@ -255,8 +255,7 @@ export default class SubmissionTray extends React.Component<
           </Alert>
         )}
         <View as="div" textAlign="center">
-          <Button {...buttonProps}>
-            <IconSpeedGraderLine />
+          <Button {...buttonProps} renderIcon={IconSpeedGraderLine}>
             {I18n.t('SpeedGrader')}
           </Button>
         </View>
