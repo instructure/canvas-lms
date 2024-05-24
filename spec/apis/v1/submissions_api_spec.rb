@@ -808,6 +808,32 @@ describe "Submissions API", type: :request do
     )
   end
 
+  context "checkpointed discussions" do
+    before do
+      course_with_teacher(active_all: true)
+      @student1 = student_in_course(course: @course, active_enrollment: true).user
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @assignment = @course.assignments.create!(has_sub_assignments: true)
+      @assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
+      @assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
+      @topic = @course.discussion_topics.create!(assignment: @assignment, reply_to_entry_required_count: 4)
+    end
+
+    it "returns sub_assignment_submissions for checkpointed discussions submissions" do
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id.to_s,
+                        user_id: @student1.id.to_s },
+                      include: %w[sub_assignment_submissions])
+
+      expect(json["sub_assignment_submissions"].size).to eq 2
+    end
+  end
+
   def submission_with_comment
     @student = user_factory(active_all: true)
     course_with_teacher(active_all: true)
