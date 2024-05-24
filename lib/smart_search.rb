@@ -27,6 +27,8 @@ module SmartSearch
     end
 
     def bedrock_client
+      return @bedrock_client if instance_variable_defined?(:@bedrock_client)
+
       # for local dev, assume that we are using creds from inseng (us-west-2)
       settings = YAML.safe_load(DynamicSettings.find(tree: :private)["bedrock.yml"] || "{}")
       config = {
@@ -36,9 +38,9 @@ module SmartSearch
       # Credentials stored in rails credential store in the `bedrock_creds` key
       # with `aws_access_key_id` and `aws_secret_access_key` keys
       config[:credentials] = Canvas::AwsCredentialProvider.new("bedrock_creds", settings["vault_credential_path"])
-      if config[:credentials].set?
-        Aws::BedrockRuntime::Client.new(config)
-      end
+      @bedrock_client = if config[:credentials].set?
+                          Aws::BedrockRuntime::Client.new(config)
+                        end
     end
 
     def smart_search_available?(context)
