@@ -2837,7 +2837,7 @@ he:
         one: "הגשה מחודשת שלא הוערכה"
         other: "%{count} הגשות מחודשות שלא הוערכו"
         two: "%{count} הגשות מחודשות שלא הוערכו"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "פריטים משויכים"
     grade_gpa_scale_screenreader: "ציון: %{grade}"
@@ -3043,7 +3043,7 @@ he:
       no_points: "אף אחד"
       no_submission: מאומה
       points: נקודות
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: "סוגי קובץ"
       submitting: מגיש/ה
       turnitin: Turnitin
@@ -7259,7 +7259,7 @@ he:
       mark_all_as_unread: "סימון הכל כלא נקרא"
       retrieved_from_feed: "אוחזר מ %{feed}"
       show_rubric: "הצגת רובריקות"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "אין אפשרות לבטל פרסום אם תלמידים כבר השיבו"
       topic: נושא
@@ -16018,7 +16018,7 @@ he:
           quiz_instructions: "הנחיות הבוחן"
           quiz_score: ציון
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           many: "%{count} נסיונות נוספים אפשריים"
@@ -16173,7 +16173,7 @@ he:
           other: "הבוחן הוערך מחדש. ציונך החדש משקף  %{count} שאלות שהושפעו."
           two: "הבוחן הוערך מחדש. ציונך החדש משקף  %{count} שאלות שהושפעו."
         quiz_regraded_your_score_not_affected: "הבוחן הזה הוערך מחדש. ציוניך לא הושפעו"
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           many: "%{count} תלמידים הגישו עד כה"
           one: "תלמיד/ה אחד/ת הגיש/ה עד כה"
@@ -18412,7 +18412,7 @@ he:
   speedgrader_d9a6fa90: Speedgrader
   speedgrader_de0affa6: SpeedGrader
   speedgrader_settings_c9503705: "הגדרות Speedgrader"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   spreadsheet_6d622119: "גיליון חישובים"
   spring_grading_period_current_score_7083cf0d: "ציון ביניים של תקופת ההערכה אביב"
   spring_grading_period_final_score_386d92f7: "ציון סופי של תקופת ההערכה אביב"
@@ -18720,7 +18720,7 @@ he:
       see_vericite_results: "ניתן לעיין בתוצאות  VeriCite "
       sent_to_whole_group: "שליחת הערה לקבוצה כולה"
       show_rubric: "הצגת רובריקות"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "ההערכות אינן זמינות כיון שהמנחה עובד עליהם כעת."
       submission_details: "פירוט ההגשה"
       submitted_at: "הוגשה %{submit_date}"

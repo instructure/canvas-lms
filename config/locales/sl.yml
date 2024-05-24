@@ -3834,7 +3834,7 @@ sl:
       resubmission_count: 
         one: "1 neocenjena ponovna oddaja"
         other: "%{count} Neocenjene ponovne oddaje"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Povezani elementi"
     grade_gpa_scale_screenreader: "Ocena: %{grade}"
@@ -3992,7 +3992,7 @@ sl:
       no_points: Brez
       no_submission: Nič
       points: Točke
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: "Vrste datotek"
       submitting: "Pošiljanje ..."
       turnitin: "Orodje Turnitin"
@@ -9136,7 +9136,7 @@ sl:
       mark_all_as_unread: "Označi vse kot neprebrano"
       retrieved_from_feed: "Pridobljeno iz %{feed}"
       show_rubric: "Prikaži ocenjevalni vodnik"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Neobjava ni mogoča, če obstajajo odgovori študentov."
       topic: Tema
@@ -20105,7 +20105,7 @@ sl:
           quiz_instructions: "Navodila za kviz"
           quiz_score: Rezultat
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "1 poskus je še na voljo."
@@ -20227,7 +20227,7 @@ sl:
           one: "Ta kviz je znova ocenjen; to je vplivalo na vaš rezultat."
           other: "Ta kviz je znova ocenjen; vaš rezultat izraža %{count} vprašanj, na katera je to vplivalo."
         quiz_regraded_your_score_not_affected: "Ta kviz je znova ocenjen; to ni vplivalo na vaš rezultat."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "1 študent do zdaj je poslal."
           other: "%{count} študentov do zdaj je poslalo."
@@ -23089,7 +23089,7 @@ sl:
   speedgrader_loading_error_235fd2e2: "Nalaganje napake SpeedGrader"
   speedgrader_settings_4195099b: "SpeedGrader nastavitve"
   speedgrader_studio_media_capture_3fd8aa93: "Zajem medija SpeedGrader Studio"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Porazdeljeno
   split_merged_users_6b81c595: "Razdeli združene uporabnike"
   split_number_of_students_per_group_4a05f76f: "Razdeli število študentov na skupino"
@@ -23595,7 +23595,7 @@ sl:
       see_vericite_results: "Ogled rezultatov VeriCite"
       sent_to_whole_group: "Pošlji komentar celotni skupini"
       show_rubric: "Prikaži ocenjevalni vodnik"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Ocene niso na voljo, ker se z njimi ukvarja učitelj."
       submission_details: "Podrobnosti o oddaji"
       submitted_at: "poslano %{submit_date}"

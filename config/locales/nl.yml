@@ -3821,7 +3821,7 @@ nl:
   anonymous_e1b8ad27: Anoniem
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Anonieme beoordeling kan niet worden ingeschakeld voor groepsopdrachten"
   anonymous_grading_ccb5045c: "Anonieme beoordeling"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Bij anoniem beoordelen moeten namen van cursisten verborgen zijn in SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Bij anoniem beoordelen moeten namen van cursisten verborgen zijn in SpeedGrader"
   anonymous_grading_with_new_quizzes_ba0391f3: "Anonieme beoordeling voor Nieuwe toetsen"
   anonymous_id_2ef1c6d2: "Anoniem %{id}"
   anonymous_id_you_cf43ab76: "Anoniem %{id} (jij)"
@@ -4600,7 +4600,7 @@ nl:
           onderstaande formulier. Cursisten zullen de aangepaste bestanden zien in hun opmerkingen voor de indiening.
           
           *Zorg dat je de namen van de bestanden niet wijzigt, zodat we ze kunnen herkennen.*
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Gerelateerde items"
     grade_gpa_scale_screenreader: "Cijfer: %{grade}"
@@ -4806,7 +4806,7 @@ nl:
       no_points: Geen
       no_submission: Niets
       points: Punten
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: Bestandstypen
       submitting: "Type inzending"
       turnitin: Turnitin
@@ -10991,7 +10991,7 @@ nl:
       reply_to_topic: "Op onderwerp antwoorden"
       retrieved_from_feed: "Opgehaald uit %{feed}"
       show_rubric: "Rubriek tonen"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Kan publicatie niet ongedaan maken als er antwoorden van cursisten zijn"
       topic: Onderwerp
@@ -24234,7 +24234,7 @@ nl:
           quiz_instructions: Toetsinstructies
           quiz_score: Score
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "1 extra poging beschikbaar"
@@ -24381,7 +24381,7 @@ nl:
           one: "Deze toets is herberekend; jouw score is beïnvloed."
           other: "Deze toets is herberekend; uw nieuwe score geeft %{count} vragen aan die zijn beïnvloed."
         quiz_regraded_your_score_not_affected: "Deze toets is herberekend; jouw score is niet beïnvloed."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "Tot dusver 1 cursist ingezonden"
           other: "Tot dusver %{count} cursisten ingezonden"
@@ -27773,7 +27773,7 @@ nl:
   speedgrader_settings_4195099b: "SpeedGrader Instellingen"
   speedgrader_settings_c9503705: "Speedgrader instellingen"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studio Media Capture"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Splitsen
   split_merged_users_6b81c595: "Samengevoegde gebruikers splitsen"
   split_number_of_students_per_group_4a05f76f: "Aantal cursisten per groep splitsen"
@@ -28332,7 +28332,7 @@ nl:
       see_vericite_results: "Zie VeriCite resultaten"
       sent_to_whole_group: "Opmerking naar de hele groep sturen"
       show_rubric: "Rubriek tonen"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Cijfers zijn niet beschikbaar omdat de cursusleider ermee bezig is."
       submission_details: "Details over inzending"
       submitted_at: "ingezonden op %{submit_date}"

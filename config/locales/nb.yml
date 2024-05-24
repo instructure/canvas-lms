@@ -3821,7 +3821,7 @@ nb:
   anonymous_e1b8ad27: Anonym
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Anonym vurdering kan ikke aktiveres for gruppeoppgaver"
   anonymous_grading_ccb5045c: "Anonym vurdering"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym karaktersetting tvinger studentnavn til å være skjult i SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym karaktersetting tvinger studentnavn til å være skjult i SpeedGrader"
   anonymous_grading_with_new_quizzes_ba0391f3: "Anonym vurdering med Nye quizer"
   anonymous_id_2ef1c6d2: "Anonym %{id}"
   anonymous_id_you_cf43ab76: "Anonym %{id} (deg)"
@@ -4600,7 +4600,7 @@ nb:
           Studentene vil se de modifiserte filene i kommentarene til innleveringen.
           
           *Vær sikker på at du ikke endrer navnene på innleveringene så vi kan kjenne de igjen.*
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Relaterte elementer"
     grade_gpa_scale_screenreader: "Karakter: %{grade}"
@@ -4806,7 +4806,7 @@ nb:
       no_points: Ingen
       no_submission: Ingenting
       points: Poeng
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: Filtyper
       submitting: "Må leveres"
       turnitin: Turnitin
@@ -10998,7 +10998,7 @@ nb:
       reply_to_topic: "Svar på temaet"
       retrieved_from_feed: "Hentet fra %{feed}"
       show_rubric: "Vis vurderingsveiledning, vurderingsveiledning"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Kan ikke avpublisere hvis det er svar fra studenter"
       topic: Tema
@@ -24244,7 +24244,7 @@ nb:
           quiz_instructions: Quizinstruksjoner
           quiz_score: Resultat
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "Ytterligere ett forsøk tilgjengelig"
@@ -24391,7 +24391,7 @@ nb:
           one: "Denne prøven har blitt vurdert på nytt; ditt resultat ble påvirket."
           other: "Denne quizen har blitt vurdert på nytt, ditt nye resultat reflekterer at %{count} spørsmål ble påvirket."
         quiz_regraded_your_score_not_affected: "Denne quizen har blitt vurdert på nytt, resultatet ditt ble ikke påvirket."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "1 student levert så langt"
           other: "%{count} studenter har levert hittil"
@@ -27789,7 +27789,7 @@ nb:
   speedgrader_settings_4195099b: "SpeedGrader Innstillinger"
   speedgrader_settings_c9503705: "Innstillinger Speedgrader"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studio Media Capture"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Del
   split_merged_users_6b81c595: "Splitt sammenslåtte brukere"
   split_number_of_students_per_group_4a05f76f: "Del antall studenter per gruppe"
@@ -28349,7 +28349,7 @@ nb:
       see_vericite_results: "Se VeriCite resultater"
       sent_to_whole_group: "Send kommentar til hele gruppen"
       show_rubric: "Vis vurderingsveiledning, vurderingsveiledning"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Vurderingene er utilgjengelige fordi faglæreren jobber med dem."
       submission_details: "Detaljer om innlevering"
       submitted_at: "levert %{submit_date}"

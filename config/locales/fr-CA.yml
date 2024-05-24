@@ -3737,7 +3737,7 @@ fr-CA:
   anonymous_e1b8ad27: Anonyme
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "La notation anonyme ne peut pas être activée pour les tâches de groupe"
   anonymous_grading_ccb5045c: "Notation anonyme"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "La notation anonyme oblige le masquage des noms des étudiants dans SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "La notation anonyme oblige le masquage des noms des étudiants dans SpeedGrader"
   anonymous_grading_with_new_quizzes_ba0391f3: "Notation anonyme avec de nouveaux questionnaires"
   anonymous_id_2ef1c6d2: "%{id} anonyme"
   anonymous_id_you_cf43ab76: "%{id} anonyme (vous)"
@@ -4438,7 +4438,7 @@ fr-CA:
       resubmission_count: 
         one: "1 tâche non notée réenvoyée"
         other: "%{count}  tâches non notées réenvoyées"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Éléments apparentés"
     grade_gpa_scale_screenreader: "Note : %{grade}"
@@ -4623,7 +4623,7 @@ fr-CA:
       no_points: Aucun
       no_submission: Aucune
       points: Points
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: "Types de fichiers"
       submitting: "Envoi en cours"
       turnitin: Turnitin
@@ -10510,7 +10510,7 @@ fr-CA:
       mark_all_as_unread: "Marquer tout comme non lu"
       retrieved_from_feed: "Récupérés de %{feed}"
       show_rubric: "Afficher le barème"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Impossible d’annuler la publication s’il existe des réponses d’étudiants"
       topic: Sujet
@@ -22765,7 +22765,7 @@ fr-CA:
           quiz_instructions: "Instructions du questionnaire"
           quiz_score: Note
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "1 tentative supplémentaire possible"
@@ -22887,7 +22887,7 @@ fr-CA:
           one: "La note de ce questionnaire a été recalculée, mais cela n’a pas changé le total."
           other: "La note de ce questionnaire a été recalculée. Votre nouveau résultat tient compte des %{count} questions concernées."
         quiz_regraded_your_score_not_affected: "La note de ce questionnaire a été recalculée, mais cela n’a pas changé le total."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "1 étudiant a effectué un envoi jusqu’ici"
           other: "%{count} étudiants ont effectué un envoi jusqu’ici"
@@ -26057,7 +26057,7 @@ fr-CA:
   speedgrader_settings_4195099b: "SpeedGrader Paramètres"
   speedgrader_settings_c9503705: "Paramètres de Speedgrader"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studio Media Capture"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Réparti
   split_merged_users_6b81c595: "Diviser les utilisateurs fusionnés"
   split_number_of_students_per_group_4a05f76f: "Répartir le nombre d’étudiants par groupe"
@@ -26597,7 +26597,7 @@ fr-CA:
       see_vericite_results: "Voir les résultats de VeriCite"
       sent_to_whole_group: "Envoyer le commentaire à l'ensemble du groupe"
       show_rubric: "Afficher le barème"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Les notes ne sont pas disponibles car le formateur travaille dessus."
       submission_details: "Informations de l’envoi"
       submitted_at: "envoyé %{submit_date}"
