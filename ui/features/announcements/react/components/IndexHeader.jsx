@@ -129,12 +129,13 @@ export default class IndexHeader extends Component {
     if (this.props.searchInputRef) this.props.searchInputRef(input)
   }
 
-  renderLockToggleButton(icon, label, screenReaderLabel) {
+  renderLockToggleButton(icon, label, screenReaderLabel, responsiveStyles) {
     return (
       <Button
         disabled={this.props.isBusy || this.props.selectedCount === 0}
         size="medium"
-        margin={instUINavEnabled() ? '0 small 0 0' : 'auto'}
+        display={responsiveStyles.buttonDisplay}
+        margin={responsiveStyles.lockButtonMargin}
         id="lock_announcements"
         data-testid="lock_announcements"
         onClick={this.props.toggleSelectedAnnouncementsLock}
@@ -146,8 +147,8 @@ export default class IndexHeader extends Component {
     )
   }
 
-  renderActionButtons() {
-    const buttonsContent = (
+  renderActionButtons(responsiveStyles) {
+    return (
       <>
         {this.props.permissions.manage_course_content_edit &&
           !this.props.announcementsLocked &&
@@ -155,18 +156,21 @@ export default class IndexHeader extends Component {
             ? this.renderLockToggleButton(
                 <IconLockLine />,
                 I18n.t('Lock'),
-                I18n.t('Lock Selected Announcements')
+                I18n.t('Lock Selected Announcements'),
+                responsiveStyles
               )
             : this.renderLockToggleButton(
                 <IconUnlockLine />,
                 I18n.t('Unlock'),
-                I18n.t('Unlock Selected Announcements')
+                I18n.t('Unlock Selected Announcements'),
+                responsiveStyles
               ))}
         {this.props.permissions.manage_course_content_delete && (
           <Button
             disabled={this.props.isBusy || this.props.selectedCount === 0}
             size="medium"
-            margin={instUINavEnabled() ? '0 small 0 0' : 'auto'}
+            display={responsiveStyles.buttonDisplay}
+            margin={responsiveStyles.buttonMargin}
             id="delete_announcements"
             data-testid="delete-announcements-button"
             onClick={this.onDelete}
@@ -183,6 +187,8 @@ export default class IndexHeader extends Component {
           <Button
             href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new?is_announcement=true`}
             color="primary"
+            display={responsiveStyles.buttonDisplay}
+            margin={responsiveStyles.buttonMargin}
             id="add_announcement"
             renderIcon={IconPlusLine}
           >
@@ -191,14 +197,6 @@ export default class IndexHeader extends Component {
           </Button>
         )}
       </>
-    )
-
-    return instUINavEnabled() ? (
-      buttonsContent
-    ) : (
-      <Flex wrap="no-wrap" gap="small" justifyItems="end">
-        {buttonsContent}
-      </Flex>
     )
   }
 
@@ -249,7 +247,12 @@ export default class IndexHeader extends Component {
             <Flex.Item size={containerSize} shouldGrow={true} shouldShrink={true}>
               {this.renderSearchField()}
             </Flex.Item>
-            <Flex.Item>{this.renderActionButtons()}</Flex.Item>
+            <Flex.Item>
+              {this.renderActionButtons({
+                buttonDisplay: 'inline-block',
+                buttonMargin: '0 0 0 small',
+              })}
+            </Flex.Item>
           </Flex>
         </View>
         <ExternalFeedsTray
@@ -260,6 +263,48 @@ export default class IndexHeader extends Component {
     )
   }
 
+  renderMenu() {
+    return (
+      <Menu
+        trigger={
+          <IconButton
+            size="small"
+            withBackground={false}
+            withBorder={false}
+            renderIcon={
+              this.state.announcementFilterOpened ? (
+                <IconArrowOpenUpLine />
+              ) : (
+                <IconArrowOpenDownLine />
+              )
+            }
+            screenReaderLabel={I18n.t('Announcement Filter')}
+          />
+        }
+        onToggle={() =>
+          this.setState({
+            announcementFilterOpened: !this.state.announcementFilterOpened,
+          })
+        }
+      >
+        <Menu.Group
+          selected={[this.state.selectedAnnouncementFilter]}
+          onSelect={(_, selected) => {
+            this.setState({selectedAnnouncementFilter: selected[0]})
+            this.props.searchAnnouncements({filter: selected[0]})
+          }}
+          label={I18n.t('View')}
+        >
+          {Object.keys(getFilters()).map(filter => (
+            <Menu.Item key={filter} value={filter}>
+              {getFilters()[filter]}
+            </Menu.Item>
+          ))}
+        </Menu.Group>
+      </Menu>
+    )
+  }
+
   render() {
     const {breakpoints} = this.props
 
@@ -267,65 +312,45 @@ export default class IndexHeader extends Component {
       return this.renderOldHeader(breakpoints)
     }
 
+    let flexBasis = 'auto'
+    let buttonDisplay = 'inline-block'
+    let buttonMargin = '0 0 0 small'
+    let lockButtonMargin = '0 0 0 0'
+    let flexDirection = 'row'
+    let headerShrink = false
+
+    if (breakpoints.mobileOnly) {
+      flexBasis = '100%'
+      buttonDisplay = 'block'
+      buttonMargin = 'small 0 0 0'
+      lockButtonMargin = 'small 0 0 0'
+      flexDirection = 'column-reverse'
+      headerShrink = true
+    }
+
     return (
-      <Flex direction="column" as="div">
-        <Flex.Item margin="0 0 large" overflow="hidden">
-          <Flex as="div" direction="row" justifyItems="space-between">
-            <Flex.Item shouldGrow={true} shouldShrink={false}>
-              <Flex as="div" direction="row" justifyItems="start" alignItems="center">
-                <Flex.Item margin="0 x-small 0 0">
+      <Flex direction="column" as="div" gap="medium">
+        <Flex.Item dmargin="0 0 large" overflow="hidden">
+          <Flex as="div" direction="row" justifyItems="space-between" wrap="wrap" gap="small">
+            <Flex.Item width={flexBasis} shouldGrow={true} shouldShrink={false}>
+              <Flex as="div" direction="row" justifyItems="start" alignItems="center" width="98%">
+                <Flex.Item margin="0 x-small 0 0" shouldShrink={headerShrink}>
                   <Heading level="h1">
                     {getFilters()[this.state.selectedAnnouncementFilter]}
                   </Heading>
                 </Flex.Item>
-                <Flex.Item>
-                  <Menu
-                    trigger={
-                      <IconButton
-                        size="small"
-                        withBackground={false}
-                        withBorder={false}
-                        renderIcon={
-                          this.state.announcementFilterOpened ? (
-                            <IconArrowOpenUpLine />
-                          ) : (
-                            <IconArrowOpenDownLine />
-                          )
-                        }
-                        screenReaderLabel={I18n.t('Announcement Filter')}
-                      />
-                    }
-                    onToggle={() =>
-                      this.setState({
-                        announcementFilterOpened: !this.state.announcementFilterOpened,
-                      })
-                    }
-                  >
-                    <Menu.Group
-                      selected={[this.state.selectedAnnouncementFilter]}
-                      onSelect={(_, selected) => {
-                        this.setState({selectedAnnouncementFilter: selected[0]})
-                        this.props.searchAnnouncements({filter: selected[0]})
-                      }}
-                      label={I18n.t('View')}
-                    >
-                      {Object.keys(getFilters()).map(filter => (
-                        <Menu.Item key={filter} value={filter}>
-                          {getFilters()[filter]}
-                        </Menu.Item>
-                      ))}
-                    </Menu.Group>
-                  </Menu>
-                </Flex.Item>
+                <Flex.Item>{this.renderMenu()}</Flex.Item>
               </Flex>
             </Flex.Item>
-            <Flex.Item overflowX="hidden" overflowY="hidden">
-              {this.renderActionButtons()}
+            <Flex.Item width={flexBasis} overflowX="hidden" overflowY="hidden">
+              <Flex direction={flexDirection}>
+                {this.renderActionButtons({buttonDisplay, buttonMargin, lockButtonMargin})}
+              </Flex>
             </Flex.Item>
           </Flex>
         </Flex.Item>
         {this.renderSearchField()}
-        <Flex.Item margin="large 0 0">
+        <Flex.Item margin="large 0 0 0">
           <ExternalFeedsTray
             atomFeedUrl={this.props.atomFeedUrl}
             permissions={this.props.permissions}
@@ -353,6 +378,7 @@ const selectedActions = [
   'toggleSelectedAnnouncementsLock',
   'deleteSelectedAnnouncements',
 ]
+
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
 export const ConnectedIndexHeader = WithBreakpoints(
   connect(connectState, connectActions)(IndexHeader)
