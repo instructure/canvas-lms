@@ -64,12 +64,17 @@ export default class AssignmentGroupCollection extends PaginatedCollection {
       const collection = new SubmissionCollection()
       const observedUser = this.getObservedUserId()
 
+      let baseUrl
       if (observedUser) {
-        collection.url = () =>
-          `${this.courseSubmissionsURL}?student_ids[]=${observedUser}&per_page=${PER_PAGE_LIMIT}`
+        baseUrl = `${this.courseSubmissionsURL}?student_ids[]=${observedUser}&per_page=${PER_PAGE_LIMIT}`
       } else {
-        collection.url = () => `${this.courseSubmissionsURL}?per_page=${PER_PAGE_LIMIT}`
+        baseUrl = `${this.courseSubmissionsURL}?per_page=${PER_PAGE_LIMIT}`
       }
+      collection.url = () =>
+        ENV.FEATURES.discussion_checkpoints
+          ? `${baseUrl}&include[]=sub_assignment_submissions`
+          : `${baseUrl}`
+
       collection.loadAll = true
       collection.on('fetched:last', () => this.loadGradesFromSubmissions(collection.toArray()))
       return collection.fetch()

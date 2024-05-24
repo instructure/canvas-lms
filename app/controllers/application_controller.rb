@@ -365,6 +365,7 @@ class ApplicationController < ActionController::Base
     rce_find_replace
     courses_popout_sisid
     dashboard_graphql_integration
+    discussion_checkpoints
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
@@ -2959,6 +2960,7 @@ class ApplicationController < ActionController::Base
                    include: [
                      "assignments",
                      "discussion_topic",
+                     Account.site_admin.feature_enabled?(:discussion_checkpoints) && "checkpoints",
                      (permissions[:manage] || current_user_has_been_observer_in_this_course) && "all_dates",
                      permissions[:manage] && "module_ids",
                      peer_reviews_for_a2_enabled? && "assessment_requests"
