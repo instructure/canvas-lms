@@ -436,6 +436,8 @@ class UserMerge
     # the comments inline show all the different cases, with the source cc on the left,
     # target cc on the right.  The * indicates the CC that will be retired in order
     # to resolve the conflict
+    target_cc.reload
+
     if target_cc.active?
       # retired, active
       # unconfirmed*, active
