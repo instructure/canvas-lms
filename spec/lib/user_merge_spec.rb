@@ -1342,6 +1342,39 @@ describe UserMerge do
       expect(@user2.all_conversations.pluck(:conversation_id)).to match_array([c1, c2, c3].map(&:conversation_id))
     end
 
+    it "moves ccs to the new user without duplicating the position" do
+      user1 = user_factory
+      user2 = user_factory
+      communication_channel(user1, { username: "f@instructure.com" })
+      communication_channel(user2, { username: "F@instructure.com", cc_state: "retired" })
+
+      communication_channel(user1, { username: "h@instructure.com", cc_state: "active" })
+      communication_channel(user2, { username: "H@instructure.com", cc_state: "retired" })
+
+      communication_channel(user2, { username: "j@instructure.com", active_cc: true })
+      communication_channel(user2, { username: "l@instructure.com" })
+
+      UserMerge.from(user1).into(user2)
+      user1.reload
+      user2.reload
+
+      expected_values = [
+        { position: 1, path: "j@instructure.com", workflow_state: "active" },
+        { position: 2, path: "l@instructure.com", workflow_state: "unconfirmed" },
+        { position: 6, path: "f@instructure.com", workflow_state: "unconfirmed" },
+        { position: 7, path: "h@instructure.com", workflow_state: "active" },
+      ]
+      user2.communication_channels.each_with_index do |cc, i|
+        expected = expected_values[i]
+        expect(cc.position).to eq(expected[:position])
+        expect(cc.path).to eq(expected[:path])
+        expect(cc.workflow_state).to eq(expected[:workflow_state])
+      end
+
+      positions = user2.communication_channels.pluck(:position)
+      expect(positions.uniq.length).to eq(positions.length), "Duplicate positions found in user2's communication_channels"
+    end
+
     context "manual invitation" do
       it "does not keep a temporary invitation in cache for an enrollment deleted after a user merge" do
         set_cache(:redis_cache_store)
