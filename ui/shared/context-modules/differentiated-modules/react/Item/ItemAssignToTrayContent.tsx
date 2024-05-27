@@ -58,6 +58,7 @@ export interface ItemAssignToTrayContentProps
   defaultGroupCategoryId: string | null
   initialLoadRef: React.MutableRefObject<boolean>
   allOptions: AssigneeOption[]
+  isLoadingAssignees: boolean
   isLoading: boolean
   loadedAssignees: boolean
   setSearchTerm: (term: string) => void
@@ -105,6 +106,7 @@ const ItemAssignToTrayContent = ({
   defaultGroupCategoryId,
   allOptions,
   setSearchTerm,
+  isLoadingAssignees,
   isLoading,
   loadedAssignees,
   everyoneOption,
@@ -520,7 +522,7 @@ const ItemAssignToTrayContent = ({
             everyoneOption={everyoneOption}
             selectedAssigneeIds={card.selectedAssigneeIds}
             customAllOptions={allOptions}
-            customIsLoading={isLoading}
+            customIsLoading={isLoadingAssignees}
             customSetSearchTerm={setSearchTerm}
             highlightCard={card.highlightCard}
             blueprintDateLocks={blueprintDateLocks}
@@ -532,7 +534,7 @@ const ItemAssignToTrayContent = ({
 
   return (
     <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
-      {fetchInFlight || !loadedAssignees ? (
+      {fetchInFlight || !loadedAssignees || isLoading ? (
         <Mask>
           <Spinner data-testid="cards-loading" renderTitle={I18n.t('Loading')} />
         </Mask>

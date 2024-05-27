@@ -624,8 +624,8 @@ describe('ItemAssignToTray', () => {
 
     it('reloads the page after saving', async () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
-      const {getByRole} = renderComponent()
-      const save = getByRole('button', {name: 'Save'})
+      const {getByTestId} = renderComponent()
+      const save = getByTestId('differentiated_modules_save_button')
       await user.click(save)
       await waitFor(() => {
         expect(window.location.reload).toHaveBeenCalled()
@@ -635,13 +635,22 @@ describe('ItemAssignToTray', () => {
     it('does not reload the page after saving if onSave is passed', async () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       const onSave = jest.fn()
-      const {getByRole} = renderComponent({onSave})
-      const save = getByRole('button', {name: 'Save'})
+      const {getByTestId} = renderComponent({onSave})
+      const save = getByTestId('differentiated_modules_save_button')
       await user.click(save)
       await waitFor(() => {
         expect(onSave).toHaveBeenCalled()
       })
       expect(window.location.reload).not.toHaveBeenCalled()
+    })
+
+    it('shows loading spinner while saving', async () => {
+      fetchMock.put(DATE_DETAILS, {}, {overwriteRoutes: true, delay: 500})
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
+      const {getByTestId} = renderComponent()
+      const save = getByTestId('differentiated_modules_save_button')
+      await user.click(save)
+      expect(getByTestId('cards-loading')).toBeInTheDocument()
     })
   })
 
