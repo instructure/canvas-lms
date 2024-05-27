@@ -349,7 +349,7 @@ describe('SplitScreenThreadsContainer', () => {
         rootEntryId: '50',
         quotedEntry: {
           ...DiscussionEntry.mock({_id: '100'}),
-          previewMessage: '<p>This is the quoted reply</p>',
+          message: '<p>This is the quoted reply</p>',
         },
       },
       overrides: {onOpenSplitScreenView},

@@ -76,7 +76,7 @@ describe('SplitScreenParent', () => {
     const quotedEntry = {
       quotedEntry: {
         createdAt: '2021-08-10T12:10:38-06:00',
-        previewMessage:
+        message:
           'Differences of habit and language are nothing at all if our aims are identical and our hearts are open.',
         author: {
           shortName: 'Albus Dumbledore',

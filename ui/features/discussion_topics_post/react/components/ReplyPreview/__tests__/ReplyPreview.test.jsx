@@ -24,7 +24,7 @@ import {AnonymousUser} from '../../../../graphql/AnonymousUser'
 
 const mockProps = ({
   createdAt = '2021-08-10T12:10:38-06:00',
-  previewMessage = 'Differences of habit and language are nothing at all if our aims are identical and our hearts are open.',
+  message = 'Differences of habit and language are nothing at all if our aims are identical and our hearts are open.',
   author = {
     shortName: 'Albus Dumbledore',
   },
@@ -33,7 +33,7 @@ const mockProps = ({
     shortName: 'Harry Potter',
   },
   deleted = false,
-} = {}) => ({createdAt, previewMessage, author, anonymousAuthor, editor, deleted})
+} = {}) => ({createdAt, message, author, anonymousAuthor, editor, deleted})
 
 const setup = props => {
   return render(<ReplyPreview {...props} />)
@@ -77,7 +77,7 @@ describe('Reply Preview', () => {
   it('read more button should be visible when message length is greater than 170 characters', () => {
     const container = setup(
       mockProps({
-        previewMessage:
+        message:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec lectus neque. Sed eu molestie purus. Phasellus laoreet ante eget augue mollis sollicitudin. Quisque congue',
       })
     )
@@ -87,7 +87,7 @@ describe('Reply Preview', () => {
   it('read more button should not be visible when message length is less than 170 characters', () => {
     const container = setup(
       mockProps({
-        previewMessage:
+        message:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec lectus neque. Sed eu molestie purus.',
       })
     )

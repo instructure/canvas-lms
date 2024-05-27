@@ -38,7 +38,7 @@ export const ReplyPreview = ({...props}) => {
   const deletedMessage = props.editor?.shortName
     ? I18n.t('Deleted by %{editor}', {editor: props.editor.shortName})
     : I18n.t('Deleted')
-  const message = props.deleted ? deletedMessage : props.previewMessage
+  const message = props.deleted ? deletedMessage : props.message
 
   return (
     <Responsive
@@ -143,7 +143,7 @@ ReplyPreview.propTypes = {
   /**
    * Quoted message
    */
-  previewMessage: PropTypes.string,
+  message: PropTypes.string,
   /**
    * True if the quoted message has been deleted
    */
