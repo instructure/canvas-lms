@@ -81,14 +81,17 @@ export const updateModuleItem = ({
   moduleItemContentId,
   payload,
   onSuccess,
+  onLoading,
 }: {
   courseId: string
   moduleItemType: ItemType
   moduleItemName: string
   moduleItemContentId: string
   payload: DateDetails
+  onLoading: (flag: boolean) => void
   onSuccess: () => void
 }) => {
+  onLoading(true)
   return doFetchApi({
     path: itemTypeToApiURL(courseId, moduleItemType, moduleItemContentId),
     method: 'PUT',
@@ -108,6 +111,7 @@ export const updateModuleItem = ({
         message: I18n.t(`Error updating "%{moduleItemName}`, {moduleItemName}),
       })
     })
+    .finally(() => onLoading(false))
 }
 
 // TODO: need props to initialize with cards corresponding to current assignments
@@ -177,6 +181,7 @@ export default function ItemAssignToTray({
   const isPacedCourse = ENV.IN_PACED_COURSE
   const initialLoadRef = useRef(false)
   const cardsRefs = useRef<{[cardId: string]: ItemAssignToCardRef}>({})
+  const [isLoading, setIsLoading] = useState(false)
   const [disabledOptionIds, setDisabledOptionIds] = useState<string[]>(
     defaultDisabledOptionIds ?? []
   )
@@ -204,7 +209,12 @@ export default function ItemAssignToTray({
     onDismiss()
   }, [defaultCards, onDismiss])
 
-  const {allOptions, isLoading, loadedAssignees, setSearchTerm} = useFetchAssignees({
+  const {
+    allOptions,
+    isLoading: isLoadingAssignees,
+    loadedAssignees,
+    setSearchTerm,
+  } = useFetchAssignees({
     courseId,
     groupCategoryId,
     disableFetch: !overridesFetched || isPacedCourse,
@@ -252,6 +262,7 @@ export default function ItemAssignToTray({
         moduleItemType: itemType,
         moduleItemName: itemName,
         payload,
+        onLoading: setIsLoading,
         onSuccess: handleDismiss,
       })
     }
@@ -389,6 +400,7 @@ export default function ItemAssignToTray({
             setDisabledOptionIds={setDisabledOptionIds}
             defaultGroupCategoryId={defaultGroupCategoryId}
             allOptions={allOptions}
+            isLoadingAssignees={isLoadingAssignees}
             isLoading={isLoading}
             loadedAssignees={loadedAssignees}
             setSearchTerm={setSearchTerm}
