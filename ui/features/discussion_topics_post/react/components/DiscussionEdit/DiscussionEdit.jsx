@@ -39,7 +39,7 @@ const I18n = useI18nScope('discussion_posts')
 export const DiscussionEdit = props => {
   const rceRef = useRef()
   const [rceContent, setRceContent] = useState(false)
-  const [includeQuotedReply, setIncludeQuotedReply] = useState(!!props.quotedEntry?.previewMessage)
+  const [includeQuotedReply, setIncludeQuotedReply] = useState(!!props.quotedEntry?.message)
   const textAreaId = useRef(`message-body-${props.rceIdentifier}`)
   const [anonymousAuthorState, setAnonymousAuthorState] = useState(
     !!props.discussionAnonymousState && props.canReplyAnonymously
@@ -81,7 +81,7 @@ export const DiscussionEdit = props => {
       }}
       data-testid="DiscussionEdit-container"
     >
-      {props.quotedEntry?.previewMessage && (
+      {props.quotedEntry?.message && (
         <span className="discussions-include-reply">
           <View as="div" margin="0 0 small 0">
             <Checkbox
