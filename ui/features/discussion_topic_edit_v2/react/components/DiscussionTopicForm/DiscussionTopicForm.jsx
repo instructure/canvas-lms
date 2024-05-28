@@ -73,8 +73,12 @@ import {
 import {MissingSectionsWarningModal} from '../MissingSectionsWarningModal/MissingSectionsWarningModal'
 import {flushSync} from 'react-dom'
 import {SavingDiscussionTopicOverlay} from '../SavingDiscussionTopicOverlay/SavingDiscussionTopicOverlay'
+import {Heading} from "@instructure/ui-heading";
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 const I18n = useI18nScope('discussion_create')
+
+const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 
 export const getAbGuidArray = event => {
   const {data} = event.data
@@ -99,7 +103,7 @@ export const isGuidDataValid = event => {
   return true
 }
 
-export default function DiscussionTopicForm({
+function DiscussionTopicForm({
   isEditing,
   currentDiscussionTopic,
   isStudent,
@@ -112,6 +116,7 @@ export default function DiscussionTopicForm({
   apolloClient,
   isSubmitting,
   setIsSubmitting,
+  breakpoints,
 }) {
   const rceRef = useRef()
   const textInputRef = useRef()
@@ -600,15 +605,28 @@ export default function DiscussionTopicForm({
     })
   }
 
+  const renderHeading = () => {
+    const itemMargin = breakpoints.desktopOnly ? '0 0 large' : '0 0 medium'
+    const headerText = isAnnouncement ? I18n.t('Create Announcement') : I18n.t('Create Discussion')
+    const titleContent = title ?? headerText
+    return (
+      instUINavEnabled() ? (
+          <Flex direction="column" as="div">
+            <Flex.Item margin={itemMargin} overflow="hidden">
+              <Heading level="h1">{headerText}</Heading>
+            </Flex.Item>
+          </Flex>
+        ) : (
+        <ScreenReaderContent>
+          <h1>{titleContent}</h1>
+        </ScreenReaderContent>
+      )
+    )
+  }
+
   return (
     <>
-      <ScreenReaderContent>
-        {title ? (
-          <h1>{title}</h1>
-        ) : (
-          <h1>{isAnnouncement ? I18n.t('New Announcement') : I18n.t('New Discussion')}</h1>
-        )}
-      </ScreenReaderContent>
+      {renderHeading()}
       <FormFieldGroup description="" rowSpacing="small">
         {(isUnpublishedAnnouncement || isEditingAnnouncement) && (
           <Alert variant={announcementAlertProps().variant}>{announcementAlertProps().text}</Alert>
@@ -1052,6 +1070,7 @@ DiscussionTopicForm.propTypes = {
   apolloClient: PropTypes.object,
   isSubmitting: PropTypes.bool,
   setIsSubmitting: PropTypes.func,
+  breakpoints: breakpointsShape,
 }
 
 DiscussionTopicForm.defaultProps = {
@@ -1064,3 +1083,5 @@ DiscussionTopicForm.defaultProps = {
   isSubmitting: false,
   setIsSubmitting: () => {},
 }
+
+export default WithBreakpoints(DiscussionTopicForm)

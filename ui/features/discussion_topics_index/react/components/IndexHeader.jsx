@@ -220,8 +220,8 @@ export default class IndexHeader extends Component {
                     href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new`}
                     color="primary"
                     id="add_discussion"
+                    renderIcon={IconPlusLine}
                   >
-                    <IconPlusLine />
                     <ScreenReaderContent>{I18n.t('Add discussion')}</ScreenReaderContent>
                     <PresentationContent>{I18n.t('Discussion')}</PresentationContent>
                   </Button>
