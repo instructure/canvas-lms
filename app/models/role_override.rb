@@ -1851,6 +1851,15 @@ class RoleOverride < ActiveRecord::Base
         account_only: true,
         account_allows: ->(a) { a.feature_enabled?(:k20_course_readiness) }
       },
+      view_lti_usage: {
+        label: -> { t("LTI Usage") },
+        group: "view_advanced_analytics",
+        group_label: -> { t("Intelligent Insights") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_only: true,
+        account_allows: ->(a) { a.feature_enabled?(:k20_lti_usage) }
+      },
       manage_impact: {
         label: -> { t("Manage Impact") },
         label_v2: -> { t("Impact - Manage") },

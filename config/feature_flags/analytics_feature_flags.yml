@@ -82,6 +82,15 @@ k20_students_in_need_of_attention:
   root_opt_in: true
   beta: true
   shadow: true
+k20_lti_usage:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - LTI Usage
+  description:
+    k20_lti_usage: Enables the LTI Usage dashboards for closed beta customers.
+  root_opt_in: true
+  beta: true
+  shadow: true
 
 # Intelligent Insights - Provided through Ask Your Data LTI App
 advanced_analytics_ask_questions:
