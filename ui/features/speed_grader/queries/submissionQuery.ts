@@ -83,6 +83,7 @@ const SUBMISSION_QUERY = gql`
             _id
             displayName
             wordCount
+            submissionPreviewUrl
           }
           rubricAssessmentsConnection {
             nodes {
