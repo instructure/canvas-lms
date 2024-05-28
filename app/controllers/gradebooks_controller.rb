@@ -1177,6 +1177,7 @@ class GradebooksController < ApplicationController
 
           remote_env(speedgrader: Services::PlatformServiceSpeedgrader.launch_url)
 
+          env[:GRADE_BY_QUESTION_SUPPORTED] = @assignment.supports_grade_by_question?
           js_env(env)
           deferred_js_bundle :platform_speedgrader
 

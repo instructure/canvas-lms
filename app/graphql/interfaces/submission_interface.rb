@@ -436,14 +436,28 @@ module Interfaces::SubmissionInterface
 
   field :preview_url, String, "This field is currently under development and its return value is subject to change.", null: true
   def preview_url
-    GraphQLHelpers::UrlHelpers.course_assignment_submission_url(
-      object.course_id,
-      object.assignment_id,
-      object.user_id,
-      host: context[:request].host_with_port,
-      preview: 1,
-      version: version_query_param(object)
-    )
+    load_association(:assignment).then do
+      if submission.not_submitted?
+        nil
+      elsif submission.submission_type == "basic_lti_launch"
+        GraphQLHelpers::UrlHelpers.retrieve_course_external_tools_url(
+          submission.course_id,
+          assignment_id: submission.assignment_id,
+          url: submission.external_tool_url(query_params: submission.tool_default_query_params(current_user)),
+          display: "borderless",
+          host: context[:request].host_with_port
+        )
+      else
+        GraphQLHelpers::UrlHelpers.course_assignment_submission_url(
+          submission.course_id,
+          submission.assignment_id,
+          submission.user_id,
+          host: context[:request].host_with_port,
+          preview: 1,
+          version: version_query_param(submission)
+        )
+      end
+    end
   end
 
   field :submission_comment_download_url, String, null: true

@@ -52,6 +52,12 @@ ready(() => {
     const theme = getCurrentTheme()
     const mountPoint = document.querySelector('#react-router-portals')
     const params = new URLSearchParams(window.location.search)
+    const postMessageAliases = {
+      'quizzesNext.register': 'tool.register',
+      'quizzesNext.nextStudent': 'tool.nextStudent',
+      'quizzesNext.previousStudent': 'tool.previousStudent',
+      'quizzesNext.submissionUpdate': 'tool.submissionUpdate',
+    }
 
     import('speedgrader/appInjector')
       .then(module => {
@@ -72,6 +78,7 @@ ready(() => {
             postAssignmentGradesForSections,
             postDraftSubmissionComment,
           },
+          postMessageAliases,
           context: {
             courseId: window.ENV.course_id,
             assignmentId: params.get('assignment_id'),
@@ -82,6 +89,10 @@ ready(() => {
           },
           features: {
             extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
+            gradeByQuestion: {
+              supported: window.ENV.GRADE_BY_QUESTION_SUPPORTED,
+              enabled: window.ENV.GRADE_BY_QUESTION,
+            },
           },
         })
       })
