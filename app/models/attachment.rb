@@ -107,8 +107,10 @@ class Attachment < ActiveRecord::Base
   belongs_to :media_object_by_media_id, class_name: "MediaObject", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :attachments_by_media_id
   has_many :media_tracks, dependent: :destroy
   has_many :submission_draft_attachments, inverse_of: :attachment
+  # don't use this association it only works for url submission types
   has_many :submissions, -> { active }
   has_many :attachment_associations
+  has_many :assignment_submissions, through: :attachment_associations, source: :context, source_type: "Submission"
   belongs_to :root_attachment, class_name: "Attachment"
   belongs_to :replacement_attachment, class_name: "Attachment", inverse_of: :replaced_attachments
   has_many :replaced_attachments, class_name: "Attachment", foreign_key: "replacement_attachment_id", inverse_of: :replacement_attachment
@@ -1420,7 +1422,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def associated_with_submission?
-    @associated_with_submission ||= attachment_associations.where(context_type: "Submission").exists?
+    @associated_with_submission ||= assignment_submissions.exists?
   end
 
   def can_read_through_assignment?(user, session)
