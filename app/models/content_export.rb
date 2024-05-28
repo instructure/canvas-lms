@@ -676,6 +676,6 @@ class ContentExport < ActiveRecord::Base
   end
 
   def new_quizzes_common_cartridge_enabled?
-    context_type == "Course" && NewQuizzesFeaturesHelper.new_quizzes_common_cartridge_enabled?(context)
+    context_type == "Course" && NewQuizzesFeaturesHelper.new_quizzes_common_cartridge_enabled?
   end
 end
