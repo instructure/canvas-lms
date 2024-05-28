@@ -30,6 +30,14 @@ export default class RelockModulesDialog extends DialogBaseView {
     }
   }
 
+  initDialog() {
+    super.initDialog()
+    this.dialog.on('dialogopen', function () {
+      setTimeout(() => $('.ui-dialog-titlebar-close').focus(), 60)
+    })
+    return this.dialog
+  }
+
   dialogOptions() {
     return {
       id: 'relock_modules_dialog',
