@@ -46,6 +46,9 @@ const SUBMISSIONS_BY_ASSIGNMENT_QUERY = gql`
           score
           submissionStatus
           submittedAt
+          attachments {
+            submissionPreviewUrl
+          }
           user {
             _id
             id
