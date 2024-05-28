@@ -73,5 +73,25 @@ module Translation
         { id: "zh", name: "Chinese" }
       ]
     end
+
+    # For translating the translation controls into the users locale. Don't translate if it's english
+    def translated_languages(user)
+      # For translating into the target locale.
+      return languages if user.locale.nil?
+
+      locale = user.locale[0..2]
+      # Don't translate unless the browser locale is different for the current user.
+      if locale == "en"
+        return languages
+      end
+
+      translated = []
+      languages.each do |language|
+        language[:name] = create(src_lang: "en", tgt_lang: locale, text: language[:name])
+        translated << language
+      end
+
+      translated
+    end
   end
 end
