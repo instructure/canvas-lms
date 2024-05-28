@@ -46,6 +46,7 @@ import select from '@canvas/obj-select'
 import {showConfirmDelete} from './ConfirmDeleteModal'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Heading} from '@instructure/ui-heading'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 const I18n = useI18nScope('announcements_v2')
 
@@ -61,6 +62,7 @@ const getFilters = () => ({
 
 export default class IndexHeader extends Component {
   static propTypes = {
+    breakpoints: breakpointsShape.isRequired,
     contextType: string.isRequired,
     contextId: string.isRequired,
     isBusy: bool,
@@ -80,6 +82,7 @@ export default class IndexHeader extends Component {
     atomFeedUrl: null,
     selectedCount: 0,
     searchInputRef: null,
+    breakpoints: {},
   }
 
   onSearch = debounce(
@@ -131,7 +134,7 @@ export default class IndexHeader extends Component {
       <Button
         disabled={this.props.isBusy || this.props.selectedCount === 0}
         size="medium"
-        margin="0 small 0 0"
+        margin={instUINavEnabled() ? '0 small 0 0' : 'auto'}
         id="lock_announcements"
         data-testid="lock_announcements"
         onClick={this.props.toggleSelectedAnnouncementsLock}
@@ -144,7 +147,7 @@ export default class IndexHeader extends Component {
   }
 
   renderActionButtons() {
-    return (
+    const buttonsContent = (
       <>
         {this.props.permissions.manage_course_content_edit &&
           !this.props.announcementsLocked &&
@@ -163,7 +166,7 @@ export default class IndexHeader extends Component {
           <Button
             disabled={this.props.isBusy || this.props.selectedCount === 0}
             size="medium"
-            margin="0 small 0 0"
+            margin={instUINavEnabled() ? '0 small 0 0' : 'auto'}
             id="delete_announcements"
             data-testid="delete-announcements-button"
             onClick={this.onDelete}
@@ -189,6 +192,14 @@ export default class IndexHeader extends Component {
         )}
       </>
     )
+
+    return instUINavEnabled() ? (
+      buttonsContent
+    ) : (
+      <Flex wrap="no-wrap" gap="small" justifyItems="end">
+        {buttonsContent}
+      </Flex>
+    )
   }
 
   renderSearchField() {
@@ -206,12 +217,15 @@ export default class IndexHeader extends Component {
     )
   }
 
-  renderOldHeader() {
+  renderOldHeader(breakpoints) {
+    const ddSize = breakpoints.desktopOnly ? '100px' : '100%'
+    const containerSize = breakpoints.tablet ? 'auto' : '100%'
+
     return (
       <View>
         <View margin="0 0 medium" display="block">
-          <Flex wrap="wrap" justifyItems="end">
-            <Flex.Item shouldGrow={true}>
+          <Flex wrap="wrap" justifyItems="end" gap="small">
+            <Flex.Item size={ddSize} shouldGrow={true} shouldShrink={true}>
               <FormField
                 id="announcement-filter"
                 label={<ScreenReaderContent>{I18n.t('Announcement Filter')}</ScreenReaderContent>}
@@ -220,7 +234,7 @@ export default class IndexHeader extends Component {
                   renderLabel=""
                   id="announcement-filter"
                   name="filter-dropdown"
-                  onChange={(e, data) => {
+                  onChange={(_e, data) => {
                     return this.props.searchAnnouncements({filter: data.value})
                   }}
                 >
@@ -232,10 +246,10 @@ export default class IndexHeader extends Component {
                 </SimpleSelect>
               </FormField>
             </Flex.Item>
-            <Flex.Item shouldGrow={true} margin="0 0 0 small">
+            <Flex.Item size={containerSize} shouldGrow={true} shouldShrink={true}>
               {this.renderSearchField()}
             </Flex.Item>
-            <Flex.Item margin="0 0 0 small">{this.renderActionButtons()}</Flex.Item>
+            <Flex.Item>{this.renderActionButtons()}</Flex.Item>
           </Flex>
         </View>
         <ExternalFeedsTray
@@ -247,8 +261,10 @@ export default class IndexHeader extends Component {
   }
 
   render() {
+    const {breakpoints} = this.props
+
     if (!instUINavEnabled()) {
-      return this.renderOldHeader()
+      return this.renderOldHeader(breakpoints)
     }
 
     return (
@@ -338,4 +354,6 @@ const selectedActions = [
   'deleteSelectedAnnouncements',
 ]
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
-export const ConnectedIndexHeader = connect(connectState, connectActions)(IndexHeader)
+export const ConnectedIndexHeader = WithBreakpoints(
+  connect(connectState, connectActions)(IndexHeader)
+)
