@@ -1348,12 +1348,20 @@ class Submission < ActiveRecord::Base
   end
   # End Plagiarism functions
 
-  def external_tool_url
+  def tool_default_query_params(current_user)
+    return {} unless cached_quiz_lti?
+
+    grade_by_question_enabled = current_user.preferences.fetch(:enable_speedgrader_grade_by_question, false)
+    { grade_by_question_enabled: }
+  end
+
+  def external_tool_url(query_params: {})
     return unless submission_type == "basic_lti_launch"
 
     external_url = url
     return unless external_url
 
+    external_url = UrlHelper.add_query_params(external_url, query_params) if query_params.any?
     URI::DEFAULT_PARSER.escape(external_url)
   end
 
@@ -1401,6 +1409,12 @@ class Submission < ActiveRecord::Base
     else
       nil
     end
+  end
+
+  # A student that has not submitted but has been graded will have a workflow_state of "graded".
+  # In that case, we can check the submission_type to see if the student has submitted or not.
+  def not_submitted?
+    unsubmitted? || submission_type.nil?
   end
 
   def update_attachment_associations
