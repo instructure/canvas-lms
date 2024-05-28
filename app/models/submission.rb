@@ -1391,7 +1391,7 @@ class Submission < ActiveRecord::Base
   end
 
   # If an object is pulled from a simply_versioned yaml it may not have a submitted at.
-  # submitted_at is needed by the SpeedGrader, so it is set to the updated_at value
+  # submitted_at is needed by SpeedGrader, so it is set to the updated_at value
   def submitted_at
     if submission_type
       unless read_attribute(:submitted_at)

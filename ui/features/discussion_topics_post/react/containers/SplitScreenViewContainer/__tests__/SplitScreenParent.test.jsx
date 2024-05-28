@@ -125,7 +125,7 @@ describe('SplitScreenParent', () => {
       expect(onDelete).toHaveBeenCalled()
     })
 
-    it('only shows the speed grader option if you have permission', () => {
+    it('only shows the SpeedGrader option if you have permission', () => {
       const props = defaultProps({overrides: {onOpenInSpeedGrader: jest.fn()}})
       props.discussionTopic.permissions.speedGrader = false
       const {getByTestId, queryByTestId} = setup(props)

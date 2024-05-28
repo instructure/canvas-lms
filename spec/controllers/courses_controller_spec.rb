@@ -1766,7 +1766,7 @@ describe CoursesController do
       expect(assigns(:js_env)[:FLAGS].keys).to include :newquizzes_on_quiz_page
     end
 
-    it "sets speed grader link flags for assignments view" do
+    it "sets SpeedGrader link flags for assignments view" do
       course_with_teacher_logged_in(active_all: true)
       @course.default_view = "assignments"
       @course.save!

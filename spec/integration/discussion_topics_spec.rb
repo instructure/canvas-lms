@@ -75,7 +75,7 @@ describe "discussion_topics" do
     expect(@topic.grants_right?(@teacher, :update)).to be
   end
 
-  it "shows speed grader button" do
+  it "shows SpeedGrader button" do
     course_with_teacher_logged_in(active_all: true)
     discussion_assignment
 

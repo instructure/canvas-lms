@@ -72,7 +72,7 @@ describe "submissions" do
   end
 
   context "grade a group assignment as a teacher" do
-    it "Submitting Group Assignments - Speedgrader", priority: "1" do
+    it "Submitting Group Assignments - SpeedGrader", priority: "1" do
       create_assignment_for_group("online_text_entry")
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       f(".ui-selectmenu-icon").click

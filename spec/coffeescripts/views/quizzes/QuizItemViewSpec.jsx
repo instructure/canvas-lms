@@ -114,25 +114,25 @@ test('does not render admin if canManage and canDelete is false', () => {
   equal(view.$('.ig-admin').length, 0)
 })
 
-test('renders link to speed grader if canManage and assignment_id', () => {
+test('renders link to SpeedGrader if canManage and assignment_id', () => {
   const quiz = createQuiz({id: 1, title: 'Pancake', assignment_id: '55'})
   const view = createView(quiz, {canManage: true})
   equal(view.$('.speed-grader-link').length, 1)
 })
 
-test('does NOT render speed grader link if no assignment_id', () => {
+test('does NOT render SpeedGrader link if no assignment_id', () => {
   const quiz = createQuiz({id: 1, title: 'French Toast'})
   const view = createView(quiz, {canManage: true})
   equal(view.$('.speed-grader-link').length, 0)
 })
 
-test('hides speed grader link if quiz is not published', () => {
+test('hides SpeedGrader link if quiz is not published', () => {
   const quiz = createQuiz({id: 1, title: 'Crepe', assignment_id: '31', published: false})
   const view = createView(quiz, {canManage: true})
   ok(view.$('.speed-grader-link-container').attr('class').includes('hidden'))
 })
 
-test('speed grader link is correct', () => {
+test('SpeedGrader link is correct', () => {
   const quiz = createQuiz({id: 1, title: 'Waffle', assignment_id: '80'})
   const view = createView(quiz, {canManage: true})
   ok(
@@ -142,7 +142,7 @@ test('speed grader link is correct', () => {
   )
 })
 
-test('speed grader link is correct for new quizzes', () => {
+test('SpeedGrader link is correct for new quizzes', () => {
   const quiz = createQuiz({id: 1, title: 'Waffle', assignment_id: '32', quiz_type: 'quizzes.next'})
   const view = createView(quiz, {canManage: true})
   ok(

@@ -127,13 +127,13 @@ describe "assignments" do
       end
     end
 
-    it "shows speed grader link when published" do
+    it "shows SpeedGrader link when published" do
       @assignment = @course.assignments.create({ name: "Test Moderated Assignment" })
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(f("#speed-grader-link-container")).to be_present
     end
 
-    it "hides speed grader link when unpublished" do
+    it "hides SpeedGrader link when unpublished" do
       @assignment = @course.assignments.create({ name: "Test Moderated Assignment" })
       @assignment.unpublish
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"

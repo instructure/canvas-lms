@@ -131,7 +131,7 @@ describe Quizzes::QuizStatisticsSerializer do
     )
   end
 
-  it "does not serialize speed_grader url if user cannot view speed grader" do
+  it "does not serialize speed_grader url if user cannot view SpeedGrader" do
     allow(quiz.assignment).to receive(:can_view_speed_grader?).and_return false
     expect(subject.as_json[:quiz_statistics][:speed_grader_url]).to be_nil
   end

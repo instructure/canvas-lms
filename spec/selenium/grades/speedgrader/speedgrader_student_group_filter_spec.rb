@@ -25,14 +25,14 @@ require_relative "../pages/gradebook_cells_page"
 require_relative "../setup/gradebook_setup"
 require_relative "../../assignments/page_objects/assignment_page"
 
-describe "filter speed grader by student group" do
+describe "filter SpeedGrader by student group" do
   include_context "in-process server selenium tests"
   include GradebookSetup
 
   before :once do
     # course with student groups
     course_with_teacher(
-      course_name: "Filter Speedgrader Course",
+      course_name: "Filter SpeedGrader Course",
       active_course: true,
       active_enrollment: true,
       name: "Dedicated Teacher1",

@@ -28,7 +28,7 @@ require_relative "../pages/gradebook_page"
 require_relative "../../assignments/page_objects/assignment_page"
 require_relative "../../assignments/page_objects/submission_detail_page"
 
-describe "Speedgrader" do
+describe "SpeedGrader" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
   include GradebookCommon

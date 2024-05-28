@@ -16,7 +16,7 @@ _/courses/:id/gradebook_
 
 _/courses/:id/gradebook/speed_grader?assignment_id=:id_
 
-<img style="width:35vw;" src="./images/speedgrader.png" alt="Speed Grader" />
+<img style="width:35vw;" src="./images/speedgrader.png" alt="SpeedGrader" />
 
 #### Student grades page
 

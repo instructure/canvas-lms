@@ -702,7 +702,7 @@ class ExternalToolsController < ApplicationController
 
     if assignment.present? && ((@current_user && assignment.quiz_lti?) || assignment.root_account.feature_enabled?(:lti_resource_link_id_speedgrader_launches_reference_assignment))
       # Set assignment LTI launch parameters for this code path (e.g. launches
-      # from Speedgrader)
+      # from SpeedGrader)
       opts[:link_code] = @tool.opaque_identifier_for(assignment.external_tool_tag)
       opts[:overrides] ||= {}
       opts[:overrides]["resource_link_title"] = assignment.title

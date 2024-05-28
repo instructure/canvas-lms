@@ -120,7 +120,7 @@ opts.parse(ARGV)
 student_count = (generate_for == :speedgrader) ? 50 : 400
 assignment_count = (generate_for == :speedgrader) ? 50 : 200
 
-puts((generate_for == :speedgrader) ? "Speedgrader".yellow : "Gradebook".yellow)
+puts((generate_for == :speedgrader) ? "SpeedGrader".yellow : "Gradebook".yellow)
 puts "Student Count = #{student_count}".red
 puts "Assignment Count = #{assignment_count}".red
 
