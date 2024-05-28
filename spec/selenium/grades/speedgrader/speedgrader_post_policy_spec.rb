@@ -67,7 +67,7 @@ RSpec.shared_examples "displayable student grade" do
   end
 end
 
-describe "Speed Grader Post Policy" do
+describe "SpeedGrader Post Policy" do
   include_context "in-process server selenium tests"
 
   # all tests skipped due to flakiness; see the referenced ticket

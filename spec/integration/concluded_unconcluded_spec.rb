@@ -49,7 +49,7 @@ describe "concluded/unconcluded courses" do
     @sub = @qsub.submission
   end
 
-  it "lets the teacher change grades in the speed grader by default" do
+  it "lets the teacher change grades in SpeedGrader by default" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     expect(response).to be_successful
 
@@ -58,7 +58,7 @@ describe "concluded/unconcluded courses" do
     expect(html.css("#grade_container").length).to eq 1
   end
 
-  it "does not let the teacher change grades in the speed grader when concluded" do
+  it "does not let the teacher change grades in SpeedGrader when concluded" do
     @e.conclude
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"

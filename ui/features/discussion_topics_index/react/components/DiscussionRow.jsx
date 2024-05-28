@@ -559,7 +559,7 @@ class DiscussionRow extends Component {
           >
             {I18n.t('SpeedGrader')}
           </a>,
-          I18n.t('Navigate to speed grader for %{title} assignment', {title: discussionTitle})
+          I18n.t('Navigate to SpeedGrader for %{title} assignment', {title: discussionTitle})
         )
       )
     }

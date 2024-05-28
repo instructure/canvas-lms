@@ -60,7 +60,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   resolves_root_account through: :quiz
 
   # update the QuizSubmission's Submission to 'graded' when the QuizSubmission is marked as 'complete.' this
-  # ensures that quiz submissions with essay questions don't show as graded in the SpeedGrader until the instructor
+  # ensures that quiz submissions with essay questions don't show as graded in SpeedGrader until the instructor
   # has graded the essays.
   after_update :grade_submission!, if: :just_completed?
 

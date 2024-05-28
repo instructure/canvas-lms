@@ -25,7 +25,7 @@ describe('canvas_quizzes/statistics/views/questions/calculated', () => {
     render(<Calculated />)
   })
 
-  it('does not render a link to speed grader', () => {
+  it('does not render a link to SpeedGrader', () => {
     const {getByText} = render(<Calculated />)
 
     try {

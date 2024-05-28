@@ -698,7 +698,7 @@ test('renders due date column in appropriate time zone', function () {
   )
 })
 
-test('renders link to speed grader if canManage', () => {
+test('renders link to SpeedGrader if canManage', () => {
   const model = buildAssignment({
     id: 1,
     title: 'Chicken Noodle',
@@ -725,7 +725,7 @@ test('does NOT render link when assignment is unpublished', () => {
   ok(view.$('.speed-grader-link-container').attr('class').includes('hidden'))
 })
 
-test('speed grader link is correct', () => {
+test('SpeedGrader link is correct', () => {
   const model = buildAssignment({
     id: 11,
     title: 'Cream of Mushroom',

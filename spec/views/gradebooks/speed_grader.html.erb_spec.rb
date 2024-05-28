@@ -70,7 +70,7 @@ describe "gradebooks/speed_grader" do
     expect(rendered).to include '<div id="speed_grader_comment_textarea_mount_point"></div>'
   end
 
-  it "includes a mount pount for speed grader settings" do
+  it "includes a mount pount for SpeedGrader settings" do
     render(template: "gradebooks/speed_grader", locals:)
     expect(rendered).to include '<span id="speed_grader_settings_mount_point"></span>'
   end

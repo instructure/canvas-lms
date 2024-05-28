@@ -204,7 +204,7 @@
 #           "type": "string"
 #         },
 #         "speedgrader_url": {
-#           "description": "Link to Speed Grader for this quiz. Will not be present if quiz is unpublished",
+#           "description": "Link to SpeedGrader for this quiz. Will not be present if quiz is unpublished",
 #           "example": "http://canvas.instructure.com/courses/1/speed_grader?assignment_id=1",
 #           "type": "string"
 #         },

@@ -140,7 +140,7 @@ describe "gradebooks/grade_summary" do
         expect(response).to have_tag("a[href='#{@assignment_url}']")
       end
 
-      it "takes the teacher to Speedgrader link" do
+      it "takes the teacher to SpeedGrader link" do
         @user = @teacher
         assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
         view_context
@@ -148,7 +148,7 @@ describe "gradebooks/grade_summary" do
         expect(response).to have_tag("a[href='#{@speed_grader_url}']")
       end
 
-      it "takes the admin to Speedgrader link" do
+      it "takes the admin to SpeedGrader link" do
         @user = account_admin_user
         assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
         view_context
@@ -156,7 +156,7 @@ describe "gradebooks/grade_summary" do
         expect(response).to have_tag("a[href='#{@speed_grader_url}']")
       end
 
-      it "takes the site admin to Speedgrader link" do
+      it "takes the site admin to SpeedGrader link" do
         @user = site_admin_user
         assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
         view_context
@@ -244,7 +244,7 @@ describe "gradebooks/grade_summary" do
         expect(response).not_to have_tag("a[href='#{@speed_grader_url}']")
       end
 
-      it "takes the site admin to Speedgrader link" do
+      it "takes the site admin to SpeedGrader link" do
         @user = site_admin_user
         assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
         view_context

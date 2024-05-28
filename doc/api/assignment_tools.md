@@ -179,7 +179,7 @@ import them into their course.
 ###Score Extension: Creating submission data
 The <a href="/doc/api/score.html" target="_blank">Score service</a> has been extended to allow
 an external tool to submission data back to the Canvas Gradebook. This data is
-then exposed in the Submission Details and Speedgrader Views so that both
+then exposed in the Submission Details and SpeedGrader Views so that both
 students and teachers can see what was submitted to the external tool without
 leaving Canvas. Support for basic urls, text, and LTI links are supported.
 

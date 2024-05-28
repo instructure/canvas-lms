@@ -210,7 +210,7 @@ describe('SplitScreenThreadsContainer', () => {
       expect(onDelete).toHaveBeenCalled()
     })
 
-    it('only shows the speed grader option if you have permission', async () => {
+    it('only shows the SpeedGrader option if you have permission', async () => {
       const props = defaultProps({overrides: {onOpenInSpeedGrader: jest.fn()}})
       props.discussionTopic.permissions.speedGrader = false
       const {queryByTestId, findAllByTestId} = setup(props)

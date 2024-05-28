@@ -490,7 +490,7 @@ QUnit.module('SpeedGrader', rootHooks => {
     strictEqual(submissionPill.innerText, 'Custom Status')
   })
 
-  test('first submission that is not late is not tagged as late in the SpeedGrader submission view dropdown', () => {
+  test('first submission that is not late is not tagged as late in SpeedGrader submission view dropdown', () => {
     SpeedGrader.setup()
     SpeedGrader.EG.currentStudent.submission.late = true
     SpeedGrader.EG.currentStudent.submission.submission_history[1].late = true
@@ -501,7 +501,7 @@ QUnit.module('SpeedGrader', rootHooks => {
     SpeedGrader.teardown()
   })
 
-  test('first submission that is not missing is not tagged as missing in the SpeedGrader submission view dropdown', () => {
+  test('first submission that is not missing is not tagged as missing in SpeedGrader submission view dropdown', () => {
     SpeedGrader.setup()
     SpeedGrader.EG.currentStudent.submission.missing = true
     SpeedGrader.EG.currentStudent.submission.submission_history[1].missing = true
@@ -512,7 +512,7 @@ QUnit.module('SpeedGrader', rootHooks => {
     SpeedGrader.teardown()
   })
 
-  test('submission that has a custom status is tagged with it in the SpeedGrader submission view dropdown', () => {
+  test('submission that has a custom status is tagged with it in SpeedGrader submission view dropdown', () => {
     SpeedGrader.setup()
     SpeedGrader.EG.currentStudent.submission.custom_grade_status_id = '1'
     SpeedGrader.EG.currentStudent.submission.submission_history[0].custom_grade_status_id = '1'

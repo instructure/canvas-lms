@@ -34,7 +34,7 @@ describe('canvas_quizzes/statistics/views/questions/essay', () => {
     expect(link.target).toBe('_blank')
   })
 
-  it('does not render a link to speed grader when url is absent', () => {
+  it('does not render a link to SpeedGrader when url is absent', () => {
     const {getByText} = render(<Essay />)
 
     try {

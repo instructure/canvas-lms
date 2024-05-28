@@ -19,7 +19,7 @@
 
 require_relative "../../helpers/speed_grader_common"
 
-describe "speed grader submissions" do
+describe "SpeedGrader submissions" do
   include_context "in-process server selenium tests"
   include SpeedGraderCommon
 
@@ -51,7 +51,7 @@ describe "speed grader submissions" do
       # check for assignment title
       expect(f("#assignment_url")).to include_text(@assignment.title)
 
-      # check for assignment text in speed grader iframe
+      # check for assignment text in SpeedGrader iframe
       check_first_student = lambda do
         expect(f("#combo_box_container .ui-selectmenu-item-header")).to include_text(@student.name)
         in_frame "speedgrader_iframe", ".is-inside-submission-frame" do

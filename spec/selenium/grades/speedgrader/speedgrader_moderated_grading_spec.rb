@@ -20,7 +20,7 @@
 require_relative "../../helpers/speed_grader_common"
 require_relative "../../helpers/gradebook_common"
 
-describe "speed grader" do
+describe "SpeedGrader" do
   include_context "in-process server selenium tests"
   include GradebookCommon
   include SpeedGraderCommon
