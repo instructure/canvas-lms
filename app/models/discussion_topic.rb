@@ -833,11 +833,14 @@ class DiscussionTopic < ActiveRecord::Base
 
   scope :discussion_topic_section_visibility_scope, lambda { |student|
     DiscussionTopicSectionVisibility
+      .select(1)
       .active
       .where("discussion_topic_section_visibilities.discussion_topic_id = discussion_topics.id")
       .where(
         Enrollment.active_or_pending.where(user_id: student)
+          .select(1)
           .where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id")
+          .limit(1)
           .arel.exists
       )
   }
