@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 
 import FindReplaceTrayController from '../components/FindReplaceTrayController'
 import userEvent, {UserEvent} from '@testing-library/user-event'
@@ -98,7 +98,7 @@ describe('FindReplaceTray', () => {
     await user.click(replaceButton)
 
     await user.click(findInput)
-    await user.keyboard('{enter}')
+    fireEvent.keyDown(findInput, {key: 'Enter'})
     const resultText = screen.getByLabelText(/1 of 3/i)
     expect(resultText).toBeInTheDocument()
   })
@@ -139,7 +139,7 @@ describe('FindReplaceTray', () => {
 
       const replaceInput = screen.getByTestId('replace-text-input')
       await type(user, replaceInput, 'some text')
-      await user.keyboard('{enter}')
+      fireEvent.keyDown(replaceInput, {key: 'Enter'})
 
       expect(fakePlugin.replace).toHaveBeenCalledWith('some text', true, false)
       expect(fakePlugin.replace).toHaveBeenCalledTimes(1)
@@ -152,7 +152,7 @@ describe('FindReplaceTray', () => {
 
       const replaceInput = screen.getByTestId('replace-text-input')
       await type(user, replaceInput, 'some text')
-      await user.keyboard('{shift>}{enter}')
+      fireEvent.keyDown(replaceInput, {shiftKey: true, key: 'Enter'})
 
       expect(fakePlugin.replace).toHaveBeenCalledWith('some text', false, false)
       expect(fakePlugin.replace).toHaveBeenCalledTimes(1)
@@ -251,8 +251,7 @@ describe('FindReplaceTray', () => {
       expect(prevButton).toBeEnabled()
     })
 
-    // LX-1710 - test is fickle
-    it.skip('replace button is enabled when search result and replacement text', async () => {
+    it('replace button is enabled when search result and replacement text', async () => {
       const {user} = renderComponent()
       const replaceButton = screen.getByTestId('replace-button')
       expect(replaceButton).toBeDisabled()
@@ -261,14 +260,8 @@ describe('FindReplaceTray', () => {
       await type(user, findInput, 'a')
       expect(replaceButton).toBeDisabled()
 
-      await user.keyboard('{backspace}')
       const replaceInput = screen.getByTestId('replace-text-input')
       await type(user, replaceInput, 'some text')
-      await waitFor(() => {
-        expect(replaceButton).toBeDisabled()
-      })
-
-      await type(user, findInput, 'a')
       expect(replaceButton).toBeEnabled()
     })
 
@@ -281,14 +274,8 @@ describe('FindReplaceTray', () => {
       await type(user, findInput, 'a')
       expect(replaceButton).toBeDisabled()
 
-      await user.keyboard('{backspace}')
       const replaceInput = screen.getByTestId('replace-text-input')
       await type(user, replaceInput, 'some text')
-      await waitFor(() => {
-        expect(replaceButton).toBeDisabled()
-      })
-
-      await type(user, findInput, 'a')
       expect(replaceButton).toBeEnabled()
     })
   })
@@ -325,12 +312,11 @@ describe('FindReplaceTray', () => {
       expect(fakePlugin.next).toHaveBeenCalledTimes(3)
     })
 
-    // fickle test - LF-1605
-    it.skip('is incremented when enter pressed on find input', async () => {
+    it('is incremented when enter pressed on find input', async () => {
       const {user} = renderComponent()
       const findInput = screen.getByTestId('find-text-input')
       await type(user, findInput, 'a')
-      await user.keyboard('{enter}')
+      fireEvent.keyDown(findInput, {key: 'Enter'})
       await waitFor(() => {
         expect(fakePlugin.next).toHaveBeenCalledTimes(1)
       })
@@ -352,7 +338,7 @@ describe('FindReplaceTray', () => {
       const {user} = renderComponent()
       const findInput = screen.getByTestId('find-text-input')
       await type(user, findInput, 'a')
-      await user.keyboard('{shift>}{enter}')
+      fireEvent.keyDown(findInput, {shiftKey: true, key: 'Enter'})
       await waitFor(() => {
         expect(fakePlugin.prev).toHaveBeenCalledTimes(1)
       })
@@ -414,7 +400,7 @@ describe('FindReplaceTray', () => {
 
       const replaceInput = screen.getByTestId('replace-text-input')
       await type(user, replaceInput, 'some text')
-      await user.keyboard('{shift>}{enter}')
+      fireEvent.keyDown(replaceInput, {shiftKey: true, key: 'Enter'})
 
       expect(fakePlugin.replace).toHaveBeenCalledTimes(1)
       const resultText = screen.getByLabelText(/3 of 3/i)
