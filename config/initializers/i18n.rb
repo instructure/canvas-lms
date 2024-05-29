@@ -114,7 +114,7 @@ module FormatInterpolatedNumbers
 
       values[key] = ActiveSupport::NumberHelper.number_to_delimited(value)
     end
-    super(string, values)
+    super
   end
 end
 I18n.singleton_class.prepend(FormatInterpolatedNumbers)
@@ -187,7 +187,7 @@ module I18nFormHelper
   # when removing this, be sure to remove it from i18nliner_extensions.rb
   def label(object_name, method, text = nil, options = {})
     text, options = _label_symbol_translation(method, text, options)
-    super(object_name, method, text, options)
+    super
   end
 end
 ActionView::Base.include(I18nFormHelper)
@@ -196,7 +196,7 @@ ActionView::Helpers::FormHelper.prepend(I18nFormHelper)
 module I18nFormTagHelper
   def label_tag(method, text = nil, options = {})
     text, options = _label_symbol_translation(method, text, options)
-    super(method, text, options)
+    super
   end
 end
 ActionView::Helpers::FormTagHelper.prepend(I18nFormTagHelper)

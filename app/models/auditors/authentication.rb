@@ -29,7 +29,7 @@ class Auditors::Authentication
     end
 
     def initialize(*args)
-      super(*args)
+      super
 
       if attributes["pseudonym"]
         self.pseudonym = attributes.delete("pseudonym")

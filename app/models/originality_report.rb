@@ -56,7 +56,7 @@ class OriginalityReport < ActiveRecord::Base
   end
 
   def as_json(options = nil)
-    super(options).tap do |h|
+    super.tap do |h|
       h[:file_id] = h.delete :attachment_id
       h[:originality_report_file_id] = h.delete :originality_report_attachment_id
       if lti_link.present?

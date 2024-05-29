@@ -276,7 +276,7 @@ class Pseudonym < ActiveRecord::Base
 
   def password=(new_pass)
     self.password_auto_generated = false
-    super(new_pass)
+    super
   end
 
   def communication_channel

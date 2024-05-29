@@ -24,7 +24,7 @@ describe "Exportable" do
     stub_const("ZipPackageTest",
                Class.new(CC::Exporter::WebZip::ZipPackage) do
                  def initialize(exporter, course, user, progress_key)
-                   super(exporter, course, user, progress_key)
+                   super
                    @index_file = "dist/index.html"
                    @bundle_file = "dist/viewer/bundle.js"
                    @dist_dir = "dist"

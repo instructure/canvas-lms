@@ -45,7 +45,7 @@ module BasicLTI
       def initialize(msg)
         InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.bad_requests",
                                      tags: { error_code: "Unauthorized" })
-        super(msg)
+        super
       end
 
       def response_status
@@ -57,7 +57,7 @@ module BasicLTI
       def initialize(msg)
         InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.bad_requests",
                                      tags: { error_code: "InvalidRequest" })
-        super(msg)
+        super
       end
 
       def response_status

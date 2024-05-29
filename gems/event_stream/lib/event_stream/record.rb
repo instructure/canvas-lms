@@ -34,7 +34,7 @@ EventStream::Record = Struct.new(:attributes) do
              :event_type
 
   def initialize(*args)
-    super(*args)
+    super
 
     if (request_id = attributes["request_id"])
       attributes["request_id"] = request_id.to_s

@@ -23,7 +23,7 @@ module SupportHelpers
       def initialize(email, after_time = nil)
         @buffer_time = Time.now - 1.hour
         @prefix = "TurnItIn"
-        super(email, after_time)
+        super
       end
 
       def success_message

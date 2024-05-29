@@ -20,7 +20,7 @@
 module Qti
   class OrderInteraction < AssessmentItemConverter
     def initialize(opts)
-      super(opts)
+      super
       @question[:matches] = []
       @question[:question_type] = "matching_question"
     end

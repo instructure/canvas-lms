@@ -85,7 +85,7 @@ module ActiveModel
       end
 
       def options
-        super().merge(scope: [:errors], throw: true)
+        super.merge(scope: [:errors], throw: true)
       end
 
       def i18n_keys

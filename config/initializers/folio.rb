@@ -53,7 +53,7 @@ module Folio::WillPaginate::ActiveRecord::Pagination
         end
       end
     end
-    super(options).to_a
+    super.to_a
   end
 end
 
@@ -69,7 +69,7 @@ module FolioARPagination
         options[:total_entries] = nil
       end
     end
-    super(page, options)
+    super
   end
 end
 

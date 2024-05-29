@@ -24,7 +24,7 @@ module Qti
     include Canvas::Migration::XMLHelper
 
     def initialize(opts)
-      super(opts)
+      super
       @question[:matches] = []
       @question[:question_type] = "matching_question"
       # to mark whether it's bb8/vista/respondus_matching if needed

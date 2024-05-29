@@ -88,7 +88,7 @@ module Workflow
 
     def initialize(msg = nil)
       @halted_because = msg
-      super(msg)
+      super
     end
   end
 

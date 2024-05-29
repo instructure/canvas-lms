@@ -1303,7 +1303,7 @@ class Attachment < ActiveRecord::Base
     # infer a display name without round-tripping through truncated CGI-escaped filename
     # (which reduces the length of unicode filenames to as few as 28 characters)
     self.display_name ||= Attachment.truncate_filename(name, 255)
-    super(name)
+    super
   end
 
   def thumbnail

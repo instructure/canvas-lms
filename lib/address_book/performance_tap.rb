@@ -20,7 +20,7 @@
 module AddressBook
   class PerformanceTap < AddressBook::MessageableUser
     def initialize(sender)
-      super(sender)
+      super
       @service_tap = AddressBook::Service.new(sender, ignore_result: true)
     end
 

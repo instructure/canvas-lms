@@ -43,7 +43,7 @@ module DynamicSettings
     private
 
     def write_entry(key, entry, **options)
-      super(key, entry, **options)
+      super
       forever_entry = entry.dup
       forever_entry.remove_instance_variable(:@expires_in)
       super(key + KEY_SUFFIX, forever_entry, **options.except(:expires_in))

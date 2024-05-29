@@ -46,7 +46,7 @@ class Auditors::FeatureFlag
     end
 
     def initialize(*args)
-      super(*args)
+      super
 
       if attributes["feature_flag"]
         self.feature_flag = attributes.delete("feature_flag")

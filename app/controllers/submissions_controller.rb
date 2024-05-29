@@ -630,7 +630,7 @@ class SubmissionsController < SubmissionsBaseController
     @assignment = @context.assignments.active.find(params.require(:assignment_id))
     @submission = @assignment.submissions.find_by(user_id: params.require(:submission_id))
 
-    super(type)
+    super
   end
 
   def resubmit_to_plagiarism(type)
@@ -639,6 +639,6 @@ class SubmissionsController < SubmissionsBaseController
     @assignment = @context.assignments.active.find(params.require(:assignment_id))
     @submission = @assignment.submissions.find_by(user_id: params.require(:submission_id))
 
-    super(type)
+    super
   end
 end

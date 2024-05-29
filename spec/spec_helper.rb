@@ -344,7 +344,7 @@ module RenderWithHelpers
       file = args.shift
       args = [{ template: file }] + args
     end
-    super(*args)
+    super
   end
 end
 RSpec::Rails::ViewExampleGroup::ExampleMethods.prepend(RenderWithHelpers)
