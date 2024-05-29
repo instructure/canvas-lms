@@ -63,7 +63,7 @@ export const RubricCriteriaRow = ({
   const {description, longDescription, outcome, learningOutcomeId, points} = criterion
 
   return (
-    <Draggable draggableId={criterion.id} index={rowIndex - 1}>
+    <Draggable draggableId={criterion.id || Date.now().toString()} index={rowIndex - 1}>
       {(provided, snapshot) => {
         return (
           <div

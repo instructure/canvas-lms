@@ -272,10 +272,10 @@ export const CriterionModal = ({
                 placeholder={I18n.t('Enter the name')}
                 display="inline-block"
                 width="20.75rem"
-                value={criterionDescription}
+                value={criterionDescription ?? ''}
                 messages={criterionDescriptionErrorMessage}
                 onChange={(e, value) => setCriterionDescription(value)}
-                data-testid="rubric-criterion-description"
+                data-testid="rubric-criterion-name-input"
               />
             </View>
             <View as="span">
@@ -284,8 +284,9 @@ export const CriterionModal = ({
                 placeholder={I18n.t('Enter the description')}
                 display="inline-block"
                 width="41.75rem"
-                value={criterionLongDescription}
+                value={criterionLongDescription ?? ''}
                 onChange={(e, value) => setCriterionLongDescription(value)}
+                data-testid="rubric-criterion-description-input"
               />
             </View>
           </Flex>
@@ -520,7 +521,7 @@ const RatingRow = ({
       </Flex.Item>
 
       <div style={{width: '100%'}}>
-        <Draggable draggableId={rating.id} index={index}>
+        <Draggable draggableId={rating.id || Date.now().toString()} index={index}>
           {provided => {
             return (
               <div ref={provided.innerRef} {...provided.draggableProps}>
@@ -545,7 +546,7 @@ const RatingRow = ({
                           <ScreenReaderContent>{I18n.t('Rating Name')}</ScreenReaderContent>
                         }
                         display="inline-block"
-                        value={rating.description}
+                        value={rating.description ?? ''}
                         onChange={(e, value) => setRatingForm('description', value)}
                         data-testid="rating-name"
                         messages={errorMessage}
@@ -558,7 +559,7 @@ const RatingRow = ({
                         label={
                           <ScreenReaderContent>{I18n.t('Rating Description')}</ScreenReaderContent>
                         }
-                        value={rating.longDescription}
+                        value={rating.longDescription ?? ''}
                         width="100%"
                         height="2.25rem"
                         maxHeight="6.75rem"
