@@ -47,6 +47,7 @@ gem "business_time", "0.13.0"
 gem "canvas_connect", "0.3.16"
 gem "canvas_link_migrator", "~> 1.0.9"
 gem "canvas_webex", "0.18.2"
+gem "cld", "~> 0.13"
 gem "crocodoc-ruby", "0.0.1", require: false
 gem "code_ownership", "~> 1.33"
 gem "ddtrace", "~> 1.13", require: false
