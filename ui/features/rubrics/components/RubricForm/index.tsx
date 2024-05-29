@@ -153,8 +153,7 @@ export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponent
   }
 
   const formValid = () => {
-    // Add more form validation here
-    return rubricForm.title.trim().length > 0
+    return rubricForm.title.trim().length > 0 && rubricForm.criteria.length > 0
   }
 
   const openCriterionModal = (criterion?: RubricCriterion) => {

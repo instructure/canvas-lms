@@ -107,6 +107,7 @@ export const RubricAssessmentContainer = ({
         <TraditionalView
           criteria={criteria}
           hidePoints={hidePoints}
+          ratingOrder={ratingOrder}
           rubricAssessmentData={rubricAssessmentData}
           rubricTitle={rubricTitle}
           rubricSavedComments={rubricSavedComments}

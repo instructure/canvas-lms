@@ -42,6 +42,7 @@ type TraditionalViewProps = {
   isPreviewMode: boolean
   isPeerReview?: boolean
   isFreeFormCriterionComments: boolean
+  ratingOrder?: string
   rubricAssessmentData: RubricAssessmentData[]
   rubricTitle: string
   rubricSavedComments?: Record<string, string[]>
@@ -53,6 +54,7 @@ export const TraditionalView = ({
   isPreviewMode,
   isPeerReview,
   isFreeFormCriterionComments,
+  ratingOrder = 'descending',
   rubricAssessmentData,
   rubricTitle,
   rubricSavedComments,
@@ -131,6 +133,7 @@ export const TraditionalView = ({
             key={`criterion-${criterion.id}-${index}`}
             criterion={criterion}
             criterionAssessment={criterionAssessment}
+            ratingOrder={ratingOrder}
             rubricSavedComments={rubricSavedComments?.[criterion.id] ?? []}
             isPreviewMode={isPreviewMode}
             isPeerReview={isPeerReview}
@@ -152,6 +155,7 @@ type CriterionRowProps = {
   isPeerReview?: boolean
   isFreeFormCriterionComments: boolean
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
+  ratingOrder: string
   rubricSavedComments: string[]
 }
 const CriterionRow = ({
@@ -162,13 +166,19 @@ const CriterionRow = ({
   isPeerReview,
   isFreeFormCriterionComments,
   onUpdateAssessmentData,
+  ratingOrder,
   rubricSavedComments,
 }: CriterionRowProps) => {
   const [hoveredRatingIndex, setHoveredRatingIndex] = useState<number>()
   const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
   const [isSaveCommentChecked, setIsSaveCommentChecked] = useState(false)
 
-  const selectedRatingIndex = criterion.ratings.findIndex(
+  const criterionRatings = [...criterion.ratings]
+  if (ratingOrder === 'ascending') {
+    criterionRatings.reverse()
+  }
+
+  const selectedRatingIndex = criterionRatings.findIndex(
     rating => rating.points === criterionAssessment?.points
   )
 
@@ -193,7 +203,7 @@ const CriterionRow = ({
       return
     }
 
-    const selectedRating = criterion.ratings.find(rating => rating.points === points)
+    const selectedRating = criterionRatings.find(rating => rating.points === points)
 
     updateAssessmentData({
       points,
@@ -294,7 +304,7 @@ const CriterionRow = ({
             <View height="13.75rem">
               <Grid>
                 <Grid.Row colSpacing="none">
-                  {criterion.ratings.map((rating, index) => {
+                  {criterionRatings.map((rating, index) => {
                     const highlightedBorder = 'medium'
 
                     const isHovered = hoveredRatingIndex === index
