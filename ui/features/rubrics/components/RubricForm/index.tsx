@@ -100,10 +100,15 @@ const stripPTags = (htmlString: string) => {
 
 type RubricFormComponentProp = {
   rootOutcomeGroup: GroupOutcome
+  canManageRubrics?: boolean
   onLoadRubric?: (rubricTitle: string) => void
 }
 
-export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponentProp) => {
+export const RubricForm = ({
+  canManageRubrics = false,
+  rootOutcomeGroup,
+  onLoadRubric,
+}: RubricFormComponentProp) => {
   const {rubricId, accountId, courseId} = useParams()
   const navigate = useNavigate()
   const navigateUrl = accountId ? `/accounts/${accountId}/rubrics` : `/courses/${courseId}/rubrics`
@@ -125,7 +130,7 @@ export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponent
   const {data, isLoading} = useQuery({
     queryKey: [`fetch-rubric-${rubricId}`],
     queryFn: async () => fetchRubric(rubricId),
-    enabled: !!rubricId,
+    enabled: !!rubricId && canManageRubrics,
   })
 
   const {
@@ -316,6 +321,12 @@ export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponent
 
     calculateDistance()
   }, [containerRef, isLoading])
+
+  useEffect(() => {
+    if (!canManageRubrics) {
+      navigate(navigateUrl)
+    }
+  }, [canManageRubrics, navigate, navigateUrl])
 
   if (isLoading && !!rubricId) {
     return <LoadingIndicator />
