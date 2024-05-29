@@ -439,8 +439,8 @@ function finalGradePointsPossibleText(groupWeightingScheme, scoreWithPointsPossi
 
 function formatScaledPointsGrade(scaledPointsEarned, scaledPointsPossible) {
   return canBeConvertedToGrade(scaledPointsEarned, scaledPointsPossible)
-    ? `${I18n.n(scaledPointsEarned, {precision: 1})} / ${I18n.n(scaledPointsPossible, {
-        precision: 1,
+    ? `${I18n.n(scaledPointsEarned, {precision: 2})} / ${I18n.n(scaledPointsPossible, {
+        precision: 2,
       })}`
     : I18n.t('N/A')
 }
