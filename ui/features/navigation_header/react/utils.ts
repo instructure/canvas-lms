@@ -117,3 +117,35 @@ export function getTrayPortal() {
   }
   return portal
 }
+
+export function sideNavReducer(state: any, action: {type: any; payload?: any}) {
+  switch (action.type) {
+    case 'SET_ACTIVE_TRAY':
+      return {
+        ...state,
+        activeTray: action.payload,
+        isTrayOpen: !!action.payload,
+        previousSelectedNavItem: action.payload
+          ? state.selectedNavItem
+          : state.previousSelectedNavItem,
+      }
+    case 'SET_SELECTED_NAV_ITEM':
+      return {
+        ...state,
+        selectedNavItem: action.payload,
+      }
+    case 'SET_IS_TRAY_OPEN':
+      return {
+        ...state,
+        isTrayOpen: action.payload,
+      }
+    case 'RESET_ACTIVE_TRAY':
+      return {
+        ...state,
+        activeTray: null,
+        selectedNavItem: state.previousSelectedNavItem,
+      }
+    default:
+      return state
+  }
+}

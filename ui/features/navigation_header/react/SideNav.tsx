@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useLayoutEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useLayoutEffect, useReducer, useState} from 'react'
 import {Navigation as SideNavBar} from '@instructure/ui-navigation'
 import {Badge} from '@instructure/ui-badge'
 import {CloseButton} from '@instructure/ui-buttons'
@@ -45,8 +45,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {useQuery} from '@canvas/query'
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {getUnreadCount} from './queries/unreadCountQuery'
-import {getActiveItem, getTrayLabel, getTrayPortal} from './utils'
-import type {ActiveTray, ExternalTool} from './utils'
+import {getActiveItem, getTrayLabel, getTrayPortal, sideNavReducer} from './utils'
+import type {ExternalTool} from './utils'
 import {getSetting, setSetting} from '@canvas/settings-query/react/settingsQuery'
 import {SVGIcon} from '@instructure/ui-svg-images'
 
@@ -68,82 +68,48 @@ export const InformationIconEnum = {
 
 const defaultActiveItem = getActiveItem()
 
-const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
-  const [isTrayOpen, setIsTrayOpen] = useState(false)
-  const [activeTray, setActiveTray] = useState<ActiveTray | null>(null)
-  const [selectedNavItem, setSelectedNavItem] = useState<ActiveTray | ''>(defaultActiveItem)
-  const sideNavRef = useRef<HTMLDivElement | null>(null)
-  const logoRef = useRef<Element | null>(null)
-  const accountRef = useRef<Element | null>(null)
-  const adminRef = useRef<Element | null>(null)
-  const dashboardRef = useRef<Element | null>(null)
-  const coursesRef = useRef<Element | null>(null)
-  const calendarRef = useRef<Element | null>(null)
-  const inboxRef = useRef<Element | null>(null)
-  const historyRef = useRef<Element | null>(null)
-  const externalTool = useRef<Element | null>(null)
-  const helpRef = useRef<Element | null>(null)
+const initialState = {
+  isTrayOpen: false,
+  activeTray: null,
+  selectedNavItem: defaultActiveItem,
+  previousSelectedNavItem: defaultActiveItem,
+}
 
-  // after tray is closed, eventually set activeTray to null
-  // we don't do this immediately in order to maintain animation of closing tray
+const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
+  const [state, dispatch] = useReducer(sideNavReducer, initialState)
+  const {isTrayOpen, activeTray, selectedNavItem, previousSelectedNavItem} = state
+
+  const handleDataSelected = (tray: any) => {
+    const active = document.querySelector('[data-selected="true"]')
+    if (active instanceof HTMLAnchorElement) {
+      active.dataset.selected = ''
+    }
+
+    const el = document.getElementById(`${tray}-tray`)
+    if (el instanceof HTMLElement) {
+      el.dataset.selected = 'true'
+    }
+  }
+
+  const handleActiveTray = useCallback((tray, showActiveTray = false) => {
+    if (showActiveTray) {
+      dispatch({type: 'SET_ACTIVE_TRAY', payload: tray})
+    }
+
+    handleDataSelected(tray)
+
+    dispatch({type: 'SET_SELECTED_NAV_ITEM', payload: tray})
+  }, [])
+
   useEffect(() => {
     if (!isTrayOpen) {
-      setTimeout(() => setActiveTray(null), 100)
+      const timer = setTimeout(() => {
+        dispatch({type: 'RESET_ACTIVE_TRAY'})
+        handleDataSelected(previousSelectedNavItem)
+      }, 100)
+      return () => clearTimeout(timer)
     }
-  }, [isTrayOpen])
-
-  useEffect(() => {
-    // when an active tray is set, we infer that the tray is opened
-    if (activeTray) {
-      setIsTrayOpen(true)
-    }
-
-    // if the active tray is set to null, the active nav item should be
-    // determined by page location
-    setSelectedNavItem(activeTray ?? defaultActiveItem)
-  }, [activeTray])
-
-  useEffect(() => {
-    if (sideNavRef.current instanceof HTMLElement) {
-      const active = sideNavRef.current.querySelector('[data-selected="true"]')
-      if (active instanceof HTMLAnchorElement) {
-        active.dataset.selected = ''
-      }
-    }
-
-    switch (selectedNavItem) {
-      case 'profile':
-        if (accountRef.current instanceof HTMLElement) {
-          accountRef.current.dataset.selected = 'true'
-        }
-        break
-      case 'accounts':
-        if (adminRef.current instanceof HTMLElement) {
-          adminRef.current.dataset.selected = 'true'
-        }
-        break
-      case 'dashboard':
-        if (dashboardRef.current instanceof HTMLElement) {
-          dashboardRef.current.dataset.selected = 'true'
-        }
-        break
-      case 'conversations':
-        if (adminRef.current instanceof HTMLElement) {
-          adminRef.current.dataset.selected = 'true'
-        }
-        break
-      case 'courses':
-        if (coursesRef.current instanceof HTMLElement) {
-          coursesRef.current.dataset.selected = 'true'
-        }
-        break
-      case 'help':
-        if (helpRef.current instanceof HTMLElement) {
-          helpRef.current.dataset.selected = 'true'
-        }
-        break
-    }
-  }, [selectedNavItem])
+  }, [isTrayOpen, previousSelectedNavItem])
 
   const [trayShouldContainFocus, setTrayShouldContainFocus] = useState(false)
   const [overrideDismiss] = useState(false)
@@ -157,8 +123,6 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
     iconSize: '26px',
     iconColor: 'white',
     contentPadding: '7px 0',
-    backgroundColor: 'transparent',
-    hoverBackgroundColor: 'transparent',
     fontWeight: 400,
     linkTextDecoration: 'inherit',
   }
@@ -243,67 +207,19 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
   }
 
   useLayoutEffect(() => {
-    /** New SideNav CSS  */
-    const sideNavTrays = [
-      document.querySelector('#admin-tray'),
-      document.querySelector('#dashboard-tray'),
-      document.querySelector('#courses-tray'),
-      document.querySelector('#calendar-tray'),
-      document.querySelector('#inbox-tray'),
-      document.querySelector('#history-tray'),
-      ...document.querySelectorAll('#external-tool-tray'),
-      document.querySelector('#help-tray'),
-    ]
-    if (Array.isArray(sideNavTrays))
-      sideNavTrays.forEach(sideNavTray => sideNavTray?.classList.add('ic-sidenav-tray'))
-
-    const externalToolsSvgImg = ['ic-svg-external-tool', 'ic-img-external-tool']
-
-    if (Array.isArray(externalToolsSvgImg))
-      externalToolsSvgImg.forEach(svgImgClassName =>
-        document.querySelector('#external-tool-tray')?.classList.add(svgImgClassName)
-      )
-
-    document.querySelector('#logo-tray')?.classList.add('ic-logo-tray')
-    document.querySelector('#user-tray')?.classList.add('ic-user-tray')
-    document.querySelector('#canvas-logo')?.classList.add('ic-canvas-logo')
-    document.querySelector('#brand-logo')?.classList.add('ic-brand-logo')
-    document.querySelector('#user-avatar')?.classList.add('ic-user-avatar')
-
     const collapseDiv = document.querySelectorAll('[aria-label="Main navigation"]')[0]
       .childNodes[1] as HTMLElement
     const collapseButton = collapseDiv.childNodes[0] as HTMLElement
-    collapseDiv.classList.add('ic-collapse-div')
-    collapseButton.classList.add('ic-collapse-button')
     collapseButton.id = 'sidenav-toggle'
 
     if (collapseGlobalNav) document.body.classList.remove('primary-nav-expanded')
     else document.body.classList.add('primary-nav-expanded')
-
-    /** New SideNav CSS  */
   }, [collapseGlobalNav])
 
   return (
-    <div
-      ref={sideNavRef}
-      style={{width: '100%', height: '100vh'}}
-      className="sidenav-container"
-      data-testid="sidenav-container"
-    >
-      <style>{`
-        ${
-          !collapseGlobalNav
-            ? `
-        .sidenav-container a[logo-tray="true"] {
-          height: 85px !important;
-        }
-        .sidenav-container a[account-tray="true"] {
-          height: 72.59px !important;
-        }`
-            : ''
-        }
-      `}</style>
+    <>
       <SideNavBar
+        id="instui-sidenav"
         label="Main navigation"
         toggleLabel={{
           expandedLabel: 'Minimize Navigation',
@@ -314,37 +230,38 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
         themeOverride={{
           minimizedWidth: '100%',
         }}
+        data-testid="sidenav-container"
       >
         <SideNavBar.Item
           id="logo-tray"
-          elementRef={el => (logoRef.current = el)}
           icon={
             !logoUrl ? (
-              <div id="canvas-logo">
-                <IconCanvasLogoSolid data-testid="sidenav-canvas-logo" />
-              </div>
+              <IconCanvasLogoSolid
+                data-testid="sidenav-canvas-logo"
+                size={collapseGlobalNav ? 'small' : 'medium'}
+              />
             ) : (
-              <div id="brand-logo">
-                <Img
-                  display="inline-block"
-                  alt="sidenav-brand-logomark"
-                  src={logoUrl}
-                  data-testid="sidenav-brand-logomark"
-                />
-              </div>
+              <Img
+                display="inline-block"
+                alt="sidenav-brand-logomark"
+                src={logoUrl}
+                data-testid="sidenav-brand-logomark"
+              />
             )
           }
           label={<ScreenReaderContent>{I18n.t('Home')}</ScreenReaderContent>}
           href="/"
           themeOverride={{
             ...navItemThemeOverride,
+            backgroundColor: 'transparent',
+            hoverBackgroundColor: 'transparent',
             contentPadding: '0',
           }}
           minimized={collapseGlobalNav}
           data-testid="sidenav-header-logo"
         />
         <SideNavBar.Item
-          id="user-tray"
+          id="profile-tray"
           icon={
             <Badge
               count={unreadContentSharesCount}
@@ -383,26 +300,24 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
               />
             </Badge>
           }
-          elementRef={el => (accountRef.current = el)}
           label={I18n.t('Account')}
           href="/profile/settings"
           onClick={event => {
             event.preventDefault()
-            setActiveTray('profile')
+            handleActiveTray('profile', true)
           }}
           selected={selectedNavItem === 'profile'}
           themeOverride={navItemThemeOverride}
           minimized={collapseGlobalNav}
         />
         <SideNavBar.Item
-          id="admin-tray"
-          elementRef={el => (adminRef.current = el)}
+          id="accounts-tray"
           icon={<IconAdminLine />}
           label={I18n.t('Admin')}
           href="/accounts"
           onClick={event => {
             event.preventDefault()
-            setActiveTray('accounts')
+            handleActiveTray('accounts', true)
           }}
           selected={selectedNavItem === 'accounts'}
           themeOverride={navItemThemeOverride}
@@ -410,24 +325,22 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
         />
         <SideNavBar.Item
           id="dashboard-tray"
-          elementRef={el => (dashboardRef.current = el)}
           icon={isK5User ? <IconHomeLine data-testid="K5HomeIcon" /> : <IconDashboardLine />}
           label={isK5User ? I18n.t('Home') : I18n.t('Dashboard')}
           href="/"
+          onClick={() => handleActiveTray('dashboard')}
           selected={selectedNavItem === 'dashboard'}
           themeOverride={navItemThemeOverride}
           minimized={collapseGlobalNav}
         />
         <SideNavBar.Item
           id="courses-tray"
-          // id={selectedNavItem === 'courses' ? 'active-courses' : ''}
-          elementRef={el => (coursesRef.current = el)}
           icon={<IconCoursesLine />}
           label={isK5User ? I18n.t('Subjects') : I18n.t('Courses')}
           href="/courses"
           onClick={event => {
             event.preventDefault()
-            setActiveTray('courses')
+            handleActiveTray('courses', true)
           }}
           selected={selectedNavItem === 'courses'}
           themeOverride={navItemThemeOverride}
@@ -435,16 +348,16 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
         />
         <SideNavBar.Item
           id="calendar-tray"
-          elementRef={el => (calendarRef.current = el)}
           icon={<IconCalendarMonthLine />}
           label={I18n.t('Calendar')}
           href="/calendar"
+          onClick={() => handleActiveTray('calendar')}
           selected={selectedNavItem === 'calendar'}
           themeOverride={navItemThemeOverride}
           minimized={collapseGlobalNav}
         />
         <SideNavBar.Item
-          id="inbox-tray"
+          id="conversations-tray"
           icon={
             <Badge
               count={unreadConversationsCount}
@@ -469,43 +382,48 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
               <IconInboxLine />
             </Badge>
           }
-          elementRef={el => (inboxRef.current = el)}
           label={I18n.t('Inbox')}
           href="/conversations"
+          onClick={() => handleActiveTray('conversations')}
           selected={selectedNavItem === 'conversations'}
           themeOverride={navItemThemeOverride}
           minimized={collapseGlobalNav}
         />
         <SideNavBar.Item
           id="history-tray"
-          elementRef={el => (historyRef.current = el)}
           icon={<IconClockLine />}
           label={I18n.t('History')}
           href={window.ENV.page_view_update_url}
+          onClick={() => handleActiveTray('history')}
           selected={selectedNavItem === 'history'}
           themeOverride={navItemThemeOverride}
           minimized={collapseGlobalNav}
         />
-        {externalTools &&
-          externalTools.map(tool => (
-            <SideNavBar.Item
-              key={tool.href}
-              id="external-tool-tray"
-              elementRef={el => (externalTool.current = el)}
-              icon={
-                'svgPath' in tool ? (
-                  <SVGIcon viewBox="0 0 64 64" src={tool.svgPath} title="svg-external-tool" />
-                ) : (
-                  <img id="img-external-tool" width="26px" height="26px" src={tool.imgSrc} alt="" />
-                )
-              }
-              label={tool.label}
-              href={tool.href?.toString()}
-              selected={tool.isActive}
-              themeOverride={navItemThemeOverride}
-              minimized={collapseGlobalNav}
-            />
-          ))}
+
+        {Array.isArray(externalTools) &&
+          [...externalTools].map(tool => {
+            const toolId = tool.label.toLowerCase().replaceAll(' ', '-')
+            const toolImg = tool.imgSrc ? tool.imgSrc : ''
+            return (
+              <SideNavBar.Item
+                key={toolId}
+                id={`${toolId}-external-tool-tray`}
+                icon={
+                  'svgPath' in tool ? (
+                    <SVGIcon viewBox="0 0 64 64" src={tool.svgPath} title="svg-external-tool" />
+                  ) : (
+                    <Img width="26px" height="26px" src={toolImg} alt="" />
+                  )
+                }
+                label={tool.label}
+                href={tool.href?.toString()}
+                onClick={() => handleActiveTray(toolId)}
+                selected={selectedNavItem === toolId}
+                themeOverride={navItemThemeOverride}
+                minimized={collapseGlobalNav}
+              />
+            )
+          })}
         <SideNavBar.Item
           id="help-tray"
           icon={
@@ -532,12 +450,11 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
               {getHelpIcon()}
             </Badge>
           }
-          elementRef={el => (helpRef.current = el)}
           label={I18n.t('Help')}
           href="https://help.instructure.com/"
           onClick={event => {
             event.preventDefault()
-            setActiveTray('help')
+            handleActiveTray('help')
           }}
           selected={selectedNavItem === 'help'}
           themeOverride={navItemThemeOverride}
@@ -556,7 +473,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
           overrideDismiss
             ? () => {}
             : () => {
-                setIsTrayOpen(false)
+                dispatch({type: 'SET_IS_TRAY_OPEN', payload: false})
                 setTrayShouldContainFocus(false)
               }
         }
@@ -569,7 +486,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
           <CloseButton
             placement="end"
             onClick={() => {
-              setIsTrayOpen(false)
+              dispatch({type: 'SET_IS_TRAY_OPEN', payload: false})
               setTrayShouldContainFocus(false)
             }}
             screenReaderLabel={I18n.t('Close')}
@@ -592,12 +509,14 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
               {activeTray === 'groups' && <GroupsTray />}
               {activeTray === 'profile' && <ProfileTray />}
               {activeTray === 'history' && <HistoryTray />}
-              {activeTray === 'help' && <HelpTray closeTray={() => setIsTrayOpen(false)} />}
+              {activeTray === 'help' && (
+                <HelpTray closeTray={() => dispatch({type: 'SET_IS_TRAY_OPEN', payload: false})} />
+              )}
             </React.Suspense>
           </div>
         </div>
       </Tray>
-    </div>
+    </>
   )
 }
 
