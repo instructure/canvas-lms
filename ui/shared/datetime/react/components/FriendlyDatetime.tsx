@@ -17,8 +17,7 @@
  */
 
 import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import * as tz from '@instructure/datetime'
+import {parse, format as format_} from '@instructure/datetime'
 import {isDate, memoize} from 'lodash'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {
@@ -27,14 +26,16 @@ import {
   datetimeString,
 } from '@canvas/datetime/date-functions'
 
-class FriendlyDatetime extends Component {
-  static propTypes = {
-    dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
-    format: PropTypes.string,
-    prefix: PropTypes.string,
-    prefixMobile: PropTypes.string,
-    showTime: PropTypes.bool,
-  }
+type Props = {
+  dateTime: string | Date | null
+  format?: string
+  prefix?: string
+  prefixMobile?: string
+  showTime?: boolean
+}
+
+class FriendlyDatetime extends Component<Props> {
+  time: HTMLTimeElement | null = null
 
   static defaultProps = {
     format: null,
@@ -54,19 +55,23 @@ class FriendlyDatetime extends Component {
 
       let datetime = this.props.dateTime
       if (!datetime) {
-        return <time />
+        return null
       }
       if (!isDate(datetime)) {
-        datetime = tz.parse(datetime)
+        datetime = parse(datetime)
       }
       const fudged = fudgeDateForProfileTimezone(datetime)
       let friendly
       if (this.props.format) {
-        friendly = tz.format(datetime, this.props.format)
+        friendly = format_(datetime, this.props.format)
       } else if (showTime) {
         friendly = datetimeString(datetime)
       } else {
         friendly = friendlyDatetime(fudged)
+      }
+
+      if (!datetime || !friendly || !fudged) {
+        return null
       }
 
       const timeProps = {
