@@ -47,6 +47,10 @@ class AssignmentCreateEditPage
       "#assignment_group_category_id option"
     end
 
+    def error_box_selector
+      ".error_text"
+    end
+
     # Selectors
     def assignment_form
       f("#edit_assignment_form")
@@ -122,6 +126,10 @@ class AssignmentCreateEditPage
 
     def group_categories
       ff(group_categories_selector)
+    end
+
+    def error_boxes
+      ff(error_box_selector)
     end
 
     # Moderated Grading Options

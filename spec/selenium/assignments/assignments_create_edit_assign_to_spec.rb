@@ -348,6 +348,16 @@ describe "group assignments", :ignore_js_errors do
     expect(@group_assignment.assignment_overrides.active.count).to eq(1)
     expect(@group_assignment.assignment_overrides.active.last.title).to eq(@testgroup[1].name)
   end
+
+  it "shows error if there is no group category selected when opening the tray" do
+    AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @group_assignment.id)
+
+    AssignmentCreateEditPage.select_assignment_group_category({})
+    AssignmentCreateEditPage.click_manage_assign_to_button
+    error_boxes = AssignmentCreateEditPage.error_boxes
+
+    expect(error_boxes.any? { |errorbox| errorbox.text.include?("Please select a group set for this assignment") }).to be_truthy
+  end
 end
 
 describe "assignments show page assign to", :ignore_js_errors do

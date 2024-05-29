@@ -188,8 +188,10 @@ const DifferentiatedModulesSection = ({
   }, [stagedCards])
 
   const handleOpen = useCallback(() => {
+    if(onTrayOpen !== undefined){
+      if(!onTrayOpen()) return;
+    }
     setOpen(true)
-    onTrayOpen?.()
   }, [onTrayOpen])
 
   useEffect(() => {

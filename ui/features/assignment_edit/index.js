@@ -91,6 +91,7 @@ ready(() => {
         inPacedCourse: assignment.inPacedCourse(),
         isModuleItem: ENV.IS_MODULE_ITEM,
         courseId: assignment.courseID(),
+        groupCategorySelector,
       }),
     },
     lockedItems: assignment.id ? lockedItems : {}, // if no id, creating a new assignment
