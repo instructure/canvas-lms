@@ -185,10 +185,10 @@ export default function StudentInformation({
 
       if (displayAsScaledPoints && possible) {
         const scaledPossible = I18n.n(scalingFactor, {
-          precision: 1,
+          precision: 2,
         })
         const scaledScore = I18n.n(scoreToScaledPoints(score, possible, scalingFactor), {
-          precision: 1,
+          precision: 2,
         })
 
         finalGradeText = `${scaledScore} / ${scaledPossible}`
