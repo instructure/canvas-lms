@@ -44,7 +44,7 @@ describe "New SideNav Navigation" do
     describe "Profile Link" do
       it "shows the profile tray upon clicking" do
         get "/"
-        user_tray = f("#user-tray")
+        user_tray = f("#profile-tray")
         user_tray.click
         wait_for_ajaximations
         expect(f('[aria-label="User profile picture"]')).to be_displayed
@@ -78,7 +78,7 @@ describe "New SideNav Navigation" do
                                     })
         @tool.save!
         get "/"
-        expect(f("#external-tool-tray")).to be_displayed
+        expect(f("#commons-external-tool-tray")).to be_displayed
       end
     end
 

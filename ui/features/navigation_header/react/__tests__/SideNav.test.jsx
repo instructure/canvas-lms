@@ -31,6 +31,9 @@ describe('SideNav', () => {
       html_url: '',
       pronouns: '',
     }
+    window.ENV.SETTINGS = {
+      collapse_global_nav: false,
+    }
     window.ENV.K5_USER = false
     window.ENV.help_link_icon = 'help'
   })
@@ -56,7 +59,7 @@ describe('SideNav', () => {
     )
 
     const sideNavContainer = getByTestId('sidenav-container')
-    expect(sideNavContainer).toHaveStyle('height: 100vh;')
+    expect(sideNavContainer).toHaveStyle('height: 100%;')
   })
 
   // test that SideNav renders a header logo with Canvas icon logo as default
