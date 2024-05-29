@@ -47,7 +47,7 @@ import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {getUnreadCount} from './queries/unreadCountQuery'
 import {getActiveItem, getTrayLabel, getTrayPortal, sideNavReducer} from './utils'
 import type {ExternalTool} from './utils'
-import {getSetting, setSetting} from '@canvas/settings-query/react/settingsQuery'
+import {getSettingAsync, setSetting} from '@canvas/settings-query/react/settingsQuery'
 import {SVGIcon} from '@instructure/ui-svg-images'
 
 const I18n = useI18nScope('sidenav')
@@ -74,10 +74,30 @@ const initialState = {
   selectedNavItem: defaultActiveItem,
   previousSelectedNavItem: defaultActiveItem,
 }
+interface ISideNav {
+  externalTools?: Array<ExternalTool>
+}
 
-const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
+const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
+  const [collapseSideNav, setCollapseSideNav] = useState(window.ENV.SETTINGS.collapse_global_nav)
   const [state, dispatch] = useReducer(sideNavReducer, initialState)
   const {isTrayOpen, activeTray, selectedNavItem, previousSelectedNavItem} = state
+
+  const {mutate: setCollapseGlobalNav} = useMutation({
+    mutationFn: setSetting,
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: ['settings', 'collapse_global_nav'],
+      }),
+  })
+
+  const updateCollapseGlobalNav = (newState: boolean) => {
+    setCollapseSideNav(newState)
+    setCollapseGlobalNav({
+      setting: 'collapse_global_nav',
+      newState,
+    })
+  }
 
   const handleDataSelected = (tray: any) => {
     const active = document.querySelector('[data-selected="true"]')
@@ -156,7 +176,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
 
   const {data: releaseNotesBadgeDisabled} = useQuery({
     queryKey: ['settings', 'release_notes_badge_disabled'],
-    queryFn: getSetting,
+    queryFn: getSettingAsync,
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
     fetchAtLeastOnce: true,
   })
@@ -184,37 +204,15 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes && !releaseNotesBadgeDisabled,
   })
 
-  const {data: collapseGlobalNav} = useQuery({
-    queryKey: ['settings', 'collapse_global_nav'],
-    queryFn: getSetting,
-    enabled: true,
-    fetchAtLeastOnce: true,
-  })
-
-  const setCollapseGlobalNav = useMutation({
-    mutationFn: setSetting,
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: ['settings', 'collapse_global_nav'],
-      }),
-  })
-
-  function updateCollapseGlobalNav(newState: boolean) {
-    setCollapseGlobalNav.mutate({
-      setting: 'collapse_global_nav',
-      newState,
-    })
-  }
-
   useLayoutEffect(() => {
     const collapseDiv = document.querySelectorAll('[aria-label="Main navigation"]')[0]
       .childNodes[1] as HTMLElement
     const collapseButton = collapseDiv.childNodes[0] as HTMLElement
     collapseButton.id = 'sidenav-toggle'
 
-    if (collapseGlobalNav) document.body.classList.remove('primary-nav-expanded')
+    if (collapseSideNav) document.body.classList.remove('primary-nav-expanded')
     else document.body.classList.add('primary-nav-expanded')
-  }, [collapseGlobalNav])
+  }, [collapseSideNav])
 
   return (
     <>
@@ -225,10 +223,13 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
           expandedLabel: 'Minimize Navigation',
           minimizedLabel: 'Expand Navigation',
         }}
-        defaultMinimized={collapseGlobalNav}
-        onMinimized={() => updateCollapseGlobalNav(!collapseGlobalNav)}
+        defaultMinimized={collapseSideNav}
+        onMinimized={e =>
+          e.nativeEvent.type === 'click' && updateCollapseGlobalNav(!collapseSideNav)
+        }
         themeOverride={{
           minimizedWidth: '100%',
+          toggleTransition: '200ms',
         }}
         data-testid="sidenav-container"
       >
@@ -238,7 +239,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
             !logoUrl ? (
               <IconCanvasLogoSolid
                 data-testid="sidenav-canvas-logo"
-                size={collapseGlobalNav ? 'small' : 'medium'}
+                size={collapseSideNav ? 'small' : 'medium'}
               />
             ) : (
               <Img
@@ -257,7 +258,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
             hoverBackgroundColor: 'transparent',
             contentPadding: '0',
           }}
-          minimized={collapseGlobalNav}
+          minimized={collapseSideNav}
           data-testid="sidenav-header-logo"
         />
         <SideNavBar.Item
@@ -286,7 +287,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
               <Avatar
                 id="user-avatar"
                 name={window.ENV.current_user.display_name}
-                size={collapseGlobalNav ? 'x-small' : 'small'}
+                size={collapseSideNav ? 'x-small' : 'small'}
                 src={window.ENV.current_user.avatar_image_url}
                 data-testid="sidenav-user-avatar"
                 showBorder="always"
@@ -308,7 +309,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
           }}
           selected={selectedNavItem === 'profile'}
           themeOverride={navItemThemeOverride}
-          minimized={collapseGlobalNav}
+          minimized={collapseSideNav}
         />
         <SideNavBar.Item
           id="accounts-tray"
@@ -321,7 +322,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
           }}
           selected={selectedNavItem === 'accounts'}
           themeOverride={navItemThemeOverride}
-          minimized={collapseGlobalNav}
+          minimized={collapseSideNav}
         />
         <SideNavBar.Item
           id="dashboard-tray"
@@ -331,7 +332,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
           onClick={() => handleActiveTray('dashboard')}
           selected={selectedNavItem === 'dashboard'}
           themeOverride={navItemThemeOverride}
-          minimized={collapseGlobalNav}
+          minimized={collapseSideNav}
         />
         <SideNavBar.Item
           id="courses-tray"
@@ -344,7 +345,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
           }}
           selected={selectedNavItem === 'courses'}
           themeOverride={navItemThemeOverride}
-          minimized={collapseGlobalNav}
+          minimized={collapseSideNav}
         />
         <SideNavBar.Item
           id="calendar-tray"
@@ -354,7 +355,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
           onClick={() => handleActiveTray('calendar')}
           selected={selectedNavItem === 'calendar'}
           themeOverride={navItemThemeOverride}
-          minimized={collapseGlobalNav}
+          minimized={collapseSideNav}
         />
         <SideNavBar.Item
           id="conversations-tray"
@@ -387,7 +388,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
           onClick={() => handleActiveTray('conversations')}
           selected={selectedNavItem === 'conversations'}
           themeOverride={navItemThemeOverride}
-          minimized={collapseGlobalNav}
+          minimized={collapseSideNav}
         />
         <SideNavBar.Item
           id="history-tray"
@@ -397,7 +398,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
           onClick={() => handleActiveTray('history')}
           selected={selectedNavItem === 'history'}
           themeOverride={navItemThemeOverride}
-          minimized={collapseGlobalNav}
+          minimized={collapseSideNav}
         />
 
         {Array.isArray(externalTools) &&
@@ -420,7 +421,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
                 onClick={() => handleActiveTray(toolId)}
                 selected={selectedNavItem === toolId}
                 themeOverride={navItemThemeOverride}
-                minimized={collapseGlobalNav}
+                minimized={collapseSideNav}
               />
             )
           })}
@@ -458,7 +459,7 @@ const SideNav = ({externalTools = []}: {externalTools?: ExternalTool[]}) => {
           }}
           selected={selectedNavItem === 'help'}
           themeOverride={navItemThemeOverride}
-          minimized={collapseGlobalNav}
+          minimized={collapseSideNav}
         />
       </SideNavBar>
       <Tray
