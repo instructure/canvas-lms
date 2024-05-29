@@ -107,7 +107,7 @@ module VisibilitySqlHelper
       SQL
     end
 
-    # assignment_override_unassign_section_join_sql
+    # assignment_override_unassign_adhoc_join_sql
     def assignment_override_unassign_adhoc_join_sql(id_column_name:)
       <<~SQL.squish
         INNER JOIN #{AssignmentOverride.quoted_table_name} ao
