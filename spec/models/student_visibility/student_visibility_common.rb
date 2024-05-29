@@ -23,7 +23,7 @@ module StudentVisibilityCommon
     when "discussion_topic"
       UngradedDiscussionStudentVisibility.where(course_id: @course.id, user_id: user.id).pluck(:discussion_topic_id)
     when "wiki_page"
-      WikiPageStudentVisibility.where(course_id: @course.id, user_id: user.id).pluck(:wiki_page_id)
+      WikiPageStudentVisibility.where(course_id: @course.id, user_id: user.id).map(&:wiki_page_id)
     end
   end
 
