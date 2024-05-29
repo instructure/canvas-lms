@@ -33,6 +33,7 @@ export interface EnvAccountsAdminTools {
     can_read_roster: boolean
     can_view_temporary_enrollments: boolean
     manage_grading_schemes: boolean
+    manage_rubrics: boolean
     logging:
       | false
       | {
