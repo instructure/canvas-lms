@@ -109,6 +109,7 @@ export default function RubricTab(props) {
         isPreviewMode={true}
         isFreeFormCriterionComments={props.rubric.free_form_criterion_comments}
         onUpdateAssessmentData={() => {}}
+        ratingOrder={props.rubric.ratingOrder}
         rubricTitle={props.rubric.title}
         rubricAssessmentData={rubricAssessmentData}
       />

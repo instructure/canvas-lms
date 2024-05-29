@@ -30,6 +30,7 @@ export const Rubric = {
       free_form_criterion_comments: freeFormCriterionComments
       hide_score_total: hideScoreTotal
       points_possible: pointsPossible
+      ratingOrder
       title
     }
     ${RubricCriterion.fragment}

@@ -214,25 +214,34 @@ describe('CriterionModal tests', () => {
       expect(getByTestId('rubric-criterion-save')).not.toBeDisabled()
     })
 
-    it('save button should be disabled if there is no criterion name', () => {
+    it('save button should display validation error if there is no criterion name', () => {
+      const onSave = jest.fn()
       const criterion = getCriterion({description: ''})
 
-      const {getByTestId} = renderComponent({criterion})
+      const {getByTestId, queryByText} = renderComponent({onSave, criterion})
 
-      expect(getByTestId('rubric-criterion-save')).toBeDisabled()
+      fireEvent.click(getByTestId('rubric-criterion-save'))
+
+      expect(onSave).not.toHaveBeenCalled()
+      expect(queryByText('Criteria Name Required')).not.toBeNull()
     })
 
-    it('save button should be disabled if there is no rating name', () => {
+    it('save button should display validation error if there is no rating name', () => {
+      const onSave = jest.fn()
       const criterion = getCriterion({
         ratings: [{id: '1', description: '', points: 0, longDescription: ''}],
       })
 
-      const {getByTestId} = renderComponent({criterion})
+      const {getByTestId, queryByText} = renderComponent({onSave, criterion})
 
-      expect(getByTestId('rubric-criterion-save')).toBeDisabled()
+      fireEvent.click(getByTestId('rubric-criterion-save'))
+
+      expect(onSave).not.toHaveBeenCalled()
+      expect(queryByText('Rating Name Required')).not.toBeNull()
     })
 
-    it('save button should be disabled if there is only a single rating with no name', () => {
+    it('save button should display validation error if there is only a single rating with no name', () => {
+      const onSave = jest.fn()
       const ratings = [
         {id: '1', description: 'Valid', points: 0, longDescription: ''},
         {id: '1', description: 'Valid', points: 0, longDescription: ''},
@@ -241,9 +250,12 @@ describe('CriterionModal tests', () => {
       ]
       const criterion = getCriterion({ratings})
 
-      const {getByTestId} = renderComponent({criterion})
+      const {getByTestId, queryByText} = renderComponent({onSave, criterion})
 
-      expect(getByTestId('rubric-criterion-save')).toBeDisabled()
+      fireEvent.click(getByTestId('rubric-criterion-save'))
+
+      expect(onSave).not.toHaveBeenCalled()
+      expect(queryByText('Rating Name Required')).not.toBeNull()
     })
 
     it('should call onSave when save button is clicked', () => {
