@@ -11,3 +11,8 @@ translate_compose_message:
   display_name: Enable Translation in Message Compose
   description: Can include translated message when composing messages.
   beta: true
+translate_inbound_message:
+  state: hidden
+  applies_to: User
+  display_name: Enable Inbound Message Translation in Inbox
+  description: Messages received that are in a different language than user locale will be translated.
