@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {func, number, string, oneOf, array} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Menu} from '@instructure/ui-menu'
 import {IconEditLine} from '@instructure/ui-icons'
@@ -29,38 +28,63 @@ import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime
 
 const I18n = useI18nScope('speed_grader')
 
-export default function SpeedGraderStatusMenu(props) {
-  const statusesMap = {
-    extended: I18n.t('Extended'),
-    excused: I18n.t('Excused'),
-    late: I18n.t('Late'),
-    missing: I18n.t('Missing'),
-    none: I18n.t('None'),
-  }
-  props.customStatuses?.forEach(status => {
-    statusesMap[status.id] = status.name
+const initialStatusesMap: Map<string, string> = new Map([
+  ['extended', I18n.t('Extended')],
+  ['excused', I18n.t('Excused')],
+  ['late', I18n.t('Late')],
+  ['missing', I18n.t('Missing')],
+  ['none', I18n.t('None')],
+])
+
+type Props = {
+  lateSubmissionInterval: 'day' | 'hour'
+  locale: string
+  secondsLate: number
+  selection: string
+  updateSubmission: (data: any) => void
+  cachedDueDate?: string
+  customStatuses?: Array<any>
+}
+
+export default function SpeedGraderStatusMenu({
+  customStatuses,
+  selection,
+  secondsLate,
+  updateSubmission,
+  lateSubmissionInterval,
+  locale,
+  cachedDueDate,
+}: Props) {
+  const statusesMap = new Map(initialStatusesMap)
+  customStatuses?.forEach(status => {
+    statusesMap.set(status.id, status.name)
   })
-  const handleSelection = (_, newSelection) => {
-    if (newSelection === props.selection) {
+  const handleSelection = (newSelection: string) => {
+    if (newSelection === selection) {
       return
     }
-    let data = {latePolicyStatus: newSelection}
+    let data: {
+      excuse?: boolean
+      latePolicyStatus?: string
+      secondsLateOverride?: number
+      customGradeStatusId?: string
+    } = {latePolicyStatus: newSelection}
     if (newSelection === 'excused') {
       data = {excuse: true}
     } else if (newSelection === 'late') {
-      data = {latePolicyStatus: newSelection, secondsLateOverride: props.secondsLate}
+      data = {latePolicyStatus: newSelection, secondsLateOverride: secondsLate}
       // eslint-disable-next-line no-restricted-globals
     } else if (!isNaN(parseInt(newSelection, 10))) {
       data = {customGradeStatusId: newSelection}
     }
-    props.updateSubmission(data)
+    updateSubmission(data)
   }
 
   const optionValues = ['late', 'missing', 'excused']
   if (ENV.FEATURES && ENV.FEATURES.extended_submission_state) {
     optionValues.push('extended')
   }
-  props.customStatuses?.forEach(status => {
+  customStatuses?.forEach(status => {
     optionValues.push(status.id)
   })
   optionValues.push('none')
@@ -70,10 +94,10 @@ export default function SpeedGraderStatusMenu(props) {
       key={status}
       value={status}
       data-testid={`speedGraderStatusMenu-${status}`}
-      selected={props.selection === status}
-      onSelect={handleSelection}
+      selected={selection === status}
+      onSelect={(_, newSelection) => handleSelection(String(newSelection))}
     >
-      {statusesMap[status]}
+      {statusesMap.get(status)}
     </Menu.Item>
   ))
 
@@ -101,23 +125,23 @@ export default function SpeedGraderStatusMenu(props) {
           </Menu>
         </Flex.Item>
       </Flex>
-      {props.selection === 'late' && (
+      {selection === 'late' && (
         <>
           <div style={{position: 'absolute', right: '24px'}}>
             <TimeLateInput
-              lateSubmissionInterval={props.lateSubmissionInterval}
-              locale={props.locale}
+              lateSubmissionInterval={lateSubmissionInterval}
+              locale={locale}
               renderLabelBefore={true}
-              secondsLate={props.secondsLate}
-              onSecondsLateUpdated={props.updateSubmission}
+              secondsLate={secondsLate}
+              onSecondsLateUpdated={updateSubmission}
               width="5rem"
             />
-            {props.cachedDueDate ? (
+            {cachedDueDate ? (
               <FriendlyDatetime
                 data-testid="original-due-date"
                 prefix={I18n.t('Due:')}
                 format={I18n.t('#date.formats.full_with_weekday')}
-                dateTime={props.cachedDueDate}
+                dateTime={cachedDueDate}
               />
             ) : null}
           </div>
@@ -125,14 +149,4 @@ export default function SpeedGraderStatusMenu(props) {
       )}
     </>
   )
-}
-
-SpeedGraderStatusMenu.propTypes = {
-  lateSubmissionInterval: oneOf(['day', 'hour']).isRequired,
-  locale: string.isRequired,
-  secondsLate: number.isRequired,
-  selection: string.isRequired,
-  updateSubmission: func.isRequired,
-  cachedDueDate: string,
-  customStatuses: array,
 }
