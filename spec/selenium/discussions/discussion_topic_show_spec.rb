@@ -94,7 +94,7 @@ describe "Discussion Topic Show" do
       expect(f("body")).not_to contain_css(Discussion.summarize_button_selector)
     end
 
-    context "group discussions in a group context" do
+    context "group discussions in a course context" do
       it "loads without errors" do
         @group_discussion_topic = group_discussion_assignment
         get "/courses/#{@course.id}/discussion_topics/#{@group_discussion_topic.id}"
@@ -105,6 +105,27 @@ describe "Discussion Topic Show" do
         wait_for_ajaximations
         expect(fj("h1:contains('topic - group 1')")).to be_present
         expect_no_flash_message :error
+      end
+
+      it "truncates long group names in the middle" do
+        group_category = @course.group_categories.create!(name: "category")
+        group1 = @course.groups.create!(name: "justasmalltowngirllivinginalonelyworldshetookthemidnighttraingoinganywhere first", group_category:)
+        group2 = @course.groups.create!(name: "justasmalltowngirllivinginalonelyworldshetookthemidnighttraingoinganywhere second", group_category:)
+        topic = @course.discussion_topics.build(title: "topic")
+        topic.group_category = group_category
+        topic.save!
+
+        get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+        f("button[data-testid='groups-menu-btn']").click
+        menu_items = ff("[data-testid='groups-menu-item']")
+        truncated_menu_items = ["justasmall…here first\n0 Unread", "justasmal…e second\n0 Unread"]
+        menu_items.each do |item|
+          expect(truncated_menu_items).to include item.text
+          hover(item)
+          # check tooltip text
+          expect(fj("span:contains('#{group1.name}')")).to be_present if item.text.include? "first"
+          expect(fj("span:contains('#{group2.name}')")).to be_present if item.text.include? "second"
+        end
       end
     end
 

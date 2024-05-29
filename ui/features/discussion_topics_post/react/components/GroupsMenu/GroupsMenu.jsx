@@ -27,6 +27,8 @@ import PropTypes from 'prop-types'
 import React, {useMemo} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {TruncateText} from '@instructure/ui-truncate-text'
 
 const I18n = useI18nScope('discussion_posts')
 
@@ -37,15 +39,22 @@ export const GroupsMenu = ({...props}) => {
         <Menu.Item
           href={getGroupDiscussionUrl(childTopic.contextId, childTopic._id)}
           key={childTopic._id}
+          data-testid="groups-menu-item"
         >
-          <Flex direction="row" gap="medium" justifyItems="space-between" alignItems="center">
-            <Flex.Item>{childTopic.contextName}</Flex.Item>
-            <Flex.Item>
-              <Text weight="light">
-                {I18n.t('%{unreadCount} Unread', {unreadCount: childTopic.entryCounts.unreadCount})}
-              </Text>
-            </Flex.Item>
-          </Flex>
+          <Tooltip renderTip={childTopic.contextName} key={childTopic._id}>
+            <Flex direction="row" gap="medium" justifyItems="space-between" alignItems="center">
+              <TruncateText position="middle" maxLines="1">
+                <Flex.Item>{childTopic.contextName}</Flex.Item>
+              </TruncateText>
+              <Flex.Item>
+                <Text weight="light">
+                  {I18n.t('%{unreadCount} Unread', {
+                    unreadCount: childTopic.entryCounts.unreadCount,
+                  })}
+                </Text>
+              </Flex.Item>
+            </Flex>
+          </Tooltip>
         </Menu.Item>
       )),
     [props.childTopics]
