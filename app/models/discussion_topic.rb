@@ -847,15 +847,21 @@ class DiscussionTopic < ActiveRecord::Base
     )
   }
 
-  scope :visible_to_ungraded_discussion_student_visibilities, lambda { |student|
+  scope :visible_to_ungraded_discussion_student_visibilities, lambda { |student, course = nil|
     if Account.site_admin.feature_enabled?(:differentiated_modules)
-      visible_topic_ids = UngradedDiscussionStudentVisibility.where(user_id: student).select(:discussion_topic_id)
+      observed_student_ids = []
 
-      non_course_topics = DiscussionTopic.where.not(context_type: "Course")
-      differentiated_visible_topics = DiscussionTopic.where(id: visible_topic_ids).where(is_section_specific: false)
-      section_specific_visible_topics = DiscussionTopic.where(is_section_specific: true).where(discussion_topic_section_visibility_scope(student).arel.exists)
+      if !course.nil? && course.is_a?(Course) && course.user_has_been_observer?(student)
+        observed_student_ids = ObserverEnrollment.observed_student_ids(course, student)
+      end
+      ids = [student.id].concat(observed_student_ids)
+      visible_topic_ids = UngradedDiscussionStudentVisibility.where(user_id: ids).select(:discussion_topic_id)
 
-      merge(non_course_topics.or(differentiated_visible_topics).or(section_specific_visible_topics))
+      merge(
+        DiscussionTopic.where.not(context_type: "Course")
+          .or(DiscussionTopic.where(id: visible_topic_ids, is_section_specific: false))
+          .or(DiscussionTopic.where(is_section_specific: true).where(discussion_topic_section_visibility_scope(ids).arel.exists))
+      )
     else
       visible_to_student_sections(student)
     end

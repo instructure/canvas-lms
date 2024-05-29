@@ -50,6 +50,6 @@ class DiscussionTopic::ScopedToSections < ScopeFilter
       *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
     )
 
-    context.is_a?(Course) ? scope.visible_to_ungraded_discussion_student_visibilities(user) : scope
+    context.is_a?(Course) ? scope.visible_to_ungraded_discussion_student_visibilities(user, context) : scope
   end
 end
