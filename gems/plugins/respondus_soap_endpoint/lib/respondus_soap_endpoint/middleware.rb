@@ -83,7 +83,7 @@ module RespondusSoapEndpoint
 
     def handle(env)
       servant.rack_env = env
-      super(env)
+      super
     end
   end
 end

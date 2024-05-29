@@ -27,7 +27,7 @@ module SupportHelpers
       def initialize(email, after_time = nil)
         @attempted_resubmit = 0
         @prefix = "Crocodoc"
-        super(email, after_time)
+        super
       end
 
       def resubmit_attachment(a)

@@ -349,7 +349,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       super(Time.zone.parse(val))
       self.lock_at = CanvasTime.fancy_midnight(lock_at) unless val.include?(":")
     else
-      super(val)
+      super
     end
   end
 
@@ -359,7 +359,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       super(Time.zone.parse(val))
       infer_times unless val.include?(":")
     else
-      super(val)
+      super
     end
   end
 

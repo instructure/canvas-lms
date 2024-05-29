@@ -220,7 +220,7 @@ module MicrosoftSync
 
       def initialize(**args)
         @retry_after_seconds = args[:response].headers["Retry-After"].presence&.to_f
-        super(**args)
+        super
       end
     end
 

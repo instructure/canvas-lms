@@ -60,7 +60,7 @@ class Auditors::GradeChange
     end
 
     def initialize(*args)
-      super(*args)
+      super
 
       if attributes["submission"]
         self.submission = attributes.delete("submission")

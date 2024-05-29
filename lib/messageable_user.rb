@@ -151,7 +151,7 @@ class MessageableUser < User
   def serializable_hash(options = {})
     options[:except] ||= []
     options[:except] << :bookmark
-    super(options)
+    super
   end
 
   private

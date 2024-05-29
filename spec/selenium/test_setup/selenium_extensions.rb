@@ -48,7 +48,7 @@ module SeleniumExtensions
     include UnexpectedPageReloadProtection
 
     def perform(*args)
-      with_page_reload_protection(@bridge) { super(*args) }
+      with_page_reload_protection(@bridge) { super }
     end
   end
 
@@ -56,7 +56,7 @@ module SeleniumExtensions
     include UnexpectedPageReloadProtection
 
     def accept(*args)
-      with_page_reload_protection(@bridge) { super(*args) }
+      with_page_reload_protection(@bridge) { super }
     end
   end
 
@@ -64,15 +64,15 @@ module SeleniumExtensions
     include UnexpectedPageReloadProtection
 
     def click(*args)
-      with_page_reload_protection(driver) { super(*args) }
+      with_page_reload_protection(driver) { super }
     end
 
     def send_keys(*args)
-      with_page_reload_protection(driver) { super(*args) }
+      with_page_reload_protection(driver) { super }
     end
 
     def submit(*args)
-      with_page_reload_protection(driver) { super(*args) }
+      with_page_reload_protection(driver) { super }
     end
   end
 

@@ -739,7 +739,7 @@ describe AccountNotification do
         # and perhaps more importantly, don't find notifications for accounts the user doesn't belong in
         id = 1
         while [Shard.default, @shard2].any? { |s| s.activate { Account.where(id:).exists? } } # make sure this id is free
-          id += 1 #
+          id += 1
         end
 
         @tricky_sub_acc = @account1.sub_accounts.create!(id:) # create it with the id

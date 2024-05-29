@@ -2554,7 +2554,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def as_json(options = {})
-    json = super(options)
+    json = super
     return json unless json
 
     if json["assignment"]

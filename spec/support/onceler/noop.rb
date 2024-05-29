@@ -31,14 +31,14 @@ module Onceler
         scope = :each if scope == :once || scope.nil?
         return if scope == :record || scope == :replay
 
-        super(scope, &)
+        super
       end
 
       def after(scope = nil, &)
         scope = :each if scope.nil?
         return if scope == :record || scope == :replay
 
-        super(scope, &)
+        super
       end
 
       %w[let_once subject_once let_each let_each! subject_each subject_each!].each do |method|

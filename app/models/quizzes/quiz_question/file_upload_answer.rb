@@ -20,7 +20,7 @@
 
 class Quizzes::QuizQuestion::FileUploadAnswer < Quizzes::QuizQuestion::UserAnswer
   def initialize(question_id, points_possible, answer_data)
-    super(question_id, points_possible, answer_data)
+    super
     self.answer_details = { attachment_ids: }
   end
 

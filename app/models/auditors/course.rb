@@ -42,7 +42,7 @@ class Auditors::Course
     end
 
     def initialize(*args)
-      super(*args)
+      super
 
       if attributes["course"]
         self.course = attributes.delete("course")

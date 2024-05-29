@@ -565,7 +565,7 @@ module AccountReports::ReportHelper
           end
         end
       end
-      super(row)
+      super
     end
   end
 

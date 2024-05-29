@@ -78,7 +78,7 @@ class Lti::Registration < ActiveRecord::Base
     ims_registration&.undestroy
     developer_key&.update!(workflow_state: active_state)
     lti_registration_account_bindings.each(&:undestroy)
-    super(active_state:)
+    super
   end
 
   private

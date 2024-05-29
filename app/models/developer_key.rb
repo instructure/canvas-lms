@@ -126,7 +126,7 @@ class DeveloperKey < ActiveRecord::Base
 
   def redirect_uris=(value)
     value = value.split if value.is_a?(String)
-    super(value)
+    super
   end
 
   def ims_registration?

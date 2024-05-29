@@ -20,7 +20,7 @@
 module Qti
   class FillInTheBlank < AssessmentItemConverter
     def initialize(opts)
-      super(opts)
+      super
       @type = opts[:custom_type]
       @question[:question_type] = if @type == "multiple_dropdowns_question" || @type == "inline_choice"
                                     "multiple_dropdowns_question"

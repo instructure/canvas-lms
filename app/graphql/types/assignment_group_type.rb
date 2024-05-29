@@ -86,7 +86,7 @@ module Types
     end
 
     def assignments_scope(*args)
-      super(*args).where(assignment_group_id: object.id)
+      super.where(assignment_group_id: object.id)
     end
     private :assignments_scope
   end

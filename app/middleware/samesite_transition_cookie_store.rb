@@ -23,7 +23,7 @@
 # iOS12 is gone from the earth.
 class SamesiteTransitionCookieStore < ActionDispatch::Session::EncryptedCookieStore
   def initialize(app, options = {})
-    super(app, options)
+    super
     @legacy_key = options[:legacy_key]
   end
 
@@ -37,7 +37,7 @@ class SamesiteTransitionCookieStore < ActionDispatch::Session::EncryptedCookieSt
   end
 
   def get_cookie(req)
-    super(req)
+    super
     cookie_jar(req)[@key] || cookie_jar(req)[@legacy_key]
   end
 
@@ -49,7 +49,7 @@ class SamesiteTransitionCookieStore < ActionDispatch::Session::EncryptedCookieSt
   def unmarshal(data, options = {})
     unmarshalled_data = nil
     begin
-      unmarshalled_data = super(data, options)
+      unmarshalled_data = super
     rescue ArgumentError => e
       # if the data being provided is not formatted in such a way that
       # we can extract appropriately sized segments from it,

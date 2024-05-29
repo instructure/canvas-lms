@@ -63,7 +63,7 @@ class AnonymousSubmissionsController < SubmissionsBaseController
     @assignment = @context.assignments.active.find(params.require(:assignment_id))
     @submission = @assignment.submissions.find_by(anonymous_id: params.require(:anonymous_id))
 
-    super(type)
+    super
   end
 
   def resubmit_to_plagiarism(type)
@@ -72,7 +72,7 @@ class AnonymousSubmissionsController < SubmissionsBaseController
     @assignment = @context.assignments.active.find(params.require(:assignment_id))
     @submission = @assignment.submissions.find_by(anonymous_id: params.require(:anonymous_id))
 
-    super(type)
+    super
   end
 
   private

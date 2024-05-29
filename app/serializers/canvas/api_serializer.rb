@@ -98,7 +98,7 @@ module Canvas
     #   Use these options in your serializer implementation using
     #   #serializer_option(key)
     def initialize(object, options = {})
-      super(object, options)
+      super
       @controller = options[:controller]
       @sideloads = options.fetch(:includes, []).map(&:to_s)
       @serializer_options = options.fetch(:serializer_options, {})
@@ -140,7 +140,7 @@ module Canvas
     # method.
     def as_json(options = {})
       root = options[:root]
-      hash = super(options)
+      hash = super
       response = root ? (hash[root] || hash) : hash
       response = response[self.root] || response
       stringify!(response)
@@ -152,7 +152,7 @@ module Canvas
     # have a method named "quiz" available to your class, so you don't have to
     # use object if you don't want to.
     def self.inherited(klass)
-      super(klass)
+      super
       resource_name = klass.name.demodulize.underscore.downcase.split("_serializer").first
       klass.send(:alias_method, resource_name.to_sym, :object)
     end

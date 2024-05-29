@@ -22,7 +22,7 @@ module Auditors; end
 
 class Auditors::Record < EventStream::Record
   def initialize(*args)
-    super(*args)
+    super
 
     self.request_id ||= RequestContext::Generator.request_id unless event_type == "corrupted"
   end

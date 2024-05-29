@@ -143,7 +143,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   def assessment_question=(aq)
     self.assessment_question_version = aq.version_number
-    super(aq)
+    super
   end
 
   def delete_assessment_question

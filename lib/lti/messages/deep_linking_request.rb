@@ -121,7 +121,7 @@ module Lti::Messages
 
     def generate_post_payload_message(validate_launch: true)
       add_deep_linking_request_claims!
-      super(validate_launch:)
+      super
     end
 
     private
