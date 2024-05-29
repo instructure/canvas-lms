@@ -463,64 +463,69 @@ const RatingRow = ({
 
   return (
     <Flex>
-      <Flex>
-        <Flex.Item align="start">
-          <View as="div" width="4.125rem">
-            <TextInput
-              renderLabel={<ScreenReaderContent>{I18n.t('Rating Display')}</ScreenReaderContent>}
-              display="inline-block"
-              width="3.125rem"
-              disabled={true}
-              textAlign="center"
-              value={scale.toString()}
-              onChange={() => {}}
-              data-testid="rating-scale"
-            />
-          </View>
-        </Flex.Item>
-        <Flex.Item align="start">
-          <View as="div" width={criterionUseRange ? '9.375rem' : '5.938rem'}>
-            <Flex alignItems="end" height="2.375rem">
-              {criterionUseRange && (
-                <Flex.Item width="3.438rem" textAlign="end" margin="0 0 x-small 0">
-                  <View as="span" margin="0 small 0 0">
-                    {rangeStart ? `${rangeStart} to ` : `--`}
-                  </View>
-                </Flex.Item>
-              )}
-              {unassessed ? (
-                <Flex.Item>
-                  <NumberInput
-                    renderLabel={
-                      <ScreenReaderContent>{I18n.t('Rating Points')}</ScreenReaderContent>
-                    }
-                    value={rating.points}
-                    onIncrement={() => setRatingForm('points', setNumber(rating.points + 1))}
-                    onDecrement={() => setRatingForm('points', setNumber(rating.points - 1))}
-                    onChange={(e, value) => setRatingForm('points', setNumber(Number(value ?? 0)))}
-                    data-testid="rating-points"
-                    width="4.938rem"
-                    onBlur={onPointsBlur}
-                  />
-                </Flex.Item>
-              ) : (
-                <Flex.Item margin="0 0 x-small 0">
-                  <View as="span" data-testid="rating-points-assessed">
-                    {rating.points}
-                  </View>
-                </Flex.Item>
-              )}
-            </Flex>
-          </View>
-        </Flex.Item>
-      </Flex>
+      <Flex.Item align="start">
+        <Flex>
+          <Flex.Item align="start">
+            <View as="div" width="4.125rem">
+              <TextInput
+                renderLabel={<ScreenReaderContent>{I18n.t('Rating Display')}</ScreenReaderContent>}
+                display="inline-block"
+                width="3.125rem"
+                disabled={true}
+                textAlign="center"
+                value={scale.toString()}
+                onChange={() => {}}
+                data-testid="rating-scale"
+              />
+            </View>
+          </Flex.Item>
+          <Flex.Item align="start">
+            <View as="div" width={criterionUseRange ? '9.375rem' : '5.938rem'}>
+              <Flex alignItems="end" height="2.375rem">
+                {criterionUseRange && (
+                  <Flex.Item width="3.438rem" textAlign="end" margin="0 0 x-small 0">
+                    <View as="span" margin="0 small 0 0">
+                      {rangeStart ? `${rangeStart} to ` : `--`}
+                    </View>
+                  </Flex.Item>
+                )}
+                {unassessed ? (
+                  <Flex.Item>
+                    <NumberInput
+                      renderLabel={
+                        <ScreenReaderContent>{I18n.t('Rating Points')}</ScreenReaderContent>
+                      }
+                      value={rating.points}
+                      onIncrement={() => setRatingForm('points', setNumber(rating.points + 1))}
+                      onDecrement={() => setRatingForm('points', setNumber(rating.points - 1))}
+                      onChange={(e, value) =>
+                        setRatingForm('points', setNumber(Number(value ?? 0)))
+                      }
+                      data-testid="rating-points"
+                      width="4.938rem"
+                      onBlur={onPointsBlur}
+                    />
+                  </Flex.Item>
+                ) : (
+                  <Flex.Item margin="0 0 x-small 0">
+                    <View as="span" data-testid="rating-points-assessed">
+                      {rating.points}
+                    </View>
+                  </Flex.Item>
+                )}
+              </Flex>
+            </View>
+          </Flex.Item>
+        </Flex>
+      </Flex.Item>
+
       <div style={{width: '100%'}}>
         <Draggable draggableId={rating.id} index={index}>
           {provided => {
             return (
               <div ref={provided.innerRef} {...provided.draggableProps}>
                 <Flex>
-                  <Flex.Item align="center" draggable={unassessed} data-testid="rating-drag-handle">
+                  <Flex.Item align="start" draggable={unassessed} data-testid="rating-drag-handle">
                     <View
                       as="div"
                       width="3rem"
@@ -533,7 +538,7 @@ const RatingRow = ({
                       </div>
                     </View>
                   </Flex.Item>
-                  <Flex.Item align="center">
+                  <Flex.Item align="start">
                     <View as="div" width="8.875rem">
                       <TextInput
                         renderLabel={
@@ -547,7 +552,7 @@ const RatingRow = ({
                       />
                     </View>
                   </Flex.Item>
-                  <Flex.Item shouldGrow={true} shouldShrink={true} align="center">
+                  <Flex.Item shouldGrow={true} shouldShrink={true} align="start">
                     <View as="div" margin="0 small" themeOverride={{marginSmall: '1rem'}}>
                       <TextArea
                         label={
@@ -563,7 +568,7 @@ const RatingRow = ({
                     </View>
                   </Flex.Item>
                   {unassessed && (
-                    <Flex.Item align="center">
+                    <Flex.Item align="start">
                       <View as="div" width="2.375rem">
                         {showRemoveButton && (
                           <IconButton
