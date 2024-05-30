@@ -63,6 +63,8 @@ describe('DiscussionTopicForm', () => {
           CAN_MODERATE: true,
           CAN_CREATE_ASSIGNMENT: true,
           CAN_SET_GROUP: true,
+          CAN_MANAGE_ASSIGN_TO_GRADED: true,
+          CAN_MANAGE_ASSIGN_TO_UNGRADED: true,
         },
         ATTRIBUTES: {},
       },
@@ -345,6 +347,7 @@ describe('DiscussionTopicForm', () => {
 
     it('hides post to section, student ToDo, and ungraded options when Graded', () => {
       ENV = {
+        FEATURES: {},
         STUDENT_PLANNER_ENABLED: true,
         DISCUSSION_TOPIC: {
           PERMISSIONS: {

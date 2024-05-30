@@ -390,6 +390,7 @@ export default AssignmentListItemView = (function () {
       data.canMove = this.canMove()
       data.canDelete = this.canDelete()
       data.canDuplicate = this.canDuplicate()
+      data.canManageAssignTo = this.canManageAssignTo()
       data.is_locked = this.model.isRestrictedByMasterCourse()
       data.showAvailability =
         !(this.model.inPacedCourse() && this.canManage()) &&
@@ -722,6 +723,10 @@ export default AssignmentListItemView = (function () {
 
     canManage() {
       return ENV.PERMISSIONS.manage
+    }
+
+    canManageAssignTo() {
+      return ENV.PERMISSIONS.by_assignment_id?.[this.model.id]?.manage_assign_to
     }
 
     canShowBuildLink() {

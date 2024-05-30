@@ -525,6 +525,7 @@ describe Quizzes::QuizSerializer do
                                                               read_statistics: true,
                                                               view_answer_audits: true,
                                                               manage: true,
+                                                              manage_assign_to: true,
                                                               delete: true,
                                                               grade: true,
                                                               preview: true

@@ -665,6 +665,7 @@ function DiscussionTopicForm({
               intraGroupPeerReviews={intraGroupPeerReviews}
               setIntraGroupPeerReviews={setIntraGroupPeerReviews}
               isCheckpoints={isCheckpoints && ENV.DISCUSSION_CHECKPOINTS_ENABLED}
+              canManageAssignTo={ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_ASSIGN_TO_GRADED}
             />
           </DiscussionDueDatesContext.Provider>
         </View>

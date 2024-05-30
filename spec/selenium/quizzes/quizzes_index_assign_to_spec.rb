@@ -186,4 +186,15 @@ describe "quizzes selective_release assign to tray" do
 
     check_element_has_focus close_button
   end
+
+  it "does not show the button when the user does not have the manage_assignments_edit permission" do
+    visit_quizzes_index_page(@course.id)
+    click_manage_quiz_button(@classic_quiz.id)
+    expect(element_exists?(assign_to_link_selector(@classic_quiz.id))).to be_truthy
+
+    RoleOverride.create!(context: @course.account, permission: "manage_assignments_edit", role: teacher_role, enabled: false)
+    visit_quizzes_index_page(@course.id)
+    click_manage_quiz_button(@classic_quiz.id)
+    expect(element_exists?(assign_to_link_selector(@classic_quiz.id))).to be_falsey
+  end
 end

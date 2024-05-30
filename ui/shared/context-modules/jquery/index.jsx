@@ -604,18 +604,11 @@ window.modules = (function () {
       $item.addClass('indent_' + (data.indent || 0))
       $item.addClass(modules.itemClass(data))
 
-      const isValidContentType = [
-        'Assignment',
-        'Quizzes::Quiz',
-        'DiscussionTopic',
-        'WikiPage',
-      ].includes(data.content_type)
-
       // This function is called twice, once with the data the user just entered
       // and again after the api request returns. The second time we have
       // all the real data, including the module item's id. Wait until then
       // to add the option.
-      if (isValidContentType && 'id' in data) {
+      if ('id' in data && data.can_manage_assign_to) {
         const $assignToMenuItem = $item.find('.assign-to-option')
         if ($assignToMenuItem.length) {
           $assignToMenuItem.removeClass('hidden')

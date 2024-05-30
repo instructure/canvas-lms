@@ -72,7 +72,10 @@ export default class WikiPageEditView extends ValidatedFormView {
     super.initialize(...arguments)
     if (!this.WIKI_RIGHTS) this.WIKI_RIGHTS = {}
     if (!this.PAGE_RIGHTS) this.PAGE_RIGHTS = {}
-    this.enableAssignTo = window.ENV.FEATURES?.differentiated_modules && ENV.COURSE_ID != null
+    this.enableAssignTo =
+      window.ENV.FEATURES?.differentiated_modules &&
+      ENV.COURSE_ID != null &&
+      ENV.WIKI_RIGHTS.manage_assign_to
     const redirect = () => {
       window.location.href = this.model.get('html_url')
     }

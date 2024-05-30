@@ -38,6 +38,7 @@ const defaultProps = {
   assignedInfoList: [],
   setAssignedInfoList: () => {},
   isCheckpoints: false,
+  canManageAssignTo: true,
 }
 
 const renderGradedDiscussionOptions = (props = {}) => {
@@ -60,6 +61,19 @@ describe('GradedDiscussionOptions', () => {
     expect(getByText('Assignment Group')).toBeInTheDocument()
     expect(getByText('Peer Reviews')).toBeInTheDocument()
     expect(getByText('Assignment Settings')).toBeInTheDocument()
+  })
+
+  describe('with differentiated_modules enabled', () => {
+    beforeEach(() => {
+      ENV.FEATURES.differentiated_modules = true
+    })
+
+    it('does not render assignment settings if canManageAssignTo is false', () => {
+      const {getByText, queryByText, rerender} = renderGradedDiscussionOptions({canManageAssignTo: true})
+      expect(getByText('Assignment Settings')).toBeInTheDocument()
+      rerender(<GradedDiscussionOptions {...defaultProps} canManageAssignTo={false} />)
+      expect(queryByText('Assignment Settings')).not.toBeInTheDocument()
+    })
   })
 
   describe('Checkpoints', () => {

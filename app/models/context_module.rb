@@ -420,6 +420,9 @@ class ContextModule < ActiveRecord::Base
 
     given { |user, session| context.grants_right?(user, session, :read) && active? }
     can :read
+
+    given { |user, session| user && context.grants_any_right?(user, session, :manage_content, :manage_course_content_edit) }
+    can :manage_assign_to
   end
 
   def low_level_locked_for?(user, opts = {})

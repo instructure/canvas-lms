@@ -158,6 +158,15 @@ describe "wiki pages show page assign to" do
       visit_wiki_page_view(@course.id, @page.title)
       expect(wiki_page_body).to include_text("a very cool page body")
     end
+
+    it "does not show the button when the user does not have the manage_wiki_update permission" do
+      visit_wiki_page_view(@course.id, @page.title)
+      expect(element_exists?(assign_to_btn_selector)).to be_truthy
+
+      RoleOverride.create!(context: @course.account, permission: "manage_wiki_update", role: teacher_role, enabled: false)
+      visit_wiki_page_view(@course.id, @page.title)
+      expect(element_exists?(assign_to_btn_selector)).to be_falsey
+    end
   end
 
   context "as a student" do

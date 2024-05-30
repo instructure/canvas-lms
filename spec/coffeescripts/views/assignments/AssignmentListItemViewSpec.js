@@ -845,15 +845,15 @@ test('displays cancel button when assignment failed to duplicate is not blueprin
 
 test('can assign assignment if flag is on and has edit permissions', function () {
   const view = createView(this.model, {
-    canManage: true,
+    individualAssignmentPermissions: {manage_assign_to: true},
     differentiated_modules: true,
   })
   equal(view.$('.assign-to-link').length, 1)
 })
 
-test('canot assign assignment if no edit permissions', function () {
+test('cannot assign assignment if no edit permissions', function () {
   const view = createView(this.model, {
-    canManage: false,
+    individualAssignmentPermissions: {manage_assign_to: false},
     differentiated_modules: true,
   })
   equal(view.$('.assign-to-link').length, 0)
@@ -861,7 +861,7 @@ test('canot assign assignment if no edit permissions', function () {
 
 test('cannot assign assignment if flag is off', function () {
   const view = createView(this.model, {
-    canManage: true,
+    individualAssignmentPermissions: {manage_assign_to: true},
     differentiated_modules: false,
   })
   equal(view.$('.assign-to-link').length, 0)

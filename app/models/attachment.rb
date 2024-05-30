@@ -1528,6 +1528,9 @@ class Attachment < ActiveRecord::Base
       context_type == "Assignment" && user == owner
     end
     can :attach_to_submission_comment
+
+    given { |user, session| user && context.is_a?(Course) && context.grants_right?(user, session, :manage_files_edit) }
+    can :manage_assign_to
   end
 
   def clear_permissions(run_at)

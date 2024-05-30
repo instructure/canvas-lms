@@ -627,6 +627,17 @@ describe "discussions" do
         expect(f("body")).not_to contain_jqcss "input[value='graded']"
         expect(f("body")).not_to contain_jqcss "input[data-testid='group-discussion-checkbox']"
       end
+
+      it "only shows the assign to UI when differentiated_modules is enabled if the student has an unrestricted enrollment" do
+        Account.site_admin.enable_feature! :differentiated_modules
+        get "/courses/#{course.id}/discussion_topics/new"
+        expect(element_exists?(Discussion.assign_to_button_selector)).to be_truthy
+
+        enrollment = course.enrollments.find_by(user: student)
+        enrollment.update!(limit_privileges_to_course_section: true)
+        get "/courses/#{course.id}/discussion_topics/new"
+        expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
+      end
     end
 
     context "as a teacher" do

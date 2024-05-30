@@ -170,6 +170,9 @@ class Wiki < ActiveRecord::Base
       context.grants_right?(user, session, :manage_wiki_update) && !context.is_a?(Group)
     end
     can :publish_page
+
+    given { |user, session| user && context.is_a?(Course) && context.grants_right?(user, session, :manage_wiki_update) }
+    can :manage_assign_to
   end
 
   def self.wiki_for_context(context)

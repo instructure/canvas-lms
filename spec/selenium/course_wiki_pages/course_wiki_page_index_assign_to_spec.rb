@@ -172,4 +172,16 @@ describe "wiki pages show page assign to" do
     expect(wiki_page_item_settings_menu).to include_text("Edit")
     expect(wiki_page_item_settings_menu).not_to include_text("Assign To")
   end
+
+  it "does not show the button when the user does not have the manage_wiki_update permission" do
+    visit_course_wiki_index_page(@course.id)
+    manage_wiki_page_item_button(@page.title).click
+    expect(fj(wiki_page_assign_to_menu_selector)).to be_truthy
+    expect(f("body")).to contain_jqcss(wiki_page_assign_to_menu_selector)
+
+    RoleOverride.create!(context: @course.account, permission: "manage_wiki_update", role: teacher_role, enabled: false)
+    visit_course_wiki_index_page(@course.id)
+    manage_wiki_page_item_button(@page.title).click
+    expect(f("body")).not_to contain_jqcss(wiki_page_assign_to_menu_selector)
+  end
 end

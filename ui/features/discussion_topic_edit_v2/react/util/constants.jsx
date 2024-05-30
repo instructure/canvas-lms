@@ -83,7 +83,11 @@ export const useShouldShowContent = (
     ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_CONTENT &&
     ENV.STUDENT_PLANNER_ENABLED
 
-  const shouldShowPostToSectionOption = !isGraded && !isGroupDiscussion && !isGroupContext
+  const shouldShowPostToSectionOption =
+    !isGraded &&
+    !isGroupDiscussion &&
+    !isGroupContext &&
+    !(ENV.FEATURES.differentiated_modules && !isAnnouncement)
 
   const shouldShowAnonymousOptions =
     !isGroupContext &&
@@ -135,8 +139,8 @@ export const useShouldShowContent = (
   const shouldShowAssignToForUngradedDiscussions =
     !isAnnouncement &&
     !isGraded &&
-    ENV?.FEATURES?.differentiated_modules &&
-    (canCreateGradedDiscussion || canEditDiscussionAssignment)
+    ENV.FEATURES?.differentiated_modules &&
+    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_ASSIGN_TO_UNGRADED
 
   return {
     shouldShowTodoSettings,

@@ -5983,7 +5983,7 @@ describe AssignmentsApiController, type: :request do
                                                  "html_url" =>
             "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                                                  "attachments" => [],
-                                                 "permissions" => { "attach" => true, "update" => true, "reply" => true, "delete" => true },
+                                                 "permissions" => { "attach" => true, "update" => true, "reply" => true, "delete" => true, "manage_assign_to" => true },
                                                  "discussion_type" => "side_comment",
                                                  "group_category_id" => nil,
                                                  "can_group" => true,

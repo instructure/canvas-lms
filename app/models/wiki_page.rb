@@ -400,6 +400,9 @@ class WikiPage < ActiveRecord::Base
 
     given { |user, session| user && can_read_page?(user) && wiki.grants_right?(user, session, :delete_page) }
     can :delete
+
+    given { |user, session| user && wiki.grants_right?(user, session, :manage_assign_to) }
+    can :manage_assign_to
   end
 
   def can_read_page?(user, session = nil)
