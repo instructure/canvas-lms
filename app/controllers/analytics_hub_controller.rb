@@ -37,7 +37,11 @@ class AnalyticsHubController < ApplicationController
 
     env = {
       accountID: @account.id.to_s,
-      # course_readiness_read: @account.grants_right?(@current_user, session, :course_readiness_read)
+      permissions: @context.granted_rights(@current_user, :view_ask_questions_analytics, :view_students_in_need, :view_course_readiness, :view_lti_usage),
+      feature_advanced_analytics_ask_questions_enabled: @account.feature_enabled?(:advanced_analytics_ask_questions),
+      feature_k20_students_in_need_of_attention_enabled: @account.feature_enabled?(:k20_students_in_need_of_attention),
+      feature_k20_course_readiness_enabled: @account.feature_enabled?(:k20_course_readiness),
+      feature_k20_lti_usage_enabled: @account.feature_enabled?(:k20_lti_usage)
     }
 
     js_env(env)
