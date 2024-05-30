@@ -194,6 +194,36 @@ describe('fileTypeUtils', () => {
         expect(url).toBe('/media_attachments_iframe/123?type=video&embedded=true&verifier=abc')
       })
 
+      it("uses adds the uuid if the window location doesn't match the RCE location origin and the feature flag is on", () => {
+        RCEGlobals.getFeatures = jest.fn().mockReturnValue({
+          file_verifiers_for_quiz_links: true,
+          media_links_use_attachment_id: true,
+        })
+        const file = {
+          id: '123',
+          type: 'video/mov',
+          contextType: 'Course',
+          uuid: 'abc',
+        }
+        const url = mediaPlayerURLFromFile(file, 'http://quizzes')
+        expect(url).toBe('/media_attachments_iframe/123?type=video&embedded=true&verifier=abc')
+      })
+
+      it("doesn't adds the uuid if the window location doesn't match the RCE location origin and the feature flag is off", () => {
+        RCEGlobals.getFeatures = jest.fn().mockReturnValue({
+          file_verifiers_for_quiz_links: false,
+          media_links_use_attachment_id: true,
+        })
+        const file = {
+          id: '123',
+          type: 'video/mov',
+          contextType: 'Course',
+          uuid: 'abc',
+        }
+        const url = mediaPlayerURLFromFile(file, 'http://quizzes')
+        expect(url).toBe('/media_attachments_iframe/123?type=video&embedded=true')
+      })
+
       it('uses the file verifier if present', () => {
         const file = {
           id: '123',
@@ -204,6 +234,20 @@ describe('fileTypeUtils', () => {
         expect(url).toBe(
           '/media_attachments_iframe/123?type=video&embedded=true&verifier=something'
         )
+      })
+
+      it("includes the file verifier if it's part of the file's url", () => {
+        RCEGlobals.getFeatures = jest.fn().mockReturnValue({
+          file_verifiers_for_quiz_links: true,
+          media_links_use_attachment_id: true,
+        })
+        const file = {
+          id: '123',
+          'content-type': 'video/mov',
+          url: 'http://origin/path/to/file?verifier=xyzzy',
+        }
+        const url = mediaPlayerURLFromFile(file, 'https://mycanvas.com')
+        expect(url).toBe('/media_attachments_iframe/123?type=video&embedded=true&verifier=xyzzy')
       })
 
       it('uses media_object route if no attachmentId exists', () => {

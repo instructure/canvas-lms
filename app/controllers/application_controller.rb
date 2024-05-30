@@ -381,6 +381,7 @@ class ApplicationController < ActionController::Base
     usage_rights_discussion_topics
     granular_permissions_manage_users
     create_course_subaccount_picker
+    file_verifiers_for_quiz_links
     lti_deep_linking_module_index_menu_modal
     lti_dynamic_registration
     lti_multiple_assignment_deep_linking
