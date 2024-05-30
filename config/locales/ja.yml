@@ -4804,7 +4804,7 @@ ja:
       no_points: なし
       no_submission: なし
       points: 点数
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: "ファイル タイプ"
       submitting: 提出方法
       turnitin: Turnitin
@@ -10992,7 +10992,7 @@ ja:
       reply_to_topic: トピックへの返信
       retrieved_from_feed: "%{feed} から取得"
       show_rubric: ルーブリックの表示
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: 受講者の返信がある場合は非公開にできません
       topic: トピック
@@ -24237,7 +24237,7 @@ ja:
           quiz_instructions: 小テストの指示
           quiz_score: スコア
       quiz_edit_header: 
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           one: "あと %{count} 回試行できます"
@@ -24384,7 +24384,7 @@ ja:
           one: "このクイズが再評価されました。新しいスコアには、変更された %{count} 個の問題が反映されています。"
           other: "この小テストが再評価されました。新しいスコアには、変更された %{count} 個の問題が反映されています。"
         quiz_regraded_your_score_not_affected: この小テストが再評価されましたが、スコアは変更されていません。
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "%{count} 人の受講生が既に提出しました"
           other: "%{count} 人の受講者が既に提出しました"
@@ -27772,7 +27772,7 @@ ja:
   speedgrader_settings_4195099b: SpeedGrader設定
   speedgrader_settings_c9503705: "Speedgrader の設定"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studio Media Capture"
-  speedgrader_tm_44688790: SpeedGrader
+  speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: 分割
   split_merged_users_6b81c595: マージされたユーザーを分割
   split_number_of_students_per_group_4a05f76f: グループのメンバー数を指定してグループを作成する
@@ -28335,7 +28335,7 @@ ja:
       see_vericite_results: VeriCite結果を見る
       sent_to_whole_group: コメントをグループ全体に送信する
       show_rubric: ルーブリックの表示
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: 評定は、インストラクタが作業中のため利用できません。
       submission_details: 提出物の詳細
       submitted_at: "%{submit_date} 提出済み"
