@@ -863,6 +863,11 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
       },
     ]
   }
+
+  if (Object.keys(errors).length === 0 && data.anonymous_state != null) {
+    data.set_assignment = false
+  }
+
   return errors
 }
 

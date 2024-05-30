@@ -523,6 +523,19 @@ describe "discussions" do
             expect_new_page_load { f(".form-actions button[type=submit]").click }
             expect(fj("span:contains('anonymous topic title')")).to be_present
           end
+
+          it "able to save anon, not graded, quick added from assignments", :ignore_js_errors do
+            get "/courses/#{course.id}/assignments"
+
+            f(".add_assignment").click
+            click_option(f('[name="submission_types"]'), "Discussion")
+            f(".create_assignment_dialog input[type=text]").send_keys("anon disc from assignment")
+            f(".more_options").click
+
+            f("input[type=radio][value=partial_anonymity]").click
+            f("input#use_for_grading").click
+            expect_new_page_load { f("button.save_and_publish").click }
+          end
         end
       end
     end
