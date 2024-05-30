@@ -305,6 +305,7 @@ class RCEWrapper extends React.Component {
       rce_transform_loaded_content = false,
       media_links_use_attachment_id = false,
       rce_find_replace = false,
+      file_verifiers_for_quiz_links = false,
     } = this.props.features
 
     return {
@@ -312,6 +313,7 @@ class RCEWrapper extends React.Component {
       explicit_latex_typesetting,
       rce_transform_loaded_content,
       media_links_use_attachment_id,
+      file_verifiers_for_quiz_links,
       rce_find_replace,
     }
   }

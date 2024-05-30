@@ -95,8 +95,7 @@ class Feature
   end
 
   # Register one or more features.  Must be done during application initialization.
-  # NOTE: there is refactoring going on for feature flags: ADMIN-2538
-  #       if you need to add/modify/delete a FF, they have been moved to ./lib/feature_flags/*yml
+  # If you need to add/modify/delete a FF, they are in config/feature_flags/*yml
   # The feature_hash is as follows:
   #   automatic_essay_grading: {
   #     display_name: -> { I18n.t('features.automatic_essay_grading', 'Automatic Essay Grading') },
