@@ -4269,7 +4269,7 @@ nn:
       no_points: Ingen
       no_submission: Ingenting
       points: Poeng
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: Filtypar
       submitting: Leverer
       turnitin: Turnitin
@@ -9657,7 +9657,7 @@ nn:
       mark_all_as_unread: "Merk alle som ulesne"
       retrieved_from_feed: "Henta frå %{feed}"
       show_rubric: "Vis vurderingsskjema"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: "Kan ikkje fjerne publisering om det er studentinnlegg"
       topic: Emne
@@ -9719,7 +9719,7 @@ nn:
       go_to_topic: "Gå til emne"
       like_entry: "Lik innlegg"
       manage_discussion_entry: "Administrer diskusjonsinnlegg"
-      open_in_speedgrader: "Opne i SpeedGrader"
+      open_in_speedgrader: "Opne i SpeedGrader™"
       unknown_author: ">Ukjend forfattar"
       write_a_reply: Svar
     entry_stats: 
@@ -12102,7 +12102,7 @@ nn:
       loading: lastar...
       no_annotation: "Merknader er ikkje tilgjengelege for dette dokumentet"
       not_newest_notice: "Merk: Dette er ikkje den siste innleveringa"
-      page_header_title: SpeedGrader
+      page_header_title: SpeedGrader™
       page_title: "%{assignment_name}, SpeedGrader, %{course_name}"
       sort_by: 
         status: "etter innleveringsstatus (må karaktersetjast, ikkje innlevert, osv.)"
@@ -17946,7 +17946,7 @@ nn:
   open_grading_scheme_menu_5f889203: "Opne vurderingsskjema-meny"
   open_id_connect_values_81fbee7: "Open Id-tilkoplingsparameterar"
   open_in_speedgrader_506a4ad5: "Opne i SpeedGrader"
-  open_in_speedgrader_57c64fe3: "Opne i SpeedGrader"
+  open_in_speedgrader_57c64fe3: "Opne i SpeedGrader™"
   open_in_theme_editor_156028e2: "Opne i temaredigeringsprogrammet"
   open_message_d7b12975: "Opne melding"
   open_name_color_picker_a2646a33: "Opne %{name} fargeveljar"
@@ -20577,7 +20577,7 @@ nn:
           quiz_instructions: Quizinstruksjonar
           quiz_score: Resultat
       quiz_edit_header: 
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           one: "1 forsøk til er tilgjengeleg"
@@ -20699,7 +20699,7 @@ nn:
           one: "Quizen er gitt ny vurdering. Resultatet ditt er påverka."
           other: "Quizen er gitt ny vurdering. Det nye resultatet viser %{count} spørsmål som er påverka."
         quiz_regraded_your_score_not_affected: "Quizen er gitt ny vurdering. Resultatet ditt er ikkje påverka."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "1 student har levert så langt"
           other: "%{count} studentar har levert så langt"
@@ -23547,8 +23547,8 @@ nn:
   speed_grader: 
     alerts: 
       no_active_students: "Enten er det ikkje aktive studentar i emnet eller så kan ingen karaktersetjast av deg."
-      no_students_in_groups_back: "Fordi det ikkje finst tildelte brukarar kan innleveringar for denne oppgåva ikkje vurderast i SpeedGrader. Tildel brukarar til gruppesettet og prøv på nytt. Klikk på 'OK' for å tilbake."
-      no_students_in_groups_close: "Fordi det ikkje finst tildelte brukarar kan innleveringar for denne oppgåva ikkje vurderast i SpeedGrader. Tildel brukarar til gruppesettet og prøv på nytt. Klikk på 'OK' for å lukke vindauget."
+      no_students_in_groups_back: "Fordi det ikkje finst tildelte brukarar kan innleveringar for denne oppgåva ikkje vurderast i SpeedGrader™. Tildel brukarar til gruppesettet og prøv på nytt. Klikk på 'OK' for å tilbake."
+      no_students_in_groups_close: "Fordi det ikkje finst tildelte brukarar kan innleveringar for denne oppgåva ikkje vurderast i SpeedGrader™. Tildel brukarar til gruppesettet og prøv på nytt. Klikk på 'OK' for å lukke vindauget."
       no_students_in_section: "Finn ingen studentar i seksjonen, går tilbake til å vise alle seksjonane."
     allow_message: "Klikk på \"Tillat\"-knappen for å starte opptak."
     begin_record_prompt: "Klikk på \"Opptak\"-knappen for å starte."
@@ -23614,7 +23614,7 @@ nn:
     turnitin: 
       resubmitting: "Sender på nytt..."
   speedgrader_d9a6fa90: SpeedGrader
-  speedgrader_de0affa6: SpeedGrader
+  speedgrader_de0affa6: SpeedGrader™
   speedgrader_error_page_d9c4a075: "SpeedGrader feilside"
   speedgrader_loading_error_235fd2e2: "SpeedGrader feil med lasting"
   speedgrader_settings_4195099b: SpeedGrader-innstillingar
@@ -24131,7 +24131,7 @@ nn:
       see_vericite_results: "Sjå VeriCite-resultat"
       sent_to_whole_group: "Send kommentar til heile gruppa"
       show_rubric: "Vis vurderingsskjemaet"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "Vurderingane er utilgjengelege fordi faglæraren jobbar med dei."
       submission_details: Innleveringsdetaljar
       submitted_at: "levert %{submit_date}"
