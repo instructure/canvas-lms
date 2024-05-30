@@ -177,7 +177,7 @@ export default class Toolbar extends React.Component {
     if (tool.canvas_icon_class) {
       return <i className={tool.canvas_icon_class} />
     } else if (tool.icon_url) {
-      return <img className="icon" alt="" src={tool.icon_url} />
+      return <img className="icon lti_tool_icon" alt="" src={tool.icon_url} />
     }
   }
 
