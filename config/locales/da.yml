@@ -4804,7 +4804,7 @@ da:
       no_points: Ingen
       no_submission: Intet
       points: Point
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: Filtyper
       submitting: Afleverer
       turnitin: Turnitin
@@ -10994,7 +10994,7 @@ da:
       reply_to_topic: "Svar til emne"
       retrieved_from_feed: "Hentet fra %{feed}"
       show_rubric: "Vis rubrik"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: "Kan ikke annullere offentliggørelsen, hvis der findes svar fra studerende"
       topic: Emne
@@ -24245,7 +24245,7 @@ da:
           quiz_instructions: Testinstruktioner
           quiz_score: Resultat
       quiz_edit_header: 
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           one: "1 forsøg tilbage"
@@ -24392,7 +24392,7 @@ da:
           one: "Denne test er blevet ombedømt. Dit resultat blev påvirket."
           other: "Denne test er blevet ombedømt. Dit nye resultat afspejler %{count} spørgsmål, som blev påvirket."
         quiz_regraded_your_score_not_affected: "Denne test er blevet ombedømt. Dit resultat blev ikke påvirket."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "1 studerende har afleveret indtil videre"
           other: "%{count} studerende har afleveret indtil videre"
@@ -28344,7 +28344,7 @@ da:
       see_vericite_results: "Se VeriCite-resultater"
       sent_to_whole_group: "Send kommentar til hele gruppen"
       show_rubric: "Vis rubrik"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "Karakterer er ikke tilgængelige, fordi instruktøren arbejder på dem."
       submission_details: Afleveringsdetaljer
       submitted_at: "afleveret %{submit_date}"
