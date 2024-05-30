@@ -39,7 +39,7 @@
             <path d="<%= svg_path %>"/>
           </svg>
         <% else %>
-          <img src="<%= tool.extension_setting(:global_navigation, :icon_url) %>" alt="" />
+          <img src="<%= tool.extension_setting(:global_navigation, :icon_url) %>" alt="" style="width: 3rem;"/>
         <% end %>
         <div class="menu-item__text">
           <%= tool.label_for(:global_navigation) %>
