@@ -7248,6 +7248,8 @@ hy:
     edit_view_rubric: "Դիտել ռուբրիկը"
     errors: 
       select_an_option: "Ընտրել պարամետրերը"
+    gradebook_header_menu: 
+      speedgrader: "«Արագ գնահատման համակարգ™»"
     graded: գնահատվող
     graded_by_me: "%{graded_time} իմ կողմից"
     graded_then_resubmitted: "գնահատված, հետո կրկին ուղարկված է (%{when})"
