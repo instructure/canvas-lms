@@ -15,26 +15,24 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import * as z from 'zod'
+import {ZLtiPrivacyLevel} from '../LtiPrivacyLevel'
+import {ZLtiPlacement} from '../LtiPlacement'
+import {ZLtiConfiguration} from './LtiConfiguration'
 
 /**
- * The set of Privacy Levels that a tool can be configured with.
+ * Represents the configuration of an LTI tool associated with a developer key.
+ *
+ * @see lib/schemas/lti/tool_configuration.rb
  */
-export const LtiPrivacyLevels = {
-  Anonymous: 'anonymous',
-  NameOnly: 'name_only',
-  EmailOnly: 'email_only',
-  Public: 'public',
-} as const
+export const ZLtiToolConfiguration = z.object({
+  id: z.string(),
+  privacy_level: ZLtiPrivacyLevel,
+  developer_key_id: z.string(),
+  disabled_placements: z.array(ZLtiPlacement),
+  settings: ZLtiConfiguration,
+  created_at: z.string(),
+  updated_at: z.string(),
+})
 
-/**
- * Returns true if the given value is a valid LTI privacy level.
- * @param setting
- * @returns
- */
-export const isLtiPrivacyLevel = (setting: unknown): setting is LtiPrivacyLevel =>
-  Object.values(LtiPrivacyLevels).includes(setting as LtiPrivacyLevel)
-
-/**
- * Identifier for an LTI privacy setting.
- */
-export type LtiPrivacyLevel = (typeof LtiPrivacyLevels)[keyof typeof LtiPrivacyLevels]
+export interface LtiToolConfiguration extends z.infer<typeof ZLtiToolConfiguration> {}

@@ -105,7 +105,7 @@ export interface PlacementOverlay {
 }
 
 export type RegistrationOverlayState = {
-  developerKeyName?: string
+  nickname?: string
   registration: RegistrationOverlay
 }
 
@@ -129,7 +129,7 @@ const updateState =
 
 const updateDevKeyName = (name: string) =>
   updateState(state => {
-    return {...state, developerKeyName: name}
+    return {...state, nickname: name}
   })
 
 const updatePrivacyLevel = (privacyLevel: LtiPrivacyLevel) =>
@@ -163,9 +163,7 @@ const updateRegistrationLaunchHeight = (s: string) =>
 const updateRegistrationLaunchWidth = (s: string) => updateRegistrationKey('launch_width')(() => s)
 // const updateRegistrationPlacements = (s: string) => updateRegistrationKey('placements')(() => s)
 const resetOverlays = (configuration: Configuration) =>
-  updateState(state =>
-    initialOverlayStateFromLtiRegistration(configuration, null, state.developerKeyName)
-  )
+  updateState(state => initialOverlayStateFromLtiRegistration(configuration, null, state.nickname))
 
 export const createRegistrationOverlayStore = (
   developerKeyName: string | null,
@@ -208,7 +206,7 @@ const initialOverlayStateFromLtiRegistration = (
   developerKeyName?: string | null
 ): RegistrationOverlayState => {
   return {
-    developerKeyName: developerKeyName || '',
+    nickname: developerKeyName || '',
     registration: {
       title: configuration.title,
       icon_url: overlay?.icon_url || configuration.icon_url,

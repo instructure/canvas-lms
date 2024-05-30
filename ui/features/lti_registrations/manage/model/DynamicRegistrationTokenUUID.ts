@@ -15,23 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {z} from 'zod'
 
-export type ApiResult<A> =
-  | {
-      _type: 'success'
-      data: A
-    }
-  | {
-      _type: 'error'
-      message: string
-    }
+export const ZDynamicRegistrationTokenUUID = z.string().brand('DynamicRegistrationUUID')
 
-export const success = <A>(data: A): ApiResult<A> => ({
-  _type: 'success',
-  data,
-})
-
-export const error = (message: string): ApiResult<never> => ({
-  _type: 'error',
-  message,
-})
+export type DynamicRegistrationTokenUUID = z.infer<typeof ZDynamicRegistrationTokenUUID>

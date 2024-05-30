@@ -22,7 +22,7 @@ import type {LtiRegistration} from '../../model/LtiRegistration'
 import type {ManageSearchParams} from './ManageSearchParams'
 import type {FetchRegistrations, DeleteRegistration} from '../../api/registrations'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {error} from '../../api/ApiResult'
+import {genericError} from '../../../common/lib/apiResult/ApiResult'
 
 export const MANAGE_EXTENSIONS_PAGE_LIMIT = 15
 
@@ -116,7 +116,10 @@ export const mkUseManagePageState =
                     _type: 'loaded',
                     lastRequested: requested,
                   }
-                : result
+                : {
+                    _type: 'error',
+                    message: result._type === 'Exception' ? result.error.message : result.message,
+                  }
             } else {
               return prev
             }
@@ -162,7 +165,7 @@ export const mkUseManagePageState =
 
         return apiDeleteRegistration(registration.id)
           .catch(() =>
-            error(
+            genericError(
               // TODO: log more info about the error? send to Sentry?
               // we could also consider returning the Error object, which
               // FlashAlert.findDetailMessage() expounds upon
