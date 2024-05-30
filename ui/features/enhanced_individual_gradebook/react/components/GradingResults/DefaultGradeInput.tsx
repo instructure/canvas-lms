@@ -43,6 +43,7 @@ type Props = {
   context: string
   elementWrapper?: 'span' | 'div'
   margin?: Spacing
+  gradingStandardPointsBased: boolean
   handleSetGradeInput: (grade: string) => void
   handleSubmitGrade?: () => void
   handleChangePassFailStatus: (
@@ -63,11 +64,12 @@ export default function DefaultGradeInput({
   handleSetGradeInput,
   handleSubmitGrade,
   handleChangePassFailStatus,
+  gradingStandardPointsBased,
 }: Props) {
   const renderOutOfText = () => {
     return (
       <View as="span" margin="0 0 0 small" data-testid={`${context}_out_of_text`}>
-        {outOfText(assignment, submission)}
+        {outOfText(assignment, submission, gradingStandardPointsBased)}
       </View>
     )
   }
@@ -81,7 +83,8 @@ export default function DefaultGradeInput({
               <ScreenReaderContent>
                 {`${I18n.t('Student Grade Pass-Fail Grade Options')}: ${outOfText(
                   assignment,
-                  submission
+                  submission,
+                  gradingStandardPointsBased
                 )}`}
               </ScreenReaderContent>
             }
@@ -106,7 +109,11 @@ export default function DefaultGradeInput({
           <TextInput
             renderLabel={
               <ScreenReaderContent>
-                {`${I18n.t('Student Grade Text Input')}: ${outOfText(assignment, submission)}`}
+                {`${I18n.t('Student Grade Text Input')}: ${outOfText(
+                  assignment,
+                  submission,
+                  gradingStandardPointsBased
+                )}`}
               </ScreenReaderContent>
             }
             display="inline-block"
