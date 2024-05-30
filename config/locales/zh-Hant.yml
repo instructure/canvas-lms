@@ -3823,7 +3823,7 @@ zh-Hant:
   anonymous_e1b8ad27: 匿名
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: 無法將匿名的評分應用到群組作業中
   anonymous_grading_ccb5045c: 匿名評分
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: 在SpeedGrader™中，匿名評分將強制隱藏學生姓名。
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: 在SpeedGrader中，匿名評分將強制隱藏學生姓名。
   anonymous_grading_with_new_quizzes_ba0391f3: 匿名等級評分與新測驗
   anonymous_id_2ef1c6d2: "匿名 %{id}"
   anonymous_id_you_cf43ab76: "匿名 %{id}（您）"
@@ -4598,7 +4598,7 @@ zh-Hant:
           僅需對其進行壓縮，並上傳壓縮檔案以及以下的表格。
           學生們將在針對其提交件的註解中看到修改後的檔案。
           *確保您沒有改變提交檔案的名稱，以便辨認。*
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: 相關項目
     grade_gpa_scale_screenreader: "成績：%{grade}"
@@ -4804,7 +4804,7 @@ zh-Hant:
       no_points: 無
       no_submission: 什麼也沒有
       points: 分數
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: 文檔類型
       submitting: 正在提交
       turnitin: Turnitin
@@ -10999,7 +10999,7 @@ zh-Hant:
       reply_to_topic: 回覆主題
       retrieved_from_feed: "從 %{feed} 取回"
       show_rubric: 顯示題目
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: 如果有學生回覆，則無法取消發佈
       topic: 主題
@@ -24235,7 +24235,7 @@ zh-Hant:
           quiz_instructions: 測驗說明
           quiz_score: 分數
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "%{count} 次以上的嘗試可用"
@@ -24382,7 +24382,7 @@ zh-Hant:
           one: "此測驗已重新評分；您的新分數反映 %{count} 個問題受影響。"
           other: "此測驗已重新評分；您的新分數反映了受影響的 %{count} 個問題。"
         quiz_regraded_your_score_not_affected: 此測驗已重新評分；您的分數並沒有受到影響。
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "到目前為止 %{count} 個學生已提交"
           other: "到目前為止 %{count} 個學生已提交"
@@ -27766,7 +27766,7 @@ zh-Hant:
   speedgrader_settings_4195099b: SpeedGrader設定
   speedgrader_settings_c9503705: "Speedgrader 設置"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studio Media Capture"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: 分拆
   split_merged_users_6b81c595: 分拆已合併的使用者
   split_number_of_students_per_group_4a05f76f: 分拆每個小組的學生人數
@@ -28325,7 +28325,7 @@ zh-Hant:
       see_vericite_results: "查看 VeriCite 成績"
       sent_to_whole_group: 發送評論給全體群組
       show_rubric: 顯示題目
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: 成績不可用，因為導師正在對其進行處理操作。
       submission_details: 提交件的詳細資料
       submitted_at: "已提交：%{submit_date}"

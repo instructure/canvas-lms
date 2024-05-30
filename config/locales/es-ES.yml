@@ -3634,7 +3634,7 @@ es-ES:
       no_points: Ninguno
       no_submission: Nada
       points: Puntos
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: "Tipos de archivo"
       submitting: Submitting
       turnitin: Turnitin
@@ -8479,7 +8479,7 @@ es-ES:
       mark_all_as_unread: "Marcar todo como no leído"
       retrieved_from_feed: "Recuperado de %{feed}"
       show_rubric: "Mostrar rúbrica"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "No se puede cancelar la publicación si hay respuestas de estudiantes"
       topic: Tema
@@ -18692,7 +18692,7 @@ es-ES:
           quiz_instructions: "Instrucciones de la prueba"
           quiz_score: Puntuación
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "Aún dispones de 1 intento más"
@@ -18813,7 +18813,7 @@ es-ES:
           one: "Esta prueba se ha evaluado de nuevo y tu puntuación ha cambiado."
           other: "Esta prueba se ha evaluado de nuevo y tu nueva puntuación muestra las %{count} preguntas que han cambiado."
         quiz_regraded_your_score_not_affected: "Esta prueba se ha evaluado de nuevo, pero tu puntuación no ha cambiado."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "1 estudiante lo ha entregado hasta ahora"
           other: "%{count} estudiantes lo han entregado hasta ahora"
@@ -21459,7 +21459,7 @@ es-ES:
   speedgrader_loading_error_235fd2e2: "SpeedGrader cargando error"
   speedgrader_settings_4195099b: "SpeedGrader Configuración"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Captura de archivos multimedia"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Dividir
   split_merged_users_6b81c595: "Dividir usuarios agrupados"
   split_number_of_students_per_group_4a05f76f: "Dividir el número de estudiantes por grupo"
@@ -21955,7 +21955,7 @@ es-ES:
       see_vericite_results: "Consultar los resultados de VeriCite."
       sent_to_whole_group: "Enviar comentario a todo el grupo"
       show_rubric: "Mostrar rúbrica"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Las notas no están disponibles porque el profesor está trabajando en ellas."
       submission_details: "Detalles de la entrega"
       submitted_at: "entregada %{submit_date}"

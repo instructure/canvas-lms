@@ -4604,7 +4604,7 @@ pt:
           Os alunos vão ver os ficheiros modificados nos seus comentários para a entrega.
           
           *Certifique que não altera os nomes dos ficheiros entregues para que os possa reconhecer.*
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Itens relacionados"
     grade_gpa_scale_screenreader: "Nota: %{grade}"
@@ -4810,7 +4810,7 @@ pt:
       no_points: Nenhum
       no_submission: Nada
       points: Pontos
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: "Tipos de ficheiro"
       submitting: "A enviar"
       turnitin: Turnitin
@@ -11009,7 +11009,7 @@ pt:
       reply_to_topic: "Responder ao tópico"
       retrieved_from_feed: "Recuperado de %{feed}"
       show_rubric: "Exibir protocolo"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Não é possível anular a publicação se existirem respostas de alunos"
       topic: Tópico
@@ -24263,7 +24263,7 @@ pt:
           quiz_instructions: "Instruções do teste"
           quiz_score: Pontuação
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "Mais 1 tentativa disponível"
@@ -24410,7 +24410,7 @@ pt:
           one: "Este teste foi reavaliado; a sua pontuação foi afetada."
           other: "Este teste foi reavaliado; a sua nova pontuação reflete %{count} perguntas que foram afetadas."
         quiz_regraded_your_score_not_affected: "Este teste foi reavaliado; a sua pontuação não foi afetada."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "1 aluno enviou até ao momento"
           other: "%{count} alunos enviaram até ao momento"
@@ -27809,7 +27809,7 @@ pt:
   speedgrader_settings_4195099b: "SpeedGrader Configurações"
   speedgrader_settings_c9503705: "Definições do SpeedGrader"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Captura de multimédia de estúdio"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Dividir
   split_merged_users_6b81c595: "Dividir utilizadores fundidos"
   split_number_of_students_per_group_4a05f76f: "Divisão do número de estudantes por grupo"
@@ -28374,7 +28374,7 @@ pt:
       see_vericite_results: "Ver VeriCite resultados"
       sent_to_whole_group: "Envie comentário para todo o grupo"
       show_rubric: "Exibir protocolo"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "As notas estão indisponíveis, pois o instrutor está trabalhando nelas."
       submission_details: "Detalhes do envio"
       submitted_at: "enviada %{submit_date}"

@@ -1839,7 +1839,7 @@ el:
   announcements_a4b8ed4a: Ανακοινώσεις
   anonymous_e1b8ad27: Ανώνυμο
   anonymous_grading_ccb5045c: "Ανώνυμη Βαθμολόγηση"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Η ανώνυμη βαθμολόγηση συνεπάγεται την υποχρεωτική απόκρυψη ονομάτων φοιτητών/τριών στο SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Η ανώνυμη βαθμολόγηση συνεπάγεται την υποχρεωτική απόκρυψη ονομάτων φοιτητών/τριών στο SpeedGrader"
   anonymous_user: "Ανώνυμος Χρήστης"
   anonymous_user_d984b9ce: "Ανώνυμος Χρήστης"
   anonymously_graded_59149570: "Ανώνυμα βαθμολογημένα"
@@ -2224,7 +2224,7 @@ el:
       resubmission_count: 
         one: "1 Μη Βαθμολογημένη Επανυποβολή"
         other: "%{count} Μη Βαθμολογημένες Επανυποβολές"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Σχετικά Στοιχεία"
     grade_gpa_scale_screenreader: "Βαθμός: %{grade}"
@@ -2385,7 +2385,7 @@ el:
       no_points: Κανένα
       no_submission: Τίποτα
       points: Μόρια
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: "Τύποι Αρχείων"
       submitting: "Υποβολή σε εξέλιξη..."
       turnitin: Turnitin
@@ -5656,7 +5656,7 @@ el:
       mark_all_as_unread: "Επισήμανση Όλων σαν Μη Αναγνωσμένα"
       retrieved_from_feed: "Ανακτήθηκε από %{feed}"
       show_rubric: "Εμφάνιση Ρουμπρίκας"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Δεν γίνεται να αναιρεθεί η δημοσίευση αν υπάρχουν απαντήσεις σπουδαστών"
       topic: Θέμα
@@ -12259,7 +12259,7 @@ el:
         labels: 
           quiz_score: Βαθμολογία
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "1 Ακόμη Προσπάθεια διαθέσιμη"
@@ -12381,7 +12381,7 @@ el:
           one: "Αυτό το κουίζ έχει αναβαθμολογηθεί. Η βαθμολογία σας επηρεάστηκε."
           other: "Αυτό το κουίζ έχει αναβαθμολογηθεί. Η νέα σας βαθμολογία αφορά %{count} ερωτήσεις που επηρεάστηκαν."
         quiz_regraded_your_score_not_affected: "Αυτό το κουίζ έχει αναβαθμολογηθεί. Η βαθμολογία σας δεν επηρεάστηκε."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "1 σπουδαστής έχει πραγματοποιήσει υποβολή μέχρι τώρα"
           other: "%{count} σπουδαστές έχουν πραγματοποιήσει υποβολές μέχρι τώρα"
@@ -14077,7 +14077,7 @@ el:
       resubmitting: Επανυποβολή...
   speedgrader_d9a6fa90: Speedgrader
   speedgrader_de0affa6: SpeedGrader
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   spreadsheet_6d622119: "Λογιστικό φύλλο"
   sr_gradebook: 
     all_grading_periods: "Όλες οι περίοδοι βαθμολογήσεων"
@@ -14316,7 +14316,7 @@ el:
       see_vericite_results: "Προβολή των αποτελεσμάτων του VeriCite"
       sent_to_whole_group: "Στείλτε Σχόλιο σε Όλη την Ομάδα"
       show_rubric: "Εμφάνιση Ρουμπρίκας"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Οι βαθμοί δεν είναι διαθέσιμοι επειδή ασχολείται με αυτούς ο εκπαιδευτής."
       submission_details: "Λεπτομέρεις Υποβολής"
       submitted_at: "υποβλήθηκε στις %{submit_date}"

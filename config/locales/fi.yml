@@ -4085,7 +4085,7 @@ fi:
       resubmission_count: 
         one: "1 arvioimaton tehtäväpalautuksen uudelleenlähetys"
         other: "%{count} arvioimatonta tehtäväpalautuksen uudelleenlähetystä"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Tehtävään liittyvät kohteet"
     grade_gpa_scale_screenreader: "Arvosana: %{grade}"
@@ -4243,7 +4243,7 @@ fi:
       no_points: "Ei mitään"
       no_submission: "Ei mitään"
       points: Pisteet
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: Tiedostotyypit
       submitting: Lähetetään
       turnitin: Turnitin
@@ -7078,7 +7078,7 @@ fi:
       edit_item: "Muokkaa kohteen tietoja"
     tool_sequence_footer: 
       edit_assignment_settings: "Muokkaa tehtävän asetuksia"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
     url_show: 
       new_tab: "Tämä sivu avautui uudessa selainikkunassa."
   context_modules_api: 
@@ -9543,7 +9543,7 @@ fi:
       mark_all_as_unread: "Merkitse kaikki lukemattomiksi"
       retrieved_from_feed: "Palautettu kohteesta %{feed}"
       show_rubric: "Näytä arviointitaulukko"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Julkaisua ei voida peruuttaa, jos on opiskelijavastauksia"
       topic: Aihe
@@ -20848,7 +20848,7 @@ fi:
           quiz_instructions: "Testin ohjeet"
           quiz_score: Pistemäärä
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "Vielä 1 yritys jäljellä"
@@ -20970,7 +20970,7 @@ fi:
           one: "Tämä testi on arvioitu uudelleen, ja pistemääräsi on muuttunut."
           other: "Tämä testi on arvioitu uudelleen; uusi pistemäärääsi heijastaa %{count} kysymystä, joissa oli muutoksia."
         quiz_regraded_your_score_not_affected: "Tämä testi on arvioitu uudelleen, mutta sillä ei ollut vaikutusta pistemäärääsi."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "1 opiskelija lähettänyt toistaiseksi"
           other: "%{count} opiskelijaa lähettänyt toistaiseksi"
@@ -23893,7 +23893,7 @@ fi:
   speedgrader_loading_error_235fd2e2: "SpeedGrader latausvirhe"
   speedgrader_settings_4195099b: "SpeedGrader Asetukset"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studion mediasieppaus"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Jaa
   split_merged_users_6b81c595: "Jaa yhdistetyt käyttäjät"
   split_number_of_students_per_group_4a05f76f: "Jaa opiskelijoiden määrä ryhmää kohti"
@@ -24413,7 +24413,7 @@ fi:
       see_vericite_results: "Katso VeriCite tulokset"
       sent_to_whole_group: "Lähetä kommentti koko ryhmälle"
       show_rubric: "Näytä arviointitaulukkko"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "Arvosanoja ei ole saatavilla, koska arviointi on ohjaajalla yhä kesken."
       submission_details: "Tehtäväpalautuksen tiedot"
       submitted_at: "lähetetty %{submit_date}"

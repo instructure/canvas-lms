@@ -111,7 +111,7 @@
             <% if @can_link_to_speed_grader %>
               <li id="speed-grader-link-container" role="presentation" class='<%= "hidden" unless @assignment.published? %>'>
                 <a href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) %>" class="speed-grader-link-assignment icon-speed-grader">
-                  <%= t(:speed_grader, "SpeedGrader™") %>
+                  <%= t(:speed_grader, "SpeedGrader") %>
                 </a>
               </li>
             <% end %>

@@ -3659,7 +3659,7 @@ it:
   anonymous_e1b8ad27: Anonimo
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "La valutazione anonima non può essere abilitata per i compiti di gruppo"
   anonymous_grading_ccb5045c: "Valutazione anonima"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "La valutazione anonima forza i nomi degli studenti a restare nascosti in SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "La valutazione anonima forza i nomi degli studenti a restare nascosti in SpeedGrader"
   anonymous_grading_with_new_quizzes_ba0391f3: "Valutazione anonima con Nuovi quiz"
   anonymous_id_2ef1c6d2: "%{id} anonimo"
   anonymous_id_you_cf43ab76: "%{id} anonimo (tu)"
@@ -4348,7 +4348,7 @@ it:
       resubmission_count: 
         one: "1 nuova consegna non valutata"
         other: "%{count} Nuove consegne non valutate"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Elementi correlati"
     grade_gpa_scale_screenreader: "Voto: %{grade}"
@@ -4521,7 +4521,7 @@ it:
       no_points: Nessuno
       no_submission: Niente
       points: Punti
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       submission_types: "Tipi di file"
       submitting: Invio
       turnitin: Turnitin
@@ -7521,7 +7521,7 @@ it:
       edit_item: "Modifica dettagli elementi"
     tool_sequence_footer: 
       edit_assignment_settings: "Modica impostazioni compiti"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
     url_show: 
       new_tab: "Questo sito è stato aperto in una nuova finestra del browser."
   context_modules_api: 
@@ -10209,7 +10209,7 @@ it:
       mark_all_as_unread: "Contrassegna tutto come non letto"
       retrieved_from_feed: "Recuperato da %{feed}"
       show_rubric: "Mostra rubrica"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       tooltips: 
         cannot_unpublish_discussion: "Impossibile annullare la pubblicazione se ci sono risposte degli studenti"
       topic: Argomento
@@ -21952,7 +21952,7 @@ it:
           quiz_instructions: "Istruzioni quiz"
           quiz_score: Punteggio
       quiz_edit_header: 
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "1 altro tentativo disponibile"
@@ -22074,7 +22074,7 @@ it:
           one: "Questo quiz è stato rivalutato; il tuo punteggio è stato influenzato."
           other: "Questo quiz è stato rivalutato; il tuo nuovo punteggio riflette %{count} domande interessate."
         quiz_regraded_your_score_not_affected: "Questo quiz è stato rivalutato; il tuo punteggio non è stato influenzato."
-        speed_grader: SpeedGrader™
+        speed_grader: SpeedGrader
         students_submitted_so_far: 
           one: "1 studente ha consegnato finora"
           other: "%{count} studenti hanno consegnato finora"
@@ -25152,7 +25152,7 @@ it:
   speedgrader_settings_4195099b: "SpeedGrader Impostazioni"
   speedgrader_settings_c9503705: "Impostazioni SpeedGrader"
   speedgrader_studio_media_capture_3fd8aa93: "Acquisizione supporti multimediali Studio SpeedGrader"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Dividi
   split_merged_users_6b81c595: "Dividi utenti uniti"
   split_number_of_students_per_group_4a05f76f: "Dividi numero di studenti per gruppo"
@@ -25681,7 +25681,7 @@ it:
       see_vericite_results: "Vedi i risultati VeriCite"
       sent_to_whole_group: "Invia commento all'intero gruppo"
       show_rubric: "Mostra rubrica"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
       student_mute_notification: "I voti non sono disponibili perché l'istruttore sta lavorando su di essi."
       submission_details: "Dettagli consegna"
       submitted_at: "inviato %{submit_date}"
