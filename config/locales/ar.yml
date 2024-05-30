@@ -4968,7 +4968,7 @@ ar:
       no_points: بلا
       no_submission: "لا شيء"
       points: النقاط
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: "أنواع الملفات"
       submitting: "جارٍ الإرسال"
       turnitin: Turnitin
@@ -11591,7 +11591,7 @@ ar:
       reply_to_topic: "الرد على الموضوع"
       retrieved_from_feed: "تم الاسترداد من %{feed}"
       show_rubric: "إظهار العنوان"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: "يتعذر إلغاء النشر في حالة وجود ردود من الطلاب"
       topic: الموضوع
@@ -25290,7 +25290,7 @@ ar:
           quiz_instructions: "تعليمات الاختبار"
           quiz_score: النقاط
       quiz_edit_header: 
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           few: "تتوافر %{count} محاولة إضافية"
@@ -25465,7 +25465,7 @@ ar:
           two: "تمت إعادة تقييم هذه الاختبار. تعكس نقاطك الجديدة أن %{count} أسئلة قد تأثرت."
           zero: "تمت إعادة تقييم هذه الاختبار. لقد تأثرت نقاطك."
         quiz_regraded_your_score_not_affected: "تمت إعادة تقييم هذه السؤال. لم تتأثر نقاطك."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           few: "قام %{count} من الطلاب بالإرسال حتى الآن"
           many: "قام %{count} من الطلاب بالإرسال حتى الآن"
@@ -29058,7 +29058,7 @@ ar:
   speedgrader_settings_4195099b: "SpeedGrader إعدادات"
   speedgrader_settings_c9503705: "إعدادات SpeedGrader"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader تسجيل وسائط Studio"
-  speedgrader_tm_44688790: SpeedGrader
+  speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: تقسيم
   split_merged_users_6b81c595: "تقسيم المستخدمين المدموجين"
   split_number_of_students_per_group_4a05f76f: "تقسيم عدد الطلاب لكل مجموعة"
@@ -29647,7 +29647,7 @@ ar:
       see_vericite_results: "عرض نتائج VeriCite"
       sent_to_whole_group: "إرسال تعليق إلى المجموعة بأكملها"
       show_rubric: "إظهار العنوان"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "تعد الدرجات غير متاحة لأن المعلم يقوم بإعدادها الآن."
       submission_details: "تفاصيل الإرسال"
       submitted_at: "تم الإرسال %{submit_date}"
