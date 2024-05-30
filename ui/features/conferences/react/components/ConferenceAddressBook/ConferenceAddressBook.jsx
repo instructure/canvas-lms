@@ -109,8 +109,9 @@ export const ConferenceAddressBook = ({menuItemList, onChange, selectedItems, is
   }
 
   const filteredMenuItems = useMemo(() => {
-    let newMenuItemList = menuItemList.filter(u => u.displayName.includes(inputValue))
-    newMenuItemList = newMenuItemList.filter(u => !selectedMenuItems.includes(u))
+    const filteredMenuItemList = menuItemList
+      .filter(u => u.displayName.toLowerCase().includes(inputValue.toLowerCase()))
+      .filter(u => !selectedMenuItems.includes(u))
 
     const getOptionsChangedMessage = newMenuItems => {
       let message =
@@ -128,11 +129,11 @@ export const ConferenceAddressBook = ({menuItemList, onChange, selectedItems, is
     }
 
     if (inputValue.length) {
-      const newAnnouncement = getOptionsChangedMessage(newMenuItemList)
+      const newAnnouncement = getOptionsChangedMessage(filteredMenuItemList)
       setAnnouncement(newAnnouncement)
     }
 
-    return newMenuItemList
+    return filteredMenuItemList
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputValue, menuItemList, selectedMenuItems.length])
 
