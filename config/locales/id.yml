@@ -3396,7 +3396,7 @@ id:
       no_points: "Tidak ada"
       no_submission: "Tidak Ada"
       points: Poin
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: "Jenis File"
       submitting: Menyerahkan
       turnitin: Turnitin
@@ -7973,7 +7973,7 @@ id:
       mark_all_as_unread: "Tandai Semua sebagai Belum Dibaca"
       retrieved_from_feed: "Diambil dari %{feed}"
       show_rubric: "Tampilkan Rubrik"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: "Tidak dapat membatalkan penerbitan jika ada balasan siswa"
       topic: Topik
@@ -17556,7 +17556,7 @@ id:
           quiz_instructions: "Instruktur Kuis"
           quiz_score: Skor
       quiz_edit_header: 
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           one: "1 Upaya Lagi Tersisa"
@@ -17677,7 +17677,7 @@ id:
           one: "Kuis ini telah dinilai ulang; skor Anda terpengaruh."
           other: "Kuis ini telah dinilai ulang; skor baru Anda mencerminkan %{count} pertanyaan yang terpengaruh."
         quiz_regraded_your_score_not_affected: "Kuis ini telah dinilai ulang; skor Anda tidak terpengaruh."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "1 siswa telah menyerahkan sejauh ini"
           other: "%{count} siswa telah menyerahkan sejauh ini"
@@ -20188,7 +20188,7 @@ id:
   speedgrader_loading_error_235fd2e2: "Kesalahan saat memuat SpeedGrader"
   speedgrader_settings_4195099b: "Pengaturan SpeedGrader"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studio Media Capture"
-  speedgrader_tm_44688790: SpeedGrader
+  speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Pisah
   split_merged_users_6b81c595: "Pisah Pengguna yang Disatukan"
   split_number_of_students_per_group_4a05f76f: "Pisah jumlah siswa per grup"
@@ -20641,7 +20641,7 @@ id:
       see_vericite_results: "Lihat VeriCite hasil"
       sent_to_whole_group: "Kirim komentar ke seluruh grup"
       show_rubric: "Tampilkan Rubrik"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "Nilai tidak tersedia karena instruktur masih mengerjakannya."
       submission_details: "Detail Penyerahan"
       submitted_at: "diserahkan pada %{submit_date}"
