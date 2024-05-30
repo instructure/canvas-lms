@@ -2385,7 +2385,7 @@ el:
       no_points: Κανένα
       no_submission: Τίποτα
       points: Μόρια
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: "Τύποι Αρχείων"
       submitting: "Υποβολή σε εξέλιξη..."
       turnitin: Turnitin
@@ -5656,7 +5656,7 @@ el:
       mark_all_as_unread: "Επισήμανση Όλων σαν Μη Αναγνωσμένα"
       retrieved_from_feed: "Ανακτήθηκε από %{feed}"
       show_rubric: "Εμφάνιση Ρουμπρίκας"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: "Δεν γίνεται να αναιρεθεί η δημοσίευση αν υπάρχουν απαντήσεις σπουδαστών"
       topic: Θέμα
@@ -12259,7 +12259,7 @@ el:
         labels: 
           quiz_score: Βαθμολογία
       quiz_edit_header: 
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           one: "1 Ακόμη Προσπάθεια διαθέσιμη"
@@ -12381,7 +12381,7 @@ el:
           one: "Αυτό το κουίζ έχει αναβαθμολογηθεί. Η βαθμολογία σας επηρεάστηκε."
           other: "Αυτό το κουίζ έχει αναβαθμολογηθεί. Η νέα σας βαθμολογία αφορά %{count} ερωτήσεις που επηρεάστηκαν."
         quiz_regraded_your_score_not_affected: "Αυτό το κουίζ έχει αναβαθμολογηθεί. Η βαθμολογία σας δεν επηρεάστηκε."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "1 σπουδαστής έχει πραγματοποιήσει υποβολή μέχρι τώρα"
           other: "%{count} σπουδαστές έχουν πραγματοποιήσει υποβολές μέχρι τώρα"
@@ -14316,7 +14316,7 @@ el:
       see_vericite_results: "Προβολή των αποτελεσμάτων του VeriCite"
       sent_to_whole_group: "Στείλτε Σχόλιο σε Όλη την Ομάδα"
       show_rubric: "Εμφάνιση Ρουμπρίκας"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "Οι βαθμοί δεν είναι διαθέσιμοι επειδή ασχολείται με αυτούς ο εκπαιδευτής."
       submission_details: "Λεπτομέρεις Υποβολής"
       submitted_at: "υποβλήθηκε στις %{submit_date}"
