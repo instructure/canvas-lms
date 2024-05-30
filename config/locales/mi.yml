@@ -10944,7 +10944,7 @@ mi:
       reply_to_topic: "Whakautu ki Kaupapa"
       retrieved_from_feed: "Te tiki mai i te %{feed}"
       show_rubric: "Whakātu Rubric"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: "Kāore e taea te tāngia ki te reira e whakautu ngā ākonga"
       topic: kaupapa
@@ -24302,7 +24302,7 @@ mi:
           one: "Kua kōeke anō tēnei quiz; ka pā ki tō kaute"
           other: "Kua kōeke anō tēnei quiz; tō kaute hou ko te %{count} ngā pātai i pāngia."
         quiz_regraded_your_score_not_affected: "Kua kōeke anō tēnei quiz; kaore tō kaute i pāngia."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "tukuna 1 ākonga i tēnei wā"
           other: " %{count} ngā ākonga kua tukuna i tēnei wā"
@@ -28261,7 +28261,7 @@ mi:
       see_vericite_results: "Titiro VeriCite ngā hua"
       sent_to_whole_group: "Tuku kōrero ki te rōpu katoa"
       show_rubric: "Whakātu Rubric"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "He wātea ngā kōeke no te mea kei te mahi i te kaitohutohu runga ki a rātou."
       submission_details: "Taipitopito tāpaetanga"
       submitted_at: "tuku %{submit_date}"
