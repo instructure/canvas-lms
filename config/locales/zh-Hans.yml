@@ -4800,7 +4800,7 @@ zh-Hans:
       no_points: 无
       no_submission: 无任何内容
       points: 得分
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: 文件类型
       submitting: 提交
       turnitin: Turnitin
@@ -10981,7 +10981,7 @@ zh-Hans:
       reply_to_topic: 回复主题
       retrieved_from_feed: "从 %{feed} 检索"
       show_rubric: 显示评分标准说明
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: 如果存在学生回复，则无法取消发布
       topic: 主题
@@ -24362,7 +24362,7 @@ zh-Hans:
           one: "此测验已重新计分; 您的新分数反映受到影响的 %{count} 个问题。"
           other: "此测验已重新计分; 您的新分数反映受到影响的 %{count} 个问题。"
         quiz_regraded_your_score_not_affected: "此测验已重新计分; 您的分数未受影响。"
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "目前 %{count} 个学生已提交"
           other: "目前 %{count} 个学生已提交"
@@ -28305,7 +28305,7 @@ zh-Hans:
       see_vericite_results: 查看VeriCite成绩
       sent_to_whole_group: 向整个小组发送评论
       show_rubric: 显示评分标准说明
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: 评分不可用，原因是教师正在进行处理。
       submission_details: 提交详细信息
       submitted_at: "提交时间 %{submit_date}"
