@@ -43,6 +43,9 @@ Rails.configuration.to_prepare do
         SentryExtensions::Settings.get("sentry_backend_traces_sample_rate", "0.0").to_f
       end
 
+      # Note that this sample rate is relative to the traces sample rate
+      config.profiles_sample_rate = SentryExtensions::Settings.get("sentry_backend_profiles_sample_rate", "0.0").to_f
+
       # Override the Sentry-provided ActiveRecord subscriber with our own (to normalize SQL queries)
       config.rails.tracing_subscribers.delete(Sentry::Rails::Tracing::ActiveRecordSubscriber)
       config.rails.tracing_subscribers.add(SentryExtensions::Tracing::ActiveRecordSubscriber)
