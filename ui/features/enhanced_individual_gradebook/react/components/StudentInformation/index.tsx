@@ -205,9 +205,16 @@ export default function StudentInformation({
       (!selectedGradingPeriodId && gradingPeriodSet?.weighted)
     )
     const showPointsText = !!(!hidePointsText && gradeToDisplay)
-    const pointsText = showPointsText
-      ? ` (${gradeToDisplay.score} / ${gradeToDisplay.possible} ${I18n.t('points')})`
-      : ''
+    let pointsText = ''
+    if (showPointsText) {
+      const scoreText = I18n.n(gradeToDisplay.score, {
+        precision: gradingStandardPointsBased ? 2 : undefined,
+      })
+      const possibleText = gradingStandardPointsBased
+        ? I18n.n(gradeToDisplay.possible, {precision: 2})
+        : I18n.n(gradeToDisplay.possible)
+      pointsText = ` (${scoreText} / ${possibleText} ${I18n.t('points')})`
+    }
 
     const letterGradeText = gradingStandard
       ? ` - ${GradeFormatHelper.replaceDashWithMinus(
