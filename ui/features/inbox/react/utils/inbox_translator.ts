@@ -62,19 +62,35 @@ export function translateMessage(args: TranslateArgs) {
  * Call the translate paragraph action, using the concocted payload as the string. The result should be
  * exactly the text to place into the TextArea.
  * */
-async function translateText(args: TranslateArgs, text: string): Promise<string> {
+export async function translateText(args: TranslateArgs, text: string): Promise<string> {
   const result = await doFetchApi({
     method: 'POST',
     path: `/courses/${ENV.course_id}/translate/paragraph`,
     body: {
       inputs: {
-        src_lang: 'en',
         tgt_lang: args.tgtLang,
         text,
       },
     },
   })
   return result.json.translated_text
+}
+
+export async function translateInboxMessage(
+  text: string,
+  callback: (arg: string) => void
+): Promise<void> {
+  const result = await doFetchApi({
+    method: 'POST',
+    path: '/translate/message',
+    body: {
+      inputs: {
+        text,
+      },
+    },
+  })
+
+  callback(result.json)
 }
 
 /**

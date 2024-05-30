@@ -18,6 +18,7 @@
 
 require "aws-sdk-sagemakerruntime"
 require "cld"
+require "pragmatic_segmenter"
 
 module Translation
   class << self
@@ -48,8 +49,6 @@ module Translation
     def available?(context, feature_flag)
       context&.feature_enabled?(feature_flag) && sagemaker_client.present?
     end
-
-    ##
 
     ##
     # Create a translation given the src -> target mapping
@@ -120,6 +119,37 @@ module Translation
       end
 
       translated
+    end
+
+    def language_matches_user_locale?(user, text)
+      locale = if user.locale.nil?
+                 "en"
+               else
+                 user.locale[0..2]
+               end
+      result = CLD.detect_language(text)[:code][0..2]
+      result == locale
+    end
+
+    def translate_message(text:, user:)
+      translated_text = []
+      src_lang = CLD.detect_language(text)[:code][0..2]
+      tgt_lang = if user.locale.nil?
+                   "en"
+                 else
+                   user.locale[0..2]
+                 end
+
+      text.split("\n").map do |paragraph|
+        passage = []
+        PragmaticSegmenter::Segmenter.new(text: paragraph, language: src_lang).segment.each do |segment|
+          trans = create(src_lang:, tgt_lang:, text: segment)
+          passage << trans
+        end
+        translated_text << passage.join
+      end
+
+      translated_text.join("\n")
     end
   end
 end

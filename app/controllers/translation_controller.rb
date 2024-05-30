@@ -21,6 +21,7 @@ class TranslationController < ApplicationController
 
   before_action :require_context, only: :translate
   before_action :require_user
+  before_action :require_inbox_translation, only: %i[translate_paragraph translate_message]
 
   # Skip the authenticity token as this is an API endpoint.
   skip_before_action :verify_authenticity_token, only: [:translate]
@@ -40,8 +41,6 @@ class TranslationController < ApplicationController
   # incrementally
   #
   def translate_paragraph
-    return render_unauthorized_action unless Translation.available?(@current_user, :translate_compose_message)
-
     # Split into paragraphs.
     text = []
     required_params[:text].split("\n").map do |paragraph|
@@ -59,9 +58,23 @@ class TranslationController < ApplicationController
     render json: { translated_text: text.join("\n") }
   end
 
+  def translate_message
+    # First, check to see if the language that we've been given matches the language of the user.
+    if Translation.language_matches_user_locale?(@current_user, required_params[:text])
+      return render json: { status: "language_matches" }
+    end
+
+    # Translate the message
+    render json: { translated_text: Translation.translate_message(text: required_params[:text], user: @current_user) }
+  end
+
   private
 
   def required_params
     params.require(:inputs).permit(:src_lang, :tgt_lang, :text)
+  end
+
+  def require_inbox_translation
+    render_unauthorized_action unless Translation.available?(@current_user, :translate_inbox_messages)
   end
 end
