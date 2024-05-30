@@ -1184,6 +1184,9 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     given { |user| context.grants_right?(user, :view_quiz_answer_audits) }
     can :view_answer_audits
+
+    given { |user, session| user && context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit) }
+    can :manage_assign_to
   end
 
   scope :include_assignment, -> { preload(:assignment) }

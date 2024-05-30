@@ -172,6 +172,30 @@ shared_examples_for "selective_release assign to tray" do |context|
 
     check_element_has_focus close_button
   end
+
+  it "does not show the button when the user does not have the manage_assignments_edit permission" do
+    get @mod_url
+    click_manage_assignment_button(@assignment1.id)
+    expect(element_exists?(assign_to_menu_link_selector(@assignment1.id))).to be_truthy
+
+    RoleOverride.create!(context: @mod_course.account, permission: "manage_assignments_edit", role: teacher_role, enabled: false)
+    get @mod_url
+    click_manage_assignment_button(@assignment1.id)
+    expect(element_exists?(assign_to_menu_link_selector(@assignment1.id))).to be_falsey
+  end
+
+  it "shows the button based off the moderate_forum permission for graded discussions on the assignments index" do
+    discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
+
+    get @mod_url
+    click_manage_assignment_button(discussion.assignment.id)
+    expect(element_exists?(assign_to_menu_link_selector(discussion.assignment.id))).to be_truthy
+
+    RoleOverride.create!(context: @mod_course.account, permission: "moderate_forum", role: teacher_role, enabled: false)
+    get @mod_url
+    click_manage_assignment_button(discussion.assignment.id)
+    expect(element_exists?(assign_to_menu_link_selector(discussion.assignment.id))).to be_falsey
+  end
 end
 
 describe "assignments index menu tool placement" do

@@ -53,6 +53,7 @@ type Props = {
   intraGroupPeerReviews: boolean
   setIntraGroupPeerReviews: (intraGroupPeerReviews: boolean) => void
   isCheckpoints: boolean
+  canManageAssignTo: boolean
 }
 
 const I18n = useI18nScope('discussion_create')
@@ -78,9 +79,26 @@ export const GradedDiscussionOptions = ({
   intraGroupPeerReviews,
   setIntraGroupPeerReviews,
   isCheckpoints,
+  canManageAssignTo,
 }: Props) => {
   const differentiatedModulesEnabled = ENV.FEATURES?.differentiated_modules
   const isPacedDiscussion = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.in_paced_course
+
+  const renderDiffModulesAssignTo = () => {
+    if (!canManageAssignTo) {
+      return
+    }
+    return (
+      <>
+        <Text size="large">{I18n.t('Assignment Settings')}</Text>
+        {isPacedDiscussion ? (
+          <CoursePacingNotice courseId={ENV.COURSE_ID} />
+        ) : (
+          <ItemAssignToTrayWrapper />
+        )}
+      </>
+    )
+  }
 
   return (
     <View as="div">
@@ -138,14 +156,7 @@ export const GradedDiscussionOptions = ({
         {!differentiatedModulesEnabled ? (
           <AssignmentDueDatesManager />
         ) : (
-          <>
-            <Text size="large">{I18n.t('Assignment Settings')}</Text>
-            {isPacedDiscussion ? (
-              <CoursePacingNotice courseId={ENV.COURSE_ID} />
-            ) : (
-              <ItemAssignToTrayWrapper />
-            )}
-          </>
+          renderDiffModulesAssignTo()
         )}
       </View>
     </View>

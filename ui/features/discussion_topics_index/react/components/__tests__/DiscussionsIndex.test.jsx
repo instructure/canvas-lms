@@ -125,7 +125,7 @@ describe('DiscussionIndex', () => {
           subscribed: false,
           can_lock: true,
           user_count: 5,
-          permissions: {delete: true, update: true},
+          permissions: {delete: true, update: true, manage_assign_to: true},
           author: {id: '1', display_name: 'bar', name: 'bar', html_url: ''},
         },
       ],

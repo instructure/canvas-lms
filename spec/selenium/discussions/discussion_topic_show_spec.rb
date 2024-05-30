@@ -390,6 +390,15 @@ describe "Discussion Topic Show" do
         wait_for_assign_to_tray_spinner
         expect(module_item_assign_to_card.last).to contain_css(due_date_input_selector)
       end
+
+      it "does not show the button when the user does not have the moderate_forum permission" do
+        get "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
+        expect(element_exists?(Discussion.assign_to_button_selector)).to be_truthy
+
+        RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: teacher_role, enabled: false)
+        get "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
+        expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
+      end
     end
 
     context "when Discussion Summary feature flag is ON" do

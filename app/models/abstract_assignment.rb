@@ -1976,6 +1976,14 @@ class AbstractAssignment < ActiveRecord::Base
          !in_closed_grading_period?)
     end
     can :delete
+
+    given do |user, session|
+      next false unless user
+      next false if submission_types == "discussion_topic" && !context.grants_right?(user, session, :moderate_forum)
+
+      context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)
+    end
+    can :manage_assign_to
   end
 
   def user_can_update?(user, session = nil)

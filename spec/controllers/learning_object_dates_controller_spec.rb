@@ -470,9 +470,16 @@ describe LearningObjectDatesController do
       expect(json_parse["overrides"]).to eq []
     end
 
-    it "returns unauthorized if you can't manage assignments" do
+    it "returns unauthorized for students" do
       course_with_student_logged_in(course: @course)
       get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
+      expect(response).to be_unauthorized
+    end
+
+    it "returns unauthorized for modules if user doesn't have manage_course_content_edit permission" do
+      RoleOverride.create!(context: @course.account, permission: "manage_course_content_edit", role: teacher_role, enabled: false)
+      context_module = @course.context_modules.create!(name: "module")
+      get :show, params: { course_id: @course.id, context_module_id: context_module.id }
       expect(response).to be_unauthorized
     end
 
@@ -661,12 +668,6 @@ describe LearningObjectDatesController do
         expect(response.code.to_s.start_with?("4")).to be_truthy
       end
 
-      it "returns unauthorized if you can't manage assignments" do
-        course_with_student_logged_in(course: @course)
-        put :update, params: { **default_params, due_at: "2020-03-02T05:59:00Z" }
-        expect(response).to be_unauthorized
-      end
-
       it "returns not_found if object is deleted" do
         learning_object.destroy!
         put :update, params: { **default_params, due_at: "2020-03-02T05:59:00Z" }
@@ -683,6 +684,12 @@ describe LearningObjectDatesController do
         Account.site_admin.disable_feature! :differentiated_modules
         put :update, params: { **default_params, due_at: "2020-03-02T05:59:00Z" }
         expect(response).to be_not_found
+      end
+
+      it "returns unauthorized for students" do
+        course_with_student_logged_in(course: @course)
+        put :update, params: { **default_params, unlock_at: "2020-03-02T05:59:00Z" }
+        expect(response).to be_unauthorized
       end
     end
 
@@ -741,6 +748,12 @@ describe LearningObjectDatesController do
         expect(response).to be_bad_request
         expect(response.body).to include "Invalid datetime for unlock_at"
       end
+
+      it "returns unauthorized if user doesn't have manage_assignments_edit permission" do
+        RoleOverride.create!(context: @course.account, permission: "manage_assignments_edit", role: teacher_role, enabled: false)
+        put :update, params: { **default_params, unlock_at: "2021-01-01T00:00:00Z" }
+        expect(response).to be_unauthorized
+      end
     end
 
     context "quizzes" do
@@ -764,6 +777,12 @@ describe LearningObjectDatesController do
       end
 
       include_examples "learning object updates", true
+
+      it "returns unauthorized if user doesn't have manage_assignments_edit permission" do
+        RoleOverride.create!(context: @course.account, permission: "manage_assignments_edit", role: teacher_role, enabled: false)
+        put :update, params: { **default_params, unlock_at: "2021-01-01T00:00:00Z" }
+        expect(response).to be_unauthorized
+      end
     end
 
     context "graded discussions" do
@@ -795,6 +814,12 @@ describe LearningObjectDatesController do
         expect(learning_object.unlock_at).to be_nil
         expect(learning_object.lock_at).to be_nil
         expect(differentiable.reload.unlock_at.iso8601).to eq "2019-01-02T05:00:00Z"
+      end
+
+      it "returns unauthorized if user doesn't have moderate_forum permission" do
+        RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: teacher_role, enabled: false)
+        put :update, params: { **default_params, unlock_at: "2021-01-01T00:00:00Z" }
+        expect(response).to be_unauthorized
       end
     end
 
@@ -833,6 +858,12 @@ describe LearningObjectDatesController do
         learning_object.reload
         expect(learning_object.is_section_specific).to be false
         expect(learning_object.discussion_topic_section_visibilities.count).to eq 0
+      end
+
+      it "returns unauthorized if user doesn't have moderate_forum permission" do
+        RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: teacher_role, enabled: false)
+        put :update, params: { **default_params, unlock_at: "2021-01-01T00:00:00Z" }
+        expect(response).to be_unauthorized
       end
     end
 
@@ -898,6 +929,12 @@ describe LearningObjectDatesController do
         expect(learning_object.assignment.only_visible_to_overrides).to be false
         expect(learning_object.assignment.assignment_overrides.active.pluck(:set_type)).to contain_exactly("Noop", "CourseSection")
       end
+
+      it "returns unauthorized if user doesn't have manage_wiki_update permission" do
+        RoleOverride.create!(context: @course.account, permission: "manage_wiki_update", role: teacher_role, enabled: false)
+        put :update, params: { **default_params, unlock_at: "2021-01-01T00:00:00Z" }
+        expect(response).to be_unauthorized
+      end
     end
 
     context "pages with an assignment" do
@@ -945,6 +982,12 @@ describe LearningObjectDatesController do
         expect(learning_object.reload.assignment).to eq assignment
         expect(differentiable.reload.assignment_overrides.active.pluck(:set_type)).to eq ["Noop"]
       end
+
+      it "returns unauthorized if user doesn't have manage_wiki_update permission" do
+        RoleOverride.create!(context: @course.account, permission: "manage_wiki_update", role: teacher_role, enabled: false)
+        put :update, params: { **default_params, unlock_at: "2021-01-01T00:00:00Z" }
+        expect(response).to be_unauthorized
+      end
     end
 
     context "files" do
@@ -967,6 +1010,12 @@ describe LearningObjectDatesController do
 
       include_examples "learning object updates", false
       include_examples "learning objects without due dates"
+
+      it "returns unauthorized if user doesn't have manage_files_edit permission" do
+        RoleOverride.create!(context: @course.account, permission: "manage_files_edit", role: teacher_role, enabled: false)
+        put :update, params: { **default_params, unlock_at: "2021-01-01T00:00:00Z" }
+        expect(response).to be_unauthorized
+      end
     end
   end
 end

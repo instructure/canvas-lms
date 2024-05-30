@@ -319,7 +319,7 @@ describe DiscussionTopic do
 
     it "does not grant moderate permissions without read permissions" do
       @course.account.role_overrides.create!(role: teacher_role, permission: "read_forum", enabled: false)
-      expect(@topic.reload.check_policy(@teacher2)).to eql %i[create duplicate attach student_reporting]
+      expect(@topic.reload.check_policy(@teacher2)).to eql %i[create duplicate attach student_reporting manage_assign_to create_assign_to]
     end
 
     it "grants permissions if it not locked" do
@@ -353,6 +353,50 @@ describe DiscussionTopic do
       expect((@entry.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
       expect((@entry.check_policy(@teacher2) & @relevant_permissions).map(&:to_s).sort).to eq %w[read reply update delete].sort
       expect((@entry.check_policy(@student) & @relevant_permissions).map(&:to_s).sort).to eq []
+    end
+
+    describe "manage_assign_to" do
+      context "graded topics" do
+        before do
+          @topic.assignment = @course.assignments.create!(title: "some assignment", points_possible: 5)
+          @topic.save!
+        end
+
+        it "is granted to users with moderate_forum and manage_assignments_edit permission" do
+          expect(@topic.grants_right?(@teacher1, :manage_assign_to)).to be true
+        end
+
+        it "is not granted to users with moderate_forum and not manage_assignments_edit permission" do
+          RoleOverride.create!(context: @course.account, permission: "manage_assignments_edit", role: teacher_role, enabled: false)
+          expect(@topic.grants_right?(@teacher1, :manage_assign_to)).to be false
+        end
+
+        it "is not granted to users with manage_assignments_edit and not moderate_forum permission" do
+          RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: teacher_role, enabled: false)
+          expect(@topic.grants_right?(@teacher1, :manage_assign_to)).to be false
+        end
+      end
+
+      context "ungraded topics" do
+        it "is granted to teachers with moderate_forum permission" do
+          expect(@topic.grants_right?(@teacher1, :manage_assign_to)).to be true
+        end
+
+        it "is not granted to students by default" do
+          expect(@topic.grants_right?(@student, :manage_assign_to)).to be false
+        end
+
+        it "is granted to students with moderate_forum permission and an unrestricted enrollment" do
+          RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: student_role, enabled: true)
+          expect(@topic.grants_right?(@student, :manage_assign_to)).to be true
+        end
+
+        it "is not granted to students with moderate_forum permission and a restricted enrollment" do
+          RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: student_role, enabled: true)
+          @student.enrollments.where(course: @course).first.update!(limit_privileges_to_course_section: true)
+          expect(@topic.grants_right?(@student, :manage_assign_to)).to be false
+        end
+      end
     end
   end
 

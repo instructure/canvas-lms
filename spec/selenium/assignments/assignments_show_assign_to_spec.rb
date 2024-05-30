@@ -134,4 +134,13 @@ describe "assignments show page assign to" do
 
     check_element_has_focus close_button
   end
+
+  it "does not show the button when the user does not have the manage_assignments_edit permission" do
+    get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
+    expect(element_exists?(AssignmentPage.assign_to_button_selector)).to be_truthy
+
+    RoleOverride.create!(context: @course.account, permission: "manage_assignments_edit", role: teacher_role, enabled: false)
+    get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
+    expect(element_exists?(AssignmentPage.assign_to_button_selector)).to be_falsey
+  end
 end

@@ -37,7 +37,7 @@ describe('DiscussionsContainer', () => {
         published: false,
         title: 'Hello World',
         can_lock: false,
-        permissions: {delete: false, update: false},
+        permissions: {delete: false, update: false, manage_assign_to: false},
         posted_at: 'January 10, 2019 at 10:00 AM',
         author: {
           id: '5',

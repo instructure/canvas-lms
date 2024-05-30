@@ -80,6 +80,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
       DUPLICATE: !!this.WIKI_RIGHTS.create_page && this.contextName === 'courses',
       UPDATE: !!this.WIKI_RIGHTS.update,
       DELETE: !!this.WIKI_RIGHTS.delete_page,
+      MANAGE_ASSIGN_TO: !!this.WIKI_RIGHTS.manage_assign_to,
     }
 
     json.DIRECT_SHARE_ENABLED = ENV.DIRECT_SHARE_ENABLED

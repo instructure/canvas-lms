@@ -446,6 +446,7 @@ export default class ItemView extends Backbone.View {
     base.DIRECT_SHARE_ENABLED = ENV.FLAGS && ENV.FLAGS.DIRECT_SHARE_ENABLED
     base.canOpenManageOptions =
       this.canManage() || this.canDuplicate() || this.canDelete() || base.DIRECT_SHARE_ENABLED
+    base.canManageAssignTo = ENV.PERMISSIONS.manage_assign_to
     return base
   }
 }

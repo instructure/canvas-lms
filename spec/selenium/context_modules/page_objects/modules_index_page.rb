@@ -93,6 +93,14 @@ module ModulesIndexPage
     "#context_module_#{context_module.id} a.duplicate_module_link"
   end
 
+  def module_index_menu_tool_link_selector(tool_text)
+    "[role=menuitem]:contains('#{tool_text}')"
+  end
+
+  def view_assign_to_link_selector
+    ".view_assign_link"
+  end
+
   #------------------------------ Elements ------------------------------
   def context_module(module_id)
     f(context_module_selector(module_id))
@@ -115,7 +123,7 @@ module ModulesIndexPage
   end
 
   def module_index_menu_tool_link(tool_text)
-    fj("[role=menuitem]:contains('#{tool_text}')")
+    fj(module_index_menu_tool_link_selector(tool_text))
   end
 
   def module_create_button

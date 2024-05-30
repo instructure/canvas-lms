@@ -2958,7 +2958,8 @@ class ApplicationController < ActionController::Base
       [assignment.id,
        {
          update: assignment.user_can_update?(@current_user, session),
-         delete: assignment.grants_right?(@current_user, :delete)
+         delete: assignment.grants_right?(@current_user, :delete),
+         manage_assign_to: assignment.grants_right?(@current_user, :manage_assign_to)
        }]
     end
 

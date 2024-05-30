@@ -964,7 +964,7 @@ const mapState = (state, ownProps) => {
     displayPinMenuItem: state.permissions.moderate,
     displayDifferentiatedModulesTray:
       ENV?.FEATURES?.differentiated_modules &&
-      discussion.permissions.update &&
+      discussion.permissions.manage_assign_to &&
       state.contextType === 'course',
     masterCourseData: state.masterCourseData,
     isMasterCourse: masterCourse,

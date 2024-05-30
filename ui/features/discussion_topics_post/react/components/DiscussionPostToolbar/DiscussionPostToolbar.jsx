@@ -303,7 +303,7 @@ export const DiscussionPostToolbar = props => {
                     </Flex>
                   </Flex.Item>
                 )}
-                {props.canEdit &&
+                {props.manageAssignTo &&
                   ENV.FEATURES?.differentiated_modules &&
                   !props.isAnnouncement &&
                   props.contextType === 'Course' && (
@@ -367,6 +367,7 @@ DiscussionPostToolbar.propTypes = {
   closeView: PropTypes.func,
   pointsPossible: PropTypes.number,
   contextType: PropTypes.oneOf(['Course', 'Group']),
+  manageAssignTo: PropTypes.bool,
 }
 
 DiscussionPostToolbar.defaultProps = {

@@ -1361,6 +1361,28 @@ class DiscussionTopic < ActiveRecord::Base
                             course.grants_right?(user, session, :manage_grades))
     end
     can :rate
+
+    given do |user, session|
+      next false unless user && context.is_a?(Course) && context.grants_right?(user, session, :moderate_forum)
+
+      if assignment_id
+        context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)
+      else
+        context.user_is_admin?(user) || !context.visibility_limited_to_course_sections?(user)
+      end
+    end
+    can :manage_assign_to
+
+    given do |user, session|
+      next false unless user && context.is_a?(Course) && context.grants_right?(user, session, :create_forum)
+
+      if assignment_id
+        context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_add)
+      else
+        context.user_is_admin?(user) || !context.visibility_limited_to_course_sections?(user)
+      end
+    end
+    can :create_assign_to
   end
 
   def self.context_allows_user_to_create?(context, user, session)

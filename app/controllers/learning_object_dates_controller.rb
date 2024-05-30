@@ -200,7 +200,7 @@ class LearningObjectDatesController < ApplicationController
   end
 
   def check_authorized_action
-    render_unauthorized_action unless @context.grants_any_right?(@current_user, :manage_content, :manage_course_content_edit)
+    render_unauthorized_action unless asset.grants_right?(@current_user, :manage_assign_to)
   end
 
   def asset
