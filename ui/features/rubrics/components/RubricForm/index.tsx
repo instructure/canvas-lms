@@ -503,7 +503,6 @@ export const RubricForm = ({
         criterion={selectedCriterion}
         isOpen={isOutcomeCriterionModalOpen}
         onDismiss={() => setIsOutcomeCriterionModalOpen(false)}
-        onSave={(updatedCriteria: RubricCriterion) => handleSaveCriterion(updatedCriteria)}
       />
       <RubricAssessmentTray
         isOpen={isPreviewTrayOpen}
