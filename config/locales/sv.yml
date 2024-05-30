@@ -4804,7 +4804,7 @@ sv:
       no_points: Ingen
       no_submission: Inget
       points: Poäng
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: Filtyper
       submitting: "Lämnar in"
       turnitin: Tunitin
@@ -11000,7 +11000,7 @@ sv:
       reply_to_topic: "Svara på ämnet"
       retrieved_from_feed: "Hämtat från %{feed}"
       show_rubric: "Visa matris"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: "Det går inte att avpublicera om det finns svar från studenter"
       topic: Ämne
@@ -24246,7 +24246,7 @@ sv:
           quiz_instructions: "Instruktioner för quiz"
           quiz_score: Poäng
       quiz_edit_header: 
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           one: "1 försök tillgängligt"
@@ -24393,7 +24393,7 @@ sv:
           one: "Detta Quiz har ombedömts; ditt resultat påverkades."
           other: "Detta Quiz har ombedömts; ditt nya resultat innehåller %{count} påverkade frågor."
         quiz_regraded_your_score_not_affected: "Detta Quiz ombedömdes; ditt resultat påverkades inte."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "1 student har lämnat in än så länge"
           other: "%{count} studenter har lämnat in än så länge"
@@ -27778,7 +27778,7 @@ sv:
   speedgrader_settings_4195099b: "SpeedGrader inställningar"
   speedgrader_settings_c9503705: "Speedgrader inställningar"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studio Media-inspelning"
-  speedgrader_tm_44688790: SpeedGrader
+  speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Dela
   split_merged_users_6b81c595: "Dela sammanfogade användare"
   split_number_of_students_per_group_4a05f76f: "Dela antal studenter per grupp"
@@ -28339,7 +28339,7 @@ sv:
       see_vericite_results: "Se VeriCite resultat"
       sent_to_whole_group: "Skicka kommentar till hela gruppen"
       show_rubric: "Visa matris"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "Omdömen är inte tillgängliga eftersom läraren arbetar på dem."
       submission_details: Inlämningsdetaljer
       submitted_at: "inlämnad %{submit_date}"
