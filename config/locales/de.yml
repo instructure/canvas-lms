@@ -4770,7 +4770,7 @@ de:
       no_points: Keine
       no_submission: Nichts
       points: Punkte
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: Dateitypen
       submitting: "Wird eingereicht"
       turnitin: Turnitin
@@ -10943,7 +10943,7 @@ de:
       reply_to_topic: "Thema beantworten"
       retrieved_from_feed: "Abgerufen von %{feed}"
       show_rubric: "Bewertungsschema anzeigen"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: "Die Veröffentlichung kann nicht rückgängig gemacht werden, wenn Antworten von Studierenden vorhanden sind."
       topic: Thema
@@ -24149,7 +24149,7 @@ de:
           quiz_instructions: Quiz-Anleitungen
           quiz_score: Punktestand
       quiz_edit_header: 
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           one: "1 weiterer Versuch verfügbar"
@@ -24296,7 +24296,7 @@ de:
           one: "Dieses Quiz wurde neu benotet. Dies hat sich auf Ihren Punktestand ausgewirkt."
           other: "Dieses Quiz wurde neu benotet. Ihr neuer Punktestand gilt für %{count} Fragen, die davon betroffen waren."
         quiz_regraded_your_score_not_affected: "Dieses Quiz wurde neu benotet. Ihre Punktzahl ist davon nicht betroffen."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "1 Studierende\\*r hat bisher abgegeben"
           other: "%{count} Studierende haben bisher abgegeben"
@@ -27682,7 +27682,7 @@ de:
   speedgrader_settings_4195099b: "SpeedGrader Einstellungen"
   speedgrader_settings_c9503705: SpeedGrader-Einstellungen
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studio-Medienerfassung"
-  speedgrader_tm_44688790: SpeedGrader
+  speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Teilen
   split_merged_users_6b81c595: "Zusammengeführte Benutzer\\*innen teilen"
   split_number_of_students_per_group_4a05f76f: "Anzahl der Studierenden pro Gruppe aufteilen"
@@ -28238,7 +28238,7 @@ de:
       see_vericite_results: "VeriCite-Ergebnisse ansehen"
       sent_to_whole_group: "Kommentar an die gesamte Gruppe senden"
       show_rubric: "Bewertungsschema anzeigen"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "Die Noten sind nicht verfügbar, da die/der Lehrende gerade daran arbeitet."
       submission_details: "Details der Abgabe"
       submitted_at: "abgegeben am %{submit_date}"

@@ -3590,7 +3590,7 @@ vi:
       no_points: "Không có"
       no_submission: Không
       points: "Điểm Thành Phần"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: "Các Loại Tệp"
       submitting: Nộp
       turnitin: "Phần mềm Turnitin"
@@ -8392,7 +8392,7 @@ vi:
       mark_all_as_unread: "Đánh Dấu Tất Cả là Chưa Đọc"
       retrieved_from_feed: "Được truy xuất từ %{feed}"
       show_rubric: "Hiển Thị Bảng Đánh Giá Theo Tiêu Chí"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: "Không thể hủy công bố nếu có các câu trả lời của sinh viên"
       topic: "Đề tài"
@@ -18547,7 +18547,7 @@ vi:
           quiz_instructions: "Hướng Dẫn Kiểm Tra"
           quiz_score: "Điểm số"
       quiz_edit_header: 
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           one: "Có Thêm 1 Lần Thử"
@@ -18668,7 +18668,7 @@ vi:
           one: "Kiểm tra này đã được chấm điểm lại; điểm của bạn đã bị ảnh hưởng."
           other: "Kiểm tra này đã được chấm điểm lại; điểm mới của bạn phản ánh %{count} câu hỏi bị ảnh hưởng."
         quiz_regraded_your_score_not_affected: "Kiểm tra này đã được chấm điểm lại; điểm của bạn không bị ảnh hưởng."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "1 sinh viên đã nộp cho đến nay"
           other: "%{count} sinh viên đã nộp cho đến nay"
@@ -21307,7 +21307,7 @@ vi:
   speedgrader_loading_error_235fd2e2: "Lỗi tải SpeedGrader"
   speedgrader_settings_4195099b: "Cài Đặt SpeedGrader"
   speedgrader_studio_media_capture_3fd8aa93: "Chụp Phương Tiện trong SpeedGrader bằng Studio"
-  speedgrader_tm_44688790: SpeedGrader
+  speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Tách
   split_merged_users_6b81c595: "Tách Người Dùng Hợp Nhất"
   split_number_of_students_per_group_4a05f76f: "Chia số sinh viên theo mỗi nhóm"
@@ -21801,7 +21801,7 @@ vi:
       see_vericite_results: "Xem VeriCite kết quả"
       sent_to_whole_group: "Gửi bình luận cho cả nhóm"
       show_rubric: "Hiển Thị Bảng Đánh Giá Theo Tiêu Chí"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "Điểm hiện chưa khả dụng do giảng viên đang chấm."
       submission_details: "Chi Tiết Bài Nộp"
       submitted_at: "đã gửi %{submit_date}"

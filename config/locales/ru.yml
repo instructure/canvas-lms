@@ -4895,7 +4895,7 @@ ru:
       no_points: Нет
       no_submission: Ничего
       points: Баллы
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: "Типы файлов"
       submitting: Отправка
       turnitin: Turnitin
@@ -11299,7 +11299,7 @@ ru:
       reply_to_topic: "Ответить на тему"
       retrieved_from_feed: "Получено от %{feed}"
       show_rubric: "Показать рубрику"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: "Невозможно отменить публикацию, если существуют ответы студентов"
       topic: Тема
@@ -24796,7 +24796,7 @@ ru:
           quiz_instructions: "Инструкции к контрольной работе"
           quiz_score: Оценка
       quiz_edit_header: 
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           few: "Доступно еще %{count} попытки"
@@ -24957,7 +24957,7 @@ ru:
           one: "Данная контрольная работа была оценена повторно. Это повлияло на вашу оценку."
           other: "Данное тестирование была оценена повторно. Новая оценка отражает %{count} вопросов, которые повлияли на вашу оценку."
         quiz_regraded_your_score_not_affected: "Данное тестирование была оценена повторно. Это не повлияло на вашу оценку."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           few: "%{count} студента отправили на данный момент"
           many: "%{count} студентов отправили на данный момент"
@@ -28454,7 +28454,7 @@ ru:
   speedgrader_settings_4195099b: "SpeedGrader Настройки"
   speedgrader_settings_c9503705: "Настройки SpeedGrader"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Запись Studio Media"
-  speedgrader_tm_44688790: SpeedGrader
+  speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Разделение
   split_merged_users_6b81c595: "Разделить объединенных пользователей"
   split_number_of_students_per_group_4a05f76f: "Разделить количество студентов на группу"
@@ -29033,7 +29033,7 @@ ru:
       see_vericite_results: "См. VeriCite результаты"
       sent_to_whole_group: "Отправить комментарий всей группе"
       show_rubric: "Показать рубрику"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "Оценки недоступны, поскольку с ними работает инструктор."
       submission_details: "Сведения об отправке"
       submitted_at: "отправлено %{submit_date}"

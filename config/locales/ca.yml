@@ -3947,7 +3947,7 @@ ca:
       no_points: Cap
       no_submission: Res
       points: Punts
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: "Tipus de fitxers"
       submitting: "S'està entregant"
       turnitin: Turnitin
@@ -9021,7 +9021,7 @@ ca:
       mark_all_as_unread: "Marca-ho tot com a no llegit"
       retrieved_from_feed: "Recuperat de %{feed}"
       show_rubric: "Mostra la rúbrica"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: "No es pot anul·lar la publicació si hi ha respostes d'estudiants"
       topic: Tema
@@ -19651,7 +19651,7 @@ ca:
           quiz_instructions: "Instruccions de la prova"
           quiz_score: Puntuació
       quiz_edit_header: 
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           one: "Hi ha un altre intent disponible"
@@ -19772,7 +19772,7 @@ ca:
           one: "Aquesta prova s'ha requalificat; la vostra puntuació s'ha vist afectada."
           other: "Aquesta prova s'ha requalificat; la vostra nova puntuació mostra que %{count} preguntes s'han vist afectades."
         quiz_regraded_your_score_not_affected: "Aquesta prova s'ha requalificat; la vostra puntuació no s'ha vist afectada."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "Fins ara l'ha entregat un estudiant"
           other: "Fins ara l'han entregat %{count} estudiants"
@@ -22492,7 +22492,7 @@ ca:
   speedgrader_loading_error_235fd2e2: "Error de càrrega de SpeedGrader"
   speedgrader_settings_4195099b: "Configuració de l’SpeedGrader"
   speedgrader_studio_media_capture_3fd8aa93: "Captura d’elements multimèdia de l’Studio SpeedGrader"
-  speedgrader_tm_44688790: SpeedGrader
+  speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Divideix
   split_merged_users_6b81c595: "Divideix els usuaris fusionats"
   split_number_of_students_per_group_4a05f76f: "Dividiu el nombre d'estudiants per grup"
@@ -23001,7 +23001,7 @@ ca:
       see_vericite_results: "Mostra VeriCite resultats"
       sent_to_whole_group: "Envia el comentari a tot el grup"
       show_rubric: "Mostra la rúbrica"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "Les notes no estan disponibles perquè l'instructor hi està treballant."
       submission_details: "Detalls de l'entrega"
       submitted_at: "entregat el %{submit_date}"

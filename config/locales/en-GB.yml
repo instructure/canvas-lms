@@ -4814,7 +4814,7 @@ en-GB:
       no_points: None
       no_submission: Nothing
       points: Points
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: "File types"
       submitting: Submitting
       turnitin: Turnitin
@@ -11015,7 +11015,7 @@ en-GB:
       reply_to_topic: "Reply to topic"
       retrieved_from_feed: "Retrieved from %{feed}"
       show_rubric: "Show rubric"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: "Can't unpublish if there are student replies"
       topic: Topic
@@ -24294,7 +24294,7 @@ en-GB:
           quiz_instructions: "Quiz instructions"
           quiz_score: Score
       quiz_edit_header: 
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           one: "1 More Attempt available"
@@ -24441,7 +24441,7 @@ en-GB:
           one: "This quiz has been re-graded; your score was affected."
           other: "This quiz has been re-graded; your new score reflects %{count} questions that were affected."
         quiz_regraded_your_score_not_affected: "This quiz has been re-graded; your score was not affected."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "1 student submitted so far"
           other: "%{count} students submitted so far"
@@ -27840,7 +27840,7 @@ en-GB:
   speedgrader_settings_4195099b: "SpeedGrader Settings"
   speedgrader_settings_c9503705: "Speedgrader settings"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studio Media Capture"
-  speedgrader_tm_44688790: SpeedGrader
+  speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Split
   split_merged_users_6b81c595: "Split Merged Users"
   split_number_of_students_per_group_4a05f76f: "Split number of students per group"
@@ -28405,7 +28405,7 @@ en-GB:
       see_vericite_results: "See VeriCite results"
       sent_to_whole_group: "Send comment to the whole group"
       show_rubric: "Show Rubric"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "Grades are unavailable because the instructor is working on them."
       submission_details: "Submission details"
       submitted_at: "submitted %{submit_date}"

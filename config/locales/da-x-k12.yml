@@ -10040,7 +10040,7 @@ da-x-k12:
       mark_all_as_unread: "Markér alle som ulæste"
       retrieved_from_feed: "Hentet fra %{feed}"
       show_rubric: "Vis vurderingskriterium"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: "Kan ikke annullere offentliggørelsen, hvis der findes svar fra elever"
       topic: Emne
@@ -21751,7 +21751,7 @@ da-x-k12:
           one: "Denne quiz er blevet ombedømt. Dit resultat blev påvirket."
           other: "Denne quiz er blevet ombedømt. Dit nye resultat afspejler %{count} spørgsmål, som blev påvirket."
         quiz_regraded_your_score_not_affected: "Denne quiz er blevet ombedømt. Dit resultat blev ikke påvirket."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "1 elev har afleveret indtil videre"
           other: "%{count} elever har afleveret indtil videre"
@@ -25283,7 +25283,7 @@ da-x-k12:
       see_vericite_results: "Se VeriCite-resultater"
       sent_to_whole_group: "Send kommentar til hele gruppen"
       show_rubric: "Vis vurderingskriterium"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "Vurderinger er ikke tilgængelige, fordi instruktøren arbejder på dem."
       submission_details: Afleveringsdetaljer
       submitted_at: "afleveret %{submit_date}"
