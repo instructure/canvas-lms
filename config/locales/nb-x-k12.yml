@@ -4474,7 +4474,7 @@ nb-x-k12:
       no_points: Ingen
       no_submission: Ingenting
       points: Poeng
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: Filtyper
       submitting: "Må leveres"
       turnitin: Turnitin
@@ -10065,7 +10065,7 @@ nb-x-k12:
       mark_all_as_unread: "Merk alle som ulest"
       retrieved_from_feed: "Hentet fra %{feed}"
       show_rubric: "Vis vurderingskriterier"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: "Kan ikke avpublisere hvis det er svar fra elever"
       topic: Tema
@@ -21674,7 +21674,7 @@ nb-x-k12:
           quiz_instructions: Quizinstruksjoner
           quiz_score: Resultat
       quiz_edit_header: 
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           one: "Ytterligere ett forsøk tilgjengelig"
@@ -21796,7 +21796,7 @@ nb-x-k12:
           one: "Denne prøven har blitt vurdert på nytt; ditt resultat ble påvirket."
           other: "Denne quizen har blitt vurdert på nytt, ditt nye resultat reflekterer at %{count} spørsmål ble påvirket."
         quiz_regraded_your_score_not_affected: "Denne quizen har blitt vurdert på nytt, resultatet ditt ble ikke påvirket."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "1 elev levert så langt"
           other: "%{count} elever har levert hittil"
@@ -24817,7 +24817,7 @@ nb-x-k12:
   speedgrader_settings_4195099b: "SpeedGrader Innstillinger"
   speedgrader_settings_c9503705: "Innstillinger Speedgrader"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studio Media Capture"
-  speedgrader_tm_44688790: SpeedGrader
+  speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Del
   split_merged_users_6b81c595: "Splitt sammenslåtte brukere"
   split_number_of_students_per_group_4a05f76f: "Del antall elever per gruppe"
@@ -25338,7 +25338,7 @@ nb-x-k12:
       see_vericite_results: "Se VeriCite resultater"
       sent_to_whole_group: "Send kommentar til hele gruppen"
       show_rubric: "Vis vurderingskriterier"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "Vurderingene er utilgjengelige fordi faglæreren jobber med dem."
       submission_details: "Detaljer om innlevering"
       submitted_at: "levert %{submit_date}"
