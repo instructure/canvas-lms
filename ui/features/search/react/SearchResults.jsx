@@ -24,7 +24,7 @@ import SearchResult from './SearchResult'
 
 const I18n = useI18nScope('SmartSearch')
 
-export default function SearchResults({onDislike, onExplain, onLike, searchResults}) {
+export default function SearchResults({onDislike, onExplain, onLike, searchResults, searchTerm}) {
   const searchItemKey = ({content_id, content_type}) => `${content_type}_${content_id}`
 
   const topResults = searchResults.filter(result => result.relevance >= 50)
@@ -39,6 +39,7 @@ export default function SearchResults({onDislike, onExplain, onLike, searchResul
           onDislike={onDislike}
           onExplain={onExplain}
           onLike={onLike}
+          searchTerm={searchTerm}
         />
       ))}
     </Flex>
@@ -52,6 +53,7 @@ export default function SearchResults({onDislike, onExplain, onLike, searchResul
               onDislike={onDislike}
               onExplain={onExplain}
               onLike={onLike}
+              searchTerm=""
             />
           ))}
         </Flex>
