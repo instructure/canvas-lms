@@ -2071,7 +2071,7 @@ ko:
       no_points: 없음
       no_submission: 없음
       points: 배점
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: "파일 유형"
       submitting: "제출 방식"
       turnitin: Turnitin
@@ -5166,7 +5166,7 @@ ko:
       reply_to_topic: "주제에 대해 답변"
       retrieved_from_feed: "%{feed}에서 추출됨"
       show_rubric: "루브릭 표시"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       topic: 주제
       topic_podcast_feed_link: "주제 Podcast 피드"
       topic_subscribe: 구독
@@ -6058,6 +6058,8 @@ ko:
     edit_view_rubric: "루브릭 보기"
     errors: 
       select_an_option: "옵션을 선택하시기 바랍니다."
+    gradebook_header_menu: 
+      speedgrader: SpeedGrader™
     graded: 평가됨
     graded_by_me: "%{graded_time}에 내가 평가"
     graded_then_resubmitted: "평가된 후 다시 제출됨 (%{when})"
@@ -11352,7 +11354,7 @@ ko:
         requires_lockdown: "Respondus LockDown Browser 필요"
         unlimited: 무제한
       quiz_edit_header: 
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         labels: 
           current_score: "현재 점수"
@@ -11476,7 +11478,7 @@ ko:
         manage: 관리
         only_registered_users: "등록한 학생만 평가되는 퀴즈를 치를 수 있습니다."
         quiz_regraded_your_score_not_affected: "이 퀴즈가 다시 평가되었으며, 여러분의 점수에 영향이 없습니다."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         titles: 
           delete: 삭제
           related_items: "관련 항목"
@@ -13045,6 +13047,7 @@ ko:
     not_submitted: "제출 안 됨"
     turnitin: 
       resubmitting: "다시 제출 중..."
+  speedgrader_de0affa6: SpeedGrader™
   speedgrader_tm_44688790: SpeedGrader
   sr_gradebook: 
     all_sections: "모든 섹션"
@@ -13228,7 +13231,7 @@ ko:
       peer_review_steps_complete: "이 피어 리뷰에 대해 필요한 단계를 마쳤습니다."
       sent_to_whole_group: "전체 그룹에 의견 보내기"
       show_rubric: "루브릭 보기"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "교사가 작업 중이므로 평점을 볼 수 없습니다."
       submission_details: "제출물 세부 정보"
       submitted_at: "%{submit_date}에 제출됨"
