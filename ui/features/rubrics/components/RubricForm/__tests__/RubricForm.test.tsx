@@ -341,6 +341,19 @@ describe('RubricForm Tests', () => {
       expect(reorderedCriteria[2]).toEqual(criteria[0])
     })
 
+    it('renders a lock icon with a tooltip next to the outcome name', async () => {
+      queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+      const {criteria = []} = RUBRICS_QUERY_RESPONSE
+
+      const {queryAllByTestId, getByTestId} = renderComponent()
+
+      const outcomeLockIcons = queryAllByTestId(/^outcome-lock-icon/)
+      expect(outcomeLockIcons.length).toEqual(1)
+
+      expect(getByTestId('outcome-lock-icon-2')).toBeInTheDocument()
+    })
+
     describe('new outcome criterion modal', () => {
       it('imports an outcome linked criteria when the import button is clicked in the find outcome modal', () => {
         const outcomeData = {
@@ -371,11 +384,11 @@ describe('RubricForm Tests', () => {
         expect(queryAllByTestId('rubric-criteria-row-description')[2]).toHaveTextContent(
           'Sample description'
         ) // removes p tags correctly
-        expect(queryAllByTestId('rubric-criteria-outcome-title')[1]).toHaveTextContent(
-          'Sample Outcome Title'
+        expect(queryAllByTestId('rubric-criteria-outcome-subtitle')[1]).toHaveTextContent(
+          'Sample Outcome Display Name'
         )
         expect(queryAllByTestId('rubric-criteria-row-outcome-tag')[1]).toHaveTextContent(
-          'Sample Outcome Display Name'
+          'Sample Outcome Title'
         )
       })
 
@@ -491,41 +504,6 @@ describe('RubricForm Tests', () => {
         expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
         const criteriaRowDescriptions = queryAllByTestId('rubric-criteria-row-description')
         expect(criteriaRowDescriptions[0]).not.toHaveTextContent('Updated Criterion Test')
-      })
-    })
-
-    describe('edit outcome criterion modal', () => {
-      it('updates existing outcome criterion when the save button is clicked', async () => {
-        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
-
-        const {getByTestId, queryAllByTestId} = renderComponent()
-        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
-
-        fireEvent.click(queryAllByTestId('rubric-criteria-row-edit-button')[1])
-        await new Promise(resolve => setTimeout(resolve, 0))
-        expect(getByTestId('outcome-rubric-criterion-modal')).toBeInTheDocument()
-        const ratingPoints = queryAllByTestId(`rating-points`)[1] as HTMLInputElement
-
-        fireEvent.change(ratingPoints, {target: {value: '20'}})
-        fireEvent.blur(ratingPoints)
-
-        fireEvent.click(getByTestId('outcome-rubric-criterion-save'))
-        fireEvent.click(queryAllByTestId('criterion-row-rating-accordion')[1])
-        const acordianRatings = queryAllByTestId('rating-scale-accordion-item')
-        expect(acordianRatings[0]).toHaveTextContent('Outcome Rating 1')
-        expect(acordianRatings[0]).toHaveTextContent('20 pts')
-        expect(acordianRatings[1]).toHaveTextContent('Outcome Rating 2')
-        expect(acordianRatings[1]).toHaveTextContent('5 pts')
-      })
-
-      it('disables the edit outcome criterion button when rubric is being used', async () => {
-        const rubricQueryResponse = {...RUBRICS_QUERY_RESPONSE, unassessed: false}
-        queryClient.setQueryData(['fetch-rubric-1'], rubricQueryResponse)
-
-        const {queryAllByTestId} = renderComponent()
-        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
-
-        expect(queryAllByTestId('rubric-criteria-row-edit-button')[1]).toBeDisabled()
       })
     })
   })
