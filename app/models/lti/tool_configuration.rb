@@ -121,15 +121,22 @@ module Lti
 
     # @return [String | nil] A warning message about any disallowed placements
     def verify_placements
-      return unless placements.any? { |p| p["placement"] == "submission_type_selection" }
-      return unless Account.site_admin.feature_enabled?(:lti_placement_restrictions)
+      placements_to_verify = placements.filter_map { |p| p["placement"] if Lti::ResourcePlacement::RESTRICTED_PLACEMENTS.include? p["placement"].to_sym }
+      return unless placements_to_verify.present? && Account.site_admin.feature_enabled?(:lti_placement_restrictions)
 
       # This is a candidate for a deduplication with the same logic in app/models/context_external_tool.rb#placement_allowed?
-      allowed_domains = Setting.get("submission_type_selection_allowed_launch_domains", "").split(",").map(&:strip).reject(&:empty?)
-      allowed_dev_keys = Setting.get("submission_type_selection_allowed_dev_keys", "").split(",").map(&:strip).reject(&:empty?)
-      return if allowed_domains.include?(domain) || allowed_dev_keys.include?(Shard.global_id_for(developer_key_id).to_s)
+      placements_to_verify.each do |placement|
+        allowed_domains = Setting.get("#{placement}_allowed_launch_domains", "").split(",").map(&:strip).reject(&:empty?)
+        allowed_dev_keys = Setting.get("#{placement}_allowed_dev_keys", "").split(",").map(&:strip).reject(&:empty?)
+        next if allowed_domains.include?(domain) || allowed_dev_keys.include?(Shard.global_id_for(developer_key_id).to_s)
 
-      t("Warning: the submission_type_selection placement is only allowed for Instructure approved LTI tools. If you believe you have received this message in error, please contact your support team.")
+        return t(
+          "Warning: the %{placement} placement is only allowed for Instructure approved LTI tools. If you believe you have received this message in error, please contact your support team.",
+          placement:
+        )
+      end
+
+      nil
     end
 
     private

@@ -322,6 +322,7 @@ class ApplicationController < ActionController::Base
         @js_env[:ACCOUNT_ID] = effective_account_id(@context)
         @js_env[:user_cache_key] = Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_=HUpgraqe;njalkhpvoiulkimmaqewg") if @current_user&.workflow_state
         @js_env[:current_course_id] = @context.id if @context.is_a?(Course)
+        @js_env[:top_navigation_tools] = external_tools_display_hashes(:top_navigation) if !!@domain_root_account&.feature_enabled?(:top_navigation_placement)
       end
     end
 
@@ -553,6 +554,9 @@ class ApplicationController < ActionController::Base
     hash[:external_url] = tool.url if custom_settings.include?(:external_url)
     if type == :submission_type_selection && tool.submission_type_selection[:description].present?
       hash[:description] = tool.submission_type_selection[:description]
+    end
+    if type == :top_navigation
+      hash[:pinned] = tool.placement_pinned?(type)
     end
 
     # Add the tool's postmessage scopes to the JS environment, if present.

@@ -27,47 +27,19 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
-
-type Tool = {
-  id: string
-  title: string
-  base_url: string
-  icon_url: string
-}
-
-type KnownResourceType =
-  | 'assignment'
-  | 'assignment_group'
-  | 'audio'
-  | 'discussion_topic'
-  | 'document'
-  | 'image'
-  | 'module'
-  | 'quiz'
-  | 'page'
-  | 'video'
-
-export type SelectableItem = {
-  course_id: string
-  type: KnownResourceType
-}
+import type {Tool} from '@canvas/global/env/EnvCommon'
 
 type Props = {
-  tool: Tool
+  tool: Tool | null
   pageContent: Element
   pageContentTitle: string
   pageContentMinWidth: string
   pageContentHeight: string
   trayPlacement: string
-  acceptedResourceTypes: KnownResourceType[]
-  targetResourceType: KnownResourceType
-  allowItemSelection: boolean
-  selectableItems: SelectableItem[]
   onDismiss: any
-  onExternalContentReady: any
+  onResize: any
+  onExternalContentReady?: any
   open: boolean
-  placement: string
-  extraQueryParams?: {}
 }
 
 export default function ContentTypeExternalToolDrawer({
@@ -77,30 +49,17 @@ export default function ContentTypeExternalToolDrawer({
   pageContentMinWidth,
   pageContentHeight,
   trayPlacement,
-  acceptedResourceTypes,
-  targetResourceType,
-  allowItemSelection,
-  selectableItems,
   onDismiss,
+  onResize,
   onExternalContentReady,
   open,
-  placement,
-  extraQueryParams = {},
 }: Props) {
-  const queryParams = {
-    com_instructure_course_accept_canvas_resource_types: acceptedResourceTypes,
-    com_instructure_course_canvas_resource_type: targetResourceType,
-    com_instructure_course_allow_canvas_resource_selection: allowItemSelection,
-    com_instructure_course_available_canvas_resources: selectableItems,
-    display: 'borderless',
-    placement,
-    ...extraQueryParams,
-  }
+  const queryParams = tool ? {display: 'borderless', placement: tool.placement} : {}
   const prefix = tool?.base_url.indexOf('?') === -1 ? '?' : '&'
   const iframeUrl = `${tool?.base_url}${prefix}${$.param(queryParams)}`
   const toolTitle = tool ? tool.title : 'External Tool'
-  const toolIconUrl = tool ? tool.icon_url : ''
-  const toolIconAlt = toolTitle ? `${toolTitle} icon` : ''
+  const toolIconUrl = tool?.icon_url
+  const toolIconAlt = toolTitle ? `${toolTitle} Icon` : 'Tool Icon'
   const iframeRef = useRef()
   const pageContentRef = useRef()
 
@@ -115,6 +74,14 @@ export default function ContentTypeExternalToolDrawer({
     [pageContent]
   )
 
+  useEffect(() => {
+    window.addEventListener('resize', onResize)
+
+    return () => {
+      window.removeEventListener('resize', onResize)
+    }
+  }, [onResize])
+
   useEffect(
     // returns cleanup function:
     () => handleExternalContentMessages({ready: onExternalContentReady}),
@@ -124,7 +91,7 @@ export default function ContentTypeExternalToolDrawer({
   return (
     <View display="block" height={pageContentHeight}>
       <DrawerLayout minWidth={pageContentMinWidth}>
-        <DrawerLayout.Content label={pageContentTitle}>
+        <DrawerLayout.Content label={pageContentTitle} id="drawer-layout-content">
           <div ref={pageContentRef} />
         </DrawerLayout.Content>
         <DrawerLayout.Tray

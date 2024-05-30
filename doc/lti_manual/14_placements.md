@@ -22,7 +22,6 @@ Congratulations! If you have made it here, you have been tasked with adding a ne
 
 1. Choose a name for your new placement. It should describe roughly where it appears and be relatively short. Recent examples include `course_assignments_menu` and `module_index_menu_modal`.
 2. Add the new placement to the list in [`Lti::ResourcePlacement::PLACEMENTS`](/app/models/lti/resource_placement.rb).
-3. Add it and its user-friendly name (usually just the name of placement capitalized and spaced, eg "Course Assignments Menu" or "Module Index Menu (Modal)") to [`ExternalToolPlacementList.ALL_PLACEMENTS`](/ui/features/external_apps//react/components/ExternalToolPlacementList.js).
-4. Add it to the list in [`Schemas::Lti::ToolConfiguration::SCHEMA`](/lib/schemas/lti/tool_configuration.rb), under extensions -> settings -> placements -> placement -> enum.
-5. Add it to the list in the [External Tools API Spec](/spec/apis/v1/external_tools_api_spec.rb), following the example of [this commit](https://gerrit.instructure.com/c/canvas-lms/+/287770/6/spec/apis/v1/external_tools_api_spec.rb)
-6. If this placement should accept deep links, or items of content returned from the tool, follow the [instructions](./12_deep_linking.md) to configure it for that.
+3. Add it and its user-friendly name (usually just the name of placement capitalized and spaced, eg "Course Assignments Menu" or "Module Index Menu (Modal)") to [`ExternalToolPlacementList.ALL_PLACEMENTS`](/ui/features/external_apps/react/components/ExternalToolPlacementList.jsx).
+4. Add it to the list in the [External Tools API Spec](/spec/apis/v1/external_tools_api_spec.rb), following the example of [this commit](https://gerrit.instructure.com/c/canvas-lms/+/287770/6/spec/apis/v1/external_tools_api_spec.rb)
+5. If this placement should accept deep links, or items of content returned from the tool, follow the [instructions](./12_deep_linking.md) to configure it for that.

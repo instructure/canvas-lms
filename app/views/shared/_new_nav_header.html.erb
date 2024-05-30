@@ -22,6 +22,10 @@
   <% js_bundle :nav_tourpoints %>
 <% end %>
 
+<% if !!@domain_root_account&.feature_enabled?(:top_navigation_placement) %>
+  <% js_bundle :top_navigation_tools %>
+<% end %>
+
 <%
   if k5_user?
     dashboard_title = t('Home')
@@ -62,6 +66,9 @@
     <% end %>
   <% else %>
     <div class="mobile-header-space"></div>
+  <% end %>
+  <% if !!@domain_root_account&.feature_enabled?(:top_navigation_placement) %>
+    <div id="mobile-top-nav-tools-mount-point"></div>
   <% end %>
   <% if show_blueprint_button? %>
     <button class="mobile-header-blueprint-button Button Button--icon-action-rev Button--large" aria-label="<%= t "Open Blueprint Sidebar" %>">

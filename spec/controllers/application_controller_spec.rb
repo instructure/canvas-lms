@@ -38,6 +38,7 @@ RSpec.describe ApplicationController do
         referer: nil
       )
       allow(controller).to receive(:request).and_return(request_double)
+      @controller.instance_variable_set(:@domain_root_account, Account.default)
     end
 
     describe "#google_drive_connection" do
@@ -408,6 +409,66 @@ RSpec.describe ApplicationController do
 
       it "sets DEEP_LINKING_POST_MESSAGE_ORIGIN" do
         expect(@controller.js_env[:DEEP_LINKING_POST_MESSAGE_ORIGIN]).to eq @controller.request.base_url
+      end
+
+      context "top_navigation_tools are present" do
+        let(:developer_key) { DeveloperKey.create! }
+        let(:domain) { "example.net" }
+        let(:devkey_tool) { external_tool_1_3_model(developer_key:, opts: { settings: { top_navigation: {} } }) }
+        let(:domain_tool) { external_tool_1_3_model(opts: { domain:, settings: { top_navigation: {} } }) }
+        let(:unauth_tool) { external_tool_1_3_model(opts: { settings: { top_navigation: {} } }) }
+
+        def tool_hash_for(tool)
+          {
+            id: tool.id,
+            canvas_icon_class: nil,
+            icon_url: nil,
+            base_url: domain,
+            title: "a",
+            pinned: tool.placement_pinned?(:top_navigation),
+          }
+        end
+
+        before do
+          Setting.set("top_navigation_allowed_dev_keys", developer_key.id.to_s)
+          Setting.set("top_navigation_allowed_launch_domains", domain)
+          allow(Lti::ContextToolFinder).to receive(:all_tools_for).and_return([devkey_tool, domain_tool, unauth_tool])
+          allow(controller).to receive(:polymorphic_url).and_return(domain)
+          Account.site_admin.disable_feature!(:top_navigation_placement)
+        end
+
+        it "does not populate tools" do
+          expect(@controller.js_env.keys).not_to include(:top_navigation_tools)
+        end
+
+        context "when the top_navigation placement is enabled" do
+          before do
+            Account.site_admin.enable_feature!(:top_navigation_placement)
+          end
+
+          context "lti_placement_restrictions FF on" do
+            before do
+              Account.site_admin.enable_feature!(:lti_placement_restrictions)
+            end
+
+            it "sets top_navigation_tools" do
+              expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(devkey_tool))
+              expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(domain_tool))
+            end
+          end
+
+          context "lti_placement_restrictions FF off" do
+            before do
+              Account.site_admin.disable_feature!(:lti_placement_restrictions)
+            end
+
+            it "sets top_navigation_tools" do
+              expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(devkey_tool))
+              expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(domain_tool))
+              expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(unauth_tool))
+            end
+          end
+        end
       end
 
       context "sharding" do

@@ -1,0 +1,408 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MobileTopNavigationTools renders 1`] = `
+<Menu
+  constrain="window"
+  defaultShow={false}
+  disabled={false}
+  key="menu"
+  label={null}
+  mountNode={null}
+  offsetX={0}
+  offsetY={0}
+  placement="bottom end"
+  shouldFocusTriggerOnClose={true}
+  shouldHideOnSelect={true}
+  trigger={
+    <IconButton
+      as="button"
+      color="secondary"
+      cursor="pointer"
+      margin="0"
+      renderIcon={[Function]}
+      screenReaderLabel="LTI Tool Menu"
+      shape="rectangle"
+      size="medium"
+      type="button"
+      withBackground={false}
+      withBorder={false}
+    />
+  }
+  withArrow={true}
+>
+  <MenuItem
+    disabled={false}
+    key="1"
+    label="Launch Tool 1"
+    onSelect={[Function]}
+    type="button"
+    value="1"
+  >
+    <Flex
+      as="span"
+      direction="row"
+      display="flex"
+      gap="small"
+      justifyItems="start"
+      withVisualDebug={false}
+      wrap="no-wrap"
+    >
+      <Img
+        alt="Tool 1"
+        display="inline-block"
+        height="1rem"
+        src="https://instructure.com"
+        withBlur={false}
+        withGrayscale={false}
+      />
+      <TruncateText
+        debounce={0}
+        ellipsis="…"
+        ignore={
+          [
+            " ",
+            ".",
+            ",",
+          ]
+        }
+        maxLines={1}
+        position="end"
+        truncate="character"
+      >
+        Tool 1
+      </TruncateText>
+    </Flex>
+  </MenuItem>
+  <MenuItem
+    disabled={false}
+    key="2"
+    label="Launch Tool 2"
+    onSelect={[Function]}
+    type="button"
+    value="2"
+  >
+    <Flex
+      as="span"
+      direction="row"
+      display="flex"
+      gap="small"
+      justifyItems="start"
+      withVisualDebug={false}
+      wrap="no-wrap"
+    >
+      <Img
+        alt="Tool 2"
+        display="inline-block"
+        height="1rem"
+        src="https://instructure.com"
+        withBlur={false}
+        withGrayscale={false}
+      />
+      <TruncateText
+        debounce={0}
+        ellipsis="…"
+        ignore={
+          [
+            " ",
+            ".",
+            ",",
+          ]
+        }
+        maxLines={1}
+        position="end"
+        truncate="character"
+      >
+        Tool 2
+      </TruncateText>
+    </Flex>
+  </MenuItem>
+</Menu>
+`;
+
+exports[`TopNavigationTools renders 1`] = `
+<Flex
+  as="div"
+  direct="row"
+  direction="row"
+  display="flex"
+  gap="small"
+  justifyItems="start"
+  marginEnd="small"
+  marginStart="small"
+  withVisualDebug={false}
+  wrap="no-wrap"
+>
+  <Item
+    as="span"
+    key="1"
+    shouldGrow={false}
+    shouldShrink={false}
+  >
+    <Button
+      as="button"
+      color="secondary"
+      cursor="pointer"
+      data-tool-id="1"
+      display="inline-block"
+      margin="0"
+      onClick={[Function]}
+      renderIcon={
+        <Img
+          alt="Tool 1"
+          display="inline-block"
+          height="1rem"
+          src="https://instructure.com"
+          withBlur={false}
+          withGrayscale={false}
+        />
+      }
+      size="medium"
+      textAlign="center"
+      type="button"
+      withBackground={true}
+    >
+      <TruncateText
+        debounce={0}
+        ellipsis="…"
+        ignore={
+          [
+            " ",
+            ".",
+            ",",
+          ]
+        }
+        maxLines={1}
+        position="end"
+        truncate="character"
+      >
+        Tool 1
+      </TruncateText>
+    </Button>
+  </Item>
+  <Item
+    as="span"
+    shouldGrow={false}
+    shouldShrink={false}
+  >
+    <Menu
+      constrain="window"
+      defaultShow={false}
+      disabled={false}
+      key="menu"
+      label={null}
+      mountNode={null}
+      offsetX={0}
+      offsetY={0}
+      placement="bottom end"
+      shouldFocusTriggerOnClose={true}
+      shouldHideOnSelect={true}
+      trigger={
+        <Button
+          as="button"
+          color="secondary"
+          cursor="pointer"
+          display="inline-block"
+          margin="0"
+          renderIcon={[Function]}
+          size="medium"
+          textAlign="center"
+          type="button"
+          withBackground={true}
+        />
+      }
+      withArrow={true}
+    >
+      <MenuItem
+        disabled={false}
+        key="2"
+        label="Launch Tool 2"
+        onSelect={[Function]}
+        type="button"
+        value="2"
+      >
+        <Flex
+          as="span"
+          direction="row"
+          display="flex"
+          gap="small"
+          justifyItems="start"
+          withVisualDebug={false}
+          wrap="no-wrap"
+        >
+          <IconLtiLine
+            alt="Tool 2"
+          />
+          <TruncateText
+            debounce={0}
+            ellipsis="…"
+            ignore={
+              [
+                " ",
+                ".",
+                ",",
+              ]
+            }
+            maxLines={1}
+            position="end"
+            truncate="character"
+          >
+            Tool 2
+          </TruncateText>
+        </Flex>
+      </MenuItem>
+    </Menu>
+  </Item>
+</Flex>
+`;
+
+exports[`TopNavigationTools renders with no pinned tools 1`] = `
+<Flex
+  as="div"
+  direct="row"
+  direction="row"
+  display="flex"
+  gap="small"
+  justifyItems="start"
+  marginEnd="small"
+  marginStart="small"
+  withVisualDebug={false}
+  wrap="no-wrap"
+>
+  <Item
+    as="span"
+    shouldGrow={false}
+    shouldShrink={false}
+  >
+    <Menu
+      constrain="window"
+      defaultShow={false}
+      disabled={false}
+      key="menu"
+      label={null}
+      mountNode={null}
+      offsetX={0}
+      offsetY={0}
+      placement="bottom end"
+      shouldFocusTriggerOnClose={true}
+      shouldHideOnSelect={true}
+      trigger={
+        <Button
+          as="button"
+          color="secondary"
+          cursor="pointer"
+          display="inline-block"
+          margin="0"
+          renderIcon={[Function]}
+          size="medium"
+          textAlign="center"
+          type="button"
+          withBackground={true}
+        />
+      }
+      withArrow={true}
+    >
+      <MenuItem
+        disabled={false}
+        key="1"
+        label="Launch Tool 1"
+        onSelect={[Function]}
+        type="button"
+        value="1"
+      >
+        <Flex
+          as="span"
+          direction="row"
+          display="flex"
+          gap="small"
+          justifyItems="start"
+          withVisualDebug={false}
+          wrap="no-wrap"
+        >
+          <Img
+            alt="Tool 1"
+            display="inline-block"
+            height="1rem"
+            src="https://instructure.com"
+            withBlur={false}
+            withGrayscale={false}
+          />
+          <TruncateText
+            debounce={0}
+            ellipsis="…"
+            ignore={
+              [
+                " ",
+                ".",
+                ",",
+              ]
+            }
+            maxLines={1}
+            position="end"
+            truncate="character"
+          >
+            Tool 1
+          </TruncateText>
+        </Flex>
+      </MenuItem>
+      <MenuItem
+        disabled={false}
+        key="2"
+        label="Launch Tool 2"
+        onSelect={[Function]}
+        type="button"
+        value="2"
+      >
+        <Flex
+          as="span"
+          direction="row"
+          display="flex"
+          gap="small"
+          justifyItems="start"
+          withVisualDebug={false}
+          wrap="no-wrap"
+        >
+          <Img
+            alt="Tool 2"
+            display="inline-block"
+            height="1rem"
+            src="https://instructure.com"
+            withBlur={false}
+            withGrayscale={false}
+          />
+          <TruncateText
+            debounce={0}
+            ellipsis="…"
+            ignore={
+              [
+                " ",
+                ".",
+                ",",
+              ]
+            }
+            maxLines={1}
+            position="end"
+            truncate="character"
+          >
+            Tool 2
+          </TruncateText>
+        </Flex>
+      </MenuItem>
+    </Menu>
+  </Item>
+</Flex>
+`;
+
+exports[`TopNavigationTools renders with no tools 1`] = `
+<Flex
+  as="div"
+  direct="row"
+  direction="row"
+  display="flex"
+  gap="small"
+  justifyItems="start"
+  marginEnd="small"
+  marginStart="small"
+  withVisualDebug={false}
+  wrap="no-wrap"
+/>
+`;
