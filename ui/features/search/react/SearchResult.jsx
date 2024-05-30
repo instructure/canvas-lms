@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import {Text} from '@instructure/ui-text'
 import {IconButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
-import {ProgressBar} from '@instructure/ui-progress'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
@@ -63,13 +62,69 @@ const icon_class = content_type => {
   }
 }
 
-export default function SearchResult({onExplain, onLike, onDislike, result}) {
+export default function SearchResult({onExplain, onLike, onDislike, result, searchTerm}) {
   const {body, content_id, content_type, relevance, html_url, readable_type, title} = result
 
+  const getHighlightedSegment = (searchTerm, text, maxTokens) => {
+    // Split the searchTerm into tokens
+    const searchTerms = searchTerm.split(' ');
+
+    // Filter out single character search terms
+    const validSearchTerms = searchTerms.filter(term => term.length > 1);
+
+    // Escape each searchTerm and join them with '|'
+    const escapedSearchTerms = validSearchTerms.map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+
+    // Create a RegExp that matches any of the searchTerms
+    // TODO: prefix this regex with a word boundry \\b to avoid substrings
+    // or figure out a way to remove stop words from the search terms
+    const searchExpression = new RegExp(`(${escapedSearchTerms})`, 'gi');
+
+    // Remove HTML tags and split the text into words
+    const words = text.replace(/<[^>]*>/gm, '').split(' ');
+
+    // Calculate the concentration of highlight words in each segment of maxTokens words
+    let segmentIndex = 0;
+    let truncatedText = text;
+    if(words.length > maxTokens) {
+      const segments = [];
+      for (let i = 0; i < words.length; i += maxTokens) {
+        const segment = words.slice(i, i + maxTokens)
+        const highlightCount = segment.filter(word => searchExpression.test(word)).length
+        const concentration = highlightCount / segment.length;
+        segments.push({ segment, concentration, segmentIndex: i / maxTokens })
+      }
+
+      // Keep the segment with the highest concentration
+      let segmentRecord = segments.sort((a, b) => b.concentration - a.concentration)[0]
+
+      // Join the words back into a string and add ellipses if the segment is not the first or last
+      truncatedText = segmentRecord.segment.join(' ')
+      segmentIndex = segmentRecord.segmentIndex
+      if(segmentIndex > 0) {
+        truncatedText = '...' + truncatedText
+      }
+      if(segmentIndex < segments.length - 1) {
+        truncatedText += '...'
+      }
+    }
+
+    return { truncatedText, searchExpression };
+  }
+
+  const addSearchHighlighting = (searchTerm, text) => {
+    const maxTokens = 128
+    const { truncatedText, searchExpression } = getHighlightedSegment(searchTerm, text, maxTokens)
+
+    return truncatedText.replace(
+      searchExpression,
+      '<span data-testid="highlighted-search-item" style="background-color: rgba(0,142,226,0.2); border-radius: .25rem; padding-bottom: 3px; padding-top: 1px;">$1</span>'
+    )
+  }
   return (
     <View as="li" borderColor="primary" borderWidth="small 0 0 0" padding="medium 0">
       <Flex alignItems="start" as="div" gap="large" justifyItems="space-between">
-        <Flex.Item shouldShrink={true} size="60%">
+        <Flex.Item shouldShrink={true} size="85%">
           <Heading as="h2" level="h3">
             {title}
           </Heading>
@@ -84,25 +139,17 @@ export default function SearchResult({onExplain, onLike, onDislike, result}) {
           >
             {readable_type}
           </Link>
-
-          <Text as="p" size="small">
-            {preview(body)}
-          </Text>
+          <Text
+            as="p"
+            size="small"
+            dangerouslySetInnerHTML={{
+              __html: addSearchHighlighting(searchTerm, body),
+            }}
+          />
         </Flex.Item>
         <Flex.Item shouldShrink={true}>
           <Flex gap="small">
             <Flex.Item as="div">
-              <Text size="small" weight="bold">
-                {I18n.t('%{percent}% Relevance', {percent: relevance})}
-              </Text>
-              <ProgressBar
-                meterColor="success"
-                size="x-small"
-                screenReaderLabel={I18n.t('Relevance')}
-                valueNow={relevance}
-                valueMax={100}
-                width="150px"
-              />
               <span className="hidden">
                 <Text size="small">
                   <Link

@@ -231,6 +231,7 @@ export default function SearchApp() {
             onExplain={onExplain}
             onLike={onLike}
             searchResults={searchResults}
+            searchTerm={previousSearch}
           />
         </View>
       )}
