@@ -2753,7 +2753,7 @@ uk:
       no_points: Ні
       no_submission: Нічого
       points: Бали
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: "Типи файлів"
       submitting: Підтвердження
       turnitin: Turnitin
@@ -6626,7 +6626,7 @@ uk:
       mark_all_as_unread: "Позначити все як Непрочитане"
       retrieved_from_feed: "Витягнуто з %{feed}"
       show_rubric: "Показати рубрику"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: "Неможливо скасувати публікацію, якщо наявні відповіді студентів"
       topic: Тема
@@ -14370,7 +14370,7 @@ uk:
           quiz_instructions: "Інструкція контрольної роботи"
           quiz_score: Оцінка
       quiz_edit_header: 
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           few: "Ще %{count}доступних спроб"
@@ -14500,7 +14500,7 @@ uk:
           one: "Цю контрольну роботу було переоцінено; це вплинуло на ваш бал."
           other: "Цю контрольну роботу було переоцінено; ваш новий бал враховує %{count} питань, які зазнали впливу."
         quiz_regraded_your_score_not_affected: "Цю контрольну роботу було переоцінено; ваш рахунок не зазнав впливу."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           few: "Поки що подало%{count} студенти"
           many: "Поки що подало%{count} студентів"
@@ -16826,7 +16826,7 @@ uk:
       see_vericite_results: "Побачити результати VeriCite "
       sent_to_whole_group: "Надіслати коментар всій групі"
       show_rubric: "Показати рубрику"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "Оцінки недоступні, тому що інструктор ще працює над ними."
       submission_details: "Детальна інформація про відправлення"
       submitted_at: "відправлено: %{submit_date}"
