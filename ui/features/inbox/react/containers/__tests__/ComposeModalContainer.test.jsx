@@ -84,7 +84,7 @@ describe('ComposeModalContainer', () => {
     conversation,
     selectedIds = ['1'],
     isSubmissionCommentsType = false,
-    inboxSignatureBlock = false
+    inboxSignatureBlock = false,
   } = {}) =>
     render(
       <ApolloProvider client={mswClient}>
@@ -516,10 +516,8 @@ describe('ComposeModalContainer', () => {
 
   describe('Inbox Settings Loader', () => {
     it('shows loader when Inbox Signature Block Setting is enabled', async () => {
-      const {getByText} = setup({inboxSignatureBlock: true})
-      await waitFor(() => {
-        expect(getByText('Loading Inbox Settings')).toBeInTheDocument()
-      })
+      const {findAllByText} = setup({inboxSignatureBlock: true})
+      expect((await findAllByText('Loading Inbox Settings')).length).toBe(2)
     })
   })
 })

@@ -16,36 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { AlertManagerContext } from '@canvas/alerts/react/AlertManager'
-import { ComposeActionButtons } from '../../components/ComposeActionButtons/ComposeActionButtons'
-import { Conversation } from '../../../graphql/Conversation'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {ComposeActionButtons} from '../../components/ComposeActionButtons/ComposeActionButtons'
+import {Conversation} from '../../../graphql/Conversation'
 import HeaderInputs from './HeaderInputs'
-import { useScope as useI18nScope } from '@canvas/i18n'
-import { Modal } from '@instructure/ui-modal'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import {Modal} from '@instructure/ui-modal'
 import ModalBody from './ModalBody'
 import ModalHeader from './ModalHeader'
 import ModalSpinner from './ModalSpinner'
 import PropTypes from 'prop-types'
-import React, { useContext, useState, useEffect, useCallback } from 'react'
-import { Responsive } from '@instructure/ui-responsive'
-import { responsiveQuerySizes } from '../../../util/utils'
-import { uploadFiles } from '@canvas/upload-file'
+import React, {useContext, useState, useEffect} from 'react'
+import {Responsive} from '@instructure/ui-responsive'
+import {responsiveQuerySizes} from '../../../util/utils'
+import {uploadFiles} from '@canvas/upload-file'
 import UploadMedia from '@instructure/canvas-media'
 import {
   UploadMediaStrings,
   MediaCaptureStrings,
   SelectStrings,
 } from '@canvas/upload-media-translations'
-import { ConversationContext } from '../../../util/constants'
-import { useLazyQuery, useQuery } from 'react-apollo'
-import { RECIPIENTS_OBSERVERS_QUERY, INBOX_SETTINGS_QUERY } from '../../../graphql/Queries'
-import { ModalBodyContext } from '../../utils/constants'
-import { translateMessage, handleTranslatedModalBody } from '../../utils/inbox_translator'
+import {ConversationContext} from '../../../util/constants'
+import {useLazyQuery, useQuery} from 'react-apollo'
+import {RECIPIENTS_OBSERVERS_QUERY, INBOX_SETTINGS_QUERY} from '../../../graphql/Queries'
+import {ModalBodyContext} from '../../utils/constants'
+import {translateMessage, handleTranslatedModalBody} from '../../utils/inbox_translator'
 
 const I18n = useI18nScope('conversations_2')
 
 const ComposeModalContainer = props => {
-  const { setOnFailure, setOnSuccess } = useContext(AlertManagerContext)
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
 
   const [attachments, setAttachments] = useState([])
   const [attachmentsToUpload, setAttachmentsToUpload] = useState([])
@@ -61,12 +61,12 @@ const ComposeModalContainer = props => {
   const [mediaUploadOpen, setMediaUploadOpen] = useState(false)
   const [uploadingMediaFile, setUploadingMediaFile] = useState(false)
   const [mediaUploadFile, setMediaUploadFile] = useState(null)
-  const { isSubmissionCommentsType } = useContext(ConversationContext)
+  const {isSubmissionCommentsType} = useContext(ConversationContext)
   const [loadingObservers, setLoadingObservers] = useState(false)
   const [includeObserversMessages, setIncludeObserversMessages] = useState(null)
   const [activeSignature, setActiveSignature] = useState()
 
-  const { loading: inboxSettingsLoading } = useQuery(INBOX_SETTINGS_QUERY, {
+  const {loading: inboxSettingsLoading} = useQuery(INBOX_SETTINGS_QUERY, {
     onCompleted: data => {
       let signature
       if (data?.myInboxSettings?.useSignature) {
@@ -78,7 +78,7 @@ const ComposeModalContainer = props => {
       setOnFailure(I18n.t('There was an error while loading inbox settings'))
       dismiss()
     },
-    skip: !props.inboxSignatureBlock || !props.open
+    skip: !props.inboxSignatureBlock || !props.open,
   })
   // Translation features
   const [translating, setTranslating] = useState(false)
@@ -219,14 +219,14 @@ const ComposeModalContainer = props => {
     }
 
     const newAttachmentsToUpload = files.map((file, i) => {
-      return { isLoading: true, id: file.url ? `${i}-${file.url}` : `${i}-${file.name}` }
+      return {isLoading: true, id: file.url ? `${i}-${file.url}` : `${i}-${file.name}`}
     })
 
     setAttachmentsToUpload(prev => prev.concat(newAttachmentsToUpload))
     setOnSuccess(I18n.t('Uploading files'))
 
     try {
-      const newFiles = await uploadFiles(files, '/files/pending', { conversations: true })
+      const newFiles = await uploadFiles(files, '/files/pending', {conversations: true})
       setAttachments(prev => prev.concat(newFiles))
     } catch (err) {
       setOnFailure(I18n.t('Error uploading files'))
@@ -279,7 +279,7 @@ const ComposeModalContainer = props => {
   }, [props.maxGroupRecipientsMet])
 
   /** TRANSLATION CODE */
-  const translateBody = (isPrimary) => {
+  const translateBody = isPrimary => {
     setTranslating(true)
     translateMessage({
       subject: subject,
@@ -287,10 +287,10 @@ const ComposeModalContainer = props => {
       signature: activeSignature,
       srcLang: 'en',
       tgtLang: translationTargetLanguage,
-      callback: (translatedText) => {
+      callback: translatedText => {
         handleTranslatedModalBody(translatedText, isPrimary, activeSignature, setBody)
         setTranslating(false)
-      }
+      },
     })
   }
   /**  END TRANSLATION CODE */
@@ -300,7 +300,7 @@ const ComposeModalContainer = props => {
       setCourseMessages([])
     }
     props.onSelectedIdsChange([])
-    setSelectedContext({ contextID: context.contextID, contextName: context.contextName })
+    setSelectedContext({contextID: context.contextID, contextName: context.contextName})
   }
 
   const validMessageFields = () => {
@@ -309,7 +309,7 @@ const ComposeModalContainer = props => {
 
     if (!body) {
       const errorMessage = I18n.t('Please insert a message body.')
-      setBodyMessages([{ text: errorMessage, type: 'error' }])
+      setBodyMessages([{text: errorMessage, type: 'error'}])
       errors.push(errorMessage) // Add error message to the array
       isValid = false
     }
@@ -317,12 +317,12 @@ const ComposeModalContainer = props => {
     if (!isSubmissionCommentsType) {
       if (addressBookInputValue !== '') {
         const errorMessage = I18n.t('No matches found. Please insert a valid recipient.')
-        setAddressBookMessages([{ text: errorMessage, type: 'error' }])
+        setAddressBookMessages([{text: errorMessage, type: 'error'}])
         errors.push(errorMessage) // Add error message to the array
         isValid = false
       } else if (props.selectedIds.length === 0) {
         const errorMessage = I18n.t('Please select a recipient.')
-        setAddressBookMessages([{ text: errorMessage, type: 'error' }])
+        setAddressBookMessages([{text: errorMessage, type: 'error'}])
         errors.push(errorMessage) // Add error message to the array
         isValid = false
       }
@@ -334,7 +334,7 @@ const ComposeModalContainer = props => {
         (!selectedContext || !selectedContext?.contextID)
       ) {
         const errorMessage = I18n.t('Please select a course')
-        setCourseMessages([{ text: errorMessage, type: 'error' }])
+        setCourseMessages([{text: errorMessage, type: 'error'}])
         errors.push(errorMessage) // Add error message to the array
         isValid = false
       }
@@ -446,14 +446,17 @@ const ComposeModalContainer = props => {
     setTranslationTargetLanguage,
     messagePosition,
     setMessagePosition,
-    translateBody
+    translateBody,
   }
+
+  const shouldShowModalSpinner =
+    props.sendingMessage && !attachmentsToUpload.length && !uploadingMediaFile
 
   return (
     <>
       <Responsive
         match="media"
-        query={responsiveQuerySizes({ mobile: true, desktop: true })}
+        query={responsiveQuerySizes({mobile: true, desktop: true})}
         props={{
           mobile: {
             modalSize: 'fullscreen',
@@ -550,8 +553,8 @@ const ComposeModalContainer = props => {
         onUploadComplete={onMediaUploadComplete}
         onDismiss={() => setMediaUploadOpen(false)}
         open={mediaUploadOpen}
-        tabs={{ embed: false, record: true, upload: true }}
-        uploadMediaTranslations={{ UploadMediaStrings, MediaCaptureStrings, SelectStrings }}
+        tabs={{embed: false, record: true, upload: true}}
+        uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings, SelectStrings}}
         liveRegion={() => document.getElementById('flash_screenreader_holder')}
         rcsConfig={{
           contextId: ENV.current_user_id,
@@ -559,11 +562,10 @@ const ComposeModalContainer = props => {
         }}
         userLocale={ENV.LOCALE}
       />
-      <ModalSpinner
-        label={I18n.t('Sending Message')}
-        message={I18n.t('Sending Message')}
-        open={props.sendingMessage && !attachmentsToUpload.length && !uploadingMediaFile}
-      />
+
+      {shouldShowModalSpinner && (
+        <ModalSpinner label={I18n.t('Sending Message')} message={I18n.t('Sending Message')} />
+      )}
       <ModalSpinner
         label={I18n.t('Uploading Files')}
         message={I18n.t('Please wait while we upload attachments and media')}
@@ -596,5 +598,5 @@ ComposeModalContainer.propTypes = {
   modalError: PropTypes.string,
   isPrivateConversation: PropTypes.bool,
   currentCourseFilter: PropTypes.string,
-  inboxSignatureBlock: PropTypes.bool
+  inboxSignatureBlock: PropTypes.bool,
 }

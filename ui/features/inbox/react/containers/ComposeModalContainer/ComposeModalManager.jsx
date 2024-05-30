@@ -233,11 +233,8 @@ const ComposeModalManager = props => {
     const success = errorMessage ? false : !!data
 
     if (success) {
-      // before we do anything, let's allow some time for any ModalSpinner to truly go away
-      setTimeout(() => {
-        props.onDismiss()
-        setOnSuccess(I18n.t('Message sent!'), false)
-      }, 500)
+      props.onDismiss()
+      setOnSuccess(I18n.t('Message sent!'), false)
     } else {
       if (errorMessage && errorMessage[0]?.message) {
         setModalError(errorMessage[0].message)
@@ -378,7 +375,7 @@ ComposeModalManager.propTypes = {
   contextIdFromUrl: PropTypes.string,
   maxGroupRecipientsMet: PropTypes.bool,
   currentCourseFilter: PropTypes.string,
-  inboxSignatureBlock: PropTypes.bool
+  inboxSignatureBlock: PropTypes.bool,
 }
 
 export default ComposeModalManager
