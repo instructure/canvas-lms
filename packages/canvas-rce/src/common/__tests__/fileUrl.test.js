@@ -16,14 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ok, strictEqual} from 'assert'
 import {
   absoluteToRelativeUrl,
   downloadToWrap,
   fixupFileUrl,
   prepEmbedSrc,
   prepLinkedSrc,
-} from '../../src/common/fileUrl'
+} from '../fileUrl'
 
 describe('Common file url utils', () => {
   describe('absoluteToRelativeUrl', () => {
@@ -31,24 +30,21 @@ describe('Common file url utils', () => {
 
     it('turns an absolute URL into a relative URL', () => {
       const absoluteUrl = 'https://mycanvas.com:3000/some/path/download?download_frd=1#hash_thing'
-      strictEqual(
-        absoluteToRelativeUrl(absoluteUrl, canvasOrigin),
+      expect(absoluteToRelativeUrl(absoluteUrl, canvasOrigin)).toEqual(
         '/some/path/download?download_frd=1#hash_thing'
       )
     })
 
     it('leaves a relative URL as is', () => {
       const relativeUrl = '/some/path/download?download_frd=1#hash_thing'
-      strictEqual(
-        absoluteToRelativeUrl(relativeUrl, canvasOrigin),
+      expect(absoluteToRelativeUrl(relativeUrl, canvasOrigin)).toEqual(
         '/some/path/download?download_frd=1#hash_thing'
       )
     })
 
     it('leaves non-Canvas absolute URLs as absolute', () => {
       const absoluteUrl = 'https://yodawg.com:3001/some/path/download?download_frd=1#hash_thing'
-      strictEqual(
-        absoluteToRelativeUrl(absoluteUrl, canvasOrigin),
+      expect(absoluteToRelativeUrl(absoluteUrl, canvasOrigin)).toEqual(
         'https://yodawg.com:3001/some/path/download?download_frd=1#hash_thing'
       )
     })
@@ -63,35 +59,35 @@ describe('Common file url utils', () => {
     })
 
     it('removes download_frd from the query params', () => {
-      ok(!/download_frd/.test(url))
+      expect(/download_frd/.test(url)).toBeFalsy()
     })
 
     it('adds wrap=1 to the query params', () => {
-      ok(/wrap=1/.test(url))
+      expect(/wrap=1/.test(url)).toBeTruthy()
     })
 
     it('returns null if url is null', () => {
-      strictEqual(downloadToWrap(null), null)
+      expect(downloadToWrap(null)).toBeNull()
     })
 
     it('returns undefined if url is undefined', () => {
-      strictEqual(downloadToWrap(undefined), undefined)
+      expect(downloadToWrap(undefined)).toBeUndefined()
     })
 
     it('returns empty string for empty strings', () => {
-      strictEqual(downloadToWrap(''), '')
+      expect(downloadToWrap('')).toEqual('')
     })
 
     it('skips swizzling the url if from a different host', () => {
       const testurl = 'http://instructure.com/some/path'
       url = downloadToWrap(testurl)
-      strictEqual(url, testurl)
+      expect(url).toEqual(testurl)
     })
 
     it('strips "preview" too', () => {
       const testurl = '/some/path/preview'
       url = downloadToWrap(testurl)
-      strictEqual(url, '/some/path?wrap=1')
+      expect(url).toEqual('/some/path?wrap=1')
     })
   })
 
@@ -109,25 +105,27 @@ describe('Common file url utils', () => {
       it('skips swizzling the url if from a different host', () => {
         fileInfo.href = 'http://instructure.com/some/path'
         const result = fixupFileUrl('course', 2, fileInfo)
-        strictEqual(result.href, fileInfo.href)
+        expect(result.href).toEqual(fileInfo.href)
       })
 
       it('transforms urls if from the specified canvas origin', () => {
         fileInfo.href = 'http://instructure.com/files/17/download?download_frd=1'
         const result = fixupFileUrl('course', 2, fileInfo, 'http://instructure.com')
-        strictEqual(result.href, 'http://instructure.com/courses/2/files/17?wrap=1')
+        expect(result.href).toEqual(
+          'http://instructure.com/courses/2/files/17?wrap=1'
+        )
       })
 
       it('transforms course file urls', () => {
         // removes download_frd and adds wrap
         const result = fixupFileUrl('course', 2, fileInfo)
-        strictEqual(result.href, '/courses/2/files/17?wrap=1')
+        expect(result.href).toEqual('/courses/2/files/17?wrap=1')
       })
 
       it('adds the verifier to user files', () => {
         // while removing download_frd
         const result = fixupFileUrl('user', 2, fileInfo)
-        strictEqual(result.href, '/users/2/files/17?wrap=1&verifier=xyzzy')
+        expect(result.href).toEqual('/users/2/files/17?wrap=1&verifier=xyzzy')
       })
     })
 
@@ -142,19 +140,19 @@ describe('Common file url utils', () => {
       it('skips transforming the url if from a different host', () => {
         fileInfo.url = 'http://instructure.com/some/path'
         const result = fixupFileUrl('course', 2, fileInfo)
-        strictEqual(result.url, fileInfo.url)
+        expect(result.url).toEqual(fileInfo.url)
       })
 
       it('transforms course file urls', () => {
         // removes download_frd and adds wrap
         const result = fixupFileUrl('course', 2, fileInfo)
-        strictEqual(result.url, '/courses/2/files/17?wrap=1')
+        expect(result.url).toEqual('/courses/2/files/17?wrap=1')
       })
 
       it('adds the verifier to user files', () => {
         // while removing download_frd and does not add wrap
         const result = fixupFileUrl('user', 2, fileInfo)
-        strictEqual(result.url, '/users/2/files/17?wrap=1&verifier=xyzzy')
+        expect(result.url).toEqual('/users/2/files/17?wrap=1&verifier=xyzzy')
       })
     })
   })
@@ -163,33 +161,33 @@ describe('Common file url utils', () => {
     it('skips transforming the url if from a different host', () => {
       const url = 'http://instructure.com/some/path'
       const result = prepEmbedSrc(url)
-      strictEqual(result, url)
+      expect(result).toEqual(url)
     })
 
     it('transforms the url if from the current canvas host', () => {
       const url = 'http://instructure.com/some/path'
       const result = prepEmbedSrc(url, 'http://instructure.com')
-      strictEqual(result, 'http://instructure.com/some/path/preview')
+      expect(result).toEqual('http://instructure.com/some/path/preview')
     })
 
     it('replaces /download?some_params with /preview?some_params', () => {
       const url = '/users/2/files/17/download?verifier=xyzzy'
-      strictEqual(prepEmbedSrc(url), '/users/2/files/17/preview?verifier=xyzzy')
+      expect(prepEmbedSrc(url)).toEqual('/users/2/files/17/preview?verifier=xyzzy')
     })
 
     it('replaces /download and no params with /preview ', () => {
       const url = '/users/2/files/17/download'
-      strictEqual(prepEmbedSrc(url), '/users/2/files/17/preview')
+      expect(prepEmbedSrc(url)).toEqual('/users/2/files/17/preview')
     })
 
     it('does not mess with a /preview URL', () => {
       const url = '/users/2/files/17/preview'
-      strictEqual(prepEmbedSrc(url), '/users/2/files/17/preview')
+      expect(prepEmbedSrc(url)).toEqual('/users/2/files/17/preview')
     })
 
     it('does not indiscriminately replace /preview in a url', () => {
       const url = '/please/preview/me'
-      strictEqual(prepEmbedSrc(url), '/please/preview/me/preview')
+      expect(prepEmbedSrc(url)).toEqual('/please/preview/me/preview')
     })
   })
 
@@ -197,17 +195,17 @@ describe('Common file url utils', () => {
     it('skips transforming the url if from a different host', () => {
       const url = 'http://instructure.com/some/path'
       const result = prepLinkedSrc(url)
-      strictEqual(url, result)
+      expect(url).toEqual(result)
     })
 
     it('removes /preview', () => {
       const url = '/users/2/files/17/preview?verifier=xyzzy'
-      strictEqual(prepLinkedSrc(url), '/users/2/files/17?verifier=xyzzy')
+      expect(prepLinkedSrc(url)).toEqual('/users/2/files/17?verifier=xyzzy')
     })
 
     it('does not indiscriminately replace /download in a url', () => {
       const url = '/please/download/me'
-      strictEqual(prepLinkedSrc(url), url)
+      expect(prepLinkedSrc(url)).toEqual(url)
     })
   })
 })
