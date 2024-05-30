@@ -23,11 +23,11 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Tabs} from '@instructure/ui-tabs'
-import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
-import {DynamicRegistrationModal} from '../manage/dynamic_registration/DynamicRegistrationModal'
-import {useDynamicRegistrationState} from '../manage/dynamic_registration/DynamicRegistrationState'
+import {openRegistrationWizard} from '../manage/registration_wizard/RegistrationWizardModalState'
+import {RegistrationWizardModal} from '../manage/registration_wizard/RegistrationWizardModal'
+import {ZAccountId} from '../manage/model/AccountId'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -44,9 +44,18 @@ export const LtiAppsLayout = React.memo(() => {
 
   const queryClient = new QueryClient()
 
-  const contextId = window.location.pathname.split('/')[2]
+  const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
 
-  const state = useDynamicRegistrationState(s => s)
+  const open = React.useCallback(() => {
+    openRegistrationWizard({
+      dynamicRegistrationUrl: '',
+      lti_version: '1p3',
+      method: 'dynamic_registration',
+      registering: false,
+      progress: 0,
+      progressMax: 100,
+    })
+  }, [])
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -56,13 +65,13 @@ export const LtiAppsLayout = React.memo(() => {
         </Flex.Item>
         {isManage ? (
           <Flex.Item>
-            <Button color="primary" onClick={() => state.open()}>
+            <Button color="primary" onClick={open}>
               {I18n.t('Install a New Extension')}
             </Button>
           </Flex.Item>
         ) : null}
       </Flex>
-      <DynamicRegistrationModal contextId={contextId} />
+      <RegistrationWizardModal accountId={accountId} />
       <Tabs margin="medium auto" padding="medium" onRequestTabChange={onTabClick}>
         {window.ENV.FEATURES.lti_registrations_discover_page && (
           <Tabs.Panel

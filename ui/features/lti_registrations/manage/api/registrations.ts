@@ -17,7 +17,7 @@
  */
 
 import {ZLtiRegistration, type LtiRegistration} from '../model/LtiRegistration'
-import {success, error, type ApiResult} from './ApiResult'
+import {success, apiParseError, type ApiResult} from '../../common/lib/apiResult/ApiResult'
 import {ZPaginatedList, type PaginatedList} from './PaginatedList'
 import {type LtiRegistrationId} from '../model/LtiRegistrationId'
 import {mockFetchSampleLtiRegistrations, mockDeleteRegistration} from './sampleLtiRegistrations'
@@ -47,7 +47,7 @@ export const fetchRegistrations: FetchRegistrations = options => {
     .then(result => {
       return result.success
         ? success(result.data)
-        : error(result.error.errors.map(e => e.message).join('\n\n'))
+        : apiParseError(result.error.errors.map(e => e.message).join('\n\n'))
     })
 }
 

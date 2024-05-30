@@ -100,11 +100,12 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
     async (app: LtiRegistration) => {
       if (await confirmDeletion(app)) {
         const deleteResult = await deleteRegistration(app)
+        const type = deleteResult._type === 'success' ? 'success' : 'error'
         showFlashAlert({
-          type: deleteResult._type,
+          type,
           message:
-            deleteResult._type === 'error'
-              ? deleteResult.message
+            deleteResult._type === 'success'
+              ? I18n.t('There was an error deleting “%{appName}”', {appName: app.name})
               : I18n.t('App “%{appName}” successfully deleted', {appName: app.name}),
         })
       }

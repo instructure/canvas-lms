@@ -15,20 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import type {LtiPlacement} from '../../model/LtiPlacements'
-import type {LtiRegistration} from '../../model/LtiRegistration'
-import createStore from 'zustand/vanilla'
-import type {LtiScope} from '../../model/LtiScopes'
+import createStore, {type StoreApi} from 'zustand/vanilla'
 import {subscribeWithSelector} from 'zustand/middleware'
-import type {LtiPrivacyLevel} from 'features/developer_keys_v2/model/LtiPrivacyLevel'
-import type {
-  Configuration,
-  PlacementConfig,
-} from 'features/developer_keys_v2/model/api/LtiToolConfiguration'
-
-export interface RegistrationOverlayStore extends RegistrationOverlayActions {
-  state: RegistrationOverlayState
-}
+import type {RegistrationOverlay} from '../../model/RegistrationOverlay'
+import type {LtiScope} from '../../model/LtiScope'
+import type {LtiPlacement} from '../../model/LtiPlacement'
+import type {LtiPlacementOverlay} from '../../model/PlacementOverlay'
+import type {LtiConfiguration} from '../../model/lti_tool_configuration/LtiConfiguration'
+import type {LtiPrivacyLevel} from '../../model/LtiPrivacyLevel'
+import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
+import type {LtiPlacementConfig} from '../../model/lti_tool_configuration/LtiPlacementConfig'
 
 interface RegistrationOverlayActions {
   updateDevKeyName: (name: string) => void
@@ -41,67 +37,13 @@ interface RegistrationOverlayActions {
   updateRegistrationLaunchWidth: (s: string) => void
   updatePlacement: (
     placement_type: LtiPlacement
-  ) => (fn: (placementOverlay: PlacementOverlay) => PlacementOverlay) => void
+  ) => (fn: (placementOverlay: LtiPlacementOverlay) => LtiPlacementOverlay) => void
   /**
    * Restore all values to their default values
    * @param configuration The configuration to apply
    */
-  resetOverlays: (configuration: Configuration) => void
+  resetOverlays: (configuration: LtiConfiguration) => void
   updatePrivacyLevel: (placement_type: LtiPrivacyLevel) => void
-}
-
-// fields explicitly not overlayable:
-// - Owner Email
-// - Redirect URIs
-// - Notes
-// - Target Link URI
-// - OIDC Connect initiation Url
-// - JWK Method
-
-// Key-level fields editable:
-// - Name
-
-// Registration-level fields not overlayable:
-// - Domain
-// - Tool Id - wut even is this
-
-// Registration-level fields overlayable:
-// - Title
-// - Description
-// - scopes :check:
-// - Subs (in place of privacy_level?) :check:
-// - Icon URL
-// - Text - wut?
-// - Launch Height/Launch Width
-
-// Placement-level fields not overlayable:
-//   - Target link uri
-//   - Message type
-
-// Placement-level fields overlayable:
-// - Enabled/disabled
-// - Icon Url
-// - Text
-// - Launch Height/Launch Width
-
-export interface RegistrationOverlay {
-  title?: string
-  disabledScopes: Array<LtiScope>
-  disabledSubs: Array<string>
-  icon_url?: string | null
-  launch_height?: string
-  launch_width?: string
-  disabledPlacements: Array<LtiPlacement>
-  placements: Array<PlacementOverlay>
-  privacy_level: LtiPrivacyLevel
-}
-
-export interface PlacementOverlay {
-  type: LtiPlacement
-  icon_url?: string
-  label?: string
-  launch_height?: string
-  launch_width?: string
 }
 
 export type RegistrationOverlayState = {
@@ -111,12 +53,14 @@ export type RegistrationOverlayState = {
 
 const updatePlacement =
   (placement_type: LtiPlacement) =>
-  (fn: (placementOverlay: PlacementOverlay) => PlacementOverlay) =>
+  (fn: (placementOverlay: LtiPlacementOverlay) => LtiPlacementOverlay) =>
     updateState(state => ({
       ...state,
       registration: {
         ...state.registration,
-        placements: state.registration.placements.map(p => (p.type === placement_type ? fn(p) : p)),
+        placements: (state.registration.placements || []).map(p =>
+          p.type === placement_type ? fn(p) : p
+        ),
       },
     }))
 
@@ -147,8 +91,15 @@ const updateRegistrationKey =
 
 const toggleString =
   <S extends string>(s: S) =>
-  (strings: Array<S>): Array<S> =>
-    strings.includes(s) ? strings.filter(x => x !== s) : [...strings, s]
+  (strings: Array<S> | undefined): Array<S> => {
+    if (typeof strings === 'undefined') {
+      return [s]
+    } else if (strings.includes(s)) {
+      return strings.filter(x => x !== s)
+    } else {
+      return [...strings, s]
+    }
+  }
 
 const updateRegistrationTitle = (s: string) => updateRegistrationKey('title')(() => s)
 const toggleDisabledScope = (scope: LtiScope) =>
@@ -162,15 +113,25 @@ const updateRegistrationLaunchHeight = (s: string) =>
   updateRegistrationKey('launch_height')(() => s)
 const updateRegistrationLaunchWidth = (s: string) => updateRegistrationKey('launch_width')(() => s)
 // const updateRegistrationPlacements = (s: string) => updateRegistrationKey('placements')(() => s)
-const resetOverlays = (configuration: Configuration) =>
+const resetOverlays = (configuration: LtiConfiguration) =>
   updateState(state =>
     initialOverlayStateFromLtiRegistration(configuration, null, state.developerKeyName)
   )
 
+export type RegistrationOverlayStore = StoreApi<
+  {
+    state: RegistrationOverlayState
+  } & RegistrationOverlayActions
+>
+
 export const createRegistrationOverlayStore = (
   developerKeyName: string | null,
-  ltiRegistration: LtiRegistration
-) =>
+  ltiRegistration: LtiImsRegistration
+): StoreApi<
+  {
+    state: RegistrationOverlayState
+  } & RegistrationOverlayActions
+> =>
   createStore<{state: RegistrationOverlayState} & RegistrationOverlayActions>(
     subscribeWithSelector(set => ({
       state: initialOverlayStateFromLtiRegistration(
@@ -193,17 +154,17 @@ export const createRegistrationOverlayStore = (
         set(state => updateRegistrationLaunchHeight(s)(state)),
       updateRegistrationLaunchWidth: (s: string) =>
         set(state => updateRegistrationLaunchWidth(s)(state)),
-      resetOverlays: (configuration: Configuration) => set(resetOverlays(configuration)),
+      resetOverlays: (configuration: LtiConfiguration) => set(resetOverlays(configuration)),
       updatePlacement:
         (placement_type: LtiPlacement) =>
-        (fn: (placementOverlay: PlacementOverlay) => PlacementOverlay) =>
+        (fn: (placementOverlay: LtiPlacementOverlay) => LtiPlacementOverlay) =>
           set(updatePlacement(placement_type)(fn)),
       updatePrivacyLevel: (privacyLevel: LtiPrivacyLevel) => set(updatePrivacyLevel(privacyLevel)),
     }))
   )
 
 const initialOverlayStateFromLtiRegistration = (
-  configuration: Configuration,
+  configuration: LtiConfiguration,
   overlay?: RegistrationOverlay | null,
   developerKeyName?: string | null
 ): RegistrationOverlayState => {
@@ -229,23 +190,20 @@ const initialOverlayStateFromLtiRegistration = (
   }
 }
 
-export const canvasPlatformSettings = (configuration: Configuration) =>
+export const canvasPlatformSettings = (configuration: LtiConfiguration) =>
   configuration.extensions?.find(e => e.platform === 'canvas.instructure.com')
 
 const placementsWithOverlay = (
-  configuration: Configuration,
+  configuration: LtiConfiguration,
   overlay?: RegistrationOverlay | null
 ) =>
   canvasPlatformSettings(configuration)?.settings.placements.flatMap(
-    initialPlacementOverlayStateFromPlacementConfig(
-      overlay?.placements || [],
-      overlay?.disabledPlacements || []
-    )
+    initialPlacementOverlayStateFromPlacementConfig(overlay?.placements || [])
   ) || []
 
 const initialPlacementOverlayStateFromPlacementConfig =
-  (placementOverlays: PlacementOverlay[] = []) =>
-  (placementConfig: PlacementConfig): PlacementOverlay => {
+  (placementOverlays: LtiPlacementOverlay[] = []) =>
+  (placementConfig: LtiPlacementConfig): LtiPlacementOverlay => {
     const placementOverlay = placementOverlays.find(pl => pl.type === placementConfig.placement)
     return {
       icon_url: placementOverlay?.icon_url || placementConfig.icon_url,

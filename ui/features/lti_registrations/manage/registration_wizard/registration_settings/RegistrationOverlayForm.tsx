@@ -28,21 +28,18 @@ import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import * as React from 'react'
 import type {StoreApi} from 'zustand'
-import {type LtiPlacement, i18nLtiPlacement} from '../../model/LtiPlacements'
-import type {LtiRegistration} from '../../model/LtiRegistration'
-import {i18nLtiScope} from '../../model/LtiScopes'
-import {
-  canvasPlatformSettings,
-  type PlacementOverlay,
-  type RegistrationOverlayStore,
-} from './RegistrationOverlayState'
+import {canvasPlatformSettings, type RegistrationOverlayStore} from './RegistrationOverlayState'
 import {RegistrationPrivacyField} from './RegistrationPrivacyField'
+import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
+import {i18nLtiScope} from '../../model/LtiScope'
+import type {LtiPlacementOverlay} from '../../model/PlacementOverlay'
+import {i18nLtiPlacement, type LtiPlacement} from '../../model/LtiPlacement'
 
 const I18n = useI18nScope('react_developer_keys')
 
 export const RegistrationOverlayForm = (props: {
-  ltiRegistration: LtiRegistration
-  store: StoreApi<RegistrationOverlayStore>
+  ltiRegistration: LtiImsRegistration
+  store: RegistrationOverlayStore
 }) => {
   const configuration = props.ltiRegistration.default_configuration
 
@@ -95,7 +92,7 @@ export const RegistrationOverlayForm = (props: {
             scopes.map(scope => (
               <Checkbox
                 key={scope}
-                checked={!state.registration.disabledScopes.includes(scope)}
+                checked={!(state.registration.disabledScopes || []).includes(scope)}
                 label={i18nLtiScope(scope)}
                 onChange={() => toggleDisabledScope(scope)}
               />
@@ -107,7 +104,7 @@ export const RegistrationOverlayForm = (props: {
       </View>
       <View margin="medium 0" as="div">
         <RegistrationPrivacyField
-          value={state.registration.privacy_level}
+          value={state.registration.privacy_level || 'public'}
           onChange={updatePrivacyLevel}
         />
       </View>
@@ -118,7 +115,7 @@ export const RegistrationOverlayForm = (props: {
           ) : null}
           {placements
             .map(placement => {
-              const placementOverlay = state.registration.placements.find(
+              const placementOverlay = (state.registration.placements || []).find(
                 p => p.type === placement.placement
               )
               if (!placementOverlay) {
@@ -128,7 +125,9 @@ export const RegistrationOverlayForm = (props: {
               }
             })
             .map(([, placementOverlay]) => {
-              const disabled = state.registration.disabledPlacements.includes(placementOverlay.type)
+              const disabled = (state.registration.disabledPlacements || []).includes(
+                placementOverlay.type
+              )
               return (
                 <div>
                   <PlacementOverlayForm
@@ -149,12 +148,12 @@ export const RegistrationOverlayForm = (props: {
 }
 
 type PlacementOverlayFormProps = {
-  placementOverlay: PlacementOverlay
+  placementOverlay: LtiPlacementOverlay
   placementDisabled: boolean
   toggleDisabledPlacement: (placementType: LtiPlacement) => void
   updatePlacement: (
     placement_type: LtiPlacement
-  ) => (fn: (placementOverlay: PlacementOverlay) => PlacementOverlay) => void
+  ) => (fn: (placementOverlay: LtiPlacementOverlay) => LtiPlacementOverlay) => void
   borders: boolean
 }
 const PlacementOverlayForm = React.memo((props: PlacementOverlayFormProps) => {
@@ -199,7 +198,7 @@ const PlacementOverlayForm = React.memo((props: PlacementOverlayFormProps) => {
                   <Grid.Col>
                     <TextInput
                       renderLabel={I18n.t('Title')}
-                      value={placementOverlay.label}
+                      value={placementOverlay.label === null ? undefined : placementOverlay.label}
                       onChange={(event, value) => {
                         updatePlacement(placementOverlay.type)(_placementOverlay => ({
                           ..._placementOverlay,
@@ -211,7 +210,9 @@ const PlacementOverlayForm = React.memo((props: PlacementOverlayFormProps) => {
                   <Grid.Col>
                     <TextInput
                       renderLabel={I18n.t('Icon URL')}
-                      value={placementOverlay.icon_url}
+                      value={
+                        placementOverlay.icon_url === null ? undefined : placementOverlay.icon_url
+                      }
                       onChange={(event, value) => {
                         updatePlacement(placementOverlay.type)(_placementOverlay => ({
                           ..._placementOverlay,

@@ -19,7 +19,7 @@
 import {z} from 'zod'
 import {ZAccountId} from './AccountId'
 import {ZLtiRegistrationId} from './LtiRegistrationId'
-import {ZDeveloperKeyId} from './DeveloperKeyId'
+import {ZDeveloperKeyId} from './developer_key/DeveloperKeyId'
 import {ZLtiRegistrationAccountBinding} from './LtiRegistrationAccountBinding'
 
 export const ZLtiRegistration = z.object({
