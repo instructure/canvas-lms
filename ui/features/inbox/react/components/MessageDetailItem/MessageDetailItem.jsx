@@ -22,7 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {MessageDetailActions} from '../MessageDetailActions/MessageDetailActions'
 import {MessageDetailParticipants} from '../MessageDetailParticipants/MessageDetailParticipants'
 import PropTypes from 'prop-types'
-import React, {useContext} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../../util/utils'
 import {IconPaperclipLine} from '@instructure/ui-icons'
@@ -33,6 +33,9 @@ import {ConversationContext} from '../../../util/constants'
 import {MediaAttachment} from '@canvas/message-attachments'
 import {formatMessage} from '@canvas/util/TextHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import { Spinner } from '@instructure/ui-spinner'
+import { translationSeparator } from '../../utils/constants'
+import { translateInboxMessage } from '../../utils/inbox_translator'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -40,6 +43,35 @@ export const MessageDetailItem = ({...props}) => {
   const createdAt = DateHelper.formatDatetimeForDisplay(props.conversationMessage.createdAt)
   const {isSubmissionCommentsType} = useContext(ConversationContext)
   const {conversationMessage: {mediaComment} = {}} = props
+  const [translatedMessage, setTranslatedMessage] = useState('')
+  const [isTranslating, setIsTranslating] = useState(false)
+  const translateInboundMessage = ENV?.inbox_translation_enabled
+
+  useEffect(() => {
+    if (translateInboundMessage == null || !translateInboundMessage) {
+      return
+    }
+
+    // We've already translated
+    if (translatedMessage !== '') {
+      return
+    }
+
+    // Should translate here, check the body for the separator.
+    // If we have the separator in the message, don't translate.
+    if (props.conversationMessage?.body.includes(translationSeparator)) {
+      return
+    }
+    
+    setIsTranslating(true)
+    // Send the translation call to the backend.
+    translateInboxMessage(props.conversationMessage?.body, (result) => {
+      if (result.translated_text) {
+        setTranslatedMessage(translationSeparator.concat(result.translated_text))
+      }
+      setIsTranslating(false)
+    })
+  }, [translatedMessage])
 
   return (
     <Responsive
@@ -115,10 +147,20 @@ export const MessageDetailItem = ({...props}) => {
               </Flex.Item>
             )}
           </Flex>
+          {isTranslating && (
+            <Flex justifyItems="start">
+              <Flex.Item>
+                <Spinner renderTitle={I18n.t('Translating')} size="x-small" />
+              </Flex.Item>
+              <Flex.Item margin="0 0 0 x-small">
+                <Text>{I18n.t('Checking for Translation')}</Text>
+              </Flex.Item>
+            </Flex>
+          )}
           <Text
             wrap="break-word"
             size={responsiveProps.messageBody}
-            dangerouslySetInnerHTML={{__html: formatMessage(props.conversationMessage?.body)}}
+            dangerouslySetInnerHTML={{__html: formatMessage(props.conversationMessage?.body.concat(translatedMessage))}}
           />
           {props.conversationMessage.attachmentsConnection?.nodes?.length > 0 && (
             <List isUnstyled={true} margin="medium auto small">

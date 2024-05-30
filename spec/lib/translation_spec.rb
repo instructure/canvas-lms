@@ -104,4 +104,16 @@ describe "Translation" do
       expect(Translation).to have_received(:create).exactly(Translation.languages.length).times
     end
   end
+
+  describe ":language_matches_user_locale?" do
+    it "does match" do
+      @user.locale = "es"
+      expect(Translation.language_matches_user_locale?(@user, "¿Dónde está el baño?")).to be_truthy
+    end
+
+    it "does not match" do
+      @user.locale = "en"
+      expect(Translation.language_matches_user_locale?(@user, "¿Dónde está el baño?")).to be_falsey
+    end
+  end
 end
