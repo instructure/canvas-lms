@@ -4454,7 +4454,7 @@ cy:
       no_points: Dim
       no_submission: "Dim byd"
       points: Pwyntiau
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       submission_types: "Mathau o Ffeiliau"
       submitting: "Wrthi'n Cyflwyno"
       turnitin: Turnitin
@@ -10223,7 +10223,7 @@ cy:
       mark_all_as_unread: "Marcio bod y cyfan heb ei ddarllen"
       retrieved_from_feed: "Wedi adfer o %{feed}"
       show_rubric: "Dangos Cyfarwyddyd Sgorio"
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       tooltips: 
         cannot_unpublish_discussion: "Does dim modd dad-gyhoeddi os oes myfyriwr wedi ateb"
       topic: Pwnc
@@ -22013,7 +22013,7 @@ cy:
           quiz_instructions: "Cyfarwyddiadau Cwis"
           quiz_score: Sgôr
       quiz_edit_header: 
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           many: "%{count} ymgais arall ar gael"
@@ -22143,7 +22143,7 @@ cy:
           other: "Mae’r cwis hwn wedi cael ei ail-raddio; mae eich sgôr newydd yn adlewyrchu %{count} cwestiwn a gafodd eu heffeithio."
           two: "Mae’r cwis hwn wedi cael ei ail-raddio; mae eich sgôr newydd yn adlewyrchu %{count} cwestiwn a gafodd eu heffeithio."
         quiz_regraded_your_score_not_affected: "Mae’r cwis hwn wedi cael ei ail-raddio; dydy hyn ddim wedi effeithio ar eich sgôr."
-        speed_grader: SpeedGrader
+        speed_grader: SpeedGrader™
         students_submitted_so_far: 
           many: "%{count} myfyriwr wedi cyflwyno hyd yma"
           one: "1 myfyriwr wedi cyflwyno hyd yma"
@@ -25262,7 +25262,7 @@ cy:
   speedgrader_loading_error_235fd2e2: "SpeedGrader gwall wrth lwytho"
   speedgrader_settings_4195099b: "SpeedGrader Gosodiadau"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Cipio Cyfryngau Studio"
-  speedgrader_tm_44688790: SpeedGrader
+  speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Hollti
   split_merged_users_6b81c595: "Hollti Defnyddwyr wedi’u Cyfuno"
   split_number_of_students_per_group_4a05f76f: "Rhannu nifer y myfyrwyr ym mhob grŵp"
@@ -25809,7 +25809,7 @@ cy:
       see_vericite_results: "Gweld canlyniadau VeriCite"
       sent_to_whole_group: "Anfon sylw at y grŵp cyfan"
       show_rubric: "Dangos Cyfarwyddyd Sgorio"
-      speedgrader: SpeedGrader
+      speedgrader: SpeedGrader™
       student_mute_notification: "Dydy’r graddau ddim ar gael oherwydd bod yr addysgwr yn gweithio arnyn nhw."
       submission_details: "Manylion cyflwyniad"
       submitted_at: "wedi cyflwyno %{submit_date}"
