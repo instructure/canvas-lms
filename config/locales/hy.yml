@@ -3402,6 +3402,7 @@ hy:
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas չի ճանաչում ձեր նույնականացուցչի պրովայդերին"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas համակարգը չունի %{user} օգտատիրոջ համար հաշիվ"
   canvas_error_report_ff678539: "Canvas սխալի մասին հաշվետվություն"
+  canvas_lms_6ce68514: "Canvas LMS"
   canvas_login_failure_message_4c922f2f: "Հաղորդագրություն Canvas մուտք գործելու ձախողման մասին "
   canvas_revision_unknown: "Անհայտ է"
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas-ը կարծում է, որ պատասխանը ընդունելի է"
