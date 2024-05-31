@@ -5738,6 +5738,7 @@ nn:
   canvas_instructor_guide_7cf106cb: "Canvas guide for undervisarar"
   canvas_introduction_video_2d81f3ad: "Canvas introduksjonsvideo"
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas er ikkje sett opp til å ta imot innloggingar frå %{issuer}."
+  canvas_lms_6ce68514: "Canvas læringsplattform (LMS)"
   canvas_login_failure_message_4c922f2f: "Feilmelding frå Canvas-pålogging"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Backup-kodar for fleirfaktorautentisering"
   canvas_needs_acccess_to_your_camera_16db6502: "Canvas treng tilgang til kameraet ditt. "
@@ -23712,6 +23713,7 @@ nn:
   startdate_to_enddate_8811cf2b: "%{startDate} til %{endDate}"
   startdatetime_enddatetime_4284113b: "%{startDateTime} - %{endDateTime}"
   startdatetime_endtime_6e08f3c2: "%{startDateTime} - %{endTime}"
+  started_5e138638: Starta
   starting_content_share_2d8c2999: "Startar innhaldsdeling"
   starting_copy_operation_cc46d911: "Startar kopieringsjobb"
   starting_import_operation_f25745f0: "Startar importjobb"
