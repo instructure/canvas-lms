@@ -2686,6 +2686,10 @@ CanvasRails::Application.routes.draw do
       put "users/:user_id/user_notes/suppress_deprecation_notice", action: :suppress_deprecation_notice
     end
 
+    scope(controller: :what_if_grades_api) do
+      put "submissions/:id/what_if_grades", action: :update
+    end
+
     scope(controller: :plugins) do
       put "plugins/:id", action: :update
       get "plugins/:id", action: :show

@@ -22,6 +22,7 @@ class SubmissionsBaseController < ApplicationController
   include GradebookSettingsHelpers
   include AssignmentsHelper
   include AssessmentRequestHelper
+  include SubmissionsHelper
 
   include Api::V1::Rubric
   include Api::V1::SubmissionComment
@@ -249,7 +250,7 @@ class SubmissionsBaseController < ApplicationController
   private
 
   def update_student_entered_score(score)
-    new_score = (score.present? && score != "null") ? score.to_f.round(2) : nil
+    new_score = sanitize_student_entered_score(score)
     # TODO: fix this by making the callback optional
     # intentionally skipping callbacks here to fix a bug where entering a
     # what-if grade for a quiz can put the submission back in a 'pending review' state
