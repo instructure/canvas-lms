@@ -20,8 +20,12 @@
 class AnalyticsHubController < ApplicationController
   before_action :require_account_context
   before_action :require_user
-  before_action :require_account_management
+  before_action :require_view_analytics_hub_permission
   before_action { |c| c.active_tab = "analytics_hub" }
+
+  def require_view_analytics_hub_permission
+    !!authorized_action(@context, @current_user, :view_analytics_hub)
+  end
 
   def show
     add_crumb "Analytics Hub"
