@@ -32,49 +32,6 @@ exports[`MobileTopNavigationTools renders 1`] = `
 >
   <MenuItem
     disabled={false}
-    key="1"
-    label="Launch Tool 1"
-    onSelect={[Function]}
-    type="button"
-    value="1"
-  >
-    <Flex
-      as="span"
-      direction="row"
-      display="flex"
-      gap="small"
-      justifyItems="start"
-      withVisualDebug={false}
-      wrap="no-wrap"
-    >
-      <Img
-        alt="Tool 1"
-        display="inline-block"
-        height="1rem"
-        src="https://instructure.com"
-        withBlur={false}
-        withGrayscale={false}
-      />
-      <TruncateText
-        debounce={0}
-        ellipsis="…"
-        ignore={
-          [
-            " ",
-            ".",
-            ",",
-          ]
-        }
-        maxLines={1}
-        position="end"
-        truncate="character"
-      >
-        Tool 1
-      </TruncateText>
-    </Flex>
-  </MenuItem>
-  <MenuItem
-    disabled={false}
     key="2"
     label="Launch Tool 2"
     onSelect={[Function]}
@@ -113,6 +70,50 @@ exports[`MobileTopNavigationTools renders 1`] = `
         truncate="character"
       >
         Tool 2
+      </TruncateText>
+    </Flex>
+  </MenuItem>
+  <MenuItemSeparator />
+  <MenuItem
+    disabled={false}
+    key="1"
+    label="Launch Tool 1"
+    onSelect={[Function]}
+    type="button"
+    value="1"
+  >
+    <Flex
+      as="span"
+      direction="row"
+      display="flex"
+      gap="small"
+      justifyItems="start"
+      withVisualDebug={false}
+      wrap="no-wrap"
+    >
+      <Img
+        alt="Tool 1"
+        display="inline-block"
+        height="1rem"
+        src="https://instructure.com"
+        withBlur={false}
+        withGrayscale={false}
+      />
+      <TruncateText
+        debounce={0}
+        ellipsis="…"
+        ignore={
+          [
+            " ",
+            ".",
+            ",",
+          ]
+        }
+        maxLines={1}
+        position="end"
+        truncate="character"
+      >
+        Tool 1
       </TruncateText>
     </Flex>
   </MenuItem>

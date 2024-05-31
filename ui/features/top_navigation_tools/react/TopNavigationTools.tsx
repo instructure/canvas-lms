@@ -30,7 +30,7 @@ const I18n = useI18nScope('top_navigation_tools')
 
 type TopNavigationToolsProps = {
   tools: Tool[]
-  handleToolLaunch: (tool: Tool) => void // eslint-disable-line react/no-unused-prop-types
+  handleToolLaunch: (tool: Tool) => void
 }
 
 function getToolIcon(tool: Tool) {
@@ -99,6 +99,9 @@ export function TopNavigationTools(props: TopNavigationToolsProps) {
 }
 
 export function MobileTopNavigationTools(props: TopNavigationToolsProps) {
+  const pinned_tools = props.tools.filter(tool => tool.pinned)
+  const menu_tools = props.tools.filter(tool => !tool.pinned)
+
   return (
     <Menu
       placement="bottom end"
@@ -112,10 +115,26 @@ export function MobileTopNavigationTools(props: TopNavigationToolsProps) {
       }
       key="menu"
     >
-      {props.tools.map((tool: Tool) => {
+      {pinned_tools.map((tool: Tool) => {
         return (
           <Menu.Item
-            onSelect={(e, val) => handleToolClick(val, props)}
+            onSelect={(e, val) => handleToolClick(val, pinned_tools, props.handleToolLaunch)}
+            key={tool.id}
+            value={tool.id}
+            label={I18n.t('Launch %{tool}', {tool: tool.title})}
+          >
+            <Flex direction="row" gap="small">
+              {getToolIcon(tool)}
+              <TruncateText>{tool.title}</TruncateText>
+            </Flex>
+          </Menu.Item>
+        )
+      })}
+      {pinned_tools.length > 0 && menu_tools.length > 0 && <Menu.Separator />}
+      {menu_tools.map((tool: Tool) => {
+        return (
+          <Menu.Item
+            onSelect={(e, val) => handleToolClick(val, menu_tools, props.handleToolLaunch)}
             key={tool.id}
             value={tool.id}
             label={I18n.t('Launch %{tool}', {tool: tool.title})}
