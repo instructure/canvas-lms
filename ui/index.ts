@@ -239,6 +239,8 @@ async function loadNewUserTutorials() {
     const {default: initializeNewUserTutorials} = await import('./features/new_user_tutorial/index')
 
     initializeNewUserTutorials()
+  } else {
+    document.getElementsByClassName('TutorialToggleHolder')[0]?.remove() // inherited margin from parent leaves a gap
   }
 }
 

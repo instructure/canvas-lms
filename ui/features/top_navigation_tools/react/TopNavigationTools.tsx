@@ -37,7 +37,7 @@ function getToolIcon(tool: Tool) {
   return (
     (tool.icon_url && (
       <Img src={tool.icon_url} height="1rem" alt={tool.title || 'Tool Icon'} />
-    )) || <IconLtiLine alt={tool.title || 'Tool Icon'} />
+    )) || <IconLtiLine title={tool.title || 'Tool Icon'} />
   )
 }
 
@@ -53,7 +53,7 @@ export function TopNavigationTools(props: TopNavigationToolsProps) {
   const menu_tools = props.tools.filter(tool => !tool.pinned)
 
   return (
-    <Flex as="div" direct="row" marginEnd="small" marginStart="small" gap="small">
+    <Flex as="div" gap="small" width="100%" height="100%">
       {pinned_tools.map((tool: Tool) => {
         return (
           <Flex.Item key={tool.id}>
@@ -63,15 +63,19 @@ export function TopNavigationTools(props: TopNavigationToolsProps) {
                 handleToolClick(e.target.dataset.toolId, pinned_tools, props.handleToolLaunch)
               }
               data-tool-id={tool.id}
-            >
-              <TruncateText>{tool.title}</TruncateText>
-            </Button>
+              title={tool.title}
+            />
           </Flex.Item>
         )
       })}
       {menu_tools.length > 0 && (
         <Flex.Item>
-          <Menu placement="bottom end" trigger={<Button renderIcon={IconLtiLine} />} key="menu">
+          <Menu
+            placement="bottom end"
+            trigger={<Button renderIcon={IconLtiLine} title={I18n.t('LTI Tools Menu')} />}
+            key="menu"
+            label={I18n.t('LTI Tools Menu')}
+          >
             {menu_tools.map((tool: Tool) => {
               return (
                 <Menu.Item

@@ -122,13 +122,12 @@ exports[`MobileTopNavigationTools renders 1`] = `
 exports[`TopNavigationTools renders 1`] = `
 <Flex
   as="div"
-  direct="row"
   direction="row"
   display="flex"
   gap="small"
+  height="100%"
   justifyItems="start"
-  marginEnd="small"
-  marginStart="small"
+  width="100%"
   withVisualDebug={false}
   wrap="no-wrap"
 >
@@ -158,26 +157,10 @@ exports[`TopNavigationTools renders 1`] = `
       }
       size="medium"
       textAlign="center"
+      title="Tool 1"
       type="button"
       withBackground={true}
-    >
-      <TruncateText
-        debounce={0}
-        ellipsis="…"
-        ignore={
-          [
-            " ",
-            ".",
-            ",",
-          ]
-        }
-        maxLines={1}
-        position="end"
-        truncate="character"
-      >
-        Tool 1
-      </TruncateText>
-    </Button>
+    />
   </Item>
   <Item
     as="span"
@@ -189,7 +172,7 @@ exports[`TopNavigationTools renders 1`] = `
       defaultShow={false}
       disabled={false}
       key="menu"
-      label={null}
+      label="LTI Tools Menu"
       mountNode={null}
       offsetX={0}
       offsetY={0}
@@ -206,6 +189,7 @@ exports[`TopNavigationTools renders 1`] = `
           renderIcon={[Function]}
           size="medium"
           textAlign="center"
+          title="LTI Tools Menu"
           type="button"
           withBackground={true}
         />
@@ -230,7 +214,7 @@ exports[`TopNavigationTools renders 1`] = `
           wrap="no-wrap"
         >
           <IconLtiLine
-            alt="Tool 2"
+            title="Tool 2"
           />
           <TruncateText
             debounce={0}
@@ -258,13 +242,12 @@ exports[`TopNavigationTools renders 1`] = `
 exports[`TopNavigationTools renders with no pinned tools 1`] = `
 <Flex
   as="div"
-  direct="row"
   direction="row"
   display="flex"
   gap="small"
+  height="100%"
   justifyItems="start"
-  marginEnd="small"
-  marginStart="small"
+  width="100%"
   withVisualDebug={false}
   wrap="no-wrap"
 >
@@ -278,7 +261,7 @@ exports[`TopNavigationTools renders with no pinned tools 1`] = `
       defaultShow={false}
       disabled={false}
       key="menu"
-      label={null}
+      label="LTI Tools Menu"
       mountNode={null}
       offsetX={0}
       offsetY={0}
@@ -295,6 +278,7 @@ exports[`TopNavigationTools renders with no pinned tools 1`] = `
           renderIcon={[Function]}
           size="medium"
           textAlign="center"
+          title="LTI Tools Menu"
           type="button"
           withBackground={true}
         />
@@ -395,13 +379,12 @@ exports[`TopNavigationTools renders with no pinned tools 1`] = `
 exports[`TopNavigationTools renders with no tools 1`] = `
 <Flex
   as="div"
-  direct="row"
   direction="row"
   display="flex"
   gap="small"
+  height="100%"
   justifyItems="start"
-  marginEnd="small"
-  marginStart="small"
+  width="100%"
   withVisualDebug={false}
   wrap="no-wrap"
 />
