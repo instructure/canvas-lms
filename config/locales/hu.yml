@@ -4819,6 +4819,7 @@ hu:
   canvas_id_f42f6ad: "Canvas ID"
   canvas_introduction_video_2d81f3ad: "Canvas bemutató videó"
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "A Canvas a jelenlegi beállítások mellett nem tud bejelentkezést fogadni a következőtől: %{issuer}."
+  canvas_lms_6ce68514: "Canvas LMS"
   canvas_login_failure_message_4c922f2f: "Canvas sikertelen belépési üzenet"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Canvas többtényezős hitelesítési biztonsági mentési kódok"
   canvas_needs_acccess_to_your_camera_16db6502: "A Canvasnak hozzá kell férnie a kamerához."
@@ -19419,6 +19420,7 @@ hu:
   start_recording_9a65141a: "Felvétel elkezdése"
   start_time_2c3d11b5: "Kezdési idő"
   start_tls_26e4b0dc: "TLS megkezdése"
+  started_5e138638: Kezdés
   starting_content_share_2d8c2999: "Tartalom megosztás indítása"
   starting_copy_operation_cc46d911: "Másolás indítása"
   starting_publish_5e4f16b9: "Publikálás megkezdése..."
