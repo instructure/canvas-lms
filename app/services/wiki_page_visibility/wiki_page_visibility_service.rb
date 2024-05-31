@@ -47,6 +47,15 @@ module WikiPageVisibility
         wiki_pages_visible_to_students(wiki_page_id_params: wiki_page_id, user_id_params: user_id)
       end
 
+      def wiki_pages_visible_to_student_by_pages(wiki_page_ids:, user_id:)
+        raise ArgumentError, "wiki_page_ids cannot be nil" if wiki_page_ids.nil?
+        raise ArgumentError, "wiki_page_ids must be an array" unless wiki_page_ids.is_a?(Array)
+        raise ArgumentError, "user_id cannot be nil" if user_id.nil?
+        raise ArgumentError, "user_id must not be an array" if user_id.is_a?(Array)
+
+        wiki_pages_visible_to_students(wiki_page_id_params: wiki_page_ids, user_id_params: user_id)
+      end
+
       def wiki_page_visible_to_students(wiki_page_id:, user_ids:)
         raise ArgumentError, "wiki_page_id cannot be nil" if wiki_page_id.nil?
         raise ArgumentError, "wiki_page_id must not be an array" if wiki_page_id.is_a?(Array)

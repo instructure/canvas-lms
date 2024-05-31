@@ -60,7 +60,6 @@ class WikiPage < ActiveRecord::Base
 
   belongs_to :current_lookup, class_name: "WikiPageLookup"
   has_many :wiki_page_lookups, inverse_of: :wiki_page
-  has_many :wiki_page_student_visibilities
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :wiki_page
   has_one :block_editor, as: :context, dependent: :destroy
   accepts_nested_attributes_for :block_editor, allow_destroy: true
@@ -84,12 +83,12 @@ class WikiPage < ActiveRecord::Base
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
     if Account.site_admin.feature_enabled?(:differentiated_modules)
-      # no assignment -> visible if wiki_page_student_visibilities has row
+      # no assignment -> visible if wiki_page_visibilities has results
       # assignment -> visible if assignment_student_visibilities has row
-      without_assignment_in_course(course_ids)
-        .joins(:wiki_page_student_visibilities)
-        .where(wiki_page_student_visibilities: { user_id: user_ids, course_id: course_ids })
-        .union(joins_assignment_student_visibilities(user_ids, course_ids))
+      visible_wiki_page_ids = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students_in_courses(course_ids:, user_ids:).map(&:wiki_page_id)
+
+      without_assignment_in_course(course_ids).where(id: visible_wiki_page_ids)
+                                              .union(joins_assignment_student_visibilities(user_ids, course_ids))
     else
       without_assignment_in_course(course_ids)
         .union(joins_assignment_student_visibilities(user_ids, course_ids))
@@ -113,7 +112,8 @@ class WikiPage < ActiveRecord::Base
 
   scope :visible_to_user, lambda { |user_id|
     if Account.site_admin.feature_enabled?(:differentiated_modules)
-      where("wiki_pages.assignment_id IS NULL AND (EXISTS (SELECT 1 FROM #{WikiPageStudentVisibility.quoted_table_name} psv WHERE wiki_pages.id = psv.wiki_page_id AND psv.user_id = ?) OR wiki_pages.context_type = 'Group')", user_id)
+      visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_student_by_pages(user_id:, wiki_page_ids: ids).map(&:wiki_page_id)
+      where("wiki_pages.assignment_id IS NULL AND (wiki_pages.id IN (?) OR wiki_pages.context_type = 'Group')", visible_wiki_pages)
         .or(where("wiki_pages.assignment_id IS NOT NULL AND EXISTS (SELECT 1 FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?)", user_id))
     else
       where("wiki_pages.assignment_id IS NULL OR EXISTS (SELECT 1 FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?)", user_id)
@@ -648,10 +648,12 @@ class WikiPage < ActiveRecord::Base
                                    .group_by { |_, user_id| user_id }
     no_assignment_page_visibilities = without_assignment_in_course(opts[:course_id])
     no_assignment_page_visibilities = if Account.site_admin.feature_enabled?(:differentiated_modules)
+                                        visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students_in_courses(course_ids: opts[:course_id], user_ids: opts[:user_id])
+                                        visible_wiki_page_ids = visible_wiki_pages.map { |visibility| [visibility.wiki_page_id, visibility.user_id] }
+
                                         no_assignment_page_visibilities
-                                          .joins(:wiki_page_student_visibilities)
-                                          .where(wiki_page_student_visibilities: opts)
-                                          .pluck("wiki_pages.id", "wiki_page_student_visibilities.user_id").group_by { |_, user_id| user_id }
+                                          .where(id: visible_wiki_page_ids.map(&:first))
+                                          .pluck(:id).group_by { |id| visible_wiki_page_ids.find { |visibility| visibility.first == id }.last }
                                       else
                                         no_assignment_page_visibilities.pluck(:id)
                                       end
