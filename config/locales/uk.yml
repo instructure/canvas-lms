@@ -3777,6 +3777,7 @@ uk:
   canvas_error_report_ff678539: "Звіт про помилки Canvas"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_introduction_video_2d81f3ad: "вступне відео до Canvas "
+  canvas_lms_6ce68514: "Canvas LMS"
   canvas_login_failure_message_4c922f2f: "Повідомлення   про помилку входу Canvas"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Запасні коди багатофакторної аутентифікації Canvas"
   canvas_observer_id_59db0918: canvas_observer_id
@@ -16579,6 +16580,7 @@ uk:
   start_participating_f0c75256: "Прийняти участь"
   start_time_2c3d11b5: "Час початку"
   start_tls_26e4b0dc: "Запустити TLS"
+  started_5e138638: Початок
   starts_at_29843f98: "Починається о"
   starts_ce584f1c: "Починається:"
   state_standards_c9b1affd: "Державні Стандарти"
