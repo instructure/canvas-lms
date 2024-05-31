@@ -348,8 +348,9 @@ export const CourseHeaderOptions = forwardRef(
         data-method="post"
         renderIcon={<IconStudentViewLine />}
         margin="0 0 0 x-small"
+        data-testid="student-view-btn"
       >
-        {I18n.t('Student View')}
+        {I18n.t('View as Student')}
       </Button>
     )
 

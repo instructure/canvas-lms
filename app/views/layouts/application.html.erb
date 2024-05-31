@@ -147,7 +147,7 @@
             <% end %>
             <% if show_student_view_button? %>
               <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn", :id => "easy_student_view", :method => :post do %>
-                <i class="icon-student-view"></i> <%= t('Student View') %>
+                <i class="icon-student-view"></i> <%= t('View as Student') %>
               <% end %>
             <% end %>
             <% if (@context&.is_a?(Course) || @context&.is_a?(Assignment)) && @context_enrollment&.observer? %>
