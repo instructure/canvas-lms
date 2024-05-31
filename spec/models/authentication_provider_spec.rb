@@ -216,10 +216,16 @@ describe AuthenticationProvider do
     before do
       # ensure the federated_attributes hash is normalized
       aac.valid?
-      user_with_pseudonym
+      user_with_pseudonym(active_all: true)
     end
 
     it "handles most attributes" do
+      notification = Notification.create!(name: "Confirm Email Communication Channel", category: "TestImmediately")
+      cc = CommunicationChannel.new
+      expect(CommunicationChannel).to receive(:new) { |attrs|
+        cc.attributes = attrs
+        cc
+      }
       aac.apply_federated_attributes(@pseudonym,
                                      {
                                        "display_name" => "Mr. Cutler",
@@ -233,6 +239,7 @@ describe AuthenticationProvider do
                                      },
                                      purpose: :provisioning)
       @user.reload
+      expect(cc.messages_sent.keys).to eq [notification.name]
       expect(@user.short_name).to eq "Mr. Cutler"
       expect(@user.communication_channels.email.in_state("unconfirmed").pluck(:path)).to include("cody@school.edu")
       expect(@pseudonym.integration_id).to eq "abc123"
