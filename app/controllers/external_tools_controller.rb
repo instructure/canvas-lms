@@ -134,7 +134,13 @@ class ExternalToolsController < ApplicationController
   end
 
   def retrieve
-    @tool = ContextExternalTool.find_external_tool(params[:url], @context)
+
+    begin
+      @tool = ContextExternalTool.find_external_tool(params[:url], @context)
+    rescue Addressable::URI::InvalidURIError
+      return render json: { error: 'Bad request' }, status: :bad_request
+    end
+
     if !@tool
       flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
       redirect_to named_context_url(@context, :context_url)
