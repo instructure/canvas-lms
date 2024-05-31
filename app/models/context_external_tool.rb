@@ -436,7 +436,13 @@ class ContextExternalTool < ActiveRecord::Base
     return "" if url.blank?
     url = url.gsub(/[[:space:]]/, '')
     url = "http://" + url unless url.match(/:\/\//)
-    res = Addressable::URI.parse(url).normalize
+
+    begin
+      res = Addressable::URI.parse(url).normalize
+    rescue Addressable::URI::InvalidURIError
+      return render json: { error: 'Bad request' }, status: :bad_request
+    end
+
     res.query = res.query.split(/&/).sort.join('&') if !res.query.blank?
     res.to_s
   end
