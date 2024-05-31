@@ -1764,7 +1764,7 @@ class UsersController < ApplicationController
       respond_to do |format|
         if @user.update_attributes(user_params)
           @user.avatar_state = (old_avatar_state == :locked ? old_avatar_state : 'approved') if admin_avatar_update
-          @user.email = new_email if update_email
+          @user.email = new_email if update_email && new_email.presence
           @user.save if admin_avatar_update || update_email
           session.delete(:require_terms)
           flash[:notice] = t('user_updated', 'User was successfully updated.')
