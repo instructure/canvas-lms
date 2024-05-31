@@ -3286,6 +3286,7 @@ el:
   canvas_error_report_ff678539: "Αναφορά Σφάλματος Canvas"
   canvas_id_f42f6ad: "Canvas ID"
   canvas_introduction_video_2d81f3ad: "Εισαγωγικό Βίντεο στο Canvas"
+  canvas_lms_6ce68514: "Σύστημα Διαχείρισης Εκπαιδευτικού Περιεχομένου Canvas"
   canvas_login_failure_message_4c922f2f: "Μήνυμα απο το Canvas σχετικά με την αποτυχία σύνδεσης"
   canvas_revision_unknown: Άγνωστο
   canvas_thinks_response_is_valid_8cc4a67d: "το Canvas πιστεύει πως η απάντηση είναι έγκυρη"
@@ -6639,6 +6640,7 @@ el:
       select_an_option: "Παρακαλώ διαλέξτε μια επιλογή"
     gradebook_header_menu: 
       assignment_details: "Λεπτομέρειες Εργασίας"
+      speedgrader: SpeedGrader™
     graded: βαθμολογήθηκε/αν
     graded_then_resubmitted: "βαθμολογήθηκε, κατόπιν επανυποβλήθηκε (%{when})"
     group: Ομάδα
