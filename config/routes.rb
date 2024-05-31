@@ -1924,6 +1924,7 @@ CanvasRails::Application.routes.draw do
       delete "accounts/:account_id/lti_registrations/:id", action: :destroy
       get "accounts/:account_id/lti_registrations/:id", action: :show
       put "accounts/:account_id/lti_registrations/:id", action: :update
+      post "accounts/:account_id/lti_registrations/:id/bind", action: :bind
     end
 
     scope(controller: :immersive_reader) do

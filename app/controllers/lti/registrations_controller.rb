@@ -443,6 +443,7 @@ class Lti::RegistrationsController < ApplicationController
   before_action :require_feature_flag
   before_action :require_manage_lti_registrations
   before_action :require_dynamic_registration, only: [:destroy, :update]
+  before_action :validate_workflow_state, only: :bind
 
   include Api::V1::Lti::Registration
 
@@ -570,16 +571,72 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
+  # @API Bind an LTI Registration to an Account
+  # Enable or disable the specified LTI registration for the specified account.
+  # To enable an inherited registration (eg from Site Admin), pass the registration's global ID.
+  #
+  # Only allowed for root accounts.
+  #
+  # <b>Specifics for Site Admin:</b>
+  # "on" enables and locks the registration on for all root accounts.
+  # "off" disables and hides the registration for all root accounts.
+  # "allow" makes the registration visible to all root accounts, but accounts must bind it to use it.
+  #
+  # <b>Specifics for centrally-managed/federated consortia:</b>
+  # Child root accounts may only bind registrations created in the same account.
+  # For parent root account, binding also applies to all child root accounts.
+  #
+  # @argument workflow_state [Required, String, "on"|"off"|"allow"]
+  #   The desired state for this registration/account binding. "allow" is only valid for Site Admin registrations.
+  #
+  # @returns Lti::RegistrationAccountBinding
+  #
+  # @example_request
+  #
+  #   This would enable the specified LTI registration for the specified account
+  #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/registrations/<registration_id>/bind' \
+  #        -H "Authorization: Bearer <token>" \
+  #        -H "Content-Type: application/json" \
+  #        -d '{"workflow_state": "on"}'
+  def bind
+    account_binding = Lti::RegistrationAccountBinding.find_or_initialize_by(account: @context, registration:)
+
+    if account_binding.new_record?
+      account_binding.created_by = @current_user
+    end
+
+    account_binding.updated_by = @current_user
+    account_binding.workflow_state = params[:workflow_state]
+
+    if account_binding.save
+      render json: lti_registration_account_binding_json(account_binding, @current_user, session, @context)
+    else
+      render json: account_binding.errors, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def update_params
     params.permit(:admin_nickname).merge({ updated_by: @current_user })
   end
 
+  # At the model level, setting an invalid workflow_state will silently change it to the
+  # initial state ("off") without complaining, so enforce this here as part of the API contract.
+  def validate_workflow_state
+    return if %w[on off allow].include?(params.require(:workflow_state))
+
+    render_error(:invalid_workflow_state, "workflow_state must be one of 'on', 'off', or 'allow'")
+  end
+
   def require_dynamic_registration
     return if registration.dynamic_registration?
 
-    render json: { errors: [{ message: "Temporarily, only Registrations created using LTI Dynamic Registration can be modified" }] }, status: :unprocessable_entity
+    render_error(:dynamic_registration_required, "Temporarily, only Registrations created using LTI Dynamic Registration can be modified")
+  end
+
+  def render_error(code, message, status: :unprocessable_entity)
+    render json: { errors: [{ code:, message: }] }, status:
   end
 
   def registration
@@ -594,10 +651,10 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   def require_feature_flag
-    unless @context.feature_enabled?(:lti_registrations_page)
+    unless @context.root_account.feature_enabled?(:lti_registrations_page)
       respond_to do |format|
         format.html { render "shared/errors/404_message", status: :not_found }
-        format.json { render json: { errors: [{ message: "The specified resource does not exist." }] }, status: :not_found }
+        format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
       end
     end
   end
