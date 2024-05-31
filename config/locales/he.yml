@@ -4125,6 +4125,7 @@ he:
   canvas_error_report_ff678539: "דוח שגיאות של קנבס"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_introduction_video_2d81f3ad: "סרטון ההכירות של קנבס"
+  canvas_lms_6ce68514: "קנבס LMS"
   canvas_login_failure_message_4c922f2f: " הודעת שגיאת התחברות למערכת קנבס"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "קודי גיבוי להזדהות מרובת מרכיבים של קנבס."
   canvas_observer_id_59db0918: canvas_observer_id
@@ -18467,6 +18468,7 @@ he:
   start_participating_f0c75256: "התחלת השתתפות"
   start_time_2c3d11b5: "זמן התחלה"
   start_tls_26e4b0dc: "התחלת TLS"
+  started_5e138638: התחיל
   starts_ce584f1c: "מתחיל:"
   state_standards_c9b1affd: "תקני מדינה"
   statistics: 
