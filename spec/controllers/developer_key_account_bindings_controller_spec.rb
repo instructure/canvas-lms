@@ -95,9 +95,9 @@ RSpec.describe DeveloperKeyAccountBindingsController do
       user_session(authorized_admin)
       post(:create_or_update, params:)
 
-      params[:developer_key_account_binding][:workflow_state] = "allow"
+      params[:developer_key_account_binding][:workflow_state] = "on"
       post(:create_or_update, params:)
-      expect(created_binding.workflow_state).to eq "allow"
+      expect(created_binding.workflow_state).to eq "on"
     end
   end
 
@@ -129,11 +129,11 @@ RSpec.describe DeveloperKeyAccountBindingsController do
     it "updates the corresponding Lti::RegistrationAccountBinding" do
       user_session(authorized_admin)
 
-      params[:developer_key_account_binding][:workflow_state] = "allow"
+      params[:developer_key_account_binding][:workflow_state] = "on"
       post(:create_or_update, params:)
 
       updated_binding.lti_registration_account_binding.reload
-      expect(updated_binding.lti_registration_account_binding.workflow_state).to eq("allow")
+      expect(updated_binding.lti_registration_account_binding.workflow_state).to eq("on")
       expect(updated_binding.lti_registration_account_binding.updated_by).to eq(authorized_admin)
     end
   end

@@ -19,11 +19,77 @@
 
 RSpec.describe Lti::RegistrationAccountBinding do
   describe "validations" do
-    it { is_expected.to belong_to(:registration).class_name("Lti::Registration").optional(false).inverse_of(:lti_registration_account_bindings) }
-    it { is_expected.to belong_to(:account).class_name("Account").optional(false).inverse_of(:lti_registration_account_bindings) }
-    it { is_expected.to belong_to(:created_by).class_name("User").inverse_of(:created_lti_registration_account_bindings) }
-    it { is_expected.to belong_to(:updated_by).class_name("User").inverse_of(:updated_lti_registration_account_bindings) }
-    it { is_expected.to belong_to(:developer_key_account_binding).class_name("DeveloperKeyAccountBinding") }
+    let(:account) { account_model }
+    let(:user) { user_model }
+    let(:registration) { lti_registration_model(account:) }
+    let(:account_binding) { Lti::RegistrationAccountBinding.new(account:, registration:) }
+
+    describe "workflow_state" do
+      context "with site admin registration" do
+        let(:registration) { lti_registration_model(account: Account.site_admin) }
+
+        it "rejects 'allow'" do
+          account_binding.workflow_state = "allow"
+          account_binding.save
+          expect(account_binding).not_to be_valid
+        end
+
+        context "with site admin" do
+          let(:account) { Account.site_admin }
+
+          it "accepts 'allow'" do
+            account_binding.workflow_state = "allow"
+            account_binding.save
+            expect(account_binding).to be_valid
+          end
+        end
+      end
+
+      it "rejects 'allow'" do
+        account_binding.workflow_state = "allow"
+        account_binding.save
+        expect(account_binding).not_to be_valid
+      end
+    end
+
+    # these specs live in MRA, along with the concept of a federated consortium:
+    # describe "#restrict_federated_child_accounts"
+
+    context "with a root account" do
+      it "is valid" do
+        account_binding.save
+        expect(account_binding).to be_valid
+      end
+    end
+
+    context "with a non-root account" do
+      let(:account) { account_model(parent_account: account_model) }
+
+      it "is invalid" do
+        account_binding.save
+        expect(account_binding).not_to be_valid
+      end
+    end
+
+    context "when registration is for a different account" do
+      context "and account is site admin" do
+        let(:registration) { lti_registration_model(account: Account.site_admin) }
+
+        it "is valid" do
+          account_binding.save
+          expect(account_binding).to be_valid
+        end
+      end
+
+      context "and account is unrelated" do
+        let(:registration) { lti_registration_model(account: account_model) }
+
+        it "is invalid" do
+          account_binding.save
+          expect(account_binding).not_to be_valid
+        end
+      end
+    end
   end
 
   describe "after_save hooks" do

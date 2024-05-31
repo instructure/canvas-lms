@@ -433,4 +433,113 @@ describe Lti::RegistrationsController do
       expect(registration.reload).to be_deleted
     end
   end
+
+  describe "POST bind" do
+    subject { post :bind, params: { account_id: account.id, id: registration.id, workflow_state: }, format: :json }
+
+    let(:root_account) { account_model }
+    let(:account) { root_account }
+    let(:admin) { account_admin_user(account:) }
+    let(:registration) { lti_registration_model(account:) }
+    let(:workflow_state) { "off" }
+
+    before do
+      user_session(admin)
+      root_account.enable_feature!(:lti_registrations_page)
+    end
+
+    context "without user session" do
+      before do
+        remove_user_session
+      end
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before do
+        user_session(student)
+      end
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with flag disabled" do
+      before do
+        account.disable_feature!(:lti_registrations_page)
+      end
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    context "when model-level validations fail" do
+      # for example, when the account is not a root account
+      let(:account) { account_model(parent_account: root_account) }
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+
+    context "with invalid workflow state" do
+      let(:workflow_state) { "invalid" }
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+
+    it "is successful" do
+      subject
+      expect(response).to be_successful
+    end
+
+    context "without existing binding" do
+      it "creates a new binding" do
+        expect { subject }.to change { Lti::RegistrationAccountBinding.count }.by(1)
+      end
+
+      it "constructs the binding properly" do
+        subject
+        account_binding = Lti::RegistrationAccountBinding.last
+        expect(account_binding.registration).to eq(registration)
+        expect(account_binding.account).to eq(account)
+        expect(account_binding.workflow_state).to eq(workflow_state)
+        expect(account_binding.created_by).to eq(admin)
+        expect(account_binding.updated_by).to eq(admin)
+        expect(account_binding.root_account_id).to eq(root_account.id)
+      end
+    end
+
+    context "with existing binding" do
+      let(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
+      let(:initial_workflow_state) { "on" }
+      let(:initial_updated_by) { user_model }
+
+      before do
+        account_binding.update!(workflow_state: initial_workflow_state, updated_by: initial_updated_by)
+      end
+
+      it "does not create a new binding" do
+        expect { subject }.not_to change { Lti::RegistrationAccountBinding.count }
+      end
+
+      it "updates the existing binding" do
+        expect { subject }.to change { account_binding.reload.workflow_state }.from(initial_workflow_state).to(workflow_state).and change { account_binding.updated_by }.from(initial_updated_by).to(admin)
+      end
+    end
+  end
 end
