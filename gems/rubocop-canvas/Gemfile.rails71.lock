@@ -87,7 +87,7 @@ GEM
       activerecord (>= 6.0, < 7.2)
       railties (>= 6.0, < 7.2)
     parallel (1.24.0)
-    parser (3.3.1.0)
+    parser (3.3.2.0)
       ast (~> 2.4.1)
       racc
     psych (5.1.2)
@@ -138,7 +138,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.1)
-    rubocop (1.64.0)
+    rubocop (1.64.1)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
