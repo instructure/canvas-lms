@@ -29,7 +29,8 @@ class GradeCalculator
       update_all_grading_period_scores: true,
       update_course_score: true,
       only_update_course_gp_metadata: false,
-      only_update_points: false
+      only_update_points: false,
+      use_what_if_scores: false
     )
 
     @course = course.is_a?(Course) ? course : Course.find(course)
@@ -76,6 +77,7 @@ class GradeCalculator
     @submissions = opts[:submissions]
     @only_update_course_gp_metadata = opts[:only_update_course_gp_metadata]
     @only_update_points = opts[:only_update_points]
+    @use_what_if_scores = opts[:use_what_if_scores]
   end
 
   # recomputes the scores and saves them to each user's Enrollment
@@ -108,7 +110,7 @@ class GradeCalculator
                            .except(:order, :select)
                            .for_user(@user_ids)
                            .where(assignment_id: @assignments)
-                           .select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state, submissions.posted_at")
+                           .select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state, submissions.posted_at, student_entered_score")
                            .preload(:assignment)
 
       submissions
@@ -479,6 +481,7 @@ class GradeCalculator
   end
 
   def save_scores
+    raise "What if score can not be saved as scores" if @use_what_if_scores
     return if @current_updates.empty? && @final_updates.empty?
     return if joined_enrollment_ids.blank?
     return if @grading_period&.deleted?
@@ -777,9 +780,9 @@ class GradeCalculator
         {
           assignment: a,
           submission: s,
-          score: s&.score,
+          score: use_what_if_score?(s) ? s.student_entered_score : s&.score,
           total: BigDecimal(a.points_possible || 0, 15),
-          excused: s&.excused?,
+          excused: use_what_if_score?(s) ? false : s&.excused?
         }
       end
 
@@ -809,6 +812,10 @@ class GradeCalculator
         dropped: dropped_submissions
       }
     end
+  end
+
+  def use_what_if_score?(submission)
+    @use_what_if_scores && submission&.student_entered_score.present?
   end
 
   # see comments for dropAssignments in grade_calculator.js
@@ -1020,6 +1027,10 @@ class GradeCalculator
   end
 
   def ignore_submission?(submission:, assignment:)
+    # If a student is testing a score, we don't want to ignore this submission
+    # even if the grade is unposted
+    return false if use_what_if_score?(submission)
+
     return false unless @ignore_muted
 
     # If we decided to ignore this submission earlier in this run (see

@@ -1923,6 +1923,8 @@
   path: "/api/v1/shared_brand_configs/:id"
 - verb: GET
   path: "/api/v1/show_k5_dashboard"
+- verb: PUT
+  path: "/api/v1/submissions/:id/what_if_grades"
 - verb: GET
   path: "/api/v1/support_helpers/crocodoc/shard"
 - verb: GET
