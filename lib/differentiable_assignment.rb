@@ -74,7 +74,7 @@ module DifferentiableAssignment
     when "WikiPage"
       WikiPageVisibility::WikiPageVisibilityService.wiki_page_visible_to_students(user_ids: conditions[:user_id], wiki_page_id: conditions[:wiki_page_id])
     when "DiscussionTopic"
-      UngradedDiscussionStudentVisibility.where(conditions)
+      UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topic_visible_to_students(user_ids: conditions[:user_id], discussion_topic_id: conditions[:discussion_topic_id])
     else
       Quizzes::QuizStudentVisibility.where(conditions)
     end
