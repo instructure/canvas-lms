@@ -61,7 +61,7 @@
     <div id="immersive_reader_mobile_mount_point"></div>
   <% end %>
   <% if show_student_view_button? %>
-    <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "Button Button--icon-action-rev Button--large mobile-header-student-view", :id => "mobile-student-view", :"aria-label" => t('Student View'), :role => "button", :method => :post do %>
+    <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "Button Button--icon-action-rev Button--large mobile-header-student-view", :id => "mobile-student-view", :"aria-label" => t('View as Student'), :role => "button", :method => :post do %>
       <i class="icon-student-view"></i>
     <% end %>
   <% else %>
