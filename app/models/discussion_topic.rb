@@ -75,7 +75,6 @@ class DiscussionTopic < ActiveRecord::Base
            },
            class_name: "DiscussionEntry"
   has_many :root_discussion_entries, -> { preload(:user).where("discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state<>'deleted'") }, class_name: "DiscussionEntry"
-  has_many :ungraded_discussion_student_visibilities
   has_one :external_feed_entry, as: :asset
   belongs_to :root_account, class_name: "Account"
   belongs_to :external_feed
@@ -757,9 +756,13 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   scope :joins_ungraded_discussion_student_visibilities, lambda { |user_ids, course_ids|
-    joins(:ungraded_discussion_student_visibilities)
-      .where(ungraded_discussion_student_visibilities: { user_id: user_ids, course_id: course_ids })
-      .where(assignment_id: nil)
+    visible_discussion_topics = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible_to_students_in_courses(user_ids:, course_ids:).map(&:discussion_topic_id)
+    if visible_discussion_topics.any?
+      where(id: visible_discussion_topics)
+        .where(assignment_id: nil)
+    else
+      none
+    end
   }
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
@@ -854,13 +857,13 @@ class DiscussionTopic < ActiveRecord::Base
       if !course.nil? && course.is_a?(Course) && course.user_has_been_observer?(student)
         observed_student_ids = ObserverEnrollment.observed_student_ids(course, student)
       end
-      ids = [student.id].concat(observed_student_ids)
-      visible_topic_ids = UngradedDiscussionStudentVisibility.where(user_id: ids).select(:discussion_topic_id)
+      user_ids = [student.id].concat(observed_student_ids)
+      visible_topic_ids = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible_to_students_by_topics(user_ids:, discussion_topic_ids: ids).map(&:discussion_topic_id)
 
       merge(
         DiscussionTopic.where.not(context_type: "Course")
           .or(DiscussionTopic.where(id: visible_topic_ids, is_section_specific: false))
-          .or(DiscussionTopic.where(is_section_specific: true).where(discussion_topic_section_visibility_scope(ids).arel.exists))
+          .or(DiscussionTopic.where(is_section_specific: true).where(discussion_topic_section_visibility_scope(user_ids).arel.exists))
       )
     else
       visible_to_student_sections(student)
@@ -1986,7 +1989,8 @@ class DiscussionTopic < ActiveRecord::Base
     ids_visible_to_sections = topic_ids_per_user
 
     if Account.site_admin.feature_enabled?(:differentiated_modules)
-      ungraded_differentiated_topic_ids_per_user = joins_ungraded_discussion_student_visibilities(opts[:user_id], opts[:course_id]).where.not(is_section_specific: true).pluck("ungraded_discussion_student_visibilities.user_id", "discussion_topics.id").group_by(&:first).transform_values { |pairs| pairs.map(&:last).uniq }
+      visible_discussion_topics = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible_to_students_in_courses(user_ids: opts[:user_id], course_ids: opts[:course_id]).map { |visibility| [visibility.discussion_topic_id, visibility.user_id] }
+      ungraded_differentiated_topic_ids_per_user = DiscussionTopic.where(id: visible_discussion_topics.map(&:first)).where(assignment_id: nil).where.not(is_section_specific: true).pluck(:id).group_by { |id| visible_discussion_topics.find { |visibility| visibility.first == id }.last }
     else
       # Ungraded discussions are *normally* visible to all -- the exception is
       # section-specific discussions, so here get the ones visible to everyone in the

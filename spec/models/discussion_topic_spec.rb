@@ -3304,7 +3304,7 @@ describe DiscussionTopic do
         create_section_override_for_assignment(@assignment, { course_section: @section })
         create_section_override_for_assignment(@assignment3, { course_section: @section2 })
         @course.reload
-        @vis_hash = DiscussionTopic.visible_ids_by_user(course_id: @course.id, user_id: [@student1, @student2, @student3].map(&:id))
+        @vis_hash = DiscussionTopic.visible_ids_by_user(course_id: [@course.id], user_id: [@student1, @student2, @student3].map(&:id))
       end
 
       it "returns both topics for a student with an override" do
@@ -3335,7 +3335,7 @@ describe DiscussionTopic do
         student = create_users(1, return_type: :record).first
         course.enroll_student(student, section: section1)
         course.reload
-        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: [course.id], user_id: [student.id], item_type: :discussion)
         expect(vis_hash[student.id].length).to eq(1)
         expect(vis_hash[student.id].first).to eq(section_specific_topic1.id)
       end
@@ -3357,7 +3357,7 @@ describe DiscussionTopic do
         course.enroll_teacher(teacher, section: section1)
         course.reload
 
-        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id, teacher.id], item_type: :discussion)
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: [course.id], user_id: [student.id, teacher.id], item_type: :discussion)
         expect(vis_hash[student.id]).to contain_exactly(topic2.id, topic3.id, topic4.id)
         expect(vis_hash[teacher.id]).to contain_exactly(topic1.id, topic3.id)
       end
@@ -3371,7 +3371,7 @@ describe DiscussionTopic do
         course.enroll_student(student, section: section1)
         course.reload
         section_specific_topic1.destroy
-        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: [course.id], user_id: [student.id], item_type: :discussion)
         expect(vis_hash[student.id].length).to eq(0)
       end
 
@@ -3385,7 +3385,7 @@ describe DiscussionTopic do
         course.enroll_student(student, section: section2)
         course.reload
 
-        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: [course.id], user_id: [student.id], item_type: :discussion)
         expect(vis_hash[student.id].length).to be(0)
       end
 
@@ -3397,7 +3397,7 @@ describe DiscussionTopic do
         student = user_factory(active_all: true)
         course.reload
 
-        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: [course.id], user_id: [student.id], item_type: :discussion)
         expect(vis_hash[student.id].length).to be(0)
       end
     end
@@ -3421,7 +3421,7 @@ describe DiscussionTopic do
         add_student_differentiation_to_topic(student_specific_topic, student1)
         add_student_differentiation_to_topic(student_specific_topic2, student2)
 
-        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student1.id], item_type: :discussion)
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: [course.id], user_id: [student1.id], item_type: :discussion)
         expect(vis_hash[student1.id].length).to eq(1)
         expect(vis_hash[student1.id].first).to eq(student_specific_topic.id)
       end
@@ -3437,7 +3437,7 @@ describe DiscussionTopic do
         student = create_users(1, return_type: :record).first
         course.enroll_student(student, section: section1)
         course.reload
-        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: [course.id], user_id: [student.id], item_type: :discussion)
         expect(vis_hash[student.id].length).to eq(1)
         expect(vis_hash[student.id].first).to eq(section_specific_topic1.id)
       end
@@ -3453,7 +3453,7 @@ describe DiscussionTopic do
         student = create_users(1, return_type: :record).first
         course.enroll_student(student, section: section1)
         course.reload
-        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: [course.id], user_id: [student.id], item_type: :discussion)
         expect(vis_hash[student.id].length).to eq(1)
         expect(vis_hash[student.id].first).to eq(section_specific_topic1.id)
       end
@@ -3474,7 +3474,7 @@ describe DiscussionTopic do
         create_section_override_for_assignment(discussion1.assignment, { course_section: section1 })
         create_section_override_for_assignment(discussion2.assignment, { course_section: section2 })
 
-        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: @course.id, user_id: [student1.id, student2.id])
+        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: [@course.id], user_id: [student1.id, student2.id])
         expect(vis_hash[student1.id]).to contain_exactly(discussion1.id)
         expect(vis_hash[student2.id]).to contain_exactly(discussion2.id)
       end
