@@ -105,7 +105,8 @@ class ContextExternalTool < ActiveRecord::Base
 
   CUSTOM_EXTENSION_KEYS = {
     file_menu: [:accept_media_types].freeze,
-    editor_button: [:use_tray].freeze
+    editor_button: [:use_tray].freeze,
+    submission_type_selection: [:description, :require_resource_selection].freeze,
   }.freeze
 
   DISABLED_STATE = "disabled"

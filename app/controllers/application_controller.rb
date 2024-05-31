@@ -548,27 +548,32 @@ class ApplicationController < ActionController::Base
   helper_method :external_tools_display_hashes
 
   def external_tool_display_hash(tool, type, url_params = {}, context = @context, custom_settings = [])
-    url_params = {
-      id: tool.id,
-      launch_type: type
-    }.merge(url_params)
-
     hash = {
       id: tool.id,
       title: tool.label_for(type, I18n.locale),
-      base_url: polymorphic_url([context, :external_tool], url_params),
-    }
-    hash[:tool_id] = tool.tool_id if tool.tool_id.present?
+      base_url: polymorphic_url(
+        [context, :external_tool],
+        { id: tool.id, launch_type: type }.merge(url_params)
+      ),
+      tool_id: tool.tool_id.presence
+    }.compact
 
     extension_settings = [:icon_url, :canvas_icon_class] | custom_settings
     extension_settings.each do |setting|
       hash[setting] = tool.extension_setting(type, setting)
     end
+
     hash[:base_title] = tool.default_label(I18n.locale) if custom_settings.include?(:base_title)
     hash[:external_url] = tool.url if custom_settings.include?(:external_url)
-    if type == :submission_type_selection && tool.submission_type_selection[:description].present?
-      hash[:description] = tool.submission_type_selection[:description]
+
+    if type == :submission_type_selection
+      hash.merge!({
+        description: tool.submission_type_selection[:description].presence,
+        require_resource_selection:
+          tool.submission_type_selection[:require_resource_selection]
+      }.compact)
     end
+
     if type == :top_navigation
       hash[:pinned] = tool.placement_pinned?(type)
     end
