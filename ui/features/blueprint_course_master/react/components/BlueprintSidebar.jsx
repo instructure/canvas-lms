@@ -70,10 +70,10 @@ export default class BlueprintCourseSidebar extends Component {
   }
 
   componentDidMount() {
-    const easyStudentBtn = document.getElementById('easy_student_view')
+    const topNavigationButtons = document.getElementsByClassName('right-of-crumbs')[0]
     window.openBPSidebar = this.open
-    if (easyStudentBtn) {
-      easyStudentBtn.classList.add('mr3')
+    if (topNavigationButtons) {
+      topNavigationButtons.classList.add('bp-sync-button-exists')
     }
   }
 

@@ -353,6 +353,18 @@ body:not(.course-menu-expanded) {
   }
 }
 
+/* Push Top Navigation buttons out from under blueprint sync button on full-width pages */
+body.full-width .right-of-crumbs.bp-sync-button-exists {
+  margin-right: 3rem;
+}
+
+/* Top Navigation buttons still need margin at smaller sizes on pages that are not full-width */
+@media (max-width: 1495px) {
+  .right-of-crumbs.bp-sync-button-exists {
+    margin-right: 3rem;
+  }
+}
+
 .ic-app-course-nav-toggle {
   margin-#{direction(right)}: $ic-sp;
   padding: 0;
