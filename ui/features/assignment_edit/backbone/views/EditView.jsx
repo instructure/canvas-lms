@@ -679,20 +679,22 @@ EditView.prototype.handleContentItem = function (item) {
     }
   }
 
-  this.renderAssignmentSubmissionTypeContainer({
-    tool: this.selectedTool || {title: item.title},
-    resource: item,
-  })
+  this.renderAssignmentSubmissionTypeContainer()
 
   // TODO: add date prefill here
 }
 
 EditView.prototype.handleRemoveResource = function () {
+  // Restore things to how they were before the user pushed the button to
+  // launch the submission_type_selection tool
+  this.$externalToolsContentType.val('context_external_tool')
   this.$externalToolsUrl.val(this.selectedTool.external_url)
   this.$externalToolsTitle.val('')
   this.$externalToolsCustomParams.val('')
   this.$externalToolsIframeWidth.val('')
   this.$externalToolsIframeHeight.val('')
+
+  this.renderAssignmentSubmissionTypeContainer()
 }
 
 /**
@@ -954,14 +956,30 @@ EditView.prototype.handleGradingTypeChange = function (gradingType) {
   return this.handleSubmissionTypeChange(null)
 }
 
+EditView.prototype.hasMasteryConnectData = function () {
+  // Some places check for this data before clearing/overwriting...
+  // It's not clear the reasoning behind this, but I'm for leaving as-is for now.
+  // If some of the resulting odd behavior (switching to MasteryCoinnect from another submission type placement tool) surfaces, revisit with Mastery Connect team (git ref ef3249f62f)
+  return !!this.$externalToolExternalData.val()
+}
+
 EditView.prototype.handleSubmissionTypeChange = function (_ev) {
   const subVal = this.$submissionType.val()
   this.$onlineSubmissionTypes.toggleAccessibly(subVal === 'online')
   this.$externalToolSettings.toggleAccessibly(subVal === 'external_tool')
   const isPlacementTool = subVal.includes('external_tool_placement')
   this.$externalToolPlacementLaunchContainer.toggleAccessibly(isPlacementTool)
+
   if (isPlacementTool) {
     this.handlePlacementExternalToolSelect(subVal)
+  } else if (this.selectedTool && subVal === 'external_tool' && !this.hasMasteryConnectData()) {
+    // Moving from a submission_type_placement tool to generic
+    // "External Tool" type: empty out the fields. this prevents people
+    // from working around the "require_resource_selection" field just
+    // by choosing the tool and then choosing "External Tool"
+    this.handleRemoveResource()
+    this.$externalToolsUrl.val('')
+    this.selectedTool = undefined
   }
   this.$groupCategorySelector.toggleAccessibly(subVal !== 'external_tool' && !isPlacementTool)
   this.$peerReviewsFields.toggleAccessibly(subVal !== 'external_tool' && !isPlacementTool)
@@ -1012,34 +1030,34 @@ EditView.prototype.handlePlacementExternalToolSelect = function (selection) {
     return toolId === tool.id
   })
 
-  const hasNoExtToolData = !this.$externalToolExternalData.val()
   const toolIdsMatch = toolId === this.assignment.selectedSubmissionTypeToolId()
   const extToolUrlsMatch = this.$externalToolsUrl.val() === this.assignment.externalToolUrl()
 
-  if (hasNoExtToolData && !(toolIdsMatch && extToolUrlsMatch)) {
-    // Set the URL of the tool, but only if we haven't just come back from a
-    // deep linking response (so we'll have a URL from the deep linking
-    // response); also don't set if we are just editing the assignment (in this
-    // case the URL [this.$externalToolsUrl] will be the assignment URL)
+  if (!this.hasMasteryConnectData() && !(toolIdsMatch && extToolUrlsMatch)) {
+    // When switching to a submission_type_selection tool in the dropdown, set
+    // the URL of the tool. Don't set if we are just editing the assignment
+    // (toolIdsMatch and extToolUrlsMatch).
+
     this.$externalToolsUrl.val(this.selectedTool.external_url)
     // Ensure that custom params & other stuff left over from another previous
     // deep link response get cleared out when the user chooses a tool:
     this.$externalToolsCustomParams.val('')
     this.$externalToolsIframeWidth.val('')
     this.$externalToolsIframeHeight.val('')
+    this.$externalToolsTitle.val('')
   } else if (this.assignment.resourceLink() && this.assignment.resourceLink().title) {
+    // NOTE: not sure this is necessary, but not risking changing now.
     this.$externalToolsTitle.val(this.assignment.resourceLink().title)
   }
 
-  this.renderAssignmentSubmissionTypeContainer({
-    tool: this.selectedTool,
-    resource: this.assignment.resourceLink(),
-  })
+  this.renderAssignmentSubmissionTypeContainer()
 }
 
-EditView.prototype.renderAssignmentSubmissionTypeContainer = function ({tool, resource}) {
+EditView.prototype.renderAssignmentSubmissionTypeContainer = function () {
+  const resource = {title: this.$externalToolsTitle.val()}
+
   const props = {
-    tool,
+    tool: this.selectedTool,
     resource,
     onRemoveResource: this.handleRemoveResource,
     onLaunchButtonClick: this.handleSubmissionTypeSelectionLaunch,
@@ -1289,6 +1307,7 @@ EditView.prototype._adjustDateValue = function (newDate, originalDate) {
 EditView.prototype.getFormData = function () {
   let data
   data = EditView.__super__.getFormData.apply(this, arguments)
+  data.submission_type = this.toolSubmissionType(data.submission_type)
   data = this._inferSubmissionTypes(data)
   data = this._filterAllowedExtensions(data)
   data = this._unsetGroupsIfExternalTool(data)
@@ -1364,7 +1383,6 @@ EditView.prototype.submit = function (event) {
   event.preventDefault()
   event.stopPropagation()
   this.cacheAssignmentSettings()
-  $(SUBMISSION_TYPE).val(this.toolSubmissionType($(SUBMISSION_TYPE).val()))
   if (this.dueDateOverrideView.containsSectionsWithoutOverrides()) {
     sections = this.dueDateOverrideView.sectionsWithoutOverrides()
     missingDateDialog = new MissingDateDialog({
@@ -1704,9 +1722,12 @@ EditView.prototype._validatePointsRequired = function (data, errors) {
 }
 
 EditView.prototype._validateExternalTool = function (data, errors) {
-  let message, ref, ref1
+  if (data.submission_type !== 'external_tool') {
+    return errors
+  }
+
+  let ref, ref1
   if (
-    data.submission_type === 'external_tool' &&
     data.grading_type !== 'not_graded' &&
     $.trim(
       (ref = data.external_tool_tag_attributes) != null
@@ -1716,18 +1737,27 @@ EditView.prototype._validateExternalTool = function (data, errors) {
         : void 0
     ).length === 0
   ) {
-    message = I18n.t('External Tool URL cannot be left blank')
-    errors['external_tool_tag_attributes[url]'] = [
-      {
-        message,
-      },
-    ]
-    errors['default-tool-launch-button'] = [
-      {
-        message,
-      },
-    ]
+    const message = I18n.t('External Tool URL cannot be left blank')
+    errors['external_tool_tag_attributes[url]'] = [{message}]
+    errors['default-tool-launch-button'] = [{message}]
   }
+
+  // This can happen when:
+  // * user chooses a tool in the submission type dropdown (Submission Type
+  //   Selection placement) but doesn't launch the tool and finish deep linking
+  //   flow
+  // * user edits assignment and removes resource by clicking the 'x'
+  //   (we reset content_type back to 'context_external_tool' then)
+  if (
+    typeof data.external_tool_tag_attributes === 'object' &&
+    !data.external_tool_tag_attributes.title &&
+    this.selectedTool &&
+    this.selectedTool.require_resource_selection
+  ) {
+    const message = I18n.t('Please click below to launch the tool and select a resource.')
+    errors.assignment_submission_container = [{message}]
+  }
+
   return errors
 }
 

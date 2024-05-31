@@ -1215,6 +1215,19 @@ describe ContextExternalTool do
     expect(@tool.extension_setting(:file_menu, :accept_media_types)).to eq "types"
   end
 
+  it "allows description and require_resource_selection exclusively for submission_type_selection extension" do
+    @tool = external_tool_model
+    description = "my description"
+    require_resource_selection = true
+    @tool.submission_type_selection = { description:, require_resource_selection: }
+    @tool.file_menu = { description:, require_resource_selection: }
+    @tool.save!
+    expect(@tool.extension_setting(:submission_type_selection, :description)).to eq description
+    expect(@tool.extension_setting(:submission_type_selection, :require_resource_selection)).to eq require_resource_selection
+    expect(@tool.extension_setting(:file_menu, :description)).to be_blank
+    expect(@tool.extension_setting(:file_menu, :require_resource_selection)).to be_blank
+  end
+
   it "clears disabled extensions" do
     @tool = @course.context_external_tools.create!(name: "a", url: "http://google.com", consumer_key: "12345", shared_secret: "secret")
     @tool.course_navigation = {

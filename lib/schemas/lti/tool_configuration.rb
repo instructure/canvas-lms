@@ -139,6 +139,9 @@ module Schemas::Lti
                               "maxLength" => 255,
                               "errorMessage" => "description must be a string with a maximum length of 255 characters"
                             }.freeze,
+                            "require_resource_selection" => {
+                              "type" => "boolean"
+                            }.freeze,
                             **LAUNCH_INFO_SCHEMA,
                           }.freeze
                         }.freeze

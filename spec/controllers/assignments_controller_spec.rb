@@ -2273,22 +2273,28 @@ describe AssignmentsController do
         let(:domain) { "justanexamplenotarealwebsite.com" }
 
         let(:tool) do
-          factory_with_protected_attributes(@course.context_external_tools,
-                                            domain:,
-                                            url: "http://www.justanexamplenotarealwebsite.com/tool1",
-                                            shared_secret: "test123",
-                                            consumer_key: "test123",
-                                            name: tool_settings[:base_title],
-                                            settings: {
-                                              submission_type_selection: tool_settings
-                                            })
+          factory_with_protected_attributes(
+            @course.context_external_tools,
+            domain:,
+            url: "http://www.justanexamplenotarealwebsite.com/tool1",
+            shared_secret: "test123",
+            consumer_key: "test123",
+            name: tool_settings[:base_title],
+            settings: {
+              submission_type_selection: tool_settings
+            }
+          )
+        end
+
+        let(:tool_in_js_env) do
+          Setting.set("submission_type_selection_allowed_launch_domains", domain)
+          tool
+          subject
+          assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0]
         end
 
         it "is correctly set" do
-          tool
-          Setting.set("submission_type_selection_allowed_launch_domains", domain)
-          subject
-          expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0]).to include(
+          expect(tool_in_js_env).to include(
             base_title: tool_settings[:base_title],
             title: tool_settings[:base_title],
             selection_width: tool_settings[:selection_width],
@@ -2296,20 +2302,36 @@ describe AssignmentsController do
           )
         end
 
-        context "the tool includes a description propery" do
-          let(:description) { "This is a description" }
-          let(:tool_settings) do
-            res = super()
-            res[:description] = description
-            res
+        describe "require_resourse_selection property" do
+          context "when not given in the settings" do
+            it "is not set in the js_env tool" do
+              expect(tool_in_js_env).to_not include(:require_resource_selection)
+            end
           end
 
+          context "when set if set to false in the settings" do
+            let(:tool_settings) { super().merge(require_resource_selection: false) }
+
+            it "is set in the js_env tool" do
+              expect(tool_in_js_env).to include(require_resource_selection: false)
+            end
+          end
+
+          context "when set if set to true in the settings" do
+            let(:tool_settings) { super().merge(require_resource_selection: true) }
+
+            it "is set in the js_env tool" do
+              expect(tool_in_js_env).to include(require_resource_selection: true)
+            end
+          end
+        end
+
+        context "the tool includes a description propery" do
+          let(:description) { "This is a description" }
+          let(:tool_settings) { super().merge(description:) }
+
           it "includes the launch points" do
-            tool
-            Setting.set("submission_type_selection_allowed_launch_domains", domain)
-            subject
-            expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0])
-              .to include(description:)
+            expect(tool_in_js_env).to include(description:)
           end
         end
       end

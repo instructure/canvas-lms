@@ -37,6 +37,7 @@ import userSettings from '@canvas/user-settings'
 import assertions from '@canvas/test-utils/assertionsSpec'
 import '@canvas/jquery/jquery.simulate'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
+import {AssignmentSubmissionTypeContainer} from '../../../react/AssignmentSubmissionTypeContainer'
 
 const s_params = 'some super secure params'
 const fixtures = document.getElementById('fixtures')
@@ -154,6 +155,7 @@ QUnit.module('EditView', {
     $('ul[id^=ui-id-]').remove()
     $('.form-dialog').remove()
     document.getElementById('fixtures').innerHTML = ''
+    sinon.restore()
   },
   editView() {
     return editView.apply(this, arguments)
@@ -365,6 +367,13 @@ test('does not allow point value of "" if grading type is letter', function () {
   equal(view.getFormData().groupCategoryId, null)
 })
 
+test('does not allow blank default external tool url', function () {
+  const view = this.editView()
+  const data = {submission_type: 'external_tool'}
+  const errors = view._validateExternalTool(data, [])
+  equal(errors['default-tool-launch-button'][0].message, 'External Tool URL cannot be left blank')
+})
+
 test('does not allow blank external tool url', function () {
   const view = this.editView()
   const data = {submission_type: 'external_tool'}
@@ -375,11 +384,165 @@ test('does not allow blank external tool url', function () {
   )
 })
 
-test('does not allow blank default external tool url', function () {
+// #region "tests regarding Submission Type Selection"
+
+test('does not allow submission_type_selection tools (selectedTool set) with require_resource_selection=true with no resource title', function () {
   const view = this.editView()
-  const data = {submission_type: 'external_tool'}
+  view.selectedTool = {require_resource_selection: true}
+  const data = {
+    submission_type: 'external_tool',
+    external_tool_tag_attributes: {
+      content_type: 'context_external_tool',
+    },
+  }
   const errors = view._validateExternalTool(data, [])
-  equal(errors['default-tool-launch-button'][0].message, 'External Tool URL cannot be left blank')
+  deepEqual(
+    errors.assignment_submission_container[0].message,
+    'Please click below to launch the tool and select a resource.'
+  )
+})
+
+test('allows submission_type_selection tools (selectedTool set) with require_resource_selection not set with no resource title', function () {
+  const view = this.editView()
+  view.selectedTool = {}
+  const data = {
+    submission_type: 'external_tool',
+    external_tool_tag_attributes: {content_type: 'context_external_tool'},
+  }
+  const errors = view._validateExternalTool(data, [])
+  notOk(errors.assignment_submission_container)
+})
+
+test('allows submission_type_selection tools with require_resource_selection=true with a resource title', function () {
+  const view = this.editView()
+  view.selectedTool = {require_resource_selection: true}
+  const data = {
+    submission_type: 'external_tool',
+    external_tool_tag_attributes: {
+      content_type: 'context_external_tool',
+      title: 'some title',
+    },
+  }
+  const errors = view._validateExternalTool(data, [])
+  notOk(errors.assignment_submission_container)
+})
+
+// sets up the editView and chooses a submission_type_selection tool
+// calls block with the edit view
+// resets mocks at the end
+function editViewWithSubmissionTypeSelection() {
+  const tool = {
+    id: '123',
+    title: 'foo',
+    description: 'bar',
+    external_url: 'http://example.com',
+    require_resource_selection: true,
+  }
+  ENV.SUBMISSION_TYPE_SELECTION_TOOLS = [tool]
+  const view = editView()
+  const types = [...view.$submissionType.find('option')].map(el => el.value)
+  ok(types.includes('external_tool_placement_123'))
+
+  // ignore render in renderSubmissionTypeSelectionDialog:
+  sinon.mock(ReactDOM).expects('render').atLeast(0)
+
+  // tests will check what is rendered to the SubmissionTypeSelection card
+  sinon.spy(React, 'createElement')
+
+  return view
+}
+
+test('when submission_type_selection tool chosen: sets selectedTool and leaves title empty', function () {
+  const view = editViewWithSubmissionTypeSelection()
+  view.$submissionType.val('external_tool_placement_123')
+  view.$submissionType.trigger('change')
+  const formData = view.getFormData()
+
+  // Needed for proper creation of the assignment on the backend, and
+  // validation in _validateExternalTool()
+  equal(formData.submission_type, 'external_tool')
+  deepEqual(formData.submission_types, ['external_tool'])
+
+  ok(view.selectedTool.require_resource_selection)
+  notOk(formData.external_tool_tag_attributes.title)
+})
+
+const lastSubmissionTypeContainerProps = function () {
+  const calls = React.createElement
+    .getCalls()
+    .filter(call => call.args[0] === AssignmentSubmissionTypeContainer)
+  return calls[calls.length - 1].args[1]
+}
+
+test('when a submission_type_selection tool chosen and a resource selected: sets selectedTool and title', function () {
+  const view = editViewWithSubmissionTypeSelection()
+  view.$submissionType.val('external_tool_placement_123')
+  view.$submissionType.trigger('change')
+  view.handleContentItem({
+    type: 'ltiResourceLink',
+    custom: {},
+    url: 'http://example.com',
+    title: 'someResource',
+    lineItem: {},
+  })
+  const formData = view.getFormData()
+
+  ok(view.selectedTool.require_resource_selection)
+  equal(formData.external_tool_tag_attributes.title, 'someResource')
+
+  // Card is shown (props include title):
+  equal(lastSubmissionTypeContainerProps().resource.title, 'someResource')
+})
+
+test('when a submission_type_selection tool chosen, a resource selected, and the resource removed: keeps selectedTool but clears out title', function () {
+  const view = editViewWithSubmissionTypeSelection()
+  view.$submissionType.val('external_tool_placement_123')
+  view.$submissionType.trigger('change')
+
+  view.handleContentItem({
+    type: 'ltiResourceLink',
+    custom: {},
+    url: 'http://example.com',
+    title: 'someResourceLinkTitle',
+    lineItem: {},
+  })
+  view.handleRemoveResource()
+
+  const formData = view.getFormData()
+  ok(view.selectedTool.require_resource_selection)
+  notOk(formData.external_tool_tag_attributes.title)
+
+  // Card is NOT shown:
+  notOk(lastSubmissionTypeContainerProps().resource.title)
+})
+
+test('when a submission_type_select tool chosen but changed back to generic "External Tool": URL reset', function () {
+  // Moving from a submission_type_placement tool to generic
+  // clear out URL & selectedTool -- shouldn't carry over selectedTool
+  // and prefill external_tool URL
+
+  const view = editViewWithSubmissionTypeSelection()
+  view.$submissionType.val('external_tool_placement_123')
+  view.$submissionType.trigger('change')
+  view.handleContentItem({
+    type: 'ltiResourceLink',
+    custom: {},
+    url: 'http://example.com',
+    title: 'someResourceLinkTitle',
+    lineItem: {},
+  })
+
+  const formData = view.getFormData()
+  ok(view.selectedTool)
+  ok(formData.external_tool_tag_attributes.url)
+
+  view.$submissionType.val('external_tool')
+  view.$submissionType.trigger('change')
+
+  const newFormData = view.getFormData()
+
+  notOk(view.selectedTool)
+  notOk(newFormData.external_tool_tag_attributes.url)
 })
 
 test('does not validate allowed extensions if file uploads is not a submission type', function () {
@@ -388,6 +551,8 @@ test('does not validate allowed extensions if file uploads is not a submission t
   const errors = view._validateAllowedExtensions(data, [])
   equal(errors.allowed_extensions, null)
 })
+
+// #endregion "tests regarding Submission Type Selection"
 
 test('removes group_category_id if an external tool is selected', function () {
   const view = this.editView()
