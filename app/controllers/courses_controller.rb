@@ -3307,8 +3307,7 @@ class CoursesController < ApplicationController
       end
       disable_conditional_release if changes[:conditional_release]&.last == false
 
-      # RUBY 3.0 - **{} can go away, because data won't implicitly convert to kwargs
-      @course.delay_if_production(priority: Delayed::LOW_PRIORITY).touch_content_if_public_visibility_changed(changes, **{})
+      @course.delay_if_production(priority: Delayed::LOW_PRIORITY).touch_content_if_public_visibility_changed(changes)
 
       if @course.errors.none? && @course.save
         Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
