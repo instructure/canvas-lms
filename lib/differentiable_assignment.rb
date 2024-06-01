@@ -30,7 +30,11 @@ module DifferentiableAssignment
       visible_instances = DifferentiableAssignment.filter([differentiable], user, context) do |_, user_ids|
         conditions = { user_id: user_ids }
         conditions[column_name] = differentiable.id
-        visibility_view.where(conditions)
+        if Account.site_admin.feature_enabled?(:differentiated_modules)
+          visibility_service(conditions)
+        else
+          visibility_view.where(conditions)
+        end
       end
       is_visible = true if visible_instances.any?
     end
@@ -57,6 +61,22 @@ module DifferentiableAssignment
       UngradedDiscussionStudentVisibility
     else
       Quizzes::QuizStudentVisibility
+    end
+  end
+
+  def visibility_service(conditions)
+    # TODO: the rest of the services and test them
+    case differentiable.class_name
+    when "Assignment"
+      AssignmentStudentVisibility.where(conditions)
+    when "ContextModule"
+      ModuleVisibility::ModuleVisibilityService.module_visible_to_students(user_ids: conditions[:user_id], context_module_id: conditions[:context_module_id])
+    when "WikiPage"
+      WikiPageStudentVisibility.where(conditions)
+    when "DiscussionTopic"
+      UngradedDiscussionStudentVisibility.where(conditions)
+    else
+      Quizzes::QuizStudentVisibility.where(conditions)
     end
   end
 
@@ -94,7 +114,7 @@ module DifferentiableAssignment
   def self.scope_filter(scope, user, context, opts = {})
     context.shard.activate do
       filter(scope, user, context, opts) do |filtered_scope, user_ids|
-        filtered_scope.visible_to_students_in_course_with_da(user_ids, context.id)
+        filtered_scope.visible_to_students_in_course_with_da(user_ids, [context.id])
       end
     end
   end

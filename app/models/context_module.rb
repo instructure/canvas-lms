@@ -35,7 +35,6 @@ class ContextModule < ActiveRecord::Base
   has_many :content_tags, -> { order("content_tags.position, content_tags.title") }, dependent: :destroy
   has_many :assignment_overrides, dependent: :destroy, inverse_of: :context_module
   has_many :assignment_override_students, dependent: :destroy
-  has_many :module_student_visibilities
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :context_module
   acts_as_list scope: { context: self, workflow_state: ["active", "unpublished"] }
 
@@ -359,9 +358,13 @@ class ContextModule < ActiveRecord::Base
   scope :starting_with_name, lambda { |name|
     where("name ILIKE ?", "#{name}%")
   }
-  scope :visible_to_students_in_course_with_da, lambda { |user_id, course_id|
-    joins(:module_student_visibilities)
-      .where(module_student_visibilities: { user_id:, course_id: })
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
+    visible_module_ids = ModuleVisibility::ModuleVisibilityService.modules_visible_to_students_in_courses(course_ids:, user_ids:).map(&:context_module_id)
+    if visible_module_ids.any?
+      where(id: visible_module_ids)
+    else
+      none
+    end
   }
 
   alias_method :published?, :active?

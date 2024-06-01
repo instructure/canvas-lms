@@ -24,5 +24,18 @@ class ModuleStudentVisibility < ActiveRecord::Base
     true
   end
 
+  def self.where_with_guard(*args)
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      raise StandardError, "ModuleStudentVisibility view should not be used when differentiated_modules site admin flag is on.  Use ModuleVisibilityService instead"
+    end
+
+    where_without_guard(*args)
+  end
+
+  class << self
+    alias_method :where_without_guard, :where
+    alias_method :where, :where_with_guard
+  end
+
   before_destroy { raise ActiveRecord::ReadOnlyRecord }
 end
