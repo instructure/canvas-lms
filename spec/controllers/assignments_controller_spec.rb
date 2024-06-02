@@ -683,48 +683,45 @@ describe AssignmentsController do
       subject { get "show", params: { course_id: assignment.course.id, id: assignment.id } }
 
       let(:assignment) { assignment_model }
+      let(:launch_url) { "https://www.my-tool.com/login" }
+      let(:key) do
+        DeveloperKey.create!(
+          scopes: [
+            TokenScopes::LTI_AGS_LINE_ITEM_SCOPE,
+            TokenScopes::LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE,
+            TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE,
+            TokenScopes::LTI_AGS_SCORE_SCOPE
+          ]
+        )
+      end
+      let(:external_tool) do
+        external_tool_1_3_model(
+          context: assignment.course,
+          opts: {
+            url: launch_url,
+            developer_key: key
+          }
+        )
+      end
 
-      before { user_session(assignment.course.teachers.first) }
+      before do
+        # For this context, the assignment and tag must
+        # be created before the tool
+        user_session(assignment.course.teachers.first)
+        assignment.update!(
+          external_tool_tag: content_tag,
+          submission_types: "external_tool"
+        )
+        external_tool
+      end
 
       context "and a default line item was never created" do
-        let(:launch_url) { "https://www.my-tool.com/login" }
         let(:content_tag) do
           ContentTag.create!(
             context: assignment,
             content_type: "ContextExternalTool",
             url: launch_url
           )
-        end
-
-        let(:key) do
-          DeveloperKey.create!(
-            scopes: [
-              TokenScopes::LTI_AGS_LINE_ITEM_SCOPE,
-              TokenScopes::LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE,
-              TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE,
-              TokenScopes::LTI_AGS_SCORE_SCOPE
-            ]
-          )
-        end
-
-        let(:external_tool) do
-          external_tool_1_3_model(
-            context: assignment.course,
-            opts: {
-              url: launch_url,
-              developer_key: key
-            }
-          )
-        end
-
-        before do
-          # For this context, the assignment and tag must
-          # be created before the tool
-          assignment.update!(
-            external_tool_tag: content_tag,
-            submission_types: "external_tool"
-          )
-          external_tool
         end
 
         it { is_expected.to be_successful }
@@ -735,6 +732,27 @@ describe AssignmentsController do
           end.to change {
             Lti::LineItem.where(assignment:).count
           }.from(0).to(1)
+        end
+      end
+
+      context "when the assignment is an external tool opened in a new tab" do
+        render_views
+
+        let(:content_tag) do
+          ContentTag.create!(
+            context: assignment,
+            content_type: "ContextExternalTool",
+            url: launch_url,
+            new_tab: true
+          )
+        end
+
+        it { is_expected.to be_successful }
+
+        it "creates a new tab iframe" do
+          subject
+          expect(assignment.external_tool_tag.new_tab).to be true
+          expect(response.body.scan('data-tool-launch-type="window"').count).to eq 1
         end
       end
     end
