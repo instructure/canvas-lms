@@ -76,6 +76,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       return render(action: "close_quiz_popup_window")
     end
 
+    flash[:notice] = t("Quiz submitted")
+
     redirect_to course_quiz_url(@context, @quiz, previewing_params)
   end
 

@@ -93,6 +93,14 @@ describe Quizzes::QuizSubmissionsController do
       events = Quizzes::QuizSubmissionEvent.where(quiz_submission_id: @submission.id)
       expect(events.size).to equal(1)
     end
+
+    it "shows message of success" do
+      user_session(@student)
+      @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
+      Quizzes::SubmissionGrader.new(@submission).grade_submission
+      post "create", params: { course_id: @quiz.context_id, quiz_id: @quiz.id, question_123: "hi", validation_token: @submission.validation_token }
+      expect(flash[:notice]).to match(/Quiz submitted/)
+    end
   end
 
   describe "PUT 'update'" do
