@@ -199,6 +199,14 @@ differentiated_modules:
   after_state_change_proc: differentiated_modules_setting_hook
   applies_to: SiteAdmin
 
+differentiated_files:
+  state: hidden
+  display_name: Differentiated Files
+  description: |-
+    If enabled, files become assignable to specific individuals and groups using the
+    same interface that other learning object use.
+  applies_to: SiteAdmin
+
 learner_passport:
   state: hidden
   applies_to: RootAccount

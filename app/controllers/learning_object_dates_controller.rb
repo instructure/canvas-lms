@@ -200,6 +200,8 @@ class LearningObjectDatesController < ApplicationController
   end
 
   def check_authorized_action
+    return render json: { error: "This API does not support files." }, status: :bad_request if asset.is_a?(Attachment) && !Account.site_admin.feature_enabled?(:differentiated_files)
+
     render_unauthorized_action unless asset.grants_right?(@current_user, :manage_assign_to)
   end
 

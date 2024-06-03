@@ -1529,7 +1529,12 @@ class Attachment < ActiveRecord::Base
     end
     can :attach_to_submission_comment
 
-    given { |user, session| user && context.is_a?(Course) && context.grants_right?(user, session, :manage_files_edit) }
+    given do |user, session|
+      user &&
+        context.is_a?(Course) &&
+        context.grants_right?(user, session, :manage_files_edit) &&
+        Account.site_admin.feature_enabled?(:differentiated_files)
+    end
     can :manage_assign_to
   end
 
