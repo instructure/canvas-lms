@@ -398,7 +398,9 @@ class Account < ActiveRecord::Base
   add_setting :enable_name_pronunciation, boolean: true, root_only: true, default: false
 
   add_setting :enable_inbox_signature_block, boolean: true, root_only: true, default: false
+  add_setting :disable_inbox_signature_block_for_students, boolean: true, root_only: true, default: false
   add_setting :enable_inbox_auto_response, boolean: true, root_only: true, default: false
+  add_setting :disable_inbox_auto_response_for_students, boolean: true, root_only: true, default: false
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
