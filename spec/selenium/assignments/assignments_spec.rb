@@ -1416,4 +1416,35 @@ describe "assignments" do
       end
     end
   end
+
+  context "with discussion_checkpoints" do
+    before :once do
+      Account.site_admin.enable_feature! :discussion_checkpoints
+    end
+
+    it "does not show points possible and due date fields for checkpointed assignments" do
+      course_with_teacher_logged_in(active_all: true, course: @course)
+      checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 2.days.from_now }],
+        points_possible: 6
+      )
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 3.days.from_now }],
+        points_possible: 7,
+        replies_required: 2
+      )
+
+      get "/courses/#{@course.id}/assignments"
+      f("div#assignment_#{checkpointed_discussion.assignment.id} button.al-trigger").click
+      f("li a.edit_assignment").click
+      expect(f("input#assign_#{checkpointed_discussion.assignment.id}_assignment_name")).to be_present
+      expect(f("body")).not_to contain_jqcss "label[for='#{checkpointed_discussion.assignment.id}_assignment_due_at']"
+      expect(f("body")).not_to contain_jqcss "label[for='#{checkpointed_discussion.assignment.id}_assignment_points']"
+    end
+  end
 end

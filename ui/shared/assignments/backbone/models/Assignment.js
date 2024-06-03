@@ -123,6 +123,7 @@ function Assignment() {
   this.groupCategoryId = this.groupCategoryId.bind(this)
   this.hasDueDate = this.hasDueDate.bind(this)
   this.hasPointsPossible = this.hasPointsPossible.bind(this)
+  this.hasSubAssignments = this.hasSubAssignments.bind(this)
   this.hasSubmittedSubmissions = this.hasSubmittedSubmissions.bind(this)
   this.hideInGradebook = this.hideInGradebook.bind(this)
   this.hideZeroPointQuizzesOptionEnabled = this.hideZeroPointQuizzesOptionEnabled.bind(this)
@@ -1071,6 +1072,10 @@ Assignment.prototype.hasPointsPossible = function () {
   return !this.isQuiz() && !this.isPage()
 }
 
+Assignment.prototype.hasSubAssignments = function () {
+  return this.get('has_sub_assignments')
+}
+
 Assignment.prototype.nonBaseDates = function () {
   const dateGroups = this.get('all_dates')
   if (!dateGroups) {
@@ -1234,6 +1239,7 @@ Assignment.prototype.toView = function () {
     'groupCategoryId',
     'hasDueDate',
     'hasPointsPossible',
+    'hasSubAssignments',
     'hideInGradebook',
     'hideZeroPointQuizzesOptionEnabled',
     'htmlBuildUrl',
