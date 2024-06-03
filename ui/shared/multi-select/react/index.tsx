@@ -65,6 +65,7 @@ type Props = {
   id?: string
   isLoading: boolean
   isShowingOptions?: boolean
+  isRequired?: boolean
   label: React.ReactNode
   inputRef?: (inputElement: HTMLInputElement | null) => void
   listRef?: (ref: HTMLUListElement | null) => void
@@ -97,6 +98,7 @@ function CanvasMultiSelect(props: Props) {
     customOnRequestSelectOption,
     customOnBlur,
     isLoading,
+    isRequired,
     onUpdateHighlightedOption,
     setInputRef,
     ...otherProps
@@ -289,7 +291,9 @@ function CanvasMultiSelect(props: Props) {
       term: string
     ) => option.label.match(new RegExp(`^${term}`, 'i'))
     const matcher = customMatcher || defaultMatcher
-    const filtered = childProps.filter(child => matcher(child, value.trim()))
+    const filtered = childProps.filter(
+      child => matcher(child, value.trim()) && !selectedOptionIds.includes(child.id)
+    )
     let message =
       // if number of options has changed, announce the new total.
       filtered.length !== filteredOptionIds?.length
@@ -302,7 +306,8 @@ function CanvasMultiSelect(props: Props) {
           )
         : null
     if (message && filtered.length > 0 && highlightedOptionId !== filtered[0].id) {
-      message = getChildById(filtered[0].id)?.label + '. ' + message
+      const child = getChildById(filtered[0].id)
+      if (child) message = primaryLabel(child) + '. ' + message
     }
     setFilteredOptionIds(filtered.map(f => f.id))
     if (filtered.length > 0) setHighlightedOptionId(filtered[0].id)
@@ -394,6 +399,7 @@ function CanvasMultiSelect(props: Props) {
           'Type or use arrow keys to navigate. Multiple selections are allowed.'
         )}
         renderBeforeInput={contentBeforeInput()}
+        isRequired={isRequired && selectedOptionIds.length === 0}
         {...otherProps}
       >
         {renderChildren()}
