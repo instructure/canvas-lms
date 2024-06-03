@@ -25,6 +25,9 @@ import {map, values} from 'lodash'
 import htmlEscape from '@instructure/html-escape'
 import sanitizeUrl from '@canvas/util/sanitizeUrl'
 import {contentMapping} from '@instructure/canvas-rce/src/common/mimeClass'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {MediaPlayer} from '@instructure/ui-media-player'
 
 const I18n = useI18nScope('jquery_media_comments')
 
@@ -96,6 +99,7 @@ mejs.MepDefaults.features.splice(positionAfterSubtitleSelector, 0, 'sourcechoose
 mejs.MepDefaults.features.splice(positionAfterSubtitleSelector, 0, 'speed')
 
 export function getSourcesAndTracks(id, attachmentId) {
+  const studioMediaEnabled = ENV.studio_media_capture_enabled
   const dfd = new $.Deferred()
   const api = attachmentId ? 'media_attachments' : 'media_objects'
   $.getJSON(`/${api}/${attachmentId || id}/info`, data => {
@@ -106,30 +110,50 @@ export function getSourcesAndTracks(id, attachmentId) {
       // mediaplayer plays the first source by default, which tends to be the highest
       // resolution. sort so we play the lowest res. by default
       .sort((a, b) => parseInt(a.bitrate, 10) - parseInt(b.bitrate, 10))
-      .map(
-        source =>
-          // xsslint safeString.function sanitizeUrl
-          `<source
-            type='${htmlEscape(source.content_type)}'
-            src='${sanitizeUrl(htmlEscape(source.url))}'
-            title='${htmlEscape(source.width)}x${htmlEscape(source.height)} ${htmlEscape(
-            Math.floor(source.bitrate / 1024)
-          )} kbps'
-          />`
-      )
+      .map(source => {
+        if (studioMediaEnabled) {
+          return {
+            src: source.url,
+            label: `${htmlEscape(source.width)}x${htmlEscape(source.height)} ${htmlEscape(
+              Math.floor(source.bitrate / 1024)
+            )} kbps`,
+          }
+        }
+        // xsslint safeString.function sanitizeUrl
+        return `<source type='${htmlEscape(source.content_type)}' src='${sanitizeUrl(
+          htmlEscape(source.url)
+        )}' title='${htmlEscape(source.width)}x${htmlEscape(source.height)} ${htmlEscape(
+          Math.floor(source.bitrate / 1024)
+        )} kbps' />`
+      })
 
     const tracks = map(data.media_tracks, track => {
       const languageName = mejs.language.codes[track.locale] || track.locale
+      if (studioMediaEnabled) {
+        return {
+          id: attachmentId || id,
+          type: track.kind,
+          label: languageName,
+          src: getPathFromUrl(track.url),
+          language: track.locale,
+        }
+      }
       return `<track kind='${htmlEscape(track.kind)}' label='${htmlEscape(
         languageName
-      )}' src='${htmlEscape(track.url)}' srclang='${htmlEscape(track.locale)}'
-      data-inherited-track='${htmlEscape(track.inherited)}' />`
+      )}' src='${htmlEscape(track.url)}' srclang='${htmlEscape(
+        track.locale
+      )}' data-inherited-track='${htmlEscape(track.inherited)}' />`
     })
 
     const types = map(data.media_sources, source => source.content_type)
     return dfd.resolve({sources, tracks, types, can_add_captions: data.can_add_captions})
   })
   return dfd
+}
+
+function getPathFromUrl(url) {
+  const urlObj = new URL(url)
+  return urlObj.pathname + urlObj.search + urlObj.hash
 }
 
 function createMediaTag({sourcesAndTracks, mediaType, height, width, mediaPlayerOptions}) {
@@ -328,6 +352,14 @@ const mediaCommentActions = {
               mediaCommentId: id,
             }
 
+            const mediaPlayer = (
+              <MediaPlayer
+                tracks={sourcesAndTracks.tracks}
+                sources={sourcesAndTracks.sources}
+                captionPosition="bottom"
+              />
+            )
+
             const $mediaTag = createMediaTag({
               sourcesAndTracks,
               mediaPlayerOptions,
@@ -335,7 +367,13 @@ const mediaCommentActions = {
               height,
               width,
             })
-            $mediaTag.appendTo($dialog.html(''))
+
+            const studioMediaEnabled = ENV.studio_media_capture_enabled
+            if (studioMediaEnabled) {
+              ReactDOM.render(mediaPlayer, $dialog[0])
+            } else {
+              $mediaTag.appendTo($dialog.html(''))
+            }
 
             $this.data({
               mediaelementplayer: new mejs.MediaElementPlayer($mediaTag, mediaPlayerOptions),
