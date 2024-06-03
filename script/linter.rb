@@ -150,7 +150,7 @@ class Linter
     if gerrit_patchset
       if boyscout_mode
         processed_comments.each do |comment|
-          comment[:severity] = "error"
+          comment[:severity] = "error" unless comment[:ignore_boyscout_severity_change]
         end
       end
       publish_gergich_comments(processed_comments)
