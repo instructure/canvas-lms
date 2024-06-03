@@ -263,7 +263,8 @@ export function submitterPreviewText(submission: GradebookUserSubmissionDetails)
 
 export function outOfText(
   assignment: AssignmentConnection,
-  submission: GradebookUserSubmissionDetails
+  submission: GradebookUserSubmissionDetails,
+  pointsBasedGradingScheme: boolean
 ): string {
   const {gradingType, pointsPossible} = assignment
 
@@ -272,10 +273,17 @@ export function outOfText(
   } else if (gradingType === 'gpa_scale') {
     return ''
   } else if (gradingType === 'letter_grade' || gradingType === 'pass_fail') {
-    return I18n.t('(%{score} out of %{points})', {
-      points: I18n.n(pointsPossible),
-      score: submission.enteredScore ?? ' -',
-    })
+    if (pointsBasedGradingScheme) {
+      return I18n.t('(%{score} out of %{points})', {
+        points: I18n.n(pointsPossible, {precision: 2}),
+        score: I18n.n(submission.enteredScore, {precision: 2}) ?? ' -',
+      })
+    } else {
+      return I18n.t('(%{score} out of %{points})', {
+        points: I18n.n(pointsPossible),
+        score: submission.enteredScore ?? ' -',
+      })
+    }
   } else if (pointsPossible === null || pointsPossible === undefined) {
     return I18n.t('No points possible')
   } else {
