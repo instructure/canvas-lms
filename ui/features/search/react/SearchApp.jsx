@@ -27,6 +27,7 @@ import {Pill} from '@instructure/ui-pill'
 import {Spinner} from '@instructure/ui-spinner'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
+import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import SearchResults from './SearchResults'
@@ -48,6 +49,7 @@ export default function SearchApp() {
   const [isLoading, setIsLoading] = useState(false)
   const [searchResults, setSearchResults] = useState([])
   const [indexingProgress, setIndexingProgress] = useState(null)
+  const [isTrayOpen, setIsTrayOpen] = useState(false)
 
   useEffect(() => {
     doUrlSearch(false)  // init the box but don't actually do the search until we've checked index status
@@ -212,10 +214,19 @@ export default function SearchApp() {
       )}
 
       <Heading level="h1" margin="0 0 medium 0">
-        {I18n.t('Smart Search')}
-        <Pill color="alert" margin="0 0 0 small" themeOverride={{background: 'alert'}}>
-          {I18n.t('Beta')}
-        </Pill>
+        <Flex justifyItems="space-between">
+          <Flex.Item>
+            {I18n.t('Smart Search')}
+            <Pill color="alert" margin="0 0 0 small" themeOverride={{background: 'alert'}}>
+              {I18n.t('Beta')}
+            </Pill>
+          </Flex.Item>
+          <Flex.Item>
+            <Button
+            onClick={ _ => setIsTrayOpen(true) }
+            >{I18n.t('How It Works')}</Button>
+          </Flex.Item>
+        </Flex>
       </Heading>
 
       <form action="#" method="get" onSubmit={onSearch}>
@@ -255,6 +266,39 @@ export default function SearchApp() {
           />
         </View>
       )}
+      <Tray
+        label={I18n.t('How It Works')}
+        open={isTrayOpen}
+        onDismiss={_ => { setIsTrayOpen(false)}}
+        size="regular"
+        placement="end"
+      >
+        <View as="div" padding="medium">
+          <Flex>
+            <Flex.Item>
+              <CloseButton
+                placement="end"
+                offset="small"
+                screenReaderLabel="Close"
+                onClick={_ => { setIsTrayOpen(false)}}
+              />
+            </Flex.Item>
+            <Flex.Item>
+              <h3>{I18n.t('What is Smart Search?')}</h3>
+              <p>{I18n.t('Smart Search is a feature of Canvas that is currently in development.  Leveraging semantic algorithms and AI, the new Smart Search feature understands the context of queries, providing more accurate and relevant results without the need for traditional boolean operators or other search tools.')}</p>
+              <h3>{I18n.t('How do I use the Search feature?')}</h3>
+              <p>{I18n.t('Our Smart Search feature relies on an AI-adjacent technology called “embeddings.” This technology “reads” the course content and creates a complex mathematical representation of each piece of content. When you perform a search, the technology “reads” your query and converts it into a complex mathematical representation. The tool then compares the mathematical representations of both your search and course content to return relevant results.')}</p>
+              <p>{I18n.t('Because Smart Search operates on “understanding” both the content and the queries, you can type in keyword(s), content, or just give a general gist of what you are looking for (“guitar”, “what are the steps of photosynthesis?”, “math to turn a function into frequencies“). We think you will be surprised at how well the system understands the intent of your queries and returns results accordingly.')}</p>
+              <p>{I18n.t('Additionally, the AI model we are using to power this feature is multilingual. This means that you can search in whatever language you like, and the most relevant content will be returned no matter what language it was written in. Give it a try!')}</p>
+              <h3>{I18n.t('What content is searchable?')}</h3>
+              <p>{I18n.t('As of June 1, 2024, the Smart Search feature is querying the following items (including titles) within a course: content pages, announcements, discussion prompts, assignment descriptions.')}</p>
+              <p>{I18n.t('The intention is to expand this scope as the Smart Search tool continues development.')}</p>
+              <h3>{I18n.t('How can I help with the development of this feature?')}</h3>
+              <p>{I18n.t('Ultimately, this feature is still classified as an experimental beta. We want to provide opportunities for participants to provide feedback. Clicking thumbs up and thumbs down on your search results and telling us why the results are good or bad will help us determine when results should or shouldn’t be shown to you. You can also provide feedback in our Canvas Community space for Smart Search Beta.')}</p>
+            </Flex.Item>
+          </Flex>
+        </View>
+      </Tray>
     </View>
   )
 }
