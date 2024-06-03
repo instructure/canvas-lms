@@ -123,6 +123,7 @@ class SmartSearchController < ApplicationController
 
     set_active_tab("search")
     @show_left_side = true
+    add_crumb(@context.name, named_context_url(@context, :course_url)) unless @skip_crumb
     add_crumb(t("#crumbs.search", "Search"), named_context_url(@context, :course_search_url)) unless @skip_crumb
     js_env({
              COURSE_ID: @context.id.to_s
