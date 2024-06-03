@@ -77,7 +77,6 @@ const AssigneeSelector = ({
 }: Props) => {
   const listElementRef = useRef<HTMLElement | null>(null)
   const [options, setOptions] = useState<AssigneeOption[]>(defaultValues)
-  const [isShowingOptions, setIsShowingOptions] = useState(false)
   const {allOptions, isLoading, setSearchTerm} = useFetchAssignees({
     courseId,
     everyoneOption,
@@ -104,10 +103,6 @@ const AssigneeSelector = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, shouldUpdateOptions)
 
-  const handleSelectOption = () => {
-    setIsShowingOptions(false)
-  }
-
   const handleChange = (newSelected: string[]) => {
     const newSelectedSet = new Set(newSelected)
     const selected = options.filter(option => newSelectedSet.has(option.id))
@@ -117,7 +112,6 @@ const AssigneeSelector = ({
   const handleInputChange = debounce(value => setSearchTerm(value), 500)
 
   const handleShowOptions = () => {
-    setIsShowingOptions(true)
     setTimeout(() => {
       setContainScrollBehavior(listElementRef.current)
     }, 500)
@@ -158,12 +152,10 @@ const AssigneeSelector = ({
         customOnInputChange={handleInputChange}
         visibleOptionsCount={10}
         isLoading={isLoading}
+        isRequired={true}
         setInputRef={inputRef}
         listRef={e => (listElementRef.current = e)}
-        isShowingOptions={isShowingOptions}
         customOnRequestShowOptions={handleShowOptions}
-        customOnRequestHideOptions={() => setIsShowingOptions(false)}
-        customOnRequestSelectOption={handleSelectOption}
         customRenderBeforeInput={tags =>
           tags?.map((tag: ReactElement) => (
             <View
