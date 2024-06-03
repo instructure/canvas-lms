@@ -50,6 +50,7 @@ export default function SearchApp() {
   const [indexingProgress, setIndexingProgress] = useState(null)
 
   useEffect(() => {
+    doUrlSearch(false)  // init the box but don't actually do the search until we've checked index status
     if (searchInput.current) {
       searchInput.current.focus()
     }
@@ -63,13 +64,26 @@ export default function SearchApp() {
           setTimeout(checkIndexStatus, 2000)
         } else {
           setIndexingProgress(null)
+          doUrlSearch()
         }
       })
     })
   }, [])
 
+  const doUrlSearch = useCallback((perform = true) => {
+    const url = new URL(window.location.href)
+    const searchTerm = url.searchParams.get('q')
+    if (searchTerm && searchTerm.length && searchInput.current) {
+      searchInput.current.value = searchTerm
+      if (perform) {
+        onSearch()
+      }
+    }
+  }, [])
+
   useEffect(() => {
     checkIndexStatus()
+    window.addEventListener('popstate', doUrlSearch)
   }, [])
 
   const onDislike = ({id, type}) => {
@@ -111,7 +125,7 @@ export default function SearchApp() {
   }
 
   const onSearch = e => {
-    e.preventDefault()
+    e?.preventDefault()
 
     if (!searchInput.current) return
 
@@ -121,6 +135,12 @@ export default function SearchApp() {
     setIsLoading(true)
     setSearchResults([])
     setPreviousSearch(searchTerm)
+
+    const url = new URL(window.location.href);
+    if (url.searchParams.get('q') !== searchTerm) {
+      url.searchParams.set('q', searchTerm);
+      window.history.pushState({}, '', url);
+    }
 
     fetch(`/api/v1/courses/${ENV.COURSE_ID}/smartsearch?q=${searchTerm}&per_page=25`)
       .then(res => {
