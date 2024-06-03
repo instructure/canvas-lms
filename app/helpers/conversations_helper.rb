@@ -335,6 +335,32 @@ module ConversationsHelper
     end
   end
 
+  def inbox_settings_student?(user: @current_user, account: @domain_root_account)
+    admin_user = account.grants_any_right?(user, :manage_account_settings, :manage_site_settings)
+
+    active_user_enrollments = Enrollment
+                              .joins(:course)
+                              .where(
+                                user_id: user.id,
+                                root_account_id: account.id,
+                                workflow_state: "active"
+                              )
+                              .where.not(course: { workflow_state: "deleted" })
+
+    active_student = active_user_enrollments
+                     .where(type: %w[StudentEnrollment StudentViewEnrollment ObserverEnrollment])
+                     .exists?
+
+    active_non_student = active_user_enrollments
+                         .where(type: %w[TeacherEnrollment TaEnrollment DesignerEnrollment])
+                         .exists?
+
+    # Not a Student
+    # - User with active Teacher, TA or Designer Enrollments
+    # - Admin user without active Student, StudentView or Observer Enrollments
+    !(active_non_student || (admin_user && !active_student))
+  end
+
   class Error < StandardError
     attr_accessor :message, :status, :attribute
 

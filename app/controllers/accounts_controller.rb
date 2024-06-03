@@ -1955,7 +1955,9 @@ class AccountsController < ApplicationController
                                    { conditional_release: [:value, :locked] }.freeze,
                                    { allow_observers_in_appointment_groups: [:value] }.freeze,
                                    :enable_inbox_signature_block,
+                                   :disable_inbox_signature_block_for_students,
                                    :enable_inbox_auto_response,
+                                   :disable_inbox_auto_response_for_students,
                                    :enable_name_pronunciation,].freeze
 
   def permitted_account_attributes

@@ -643,6 +643,26 @@ $(document).ready(function () {
     onTermsTypeChange()
   }
 
+  $('#account_settings_enable_inbox_signature_block').click(event => {
+    const lockbox = $('#account_settings_disable_inbox_signature_block_for_students')
+    if (event.target.checked) {
+      lockbox.prop('disabled', false)
+    } else {
+      lockbox.prop('checked', false)
+      lockbox.prop('disabled', true)
+    }
+  })
+
+  $('#account_settings_enable_inbox_auto_response').click(event => {
+    const lockbox = $('#account_settings_disable_inbox_auto_response_for_students')
+    if (event.target.checked) {
+      lockbox.prop('disabled', false)
+    } else {
+      lockbox.prop('checked', false)
+      lockbox.prop('disabled', true)
+    }
+  })
+
   window.addEventListener('popstate', () => {
     const openTab = window.location.hash
     if (openTab) {

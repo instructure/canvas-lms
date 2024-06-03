@@ -300,8 +300,13 @@ class ConversationsController < ApplicationController
           MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size
         }
 
-        hash[:INBOX_SIGNATURE_BLOCK_ENABLED] = Account.site_admin.feature_enabled?(:inbox_settings) && @domain_root_account.enable_inbox_signature_block?
-        hash[:INBOX_AUTO_RESPONSE_ENABLED] = Account.site_admin.feature_enabled?(:inbox_settings) && @domain_root_account.enable_inbox_auto_response?
+        is_student = inbox_settings_student?(user: @current_user, account: @domain_root_account)
+        hash[:INBOX_SIGNATURE_BLOCK_ENABLED] = Account.site_admin.feature_enabled?(:inbox_settings) &&
+                                               @domain_root_account.enable_inbox_signature_block? &&
+                                               (!is_student || (is_student && !@domain_root_account.disable_inbox_signature_block_for_students?))
+        hash[:INBOX_AUTO_RESPONSE_ENABLED] = Account.site_admin.feature_enabled?(:inbox_settings) &&
+                                             @domain_root_account.enable_inbox_auto_response? &&
+                                             (!is_student || (is_student && !@domain_root_account.disable_inbox_auto_response_for_students?))
 
         notes_enabled_accounts = @current_user.associated_accounts.having_user_notes_enabled
 

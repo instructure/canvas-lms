@@ -691,14 +691,34 @@
                 </div>
               <% end %>
               <% if !@account.site_admin? && @account.root_account? && Account.site_admin.feature_enabled?(:inbox_settings) %>
-                <div>
-                  <%= settings.check_box :enable_inbox_signature_block, :checked => @account.enable_inbox_signature_block? %>
-                  <%= settings.label     :enable_inbox_signature_block, :en => "Enable Inbox Signature Block" %>
-                </div>
-                <div>
-                  <%= settings.check_box :enable_inbox_auto_response, :checked => @account.enable_inbox_auto_response? %>
-                  <%= settings.label     :enable_inbox_auto_response, :en => "Enable Inbox Auto Response" %>
-                </div>
+                <table>
+                  <% inbox_signature_block_enabled = @account.enable_inbox_signature_block? %>
+                  <tr>
+                    <td colspan="2">
+                      <%= settings.check_box :enable_inbox_signature_block, :checked => inbox_signature_block_enabled %>
+                      <%= settings.label     :enable_inbox_signature_block, :en => "Enable Inbox Signature Block" %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2" class="sub_checkbox">
+                      <%= settings.check_box :disable_inbox_signature_block_for_students, :checked => @account.disable_inbox_signature_block_for_students?, :disabled => !inbox_signature_block_enabled %>
+                      <%= settings.label     :disable_inbox_signature_block_for_students, :en => "Disable Inbox Signature Block for Students" %>
+                    </td>
+                  </tr>
+                  <% inbox_auto_response_enabled = @account.enable_inbox_auto_response? %>
+                  <tr>
+                    <td colspan="2">
+                      <%= settings.check_box :enable_inbox_auto_response, :checked => inbox_auto_response_enabled %>
+                      <%= settings.label     :enable_inbox_auto_response, :en => "Enable Inbox Auto Response" %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2" class="sub_checkbox">
+                      <%= settings.check_box :disable_inbox_auto_response_for_students, :checked => @account.disable_inbox_auto_response_for_students?, :disabled => !inbox_auto_response_enabled %>
+                      <%= settings.label     :disable_inbox_auto_response_for_students, :en => "Disable Inbox Auto Response for Students" %>
+                    </td>
+                  </tr>
+                </table>
               <% end %>
               <% if !@account.site_admin? && @account.root_account? %>
                 <div>
