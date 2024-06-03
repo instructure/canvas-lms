@@ -34,7 +34,13 @@ class Login::Oauth2Controller < Login::OauthBaseController
     unique_id = nil
     provider_attributes = {}
     return unless timeout_protection do
-      token = @aac.get_token(params[:code], oauth2_login_callback_url)
+
+      begin
+        token = @aac.get_token(params[:code], oauth2_login_callback_url)
+      rescue Oauth2::Error => e
+        return render_json_unauthorized
+      end
+
       unique_id = @aac.unique_id(token)
       provider_attributes = @aac.provider_attributes(token)
 
