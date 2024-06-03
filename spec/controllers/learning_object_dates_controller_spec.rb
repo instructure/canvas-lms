@@ -21,6 +21,7 @@
 describe LearningObjectDatesController do
   before :once do
     Account.site_admin.enable_feature! :differentiated_modules
+    Account.site_admin.enable_feature! :differentiated_files
     course_with_teacher(active_all: true)
   end
 
@@ -499,6 +500,13 @@ describe LearningObjectDatesController do
       Account.site_admin.disable_feature! :differentiated_modules
       get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
       expect(response).to be_not_found
+    end
+
+    it "returns bad_request if attempting to get a file's details and differentiated_files is disabled" do
+      Account.site_admin.disable_feature! :differentiated_files
+      attachment = @course.attachments.create!(filename: "coolpdf.pdf", uploaded_data: StringIO.new("test"))
+      get :show, params: { course_id: @course.id, attachment_id: attachment.id }
+      expect(response).to be_bad_request
     end
 
     context "on blueprint child courses" do
@@ -1015,6 +1023,12 @@ describe LearningObjectDatesController do
         RoleOverride.create!(context: @course.account, permission: "manage_files_edit", role: teacher_role, enabled: false)
         put :update, params: { **default_params, unlock_at: "2021-01-01T00:00:00Z" }
         expect(response).to be_unauthorized
+      end
+
+      it "returns bad_request if differentiated_files is disabled" do
+        Account.site_admin.disable_feature! :differentiated_files
+        put :update, params: { **default_params, unlock_at: "2021-01-01T00:00:00Z" }
+        expect(response).to be_bad_request
       end
     end
   end
