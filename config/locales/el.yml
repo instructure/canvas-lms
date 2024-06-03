@@ -14119,6 +14119,7 @@ el:
   start_link_validation_dc0ac99c: "Έναρξη Επικύρωσης Συνδέσμου"
   start_participating_f0c75256: "Έναρξη συμμετοχής"
   start_tls_26e4b0dc: "Έναρξη TLS"
+  started_5e138638: Εκκίνηση
   state_standards_c9b1affd: "Πρότυπα της Πολιτείας"
   statistics: 
     csv_columns: 
