@@ -132,6 +132,7 @@ export default function SearchResult({onExplain, onLike, onDislike, result, sear
           <Link
             href={html_url}
             isWithinText={false}
+            target="_blank"
             renderIcon={React.createElement(icon_class(content_type), {
               color: 'brand',
               size: 'x-small',
