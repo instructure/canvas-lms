@@ -421,7 +421,7 @@ describe('CalendarEventDetailsForm', () => {
     await user.click(component.getByTestId('edit-calendar-event-form-date'))
     await user.click(component.getByTestId('edit-calendar-event-form-title'))
     expect(component.getByTestId('edit-calendar-event-form-date').value).toMatch(
-      /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat), \d{1,2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}$/
+      /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat), \d{1,2} (Jan|Feb|Mar|Apr|May|June|July|Aug|Sept|Oct|Nov|Dec) \d{4}$/
     )
 
     const errMessage = component.queryByText('This date is invalid.')
