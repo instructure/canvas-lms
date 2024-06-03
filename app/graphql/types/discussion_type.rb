@@ -34,6 +34,14 @@ module Types
     value "desc", value: :desc
   end
 
+  class Types::DiscussionTopicAnonymousStateType < Types::BaseEnum
+    graphql_name "DiscussionTopicAnonymousStateType"
+    description "Anonymous states for discussionTopics"
+    value "partial_anonymity"
+    value "full_anonymity"
+    value "off"
+  end
+
   class DiscussionType < ApplicationObjectType
     graphql_name "Discussion"
 
@@ -46,6 +54,7 @@ module Types
     include Canvas::LockExplanation
 
     global_id_field :id
+    field :anonymous_state, DiscussionTopicAnonymousStateType, null: true
     field :title, String, null: true
     field :context_id, ID, null: false
     field :context_type, String, null: false
@@ -57,7 +66,6 @@ module Types
     field :podcast_enabled, Boolean, null: true
     field :podcast_has_student_posts, Boolean, null: true
     field :discussion_type, String, null: true
-    field :anonymous_state, String, null: true
     field :is_anonymous_author, Boolean, null: true
     field :position, Int, null: true
     field :allow_rating, Boolean, null: true
