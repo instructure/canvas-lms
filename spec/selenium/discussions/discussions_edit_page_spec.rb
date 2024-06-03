@@ -594,7 +594,7 @@ describe "discussions" do
           get "/courses/#{course.id}/discussion_topics/#{@topic_all_options.id}/edit"
 
           expect(f("input[value='full_anonymity']").selected?).to be_truthy
-          expect(f("input[value='full_anonymity']").attribute("disabled")).to eq "true"
+          expect(f("input[value='full_anonymity']").attribute("disabled")).to be_nil
 
           expect(f("input[value='must-respond-before-viewing-replies']").selected?).to be_truthy
           expect(f("input[value='enable-podcast-feed']").selected?).to be_truthy
@@ -613,7 +613,7 @@ describe "discussions" do
           get "/courses/#{course.id}/discussion_topics/#{@topic_all_options.id}/edit"
 
           expect(f("input[value='full_anonymity']").selected?).to be_truthy
-          expect(f("input[value='full_anonymity']").attribute("disabled")).to eq "true"
+          expect(f("input[value='full_anonymity']").attribute("disabled")).to be_nil
           expect(f("body")).not_to contain_jqcss("[data-testid=groups_grading_not_allowed]")
         end
 
@@ -621,7 +621,7 @@ describe "discussions" do
           get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
 
           expect(f("input[value='full_anonymity']").selected?).to be_falsey
-          expect(f("input[value='full_anonymity']").attribute("disabled")).to eq "true"
+          expect(f("input[value='full_anonymity']").attribute("disabled")).to be_nil
 
           # There are less checks here because certain options are only visible if their parent input is selected
           expect(f("input[value='must-respond-before-viewing-replies']").selected?).to be_falsey

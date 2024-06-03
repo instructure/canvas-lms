@@ -136,7 +136,18 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
 
   const [updateDiscussionTopic] = useMutation(UPDATE_DISCUSSION_TOPIC, {
     onCompleted: completionData => {
-      const updatedDiscussionTopic = completionData?.updateDiscussionTopic?.discussionTopic
+      const {discussionTopic: updatedDiscussionTopic, errors} =
+        completionData?.updateDiscussionTopic || {}
+
+      if (!updatedDiscussionTopic && errors.length) {
+        setIsSubmitting(false)
+
+        // the current validation_error doesn't allow multiple error messages
+        const message = errors[0]?.message
+
+        setOnFailure(message || I18n.t('Error updating discussion topic'))
+        return
+      }
 
       handleDiscussionTopicMutationCompletion(updatedDiscussionTopic).catch(() => {
         setOnFailure(I18n.t('Error updating file usage rights'))

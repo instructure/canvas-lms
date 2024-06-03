@@ -473,6 +473,10 @@ function DiscussionTopicForm({
       )
     }
 
+    const previousAnonymousState = !currentDiscussionTopic?.anonymousState
+      ? 'off'
+      : currentDiscussionTopic.anonymousState
+
     // Additional properties for editing mode
     if (isEditing) {
       const editingPayload = {
@@ -480,6 +484,9 @@ function DiscussionTopicForm({
         discussionTopicId: currentDiscussionTopic._id,
         published: shouldPublish,
         removeAttachment: !attachment?._id,
+        ...(previousAnonymousState !== discussionAnonymousState && {
+          anonymousState: discussionAnonymousState,
+        }),
       }
 
       if (currentDiscussionTopic?.assignment?.hasSubAssignments && isGraded) {
@@ -819,8 +826,9 @@ function DiscussionTopicForm({
           <AnonymousSelector
             discussionAnonymousState={discussionAnonymousState}
             setDiscussionAnonymousState={setDiscussionAnonymousState}
-            isEditing={isEditing}
-            isGraded={isGraded}
+            isSelectDisabled={
+              (isEditing && currentDiscussionTopic?.entryCounts?.repliesCount) || isGraded
+            }
             setIsGraded={setIsGraded}
             setIsGroupDiscussion={setIsGroupDiscussion}
             setGroupCategoryId={setGroupCategoryId}
