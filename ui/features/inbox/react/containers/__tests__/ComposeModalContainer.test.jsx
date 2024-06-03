@@ -29,9 +29,7 @@ import {ConversationContext} from '../../../util/constants'
 import * as utils from '../../../util/utils'
 import * as uploadFileModule from '@canvas/upload-file'
 
-jest.mock('@canvas/upload-file', () => ({
-  uploadFiles: jest.fn().mockResolvedValue([]), // Or any initial mock setup
-}))
+jest.mock('@canvas/upload-file')
 
 jest.mock('../../../util/utils', () => ({
   responsiveQuerySizes: jest.fn().mockReturnValue({
@@ -144,8 +142,7 @@ describe('ComposeModalContainer', () => {
     })
   })
 
-  // VICE-4065 - remove or rewrite to remove spies on responsiveQuerySizes import
-  describe.skip('Attachments', () => {
+  describe('Attachments', () => {
     it('attempts to upload a file', async () => {
       uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'file1.jpg'}])
       const {findByTestId} = setup()
