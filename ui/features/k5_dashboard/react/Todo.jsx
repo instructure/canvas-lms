@@ -32,7 +32,7 @@ import {Flex} from '@instructure/ui-flex'
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {ignoreTodo} from '@canvas/k5/react/utils'
-import * as tz from '@instructure/datetime'
+import * as tz from '@instructure/moment-utils'
 
 const I18n = useI18nScope('todo')
 

@@ -19,6 +19,8 @@
 import moment from 'moment'
 import getFormats from './formats'
 
+export * from './datetime'
+
 const config = {customI18nFormats: []}
 
 // Parse a DateTime string according to any of the pre-defined formats. The

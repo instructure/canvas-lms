@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {dateString, timeString, parse} from '@instructure/datetime'
+import {dateString, timeString, parse} from '@instructure/moment-utils'
 
 const I18n = useI18nScope('instructure_date_and_time')
 
@@ -75,4 +75,4 @@ export {
   sameYear,
   timeString,
   unfudgeDateForProfileTimezone,
-} from '@instructure/datetime'
+} from '@instructure/moment-utils'

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as tz from '@instructure/datetime'
+import * as tz from '@instructure/moment-utils'
 import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'

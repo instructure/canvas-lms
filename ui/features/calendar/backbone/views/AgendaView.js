@@ -21,7 +21,7 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import * as tz from '@instructure/datetime'
+import * as tz from '@instructure/moment-utils'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import calendarEventFilter from '../../CalendarEventFilter'
 import {map, minBy, includes, first, filter, reduce, isEmpty, last, sortBy} from 'lodash'

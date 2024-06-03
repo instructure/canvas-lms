@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import * as timezone from '@instructure/datetime'
+import * as timezone from '@instructure/moment-utils'
 import newYork from 'timezone/America/New_York'
 
 import DateEventGroup from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AuditTrail/DateEventGroup'

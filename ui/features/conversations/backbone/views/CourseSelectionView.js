@@ -21,7 +21,7 @@ import {debounce, bind, filter, each} from 'lodash'
 import {View} from '@canvas/backbone'
 import SearchableSubmenuView from './SearchableSubmenuView'
 import template from '../../jst/courseOptions.handlebars'
-import {fudgeDateForProfileTimezone} from '@instructure/datetime'
+import {fudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import 'bootstrap-dropdown'
 import 'bootstrap-select'
 

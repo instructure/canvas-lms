@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import * as tz from '@instructure/datetime'
+import * as tz from '@instructure/moment-utils'
 import 'fullcalendar'
-import {fudgeDateForProfileTimezone, unfudgeDateForProfileTimezone} from '@instructure/datetime'
+import {fudgeDateForProfileTimezone, unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 
 // expects a date (unfudged), and returns a fullcalendar moment
 // (fudged) appropriate for passing to fullcalendar methods

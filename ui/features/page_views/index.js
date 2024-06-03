@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {unfudgeDateForProfileTimezone} from '@instructure/datetime'
+import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import moment from 'moment'
 import PageViewCollection from './backbone/collections/PageViewCollection'
 import PageViewView from './backbone/views/PageViewView'

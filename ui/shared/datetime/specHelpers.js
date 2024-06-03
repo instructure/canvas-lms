@@ -17,7 +17,7 @@
  */
 
 import timezone from 'timezone'
-import {configure} from '@instructure/datetime'
+import {configure} from '@instructure/moment-utils'
 
 const snapshots = []
 

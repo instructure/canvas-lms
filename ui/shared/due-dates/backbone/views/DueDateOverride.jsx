@@ -30,7 +30,7 @@ import CoursePacingNotice from '../../react/CoursePacingNotice'
 import StudentGroupStore from '../../react/StudentGroupStore'
 import DifferentiatedModulesSection from '../../react/DifferentiatedModulesSection'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
-import * as tz from '@instructure/datetime'
+import * as tz from '@instructure/moment-utils'
 import '@canvas/jquery/jquery.instructure_forms'
 import sanitizeData from '../../../forms/sanitizeData'
 

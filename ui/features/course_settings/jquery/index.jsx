@@ -20,7 +20,7 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {tabIdFromElement} from './course_settings_helper'
-import * as tz from '@instructure/datetime'
+import * as tz from '@instructure/moment-utils'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
 import 'jqueryui/dialog'

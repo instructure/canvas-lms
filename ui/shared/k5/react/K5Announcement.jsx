@@ -18,7 +18,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import * as tz from '@instructure/datetime'
+import * as tz from '@instructure/moment-utils'
 import PropTypes from 'prop-types'
 
 import {Heading} from '@instructure/ui-heading'
