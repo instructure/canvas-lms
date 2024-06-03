@@ -258,6 +258,7 @@ describe "differentiated_assignments" do
 
     context "module overrides" do
       before do
+        skip "differentiated modules no longer uses views. LX-1747"
         Account.site_admin.enable_feature!(:differentiated_modules)
         Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
         Quizzes::QuizStudentVisibility.reset_table_name
@@ -340,6 +341,7 @@ describe "differentiated_assignments" do
 
     context "unassign item overrides" do
       before do
+        skip "differentiated modules no longer uses views. LX-1747"
         Account.site_admin.enable_feature!(:differentiated_modules)
         Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
         Quizzes::QuizStudentVisibility.reset_table_name
@@ -409,6 +411,7 @@ describe "differentiated_assignments" do
 
     context "course overrides" do
       before do
+        skip "differentiated modules no longer uses views. LX-1747"
         Account.site_admin.enable_feature!(:differentiated_modules)
         Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
         Quizzes::QuizStudentVisibility.reset_table_name

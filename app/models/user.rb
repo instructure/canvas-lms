@@ -348,8 +348,13 @@ class User < ActiveRecord::Base
 
   # NOTE: only use for courses with differentiated assignments on
   scope :able_to_see_quiz_in_course_with_da, lambda { |quiz_id, course_id|
-    joins(:quiz_student_visibilities)
-      .where(quiz_student_visibilities: { quiz_id:, course_id: })
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      visible_user_ids = QuizVisibility::QuizVisibilityService.quiz_visible_in_course(quiz_id:, course_id:).map(&:user_id)
+      where(id: visible_user_ids)
+    else
+      joins(:quiz_student_visibilities)
+        .where(quiz_student_visibilities: { quiz_id:, course_id: })
+    end
   }
 
   scope :observing_students_in_course, lambda { |observee_ids, course_ids|
