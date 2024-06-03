@@ -20,7 +20,7 @@ import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import RecentStudentTemplate from '../../jst/recentStudent.handlebars'
-import {fudgeDateForProfileTimezone} from '@instructure/datetime'
+import {fudgeDateForProfileTimezone} from '@instructure/moment-utils'
 
 const I18n = useI18nScope('course_statistics')
 

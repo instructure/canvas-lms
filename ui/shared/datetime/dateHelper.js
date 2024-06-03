@@ -17,7 +17,7 @@
  */
 
 import {isUndefined, each} from 'lodash'
-import * as tz from '@instructure/datetime'
+import * as tz from '@instructure/moment-utils'
 import {datetimeString, dateString, discussionsDatetimeString} from './date-functions'
 
 const DateHelper = {

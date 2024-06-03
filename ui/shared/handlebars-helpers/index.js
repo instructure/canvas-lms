@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as tz from '@instructure/datetime'
+import * as tz from '@instructure/moment-utils'
 import enrollmentName from './enrollmentName'
 import _Handlebars from 'handlebars/runtime'
 import I18nObj, {useScope as useI18nScope} from '@canvas/i18n' //  'i18nObj' gets the extended I18n object with all the extra functions (interpolate, strftime, ...)

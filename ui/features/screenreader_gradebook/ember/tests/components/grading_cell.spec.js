@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import Ember from 'ember'
-import * as tz from '@instructure/datetime'
+import * as tz from '@instructure/moment-utils'
 import startApp from '../start_app'
 import fixtures from '../ajax_fixtures'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'

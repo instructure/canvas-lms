@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {hasMeridiem} from '@instructure/datetime'
+import {hasMeridiem} from '@instructure/moment-utils'
 
 describe('hasMeridiem::', () => {
   const oldENV = window.ENV

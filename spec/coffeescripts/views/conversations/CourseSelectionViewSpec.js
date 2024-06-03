@@ -23,7 +23,7 @@ import FavoriteCourseCollection from 'ui/features/conversations/backbone/collect
 import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
-import {fudgeDateForProfileTimezone} from '@instructure/datetime'
+import {fudgeDateForProfileTimezone} from '@instructure/moment-utils'
 
 const courseSelectionView = function () {
   const courses = {

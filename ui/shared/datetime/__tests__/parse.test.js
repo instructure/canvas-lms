@@ -18,7 +18,7 @@
 
 import moment from 'moment-timezone'
 import timezone from 'timezone'
-import * as tz from '@instructure/datetime'
+import * as tz from '@instructure/moment-utils'
 import {moonwalk, equal, setup} from './helpers'
 
 setup(this)

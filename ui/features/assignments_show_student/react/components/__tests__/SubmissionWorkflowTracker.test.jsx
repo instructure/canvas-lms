@@ -21,7 +21,7 @@ import canvas from '@instructure/canvas-theme'
 import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import SubmissionWorkflowTracker from '../SubmissionWorkflowTracker'
-import * as tz from '@instructure/datetime'
+import * as tz from '@instructure/moment-utils'
 
 const {colors} = canvas.variables
 

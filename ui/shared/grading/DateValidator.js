@@ -17,7 +17,7 @@
 //
 
 import {find, forEach} from 'lodash'
-import * as tz from '@instructure/datetime'
+import * as tz from '@instructure/moment-utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from './GradingPeriodsHelper'
 import DateHelper from '@canvas/datetime/dateHelper'

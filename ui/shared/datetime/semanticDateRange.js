@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import * as tz from '@instructure/datetime'
+import * as tz from '@instructure/moment-utils'
 import {sameDate, timeString, dateString, datetimeString} from './date-functions'
 import htmlEscape from '@instructure/html-escape'
 

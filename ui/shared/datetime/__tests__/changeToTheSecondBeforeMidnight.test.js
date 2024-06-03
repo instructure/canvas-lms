@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {changeToTheSecondBeforeMidnight as subject} from '@instructure/datetime'
+import {changeToTheSecondBeforeMidnight as subject} from '@instructure/moment-utils'
 import {epoch} from '../specHelpers'
 
 describe('changeToTheSecondBeforeMidnight', () => {

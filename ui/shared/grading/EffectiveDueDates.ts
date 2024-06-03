@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash'
-import * as timezone from '@instructure/datetime'
+import * as timezone from '@instructure/moment-utils'
 import GradingPeriodsHelper from './GradingPeriodsHelper'
 import type {CamelizedGradingPeriod} from './grading.d'
 import type {Submission, DueDate, UserDueDateMap, AssignmentUserDueDateMap} from '../../api.d'

@@ -88,7 +88,7 @@ import {map, keyBy, values, find, includes, reject, some, isEqual, filter} from 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import qs from 'qs'
-import * as tz from '@instructure/datetime'
+import * as tz from '@instructure/moment-utils'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import userSettings from '@canvas/user-settings'
 import htmlEscape from '@instructure/html-escape'

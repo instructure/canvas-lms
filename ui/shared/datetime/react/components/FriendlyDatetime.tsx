@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react'
-import {parse, format as format_} from '@instructure/datetime'
+import {parse, format as format_} from '@instructure/moment-utils'
 import {isDate, memoize} from 'lodash'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {
