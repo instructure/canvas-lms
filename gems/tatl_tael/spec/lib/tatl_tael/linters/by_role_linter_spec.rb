@@ -52,7 +52,8 @@ describe TatlTael::Linters::ByRoleLinter do
             path: file,
             message: config[:message],
             severity: config[:severity],
-            position: line_number
+            position: line_number,
+            ignore_boyscout_severity_change: true
           }
         end
       end.flatten
@@ -100,7 +101,8 @@ describe TatlTael::Linters::ByRoleLinter do
               path: file,
               message: config[:message],
               severity: config[:severity],
-              position: line_number
+              position: line_number,
+              ignore_boyscout_severity_change: true
             }
           end
         end.flatten
@@ -141,7 +143,8 @@ describe TatlTael::Linters::ByRoleLinter do
               path: file,
               message: config[:message],
               severity: config[:severity],
-              position: line_number
+              position: line_number,
+              ignore_boyscout_severity_change: true
             }
           end
         end.flatten
@@ -168,7 +171,8 @@ describe TatlTael::Linters::ByRoleLinter do
               path: file,
               message: config[:message],
               severity: config[:severity],
-              position: line_number
+              position: line_number,
+              ignore_boyscout_severity_change: true
             }
           end
         end.flatten

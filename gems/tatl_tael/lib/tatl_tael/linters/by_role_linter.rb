@@ -34,7 +34,8 @@ module TatlTael
           path:,
           message: config[:message],
           severity: config[:severity],
-          position:
+          position:,
+          ignore_boyscout_severity_change: true
         }
       end
 
