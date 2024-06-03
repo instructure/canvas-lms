@@ -20,7 +20,7 @@
 import React from 'react'
 import {render, waitFor, fireEvent} from '@testing-library/react'
 import DateTimeInput from '../DateTimeInput'
-import {changeTimezone} from '@instructure/moment-parser/changeTimezone'
+import {changeTimezone} from '@instructure/moment-utils/changeTimezone'
 
 const sampleDateTime = '2021-04-07T15:00:00Z'
 const locale = 'en-US'

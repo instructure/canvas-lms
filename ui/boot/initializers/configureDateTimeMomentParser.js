@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {loadI18nFormats} from '@instructure/moment-parser'
+import {loadI18nFormats} from '@instructure/moment-utils'
 
 const I18n = useI18nScope('instructure')
 

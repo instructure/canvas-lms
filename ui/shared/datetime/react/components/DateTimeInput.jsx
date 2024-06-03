@@ -22,7 +22,7 @@ import {func, node, string} from 'prop-types'
 import {TimeSelect} from '@instructure/ui-time-select'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import DateInput from './DateInput'
-import {utcTimeOffset, utcDateOffset} from '@instructure/moment-parser/changeTimezone'
+import {utcTimeOffset, utcDateOffset} from '@instructure/moment-utils/changeTimezone'
 
 const I18n = useI18nScope('date_time_input')
 
