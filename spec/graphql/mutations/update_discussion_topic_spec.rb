@@ -733,21 +733,48 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     end
   end
 
-  it "updates ungraded assignment overrides" do
-    student1 = @course.enroll_student(User.create!, enrollment_state: "active").user
-    student2 = @course.enroll_student(User.create!, enrollment_state: "active").user
-    @course.enroll_student(User.create!, enrollment_state: "active").user
+  context "with selective_release_ui_api flag ON" do
+    before do
+      Account.site_admin.enable_feature!(:selective_release_ui_api)
+    end
 
-    ungraded_discussion_overrides = {
-      studentIds: [student1.id, student2.id]
-    }
-    result = run_mutation(id: @topic.id, ungraded_discussion_overrides:)
-    expect(result["errors"]).to be_nil
+    after do
+      Account.site_admin.disable_feature!(:selective_release_ui_api)
+    end
 
-    new_override = DiscussionTopic.last.active_assignment_overrides.first
+    it "updates ungraded assignment overrides" do
+      student1 = @course.enroll_student(User.create!, enrollment_state: "active").user
+      student2 = @course.enroll_student(User.create!, enrollment_state: "active").user
+      @course.enroll_student(User.create!, enrollment_state: "active").user
 
-    expect(new_override.set_type).to eq("ADHOC")
-    expect(new_override.set_id).to be_nil
-    expect(new_override.set.map(&:id)).to match_array([student1.id, student2.id])
+      ungraded_discussion_overrides = {
+        studentIds: [student1.id, student2.id]
+      }
+      result = run_mutation(id: @topic.id, ungraded_discussion_overrides:)
+      expect(result["errors"]).to be_nil
+
+      new_override = DiscussionTopic.last.active_assignment_overrides.first
+
+      expect(new_override.set_type).to eq("ADHOC")
+      expect(new_override.set_id).to be_nil
+      expect(new_override.set.map(&:id)).to match_array([student1.id, student2.id])
+    end
+
+    it "does not update ungraded assignment overrides if flag is off" do
+      Account.site_admin.disable_feature!(:selective_release_ui_api)
+
+      student1 = @course.enroll_student(User.create!, enrollment_state: "active").user
+      student2 = @course.enroll_student(User.create!, enrollment_state: "active").user
+      @course.enroll_student(User.create!, enrollment_state: "active").user
+
+      ungraded_discussion_overrides = {
+        studentIds: [student1.id, student2.id]
+      }
+      result = run_mutation(id: @topic.id, ungraded_discussion_overrides:)
+      expect(result["errors"]).to be_nil
+
+      new_override = DiscussionTopic.last.active_assignment_overrides.first
+      expect(new_override).to be_nil
+    end
   end
 end
