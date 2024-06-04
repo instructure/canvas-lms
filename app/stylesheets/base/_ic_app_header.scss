@@ -354,7 +354,7 @@ button.ic-app-header__menu-list-link {
         color: var(--ic-brand-global-nav-menu-item__text-color);
       }
 
-      &[data-selected]:hover {
+      &[data-selected="true"]:hover {
         color: var(--ic-brand-global-nav-menu-item__text-color--active);
       }
     }
@@ -380,7 +380,7 @@ button.ic-app-header__menu-list-link {
         color: var(--ic-brand-global-nav-menu-item__text-color);
       }
 
-      &[data-selected]:hover {
+      &[data-selected="true"]:hover {
         color: var(--ic-brand-global-nav-menu-item__text-color--active);
       }
     }
