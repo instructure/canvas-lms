@@ -1524,6 +1524,9 @@ CanvasRails::Application.routes.draw do
       post "/accounts/:account_id/external_tools/rce_favorites/:id", action: :add_rce_favorite, as: :account_external_tools_add_rce_favorite
       delete "/accounts/:account_id/external_tools/rce_favorites/:id", action: :remove_rce_favorite, as: :account_external_tools_remove_rce_favorite
 
+      post "/accounts/:account_id/external_tools/top_nav_favorites/:id", action: :add_top_nav_favorite, as: :account_external_tools_add_top_nav_favorite
+      delete "/accounts/:account_id/external_tools/top_nav_favorites/:id", action: :remove_top_nav_favorite, as: :account_external_tools_remove_top_nav_favorite
+
       get "/courses/:course_id/external_tools/visible_course_nav_tools", action: :visible_course_nav_tools, as: :visible_course_nav_tools
       get "/external_tools/visible_course_nav_tools", action: :all_visible_nav_tools, as: :all_visible_nav_tools
 
