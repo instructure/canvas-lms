@@ -209,7 +209,6 @@ PATH
     event_stream (0.1.0)
       activerecord (>= 4.2)
       bookmarked_collection
-      canvas_cassandra
       inst_statsd
       json_token
       paginated_collection

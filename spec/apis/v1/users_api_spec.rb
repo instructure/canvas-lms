@@ -20,7 +20,6 @@
 
 require_relative "../api_spec_helper"
 require_relative "../file_uploads_spec_helper"
-require_relative "../../cassandra_spec_helper"
 
 class TestUserApi
   include Api::V1::User
@@ -763,72 +762,57 @@ describe "Users API", type: :request do
     assert_status(401)
   end
 
-  shared_examples_for "page view api" do
-    describe "page view api" do
-      before do
-        @timestamp = Time.zone.at(1.day.ago.to_i)
-        page_view_model(user: @student, created_at: @timestamp - 1.day)
-        page_view_model(user: @student, created_at: @timestamp + 1.day)
-        page_view_model(user: @student, created_at: @timestamp, developer_key: DeveloperKey.default)
-      end
-
-      it "returns page view history" do
-        stub_const("Api::MAX_PER_PAGE", 2)
-        json = api_call(:get,
-                        "/api/v1/users/#{@student.id}/page_views?per_page=1000",
-                        { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", per_page: "1000" })
-        expect(json.size).to eq 2
-        json.each { |j| expect(j["url"]).to eq "http://www.example.com/courses/1" }
-        expect(json[0]["created_at"]).to be > json[1]["created_at"]
-        expect(json[0]["app_name"]).to be_nil
-        expect(json[1]["app_name"]).to eq "User-Generated"
-        expect(response.headers["Link"]).to match(/next/)
-        response.headers["Link"].split(",").find { |l| l =~ /<([^>]+)>.+next/ }
-        url = $1
-        _path, querystring = url.split("?")
-        page = Rack::Utils.parse_nested_query(querystring)["page"]
-        json = api_call(:get,
-                        url,
-                        { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", page:, per_page: Setting.get("api_max_per_page", "2") })
-        expect(json.size).to eq 1
-        json.each { |j| expect(j["url"]).to eq "http://www.example.com/courses/1" }
-        expect(response.headers["Link"]).not_to match(/next/)
-        expect(response.headers["Link"]).to match(/last/)
-      end
-
-      it "recognizes start_time parameter" do
-        stub_const("Api::MAX_PER_PAGE", 3)
-        start_time = @timestamp.iso8601
-        json = api_call(:get,
-                        "/api/v1/users/#{@student.id}/page_views?start_time=#{start_time}",
-                        { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", start_time: })
-        expect(json.size).to eq 2
-        json.each { |j| expect(CanvasTime.try_parse(j["created_at"]).to_i).to be >= @timestamp.to_i }
-      end
-
-      it "recognizes end_time parameter" do
-        stub_const("Api::MAX_PER_PAGE", 3)
-        end_time = @timestamp.iso8601
-        json = api_call(:get,
-                        "/api/v1/users/#{@student.id}/page_views?end_time=#{end_time}",
-                        { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", end_time: })
-        expect(json.size).to eq 2
-        json.each { |j| expect(CanvasTime.try_parse(j["created_at"]).to_i).to be <= @timestamp.to_i }
-      end
-    end
-  end
-
-  include_examples "page view api"
-
-  describe "cassandra page views" do
+  describe "page view api" do
     before do
-      # can't use :once'd @student, since cassandra doesn't reset
-      student_in_course(course: @course, user: user_with_pseudonym(name: "Student", username: "pvuser2@example.com", active_user: true))
-      @user = @admin
+      @timestamp = Time.zone.at(1.day.ago.to_i)
+      page_view_model(user: @student, created_at: @timestamp - 1.day)
+      page_view_model(user: @student, created_at: @timestamp + 1.day)
+      page_view_model(user: @student, created_at: @timestamp, developer_key: DeveloperKey.default)
     end
 
-    include_examples "cassandra page views"
-    include_examples "page view api"
+    it "returns page view history" do
+      stub_const("Api::MAX_PER_PAGE", 2)
+      json = api_call(:get,
+                      "/api/v1/users/#{@student.id}/page_views?per_page=1000",
+                      { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", per_page: "1000" })
+      expect(json.size).to eq 2
+      json.each { |j| expect(j["url"]).to eq "http://www.example.com/courses/1" }
+      expect(json[0]["created_at"]).to be > json[1]["created_at"]
+      expect(json[0]["app_name"]).to be_nil
+      expect(json[1]["app_name"]).to eq "User-Generated"
+      expect(response.headers["Link"]).to match(/next/)
+      response.headers["Link"].split(",").find { |l| l =~ /<([^>]+)>.+next/ }
+      url = $1
+      _path, querystring = url.split("?")
+      page = Rack::Utils.parse_nested_query(querystring)["page"]
+      json = api_call(:get,
+                      url,
+                      { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", page:, per_page: Setting.get("api_max_per_page", "2") })
+      expect(json.size).to eq 1
+      json.each { |j| expect(j["url"]).to eq "http://www.example.com/courses/1" }
+      expect(response.headers["Link"]).not_to match(/next/)
+      expect(response.headers["Link"]).to match(/last/)
+    end
+
+    it "recognizes start_time parameter" do
+      stub_const("Api::MAX_PER_PAGE", 3)
+      start_time = @timestamp.iso8601
+      json = api_call(:get,
+                      "/api/v1/users/#{@student.id}/page_views?start_time=#{start_time}",
+                      { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", start_time: })
+      expect(json.size).to eq 2
+      json.each { |j| expect(CanvasTime.try_parse(j["created_at"]).to_i).to be >= @timestamp.to_i }
+    end
+
+    it "recognizes end_time parameter" do
+      stub_const("Api::MAX_PER_PAGE", 3)
+      end_time = @timestamp.iso8601
+      json = api_call(:get,
+                      "/api/v1/users/#{@student.id}/page_views?end_time=#{end_time}",
+                      { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", end_time: })
+      expect(json.size).to eq 2
+      json.each { |j| expect(CanvasTime.try_parse(j["created_at"]).to_i).to be <= @timestamp.to_i }
+    end
   end
 
   it "does not find users in other root accounts by sis id" do

@@ -23,33 +23,23 @@ require "active_support/core_ext/module/delegation"
 class EventStream::Stream
   include EventStream::AttrConfig
 
-  attr_config :database, default: nil # only needed if backend_strategy evaluates to :cassandra
-  attr_config :table, type: String, default: nil # only needed if backend_strategy evaluates to :cassandra
-  attr_config :id_column, type: String, default: "id"
-  attr_config :record_type, default: EventStream::Record
-  attr_config :time_to_live, type: Integer, default: 1.year # only honored for cassandra strategy
-  attr_config :read_consistency_level, default: nil # only honored for cassandra strategy
-  attr_config :backend_strategy, default: -> { :active_record } # one of [:cassandra, :active_record]
-  attr_config :active_record_type, default: nil # only needed if backend_strategy evaluates to :active_record
+  attr_config :record_type
 
-  attr_accessor :raise_on_error, :backend_override
+  attr_accessor :raise_on_error
 
   def initialize(&blk)
-    @backend_override = nil
     instance_exec(&blk) if blk
     attr_config_validate
   end
 
-  delegate :available?, :database_name, :database_fingerprint, to: :current_backend
+  delegate :available?, :database_name, :database_fingerprint, :fetch, to: :current_backend
 
   def on_insert(&callback)
     add_callback(:insert, callback)
   end
 
-  def insert(record, options = {})
-    backend_for(options.fetch(:backend_strategy, backend_strategy)) do |backend|
-      backend.execute(:insert, record)
-    end
+  def insert(record)
+    current_backend.execute(:insert, record)
     record
   end
 
@@ -57,10 +47,8 @@ class EventStream::Stream
     add_callback(:update, callback)
   end
 
-  def update(record, options = {})
-    backend_for(options.fetch(:backend_strategy, backend_strategy)) do |backend|
-      backend.execute(:update, record)
-    end
+  def update(record)
+    current_backend.execute(:update, record)
     record
   end
 
@@ -68,20 +56,12 @@ class EventStream::Stream
     add_callback(:error, callback)
   end
 
-  def fetch(ids, strategy: :batch)
-    current_backend.fetch(ids, strategy:)
-  end
-
   def current_backend
-    @backend_override || backend_for(backend_strategy)
+    @current_backend ||= EventStream::Backend::ActiveRecord.new(self)
   end
 
   def add_index(name, &)
     index = EventStream::Index.new(self, &)
-
-    on_insert do |record|
-      current_backend.index_on_insert(index, record)
-    end
 
     singleton_class.send(:define_method, "for_#{name}") do |*args|
       current_backend.find_with_index(index, args)
@@ -107,7 +87,7 @@ class EventStream::Stream
   end
 
   def identifier
-    "#{database_name}.#{table}"
+    "#{database_name}.#{record_type.table_name}"
   end
 
   def ttl_seconds(timestamp)
@@ -120,36 +100,7 @@ class EventStream::Stream
     end
   end
 
-  # primarily for use in testing
-  # to regenerate state of
-  # backend strategy
-  def reset_backend!
-    @backends = {}
-  end
-
   private
-
-  def backend_for(strategy)
-    @backends ||= {}
-    @backends[strategy] ||= EventStream::Backend.for_strategy(self, strategy)
-    to_return = @backends[strategy]
-    if block_given?
-      begin
-        # this is useful because callbacks like indexers
-        # use the "current_backend".  If we explicitly pass in a backend
-        # for an invocation, then we want that same backend to be
-        # used in the callbacks
-        restore_state, @backend_override = @backend_override, to_return
-        yield @backend_override
-      ensure
-        # restore_state will usually be nil,
-        # but if we have some insert triggered from a callback
-        # it will pop off the previous backend
-        @backend_override = restore_state
-      end
-    end
-    to_return
-  end
 
   def callbacks_for(operation)
     @callbacks ||= {}

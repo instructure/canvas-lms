@@ -34,30 +34,6 @@ module Canvas
 
           Switchman::Shard.current == Switchman::Shard.birth && CanvasCassandra::DatabaseBuilder.configured?(cassandra_cluster)
         end
-
-        def cassandra_table_exists?(table)
-          cql = <<~SQL.squish
-            SELECT *
-            FROM #{table}
-            LIMIT 1
-          SQL
-          cassandra.execute(cql)
-          true
-        rescue CassandraCQL::Error::InvalidRequestException
-          false
-        end
-
-        def cassandra_column_exists?(table, column)
-          cql = <<~SQL.squish
-            SELECT #{column}
-            FROM #{table}
-            LIMIT 1
-          SQL
-          cassandra.execute(cql)
-          true
-        rescue CassandraCQL::Error::InvalidRequestException
-          false
-        end
       end
 
       def self.included(migration)

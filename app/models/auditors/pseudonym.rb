@@ -48,14 +48,10 @@ class Auditors::Pseudonym
 
   Stream = Auditors.stream do
     pseudonym_ar_type = Auditors::ActiveRecord::PseudonymRecord
-    active_record_type pseudonym_ar_type
-    record_type Auditors::Pseudonym::Record
+    record_type pseudonym_ar_type
     self.raise_on_error = true
 
     add_index :pseudonym do
-      table :pseudonym_changes_by_pseudonym
-      entry_proc ->(record) { record.pseudonym }
-      key_proc ->(pseudonym) { pseudonym.global_id }
       ar_scope_proc ->(pseudonym) { pseudonym_ar_type.where(pseudonym_id: pseudonym.id) }
     end
   end

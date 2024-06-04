@@ -245,10 +245,6 @@ colorized rails log and a browser screenshot taken at the time of the failure.
 
 ## Extra Services
 
-### Cassandra
-
-This feature is not yet supported.
-
 ### Mail Catcher
 
 To enable Mail Catcher: Add `docker-compose/mailcatcher.override.yml` to your `COMPOSE_FILE` var in `.env`. Then you can `docker compose up mailcatcher`.
