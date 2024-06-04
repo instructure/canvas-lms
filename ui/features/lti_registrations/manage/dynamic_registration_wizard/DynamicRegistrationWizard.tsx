@@ -22,6 +22,10 @@ import React from 'react'
 import type {AccountId} from '../model/AccountId'
 import {mkUseDynamicRegistrationWizardState} from './DynamicRegistrationWizardState'
 import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {Spinner} from '@instructure/ui-spinner'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -53,11 +57,18 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
       return (
         <>
           <Modal.Body>
-            <div>Requesting Token</div>
+            <View as="div" height="20rem" data-testid="dynamic-reg-modal-loading-registration">
+              <Flex justifyItems="center" alignItems="center" height="100%">
+                <Flex.Item>
+                  <Spinner renderTitle={I18n.t('Loading')} />
+                </Flex.Item>
+                <Flex.Item>{I18n.t('Loading')}</Flex.Item>
+              </Flex>
+            </View>
           </Modal.Body>
           <Modal.Footer>
             <Button color="secondary" type="submit" onClick={props.unregister}>
-              {I18n.t('Previous')}
+              {I18n.t('Cancel')}
             </Button>
             <Button margin="small" color="primary" type="submit" disabled={true}>
               {I18n.t('Next')}
@@ -79,7 +90,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
           />
           <Modal.Footer>
             <Button color="secondary" type="submit" onClick={props.unregister}>
-              {I18n.t('Previous')}
+              {I18n.t('Cancel')}
             </Button>
             <Button margin="small" color="primary" type="submit" disabled={true}>
               {I18n.t('Next')}
@@ -88,7 +99,18 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
         </>
       )
     case 'LoadingRegistration':
-      return <div>Loading Registration</div>
+      return (
+        <Modal.Body>
+          <View as="div" height="20rem" data-testid="dynamic-reg-modal-loading-registration">
+            <Flex justifyItems="center" alignItems="center" height="100%">
+              <Flex.Item>
+                <Spinner renderTitle={I18n.t('Loading')} />
+              </Flex.Item>
+              <Flex.Item>{I18n.t('Loading Registration')}</Flex.Item>
+            </Flex>
+          </View>
+        </Modal.Body>
+      )
     case 'PermissionConfirmation':
       return (
         <>
@@ -96,6 +118,29 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
             <div>Permission Confirmation</div>
           </Modal.Body>
           <Modal.Footer>
+            <Button
+              margin="small"
+              color="secondary"
+              type="submit"
+              disabled={false}
+              onClick={async () => {
+                props.unregister()
+                const result = await dynamicRegistrationWizardState.deleteKey(
+                  state._type,
+                  state.registration.developer_key_id
+                )
+                if (result._type !== 'success') {
+                  showFlashAlert({
+                    message: I18n.t(
+                      'Something went wrong deleting the registration. The registration can still be deleted manually on the Manage page.'
+                    ),
+                    type: 'error',
+                  })
+                }
+              }}
+            >
+              {I18n.t('Cancel')}
+            </Button>
             <Button
               margin="small"
               color="primary"

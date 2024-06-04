@@ -28,6 +28,7 @@ import {
   type RegistrationOverlayStore,
 } from '../registration_wizard/registration_settings/RegistrationOverlayState'
 import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
+import type {ApiResult} from 'features/lti_registrations/common/lib/apiResult/ApiResult'
 
 /**
  * Steps are:
@@ -69,12 +70,16 @@ interface DynamicRegistrationActions {
 
   /**
    * Deletes the Developer Key for the given id
-   * and closes the modal
+   * and closes the modal. The previous state must be a confirmation state.
    *
+   * @param prevState The previous state of the modal
    * @param developerKeyId The id of the developer key to delete
-   * @returns
+   * @returns The result of the delete operation
    */
-  deleteKey: (developerKeyId: DeveloperKeyId) => Promise<unknown>
+  deleteKey: (
+    prevState: ReviewingStateType,
+    developerKeyId: DeveloperKeyId
+  ) => Promise<ApiResult<unknown>>
   /**
    * Transition to a new confirmation state, copying the
    * state from the previous confirmation state
@@ -128,6 +133,7 @@ type ConfirmationStateType = Exclude<
   DynamicRegistrationWizardState['_type'],
   'RequestingToken' | 'WaitingForTool' | 'LoadingRegistration' | 'Error'
 >
+type ReviewingStateType = Exclude<ConfirmationStateType, 'Enabling' | 'DeletingDevKey'>
 
 /**
  * Helper for constructing a 'confirmation' state (a substate of the confirmation screen)
@@ -292,31 +298,30 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
           }
         })
       },
-      enableAndClose: (
+      enableAndClose: async (
         accountId: AccountId,
         registrationId: LtiImsRegistrationId,
         developerKeyId: DeveloperKeyId,
         overlay: RegistrationOverlay
       ) => {
         set(stateFrom('Reviewing')(state => enabling(state.registration, state.overlayStore)))
-        return Promise.all([
+        const [a, b] = await Promise.all([
           service.updateRegistrationOverlay(accountId, registrationId, overlay),
           service.updateDeveloperKeyWorkflowState(accountId, developerKeyId, 'on'),
-        ]).then(([a, b]) => {
-          if (a._type !== 'success') {
-            set(stateFor(errorState(a)))
-          } else if (b._type !== 'success') {
-            set(stateFor(errorState(b)))
-          }
-        })
+        ])
+        if (a._type !== 'success') {
+          set(stateFor(errorState(a)))
+        } else if (b._type !== 'success') {
+          set(stateFor(errorState(b)))
+        }
       },
-      deleteKey: (developerKeyId: DeveloperKeyId) => {
-        set(stateFrom('Reviewing')(state => deleting(state.registration, state.overlayStore)))
-        return service.deleteDeveloperKey(developerKeyId).then(result => {
-          if (result._type !== 'success') {
-            set(stateFor(errorState(result)))
-          }
-        })
+      deleteKey: async (prevState: ReviewingStateType, developerKeyId: DeveloperKeyId) => {
+        set(stateFrom(prevState)(state => deleting(state.registration, state.overlayStore)))
+        const result = await service.deleteDeveloperKey(developerKeyId)
+        if (result._type !== 'success') {
+          set(stateFor(errorState(result)))
+        }
+        return result
       },
       transitionToConfirmationState: (
         prevState: ConfirmationStateType,
