@@ -22,7 +22,7 @@ import './datepicker'
 import * as tz from '@instructure/moment-utils'
 import fallbacks from 'translations/en.json'
 import datePickerFormat from '@instructure/moment-utils/datePickerFormat'
-import {fudgeDateForProfileTimezone} from '@instructure/moment-utils'
+import {fudgeDateForProfileTimezone, isMidnight} from '@instructure/moment-utils'
 import {isRTL} from '@canvas/i18n/rtlHelper'
 
 import moment from 'moment'
@@ -339,7 +339,7 @@ export default class DatetimeField {
       this.datetime = tz.mergeTimeAndDate(this.datetime, this.implicitDate)
     }
     this.fudged = fudgeDateForProfileTimezone(this.datetime)
-    this.showTime = this.alwaysShowTime || (this.allowTime && !tz.isMidnight(this.datetime))
+    this.showTime = this.alwaysShowTime || (this.allowTime && !isMidnight(this.datetime))
   }
 
   setFormattedDatetime(datetime, format) {
@@ -357,7 +357,7 @@ export default class DatetimeField {
       this.$field.val('')
     }
     this.valid = PARSE_RESULTS.VALID
-    this.showTime = this.alwaysShowTime || (this.allowTime && !tz.isMidnight(this.datetime))
+    this.showTime = this.alwaysShowTime || (this.allowTime && !isMidnight(this.datetime))
     this.update()
     this.updateSuggest(false)
   }
