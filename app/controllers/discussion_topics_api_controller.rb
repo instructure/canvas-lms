@@ -28,10 +28,11 @@ class DiscussionTopicsApiController < ApplicationController
   include LocaleSelection
 
   before_action :require_context_and_read_access
-  before_action :require_topic
+  before_action :require_topic, except: %i[mark_all_topic_read]
   before_action :require_initial_post, except: %i[add_entry
                                                   mark_topic_read
                                                   mark_topic_unread
+                                                  mark_all_topic_read
                                                   show
                                                   unsubscribe_topic]
   before_action only: %i[replies
@@ -717,6 +718,37 @@ class DiscussionTopicsApiController < ApplicationController
   #        -H "Content-Length: 0"
   def mark_topic_read
     change_topic_read_state("read")
+  end
+
+  # @API Mark all topic as read
+  # Mark the initial text of all the discussion topics as read in  the context.
+  #
+  # No request fields are necessary.
+  #
+  # On success, the response will be 204 No Content with an empty body.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/read_all' \
+  #        -X POST \
+  #        -H "Authorization: Bearer <token>" \
+  #        -H "Content-Length: 0"
+  def mark_all_topic_read
+    scope = if params[:only_announcements] == "true"
+              @context.announcements
+            else
+              @context.discussion_topics.only_discussion_topics.published
+            end
+
+    scope = scope.unread_for(@current_user)
+                 .where.not("unlock_at > ?", Time.now)
+                 .or(scope.where(unlock_at: nil))
+
+    scope.each do |announcement|
+      announcement.change_read_state("read", @current_user)
+    end
+
+    head :no_content
   end
 
   # @API Mark topic as unread

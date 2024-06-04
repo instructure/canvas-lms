@@ -402,4 +402,67 @@ describe DiscussionTopicsApiController do
       expect(@topic.reload.summary_enabled).to be_falsey
     end
   end
+
+  context "mark_all_topic_read" do
+    before do
+      course_with_teacher(active_course: true)
+      user_session(@teacher)
+    end
+
+    it "marks all topic read, but not the announcements" do
+      topic1 = @course.discussion_topics.create!(title: "discussion")
+      topic2 = @course.discussion_topics.create!(title: "discussion", unlock_at: 1.day.ago)
+      announcement1 = @course.announcements.create!(title: "announcement", message: "test")
+      # announcement is a discussion topic
+
+      expect(topic1.reload.read_state(@teacher)).to eq("unread")
+      expect(topic2.reload.read_state(@teacher)).to eq("unread")
+      expect(announcement1.reload.read_state(@teacher)).to eq("unread")
+
+      put "mark_all_topic_read", params: { course_id: @course.id }, format: "json"
+
+      expect(response).to be_successful
+      expect(topic1.reload.read_state(@teacher)).to eq("read")
+      expect(topic2.reload.read_state(@teacher)).to eq("read")
+      expect(announcement1.reload.read_state(@teacher)).to eq("unread")
+    end
+
+    it "does not mark unpublished topics read" do
+      topic = @course.discussion_topics.create!(title: "discussion", workflow_state: "unpublished")
+      expect(topic.reload.read_state(@teacher)).to eq("unread")
+
+      put "mark_all_topic_read", params: { course_id: @course.id }, format: "json"
+
+      expect(response).to be_successful
+      expect(topic.reload.read_state(@teacher)).to eq("unread")
+    end
+
+    it "marks announcements read if only_announcements is true" do
+      announcement1 = @course.announcements.create!(title: "announcement", message: "test")
+      announcement2 = @course.announcements.create!(title: "announcement", message: "test", unlock_at: 1.day.ago)
+      topic1 = @course.discussion_topics.create!(title: "discussion")
+
+      expect(announcement1.reload.read_state(@teacher)).to eq("unread")
+      expect(announcement2.reload.read_state(@teacher)).to eq("unread")
+      expect(topic1.reload.read_state(@teacher)).to eq("unread")
+
+      put "mark_all_topic_read", params: { course_id: @course.id, only_announcements: true }, format: "json"
+
+      expect(response).to be_successful
+      expect(announcement1.reload.read_state(@teacher)).to eq("read")
+      expect(announcement2.reload.read_state(@teacher)).to eq("read")
+      expect(topic1.reload.read_state(@teacher)).to eq("unread")
+    end
+
+    it "does not mark a topic read if the unlock_at is in the future" do
+      topic = @course.discussion_topics.create!(title: "discussion", unlock_at: 1.day.from_now)
+
+      expect(topic.reload.read_state(@teacher)).to eq("unread")
+
+      put "mark_all_topic_read", params: { course_id: @course.id }, format: "json"
+
+      expect(response).to be_successful
+      expect(topic.reload.read_state(@teacher)).to eq("unread")
+    end
+  end
 end

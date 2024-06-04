@@ -148,6 +148,14 @@ export default combineReducers({
     },
     false
   ),
+  isMarkingAllRead: handleActions(
+    {
+      [actionTypes.MARK_ALL_ANNOUNCEMENTS_READ_START]: () => true,
+      [actionTypes.MARK_ALL_ANNOUNCEMENTS_READ_SUCCESS]: () => false,
+      [actionTypes.MARK_ALL_ANNOUNCEMENTS_READ_FAIL]: () => false,
+    },
+    false
+  ),
   externalRssFeed: combineReducers({
     isSaving: handleActions(
       {

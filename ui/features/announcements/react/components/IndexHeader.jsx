@@ -35,6 +35,7 @@ import {
   IconSearchLine,
   IconTrashLine,
   IconUnlockLine,
+  IconInvitationLine,
 } from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
@@ -74,6 +75,7 @@ export default class IndexHeader extends Component {
     toggleSelectedAnnouncementsLock: func.isRequired,
     deleteSelectedAnnouncements: func.isRequired,
     searchInputRef: func,
+    markAllAnnouncementRead: func.isRequired,
     announcementsLocked: bool.isRequired,
   }
 
@@ -135,7 +137,6 @@ export default class IndexHeader extends Component {
         disabled={this.props.isBusy || this.props.selectedCount === 0}
         size="medium"
         display={responsiveStyles.buttonDisplay}
-        margin={responsiveStyles.lockButtonMargin}
         id="lock_announcements"
         data-testid="lock_announcements"
         onClick={this.props.toggleSelectedAnnouncementsLock}
@@ -170,7 +171,6 @@ export default class IndexHeader extends Component {
             disabled={this.props.isBusy || this.props.selectedCount === 0}
             size="medium"
             display={responsiveStyles.buttonDisplay}
-            margin={responsiveStyles.buttonMargin}
             id="delete_announcements"
             data-testid="delete-announcements-button"
             onClick={this.onDelete}
@@ -183,12 +183,22 @@ export default class IndexHeader extends Component {
             <ScreenReaderContent>{I18n.t('Delete Selected Announcements')}</ScreenReaderContent>
           </Button>
         )}
+        <Button
+          id="mark_all_announcement_read"
+          data-testid="mark-all-announcement-read"
+          renderIcon={IconInvitationLine}
+          display={responsiveStyles.buttonDisplay}
+          onClick={this.props.markAllAnnouncementRead}
+          disabled={this.props.isBusy}
+        >
+          <ScreenReaderContent>{I18n.t('Mark all announcement read')}</ScreenReaderContent>
+          <PresentationContent>{I18n.t('Mark all as read')}</PresentationContent>
+        </Button>
         {this.props.permissions.create && (
           <Button
             href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new?is_announcement=true`}
             color="primary"
             display={responsiveStyles.buttonDisplay}
-            margin={responsiveStyles.buttonMargin}
             id="add_announcement"
             renderIcon={IconPlusLine}
           >
@@ -248,10 +258,12 @@ export default class IndexHeader extends Component {
               {this.renderSearchField()}
             </Flex.Item>
             <Flex.Item>
-              {this.renderActionButtons({
-                buttonDisplay: 'inline-block',
-                buttonMargin: '0 0 0 small',
-              })}
+              <Flex wrap="wrap" gap="small">
+                {this.renderActionButtons({
+                  buttonDisplay: 'inline-block',
+                  buttonMargin: '0 0 0 small',
+                })}
+              </Flex>
             </Flex.Item>
           </Flex>
         </View>
@@ -314,23 +326,19 @@ export default class IndexHeader extends Component {
 
     let flexBasis = 'auto'
     let buttonDisplay = 'inline-block'
-    let buttonMargin = '0 0 0 small'
-    let lockButtonMargin = '0 0 0 0'
     let flexDirection = 'row'
     let headerShrink = false
 
     if (breakpoints.mobileOnly) {
       flexBasis = '100%'
       buttonDisplay = 'block'
-      buttonMargin = 'small 0 0 0'
-      lockButtonMargin = 'small 0 0 0'
       flexDirection = 'column-reverse'
       headerShrink = true
     }
 
     return (
       <Flex direction="column" as="div" gap="medium">
-        <Flex.Item dmargin="0 0 large" overflow="hidden">
+        <Flex.Item overflow="hidden">
           <Flex as="div" direction="row" justifyItems="space-between" wrap="wrap" gap="small">
             <Flex.Item width={flexBasis} shouldGrow={true} shouldShrink={false}>
               <Flex as="div" direction="row" justifyItems="start" alignItems="center" width="98%">
@@ -343,8 +351,10 @@ export default class IndexHeader extends Component {
               </Flex>
             </Flex.Item>
             <Flex.Item width={flexBasis} overflowX="hidden" overflowY="hidden">
-              <Flex direction={flexDirection}>
-                {this.renderActionButtons({buttonDisplay, buttonMargin, lockButtonMargin})}
+              <Flex direction={flexDirection} wrap="wrap" gap="small">
+                {this.renderActionButtons({
+                  buttonDisplay,
+                })}
               </Flex>
             </Flex.Item>
           </Flex>
@@ -362,7 +372,7 @@ export default class IndexHeader extends Component {
 }
 
 const connectState = state => ({
-  isBusy: state.isLockingAnnouncements || state.isDeletingAnnouncements,
+  isBusy: state.isLockingAnnouncements || state.isDeletingAnnouncements || state.isMarkingAllRead,
   selectedCount: state.selectedAnnouncements.length,
   isToggleLocking: state.isToggleLocking,
   ...select(state, [
@@ -377,6 +387,7 @@ const selectedActions = [
   'searchAnnouncements',
   'toggleSelectedAnnouncementsLock',
   'deleteSelectedAnnouncements',
+  'markAllAnnouncementRead',
 ]
 
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)

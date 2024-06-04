@@ -39,6 +39,7 @@ function makeProps() {
     toggleSelectedAnnouncementsLock: jest.fn(),
     announcementsLocked: false,
     isToggleLocking: false,
+    markAllAnnouncementRead: jest.fn(),
   }
 }
 
@@ -96,7 +97,7 @@ describe('"Announcement Filter" select', () => {
 
     await userEvent.click(filterDDown)
 
-    expect(screen.getByText(/All/i)).toBeInTheDocument()
+    expect(screen.getByText(/All/)).toBeInTheDocument()
     expect(screen.getByText(/Unread/i)).toBeInTheDocument()
   })
 
@@ -159,16 +160,13 @@ describe('"Lock Selected Announcements" button', () => {
   })
 
   test('calls the toggleSelectedAnnouncementsLock prop when clicked', async () => {
-    const spy = jest.fn()
     const props = makeProps()
-    props.toggleSelectedAnnouncementsLock = spy
     props.selectedCount = 1
     render(<IndexHeader {...props} />)
     await userEvent.click(screen.getByTestId('lock_announcements'))
 
     waitFor(() => {
-      expect(spy).toHaveBeenCalled()
-      expect(spy.callCount).toEqual(1)
+      expect(props.toggleSelectedAnnouncementsLock).toHaveBeenCalledTimes(1)
     })
   })
 })
@@ -215,5 +213,15 @@ describe('"Delete Selected Announcements" button', () => {
         name: /confirm delete/i,
       })
     ).toBeInTheDocument()
+  })
+})
+
+describe('"Mark all announcement read" button', () => {
+  it('calls the markAllAnnouncementRead prop when clicked', async () => {
+    const props = makeProps()
+    render(<IndexHeader {...props} />)
+    await userEvent.click(screen.getByTestId('mark-all-announcement-read'))
+
+    expect(props.markAllAnnouncementRead).toHaveBeenCalledTimes(1)
   })
 })
