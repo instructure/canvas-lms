@@ -453,6 +453,63 @@ class Lti::RegistrationsController < ApplicationController
     render :index
   end
 
+  # @API List LTI Registrations in an account
+  # Returns all LTI registrations in the specified account.
+  #
+  # @returns [Lti::Registration]
+  #
+  # @example_request
+  #
+  #   This would return the specified LTI registration
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/registrations' \
+  #        -H "Authorization: Bearer <token>"
+  def list
+    GuardRail.activate(:secondary) do
+      eager_load_models = [
+        { lti_registration_account_bindings: [:created_by, :updated_by] },
+        :created_by, # registration's created_by
+        :updated_by  # registration's updated_by
+      ]
+
+      # Get all registrations on this account, regardless of their bindings
+      account_registrations = Lti::Registration.active
+                                               .where(account_id: params[:account_id])
+                                               .eager_load(eager_load_models)
+
+      # Get all registration account bindings that are bound to the site admin account and that are "on,"
+      # since they will apply to this account (and all accounts)
+      forced_on_in_site_admin = Shard.default.activate do
+        Lti::Registration.active
+                         .where(account: Account.site_admin)
+                         .where(lti_registration_account_bindings: { workflow_state: "on", account_id: Account.site_admin.id })
+                         .eager_load(eager_load_models)
+      end
+
+      # Get all registration account bindings in this account, then fetch the registrations from their own shards
+      # Omit registrations that were found in the "account_registrations" list; we're only looking for ones that
+      # are uniquely being inherited from a different account.
+      inherited_on_registration_bindings = Lti::RegistrationAccountBinding.where(workflow_state: "on")
+                                                                          .where(account_id: params[:account_id])
+                                                                          .where.not(registration_id: account_registrations.map(&:id))
+
+      registration_ids = inherited_on_registration_bindings.map(&:registration_id)
+      inherited_on_registrations = Shard.partition_by_shard(registration_ids) do |registration_ids_for_shard|
+        Lti::Registration.where(id: registration_ids_for_shard).eager_load(eager_load_models)
+      end.flatten
+
+      render json: lti_registrations_json(
+        account_registrations + forced_on_in_site_admin + inherited_on_registrations,
+        @current_user,
+        session,
+        @context,
+        includes: [:account_binding]
+      )
+    end
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
   # @API Show an LTI Registration
   # Return details about the specified LTI registration, including the
   # configuration and account binding.
@@ -463,7 +520,7 @@ class Lti::RegistrationsController < ApplicationController
   #
   #   This would return the specified LTI registration
   #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/registrations/<registration_id>' \
-  #        -H "Authorization: Bearer <token
+  #        -H "Authorization: Bearer <token>"
   def show
     GuardRail.activate(:secondary) do
       registration = Lti::Registration.active.find(params[:id])

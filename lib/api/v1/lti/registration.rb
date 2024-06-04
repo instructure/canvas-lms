@@ -30,7 +30,8 @@ module Api::V1::Lti::Registration
   # Serializes a list of LTI registrations.
   # @param includes [Array<Symbol>] Accepted values: [:configuration, :account_binding]
   def lti_registrations_json(registrations, user, session, context, includes: [])
-    registrations.map { |r| lti_registration_json(r, user, session, context, includes:) }
+    sorted_registrations = registrations.sort { |first, second| (second.created_at - first.created_at) }
+    sorted_registrations.map { |r| lti_registration_json(r, user, session, context, includes:) }
   end
 
   # Serializes a single LTI registration.
