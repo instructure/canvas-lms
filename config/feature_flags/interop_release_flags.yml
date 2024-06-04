@@ -81,6 +81,18 @@ disable_oembed_retrieve:
     This is to ease transitioning any potential users off this endpoint before
     removing it altogether.
   shadow: true
+disallow_null_custom_variables:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Disallow all null values for custom variables
+  description: |-
+    When enabled, any custom variables that have previously been returning NULL
+    will now return the name of the custom variable.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 enhanced_developer_keys_tables:
   state: hidden
   applies_to: RootAccount
