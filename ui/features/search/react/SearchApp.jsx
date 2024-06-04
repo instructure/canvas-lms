@@ -50,6 +50,7 @@ export default function SearchApp() {
   const [searchResults, setSearchResults] = useState([])
   const [indexingProgress, setIndexingProgress] = useState(null)
   const [isTrayOpen, setIsTrayOpen] = useState(false)
+  const [resolveFeedback, setResolveFeedback] = useState(null)
 
   useEffect(() => {
     doUrlSearch(false)  // init the box but don't actually do the search until we've checked index status
@@ -93,6 +94,7 @@ export default function SearchApp() {
 
     setFeedbackOpen(true)
     setFeedback({...feedback, action: 'DISLIKE', objectId: id, objectType: type})
+    return new Promise(resolve => setResolveFeedback(() => resolve))
   }
 
   const onExplain = ({id, type}) => {
@@ -104,6 +106,7 @@ export default function SearchApp() {
 
     setFeedbackOpen(true)
     setFeedback({...feedback, action: 'LIKE', objectId: id, objectType: type})
+    return new Promise(resolve => setResolveFeedback(() => resolve))
   }
 
   const onCloseFeedback = () => {
@@ -124,6 +127,9 @@ export default function SearchApp() {
     )
     setFeedback({action: null, comment: '', objectId: null, objectType: null})
     setFeedbackOpen(false)
+    if (resolveFeedback) {
+      resolveFeedback()
+    }
   }
 
   const onSearch = e => {
