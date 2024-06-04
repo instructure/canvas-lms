@@ -76,8 +76,6 @@ import {
 } from '../../util/utils'
 import {MissingSectionsWarningModal} from '../MissingSectionsWarningModal/MissingSectionsWarningModal'
 import {flushSync} from 'react-dom'
-import {SavingDiscussionTopicOverlay} from '../SavingDiscussionTopicOverlay/SavingDiscussionTopicOverlay'
-import {Heading} from '@instructure/ui-heading'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import {ItemAssignToTrayWrapper} from '../DiscussionOptions/ItemAssignToTrayWrapper'
 import {SendEditNotificationModal} from '../SendEditNotificationModal'
@@ -122,7 +120,6 @@ function DiscussionTopicForm({
   apolloClient,
   isSubmitting,
   setIsSubmitting,
-  breakpoints,
 }) {
   const rceRef = useRef()
   const textInputRef = useRef()
@@ -164,6 +161,7 @@ function DiscussionTopicForm({
   const [titleValidationMessages, setTitleValidationMessages] = useState([
     {text: '', type: 'success'},
   ])
+
   const [postToValidationMessages, setPostToValidationMessages] = useState([])
 
   const [rceContent, setRceContent] = useState(currentDiscussionTopic?.message || '')
@@ -579,6 +577,10 @@ function DiscussionTopicForm({
   }
 
   const renderLabelWithPublishStatus = () => {
+    if (instUINavEnabled()) {
+      return <></>
+    }
+
     const publishStatus = published ? (
       <Text color="success" weight="normal">
         <IconPublishSolid /> {I18n.t('Published')}
@@ -627,23 +629,6 @@ function DiscussionTopicForm({
       setShouldShowMissingSectionsWarning(false)
       setMissingSections([])
     })
-  }
-
-  const renderHeading = () => {
-    const itemMargin = breakpoints.desktopOnly ? '0 0 large' : '0 0 medium'
-    const headerText = isAnnouncement ? I18n.t('Create Announcement') : I18n.t('Create Discussion')
-    const titleContent = title ?? headerText
-    return instUINavEnabled() ? (
-      <Flex direction="column" as="div">
-        <Flex.Item margin={itemMargin} overflow="hidden">
-          <Heading level="h1">{headerText}</Heading>
-        </Flex.Item>
-      </Flex>
-    ) : (
-      <ScreenReaderContent>
-        <h1>{titleContent}</h1>
-      </ScreenReaderContent>
-    )
   }
 
   const renderAvailabilityOptions = useCallback(() => {
@@ -725,7 +710,6 @@ function DiscussionTopicForm({
 
   return (
     <>
-      {renderHeading()}
       <FormFieldGroup description="" rowSpacing="small">
         {isUnpublishedAnnouncement && (
           <Alert variant={announcementAlertProps().variant}>{announcementAlertProps().text}</Alert>
@@ -1119,7 +1103,6 @@ function DiscussionTopicForm({
           }}
         />
       )}
-      <SavingDiscussionTopicOverlay open={isSubmitting} />
       {showEditAnnouncementModal && (
         <SendEditNotificationModal
           onClose={() => setShowEditAnnouncementModal(false)}

@@ -27,15 +27,30 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import DiscussionTopicForm from '../../components/DiscussionTopicForm/DiscussionTopicForm'
 import {setUsageRights} from '../../util/setUsageRights'
 import {getContextQuery} from '../../util/utils'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {IconCompleteSolid, IconUnpublishedLine} from '@instructure/ui-icons'
+import {Pill} from '@instructure/ui-pill'
+import {Tabs} from '@instructure/ui-tabs'
+import {SavingDiscussionTopicOverlay} from '../../components/SavingDiscussionTopicOverlay/SavingDiscussionTopicOverlay'
+import WithBreakpoints from '@canvas/with-breakpoints'
 
 const I18n = useI18nScope('discussion_create')
+const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 
-export default function DiscussionTopicFormContainer({apolloClient}) {
+function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
   const {setOnFailure} = useContext(AlertManagerContext)
   const [usageRightData, setUsageRightData] = useState()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const contextType = ENV.context_is_not_group ? 'Course' : 'Group'
   const {contextQueryToUse, contextQueryVariables} = getContextQuery(contextType)
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0)
+  const handleTabChange = (event, {index}) => {
+    setSelectedTabIndex(index)
+  }
+
+  const isAnnouncement = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
 
   const {data: contextData, loading: courseIsLoading} = useQuery(contextQueryToUse, {
     variables: contextQueryVariables,
@@ -43,7 +58,6 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
   const currentContext = contextData?.legacyNode
   const currentDiscussionTopicId = ENV.DISCUSSION_TOPIC?.ATTRIBUTES?.id
   const isEditing = !!currentDiscussionTopicId
-
   const {data: topicData, loading: topicIsLoading} = useQuery(DISCUSSION_TOPIC_QUERY, {
     skip: !isEditing,
     variables: {
@@ -51,6 +65,7 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
     },
   })
   const currentDiscussionTopic = topicData?.legacyNode
+  const published = currentDiscussionTopic?.published ?? false
 
   // Use setUsageRights to save new usageRightsData
   const saveUsageRights = async (usageData, attachmentData) => {
@@ -113,6 +128,43 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
     }
   }
 
+  const renderPublishStatusPill = () => {
+    const pillProps = {
+      color: published ? 'success' : undefined,
+      renderIcon: published ? <IconCompleteSolid /> : <IconUnpublishedLine />,
+    }
+
+    return (
+      <Pill margin="small 0 0 0" variant="primary" {...pillProps}>
+        {published ? I18n.t('Published') : I18n.t('Unpublished')}
+      </Pill>
+    )
+  }
+
+  const renderHeading = () => {
+    const headerText = isAnnouncement ? I18n.t('Create Announcement') : I18n.t('Create Discussion')
+    const titleContent = currentDiscussionTopic?.title ?? headerText
+
+    const headerMargin = breakpoints.desktop ? '0 0 large 0' : '0 0 medium 0'
+
+    return instUINavEnabled() ? (
+      <Flex margin={headerMargin} direction="column" as="div">
+        <Flex.Item margin="0" overflow="hidden">
+          <Heading level="h1">{titleContent}</Heading>
+        </Flex.Item>
+        {!isAnnouncement && (
+          <Flex.Item margin="0" shouldShrink={true} overflowX="visible" overflowY="visible">
+            {renderPublishStatusPill()}
+          </Flex.Item>
+        )}
+      </Flex>
+    ) : (
+      <ScreenReaderContent>
+        <h1>{titleContent}</h1>
+      </ScreenReaderContent>
+    )
+  }
+
   const [createDiscussionTopic] = useMutation(CREATE_DISCUSSION_TOPIC, {
     onCompleted: completionData => {
       const newDiscussionTopic = completionData?.createDiscussionTopic?.discussionTopic
@@ -163,20 +215,45 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
     return <LoadingIndicator />
   }
 
+  const renderForm = () => {
+    return (
+      <DiscussionTopicForm
+        isGroupContext={contextType === 'Group'}
+        isEditing={isEditing}
+        currentDiscussionTopic={currentDiscussionTopic}
+        isStudent={ENV.current_user_is_student}
+        assignmentGroups={currentContext?.assignmentGroupsConnection?.nodes}
+        sections={ENV.SECTION_LIST}
+        groupCategories={currentContext?.groupSetsConnection?.nodes}
+        studentEnrollments={currentContext?.usersConnection?.nodes}
+        apolloClient={apolloClient}
+        onSubmit={handleFormSubmit}
+        isSubmitting={isSubmitting}
+        setIsSubmitting={setIsSubmitting}
+      />
+    )
+  }
+
   return (
-    <DiscussionTopicForm
-      isGroupContext={contextType === 'Group'}
-      isEditing={isEditing}
-      currentDiscussionTopic={currentDiscussionTopic}
-      isStudent={ENV.current_user_is_student}
-      assignmentGroups={currentContext?.assignmentGroupsConnection?.nodes}
-      sections={ENV.SECTION_LIST}
-      groupCategories={currentContext?.groupSetsConnection?.nodes}
-      studentEnrollments={currentContext?.usersConnection?.nodes}
-      apolloClient={apolloClient}
-      onSubmit={handleFormSubmit}
-      isSubmitting={isSubmitting}
-      setIsSubmitting={setIsSubmitting}
-    />
+    <>
+      {renderHeading()}
+      {instUINavEnabled() ? (
+        <>
+          <Tabs onRequestTabChange={handleTabChange}>
+            <Tabs.Panel
+              isSelected={selectedTabIndex === 0}
+              renderTitle={I18n.t('Details')}
+              textAlign="center"
+            />
+          </Tabs>
+          {selectedTabIndex === 0 && renderForm()}
+        </>
+      ) : (
+        renderForm()
+      )}
+      <SavingDiscussionTopicOverlay open={isSubmitting} />
+    </>
   )
 }
+
+export default WithBreakpoints(DiscussionTopicFormContainer)
