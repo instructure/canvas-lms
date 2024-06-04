@@ -342,8 +342,17 @@ class User < ActiveRecord::Base
 
   # NOTE: only use for courses with differentiated assignments on
   scope :able_to_see_assignment_in_course_with_da, lambda { |assignment_id, course_id|
-    joins(:assignment_student_visibilities)
-      .where(assignment_student_visibilities: { assignment_id:, course_id: })
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      visible_user_id = AssignmentVisibility::AssignmentVisibilityService.assignment_visible_in_course(assignment_id:, course_id:).map(&:user_id)
+      if visible_user_id.any?
+        where(id: visible_user_id)
+      else
+        none
+      end
+    else
+      joins(:assignment_student_visibilities)
+        .where(assignment_student_visibilities: { assignment_id:, course_id: })
+    end
   }
 
   # NOTE: only use for courses with differentiated assignments on

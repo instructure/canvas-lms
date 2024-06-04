@@ -20,14 +20,14 @@
 module AssignmentVisibility
   class AssignmentVisibilityService
     class << self
-      def visible_assignment_ids_in_course_by_user(user_ids:, course_id:, use_global_id: false)
-        raise ArgumentError, "course_id cannot be nil" if course_id.nil?
-        raise ArgumentError, "course_id must not be an array" if course_id.is_a?(Array)
+      def visible_assignment_ids_in_course_by_user(user_ids:, course_ids:, use_global_id: false)
+        raise ArgumentError, "course_ids cannot be nil" if course_ids.nil?
+        raise ArgumentError, "course_ids must be an array" unless course_ids.is_a?(Array)
         raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
         raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
 
         vis_hash = {}
-        assignments_visible_to_students(user_id_params: user_ids, course_id_params: course_id).each do |assignment_visible_to_student|
+        assignments_visible_to_students(user_id_params: user_ids, course_id_params: course_ids).each do |assignment_visible_to_student|
           user_id = assignment_visible_to_student.user_id
           user_id = Shard.global_id_for(user_id) if use_global_id
           vis_hash[user_id] ||= []
@@ -43,7 +43,7 @@ module AssignmentVisibility
         raise ArgumentError, "user_id cannot be nil" if user_id.nil?
         raise ArgumentError, "user_id must not be an array" if user_id.is_a?(Array)
 
-        visible_assignment_ids_in_course_by_user(user_ids: [user_id], course_id:, use_global_id:)
+        visible_assignment_ids_in_course_by_user(user_ids: [user_id], course_ids: [course_id], use_global_id:)
       end
 
       def users_with_visibility_by_assignment(course_id:, assignment_ids:)
@@ -119,15 +119,24 @@ module AssignmentVisibility
         assignments_visible_to_students(assignment_id_params: assignment_id, user_id_params: user_ids)
       end
 
-      def assignment_visible_to_students_in_course(assignment_id:, user_ids:, course_id:)
-        raise ArgumentError, "course_id cannot be nil" if course_id.nil?
-        raise ArgumentError, "course_id must not be an array" if course_id.is_a?(Array)
-        raise ArgumentError, "assignment_id cannot be nil" if assignment_id.nil?
-        raise ArgumentError, "assignment_id must not be an array" if assignment_id.is_a?(Array)
+      def assignments_visible_to_student_by_assignment(assignment_ids:, user_id:)
+        raise ArgumentError, "assignment_ids cannot be nil" if assignment_ids.nil?
+        raise ArgumentError, "assignment_ids must be an array" unless assignment_ids.is_a?(Array)
+        raise ArgumentError, "user_id cannot be nil" if user_id.nil?
+        raise ArgumentError, "user_ids must not be an array" if user_id.is_a?(Array)
+
+        assignments_visible_to_students(assignment_id_params: assignment_ids, user_id_params: user_id)
+      end
+
+      def assignment_visible_to_students_in_course(assignment_ids:, user_ids:, course_ids:)
+        raise ArgumentError, "course_ids cannot be nil" if course_ids.nil?
+        raise ArgumentError, "course_ids must be an array" unless course_ids.is_a?(Array)
+        raise ArgumentError, "assignment_ids cannot be nil" if assignment_ids.nil?
+        raise ArgumentError, "assignment_ids must be an array" unless assignment_ids.is_a?(Array)
         raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
         raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
 
-        assignments_visible_to_students(course_id_params: course_id, assignment_id_params: assignment_id, user_id_params: user_ids)
+        assignments_visible_to_students(course_id_params: course_ids, assignment_id_params: assignment_ids, user_id_params: user_ids)
       end
 
       def assignment_visible_in_course(assignment_id:, course_id:)
@@ -137,6 +146,15 @@ module AssignmentVisibility
         raise ArgumentError, "assignment_id must not be an array" if assignment_id.is_a?(Array)
 
         assignments_visible_to_students(course_id_params: course_id, assignment_id_params: assignment_id)
+      end
+
+      def assignments_visible_in_course(assignment_ids:, course_id:)
+        raise ArgumentError, "course_id cannot be nil" if course_id.nil?
+        raise ArgumentError, "course_id must not be an array" if course_id.is_a?(Array)
+        raise ArgumentError, "assignment_ids cannot be nil" if assignment_ids.nil?
+        raise ArgumentError, "assignment_ids must be an array" unless assignment_ids.is_a?(Array)
+
+        assignments_visible_to_students(course_id_params: course_id, assignment_id_params: assignment_ids)
       end
 
       # TODO: better name for this method, or a better location?
