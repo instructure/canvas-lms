@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import $ from 'jquery'
+import $, {type} from 'jquery'
 import {map, sortBy, filter, forEach, find} from 'lodash'
 import createStore from './createStoreJestCompatible'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
@@ -137,8 +137,14 @@ store.save = function (configurationType, data, success, error) {
   })
 }
 
-store.setAsFavorite = function (tool, isFavorite, success, error) {
-  const url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/external_tools/rce_favorites/' + tool.app_id
+store.setAsFavorite = function (tool, isFavorite, favoriteType, success, error) {
+  const url =
+    '/api/v1' +
+    ENV.CONTEXT_BASE_URL +
+    '/external_tools/' +
+    favoriteType +
+    '_favorites/' +
+    tool.app_id
   const method = isFavorite ? 'POST' : 'DELETE'
 
   $.ajax({

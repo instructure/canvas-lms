@@ -81,7 +81,8 @@ class ExternalToolsController < ApplicationController
   #        "updated_at": "2037-07-28T19:38:31Z",
   #        "privacy_level": "anonymous",
   #        "custom_fields": {"key": "value"},
-  #        "is_rce_favorite": false
+  #        "is_rce_favorite": false,
+  #        "is_top_nav_favorite": false,
   #        "account_navigation": {
   #             "canvas_icon_class": "icon-lti",
   #             "icon_url": "...",
@@ -373,6 +374,7 @@ class ExternalToolsController < ApplicationController
   # @response_field privacy_level How much user information to send to the external tool: "anonymous", "name_only", "email_only", "public"
   # @response_field custom_fields Custom fields that will be sent to the tool consumer
   # @response_field is_rce_favorite Boolean determining whether this tool should be in a preferred location in the RCE.
+  # @response_field is_top_nav_favorite Boolean determining whether this tool should have a dedicated button in Top Navigation.
   # @response_field account_navigation The configuration for account navigation links (see create API for values)
   # @response_field assignment_selection The configuration for assignment selection links (see create API for values)
   # @response_field course_home_sub_navigation The configuration for course home navigation links (see create API for values)
@@ -1327,6 +1329,58 @@ class ExternalToolsController < ApplicationController
     end
   end
 
+  # @API Add tool to Top Navigation Favorites
+  # Adds a dedicated button in Top Navigation for the specified tool for the given account.
+  # Cannot set more than 2 top_navigation Favorites.
+  #
+  # @example_request
+  #
+  #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/external_tools/top_nav_favorites/<id>' \
+  #        -H "Authorization: Bearer <token>"
+  def add_top_nav_favorite
+    if authorized_action(@context, @current_user, [:lti_add_edit, :manage_lti_add])
+      @tool = ContextExternalTool.find_external_tool_by_id(params[:id], @context)
+      raise ActiveRecord::RecordNotFound unless @tool
+      unless @tool.can_be_top_nav_favorite?
+        return render json: { message: "Tool does not have top_navigation placement" }, status: :bad_request
+      end
+
+      favorite_ids = @context.get_top_nav_favorite_tool_ids
+      favorite_ids << @tool.global_id
+      favorite_ids.uniq!
+      if favorite_ids.length > 2
+        valid_ids = Lti::ContextToolFinder.new(@context, placements: [:top_navigation]).all_tools_scope_union.pluck(:id)
+        valid_ids.map! { |id| Shard.global_id_for(id) }
+        favorite_ids &= valid_ids # try to clear out any possibly deleted tool references first before causing a fuss
+      end
+      if favorite_ids.length > 2
+        render json: { message: "Cannot have more than 2 favorited tools" }, status: :bad_request
+      else
+        @context.settings[:top_nav_favorite_tool_ids] = { value: favorite_ids }
+        @context.save!
+        render json: { top_nav_favorite_tool_ids: favorite_ids.map { |id| Shard.relative_id_for(id, Shard.current, Shard.current) } }
+      end
+    end
+  end
+
+  # @API Remove tool from Top Navigation Favorites
+  # Removes the dedicated button in Top Navigation for the specified tool for the given account.
+  #
+  # @example_request
+  #
+  #   curl -X DELETE 'https://<canvas>/api/v1/accounts/<account_id>/external_tools/top_nav_favorites/<id>' \
+  #        -H "Authorization: Bearer <token>"
+  def remove_top_nav_favorite
+    if authorized_action(@context, @current_user, [:lti_add_edit, :manage_lti_delete])
+      favorite_ids = @context.get_top_nav_favorite_tool_ids
+      if favorite_ids.delete(Shard.global_id_for(params[:id]))
+        @context.settings[:top_nav_favorite_tool_ids] = { value: favorite_ids }
+        @context.save!
+      end
+      render json: { top_nav_favorite_tool_ids: favorite_ids.map { |id| Shard.relative_id_for(id, Shard.current, Shard.current) } }
+    end
+  end
+
   # @API Get visible course navigation tools
   # Get a list of external tools with the course_navigation placement that have not been hidden in
   # course settings and whose visibility settings apply to the requesting user. These tools are the
@@ -1620,7 +1674,8 @@ class ExternalToolsController < ApplicationController
                 not_selectable
                 app_center_id
                 oauth_compliant
-                is_rce_favorite]
+                is_rce_favorite
+                is_top_nav_favorite]
     attrs += [:allow_membership_service_access] if @context.root_account.feature_enabled?(:membership_service_for_lti_tools)
 
     attrs.each do |prop|

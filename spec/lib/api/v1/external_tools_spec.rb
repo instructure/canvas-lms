@@ -104,5 +104,27 @@ describe Api::V1::ExternalTools do
         expect(json).not_to have_key(:is_rce_favorite)
       end
     end
+
+    describe "is_top_nav_favorite" do
+      let(:root_acount_tool) do
+        tool.context = @course.root_account
+        tool.save!
+        tool.context.settings[:top_nav_favorite_tool_ids] = { value: [tool.global_id] }
+        tool.context.save!
+        tool
+      end
+
+      it "includes is_top_nav_favorite when can_be_top_nav_favorite?" do
+        root_acount_tool.context_external_tool_placements.create(placement_type: :top_navigation)
+
+        json = controller.external_tool_json(root_acount_tool, @course.root_account, account_admin_user, nil)
+        expect(json[:is_top_nav_favorite]).to be true
+      end
+
+      it "excludes is_rce_favorite when not can_be_rce_favorite?" do
+        json = controller.external_tool_json(root_acount_tool, @course.root_account, account_admin_user, nil)
+        expect(json).not_to have_key(:is_top_nav_favorite)
+      end
+    end
   end
 end
