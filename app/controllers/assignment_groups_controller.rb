@@ -345,7 +345,7 @@ class AssignmentGroupsController < ApplicationController
 
   def assignment_visibilities(course, assignments)
     if include_visibility?
-      if Account.site_admin.feature_enabled?(:differentiated_modules)
+      if Account.site_admin.feature_enabled?(:selective_release_backend)
         AssignmentVisibility::AssignmentVisibilityService.assignments_with_user_visibilities(course, assignments)
       else
         AssignmentStudentVisibility.assignments_with_user_visibilities(course, assignments)

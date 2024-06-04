@@ -456,7 +456,7 @@ function DiscussionTopicForm({
       ...(shouldShowUsageRightsOption && {usageRightsData}),
     }
 
-    if (!isGraded && !currentDiscussionTopic?.assignment && ENV.FEATURES?.differentiated_modules) {
+    if (!isGraded && !currentDiscussionTopic?.assignment && ENV.FEATURES?.selective_release_ui_api) {
       Object.assign(
         payload,
         prepareUngradedDiscussionOverridesPayload(

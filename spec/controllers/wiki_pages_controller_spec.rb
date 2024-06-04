@@ -52,9 +52,9 @@ describe WikiPagesController do
         user_session(@student)
       end
 
-      context "with differentiated_modules enabled" do
+      context "with selective_release_backend enabled" do
         before do
-          Account.site_admin.enable_feature! :differentiated_modules
+          Account.site_admin.enable_feature! :selective_release_backend
         end
 
         context "regular pages" do
@@ -103,8 +103,9 @@ describe WikiPagesController do
         end
       end
 
-      context "with differentiated_modules disabled" do
+      context "with selective_release_backend disabled" do
         before do
+          Account.site_admin.disable_feature!(:selective_release_backend)
           @assignment = @course.assignments.create!(submission_types: "wiki_page")
           @page.assignment = @assignment
           @page.save!

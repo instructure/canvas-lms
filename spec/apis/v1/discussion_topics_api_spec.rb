@@ -1167,7 +1167,7 @@ describe DiscussionTopicsController, type: :request do
 
       describe "differentiated modules" do
         before do
-          Account.site_admin.enable_feature! :differentiated_modules
+          Account.site_admin.enable_feature! :selective_release_backend
         end
 
         context "ungraded discussions" do

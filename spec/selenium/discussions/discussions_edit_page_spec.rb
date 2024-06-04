@@ -697,9 +697,10 @@ describe "discussions" do
           expect(driver.current_url).to include("?embed=true")
         end
 
-        context "with differentiated_modules enabled" do
+        context "with selective_release_backend and selective_release_ui_api enabled" do
           before :once do
-            Account.site_admin.enable_feature!(:differentiated_modules)
+            Account.site_admin.enable_feature!(:selective_release_backend)
+            Account.site_admin.enable_feature!(:selective_release_ui_api)
           end
 
           it "does not show the assign to UI when the user does not have permission even if user can access edit page" do

@@ -634,7 +634,7 @@ class ContentTag < ActiveRecord::Base
   }
 
   scope :for_differentiable_quizzes, lambda { |user_ids, course_ids|
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
       visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students_in_courses(user_ids:, course_ids:).map(&:quiz_id)
       where(content_id: visible_quiz_ids, context_id: course_ids, context_type: "Course", content_type: ["Quiz", "Quizzes::Quiz"])
     else
@@ -652,7 +652,7 @@ class ContentTag < ActiveRecord::Base
   }
 
   scope :for_differentiable_assignments, lambda { |user_ids, course_ids|
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
       visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students_in_courses(user_ids:, course_ids:).map(&:assignment_id)
       where(content_id: visible_assignment_ids, context_id: course_ids, context_type: "Course", content_type: "Assignment")
     else
@@ -670,7 +670,7 @@ class ContentTag < ActiveRecord::Base
   }
 
   scope :for_differentiable_discussions, lambda { |user_ids, course_ids|
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
       unfiltered_discussion_ids = where(content_type: "DiscussionTopic").pluck(:content_id)
       assignment_ids = DiscussionTopic.where(id: unfiltered_discussion_ids).where.not(assignment_id: nil).pluck(:assignment_id)
       visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignment_visible_to_students_in_course(user_ids:, course_ids:, assignment_ids:).map(&:assignment_id)
@@ -696,7 +696,7 @@ class ContentTag < ActiveRecord::Base
   }
 
   scope :for_differentiable_wiki_pages, lambda { |user_ids, course_ids|
-    if Account.site_admin.feature_enabled?(:differentiated_modules) # TODO: I feel like this could be better
+    if Account.site_admin.feature_enabled?(:selective_release_backend) # TODO: I feel like this could be better
       unfiltered_page_ids = where(content_type: "WikiPage").pluck(:content_id)
       assignment_ids = WikiPage.where(id: unfiltered_page_ids).where.not(assignment_id: nil).pluck(:assignment_id)
       visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignment_visible_to_students_in_course(user_ids:, course_ids:, assignment_ids:).map(&:assignment_id)
@@ -889,7 +889,7 @@ class ContentTag < ActiveRecord::Base
 
   def update_module_item_submissions(change_of_module: true)
     valid_types = ["Assignment", "Quizzes::Quiz", "DiscussionTopic"]
-    return unless Account.site_admin.feature_enabled?(:differentiated_modules)
+    return unless Account.site_admin.feature_enabled?(:selective_release_backend)
 
     return unless tag_type == "context_module" && valid_types.include?(content_type)
 

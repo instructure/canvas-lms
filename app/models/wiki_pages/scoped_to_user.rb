@@ -24,7 +24,7 @@ class WikiPages::ScopedToUser < ScopeFilter
     concat_scope { @relation.published unless can?(:view_unpublished_items) }
     concat_scope do
       wiki_context = context.is_a?(Wiki) ? context.context : context
-      if wiki_context.is_a?(Course) && (wiki_context.conditional_release? || Account.site_admin.feature_enabled?(:differentiated_modules))
+      if wiki_context.is_a?(Course) && (wiki_context.conditional_release? || Account.site_admin.feature_enabled?(:selective_release_backend))
         return DifferentiableAssignment.scope_filter(@relation, user, wiki_context)
       end
 

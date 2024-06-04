@@ -82,7 +82,7 @@ class WikiPage < ActiveRecord::Base
   after_save :delete_lookups, if: -> { !Account.site_admin.feature_enabled?(:permanent_page_links) && saved_change_to_workflow_state? && deleted? }
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
       # no assignment -> visible if wiki_page_visibilities has results
       # assignment -> visible if assignment_visibilities has results
       visible_wiki_page_ids = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students_in_courses(course_ids:, user_ids:).map(&:wiki_page_id)
@@ -111,7 +111,7 @@ class WikiPage < ActiveRecord::Base
   }
 
   scope :visible_to_user, lambda { |user_id|
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
       scope_assignments = where.not(assignment_id: nil).pluck(:assignment_id)
       visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_student_by_pages(user_id:, wiki_page_ids: ids).map(&:wiki_page_id)
       visible_assignments = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_student_by_assignment(user_id:, assignment_ids: scope_assignments).map(&:assignment_id)
@@ -332,7 +332,7 @@ class WikiPage < ActiveRecord::Base
   scope :order_by_id, -> { order(:id) }
 
   def low_level_locked_for?(user, opts = {})
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
       return false if opts[:check_policies] && grants_right?(user, :update)
 
       RequestCache.cache(locked_request_cache_key(user)) do
@@ -649,7 +649,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def self.visible_ids_by_user(opts)
-    assignment_page_visibilities = if Account.site_admin.feature_enabled?(:differentiated_modules)
+    assignment_page_visibilities = if Account.site_admin.feature_enabled?(:selective_release_backend)
                                      visible_assignments = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students_in_courses(user_ids: opts[:user_id], course_ids: opts[:course_id])
                                      # map the visibilities to a hash of assignment_id => [user_ids]
                                      assignment_user_map = visible_assignments.each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |visibility, hash|
@@ -666,7 +666,7 @@ class WikiPage < ActiveRecord::Base
                                        .group_by { |_, user_id| user_id }
                                    end
     no_assignment_page_visibilities = without_assignment_in_course(opts[:course_id])
-    no_assignment_page_visibilities = if Account.site_admin.feature_enabled?(:differentiated_modules)
+    no_assignment_page_visibilities = if Account.site_admin.feature_enabled?(:selective_release_backend)
                                         visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students_in_courses(course_ids: opts[:course_id], user_ids: opts[:user_id])
                                         visible_wiki_page_ids = visible_wiki_pages.map { |visibility| [visibility.wiki_page_id, visibility.user_id] }
 
@@ -679,7 +679,7 @@ class WikiPage < ActiveRecord::Base
 
     opts[:user_id].index_with do |user_id|
       page_ids_with_assignment = (assignment_page_visibilities[user_id] || []).map { |page_id, _| page_id }
-      page_ids_no_assignment = if Account.site_admin.feature_enabled?(:differentiated_modules)
+      page_ids_no_assignment = if Account.site_admin.feature_enabled?(:selective_release_backend)
                                  (no_assignment_page_visibilities[user_id] || []).map { |page_id, _| page_id }
                                else
                                  no_assignment_page_visibilities

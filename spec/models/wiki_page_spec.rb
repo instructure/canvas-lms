@@ -956,9 +956,9 @@ describe WikiPage do
       expect(page.reload.locked_for?(@student)).not_to have_key :unlock_at
     end
 
-    context "with differentiated_modules enabled" do
+    context "with selective_release_backend enabled" do
       before(:once) do
-        Account.site_admin.enable_feature! :differentiated_modules
+        Account.site_admin.enable_feature! :selective_release_backend
         course_with_student(active_all: true)
         @page = @course.wiki_pages.create!(title: "page")
       end
@@ -1301,16 +1301,16 @@ describe WikiPage do
       expect(WikiPage.visible_to_user(@student1.id)).to include(group_page)
     end
 
-    context "with differentiated_modules disabled" do
+    context "with selective_release_backend disabled" do
       it "does not consider WikiPageStudentVisibility" do
         @page1.update!(only_visible_to_overrides: true)
         assert_visible(@student1, [@page1])
       end
     end
 
-    context "with differentiated_modules enabled" do
+    context "with selective_release_backend enabled" do
       before :once do
-        Account.site_admin.enable_feature!(:differentiated_modules)
+        Account.site_admin.enable_feature!(:selective_release_backend)
       end
 
       it "does not include pages if the page does not have an assignment but has only_visible_to_overrides set to true" do

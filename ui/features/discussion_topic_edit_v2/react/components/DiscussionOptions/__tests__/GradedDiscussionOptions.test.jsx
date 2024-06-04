@@ -63,9 +63,9 @@ describe('GradedDiscussionOptions', () => {
     expect(getByText('Assignment Settings')).toBeInTheDocument()
   })
 
-  describe('with differentiated_modules enabled', () => {
+  describe('with selective_release_ui_api enabled', () => {
     beforeEach(() => {
-      ENV.FEATURES.differentiated_modules = true
+      ENV.FEATURES.selective_release_ui_api = true
     })
 
     it('does not render assignment settings if canManageAssignTo is false', () => {

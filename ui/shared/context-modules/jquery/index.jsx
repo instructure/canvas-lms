@@ -103,7 +103,7 @@ window.modules = (function () {
     },
 
     addModule(callback = () => {}) {
-      if (ENV.FEATURES.differentiated_modules) {
+      if (ENV.FEATURES.selective_release_ui_api) {
         const options = {initialTab: 'settings'}
         const settings = {
           moduleList: parseModuleList(),
@@ -2485,7 +2485,7 @@ $(document).ready(function () {
 
   $(document).on('click', '.edit_module_link', function (event) {
     event.preventDefault()
-    if (ENV.FEATURES.differentiated_modules) {
+    if (ENV.FEATURES.selective_release_ui_api) {
       const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
       const moduleElement = $(event.target).parents('.context_module')[0]
       const settingsProps = parseModule(moduleElement)

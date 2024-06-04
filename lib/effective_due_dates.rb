@@ -159,7 +159,7 @@ class EffectiveDueDates
   end
 
   def context_module_overrides
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
       "/* fetch all module overrides for this assignment */
       tags AS (
         SELECT
@@ -216,7 +216,7 @@ class EffectiveDueDates
   end
 
   def visible_to_everyone
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
       "a.only_visible_to_overrides IS NOT TRUE AND (NOT EXISTS (SELECT * FROM modules) OR EXISTS (
         SELECT
           *
@@ -236,7 +236,7 @@ class EffectiveDueDates
   end
 
   def union_all_overrides
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
       "overrides AS (
         SELECT * FROM assignment_overrides
         UNION ALL
@@ -250,7 +250,7 @@ class EffectiveDueDates
   end
 
   def course_overrides
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
       "/* fetch all students affected by course overrides */
       override_course_students AS (
         SELECT
@@ -279,7 +279,7 @@ class EffectiveDueDates
   end
 
   def union_course_overrides
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
       "SELECT * FROM override_course_students
         UNION ALL"
     else
@@ -288,7 +288,7 @@ class EffectiveDueDates
   end
 
   def unassign_item
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
       "WHERE
         overrides.unassign_item = FALSE"
     else

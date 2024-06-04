@@ -60,7 +60,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     this.prototype.template = template
     this.prototype.className = 'form-horizontal edit-form validated-form-view'
     this.prototype.dontRenableAfterSaveSuccess = true
-    if (window.ENV.FEATURES?.differentiated_modules) {
+    if (window.ENV.FEATURES?.selective_release_ui_api) {
       this.prototype.disablingDfd = new $.Deferred()
     }
     this.optionProperty('wiki_pages_path')
@@ -73,7 +73,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     if (!this.WIKI_RIGHTS) this.WIKI_RIGHTS = {}
     if (!this.PAGE_RIGHTS) this.PAGE_RIGHTS = {}
     this.enableAssignTo =
-      window.ENV.FEATURES?.differentiated_modules &&
+      window.ENV.FEATURES?.selective_release_ui_api &&
       ENV.COURSE_ID != null &&
       ENV.WIKI_RIGHTS.manage_assign_to
     const redirect = () => {
@@ -142,7 +142,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     json.assignment = json.assignment != null ? json.assignment.toView() : undefined
 
     json.content_is_locked = this.lockedItems.content
-    json.differentiated_modules = this.enableAssignTo
+    json.show_assign_to = this.enableAssignTo
 
     return json
   }

@@ -20,7 +20,8 @@
 
 describe LearningObjectDatesController do
   before :once do
-    Account.site_admin.enable_feature! :differentiated_modules
+    Account.site_admin.enable_feature! :selective_release_backend
+    Account.site_admin.enable_feature! :selective_release_ui_api
     Account.site_admin.enable_feature! :differentiated_files
     course_with_teacher(active_all: true)
   end
@@ -496,8 +497,8 @@ describe LearningObjectDatesController do
       expect(response).to be_not_found
     end
 
-    it "returns not_found if differentiated_modules is disabled" do
-      Account.site_admin.disable_feature! :differentiated_modules
+    it "returns not_found if selective_release_ui_api is disabled" do
+      Account.site_admin.disable_feature! :selective_release_ui_api
       get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
       expect(response).to be_not_found
     end
@@ -688,8 +689,8 @@ describe LearningObjectDatesController do
         expect(response).to be_not_found
       end
 
-      it "returns not_found if differentiated_modules is disabled" do
-        Account.site_admin.disable_feature! :differentiated_modules
+      it "returns not_found if selective_release_ui_api is disabled" do
+        Account.site_admin.disable_feature! :selective_release_ui_api
         put :update, params: { **default_params, due_at: "2020-03-02T05:59:00Z" }
         expect(response).to be_not_found
       end

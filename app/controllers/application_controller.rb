@@ -363,7 +363,8 @@ class ApplicationController < ActionController::Base
     explicit_latex_typesetting
     media_links_use_attachment_id
     permanent_page_links
-    differentiated_modules
+    selective_release_backend
+    selective_release_ui_api
     enhanced_course_creation_account_fetching
     instui_for_import_page
     multiselect_gradebook_filters

@@ -30,8 +30,8 @@ class AssignmentStudentVisibility < ActiveRecord::Base
   end
 
   def self.where_with_guard(*args)
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
-      raise StandardError, "AssignmentStudentVisibility view should not be used when differentiated_modules site admin flag is on.  Use AssignmentVisibilityService instead"
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      raise StandardError, "AssignmentStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use AssignmentVisibilityService instead"
     end
 
     where_without_guard(*args)
@@ -43,16 +43,16 @@ class AssignmentStudentVisibility < ActiveRecord::Base
   end
 
   def self.visible_assignment_ids_in_course_by_user(opts)
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
-      raise StandardError, "AssignmentStudentVisibility view should not be used when differentiated_modules site admin flag is on.  Use AssignmentVisibilityService instead"
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      raise StandardError, "AssignmentStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use AssignmentVisibilityService instead"
     end
 
     visible_object_ids_in_course_by_user(:assignment_id, opts)
   end
 
   def self.assignments_with_user_visibilities(course, assignments)
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
-      raise StandardError, "AssignmentStudentVisibility view should not be used when differentiated_modules site admin flag is on.  Use AssignmentVisibilityService instead"
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      raise StandardError, "AssignmentStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use AssignmentVisibilityService instead"
     end
 
     only_visible_to_overrides, visible_to_everyone = assignments.partition(&:only_visible_to_overrides)
@@ -72,8 +72,8 @@ class AssignmentStudentVisibility < ActiveRecord::Base
   end
 
   def self.assignments_visible_to_all_students(assignments_visible_to_everyone)
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
-      raise StandardError, "AssignmentStudentVisibility view should not be used when differentiated_modules site admin flag is on.  Use AssignmentVisibilityService instead"
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      raise StandardError, "AssignmentStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use AssignmentVisibilityService instead"
     end
 
     assignments_visible_to_everyone.each_with_object({}) do |assignment, assignment_visibilities|
@@ -85,16 +85,16 @@ class AssignmentStudentVisibility < ActiveRecord::Base
   end
 
   def self.users_with_visibility_by_assignment(opts)
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
-      raise StandardError, "AssignmentStudentVisibility view should not be used when differentiated_modules site admin flag is on.  Use AssignmentVisibilityService instead"
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      raise StandardError, "AssignmentStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use AssignmentVisibilityService instead"
     end
 
     users_with_visibility_by_object_id(:assignment_id, opts)
   end
 
   def self.visible_assignment_ids_for_user(user_id, course_ids = nil)
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
-      raise StandardError, "AssignmentStudentVisibility view should not be used when differentiated_modules site admin flag is on.  Use AssignmentVisibilityService instead"
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      raise StandardError, "AssignmentStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use AssignmentVisibilityService instead"
     end
 
     opts = { user_id: }

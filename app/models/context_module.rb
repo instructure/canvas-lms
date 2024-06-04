@@ -994,14 +994,14 @@ class ContextModule < ActiveRecord::Base
   end
 
   def update_assignment_submissions(module_assignments = current_items_with_assignment)
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
       module_assignments.clear_cache_keys(:availability)
       SubmissionLifecycleManager.recompute_course(context, assignments: module_assignments, update_grades: true)
     end
   end
 
   def current_items_with_assignment
-    return unless Account.site_admin.feature_enabled?(:differentiated_modules)
+    return unless Account.site_admin.feature_enabled?(:selective_release_backend)
 
     module_assignments = Assignment.active.where(id: content_tags.not_deleted.where(content_type: "Assignment").select(:content_id)).pluck(:id)
 

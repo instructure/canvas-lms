@@ -304,7 +304,7 @@ export const DiscussionPostToolbar = props => {
                   </Flex.Item>
                 )}
                 {props.manageAssignTo &&
-                  ENV.FEATURES?.differentiated_modules &&
+                  ENV.FEATURES?.selective_release_ui_api &&
                   !props.isAnnouncement &&
                   props.contextType === 'Course' && (
                     <Flex.Item shouldGrow={true} textAlign="end">

@@ -25,8 +25,8 @@ class WikiPageStudentVisibility < ActiveRecord::Base
   end
 
   def self.where_with_guard(*args)
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
-      raise StandardError, "WikiPageStudentVisibility view should not be used when differentiated_modules site admin flag is on.  Use WikiPageVisibilityService instead"
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      raise StandardError, "WikiPageStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use WikiPageVisibilityService instead"
     end
 
     where_without_guard(*args)

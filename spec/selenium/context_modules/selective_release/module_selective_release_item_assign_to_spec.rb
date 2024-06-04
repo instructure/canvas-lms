@@ -123,7 +123,7 @@ describe "selective_release module item assign to tray" do
     end
 
     it "does not show tray when flag if off after item indent" do
-      Account.site_admin.disable_feature! :differentiated_modules
+      Account.site_admin.disable_feature! :selective_release_ui_api
       go_to_modules
       add_new_module_item_and_yield("#quizs_select", "Quiz", "[ Create Quiz ]", "A Classic Quiz") do
         f("label[for=classic_quizzes_radio]").click

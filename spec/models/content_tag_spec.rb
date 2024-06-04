@@ -1038,7 +1038,7 @@ describe ContentTag do
 
   describe "#update_module_item_submissions" do
     before do
-      Account.site_admin.enable_feature!(:differentiated_modules)
+      Account.site_admin.enable_feature!(:selective_release_backend)
       course_factory
       @student1 = student_in_course(active_all: true, name: "Student 1").user
       @student2 = student_in_course(active_all: true, name: "Student 2").user

@@ -628,8 +628,9 @@ describe "discussions" do
         expect(f("body")).not_to contain_jqcss "input[data-testid='group-discussion-checkbox']"
       end
 
-      it "only shows the assign to UI when differentiated_modules is enabled if the student has an unrestricted enrollment" do
-        Account.site_admin.enable_feature! :differentiated_modules
+      it "only shows the assign to UI when selective_release_backend and selective_release_ui_api is enabled if the student has an unrestricted enrollment" do
+        Account.site_admin.enable_feature!(:selective_release_backend)
+        Account.site_admin.enable_feature!(:selective_release_ui_api)
         get "/courses/#{course.id}/discussion_topics/new"
         expect(element_exists?(Discussion.assign_to_button_selector)).to be_truthy
 

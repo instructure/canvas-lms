@@ -30,7 +30,7 @@ describe "context modules" do
 
   context "as a teacher", priority: "1" do
     before(:once) do
-      Account.site_admin.disable_feature! :differentiated_modules
+      Account.site_admin.disable_feature! :selective_release_ui_api
       course_with_teacher(active_all: true)
       # have to add quiz and assignment to be able to add them to a new module
       @quiz = @course.assignments.create!(title: "quiz assignment", submission_types: "online_quiz")
@@ -109,7 +109,7 @@ describe "context modules" do
 
     context "edit dialog" do
       before :once do
-        Account.site_admin.disable_feature! :differentiated_modules
+        Account.site_admin.disable_feature! :selective_release_ui_api
         @mod = create_modules(2, true)
         @mod[0].add_item({ id: @assignment.id, type: "assignment" })
         @mod[0].add_item({ id: @assignment2.id, type: "assignment" })
@@ -185,7 +185,7 @@ describe "context modules" do
     end
 
     it "groups quizzes and new quizzes together in dropdown" do
-      Account.site_admin.disable_feature! :differentiated_modules
+      Account.site_admin.disable_feature! :selective_release_ui_api
       module_setup
       @course.context_external_tools.create!(
         tool_id: ContextExternalTool::QUIZ_LTI,
@@ -213,7 +213,7 @@ describe "context modules" do
 
     context "specific tests without differentiated modules" do
       before :once do
-        Account.site_admin.disable_feature! :differentiated_modules
+        Account.site_admin.disable_feature! :selective_release_ui_api
       end
 
       it "shows the added prerequisites when editing a module" do

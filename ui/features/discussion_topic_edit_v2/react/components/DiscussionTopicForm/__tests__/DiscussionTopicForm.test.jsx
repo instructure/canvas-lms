@@ -750,9 +750,9 @@ describe('DiscussionTopicForm', () => {
   })
 
   describe('Ungraded', () => {
-    describe('differentiated_modules flag is ON', () => {
+    describe('selective_release_ui_api flag is ON', () => {
       beforeAll(() => {
-        window.ENV.FEATURES.differentiated_modules = true
+        window.ENV.FEATURES.selective_release_ui_api = true
       })
 
       it('renders expected default teacher discussion options', () => {

@@ -863,7 +863,7 @@ class DiscussionRow extends Component {
                 <Grid.Row vAlign="middle">
                   <Grid.Col vAlign="middle" textAlign="start">
                     {this.renderTitle()}
-                    {!ENV?.FEATURES?.differentiated_modules && this.renderSectionsTooltip()}
+                    {!ENV?.FEATURES?.selective_release_ui_api && this.renderSectionsTooltip()}
                   </Grid.Col>
                   <Grid.Col vAlign="top" textAlign="end">
                     {this.renderUpperRightBadges()}
@@ -963,7 +963,7 @@ const mapState = (state, ownProps) => {
       (state.DIRECT_SHARE_ENABLED && state.permissions.read_as_admin),
     displayPinMenuItem: state.permissions.moderate,
     displayDifferentiatedModulesTray:
-      ENV?.FEATURES?.differentiated_modules &&
+      ENV?.FEATURES?.selective_release_ui_api &&
       discussion.permissions.manage_assign_to &&
       state.contextType === 'course',
     masterCourseData: state.masterCourseData,

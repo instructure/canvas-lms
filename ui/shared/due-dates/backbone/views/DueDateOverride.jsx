@@ -81,7 +81,7 @@ DueDateOverrideView.prototype.render = function () {
     )
   }
 
-  const assignToSection = ENV.FEATURES?.differentiated_modules
+  const assignToSection = ENV.FEATURES?.selective_release_ui_api
     ? React.createElement(DifferentiatedModulesSection, {
       onSync: this.setNewOverridesCollection,
       defaultSectionId: this.model.defaultDueDateSectionId,
@@ -127,7 +127,7 @@ DueDateOverrideView.prototype.render = function () {
           return false;
         }
         this.trigger('tray:open')
-      return true;  
+      return true;
       },
       onTrayClose: () => this.trigger('tray:close'),
     })
@@ -350,7 +350,7 @@ DueDateOverrideView.prototype.overridesContainDefault = function () {
 }
 
 DueDateOverrideView.prototype.setOnlyVisibleToOverrides = function () {
-  if(ENV.FEATURES?.differentiated_modules){
+  if(ENV.FEATURES?.selective_release_ui_api){
     return !((this.model.overridesContainDefault()) || this.model.onlyContainsModuleOverrides())
   }else return !this.model.overridesContainDefault()
 }

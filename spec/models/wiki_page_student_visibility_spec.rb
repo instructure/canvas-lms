@@ -27,8 +27,8 @@ describe "WikiPageStudentVisibility" do
   end
 
   before :once do
-    Account.site_admin.enable_feature!(:differentiated_modules)
-    Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
+    Account.site_admin.enable_feature!(:selective_release_backend)
+    Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:selective_release_backend) ? "true" : "false")
     AssignmentStudentVisibility.reset_table_name
 
     course_factory(active_all: true)

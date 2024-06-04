@@ -63,7 +63,7 @@ const createView = function (quiz, options = {}) {
 
   ENV.context_asset_string = 'course_1'
   ENV.SHOW_SPEED_GRADER_LINK = true
-  ENV.FEATURES.differentiated_modules = options.differentiated_modules
+  ENV.FEATURES.selective_release_ui_api = options.selective_release
 
   const view = new QuizItemView({model: quiz, publishIconView: icon})
   view.$el.appendTo($('#fixtures'))
@@ -156,7 +156,7 @@ test('can assign assignment if flag is on and has edit permissions', function ()
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
   const view = createView(quiz, {
     canManage: true,
-    differentiated_modules: true,
+    selective_release: true,
   })
   equal(view.$('.assign-to-link').length, 1)
 })
@@ -165,7 +165,7 @@ test('cannot assign assignment if no edit permissions', function () {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
   const view = createView(quiz, {
     canManage: false,
-    differentiated_modules: true,
+    selective_release: true,
   })
   equal(view.$('.assign-to-link').length, 0)
 })
@@ -174,7 +174,7 @@ test('cannot assign assignment if flag is off', function () {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
   const view = createView(quiz, {
     canManage: true,
-    differentiated_modules: false,
+    selective_release: false,
   })
   equal(view.$('.assign-to-link').length, 0)
 })

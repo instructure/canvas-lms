@@ -132,7 +132,7 @@
           <%= 'data-tooltip' unless @quiz.can_unpublish? %>>
         </button>
         <%= link_to_preview_quiz('class' => "btn", 'id' => "preview_quiz_button", 'preview' => 1) %>
-      <% if @quiz.grants_right?(@current_user, session, :manage_assign_to) && Account.site_admin.feature_enabled?(:differentiated_modules) %>
+      <% if @quiz.grants_right?(@current_user, session, :manage_assign_to) && Account.site_admin.feature_enabled?(:selective_release_ui_api) %>
           <button
             class='btn assign-to-link'
             data-quiz-name="<%= @quiz.title %>"
