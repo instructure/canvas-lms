@@ -63,15 +63,12 @@ describe EventStream::IndexStrategy::ActiveRecord do
   describe "scope assembly" do
     before do
       stream = double("stream",
-                      record_type: EventStream::Record,
-                      active_record_type: fake_record_type)
+                      record_type: fake_record_type)
       ar_cls = fake_record_type
       base_index = EventStream::Index.new(stream) do
-        table "table"
-        entry_proc ->(_a1, _a2) {}
         ar_scope_proc ->(a1, a2) { ar_cls.where({ one: a1.id, two: a2.id }) }
       end
-      @index = base_index.strategy_for(:active_record)
+      @index = base_index.strategy
     end
 
     it "loads records from DB" do

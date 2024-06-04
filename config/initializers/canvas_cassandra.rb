@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Rails.configuration.to_prepare do
+  require "canvas_cassandra"
+
   CanvasCassandra.logger = Rails.logger
   CanvasCassandra.settings_store = Setting # to avoid having to pull this out as a full engine yet.
 end

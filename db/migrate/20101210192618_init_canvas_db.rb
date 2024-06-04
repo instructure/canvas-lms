@@ -990,15 +990,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamp :created_at, null: false
       t.references :grading_period, foreign_key: true, index: { where: "grading_period_id IS NOT NULL" }
 
-      # next index covers cassandra previous indices by course_id, course_id -> assignment_id,
-      # course_id -> assignment_id -> grader_id -> student_id,
-      # course_id -> assignment_id -> student_id
-      # (the claim is that those subsets are small enough filtering the results from the simpler index is fine)
       t.index %i[context_type context_id assignment_id], name: "index_auditor_grades_by_course_and_assignment"
       t.index [:root_account_id, :grader_id], name: "index_auditor_grades_by_account_and_grader"
       t.index [:root_account_id, :student_id], name: "index_auditor_grades_by_account_and_student"
-      # next index overs cassandra previous indices by course_id -> grader_id,
-      # and course_id -> grader_id -> student_id (same theory as above)
       t.index %i[context_type context_id grader_id], name: "index_auditor_grades_by_course_and_grader"
       t.index %i[context_type context_id student_id], name: "index_auditor_grades_by_course_and_student"
     end

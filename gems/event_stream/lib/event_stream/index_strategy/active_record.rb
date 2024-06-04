@@ -25,10 +25,6 @@ module EventStream::IndexStrategy
       @index = index_obj
     end
 
-    def insert(_record, _key)
-      # no-op because the DB has indexes
-    end
-
     def find_with(args, options)
       for_ar_scope(args, options)
     end
@@ -38,7 +34,7 @@ module EventStream::IndexStrategy
     end
 
     def for_ar_scope(args, options = {})
-      ar_type = index.event_stream.active_record_type
+      ar_type = index.event_stream.record_type
       index_scope = index.ar_scope_proc.call(*args)
       self.class.for_ar_scope(ar_type, index_scope, options)
     end
