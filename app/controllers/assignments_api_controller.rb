@@ -996,6 +996,10 @@ class AssignmentsApiController < ApplicationController
         scope = scope.type_quiz_lti
       end
 
+      if params[:exclude_checkpoints]
+        scope = scope.where.not(has_sub_assignments: true)
+      end
+
       if params[:assignment_ids]
         if params[:assignment_ids].length > Api::MAX_PER_PAGE
           return render json: { message: "Request contains too many assignment_ids.  Limit #{Api::MAX_PER_PAGE}" }, status: :bad_request
