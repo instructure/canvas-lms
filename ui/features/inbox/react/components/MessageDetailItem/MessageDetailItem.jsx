@@ -41,6 +41,7 @@ const I18n = useI18nScope('conversations_2')
 
 export const MessageDetailItem = ({...props}) => {
   const createdAt = DateHelper.formatDatetimeForDisplay(props.conversationMessage.createdAt)
+  const pronouns = props.conversationMessage?.author?.pronouns
   const {isSubmissionCommentsType} = useContext(ConversationContext)
   const {conversationMessage: {mediaComment} = {}} = props
   const [translatedMessage, setTranslatedMessage] = useState('')
@@ -124,6 +125,13 @@ export const MessageDetailItem = ({...props}) => {
                     {props.contextName}
                   </Text>
                 </Flex.Item>
+                {ENV?.SETTINGS?.can_add_pronouns && pronouns && (
+                  <Flex.Item>
+                    <Text weight="normal" size={responsiveProps.courseNameDate} wrap="break-word">
+                      {pronouns}
+                    </Text>
+                  </Flex.Item>
+                )}
                 <Flex.Item>
                   <Text weight="normal" size={responsiveProps.courseNameDate} wrap="break-word">
                     {createdAt}
