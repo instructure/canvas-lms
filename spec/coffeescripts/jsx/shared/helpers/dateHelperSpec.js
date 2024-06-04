@@ -19,7 +19,7 @@
 import DateHelper from '@canvas/datetime/dateHelper'
 import {isMidnight} from '@instructure/moment-utils'
 import {isDate, isNull, isUndefined} from 'lodash'
-import tzInTest from '@canvas/datetime/specHelpers'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'

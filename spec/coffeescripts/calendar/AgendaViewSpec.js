@@ -22,7 +22,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import {isArray, isObject, uniq} from 'lodash'
-import tzInTest from '@canvas/datetime/specHelpers'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import denver from 'timezone/America/Denver'

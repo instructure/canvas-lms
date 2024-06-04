@@ -18,7 +18,7 @@
 
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import * as tz from '@instructure/moment-utils'
-import tzInTest from '@canvas/datetime/specHelpers'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
 import denver from 'timezone/America/Denver'
 

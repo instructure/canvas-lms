@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import EditPlannerNoteDetails from 'ui/features/calendar/backbone/views/EditPlannerNoteDetails'
-import tzInTest from '@canvas/datetime/specHelpers'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 import fakeENV from 'helpers/fakeENV'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 

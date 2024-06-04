@@ -17,7 +17,7 @@
  */
 
 import tz from 'timezone'
-import tzInTest from '@canvas/datetime/specHelpers'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 import newYork from 'timezone/America/New_York'
 
 import {auditEventStudentAnonymityStates, overallAnonymityStates} from '../AuditTrailHelpers'

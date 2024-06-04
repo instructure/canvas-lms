@@ -27,7 +27,7 @@ import CreateAssignmentView from 'ui/features/assignment_index/backbone/views/Cr
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import $ from 'jquery'
 import 'jquery-migrate'
-import tzInTest from '@canvas/datetime/specHelpers'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import timezone from 'timezone'
 import juneau from 'timezone/America/Juneau'

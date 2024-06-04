@@ -17,7 +17,7 @@
  */
 
 import * as tz from '@instructure/moment-utils'
-import tzInTest from '@canvas/datetime/specHelpers'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 
 tz.snapshot = () => {}
 tz.restore = tzInTest.restore
