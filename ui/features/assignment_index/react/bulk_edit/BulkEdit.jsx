@@ -95,6 +95,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
       per_page: 50,
       include: ['all_dates', 'can_edit'],
       order_by: 'due_at',
+      exclude_checkpoints: true,
     },
   })
 

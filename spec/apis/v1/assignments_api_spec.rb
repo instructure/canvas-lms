@@ -1644,6 +1644,13 @@ describe AssignmentsApiController, type: :request do
         expect(checkpoints.pluck("due_at")).to match_array [@c1.due_at.iso8601, @c2.due_at.iso8601]
         expect(checkpoints.pluck("only_visible_to_overrides")).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]
       end
+
+      it "excludes checkpointed assignments if exclude_checkpoints is enabled" do
+        json = api_get_assignments_user_index(@teacher, @course, @teacher, exclude_checkpoints: true)
+        expect(json.length).to eq 0
+        json = api_get_assignments_user_index(@teacher, @course, @teacher)
+        expect(json.length).to eq 1
+      end
     end
 
     it "returns data for user calling on self" do
