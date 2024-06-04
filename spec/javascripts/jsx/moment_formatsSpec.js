@@ -17,7 +17,7 @@
  */
 
 import I18nStubber from 'helpers/I18nStubber'
-import {prepareFormats} from '../../../ui/boot/initializers/configureDateTimeMomentParser'
+import {prepareFormats} from '@canvas/datetime/configureDateTimeMomentParser'
 
 QUnit.module('Moment formats', {
   setup() {

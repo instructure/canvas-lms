@@ -22,11 +22,11 @@ import zh_CN from 'timezone/zh_CN'
 import en_US from 'timezone/en_US'
 import MockDate from 'mockdate'
 import I18nStubber from '../../../../spec/coffeescripts/helpers/I18nStubber'
-import {up as configureDateTime, down as resetDateTime} from '../configureDateTime'
+import {up as configureDateTime, down as resetDateTime} from '@canvas/datetime/configureDateTime'
 import {
   up as configureDateTimeMomentParser,
   down as resetDateTimeMomentParser,
-} from '../configureDateTimeMomentParser'
+} from '@canvas/datetime/configureDateTimeMomentParser'
 
 const equal = (a, b, _message) => expect(a).toEqual(b)
 

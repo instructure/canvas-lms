@@ -35,7 +35,8 @@ import {
   timeString,
   unfudgeDateForProfileTimezone,
 } from '@canvas/datetime/date-functions'
-import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
+import {getI18nFormats} from '@canvas/datetime/configureDateTime'
+import '@canvas/datetime/jquery/datepicker'
 
 QUnit.module('fudgeDateForProfileTimezone', {
   setup() {

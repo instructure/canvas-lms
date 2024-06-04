@@ -34,7 +34,7 @@ import SyllabusView from 'ui/features/syllabus/backbone/views/SyllabusView'
 import SyllabusViewPrerendered from './SyllabusViewPrerendered'
 import fakeENV from 'helpers/fakeENV'
 import '@canvas/jquery/jquery.simulate'
-import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
+import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 
 function setupServerResponses() {
   const server = sinon.fakeServer.create()
