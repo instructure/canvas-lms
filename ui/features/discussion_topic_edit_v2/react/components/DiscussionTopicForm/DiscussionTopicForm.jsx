@@ -456,7 +456,12 @@ function DiscussionTopicForm({
       ...(shouldShowUsageRightsOption && {usageRightsData}),
     }
 
-    if (!isGraded && !currentDiscussionTopic?.assignment && ENV.FEATURES?.selective_release_ui_api) {
+    if (
+      !isGraded &&
+      !currentDiscussionTopic?.assignment &&
+      ENV.FEATURES?.selective_release_ui_api
+    ) {
+      delete payload.specificSections
       Object.assign(
         payload,
         prepareUngradedDiscussionOverridesPayload(
