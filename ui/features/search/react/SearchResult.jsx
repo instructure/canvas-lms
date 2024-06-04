@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useEffect, useRef } from 'react'
+import React, { useState } from 'react'
 import {Text} from '@instructure/ui-text'
 import {IconButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
@@ -25,6 +25,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {
   IconLikeLine,
+  IconLikeSolid,
   IconAssignmentLine,
   IconDocumentLine,
   IconAnnouncementLine,
@@ -121,6 +122,9 @@ export default function SearchResult({onExplain, onLike, onDislike, result, sear
       '<span data-testid="highlighted-search-item" style="background-color: rgba(0,142,226,0.2); border-radius: .25rem; padding-bottom: 3px; padding-top: 1px;">$1</span>'
     )
   }
+
+  const [feedback, setFeedback] = useState()
+
   return (
     <View as="li" borderColor="primary" borderWidth="small 0 0 0" padding="medium 0">
       <Flex alignItems="start" as="div" gap="large" justifyItems="space-between">
@@ -165,17 +169,17 @@ export default function SearchResult({onExplain, onLike, onDislike, result, sear
             </Flex.Item>
             <Flex.Item>
               <IconButton
-                onClick={_ => onLike({id: content_id, type: content_type})}
+                onClick={_ => onLike({id: content_id, type: content_type}).then(_ => setFeedback("liked"))}
                 screenReaderLabel={I18n.t('I like this result')}
-                renderIcon={<IconLikeLine />}
+                renderIcon={feedback === "liked" ? <IconLikeSolid color="brand" />: <IconLikeLine />}
                 withBackground={false}
                 withBorder={false}
               />
               <span style={{display: 'inline-block', transform: 'rotate(180deg)'}}>
                 <IconButton
-                  onClick={_ => onDislike({id: content_id, type: content_type})}
+                  onClick={_ => onDislike({id: content_id, type: content_type}).then(_ => setFeedback("disliked"))}
                   screenReaderLabel={I18n.t('I do not like this result')}
-                  renderIcon={<IconLikeLine />}
+                  renderIcon={feedback === "disliked" ? <IconLikeSolid color="brand" /> : <IconLikeLine />}
                   withBackground={false}
                   withBorder={false}
                 />
