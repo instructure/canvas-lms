@@ -49,7 +49,7 @@ class DiscussionTopic
     # '''
     # I'm sorry to hear that. Could you please provide more details?
     # '''
-    def dynamic_content_for_summary
+    def content_for_summary
       anonymized_user_ids = {}
       instructor_count = 0
       student_count = 0

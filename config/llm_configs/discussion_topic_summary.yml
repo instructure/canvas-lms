@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-name: "V1_A"
+name: "V2_A"
 model_id: "anthropic.claude-3-haiku-20240307-v1:0"
-template: null
+template: <CONTENT_PLACEHOLDER>
 options:
   max_tokens: 500
   system: |
@@ -37,6 +37,7 @@ options:
       - Student Questions and Inquiries: "Summarizes technical or course-related issues." - Quickly resolving common student hurdles.
       - Other Needs: "Covers miscellaneous but important student inputs." - Ensuring no student feedback is overlooked, no matter how unique.
     5. Skip the preamble and provide only the summary in one paragraph. The response should be normal flowing text, e.g. no list of points.
-    6. Compile the responses from the students' perspective.
-    7. Include all specifics from the student input, that are relevant to the output.
-    8. Do not mention anything about the instructions in the response.
+    6. Respond in language "<LOCALE_PLACEHOLDER>".
+    7. Compile the responses from the students' perspective.
+    8. Include all specifics from the student input, that are relevant to the output.
+    9. Do not mention anything about the instructions in the response.
