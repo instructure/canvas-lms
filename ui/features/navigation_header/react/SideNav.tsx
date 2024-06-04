@@ -99,24 +99,10 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     })
   }
 
-  const handleDataSelected = (tray: any) => {
-    const active = document.querySelector('[data-selected="true"]')
-    if (active instanceof HTMLAnchorElement) {
-      active.dataset.selected = ''
-    }
-
-    const el = document.getElementById(`${tray}-tray`)
-    if (el instanceof HTMLElement) {
-      el.dataset.selected = 'true'
-    }
-  }
-
   const handleActiveTray = useCallback((tray, showActiveTray = false) => {
     if (showActiveTray) {
       dispatch({type: 'SET_ACTIVE_TRAY', payload: tray})
     }
-
-    handleDataSelected(tray)
 
     dispatch({type: 'SET_SELECTED_NAV_ITEM', payload: tray})
   }, [])
@@ -125,7 +111,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     if (!isTrayOpen) {
       const timer = setTimeout(() => {
         dispatch({type: 'RESET_ACTIVE_TRAY'})
-        handleDataSelected(previousSelectedNavItem)
+        dispatch({type: 'SET_SELECTED_NAV_ITEM', payload: previousSelectedNavItem})
       }, 100)
       return () => clearTimeout(timer)
     }
@@ -212,7 +198,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
 
     if (collapseSideNav) document.body.classList.remove('primary-nav-expanded')
     else document.body.classList.add('primary-nav-expanded')
-  }, [collapseSideNav])
+  }, [collapseSideNav, selectedNavItem])
 
   return (
     <>
@@ -308,6 +294,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
             handleActiveTray('profile', true)
           }}
           selected={selectedNavItem === 'profile'}
+          data-selected={selectedNavItem === 'profile'}
           themeOverride={navItemThemeOverride}
           minimized={collapseSideNav}
         />
@@ -321,6 +308,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
             handleActiveTray('accounts', true)
           }}
           selected={selectedNavItem === 'accounts'}
+          data-selected={selectedNavItem === 'accounts'}
           themeOverride={navItemThemeOverride}
           minimized={collapseSideNav}
         />
@@ -330,7 +318,8 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
           label={isK5User ? I18n.t('Home') : I18n.t('Dashboard')}
           href="/"
           onClick={() => handleActiveTray('dashboard')}
-          selected={selectedNavItem === 'dashboard'}
+          selected={selectedNavItem === 'dashboard' || selectedNavItem === ''}
+          data-selected={selectedNavItem === 'dashboard' || selectedNavItem === ''}
           themeOverride={navItemThemeOverride}
           minimized={collapseSideNav}
         />
@@ -344,6 +333,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
             handleActiveTray('courses', true)
           }}
           selected={selectedNavItem === 'courses'}
+          data-selected={selectedNavItem === 'courses'}
           themeOverride={navItemThemeOverride}
           minimized={collapseSideNav}
         />
@@ -354,6 +344,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
           href="/calendar"
           onClick={() => handleActiveTray('calendar')}
           selected={selectedNavItem === 'calendar'}
+          data-selected={selectedNavItem === 'calendar'}
           themeOverride={navItemThemeOverride}
           minimized={collapseSideNav}
         />
@@ -387,6 +378,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
           href="/conversations"
           onClick={() => handleActiveTray('conversations')}
           selected={selectedNavItem === 'conversations'}
+          data-selected={selectedNavItem === 'conversations'}
           themeOverride={navItemThemeOverride}
           minimized={collapseSideNav}
         />
@@ -397,6 +389,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
           href={window.ENV.page_view_update_url}
           onClick={() => handleActiveTray('history')}
           selected={selectedNavItem === 'history'}
+          data-selected={selectedNavItem === 'history'}
           themeOverride={navItemThemeOverride}
           minimized={collapseSideNav}
         />
@@ -420,6 +413,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
                 href={tool.href?.toString()}
                 onClick={() => handleActiveTray(toolId)}
                 selected={selectedNavItem === toolId}
+                data-selected={selectedNavItem === toolId}
                 themeOverride={navItemThemeOverride}
                 minimized={collapseSideNav}
               />
@@ -458,6 +452,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
             handleActiveTray('help')
           }}
           selected={selectedNavItem === 'help'}
+          data-selected={selectedNavItem === 'help'}
           themeOverride={navItemThemeOverride}
           minimized={collapseSideNav}
         />
