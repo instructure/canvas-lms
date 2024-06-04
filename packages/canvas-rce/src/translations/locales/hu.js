@@ -306,6 +306,7 @@ const locale = {
     "message": "Kiterjesztés a(z) { types } megtekintéséhez"
   },
   "external_link_d3f9e62a": { "message": "külső hivatkozás" },
+  "external_tool_frame_70b32473": { "message": "External tool frame" },
   "external_tools_6e77821": { "message": "Külső eszközök" },
   "extra_large_b6cdf1ff": { "message": "Extra nagy" },
   "extra_small_9ae33252": { "message": "Extra kicsi" },
@@ -956,6 +957,7 @@ const locale = {
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height } pixel" },
   "wiki_home_9cd54d0": { "message": "Wiki kezdőlap" },
+  "word_count_c77fe3a6": { "message": "Word Count" },
   "wreath_product_200b38ef": { "message": "Koszorú termék" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Igen" },
