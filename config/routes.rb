@@ -1460,6 +1460,14 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :discussion_topics_api) do
       %w[course group].each do |context|
+        put "#{context.pluralize}/:#{context}_id/discussion_topics/read_all", action: :mark_all_topic_read, as: "#{context}_discussion_mark_all_read"
+        put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/read", action: :mark_topic_read, as: "#{context}_discussion_topic_mark_read"
+        delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/read", action: :mark_topic_unread, as: "#{context}_discussion_topic_mark_unread"
+        put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/read_all", action: :mark_all_read, as: "#{context}_discussion_topic_mark_all_read"
+        delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/read_all", action: :mark_all_unread, as: "#{context}_discussion_topic_mark_all_unread"
+        put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/read", action: :mark_entry_read, as: "#{context}_discussion_topic_discussion_entry_mark_read"
+        delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/read", action: :mark_entry_unread, as: "#{context}_discussion_topic_discussion_entry_mark_unread"
+
         get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id", action: :show, as: "#{context}_discussion_topic"
         post "#{context.pluralize}/:#{context}_id/discussion_topics", controller: :discussion_topics, action: :create
         put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id", controller: :discussion_topics, action: :update
@@ -1479,12 +1487,6 @@ CanvasRails::Application.routes.draw do
         put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:id", controller: :discussion_entries, action: :update, as: "#{context}_discussion_update_reply"
         delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:id", controller: :discussion_entries, action: :destroy, as: "#{context}_discussion_delete_reply"
 
-        put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/read", action: :mark_topic_read, as: "#{context}_discussion_topic_mark_read"
-        delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/read", action: :mark_topic_unread, as: "#{context}_discussion_topic_mark_unread"
-        put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/read_all", action: :mark_all_read, as: "#{context}_discussion_topic_mark_all_read"
-        delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/read_all", action: :mark_all_unread, as: "#{context}_discussion_topic_mark_all_unread"
-        put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/read", action: :mark_entry_read, as: "#{context}_discussion_topic_discussion_entry_mark_read"
-        delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/read", action: :mark_entry_unread, as: "#{context}_discussion_topic_discussion_entry_mark_unread"
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/rating",
              action: :rate_entry,
              as: "#{context}_discussion_topic_discussion_entry_rate"

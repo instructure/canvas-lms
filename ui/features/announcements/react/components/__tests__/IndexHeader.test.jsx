@@ -44,6 +44,7 @@ const defaultProps = () => ({
   deleteSelectedAnnouncements: () => Promise.reject(new Error('Not Implemented')),
   searchInputRef: null,
   announcementsLocked: false,
+  markAllAnnouncementRead: jest.fn(),
 })
 
 describe('IndexHeader', () => {
