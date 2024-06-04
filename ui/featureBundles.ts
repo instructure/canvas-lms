@@ -69,7 +69,6 @@ const featureBundles: {
   context_roster_user_services: () => import('./features/context_roster_user_services/index'),
   context_roster_user: () => import('./features/context_roster_user/index'),
   context_undelete_item: () => import('./features/context_undelete_item/index'),
-  conversations: () => import('./features/conversations/index'),
   copy_course: () => import('./features/copy_course/index'),
   course_grading_standards: () => import('./features/course_grading_standards/index'),
   course_link_validator: () => import('./features/course_link_validator/index'),
