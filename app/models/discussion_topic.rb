@@ -857,7 +857,7 @@ class DiscussionTopic < ActiveRecord::Base
       if !course.nil? && course.is_a?(Course) && course.user_has_been_observer?(student)
         observed_student_ids = ObserverEnrollment.observed_student_ids(course, student)
       end
-      user_ids = [student.id].concat(observed_student_ids)
+      user_ids = Array(student).concat(observed_student_ids)
       visible_topic_ids = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible_to_students_by_topics(user_ids:, discussion_topic_ids: ids).map(&:discussion_topic_id)
 
       merge(
