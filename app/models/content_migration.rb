@@ -1190,6 +1190,7 @@ class ContentMigration < ActiveRecord::Base
   }.freeze
 
   def migration_data_fields_for(asset_type)
+    MIGRATION_DATA_FIELDS["Attachment"] << :uuid if context.root_account.feature_enabled?(:file_verifiers_for_quiz_links)
     MIGRATION_DATA_FIELDS[asset_type] || []
   end
 
