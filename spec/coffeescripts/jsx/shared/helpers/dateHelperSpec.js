@@ -24,7 +24,7 @@ import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
 import tokyo from 'timezone/Asia/Tokyo'
-import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
+import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 
 const defaultAssignment = () => ({
   title: 'assignment',

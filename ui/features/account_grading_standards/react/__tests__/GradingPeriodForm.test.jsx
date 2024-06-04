@@ -25,7 +25,7 @@ import * as tz from '@instructure/moment-utils'
 import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
 import GradingPeriodForm from '../GradingPeriodForm'
-import {getI18nFormats} from '../../../../boot/initializers/configureDateTime'
+import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 
 const onSave = jest.fn()
 const onCancel = jest.fn()
