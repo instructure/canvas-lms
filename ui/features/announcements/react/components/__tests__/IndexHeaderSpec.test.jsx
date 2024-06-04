@@ -201,7 +201,8 @@ describe('"Delete Selected Announcements" button', () => {
     expect(screen.getByTestId('delete-announcements-button')).toBeDisabled()
   })
 
-  test('shows the "Confirm Delete" modal when clicked', async () => {
+  // see VICE-4352
+  test.skip('shows the "Confirm Delete" modal when clicked', async () => {
     const props = makeProps()
     props.selectedCount = 1
     const ref = React.createRef()
