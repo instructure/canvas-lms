@@ -1920,6 +1920,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: "lti/registrations") do
+      get "accounts/:account_id/lti_registrations", action: :list
       delete "accounts/:account_id/lti_registrations/:id", action: :destroy
       get "accounts/:account_id/lti_registrations/:id", action: :show
       put "accounts/:account_id/lti_registrations/:id", action: :update
