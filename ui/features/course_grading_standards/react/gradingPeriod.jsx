@@ -22,6 +22,7 @@ import PropTypes from 'prop-types'
 import $ from 'jquery'
 import GradingPeriodTemplate from './gradingPeriodTemplate'
 import DateHelper from '@canvas/datetime/dateHelper'
+import {isMidnight} from '@instructure/moment-utils'
 
 class GradingPeriod extends React.Component {
   static propTypes = {
@@ -73,7 +74,7 @@ class GradingPeriod extends React.Component {
     const isValidDate = !($date.data('invalid') || $date.data('blank'))
     let updatedDate = isValidDate ? $date.data('unfudged-date') : new Date('invalid date')
 
-    if (dateType === 'endDate' && DateHelper.isMidnight(updatedDate)) {
+    if (dateType === 'endDate' && isMidnight(updatedDate)) {
       updatedDate = tz.changeToTheSecondBeforeMidnight(updatedDate)
     }
 

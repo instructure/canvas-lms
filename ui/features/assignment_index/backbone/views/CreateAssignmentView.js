@@ -32,7 +32,12 @@ import round from '@canvas/round'
 import $ from 'jquery'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
-import {dateString, timeString, unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
+import {
+  dateString,
+  timeString,
+  unfudgeDateForProfileTimezone,
+  isMidnight,
+} from '@instructure/moment-utils'
 import * as tz from '@instructure/moment-utils'
 import {encodeQueryString} from '@canvas/query-string-encoding'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
@@ -231,7 +236,7 @@ CreateAssignmentView.prototype.openAgain = function () {
       const trimmedInput = $.trim(e.target.value)
       newDate = timeField.data('unfudged-date')
       newDate = trimmedInput === '' ? null : newDate
-      if (tz.isMidnight(newDate)) {
+      if (isMidnight(newDate)) {
         if (ENV.DEFAULT_DUE_TIME) {
           newDate = tz.parse(tz.format(newDate, '%F ' + ENV.DEFAULT_DUE_TIME))
         } else {

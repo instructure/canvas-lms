@@ -18,6 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import * as tz from '@instructure/moment-utils'
+import {isMidnight} from '@instructure/moment-utils'
 import moment from 'moment'
 import React, {useState} from 'react'
 import {bool} from 'prop-types'
@@ -223,7 +224,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
               )}
             </Flex.Item>
           </Flex>
-          {tz.isMidnight(endDate) && selectedApplicabilityValue === 'course' && (
+          {isMidnight(endDate) && selectedApplicabilityValue === 'course' && (
             <Flex>
               <Flex.Item margin="xx-small small xx-small 0" align="start">
                 <AccessibleContent alt={I18n.t('Warning')}>

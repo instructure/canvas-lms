@@ -40,10 +40,6 @@ const DateHelper = {
   formatDateForDisplay(date, format = 'medium', timezone = ENV.CONTEXT_TIMEZONE) {
     return dateString(date, {format, timezone})
   },
-
-  isMidnight(date) {
-    return tz.isMidnight(date)
-  },
 }
 
 export default DateHelper
