@@ -30,6 +30,8 @@ public/dist/
 public/doc/
 public/javascripts/translations/
 !public/javascripts/translations/en.json
+log/
+!log/.keep
 tmp/*
 vendor/bundle/
 vendor/*/.git
