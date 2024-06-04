@@ -149,6 +149,9 @@ class TermsApiController < ApplicationController
   #
   # @returns EnrollmentTermsList
   def index
+    add_crumb(t("Terms"))
+    page_has_instui_topnav
+
     @terms = @context.enrollment_terms
 
     @term_name = params[:term_name]
