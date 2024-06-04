@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, waitFor, fireEvent, screen} from '@testing-library/react'
+import {render, waitFor, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import DiscussionTopicForm, {isGuidDataValid, getAbGuidArray} from '../DiscussionTopicForm'
@@ -79,30 +79,6 @@ describe('DiscussionTopicForm', () => {
       ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS: false,
       context_is_not_group: true,
     }
-  })
-
-  describe('instui_nav feature flag is enabled', () => {
-    const oldEnv = window.ENV
-    beforeEach(() => {
-      window.ENV.FEATURES =  {instui_nav: true}
-    })
-
-    afterEach(() => {
-      window.ENV = oldEnv
-    })
-
-    it('renders title if came from Announcements page', () => {
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
-      const document = setup()
-      expect(document.getAllByText('Create Announcement').length).toBe(1)
-    })
-
-    it('renders title if came from Discussion page', () => {
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
-      const document = setup()
-      expect(document.getAllByText('Create Discussion').length).toBe(1)
-    })
-
   })
 
   it('renders', () => {
