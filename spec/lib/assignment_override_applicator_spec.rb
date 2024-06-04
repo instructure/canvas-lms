@@ -246,7 +246,7 @@ describe AssignmentOverrideApplicator do
       end
 
       it "does not apply overrides if adhoc override is unassigned" do
-        Account.site_admin.enable_feature!(:differentiated_modules)
+        Account.site_admin.enable_feature!(:selective_release_backend)
         @adhoc_override.unassign_item = true
         @adhoc_override.save!
 
@@ -255,7 +255,7 @@ describe AssignmentOverrideApplicator do
       end
 
       it "applies unassigned overrides if flag is off" do
-        Account.site_admin.disable_feature!(:differentiated_modules)
+        Account.site_admin.disable_feature!(:selective_release_backend)
         @adhoc_override.unassign_item = true
         @adhoc_override.save!
 
@@ -264,7 +264,7 @@ describe AssignmentOverrideApplicator do
       end
 
       it "applies adhoc override even if section override is unassigned" do
-        Account.site_admin.enable_feature!(:differentiated_modules)
+        Account.site_admin.enable_feature!(:selective_release_backend)
         @section_override.unassign_item = true
         @section_override.save!
 
@@ -472,7 +472,7 @@ describe AssignmentOverrideApplicator do
       end
 
       it "orders section override before course overrides" do
-        Account.site_admin.enable_feature!(:differentiated_modules)
+        Account.site_admin.enable_feature!(:selective_release_backend)
         @section_override = assignment_override_model(assignment: @assignment)
         @section_override.set = @course.default_section
         @section_override.save!
@@ -541,7 +541,7 @@ describe AssignmentOverrideApplicator do
 
         it "includes context module overrides" do
           @override.destroy!
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           create_context_module_and_override_adhoc
 
           result = AssignmentOverrideApplicator.adhoc_override(@assignment, @student)
@@ -565,7 +565,7 @@ describe AssignmentOverrideApplicator do
         end
 
         it "includes context module overrides" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           create_context_module_and_override_adhoc
 
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @teacher)
@@ -583,7 +583,7 @@ describe AssignmentOverrideApplicator do
 
         it "includes context module overrides" do
           @override.destroy!
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           course_with_observer({ course: @course, active_all: true })
           @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
           create_context_module_and_override_adhoc
@@ -600,7 +600,7 @@ describe AssignmentOverrideApplicator do
         end
 
         it "includes context module overrides" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           account_admin_user
           create_context_module_and_override_adhoc
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
@@ -859,7 +859,7 @@ describe AssignmentOverrideApplicator do
         end
 
         it "includes context module overrides" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           create_section_context_module_override(@course.default_section)
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           expect(overrides).to include(@module_override)
@@ -874,7 +874,7 @@ describe AssignmentOverrideApplicator do
         end
 
         it "includes context module overrides" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           teacher_in_course
           create_section_context_module_override(@course.default_section)
           result = AssignmentOverrideApplicator.section_overrides(@assignment, @teacher)
@@ -891,7 +891,7 @@ describe AssignmentOverrideApplicator do
         end
 
         it "includes context module overrides" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           course_with_observer({ course: @course, active_all: true })
           @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student2.id })
 
@@ -910,7 +910,7 @@ describe AssignmentOverrideApplicator do
         end
 
         it "includes context module overrides" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           account_admin_user
           create_section_context_module_override(@section2)
           result = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
@@ -983,19 +983,19 @@ describe AssignmentOverrideApplicator do
 
       describe "for students" do
         it "returns course overrides" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           result = AssignmentOverrideApplicator.course_overrides(@assignment, @student)
           expect(result.length).to eq 1
         end
 
         it "doesn't include course overrides if flag is off" do
-          Account.site_admin.disable_feature!(:differentiated_modules)
+          Account.site_admin.disable_feature!(:selective_release_backend)
           result = AssignmentOverrideApplicator.course_overrides(@assignment, @student)
           expect(result).to be_nil
         end
 
         it "doesn't include course overrides for student not in course" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           course2 = course_factory
           student2 = student_in_course(course: course2)
           result = AssignmentOverrideApplicator.course_overrides(@assignment, student2.user)
@@ -1005,14 +1005,14 @@ describe AssignmentOverrideApplicator do
 
       describe "for teachers" do
         it "works" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           teacher_in_course
           result = AssignmentOverrideApplicator.course_overrides(@assignment, @teacher)
           expect(result).to include(@override)
         end
 
         it "doesn't include course overrides if flag is off" do
-          Account.site_admin.disable_feature!(:differentiated_modules)
+          Account.site_admin.disable_feature!(:selective_release_backend)
           teacher_in_course
           result = AssignmentOverrideApplicator.course_overrides(@assignment, @teacher)
           expect(result).to be_nil
@@ -1021,7 +1021,7 @@ describe AssignmentOverrideApplicator do
 
       describe "for observers" do
         it "works" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           course_with_observer({ course: @course, active_all: true })
           @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
@@ -1029,7 +1029,7 @@ describe AssignmentOverrideApplicator do
         end
 
         it "doesn't include course overrides if flag is off" do
-          Account.site_admin.disable_feature!(:differentiated_modules)
+          Account.site_admin.disable_feature!(:selective_release_backend)
           course_with_observer({ course: @course, active_all: true })
           @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
@@ -1039,14 +1039,14 @@ describe AssignmentOverrideApplicator do
 
       describe "for admins" do
         it "works" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           account_admin_user
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
           expect(overrides).to eq [@override]
         end
 
         it "doesn't include course overrides if flag is off" do
-          Account.site_admin.disable_feature!(:differentiated_modules)
+          Account.site_admin.disable_feature!(:selective_release_backend)
           account_admin_user
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
           expect(overrides).to eq []
@@ -1055,7 +1055,7 @@ describe AssignmentOverrideApplicator do
 
       describe "for other types of learning objects" do
         before do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           teacher_in_course(active_all: true)
           account_admin_user
           course_with_observer({ course: @course, active_all: true })
@@ -1156,7 +1156,7 @@ describe AssignmentOverrideApplicator do
       end
 
       it "returns false if the assignment has context module overrides" do
-        Account.site_admin.enable_feature!(:differentiated_modules)
+        Account.site_admin.enable_feature!(:selective_release_backend)
         @module = @course.context_modules.create!(name: "Module 1")
         @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
 
@@ -1575,13 +1575,13 @@ describe AssignmentOverrideApplicator do
       end
 
       it "uses no override if the override is unassigned" do
-        Account.site_admin.enable_feature!(:differentiated_modules)
+        Account.site_admin.enable_feature!(:selective_release_backend)
         @adhoc_override.unassign_item = true
         expect(due_at).to eq @assignment.due_at
       end
 
       it "uses adhoc override even if section override is unassigned" do
-        Account.site_admin.enable_feature!(:differentiated_modules)
+        Account.site_admin.enable_feature!(:selective_release_backend)
         @section_override.unassign_item = true
         expect(due_at).to eq @adhoc_override.due_at
       end
@@ -1635,7 +1635,7 @@ describe AssignmentOverrideApplicator do
     end
 
     it "uses no override with no adhoc override due_at and section override unassigned" do
-      Account.site_admin.enable_feature!(:differentiated_modules)
+      Account.site_admin.enable_feature!(:selective_release_backend)
       @section_override = assignment_override_model(assignment: @assignment, set: @course.default_section)
       @section_override.override_due_at(7.days.from_now)
       @section_override.unassign_item = true
@@ -1655,7 +1655,7 @@ describe AssignmentOverrideApplicator do
     end
 
     it "uses no override if the override is unassigned" do
-      Account.site_admin.enable_feature!(:differentiated_modules)
+      Account.site_admin.enable_feature!(:selective_release_backend)
       @override.override_unlock_at(7.days.from_now)
       @override.unassign_item = true
       unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
@@ -1663,7 +1663,7 @@ describe AssignmentOverrideApplicator do
     end
 
     it "uses adhoc override even if section override is unassigned" do
-      Account.site_admin.enable_feature!(:differentiated_modules)
+      Account.site_admin.enable_feature!(:selective_release_backend)
       @adhoc_override = @override
       @adhoc_override.override_unlock_at(7.days.from_now)
 
@@ -1769,7 +1769,7 @@ describe AssignmentOverrideApplicator do
     end
 
     it "uses no override if the override is unassigned" do
-      Account.site_admin.enable_feature!(:differentiated_modules)
+      Account.site_admin.enable_feature!(:selective_release_backend)
       @override.override_lock_at(7.days.from_now)
       @override.unassign_item = true
       lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, [@override])
@@ -1777,7 +1777,7 @@ describe AssignmentOverrideApplicator do
     end
 
     it "uses adhoc override even if section override is unassigned" do
-      Account.site_admin.enable_feature!(:differentiated_modules)
+      Account.site_admin.enable_feature!(:selective_release_backend)
       @adhoc_override = @override
       @adhoc_override.override_lock_at(7.days.from_now)
 

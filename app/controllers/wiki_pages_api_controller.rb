@@ -161,7 +161,7 @@ class WikiPagesApiController < ApplicationController
   before_action :require_wiki_page, except: %i[create update update_front_page index check_title_availability]
   before_action :was_front_page, except: [:index, :check_title_availability]
   before_action only: %i[show update destroy revisions show_revision revert] do
-    check_differentiated_assignments(@page) if @context.conditional_release? || Account.site_admin.feature_enabled?(:differentiated_modules)
+    check_differentiated_assignments(@page) if @context.conditional_release? || Account.site_admin.feature_enabled?(:selective_release_backend)
   end
 
   include Api::V1::WikiPage
@@ -360,7 +360,7 @@ class WikiPagesApiController < ApplicationController
       assign_todo_date
       if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, "participate")
-        apply_assignment_parameters(assignment_params, @page) if @context.conditional_release? && !Account.site_admin.feature_enabled?(:differentiated_modules)
+        apply_assignment_parameters(assignment_params, @page) if @context.conditional_release? && !Account.site_admin.feature_enabled?(:selective_release_ui_api)
         render json: wiki_page_json(@page, @current_user, session)
       else
         render json: @page.errors, status: update_params.is_a?(Symbol) ? update_params : :bad_request
@@ -448,7 +448,7 @@ class WikiPagesApiController < ApplicationController
       if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, "participate")
         @page.context_module_action(@current_user, @context, :contributed)
-        apply_assignment_parameters(assignment_params, @page) if @context.conditional_release? && !Account.site_admin.feature_enabled?(:differentiated_modules)
+        apply_assignment_parameters(assignment_params, @page) if @context.conditional_release? && !Account.site_admin.feature_enabled?(:selective_release_ui_api)
         render json: wiki_page_json(@page, @current_user, session)
       else
         render json: @page.errors, status: update_params.is_a?(Symbol) ? update_params : :bad_request

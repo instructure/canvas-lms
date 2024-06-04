@@ -379,7 +379,7 @@ export default AssignmentListItemView = (function () {
         data = this._setJSONForGrade(data)
       }
       data.courseId = this.model.get('course_id')
-      data.differentiatedModulesFlag = ENV.FEATURES?.differentiated_modules
+      data.differentiatedModulesFlag = ENV.FEATURES?.selective_release_ui_api
       data.showSpeedGraderLinkFlag = ENV.FLAGS?.show_additional_speed_grader_link
       data.showSpeedGraderLink = ENV.SHOW_SPEED_GRADER_LINK
       // publishing and unpublishing the underlying model does not rerender this view.

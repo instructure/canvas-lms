@@ -28,7 +28,7 @@ module Submittable
     }
 
     klass.scope :joins_assignment_student_visibilities, lambda { |user_ids, course_ids|
-      if Account.site_admin.feature_enabled?(:differentiated_modules)
+      if Account.site_admin.feature_enabled?(:selective_release_backend)
         visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students_in_courses(user_ids:, course_ids:).map(&:assignment_id)
 
         if visible_assignment_ids.any?

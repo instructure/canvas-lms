@@ -136,7 +136,7 @@ const renderDueDates = lockedItems => {
       courseId: ENV.COURSE_ID,
     })
 
-    if (ENV.FEATURES?.differentiated_modules) {
+    if (ENV.FEATURES?.selective_release_ui_api) {
       overrideView.bind('tray:open', () => {
         $('#quiz_edit_wrapper .btn.save_quiz_button').prop('disabled', true)
         $('#quiz_edit_wrapper .btn.save_and_publish').prop('disabled', true)

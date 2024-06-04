@@ -179,7 +179,7 @@ const preparePeerReviewPayload = (
 
 const setOnlyVisibleToOverrides = (assignedInfoList, everyoneOverride) => {
   const hasDefaultEveryone = !!Object.keys(everyoneOverride).length
-  if (ENV.FEATURES?.differentiated_modules) {
+  if (ENV.FEATURES?.selective_release_ui_api) {
     const contextModuleOverrides = assignedInfoList.filter(info => info.context_module_id != null)
     return !(hasDefaultEveryone || contextModuleOverrides.length === assignedInfoList.length)
   } else {

@@ -28,7 +28,7 @@ describe WikiPageVisibility::WikiPageVisibilityService do
   end
 
   before :once do
-    Account.site_admin.enable_feature!(:differentiated_modules)
+    Account.site_admin.enable_feature!(:selective_release_backend)
 
     course_factory(active_all: true)
     @section1 = @course.default_section

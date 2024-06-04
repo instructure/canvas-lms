@@ -342,7 +342,7 @@ class User < ActiveRecord::Base
 
   # NOTE: only use for courses with differentiated assignments on
   scope :able_to_see_assignment_in_course_with_da, lambda { |assignment_id, course_id|
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
       visible_user_id = AssignmentVisibility::AssignmentVisibilityService.assignment_visible_in_course(assignment_id:, course_id:).map(&:user_id)
       if visible_user_id.any?
         where(id: visible_user_id)
@@ -357,7 +357,7 @@ class User < ActiveRecord::Base
 
   # NOTE: only use for courses with differentiated assignments on
   scope :able_to_see_quiz_in_course_with_da, lambda { |quiz_id, course_id|
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
       visible_user_ids = QuizVisibility::QuizVisibilityService.quiz_visible_in_course(quiz_id:, course_id:).map(&:user_id)
       where(id: visible_user_ids)
     else
@@ -399,7 +399,7 @@ class User < ActiveRecord::Base
       GuardRail.activate(:secondary) do
         visibilities = { assignment_ids: DifferentiableAssignment.scope_filter(context.assignments, self, context).pluck(:id),
                          quiz_ids: DifferentiableAssignment.scope_filter(context.quizzes, self, context).pluck(:id) }
-        if Account.site_admin.feature_enabled?(:differentiated_modules)
+        if Account.site_admin.feature_enabled?(:selective_release_backend)
           visibilities[:context_module_ids] = DifferentiableAssignment.scope_filter(context.context_modules, self, context).pluck(:id)
           visibilities[:discussion_topic_ids] = DifferentiableAssignment.scope_filter(context.discussion_topics, self, context).pluck(:id)
           visibilities[:wiki_page_ids] = DifferentiableAssignment.scope_filter(context.wiki_pages, self, context).pluck(:id)

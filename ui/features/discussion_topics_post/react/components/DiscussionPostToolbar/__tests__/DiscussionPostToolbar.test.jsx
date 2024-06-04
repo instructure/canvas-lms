@@ -218,7 +218,7 @@ describe('DiscussionPostToolbar', () => {
   describe('Assign To', () => {
     beforeEach(() => {
       ENV.FEATURES = {
-        differentiated_modules: true,
+        selective_release_ui_api: true,
       }
     })
 

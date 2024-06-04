@@ -3081,7 +3081,7 @@ class AbstractAssignment < ActiveRecord::Base
   scope :for_group_category, ->(group_category_id) { where(group_category_id:) }
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
       visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students_in_courses(user_ids:, course_ids:).map(&:assignment_id)
 
       if visible_assignment_ids.any?
@@ -3100,7 +3100,7 @@ class AbstractAssignment < ActiveRecord::Base
   scope :filter_by_visibilities_in_given_courses, lambda { |user_ids, course_ids_that_have_da_enabled|
     if course_ids_that_have_da_enabled.blank?
       active
-    elsif Account.site_admin.feature_enabled?(:differentiated_modules)
+    elsif Account.site_admin.feature_enabled?(:selective_release_backend)
       user_ids = Array.wrap(user_ids)
       course_ids = Array.wrap(course_ids_that_have_da_enabled)
       visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignment_visible_to_students_in_course(user_ids:, course_ids:, assignment_ids: ids).map(&:assignment_id)

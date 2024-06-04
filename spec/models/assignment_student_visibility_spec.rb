@@ -160,7 +160,7 @@ describe "differentiated_assignments" do
 
   context "table" do
     before do
-      Account.site_admin.disable_feature!(:differentiated_modules)
+      Account.site_admin.disable_feature!(:selective_release_backend)
       course_with_differentiated_assignments_enabled
       add_multiple_sections
       assignment_with_true_only_visible_to_overrides
@@ -175,7 +175,7 @@ describe "differentiated_assignments" do
 
   context "course_with_differentiated_assignments_enabled" do
     before do
-      Account.site_admin.disable_feature!(:differentiated_modules)
+      Account.site_admin.disable_feature!(:selective_release_backend)
       course_with_differentiated_assignments_enabled
       add_multiple_sections
     end
@@ -467,7 +467,7 @@ describe "differentiated_assignments" do
     let(:fake_student) { User.create! }
 
     before do
-      Account.site_admin.disable_feature!(:differentiated_modules)
+      Account.site_admin.disable_feature!(:selective_release_backend)
     end
 
     describe ".assignments_visible_to_all_students" do

@@ -236,7 +236,7 @@ describe ContextModule do
 
   describe "update_assignment_submissions" do
     before :once do
-      Account.site_admin.enable_feature!(:differentiated_modules)
+      Account.site_admin.enable_feature!(:selective_release_backend)
       course_module
       @student1 = student_in_course(active_all: true, name: "Student 1").user
       @assignment = @course.assignments.create!(title: "some assignment")
@@ -1876,8 +1876,8 @@ describe ContextModule do
     expect(m.grants_right?(@teacher, :manage_course_content_delete)).to be false
   end
 
-  it "only loads visibility and progression information once when calculating prerequisites with differentiated_modules on" do
-    Account.site_admin.enable_feature!(:differentiated_modules)
+  it "only loads visibility and progression information once when calculating prerequisites with selective_release_backend on" do
+    Account.site_admin.enable_feature!(:selective_release_backend)
     course_factory(active_all: true)
     student_in_course(course: @course)
     m1 = @course.context_modules.create!(name: "m1")
@@ -1897,7 +1897,7 @@ describe ContextModule do
   end
 
   it "only loads visibility and progression information once when calculating prerequisites" do
-    Account.site_admin.disable_feature!(:differentiated_modules)
+    Account.site_admin.disable_feature!(:selective_release_backend)
     course_factory(active_all: true)
     student_in_course(course: @course)
     m1 = @course.context_modules.create!(name: "m1")

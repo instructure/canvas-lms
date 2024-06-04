@@ -569,7 +569,7 @@ describe "context modules" do
       end
 
       it "creating a new module should display a drag and drop area without differentiated modules" do
-        Account.site_admin.disable_feature! :differentiated_modules
+        Account.site_admin.disable_feature! :selective_release_ui_api
 
         get "/courses/#{@course.id}/modules"
         wait_for_ajaximations
@@ -597,7 +597,7 @@ describe "context modules" do
     end
 
     it "adds a file item to a module when differentiated modules is disabled", priority: "1" do
-      Account.site_admin.disable_feature! :differentiated_modules
+      Account.site_admin.disable_feature! :selective_release_ui_api
       get "/courses/#{@course.id}/modules"
       manually_add_module_item("#attachments_select", "File", file_name)
       expect(f(".context_module_item")).to include_text(file_name)

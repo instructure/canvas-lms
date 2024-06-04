@@ -81,7 +81,7 @@ export const GradedDiscussionOptions = ({
   isCheckpoints,
   canManageAssignTo,
 }: Props) => {
-  const differentiatedModulesEnabled = ENV.FEATURES?.differentiated_modules
+  const differentiatedModulesEnabled = ENV.FEATURES?.selective_release_ui_api
   const isPacedDiscussion = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.in_paced_course
 
   const renderDiffModulesAssignTo = () => {

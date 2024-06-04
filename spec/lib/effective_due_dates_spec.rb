@@ -400,7 +400,7 @@ describe Course do
     end
 
     it "includes everyone else if there no modules and no overrides" do
-      Account.site_admin.enable_feature!(:differentiated_modules)
+      Account.site_admin.enable_feature!(:selective_release_backend)
       edd = EffectiveDueDates.for_course(@test_course, @assignment1)
       result = edd.to_hash
       expected = {
@@ -432,7 +432,7 @@ describe Course do
     end
 
     it "does not include student with unassign_item ADHOC override" do
-      Account.site_admin.enable_feature!(:differentiated_modules)
+      Account.site_admin.enable_feature!(:selective_release_backend)
 
       override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
       override.assignment_override_students.create!(user: @student1)
@@ -578,7 +578,7 @@ describe Course do
         end
 
         it "doesn't apply adhoc overrides with unassign_item" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
           override.assignment_override_students.create!(user: @student1)
 
@@ -600,7 +600,7 @@ describe Course do
         end
 
         it "applies adhoc overrides with section unassign_item override" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
           override.assignment_override_students.create!(user: @student1)
 
@@ -630,7 +630,7 @@ describe Course do
         end
 
         it "applies adhoc overrides with unassign_item if flag is off" do
-          Account.site_admin.disable_feature!(:differentiated_modules)
+          Account.site_admin.disable_feature!(:selective_release_backend)
           override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
           override.assignment_override_students.create!(user: @student1)
 
@@ -655,7 +655,7 @@ describe Course do
 
         context "with context module overrides" do
           before(:once) do
-            Account.site_admin.enable_feature!(:differentiated_modules)
+            Account.site_admin.enable_feature!(:selective_release_backend)
             @assignment1.only_visible_to_overrides = false
             @assignment1.save!
             @module = @test_course.context_modules.create!(name: "Module 1")
@@ -979,7 +979,7 @@ describe Course do
           end
 
           it "does not include context module overrides with the flag off" do
-            Account.site_admin.disable_feature!(:differentiated_modules)
+            Account.site_admin.disable_feature!(:selective_release_backend)
             @assignment1.only_visible_to_overrides = true
             @assignment1.save!
             edd = EffectiveDueDates.for_course(@test_course, @assignment1)
@@ -1249,7 +1249,7 @@ describe Course do
         end
 
         it "doesn't assign group with overrides with unassign_item" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
 
           group_with_user(user: @student3, active_all: true)
           @group.users << @student2
@@ -1367,7 +1367,7 @@ describe Course do
 
         context "with context module section overrides" do
           before :once do
-            Account.site_admin.enable_feature!(:differentiated_modules)
+            Account.site_admin.enable_feature!(:selective_release_backend)
             section = CourseSection.create!(name: "Section 1", course: @test_course)
             student_in_section(section, user: @student1)
             @module = @test_course.context_modules.create!(name: "Module 1")
@@ -1434,7 +1434,7 @@ describe Course do
           end
 
           it "does not include context module overrides with the flag off" do
-            Account.site_admin.disable_feature!(:differentiated_modules)
+            Account.site_admin.disable_feature!(:selective_release_backend)
             @assignment1.only_visible_to_overrides = true
             @assignment1.save!
 
@@ -1444,7 +1444,7 @@ describe Course do
         end
 
         it "doesn't assign section with overrides with unassign_item" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
 
           section = CourseSection.create!(name: "My Awesome Section", course: @test_course)
           student_in_section(section, user: @student1)
@@ -1527,7 +1527,7 @@ describe Course do
 
       context "when course overrides apply" do
         before :once do
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           @override = @assignment1.assignment_overrides.create!(
             due_at: 1.day.from_now(@now),
             due_at_overridden: true,
@@ -1581,7 +1581,7 @@ describe Course do
         end
 
         it "does not apply course overrides with flag off" do
-          Account.site_admin.disable_feature!(:differentiated_modules)
+          Account.site_admin.disable_feature!(:selective_release_backend)
           edd = EffectiveDueDates.for_course(@test_course, @assignment1)
           result = edd.to_hash
           expect(result).to eq({})
@@ -1682,7 +1682,7 @@ describe Course do
           individual_override.assignment_override_students.create!(user: @student1)
 
           # course override
-          Account.site_admin.enable_feature!(:differentiated_modules)
+          Account.site_admin.enable_feature!(:selective_release_backend)
           course_override = @assignment2.assignment_overrides.create!(
             due_at: 5.days.from_now(@now),
             due_at_overridden: true,

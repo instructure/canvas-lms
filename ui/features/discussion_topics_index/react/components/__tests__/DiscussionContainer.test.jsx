@@ -77,7 +77,7 @@ describe('DiscussionsContainer', () => {
   const oldEnv = window.ENV
 
   beforeEach(() => {
-    window.ENV.FEATURES.differentiated_modules = true
+    window.ENV.FEATURES.selective_release_ui_api = true
   })
 
   afterEach(() => {

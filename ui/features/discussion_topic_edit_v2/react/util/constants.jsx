@@ -87,7 +87,7 @@ export const useShouldShowContent = (
     !isGraded &&
     !isGroupDiscussion &&
     !isGroupContext &&
-    !(ENV.FEATURES.differentiated_modules && !isAnnouncement)
+    !(ENV.FEATURES.selective_release_ui_api && !isAnnouncement)
 
   const shouldShowAnonymousOptions =
     !isGroupContext &&
@@ -139,7 +139,7 @@ export const useShouldShowContent = (
   const shouldShowAssignToForUngradedDiscussions =
     !isAnnouncement &&
     !isGraded &&
-    ENV.FEATURES?.differentiated_modules &&
+    ENV.FEATURES?.selective_release_ui_api &&
     ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_ASSIGN_TO_UNGRADED
 
   return {

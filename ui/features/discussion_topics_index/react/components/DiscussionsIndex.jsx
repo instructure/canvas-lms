@@ -306,7 +306,7 @@ export default class DiscussionsIndex extends Component {
             onDismiss={() => this.props.setSendToOpen(false)}
           />
         )}{' '}
-        {ENV?.FEATURES?.differentiated_modules &&
+        {ENV?.FEATURES?.selective_release_ui_api &&
           this.state.showAssignToTray &&
           this.props.contextType === 'course' && (
             <ItemAssignToTray

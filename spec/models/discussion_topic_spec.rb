@@ -581,7 +581,7 @@ describe DiscussionTopic do
 
       context "differentiated modules" do
         before do
-          Account.site_admin.enable_feature! :differentiated_modules
+          Account.site_admin.enable_feature! :selective_release_backend
         end
 
         context "ungraded discussions" do
@@ -1661,7 +1661,7 @@ describe DiscussionTopic do
 
     context "differentiated modules" do
       before do
-        Account.site_admin.enable_feature! :differentiated_modules
+        Account.site_admin.enable_feature! :selective_release_backend
       end
 
       context "ungraded discussions" do
@@ -2616,7 +2616,7 @@ describe DiscussionTopic do
 
     context "differentiated modules address_book_context_for" do
       before do
-        Account.site_admin.enable_feature! :differentiated_modules
+        Account.site_admin.enable_feature! :selective_release_backend
 
         @topic = discussion_topic_model(user: @teacher, context: @course)
         @topic.update!(only_visible_to_overrides: true)
@@ -3336,7 +3336,7 @@ describe DiscussionTopic do
 
     describe "differentiated topics" do
       before :once do
-        Account.site_admin.enable_feature! :differentiated_modules
+        Account.site_admin.enable_feature! :selective_release_backend
         @course = course_factory(active_course: true)
 
         @item_without_assignment = discussion_topic_model(user: @teacher)
@@ -3454,7 +3454,7 @@ describe DiscussionTopic do
 
     describe "differentiated modules" do
       before do
-        Account.site_admin.enable_feature! :differentiated_modules
+        Account.site_admin.enable_feature! :selective_release_backend
       end
 
       it "filters based on adhoc overrides" do

@@ -1551,9 +1551,9 @@ describe "Pages API", type: :request do
       expect(json.find { |page| page["url"] == @front_page.url }["lock_explanation"]).to eq("This page is part of an unpublished module and is not available yet.")
     end
 
-    context "with differentiated_modules enabled" do
+    context "with selective_release_backend enabled" do
       before :once do
-        Account.site_admin.enable_feature!(:differentiated_modules)
+        Account.site_admin.enable_feature!(:selective_release_backend)
         @page = @course.wiki_pages.create!(title: "potentially locked page", body: "the page body")
       end
 
@@ -1563,7 +1563,7 @@ describe "Pages API", type: :request do
                  { controller: "wiki_pages_api", action: "index", format: "json", course_id: @course.id.to_s, include: ["body"] })
       end
 
-      it "includes lock info and excludes body for pages locked by unlock_at with differentiated_modules enabled" do
+      it "includes lock info and excludes body for pages locked by unlock_at with selective_release_backend enabled" do
         @page.update!(unlock_at: 1.day.from_now)
         page_json = json.find { |p| p["url"] == @page.url }
         expect(page_json["locked_for_user"]).to be(true)
@@ -1571,7 +1571,7 @@ describe "Pages API", type: :request do
         expect(page_json.keys).not_to include("body")
       end
 
-      it "includes lock info and excludes body for pages locked by lock_at with differentiated_modules enabled" do
+      it "includes lock info and excludes body for pages locked by lock_at with selective_release_backend enabled" do
         @page.update!(lock_at: 1.day.ago)
         page_json = json.find { |p| p["url"] == @page.url }
         expect(page_json["locked_for_user"]).to be(true)
@@ -2226,9 +2226,9 @@ describe "Pages API", type: :request do
                     @page_only_visible_to_overrides]
     end
 
-    context "with differentiated_modules enabled" do
+    context "with selective_release_backend enabled" do
       before :once do
-        Account.site_admin.enable_feature! :differentiated_modules
+        Account.site_admin.enable_feature! :selective_release_backend
       end
 
       it "lets the teacher see all pages" do
@@ -2283,7 +2283,7 @@ describe "Pages API", type: :request do
       end
     end
 
-    context "with differentiated_modules disabled and conditional release enabled" do
+    context "with selective_release_backend disabled and conditional release enabled" do
       before :once do
         @course.update!(conditional_release: true)
       end
@@ -2334,7 +2334,7 @@ describe "Pages API", type: :request do
       end
     end
 
-    context "with differentiated_modules disabled and conditional release disabled" do
+    context "with selective_release_backend disabled and conditional release disabled" do
       before :once do
         @course.update!(conditional_release: false)
       end

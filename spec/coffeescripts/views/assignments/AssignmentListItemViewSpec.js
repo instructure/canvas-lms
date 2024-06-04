@@ -135,7 +135,7 @@ const createView = function (model, options) {
     newquizzes_on_quiz_page: options.newquizzes_on_quiz_page,
   }
   ENV.SHOW_SPEED_GRADER_LINK = options.show_additional_speed_grader_link
-  ENV.FEATURES.differentiated_modules = options.differentiated_modules
+  ENV.FEATURES.selective_release_ui_api = options.selective_release
 
   const view = new AssignmentListItemView({
     model,
@@ -846,7 +846,7 @@ test('displays cancel button when assignment failed to duplicate is not blueprin
 test('can assign assignment if flag is on and has edit permissions', function () {
   const view = createView(this.model, {
     individualAssignmentPermissions: {manage_assign_to: true},
-    differentiated_modules: true,
+    selective_release: true,
   })
   equal(view.$('.assign-to-link').length, 1)
 })
@@ -854,7 +854,7 @@ test('can assign assignment if flag is on and has edit permissions', function ()
 test('cannot assign assignment if no edit permissions', function () {
   const view = createView(this.model, {
     individualAssignmentPermissions: {manage_assign_to: false},
-    differentiated_modules: true,
+    selective_release: true,
   })
   equal(view.$('.assign-to-link').length, 0)
 })
@@ -862,7 +862,7 @@ test('cannot assign assignment if no edit permissions', function () {
 test('cannot assign assignment if flag is off', function () {
   const view = createView(this.model, {
     individualAssignmentPermissions: {manage_assign_to: true},
-    differentiated_modules: false,
+    selective_release: false,
   })
   equal(view.$('.assign-to-link').length, 0)
 })

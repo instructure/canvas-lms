@@ -1053,7 +1053,7 @@ class AssignmentsApiController < ApplicationController
       include_visibility = include_params.include?("assignment_visibility") && @context.grants_any_right?(user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
       if include_visibility
-        assignment_visibilities = if Account.site_admin.feature_enabled?(:differentiated_modules)
+        assignment_visibilities = if Account.site_admin.feature_enabled?(:selective_release_backend)
                                     AssignmentVisibility::AssignmentVisibilityService.users_with_visibility_by_assignment(course_id: @context.id, assignment_ids: assignments.map(&:id))
                                   else
                                     AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, assignment_id: assignments.map(&:id))

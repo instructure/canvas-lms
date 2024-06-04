@@ -20,7 +20,8 @@
 
 describe ModuleAssignmentOverridesController do
   before :once do
-    Account.site_admin.enable_feature!(:differentiated_modules)
+    Account.site_admin.enable_feature!(:selective_release_backend)
+    Account.site_admin.enable_feature!(:selective_release_ui_api)
     course_with_teacher(active_all: true, course_name: "Awesome Course")
     @student1 = student_in_course(active_all: true, name: "Student 1").user
     @student2 = student_in_course(active_all: true, name: "Student 2").user
@@ -102,8 +103,8 @@ describe ModuleAssignmentOverridesController do
       expect(response).to be_not_found
     end
 
-    it "returns 404 if the differentiated_modules flag is disabled" do
-      Account.site_admin.disable_feature!(:differentiated_modules)
+    it "returns 404 if the selective_release_ui_api flag is disabled" do
+      Account.site_admin.disable_feature!(:selective_release_ui_api)
       get :index, params: { course_id: @course.id, context_module_id: @module1.id }
       expect(response).to be_not_found
     end
@@ -276,8 +277,8 @@ describe ModuleAssignmentOverridesController do
       expect(response).to be_not_found
     end
 
-    it "returns 404 if the differentiated_modules flag is disabled" do
-      Account.site_admin.disable_feature!(:differentiated_modules)
+    it "returns 404 if the selective_release_ui_api flag is disabled" do
+      Account.site_admin.disable_feature!(:selective_release_ui_api)
       put :bulk_update, params: { course_id: @course.id, context_module_id: @module1.id, overrides: [] }
       expect(response).to be_not_found
     end

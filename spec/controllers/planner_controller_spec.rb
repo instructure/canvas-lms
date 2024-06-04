@@ -185,7 +185,7 @@ describe PlannerController do
       end
 
       it "differentiated modules: only shows section specific announcements to students who can view them" do
-        Account.site_admin.enable_feature! :differentiated_modules
+        Account.site_admin.enable_feature! :selective_release_backend
         a1 = @course.announcements.create!(message: "for the defaults")
         a1.update!(only_visible_to_overrides: true)
         a1.assignment_overrides.create!(set: @course.default_section)
