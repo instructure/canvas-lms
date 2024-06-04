@@ -426,6 +426,10 @@ class ContextExternalTool < ActiveRecord::Base
     !editor_button.nil?
   end
 
+  def can_be_top_nav_favorite?
+    has_placement? :top_navigation
+  end
+
   def is_rce_favorite_in_context?(context)
     context = context.context if context.is_a?(Group)
     context = context.account if context.is_a?(Course)
@@ -436,6 +440,13 @@ class ContextExternalTool < ActiveRecord::Base
       # TODO: remove after the datafixup and this column is dropped
       is_rce_favorite
     end
+  end
+
+  def top_nav_favorite_in_context?(context)
+    context = context.context if context.is_a?(Group)
+    context = context.account if context.is_a?(Course)
+    top_nav_favorite_tool_ids = context.top_nav_favorite_tool_ids[:value]
+    !!top_nav_favorite_tool_ids&.include?(global_id)
   end
 
   def sync_placements!(placements)
@@ -1616,14 +1627,6 @@ class ContextExternalTool < ActiveRecord::Base
     allowed_domains = Setting.get("#{placement}_allowed_launch_domains", "").split(",").map(&:strip).reject(&:empty?)
     allowed_dev_keys = Setting.get("#{placement}_allowed_dev_keys", "").split(",").map(&:strip).reject(&:empty?)
     allowed_domains.include?(domain) || allowed_dev_keys.include?(Shard.global_id_for(developer_key&.id).to_s)
-  end
-
-  def placement_pinned?(placement)
-    return false unless Lti::ResourcePlacement::PINNABLE_PLACEMENTS.include? placement.to_sym
-
-    pinned_launch_domains = Setting.get("#{placement}_pinned_launch_domains", "").split(",").map(&:strip).reject(&:empty?)
-    pinned_dev_keys = Setting.get("#{placement}_pinned_dev_keys", "").split(",").map(&:to_i)
-    pinned_launch_domains.include?(domain) || pinned_dev_keys.include?(Shard.global_id_for(developer_key&.id))
   end
 
   private

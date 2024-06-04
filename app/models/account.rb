@@ -374,6 +374,7 @@ class Account < ActiveRecord::Base
   add_setting :disable_post_to_sis_when_grading_period_closed, boolean: true, root_only: true, default: false
 
   add_setting :rce_favorite_tool_ids, inheritable: true
+  add_setting :top_nav_favorite_tool_ids, inheritable: true
 
   add_setting :enable_as_k5_account, boolean: true, default: false, inheritable: true
   add_setting :use_classic_font_in_k5, boolean: true, default: false, inheritable: true
@@ -701,7 +702,7 @@ class Account < ActiveRecord::Base
 
     result = self[:settings]
     if result
-      @old_settings ||= result.dup
+      @old_settings ||= result.deep_dup
       return SettingsWrapper.new(self, result)
     end
     unless frozen?
@@ -2464,6 +2465,10 @@ class Account < ActiveRecord::Base
     rce_favorite_tool_ids[:value] ||
       Lti::ContextToolFinder.all_tools_for(self, placements: [:editor_button]) # TODO: remove after datafixup and the is_rce_favorite column is removed
                             .where(is_rce_favorite: true).pluck(:id).map { |id| Shard.global_id_for(id) }
+  end
+
+  def get_top_nav_favorite_tool_ids
+    top_nav_favorite_tool_ids[:value] || []
   end
 
   def effective_course_template

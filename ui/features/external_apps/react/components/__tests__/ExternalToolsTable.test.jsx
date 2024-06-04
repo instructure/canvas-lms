@@ -55,4 +55,18 @@ describe('ExternalToolsTable', () => {
       expect(queryByText('Add to RCE toolbar')).not.toBeInTheDocument()
     })
   })
+
+  describe('top nav favorites toggle', function () {
+    it('shows if admin has permission', () => {
+      const {queryByText} = renderTable()
+      expect(queryByText('Name')).toBeInTheDocument()
+      expect(queryByText('Pin to Top Navigation')).toBeInTheDocument()
+    })
+
+    it('does not show if admin does not have permission', () => {
+      const {queryByText} = renderTable(false, false, false, false)
+      expect(queryByText('Name')).toBeInTheDocument()
+      expect(queryByText('Pin to Top Navigation')).not.toBeInTheDocument()
+    })
+  })
 })
