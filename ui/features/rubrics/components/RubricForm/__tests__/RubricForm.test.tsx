@@ -354,7 +354,13 @@ describe('RubricForm Tests', () => {
       expect(getByTestId('outcome-lock-icon-2')).toBeInTheDocument()
     })
 
-    describe('new outcome criterion modal', () => {
+    /**
+     * EVAL-4246
+     * This test is skipped because it is dependent on a legacy FindDialog backbone component
+     * It currently has failures in packages/jquery and is incompatible with the current React test environment
+     * These tests should be re-enabled once the Outcomes Tray React component is implemented
+     */
+    describe.skip('new outcome criterion modal', () => {
       it('imports an outcome linked criteria when the import button is clicked in the find outcome modal', () => {
         const outcomeData = {
           attributes: {
