@@ -346,6 +346,7 @@ body:not(.course-menu-expanded) {
     display: flex;
     flex: 1;
     flex-direction: row-reverse;
+    align-items: center;
   }
 
   .right-of-crumbs > * {
