@@ -98,8 +98,12 @@ react_inbox:
     This refactor will make this page more maintainable
   applies_to: RootAccount
   environments:
+    ci:
+      state: allowed_on # enable for automated testings builds and local testing
     development:
-      state: on # enable for local development
+      state: allowed_on # enable for local development
+    test:
+      state: allowed_on # enable for the deployed 'test' environment
 
 react_inbox_labels:
   state: hidden
