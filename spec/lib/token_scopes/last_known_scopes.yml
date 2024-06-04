@@ -1123,6 +1123,8 @@
   path: "/api/v1/accounts/:account_id/lti_registrations/:id"
 - verb: GET
   path: "/api/v1/accounts/:account_id/lti_registrations/:id"
+- verb: PUT
+  path: "/api/v1/accounts/:account_id/lti_registrations/:id"
 - verb: GET
   path: "/api/v1/immersive_reader/authenticate"
 - verb: GET
