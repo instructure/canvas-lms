@@ -1899,6 +1899,11 @@ module Lti
           expect(expand!("$Canvas.assignment.allowedAttempts")).to eq 5
         end
 
+        it "handles a nil assignment.allowedAttempts" do
+          assignment.allowed_attempts = nil
+          expect(expand!("$Canvas.assignment.allowedAttempts")).to eq "$Canvas.assignment.allowedAttempts"
+        end
+
         describe "$Canvas.assignment.submission.studentAttempts" do
           before do
             user.save
@@ -2298,7 +2303,9 @@ module Lti
             before { allow(tool).to receive(:use_1_3?).and_return(true) }
 
             it "returns the user's lti id instead of lti 1.1 user_id" do
-              expect(expand!("$Canvas.masqueradingUser.userId")).to eq user.lti_id
+              user.lti_id = "fake_lti_id"
+              expanded = expand!("$Canvas.masqueradingUser.userId")
+              expect(expanded).to eq user.lti_id
             end
           end
         end
