@@ -442,7 +442,7 @@ class Lti::RegistrationsController < ApplicationController
   before_action :require_account_context_instrumented
   before_action :require_feature_flag
   before_action :require_manage_lti_registrations
-  before_action :require_dynamic_registration, only: [:destroy]
+  before_action :require_dynamic_registration, only: [:destroy, :update]
 
   include Api::V1::Lti::Registration
 
@@ -474,6 +474,27 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
+  # @API Update an LTI Registration
+  # Update the specified LTI registration with the provided parameters
+  #
+  # @argument admin_nickname [String] The admin-configured friendly display name for the registration
+  #
+  # @example_request
+  #
+  #   This would update the specified LTI registration
+  #   curl -X PUT 'https://<canvas>/api/v1/accounts/<account_id>/registrations/<registration_id>' \
+  #       -H "Authorization: Bearer <token>" \
+  #       -d 'admin_nickname=A New Nickname'
+  #
+  # @returns Lti::Registration
+  def update
+    registration.update!(update_params)
+    render json: lti_registration_json(registration, @current_user, session, @context)
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
   # @API Delete an LTI Registration
   # Remove the specified LTI registration
   #
@@ -493,6 +514,10 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   private
+
+  def update_params
+    params.permit(:admin_nickname).merge({ updated_by: @current_user })
+  end
 
   def require_dynamic_registration
     return if registration.dynamic_registration?

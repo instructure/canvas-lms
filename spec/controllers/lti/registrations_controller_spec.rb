@@ -20,8 +20,8 @@
 
 describe Lti::RegistrationsController do
   describe "GET index" do
-    let(:account) { account_model }
-    let(:admin) { account_admin_user(account:) }
+    let_once(:account) { account_model }
+    let_once(:admin) { account_admin_user(account:) }
 
     before do
       user_session(admin)
@@ -83,11 +83,12 @@ describe Lti::RegistrationsController do
   describe "GET show" do
     subject { get :show, params: { account_id: account.id, id: registration.id }, format: :json }
 
-    let(:account) { account_model }
-    let(:admin) { account_admin_user(account:) }
-    let(:registration) { lti_registration_model(account:) }
-    let(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
     let(:response_json) { response.parsed_body.with_indifferent_access }
+
+    let_once(:account) { account_model }
+    let_once(:admin) { account_admin_user(account:) }
+    let_once(:registration) { lti_registration_model(account:) }
+    let_once(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
 
     before do
       user_session(admin)
@@ -160,13 +161,95 @@ describe Lti::RegistrationsController do
     end
   end
 
+  describe "PUT update" do
+    subject { put :update, params: { account_id: account.id, id: registration.id, admin_nickname: }, format: :json }
+
+    let_once(:account) { account_model }
+    let_once(:other_admin) { account_admin_user(account:) }
+    let_once(:admin) { account_admin_user(account:) }
+    let_once(:registration) { lti_registration_model(account:, created_by: other_admin, updated_by: other_admin) }
+    let_once(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
+    let_once(:admin_nickname) { "New Name" }
+
+    before do
+      ims_registration
+      user_session(admin)
+      account.enable_feature!(:lti_registrations_page)
+    end
+
+    it "is successful" do
+      subject
+      expect(response).to be_successful
+      expect(registration.reload.admin_nickname).to eq(admin_nickname)
+      expect(registration.updated_by).to eq(admin)
+    end
+
+    context "without user session" do
+      before do
+        remove_user_session
+      end
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before do
+        user_session(student)
+      end
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with flag disabled" do
+      before do
+        account.disable_feature!(:lti_registrations_page)
+      end
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    context "with non-dynamic registration" do
+      before do
+        ims_registration.update!(lti_registration: nil)
+      end
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it "does not modify the registration" do
+        expect { subject }.not_to change { registration.reload.admin_nickname }
+      end
+    end
+
+    context "with additional params" do
+      let(:registration_params) { { admin_nickname:, created_by: admin } }
+
+      it "only updates the nickname" do
+        expect { subject }.not_to change { registration.reload.created_by }
+      end
+    end
+  end
+
   describe "DELETE destroy" do
     subject { delete :destroy, params: { account_id: account.id, id: registration.id }, format: :json }
 
-    let(:account) { account_model }
-    let(:admin) { account_admin_user(account:) }
-    let(:registration) { lti_registration_model(account:) }
-    let(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
+    let_once(:account) { account_model }
+    let_once(:admin) { account_admin_user(account:) }
+    let_once(:registration) { lti_registration_model(account:) }
+    let_once(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
 
     before do
       ims_registration
