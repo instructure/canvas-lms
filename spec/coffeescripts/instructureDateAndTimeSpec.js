@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import * as tz from '@instructure/moment-utils'
-import tzInTest from '@canvas/datetime/specHelpers'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'

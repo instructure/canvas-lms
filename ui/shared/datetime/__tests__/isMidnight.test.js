@@ -18,8 +18,13 @@
 
 import detroit from 'timezone/America/Detroit'
 import timezone from 'timezone'
-import {configureAndRestoreLater, epoch, moonwalk, restore} from '../specHelpers'
 import {isMidnight} from '@instructure/moment-utils'
+import {
+  configureAndRestoreLater,
+  epoch,
+  moonwalk,
+  restore,
+} from '@instructure/moment-utils/specHelpers'
 
 describe('isMidnight', () => {
   afterEach(restore)

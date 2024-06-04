@@ -22,7 +22,7 @@ import RosterTableLastActivity from '../RosterTableLastActivity'
 import tz from 'timezone'
 import chicago from 'timezone/America/Chicago'
 import detroit from 'timezone/America/Detroit'
-import tzInTest from '@canvas/datetime/specHelpers'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 import {getI18nFormats} from '../../../../../../boot/initializers/configureDateTime'
 
 const observerEnrollment = {

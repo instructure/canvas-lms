@@ -21,7 +21,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import _ from 'lodash'
-import tzInTest from '@canvas/datetime/specHelpers'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
 import denver from 'timezone/America/Denver'
 import newYork from 'timezone/America/New_York'

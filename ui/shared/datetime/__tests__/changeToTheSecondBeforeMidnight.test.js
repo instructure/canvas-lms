@@ -17,7 +17,7 @@
  */
 
 import {changeToTheSecondBeforeMidnight as subject} from '@instructure/moment-utils'
-import {epoch} from '../specHelpers'
+import {epoch} from '@instructure/moment-utils/specHelpers'
 
 describe('changeToTheSecondBeforeMidnight', () => {
   it('returns null when no argument given.', () => {
