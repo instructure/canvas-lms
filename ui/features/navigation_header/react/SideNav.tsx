@@ -387,7 +387,10 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
           icon={<IconClockLine />}
           label={I18n.t('History')}
           href={window.ENV.page_view_update_url}
-          onClick={() => handleActiveTray('history')}
+          onClick={event => {
+            event.preventDefault()
+            handleActiveTray('history', true)
+          }}
           selected={selectedNavItem === 'history'}
           data-selected={selectedNavItem === 'history'}
           themeOverride={navItemThemeOverride}
@@ -449,7 +452,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
           href="https://help.instructure.com/"
           onClick={event => {
             event.preventDefault()
-            handleActiveTray('help')
+            handleActiveTray('help', true)
           }}
           selected={selectedNavItem === 'help'}
           data-selected={selectedNavItem === 'help'}
