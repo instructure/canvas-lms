@@ -20,6 +20,7 @@ import * as z from 'zod'
 import type {AccountId} from '../model/AccountId'
 import {parseFetchResult} from '../../common/lib/apiResult/ApiResult'
 import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
+import {defaultFetchOptions} from '@canvas/util/xhr'
 
 /**
  * Updates the workflow state of a developer key
@@ -37,6 +38,7 @@ export const updateDeveloperKeyWorkflowState = (
     fetch(
       `/api/v1/accounts/${accountId}/developer_keys/${developerKeyId}/developer_key_account_bindings`,
       {
+        ...defaultFetchOptions(),
         method: 'POST',
         body: JSON.stringify({
           developer_key_account_binding: {
@@ -55,6 +57,7 @@ export const updateDeveloperKeyWorkflowState = (
 export const deleteDeveloperKey = (developerKeyId: DeveloperKeyId) =>
   parseFetchResult(z.unknown())(
     fetch(`/api/v1/developer_keys/${developerKeyId}`, {
+      ...defaultFetchOptions(),
       method: 'DELETE',
     })
   )

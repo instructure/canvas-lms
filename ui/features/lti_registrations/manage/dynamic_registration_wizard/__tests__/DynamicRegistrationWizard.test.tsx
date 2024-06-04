@@ -25,6 +25,12 @@ import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRe
 import {ZLtiImsRegistrationId} from '../../model/lti_ims_registration/LtiImsRegistrationId'
 import {ZDeveloperKeyId} from '../../model/developer_key/DeveloperKeyId'
 import type {LtiConfiguration} from '../../model/lti_tool_configuration/LtiConfiguration'
+import userEvent from '@testing-library/user-event'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+jest.mock('@canvas/alerts/react/FlashAlert')
+
+const mockAlert = showFlashAlert as jest.Mock<typeof showFlashAlert>
 
 const mockService = (
   mocked?: Partial<DynamicRegistrationWizardService>
@@ -85,6 +91,29 @@ const mockRegistration = (
 })
 
 describe('DynamicRegistrationWizard', () => {
+  it('renders a loading screen when fetching the registration token', () => {
+    const accountId = ZAccountId.parse('123')
+
+    const fetchRegistrationToken = jest.fn().mockImplementation(() => new Promise(() => {}))
+
+    const getRegistrationByUUID = jest.fn().mockResolvedValue(success(mockRegistration()))
+
+    const service = mockService({fetchRegistrationToken, getRegistrationByUUID})
+
+    render(
+      <DynamicRegistrationWizard
+        dynamicRegistrationUrl="https://example.com"
+        service={service}
+        accountId={accountId}
+        unregister={() => {}}
+      />
+    )
+
+    expect(fetchRegistrationToken).toHaveBeenCalledWith(accountId)
+    // Ignore screenreader title.
+    expect(screen.getByText(/Loading/i, {ignore: 'title'})).toBeInTheDocument()
+  })
+
   it('forwards users to the tool', async () => {
     const accountId = ZAccountId.parse('123')
     const fetchRegistrationToken = jest.fn().mockResolvedValue(
@@ -106,18 +135,13 @@ describe('DynamicRegistrationWizard', () => {
       />
     )
     expect(fetchRegistrationToken).toHaveBeenCalledWith(accountId)
-    const headerText = screen.getByText(/Requesting Token/i)
-    expect(headerText).toBeInTheDocument()
-
     const frame = await waitFor(() => screen.getByTestId('dynamic-reg-wizard-iframe'))
     expect(frame).toBeInTheDocument()
-    if (frame instanceof HTMLIFrameElement) {
-      expect(frame.src).toBe(
-        'https://example.com/?foo=bar&openid_configuration=oidc_config_url_value&registration_token=reg_token_value'
-      )
-    } else {
-      throw new Error('frame is not an instance of HTMLIFrameElement')
-    }
+    expect(frame).toBeInstanceOf(HTMLIFrameElement)
+    expect(frame as HTMLIFrameElement).toHaveAttribute(
+      'src',
+      'https://example.com/?foo=bar&openid_configuration=oidc_config_url_value&registration_token=reg_token_value'
+    )
   })
 
   it('retrieves the registration when the tool returns', async () => {
@@ -132,7 +156,7 @@ describe('DynamicRegistrationWizard', () => {
     const getRegistrationByUUID = jest.fn().mockResolvedValue(success(mockRegistration()))
     const service = mockService({fetchRegistrationToken, getRegistrationByUUID})
 
-    const component = render(
+    render(
       <DynamicRegistrationWizard
         service={service}
         dynamicRegistrationUrl="https://example.com/"
@@ -141,7 +165,7 @@ describe('DynamicRegistrationWizard', () => {
       />
     )
 
-    const iframe = await component.findByTestId('dynamic-reg-wizard-iframe')
+    const iframe = await screen.findByTestId('dynamic-reg-wizard-iframe')
     expect(iframe).toBeInTheDocument()
     expect(iframe).toHaveAttribute(
       'src',
@@ -158,10 +182,63 @@ describe('DynamicRegistrationWizard', () => {
       })
     )
 
-    await waitFor(() => screen.getByText(/Loading Registration/i))
+    await waitFor(() => {
+      expect(screen.getByText(/Loading Registration/i)).toBeInTheDocument()
+    })
 
     await waitFor(() => screen.findByText(/Permission Confirmation/i))
 
     expect(getRegistrationByUUID).toHaveBeenCalledWith('123', 'uuid_value')
+  })
+
+  describe('PermissionConfirmation', () => {
+    it('tries to delete the associated dev key when Cancel is clicked', async () => {
+      const accountId = ZAccountId.parse('123')
+      const fetchRegistrationToken = jest.fn().mockResolvedValue(
+        success({
+          token: 'reg_token_value',
+          oidc_configuration_url: 'oidc_config_url_value',
+          uuid: 'uuid_value',
+        })
+      )
+      const reg = mockRegistration()
+      const getRegistrationByUUID = jest.fn().mockResolvedValue(success(reg))
+      const deleteDeveloperKey = jest.fn().mockResolvedValue(success(reg))
+      const service = mockService({
+        fetchRegistrationToken,
+        getRegistrationByUUID,
+        deleteDeveloperKey,
+      })
+
+      render(
+        <DynamicRegistrationWizard
+          service={service}
+          dynamicRegistrationUrl="https://example.com/"
+          accountId={accountId}
+          unregister={() => {}}
+        />
+      )
+
+      await screen.findByTestId('dynamic-reg-wizard-iframe')
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            subject: 'org.imsglobal.lti.close',
+          },
+          origin: 'https://example.com',
+        })
+      )
+
+      await screen.findByText(/Permission Confirmation/i)
+
+      await userEvent.click(screen.getByText(/Cancel/i).closest('button')!)
+
+      await waitFor(() => {
+        expect(service.deleteDeveloperKey).toHaveBeenCalledWith(reg.developer_key_id)
+        expect(mockAlert).not.toHaveBeenCalled()
+      })
+    })
   })
 })

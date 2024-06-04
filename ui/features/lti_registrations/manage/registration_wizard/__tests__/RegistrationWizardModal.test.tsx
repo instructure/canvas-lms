@@ -104,7 +104,7 @@ describe('RegistrationWizardModal', () => {
     })
     fireEvent.click(nextButton)
     // expect the dynamic registration wizard to be rendered
-    const el = screen.getByText(/Requesting Token/i)
+    const el = screen.getByText(/Loading/i, {ignore: 'title'})
     expect(el).toBeInTheDocument()
   })
 })
