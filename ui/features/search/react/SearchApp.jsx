@@ -146,6 +146,9 @@ export default function SearchApp() {
 
     fetch(`/api/v1/courses/${ENV.COURSE_ID}/smartsearch?q=${searchTerm}&per_page=25`)
       .then(res => {
+        if(!res.ok) {
+          throw new Error(I18n.t('Failed to execute search: ') + res.statusText)
+        }
         res
           .json()
           .then(({results}) => {
