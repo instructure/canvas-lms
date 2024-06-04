@@ -49,8 +49,9 @@ import ProfileTabsList from './lists/ProfileTabsList'
 import HistoryList from './lists/HistoryList'
 import {useQuery} from '@canvas/query'
 import {getUnreadCount} from './queries/unreadCountQuery'
-import {getExternalTools} from './utils'
-import type {ExternalTool} from './utils'
+import {getExternalApps} from './utils'
+import {SVGIcon} from '@instructure/ui-svg-images'
+import {Img} from '@instructure/ui-img'
 
 const I18n = useI18nScope('MobileGlobalMenu')
 
@@ -59,7 +60,6 @@ type Props = {
 }
 
 export default function MobileGlobalMenu(props: Props) {
-  const externalTools = useMemo<ExternalTool[]>(() => getExternalTools(), [])
   const showGroups = useMemo(() => Boolean(document.getElementById('global_nav_groups_link')), [])
   const countsEnabled = Boolean(
     window.ENV.current_user_id && !window.ENV.current_user?.fake_student
@@ -72,6 +72,13 @@ export default function MobileGlobalMenu(props: Props) {
     display_name: string
     avatar_image_url: string
   } = window.ENV.current_user
+
+  const {data: externalTools} = useQuery({
+    queryKey: ['external_tools'],
+    queryFn: getExternalApps,
+    staleTime: 2 * 60 * 1000, // two minutes,
+    enabled: true,
+  })
 
   const {data: unreadConversationsCount, isSuccess: unreadConversationsCountHasLoaded} = useQuery({
     queryKey: ['unread_count', 'conversations'],
@@ -253,36 +260,36 @@ export default function MobileGlobalMenu(props: Props) {
           </Link>
         </List.Item>
 
-        {externalTools.map(tool => (
-          <List.Item key={tool.href}>
-            <Link href={tool.href || ''} isWithinText={false} display="block">
-              <Flex>
-                <Flex.Item width="3rem">
-                  {'svgPath' in tool ? (
-                    <svg
-                      version="1.1"
-                      xmlns="http://www.w3.org/2000/svg"
-                      xmlnsXlink="http://www.w3.org/1999/xlink"
-                      viewBox="0 0 64 64"
-                      dangerouslySetInnerHTML={{__html: tool.svgPath ?? ''}}
-                      width="1em"
-                      height="1em"
-                      aria-hidden="true"
-                      role="presentation"
-                      focusable="false"
-                      style={{fill: 'currentColor', fontSize: 32}}
-                    />
-                  ) : (
-                    <img width="1em" height="1em" src={tool.imgSrc} alt="" />
-                  )}
-                </Flex.Item>
-                <Flex.Item>
-                  <Text size="medium">{tool.label}</Text>
-                </Flex.Item>
-              </Flex>
-            </Link>
-          </List.Item>
-        ))}
+        {Array.isArray(externalTools) &&
+          [...externalTools].map(tool => {
+            const toolId = tool.label.toLowerCase().replaceAll(' ', '-')
+            const toolImg = tool.imgSrc ? tool.imgSrc : ''
+            return (
+              <List.Item key={toolId}>
+                <Link href={tool.href || ''} isWithinText={false} display="block">
+                  <Flex>
+                    <Flex.Item width="3rem">
+                      {'svgPath' in tool ? (
+                        <SVGIcon
+                          size="small"
+                          viewBox="0 0 64 64"
+                          title="svg-external-tool"
+                          color="auto"
+                        >
+                          <path d={tool.svgPath} />
+                        </SVGIcon>
+                      ) : (
+                        <Img width="26px" height="26px" src={toolImg} alt="" />
+                      )}
+                    </Flex.Item>
+                    <Flex.Item>
+                      <Text size="medium">{tool.label}</Text>
+                    </Flex.Item>
+                  </Flex>
+                </Link>
+              </List.Item>
+            )
+          })}
 
         <List.Item>
           <ToggleDetails
