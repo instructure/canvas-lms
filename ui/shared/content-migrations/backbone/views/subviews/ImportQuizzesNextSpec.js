@@ -27,6 +27,7 @@ test('it should be accessible', assert => {
   const importQuizzesNext = new ImportQuizzesNextView({
     quizzesNextEnabled: true,
     migrationDefault: false,
+    disableNQMigrationCheckbox: false,
     model: new Backbone.Model(),
   })
   const done = assert.async()
@@ -37,6 +38,7 @@ test('it should have checkbox enabled, and not checked', () => {
   const importQuizzesNext = new ImportQuizzesNextView({
     quizzesNextEnabled: true,
     migrationDefault: false,
+    disableNQMigrationCheckbox: false,
     model: new Backbone.Model(),
   })
   importQuizzesNext.render()
@@ -54,6 +56,7 @@ test('it should have checkbox disabled, and not checked', () => {
   const importQuizzesNext = new ImportQuizzesNextView({
     quizzesNextEnabled: false,
     migrationDefault: false,
+    disableNQMigrationCheckbox: true,
     model: new Backbone.Model(),
   })
   importQuizzesNext.render()
@@ -71,6 +74,7 @@ test('it should have checkbox enabled, and checked', () => {
   const importQuizzesNext = new ImportQuizzesNextView({
     quizzesNextEnabled: true,
     migrationDefault: true,
+    disableNQMigrationCheckbox: false,
     model: new Backbone.Model(),
   })
   importQuizzesNext.render()
@@ -89,6 +93,7 @@ test('it should have checkbox disabled, and checked', () => {
     model: new Backbone.Model(),
     quizzesNextEnabled: false,
     migrationDefault: true,
+    disableNQMigrationCheckbox: true,
   })
   importQuizzesNext.render()
   ok(
