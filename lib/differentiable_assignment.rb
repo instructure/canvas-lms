@@ -31,7 +31,7 @@ module DifferentiableAssignment
         conditions = { user_id: user_ids }
         conditions[column_name] = differentiable.id
         if Account.site_admin.feature_enabled?(:differentiated_modules)
-          visibility_service(conditions)
+          visible(conditions)
         else
           visibility_view.where(conditions)
         end
@@ -64,11 +64,10 @@ module DifferentiableAssignment
     end
   end
 
-  def visibility_service(conditions)
-    # TODO: the rest of the services and test them
+  def visible(conditions)
     case differentiable.class_name
     when "Assignment"
-      AssignmentStudentVisibility.where(conditions)
+      AssignmentVisibility::AssignmentVisibilityService.assignment_visible_to_students(user_ids: conditions[:user_id], assignment_id: conditions[:assignment_id])
     when "ContextModule"
       ModuleVisibility::ModuleVisibilityService.module_visible_to_students(user_ids: conditions[:user_id], context_module_id: conditions[:context_module_id])
     when "WikiPage"

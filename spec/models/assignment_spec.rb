@@ -671,7 +671,7 @@ describe Assignment do
   describe "#visible_to_students_in_course_with_da" do
     let(:student_enrollment) { @course.enrollments.find_by(user: @student) }
     let(:visible_assignments) do
-      Assignment.visible_to_students_in_course_with_da(@student.id, @course.id)
+      Assignment.visible_to_students_in_course_with_da([@student.id], [@course.id])
     end
 
     it "excludes unpublished assignments" do

@@ -1982,10 +1982,22 @@ class DiscussionTopic < ActiveRecord::Base
 
   def self.visible_ids_by_user(opts)
     # Discussions with an assignment: pluck id, assignment_id, and user_id from items joined with the SQL view
-    plucked_visibilities = joins_assignment_student_visibilities(opts[:user_id], opts[:course_id])
-                           .pluck("discussion_topics.id", "discussion_topics.assignment_id", "assignment_student_visibilities.user_id")
-                           .group_by { |_, _, user_id| user_id }
-
+    plucked_visibilities = if Account.site_admin.feature_enabled?(:differentiated_modules)
+                             visible_assignments = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students_in_courses(user_ids: opts[:user_id], course_ids: opts[:course_id])
+                             # map the visibilities to a hash of assignment_id => [user_ids]
+                             assignment_user_map = visible_assignments.each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |visibility, hash|
+                               hash[visibility.assignment_id] << visibility.user_id
+                             end
+                             # this mimicks the format of the non-flagged group_by to pair each user_id to the correct visible discussion/discussion's assignment
+                             where(assignment_id: assignment_user_map.keys)
+                               .pluck(:id, :assignment_id)
+                               .flat_map { |discussion_id, assignment_id| assignment_user_map[assignment_id].map { |user_id| [discussion_id, assignment_id, user_id] } }
+                               .group_by { |_, _, user_id| user_id }
+                           else
+                             joins_assignment_student_visibilities(opts[:user_id], opts[:course_id])
+                               .pluck("discussion_topics.id", "discussion_topics.assignment_id", "assignment_student_visibilities.user_id")
+                               .group_by { |_, _, user_id| user_id }
+                           end
     # Initialize dictionaries for different visibility scopes
     ungraded_differentiated_topic_ids_per_user = {}
     ids_visible_to_sections = {}

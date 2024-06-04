@@ -59,7 +59,11 @@ module Courses
         opts = { user_id: user_ids, course_id: [id] }
         case item_type
         when :assignment
-          AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(opts)
+          if Account.site_admin.feature_enabled?(:differentiated_modules)
+            AssignmentVisibility::AssignmentVisibilityService.visible_assignment_ids_in_course_by_user(user_ids: opts[:user_id], course_ids: opts[:course_id])
+          else
+            AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(opts)
+          end
         when :discussion
           DiscussionTopic.visible_ids_by_user(opts)
         when :page

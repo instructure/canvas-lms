@@ -94,7 +94,15 @@ describe CourseProgress do
                              })
     end
 
+    it "only runs item visibility methods once with differentiated_modules enabled" do
+      Account.site_admin.enable_feature!(:differentiated_modules)
+      expect(AssignmentVisibility::AssignmentVisibilityService).to receive(:visible_assignment_ids_in_course_by_user).once.and_call_original
+      progress = CourseProgress.new(@course, @user).to_json
+      expect(progress[:requirement_count]).to eq 5
+    end
+
     it "only runs item visibility methods once" do
+      Account.site_admin.disable_feature!(:differentiated_modules)
       expect(AssignmentStudentVisibility).to receive(:visible_assignment_ids_in_course_by_user).once.and_call_original
       progress = CourseProgress.new(@course, @user).to_json
       expect(progress[:requirement_count]).to eq 5

@@ -84,7 +84,7 @@ class WikiPage < ActiveRecord::Base
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
     if Account.site_admin.feature_enabled?(:differentiated_modules)
       # no assignment -> visible if wiki_page_visibilities has results
-      # assignment -> visible if assignment_student_visibilities has row
+      # assignment -> visible if assignment_visibilities has results
       visible_wiki_page_ids = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students_in_courses(course_ids:, user_ids:).map(&:wiki_page_id)
 
       without_assignment_in_course(course_ids).where(id: visible_wiki_page_ids)
@@ -112,9 +112,12 @@ class WikiPage < ActiveRecord::Base
 
   scope :visible_to_user, lambda { |user_id|
     if Account.site_admin.feature_enabled?(:differentiated_modules)
+      scope_assignments = where.not(assignment_id: nil).pluck(:assignment_id)
       visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_student_by_pages(user_id:, wiki_page_ids: ids).map(&:wiki_page_id)
+      visible_assignments = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_student_by_assignment(user_id:, assignment_ids: scope_assignments).map(&:assignment_id)
+
       where("wiki_pages.assignment_id IS NULL AND (wiki_pages.id IN (?) OR wiki_pages.context_type = 'Group')", visible_wiki_pages)
-        .or(where("wiki_pages.assignment_id IS NOT NULL AND EXISTS (SELECT 1 FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?)", user_id))
+        .or(where("wiki_pages.assignment_id IS NOT NULL AND wiki_pages.assignment_id IN (?)", visible_assignments))
     else
       where("wiki_pages.assignment_id IS NULL OR EXISTS (SELECT 1 FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?)", user_id)
     end
@@ -646,9 +649,22 @@ class WikiPage < ActiveRecord::Base
   end
 
   def self.visible_ids_by_user(opts)
-    assignment_page_visibilities = joins_assignment_student_visibilities(opts[:user_id], opts[:course_id])
-                                   .pluck("wiki_pages.id", "assignment_student_visibilities.user_id")
-                                   .group_by { |_, user_id| user_id }
+    assignment_page_visibilities = if Account.site_admin.feature_enabled?(:differentiated_modules)
+                                     visible_assignments = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students_in_courses(user_ids: opts[:user_id], course_ids: opts[:course_id])
+                                     # map the visibilities to a hash of assignment_id => [user_ids]
+                                     assignment_user_map = visible_assignments.each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |visibility, hash|
+                                       hash[visibility.assignment_id] << visibility.user_id
+                                     end
+                                     # this mimicks the format of the non-flagged group_by to pair each user_id to the correct visible wiki page for wiki pages with assignments
+                                     where(assignment_id: assignment_user_map.keys)
+                                       .pluck(:id, :assignment_id)
+                                       .flat_map { |wiki_page_id, assignment_id| assignment_user_map[assignment_id].map { |user_id| [wiki_page_id, user_id] } }
+                                       .group_by { |_, user_id| user_id }
+                                   else
+                                     joins_assignment_student_visibilities(opts[:user_id], opts[:course_id])
+                                       .pluck("wiki_pages.id", "assignment_student_visibilities.user_id")
+                                       .group_by { |_, user_id| user_id }
+                                   end
     no_assignment_page_visibilities = without_assignment_in_course(opts[:course_id])
     no_assignment_page_visibilities = if Account.site_admin.feature_enabled?(:differentiated_modules)
                                         visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students_in_courses(course_ids: opts[:course_id], user_ids: opts[:user_id])
