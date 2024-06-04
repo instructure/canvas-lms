@@ -22,4 +22,3 @@ import tzInTest from '@canvas/datetime/specHelpers'
 tz.snapshot = () => {}
 tz.restore = tzInTest.restore
 tz.changeZone = tzInTest.changeZone
-tz.changeLocale = tzInTest.changeLocale
