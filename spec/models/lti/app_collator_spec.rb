@@ -86,7 +86,8 @@ module Lti
         expect(definition).to eq(example_definition(external_tool,
                                                     lti_version: "1.1",
                                                     deployment_id: external_tool.deployment_id,
-                                                    editor_button_settings: external_tool.editor_button))
+                                                    editor_button_settings: external_tool.editor_button,
+                                                    top_navigation_settings: external_tool.top_navigation))
       end
 
       it "returns an external tool app definition as 1.3 tool" do
@@ -101,7 +102,8 @@ module Lti
         expect(definition).to eq(example_definition(external_tool,
                                                     lti_version: "1.3",
                                                     deployment_id: external_tool.deployment_id,
-                                                    editor_button_settings: external_tool.editor_button))
+                                                    editor_button_settings: external_tool.editor_button,
+                                                    top_navigation_settings: external_tool.top_navigation))
       end
 
       it "returns definition with rce_favorite when editor_button placement is present" do
@@ -117,7 +119,29 @@ module Lti
                                                     lti_version: "1.1",
                                                     deployment_id: external_tool.deployment_id,
                                                     editor_button_settings: external_tool.editor_button,
+                                                    top_navigation_settings: external_tool.top_navigation,
                                                     is_rce_favorite: false))
+      end
+
+      it "returns definition with top_nav_favorite when top_navigation placement is present" do
+        external_tool = new_valid_external_tool(account)
+        external_tool.use_1_3 = true
+        external_tool.save!
+        external_tool.context_external_tool_placements.create(placement_type: :top_navigation)
+        tools_collection = subject.bookmarked_collection.paginate(per_page: 100).to_a
+
+        definitions = subject.app_definitions(tools_collection)
+        expect(definitions.count).to eq 1
+        expect(definitions.first).to eq(
+          example_definition(
+            external_tool,
+            lti_version: "1.3",
+            deployment_id: external_tool.deployment_id,
+            editor_button_settings: nil,
+            top_navigation_settings: nil,
+            is_top_nav_favorite: false
+          )
+        )
       end
 
       it "returns an external tool and a tool proxy" do

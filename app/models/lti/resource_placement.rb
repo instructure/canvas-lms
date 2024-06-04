@@ -52,9 +52,6 @@ module Lti
     # These placements require tools to be on an allow list
     RESTRICTED_PLACEMENTS = %i[submission_type_selection top_navigation].freeze
 
-    # These placements can be marked as pinned, which will influence their visibility in the UI
-    PINNABLE_PLACEMENTS = %i[top_navigation].freeze
-
     PLACEMENTS_BY_MESSAGE_TYPE = {
       LtiAdvantage::Messages::ResourceLinkRequest::MESSAGE_TYPE => %i[
         account_navigation

@@ -3629,6 +3629,65 @@ describe ContextExternalTool do
     end
   end
 
+  context "top_navigation placement" do
+    def tool_in_context(context, with_placement: true)
+      tool = ContextExternalTool.create!(
+        context:,
+        consumer_key: "key",
+        shared_secret: "secret",
+        name: "test tool",
+        url: "http://www.tool.com/launch"
+      )
+      tool.context_external_tool_placements.create(placement_type: :top_navigation) if with_placement
+      tool
+    end
+
+    it "can be a top nav favorite if it has a top_navigation placement" do
+      tool = tool_in_context(@root_account)
+      expect(tool.can_be_top_nav_favorite?).to be true
+    end
+
+    it "cannot be a top nav favorite if no top_navigation placement" do
+      tool = tool_in_context(@root_account, with_placement: false)
+      expect(tool.can_be_rce_favorite?).to be false
+    end
+
+    it "does not set tools as a top nav favorite for any context by default" do
+      sub_account = @root_account.sub_accounts.create!
+      tool = tool_in_context(@root_account)
+      expect(tool.top_nav_favorite_in_context?(@root_account)).to be false
+      expect(tool.top_nav_favorite_in_context?(sub_account)).to be false
+    end
+
+    it "inherits from root account configuration if not set on sub-account" do
+      sub_account = @root_account.sub_accounts.create!
+      tool = tool_in_context(@root_account)
+      @root_account.settings[:top_nav_favorite_tool_ids] = { value: [tool.global_id] }
+      @root_account.save!
+      expect(tool.top_nav_favorite_in_context?(@root_account)).to be true
+      expect(tool.top_nav_favorite_in_context?(sub_account)).to be true
+    end
+
+    it "overrides with sub-account configuration if specified" do
+      sub_account = @root_account.sub_accounts.create!
+      tool = tool_in_context(@root_account)
+      @root_account.settings[:top_nav_favorite_tool_ids] = { value: [tool.global_id] }
+      @root_account.save!
+      sub_account.settings[:top_nav_favorite_tool_ids] = { value: [] }
+      sub_account.save!
+      expect(tool.top_nav_favorite_in_context?(@root_account)).to be true
+      expect(tool.top_nav_favorite_in_context?(sub_account)).to be false
+    end
+
+    it "can set sub-account tools as favorites" do
+      sub_account = @root_account.sub_accounts.create!
+      tool = tool_in_context(sub_account)
+      sub_account.settings[:top_nav_favorite_tool_ids] = { value: [tool.global_id] }
+      sub_account.save!
+      expect(tool.top_nav_favorite_in_context?(sub_account)).to be true
+    end
+  end
+
   describe "upgrading from 1.1 to 1.3" do
     let(:domain) { "special.url" }
     let(:url) { "https://special.url" }
@@ -4130,58 +4189,6 @@ describe ContextExternalTool do
 
     it "return true for all other placements" do
       expect(tool.placement_allowed?(:collaboration)).to be true
-    end
-  end
-
-  describe "#placement_pinned?" do
-    let(:tool) { external_tool_1_3_model }
-
-    context "when the placement is not pinnable" do
-      let(:placement) { :global_navigation }
-
-      before do
-        Setting.set("#{placement}_pinned_dev_keys", Shard.global_id_for(tool.developer_key.id).to_s)
-        Setting.set("#{placement}_pinned_launch_domains", tool.domain)
-      end
-
-      it "is false" do
-        expect(tool.placement_pinned?(placement)).to be false
-      end
-    end
-
-    %i[top_navigation].each do |pinnable_placement|
-      context "when the placement is pinnable #{pinnable_placement}" do
-        let(:placement) { pinnable_placement }
-
-        before do
-          Setting.set("#{placement}_pinned_dev_keys", "")
-          Setting.set("#{placement}_pinned_launch_domains", "")
-        end
-
-        it "is false by default" do
-          expect(tool.placement_pinned?(placement)).to be false
-        end
-
-        context "when dev key is in pinned list" do
-          before do
-            Setting.set("#{placement}_pinned_dev_keys", Shard.global_id_for(tool.developer_key.id).to_s)
-          end
-
-          it "is true" do
-            expect(tool.placement_pinned?(placement)).to be true
-          end
-        end
-
-        context "when domain is in pinned list" do
-          before do
-            Setting.set("#{placement}_pinned_launch_domains", tool.domain)
-          end
-
-          it "is true" do
-            expect(tool.placement_pinned?(placement)).to be true
-          end
-        end
-      end
     end
   end
 end

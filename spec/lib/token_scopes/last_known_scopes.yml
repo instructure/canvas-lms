@@ -2225,3 +2225,7 @@
   path: /api/v1/accounts/:account_id/learn_platform/products/:id
 - verb: GET
   path: /api/v1/accounts/:account_id/learn_platform/products/filters
+- verb: DELETE
+  path: "/api/v1/accounts/:account_id/external_tools/top_nav_favorites/:id"
+- verb: POST
+  path: "/api/v1/accounts/:account_id/external_tools/top_nav_favorites/:id"
