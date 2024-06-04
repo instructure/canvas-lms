@@ -21,12 +21,14 @@ import {ZAccountId} from '../../model/AccountId'
 import {DynamicRegistrationWizard} from '../DynamicRegistrationWizard'
 import type {DynamicRegistrationWizardService} from '../DynamicRegistrationWizardService'
 import {success} from '../../../common/lib/apiResult/ApiResult'
+import userEvent from '@testing-library/user-event'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {LtiScopes, i18nLtiScope} from '../../model/LtiScope'
+import type {LtiConfiguration} from '../../model/lti_tool_configuration/LtiConfiguration'
 import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
 import {ZLtiImsRegistrationId} from '../../model/lti_ims_registration/LtiImsRegistrationId'
 import {ZDeveloperKeyId} from '../../model/developer_key/DeveloperKeyId'
-import type {LtiConfiguration} from '../../model/lti_tool_configuration/LtiConfiguration'
-import userEvent from '@testing-library/user-event'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {htmlEscape} from '@instructure/html-escape'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 
@@ -75,7 +77,7 @@ const mockRegistration = (
   jwks_uri: '',
   token_endpoint_auth_method: '',
   contacts: [],
-  scopes: [],
+  scopes: [...Object.values(LtiScopes)],
   created_at: '',
   updated_at: '',
   guid: '',
@@ -186,30 +188,30 @@ describe('DynamicRegistrationWizard', () => {
       expect(screen.getByText(/Loading Registration/i)).toBeInTheDocument()
     })
 
-    await waitFor(() => screen.findByText(/Permission Confirmation/i))
+    await waitFor(() => screen.findByText(/Permissions/i))
 
     expect(getRegistrationByUUID).toHaveBeenCalledWith('123', 'uuid_value')
   })
 
   describe('PermissionConfirmation', () => {
-    it('tries to delete the associated dev key when Cancel is clicked', async () => {
-      const accountId = ZAccountId.parse('123')
-      const fetchRegistrationToken = jest.fn().mockResolvedValue(
-        success({
-          token: 'reg_token_value',
-          oidc_configuration_url: 'oidc_config_url_value',
-          uuid: 'uuid_value',
-        })
-      )
-      const reg = mockRegistration()
-      const getRegistrationByUUID = jest.fn().mockResolvedValue(success(reg))
-      const deleteDeveloperKey = jest.fn().mockResolvedValue(success(reg))
-      const service = mockService({
-        fetchRegistrationToken,
-        getRegistrationByUUID,
-        deleteDeveloperKey,
+    const accountId = ZAccountId.parse('123')
+    const fetchRegistrationToken = jest.fn().mockResolvedValue(
+      success({
+        token: 'reg_token_value',
+        oidc_configuration_url: 'oidc_config_url_value',
+        uuid: 'uuid_value',
       })
+    )
+    let reg = mockRegistration()
+    const getRegistrationByUUID = jest.fn().mockImplementation(async () => success(reg))
+    const deleteDeveloperKey = jest.fn().mockImplementation(async () => success(reg))
+    const service = mockService({
+      fetchRegistrationToken,
+      getRegistrationByUUID,
+      deleteDeveloperKey,
+    })
 
+    const setup = async () => {
       render(
         <DynamicRegistrationWizard
           service={service}
@@ -230,9 +232,40 @@ describe('DynamicRegistrationWizard', () => {
           origin: 'https://example.com',
         })
       )
+      await screen.findByText(/Permissions/i)
+    }
 
-      await screen.findByText(/Permission Confirmation/i)
+    it('renders the requested permissions', async () => {
+      await setup()
+      expect(reg.scopes.length).toBeGreaterThan(0)
+      for (const scope of reg.scopes) {
+        expect(screen.getByText(i18nLtiScope(scope))).toBeInTheDocument()
+      }
+    })
 
+    it("doesn't allow for xss", async () => {
+      const xss = '<script>alert("xss")</script>'
+      reg = mockRegistration({client_name: xss})
+      await setup()
+      expect(screen.getByText(htmlEscape(xss))).toBeInTheDocument()
+    })
+
+    it("renders the tool's name in bold", async () => {
+      reg = mockRegistration({client_name: 'Tool Name'})
+      await setup()
+      expect(screen.getByText(reg.client_name).closest('strong')).toBeInTheDocument()
+    })
+
+    it('lets the user disable scopes', async () => {
+      await setup()
+      const checkbox = screen.getByTestId(reg.scopes[0])
+      expect(checkbox).toBeChecked()
+      await userEvent.click(checkbox)
+      expect(checkbox).not.toBeChecked()
+    })
+
+    it('tries to delete the associated dev key when Cancel is clicked', async () => {
+      await setup()
       await userEvent.click(screen.getByText(/Cancel/i).closest('button')!)
 
       await waitFor(() => {
