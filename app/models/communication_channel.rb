@@ -104,102 +104,6 @@ class CommunicationChannel < ActiveRecord::Base
     user.clear_email_cache! if path_type == TYPE_EMAIL
   end
 
-  def self.country_codes
-    # [country code, name, true if email should be used instead of Twilio]
-    [
-      ["93",   I18n.t("Afghanistan (+93)"),            false],
-      ["54",   I18n.t("Argentina (+54)"),              false],
-      ["61",   I18n.t("Australia (+61)"),              false],
-      ["43",   I18n.t("Austria (+43)"),                false],
-      ["32",   I18n.t("Belgium (+32)"),                false],
-      ["591",  I18n.t("Bolivia (+591)"),               false],
-      ["55",   I18n.t("Brazil (+55)"),                 false],
-      ["1",    I18n.t("Canada (+1)"),                  false],
-      ["56",   I18n.t("Chile (+56)"),                  false],
-      ["86",   I18n.t("China (+86)"),                  false],
-      ["57",   I18n.t("Colombia (+57)"),               false],
-      ["506",  I18n.t("Costa Rica (+506)"),            false],
-      ["45",   I18n.t("Denmark (+45)"),                false],
-      ["1",    I18n.t("Dominican Republic (+1)"),      false],
-      # ['593',  I18n.t('Ecuador (+593)'),               false],
-      ["503",  I18n.t("El Salvador (+503)"),           false],
-      ["358",  I18n.t("Finland (+358)"),               false],
-      ["33",   I18n.t("France (+33)"),                 false],
-      ["49",   I18n.t("Germany (+49)"),                false],
-      ["502",  I18n.t("Guatemala (+502)"),             false],
-      ["504",  I18n.t("Honduras (+504)"),              false],
-      ["852",  I18n.t("Hong Kong (+852)"),             false],
-      ["36",   I18n.t("Hungary (+36)"),                false],
-      ["354",  I18n.t("Iceland (+354)"),               false],
-      ["91",   I18n.t("India (+91)"),                  false],
-      ["62",   I18n.t("Indonesia (+62)"),              false],
-      ["353",  I18n.t("Ireland (+353)"),               false],
-      ["972",  I18n.t("Israel (+972)"),                false],
-      ["39",   I18n.t("Italy (+39)"),                  false],
-      ["81",   I18n.t("Japan (+81)"),                  false],
-      ["7",    I18n.t("Kazakhstan (+7)"),              false],
-      ["254",  I18n.t("Kenya (+254)"),                 false],
-      ["352",  I18n.t("Luxembourg (+352)"),            false],
-      ["60",   I18n.t("Malaysia (+60)"),               false],
-      ["52",   I18n.t("Mexico (+52)"),                 false],
-      ["31",   I18n.t("Netherlands (+31)"),            false],
-      ["64",   I18n.t("New Zealand (+64)"),            false],
-      ["47",   I18n.t("Norway (+47)"),                 false],
-      ["968",  I18n.t("Oman (+968)"),                  false],
-      ["507",  I18n.t("Panama (+507)"),                false],
-      ["92",   I18n.t("Pakistan (+92)"),               false],
-      ["595",  I18n.t("Paraguay (+595)"),              false],
-      # ['51',   I18n.t('Peru (+51)'),                   false],
-      ["63",   I18n.t("Philippines (+63)"),            false],
-      ["48",   I18n.t("Poland (+48)"),                 false],
-      ["974",  I18n.t("Qatar (+974)"),                 false],
-      ["7",    I18n.t("Russia (+7)"),                  false],
-      ["250",  I18n.t("Rwanda (+250)"),                false],
-      ["966",  I18n.t("Saudi Arabia (+966)"),          false],
-      ["65",   I18n.t("Singapore (+65)"),              false],
-      ["27",   I18n.t("South Africa (+27)"),           false],
-      ["82",   I18n.t("South Korea (+82)"),            false],
-      ["34",   I18n.t("Spain (+34)"),                  false],
-      ["46",   I18n.t("Sweden (+46)"),                 false],
-      ["41",   I18n.t("Switzerland (+41)"),            false],
-      ["886",  I18n.t("Taiwan (+886)"),                false],
-      ["66",   I18n.t("Thailand (+66)"),               false],
-      ["1",    I18n.t("Trinidad and Tobago (+1)"),     false],
-      ["971",  I18n.t("United Arab Emirates (+971)"),  false],
-      ["44",   I18n.t("United Kingdom (+44)"),         false],
-      ["1",    I18n.t("United States (+1)"),           true],
-      ["598",  I18n.t("Uruguay (+598)"),               false],
-      ["58",   I18n.t("Venezuela (+58)"),              false],
-      ["84",   I18n.t("Vietnam (+84)"),                false]
-    ].sort_by { |a| Canvas::ICU.collation_key(a[1]) }
-  end
-
-  DEFAULT_SMS_CARRIERS = {
-    "txt.att.net" => { name: "AT&T", country_code: 1 }.with_indifferent_access.freeze,
-    "message.alltel.com" => { name: "Alltel", country_code: 1 }.with_indifferent_access.freeze,
-    "myboostmobile.com" => { name: "Boost", country_code: 1 }.with_indifferent_access.freeze,
-    "cspire1.com" => { name: "C Spire", country_code: 1 }.with_indifferent_access.freeze,
-    "cingularme.com" => { name: "Cingular", country_code: 1 }.with_indifferent_access.freeze,
-    "mobile.celloneusa.com" => { name: "CellularOne", country_code: 1 }.with_indifferent_access.freeze,
-    "mms.cricketwireless.net" => { name: "Cricket", country_code: 1 }.with_indifferent_access.freeze,
-    "messaging.nextel.com" => { name: "Nextel", country_code: 1 }.with_indifferent_access.freeze,
-    "messaging.sprintpcs.com" => { name: "Sprint PCS", country_code: 1 }.with_indifferent_access.freeze,
-    "tmomail.net" => { name: "T-Mobile", country_code: 1 }.with_indifferent_access.freeze,
-    "vtext.com" => { name: "Verizon", country_code: 1 }.with_indifferent_access.freeze,
-    "vmobl.com" => { name: "Virgin Mobile", country_code: 1 }.with_indifferent_access.freeze,
-  }.freeze
-
-  def self.sms_carriers
-    @sms_carriers ||= ConfigFile.load("sms", false) || DEFAULT_SMS_CARRIERS
-  end
-
-  def self.sms_carriers_by_name
-    carriers = sms_carriers.map do |domain, carrier|
-      [carrier["name"], domain]
-    end
-    Canvas::ICU.collate_by(carriers, &:first)
-  end
-
   set_policy do
     given { |user| self.user.grants_right?(user, :manage_user_details) }
     can :force_confirm
@@ -382,14 +286,12 @@ class CommunicationChannel < ActiveRecord::Base
   def otp_impaired?
     return false unless path_type == TYPE_SMS
 
-    # strip off the leading +
-    raw_number = e164_path[1...]
-    # Imperfect
-    country = CommunicationChannel.country_codes.find do |code, _, _|
-      raw_number.start_with?(code)
-    end || ["unknown"]
+    return false unless e164_path
 
-    Setting.get("otp_impaired_country_codes", "").split(",").include?(country.first)
+    # remove leading + if present
+    raw_number = e164_path.sub(/^\+/, "")
+    # return true if the number is not us-based
+    !raw_number.start_with?(Login::OtpHelper::DEFAULT_US_COUNTRY_CODE)
   end
 
   def send_otp!(code, account = nil)
@@ -674,11 +576,17 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def e164_path
+    # return if already in e.164 format
     return path if /^\+\d+$/.match?(path)
-    return nil unless (match = path.match(/^(?<number>\d+)@(?<domain>.+)$/))
-    return nil unless (carrier = CommunicationChannel.sms_carriers[match[:domain]])
 
-    "+#{carrier["country_code"]}#{match[:number]}"
+    is_plain_number = /^\d+$/.match?(path)
+    domain_match = path.match(/^(?<number>\d+)@(?<domain>.+)$/)
+    number = domain_match ? domain_match[:number] : (path if is_plain_number)
+
+    # return number in e.164 format with default US country code if number is present
+    return "+#{Login::OtpHelper::DEFAULT_US_COUNTRY_CODE}#{number}" if number
+
+    nil
   end
 
   def after_save_flag_old_microsoft_sync_user_mappings
