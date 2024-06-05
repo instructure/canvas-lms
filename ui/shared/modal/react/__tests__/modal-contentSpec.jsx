@@ -21,16 +21,24 @@ import 'jquery-migrate'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import FileNotFound from 'ui/features/file_not_found/react/FileNotFound'
+import ModalContent from '../content'
 
-QUnit.module('FileNotFoundSpec', {
-  setup() {
-    this.element = <FileNotFound contextCode="fakeContextCode" />
-  },
+QUnit.module('ModalContent')
+
+test('applies className to parent node', () => {
+  const ModalContentElement = <ModalContent className="cat" />
+  const component = TestUtils.renderIntoDocument(ModalContentElement)
+  ok($(ReactDOM.findDOMNode(component)).hasClass('cat'), 'applies class name')
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
-test('it renders', function () {
-  const rendered = TestUtils.renderIntoDocument(this.element)
-  ok(rendered, 'the component rendered')
-  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(rendered).parentNode)
+test('renders children components', () => {
+  const mC = (
+    <ModalContent>
+      <div className="my_fun_div" />
+    </ModalContent>
+  )
+  const component = TestUtils.renderIntoDocument(mC)
+  ok($(ReactDOM.findDOMNode(component)).find('.my_fun_div'), 'inserts child component elements')
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })

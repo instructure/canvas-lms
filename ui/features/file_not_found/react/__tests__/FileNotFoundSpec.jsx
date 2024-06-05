@@ -16,13 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import accessibleDateFormat from '@canvas/datetime/accessibleDateFormat'
+import $ from 'jquery'
+import 'jquery-migrate'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import TestUtils from 'react-dom/test-utils'
+import FileNotFound from '../FileNotFound'
 
-QUnit.module('accessibleDateFormat', {
-  setup() {},
+QUnit.module('FileNotFoundSpec', {
+  setup() {
+    this.element = <FileNotFound contextCode="fakeContextCode" />
+  },
 })
 
-test('it pulls out the links from an Axios response header', () => {
-  ok(accessibleDateFormat().match(/YYYY/))
-  ok(accessibleDateFormat().match(/hh:mm/))
+test('it renders', function () {
+  const rendered = TestUtils.renderIntoDocument(this.element)
+  ok(rendered, 'the component rendered')
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(rendered).parentNode)
 })

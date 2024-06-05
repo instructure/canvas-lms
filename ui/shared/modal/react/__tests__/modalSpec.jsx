@@ -22,8 +22,8 @@ import Modal from '@canvas/modal'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import ModalContent from '@canvas/modal/react/content'
-import ModalButtons from '@canvas/modal/react/buttons'
+import ModalContent from '../content'
+import ModalButtons from '../buttons'
 
 QUnit.module('Modal', {
   setup() {
