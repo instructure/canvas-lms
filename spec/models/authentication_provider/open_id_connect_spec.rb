@@ -61,12 +61,19 @@ describe AuthenticationProvider::OpenIDConnect do
       expect(uid).to be_nil
     end
 
-    it "validates the audience claim" do
-      subject.client_id = "abc"
-      payload = { sub: "some-login-attribute", aud: "someone_else" }
+    it "validates the audience claim for subclasses" do
+      subject = AuthenticationProvider::Microsoft.new(client_id: "abc", tenant: "microsoft", account: Account.default)
+      payload = { sub: "some-login-attribute", aud: "someone_else", tid: AuthenticationProvider::Microsoft::MICROSOFT_TENANT }
       id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
       expect { subject.unique_id(double(params: { "id_token" => id_token }, options: {})) }.to raise_error(OAuthValidationError)
       subject.client_id = "someone_else"
+      expect { subject.unique_id(double(params: { "id_token" => id_token }, options: {})) }.not_to raise_error
+    end
+
+    it "does not validate the audience claim for self" do
+      subject.client_id = "abc"
+      payload = { sub: "some-login-attribute", aud: "someone_else" }
+      id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
       expect { subject.unique_id(double(params: { "id_token" => id_token }, options: {})) }.not_to raise_error
     end
   end
