@@ -847,36 +847,49 @@ describe CommunicationChannel do
   end
 
   describe "#otp_impaired?" do
-    let(:us_cc) do
-      communication_channel(user_model, { username: "8015555555@txt.att.net", path_type: CommunicationChannel::TYPE_SMS })
-    end
-    let(:eu_cc) do
-      communication_channel(user_model, { username: "+353872337277", path_type: CommunicationChannel::TYPE_SMS })
-    end
+    let(:us_cc) { communication_channel(user_model, { username: "8015555555@txt.att.net", path_type: CommunicationChannel::TYPE_SMS }) }
+    let(:eu_cc) { communication_channel(user_model, { username: "+353872337277", path_type: CommunicationChannel::TYPE_SMS }) }
+    let(:new_us_format) { communication_channel(user_model, { username: "8015555555", path_type: CommunicationChannel::TYPE_SMS }) }
+    let(:malformed_number) { communication_channel(user_model, { username: "8015555abc", path_type: CommunicationChannel::TYPE_SMS }) }
 
-    context "no impaired channels" do
-      it "returns false for US channels" do
-        expect(us_cc.otp_impaired?).to be false
-      end
-
-      it "returns false for EU channels" do
-        expect(eu_cc.otp_impaired?).to be false
-      end
+    it "returns false for US channels with old format" do
+      expect(us_cc.otp_impaired?).to be false
     end
 
-    context "only US impaired channels" do
-      before do
-        allow(Setting).to receive(:get).and_call_original
-        allow(Setting).to receive(:get).with("otp_impaired_country_codes", "").and_return("1")
-      end
+    it "returns true for EU channels" do
+      expect(eu_cc.otp_impaired?).to be true
+    end
 
-      it "returns true for US channels" do
-        expect(us_cc.otp_impaired?).to be true
-      end
+    it "returns false for US channels with new format" do
+      expect(new_us_format.otp_impaired?).to be false
+    end
 
-      it "returns false for EU channels" do
-        expect(eu_cc.otp_impaired?).to be false
-      end
+    it "returns false for malformed numbers" do
+      expect(malformed_number.otp_impaired?).to be false
+    end
+  end
+
+  describe "#e164_path" do
+    let(:sms_user) { user_model }
+
+    it "returns the number in E.164 format if already formatted" do
+      cc = communication_channel(sms_user, username: "+18015555555", path_type: CommunicationChannel::TYPE_SMS)
+      expect(cc.e164_path).to eq "+18015555555"
+    end
+
+    it "formats a US number with a domain to E.164" do
+      cc = communication_channel(sms_user, username: "8015555555@txt.att.net", path_type: CommunicationChannel::TYPE_SMS)
+      expect(cc.e164_path).to eq "+18015555555"
+    end
+
+    it "prepends the default US country code to a plain number" do
+      cc = communication_channel(sms_user, username: "8015555555", path_type: CommunicationChannel::TYPE_SMS)
+      expect(cc.e164_path).to eq "+18015555555"
+    end
+
+    it "returns nil for malformed numbers" do
+      cc = communication_channel(sms_user, username: "8015555abc", path_type: CommunicationChannel::TYPE_SMS)
+      expect(cc.e164_path).to be_nil
     end
   end
 
