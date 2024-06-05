@@ -22,7 +22,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import _ from 'lodash'
-import DashboardCardAction from '@canvas/dashboard-card/react/DashboardCardAction'
+import DashboardCardAction from '../DashboardCardAction'
 
 QUnit.module('DashboardCardAction', {
   setup() {
