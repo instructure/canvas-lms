@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'ui/features/discussion_topics_index/react/actions'
-import reducer from 'ui/features/discussion_topics_index/react/rootReducer'
+import actions from '../actions'
+import reducer from '../rootReducer'
 
 QUnit.module('Discussions reducer')
 

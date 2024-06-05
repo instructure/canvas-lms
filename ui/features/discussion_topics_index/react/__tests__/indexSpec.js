@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import createAnnIndex from 'ui/features/discussion_topics_index/react/index'
+import createAnnIndex from '../index'
 
 let app = null
 const container = document.getElementById('fixtures')
