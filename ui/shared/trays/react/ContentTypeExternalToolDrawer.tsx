@@ -126,12 +126,14 @@ export default function ContentTypeExternalToolDrawer({
               <CloseButton size="small" onClick={onDismiss} screenReaderLabel="Close" />
             </Flex.Item>
           </Flex>
-          <ToolLaunchIframe
-            data-testid="ltiIframe"
-            ref={iframeRef}
-            src={iframeUrl}
-            title={toolTitle}
-          />
+          {tool && (
+            <ToolLaunchIframe
+              data-testid="ltiIframe"
+              ref={iframeRef}
+              src={iframeUrl}
+              title={toolTitle}
+            />
+          )}
         </DrawerLayout.Tray>
       </DrawerLayout>
     </View>
