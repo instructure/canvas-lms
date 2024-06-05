@@ -18,3 +18,4 @@
 
 export const CURRENT_USER = 'current_user'
 export const DEFAULT_AVATAR_URL = 'http://canvas.instructure.com/images/messages/avatar-50.png'
+export const DEFAULT_SEARCH_DELAY = 750

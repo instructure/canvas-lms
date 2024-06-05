@@ -19,26 +19,20 @@
 import {bindActionCreators} from 'redux'
 import {bool, func, number, string} from 'prop-types'
 import {connect} from 'react-redux'
-import {debounce} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {FormField} from '@instructure/ui-form-field'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Menu} from '@instructure/ui-menu'
 import {
-  IconArrowOpenDownLine,
-  IconArrowOpenUpLine,
   IconLockLine,
   IconPlusLine,
-  IconSearchLine,
   IconTrashLine,
   IconUnlockLine,
   IconInvitationLine,
 } from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {TextInput} from '@instructure/ui-text-input'
 
 import actions from '../actions'
 import ExternalFeedsTray from './ExternalFeedsTray'
@@ -46,8 +40,9 @@ import propTypes from '../propTypes'
 import select from '@canvas/obj-select'
 import {showConfirmDelete} from './ConfirmDeleteModal'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {Heading} from '@instructure/ui-heading'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {HeadingMenu} from '@canvas/discussions/react/components/HeadingMenu'
+import {SearchField} from '@canvas/discussions/react/components/SearchField'
 
 const I18n = useI18nScope('announcements_v2')
 
@@ -55,7 +50,7 @@ const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 
 // Delay the search so as not to overzealously read out the number
 // of search results to the user
-export const SEARCH_TIME_DELAY = 750
+
 const getFilters = () => ({
   all: instUINavEnabled() ? I18n.t('All Announcements') : I18n.t('All'),
   unread: instUINavEnabled() ? I18n.t('Unread Announcements') : I18n.t('Unread'),
@@ -87,27 +82,6 @@ export default class IndexHeader extends Component {
     breakpoints: {},
   }
 
-  onSearch = debounce(
-    () => {
-      const term = this.searchInput.value
-      this.props.searchAnnouncements({term})
-    },
-    SEARCH_TIME_DELAY,
-    {
-      leading: false,
-      trailing: true,
-    }
-  )
-
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      selectedAnnouncementFilter: 'all',
-      announcementFilterOpened: false,
-    }
-  }
-
   onDelete = () => {
     showConfirmDelete({
       modalRef: modal => {
@@ -126,9 +100,12 @@ export default class IndexHeader extends Component {
     })
   }
 
-  searchInputRef = input => {
-    this.searchInput = input
-    if (this.props.searchInputRef) this.props.searchInputRef(input)
+  onFilterChange = data => {
+    this.props.searchAnnouncements({filter: data.value})
+  }
+
+  onSearchChange = data => {
+    this.props.searchAnnouncements({term: data.searchTerm})
   }
 
   renderLockToggleButton(icon, label, screenReaderLabel, responsiveStyles) {
@@ -210,24 +187,10 @@ export default class IndexHeader extends Component {
     )
   }
 
-  renderSearchField() {
-    return (
-      <TextInput
-        renderLabel={
-          <ScreenReaderContent>{I18n.t('Search announcements by title')}</ScreenReaderContent>
-        }
-        placeholder={I18n.t('Search...')}
-        renderBeforeInput={<IconSearchLine />}
-        ref={this.searchInputRef}
-        onChange={this.onSearch}
-        name="announcements_search"
-      />
-    )
-  }
-
   renderOldHeader(breakpoints) {
     const ddSize = breakpoints.desktopOnly ? '100px' : '100%'
     const containerSize = breakpoints.tablet ? 'auto' : '100%'
+    const {searchInputRef} = this.props
 
     return (
       <View>
@@ -255,7 +218,11 @@ export default class IndexHeader extends Component {
               </FormField>
             </Flex.Item>
             <Flex.Item size={containerSize} shouldGrow={true} shouldShrink={true}>
-              {this.renderSearchField()}
+              <SearchField
+                name="announcements_search"
+                searchInputRef={searchInputRef}
+                onSearchEvent={this.onSearchChange}
+              />
             </Flex.Item>
             <Flex.Item>
               <Flex wrap="wrap" gap="small">
@@ -275,50 +242,8 @@ export default class IndexHeader extends Component {
     )
   }
 
-  renderMenu() {
-    return (
-      <Menu
-        trigger={
-          <IconButton
-            size="small"
-            withBackground={false}
-            withBorder={false}
-            renderIcon={
-              this.state.announcementFilterOpened ? (
-                <IconArrowOpenUpLine />
-              ) : (
-                <IconArrowOpenDownLine />
-              )
-            }
-            screenReaderLabel={I18n.t('Announcement Filter')}
-          />
-        }
-        onToggle={() =>
-          this.setState({
-            announcementFilterOpened: !this.state.announcementFilterOpened,
-          })
-        }
-      >
-        <Menu.Group
-          selected={[this.state.selectedAnnouncementFilter]}
-          onSelect={(_, selected) => {
-            this.setState({selectedAnnouncementFilter: selected[0]})
-            this.props.searchAnnouncements({filter: selected[0]})
-          }}
-          label={I18n.t('View')}
-        >
-          {Object.keys(getFilters()).map(filter => (
-            <Menu.Item key={filter} value={filter}>
-              {getFilters()[filter]}
-            </Menu.Item>
-          ))}
-        </Menu.Group>
-      </Menu>
-    )
-  }
-
   render() {
-    const {breakpoints} = this.props
+    const {breakpoints, searchInputRef} = this.props
 
     if (!instUINavEnabled()) {
       return this.renderOldHeader(breakpoints)
@@ -340,15 +265,13 @@ export default class IndexHeader extends Component {
       <Flex direction="column" as="div" gap="medium">
         <Flex.Item overflow="hidden">
           <Flex as="div" direction="row" justifyItems="space-between" wrap="wrap" gap="small">
-            <Flex.Item width={flexBasis} shouldGrow={true} shouldShrink={false}>
-              <Flex as="div" direction="row" justifyItems="start" alignItems="center" width="98%">
-                <Flex.Item margin="0 x-small 0 0" shouldShrink={headerShrink}>
-                  <Heading level="h1">
-                    {getFilters()[this.state.selectedAnnouncementFilter]}
-                  </Heading>
-                </Flex.Item>
-                <Flex.Item>{this.renderMenu()}</Flex.Item>
-              </Flex>
+            <Flex.Item width={flexBasis} shouldGrow={true} shouldShrink={headerShrink}>
+              <HeadingMenu
+                name={I18n.t('Announcement Filter')}
+                filters={getFilters()}
+                defaultSelectedFilter="all"
+                onSelectFilter={this.onFilterChange}
+              />
             </Flex.Item>
             <Flex.Item width={flexBasis} overflowX="hidden" overflowY="hidden">
               <Flex direction={flexDirection} wrap="wrap" gap="small">
@@ -359,7 +282,11 @@ export default class IndexHeader extends Component {
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        {this.renderSearchField()}
+        <SearchField
+          name="announcements_search"
+          searchInputRef={searchInputRef}
+          onSearchEvent={this.onSearchChange}
+        />
         <Flex.Item margin="large 0 0 0">
           <ExternalFeedsTray
             atomFeedUrl={this.props.atomFeedUrl}
