@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import CourseList from 'ui/features/epub_exports/react/CourseList'
+import CourseList from '../CourseList'
 
 QUnit.module('CourseListSpec', {
   setup() {

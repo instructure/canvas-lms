@@ -22,8 +22,8 @@ import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import GenerateLink from 'ui/features/epub_exports/react/GenerateLink'
-import CourseEpubExportStore from 'ui/features/epub_exports/react/CourseStore'
+import GenerateLink from '../GenerateLink'
+import CourseEpubExportStore from '../CourseStore'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('epub_exports')
