@@ -374,6 +374,7 @@ describe "Discussion Topic Show" do
         Discussion.click_assign_to_button
         wait_for_assign_to_tray_spinner
         expect(module_item_assign_to_card.last).not_to contain_css(due_date_input_selector)
+        expect(module_item_assign_to_card.last).not_to contain_css(reply_to_topic_due_date_input_selector)
       end
 
       it "shows due date inputs on graded discussion" do

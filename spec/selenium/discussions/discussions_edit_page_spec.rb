@@ -1674,6 +1674,36 @@ describe "discussions" do
             get "/courses/#{course.id}/discussion_topics/#{discussion.id}/edit"
             expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
           end
+
+          context "checkpoints" do
+            it "shows reply to topic input on graded discussion with sub assignments" do
+              Account.site_admin.enable_feature!(:discussion_checkpoints)
+              @course.root_account.enable_feature!(:discussion_checkpoints)
+              assignment = @course.assignments.create!(
+                name: "Assignment",
+                submission_types: ["online_text_entry"],
+                points_possible: 20
+              )
+              assignment.update!(has_sub_assignments: true)
+              assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 10, due_at: 3.days.from_now)
+              assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+              graded_discussion = @course.discussion_topics.create!(
+                title: "Graded Discussion",
+                discussion_type: "threaded",
+                posted_at: "2017-07-09 16:32:34",
+                user: @teacher,
+                assignment:,
+                reply_to_entry_required_count: 1
+              )
+
+              # Open page and assignTo tray
+              get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}/edit"
+              Discussion.assign_to_button.click
+
+              wait_for_assign_to_tray_spinner
+              expect(module_item_assign_to_card.last).to contain_css(reply_to_topic_due_date_input_selector)
+            end
+          end
         end
 
         context "checkpoints" do

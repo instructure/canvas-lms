@@ -61,6 +61,7 @@ const DifferentiatedModulesSection = ({
   onTrayOpen,
   onTrayClose,
   supportDueDates = true,
+  isCheckpointed,
 }) => {
   const [open, setOpen] = useState(false)
   // stagedCards are the itemAssignToCards that will be saved when the assignment is saved
@@ -204,6 +205,7 @@ const DifferentiatedModulesSection = ({
         hasAssignees: uniqueIds.length > 0,
         due_at: dates.due_at,
         unlock_at: dates.unlock_at,
+        reply_to_topic_due_at: dates.reply_to_topic_due_at,
         lock_at: dates.lock_at,
         selectedAssigneeIds: uniqueIds,
         defaultOptions: uniqueIds,
@@ -538,6 +540,7 @@ const DifferentiatedModulesSection = ({
         onDatesChange={handleDatesUpdate}
         onCardRemove={handleCardRemove}
         removeDueDateInput={!supportDueDates}
+        isCheckpointed={isCheckpointed}
       />
     </>
   )
@@ -556,6 +559,7 @@ DifferentiatedModulesSection.propTypes = {
   onTrayOpen: func,
   onTrayClose: func,
   supportDueDates: bool,
+  isCheckpointed: bool,
 }
 
 export default DifferentiatedModulesSection

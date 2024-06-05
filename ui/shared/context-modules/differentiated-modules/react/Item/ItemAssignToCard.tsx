@@ -45,6 +45,7 @@ import {
   generateCardActionLabels,
 } from './utils'
 import {DueDateTimeInput} from './DueDateTimeInput'
+import {ReplyToTopicDueDateTimeInput} from './ReplyToTopicDueDateTimeInput'
 import {AvailableFromDateTimeInput} from './AvailableFromDateTimeInput'
 import {AvailableToDateTimeInput} from './AvailableToDateTimeInput'
 import {Text} from '@instructure/ui-text'
@@ -53,6 +54,7 @@ import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 const I18n = useI18nScope('differentiated_modules')
 
 export interface DateValidatorInputArgs {
+  reply_to_topic_due_at: string | null
   lock_at: string | null
   unlock_at: string | null
   due_at: string | null
@@ -68,6 +70,7 @@ export type ItemAssignToCardProps = {
   cardId: string
   contextModuleId?: string | null
   contextModuleName?: string | null
+  reply_to_topic_due_at: string | null
   due_at: string | null
   original_due_at: string | null
   unlock_at: string | null
@@ -89,6 +92,7 @@ export type ItemAssignToCardProps = {
   customSetSearchTerm?: (term: string) => void
   highlightCard?: boolean
   removeDueDateInput?: boolean
+  isCheckpointed?: boolean
   blueprintDateLocks?: DateLockTypes[]
 }
 
@@ -120,9 +124,13 @@ export default forwardRef(function ItemAssignToCard(
     highlightCard,
     blueprintDateLocks,
     removeDueDateInput,
+    isCheckpointed,
     original_due_at,
   } = props
   const [
+    replyToTopicDueDate,
+    setReplyToTopicDueDate,
+    handleReplyToTopicDueDateChange,
     dueDate,
     setDueDate,
     handleDueDateChange,
@@ -187,6 +195,7 @@ export default forwardRef(function ItemAssignToCard(
 
   useEffect(() => {
     const data: DateValidatorInputArgs = {
+      reply_to_topic_due_at: replyToTopicDueDate,
       due_at: dueDate,
       unlock_at: availableFromDate,
       lock_at: availableToDate,
@@ -200,7 +209,7 @@ export default forwardRef(function ItemAssignToCard(
     const oldBadDates = Object.keys(validationErrors)
     if (!arrayEquals(newBadDates, oldBadDates)) setValidationErrors(newErrors)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dueDate, availableFromDate, availableToDate])
+  }, [dueDate, availableFromDate, availableToDate, replyToTopicDueDate])
 
   useEffect(() => {
     const errorMessage: FormMessage = {
@@ -227,7 +236,7 @@ export default forwardRef(function ItemAssignToCard(
         return
       }
 
-      const dateInputKeys = ['due_at', 'unlock_at', 'lock_at']
+      const dateInputKeys = ['reply_to_topic_due_at', 'due_at', 'unlock_at', 'lock_at']
       let key
       if (Object.keys(validationErrors).length > 0) {
         key = dateInputKeys.find(k => validationErrors[k] !== undefined)
@@ -347,7 +356,7 @@ export default forwardRef(function ItemAssignToCard(
           onBlur={() => setShowValidations(true)}
           disabledWithGradingPeriod={isInClosedGradingPeriod}
         />
-        {!removeDueDateInput && (
+        {!removeDueDateInput && !isCheckpointed && (
           <DueDateTimeInput
             {...{
               dueDate,
@@ -362,6 +371,26 @@ export default forwardRef(function ItemAssignToCard(
             }}
             {...commonDateTimeInputProps}
             handleDueDateChange={handleDueDateChange(timeInputRefs.current.due_at?.value || '')}
+            disabledWithGradingPeriod={isInClosedGradingPeriod}
+          />
+        )}
+        {isCheckpointed && (
+          <ReplyToTopicDueDateTimeInput
+            {...{
+              replyToTopicDueDate,
+              setReplyToTopicDueDate,
+              validationErrors,
+              unparsedFieldKeys,
+              blueprintDateLocks,
+              dateInputRefs: dateInputRefs.current,
+              timeInputRefs: timeInputRefs.current,
+              handleBlur,
+              clearButtonAltLabel: cardActionLabels.clearReplyToTopicDueAt,
+            }}
+            {...commonDateTimeInputProps}
+            handleReplyToTopicDueDateChange={handleReplyToTopicDueDateChange(
+              timeInputRefs.current.reply_to_topic_due_at?.value || ''
+            )}
             disabledWithGradingPeriod={isInClosedGradingPeriod}
           />
         )}

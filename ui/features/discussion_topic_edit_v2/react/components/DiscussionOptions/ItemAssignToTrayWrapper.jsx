@@ -20,6 +20,7 @@ import React, {useContext, useEffect, useState} from 'react'
 import {DiscussionDueDatesContext} from '../../util/constants'
 import DifferentiatedModulesSection from '@canvas/due-dates/react/DifferentiatedModulesSection'
 import LoadingIndicator from '@canvas/loading-indicator'
+import {string, func, array, number, oneOfType, bool} from 'prop-types'
 
 const DEFAULT_SECTION_ID = '0'
 
@@ -33,6 +34,7 @@ export const ItemAssignToTrayWrapper = () => {
     setImportantDates,
     pointsPossible,
     isGraded,
+    isCheckpoints,
   } = useContext(DiscussionDueDatesContext)
 
   const [overrides, setOverrides] = useState([])
@@ -53,10 +55,12 @@ export const ItemAssignToTrayWrapper = () => {
       due_at: inputObj.dueDate || null,
       lock_at: inputObj.availableUntil || null,
       unlock_at: inputObj.availableFrom || null,
+      reply_to_topic_due_at: inputObj.replyToTopicDueDate || null,
       due_at_overridden: true,
       all_day: false,
       all_day_date: null,
       unlock_at_overridden: true,
+      reply_to_topic_due_at_overridden: true,
       lock_at_overridden: true,
       unassign_item: inputObj.unassignItem || false,
       id: inputObj.dueDateId,
@@ -121,6 +125,7 @@ export const ItemAssignToTrayWrapper = () => {
     const outputObj = {
       dueDateId: inputObj.rowKey || inputObj.stagedOverrideId || null,
       assignedList: [],
+      replyToTopicDueDate: inputObj.reply_to_topic_due_at_overridden ? inputObj.reply_to_topic_due_at : null,
       dueDate: inputObj.due_at ? inputObj.due_at : null,
       availableFrom: inputObj.unlock_at_overridden ? inputObj.unlock_at : null,
       availableUntil: inputObj.lock_at_overridden ? inputObj.lock_at : null,
@@ -188,10 +193,13 @@ export const ItemAssignToTrayWrapper = () => {
       importantDates={importantDates}
       defaultSectionId={DEFAULT_SECTION_ID}
       supportDueDates={isGraded}
+      isCheckpointed={isCheckpoints}
     />
   )
 }
 
-ItemAssignToTrayWrapper.propTypes = {}
+ItemAssignToTrayWrapper.propTypes = {
+  isCheckpoints: bool,
+}
 
 ItemAssignToTrayWrapper.defaultProps = {}
