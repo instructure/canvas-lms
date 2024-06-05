@@ -19,16 +19,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import PerformanceControls from 'ui/features/gradebook/react/default_gradebook/PerformanceControls'
+import PerformanceControls from '../PerformanceControls'
 import {RequestDispatch} from '@canvas/network'
-import Gradebook from 'ui/features/gradebook/react/default_gradebook/Gradebook'
-import GradebookApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookApi'
-import {
-  createGradebook,
-  setFixtureHtml,
-  defaultGradebookProps,
-} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
-import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents'
+import Gradebook from '../Gradebook'
+import GradebookApi from '../apis/GradebookApi'
+import {createGradebook, setFixtureHtml, defaultGradebookProps} from './GradebookSpecHelper'
+import AsyncComponents from '../AsyncComponents'
 
 const performance_controls = {
   students_chunk_size: 2, // students per page,
