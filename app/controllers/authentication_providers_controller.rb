@@ -215,6 +215,12 @@
 #           "type": "boolean",
 #           "default": false,
 #           "example": false
+#         },
+#         "autoconfirm": {
+#           "description": "(only for email) If the email address is trusted and should be automatically confirmed",
+#           "type": "boolean",
+#           "default": false,
+#           "example": false
 #         }
 #       }
 #     }
