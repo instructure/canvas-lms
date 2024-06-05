@@ -17,31 +17,37 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-import AssignmentSubmissionTypeSelectionLaunchButton from '../AssignmentSubmissionTypeSelectionLaunchButton'
+import {render, screen, fireEvent} from '@testing-library/react'
+import {AssignmentSubmissionTypeSelectionLaunchButton} from '../AssignmentSubmissionTypeSelectionLaunchButton'
 
+const onClickFn = jest.fn()
 const tool = {
+  id: '1',
   title: 'Tool Title',
   description: 'The tool description.',
-  icon_url: 'https://www.example.com/icon.png'
+  icon_url: 'https://www.example.com/icon.png',
+}
+
+const renderComponent = () => {
+  return render(<AssignmentSubmissionTypeSelectionLaunchButton tool={tool} onClick={onClickFn} />)
 }
 
 describe('AssignmentSubmissionTypeSelectionLaunchButton', () => {
-  beforeEach(() => {
-    window.ENV = {
-      UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED: true
-    }
-  });
-
   it('renders a button to launch the tool', () => {
-    const wrapper = render(<AssignmentSubmissionTypeSelectionLaunchButton tool={tool} />)
-    expect(wrapper.getByRole('button', { name: `${tool.title} ${tool.description}` })).toBeTruthy()
+    const {getByTestId} = renderComponent()
+    expect(getByTestId('assignment_submission_type_selection_launch_button')).toBeTruthy()
   })
 
   it('renders an icon, a title, description', () => {
-    const wrapper = render(<AssignmentSubmissionTypeSelectionLaunchButton tool={tool} />)
-    expect(wrapper.getByRole('img')).toHaveAttribute('src', tool.icon_url)
-    expect(wrapper.getByText(tool.title)).toBeInTheDocument()
-    expect(wrapper.getByText(tool.description)).toBeInTheDocument()
+    const {container} = renderComponent()
+    expect(container.querySelector('img').src).toBe(tool.icon_url)
+    expect(container.querySelector('#title_text')).toBeTruthy()
+    expect(container.querySelector('#desc_text')).toBeTruthy()
+  })
+
+  it('calls the onClick function when the button is clicked', () => {
+    renderComponent()
+    fireEvent.click(screen.getByTestId('assignment_submission_type_selection_launch_button'))
+    expect(onClickFn).toHaveBeenCalledTimes(1)
   })
 })

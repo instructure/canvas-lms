@@ -3402,6 +3402,7 @@ hy:
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas չի ճանաչում ձեր նույնականացուցչի պրովայդերին"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas համակարգը չունի %{user} օգտատիրոջ համար հաշիվ"
   canvas_error_report_ff678539: "Canvas սխալի մասին հաշվետվություն"
+  canvas_lms_6ce68514: "Canvas LMS"
   canvas_login_failure_message_4c922f2f: "Հաղորդագրություն Canvas մուտք գործելու ձախողման մասին "
   canvas_revision_unknown: "Անհայտ է"
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas-ը կարծում է, որ պատասխանը ընդունելի է"
@@ -5392,6 +5393,7 @@ hy:
   create_132b3be1: Ստեղծել
   create_assignment_68532ceb: "Ստեղծել հանձնարարություն"
   create_course_9a69b32c: "Ստեղծել դասընթաց"
+  create_discussion_982f915e: "Ստեղծել քննարկում"
   create_discussion_topics_8330d52b: "Ստեղծել քննարկման թեմաներ"
   create_group_set_7fe1cd53: "Ստեղծել խմբերի շարք"
   create_item_base: 
@@ -7248,6 +7250,8 @@ hy:
     edit_view_rubric: "Դիտել ռուբրիկը"
     errors: 
       select_an_option: "Ընտրել պարամետրերը"
+    gradebook_header_menu: 
+      speedgrader: "«Արագ գնահատման համակարգ™»"
     graded: գնահատվող
     graded_by_me: "%{graded_time} իմ կողմից"
     graded_then_resubmitted: "գնահատված, հետո կրկին ուղարկված է (%{when})"

@@ -22,7 +22,6 @@ import TimeBlockSelectRow from 'ui/features/calendar_appointment_group_edit/reac
 import london from 'timezone/Europe/London'
 import * as tz from '@canvas/datetime'
 import fakeENV from 'helpers/fakeENV'
-import '@canvas/datetime/jquery'
 
 let props
 let tzSnapshot

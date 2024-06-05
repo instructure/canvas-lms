@@ -31,3 +31,7 @@ The possible `rel` values are:
 These will only be included if they are relevant. For example, the first page
 of results will not contain a rel="prev" link.  rel="last" may also be excluded
 if the total count is too expensive to compute on each request.
+
+**NOTE**: Because HTTP header names are [case-insensitive](https://datatracker.ietf.org/doc/html/rfc9110#section-5.1-3),
+please be sure you are not parsing the `Link` header in a case-sensitive way.
+The capitalization of the header name is not guaranteed.

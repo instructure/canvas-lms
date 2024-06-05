@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import React from 'react'
+import ReactDOM from 'react-dom'
 import RCELoader from '@canvas/rce/serviceRCELoader'
 import SectionCollection from '@canvas/sections/backbone/collections/SectionCollection'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
@@ -26,6 +27,7 @@ import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
 import Section from '@canvas/sections/backbone/models/Section'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector'
 import DueDateOverrideView from '@canvas/due-dates'
+import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import EditView from 'ui/features/assignment_edit/backbone/views/EditView'
 import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeSelector'
 import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySelector'
@@ -603,19 +605,19 @@ test('rounds points_possible', function () {
 
 test('sets seconds of due_at to 59 if the new minute value is 59', function () {
   const view = this.editView({
-    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
+    due_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  override.attributes.due_at = unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().due_at, '2000-08-28T11:59:59.000Z')
 })
 
 test('sets seconds of due_at to 00 if the new minute value is not 59', function () {
   const view = this.editView({
-    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
+    due_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
+  override.attributes.due_at = unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
   strictEqual(view.getFormData().due_at, '2000-09-28T11:58:00.000Z')
 })
 
@@ -637,37 +639,37 @@ test('getFormData returns custom_params as a JSON object, not a string', functio
 // that value.
 test('keeps original due_at seconds if only the seconds value has changed', function () {
   const view = this.editView({
-    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23')),
+    due_at: unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
+  override.attributes.due_at = unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
   strictEqual(view.getFormData().due_at, '2000-08-29T11:59:23.000Z')
 })
 
 test('keeps original due_at seconds if the date has not changed', function () {
   const view = this.editView({
-    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
+    due_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  override.attributes.due_at = unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().due_at, '2000-08-28T11:59:23.000Z')
 })
 
 test('sets seconds of unlock_at to 59 if the new minute value is 59', function () {
   const view = this.editView({
-    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
+    unlock_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  override.attributes.unlock_at = unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().unlock_at, '2000-08-28T11:59:59.000Z')
 })
 
 test('sets seconds of unlock_at to 00 if the new minute value is not 59', function () {
   const view = this.editView({
-    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
+    unlock_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
+  override.attributes.unlock_at = unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
   strictEqual(view.getFormData().unlock_at, '2000-09-28T11:58:00.000Z')
 })
 
@@ -676,37 +678,37 @@ test('sets seconds of unlock_at to 00 if the new minute value is not 59', functi
 // that value.
 test('keeps original unlock_at seconds if only the seconds value has changed', function () {
   const view = this.editView({
-    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23')),
+    unlock_at: unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
+  override.attributes.unlock_at = unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
   strictEqual(view.getFormData().unlock_at, '2000-08-29T11:59:23.000Z')
 })
 
 test('keeps original unlock_at seconds if the date has not changed', function () {
   const view = this.editView({
-    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
+    unlock_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  override.attributes.unlock_at = unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().unlock_at, '2000-08-28T11:59:23.000Z')
 })
 
 test('sets seconds of lock_at to 59 if the new minute value is 59', function () {
   const view = this.editView({
-    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
+    lock_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  override.attributes.lock_at = unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().lock_at, '2000-08-28T11:59:59.000Z')
 })
 
 test('sets seconds of lock_at to 00 if the new minute value is not 59', function () {
   const view = this.editView({
-    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
+    lock_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
+  override.attributes.lock_at = unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
   strictEqual(view.getFormData().lock_at, '2000-09-28T11:58:00.000Z')
 })
 
@@ -715,19 +717,19 @@ test('sets seconds of lock_at to 00 if the new minute value is not 59', function
 // that value.
 test('keeps original lock_at seconds if only the seconds value has changed', function () {
   const view = this.editView({
-    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23')),
+    lock_at: unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
+  override.attributes.lock_at = unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
   strictEqual(view.getFormData().lock_at, '2000-08-29T11:59:23.000Z')
 })
 
 test('keeps original lock_at seconds if the date has not changed', function () {
   const view = this.editView({
-    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
+    lock_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  override.attributes.lock_at = unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().lock_at, '2000-08-28T11:59:23.000Z')
 })
 
@@ -1434,6 +1436,7 @@ test('#handleAssignmentSelectionSubmit updates the external_tool_tag_attributes 
     'item[type]': 'LtiResourceLink',
     'item[id]': 1,
     'item[url]': 'https://foo.bar/internal_link/klIknZO7sE',
+    'item[title]': 'tool title',
     'item[new_tab]': '1',
     'item[iframe][width]': '111',
     'item[iframe][height]': '222',
@@ -1445,6 +1448,9 @@ test('#handleAssignmentSelectionSubmit updates the external_tool_tag_attributes 
   }
   const view = editView()
 
+  const reactMock = sinon.mock(ReactDOM)
+  reactMock.expects('render').once()
+
   // when selectContentDialog.submit is triggered the handleAssignmentSelectionSubmit function is called
   view.handleAssignmentSelectionSubmit(data)
 
@@ -1455,11 +1461,14 @@ test('#handleAssignmentSelectionSubmit updates the external_tool_tag_attributes 
   equal(view.$externalToolsContentType.val(), 'LtiResourceLink')
   equal(view.$externalToolsContentId.val(), '1')
   equal(view.$externalToolsUrl.val(), 'https://foo.bar/internal_link/klIknZO7sE')
+  equal(view.$externalToolsTitle.val(), 'tool title')
   equal(view.$externalToolsNewTab.val(), '1')
   equal(view.$assignmentPointsPossible.val(), '1234')
   equal(view.$externalToolsIframeWidth.val(), '111')
   equal(view.$externalToolsIframeHeight.val(), '222')
   equal(view.$externalToolsLineItem.val(), '{"scoreMaximum":1234}')
+
+  sinon.restore()
 })
 
 test('#handleContentItem updates the external_tool_tag_attributes input fields', async () => {
@@ -1493,6 +1502,9 @@ test('#handleContentItem updates the external_tool_tag_attributes input fields',
   }
   const view = editView()
 
+  const reactMock = sinon.mock(ReactDOM)
+  reactMock.expects('render').once()
+
   // when selectContentDialog.submit is triggered the handleAssignmentSelectionSubmit function is called
   view.handleContentItem(data)
 
@@ -1508,6 +1520,8 @@ test('#handleContentItem updates the external_tool_tag_attributes input fields',
   equal(view.$externalToolsIframeWidth.val(), '111')
   equal(view.$externalToolsIframeHeight.val(), '222')
   equal(view.$externalToolsLineItem.val(), '{"scoreMaximum":1234}')
+
+  sinon.restore()
 })
 
 test('submission_type_selection modal opens on tool click', () => {
@@ -1563,6 +1577,7 @@ test('submission_type_selection modal closes on deep link postMessage', () => {
       subject: 'LtiDeepLinkingResponse',
       content_items: [
         {
+          title: 'Resource Link Title',
           type: 'LtiResourceLink',
           url: 'https://foo.bar/internal_link/klIknZO7sE',
           lineItem: {
@@ -1648,7 +1663,6 @@ test('shows the "hide_zero_point_quiz" checkbox when points possible is 0', func
   this.view.$assignmentPointsPossible.val(0)
   this.view.$assignmentPointsPossible.trigger('change')
   strictEqual(this.view.$hideZeroPointQuizzesOption.length, 1)
-  strictEqual(this.view.$hideZeroPointQuizzesOption.css('display'), 'block')
 })
 
 test('does not show the "hide_zero_point_quiz" checkbox when points possible is not 0', function () {

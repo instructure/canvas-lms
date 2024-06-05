@@ -22,6 +22,7 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
+import {DiscussionSummary} from '../../components/DiscussionSummary/DiscussionSummary'
 import {getSpeedGraderUrl, getReviewLinkUrl, responsiveQuerySizes} from '../../utils'
 import {Highlight} from '../../components/Highlight/Highlight'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -257,7 +258,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           },
         },
       }}
-      render={responsiveProps => (
+      render={(responsiveProps, matches) => (
         <>
           <DiscussionTopicAlertManager discussionTopic={props.discussionTopic} />
           {!isSearch && (
@@ -286,6 +287,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             discussionTopic={props.discussionTopic}
                             inPacedCourse={ENV.IN_PACED_COURSE}
                             courseId={ENV.course_id}
+                            replyToTopicSubmission={props.replyToTopicSubmission}
+                            replyToEntrySubmission={props.replyToEntrySubmission}
                           />
                           {props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.map(
                             assessmentRequest => (
@@ -410,6 +413,15 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             attachment={props.discussionTopic.attachment}
                             discussionTopic={props.discussionTopic}
                           >
+                            {!props.discussionTopic.permissions?.reply && (
+                              <Text
+                                size="small"
+                                color="secondary"
+                                data-testid="discussion-topic-closed-for-comments"
+                              >
+                                {I18n.t('This topic is closed for comments.')}
+                              </Text>
+                            )}
                             {props.discussionTopic.permissions?.reply && !expandedReply && (
                               <>
                                 <View
@@ -487,6 +499,26 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                     )}
                   </View>
                 </Flex.Item>
+                {props.isSummaryEnabled && (
+                  <Flex.Item>
+                    <View
+                      as="div"
+                      borderWidth={responsiveProps?.border?.width}
+                      borderRadius={responsiveProps?.border?.radius}
+                      borderStyle="solid"
+                      borderColor="primary"
+                      padding="small"
+                      margin="0 0 small 0"
+                    >
+                      <Flex direction="column" padding={responsiveProps?.container?.padding}>
+                        <DiscussionSummary
+                          onDisableSummaryClick={() => props.setIsSummaryEnabled(false)}
+                          showButtonText={!matches.includes('mobile')}
+                        />
+                      </Flex>
+                    </View>
+                  </Flex.Item>
+                )}
               </Flex>
             </Highlight>
           )}
@@ -540,6 +572,22 @@ DiscussionTopicContainer.propTypes = {
    * useState Boolean to toggle highlight
    */
   isHighlighted: PropTypes.bool,
+  /**
+   * useState object to set the REPLY_TO_TOPIC submission status
+   */
+  replyToTopicSubmission: PropTypes.object,
+  /**
+   * useState object to set the REPLY_TO_ENTRY submission status
+   */
+  replyToEntrySubmission: PropTypes.object,
+  /**
+   * useState Boolean to toggle the Discussion Summary
+   */
+  isSummaryEnabled: PropTypes.bool,
+  /**
+   * useState function to set the Discussion Summary
+   */
+  setIsSummaryEnabled: PropTypes.func,
 }
 
 export default DiscussionTopicContainer

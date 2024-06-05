@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {datetimeString} from '@canvas/datetime/date-functions'
 
 const I18n = useI18nScope('file_status')
 
@@ -41,8 +41,8 @@ export default function getFileStatus(model) {
 
   if (status.published && status.restricted) {
     return I18n.t('restricted_status', 'Available from %{from_date} until %{until_date}', {
-      from_date: $.datetimeString(model.get('unlock_at')),
-      until_date: $.datetimeString(model.get('lock_at')),
+      from_date: datetimeString(model.get('unlock_at')),
+      until_date: datetimeString(model.get('lock_at')),
     })
   } else if (status.published && status.hidden) {
     return I18n.t('hidden_status', 'Hidden. Available with a link')

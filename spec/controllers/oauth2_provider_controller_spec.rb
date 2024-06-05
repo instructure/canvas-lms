@@ -724,6 +724,16 @@ describe OAuth2ProviderController do
           end
         end
 
+        context "with aud as the Lti::Oidc auth domain" do
+          let(:aud) { "https://example.com" }
+
+          before do
+            allow(Lti::Oidc).to receive(:auth_domain).and_return(aud)
+          end
+
+          it { is_expected.to have_http_status :ok }
+        end
+
         context "with aud as an array" do
           let(:aud) { [Rails.application.routes.url_helpers.oauth2_token_url(host: "test.host"), "doesnotexist"] }
 

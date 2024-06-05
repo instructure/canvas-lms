@@ -1839,7 +1839,7 @@ el:
   announcements_a4b8ed4a: Ανακοινώσεις
   anonymous_e1b8ad27: Ανώνυμο
   anonymous_grading_ccb5045c: "Ανώνυμη Βαθμολόγηση"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Η ανώνυμη βαθμολόγηση συνεπάγεται την υποχρεωτική απόκρυψη ονομάτων φοιτητών/τριών στο SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Η ανώνυμη βαθμολόγηση συνεπάγεται την υποχρεωτική απόκρυψη ονομάτων φοιτητών/τριών στο SpeedGrader"
   anonymous_user: "Ανώνυμος Χρήστης"
   anonymous_user_d984b9ce: "Ανώνυμος Χρήστης"
   anonymously_graded_59149570: "Ανώνυμα βαθμολογημένα"
@@ -2224,7 +2224,7 @@ el:
       resubmission_count: 
         one: "1 Μη Βαθμολογημένη Επανυποβολή"
         other: "%{count} Μη Βαθμολογημένες Επανυποβολές"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Σχετικά Στοιχεία"
     grade_gpa_scale_screenreader: "Βαθμός: %{grade}"
@@ -3286,6 +3286,7 @@ el:
   canvas_error_report_ff678539: "Αναφορά Σφάλματος Canvas"
   canvas_id_f42f6ad: "Canvas ID"
   canvas_introduction_video_2d81f3ad: "Εισαγωγικό Βίντεο στο Canvas"
+  canvas_lms_6ce68514: "Σύστημα Διαχείρισης Εκπαιδευτικού Περιεχομένου Canvas"
   canvas_login_failure_message_4c922f2f: "Μήνυμα απο το Canvas σχετικά με την αποτυχία σύνδεσης"
   canvas_revision_unknown: Άγνωστο
   canvas_thinks_response_is_valid_8cc4a67d: "το Canvas πιστεύει πως η απάντηση είναι έγκυρη"
@@ -6639,6 +6640,7 @@ el:
       select_an_option: "Παρακαλώ διαλέξτε μια επιλογή"
     gradebook_header_menu: 
       assignment_details: "Λεπτομέρειες Εργασίας"
+      speedgrader: SpeedGrader™
     graded: βαθμολογήθηκε/αν
     graded_then_resubmitted: "βαθμολογήθηκε, κατόπιν επανυποβλήθηκε (%{when})"
     group: Ομάδα
@@ -14077,7 +14079,7 @@ el:
       resubmitting: Επανυποβολή...
   speedgrader_d9a6fa90: Speedgrader
   speedgrader_de0affa6: SpeedGrader
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   spreadsheet_6d622119: "Λογιστικό φύλλο"
   sr_gradebook: 
     all_grading_periods: "Όλες οι περίοδοι βαθμολογήσεων"
@@ -14117,6 +14119,7 @@ el:
   start_link_validation_dc0ac99c: "Έναρξη Επικύρωσης Συνδέσμου"
   start_participating_f0c75256: "Έναρξη συμμετοχής"
   start_tls_26e4b0dc: "Έναρξη TLS"
+  started_5e138638: Εκκίνηση
   state_standards_c9b1affd: "Πρότυπα της Πολιτείας"
   statistics: 
     csv_columns: 

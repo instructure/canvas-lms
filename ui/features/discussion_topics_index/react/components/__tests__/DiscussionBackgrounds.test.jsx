@@ -37,9 +37,7 @@ describe('DiscussionBackgrounds', () => {
   it('renders correct student view for the pinnedDiscussionBackground with manage_content true', () => {
     render(pinnedDiscussionBackground(defaultProps))
     expect(screen.getByText('You currently have no pinned discussions')).toBeInTheDocument()
-    expect(
-      screen.getByText('To pin a discussion to the top', {exact: false})
-    ).toBeInTheDocument()
+    expect(screen.getByText('To pin a discussion to the top', {exact: false})).toBeInTheDocument()
   })
 
   it('renders correct student view for the pinnedDiscussionBackground with manage_content false', () => {

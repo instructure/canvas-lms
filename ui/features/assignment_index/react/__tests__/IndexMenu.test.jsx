@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import { render, screen, fireEvent, cleanup} from '@testing-library/react'
+import {render, screen, fireEvent, cleanup} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import Actions from '../actions/IndexMenuActions'
 import IndexMenu from '../IndexMenu'
@@ -66,7 +66,7 @@ const generateProps = (overrides, initialState = {}) => {
   }
 }
 
-const renderComponent = (overrides={}, initialState={}) => {
+const renderComponent = (overrides = {}, initialState = {}) => {
   return render(<IndexMenu {...generateProps(overrides, initialState)} />)
 }
 
@@ -74,10 +74,10 @@ describe('AssignmentsIndexMenu', () => {
   let oldEnv
 
   beforeEach(() => {
-    oldEnv = { ...window.ENV }
+    oldEnv = {...window.ENV}
 
     Actions.apiGetLaunches.mockReturnValue({
-       type: 'STUB_API_GET_TOOLS',
+      type: 'STUB_API_GET_TOOLS',
     })
   })
 
@@ -98,8 +98,8 @@ describe('AssignmentsIndexMenu', () => {
 
   it('renders a bulk edit option if property is specified', () => {
     const requestBulkEditFn = jest.fn()
-    const {getAllByText} = renderComponent({ requestBulkEdit: requestBulkEditFn })
-    const menuitem = getAllByText("Edit Assignment Dates")
+    const {getAllByText} = renderComponent({requestBulkEdit: requestBulkEditFn})
+    const menuitem = getAllByText('Edit Assignment Dates')
     expect(menuitem.length).toBe(1)
     // click menuitem:
     fireEvent.click(menuitem[0])
@@ -109,7 +109,7 @@ describe('AssignmentsIndexMenu', () => {
   it('does not render a bulk edit option if property is not specified', () => {
     const {queryByText} = renderComponent()
     // expect no element with text "Edit Assignment Dates":
-    expect(queryByText("Edit Assignment Dates")).toBeNull()
+    expect(queryByText('Edit Assignment Dates')).toBeNull()
   })
 
   it("doesn't show an LTI tool modal if modalIsOpen is not true", () => {
@@ -118,13 +118,16 @@ describe('AssignmentsIndexMenu', () => {
   })
 
   it('shows the LTI tool modal state if modalIsOpen is true', () => {
-    renderComponent({}, {
-      modalIsOpen: true,
-      selectedTool: {
-        placements: {course_assignments_menu: {title: 'foo'}},
-        definition_id: 100,
-      },
-    })
+    renderComponent(
+      {},
+      {
+        modalIsOpen: true,
+        selectedTool: {
+          placements: {course_assignments_menu: {title: 'foo'}},
+          definition_id: 100,
+        },
+      }
+    )
     expect(screen.queryByRole('dialog')).not.toBeNull()
   })
 
@@ -199,7 +202,7 @@ describe('AssignmentsIndexMenu', () => {
       ]
 
       mockWindowLocationReload = jest.fn()
-      const mockLocation = { ...window.location, reload: mockWindowLocationReload }
+      const mockLocation = {...window.location, reload: mockWindowLocationReload}
       jest.spyOn(window, 'location', 'get').mockImplementation(() => mockLocation)
     })
 
@@ -232,7 +235,7 @@ describe('AssignmentsIndexMenu', () => {
     // that here.
 
     it('reloads the page when assignment_index_menu receives and LTI 1.1 externalContentReady message', () => {
-      const {container} = renderComponent({sisName: "test1"})
+      const {container} = renderComponent({sisName: 'test1'})
 
       makeMountPointUsedForTray(container)
       openTray(container)
@@ -245,14 +248,14 @@ describe('AssignmentsIndexMenu', () => {
     it('clears the window listener handler when unmounted', () => {
       let container
 
-      container = renderComponent({sisName: "test2"}).container
+      container = renderComponent({sisName: 'test2'}).container
       makeMountPointUsedForTray(container)
       openTray(container)
 
       cleanup()
       expect(mockWindowLocationReload).toHaveBeenCalledTimes(0)
 
-      container = renderComponent({sisName: "test2"}).container
+      container = renderComponent({sisName: 'test2'}).container
       makeMountPointUsedForTray(container)
       openTray(container)
 

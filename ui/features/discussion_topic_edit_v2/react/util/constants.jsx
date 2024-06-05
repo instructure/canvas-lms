@@ -43,11 +43,13 @@ const GradedDiscussionDueDateDefaultValues = {
   gradedDiscussionRefMap: new Map(),
   setGradedDiscussionRefMap: () => {},
   pointsPossibleReplyToTopic: 0,
-  setPointsPossibleReplyToTopic: (points) => {},
+  setPointsPossibleReplyToTopic: points => {},
   pointsPossibleReplyToEntry: 0,
-  setPointsPossibleReplyToEntry: (points) => {},
+  setPointsPossibleReplyToEntry: points => {},
   replyToEntryRequiredCount: 1,
-  setReplyToEntryRequiredCount: (count) => {},
+  setReplyToEntryRequiredCount: count => {},
+  importantDates: false,
+  setImportantDates: newImportantDatesValue => {},
 }
 
 export const GradedDiscussionDueDatesContext = React.createContext(

@@ -261,7 +261,8 @@ export default class AssignmentColumnHeader extends ColumnHeader<
       .filter(student => !student.isInactive && !student.isTestStudent)
 
     return activeStudents.map(student => {
-      const {excused, grade, latePolicyStatus, score, submittedAt, redoRequest} = student.submission
+      const {excused, grade, latePolicyStatus, score, submittedAt, redoRequest, workflowState} =
+        student.submission
       return {
         excused,
         grade,
@@ -272,6 +273,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
         score,
         sortableName: student.sortableName,
         submittedAt,
+        workflowState,
       }
     })
   }

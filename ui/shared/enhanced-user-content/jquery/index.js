@@ -27,7 +27,7 @@ import {makeAllExternalLinksExternalLinks} from '@instructure/canvas-rce/es/enha
 import './instructure_helper'
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime/jquery' /* datetimeString, dateString, fudgeDateForProfileTimezone */
+import {datetimeString, fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags, youTubeID */
@@ -48,7 +48,7 @@ import {captureException} from '@sentry/browser'
 const I18n = useI18nScope('instructure_js')
 
 export function formatTimeAgoTitle(date) {
-  const fudgedDate = $.fudgeDateForProfileTimezone(date)
+  const fudgedDate = fudgeDateForProfileTimezone(date)
   return fudgedDate.toString('MMM d, yyyy h:mmtt')
 }
 
@@ -435,7 +435,7 @@ function doThingsWhenDiscussionTopicSubMessageIsPosted() {
           const comment =
             submission.submission_comments[submission.submission_comments.length - 1]
               .submission_comment
-          comment.post_date = $.datetimeString(comment.created_at)
+          comment.post_date = datetimeString(comment.created_at)
           comment.message = comment.formatted_body || comment.comment
           $message.fillTemplateData({
             data: comment,
@@ -444,7 +444,7 @@ function doThingsWhenDiscussionTopicSubMessageIsPosted() {
         }
       } else {
         const entry = data.discussion_entry
-        entry.post_date = $.datetimeString(entry.created_at)
+        entry.post_date = datetimeString(entry.created_at)
         $message.find('.content > .message_html').val(entry.message)
         $message.fillTemplateData({
           data: entry,

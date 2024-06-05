@@ -40,7 +40,7 @@ describe('OutcomeHeader', () => {
 
   const defaultProps = () => {
     return {
-      outcome: outcome,
+      outcome,
     }
   }
 

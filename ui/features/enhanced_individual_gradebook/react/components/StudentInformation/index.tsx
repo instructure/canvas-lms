@@ -185,10 +185,10 @@ export default function StudentInformation({
 
       if (displayAsScaledPoints && possible) {
         const scaledPossible = I18n.n(scalingFactor, {
-          precision: 1,
+          precision: 2,
         })
         const scaledScore = I18n.n(scoreToScaledPoints(score, possible, scalingFactor), {
-          precision: 1,
+          precision: 2,
         })
 
         finalGradeText = `${scaledScore} / ${scaledPossible}`
@@ -205,9 +205,16 @@ export default function StudentInformation({
       (!selectedGradingPeriodId && gradingPeriodSet?.weighted)
     )
     const showPointsText = !!(!hidePointsText && gradeToDisplay)
-    const pointsText = showPointsText
-      ? ` (${gradeToDisplay.score} / ${gradeToDisplay.possible} ${I18n.t('points')})`
-      : ''
+    let pointsText = ''
+    if (showPointsText) {
+      const scoreText = I18n.n(gradeToDisplay.score, {
+        precision: gradingStandardPointsBased ? 2 : undefined,
+      })
+      const possibleText = gradingStandardPointsBased
+        ? I18n.n(gradeToDisplay.possible, {precision: 2})
+        : I18n.n(gradeToDisplay.possible)
+      pointsText = ` (${scoreText} / ${possibleText} ${I18n.t('points')})`
+    }
 
     const letterGradeText = gradingStandard
       ? ` - ${GradeFormatHelper.replaceDashWithMinus(

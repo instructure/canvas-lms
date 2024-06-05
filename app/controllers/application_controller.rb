@@ -321,6 +321,16 @@ class ApplicationController < ActionController::Base
         @js_env[:LOCALE_TRANSLATION_FILE] = ::Canvas::Cdn.registry.url_for("javascripts/translations/#{@js_env[:LOCALES].first}.json")
         @js_env[:ACCOUNT_ID] = effective_account_id(@context)
         @js_env[:user_cache_key] = Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_=HUpgraqe;njalkhpvoiulkimmaqewg") if @current_user&.workflow_state
+        @js_env[:top_navigation_tools] = external_tools_display_hashes(:top_navigation) if !!@domain_root_account&.feature_enabled?(:top_navigation_placement)
+        # partner context data
+        if @context&.grants_right?(@current_user, session, :read)
+          @js_env[:current_context] = {
+            id: @context.id,
+            name: @context.name,
+            type: @context.class.name,
+            url: named_context_url(@context, :context_url, include_host: true)
+          }
+        end
       end
     end
 
@@ -552,6 +562,9 @@ class ApplicationController < ActionController::Base
     hash[:external_url] = tool.url if custom_settings.include?(:external_url)
     if type == :submission_type_selection && tool.submission_type_selection[:description].present?
       hash[:description] = tool.submission_type_selection[:description]
+    end
+    if type == :top_navigation
+      hash[:pinned] = tool.placement_pinned?(type)
     end
 
     # Add the tool's postmessage scopes to the JS environment, if present.

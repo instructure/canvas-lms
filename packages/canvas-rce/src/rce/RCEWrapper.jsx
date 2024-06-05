@@ -1744,20 +1744,14 @@ class RCEWrapper extends React.Component {
   setEditorView(view) {
     switch (view) {
       case RAW_HTML_EDITOR_VIEW:
-        this.getTextarea().removeAttribute('aria-hidden')
-        this.getTextarea().labels?.[0]?.removeAttribute('aria-hidden')
         this.mceInstance().hide()
         break
       case PRETTY_HTML_EDITOR_VIEW:
-        this.getTextarea().setAttribute('aria-hidden', true)
-        this.getTextarea().labels?.[0]?.setAttribute('aria-hidden', true)
         this.mceInstance().hide()
         this._elementRef.current.querySelector('.CodeMirror')?.CodeMirror.setCursor(0, 0)
         break
       case WYSIWYG_VIEW:
         this.setCode(this.textareaValue())
-        this.getTextarea().setAttribute('aria-hidden', true)
-        this.getTextarea().labels?.[0]?.setAttribute('aria-hidden', true)
         this.mceInstance().show()
     }
   }

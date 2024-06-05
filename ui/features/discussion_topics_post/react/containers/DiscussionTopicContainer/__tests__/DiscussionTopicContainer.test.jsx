@@ -57,6 +57,8 @@ describe('DiscussionTopicContainer', () => {
       PEER_REVIEWS_URL: 'this_is_the_peer_reviews_url',
       context_asset_string: 'course_1',
       course_id: '1',
+      context_type: 'Course',
+      context_id: '1',
       discussion_topic_menu_tools: [
         {
           base_url: 'example.com',
@@ -389,6 +391,21 @@ describe('DiscussionTopicContainer', () => {
   it('renders an attachment if it exists', async () => {
     const container = setup({discussionTopic: Discussion.mock()})
     expect(await container.findByText('288777.jpeg')).toBeInTheDocument()
+  })
+
+  it('renders "discussion topic closed for comments" message if user has reply permission false', async () => {
+    const container = setup({
+      discussionTopic: Discussion.mock({permissions: DiscussionPermissions.mock({reply: false})}),
+    })
+
+    expect(await container.findByText('This is a Discussion Topic Message')).toBeInTheDocument()
+    expect(await container.findByTestId('discussion-topic-closed-for-comments')).toBeInTheDocument()
+  })
+
+  it('does not renders "discussion topic closed for comments" message if user has reply permission true', () => {
+    const container = setup({discussionTopic: Discussion.mock()})
+
+    expect(container.queryByTestId('discussion-topic-closed-for-comments')).toBeNull()
   })
 
   it('renders a reply button if user has reply permission true', async () => {
@@ -796,6 +813,24 @@ describe('DiscussionTopicContainer', () => {
         })
         expect(queryByTestId('add_rubric_url')).toBeNull()
       })
+    })
+  })
+
+  describe('Discussion Summary', () => {
+    it('renders a summary', () => {
+      const {queryByTestId} = setup({
+        discussionTopic: Discussion.mock(),
+        isSummaryEnabled: true,
+      })
+      expect(queryByTestId('summary-loading')).toBeTruthy()
+    })
+
+    it('does not render a summary', () => {
+      const {queryAllByTestId} = setup({
+        discussionTopic: Discussion.mock(),
+        isSummaryEnabled: false,
+      })
+      expect(queryAllByTestId(/summary-.*/)).toEqual([])
     })
   })
 })

@@ -41,6 +41,17 @@ type Role = {
   plural_label: string
 }
 
+type ToolPlacement = 'top_navigation'
+
+export type Tool = {
+  id: string
+  title: string
+  base_url: string
+  icon_url: string
+  pinned?: boolean
+  placement?: ToolPlacement
+}
+
 export type GroupOutcome = {
   id: string
   title: string
@@ -78,6 +89,7 @@ export interface EnvCommon {
   current_user_id: string | null
   current_user_global_id: string
   COURSE_ROLES: Role[]
+  COURSE_USERS_PATH?: string
   current_user_roles: string[]
   current_user_is_student: boolean
   current_user_is_admin: boolean
@@ -209,6 +221,12 @@ export interface EnvCommon {
     classes?: string
   }>
   breadcrumbs: {name: string; url: string}[]
+
+  /**
+   * Used by ui/features/top_navigation_tools/react/TopNavigationTools.tsx
+   * and ui/shared/trays/react/ContentTypeExternalToolDrawer.tsx
+   */
+  top_navigation_tools: Tool[]
 }
 
 /**

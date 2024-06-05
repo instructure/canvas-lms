@@ -33,6 +33,7 @@ import htmlEscape from '@instructure/html-escape'
 import {publish} from 'jquery-tinypubsub'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import {isRTL} from '@canvas/i18n/rtlHelper'
+import {datetimeString} from '@canvas/datetime/date-functions'
 import '@canvas/avatar/jst/_avatar.handlebars'
 import '../../jst/_reply_form.handlebars'
 
@@ -180,7 +181,7 @@ EntryView.prototype.toJSON = function () {
   if (json.author) {
     json.author.no_avatar_link = true
   }
-  json.edited_at = $.datetimeString(json.updated_at)
+  json.edited_at = datetimeString(json.updated_at)
   if (json.editor) {
     json.editor_name = json.editor.display_name
     json.editor_href = json.editor.html_url

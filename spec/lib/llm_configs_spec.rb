@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe LlmConfigs do
-  before { LlmConfigs.instance_variable_set(:@configs, nil) }
+describe LLMConfigs do
+  before { LLMConfigs.instance_variable_set(:@configs, nil) }
 
   describe ".configs" do
     before do
@@ -33,10 +33,10 @@ describe LlmConfigs do
     end
 
     it "loads configuration from YAML files" do
-      expect(LlmConfigs.configs["test"].name).to eq("test")
-      expect(LlmConfigs.configs["test"].model_id).to eq("model123")
-      expect(LlmConfigs.configs["test"].template).to eq("template123")
-      expect(LlmConfigs.configs["test"].options).to eq({ "option1" => "value1" })
+      expect(LLMConfigs.configs["test"].name).to eq("test")
+      expect(LLMConfigs.configs["test"].model_id).to eq("model123")
+      expect(LLMConfigs.configs["test"].template).to eq("template123")
+      expect(LLMConfigs.configs["test"].options).to eq({ "option1" => "value1" })
     end
 
     context "when there is an ArgumentError" do
@@ -49,25 +49,25 @@ describe LlmConfigs do
       end
 
       it "raises an error with a descriptive message" do
-        expect { LlmConfigs.configs }.to raise_error(ArgumentError, /Error in LLM config test: Name must be a string/)
+        expect { LLMConfigs.configs }.to raise_error(ArgumentError, /Error in LLM config test: Name must be a string/)
       end
     end
   end
 
   describe ".config_for" do
     before do
-      allow(LlmConfigs).to receive(:configs).and_return({
-                                                          "test" => LlmConfig.new(
-                                                            name: "test",
-                                                            model_id: "model123",
-                                                            template: "template123",
-                                                            options: { "option1" => "value1" }
-                                                          )
-                                                        })
+      expect(LLMConfigs).to receive(:configs).and_return({
+                                                           "test" => LLMConfig.new(
+                                                             name: "test",
+                                                             model_id: "model123",
+                                                             template: "template123",
+                                                             options: { "option1" => "value1" }
+                                                           )
+                                                         })
     end
 
     it "returns the correct LlmConfig object for a given prompt type" do
-      config = LlmConfigs.config_for(:test)
+      config = LLMConfigs.config_for(:test)
       expect(config.name).to eq("test")
       expect(config.model_id).to eq("model123")
       expect(config.template).to eq("template123")
@@ -75,7 +75,7 @@ describe LlmConfigs do
     end
 
     it "returns nil if the config does not exist" do
-      expect(LlmConfigs.config_for(:nonexistent)).to be_nil
+      expect(LLMConfigs.config_for(:nonexistent)).to be_nil
     end
   end
 end

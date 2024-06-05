@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import filterUselessConsoleMessages from '@instructure/filter-console-messages'
+
 // because InstUI themeable components need an explicit "dir" attribute on the <html> element
 document.documentElement.setAttribute('dir', 'ltr')
 
@@ -68,6 +70,7 @@ global.console = {
   debug: console.debug,
 }
 /* eslint-enable no-console */
+filterUselessConsoleMessages(global.console)
 
 if (typeof window.URL.createObjectURL === 'undefined') {
   Object.defineProperty(window.URL, 'createObjectURL', {value: () => 'http://example.com/whatever'})

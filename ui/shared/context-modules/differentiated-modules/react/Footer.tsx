@@ -27,6 +27,7 @@ const I18n = useI18nScope('differentiated_modules')
 
 export interface FooterProps {
   saveButtonLabel: string
+  disableSave?: boolean
   onDismiss: () => void
   onUpdate: () => void
   hasErrors?: boolean
@@ -34,6 +35,7 @@ export interface FooterProps {
 
 export default function Footer({
   saveButtonLabel,
+  disableSave = false,
   onDismiss,
   onUpdate,
   hasErrors = false,
@@ -56,7 +58,12 @@ export default function Footer({
       )
     } else {
       return (
-        <Button color="primary" onClick={onUpdate} data-testid="differentiated_modules_save_button">
+        <Button
+          interaction={disableSave ? 'disabled' : 'enabled'}
+          color="primary"
+          onClick={onUpdate}
+          data-testid="differentiated_modules_save_button"
+        >
           {saveButtonLabel}
         </Button>
       )
@@ -67,7 +74,9 @@ export default function Footer({
     <View as="div" padding="small" background="secondary" borderWidth="small none none none">
       <Flex as="div" justifyItems="end">
         <Flex.Item>
-          <Button onClick={onDismiss}>{I18n.t('Cancel')}</Button>
+          <Button data-testid="differentiated_modules_cancel_button" onClick={onDismiss}>
+            {I18n.t('Cancel')}
+          </Button>
         </Flex.Item>
         <Flex.Item margin="0 0 0 small">{updateButton()}</Flex.Item>
       </Flex>

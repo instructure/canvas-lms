@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module LlmConfigs
+module LLMConfigs
   def self.configs
     @configs ||= Dir[Rails.root.join("config/llm_configs/*.yml").to_s].each_with_object({}) do |path, config_hash|
       name = File.basename(path, ".yml")
       config_data = YAML.load_file(path)
 
       begin
-        config_item = LlmConfig.new(
+        config_item = LLMConfig.new(
           name: config_data["name"],
           model_id: config_data["model_id"],
           template: config_data["template"],

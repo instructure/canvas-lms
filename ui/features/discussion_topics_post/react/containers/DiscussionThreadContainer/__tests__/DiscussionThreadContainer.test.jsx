@@ -27,7 +27,10 @@ import {fireEvent, render} from '@testing-library/react'
 import {getSpeedGraderUrl} from '../../../utils'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
-import {updateDiscussionEntryParticipantMock, updateDiscussionThreadReadStateMock} from '../../../../graphql/Mocks'
+import {
+  updateDiscussionEntryParticipantMock,
+  updateDiscussionThreadReadStateMock,
+} from '../../../../graphql/Mocks'
 import {User} from '../../../../graphql/User'
 import {waitFor} from '@testing-library/dom'
 
@@ -186,18 +189,18 @@ describe('DiscussionThreadContainer', () => {
       window.location = {assign: jest.fn()}
       const setHighlightEntryId = jest.fn()
       const {getByTestId, getAllByText} = setup(
-      defaultProps({propOverrides: {setHighlightEntryId: setHighlightEntryId}}),
-      updateDiscussionThreadReadStateMock({
-        discussionEntryId: 'DiscussionEntry-default-mock', 
-        read: false
-      })
-    )
+        defaultProps({propOverrides: {setHighlightEntryId}}),
+        updateDiscussionThreadReadStateMock({
+          discussionEntryId: 'DiscussionEntry-default-mock',
+          read: false,
+        })
+      )
 
       fireEvent.click(getByTestId('thread-actions-menu'))
 
       expect(getAllByText('Mark Thread as Unread').length).toBe(1)
       expect(getAllByText('Mark Thread as Read').length).toBe(1)
-      
+
       fireEvent.click(getAllByText('Mark Thread as Unread')[0])
       expect(setHighlightEntryId.mock.calls.length).toBe(1)
       expect(setHighlightEntryId).toHaveBeenCalledWith('DiscussionEntry-default-mock')

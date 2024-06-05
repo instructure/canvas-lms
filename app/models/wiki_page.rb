@@ -329,16 +329,33 @@ class WikiPage < ActiveRecord::Base
   scope :order_by_id, -> { order(:id) }
 
   def low_level_locked_for?(user, opts = {})
-    return false unless could_be_locked
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      return false if opts[:check_policies] && grants_right?(user, :update)
 
-    RequestCache.cache(locked_request_cache_key(user), opts[:deep_check_if_needed]) do
-      locked = false
-      if (item = locked_by_module_item?(user, opts))
-        locked = { object: self, module: item.context_module }
-        unlock_at = locked[:module].unlock_at
-        locked[:unlock_at] = unlock_at if unlock_at && unlock_at > Time.now.utc
+      RequestCache.cache(locked_request_cache_key(user)) do
+        locked = false
+        page_for_user = overridden_for(user)
+        if page_for_user.unlock_at && page_for_user.unlock_at > Time.zone.now
+          locked = { object: page_for_user, unlock_at: page_for_user.unlock_at }
+        elsif could_be_locked && (item = locked_by_module_item?(user, opts))
+          locked = { object: self, module: item.context_module }
+        elsif page_for_user.lock_at && page_for_user.lock_at < Time.zone.now
+          locked = { object: page_for_user, lock_at: page_for_user.lock_at }
+        end
+        locked
       end
-      locked
+    else
+      return false unless could_be_locked
+
+      RequestCache.cache(locked_request_cache_key(user), opts[:deep_check_if_needed]) do
+        locked = false
+        if (item = locked_by_module_item?(user, opts))
+          locked = { object: self, module: item.context_module }
+          unlock_at = locked[:module].unlock_at
+          locked[:unlock_at] = unlock_at if unlock_at && unlock_at > Time.now.utc
+        end
+        locked
+      end
     end
   end
 

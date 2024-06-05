@@ -23,7 +23,6 @@ import BlueprintAssociations from '../BlueprintAssociations'
 import getSampleData from './getSampleData'
 
 describe('BlueprintAssociations component', () => {
-
   const defaultProps = () => ({
     courses: [],
     existingAssociations: [],

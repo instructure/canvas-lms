@@ -164,7 +164,7 @@ describe "quiz restrictions as a teacher" do
       f("#quiz_ip_filter").send_keys("7")
 
       wait_for_new_page_load { f("button.save_quiz_button.btn.btn-primary").click }
-      expect(ffj(".error_text")[1]).to include_text("IP filter is not valid")
+      expect(ff(".error_text")[-1]).to include_text("IP filter is not valid")
     end
 
     it "has a working link to help with ip address filtering", priority: "1" do

@@ -150,7 +150,9 @@ describe "discussions" do
           f('input[type=checkbox][name="assignment[set_assignment]"]').click
           f("#has_group_category").click
           f(%(span[data-testid="group-set-close"])).click
-          f("#edit_discussion_form_buttons .btn-primary[type=submit]").click
+          submit_button = f("#edit_discussion_form_buttons .btn-primary[type=submit]")
+          scroll_into_view(submit_button)
+          submit_button.click
           wait_for_ajaximations
           error_box = f("div[role='alert'] .error_text")
           expect(error_box.text).to eq "Please create a group set"
@@ -1791,6 +1793,31 @@ describe "discussions" do
           expect(dt.assignment.only_visible_to_overrides).to be false
           expect(dt.assignment.group_category).to be_nil
           expect(dt.assignment.description).to eq "<p>replying to topic</p>"
+        end
+
+        it "sets the mark important dates checkbox for discussion create with differentiated modules FF off" do
+          feature_setup
+
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          Discussion.update_discussion_topic_title
+
+          force_click_native('input[type=checkbox][value="graded"]')
+          wait_for_ajaximations
+
+          assign_to_element = f("input[placeholder='Select Assignment Due Date']")
+          formatted_date = format_date_for_view(2.days.from_now(Time.zone.now), "%m/%d/%Y")
+          assign_to_element.send_keys formatted_date
+          assign_to_element.send_keys :enter
+
+          scroll_to_element(mark_important_dates)
+          click_mark_important_dates
+
+          Discussion.save_and_publish_button.click
+          wait_for_ajaximations
+
+          assignment = Assignment.last
+          expect(assignment.important_dates).to be(true)
         end
 
         context "with Differentiated Modules FF on" do

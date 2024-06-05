@@ -98,14 +98,26 @@
     <tr>
       <th scope="row"><%= f.blabel :pronouns, :en => "Pronouns" %></th>
       <td>
-        <span id="pronouns" class="<%= @domain_root_account.can_change_pronouns? ? 'display_data' : 'edit_or_show_data' %>"><%= @user.pronouns || t("None") %></span>
-        <% if @domain_root_account.can_change_pronouns? %>
-          <span class="edit_data">
-            <%= f.select(
-              :pronouns,
-              options_for_select(([[t("None"), '']] + @domain_root_account.pronouns + [@user.pronouns]).compact.uniq, @user.pronouns))
-            %>
-          </span>
+        <% if @domain_root_account.grants_right?(@current_user, :manage_courses_admin) %>
+          <span id="pronouns" class="<%= @domain_root_account.can_add_pronouns? ? 'display_data' : 'edit_or_show_data' %>"><%= @user.pronouns || t("None") %></span>
+          <% if @domain_root_account.can_add_pronouns? %>
+            <span class="edit_data">
+              <%= f.select(
+                :pronouns,
+                options_for_select(([[t("None"), '']] + @domain_root_account.pronouns + [@user.pronouns]).compact.uniq, @user.pronouns))
+              %>
+            </span>
+          <% end %>
+        <% else %>
+          <span id="pronouns" class="<%= @domain_root_account.can_change_pronouns? ? 'display_data' : 'edit_or_show_data' %>"><%= @user.pronouns || t("None") %></span>
+          <% if @domain_root_account.can_change_pronouns? %>
+            <span class="edit_data">
+              <%= f.select(
+                :pronouns,
+                options_for_select(([[t("None"), '']] + @domain_root_account.pronouns + [@user.pronouns]).compact.uniq, @user.pronouns))
+              %>
+            </span>
+          <% end %>
         <% end %>
         <span class="edit_or_show_data data_description">
           <br/>

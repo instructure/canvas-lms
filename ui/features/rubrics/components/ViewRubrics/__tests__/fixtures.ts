@@ -53,6 +53,7 @@ export const RUBRICS_DATA: Rubric[] = [
     hasRubricAssociations: false,
     pointsPossible: 5,
     ratingOrder: 'ascending',
+    freeFormCriterionComments: false,
     buttonDisplay: 'points',
     locations: [],
     workflowState: 'active',
@@ -113,6 +114,7 @@ export const RUBRICS_DATA: Rubric[] = [
     hasRubricAssociations: false,
     pointsPossible: 10,
     ratingOrder: 'ascending',
+    freeFormCriterionComments: false,
     buttonDisplay: 'points',
     locations: [],
     workflowState: 'archived',
@@ -196,6 +198,7 @@ export const RUBRICS_DATA: Rubric[] = [
     hasRubricAssociations: true,
     pointsPossible: 15,
     ratingOrder: 'ascending',
+    freeFormCriterionComments: false,
     buttonDisplay: 'points',
     locations: [],
     workflowState: 'active',
@@ -208,8 +211,12 @@ export const RUBRICS_QUERY_RESPONSE: RubricQueryResponse = {
   },
 }
 
-export const RUBRIC_PREVIEW_QUERY_RESPONSE: Pick<Rubric, 'criteria' | 'title' | 'ratingOrder'> = {
+export const RUBRIC_PREVIEW_QUERY_RESPONSE: Pick<
+  Rubric,
+  'criteria' | 'title' | 'ratingOrder' | 'freeFormCriterionComments'
+> = {
   criteria: RUBRICS_DATA[0].criteria,
   title: RUBRICS_DATA[0].title,
   ratingOrder: RUBRICS_DATA[0].ratingOrder,
+  freeFormCriterionComments: RUBRICS_DATA[0].freeFormCriterionComments,
 }

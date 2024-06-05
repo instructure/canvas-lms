@@ -23,6 +23,7 @@ export type RubricFormProps = {
   title: string
   hasRubricAssociations: boolean
   hidePoints: boolean
+  freeFormCriterionComments: boolean
   accountId?: string
   courseId?: string
   criteria: RubricCriterion[]

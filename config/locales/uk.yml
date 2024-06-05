@@ -2116,7 +2116,7 @@ uk:
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "Зробити анонімними всі коментарі, зроблені інструкторами, або подання на завдання у SpeedGrader"
   anonymous_e1b8ad27: Анонімний
   anonymous_grading_ccb5045c: "Анонімне оцінювання "
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Анонімне примусове оцінювання приховує імена студентів в SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Анонімне примусове оцінювання приховує імена студентів в SpeedGrader"
   anonymous_instructor_annotations_2b6c822: "Анонімні коментарі інструктора"
   anonymous_user: "Анонімний користувач"
   anonymous_user_d984b9ce: "Анонімний користувач"
@@ -2591,7 +2591,7 @@ uk:
         many: "%{count} неоцінених повторно завантажених робіт"
         one: "1 неоцінена повторно завантажена робота"
         other: "%{count} неоцінених повторно завантажених робіт"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Пов'язані елементи"
     grade_gpa_scale_screenreader: "Оцінка: %{grade}"
@@ -3777,6 +3777,7 @@ uk:
   canvas_error_report_ff678539: "Звіт про помилки Canvas"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_introduction_video_2d81f3ad: "вступне відео до Canvas "
+  canvas_lms_6ce68514: "Canvas LMS"
   canvas_login_failure_message_4c922f2f: "Повідомлення   про помилку входу Canvas"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Запасні коди багатофакторної аутентифікації Canvas"
   canvas_observer_id_59db0918: canvas_observer_id
@@ -16526,7 +16527,7 @@ uk:
       resubmitting: "Повторне надавання..."
   speedgrader_de0affa6: SpeedGrader
   speedgrader_settings_c9503705: "Налаштування Speedgrader"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   spreadsheet_6d622119: "Електронна таблиця"
   spring_grading_period_current_score_7083cf0d: "Поточний бал весіннього періоду оцінювання"
   spring_grading_period_final_score_386d92f7: "Підсумковий бал весіннього періоду оцінювання"
@@ -16579,6 +16580,7 @@ uk:
   start_participating_f0c75256: "Прийняти участь"
   start_time_2c3d11b5: "Час початку"
   start_tls_26e4b0dc: "Запустити TLS"
+  started_5e138638: Початок
   starts_at_29843f98: "Починається о"
   starts_ce584f1c: "Починається:"
   state_standards_c9b1affd: "Державні Стандарти"

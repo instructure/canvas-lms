@@ -24,20 +24,7 @@ require_relative "../lti_1_3_spec_helper"
 RSpec.describe ApplicationController do
   context "group 1" do
     before do
-      request_double = double(
-        cookies_same_site_protection: proc { false },
-        host_with_port: "www.example.com",
-        host: "www.example.com",
-        url: "http://www.example.com",
-        method: "GET",
-        headers: {},
-        format: double(html?: true),
-        user_agent: nil,
-        remote_ip: "0.0.0.0",
-        base_url: "https://canvas.test",
-        referer: nil
-      )
-      allow(controller).to receive(:request).and_return(request_double)
+      @controller.instance_variable_set(:@domain_root_account, Account.default)
     end
 
     describe "#google_drive_connection" do
@@ -108,7 +95,7 @@ RSpec.describe ApplicationController do
       end
 
       it "sets items" do
-        expect(HostUrl).to receive(:file_host).with(Account.default, "www.example.com").and_return("files.example.com")
+        expect(HostUrl).to receive(:file_host).with(Account.default, "test.host").and_return("files.example.com")
         controller.js_env FOO: "bar"
         expect(controller.js_env[:FOO]).to eq "bar"
         expect(controller.js_env[:files_domain]).to eq "files.example.com"
@@ -281,20 +268,23 @@ RSpec.describe ApplicationController do
 
       it "sets the contextual timezone from the context" do
         Time.use_zone("Mountain Time (US & Canada)") do
-          controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
+          controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil, grants_right?: false))
           controller.js_env({})
           expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq "America/Denver"
         end
       end
 
       context "session_timezone url param is given" do
+        let(:context_double) { double(asset_string: "", class_name: nil, grants_right?: false) }
+
         before do
           allow(controller).to receive(:params).and_return({ session_timezone: "America/New_York" })
+          controller.instance_variable_set(:@context, context_double)
         end
 
         it "sets the timezone from the url" do
           Time.use_zone("Mountain Time (US & Canada)") do
-            controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
+            allow(context_double).to receive(:time_zone).and_return(Time.zone)
             controller.js_env({})
             expect(controller.js_env[:TIMEZONE]).to eq "America/New_York"
           end
@@ -302,7 +292,7 @@ RSpec.describe ApplicationController do
 
         it "sets the contextual timezone from the url" do
           Time.use_zone("Mountain Time (US & Canada)") do
-            controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
+            allow(context_double).to receive(:time_zone).and_return(Time.zone)
             controller.js_env({})
             expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq "America/New_York"
           end
@@ -315,7 +305,7 @@ RSpec.describe ApplicationController do
 
           it "sets the contextual timezone from the context" do
             Time.use_zone("Mountain Time (US & Canada)") do
-              controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
+              allow(context_double).to receive(:time_zone).and_return(Time.zone)
               controller.js_env({})
               expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq "America/Denver"
             end
@@ -323,7 +313,7 @@ RSpec.describe ApplicationController do
 
           it "sets the timezone from the context" do
             Time.use_zone("Mountain Time (US & Canada)") do
-              controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
+              allow(context_double).to receive(:time_zone).and_return(Time.zone)
               controller.js_env({})
               expect(controller.js_env[:TIMEZONE]).to eq "America/Denver"
             end
@@ -408,6 +398,66 @@ RSpec.describe ApplicationController do
 
       it "sets DEEP_LINKING_POST_MESSAGE_ORIGIN" do
         expect(@controller.js_env[:DEEP_LINKING_POST_MESSAGE_ORIGIN]).to eq @controller.request.base_url
+      end
+
+      context "top_navigation_tools are present" do
+        let(:developer_key) { DeveloperKey.create! }
+        let(:domain) { "example.net" }
+        let(:devkey_tool) { external_tool_1_3_model(developer_key:, opts: { settings: { top_navigation: {} } }) }
+        let(:domain_tool) { external_tool_1_3_model(opts: { domain:, settings: { top_navigation: {} } }) }
+        let(:unauth_tool) { external_tool_1_3_model(opts: { settings: { top_navigation: {} } }) }
+
+        def tool_hash_for(tool)
+          {
+            id: tool.id,
+            canvas_icon_class: nil,
+            icon_url: nil,
+            base_url: domain,
+            title: "a",
+            pinned: tool.placement_pinned?(:top_navigation),
+          }
+        end
+
+        before do
+          Setting.set("top_navigation_allowed_dev_keys", developer_key.id.to_s)
+          Setting.set("top_navigation_allowed_launch_domains", domain)
+          allow(Lti::ContextToolFinder).to receive(:all_tools_for).and_return([devkey_tool, domain_tool, unauth_tool])
+          allow(controller).to receive(:polymorphic_url).and_return(domain)
+          Account.site_admin.disable_feature!(:top_navigation_placement)
+        end
+
+        it "does not populate tools" do
+          expect(@controller.js_env.keys).not_to include(:top_navigation_tools)
+        end
+
+        context "when the top_navigation placement is enabled" do
+          before do
+            Account.site_admin.enable_feature!(:top_navigation_placement)
+          end
+
+          context "lti_placement_restrictions FF on" do
+            before do
+              Account.site_admin.enable_feature!(:lti_placement_restrictions)
+            end
+
+            it "sets top_navigation_tools" do
+              expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(devkey_tool))
+              expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(domain_tool))
+            end
+          end
+
+          context "lti_placement_restrictions FF off" do
+            before do
+              Account.site_admin.disable_feature!(:lti_placement_restrictions)
+            end
+
+            it "sets top_navigation_tools" do
+              expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(devkey_tool))
+              expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(domain_tool))
+              expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(unauth_tool))
+            end
+          end
+        end
       end
 
       context "sharding" do
@@ -885,8 +935,8 @@ RSpec.describe ApplicationController do
         let(:course) { course_model }
 
         before do
-          controller.instance_variable_set(:@context, course)
           allow(course).to receive(:grants_any_right?).and_return true
+          controller.instance_variable_set(:@context, course)
         end
 
         it "redirects for an assignment" do
@@ -3087,5 +3137,37 @@ RSpec.describe ApplicationController, "#compute_http_cost" do
     expect(response).to have_http_status :internal_server_error
     expect(CanvasHttp.cost > 0).to be_truthy
     expect(controller.request.env["extra-request-cost"]).to eq(CanvasHttp.cost)
+  end
+end
+
+RSpec.describe ApplicationController, "#set_js_env" do
+  context "when a context is set" do
+    let(:context) { course_model }
+
+    before do
+      controller.instance_variable_set(:@context, context)
+      allow(controller).to receive(:request).and_return(request)
+    end
+
+    it "does not set current_context" do
+      expect(controller.js_env[:current_context]).to be_nil
+    end
+
+    context "when user has access to the context" do
+      before do
+        allow(context).to receive(:grants_right?).and_return(true)
+      end
+
+      it "sets current_context" do
+        expect(controller.js_env[:current_context]).to eq(
+          {
+            id: context.id,
+            url: "http://test.host/courses/#{context.id}",
+            name: context.name,
+            type: "Course"
+          }
+        )
+      end
+    end
   end
 end

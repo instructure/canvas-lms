@@ -23,9 +23,9 @@ import ExportCSVButton from '../ExportCSVButton'
 describe('ExportCSVButton', () => {
   const defaultProps = (props = {}) => {
     return {
-      courseId: "1",
+      courseId: '1',
       gradebookFilters: [],
-      ...props
+      ...props,
     }
   }
 

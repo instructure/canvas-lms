@@ -29,7 +29,6 @@ import addPrivacyLinkToDialog from './addPrivacyLinkToDialog'
 import htmlEscape from '@instructure/html-escape'
 import './validate'
 import '@canvas/jquery/jquery.instructure_forms'
-import '@canvas/datetime/jquery'
 import '@canvas/util/jquery/fixDialogButtons'
 import extensions from '@canvas/bundles/extensions'
 

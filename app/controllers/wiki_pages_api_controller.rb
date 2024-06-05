@@ -360,7 +360,7 @@ class WikiPagesApiController < ApplicationController
       assign_todo_date
       if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, "participate")
-        apply_assignment_parameters(assignment_params, @page) if @context.conditional_release?
+        apply_assignment_parameters(assignment_params, @page) if @context.conditional_release? && !Account.site_admin.feature_enabled?(:differentiated_modules)
         render json: wiki_page_json(@page, @current_user, session)
       else
         render json: @page.errors, status: update_params.is_a?(Symbol) ? update_params : :bad_request
@@ -448,7 +448,7 @@ class WikiPagesApiController < ApplicationController
       if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, "participate")
         @page.context_module_action(@current_user, @context, :contributed)
-        apply_assignment_parameters(assignment_params, @page) if @context.conditional_release?
+        apply_assignment_parameters(assignment_params, @page) if @context.conditional_release? && !Account.site_admin.feature_enabled?(:differentiated_modules)
         render json: wiki_page_json(@page, @current_user, session)
       else
         render json: @page.errors, status: update_params.is_a?(Symbol) ? update_params : :bad_request

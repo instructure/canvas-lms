@@ -51,6 +51,7 @@ const ALL_PLACEMENTS = {
   file_menu: I18n.t('File Menu'),
   file_index_menu: I18n.t('Files Index Menu'),
   global_navigation: I18n.t('Global Navigation'),
+  top_navigation: I18n.t('Top Navigation'),
   homework_submission: I18n.t('Homework Submission'),
   link_selection: I18n.t('Link Selection'),
   migration_selection: I18n.t('Migration Selection'),

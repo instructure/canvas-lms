@@ -51,15 +51,21 @@ describe('CoursePickerTable component', () => {
     const rows = tree.container.querySelectorAll('tr[data-testid="bca-table__course-row"]')
 
     expect(rows.length).toEqual(props.courses.length)
-    expect(rows[0].querySelectorAll('td')[0].textContent).toEqual(`Toggle select course ${props.courses[0].name}`)
-    expect(rows[1].querySelectorAll('td')[0].textContent).toEqual(`Toggle select course ${props.courses[1].name}`)
+    expect(rows[0].querySelectorAll('td')[0].textContent).toEqual(
+      `Toggle select course ${props.courses[0].name}`
+    )
+    expect(rows[1].querySelectorAll('td')[0].textContent).toEqual(
+      `Toggle select course ${props.courses[1].name}`
+    )
   })
 
   test('calls onSelectedChanged when courses are selected', async () => {
     const props = defaultProps()
     props.onSelectedChanged = sinon.spy()
     const tree = render(<CoursePickerTable {...props} />)
-    const checkbox = tree.container.querySelectorAll('[data-testid="bca-table__course-row"] input[type="checkbox"]')[0]
+    const checkbox = tree.container.querySelectorAll(
+      '[data-testid="bca-table__course-row"] input[type="checkbox"]'
+    )[0]
     await userEvent.click(checkbox)
 
     expect(props.onSelectedChanged.callCount).toEqual(1)
@@ -71,7 +77,9 @@ describe('CoursePickerTable component', () => {
     props.selectedCourses = ['1']
     props.onSelectedChanged = sinon.spy()
     const tree = render(<CoursePickerTable {...props} />)
-    const checkbox = tree.container.querySelectorAll('[data-testid="bca-table__course-row"] input[type="checkbox"]')[0]
+    const checkbox = tree.container.querySelectorAll(
+      '[data-testid="bca-table__course-row"] input[type="checkbox"]'
+    )[0]
     await userEvent.click(checkbox)
 
     expect(props.onSelectedChanged.callCount).toEqual(1)
@@ -83,7 +91,9 @@ describe('CoursePickerTable component', () => {
     props.onSelectedChanged = sinon.spy()
     const tree = render(<CoursePickerTable {...props} />)
 
-    const checkbox = tree.container.querySelectorAll('.btps-table__header-wrapper input[type="checkbox"]')[0]
+    const checkbox = tree.container.querySelectorAll(
+      '.btps-table__header-wrapper input[type="checkbox"]'
+    )[0]
     await userEvent.click(checkbox)
 
     expect(props.onSelectedChanged.callCount).toEqual(1)
@@ -96,7 +106,9 @@ describe('CoursePickerTable component', () => {
     const tree = render(<CoursePickerTable {...props} ref={ref} />)
     const instance = ref.current
 
-    const check = tree.container.querySelectorAll('[data-testid="bca-table__course-row"] input[type="checkbox"]')[0]
+    const check = tree.container.querySelectorAll(
+      '[data-testid="bca-table__course-row"] input[type="checkbox"]'
+    )[0]
     check.focus = sinon.spy()
 
     instance.handleFocusLoss(0)
@@ -109,7 +121,9 @@ describe('CoursePickerTable component', () => {
     const tree = render(<CoursePickerTable {...props} ref={ref} />)
     const instance = ref.current
 
-    const check = tree.container.querySelectorAll('[data-testid="bca-table__course-row"] input[type="checkbox"]')[1]
+    const check = tree.container.querySelectorAll(
+      '[data-testid="bca-table__course-row"] input[type="checkbox"]'
+    )[1]
     check.focus = sinon.spy()
 
     instance.handleFocusLoss(2)
@@ -123,7 +137,9 @@ describe('CoursePickerTable component', () => {
     const tree = render(<CoursePickerTable {...props} ref={ref} />)
     const instance = ref.current
 
-    const check = tree.container.querySelectorAll('.bca-table__select-all input[type="checkbox"]')[0]
+    const check = tree.container.querySelectorAll(
+      '.bca-table__select-all input[type="checkbox"]'
+    )[0]
     check.focus = sinon.spy()
 
     instance.handleFocusLoss(1)

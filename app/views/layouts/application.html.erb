@@ -19,6 +19,7 @@
   css_bundle(:instructure_eportfolio) if @eportfolio_view === true
   css_bundle(:new_user_tutorials) if tutorials_enabled?
   js_bundle(:navigation_header) unless @headers == false
+  js_bundle(:top_navigation_tools) if @domain_root_account&.feature_enabled?(:top_navigation_placement)
 
   load_blueprint_courses_ui
   @has_content_notices = load_content_notices
@@ -35,6 +36,7 @@
   # Collapse the course menu according to user preference, unless a certain action
   # requests that it default to collapsed for that page
   @collapse_course_menu ||= @current_user&.reload&.collapse_course_nav?
+  @enhanced_rubrics_enabled = !!@domain_root_account&.feature_enabled?(:enhanced_rubrics)
 
   if @collapse_course_menu
     subnav_menu_text = t('Show Navigation Menu')
@@ -94,7 +96,7 @@
 <%# Flash messages must be outside of #application or they won't work in screenreaders with modals open. %>
 <%= render :partial => 'shared/static_notices' %>
 <%= render :partial => 'shared/flash_notices' %>
-<%if !!@domain_root_account&.feature_enabled?(:external_tool_drawer) %>
+<%if @domain_root_account&.feature_enabled?(:top_navigation_placement) %>
   <div id="drawer-layout-mount-point"></div>
 <% end %>
 <div id="application" class="ic-app">
@@ -119,7 +121,7 @@
             </button>
           <% end %>
 
-          <div class="ic-app-crumbs">
+          <div class="ic-app-crumbs <%= 'ic-app-crumbs-enhanced-rubrics' if @enhanced_rubrics_enabled %>">
             <% if @context&.is_a?(Course) && @context.elementary_subject_course? %>
               <%= link_to course_path(id: @context.id), :class => "btn k5-back-to-subject", :id => "back_to_subject" do %>
                 <i class="icon-arrow-open-left"></i> <%= t('Back to Subject') %>
@@ -134,6 +136,9 @@
           <% end %>
 
           <div class="right-of-crumbs">
+            <%if @domain_root_account&.feature_enabled?(:top_navigation_placement) %>
+              <div id="top-nav-tools-mount-point"></div>
+            <% end %>
             <% if tutorials_enabled? %>
               <div class="TutorialToggleHolder"></div>
             <% end %>

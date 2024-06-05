@@ -45,7 +45,7 @@ import SisValidationHelper from '@canvas/sis/SisValidationHelper'
 import SimilarityDetectionTools from '../../react/AssignmentConfigurationTools'
 import ModeratedGradingFormFieldGroup from '../../react/ModeratedGradingFormFieldGroup'
 import AllowedAttemptsWithState from '../../react/allowed_attempts/AllowedAttemptsWithState'
-import AssignmentSubmissionTypeSelectionLaunchButton from '../../react/AssignmentSubmissionTypeSelectionLaunchButton'
+import {AssignmentSubmissionTypeContainer} from '../../react/AssignmentSubmissionTypeContainer'
 import DefaultToolForm from '../../react/DefaultToolForm'
 import UsageRightsSelectBox from '@canvas/files/react/components/UsageRightsSelectBox'
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
@@ -163,11 +163,13 @@ function EditView() {
     this.handleSubmissionTypeSelectionDialogClose.bind(this)
   this.handleSubmissionTypeSelectionLaunch = this.handleSubmissionTypeSelectionLaunch.bind(this)
   this.handlePlacementExternalToolSelect = this.handlePlacementExternalToolSelect.bind(this)
+  this.handleRemoveResource = this.handleRemoveResource.bind(this)
   this.handleSubmissionTypeChange = this.handleSubmissionTypeChange.bind(this)
   this.handleGradingTypeChange = this.handleGradingTypeChange.bind(this)
   this.handleRestrictFileUploadsChange = this.handleRestrictFileUploadsChange.bind(this)
   this.renderDefaultExternalTool = this.renderDefaultExternalTool.bind(this)
-  this.renderAssignmentSubmissionTypeSelectionLaunchButton = this.renderAssignmentSubmissionTypeSelectionLaunchButton.bind(this)
+  this.renderAssignmentSubmissionTypeContainer =
+    this.renderAssignmentSubmissionTypeContainer.bind(this)
   this.defaultExternalToolName = this.defaultExternalToolName.bind(this)
   this.defaultExternalToolUrl = this.defaultExternalToolUrl.bind(this)
   this.defaultExternalToolEnabled = this.defaultExternalToolEnabled.bind(this)
@@ -677,7 +679,20 @@ EditView.prototype.handleContentItem = function (item) {
     }
   }
 
+  this.renderAssignmentSubmissionTypeContainer({
+    tool: this.selectedTool || {title: item.title},
+    resource: item,
+  })
+
   // TODO: add date prefill here
+}
+
+EditView.prototype.handleRemoveResource = function () {
+  this.$externalToolsUrl.val(this.selectedTool.external_url)
+  this.$externalToolsTitle.val('')
+  this.$externalToolsCustomParams.val('')
+  this.$externalToolsIframeWidth.val('')
+  this.$externalToolsIframeHeight.val('')
 }
 
 /**
@@ -901,18 +916,6 @@ EditView.prototype.toggleAdvancedTurnitinSettings = function (ev) {
   )
 }
 
-EditView.prototype.renderAssignmentSubmissionTypeSelectionLaunchButton = function () {
-  const tool = this.selectedTool
-  const props = {
-    tool,
-    onClick: this.handleSubmissionTypeSelectionLaunch,
-  }
-  return ReactDOM.render(
-    React.createElement(AssignmentSubmissionTypeSelectionLaunchButton, props),
-    document.querySelector('[data-component="AssignmentSubmissionTypeSelectionLaunchButton"]')
-  )
-}
-
 EditView.prototype.defaultExternalToolEnabled = function () {
   return !!this.defaultExternalToolUrl()
 }
@@ -1024,9 +1027,28 @@ EditView.prototype.handlePlacementExternalToolSelect = function (selection) {
     this.$externalToolsCustomParams.val('')
     this.$externalToolsIframeWidth.val('')
     this.$externalToolsIframeHeight.val('')
+  } else if (this.assignment.resourceLink() && this.assignment.resourceLink().title) {
+    this.$externalToolsTitle.val(this.assignment.resourceLink().title)
   }
 
-    this.renderAssignmentSubmissionTypeSelectionLaunchButton()
+  this.renderAssignmentSubmissionTypeContainer({
+    tool: this.selectedTool,
+    resource: this.assignment.resourceLink(),
+  })
+}
+
+EditView.prototype.renderAssignmentSubmissionTypeContainer = function ({tool, resource}) {
+  const props = {
+    tool,
+    resource,
+    onRemoveResource: this.handleRemoveResource,
+    onLaunchButtonClick: this.handleSubmissionTypeSelectionLaunch,
+  }
+
+  ReactDOM.render(
+    React.createElement(AssignmentSubmissionTypeContainer, props),
+    document.querySelector('[data-component="AssignmentSubmissionTypeContainer"]')
+  )
 }
 
 EditView.prototype.handleSubmissionTypeSelectionLaunch = function () {

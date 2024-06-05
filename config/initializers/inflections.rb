@@ -28,5 +28,6 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym "CSV"
   inflect.acronym "OAuth"
   inflect.acronym "OAuth2"
+  inflect.acronym "LLM"
   inflect.irregular "feedback", "feedback"
 end

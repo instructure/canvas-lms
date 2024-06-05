@@ -17,43 +17,34 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {createEvent, fireEvent, render} from '@testing-library/react'
 
 import FocusableView from '../FocusableView'
-import userEvent from '@testing-library/user-event'
-
-// This rule does not apply for these specs.
-/* eslint-disable react/prop-types */
 
 describe('GradeSummary FocusableView', () => {
-  let $container
   let renderChildren
   let wrapper
 
-  beforeEach(() => {
-    $container = document.createElement('div')
-    document.body.appendChild($container)
-  })
-
   function mountComponent() {
-    wrapper = render(<FocusableView>{renderChildren}</FocusableView>, {attachTo: $container})
+    wrapper = render(<FocusableView>{renderChildren}</FocusableView>)
   }
 
   const keyCodeMap = {
-    down: '[ArrowUp]',
-    left: '[ArrowLeft]',
-    right: '[ArrowRight]',
-    up: '[ArrowUp]',
+    down: 40,
+    left: 37,
+    right: 39,
+    up: 38,
   }
 
   async function scroll(direction) {
-    const user = userEvent.setup()
-    const event = {
+    const focusableView = wrapper.container.querySelector('.FocusableView')
+    const preventDefault = jest.fn()
+    const keyEvent = createEvent.keyDown(focusableView, {
       keyCode: keyCodeMap[direction],
-      preventDefault: jest.fn(),
-    }
-    await user.keyboard(keyCodeMap[direction])
-    return event
+      preventDefault,
+    })
+    fireEvent(focusableView, keyEvent)
+    return keyEvent
   }
 
   function horizontalScrollTarget() {
@@ -98,26 +89,33 @@ describe('GradeSummary FocusableView', () => {
       }
     })
 
-    test.skip('scrolls right on the scroll target', async () => {
+    test('scrolls right on the scroll target', async () => {
+      jest.spyOn(horizontalScrollTarget(), 'clientWidth', 'get').mockImplementation(() => 450)
+      jest.spyOn(horizontalScrollTarget(), 'scrollWidth', 'get').mockImplementation(() => 500)
       await scroll('right')
-      strictEqual(horizontalScrollTarget().scrollLeft, 50)
+      expect(horizontalScrollTarget().scrollLeft).toBe(50)
     })
 
-    test.skip('prevents default event behavior when scrolling right', async () => {
+    test('prevents default event behavior when scrolling right', async () => {
+      jest.spyOn(horizontalScrollTarget(), 'clientWidth', 'get').mockImplementation(() => 450)
+      jest.spyOn(horizontalScrollTarget(), 'scrollWidth', 'get').mockImplementation(() => 500)
       const event = await scroll('right')
-      strictEqual(event.preventDefault.callCount, 1)
+      expect(event.defaultPrevented).toBe(true)
     })
 
-    test.skip('stops scrolling right at the rightmost limit', async () => {
+    test('stops scrolling right at the rightmost limit', async () => {
+      jest.spyOn(horizontalScrollTarget(), 'scrollLeft', 'get').mockImplementation(() => 500)
       horizontalScrollTarget().scrollLeft = maxScrollLeft - 10
       await scroll('right')
-      strictEqual(horizontalScrollTarget().scrollLeft, maxScrollLeft)
+      expect(horizontalScrollTarget().scrollLeft).toBe(maxScrollLeft)
     })
 
-    test.skip('prevents default event behavior when scrolling to the rightmost limit', async () => {
+    test('prevents default event behavior when scrolling to the rightmost limit', async () => {
+      jest.spyOn(horizontalScrollTarget(), 'clientWidth', 'get').mockImplementation(() => 0)
+      jest.spyOn(horizontalScrollTarget(), 'scrollWidth', 'get').mockImplementation(() => 500)
       horizontalScrollTarget().scrollLeft = maxScrollLeft - 10
       const event = await scroll('right')
-      strictEqual(event.preventDefault.callCount, 1)
+      expect(event.defaultPrevented).toBe(true)
     })
 
     test('does not scroll beyond the rightmost limit', async () => {
@@ -129,31 +127,32 @@ describe('GradeSummary FocusableView', () => {
     test('does not prevent default event behavior when stopped at the rightmost limit', async () => {
       horizontalScrollTarget().scrollLeft = maxScrollLeft
       const event = await scroll('right')
-      expect(event.preventDefault).toHaveBeenCalledTimes(0)
+      expect(event.defaultPrevented).toBe(false)
     })
 
-    test.skip('scrolls left on the scroll target', async () => {
+    test('scrolls left on the scroll target', async () => {
       horizontalScrollTarget().scrollLeft = 250
       await scroll('left')
       expect(horizontalScrollTarget().scrollLeft).toBe(200)
     })
 
-    test.skip('prevents default event behavior when scrolling left', async () => {
+    test('prevents default event behavior when scrolling left', async () => {
       horizontalScrollTarget().scrollLeft = 250
       const event = await scroll('left')
-      strictEqual(event.preventDefault.callCount, 1)
+      expect(event.defaultPrevented).toBe(true)
     })
 
-    test.skip('stops scrolling left at the leftmost limit', async () => {
+    test('stops scrolling left at the leftmost limit', async () => {
+      jest.spyOn(horizontalScrollTarget(), 'scrollLeft', 'get').mockImplementation(() => 0)
       horizontalScrollTarget().scrollLeft = 10
       await scroll('left')
-      strictEqual(horizontalScrollTarget().scrollLeft, 0)
+      expect(horizontalScrollTarget().scrollLeft).toBe(0)
     })
 
-    test.skip('prevents default event behavior when scrolling to the leftmost limit', async () => {
+    test('prevents default event behavior when scrolling to the leftmost limit', async () => {
       horizontalScrollTarget().scrollLeft = 10
       const event = await scroll('left')
-      strictEqual(event.preventDefault.callCount, 1)
+      expect(event.defaultPrevented).toBe(true)
     })
 
     test('does not scroll beyond the leftmost limit', async () => {
@@ -165,7 +164,7 @@ describe('GradeSummary FocusableView', () => {
     test('does not prevent default event behavior when stopped at the leftmost limit', async () => {
       horizontalScrollTarget().scrollLeft = 0
       const event = await scroll('left')
-      expect(event.preventDefault).toHaveBeenCalledTimes(0)
+      expect(event.defaultPrevented).toBe(false)
     })
 
     test('does not scroll down', async () => {
@@ -176,7 +175,7 @@ describe('GradeSummary FocusableView', () => {
     test('does not prevent default event behavior for down arrow', async () => {
       horizontalScrollTarget().scrollLeft = 0
       const event = await scroll('down')
-      expect(event.preventDefault).toHaveBeenCalledTimes(0)
+      expect(event.defaultPrevented).toBe(false)
     })
 
     test('does not scroll up', async () => {
@@ -188,7 +187,7 @@ describe('GradeSummary FocusableView', () => {
     test('does not prevent default event behavior for up arrow', async () => {
       horizontalScrollTarget().scrollTop = 100
       const event = await scroll('up')
-      expect(event.preventDefault).toHaveBeenCalledTimes(0)
+      expect(event.defaultPrevented).toBe(false)
     })
   })
 
@@ -211,26 +210,32 @@ describe('GradeSummary FocusableView', () => {
       }
     })
 
-    test.skip('scrolls down on the scroll target', async () => {
+    test('scrolls down on the scroll target', async () => {
+      jest.spyOn(verticalScrollTarget(), 'clientHeight', 'get').mockImplementation(() => 450)
+      jest.spyOn(verticalScrollTarget(), 'scrollHeight', 'get').mockImplementation(() => 500)
       await scroll('down')
-      strictEqual(verticalScrollTarget().scrollTop, 50)
+      expect(verticalScrollTarget().scrollTop).toBe(50)
     })
 
-    test.skip('prevents default event behavior when scrolling down', async () => {
+    test('prevents default event behavior when scrolling down', async () => {
+      jest.spyOn(verticalScrollTarget(), 'clientHeight', 'get').mockImplementation(() => 450)
+      jest.spyOn(verticalScrollTarget(), 'scrollHeight', 'get').mockImplementation(() => 500)
       const event = await scroll('down')
-      strictEqual(event.preventDefault.callCount, 1)
+      expect(event.defaultPrevented).toBe(true)
     })
 
-    test.skip('stops scrolling down at the bottommost limit', async () => {
+    test('stops scrolling down at the bottommost limit', async () => {
+      jest.spyOn(verticalScrollTarget(), 'scrollTop', 'get').mockImplementation(() => 500)
       verticalScrollTarget().scrollTop = maxScrollTop - 10
       await scroll('down')
-      strictEqual(verticalScrollTarget().scrollTop, maxScrollTop)
+      expect(verticalScrollTarget().scrollTop).toBe(maxScrollTop)
     })
 
-    test.skip('prevents default event behavior when scrolling to the bottommost limit', async () => {
+    test('prevents default event behavior when scrolling to the bottommost limit', async () => {
+      jest.spyOn(verticalScrollTarget(), 'scrollHeight', 'get').mockImplementation(() => 500)
       verticalScrollTarget().scrollTop = maxScrollTop - 10
       const event = await scroll('down')
-      expect(event.preventDefault.callCount).toBe(1)
+      expect(event.defaultPrevented).toBe(true)
     })
 
     test('does not scroll beyond the bottommost limit', async () => {
@@ -242,31 +247,32 @@ describe('GradeSummary FocusableView', () => {
     test('does not prevent default event behavior when stopped at the bottommost limit', async () => {
       verticalScrollTarget().scrollTop = maxScrollTop
       const event = await scroll('down')
-      expect(event.preventDefault).toHaveBeenCalledTimes(0)
+      expect(event.defaultPrevented).toBe(false)
     })
 
-    test.skip('scrolls up on the scroll target', async () => {
+    test('scrolls up on the scroll target', async () => {
       verticalScrollTarget().scrollTop = 250
       await scroll('up')
-      strictEqual(verticalScrollTarget().scrollTop, 200)
+      expect(verticalScrollTarget().scrollTop).toBe(200)
     })
 
-    test.skip('prevents default event behavior when scrolling up', async () => {
+    test('prevents default event behavior when scrolling up', async () => {
       verticalScrollTarget().scrollTop = 250
       const event = await scroll('up')
-      strictEqual(event.preventDefault.callCount, 1)
+      expect(event.defaultPrevented).toBe(true)
     })
 
-    test.skip('stops scrolling up at the topmost limit', async () => {
+    test('stops scrolling up at the topmost limit', async () => {
+      jest.spyOn(verticalScrollTarget(), 'scrollTop', 'get').mockImplementation(() => 0)
       verticalScrollTarget().scrollTop = 10
       await scroll('up')
-      strictEqual(verticalScrollTarget().scrollTop, 0)
+      expect(verticalScrollTarget().scrollTop).toBe(0)
     })
 
-    test.skip('prevents default event behavior when scrolling to the topmost limit', async () => {
+    test('prevents default event behavior when scrolling to the topmost limit', async () => {
       verticalScrollTarget().scrollTop = 10
       const event = await scroll('up')
-      strictEqual(event.preventDefault.callCount, 1)
+      expect(event.defaultPrevented).toBe(true)
     })
 
     test('does not scroll beyond the topmost limit', async () => {
@@ -278,7 +284,7 @@ describe('GradeSummary FocusableView', () => {
     test('does not prevent default event behavior when stopped at the topmost limit', async () => {
       verticalScrollTarget().scrollTop = 0
       const event = await scroll('up')
-      expect(event.preventDefault).toHaveBeenCalledTimes(0)
+      expect(event.defaultPrevented).toBe(false)
     })
 
     test('does not scroll right', async () => {
@@ -288,7 +294,7 @@ describe('GradeSummary FocusableView', () => {
 
     test('does not prevent default event behavior for right arrow', async () => {
       const event = await scroll('right')
-      expect(event.preventDefault).toHaveBeenCalledTimes(0)
+      expect(event.defaultPrevented).toBe(false)
     })
 
     test('does not scroll left', async () => {
@@ -300,11 +306,11 @@ describe('GradeSummary FocusableView', () => {
     test('does not prevent default event behavior for left arrow', async () => {
       verticalScrollTarget().scrollLeft = 100
       const event = await scroll('left')
-      expect(event.preventDefault).toHaveBeenCalledTimes(0)
+      expect(event.defaultPrevented).toBe(false)
     })
   })
 
-  describe.skip('when given the same horizontal and vertical scroll reference', () => {
+  describe('when given the same horizontal and vertical scroll reference', () => {
     const scrollTargetStyle = {height: '200px', overflow: 'auto', width: '200px'}
     const scrollContentStyle = {height: '500px', width: '500px'}
 
@@ -325,25 +331,29 @@ describe('GradeSummary FocusableView', () => {
     })
 
     test('scrolls right on the scroll target', async () => {
+      jest.spyOn(horizontalScrollTarget(), 'clientWidth', 'get').mockImplementation(() => 450)
+      jest.spyOn(horizontalScrollTarget(), 'scrollWidth', 'get').mockImplementation(() => 500)
       await scroll('right')
-      strictEqual(horizontalScrollTarget().scrollLeft, 50)
+      expect(horizontalScrollTarget().scrollLeft).toBe(50)
     })
 
     test('scrolls left on the scroll target', async () => {
       horizontalScrollTarget().scrollLeft = 250
       await scroll('left')
-      strictEqual(horizontalScrollTarget().scrollLeft, 200)
+      expect(horizontalScrollTarget().scrollLeft).toBe(200)
     })
 
     test('scrolls down on the scroll target', async () => {
+      jest.spyOn(verticalScrollTarget(), 'clientHeight', 'get').mockImplementation(() => 450)
+      jest.spyOn(verticalScrollTarget(), 'scrollHeight', 'get').mockImplementation(() => 500)
       await scroll('down')
-      strictEqual(verticalScrollTarget().scrollTop, 50)
+      expect(verticalScrollTarget().scrollTop).toBe(50)
     })
 
     test('scrolls up on the scroll target', async () => {
       verticalScrollTarget().scrollTop = 250
       await scroll('up')
-      strictEqual(verticalScrollTarget().scrollTop, 200)
+      expect(verticalScrollTarget().scrollTop).toBe(200)
     })
   })
 
@@ -370,9 +380,11 @@ describe('GradeSummary FocusableView', () => {
       mountComponent()
     })
 
-    test.skip('scrolls right on the horizontal scroll target', async () => {
+    test('scrolls right on the horizontal scroll target', async () => {
+      jest.spyOn(horizontalScrollTarget(), 'clientWidth', 'get').mockImplementation(() => 450)
+      jest.spyOn(horizontalScrollTarget(), 'scrollWidth', 'get').mockImplementation(() => 500)
       await scroll('right')
-      strictEqual(horizontalScrollTarget().scrollLeft, 50)
+      expect(horizontalScrollTarget().scrollLeft).toBe(50)
     })
 
     test('does not scroll the vertical target right', async () => {
@@ -380,10 +392,10 @@ describe('GradeSummary FocusableView', () => {
       expect(verticalScrollTarget().scrollLeft).toBe(0)
     })
 
-    test.skip('scrolls left on the horizontal scroll target', async () => {
+    test('scrolls left on the horizontal scroll target', async () => {
       horizontalScrollTarget().scrollLeft = 250
       await scroll('left')
-      strictEqual(horizontalScrollTarget().scrollLeft, 200)
+      expect(horizontalScrollTarget().scrollLeft).toBe(200)
     })
 
     test('does not scroll the vertical target left', async () => {
@@ -392,9 +404,11 @@ describe('GradeSummary FocusableView', () => {
       expect(verticalScrollTarget().scrollLeft).toBe(100)
     })
 
-    test.skip('scrolls down on the vertical scroll target', async () => {
+    test('scrolls down on the vertical scroll target', async () => {
+      jest.spyOn(verticalScrollTarget(), 'clientHeight', 'get').mockImplementation(() => 450)
+      jest.spyOn(verticalScrollTarget(), 'scrollHeight', 'get').mockImplementation(() => 500)
       await scroll('down')
-      strictEqual(verticalScrollTarget().scrollTop, 50)
+      expect(verticalScrollTarget().scrollTop).toBe(50)
     })
 
     test('does not scroll the horizontal target down', async () => {
@@ -402,10 +416,10 @@ describe('GradeSummary FocusableView', () => {
       expect(horizontalScrollTarget().scrollTop).toBe(0)
     })
 
-    test.skip('scrolls up on the vertical scroll target', async () => {
+    test('scrolls up on the vertical scroll target', async () => {
       verticalScrollTarget().scrollTop = 250
       await scroll('up')
-      strictEqual(verticalScrollTarget().scrollTop, 200)
+      expect(verticalScrollTarget().scrollTop).toBe(200)
     })
 
     test('does not scroll the horizontal target up', async () => {

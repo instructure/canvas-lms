@@ -218,7 +218,7 @@ export default class StudentContextTray extends React.Component {
           placement="end"
         >
           <CloseButton
-            placement="start"
+            placement="end"
             onClick={this.handleRequestClose}
             screenReaderLabel={I18n.t('Close')}
           />

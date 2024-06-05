@@ -191,8 +191,22 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  # This Method is used to help the messageable user calculator narrow down the scope of users to filter.
+  # After the scope is narrowed down , the calculator uses the visible_for? method to reject users without visibility permissions
   def address_book_context_for(user)
-    if is_section_specific?
+    # If the differentiated flag is on, and only section overrides are present
+    if Account.site_admin.feature_enabled?(:differentiated_modules) && only_visible_to_overrides && !all_assignment_overrides.active.where.not(set_type: "CourseSection").exists?
+      # Get all section overrides for the topic
+      section_overrides = all_assignment_overrides.active.where(set_type: "CourseSection").pluck(:set_id)
+
+      # get the sectiosn the user can see
+      visible_sections_for_user = context.course_section_visibility(user)
+      return [] if visible_sections_for_user == :none
+
+      # If a user can see alls ections, then just return section_overrides for the topic
+      section_overrides_and_visibility = (visible_sections_for_user == :all) ? section_overrides : (visible_sections_for_user & section_overrides) # return a list of sections that the user can see
+      CourseSection.where(id: section_overrides_and_visibility)
+    elsif is_section_specific?
       sections_for(user)
     else
       context
@@ -745,6 +759,7 @@ class DiscussionTopic < ActiveRecord::Base
   scope :joins_ungraded_discussion_student_visibilities, lambda { |user_ids, course_ids|
     joins(:ungraded_discussion_student_visibilities)
       .where(ungraded_discussion_student_visibilities: { user_id: user_ids, course_id: course_ids })
+      .where(assignment_id: nil)
   }
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
@@ -752,8 +767,7 @@ class DiscussionTopic < ActiveRecord::Base
       where.not(assignment_id: nil)
            .joins_assignment_student_visibilities(user_ids, course_ids)
            .union(
-             where(assignment_id: nil)
-               .joins_ungraded_discussion_student_visibilities(user_ids, course_ids)
+             joins_ungraded_discussion_student_visibilities(user_ids, course_ids)
            )
     else
       without_assignment_in_course(course_ids)
@@ -814,20 +828,37 @@ class DiscussionTopic < ActiveRecord::Base
              { course_sections: course_sections.pluck(:id) }).distinct
   }
 
+  scope :discussion_topic_section_visibility_scope, lambda { |student|
+    DiscussionTopicSectionVisibility
+      .active
+      .where("discussion_topic_section_visibilities.discussion_topic_id = discussion_topics.id")
+      .where(
+        Enrollment.active_or_pending.where(user_id: student)
+          .where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id")
+          .arel.exists
+      )
+  }
+
   scope :visible_to_student_sections, lambda { |student|
-    visibility_scope = DiscussionTopicSectionVisibility
-                       .active
-                       .where("discussion_topic_section_visibilities.discussion_topic_id = discussion_topics.id")
-                       .where(
-                         Enrollment.active_or_pending.where(user_id: student)
-                          .where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id")
-                          .arel.exists
-                       )
     merge(
       DiscussionTopic.where.not(discussion_topics: { context_type: "Course" })
       .or(DiscussionTopic.where(discussion_topics: { is_section_specific: false }))
-      .or(DiscussionTopic.where(visibility_scope.arel.exists))
+      .or(DiscussionTopic.where(discussion_topic_section_visibility_scope(student).arel.exists))
     )
+  }
+
+  scope :visible_to_ungraded_discussion_student_visibilities, lambda { |student|
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      visible_topic_ids = UngradedDiscussionStudentVisibility.where(user_id: student).select(:discussion_topic_id)
+
+      non_course_topics = DiscussionTopic.where.not(context_type: "Course")
+      differentiated_visible_topics = DiscussionTopic.where(id: visible_topic_ids).where(is_section_specific: false)
+      section_specific_visible_topics = DiscussionTopic.where(is_section_specific: true).where(discussion_topic_section_visibility_scope(student).arel.exists)
+
+      merge(non_course_topics.or(differentiated_visible_topics).or(section_specific_visible_topics))
+    else
+      visible_to_student_sections(student)
+    end
   }
 
   scope :recent, -> { where("discussion_topics.last_reply_at>?", 2.weeks.ago).order("discussion_topics.last_reply_at DESC") }
@@ -1344,6 +1375,16 @@ class DiscussionTopic < ActiveRecord::Base
     context.is_a?(Group) ||
       course.user_is_instructor?(user) ||
       context.grants_right?(user, session, :read_as_admin)
+  end
+
+  def user_can_summarize?(user)
+    if is_announcement
+      return false
+    end
+
+    course.feature_enabled?(:discussion_summary) && (
+      course.user_is_instructor?(user) || course.grants_right?(user, :read_as_admin)
+    )
   end
 
   def discussion_topic_id
@@ -1914,13 +1955,12 @@ class DiscussionTopic < ActiveRecord::Base
                            .pluck("discussion_topics.id", "discussion_topics.assignment_id", "assignment_student_visibilities.user_id")
                            .group_by { |_, _, user_id| user_id }
 
-    # Ungraded discussions are *normally* visible to all -- the exception is
-    # section-specific discussions, so here get the ones visible to everyone in the
-    # course, and below get the ones that are visible to the right section.
-    ids_visible_to_all = without_assignment_in_course(opts[:course_id]).where(is_section_specific: false).pluck(:id)
+    # Initialize dictionaries for different visibility scopes
+    ungraded_differentiated_topic_ids_per_user = {}
+    ids_visible_to_sections = {}
+    ids_visible_to_all = []
 
-    # Now get the section-specific discussions that are in the proper sections.
-    # build hash of user_ids to array of section ids
+    # Get Section specific discussions:
     sections_per_user = {}
     Enrollment.active.where(course_id: opts[:course_id], user_id: opts[:user_id])
               .pluck(:user_id, :course_section_id)
@@ -1939,11 +1979,21 @@ class DiscussionTopic < ActiveRecord::Base
     opts[:user_id].each { |user_id| topic_ids_per_user[user_id] = sections_per_user[user_id]&.map { |section_id| topic_ids_per_section[section_id] }&.flatten&.uniq&.compact }
     ids_visible_to_sections = topic_ids_per_user
 
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      ungraded_differentiated_topic_ids_per_user = joins_ungraded_discussion_student_visibilities(opts[:user_id], opts[:course_id]).where.not(is_section_specific: true).pluck("ungraded_discussion_student_visibilities.user_id", "discussion_topics.id").group_by(&:first).transform_values { |pairs| pairs.map(&:last).uniq }
+    else
+      # Ungraded discussions are *normally* visible to all -- the exception is
+      # section-specific discussions, so here get the ones visible to everyone in the
+      # course, and below get the ones that are visible to the right section.
+      ids_visible_to_all = without_assignment_in_course(opts[:course_id]).where(is_section_specific: false).pluck(:id)
+    end
+
     # build map of user_ids to array of item ids {1 => [2,3,4], 2 => [2,4]}
     opts[:user_id].index_with do |student_id|
       assignment_item_ids = (plucked_visibilities[student_id] || []).map { |id, _, _| id }
       section_specific_ids = ids_visible_to_sections[student_id] || []
-      assignment_item_ids.concat(ids_visible_to_all).concat(section_specific_ids)
+      ungraded_differentiated_specific_ids = ungraded_differentiated_topic_ids_per_user[student_id] || []
+      assignment_item_ids.concat(ids_visible_to_all).concat(section_specific_ids).concat(ungraded_differentiated_specific_ids)
     end
   end
 

@@ -404,4 +404,59 @@ describe GradeSummaryAssignmentPresenter do
       expect(@test_presenter.item_unread?("comment")).to be_falsey
     end
   end
+
+  describe "#display_score" do
+    before do
+      course_factory(active_all: true)
+      student_in_course(active_all: true)
+      teacher_in_course(active_all: true)
+      @assignment = @course.assignments.create!(title: "some assignment",
+                                                assignment_group: @group,
+                                                points_possible: 12)
+      @submission = @assignment.find_or_create_submission(@student)
+    end
+
+    let(:summary) do
+      GradeSummaryPresenter.new :first, :second, :third
+    end
+
+    let(:presenter) do
+      GradeSummaryAssignmentPresenter.new(summary,
+                                          @student,
+                                          @assignment,
+                                          @submission)
+    end
+
+    context "when has_no_score_display? is true" do
+      it "returns an empty string" do
+        allow(presenter).to receive(:has_no_score_display?).and_return(true)
+        expect(presenter.display_score).to eq("")
+      end
+    end
+
+    context "when has_no_score_display? is false" do
+      before do
+        allow(@submission).to receive(:published_score).and_return(5.666666667)
+        allow(presenter).to receive_messages(has_no_score_display?: false, published_grade: "F")
+      end
+
+      context "when points_based is true" do
+        it "returns the formatted score with precision" do
+          grading_standard = double("GradingStandard", points_based: true)
+          allow(@assignment).to receive(:grading_standard_or_default).and_return(grading_standard)
+
+          expect(presenter.display_score).to eq("5.67 F")
+        end
+      end
+
+      context "when points_based is false" do
+        it "returns the formatted score without precision" do
+          grading_standard = double("GradingStandard", points_based: false)
+          allow(@assignment).to receive(:grading_standard_or_default).and_return(grading_standard)
+
+          expect(presenter.display_score).to eq("5.666666667 F")
+        end
+      end
+    end
+  end
 end

@@ -29,7 +29,10 @@ import {
   outcomeGroupsMocks,
 } from '@canvas/outcomes/mocks/Outcomes'
 import {createCache} from '@canvas/apollo'
-import {showOutcomesImporter, showOutcomesImporterIfInProgress} from '@canvas/outcomes/react/OutcomesImporter'
+import {
+  showOutcomesImporter,
+  showOutcomesImporterIfInProgress,
+} from '@canvas/outcomes/react/OutcomesImporter'
 import {courseMocks, groupDetailMocks, groupMocks} from '@canvas/outcomes/mocks/Management'
 
 jest.mock('@canvas/outcomes/react/OutcomesImporter', () => ({
@@ -105,25 +108,25 @@ describe('OutcomeManagement', () => {
         <OutcomeManagement breakpoints={{tablet: true}} />
       </MockedProvider>
     )
-    jest.runAllTimers()
+    await act(async () => jest.runAllTimers())
 
     // Select a group in the lsh
     const cf0 = await findByText('Course folder 0')
     fireEvent.click(cf0)
-    jest.runAllTimers()
+    await act(async () => jest.runAllTimers())
 
     // The easy way to determine if lsh is passing to ManagementHeader is
     // to open the create outcome modal and check if the lhs group was loaded
     // by checking if the child of the lhs group is there
     fireEvent.click(within(getByTestId('managementHeader')).getByText('Create'))
-    jest.runAllTimers()
+    await act(async () => jest.runAllTimers())
     // there's something weird going on in the test here that while we find the modal
     // .toBeInTheDocument() fails, even though a findBy for it fails before ^that click.
     // We can test that the elements expected to be within it exist.
     const modal = await findByTestId('createOutcomeModal')
     expect(within(modal).getByText('Course folder 0')).not.toBeNull()
     expect(within(modal).getByText('Group 200 folder 0')).not.toBeNull()
-  }, 7500)  // Increase time to 7.5 seconds
+  }, 7500) // Increase time to 7.5 seconds
 
   const sharedExamples = () => {
     beforeEach(() => {

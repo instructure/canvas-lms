@@ -1905,7 +1905,7 @@ ko:
           학생이 제출물 파일에 대한 의견에서 변경된 파일을 볼 수 있습니다.
           
           *파일 이름을 인식할 수 있도록 제출물 파일의 이름을 바꾸지 마십시오.*
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "관련 항목"
     grade_gpa_scale_screenreader: "평점: %{grade}"
@@ -2881,6 +2881,7 @@ ko:
   canvas_cartridge_name: "Canvas Cartridge 가져오기"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas에서 ID 공급자를 인식할 수 없음"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas에 다음 사용자를 위한 계정이 없습니다: %{user}"
+  canvas_lms_6ce68514: "Canvas LMS"
   canvas_login_failure_message_4c922f2f: "Canvas 로그인 실패 메시지"
   canvas_revision_unknown: "알 수 없음"
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas가 응답이 유효하다고 간주"
@@ -6058,6 +6059,8 @@ ko:
     edit_view_rubric: "루브릭 보기"
     errors: 
       select_an_option: "옵션을 선택하시기 바랍니다."
+    gradebook_header_menu: 
+      speedgrader: SpeedGrader™
     graded: 평가됨
     graded_by_me: "%{graded_time}에 내가 평가"
     graded_then_resubmitted: "평가된 후 다시 제출됨 (%{when})"
@@ -13045,7 +13048,8 @@ ko:
     not_submitted: "제출 안 됨"
     turnitin: 
       resubmitting: "다시 제출 중..."
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_de0affa6: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   sr_gradebook: 
     all_sections: "모든 섹션"
     assignment_order_due_date: 기한으로
@@ -13057,6 +13061,7 @@ ko:
   start_5a4cfcd6: 시작
   start_a_new_course_57ae2480: "새 과목 시작하기"
   start_date_e937be8a: "시작 날짜"
+  started_5e138638: 시작됨
   state_66a67ba2: 상태
   state_standards_c9b1affd: "전국 표준"
   statistics: 

@@ -23,6 +23,7 @@ import FavoriteCourseCollection from 'ui/features/conversations/backbone/collect
 import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
+import {fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 
 const courseSelectionView = function () {
   const courses = {
@@ -35,7 +36,7 @@ const courseSelectionView = function () {
 
 QUnit.module('CourseSelectionView', {
   setup() {
-    this.now = $.fudgeDateForProfileTimezone(new Date())
+    this.now = fudgeDateForProfileTimezone(new Date())
     fakeENV.setup({CONVERSATIONS: {CAN_MESSAGE_ACCOUNT_CONTEXT: false}})
   },
   teardown() {
@@ -43,7 +44,9 @@ QUnit.module('CourseSelectionView', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', assert => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const course = new Course()
   const done = assert.async()
   assertions.isAccessible(courseSelectionView(), done, {a11yReport: true})

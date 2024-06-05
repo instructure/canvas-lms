@@ -31,7 +31,7 @@ import {TextArea} from '@instructure/ui-text-area'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import { captureException } from '@sentry/react'
+import {captureException} from '@sentry/react'
 
 const I18n = useI18nScope('groups')
 

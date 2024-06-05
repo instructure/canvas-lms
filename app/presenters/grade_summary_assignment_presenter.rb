@@ -214,6 +214,8 @@ class GradeSummaryAssignmentPresenter
   def display_score
     if has_no_score_display?
       ""
+    elsif assignment.grading_standard_or_default.points_based
+      "#{I18n.n(round_if_whole(submission.published_score), precision: 2)} #{published_grade}"
     else
       "#{I18n.n round_if_whole(submission.published_score)} #{published_grade}"
     end

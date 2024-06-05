@@ -5,6 +5,9 @@ ENV["RUNNING_AS_DAEMON"] = "true"
 ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
 # We avoid loading the whole rails environment here, so that commands like
 # `status` and `start` return much faster.
+require "bundler"
+Bundler.self_manager.restart_with_locked_bundler_if_needed
+
 require "bundler/setup"
 require "delayed_job"
 

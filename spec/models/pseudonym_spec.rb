@@ -84,7 +84,7 @@ describe Pseudonym do
 
   it "infers the login_attribute on a new pseudonym for an auth provider that uses them" do
     u = User.create!
-    ap = Account.default.authentication_providers.create!(auth_type: "microsoft")
+    ap = Account.default.authentication_providers.create!(auth_type: "microsoft", tenant: "microsoft")
     p = u.pseudonyms.create!(unique_id: "a@b.com", authentication_provider: ap)
     expect(p.login_attribute).to eq "sub"
   end
@@ -720,7 +720,7 @@ describe Pseudonym do
     end
 
     context "with contemporary auth types" do
-      let!(:aac) { Account.default.authentication_providers.create!(auth_type: "microsoft", login_attribute: "sub") }
+      let!(:aac) { Account.default.authentication_providers.create!(auth_type: "microsoft", tenant: "microsoft", login_attribute: "sub") }
 
       before do
         new_pseud.authentication_provider_id = aac.id
@@ -816,7 +816,7 @@ describe Pseudonym do
     before :once do
       user_factory(active_all: true, active_cc: true)
       Notification.create!(name: "Account Verification", subject: "Test", category: "Registration", delay_for: 0)
-      @authentication_provider = Account.default.authentication_providers.create!(auth_type: "microsoft", login_attribute: "tid+oid")
+      @authentication_provider = Account.default.authentication_providers.create!(auth_type: "microsoft", tenant: "common", login_attribute: "tid+oid")
       @authentication_provider.settings["old_login_attribute"] = "email"
       @authentication_provider.save!
       @pseudonym = @user.pseudonyms.create!(unique_id: "foo@example.com", authentication_provider: @authentication_provider)

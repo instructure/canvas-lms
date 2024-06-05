@@ -20,7 +20,7 @@
 import {render, waitFor, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import DiscussionTopicForm from '../DiscussionTopicForm'
+import DiscussionTopicForm, {isGuidDataValid, getAbGuidArray} from '../DiscussionTopicForm'
 import {DiscussionTopic} from '../../../../graphql/DiscussionTopic'
 import {Assignment} from '../../../../graphql/Assignment'
 import {GroupSet} from '../../../../graphql/GroupSet'
@@ -74,6 +74,8 @@ describe('DiscussionTopicForm', () => {
       current_user: {},
       STUDENT_PLANNER_ENABLED: true,
       DISCUSSION_CHECKPOINTS_ENABLED: true,
+      ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS: false,
+      context_is_not_group: true,
     }
   })
 
@@ -133,6 +135,36 @@ describe('DiscussionTopicForm', () => {
     expect(document.queryByTestId('group-discussion-checkbox')).not.toBeTruthy()
     expect(document.queryByText('Available from')).not.toBeTruthy()
     expect(document.queryByText('Until')).not.toBeTruthy()
+  })
+
+  describe('assignment edit placement', () => {
+    it('renders if the discussion is not an announcement', () => {
+      const {queryByTestId} = setup()
+      expect(queryByTestId('assignment-external-tools')).toBeInTheDocument()
+    })
+
+    it('renders if it is an announcement and the assignment edit placement not on announcements FF is off', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES = {
+        is_announcement: true,
+      }
+      const {queryByTestId} = setup()
+      expect(queryByTestId('assignment-external-tools')).toBeInTheDocument()
+    })
+
+    it('does not render if it is an announcement and the assignment edit placement not on announcements FF is on', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES = {
+        is_announcement: true,
+      }
+      window.ENV.ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS = true
+      const {queryByTestId} = setup()
+      expect(queryByTestId('assignment-external-tools')).not.toBeInTheDocument()
+    })
+
+    it('does not render if the context is not a course', () => {
+      ENV.context_is_not_group = false
+      const {queryByTestId} = setup()
+      expect(queryByTestId('assignment-external-tools')).not.toBeInTheDocument()
+    })
   })
 
   describe('publish indicator', () => {
@@ -454,6 +486,63 @@ describe('DiscussionTopicForm', () => {
 
       fireEvent.keyDown(automaticReviewsInput, {keyCode: 40})
       expect(automaticReviewsInput.value).toBe('1')
+    })
+
+    describe('validate abGuid for Mastery Connect', () => {
+      it('returns the ab_guid array from the event data', () => {
+        setup()
+
+        const mockEvent = {
+          data: {
+            subject: 'assignment.set_ab_guid',
+            data: ['1E20776E-7053-11DF-8EBF-BE719DFF4B22', '1E20776E-7053-0000-0000-BE719DFF4B22'],
+          },
+        }
+
+        expect(getAbGuidArray(mockEvent)).toEqual([
+          '1E20776E-7053-11DF-8EBF-BE719DFF4B22',
+          '1E20776E-7053-0000-0000-BE719DFF4B22',
+        ])
+      })
+
+      it('isGuidDataValid returns true if ab_guid format and subject are correct', () => {
+        setup()
+
+        const mockEvent = {
+          data: {
+            subject: 'assignment.set_ab_guid',
+            data: ['1E20776E-7053-11DF-8EBF-BE719DFF4B22'],
+          },
+        }
+
+        expect(isGuidDataValid(mockEvent)).toEqual(true)
+      })
+
+      it('isGuidDataValid returns false if subject is not assignment.set_ab_guid', () => {
+        setup()
+
+        const mockEvent = {
+          data: {
+            subject: 'not right subject',
+            data: ['1E20776E-7053-11DF-8EBF-BE719DFF4B22'],
+          },
+        }
+
+        expect(isGuidDataValid(mockEvent)).toBe(false)
+      })
+
+      it('isGuidDataValid returns false if at least one of the ab_guids in the array is not formatted correctly', () => {
+        setup()
+
+        const mockEvent = {
+          data: {
+            subject: 'assignment.set_ab_guid',
+            data: ['not right format', '1E20776E-7053-11DF-8EBF-BE719DFF4B22'],
+          },
+        }
+
+        expect(isGuidDataValid(mockEvent)).toBe(false)
+      })
     })
 
     describe('Checkpoints', () => {

@@ -176,6 +176,9 @@ const locale = {
   "congruent_5a244acd": { "message": "Kongriyan" },
   "contains_311f37b7": { "message": "Kontni" },
   "content_1440204b": { "message": "Kontni" },
+  "content_in_the_editor_will_be_changed_press_cancel_d5bf3357": {
+    "message": "Kontni ki nan editè a ap chanje. Peze Cancel pou w ka konsève kontni orijinal la."
+  },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "Kontni an ap transfere toujou, si w kontinye li pa p entegre jan li ta dwe a."
   },
@@ -754,6 +757,9 @@ const locale = {
   "precedes_196b9aef": { "message": "Presedan" },
   "precedes_equal_20701e84": { "message": "Presedan Egalite" },
   "preformatted_d0670862": { "message": "Prefòmate" },
+  "prepend_findtext_append_8e0e769a": {
+    "message": "{ prepend }{ findText }{ append }"
+  },
   "prev_f82cbc48": { "message": "Anvan" },
   "preview_53003fd2": { "message": "Apèsi" },
   "preview_a3f8f854": { "message": "APÈSI" },
@@ -808,6 +814,9 @@ const locale = {
   "resize_ec83d538": { "message": "Redimansyone" },
   "restore_auto_save_deccd84b": {
     "message": "Restore anrejistreman otomatik?"
+  },
+  "result_index_of_max_7db5ad8b": {
+    "message": "Rezilta { index } sou { max }."
   },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Tounikè Envèse (pa sede)"

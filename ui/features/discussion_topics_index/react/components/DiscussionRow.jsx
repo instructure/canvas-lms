@@ -863,7 +863,7 @@ class DiscussionRow extends Component {
                 <Grid.Row vAlign="middle">
                   <Grid.Col vAlign="middle" textAlign="start">
                     {this.renderTitle()}
-                    {this.renderSectionsTooltip()}
+                    {!ENV?.FEATURES?.differentiated_modules && this.renderSectionsTooltip()}
                   </Grid.Col>
                   <Grid.Col vAlign="top" textAlign="end">
                     {this.renderUpperRightBadges()}

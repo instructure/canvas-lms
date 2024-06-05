@@ -197,6 +197,9 @@ const locale = {
   "congruent_5a244acd": { "message": "Congruent" },
   "contains_311f37b7": { "message": "Conté" },
   "content_1440204b": { "message": "Contingut" },
+  "content_in_the_editor_will_be_changed_press_cancel_d5bf3357": {
+    "message": "Es canviarà el contingut de l''editor. Premeu Cancel·la per mantenir el contingut original."
+  },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "Encara s''està penjant el contingut. Si continueu, no s''integrarà adequadament."
   },
@@ -835,6 +838,9 @@ const locale = {
   "precedes_196b9aef": { "message": "Precedeix a" },
   "precedes_equal_20701e84": { "message": "El precedent és igual que" },
   "preformatted_d0670862": { "message": "Amb format previ" },
+  "prepend_findtext_append_8e0e769a": {
+    "message": "{ prepend }{ findText }{ append }"
+  },
   "prev_f82cbc48": { "message": "Anterior" },
   "preview_53003fd2": { "message": "Visualització prèvia" },
   "preview_a3f8f854": { "message": "VISUALITZACIÓ PRÈVIA" },
@@ -895,6 +901,9 @@ const locale = {
   "resize_ec83d538": { "message": "Canvia la mida" },
   "restore_auto_save_deccd84b": {
     "message": "Voleu restaurar el contingut desat automàticament?"
+  },
+  "result_index_of_max_7db5ad8b": {
+    "message": "Resultat { index } de { max }."
   },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Trinquet invers (no produeix)"

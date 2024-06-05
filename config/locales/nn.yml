@@ -207,6 +207,7 @@ nn:
   a_name_for_this_set_is_required_222bad23: "Eit namn er obligatorisk. "
   a_name_is_required_b5df38a9: "Eit namn er obligatorisk"
   a_new_annotation_has_been_made_by_author_on_the_as_63ad4351: " %{author} har lagt til ein ny merknad på oppgåva %{assignment_name}."
+  a_new_annotation_has_been_made_on_the_assignment_a_e473936e: "Ein ny kommentar har blitt gjort på innleveringa %{assignment_name}"
   a_new_assignment_has_been_created_for_your_course__12b72639: "Ei ny oppgåve er oppretta for emnet ditt, %{course_name}"
   a_new_module_has_been_created_with_the_content_ret_b01468b2: "Ein ny modul er blitt oppretta med innhaldet som vart returnert frå verktøyet. Om du vil sjå det, kan du gå til Modular."
   a_page_with_this_title_already_exists_please_choos_19c53cc4: "Ei side med denne tittelen finst allereie. Vennligst vel ein annan tittel."
@@ -290,6 +291,7 @@ nn:
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Ein tabell som inneheld data frå graderingsskjemaet. Kvar rad inneheld eit namn, ein maksimum prosentverdi og ein minimum prosentverdi. Kvar rad inneheld også ein knapp for å legge til ei ny rad nedanfor, og ein knapp for å slette gjeldande rad."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Ein tabell som inneheld data for vurderingsskala. Først er eit namn på vurderingsskalaen og knappar for redigering og sletting av skalaen. Kvar rad inneheld eit namn, ein maksimal prosentandel og ein minste prosentandel. I tillegg inneheld kvar rad ein knapp for å leggje til ein ny rad nedanfor, og ein knapp for å slette gjeldande rad."
   a_timeout_occurred_contacting_external_authenticat_c064ea48: "Ei tidsavbrot oppstod ved kontakt med ekstern autentiseringsteneste"
+  a_verification_code_has_been_sent_to_email_please__108f2713: "Godkjenningskode er send til %{email}. Skriv inn koden her:"
   a_wonderful_assignment_d3139d9b: "Ei fin oppgåve"
   a_yearly_rrule_must_include_byday_or_bymonthday_b56649f4: "Ein årleg RRULE må inkludere BYDAY eller BYMONTHDAY"
   a_z_243c3301: A–Å
@@ -312,6 +314,16 @@ nn:
         partner_id: Partnar-ID
         partner_key: Partnarnøkkel
   academic_engagement_capella_74946a80: "Akademisk engasjement (Capella)"
+  academic_engagement_capella_v2_2023_08_28_5c92fd3f: "Akademisk engasjement (Capella V2-2023-08-28)"
+  academic_engagement_capella_v3_2024_02_05_775b9f21: "Akademisk engasjement (Capella V3-2024-02-05)"
+  academic_engagement_detail_capella_e76c939d: "Akademisk engasjement detalj (Capella)"
+  academic_engagement_detail_capella_v2_2023_08_28_3ba31c31: "Akademisk engasjement detalj (Capella V2-2023-08-28)"
+  academic_engagement_detail_capella_v3_2024_02_05_106a7e2f: "Akademisk engasjement detalj (Capella V3-2024-02-05)"
+  academic_engagement_detail_strayer_1f80cba4: "Akademisk engasjement detalj (Strayer)"
+  academic_engagement_detail_strayer_v3_2023_08_28_cea3521c: "Akademisk engasjement detalj (Strayer V3-2023-08-28)"
+  academic_engagement_strayer_8c7832b9: "Akademisk engasjement (Strayer)"
+  academic_engagement_strayer_v2_61e00b88: "Akademisk engasjement (Strayer V2)"
+  academic_engagement_strayer_v3_2023_08_28_a992b312: "Akademisk engasjement (Strayer V3-2023-08-28)"
   academic_success_reporting_2585c499: "Akademisk suksessrapportering"
   acalanes_union_high_grade_report_ae9bce11: "Acalanes Union High vurderingsrapport"
   accept_2fdd362e: Godta
@@ -328,6 +340,7 @@ nn:
   access_canvas_training_videos_and_courses_ea43173a: "Gå til Canvas sine opplæringsvideoar og -emne"
   access_denied_f922a9ff: "Ingen tilgang"
   access_report_80d28095: Tilgangsrapport
+  access_to_faculty_journal_will_end_on_deprecationd_a0774848: "Tilgang til fakultetsjournalen vil ende %{deprecationDate}. Ta kontakt med brukerstøtte om du har spørsmål."
   access_to_these_tabs_requires_the_outcome_proficie_dd8ca732: "Tilgang til desse fanene krev Ferdigheitsberekningar for læringsmål - legg til/rediger og Meistringsskalaer for læringsmål - legg til/rediger rettigheter."
   access_token_3be22221: Tilgangstoken
   access_token_count_access_token_count_dfb5463c: "Tal på tilgangs-token %{access_token_count}"
@@ -697,6 +710,8 @@ nn:
   account_user: 
     types: 
       account_admin: Kontoadministrator
+  account_verification_required_486c5ccd: "Verifisering av konto er påkrevd"
+  account_verification_successful_b051223: "Konto er verifisert"
   accountname_accountcount_a6e2ba71: "%{accountName} (%{accountCount})"
   accountname_accountcount_accounts_e2c19840: "%{accountName}, %{accountCount} kontoar"
   accounts: 
@@ -2210,7 +2225,7 @@ nn:
   add_edit_and_delete_events_on_account_calendars_71bea006: "Legg til, rediger og slett hendingar på kontokalendarar"
   add_edit_delete_sections_d32c5b4d: "legg til / rediger / slett seksjonar"
   add_email_address_aef3b61: "Legg til e-postadresse"
-  add_event_9e21d0ff: "Legg til hendelse"
+  add_event_9e21d0ff: "Legg til hending"
   add_existing_content_7e36da66: "Legg til eksisterande innhald"
   add_external_feed_6d437a28: "Legg til ekstern straum"
   add_feed_49ed1cb2: "Legg til straum"
@@ -2239,6 +2254,7 @@ nn:
   add_manage_conclude_delete_publish_reset_8a5aa902: "legg til / administrer / avslutt / slett / publiser / tilbakestill"
   add_mastery_level_76469d98: "Legg til meistringsnivå"
   add_media_cfa37b54: "Legg til media"
+  add_message_10cc308c: "Legg til melding"
   add_moderator_review_copy_1st_a484c813: "Legg til gjennomgang frå sensuransvarleg (første eksemplar)"
   add_moderator_review_copy_2nd_e80d458f: "Legg til gjennomgang frå sensuransvarleg (andre eksemplar)"
   add_moderator_review_new_3c183cea: "Legg til gjennomgang frå sensuransvarleg (ny)"
@@ -2275,12 +2291,14 @@ nn:
   add_recipient_ff135ed7: "Legg til mottakar"
   add_remove_in_courses_d65aaee3: "legg til / fjern i emne"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Legg til, fjerne eller ordne seksjon på nytt for porteføljen"
+  add_requirement_357585bc: "Legg til vilkår"
   add_review_2fb1590c: "Legg til gjennomgang"
   add_role_3dc4d273: "Legg til rolle"
   add_rubric_3636d9a6: "Legg til vurderingsskjema"
   add_scope_a5208f8b: "Legg til omfang"
   add_section_8b027a1c: "Legg til seksjon"
   add_set_of_grading_periods_5b4d6e51: "Legg til fleire periodar for karaktersetjing"
+  add_signature_399fa4df: "Legg til signatur"
   add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "Legg til SpeedGrader-lenker til oversiktene for oppgåver og quizzar"
   add_status_2df2bdd6: "Legg til status"
   add_student_1152afc0: "Legg til student"
@@ -2332,7 +2350,7 @@ nn:
   additional_occurrence_s_7b5b0173: Tilleggsførekomst(ar)
   additional_options_7cefee79: "Fleire innstillingar"
   additional_outcomes_options_6df428f1: "Fleire læringsmålalternativ"
-  additional_replies_required_13697d0a: "Fleire svar er krevd"
+  additional_replies_required_13697d0a: "Fleire svar er påkrevd"
   additional_settings_20362654: "Fleire innstillingar"
   additional_settings_for_sis_syncing_f926973e: "Tilleggsinnstillingar for SIS-synkronisering"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Fleire alternativ for SIS-synkroniserte oppgåver, quizar og diskusjonar"
@@ -2364,6 +2382,8 @@ nn:
   admin_analytics_description: "Gjer det mogleg å bruke analyseverktøy på kontonivå. Admin Analytics dashboardet gir detaljar om bruken av Canvas, suksess i Canvasemne og engasjement frå studentar. Les meir i *Admin Analytics Hub* i Canvas-fellesskapet."
   admin_analytics_eacba735: "Admin Analyse"
   admin_analytics_view_admin_analytics_permission_cc7d46db: "Administrasjons analyse - Vis løyve for admin analyse"
+  admin_analytics_view_and_export_data_7dc4d362: "Analytics for administratorar - sjå og eksporter data"
+  admin_analytics_view_permission_description: "Gjør det nye løyve for Admin Analytics synleg"
   admin_csv_f8d1b3eb: "CSV-fil over administratorar"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Administratoreksport for fleire vurderingsperiodar"
   admin_navigation_menu_77b801a2: Admin-navigeringsmeny
@@ -2466,6 +2486,7 @@ nn:
   all_4321c3a1: Alle
   all_account_types_e83c1516: "Alle kontoar"
   all_accounts_3bafc860: "Alle kontoar"
+  all_announcements_b374ffda: "Alle kunngjeringar"
   all_assignees_removed_14639499: "Alle mottakarar fjerna"
   all_assignment_groups_a65e9e46: "Alle oppgåvegruppene"
   all_assignments_b79a4d6a: "Alle oppgåvene"
@@ -2524,6 +2545,7 @@ nn:
   all_subject_navigation_has_been_disabled_f06b0154: "All emnenavigering er deaktivert."
   all_subjects_5a42cfdb: "Alle emner"
   all_submission_comments_have_been_marked_as_read_74c0683b: "Alle innleveringskommentarar er merka som lesne"
+  all_submissions_3eedfb97: "Alle innleveringar"
   all_submissions_must_have_a_selected_grade_3a84e5a9: "Alle innleveringar må ha ein vurdering."
   all_terms_cd27b0fb: "Alle semester"
   all_timezones_5e8afa7b: "Alle tidssoner"
@@ -2538,6 +2560,7 @@ nn:
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "La ein sensuransvarleg gå gjennom fleire uavhengige karaktersetjingar for utvalde innleveringar"
   allow_a_teacher_to_set_the_number_of_allowed_attem_19deb51d: "Tillat lærarar å setje ei oppgåve sitt antal tillatne forsøk gjennom brukargrensesnittet"
   allow_administrative_actions_in_courses_20c33fed: "Tillat administrative handlingar i emne"
+  allow_administrators_to_set_a_default_grading_sche_9b928f00: "La administratorar velje eit standard karakteroppsett for kontoen. Dette oppsettet vil bli standard for alle emne tilhøyrande kontoen, men enkeltemner kan overstyre valet med sitt eige standardval"
   allow_attendees_to_4ef30c3: "Tillat deltakarar å..."
   allow_bb7ce9b1: Tillat
   allow_blueprint_publishing_after_association_fae6ba95: "Tillat Blueprint publisering basert på forbindelse"
@@ -2591,6 +2614,7 @@ nn:
   allow_switching_to_the_new_assignments_page_9ac0ad93: "Tillat å byte til den nye oppgåvesida"
   allow_teachers_to_change_the_dates_on_a_set_of_ass_4d48baec: "Tillat lærarar å endre datoane til eit sett med oppgåver i eitt trinn"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Tillat å sende varsel gjennom vår dispatch-kø"
+  allow_the_item_banks_share_with_subaccounts_permis_a8a6e87f: "Tillat løyve \"Spørsmålsbank - del med underkontoar\""
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Tillat at verktøyet får tilgang til IMS-namn og rolletildelingsteneste. "
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "Tillat ikkje-verifiserte e-postadresser når du legg til brukarar"
   allow_users_to_comment_45b8f753: "La studentane få kommentere"
@@ -3392,7 +3416,7 @@ nn:
   anonymous_e1b8ad27: Anonym
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Anonym vurdering kan ikkje aktiverast for gruppeoppgåver"
   anonymous_grading_ccb5045c: "Anonym karaktersetjing"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym karaktersetjing tvingar studentnamn til å vere skjulte i SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym karaktersetjing tvingar studentnamn til å vere skjulte i SpeedGrader"
   anonymous_grading_with_new_quizzes_ba0391f3: "Anonym vurdering med nye quizar"
   anonymous_id_2ef1c6d2: "Anonym %{id}"
   anonymous_id_you_cf43ab76: "Anonym %{id} (du)"
@@ -3582,7 +3606,7 @@ nn:
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Er du sikker på at du vil slette kunngjeringa?"
   are_you_sure_you_want_to_delete_this_assignment_88be6f5e: "Er du sikker på at du vil slette denne oppgåva?"
   are_you_sure_you_want_to_delete_this_comment_4ee386d: "Er du sikker på at du vil slette denne kommentaren?"
-  are_you_sure_you_want_to_delete_this_custom_status_487882ee: "Er du sikker på at du vil slette denne tilpassa statusen? Denne handlinga kan ikkje angrast. Alle innsendingar og poeng som for øyeblikket er merket med denne tilpassa statusen, vil få statusen fjerna."
+  are_you_sure_you_want_to_delete_this_custom_status_487882ee: "Er du sikker på at du vil slette denne tilpassa statusen? Denne handlinga kan ikkje angrast. Alle innsendingar og poeng som for augeblikket er merka med denne tilpassa statusen, vil få statusen fjerna."
   are_you_sure_you_want_to_delete_this_developer_key_9937481a: "Er du sikker på at du vil slette denne utviklarnøkkelen?"
   are_you_sure_you_want_to_delete_this_developer_key_ce246033: "Er du sikker på at du vil slette utviklarnøkkelen? Handlinga vil også slette andre verktøy som er forbundet med utviklarnøkkelen i denne konteksten."
   are_you_sure_you_want_to_delete_this_discussion_334554e0: "Er du sikker på at du vil slette denne diskusjonen?"
@@ -4066,7 +4090,7 @@ nn:
       group_assignment_header: Kommentarar...
     external_grader_sidebar: 
       edit_assignment_settings: "Rediger oppgåveinnstillingar"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
     file_retrieval_error: "Henting av fil mislukkast"
     getting_file: "Hentar fil..."
     grade_assignment: 
@@ -4080,7 +4104,7 @@ nn:
       resubmission_count: 
         one: "1 innlevering send på nytt som ikkje er vurdert"
         other: "%{count} innleveringar sende på nytt som ikkje er vurderte"
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "Relaterte element"
     grade_gpa_scale_screenreader: "Vurdering: %{grade}"
@@ -4534,7 +4558,7 @@ nn:
   assignmenttype_title_at_datetime_until_endtime_8d4c211a: "%{assignmentType}%{title}, den %{datetime}til %{endTime}"
   assignmenttype_title_due_datetime_c7eaaffb: "%{assignmentType}%{title}, frist %{datetime}"
   assignmenttype_title_has_a_to_do_time_at_datetime_dace2699: "%{assignmentType}%{title} har frist %{datetime}."
-  assignmenttype_title_is_marked_as_done_fbcc0bb: "%{assignmentType}%{title}er merka som fullført."
+  assignmenttype_title_is_marked_as_done_fbcc0bb: "%{assignmentType}%{title}er markert som fullført."
   assignmenttype_title_is_not_marked_as_done_9344572f: "%{assignmentType}%{title} er ikkje markert som fullført."
   assignmenttype_title_posted_datetime_e070c79: "%{assignmentType}%{title}publisert %{datetime}."
   assignmenttype_title_reminder_datetime_2f1e8dca: "%{assignmentType}%{title}, påminning%{datetime}."
@@ -5474,7 +5498,7 @@ nn:
     see_quiz: "Sjå %{quiz_name}"
     see_related_link: "Sjå relatert lenke"
   calendar_event_89aadc1c: Kalenderhending
-  calendar_event_itemtitle_812caedd: "Kalenderhendelse, %{itemTitle}"
+  calendar_event_itemtitle_812caedd: "Kalenderhending, %{itemTitle}"
   calendar_events: 
     crumbs: 
       new: "Ny kalenderhending"
@@ -5738,6 +5762,7 @@ nn:
   canvas_instructor_guide_7cf106cb: "Canvas guide for undervisarar"
   canvas_introduction_video_2d81f3ad: "Canvas introduksjonsvideo"
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas er ikkje sett opp til å ta imot innloggingar frå %{issuer}."
+  canvas_lms_6ce68514: "Canvas læringsplattform (LMS)"
   canvas_login_failure_message_4c922f2f: "Feilmelding frå Canvas-pålogging"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Backup-kodar for fleirfaktorautentisering"
   canvas_needs_acccess_to_your_camera_16db6502: "Canvas treng tilgang til kameraet ditt. "
@@ -11549,8 +11574,8 @@ nn:
   gradebook: 
     alerts: 
       no_active_students: "Enten er det ikkje aktive studentar i emnet eller så kan ingen karaktersetjast av deg."
-      no_students_in_groups_back: "Fordi det ikkje finst tildelte brukarar kan innleveringar for denne oppgåva ikkje vurderast i SpeedGrader™. Tildel brukarar til gruppesettet og prøv på nytt. Klikk på 'OK' for å tilbake."
-      no_students_in_groups_close: "Fordi det ikkje finst tildelte brukarar kan innleveringar for denne oppgåva ikkje vurderast i SpeedGrader™. Tildel brukarar til gruppesettet og prøv på nytt. Klikk på 'OK' for å lukke vindauget."
+      no_students_in_groups_back: "Fordi det ikkje finst tildelte brukarar kan innleveringar for denne oppgåva ikkje vurderast i SpeedGrader. Tildel brukarar til gruppesettet og prøv på nytt. Klikk på 'OK' for å tilbake."
+      no_students_in_groups_close: "Fordi det ikkje finst tildelte brukarar kan innleveringar for denne oppgåva ikkje vurderast i SpeedGrader. Tildel brukarar til gruppesettet og prøv på nytt. Klikk på 'OK' for å lukke vindauget."
       no_students_in_section: "Finn ingen studentar i seksjonen, går tilbake til å vise alle seksjonane."
       scores_updated: 
         one: "1 studentresultat er oppdatert"
@@ -11733,7 +11758,7 @@ nn:
       message_students_who: "Send melding til studentar som ..."
       re_upload_submissions: "Last tilbake kommenterte filer"
       set_default_grade: "Bruk standardkarakter"
-      speedgrader: SpeedGrader™
+      speedgrader: SpeedGrader
     header_filter: 
       course_average: Kursgjennomsnitt
       course_median: Kursmedian
@@ -23613,14 +23638,14 @@ nn:
     not_submitted: "ikkje levert"
     turnitin: 
       resubmitting: "Sender på nytt..."
-  speedgrader_d9a6fa90: SpeedGrader™
+  speedgrader_d9a6fa90: SpeedGrader
   speedgrader_de0affa6: SpeedGrader™
   speedgrader_error_page_d9c4a075: "SpeedGrader feilside"
   speedgrader_loading_error_235fd2e2: "SpeedGrader feil med lasting"
   speedgrader_settings_4195099b: SpeedGrader-innstillingar
   speedgrader_settings_c9503705: SpeedGrader-innstillingar
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studio Media opptak"
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Separer
   split_merged_users_6b81c595: "Del samanslåtte brukarar"
   split_number_of_students_per_group_4a05f76f: "Del antall studentar per gruppe"
@@ -23712,6 +23737,7 @@ nn:
   startdate_to_enddate_8811cf2b: "%{startDate} til %{endDate}"
   startdatetime_enddatetime_4284113b: "%{startDateTime} - %{endDateTime}"
   startdatetime_endtime_6e08f3c2: "%{startDateTime} - %{endTime}"
+  started_5e138638: Starta
   starting_content_share_2d8c2999: "Startar innhaldsdeling"
   starting_copy_operation_cc46d911: "Startar kopieringsjobb"
   starting_import_operation_f25745f0: "Startar importjobb"

@@ -24,7 +24,13 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   plugin_settings :application_id, application_secret: :application_secret_dec
 
   SENSITIVE_PARAMS = [:application_secret].freeze
+  # Tenant IDs are always GUIDs, but we will translate the GUID for
+  # the Microsoft personal account tenant to "microsoft" for ease
+  # of identification. "guests" and "common" are special cases that
+  # trigger special processing
   MICROSOFT_TENANT = "9188040d-6c67-4c5b-b112-36a304b66dad"
+  WELL_KNOWN_TENANTS = %w[microsoft guests common].freeze
+  GUID_REGEX = /^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$/
 
   def self.singleton?
     false
@@ -35,6 +41,10 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   alias_method :application_secret, :client_secret
   alias_method :application_secret=, :client_secret=
   alias_method :login_attribute_for_pseudonyms, :login_attribute
+
+  validates :tenants, presence: true
+  validate :tenants, :validate_tenants
+  validate :login_attribute, :validate_secure_login_attribute
 
   def client_id
     application_id
@@ -95,10 +105,17 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     ids.slice("tid", *self.class.login_attributes)
   end
 
+  # always process through the multi-valued setter
+  def tenant=(value)
+    self.tenants = value
+  end
+
   def tenants=(value)
     value = value.split(",") if value.is_a?(String)
     value = value.filter_map(&:strip).uniq
-    self.tenant = value.first
+    value << "microsoft" if value.delete(MICROSOFT_TENANT)
+    value = ["common"] if value.include?("common")
+    self["tenant"] = value.first
     settings["allowed_tenants"] = value[1..]
   end
 
@@ -138,5 +155,53 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     return "common" if tenants.length != 1 || tenants == ["common"]
 
     tenants.first
+  end
+
+  def validate_tenants
+    tenants.each do |tenant|
+      next if WELL_KNOWN_TENANTS.include?(tenant)
+      next if GUID_REGEX.match?(tenant)
+
+      errors.add(:base, t("Invalid tenant %{tenant}", tenant: tenant.inspect))
+    end
+
+    if tenants == ["guests"]
+      errors.add(:base, t('"guests" cannot be the only allowed tenant'))
+    end
+
+    if mapped_allowed_tenants - [MICROSOFT_TENANT] == ["guests"]
+      errors.add(:base, t('"guests" cannot be used with the "microsoft" tenant'))
+    end
+  end
+
+  def validate_secure_login_attribute
+    # don't error out on this if we already errored on empty tenants
+    return if tenants.empty?
+
+    tenants = mapped_allowed_tenants
+    tenants.delete("guests")
+
+    if tenants.include?("common")
+      unless login_attribute == "tid+oid"
+        errors.add(:base, t('Only "tid+oid" is supported with the "common" tenant'))
+      end
+      return
+    end
+
+    if tenants.length > 1 && login_attribute == "oid"
+      errors.add(:base, t('"oid" cannot be used with multiple tenants'))
+    end
+
+    return unless jit_provisioning?
+
+    if tenants.include?(MICROSOFT_TENANT)
+      if tenants == [MICROSOFT_TENANT]
+        unless ["sub", "tid+oid", "oid"].include?(login_attribute)
+          errors.add(:base, t('Only "tid+oid", "sub", or "oid" are supported with the "microsoft" tenant'))
+        end
+      elsif !["sub", "tid+oid"].include?(login_attribute)
+        errors.add(:base, t('Only "tid+oid" or "sub" are supported with the "microsoft" tenant'))
+      end
+    end
   end
 end

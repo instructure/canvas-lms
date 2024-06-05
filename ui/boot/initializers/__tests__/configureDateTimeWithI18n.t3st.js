@@ -39,9 +39,8 @@ import '../../../ext/custom_moment_locales/mi_nz'
 import '../../../ext/custom_moment_locales/hy_am'
 import '../../../ext/custom_moment_locales/sl'
 
-import $ from 'jquery'
-import '@canvas/datetime/jquery'
 import {parse, format, hasMeridiem} from '@canvas/datetime'
+import {dateString} from '@canvas/datetime/date-functions'
 import * as configureDateTime from '../configureDateTime'
 import * as configureDateTimeMomentParser from '../configureDateTimeMomentParser'
 // eslint-disable-next-line import/no-nodejs-modules
@@ -127,7 +126,7 @@ for (const locale of locales) {
 
     test(`timezone -> moment`, () => {
       for (const date of dates) {
-        const formattedDate = $.dateString(date)
+        const formattedDate = dateString(date)
         const formattedTime = format(date, 'time.formats.tiny')
         const formatted = `${formattedDate} ${formattedTime}`
 

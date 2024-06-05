@@ -836,10 +836,6 @@ class ContextExternalTool < ActiveRecord::Base
       settings.delete(type) unless extension_setting(type, :url)
     end
 
-    unless root_account.feature_enabled?(:allow_lti_tools_editor_button_placement_without_icon)
-      settings.delete(:editor_button) unless editor_button(:icon_url) || editor_button(:canvas_icon_class)
-    end
-
     sync_placements!(Lti::ResourcePlacement::PLACEMENTS.select { |type| settings[type] }.map(&:to_s))
     true
   end
@@ -1614,11 +1610,19 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def placement_allowed?(placement)
-    return true if placement != :submission_type_selection
+    return true unless Lti::ResourcePlacement::RESTRICTED_PLACEMENTS.include? placement.to_sym
 
-    allowed_domains = Setting.get("submission_type_selection_allowed_launch_domains", "").split(",").map(&:strip).reject(&:empty?)
-    allowed_dev_keys = Setting.get("submission_type_selection_allowed_dev_keys", "").split(",").map(&:strip).reject(&:empty?)
+    allowed_domains = Setting.get("#{placement}_allowed_launch_domains", "").split(",").map(&:strip).reject(&:empty?)
+    allowed_dev_keys = Setting.get("#{placement}_allowed_dev_keys", "").split(",").map(&:strip).reject(&:empty?)
     allowed_domains.include?(domain) || allowed_dev_keys.include?(Shard.global_id_for(developer_key&.id).to_s)
+  end
+
+  def placement_pinned?(placement)
+    return false unless Lti::ResourcePlacement::PINNABLE_PLACEMENTS.include? placement.to_sym
+
+    pinned_launch_domains = Setting.get("#{placement}_pinned_launch_domains", "").split(",").map(&:strip).reject(&:empty?)
+    pinned_dev_keys = Setting.get("#{placement}_pinned_dev_keys", "").split(",").map(&:to_i)
+    pinned_launch_domains.include?(domain) || pinned_dev_keys.include?(Shard.global_id_for(developer_key&.id))
   end
 
   private

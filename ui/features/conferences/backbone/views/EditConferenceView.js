@@ -31,6 +31,7 @@ import authenticity_token from '@canvas/authenticity-token'
 import numberHelper from '@canvas/i18n/numberHelper'
 import '@canvas/jquery/jquery.instructure_forms'
 import {encodeQueryString} from '@canvas/query-string-encoding'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('conferences')
 
@@ -250,7 +251,7 @@ EditConferenceView.prototype.renderConferenceFormUserSettings = function () {
   )
   return this.$('.date_entry').each(function () {
     if (!this.disabled) {
-      return $(this).datetime_field({
+      return renderDatetimeField($(this), {
         alwaysShowTime: true,
       })
     }

@@ -438,7 +438,7 @@ window.rubricAssessment = {
         if (!rating.id) {
           $criterion.find('.rating').each(function () {
             const rating_val = parseFloat($(this).find('.points').text(), 10)
-            if (rating_val == rating.points) {
+            if (rating_val === rating.points) {
               rating.id = $(this).find('.rating_id').text()
             }
           })

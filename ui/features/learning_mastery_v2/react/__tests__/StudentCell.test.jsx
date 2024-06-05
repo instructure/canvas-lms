@@ -54,7 +54,7 @@ describe('StudentCell', () => {
 
   describe('student status', () => {
     const getTestStudent = status => ({
-      status: status,
+      status,
       name: 'Student Test',
       display_name: 'Student Test',
       sortable_name: 'Test, Student',

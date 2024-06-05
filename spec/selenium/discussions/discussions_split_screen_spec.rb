@@ -188,4 +188,61 @@ describe "threaded discussions" do
     wait_for_ajaximations
     expect(f("span[data-testid='discussions-split-screen-view-content']")).to be_truthy
   end
+
+  context "checkpoints", :ignore_js_errors do
+    before do
+      Account.site_admin.enable_feature! :discussion_checkpoints
+
+      @due_at = 2.days.from_now
+      @replies_required = 2
+      @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: @due_at }],
+        points_possible: 6
+      )
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: @due_at }],
+        points_possible: 7,
+        replies_required: @replies_required
+      )
+    end
+
+    it "displays updated reply to entry checkpoint status on entry creation within splitscreen" do
+      @checkpointed_discussion.discussion_entries.create!(user: @teacher, message: "reply to topic")
+
+      @student.preferences[:discussions_splitscreen_view] = true
+      @student.save!
+      user_session(@student)
+      Discussion.visit(@course, @checkpointed_discussion)
+
+      fj("button:contains('Due Dates')").click
+      wait_for_ajaximations
+      expect(fj("span:contains('Due Dates')")).to be_present
+      reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
+      expect(reply_to_entry_contents).to include("Additional Replies Required: #{@replies_required}")
+      expect(reply_to_entry_contents).not_to include("Competed")
+      fj("button:contains('Close')").click
+
+      f("button[data-testid='threading-toolbar-reply']").click
+      type_in_tiny("textarea", "additional reply 1")
+      f("button[data-testid='DiscussionEdit-submit']").click
+      fj("button:contains('Close')").click
+      fj("button:contains('Due Dates')").click
+      reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
+      expect(reply_to_entry_contents).not_to include("Competed")
+      fj("button:contains('Close')").click
+
+      f("button[data-testid='threading-toolbar-reply']").click
+      type_in_tiny("textarea", "additional reply 2")
+      f("button[data-testid='DiscussionEdit-submit']").click
+      fj("button:contains('Close')").click
+      fj("button:contains('Due Dates')").click
+      reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
+      expect(reply_to_entry_contents).to include("Completed #{format_date_for_view(@checkpointed_discussion.reload.discussion_entries.last.created_at)}")
+    end
+  end
 end

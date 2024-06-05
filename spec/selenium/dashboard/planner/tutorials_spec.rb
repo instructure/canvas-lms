@@ -165,7 +165,7 @@ describe "Tutorials" do
     it "the 'Cancel' button closes the End Course Set-up Tutorial modal", priority: "1" do
       get "/courses/#{@course.id}"
       fj("button:contains('Don\\'t Show Again')").click
-      fj("span button:contains('Cancel')").click
+      fj("span[role='dialog'] button:contains('Cancel')").click
       expect(f(".NewUserTutorialTray")).to be_displayed
       expect(driver).not_to contain_css("End Course Set-up Tutorial")
     end

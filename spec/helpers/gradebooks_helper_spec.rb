@@ -236,7 +236,7 @@ describe GradebooksHelper do
       context "and the submission is a pending new quiz" do
         before do
           submission.cached_quiz_lti = true
-          submission.workflow_state = Submission.workflow_states.pending_review
+          submission.workflow_state = "pending_review"
           submission.submission_type = "basic_lti_launch"
         end
 

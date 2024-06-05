@@ -2126,7 +2126,8 @@ class UsersController < ApplicationController
       managed_attributes << :title if @user.grants_right?(@current_user, :rename)
     end
 
-    if @domain_root_account.can_change_pronouns? && @user.grants_right?(@current_user, :manage_user_details)
+    can_admin_change_pronouns = @domain_root_account.can_add_pronouns? && @user.grants_right?(@current_user, :manage_user_details)
+    if can_admin_change_pronouns || (@domain_root_account.can_change_pronouns? && @user.grants_right?(@current_user, :change_pronoun))
       managed_attributes << :pronouns
     end
 

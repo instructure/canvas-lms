@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe LlmConfig do
+describe LLMConfig do
   describe "#initialize" do
     context "with valid attributes" do
       it "initializes successfully" do
-        config = LlmConfig.new(name: "TestConfig", model_id: "model123")
+        config = LLMConfig.new(name: "TestConfig", model_id: "model123")
         expect(config.name).to eq("TestConfig")
         expect(config.model_id).to eq("model123")
         expect(config.template).to be_nil
@@ -32,25 +32,25 @@ describe LlmConfig do
 
     context "with invalid attributes" do
       it "raises an error if name is not a string" do
-        expect { LlmConfig.new(name: nil, model_id: "model123") }.to raise_error(ArgumentError, "Name must be a string")
+        expect { LLMConfig.new(name: nil, model_id: "model123") }.to raise_error(ArgumentError, "Name must be a string")
       end
 
       it "raises an error if model_id is not a string" do
-        expect { LlmConfig.new(name: "TestConfig", model_id: nil) }.to raise_error(ArgumentError, "Model ID must be a string")
+        expect { LLMConfig.new(name: "TestConfig", model_id: nil) }.to raise_error(ArgumentError, "Model ID must be a string")
       end
 
       it "raises an error if template is neither string nor nil" do
-        expect { LlmConfig.new(name: "TestConfig", model_id: "model123", template: 123) }.to raise_error(ArgumentError, "Template must be a string or nil")
+        expect { LLMConfig.new(name: "TestConfig", model_id: "model123", template: 123) }.to raise_error(ArgumentError, "Template must be a string or nil")
       end
 
       it "raises an error if options is not a hash" do
-        expect { LlmConfig.new(name: "TestConfig", model_id: "model123", options: "invalid") }.to raise_error(ArgumentError, "Options must be a hash")
+        expect { LLMConfig.new(name: "TestConfig", model_id: "model123", options: "invalid") }.to raise_error(ArgumentError, "Options must be a hash")
       end
     end
   end
 
   describe "#generate_prompt" do
-    let(:config) { LlmConfig.new(name: "TestConfig", model_id: "model123", template: "Hello <PLACEHOLDER>") }
+    let(:config) { LLMConfig.new(name: "TestConfig", model_id: "model123", template: "Hello <PLACEHOLDER>") }
 
     context "when template is not nil" do
       it "replaces the placeholder with dynamic content" do
@@ -59,7 +59,7 @@ describe LlmConfig do
     end
 
     context "when template is nil" do
-      let(:config) { LlmConfig.new(name: "TestConfig", model_id: "model123") }
+      let(:config) { LLMConfig.new(name: "TestConfig", model_id: "model123") }
 
       it "returns the dynamic content" do
         expect(config.generate_prompt(dynamic_content: "Hello")).to eq("Hello")

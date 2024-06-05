@@ -20,6 +20,7 @@ import $ from 'jquery'
 import {extend} from '@canvas/backbone/utils'
 import {View} from '@canvas/backbone'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {datetimeString} from '@canvas/datetime/date-functions'
 import template from '../../jst/results_entry.handlebars'
 
 const I18n = useI18nScope('discussions')
@@ -54,7 +55,7 @@ FilterEntryView.prototype.initialize = function () {
 
 FilterEntryView.prototype.toJSON = function () {
   const json = this.model.attributes
-  json.edited_at = $.datetimeString(json.updated_at)
+  json.edited_at = datetimeString(json.updated_at)
   if (json.editor) {
     json.editor_name = json.editor.display_name
     json.editor_href = json.editor.html_url

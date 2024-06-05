@@ -1,0 +1,7 @@
+---
+discussion_summary:
+  state: hidden
+  applies_to: Course
+  display_name: Discussion Summary
+  description: Summarize discussions using AI.
+  beta: true

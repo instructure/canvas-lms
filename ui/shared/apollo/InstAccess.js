@@ -37,7 +37,6 @@ class InstAccess {
         return fetch(uri, opts)
       })
   }
-
 }
 
 export default InstAccess

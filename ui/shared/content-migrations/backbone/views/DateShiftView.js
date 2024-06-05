@@ -20,6 +20,7 @@ import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import DaySubModel from '@canvas/day-substitution/backbone/models/DaySubstitution'
 import template from '../../jst/DateShift.handlebars'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 extend(DateShiftView, Backbone.View)
 
@@ -61,7 +62,7 @@ DateShiftView.prototype.events = {
 }
 
 DateShiftView.prototype.afterRender = function () {
-  this.$el.find('input[type=text]').datetime_field({
+  renderDatetimeField(this.$el.find('input[type=text]'), {
     addHiddenInput: this.addHiddenInput,
   })
   if (this.oldStartDate) {

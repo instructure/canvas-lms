@@ -18,9 +18,13 @@
           <i class="icon-mini-arrow-down"></i>
           {{name}}
         </button>
-        {{#if hasIntegrationData}}
+        {{#if hasSisSourceId}}
           <i class="icon-sis-imported" aria-hidden="true" title='{{#t}}Imported from {{postToSISName}}{{/t}}'></i>
           <span class="screenreader-only">{{#t}}Imported from {{postToSISName}}{{/t}}</span>
+        {{/if}}
+        {{#if syncedWithSisCategory}}
+          <i class="icon-link" aria-hidden="true" title='{{#t}}Grading category aligned with SIS{{/t}}'></i>
+          <span class="screenreader-only">{{#t}}Grading category aligned with SIS{{/t}}</span>
         {{/if}}
       </h3>
     {{else}}
@@ -35,9 +39,13 @@
           <i class="icon-mini-arrow-down" aria-hidden="true"></i>
           {{name}}
         </button>
-        {{#if hasIntegrationData}}
+        {{#if hasSisSourceId}}
           <i class="icon-sis-imported" aria-hidden="true" title='{{#t}}Imported from {{postToSISName}}{{/t}}'></i>
           <span class="screenreader-only">{{#t}}Imported from {{postToSISName}}{{/t}}</span>
+        {{/if}}
+        {{#if syncedWithSisCategory}}
+          <i class="icon-link" aria-hidden="true" title='{{#t}}Grading category aligned with SIS{{/t}}'></i>
+          <span class="screenreader-only">{{#t}}Grading category aligned with SIS{{/t}}</span>
         {{/if}}
       </h2>
     {{/if}}

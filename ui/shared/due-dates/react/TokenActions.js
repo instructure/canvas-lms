@@ -27,7 +27,6 @@ const TokenActions = {
 
   handleTokenAdd(newToken, overridesFromRow, rowKey, dates) {
     this.setOverrideInitializer(rowKey, dates)
-
     if (newToken.course_section_id) {
       return this.handleSectionTokenAdd(newToken, overridesFromRow)
     } else if (newToken.group_id) {

@@ -123,7 +123,7 @@ class Group extends React.Component {
         aria-label={I18n.t('Manage group %{group_name}', {group_name: groupName})}
         onClick={this._onManage}
       >
-        Manage
+        {I18n.t('Manage')}
       </a>
     ) : null
 

@@ -24,8 +24,13 @@ import {
   getOptimisticResponse,
   buildQuotedReply,
   getDisplayName,
+  getCheckpointSubmission,
 } from '../../utils'
-import {DiscussionManagerUtilityContext} from '../../utils/constants'
+import {
+  DiscussionManagerUtilityContext,
+  REPLY_TO_TOPIC,
+  REPLY_TO_ENTRY,
+} from '../../utils/constants'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CloseButton} from '@instructure/ui-buttons'
 import {
@@ -85,6 +90,8 @@ export const SplitScreenViewContainer = props => {
     } else if (splitScreenEntryOlderDirection.data.legacyNode.depth === 3) {
       props.onOpenSplitScreenView(data.createDiscussionEntry.discussionEntry.parentId, false)
     }
+    props.setReplytoTopicSubmission(getCheckpointSubmission(data, REPLY_TO_TOPIC))
+    props.setReplyToEntrySubmission(getCheckpointSubmission(data, REPLY_TO_ENTRY))
   }
 
   const {createDiscussionEntry} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
@@ -558,6 +565,8 @@ SplitScreenViewContainer.propTypes = {
   setHighlightEntryId: PropTypes.func,
   relativeEntryId: PropTypes.string,
   isTrayFinishedOpening: PropTypes.bool,
+  setReplytoTopicSubmission: PropTypes.func,
+  setReplyToEntrySubmission: PropTypes.func,
 }
 
 export default SplitScreenViewContainer

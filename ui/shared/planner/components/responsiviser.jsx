@@ -38,10 +38,9 @@ class MediaQueryWatcher {
     // even if the browser window is physicallly wide, but the font-size is
     // enlarged. This will make for a better experience.
     if (this.sizes_override) {
-      this.mediaQueries.small = window.matchMedia(this.sizes_override['small'])
-      this.mediaQueries.medium = window.matchMedia(this.sizes_override['medium'])
-    }
-    else {
+      this.mediaQueries.small = window.matchMedia(this.sizes_override.small)
+      this.mediaQueries.medium = window.matchMedia(this.sizes_override.medium)
+    } else {
       this.mediaQueries.small = window.matchMedia(SMALL_MEDIA_QUERY)
       this.mediaQueries.medium = window.matchMedia(MEDIUM_MEDIA_QUERY)
     }
@@ -165,7 +164,7 @@ function responsiviser() {
         if (sizes_override) {
           responsiviser.mqwatcher.set_sizes_override(sizes_override)
         }
-        
+
         const size = responsiviser.mqwatcher.add(this)
         this.state = {
           size,

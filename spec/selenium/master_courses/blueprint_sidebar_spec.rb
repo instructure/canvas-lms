@@ -150,7 +150,7 @@ describe "master courses sidebar" do
       blueprint_open_sidebar_button.click
       f("button#mcSyncHistoryBtn").click
       expect(f('span[aria-label="Sync History"]')).to be_displayed
-      expect(f("#application")).to have_attribute("aria-hidden", "true")
+      expect(f("#drawer-layout-mount-point")).to have_attribute("aria-hidden", "true")
     end
 
     it "shows Unsynced Changes modal when button is clicked" do
@@ -160,7 +160,7 @@ describe "master courses sidebar" do
       f("button#mcUnsyncedChangesBtn").click
       wait_for_ajaximations
       expect(f('span[aria-label="Unsynced Changes"]')).to be_displayed
-      expect(f("#application")).to have_attribute("aria-hidden", "true")
+      expect(f("#drawer-layout-mount-point")).to have_attribute("aria-hidden", "true")
     end
 
     it "does not show the tutorial sidebar button" do

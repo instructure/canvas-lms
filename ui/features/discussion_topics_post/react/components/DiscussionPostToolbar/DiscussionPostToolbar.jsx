@@ -30,7 +30,7 @@ import {
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import {CURRENT_USER, DiscussionManagerUtilityContext} from '../../utils/constants'
-import React, { useContext, useState } from 'react'
+import React, {useContext, useState} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -42,7 +42,8 @@ import {View} from '@instructure/ui-view'
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {ExpandCollapseThreadsButton} from './ExpandCollapseThreadsButton'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
-import { MoreMenuButton } from "./MoreMenuButton"
+import {MoreMenuButton} from './MoreMenuButton'
+import {SummarizeButton} from './SummarizeButton'
 
 const I18n = useI18nScope('discussions_posts')
 
@@ -78,7 +79,7 @@ const getClearButton = props => {
 
 export const DiscussionPostToolbar = props => {
   const [showAssignToTray, setShowAssignToTray] = useState(false)
-  const { translationLanguages } = useContext(DiscussionManagerUtilityContext)
+  const {translationLanguages} = useContext(DiscussionManagerUtilityContext)
 
   const clearButton = () => {
     return getClearButton({
@@ -281,6 +282,14 @@ export const DiscussionPostToolbar = props => {
                     <MoreMenuButton />
                   </Flex.Item>
                 )}
+                {ENV.user_can_summarize && !props.isSummaryEnabled && (
+                  <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
+                    <SummarizeButton
+                      onClick={props.onSummarizeClick}
+                      showText={!matches.includes('mobile')}
+                    />
+                  </Flex.Item>
+                )}
                 {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (
                   <Flex.Item shouldGrow={true}>
                     <Flex justifyItems="end">
@@ -353,6 +362,8 @@ DiscussionPostToolbar.propTypes = {
   discussionAnonymousState: PropTypes.string,
   setUserSplitScreenPreference: PropTypes.func,
   userSplitScreenPreference: PropTypes.bool,
+  onSummarizeClick: PropTypes.func,
+  isSummaryEnabled: PropTypes.bool,
   closeView: PropTypes.func,
   pointsPossible: PropTypes.number,
   contextType: PropTypes.oneOf(['Course', 'Group']),

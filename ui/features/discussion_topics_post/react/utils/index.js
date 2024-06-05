@@ -369,10 +369,20 @@ export const getOptimisticResponse = ({
         depth,
         __typename: 'DiscussionEntry',
       },
+      mySubAssignmentSubmissions: [],
       errors: null,
       __typename: 'CreateDiscussionEntryPayload',
     },
   }
+}
+
+// data must contain data response to create discussion entry mutation
+export const getCheckpointSubmission = (data, subAssignmentTag) => {
+  return (
+    data.createDiscussionEntry.mySubAssignmentSubmissions?.find(
+      sub => sub.subAssignmentTag === subAssignmentTag
+    ) || {}
+  )
 }
 
 export const buildQuotedReply = (nodes, previewId) => {
@@ -441,6 +451,11 @@ export const getTranslation = async (
   }
 
   const apiPath = `/courses/${ENV.course_id}/translate`
+
+  // Remove any tags from the string to be translated
+  const parsedDocument = new DOMParser().parseFromString(text, 'text/html')
+  const toTranslate = parsedDocument.documentElement.textContent
+
   try {
     setIsTranslating(true)
     const {json} = await doFetchApi({
@@ -450,14 +465,17 @@ export const getTranslation = async (
         inputs: {
           src_lang: 'en', // TODO: detect source language.
           tgt_lang: translateTargetLanguage,
-          text,
+          text: toTranslate,
         },
       },
     })
-    setter(json.translated_text)
+    // Join together all the text with a separator, so that the original text remains separate
+    setter([text, translationSeparator, json.translated_text].join(''))
   } catch (e) {
     // TODO: Do something with the error message.
   }
 
   setIsTranslating(false)
 }
+
+export const translationSeparator = "\n\n----------\n\n\n"

@@ -26,7 +26,8 @@ import WikiPageDeleteDialog from './WikiPageDeleteDialog'
 import WikiPageReloadView from './WikiPageReloadView'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
-import '@canvas/datetime/jquery'
+import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import renderWikiPageTitle from '../../react/renderWikiPageTitle'
 import {renderAssignToTray} from '../../react/renderAssignToTray'
 import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
@@ -72,7 +73,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     if (!this.WIKI_RIGHTS) this.WIKI_RIGHTS = {}
     if (!this.PAGE_RIGHTS) this.PAGE_RIGHTS = {}
     this.enableAssignTo = window.ENV.FEATURES?.differentiated_modules && ENV.COURSE_ID != null
-    let redirect = () => {
+    const redirect = () => {
       window.location.href = this.model.get('html_url')
     }
     let callBack = redirect
@@ -243,8 +244,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       if (this.model.get('published')) {
         publishAtInput.prop('disabled', true)
       } else {
-        publishAtInput
-          .datetime_field()
+        renderDatetimeField(publishAtInput)
           .change(e => {
             $('.save_and_publish').prop('disabled', e.target.value.length > 0)
           })
@@ -409,7 +409,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     }
 
     if (page_data.publish_at) {
-      page_data.publish_at = $.unfudgeDateForProfileTimezone(page_data.publish_at)
+      page_data.publish_at = unfudgeDateForProfileTimezone(page_data.publish_at)
     }
     if (this.blockEditorData) {
       page_data.block_editor_attributes = this.blockEditorData

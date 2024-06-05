@@ -17,29 +17,28 @@
  */
 
 import {isUndefined, each} from 'lodash'
-import $ from 'jquery'
 import * as tz from './index'
-import './jquery/index'
+import {datetimeString, dateString, discussionsDatetimeString} from './date-functions'
 
 const DateHelper = {
   parseDates(object, datesToParse) {
-    each(datesToParse, dateString => {
-      const propertyExists = !isUndefined(object[dateString])
-      if (propertyExists) object[dateString] = tz.parse(object[dateString])
+    each(datesToParse, dateString_ => {
+      const propertyExists = !isUndefined(object[dateString_])
+      if (propertyExists) object[dateString_] = tz.parse(object[dateString_])
     })
     return object
   },
 
   formatDatetimeForDisplay(date, format = 'medium') {
-    return $.datetimeString(date, {format, timezone: ENV.CONTEXT_TIMEZONE})
+    return datetimeString(date, {format, timezone: ENV.CONTEXT_TIMEZONE})
   },
 
   formatDatetimeForDiscussions(datetime, format = '', timezone = ENV.TIMEZONE) {
-    return $.discussionsDatetimeString(datetime, {format, timezone})
+    return discussionsDatetimeString(datetime, {format, timezone})
   },
 
   formatDateForDisplay(date, format = 'medium', timezone = ENV.CONTEXT_TIMEZONE) {
-    return $.dateString(date, {format, timezone})
+    return dateString(date, {format, timezone})
   },
 
   isMidnight(date) {

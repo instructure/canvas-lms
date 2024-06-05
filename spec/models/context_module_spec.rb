@@ -241,25 +241,33 @@ describe ContextModule do
       @student1 = student_in_course(active_all: true, name: "Student 1").user
       @assignment = @course.assignments.create!(title: "some assignment")
       @quiz = @course.quizzes.create!(title: "some quiz", quiz_type: "assignment")
+      @discussion = @course.discussion_topics.create!(title: "some discussion")
+      @discussion.assignment = @course.assignments.create!
+      @discussion.save!
       @module.add_item({ id: @assignment.id, type: "assignment" })
       @module.add_item({ id: @quiz.id, type: "quiz" })
+      @module.add_item({ id: @discussion.id, type: "discussion_topic" })
     end
 
-    it "correctly updates submissions after delete" do
+    it "correctly updates submissions after delete for all items with assignments" do
       adhoc_override = @module.assignment_overrides.create!(set_type: "ADHOC")
       adhoc_override.assignment_override_students.create!(user: @student1)
 
-      @module.update_assignment_submissions(@module.current_assignments_and_quizzes)
+      @module.update_assignment_submissions(@module.current_items_with_assignment)
       @assignment.submissions.reload
       @quiz.assignment.submissions.reload
+      @discussion.assignment.submissions.reload
       expect(@assignment.submissions.length).to eq 1
       expect(@quiz.assignment.submissions.length).to eq 1
+      expect(@discussion.assignment.submissions.length).to eq 1
 
       @module.destroy!
       @assignment.submissions.reload
       @quiz.assignment.submissions.reload
+      @discussion.assignment.submissions.reload
       expect(@assignment.submissions.length).to eq 2
       expect(@quiz.assignment.submissions.length).to eq 2
+      expect(@discussion.assignment.submissions.length).to eq 2
     end
   end
 

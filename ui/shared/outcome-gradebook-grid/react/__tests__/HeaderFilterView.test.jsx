@@ -35,32 +35,32 @@ describe('Test redraw function', () => {
   beforeEach(() => {
     grid = {}
     redrawFn = jest.fn()
-    averageFn = "mean"
+    averageFn = 'mean'
   })
 
-  it('calls redrawFn with \"median\" when averageFn is \"mean\"', () => {
+  it('calls redrawFn with "median" when averageFn is "mean"', () => {
     const {getByTestId} = render(<HeaderFilterView {...defaultProps()} />)
     fireEvent.click(getByTestId('lmgb-course-calc-dropdown'))
     fireEvent.click(getByTestId('course-median-calc-option'))
-    expect(redrawFn).toHaveBeenCalledWith({}, "median")
+    expect(redrawFn).toHaveBeenCalledWith({}, 'median')
   })
 
-  it('calls redrawFn with \"mean\" when averageFn is \"median\"', () => {
-    const {getByTestId} = render(<HeaderFilterView {...defaultProps({averageFn: "median"})} />)
+  it('calls redrawFn with "mean" when averageFn is "median"', () => {
+    const {getByTestId} = render(<HeaderFilterView {...defaultProps({averageFn: 'median'})} />)
     fireEvent.click(getByTestId('lmgb-course-calc-dropdown'))
     fireEvent.click(getByTestId('course-average-calc-option'))
-    expect(redrawFn).toHaveBeenCalledWith({}, "mean")
+    expect(redrawFn).toHaveBeenCalledWith({}, 'mean')
   })
 
-  it('does not call redrawFn when selecting \"mean\" and calculation is already \"mean\"', () => {
+  it('does not call redrawFn when selecting "mean" and calculation is already "mean"', () => {
     const {getByTestId} = render(<HeaderFilterView {...defaultProps()} />)
     fireEvent.click(getByTestId('lmgb-course-calc-dropdown'))
     fireEvent.click(getByTestId('course-average-calc-option'))
     expect(redrawFn).not.toHaveBeenCalled()
   })
 
-  it('does not call redrawFn when selecting \"median\" and calculation is already \"median\"', () => {
-    const {getByTestId} = render(<HeaderFilterView {...defaultProps({averageFn: "median"})} />)
+  it('does not call redrawFn when selecting "median" and calculation is already "median"', () => {
+    const {getByTestId} = render(<HeaderFilterView {...defaultProps({averageFn: 'median'})} />)
     fireEvent.click(getByTestId('lmgb-course-calc-dropdown'))
     fireEvent.click(getByTestId('course-median-calc-option'))
     expect(redrawFn).not.toHaveBeenCalled()

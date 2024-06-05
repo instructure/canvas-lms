@@ -121,7 +121,7 @@ class AnnouncementsApiController < ApplicationController
           *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
         )
       end
-      scope = scope.visible_to_student_sections(@current_user) unless skip_section_filtering
+      scope = scope.visible_to_ungraded_discussion_student_visibilities(@current_user) unless skip_section_filtering
       scope
     end
 

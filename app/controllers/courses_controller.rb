@@ -116,7 +116,7 @@
 #           "type": "string"
 #         },
 #         "workflow_state": {
-#           "description": "the current state of the course one of 'unpublished', 'available', 'completed', or 'deleted'",
+#           "description": "the current state of the course, also known as ‘status’.  The value will be one of the following values: 'unpublished', 'available', 'completed', or 'deleted'.  NOTE: When fetching a singular course that has a 'deleted' workflow state value, an error will be returned with a message of 'The specified resource does not exist.'",
 #           "example": "available",
 #           "type": "string",
 #           "allowableValues": {
@@ -1844,7 +1844,7 @@ class CoursesController < ApplicationController
       if enrollment.invited?
         GuardRail.activate(:primary) do
           SubmissionLifecycleManager.with_executing_user(@current_user) do
-            enrollment.accept!
+            enrollment.accept! && RequestCache.clear
           end
         end
         @pending_enrollment = nil
@@ -1951,7 +1951,7 @@ class CoursesController < ApplicationController
        (enrollment = @context.enrollments.where(uuid: session[:accepted_enrollment_uuid]).first)
 
       if enrollment.invited?
-        enrollment.accept!
+        enrollment.accept! && RequestCache.clear
         flash[:notice] = t("notices.invitation_accepted", "Invitation accepted!  Welcome to %{course}!", course: @context.name)
       end
 
@@ -2366,7 +2366,7 @@ class CoursesController < ApplicationController
             scope = Announcement.where(context_type: "Course", context_id: @context.id, workflow_state: "active")
                                 .ordered_between(start_date, end_date)
             unless @context.grants_any_right?(@current_user, session, :read_as_admin, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
-              scope = scope.visible_to_student_sections(@current_user)
+              scope = scope.visible_to_ungraded_discussion_student_visibilities(@current_user)
             end
             latest_announcement = scope.limit(1).first
           end

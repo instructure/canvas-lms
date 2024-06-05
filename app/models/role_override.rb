@@ -324,6 +324,13 @@ class RoleOverride < ActiveRecord::Base
         true_for: %w[AccountAdmin],
         available_to: %w[AccountAdmin AccountMembership],
       },
+      manage_lti_registrations: {
+        label: -> { t("LTI Registrations - manage ") },
+        account_only: true,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
+        account_allows: ->(a) { a.root_account.feature_enabled?(:lti_registrations_page) }
+      },
       manage_release_notes: {
         label: -> { t("Manage release notes") },
         account_only: :site_admin,
@@ -1820,11 +1827,38 @@ class RoleOverride < ActiveRecord::Base
       view_ask_questions_analytics: {
         label: -> { t("Ask Your Data") },
         group: "view_advanced_analytics",
-        group_label: -> { t("Advanced Analytics") },
+        group_label: -> { t("Intelligent Insights") },
         available_to: %w[AccountAdmin AccountMembership],
         true_for: %w[AccountAdmin],
         account_only: true,
         account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) }
+      },
+      view_students_in_need: {
+        label: -> { t("Students in Need of Attention") },
+        group: "view_advanced_analytics",
+        group_label: -> { t("Intelligent Insights") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_only: true,
+        account_allows: ->(a) { a.feature_enabled?(:k20_students_in_need_of_attention) }
+      },
+      view_course_readiness: {
+        label: -> { t("Course Readiness") },
+        group: "view_advanced_analytics",
+        group_label: -> { t("Intelligent Insights") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_only: true,
+        account_allows: ->(a) { a.feature_enabled?(:k20_course_readiness) }
+      },
+      view_lti_usage: {
+        label: -> { t("LTI Usage") },
+        group: "view_advanced_analytics",
+        group_label: -> { t("Intelligent Insights") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_only: true,
+        account_allows: ->(a) { a.feature_enabled?(:k20_lti_usage) }
       },
       manage_impact: {
         label: -> { t("Manage Impact") },

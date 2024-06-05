@@ -300,11 +300,11 @@ class ContextModule < ActiveRecord::Base
   def destroy
     self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
-    module_assignments_quizzes = current_assignments_and_quizzes
+    module_assignments = current_items_with_assignment
     ContentTag.where(context_module_id: self).where.not(workflow_state: "deleted").update(workflow_state: "deleted", updated_at: deleted_at)
     delay_if_production(n_strand: "context_module_update_downstreams", priority: Delayed::LOW_PRIORITY).update_downstreams
     save!
-    update_assignment_submissions(module_assignments_quizzes) if assignment_overrides.active.exists?
+    update_assignment_submissions(module_assignments)
     true
   end
 
@@ -987,20 +987,25 @@ class ContextModule < ActiveRecord::Base
     assignment_overrides
   end
 
-  def update_assignment_submissions(module_assignments_quizzes = current_assignments_and_quizzes)
+  def update_assignment_submissions(module_assignments_quizzes = current_items_with_assignment)
     if Account.site_admin.feature_enabled?(:differentiated_modules)
       module_assignments_quizzes.clear_cache_keys(:availability)
       SubmissionLifecycleManager.recompute_course(context, assignments: module_assignments_quizzes, update_grades: true)
     end
   end
 
-  def current_assignments_and_quizzes
+  def current_items_with_assignment
     return unless Account.site_admin.feature_enabled?(:differentiated_modules)
 
     module_assignments = Assignment.active.where(id: content_tags.not_deleted.where(content_type: "Assignment").select(:content_id)).pluck(:id)
+
+    module_discussions_assignment_ids = DiscussionTopic.active.where(id: content_tags.not_deleted.where(content_type: "DiscussionTopic").select(:content_id)).select(:assignment_id)
     module_quizzes_assignment_ids = Quizzes::Quiz.active.where(id: content_tags.not_deleted.where(content_type: "Quizzes::Quiz").select(:content_id)).select(:assignment_id)
-    module_quizzes = Assignment.active.where(id: module_quizzes_assignment_ids).pluck(:id)
-    assignments_quizzes = module_assignments + module_quizzes
+
+    module_quizzes_and_discussions = Assignment.active.where(id: module_discussions_assignment_ids).select(:id)
+    module_quizzes_and_discussions += Assignment.active.where(id: module_quizzes_assignment_ids).select(:id)
+
+    assignments_quizzes = module_assignments + module_quizzes_and_discussions
     Assignment.where(id: assignments_quizzes)
   end
 end

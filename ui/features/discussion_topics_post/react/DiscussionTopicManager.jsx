@@ -22,12 +22,14 @@ import {DiscussionTopicRepliesContainer} from './containers/DiscussionTopicRepli
 import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
-import {getOptimisticResponse, responsiveQuerySizes} from './utils'
+import {getOptimisticResponse, responsiveQuerySizes, getCheckpointSubmission} from './utils'
 import {
   HIGHLIGHT_TIMEOUT,
   SearchContext,
   DiscussionManagerUtilityContext,
   AllThreadsState,
+  REPLY_TO_TOPIC,
+  REPLY_TO_ENTRY,
 } from './utils/constants'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -107,6 +109,9 @@ const DiscussionTopicManager = props => {
   const [highlightEntryId, setHighlightEntryId] = useState(ENV.discussions_deep_link?.entry_id)
   const [relativeEntryId, setRelativeEntryId] = useState(null)
 
+  const [replyToTopicSubmission, setReplytoTopicSubmission] = useState({})
+  const [replyToEntrySubmission, setReplyToEntrySubmission] = useState({})
+
   const [isUserMissingInitialPost, setIsUserMissingInitialPost] = useState(null)
 
   const [isGradedDiscussion, setIsGradedDiscussion] = useState(false)
@@ -115,6 +120,8 @@ const DiscussionTopicManager = props => {
   const [isTrayFinishedOpening, setIsTrayFinishedOpening] = useState(false)
 
   const usedThreadingToolbarChildRef = useRef(null)
+
+  const [isSummaryEnabled, setIsSummaryEnabled] = useState(ENV.discussion_summary_enabled || false)
 
   const discussionManagerUtilities = {
     replyFromId,
@@ -132,6 +139,8 @@ const DiscussionTopicManager = props => {
     setShowTranslationControl,
     translateTargetLanguage,
     setTranslateTargetLanguage,
+    isSummaryEnabled,
+    setIsSummaryEnabled,
   }
 
   const isModuleItem = ENV.SEQUENCE != null
@@ -231,6 +240,20 @@ const DiscussionTopicManager = props => {
     setIsGradedDiscussion(!!discussionTopicQuery?.data?.legacyNode?.assignment)
   }, [discussionTopicQuery])
 
+  const getSubmissionObject = (submissionsArray, submissionTag) => {
+    return submissionsArray.find(node => node.subAssignmentTag === submissionTag) || {}
+  }
+  // set initial checkpoint submission objects
+  useEffect(() => {
+    setTimeout(() => {
+      const submissionsArray =
+        discussionTopicQuery?.data?.legacyNode?.assignment?.mySubAssignmentSubmissionsConnection
+          ?.nodes || []
+      setReplytoTopicSubmission(getSubmissionObject(submissionsArray, REPLY_TO_TOPIC))
+      setReplyToEntrySubmission(getSubmissionObject(submissionsArray, REPLY_TO_ENTRY))
+    }, 0)
+  }, [discussionTopicQuery])
+
   const updateCache = (cache, result) => {
     try {
       const options = {
@@ -258,6 +281,13 @@ const DiscussionTopicManager = props => {
         }
         cache.writeQuery({...options, data: currentDiscussion})
       }
+
+      if (result.data.createDiscussionEntry.mySubAssignmentSubmissions?.length > 0) {
+        const submissionsArray = result.data.createDiscussionEntry.mySubAssignmentSubmissions
+        currentDiscussion.legacyNode.assignment.mySubAssignmentSubmissionsConnection.nodes =
+          submissionsArray
+        cache.writeQuery({...options, data: currentDiscussion})
+      }
     } catch (e) {
       discussionTopicQuery.refetch(variables)
     }
@@ -265,6 +295,9 @@ const DiscussionTopicManager = props => {
 
   const onEntryCreationCompletion = data => {
     setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
+    setReplytoTopicSubmission(getCheckpointSubmission(data, REPLY_TO_TOPIC))
+    setReplyToEntrySubmission(getCheckpointSubmission(data, REPLY_TO_ENTRY))
+
     if (sort === 'asc') {
       setPageNumber(discussionTopicQuery.data.legacyNode.entriesTotalPages - 1)
     }
@@ -308,7 +341,8 @@ const DiscussionTopicManager = props => {
         <Responsive
           match="media"
           query={responsiveQuerySizes({mobile: true, desktop: true})}
-          props={{mobile: {
+          props={{
+            mobile: {
               viewPortWidth: '100vw',
             },
             desktop: {
@@ -335,6 +369,8 @@ const DiscussionTopicManager = props => {
                       discussionTopic={discussionTopicQuery.data.legacyNode}
                       setUserSplitScreenPreference={setUserSplitScreenPreference}
                       userSplitScreenPreference={userSplitScreenPreference}
+                      setIsSummaryEnabled={setIsSummaryEnabled}
+                      isSummaryEnabled={isSummaryEnabled}
                       closeView={closeView}
                     />
                     <DiscussionTopicContainer
@@ -359,6 +395,10 @@ const DiscussionTopicManager = props => {
                         setHighlightEntryId('DISCUSSION_ENTRY_PLACEHOLDER')
                       }}
                       isHighlighted={isTopicHighlighted}
+                      replyToTopicSubmission={replyToTopicSubmission}
+                      replyToEntrySubmission={replyToEntrySubmission}
+                      isSummaryEnabled={ENV.user_can_summarize && isSummaryEnabled}
+                      setIsSummaryEnabled={setIsSummaryEnabled}
                     />
 
                     {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes
@@ -413,6 +453,8 @@ const DiscussionTopicManager = props => {
                         highlightEntryId={highlightEntryId}
                         setHighlightEntryId={setHighlightEntryId}
                         isTrayFinishedOpening={isTrayFinishedOpening}
+                        setReplytoTopicSubmission={setReplytoTopicSubmission}
+                        setReplyToEntrySubmission={setReplyToEntrySubmission}
                       />
                     </View>
                   )}

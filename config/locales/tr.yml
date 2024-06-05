@@ -2430,7 +2430,7 @@ tr:
   anonymize_all_instructor_comments_and_annotations__713924c9: "DocViewer'daki tüm eğitmen yorumlarını ve ek açıklamalarını anonimleştirir."
   anonymous_e1b8ad27: Anonim
   anonymous_grading_ccb5045c: "İsimsiz Notlandırma"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "İsimsiz notlandırma, SpeedGrader™ da öğrencilerin isimlerini gizler"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "İsimsiz notlandırma, SpeedGrader da öğrencilerin isimlerini gizler"
   anonymous_instructor_annotations_2b6c822: "İsimsiz Öğretmen Ek açıklamaları"
   anonymous_moderated_marking_801bbb65: "İsimsiz Modere Edilmiş Notlandırma"
   anonymous_user: "İsimsiz Kullanıcı"
@@ -2995,7 +2995,7 @@ tr:
           bu düzenlenmiş dosyayı görecekler 
           
           *Gönderilen dosyaların adlarını değiştirmeyin ki sistem bu dosyaları tanımlayabilsin.*
-      speed_grader: SpeedGrader™
+      speed_grader: SpeedGrader
       titles: 
         related_items: "İlişkili Öğeler"
     grade_gpa_scale_screenreader: "Not: %{grade}"
@@ -4330,6 +4330,7 @@ tr:
   canvas_error_report_ff678539: "Canvas Hata Raporu"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_introduction_video_2d81f3ad: "Canvas Tanıtım Videosu"
+  canvas_lms_6ce68514: "Canvas LMS"
   canvas_login_failure_message_4c922f2f: "Canvas oturum açma hata mesajı"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Canvas Çoklu Kimlik Doğrulama Yedek Kodları"
   canvas_observer_id_59db0918: canvas_observer_id
@@ -6704,6 +6705,7 @@ tr:
   create_content_for_your_course_500a7032: "Dersiniz için içerik oluşturun"
   create_course_9a69b32c: "Dersi Oluştur"
   create_criterion_6df4d4ad: "Kriter Oluştur"
+  create_discussion_982f915e: "Tartışma Oluştur"
   create_discussion_topics_8330d52b: "Tarışma başlıkları oluştur"
   create_educational_resources_8219326e: "Eğitsel kaynak oluştur"
   create_failed_15d07ad4: "Oluşturma başarısız"
@@ -18317,7 +18319,7 @@ tr:
       resubmitting: "Yeniden gönderiliyor..."
   speedgrader_d9a6fa90: Speedgrader
   speedgrader_de0affa6: SpeedGrader
-  speedgrader_tm_44688790: SpeedGrader™
+  speedgrader_tm_44688790: SpeedGrader
   spreadsheet_6d622119: "Elektronik Tablo"
   sr_gradebook: 
     all_grading_periods: "Tüm Notlandırma Periyotları"
@@ -18354,6 +18356,7 @@ tr:
   start_a_new_course_57ae2480: "Yeni bir Ders Aç"
   start_date_e937be8a: "Başlangıç Tarihi"
   start_participating_f0c75256: "Katılımı Başlat"
+  started_5e138638: Başladı
   state_66a67ba2: Durum
   state_standards_c9b1affd: "Eyalet Standartları"
   statistics: 

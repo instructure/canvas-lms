@@ -24,7 +24,7 @@ import {
   postMessageExternalContentReady,
   postMessageExternalContentCancel,
 } from '@canvas/external-tools/messages'
-import { captureException } from '@sentry/react'
+import {captureException} from '@sentry/react'
 
 const I18n = useI18nScope('content_migrations')
 

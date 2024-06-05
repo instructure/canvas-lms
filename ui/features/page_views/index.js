@@ -17,11 +17,12 @@
  */
 
 import $ from 'jquery'
-import '@canvas/datetime/jquery'
+import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import moment from 'moment'
 import PageViewCollection from './backbone/collections/PageViewCollection'
 import PageViewView from './backbone/views/PageViewView'
 import ready from '@instructure/ready'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 function renderTable(date) {
   const $container = $('#pageviews')
@@ -33,7 +34,7 @@ function renderTable(date) {
   const $csvLink = $('#page_views_csv_link')
   let csvUrl = $csvLink.attr('href').split('?')[0]
   if (date) {
-    const start_time = $.unfudgeDateForProfileTimezone(date)
+    const start_time = unfudgeDateForProfileTimezone(date)
     const end_time = moment(start_time).add(1, 'days')
     const date_params = `?start_time=${start_time.toISOString()}&end_time=${end_time.toISOString()}`
     pageViews.url += date_params
@@ -61,12 +62,12 @@ function renderTable(date) {
 
 ready(() => {
   let view = renderTable()
-  $('#page_view_date')
-    .datetime_field({dateOnly: true})
-    .change(event => {
-      const date = $(event.target).data('date')
-      view.stopPaginationListener()
-      $('#page_view_results').empty()
-      view = renderTable(date)
-    })
+  const input = $('#page_view_date')
+  renderDatetimeField(input, {dateOnly: true})
+  input.change(event => {
+    const date = $(event.target).data('date')
+    view.stopPaginationListener()
+    $('#page_view_results').empty()
+    view = renderTable(date)
+  })
 })

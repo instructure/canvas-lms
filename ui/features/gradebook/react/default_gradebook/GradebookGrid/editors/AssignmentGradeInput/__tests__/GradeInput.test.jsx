@@ -781,7 +781,9 @@ describe('GradebookGrid AssignmentGradeInput', () => {
       })
 
       test('returns false when the input adds only whitespace', () => {
-        fireEvent.change(wrapper.container.querySelector('input'), {target: {value: '   Excused   '}})
+        fireEvent.change(wrapper.container.querySelector('input'), {
+          target: {value: '   Excused   '},
+        })
         expect(hasGradeChanged()).toBeFalsy()
       })
     })

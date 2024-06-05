@@ -18,18 +18,20 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {createBrowserRouter, RouterProvider, Link} from 'react-router-dom'
-import {Discover} from './discover/components/Discover'
-import {Manage} from './manage/Manage'
+import {createBrowserRouter, RouterProvider} from 'react-router-dom'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {LtiAppsLayout} from './layout/LtiAppsLayout'
 import {DiscoverRoute} from './discover/components'
-import {ManageRoute} from './manage'
+import {ManageRoutes} from './manage'
+import ProductDetail from './discover/components/ProductDetail/ProductDetail'
 
 const getBasename = () => {
   const path = window.location.pathname
   const parts = path.split('/')
   return parts.slice(0, parts.indexOf('extensions') + 1).join('/')
 }
+
+const queryClient = new QueryClient()
 
 // window.ENV.lti_registrations_discover_page
 
@@ -39,10 +41,27 @@ const router = createBrowserRouter(
       path: '/',
       element: <LtiAppsLayout />,
       children: window.ENV.FEATURES.lti_registrations_discover_page
-        ? [DiscoverRoute, ManageRoute]
-        : [ManageRoute],
+        ? [DiscoverRoute, ...ManageRoutes]
+        : [...ManageRoutes],
+    },
+    {
+      path: 'product_detail/:id',
+      element: (
+        <QueryClientProvider client={queryClient}>
+          <ProductDetail />
+        </QueryClientProvider>
+      ),
+    },
+    {
+      path: 'product_detail/:id',
+      element: (
+        <QueryClientProvider client={queryClient}>
+          <ProductDetail />
+        </QueryClientProvider>
+      ),
     },
   ],
+
   {
     basename: getBasename(),
   }

@@ -27,30 +27,30 @@ import sinon from 'sinon'
 import AnnouncementsIndex from '../AnnouncementsIndex'
 
 const announcements = [
-    {
+  {
+    id: '1',
+    position: 2,
+    published: true,
+    title: 'hello world',
+    message: 'lorem ipsum foo bar baz',
+    posted_at: new Date().toString(),
+    author: {
       id: '1',
-      position: 2,
-      published: true,
-      title: 'hello world',
-      message: 'lorem ipsum foo bar baz',
-      posted_at: new Date().toString(),
-      author: {
-        id: '1',
-        display_name: 'John Doe',
-        name: 'John Doe',
-        html_url: 'http://example.org/user/5',
-      },
-      read_state: 'read',
-      unread_count: 0,
-      discussion_subentry_count: 0,
-      locked: false,
-      user_count: 2,
-      html_url: 'http://example.org/announcement/5',
-      permissions: {
-        delete: true,
-      },
+      display_name: 'John Doe',
+      name: 'John Doe',
+      html_url: 'http://example.org/user/5',
     },
-  ]
+    read_state: 'read',
+    unread_count: 0,
+    discussion_subentry_count: 0,
+    locked: false,
+    user_count: 2,
+    html_url: 'http://example.org/announcement/5',
+    permissions: {
+      delete: true,
+    },
+  },
+]
 
 const makeProps = (props = {}) =>
   _.merge(
@@ -155,7 +155,7 @@ describe('AnnouncementsIndex component', function () {
   test('clicking announcement checkbox triggers setAnnouncementSelection with correct data', async () => {
     const selectSpy = sinon.spy()
     const props = {
-      announcements: announcements,
+      announcements,
       announcementSelectionChangeStart: selectSpy,
       hasLoadedAnnouncements: true,
       permissions: {moderate: true, manage_course_content_delete: true},
@@ -177,7 +177,7 @@ describe('AnnouncementsIndex component', function () {
   test('does not show checkbox if manage_course_content_edit/delete is false', () => {
     const selectSpy = sinon.spy()
     const props = {
-      announcements: announcements,
+      announcements,
       announcementSelectionChangeStart: selectSpy,
       hasLoadedAnnouncements: true,
       permissions: {
@@ -197,7 +197,7 @@ describe('AnnouncementsIndex component', function () {
 
   test('onManageAnnouncement shows delete modal when called with delete action', done => {
     const props = {
-      announcements: announcements,
+      announcements,
       hasLoadedAnnouncements: true,
       permissions: {
         moderate: true,
@@ -226,7 +226,7 @@ describe('AnnouncementsIndex component', function () {
   test('onManageAnnouncement calls toggleAnnouncementsLock when called with lock action', done => {
     const lockSpy = sinon.spy()
     const props = {
-      announcements: announcements,
+      announcements,
       hasLoadedAnnouncements: true,
       permissions: {
         moderate: true,

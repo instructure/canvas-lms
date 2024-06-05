@@ -25,12 +25,10 @@ import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 
-// until InstUI supports break points with multiple queries
-describe.skip('MessageListActionContainer', () => {
+describe('MessageListActionContainer', () => {
   const server = mswServer(handlers)
+
   beforeAll(() => {
-    // eslint-disable-next-line no-undef
-    fetchMock.dontMock()
     server.listen()
 
     window.matchMedia = jest.fn().mockImplementation(() => {
@@ -50,8 +48,6 @@ describe.skip('MessageListActionContainer', () => {
 
   afterAll(() => {
     server.close()
-    // eslint-disable-next-line no-undef
-    fetchMock.enableMocks()
   })
 
   beforeEach(() => {
@@ -259,6 +255,20 @@ describe.skip('MessageListActionContainer', () => {
 
     const unarchBtn = await component.findByTestId('unarchive')
     expect(unarchBtn).toBeTruthy()
+  })
+
+  it('should trigger archive function when archiving', async () => {
+    const archiveMock = jest.fn()
+
+    const component = setup({
+      archiveDisabled: false,
+      selectedConversations: [{test1: 'test1'}, {test2: 'test2'}],
+      onArchive: archiveMock,
+    })
+    const archiveButton = await component.findByTestId('archive')
+    fireEvent.click(archiveButton)
+
+    expect(archiveMock).toHaveBeenCalled()
   })
 
   it('should trigger archive function when unarchiving', async () => {

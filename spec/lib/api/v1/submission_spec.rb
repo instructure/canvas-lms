@@ -82,6 +82,44 @@ describe Api::V1::Submission do
   end
 
   describe "#submission_json" do
+    context "when discussion_checkpoints feature flag is enabled" do
+      let(:field) { "sub_assignment_submissions" }
+
+      before :once do
+        Account.site_admin.enable_feature!(:discussion_checkpoints)
+      end
+
+      it "includes sub_assignment_submissions for checkpointed assignments" do
+        student = course_with_user("StudentEnrollment", course:, active_all: true, name: "Student").user
+
+        parent_assignment = course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
+        parent_submission = parent_assignment.submissions.find_by(user_id: student.id)
+        parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+
+        json = fake_controller.submission_json(parent_submission, parent_assignment, teacher, session, parent_assignment.context, field, params)
+        expect(json["has_sub_assignment_submissions"]).to be true
+        sas = json["sub_assignment_submissions"]
+        expect(sas.pluck("sub_assignment_tag")).to match_array([CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY])
+        expect(sas.pluck("id")).to match_array([nil, nil])
+        expect(sas.pluck("user_id")).to match_array([student.id, student.id])
+
+        # since these are now the sub-assignments themselves, they should not have sub-assignments
+        expect(sas.pluck("has_sub_assignment_submissions")).to match_array([false, false])
+        expect(sas.pluck("sub_assignment_submissions")).to match_array([[], []])
+      end
+
+      it "has falso sub_assignment_submissions info for non-checkpointed assignments" do
+        student = course_with_user("StudentEnrollment", course:, active_all: true, name: "Student").user
+        assignment = course.assignments.create!(title: "Assignment 1", has_sub_assignments: false)
+        submission = assignment.submissions.find_by(user_id: student.id)
+
+        json = fake_controller.submission_json(submission, assignment, teacher, session, assignment.context, field, params)
+        expect(json["has_sub_assignment_submissions"]).to be false
+        expect(json["sub_assignment_submissions"]).to be_empty
+      end
+    end
+
     describe "anonymous_id" do
       let(:field) { "anonymous_id" }
       let(:submission) { assignment.submissions.build(user:) }

@@ -2116,17 +2116,13 @@ describe "Users API", type: :request do
             end
           end
 
-          it "errors" do
+          it "admin can update student pronoun" do
             @student.pronouns = "She/Her"
             @student.save!
-            original_pronoun = @student.pronouns
             test_pronoun = "He/Him"
             raw_api_call(:put, @path, @path_options, { user: { pronouns: test_pronoun } })
-            json = JSON.parse(response.body)
-            expect(response).to have_http_status :unauthorized
-            expect(json["status"]).to eq "unauthorized"
-            expect(json["errors"][0]["message"]).to eq "user not authorized to perform that action"
-            expect(@student.reload.pronouns).to eq original_pronoun
+            expect(response).to have_http_status :ok
+            expect(@student.reload.pronouns).to eq test_pronoun
           end
         end
       end

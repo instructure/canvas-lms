@@ -24,7 +24,7 @@ import {IconDiscussionCheckLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Checkpoint} from '../../../graphql/Checkpoint'
 import {Submission} from '../../../graphql/Submission'
-import {REPLY_TO_TOPIC, REPLY_TO_ENTRY, SUBMITTED} from '../../utils/constants'
+import {REPLY_TO_TOPIC, REPLY_TO_ENTRY, SUBMITTED, MISSING, LATE} from '../../utils/constants'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
@@ -45,23 +45,39 @@ export function CheckpointsTray({...props}) {
     checkpoint => checkpoint.tag === REPLY_TO_ENTRY
   )
 
-  const getCompletedString = submittedAt => {
-    return I18n.t('Completed %{submittedAt}', {
-      submittedAt: DateHelper.formatDatetimeForDiscussions(submittedAt),
-    })
-  }
-
-  const renderSubmissionStatus = (submission = {}, expectedSubmittedStatus = SUBMITTED) => {
-    if (submission.submissionStatus === expectedSubmittedStatus) {
+  const renderSubmissionStatus = (submission = {}) => {
+    if (submission.submissionStatus === SUBMITTED) {
       return (
         <Flex.Item align="start">
           <Text size="small" color="success" weight="bold">
             <IconDiscussionCheckLine />
-            &nbsp;{getCompletedString(submission.submittedAt)}
+            &nbsp;
+            {I18n.t('Completed %{submittedAt}', {
+              submittedAt: DateHelper.formatDatetimeForDiscussions(submission.submittedAt),
+            })}
+          </Text>
+        </Flex.Item>
+      )
+    } else if (submission.submissionStatus === LATE) {
+      return (
+        <Flex.Item align="start">
+          <Text size="small" color="brand" weight="bold">
+            {I18n.t('Late %{submittedAt}', {
+              submittedAt: DateHelper.formatDatetimeForDiscussions(submission.submittedAt),
+            })}
+          </Text>
+        </Flex.Item>
+      )
+    } else if (submission.submissionStatus === MISSING) {
+      return (
+        <Flex.Item align="start">
+          <Text size="small" color="danger" weight="bold">
+            {I18n.t('Missing')}
           </Text>
         </Flex.Item>
       )
     } else {
+      // typically this means unsubmitted, and not late
       return null
     }
   }
@@ -82,7 +98,7 @@ export function CheckpointsTray({...props}) {
               <Flex.Item align="start">
                 <Text size="small">{getCheckpointDueString(replyToTopicCheckpoint)}</Text>
               </Flex.Item>
-              {renderSubmissionStatus(props.replyToTopicSubmission, SUBMITTED)}
+              {renderSubmissionStatus(props.replyToTopicSubmission)}
             </Flex>
           </View>
         </Flex.Item>
@@ -100,7 +116,7 @@ export function CheckpointsTray({...props}) {
             <Flex.Item align="start">
               <Text size="small">{getCheckpointDueString(replyToEntryCheckpoint)}</Text>
             </Flex.Item>
-            {renderSubmissionStatus(props.replyToEntrySubmission, SUBMITTED)}
+            {renderSubmissionStatus(props.replyToEntrySubmission)}
           </Flex>
         </Flex.Item>
       )}

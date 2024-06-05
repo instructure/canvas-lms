@@ -24,7 +24,6 @@ import userEvent from '@testing-library/user-event'
 import MigrationSync from '../MigrationSync'
 
 describe('MigrationSync component', () => {
-
   const defaultProps = () => ({
     migrationStatus: 'void',
     hasCheckedMigration: true,

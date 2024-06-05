@@ -118,7 +118,9 @@
 
   .view_assign {
     margin-inline-end: 9px;
-    a {
+    display: flex;
+    align-items: center;
+    button {
       @include ic-focus-base;
       border-radius: 3px;
       padding: 3px;
@@ -127,6 +129,12 @@
         position: relative;
         text-decoration: none;
       }
+      &:hover {
+        text-decoration: underline;
+      }
+      border: none;
+      color: var(--ic-brand-primary);
+      background: none;
     }
   }
 

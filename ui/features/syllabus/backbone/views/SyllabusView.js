@@ -24,10 +24,10 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import $ from 'jquery'
 import {reduce, each} from 'lodash'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/Syllabus.handlebars'
+import {fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 
 function assignmentSubType(json) {
   if (/discussion/.test(json.submission_types)) return 'discussion_topic'
@@ -132,15 +132,15 @@ export default class SyllabusView extends Backbone.View {
 
       const title = json.title
       if (json.start_at) {
-        start_at = $.fudgeDateForProfileTimezone(json.start_at)
+        start_at = fudgeDateForProfileTimezone(json.start_at)
       }
       if (json.end_at) {
-        end_at = $.fudgeDateForProfileTimezone(json.end_at)
+        end_at = fudgeDateForProfileTimezone(json.end_at)
       }
       if (json.type === 'assignment') {
         due_at = start_at
       } else if (json.type === 'wiki_page' || json.type === 'discussion_topic') {
-        todo_at = $.fudgeDateForProfileTimezone(json.todo_at)
+        todo_at = fudgeDateForProfileTimezone(json.todo_at)
       }
 
       let override = null

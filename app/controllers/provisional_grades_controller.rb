@@ -63,7 +63,7 @@
 #           "type": "boolean"
 #         },
 #         "speedgrader_url": {
-#           "description": "A link to view this provisional grade in SpeedGrader™",
+#           "description": "A link to view this provisional grade in SpeedGrader",
 #           "example": "http://www.example.com/courses/123/gradebook/speed_grader?...",
 #           "type": "string"
 #         }

@@ -603,10 +603,10 @@ class ContentTag < ActiveRecord::Base
     end
     scope.union(
       for_non_differentiable_discussions(course_ids)
-        .merge(DiscussionTopic.visible_to_student_sections(user_ids)),
+        .merge(DiscussionTopic.visible_to_ungraded_discussion_student_visibilities(user_ids)),
       for_differentiable_assignments(user_ids, course_ids),
       for_differentiable_discussions(user_ids, course_ids)
-        .merge(DiscussionTopic.visible_to_student_sections(user_ids)),
+        .merge(DiscussionTopic.visible_to_ungraded_discussion_student_visibilities(user_ids)),
       for_differentiable_quizzes(user_ids, course_ids)
     )
   }
@@ -858,21 +858,20 @@ class ContentTag < ActiveRecord::Base
   end
 
   def update_module_item_submissions(change_of_module: true)
+    valid_types = ["Assignment", "Quizzes::Quiz", "DiscussionTopic"]
     return unless Account.site_admin.feature_enabled?(:differentiated_modules)
 
-    return unless tag_type == "context_module" && (content_type == "Assignment" || content_type == "Quizzes::Quiz")
+    return unless tag_type == "context_module" && valid_types.include?(content_type)
 
     if change_of_module
       return unless saved_change_to_context_module_id? && AssignmentOverride.active.where(context_module_id: saved_change_to_context_module_id).exists?
-    else
-      return unless context_module.assignment_overrides.active.exists?
     end
 
     content.clear_cache_key(:availability)
 
     if content_type == "Assignment"
       SubmissionLifecycleManager.recompute(content, update_grades: true)
-    elsif content_type == "Quizzes::Quiz" && content.assignment
+    elsif content.assignment
       content.assignment.clear_cache_key(:availability)
       SubmissionLifecycleManager.recompute(content.assignment, update_grades: true)
     end

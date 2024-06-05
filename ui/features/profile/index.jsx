@@ -25,12 +25,15 @@ import ReactDOM from 'react-dom'
 import GeneratePairingCode from '@canvas/generate-pairing-code'
 import ready from '@instructure/ready'
 import FeatureFlags from '@canvas/feature-flags'
+import TopNavPortal from '@canvas/top-navigation/react/TopNavPortal'
 
 ready(() => {
   const hiddenFlags = []
   if (!ENV.NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT) {
     hiddenFlags.push('new_user_tutorial_on_off')
   }
+
+  ReactDOM.render(<TopNavPortal />, document.querySelector('#react-instui-topnav'))
 
   ReactDOM.render(
     <FeatureFlags hiddenFlags={hiddenFlags} disableDefaults={true} />,

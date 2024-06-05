@@ -28,17 +28,17 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('gradebook')
 
-const HeaderFilterView = ({ grid, averageFn, redrawFn }) => {
+const HeaderFilterView = ({grid, averageFn, redrawFn}) => {
   const calculationMethods = {
     mean: I18n.t('course_average', 'Course average'),
     median: I18n.t('course_median', 'Course median'),
   }
 
-  const getCalculationMethod = (method) => {
+  const getCalculationMethod = method => {
     return calculationMethods[method]
   }
 
-  const onOptionClick = (calcMethod) => {
+  const onOptionClick = calcMethod => {
     // Do not recalculate if calcMethod is the current calculation method
     if (calcMethod === averageFn) {
       return
@@ -70,23 +70,20 @@ const HeaderFilterView = ({ grid, averageFn, redrawFn }) => {
               />
             }
           >
-            <Menu.Group
-              data-testid="course-calc-group"
-              label={I18n.t('Calculations')}
-            >
+            <Menu.Group data-testid="course-calc-group" label={I18n.t('Calculations')}>
               <Menu.Item
                 data-testid="course-average-calc-option"
-                selected={averageFn === "mean"}
-                onSelect={() => onOptionClick("mean")}
+                selected={averageFn === 'mean'}
+                onSelect={() => onOptionClick('mean')}
               >
-                {getCalculationMethod("mean")}
+                {getCalculationMethod('mean')}
               </Menu.Item>
               <Menu.Item
                 data-testid="course-median-calc-option"
-                selected={averageFn === "median"}
-                onSelect={() => onOptionClick("median")}
+                selected={averageFn === 'median'}
+                onSelect={() => onOptionClick('median')}
               >
-                {getCalculationMethod("median")}
+                {getCalculationMethod('median')}
               </Menu.Item>
             </Menu.Group>
           </Menu>

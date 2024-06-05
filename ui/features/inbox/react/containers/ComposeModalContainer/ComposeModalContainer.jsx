@@ -66,9 +66,7 @@ const ComposeModalContainer = props => {
   const [includeObserversMessages, setIncludeObserversMessages] = useState(null)
   const [activeSignature, setActiveSignature] = useState()
 
-  const {
-    loading: inboxSettingsLoading
-  } = useQuery(INBOX_SETTINGS_QUERY, {
+  const { loading: inboxSettingsLoading } = useQuery(INBOX_SETTINGS_QUERY, {
     onCompleted: data => {
       let signature
       if (data?.myInboxSettings?.useSignature) {
@@ -80,7 +78,7 @@ const ComposeModalContainer = props => {
       setOnFailure(I18n.t('There was an error while loading inbox settings'))
       dismiss()
     },
-    skip: !props.inboxSettingsFeature || !props.open
+    skip: !props.inboxSettingsFeature || !props.open,
   })
   // Translation features
   const [translating, setTranslating] = useState(false)

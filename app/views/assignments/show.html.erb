@@ -72,8 +72,7 @@
           class='btn <%= "published" if @assignment.published? %> <%= "disabled" unless assignment_publishing_enabled?(@assignment, @current_user) %>'>
         </button>
         <% if @context.grants_any_right?(@current_user, :manage_assignments_edit) && Account.site_admin.feature_enabled?(:differentiated_modules)%>
-          <a
-            href="#<%= @assignment.id %>"
+          <button
             class='btn assign-to-link'
             data-assignment-name="<%= @assignment.title %>"
             data-assignment-context-id="<%= @assignment.context_id %>"
@@ -81,7 +80,7 @@
             data-assignment-points-possible="<%= @assignment.points_possible %>"
           >
             <i class='icon-permissions'></i> <%= t('Assign To') %>
-          </a>
+          </button>
         <% end %>
         <% if @context.grants_any_right?(@current_user, :manage_assignments, :manage_assignments_edit) %>
           <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link<%= ' disabled' unless can_do(@assignment, @current_user, :update) %>'>
@@ -112,7 +111,7 @@
             <% if @can_link_to_speed_grader %>
               <li id="speed-grader-link-container" role="presentation" class='<%= "hidden" unless @assignment.published? %>'>
                 <a href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) %>" class="speed-grader-link-assignment icon-speed-grader">
-                  <%= t(:speed_grader, "SpeedGrader™") %>
+                  <%= t(:speed_grader, "SpeedGrader") %>
                 </a>
               </li>
             <% end %>
@@ -146,15 +145,6 @@
         <%= render "shared/mark_as_done" %>
         <%= assignment_submission_button(@assignment, @current_user, @current_user_submission, @first_annotation_submission) %>
       </div>
-      <% if @assignment_menu_tools.present? %>
-        <button class="al-trigger btn" aria-haspopup="true" aria-owns="toolbar-1">
-          <i class="icon-more" aria-hidden="true"></i>
-          <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
-        </button>
-        <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
-          <%= external_tools_menu_items(@assignment_menu_tools, {link_class: "menu_tool_link", settings_key: :assignment_menu, in_list: true, url_params: {:assignments => [@assignment.id]}}) %>
-        </ul>
-      <% end %>
     </div>
     <%= render "student_assignment_overview" %>
   <% end %>

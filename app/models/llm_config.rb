@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class LlmConfig
+class LLMConfig
   attr_reader :name, :model_id, :template, :options
 
   def initialize(name:, model_id:, template: nil, options: nil)
