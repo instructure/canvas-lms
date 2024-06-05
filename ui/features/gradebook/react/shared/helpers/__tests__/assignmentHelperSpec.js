@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash'
-import assignmentHelper from 'ui/features/gradebook/react/shared/helpers/assignmentHelper'
+import assignmentHelper from '../assignmentHelper'
 
 QUnit.module('assignmentHelper#getComparator', {
   setup() {},
