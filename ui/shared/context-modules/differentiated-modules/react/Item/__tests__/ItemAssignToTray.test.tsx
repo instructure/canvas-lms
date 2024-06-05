@@ -54,11 +54,11 @@ describe('ItemAssignToTray', () => {
 
   const FIRST_GROUP_CATEGORY_ID = '2'
   const SECOND_GROUP_CATEGORY_ID = '3'
-  const FIRST_GROUP_CATEGORY_URL = `/api/v1/group_categories/${FIRST_GROUP_CATEGORY_ID}/groups`
-  const SECOND_GROUP_CATEGORY_URL = `/api/v1/group_categories/${SECOND_GROUP_CATEGORY_ID}/groups`
-  const SECTIONS_URL = `/api/v1/courses/${props.courseId}/sections`
-  const STUDENTS_URL = `api/v1/courses/${props.courseId}/users?enrollment_type=student`
-  const OVERRIDES_URL = '/api/v1/courses/1/assignments/23/date_details'
+  const FIRST_GROUP_CATEGORY_URL = `/api/v1/group_categories/${FIRST_GROUP_CATEGORY_ID}/groups?per_page=100`
+  const SECOND_GROUP_CATEGORY_URL = `/api/v1/group_categories/${SECOND_GROUP_CATEGORY_ID}/groups?per_page=100`
+  const SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=\d+/
+  const STUDENTS_URL = /\/api\/v1\/courses\/.+\/users\?per_page=\d+&enrollment_type=student/
+  const OVERRIDES_URL = '/api/v1/courses/1/assignments/23/date_details?per_page=100'
 
   const OVERRIDES = [
     {
@@ -112,7 +112,7 @@ describe('ItemAssignToTray', () => {
         overrides: OVERRIDES,
       })
       // an assignment with invalid dates
-      .get('/api/v1/courses/1/assignments/24/date_details', {
+      .get('/api/v1/courses/1/assignments/24/date_details?per_page=100', {
         id: '24',
         due_at: '2023-09-30T12:00:00Z',
         unlock_at: '2023-10-01T12:00:00Z',
@@ -122,7 +122,7 @@ describe('ItemAssignToTray', () => {
         overrides: [],
       })
       // an assignment with valid dates and no overrides
-      .get('/api/v1/courses/1/assignments/25/date_details', {
+      .get('/api/v1/courses/1/assignments/25/date_details?per_page=100', {
         id: '25',
         due_at: '2023-10-05T12:01:00Z',
         unlock_at: null,
@@ -131,9 +131,9 @@ describe('ItemAssignToTray', () => {
         visible_to_everyone: true,
         overrides: [],
       })
-      .get('/api/v1/courses/1/quizzes/23/date_details', {})
-      .get('/api/v1/courses/1/discussion_topics/23/date_details', {})
-      .get('/api/v1/courses/1/pages/23/date_details', {})
+      .get('/api/v1/courses/1/quizzes/23/date_details?per_page=100', {})
+      .get('/api/v1/courses/1/discussion_topics/23/date_details?per_page=100', {})
+      .get('/api/v1/courses/1/pages/23/date_details?per_page=100', {})
     fetchMock
       .get(STUDENTS_URL, STUDENTS_DATA)
       .get(SECTIONS_URL, SECTIONS_DATA)
@@ -270,7 +270,7 @@ describe('ItemAssignToTray', () => {
   })
 
   it('renders blueprint locking info when there are locked dates', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {
+    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
       blueprint_date_locks: ['availability_dates'],
     })
     const {getAllByText, getByTestId} = renderComponent({itemContentId: '31'})
@@ -287,7 +287,7 @@ describe('ItemAssignToTray', () => {
 
   // LF-1370
   it.skip('renders blueprint locking info when there are locked dates and default cards', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {
+    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
       blueprint_date_locks: ['availability_dates'],
     })
     const {getAllByText, findAllByTestId} = renderComponent({
@@ -313,7 +313,9 @@ describe('ItemAssignToTray', () => {
   })
 
   it('does not render blueprint locking info when locked with unlocked due dates', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {blueprint_date_locks: []})
+    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
+      blueprint_date_locks: [],
+    })
     const {getByTestId, queryByText} = renderComponent({itemContentId: '31'})
 
     // wait for the cards to render
@@ -327,7 +329,7 @@ describe('ItemAssignToTray', () => {
 
   // LF-1370
   it.skip('disables add button if there are blueprint-locked dates', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {
+    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
       blueprint_date_locks: ['availability_dates'],
     })
     const {getByRole, findAllByText} = renderComponent({itemContentId: '31'})
@@ -337,7 +339,7 @@ describe('ItemAssignToTray', () => {
 
   // LF-1370
   it.skip('disables add button if there are blueprint-locked dates and default cards', async () => {
-    fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {
+    fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
       blueprint_date_locks: ['availability_dates'],
     })
     const {getByRole, findAllByText} = renderComponent({
@@ -616,9 +618,9 @@ describe('ItemAssignToTray', () => {
 
       savebtn.click()
       expect(getByText('Please fix errors before continuing')).toBeInTheDocument()
-      expect(fetchMock.lastOptions('/api/v1/courses/1/assignments/24/date_details')?.method).toBe(
-        'GET'
-      )
+      expect(
+        fetchMock.lastOptions('/api/v1/courses/1/assignments/24/date_details?per_page=100')?.method
+      ).toBe('GET')
       expect(onDismissMock).not.toHaveBeenCalled()
     })
 
