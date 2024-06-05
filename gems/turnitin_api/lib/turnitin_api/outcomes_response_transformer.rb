@@ -36,20 +36,21 @@ module TurnitinApi
 
     # download original
     def original_submission
-      yield make_call(response.body["outcome_originalfile"]["launch_url"])
+      launch_url = response_body_accessor('outcome_originalfile', 'launch_url')
+      yield make_call(launch_url)
     end
 
     # store link to report
     def originality_report_url
-      response.body["outcome_originalityreport"]["launch_url"]
+      response_body_accessor('outcome_originalityreport', 'launch_url')
     end
 
     def originality_data
-      response.body['outcome_originalityreport'].select {|k, _| %w(breakdown numeric).include?(k)}
+      response_body_accessor('outcome_originalityreport')&.select { |k, _| %w(breakdown numeric).include?(k) }
     end
 
     def uploaded_at
-      response.body['meta']['date_uploaded']
+      response_body_accessor('meta', 'date_uploaded')
     end
 
     def scored?
@@ -81,5 +82,8 @@ module TurnitinApi
       connection.post url, params.merge(header.signed_attributes)
     end
 
+    def response_body_accessor(*keys)
+      response.body&.dig(*keys)
+    end
   end
 end
