@@ -49,6 +49,10 @@ class AuthenticationProvider::Twitter < AuthenticationProvider::OAuth
     ].freeze
   end
 
+  def self.supports_autoconfirmed_email?
+    false
+  end
+
   def login_attribute
     super || "user_id"
   end
