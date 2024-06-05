@@ -207,6 +207,7 @@ nn:
   a_name_for_this_set_is_required_222bad23: "Eit namn er obligatorisk. "
   a_name_is_required_b5df38a9: "Eit namn er obligatorisk"
   a_new_annotation_has_been_made_by_author_on_the_as_63ad4351: " %{author} har lagt til ein ny merknad på oppgåva %{assignment_name}."
+  a_new_annotation_has_been_made_on_the_assignment_a_e473936e: "Ein ny kommentar har blitt gjort på innleveringa %{assignment_name}"
   a_new_assignment_has_been_created_for_your_course__12b72639: "Ei ny oppgåve er oppretta for emnet ditt, %{course_name}"
   a_new_module_has_been_created_with_the_content_ret_b01468b2: "Ein ny modul er blitt oppretta med innhaldet som vart returnert frå verktøyet. Om du vil sjå det, kan du gå til Modular."
   a_page_with_this_title_already_exists_please_choos_19c53cc4: "Ei side med denne tittelen finst allereie. Vennligst vel ein annan tittel."
@@ -290,6 +291,7 @@ nn:
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Ein tabell som inneheld data frå graderingsskjemaet. Kvar rad inneheld eit namn, ein maksimum prosentverdi og ein minimum prosentverdi. Kvar rad inneheld også ein knapp for å legge til ei ny rad nedanfor, og ein knapp for å slette gjeldande rad."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Ein tabell som inneheld data for vurderingsskala. Først er eit namn på vurderingsskalaen og knappar for redigering og sletting av skalaen. Kvar rad inneheld eit namn, ein maksimal prosentandel og ein minste prosentandel. I tillegg inneheld kvar rad ein knapp for å leggje til ein ny rad nedanfor, og ein knapp for å slette gjeldande rad."
   a_timeout_occurred_contacting_external_authenticat_c064ea48: "Ei tidsavbrot oppstod ved kontakt med ekstern autentiseringsteneste"
+  a_verification_code_has_been_sent_to_email_please__108f2713: "Godkjenningskode er send til %{email}. Skriv inn koden her:"
   a_wonderful_assignment_d3139d9b: "Ei fin oppgåve"
   a_yearly_rrule_must_include_byday_or_bymonthday_b56649f4: "Ein årleg RRULE må inkludere BYDAY eller BYMONTHDAY"
   a_z_243c3301: A–Å
@@ -312,6 +314,16 @@ nn:
         partner_id: Partnar-ID
         partner_key: Partnarnøkkel
   academic_engagement_capella_74946a80: "Akademisk engasjement (Capella)"
+  academic_engagement_capella_v2_2023_08_28_5c92fd3f: "Akademisk engasjement (Capella V2-2023-08-28)"
+  academic_engagement_capella_v3_2024_02_05_775b9f21: "Akademisk engasjement (Capella V3-2024-02-05)"
+  academic_engagement_detail_capella_e76c939d: "Akademisk engasjement detalj (Capella)"
+  academic_engagement_detail_capella_v2_2023_08_28_3ba31c31: "Akademisk engasjement detalj (Capella V2-2023-08-28)"
+  academic_engagement_detail_capella_v3_2024_02_05_106a7e2f: "Akademisk engasjement detalj (Capella V3-2024-02-05)"
+  academic_engagement_detail_strayer_1f80cba4: "Akademisk engasjement detalj (Strayer)"
+  academic_engagement_detail_strayer_v3_2023_08_28_cea3521c: "Akademisk engasjement detalj (Strayer V3-2023-08-28)"
+  academic_engagement_strayer_8c7832b9: "Akademisk engasjement (Strayer)"
+  academic_engagement_strayer_v2_61e00b88: "Akademisk engasjement (Strayer V2)"
+  academic_engagement_strayer_v3_2023_08_28_a992b312: "Akademisk engasjement (Strayer V3-2023-08-28)"
   academic_success_reporting_2585c499: "Akademisk suksessrapportering"
   acalanes_union_high_grade_report_ae9bce11: "Acalanes Union High vurderingsrapport"
   accept_2fdd362e: Godta
@@ -328,6 +340,7 @@ nn:
   access_canvas_training_videos_and_courses_ea43173a: "Gå til Canvas sine opplæringsvideoar og -emne"
   access_denied_f922a9ff: "Ingen tilgang"
   access_report_80d28095: Tilgangsrapport
+  access_to_faculty_journal_will_end_on_deprecationd_a0774848: "Tilgang til fakultetsjournalen vil ende %{deprecationDate}. Ta kontakt med brukerstøtte om du har spørsmål."
   access_to_these_tabs_requires_the_outcome_proficie_dd8ca732: "Tilgang til desse fanene krev Ferdigheitsberekningar for læringsmål - legg til/rediger og Meistringsskalaer for læringsmål - legg til/rediger rettigheter."
   access_token_3be22221: Tilgangstoken
   access_token_count_access_token_count_dfb5463c: "Tal på tilgangs-token %{access_token_count}"
@@ -697,6 +710,8 @@ nn:
   account_user: 
     types: 
       account_admin: Kontoadministrator
+  account_verification_required_486c5ccd: "Verifisering av konto er påkrevd"
+  account_verification_successful_b051223: "Konto er verifisert"
   accountname_accountcount_a6e2ba71: "%{accountName} (%{accountCount})"
   accountname_accountcount_accounts_e2c19840: "%{accountName}, %{accountCount} kontoar"
   accounts: 
@@ -2239,6 +2254,7 @@ nn:
   add_manage_conclude_delete_publish_reset_8a5aa902: "legg til / administrer / avslutt / slett / publiser / tilbakestill"
   add_mastery_level_76469d98: "Legg til meistringsnivå"
   add_media_cfa37b54: "Legg til media"
+  add_message_10cc308c: "Legg til melding"
   add_moderator_review_copy_1st_a484c813: "Legg til gjennomgang frå sensuransvarleg (første eksemplar)"
   add_moderator_review_copy_2nd_e80d458f: "Legg til gjennomgang frå sensuransvarleg (andre eksemplar)"
   add_moderator_review_new_3c183cea: "Legg til gjennomgang frå sensuransvarleg (ny)"
@@ -2275,12 +2291,14 @@ nn:
   add_recipient_ff135ed7: "Legg til mottakar"
   add_remove_in_courses_d65aaee3: "legg til / fjern i emne"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Legg til, fjerne eller ordne seksjon på nytt for porteføljen"
+  add_requirement_357585bc: "Legg til vilkår"
   add_review_2fb1590c: "Legg til gjennomgang"
   add_role_3dc4d273: "Legg til rolle"
   add_rubric_3636d9a6: "Legg til vurderingsskjema"
   add_scope_a5208f8b: "Legg til omfang"
   add_section_8b027a1c: "Legg til seksjon"
   add_set_of_grading_periods_5b4d6e51: "Legg til fleire periodar for karaktersetjing"
+  add_signature_399fa4df: "Legg til signatur"
   add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "Legg til SpeedGrader-lenker til oversiktene for oppgåver og quizzar"
   add_status_2df2bdd6: "Legg til status"
   add_student_1152afc0: "Legg til student"
@@ -2364,6 +2382,8 @@ nn:
   admin_analytics_description: "Gjer det mogleg å bruke analyseverktøy på kontonivå. Admin Analytics dashboardet gir detaljar om bruken av Canvas, suksess i Canvasemne og engasjement frå studentar. Les meir i *Admin Analytics Hub* i Canvas-fellesskapet."
   admin_analytics_eacba735: "Admin Analyse"
   admin_analytics_view_admin_analytics_permission_cc7d46db: "Administrasjons analyse - Vis løyve for admin analyse"
+  admin_analytics_view_and_export_data_7dc4d362: "Analytics for administratorar - sjå og eksporter data"
+  admin_analytics_view_permission_description: "Gjør det nye løyve for Admin Analytics synleg"
   admin_csv_f8d1b3eb: "CSV-fil over administratorar"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Administratoreksport for fleire vurderingsperiodar"
   admin_navigation_menu_77b801a2: Admin-navigeringsmeny
@@ -2466,6 +2486,7 @@ nn:
   all_4321c3a1: Alle
   all_account_types_e83c1516: "Alle kontoar"
   all_accounts_3bafc860: "Alle kontoar"
+  all_announcements_b374ffda: "Alle kunngjeringar"
   all_assignees_removed_14639499: "Alle mottakarar fjerna"
   all_assignment_groups_a65e9e46: "Alle oppgåvegruppene"
   all_assignments_b79a4d6a: "Alle oppgåvene"
@@ -2524,6 +2545,7 @@ nn:
   all_subject_navigation_has_been_disabled_f06b0154: "All emnenavigering er deaktivert."
   all_subjects_5a42cfdb: "Alle emner"
   all_submission_comments_have_been_marked_as_read_74c0683b: "Alle innleveringskommentarar er merka som lesne"
+  all_submissions_3eedfb97: "Alle innleveringar"
   all_submissions_must_have_a_selected_grade_3a84e5a9: "Alle innleveringar må ha ein vurdering."
   all_terms_cd27b0fb: "Alle semester"
   all_timezones_5e8afa7b: "Alle tidssoner"
@@ -2538,6 +2560,7 @@ nn:
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "La ein sensuransvarleg gå gjennom fleire uavhengige karaktersetjingar for utvalde innleveringar"
   allow_a_teacher_to_set_the_number_of_allowed_attem_19deb51d: "Tillat lærarar å setje ei oppgåve sitt antal tillatne forsøk gjennom brukargrensesnittet"
   allow_administrative_actions_in_courses_20c33fed: "Tillat administrative handlingar i emne"
+  allow_administrators_to_set_a_default_grading_sche_9b928f00: "La administratorar velje eit standard karakteroppsett for kontoen. Dette oppsettet vil bli standard for alle emne tilhøyrande kontoen, men enkeltemner kan overstyre valet med sitt eige standardval"
   allow_attendees_to_4ef30c3: "Tillat deltakarar å..."
   allow_bb7ce9b1: Tillat
   allow_blueprint_publishing_after_association_fae6ba95: "Tillat Blueprint publisering basert på forbindelse"
@@ -2591,6 +2614,7 @@ nn:
   allow_switching_to_the_new_assignments_page_9ac0ad93: "Tillat å byte til den nye oppgåvesida"
   allow_teachers_to_change_the_dates_on_a_set_of_ass_4d48baec: "Tillat lærarar å endre datoane til eit sett med oppgåver i eitt trinn"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Tillat å sende varsel gjennom vår dispatch-kø"
+  allow_the_item_banks_share_with_subaccounts_permis_a8a6e87f: "Tillat løyve \"Spørsmålsbank - del med underkontoar\""
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Tillat at verktøyet får tilgang til IMS-namn og rolletildelingsteneste. "
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "Tillat ikkje-verifiserte e-postadresser når du legg til brukarar"
   allow_users_to_comment_45b8f753: "La studentane få kommentere"
