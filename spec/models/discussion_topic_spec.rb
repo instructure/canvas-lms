@@ -3331,6 +3331,7 @@ describe DiscussionTopic do
 
     describe "differentiated topics" do
       before :once do
+        Account.site_admin.enable_feature! :differentiated_modules
         @course = course_factory(active_course: true)
 
         @item_without_assignment = discussion_topic_model(user: @teacher)
