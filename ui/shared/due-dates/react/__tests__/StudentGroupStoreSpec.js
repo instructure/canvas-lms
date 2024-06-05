@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash'
-import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
+import StudentGroupStore from '../StudentGroupStore'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('StudentGroupStore', {

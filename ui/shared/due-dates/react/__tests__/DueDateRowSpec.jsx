@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import DueDateRow from '@canvas/due-dates/react/DueDateRow'
+import DueDateRow from '../DueDateRow'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('DueDateRow with empty props and canDelete true', {
@@ -126,20 +126,20 @@ test('does not return remove link if not canDelete', function () {
 
 test('tokenizing ADHOC overrides works', function () {
   const tokens = this.dueDateRow.tokenizedOverrides()
-  equal(6, tokens.length)
-  equal(3, tokens.filter(t => t.type === 'student').length)
+  equal(tokens.length, 6)
+  equal(tokens.filter(t => t.type === 'student').length, 3)
 })
 
 test('tokenizing section overrides works', function () {
   const tokens = this.dueDateRow.tokenizedOverrides()
-  equal(6, tokens.length)
-  equal(2, tokens.filter(t => t.type === 'section').length)
+  equal(tokens.length, 6)
+  equal(tokens.filter(t => t.type === 'section').length, 2)
 })
 
 test('tokenizing group overrides works', function () {
   const tokens = this.dueDateRow.tokenizedOverrides()
-  equal(6, tokens.length)
-  equal(1, tokens.filter(t => t.type === 'group').length)
+  equal(tokens.length, 6)
+  equal(tokens.filter(t => t.type === 'group').length, 1)
 })
 
 test('section tokens are given their proper name if loaded', function () {

@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import DueDateTokenWrapper from '@canvas/due-dates/react/DueDateTokenWrapper'
+import DueDateTokenWrapper from '../DueDateTokenWrapper'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('DueDateTokenWrapper', {

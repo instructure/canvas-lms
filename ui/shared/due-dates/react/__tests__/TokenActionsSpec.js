@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import TokenActions from '@canvas/due-dates/react/TokenActions'
+import TokenActions from '../TokenActions'
 import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride'
 import {map} from 'lodash'
 

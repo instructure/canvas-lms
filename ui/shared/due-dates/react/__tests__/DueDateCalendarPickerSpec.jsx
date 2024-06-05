@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import chicago from 'timezone/America/Chicago'
-import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
+import DueDateCalendarPicker from '../DueDateCalendarPicker'
 import * as tz from '@instructure/moment-utils'
 import tzInTest from '@instructure/moment-utils/specHelpers'
 import fakeENV from 'helpers/fakeENV'

@@ -21,7 +21,7 @@ import 'jquery-migrate'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
-import DueDateRemoveRowLink from '@canvas/due-dates/react/DueDateRemoveRowLink'
+import DueDateRemoveRowLink from '../DueDateRemoveRowLink'
 
 QUnit.module('DueDateRemoveRowLink', {
   setup() {
