@@ -1368,7 +1368,7 @@ class DiscussionTopic < ActiveRecord::Base
       if assignment_id
         context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)
       else
-        context.user_is_admin?(user) || !context.visibility_limited_to_course_sections?(user)
+        context.user_is_admin?(user) || context.account_membership_allows(user) || !context.visibility_limited_to_course_sections?(user)
       end
     end
     can :manage_assign_to
@@ -1379,7 +1379,7 @@ class DiscussionTopic < ActiveRecord::Base
       if assignment_id
         context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_add)
       else
-        context.user_is_admin?(user) || !context.visibility_limited_to_course_sections?(user)
+        context.user_is_admin?(user) || context.account_membership_allows(user) || !context.visibility_limited_to_course_sections?(user)
       end
     end
     can :create_assign_to
