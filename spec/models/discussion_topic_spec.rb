@@ -396,6 +396,11 @@ describe DiscussionTopic do
           @student.enrollments.where(course: @course).first.update!(limit_privileges_to_course_section: true)
           expect(@topic.grants_right?(@student, :manage_assign_to)).to be false
         end
+
+        it "is granted to account admins" do
+          account_admin = account_admin_user(account: @course.root_account)
+          expect(@topic.grants_right?(account_admin, :manage_assign_to)).to be true
+        end
       end
     end
   end
