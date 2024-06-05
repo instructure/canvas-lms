@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash'
-import AssignmentOverrideHelper from '@canvas/due-dates/AssignmentOverrideHelper'
+import AssignmentOverrideHelper from '../AssignmentOverrideHelper'
 
 const defaultStudents = [
   {id: '1', group_ids: ['1'], sections: ['1']},

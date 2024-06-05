@@ -19,14 +19,11 @@
 import {map} from 'lodash'
 import $ from 'jquery'
 import 'jquery-migrate'
-import {
-  createGradebook,
-  setFixtureHtml,
-} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
-import studentRowHeaderConstants from 'ui/features/gradebook/react/default_gradebook/constants/studentRowHeaderConstants'
-import ContentFilterDriver from './default_gradebook/components/content-filters/ContentFilterDriver'
-import PostGradesStore from 'ui/features/gradebook/react/SISGradePassback/PostGradesStore'
-import {hideAggregateColumns} from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/Grid.utils'
+import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
+import studentRowHeaderConstants from '../constants/studentRowHeaderConstants'
+import ContentFilterDriver from '../../../../../../spec/javascripts/jsx/gradebook/default_gradebook/components/content-filters/ContentFilterDriver'
+import PostGradesStore from '../../SISGradePassback/PostGradesStore'
+import {hideAggregateColumns} from '../GradebookGrid/Grid.utils'
 
 const $fixtures = document.getElementById('fixtures')
 

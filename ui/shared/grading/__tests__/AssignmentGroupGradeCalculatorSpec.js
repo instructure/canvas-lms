@@ -17,13 +17,12 @@
  */
 
 import _ from 'lodash'
-import AssignmentGroupGradeCalculator from '@canvas/grading/AssignmentGroupGradeCalculator'
+import AssignmentGroupGradeCalculator from '../AssignmentGroupGradeCalculator'
 
 let submissions
 let assignments
 let assignmentGroup
 
-/* eslint-disable qunit/no-identical-names */
 QUnit.module('AssignmentGroupGradeCalculator.calculate with no submissions and no assignments', {
   setup() {
     submissions = []
@@ -1129,4 +1128,3 @@ QUnit.module('AssignmentGroupGradeCalculator', () => {
     })
   })
 })
-/* eslint-enable qunit/no-identical-names */

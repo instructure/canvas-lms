@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash'
-import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
+import CourseGradeCalculator from '../CourseGradeCalculator'
 
 let submissions
 let assignments

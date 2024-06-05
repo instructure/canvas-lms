@@ -18,7 +18,7 @@
 
 import _ from 'lodash'
 import * as timezone from '@instructure/moment-utils'
-import {scopeToUser, updateWithSubmissions} from '@canvas/grading/EffectiveDueDates'
+import {scopeToUser, updateWithSubmissions} from '../EffectiveDueDates'
 
 QUnit.module('EffectiveDueDates', () => {
   QUnit.module('.scopeToUser', () => {
