@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import SpeedGraderAlerts from 'ui/features/speed_grader/react/SpeedGraderAlerts'
+import SpeedGraderAlerts from '../SpeedGraderAlerts'
 
 QUnit.module('SpeedGraderAlerts', hooks => {
   QUnit.module('showStudentGroupChangeAlert', () => {

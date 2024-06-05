@@ -18,12 +18,12 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import SpeedGraderHelpers from 'ui/features/speed_grader/jquery/speed_grader_helpers'
+import SpeedGraderHelpers from '../speed_grader_helpers'
 import SpeedGraderSelectMenu, {
   replaceDropdownIcon,
   focusHandlerAccessibilityFixes,
   selectMenuAccessibilityFixes,
-} from 'ui/features/speed_grader/jquery/speed_grader_select_menu'
+} from '../speed_grader_select_menu'
 
 QUnit.module('SpeedGraderSelectMenu', () => {
   QUnit.module('#updateSelectMenuStatus', updateSelectMenuStatusHooks => {
