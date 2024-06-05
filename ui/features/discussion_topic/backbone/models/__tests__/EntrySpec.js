@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Entry from 'ui/features/discussion_topic/backbone/models/Entry'
+import Entry from '../Entry'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('Entry', {
