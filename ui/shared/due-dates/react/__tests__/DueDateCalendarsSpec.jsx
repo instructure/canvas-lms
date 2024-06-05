@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import DueDateCalendars from '@canvas/due-dates/react/DueDateCalendars'
+import DueDateCalendars from '../DueDateCalendars'
 import fakeENV from 'helpers/fakeENV'
 
 let wrapper = null

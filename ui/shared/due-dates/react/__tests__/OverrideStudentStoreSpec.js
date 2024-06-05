@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash'
-import OverrideStudentStore from '@canvas/due-dates/react/OverrideStudentStore'
+import OverrideStudentStore from '../OverrideStudentStore'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('OverrideStudentStore', {
@@ -238,16 +238,16 @@ test('can properly fetch a student by name', function () {
   this.setupServerResponses()
   OverrideStudentStore.fetchStudentsByName('publiu')
   this.server.respond()
-  equal(200, this.server.requests[0].status)
+  equal(this.server.requests[0].status, 200)
 })
 
 test('sets currentlySearching properly', function () {
   this.setupServerResponses()
-  equal(false, OverrideStudentStore.currentlySearching())
+  equal(OverrideStudentStore.currentlySearching(), false)
   OverrideStudentStore.fetchStudentsByName('publiu')
-  equal(true, OverrideStudentStore.currentlySearching())
+  equal(OverrideStudentStore.currentlySearching(), true)
   this.server.respond()
-  equal(false, OverrideStudentStore.currentlySearching())
+  equal(OverrideStudentStore.currentlySearching(), false)
 })
 
 test('fetches students by same name only once', function () {
@@ -255,7 +255,7 @@ test('fetches students by same name only once', function () {
   OverrideStudentStore.fetchStudentsByName('publiu')
   this.server.respond()
   OverrideStudentStore.fetchStudentsByName('publiu')
-  equal(1, this.server.requests.length)
+  equal(this.server.requests.length, 1)
 })
 
 test('does not fetch if allStudentsFetched is true', function () {

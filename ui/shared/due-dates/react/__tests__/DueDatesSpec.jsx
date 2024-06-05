@@ -22,9 +22,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import {every, keys, isEmpty, intersection, map} from 'lodash'
-import DueDates from '@canvas/due-dates/react/DueDates'
-import OverrideStudentStore from '@canvas/due-dates/react/OverrideStudentStore'
-import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
+import DueDates from '../DueDates'
+import OverrideStudentStore from '../OverrideStudentStore'
+import StudentGroupStore from '../StudentGroupStore'
 import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride'
 import fakeENV from 'helpers/fakeENV'
 
@@ -144,6 +144,7 @@ test('properly removes a row', function () {
     },
   })
   equal(this.dueDates.sortedRowKeys().length, 2)
+  // eslint-disable-next-line qunit/assert-args
   equal(this.dueDates.removeRow('2'))
   equal(this.dueDates.sortedRowKeys().length, 1)
 })
@@ -157,9 +158,11 @@ test('will not allow removing the last row', function () {
   })
   equal(this.dueDates.sortedRowKeys().length, 2)
   ok(this.dueDates.canRemoveRow())
+  // eslint-disable-next-line qunit/assert-args
   equal(this.dueDates.removeRow('2'))
   equal(this.dueDates.sortedRowKeys().length, 1)
   ok(!this.dueDates.canRemoveRow())
+  // eslint-disable-next-line qunit/assert-args
   equal(this.dueDates.removeRow('1'))
   equal(this.dueDates.sortedRowKeys().length, 1)
 })
@@ -461,8 +464,6 @@ QUnit.module('DueDates render callbacks', {
       student_ids: ['1', '3'],
       due_at: null,
     })
-
-    this.dueDates
 
     this.props = {
       overrides: [this.override],
