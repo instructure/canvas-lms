@@ -18,7 +18,7 @@
 
 import React from 'react'
 import enzyme from 'enzyme'
-import ExportListItem from 'ui/features/webzip_export/react/components/ExportListItem'
+import ExportListItem from '../ExportListItem'
 
 QUnit.module('ExportListItem')
 
