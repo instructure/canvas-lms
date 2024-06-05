@@ -17,11 +17,11 @@
  */
 
 import fakeENV from 'helpers/fakeENV'
-import LearningMastery from 'ui/features/learning_mastery/react/LearningMastery'
+import LearningMastery from '../LearningMastery'
 import FakeServer, {
   formBodyFromRequest,
 } from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
-import ContentFilterDriver from '../gradebook/default_gradebook/components/content-filters/ContentFilterDriver'
+import ContentFilterDriver from '../../../../../spec/javascripts/jsx/gradebook/default_gradebook/components/content-filters/ContentFilterDriver'
 
 QUnit.module('Learning Mastery > LearningMastery', suiteHooks => {
   let $container
