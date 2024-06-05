@@ -18,13 +18,26 @@
 
 import React from 'react'
 import enzyme from 'enzyme'
-import Errors from 'ui/features/webzip_export/react/components/Errors'
+import ExportInProgress from '../ExportInProgress'
 
-QUnit.module('Web Zip Export Errors')
+QUnit.module('ExportInProgress')
 
-test('renders the Error component', () => {
-  const errors = [{response: 'Instance of demon found in code', code: 666}]
-  const tree = enzyme.shallow(<Errors errors={errors} />)
-  const node = tree.find('.webzipexport__errors')
+test('renders the ExportInProgress component', () => {
+  const webzip = {progressId: '117'}
+  const tree = enzyme.shallow(<ExportInProgress webzip={webzip} loadExports={() => {}} />)
+
+  const node = tree.find('.webzipexport__inprogress')
+
   ok(node.exists())
+})
+
+test('doesnt render when completed is true', () => {
+  const webzip = {progressId: '117'}
+  const tree = enzyme.shallow(<ExportInProgress webzip={webzip} loadExports={() => {}} />)
+
+  tree.setState({completed: true})
+
+  const node = tree.find('.webzipexport__inprogress')
+
+  equal(node.length, 0)
 })
