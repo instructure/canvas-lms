@@ -566,6 +566,21 @@ describe('DiscussionTopicForm', () => {
         checkbox.click()
         expect(checkbox.checked).toBe(false)
       })
+
+      it('unchecks the checkpoints checkbox when graded is unchecked', () => {
+        const {getByTestId, getByLabelText} = setup()
+
+        getByLabelText('Graded').click()
+        getByTestId('checkpoints-checkbox').click()
+        expect(getByTestId('checkpoints-checkbox').checked).toBe(true)
+
+        // 1st graded click will uncheck checkpoints. but it also hides from document.
+        // 2nd graded click will render checkpoints, notice its unchecked.
+        getByLabelText('Graded').click()
+        getByLabelText('Graded').click()
+        expect(getByTestId('checkpoints-checkbox').checked).toBe(false)
+      })
+
       it('renders the checkpoints checkbox as selected when there are existing checkpoints', () => {
         const {getByTestId} = setup({
           currentDiscussionTopic: DiscussionTopic.mock({

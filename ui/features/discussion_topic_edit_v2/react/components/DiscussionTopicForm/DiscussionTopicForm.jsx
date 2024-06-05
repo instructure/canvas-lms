@@ -292,6 +292,7 @@ function DiscussionTopicForm({
     setImportantDates,
     pointsPossible,
     isGraded,
+    isCheckpoints,
   }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
@@ -865,7 +866,12 @@ function DiscussionTopicForm({
               label={I18n.t('Graded')}
               value="graded"
               checked={isGraded}
-              onChange={() => setIsGraded(!isGraded)}
+              onChange={() => {
+                  if(isGraded){
+                    setIsCheckpoints(false)
+                  }
+                  setIsGraded(!isGraded)
+              }}
               // disabled={sectionIdsToPostTo === [allSectionsOption._id]}
             />
           )}

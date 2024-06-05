@@ -579,6 +579,7 @@ describe('ItemAssignToTray', () => {
         DATE_DETAILS_OBJ
       const expectedPayload = JSON.stringify({
         ...payloadValues,
+        reply_to_topic_due_at: null,
         only_visible_to_overrides,
         assignment_overrides: [
           {

@@ -43,6 +43,7 @@ export const datesFromOverride = override => ({
   due_at: override ? override.due_at : null,
   lock_at: override ? override.lock_at : null,
   unlock_at: override ? override.unlock_at : null,
+  reply_to_topic_due_at: override ? override.reply_to_topic_due_at : null,
 })
 
 export const getAllOverridesFromCards = givenCards => {
