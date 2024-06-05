@@ -20,8 +20,8 @@ import {isNull} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import ApiProgressBar from '@canvas/progress/react/components/ApiProgressBar'
-import ProgressStore from '@canvas/progress/stores/ProgressStore'
+import ApiProgressBar from '../ApiProgressBar'
+import ProgressStore from '../../../stores/ProgressStore'
 
 QUnit.module('ApiProgressBarSpec', {
   setup() {

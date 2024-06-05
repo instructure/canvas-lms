@@ -21,24 +21,28 @@ import 'jquery-migrate'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import ModalContent from '@canvas/modal/react/content'
+import ModalButtons from '../buttons'
 
-QUnit.module('ModalContent')
+QUnit.module('ModalButtons')
 
-test('applies className to parent node', () => {
-  const ModalContentElement = <ModalContent className="cat" />
-  const component = TestUtils.renderIntoDocument(ModalContentElement)
-  ok($(ReactDOM.findDOMNode(component)).hasClass('cat'), 'applies class name')
+test('applies className', () => {
+  const ModalButtonsElement = <ModalButtons className="cat" footerClassName="dog" />
+  const component = TestUtils.renderIntoDocument(ModalButtonsElement)
+  ok($(ReactDOM.findDOMNode(component)).hasClass('cat'), 'has parent class')
+  ok($(ReactDOM.findDOMNode(component)).find('.dog').length === 1, 'Finds footer class name')
   ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
-test('renders children components', () => {
-  const mC = (
-    <ModalContent>
-      <div className="my_fun_div" />
-    </ModalContent>
+test('renders children', () => {
+  const mB = (
+    <ModalButtons>
+      <div className="cool_div" />
+    </ModalButtons>
   )
-  const component = TestUtils.renderIntoDocument(mC)
-  ok($(ReactDOM.findDOMNode(component)).find('.my_fun_div'), 'inserts child component elements')
+  const component = TestUtils.renderIntoDocument(mB)
+  ok(
+    $(ReactDOM.findDOMNode(component)).find('.cool_div').length === 1,
+    'renders the child component'
+  )
   ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
