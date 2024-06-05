@@ -187,9 +187,25 @@ describe AuthenticationProvider do
         expect(aac).not_to be_valid
       end
 
-      it "rejects unknown keys for attriutes" do
+      it "rejects unknown keys for attributes" do
         aac = Account.default.authentication_providers.new(auth_type: "saml",
-                                                           federated_attributes: { "integration_id" => { "garbage" => "internal_id" } })
+                                                           federated_attributes: { "integration_id" => { "attribute" => "internal_id", "garbage" => "internal_id" } })
+        expect(aac).not_to be_valid
+      end
+
+      it "requires attribute key for hash attributes" do
+        aac = Account.default.authentication_providers.new(auth_type: "saml",
+                                                           federated_attributes: { "integration_id" => { "provisioning_only" => true } })
+        expect(aac).not_to be_valid
+      end
+
+      it "only accepts autoconfirm for email" do
+        aac = Account.default.authentication_providers.new(auth_type: "saml",
+                                                           federated_attributes: { "email" => { "attribute" => "email", "autoconfirm" => true } })
+        expect(aac).to be_valid
+
+        aac = Account.default.authentication_providers.new(auth_type: "saml",
+                                                           federated_attributes: { "integration_id" => { "attribute" => "internal_id", "autoconfirm" => true } })
         expect(aac).not_to be_valid
       end
     end
@@ -298,6 +314,38 @@ describe AuthenticationProvider do
                                      purpose: :provisioning)
       expect(@pseudonym.sis_user_id).to eq "test"
       expect(@pseudonym.integration_id).to eq "testfrd"
+    end
+
+    it "can autoconfirm emails" do
+      aac.federated_attributes["email"]["autoconfirm"] = true
+      aac.apply_federated_attributes(@pseudonym,
+                                     {
+                                       "email" => "cody@school.edu",
+                                       "internal_id" => "abc123",
+                                       "locale" => "es",
+                                       "name" => "Cody Cutrer",
+                                       "sis_id" => "28",
+                                       "sortable_name" => "Cutrer, Cody",
+                                       "timezone" => "America/New_York"
+                                     })
+      @user.reload
+      expect(@user.communication_channels.email.in_state("active").pluck(:path)).to include("cody@school.edu")
+    end
+
+    it "does not autoconfirm emails for some social providers" do
+      aac = AuthenticationProvider::Microsoft.new(federated_attributes: { "email" => { "attribute" => "email", "autoconfirm" => true } })
+      aac.apply_federated_attributes(@pseudonym,
+                                     {
+                                       "email" => "cody@school.edu",
+                                       "internal_id" => "abc123",
+                                       "locale" => "es",
+                                       "name" => "Cody Cutrer",
+                                       "sis_id" => "28",
+                                       "sortable_name" => "Cutrer, Cody",
+                                       "timezone" => "America/New_York"
+                                     })
+      @user.reload
+      expect(@user.communication_channels.email.in_state("unconfirmed").pluck(:path)).to include("cody@school.edu")
     end
 
     context "admin_roles" do
