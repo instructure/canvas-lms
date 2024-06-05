@@ -229,6 +229,8 @@ module Interfaces::SubmissionInterface
   field :submitted_at, Types::DateTimeType, null: true
   field :graded_at, Types::DateTimeType, null: true
   field :posted_at, Types::DateTimeType, null: true
+  field :cached_due_date, Types::DateTimeType, null: true
+  field :seconds_late, Float, null: true
   field :posted, Boolean, method: :posted?, null: false
   field :state, Types::SubmissionStateType, method: :workflow_state, null: false
 
