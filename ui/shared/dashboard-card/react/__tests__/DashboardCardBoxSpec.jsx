@@ -24,9 +24,9 @@ import sinon from 'sinon'
 import {waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 
-import DashboardCard from '@canvas/dashboard-card/react/DashboardCard'
-import getDroppableDashboardCardBox from '@canvas/dashboard-card/react/getDroppableDashboardCardBox'
-import CourseActivitySummaryStore from '@canvas/dashboard-card/react/CourseActivitySummaryStore'
+import DashboardCard from '../DashboardCard'
+import getDroppableDashboardCardBox from '../getDroppableDashboardCardBox'
+import CourseActivitySummaryStore from '../CourseActivitySummaryStore'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('DashboardCardBox', suiteHooks => {
