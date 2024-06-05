@@ -59,9 +59,9 @@ describe('DifferentiatedModulesSection', () => {
     defaultSectionId: 0,
   }
 
-  const SECTIONS_URL = `/api/v1/courses/${COURSE_ID}/sections`
-  const STUDENTS_URL = `api/v1/courses/${COURSE_ID}/users?enrollment_type=student`
-  const DATE_DETAILS = `/api/v1/courses/${COURSE_ID}/assignments/${ASSIGNMENT_ID}/date_details`
+  const SECTIONS_URL = `/api/v1/courses/${COURSE_ID}/sections?per_page=100`
+  const STUDENTS_URL = `api/v1/courses/${COURSE_ID}/users?per_page=100&enrollment_type=student`
+  const DATE_DETAILS = `/api/v1/courses/${COURSE_ID}/assignments/${ASSIGNMENT_ID}/date_details?per_page=100`
 
   beforeAll(() => {
     window.ENV ||= {}

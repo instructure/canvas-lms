@@ -288,6 +288,40 @@ shared_examples_for "item assign to tray during assignment creation/update" do
   end
 end
 
+describe "override assignees" do
+  include_context "in-process server selenium tests"
+  include ItemsAssignToTray
+  include ContextModulesCommon
+
+  before :once do
+    differentiated_modules_on
+    course_with_teacher(active_all: true)
+    @assignment = Assignment.create!(context: @course, title: "Test Assignment", only_visible_to_overrides: true)
+    @assignment.assignment_overrides.create!(set_type: "ADHOC")
+    @students = create_users_in_course @course, 20
+    @students.each do |student|
+      user = User.find(student)
+      @assignment.assignment_overrides.first.assignment_override_students.create!(user:)
+    end
+  end
+
+  before do
+    user_session(@teacher)
+    @page_size = 5
+    stub_const("Api::MAX_PER_PAGE", @page_size)
+  end
+
+  it "renders all the override assignees" do
+    AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment.id)
+    AssignmentCreateEditPage.click_manage_assign_to_button
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+    # 20 students
+    expect(selected_assignee_options.count).to eq @students.length
+  end
+end
+
 describe "group assignments", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include ItemsAssignToTray

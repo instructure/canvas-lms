@@ -131,6 +131,7 @@ const ItemAssignToTrayContent = ({
     setFetchInFlight(true)
     doFetchApi({
       path: itemTypeToApiURL(courseId, itemType, itemContentId),
+      params: {per_page: 100},
     })
       .then((response: FetchDueDatesResponse) => {
         const dateDetailsApiResponse = response.json
@@ -202,6 +203,7 @@ const ItemAssignToTrayContent = ({
     setFetchInFlight(true)
     doFetchApi({
       path: itemTypeToApiURL(courseId, itemType, itemContentId),
+      params: {per_page: 100},
     })
       .then((response: FetchDueDatesResponse) => {
         // TODO: exhaust pagination

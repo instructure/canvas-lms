@@ -189,7 +189,9 @@ export default function ItemAssignToTray({
   const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
   const [moduleAssignees, setModuleAssignees] = useState<string[]>([])
   const [groupCategoryId, setGroupCategoryId] = useState<string | null>(defaultGroupCategoryId)
-  const [overridesFetched, setOverridesFetched] = useState(defaultCards !== undefined)
+  const [overridesFetched, setOverridesFetched] = useState(
+    defaultCards !== undefined && defaultCards.length > 0
+  )
   const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
     undefined
   )
@@ -221,6 +223,7 @@ export default function ItemAssignToTray({
     everyoneOption,
     checkMasteryPaths: true,
     defaultValues: [],
+    requiredOptions: disabledOptionIds,
     onError: handleDismiss,
   })
 
