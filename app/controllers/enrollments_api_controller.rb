@@ -368,11 +368,11 @@ class EnrollmentsApiController < ApplicationController
   #   roles created by the {api:RoleOverridesController#add_role Add Role API}
   #   as well as the base enrollment types accepted by the `type` argument above.
   #
-  # @argument state[] [String, "active"|"invited"|"creation_pending"|"deleted"|"rejected"|"completed"|"inactive"|"current_and_invited"|"current_and_future"|"current_and_concluded"]
+  # @argument state[] [String, "active"|"invited"|"creation_pending"|"deleted"|"rejected"|"completed"|"inactive"|"current_and_invited"|"current_and_future"|"current_future_and_restricted"|"current_and_concluded"]
   #   Filter by enrollment state. If omitted, 'active' and 'invited' enrollments
   #   are returned. The following synthetic states are supported only when
   #   querying a user's enrollments (either via user_id argument or via user
-  #   enrollments endpoint): +current_and_invited+, +current_and_future+, +current_and_concluded+
+  #   enrollments endpoint): +current_and_invited+, +current_and_future+, +current_future_and_restricted+, +current_and_concluded+
   #
   # @argument include[] [String, "avatar_url"|"group_ids"|"locked"|"observed_users"|"can_be_removed"|"uuid"|"current_points"]
   #   Array of additional information to include on the enrollment or user records.
@@ -962,9 +962,9 @@ class EnrollmentsApiController < ApplicationController
           account = api_find(Account, params[:account_id]) if params[:account_id].present?
           enrollment_scope =
             if account
-              Enrollment.active_or_pending_by_date.joins(:course).where(courses: { account_id: account.id })
+              Enrollment.all_active_or_pending.joins(:course).where(courses: { account_id: account.id })
             else
-              Enrollment.active_or_pending_by_date
+              Enrollment.all_active_or_pending
             end
           is_provider = enrollment_scope.temporary_enrollment_recipients_for_provider(user).exists?
           is_recipient = enrollment_scope.temporary_enrollments_for_recipient(user).exists?
@@ -1045,6 +1045,7 @@ class EnrollmentsApiController < ApplicationController
                           completed
                           current_and_invited
                           current_and_future
+                          current_future_and_restricted
                           current_and_concluded]
 
         params[:state].each do |state|
@@ -1179,8 +1180,13 @@ class EnrollmentsApiController < ApplicationController
   def enrollment_states_for_state_param
     states = Array(params[:state]).uniq
     states.push("active", "invited") if states.delete "current_and_invited"
-    states.push("active", "invited", "creation_pending", "pending_active", "pending_invited") if states.delete "current_and_future"
+    if states.delete "current_and_future"
+      states.push("active", "invited", "creation_pending", "pending_active", "pending_invited")
+    end
     states.push("active", "completed") if states.delete "current_and_concluded"
+    if states.delete "current_future_and_restricted"
+      states.push("active", "invited", "creation_pending", "pending_active", "pending_invited", "inactive")
+    end
     states.uniq
   end
 
