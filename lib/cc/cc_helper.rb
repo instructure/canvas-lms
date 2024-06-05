@@ -357,6 +357,8 @@ module CC
                              obj.save!
                              obj.attachment
                            end
+
+          new_attachment.update! file_state: "available"
           new_attachment.export_id = @key_generator.create_key(new_attachment)
           @referenced_files[new_attachment.id] = new_attachment
         end

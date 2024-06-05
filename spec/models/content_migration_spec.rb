@@ -2126,4 +2126,54 @@ describe ContentMigration do
       expect(@zip_file.find_entry("web_resources/Uploaded Media/second.webm")).not_to be_nil
     end
   end
+
+  context "old media exports with deleted assignments" do
+    let(:success_response) { Net::HTTPSuccess.new(Net::HTTPOK, "200", "OK") }
+
+    def og_asset(id)
+      {
+        isOriginal: 1,
+        containerFormat: "mp4",
+        fileExt: "mp4",
+        id:,
+        status: "2",
+        size: 15,
+      }
+    end
+
+    before do
+      @kaltura_media_handler = instance_double("KalturaMediaFileHandler")
+      expect(@kaltura_media_handler).to receive(:add_media_files) do |attachments, _wait_for_completion|
+        MediaObject.build_media_objects({
+                                          entries: [
+                                            {
+                                              name: "m-5JxJzd136Gk3nSPn9G5e5b46s4xRXz2m.mp4",
+                                              originalId: attachments.last.id,
+                                              entryId: "m-2t1CXfzgyJh3qEpM9CqMAPNFnwQTXNyM"
+                                            }
+                                          ]
+                                        },
+                                        @course.root_account_id)
+      end
+      expect(KalturaMediaFileHandler).to receive(:new).and_return(@kaltura_media_handler)
+      expect(CanvasKaltura::ClientV3).to receive(:config).at_least(3).times.and_return({})
+    end
+
+    it "retains the destination media object attachment" do
+      archive_file_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/rcx-1949.imscc")
+      unzipped_file_path = create_temp_dir!
+      converter = CC::Importer::Canvas::Converter.new(export_archive_path: archive_file_path, course_name: "oi", base_download_dir: unzipped_file_path)
+      converter.export
+      @course_data = converter.course.with_indifferent_access
+
+      @course = course_factory
+      @migration = ContentMigration.create(context: @course)
+      @migration.migration_type = "canvas_cartridge_importer"
+      @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+      run_jobs
+      expect(@course.attachments.last.media_entry_id).not_to eq("maybe")
+      expect(@course.attachments.last.file_state).not_to eq("deleted")
+    end
+  end
 end
