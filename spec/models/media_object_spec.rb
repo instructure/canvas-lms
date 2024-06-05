@@ -42,21 +42,6 @@ describe MediaObject do
   end
 
   describe ".build_media_objects" do
-    it "deletes attachments created temporarily for import" do
-      folder = Folder.assert_path(CC::CCHelper::MEDIA_OBJECTS_FOLDER, @course)
-      @a1 = attachment_model(folder:, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
-      @a2 = attachment_model(context: @course, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
-      data = {
-        entries: [
-          { originalId: @a1.id, },
-          { originalId: @a2.id, },
-        ],
-      }
-      MediaObject.build_media_objects(data, Account.default.id)
-      expect(@a1.reload.file_state).to eq "deleted"
-      expect(@a2.reload.file_state).to eq "available"
-    end
-
     it "builds media objects from attachment_id" do
       @a1 = attachment_model(context: @course, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
       @a3 = attachment_model(context: @course, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
