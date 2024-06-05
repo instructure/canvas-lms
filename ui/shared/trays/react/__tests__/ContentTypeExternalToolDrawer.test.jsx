@@ -30,7 +30,6 @@ describe('ContentTypeExternalToolDrawer', () => {
   }
   const onDismiss = jest.fn()
   const onExternalContentReady = jest.fn()
-  const extraQueryParams = {key1: 'value1', key2: 'value2'}
   const pageContent = (() => {
     const el = document.createElement('div')
     el.setAttribute('id', 'page-content-id')
@@ -108,5 +107,22 @@ describe('ContentTypeExternalToolDrawer', () => {
     const {getByTestId} = renderTray()
     const src = getByTestId('ltiIframe').src
     expect(src).toContain(`${tool.base_url}?`)
+    expect(getByTestId('ltiIframe')).toBeInTheDocument()
+  })
+
+  it('does not render ToolLaunchIframe when there is no tool', () => {
+    const {queryByTestId} = render(
+      <ContentTypeExternalToolDrawer
+        tool={null}
+        pageContent={pageContent}
+        pageContentTitle={pageContentTitle}
+        pageContentMinWidth="40rem"
+        trayPlacement="end"
+        onDismiss={onDismiss}
+        onExternalContentReady={onExternalContentReady}
+        open={true}
+      />
+    )
+    expect(queryByTestId('ltiIframe')).toBeNull()
   })
 })
