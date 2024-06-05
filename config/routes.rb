@@ -1112,6 +1112,7 @@ CanvasRails::Application.routes.draw do
   scope(controller: :translation) do
     post "courses/:course_id/translate", action: :translate
     post "courses/:course_id/translate/paragraph", action: :translate_paragraph
+    post "translate/message", action: :translate_message
   end
 
   ### API routes ###

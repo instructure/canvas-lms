@@ -30,7 +30,7 @@
   skip_sub_entries ||= false
   read_state = entry ? entry.read_state(@current_user) : "read"
   link_to_headless ||= false
-  headless_param = {:headless => 1, :hide_student_names => hide_student_names, :student_id => user_id} if link_to_headless
+  headless_param = {:headless => 1, :embed => true, :hide_student_names => hide_student_names, :student_id => user_id} if link_to_headless
   hide_student_names = hide_student_names
  %>
 <% cache([

@@ -131,7 +131,7 @@ hu:
       error: "Hiba történt! Kérjük, frissítse az oldalt, és próbálja újra!"
       unexpectedDeleteError: "Hiba történt! A törlés most nem lehetséges."
       updateSuccess: "A frissítés sikeres"
-      userDeleteError: "Az eredménycsoport egy vagy több olyan eredményt tartalmaz, amelyek jelenleg a tartalomhoz igazodnak."
+      userDeleteError: "Az eredménycsoport egy vagy több olyan eredményt tartalmaz, amelyek jelenleg a tartalomhoz vannak hangolva."
     length_error: "Maximum 255 karakter hosszú lehet"
   OutcomeView: 
     length_error: "Maximum 255 karakter hosszú lehet"
@@ -2168,7 +2168,7 @@ hu:
   alerts_6b871b71: Figyelmeztetések
   alerts_add_edit_delete_d71091c6: "Értesítések - hozzáadás / szerkesztés / törlés"
   alerts_must_be_configured_for_the_institution_aler_43bbacb1: "A riasztásokat az intézményhez kell konfigurálni. A riasztások egy ritkán használt funkció, amelyet arra terveztek, hogy riasztást küldjön a diákoknak, tanároknak vagy rendszergazdáknak adott eseményindítók esetén (például, hogy 7 napig nincs diák-tanár interakció). Ezeket minden nap ellenőrzik, és értesítést küldenek a tanulónak és/vagy a tanárnak, amíg a kiváltó probléma meg nem oldódik."
-  align_outcomes_to_this_page_7d055196: "Igazítsa az eredményeket ehhez az oldalhoz"
+  align_outcomes_to_this_page_7d055196: "Hangolja az eredményeket ehhez az oldalhoz"
   all_4321c3a1: Összes
   all_account_types_e83c1516: "Összes fióktípus"
   all_accounts_3bafc860: "Összes fiók"
@@ -2249,7 +2249,7 @@ hu:
   allow_importing_of_third_party_packages_into_new_q_f6b8b1c7: "Lehetővé teszi harmadik féltől származó csomagok importálását az új kvízekbe"
   allow_in_mastery_paths_5332c786: "Engedélyezett a jártassági útvonalon"
   allow_include_parameters_bf3d3230: "Paraméterek belefoglalása"
-  allow_intra_group_peer_reviews_53f1e455: "Csoporton belüli szakértői értékelés engedélyezése"
+  allow_intra_group_peer_reviews_53f1e455: "Csoporton belüli társértékelés engedélyezése"
   allow_liking_6dad6e52: "Lájkolás engedélyezése"
   allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       Élő eseményre vonatkozó előfizetés kézbesítésének beállítása
@@ -2285,7 +2285,7 @@ hu:
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
       Lehetővé teszi az adminisztrátorok számára egy napló megtekintését, amiben minden,
       a közelmúltban futtatot GraphQL-mutációról található információ
-  allows_aligning_outcomes_to_non_scoring_content_537ce399: "Lehetővé teszi az eredmények igazítását a nem pontozó tartalomhoz"
+  allows_aligning_outcomes_to_non_scoring_content_537ce399: "Lehetővé teszi az eredmények összehangolását a nem pontozó tartalomhoz"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Lehetővé teszi a Súgóhivatkozások Kiemelt vagy Új megjelölését, és jól láthatóan megjeleníti a kiemelt súgóhivatkozást a Súgó menüben."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Lehetővé teszi az oktatók számára, hogy tömegesen alkalmazzanak pontszámokat az osztályozatlan beadványokra az Osztálynapló feladatcsoport és Összes oszlopmenüiből."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Lehetővé teszi a tanulási eredmények kiválasztását a kurzus tartalmának migrálásakor"
@@ -2679,7 +2679,7 @@ hu:
   an_error_occurred_while_removing_these_outcomes_pl_21f22da0: 
     one: "Hiba történt a tanulási eredmény mozgatása közben. Kérem próbálja újra!"
     other: "Hiba történt a tanulási eredmények mozgatása közben. Kérem próbálja újra!"
-  an_error_occurred_while_removing_this_group_groupt_2c343304: "Hiba történt a csoport eltávolítása közben: \"%{groupTitle}\" egy vagy több olyan eredményt tartalmaz, amelyek jelenleg a tartalomhoz vannak igazítva."
+  an_error_occurred_while_removing_this_group_groupt_2c343304: "Hiba történt a csoport eltávolítása közben: \"%{groupTitle}\" egy vagy több olyan eredményt tartalmaz, amelyek jelenleg a tartalomhoz vannak hangolva."
   an_error_occurred_while_removing_this_group_please_bd9407ff: "Hiba történt a csoport eltávolítása közben. Kérem próbálja újra!"
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: "Hiba történt a QR-kód lekérése közben"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "Hiba történt a fiók jártassági értékelésének mentése közben"
@@ -4106,7 +4106,7 @@ hu:
     recording_setting_enabled_description: "A konferencia felvételének engedélyezése"
   blackboard: 
     no_manifest: "Ennek a Blackboard .zip-nek nem található imsmanifest.xml fájl a gyökérkönyvtárában."
-  blackout_dates_4a140a72: "Blackout dátumok"
+  blackout_dates_4a140a72: "Tilalmi dátumok"
   blank_38df4238: üres
   blocked_by_running_migration_d8a57cb7: "Blokkolva a migráció futtatása miatt"
   blocked_domain_name_b5b93150: "Blokkolt domain név"
@@ -4690,7 +4690,9 @@ hu:
   can_show_external_tools_bb4988c5: "Képes külső eszközöket mutatni."
   can_show_subscription_to_data_service_data_688ce3: "Megjelenítheti az előfizetést az adat szolgáltatás adatokhoz."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Addig nem lehet pontszámot számolni, amíg egy feladatnál vannak lehetséges pontok"
-  can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "Az értékeltábla társításokon alapuló igazítások nem törölhetők. A társítások eltávolításához el kell távolítania a sort az eszköz értékelőtáblájából\""
+  can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: |-
+      
+      Az értékeltábla társításokon alapuló igazítások nem törölhetők. A társítások eltávolításához el kell távolítania a sort az eszköz értékelőtáblájából"
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Nem törölheti az illesztéseket az értékelőtábla hozzárendelés alapján. A hozzárendelések eltávolításához az elem értékelési táblájából kell eltávolítani a megfelelő sort"
   can_t_enable_anonymous_grading_and_group_assignmen_9938416e: "A névtelen értékelés és a csoportos feladat nem összeférhető beállítás."
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Nem végezhető el az összehasonlítás több mint egy ugyanolyan típusú fájllal"
@@ -6349,7 +6351,7 @@ hu:
   count_alignments_40fbc23c: 
     one: "%{count} igazítás"
     other: "%{count} igazítás"
-    zero: "Nincs igazítás"
+    zero: "Nincsenek összehangolások"
   count_announcements_found_b7b055b3: "%{count} hirdetmény található."
   count_apps_found_f4d86860: "%{count}appot találtunk"
   count_assignments_bce378d7: 
@@ -6793,7 +6795,7 @@ hu:
   course_outcomes_7dc1cbc7: "Kurzus tanulási eredményei"
   course_pace_4dfc7ef3: "Kurzus beosztás"
   course_paces_4396b508: "Kurzus beosztások"
-  course_pacing_40c14b61: "Kurzus ütemezése"
+  course_pacing_40c14b61: "Kurzus ütemezés"
   course_pacing_adds_support_for_rolling_enrollments_3331cbaa: "A Kurzus beosztás támogatást nyújt a Canvas beiratkozásokhoz; lehetővé teszi a határidők elosztását a különböző beirakozási dátumokkal rendelkező hallgatók számára az oktató által meghatározott tempó alapján. Tudjon meg többet, és adjon visszajelzést, ha csatlakozik a Kurzus beosztás felhasználói csoporthoz."
   course_pacing_is_in_active_development_348e33cf: "A Kurzus beosztás aktív fejlesztés alatt áll."
   course_pages_449f1dd4: Kurzusoldalak
@@ -7156,7 +7158,7 @@ hu:
         course_grading_standard_enabled: "Kurzus osztályzási rendszer engedélyezése"
         course_name: Név
         course_offline_export: "Offline kurzus"
-        course_paces: "Kurzus ütemezése"
+        course_paces: "Kurzus ütemezés"
         course_section_name: "Új szekció hozzáadása"
         course_status_published: "A kurzus publikálása megtörtént"
         course_status_unpublished: "A kurzus még nincs publikálva"
@@ -7830,7 +7832,7 @@ hu:
   delete_a143a2ab: törlés
   delete_a6efa79d: Törlés
   delete_account_name_96aee330: "%{account_name} törlése"
-  delete_alignment_f33c97d5: "Illesztés törlése"
+  delete_alignment_f33c97d5: "Összehangolás törlése"
   delete_announcement_title_756a9d1f: "Hirdetmény törlése: %{title}"
   delete_assignment_5d3f3f15: "feladat törlése"
   delete_assignment_group_7c3b01c4: "Feladatcsoport törlése"
@@ -8849,7 +8851,7 @@ hu:
   enable_gravatar_8a865b41: "Gravatar engedélyezése"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "i18n funkciók engedélyezése az eredmények exportálásánál"
   enable_individual_learning_paths_for_students_base_5236d3bb: "Egyéni tanulási utak engedélyezése a hallgatók számára az értékelések alapján"
-  enable_migrating_item_banks_to_new_quizzes_during__af6ca020: "Engedélyezze az elembankok áttelepítését az új kvízekre a kurzus importálása/másolása során"
+  enable_migrating_item_banks_to_new_quizzes_during__af6ca020: "Engedélyezze az itembankok áttelepítését az új kvízekre a kurzus importálása/másolása során"
   enable_moderated_grading_bacd20d8: "Moderált osztályzás engedélyezése"
   enable_new_sis_integration_settings_ab6780a4: "Új SIS-integrációs beállítások engedélyezése"
   enable_notifications_for_contextname_b5b4440e: "Értesítések engedélyezése %{contextName} számára"
@@ -11072,7 +11074,7 @@ hu:
   how_do_i_add_users_to_a_course_4a88efaf: "Hogyan adjak résztvevőket a kurzushoz?"
   how_do_i_add_zoom_to_a_course_31300d74: "Hogyan adjam hozzá a Zoom szolgáltatást a kurzushoz?"
   how_do_i_adjust_events_and_due_dates_in_a_course_i_4647c50b: "Hogyan állíthatom be az eseményeket és a határidőket a kurzusimportálás során?"
-  how_do_i_align_an_outcome_with_a_rubric_in_a_cours_d9c8f009: "Hogyan igazíthatom az eredményt egy kurzus értékelőtáblájához?"
+  how_do_i_align_an_outcome_with_a_rubric_in_a_cours_d9c8f009: "Hogyan hangolhatom össze a tanulási eredményt egy kurzus értékelőtáblájához?"
   how_do_i_bulk_upload_files_to_a_course_b145d8cc: "Hogyan töltsek fel tömegesen fájlokat a kurzusba?"
   how_do_i_change_a_course_name_and_course_code_23b41292: "Hogyan változtassam meg a kurzus nevét és a kurzus kódját?"
   how_do_i_change_the_course_home_page_326cee50: "Hogyan változtassam meg a kurzus kezdőlapját?"
@@ -11235,7 +11237,7 @@ hu:
   if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: "Ha engedélyezve van, a webhelyadminisztrátori fejlesztői kulcs felhasználói felülete csak a webhelyadminisztrátori fejlesztői kulcsokat jeleníti meg. Vegye figyelembe, hogy ez csak azokat a Canvas-példányokat érinti, ahol a root fiókok ugyanazon a szilánkon vannak, mint a webhelyadminisztrátori fiók. A viselkedés más esetekben már így viselkedett."
   if_lti_add_is_disabled_users_can_still_install_app_78aa7908: "Ha az LTI - add le van tiltva, a felhasználók továbbra is telepíthetnek jóváhagyott alkalmazásokat a Canvas App Centeren keresztül (ha engedélyezve van az intézményben). Ha azonban az LTI - törlés nincs engedélyezve, nem tudják törölni a manuálisan hozzáadott külső alkalmazásokat."
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Ha a jártassági skálák engedélyezve vannak, a jelentés csonkolva lesz, hogy ne tartalmazza a számítási módszert, számítási int, mastering pontokat vagy értékeléseket."
-  if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: "Ha engedélyezve vannak az új kvízek, ez lehetővé teszi az adott kurzusokhoz tartozó tételbankok és a gyökérfiók létrehozását és kezelését az új kvízekben."
+  if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: "Ha engedélyezve vannak az új kvízek, ez lehetővé teszi az adott kurzusokhoz tartozóitembankok és a gyökérfiók létrehozását és kezelését az új kvízekben."
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(Ha senki nincs kiválasztva, küldés mindenkinek a fiókon belül)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Ha senki nincs kiválasztva, küldés mindenkinek az alfiókon belül)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Ha egyik sincs kijelölve, akkor mindenkinek megjelenik a teljes alfiókban)"
@@ -14358,7 +14360,7 @@ hu:
   n_a_d5d5a207: n.a.
   n_a_d6f6c42f: N/A
   n_contextscount_more_2f708db4: "+ %{n_contextsCount} számmal több"
-  n_count_alignments_a45bebe7: "*%{n_count}* illesztés"
+  n_count_alignments_a45bebe7: "*%{n_count}* összehangolás"
   n_groupweight_percentage_of_total_2ae4d996: "%{n_groupWeight_percentage} az összesből"
   n_number_of_times_c2e78b72: "x alkalommal"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} pont"
@@ -15174,7 +15176,7 @@ hu:
       scoring: "%{points} pont az elérhető %{possible_points} pontból"
     outcomes_for: "%{user_name} tanulási eredményei"
     show: 
-      no_aligned_items: "Nincsenek testreszabott elemek"
+      no_aligned_items: "Nincsenek összehangolt elemek"
       no_artifacts: "Nincsenek alkotások"
     state_standards: "Állami szabványok"
     state_standards_description: "Bal oldalon mappákat talál, amelyben az állami szabványok lettek feltöltve. Ezeket a saját kurzusában is felhasználhatja az értékelések során."
@@ -16322,7 +16324,7 @@ hu:
   question_9121487: Kérdés
   question_answered: Megválaszolt
   question_bank: 
-    align_outcomes: "Tanulási eredmények testreszabása"
+    align_outcomes: "Tanulási eredmények összehangolása"
     already_bookmarked: "Már könyvjelzőbe lett helyezve"
     bookmark_failed: "A könyvjelzőzés sikertelen"
     bookmarking: "Könyvjelző-beállítás folyamatban..."
@@ -16394,14 +16396,14 @@ hu:
         move_questions: "Több kérdés mozgatása"
       edit_warning: "Vegye figyelembe, hogy a kérdéssablonok változtatása nem fogja automatikusan frissíteni a kérdést tartalmazó kvízeket."
       headings: 
-        aligned_outcomes: "Testreszabott tanulási eredmények"
+        aligned_outcomes: "Összehangolt tanulási eredmények"
       labels: 
         keep_copy: "Másolat megtartása ebben a kérdésbankban is"
         new_bank_name: "Új banknév"
         new_question_bank: "Új kérdésbank"
         title: "Kérdésbank neve"
       links: 
-        align_outcome: "Tanulási eredmény testreszabása"
+        align_outcome: "Tanulási eredmény összehangolása"
         more_questions: "további kérdések"
       loading_banks: "Bankok betöltése..."
       mastery_threshold: "jártassági szint: %{threshold_percentage}"
@@ -17880,7 +17882,7 @@ hu:
       create_collaborations: "Hallgatók közti együttműködés készítése"
       create_conferences: "Webkonferencia létrehozása"
       manage_: "Kezelés ( hozzáadás / szerkesztés / törlés )"
-      manage_account_banks: "Fiókszintű elembankok kezelése"
+      manage_account_banks: "Fiókszintű itembankok kezelése"
       manage_account_memberships: "További adminisztrátorok hozzáadása/eltávolítása a fiókhoz/fiókból"
       manage_account_settings: "Fiókszintű beállítások kezelése"
       manage_admin_users: "A kurzushoz további oktatók, tervezők, segítők hozzáadása/eltávolítása"
@@ -19231,7 +19233,7 @@ hu:
     headers: 
       import_errors: "Hibák, amelyek megakadályozzák az importálást"
       import_warnings: Figyelmeztetések
-      imported_items: "Importált elemek"
+      imported_items: "Importált itemek"
     import_counts: 
       accounts: "Fiókok: %{account_count}"
       courses: "Kurzusok: %{course_count}"
@@ -20124,7 +20126,7 @@ hu:
     other: "%{count} eredmény van a listában."
   there_are_no_announcements_for_this_course_5ee649c3: "Nincsenek megjelenítendő hirdetmények ehhez a kurzushoz"
   there_are_no_discussions_to_show_in_this_section_e8f04ebd: "Ebben a szekcióban nincsenek megjeleníthető fórumok"
-  there_are_no_points_associated_with_this_item_449c712a: "Ehhez az elemhez nincsenek pontok rendelve."
+  there_are_no_points_associated_with_this_item_449c712a: "Ehhez az itemhez nincsenek pontok rendelve."
   there_are_no_reports_for_you_to_view_b716717a: "Nincsenek megtekinthető riportok."
   there_are_no_unsaved_changes_9276e87c: "Nincsenek mentetlen módosításai"
   there_is_nothing_planned_for_today_e09bfc8c: "Mára nincs tervben semmi."
@@ -20505,7 +20507,7 @@ hu:
   title_is_too_long_must_be_under_length_characters_ab694ae4: "A cím túl hosszú, legfeljebb %{length} karakterből állhat"
   title_separator: ":"
   titles: 
-    aligned_items: "Testreszabott elemek"
+    aligned_items: "Összehangolt itemek"
     announcement: Hirdetmény
     announcements: Hirdetmények
     assignments: Feladatok
@@ -20622,7 +20624,7 @@ hu:
   type_c8106334: Típus
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' nem egy érvényes képtípus (jpg, png, vagy gif fájlokat használjon)"
   type_of_change_1cb24a0e: "Változtatás típusa"
-  type_of_item_8a37f69d: "Elem típusa"
+  type_of_item_8a37f69d: "Item típusa"
   type_to_search_de63ad38: "Gépeljen a keresés megkezdéséhez"
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Gépeljen a keresés megkezdéséhez, vagy használja a nyíl billentyűket az opciók közti navigáláshoz"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Jaj, ne! Lépjen kapcsolatba a katalógusfejlesztővel! Hibaüzenet: %{message}"
