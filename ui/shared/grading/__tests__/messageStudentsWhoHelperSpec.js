@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash'
-import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
+import MessageStudentsWhoHelper from '../messageStudentsWhoHelper'
 
 QUnit.module('messageStudentsWhoHelper#options', function (hooks) {
   hooks.beforeEach(function () {
