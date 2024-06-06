@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import NewCollaborationsDropDown from 'ui/features/lti_collaborations/react/NewCollaborationsDropDown'
+import NewCollaborationsDropDown from '../NewCollaborationsDropDown'
 
 QUnit.module('NewCollaborationsDropDown')
 

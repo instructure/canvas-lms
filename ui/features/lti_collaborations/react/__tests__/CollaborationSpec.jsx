@@ -19,7 +19,7 @@
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import ReactDOM from 'react-dom'
-import Collaboration from 'ui/features/lti_collaborations/react/Collaboration'
+import Collaboration from '../Collaboration'
 import * as tz from '@instructure/moment-utils'
 
 QUnit.module('Collaboration')
