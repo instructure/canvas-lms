@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import 'jqueryui/autocomplete'
-import '@canvas/jquery/jquery.simulate'
+import '../jquery.simulate'
 
 QUnit.module('Autocomplete Widget', {
   beforeEach() {

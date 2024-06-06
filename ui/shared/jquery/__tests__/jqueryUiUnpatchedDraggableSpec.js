@@ -19,7 +19,7 @@
 import $ from 'jquery'
 
 import 'jqueryui/draggable'
-import '@canvas/jquery/jquery.simulate'
+import '../jquery.simulate'
 
 QUnit.module('Draggable Widget', {
   beforeEach() {

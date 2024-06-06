@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 
-import '@canvas/jquery/jquery.simulate'
+import '../jquery.simulate'
 import 'jqueryui/droppable'
 
 QUnit.module('droppable widget', {
