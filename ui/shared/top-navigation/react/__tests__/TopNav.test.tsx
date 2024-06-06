@@ -37,6 +37,10 @@ describe('TopNav', () => {
     ]
   })
 
+  afterEach(() => {
+    window.ENV.breadcrumbs = []
+  })
+
   it('renders', () => {
     expect(() =>
       render(
@@ -56,6 +60,54 @@ describe('TopNav', () => {
 
     expect(getByText('crumb')).toBeInTheDocument()
   })
+
+  describe('getBreadCrumbSetter', () => {
+    const callback = jest.fn()
+
+    it('returns an object with getter and setter functions', () => {
+      render(
+        <QueryClientProvider client={queryClient}>
+          <TopNav getBreadCrumbSetter={callback} />
+        </QueryClientProvider>
+      )
+
+      expect(callback).toHaveBeenCalledWith({
+        getCrumbs: expect.any(Function),
+        setCrumbs: expect.any(Function),
+      })
+    })
+
+    it('provides a getter function that actually returns the crumbs', () => {
+      render(
+        <QueryClientProvider client={queryClient}>
+          <TopNav getBreadCrumbSetter={callback} />
+        </QueryClientProvider>
+      )
+
+      const {getCrumbs} = callback.mock.calls[0][0]
+      expect(getCrumbs()).toEqual(window.ENV.breadcrumbs)
+    })
+
+    // we need to figure out how to test this in the desktop layout mode
+    // right now for some reason the Jest environment is triggering InstUI's
+    // smallViewport layout, which doesn't show all the breadcrumbs. That
+    // makes some of the stuff we want to test here meaningless.
+    it.skip('provides a setter function that can set the last crumb', async () => {
+      const {findByText} = render(
+        <QueryClientProvider client={queryClient}>
+          <TopNav getBreadCrumbSetter={callback} />
+        </QueryClientProvider>
+      )
+
+      const {setCrumbs} = callback.mock.calls[0][0]
+      setCrumbs({name: 'new-crumb2', url: 'new-crumb2'})
+
+      expect(await findByText('new-crumb2')).toBeInTheDocument()
+    })
+
+    it.skip('provides a setter function that can set all crumbs', () => {})
+  })
+
   it('shows action buttons when sent through prop', () => {
     const {getByText} = render(
       <QueryClientProvider client={queryClient}>

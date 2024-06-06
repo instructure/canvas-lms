@@ -220,7 +220,7 @@ export interface EnvCommon {
     type?: string
     classes?: string
   }>
-  breadcrumbs: {name: string; url: string}[]
+  breadcrumbs: {name: string; url: string | null}[]
 
   /**
    * Used by ui/features/top_navigation_tools/react/TopNavigationTools.tsx
