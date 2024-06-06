@@ -279,6 +279,8 @@ class Course < ActiveRecord::Base
 
   prepend Profile::Association
 
+  before_create :set_restrict_quantitative_data_when_needed
+
   before_save :assign_uuid
   before_validation :assert_defaults
   before_save :update_enrollments_later
@@ -294,7 +296,6 @@ class Course < ActiveRecord::Base
 
   after_create :set_default_post_policy
   after_create :copy_from_course_template
-  after_create :set_restrict_quantitative_data_when_needed
 
   after_update :clear_cached_short_name, if: :saved_change_to_course_code?
   after_update :log_create_to_publish_time, if: :saved_change_to_workflow_state?
@@ -4485,7 +4486,6 @@ class Course < ActiveRecord::Base
        account.restrict_quantitative_data[:value] == true &&
        account.restrict_quantitative_data[:locked] == true
       self.restrict_quantitative_data = true
-      save!
     end
   end
 
