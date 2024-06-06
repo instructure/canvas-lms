@@ -20,8 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import Modal from '@canvas/react-modal'
-import ReregisterExternalToolButton from 'ui/features/external_apps/react/components/ReregisterExternalToolButton'
-import store from 'ui/features/external_apps/react/lib/ExternalAppsStore'
+import ReregisterExternalToolButton from '../ReregisterExternalToolButton'
+import store from '../../lib/ExternalAppsStore'
 
 const wrapper = document.getElementById('fixtures')
 Modal.setAppElement(wrapper)

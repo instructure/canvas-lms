@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import InheritedTable from 'ui/features/developer_keys_v2/react/InheritedTable'
+import InheritedTable from '../InheritedTable'
 import $ from 'jquery'
 import 'jquery-migrate'
 
