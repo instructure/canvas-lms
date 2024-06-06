@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Fixtures from '../Fixtures'
-import GradebookHistoryStore from 'ui/features/gradebook_history/react/store/GradebookHistoryStore'
-import * as HistoryActions from 'ui/features/gradebook_history/react/actions/HistoryActions'
-import HistoryApi from 'ui/features/gradebook_history/react/api/HistoryApi'
-import * as SearchResultsActions from 'ui/features/gradebook_history/react/actions/SearchResultsActions'
+import Fixtures from '../../../../../../spec/javascripts/jsx/gradebook-history/Fixtures'
+import GradebookHistoryStore from '../../store/GradebookHistoryStore'
+import * as HistoryActions from '../HistoryActions'
+import HistoryApi from '../../api/HistoryApi'
+import * as SearchResultsActions from '../SearchResultsActions'
 
 QUnit.module('SearchResultsActionsSpec getHistoryNextPage', {
   setup() {

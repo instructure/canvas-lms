@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Fixtures from '../Fixtures'
+import Fixtures from '../../../../../../spec/javascripts/jsx/gradebook-history/Fixtures'
 import {
   FETCH_HISTORY_START,
   FETCH_HISTORY_SUCCESS,
@@ -24,9 +24,9 @@ import {
   FETCH_HISTORY_NEXT_PAGE_START,
   FETCH_HISTORY_NEXT_PAGE_SUCCESS,
   FETCH_HISTORY_NEXT_PAGE_FAILURE,
-} from 'ui/features/gradebook_history/react/actions/HistoryActions'
+} from '../../actions/HistoryActions'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
-import reducer from 'ui/features/gradebook_history/react/reducers/HistoryReducer'
+import reducer from '../HistoryReducer'
 
 QUnit.module('HistoryReducer')
 
