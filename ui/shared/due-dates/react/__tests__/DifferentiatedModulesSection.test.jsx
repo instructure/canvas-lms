@@ -172,8 +172,23 @@ describe('DifferentiatedModulesSection', () => {
       }
     })
 
-    it('does not render the option for non-assignment items', () => {
+    it('renders the option for assignment items', () => {
+      const {queryByTestId} = render(<DifferentiatedModulesSection {...props} type="assignment" />)
+      expect(queryByTestId('important_dates')).toBeInTheDocument()
+    })
+
+    it('renders the option for discussion items', () => {
+      const {queryByTestId} = render(<DifferentiatedModulesSection {...props} type="discussion" />)
+      expect(queryByTestId('important_dates')).toBeInTheDocument()
+    })
+
+    it('renders the option for quiz items', () => {
       const {queryByTestId} = render(<DifferentiatedModulesSection {...props} type="quiz" />)
+      expect(queryByTestId('important_dates')).toBeInTheDocument()
+    })
+
+    it('does not render the option for non-supported items', () => {
+      const {queryByTestId} = render(<DifferentiatedModulesSection {...props} type="module" />)
 
       expect(queryByTestId('important_dates')).not.toBeInTheDocument()
     })
