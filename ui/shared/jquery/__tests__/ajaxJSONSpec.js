@@ -1,4 +1,3 @@
-/* eslint-disable qunit/no-identical-names */
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
