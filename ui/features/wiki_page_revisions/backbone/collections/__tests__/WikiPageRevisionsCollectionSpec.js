@@ -17,7 +17,7 @@
  */
 
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
-import WikiPageRevisionsCollection from 'ui/features/wiki_page_revisions/backbone/collections/WikiPageRevisionsCollection'
+import WikiPageRevisionsCollection from '../WikiPageRevisionsCollection'
 
 QUnit.module('WikiPageRevisionsCollection')
 

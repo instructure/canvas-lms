@@ -1,4 +1,3 @@
-/* eslint-disable babel/no-unused-expressions */
 /*
  * Copyright (C) 2012 - present Instructure, Inc.
  *
@@ -19,9 +18,9 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import Backbone from '@canvas/backbone'
+import {Collection, Model} from '..'
 
-class TestCollection extends Backbone.Collection {}
+class TestCollection extends Collection {}
 TestCollection.prototype.defaults = {
   foo: 'bar',
   params: {
@@ -31,15 +30,15 @@ TestCollection.prototype.defaults = {
 }
 TestCollection.optionProperty('foo')
 TestCollection.prototype.url = '/fake'
-TestCollection.prototype.model = Backbone.Model.extend()
+TestCollection.prototype.model = Model.extend()
 
-QUnit.module('Backbone.Collection', {
+QUnit.module('Collection', {
   setup() {
     this.xhr = sinon.useFakeXMLHttpRequest()
     this.ajaxSpy = sandbox.spy($, 'ajax')
   },
   teardown() {
-    this.xhr.restore
+    this.xhr.restore()
   },
 })
 
@@ -77,12 +76,9 @@ test('sends @params in request', () => {
 
 test('uses conventional default url', () => {
   let assetString
-  const FakeModel = Backbone.Model.extend(
-    {resourceName: 'discussion_topics'},
-    (assetString = 'course_1')
-  )
+  const FakeModel = Model.extend({resourceName: 'discussion_topics'}, (assetString = 'course_1'))
 
-  const FakeCollection = Backbone.Collection.extend({
+  const FakeCollection = Collection.extend({
     model: FakeModel,
   })
 
@@ -97,7 +93,7 @@ test('uses conventional default url', () => {
 })
 
 test('triggers setParam event', () => {
-  const collection = new Backbone.Collection()
+  const collection = new Collection()
   const spy = sinon.spy()
   collection.on('setParam', spy)
   collection.setParam('foo', 'bar')
@@ -107,7 +103,7 @@ test('triggers setParam event', () => {
 })
 
 test('setParams', () => {
-  const collection = new Backbone.Collection()
+  const collection = new Collection()
   ok(!collection.options.params, 'no params')
   collection.setParams({
     foo: 'bar',
@@ -117,7 +113,7 @@ test('setParams', () => {
 })
 
 test('triggers setParams event', () => {
-  const collection = new Backbone.Collection()
+  const collection = new Collection()
   const spy = sinon.spy()
   collection.on('setParams', spy)
   const params = {
@@ -130,7 +126,7 @@ test('triggers setParams event', () => {
 })
 
 test('parse', () => {
-  class SideLoader extends Backbone.Collection {}
+  class SideLoader extends Collection {}
   const collection = new SideLoader()
 
   // boolean

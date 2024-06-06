@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CheckboxCollection from 'ui/features/content_migrations/backbone/collections/ContentCheckboxCollection'
-import CheckboxModel from 'ui/features/content_migrations/backbone/models/ContentCheckbox'
+import CheckboxCollection from '../ContentCheckboxCollection'
+import CheckboxModel from '../../models/ContentCheckbox'
 
 QUnit.module('ContentCheckboxCollectionSpec')
 const createCheckboxCollection = function (properties) {
@@ -46,6 +46,7 @@ test('url is going to the correct api endpoint', () => {
 
 test("contains ContentCheckboxModel's ", () => {
   const {model} = createCheckboxCollection()
+  // eslint-disable-next-line new-cap
   const modelInstance = new model()
   ok(
     modelInstance instanceof CheckboxModel,
@@ -55,12 +56,14 @@ test("contains ContentCheckboxModel's ", () => {
 
 test('has a courseID', () =>
   ok(
+    // eslint-disable-next-line no-restricted-globals
     isFinite(Number(createCheckboxCollection({options: {courseID: '23'}}).courseID)),
     'Has a courseID number'
   ))
 
 test('has a migrationID', () =>
   ok(
+    // eslint-disable-next-line no-restricted-globals
     isFinite(Number(createCheckboxCollection({options: {migrationID: '13'}}).migrationID)),
     'Has a migrationID number'
   ))

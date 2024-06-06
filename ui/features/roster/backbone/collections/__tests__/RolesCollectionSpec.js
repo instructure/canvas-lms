@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Role from 'ui/features/roster/backbone/models/Role'
-import RolesCollection from 'ui/features/roster/backbone/collections/RolesCollection'
+import Role from '../../models/Role'
+import RolesCollection from '../RolesCollection'
 
 QUnit.module('RolesCollection', {
   setup() {
@@ -28,6 +28,7 @@ QUnit.module('RolesCollection', {
   },
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('generate the correct url for a collection of roles', 1, function () {
   const roles_collection = new RolesCollection(null, {
     contextAssetString: `account_${this.account_id}`,
@@ -35,6 +36,7 @@ test('generate the correct url for a collection of roles', 1, function () {
   equal(roles_collection.url(), `/api/v1/accounts/${this.account_id}/roles`, 'roles collection url')
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('fetches a collection of roles', 1, function () {
   const server = sinon.fakeServer.create()
   const role1 = new Role()

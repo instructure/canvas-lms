@@ -17,7 +17,7 @@
  */
 
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
-import WikiPageCollection from 'ui/features/wiki_page_index/backbone/collections/WikiPageCollection'
+import WikiPageCollection from '../WikiPageCollection'
 
 QUnit.module('WikiPageCollection')
 const checkFrontPage = function (collection) {

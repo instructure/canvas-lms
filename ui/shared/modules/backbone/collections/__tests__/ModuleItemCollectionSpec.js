@@ -16,12 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ModuleCollection from '@canvas/modules/backbone/collections/ModuleCollection'
+import ModuleItemCollection from '../ModuleItemCollection'
 
-QUnit.module('ModuleCollection')
+QUnit.module('ModuleItemCollection')
 
 test('generates the correct fetch url', () => {
   const course_id = 5
-  const collection = new ModuleCollection([], {course_id})
-  equal(collection.url(), `/api/v1/courses/${course_id}/modules`)
+  const module_id = 10
+  const collection = new ModuleItemCollection([], {
+    course_id,
+    module_id,
+  })
+  equal(collection.url(), `/api/v1/courses/${course_id}/modules/${module_id}/items`)
 })
