@@ -18,7 +18,7 @@
 
 import Backbone from '@canvas/backbone'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
-import OutcomeResultCollection from 'ui/features/grade_summary/backbone/collections/OutcomeResultCollection'
+import OutcomeResultCollection from '../OutcomeResultCollection'
 import fakeENV from 'helpers/fakeENV'
 import * as tz from '@instructure/moment-utils'
 

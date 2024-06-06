@@ -16,12 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Quiz from '@canvas/quizzes/backbone/models/Quiz'
-import QuizCollection from 'ui/features/quizzes_index/backbone/collections/QuizCollection'
+import DaySubCollection from '../DaySubstitutionCollection'
 
-QUnit.module('QuizCollection')
+QUnit.module('DaySubstitutionCollection')
 
-test('builds a collection', () => {
-  const collection = new QuizCollection([new Quiz({id: 123})])
-  ok(collection.get(123))
+test('toJSON contains nested day_substitution objects', () => {
+  const collection = new DaySubCollection()
+  collection.add({one: 'bar'})
+  collection.add({two: 'baz'})
+  const json = collection.toJSON()
+  equal(json.one, 'bar', 'nested one correctly')
+  equal(json.two, 'baz', 'nexted two correctly')
 })

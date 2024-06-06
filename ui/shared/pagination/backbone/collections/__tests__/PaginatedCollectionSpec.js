@@ -1,4 +1,3 @@
-/* eslint-disable qunit/no-test-expect-argument */
 /*
  * Copyright (C) 2012 - present Instructure, Inc.
  *
@@ -20,7 +19,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
-import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
+import PaginatedCollection from '../PaginatedCollection'
 import getFakePage from 'helpers/getFakePage'
 
 QUnit.module('PaginatedCollection', {
@@ -54,6 +53,7 @@ QUnit.module('PaginatedCollection', {
   },
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('fetch maintains parent API', 6, function () {
   const page = getFakePage()
   const dfd = this.collection.fetch({
@@ -71,6 +71,7 @@ test('fetch maintains parent API', 6, function () {
   return this.server.sendPage(page, this.collection.urlWithParams())
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('fetch maintains error handler API', 2, function () {
   this.collection.fetch({
     error: (self, xhr) => {
@@ -85,6 +86,7 @@ test('fetch maintains error handler API', 2, function () {
   ])
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('fetch fires fetch event', 3, function () {
   const page = getFakePage()
   this.collection.on('fetch', (self, modelData) => {
@@ -96,6 +98,7 @@ test('fetch fires fetch event', 3, function () {
   return this.server.sendPage(page, this.collection.urlWithParams())
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('fetches current page', 10, function () {
   const page1 = getFakePage(1)
 
@@ -124,6 +127,7 @@ test('fetches current page', 10, function () {
   return this.server.sendPage(page1, this.collection.urls.current)
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('fetches next page', 8, function () {
   const page1 = getFakePage(1)
   const page2 = getFakePage(2)
@@ -151,6 +155,7 @@ test('fetches next page', 8, function () {
   return this.server.sendPage(page2, this.collection.urls.next)
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('fetches previous page', 8, function () {
   const page1 = getFakePage(1)
   const page2 = getFakePage(2)
@@ -180,6 +185,7 @@ test('fetches previous page', 8, function () {
   return this.server.sendPage(page1, this.collection.urls.prev)
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('fetches current, prev, next, top and bottom pages', 8, function () {
   const page1 = getFakePage(1)
   const page2 = getFakePage(2)

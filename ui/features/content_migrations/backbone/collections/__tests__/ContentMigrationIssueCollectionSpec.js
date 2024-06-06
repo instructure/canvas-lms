@@ -16,15 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import DaySubCollection from '@canvas/day-substitution/backbone/collections/DaySubstitutionCollection'
+import ContentMigrationIssueCollection from '../ContentMigrationIssueCollection'
 
-QUnit.module('DaySubstitutionCollection')
+QUnit.module('ContentMigrationIssueCollection')
 
-test('toJSON contains nested day_substitution objects', () => {
-  const collection = new DaySubCollection()
-  collection.add({one: 'bar'})
-  collection.add({two: 'baz'})
-  const json = collection.toJSON()
-  equal(json.one, 'bar', 'nested one correctly')
-  equal(json.two, 'baz', 'nexted two correctly')
+test('generates the correct fetch url', () => {
+  const course_id = 5
+  const content_migration_id = 10
+  const cmiCollection = new ContentMigrationIssueCollection([], {
+    course_id,
+    content_migration_id,
+  })
+  equal(
+    cmiCollection.url(),
+    `/api/v1/courses/${course_id}/content_migrations/${content_migration_id}/migration_issues`
+  )
 })
