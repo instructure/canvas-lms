@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
+import WikiPage from '../WikiPage'
 import _ from 'lodash'
 
 const wikiPageObj = function (options = {}) {
@@ -103,6 +103,7 @@ test('present includes the context information', () => {
   equal(json.contextId, 31, 'contextId')
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('publish convenience method', 3, () => {
   const wikiPage = new WikiPage(wikiPageObj())
   sandbox.stub(wikiPage, 'save').callsFake((attributes, options) => {
@@ -113,6 +114,7 @@ test('publish convenience method', 3, () => {
   wikiPage.publish()
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('unpublish convenience method', 3, () => {
   const wikiPage = new WikiPage(wikiPageObj())
   sandbox.stub(wikiPage, 'save').callsFake((attributes, options) => {
@@ -123,6 +125,7 @@ test('unpublish convenience method', 3, () => {
   return wikiPage.unpublish()
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('setFrontPage convenience method', 3, () => {
   const wikiPage = new WikiPage(wikiPageObj())
   sandbox.stub(wikiPage, 'save').callsFake((attributes, options) => {
@@ -133,6 +136,7 @@ test('setFrontPage convenience method', 3, () => {
   wikiPage.setFrontPage()
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('unsetFrontPage convenience method', 3, () => {
   const wikiPage = new WikiPage(wikiPageObj())
   sandbox.stub(wikiPage, 'save').callsFake((attributes, options) => {

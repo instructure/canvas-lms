@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
+import Outcome from '../Outcome'
 
 QUnit.module('Outcome')
 
@@ -107,5 +107,5 @@ test('#masteryPercent should be master_points over points possible', () => {
 test('#parse', () => {
   const outcome = new Outcome()
   const parsed = outcome.parse({submitted_or_assessed_at: '2015-04-24T19:27:54Z'})
-  equal('object', typeof parsed.submitted_or_assessed_at, 'is an object, not a string')
+  equal(typeof parsed.submitted_or_assessed_at, 'object', 'is an object, not a string')
 })

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import UserRestoreModel from 'ui/features/account_admin_tools/backbone/models/UserRestore'
+import UserRestoreModel from '../UserRestore'
 import $ from 'jquery'
 import 'jquery-migrate'
 
