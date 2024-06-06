@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Conversation from '@canvas/message-students-dialog/backbone/models/Conversation'
+import Conversation from '../Conversation'
 
 QUnit.module('Conversation', {
   setup() {
@@ -27,6 +27,7 @@ QUnit.module('Conversation', {
 test('#validate validates body length', function () {
   ok(this.conversation.validate({body: ''}))
   ok(this.conversation.validate({body: null}).body)
+  // eslint-disable-next-line qunit/no-ok-equality
   ok(
     this.conversation.validate({
       body: 'body',
@@ -40,6 +41,7 @@ test('#validate validates there must be at least one recipient object', function
     body: 'i love testing javascript',
     recipients: [{}],
   }
+  // eslint-disable-next-line qunit/no-ok-equality
   ok(this.conversation.validate(testData) === undefined)
   testData.recipients = []
   ok(this.conversation.validate(testData).recipients)
