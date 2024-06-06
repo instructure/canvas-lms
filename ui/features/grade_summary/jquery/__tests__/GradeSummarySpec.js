@@ -515,6 +515,37 @@ QUnit.module('GradeSummary.calculateTotals', suiteHooks => {
       strictEqual($grade.text(), '-')
     })
   })
+
+  QUnit.module('points based grading scheme', contextHooks => {
+    contextHooks.beforeEach(() => {
+      exampleGrades = createExampleGrades()
+      exampleGrades.current = {score: 89.98, possible: 100}
+      exampleGrades.final = {score: 89.98, possible: 100}
+      const gradingSchemeDataRows = [
+        {name: 'A', value: 0.9},
+        {name: 'B', value: 0.8},
+        {name: 'C', value: 0.7},
+        {name: 'D', value: 0.6},
+        {name: 'F', value: 0},
+      ]
+      ENV.course_active_grading_scheme = {data: gradingSchemeDataRows}
+      ENV.course_active_grading_scheme.points_based = true
+      ENV.course_active_grading_scheme.scaling_factor = 10
+      ENV.grading_scheme = [
+        ['A', 0.9],
+        ['B', 0.8],
+        ['C', 0.7],
+        ['D', 0.6],
+        ['F', 0],
+      ]
+    })
+
+    test('when points based grading scheme is in use the letter score is based off the scaled final score', () => {
+      GradeSummary.calculateTotals(exampleGrades, 'current', null)
+      const $letterGrade = $fixtures.find('.final_grade .letter_grade')
+      strictEqual($letterGrade.text(), 'A')
+    })
+  })
 })
 
 QUnit.module('GradeSummary.calculateSubtotalsByGradingPeriod', {
