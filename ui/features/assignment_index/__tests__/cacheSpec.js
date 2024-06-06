@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import cache from 'ui/features/assignment_index/cache'
+import cache from '../cache'
 
 QUnit.module('class/cache', {
   setup() {
