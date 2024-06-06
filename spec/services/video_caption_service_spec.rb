@@ -34,6 +34,11 @@ RSpec.describe VideoCaptionService, type: :service do
         expect { service.call }.to change { MediaTrack.count }.by(1)
         expect { service.call }.not_to change { MediaTrack.count }
       end
+
+      it "sets auto_caption_status to complete" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("Complete")
+      end
     end
 
     context "when media type is not video" do
@@ -43,6 +48,11 @@ RSpec.describe VideoCaptionService, type: :service do
 
       it "does not create a media track" do
         expect { service.call }.not_to change { MediaTrack.count }
+      end
+
+      it "sets auto_caption_status to failed_initial_validation" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("Error - Something went wrong")
       end
     end
 
@@ -54,6 +64,11 @@ RSpec.describe VideoCaptionService, type: :service do
       it "does not create a media track" do
         expect { service.call }.not_to change { MediaTrack.count }
       end
+
+      it "sets auto_caption_status to failed_initial_validation" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("Error - Something went wrong")
+      end
     end
 
     context "when URL is not available" do
@@ -64,25 +79,101 @@ RSpec.describe VideoCaptionService, type: :service do
       it "does not create a media track" do
         expect { service.call }.not_to change { MediaTrack.count }
       end
+
+      it "sets auto_caption_status to failed_initial_validation" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("Error - Something went wrong")
+      end
     end
 
     context "when handoff request fails" do
       before do
-        allow(service).to receive_messages(url: "https://example.com/video.mp4", poll_for_captions_ready: "en", request_handoff: nil)
+        allow(service).to receive_messages(
+          url: "https://example.com/video.mp4",
+          request_handoff: nil,
+          poll_for_captions_ready: "en",
+          config: { "app-host" => "https://example.com" },
+          auth_token: "token"
+        )
+        allow(media_object).to receive_messages(media_type: "video", media_id: "valid_media_id")
       end
 
       it "does not create a media track" do
         expect { service.call }.not_to change { MediaTrack.count }
+      end
+
+      it "sets auto_caption_status to failed_handoff" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("Error - Failed to communicate with captioning service")
       end
     end
 
     context "when caption request fails" do
       before do
-        allow(service).to receive_messages(url: "https://example.com/video.mp4", request_handoff: { "media" => { "id" => "1234" } }, poll_for_caption_request: false)
+        allow(service).to receive_messages(
+          url: "https://example.com/video.mp4",
+          request_handoff: { "media" => { "id" => "1234" } },
+          poll_for_caption_request: false,
+          config: { "app-host" => "https://example.com" },
+          auth_token: "token"
+        )
+        allow(media_object).to receive_messages(media_type: "video", media_id: "valid_media_id")
       end
 
       it "does not create a media track" do
         expect { service.call }.not_to change { MediaTrack.count }
+      end
+
+      it "sets auto_caption_status to failed_request" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("Error - Failed to request")
+      end
+    end
+
+    context "when captions are not ready" do
+      before do
+        allow(service).to receive_messages(
+          url: "https://example.com/video.mp4",
+          request_handoff: { "media" => { "id" => "1234" } },
+          poll_for_caption_request: true,
+          poll_for_captions_ready: nil,
+          config: { "app-host" => "https://example.com" },
+          auth_token: "token"
+        )
+        allow(media_object).to receive_messages(media_type: "video", media_id: "valid_media_id")
+      end
+
+      it "does not create a media track" do
+        expect { service.call }.not_to change { MediaTrack.count }
+      end
+
+      it "sets auto_caption_status to failed_captions" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("Error - Caption request failed")
+      end
+    end
+
+    context "when captions cannot be pulled" do
+      before do
+        allow(service).to receive_messages(
+          url: "https://example.com/video.mp4",
+          request_handoff: { "media" => { "id" => "1234" } },
+          poll_for_caption_request: true,
+          poll_for_captions_ready: "en",
+          collect_captions: double("Response", code: 500, body: ""),
+          config: { "app-host" => "https://example.com" },
+          auth_token: "token"
+        )
+        allow(media_object).to receive_messages(media_type: "video", media_id: "valid_media_id")
+      end
+
+      it "does not create a media track" do
+        expect { service.call }.not_to change { MediaTrack.count }
+      end
+
+      it "sets auto_caption_status to failed_to_pull" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("Error - Captions not found")
       end
     end
   end

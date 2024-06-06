@@ -29,6 +29,7 @@ module Api::V1::MediaObject
       json["can_add_captions"] = media_object.grants_right?(current_user, session, :add_captions)
       json["media_sources"] = media_sources_json(media_object) unless exclude.include?("sources")
       json["embedded_iframe_url"] = media_object_iframe_url(media_object.media_id)
+      json["auto_caption_status"] = media_object.auto_caption_status
 
       unless exclude.include?("tracks")
         json["media_tracks"] = media_object.media_tracks.map do |track|
@@ -46,6 +47,7 @@ module Api::V1::MediaObject
       json["can_add_captions"] = attachment.grants_right?(current_user, session, :update)
       json["media_sources"] = media_sources_json(media_object, attachment:, verifier:) unless exclude.include?("sources")
       json["embedded_iframe_url"] = media_attachment_iframe_url(attachment.id)
+      json["auto_caption_status"] = media_object.auto_caption_status
 
       unless exclude.include?("tracks")
         json["media_tracks"] = attachment.media_tracks_include_originals.map do |track|
