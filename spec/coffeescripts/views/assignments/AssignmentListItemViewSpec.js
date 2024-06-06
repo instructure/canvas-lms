@@ -24,7 +24,7 @@ import Submission from '@canvas/assignments/backbone/models/Submission'
 import AssignmentListItemView from 'ui/features/assignment_index/backbone/views/AssignmentListItemView'
 import $ from 'jquery'
 import 'jquery-migrate'
-import tzInTest from '@canvas/datetime/specHelpers'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
 import juneau from 'timezone/America/Juneau'
 import french from 'timezone/fr_FR'
@@ -135,7 +135,7 @@ const createView = function (model, options) {
     newquizzes_on_quiz_page: options.newquizzes_on_quiz_page,
   }
   ENV.SHOW_SPEED_GRADER_LINK = options.show_additional_speed_grader_link
-  ENV.FEATURES.differentiated_modules = options.differentiated_modules
+  ENV.FEATURES.selective_release_ui_api = options.selective_release
 
   const view = new AssignmentListItemView({
     model,
@@ -698,7 +698,7 @@ test('renders due date column in appropriate time zone', function () {
   )
 })
 
-test('renders link to speed grader if canManage', () => {
+test('renders link to SpeedGrader if canManage', () => {
   const model = buildAssignment({
     id: 1,
     title: 'Chicken Noodle',
@@ -725,7 +725,7 @@ test('does NOT render link when assignment is unpublished', () => {
   ok(view.$('.speed-grader-link-container').attr('class').includes('hidden'))
 })
 
-test('speed grader link is correct', () => {
+test('SpeedGrader link is correct', () => {
   const model = buildAssignment({
     id: 11,
     title: 'Cream of Mushroom',
@@ -845,24 +845,24 @@ test('displays cancel button when assignment failed to duplicate is not blueprin
 
 test('can assign assignment if flag is on and has edit permissions', function () {
   const view = createView(this.model, {
-    canManage: true,
-    differentiated_modules: true,
+    individualAssignmentPermissions: {manage_assign_to: true},
+    selective_release: true,
   })
   equal(view.$('.assign-to-link').length, 1)
 })
 
-test('canot assign assignment if no edit permissions', function () {
+test('cannot assign assignment if no edit permissions', function () {
   const view = createView(this.model, {
-    canManage: false,
-    differentiated_modules: true,
+    individualAssignmentPermissions: {manage_assign_to: false},
+    selective_release: true,
   })
   equal(view.$('.assign-to-link').length, 0)
 })
 
 test('cannot assign assignment if flag is off', function () {
   const view = createView(this.model, {
-    canManage: true,
-    differentiated_modules: false,
+    individualAssignmentPermissions: {manage_assign_to: true},
+    selective_release: false,
   })
   equal(view.$('.assign-to-link').length, 0)
 })

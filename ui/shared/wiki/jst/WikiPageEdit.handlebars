@@ -62,7 +62,7 @@
           {{/if}}
         {{/if}}
         {{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED}}
-          {{#unless ENV.FEATURES.differentiated_modules}}
+          {{#unless ENV.FEATURES.selective_release_ui_api}}
             <div class="controls-section">
               <label class="checkbox" for="conditional_content">
                 {{checkbox "assignment.set_assignment"
@@ -76,7 +76,7 @@
         {{/if}}
       </div>
     </div>
-    {{#if differentiated_modules}}
+    {{#if show_assign_to}}
     <div class="responsive-control-group options">
       <label class="control-label"><strong>{{#t "assign_to_label"}}Assign Access{{/t}}</strong></label>
       <div class="controls">

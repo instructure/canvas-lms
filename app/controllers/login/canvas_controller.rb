@@ -106,9 +106,18 @@ class Login::CanvasController < ApplicationController
       end
     end
 
-    case @pseudonym_session&.login_error || pseudonym
+    login_error = @pseudonym_session&.login_error || pseudonym
+    case login_error
+    when :remaining_attempts_2, :remaining_attempts_1, :final_attempt
+      attempts = Canvas::Security::LoginRegistry::WARNING_ATTEMPTS[login_error]
+      if login_error == :final_attempt
+        unsuccessful_login t("We've received several incorrect username or password entries. To protect your account, it has been locked. Please contact your system administrator.")
+      else
+        unsuccessful_login t("Please verify your username or password and try again. After %{attempts} more attempt(s), your account will be locked.", attempts:)
+      end
+      return
     when :impossible_credentials
-      unsuccessful_login t("Invalid username or password")
+      unsuccessful_login t("Please verify your username or password and try again.")
       return
     when :too_many_attempts
       unsuccessful_login t("Too many failed login attempts. Please try again later or contact your system administrator.")
@@ -137,11 +146,11 @@ class Login::CanvasController < ApplicationController
       link_url = Setting.get("invalid_login_faq_url", nil)
       if link_url
         unsuccessful_login t(
-          "Invalid username or password. Trouble logging in? *Check out our Login FAQs*.",
+          "Please verify your username or password and try again. Trouble logging in? *Check out our Login FAQs*.",
           wrapper: view_context.link_to('\1', link_url)
         )
       else
-        unsuccessful_login t("Invalid username or password")
+        unsuccessful_login t("Please verify your username or password and try again.")
       end
     end
   end

@@ -75,10 +75,6 @@ module CanvasCassandra
       ConfigFile.load("cassandra") || {}
     end
 
-    def self.reset_connections!
-      @connections = {}
-    end
-
     def self.config_names
       configs.keys
     end

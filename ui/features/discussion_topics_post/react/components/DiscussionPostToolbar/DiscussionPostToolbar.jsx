@@ -303,8 +303,8 @@ export const DiscussionPostToolbar = props => {
                     </Flex>
                   </Flex.Item>
                 )}
-                {props.canEdit &&
-                  ENV.FEATURES?.differentiated_modules &&
+                {props.manageAssignTo &&
+                  ENV.FEATURES?.selective_release_ui_api &&
                   !props.isAnnouncement &&
                   props.contextType === 'Course' && (
                     <Flex.Item shouldGrow={true} textAlign="end">
@@ -367,6 +367,7 @@ DiscussionPostToolbar.propTypes = {
   closeView: PropTypes.func,
   pointsPossible: PropTypes.number,
   contextType: PropTypes.oneOf(['Course', 'Group']),
+  manageAssignTo: PropTypes.bool,
 }
 
 DiscussionPostToolbar.defaultProps = {

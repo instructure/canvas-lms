@@ -104,7 +104,7 @@ module Csp::AccountHelper
   def add_domain!(domain)
     domain = domain.downcase
     Csp::Domain.unique_constraint_retry do |retry_count|
-      if retry_count > 0 && (record = csp_domains.where(domain:).take)
+      if retry_count > 0 && (record = csp_domains.find_by(domain:))
         record.undestroy if record.deleted?
         record
       else
@@ -115,7 +115,7 @@ module Csp::AccountHelper
   end
 
   def remove_domain!(domain)
-    csp_domains.active.where(domain: domain.downcase).take&.destroy!
+    csp_domains.active.find_by(domain: domain.downcase)&.destroy!
   end
 
   def csp_whitelisted_domains(request = nil, include_files:, include_tools:)
@@ -187,7 +187,13 @@ module Csp::AccountHelper
     end
     canvadocs_host = Canvadocs.enabled?.presence && URI.parse(Canvadocs.config["base_url"]).host
     inst_fs_host = InstFS.enabled?.presence && URI.parse(InstFS.app_host).host
-    [files_host, canvadocs_host, inst_fs_host].compact
+    # allow for custom CDN domain for inst-fs, sub-domain naming scheme not enforced
+    inst_fs_cdn_host = "*.#{inst_fs_host}" if inst_fs_host
+
+    csp_files_domains = [files_host, canvadocs_host, inst_fs_host]
+    csp_files_domains << inst_fs_cdn_host if inst_fs_cdn_host
+
+    csp_files_domains.compact
   end
 
   def csp_logging_config

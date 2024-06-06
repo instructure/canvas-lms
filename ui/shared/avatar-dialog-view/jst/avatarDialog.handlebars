@@ -1,21 +1,20 @@
 <div class="avatar-nav">
-  <ul class="nav nav-pills">
-    {{#if hasFileReader}}
-      <li class="active">
-        <a href="#upload-picture">{{#t}}Upload a Picture{{/t}}</a>
-      </li>
-    {{/if}}
-    {{#if hasGetUserMedia}}
-      <li>
-        <a href="#take-picture">{{#t}}Take a Picture{{/t}}</a>
-      </li>
-    {{/if}}
-    {{#if enableGravatar}}
-      <li>
-        <a href="#from-gravatar">{{#t}}From Gravatar{{/t}}</a>
-      </li>
-    {{/if}}
-  </ul>
+  <div class="avatar-nav-dropdown text-left">
+    <label for="avatarDropdown" style="display: block; font-weight: bold;">
+      {{#t "avatar.dropdown"}}Picture Options{{/t}}
+    </label>
+    <select id="avatarDropdown" class="span3">
+      {{#if hasFileReader}}
+        <option value="#upload-picture">{{#t}}Upload a Picture{{/t}}</option>
+      {{/if}}
+      {{#if hasGetUserMedia}}
+        <option value="#take-picture">{{#t}}Take a Picture{{/t}}</option>
+      {{/if}}
+      {{#if enableGravatar}}
+        <option value="#from-gravatar">{{#t}}From Gravatar{{/t}}</option>
+      {{/if}}
+    </select>
+  </div>
 </div>
 
 <div class="avatar-content">

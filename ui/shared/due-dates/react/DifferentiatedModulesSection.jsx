@@ -58,6 +58,7 @@ const DifferentiatedModulesSection = ({
   importantDates,
   onTrayOpen,
   onTrayClose,
+  removeDueDateInput = false,
 }) => {
   const [open, setOpen] = useState(false)
   // stagedCards are the itemAssignToCards that will be saved when the assignment is saved
@@ -78,11 +79,15 @@ const DifferentiatedModulesSection = ({
   const [moduleAssignees, setModuleAssignees] = useState([])
   const linkRef = useRef()
 
-  const formData = useMemo(() => ({
-    assignmentName: getAssignmentName(),
-    pointsPossible: getPointsPossible(),
-    groupCategoryId: getGroupCategoryId?.()
-  }), [open]);
+  const formData = useMemo(
+    () => ({
+      assignmentName: getAssignmentName(),
+      pointsPossible: getPointsPossible(),
+      groupCategoryId: getGroupCategoryId?.(),
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [open]
+  )
 
   useEffect(() => {
     const updatedOverrides = overrides.map(override => {
@@ -99,7 +104,11 @@ const DifferentiatedModulesSection = ({
 
   useEffect(() => {
     if (stagedOverrides === null) return
-    const parsedOverrides = getParsedOverrides(stagedOverrides, stagedCards, formData.groupCategoryId)
+    const parsedOverrides = getParsedOverrides(
+      stagedOverrides,
+      stagedCards,
+      formData.groupCategoryId
+    )
     const uniqueOverrides = removeOverriddenAssignees(overrides, parsedOverrides)
     setStagedCards(uniqueOverrides)
     if (initialState === null) {
@@ -188,8 +197,10 @@ const DifferentiatedModulesSection = ({
   }, [stagedCards])
 
   const handleOpen = useCallback(() => {
+    if(onTrayOpen !== undefined){
+      if(!onTrayOpen()) return;
+    }
     setOpen(true)
-    onTrayOpen?.()
   }, [onTrayOpen])
 
   useEffect(() => {
@@ -217,7 +228,12 @@ const DifferentiatedModulesSection = ({
     )
     const defaultState = getParsedOverrides(preSaved, checkPoint)
     const checkPointOverrides = getAllOverridesFromCards(defaultState).filter(
-      card => card.course_section_id || card.student_ids || card.noop_id || card.course_id || card.group_id
+      card =>
+        card.course_section_id ||
+        card.student_ids ||
+        card.noop_id ||
+        card.course_id ||
+        card.group_id
     )
     setStagedOverrides(checkPointOverrides)
     const newStagedCards = resetStagedCards(stagedCards, checkPoint, defaultState)
@@ -231,7 +247,12 @@ const DifferentiatedModulesSection = ({
     newCard.draft = true
     newCard.index = stagedOverrides.length + 1
     const oldOverrides = getAllOverridesFromCards(stagedCards).filter(
-      card => card.course_section_id || card.student_ids || card.noop_id || card.course_id || card.group_id
+      card =>
+        card.course_section_id ||
+        card.student_ids ||
+        card.noop_id ||
+        card.course_id ||
+        card.group_id
     )
     const newStageOverrides = [...oldOverrides, newCard]
     setStagedOverrides(newStageOverrides)
@@ -281,6 +302,7 @@ const DifferentiatedModulesSection = ({
       return {
         ...override,
         [dateType]: date,
+        [`${dateType}_overridden`]: !!date,
       }
     })
 
@@ -368,7 +390,12 @@ const DifferentiatedModulesSection = ({
 
   const handleSave = () => {
     const newOverrides = getAllOverridesFromCards(stagedCards).filter(
-      card => card.course_section_id || card.student_ids || card.noop_id || card.course_id || card.group_id
+      card =>
+        card.course_section_id ||
+        card.student_ids ||
+        card.noop_id ||
+        card.course_id ||
+        card.group_id
     )
 
     const deletedModuleAssignees = moduleAssignees.filter(
@@ -483,6 +510,7 @@ const DifferentiatedModulesSection = ({
         onAssigneesChange={handleChange}
         onDatesChange={handleDatesUpdate}
         onCardRemove={handleCardRemove}
+        removeDueDateInput={removeDueDateInput}
       />
     </>
   )
@@ -500,5 +528,7 @@ DifferentiatedModulesSection.propTypes = {
   getGroupCategoryId: func,
   onTrayOpen: func,
   onTrayClose: func,
+  removeDueDateInput: bool,
 }
+
 export default DifferentiatedModulesSection

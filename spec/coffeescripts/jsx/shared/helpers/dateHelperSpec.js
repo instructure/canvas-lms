@@ -17,13 +17,14 @@
  */
 
 import DateHelper from '@canvas/datetime/dateHelper'
+import {isMidnight} from '@instructure/moment-utils'
 import {isDate, isNull, isUndefined} from 'lodash'
-import tzInTest from '@canvas/datetime/specHelpers'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
 import tokyo from 'timezone/Asia/Tokyo'
-import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
+import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 
 const defaultAssignment = () => ({
   title: 'assignment',
@@ -156,7 +157,7 @@ test('formats the date for display, adjusted for the user settings timezone', ()
   equal(formattedDate, 'Jul 14, 2015 2:35pm')
 })
 
-QUnit.module('DateHelper#isMidnight', {
+QUnit.module('isMidnight', {
   teardown() {
     tzInTest.restore()
   },
@@ -170,12 +171,12 @@ test('returns true if the time is midnight, adjusted for the timezone', () => {
       'America/Detroit': detroit,
     },
   })
-  ok(DateHelper.isMidnight(date))
+  ok(isMidnight(date))
   tzInTest.configureAndRestoreLater({
     tz: timezone(juneau, 'America/Juneau'),
     tzData: {
       'America/Juneau': juneau,
     },
   })
-  notOk(DateHelper.isMidnight(date))
+  notOk(isMidnight(date))
 })

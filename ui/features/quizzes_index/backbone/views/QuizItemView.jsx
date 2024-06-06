@@ -435,7 +435,7 @@ export default class ItemView extends Backbone.View {
       this.model.get('restricted_by_master_course')
 
     base.courseId = ENV.context_asset_string.split('_')[1]
-    base.differentiatedModulesFlag = ENV.FEATURES?.differentiated_modules
+    base.differentiatedModulesFlag = ENV.FEATURES?.selective_release_ui_api
     base.showSpeedGraderLinkFlag = ENV.FLAGS?.show_additional_speed_grader_link
     base.showSpeedGraderLink = ENV.SHOW_SPEED_GRADER_LINK
 
@@ -446,6 +446,7 @@ export default class ItemView extends Backbone.View {
     base.DIRECT_SHARE_ENABLED = ENV.FLAGS && ENV.FLAGS.DIRECT_SHARE_ENABLED
     base.canOpenManageOptions =
       this.canManage() || this.canDuplicate() || this.canDelete() || base.DIRECT_SHARE_ENABLED
+    base.canManageAssignTo = ENV.PERMISSIONS.manage_assign_to
     return base
   }
 }

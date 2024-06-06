@@ -21,8 +21,7 @@ class Notifier
   def send_notification(record, dispatch, messages, to_list, data = nil)
     recipient_keys = (to_list || []).compact.map { |o| o.is_a?(String) ? o : o.asset_string }
     messages = DelayedNotification.delay_if_production(priority: 30)
-                                  .process(record, messages, recipient_keys, data, **{})
-    # RUBY 3.0 - **{} can go away, because data won't implicitly convert to kwargs
+                                  .process(record, messages, recipient_keys, data)
 
     messages ||= DelayedNotification.new(
       asset: record,

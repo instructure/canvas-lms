@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef, useEffect, useContext} from 'react'
+import React, {useState, useRef, useEffect, useContext, useCallback} from 'react'
 import PropTypes from 'prop-types'
 import {CreateOrEditSetModal} from '@canvas/groups/react/CreateOrEditSetModal'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -45,7 +45,7 @@ import {GradedDiscussionOptions} from '../DiscussionOptions/GradedDiscussionOpti
 import {NonGradedDateOptions} from '../DiscussionOptions/NonGradedDateOptions'
 import {AnonymousSelector} from '../DiscussionOptions/AnonymousSelector'
 import {
-  GradedDiscussionDueDatesContext,
+  DiscussionDueDatesContext,
   defaultEveryoneOption,
   defaultEveryoneElseOption,
   masteryPathsOption,
@@ -60,7 +60,11 @@ import {UsageRightsContainer} from '../../containers/usageRights/UsageRightsCont
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-import {prepareAssignmentPayload, prepareCheckpointsPayload} from '../../util/payloadPreparations'
+import {
+  prepareAssignmentPayload,
+  prepareCheckpointsPayload,
+  prepareUngradedDiscussionOverridesPayload,
+} from '../../util/payloadPreparations'
 import {validateTitle, validateFormFields} from '../../util/formValidation'
 
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
@@ -73,8 +77,13 @@ import {
 import {MissingSectionsWarningModal} from '../MissingSectionsWarningModal/MissingSectionsWarningModal'
 import {flushSync} from 'react-dom'
 import {SavingDiscussionTopicOverlay} from '../SavingDiscussionTopicOverlay/SavingDiscussionTopicOverlay'
+import {Heading} from '@instructure/ui-heading'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {ItemAssignToTrayWrapper} from '../DiscussionOptions/ItemAssignToTrayWrapper'
 
 const I18n = useI18nScope('discussion_create')
+
+const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 
 export const getAbGuidArray = event => {
   const {data} = event.data
@@ -99,7 +108,7 @@ export const isGuidDataValid = event => {
   return true
 }
 
-export default function DiscussionTopicForm({
+function DiscussionTopicForm({
   isEditing,
   currentDiscussionTopic,
   isStudent,
@@ -112,6 +121,7 @@ export default function DiscussionTopicForm({
   apolloClient,
   isSubmitting,
   setIsSubmitting,
+  breakpoints,
 }) {
   const rceRef = useRef()
   const textInputRef = useRef()
@@ -242,9 +252,7 @@ export default function DiscussionTopicForm({
     currentDiscussionTopic?.assignment?.peerReviews?.dueAt || ''
   )
   const [assignedInfoList, setAssignedInfoList] = useState(
-    isEditing
-      ? buildAssignmentOverrides(currentDiscussionTopic?.assignment)
-      : buildDefaultAssignmentOverride()
+    isEditing ? buildAssignmentOverrides(currentDiscussionTopic) : buildDefaultAssignmentOverride()
   )
 
   const [gradedDiscussionRefMap, setGradedDiscussionRefMap] = useState(new Map())
@@ -297,6 +305,7 @@ export default function DiscussionTopicForm({
     importantDates,
     setImportantDates,
     pointsPossible,
+    isGraded,
   }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
@@ -380,6 +389,7 @@ export default function DiscussionTopicForm({
     shouldShowSaveAndPublishButton,
     shouldShowPodcastFeedOption,
     shouldShowCheckpointsOptions,
+    shouldShowAssignToForUngradedDiscussions,
   } = useShouldShowContent(
     isGraded,
     isAnnouncement,
@@ -444,6 +454,18 @@ export default function DiscussionTopicForm({
       allowRating: shouldShowLikingOption ? allowLiking : false,
       onlyGradersCanRate: shouldShowLikingOption ? onlyGradersCanLike : false,
       ...(shouldShowUsageRightsOption && {usageRightsData}),
+    }
+
+    if (!isGraded && !currentDiscussionTopic?.assignment && ENV.FEATURES?.selective_release_ui_api) {
+      Object.assign(
+        payload,
+        prepareUngradedDiscussionOverridesPayload(
+          assignedInfoList,
+          defaultEveryoneOption,
+          defaultEveryoneElseOption,
+          masteryPathsOption
+        )
+      )
     }
 
     // Additional properties for editing mode
@@ -519,7 +541,7 @@ export default function DiscussionTopicForm({
   }
 
   const submitForm = shouldPublish => {
-    if (shouldShowAvailabilityOptions && isGraded) {
+    if (shouldShowAvailabilityOptions) {
       const selectedAssignedTo = assignedInfoList.map(info => info.assignedList).flatMap(x => x)
       const isEveryoneOrEveryoneElseSelected = selectedAssignedTo.some(
         assignedTo =>
@@ -600,15 +622,103 @@ export default function DiscussionTopicForm({
     })
   }
 
+  const renderHeading = () => {
+    const itemMargin = breakpoints.desktopOnly ? '0 0 large' : '0 0 medium'
+    const headerText = isAnnouncement ? I18n.t('Create Announcement') : I18n.t('Create Discussion')
+    const titleContent = title ?? headerText
+    return instUINavEnabled() ? (
+      <Flex direction="column" as="div">
+        <Flex.Item margin={itemMargin} overflow="hidden">
+          <Heading level="h1">{headerText}</Heading>
+        </Flex.Item>
+      </Flex>
+    ) : (
+      <ScreenReaderContent>
+        <h1>{titleContent}</h1>
+      </ScreenReaderContent>
+    )
+  }
+
+  const renderAvailabilityOptions = useCallback(() => {
+    if (isGraded) {
+      return (
+        <View as="div" data-testid="assignment-settings-section">
+          <DiscussionDueDatesContext.Provider value={assignmentDueDateContext}>
+            <GradedDiscussionOptions
+              assignmentGroups={assignmentGroups}
+              pointsPossible={pointsPossible}
+              setPointsPossible={setPointsPossible}
+              displayGradeAs={displayGradeAs}
+              setDisplayGradeAs={setDisplayGradeAs}
+              assignmentGroup={assignmentGroup}
+              setAssignmentGroup={setAssignmentGroup}
+              peerReviewAssignment={peerReviewAssignment}
+              setPeerReviewAssignment={setPeerReviewAssignment}
+              peerReviewsPerStudent={peerReviewsPerStudent}
+              setPeerReviewsPerStudent={setPeerReviewsPerStudent}
+              peerReviewDueDate={peerReviewDueDate}
+              setPeerReviewDueDate={setPeerReviewDueDate}
+              postToSis={postToSis}
+              setPostToSis={setPostToSis}
+              gradingSchemeId={gradingSchemeId}
+              setGradingSchemeId={setGradingSchemeId}
+              intraGroupPeerReviews={intraGroupPeerReviews}
+              setIntraGroupPeerReviews={setIntraGroupPeerReviews}
+              isCheckpoints={isCheckpoints && ENV.DISCUSSION_CHECKPOINTS_ENABLED}
+              canManageAssignTo={ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_ASSIGN_TO_GRADED}
+            />
+          </DiscussionDueDatesContext.Provider>
+        </View>
+      )
+    } else if (shouldShowAssignToForUngradedDiscussions) {
+      return (
+        <View as="div" data-testid="assignment-settings-section">
+          <Text weight="bold">{I18n.t('Assign Access')}</Text>
+          <DiscussionDueDatesContext.Provider value={assignmentDueDateContext}>
+            <ItemAssignToTrayWrapper />
+          </DiscussionDueDatesContext.Provider>
+        </View>
+      )
+    } else {
+      return (
+        <NonGradedDateOptions
+          availableFrom={availableFrom}
+          setAvailableFrom={setAvailableFrom}
+          availableUntil={availableUntil}
+          setAvailableUntil={setAvailableUntil}
+          isGraded={isGraded}
+          setAvailabilityValidationMessages={setAvailabilityValidationMessages}
+          availabilityValidationMessages={availabilityValidationMessages}
+          inputWidth={inputWidth}
+          setDateInputRef={ref => {
+            dateInputRef.current = ref
+          }}
+        />
+      )
+    }
+  }, [
+    assignmentDueDateContext,
+    assignmentGroup,
+    assignmentGroups,
+    availabilityValidationMessages,
+    availableFrom,
+    availableUntil,
+    displayGradeAs,
+    gradingSchemeId,
+    intraGroupPeerReviews,
+    isCheckpoints,
+    isGraded,
+    peerReviewAssignment,
+    peerReviewDueDate,
+    peerReviewsPerStudent,
+    pointsPossible,
+    postToSis,
+    shouldShowAssignToForUngradedDiscussions,
+  ])
+
   return (
     <>
-      <ScreenReaderContent>
-        {title ? (
-          <h1>{title}</h1>
-        ) : (
-          <h1>{isAnnouncement ? I18n.t('New Announcement') : I18n.t('New Discussion')}</h1>
-        )}
-      </ScreenReaderContent>
+      {renderHeading()}
       <FormFieldGroup description="" rowSpacing="small">
         {(isUnpublishedAnnouncement || isEditingAnnouncement) && (
           <Alert variant={announcementAlertProps().variant}>{announcementAlertProps().text}</Alert>
@@ -656,7 +766,7 @@ export default function DiscussionTopicForm({
             canAttach={ENV.DISCUSSION_TOPIC?.PERMISSIONS.CAN_ATTACH}
           />
         )}
-        {shouldShowPostToSectionOption && (
+        {shouldShowPostToSectionOption && !shouldShowAssignToForUngradedDiscussions && (
           <View display="block" padding="medium none">
             <CanvasMultiSelect
               data-testid="section-select"
@@ -967,49 +1077,7 @@ export default function DiscussionTopicForm({
             </Alert>
           </View>
         )}
-        {shouldShowAvailabilityOptions &&
-          (isGraded ? (
-            <View as="div" data-testid="assignment-settings-section">
-              <GradedDiscussionDueDatesContext.Provider value={assignmentDueDateContext}>
-                <GradedDiscussionOptions
-                  assignmentGroups={assignmentGroups}
-                  pointsPossible={pointsPossible}
-                  setPointsPossible={setPointsPossible}
-                  displayGradeAs={displayGradeAs}
-                  setDisplayGradeAs={setDisplayGradeAs}
-                  assignmentGroup={assignmentGroup}
-                  setAssignmentGroup={setAssignmentGroup}
-                  peerReviewAssignment={peerReviewAssignment}
-                  setPeerReviewAssignment={setPeerReviewAssignment}
-                  peerReviewsPerStudent={peerReviewsPerStudent}
-                  setPeerReviewsPerStudent={setPeerReviewsPerStudent}
-                  peerReviewDueDate={peerReviewDueDate}
-                  setPeerReviewDueDate={setPeerReviewDueDate}
-                  postToSis={postToSis}
-                  setPostToSis={setPostToSis}
-                  gradingSchemeId={gradingSchemeId}
-                  setGradingSchemeId={setGradingSchemeId}
-                  intraGroupPeerReviews={intraGroupPeerReviews}
-                  setIntraGroupPeerReviews={setIntraGroupPeerReviews}
-                  isCheckpoints={isCheckpoints && ENV.DISCUSSION_CHECKPOINTS_ENABLED}
-                />
-              </GradedDiscussionDueDatesContext.Provider>
-            </View>
-          ) : (
-            <NonGradedDateOptions
-              availableFrom={availableFrom}
-              setAvailableFrom={setAvailableFrom}
-              availableUntil={availableUntil}
-              setAvailableUntil={setAvailableUntil}
-              isGraded={isGraded}
-              setAvailabilityValidationMessages={setAvailabilityValidationMessages}
-              availabilityValidationMessages={availabilityValidationMessages}
-              inputWidth={inputWidth}
-              setDateInputRef={ref => {
-                dateInputRef.current = ref
-              }}
-            />
-          ))}
+        {shouldShowAvailabilityOptions && renderAvailabilityOptions()}
         {(!isAnnouncement || !ENV.ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS) &&
           ENV.context_is_not_group && (
             <div id="assignment_external_tools" data-testid="assignment-external-tools" />
@@ -1052,6 +1120,7 @@ DiscussionTopicForm.propTypes = {
   apolloClient: PropTypes.object,
   isSubmitting: PropTypes.bool,
   setIsSubmitting: PropTypes.func,
+  breakpoints: breakpointsShape,
 }
 
 DiscussionTopicForm.defaultProps = {
@@ -1064,3 +1133,5 @@ DiscussionTopicForm.defaultProps = {
   isSubmitting: false,
   setIsSubmitting: () => {},
 }
+
+export default WithBreakpoints(DiscussionTopicForm)

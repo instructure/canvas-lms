@@ -60,38 +60,6 @@ deep_linking_use_window_parent:
       state: allowed_on
     ci:
       state: on
-developer_key_consortia_fix_inheritance_logic:
-  state: hidden
-  applies_to: RootAccount
-  shadow: true
-  display_name: Consistent inheritance logic for Developer Keys in non-CMC consortia
-  description: |-
-    When enabled for a child account of a non-centrally managed consortium,
-    developer key state and tokens from the consortium parent will not be
-    inherited to subaccounts of a consortium child. When disabled, the legacy
-    (inconsistent) behavior is followed. This flag applies only to consortium
-    _child_ accounts. This flag does not affect centrally-managed consortia in
-    any way.
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
-developer_key_consortia_stop_tool_management_from_parent:
-  state: allowed_on
-  applies_to: RootAccount
-  shadow: true
-  display_name: Prevent non-CMC consortium parent dev key from affecting tools in children
-  description: |-
-    When enabled for the parent account of a non-centrally managed consortium,
-    turning on/off developer keys in the parent will not affect the tool
-    installs of the child accounts. When disabled, turning on/off
-    SiteAdmin-inherited developer keys in the parent account of a non-centrally
-    managed consortium will affect (delete/restore) tools in the children
-    accounts (legacy behavior). This flag applies only to consortium _parent_
-    accounts. This flag does not affect centrally-managed consortia in any way.
 developer_key_support_includes:
   state: hidden
   display_name: Developer Key Include Parameter Support

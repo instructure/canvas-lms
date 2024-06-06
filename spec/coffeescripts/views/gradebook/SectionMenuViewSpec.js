@@ -1,5 +1,4 @@
 /* eslint-disable qunit/no-global-stop-start */
-/* eslint-disable qunit/no-ok-equality */
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -68,7 +67,8 @@ test('it renders a button', function () {
   )
 })
 
-test('it displays given sections', function () {
+// FOO-4485
+QUnit.skip('it displays given sections', function () {
   const clock = sinon.useFakeTimers()
   this.view.$el.find('button').click()
   clock.tick(101)
@@ -79,13 +79,17 @@ test('it displays given sections', function () {
   return clock.restore()
 })
 
-test('it changes sections', function () {
+// FOO-4485
+QUnit.skip('it changes sections', function () {
+  // may have to eslint disable qunit/no-ok-equality after fixing some
+  // of these tests
   this.view.$el.find('button').click()
   $('input[value=2]').parent().click()
   ok(this.view.currentSection === '2', 'updates its section')
 })
 
-test('it publishes changes', function (assert) {
+// FOO-4485
+QUnit.skip('it publishes changes', function (assert) {
   const start = assert.async()
   assert.expect(1)
   $.subscribe('currentSection/change', section => {

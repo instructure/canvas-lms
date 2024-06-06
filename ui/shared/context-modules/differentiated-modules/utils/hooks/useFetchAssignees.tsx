@@ -20,9 +20,9 @@ import {useEffect, useState} from 'react'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {type AssigneeOption} from '../../react/AssigneeSelector'
 import {uniqBy} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {AssigneeOption} from '../../react/Item/types'
 
 const I18n = useI18nScope('differentiated_modules')
 

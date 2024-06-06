@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import * as tz from '@canvas/datetime'
-import tzInTest from '@canvas/datetime/specHelpers'
+import * as tz from '@instructure/moment-utils'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
@@ -35,7 +35,8 @@ import {
   timeString,
   unfudgeDateForProfileTimezone,
 } from '@canvas/datetime/date-functions'
-import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
+import {getI18nFormats} from '@canvas/datetime/configureDateTime'
+import '@canvas/datetime/jquery/datepicker'
 
 QUnit.module('fudgeDateForProfileTimezone', {
   setup() {

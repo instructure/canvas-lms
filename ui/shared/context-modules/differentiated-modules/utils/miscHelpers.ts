@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/moment-utils'
 import type {SettingsPanelState} from '../react/settingsReducer'
 import type {ModuleItem, Requirement} from '../react/types'
 

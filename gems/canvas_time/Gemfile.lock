@@ -17,7 +17,7 @@ GEM
     diff-lcs (1.5.1)
     i18n (1.14.5)
       concurrent-ruby (~> 1.0)
-    minitest (5.23.0)
+    minitest (5.23.1)
     rake (13.2.1)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
@@ -54,4 +54,4 @@ RUBY VERSION
    ruby 3.1.2p20
 
 BUNDLED WITH
-   2.5.9
+   2.5.10

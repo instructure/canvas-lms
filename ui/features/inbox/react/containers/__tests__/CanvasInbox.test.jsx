@@ -227,31 +227,19 @@ describe('CanvasInbox App Container', () => {
     })
   })
 
-  describe('Inbox Settings FF enabled', () => {
+  describe('Inbox Signature Block Settings enabled', () => {
     it('should display Inbox Settings in header', () => {
-      window.ENV = {
-        ...window.ENV,
-        CONVERSATIONS: {
-          ...window.ENV.CONVERSATIONS,
-          INBOX_SETTINGS_ENABLED: true,
-        },
-      }
+      window.ENV.CONVERSATIONS.INBOX_SIGNATURE_BLOCK_ENABLED = true
       const {getByTestId} = setup()
       expect(getByTestId('inbox-settings-in-header')).toBeInTheDocument()
     })
 
     it('should redirect to inbox when submission_comments and click on Compose button', async () => {
-      window.ENV = {
-        ...window.ENV,
-        CONVERSATIONS: {
-          ...window.ENV.CONVERSATIONS,
-          INBOX_SETTINGS_ENABLED: true,
-        },
-      }
-      const container = setup()
+      window.ENV.CONVERSATIONS.INBOX_SIGNATURE_BLOCK_ENABLED = true
+      const {findByText} = setup()
       await waitForApolloLoading()
       window.location.hash = '#filter=type=submission_comments=randomstring'
-      const composeButton = await container.findByText('Compose')
+      const composeButton = await findByText('Compose')
       fireEvent.click(composeButton)
       await waitForApolloLoading()
       expect(window.location.hash).toBe('#filter=type=inbox')

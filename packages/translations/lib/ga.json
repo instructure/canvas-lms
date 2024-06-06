@@ -54,7 +54,7 @@
         "message": "Gach"
     },
     "all_apps_a50dea49": {
-        "message": "Aipeanna ar fad"
+        "message": "Aipeanna ar Fad"
     },
     "alpha_15d59033": {
         "message": "Alfa"
@@ -561,7 +561,7 @@
         "message": "Doiciméad"
     },
     "documents_81393201": {
-        "message": "Cáipéisí"
+        "message": "Doiciméid"
     },
     "done_54e3d4b6": {
         "message": "Déanta"
@@ -1122,7 +1122,7 @@
         "message": "Aicearraí méarchláir"
     },
     "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
-        "message": "Déanann méarchláir nascleanúint chuig naisc ag baint úsáide as an eochair Táb. Is féidir le dhá nasc cóngaracha a dhíríon chuig an gceann scríbe céanna mearbhall a chur ar úsáideoirí méarchláir."
+        "message": "Déanann méarchláir nascleanúint chuig naisc ag baint úsáid as an eochair Táb. Is féidir le dhá nasc cóngaracha a dhíríon chuig an gceann scríbe céanna mearbhall a chur ar úsáideoirí méarchláir."
     },
     "korean_da812d9": {
         "message": "Cóiréis"
@@ -1440,10 +1440,10 @@
         "message": "Níor aimsíodh aon fhógraí."
     },
     "no_assignments_created_yet_1b236d87": {
-        "message": "Níl aon tasc cruthaithe go fóill."
+        "message": "Níl tascanna cruthaithe go fóill."
     },
     "no_assignments_found_79e46d7f": {
-        "message": "Níor aimsíodh aon tascanna."
+        "message": "Níor aimsíodh tascanna."
     },
     "no_changes_to_save_d29f6e91": {
         "message": "Níl aon athruithe le sábháil."
@@ -1458,7 +1458,7 @@
         "message": "Níl"
     },
     "no_file_chosen_9a880793": {
-        "message": "Níor roghnaíodh aon chomhad"
+        "message": "Níor roghnaíodh comhad"
     },
     "no_headers_9bc7dc7f": {
         "message": "Gan ceanntásca"
@@ -1935,7 +1935,7 @@
         "message": "Géar (Ceol)"
     },
     "shift_arrows_4d5785fe": {
-        "message": "SHIFT+Saigheada"
+        "message": "SaigheadaSHIFT+"
     },
     "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
         "message": "Shift-O chun an t-eagarthóir deas html a oscailt."
@@ -2586,7 +2586,7 @@
         "message": "Seans go bhfuil do ceamara gréasáin in úsáid cheana féin."
     },
     "zeta_5ef24f0e": {
-        "message": "Zéite"
+        "message": "Zeta"
     },
     "zoom_f3e54d69": {
         "message": "Súmáil"

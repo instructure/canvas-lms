@@ -91,7 +91,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to update modules (edit module settings, publish, unpublish, batch edit).'
+        'Allows user to update modules (edit module settings, publish, unpublish, batch edit, assign modules).'
       ),
     },
     {
@@ -270,7 +270,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to update modules (edit module settings, publish, unpublish, batch edit).'
+        'Allows user to update modules (edit module settings, publish, unpublish, batch edit, assign modules).'
       ),
     },
     {

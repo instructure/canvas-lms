@@ -19,6 +19,10 @@
 
 module Lti
   module IMS
+    # @API LTI Dynamic Registrations
+    # @internal
+    # Implements the 1EdTech LTI 1.3 Dynamic Registration <a href="/doc/api/registration.html">spec</a>.
+    # See the <a href="/doc/api/registration.html">Registration guide</a> for how to use this API.
     class DynamicRegistrationController < ApplicationController
       REGISTRATION_TOKEN_EXPIRATION = 1.hour
 
@@ -97,6 +101,10 @@ module Lti
         render json: registration
       end
 
+      # @API Create a Dynamic Registration
+      # The final step of the Dynamic Registration process.
+      # Refer to the Registration guide linked at the top of this page for usage of this endpoint.
+      # Requires special Dynamic Registration token and is not for out-of-band use.
       def create
         access_token = AuthenticationMethods.access_token(request)
         jwt = Canvas::Security.decode_jwt(access_token)
@@ -134,6 +142,7 @@ module Lti
 
         root_account.shard.activate do
           developer_key = DeveloperKey.new(
+            current_user: User.find(jwt["user_id"]),
             name: registration_params["client_name"],
             account: root_account.site_admin? ? nil : root_account,
             redirect_uris: registration_params["redirect_uris"],

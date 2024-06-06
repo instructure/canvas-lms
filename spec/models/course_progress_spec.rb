@@ -94,7 +94,15 @@ describe CourseProgress do
                              })
     end
 
+    it "only runs item visibility methods once with selective_release_backend enabled" do
+      Account.site_admin.enable_feature!(:selective_release_backend)
+      expect(AssignmentVisibility::AssignmentVisibilityService).to receive(:visible_assignment_ids_in_course_by_user).once.and_call_original
+      progress = CourseProgress.new(@course, @user).to_json
+      expect(progress[:requirement_count]).to eq 5
+    end
+
     it "only runs item visibility methods once" do
+      Account.site_admin.disable_feature!(:selective_release_backend)
       expect(AssignmentStudentVisibility).to receive(:visible_assignment_ids_in_course_by_user).once.and_call_original
       progress = CourseProgress.new(@course, @user).to_json
       expect(progress[:requirement_count]).to eq 5

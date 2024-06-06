@@ -29,9 +29,7 @@ import {ConversationContext} from '../../../util/constants'
 import * as utils from '../../../util/utils'
 import * as uploadFileModule from '@canvas/upload-file'
 
-jest.mock('@canvas/upload-file', () => ({
-  uploadFiles: jest.fn().mockResolvedValue([]), // Or any initial mock setup
-}))
+jest.mock('@canvas/upload-file')
 
 jest.mock('../../../util/utils', () => ({
   responsiveQuerySizes: jest.fn().mockReturnValue({
@@ -84,7 +82,7 @@ describe('ComposeModalContainer', () => {
     conversation,
     selectedIds = ['1'],
     isSubmissionCommentsType = false,
-    inboxSettingsFeature = false,
+    inboxSignatureBlock = false,
   } = {}) =>
     render(
       <ApolloProvider client={mswClient}>
@@ -99,7 +97,7 @@ describe('ComposeModalContainer', () => {
               conversation={conversation}
               onSelectedIdsChange={jest.fn()}
               selectedIds={selectedIds}
-              inboxSettingsFeature={inboxSettingsFeature}
+              inboxSignatureBlock={inboxSignatureBlock}
             />
           </ConversationContext.Provider>
         </AlertManagerContext.Provider>
@@ -144,8 +142,7 @@ describe('ComposeModalContainer', () => {
     })
   })
 
-  // VICE-4065 - remove or rewrite to remove spies on responsiveQuerySizes import
-  describe.skip('Attachments', () => {
+  describe('Attachments', () => {
     it('attempts to upload a file', async () => {
       uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'file1.jpg'}])
       const {findByTestId} = setup()
@@ -515,11 +512,9 @@ describe('ComposeModalContainer', () => {
   })
 
   describe('Inbox Settings Loader', () => {
-    it('shows loader when inboxSettingsFeature flag is enabled', async () => {
-      const {getByText} = setup({inboxSettingsFeature: true})
-      await waitFor(() => {
-        expect(getByText('Loading Inbox Settings')).toBeInTheDocument()
-      })
+    it('shows loader when Inbox Signature Block Setting is enabled', async () => {
+      const {findAllByText} = setup({inboxSignatureBlock: true})
+      expect((await findAllByText('Loading Inbox Settings')).length).toBe(2)
     })
   })
 })

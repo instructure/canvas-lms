@@ -29,6 +29,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
+import {Heading} from '@instructure/ui-heading'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import ModalSpinner from '../ComposeModalContainer/ModalSpinner'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
@@ -43,6 +44,8 @@ import type {FormMessage} from '@instructure/ui-form-field'
 const I18n = useI18nScope('conversations_2')
 
 export interface Props {
+  inboxSignatureBlock: boolean
+  inboxAutoResponse: boolean
   onDismissWithAlert: (arg?: string) => void
 }
 
@@ -59,7 +62,11 @@ export const defaultInboxSettings: InboxSettings = {
   outOfOfficeMessage: '',
 }
 
-const InboxSettingsModalContainer = ({onDismissWithAlert}: Props) => {
+const InboxSettingsModalContainer = ({
+  inboxSignatureBlock,
+  inboxAutoResponse,
+  onDismissWithAlert,
+}: Props) => {
   const [isOpen, setIsOpen] = useState<boolean>(true)
   const [isExited, setIsExited] = useState<boolean>(false)
   const [alert, setAlert] = useState<string>('')
@@ -363,16 +370,33 @@ const InboxSettingsModalContainer = ({onDismissWithAlert}: Props) => {
     />
   )
 
-  const onSaveInboxSettingsHandler = () =>
+  const onSaveInboxSettingsHandler = () => {
+    let firstDateError = false
+    let lastDateError = false
+    let subjectError = false
+    let messageError = false
+    let signatureError = false
+
+    if (inboxSignatureBlock) {
+      signatureError = !validateSignatureOnSave()
+    }
+    if (inboxAutoResponse) {
+      firstDateError = !validateFirstDateOnSave()
+      lastDateError = !validateLastDateOnSave()
+      subjectError = !validateSubjectOnSave()
+      messageError = !validateMessageOnSave()
+    }
+
     validateForm({
-      firstDateError: !validateFirstDateOnSave(),
-      lastDateError: !validateLastDateOnSave(),
-      subjectError: !validateSubjectOnSave(),
-      messageError: !validateMessageOnSave(),
-      signatureError: !validateSignatureOnSave(),
+      firstDateError,
+      lastDateError,
+      subjectError,
+      messageError,
+      signatureError,
     })
       ? saveInboxSettings()
       : focusOnError()
+  }
 
   const loadInboxSettingsSpinner = () => (
     <ModalSpinner
@@ -415,122 +439,138 @@ const InboxSettingsModalContainer = ({onDismissWithAlert}: Props) => {
           >
             <Modal.Body padding={responsiveProps?.modalBodyPadding || 'medium'}>
               <>
-                <View as="div">
-                  <Text weight="bold">{I18n.t('Out of Office')}</Text>
-                </View>
-                <View as="div" padding="x-small 0 0">
-                  {I18n.t('Send automatic replies to incoming mail.')}
-                </View>
-                <View as="div" padding="small 0 x-small 0">
-                  <RadioInputGroup
-                    name="response_toggle"
-                    description={
-                      <ScreenReaderContent>{I18n.t('Response On/Off')}</ScreenReaderContent>
-                    }
-                    value={formState.useOutOfOffice ? 'true' : 'false'}
-                    onChange={radioGroupInput =>
-                      onUseOutOfOffice(radioGroupInput.currentTarget.value)
-                    }
-                  >
-                    <RadioInput label={I18n.t('Response Off')} value="false" />
-                    <RadioInput label={I18n.t('Response On')} value="true" />
-                  </RadioInputGroup>
-                </View>
-                <View as="div">
-                  {!responsiveProps?.isMobile ? (
-                    <Flex
-                      justifyItems="space-between"
-                      alignItems="start"
-                      padding="small 0 x-small 0"
-                    >
-                      <Flex.Item
-                        padding="none small none none"
-                        shouldShrink={true}
-                        shouldGrow={true}
+                {inboxAutoResponse && (
+                  <>
+                    <View as="div">
+                      <Heading level="h3">
+                        <Text weight="bold">{I18n.t('Out of Office')}</Text>
+                      </Heading>
+                    </View>
+                    <View as="div" padding="x-small 0">
+                      <Text size="small">{I18n.t('Send automatic replies to incoming mail.')}</Text>
+                    </View>
+                    <View as="div" padding="small 0 x-small 0">
+                      <RadioInputGroup
+                        name="response_toggle"
+                        description={
+                          <ScreenReaderContent>
+                            {I18n.t('Out of Office Response')}
+                          </ScreenReaderContent>
+                        }
+                        value={formState.useOutOfOffice ? 'true' : 'false'}
+                        onChange={radioGroupInput =>
+                          onUseOutOfOffice(radioGroupInput.currentTarget.value)
+                        }
                       >
-                        {firstDateInput()}
-                      </Flex.Item>
-                      <Flex.Item
-                        padding="none none none small"
-                        shouldShrink={true}
-                        shouldGrow={true}
-                      >
-                        {lastDateInput()}
-                      </Flex.Item>
-                    </Flex>
-                  ) : (
-                    <>
+                        <RadioInput label={I18n.t('Response Off')} value="false" />
+                        <RadioInput label={I18n.t('Response On')} value="true" />
+                      </RadioInputGroup>
+                    </View>
+                    <View as="div">
+                      {!responsiveProps?.isMobile ? (
+                        <Flex
+                          justifyItems="space-between"
+                          alignItems="start"
+                          padding="small 0 x-small 0"
+                        >
+                          <Flex.Item
+                            padding="none small none none"
+                            shouldShrink={true}
+                            shouldGrow={true}
+                          >
+                            {firstDateInput()}
+                          </Flex.Item>
+                          <Flex.Item
+                            padding="none none none small"
+                            shouldShrink={true}
+                            shouldGrow={true}
+                          >
+                            {lastDateInput()}
+                          </Flex.Item>
+                        </Flex>
+                      ) : (
+                        <>
+                          <View as="div" padding="small 0 x-small 0">
+                            {firstDateInput()}
+                          </View>
+                          <View as="div" padding="small 0 x-small 0">
+                            {lastDateInput()}
+                          </View>
+                        </>
+                      )}
                       <View as="div" padding="small 0 x-small 0">
-                        {firstDateInput()}
+                        <TextInput
+                          renderLabel={I18n.t('Subject*')}
+                          placeholder={I18n.t('Enter Subject')}
+                          interaction={formState.useOutOfOffice ? 'enabled' : 'disabled'}
+                          value={formState.outOfOfficeSubject || ''}
+                          onChange={(_e, value) => onOutOfOfficeSubjectChange(value)}
+                          inputRef={setSubjectRef}
+                          messages={subjectError}
+                          isRequired={formState.useOutOfOffice}
+                          data-testid="out-of-office-subject-input"
+                        />
                       </View>
                       <View as="div" padding="small 0 x-small 0">
-                        {lastDateInput()}
+                        <TextArea
+                          label={I18n.t('Message')}
+                          height="8rem"
+                          maxHeight="10rem"
+                          placeholder={I18n.t('Add Message')}
+                          value={formState.outOfOfficeMessage || ''}
+                          disabled={!formState.useOutOfOffice}
+                          onChange={e => onOutOfOfficeMessageChange(e.currentTarget.value)}
+                          textareaRef={setMessageRef}
+                          messages={messageError}
+                        />
                       </View>
-                    </>
-                  )}
-                  <View as="div" padding="small 0 x-small 0">
-                    <TextInput
-                      renderLabel={I18n.t('Subject*')}
-                      placeholder={I18n.t('Enter Subject')}
-                      interaction={formState.useOutOfOffice ? 'enabled' : 'disabled'}
-                      value={formState.outOfOfficeSubject || ''}
-                      onChange={(_e, value) => onOutOfOfficeSubjectChange(value)}
-                      inputRef={setSubjectRef}
-                      messages={subjectError}
-                    />
-                  </View>
-                  <View as="div" padding="small 0 x-small 0">
-                    <Text weight="bold">{I18n.t('Message')}</Text>
-                  </View>
-                  <TextArea
-                    label={<ScreenReaderContent>{I18n.t('Message')}</ScreenReaderContent>}
-                    height="8rem"
-                    maxHeight="10rem"
-                    placeholder={I18n.t('Add Message')}
-                    value={formState.outOfOfficeMessage || ''}
-                    disabled={!formState.useOutOfOffice}
-                    onChange={e => onOutOfOfficeMessageChange(e.currentTarget.value)}
-                    textareaRef={setMessageRef}
-                    messages={messageError}
-                  />
-                </View>
-                <View as="div" padding="large 0 0">
-                  <Text weight="bold">{I18n.t('Signature')}</Text>
-                </View>
-                <View as="div" padding="x-small 0">
-                  {I18n.t('Signature will be added at the end of all messaging.')}
-                </View>
-                <View as="div" padding="small 0 x-small 0">
-                  <RadioInputGroup
-                    name="signature_toggle"
-                    description={
-                      <ScreenReaderContent>{I18n.t('Signature On/Off')}</ScreenReaderContent>
-                    }
-                    value={formState.useSignature ? 'true' : 'false'}
-                    onChange={radioGroupInput => {
-                      onUseSignature(radioGroupInput.currentTarget.value)
-                    }}
-                  >
-                    <RadioInput label={I18n.t('Signature Off')} value="false" />
-                    <RadioInput label={I18n.t('Signature On')} value="true" />
-                  </RadioInputGroup>
-                </View>
-                <View as="div">
-                  <View as="div" padding="small 0 x-small 0">
-                    <Text weight="bold">{I18n.t('Add Signature*')}</Text>
-                  </View>
-                  <TextArea
-                    label={<ScreenReaderContent>{I18n.t('Signature')}</ScreenReaderContent>}
-                    height="8rem"
-                    maxHeight="10rem"
-                    placeholder={I18n.t('Add Signature')}
-                    value={formState.signature}
-                    disabled={!formState.useSignature}
-                    onChange={e => onSignatureChange(e.currentTarget.value)}
-                    textareaRef={setSignatureRef}
-                    messages={signatureError}
-                  />
-                </View>
+                    </View>
+                  </>
+                )}
+                {inboxSignatureBlock && (
+                  <>
+                    <View as="div" padding={inboxAutoResponse ? 'large 0 0' : '0 0 0'}>
+                      <Heading level="h3">
+                        <Text weight="bold">{I18n.t('Signature')}</Text>
+                      </Heading>
+                    </View>
+                    <View as="div" padding="x-small 0">
+                      <Text size="small">
+                        {I18n.t('Signature will be added at the end of all messaging.')}
+                      </Text>
+                    </View>
+                    <View as="div" padding="small 0 x-small 0">
+                      <RadioInputGroup
+                        name="signature_toggle"
+                        description={
+                          <ScreenReaderContent>{I18n.t('Signature On/Off')}</ScreenReaderContent>
+                        }
+                        value={formState.useSignature ? 'true' : 'false'}
+                        onChange={radioGroupInput => {
+                          onUseSignature(radioGroupInput.currentTarget.value)
+                        }}
+                      >
+                        <RadioInput label={I18n.t('Signature Off')} value="false" />
+                        <RadioInput label={I18n.t('Signature On')} value="true" />
+                      </RadioInputGroup>
+                    </View>
+                    <View as="div" padding="small 0 x-small 0">
+                      <TextArea
+                        label={I18n.t('Signature*')}
+                        height="8rem"
+                        maxHeight="10rem"
+                        placeholder={I18n.t('Add Signature')}
+                        value={formState.signature}
+                        disabled={!formState.useSignature}
+                        onChange={e => onSignatureChange(e.currentTarget.value)}
+                        textareaRef={setSignatureRef}
+                        messages={signatureError}
+                        required={formState.useSignature}
+                        data-testid="inbox-signature-input"
+                      />
+                    </View>
+                  </>
+                )}
               </>
             </Modal.Body>
             <Modal.Footer>

@@ -112,7 +112,7 @@ GEM
       mime-types-data (~> 3.2015)
     mime-types-data (3.2024.0507)
     mini_portile2 (2.8.6)
-    minitest (5.23.0)
+    minitest (5.23.1)
     net-http (0.4.1)
       uri
     nokogiri (1.16.5)
@@ -148,7 +148,7 @@ GEM
     rake (13.2.1)
     redis (5.2.0)
       redis-client (>= 0.22.0)
-    redis-client (0.22.1)
+    redis-client (0.22.2)
       connection_pool
     redis-cluster-client (0.10.0)
       redis-client (~> 0.22)
@@ -207,4 +207,4 @@ RUBY VERSION
    ruby 3.1.2p20
 
 BUNDLED WITH
-   2.5.9
+   2.5.10

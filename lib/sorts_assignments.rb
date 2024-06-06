@@ -68,9 +68,9 @@ class SortsAssignments
     @filters ||= {
       has_no_date: ->(scope) { scope.where(submissions: { cached_due_date: nil }) },
       has_date: ->(scope) { scope.where.not(submissions: { cached_due_date: nil }) },
-      past_due: ->(scope) { scope.where("submissions.cached_due_date < ?", @now) },
+      past_due: ->(scope) { scope.where(submissions: { cached_due_date: ...@now }) },
       due_in_future: ->(scope) { scope.where("submissions.cached_due_date IS NULL OR submissions.cached_due_date >= ?", @now) },
-      due_soon: ->(scope) { scope.where("submissions.cached_due_date >= ? AND submissions.cached_due_date <= ?", @now, 1.week.from_now(@now)) },
+      due_soon: ->(scope) { scope.where(submissions: { cached_due_date: @now..1.week.from_now(@now) }) },
       expects_submission: lambda do |additional_excludes: ["external_tool"]|
         ->(scope) { scope.expecting_submission(additional_excludes:) }
       end,

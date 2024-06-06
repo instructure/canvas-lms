@@ -57,11 +57,11 @@ module NewQuizzesFeaturesHelper
     context.feature_enabled?(:quizzes_next) && Account.site_admin.feature_enabled?(:new_quizzes_migrate_without_content_rewrite)
   end
 
-  def new_quizzes_common_cartridge_enabled?(context = @context)
-    context.feature_enabled?(:quizzes_next) && Account.site_admin.feature_enabled?(:new_quizzes_common_cartridge)
+  def new_quizzes_common_cartridge_enabled?
+    Account.site_admin.feature_enabled?(:new_quizzes_common_cartridge)
   end
 
   def common_cartridge_qti_new_quizzes_import_enabled?(context = @context)
-    context.feature_enabled?(:quizzes_next) && context.root_account.feature_enabled?(:new_quizzes_migration) && Account.site_admin.feature_enabled?(:common_cartridge_qti_new_quizzes_import)
+    context.root_account.feature_enabled?(:new_quizzes_migration) && Account.site_admin.feature_enabled?(:common_cartridge_qti_new_quizzes_import)
   end
 end

@@ -20,7 +20,7 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {tabIdFromElement} from './course_settings_helper'
-import * as tz from '@canvas/datetime'
+import {isMidnight} from '@instructure/moment-utils'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
 import 'jqueryui/dialog'
@@ -439,9 +439,9 @@ $(document).ready(function () {
     const $warning = $course_form.find('#course_conclude_at_warning')
     const $parent = $(this).parent()
     const date = $(this).data('unfudged-date')
-    const isMidnight = tz.isMidnight(date)
-    $warning.detach().appendTo($parent).showIf(isMidnight)
-    $(this).attr('aria-describedby', isMidnight ? 'course_conclude_at_warning' : null)
+    const isMidnight_ = isMidnight(date)
+    $warning.detach().appendTo($parent).showIf(isMidnight_)
+    $(this).attr('aria-describedby', isMidnight_ ? 'course_conclude_at_warning' : null)
   })
   $course_form.formSubmit({
     beforeSubmit(data) {

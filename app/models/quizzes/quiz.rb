@@ -349,7 +349,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       super(Time.zone.parse(val))
       self.lock_at = CanvasTime.fancy_midnight(lock_at) unless val.include?(":")
     else
-      super(val)
+      super
     end
   end
 
@@ -359,7 +359,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       super(Time.zone.parse(val))
       infer_times unless val.include?(":")
     else
-      super(val)
+      super
     end
   end
 
@@ -1184,6 +1184,9 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     given { |user| context.grants_right?(user, :view_quiz_answer_audits) }
     can :view_answer_audits
+
+    given { |user, session| user && context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit) }
+    can :manage_assign_to
   end
 
   scope :include_assignment, -> { preload(:assignment) }
@@ -1194,9 +1197,18 @@ class Quizzes::Quiz < ActiveRecord::Base
   scope :for_course, ->(course_id) { where(context_type: "Course", context_id: course_id) }
 
   # NOTE: only use for courses with differentiated assignments on
-  scope :visible_to_students_in_course_with_da, lambda { |student_ids, course_ids|
-    joins(:quiz_student_visibilities)
-      .where(quiz_student_visibilities: { user_id: student_ids, course_id: course_ids })
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students_in_courses(course_ids:, user_ids:).map(&:quiz_id)
+      if visible_quiz_ids.any?
+        where(id: visible_quiz_ids)
+      else
+        none
+      end
+    else
+      joins(:quiz_student_visibilities)
+        .where(quiz_student_visibilities: { user_id: user_ids, course_id: course_ids })
+    end
   }
 
   # Return all quizzes and their active overrides where either the
@@ -1565,8 +1577,19 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   # returns visible students for differentiated assignments
   def visible_students_with_da(context_students)
-    quiz_students = context_students.joins(:quiz_student_visibilities)
-                                    .where(quiz_student_visibilities: { quiz_id: id })
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      user_ids = context_students.pluck(:id)
+      visible_user_ids = QuizVisibility::QuizVisibilityService.quiz_visible_to_students(quiz_id: id, user_ids:).map(&:user_id)
+
+      quiz_students = if visible_user_ids.any?
+                        context_students.where(id: visible_user_ids)
+                      else
+                        none
+                      end
+    else
+      quiz_students = context_students.joins(:quiz_student_visibilities)
+                                      .where(quiz_student_visibilities: { quiz_id: id })
+    end
 
     # empty quiz_students means the quiz is for everyone
     return quiz_students if quiz_students.present?

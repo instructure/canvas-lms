@@ -123,7 +123,9 @@ describe "course settings/blueprint" do
       fj(".bcs__object-tab:contains('Assignments') .bcs_check_box-group label:contains('Content')").click
       fj(".bcs__object-tab:contains('Assignments') .bcs_check_box-group label:contains('Points')").click
 
-      fj(".bcs__object-tab:contains('Quizzes') .bcs_tab_indicator-icon button").click
+      button = fj(".bcs__object-tab:contains('Quizzes') .bcs_tab_indicator-icon button")
+      scroll_into_view(button)
+      button.click
       fj(".bcs__object-tab:contains('Quizzes') .bcs_check_box-group label:contains('Due Dates')").click
 
       expect_new_page_load { submit_form("#course_form") }

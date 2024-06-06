@@ -673,11 +673,11 @@ describe ContentTag do
 
       it "returns assignments if there is visibility" do
         create_section_override_for_assignment(@assignment, { course_section: @section })
-        expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@tag)
       end
 
       it "does not return assignments if there is no visibility" do
-        expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).not_to include(@tag)
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).not_to include(@tag)
       end
     end
 
@@ -700,18 +700,18 @@ describe ContentTag do
       end
 
       it "returns discussions without attached assignments" do
-        expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@tag)
       end
 
       it "returns discussions with attached assignments if there is visibility" do
         attach_assignment_to_discussion
         create_section_override_for_assignment(@assignment, { course_section: @section })
-        expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@tag)
       end
 
       it "does not return discussions with attached assignments if there is no visibility" do
         attach_assignment_to_discussion
-        expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).not_to include(@tag)
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).not_to include(@tag)
       end
     end
 
@@ -728,11 +728,11 @@ describe ContentTag do
 
       it "returns a quiz if there is visibility" do
         create_section_override_for_quiz(@quiz, course_section: @section)
-        expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@tag)
       end
 
       it "does not return quiz if there is not visibility" do
-        expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).not_to include(@tag)
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).not_to include(@tag)
       end
     end
 
@@ -741,7 +741,7 @@ describe ContentTag do
         @page = @course.wiki_pages.create!(title: "some page")
         @module = @course.context_modules.create!(name: "module")
         @tag = @module.add_item({ type: "WikiPage", title: "oh noes!" * 35, id: @page.id })
-        expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@tag)
       end
     end
   end
@@ -1038,7 +1038,7 @@ describe ContentTag do
 
   describe "#update_module_item_submissions" do
     before do
-      Account.site_admin.enable_feature!(:differentiated_modules)
+      Account.site_admin.enable_feature!(:selective_release_backend)
       course_factory
       @student1 = student_in_course(active_all: true, name: "Student 1").user
       @student2 = student_in_course(active_all: true, name: "Student 2").user

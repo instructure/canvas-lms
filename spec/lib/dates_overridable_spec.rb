@@ -284,7 +284,7 @@ shared_examples_for "all learning objects" do
       end
 
       it "works with an ADHOC context module override" do
-        Account.site_admin.enable_feature!(:differentiated_modules)
+        Account.site_admin.enable_feature!(:selective_release_backend)
         module1 = @course.context_modules.create!(name: "Module 1")
         overridable.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
 
@@ -467,7 +467,7 @@ shared_examples_for "all learning objects" do
 
   describe "all_assignment_overrides" do
     before do
-      Account.site_admin.enable_feature!(:differentiated_modules)
+      Account.site_admin.enable_feature!(:selective_release_backend)
       student_in_course(course:)
       override.override_lock_at(7.days.from_now)
       override.set_type = "ADHOC"
@@ -506,14 +506,14 @@ shared_examples_for "all learning objects" do
     end
 
     it "does not include context module overrides without the flag" do
-      Account.site_admin.disable_feature!(:differentiated_modules)
+      Account.site_admin.disable_feature!(:selective_release_backend)
       expect(overridable.all_assignment_overrides).not_to include(@module_override)
     end
   end
 
   describe "visible_to_everyone" do
     before do
-      Account.site_admin.enable_feature!(:differentiated_modules)
+      Account.site_admin.enable_feature!(:selective_release_backend)
       student_in_course(course:)
 
       @module1 = @course.context_modules.create!(name: "Module 1")

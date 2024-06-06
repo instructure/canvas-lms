@@ -31,7 +31,7 @@ export const A11Y_CHECKER_STYLE_ELEM_ID = 'a11y-checker-style'
 // Remove the current indicator(s) by removing the contents of
 // the style element
 export function clearIndicators(doc) {
-  const checker_style = doc.getElementById(A11Y_CHECKER_STYLE_ELEM_ID)
+  const checker_style = doc?.getElementById(A11Y_CHECKER_STYLE_ELEM_ID)
   if (checker_style) {
     checker_style.textContent = ''
   }

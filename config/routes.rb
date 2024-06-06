@@ -1917,6 +1917,11 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/developer_keys", action: :create
     end
 
+    scope(controller: "lti/registrations") do
+      delete "accounts/:account_id/lti_registrations/:id", action: :destroy
+      get "accounts/:account_id/lti_registrations/:id", action: :show
+    end
+
     scope(controller: :immersive_reader) do
       get "immersive_reader/authenticate", action: :authenticate
     end

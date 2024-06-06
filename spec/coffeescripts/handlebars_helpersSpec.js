@@ -23,13 +23,13 @@ import _ from 'lodash'
 import assertions from 'helpers/assertions'
 import fakeENV from 'helpers/fakeENV'
 import numberFormat from '@canvas/i18n/numberFormat'
-import tzInTest from '@canvas/datetime/specHelpers'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import chicago from 'timezone/America/Chicago'
 import newYork from 'timezone/America/New_York'
 import I18n from 'i18n-js'
-import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
+import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 
 const {helpers} = Handlebars
 const {contains} = assertions

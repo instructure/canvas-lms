@@ -233,7 +233,7 @@ const getMenuConfigs = props => {
     options.push({
       key: 'speedGrader',
       icon: <IconSpeedGraderSolid />,
-      label: I18n.t('Open in Speedgrader'),
+      label: I18n.t('Open in SpeedGrader'),
       selectionCallback: props.onOpenSpeedgrader,
     })
   }

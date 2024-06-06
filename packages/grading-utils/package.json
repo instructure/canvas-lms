@@ -10,6 +10,9 @@
   "author": "Instructure, Inc",
   "license": "AGPL-3.0",
   "dependencies": {
-    "big.js": "^5.2.2"
+    "big.js": "^6.2.1"
+  },
+  "devDependencies": {
+    "@types/big.js": "^6.2.2"
   }
 }

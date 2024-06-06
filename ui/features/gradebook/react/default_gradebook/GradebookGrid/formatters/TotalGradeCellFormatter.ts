@@ -44,7 +44,7 @@ function buildHiddenAssignmentsWarning() {
   return {
     icon: 'icon-off',
     warningText: I18n.t(
-      "This grade differs from the student's view of the grade because some assignment grades are not yet posted"
+      "This grade may differ from the student's view of the grade because some assignment grades are not yet posted"
     ),
   }
 }

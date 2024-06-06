@@ -19,12 +19,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import timezone from 'timezone'
-import tzInTest from '@canvas/datetime/specHelpers'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 import newYork from 'timezone/America/New_York'
 
 import AssessmentSummary from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AssessmentSummary'
 import {overallAnonymityStates} from 'ui/features/speed_grader/react/AssessmentAuditTray/AuditTrailHelpers'
-import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
+import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 
 const {FULL, NA, PARTIAL} = overallAnonymityStates
 

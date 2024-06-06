@@ -152,7 +152,7 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
   test('renders a warning when there are hidden assignments', () => {
     gradebook.listHiddenAssignments.returns([{id: '2301'}])
     const expectedTooltip =
-      "This grade differs from the student's view of the grade because some assignment grades are not yet posted"
+      "This grade may differ from the student's view of the grade because some assignment grades are not yet posted"
     strictEqual(getTooltip(), expectedTooltip)
   })
 

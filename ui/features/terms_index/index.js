@@ -24,7 +24,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/util/templateData'
 import replaceTags from '@canvas/util/replaceTags'
 import {underscoreString} from '@canvas/convert-case'
-import {dateString} from '@canvas/datetime/date-functions'
+import {dateString} from '@instructure/moment-utils'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('terms.index')

@@ -127,7 +127,7 @@
 #       wait_for_ajaximations
 #       page_load_end_time = Time.zone.now
 #       load_time = page_load_end_time - page_load_start_time
-#       puts "\nPage:Speedgrader Submissions:200,000 Expected_Load:100 Actual_Load:#{load_time}"
+#       puts "\nPage:SpeedGrader Submissions:200,000 Expected_Load:100 Actual_Load:#{load_time}"
 #       expect(load_time).to be < 100
 #     end
 #   end
@@ -149,7 +149,7 @@
 #       wait_for_ajaximations
 #       page_load_end_time = Time.zone.now
 #       load_time = page_load_end_time - page_load_start_time
-#       puts "\nPage:Speedgrader Submissions:100,000_2000x50 Expected_Load:45 Actual_Load:#{load_time}"
+#       puts "\nPage:SpeedGrader Submissions:100,000_2000x50 Expected_Load:45 Actual_Load:#{load_time}"
 #       expect(load_time).to be < 45
 #     end
 #   end
@@ -172,7 +172,7 @@
 #       wait_for_ajaximations
 #       page_load_end_time = Time.zone.now
 #       load_time = page_load_end_time - page_load_start_time
-#       puts "\nPage:Speedgrader Submissions:100,000_2000x50 Expected_Load:19 Actual_Load:#{load_time}"
+#       puts "\nPage:SpeedGrader Submissions:100,000_2000x50 Expected_Load:19 Actual_Load:#{load_time}"
 #       expect(load_time).to be < 19
 #     end
 #   end
@@ -194,7 +194,7 @@
 #       wait_for_ajaximations
 #       page_load_end_time = Time.zone.now
 #       load_time = page_load_end_time - page_load_start_time
-#       puts "\nPage:Speedgrader Submissions:10,000 Expected_Load:10 Actual_Load:#{load_time}"
+#       puts "\nPage:SpeedGrader Submissions:10,000 Expected_Load:10 Actual_Load:#{load_time}"
 #       expect(load_time).to be < 10
 #     end
 #   end

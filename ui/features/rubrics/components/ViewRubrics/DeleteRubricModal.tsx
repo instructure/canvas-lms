@@ -111,7 +111,7 @@ export const DeleteRubricModal = ({
             onClick={() => mutate()}
             color="danger"
             type="submit"
-            data-testid="delete-rubric-button"
+            data-testid="delete-rubric-modal-button"
           >
             {I18n.t('Delete')}
           </Button>

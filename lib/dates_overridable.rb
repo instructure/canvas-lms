@@ -80,7 +80,7 @@ module DatesOverridable
   end
 
   def all_assignment_overrides
-    if Account.site_admin.feature_enabled? :differentiated_modules
+    if Account.site_admin.feature_enabled? :selective_release_backend
       assignment_overrides.or(context_module_overrides)
     else
       assignment_overrides.where.not(set_type: "Course")
@@ -92,7 +92,7 @@ module DatesOverridable
   end
 
   def visible_to_everyone
-    if Account.site_admin.feature_enabled? :differentiated_modules
+    if Account.site_admin.feature_enabled? :selective_release_backend
       if is_a?(DiscussionTopic)
         # need to check if is_section_specific for ungraded discussions
         # this column will eventually be deprecated and then this can be removed

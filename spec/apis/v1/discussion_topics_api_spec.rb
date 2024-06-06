@@ -694,7 +694,7 @@ describe DiscussionTopicsController, type: :request do
         "comments_disabled" => false,
         "locked_for_user" => false,
         "author" => user_display_json(@topic.user, @topic.context).stringify_keys!,
-        "permissions" => { "delete" => true, "attach" => true, "update" => true, "reply" => true },
+        "permissions" => { "delete" => true, "attach" => true, "update" => true, "reply" => true, "manage_assign_to" => true },
         "can_group" => true,
         "allow_rating" => false,
         "only_graders_can_rate" => false,
@@ -1167,7 +1167,7 @@ describe DiscussionTopicsController, type: :request do
 
       describe "differentiated modules" do
         before do
-          Account.site_admin.enable_feature! :differentiated_modules
+          Account.site_admin.enable_feature! :selective_release_backend
         end
 
         context "ungraded discussions" do
@@ -2257,7 +2257,7 @@ describe DiscussionTopicsController, type: :request do
       "topic_children" => [],
       "group_topic_children" => [],
       "discussion_type" => "side_comment",
-      "permissions" => { "delete" => true, "attach" => true, "update" => true, "reply" => true },
+      "permissions" => { "delete" => true, "attach" => true, "update" => true, "reply" => true, "manage_assign_to" => false },
       "locked" => false,
       "can_lock" => true,
       "comments_disabled" => false,
@@ -2331,7 +2331,8 @@ describe DiscussionTopicsController, type: :request do
         "attach" => false,
         "update" => true,
         "reply" => true,
-        "delete" => true
+        "delete" => true,
+        "manage_assign_to" => false
       },
       "pinned" => false,
       "podcast_has_student_posts" => false,

@@ -22,7 +22,7 @@ module Canvas
     include Canvas::APISerialization
 
     def initialize(object, options = {})
-      super(object, options)
+      super
       @options = options
       @controller = options.fetch(:controller)
       @sideloads  = options.fetch(:includes, [])

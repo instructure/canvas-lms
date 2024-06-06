@@ -19,11 +19,10 @@
 #
 
 require_relative "../api_spec_helper"
-require_relative "../../cassandra_spec_helper"
 
 describe "AuthenticationAudit API", type: :request do
   before do
-    Setting.set("enable_page_views", "cassandra")
+    Setting.set("enable_page_views", "db")
     @request_id = SecureRandom.uuid
     allow(RequestContextGenerator).to receive_messages(request_id: @request_id)
 

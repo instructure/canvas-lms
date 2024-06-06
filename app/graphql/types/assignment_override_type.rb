@@ -68,7 +68,10 @@ module Types
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
-    implements Interfaces::LegacyIDInterface
+
+    # IDs could be nil since DiscussionTopicSectionVisibilities are not persisted
+    # So we use expect null IDs instead of implementing Interfaces::LegacyIDInterface
+    field :_id, ID, "legacy canvas id", method: :id, null: true
 
     alias_method :override, :object
 

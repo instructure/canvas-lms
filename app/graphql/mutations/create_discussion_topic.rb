@@ -34,18 +34,24 @@ class Types::DiscussionTopicAnonymousStateType < Types::BaseEnum
 end
 
 class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
+  include Api
+  include Api::V1::AssignmentOverride
+
   graphql_name "CreateDiscussionTopic"
 
   argument :is_announcement, Boolean, required: false
   argument :is_anonymous_author, Boolean, required: false
   argument :anonymous_state, Types::DiscussionTopicAnonymousStateType, required: false
-  argument :context_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Context")
+  argument :context_id, GraphQL::Schema::Object::ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Context")
   argument :context_type, Types::DiscussionTopicContextType, required: true
   argument :assignment, Mutations::AssignmentBase::AssignmentCreate, required: false
+  argument :ungraded_discussion_overrides, [Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate], required: false
 
   # most arguments inherited from DiscussionBase
 
   def resolve(input:)
+    @current_user = current_user
+
     discussion_topic_context = find_context(input)
     return validation_error(I18n.t("Invalid context")) unless discussion_topic_context
 
@@ -110,7 +116,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
     end
 
     process_common_inputs(input, is_announcement, discussion_topic)
-    process_future_date_inputs(input[:delayed_post_at], input[:lock_at], discussion_topic)
+    process_future_date_inputs(input.slice(:delayed_post_at, :lock_at), discussion_topic)
     process_locked_parameter(input[:locked], discussion_topic)
 
     if input.key?(:assignment) && input[:assignment].present?
@@ -143,6 +149,11 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
 
     discussion_topic.saved_by = :assignment if discussion_topic.assignment.present?
     return errors_for(discussion_topic) unless discussion_topic.save!
+
+    if input.key?(:ungraded_discussion_overrides)
+      overrides = input[:ungraded_discussion_overrides] || []
+      update_ungraded_discussion(discussion_topic, overrides)
+    end
 
     { discussion_topic: }
   rescue Checkpoints::DiscussionCheckpointError => e

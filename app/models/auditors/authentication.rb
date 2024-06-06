@@ -29,7 +29,7 @@ class Auditors::Authentication
     end
 
     def initialize(*args)
-      super(*args)
+      super
 
       if attributes["pseudonym"]
         self.pseudonym = attributes.delete("pseudonym")
@@ -52,27 +52,17 @@ class Auditors::Authentication
 
   Stream = Auditors.stream do
     auth_ar_type = Auditors::ActiveRecord::AuthenticationRecord
-    active_record_type auth_ar_type
-    record_type Auditors::Authentication::Record
+    record_type auth_ar_type
 
     add_index :pseudonym do
-      table :authentications_by_pseudonym
-      entry_proc ->(record) { record.pseudonym }
-      key_proc ->(pseudonym) { pseudonym.global_id }
       ar_scope_proc ->(pseudonym) { auth_ar_type.where(pseudonym_id: pseudonym.id) }
     end
 
     add_index :user do
-      table :authentications_by_user
-      entry_proc ->(record) { record.user }
-      key_proc ->(user) { user.global_id }
       ar_scope_proc ->(user) { auth_ar_type.where(user_id: user.id) }
     end
 
     add_index :account do
-      table :authentications_by_account
-      entry_proc ->(record) { record.account }
-      key_proc ->(account) { account.global_id }
       ar_scope_proc ->(account) { auth_ar_type.where(account_id: account.id) }
     end
   end

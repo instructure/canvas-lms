@@ -25,7 +25,7 @@ import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
 import GradebookExportManager from '../../shared/GradebookExportManager'
 import PostGradesApp from '../../SISGradePassback/PostGradesApp'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/moment-utils'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
@@ -291,7 +291,11 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
   renderPostGradesFeature() {
     const sisName = this.props.postGradesFeature.label || I18n.t('SIS')
     return (
-      <MenuItem onSelect={this.launchPostGrades} key="post_grades_feature_tool">
+      <MenuItem
+        onSelect={this.launchPostGrades}
+        key="post_grades_feature_tool"
+        data-testid="post_grades_feature_tool"
+      >
         <span data-menu-id="post_grades_feature_tool">
           {I18n.t('Sync to %{sisName}', {sisName})}
         </span>

@@ -22,7 +22,7 @@ require_relative "../../helpers/speed_grader_common"
 require_relative "../../helpers/gradebook_common"
 require_relative "../pages/speedgrader_page"
 
-describe "speed grader - grade display" do
+describe "SpeedGrader - grade display" do
   include_context "in-process server selenium tests"
   include SpeedGraderCommon
   include_context "late_policy_course_setup"

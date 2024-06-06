@@ -27,7 +27,7 @@
 import {reduce, each} from 'lodash'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/Syllabus.handlebars'
-import {fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
+import {fudgeDateForProfileTimezone} from '@instructure/moment-utils'
 
 function assignmentSubType(json) {
   if (/discussion/.test(json.submission_types)) return 'discussion_topic'

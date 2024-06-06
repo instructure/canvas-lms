@@ -128,7 +128,7 @@ export default function SubmissionDetailModal({
 
         <View as="div" margin="small 0" padding="0 medium">
           <Link href={speedGraderUrl()} isWithinText={false}>
-            {I18n.t('More details in the SpeedGrader')}
+            {I18n.t('More details in SpeedGrader')}
           </Link>
         </View>
 

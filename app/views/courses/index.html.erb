@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<% js_bundle :courses %>
+
 <%
   if k5_user?
     all_courses_title = t('All Subjects')
@@ -71,12 +73,38 @@
   <table id="my_courses_table" class="ic-Table ic-Table--bordered course-list-table">
     <thead>
       <tr>
-        <% if @show_star_column %><th scope="col" class="course-list-star-column"><span class="screenreader-only"><%= t ('Favorites') %></span></th><% end %>
-        <th scope="col" class="course-list-course-title-column course-list-no-left-border"><%= course_label %></th>
-        <th scope="col" class="course-list-nickname-column course-list-no-left-border"><%= t ('Nickname') %></th>
-        <th scope="col" class="course-list-term-column course-list-no-left-border"><%= t ('Term') %></th>
-        <th scope="col" class="course-list-enrolled-as-column course-list-no-left-border"><%= t ('Enrolled as') %></th>
-        <th scope="col" class="course-list-published-column course-list-no-left-border"><%= t ('Published') %></th>
+        <% if @show_star_column %>
+          <th scope="col" class="course-list-star-column course-list-column-header course-list-no-left-border">
+            <a href="<%= courses_path(get_courses_params("cc", "favorite", params)) %>" id="cc_favorite">
+              <%= t('Favorite') %> <i class="<%= "course-list-sort-icon #{params[:cc_sort] == "favorite" ? "sorted" : ""}" %> <%= get_sorting_icon("favorite", params[:cc_sort], params[:cc_order]) %>"></i>
+            </a>
+          </th>
+        <% end %>
+        <th scope="col" class="course-list-course-title-column course-list-column-header course-list-no-left-border">
+          <a href="<%= courses_path(get_courses_params("cc", "course", params)) %>" id="cc_course">
+            <%= course_label %> <i class="<%= "course-list-sort-icon #{params[:cc_sort] == "course" ? "sorted" : ""}" %> <%= get_sorting_icon("course", params[:cc_sort], params[:cc_order]) %>"></i>
+          </a>
+        </th>
+        <th scope="col" class="course-list-nickname-column course-list-column-header course-list-no-left-border">
+          <a href="<%= courses_path(get_courses_params("cc", "nickname", params)) %>" id="cc_nickname">
+            <%= t ('Nickname') %> <i class="<%= "course-list-sort-icon #{params[:cc_sort] == "nickname" ? "sorted" : ""}" %> <%= get_sorting_icon("nickname", params[:cc_sort], params[:cc_order]) %>"></i>
+          </a>
+        </th>
+        <th scope="col" class="course-list-term-column course-list-column-header course-list-no-left-border">
+          <a href="<%= courses_path(get_courses_params("cc", "term", params)) %>" id="cc_term">
+            <%= t ('Term') %> <i class="<%= "course-list-sort-icon #{params[:cc_sort] == "term" ? "sorted" : ""}" %> <%= get_sorting_icon("term", params[:cc_sort], params[:cc_order]) %>"></i>
+          </a>
+        </th>
+        <th scope="col" class="course-list-enrolled-as-column course-list-column-header course-list-no-left-border">
+          <a href="<%= courses_path(get_courses_params("cc", "enrolled_as", params)) %>" id="cc_enrolled_as">
+            <%= t ('Enrolled as') %> <i class="<%= "course-list-sort-icon #{params[:cc_sort] == "enrolled_as" ? "sorted" : ""}" %> <%= get_sorting_icon("enrolled_as", params[:cc_sort], params[:cc_order]) %>"></i>
+          </a>
+        </th>
+        <th scope="col" class="course-list-published-column course-list-column-header course-list-no-left-border">
+          <a href="<%= courses_path(get_courses_params("cc", "published", params)) %>" id="cc_published">
+            <%= t ('Published') %> <i class="<%= "course-list-sort-icon #{(params[:cc_sort] == "published" || params[:cc_sort].nil?) ? "sorted" : ""}" %> <%= get_sorting_icon("published", params[:cc_sort], params[:cc_order]) %>"></i>
+          </a>
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -95,12 +123,38 @@
   <table id="past_enrollments_table" class="ic-Table ic-Table--bordered course-list-table">
     <thead>
       <tr>
-        <% if @show_star_column %><th scope="col" class="course-list-star-column"><span class="screenreader-only"><%= t ('Favorites') %></span></th><% end %>
-        <th scope="col" class="course-list-course-title-column course-list-no-left-border"><%= course_label %></th>
-        <th scope="col" class="course-list-nickname-column course-list-no-left-border"><%= t ('Nickname') %></th>
-        <th scope="col" class="course-list-term-column course-list-no-left-border"><%= t ('Term') %></th>
-        <th scope="col" class="course-list-enrolled-as-column course-list-no-left-border"><%= t ('Enrolled as') %></th>
-        <th scope="col" class="course-list-published-column course-list-no-left-border"><%= t ('Published') %></th>
+        <% if @show_star_column %>
+          <th scope="col" class="course-list-star-column course-list-column-header course-list-no-left-border">
+            <a href="<%= courses_path(get_courses_params("pc", "favorite", params)) %>" id="pc_favorite">
+              <%= t('Favorite') %> <i class="<%= "course-list-sort-icon #{params[:pc_sort] == "favorite" ? "sorted" : ""}" %> <%= get_sorting_icon("favorite", params[:pc_sort], params[:pc_order]) %>"></i>
+            </a>
+          </th>
+        <% end %>
+        <th scope="col" class="course-list-course-title-column course-list-column-header course-list-no-left-border">
+          <a href="<%= courses_path(get_courses_params("pc", "course", params)) %>" id="pc_course">
+            <%= course_label %> <i class="<%= "course-list-sort-icon #{params[:pc_sort] == "course" ? "sorted" : ""}" %> <%= get_sorting_icon("course", params[:pc_sort], params[:pc_order]) %>"></i>
+          </a>
+        </th>
+        <th scope="col" class="course-list-nickname-column course-list-column-header course-list-no-left-border">
+          <a href="<%= courses_path(get_courses_params("pc", "nickname", params)) %>" id="pc_nickname">
+            <%= t ('Nickname') %> <i class="<%= "course-list-sort-icon #{params[:pc_sort] == "nickname" ? "sorted" : ""}" %> <%= get_sorting_icon("nickname", params[:pc_sort], params[:pc_order]) %>"></i>
+          </a>
+        </th>
+        <th scope="col" class="course-list-term-column course-list-column-header course-list-no-left-border">
+          <a href="<%= courses_path(get_courses_params("pc", "term", params)) %>" id="pc_term">
+            <%= t ('Term') %> <i class="<%= "course-list-sort-icon #{params[:pc_sort] == "term" ? "sorted" : ""}" %> <%= get_sorting_icon("term", params[:pc_sort], params[:pc_order]) %>"></i>
+          </a>
+        </th>
+        <th scope="col" class="course-list-enrolled-as-column course-list-column-header course-list-no-left-border">
+          <a href="<%= courses_path(get_courses_params("pc", "enrolled_as", params)) %>" id="pc_enrolled_as">
+            <%= t ('Enrolled as') %> <i class="<%= "course-list-sort-icon #{params[:pc_sort] == "enrolled_as" ? "sorted" : ""}" %> <%= get_sorting_icon("enrolled_as", params[:pc_sort], params[:pc_order]) %>"></i>
+          </a>
+        </th>
+        <th scope="col" class="course-list-published-column course-list-column-header course-list-no-left-border">
+          <a href="<%= courses_path(get_courses_params("pc", "published", params)) %>" id="pc_published">
+            <%= t ('Published') %> <i class="<%= "course-list-sort-icon #{(params[:pc_sort] == "published" || params[:pc_sort].nil?) ? "sorted" : ""}" %> <%= get_sorting_icon("published", params[:pc_sort], params[:pc_order]) %>"></i>
+          </a>
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -119,12 +173,38 @@
   <table id="future_enrollments_table" class="ic-Table ic-Table--bordered course-list-table">
     <thead>
       <tr>
-        <% if @show_star_column %><th scope="col" class="course-list-star-column"><span class="screenreader-only"><%= t ('Favorites') %></span></th><% end %>
-        <th scope="col" class="course-list-course-title-column course-list-no-left-border"><%= course_label %></th>
-        <th scope="col" class="course-list-nickname-column course-list-no-left-border"><%= t ('Nickname') %></th>
-        <th scope="col" class="course-list-term-column course-list-no-left-border"><%= t ('Term') %></th>
-        <th scope="col" class="course-list-enrolled-as-column course-list-no-left-border"><%= t ('Enrolled as') %></th>
-        <th scope="col" class="course-list-published-column course-list-no-left-border"><%= t ('Published') %></th>
+        <% if @show_star_column %>
+          <th scope="col" class="course-list-star-column course-list-column-header course-list-no-left-border">
+            <a href="<%= courses_path(get_courses_params("fc", "favorite", params)) %>" id="fc_favorite">
+              <%= t('Favorite') %> <i class="<%= "course-list-sort-icon #{params[:fc_sort] == "favorite" ? "sorted" : ""}" %> <%= get_sorting_icon("favorite", params[:fc_sort], params[:fc_order]) %>"></i>
+            </a>
+          </th>
+        <% end %>
+        <th scope="col" class="course-list-course-title-column course-list-column-header course-list-no-left-border">
+          <a href="<%= courses_path(get_courses_params("fc", "course", params)) %>" id="fc_course">
+            <%= course_label %> <i class="<%= "course-list-sort-icon #{params[:fc_sort] == "course" ? "sorted" : ""}" %> <%= get_sorting_icon("course", params[:fc_sort], params[:fc_order]) %>"></i>
+          </a>
+        </th>
+        <th scope="col" class="course-list-nickname-column course-list-column-header course-list-no-left-border">
+          <a href="<%= courses_path(get_courses_params("fc", "nickname", params)) %>" id="fc_nickname">
+            <%= t ('Nickname') %> <i class="<%= "course-list-sort-icon #{params[:fc_sort] == "nickname" ? "sorted" : ""}" %> <%= get_sorting_icon("nickname", params[:fc_sort], params[:fc_order]) %>"></i>
+          </a>
+        </th>
+        <th scope="col" class="course-list-term-column course-list-column-header course-list-no-left-border">
+          <a href="<%= courses_path(get_courses_params("fc", "term", params)) %>" id="fc_term">
+            <%= t ('Term') %> <i class="<%= "course-list-sort-icon #{params[:fc_sort] == "term" ? "sorted" : ""}" %> <%= get_sorting_icon("term", params[:fc_sort], params[:fc_order]) %>"></i> 
+          </a>
+        </th>
+        <th scope="col" class="course-list-enrolled-as-column course-list-column-header course-list-no-left-border">
+          <a href="<%= courses_path(get_courses_params("fc", "enrolled_as", params)) %>" id="fc_enrolled_as">
+            <%= t ('Enrolled as') %> <i class="<%= "course-list-sort-icon #{params[:fc_sort] == "enrolled_as" ? "sorted" : ""}" %> <%= get_sorting_icon("enrolled_as", params[:fc_sort], params[:fc_order]) %>"></i>
+          </a>
+        </th>
+        <th scope="col" class="course-list-published-column course-list-column-header course-list-no-left-border">
+          <a href="<%= courses_path(get_courses_params("fc", "published", params)) %>" id="fc_published">
+            <%= t ('Published') %> <i class="<%= "course-list-sort-icon #{(params[:fc_sort] == "published" || params[:fc_sort].nil?) ? "sorted" : ""}" %> <%= get_sorting_icon("published", params[:fc_sort], params[:fc_order]) %>"></i>
+          </a>
+        </th>
       </tr>
     </thead>
     <tbody>

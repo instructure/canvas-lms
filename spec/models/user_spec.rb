@@ -4584,12 +4584,13 @@ describe User do
       student_in_course(active_all: true)
     end
 
-    it "includes assignment and quiz ids with the differentiated_modules flag disabled" do
+    it "includes assignment and quiz ids with the selective_release_backend flag disabled" do
+      Account.site_admin.disable_feature!(:selective_release_backend)
       expect(@user.learning_object_visibilities(@course).keys).to contain_exactly(:assignment_ids, :quiz_ids)
     end
 
-    it "includes all learning object ids with the differentiated_modules flag enabled" do
-      Account.site_admin.enable_feature!(:differentiated_modules)
+    it "includes all learning object ids with the selective_release_backend flag enabled" do
+      Account.site_admin.enable_feature!(:selective_release_backend)
       expect(@user.learning_object_visibilities(@course).keys).to contain_exactly(:assignment_ids, :quiz_ids, :context_module_ids, :discussion_topic_ids, :wiki_page_ids)
     end
   end

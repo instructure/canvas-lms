@@ -300,7 +300,8 @@ class ConversationsController < ApplicationController
           MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size
         }
 
-        hash[:INBOX_SETTINGS_ENABLED] = Account.site_admin.feature_enabled?(:inbox_settings)
+        hash[:INBOX_SIGNATURE_BLOCK_ENABLED] = Account.site_admin.feature_enabled?(:inbox_settings) && @domain_root_account.enable_inbox_signature_block?
+        hash[:INBOX_AUTO_RESPONSE_ENABLED] = Account.site_admin.feature_enabled?(:inbox_settings) && @domain_root_account.enable_inbox_auto_response?
 
         notes_enabled_accounts = @current_user.associated_accounts.having_user_notes_enabled
 

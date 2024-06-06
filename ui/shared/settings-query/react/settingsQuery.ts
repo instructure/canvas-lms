@@ -39,6 +39,19 @@ export function getSetting({queryKey}: {queryKey: QueryKey}) {
   return Boolean(ENV.SETTINGS[setting])
 }
 
+export async function getSettingAsync({queryKey}: {queryKey: QueryKey}) {
+  const setting = queryKey[1] as Setting
+  if (!settings.includes(setting)) {
+    throw new Error('Invalid setting')
+  }
+  const {json} = await doFetchApi({
+    method: 'GET',
+    path: '/api/v1/users/self/settings',
+  })
+  ENV.SETTINGS[setting] = json[setting]
+  return Boolean(ENV.SETTINGS[setting])
+}
+
 export function setSetting({setting, newState}: {setting: Setting; newState: boolean}) {
   const oldValue = ENV.SETTINGS[setting]
 
@@ -47,6 +60,7 @@ export function setSetting({setting, newState}: {setting: Setting; newState: boo
 
   // use fetch
   return doFetchApi({
+    method: 'PUT',
     path: '/api/v1/users/self/settings',
     params: {[setting]: newState},
   })

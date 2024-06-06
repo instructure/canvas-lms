@@ -23,11 +23,15 @@ class AssignmentPage
 
     # Selectors
     def assign_to_button
-      f("button.assign-to-link")
+      f(assign_to_button_selector)
     end
 
     def course_pacing_notice_selector
       "[data-testid='CoursePacingNotice']"
+    end
+
+    def assign_to_button_selector
+      "button.assign-to-link"
     end
 
     def visit(course, assignment)

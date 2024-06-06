@@ -68,7 +68,7 @@ describe('StudentsSearcher', () => {
 
   it('shows action buttons when assignment is published', () => {
     const {getByText} = renderStudentsSearcher()
-    expect(closest(getByText('Speedgrader'), 'a')).toBeTruthy()
+    expect(closest(getByText('SpeedGrader'), 'a')).toBeTruthy()
     expect(closest(getByText('Message Students'), 'button')).toBeTruthy()
   })
 
@@ -88,7 +88,7 @@ describe('StudentsSearcher', () => {
 
   it('should open speedgrader link in a new tab', () => {
     const {getByText} = renderStudentsSearcher()
-    const sgLink = closest(getByText('Speedgrader'), 'a')
+    const sgLink = closest(getByText('SpeedGrader'), 'a')
     expect(sgLink.getAttribute('href')).toMatch(
       /\/courses\/course-lid\/gradebook\/speed_grader\?assignment_id=assignment-lid/
     )
@@ -98,7 +98,7 @@ describe('StudentsSearcher', () => {
   it('does not render submission and grading links when assignment is not published', () => {
     const assignment = mockAssignment({state: 'unpublished'})
     const {queryByText} = renderStudentsSearcher([], assignment)
-    expect(queryByText('Speedgrader', {exact: false})).toBeNull()
+    expect(queryByText('SpeedGrader', {exact: false})).toBeNull()
     expect(queryByText('Message Students', {exact: false})).toBeNull()
   })
 

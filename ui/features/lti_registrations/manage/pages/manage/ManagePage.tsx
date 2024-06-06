@@ -22,15 +22,21 @@ import {ExtensionsSearchBar} from './ExtensionsSearchBar'
 
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {Flex} from '@instructure/ui-flex'
 import {Pagination} from '@instructure/ui-pagination'
 import {Spinner} from '@instructure/ui-spinner'
-import {fetchRegistrations} from '../../api/registrations'
+import {
+  fetchRegistrations as apiFetchRegistrations,
+  deleteRegistration as apiDeleteRegistration,
+} from '../../api/registrations'
 import {ExtensionsTable} from './ExtensionsTable'
 import {MANAGE_EXTENSIONS_PAGE_LIMIT, mkUseManagePageState} from './ManagePageLoadingState'
 import {type ManageSearchParams, useManageSearchParams} from './ManageSearchParams'
 import {formatSearchParamErrorMessages} from '../../../common/lib/useZodParams/ParamsParseResult'
+import type {LtiRegistration} from '../../model/LtiRegistration'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const SEARCH_DEBOUNCE_MS = 250
 
@@ -54,14 +60,24 @@ type ManagePageInnerProps = {
   searchParams: ManageSearchParams
 }
 
-const useManagePageState = mkUseManagePageState(fetchRegistrations)
+const confirmDeletion = (registration: LtiRegistration): Promise<boolean> =>
+  confirmDanger({
+    title: I18n.t('Delete App'),
+    confirmButtonLabel: I18n.t('Delete'),
+    heading: I18n.t('You are about to delete “%{appName}”.', {appName: registration.name}),
+    message: I18n.t(
+      'You are removing the app from the entire account. It will be removed from its placements and any resource links to it will stop working. To reestablish placements and links, you will need to reinstall the app.'
+    ),
+  })
+
+const useManagePageState = mkUseManagePageState(apiFetchRegistrations, apiDeleteRegistration)
 
 export const ManagePageInner = (props: ManagePageInnerProps) => {
   const {sort, dir, page} = props.searchParams
 
   const [, setManageSearchParams] = useManageSearchParams()
 
-  const [extensions, {setStale}] = useManagePageState(props.searchParams)
+  const [extensions, {setStale, deleteRegistration}] = useManagePageState(props.searchParams)
 
   /**
    * Holds the state of the search input field
@@ -78,6 +94,22 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
       setManageSearchParams(params)
     },
     [setStale, setManageSearchParams]
+  )
+
+  const deleteApp = React.useCallback(
+    async (app: LtiRegistration) => {
+      if (await confirmDeletion(app)) {
+        const deleteResult = await deleteRegistration(app)
+        showFlashAlert({
+          type: deleteResult._type,
+          message:
+            deleteResult._type === 'error'
+              ? deleteResult.message
+              : I18n.t('App “%{appName}” successfully deleted', {appName: app.name}),
+        })
+      }
+    },
+    [deleteRegistration]
   )
 
   /**
@@ -114,7 +146,7 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
           return (
             <GenericErrorPage
               imageUrl={errorShipUrl}
-              errorSubject="LTI Registrations listing error"
+              errorSubject={I18n.t('LTI Registrations listing error')}
               error={extensions.message}
             />
           )
@@ -127,6 +159,7 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
                 sort={sort}
                 dir={dir}
                 updateSearchParams={updateSearchParams}
+                deleteApp={deleteApp}
               />
               <Pagination
                 as="nav"

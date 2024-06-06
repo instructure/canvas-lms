@@ -99,9 +99,20 @@ describe('IndexHeader', () => {
     const props = makeProps({searchDiscussions: filterMock()})
 
     render(<IndexHeader {...props} />)
-    const select = screen.getByRole('combobox')
-    userEvent.selectOptions(select, 'unread')
 
-    await waitFor(() => expect(filterMock).toHaveBeenCalled())
+    const filterDDown = screen.getByRole('combobox', {name: 'Discussion Filter'})
+
+    await userEvent.click(filterDDown)
+
+    const secondOption = screen.getByText(/Unread/i)
+
+    expect(screen.getByText(/All/i)).toBeInTheDocument()
+    expect(secondOption).toBeInTheDocument()
+
+    await userEvent.click(secondOption)
+
+    await waitFor(() => {
+      return expect(filterMock).toHaveBeenCalledWith()
+    })
   })
 })

@@ -33,10 +33,10 @@ import {IconTrashLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DateValidator from '@canvas/grading/DateValidator'
 import moment from 'moment'
-import AssigneeSelector, {type AssigneeOption} from '../AssigneeSelector'
+import AssigneeSelector from '../AssigneeSelector'
 import type {FormMessage} from '@instructure/ui-form-field'
 import ContextModuleLink from './ContextModuleLink'
-import type {DateLockTypes} from './types'
+import type {AssigneeOption, DateLockTypes} from './types'
 import {
   arrayEquals,
   generateWrapperStyleProps,

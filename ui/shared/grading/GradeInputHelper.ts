@@ -48,7 +48,7 @@ function percentageFromPoints(points: number, pointsPossible: number): number {
   return toNumber(new Big(points).div(pointsPossible).times(100))
 }
 
-function invalid(value) {
+function invalid(value, options) {
   return {
     enteredAs: null,
     late_policy_status: null,
@@ -56,6 +56,7 @@ function invalid(value) {
     grade: value,
     score: null,
     valid: false,
+    subAssignmentTag: options.subAssignmentTag,
   }
 }
 
@@ -133,10 +134,11 @@ function parseForGradingScheme(value, options): GradeResult {
       grade: result.schemeKey,
       score: result.points,
       valid: true,
+      subAssignmentTag: options.subAssignmentTag,
     }
   }
 
-  return invalid(value)
+  return invalid(value, options)
 }
 
 function parseForPercent(value, options): GradeResult {
@@ -151,10 +153,11 @@ function parseForPercent(value, options): GradeResult {
       grade: `${result.percent}%`,
       score: result.points,
       valid: true,
+      subAssignmentTag: options.subAssignmentTag,
     }
   }
 
-  return invalid(value)
+  return invalid(value, options)
 }
 
 function parseForPoints(value, options) {
@@ -171,10 +174,11 @@ function parseForPoints(value, options) {
       grade: `${result.points}`,
       score: result.points,
       valid: true,
+      subAssignmentTag: options.subAssignmentTag,
     }
   }
 
-  return invalid(value)
+  return invalid(value, options)
 }
 
 function parseForPassFail(value: string, options: {pointsPossible: number}): GradeResult {
@@ -187,6 +191,7 @@ function parseForPassFail(value: string, options: {pointsPossible: number}): Gra
     grade: cleanValue,
     valid: true,
     score: null,
+    subAssignmentTag: options.subAssignmentTag,
   }
 
   if (cleanValue === 'complete') {
@@ -194,7 +199,7 @@ function parseForPassFail(value: string, options: {pointsPossible: number}): Gra
   } else if (cleanValue === 'incomplete') {
     result.score = 0
   } else {
-    return invalid(value)
+    return invalid(value, options)
   }
 
   return result
@@ -267,6 +272,7 @@ export function parseTextValue(value: string, options): GradeResult {
       grade: null,
       score: null,
       valid: true,
+      subAssignmentTag: options.subAssignmentTag,
     }
   }
 
@@ -278,6 +284,7 @@ export function parseTextValue(value: string, options): GradeResult {
       grade: null,
       score: null,
       valid: true,
+      subAssignmentTag: options.subAssignmentTag,
     }
   }
 
@@ -289,6 +296,7 @@ export function parseTextValue(value: string, options): GradeResult {
       grade: null,
       score: null,
       valid: true,
+      subAssignmentTag: options.subAssignmentTag,
     }
   }
 

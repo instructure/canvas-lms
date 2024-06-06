@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useRef, useState} from 'react'
+import React, {useCallback, useMemo, useRef, useState} from 'react'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -44,6 +44,7 @@ import {Alert} from '@instructure/ui-alerts'
 import type {IconType, ItemType} from '../types'
 import ItemAssignToTrayContent from './ItemAssignToTrayContent'
 import CoursePacingNotice from '@canvas/due-dates/react/CoursePacingNotice'
+import useFetchAssignees from '../../utils/hooks/useFetchAssignees'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -80,14 +81,17 @@ export const updateModuleItem = ({
   moduleItemContentId,
   payload,
   onSuccess,
+  onLoading,
 }: {
   courseId: string
   moduleItemType: ItemType
   moduleItemName: string
   moduleItemContentId: string
   payload: DateDetails
+  onLoading: (flag: boolean) => void
   onSuccess: () => void
 }) => {
+  onLoading(true)
   return doFetchApi({
     path: itemTypeToApiURL(courseId, moduleItemType, moduleItemContentId),
     method: 'PUT',
@@ -107,6 +111,7 @@ export const updateModuleItem = ({
         message: I18n.t(`Error updating "%{moduleItemName}`, {moduleItemName}),
       })
     })
+    .finally(() => onLoading(false))
 }
 
 // TODO: need props to initialize with cards corresponding to current assignments
@@ -174,16 +179,28 @@ export default function ItemAssignToTray({
   onInitialStateSet,
 }: ItemAssignToTrayProps) {
   const isPacedCourse = ENV.IN_PACED_COURSE
+  const initialLoadRef = useRef(false)
   const cardsRefs = useRef<{[cardId: string]: ItemAssignToCardRef}>({})
+  const [isLoading, setIsLoading] = useState(false)
   const [disabledOptionIds, setDisabledOptionIds] = useState<string[]>(
     defaultDisabledOptionIds ?? []
   )
   const [assignToCards, setAssignToCards] = useState<ItemAssignToCardSpec[]>(defaultCards ?? [])
   const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
   const [moduleAssignees, setModuleAssignees] = useState<string[]>([])
+  const [groupCategoryId, setGroupCategoryId] = useState<string | null>(defaultGroupCategoryId)
+  const [overridesFetched, setOverridesFetched] = useState(defaultCards !== undefined)
   const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
     undefined
   )
+
+  const everyoneOption = useMemo(() => {
+    const hasOverrides =
+      (disabledOptionIds.length === 1 && !disabledOptionIds.includes('everyone')) ||
+      disabledOptionIds.length > 1 ||
+      assignToCards.length > 1
+    return getEveryoneOption(hasOverrides)
+  }, [disabledOptionIds, assignToCards])
 
   const handleDismiss = useCallback(() => {
     if (defaultCards) {
@@ -191,6 +208,21 @@ export default function ItemAssignToTray({
     }
     onDismiss()
   }, [defaultCards, onDismiss])
+
+  const {
+    allOptions,
+    isLoading: isLoadingAssignees,
+    loadedAssignees,
+    setSearchTerm,
+  } = useFetchAssignees({
+    courseId,
+    groupCategoryId,
+    disableFetch: !overridesFetched || isPacedCourse,
+    everyoneOption,
+    checkMasteryPaths: true,
+    defaultValues: [],
+    onError: handleDismiss,
+  })
 
   const handleUpdate = useCallback(() => {
     const hasErrors = assignToCards.some(card => !card.isValid)
@@ -230,6 +262,7 @@ export default function ItemAssignToTray({
         moduleItemType: itemType,
         moduleItemName: itemName,
         payload,
+        onLoading: setIsLoading,
         onSuccess: handleDismiss,
       })
     }
@@ -335,6 +368,7 @@ export default function ItemAssignToTray({
         ) : (
           <ItemAssignToTrayContent
             open={open}
+            initialLoadRef={initialLoadRef}
             onClose={onClose}
             onDismiss={onDismiss}
             courseId={courseId}
@@ -365,6 +399,14 @@ export default function ItemAssignToTray({
             disabledOptionIds={disabledOptionIds}
             setDisabledOptionIds={setDisabledOptionIds}
             defaultGroupCategoryId={defaultGroupCategoryId}
+            allOptions={allOptions}
+            isLoadingAssignees={isLoadingAssignees}
+            isLoading={isLoading}
+            loadedAssignees={loadedAssignees}
+            setSearchTerm={setSearchTerm}
+            everyoneOption={everyoneOption}
+            setGroupCategoryId={setGroupCategoryId}
+            setOverridesFetched={setOverridesFetched}
           />
         )}
         {Footer()}

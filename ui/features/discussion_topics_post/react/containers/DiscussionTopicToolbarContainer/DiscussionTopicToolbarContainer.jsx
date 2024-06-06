@@ -101,6 +101,7 @@ export const DiscussionTopicToolbarContainer = props => {
         isAnnouncement={props.discussionTopic.isAnnouncement}
         isGraded={props.discussionTopic.assignment !== null}
         contextType={props.discussionTopic.contextType}
+        manageAssignTo={props.discussionTopic.permissions.manageAssignTo}
       />
       {showTranslationControl && <TranslationControls />}
     </View>

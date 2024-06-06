@@ -20,7 +20,7 @@
 require_relative "../../common"
 require_relative "../pages/speedgrader_page"
 
-describe "speed grader - quiz submissions" do
+describe "SpeedGrader - quiz submissions" do
   include_context "in-process server selenium tests"
 
   before do

@@ -37,6 +37,8 @@ import {TextInput} from '@instructure/ui-text-input'
 import ReactDOM from 'react-dom'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
+import {SimpleSelect} from '@instructure/ui-simple-select'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 const I18n = useI18nScope('discussions_v2')
 
@@ -49,6 +51,7 @@ const SEARCH_DELAY = 350
 
 export default class IndexHeader extends Component {
   static propTypes = {
+    breakpoints: breakpointsShape.isRequired,
     contextId: string.isRequired,
     contextType: string.isRequired,
     courseSettings: propTypes.courseSettings,
@@ -66,6 +69,7 @@ export default class IndexHeader extends Component {
 
   static defaultProps = {
     courseSettings: {},
+    breakpoints: {},
   }
 
   state = {
@@ -84,8 +88,8 @@ export default class IndexHeader extends Component {
     this.setState({searchTerm: e.target.value}, this.filterDiscussions)
   }
 
-  onFilterChange = e => {
-    this.setState({filter: e.target.value}, this.filterDiscussions)
+  onFilterChange = (_e, data) => {
+    this.setState({filter: data.value}, this.filterDiscussions)
   }
 
   // This is needed to make the search results do not keep cutting each
@@ -98,34 +102,36 @@ export default class IndexHeader extends Component {
   renderTrayToolsMenu = () => {
     if (this.props.discussionTopicIndexMenuTools?.length > 0) {
       return (
-        <div className="inline-block">
-          {/* TODO: use InstUI button */}
-          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a
-            className="al-trigger btn"
-            id="discussion_menu_link"
-            role="button"
-            tabIndex="0"
-            title={I18n.t('Discussions Menu')}
-            aria-label={I18n.t('Discussions Menu')}
-          >
-            <i className="icon-more" aria-hidden="true" />
-            <span className="screenreader-only">{I18n.t('Discussions Menu')}</span>
-          </a>
-          <ul className="al-options" role="menu">
-            {this.props.discussionTopicIndexMenuTools.map(tool => (
-              <li key={tool.id} role="menuitem">
-                {/* TODO: use InstUI button */}
-                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                <a aria-label={tool.title} href="#" onClick={this.onLaunchTrayTool(tool)}>
-                  {this.iconForTrayTool(tool)}
-                  {tool.title}
-                </a>
-              </li>
-            ))}
-          </ul>
-          <div id="external-tool-mount-point" />
-        </div>
+        <Flex.Item>
+          <div className="inline-block">
+            {/* TODO: use InstUI button */}
+            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+            <a
+              className="al-trigger btn"
+              id="discussion_menu_link"
+              role="button"
+              tabIndex="0"
+              title={I18n.t('Discussions Menu')}
+              aria-label={I18n.t('Discussions Menu')}
+            >
+              <i className="icon-more" aria-hidden="true" />
+              <span className="screenreader-only">{I18n.t('Discussions Menu')}</span>
+            </a>
+            <ul className="al-options" role="menu">
+              {this.props.discussionTopicIndexMenuTools.map(tool => (
+                <li key={tool.id} role="menuitem">
+                  {/* TODO: use InstUI button */}
+                  {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                  <a aria-label={tool.title} href="#" onClick={this.onLaunchTrayTool(tool)}>
+                    {this.iconForTrayTool(tool)}
+                    {tool.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <div id="external-tool-mount-point" />
+          </div>
+        </Flex.Item>
       )
     }
   }
@@ -169,32 +175,33 @@ export default class IndexHeader extends Component {
   }
 
   render() {
+    const {breakpoints} = this.props
+    const ddSize = breakpoints.desktopOnly ? '100px' : '100%'
+    const containerSize = breakpoints.tablet ? 'auto' : '100%'
+
     return (
       <View display="block" data-testid="discussions-index-container">
-        <Flex wrap="wrap" justifyItems="end">
-          <Flex.Item shouldGrow={true}>
+        <Flex wrap="wrap" justifyItems="end" gap="small">
+          <Flex.Item size={ddSize} shouldGrow={true} shouldShrink={true}>
             <FormField
               id="discussion-filter"
               label={<ScreenReaderContent>{I18n.t('Discussion Filter')}</ScreenReaderContent>}
             >
-              <select
+              <SimpleSelect
+                renderLabel=""
                 id="discussion-filter"
                 name="filter-dropdown"
                 onChange={this.onFilterChange}
-                style={{
-                  margin: '0',
-                  width: '100%',
-                }}
               >
                 {Object.keys(filters).map(filter => (
-                  <option key={filter} value={filter}>
+                  <SimpleSelect.Option key={filter} id={filter} value={filter}>
                     {filters[filter]}
-                  </option>
+                  </SimpleSelect.Option>
                 ))}
-              </select>
+              </SimpleSelect>
             </FormField>
           </Flex.Item>
-          <Flex.Item shouldGrow={true} margin="0 0 0 small">
+          <Flex.Item size={containerSize} shouldGrow={true} shouldShrink={true} margin="0">
             <TextInput
               renderLabel={
                 <ScreenReaderContent>{I18n.t('Search discussion by title')}</ScreenReaderContent>
@@ -205,32 +212,36 @@ export default class IndexHeader extends Component {
               name="discussion_search"
             />
           </Flex.Item>
-          <Flex.Item margin="0 0 0 small">
-            {this.props.permissions.create && (
-              <Button
-                href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new`}
-                color="primary"
-                id="add_discussion"
-              >
-                <IconPlusLine />
-                <ScreenReaderContent>{I18n.t('Add discussion')}</ScreenReaderContent>
-                <PresentationContent>{I18n.t('Discussion')}</PresentationContent>
-              </Button>
-            )}
-            &nbsp;
-            {Object.keys(this.props.userSettings).length ? (
-              <DiscussionSettings
-                courseSettings={this.props.courseSettings}
-                userSettings={this.props.userSettings}
-                permissions={this.props.permissions}
-                saveSettings={this.props.saveSettings}
-                toggleModalOpen={this.props.toggleModalOpen}
-                isSettingsModalOpen={this.props.isSettingsModalOpen}
-                isSavingSettings={this.props.isSavingSettings}
-              />
-            ) : null}
-            &nbsp;
-            {this.renderTrayToolsMenu()}
+          <Flex.Item size={containerSize}>
+            <Flex wrap="no-wrap" gap="small" justifyItems="end">
+              {this.props.permissions.create && (
+                <Flex.Item>
+                  <Button
+                    href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new`}
+                    color="primary"
+                    id="add_discussion"
+                    renderIcon={IconPlusLine}
+                  >
+                    <ScreenReaderContent>{I18n.t('Add discussion')}</ScreenReaderContent>
+                    <PresentationContent>{I18n.t('Discussion')}</PresentationContent>
+                  </Button>
+                </Flex.Item>
+              )}
+              {Object.keys(this.props.userSettings).length ? (
+                <Flex.Item>
+                  <DiscussionSettings
+                    courseSettings={this.props.courseSettings}
+                    userSettings={this.props.userSettings}
+                    permissions={this.props.permissions}
+                    saveSettings={this.props.saveSettings}
+                    toggleModalOpen={this.props.toggleModalOpen}
+                    isSettingsModalOpen={this.props.isSettingsModalOpen}
+                    isSavingSettings={this.props.isSavingSettings}
+                  />
+                </Flex.Item>
+              ) : null}
+              {this.renderTrayToolsMenu()}
+            </Flex>
           </Flex.Item>
         </Flex>
       </View>
@@ -258,4 +269,6 @@ const selectedActions = [
   'toggleModalOpen',
 ]
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
-export const ConnectedIndexHeader = connect(connectState, connectActions)(IndexHeader)
+export const ConnectedIndexHeader = WithBreakpoints(
+  connect(connectState, connectActions)(IndexHeader)
+)

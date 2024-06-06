@@ -30,10 +30,13 @@ import ready from '@instructure/ready'
 import MicrosoftSyncAccountSettings from '@canvas/integrations/react/accounts/microsoft_sync/MicrosoftSyncAccountSettings'
 import CourseCreationSettings from './react/course_creation_settings/CourseCreationSettings'
 import {InternalSettings} from './react/internal_settings/InternalSettings'
+import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
 const I18n = useI18nScope('account_settings_jsx_bundle')
 
 ready(() => {
+  initializeTopNavPortal(document.getElementById('react-instui-topnav'))
+
   ReactDOM.render(<FeatureFlags />, document.getElementById('tab-features'))
 
   if (document.getElementById('custom_help_link_settings')) {

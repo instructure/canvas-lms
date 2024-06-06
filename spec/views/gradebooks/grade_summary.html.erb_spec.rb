@@ -140,7 +140,7 @@ describe "gradebooks/grade_summary" do
         expect(response).to have_tag("a[href='#{@assignment_url}']")
       end
 
-      it "takes the teacher to Speedgrader link" do
+      it "takes the teacher to SpeedGrader link" do
         @user = @teacher
         assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
         view_context
@@ -148,7 +148,7 @@ describe "gradebooks/grade_summary" do
         expect(response).to have_tag("a[href='#{@speed_grader_url}']")
       end
 
-      it "takes the admin to Speedgrader link" do
+      it "takes the admin to SpeedGrader link" do
         @user = account_admin_user
         assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
         view_context
@@ -156,7 +156,7 @@ describe "gradebooks/grade_summary" do
         expect(response).to have_tag("a[href='#{@speed_grader_url}']")
       end
 
-      it "takes the site admin to Speedgrader link" do
+      it "takes the site admin to SpeedGrader link" do
         @user = site_admin_user
         assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
         view_context
@@ -244,7 +244,7 @@ describe "gradebooks/grade_summary" do
         expect(response).not_to have_tag("a[href='#{@speed_grader_url}']")
       end
 
-      it "takes the site admin to Speedgrader link" do
+      it "takes the site admin to SpeedGrader link" do
         @user = site_admin_user
         assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
         view_context
@@ -810,6 +810,32 @@ describe "gradebooks/grade_summary" do
       render "gradebooks/grade_summary"
       expect(response).to match(%r{</span>\s+90%\s+</span>}mi)
       expect(response).to have_tag("span.points_possible")
+    end
+
+    it "does not render context subtext in case of groups" do
+      assignment1 = course.assignments.create!(grading_type: "percent", points_possible: 10)
+      assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey 2"
+      assignment1.grade_student(student, grade: "90%", grader: teacher)
+
+      group = course.assignment_groups.create!(name: "a group")
+      group_assignment = Assignment::HardCoded.new(id: "group-#{group.id}",
+                                                   rules: group.rules,
+                                                   title: group.name,
+                                                   points_possible: 10,
+                                                   special_class: "group_total",
+                                                   assignment_group_id: group.id,
+                                                   group_weight: group.group_weight,
+                                                   asset_string: "group_total_#{group.id}")
+      presenter.groups_assignments = [group_assignment]
+
+      assignment2 = course.assignments.create!(grading_type: "percent", points_possible: 10)
+      assignment2.submit_homework student, submission_type: "online_text_entry", body: "hey 2"
+      assignment2.grade_student(student, grade: "90%", grader: teacher)
+
+      render "gradebooks/grade_summary"
+      expect(response).to have_tag(".student_assignment .title .context")
+      expect(response).to have_tag(".group_total .title")
+      expect(response).not_to have_tag(".group_total .title .context")
     end
   end
 

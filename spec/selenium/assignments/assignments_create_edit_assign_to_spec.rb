@@ -233,6 +233,16 @@ shared_examples_for "item assign to tray during assignment creation/update" do
       keep_trying_until { expect(item_tray_exists?).to be_truthy }
       expect(inherited_from.last.text).to eq("Inherited from #{@context_module.name}")
       expect(element_exists?(assign_to_in_tray_selector("Remove Everyone else"))).to be_falsey
+
+      click_save_button("Apply")
+
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      AssignmentCreateEditPage.save_assignment
+
+      assignment = Assignment.last
+      assignment.reload
+      expect(assignment.only_visible_to_overrides).to be_falsey
     end
 
     it "does not show module override if an unassigned override exists" do
@@ -337,6 +347,16 @@ describe "group assignments", :ignore_js_errors do
 
     expect(@group_assignment.assignment_overrides.active.count).to eq(1)
     expect(@group_assignment.assignment_overrides.active.last.title).to eq(@testgroup[1].name)
+  end
+
+  it "shows error if there is no group category selected when opening the tray" do
+    AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @group_assignment.id)
+
+    AssignmentCreateEditPage.select_assignment_group_category({})
+    AssignmentCreateEditPage.click_manage_assign_to_button
+    error_boxes = AssignmentCreateEditPage.error_boxes
+
+    expect(error_boxes.any? { |errorbox| errorbox.text.include?("Please select a group set for this assignment") }).to be_truthy
   end
 end
 

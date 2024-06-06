@@ -98,10 +98,16 @@ class PseudonymSession < Authlogic::Session::Base
   # `invalid_password?`.
   def validate_by_password
     super
-
     # have to call super first, as that's what loads attempted_record
     if (@login_error = attempted_record&.audit_login(!invalid_password?))
       case @login_error
+      when :remaining_attempts_2, :remaining_attempts_1, :final_attempt
+        attempts = Canvas::Security::LoginRegistry::WARNING_ATTEMPTS[@login_error]
+        if @login_error == :final_attempt
+          errors.add(password_field, I18n.t("We've received several incorrect username or password entries. To protect your account, it has been locked. Please contact your system administrator."))
+        else
+          errors.add(password_field, I18n.t("Please verify your username or password and try again. After %{attempts} more attempt(s), your account will be locked.", attempts:))
+        end
       when :too_many_attempts
         errors.add(password_field, I18n.t("errors.max_attempts", "Too many failed login attempts. Please try again later or contact your system administrator."))
       when :too_recent_login

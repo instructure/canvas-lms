@@ -24,7 +24,7 @@ import router from './react/router'
 import configureStore from './react/store/configureStore'
 import initialState from './react/store/initialState'
 import ready from '@instructure/ready'
-import { initializeTopNavPortal } from '@canvas/top-navigation/react/TopNavPortal'
+import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
 // eg: '/accounts/xxx' for anything like '/accounts/xxx/whatever`
 initialState.tabList.basePath = window.location.pathname.match(/.*accounts\/[^/]*/)[0]

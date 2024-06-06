@@ -64,7 +64,7 @@ describe "context modules" do
     end
 
     it "creates a new module using enter key", priority: "2" do
-      Account.site_admin.disable_feature! :differentiated_modules
+      Account.site_admin.disable_feature! :selective_release_ui_api
       get "/courses/#{@course.id}/modules"
       add_form = new_module_form
       replace_content(add_form.find_element(:id, "context_module_name"), "module 1")
@@ -98,7 +98,7 @@ describe "context modules" do
     end
 
     it "retains focus when deleting prerequisites without differentiated modules" do
-      Account.site_admin.disable_feature! :differentiated_modules
+      Account.site_admin.disable_feature! :selective_release_ui_api
 
       modules = create_modules(2)
       get "/courses/#{@course.id}/modules"
@@ -284,7 +284,7 @@ describe "context modules" do
 
     context "Keyboard Accessibility only for non-differentiated modules modals", priority: "1" do
       before :once do
-        Account.site_admin.disable_feature! :differentiated_modules
+        Account.site_admin.disable_feature! :selective_release_ui_api
         modules = create_modules(2, true)
         modules[0].add_item({ id: @assignment.id, type: "assignment" })
         modules[0].add_item({ id: @assignment2.id, type: "assignment" })

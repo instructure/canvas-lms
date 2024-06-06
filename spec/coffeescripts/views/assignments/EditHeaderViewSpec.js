@@ -186,7 +186,7 @@ test('does not attempt to delete an assignment due in a closed grading period', 
   ok(view.delete.notCalled)
 })
 
-QUnit.module('EditHeaderView - speed grader link', {
+QUnit.module('EditHeaderView - SpeedGrader link', {
   setup() {
     fakeENV.setup()
     ENV.SHOW_SPEED_GRADER_LINK = true

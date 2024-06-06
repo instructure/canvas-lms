@@ -50,21 +50,30 @@ type Props = {
   visible: boolean
 }
 
-export default function TimeLateInput(props: Props) {
+export default function TimeLateInput({
+  disabled,
+  lateSubmissionInterval,
+  locale,
+  renderLabelBefore,
+  secondsLate,
+  onSecondsLateUpdated,
+  width,
+  visible,
+}: Props) {
   const [numberInputValue, setNumberInputValue] = useState(
-    defaultDurationLate(props.lateSubmissionInterval, props.secondsLate)
+    defaultDurationLate(lateSubmissionInterval, secondsLate)
   )
   const [numberInputValueSinceBlur, setNumberInputValueSinceBlur] = useState(numberInputValue)
 
   const numberInputLabel =
-    props.lateSubmissionInterval === 'day' ? I18n.t('Days late') : I18n.t('Hours late')
+    lateSubmissionInterval === 'day' ? I18n.t('Days late') : I18n.t('Hours late')
 
   const numberInputText =
-    props.lateSubmissionInterval === 'day'
+    lateSubmissionInterval === 'day'
       ? I18n.t('late_input.days', {one: 'Day', other: 'Days'}, {count: numberInputValue})
       : I18n.t('late_input.hours', {one: 'Hour', other: 'Hours'}, {count: numberInputValue})
 
-  if (!props.visible) {
+  if (!visible) {
     return null
   }
 
@@ -84,11 +93,11 @@ export default function TimeLateInput(props: Props) {
     setNumberInputValueSinceBlur(roundedValue)
 
     let secondsLateOverride = parsedValue * 3600
-    if (props.lateSubmissionInterval === 'day') {
+    if (lateSubmissionInterval === 'day') {
       secondsLateOverride *= 24
     }
 
-    props.onSecondsLateUpdated({
+    onSecondsLateUpdated({
       latePolicyStatus: 'late',
       secondsLateOverride: Math.trunc(secondsLateOverride),
     })
@@ -96,14 +105,14 @@ export default function TimeLateInput(props: Props) {
 
   return (
     <span className="NumberInput__Container NumberInput__Container-LeftIndent">
-      <Flex direction={props.renderLabelBefore ? 'row-reverse' : 'row'}>
+      <Flex direction={renderLabelBefore ? 'row-reverse' : 'row'}>
         <Flex.Item>
           <NumberInput
             value={numberInputValue}
-            interaction={props.disabled ? 'disabled' : 'enabled'}
+            interaction={disabled ? 'disabled' : 'enabled'}
             display="inline-block"
             renderLabel={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
-            locale={props.locale}
+            locale={locale}
             min="0"
             onBlur={handleNumberInputBlur}
             onChange={(e, value) => {
@@ -111,7 +120,7 @@ export default function TimeLateInput(props: Props) {
               setNumberInputValue(Number.isNaN(inputValue) ? 0 : inputValue)
             }}
             showArrows={false}
-            width={props.width}
+            width={width}
           />
         </Flex.Item>
         <Flex.Item>

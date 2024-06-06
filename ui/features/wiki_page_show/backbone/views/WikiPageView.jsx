@@ -19,7 +19,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import 'jquery-scroll-to-visible'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/moment-utils'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {clone, each} from 'lodash'
 import Backbone from '@canvas/backbone'
@@ -336,6 +336,7 @@ export default class WikiPageView extends Backbone.View {
       DELETE: !!this.PAGE_RIGHTS.delete && !this.course_home,
       READ_REVISIONS: !!this.PAGE_RIGHTS.read_revisions,
       UPDATE: !!this.WIKI_RIGHTS.update,
+      MANAGE_ASSIGN_TO: !!this.WIKI_RIGHTS.manage_assign_to,
     }
     json.CAN.DIRECT_SHARE = !!ENV.DIRECT_SHARE_ENABLED
     json.CAN.ACCESS_GEAR_MENU = json.CAN.DELETE || json.CAN.READ_REVISIONS || json.CAN.DIRECT_SHARE
@@ -347,7 +348,7 @@ export default class WikiPageView extends Backbone.View {
       json.CAN.ACCESS_GEAR_MENU
     json.recent_announcements_enabled = !!ENV.SHOW_ANNOUNCEMENTS
     json.explicit_latex_typesetting = !!ENV.FEATURES?.explicit_latex_typesetting
-    json.differentiated_modules = !!ENV.FEATURES.differentiated_modules && !!this.course_id
+    json.show_assign_to = !!ENV.FEATURES.selective_release_ui_api && !!this.course_id
 
     if (json.lock_info) {
       json.lock_info = clone(json.lock_info)

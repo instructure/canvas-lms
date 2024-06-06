@@ -35,17 +35,35 @@ describe('CoursesTray', () => {
       id: '2',
       name: 'Course2',
       workflow_state: 'published',
+      enrollment_term_id: '2',
+      term: {
+        id: '2',
+        name: 'Term2',
+      },
     },
     {
       id: '3',
       name: 'Course3',
       workflow_state: 'unpublished',
+      sis_course_id: 'sis1',
+    },
+    {
+      id: '4',
+      name: 'Course4',
+      workflow_state: 'published',
+      enrollment_term_id: '2',
+      term: {
+        id: '2',
+        name: 'Term2',
+      },
+      sis_course_id: 'sis1',
     },
   ]
 
   beforeEach(() => {
     queryClient.setQueryData(['courses'], courses)
     window.ENV.K5_USER = false
+    window.ENV.FEATURES.courses_popout_sisid = true
     ENV.current_user_roles = []
   })
 
@@ -88,5 +106,20 @@ describe('CoursesTray', () => {
     expect(getByText('Subjects')).toBeInTheDocument()
     expect(getByText('All Subjects')).toBeInTheDocument()
     expect(queryByText('Courses')).not.toBeInTheDocument()
+  })
+
+  it('renders the term name if present', () => {
+    const {getByText} = render(<CoursesTray />)
+    expect(getByText('Term2')).toBeInTheDocument()
+  })
+
+  it('renders the sis id if present', () => {
+    const {getByText} = render(<CoursesTray />)
+    expect(getByText('sis1')).toBeInTheDocument()
+  })
+
+  it('rendrs both the term name and the sis id if both are present', () => {
+    const {getByText} = render(<CoursesTray />)
+    expect(getByText('Term2 - sis1')).toBeInTheDocument()
   })
 })

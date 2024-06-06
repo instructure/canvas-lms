@@ -52,6 +52,8 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
           cm.update_import_progress(20)
 
           cm.import_content
+          SmartSearch.copy_embeddings(cm)
+
           cm.workflow_state = :imported
           cm.save
           cm.update_import_progress(100)

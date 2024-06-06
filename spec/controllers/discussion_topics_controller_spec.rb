@@ -371,36 +371,24 @@ describe DiscussionTopicsController do
 
     describe "differentiated modules" do
       before do
-        Account.site_admin.enable_feature! :differentiated_modules
+        Account.site_admin.enable_feature!(:selective_release_backend)
       end
 
       context "ungraded discussions" do
         before do
-          course_factory(active_all: true)
-          @course_section = @course.course_sections.create
-
-          @student1, @student2 = create_users(2, return_type: :record)
-          @course.enroll_student(@student1, enrollment_state: "active")
-          @course.enroll_student(@student2, enrollment_state: "active")
-          student_in_section(@course.course_sections.first, user: @student1)
-          student_in_section(@course.course_sections.second, user: @student2)
-
-          @teacher = teacher_in_course(course: @course, active_enrollment: true).user
-          @topic_visible_to_everyone = discussion_topic_model(user: @teacher, context: @course)
-          @topic = discussion_topic_model(user: @teacher, context: @course)
-          @topic.update!(only_visible_to_overrides: true)
+          setup_course_and_users
+          setup_discussion_topics
         end
 
         it "shows only assigned topics" do
-          override = @topic.assignment_overrides.create!
-          override.assignment_override_students.create!(user: @student1)
+          assign_topic_to_student(@topic, @student1)
 
           user_session(@student2)
           get "index", params: { course_id: @course.id }, format: :json
           parsed_json = json_parse(response.body)
           visible_ids_to_student_2 = parsed_json.pluck("id")
 
-          expect(assigns["topics"]).not_to include(@topic)
+          expect(response).to have_http_status(:success)
           expect(visible_ids_to_student_2).to include(@topic_visible_to_everyone.id)
           expect(visible_ids_to_student_2).not_to include(@topic.id)
 
@@ -409,18 +397,20 @@ describe DiscussionTopicsController do
           parsed_json = json_parse(response.body)
           visible_ids_to_student_1 = parsed_json.pluck("id")
 
+          expect(response).to have_http_status(:success)
           expect(visible_ids_to_student_1).to include(@topic_visible_to_everyone.id)
           expect(visible_ids_to_student_1).to include(@topic.id)
         end
 
         it "is visible only to users who can access the assigned section" do
-          @topic.assignment_overrides.create!(set: @course_section)
+          assign_topic_to_section(@topic, @course_section)
 
           user_session(@student2)
           get "index", params: { course_id: @course.id }, format: :json
           parsed_json = json_parse(response.body)
           visible_ids_to_student_2 = parsed_json.pluck("id")
 
+          expect(response).to have_http_status(:success)
           expect(visible_ids_to_student_2).to include(@topic_visible_to_everyone.id)
           expect(visible_ids_to_student_2).to include(@topic.id)
 
@@ -429,25 +419,20 @@ describe DiscussionTopicsController do
           parsed_json = json_parse(response.body)
           visible_ids_to_student_1 = parsed_json.pluck("id")
 
+          expect(response).to have_http_status(:success)
           expect(visible_ids_to_student_1).to include(@topic_visible_to_everyone.id)
           expect(visible_ids_to_student_1).not_to include(@topic.id)
         end
 
         it "is visible only to students in module override section" do
-          context_module = @course.context_modules.create!(name: "module")
-          context_module.content_tags.create!(content: @topic, context: @course)
-
-          override2 = @topic.assignment_overrides.create!(unlock_at: "2022-02-01T01:00:00Z",
-                                                          unlock_at_overridden: true,
-                                                          lock_at: "2022-02-02T01:00:00Z",
-                                                          lock_at_overridden: true)
-          override2.assignment_override_students.create!(user: @student2)
+          create_module_and_assign_topic(@topic, @student2)
 
           user_session(@student2)
           get "index", params: { course_id: @course.id }, format: :json
           parsed_json = json_parse(response.body)
           visible_ids_to_student_2 = parsed_json.pluck("id")
 
+          expect(response).to have_http_status(:success)
           expect(visible_ids_to_student_2).to include(@topic_visible_to_everyone.id)
           expect(visible_ids_to_student_2).to include(@topic.id)
 
@@ -456,9 +441,118 @@ describe DiscussionTopicsController do
           parsed_json = json_parse(response.body)
           visible_ids_to_student_1 = parsed_json.pluck("id")
 
+          expect(response).to have_http_status(:success)
           expect(visible_ids_to_student_1).to include(@topic_visible_to_everyone.id)
           expect(visible_ids_to_student_1).not_to include(@topic.id)
         end
+
+        it "shows observers their observed students topics" do
+          assign_topic_to_section(@topic, @course_section)
+
+          user_session(@observer)
+          get "index", params: { course_id: @course.id }, format: :json
+          parsed_json = json_parse(response.body)
+          visible_ids_to_observer = parsed_json.pluck("id")
+
+          expect(response).to have_http_status(:success)
+          expect(visible_ids_to_observer).to include(@topic_visible_to_everyone.id)
+          expect(visible_ids_to_observer).not_to include(@topic.id)
+
+          @observer_enrollment.associated_user = @student2
+          @observer_enrollment.save
+          @observer.reload
+
+          user_session(@observer)
+          get "index", params: { course_id: @course.id }, format: :json
+          parsed_json = json_parse(response.body)
+          visible_ids_to_observer = parsed_json.pluck("id")
+
+          expect(response).to have_http_status(:success)
+          expect(visible_ids_to_observer).to include(@topic_visible_to_everyone.id)
+          expect(visible_ids_to_observer).to include(@topic.id)
+        end
+
+        it "shows observers module overridden topics for their students" do
+          create_module_and_assign_topic(@topic, @student2)
+
+          @observer_enrollment.associated_user = @student2
+          @observer_enrollment.save
+          @observer.reload
+
+          user_session(@observer)
+          get "index", params: { course_id: @course.id }, format: :json
+          parsed_json = json_parse(response.body)
+          visible_ids_to_observer = parsed_json.pluck("id")
+
+          expect(response).to have_http_status(:success)
+          expect(visible_ids_to_observer).to include(@topic_visible_to_everyone.id)
+          expect(visible_ids_to_observer).to include(@topic.id)
+        end
+
+        it "shows observers topics of all students they are assigned to" do
+          topic_for_student_3 = discussion_topic_model(user: @teacher, context: @course)
+          topic_for_student_3.update!(only_visible_to_overrides: true)
+          assign_topic_to_student(topic_for_student_3, @student3)
+
+          assign_topic_to_student(@topic, @student2)
+
+          observer = course_with_observer(course: @course, associated_user_id: @student2.id, active_all: true).user
+          course_with_observer(course: @course, associated_user_id: @student3.id, active_all: true, user: observer).user
+
+          user_session(observer)
+          get "index", params: { course_id: @course.id }, format: :json
+          parsed_json = json_parse(response.body)
+          visible_ids_to_observer = parsed_json.pluck("id")
+
+          expect(response).to have_http_status(:success)
+          expect(visible_ids_to_observer).to include(@topic_visible_to_everyone.id)
+          expect(visible_ids_to_observer).to include(@topic.id)
+          expect(visible_ids_to_observer).to include(topic_for_student_3.id)
+        end
+      end
+
+      def setup_course_and_users
+        course_factory(active_all: true)
+        @course_section = @course.course_sections.create
+
+        @student1, @student2, @student3 = create_users(3, return_type: :record)
+        [@student1, @student2, @student3].each { |student| @course.enroll_student(student, enrollment_state: "active") }
+        student_in_section(@course.course_sections.first, user: @student1)
+        student_in_section(@course.course_sections.second, user: @student2)
+
+        course_with_observer(active_all: true, course: @course)
+        @observer_enrollment = @enrollment
+        @observer_enrollment.associated_user = @student1
+        @observer_enrollment.save
+        @observer.reload
+
+        @teacher = teacher_in_course(course: @course, active_enrollment: true).user
+      end
+
+      def setup_discussion_topics
+        @topic_visible_to_everyone = discussion_topic_model(user: @teacher, context: @course)
+        @topic = discussion_topic_model(user: @teacher, context: @course)
+        @topic.update!(only_visible_to_overrides: true)
+      end
+
+      def assign_topic_to_student(topic, student)
+        override = topic.assignment_overrides.create!
+        override.assignment_override_students.create!(user: student)
+      end
+
+      def assign_topic_to_section(topic, section)
+        topic.assignment_overrides.create!(set: section)
+      end
+
+      def create_module_and_assign_topic(topic, student)
+        context_module = @course.context_modules.create!(name: "module")
+        context_module.content_tags.create!(content: topic, context: @course)
+
+        override = topic.assignment_overrides.create!(unlock_at: "2022-02-01T01:00:00Z",
+                                                      unlock_at_overridden: true,
+                                                      lock_at: "2022-02-02T01:00:00Z",
+                                                      lock_at_overridden: true)
+        override.assignment_override_students.create!(user: student)
       end
     end
   end

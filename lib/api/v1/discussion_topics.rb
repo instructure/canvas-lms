@@ -141,7 +141,7 @@ module Api::V1::DiscussionTopics
     )
 
     opts[:user_can_moderate] = context.grants_right?(user, session, :moderate_forum) if opts[:user_can_moderate].nil?
-    permissions = opts[:skip_permissions] ? [] : %i[attach update reply delete]
+    permissions = opts[:skip_permissions] ? [] : %i[attach update reply delete manage_assign_to]
     json = api_json(topic, user, session, { only: ALLOWED_TOPIC_FIELDS, methods: ALLOWED_TOPIC_METHODS }, permissions)
 
     json.merge!(serialize_additional_topic_fields(topic, context, user, opts))
@@ -149,7 +149,9 @@ module Api::V1::DiscussionTopics
     if (hold = topic.subscription_hold(user, session))
       json[:subscription_hold] = hold
     end
-
+    if topic.checkpoints?
+      json[:reply_to_entry_required_count] = topic.reply_to_entry_required_count
+    end
     if opts[:include_assignment] && topic.assignment
       excludes = opts[:exclude_assignment_description] ? ["description"] : []
       json[:assignment] = assignment_json(topic.assignment,

@@ -190,13 +190,36 @@ instui_for_import_page:
     If enabled, the course import page will use InstUI components
   applies_to: SiteAdmin
 
-differentiated_modules:
+selective_release_backend:
   state: hidden
-  display_name: Differentiated Modules
+  display_name: Selective Release - Backend Changes
   description: |-
-    If enabled, modules and module items become assignable to specific
-    individuals and groups.
-  after_state_change_proc: differentiated_modules_setting_hook
+    Selective Release is a feature that allows modules and module items to
+    be assigned to specific individuals and groups. This is the first of two flags
+    that must be enabled to use this feature. When this flag is enabled, the
+    transparent backend changes that support assigning modules and module items will
+    be enabled. As long as no module-type AssignmentOverrides exist, enabling this
+    feature is backwards-compatible, and exists to ensure that the backend changes
+    are performant.
+  applies_to: SiteAdmin
+
+selective_release_ui_api:
+  state: hidden
+  display_name: Selective Release - UI/API Changes
+  description: |-
+    Selective Release is a feature that allows modules and module items to
+    be assigned to specific individuals and groups. The selective_release_backend
+    flag MUST be enabled before this flag can be enabled. When this flag is enabled,
+    the UI and API that allow users to create module-type AssignmentOverrides will be
+    enabled, and thus the feature will be fully functional.
+  applies_to: SiteAdmin
+
+differentiated_files:
+  state: hidden
+  display_name: Selective Release - Files
+  description: |-
+    If enabled, files become assignable to specific individuals and groups using the
+    same interface that other learning object use.
   applies_to: SiteAdmin
 
 learner_passport:
@@ -247,4 +270,12 @@ rce_find_replace:
   display_name: Find and Replace RCE Plugin
   description: |-
     Enable a plugin which can find and replace content when editing in an RCE
+  applies_to: SiteAdmin
+
+dashboard_graphql_integration:
+  state: hidden
+  display_name: Dashboard GraphQL Integration
+  description: |-
+    Integrate GraphQL queries and mutations for the Dashboard to improve loading speed
+    and simplify data fetching logic.
   applies_to: SiteAdmin

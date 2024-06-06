@@ -84,7 +84,7 @@ class ContextModulesController < ApplicationController
       @is_student = @context.grants_right?(@current_user, session, :participate_as_student)
       @can_view_unpublished = @context.grants_right?(@current_user, session, :read_as_admin)
 
-      if Account.site_admin.feature_enabled?(:differentiated_modules)
+      if Account.site_admin.feature_enabled?(:selective_release_backend)
         @module_ids_with_overrides = AssignmentOverride.where(context_module_id: @modules).active.distinct.pluck(:context_module_id)
       end
 
@@ -702,7 +702,8 @@ class ContextModulesController < ApplicationController
         content_details: content_details(@tag, @current_user),
         assignment_id: @tag.assignment.try(:id),
         is_cyoe_able: cyoe_able?(@tag),
-        is_duplicate_able: @tag.duplicate_able?
+        is_duplicate_able: @tag.duplicate_able?,
+        can_manage_assign_to: @tag.content&.grants_right?(@current_user, session, :manage_assign_to)
       )
       @context.touch
       render json:

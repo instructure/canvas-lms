@@ -74,7 +74,11 @@ module BroadcastPolicies
     def user_has_visibility?
       return false if quiz_submission.user_id.nil?
 
-      Quizzes::QuizStudentVisibility.where(quiz_id: quiz.id, user_id: quiz_submission.user_id).any?
+      if Account.site_admin.feature_enabled?(:selective_release_backend)
+        QuizVisibility::QuizVisibilityService.quiz_visible_to_student(quiz_id: quiz.id, user_id: quiz_submission.user_id).any?
+      else
+        Quizzes::QuizStudentVisibility.where(quiz_id: quiz.id, user_id: quiz_submission.user_id).any?
+      end
     end
 
     def user_is_actively_enrolled?

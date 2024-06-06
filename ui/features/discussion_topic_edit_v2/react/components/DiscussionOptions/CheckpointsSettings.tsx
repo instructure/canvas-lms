@@ -26,7 +26,7 @@ import theme from '@instructure/canvas-theme'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {PointsPossible} from './PointsPossible'
 import {
-  GradedDiscussionDueDatesContext,
+  DiscussionDueDatesContext,
   minimumReplyToEntryRequiredCount,
   maximumReplyToEntryRequiredCount,
 } from '../../util/constants'
@@ -49,7 +49,7 @@ export const CheckpointsSettings = () => {
     setPointsPossibleReplyToEntry,
     replyToEntryRequiredCount,
     setReplyToEntryRequiredCount,
-  } = useContext(GradedDiscussionDueDatesContext)
+  } = useContext(DiscussionDueDatesContext)
 
   return (
     <>

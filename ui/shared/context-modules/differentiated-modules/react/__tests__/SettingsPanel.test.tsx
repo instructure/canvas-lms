@@ -82,7 +82,9 @@ describe('SettingsPanel', () => {
 
   it('renders the module name', () => {
     const {getByDisplayValue} = renderComponent()
-    expect(getByDisplayValue('Week 1')).toBeInTheDocument()
+    const nameInput = getByDisplayValue('Week 1')
+    expect(nameInput).toBeInTheDocument()
+    expect(nameInput).toBeRequired()
   })
 
   it('renders the date time input when lock until is checked', () => {
@@ -261,6 +263,7 @@ describe('SettingsPanel', () => {
         expect(showFlashAlert).toHaveBeenCalledWith({
           type: 'success',
           message: 'Week 1 settings updated successfully.',
+          politeness: 'polite',
         })
       })
     })
@@ -312,6 +315,7 @@ describe('SettingsPanel', () => {
         expect(showFlashAlert).toHaveBeenCalledWith({
           type: 'success',
           message: 'Week 1 created successfully.',
+          politeness: 'polite',
         })
         expect(addModuleUI).toHaveBeenCalled()
       })

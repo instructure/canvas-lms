@@ -433,5 +433,12 @@ module Types
     field :root_outcome_group, LearningOutcomeGroupType, null: false
 
     field :grade_statuses, [CourseGradeStatus], null: false
+
+    field :dashboard_card, CourseDashboardCardType, "returns dashboard card information for this course", null: true
+    def dashboard_card
+      return unless Account.site_admin.feature_enabled?(:dashboard_graphql_integration)
+
+      object
+    end
   end
 end

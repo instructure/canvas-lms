@@ -21,7 +21,8 @@ import React, {useEffect, useRef} from 'react'
 import {string, func, bool, instanceOf, oneOfType} from 'prop-types'
 import accessibleDateFormat from '@canvas/datetime/accessibleDateFormat'
 import shortId from '@canvas/shortid'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/moment-utils'
+import {isMidnight} from '@instructure/moment-utils'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import '@canvas/jquery/jquery.instructure_forms'
 import cx from 'classnames'
@@ -59,14 +60,14 @@ function DueDateCalendarPicker(props) {
   }, [formatDate, props.dateValue])
 
   function applyDefaultTimeIfNeeded(date) {
-    if (props.defaultTime && tz.isMidnight(date)) {
+    if (props.defaultTime && isMidnight(date)) {
       return tz.parse(tz.format(date, `%F ${props.defaultTime}`))
     }
     return date
   }
 
   function changeToFancyMidnightIfNeeded(date) {
-    if (props.isFancyMidnight && tz.isMidnight(date)) {
+    if (props.isFancyMidnight && isMidnight(date)) {
       return tz.changeToTheSecondBeforeMidnight(date)
     }
     return date

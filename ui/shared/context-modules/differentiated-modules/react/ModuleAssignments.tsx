@@ -17,8 +17,9 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import AssigneeSelector, {type AssigneeOption} from './AssigneeSelector'
+import AssigneeSelector from './AssigneeSelector'
 import type {FormMessage} from '@instructure/ui-form-field'
+import {AssigneeOption} from './Item/types'
 
 export interface ModuleAssignmentsProps {
   courseId: string
@@ -30,7 +31,7 @@ export interface ModuleAssignmentsProps {
   inputRef?: (inputElement: HTMLInputElement | null) => void
 }
 
-export type {AssigneeOption} from './AssigneeSelector'
+export type {AssigneeOption} from './Item/types'
 
 export default function ModuleAssignments({
   courseId,

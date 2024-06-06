@@ -1824,6 +1824,13 @@ class RoleOverride < ActiveRecord::Base
         account_only: true,
         account_allows: ->(a) { a.feature_enabled?(:admin_analytics_view_permission) }
       },
+      view_analytics_hub: {
+        label: -> { t("Analytics Hub") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_only: true,
+        account_allows: ->(a) { a.feature_enabled?(:analytics_hub) }
+      },
       view_ask_questions_analytics: {
         label: -> { t("Ask Your Data") },
         group: "view_advanced_analytics",

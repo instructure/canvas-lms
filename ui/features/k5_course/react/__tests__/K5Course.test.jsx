@@ -370,25 +370,25 @@ describe('K-5 Subject Course', () => {
 
   describe('Student View Button functionality', () => {
     it('Shows the Student View button when the user has student view mode access', () => {
-      const {queryByRole} = render(<K5Course {...defaultProps} showStudentView={true} />)
-      expect(queryByRole('link', {name: 'Student View'})).toBeInTheDocument()
+      const {getByTestId} = render(<K5Course {...defaultProps} showStudentView={true} />)
+      expect(getByTestId('student-view-btn')).toBeInTheDocument()
     })
 
     it('Does not show the Student View button when the user does not have student view mode access', () => {
-      const {queryByRole} = render(<K5Course {...defaultProps} />)
-      expect(queryByRole('link', {name: 'Student View'})).not.toBeInTheDocument()
+      const {queryByTestId} = render(<K5Course {...defaultProps} />)
+      expect(queryByTestId('student-view-btn')).not.toBeInTheDocument()
     })
 
     it('Should open student view path when clicked', () => {
-      const {getByRole} = render(<K5Course {...defaultProps} showStudentView={true} />)
-      const studentViewBtn = getByRole('link', {name: 'Student View'})
+      const {getByTestId} = render(<K5Course {...defaultProps} showStudentView={true} />)
+      const studentViewBtn = getByTestId('student-view-btn')
       expect(studentViewBtn.href).toBe('http://localhost/courses/30/student_view/1')
     })
 
     it('Should keep the navigation tab when accessing student view mode', () => {
-      const {getByRole} = render(<K5Course {...defaultProps} showStudentView={true} />)
+      const {getByRole, getByTestId} = render(<K5Course {...defaultProps} showStudentView={true} />)
       getByRole('tab', {name: 'Arts and Crafts Grades'}).click()
-      const studentViewBtn = getByRole('link', {name: 'Student View'})
+      const studentViewBtn = getByTestId('student-view-btn')
       expect(studentViewBtn.href).toBe('http://localhost/courses/30/student_view/1#grades')
     })
 

@@ -26,7 +26,7 @@ GEM
     drb (2.2.1)
     i18n (1.14.5)
       concurrent-ruby (~> 1.0)
-    minitest (5.23.0)
+    minitest (5.23.1)
     mutex_m (0.2.0)
     rake (13.2.1)
     rspec (3.13.0)
@@ -69,4 +69,4 @@ RUBY VERSION
    ruby 3.1.2p20
 
 BUNDLED WITH
-   2.5.9
+   2.5.10

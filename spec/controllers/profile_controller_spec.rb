@@ -206,6 +206,15 @@ describe ProfileController do
       expect(flash[:success]).to be_falsey
     end
 
+    it "alert is set to failed when user profile validation fails" do
+      pronunciation = "a" * 1000
+      put "update_profile",
+          params: { user: { short_name: "Monsturd", name: "Jenkins" },
+                    user_profile: { bio: "...", title: "!!!", pronunciation: } },
+          format: "json"
+      expect(flash[:success]).to be_falsey
+    end
+
     it "lets you change your short_name and profile information" do
       put "update_profile",
           params: { user: { short_name: "Monsturd", name: "Jenkins" },

@@ -59,6 +59,7 @@ class DeveloperKeysController < ApplicationController
 
   def create
     @key = DeveloperKey.new(developer_key_params)
+    @key.current_user = @current_user
     @key.account = @context if params[:account_id] && @context != Account.site_admin
     if @key.save
       render json: developer_key_json(@key, @current_user, session, account_context)

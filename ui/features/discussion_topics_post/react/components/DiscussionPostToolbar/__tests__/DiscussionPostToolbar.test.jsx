@@ -218,21 +218,21 @@ describe('DiscussionPostToolbar', () => {
   describe('Assign To', () => {
     beforeEach(() => {
       ENV.FEATURES = {
-        differentiated_modules: true,
+        selective_release_ui_api: true,
       }
     })
 
-    it('renders the Assign To button if user can edit and in a course discussion', () => {
+    it('renders the Assign To button if user can manageAssignTo and in a course discussion', () => {
       const {getByRole} = setup({
-        canEdit: true,
+        manageAssignTo: true,
         contextType: 'Course',
       })
       expect(getByRole('button', {name: 'Assign To'})).toBeInTheDocument()
     })
 
-    it('does not render the Assign To button if user can not edit', () => {
+    it('does not render the Assign To button if user can not manageAssignTo', () => {
       const {queryByRole} = setup({
-        canEdit: false,
+        manageAssignTo: false,
         contextType: 'Course',
       })
       expect(queryByRole('button', {name: 'Assign To'})).not.toBeInTheDocument()
@@ -240,7 +240,7 @@ describe('DiscussionPostToolbar', () => {
 
     it('does not render the Assign To button if a group discussion', () => {
       const {queryByRole} = setup({
-        canEdit: true,
+        manageAssignTo: true,
         contextType: 'Group',
       })
       expect(queryByRole('button', {name: 'Assign To'})).not.toBeInTheDocument()

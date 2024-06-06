@@ -24,7 +24,7 @@ module Types
 
     def initialize(object, context)
       @rubric_id = context[:rubric_id]
-      super(object, context)
+      super
     end
 
     implements Interfaces::LegacyIDInterface

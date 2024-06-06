@@ -43,7 +43,7 @@ import VisualOnFocusMessage from './VisualOnFocusMessage'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {Flex} from '@instructure/ui-flex'
-import {arrayOf, func} from 'prop-types'
+import {arrayOf, func, bool} from 'prop-types'
 
 const I18n = useI18nScope('assignments_2_student_content')
 
@@ -128,7 +128,7 @@ function renderAttemptsAndAvailability(assignment) {
 }
 
 function renderContentBaseOnAvailability(
-  {assignment, submission, reviewerSubmission},
+  {assignment, submission, reviewerSubmission, rubricExpanded, toggleRubricExpanded},
   alertContext,
   onSuccessfulPeerReview
 ) {
@@ -182,7 +182,12 @@ function renderContentBaseOnAvailability(
 
             {assignment.rubric && (
               <Suspense fallback={<LoadingIndicator />}>
-                <RubricsQuery assignment={assignment} submission={submission} />
+                <RubricsQuery
+                  assignment={assignment}
+                  submission={submission}
+                  rubricExpanded={rubricExpanded}
+                  toggleRubricExpanded={toggleRubricExpanded}
+                />
               </Suspense>
             )}
           </div>
@@ -314,6 +319,8 @@ StudentContent.propTypes = {
   reviewerSubmission: Submission.shape,
   onChangeSubmission: func,
   allSubmissions: arrayOf(Submission.shape),
+  rubricExpanded: bool,
+  toggleRubricExpanded: func,
 }
 
 StudentContent.defaultProps = {

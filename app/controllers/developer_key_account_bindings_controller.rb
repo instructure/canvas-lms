@@ -78,6 +78,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
     # this endpoint.
     binding = existing_binding || DeveloperKeyAccountBinding.new(create_params)
     binding.assign_attributes workflow_state_param
+    binding.current_user = @current_user
     binding.save!
     render json: DeveloperKeyAccountBindingSerializer.new(binding, @context),
            status: existing_binding.present? ? :ok : :created

@@ -644,7 +644,7 @@ class ContentExport < ActiveRecord::Base
   scope :without_epub, -> { eager_load(:epub_export).where(epub_exports: { id: nil }) }
   scope :expired, lambda {
     if ContentExport.expire?
-      where("created_at < ?", ContentExport.expire_days.days.ago)
+      where(created_at: ...ContentExport.expire_days.days.ago)
     else
       none
     end
@@ -676,6 +676,6 @@ class ContentExport < ActiveRecord::Base
   end
 
   def new_quizzes_common_cartridge_enabled?
-    context_type == "Course" && NewQuizzesFeaturesHelper.new_quizzes_common_cartridge_enabled?(context)
+    context_type == "Course" && NewQuizzesFeaturesHelper.new_quizzes_common_cartridge_enabled?
   end
 end

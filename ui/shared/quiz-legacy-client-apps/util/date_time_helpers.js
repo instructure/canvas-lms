@@ -18,7 +18,7 @@
 
 import {friendlyDatetime as friendlyDatetime_} from '@canvas/datetime/date-functions'
 
-export {fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
+export {fudgeDateForProfileTimezone} from '@instructure/moment-utils'
 
 export function friendlyDatetime(dateTime, perspective) {
   const muddledDateTime = dateTime

@@ -94,9 +94,14 @@ export const updateModuleAssignees = ({
     body: payload,
   })
     .then(() => {
-      showFlashAlert({
-        type: 'success',
-        message: I18n.t('Module access updated successfully.'),
+      // add the alert in the next event cycle so that the alert is added to the DOM's aria-live
+      // region after focus changes, thus preventing the focus change from interrupting the alert
+      setTimeout(() => {
+        showFlashAlert({
+          type: 'success',
+          message: I18n.t('Module access updated successfully.'),
+          politeness: 'polite',
+        })
       })
       updateModuleUI(moduleElement, payload)
     })

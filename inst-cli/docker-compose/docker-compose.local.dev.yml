@@ -54,6 +54,8 @@ services:
     depends_on:
       - postgres
       - redis
+    ports:
+    - "12345:12345"
     networks:
       default:
         aliases:

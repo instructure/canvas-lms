@@ -34,6 +34,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $isAnonymousAuthor: Boolean
     $allowRating: Boolean
     $onlyGradersCanRate: Boolean
+    $onlyVisibleToOverrides: Boolean
     $todoDate: DateTime
     $podcastEnabled: Boolean
     $podcastHasStudentPosts: Boolean
@@ -44,6 +45,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $assignment: AssignmentCreate
     $checkpoints: [DiscussionCheckpoints!]
     $fileId: ID
+    $ungradedDiscussionOverrides: [AssignmentOverrideCreateOrUpdate!]
   ) {
     createDiscussionTopic(
       input: {
@@ -59,6 +61,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         isAnonymousAuthor: $isAnonymousAuthor
         allowRating: $allowRating
         onlyGradersCanRate: $onlyGradersCanRate
+        onlyVisibleToOverrides: $onlyVisibleToOverrides
         todoDate: $todoDate
         podcastEnabled: $podcastEnabled
         podcastHasStudentPosts: $podcastHasStudentPosts
@@ -69,6 +72,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         assignment: $assignment
         checkpoints: $checkpoints
         fileId: $fileId
+        ungradedDiscussionOverrides: $ungradedDiscussionOverrides
       }
     ) {
       discussionTopic {
@@ -84,6 +88,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         isAnonymousAuthor
         allowRating
         onlyGradersCanRate
+        onlyVisibleToOverrides
         todoDate
         podcastEnabled
         podcastHasStudentPosts
@@ -145,6 +150,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
     $lockAt: DateTime
     $allowRating: Boolean
     $onlyGradersCanRate: Boolean
+    $onlyVisibleToOverrides: Boolean
     $todoDate: DateTime
     $podcastEnabled: Boolean
     $podcastHasStudentPosts: Boolean
@@ -156,6 +162,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
     $assignment: AssignmentUpdate
     $checkpoints: [DiscussionCheckpoints!]
     $setCheckpoints: Boolean
+    $ungradedDiscussionOverrides: [AssignmentOverrideCreateOrUpdate!]
   ) {
     updateDiscussionTopic(
       input: {
@@ -168,6 +175,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         lockAt: $lockAt
         allowRating: $allowRating
         onlyGradersCanRate: $onlyGradersCanRate
+        onlyVisibleToOverrides: $onlyVisibleToOverrides
         todoDate: $todoDate
         podcastEnabled: $podcastEnabled
         podcastHasStudentPosts: $podcastHasStudentPosts
@@ -179,6 +187,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         assignment: $assignment
         checkpoints: $checkpoints
         setCheckpoints: $setCheckpoints
+        ungradedDiscussionOverrides: $ungradedDiscussionOverrides
       }
     ) {
       discussionTopic {
@@ -194,6 +203,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         isAnonymousAuthor
         allowRating
         onlyGradersCanRate
+        onlyVisibleToOverrides
         todoDate
         podcastEnabled
         podcastHasStudentPosts

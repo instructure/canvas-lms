@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Ember from 'ember'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/moment-utils'
 
 const {Handlebars} = Ember
 

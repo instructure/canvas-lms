@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {AssigneeOption} from '../react/AssigneeSelector'
 import type {AssignmentOverridePayload, AssignmentOverridesPayload, ItemType} from '../react/types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {
   DateDetailsPayload,
   ItemAssignToCardSpec,
   DateDetailsOverride,
+  AssigneeOption,
 } from '../react/Item/types'
 
 const I18n = useI18nScope('differentiated_modules')
@@ -79,10 +79,17 @@ export const generateDateDetailsPayload = (
     payload.due_at = everyoneCard.due_at || null
     payload.unlock_at = everyoneCard.unlock_at || null
     payload.lock_at = everyoneCard.lock_at || null
+  }
+
+  if (
+    (everyoneCard !== undefined && !hasModuleOverrides) ||
+    (hasModuleOverrides && overrideCards.length === 0)
+  ) {
     payload.only_visible_to_overrides = false
-  } else if (!hasModuleOverrides) {
+  } else {
     payload.only_visible_to_overrides = true
   }
+
   payload.assignment_overrides = overrideCards
     .map(card => {
       const isUpdatedModuleOverride = card.contextModuleId !== undefined && card.isEdited

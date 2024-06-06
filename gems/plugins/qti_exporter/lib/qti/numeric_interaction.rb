@@ -20,7 +20,7 @@
 module Qti
   class NumericInteraction < AssessmentItemConverter
     def initialize(opts = {})
-      super(opts)
+      super
       @question[:question_type] = "numerical_question"
       @type = opts[:custom_type]
     end

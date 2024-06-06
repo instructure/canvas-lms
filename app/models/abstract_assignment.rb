@@ -1976,6 +1976,14 @@ class AbstractAssignment < ActiveRecord::Base
          !in_closed_grading_period?)
     end
     can :delete
+
+    given do |user, session|
+      next false unless user
+      next false if submission_types == "discussion_topic" && !context.grants_right?(user, session, :moderate_forum)
+
+      context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)
+    end
+    can :manage_assign_to
   end
 
   def user_can_update?(user, session = nil)
@@ -2554,7 +2562,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def as_json(options = {})
-    json = super(options)
+    json = super
     return json unless json
 
     if json["assignment"]
@@ -3072,9 +3080,19 @@ class AbstractAssignment < ActiveRecord::Base
   scope :for_course, ->(course_id) { where(context_type: "Course", context_id: course_id) }
   scope :for_group_category, ->(group_category_id) { where(group_category_id:) }
 
-  scope :visible_to_students_in_course_with_da, lambda { |user_id, course_id|
-    joins(:assignment_student_visibilities)
-      .where(assignment_student_visibilities: { user_id:, course_id: })
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students_in_courses(user_ids:, course_ids:).map(&:assignment_id)
+
+      if visible_assignment_ids.any?
+        where(id: visible_assignment_ids)
+      else
+        none # Return no records if no assignment IDs are visible
+      end
+    else
+      joins(:assignment_student_visibilities)
+        .where(assignment_student_visibilities: { user_id: user_ids, course_id: course_ids })
+    end
   }
 
   # course_ids should be courses that restrict visibility based on overrides
@@ -3082,6 +3100,15 @@ class AbstractAssignment < ActiveRecord::Base
   scope :filter_by_visibilities_in_given_courses, lambda { |user_ids, course_ids_that_have_da_enabled|
     if course_ids_that_have_da_enabled.blank?
       active
+    elsif Account.site_admin.feature_enabled?(:selective_release_backend)
+      user_ids = Array.wrap(user_ids)
+      course_ids = Array.wrap(course_ids_that_have_da_enabled)
+      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignment_visible_to_students_in_course(user_ids:, course_ids:, assignment_ids: ids).map(&:assignment_id)
+      where(
+        "(assignments.context_id NOT IN (?) AND assignments.workflow_state <> 'deleted') OR assignments.id IN (?)",
+        course_ids,
+        visible_assignment_ids
+      )
     else
       user_ids = Array.wrap(user_ids).join(",")
       course_ids = Array.wrap(course_ids_that_have_da_enabled).join(",")

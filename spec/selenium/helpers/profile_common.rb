@@ -72,9 +72,12 @@ shared_examples "user settings page change pic window" do
     # There is a default gray image placeholder for picture
     expect(f(".avatar-content .active .select-photo-link")).to include_text("choose a picture")
 
+    picture_options = f("#avatarDropdown")
+    select_list = Selenium::WebDriver::Support::Select.new(picture_options)
+
     # There are 'Upload Picture' and 'From Gravatar' buttons
-    expect(f(".nav.nav-pills .active")).to include_text("Upload a Picture")
-    expect(fj('.nav.nav-pills li :contains("From Gravatar")')).to include_text("From Gravatar")
+    expect(select_list.options[0]).to include_text("Upload a Picture")
+    expect(select_list.options[1]).to include_text("From Gravatar")
 
     # There are 'X', Save, and Cancel buttons
     expect(f(".ui-dialog-titlebar-close")).to be_truthy
@@ -92,7 +95,9 @@ shared_examples "with gravatar settings" do
 
     f(".avatar.profile_pic_link.none").click
     wait_for_ajaximations
-    expect(fj(".nav.nav-pills li")).not_to include_text("From Gravatar")
+
+    options = Selenium::WebDriver::Support::Select.new(f("#avatarDropdown")).options.map(&:text)
+    expect(options).not_to include("From Gravatar")
   end
 
   it "allows user to see gravatar when enabled", priority: "1" do
@@ -102,7 +107,8 @@ shared_examples "with gravatar settings" do
     f(".avatar.profile_pic_link.none").click
     wait_for_ajaximations
 
-    expect(fj('.nav.nav-pills li :contains("From Gravatar")')).to include_text("From Gravatar")
+    options = Selenium::WebDriver::Support::Select.new(f("#avatarDropdown")).options.map(&:text)
+    expect(options).to include("From Gravatar")
   end
 end
 

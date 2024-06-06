@@ -419,7 +419,7 @@ class SubmissionLifecycleManager
     @quiz_lti_assignments ||=
       ContentTag.joins("INNER JOIN #{ContextExternalTool.quoted_table_name} ON content_tags.content_type='ContextExternalTool' AND context_external_tools.id = content_tags.content_id")
                 .merge(ContextExternalTool.quiz_lti)
-                .where(context_type: "Assignment"). #
+                .where(context_type: "Assignment").
       # We're doing the following direct postgres any() rather than .where(context_id: @assignment_ids) on advice
       # from our DBAs that the any is considerably faster in the postgres planner than the "IN ()" statement that
       # AR would have generated.

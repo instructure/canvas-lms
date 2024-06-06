@@ -21,7 +21,7 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
   attr_reader :submissions, :attachments, :zip_attachment, :quiz, :filename
 
   def initialize(hash)
-    super(hash)
+    super
     @quiz = hash.fetch :quiz
     @zip_attachment = hash.fetch :zip_attachment
     @submissions = find_submissions

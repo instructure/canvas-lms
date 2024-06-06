@@ -17,8 +17,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// this is called by speed grader to enable communication
-// between quizzesNext LTI tool and speed grader
+// this is called by SpeedGrader to enable communication
+// between quizzesNext LTI tool and SpeedGrader
 // and modify normal speedGrader behavior to be more compatible
 // with our LTI tool
 

@@ -31,6 +31,13 @@ describe JwtsController do
       CanvasSecurity::ServicesJwt.decrypt(decoded_crypted_token)
     end
   end
+  let(:translate_unencrypted_token) do
+    lambda do |resp|
+      utf8_token_string = json_parse(resp.body)["token"]
+      decoded_token = Canvas::Security.base64_decode(utf8_token_string)
+      CanvasSecurity.decode_jwt(decoded_token, [CanvasSecurity::ServicesJwt::KeyStorage.present_key])
+    end
+  end
 
   describe "#generate" do
     it "requires being logged in" do
@@ -52,6 +59,31 @@ describe JwtsController do
         post "create", format: "json"
         decrypted_token_body = translate_token.call(response)
         expect(decrypted_token_body[:domain]).to eq("test.host")
+      end
+    end
+
+    context "asymmetric tokens" do
+      before { user_session(token_user) }
+
+      it "gererates an unencrypt token for non-canvas audiences" do
+        post "create", params: { canvas_audience: false }, format: "json"
+
+        jwt = translate_unencrypted_token.call(response)
+        expect(jwt[:sub]).to eq(token_user.global_id)
+      end
+
+      it "generates an encrypted token by default" do
+        post "create", format: "json"
+
+        jwt = translate_token.call(response)
+        expect(jwt[:sub]).to eq(token_user.global_id)
+      end
+
+      it "generates an encrypted token for the canvas audience" do
+        post "create", params: { canvas_audience: true }, format: "json"
+
+        jwt = translate_token.call(response)
+        expect(jwt[:sub]).to eq(token_user.global_id)
       end
     end
 

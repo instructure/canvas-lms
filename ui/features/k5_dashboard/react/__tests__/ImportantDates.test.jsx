@@ -23,7 +23,7 @@ import {act, render, waitForElementToBeRemoved, waitFor} from '@testing-library/
 
 import ImportantDates from '../ImportantDates'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/moment-utils'
 import {
   MOCK_ASSIGNMENTS,
   MOCK_EVENTS,

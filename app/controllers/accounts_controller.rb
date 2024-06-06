@@ -299,7 +299,7 @@ class AccountsController < ApplicationController
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
-  before_action :page_has_instui_topnav, only: [:users]
+  before_action :page_has_instui_topnav, only: %i[show users statistics settings]
 
   include Api::V1::Account
   include CustomSidebarLinksHelper
@@ -1953,7 +1953,10 @@ class AccountsController < ApplicationController
                                    :students_can_create_courses_anywhere,
                                    { default_due_time: [:value] }.freeze,
                                    { conditional_release: [:value, :locked] }.freeze,
-                                   { allow_observers_in_appointment_groups: [:value] }.freeze,].freeze
+                                   { allow_observers_in_appointment_groups: [:value] }.freeze,
+                                   :enable_inbox_signature_block,
+                                   :enable_inbox_auto_response,
+                                   :enable_name_pronunciation,].freeze
 
   def permitted_account_attributes
     [:name,

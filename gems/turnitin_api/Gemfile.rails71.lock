@@ -58,7 +58,7 @@ GEM
       aroi (>= 0.0.7)
       dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
       statsd-ruby (~> 1.0)
-    minitest (5.23.0)
+    minitest (5.23.1)
     multipart-post (2.4.1)
     mutex_m (0.2.0)
     net-http (0.4.1)
@@ -110,4 +110,4 @@ RUBY VERSION
    ruby 3.1.2p20
 
 BUNDLED WITH
-   2.5.9
+   2.5.10

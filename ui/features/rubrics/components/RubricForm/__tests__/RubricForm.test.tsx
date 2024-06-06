@@ -19,13 +19,12 @@
 import React from 'react'
 import Router from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import {QueryProvider, queryClient} from '@canvas/query'
 import {RubricForm, reorder} from '../index'
 import {RUBRICS_QUERY_RESPONSE} from './fixtures'
 import * as RubricFormQueries from '../../../queries/RubricFormQueries'
 import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
-import {get} from 'lodash'
 
 jest.mock('react-router', () => ({
   ...jest.requireActual('react-router'),
@@ -129,10 +128,26 @@ describe('RubricForm Tests', () => {
       expect(getByTestId('save-rubric-button')).toBeDisabled()
     })
 
-    it('save button is enabled when title is not empty', () => {
+    it('save button is disabled when there are no criteria', () => {
       const {getByTestId} = renderComponent()
       const titleInput = getByTestId('rubric-form-title')
       fireEvent.change(titleInput, {target: {value: 'Rubric 1'}})
+      expect(getByTestId('save-rubric-button')).toBeDisabled()
+    })
+
+    it('save button is enabled when title is not empty and there is criteria', async () => {
+      const {getByTestId} = renderComponent()
+      const titleInput = getByTestId('rubric-form-title')
+      fireEvent.change(titleInput, {target: {value: 'Rubric 1'}})
+
+      fireEvent.click(getByTestId('add-criterion-button'))
+      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
+      fireEvent.change(getByTestId('rubric-criterion-description'), {
+        target: {value: 'New Criterion Test'},
+      })
+      fireEvent.click(getByTestId('rubric-criterion-save'))
+
       expect(getByTestId('save-rubric-button')).toBeEnabled()
     })
 
@@ -151,6 +166,13 @@ describe('RubricForm Tests', () => {
       const {getByTestId} = renderComponent()
       const titleInput = getByTestId('rubric-form-title')
       fireEvent.change(titleInput, {target: {value: 'Rubric 1'}})
+      fireEvent.click(getByTestId('add-criterion-button'))
+      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
+      fireEvent.change(getByTestId('rubric-criterion-description'), {
+        target: {value: 'New Criterion Test'},
+      })
+      fireEvent.click(getByTestId('rubric-criterion-save'))
       fireEvent.click(getByTestId('save-rubric-button'))
 
       await new Promise(resolve => setTimeout(resolve, 0))
@@ -336,7 +358,7 @@ describe('RubricForm Tests', () => {
             },
           },
         }
-        jest.spyOn(FindDialog.prototype, 'import').mockImplementation(function (e) {
+        jest.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
           // @ts-ignore
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })
@@ -373,7 +395,7 @@ describe('RubricForm Tests', () => {
             },
           },
         }
-        jest.spyOn(FindDialog.prototype, 'import').mockImplementation(function (e) {
+        jest.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
           // @ts-ignore
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })

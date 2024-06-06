@@ -1,3 +1,4 @@
+/* eslint-disable no-throw-literal */
 /*
  * Copyright (C) 2015 - present Instructure, Inc.
  *
@@ -16,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n, {useTranslations} from '@canvas/i18n'
+import I18n from '@canvas/i18n'
 import enTranslations from 'translations/en.json'
 
 const frames = []

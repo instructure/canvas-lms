@@ -8,9 +8,10 @@ if [ "$GERRIT_PROJECT" == "canvas-lms" ]; then
     gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"warn\",\"message\":\"$message\"}"
   fi
 
-  # when modifying Dockerfile or Dockerfile.jenkins*, Dockerfile.template must also be modified.
+  # when modifying Dockerfile, Dockerfile.jenkins, or Dockerfile.production, Dockerfile.template must also be modified.
   ruby build/dockerfile_writer.rb --env development --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile
   ruby build/dockerfile_writer.rb --env jenkins --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.jenkins
+  ruby build/dockerfile_writer.rb --env production --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.production
   if ! git diff --exit-code Dockerfile; then
     message="Dockerfile and build/Dockerfile.template need to be kept in sync. Update Dockerfile by running the command given at the top.\\n"
     gergich comment "{\"path\":\"\Dockerfile\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
@@ -18,6 +19,10 @@ if [ "$GERRIT_PROJECT" == "canvas-lms" ]; then
   if ! git diff --exit-code Dockerfile.jenkins; then
     message="Dockerfile.jenkins and build/Dockerfile.template need to be kept in sync. Update Dockerfile.jenkins by running the command given at the top.\\n"
     gergich comment "{\"path\":\"\Dockerfile.jenkins\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
+  fi
+  if ! git diff --exit-code Dockerfile.production; then
+    message="Dockerfile.production and build/Dockerfile.template need to be kept in sync. Update Dockerfile.production by running the command given at the top.\\n"
+    gergich comment "{\"path\":\"\Dockerfile.production\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
   fi
 fi
 

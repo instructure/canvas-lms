@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../lti_1_3_spec_helper"
+
 describe DeveloperKeysController do
   let(:test_domain_root_account) { Account.create! }
   let(:site_admin_key) { DeveloperKey.create!(name: "Site Admin Key", visible: false) }
@@ -527,11 +529,14 @@ describe DeveloperKeysController do
     end
 
     describe "Should be able to create developer key" do
+      include_context "lti_1_3_spec_helper"
+
       let(:create_params) do
         {
           account_id: test_domain_root_account.id,
           developer_key: {
-            redirect_uri: "http://example.com/sdf"
+            redirect_uri: "http://example.com/sdf",
+            name: "test tool"
           }
         }
       end

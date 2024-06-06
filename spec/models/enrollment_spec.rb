@@ -187,6 +187,39 @@ describe Enrollment do
     end
   end
 
+  describe "#enrollment_state" do
+    let_once(:enrollment) { enrollment_model }
+
+    context "when called on a new record" do
+      it "raises an error" do
+        expect { described_class.new.enrollment_state }
+          .to raise_error(RuntimeError, "cannot call enrollment_state on a new record")
+      end
+    end
+
+    context "when enrollment_state exists" do
+      let(:enrollment_state) { EnrollmentState.find_by(enrollment_id: enrollment) }
+
+      it "returns the existing enrollment_state" do
+        expect(enrollment.enrollment_state).to eq(enrollment_state)
+      end
+    end
+
+    context "when enrollment enrollment_state association is nil" do
+      let(:non_stale_enrollment_state) { EnrollmentState.find_by(enrollment_id: enrollment) }
+
+      before do
+        allow_any_instance_of(ActiveRecord::Associations::HasOneAssociation).to receive(:reload)
+      end
+
+      it "returns the non-stale enrollment_state" do
+        enrollment.association(:enrollment_state).target = nil
+
+        expect(enrollment.enrollment_state).to eq(non_stale_enrollment_state)
+      end
+    end
+  end
+
   describe "#destroy" do
     context "with overrides" do
       before(:once) do

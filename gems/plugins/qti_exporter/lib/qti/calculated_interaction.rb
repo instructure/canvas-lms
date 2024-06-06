@@ -20,7 +20,7 @@
 module Qti
   class CalculatedInteraction < AssessmentItemConverter
     def initialize(opts)
-      super(opts)
+      super
       @question[:answers] = []
       @question[:variables] = []
       @question[:question_type] = "calculated_question"

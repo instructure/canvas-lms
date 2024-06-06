@@ -634,61 +634,91 @@ class ContentTag < ActiveRecord::Base
   }
 
   scope :for_differentiable_quizzes, lambda { |user_ids, course_ids|
-    joins("JOIN #{Quizzes::QuizStudentVisibility.quoted_table_name} as qsv ON qsv.quiz_id = content_tags.content_id")
-      .where("content_tags.context_id IN (?)
-             AND content_tags.context_type = 'Course'
-             AND qsv.course_id IN (?)
-             AND content_tags.content_type in ('Quiz', 'Quizzes::Quiz')
-             AND qsv.user_id = ANY( '{?}'::INT8[] )
-        ",
-             course_ids,
-             course_ids,
-             user_ids)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students_in_courses(user_ids:, course_ids:).map(&:quiz_id)
+      where(content_id: visible_quiz_ids, context_id: course_ids, context_type: "Course", content_type: ["Quiz", "Quizzes::Quiz"])
+    else
+      joins("JOIN #{Quizzes::QuizStudentVisibility.quoted_table_name} as qsv ON qsv.quiz_id = content_tags.content_id")
+        .where("content_tags.context_id IN (?)
+              AND content_tags.context_type = 'Course'
+              AND qsv.course_id IN (?)
+              AND content_tags.content_type in ('Quiz', 'Quizzes::Quiz')
+              AND qsv.user_id = ANY( '{?}'::INT8[] )
+          ",
+               course_ids,
+               course_ids,
+               user_ids)
+    end
   }
 
   scope :for_differentiable_assignments, lambda { |user_ids, course_ids|
-    joins("JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv ON asv.assignment_id = content_tags.content_id")
-      .where("content_tags.context_id IN (?)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students_in_courses(user_ids:, course_ids:).map(&:assignment_id)
+      where(content_id: visible_assignment_ids, context_id: course_ids, context_type: "Course", content_type: "Assignment")
+    else
+      joins("JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv ON asv.assignment_id = content_tags.content_id")
+        .where("content_tags.context_id IN (?)
              AND content_tags.context_type = 'Course'
              AND asv.course_id IN (?)
              AND content_tags.content_type = 'Assignment'
              AND asv.user_id = ANY( '{?}'::INT8[] )
         ",
-             course_ids,
-             course_ids,
-             user_ids)
+               course_ids,
+               course_ids,
+               user_ids)
+    end
   }
 
   scope :for_differentiable_discussions, lambda { |user_ids, course_ids|
-    joins("JOIN #{DiscussionTopic.quoted_table_name} ON discussion_topics.id = content_tags.content_id
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      unfiltered_discussion_ids = where(content_type: "DiscussionTopic").pluck(:content_id)
+      assignment_ids = DiscussionTopic.where(id: unfiltered_discussion_ids).where.not(assignment_id: nil).pluck(:assignment_id)
+      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignment_visible_to_students_in_course(user_ids:, course_ids:, assignment_ids:).map(&:assignment_id)
+      discussion_topic_ids = DiscussionTopic.where(assignment_id: visible_assignment_ids).pluck(:id)
+      joins("JOIN #{DiscussionTopic.quoted_table_name} ON discussion_topics.id = content_tags.content_id
+             AND content_tags.content_type = 'DiscussionTopic'")
+        .where(content_id: discussion_topic_ids, context_id: course_ids, context_type: "Course", content_type: "DiscussionTopic")
+    else
+      joins("JOIN #{DiscussionTopic.quoted_table_name} ON discussion_topics.id = content_tags.content_id
            AND content_tags.content_type = 'DiscussionTopic'")
-      .joins("JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv ON asv.assignment_id = discussion_topics.assignment_id")
-      .where("content_tags.context_id IN (?)
+        .joins("JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv ON asv.assignment_id = discussion_topics.assignment_id")
+        .where("content_tags.context_id IN (?)
              AND content_tags.context_type = 'Course'
              AND asv.course_id IN (?)
              AND content_tags.content_type = 'DiscussionTopic'
              AND discussion_topics.assignment_id IS NOT NULL
              AND asv.user_id = ANY( '{?}'::INT8[] )
       ",
-             course_ids,
-             course_ids,
-             user_ids)
+               course_ids,
+               course_ids,
+               user_ids)
+    end
   }
 
   scope :for_differentiable_wiki_pages, lambda { |user_ids, course_ids|
-    joins("JOIN #{WikiPage.quoted_table_name} as wp on wp.id = content_tags.content_id
+    if Account.site_admin.feature_enabled?(:selective_release_backend) # TODO: I feel like this could be better
+      unfiltered_page_ids = where(content_type: "WikiPage").pluck(:content_id)
+      assignment_ids = WikiPage.where(id: unfiltered_page_ids).where.not(assignment_id: nil).pluck(:assignment_id)
+      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignment_visible_to_students_in_course(user_ids:, course_ids:, assignment_ids:).map(&:assignment_id)
+      page_ids = WikiPage.where(assignment_id: visible_assignment_ids).pluck(:id)
+      joins("JOIN #{WikiPage.quoted_table_name} ON wiki_pages.id = content_tags.content_id
+            AND content_tags.content_type = 'WikiPage'")
+        .where(content_id: page_ids, context_id: course_ids, context_type: "Course", content_type: "WikiPage")
+    else
+      joins("JOIN #{WikiPage.quoted_table_name} as wp on wp.id = content_tags.content_id
            AND content_tags.content_type = 'WikiPage'")
-      .joins("JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv on asv.assignment_id = wp.assignment_id")
-      .where("content_tags.context_id IN (?)
+        .joins("JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv on asv.assignment_id = wp.assignment_id")
+        .where("content_tags.context_id IN (?)
              AND content_tags.context_type = 'Course'
              AND asv.course_id in (?)
              AND content_tags.content_type = 'WikiPage'
              AND wp.assignment_id IS NOT NULL
              AND asv.user_id = ANY( '{?}'::INT8[] )
       ",
-             course_ids,
-             course_ids,
-             user_ids)
+               course_ids,
+               course_ids,
+               user_ids)
+    end
   }
 
   scope :can_have_assignment, -> { where(content_type: ["Assignment", "DiscussionTopic", "Quizzes::Quiz", "WikiPage"]) }
@@ -859,7 +889,7 @@ class ContentTag < ActiveRecord::Base
 
   def update_module_item_submissions(change_of_module: true)
     valid_types = ["Assignment", "Quizzes::Quiz", "DiscussionTopic"]
-    return unless Account.site_admin.feature_enabled?(:differentiated_modules)
+    return unless Account.site_admin.feature_enabled?(:selective_release_backend)
 
     return unless tag_type == "context_module" && valid_types.include?(content_type)
 

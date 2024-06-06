@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+const {glob} = require('glob')
 const path = require('path')
 
 module.exports = {
@@ -258,6 +259,36 @@ module.exports = {
     },
   },
   overrides: [
+    {
+      files: ['ui/**/*Spec.js', 'ui/**/*Spec.jsx'],
+      extends: ['plugin:qunit/recommended', 'plugin:qunit/two'],
+      plugins: ['qunit'],
+      globals: {
+        module: true,
+        test: true,
+        equal: true,
+        ok: true,
+        sandbox: true,
+        sinon: true,
+        deepEqual: true,
+      },
+      env: {
+        qunit: true,
+      },
+      rules: {
+        'func-names': 'off',
+        'prefer-arrow-callback': 'off',
+        'jest/no-identical-title': 'off',
+        'qunit/no-identical-names': 'off',
+        'qunit/no-setup-teardown': 'off',
+        'qunit/no-global-assertions': 'off',
+        'qunit/no-global-module-test': 'off',
+        'qunit/require-expect': 'off',
+        'qunit/no-assert-logical-expression': 'error',
+        'qunit/no-commented-tests': 'error',
+        'qunit/no-compare-relation-boolean': 'error',
+      },
+    },
     {
       files: require('./jest.config').testMatch,
       plugins: ['jest'],

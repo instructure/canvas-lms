@@ -1029,10 +1029,10 @@ figure {
   margin-#{direction(right)}: 0 !important;
 }
 
-// even though we show no headers in speed grader, we want the
+// even though we show no headers in SpeedGrader, we want the
 // masquerade bar to always show if someone is masquerading
 // (#masquerade_bar is set to 'display: none !important' for
-// body.no-headers at the top level _layout.scss, and speed grader
+// body.no-headers at the top level _layout.scss, and SpeedGrader
 // uses body.no-headers to hide the standard canvas headers/footer)
 body.no-headers {
   #masquerade_bar {

@@ -1168,7 +1168,7 @@ class GradebooksController < ApplicationController
           )
         end
 
-        if Account.site_admin.feature_enabled?(:platform_service_speedgrader) && params[:platform_sg].present?
+        if Account.site_admin.feature_enabled?(:platform_service_speedgrader) && value_to_boolean(params[:platform_sg])
 
           @page_title = t("SpeedGrader")
           @body_classes << "full-width padless-content"

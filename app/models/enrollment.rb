@@ -762,7 +762,9 @@ class Enrollment < ActiveRecord::Base
       association(:enrollment_state).reload
       result = super
     end
-    result.enrollment = self # ensure reverse association
+    # ensure we have an enrollment state object present with a reverse association
+    result ||= create_enrollment_state
+    result.enrollment = self
     result
   end
 

@@ -24,5 +24,18 @@ class UngradedDiscussionStudentVisibility < ActiveRecord::Base
     true
   end
 
+  def self.where_with_guard(*args)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      raise StandardError, "UngradedDiscussionStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use UngradedDiscussionVisibilityService instead"
+    end
+
+    where_without_guard(*args)
+  end
+
+  class << self
+    alias_method :where_without_guard, :where
+    alias_method :where, :where_with_guard
+  end
+
   before_destroy { raise ActiveRecord::ReadOnlyRecord }
 end

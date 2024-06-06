@@ -324,6 +324,18 @@ describe "discussions index" do
         expect(DiscussionsIndex.manage_discussions_menu).to include_text("Delete")
         expect(DiscussionsIndex.manage_discussions_menu).not_to include_text("Assign To")
       end
+
+      it "does not show the option when the user does not have the moderate_forum permission" do
+        discussion = create_graded_discussion(@course)
+        login_and_visit_course(@teacher, @course)
+        DiscussionsIndex.discussion_menu(discussion.title).click
+        expect(DiscussionsIndex.manage_discussions_menu).to include_text("Assign To")
+
+        RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: teacher_role, enabled: false)
+        login_and_visit_course(@teacher, @course)
+        DiscussionsIndex.discussion_menu(discussion.title).click
+        expect(DiscussionsIndex.manage_discussions_menu).not_to include_text("Assign To")
+      end
     end
   end
 end

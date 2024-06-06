@@ -60,12 +60,12 @@ describe('GroupsMenu', () => {
     })
 
     it('should find the group names, and corresponding unread counts', () => {
-      const {queryByText, queryByTestId} = setup(defaultProps)
-      expect(queryByText('Group_Test_1')).toBeFalsy()
+      const {queryByText, queryAllByText, queryByTestId} = setup(defaultProps)
+      expect(queryAllByText('Group_Test_1')).toEqual([])
       fireEvent.click(queryByTestId('groups-menu-btn'))
-      expect(queryByText('Group_Test_1')).toBeTruthy()
+      expect(queryAllByText('Group_Test_1').length).toEqual(2)
       expect(queryByText('0 Unread')).toBeTruthy()
-      expect(queryByText('Group_Test_2')).toBeTruthy()
+      expect(queryAllByText('Group_Test_2').length).toEqual(2)
       expect(queryByText('5 Unread')).toBeTruthy()
     })
   })

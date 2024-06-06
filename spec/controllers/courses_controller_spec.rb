@@ -29,12 +29,12 @@ describe CoursesController do
       controller.instance_variable_set(:@domain_root_account, Account.default)
     end
 
-    def get_index(user = nil)
+    def get_index(user: nil, index_params: {})
       user_session(user) if user
       user ||= @user
       controller.instance_variable_set(:@current_user, user)
+      get "index", params: index_params
       controller.load_enrollments_for_index
-      get "index"
     end
 
     it "forces login" do
@@ -75,7 +75,7 @@ describe CoursesController do
       course_with_student_logged_in
       toggle_k5_setting(@course.account)
 
-      get_index @student
+      get_index(user: @student)
       expect(assigns[:js_bundles].flatten).to include :k5_theme
       expect(assigns[:css_bundles].flatten).to include :k5_theme, :k5_font
     end
@@ -83,7 +83,7 @@ describe CoursesController do
     it "does not set k5_theme when k5 is off" do
       course_with_student_logged_in
 
-      get_index @student
+      get_index(user: @student)
       expect(assigns[:js_bundles].flatten).not_to include :k5_theme
       expect(assigns[:css_bundles].flatten).not_to include :k5_theme, :k5_font
     end
@@ -93,7 +93,7 @@ describe CoursesController do
       toggle_k5_setting(@course.account)
       toggle_classic_font_setting(@course.account)
 
-      get_index @student
+      get_index(user: @student)
       expect(assigns[:css_bundles].flatten).to include :k5_theme
       expect(assigns[:css_bundles].flatten).not_to include :k5_font
     end
@@ -136,6 +136,133 @@ describe CoursesController do
         controller.instance_variable_set(:@current_user, @student1)
         controller.load_enrollments_for_index
         expect(assigns[:current_enrollments].length).to be 3
+      end
+    end
+
+    shared_examples "sorting" do
+      before do
+        @course1 = (type == "future") ? Account.default.courses.create!(name: "A", start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true) : Account.default.courses.create!(name: "A")
+        @course2 = (type == "future") ? Account.default.courses.create!(name: "Z", start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true) : Account.default.courses.create!(name: "Z")
+
+        # user is enrolled as a student in course 1
+        enrollment1 = course_with_student user: @student, course: @course1
+        enrollment1.invite!
+
+        # publish course 2
+        @course2.offer!
+        # user is enrolled as a ta in course 2
+        enrollment2 = course_with_ta course: @course2, user: @student, active_all: true
+
+        term1 = @course1.root_account.enrollment_terms.create!(name: "Term 1")
+        @course1.enrollment_term = term1
+        @course1.save!
+
+        term2 = @course2.root_account.enrollment_terms.create!(name: "Term 2")
+        @course2.enrollment_term = term2
+        @course2.save!
+
+        @student.set_preference(:course_nicknames, @course1.id, "English")
+        @student.set_preference(:course_nicknames, @course2.id, "Math")
+
+        @student.favorites.create!(context: @course2)
+
+        if type == "past"
+          [enrollment1, enrollment2].each(&:complete!)
+        end
+      end
+
+      context "on published column" do
+        it "lists unpublished courses after published" do
+          user_session(@student)
+          get_index
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course2.id, @course1.id]
+        end
+
+        it "lists unpublished courses after published when descending order" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "published", order_column => "desc" })
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course1.id, @course2.id]
+        end
+      end
+
+      context "on enrolled as column" do
+        it "lists enrollment type alphabetically" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "enrolled_as" })
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course1.id, @course2.id]
+        end
+
+        it "lists enrollment type reverse alphabetically when descending order" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "enrolled_as", order_column => "desc" })
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course2.id, @course1.id]
+        end
+      end
+
+      context "on term column" do
+        it "lists terms alphabetically" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "term" })
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course1.id, @course2.id]
+        end
+
+        it "lists terms reverse alphabetically when descending order" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "term", order_column => "desc" })
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course2.id, @course1.id]
+        end
+      end
+
+      context "on nickname column" do
+        it "lists course nicknames alphabetically" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "nickname" })
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course1.id, @course2.id]
+        end
+
+        it "lists course nicknames reverse alphabetically when descending order" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "nickname", order_column => "desc" })
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course2.id, @course1.id]
+        end
+      end
+
+      context "on course name column" do
+        it "lists course names alphabetically" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "course" })
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course1.id, @course2.id]
+        end
+
+        it "lists course names reverse alphabetically when descending order" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "course", order_column => "desc" })
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course2.id, @course1.id]
+        end
+      end
+
+      context "on favorites column" do
+        it "lists favorited courses first" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "favorite" })
+          if type == "past"
+            # Only active courses can be favorited. Therefore, we don't expect the sorting to affect the order.
+            expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course1.id, @course2.id]
+          else
+            expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course2.id, @course1.id]
+          end
+        end
+
+        it "lists favorited courses last when descending order" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "favorite", order_column => "desc" })
+          if type == "past"
+            # Only active courses can be favorited. Therefore, the list will just be reversed from its ascending order.
+            expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course2.id, @course1.id]
+          else
+            expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course1.id, @course2.id]
+          end
+        end
       end
     end
 
@@ -246,25 +373,6 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to be_empty
       end
 
-      describe "unpublished_courses" do
-        it "lists unpublished courses after published" do
-          # unpublished course
-          course1 = Account.default.courses.create! name: "A"
-          enrollment1 = course_with_student user: @student, course: course1
-          enrollment1.invite!
-          expect(course1).to be_unpublished
-
-          # published course
-          course2 = Account.default.courses.create! name: "Z"
-          course2.offer!
-          course_with_student course: course2, user: @student, active_all: true
-
-          user_session(@student)
-          get_index
-          expect(assigns[:current_enrollments].map(&:course_id)).to eq [course2.id, course1.id]
-        end
-      end
-
       context "as enrollment admin" do
         it "includes courses with no applicable start/end dates" do
           # no dates at all
@@ -291,6 +399,14 @@ describe CoursesController do
           expect(assigns[:past_enrollments]).to be_empty
           expect(assigns[:current_enrollments]).to eq [enrollment1, enrollment2, enrollment3]
           expect(assigns[:future_enrollments]).to be_empty
+        end
+      end
+
+      describe "sorting" do
+        include_examples "sorting" do
+          let(:type) { "current" }
+          let(:sort_column) { "cc_sort" }
+          let(:order_column) { "cc_order" }
         end
       end
     end
@@ -502,7 +618,7 @@ describe CoursesController do
 
         course1.enrollment_term.update_attribute(:end_at, 1.month.ago)
 
-        get_index(@student)
+        get_index(user: @student)
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
@@ -510,13 +626,13 @@ describe CoursesController do
 
         observer = user_with_pseudonym(active_all: true)
         add_linked_observer(@student, observer)
-        get_index(observer)
+        get_index(user: observer)
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
 
-        get_index(teacher)
+        get_index(user: teacher)
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to eq [teacher_enrollment]
         expect(assigns[:current_enrollments]).to be_empty
@@ -563,6 +679,14 @@ describe CoursesController do
           user_session(@student)
           get_index
           expect(assigns[:past_enrollments].map(&:course_id)).to eq [course2.id, course1.id] # Z, then A
+        end
+      end
+
+      describe "sorting" do
+        include_examples "sorting" do
+          let(:type) { "past" }
+          let(:sort_column) { "pc_sort" }
+          let(:order_column) { "pc_order" }
         end
       end
     end
@@ -696,6 +820,14 @@ describe CoursesController do
           user_session(@student)
           get_index
           expect(assigns[:future_enrollments].map(&:course_id)).to eq [course2.id, course1.id] # Z, then A
+        end
+      end
+
+      describe "sorting" do
+        include_examples "sorting" do
+          let(:type) { "future" }
+          let(:sort_column) { "fc_sort" }
+          let(:order_column) { "fc_order" }
         end
       end
     end
@@ -1634,7 +1766,7 @@ describe CoursesController do
       expect(assigns(:js_env)[:FLAGS].keys).to include :newquizzes_on_quiz_page
     end
 
-    it "sets speed grader link flags for assignments view" do
+    it "sets SpeedGrader link flags for assignments view" do
       course_with_teacher_logged_in(active_all: true)
       @course.default_view = "assignments"
       @course.save!

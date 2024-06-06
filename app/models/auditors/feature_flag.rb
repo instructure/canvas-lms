@@ -46,7 +46,7 @@ class Auditors::FeatureFlag
     end
 
     def initialize(*args)
-      super(*args)
+      super
 
       if attributes["feature_flag"]
         self.feature_flag = attributes.delete("feature_flag")
@@ -98,14 +98,10 @@ class Auditors::FeatureFlag
 
   Stream = Auditors.stream do
     ff_ar_type = Auditors::ActiveRecord::FeatureFlagRecord
-    active_record_type ff_ar_type
-    record_type Auditors::FeatureFlag::Record
+    record_type ff_ar_type
     self.raise_on_error = true
 
     add_index :feature_flag do
-      table :feature_flag_changes_by_feature_flag
-      entry_proc ->(record) { record.feature_flag }
-      key_proc ->(feature_flag) { feature_flag.global_id }
       ar_scope_proc ->(feature_flag) { ff_ar_type.where(feature_flag_id: feature_flag.id) }
     end
   end

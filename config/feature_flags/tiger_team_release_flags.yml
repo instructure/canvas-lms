@@ -1,0 +1,10 @@
+courses_popout_sisid:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Courses Popout SIS ID
+  description: Adds the course sis id (if present) to the additional information in the courses popout
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on

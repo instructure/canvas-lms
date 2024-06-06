@@ -26,6 +26,7 @@ describe Courses::ItemVisibilityHelper do
   end
 
   it "loads (and cache) visibilities for each model" do
+    Account.site_admin.disable_feature!(:selective_release_backend)
     expect(AssignmentStudentVisibility).to receive(:visible_assignment_ids_in_course_by_user).and_return({}).once
     expect(DiscussionTopic).to receive(:visible_ids_by_user).and_return({}).once
     expect(WikiPage).to receive(:visible_ids_by_user).and_return({}).once
@@ -39,6 +40,7 @@ describe Courses::ItemVisibilityHelper do
   end
 
   it "preloads visibilities if desired" do
+    Account.site_admin.disable_feature!(:selective_release_backend)
     assignment_model(course: @course, submission_types: "online_url", workflow_state: "published", only_visible_to_overrides: false)
 
     enrolls = []
