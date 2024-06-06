@@ -20,8 +20,8 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import _ from 'lodash'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
-import OutcomeDialogView from 'ui/features/grade_summary/backbone/views/OutcomeDialogView'
-import OutcomeLineGraphView from 'ui/features/grade_summary/backbone/views/OutcomeLineGraphView'
+import OutcomeDialogView from '../OutcomeDialogView'
+import OutcomeLineGraphView from '../OutcomeLineGraphView'
 
 QUnit.module('OutcomeDialogViewSpec', {
   setup() {

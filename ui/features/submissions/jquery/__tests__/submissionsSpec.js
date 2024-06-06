@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 
-import {setup, teardown} from 'ui/features/submissions/jquery/index'
+import {setup, teardown} from '../index'
 import fakeENV from 'helpers/fakeENV'
 import '@canvas/jquery/jquery.ajaxJSON'
 

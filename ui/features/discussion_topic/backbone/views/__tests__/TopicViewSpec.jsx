@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import TopicView from 'ui/features/discussion_topic/backbone/views/TopicView'
+import TopicView from '../TopicView'
 import Backbone from '@canvas/backbone'
 import fakeENV from 'helpers/fakeENV'
-import DiscussionFilterState from 'ui/features/discussion_topic/backbone/models/DiscussionFilterState'
+import DiscussionFilterState from '../../models/DiscussionFilterState'
 import ReactDOM from 'react-dom'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'

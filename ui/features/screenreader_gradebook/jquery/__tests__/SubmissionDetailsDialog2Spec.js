@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 
 import fakeENV from 'helpers/fakeENV'
-import SubmissionDetailsDialog from 'ui/features/screenreader_gradebook/jquery/SubmissionDetailsDialog'
+import SubmissionDetailsDialog from '../SubmissionDetailsDialog'
 
 let assignment
 let student

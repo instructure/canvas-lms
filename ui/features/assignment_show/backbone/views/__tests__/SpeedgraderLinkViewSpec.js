@@ -1,4 +1,3 @@
-/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import SpeedgraderLinkView from 'ui/features/assignment_show/backbone/views/SpeedgraderLinkView'
+import SpeedgraderLinkView from '../SpeedgraderLinkView'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import $ from 'jquery'
 import 'jquery-migrate'
@@ -41,6 +40,7 @@ QUnit.module('SpeedgraderLinkView', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.view, done, {a11yReport: true})
