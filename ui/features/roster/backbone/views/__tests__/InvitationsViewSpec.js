@@ -1,4 +1,3 @@
-/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -19,8 +18,8 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import InvitationsView from 'ui/features/roster/backbone/views/InvitationsView'
-import RosterUser from 'ui/features/roster/backbone/models/RosterUser'
+import InvitationsView from '../InvitationsView'
+import RosterUser from '../../models/RosterUser'
 import assertions from 'helpers/assertions'
 
 QUnit.module('InvitationsView', {
@@ -45,6 +44,7 @@ const buildView = function (enrollments) {
   model.currentRole = 'student'
   return new InvitationsView({model})
 }
+// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', assert => {
   const enrollments = [
     {

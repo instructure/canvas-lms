@@ -1,4 +1,3 @@
-/* eslint-disable qunit/resolve-async */
 //
 // Copyright (C) 2013 - present Instructure, Inc.
 //
@@ -20,7 +19,7 @@ import _ from 'lodash'
 import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
 import Course from '@canvas/courses/backbone/models/Course'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
-import ToggleShowByView from 'ui/features/assignment_index/backbone/views/ToggleShowByView'
+import ToggleShowByView from '../ToggleShowByView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
@@ -130,6 +129,7 @@ QUnit.module('ToggleShowByView', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('should be accessible', assert => {
   const view = createView(true)
   const done = assert.async()
