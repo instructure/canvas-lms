@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
-import CollaborationView from 'ui/features/collaborations/backbone/views/CollaborationView'
+import CollaborationView from '../CollaborationView'
 
 let fixtures
 let view
