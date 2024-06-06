@@ -17,11 +17,8 @@
  */
 
 import ReactDOM from 'react-dom'
-import AnonymousSpeedGraderAlert from 'ui/features/gradebook/react/default_gradebook/components/AnonymousSpeedGraderAlert'
-import {
-  createGradebook,
-  setFixtureHtml,
-} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import AnonymousSpeedGraderAlert from '../AnonymousSpeedGraderAlert'
+import {createGradebook, setFixtureHtml} from '../../__tests__/GradebookSpecHelper'
 
 const $fixtures = document.getElementById('fixtures')
 

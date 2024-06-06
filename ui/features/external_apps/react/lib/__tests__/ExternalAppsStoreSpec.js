@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import store from 'ui/features/external_apps/react/lib/ExternalAppsStore'
+import $ from 'jquery'
+import store from '../ExternalAppsStore'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('ExternalApps.ExternalAppsStore', {
@@ -118,6 +119,7 @@ test('updateAccessToken', function () {
 })
 
 test('fetchWithDetails with ContextExternalTool', function () {
+  // eslint-disable-next-line jest/valid-expect, qunit/no-global-expect
   expect(1)
   const tool = this.tools[0]
   this.server.respondWith('GET', /\/external_tools/, [
@@ -130,6 +132,7 @@ test('fetchWithDetails with ContextExternalTool', function () {
 })
 
 test('fetchWithDetails with Lti::ToolProxy', function () {
+  // eslint-disable-next-line jest/valid-expect, qunit/no-global-expect
   expect(1)
   const tool = this.tools[1]
   this.server.respondWith('GET', /\/tool_proxies/, [
@@ -142,6 +145,7 @@ test('fetchWithDetails with Lti::ToolProxy', function () {
 })
 
 test('save', function () {
+  // eslint-disable-next-line jest/valid-expect, qunit/no-global-expect
   expect(4)
   const {_generateParams} = store
   store._generateParams = () => ({foo: 'bar'})
@@ -284,6 +288,7 @@ test('_generateParams xml', () => {
 })
 
 test('delete ContextExternalTool', function () {
+  // eslint-disable-next-line jest/valid-expect, qunit/no-global-expect
   expect(4)
   store.setState({externalTools: this.tools})
   const tool = this.tools[0]
@@ -310,6 +315,7 @@ test('delete ContextExternalTool', function () {
 })
 
 test('delete Lti::ToolProxy', function () {
+  // eslint-disable-next-line jest/valid-expect, qunit/no-global-expect
   expect(4)
   store.setState({externalTools: this.tools})
   const tool = this.tools[1]
@@ -336,6 +342,7 @@ test('delete Lti::ToolProxy', function () {
 })
 
 test('deactivate', function () {
+  // eslint-disable-next-line jest/valid-expect, qunit/no-global-expect
   expect(4)
   store.setState({externalTools: this.tools})
   const tool = this.tools[1]

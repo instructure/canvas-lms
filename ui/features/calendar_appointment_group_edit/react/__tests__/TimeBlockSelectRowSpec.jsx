@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import TimeBlockSelectRow from 'ui/features/calendar_appointment_group_edit/react/TimeBlockSelectRow'
+import TimeBlockSelectRow from '../TimeBlockSelectRow'
 import london from 'timezone/Europe/London'
 import * as tz from '@instructure/moment-utils'
 import fakeENV from 'helpers/fakeENV'
@@ -111,6 +111,7 @@ test('handleFieldBlur calls setData', () => {
 test('handleFieldBlur calls onBlur when non-blank and when the target row is the last', () => {
   const firstOnBlur = sinon.spy()
   props.onBlur = sinon.spy()
+  // eslint-disable-next-line react/prefer-stateless-function
   class TestComponent extends React.Component {
     render() {
       return (
