@@ -17,7 +17,7 @@
  */
 
 import fakeENV from 'helpers/fakeENV'
-import PostGradesFrameDialog from 'ui/features/gradebook/jquery/PostGradesFrameDialog'
+import PostGradesFrameDialog from '../PostGradesFrameDialog'
 
 QUnit.module('Gradebook > PostGradesFrameDialog', suiteHooks => {
   let dialog

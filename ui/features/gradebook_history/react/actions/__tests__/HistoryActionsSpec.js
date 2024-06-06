@@ -29,7 +29,7 @@ import {
   fetchHistoryNextPageStart,
   fetchHistoryNextPageSuccess,
   fetchHistoryNextPageFailure,
-} from 'ui/features/gradebook_history/react/actions/HistoryActions'
+} from '../HistoryActions'
 
 function defaultResponse() {
   return {

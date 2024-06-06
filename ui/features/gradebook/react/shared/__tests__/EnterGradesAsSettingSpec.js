@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as EnterGradesAsSetting from 'ui/features/gradebook/react/shared/EnterGradesAsSetting'
+import * as EnterGradesAsSetting from '../EnterGradesAsSetting'
 
 QUnit.module('EnterGradesAsSetting', () => {
   QUnit.module('.defaultOptionForGradingType', () => {
