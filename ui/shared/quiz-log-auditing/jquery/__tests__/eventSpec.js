@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QuizEvent from '@canvas/quiz-log-auditing/jquery/event'
+import QuizEvent from '../event'
 
 QUnit.module('Quizzes::LogAuditing::QuizEvent')
 
@@ -31,6 +31,7 @@ test('#constructor', () => {
 
 test('#constructor: auto-generates an ID for internal tracking', () => {
   const evt = new QuizEvent('some_event_type')
+  // eslint-disable-next-line qunit/no-assert-logical-expression
   ok(evt._id && evt._id.length > 0)
 })
 

@@ -16,19 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QuizEvent from '@canvas/quiz-log-auditing/jquery/event'
-import EventBuffer from '@canvas/quiz-log-auditing/jquery/event_buffer'
-import K from '@canvas/quiz-log-auditing/jquery/constants'
+import QuizEvent from '../event'
+import EventBuffer from '../event_buffer'
+import K from '../constants'
 
 const useLocalStorage = () => EventBuffer.setStorageAdapter(K.EVT_STORAGE_LOCAL_STORAGE)
 const useMemoryStorage = () => EventBuffer.setStorageAdapter(K.EVT_STORAGE_MEMORY)
 
 QUnit.module('Quizzes::LogAuditing::EventBuffer', {
   setup() {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     return useMemoryStorage()
   },
   teardown() {
     localStorage.removeItem(K.EVT_STORAGE_KEY)
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     return useMemoryStorage()
   },
 })

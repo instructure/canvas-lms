@@ -1,4 +1,3 @@
-/* eslint-disable qunit/no-test-expect-argument */
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -20,7 +19,7 @@
 import {defer} from 'lodash'
 import $ from 'jquery'
 import 'jquery-migrate'
-import LDBLoginPopup from 'ui/features/take_quiz/backbone/views/LDBLoginPopup'
+import LDBLoginPopup from '../LDBLoginPopup'
 
 let whnd
 let popup
@@ -36,12 +35,14 @@ QUnit.module('LDBLoginPopup', {
   },
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('it should exec', 1, () => {
   whnd = popup.exec()
 
   ok(whnd, 'popup window is created')
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('it should inject styleSheets', 1, () => {
   whnd = popup.exec()
   strictEqual($(whnd.document).find('link[href]').length, $('link').length)
@@ -61,6 +62,7 @@ test('it should trigger the @open and @close events', () => {
   ok(onClose.called, '@close handler gets called')
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('it should close after a successful login', 1, () => {
   const onClose = sinon.spy()
   const clock = sinon.useFakeTimers()
@@ -80,6 +82,7 @@ test('it should close after a successful login', 1, () => {
   whnd = popup.exec()
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('it should trigger the @login_success event', 1, () => {
   const onSuccess = sinon.spy()
   const clock = sinon.useFakeTimers()
@@ -99,6 +102,7 @@ test('it should trigger the @login_success event', 1, () => {
   whnd = popup.exec()
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('it should trigger the @login_failure event', 1, () => {
   const onFailure = sinon.spy()
 

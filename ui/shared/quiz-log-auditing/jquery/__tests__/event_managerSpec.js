@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import K from '@canvas/quiz-log-auditing/jquery/constants'
-import QuizEvent from '@canvas/quiz-log-auditing/jquery/event'
-import EventManager from '@canvas/quiz-log-auditing/jquery/event_manager'
-import EventTracker from '@canvas/quiz-log-auditing/jquery/event_tracker'
+import K from '../constants'
+import EventManager from '../event_manager'
+import EventTracker from '../event_tracker'
 import Backbone from 'node_modules-version-of-backbone'
 import sinon from 'sinon'
 
