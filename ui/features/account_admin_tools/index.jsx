@@ -39,6 +39,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import BouncedEmailsView from './react/BouncedEmailsView'
 import ready from '@instructure/ready'
+import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
 // This is used by admin tools to display search results
 const courseRestoreModel = new CourseRestoreModel({account_id: ENV.ACCOUNT_ID})
@@ -49,6 +50,8 @@ const messagesUsers = new AccountUserCollection(null, {account_id: ENV.ACCOUNT_I
 const loggingUsers = new AccountUserCollection(null, {account_id: ENV.ACCOUNT_ID})
 
 ready(() => {
+  initializeTopNavPortal(document.getElementById('react-instui-topnav'))
+
   const messagesContentView = new CommMessagesContentPaneView({
     searchForm: new UserDateRangeSearchFormView({
       formName: 'messages',

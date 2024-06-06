@@ -1370,6 +1370,9 @@ class AccountsController < ApplicationController
       return render_unauthorized_action
     end
 
+    add_crumb t("Admin tools")
+    page_has_instui_topnav
+
     authentication_logging = @account.grants_any_right?(@current_user, :view_statistics, :manage_user_logins)
     grade_change_logging = @account.grants_right?(@current_user, :view_grade_changes)
     course_logging = @account.grants_right?(@current_user, :view_course_changes)
