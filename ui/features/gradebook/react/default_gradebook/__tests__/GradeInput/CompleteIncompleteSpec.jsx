@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 
-import GradeInput from 'ui/features/gradebook/react/default_gradebook/components/GradeInput'
+import GradeInput from '../../components/GradeInput'
 import GradeInputDriver from './GradeInputDriver'
 import fakeENV from 'helpers/fakeENV'
 
