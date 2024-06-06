@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 
-import GradeInput from 'ui/features/gradebook/react/default_gradebook/components/GradeInput'
+import GradeInput from '../../components/GradeInput'
 import GradeInputDriver from './GradeInputDriver'
 import fakeENV from 'helpers/fakeENV'
 
@@ -35,12 +35,12 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
     })
     const assignment = {
       anonymizeStudents: false,
-      gradingType: 'points',
+      gradingType: 'letter_grade',
       pointsPossible: 10,
     }
 
     const submission = {
-      enteredGrade: '7.8',
+      enteredGrade: 'C',
       enteredScore: 7.8,
       excused: false,
       id: '2501',
@@ -57,7 +57,7 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
     props = {
       assignment,
       disabled: false,
-      enterGradesAs: 'points',
+      enterGradesAs: 'gradingScheme',
       gradingScheme,
       onSubmissionUpdate: sinon.stub(),
       pendingGradeInfo: null,
@@ -85,27 +85,15 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
     }
   }
 
-  QUnit.module('when entering grades as points', () => {
-    test('displays a label of "Grade out of <points possible>"', () => {
+  QUnit.module('when entering grades as grading scheme keys', () => {
+    test('displays a label of "Letter Grade"', () => {
       renderComponent()
-      equal(gradeInput.labelText, 'Grade out of 10')
+      equal(gradeInput.labelText, 'Letter Grade')
     })
 
-    test('sets the formatted entered score of the submission as the input value', () => {
+    test('sets the scheme key grade of the submission as the input value', () => {
       renderComponent()
-      strictEqual(gradeInput.value, '7.8')
-    })
-
-    test('rounds the formatted entered score to two decimal places', () => {
-      props.submission.enteredScore = 7.816
-      renderComponent()
-      strictEqual(gradeInput.value, '7.82')
-    })
-
-    test('strips insignificant zeros', () => {
-      props.submission.enteredScore = 8.0
-      renderComponent()
-      strictEqual(gradeInput.value, '8')
+      strictEqual(gradeInput.value, 'C')
     })
 
     test('is blank when the submission is not graded', () => {
@@ -144,11 +132,11 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
     QUnit.module('when the input receives a new value', hooks => {
       hooks.beforeEach(() => {
         renderComponent()
-        gradeInput.inputValue('9.8')
+        gradeInput.inputValue('A')
       })
 
       test('updates the input to the given value', () => {
-        strictEqual(gradeInput.value, '9.8')
+        strictEqual(gradeInput.value, 'A')
       })
 
       test('does not call the onSubmissionUpdate prop', () => {
@@ -159,14 +147,14 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
     QUnit.module('when the input blurs after receiving a new value', () => {
       test('calls the onSubmissionUpdate prop', () => {
         renderComponent()
-        gradeInput.inputValue('9.8')
+        gradeInput.inputValue('A')
         gradeInput.blurInput()
         strictEqual(props.onSubmissionUpdate.callCount, 1)
       })
 
       test('calls the onSubmissionUpdate prop with the submission', () => {
         renderComponent()
-        gradeInput.inputValue('9.8')
+        gradeInput.inputValue('A')
         gradeInput.blurInput()
         const [updatedSubmission] = props.onSubmissionUpdate.lastCall.args
         strictEqual(updatedSubmission, props.submission)
@@ -174,10 +162,10 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
 
       test('calls the onSubmissionUpdate prop with the current grade info', () => {
         renderComponent()
-        gradeInput.inputValue('9.8')
+        gradeInput.inputValue('A')
         gradeInput.blurInput()
         const [, gradeInfo] = props.onSubmissionUpdate.lastCall.args
-        strictEqual(gradeInfo.score, 9.8)
+        equal(gradeInfo.grade, 'A')
       })
 
       QUnit.module('when a point value is entered', contextHooks => {
@@ -190,8 +178,8 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
           gradeInfo = props.onSubmissionUpdate.lastCall.args[1]
         })
 
-        test('calls the onSubmissionUpdate prop with the entered grade', () => {
-          strictEqual(gradeInfo.grade, '8.9')
+        test('calls the onSubmissionUpdate prop with the scheme key form of the entered grade', () => {
+          strictEqual(gradeInfo.grade, 'B')
         })
 
         test('calls the onSubmissionUpdate prop with the score form of the entered grade', () => {
@@ -208,17 +196,17 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
 
         contextHooks.beforeEach(() => {
           renderComponent()
-          gradeInput.inputValue('89%')
+          gradeInput.inputValue('89.1%')
           gradeInput.blurInput()
           gradeInfo = props.onSubmissionUpdate.lastCall.args[1]
         })
 
-        test('calls the onSubmissionUpdate prop with the points form of the entered grade', () => {
-          strictEqual(gradeInfo.grade, '8.9')
+        test('calls the onSubmissionUpdate prop with the scheme key form of the entered grade', () => {
+          strictEqual(gradeInfo.grade, 'B')
         })
 
         test('calls the onSubmissionUpdate prop with the score form of the entered grade', () => {
-          strictEqual(gradeInfo.score, 8.9)
+          strictEqual(gradeInfo.score, 8.91)
         })
 
         test('calls the onSubmissionUpdate prop with the enteredAs set to "percent"', () => {
@@ -236,8 +224,8 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
           gradeInfo = props.onSubmissionUpdate.lastCall.args[1]
         })
 
-        test('calls the onSubmissionUpdate prop with the points form of the entered grade', () => {
-          strictEqual(gradeInfo.grade, '8.9')
+        test('calls the onSubmissionUpdate prop with the scheme key form of the entered grade', () => {
+          strictEqual(gradeInfo.grade, 'B')
         })
 
         test('calls the onSubmissionUpdate prop with the score form of the entered grade', () => {
@@ -246,6 +234,29 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
 
         test('calls the onSubmissionUpdate prop with the enteredAs set to "gradingScheme"', () => {
           strictEqual(gradeInfo.enteredAs, 'gradingScheme')
+        })
+      })
+
+      QUnit.module('when the submission is being excused', contextHooks => {
+        let gradeInfo
+
+        contextHooks.beforeEach(() => {
+          renderComponent()
+          gradeInput.inputValue('EX')
+          gradeInput.blurInput()
+          gradeInfo = props.onSubmissionUpdate.lastCall.args[1]
+        })
+
+        test('calls the onSubmissionUpdate prop with a null grade form', () => {
+          strictEqual(gradeInfo.grade, null)
+        })
+
+        test('calls the onSubmissionUpdate prop with a null score form', () => {
+          strictEqual(gradeInfo.score, null)
+        })
+
+        test('calls the onSubmissionUpdate prop with the enteredAs set to "excused"', () => {
+          strictEqual(gradeInfo.enteredAs, 'excused')
         })
       })
 
@@ -259,7 +270,7 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
           gradeInfo = props.onSubmissionUpdate.lastCall.args[1]
         })
 
-        test('calls the onSubmissionUpdate prop with the points form set to the given value', () => {
+        test('calls the onSubmissionUpdate prop with the grade set to the given value', () => {
           strictEqual(gradeInfo.grade, 'unknown')
         })
 
@@ -280,8 +291,8 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
     QUnit.module('when the input blurs without having received a new value', hooks => {
       hooks.beforeEach(() => {
         renderComponent()
-        gradeInput.inputValue('9.8') // change the input value
-        gradeInput.inputValue('7.8') // revert to the initial value
+        gradeInput.inputValue('A') // change the input value
+        gradeInput.inputValue('C') // revert to the initial value
         gradeInput.blurInput()
       })
 
@@ -294,12 +305,12 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
       hooks.beforeEach(() => {
         props.submission = {...props.submission, enteredGrade: null, enteredScore: null}
         props.submissionUpdating = true
-        props.pendingGradeInfo = {grade: '9.8', valid: true, excused: false}
+        props.pendingGradeInfo = {grade: 'A', score: 9.8, valid: true, excused: false}
       })
 
       test('updates the text input with the value of the pending grade', () => {
         renderComponent()
-        strictEqual(gradeInput.value, '9.8')
+        strictEqual(gradeInput.value, 'A')
       })
 
       test('sets the text input to "Excused" when the submission is being excused', () => {
@@ -316,13 +327,13 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
       QUnit.module('when the submission grade finishes updating', moreHooks => {
         moreHooks.beforeEach(() => {
           renderComponent()
-          props.submission = {...props.submission, enteredGrade: '9.8'}
+          props.submission = {...props.submission, enteredGrade: 'A', enteredScore: 9.8}
           props.submissionUpdating = false
           renderComponent()
         })
 
         test('updates the input value with the updated grade', () => {
-          strictEqual(gradeInput.value, '9.8')
+          strictEqual(gradeInput.value, 'A')
         })
 
         test('enables the input', () => {
@@ -334,19 +345,19 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
     QUnit.module('when the submission is otherwise being updated', () => {
       test('does not update the input value when the submission begins updating', () => {
         renderComponent()
-        props.submission = {...props.submission, enteredGrade: '9.8'}
+        props.submission = {...props.submission, enteredGrade: 'A', enteredScore: 9.8}
         props.submissionUpdating = true
         renderComponent()
-        strictEqual(gradeInput.value, '7.8')
+        strictEqual(gradeInput.value, 'C')
       })
 
       test('updates the input value when the submission finishes updating', () => {
         props.submissionUpdating = true
         renderComponent()
-        props.submission = {...props.submission, enteredGrade: '9.8', enteredScore: 9.8}
+        props.submission = {...props.submission, enteredGrade: 'A', enteredScore: 9.8}
         props.submissionUpdating = false
         renderComponent()
-        strictEqual(gradeInput.value, '9.8')
+        strictEqual(gradeInput.value, 'A')
       })
     })
   })
