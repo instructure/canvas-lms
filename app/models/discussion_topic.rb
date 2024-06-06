@@ -850,24 +850,30 @@ class DiscussionTopic < ActiveRecord::Base
     )
   }
 
-  scope :visible_to_ungraded_discussion_student_visibilities, lambda { |student, course = nil|
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      observed_student_ids = []
+  scope :visible_to_ungraded_discussion_student_visibilities, lambda { |users, courses = nil|
+    return visible_to_student_sections(users) unless Account.site_admin.feature_enabled?(:selective_release_backend)
 
-      if !course.nil? && course.is_a?(Course) && course.user_has_been_observer?(student)
-        observed_student_ids = ObserverEnrollment.observed_student_ids(course, student)
+    observed_student_ids = []
+    visible_topic_ids = []
+
+    Array(courses).each do |course|
+      course = Course.find(course) unless course.is_a?(Course)
+
+      if course&.user_has_been_observer?(users)
+        observed_student_ids.concat(ObserverEnrollment.observed_student_ids(course, users))
       end
-      user_ids = Array(student).concat(observed_student_ids)
-      visible_topic_ids = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible_to_students_by_topics(user_ids:, discussion_topic_ids: ids).map(&:discussion_topic_id)
 
-      merge(
-        DiscussionTopic.where.not(context_type: "Course")
-          .or(DiscussionTopic.where(id: visible_topic_ids, is_section_specific: false))
-          .or(DiscussionTopic.where(is_section_specific: true).where(discussion_topic_section_visibility_scope(user_ids).arel.exists))
-      )
-    else
-      visible_to_student_sections(student)
+      if User.observing_full_course(course).where(id: users).exists?
+        visible_topic_ids.concat(DiscussionTopic.where(context_type: "Course", context_id: course.id).active.pluck(:id))
+      end
     end
+
+    user_ids = Array(users) | observed_student_ids
+    visible_differentiated_topic_ids = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible_to_students_by_topics(user_ids:, discussion_topic_ids: ids).map(&:discussion_topic_id)
+    merge(DiscussionTopic.where.not(context_type: "Course")
+    .or(DiscussionTopic.where(id: visible_topic_ids))
+    .or(DiscussionTopic.where(id: visible_differentiated_topic_ids, is_section_specific: false))
+    .or(DiscussionTopic.where(is_section_specific: true).where(discussion_topic_section_visibility_scope(user_ids).arel.exists)))
   }
 
   scope :recent, -> { where("discussion_topics.last_reply_at>?", 2.weeks.ago).order("discussion_topics.last_reply_at DESC") }
