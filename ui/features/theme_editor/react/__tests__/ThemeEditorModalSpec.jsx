@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import ThemeEditorModal from 'ui/features/theme_editor/react/ThemeEditorModal'
+import ThemeEditorModal from '../ThemeEditorModal'
 
 const defaultProps = {
   showProgressModal: false,
