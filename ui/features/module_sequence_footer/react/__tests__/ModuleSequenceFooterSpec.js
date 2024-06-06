@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {renderModuleSequenceFooter} from 'ui/features/module_sequence_footer/react/index'
+import {renderModuleSequenceFooter} from '../index'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('renderModuleSequenceFooter', hooks => {
