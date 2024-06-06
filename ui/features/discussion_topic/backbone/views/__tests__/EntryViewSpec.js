@@ -1,4 +1,3 @@
-/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2015 - present Instructure, Inc.
  *
@@ -19,8 +18,8 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import Entry from 'ui/features/discussion_topic/backbone/models/Entry'
-import EntryView from 'ui/features/discussion_topic/backbone/views/EntryView'
+import Entry from '../../models/Entry'
+import EntryView from '../EntryView'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 
@@ -40,6 +39,7 @@ QUnit.module('EntryView', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', assert => {
   const entry = new Entry({
     id: 1,

@@ -17,7 +17,7 @@
  */
 
 import Backbone from '@canvas/backbone'
-import ExternalContentLtiLinkSubmissionView from 'ui/features/submit_assignment/backbone/views/ExternalContentLtiLinkSubmissionView'
+import ExternalContentLtiLinkSubmissionView from '../ExternalContentLtiLinkSubmissionView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'

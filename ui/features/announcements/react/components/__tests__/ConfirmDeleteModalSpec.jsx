@@ -20,7 +20,7 @@ import React from 'react'
 import {shallow} from 'enzyme'
 import merge from 'lodash/merge'
 
-import ConfirmDeleteModal from 'ui/features/announcements/react/components/ConfirmDeleteModal'
+import ConfirmDeleteModal from '../ConfirmDeleteModal'
 
 const makeProps = (props = {}) =>
   merge(
