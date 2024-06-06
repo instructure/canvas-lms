@@ -17,8 +17,8 @@
  */
 
 import Quiz from '@canvas/quizzes/backbone/models/Quiz'
-import QuizCollection from 'ui/features/quizzes_index/backbone/collections/QuizCollection'
-import QuizItemGroupView from 'ui/features/quizzes_index/backbone/views/QuizItemGroupView'
+import QuizCollection from '../../collections/QuizCollection'
+import QuizItemGroupView from '../QuizItemGroupView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'

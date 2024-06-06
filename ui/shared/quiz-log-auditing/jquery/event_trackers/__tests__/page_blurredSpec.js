@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Subject from '@canvas/quiz-log-auditing/jquery/event_trackers/page_blurred'
-import K from '@canvas/quiz-log-auditing/jquery/constants'
+import Subject from '../page_blurred'
+import K from '../../constants'
 import $ from 'jquery'
 import 'jquery-migrate'
 

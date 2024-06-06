@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Subject from '@canvas/quiz-log-auditing/jquery/event_trackers/session_started'
-import K from '@canvas/quiz-log-auditing/jquery/constants'
+import Subject from '../session_started'
+import K from '../../constants'
 
 QUnit.module('Quizzes::LogAuditing::EventTrackers::SessionStarted')
 

@@ -17,7 +17,7 @@
  */
 
 import Quiz from '@canvas/quizzes/backbone/models/Quiz'
-import QuizItemView from 'ui/features/quizzes_index/backbone/views/QuizItemView'
+import QuizItemView from '../QuizItemView'
 import PublishIconView from '@canvas/publish-icon-view'
 import $ from 'jquery'
 import 'jquery-migrate'

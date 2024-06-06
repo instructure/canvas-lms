@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QuizOverrideLoader from 'ui/features/quizzes_index/backbone/models/QuizOverrideLoader'
+import QuizOverrideLoader from '../QuizOverrideLoader'
 
 QUnit.module('QuizOverrideLoader dates selection', {
   setup() {

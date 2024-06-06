@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GradingForm from 'ui/features/quiz_history/jquery/grading_form'
+import GradingForm from '../grading_form'
 import $ from 'jquery'
 import 'jquery-migrate'
 

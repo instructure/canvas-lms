@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QuizCollection from 'ui/features/quizzes_index/backbone/collections/QuizCollection'
-import IndexView from 'ui/features/quizzes_index/backbone/views/IndexView'
-import QuizItemGroupView from 'ui/features/quizzes_index/backbone/views/QuizItemGroupView'
-import NoQuizzesView from 'ui/features/quizzes_index/backbone/views/NoQuizzesView'
+import QuizCollection from '../../collections/QuizCollection'
+import IndexView from '../IndexView'
+import QuizItemGroupView from '../QuizItemGroupView'
+import NoQuizzesView from '../NoQuizzesView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
