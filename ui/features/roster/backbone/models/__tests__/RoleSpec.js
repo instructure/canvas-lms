@@ -16,9 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Role from 'ui/features/roster/backbone/models/Role'
-import Account from 'ui/features/account_settings/backbone/models/Account'
+import Role from '../Role'
 import fakeENV from 'helpers/fakeENV'
+import {clone, omit} from 'lodash'
+import Backbone from '@canvas/backbone'
+
+class Account extends Backbone.Model {
+  present = () => clone(this.attributes)
+
+  toJSON = () => ({
+    id: this.get('id'),
+    account: omit(this.attributes, ['id']),
+  })
+}
+
+Account.prototype.urlRoot = '/api/v1/accounts'
 
 QUnit.module('RoleModel', {
   setup() {
@@ -35,6 +47,7 @@ QUnit.module('RoleModel', {
   },
 })
 
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('generates the correct url for existing and non-existing roles', 2, function () {
   equal(this.role.url(), '/api/v1/accounts/3/roles', 'non-existing role url')
   this.role.fetch({

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CourseRestoreModel from 'ui/features/account_admin_tools/backbone/models/CourseRestore'
+import CourseRestoreModel from '../CourseRestore'
 import $ from 'jquery'
 import 'jquery-migrate'
 

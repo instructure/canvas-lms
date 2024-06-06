@@ -16,21 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'jquery-migrate'
 import React from 'react'
-import {render} from '@testing-library/react'
-import File from '@canvas/files/backbone/models/File'
-import DragFeedback from 'ui/features/files/react/components/DragFeedback'
+import {shallow} from 'enzyme'
+import LoadingIndicator from '../LoadingIndicator'
 
-QUnit.module('DragFeedback')
+QUnit.module('LoadingIndicator')
 
-test('DF: shows a badge with number of items being dragged', () => {
-  const file = new File({id: 1, name: 'Test File', thumbnail_url: 'blah'})
-  const file2 = new File({id: 2, name: 'Test File 2', thumbnail_url: 'blah'})
-  file.url = () => 'some_url'
-  file2.url = () => 'some_url'
+test('display none if no props supplied', () => {
+  equal(shallow(<LoadingIndicator />).prop('style').display, 'none', 'loading indicator not shown')
+})
 
-  const dragFeedback = render(<DragFeedback pageX={1} pageY={1} itemsToDrag={[file, file2]} />)
-
-  equal(dragFeedback.container.querySelector('.badge').innerHTML, '2', 'has two items')
+test('if props supplied for loading', () => {
+  equal(
+    shallow(<LoadingIndicator isLoading />).prop('style').display,
+    '',
+    'loading indicator is shown'
+  )
 })

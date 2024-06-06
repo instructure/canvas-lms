@@ -1,4 +1,3 @@
-/* eslint-disable qunit/no-global-stop-start */
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -20,7 +19,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
-import api from 'ui/features/account_grading_standards/enrollmentTermsApi'
+import api from '../enrollmentTermsApi'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 const deserializedTerms = [
@@ -107,8 +106,10 @@ test('deserializes returned enrollment terms', function (assert) {
     },
     JSON.stringify(serializedTerms),
   ])
+  // eslint-disable-next-line promise/catch-or-return
   api.list().then(terms => {
     deepEqual(terms, deserializedTerms)
+    // eslint-disable-next-line qunit/no-global-stop-start
     start()
   })
   this.server.respond()
@@ -123,6 +124,7 @@ test('rejects the promise upon errors', function (assert) {
   ])
   api.list().catch(error => {
     ok('we got here')
+    // eslint-disable-next-line qunit/no-global-stop-start
     start()
   })
   this.server.respond()

@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import DiscussionTopicKeyboardShortcutModal from 'ui/features/discussion_topic/react/DiscussionTopicKeyboardShortcutModal'
+import $ from 'jquery'
+import DiscussionTopicKeyboardShortcutModal from '../DiscussionTopicKeyboardShortcutModal'
 import React from 'react'
 import {render} from '@testing-library/react'
 
@@ -59,6 +60,7 @@ test('renders shortcuts', async function () {
   document.dispatchEvent(e)
 
   // have to wait for instUI modal css transitions
+  // eslint-disable-next-line promise/param-names
   await new Promise(res => setTimeout(res, 1))
 
   const list = $('.navigation_list li')

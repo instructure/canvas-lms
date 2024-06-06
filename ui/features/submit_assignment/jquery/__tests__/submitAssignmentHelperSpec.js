@@ -16,10 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  recordEulaAgreement,
-  verifyPledgeIsChecked,
-} from 'ui/features/submit_assignment/jquery/helper'
+import {recordEulaAgreement, verifyPledgeIsChecked} from '../helper'
 import $ from 'jquery'
 import 'jquery-migrate'
 
