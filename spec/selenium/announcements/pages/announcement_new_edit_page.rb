@@ -42,6 +42,28 @@ class AnnouncementNewEdit
       "/#{context_type}/#{context.id}/discussion_topics/#{announcement.id}"
     end
 
+    # -------------------- discussion_create + react_discussions_post flag elements -----------------
+
+    def publish_button
+      fj("button:contains('Publish')")
+    end
+
+    def notification_modal
+      f('form[data-testid="send-notification-modal"]')
+    end
+
+    def notification_modal_send
+      f("button[data-testid='send']", notification_modal)
+    end
+
+    def notification_modal_dont_send
+      f("button[data-testid='no_send']", notification_modal)
+    end
+
+    def notification_modal_cancel
+      f("button[data-testid='cancel']", notification_modal)
+    end
+
     # ---------------------- Controls ----------------------
     def section_autocomplete_css
       "#sections_autocomplete_root input[type='text']"

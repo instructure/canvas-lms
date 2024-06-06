@@ -164,6 +164,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
     $setCheckpoints: Boolean
     $ungradedDiscussionOverrides: [AssignmentOverrideCreateOrUpdate!]
     $anonymousState: DiscussionTopicAnonymousStateType
+    $notifyUsers: Boolean
   ) {
     updateDiscussionTopic(
       input: {
@@ -190,6 +191,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         setCheckpoints: $setCheckpoints
         ungradedDiscussionOverrides: $ungradedDiscussionOverrides
         anonymousState: $anonymousState
+        notifyUsers: $notifyUsers
       }
     ) {
       discussionTopic {

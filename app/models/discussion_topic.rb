@@ -50,7 +50,7 @@ class DiscussionTopic < ActiveRecord::Base
   restrict_assignment_columns
 
   attr_writer :can_unpublish, :preloaded_subentry_count, :sections_changed
-  attr_accessor :user_has_posted, :saved_by, :total_root_discussion_entries
+  attr_accessor :user_has_posted, :saved_by, :total_root_discussion_entries, :notify_users
 
   module DiscussionTypes
     SIDE_COMMENT = "side_comment"
