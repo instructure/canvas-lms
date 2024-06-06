@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Actions from 'ui/features/course_settings/react/actions'
+import Actions from '../actions'
 
 QUnit.module('Course Settings Actions')
 
@@ -132,6 +132,7 @@ test('prepareSetImage without a imageUrl calls the API to get the url', assert =
     0,
     fakeAjaxLib
   )(dispatched => {
+    // eslint-disable-next-line qunit/assert-args
     ok(
       Actions.putImageData.called,
       'image',
