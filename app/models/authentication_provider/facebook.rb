@@ -66,6 +66,10 @@ class AuthenticationProvider::Facebook < AuthenticationProvider::OAuth2
     ].freeze
   end
 
+  def self.supports_autoconfirmed_email?
+    false
+  end
+
   def login_attribute
     super || "id"
   end

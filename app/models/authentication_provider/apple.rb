@@ -60,6 +60,10 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
     ].freeze
   end
 
+  def self.supports_autoconfirmed_email?
+    false
+  end
+
   def get_token(_code, _redirect_uri, params)
     jwt_string = params["id_token"]
     debug_set(:id_token, jwt_string) if instance_debugging

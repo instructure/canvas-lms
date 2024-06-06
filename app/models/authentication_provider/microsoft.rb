@@ -75,6 +75,10 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     ].freeze
   end
 
+  def self.supports_autoconfirmed_email?
+    false
+  end
+
   def login_attribute
     raw_login_attribute || "tid+oid"
   end
