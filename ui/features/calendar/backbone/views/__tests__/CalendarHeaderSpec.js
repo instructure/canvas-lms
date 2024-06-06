@@ -1,4 +1,3 @@
-/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -19,7 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import CalendarHeader from 'ui/features/calendar/backbone/views/CalendarHeader'
+import CalendarHeader from '../CalendarHeader'
 import assertions from 'helpers/assertions'
 
 QUnit.module('CalendarHeader', {
@@ -33,6 +32,7 @@ QUnit.module('CalendarHeader', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.header, done, {a11yReport: true})

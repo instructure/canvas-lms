@@ -17,9 +17,9 @@
  */
 
 import Course from '@canvas/courses/backbone/models/Course'
-import CourseSelectionView from 'ui/features/conversations/backbone/views/CourseSelectionView'
-import CourseCollection from 'ui/features/conversations/backbone/collections/CourseCollection'
-import FavoriteCourseCollection from 'ui/features/conversations/backbone/collections/FavoriteCourseCollection'
+import CourseSelectionView from '../CourseSelectionView'
+import CourseCollection from '../../collections/CourseCollection'
+import FavoriteCourseCollection from '../../collections/FavoriteCourseCollection'
 import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'

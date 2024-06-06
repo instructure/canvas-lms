@@ -19,9 +19,9 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
-import MessageFormDialog from 'ui/features/conversations/backbone/views/MessageFormDialog'
-import FavoriteCourseCollection from 'ui/features/conversations/backbone/collections/FavoriteCourseCollection'
-import CourseCollection from 'ui/features/conversations/backbone/collections/CourseCollection'
+import MessageFormDialog from '../MessageFormDialog'
+import FavoriteCourseCollection from '../../collections/FavoriteCourseCollection'
+import CourseCollection from '../../collections/CourseCollection'
 import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection'
 
 const recipients = [
