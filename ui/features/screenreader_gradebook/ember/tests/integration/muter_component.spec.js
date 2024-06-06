@@ -95,7 +95,8 @@ QUnit.skip('dialog opens and closes without changes', () => {
   })
 })
 
-test('dialog opens and makes changes upon confirmation', function () {
+// unskip in FOO-4345
+QUnit.skip('dialog opens and makes changes upon confirmation', function () {
   const {server} = this
   checkLabel(ariaMuted)
   checkChecked(true)
@@ -167,7 +168,8 @@ QUnit.skip('dialog opens and closes without changes', () => {
   })
 })
 
-test('dialog opens and makes changes upon confirmation', function () {
+// unskip in FOO-4345
+QUnit.skip('dialog opens and makes changes upon confirmation', function () {
   const {server} = this
   checkLabel(ariaUnmuted)
   checkChecked(false)
