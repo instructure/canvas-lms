@@ -256,6 +256,40 @@ describe CommunicationChannel do
     expect { communication_channel(user, invalid_stuff) }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
+  it "blocks account-level forbidden emails" do
+    account = account_model
+    user = user_with_pseudonym(account:)
+    expect { communication_channel(user, { username: "test1@test.com", user:, pseudonym_id: "1" }) }.not_to raise_error
+    expect { communication_channel(user, { username: "test2@test2.com", user:, pseudonym_id: "2" }) }.not_to raise_error
+
+    account.settings[:banned_email_domains] = ["test2.com"]
+    account.save!
+    user.reload
+
+    expect { communication_channel(user, { username: "test3@test.com", user:, pseudonym_id: "3" }) }.not_to raise_error
+    expect { communication_channel(user, { username: "test4@test2.com", user:, pseudonym_id: "4" }) }.to raise_error(ActiveRecord::RecordInvalid)
+  end
+
+  it "blocks account-level forbidden emails for unsaved users" do
+    account = account_model
+    account.settings[:banned_email_domains] = ["test2.com"]
+    account.save!
+
+    expect do
+      user = User.new
+      user.pseudonyms.build(user:, account:, unique_id: "user1")
+      user.communication_channels.build(path_type: "email", path: "test1@test.com")
+      user.valid?
+      user.save!
+    end.not_to raise_error
+    expect do
+      user = User.new
+      user.pseudonyms.build(user:, account:, unique_id: "user1")
+      user.communication_channels.build(path_type: "email", path: "test2@test2.com")
+      user.save!
+    end.to raise_error(ActiveRecord::RecordInvalid)
+  end
+
   it "limits quantity of channels a user can have" do
     stub_const("CommunicationChannel::MAX_CCS_PER_USER", 3)
     user = User.create!(name: "jim halpert")
