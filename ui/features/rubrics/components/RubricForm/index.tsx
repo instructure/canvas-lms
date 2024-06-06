@@ -24,6 +24,7 @@ import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import LoadingIndicator from '@canvas/loading-indicator/react'
 import {useQuery, useMutation, queryClient} from '@canvas/query'
 import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+import {colors} from '@instructure/canvas-theme'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
@@ -307,21 +308,6 @@ export const RubricForm = ({
     }
   }, [navigate, navigateUrl, saveSuccess])
 
-  const [distanceToBottom, setDistanceToBottom] = useState<number>(0)
-  const containerRef = useRef<HTMLElement>()
-
-  useEffect(() => {
-    const calculateDistance = () => {
-      if (containerRef.current) {
-        const rect = (containerRef.current as HTMLElement).getBoundingClientRect()
-        const distance = window.innerHeight - rect.bottom
-        setDistanceToBottom(distance)
-      }
-    }
-
-    calculateDistance()
-  }, [containerRef, isLoading])
-
   useEffect(() => {
     if (!canManageRubrics) {
       navigate(navigateUrl)
@@ -333,18 +319,8 @@ export const RubricForm = ({
   }
 
   return (
-    <View as="div">
-      <Flex
-        height={`${distanceToBottom}px`}
-        as="div"
-        direction="column"
-        elementRef={elRef => {
-          if (elRef instanceof HTMLElement) {
-            containerRef.current = elRef
-          }
-        }}
-        style={{minHeight: '100%'}}
-      >
+    <View as="div" margin="0 0 medium 0">
+      <Flex as="div" direction="column" style={{minHeight: '100%'}}>
         <Flex.Item>
           {saveError && (
             <Alert
@@ -462,11 +438,15 @@ export const RubricForm = ({
             )}
           </View>
         </Flex.Item>
+      </Flex>
 
-        <Flex.Item as="footer" height="75px">
-          <View as="hr" margin="0 0 small 0" />
-
-          <Flex justifyItems="end" margin="0 0 medium 0">
+      <div id="enhanced-rubric-builder-footer" style={{backgroundColor: colors.white}}>
+        <View
+          as="div"
+          margin="small large"
+          themeOverride={{marginLarge: '48px', marginSmall: '12px'}}
+        >
+          <Flex justifyItems="end">
             <Flex.Item margin="0 medium 0 0">
               <Button onClick={() => navigate(navigateUrl)}>{I18n.t('Cancel')}</Button>
 
@@ -509,8 +489,8 @@ export const RubricForm = ({
               </View>
             </Flex.Item>
           </Flex>
-        </Flex.Item>
-      </Flex>
+        </View>
+      </div>
 
       <CriterionModal
         criterion={selectedCriterion}
