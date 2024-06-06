@@ -20,13 +20,10 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {
-  createGradebook,
-  setFixtureHtml,
-} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
-import {createCourseGradesWithGradingPeriods as createGrades} from './GradeCalculatorSpecHelper'
+import {createCourseGradesWithGradingPeriods as createGrades} from '@canvas/grading/GradeCalculatorSpecHelper'
 import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import fakeENV from 'helpers/fakeENV'

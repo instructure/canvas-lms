@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as AssignmentApi from 'ui/features/assignment_grade_summary/react/assignment/AssignmentApi'
+import * as AssignmentApi from '../AssignmentApi'
 import FakeServer, {
   paramsFromRequest,
   pathFromRequest,
