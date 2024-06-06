@@ -26,7 +26,7 @@ import fakeENV from 'helpers/fakeENV'
 import numberHelper from '@canvas/i18n/numberHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import GradeSummary from '../index'
-import {createCourseGradesWithGradingPeriods} from '../../../../../spec/javascripts/jsx/gradebook/GradeCalculatorSpecHelper'
+import {createCourseGradesWithGradingPeriods} from '@canvas/grading/GradeCalculatorSpecHelper'
 import useStore from '../../react/stores'
 
 const I18n = useI18nScope('gradingGradeSummary')
