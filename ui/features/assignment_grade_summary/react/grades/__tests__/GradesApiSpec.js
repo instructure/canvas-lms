@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as GradesApi from 'ui/features/assignment_grade_summary/react/grades/GradesApi'
+import * as GradesApi from '../GradesApi'
 import FakeServer, {
   jsonBodyFromRequest,
   pathFromRequest,

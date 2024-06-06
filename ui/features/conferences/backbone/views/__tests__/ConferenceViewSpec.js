@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Conference from 'ui/features/conferences/backbone/models/Conference'
-import ConferenceView from 'ui/features/conferences/backbone/views/ConferenceView'
+import Conference from '../../models/Conference'
+import ConferenceView from '../ConferenceView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
