@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import '@canvas/media-comments/jquery/mediaCommentThumbnail'
+import '../mediaCommentThumbnail'
 
 const awhile = () => new Promise(resolve => setTimeout(resolve, 2))
 
