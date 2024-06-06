@@ -428,18 +428,16 @@ module Interfaces::SubmissionInterface
     Loaders::SubmissionGroupIdLoader.load(object).then { |group_id| group_id }
   end
 
-  field :preview_url, String, null: true
+  field :preview_url, String, "This field is currently under development and its return value is subject to change.", null: true
   def preview_url
-    Loaders::SubmissionVersionNumberLoader.load(object).then do |version_number|
-      GraphQLHelpers::UrlHelpers.course_assignment_submission_url(
-        object.course_id,
-        object.assignment_id,
-        object.user_id,
-        host: context[:request].host_with_port,
-        preview: 1,
-        version: version_number
-      )
-    end
+    GraphQLHelpers::UrlHelpers.course_assignment_submission_url(
+      object.course_id,
+      object.assignment_id,
+      object.user_id,
+      host: context[:request].host_with_port,
+      preview: 1,
+      version: version_query_param(object)
+    )
   end
 
   field :submission_comment_download_url, String, null: true
@@ -449,4 +447,14 @@ module Interfaces::SubmissionInterface
 
   field :word_count, Float, null: true
   delegate :word_count, to: :object
+
+  private
+
+  def version_query_param(submission)
+    if submission.attempt.present? && submission.attempt > 0
+      submission.attempt - 1
+    else
+      submission.attempt
+    end
+  end
 end
