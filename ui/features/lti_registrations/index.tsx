@@ -28,7 +28,7 @@ import ProductDetail from './discover/components/ProductDetail/ProductDetail'
 const getBasename = () => {
   const path = window.location.pathname
   const parts = path.split('/')
-  return parts.slice(0, parts.indexOf('extensions') + 1).join('/')
+  return parts.slice(0, parts.indexOf('apps') + 1).join('/')
 }
 
 const queryClient = new QueryClient()

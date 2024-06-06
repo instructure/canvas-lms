@@ -74,14 +74,14 @@ describe Lti::RegistrationsController do
       expect(response).to be_successful
     end
 
-    it "sets Extensions crumb" do
+    it "sets Apps crumb" do
       get :index, params: { account_id: account.id }
-      expect(assigns[:_crumbs].last).to include("Extensions")
+      expect(assigns[:_crumbs].last).to include("Apps")
     end
 
     it "sets active tab" do
       get :index, params: { account_id: account.id }
-      expect(assigns[:active_tab]).to eq("extensions")
+      expect(assigns[:active_tab]).to eq("apps")
     end
   end
 

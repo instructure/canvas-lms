@@ -24,7 +24,7 @@ import type {FetchRegistrations, DeleteRegistration} from '../../api/registratio
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {genericError} from '../../../common/lib/apiResult/ApiResult'
 
-export const MANAGE_EXTENSIONS_PAGE_LIMIT = 15
+export const MANAGE_APPS_PAGE_LIMIT = 15
 
 const I18n = useI18nScope('lti_registrations')
 

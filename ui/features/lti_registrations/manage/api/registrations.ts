@@ -22,7 +22,7 @@ import {ZPaginatedList, type PaginatedList} from './PaginatedList'
 import {type LtiRegistrationId} from '../model/LtiRegistrationId'
 import {mockFetchSampleLtiRegistrations, mockDeleteRegistration} from './sampleLtiRegistrations'
 
-export type ExtensionsSortProperty =
+export type AppsSortProperty =
   | 'name'
   | 'nickname'
   | 'lti_version'
@@ -30,12 +30,12 @@ export type ExtensionsSortProperty =
   | 'installed_by'
   | 'on'
 
-export type ExtensionsSortDirection = 'asc' | 'desc'
+export type AppsSortDirection = 'asc' | 'desc'
 
 export type FetchRegistrations = (options: {
   query: string
-  sort: ExtensionsSortProperty
-  dir: ExtensionsSortDirection
+  sort: AppsSortProperty
+  dir: AppsSortDirection
   offset: number
   limit: number
 }) => Promise<ApiResult<PaginatedList<LtiRegistration>>>
