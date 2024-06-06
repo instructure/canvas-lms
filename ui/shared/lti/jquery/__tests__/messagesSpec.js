@@ -82,7 +82,7 @@ QUnit.module('Messages', suiteHooks => {
     ltiToolWrapperFixture.empty()
   })
 
-  test('finds and resizes the tool content wrapper', async () => {
+  test('finds and resizes the iframe', async () => {
     ltiToolWrapperFixture.append(`
       <div id="content-wrapper" class="ic-Layout-contentWrapper">
         <div id="content" class="ic-Layout-contentMain" role="main">
@@ -93,12 +93,11 @@ QUnit.module('Messages', suiteHooks => {
       </div>
     `)
     const el = $('#content-wrapper')
-    const toolContentWrapper = el.find('.tool_content_wrapper')
-    const iframe = $('iframe')
+    const iframe = el.find('iframe')
 
-    equal(toolContentWrapper.height(), 100)
+    equal(iframe.height(), 100)
     await ltiMessageHandler(postMessageEvent(resizeMessage, iframe[0].contentWindow))
-    equal(toolContentWrapper.height(), finalHeight)
+    equal(iframe.height(), finalHeight)
   })
 
   test('finds and resizes an iframe in embedded content', async () => {

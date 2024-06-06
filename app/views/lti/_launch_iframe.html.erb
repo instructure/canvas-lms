@@ -1,6 +1,7 @@
 <div class="tool_content_wrapper
-  <%= 'custom_height' unless @lti_launch.tool_dimensions[:selection_height] == '100%' %>"
+  <%= 'custom_height' unless full_height? %>"
   data-tool-wrapper-id="<%= @lti_launch.post_message_token %>"
+  <% unless full_height? %> data-height_overridden="true" <% end %>
 >
     <form action="<%= @lti_launch.resource_url %>"
         class="hide"
