@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Actions from 'ui/features/assignment_index/react/actions/IndexMenuActions'
-import Reducer from 'ui/features/assignment_index/react/reducers/indexMenuReducer'
+import Actions from '../../actions/IndexMenuActions'
+import Reducer from '../indexMenuReducer'
 
 QUnit.module('AssignmentsIndexMenuReducer')
 

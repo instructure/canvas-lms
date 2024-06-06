@@ -16,14 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  FAILURE,
-  STARTED,
-  SUCCESS,
-  addStudents,
-  setLoadStudentsStatus,
-} from 'ui/features/assignment_grade_summary/react/students/StudentActions'
-import configureStore from 'ui/features/assignment_grade_summary/react/configureStore'
+import {FAILURE, STARTED, SUCCESS, addStudents, setLoadStudentsStatus} from '../StudentActions'
+import configureStore from '../../configureStore'
 
 QUnit.module('GradeSummary studentsReducer()', suiteHooks => {
   let store
