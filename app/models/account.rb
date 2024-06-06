@@ -2498,4 +2498,8 @@ class Account < ActiveRecord::Base
 
     read_attribute(:enable_user_notes)
   end
+
+  def banned_email_domains
+    settings[:banned_email_domains] || []
+  end
 end
