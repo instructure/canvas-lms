@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
-import WikiPageDeleteDialog from '@canvas/wiki/backbone/views/WikiPageDeleteDialog'
+import WikiPage from '../../models/WikiPage'
+import WikiPageDeleteDialog from '../WikiPageDeleteDialog'
 
 QUnit.module('WikiPageDeleteDialog')
 

@@ -1,4 +1,3 @@
-/* eslint-disable qunit/no-identical-names */
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -18,7 +17,7 @@
  */
 
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
-import WikiPageContentView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageContentView'
+import WikiPageContentView from '../WikiPageContentView'
 import {subscribe} from 'jquery-tinypubsub'
 
 QUnit.module('WikiPageContentView')

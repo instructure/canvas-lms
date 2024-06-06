@@ -17,7 +17,7 @@
  */
 
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
-import WikiPageView from 'ui/features/wiki_page_show/backbone/views/WikiPageView'
+import WikiPageView from '../WikiPageView'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import 'jquery-migrate'
