@@ -17,7 +17,7 @@
  */
 
 import Backbone from '@canvas/backbone'
-import ExternalContentHomeworkSubmissionView from 'ui/features/submit_assignment/backbone/views/ExternalContentHomeworkSubmissionView'
+import ExternalContentHomeworkSubmissionView from '../ExternalContentHomeworkSubmissionView'
 
 function newView() {
   const view = new ExternalContentHomeworkSubmissionView()

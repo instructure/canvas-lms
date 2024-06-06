@@ -17,8 +17,8 @@
  */
 
 import {unmountComponentAtNode} from 'react-dom'
-import PostPolicies from 'ui/features/speed_grader/react/PostPolicies/index'
-import SpeedGraderHelpers from 'ui/features/speed_grader/jquery/speed_grader_helpers'
+import PostPolicies from '../index'
+import SpeedGraderHelpers from '../../../jquery/speed_grader_helpers'
 
 QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
   let $hideTrayMountPoint

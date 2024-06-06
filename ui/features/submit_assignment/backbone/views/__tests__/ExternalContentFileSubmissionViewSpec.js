@@ -17,7 +17,7 @@
  */
 
 import Backbone from '@canvas/backbone'
-import ExternalContentFileSubmissionView from 'ui/features/submit_assignment/backbone/views/ExternalContentFileSubmissionView'
+import ExternalContentFileSubmissionView from '../ExternalContentFileSubmissionView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'

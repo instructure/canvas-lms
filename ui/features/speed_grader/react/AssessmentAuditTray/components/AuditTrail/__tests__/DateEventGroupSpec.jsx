@@ -21,9 +21,9 @@ import ReactDOM from 'react-dom'
 import * as timezone from '@instructure/moment-utils'
 import newYork from 'timezone/America/New_York'
 
-import DateEventGroup from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AuditTrail/DateEventGroup'
-import {buildEvent} from 'ui/features/speed_grader/react/AssessmentAuditTray/__tests__/AuditTrailSpecHelpers'
-import buildAuditTrail from 'ui/features/speed_grader/react/AssessmentAuditTray/buildAuditTrail'
+import DateEventGroup from '../DateEventGroup'
+import {buildEvent} from '../../../__tests__/AuditTrailSpecHelpers'
+import buildAuditTrail from '../../../buildAuditTrail'
 
 QUnit.module('AssessmentAuditTray DateEventGroup', suiteHooks => {
   let $container

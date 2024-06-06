@@ -1,4 +1,3 @@
-/* eslint-disable qunit/no-compare-relation-boolean */
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -18,7 +17,7 @@
  */
 import $ from 'jquery'
 import 'jquery-migrate'
-import JQuerySelectorCache from 'ui/features/speed_grader/JQuerySelectorCache'
+import JQuerySelectorCache from '../JQuerySelectorCache'
 
 QUnit.module('JQuerySelectorCache', hooks => {
   let selectorCache
@@ -37,6 +36,7 @@ QUnit.module('JQuerySelectorCache', hooks => {
   QUnit.module('#get', () => {
     test('returns a jquery selector', () => {
       const response = selectorCache.get('#foo')
+      // eslint-disable-next-line qunit/no-compare-relation-boolean
       strictEqual(response instanceof $, true)
     })
 

@@ -22,8 +22,8 @@ import timezone from 'timezone'
 import tzInTest from '@instructure/moment-utils/specHelpers'
 import newYork from 'timezone/America/New_York'
 
-import AssessmentSummary from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AssessmentSummary'
-import {overallAnonymityStates} from 'ui/features/speed_grader/react/AssessmentAuditTray/AuditTrailHelpers'
+import AssessmentSummary from '../AssessmentSummary'
+import {overallAnonymityStates} from '../../AuditTrailHelpers'
 import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 
 const {FULL, NA, PARTIAL} = overallAnonymityStates
