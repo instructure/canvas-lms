@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import Configurations from 'ui/features/external_apps/react/components/Configurations'
+import Configurations from '../Configurations'
 
 const wrapper = document.getElementById('fixtures')
 const createElement = (data = {}) => <Configurations {...data} />
