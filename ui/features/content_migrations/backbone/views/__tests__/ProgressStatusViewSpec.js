@@ -1,4 +1,3 @@
-/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -19,8 +18,8 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import ProgressStatusView from 'ui/features/content_migrations/backbone/views/ProgressStatusView'
-import ProgressingModel from 'ui/features/content_migrations/backbone/models/ProgressingContentMigration'
+import ProgressStatusView from '../ProgressStatusView'
+import ProgressingModel from '../../models/ProgressingContentMigration'
 import assertions from 'helpers/assertions'
 
 QUnit.module('ProgressStatusViewSpec', {
@@ -34,6 +33,7 @@ QUnit.module('ProgressStatusViewSpec', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.$fixtures, done, {a11yReport: true})

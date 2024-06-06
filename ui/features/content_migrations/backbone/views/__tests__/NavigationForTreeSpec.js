@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import NavigationForTree from 'ui/features/content_migrations/backbone/views/NavigationForTree'
+import NavigationForTree from '../NavigationForTree'
 import $ from 'jquery'
 import 'jquery-migrate'
 

@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import SelectContentView from 'ui/features/content_migrations/backbone/views/SelectContentView'
-import ProgressingMigration from 'ui/features/content_migrations/backbone/models/ProgressingContentMigration'
+import SelectContentView from '../SelectContentView'
+import ProgressingMigration from '../../models/ProgressingContentMigration'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 import '@canvas/jquery/jquery.simulate'

@@ -1,4 +1,3 @@
-/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -20,7 +19,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
-import ExternalToolLaunchView from 'ui/features/content_migrations/backbone/views/subviews/ExternalToolLaunchView'
+import ExternalToolLaunchView from '../ExternalToolLaunchView'
 import assertions from 'helpers/assertions'
 
 QUnit.module('ExternalToolLaunchView', {
@@ -38,6 +37,7 @@ QUnit.module('ExternalToolLaunchView', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.launchView, done, {a11yReport: true})
