@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'ui/features/developer_keys_v2/react/actions/developerKeysActions'
-import reducer from 'ui/features/developer_keys_v2/react/reducers/makeInvisibleReducer'
+import actions from '../../actions/developerKeysActions'
+import reducer from '../makeInvisibleReducer'
 
 QUnit.module('makeInvisibleReducer')
 
