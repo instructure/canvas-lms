@@ -19,8 +19,8 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import WikiPageRevision from '@canvas/wiki/backbone/models/WikiPageRevision'
-import WikiPageRevisionsCollection from 'ui/features/wiki_page_revisions/backbone/collections/WikiPageRevisionsCollection'
-import WikiPageRevisionView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageRevisionView'
+import WikiPageRevisionsCollection from '../../collections/WikiPageRevisionsCollection'
+import WikiPageRevisionView from '../WikiPageRevisionView'
 import {waitFor} from '@testing-library/react'
 
 QUnit.module('WikiPageRevisionView')

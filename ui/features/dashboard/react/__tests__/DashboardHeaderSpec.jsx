@@ -25,7 +25,7 @@ import {moxiosWait} from '@canvas/jest-moxios-utils'
 import sinon from 'sinon'
 import $ from 'jquery'
 import 'jquery-migrate'
-import {DashboardHeader} from 'ui/features/dashboard/react/DashboardHeader'
+import {DashboardHeader} from '../DashboardHeader'
 import {resetPlanner} from '@canvas/planner'
 import fetchMock from 'fetch-mock'
 import {
@@ -126,7 +126,7 @@ QUnit.module('Dashboard Header', hooks => {
         status: 200,
         responseText: {},
       })
-      const promiseToGetNewCourseForm = import('ui/features/dashboard/jquery/util/newCourseForm')
+      const promiseToGetNewCourseForm = import('../../jquery/util/newCourseForm')
 
       ReactDOM.render(
         <FakeDashboard
