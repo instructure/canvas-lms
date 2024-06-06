@@ -17,7 +17,7 @@
  */
 
 import fakeENV from 'helpers/fakeENV'
-import SpeedgraderHelpers from 'ui/features/speed_grader/jquery/speed_grader_helpers'
+import SpeedgraderHelpers from '../speed_grader_helpers'
 import {
   setupIsAnonymous,
   setupAnonymousGraders,
@@ -25,7 +25,7 @@ import {
   setupAnonymizableUserId,
   setupAnonymizableStudentId,
   setupAnonymizableAuthorId,
-} from 'ui/features/speed_grader/jquery/speed_grader.utils'
+} from '../speed_grader.utils'
 import $ from 'jquery'
 import 'jquery-migrate'
 

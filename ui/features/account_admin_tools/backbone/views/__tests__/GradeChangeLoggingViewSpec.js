@@ -1,4 +1,3 @@
-/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -17,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GradeChangeLoggingCollection from 'ui/features/account_admin_tools/backbone/collections/GradeChangeLoggingCollection'
-import GradeChangeLoggingContentView from 'ui/features/account_admin_tools/backbone/views/GradeChangeLoggingContentView'
+import GradeChangeLoggingCollection from '../../collections/GradeChangeLoggingCollection'
+import GradeChangeLoggingContentView from '../GradeChangeLoggingContentView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
@@ -83,6 +82,7 @@ QUnit.module('GradeChangeLoggingItemView', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', assert => {
   const view = createView([excusedEvent()])
   const done = assert.async()

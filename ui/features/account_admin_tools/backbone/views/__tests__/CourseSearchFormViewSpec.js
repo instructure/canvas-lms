@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CourseRestore from 'ui/features/account_admin_tools/backbone/models/CourseRestore'
-import CourseSearchFormView from 'ui/features/account_admin_tools/backbone/views/CourseSearchFormView'
+import CourseRestore from '../../models/CourseRestore'
+import CourseSearchFormView from '../CourseSearchFormView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import assertions from 'helpers/assertions'

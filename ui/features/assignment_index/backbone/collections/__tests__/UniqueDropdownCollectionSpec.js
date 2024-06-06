@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import UniqueDropdownCollection from 'ui/features/assignment_index/backbone/collections/UniqueDropdownCollection'
+import UniqueDropdownCollection from '../UniqueDropdownCollection'
 import Backbone from '@canvas/backbone'
 import _ from 'lodash'
 
@@ -38,6 +38,7 @@ QUnit.module('UniqueDropdownCollection', {
 })
 
 test('#intialize', function () {
+  // eslint-disable-next-line qunit/no-ok-equality
   ok(this.coll.length === this.records.length, 'stores all the records')
   equal(this.coll.takenValues.length, 3)
   equal(this.coll.availableValues.length, 1)
