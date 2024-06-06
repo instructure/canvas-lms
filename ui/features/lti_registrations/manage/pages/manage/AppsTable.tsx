@@ -31,17 +31,17 @@ import {View} from '@instructure/ui-view'
 import React from 'react'
 import {Link as RouterLink} from 'react-router-dom'
 import type {PaginatedList} from '../../api/PaginatedList'
-import type {ExtensionsSortDirection, ExtensionsSortProperty} from '../../api/registrations'
+import type {AppsSortDirection, AppsSortProperty} from '../../api/registrations'
 import type {LtiRegistration} from '../../model/LtiRegistration'
 import {useManageSearchParams, type ManageSearchParams} from './ManageSearchParams'
 import {colors} from '@instructure/canvas-theme'
 
 type CallbackWithRegistration = (registration: LtiRegistration) => void
 
-export type ExtensionsTableProps = {
-  extensions: PaginatedList<LtiRegistration>
-  sort: ExtensionsSortProperty
-  dir: ExtensionsSortDirection
+export type AppsTableProps = {
+  apps: PaginatedList<LtiRegistration>
+  sort: AppsSortProperty
+  dir: AppsSortDirection
   stale: boolean
   updateSearchParams: ReturnType<typeof useManageSearchParams>[1]
   deleteApp: CallbackWithRegistration
@@ -64,7 +64,7 @@ type Column = {
 const Columns: ReadonlyArray<Column> = [
   {
     id: 'name',
-    header: I18n.t('Extension Name'),
+    header: I18n.t('App Name'),
     width: '26%',
     sortable: true,
     render: r => (
@@ -154,8 +154,8 @@ const Columns: ReadonlyArray<Column> = [
 ]
 
 const renderHeaderRow = (props: {
-  sort: ExtensionsSortProperty
-  dir: ExtensionsSortDirection
+  sort: AppsSortProperty
+  dir: AppsSortDirection
   updateSearchParams: (
     params: Partial<Record<keyof ManageSearchParams, string | undefined>>
   ) => void
@@ -190,16 +190,16 @@ const renderHeaderRow = (props: {
   </Table.Row>
 )
 
-export const ExtensionsTable = (extensionsTableProps: ExtensionsTableProps) => {
-  const {extensions, stale, ...restOfProps} = extensionsTableProps
+export const AppsTable = (appsTableProps: AppsTableProps) => {
+  const {apps, stale, ...restOfProps} = appsTableProps
   return (
     <div
       style={{
         opacity: stale ? '0.5' : '1',
       }}
     >
-      {extensions.data.length > 0 ? (
-        <ExtensionsTableResponsiveWrapper extensions={extensions} {...restOfProps} />
+      {apps.data.length > 0 ? (
+        <AppsTableResponsiveWrapper apps={apps} {...restOfProps} />
       ) : (
         <Flex direction="column" alignItems="center" padding="large 0">
           <IconSearchLine size="medium" color="secondary" />
@@ -229,26 +229,26 @@ const ResponsiveProps = {
   large: {layout: 'auto'},
 }
 
-const ExtensionsTableResponsiveWrapper = React.memo(
-  (tableProps: Omit<ExtensionsTableProps, 'stale' | 'page' | 'pageCount' | 'updatePage'>) => {
+const AppsTableResponsiveWrapper = React.memo(
+  (tableProps: Omit<AppsTableProps, 'stale' | 'page' | 'pageCount' | 'updatePage'>) => {
     return (
       <Responsive query={ResponsiveQuery} props={ResponsiveProps}>
         {responsiveProps => (
-          <ExtensionsTableInner tableProps={tableProps} responsiveProps={responsiveProps} />
+          <AppsTableInner tableProps={tableProps} responsiveProps={responsiveProps} />
         )}
       </Responsive>
     )
   }
 )
 
-type ExtensionsTableInnerProps = {
+type AppsTableInnerProps = {
   responsiveProps: ResponsivePropsObject | null | undefined
-  tableProps: Omit<ExtensionsTableProps, 'stale' | 'page' | 'pageCount' | 'updatePage'>
+  tableProps: Omit<AppsTableProps, 'stale' | 'page' | 'pageCount' | 'updatePage'>
 }
 
-export const ExtensionsTableInner = React.memo((props: ExtensionsTableInnerProps) => {
+export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
   const rows = React.useMemo(() => {
-    return props.tableProps.extensions.data.map(row => (
+    return props.tableProps.apps.data.map(row => (
       <Table.Row key={row.id}>
         {Columns.map(({id, render, textAlign}) => (
           <Table.Cell key={id} textAlign={textAlign}>
@@ -257,13 +257,13 @@ export const ExtensionsTableInner = React.memo((props: ExtensionsTableInnerProps
         ))}
       </Table.Row>
     ))
-  }, [props.tableProps.extensions, props.tableProps.deleteApp])
+  }, [props.tableProps.apps, props.tableProps.deleteApp])
 
   return (
     <>
       <Table
         {...props.responsiveProps}
-        caption={I18n.t('Installed Extensions')}
+        caption={I18n.t('Installed Apps')}
         layout={
           props.responsiveProps && props.responsiveProps.layout === 'stacked' ? 'stacked' : 'fixed'
         }

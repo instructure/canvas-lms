@@ -125,10 +125,10 @@ export const Discover = () => {
             <TextInput
               renderLabel={
                 <ScreenReaderContent>
-                  {I18n.t('Search by extension name & company name')}
+                  {I18n.t('Search by app name & company name')}
                 </ScreenReaderContent>
               }
-              placeholder="Search by extension name & company name"
+              placeholder="Search by app name & company name"
               value={searchString}
               onChange={event =>
                 setSearchParams({

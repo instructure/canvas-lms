@@ -25,7 +25,7 @@ import {IconButton} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('lti_registrations')
 
-type ExtensionsSearchBarProps = {
+type AppsSearchBarProps = {
   value: string
   handleChange: (event: React.ChangeEvent<HTMLInputElement>, value: string) => void
   handleClear: () => void
@@ -45,10 +45,10 @@ const renderClearButton = (value: string, handleClear: () => void) =>
     </IconButton>
   )
 
-export const ExtensionsSearchBar = (props: ExtensionsSearchBarProps) => {
+export const AppsSearchBar = (props: AppsSearchBarProps) => {
   const label = I18n.t('Search names & nicknames')
   return (
-    <form name="extensionsSearch" autoComplete="off">
+    <form name="appsSearch" autoComplete="off">
       <TextInput
         renderLabel={<ScreenReaderContent>{label}</ScreenReaderContent>}
         placeholder={label}

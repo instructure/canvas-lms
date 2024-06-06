@@ -448,8 +448,8 @@ class Lti::RegistrationsController < ApplicationController
   include Api::V1::Lti::Registration
 
   def index
-    set_active_tab "extensions"
-    add_crumb t("#crumbs.apps", "Extensions")
+    set_active_tab "apps"
+    add_crumb t("#crumbs.apps", "Apps")
 
     render :index
   end

@@ -61,12 +61,12 @@ export const LtiAppsLayout = React.memo(() => {
     <QueryClientProvider client={queryClient}>
       <Flex alignItems="start" justifyItems="space-between" margin="0 0 small 0">
         <Flex.Item>
-          <Heading level="h1">{I18n.t('Extensions')}</Heading>
+          <Heading level="h1">{I18n.t('Apps')}</Heading>
         </Flex.Item>
         {isManage ? (
           <Flex.Item>
             <Button color="primary" onClick={open}>
-              {I18n.t('Install a New Extension')}
+              {I18n.t('Install a New App')}
             </Button>
           </Flex.Item>
         ) : null}
