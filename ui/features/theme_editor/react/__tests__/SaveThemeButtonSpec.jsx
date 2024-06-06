@@ -20,12 +20,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {shallow} from 'enzyme'
 import jQuery from 'jquery'
-import SaveThemeButton from 'ui/features/theme_editor/react/SaveThemeButton'
+import SaveThemeButton from '../SaveThemeButton'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 let elem, props
-
-const isType = type => child => child.type === type
 
 QUnit.module('SaveThemeButton Component', {
   setup() {

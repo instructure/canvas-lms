@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import RangeInput from 'ui/features/theme_editor/react/RangeInput'
+import RangeInput from '../RangeInput'
 
 let elem, props
 
@@ -56,6 +56,7 @@ test('renders formatted output', assert => {
     ok(output, 'renders the output element')
     ok(props.formatValue.calledWith(expected), 'formats the value')
     equal(output.textContent, expectedFormatted, 'outputs value')
+    // eslint-disable-next-line qunit/no-global-stop-start
     start()
   })
 })
