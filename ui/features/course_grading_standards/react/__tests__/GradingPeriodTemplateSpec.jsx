@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import {defaults} from 'lodash'
-import GradingPeriod from 'ui/features/course_grading_standards/react/gradingPeriodTemplate'
+import GradingPeriod from '../gradingPeriodTemplate'
 
 const defaultProps = {
   title: 'Spring',

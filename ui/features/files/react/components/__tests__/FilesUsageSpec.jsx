@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
 import 'jquery-migrate'
-import FilesUsage from 'ui/features/files/react/components/FilesUsage'
+import FilesUsage from '../FilesUsage'
 
 QUnit.module('FilesUsage#update', {
   filesUpdateTest(props, test) {

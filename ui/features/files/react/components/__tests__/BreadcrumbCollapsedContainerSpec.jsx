@@ -21,11 +21,9 @@ import 'jquery-migrate'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import BreadcrumbCollapsedContainer from 'ui/features/files/react/components/BreadcrumbCollapsedContainer'
+import BreadcrumbCollapsedContainer from '../BreadcrumbCollapsedContainer'
 import Folder from '@canvas/files/backbone/models/Folder'
-import filesEnv from '@canvas/files/react/modules/filesEnv'
-import mockFilesENV from '../mockFilesENV'
-import stubRouterContext from '../../helpers/stubRouterContext'
+import stubRouterContext from '../../../../../../spec/coffeescripts/helpers/stubRouterContext'
 
 const simulate = TestUtils.Simulate
 const simulateNative = TestUtils.SimulateNative

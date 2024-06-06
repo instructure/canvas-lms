@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import collaborations from 'ui/features/collaborations/jquery/index'
+import collaborations from '../index'
 import $ from 'jquery'
 import 'jquery-migrate'
 import '@canvas/jquery/jquery.ajaxJSON'
