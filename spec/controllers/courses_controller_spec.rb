@@ -2194,6 +2194,16 @@ describe CoursesController do
         expect(assigns[:js_env][:COURSE][:latest_announcement][:message]).to eq "Welcome to the grind"
       end
 
+      it "is set with most recent visible announcement for observers with selective_release_backend" do
+        Account.site_admin.enable_feature!(:selective_release_backend)
+        @observer = course_with_observer(course: @course, active_all: true).user
+        user_session(@observer)
+
+        get "show", params: { id: @course.id }
+        expect(assigns[:js_env][:COURSE][:latest_announcement][:title]).to eq "Hello students"
+        expect(assigns[:js_env][:COURSE][:latest_announcement][:message]).to eq "Welcome to the grind"
+      end
+
       it "is set to nil if there are no recent (within 2 weeks) announcements" do
         announcement1.posted_at = 3.weeks.ago
         announcement1.save!
