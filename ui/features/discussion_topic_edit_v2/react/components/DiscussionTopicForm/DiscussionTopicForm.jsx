@@ -80,6 +80,7 @@ import {SavingDiscussionTopicOverlay} from '../SavingDiscussionTopicOverlay/Savi
 import {Heading} from '@instructure/ui-heading'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import {ItemAssignToTrayWrapper} from '../DiscussionOptions/ItemAssignToTrayWrapper'
+import {SendEditNotificationModal} from '../SendEditNotificationModal'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -134,7 +135,6 @@ function DiscussionTopicForm({
   const isAnnouncement = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
   const isUnpublishedAnnouncement =
     isAnnouncement && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published
-  const isEditingAnnouncement = isAnnouncement && ENV?.DISCUSSION_TOPIC?.ATTRIBUTES.id
   const published = currentDiscussionTopic?.published ?? false
 
   const announcementAlertProps = () => {
@@ -145,15 +145,6 @@ function DiscussionTopicForm({
         variant: 'warning',
         text: I18n.t(
           'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Delay Posting option and set to publish on a future date.'
-        ),
-      }
-    } else if (isEditingAnnouncement) {
-      return {
-        id: 'announcement-no-notification-on-edit',
-        key: 'announcement-no-notification-on-edit',
-        variant: 'info',
-        text: I18n.t(
-          'Users do not receive updated notifications when editing an announcement. If you wish to have users notified of this update via their notification settings, you will need to create a new announcement.'
         ),
       }
     } else {
@@ -218,6 +209,7 @@ function DiscussionTopicForm({
   const [delayPosting, setDelayPosting] = useState(
     (!!currentDiscussionTopic?.delayedPostAt && isAnnouncement) || false
   )
+
   const [locked, setLocked] = useState((currentDiscussionTopic.locked && isAnnouncement) || false)
 
   const [availableFrom, setAvailableFrom] = useState(currentDiscussionTopic?.delayedPostAt || null)
@@ -334,6 +326,9 @@ function DiscussionTopicForm({
   const [lastShouldPublish, setLastShouldPublish] = useState(false)
   const [missingSections, setMissingSections] = useState([])
   const [shouldShowMissingSectionsWarning, setShouldShowMissingSectionsWarning] = useState(false)
+
+  const [showEditAnnouncementModal, setShowEditAnnouncementModal] = useState(false)
+  const [shouldPublish, setShouldPublish] = useState(false)
 
   const handleSettingUsageRightsData = data => {
     setUsageRightsErrorState(false)
@@ -510,7 +505,7 @@ function DiscussionTopicForm({
     }
   }
 
-  const continueSubmitForm = shouldPublish => {
+  const continueSubmitForm = (shouldPublish, shouldNotifyUsers = false) => {
     setTimeout(() => {
       setIsSubmitting(true)
     }, 0)
@@ -541,7 +536,7 @@ function DiscussionTopicForm({
       )
     ) {
       const payload = createSubmitPayload(shouldPublish)
-      onSubmit(payload)
+      onSubmit(payload, shouldNotifyUsers)
       return true
     }
 
@@ -552,7 +547,7 @@ function DiscussionTopicForm({
     return false
   }
 
-  const submitForm = shouldPublish => {
+  const submitForm = (shouldPublish, shouldNotifyUsers = false) => {
     if (shouldShowAvailabilityOptions) {
       const selectedAssignedTo = assignedInfoList.map(info => info.assignedList).flatMap(x => x)
       const isEveryoneOrEveryoneElseSelected = selectedAssignedTo.some(
@@ -580,7 +575,7 @@ function DiscussionTopicForm({
       }
     }
 
-    return continueSubmitForm(shouldPublish)
+    return continueSubmitForm(shouldPublish, shouldNotifyUsers)
   }
 
   const renderLabelWithPublishStatus = () => {
@@ -732,7 +727,7 @@ function DiscussionTopicForm({
     <>
       {renderHeading()}
       <FormFieldGroup description="" rowSpacing="small">
-        {(isUnpublishedAnnouncement || isEditingAnnouncement) && (
+        {isUnpublishedAnnouncement && (
           <Alert variant={announcementAlertProps().variant}>{announcementAlertProps().text}</Alert>
         )}
         <TextInput
@@ -839,6 +834,7 @@ function DiscussionTopicForm({
         <FormFieldGroup description="" rowSpacing="small">
           {shouldShowAnnouncementOnlyOptions && (
             <Checkbox
+              id="delay-posting-cb"
               label={I18n.t('Delay Posting')}
               value="enable-delay-posting"
               checked={delayPosting}
@@ -1100,7 +1096,15 @@ function DiscussionTopicForm({
           isEditing={isEditing}
           published={published}
           shouldShowSaveAndPublishButton={shouldShowSaveAndPublishButton}
-          submitForm={submitForm}
+          submitForm={publish => {
+            if (isAnnouncement && isEditing && !delayPosting) {
+              // remember  publish value for SendEditNotificationModal later
+              setShowEditAnnouncementModal(true)
+              setShouldPublish(publish)
+            } else {
+              submitForm(publish)
+            }
+          }}
           isSubmitting={isSubmitting}
           willAnnouncementPostRightAway={willAnnouncementPostRightAway}
         />
@@ -1116,6 +1120,14 @@ function DiscussionTopicForm({
         />
       )}
       <SavingDiscussionTopicOverlay open={isSubmitting} />
+      {showEditAnnouncementModal && (
+        <SendEditNotificationModal
+          onClose={() => setShowEditAnnouncementModal(false)}
+          submitForm={shouldNotify => {
+            submitForm(shouldPublish, shouldNotify)
+          }}
+        />
+      )}
     </>
   )
 }

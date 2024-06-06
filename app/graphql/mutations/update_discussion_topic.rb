@@ -24,12 +24,16 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
 
   graphql_name "UpdateDiscussionTopic"
 
+  # rubocop:disable GraphQL/ExtractInputType
   argument :anonymous_state, Types::DiscussionTopicAnonymousStateType, required: false
   argument :discussion_topic_id, GraphQL::Schema::Object::ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
   argument :remove_attachment, Boolean, required: false
   argument :assignment, Mutations::AssignmentBase::AssignmentUpdate, required: false
+  # sets in-memory (not persisiting) flag to decide when to notify users about announcement changes
+  argument :notify_users, Boolean, required: false
   argument :set_checkpoints, Boolean, required: false
   argument :ungraded_discussion_overrides, [Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate], required: false
+  # rubocop:enable GraphQL/ExtractInputType
 
   field :discussion_topic, Types::DiscussionType
   def resolve(input:)
@@ -135,6 +139,10 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
           )
         end
       end
+    end
+
+    if input[:notify_users]
+      discussion_topic.notify_users = true
     end
 
     # Determine if the checkpoints are being deleted

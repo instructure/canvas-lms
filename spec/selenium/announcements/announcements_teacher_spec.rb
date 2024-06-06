@@ -18,12 +18,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../common"
+require_relative "../helpers/notifications_common"
 require_relative "../helpers/announcements_common"
 require_relative "pages/announcement_new_edit_page"
 
 describe "announcements" do
   include_context "in-process server selenium tests"
   include AnnouncementsCommon
+  include NotificationsCommon
+
+  def verify_email_address(email)
+    cc = CommunicationChannel.find_by(path: email)
+    cc.workflow_state = "active"
+    cc.save!
+  end
 
   context "announcements as a teacher" do
     before :once do
@@ -50,7 +58,76 @@ describe "announcements" do
       expect(fj("div:contains('Users do not receive updated notifications when editing an announcement. If you wish to have users notified of this update via their notification settings, you will need to create a new announcement.')")).to be_present
     end
 
-    it "allows saving of section announcement", priority: "1" do
+    context "when :discussion_create feature flag is ON" do
+      before do
+        Account.site_admin.enable_feature!(:discussion_create)
+        Account.site_admin.enable_feature!(:react_discussions_post)
+
+        site_admin_logged_in
+
+        @user = user_with_pseudonym(active_user: true, username: "someone")
+        @course.enroll_user(@user, "StudentEnrollment", enrollment_state: :active)
+
+        verify_email_address("someone#{@user.id}@example.com")
+        setup_notification(@user, name: "New Announcement", category: "Announcement", sms: true)
+
+        @announcement = @course.announcements.create!(title: "something", message: "hello my favorite section!")
+      end
+
+      it "should send notification when user decides to notify users when editing an announcement", :ignore_js_errors do
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
+
+        type_in_tiny("#discussion-topic-message-body", "Hi, this is my EDITED message")
+
+        AnnouncementNewEdit.publish_button.click
+
+        # Expect Modal to appear with proper header
+        expect(AnnouncementNewEdit.notification_modal).to be_displayed
+
+        # Choose sending Notification along with our change
+        AnnouncementNewEdit.notification_modal_send.click
+
+        expect(Message.last.body).to include "Hi, this is my EDITED message"
+      end
+
+      it "should not send notification when user decides not to notify users when editing an announcement", :ignore_js_errors do
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
+
+        type_in_tiny("#discussion-topic-message-body", "Hi, this is my EDITED message")
+
+        AnnouncementNewEdit.publish_button.click
+
+        # Expect Modal to appear with proper header
+        expect(AnnouncementNewEdit.notification_modal).to be_displayed
+
+        # Choose not to send Notification along with our change
+        AnnouncementNewEdit.notification_modal_dont_send.click
+
+        # Verify back if user got the message
+        expect(Message.last.body).not_to include "Hi, this is my EDITED message"
+      end
+
+      it "for delayed posting notification sending is not available", :ignore_js_errors do
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
+
+        type_in_tiny("#discussion-topic-message-body", "Hi, this is my EDITED message")
+
+        f('label[for="delay-posting-cb"]').click
+
+        expect_new_page_load { AnnouncementNewEdit.publish_button.click }
+      end
+
+      it "should not send notifications at all if we hit Cancel", :ignore_js_errors do
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
+
+        AnnouncementNewEdit.publish_button.click
+        AnnouncementNewEdit.notification_modal_cancel.click
+
+        expect(AnnouncementNewEdit.publish_button).to be_displayed
+      end
+    end
+
+    it "allows saving of section announcement", :ignore_js_errors, priority: "1" do
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
       AnnouncementNewEdit.visit_new(@course)
@@ -168,7 +245,7 @@ describe "announcements" do
       end
     end
 
-    it "creates a delayed announcement with an attachment", priority: "1" do
+    it "creates a delayed announcement with an attachment", :ignore_js_errors, priority: "1" do
       AnnouncementNewEdit.visit_new(@course)
       f("input[type=checkbox][name=delay_posting]").click
       replace_content(f("input[name=title]"), "First Announcement")

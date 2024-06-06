@@ -81,12 +81,12 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
     }
   }
 
-  const handleFormSubmit = formData => {
+  const handleFormSubmit = (formData, notifyUsers) => {
     const {usageRightsData, ...formDataWithoutUsageRights} = formData
     setUsageRightData(usageRightsData)
 
     if (isEditing) {
-      updateDiscussionTopic({variables: formDataWithoutUsageRights})
+      updateDiscussionTopic({variables: {...formDataWithoutUsageRights, notifyUsers}})
     } else {
       createDiscussionTopic({variables: formDataWithoutUsageRights})
     }
