@@ -21,7 +21,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
 import studentRowHeaderConstants from '../constants/studentRowHeaderConstants'
-import ContentFilterDriver from '../../../../../../spec/javascripts/jsx/gradebook/default_gradebook/components/content-filters/ContentFilterDriver'
+import ContentFilterDriver from '@canvas/grading/content-filters/ContentFilterDriver'
 import PostGradesStore from '../../SISGradePassback/PostGradesStore'
 import {hideAggregateColumns} from '../GradebookGrid/Grid.utils'
 
