@@ -224,11 +224,13 @@ class ProfileController < ApplicationController
         @user.reload
         show_tutorial_ff_to_user = @domain_root_account&.feature_enabled?(:new_user_tutorial) &&
                                    @user.participating_instructor_course_ids.any?
-        add_crumb(t(:crumb, "%{user}'s settings", user: @user.short_name), settings_profile_path)
+        add_crumb(@user.short_name, profile_path)
+        add_crumb(t("Settings"))
         js_env(
           NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT: show_tutorial_ff_to_user,
           CONTEXT_BASE_URL: "/users/#{@user.id}"
         )
+        page_has_instui_topnav
         render :profile
       end
       format.json do
