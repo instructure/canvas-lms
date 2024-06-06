@@ -1,4 +1,3 @@
-/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -19,9 +18,8 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import Backbone from '@canvas/backbone'
-import CourseSearchResultsView from 'ui/features/account_admin_tools/backbone/views/CourseSearchResultsView'
-import CourseRestore from 'ui/features/account_admin_tools/backbone/models/CourseRestore'
+import CourseSearchResultsView from '../CourseSearchResultsView'
+import CourseRestore from '../../models/CourseRestore'
 import assertions from 'helpers/assertions'
 import {initFlashContainer} from '@canvas/rails-flash-notifications'
 
@@ -55,6 +53,7 @@ QUnit.module('CourseSearchResultsView', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.courseSearchResultsView, done, {a11yReport: true})

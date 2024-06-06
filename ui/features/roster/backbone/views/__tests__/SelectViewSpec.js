@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
-import SelectView from 'ui/features/roster/backbone/views/SelectView'
+import SelectView from '../SelectView'
 import '@canvas/jquery/jquery.simulate'
 
 let view = null

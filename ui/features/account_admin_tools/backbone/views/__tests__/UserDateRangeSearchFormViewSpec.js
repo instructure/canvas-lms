@@ -18,13 +18,13 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import usersTemplate from 'ui/features/account_admin_tools/jst/usersList.handlebars'
-import CommMessageCollection from 'ui/features/account_admin_tools/backbone/collections/CommMessageCollection'
-import AccountUserCollection from 'ui/features/account_admin_tools/backbone/collections/AccountUserCollection'
-import UserDateRangeSearchFormView from 'ui/features/account_admin_tools/backbone/views/UserDateRangeSearchFormView'
+import usersTemplate from '../../../jst/usersList.handlebars'
+import CommMessageCollection from '../../collections/CommMessageCollection'
+import AccountUserCollection from '../../collections/AccountUserCollection'
+import UserDateRangeSearchFormView from '../UserDateRangeSearchFormView'
 import InputFilterView from '@canvas/backbone-input-filter-view'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
-import UserView from 'ui/features/account_admin_tools/backbone/views/UserView'
+import UserView from '../UserView'
 
 QUnit.module('UserDateRangeSearchFormView', {
   setup() {

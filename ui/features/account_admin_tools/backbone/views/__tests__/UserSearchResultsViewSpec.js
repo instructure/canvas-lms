@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import UserSearchResultsView from 'ui/features/account_admin_tools/backbone/views/UserSearchResultsView'
-import UserRestore from 'ui/features/account_admin_tools/backbone/models/UserRestore'
+import UserSearchResultsView from '../UserSearchResultsView'
+import UserRestore from '../../models/UserRestore'
 import {initFlashContainer} from '@canvas/rails-flash-notifications'
 
 const errorMessageJSON = {
