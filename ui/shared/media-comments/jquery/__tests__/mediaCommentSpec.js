@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import MediaUtils from '@canvas/media-comments/jquery/mediaComment'
+import MediaUtils from '../mediaComment'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.disableWhileLoading'
 
