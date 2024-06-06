@@ -24,6 +24,7 @@ import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 import '@canvas/jquery/jquery.simulate'
+import 'jqueryui/tooltip'
 
 const createView = function (collection) {
   if (collection == null) {

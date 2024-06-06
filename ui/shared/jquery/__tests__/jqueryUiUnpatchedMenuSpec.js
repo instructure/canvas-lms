@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import 'jqueryui/menu'
-import '@canvas/jquery/jquery.simulate'
+import '../jquery.simulate'
 
 QUnit.module('Menu Widget', {
   setup() {
