@@ -16,11 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as GradeActions from 'ui/features/assignment_grade_summary/react/grades/GradeActions'
-import * as GradesApi from 'ui/features/assignment_grade_summary/react/grades/GradesApi'
-import configureStore from 'ui/features/assignment_grade_summary/react/configureStore'
-
-/* eslint-disable qunit/no-identical-names */
+import * as GradeActions from '../GradeActions'
+import * as GradesApi from '../GradesApi'
+import configureStore from '../../configureStore'
 
 QUnit.module('GradeSummary GradeActions', suiteHooks => {
   let store
