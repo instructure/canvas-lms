@@ -7947,6 +7947,16 @@ describe Course do
           expect(crs.restrict_quantitative_data).to be true
         end
 
+        it "creates course account association for newly created courses when account setting is true and locked" do
+          @sub_account = Account.create(parent_account: @root, name: "English")
+          @root.settings[:restrict_quantitative_data] = { locked: true, value: true }
+          @root.save!
+
+          crs = Course.create!(account: @sub_account)
+          associated = @sub_account.associated_courses.first
+          expect(associated.id).to eq crs.id
+        end
+
         it "does not set restrict_quantitative_data for newly created courses when account setting is true and not locked" do
           Account.default.settings[:restrict_quantitative_data] = { locked: false, value: true }
           Account.default.save!
