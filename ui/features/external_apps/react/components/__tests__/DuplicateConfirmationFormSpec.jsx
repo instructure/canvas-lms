@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import DuplicateConfirmationForm from 'ui/features/external_apps/react/components/DuplicateConfirmationForm'
+import DuplicateConfirmationForm from '../DuplicateConfirmationForm'
 
 let domNode
 

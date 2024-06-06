@@ -21,9 +21,9 @@ import 'jquery-migrate'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import Breadcrumbs from 'ui/features/files/react/components/Breadcrumbs'
+import Breadcrumbs from '../Breadcrumbs'
 import Folder from '@canvas/files/backbone/models/Folder'
-import fakeENV from '../../../../coffeescripts/helpers/fakeENV'
+import fakeENV from '../../../../../../spec/coffeescripts/helpers/fakeENV'
 import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 QUnit.module('Files Breadcrumbs Component', {
@@ -52,6 +52,7 @@ test('generates the home, rootFolder, and other links', () => {
   )
 
   const links = TestUtils.scryRenderedDOMComponentsWithTag(component, 'a')
+  // eslint-disable-next-line qunit/no-ok-equality
   ok(links.length === 4)
   equal(new URL(links[0].href).pathname, '/', 'correct home url')
   equal(new URL(links[2].href).pathname, '/courses/1/files', 'rootFolder link has correct url')
