@@ -17,7 +17,7 @@
  */
 
 import Backbone from '@canvas/backbone'
-import CourseFindSelectView from 'ui/features/content_migrations/backbone/views/subviews/CourseFindSelectView'
+import CourseFindSelectView from '../CourseFindSelectView'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 
@@ -71,6 +71,7 @@ QUnit.module('CourseFindSelectView: #setSourceCourseId', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', assert => {
   const courseFindSelectView = new CourseFindSelectView({model: new Backbone.Model()})
   const done = assert.async()
@@ -107,6 +108,7 @@ test('Sorts courses by most recent term to least, then alphabetically', function
   // then flattens by ID in the order they
   // should be in
   const groupedIds = sortedCourses.map(item => item.courses.map(course => course.id))
+  // eslint-disable-next-line prefer-spread
   const result = [].concat.apply([], groupedIds)
 
   // Array of ordered IDs from @courses

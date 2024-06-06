@@ -17,11 +17,12 @@
  */
 
 import Backbone from '@canvas/backbone'
-import ImportQuizzesNextView from '@canvas/content-migrations/backbone/views/ImportQuizzesNextView'
+import ImportQuizzesNextView from '../ImportQuizzesNextView'
 import assertions from 'helpers/assertions'
 
 QUnit.module('Import Quizzes Next', {})
 
+// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', assert => {
   const importQuizzesNext = new ImportQuizzesNextView({
     quizzesNextEnabled: true,
