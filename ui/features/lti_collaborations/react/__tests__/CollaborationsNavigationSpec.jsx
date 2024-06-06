@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import CollaborationsNavigation from 'ui/features/lti_collaborations/react/CollaborationsNavigation'
+import CollaborationsNavigation from '../CollaborationsNavigation'
 
 QUnit.module('CollaborationsNavigation')
 
