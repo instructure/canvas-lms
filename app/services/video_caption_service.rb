@@ -29,19 +29,20 @@ class VideoCaptionService < ApplicationService
   end
 
   def call
-    return unless pass_initial_checks
+    update_status(:processing)
+    return update_status(:failed_initial_validation) unless pass_initial_checks
 
     # send to Notorious so it can process the media; grab and use the media_id from the handoff response
     @media_id = handoff
-    return unless @media_id
+    return update_status(:failed_handoff) unless @media_id
 
     # tell Notorious to start generating captions -- must be complete with handoff first
     captions_request_successful = poll_for_caption_request
-    return unless captions_request_successful
+    return update_status(:failed_request) unless captions_request_successful
 
     # check if captions are available and what language was detected by whisper
     @srclang = poll_for_captions_ready
-    return unless @srclang
+    return update_status(:failed_captions) unless @srclang
 
     # grab the captions once they're ready
     captions = grab_captions
@@ -65,6 +66,9 @@ class VideoCaptionService < ApplicationService
   def save_media_track(content)
     if content.present?
       @media_object.media_tracks.first_or_create(user: @media_object.user, locale: @srclang, kind: "subtitles", content:)
+      update_status(:complete)
+    else
+      update_status(:failed_to_pull)
     end
   end
 
@@ -174,5 +178,9 @@ class VideoCaptionService < ApplicationService
 
   def config
     @config ||= DynamicSettings.find("notorious-admin", tree: :private) || {}
+  end
+
+  def update_status(status)
+    @media_object.update_attribute(:auto_caption_status, MediaObject::AUTO_CAPTION_STATUSES[status])
   end
 end
