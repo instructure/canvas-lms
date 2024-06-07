@@ -127,7 +127,7 @@ describe "Default Account Reports" do
 
     it "runs grade export for a term and return one line per enrollment" do
       user_with_managed_pseudonym(user: @user1, account: @account)
-      p = @account.pseudonyms.where(sis_user_id: "user_sis_id_01").take
+      p = @account.pseudonyms.find_by(sis_user_id: "user_sis_id_01")
       @enrollment1.sis_pseudonym = p
       @enrollment1.save!
 
@@ -284,9 +284,10 @@ describe "Default Account Reports" do
     end
 
     it "runs grade export with no parameters" do
+      @enrollment5.enrollment_state.update!(state: "completed")
+
       parsed = read_report("grade_export_csv", { order: 13 })
       expect(parsed.length).to eq 5
-
       expect(parsed[0]).to eq ["John St. Clair",
                                @user1.id.to_s,
                                "user_sis_id_01",
@@ -393,7 +394,7 @@ describe "Default Account Reports" do
                                nil,
                                nil,
                                "99.0",
-                               "active",
+                               "concluded",
                                nil,
                                nil,
                                nil,
