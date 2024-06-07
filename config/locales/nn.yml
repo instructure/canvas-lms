@@ -3404,6 +3404,7 @@ nn:
   announcements_tutorial_tray_994287d6: "Kunngjeringar opplæringsmeny"
   announcements_unlocked_successfully_1432da9d: "Kunngjeringar er låst opp"
   announcements_view_1019d00d: "Kunngjeringar - vis"
+  anonymity_settings_are_locked_due_to_a_posted_repl_54e2c2d1: "Du har ikkje løyve til å oppdatere den anonyme statusen til ein diskusjon"
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "Anonymiser alle merknader frå faglærar for alle innleveringar til denne oppgåva i SpeedGrader"
   anonymize_all_annotations_made_by_instructors_on_s_5540bc09: "Anonymiser alle merknader frå faglærar for alle innleveringar til denne oppgåva i DocViewer"
   anonymize_all_instructor_comments_and_annotations__713924c9: "Anonymiser alle merknader og kommentarar frå undervisar innafor DocViewer"
