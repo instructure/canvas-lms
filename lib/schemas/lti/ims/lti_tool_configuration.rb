@@ -69,7 +69,10 @@ module Schemas::Lti::IMS
                 "type" => "array",
                 "items" => {
                   "type" => "string",
-                  "enum" => Lti::ResourcePlacement::PLACEMENTS.map(&:to_s)
+                  "enum" => Lti::ResourcePlacement::PLACEMENTS.map(&:to_s) + [
+                    Lti::ResourcePlacement::CONTENT_AREA,
+                    Lti::ResourcePlacement::RICH_TEXT_EDITOR
+                  ]
                 }.freeze
               }.freeze,
             }.freeze
