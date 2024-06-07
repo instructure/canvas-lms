@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import helpDialog from '../../ui/boot/initializers/enableHelpDialog'
+import helpDialog from '../enableHelpDialog'
 import fakeENV from 'helpers/fakeENV'
 import 'jquery-tinypubsub'
 

@@ -1,5 +1,5 @@
 {
-  "name": "@instructure/date-js",
+  "name": "date-js",
   "version": "1.0.0",
   "main": "parser.js",
   "private": true

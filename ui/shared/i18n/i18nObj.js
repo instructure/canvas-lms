@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'date-js'
+import '@instructure/date-js'
 import i18nLolcalize from './i18nLolcalize'
 import I18n from 'i18n-js'
 import {

@@ -36,7 +36,7 @@ import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 import '@canvas/jquery/jquery.simulate'
-import '../../../../ui/boot/initializers/activateTooltips'
+import '@canvas/common/activateTooltips'
 
 function buildAssignment1() {
   const date1 = {

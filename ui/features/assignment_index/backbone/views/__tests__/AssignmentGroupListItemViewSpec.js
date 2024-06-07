@@ -23,7 +23,7 @@ import AssignmentGroupListView from '../AssignmentGroupListView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
-import elementToggler from '../../../../../boot/initializers/activateElementToggler'
+import elementToggler from '@canvas/common/activateElementToggler'
 
 const assignment1 = function () {
   const date1 = {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'date-js'
+import '@instructure/date-js'
 
 QUnit.module('Date')
 
@@ -131,7 +131,7 @@ test('date.add* at DST-end', () => {
 test('date.set at DST-end', () => {
   const date = new Date(2012, 10, 4, 0, 0, 0)
   date.set({hour: 14})
-  ok(date.getHours() === 14)
+  strictEqual(date.getHours(), 14)
   date.set({hour: 1})
-  ok(date.getHours() === 1)
+  strictEqual(date.getHours(), 1)
 })

@@ -19,7 +19,7 @@
 // note: most of these tests are now redundant w/ i18nliner-js, leaving them
 // for a little bit though
 
-import I18n, {useScope} from '@canvas/i18n'
+import I18n, {useScope} from '..'
 import I18nStubber from 'helpers/I18nStubber'
 import {raw} from '@instructure/html-escape'
 

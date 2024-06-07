@@ -39,10 +39,10 @@ import pluginBundles from 'plugin-bundles-generated'
 // so they have to be ran before any other app code runs.
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms'
-import './boot/initializers/ajax_errors'
-import './boot/initializers/activateKeyClicks'
-import './boot/initializers/activateTooltips'
-import './boot/initializers/injectAuthTokenIntoForms'
+import '@canvas/common/ajax_errors'
+import '@canvas/common/activateKeyClicks'
+import '@canvas/common/activateTooltips'
+import '@canvas/common/injectAuthTokenIntoForms'
 
 interface CustomWindow extends Window {
   bundles: string[]
@@ -218,7 +218,7 @@ if (ENV.badge_counts) {
 async function openHelpDialog(event: Event): Promise<void> {
   event.preventDefault()
   try {
-    const {default: helpDialog} = await import('./boot/initializers/enableHelpDialog')
+    const {default: helpDialog} = await import('@canvas/common/enableHelpDialog')
     helpDialog.open()
   } catch (e) {
     /* eslint-disable no-console */
