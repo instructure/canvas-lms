@@ -75,7 +75,7 @@ export default function BulkEditHeader({
 
   const selectedAssignmentsCount = assignments.filter(a => a.selected).length
 
-  return window.ENV.FEATURES.instui_nav ? (
+  return window.ENV.FEATURES?.instui_nav ? (
     <>
       <Flex margin={jobRunning ? '0 0 medium 0' : '0 0 large 0'} wrap="wrap" gap="medium">
         <Flex.Item shouldGrow={true} shouldShrink={true}>

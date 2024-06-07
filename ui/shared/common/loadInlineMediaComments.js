@@ -77,7 +77,10 @@ const resizeContainingTd = $link => {
 $(document).on('click', 'a.instructure_inline_media_comment', function (event) {
   event.preventDefault()
   if (!INST.kalturaSettings) {
-    alert(I18n.t('alerts.kaltura_disabled', 'Kaltura has been disabled for this Canvas site'))
+    // eslint-disable-next-line no-alert
+    window.alert(
+      I18n.t('alerts.kaltura_disabled', 'Kaltura has been disabled for this Canvas site')
+    )
     return
   }
 

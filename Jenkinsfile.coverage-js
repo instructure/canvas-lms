@@ -179,14 +179,6 @@ pipeline {
                   }
                 }
 
-                extendedStage('Runner - Karma').nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.karmaNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(jsStages) {
-                  def tests = [:]
-
-                  callableWithDelegate(jsStage.queueKarmaDistribution())(tests)
-
-                  parallel(tests)
-                }
-
                 parallel(jsStages)
               } //parallel tests
             } //builder

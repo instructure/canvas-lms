@@ -47,7 +47,7 @@ const GradebookHistoryApp = ({
       padding and get the menu to line up with the search form */}
       {/* EVAL-3711 Remove ICE Feature Flag */}
       <div
-        style={window.ENV.FEATURES.instui_nav ? {margin: '0 0 2.25em 0'} : {margin: '0 0 1.5em 0'}}
+        style={window.ENV.FEATURES?.instui_nav ? {margin: '0 0 2.25em 0'} : {margin: '0 0 1.5em 0'}}
       >
         <GradebookMenu
           courseUrl={courseUrl}

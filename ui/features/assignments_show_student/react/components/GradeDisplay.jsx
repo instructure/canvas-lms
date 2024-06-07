@@ -124,7 +124,7 @@ export default function PointsDisplay(props) {
             dangerouslySetInnerHTML={{__html: formatGrade()}}
             data-testid="grade-display"
             lineHeight="fit"
-            size={window.ENV.FEATURES.instui_nav ? 'medium' : 'x-large'}
+            size={window.ENV.FEATURES?.instui_nav ? 'medium' : 'x-large'}
             transform="capitalize"
           />
         </Flex.Item>

@@ -82,12 +82,15 @@ pipeline {
               }
             }
 
-            extendedStage('Runner - Karma').hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.karmaNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
-              def tests = [:]
+            for (int i = 0; i < jsStage.KARMA_NODE_COUNT; i++) {
+              String index = i
+              extendedStage("Runner - Karma ${i}").hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.karmaNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(runnerStages) {
+                def tests = [:]
 
-              callableWithDelegate(jsStage.queueKarmaDistribution())(tests)
+                callableWithDelegate(jsStage.queueKarmaDistribution(index))(tests)
 
-              parallel(tests)
+                parallel(tests)
+              }
             }
 
             extendedStage('Runner - Packages').hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.packagesNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {

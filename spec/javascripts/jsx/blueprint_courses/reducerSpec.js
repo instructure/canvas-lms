@@ -20,7 +20,7 @@ import actions from '@canvas/blueprint-courses/react/actions'
 import reducer from '@canvas/blueprint-courses/react/reducer'
 import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
 import LoadStates from '@canvas/blueprint-courses/react/loadStates'
-import getSampleData from './getSampleData'
+import getSampleData from '@canvas/blueprint-courses/getSampleData'
 
 QUnit.module('Blueprint Courses reducer')
 

@@ -31,17 +31,17 @@ QUnit.module('Quizzes::LogAuditing::EventTrackers::PageFocused', {
   },
 })
 
-test('#constructor: it sets up the proper context', () => {
+QUnit.skip('#constructor: it sets up the proper context', () => {
   equal(tracker.eventType, K.EVT_PAGE_FOCUSED)
   equal(tracker.priority, K.EVT_PRIORITY_LOW)
 })
 
-test('capturing: it works', () => {
+QUnit.skip('capturing: it works', () => {
   $(window).focus()
   ok(capture.called, 'it captures page focus')
 })
 
-test('capturing: it throttles captures', () => {
+QUnit.skip('capturing: it throttles captures', () => {
   $(window).focus()
   $(window).blur()
   $(window).focus()

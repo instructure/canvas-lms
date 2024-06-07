@@ -19,7 +19,7 @@
 import React from 'react'
 import * as enzyme from 'enzyme'
 import MasterChildStack from '../MasterChildStack'
-import getSampleData from '../../../../../../spec/javascripts/jsx/blueprint_courses/getSampleData'
+import getSampleData from '@canvas/blueprint-courses/getSampleData'
 
 QUnit.module('MasterChildStack component')
 

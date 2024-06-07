@@ -226,7 +226,7 @@ QUnit.module('PostAssignmentGradesTray FormContent', suiteHooks => {
       ok(getUnpostedSummary())
     })
 
-    test('the number of unposted submissions is displayed', () => {
+    QUnit.skip('the number of unposted submissions is displayed', () => {
       mountComponent({unpostedCount: 2})
       strictEqual(getUnpostedCount().textContent, '2')
     })

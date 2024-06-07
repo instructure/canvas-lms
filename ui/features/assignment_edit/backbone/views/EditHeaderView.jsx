@@ -74,7 +74,7 @@ EditHeaderView.prototype.afterRender = function () {
     return this.toggleConditionalReleaseTab(this.model.gradingType())
   }
   // EVAL-3711 Remove ICE feature flag
-  if (ENV.FEATURES.instui_nav) {
+  if (ENV.FEATURES?.instui_nav) {
     ReactDOM.render(
       <Pill
         renderIcon={this.model.published() ? <IconPublishSolid /> : <IconUnpublishedLine />}

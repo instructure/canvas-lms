@@ -560,7 +560,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       gradebook.gotChunkOfStudents([student])
       render()
       const studentProp = component.props.allStudents.find(s => s.id === student.id)
-      strictEqual(studentProp.submission.score, '9')
+      strictEqual(studentProp.submission.score, 9)
     })
 
     test('"score" is null if the student does not have a submission', () => {

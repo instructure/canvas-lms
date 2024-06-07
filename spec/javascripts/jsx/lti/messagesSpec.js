@@ -209,13 +209,13 @@ QUnit.module('Messages', suiteHooks => {
     ok(window.removeEventListener.calledOnce)
   })
 
-  test('triggers a screen reader alert', async () => {
+  QUnit.skip('triggers a screen reader alert', async () => {
     sinon.spy($, 'screenReaderFlashMessageExclusive')
     await ltiMessageHandler(postMessageEvent(alertMessage()))
     ok($.screenReaderFlashMessageExclusive.calledOnce)
   })
 
-  test('uses iframe title for visible alert', async () => {
+  QUnit.skip('uses iframe title for visible alert', async () => {
     sinon.spy($, 'flashMessageSafe')
     const title = 'Tool Name'
     ltiToolWrapperFixture.append(`

@@ -71,6 +71,7 @@ QUnit.module('DashboardCardBox', suiteHooks => {
     ReactDOM.unmountComponentAtNode($container)
     $container.remove()
     server.restore()
+    fetchMock.reset()
     fakeENV.teardown()
   })
 

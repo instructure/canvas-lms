@@ -54,7 +54,19 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor', suiteHooks => {
       },
 
       container: $container,
-      item: {id: '1101'},
+      item: {
+        id: '1101',
+        name: 'Some Student',
+        avatar_url: 'https://canvas.instructure.com/images/messages/avatar-55.png',
+        enrollments: [
+          {
+            id: '222',
+            grades: {
+              html_url: 'https://canvas.instructure.com/courses/1101/grades',
+            },
+          },
+        ],
+      },
     }
   })
 

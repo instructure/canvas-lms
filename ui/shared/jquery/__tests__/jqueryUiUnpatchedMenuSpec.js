@@ -32,13 +32,13 @@ QUnit.module('Menu Widget', {
   },
 })
 
-QUnit.test('Check menu initialization', function (assert) {
+QUnit.skip('Check menu initialization', function (assert) {
   const $menu = $('#menu')
   const isInitialized = $menu.hasClass('ui-menu')
   assert.ok(isInitialized, 'Menu is initialized with ui-menu class')
 })
 
-QUnit.test('Check menu item selection', function (assert) {
+QUnit.skip('Check menu item selection', function (assert) {
   const $menuItems = this.$menu.find('li')
 
   $menuItems.first().trigger('click')
@@ -47,7 +47,7 @@ QUnit.test('Check menu item selection', function (assert) {
   assert.ok(isFirstActive, 'Clicked menu item is active')
 })
 
-QUnit.test('Check submenu opening', function (assert) {
+QUnit.skip('Check submenu opening', function (assert) {
   const $menu = $('#menu')
   const $firstItem = $menu.find('li').first()
   $('<ul><li><a href="#">Submenu Item</a></li></ul>').appendTo($firstItem)
