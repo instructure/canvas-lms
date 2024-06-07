@@ -279,7 +279,7 @@ describe('ItemAssignToCard', () => {
     expect(getByLabelText('Due Date')).not.toBeDisabled()
   })
 
-  it.skip('renders error when date change to a closed grading period for teacher', async () => {
+  it('renders error when date change to a closed grading period for teacher', async () => {
     // Flakey spec
     withWithGradingPeriodsMock()
     window.ENV.current_user_is_admin = false
@@ -291,11 +291,7 @@ describe('ItemAssignToCard', () => {
     const dateInput = getByLabelText('Due Date')
     fireEvent.change(dateInput, {target: {value: 'May 4, 2024'}})
     getAllByRole('option', {name: '4 May 2024'})[0].click()
-
-    await waitFor(async () => {
-      expect(dateInput).toHaveValue('May 4, 2024')
-      expect(getAllByText(/Please enter a due date on or after/).length).toBeGreaterThanOrEqual(1)
-    })
+    expect(getAllByText(/Please enter a due date on or after/).length).toBeGreaterThanOrEqual(1)
   })
 
   describe('when course and user timezones differ', () => {

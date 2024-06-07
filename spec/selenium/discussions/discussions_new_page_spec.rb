@@ -2043,5 +2043,55 @@ describe "discussions" do
         end
       end
     end
+
+    context "with selective_release_backend and selective_release_ui_api enabled" do
+      before do
+        Account.site_admin.enable_feature!(:selective_release_backend)
+        Account.site_admin.enable_feature!(:selective_release_ui_api)
+        user_session(teacher)
+      end
+
+      it "does not display 'Post To' section and Available From/Until inputs" do
+        get "/courses/#{course.id}/discussion_topics/new"
+        expect(Discussion.select_date_input_exists?).to be_falsey
+        expect(Discussion.section_selection_input_exists?).to be_falsey
+      end
+
+      it "creates overrides using 'Assign To' tray", :ignore_js_errors do
+        student1 = @course.enroll_student(User.create!, enrollment_state: "active").user
+        title = "My Test Topic"
+        available_from = 5.days.ago
+        available_until = 5.days.from_now
+
+        get "/courses/#{course.id}/discussion_topics/new"
+
+        Discussion.update_discussion_topic_title(title)
+
+        Discussion.click_assign_to_button
+        wait_for_assign_to_tray_spinner
+        keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+        click_add_assign_to_card
+        expect(element_exists?(due_date_input_selector)).to be_falsey
+        select_module_item_assignee(1, student1.name)
+        update_available_date(1, format_date_for_view(available_from, "%-m/%-d/%Y"), true)
+        update_available_time(1, "8:00 AM", true)
+        update_until_date(1, format_date_for_view(available_until, "%-m/%-d/%Y"), true)
+        update_until_time(1, "9:00 PM", true)
+
+        click_save_button("Apply")
+        keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+        Discussion.save_button.click
+        wait_for_ajaximations
+
+        course.reload
+        discussion_topic = DiscussionTopic.last
+        new_override = discussion_topic.active_assignment_overrides.last
+        expect(new_override.set_type).to eq("ADHOC")
+        expect(new_override.set_id).to be_nil
+        expect(new_override.set.map(&:id)).to match_array([student1.id])
+      end
+    end
   end
 end

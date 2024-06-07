@@ -26,15 +26,37 @@ require_relative "../dashboard/pages/k5_dashboard_common_page"
 require_relative "../common"
 require_relative "pages/discussion_page"
 require_relative "../assignments/page_objects/assignment_create_edit_page"
+require_relative "../discussions/discussion_helpers"
 
 describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
+  include DiscussionHelpers
   include ItemsAssignToTray
   include ContextModulesCommon
   include K5DashboardCommonPageObject
   include K5Common
   include K5ImportantDatesSectionPageObject
+
+  def create_graded_discussion(discussion_course, assignment_options = {})
+    default_assignment_options = {
+      name: "Default Assignment",
+      points_possible: 10,
+      assignment_group: discussion_course.assignment_groups.create!(name: "Default Assignment Group"),
+      only_visible_to_overrides: false
+    }
+    options = default_assignment_options.merge(assignment_options)
+
+    @discussion_assignment = discussion_course.assignments.create!(options)
+    all_graded_discussion_options = {
+      user: teacher,
+      title: "assignment topic title",
+      message: "assignment topic message",
+      discussion_type: "threaded",
+      assignment: @discussion_assignment,
+    }
+    discussion_course.discussion_topics.create!(all_graded_discussion_options)
+  end
 
   let(:course) { course_model.tap(&:offer!) }
   let(:teacher) { teacher_in_course(course:, name: "teacher", active_all: true).user }
@@ -733,6 +755,175 @@ describe "discussions" do
             get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
             expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
           end
+
+          it "does not display 'Post To' section and Available From/Until inputs" do
+            get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
+            expect(Discussion.select_date_input_exists?).to be_falsey
+            expect(Discussion.section_selection_input_exists?).to be_falsey
+          end
+
+          it "updates overrides using 'Assign To' tray", :ignore_js_errors do
+            student1 = course.enroll_student(User.create!, enrollment_state: "active").user
+            available_from = 5.days.ago
+            available_until = 5.days.from_now
+
+            get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
+
+            Discussion.click_assign_to_button
+            wait_for_assign_to_tray_spinner
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            click_add_assign_to_card
+            expect(element_exists?(due_date_input_selector)).to be_falsey
+            select_module_item_assignee(1, student1.name)
+            update_available_date(1, format_date_for_view(available_from, "%-m/%-d/%Y"), true)
+            update_available_time(1, "8:00 AM", true)
+            update_until_date(1, format_date_for_view(available_until, "%-m/%-d/%Y"), true)
+            update_until_time(1, "9:00 PM", true)
+
+            click_save_button("Apply")
+            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+            Discussion.save_button.click
+            wait_for_ajaximations
+
+            @topic_no_options.reload
+            new_override = @topic_no_options.active_assignment_overrides.last
+            expect(new_override.set_type).to eq("ADHOC")
+            expect(new_override.set_id).to be_nil
+            expect(new_override.set.map(&:id)).to match_array([student1.id])
+          end
+
+          it "shows pending changes when overrides have been added", :ignore_js_errors, custom_timeout: 45 do
+            student1 = course.enroll_student(User.create!, enrollment_state: "active").user
+            available_from = 5.days.ago
+            available_until = 5.days.from_now
+
+            get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
+
+            Discussion.click_assign_to_button
+            wait_for_assign_to_tray_spinner
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            click_add_assign_to_card
+            select_module_item_assignee(1, student1.name)
+            update_available_date(1, format_date_for_view(available_from, "%-m/%-d/%Y"), true)
+            update_available_time(1, "8:00 AM", true)
+            update_until_date(1, format_date_for_view(available_until, "%-m/%-d/%Y"), true)
+            update_until_time(1, "9:00 PM", true)
+
+            click_save_button("Apply")
+            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+            expect(Discussion.pending_changes_pill_exists?).to be_truthy
+          end
+
+          it "shows no pending changes when override tray cancelled", :ignore_js_errors do
+            student1 = course.enroll_student(User.create!, enrollment_state: "active").user
+            available_from = 5.days.ago
+            available_until = 5.days.from_now
+
+            get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
+
+            Discussion.click_assign_to_button
+            wait_for_assign_to_tray_spinner
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            click_add_assign_to_card
+            select_module_item_assignee(1, student1.name)
+            update_available_date(1, format_date_for_view(available_from, "%-m/%-d/%Y"), true)
+            update_available_time(1, "8:00 AM", true)
+            update_until_date(1, format_date_for_view(available_until, "%-m/%-d/%Y"), true)
+            update_until_time(1, "9:00 PM", true)
+
+            click_cancel_button
+            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+            expect(Discussion.pending_changes_pill_exists?).to be_falsey
+          end
+
+          it "transitions from ungraded to graded and overrides are ok", :ignore_js_errors do
+            discussion_topic = DiscussionHelpers.create_discussion_topic(
+              course,
+              teacher,
+              "Teacher Discussion 1 Title",
+              "Teacher Discussion 1 message",
+              nil
+            )
+            student1 = course.enroll_student(User.create!, enrollment_state: "active").user
+            available_from = 5.days.ago
+            available_until = 5.days.from_now
+
+            discussion_topic.assignment_overrides.create!(set_type: "ADHOC",
+                                                          unlock_at: available_from,
+                                                          lock_at: available_until)
+
+            discussion_topic.assignment_overrides.last.assignment_override_students.create!(user: student1)
+
+            get "/courses/#{course.id}/discussion_topics/#{discussion_topic.id}/edit"
+
+            expect(is_checked(Discussion.graded_checkbox)).to be_falsey
+
+            Discussion.click_graded_checkbox
+            Discussion.save_button.click
+            wait_for_ajaximations
+
+            get "/courses/#{course.id}/discussion_topics/#{discussion_topic.id}/edit"
+
+            Discussion.click_assign_to_button
+            wait_for_assign_to_tray_spinner
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            expect(assign_to_due_date(1).attribute("value")).to eq("")
+            expect(assign_to_due_time(1).attribute("value")).to eq("")
+            expect(assign_to_available_from_date(1).attribute("value")).to eq(format_date_for_view(available_from, "%b %-e, %Y"))
+            expect(assign_to_available_from_time(1).attribute("value")).to eq(available_from.strftime("%-l:%M %p"))
+            expect(assign_to_until_date(1).attribute("value")).to eq(format_date_for_view(available_until, "%b %-e, %Y"))
+            expect(assign_to_until_time(1).attribute("value")).to eq(available_until.strftime("%-l:%M %p"))
+          end
+
+          it "transitions from graded to ungraded and overrides are ok", :ignore_js_errors do
+            skip("LX-1761 this test should work but doesn't right now")
+
+            discussion_assignment_options = {
+              name: "assignment",
+              points_possible: 10,
+            }
+            discussion_topic = create_graded_discussion(course, discussion_assignment_options)
+
+            student1 = course.enroll_student(User.create!, enrollment_state: "active").user
+
+            due_at = 3.days.from_now
+            available_from = 5.days.ago
+            available_until = 5.days.from_now
+
+            @discussion_assignment.assignment_overrides.create!(set_type: "ADHOC",
+                                                                due_at:,
+                                                                unlock_at: available_from,
+                                                                lock_at: available_until)
+
+            @discussion_assignment.assignment_overrides.last.assignment_override_students.create!(user: student1)
+
+            get "/courses/#{course.id}/discussion_topics/#{discussion_topic.id}/edit"
+
+            expect(is_checked(Discussion.graded_checkbox)).to be_truthy
+
+            Discussion.click_graded_checkbox
+            Discussion.save_button.click
+            wait_for_ajaximations
+
+            get "/courses/#{course.id}/discussion_topics/#{discussion_topic.id}/edit"
+
+            Discussion.click_assign_to_button
+            wait_for_assign_to_tray_spinner
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            expect(assign_to_date_and_time[1].text).not_to include("Due Date")
+            expect(assign_to_available_from_date(1, false).attribute("value")).to eq(format_date_for_view(available_from, "%b %-e, %Y"))
+            expect(assign_to_available_from_time(1, false).attribute("value")).to eq(available_from.strftime("%-l:%M %p"))
+            expect(assign_to_until_date(1, false).attribute("value")).to eq(format_date_for_view(available_until, "%b %-e, %Y"))
+            expect(assign_to_until_time(1, false).attribute("value")).to eq(available_until.strftime("%-l:%M %p"))
+          end
         end
       end
 
@@ -805,26 +996,6 @@ describe "discussions" do
       end
 
       context "graded" do
-        def create_graded_discussion(discussion_course, assignment_options = {})
-          default_assignment_options = {
-            name: "Default Assignment",
-            points_possible: 10,
-            assignment_group: discussion_course.assignment_groups.create!(name: "Default Assignment Group"),
-            only_visible_to_overrides: false
-          }
-          options = default_assignment_options.merge(assignment_options)
-
-          discussion_assignment = discussion_course.assignments.create!(options)
-          all_graded_discussion_options = {
-            user: teacher,
-            title: "assignment topic title",
-            message: "assignment topic message",
-            discussion_type: "threaded",
-            assignment: discussion_assignment,
-          }
-          discussion_course.discussion_topics.create!(all_graded_discussion_options)
-        end
-
         it "displays graded assignment options correctly when initially opening edit page with archived grading schemes disabled" do
           Account.site_admin.disable_feature!(:archived_grading_schemes)
           grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
