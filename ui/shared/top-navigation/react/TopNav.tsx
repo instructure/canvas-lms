@@ -83,7 +83,10 @@ const TopNav: React.FC<ITopNavProps> = ({actionItems, getBreadCrumbSetter}) => {
         if (Array.isArray(newCrumbs)) {
           setBreadCrumbs(newCrumbs)
         } else {
-          setBreadCrumbs(crumbs => [...crumbs.slice(0, -1), newCrumbs])
+          setBreadCrumbs(crumbs => {
+            const oldCrumbs = crumbs.length > 1 ? crumbs.slice(0, -1) : crumbs
+            return [...oldCrumbs, newCrumbs]
+          })
         }
       }
       getBreadCrumbSetter({getCrumbs, setCrumbs})

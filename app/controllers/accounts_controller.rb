@@ -299,7 +299,7 @@ class AccountsController < ApplicationController
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
-  before_action :page_has_instui_topnav, only: %i[show users statistics settings]
+  before_action :page_has_instui_topnav, only: %i[show users]
 
   include Api::V1::Account
   include CustomSidebarLinksHelper
@@ -1298,6 +1298,8 @@ class AccountsController < ApplicationController
 
   def settings
     if authorized_action(@account, @current_user, :read_as_admin)
+      add_crumb t(:settings_crumb, "Settings")
+      page_has_instui_topnav
       @account_users = @account.account_users.active
       @account_user_permissions_cache = AccountUser.create_permissions_cache(@account_users, @current_user, session)
       ActiveRecord::Associations.preload(@account_users, user: :communication_channels)
@@ -1524,7 +1526,8 @@ class AccountsController < ApplicationController
 
   def statistics
     if authorized_action(@account, @current_user, :view_statistics)
-      add_crumb(t(:crumb_statistics, "Statistics"), statistics_account_url(@account))
+      add_crumb(t(:crumb_statistics, "Statistics"))
+      page_has_instui_topnav
       if @account.grants_right?(@current_user, :read_course_list)
         @recently_started_courses = @account.associated_courses.active.recently_started
         @recently_ended_courses = @account.associated_courses.active.recently_ended
