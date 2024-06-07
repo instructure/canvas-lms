@@ -204,15 +204,5 @@ module.exports = {
       jQuery: 'jquery',
       'window.jQuery': 'jquery',
     }),
-  ].concat(
-    process.env.JSPEC_GROUP
-      ? [
-          partitioning.createPlugin({
-            group: process.env.JSPEC_GROUP,
-            nodeIndex: +process.env.CI_NODE_INDEX,
-            nodeTotal: +process.env.CI_NODE_TOTAL,
-          }),
-        ]
-      : []
-  ),
+  ].concat(process.env.JSPEC_GROUP ? [partitioning.createPlugin()] : []),
 }
