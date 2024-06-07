@@ -18,16 +18,13 @@
 
 import React, {useState} from 'react'
 import {Element, useEditor} from '@craftjs/core'
-
-import {contrast} from '@instructure/ui-color-utils'
-
 import {Container} from '../../blocks/Container'
 import {ButtonBlock} from '../../blocks/ButtonBlock'
 import {SVGImageBlock} from '../../blocks/SVGImageBlock'
 import canvas_logo from '../../../../assets/logos/canvas_logo_left'
 import {NoSections} from '../ColumnsSection'
 
-import {useClassNames, white, black} from '../../../../utils'
+import {useClassNames, getContrastingColor, getContrastingButtonColor} from '../../../../utils'
 
 type FooterSectionProps = {
   background?: string
@@ -38,14 +35,11 @@ const FooterSection = ({background}: FooterSectionProps) => {
     enabled: state.options.enabled,
   }))
   const [cid] = useState<string>('hero-section')
-  const clazz = useClassNames(enabled, {isEmpty: false, isSelected: false, isHovered: false}, [
-    'footer-section',
-  ])
+  const clazz = useClassNames(enabled, {empty: false}, ['footer-section'])
 
   const backgroundColor = background || FooterSection.craft.defaultProps.background
-  const textColor =
-    contrast(backgroundColor, white) > contrast(backgroundColor, black) ? white : black
-  const buttonColor = textColor === white ? 'primary-inverse' : 'secondary'
+  const textColor = getContrastingColor(backgroundColor)
+  const buttonColor = getContrastingButtonColor(textColor)
 
   return (
     <Container className={clazz} style={{color: textColor}} background={backgroundColor}>
@@ -56,8 +50,17 @@ const FooterSection = ({background}: FooterSectionProps) => {
         variant="fixed"
         className="footer-section__inner"
       >
-        <SVGImageBlock src={canvas_logo} color={textColor} />
-        <ButtonBlock
+        <Element
+          id={`${cid}__footer-canvas-icon`}
+          is={SVGImageBlock}
+          canvas={true}
+          src={canvas_logo}
+          color={textColor}
+        />
+        <Element
+          id={`${cid}__footer-canvas-to-top`}
+          is={ButtonBlock}
+          canvas={true}
           text="Back to top"
           variant="condensed"
           color={buttonColor}
@@ -72,11 +75,11 @@ const FooterSection = ({background}: FooterSectionProps) => {
 
 FooterSection.craft = {
   displayName: 'Footer',
-  custom: {
-    isSection: true,
-  },
   defaultProps: {
     background: '#1A2729',
+  },
+  custom: {
+    isSection: true,
   },
 }
 

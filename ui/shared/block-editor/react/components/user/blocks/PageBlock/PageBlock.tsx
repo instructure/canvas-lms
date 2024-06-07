@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect} from 'react'
 import {useEditor, useNode, type Node} from '@craftjs/core'
 import {useClassNames} from '../../../../utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -36,7 +36,6 @@ export const PageBlock = ({children}: PageBlockProps) => {
     connectors: {connect},
   } = useNode()
   const clazz = useClassNames(enabled, {empty: !children}, ['page-block'])
-  const [pageRef, setPageRef] = useState<HTMLDivElement | null>(null)
 
   const handlePagekey = useCallback(
     (e: KeyboardEvent) => {
@@ -49,11 +48,11 @@ export const PageBlock = ({children}: PageBlockProps) => {
   )
 
   useEffect(() => {
-    pageRef?.addEventListener('keydown', handlePagekey)
+    document.addEventListener('keydown', handlePagekey)
     return () => {
-      pageRef?.removeEventListener('keydown', handlePagekey)
+      document.removeEventListener('keydown', handlePagekey)
     }
-  }, [handlePagekey, pageRef])
+  }, [handlePagekey])
 
   const handlePaste = useCallback((_e: React.ClipboardEvent<HTMLDivElement>) => {
     // Some day we should take what's on the clipboard and convert it into
@@ -65,10 +64,7 @@ export const PageBlock = ({children}: PageBlockProps) => {
     <div
       className={clazz}
       data-placeholder="Drop a section here"
-      ref={el => {
-        el && connect(el)
-        setPageRef(el)
-      }}
+      ref={el => el && connect(el)}
       style={{
         background: 'transparent',
         padding: '16px',
@@ -88,8 +84,7 @@ PageBlock.craft = {
   displayName: 'Page',
   rules: {
     canMoveIn: (incomingNodes: Node[]) => {
-      // return incomingNodes.every((incomingNode: Node) => incomingNode.data.custom.isSection)
-      return true
+      return incomingNodes.every((incomingNode: Node) => incomingNode.data.custom.isSection)
     },
   },
 }

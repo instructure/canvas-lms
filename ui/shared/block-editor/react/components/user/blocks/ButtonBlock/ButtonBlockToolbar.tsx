@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useRef, useState} from 'react'
 import {useNode} from '@craftjs/core'
 
 import {IconButton} from '@instructure/ui-buttons'
@@ -27,14 +27,15 @@ import {
   IconTextBackgroundColorLine,
   IconButtonAndIconMakerLine,
   IconBoxLine,
+  IconImageLine,
 } from '@instructure/ui-icons'
 
-import {IconBlockSettings} from '../IconBlock'
 import {LinkModal} from '../../../editor/LinkModal'
 import {ColorModal} from './ColorModal'
 
 import {isInstuiButtonColor} from './common'
 import type {ButtonBlockProps, ButtonSize, ButtonVariant} from './common'
+import {ButtonIconPopup} from './ButtonIconPopup'
 
 const ButtonBlockToolbar = () => {
   const {
@@ -45,6 +46,8 @@ const ButtonBlockToolbar = () => {
   }))
   const [linkModalOpen, setLinkModalOpen] = useState(false)
   const [colorModalOpen, setColorModalOpen] = useState(false)
+  const [iconPopupOpen, setIconPopupOpen] = useState(false)
+  const buttonIconPopupRef = useRef<HTMLButtonElement | null>(null)
 
   const handleSizeChange = useCallback(
     (
@@ -74,22 +77,6 @@ const ButtonBlockToolbar = () => {
   )
 
   const handleColorChange = useCallback(
-    (
-      _e: React.MouseEvent,
-      value: MenuItemProps['value'] | MenuItemProps['value'][],
-      _selected: MenuItemProps['selected'],
-      _args: MenuItem
-    ) => {
-      if (value === 'custom') {
-        setColorModalOpen(true)
-      } else {
-        setProp((prps: ButtonBlockProps) => (prps.color = value as string))
-      }
-    },
-    [setProp]
-  )
-
-  const handleCustomColorChange = useCallback(
     (color: string) => {
       setProp((prps: ButtonBlockProps) => (prps.color = color))
       setColorModalOpen(false)
@@ -105,6 +92,10 @@ const ButtonBlockToolbar = () => {
     setLinkModalOpen(false)
   }, [])
 
+  const handleColorButtonClick = useCallback(() => {
+    setColorModalOpen(true)
+  }, [])
+
   const handleCloseColorModal = useCallback(() => {
     setColorModalOpen(false)
   }, [])
@@ -118,6 +109,10 @@ const ButtonBlockToolbar = () => {
     },
     [setProp]
   )
+
+  const handleCloseButtonIconPopup = useCallback(() => {
+    setIconPopupOpen(false)
+  }, [])
 
   return (
     <Flex gap="small">
@@ -185,76 +180,19 @@ const ButtonBlockToolbar = () => {
         </Menu.Item>
       </Menu>
 
-      <Menu
-        placement="bottom"
-        trigger={
-          <IconButton
-            size="small"
-            withBackground={false}
-            withBorder={false}
-            screenReaderLabel="Color"
-            disabled={props.variant === 'condensed'}
-          >
-            <IconTextBackgroundColorLine size="x-small" />
-          </IconButton>
-        }
-        onSelect={handleColorChange}
+      <IconButton
+        size="small"
+        withBackground={false}
+        withBorder={false}
+        screenReaderLabel="Color"
+        disabled={props.variant === 'condensed'}
+        onClick={handleColorButtonClick}
       >
-        <Menu.Item value="primary" type="checkbox" defaultSelected={props.color === 'primary'}>
-          Primary
-        </Menu.Item>
-        <Menu.Item value="secondary" type="checkbox" defaultSelected={props.color === 'secondary'}>
-          Secondary
-        </Menu.Item>
-        <Menu.Item value="success" type="checkbox" defaultSelected={props.color === 'success'}>
-          Success
-        </Menu.Item>
-        <Menu.Item value="danger" type="checkbox" defaultSelected={props.color === 'danger'}>
-          Danger
-        </Menu.Item>
-        <Menu.Item
-          value="primary-inverse"
-          type="checkbox"
-          defaultSelected={props.color === 'primary-inverse'}
-        >
-          Primary Inverse
-        </Menu.Item>
-        <Menu.Item
-          value="custom"
-          type="checkbox"
-          defaultSelected={!isInstuiButtonColor(props.color)}
-        >
-          Custom
-        </Menu.Item>
-      </Menu>
+        <IconTextBackgroundColorLine size="x-small" />
+      </IconButton>
 
-      {/*
-      <View as="div" margin="small">
-        <RadioInputGroup
-          disabled={props.variant === 'condensed'}
-          name="color"
-          defaultValue={isInstuiButtonColor(props.color) ? props.color : 'custom'}
-          description="Color"
-          onChange={handleButtonColorChange}
-        >
-          <RadioInput value="primary" label="Primary" />
-          <RadioInput value="secondary" label="Secondary" />
-          <RadioInput value="success" label="Success" />
-          <RadioInput value="danger" label="Danger" />
-          <RadioInput value="primary-inverse" label="Primary Inverse" />
-          <RadioInput value="custom" label="Custom" />
-        </RadioInputGroup>
-      </View>
+      <ButtonIconPopup />
 
-
-      {!isInstuiButtonColor(props.color) && (
-        <View as="div" margin="small">
-
-        </View>
-
-      )}
-      <IconBlockSettings />
-                          */}
       <LinkModal
         open={linkModalOpen}
         text={props.text}
@@ -266,7 +204,7 @@ const ButtonBlockToolbar = () => {
         open={colorModalOpen}
         color={props.color}
         onClose={handleCloseColorModal}
-        onSubmit={handleCustomColorChange}
+        onSubmit={handleColorChange}
       />
     </Flex>
   )

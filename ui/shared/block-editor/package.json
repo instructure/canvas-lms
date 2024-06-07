@@ -8,10 +8,8 @@
     "@craftjs/core": "^0.2.7",
     "@instructure/ui-color-picker": "^8",
     "styled-components": ">= 4",
-   "@mui/material": "^5.15.17",
-   "@mui/styles": "^5.15.17",
-   "mui-color-input": "^2.0.3",
    "react-contenteditable": "^3.3.7",
-   "re-resizable": "6.9.16"
+   "re-resizable": "6.9.16",
+   "tinycolor2": "^1.6.0"
   }
 }

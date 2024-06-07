@@ -35,6 +35,7 @@ import {HeadingBlock, HeadingBlockIcon} from '../user/blocks/HeadingBlock'
 import {ResourceCard, ResourceCardIcon} from '../user/blocks/ResourceCard'
 import {ImageBlock, ImageBlockIcon} from '../user/blocks/ImageBlock'
 import {IconBlock, IconBlockIcon} from '../user/blocks/IconBlock'
+import {SVGImageBlock, SVGImageBlockIcon} from '../user/blocks/SVGImageBlock'
 import {IframeBlock, IframeBlockIcon} from '../user/blocks/IframeBlock'
 // import {Card} from '../user/Card'
 
@@ -171,6 +172,7 @@ export const Toolbox = ({open, onClose}: ToolboxProps) => {
                 {renderBox('Heading', HeadingBlockIcon, <HeadingBlock />)}
                 {renderBox('Resource Card', ResourceCardIcon, <ResourceCard />)}
                 {renderBox('Image', ImageBlockIcon, <ImageBlock />)}
+                {renderBox('SVG Image', SVGImageBlockIcon, <SVGImageBlock />)}
                 {renderBox('Iframe', IframeBlockIcon, <IframeBlock />)}
               </Flex>
             </Tabs.Panel>

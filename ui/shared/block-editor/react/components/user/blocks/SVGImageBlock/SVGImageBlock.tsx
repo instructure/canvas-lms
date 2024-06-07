@@ -16,28 +16,43 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import {useNode} from '@craftjs/core'
+import {validateSVG} from '../../../../utils'
+import {SVGImageToolbar} from './SVGImageToolbar'
 
-const CIRCLE = '<svg><circle cx="250" cy="250" r="250" /></svg>'
+const DEFAULT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="50" height="16" viewBox="0 0 50 16">
+<text x="0" y="16" font-size="16">SVG</text>
+</svg>`
 
 type SVGImageBlockProps = {
-  src: string
+  src?: string
   color?: string
   width?: number
   height?: number
 }
 
-const SVGImageBlock = ({src = CIRCLE, color = 'inherit', width, height}: SVGImageBlockProps) => {
+const SVGImageBlock = ({
+  src = DEFAULT_SVG,
+  color = 'inherit',
+  width,
+  height,
+}: SVGImageBlockProps) => {
   const {
     connectors: {connect, drag},
   } = useNode()
+  const [svg, setSvg] = useState<string>(validateSVG(src) ? src : DEFAULT_SVG)
+
+  // TODO: can append the svg element from the document fragment to the div
+  useEffect(() => {
+    setSvg(validateSVG(src) ? src : DEFAULT_SVG)
+  }, [src])
 
   return (
     <div
       style={{color, width: width || 'auto', height: height || 'auto'}}
       ref={ref => ref && connect(drag(ref))}
-      dangerouslySetInnerHTML={{__html: src}}
+      dangerouslySetInnerHTML={{__html: svg}}
     />
   )
 }
@@ -45,8 +60,11 @@ const SVGImageBlock = ({src = CIRCLE, color = 'inherit', width, height}: SVGImag
 SVGImageBlock.craft = {
   displayName: 'SVG Image',
   defaultProps: {
-    src: CIRCLE,
+    src: DEFAULT_SVG,
+  },
+  related: {
+    toolbar: SVGImageToolbar,
   },
 }
 
-export {SVGImageBlock}
+export {SVGImageBlock, type SVGImageBlockProps}

@@ -20,19 +20,21 @@
 import React, {useCallback, useState} from 'react'
 import {useEditor} from '@craftjs/core'
 
-import {Button} from '@instructure/ui-buttons'
-import {Checkbox} from '@instructure/ui-checkbox'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {PreviewModal} from './PreviewModal'
+import {IconUndo, IconRedo} from '../../assets/internal-icons'
 
 type TopbarProps = {
   onOpenToolbox: () => void
 }
 
 export const Topbar = ({onOpenToolbox}: TopbarProps) => {
-  const {actions, query, enabled} = useEditor(state => ({
-    enabled: state.options.enabled,
+  const {canUndo, canRedo, actions, query} = useEditor((state, qry) => ({
+    canUndo: qry.history.canUndo(),
+    canRedo: qry.history.canRedo(),
+    query: qry,
   }))
   const [previewOpen, setPreviewOpen] = useState(false)
 
@@ -48,9 +50,27 @@ export const Topbar = ({onOpenToolbox}: TopbarProps) => {
     <View as="div" background="secondary">
       <Flex justifyItems="space-between" padding="x-small">
         <Flex.Item>
-          <Button onClick={handleOpenPreview} size="small">
-            Preview
-          </Button>
+          <Flex gap="small">
+            <Button onClick={handleOpenPreview} size="small">
+              Preview
+            </Button>
+            <IconButton
+              screenReaderLabel="Undo"
+              onClick={() => actions.history.undo()}
+              disabled={!canUndo}
+              size="small"
+            >
+              <IconUndo size="x-small" />
+            </IconButton>
+            <IconButton
+              screenReaderLabel="Redo"
+              onClick={() => actions.history.redo()}
+              disabled={!canRedo}
+              size="small"
+            >
+              <IconRedo size="x-small" />
+            </IconButton>
+          </Flex>
         </Flex.Item>
         <Flex.Item>
           <Button onClick={onOpenToolbox} margin="0 small 0 0" size="small" withBackground={false}>
