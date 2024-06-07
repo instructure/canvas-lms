@@ -60,6 +60,7 @@ const unexcusedEvent = () =>
     excused_after: false,
   })
 const createView = function (logItems, options) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   options = {
     users: [],
     ...options,

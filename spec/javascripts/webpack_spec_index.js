@@ -74,19 +74,12 @@ if (!process.env.JSPEC_PATH) {
     require.context(
       CONTEXT_COFFEESCRIPT_SPEC,
       process.env.JSPEC_RECURSE !== '0',
-      RESOURCE_COFFEESCRIPT_SPEC
-    )
-  )
-  requireAll(
-    require.context(
-      CONTEXT_EMBER_GRADEBOOK_SPEC,
-      process.env.JSPEC_RECURSE !== '0',
-      RESOURCE_EMBER_GRADEBOOK_SPEC
+      QUNIT_SPEC
     )
   )
 
   requireAll(
-    require.context(CONTEXT_JSX_SPEC, process.env.JSPEC_RECURSE !== '0', RESOURCE_JSX_SPEC)
+    require.context(CONTEXT_JSX_SPEC, process.env.JSPEC_RECURSE !== '0', QUNIT_SPEC)
   )
 
   // eslint-disable-next-line import/no-dynamic-require
