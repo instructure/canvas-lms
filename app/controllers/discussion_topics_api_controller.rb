@@ -104,17 +104,16 @@ class DiscussionTopicsApiController < ApplicationController
   def summary
     return render_unauthorized_action unless @topic.user_can_summarize?(@current_user)
 
-    llm_config = LLMConfigs.config_for("discussion_topic_summary")
-    if llm_config.nil?
+    llm_config_raw = LLMConfigs.config_for("discussion_topic_summary_raw")
+    llm_config_refined = LLMConfigs.config_for("discussion_topic_summary_refined")
+
+    if llm_config_raw.nil? || llm_config_refined.nil?
       logger.error("No LLM config found for discussion topic summary")
       return render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity)
     end
 
-    dynamic_content = {
-      content: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary,
-      locale: available_locales[@current_user.locale || I18n.default_locale.to_s]
-    }
-    dynamic_content_hash = Digest::SHA256.hexdigest(dynamic_content.to_json)
+    raw_dynamic_content = { CONTENT: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary }
+    raw_dynamic_content_hash = Digest::SHA256.hexdigest(raw_dynamic_content.to_json)
 
     forced = params[:force] == "true"
     unless @topic.summary_enabled
@@ -122,59 +121,42 @@ class DiscussionTopicsApiController < ApplicationController
       forced = true
     end
 
-    unless forced
-      dts = @topic.summaries.where(discussion_topic: @topic, llm_config_version: llm_config.name, dynamic_content_hash:)
-                  .order(created_at: :desc)
-                  .first
-
-      if dts
-        return render(json: { id: dts.id, text: dts.summary })
-      end
-    end
-
-    response = nil
-    begin
-      prompt, options = llm_config.generate_prompt_and_options(
-        substitutions: {
-          CONTENT: dynamic_content[:content],
-          LOCALE: dynamic_content[:locale]
-        }
-      )
-
-      time = Benchmark.measure do
-        response = InstLLMHelper.client(llm_config.model_id).chat(
-          [{ role: "user", content: prompt }],
-          **options.symbolize_keys
-        )
-      end
-    rescue => e
-      logger.error("Error summarizing discussion topic: #{e.class} - #{e.message}")
-
-      case e
-      when InstLLM::ServiceQuotaExceededError
-        return render(json: { error: t("Sorry, we are currently experiencing high demand. Please try again later.") }, status: :service_unavailable)
-      when InstLLM::ThrottlingError
-        return render(json: { error: t("Sorry, the service is currently busy. Please try again later.") }, status: :service_unavailable)
-      when InstLLM::ValidationTooLongError
-        return render(json: { error: t("Sorry, we are unable to summarize this discussion as it is too long.") }, status: :unprocessable_entity)
-      when InstLLM::ValidationError
-        return render(json: { error: t("Oops! There was an error validating the service request. Please try again later.") }, status: :unprocessable_entity)
-      else
-        return render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity)
-      end
-    end
-
-    summary = response.message[:content]
-    dts = @topic.summaries.create!(
-      llm_config_version: llm_config.name,
-      dynamic_content_hash:,
-      summary:,
-      input_tokens: response.usage[:input_tokens],
-      output_tokens: response.usage[:output_tokens],
-      generation_time: time.real.round(2)
+    raw_summary = fetch_or_create_summary(
+      llm_config: llm_config_raw,
+      dynamic_content: raw_dynamic_content,
+      dynamic_content_hash: raw_dynamic_content_hash,
+      forced:
     )
 
-    render(json: { id: dts.id, text: dts.summary })
+    locale = @current_user.locale || I18n.default_locale.to_s
+    pretty_locale = available_locales[locale] || "English"
+    refined_dynamic_content = { CONTENT: raw_summary.summary, LOCALE: pretty_locale }
+    refined_dynamic_content_hash = Digest::SHA256.hexdigest(refined_dynamic_content.to_json)
+    refined_summary = fetch_or_create_summary(
+      llm_config: llm_config_refined,
+      dynamic_content: refined_dynamic_content,
+      dynamic_content_hash: refined_dynamic_content_hash,
+      forced:,
+      parent_summary: raw_summary,
+      locale:
+    )
+
+    render(json: { id: refined_summary.id, text: refined_summary.summary })
+  rescue => e
+    logger.error("Error summarizing discussion topic: #{e.class} - #{e.message}")
+
+    case e
+    when InstLLM::ServiceQuotaExceededError
+      render(json: { error: t("Sorry, we are currently experiencing high demand. Please try again later.") }, status: :service_unavailable)
+    when InstLLM::ThrottlingError
+      render(json: { error: t("Sorry, the service is currently busy. Please try again later.") }, status: :service_unavailable)
+    when InstLLM::ValidationTooLongError
+      render(json: { error: t("Sorry, we are unable to summarize this discussion as it is too long.") }, status: :unprocessable_entity)
+    when InstLLM::ValidationError
+      render(json: { error: t("Oops! There was an error validating the service request. Please try again later.") }, status: :unprocessable_entity)
+    else
+      render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity)
+    end
   end
 
   # @API Disable summary
@@ -1042,5 +1024,45 @@ class DiscussionTopicsApiController < ApplicationController
     end
 
     true
+  end
+
+  def fetch_or_create_summary(llm_config:, dynamic_content:, dynamic_content_hash:, forced:, parent_summary: nil, locale: nil)
+    unless forced
+      summary = @topic.summaries.where(llm_config_version: llm_config.name, dynamic_content_hash:, parent: parent_summary, locale:)
+                      .order(created_at: :desc)
+                      .first
+      return summary if summary
+    end
+
+    prompt, options = llm_config.generate_prompt_and_options(substitutions: dynamic_content)
+    content, input_tokens, output_tokens, generation_time = generate_llm_response(llm_config, prompt, options)
+
+    @topic.summaries.create!(
+      llm_config_version: llm_config.name,
+      dynamic_content_hash:,
+      summary: content,
+      input_tokens:,
+      output_tokens:,
+      generation_time:,
+      parent: parent_summary,
+      locale:
+    )
+  end
+
+  def generate_llm_response(llm_config, prompt, options)
+    response = nil
+    time = Benchmark.measure do
+      response = InstLLMHelper.client(llm_config.model_id).chat(
+        [{ role: "user", content: prompt }],
+        **options.symbolize_keys
+      )
+    end
+
+    [
+      response.message[:content],
+      response.usage[:input_tokens],
+      response.usage[:output_tokens],
+      time.real.round(2)
+    ]
   end
 end

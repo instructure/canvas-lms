@@ -188,6 +188,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
       </Flex>
     )
   } else {
+    /* eslint-disable react/no-array-index-key */
     return (
       <Flex direction="column" justifyItems="start">
         <Flex.Item>
@@ -195,7 +196,12 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
         </Flex.Item>
         <Flex.Item>
           <Text fontStyle="italic" data-testid="summary-text">
-            {summary.text}
+            {summary.text.split('\n').map((line, index) => (
+              <React.Fragment key={index}>
+                {line}
+                <br />
+              </React.Fragment>
+            ))}
           </Text>
         </Flex.Item>
         <Flex.Item>
@@ -233,5 +239,6 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
         </Flex>
       </Flex>
     )
+    /* eslint-enable react/no-array-index-key */
   }
 }
