@@ -156,6 +156,8 @@ define [
 
     courseID: => @get('course_id')
 
+    contextTagID: => @get('context_tag_id')
+
     submissionTypes: (submissionTypes) =>
       return @_submissionTypes() unless arguments.length > 0
       @set 'submission_types', submissionTypes
@@ -328,6 +330,12 @@ define [
     htmlUrl: =>
       @get 'html_url'
 
+    moduleItemUrl: =>
+      if @get 'context_tag_id'
+       return "#{@get 'html_url'}?module_item_id=#{@get 'context_tag_id'}"
+      else
+       return @htmlUrl()
+
     htmlEditUrl: =>
       "#{@get 'html_url'}/edit"
 
@@ -421,7 +429,8 @@ define [
         'allDates', 'hasDueDate', 'hasPointsPossible', 'singleSectionDueDate',
         'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides',
         'omitFromFinalGrade', 'is_quiz_assignment', 'isQuizLTIAssignment',
-        'secureParams', 'inClosedGradingPeriod', 'dueDateRequired', 'submissionTypesFrozen'
+        'secureParams', 'inClosedGradingPeriod', 'dueDateRequired', 'submissionTypesFrozen',
+        'contextTagID', "moduleItemUrl"
       ]
 
       hash =

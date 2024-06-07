@@ -293,6 +293,11 @@ class Assignment < ActiveRecord::Base
     grading_standard_id
   )
 
+  def context_tag_id
+    if context_module_tags
+      context_module_tags.first.id unless context_module_tags.first.nil?
+    end
+  end
   def external_tool?
     self.submission_types == 'external_tool'
   end

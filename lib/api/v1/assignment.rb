@@ -123,6 +123,7 @@ module Api::V1::Assignment
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
     hash['due_date_required'] = assignment.due_date_required?
     hash['max_name_length'] = assignment.max_name_length
+    hash['context_tag_id'] = assignment.context_tag_id unless assignment.context_tag_id.nil?
 
     unless opts[:exclude_response_fields].include?('in_closed_grading_period')
       hash['in_closed_grading_period'] = assignment.in_closed_grading_period?
