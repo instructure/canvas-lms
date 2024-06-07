@@ -18,8 +18,6 @@
 
 import groovy.transform.Field
 
-@Field static final COFFEE_NODE_COUNT = 4
-@Field static final JSG_NODE_COUNT = 3
 @Field static final JEST_NODE_COUNT = 5
 
 def jestNodeRequirementsTemplate(index) {
@@ -63,40 +61,17 @@ def getSeleniumGridContainers(count) {
   ]
 }
 
-def coffeeNodeRequirementsTemplate() {
-  def baseTestContainer = [
-    image: 'local/karma-runner',
-    command: 'cat'
-  ]
-
-  return [
-    containers: (0..COFFEE_NODE_COUNT).collect { index ->
-      def portNumber = 9876 + index
-      baseTestContainer + [name: "coffee${index}", ports: [portNumber], envVars: [KARMA_BROWSER: 'ChromeSeleniumGridHeadless', KARMA_PORT: portNumber]]
-    } + getSeleniumGridContainers(COFFEE_NODE_COUNT)
-  ]
-}
-
 def karmaNodeRequirementsTemplate() {
   def baseTestContainer = [
     image: 'local/karma-runner',
-    command: 'cat'
+    command: 'cat',
+    ports: [9876],
+    envVars: [KARMA_BROWSER: 'ChromeSeleniumGridHeadless', KARMA_PORT: 9876],
+    name: 'karma-qunit'
   ]
 
-  def karmaContainers = []
-
-  karmaContainers = karmaContainers + (0..JSG_NODE_COUNT).collect { index ->
-    def portNumber = 9876 + index
-    baseTestContainer + [name: "jsg${index}", ports: [portNumber], envVars: [KARMA_BROWSER: 'ChromeSeleniumGridHeadless', KARMA_PORT: portNumber]]
-  }
-
-  karmaContainers = karmaContainers + ['jsa', 'jsh'].collect { group ->
-    def portNumber = group == 'jsa' ? 9875 : 9874
-    baseTestContainer + [name: group, ports: [portNumber], envVars: [KARMA_BROWSER: 'ChromeSeleniumGridHeadless', KARMA_PORT: portNumber]]
-  }
-
   return [
-    containers: karmaContainers + getSeleniumGridContainers(JSG_NODE_COUNT + 2),
+    containers: [baseTestContainer] + getSeleniumGridContainers(1),
   ]
 }
 
@@ -144,20 +119,6 @@ def tearDownNode() {
   }
 }
 
-def queueCoffeeDistribution() {
-  { stages ->
-    COFFEE_NODE_COUNT.times { index ->
-      def coffeeEnvVars = [
-        "CI_NODE_INDEX=${index}",
-        "CI_NODE_TOTAL=${COFFEE_NODE_COUNT}",
-        'JSPEC_GROUP=coffee',
-      ]
-
-      callableWithDelegate(queueTestStage())(stages, "coffee${index}", coffeeEnvVars, 'yarn test:karma:headless')
-    }
-  }
-}
-
 def queueJestDistribution(index) {
   { stages ->
     def jestEnvVars = [
@@ -171,19 +132,7 @@ def queueJestDistribution(index) {
 
 def queueKarmaDistribution() {
   { stages ->
-    JSG_NODE_COUNT.times { index ->
-      def jsgEnvVars = [
-        "CI_NODE_INDEX=${index}",
-        "CI_NODE_TOTAL=${JSG_NODE_COUNT}",
-        'JSPEC_GROUP=jsg',
-      ]
-
-      callableWithDelegate(queueTestStage())(stages, "jsg${index}", jsgEnvVars, 'yarn test:karma:headless')
-    }
-
-    ['jsa', 'jsh'].each { group ->
-      callableWithDelegate(queueTestStage())(stages, "${group}", ["JSPEC_GROUP=${group}"], 'yarn test:karma:headless')
-    }
+    callableWithDelegate(queueTestStage())(stages, "karma-qunit", [], 'yarn test:karma:headless')
   }
 }
 

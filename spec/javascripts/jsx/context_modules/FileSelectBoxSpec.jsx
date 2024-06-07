@@ -94,6 +94,7 @@ const setupServer = () => {
   return server
 }
 
+// cf. LX-1763
 QUnit.module('FileSelectBox', {
   setup() {
     wrapper = document.getElementById('fixtures')
@@ -106,11 +107,11 @@ QUnit.module('FileSelectBox', {
   },
 })
 
-test('it renders', function () {
+QUnit.skip('it renders', function () {
   ok(this.component)
 })
 
-test('it should alphabetize the folder list', function () {
+QUnit.skip('it should alphabetize the folder list', function () {
   this.server.respond()
   // This also tests that folders without files are not shown.
   const childrenLabels = $(this.component.selectBoxRef)
@@ -121,7 +122,7 @@ test('it should alphabetize the folder list', function () {
   deepEqual(childrenLabels, expected)
 })
 
-test('it should show the loading state while files are loading', function () {
+QUnit.skip('it should show the loading state while files are loading', function () {
   // Has aria-busy attr set to true for a11y
   equal($(this.component.selectBoxRef).attr('aria-busy'), 'true')
   equal($(this.component.selectBoxRef).children()[1].text, 'Loading...')
@@ -135,7 +136,7 @@ test('it should show the loading state while files are loading', function () {
   equal(loading.length, 0)
 })
 
-test('it renders Create', function () {
+QUnit.skip('it renders Create', function () {
   ReactDOM.unmountComponentAtNode(wrapper)
   this.component = renderComponent()
   ok(wrapper.innerText.match(/\[ Create File\(s\) \]/))

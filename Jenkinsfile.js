@@ -82,14 +82,6 @@ pipeline {
               }
             }
 
-            extendedStage('Runner - Coffee').hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.coffeeNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
-              def tests = [:]
-
-              callableWithDelegate(jsStage.queueCoffeeDistribution())(tests)
-
-              parallel(tests)
-            }
-
             extendedStage('Runner - Karma').hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.karmaNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
               def tests = [:]
 

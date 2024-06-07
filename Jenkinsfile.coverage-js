@@ -179,14 +179,6 @@ pipeline {
                   }
                 }
 
-                extendedStage('Runner - Coffee').nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.coffeeNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(jsStages) {
-                  def tests = [:]
-
-                  callableWithDelegate(jsStage.queueCoffeeDistribution())(tests)
-
-                  parallel(tests)
-                }
-
                 extendedStage('Runner - Karma').nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.karmaNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(jsStages) {
                   def tests = [:]
 

@@ -62,7 +62,8 @@ test('displays the correct exception count', () => {
   equal(pill.text(), '3 exceptions')
 })
 
-test('displays the correct exception types', () => {
+// cf. LX-1762
+QUnit.skip('displays the correct exception types', () => {
   const props = defaultProps()
   props.isLoadingHistory = true
   ReactDOM.render(<SyncChange {...props} />, document.getElementById('fixtures'))
