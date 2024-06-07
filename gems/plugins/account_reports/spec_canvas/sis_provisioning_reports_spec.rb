@@ -1197,7 +1197,6 @@ describe "Default Account Reports" do
         parsed = read_report("sis_export_csv", { params: parameters, order: [1, 0] })
         # should ignore creation pending enrollments on sis_export
         expect(parsed.length).to eq 8
-
         expect(parsed).to match_array [["SIS_COURSE_ID_1",
                                         "user_sis_id_01",
                                         "observer",
@@ -1308,6 +1307,7 @@ describe "Default Account Reports" do
       end
 
       it "runs the provisioning report with deleted enrollments" do
+        @enrollment2.enrollment_state.update!(state: "completed")
         c = Course.create(name: "course1")
         c.student_view_student
         Course.where(id: @course2.id).update_all(workflow_state: "deleted")
@@ -1383,7 +1383,7 @@ describe "Default Account Reports" do
                                         student_role(root_account_id: @account.id).id.to_s,
                                         @enrollment2.course_section_id.to_s,
                                         nil,
-                                        "active",
+                                        "concluded",
                                         nil,
                                         nil,
                                         "true",
