@@ -19,6 +19,7 @@
 class DiscussionTopicSummary < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
   belongs_to :discussion_topic, inverse_of: :summaries
+  belongs_to :parent, class_name: "DiscussionTopicSummary", optional: true
 
   has_many :feedback, class_name: "DiscussionTopicSummary::Feedback"
 

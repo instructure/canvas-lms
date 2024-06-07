@@ -417,7 +417,18 @@ describe "Discussion Topic Show" do
         expect(@inst_llm).to receive(:chat).and_return(
           InstLLM::Response::ChatResponse.new(
             model: "model",
-            message: { role: :assistant, content: "summary_1" },
+            message: { role: :assistant, content: "raw_summary_1" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "refined_summary_1" },
             stop_reason: "stop_reason",
             usage: {
               input_tokens: 10,
@@ -428,7 +439,7 @@ describe "Discussion Topic Show" do
 
         Discussion.click_summarize_button
 
-        expect(Discussion.summary_text).to include_text("summary_1")
+        expect(Discussion.summary_text).to include_text("refined_summary_1")
         expect(Discussion.summary_like_button).to be_present
         expect(Discussion.summary_dislike_button).to be_present
         expect(Discussion.summary_regenerate_button).to be_present
@@ -441,7 +452,18 @@ describe "Discussion Topic Show" do
         expect(@inst_llm).to receive(:chat).and_return(
           InstLLM::Response::ChatResponse.new(
             model: "model",
-            message: { role: :assistant, content: "summary_2" },
+            message: { role: :assistant, content: "raw_summary_2" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "refined_summary_2" },
             stop_reason: "stop_reason",
             usage: {
               input_tokens: 10,
@@ -452,7 +474,7 @@ describe "Discussion Topic Show" do
 
         Discussion.click_summary_regenerate_button
 
-        expect(Discussion.summary_text).to include_text("summary_2")
+        expect(Discussion.summary_text).to include_text("refined_summary_2")
         expect(Discussion.summary_like_button).to be_present
         expect(Discussion.summary_dislike_button).to be_present
         expect(Discussion.summary_regenerate_button).to be_present
@@ -463,6 +485,119 @@ describe "Discussion Topic Show" do
 
         expect(f("body")).not_to contain_css(Discussion.summary_text_selector)
         expect(Discussion.summarize_button).to be_present
+      end
+
+      it "generates a new summary if discussion has changed" do
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "raw_summary_1" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "refined_summary_1" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+
+        Discussion.click_summarize_button
+
+        expect(Discussion.summary_text).to include_text("refined_summary_1")
+
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+
+        expect(Discussion.summary_text).to include_text("refined_summary_1")
+
+        @topic.discussion_entries.create!(user: @student, message: "reply to topic")
+
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "raw_summary_2" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "refined_summary_2" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+
+        expect(Discussion.summary_text).to include_text("refined_summary_2")
+      end
+
+      it "generates a new summary if locale has changed" do
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "raw_summary_1" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "refined_summary_1" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+
+        Discussion.click_summarize_button
+
+        expect(Discussion.summary_text).to include_text("refined_summary_1")
+
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+
+        expect(Discussion.summary_text).to include_text("refined_summary_1")
+
+        @teacher.update!(locale: "es")
+
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "refined_summary_2" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+
+        expect(Discussion.summary_text).to include_text("refined_summary_2")
       end
 
       it "shows an error message when summarization fails" do
