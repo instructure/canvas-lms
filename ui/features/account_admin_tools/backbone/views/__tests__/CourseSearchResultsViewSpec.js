@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable qunit/resolve-async */
 import $ from 'jquery'
 import 'jquery-migrate'
 import CourseSearchResultsView from '../CourseSearchResultsView'
@@ -53,7 +54,6 @@ QUnit.module('CourseSearchResultsView', {
   },
 })
 
-// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.courseSearchResultsView, done, {a11yReport: true})

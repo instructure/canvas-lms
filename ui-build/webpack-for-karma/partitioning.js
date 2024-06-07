@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable no-restricted-globals */
+
 const assert = require('assert')
 const fs = require('fs')
 const {IgnorePlugin} = require('webpack')
 
 const CONTEXT_COFFEESCRIPT_SPEC = 'spec/coffeescripts'
-const CONTEXT_EMBER_GRADEBOOK_SPEC = 'ui/features/screenreader_gradebook/ember'
+const UI_FEATURES_SPEC = 'ui/features'
 const CONTEXT_JSX_SPEC = 'spec/javascripts/jsx'
 
-const RESOURCE_COFFEESCRIPT_SPEC = /Spec$/
-const RESOURCE_EMBER_GRADEBOOK_SPEC = /\.spec$/
-const RESOURCE_JSX_SPEC = /Spec$/
+const QUNIT_SPEC = /Spec$/
 
 const RESOURCE_JSA_SPLIT_SPEC = /^\.\/[a-f].*Spec$/
 const RESOURCE_JSG_SPLIT_SPEC = /^\.\/g.*Spec$/
@@ -48,15 +48,7 @@ exports.createPlugin = ({group, nodeIndex, nodeTotal}) => {
           .replace(CONTEXT_COFFEESCRIPT_SPEC, '.')
           .replace(/\.(coffee|js)$/, '')
 
-        return RESOURCE_COFFEESCRIPT_SPEC.test(relativePath) ? relativePath : null
-      })
-
-      getAllFiles(CONTEXT_EMBER_GRADEBOOK_SPEC, allFiles, filePath => {
-        const relativePath = filePath
-          .replace(CONTEXT_EMBER_GRADEBOOK_SPEC, '.')
-          .replace(/\.(coffee|js)$/, '')
-
-        return RESOURCE_EMBER_GRADEBOOK_SPEC.test(relativePath) ? relativePath : null
+        return QUNIT_SPEC.test(relativePath) ? relativePath : null
       })
 
       partitions = makeSortedPartitions(allFiles, nodeTotal)
@@ -64,16 +56,16 @@ exports.createPlugin = ({group, nodeIndex, nodeTotal}) => {
 
     ignoreResource = (resource, context) => {
       return (
-        (context.endsWith(CONTEXT_JSX_SPEC) && RESOURCE_JSX_SPEC.test(resource)) ||
+        (context.endsWith(CONTEXT_JSX_SPEC) && QUNIT_SPEC.test(resource)) ||
         (partitions &&
           context.endsWith(CONTEXT_COFFEESCRIPT_SPEC) &&
-          RESOURCE_COFFEESCRIPT_SPEC.test(resource) &&
+          QUNIT_SPEC.test(resource) &&
           !isPartitionMatch(resource, partitions, nodeIndex)) ||
         (partitions &&
-          context.endsWith(CONTEXT_EMBER_GRADEBOOK_SPEC) &&
+          context.endsWith(UI_FEATURES_SPEC) &&
           // FIXME: Unlike the other specs, webpack is including the suffix
-          (resource = resource.replace(/\.(coffee|js)$/, '')) &&
-          RESOURCE_EMBER_GRADEBOOK_SPEC.test(resource) &&
+          (resource = resource.replace(/\.js$/, '')) &&
+          QUNIT_SPEC.test(resource) &&
           !isPartitionMatch(resource, partitions, nodeIndex))
       )
     }
@@ -81,9 +73,9 @@ exports.createPlugin = ({group, nodeIndex, nodeTotal}) => {
     ignoreResource = (resource, context) => {
       return (
         context.endsWith(CONTEXT_COFFEESCRIPT_SPEC) ||
-        context.endsWith(CONTEXT_EMBER_GRADEBOOK_SPEC) ||
+        context.endsWith(UI_FEATURES_SPEC) ||
         (context.endsWith(CONTEXT_JSX_SPEC) &&
-          RESOURCE_JSX_SPEC.test(resource) &&
+        QUNIT_SPEC.test(resource) &&
           !RESOURCE_JSA_SPLIT_SPEC.test(resource))
       )
     }
@@ -103,13 +95,13 @@ exports.createPlugin = ({group, nodeIndex, nodeTotal}) => {
     ignoreResource = (resource, context) => {
       return (
         context.endsWith(CONTEXT_COFFEESCRIPT_SPEC) ||
-        context.endsWith(CONTEXT_EMBER_GRADEBOOK_SPEC) ||
+        context.endsWith(UI_FEATURES_SPEC) ||
         (context.endsWith(CONTEXT_JSX_SPEC) &&
-          RESOURCE_JSX_SPEC.test(resource) &&
+        QUNIT_SPEC.test(resource) &&
           !RESOURCE_JSG_SPLIT_SPEC.test(resource)) ||
         (partitions &&
           context.endsWith(CONTEXT_JSX_SPEC) &&
-          RESOURCE_JSX_SPEC.test(resource) &&
+          QUNIT_SPEC.test(resource) &&
           RESOURCE_JSG_SPLIT_SPEC.test(resource) &&
           !isPartitionMatch(resource, partitions, nodeIndex))
       )
@@ -118,9 +110,9 @@ exports.createPlugin = ({group, nodeIndex, nodeTotal}) => {
     ignoreResource = (resource, context) => {
       return (
         context.endsWith(CONTEXT_COFFEESCRIPT_SPEC) ||
-        context.endsWith(CONTEXT_EMBER_GRADEBOOK_SPEC) ||
+        context.endsWith(UI_FEATURES_SPEC) ||
         (context.endsWith(CONTEXT_JSX_SPEC) &&
-          RESOURCE_JSX_SPEC.test(resource) &&
+        QUNIT_SPEC.test(resource) &&
           !RESOURCE_JSH_SPLIT_SPEC.test(resource))
       )
     }
@@ -167,11 +159,9 @@ const makeSortedPartitions = (arr, partitionCount) => {
 }
 
 exports.CONTEXT_COFFEESCRIPT_SPEC = CONTEXT_COFFEESCRIPT_SPEC
-exports.CONTEXT_EMBER_GRADEBOOK_SPEC = CONTEXT_EMBER_GRADEBOOK_SPEC
+exports.UI_FEATURES_SPEC = UI_FEATURES_SPEC
 exports.CONTEXT_JSX_SPEC = CONTEXT_JSX_SPEC
-exports.RESOURCE_COFFEESCRIPT_SPEC = RESOURCE_COFFEESCRIPT_SPEC
-exports.RESOURCE_EMBER_GRADEBOOK_SPEC = RESOURCE_EMBER_GRADEBOOK_SPEC
+exports.QUNIT_SPEC = QUNIT_SPEC
 exports.RESOURCE_JSA_SPLIT_SPEC = RESOURCE_JSA_SPLIT_SPEC
 exports.RESOURCE_JSG_SPLIT_SPEC = RESOURCE_JSG_SPLIT_SPEC
 exports.RESOURCE_JSH_SPLIT_SPEC = RESOURCE_JSH_SPLIT_SPEC
-exports.RESOURCE_JSX_SPEC = RESOURCE_JSX_SPEC

@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable qunit/resolve-async */
+
 import $ from 'jquery'
 import 'jquery-migrate'
 import Entry from '../../models/Entry'
@@ -39,7 +41,6 @@ QUnit.module('EntryView', {
   },
 })
 
-// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', assert => {
   const entry = new Entry({
     id: 1,

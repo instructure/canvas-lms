@@ -23,14 +23,7 @@ const partitioning = require('./partitioning')
 const PluginSpecsRunner = require('./PluginSpecsRunner')
 const {canvasDir} = require('../params')
 
-const {
-  CONTEXT_COFFEESCRIPT_SPEC,
-  CONTEXT_EMBER_GRADEBOOK_SPEC,
-  CONTEXT_JSX_SPEC,
-  RESOURCE_COFFEESCRIPT_SPEC,
-  RESOURCE_EMBER_GRADEBOOK_SPEC,
-  RESOURCE_JSX_SPEC,
-} = partitioning
+const {CONTEXT_COFFEESCRIPT_SPEC, UI_FEATURES_SPEC, CONTEXT_JSX_SPEC, QUNIT_SPEC} = partitioning
 
 const WEBPACK_PLUGIN_SPECS = path.join(canvasDir, 'tmp/webpack-plugin-specs.js')
 
@@ -147,7 +140,7 @@ module.exports = {
       'ui/ext': path.join(canvasDir, 'ui/ext'),
       'ui/features': path.join(canvasDir, 'ui/features'),
       [CONTEXT_COFFEESCRIPT_SPEC]: path.join(canvasDir, CONTEXT_COFFEESCRIPT_SPEC),
-      [CONTEXT_EMBER_GRADEBOOK_SPEC]: path.join(canvasDir, CONTEXT_EMBER_GRADEBOOK_SPEC),
+      [UI_FEATURES_SPEC]: path.join(canvasDir, UI_FEATURES_SPEC),
       [CONTEXT_JSX_SPEC]: path.join(canvasDir, CONTEXT_JSX_SPEC),
 
       // need to explicitly point this out for whatwg-url otherwise you get an
@@ -179,11 +172,9 @@ module.exports = {
   plugins: [
     new DefinePlugin({
       CONTEXT_COFFEESCRIPT_SPEC: JSON.stringify(CONTEXT_COFFEESCRIPT_SPEC),
-      CONTEXT_EMBER_GRADEBOOK_SPEC: JSON.stringify(CONTEXT_EMBER_GRADEBOOK_SPEC),
+      UI_FEATURES_SPEC: JSON.stringify(UI_FEATURES_SPEC),
       CONTEXT_JSX_SPEC: JSON.stringify(CONTEXT_JSX_SPEC),
-      RESOURCE_COFFEESCRIPT_SPEC,
-      RESOURCE_EMBER_GRADEBOOK_SPEC,
-      RESOURCE_JSX_SPEC,
+      QUNIT_SPEC,
       WEBPACK_PLUGIN_SPECS: JSON.stringify(WEBPACK_PLUGIN_SPECS),
       process: {browser: true, env: {}},
     }),

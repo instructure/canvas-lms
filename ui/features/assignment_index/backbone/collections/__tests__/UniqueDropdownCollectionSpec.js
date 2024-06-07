@@ -98,6 +98,7 @@ QUnit.module('UniqueDropdownCollection, lazy setup', {
     })()
     this.coll = new UniqueDropdownCollection([], {
       propertyName: 'state',
+      // eslint-disable-next-line @typescript-eslint/no-shadow
       possibleValues: _.map([1, 2, 3, 4], i => i.toString()),
     })
   },
