@@ -22,8 +22,7 @@ import {ButtonBlockToolbar} from './ButtonBlockToolbar'
 import {getIcon} from '../../../../assets/icons'
 import {Button, CondensedButton} from '@instructure/ui-buttons'
 import {type ViewProps} from '@instructure/ui-view'
-import {contrast} from '@instructure/ui-color-utils'
-import {white, black} from '../../../../utils'
+import {getContrastingColor} from '../../../../utils'
 import {isInstuiButtonColor} from './common'
 import type {InstuiButtonColor, ButtonSize, ButtonVariant, ButtonBlockProps} from './common'
 
@@ -33,7 +32,7 @@ const ButtonBlock = ({
   variant,
   color,
   iconName,
-  iconSize = 'small',
+  iconSize = 'x-small',
   href,
 }: ButtonBlockProps) => {
   const {enabled} = useEditor(state => {
@@ -71,11 +70,8 @@ const ButtonBlock = ({
     colorProp = color
   } else if (color) {
     if (!themeOverride.primaryColor) {
-      if (contrast(color, white) > contrast(color, black)) {
-        themeOverride.primaryColor = white
-      } else {
-        themeOverride.primaryColor = black
-      }
+      const primaryColor = getContrastingColor(color)
+      themeOverride.primaryColor = primaryColor
     }
 
     themeOverride.primaryBackground = color

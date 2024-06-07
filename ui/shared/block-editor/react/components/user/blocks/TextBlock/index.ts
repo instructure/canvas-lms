@@ -17,10 +17,9 @@
  */
 
 import {TextBlock} from './TextBlock'
-import {TextBlockSettings} from './TextBlockSettings'
 
 const TextBlockIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M2 0H15.3714V4.70571H13.4686V1.90286H9.74V16.0971H12.5686V18H4.77714V16.0971H7.60571V1.90286H3.90286V4.70571H2V0Z" fill="#2D3B45"/>
 </svg>`
 
-export {TextBlock, TextBlockSettings, TextBlockIcon}
+export {TextBlock, TextBlockIcon}

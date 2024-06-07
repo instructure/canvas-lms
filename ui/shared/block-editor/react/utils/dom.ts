@@ -198,3 +198,12 @@ export function scrollIntoViewWithCallback(
   // Scroll the element into view
   element.scrollIntoView(scrollIntoViewOpts)
 }
+
+export function validateSVG(svg: string): boolean {
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(svg, 'image/svg+xml')
+  if (doc.documentElement.childElementCount !== 1 || doc.querySelector('svg') === null) {
+    return false
+  }
+  return true
+}

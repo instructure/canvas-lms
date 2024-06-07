@@ -19,13 +19,11 @@
 import React, {useState} from 'react'
 import {Element, useEditor} from '@craftjs/core'
 
-import {contrast} from '@instructure/ui-color-utils'
-
 import {Container} from '../../blocks/Container'
 import {AboutTextHalf} from './AboutTextHalf'
 import {ImageBlock} from '../../blocks/ImageBlock'
 import {NoSections} from '../ColumnsSection/NoSections'
-import {useClassNames, white, black} from '../../../../utils'
+import {useClassNames, white, black, getContrastingColor} from '../../../../utils'
 
 type AboutSectionProps = {
   background?: string
@@ -44,8 +42,7 @@ export const AboutSection = ({background}: AboutSectionProps) => {
   ])
 
   const backgroundColor = background || AboutSection.craft.defaultProps.background
-  const textColor =
-    contrast(backgroundColor, white) > contrast(backgroundColor, black) ? white : black
+  const textColor = getContrastingColor(backgroundColor)
 
   // TODO: the layout here is inadequate. The AboutTextHalf needs to be different to the user
   //       can drop components anywhere they want. As it is, the flexbox layout
@@ -56,10 +53,10 @@ export const AboutSection = ({background}: AboutSectionProps) => {
     <Container
       className={clazz}
       style={{gridTemplateColumns: `1fr 1fr`}}
-      background={background || AboutSection.craft.defaultProps.background}
+      background={backgroundColor}
     >
       <Element
-        id={`${cid}_nosection2`}
+        id={`${cid}_about-nosection1`}
         is={NoSections}
         canvas={true}
         variant="fixed"
@@ -75,7 +72,7 @@ export const AboutSection = ({background}: AboutSectionProps) => {
         />
       </Element>
       <Element
-        id={`${cid}_nosection1`}
+        id={`${cid}_about-no-section2`}
         is={NoSections}
         canvas={true}
         variant="fixed"
