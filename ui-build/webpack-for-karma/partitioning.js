@@ -18,13 +18,13 @@
 
 /* eslint-disable no-restricted-globals */
 
-const assert = require('assert')
-const fs = require('fs')
 const {IgnorePlugin} = require('webpack')
+const {getAllFiles, isPartitionMatch, makeSortedPartitions} = require('./partitioning.utils')
 
 const CONTEXT_COFFEESCRIPT_SPEC = 'spec/coffeescripts'
-const UI_FEATURES_SPEC = 'ui/features'
 const CONTEXT_JSX_SPEC = 'spec/javascripts/jsx'
+const UI_FEATURES_SPEC = 'ui/features'
+const UI_SHARED_SPEC = 'ui/shared'
 
 const QUNIT_SPEC = /Spec$/
 
@@ -33,7 +33,7 @@ const RESOURCE_JSG_SPLIT_SPEC = /^\.\/g.*Spec$/
 const RESOURCE_JSH_SPLIT_SPEC = /^\.\/[h-z].*Spec$/
 
 exports.createPlugin = ({group, nodeIndex, nodeTotal}) => {
-  let ignoreResource = () => {
+  let checkResource = () => {
     throw new Error(`Unknown JSPEC_GROUP ${group}`)
   }
 
@@ -41,12 +41,8 @@ exports.createPlugin = ({group, nodeIndex, nodeTotal}) => {
     let partitions = null
 
     if (!isNaN(nodeIndex) && !isNaN(nodeTotal)) {
-      const allFiles = []
-
-      getAllFiles(CONTEXT_COFFEESCRIPT_SPEC, allFiles, filePath => {
-        const relativePath = filePath
-          .replace(CONTEXT_COFFEESCRIPT_SPEC, '.')
-          .replace(/\.(coffee|js)$/, '')
+      const allFiles = getAllFiles(CONTEXT_COFFEESCRIPT_SPEC, filePath => {
+        const relativePath = filePath.replace(CONTEXT_COFFEESCRIPT_SPEC, '.').replace(/\.js$/, '')
 
         return QUNIT_SPEC.test(relativePath) ? relativePath : null
       })
@@ -54,7 +50,7 @@ exports.createPlugin = ({group, nodeIndex, nodeTotal}) => {
       partitions = makeSortedPartitions(allFiles, nodeTotal)
     }
 
-    ignoreResource = (resource, context) => {
+    checkResource = (resource, context) => {
       return (
         (context.endsWith(CONTEXT_JSX_SPEC) && QUNIT_SPEC.test(resource)) ||
         (partitions &&
@@ -70,12 +66,13 @@ exports.createPlugin = ({group, nodeIndex, nodeTotal}) => {
       )
     }
   } else if (group === 'jsa') {
-    ignoreResource = (resource, context) => {
+    checkResource = (resource, context) => {
       return (
         context.endsWith(CONTEXT_COFFEESCRIPT_SPEC) ||
         context.endsWith(UI_FEATURES_SPEC) ||
+        context.endsWith(UI_SHARED_SPEC) ||
         (context.endsWith(CONTEXT_JSX_SPEC) &&
-        QUNIT_SPEC.test(resource) &&
+          QUNIT_SPEC.test(resource) &&
           !RESOURCE_JSA_SPLIT_SPEC.test(resource))
       )
     }
@@ -83,7 +80,7 @@ exports.createPlugin = ({group, nodeIndex, nodeTotal}) => {
     let partitions = null
 
     if (!isNaN(nodeIndex) && !isNaN(nodeTotal)) {
-      const allFiles = getAllFiles(CONTEXT_JSX_SPEC, [], filePath => {
+      const allFiles = getAllFiles(CONTEXT_JSX_SPEC, filePath => {
         const relativePath = filePath.replace(CONTEXT_JSX_SPEC, '.').replace(/\.js$/, '')
 
         return RESOURCE_JSG_SPLIT_SPEC.test(relativePath) ? relativePath : null
@@ -92,12 +89,13 @@ exports.createPlugin = ({group, nodeIndex, nodeTotal}) => {
       partitions = makeSortedPartitions(allFiles, nodeTotal)
     }
 
-    ignoreResource = (resource, context) => {
+    checkResource = (resource, context) => {
       return (
         context.endsWith(CONTEXT_COFFEESCRIPT_SPEC) ||
         context.endsWith(UI_FEATURES_SPEC) ||
+        context.endsWith(UI_SHARED_SPEC) ||
         (context.endsWith(CONTEXT_JSX_SPEC) &&
-        QUNIT_SPEC.test(resource) &&
+          QUNIT_SPEC.test(resource) &&
           !RESOURCE_JSG_SPLIT_SPEC.test(resource)) ||
         (partitions &&
           context.endsWith(CONTEXT_JSX_SPEC) &&
@@ -107,61 +105,23 @@ exports.createPlugin = ({group, nodeIndex, nodeTotal}) => {
       )
     }
   } else if (group === 'jsh') {
-    ignoreResource = (resource, context) => {
+    checkResource = (resource, context) => {
       return (
         context.endsWith(CONTEXT_COFFEESCRIPT_SPEC) ||
         context.endsWith(UI_FEATURES_SPEC) ||
+        context.endsWith(UI_SHARED_SPEC) ||
         (context.endsWith(CONTEXT_JSX_SPEC) &&
-        QUNIT_SPEC.test(resource) &&
+          QUNIT_SPEC.test(resource) &&
           !RESOURCE_JSH_SPLIT_SPEC.test(resource))
       )
     }
   }
 
-  return new IgnorePlugin({checkResource: ignoreResource})
-}
-
-const getAllFiles = (dirPath, arrayOfFiles, callback) => {
-  const files = fs.readdirSync(dirPath)
-
-  files.forEach(file => {
-    if (fs.statSync(dirPath + '/' + file).isDirectory()) {
-      arrayOfFiles = getAllFiles(dirPath + '/' + file, arrayOfFiles, callback)
-    } else {
-      const filePath = callback(dirPath + '/' + file)
-
-      if (filePath) {
-        arrayOfFiles.push(filePath)
-      }
-    }
-  })
-
-  return arrayOfFiles
-}
-
-const isPartitionMatch = (resource, partitions, partitionIndex) => {
-  return isNaN(partitionIndex) || partitions[partitionIndex].indexOf(resource) >= 0
-}
-
-const makeSortedPartitions = (arr, partitionCount) => {
-  const sortedArr = arr.sort()
-  const sortedArrLength = sortedArr.length
-  const chunkSize = Math.ceil(sortedArrLength / partitionCount)
-  const R = []
-
-  for (let i = 0; i < sortedArrLength; i += chunkSize) {
-    R.push(sortedArr.slice(i, i + chunkSize))
-  }
-
-  assert(R.length <= partitionCount)
-
-  return R
+  return new IgnorePlugin({checkResource})
 }
 
 exports.CONTEXT_COFFEESCRIPT_SPEC = CONTEXT_COFFEESCRIPT_SPEC
 exports.UI_FEATURES_SPEC = UI_FEATURES_SPEC
+exports.UI_SHARED_SPEC = UI_SHARED_SPEC
 exports.CONTEXT_JSX_SPEC = CONTEXT_JSX_SPEC
 exports.QUNIT_SPEC = QUNIT_SPEC
-exports.RESOURCE_JSA_SPLIT_SPEC = RESOURCE_JSA_SPLIT_SPEC
-exports.RESOURCE_JSG_SPLIT_SPEC = RESOURCE_JSG_SPLIT_SPEC
-exports.RESOURCE_JSH_SPLIT_SPEC = RESOURCE_JSH_SPLIT_SPEC
