@@ -54,6 +54,28 @@ RSpec.describe Lti::RegistrationAccountBinding do
       lrab.update!(workflow_state: :on)
       expect(lrab.developer_key_account_binding.workflow_state).to eq("on")
     end
+
+    context "when dev key binding already exists and isn't linked" do
+      let(:dkab) { DeveloperKeyAccountBinding.create!(account: lrab.account, developer_key: lrab.registration.developer_key, skip_lime_sync: true) }
+
+      before do
+        old_dkab = lrab.developer_key_account_binding
+        lrab.developer_key_account_binding = nil
+        lrab.skip_lime_sync = true
+        lrab.save!
+        old_dkab.delete
+        dkab # instantiate before test runs
+      end
+
+      it "doesn't error" do
+        expect { lrab.save! }.not_to raise_error
+      end
+
+      it "links bindings" do
+        lrab.save!
+        expect(lrab.developer_key_account_binding).to eq(dkab)
+      end
+    end
   end
 
   describe "#destroy" do
