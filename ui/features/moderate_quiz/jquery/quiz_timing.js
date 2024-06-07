@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import 'date-js'
+import '@instructure/date-js'
 
 const I18n = useI18nScope('quizzes.timing')
 /* Date.parse */

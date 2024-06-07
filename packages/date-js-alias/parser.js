@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,13 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import ready from '@instructure/ready'
-import CollaborationsPage from './backbone/views/CollaborationsPage'
-import './jquery/index'
-import '@canvas/common/activateKeyClicks'
-
-ready(() => {
-  const page = new CollaborationsPage({el: $('body')})
-  page.initPageState()
-})
+export * from '@instructure/date-js'

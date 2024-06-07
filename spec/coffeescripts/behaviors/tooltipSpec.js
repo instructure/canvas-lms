@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tooltip from '../../../ui/boot/initializers/activateTooltips'
+import tooltip from '@canvas/common/activateTooltips'
 
 QUnit.module('tooltip')
 

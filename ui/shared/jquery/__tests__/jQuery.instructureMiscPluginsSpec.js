@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable qunit/no-ok-equality */
+
 import jQuery from 'jquery'
-import '@canvas/jquery/jquery.instructure_misc_plugins'
+import '../jquery.instructure_misc_plugins'
 
 const $ = jQuery
 

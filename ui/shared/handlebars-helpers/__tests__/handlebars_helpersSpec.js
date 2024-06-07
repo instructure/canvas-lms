@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Handlebars from '@canvas/handlebars-helpers'
+import Handlebars from '..'
 import $ from 'jquery'
 import 'jquery-migrate'
 import _ from 'lodash'
