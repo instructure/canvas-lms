@@ -20,7 +20,7 @@ import React from 'react'
 import * as enzyme from 'enzyme'
 import ChildChangeLog from '../ChildChangeLog'
 import loadStates from '@canvas/blueprint-courses/react/loadStates'
-import getSampleData from '../../../../../../spec/javascripts/jsx/blueprint_courses/getSampleData'
+import getSampleData from '@canvas/blueprint-courses/getSampleData'
 
 QUnit.module('ChildChangeLog component')
 

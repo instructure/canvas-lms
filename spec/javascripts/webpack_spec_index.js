@@ -58,29 +58,50 @@ canvas.use({
   },
 })
 
-const requireAll = context => {
-  const keys = context.keys()
+const totalNodes = parseInt(CI_NODE_TOTAL, 10) || 1
+const nodexIndex = parseInt(CI_NODE_INDEX, 10) || 0
+
+const requireAll = (context, filter = null) => {
+  const keys = context.keys().filter(key => {
+    if (filter) {
+      return filter.test(key)
+    }
+    return true
+  })
+  const total = keys.length
+  const chunkSize = Math.ceil(total / totalNodes)
+  const startIndex = nodexIndex * chunkSize
+  const endIndex = startIndex + chunkSize
+  const nodeKeys = keys.slice(startIndex, endIndex)
 
   if (process.env.JSPEC_VERBOSE === '1') {
-    // eslint-disable-next-line no-console
-    console.log(`webpack_spec_index: running ${keys.length} files in ${process.env.JSPEC_PATH}`)
+    console.log(
+      `webpack_spec_index: running ${nodeKeys.length} of ${total} files in ${process.env.JSPEC_PATH}`
+    )
   }
 
-  keys.map(context)
+  nodeKeys.forEach(context)
 }
 
 if (!process.env.JSPEC_PATH) {
+  // because the Gradebook specs are so slow, we spread them out over multiple nodes
   requireAll(
-    require.context(
-      CONTEXT_COFFEESCRIPT_SPEC,
-      process.env.JSPEC_RECURSE !== '0',
-      QUNIT_SPEC
-    )
+    require.context(UI_FEATURES_SPEC, process.env.JSPEC_RECURSE !== '0', QUNIT_SPEC),
+    /gradebook/i
   )
 
   requireAll(
-    require.context(CONTEXT_JSX_SPEC, process.env.JSPEC_RECURSE !== '0', QUNIT_SPEC)
+    require.context(UI_FEATURES_SPEC, process.env.JSPEC_RECURSE !== '0', QUNIT_SPEC),
+    /^(?!.*gradebook).*/i
   )
+
+  requireAll(require.context(UI_SHARED_SPEC, process.env.JSPEC_RECURSE !== '0', QUNIT_SPEC))
+
+  requireAll(
+    require.context(CONTEXT_COFFEESCRIPT_SPEC, process.env.JSPEC_RECURSE !== '0', QUNIT_SPEC)
+  )
+
+  requireAll(require.context(CONTEXT_JSX_SPEC, process.env.JSPEC_RECURSE !== '0', QUNIT_SPEC))
 
   // eslint-disable-next-line import/no-dynamic-require
   require(WEBPACK_PLUGIN_SPECS)

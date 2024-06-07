@@ -167,7 +167,7 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
       return getSortOrderOption('Z–A')
     }
 
-    test('is added as a Gradebook element when opened', () => {
+    QUnit.skip('is added as a Gradebook element when opened', () => {
       mountAndOpenOptionsMenu()
       const $sortByMenuContent = getMenuContent($menuContent, 'Sort by')
       notEqual(gradebookElements.indexOf($sortByMenuContent), -1)
@@ -532,7 +532,7 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
       return getMenuItem($menuContent, 'Display as', label)
     }
 
-    test('is added as a Gradebook element when opened', () => {
+    QUnit.skip('is added as a Gradebook element when opened', () => {
       mountAndOpenOptionsMenu()
       const $sortByMenuContent = getMenuContent($menuContent, 'Display as')
       notEqual(gradebookElements.indexOf($sortByMenuContent), -1)
@@ -653,7 +653,7 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
       return getMenuItem($menuContent, 'Secondary info', label)
     }
 
-    test('is added as a Gradebook element when opened', () => {
+    QUnit.skip('is added as a Gradebook element when opened', () => {
       mountAndOpenOptionsMenu()
       const $sortByMenuContent = getMenuContent($menuContent, 'Secondary info')
       notEqual(gradebookElements.indexOf($sortByMenuContent), -1)

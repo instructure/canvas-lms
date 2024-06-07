@@ -35,7 +35,7 @@ export const isStatusPillPresent = submission => {
 }
 
 const StatusPill = ({label, testId, color = 'primary'}) => {
-  return window.ENV.FEATURES.instui_nav ? (
+  return window.ENV.FEATURES?.instui_nav ? (
     <Pill data-testid={testId} color={color}>
       {label}
     </Pill>

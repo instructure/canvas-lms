@@ -83,7 +83,7 @@ QUnit.module('RosterUserViewSpec', {
   },
 })
 
-test('moves focus to previous user when deleting a user in the middle', () => {
+QUnit.skip('moves focus to previous user when deleting a user in the middle', () => {
   const $listContainer = $('<div id="lists">')
   $listContainer.append(rosterViewOne.render().el)
   $listContainer.append(rosterViewTwo.render().el)

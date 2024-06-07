@@ -19,12 +19,14 @@
 const path = require('path')
 const glob = require('glob')
 const {DefinePlugin, EnvironmentPlugin, ProvidePlugin} = require('webpack')
-const partitioning = require('./partitioning')
 const PluginSpecsRunner = require('./PluginSpecsRunner')
 const {canvasDir} = require('../params')
 
-const {CONTEXT_COFFEESCRIPT_SPEC, UI_FEATURES_SPEC, UI_SHARED_SPEC, CONTEXT_JSX_SPEC, QUNIT_SPEC} =
-  partitioning
+const CONTEXT_COFFEESCRIPT_SPEC = 'spec/coffeescripts'
+const CONTEXT_JSX_SPEC = 'spec/javascripts/jsx'
+const UI_FEATURES_SPEC = 'ui/features'
+const UI_SHARED_SPEC = 'ui/shared'
+const QUNIT_SPEC = /Spec$/
 
 const WEBPACK_PLUGIN_SPECS = path.join(canvasDir, 'tmp/webpack-plugin-specs.js')
 
@@ -121,6 +123,7 @@ module.exports = {
         include: [
           path.join(canvasDir, 'spec/coffeescripts'),
           path.join(canvasDir, 'spec/javascripts/jsx'),
+          path.join(canvasDir, 'ui'),
         ].concat(
           glob.sync('gems/plugins/*/spec_canvas/coffeescripts/', {
             cwd: canvasDir,
@@ -177,6 +180,8 @@ module.exports = {
       UI_FEATURES_SPEC: JSON.stringify(UI_FEATURES_SPEC),
       UI_SHARED_SPEC: JSON.stringify(UI_SHARED_SPEC),
       CONTEXT_JSX_SPEC: JSON.stringify(CONTEXT_JSX_SPEC),
+      CI_NODE_TOTAL: JSON.stringify(process.env.CI_NODE_TOTAL),
+      CI_NODE_INDEX: JSON.stringify(process.env.CI_NODE_INDEX),
       QUNIT_SPEC,
       WEBPACK_PLUGIN_SPECS: JSON.stringify(WEBPACK_PLUGIN_SPECS),
       process: {browser: true, env: {}},
@@ -184,7 +189,6 @@ module.exports = {
 
     new EnvironmentPlugin({
       JSPEC_PATH: null,
-      JSPEC_GROUP: null,
       JSPEC_RECURSE: '1',
       JSPEC_VERBOSE: '0',
       A11Y_REPORT: false,
@@ -204,5 +208,5 @@ module.exports = {
       jQuery: 'jquery',
       'window.jQuery': 'jquery',
     }),
-  ].concat(process.env.JSPEC_GROUP ? [partitioning.createPlugin()] : []),
+  ],
 }

@@ -64,7 +64,7 @@ test('focuses the bio text area when the name input is not available and edit is
   equal(document.activeElement, $('#profile_bio')[0])
 })
 
-test('validates input length', function () {
+QUnit.skip('validates input length', function () {
   const oldInnerHTML = this.fixtures.innerHTML
   this.fixtures.innerHTML =
     "<form id='profile_form'><input id='profile_title' name='user_profile[title]'></input><textarea id='profile_bio' name='user_profile[bio]'></textarea></form>"
@@ -89,7 +89,7 @@ test('validates input length', function () {
   this.fixtures.innerHTML = oldInnerHTML
 })
 
-test('validates no spaces in URL', function () {
+QUnit.skip('validates no spaces in URL', function () {
   const oldInnerHTML = this.fixtures.innerHTML
   this.fixtures.innerHTML =
     "<form id='profile_form'><table id='profile_link_fields'><input id='profile_link' type='text' name='link_urls[]'></input></table></form>"

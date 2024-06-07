@@ -190,7 +190,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         {
           hasPostableComments: true,
           postedAt: submission.posted_at,
-          score: '1',
+          score: 1,
           workflowState: 'graded',
         },
       ])
@@ -366,7 +366,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         {
           hasPostableComments: true,
           postedAt: submission.posted_at,
-          score: '1',
+          score: 1,
           workflowState: 'graded',
         },
       ])

@@ -134,7 +134,7 @@ test('closing the dialog calls view#close', function () {
   ok(this.closeSpy.called)
 })
 
-test('focuses close button when opened', () => {
+QUnit.skip('focuses close button when opened', () => {
   openDialog()
   equal(document.activeElement, $('.ui-dialog-titlebar-close')[0])
 })

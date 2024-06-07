@@ -175,7 +175,7 @@ export default class TotalGradeColumnHeader extends ColumnHeader<Props, State> {
     const props = {
       assignment: null,
       launchContext: MSWLaunchContext.TOTAL_COURSE_GRADE_CONTEXT,
-      students: students.filter(student => !student.isInactive && !student.isTestStudent),
+      students: (students || []).filter(student => !student.isInactive && !student.isTestStudent),
       courseId,
       onClose: () => {},
       onSend: this.handleSendMessageStudentsWho,

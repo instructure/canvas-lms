@@ -368,7 +368,7 @@ export default class WikiPageView extends Backbone.View {
       json.CAN.ACCESS_GEAR_MENU
     json.recent_announcements_enabled = !!ENV.SHOW_ANNOUNCEMENTS
     json.explicit_latex_typesetting = !!ENV.FEATURES?.explicit_latex_typesetting
-    json.show_assign_to = !!ENV.FEATURES.selective_release_ui_api && !!this.course_id
+    json.show_assign_to = !!ENV.FEATURES?.selective_release_ui_api && !!this.course_id
 
     if (json.lock_info) {
       json.lock_info = clone(json.lock_info)

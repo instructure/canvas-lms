@@ -138,7 +138,7 @@ class Header extends React.Component {
           ) : (
             <>
               {/* EVAL-3711 Remove ICE Feature Flag */}
-              {!window.ENV.FEATURES.instui_nav && (
+              {!window.ENV.FEATURES?.instui_nav && (
                 <Flex.Item margin="0 small 0 0">
                   <PeerReviewsCounter
                     current={this.currentAssessmentIndex(
@@ -201,7 +201,7 @@ class Header extends React.Component {
             <Flex.Item>
               <Flex as="div" alignItems="center">
                 {/* EVAL-3711 Remove ICE Feature Flag */}
-                {!window.ENV.FEATURES.instui_nav && (
+                {!window.ENV.FEATURES?.instui_nav && (
                   <Flex.Item margin="0 x-small 0 0">
                     <SubmissionStatusPill
                       submissionStatus={this.props.submission.submissionStatus}

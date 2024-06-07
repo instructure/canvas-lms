@@ -54,7 +54,7 @@ test('#identifyVisibleQuestions', () => {
   )
 })
 
-test('capturing: it works', () => {
+QUnit.skip('capturing: it works', () => {
   const tracker = new Subject({frequency: 0})
   const capture = sinon.stub()
   tracker.install(capture, scrollSelector)

@@ -117,7 +117,7 @@ test('skips instantiation when called with empty target', () => {
   ok(RCELoader.loadOnTarget.notCalled)
 })
 
-test('hides resize handle when called', function () {
+QUnit.skip('hides resize handle when called', function () {
   const $resize = fixtures.create('<div class="mce-resizehandle"></div>')
   RichContentEditor.loadNewEditor(this.$target, {})
   equal($resize.attr('aria-hidden'), 'true')

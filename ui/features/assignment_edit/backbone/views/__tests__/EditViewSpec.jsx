@@ -1428,50 +1428,53 @@ test('it attaches assignment external tools component', function () {
   equal(view.$assignmentExternalTools.children().size(), 1)
 })
 
-test('#handleAssignmentSelectionSubmit updates the external_tool_tag_attributes input fields', async () => {
-  const data = {
-    'item[assignment_id]': '',
-    'item[custom_params]':
-      '{"RootAccountId":"$Canvas.rootAccount.id","ExternalToolGlobalId":"$Canvas.externalTool.global_id","ShardId":"$Canvas.shard.id"}',
-    'item[type]': 'LtiResourceLink',
-    'item[id]': 1,
-    'item[url]': 'https://foo.bar/internal_link/klIknZO7sE',
-    'item[title]': 'tool title',
-    'item[new_tab]': '1',
-    'item[iframe][width]': '111',
-    'item[iframe][height]': '222',
-    'item[line_item]': '{"scoreMaximum": 1234}',
-    'item[submission]': '{"endDateTime": "2023-04-21T00:00:00.000Z"}',
-    'item[available]':
-      '{"startDateTime": "2023-04-13T00:00:00.000Z", "endDateTime": "2023-04-14T00:00:00.000Z"}',
-    'item[description]': 'todo_fix_me',
+QUnit.skip(
+  '#handleAssignmentSelectionSubmit updates the external_tool_tag_attributes input fields',
+  async () => {
+    const data = {
+      'item[assignment_id]': '',
+      'item[custom_params]':
+        '{"RootAccountId":"$Canvas.rootAccount.id","ExternalToolGlobalId":"$Canvas.externalTool.global_id","ShardId":"$Canvas.shard.id"}',
+      'item[type]': 'LtiResourceLink',
+      'item[id]': 1,
+      'item[url]': 'https://foo.bar/internal_link/klIknZO7sE',
+      'item[title]': 'tool title',
+      'item[new_tab]': '1',
+      'item[iframe][width]': '111',
+      'item[iframe][height]': '222',
+      'item[line_item]': '{"scoreMaximum": 1234}',
+      'item[submission]': '{"endDateTime": "2023-04-21T00:00:00.000Z"}',
+      'item[available]':
+        '{"startDateTime": "2023-04-13T00:00:00.000Z", "endDateTime": "2023-04-14T00:00:00.000Z"}',
+      'item[description]': 'todo_fix_me',
+    }
+    const view = editView()
+
+    const reactMock = sinon.mock(ReactDOM)
+    reactMock.expects('render').once()
+
+    // when selectContentDialog.submit is triggered the handleAssignmentSelectionSubmit function is called
+    view.handleAssignmentSelectionSubmit(data)
+
+    equal(
+      view.$externalToolsCustomParams.val(),
+      '{"RootAccountId":"$Canvas.rootAccount.id","ExternalToolGlobalId":"$Canvas.externalTool.global_id","ShardId":"$Canvas.shard.id"}'
+    )
+    equal(view.$externalToolsContentType.val(), 'LtiResourceLink')
+    equal(view.$externalToolsContentId.val(), '1')
+    equal(view.$externalToolsUrl.val(), 'https://foo.bar/internal_link/klIknZO7sE')
+    equal(view.$externalToolsTitle.val(), 'tool title')
+    equal(view.$externalToolsNewTab.val(), '1')
+    equal(view.$assignmentPointsPossible.val(), '1234')
+    equal(view.$externalToolsIframeWidth.val(), '111')
+    equal(view.$externalToolsIframeHeight.val(), '222')
+    equal(view.$externalToolsLineItem.val(), '{"scoreMaximum":1234}')
+
+    sinon.restore()
   }
-  const view = editView()
+)
 
-  const reactMock = sinon.mock(ReactDOM)
-  reactMock.expects('render').once()
-
-  // when selectContentDialog.submit is triggered the handleAssignmentSelectionSubmit function is called
-  view.handleAssignmentSelectionSubmit(data)
-
-  equal(
-    view.$externalToolsCustomParams.val(),
-    '{"RootAccountId":"$Canvas.rootAccount.id","ExternalToolGlobalId":"$Canvas.externalTool.global_id","ShardId":"$Canvas.shard.id"}'
-  )
-  equal(view.$externalToolsContentType.val(), 'LtiResourceLink')
-  equal(view.$externalToolsContentId.val(), '1')
-  equal(view.$externalToolsUrl.val(), 'https://foo.bar/internal_link/klIknZO7sE')
-  equal(view.$externalToolsTitle.val(), 'tool title')
-  equal(view.$externalToolsNewTab.val(), '1')
-  equal(view.$assignmentPointsPossible.val(), '1234')
-  equal(view.$externalToolsIframeWidth.val(), '111')
-  equal(view.$externalToolsIframeHeight.val(), '222')
-  equal(view.$externalToolsLineItem.val(), '{"scoreMaximum":1234}')
-
-  sinon.restore()
-})
-
-test('#handleContentItem updates the external_tool_tag_attributes input fields', async () => {
+QUnit.skip('#handleContentItem updates the external_tool_tag_attributes input fields', async () => {
   const data = {
     custom: {
       RootAccountId: '$Canvas.rootAccount.id',

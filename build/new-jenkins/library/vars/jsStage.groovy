@@ -18,6 +18,7 @@
 
 import groovy.transform.Field
 
+@Field static final KARMA_NODE_COUNT = 7
 @Field static final JEST_NODE_COUNT = 5
 
 def jestNodeRequirementsTemplate(index) {
@@ -27,51 +28,50 @@ def jestNodeRequirementsTemplate(index) {
   ]
 
   return [
-    containers: [baseTestContainer + [name: "jest${index}"]]
+    containers: [baseTestContainer + [name: "jest-${index}"]]
   ]
 }
 
-def getSeleniumGridContainers(count) {
+def getSeleniumGridContainers(parentIndex, count) {
   def baseChromeContainer = [
     image: env.SELENIUM_NODE_IMAGE,
     ttyEnabled: true,
   ]
 
   def baseChromeEnvVars = [
-    SE_EVENT_BUS_HOST: "selenium-hub",
+    SE_EVENT_BUS_HOST: 'selenium-hub',
     SE_EVENT_BUS_PUBLISH_PORT: 4442,
     SE_EVENT_BUS_SUBSCRIBE_PORT: 4443,
-    HUB_PORT_4444_TCP_ADDR: "selenium-hub",
+    HUB_PORT_4444_TCP_ADDR: 'selenium-hub',
     HUB_PORT_4444_TCP_PORT: 4444,
     JAVA_OPTS: '-Dwebdriver.chrome.whitelistedIps='
   ]
 
   return (0..count).collect { index ->
-    baseChromeContainer + [name: "selenium-chrome${index}", envVars: baseChromeEnvVars + [SE_NODE_HOST: "selenium-chrome${index}"]]
+    baseChromeContainer + [name: "selenium-chrome-${parentIndex}-${index}", envVars: baseChromeEnvVars + [SE_NODE_HOST: "selenium-chrome-${parentIndex}-${index}"]]
   } + [
     [
       name: 'selenium-hub',
       image: env.SELENIUM_HUB_IMAGE,
       ttyEnabled: true,
       envVars: [
-        GRID_BROWSER_TIMEOUT: 3000
+        GRID_BROWSER_TIMEOUT: 5000
       ],
       ports: [4442, 4443, 4444]
     ]
   ]
 }
 
-def karmaNodeRequirementsTemplate() {
+def karmaNodeRequirementsTemplate(index) {
   def baseTestContainer = [
     image: 'local/karma-runner',
     command: 'cat',
     ports: [9876],
     envVars: [KARMA_BROWSER: 'ChromeSeleniumGridHeadless', KARMA_PORT: 9876],
-    name: 'karma-qunit'
   ]
 
   return [
-    containers: [baseTestContainer] + getSeleniumGridContainers(1),
+    containers: [baseTestContainer + [name: "karma-qunit-${index}"]] + getSeleniumGridContainers("karma-${index}", 1),
   ]
 }
 
@@ -87,7 +87,7 @@ def packagesNodeRequirementsTemplate() {
   ]
 
   return [
-    containers: [baseTestContainer + [name: "packages"]] + getSeleniumGridContainers(1),
+    containers: [baseTestContainer + [name: 'packages']] + getSeleniumGridContainers('packages', 1),
   ]
 }
 
@@ -126,19 +126,24 @@ def queueJestDistribution(index) {
       "CI_NODE_TOTAL=${JEST_NODE_COUNT}",
     ]
 
-    callableWithDelegate(queueTestStage())(stages, "jest${index}", jestEnvVars, 'yarn test:jest:build')
+    callableWithDelegate(queueTestStage())(stages, "jest-${index}", jestEnvVars, 'yarn test:jest:build')
   }
 }
 
-def queueKarmaDistribution() {
+def queueKarmaDistribution(index) {
   { stages ->
-    callableWithDelegate(queueTestStage())(stages, "karma-qunit", [], 'yarn test:karma:headless')
+    def jsgEnvVars = [
+        "CI_NODE_INDEX=${index}",
+        "CI_NODE_TOTAL=${KARMA_NODE_COUNT}",
+      ]
+
+    callableWithDelegate(queueTestStage())(stages, "karma-qunit-${index}", jsgEnvVars, 'yarn test:karma:headless')
   }
 }
 
 def queuePackagesDistribution() {
   { stages ->
-    callableWithDelegate(queueTestStage())(stages, 'packages', ["CANVAS_RCE_PARALLEL=1"], 'TEST_RESULT_OUTPUT_DIR=/usr/src/app/$TEST_RESULT_OUTPUT_DIR yarn test:packages:parallel')
+    callableWithDelegate(queueTestStage())(stages, 'packages', ['CANVAS_RCE_PARALLEL=1'], 'TEST_RESULT_OUTPUT_DIR=/usr/src/app/$TEST_RESULT_OUTPUT_DIR yarn test:packages:parallel')
   }
 }
 
@@ -160,6 +165,7 @@ def queueTestStage() {
       .envVars(baseEnvVars + additionalEnvVars)
       .hooks(postStageHandler + [onNodeReleasing: this.tearDownNode()])
       .obeysAllowStages(false)
+      .timeout(20)
       .nodeRequirements(container: containerName)
       .queue(stages) { sh(scriptName) }
   }

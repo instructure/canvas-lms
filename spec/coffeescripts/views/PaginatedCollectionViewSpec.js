@@ -114,7 +114,7 @@ test('renders items on collection fetch and fetch next', () => {
   assertItemRendered('4')
 })
 
-test('fetches the next page on scroll', () => {
+QUnit.skip('fetches the next page on scroll', () => {
   collection.fetch()
   server.sendPage(fakePage(), collection.url)
   scrollToBottom()

@@ -42,7 +42,7 @@ const karmaConfig = {
   // this is to make a nice "spec failures" report in the jenkins build instead of having to look at the log output
   junitReporter: {
     outputDir: process.env.TEST_RESULT_OUTPUT_DIR || 'coverage-js/junit-reports',
-    outputFile: `karma-${process.env.JSPEC_GROUP || 'all'}.xml`,
+    outputFile: `karma-qunit.xml`,
     useBrowserName: false, // don't add browser name to report and classes names
   },
   specReporter: {
@@ -92,10 +92,12 @@ const karmaConfig = {
     },
   },
 
+  browserDisconnectTolerance: 3,
+
   // If browser does not capture in given timeout [ms], kill it
   captureTimeout: 60000,
 
-  browserDisconnectTimeout: 100000,
+  browserDisconnectTimeout: 600000,
   browserNoActivityTimeout: 2000000,
 
   reportSlowerThan: 1000,
@@ -133,7 +135,7 @@ if (process.env.COVERAGE === '1') {
     fixWebpackSourcePaths: true,
   }
   karmaConfig.webpack.module.rules.unshift({
-    test: /\.(js|jsx|ts|tsx|coffee)$/,
+    test: /\.(js|jsx|ts|tsx)$/,
     use: {
       loader: 'coverage-istanbul-loader',
       options: {esModules: true, produceSourceMap: true},

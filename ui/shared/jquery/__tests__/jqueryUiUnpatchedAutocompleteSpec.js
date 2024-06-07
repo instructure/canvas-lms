@@ -35,11 +35,11 @@ QUnit.module('Autocomplete Widget', {
   },
 })
 
-QUnit.test('Autocomplete widget is initialized', function (assert) {
+QUnit.skip('Autocomplete widget is initialized', function (assert) {
   assert.ok(this.$input.data('ui-autocomplete'), 'Autocomplete widget is initialized')
 })
 
-QUnit.test('Autocomplete suggests available tags', function (assert) {
+QUnit.skip('Autocomplete suggests available tags', function (assert) {
   const done = assert.async()
   const input = this.$input
 

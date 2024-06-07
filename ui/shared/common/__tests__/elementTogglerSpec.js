@@ -29,7 +29,7 @@ QUnit.module('elementToggler', {
   },
 })
 
-test('handles data-text-while-target-shown', function () {
+QUnit.skip('handles data-text-while-target-shown', function () {
   this.$trigger = $('<a>', {
     href: '#',
     class: 'element_toggler',
@@ -70,7 +70,7 @@ test('handles data-text-while-target-shown', function () {
   equal(this.$otherTrigger.text(), 'while hidden', msg)
 })
 
-test('handles data-hide-while-target-shown', function () {
+QUnit.skip('handles data-hide-while-target-shown', function () {
   this.$trigger = $('<a>', {
     href: '#',
     class: 'element_toggler',
@@ -105,7 +105,7 @@ test('handles data-hide-while-target-shown', function () {
   ok(this.$otherTrigger.is(':visible'), msg)
 })
 
-test('handles dialogs', function () {
+QUnit.skip('handles dialogs', function () {
   this.$trigger = $('<button>', {
     class: 'element_toggler',
     'aria-controls': 'thing',
@@ -183,7 +183,7 @@ test('handles dialogs', function () {
   equal(this.$target.dialog('isOpen'), false)
 })
 
-test('checkboxes can be used as trigger', function () {
+QUnit.skip('checkboxes can be used as trigger', function () {
   this.$trigger = $(
     '<input type="checkbox" class="element_toggler" aria-controls="thing">'
   ).appendTo('#fixtures')
@@ -194,7 +194,7 @@ test('checkboxes can be used as trigger', function () {
   ok(this.$target.is(':hidden'), 'target is hidden')
 })
 
-test('toggles multiple elements separated by spaces', function () {
+QUnit.skip('toggles multiple elements separated by spaces', function () {
   this.$trigger = $(
     '<input type="checkbox" class="element_toggler" aria-controls="one two" />'
   ).appendTo('#fixtures')

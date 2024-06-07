@@ -18,7 +18,7 @@
 
 import BlueprintCourse from '../BlueprintCourse'
 import select from '@canvas/obj-select'
-import getSampleData from '../../../../../../spec/javascripts/jsx/blueprint_courses/getSampleData'
+import getSampleData from '@canvas/blueprint-courses/getSampleData'
 
 let blueprint = null
 const container = document.getElementById('fixtures')

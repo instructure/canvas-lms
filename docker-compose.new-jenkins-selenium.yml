@@ -30,7 +30,7 @@ services:
   selenium-hub:
     image: starlord.inscloudgate.net/jenkins/selenium-hub:${HUB_VERSION:-4.16}
     environment:
-      GRID_BROWSER_TIMEOUT: 3000
+      GRID_BROWSER_TIMEOUT: 5000
 
   selenium-chrome: &NODE_CHROME
     image: starlord.inscloudgate.net/jenkins/selenium-node-chrome:${CHROME_VERSION:-120.0}

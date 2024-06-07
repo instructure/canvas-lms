@@ -17794,10 +17794,9 @@ karma-qunit@~1.2.1:
   resolved "https://registry.yarnpkg.com/karma-qunit/-/karma-qunit-1.2.1.tgz#88252afd2127bc03b0cc31978ed6882b139f470a"
   integrity sha1-iCUq/SEnvAOwzDGXjtaIKxOfRwo=
 
-karma-selenium-grid-launcher@^0.3.0:
+"karma-selenium-grid-launcher@github:ErDmKo/karma-selenium-grid-launcher#3d202186307fcb463786cca93a98cf9877435668":
   version "0.3.0"
-  resolved "https://registry.yarnpkg.com/karma-selenium-grid-launcher/-/karma-selenium-grid-launcher-0.3.0.tgz#8aa712021aea44fb3110cde7b7daba8ea97488e6"
-  integrity sha512-8qG2qUGt0QtwH/u/dBufyYGe8fRtmWtGidZdddw/Cm9uRsK0TkwJ09k3xk6xhS0GuGAOpy+5aOr6xwaFcqOxSQ==
+  resolved "https://codeload.github.com/ErDmKo/karma-selenium-grid-launcher/tar.gz/3d202186307fcb463786cca93a98cf9877435668"
   dependencies:
     selenium-webdriver "^4.0.0-alpha.1"
 

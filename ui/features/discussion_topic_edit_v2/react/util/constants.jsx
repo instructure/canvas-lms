@@ -87,7 +87,7 @@ export const useShouldShowContent = (
     !isGraded &&
     !isGroupDiscussion &&
     !isGroupContext &&
-    !(ENV.FEATURES.selective_release_ui_api && !isAnnouncement)
+    !(ENV.FEATURES?.selective_release_ui_api && !isAnnouncement)
 
   const shouldShowAnonymousOptions =
     !isGroupContext &&
