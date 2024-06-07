@@ -16,11 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './useClassNames'
-export * from './kb'
-export * from './dom'
-export * from './buildPageContent'
-export * from './constants'
-export * from './getScrollParent'
-export * from './getCloneTree'
-export * from './colorUtils'
+import {contrast} from '@instructure/ui-color-utils'
+import {white, black} from './constants'
+
+const getContrastingColor = (color1: string) => {
+  const color2 = contrast(color1, white) > contrast(color1, black) ? white : black
+  return color2
+}
+
+const getContrastingButtonColor = (color1: string) => {
+  const buttonColor = color1 === white ? 'primary-inverse' : 'secondary'
+  return buttonColor
+}
+
+export {getContrastingColor, getContrastingButtonColor}

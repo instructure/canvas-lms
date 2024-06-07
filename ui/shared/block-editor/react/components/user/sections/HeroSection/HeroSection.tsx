@@ -18,14 +18,11 @@
 
 import React, {useState} from 'react'
 import {Element, useEditor} from '@craftjs/core'
-
-import {contrast} from '@instructure/ui-color-utils'
-
 import {Container} from '../../blocks/Container'
 import {HeroTextHalf} from './HeroTextHalf'
 import {ImageBlock} from '../../blocks/ImageBlock'
 import {NoSections} from '../ColumnsSection/NoSections'
-import {useClassNames, white, black} from '../../../../utils'
+import {useClassNames, getContrastingColor} from '../../../../utils'
 
 type HeroSectionProps = {
   background?: string
@@ -36,7 +33,7 @@ export const HeroSection = ({background}: HeroSectionProps) => {
     enabled: state.options.enabled,
   }))
   const [cid] = useState<string>('hero-section')
-  const clazz = useClassNames(enabled, {isEmpty: false, isSelected: false, isHovered: false}, [
+  const clazz = useClassNames(enabled, {empty: false}, [
     'section',
     'columns-section',
     'hero-section',
@@ -44,8 +41,7 @@ export const HeroSection = ({background}: HeroSectionProps) => {
   ])
 
   const backgroundColor = background || HeroSection.craft.defaultProps.background
-  const textColor =
-    contrast(backgroundColor, white) > contrast(backgroundColor, black) ? white : black
+  const textColor = getContrastingColor(backgroundColor)
 
   // TODO: the layout here is inadequate. The HeroTextHalf needs to be different to the user
   //       can drop components anywhere they want. As it is, the flexbox layout

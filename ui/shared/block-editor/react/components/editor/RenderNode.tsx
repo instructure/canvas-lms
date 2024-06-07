@@ -50,7 +50,14 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {type ViewProps} from '@instructure/ui-view'
 import {ToolbarSeparator} from './ToolbarSeparator'
-import {SectionMenu} from './SectionMenu'
+
+const findUpNode = (node: Node, query: any): string | undefined => {
+  let upnode = node.data.parent ? query.node(node.data.parent).get() : undefined
+  while (upnode && upnode.data.parent && upnode.data.custom?.noToolbar) {
+    upnode = upnode.data.parent ? query.node(upnode.data.parent).get() : undefined
+  }
+  return upnode && upnode.id !== ROOT_NODE ? upnode.id : undefined
+}
 
 type RenderNodeProps = {
   render: React.ReactElement
@@ -58,31 +65,30 @@ type RenderNodeProps = {
 
 export const RenderNode = ({render}: RenderNodeProps) => {
   const {id} = useNode()
-  const {actions, query, selected} = useEditor((_, qry) => ({
-    selected: qry.getEvent('selected').contains(id),
-  }))
+  const {actions, query} = useEditor()
   const {
     hovered,
+    selected,
     node,
     dom,
     name,
     moveable,
     deletable,
     connectors: {drag},
-    parent,
-  } = useNode((node: Node) => ({
-    node,
-    hovered: node.events.hovered,
-    dom: node.dom,
-    name: node.data.custom.displayName || node.data.displayName,
-    moveable: query.node(node.id).isDraggable(),
-    deletable: query.node(node.id).isDeletable(),
-    parent: node.data.parent,
-    props: node.data.props,
+  } = useNode((n: Node) => ({
+    node: n,
+    hovered: n.events.hovered,
+    selected: n.events.selected,
+    dom: n.dom,
+    name: n.data.custom.displayName || n.data.displayName,
+    moveable: query.node(n.id).isDraggable(),
+    deletable: query.node(n.id).isDeletable(),
+    props: n.data.props,
   }))
 
   const [currentToolbarRef, setCurrentToolbarRef] = useState<HTMLDivElement | null>(null)
   const [currentMenuRef, setCurrentMenuRef] = useState<HTMLDivElement | null>(null)
+  const [upnodeId] = useState<string | undefined>(findUpNode(node, query))
 
   useEffect(() => {
     if (dom) {
@@ -143,15 +149,13 @@ export const RenderNode = ({render}: RenderNodeProps) => {
     }
   }, [dom, scroll])
 
+  // TODO: maybe setState the upnode so we know whether to show the up button or not
   const handleGoUp = useCallback(
     (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) => {
       e.stopPropagation()
-      actions.selectNode(parent || undefined)
-      // if (parent) {
-      //   query.node(parent).get().dom?.scrollIntoView({behavior: 'smooth', block: 'start'})
-      // }
+      actions.selectNode(upnodeId)
     },
-    [actions, parent]
+    [actions, upnodeId]
   )
 
   const handleDeleteNode = useCallback(
@@ -162,7 +166,9 @@ export const RenderNode = ({render}: RenderNodeProps) => {
     [actions, node.id]
   )
 
+  // TODO: this should be role="toolbar" and nav with arrow keys
   const renderBlockToolbar = () => {
+    if (node.data?.custom?.noToolbar) return null
     return ReactDOM.createPortal(
       <div
         ref={(el: HTMLDivElement) => setCurrentToolbarRef(el)}
@@ -186,7 +192,7 @@ export const RenderNode = ({render}: RenderNodeProps) => {
             <IconDragHandleLine size="x-small" />
           </IconButton>
         ) : null}
-        {node.id !== ROOT_NODE && (
+        {upnodeId && (
           <IconButton
             cursor="pointer"
             size="small"

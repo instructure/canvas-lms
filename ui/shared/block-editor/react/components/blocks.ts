@@ -27,7 +27,6 @@ import {PageBlock} from './user/blocks/PageBlock'
 import {ImageBlock} from './user/blocks/ImageBlock'
 import {SVGImageBlock} from './user/blocks/SVGImageBlock'
 import {IframeBlock} from './user/blocks/IframeBlock'
-import {QuizSection} from './user/sections/QuizSection'
 
 // sections
 import {ResourcesSection, ResourcesSectionInner} from './user/sections/ResourcesSection'
@@ -36,6 +35,7 @@ import {HeroSection, HeroTextHalf} from './user/sections/HeroSection'
 import {NavigationSection, NavigationSectionInner} from './user/sections/NavigationSection'
 import {AboutSection, AboutTextHalf} from './user/sections/AboutSection'
 import {FooterSection} from './user/sections/FooterSection'
+import {QuizSection} from './user/sections/QuizSection'
 
 // import {Card, CardTop, CardBottom} from './user/Card'
 

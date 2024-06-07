@@ -50,6 +50,9 @@ ResourcesSectionInner.craft = {
       return currentNode.data.nodes.length > outgoingNodes.length
     },
   },
+  custom: {
+    noToolbar: true,
+  },
 }
 
 // type ResourcesSectionProps = BlockProps

@@ -18,12 +18,14 @@
 
 import React, {useCallback, useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
+import {RadioInput} from '@instructure/ui-radio-input'
+import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
-import {ColorPicker} from '@instructure/ui-color-picker'
 import {View} from '@instructure/ui-view'
 import {isInstuiButtonColor} from './common'
+import {ColorPicker} from '../../../editor/ColorPicker'
+import {FormFieldGroup} from '@instructure/ui-form-field'
 
 type LinkModalProps = {
   open: boolean
@@ -40,88 +42,85 @@ const ColorModal = ({open, color, onClose, onSubmit}: LinkModalProps) => {
   }, [])
 
   const handleButtonColorChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-      handleColorChange(value)
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      handleColorChange(event.target.value)
     },
     [handleColorChange]
   )
 
   const handleSubmit = useCallback(() => {
     onSubmit(currColor)
-    onClose()
-  }, [onSubmit, currColor, onClose])
+  }, [onSubmit, currColor])
 
   return (
-    <Modal open={open} onDismiss={onClose} label="Link" size="medium">
+    <Modal open={open} onDismiss={onClose} label="Link" size="small">
       <Modal.Header>
         <Heading level="h2">Select an Button Color</Heading>
         <CloseButton placement="end" onClick={onClose} screenReaderLabel="Close" />
       </Modal.Header>
       <Modal.Body padding="medium">
-        <View as="div" margin="small">
-          <RadioInputGroup
-            name="color"
-            defaultValue={isInstuiButtonColor(currColor) ? currColor : 'custom'}
-            description="Color"
-            onChange={handleButtonColorChange}
-          >
-            <RadioInput value="primary" label="Primary" />
-            <RadioInput value="secondary" label="Secondary" />
-            <RadioInput value="success" label="Success" />
-            <RadioInput value="danger" label="Danger" />
-            <RadioInput value="primary-inverse" label="Primary Inverse" />
-            <RadioInput value="custom" label="Custom" />
-          </RadioInputGroup>
-        </View>
-
-        {!isInstuiButtonColor(currColor) && (
-          <View as="div" margin="small">
-            <ColorPicker
-              label="Custom Color"
-              tooltip="Set the button's background color"
-              placeholderText="Enter HEX"
-              popoverButtonScreenReaderLabel="Open color mixer"
-              withAlpha={false}
-              colorMixerSettings={{
-                popoverAddButtonLabel: 'Set',
-                popoverCloseButtonLabel: 'Cancel',
-                colorMixer: {
-                  withAlpha: false,
-                  rgbRedInputScreenReaderLabel: 'Input field for red',
-                  rgbGreenInputScreenReaderLabel: 'Input field for green',
-                  rgbBlueInputScreenReaderLabel: 'Input field for blue',
-                  rgbAlphaInputScreenReaderLabel: 'Input field for alpha',
-                  colorSliderNavigationExplanationScreenReaderLabel: `You are on a color slider. To navigate the slider left or right, use the 'A' and 'D' buttons respectively`,
-                  alphaSliderNavigationExplanationScreenReaderLabel: `You are on an alpha slider. To navigate the slider left or right, use the 'A' and 'D' buttons respectively`,
-                  colorPaletteNavigationExplanationScreenReaderLabel: `You are on a color palette. To navigate on the palette up, left, down or right, use the 'W', 'A', 'S' and 'D' buttons respectively`,
-                },
-                colorPreset: {
-                  label: 'Choose a nice color',
-                  colors: [
-                    '#ffffff',
-                    '#0CBF94',
-                    '#0C89BF00',
-                    '#BF0C6D',
-                    '#BF8D0C',
-                    '#ff0000',
-                    '#576A66',
-                    '#35423A',
-                    '#35423F',
-                  ],
-                },
-              }}
-              onChange={handleColorChange}
-              value={currColor}
+        <FormFieldGroup description="Standard Button Colors">
+          <Flex as="div" margin="small" gap="small" wrap="wrap">
+            <RadioInput
+              value="primary"
+              label="Primary"
+              inline={true}
+              onChange={handleButtonColorChange}
+              checked={currColor === 'primary'}
             />
-          </View>
-        )}
+            <RadioInput
+              value="secondary"
+              label="Secondary"
+              inline={true}
+              onChange={handleButtonColorChange}
+              checked={currColor === 'secondary'}
+            />
+            <RadioInput
+              value="success"
+              label="Success"
+              inline={true}
+              onChange={handleButtonColorChange}
+              checked={currColor === 'success'}
+            />
+            <RadioInput
+              value="danger"
+              label="Danger"
+              inline={true}
+              onChange={handleButtonColorChange}
+              checked={currColor === 'danger'}
+            />
+            <RadioInput
+              value="primary-inverse"
+              label="Primary Inverse"
+              inline={true}
+              onChange={handleButtonColorChange}
+              checked={currColor === 'primary-inverse'}
+            />
+            <RadioInput
+              value="custom"
+              label="Custom"
+              inline={true}
+              onChange={handleButtonColorChange}
+              checked={!isInstuiButtonColor(currColor)}
+            />
+          </Flex>
+        </FormFieldGroup>
+
+        <View as="div" margin="small 0 0 0" borderWidth="small 0 0 0" padding="small 0 0 0">
+          <ColorPicker
+            label="Custom Color"
+            onChange={handleColorChange}
+            value={currColor}
+            disabled={isInstuiButtonColor(currColor)}
+          />
+        </View>
       </Modal.Body>
       <Modal.Footer>
         <Button color="secondary" onClick={onClose}>
           Cancel
         </Button>
         <Button color="primary" onClick={handleSubmit} margin="0 0 0 small">
-          Submit
+          Set Color
         </Button>
       </Modal.Footer>
     </Modal>

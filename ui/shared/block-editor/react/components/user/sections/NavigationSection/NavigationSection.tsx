@@ -18,12 +18,9 @@
 
 import React, {useState} from 'react'
 import {Element, useEditor, useNode, type Node} from '@craftjs/core'
-
-import {contrast} from '@instructure/ui-color-utils'
-
 import {Container} from '../../blocks/Container'
 import {ButtonBlock} from '../../blocks/ButtonBlock'
-import {useClassNames, white, black} from '../../../../utils'
+import {useClassNames, getContrastingColor} from '../../../../utils'
 
 export type NavigationSectionInnerProps = {
   children?: React.ReactNode
@@ -60,26 +57,18 @@ type NavigationSectionProps = {
   background?: string
 }
 
-export const NavigationSection = ({background}: NavigationSectionProps) => {
+const NavigationSection = ({background}: NavigationSectionProps) => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
   const [cid] = useState<string>('navigation-section')
-  const clazz = useClassNames(enabled, {isEmpty: false, isSelected: false, isHovered: false}, [
-    'section',
-    'navigation-section',
-    'fixed',
-  ])
+  const clazz = useClassNames(enabled, {empty: false}, ['section', 'navigation-section', 'fixed'])
 
   const backgroundColor = background || NavigationSection.craft.defaultProps.background
-  const textColor =
-    contrast(backgroundColor, white) > contrast(backgroundColor, black) ? white : black
+  const textColor = getContrastingColor(backgroundColor)
 
   return (
-    <Container
-      className={clazz}
-      background={background || NavigationSection.craft.defaultProps.background}
-    >
+    <Container className={clazz} background={backgroundColor} style={{color: textColor}}>
       <Element id={`${cid}__inner`} is={NavigationSectionInner} canvas={true}>
         <Element
           id={`${cid}_link1`}
@@ -129,5 +118,6 @@ NavigationSection.craft = {
   custom: {
     isSection: true,
   },
-  related: {},
 }
+
+export {NavigationSection}

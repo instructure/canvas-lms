@@ -22,16 +22,12 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Toolbox} from './components/editor/Toolbox'
-import {SettingsPanel} from './components/editor/SettingsPanel'
 import {Topbar} from './components/editor/Topbar'
 import {blocks} from './components/blocks'
 import {NewPageStepper} from './components/editor/NewPageStepper'
 import {RenderNode} from './components/editor/RenderNode'
 
-import TEST_CONTENT from '../dummycontent'
-
 import './style.css'
-import {W, e} from 'vitest/dist/reporters-rzC174PQ'
 
 const I18n = useI18nScope('block-editor')
 
@@ -57,11 +53,8 @@ type BlockEditorProps = {
 }
 
 export default function BlockEditor({enabled = true, version, content}: BlockEditorProps) {
-  const [json] = useState(() => {
-    return window.location.hash === '#reset' ? TEST_CONTENT : content || DEFAULT_CONTENT
-  })
-  const [isEnabled, setIsEnabled] = useState(enabled)
-  const [toolboxOpen, setToolboxOpen] = useState(false)
+  const [json] = useState(content || DEFAULT_CONTENT)
+  const [toolboxOpen, setToolboxOpen] = useState(true)
   const [stepperOpen, setStepperOpen] = useState(!content)
 
   useEffect(() => {
@@ -89,11 +82,6 @@ export default function BlockEditor({enabled = true, version, content}: BlockEdi
     setStepperOpen(false)
   }, [])
 
-  const handleSubmitStepper = useCallback((initContent: string) => {
-    console.log('>>> submit stepper')
-    setStepperOpen(false)
-  }, [])
-
   return (
     <View
       as="span"
@@ -108,7 +96,7 @@ export default function BlockEditor({enabled = true, version, content}: BlockEdi
       borderRadius="large large none none"
     >
       <Editor
-        enabled={isEnabled}
+        enabled={enabled}
         resolver={blocks}
         onNodesChange={handleNodesChange}
         onRender={RenderNode}

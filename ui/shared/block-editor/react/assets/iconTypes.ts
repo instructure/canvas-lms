@@ -16,33 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {useNode} from '@craftjs/core'
-import {Slider, FormControl, FormLabel} from '@mui/material'
-
-const TextBlockSettings = () => {
-  const {
-    actions: {setProp},
-    fontSize,
-  } = useNode(node => ({
-    fontSize: node.data.props.fontSize,
-  }))
-
-  return (
-    <FormControl>
-      <FormLabel component="legend">Font Size</FormLabel>
-      <Slider
-        value={fontSize || 7}
-        step={1}
-        min={7}
-        max={50}
-        valueLabelDisplay="auto"
-        onChange={(_, value) => {
-          setProp(prps => (prps.fontSize = value))
-        }}
-      />
-    </FormControl>
-  )
+export type IconSize = 'x-small' | 'small' | 'medium' | 'large' | 'x-large'
+export type IconProps = {
+  elementRef?: (element: Element | null) => void
+  size?: IconSize
 }
-
-export {TextBlockSettings}

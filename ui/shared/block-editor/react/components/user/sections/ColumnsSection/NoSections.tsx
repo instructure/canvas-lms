@@ -55,4 +55,7 @@ NoSections.craft = {
   rules: {
     canMoveIn: (nodes: Node[]) => !nodes.some(node => node.data.custom.isSection),
   },
+  custom: {
+    noToolbar: true,
+  },
 }
