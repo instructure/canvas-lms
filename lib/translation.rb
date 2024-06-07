@@ -59,7 +59,7 @@ module Translation
 
       # If source lang was not set, then detect the language.
       if src_lang.nil?
-        result = CLD.detect_language(text)[:code][0..2]
+        result = trim_locale(CLD.detect_language(text)[:code])
         if result == "un" # Unknown language code.
           logger.warn("Could not detect language from src text, defaulting to English")
           src_lang = "en"
@@ -70,12 +70,7 @@ module Translation
 
       # If target lang was nil, then user must be set. Try to get locale from the user.
       if tgt_lang.nil?
-        tgt_lang = if user.locale.nil?
-                     # Go ahead and use english as the target language. It is the system default for Canvas.
-                     "en"
-                   else
-                     user.locale[0..2]
-                   end
+        tgt_lang = trim_locale(user.locale)
       end
 
       # TODO: Error handling of invoke endpoint.
@@ -106,7 +101,7 @@ module Translation
       # For translating into the target locale.
       return languages if user.locale.nil?
 
-      locale = user.locale[0..2]
+      locale = trim_locale(user.locale)
       # Don't translate unless the browser locale is different for the current user.
       if locale == "en"
         return languages
@@ -125,19 +120,19 @@ module Translation
       locale = if user.locale.nil?
                  "en"
                else
-                 user.locale[0..2]
+                 trim_locale(user.locale)
                end
-      result = CLD.detect_language(text)[:code][0..2]
+      result = trim_locale(CLD.detect_language(text)[:code])
       result == locale
     end
 
     def translate_message(text:, user:)
       translated_text = []
-      src_lang = CLD.detect_language(text)[:code][0..2]
+      src_lang = trim_locale(CLD.detect_language(text)[:code])
       tgt_lang = if user.locale.nil?
                    "en"
                  else
-                   user.locale[0..2]
+                   trim_locale(user.locale)
                  end
 
       text.split("\n").map do |paragraph|
@@ -150,6 +145,12 @@ module Translation
       end
 
       translated_text.join("\n")
+    end
+
+    private
+
+    def trim_locale(locale)
+      locale[0..1]
     end
   end
 end
