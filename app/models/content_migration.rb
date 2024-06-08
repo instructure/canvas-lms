@@ -1193,7 +1193,7 @@ class ContentMigration < ActiveRecord::Base
 
   MIGRATION_DATA_FIELDS = {
     "WikiPage" => %i[url current_lookup_id],
-    "Attachment" => %i[media_entry_id]
+    "Attachment" => %i[media_entry_id uuid]
   }.freeze
 
   def migration_data_fields_for(asset_type)
@@ -1255,6 +1255,14 @@ class ContentMigration < ActiveRecord::Base
         migration_data_fields_for(asset_type).each do |field|
           mig_id_to_dest_id[o.migration_id.to_s][field] = o.send(field)
         end
+      end
+
+      if key == "files" && context.root_account.feature_enabled?(:file_verifiers_for_quiz_links)
+        dest_id_to_dest_uuid = {}
+        scope.each do |file|
+          dest_id_to_dest_uuid[file.id] = file.uuid
+        end
+        mapping["verifiers"] = dest_id_to_dest_uuid unless dest_id_to_dest_uuid.empty?
       end
 
       next if mig_id_to_dest_id.empty?
