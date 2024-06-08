@@ -96,6 +96,7 @@ const featureBundles: {
   edit_rubric: () => import('./features/edit_rubric/index'),
   enhanced_individual_gradebook: () => import('./features/enhanced_individual_gradebook/index'),
   eportfolio: () => import('./features/eportfolio/index'),
+  eportfolio_moderation: () => import('./features/eportfolio_moderation/index'),
   eportfolios_wizard_box: () => import('./features/eportfolios_wizard_box/index'),
   epub_exports: () => import('./features/epub_exports/index'),
   error_form: () => import('./features/error_form/index'),
