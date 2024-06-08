@@ -189,7 +189,7 @@ class Course < ActiveRecord::Base
   belongs_to :wiki
   has_many :wiki_pages, as: :context, inverse_of: :context
   has_many :wiki_page_lookups, as: :context, inverse_of: :context
-  has_many :quizzes, -> { order("lock_at, title, id") }, class_name: "Quizzes::Quiz", as: :context, inverse_of: :context, dependent: :destroy
+  has_many :quizzes, -> { order(:lock_at, :title, :id) }, class_name: "Quizzes::Quiz", as: :context, inverse_of: :context, dependent: :destroy
   has_many :quiz_questions, class_name: "Quizzes::QuizQuestion", through: :quizzes
   has_many :active_quizzes, -> { preload(:assignment).where("quizzes.workflow_state<>'deleted'").order(:created_at) }, class_name: "Quizzes::Quiz", as: :context, inverse_of: :context
   has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context, inverse_of: :context

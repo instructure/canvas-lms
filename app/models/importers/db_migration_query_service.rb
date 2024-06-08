@@ -73,6 +73,8 @@ module Importers
       # it to the URL as a verifier, which we don't want to do with links inside
       # of Canvas, so we're excluding it
       att = @context.attachments.find_by(migration_id:)
+      return nil unless att
+
       att.media_entry_id ||= att.media_object&.media_id
       att.attributes.except("uuid")
     end
