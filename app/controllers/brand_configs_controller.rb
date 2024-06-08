@@ -33,6 +33,8 @@ class BrandConfigsController < ApplicationController
     css_bundle :brand_config_index
     js_bundle :brand_configs
 
+    page_has_instui_topnav
+
     base_brand_config = @account.first_parent_brand_config
     base_brand_config ||= BrandConfig.k12_config if k12?
     base_brand_config ||= BrandConfig.new
