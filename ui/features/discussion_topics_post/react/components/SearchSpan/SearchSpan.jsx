@@ -19,35 +19,48 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-// add highlighting and remove HTML from all incoming text
-// with the exception of anything within the <iframe></iframe> HTML tag
+// Highlights plaintext while not modifying any existing HTML or styling.
 const addSearchHighlighting = (searchTerm, searchArea, isSplitView) => {
   // Check for conditions where highlighting should not be applied
   if (!searchArea || !searchTerm || isSplitView) {
     return searchArea
   }
 
-  let cursor = 0 // Initialize cursor to keep track of position in searchArea
-  const iframePattern = /<iframe[\s\S]*?<\/iframe>/gi // Regular expression to match <iframe> elements
+  // If no HTML tags, bypass parsing for performance
+  if(!searchArea.includes('<')) return highlightText(searchArea, searchTerm)
 
-  // Get an array of all matches using matchAll, then process them
-  const iframeMatches = Array.from(searchArea.matchAll(iframePattern))
-  const modifiedHtml = iframeMatches
-    .map(iframeMatch => {
-      const startIndexOfIframeHtml = iframeMatch.index
-      const endIndexOfIframeHtml = startIndexOfIframeHtml + iframeMatch[0].length
-      const highlightedPart = highlightText(
-        searchArea.substring(cursor, startIndexOfIframeHtml),
-        searchTerm
-      )
-      cursor = endIndexOfIframeHtml
-      // Construct modified HTML for this match
-      return `${highlightedPart}<br>${iframeMatch[0]}<br>`
-    })
-    .join('') // Join all modified HTML strings into a single string
+  const textAndTags = [] // Stores HTML tags and plaintext as separate elements
+  const textAndTagsMatches = [] // Stores indexes of matched elements
+  let tempString = ""
 
-  // Highlight any remaining text after the last match
-  return modifiedHtml + highlightText(searchArea.substring(cursor), searchTerm)
+  // Parse the input to split HTML tags from plaintext elements
+  for(let i = 0; i < searchArea.length; i++) {
+    if(searchArea[i] === '<' && tempString) {
+      // Check if the plaintext element contains the search term
+      if(tempString.toLowerCase().includes(searchTerm.toLowerCase())) {
+        textAndTagsMatches.push(textAndTags.length)
+      }
+      // Add the plaintext element to array and reset for the tag element
+      textAndTags.push(tempString)
+      tempString = searchArea[i]
+    }
+    else if(searchArea[i] === '>' || i === searchArea.length - 1) {
+      // Add the tag element to array and reset for next element
+      tempString += searchArea[i]
+      textAndTags.push(tempString)
+      tempString = ""
+    }
+    else
+    {
+      tempString += searchArea[i]
+    }
+  }
+
+  textAndTagsMatches.forEach( (index) => {
+    textAndTags[index] = highlightText(textAndTags[index], searchTerm)
+  })
+
+  return textAndTags.join("")
 }
 
 // Highlight the search term and remove HTML
@@ -59,7 +72,7 @@ const highlightText = (text, searchTerm) => {
     .replace(/<[^>]*>/gm, '')
     .replace(
       searchExpression,
-      '<span data-testid="highlighted-search-item" style="background-color: rgba(0,142,226,0.2); border-radius: .25rem; padding-bottom: 3px; padding-top: 1px;">$1</span>'
+      '<span data-testid="highlighted-search-item" style="font-weight: bold; background-color: rgba(0,142,226,0.2); border-radius: .25rem; padding-bottom: 3px; padding-top: 1px;">$1</span>'
     )
 }
 
