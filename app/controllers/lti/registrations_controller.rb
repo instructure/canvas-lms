@@ -498,8 +498,14 @@ class Lti::RegistrationsController < ApplicationController
         Lti::Registration.where(id: registration_ids_for_shard).eager_load(eager_load_models)
       end.flatten
 
+      all_registrations = account_registrations + forced_on_in_site_admin + inherited_on_registrations
+      # somewhat hacky here; we need to sort them again after combining all of these separately-queried registrations
+      # together into all_registrations, since the overall batch will not be in created_at order.
+      all_registrations.sort! { |first, second| second.created_at - first.created_at }
+      paginated_registrations = Api.jsonapi_paginate(all_registrations, self, url_for(controller: "lti/registrations", action: "list"), { per_page: 15 })
       render json: lti_registrations_json(
-        account_registrations + forced_on_in_site_admin + inherited_on_registrations,
+        # jsonapi_paginate returns tuple; [0]th item has results, [1]nd item has pagination metadata
+        paginated_registrations.first,
         @current_user,
         session,
         @context,
