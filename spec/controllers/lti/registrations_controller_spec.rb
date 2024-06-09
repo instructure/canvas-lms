@@ -86,113 +86,192 @@ describe Lti::RegistrationsController do
   end
 
   describe "GET list", type: :request do
-    subject { get "/api/v1/accounts/#{account.id}/lti_registrations" }
+    subject { get url }
 
+    let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations" }
     let(:account) { account_model }
     let(:admin) { account_admin_user(account:) }
 
     before do
       account.enable_feature!(:lti_registrations_page)
-
-      3.times do |number|
-        registration = lti_registration_model(account:, name: "Registration no. #{number}")
-        lti_registration_account_binding_model(registration:, account:, workflow_state: "on", created_by: admin)
-      end
-
-      other_account = account_model
-      # registration in another account
-      lti_registration_model(account: other_account, name: "Other account registration")
-
-      enabled_site_admin_reg = lti_registration_model(account: Account.site_admin, name: "Site admin registration")
-      lti_registration_account_binding_model(
-        registration: enabled_site_admin_reg,
-        account:,
-        workflow_state: "on"
-      )
-
-      disabled_site_admin_reg = lti_registration_model(account: Account.site_admin, name: "Site admin registration 2")
-      lti_registration_account_binding_model(
-        registration: disabled_site_admin_reg,
-        account:,
-        workflow_state: "off"
-      )
-
-      # a registration account binding enabled for a different account
-      lti_registration_account_binding_model(
-        registration: disabled_site_admin_reg,
-        account: other_account,
-        workflow_state: "on"
-      )
-
-      # an lti registration with no account binding
-      lti_registration_model(account: Account.site_admin, name: "Site admin registration with no binding")
     end
 
-    context "with a user session" do
+    context "correctness verifications" do
       before do
-        user_session(admin)
-        account.enable_feature!(:lti_registrations_page)
+        3.times do |number|
+          registration = lti_registration_model(account:, name: "Registration no. #{number}")
+          lti_registration_account_binding_model(registration:, account:, workflow_state: "on", created_by: admin)
+        end
+
+        other_account = account_model
+        # registration in another account
+        lti_registration_model(account: other_account, name: "Other account registration")
+
+        enabled_site_admin_reg = lti_registration_model(account: Account.site_admin, name: "Site admin registration")
+        lti_registration_account_binding_model(
+          registration: enabled_site_admin_reg,
+          account:,
+          workflow_state: "on"
+        )
+
+        disabled_site_admin_reg = lti_registration_model(account: Account.site_admin, name: "Site admin registration 2")
+        lti_registration_account_binding_model(
+          registration: disabled_site_admin_reg,
+          account:,
+          workflow_state: "off"
+        )
+
+        # a registration account binding enabled for a different account
+        lti_registration_account_binding_model(
+          registration: disabled_site_admin_reg,
+          account: other_account,
+          workflow_state: "on"
+        )
+
+        # an lti registration with no account binding
+        lti_registration_model(account: Account.site_admin, name: "Site admin registration with no binding")
       end
 
-      it "is successful" do
-        subject
-        expect(response).to be_successful
+      context "with a user session" do
+        before do
+          user_session(admin)
+          account.enable_feature!(:lti_registrations_page)
+        end
+
+        it "is successful" do
+          subject
+          expect(response).to be_successful
+        end
+
+        it "returns a list of registrations" do
+          subject
+          expect(response_json.length).to eq(4)
+        end
+
+        it "has the expected fields in the results" do
+          subject
+
+          expect(response_json.first)
+            .to include({ account_id: an_instance_of(Integer), name: an_instance_of(String) })
+
+          expect(response_json.first[:account_binding])
+            .to include({ workflow_state: an_instance_of(String) })
+
+          expect(response_json.first[:account_binding][:created_by])
+            .to include({ id: an_instance_of(Integer) })
+        end
+
+        it "sorts the results by newest first" do
+          lti_registration_model(account:, name: "created just now")
+          lti_registration_model(account:, name: "created an hour ago", created_at: 1.hour.ago)
+
+          subject
+          expect(response_json.first["name"]).to eq("created just now")
+          expect(response_json.last["name"]).to eq("created an hour ago")
+        end
       end
 
-      it "returns a list of registrations" do
-        subject
-        expect(response_json.length).to eq(4)
+      context "without user session" do
+        it "returns 401" do
+          subject
+          expect(response).to be_unauthorized
+        end
       end
 
-      it "has the expected fields in the results" do
-        subject
+      context "with non-admin user" do
+        before do
+          user_session(student_in_course(account:).user)
+        end
 
-        expect(response_json.first)
-          .to include({ account_id: an_instance_of(Integer), name: an_instance_of(String) })
-
-        expect(response_json.first[:account_binding])
-          .to include({ workflow_state: an_instance_of(String) })
-
-        expect(response_json.first[:account_binding][:created_by])
-          .to include({ id: an_instance_of(Integer) })
+        it "returns 401" do
+          subject
+          expect(response).to be_unauthorized
+        end
       end
 
-      it "sorts the results by newest first" do
-        lti_registration_model(account:, name: "created just now")
-        lti_registration_model(account:, name: "created an hour ago", created_at: 1.hour.ago)
+      context "with flag disabled" do
+        before do
+          account.disable_feature!(:lti_registrations_page)
+        end
 
-        subject
-        expect(response_json.first["name"]).to eq("created just now")
-        expect(response_json.last["name"]).to eq("created an hour ago")
+        it "returns 404" do
+          subject
+          expect(response).to be_not_found
+        end
       end
     end
 
-    context "without user session" do
-      it "returns 401" do
-        subject
-        expect(response).to be_unauthorized
-      end
-    end
+    context "pagination" do
+      # Link header is a comma-separated list
+      let(:link_header_values) { response.headers["Link"].split(",") }
+      let(:current_pagination_link) { "http://www.example.com#{url}?page=#{expected_page_number}&per_page=15" }
+      let(:expected_page_number) { raise "define expected_page_number in specific contexts" }
 
-    context "with non-admin user" do
-      before do
-        user_session(student_in_course(account:).user)
-      end
+      context "with exactly 15 registrations present" do
+        before do
+          user_session(admin)
 
-      it "returns 401" do
-        subject
-        expect(response).to be_unauthorized
-      end
-    end
+          10.times do |number|
+            registration = lti_registration_model(account:, name: "Registration no. #{number}")
+            lti_registration_account_binding_model(registration:, account:, workflow_state: "on", created_by: admin)
+          end
 
-    context "with flag disabled" do
-      before do
-        account.disable_feature!(:lti_registrations_page)
-      end
+          # registration in another account
+          5.times do
+            enabled_site_admin_reg = lti_registration_model(account: Account.site_admin, name: "Site admin registration")
+            lti_registration_account_binding_model(
+              registration: enabled_site_admin_reg,
+              account:,
+              workflow_state: "on"
+            )
+          end
+        end
 
-      it "returns 404" do
-        subject
-        expect(response).to be_not_found
+        let(:expected_page_number) { 1 }
+
+        it "puts results on one page and does not give a 'next' page in the Link header" do
+          subject
+          expect(response_json.length).to eq(15)
+
+          # Expect the current pagination link to be given as rel=first, rel=last, and rel=current
+          # in the header.
+          %w[first last current].each do |link_rel|
+            expect(link_header_values).to include("<#{current_pagination_link}>; rel=\"#{link_rel}\"")
+          end
+
+          # Should only be three items in the list (i.e. no "next").
+          expect(link_header_values.length).to eq(3)
+        end
+
+        context "with 20 registrations present" do
+          # create 5 additional registrations on top of the existing 15
+          before do
+            5.times do |number|
+              registration = lti_registration_model(account:, name: "Registration no. #{15 + number}")
+              lti_registration_account_binding_model(registration:, account:, workflow_state: "on", created_by: admin)
+            end
+          end
+
+          let(:expected_page_number) { 2 }
+
+          it "gives a link to page 2 for the next, and last, page" do
+            subject
+
+            %w[next last].each do |link_rel|
+              expect(link_header_values).to include("<#{current_pagination_link}>; rel=\"#{link_rel}\"")
+            end
+          end
+
+          it "returns five results on page 2 and says that is the last page" do
+            get "#{url}?page=2"
+
+            expect(response_json.length).to eq(5)
+
+            %w[current last].each do |link_rel|
+              expect(link_header_values).to include("<#{current_pagination_link}>; rel=\"#{link_rel}\"")
+            end
+          end
+        end
       end
     end
   end
