@@ -97,4 +97,16 @@ RSpec.describe Lti::RegistrationAccountBinding do
       expect(Lti::RegistrationAccountBinding.find_by(id: account_binding.id)).to be_nil
     end
   end
+
+  describe "for cross-shard registration" do
+    specs_require_sharding
+
+    let(:account) { @shard2.activate { account_model } }
+    let(:registration) { Shard.default.activate { lti_registration_model(account: Account.site_admin) } }
+    let(:account_binding) { @shard2.activate { lti_registration_account_binding_model(account:, registration:) } }
+
+    it "saves" do
+      expect { @shard2.activate { account_binding.save! } }.not_to raise_error
+    end
+  end
 end
