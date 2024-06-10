@@ -412,6 +412,8 @@ class Account < ActiveRecord::Base
                                                                         minimum_character_length
                                                                         maximum_login_attempts]
 
+  add_setting :enable_limited_access_for_students, boolean: true, root_only: false, default: false, inheritable: false
+
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
       hash.each do |key, val|
@@ -530,6 +532,10 @@ class Account < ActiveRecord::Base
 
   def use_classic_font_in_k5?
     use_classic_font_in_k5[:value]
+  end
+
+  def limited_access_for_students?
+    root_account.feature_enabled?(:allow_limited_access_for_students) && settings[:enable_limited_access_for_students]
   end
 
   def conditional_release?
