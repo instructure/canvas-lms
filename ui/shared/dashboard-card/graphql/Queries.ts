@@ -19,7 +19,7 @@
 import gql from 'graphql-tag'
 import {CourseDashboardCard} from './CourseDashboardCard'
 
-const dashcard_query_enabled = ENV.FEATURES.dashboard_graphql_integration
+const dashcard_query_enabled = !!ENV?.FEATURES?.dashboard_graphql_integration
 
 export const LOAD_DASHBOARD_CARDS_QUERY = gql`
   query GetDashboardCards($userID: ID!, $observedUserId: ID = null) {
