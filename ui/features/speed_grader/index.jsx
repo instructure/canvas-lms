@@ -73,9 +73,9 @@ ready(() => {
             hrefs: {
               heroIcon: `/courses/${window.ENV.course_id}/gradebook`,
             },
-            features: {
-              extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
-            },
+          },
+          features: {
+            extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
           },
         })
       })
