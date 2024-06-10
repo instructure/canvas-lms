@@ -37,7 +37,7 @@ GEM
       tzinfo (~> 2.0)
     after_transaction_commit (2.2.2)
       activerecord (>= 5.2)
-    builder (3.2.4)
+    builder (3.3.0)
     code_ownership (1.36.2)
       code_teams (~> 1.0)
       packs-specification
