@@ -17,16 +17,16 @@
  */
 
 import React, {useState} from 'react'
-import {Element, useEditor, useNode, type Node} from '@craftjs/core'
+import {Element, useEditor} from '@craftjs/core'
 
 import {Container} from '../../blocks/Container'
-import {NoSections, type ColumnSectionVariant} from './NoSections'
-import {ColumnsSectionSettings} from './ColumnsSectionSettings'
+import {NoSections, type ColumnsSectionVariant} from './NoSections'
+import {ColumnsSectionToolbar} from './ColumnsSectionToolbar'
 import {useClassNames} from '../../../../utils'
 
 type ColumnsSectionProps = {
   columns: number
-  variant?: ColumnSectionVariant
+  variant?: ColumnsSectionVariant
 }
 
 export const ColumnsSection = ({columns = 2, variant = 'fixed'}: ColumnsSectionProps) => {
@@ -34,7 +34,12 @@ export const ColumnsSection = ({columns = 2, variant = 'fixed'}: ColumnsSectionP
     enabled: state.options.enabled,
   }))
   const [cid] = useState<string>('columns-section') // uid('columns-section', 2)
-  const clazz = useClassNames(enabled, {empty: false}, ['section', 'columns-section', variant])
+  const clazz = useClassNames(enabled, {empty: false}, [
+    'section',
+    'columns-section',
+    variant,
+    `columns-${columns}`,
+  ])
 
   const renderCols = () => {
     if (variant === 'fixed') {
@@ -67,11 +72,7 @@ export const ColumnsSection = ({columns = 2, variant = 'fixed'}: ColumnsSectionP
     }
   }
 
-  return (
-    <Container className={clazz} style={{gridTemplateColumns: `repeat(${columns}, 1fr)`}}>
-      {renderCols()}
-    </Container>
-  )
+  return <Container className={clazz}>{renderCols()}</Container>
 }
 
 ColumnsSection.craft = {
@@ -84,6 +85,6 @@ ColumnsSection.craft = {
     isSection: true,
   },
   related: {
-    settings: ColumnsSectionSettings,
+    toolbar: ColumnsSectionToolbar,
   },
 }

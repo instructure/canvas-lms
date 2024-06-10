@@ -65,11 +65,6 @@ export const PageBlock = ({children}: PageBlockProps) => {
       className={clazz}
       data-placeholder="Drop a section here"
       ref={el => el && connect(el)}
-      style={{
-        background: 'transparent',
-        padding: '16px',
-        minHeight: '10rem',
-      }}
       onPaste={handlePaste}
     >
       <a id="page-top" href="#page-top">

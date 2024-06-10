@@ -18,53 +18,59 @@
 
 import React, {useCallback, useState} from 'react'
 import {useNode} from '@craftjs/core'
-import {NumberInput} from '@instructure/ui-number-input'
-import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
-import {View} from '@instructure/ui-view'
 import {type FormMessage} from '@instructure/ui-form-field'
-import {type ColumnSectionVariant} from './ColumnsSection'
+import {IconButton} from '@instructure/ui-buttons'
+import {NumberInput} from '@instructure/ui-number-input'
+import {Popover} from '@instructure/ui-popover'
+import {IconTableInsertColumnAfterLine} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
 
 const MIN_COLS = 1
 const MAX_COLS = 4
 
-const ColumnsSectionSettings = () => {
+type ColumnCountPopupProps = {
+  columns: number
+}
+
+const ColumnCountPopup = ({columns}: ColumnCountPopupProps) => {
   const {
-    columns,
-    variant,
     actions: {setProp},
+    props,
   } = useNode(node => ({
-    columns: node.data.props.columns,
-    variant: node.data.props.variant,
+    props: node.data.props,
   }))
+  const [userValue, setUserValue] = useState<string>(columns.toString())
   const [cols, setCols] = useState<number>(columns)
-  const [vart, setVart] = useState<ColumnSectionVariant>(variant)
   const [messages, setMessages] = useState<FormMessage[]>([])
+  const [isShowingContent, setIsShowingContent] = useState(false)
+
+  const handleShowContent = useCallback(() => {
+    setIsShowingContent(true)
+  }, [])
+
+  const handleHideContent = useCallback(() => {
+    setIsShowingContent(false)
+  }, [])
 
   const setColumns = useCallback(
     (value: number) => {
       setCols(value)
-      setProp(props => (props.columns = value))
+      setUserValue(value.toString())
+      setProp(prps => (prps.columns = value))
     },
     [setProp]
   )
 
   const handleChangeColumnns = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
+      setUserValue(value)
       const cols = parseInt(value, 10)
       setCols(cols)
-      if (cols >= MIN_COLS && cols <= MAX_COLS) {
-        setProp(props => (props.columns = value))
+      if (!Number.isNaN(cols) && cols >= MIN_COLS && cols <= MAX_COLS) {
+        setProp(prps => (prps.columns = value))
       } else {
         setMessages([{text: `Columns must be between 1 and ${MAX_COLS}`, type: 'error'}])
       }
-    },
-    [setProp]
-  )
-
-  const handleChangeVariant = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-      setVart(value as ColumnSectionVariant)
-      setProp(props => (props.variant = value))
     },
     [setProp]
   )
@@ -81,30 +87,40 @@ const ColumnsSectionSettings = () => {
   }, [cols, setColumns])
 
   return (
-    <div>
-      <NumberInput
-        renderLabel={`Columns (1-${MAX_COLS})`}
-        isRequired={true}
-        messages={messages}
-        value={cols}
-        width="8rem"
-        onChange={handleChangeColumnns}
-        onIncrement={handleIncrementCols}
-        onDecrement={handleDecrementCols}
-      />
-      <View as="div" margin="small 0 0 0">
-        <RadioInputGroup
-          description="Column Style"
-          name="variant"
-          value={vart}
-          onChange={handleChangeVariant}
+    <Popover
+      renderTrigger={
+        <IconButton
+          size="small"
+          withBackground={false}
+          withBorder={false}
+          screenReaderLabel="Button Icon"
         >
-          <RadioInput label="Fixed" value="fixed" />
-          <RadioInput label="Fluid" value="fluid" />
-        </RadioInputGroup>
+          <IconTableInsertColumnAfterLine size="x-small" />
+        </IconButton>
+      }
+      isShowingContent={isShowingContent}
+      onShowContent={handleShowContent}
+      onHideContent={handleHideContent}
+      on="click"
+      screenReaderLabel="Popover Dialog Example"
+      shouldContainFocus={true}
+      shouldReturnFocus={true}
+      shouldCloseOnDocumentClick={true}
+    >
+      <View as="div" padding="x-small">
+        <NumberInput
+          renderLabel={`Columns (1-${MAX_COLS})`}
+          isRequired={true}
+          messages={messages}
+          value={userValue}
+          width="15rem"
+          onChange={handleChangeColumnns}
+          onIncrement={handleIncrementCols}
+          onDecrement={handleDecrementCols}
+        />
       </View>
-    </div>
+    </Popover>
   )
 }
 
-export {ColumnsSectionSettings}
+export {ColumnCountPopup}

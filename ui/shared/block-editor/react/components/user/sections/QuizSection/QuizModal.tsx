@@ -84,6 +84,7 @@ const QuizModal = ({open, currentQuestionId, onClose, onSelect}: QuizModalProps)
           onClick={handleChooseQuestion}
           color="primary"
           interaction={questionId ? 'enabled' : 'disabled'}
+          margin="0 0 0 x-small"
         >
           Add to Section
         </Button>

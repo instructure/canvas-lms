@@ -87,10 +87,10 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
           <View
             elementRef={el => setContainer(el)}
             as="div"
-            className={`block-editor-preview ${viewSize}`}
+            className={`block-editor-view ${viewSize}`}
             maxWidth={getViewWidth()}
             shadow="resting"
-            padding="medium"
+            padding="0"
             margin="0 auto"
           >
             <BlockEditorView content={query.serialize()} />

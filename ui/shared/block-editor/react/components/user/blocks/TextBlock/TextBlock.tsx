@@ -55,7 +55,7 @@ export const TextBlock = ({
     id: state.id,
     selected: state.events.selected,
   }))
-  const clazz = useClassNames(enabled, {empty: !text}, 'TextBlock')
+  const clazz = useClassNames(enabled, {empty: !text}, 'text-block')
   const focusableElem = useRef<HTMLDivElement | null>(null)
 
   const [editable, setEditable] = useState(true)

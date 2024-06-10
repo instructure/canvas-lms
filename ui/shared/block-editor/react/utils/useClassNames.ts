@@ -24,11 +24,11 @@ const useClassNames = (
   nodeState: {
     empty: boolean
     selected?: boolean
-    hovereded?: boolean
+    hovered?: boolean
   },
   others?: string | string[]
 ) => {
-  const {empty, selected = false, hovereded = false} = nodeState
+  const {empty, selected = false, hovered = false} = nodeState
   const rest: string[] = others ? (Array.isArray(others) ? others : [others]) : []
 
   const [classNameState, setClassNameState] = useState<string>('')
@@ -43,10 +43,10 @@ const useClassNames = (
       enabled,
       empty: empty && enabled,
       selected,
-      hovereded,
+      hovered,
     })
     setClassNameState(newClassNames)
-  }, [empty, hovereded, selected, rest, enabled])
+  }, [empty, hovered, selected, rest, enabled])
 
   return classNameState
 }

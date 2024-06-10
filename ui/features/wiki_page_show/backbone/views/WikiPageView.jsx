@@ -195,6 +195,7 @@ export default class WikiPageView extends Backbone.View {
   renderBlockEditorContent() {
     if (ENV.BLOCK_EDITOR && this.model.get('block_editor_attributes')?.blocks?.[0]?.data) {
       const container = document.getElementById('block-editor-content')
+      container.classList.add('block-editor-view')
       const content = JSON.parse(this.model.get('block_editor_attributes').blocks[0].data)
       renderBlockEditorView(content, container)
     }

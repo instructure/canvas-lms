@@ -17,8 +17,8 @@
  */
 
 import {ColumnsSection} from './ColumnsSection'
-import {NoSections} from './NoSections'
-import {ColumnsSectionSettings} from './ColumnsSectionSettings'
+import {NoSections, type ColumnsSectionVariant} from './NoSections'
+import {ColumnsSectionToolbar} from './ColumnsSectionToolbar'
 
 const ColumnsSectionIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
 <g clip-path="url(#clip0_1375_197267)">
@@ -31,4 +31,10 @@ const ColumnsSectionIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="18" h
 </defs>
 </svg>`
 
-export {ColumnsSection, NoSections, ColumnsSectionSettings, ColumnsSectionIcon}
+export {
+  ColumnsSection,
+  NoSections,
+  ColumnsSectionToolbar,
+  ColumnsSectionIcon,
+  type ColumnsSectionVariant,
+}

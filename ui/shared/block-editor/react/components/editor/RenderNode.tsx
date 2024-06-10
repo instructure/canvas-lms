@@ -169,6 +169,9 @@ export const RenderNode = ({render}: RenderNodeProps) => {
   // TODO: this should be role="toolbar" and nav with arrow keys
   const renderBlockToolbar = () => {
     if (node.data?.custom?.noToolbar) return null
+    const mountPoint = document.querySelector('.block-editor-editor')
+    if (!mountPoint) return null
+
     return ReactDOM.createPortal(
       <div
         ref={(el: HTMLDivElement) => setCurrentToolbarRef(el)}
@@ -227,11 +230,13 @@ export const RenderNode = ({render}: RenderNodeProps) => {
           </>
         ) : null}
       </div>,
-      document.querySelector('.block-editor') as HTMLElement
+      mountPoint
     )
   }
 
   const renderSectionMenu = () => {
+    const mountPoint = document.querySelector('.block-editor-editor')
+    if (!mountPoint) return null
     return node.related?.sectionMenu
       ? ReactDOM.createPortal(
           <div
@@ -244,7 +249,7 @@ export const RenderNode = ({render}: RenderNodeProps) => {
           >
             {React.createElement(node.related.sectionMenu)}
           </div>,
-          document.querySelector('.block-editor') as HTMLElement
+          mountPoint
         )
       : null
   }

@@ -74,8 +74,8 @@ export default function BlockEditor({enabled = true, version, content}: BlockEdi
     setToolboxOpen(false)
   }, [])
 
-  const handleOpenToolbox = useCallback(() => {
-    setToolboxOpen(true)
+  const handleOpenToolbox = useCallback((open: boolean) => {
+    setToolboxOpen(open)
   }, [])
 
   const handleCloseStepper = useCallback(() => {
@@ -84,13 +84,12 @@ export default function BlockEditor({enabled = true, version, content}: BlockEdi
 
   return (
     <View
-      as="span"
-      className="block-editor"
+      as="div"
+      className="block-editor-editor"
       display="inline-block"
       position="relative"
       width="100%"
       maxWidth="100%"
-      margin="small"
       padding="small"
       shadow="above"
       borderRadius="large large none none"
@@ -103,7 +102,7 @@ export default function BlockEditor({enabled = true, version, content}: BlockEdi
       >
         <Flex direction="column" alignItems="stretch" justifyItems="start" gap="small" width="100%">
           <Flex.Item shouldGrow={false}>
-            <Topbar onOpenToolbox={handleOpenToolbox} />
+            <Topbar onToolboxChange={handleOpenToolbox} toolboxOpen={toolboxOpen} />
           </Flex.Item>
           <Flex.Item id="editor-area" shouldGrow={true}>
             <Frame data={json} />
