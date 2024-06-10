@@ -20,12 +20,12 @@ import React from 'react'
 import {useEditor, useNode, type Node} from '@craftjs/core'
 import {useClassNames} from '../../../../utils'
 
-export type ColumnSectionVariant = 'fixed' | 'fluid'
+export type ColumnsSectionVariant = 'fixed' | 'fluid'
 
 export type NoSectionsProps = {
   columns?: number
   className?: string
-  variant: ColumnSectionVariant
+  variant: ColumnsSectionVariant
   children?: React.ReactNode
 }
 
@@ -39,12 +39,7 @@ export const NoSections = ({columns = 1, variant, className = '', children}: NoS
   const clazz = useClassNames(enabled, {empty: !children}, [className])
 
   return (
-    <div
-      ref={el => el && connect(el)}
-      className={clazz}
-      style={variant === 'fluid' ? {columnCount: columns} : undefined}
-      data-placeholder="Drop blocks here"
-    >
+    <div ref={el => el && connect(el)} className={clazz} data-placeholder="Drop blocks here">
       {children}
     </div>
   )
