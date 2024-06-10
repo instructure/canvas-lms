@@ -32,6 +32,7 @@ import {
   IconDiscussionLine,
 } from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
+import stopwords from "./stopwords"
 
 const I18n = useI18nScope('SmartSearch')
 
@@ -70,8 +71,8 @@ export default function SearchResult({onExplain, onLike, onDislike, result, sear
     // Split the searchTerm into tokens
     const searchTerms = searchTerm.split(' ');
 
-    // Filter out single character search terms
-    const validSearchTerms = searchTerms.filter(term => term.length > 1);
+    // Filter out single character search terms and common words
+    const validSearchTerms = searchTerms.filter(term => term.length > 1 && !stopwords.includes(term))
 
     // Escape each searchTerm and join them with '|'
     const escapedSearchTerms = validSearchTerms.map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
