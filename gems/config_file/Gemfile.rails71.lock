@@ -54,7 +54,7 @@ GEM
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    mini_portile2 (2.8.6)
+    mini_portile2 (2.8.7)
     minitest (5.23.1)
     mutex_m (0.2.0)
     nokogiri (1.16.5)
