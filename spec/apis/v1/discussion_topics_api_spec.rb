@@ -4299,34 +4299,30 @@ describe DiscussionTopicsController, type: :request do
     end
 
     context "should be shown" do
-      let(:check_access) do
-        lambda do |json|
-          expect(json["new_entries"]).not_to be_nil
-          expect(json["new_entries"].count).to eq(2)
-          expect(json["new_entries"].first["user_id"]).to eq(@student1.id)
-          expect(json["new_entries"].second["user_id"]).to eq(@student2.id)
-        end
+      def check_access(json)
+        expect(json["new_entries"]).not_to be_nil
+        expect(json["new_entries"].count).to eq(2)
+        expect(json["new_entries"].first["user_id"]).to eq(@student1.id)
+        expect(json["new_entries"].second["user_id"]).to eq(@student2.id)
       end
 
       it "shows student comments to students" do
-        check_access.call(announcements_view_api.call(@student1, @course.id, @announcement.id))
+        check_access(announcements_view_api.call(@student1, @course.id, @announcement.id))
       end
 
       it "shows student comments to teachers" do
-        check_access.call(announcements_view_api.call(@teacher, @course.id, @announcement.id))
+        check_access(announcements_view_api.call(@teacher, @course.id, @announcement.id))
       end
 
       it "shows student comments to admins" do
-        check_access.call(announcements_view_api.call(@admin, @course.id, @announcement.id))
+        check_access(announcements_view_api.call(@admin, @course.id, @announcement.id))
       end
     end
 
     context "should not be shown" do
-      let(:check_access) do
-        lambda do |json|
-          expect(json["new_entries"]).to be_nil
-          expect(%w[unauthorized unauthenticated]).to include(json["status"])
-        end
+      def check_access(json)
+        expect(json["new_entries"]).to be_nil
+        expect(%w[unauthorized unauthenticated]).to include(json["status"])
       end
 
       before do
@@ -4337,15 +4333,15 @@ describe DiscussionTopicsController, type: :request do
       end
 
       it "does not show student comments to unauthenticated users" do
-        check_access.call(announcements_view_api.call(nil, @course.id, @announcement.id, 401))
+        check_access(announcements_view_api.call(nil, @course.id, @announcement.id, 401))
       end
 
       it "does not show student comments to other students not in the course" do
-        check_access.call(announcements_view_api.call(@student, @course.id, @announcement.id, 401))
+        check_access(announcements_view_api.call(@student, @course.id, @announcement.id, 401))
       end
 
       it "does not show student comments to other teachers not in the course" do
-        check_access.call(announcements_view_api.call(@teacher, @course.id, @announcement.id, 401))
+        check_access(announcements_view_api.call(@teacher, @course.id, @announcement.id, 401))
       end
     end
   end
