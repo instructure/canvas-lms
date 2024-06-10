@@ -1883,7 +1883,7 @@ describe Canvas::LiveEvents do
       end
     end
 
-    context "learning_outcome_result_associated_asset" do
+    context "#rubric_assessment_learning_outcome_result_associated_asset" do
       it "updates associated_asset info to the assignment if the artifact is a RubricAssessment" do
         assignment_model
         course_with_student
@@ -1897,6 +1897,8 @@ describe Canvas::LiveEvents do
           id: result.id.to_s,
           learning_outcome_id: result.learning_outcome_id.to_s,
           learning_outcome_context_uuid: result.learning_outcome.context&.uuid,
+          result_context_id: result.context_id.to_s,
+          result_context_type: result.context_type,
           result_context_uuid: result&.context&.uuid,
           mastery: result.mastery,
           score: result.score,
@@ -1926,6 +1928,8 @@ describe Canvas::LiveEvents do
           id: result.id.to_s,
           learning_outcome_id: result.learning_outcome_id.to_s,
           learning_outcome_context_uuid: result.learning_outcome.context&.uuid,
+          result_context_id: result.context_id.to_s,
+          result_context_type: result.context_type,
           result_context_uuid: result&.context&.uuid,
           mastery: result.mastery,
           score: result.score,
@@ -1954,7 +1958,9 @@ describe Canvas::LiveEvents do
           id: result.id.to_s,
           learning_outcome_id: result.learning_outcome_id.to_s,
           learning_outcome_context_uuid: result.learning_outcome.context&.uuid,
-          result_context_uuid: result&.context&.uuid,
+          result_context_id: nil,
+          result_context_type: nil,
+          result_context_uuid: nil,
           mastery: result.mastery,
           score: result.score,
           created_at: result.created_at,
@@ -1987,6 +1993,8 @@ describe Canvas::LiveEvents do
           id: result.id.to_s,
           learning_outcome_id: result.learning_outcome_id.to_s,
           learning_outcome_context_uuid: result.learning_outcome.context&.uuid,
+          result_context_id: result.context_id.to_s,
+          result_context_type: result.context_type,
           result_context_uuid: nil,
           mastery: result.mastery,
           score: result.score,
@@ -2018,6 +2026,8 @@ describe Canvas::LiveEvents do
           id: result.id.to_s,
           learning_outcome_id: result.learning_outcome_id.to_s,
           learning_outcome_context_uuid: result.learning_outcome.context&.uuid,
+          result_context_id: result.context_id.to_s,
+          result_context_type: result.context_type,
           result_context_uuid: result&.context&.uuid,
           mastery: result.mastery,
           score: result.score,
@@ -2048,6 +2058,8 @@ describe Canvas::LiveEvents do
           id: result.id.to_s,
           learning_outcome_id: result.learning_outcome_id.to_s,
           learning_outcome_context_uuid: result.learning_outcome.context&.uuid,
+          result_context_id: result.context_id.to_s,
+          result_context_type: result.context_type,
           result_context_uuid: result&.context&.uuid,
           mastery: result.mastery,
           score: result.score,
@@ -2077,6 +2089,8 @@ describe Canvas::LiveEvents do
           id: result.id.to_s,
           learning_outcome_id: result.learning_outcome_id.to_s,
           learning_outcome_context_uuid: result.learning_outcome.context&.uuid,
+          result_context_id: nil,
+          result_context_type: nil,
           result_context_uuid: nil,
           mastery: result.mastery,
           score: result.score,
@@ -2111,6 +2125,8 @@ describe Canvas::LiveEvents do
           id: result.id.to_s,
           learning_outcome_id: result.learning_outcome_id.to_s,
           learning_outcome_context_uuid: result.learning_outcome.context&.uuid,
+          result_context_id: result.context_id.to_s,
+          result_context_type: result.context_type,
           result_context_uuid: nil,
           mastery: result.mastery,
           score: result.score,
