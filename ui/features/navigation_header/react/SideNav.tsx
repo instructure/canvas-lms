@@ -413,7 +413,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
                   )
                 }
                 label={tool.label}
-                href={tool.href?.toString()}
+                href={`${tool.href?.toString()}&toolId=${toolId}`}
                 onClick={() => handleActiveTray(toolId)}
                 selected={selectedNavItem === toolId}
                 data-selected={selectedNavItem === toolId}

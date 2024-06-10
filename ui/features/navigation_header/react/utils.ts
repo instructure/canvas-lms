@@ -109,8 +109,9 @@ const ACTIVE_ROUTE_REGEX =
   /^\/(courses|groups|accounts|grades|calendar|conversations|profile)|^#history/
 export function getActiveItem(): ActiveTray | '' {
   const path = window.location.pathname
+  const toolId = window.location.search.split('toolId=')
   const matchData = path.match(EXTERNAL_TOOLS_REGEX) || path.match(ACTIVE_ROUTE_REGEX)
-  return (matchData && (matchData[1] as ActiveTray)) || ''
+  return (toolId && (toolId[1] as ActiveTray)) ?? (matchData && (matchData[1] as ActiveTray)) ?? ''
 }
 
 export function getTrayLabel(type: string | null) {
