@@ -160,6 +160,27 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
       end
     end
 
+    context "with a version for each url on manual posting" do
+      let(:url_grades) do
+        [
+          { url: "https://abcdef.com/uuurrrlll00?p1=9&p2=11", grade: 0.11 },
+          { url: "https://abcdef.com/uuurrrlll01?p1=10&p2=12", grade: 0.22 }
+        ]
+      end
+
+      it "outputs all versions with hidden scores" do
+        expect(
+          subject.grade_history(hide_history_scores_on_manual_posting: true).map do |submission|
+            [submission[:url], submission[:score], submission[:grade]]
+          end
+        ).to eq(
+          url_grades.map do |x|
+            [x[:url], nil, nil]
+          end
+        )
+      end
+    end
+
     context "with multiple versions for each url" do
       let(:urls) do
         %w[

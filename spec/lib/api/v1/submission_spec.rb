@@ -541,8 +541,23 @@ describe Api::V1::Submission do
         ]
       end
 
-      it "outputs submission histories only for distinct urls" do
-        expect(json.fetch(field).count).to be 4
+      it "outputs submission histories only for distinct urls with not null grade and score" do
+        fields = json.fetch(field)
+        expect(fields.count).to be 4
+        fields.each do |field|
+          expect(field["grade"]).not_to be_nil
+          expect(field["score"]).not_to be_nil
+        end
+      end
+
+      it "outputs submission histories only for distinct urls with null grade and score" do
+        assignment.ensure_post_policy(post_manually: true)
+        fields = json.fetch(field)
+        expect(fields.count).to be 4
+        fields.each do |field|
+          expect(field["grade"]).to be_nil
+          expect(field["score"]).to be_nil
+        end
       end
     end
 
