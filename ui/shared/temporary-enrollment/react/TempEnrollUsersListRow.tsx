@@ -90,7 +90,7 @@ interface Props {
   handleSubmitEditUserForm?: () => void
 }
 
-interface TemporaryEnrollmentData {
+export interface TemporaryEnrollmentData {
   is_provider: boolean
   is_recipient: boolean
 }
