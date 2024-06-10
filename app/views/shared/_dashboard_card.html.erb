@@ -36,10 +36,14 @@ render_on_pageload = user_dashboard_view == 'cards'
 <% if render_on_pageload %>
   <%# fire off these `fetch` requests now so they are ready sooner %>
   <% if @current_user.roles(@domain_root_account).include?("observer") && @cards_prefetch_observed_param.present? %>
-    <%= prefetch_xhr("/api/v1/dashboard/dashboard_cards?observed_user_id=#{@cards_prefetch_observed_param}") %>
+    <% if !Account.site_admin.feature_enabled?(:dashboard_graphql_integration) %>
+      <%= prefetch_xhr("/api/v1/dashboard/dashboard_cards?observed_user_id=#{@cards_prefetch_observed_param}") %>
+    <% end %>
     <%= prefetch_xhr("/dashboard-sidebar?observed_user_id=#{@cards_prefetch_observed_param}") %>
   <% else %>
-    <%= prefetch_xhr("/api/v1/dashboard/dashboard_cards") %>
+    <% if !Account.site_admin.feature_enabled?(:dashboard_graphql_integration) %>
+      <%= prefetch_xhr("/api/v1/dashboard/dashboard_cards") %>
+    <% end %>
     <%= prefetch_xhr("/dashboard-sidebar") %>
   <% end %>
 <% end %>
