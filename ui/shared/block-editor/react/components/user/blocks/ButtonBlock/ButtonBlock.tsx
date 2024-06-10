@@ -22,7 +22,8 @@ import {ButtonBlockToolbar} from './ButtonBlockToolbar'
 import {getIcon} from '../../../../assets/icons'
 import {Button, CondensedButton} from '@instructure/ui-buttons'
 import {type ViewProps} from '@instructure/ui-view'
-import {getContrastingColor} from '../../../../utils'
+import {darken, lighten} from '@instructure/ui-color-utils'
+import {getContrastingColor, white} from '../../../../utils'
 import {isInstuiButtonColor} from './common'
 import type {InstuiButtonColor, ButtonSize, ButtonVariant, ButtonBlockProps} from './common'
 
@@ -70,11 +71,17 @@ const ButtonBlock = ({
     colorProp = color
   } else if (color) {
     if (!themeOverride.primaryColor) {
+      themeOverride.primaryBackground = color
       const primaryColor = getContrastingColor(color)
       themeOverride.primaryColor = primaryColor
+      if (themeOverride.primaryBackground) {
+        const hoverColor =
+          primaryColor === white
+            ? lighten(themeOverride.primaryBackground, 10)
+            : darken(themeOverride.primaryBackground, 10)
+        themeOverride.primaryHoverBackground = hoverColor
+      }
     }
-
-    themeOverride.primaryBackground = color
   }
 
   if (variant === 'condensed') {

@@ -38,6 +38,7 @@ export const HeroSection = ({background}: HeroSectionProps) => {
     'columns-section',
     'hero-section',
     'fixed',
+    'columns-2',
   ])
 
   const backgroundColor = background || HeroSection.craft.defaultProps.background
@@ -49,11 +50,7 @@ export const HeroSection = ({background}: HeroSectionProps) => {
   // Or maybe we don't want to let the user drop any new things in here and just edit
   // what's already there.
   return (
-    <Container
-      className={clazz}
-      style={{gridTemplateColumns: `1fr 1fr`}}
-      background={backgroundColor}
-    >
+    <Container className={clazz} background={backgroundColor}>
       <Element
         id={`${cid}_nosection1`}
         is={NoSections}

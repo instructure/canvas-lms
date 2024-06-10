@@ -44,54 +44,44 @@ const ResourceCard = ({id, title, description, iconName, linkText, linkUrl}: Res
   const [myLinkUrl] = useState(linkUrl || '')
 
   return (
-    <Container className="resource-card" id={myId}>
-      <div
-        style={{
-          backgroundColor: '#fff',
-          borderRadius: '15px',
-          border: '1px solid black',
-          width: '310px',
-          height: '250px',
-        }}
+    <Container className="resource-card" id={myId} background="#fff">
+      <Flex
+        direction="column"
+        justifyItems="center"
+        alignItems="center"
+        padding="medium"
+        height="100%"
+        gap="x-small"
       >
-        <Flex
-          direction="column"
-          justifyItems="center"
-          alignItems="center"
-          padding="medium"
-          height="100%"
-          gap="x-small"
-        >
-          <Element
-            id={`${myId}__icon`}
-            is={IconBlock}
-            iconName={myIcon}
-            custom={{displayName: 'Icon'}}
-          />
-          <Element
-            id={`${myId}__title`}
-            is={HeadingBlock}
-            text={myTitle}
-            level="h3"
-            custom={{displayName: 'Title'}}
-          />
-          <Element
-            id={`${myId}__desc`}
-            is={TextBlock}
-            text={myDescription}
-            textAlign="center"
-            custom={{displayName: 'Description'}}
-          />
-          <Element
-            id={`${myId}__link`}
-            is={ButtonBlock}
-            href={myLinkUrl}
-            color="#fff"
-            text={myLinkText}
-            custom={{displayName: 'Link'}}
-          />
-        </Flex>
-      </div>
+        <Element
+          id={`${myId}__icon`}
+          is={IconBlock}
+          iconName={myIcon}
+          custom={{displayName: 'Icon'}}
+        />
+        <Element
+          id={`${myId}__title`}
+          is={HeadingBlock}
+          text={myTitle}
+          level="h3"
+          custom={{displayName: 'Title'}}
+        />
+        <Element
+          id={`${myId}__desc`}
+          is={TextBlock}
+          text={myDescription}
+          textAlign="center"
+          custom={{displayName: 'Description'}}
+        />
+        <Element
+          id={`${myId}__link`}
+          is={ButtonBlock}
+          href={myLinkUrl}
+          color="#fff"
+          text={myLinkText}
+          custom={{displayName: 'Link'}}
+        />
+      </Flex>
     </Container>
   )
 }

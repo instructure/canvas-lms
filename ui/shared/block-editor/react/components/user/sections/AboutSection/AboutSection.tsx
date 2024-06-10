@@ -39,6 +39,7 @@ export const AboutSection = ({background}: AboutSectionProps) => {
     'columns-section',
     'about-section',
     'fixed',
+    'columns-2',
   ])
 
   const backgroundColor = background || AboutSection.craft.defaultProps.background
@@ -50,11 +51,7 @@ export const AboutSection = ({background}: AboutSectionProps) => {
   // Or maybe we don't want to let the user drop any new things in here and just edit
   // what's already there.
   return (
-    <Container
-      className={clazz}
-      style={{gridTemplateColumns: `1fr 1fr`}}
-      background={backgroundColor}
-    >
+    <Container className={clazz} background={backgroundColor}>
       <Element
         id={`${cid}_about-nosection1`}
         is={NoSections}

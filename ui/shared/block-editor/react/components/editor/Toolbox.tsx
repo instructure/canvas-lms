@@ -57,36 +57,26 @@ type ToolboxProps = {
 export const Toolbox = ({open, onClose}: ToolboxProps) => {
   const {connectors} = useEditor()
   const [activeTab, setActiveTab] = useState(1)
-  const [hasOpened, setHasOpened] = useState(false)
-  const trayRef = useRef<HTMLElement | null>(null)
+  const [trayRef, setTrayRef] = useState<HTMLElement | null>(null)
 
   useEffect(() => {
-    if (!hasOpened) return
+    // if (!hasOpened) return
 
-    let c = document.querySelector('[role="main"]') as HTMLElement | null
-    let target_w = 0
-    if (!c) return
+    if (open && trayRef) {
+      const ed = document.querySelector('.block-editor-editor') as HTMLElement | null
+      if (!ed) return
 
-    const margin =
-      window.getComputedStyle(c).direction === 'ltr'
-        ? document.body.getBoundingClientRect().right - c.getBoundingClientRect().right
-        : c.getBoundingClientRect().left
-
-    target_w = c.offsetWidth - (trayRef.current?.offsetWidth || 0) + margin
-
-    if (target_w >= 320 && target_w < c.offsetWidth) {
-      c.style.boxSizing = 'border-box'
-      c.style.width = `${target_w}px`
+      const ed_rect = ed.getBoundingClientRect()
+      const tray_left = window.innerWidth - trayRef.offsetWidth
+      if (ed_rect.right > tray_left) {
+        ed.style.width = `${ed_rect.width - (ed_rect.right - tray_left)}px`
+      }
+    } else {
+      const ed = document.querySelector('.block-editor-editor') as HTMLElement | null
+      if (!ed) return
+      ed.style.width = ''
     }
-
-    // setHidingTrayOnAction(target_w < 320)
-
-    return () => {
-      c = document.querySelector('[role="main"]')
-      if (!c) return
-      c.style.width = ''
-    }
-  }, [hasOpened])
+  }, [open, trayRef])
 
   const handleTabChange = useCallback(
     (
@@ -98,12 +88,7 @@ export const Toolbox = ({open, onClose}: ToolboxProps) => {
     []
   )
 
-  const handleOpenTray = useCallback(() => {
-    setHasOpened(true)
-  }, [])
-
   const handleCloseTray = useCallback(() => {
-    setHasOpened(false)
     onClose()
   }, [onClose])
 
@@ -131,12 +116,11 @@ export const Toolbox = ({open, onClose}: ToolboxProps) => {
 
   return (
     <Tray
-      contentRef={el => (trayRef.current = el)}
+      contentRef={el => setTrayRef(el)}
       label="Toolbox"
       open={open}
       placement="end"
       size="small"
-      onOpen={handleOpenTray}
       onClose={handleCloseTray}
     >
       <Flex direction="column" height={getTrayHeight()}>

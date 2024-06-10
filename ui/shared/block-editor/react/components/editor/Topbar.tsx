@@ -21,16 +21,18 @@ import React, {useCallback, useState} from 'react'
 import {useEditor} from '@craftjs/core'
 
 import {Button, IconButton} from '@instructure/ui-buttons'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {PreviewModal} from './PreviewModal'
 import {IconUndo, IconRedo} from '../../assets/internal-icons'
 
 type TopbarProps = {
-  onOpenToolbox: () => void
+  toolboxOpen: boolean
+  onToolboxChange: (open: boolean) => void
 }
 
-export const Topbar = ({onOpenToolbox}: TopbarProps) => {
+export const Topbar = ({toolboxOpen, onToolboxChange}: TopbarProps) => {
   const {canUndo, canRedo, actions, query} = useEditor((state, qry) => ({
     canUndo: qry.history.canUndo(),
     canRedo: qry.history.canRedo(),
@@ -45,6 +47,13 @@ export const Topbar = ({onOpenToolbox}: TopbarProps) => {
   const handleClosePreview = useCallback(() => {
     setPreviewOpen(false)
   }, [])
+
+  const handleToggleToolbox = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      onToolboxChange(e.target.checked)
+    },
+    [onToolboxChange]
+  )
 
   return (
     <View as="div" background="secondary">
@@ -73,10 +82,14 @@ export const Topbar = ({onOpenToolbox}: TopbarProps) => {
           </Flex>
         </Flex.Item>
         <Flex.Item>
-          <Button onClick={onOpenToolbox} margin="0 small 0 0" size="small" withBackground={false}>
-            Open Toolbox
-          </Button>
-          <Button
+          <Checkbox
+            label="Block Toolbox"
+            variant="toggle"
+            size="small"
+            checked={toolboxOpen}
+            onChange={handleToggleToolbox}
+          />
+          {/* <Button
             size="small"
             withBackground={false}
             onClick={() => {
@@ -84,7 +97,7 @@ export const Topbar = ({onOpenToolbox}: TopbarProps) => {
             }}
           >
             Serialize JSON to console
-          </Button>
+          </Button> */}
         </Flex.Item>
       </Flex>
       <PreviewModal open={previewOpen} onDismiss={handleClosePreview} />
