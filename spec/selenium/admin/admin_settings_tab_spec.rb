@@ -662,4 +662,22 @@ describe "admin settings tab" do
       expect(f(checkbox)).to be_disabled
     end
   end
+
+  context "Limited Access for Students" do
+    before do |test|
+      @account = Account.default
+      @current_user = @user
+      allow(@account).to receive(:grants_right?).with(@current_user, :manage_account_settings).and_return(true)
+      @account.enable_feature!(:allow_limited_access_for_students) if test.metadata[:enable_feature]
+      get "/accounts/#{Account.default.id}/settings"
+    end
+
+    it "displays enable_limited_access_for_students if feature flag is enabled", :enable_feature do
+      expect(f("#account_settings")).to contain_css("#account_settings_enable_limited_access_for_students")
+    end
+
+    it "does not display enable_limited_access_for_students if feature flag is disabled" do
+      expect(f("#account_settings")).not_to contain_css("#account_settings_enable_limited_access_for_students")
+    end
+  end
 end

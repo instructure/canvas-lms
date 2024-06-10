@@ -2026,7 +2026,8 @@ class AccountsController < ApplicationController
                                    :disable_inbox_signature_block_for_students,
                                    :enable_inbox_auto_response,
                                    :disable_inbox_auto_response_for_students,
-                                   :enable_name_pronunciation].freeze
+                                   :enable_name_pronunciation,
+                                   :enable_limited_access_for_students].freeze
 
   def permitted_account_attributes
     [:name,
