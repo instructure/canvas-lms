@@ -31,7 +31,7 @@ GEM
     sqlite3 (1.7.3-arm64-darwin)
     sqlite3 (1.7.3-x86_64-darwin)
     sqlite3 (1.7.3-x86_64-linux)
-    will_paginate (4.0.0)
+    will_paginate (4.0.1)
 
 PLATFORMS
   aarch64-linux
