@@ -95,7 +95,7 @@ GEM
     digest-murmurhash (1.1.1)
     drb (2.2.1)
     erubi (1.12.0)
-    faraday (2.9.0)
+    faraday (2.9.1)
       faraday-net_http (>= 2.0, < 3.2)
     faraday-follow_redirects (0.3.0)
       faraday (>= 1, < 3)
