@@ -42,7 +42,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.1)
-    timecop (0.9.8)
+    timecop (0.9.9)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
 
