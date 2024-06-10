@@ -189,8 +189,10 @@ module AssignmentVisibility
       private
 
       def assignments_visible_to_students(course_id_params: nil, user_id_params: nil, assignment_id_params: nil)
-        if course_id_params.nil? && user_id_params.nil? && assignment_id_params.nil?
-          raise ArgumentError, "at least one non nil course_id, user_id, or assignment_id is required (for query performance reasons)"
+        # Must have a course_id or assignment_id for performance of the all_tags section of the query
+        # General query performance requires at least one non-nil course_id, assignment_id, or user_id
+        if course_id_params.nil? && assignment_id_params.nil?
+          raise ArgumentError, "at least one non nil course_id or assignment_id is required (for query performance reasons)"
         end
 
         visible_assignments = []

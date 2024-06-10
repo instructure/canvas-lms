@@ -26,7 +26,14 @@ describe AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepositor
       expect do
         AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
           .find_assignments_visible_to_everyone(course_id_params: nil, user_id_params: nil, assignment_id_params: nil)
-      end.to raise_error(ArgumentError, "AssignmentsVisibleToStudents must have a limiting where clause of at least one course_id, user_id, or assignment_id (for performance reasons)")
+      end.to raise_error(ArgumentError, "AssignmentsVisibleToStudents must have a limiting where clause of at least one course_id or assignment_id (for performance reasons)")
+    end
+
+    it "raises error if called with no course or assignment parameters" do
+      expect do
+        AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository
+          .find_assignments_visible_to_everyone(course_id_params: nil, user_id_params: [1], assignment_id_params: nil)
+      end.to raise_error(ArgumentError, "AssignmentsVisibleToStudents must have a limiting where clause of at least one course_id or assignment_id (for performance reasons)")
     end
   end
 end
