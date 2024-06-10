@@ -21,12 +21,11 @@ module AssignmentVisibility
   module Repositories
     class AssignmentVisibleToStudentRepository
       class << self
-        # NOTE: context module has a pretty different function for a few of the functions implemented here
-
         # if only_visible_to_overrides is false, or there's related modules with no overrides, then everyone can see it
         def find_assignments_visible_to_everyone(course_id_params:, user_id_params:, assignment_id_params:)
           filter_condition_sql = filter_condition_sql(course_id_params:, user_id_params:, assignment_id_params:)
           query_sql = <<~SQL.squish
+            WITH #{assignment_module_items_cte_sql(course_id_params:, assignment_id_params:)}
 
             #{assignment_select_sql}
 
@@ -52,6 +51,8 @@ module AssignmentVisibility
         def find_assignments_visible_to_sections(course_id_params:, user_id_params:, assignment_id_params:)
           filter_condition_sql = filter_condition_sql(course_id_params:, user_id_params:, assignment_id_params:)
           query_sql = <<~SQL.squish
+            WITH #{assignment_module_items_cte_sql(course_id_params:, assignment_id_params:)}
+
             #{assignment_select_sql}
 
             /* join active student enrollments */
@@ -115,6 +116,8 @@ module AssignmentVisibility
         def find_assignments_visible_to_adhoc_overrides(course_id_params:, user_id_params:, assignment_id_params:)
           filter_condition_sql = filter_condition_sql(course_id_params:, user_id_params:, assignment_id_params:)
           query_sql = <<~SQL.squish
+            WITH #{assignment_module_items_cte_sql(course_id_params:, assignment_id_params:)}
+
             #{assignment_select_sql}
 
             /* join active student enrollments */
@@ -167,24 +170,11 @@ module AssignmentVisibility
             /* join active student enrollments */
             #{VisibilitySqlHelper.enrollment_join_sql}
 
-            INNER JOIN #{AssignmentOverride.quoted_table_name} ao
-              ON o.id = ao.assignment_id
-              AND ao.set_type = 'Group'
-
-            INNER JOIN #{Group.quoted_table_name} g
-              ON g.id = ao.set_id
-
-            INNER JOIN #{GroupMembership.quoted_table_name} gm
-              ON gm.group_id = g.id
-              AND gm.user_id = e.user_id
+            /* join assignment group overrides */
+            #{assignment_group_override_join_sql}
 
             /* filtered to course_id, user_id, assignment_id, and additional conditions */
-            WHERE #{filter_condition_sql}
-              AND gm.workflow_state <> 'deleted'
-              AND g.workflow_state <> 'deleted'
-              AND ao.workflow_state = 'active'
-              AND o.workflow_state NOT IN ('deleted','unpublished')
-              AND o.only_visible_to_overrides = 'true'
+            #{assignment_group_override_filter_sql(filter_condition_sql:)}
           SQL
 
           query_params = query_params(course_id_params:, user_id_params:, assignment_id_params:)
@@ -217,6 +207,10 @@ module AssignmentVisibility
         # Create a filter clause SQL from the params - something like: e.user_id IN ['1', '2'] AND course_id = '20'
         # Note that at least one of the params must be non nil
         def filter_condition_sql(course_id_params: nil, user_id_params: nil, assignment_id_params: nil)
+          unless assignment_id_params || course_id_params
+            raise ArgumentError, "AssignmentsVisibleToStudents must have a limiting where clause of at least one course_id or assignment_id (for performance reasons)"
+          end
+
           query_conditions = []
 
           if assignment_id_params
@@ -243,16 +237,12 @@ module AssignmentVisibility
                                 end
           end
 
-          if query_conditions.empty?
-            raise ArgumentError, "AssignmentsVisibleToStudents must have a limiting where clause of at least one course_id, user_id, or assignment_id (for performance reasons)"
-          end
-
           query_conditions.join(" AND ")
         end
 
         # assignments utilize a CTE which gathers associated content tags since their tags can come directly
         # from the assignment or from the assignment's associated objects
-        def assignment_module_items_cte_sql
+        def assignment_module_items_cte_sql(course_id_params: nil, assignment_id_params: nil)
           <<~SQL.squish
             assignment_tags AS (
                      SELECT
@@ -261,9 +251,10 @@ module AssignmentVisibility
                      FROM
                          #{ContentTag.quoted_table_name} AS t
                      WHERE
-                         t.content_type = 'Assignment' AND
-                         t.tag_type = 'context_module' AND
-                         t.workflow_state <> 'deleted'
+                         #{all_tags_filter_condition_sql(tag_type: "assignment", course_id_params:, assignment_id_params:)}
+                         AND t.content_type = 'Assignment'
+                         AND t.tag_type = 'context_module'
+                         AND t.workflow_state <> 'deleted'
                  ), quiz_tags AS (
                      SELECT
                          q.assignment_id,
@@ -273,9 +264,10 @@ module AssignmentVisibility
                          JOIN #{ContentTag.quoted_table_name} AS qt ON qt.content_id = q.id AND
                          qt.content_type = 'Quizzes::Quiz'
                      WHERE
-                         qt.tag_type = 'context_module' AND
-                         qt.workflow_state <> 'deleted' AND
-                         q.assignment_id IS NOT NULL
+                         #{all_tags_filter_condition_sql(tag_type: "quiz", course_id_params:, assignment_id_params:)}
+                         AND qt.tag_type = 'context_module'
+                         AND qt.workflow_state <> 'deleted'
+                         AND q.assignment_id IS NOT NULL
                  ), discussion_topic_tags AS (
                      SELECT
                          d.assignment_id,
@@ -285,9 +277,10 @@ module AssignmentVisibility
                          JOIN #{ContentTag.quoted_table_name} AS dt ON dt.content_id = d.id AND
                          dt.content_type = 'DiscussionTopic'
                      WHERE
-                         dt.tag_type = 'context_module' AND
-                         dt.workflow_state <> 'deleted' AND
-                         d.assignment_id IS NOT NULL
+                         #{all_tags_filter_condition_sql(tag_type: "discussion", course_id_params:, assignment_id_params:)}
+                         AND dt.tag_type = 'context_module'
+                         AND dt.workflow_state <> 'deleted'
+                         AND d.assignment_id IS NOT NULL
                  ), wiki_pages_tags AS (
                      SELECT
                          p.assignment_id,
@@ -297,9 +290,10 @@ module AssignmentVisibility
                          JOIN #{ContentTag.quoted_table_name} AS pt ON pt.content_id = p.id AND
                          pt.content_type = 'WikiPage'
                      WHERE
-                         pt.tag_type = 'context_module' AND
-                         pt.workflow_state <> 'deleted' AND
-                         p.assignment_id IS NOT NULL
+                         #{all_tags_filter_condition_sql(tag_type: "page", course_id_params:, assignment_id_params:)}
+                         AND pt.tag_type = 'context_module'
+                         AND pt.workflow_state <> 'deleted'
+                         AND p.assignment_id IS NOT NULL
                  ), all_tags AS (
                      ( SELECT * FROM assignment_tags)
                      UNION
@@ -314,9 +308,6 @@ module AssignmentVisibility
 
         def assignment_select_sql
           <<~SQL.squish
-            /* CTE for assignment / context module relationship */
-            WITH #{assignment_module_items_cte_sql}
-
             SELECT DISTINCT o.id as assignment_id,
                                     e.user_id as user_id,
                                                  e.course_id as course_id
@@ -336,6 +327,54 @@ module AssignmentVisibility
               ON m.id = t.context_module_id
               AND m.workflow_state<>'deleted'
           SQL
+        end
+
+        def assignment_group_override_join_sql
+          <<~SQL.squish
+            INNER JOIN #{AssignmentOverride.quoted_table_name} ao
+              ON o.id = ao.assignment_id
+              AND ao.set_type = 'Group'
+            INNER JOIN #{Group.quoted_table_name} g
+              ON g.id = ao.set_id
+            INNER JOIN #{GroupMembership.quoted_table_name} gm
+              ON gm.group_id = g.id
+              AND gm.user_id = e.user_id
+          SQL
+        end
+
+        def assignment_group_override_filter_sql(filter_condition_sql:)
+          <<~SQL.squish
+            WHERE #{filter_condition_sql}
+            AND gm.workflow_state <> 'deleted'
+            AND g.workflow_state <> 'deleted'
+            AND ao.workflow_state = 'active'
+            AND o.workflow_state NOT IN ('deleted','unpublished')
+            AND o.only_visible_to_overrides = 'true'
+          SQL
+        end
+
+        # create the right where filter for each type of content_tag based on given course_ids or assignment_ids
+        def all_tags_filter_condition_sql(tag_type:, course_id_params:, assignment_id_params:)
+          unless assignment_id_params || course_id_params
+            raise ArgumentError, "AssignmentsVisibleToStudents must have a limiting where clause of at least one course_id or assignment_id (for performance reasons)"
+          end
+
+          query_conditions = []
+
+          case tag_type
+          when "assignment"
+            content_id_field = assignment_id_params.is_a?(Array) ? "IN (:assignment_id)" : "= :assignment_id"
+            context_id_field = course_id_params.is_a?(Array) ? "IN (:course_id)" : "= :course_id"
+            query_conditions << "t.content_id #{content_id_field}" if assignment_id_params
+            query_conditions << "t.context_id #{context_id_field}" if course_id_params
+          when "quiz", "discussion", "page"
+            assignment_id_field = "#{tag_type[0]}." + (assignment_id_params.is_a?(Array) ? "assignment_id IN (:assignment_id)" : "assignment_id = :assignment_id")
+            context_id_field = "#{tag_type[0]}t.context_id " + (course_id_params.is_a?(Array) ? "IN (:course_id)" : "= :course_id")
+            query_conditions << assignment_id_field if assignment_id_params
+            query_conditions << context_id_field if course_id_params
+          end
+
+          query_conditions.join(" AND ")
         end
       end
     end
