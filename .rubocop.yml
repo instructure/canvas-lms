@@ -3,6 +3,8 @@ require:
   - rubocop-graphql
   - rubocop-rails
   - rubocop-rake
+  - rubocop-rspec
+  #- rubocop-rspec_rails
   # this odd relative path is so that rubocop works when run without "bundle
   # exec", such as from most editors/IDEs.
   - ./gems/rubocop-canvas/lib/rubocop_canvas
@@ -18,9 +20,6 @@ AllCops:
 
 Bundler:
   Severity: error
-
-Capybara:
-  Enabled: false # we don't use capybara (it's automatically included by rubocop-rspec until they hit 3.0)
 
 FactoryBot:
   Severity: error
@@ -144,8 +143,6 @@ RSpec:
   Severity: error
 RSpec/AnyInstance:
   Enabled: false # while using an instance double would be preferable, it's a pain
-RSpec/FilePath:
-  Enabled: false # superceded by RSpec/SpecFilePathSuffix and RSpec/SpecFilePathFormat
 RSpec/IndexedLet:
   Enabled: false
 RSpec/InstanceVariable:
@@ -155,11 +152,8 @@ RSpec/MultipleMemoizedHelpers:
 RSpec/SubjectStub:
   Enabled: false # yes, canvas is big and complicated sometimes
 
-RSpec/Capybara:
-  Enabled: false # we don't use capybara
-
-RSpec/Rails:
-  Severity: error
+#RSpec/Rails:
+#  Severity: error
 
 Security:
   Severity: error
