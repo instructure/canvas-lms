@@ -55,8 +55,8 @@ GEM
       uri
     public_suffix (5.0.5)
     rake (13.2.1)
-    rexml (3.2.8)
-      strscan (>= 3.0.9)
+    rexml (3.2.9)
+      strscan
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
