@@ -154,7 +154,7 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
             <GenericErrorPage
               imageUrl={errorShipUrl}
               errorSubject={I18n.t('LTI Registrations listing error')}
-              error={apps.message}
+              errorMessage={apps.message}
             />
           )
         } else if ('items' in apps && typeof apps.items !== 'undefined') {

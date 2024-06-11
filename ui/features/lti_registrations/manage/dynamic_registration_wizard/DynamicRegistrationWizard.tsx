@@ -19,6 +19,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import React from 'react'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import type {AccountId} from '../model/AccountId'
 import {mkUseDynamicRegistrationWizardState} from './DynamicRegistrationWizardState'
 import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
@@ -30,6 +31,7 @@ import {PermissionConfirmation} from './components/PermissionConfirmation'
 import {PrivacyConfirmation} from './components/PrivacyConfirmation'
 import {PlacementsConfirmation} from './components/PlacementsConfirmation'
 import {NamingConfirmation} from './components/NamingConfirmation'
+import GenericErrorPage from '@canvas/generic-error-page/react'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -295,7 +297,12 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
     case 'Error':
       return (
         <div>
-          Error <pre>{state.error instanceof Error ? state.error.message : state.error}</pre>
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            errorSubject={I18n.t('Dynamic Registration error')}
+            errorCategory="Dynamic Registration"
+            errorMessage={state.message}
+          />
         </div>
       )
   }
