@@ -27,7 +27,6 @@ import {
   IconTextBackgroundColorLine,
   IconButtonAndIconMakerLine,
   IconBoxLine,
-  IconImageLine,
 } from '@instructure/ui-icons'
 
 import {LinkModal} from '../../../editor/LinkModal'
@@ -35,7 +34,7 @@ import {ColorModal} from './ColorModal'
 
 import {isInstuiButtonColor} from './common'
 import type {ButtonBlockProps, ButtonSize, ButtonVariant} from './common'
-import {ButtonIconPopup} from './ButtonIconPopup'
+import {IconPopup} from '../../common/IconPopup'
 
 const ButtonBlockToolbar = () => {
   const {
@@ -46,8 +45,6 @@ const ButtonBlockToolbar = () => {
   }))
   const [linkModalOpen, setLinkModalOpen] = useState(false)
   const [colorModalOpen, setColorModalOpen] = useState(false)
-  const [iconPopupOpen, setIconPopupOpen] = useState(false)
-  const buttonIconPopupRef = useRef<HTMLButtonElement | null>(null)
 
   const handleSizeChange = useCallback(
     (
@@ -109,10 +106,6 @@ const ButtonBlockToolbar = () => {
     },
     [setProp]
   )
-
-  const handleCloseButtonIconPopup = useCallback(() => {
-    setIconPopupOpen(false)
-  }, [])
 
   return (
     <Flex gap="small">
@@ -191,7 +184,7 @@ const ButtonBlockToolbar = () => {
         <IconTextBackgroundColorLine size="x-small" />
       </IconButton>
 
-      <ButtonIconPopup />
+      <IconPopup />
 
       <LinkModal
         open={linkModalOpen}

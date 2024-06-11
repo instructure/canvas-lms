@@ -21,6 +21,7 @@ import {Element, useEditor, useNode, type Node} from '@craftjs/core'
 import {Container} from '../../blocks/Container'
 import {ButtonBlock} from '../../blocks/ButtonBlock'
 import {useClassNames, getContrastingColor} from '../../../../utils'
+import {SectionMenu} from '../../../editor/SectionMenu'
 
 export type NavigationSectionInnerProps = {
   children?: React.ReactNode
@@ -50,6 +51,9 @@ NavigationSectionInner.craft = {
     canMoveOut: (outgoingNodes: Node[], currentNode: Node) => {
       return currentNode.data.nodes.length > outgoingNodes.length
     },
+  },
+  custom: {
+    noToolbar: true,
   },
 }
 
@@ -112,11 +116,15 @@ const NavigationSection = ({background}: NavigationSectionProps) => {
 }
 
 NavigationSection.craft = {
+  displayName: 'Navigation',
   defaultProps: {
     background: '#334870',
   },
   custom: {
     isSection: true,
+  },
+  related: {
+    sectionMenu: SectionMenu,
   },
 }
 

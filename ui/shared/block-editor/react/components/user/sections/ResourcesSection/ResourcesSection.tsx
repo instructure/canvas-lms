@@ -22,6 +22,7 @@ import {uid} from '@instructure/uid'
 
 import {Container} from '../../blocks/Container'
 import {ResourceCard} from '../../blocks/ResourceCard'
+import {SectionMenu} from '../../../editor/SectionMenu'
 
 type ResourcesSectionInnerProps = {
   children: React.ReactNode
@@ -104,6 +105,9 @@ ResourcesSection.craft = {
   displayName: 'Highlights or services',
   custom: {
     isSection: true,
+  },
+  related: {
+    sectionMenu: SectionMenu,
   },
 }
 

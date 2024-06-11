@@ -37,6 +37,7 @@ import {ImageBlock, ImageBlockIcon} from '../user/blocks/ImageBlock'
 import {IconBlock, IconBlockIcon} from '../user/blocks/IconBlock'
 import {SVGImageBlock, SVGImageBlockIcon} from '../user/blocks/SVGImageBlock'
 import {IframeBlock, IframeBlockIcon} from '../user/blocks/IframeBlock'
+import {RCEBlock, RCEBlockIcon} from '../user/blocks/RCEBlock'
 // import {Card} from '../user/Card'
 
 import {ResourcesSection, ResourcesSectionIcon} from '../user/sections/ResourcesSection'
@@ -46,6 +47,7 @@ import {NavigationSection, NavigationSectionIcon} from '../user/sections/Navigat
 import {AboutSection, AboutSectionIcon} from '../user/sections/AboutSection'
 import {QuizSection, QuizSectionIcon} from '../user/sections/QuizSection'
 import {FooterSection, FooterSectionIcon} from '../user/sections/FooterSection'
+import {BlankSection, BlankSectionIcon} from '../user/sections/BlankSection'
 
 import {getTrayHeight} from '../../utils'
 
@@ -147,6 +149,7 @@ export const Toolbox = ({open, onClose}: ToolboxProps) => {
                 */}
                 {renderBox('Button', ButtonBlockIcon, <ButtonBlock text="Click me" />)}
                 {renderBox('Text', TextBlockIcon, <TextBlock text="" />)}
+                {renderBox('RCE', RCEBlockIcon, <RCEBlock text="" />)}
                 {renderBox(
                   'Container',
                   ContainerIcon,
@@ -175,6 +178,7 @@ export const Toolbox = ({open, onClose}: ToolboxProps) => {
                   ColumnsSectionIcon,
                   <ColumnsSection columns={2} variant="fixed" />
                 )}
+                {renderBox('Blank', BlankSectionIcon, <BlankSection />)}
                 {renderBox('Hero', ImageBlockIcon, <HeroSection />)}
                 {renderBox('Navigation', NavigationSectionIcon, <NavigationSection />)}
                 {renderBox('About', AboutSectionIcon, <AboutSection />)}

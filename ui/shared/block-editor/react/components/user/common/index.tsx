@@ -16,11 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {IconBlock} from './IconBlock'
-import {IconBlockSettings} from './IconBlockToolbar'
-import {IconPicker} from './IconPicker'
-import {IconLikeLine} from '@instructure/ui-icons/es/svg'
+import {NoSections} from './NoSections'
+import {IconPopup} from './IconPopup'
 
-const IconBlockIcon = IconLikeLine?.src
-
-export {IconBlock, IconBlockSettings, IconPicker, IconBlockIcon}
+export {NoSections, IconPopup}

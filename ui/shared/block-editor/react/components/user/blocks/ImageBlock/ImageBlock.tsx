@@ -16,15 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {useNode} from '@craftjs/core'
+import React, {useCallback} from 'react'
+import {useEditor, useNode} from '@craftjs/core'
 
 import {Img} from '@instructure/ui-img'
 
 import {ImageBlockToolbar} from './ImageBlockToolbar'
-
-const GREY_PIXEL =
-  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wcAAwAB/duMYYsAAAAASUVORK5CYII='
 
 export type ImageConstraint = 'cover' | 'contain'
 export type ImageVariant = 'default' | 'hero'
@@ -42,21 +39,32 @@ const ImageBlock = ({src, width, height, constraint}: ImageBlockProps) => {
     connectors: {connect, drag},
   } = useNode()
 
-  return (
-    <Img
-      elementRef={el => el && connect(drag(el as HTMLImageElement))}
-      src={src || ImageBlock.craft.defaultProps.imageSrc}
-      constrain={constraint || ImageBlock.craft.defaultProps.constraint}
-      width={width}
-      height={height}
-    />
-  )
+  const handleGetImage = useCallback(() => {
+    console.log('Get Image')
+  }, [])
+
+  if (!src) {
+    return (
+      <div className="image-block__empty" ref={el => el && connect(drag(el as HTMLImageElement))} />
+    )
+  } else {
+    return (
+      <Img
+        display="inline-block"
+        elementRef={el => el && connect(drag(el as HTMLImageElement))}
+        src={src || ImageBlock.craft.defaultProps.imageSrc}
+        constrain={constraint || ImageBlock.craft.defaultProps.constraint}
+        width={width}
+        height={height}
+      />
+    )
+  }
 }
 
 ImageBlock.craft = {
   displayName: 'Image',
   defaultProps: {
-    imageSrc: GREY_PIXEL,
+    imageSrc: '',
     variant: 'default' as ImageVariant,
     constraint: 'cover' as ImageConstraint,
   },

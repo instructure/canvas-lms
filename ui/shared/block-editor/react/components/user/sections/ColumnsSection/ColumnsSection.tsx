@@ -20,9 +20,11 @@ import React, {useState} from 'react'
 import {Element, useEditor} from '@craftjs/core'
 
 import {Container} from '../../blocks/Container'
-import {NoSections, type ColumnsSectionVariant} from './NoSections'
+import {NoSections} from '../../common'
 import {ColumnsSectionToolbar} from './ColumnsSectionToolbar'
 import {useClassNames} from '../../../../utils'
+import {SectionMenu} from '../../../editor/SectionMenu'
+import {type ColumnsSectionVariant} from './types'
 
 type ColumnsSectionProps = {
   columns: number
@@ -43,7 +45,7 @@ export const ColumnsSection = ({columns = 2, variant = 'fixed'}: ColumnsSectionP
 
   const renderCols = () => {
     if (variant === 'fixed') {
-      const cols = []
+      const cols: JSX.Element[] = []
       for (let i = 0; i < columns; i++) {
         cols.push(
           <Element
@@ -51,24 +53,13 @@ export const ColumnsSection = ({columns = 2, variant = 'fixed'}: ColumnsSectionP
             id={`${cid}-${i}`}
             is={NoSections}
             canvas={true}
-            columns={columns}
-            variant="fixed"
             className="columns-section__inner"
           />
         )
       }
       return cols
     } else {
-      return (
-        <Element
-          id={cid}
-          is={NoSections}
-          canvas={true}
-          columns={columns}
-          variant="fluid"
-          className="columns-section__inner"
-        />
-      )
+      return <Element id={cid} is={NoSections} canvas={true} className="columns-section__inner" />
     }
   }
 
@@ -86,5 +77,6 @@ ColumnsSection.craft = {
   },
   related: {
     toolbar: ColumnsSectionToolbar,
+    sectionMenu: SectionMenu,
   },
 }

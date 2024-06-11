@@ -21,8 +21,14 @@ import {useNode} from '@craftjs/core'
 import {validateSVG} from '../../../../utils'
 import {SVGImageToolbar} from './SVGImageToolbar'
 
-const DEFAULT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="50" height="16" viewBox="0 0 50 16">
-<text x="0" y="16" font-size="16">SVG</text>
+const DEFAULT_SVG = `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <pattern id="striped-pattern" patternUnits="userSpaceOnUse" width="20" height="20" patternTransform="rotate(45)">
+    <rect width="10" height="20" fill="#f5f5f5"></rect>
+    <rect x="10" width="10" height="20" fill="#a5a5a5"></rect>
+  </pattern>
+</defs>
+<rect width="100%" height="100%" fill="url(#striped-pattern)"></rect>
 </svg>`
 
 type SVGImageBlockProps = {
@@ -50,6 +56,7 @@ const SVGImageBlock = ({
 
   return (
     <div
+      className="svg-image-block"
       style={{color, width: width || 'auto', height: height || 'auto'}}
       ref={ref => ref && connect(drag(ref))}
       dangerouslySetInnerHTML={{__html: svg}}
