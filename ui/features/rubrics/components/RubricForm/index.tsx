@@ -253,8 +253,8 @@ export const RubricForm = ({
         const newOutcomeCriteria = {
           id: Date.now().toString(),
           points: outcomeData.attributes.points_possible,
-          description: stripPTags(outcomeData.attributes.description),
-          longDescription: '',
+          description: outcomeData.outcomeLink.outcome.title,
+          longDescription: stripPTags(outcomeData.attributes.description),
           outcome: {
             displayName: outcomeData.attributes.display_name,
             title: outcomeData.outcomeLink.outcome.title,

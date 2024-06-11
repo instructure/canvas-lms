@@ -23,6 +23,7 @@ import {Flex} from '@instructure/ui-flex'
 import {RatingButton} from './RatingButton'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {escapeNewLineText} from './utils/rubricUtils'
 
 const {licorice} = colors
 
@@ -88,7 +89,10 @@ export const VerticalButtonDisplay = ({
                       </Text>
                     </View>
                     <View as="div" display="block">
-                      <Text size="x-small">{rating.longDescription}</Text>
+                      <Text
+                        size="x-small"
+                        dangerouslySetInnerHTML={escapeNewLineText(rating.longDescription)}
+                      />
                     </View>
                   </View>
                 ) : (

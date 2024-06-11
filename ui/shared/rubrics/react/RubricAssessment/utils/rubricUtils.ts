@@ -16,7 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './RubricAssessmentTray'
-export * from './RubricAssessmentContainer'
-export * from './TraditionalView'
-export * from './utils/rubricUtils'
+import htmlEscape from '@instructure/html-escape'
+import type {RubricCriterion} from '../../types/rubric'
+
+export const htmlEscapeCriteriaLongDescription = (criteria: RubricCriterion) => {
+  const {longDescription} = criteria
+
+  return {
+    __html: longDescription ?? '',
+  }
+}
+
+export const escapeNewLineText = (text: string) => {
+  return {
+    __html: htmlEscape(text ?? '').replace(/\n/g, '<br />'),
+  }
+}
