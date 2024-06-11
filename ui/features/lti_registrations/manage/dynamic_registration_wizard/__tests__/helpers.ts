@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {LtiPlacement} from '../../model/LtiPlacement'
 import {ZLtiRegistrationId} from '../../model/LtiRegistrationId'
 import {LtiScopes} from '../../model/LtiScope'
 import {ZDeveloperKeyId} from '../../model/developer_key/DeveloperKeyId'
@@ -84,7 +85,7 @@ export const mockRegistration = (
   ...reg,
 })
 
-export const mockConfigWithPlacements = (placements: string[]): Partial<LtiConfiguration> => {
+export const mockConfigWithPlacements = (placements: LtiPlacement[]): Partial<LtiConfiguration> => {
   return {
     extensions: [
       {

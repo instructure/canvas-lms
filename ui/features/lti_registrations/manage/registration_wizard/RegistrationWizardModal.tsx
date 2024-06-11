@@ -31,13 +31,17 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {ProgressBar} from '@instructure/ui-progress'
 import {DynamicRegistrationWizard} from '../dynamic_registration_wizard/DynamicRegistrationWizard'
-import type {AccountId} from '../model/AccountId'
+import {ZAccountId, type AccountId} from '../model/AccountId'
 import {
   fetchRegistrationToken,
   getRegistrationByUUID,
   updateRegistrationOverlay,
 } from '../api/ltiImsRegistration'
-import {deleteDeveloperKey, updateDeveloperKeyWorkflowState} from '../api/developerKey'
+import {
+  deleteDeveloperKey,
+  updateAdminNickname,
+  updateDeveloperKeyWorkflowState,
+} from '../api/developerKey'
 import type {DynamicRegistrationWizardService} from '../dynamic_registration_wizard/DynamicRegistrationWizardService'
 
 const I18n = useI18nScope('lti_registrations')
@@ -72,6 +76,7 @@ export const RegistrationWizardModal = (props: RegistrationWizardModalProps) => 
         }}
         margin="0 0 small"
       />
+
       <ModalBodyWrapper state={state} accountId={props.accountId} />
     </Modal>
   )
@@ -82,6 +87,7 @@ const dynamicRegistrationWizardService: DynamicRegistrationWizardService = {
   fetchRegistrationToken,
   getRegistrationByUUID,
   updateDeveloperKeyWorkflowState,
+  updateAdminNickname,
   updateRegistrationOverlay,
 }
 

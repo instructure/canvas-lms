@@ -23,6 +23,7 @@ import type {ManageSearchParams} from './ManageSearchParams'
 import type {FetchRegistrations, DeleteRegistration} from '../../api/registrations'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {genericError} from '../../../common/lib/apiResult/ApiResult'
+import type {AccountId} from '../../model/AccountId'
 
 export const MANAGE_APPS_PAGE_LIMIT = 15
 
@@ -80,8 +81,8 @@ const LIMIT = 15
  */
 export const mkUseManagePageState =
   (apiFetchRegistrations: FetchRegistrations, apiDeleteRegistration: DeleteRegistration) =>
-  (params: ManageSearchParams) => {
-    const {q, sort, dir, page} = params
+  (params: ManageSearchParams & {accountId: AccountId}) => {
+    const {accountId, q, sort, dir, page} = params
     const [state, setState] = React.useState<ManagePageLoadingState>({
       _type: 'not_requested',
     })
@@ -100,10 +101,11 @@ export const mkUseManagePageState =
       }))
 
       return apiFetchRegistrations({
+        accountId,
         sort,
         dir,
         query: q || '',
-        offset: (page - 1) * LIMIT,
+        page,
         limit: LIMIT,
       })
         .then(result => {
@@ -131,7 +133,7 @@ export const mkUseManagePageState =
             message: I18n.t(`Error retrieving registrations`),
           })
         })
-    }, [sort, dir, q, page])
+    }, [accountId, sort, dir, q, page])
 
     // Refresh whenever search params (and thus refreshRef.current) change
     React.useEffect(() => {

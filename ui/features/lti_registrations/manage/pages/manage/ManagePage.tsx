@@ -37,6 +37,7 @@ import {type ManageSearchParams, useManageSearchParams} from './ManageSearchPara
 import {formatSearchParamErrorMessages} from '../../../common/lib/useZodParams/ParamsParseResult'
 import type {LtiRegistration} from '../../model/LtiRegistration'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {ZAccountId, type AccountId} from '../../model/AccountId'
 
 const SEARCH_DEBOUNCE_MS = 250
 
@@ -44,8 +45,9 @@ const I18n = useI18nScope('lti_registrations')
 
 export const ManagePage = () => {
   const [searchParams] = useManageSearchParams()
+  const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
   return searchParams.success ? (
-    <ManagePageInner searchParams={searchParams.value} />
+    <ManagePageInner searchParams={searchParams.value} accountId={accountId} />
   ) : (
     <GenericErrorPage
       imageUrl={errorShipUrl}
@@ -57,6 +59,7 @@ export const ManagePage = () => {
 }
 
 type ManagePageInnerProps = {
+  accountId: AccountId
   searchParams: ManageSearchParams
 }
 
@@ -77,7 +80,10 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
 
   const [, setManageSearchParams] = useManageSearchParams()
 
-  const [apps, {setStale, deleteRegistration}] = useManagePageState(props.searchParams)
+  const [apps, {setStale, deleteRegistration}] = useManagePageState({
+    ...props.searchParams,
+    accountId: props.accountId,
+  })
 
   /**
    * Holds the state of the search input field
