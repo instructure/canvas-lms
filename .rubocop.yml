@@ -278,8 +278,6 @@ Rails/Date:
   AutoCorrect: false
 Rails/DeprecatedActiveModelErrorsMethods:
   AutoCorrect: false
-Rails/DuplicateAssociation:
-  AutoCorrect: false
 Rails/EagerEvaluationLogMessage:
   Severity: convention
   AutoCorrect: false
