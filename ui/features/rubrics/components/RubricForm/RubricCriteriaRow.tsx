@@ -19,8 +19,8 @@
 import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
-import {possibleString} from '@canvas/rubrics/react/Points'
-import {escapeNewLineText} from '@canvas/rubrics/react/RubricAssessment'
+import {possibleString, possibleStringRange} from '@canvas/rubrics/react/Points'
+import {escapeNewLineText, rangingFrom} from '@canvas/rubrics/react/RubricAssessment'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
@@ -214,7 +214,10 @@ export const RubricCriteriaRow = ({
                 )}
               </Flex.Item>
             </Flex>
-            <RatingScaleAccordion ratings={criterion.ratings} />
+            <RatingScaleAccordion
+              ratings={criterion.ratings}
+              criterionUseRange={criterion.criterionUseRange}
+            />
             <View
               as="hr"
               margin="medium 0 medium 0"
@@ -233,14 +236,15 @@ export const RubricCriteriaRow = ({
 
 type RatingScaleAccordionProps = {
   ratings: RubricRating[]
+  criterionUseRange: boolean
 }
-const RatingScaleAccordion = ({ratings}: RatingScaleAccordionProps) => {
+const RatingScaleAccordion = ({ratings, criterionUseRange}: RatingScaleAccordionProps) => {
   const [ratingsOpen, setRatingsOpen] = useState(false)
 
   return (
     <View
       as="div"
-      padding="medium 0 0 large"
+      padding="small 0 0 large"
       themeOverride={{paddingMedium: '1.5rem', paddingLarge: '3.35rem'}}
     >
       <View
@@ -271,6 +275,7 @@ const RatingScaleAccordion = ({ratings}: RatingScaleAccordionProps) => {
         ratings.map((rating, index) => {
           const scale = ratings.length - (index + 1)
           const spacing = index === 0 ? '1.5rem' : '2.25rem'
+          const min = criterionUseRange ? rangingFrom(ratings, index) : undefined
           return (
             <RatingScaleAccordionItem
               rating={rating}
@@ -278,6 +283,7 @@ const RatingScaleAccordion = ({ratings}: RatingScaleAccordionProps) => {
               key={`rating-scale-item-${rating.id}-${index}`}
               scale={scale}
               spacing={spacing}
+              min={min}
             />
           )
         })}
@@ -289,8 +295,9 @@ type RatingScaleAccordionItemProps = {
   rating: RubricRating
   scale: number
   spacing: string
+  min?: number
 }
-const RatingScaleAccordionItem = ({rating, scale, spacing}: RatingScaleAccordionItemProps) => {
+const RatingScaleAccordionItem = ({rating, scale, spacing, min}: RatingScaleAccordionItemProps) => {
   return (
     <View
       as="div"
@@ -323,7 +330,11 @@ const RatingScaleAccordionItem = ({rating, scale, spacing}: RatingScaleAccordion
         </Flex.Item>
         <Flex.Item align="start">
           <View as="div" margin="0 0 0 medium" themeOverride={{marginMedium: '1.5rem'}}>
-            <Text>{possibleString(rating.points)}</Text>
+            <Text>
+              {min != null
+                ? possibleStringRange(min, rating.points)
+                : possibleString(rating.points)}
+            </Text>
           </View>
         </Flex.Item>
       </Flex>

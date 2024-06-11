@@ -24,7 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
-import {possibleString} from '../Points'
+import {possibleString, possibleStringRange} from '../Points'
 import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '../types/rubric'
 import {Grid} from '@instructure/ui-grid'
 import {TextInput} from '@instructure/ui-text-input'
@@ -32,7 +32,11 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {CommentLibrary} from './CommentLibrary'
 import {CriteriaReadonlyComment} from './CriteriaReadonlyComment'
 import {Button} from '@instructure/ui-buttons'
-import {escapeNewLineText, htmlEscapeCriteriaLongDescription} from './utils/rubricUtils'
+import {
+  escapeNewLineText,
+  htmlEscapeCriteriaLongDescription,
+  rangingFrom,
+} from './utils/rubricUtils'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 const {licorice} = colors
@@ -334,6 +338,10 @@ const CriterionRow = ({
                       }
                     }
 
+                    const min = criterion.criterionUseRange
+                      ? rangingFrom(criterionRatings, index, ratingOrder)
+                      : undefined
+
                     return (
                       // we use the array index because rating may not have an id
                       /* eslint-disable-next-line react/no-array-index-key */
@@ -390,7 +398,10 @@ const CriterionRow = ({
                                     weight="bold"
                                     data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-points`}
                                   >
-                                    {!hidePoints && possibleString(rating.points)}
+                                    {!hidePoints &&
+                                      (min != null
+                                        ? possibleStringRange(min, rating.points)
+                                        : possibleString(rating.points))}
                                   </Text>
                                 </View>
 

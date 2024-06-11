@@ -17,7 +17,7 @@
  */
 
 import htmlEscape from '@instructure/html-escape'
-import type {RubricCriterion} from '../../types/rubric'
+import type {RubricCriterion, RubricRating} from '../../types/rubric'
 
 export const htmlEscapeCriteriaLongDescription = (criteria: RubricCriterion) => {
   const {longDescription} = criteria
@@ -31,4 +31,11 @@ export const escapeNewLineText = (text: string) => {
   return {
     __html: htmlEscape(text ?? '').replace(/\n/g, '<br />'),
   }
+}
+
+export const rangingFrom = (ratings: RubricRating[], index: number, ratingOrder?: string) => {
+  if (ratingOrder === 'ascending') {
+    return index > 0 ? ratings[index - 1].points + 0.1 : undefined
+  }
+  return index < ratings.length - 1 ? ratings[index + 1].points + 0.1 : undefined
 }
