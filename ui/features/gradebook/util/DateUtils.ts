@@ -15,13 +15,20 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import moment from 'moment'
+import moment from 'moment-timezone'
 import type {MomentInput} from 'moment-timezone'
 
-export function isoDateFromInput(dateType: 'start-date' | 'end-date', input: MomentInput) {
+export function isoDateFromInput(
+  dateType: 'start-date' | 'end-date',
+  input: MomentInput,
+  timezone?: string
+) {
   if (!input) return undefined
 
-  const date = moment(input)
+  let date = moment(input)
+  if (timezone) {
+    date = date.tz(timezone)
+  }
   const shiftedDate = dateType === 'end-date' ? date.endOf('day') : date.startOf('day')
   return shiftedDate.toISOString()
 }
