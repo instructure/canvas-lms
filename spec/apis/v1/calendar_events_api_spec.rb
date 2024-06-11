@@ -2252,7 +2252,7 @@ describe CalendarEventsApiController, type: :request do
     it "apis translate event descriptions in ics" do
       allow(HostUrl).to receive(:default_host).and_return("www.example.com")
       should_translate_user_content(@course, false) do |content|
-        @course.calendar_events.create!(description: content, start_at: Time.now + 1.hour, end_at: Time.now + 2.hours)
+        @course.calendar_events.create!(description: content, start_at: 1.hour.from_now, end_at: 2.hours.from_now)
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}",
                         controller: "courses",

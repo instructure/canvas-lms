@@ -2784,8 +2784,8 @@ describe DiscussionTopicsController do
 
     it "deletes attachments" do
       attachment = @topic.attachment = attachment_model(context: @course)
-      @topic.lock_at = Time.now + 1.week
-      @topic.delayed_post_at = Time.now - 1.week
+      @topic.lock_at = 1.week.from_now
+      @topic.delayed_post_at = 1.week.ago
       @topic.save!
       @topic.unlock!
       put("update", params: { course_id: @course.id, topic_id: @topic.id, remove_attachment: "1" }, format: "json")

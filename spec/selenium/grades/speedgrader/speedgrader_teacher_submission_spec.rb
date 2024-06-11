@@ -113,9 +113,9 @@ describe "SpeedGrader submissions" do
     end
 
     it "does not display a late message if an assignment has been overridden", priority: "1" do
-      @assignment.update_attribute(:due_at, Time.now - 2.days)
+      @assignment.update_attribute(:due_at, 2.days.ago)
       override = @assignment.assignment_overrides.build
-      override.due_at = Time.now + 2.days
+      override.due_at = 2.days.from_now
       override.due_at_overridden = true
       override.set = @course.course_sections.first
       override.save!

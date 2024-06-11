@@ -171,7 +171,7 @@ describe "Discussion Topic Show" do
       student_in_course(active_all: true)
       user_session(@student)
       module1 = @course.context_modules.create!(name: "module1")
-      module1.unlock_at = Time.now + 1.day
+      module1.unlock_at = 1.day.from_now
 
       topic = @course.discussion_topics.create!(
         title: "Ya Ya Ding Dong",

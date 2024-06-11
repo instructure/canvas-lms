@@ -407,7 +407,7 @@ describe AssignmentOverrideApplicator do
       end
 
       it "distinguishes cache by assignment version" do
-        Timecop.travel Time.now + 1.hour do
+        Timecop.travel 1.hour.from_now do
           @assignment.due_at = 7.days.from_now
           @assignment.save!
           expect(@assignment.versions.count).to eq 2
@@ -1457,7 +1457,7 @@ describe AssignmentOverrideApplicator do
 
     it "distinguishes cache by assignment updated_at" do
       @assignment = create_assignment
-      Timecop.travel Time.now + 1.hour do
+      Timecop.travel 1.hour.from_now do
         @assignment.due_at = 5.days.from_now
         @assignment.save!
         expect(@assignment.versions.count).to eq 2

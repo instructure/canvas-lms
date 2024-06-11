@@ -1347,7 +1347,7 @@ describe Quizzes::QuizSubmission do
         end
 
         it "returns false if it isn't overdue" do
-          @quiz.due_at = Time.now + 1.hour
+          @quiz.due_at = 1.hour.from_now
           @quiz.save!
 
           submission = @quiz.generate_submission(@student)

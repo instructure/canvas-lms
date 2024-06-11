@@ -107,7 +107,7 @@ module Lti
           end
 
           it "responds with 422 if course end date has passed" do
-            context.update!(start_at: Time.now - 2.days, conclude_at: Time.now - 1.day, restrict_enrollments_to_course_dates: true)
+            context.update!(start_at: 2.days.ago, conclude_at: 1.day.ago, restrict_enrollments_to_course_dates: true)
             get :index, params: valid_params
             expect(response).to have_http_status(:unprocessable_entity)
           end
@@ -130,7 +130,7 @@ module Lti
           end
 
           it "responds with a 404 if the course end has passed" do
-            context.update!(start_at: Time.now - 2.days, conclude_at: Time.now - 1.day, restrict_enrollments_to_course_dates: true)
+            context.update!(start_at: 2.days.ago, conclude_at: 1.day.ago, restrict_enrollments_to_course_dates: true)
             get :index, params: valid_params
             expect(response).to have_http_status(:not_found)
           end

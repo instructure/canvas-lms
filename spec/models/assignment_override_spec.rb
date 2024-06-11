@@ -176,7 +176,7 @@ describe AssignmentOverride do
         due_at_overridden: true
       )
       override.assignment_override_students.create!(user: @student)
-      assignment.update(due_at: nil, only_visible_to_overrides: true, created_at: Time.now - 4.hours)
+      assignment.update(due_at: nil, only_visible_to_overrides: true, created_at: 4.hours.ago)
       expect(override.notify_change?).to be true
       @student.destroy
       expect(override.reload.notify_change?).to be false
@@ -190,7 +190,7 @@ describe AssignmentOverride do
         due_at_overridden: true
       )
       override.assignment_override_students.create!(user: @student)
-      assignment.update(due_at: nil, only_visible_to_overrides: true, created_at: Time.now - 4.hours)
+      assignment.update(due_at: nil, only_visible_to_overrides: true, created_at: 4.hours.ago)
       expect(override.notify_change?).to be true
 
       expect do

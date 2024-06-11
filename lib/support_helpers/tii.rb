@@ -21,7 +21,7 @@ module SupportHelpers
   module Tii
     class TiiFixer < Fixer
       def initialize(email, after_time = nil)
-        @buffer_time = Time.now - 1.hour
+        @buffer_time = 1.hour.ago
         @prefix = "TurnItIn"
         super
       end

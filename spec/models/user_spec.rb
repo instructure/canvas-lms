@@ -256,7 +256,7 @@ describe User do
     course_with_student(active_all: true)
     google_docs_collaboration_model(user_id: @user.id)
     expect(@user.recent_stream_items.size).to eq 1
-    @enrollment.end_at = @enrollment.start_at = Time.now - 1.day
+    @enrollment.end_at = @enrollment.start_at = 1.day.ago
     @enrollment.save!
     @user = User.find(@user.id)
     expect(@user.recent_stream_items.size).to eq 0
@@ -2527,7 +2527,7 @@ describe User do
 
   describe "select_upcoming_assignments" do
     it "filters based on assignment date for asignments the user cannot delete" do
-      time = Time.now + 1.day
+      time = 1.day.from_now
       context = double
       assignments = [double, double, double]
       user = User.new
@@ -2545,8 +2545,8 @@ describe User do
       Timecop.freeze(Time.utc(2013, 3, 13, 0, 0)) do
         user = User.new
         allow(context).to receive(:grants_any_right?).with(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS).and_return true
-        due_date1 = { due_at: Time.now + 1.day }
-        due_date2 = { due_at: Time.now + 1.week }
+        due_date1 = { due_at: 1.day.from_now }
+        due_date2 = { due_at: 1.week.from_now }
         due_date3 = { due_at: 2.weeks.from_now }
         due_date4 = { due_at: nil }
         assignments.each do |assignment|

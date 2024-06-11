@@ -59,7 +59,7 @@ describe CoursesController do
     it "does not duplicate enrollments in variables" do
       course_with_student_logged_in(active_all: true)
       course_factory
-      @course.start_at = Time.now + 2.weeks
+      @course.start_at = 2.weeks.from_now
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
       @course.offer!
@@ -1209,7 +1209,7 @@ describe CoursesController do
       course_with_student_logged_in(active_all: true)
 
       @course.update(restrict_enrollments_to_course_dates: true,
-                     start_at: Time.now + 2.weeks)
+                     start_at: 2.weeks.from_now)
       @enrollment.update(workflow_state: "invited", last_activity_at: nil)
 
       post "enrollment_invitation", params: { course_id: @course.id,
@@ -1331,7 +1331,7 @@ describe CoursesController do
     it "shows unauthorized/authorized to a student for a future course depending on restrict_student_future_view setting" do
       course_with_student_logged_in(active_course: 1)
 
-      @course.start_at = Time.now + 2.weeks
+      @course.start_at = 2.weeks.from_now
       @course.restrict_enrollments_to_course_dates = true
       @course.restrict_student_future_view = true
       @course.save!
@@ -2966,7 +2966,7 @@ describe CoursesController do
       deleted_announcement = @course.announcements.create!(title: "deleted", message: "test")
 
       delayed_announcement.workflow_state  = "post_delayed"
-      delayed_announcement.delayed_post_at = Time.now + 3.weeks
+      delayed_announcement.delayed_post_at = 3.weeks.from_now
       delayed_announcement.save!
 
       deleted_announcement.destroy
