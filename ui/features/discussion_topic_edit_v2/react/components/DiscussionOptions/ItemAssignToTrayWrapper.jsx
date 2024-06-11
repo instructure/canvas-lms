@@ -187,7 +187,7 @@ export const ItemAssignToTrayWrapper = () => {
       type="discussion"
       importantDates={importantDates}
       defaultSectionId={DEFAULT_SECTION_ID}
-      removeDueDateInput={!isGraded}
+      supportDueDates={isGraded}
     />
   )
 }
