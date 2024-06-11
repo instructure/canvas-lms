@@ -83,6 +83,7 @@ export default class GenericErrorPage extends React.Component {
       error: {
         subject: this.props.errorSubject,
         category: this.props.errorCategory,
+        exception_message: this.props.errorMessage,
         message: this.props.errorMessage,
         url: window.location.href,
         comments: this.state.textAreaComment,
