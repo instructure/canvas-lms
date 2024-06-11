@@ -1047,3 +1047,13 @@ body.no-headers {
 #enhanced-rubric-assessment-tray div[class*="-tray__content"] {
   min-height: calc(100vh - 50px) !important;
 }
+
+body.is-masquerading-or-student-view {
+  #enhanced-rubric-assessment-tray div[class*="-tray__content"] {
+    min-height: calc(100vh - 100px) !important;
+  }
+
+  #enhanced-rubric-assessment-tray {
+    margin-bottom: 50px;
+  }
+}

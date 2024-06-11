@@ -41,7 +41,7 @@
 
 body.is-masquerading-or-student-view {
   // show the student footer above the masquerading banner
-  #assignments-student-footer {
+  #enhanced-rubric-builder-footer {
     bottom: $student-view-banner-height;
     // don't obstruct the "border" of the student view
     #{direction(right)}: 3px;
