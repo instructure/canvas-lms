@@ -346,7 +346,12 @@ const AssessmentHeader = ({
   selectedViewMode,
 }: AssessmentHeaderProps) => {
   return (
-    <View as="div" padding={isTraditionalView ? '0 0 medium 0' : '0'}>
+    <View
+      as="div"
+      padding={isTraditionalView ? '0 0 medium 0' : '0'}
+      overflowX="hidden"
+      overflowY="hidden"
+    >
       <Flex>
         <Flex.Item align="end">
           <Text weight="bold" size="large" data-testid="rubric-assessment-header">

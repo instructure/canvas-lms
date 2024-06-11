@@ -23,6 +23,7 @@ import {Flex} from '@instructure/ui-flex'
 import {RatingButton} from './RatingButton'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {escapeNewLineText} from './utils/rubricUtils'
 
 const {licorice} = colors
 
@@ -40,6 +41,7 @@ export const HorizontalButtonDisplay = ({
   selectedRatingIndex = -1,
   onSelectRating,
 }: HorizontalButtonDisplayProps) => {
+  const selectedRating = ratings[selectedRatingIndex]
   return (
     <View as="div" data-testid="rubric-assessment-horizontal-display">
       {selectedRatingIndex >= 0 && (
@@ -50,16 +52,19 @@ export const HorizontalButtonDisplay = ({
           borderRadius="medium"
           padding="xx-small"
           margin="0 xx-small small xx-small"
-          data-testid={`rating-details-${ratings[selectedRatingIndex]?.id}`}
+          data-testid={`rating-details-${selectedRating?.id}`}
           themeOverride={{borderColorBrand: licorice, borderWidthMedium: '0.188rem'}}
         >
           <View as="div">
             <Text size="x-small" weight="bold">
-              {ratings[selectedRatingIndex]?.description}
+              {selectedRating?.description}
             </Text>
           </View>
           <View as="div" display="block">
-            <Text size="x-small">{ratings[selectedRatingIndex]?.longDescription}</Text>
+            <Text
+              size="x-small"
+              dangerouslySetInnerHTML={escapeNewLineText(selectedRating?.longDescription)}
+            />
           </View>
         </View>
       )}
