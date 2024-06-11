@@ -367,6 +367,7 @@ nn:
     root_account_cant_have_sis_id: "SIS-ID-ar kan ikkje setjast på rot-kontoar"
     sis_id_in_use: "SIS-ID \"%{sis_id}\" er allereie i bruk"
     tab_admin_tools: Administrasjonsverktøy
+    tab_apps: Utvidingar
     tab_authentication: Godkjenning
     tab_brand_configs: Tema
     tab_courses: Emne
@@ -1703,6 +1704,7 @@ nn:
       turnitin_pledge_help: "studentane må krysse av for å vise at dei samtykkjer i løftet"
       turnitin_settings_title: Turnitin-innstillingar
       update_settings_button: "Oppdater innstillingar"
+    settings_crumb: Innstillingar
     show: 
       courses_crumb: Emne
       no_courses_account_message: "Det er ingen emne i denne kontoen"
@@ -2387,6 +2389,7 @@ nn:
   admin_csv_f8d1b3eb: "CSV-fil over administratorar"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Administratoreksport for fleire vurderingsperiodar"
   admin_navigation_menu_77b801a2: Admin-navigeringsmeny
+  admin_tools_9e2c9268: Administratorverktøy
   admin_tools_grade_change_logs_d804833f: "Administrasjonsverktøy (vurderingsloggar)"
   admin_tools_logging_tab_680698f3: "Administrasjonsverktøy (loggfane)"
   admin_tools_notifications_tab_120d6cdf: "Administrasjonsverktøy (varselfane)"
@@ -3564,7 +3567,7 @@ nn:
   appointments_dcb41d23: Avtalar
   approved_c3b285d4: Godkjent
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} med presisjon %{precision}"
-  apps_54d24a47: Appar
+  apps_54d24a47: Utvidingar
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Appar er ein enkel måte å legge nye funksjonar i Canvas. Dei kan leggast til individuelle emne eller til alle emna i ein konto. Når dei er konfigurerte, kan du kople deg til dei gjennom emnemodular og opprette oppgåver med vurderingsverktøy."
   appt_calendar_event_dialog: 
     invalid_participants: "Du må tillate at minst ein brukar deltek"
@@ -4733,6 +4736,7 @@ nn:
       login_handle_name_description: "Etiketten som blir brukt for unike påloggings-ID-ar. Eksempel: Pålogging, brukarnamn, student-ID osv."
       unknown_user_url_description: "URL-en for omdirigering av godkjend brukar finst ikkje i Canvas."
   authentication_providers_9e8e0e84: "Kan gje godkjenning"
+  authentication_settings_5c2078a3: Autentiseringsinnstillingar
   authentication_with_provider_was_successful_but_no_6a194137: "Autorisering med %{provider} var vellykka, men ein unik ID for pålogging til Canvas blei ikkje tilbydd."
   authentications_log_ca16ce81: Autentiseringslogg
   authnrequest_sent_to_idp_74e030fc: "AuthnRequest send til IdP"
@@ -10511,6 +10515,7 @@ nn:
     default_content: "Det er ikkje lagt til innhald"
     default_name: Sidenamn
   eportfolio_id_c69233c1: eportfolio_id
+  eportfolio_moderation_73848a00: "Eportfolio administrasjon"
   eportfolio_moderation_feb0ffd3: "ePortfolio administrasjon"
   eportfolio_name_fd4b9e13: eportfolio_name
   eportfolio_report_140b417f: "Eportfolio rapport"
@@ -23986,6 +23991,8 @@ nn:
     sub_accounts_count: 
       one: "1 underkonto"
       other: "%{count} underkontoar"
+    titles: 
+      sub_accounts: Underkontoar
   subaccount_91f4c279: Underkonto
   subaccount_admins_are_not_able_to_view_sis_informa_a9690589: "Administratorar på underkontonivå kan ikkje sjå SIS informasjon med mindre dei også har ein status som faglærar i eit emne"
   subaccount_admins_cannot_view_sis_information_with_15a41444: "Administratorar på underkontonivå kan ikkje sjå SIS informasjon utan emnetilknytning, då rollen som faglærar har løyve til å lese SIS data på kontonivå"

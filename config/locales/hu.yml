@@ -269,6 +269,7 @@ hu:
     root_account_cant_have_sis_id: "SIS ID-k nem állíthatóak be root fiókokon"
     sis_id_in_use: "A \"%{sis_id}\" SIS ID már használatban van"
     tab_admin_tools: Admineszközök
+    tab_apps: Alkalmazások
     tab_authentication: Hitelesítés
     tab_brand_configs: Témák
     tab_courses: Kurzusok
@@ -1476,6 +1477,7 @@ hu:
       turnitin_pledge_help: "a hallgatóknak be kell jelölniük a jelölőnégyzetet, mellyel elismerik, hogy elfogadják az ebben foglaltakat"
       turnitin_settings_title: Turnitinbeállítások
       update_settings_button: "Beállítások frissítése"
+    settings_crumb: Beállítások
     show: 
       courses_crumb: Kurzusok
       no_courses_account_message: "Nem találhatóak kurzusok ehhez a fiókhoz"
@@ -2085,6 +2087,7 @@ hu:
   admin_csv_f8d1b3eb: "Admin CSV"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Admin exportálás a többszörös osztályzási időszakokra"
   admin_navigation_menu_77b801a2: "Admin navigációs menü"
+  admin_tools_9e2c9268: Admineszközök
   admin_tools_grade_change_logs_d804833f: "Admin eszközök (Osztályzat változási naplók)"
   admin_tools_logging_tab_680698f3: "Felügyeleti eszközök (Naplózás fül)"
   admin_tools_notifications_tab_120d6cdf: "Felügyeleti eszközök (Értesítések fül)"
@@ -3979,6 +3982,7 @@ hu:
       login_handle_name_description: "A címke az egyedi azonosítóhoz. Példák: Login, Username, Student ID, stb."
       unknown_user_url_description: "Az url, amire átirányítjuk az authentikált felhasználót, amikor nem szerepel a Canvas-ban."
   authentication_providers_9e8e0e84: "Hitelesítés Ellátók"
+  authentication_settings_5c2078a3: "Hitelesítési beállítások"
   authentication_with_provider_was_successful_but_no_6a194137: "A %{provider} általi hitelesítés sikeres, de nem biztosított a Canvas bejelentkezés számára egyedi azonosítót"
   authentications_log_ca16ce81: "Hitelesítési Napló"
   authnrequest_sent_to_idp_74e030fc: "AuthnRequest elküldve az IdP-nek"
@@ -9051,6 +9055,7 @@ hu:
     default_content: "Nincs még tartalom hozzáadva "
     default_name: "Oldal neve"
   eportfolio_id_c69233c1: eportfolio_id
+  eportfolio_moderation_73848a00: "E-portfólió moderálása"
   eportfolio_moderation_feb0ffd3: "ePortfolio moderáció"
   eportfolio_name_fd4b9e13: eportfolio_name
   eportfolio_report_140b417f: "Eportfolio riport"
@@ -19604,6 +19609,8 @@ hu:
     sub_accounts_count: 
       one: "1 Alfiók"
       other: "%{count} alfiók"
+    titles: 
+      sub_accounts: Alfiókok
   subaccount_91f4c279: Alfiók
   subaccount_settings_8549eff7: "Alfiók beállítások"
   subaccounts_efd02bd4: Alfiókok
