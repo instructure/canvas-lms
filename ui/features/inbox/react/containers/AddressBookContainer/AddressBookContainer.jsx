@@ -246,6 +246,7 @@ export const AddressBookContainer = props => {
         _id: u._id,
         id: u.id,
         name: u.shortName,
+        pronouns: u.pronouns,
         commonCoursesInfo: props.includeCommonCourses
           ? getCommonCoursesInformation(u.commonCoursesConnection)
           : [],

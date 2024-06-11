@@ -30,6 +30,8 @@ module Types
 
     field :short_name, String, null: false
 
+    field :pronouns, String, null: true
+
     field :common_courses_connection, Types::EnrollmentType.connection_type, null: true
     def common_courses_connection
       Promise.all([
