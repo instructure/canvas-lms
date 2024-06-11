@@ -270,6 +270,7 @@ tr:
     root_account_cant_have_sis_id: "ÖBS ID'leri kök hesaplara ayarlanamaz"
     sis_id_in_use: "ÖBS ID \"%{sis_id}\" zaten kullanılıyor"
     tab_admin_tools: "Yönetici Araçları"
+    tab_apps: Uygulamalar
     tab_authentication: "Kimlik Doğrulama"
     tab_brand_configs: Temalar
     tab_courses: Dersler
@@ -1544,6 +1545,7 @@ tr:
       turnitin_pledge_help: "öğrenciler bu sözleşmeyi kabul ettiklerini göstermek için kutuya tik atmalıdır"
       turnitin_settings_title: "Turnitin Ayarları"
       update_settings_button: "Ayarları Güncelle"
+    settings_crumb: Ayarlar
     show: 
       courses_crumb: Dersler
       no_courses_account_message: "Bu hesapta hiç ders yok"
@@ -2121,6 +2123,7 @@ tr:
   admin_4d3ba42f: Yönetici
   admin_csv_f8d1b3eb: "Yönetici CSV"
   admin_navigation_menu_77b801a2: "Yönetici Gezinme Menüsü"
+  admin_tools_9e2c9268: "Yönetici araçları"
   admin_tools_undelete_courses_d9bd8631: "Yönetici Araçları (Dersleri Silme İşlemini Geri Al)"
   admin_user_name_29dd115a: admin_user_name
   admins_3e1dce15: Yöneticiler
@@ -3579,6 +3582,7 @@ tr:
       discovery_url_description: "Bir Keşif URL'si ayarlanırsa kimlilk doğrulama gerektiğinde Canvas bütün kullanıcıları bu URL'ye yönlendirecektir. Bu sayfada, kullanıcıların oturum açması için nereye gitmeleri gerektiği net bir şekilde belirtilmelidir. Keşif URL'si yapılandırılmazsa kullanıcı doğrulama girişimi için ilk yapılandırma kullanılacaktır."
       login_handle_name_description: "Özel oturum açma tanımlamaları için kullanılan etiket. Örneğin: Oturum Açma, Kullanıcı Adı, Öğrenci ID, vs."
       unknown_user_url_description: "Kimliği doğrulanmış bir kullanıcı Canvas'ta bulunamadığında yönlendirilecek URL."
+  authentication_settings_5c2078a3: "Kimlik Doğrulama Ayarları"
   authentication_with_provider_was_successful_but_no_6a194137: "%{provider} ile doğrulama başarılı fakat Canvas'ta oturum açmak için benzersiz ID sağlanmadı."
   authnrequest_sent_to_idp_74e030fc: "AuthnRequest IdP'ye gönderildi"
   authnresponse_from_idp_185037e9: "IdP'den AuthnResponse"
@@ -18490,6 +18494,8 @@ tr:
     sub_accounts_count: 
       one: "1 Alt Hesap"
       other: "%{count} Alt Hesap"
+    titles: 
+      sub_accounts: "Alt Hesaplar"
   subaccount_91f4c279: "Alt hesap"
   subject_114b2e98: Konu
   subject_reply_to: "Ynt: %{subject}"
