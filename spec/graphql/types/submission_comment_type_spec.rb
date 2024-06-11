@@ -43,6 +43,12 @@ describe Types::SubmissionCommentType do
     ).to eq [@comment3.id.to_s]
   end
 
+  it "returns the draft state" do
+    expect(
+      submission_type.resolve("commentsConnection { nodes { draft }}")
+    ).to eq [false]
+  end
+
   describe "Submission Comment Read" do
     it "returns the correct read state" do
       @assignment.post_submissions

@@ -33,6 +33,7 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
   argument :media_object_type, String, required: false
   argument :reviewer_submission_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
   argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
+  argument :draft_comment, Boolean, required: false, default_value: false
 
   field :submission_comment, Types::SubmissionCommentType, null: true
 
@@ -44,7 +45,8 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
     opts = {
       attempt: input[:attempt] || latest_attempt,
       author: current_user,
-      comment: input[:comment]
+      comment: input[:comment],
+      draft_comment: input[:draft_comment]
     }
 
     if input[:media_object_id].present?
