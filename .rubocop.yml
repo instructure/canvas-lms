@@ -292,9 +292,6 @@ Rails/LexicallyScopedActionFilter:
   Severity: convention
 Rails/OutputSafety:
   Severity: convention
-Rails/PluckInWhere:
-  Severity: convention
-  AutoCorrect: false
 Rails/RakeEnvironment:
   Severity: convention
   AutoCorrect: false
