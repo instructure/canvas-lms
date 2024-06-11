@@ -51,12 +51,21 @@ import {Text} from '@instructure/ui-text'
 import {type ViewProps} from '@instructure/ui-view'
 import {ToolbarSeparator} from './ToolbarSeparator'
 
-const findUpNode = (node: Node, query: any): string | undefined => {
+const findUpNode = (node: Node, query: any): Node | undefined => {
   let upnode = node.data.parent ? query.node(node.data.parent).get() : undefined
   while (upnode && upnode.data.parent && upnode.data.custom?.noToolbar) {
     upnode = upnode.data.parent ? query.node(upnode.data.parent).get() : undefined
   }
-  return upnode && upnode.id !== ROOT_NODE ? upnode.id : undefined
+  return upnode && upnode.id !== ROOT_NODE ? upnode : undefined
+}
+
+const findContainingSection = (node: Node, query: any): Node | undefined => {
+  if (node.data.custom?.isSection) return node
+  let upnode = findUpNode(node, query)
+  while (upnode && !upnode.data.custom?.isSection) {
+    upnode = findUpNode(upnode, query)
+  }
+  return upnode && upnode.data.custom?.isSection ? upnode : undefined
 }
 
 type RenderNodeProps = {
@@ -64,9 +73,13 @@ type RenderNodeProps = {
 }
 
 export const RenderNode = ({render}: RenderNodeProps) => {
-  const {id} = useNode()
-  const {actions, query} = useEditor()
+  const {actions, query} = useEditor(state => {
+    if (state.events.selected.size === 0) {
+      RenderNode.globals.selectedSectionId = ''
+    }
+  })
   const {
+    nodeActions,
     hovered,
     selected,
     node,
@@ -76,6 +89,7 @@ export const RenderNode = ({render}: RenderNodeProps) => {
     deletable,
     connectors: {drag},
   } = useNode((n: Node) => ({
+    nodeActions: actions,
     node: n,
     hovered: n.events.hovered,
     selected: n.events.selected,
@@ -88,7 +102,41 @@ export const RenderNode = ({render}: RenderNodeProps) => {
 
   const [currentToolbarRef, setCurrentToolbarRef] = useState<HTMLDivElement | null>(null)
   const [currentMenuRef, setCurrentMenuRef] = useState<HTMLDivElement | null>(null)
-  const [upnodeId] = useState<string | undefined>(findUpNode(node, query))
+  const [upnodeId] = useState<string | undefined>(findUpNode(node, query)?.id)
+
+  useEffect(() => {
+    // get a newly dropped block selected
+    // select once will select it's section
+    // select again to get the block
+    // (see the following useEffect for details)
+    if (node.id !== 'ROOT') {
+      actions.selectNode(node.id)
+      requestAnimationFrame(() => {
+        actions.selectNode(node.id)
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // first click/select on a block will select its parent section
+  // if the section is selected, a click on a block will select the block
+  useEffect(() => {
+    if (selected) {
+      const parentSection = findContainingSection(node, query)
+      if (parentSection) {
+        const isMySectionSelected = RenderNode.globals.selectedSectionId === parentSection.id
+        if (!isMySectionSelected) {
+          RenderNode.globals.selectedSectionId = parentSection.id
+          actions.selectNode(parentSection.id)
+        } else if (node.data.custom?.noToolbar) {
+          const upnode = findUpNode(node, query)
+          if (upnode) {
+            actions.selectNode(upnode.id)
+          }
+        }
+      }
+    }
+  }, [actions, node, nodeActions, query, selected])
 
   useEffect(() => {
     if (dom) {
@@ -187,7 +235,7 @@ export const RenderNode = ({render}: RenderNodeProps) => {
           <IconButton
             cursor="move"
             size="small"
-            elementRef={el => el && drag(el)}
+            elementRef={el => el && drag(el as HTMLElement)}
             screenReaderLabel="Drag to move"
             withBackground={false}
             withBorder={false}
@@ -269,4 +317,8 @@ export const RenderNode = ({render}: RenderNodeProps) => {
       {render}
     </>
   )
+}
+
+RenderNode.globals = {
+  selectedSectionId: '',
 }

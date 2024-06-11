@@ -20,11 +20,11 @@ import React, {useState} from 'react'
 import {Element, type Node} from '@craftjs/core'
 import {uid} from '@instructure/uid'
 import {Container} from '../../blocks/Container'
-import {NoSections} from '../ColumnsSection/NoSections'
+import {NoSections} from '../../common'
 import {HeadingBlock} from '../../blocks/HeadingBlock'
 import {TextBlock} from '../../blocks/TextBlock'
 import {ButtonBlock} from '../../blocks/ButtonBlock'
-import {white, black} from '../../../../utils'
+import {black} from '../../../../utils'
 import {SVGImageBlock} from '../../blocks/SVGImageBlock'
 import canvas_logo from '../../../../assets/logos/canvas_logo_left'
 
@@ -47,13 +47,7 @@ const HeroTextHalf = ({
 }: HeroTextHalfProps) => {
   return (
     <Container className="hero-section__text" id={id}>
-      <Element
-        id={`${id}__no-section`}
-        is={NoSections}
-        canvas={true}
-        variant="fixed"
-        className="text-half__inner"
-      >
+      <Element id={`${id}__no-section`} is={NoSections} canvas={true} className="text-half__inner">
         <SVGImageBlock src={canvas_logo} />
         <Element
           id={`${id}__title`}

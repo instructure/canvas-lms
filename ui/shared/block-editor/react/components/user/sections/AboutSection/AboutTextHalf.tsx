@@ -20,7 +20,7 @@ import React from 'react'
 import {Element} from '@craftjs/core'
 import {uid} from '@instructure/uid'
 import {Container} from '../../blocks/Container'
-import {NoSections} from '../ColumnsSection/NoSections'
+import {NoSections} from '../../common'
 import {HeadingBlock} from '../../blocks/HeadingBlock'
 import {TextBlock} from '../../blocks/TextBlock'
 import {black} from '../../../../utils'
@@ -40,13 +40,7 @@ const AboutTextHalf = ({
 }: AboutTextHalfProps) => {
   return (
     <Container className="about-section__text" id={id}>
-      <Element
-        id={`${id}__no-section`}
-        is={NoSections}
-        canvas={true}
-        variant="fixed"
-        className="text-half__inner"
-      >
+      <Element id={`${id}__no-section`} is={NoSections} canvas={true} className="text-half__inner">
         <Element
           id={`${id}__title`}
           is={HeadingBlock}

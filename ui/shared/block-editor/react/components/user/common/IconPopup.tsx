@@ -20,18 +20,16 @@ import React, {useCallback, useState} from 'react'
 import {useNode} from '@craftjs/core'
 import {IconButton} from '@instructure/ui-buttons'
 import {Popover} from '@instructure/ui-popover'
-import {View} from '@instructure/ui-view'
 import {IconImageLine} from '@instructure/ui-icons'
-import {IconPicker} from '../IconBlock'
+import {IconPicker} from '../blocks/IconBlock'
 
-type ButtonIconPopupProps = {
+type IconPopupProps = {
   iconName?: string
 }
 
-const ButtonIconPopup = ({iconName}: ButtonIconPopupProps) => {
+const IconPopup = ({iconName}: IconPopupProps) => {
   const {
     actions: {setProp},
-    props,
   } = useNode(node => ({
     props: node.data.props,
   }))
@@ -70,7 +68,10 @@ const ButtonIconPopup = ({iconName}: ButtonIconPopupProps) => {
       onShowContent={handleShowContent}
       onHideContent={handleHideContent}
       on="click"
+      placement="bottom start"
+      shadow="resting"
       screenReaderLabel="Popover Dialog Example"
+      shouldAlignArrow={true}
       shouldContainFocus={true}
       shouldReturnFocus={true}
       shouldCloseOnDocumentClick={true}
@@ -80,4 +81,4 @@ const ButtonIconPopup = ({iconName}: ButtonIconPopupProps) => {
   )
 }
 
-export {ButtonIconPopup}
+export {IconPopup}
