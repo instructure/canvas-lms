@@ -23,7 +23,8 @@ import {Flex} from '@instructure/ui-flex'
 import {RatingButton} from './RatingButton'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {escapeNewLineText} from './utils/rubricUtils'
+import {possibleString, possibleStringRange} from '../Points'
+import {escapeNewLineText, rangingFrom} from './utils/rubricUtils'
 
 const {licorice} = colors
 
@@ -33,6 +34,7 @@ type VerticalButtonDisplayProps = {
   ratingOrder: string
   selectedRatingIndex?: number
   onSelectRating: (index: number) => void
+  criterionUseRange: boolean
 }
 export const VerticalButtonDisplay = ({
   isPreviewMode,
@@ -40,6 +42,7 @@ export const VerticalButtonDisplay = ({
   ratingOrder,
   selectedRatingIndex,
   onSelectRating,
+  criterionUseRange,
 }: VerticalButtonDisplayProps) => {
   return (
     <Flex
@@ -50,6 +53,8 @@ export const VerticalButtonDisplay = ({
       {ratings.map((rating, index) => {
         const buttonDisplay = (ratings.length - (index + 1)).toString()
         const isSelected = selectedRatingIndex === index
+
+        const min = criterionUseRange ? rangingFrom(ratings, index) : undefined
 
         return (
           <Flex.Item key={`${rating.id}-${buttonDisplay}`} padding="xx-small 0 0 0">
@@ -93,6 +98,13 @@ export const VerticalButtonDisplay = ({
                         size="x-small"
                         dangerouslySetInnerHTML={escapeNewLineText(rating.longDescription)}
                       />
+                    </View>
+                    <View as="div" textAlign="end">
+                      <Text size="x-small" weight="bold">
+                        {min != null
+                          ? possibleStringRange(min, rating.points)
+                          : possibleString(rating.points)}
+                      </Text>
                     </View>
                   </View>
                 ) : (

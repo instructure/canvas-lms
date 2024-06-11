@@ -76,6 +76,7 @@ export const ModernView = ({
             isPreviewMode={isPreviewMode}
             isPeerReview={isPeerReview}
             ratingOrder={ratingOrder}
+            criterionUseRange={criterion.criterionUseRange}
             criterionAssessment={criterionAssessment}
             selectedViewMode={selectedViewMode}
             rubricSavedComments={rubricSavedComments?.[criterion.id] ?? []}
@@ -96,6 +97,7 @@ type CriterionRowProps = {
   isPeerReview: boolean
   isFreeFormCriterionComments: boolean
   ratingOrder: string
+  criterionUseRange: boolean
   criterionAssessment?: RubricAssessmentData
   selectedViewMode: ModernViewModes
   rubricSavedComments: string[]
@@ -109,6 +111,7 @@ export const CriterionRow = ({
   isPeerReview,
   isFreeFormCriterionComments,
   ratingOrder,
+  criterionUseRange,
   criterionAssessment,
   selectedViewMode,
   rubricSavedComments,
@@ -175,6 +178,7 @@ export const CriterionRow = ({
           ratingOrder={ratingOrder}
           selectedRatingIndex={selectedRatingIndex}
           onSelectRating={selectRating}
+          criterionUseRange={criterionUseRange}
         />
       )
     }
@@ -186,6 +190,7 @@ export const CriterionRow = ({
         ratingOrder={ratingOrder}
         selectedRatingIndex={selectedRatingIndex}
         onSelectRating={selectRating}
+        criterionUseRange={criterionUseRange}
       />
     )
   }
