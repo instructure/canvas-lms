@@ -207,6 +207,7 @@ CanvasRails::Application.routes.draw do
     post "unconclude_user/:id" => "courses#unconclude_user", :as => :unconclude_user_enrollment
     resources :sections, except: %i[index edit new] do
       get "crosslist/confirm/:new_course_id" => "sections#crosslist_check", :as => :confirm_crosslist
+      get "user_count" => "sections#user_count", :on => :collection, :as => :user_count
       post :crosslist
       delete "crosslist" => "sections#uncrosslist", :as => :uncrosslist
     end

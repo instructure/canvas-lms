@@ -63,6 +63,20 @@
     @include name_bubbles;
     clear: direction(left);
     margin-top: $ic-sp*0.5;
+
+    // Unfortunately the css from here overrides the inst ui display settings.
+    // This was meant to be a quick fix to make things work, once inst ui spreads in the component we should be able to throw this file out
+    button {
+      &:hover {
+        border: none;
+      }
+      & > span {
+        display: block;
+        > span {
+          display: flex;
+        }
+      }
+    }
   }
 }
 

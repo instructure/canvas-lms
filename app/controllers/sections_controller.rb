@@ -89,9 +89,10 @@
 #
 class SectionsController < ApplicationController
   before_action :require_context
-  before_action :require_section, except: [:index, :create]
+  before_action :require_section, except: %i[index create user_count]
 
   include Api::V1::Section
+  include AvatarHelper
 
   # @API List course sections
   # A paginated list of the list of sections for this course.
@@ -186,6 +187,37 @@ class SectionsController < ApplicationController
           format.json { render json: @section.errors, status: :bad_request }
         end
       end
+    end
+  end
+
+  def user_count
+    GuardRail.activate(:secondary) do
+      # Limit 100 to avoid killing the servers, ppl should use search anyway with this amount of sections
+      sections = @context.course_sections.active.order(CourseSection.best_unicode_collation_key("name")).limit(100)
+      sections = sections.where("name ILIKE ?", "%#{params[:search]}%") if params[:search].present?
+
+      if params[:exclude].present?
+        exclude_ids = params[:exclude].map { |id| id.gsub("section_", "") }
+        sections = sections.where.not(id: exclude_ids)
+      end
+
+      # This prevents N+1 queries without lots of added complexity, as we cant preload association scopes
+      section_counts_by_section_id = Enrollment
+                                     .select("course_section_id, count(*) as count")
+                                     .not_fake.where.not(workflow_state: "rejected")
+                                     .where(course_section_id: sections.select(:id))
+                                     .group(:course_section_id)
+
+      response = sections.map do |section|
+        {
+          id: section.id,
+          name: section.name,
+          user_count: section_counts_by_section_id.find { |count| count.course_section_id == section.id }&.count || 0,
+          avatar_url: avatar_url_for_group,
+          type: "context",
+        }
+      end
+      render json: { sections: response }
     end
   end
 
