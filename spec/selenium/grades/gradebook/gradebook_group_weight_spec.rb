@@ -46,7 +46,7 @@ describe "Gradebook - group weights" do
     @assignment1 = assignment_model({
                                       course: @course,
                                       name: "first assignment",
-                                      due_at: Date.today,
+                                      due_at: Time.zone.today,
                                       points_possible: 50,
                                       submission_types: "online_text_entry",
                                       assignment_group: @group1
@@ -54,7 +54,7 @@ describe "Gradebook - group weights" do
     @assignment2 = assignment_model({
                                       course: @course,
                                       name: "second assignment",
-                                      due_at: Date.today,
+                                      due_at: Time.zone.today,
                                       points_possible: 10,
                                       submission_types: "online_text_entry",
                                       assignment_group: @group2
@@ -96,7 +96,7 @@ describe "Gradebook - group weights" do
       @assignment1 = assignment_model({
                                         course: @course,
                                         name: "first assignment",
-                                        due_at: Date.today,
+                                        due_at: Time.zone.today,
                                         points_possible: 50,
                                         submission_types: "online_text_entry",
                                         assignment_group: @group1
@@ -104,7 +104,7 @@ describe "Gradebook - group weights" do
       @assignment2 = assignment_model({
                                         course: @course,
                                         name: "second assignment",
-                                        due_at: Date.today,
+                                        due_at: Time.zone.today,
                                         points_possible: 0,
                                         submission_types: "online_text_entry",
                                         assignment_group: @group2

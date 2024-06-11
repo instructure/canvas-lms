@@ -275,9 +275,6 @@ Rails/ActiveSupportOnLoad:
 Rails/ApplicationMailer:
   Severity: convention
   AutoCorrect: false
-Rails/Date:
-  Enabled: false
-  AutoCorrect: false
 Rails/DeprecatedActiveModelErrorsMethods:
   AutoCorrect: false
 Rails/EagerEvaluationLogMessage:

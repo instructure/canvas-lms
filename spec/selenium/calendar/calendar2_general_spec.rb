@@ -43,7 +43,7 @@ describe "calendar2" do
     end
 
     it "lets me go to the Edit Appointment group page from the appointment group slot dialog" do
-      date = Date.today.to_s
+      date = Time.zone.today.to_s
       create_appointment_group new_appointments: [
         ["#{date} 12:00:00", "#{date} 13:00:00"],
         ["#{date} 13:00:00", "#{date} 14:00:00"],
@@ -59,7 +59,7 @@ describe "calendar2" do
     end
 
     it "lets me message students who have signed up for an appointment" do
-      date = Date.today.to_s
+      date = Time.zone.today.to_s
       create_appointment_group new_appointments: [
         ["#{date} 12:00:00", "#{date} 13:00:00"],
         ["#{date} 13:00:00", "#{date} 14:00:00"],
@@ -197,7 +197,7 @@ describe "calendar2" do
       end
 
       it "allows moving events between calendars" do
-        event = @user.calendar_events.create! title: "blah", start_at: Date.today
+        event = @user.calendar_events.create! title: "blah", start_at: Time.zone.today
         get "/calendar2"
         open_edit_event_dialog
         click_option(edit_calendar_event_form_context, @course.name)

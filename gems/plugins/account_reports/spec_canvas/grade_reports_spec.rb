@@ -844,7 +844,7 @@ describe "Default Account Reports" do
 
     it "does not return results that don't fall within the limiting period" do
       @course1.complete!
-      @course1.conclude_at = Date.today - 3.days
+      @course1.conclude_at = Time.zone.today - 3.days
       @course1.save!
 
       parameters = {}

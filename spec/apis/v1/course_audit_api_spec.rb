@@ -32,7 +32,7 @@ describe "CourseAudit API", type: :request do
     course_with_teacher(account: @domain_root_account)
 
     @course.name = "Course 1"
-    @course.start_at = Date.today
+    @course.start_at = Time.zone.today
     @course.conclude_at = @course.start_at + 7.days
 
     @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
