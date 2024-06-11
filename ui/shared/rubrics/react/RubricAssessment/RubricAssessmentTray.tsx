@@ -84,7 +84,7 @@ export const RubricAssessmentTray = ({
       ?.find(c => c.id === criterionId)
       ?.ratings.find(r => r.points === points)
 
-    const matchingRatingId = matchingRating?.id ?? '-1'
+    const matchingRatingId = matchingRating?.id ?? ''
 
     if (existingAssessmentIndex === -1) {
       setRubricAssessmentDraftData([
