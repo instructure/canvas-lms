@@ -3301,7 +3301,7 @@ describe DiscussionTopic do
 
     it "prefers unlock_at to delayed_post_at" do
       @topic[:delayed_post_at] = 5.days.from_now
-      @topic[:unlock_at] = Time.now
+      @topic[:unlock_at] = Time.zone.now
       expect(@topic.delayed_post_at).to equal @topic[:unlock_at]
       expect(@topic.unlock_at).to equal @topic[:unlock_at]
     end

@@ -204,8 +204,8 @@ describe ContentMigration do
         everything: true,
         shift_dates: true,
         old_start_date: 7.days.ago.to_s,
-        old_end_date: Time.now.to_s,
-        new_start_date: Time.now.to_s,
+        old_end_date: Time.zone.now.to_s,
+        new_start_date: Time.zone.now.to_s,
         new_end_date: 7.days.from_now.to_s
       }
       @cm.save!

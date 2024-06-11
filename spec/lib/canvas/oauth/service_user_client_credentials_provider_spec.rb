@@ -93,7 +93,7 @@ describe Canvas::OAuth::ServiceUserClientCredentialsProvider do
     it "generates a token that expires in an hour" do
       token = AuthenticationMethods::InstAccessToken.parse(subject["access_token"])
 
-      expect(Time.at(token.jwt_payload[:exp])).to be_within(
+      expect(Time.zone.at(token.jwt_payload[:exp])).to be_within(
         30.seconds
       ).of(1.hour.from_now)
     end

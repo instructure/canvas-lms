@@ -36,7 +36,7 @@ describe CalendarEvent do
   describe "default_values" do
     before(:once) do
       course_model
-      @original_start_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
+      @original_start_at = Time.zone.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
       @original_end_at = @original_start_at + 2.hours
 
       # Create the initial event
@@ -74,7 +74,7 @@ describe CalendarEvent do
     end
 
     it "populates all day flag" do
-      midnight = Time.at(1_361_862_000) # 2013-02-26 00:00:00
+      midnight = Time.zone.at(1_361_862_000) # 2013-02-26 00:00:00
 
       event_1 = calendar_event_model(time_zone_edited: "Mountain Time (US & Canada)")
       event_1.start_at = event_1.end_at = midnight
@@ -125,9 +125,9 @@ describe CalendarEvent do
   describe "default_values during update" do
     before(:once) do
       course_model
-      @original_start_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
+      @original_start_at = Time.zone.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
       @original_end_at = @original_start_at + 2.hours
-      @midnight = Time.at(1_220_421_600)
+      @midnight = Time.zone.at(1_220_421_600)
       @event = calendar_event_model(
         start_at: @original_start_at,
         end_at: @original_end_at,
@@ -166,7 +166,7 @@ describe CalendarEvent do
         Time.zone = "UTC"
         calendar_event_model(start_at: "Sep 3 2008 11:55am", end_at: "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
-        @event.updated_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
+        @event.updated_at = Time.zone.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
         res = @event.to_ics
         expect(res).not_to be_nil
         expect(res.include?("DTSTART:20080903T115500Z")).not_to be_nil
@@ -178,7 +178,7 @@ describe CalendarEvent do
         Time.zone = "Alaska" # -0800
         calendar_event_model(start_at: "Sep 3 2008 11:55am", end_at: "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
-        @event.updated_at = Time.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
+        @event.updated_at = Time.zone.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
         res = @event.to_ics
         expect(res).not_to be_nil
         expect(res.include?("DTSTART:20080903T195500Z")).not_to be_nil
@@ -190,7 +190,7 @@ describe CalendarEvent do
         Time.zone = "UTC"
         calendar_event_model(start_at: "Sep 3 2008 11:55am", end_at: "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
-        @event.updated_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
+        @event.updated_at = Time.zone.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
         res = @event.to_ics(in_own_calendar: false)
         expect(res).not_to be_nil
         expect(res.dtstart.tz_utc).to be true
@@ -205,7 +205,7 @@ describe CalendarEvent do
         Time.zone = "Alaska" # -0800
         calendar_event_model(start_at: "Sep 3 2008 11:55am", end_at: "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
-        @event.updated_at = Time.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
+        @event.updated_at = Time.zone.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
         res = @event.to_ics(in_own_calendar: false)
         expect(res).not_to be_nil
         expect(res.dtstart.tz_utc).to be true
@@ -495,7 +495,7 @@ describe CalendarEvent do
 
       context "with event date edited" do
         before :once do
-          @event1.update(start_at: Time.now, end_at: Time.now)
+          @event1.update(start_at: Time.zone.now, end_at: Time.zone.now)
         end
 
         context "edit notification" do

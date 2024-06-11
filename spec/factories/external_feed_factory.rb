@@ -28,7 +28,7 @@ module Factories
       context: @course || Account.default.courses.create!,
       title: "some feed",
       url: "http://www.nowhere.com",
-      created_at: Time.parse("Jan 1 2000"),
+      created_at: Time.zone.parse("Jan 1 2000"),
     }
   end
 end

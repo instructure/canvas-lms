@@ -22,7 +22,7 @@ describe PageView do
   before do
     # sets both @user and @course (@user is a teacher in @course)
     course_model(account: Account.default.manually_created_courses_account)
-    @page_view = PageView.new { |p| p.assign_attributes({ created_at: Time.now, url: "http://test.one/", session_id: "phony", context: @course, controller: "courses", action: "show", user_request: true, render_time: 0.01, user_agent: "None", account_id: Account.default.id, request_id: "abcde", interaction_seconds: 5, user: @user }) }
+    @page_view = PageView.new { |p| p.assign_attributes({ created_at: Time.zone.now, url: "http://test.one/", session_id: "phony", context: @course, controller: "courses", action: "show", user_request: true, render_time: 0.01, user_agent: "None", account_id: Account.default.id, request_id: "abcde", interaction_seconds: 5, user: @user }) }
   end
 
   describe "sharding" do
@@ -74,7 +74,7 @@ describe PageView do
       it "does nothing if not enabled" do
         Setting.set("page_views_store_active_user_counts", "false")
         expect(@page_view.store).to be_truthy
-        expect(Canvas.redis.smembers(PageView.user_count_bucket_for_time(Time.now))).to eq []
+        expect(Canvas.redis.smembers(PageView.user_count_bucket_for_time(Time.zone.now))).to eq []
       end
 
       it "stores if enabled" do

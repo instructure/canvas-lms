@@ -514,7 +514,7 @@ describe "calendar2" do
 
       it "has a working today button", priority: "1" do
         load_month_view
-        date = Time.now.strftime("%-d")
+        date = Time.zone.now.strftime("%-d")
 
         # Check for highlight to be present on this month
         # this class is also present on the mini calendar so we need to make

@@ -540,17 +540,17 @@ describe Course do
                                                                       new_start_date: "2014-5-11",
                                                                       new_end_date: "2014-7-5"
                                                                     })
-      unlock_at = Time.new(2014, 3, 23, 0, 0)
-      due_at    = Time.new(2014, 3, 29, 23, 59)
-      lock_at   = Time.new(2014, 4, 1, 23, 59)
+      unlock_at = Time.zone.local(2014, 3, 23, 0, 0)
+      due_at    = Time.zone.local(2014, 3, 29, 23, 59)
+      lock_at   = Time.zone.local(2014, 4, 1, 23, 59)
 
       new_unlock_at = Importers::CourseContentImporter.shift_date(unlock_at, options)
       new_due_at    = Importers::CourseContentImporter.shift_date(due_at, options)
       new_lock_at   = Importers::CourseContentImporter.shift_date(lock_at, options)
 
-      expect(new_unlock_at).to eq Time.new(2014, 6,  1, 0, 0)
-      expect(new_due_at).to    eq Time.new(2014, 6,  7, 23, 59)
-      expect(new_lock_at).to   eq Time.new(2014, 6, 10, 23, 59)
+      expect(new_unlock_at).to eq Time.zone.local(2014, 6,  1, 0, 0)
+      expect(new_due_at).to    eq Time.zone.local(2014, 6,  7, 23, 59)
+      expect(new_lock_at).to   eq Time.zone.local(2014, 6, 10, 23, 59)
     end
 
     it "returns error when removing dates and new_sis_integrations is enabled" do

@@ -1365,7 +1365,7 @@ describe PlannerController do
       end
 
       context "date ranges" do
-        let(:start_date) { Time.parse("2020-01-1T00:00:00") }
+        let(:start_date) { Time.zone.parse("2020-01-1T00:00:00") }
         let(:end_date) { Time.parse("2020-01-1T23:59:59Z") }
 
         it "only returns items between (inclusive) the specified dates" do

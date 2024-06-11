@@ -3316,7 +3316,7 @@ describe AssignmentsApiController, type: :request do
         @ta.register!
         @ta.communication_channels.create(path: "ta@instructure.com").confirm!
 
-        @override_due_at = Time.parse("2002 Jun 22 12:00:00")
+        @override_due_at = Time.zone.parse("2002 Jun 22 12:00:00")
 
         @user = @teacher
         json = api_call(:post,
@@ -4488,7 +4488,7 @@ describe AssignmentsApiController, type: :request do
                                                   position: 2,
                                                   peer_review_count: 2,
                                                   peer_reviews: true,
-                                                  peer_reviews_due_at: Time.now,
+                                                  peer_reviews_due_at: Time.zone.now,
                                                   grading_type: "percent",
                                                   due_at: nil)
         @assignment.assignment_group = @start_group

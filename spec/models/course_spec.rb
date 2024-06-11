@@ -2057,7 +2057,7 @@ describe Course do
     it "orders assignments and groups by position" do
       @assignment_group_1, @assignment_group_2 = [@course.assignment_groups.create!(name: "Some Assignment Group 1", group_weight: 100), @course.assignment_groups.create!(name: "Some Assignment Group 2", group_weight: 100)].sort_by(&:id)
 
-      now = Time.now
+      now = Time.zone.now
 
       g1a1 = @course.assignments.create!(title: "Assignment 01", due_at: now + 1.day, position: 3, assignment_group: @assignment_group_1, points_possible: 10)
       @course.assignments.create!(title: "Assignment 02", due_at: now + 1.day, position: 1, assignment_group: @assignment_group_1, points_possible: 10)
@@ -2117,7 +2117,7 @@ describe Course do
 
       assignment_group = @course.assignment_groups.create!(name: "Some Assignment Group 1")
 
-      now = Time.now
+      now = Time.zone.now
 
       @course.assignments.create!(title: "Assignment 01", due_at: now + 1.day, position: 1, assignment_group:, points_possible: 10)
       @course.assignments.create!(title: "Assignment 02", due_at: nil, position: 1, assignment_group:, points_possible: 10)
@@ -5065,7 +5065,7 @@ describe Course do
     context "appointment cancellation" do
       before :once do
         course_with_student(active_all: true)
-        @ag = AppointmentGroup.create!(title: "test", contexts: [@course], new_appointments: [["2010-01-01 13:00:00", "2010-01-01 14:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+        @ag = AppointmentGroup.create!(title: "test", contexts: [@course], new_appointments: [["2010-01-01 13:00:00", "2010-01-01 14:00:00"], ["#{Time.zone.now.year + 1}-01-01 13:00:00", "#{Time.zone.now.year + 1}-01-01 14:00:00"]])
         @ag.appointments.each do |a|
           a.reserve_for(@user, @user)
         end
@@ -7413,7 +7413,7 @@ describe Course do
         allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
 
-        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.now, settings: { enable_course_paces: true }).offer!
+        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.zone.now, settings: { enable_course_paces: true }).offer!
         expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.has_end_date").once
 
         Course.last.update! restrict_enrollments_to_course_dates: false
@@ -7424,7 +7424,7 @@ describe Course do
         allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
 
-        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.now).offer!
+        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.zone.now).offer!
         expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.has_end_date").once
 
         Course.last.update! settings: { enable_course_paces: true }
@@ -7435,7 +7435,7 @@ describe Course do
       it "increments and decrements on pace status and end date existence concurrently" do
         allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
-        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.now).offer!
+        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.zone.now).offer!
         expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.has_end_date").once
 
         Course.last.update! restrict_enrollments_to_course_dates: false, settings: { enable_course_paces: true }
@@ -7450,7 +7450,7 @@ describe Course do
       it "ignores unpublished date having changes" do
         allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
-        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.now)
+        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.zone.now)
         expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.unpaced.has_end_date")
         Course.last.update! settings: { enable_course_paces: true }
         expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course.unpaced.has_end_date")

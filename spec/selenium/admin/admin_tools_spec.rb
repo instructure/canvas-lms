@@ -189,7 +189,7 @@ describe "admin_tools" do
           @account.default_locale = "es-ES"
           @account.save!
 
-          Timecop.travel(Time.new(2010, 1, 3, 14, 35, 0)) do
+          Timecop.travel(Time.zone.local(2010, 1, 3, 14, 35, 0)) do
             Messages::Partitioner.process
             message_model(user_id: @student.id, body: "foo bar", root_account_id: @account.id)
           end

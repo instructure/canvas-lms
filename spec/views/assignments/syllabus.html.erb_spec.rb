@@ -25,7 +25,7 @@ describe "assignments/syllabus" do
     course_with_student
     view_context(@course, @user)
 
-    events = assign(:events, [@course.assignments.create!(title: "some assignment", due_at: Time.now), @course.calendar_events.create!(title: "some event", start_at: Time.now, end_at: Time.now)])
+    events = assign(:events, [@course.assignments.create!(title: "some assignment", due_at: Time.zone.now), @course.calendar_events.create!(title: "some event", start_at: Time.zone.now, end_at: Time.zone.now)])
     assign(:dates, events.map(&:start_at))
     assign(:undated_events, [@course.assignments.create!(title: "assignment 2"), @course.calendar_events.create!(title: "event 2")])
     render "assignments/syllabus"

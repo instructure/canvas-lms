@@ -177,7 +177,7 @@ describe "course copy" do
     before do
       course_with_admin_logged_in
       @date_to_use = 2.weeks.from_now.monday.strftime("%Y-%m-%d")
-      @course.start_at = Time.now
+      @course.start_at = Time.zone.now
       @course.save!
     end
 

@@ -45,7 +45,7 @@ module Alerts
 
         context "when there is not a start_at set on the course" do
           it "returns true for new courses" do
-            @course.created_at = Time.now
+            @course.created_at = Time.zone.now
             @course.start_at = nil
             @course.save!
 

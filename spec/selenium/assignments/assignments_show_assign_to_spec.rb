@@ -204,9 +204,9 @@ describe "assignments show page assign to" do
   end
 
   context "overrides table" do
-    let(:due_at) { Time.parse("2024-04-15") }
-    let(:unlock_at) { Time.parse("2024-04-10") }
-    let(:lock_at) { Time.parse("2024-04-20") }
+    let(:due_at) { Time.zone.parse("2024-04-15") }
+    let(:unlock_at) { Time.zone.parse("2024-04-10") }
+    let(:lock_at) { Time.zone.parse("2024-04-20") }
 
     before do
       @assignment = @course.assignments.create(name: "test assignment", points_possible: 25)
@@ -562,7 +562,7 @@ describe "assignments show page assign to" do
     it "shows all overrides for teachers when they are also observers in the course" do
       @assignment1.update!(only_visible_to_overrides: true)
       @student3 = student_in_course(course: @course, active_all: true, name: "Student 3").user
-      @assignment1.assignment_overrides.create!(set_type: "ADHOC", due_at: Time.parse("2024-04-12"))
+      @assignment1.assignment_overrides.create!(set_type: "ADHOC", due_at: Time.zone.parse("2024-04-12"))
       @assignment1.assignment_overrides.last.assignment_override_students.create!(user: @student3)
 
       get "/courses/#{@course.id}/assignments/#{@assignment1.id}"

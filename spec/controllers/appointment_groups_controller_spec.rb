@@ -27,7 +27,7 @@ describe AppointmentGroupsController do
     @group_student = @student
     student_in_course(active_all: true)
     teacher_in_course(active_all: true)
-    @next_year = Time.now.year + 1
+    @next_year = Time.zone.now.year + 1
     @ag = AppointmentGroup.create!(title: "blah",
                                    contexts: [@course, @course2],
                                    new_appointments: [

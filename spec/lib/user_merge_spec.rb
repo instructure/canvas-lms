@@ -677,8 +677,8 @@ describe UserMerge do
                                    participants_per_appointment: 1,
                                    min_appointments_per_participant: 1,
                                    new_appointments: [
-                                     ["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"],
-                                     ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]
+                                     ["#{Time.zone.now.year + 1}-01-01 12:00:00", "#{Time.zone.now.year + 1}-01-01 13:00:00"],
+                                     ["#{Time.zone.now.year + 1}-01-01 13:00:00", "#{Time.zone.now.year + 1}-01-01 14:00:00"]
                                    ])
       res1 = ag.appointments.first.reserve_for(user1, @teacher)
       ag.appointments.last.reserve_for(user2, @teacher)
@@ -717,7 +717,7 @@ describe UserMerge do
 
     it "freshens moved topics" do
       topic = course1.discussion_topics.create!(user: user2)
-      now = Time.at(5.minutes.from_now.to_i) # truncate milliseconds
+      now = Time.zone.at(5.minutes.from_now.to_i) # truncate milliseconds
       Timecop.freeze(now) do
         UserMerge.from(user2).into(user1)
         expect(topic.reload.updated_at).to eq now
@@ -727,7 +727,7 @@ describe UserMerge do
     it "freshens topics with moved entries" do
       topic = course1.discussion_topics.create!(user: user1)
       topic.discussion_entries.create!(user: user2)
-      now = Time.at(5.minutes.from_now.to_i) # truncate milliseconds
+      now = Time.zone.at(5.minutes.from_now.to_i) # truncate milliseconds
       Timecop.freeze(now) do
         UserMerge.from(user2).into(user1)
         expect(topic.reload.updated_at).to eq now

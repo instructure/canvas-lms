@@ -288,7 +288,7 @@ describe "calendar2" do
 
     it "tests the today button" do
       get "/calendar2"
-      current_month_num = Time.now.month
+      current_month_num = Time.zone.now.month
       current_month = Date::MONTHNAMES[current_month_num]
 
       change_calendar
@@ -302,7 +302,7 @@ describe "calendar2" do
       unrelated_course = Course.create!(account: Account.default, name: "unrelated course")
       # make the user an admin so they can view the course's calendar without an enrollment
       Account.default.account_users.create!(user: @user)
-      CalendarEvent.create!(title: "from unrelated one", start_at: Time.now, end_at: 5.hours.from_now) { |c| c.context = unrelated_course }
+      CalendarEvent.create!(title: "from unrelated one", start_at: Time.zone.now, end_at: 5.hours.from_now) { |c| c.context = unrelated_course }
       keep_trying_until { expect(CalendarEvent.last.title).to eq "from unrelated one" }
       get "/courses/#{unrelated_course.id}/settings"
       expect(f("#course_calendar_link")["href"]).to match(/course_#{Course.last.id}/)

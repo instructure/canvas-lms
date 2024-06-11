@@ -249,7 +249,7 @@ describe Attachment do
         # first attempt
         @attachment.submit_to_crocodoc
 
-        time = Time.now
+        time = Time.zone.now
         # nth attempt won't create more jobs
         attempts.times do
           time += 1.hour
@@ -546,7 +546,7 @@ describe Attachment do
     end
 
     it "delays the creation of the media object" do
-      now = Time.now
+      now = Time.zone.now
       allow(Time).to receive(:now).and_return(now)
       track_jobs do
         @attachment.save!

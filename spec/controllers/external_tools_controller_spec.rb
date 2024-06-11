@@ -2818,7 +2818,7 @@ describe ExternalToolsController do
         expect(tool_settings["resource_link_id"]).to eq opaque_id(@assignment.external_tool_tag)
         expect(tool_settings["resource_link_title"]).to eq "tool assignment"
 
-        expect(Time.parse(tool_settings["custom_assignment_due_at"])).to be_within(5.seconds).of due_at
+        expect(Time.zone.parse(tool_settings["custom_assignment_due_at"])).to be_within(5.seconds).of due_at
       end
 
       context "and the assignment has due date overrides" do
@@ -2838,7 +2838,7 @@ describe ExternalToolsController do
         it "sends the overridden due_at value in the launch parameters" do
           get :generate_sessionless_launch, params: { course_id: course.id, launch_type: "assessment", assignment_id: assignment.id }
 
-          expect(Time.parse(tool_settings["custom_assignment_due_at"])).to be_within(5.seconds).of(assignment_override.due_at)
+          expect(Time.zone.parse(tool_settings["custom_assignment_due_at"])).to be_within(5.seconds).of(assignment_override.due_at)
         end
       end
     end

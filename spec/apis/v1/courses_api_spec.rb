@@ -1237,7 +1237,7 @@ describe CoursesController, type: :request do
              public_description
              restrict_enrollments_to_course_dates].each do |attr|
             expect(new_course.send(attr)).to eq(if [:start_at, :end_at].include?(attr)
-                                                  Time.parse(post_params["course"][attr.to_s])
+                                                  Time.zone.parse(post_params["course"][attr.to_s])
                                                 else
                                                   post_params["course"][attr.to_s]
                                                 end)
@@ -1500,7 +1500,7 @@ describe CoursesController, type: :request do
             "course" => {
               "name" => "Test Course 📝",
               "term_id" => term.id,
-              "start_at" => Time.now,
+              "start_at" => Time.zone.now,
               "conclude_at" => 16.weeks.from_now,
             }
           }
@@ -1519,7 +1519,7 @@ describe CoursesController, type: :request do
               "name" => "Test Course 📝",
               "term_id" => term.id,
               "restrict_enrollments_to_course_dates" => true,
-              "start_at" => Time.now,
+              "start_at" => Time.zone.now,
               "conclude_at" => 16.weeks.from_now,
 
             }
@@ -1655,7 +1655,7 @@ describe CoursesController, type: :request do
         end
 
         it "allows a date to be deleted" do
-          @course.update_attribute(:conclude_at, Time.now)
+          @course.update_attribute(:conclude_at, Time.zone.now)
           @new_values["course"]["end_at"] = nil
           api_call(:put, @path, @params, @new_values)
           @course.reload

@@ -157,14 +157,14 @@ describe TextHelper do
     end
 
     it "ignores the end date if it matches the start date" do
-      start_date = Time.parse("2012-01-01 12:00:00")
-      end_date = Time.parse("2012-01-01 13:00:00")
+      start_date = Time.zone.parse("2012-01-01 12:00:00")
+      end_date = Time.zone.parse("2012-01-01 13:00:00")
       expect(th.date_string(start_date, end_date)).to eq th.date_string(start_date)
     end
 
     it "does date ranges if the end date differs from the start date" do
-      start_date = Time.parse("2012-01-01 12:00:00")
-      end_date = Time.parse("2012-01-08 12:00:00")
+      start_date = Time.zone.parse("2012-01-01 12:00:00")
+      end_date = Time.zone.parse("2012-01-08 12:00:00")
       expect(th.date_string(start_date, end_date)).to eq "#{th.date_string(start_date)} to #{th.date_string(end_date)}"
     end
   end

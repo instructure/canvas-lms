@@ -1141,7 +1141,7 @@ describe Quizzes::QuizzesController do
     it "lets them take the quiz if it's locked but unlocked by an override" do
       user_session(@student)
       course_quiz(true)
-      @quiz.lock_at = Time.now
+      @quiz.lock_at = Time.zone.now
       @quiz.save!
       override = AssignmentOverride.new
       override.title = "ADHOC quiz override"
@@ -2190,7 +2190,7 @@ describe Quizzes::QuizzesController do
         course_quiz
         @quiz.generate_quiz_data
         @quiz.workflow_state = "available"
-        @quiz.published_at = Time.now
+        @quiz.published_at = Time.zone.now
         @quiz.save!
 
         @quiz.update_attribute(:created_at, 1.day.ago)
