@@ -36,8 +36,8 @@ describe "AuthenticationAudit API", type: :request do
     @page_view.user = @viewing_user
     @page_view.request_id = @request_id
     @page_view.remote_ip = "10.10.10.10"
-    @page_view.created_at = Time.now
-    @page_view.updated_at = Time.now
+    @page_view.created_at = Time.zone.now
+    @page_view.updated_at = Time.zone.now
     @page_view.save!
 
     @event = Auditors::Authentication.record(@pseudonym, "login")

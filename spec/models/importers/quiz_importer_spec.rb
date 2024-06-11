@@ -371,7 +371,7 @@ describe "Importers::QuizImporter" do
       "unlock_at" => nil
     }
     migration = @course.content_migrations.create!
-    quiz = @course.quizzes.create! title: "test", due_at: Time.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now, migration_id: "ib4834d160d180e2e91572e8b9e3b1bc6"
+    quiz = @course.quizzes.create! title: "test", due_at: Time.zone.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now, migration_id: "ib4834d160d180e2e91572e8b9e3b1bc6"
     Importers::QuizImporter.import_from_migration(quiz_hash, @course, migration, {})
     quiz.reload
     expect(quiz.title).to eq "date clobber or not"

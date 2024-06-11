@@ -738,7 +738,7 @@ describe UsersController do
         accepted_terms = json["user"]["user"]["preferences"]["accepted_terms"]
         expect(response).to be_successful
         expect(accepted_terms).to be_present
-        expect(Time.parse(accepted_terms)).to be_within(1.minute.to_i).of(Time.now.utc)
+        expect(Time.zone.parse(accepted_terms)).to be_within(1.minute.to_i).of(Time.now.utc)
       end
 
       it "stores a confirmation_redirect url if it's trusted" do

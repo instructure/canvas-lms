@@ -1128,7 +1128,7 @@ describe SisImportsApiController, type: :request do
                       account_id: @account.id.to_s,
                       id: batch.id.to_s })
     url_params = Rack::Utils.parse_query URI(json["errors_attachment"]["url"]).query
-    expiration = Time.at(CanvasSecurity.decode_jwt(url_params["verifier"])[:exp])
+    expiration = Time.zone.at(CanvasSecurity.decode_jwt(url_params["verifier"])[:exp])
 
     expect(expiration).to be_within(1.minute).of(1.hour.from_now)
   end

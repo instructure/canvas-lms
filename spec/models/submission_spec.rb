@@ -2070,7 +2070,7 @@ describe Submission do
 
     it "moves mastery path along on force audit if appropriate" do
       expect(ConditionalRelease::Rule).to receive(:is_trigger_assignment?).with(submission.assignment).once
-      submission.update! score: 1, workflow_state: :graded, posted_at: Time.now
+      submission.update! score: 1, workflow_state: :graded, posted_at: Time.zone.now
       submission.grade_change_audit(force_audit: true)
     end
   end
@@ -2186,7 +2186,7 @@ describe Submission do
 
       it "sends the correct message when an assignment is turned in late" do
         @assignment.workflow_state = "published"
-        @assignment.update(due_at: Time.now - 1000)
+        @assignment.update(due_at: Time.zone.now - 1000)
 
         submission_spec_model(user: @student, submit_homework: true)
         expect(@submission.messages_sent.keys).to eq ["Assignment Submitted Late"]
@@ -2194,7 +2194,7 @@ describe Submission do
 
       it "sends the correct message when an assignment is resubmitted on-time" do
         @assignment.submission_types = ["online_text_entry"]
-        @assignment.due_at = Time.now + 1000
+        @assignment.due_at = Time.zone.now + 1000
         @assignment.save!
 
         @assignment.submit_homework(@student, body: "lol")
@@ -2204,7 +2204,7 @@ describe Submission do
 
       it "sends the correct message when an assignment is resubmitted late" do
         @assignment.submission_types = ["online_text_entry"]
-        @assignment.due_at = Time.now - 1000
+        @assignment.due_at = Time.zone.now - 1000
         @assignment.save!
 
         @assignment.submit_homework(@student, body: "lol")
@@ -2213,7 +2213,7 @@ describe Submission do
       end
 
       it "sends the correct message when a group assignment is submitted late" do
-        @a = assignment_model(course: @context, group_category: "Study Groups", due_at: Time.now - 1000, submission_types: ["online_text_entry"])
+        @a = assignment_model(course: @context, group_category: "Study Groups", due_at: Time.zone.now - 1000, submission_types: ["online_text_entry"])
         @group1 = @a.context.groups.create!(name: "Study Group 1", group_category: @a.group_category)
         @group1.add_user(@student)
         submission = @a.submit_homework @student, submission_type: "online_text_entry", body: "blah"
@@ -2490,7 +2490,7 @@ describe Submission do
 
       it "does not create a grade changed message when theres a quiz attached" do
         Notification.create(name: "Submission Grade Changed")
-        allow(@assignment).to receive_messages(score_to_grade: "10.0", due_at: Time.now - 100)
+        allow(@assignment).to receive_messages(score_to_grade: "10.0", due_at: Time.zone.now - 100)
         submission_spec_model
 
         @quiz = Quizzes::Quiz.create!(context: @course)
@@ -3950,12 +3950,12 @@ describe Submission do
     usec = submission.submitted_at.usec
     timestamp = "#{time_to_i}.#{usec}".to_f
 
-    quiz_submission.finished_at = Time.at(timestamp)
+    quiz_submission.finished_at = Time.zone.at(timestamp)
     quiz_submission.save
 
     # get the data in a strange state where the quiz_submission.finished_at is
     # microseconds older than the submission (caused the bug in #6048)
-    quiz_submission.finished_at = Time.at(timestamp + 0.00001)
+    quiz_submission.finished_at = Time.zone.at(timestamp + 0.00001)
     quiz_submission.save
 
     # verify the data is weird, to_i says they are equal, but the usecs are off
@@ -4150,7 +4150,7 @@ describe Submission do
     it "is read if other submission fields change" do
       @submission = @assignment.submit_homework(@user)
       @submission.workflow_state = "graded"
-      @submission.graded_at = Time.now
+      @submission.graded_at = Time.zone.now
       @submission.save!
       expect(@submission.read?(@user)).to be_truthy
     end
@@ -4158,7 +4158,7 @@ describe Submission do
     it "mark read/unread" do
       @submission = @assignment.submit_homework(@user)
       @submission.workflow_state = "graded"
-      @submission.graded_at = Time.now
+      @submission.graded_at = Time.zone.now
       @submission.save!
       expect(@submission.read?(@user)).to be_truthy
       @submission.mark_unread(@user)
@@ -4265,7 +4265,7 @@ describe Submission do
     before do
       submission.published_score = 100
       submission.published_grade = "A"
-      submission.graded_at = Time.now
+      submission.graded_at = Time.zone.now
       submission.grade = "B"
       submission.score = 90
       submission.mute
@@ -9550,7 +9550,7 @@ describe Submission do
     it "calls Statsd when a classic quiz is manually graded" do
       expect(InstStatsd::Statsd).to receive(:gauge).once.with("submission.manually_graded.grading_time", 600.0, 1.0, tags: { quiz_type: "classic_quiz" })
 
-      now = Time.now
+      now = Time.zone.now
       Timecop.freeze(now) do
         quiz_with_graded_submission([{ question_data: { :name => "question 1", :points_possible => 10, "question_type" => "essay_question" } }])
       end
@@ -9564,7 +9564,7 @@ describe Submission do
     it "calls Statsd when a new quiz is manually graded" do
       expect(InstStatsd::Statsd).to receive(:gauge).once.with("submission.manually_graded.grading_time", 300.0, 1.0, tags: { quiz_type: "new_quiz" })
 
-      now = Time.now
+      now = Time.zone.now
       Timecop.freeze(now) do
         quiz_with_graded_submission([{ question_data: { :name => "question 1", :points_possible => 10, "question_type" => "essay_question" } }])
       end
@@ -9585,7 +9585,7 @@ describe Submission do
     it "does not call Statsd when a submission is updated" do
       expect(InstStatsd::Statsd).not_to receive(:gauge)
 
-      now = Time.now
+      now = Time.zone.now
       Timecop.freeze(now) do
         quiz_with_graded_submission([{ question_data: { :name => "question 1", :points_possible => 10, "question_type" => "essay_question" } }])
       end
@@ -9600,7 +9600,7 @@ describe Submission do
     it "does not call Statsd when the time between submission and grading is less than 30 seconds" do
       expect(InstStatsd::Statsd).not_to receive(:gauge)
 
-      now = Time.now
+      now = Time.zone.now
       Timecop.freeze(now) do
         quiz_with_graded_submission([{ question_data: { :name => "question 1", :points_possible => 10, "question_type" => "essay_question" } }])
       end

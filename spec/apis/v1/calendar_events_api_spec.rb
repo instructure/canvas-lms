@@ -340,7 +340,7 @@ describe CalendarEventsApiController, type: :request do
 
     it "sorts and paginate events" do
       undated = (1..7).map { |i| @course.calendar_events.create(title: "undated:#{i}", start_at: nil, end_at: nil).id }
-      dated = (1..18).map { |i| @course.calendar_events.create(title: "dated:#{i}", start_at: Time.parse("2012-01-20 12:00:00").advance(days: -i)).id }
+      dated = (1..18).map { |i| @course.calendar_events.create(title: "dated:#{i}", start_at: Time.zone.parse("2012-01-20 12:00:00").advance(days: -i)).id }
       ids = dated.reverse + undated
 
       json = api_call(:get, "/api/v1/calendar_events?all_events=1&context_codes[]=course_#{@course.id}&per_page=10", {
@@ -383,7 +383,7 @@ describe CalendarEventsApiController, type: :request do
       @course.root_account.enable_feature!(:calendar_events_api_pagination_enhancements)
 
       undated = (1..3).map { |i| create_assignments(@course.id, 1, title: "#{@course.id}:#{i}", due_at: nil).first }
-      dated = (1..3).map { |i| create_assignments(@course.id, 1, title: "#{@course.id}:#{i}", due_at: Time.parse("2012-01-20 12:00:00").advance(days: -i)).first }
+      dated = (1..3).map { |i| create_assignments(@course.id, 1, title: "#{@course.id}:#{i}", due_at: Time.zone.parse("2012-01-20 12:00:00").advance(days: -i)).first }
       ids = dated.reverse + undated
 
       (1..6).each do |i|
@@ -583,7 +583,7 @@ describe CalendarEventsApiController, type: :request do
     it "allows specifying an unenrolled but accessible context" do
       unrelated_course = Course.create!(account: Account.default, name: "unrelated course")
       Account.default.account_users.create!(user: @user)
-      CalendarEvent.create!(title: "from unrelated one", start_at: Time.now, end_at: 5.hours.from_now) { |c| c.context = unrelated_course }
+      CalendarEvent.create!(title: "from unrelated one", start_at: Time.zone.now, end_at: 5.hours.from_now) { |c| c.context = unrelated_course }
 
       json = api_call(:get,
                       "/api/v1/calendar_events",
@@ -1116,7 +1116,7 @@ describe CalendarEventsApiController, type: :request do
 
           student_in_course(course: @course, user: (@other_guy = user_factory), active_all: true)
 
-          year = Time.now.year + 1
+          year = Time.zone.now.year + 1
           @ag1 = AppointmentGroup.create!(title: "something", participants_per_appointment: 4, new_appointments: [["#{year}-01-01 12:00:00", "#{year}-01-01 13:00:00", "#{year}-01-01 13:00:00", "#{year}-01-01 14:00:00"]], contexts: [@course])
           @ag1.publish!
           @event1 = @ag1.appointments.first
@@ -1993,7 +1993,7 @@ describe CalendarEventsApiController, type: :request do
         it "updates one event from the series" do
           target_event = @event_series["duplicates"][0]["calendar_event"]
           target_event_id = target_event["id"]
-          new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
+          new_start_at = (Time.zone.parse(target_event["start_at"]) + 15.minutes).iso8601
 
           json = api_call(:put,
                           "/api/v1/calendar_events/#{target_event_id}",
@@ -2007,7 +2007,7 @@ describe CalendarEventsApiController, type: :request do
         it "updates one event from the series and change it to a single event" do
           target_event = @event_series["duplicates"][1]["calendar_event"]
           target_event_id = target_event["id"]
-          new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
+          new_start_at = (Time.zone.parse(target_event["start_at"]) + 15.minutes).iso8601
 
           json = api_call(:put,
                           "/api/v1/calendar_events/#{target_event_id}",
@@ -2029,7 +2029,7 @@ describe CalendarEventsApiController, type: :request do
           target_event = @event_series["duplicates"][0]["calendar_event"]
           target_event_id = target_event["id"]
           new_title = "a new title"
-          new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
+          new_start_at = (Time.zone.parse(target_event["start_at"]) + 15.minutes).iso8601
 
           json = api_call(:put,
                           "/api/v1/calendar_events/#{target_event_id}",
@@ -2041,7 +2041,7 @@ describe CalendarEventsApiController, type: :request do
             expect(event.keys).to match_array expected_series_fields
             expect(event["id"]).to eql orig_events[i]["id"]
             expect(event["title"]).to eql new_title
-            expect(event["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
+            expect(event["start_at"]).to eql (Time.zone.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
           end
         end
 
@@ -2075,7 +2075,7 @@ describe CalendarEventsApiController, type: :request do
             target_event = @new_event_series["duplicates"][0]["calendar_event"]
             target_event_id = target_event["id"]
             new_title = "a new title"
-            new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
+            new_start_at = (Time.zone.parse(target_event["start_at"]) + 15.minutes).iso8601
 
             json = api_call_as_user(@teacher,
                                     :put,
@@ -2088,7 +2088,7 @@ describe CalendarEventsApiController, type: :request do
               expect(event.keys).to match_array expected_series_fields
               expect(event["id"]).to eql orig_events[i]["id"]
               expect(event["title"]).to eql new_title
-              expect(event["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
+              expect(event["start_at"]).to eql (Time.zone.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
             end
             expect(Message.count).to eq 1
             expect(Message.last.user_id).to eq student_1.id
@@ -2104,7 +2104,7 @@ describe CalendarEventsApiController, type: :request do
           target_event_id = target_event["id"]
           series_uuid = target_event["series_uuid"]
           new_title = "a new title"
-          new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
+          new_start_at = (Time.zone.parse(target_event["start_at"]) + 15.minutes).iso8601
 
           json = api_call(:put,
                           "/api/v1/calendar_events/#{target_event_id}",
@@ -2122,7 +2122,7 @@ describe CalendarEventsApiController, type: :request do
               expect(event["series_uuid"]).to eql series_uuid
             else
               expect(event["title"]).to eql new_title
-              expect(event["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
+              expect(event["start_at"]).to eql (Time.zone.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
               # we changed start_at, so the changed events belong to a new series
               expect(event["series_uuid"]).not_to eql series_uuid
             end
@@ -2145,7 +2145,7 @@ describe CalendarEventsApiController, type: :request do
         it "returns an error when which='all' the event is not the head event and the start date changes" do
           target_event = @event_series["duplicates"][0]["calendar_event"]
           target_event_id = target_event["id"].to_s
-          new_start_at = (Time.parse(target_event["start_at"]) + 1.day).iso8601
+          new_start_at = (Time.zone.parse(target_event["start_at"]) + 1.day).iso8601
 
           json = api_call(:put,
                           "/api/v1/calendar_events/#{target_event_id}",
@@ -2160,7 +2160,7 @@ describe CalendarEventsApiController, type: :request do
           orig_events += @event_series["duplicates"].pluck("calendar_event")
           target_event = orig_events[0]
           target_event_id = target_event["id"].to_s
-          new_start_at = (Time.parse(target_event["start_at"]) + 1.day).iso8601
+          new_start_at = (Time.zone.parse(target_event["start_at"]) + 1.day).iso8601
           series_uuid = target_event["series_uuid"]
           new_title = "a new title"
 
@@ -2173,7 +2173,7 @@ describe CalendarEventsApiController, type: :request do
           json.each_with_index do |event, i|
             expect(event["id"]).to eql orig_events[i]["id"]
             expect(event["title"]).to eql new_title
-            expect(event["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 1.day).iso8601
+            expect(event["start_at"]).to eql (Time.zone.parse(orig_events[i]["start_at"]) + 1.day).iso8601
             expect(event["series_uuid"]).to eql series_uuid
           end
         end
@@ -2220,7 +2220,7 @@ describe CalendarEventsApiController, type: :request do
           target_event_id = target_event["id"]
           rrule = "FREQ=WEEKLY;INTERVAL=1;COUNT=2"
           new_title = "a new title"
-          new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
+          new_start_at = (Time.zone.parse(target_event["start_at"]) + 15.minutes).iso8601
 
           json = api_call(:put,
                           "/api/v1/calendar_events/#{target_event_id}",
@@ -2232,7 +2232,7 @@ describe CalendarEventsApiController, type: :request do
             expect(json[i].keys).to match_array expected_series_fields
             expect(json[i]["id"]).to eql orig_events[i]["id"]
             expect(json[i]["title"]).to eql new_title
-            expect(json[i]["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
+            expect(json[i]["start_at"]).to eql (Time.zone.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
             expect(json[0]["series_uuid"]).to eql event["series_uuid"]
           end
         end
@@ -2252,7 +2252,7 @@ describe CalendarEventsApiController, type: :request do
           expect(json.length).to be 2
           json.each_with_index do |series_event, i|
             expect(json[i]["title"]).to eql new_title
-            expect(Time.parse(json[i]["start_at"])).to eql(Time.parse((single_event["start_at"] + i.weeks).iso8601))
+            expect(Time.zone.parse(json[i]["start_at"])).to eql(Time.zone.parse((single_event["start_at"] + i.weeks).iso8601))
             expect(json[0]["series_uuid"]).to eql series_event["series_uuid"]
           end
         end
@@ -2260,8 +2260,8 @@ describe CalendarEventsApiController, type: :request do
         it "creates series events from single event including changing time" do
           single_event = @user.calendar_events.create!(title: "event", start_at: "2023-06-29 09:00:00", end_at: "2023-06-29 10:00:00")
           rrule = "FREQ=WEEKLY;INTERVAL=1;COUNT=2"
-          new_start_at = Time.parse(single_event["start_at"].iso8601) + 15.minutes
-          new_end_at = (Time.parse(single_event["end_at"].iso8601) + 15.minutes)
+          new_start_at = Time.zone.parse(single_event["start_at"].iso8601) + 15.minutes
+          new_end_at = (Time.zone.parse(single_event["end_at"].iso8601) + 15.minutes)
 
           json = api_call(:put,
                           "/api/v1/calendar_events/#{single_event.id}",
@@ -2270,16 +2270,16 @@ describe CalendarEventsApiController, type: :request do
           assert_status(200)
           expect(json.length).to be 2
           json.each_with_index do |_event, i|
-            expect(Time.parse(json[i]["start_at"])).to eql(new_start_at + i.weeks)
-            expect(Time.parse(json[i]["end_at"])).to eql(new_end_at + i.weeks)
+            expect(Time.zone.parse(json[i]["start_at"])).to eql(new_start_at + i.weeks)
+            expect(Time.zone.parse(json[i]["end_at"])).to eql(new_end_at + i.weeks)
           end
         end
 
         it "creates series events from single event including changing date and time" do
           single_event = @user.calendar_events.create!(title: "event", start_at: "2023-06-29 09:00:00", end_at: "2023-06-29 10:00:00")
           rrule = "FREQ=WEEKLY;INTERVAL=1;COUNT=2"
-          new_start_at = Time.parse(single_event["start_at"].iso8601) + 1.day + 15.minutes
-          new_end_at = Time.parse(single_event["end_at"].iso8601) + 1.day + 15.minutes
+          new_start_at = Time.zone.parse(single_event["start_at"].iso8601) + 1.day + 15.minutes
+          new_end_at = Time.zone.parse(single_event["end_at"].iso8601) + 1.day + 15.minutes
 
           json = api_call(:put,
                           "/api/v1/calendar_events/#{single_event.id}",
@@ -2288,8 +2288,8 @@ describe CalendarEventsApiController, type: :request do
           assert_status(200)
           expect(json.length).to be 2
           json.each_with_index do |_event, i|
-            expect(Time.parse(json[i]["start_at"])).to eql(new_start_at + i.weeks)
-            expect(Time.parse(json[i]["end_at"])).to eql(new_end_at + i.weeks)
+            expect(Time.zone.parse(json[i]["start_at"])).to eql(new_start_at + i.weeks)
+            expect(Time.zone.parse(json[i]["end_at"])).to eql(new_end_at + i.weeks)
           end
         end
       end
@@ -2461,7 +2461,7 @@ describe CalendarEventsApiController, type: :request do
 
     it "works when event descriptions contain paths to user attachments" do
       attachment_with_context(@user)
-      @user.calendar_events.create!(description: "/users/#{@user.id}/files/#{@attachment.id}", start_at: Time.now)
+      @user.calendar_events.create!(description: "/users/#{@user.id}/files/#{@attachment.id}", start_at: Time.zone.now)
       api_call(:get, "/api/v1/calendar_events", {
                  controller: "calendar_events_api", action: "index", format: "json"
                })
@@ -2946,7 +2946,7 @@ describe CalendarEventsApiController, type: :request do
 
     it "sorts and paginate assignments" do
       undated = (1..7).map { |i| create_assignments(@course.id, 1, title: "#{@course.id}:#{i}", due_at: nil).first }
-      dated = (1..18).map { |i| create_assignments(@course.id, 1, title: "#{@course.id}:#{i}", due_at: Time.parse("2012-01-20 12:00:00").advance(days: -i)).first }
+      dated = (1..18).map { |i| create_assignments(@course.id, 1, title: "#{@course.id}:#{i}", due_at: Time.zone.parse("2012-01-20 12:00:00").advance(days: -i)).first }
       ids = dated.reverse + undated
 
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}&per_page=10", {
@@ -4440,7 +4440,7 @@ describe CalendarEventsApiController, type: :request do
         allow(InstStatsd::Statsd).to receive(:count)
       end
 
-      let_once(:start_date) { Time.now }
+      let_once(:start_date) { Time.zone.now }
       let_once(:end_date) { 1.week.from_now }
 
       it "logs when event count exceeds page size" do

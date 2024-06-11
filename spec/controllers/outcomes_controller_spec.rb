@@ -316,7 +316,7 @@ describe OutcomesController do
       rubric_association3 = rubric.associate_with(assignment3, @course, purpose: "grading")
       rubric_association2 = rubric.associate_with(assignment2, @course, purpose: "grading")
 
-      now = Time.now
+      now = Time.zone.now
       yesterday = now - 1.day
       day_before_yesterday = now - 2.days
 

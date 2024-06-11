@@ -842,7 +842,7 @@ describe CommunicationChannel do
 
       it "doesn't flag old mappings if nothing relevant has changed" do
         expect(MicrosoftSync::UserMapping).to_not receive(:flag_as_needs_updating_if_using_email)
-        cc.update!(updated_at: cc.updated_at + 1, last_bounce_at: Time.now)
+        cc.update!(updated_at: cc.updated_at + 1, last_bounce_at: Time.zone.now)
       end
     end
   end

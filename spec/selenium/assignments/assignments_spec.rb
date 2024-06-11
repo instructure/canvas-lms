@@ -286,7 +286,7 @@ describe "assignments" do
     it "creates an assignment using main add button", :xbrowser, priority: "1" do
       assignment_name = "first assignment"
       # freeze for a certain time, so we don't get unexpected ui complications
-      time = Time.new(Time.now.year, 1, 7, 2, 13)
+      time = Time.zone.parse("#{Time.zone.now.year}-01-07 02:13")
       Timecop.freeze(time) do
         due_at = format_time_for_view(time)
 
@@ -320,7 +320,7 @@ describe "assignments" do
       @course.root_account.enable_feature!(:instui_nav)
       assignment_name = "first assignment"
       # freeze for a certain time, so we don't get unexpected ui complications
-      time = Time.new(Time.now.year, 1, 7, 2, 13)
+      time = Time.zone.parse("#{Time.zone.now.year}-01-07 02:13")
       Timecop.freeze(time) do
         due_at = format_time_for_view(time)
 
@@ -414,7 +414,7 @@ describe "assignments" do
       enable_cache do
         expected_text = "Assignment 1"
         # freeze time to avoid ui complications
-        time = Time.new(2015, 1, 7, 2, 13)
+        time = Time.zone.local(2015, 1, 7, 2, 13)
         Timecop.freeze(time) do
           due_at = format_time_for_datepicker(time)
           points = "25"

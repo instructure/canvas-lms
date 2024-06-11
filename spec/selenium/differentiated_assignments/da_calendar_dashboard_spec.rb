@@ -73,14 +73,14 @@ describe "interaction with differentiated assignments on the dashboard and calen
 
     context "Calendar" do
       it "does not show inaccessible assignments" do
-        create_section_override_for_assignment(@da_assignment, course_section: @section1, due_at: Time.now)
+        create_section_override_for_assignment(@da_assignment, course_section: @section1, due_at: Time.zone.now)
         get "/calendar"
         # there should be no events for this user to see, thus .fc-event-title should be nil
         expect(f(".fc-month-view")).not_to include_text(@da_assignment.title)
       end
 
       it "shows assignments with an override" do
-        create_section_override_for_assignment(@da_assignment, due_at: Time.now)
+        create_section_override_for_assignment(@da_assignment, due_at: Time.zone.now)
         get "/calendar"
         expect(f(".fc-month-view")).to include_text(@da_assignment.title)
       end
@@ -144,14 +144,14 @@ describe "interaction with differentiated assignments on the dashboard and calen
 
     context "Calendar" do
       it "does not show inaccessible assignments" do
-        create_section_override_for_assignment(@da_assignment, course_section: @section1, due_at: Time.now)
+        create_section_override_for_assignment(@da_assignment, course_section: @section1, due_at: Time.zone.now)
         get "/calendar"
         # there should be no events for this user to see, thus .fc-event-month should be nil
         expect(f(".fc-month-view")).not_to include_text(@da_assignment.title)
       end
 
       it "shows assignments with an override" do
-        create_section_override_for_assignment(@da_assignment, due_at: Time.now)
+        create_section_override_for_assignment(@da_assignment, due_at: Time.zone.now)
         get "/calendar"
         expect(f(".fc-month-view")).to include_text(@da_assignment.title)
       end

@@ -216,11 +216,11 @@ describe CoursePace do
       @course_pace.reload.publish
       mt_due_at = @course.reload.assignments.last.assignment_overrides.last.due_at
 
-      expected_abu_due_at = CanvasTime.fancy_midnight(Time.parse(@course.start_at.to_s).utc) - 4.hours
-      expected_br_due_at  = CanvasTime.fancy_midnight(Time.parse(@course.start_at.to_s).utc) + 3.hours
+      expected_abu_due_at = CanvasTime.fancy_midnight(@course.start_at).change(usec: 999_999) - 4.hours
+      expected_br_due_at  = CanvasTime.fancy_midnight(@course.start_at).change(usec: 999_999) + 3.hours
 
       # DST, otherwise it'd be +7 (-0700)
-      expected_mt_due_at  = CanvasTime.fancy_midnight(Time.parse(@course.start_at.to_s).utc) + 6.hours
+      expected_mt_due_at  = CanvasTime.fancy_midnight(@course.start_at).change(usec: 999_999) + 6.hours
 
       expect([abu_due_at, br_due_at, mt_due_at]).to eq([expected_abu_due_at, expected_br_due_at, expected_mt_due_at])
     end
@@ -411,7 +411,7 @@ describe CoursePace do
     end
 
     it "does not change overrides for sections that have course paces if the course pace is published" do
-      @student_enrollment.reload.update(start_at: nil, created_at: Time.at(0))
+      @student_enrollment.reload.update(start_at: nil, created_at: Time.zone.at(0))
       expect(@course_pace.publish).to be(true)
       expect(@assignment.assignment_overrides.active.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.active.first
@@ -523,10 +523,10 @@ describe CoursePace do
       # there's an extremely tiny window where the date may have changed between
       # when start_date called Time.now and now causing this to fail
       # I don't think it's worth worrying about.
-      expect(@course_pace.start_date.to_date).to eq(Time.now.to_date)
+      expect(@course_pace.start_date.to_date).to eq(Time.zone.now.to_date)
 
       result = @course_pace.start_date(with_context: true)
-      expect(result[:start_date].to_date).to eq(Time.now.to_date)
+      expect(result[:start_date].to_date).to eq(Time.zone.now.to_date)
       expect(result[:start_date_context]).to eq("hypothetical")
     end
   end

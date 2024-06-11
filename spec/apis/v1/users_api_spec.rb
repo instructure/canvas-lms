@@ -2028,7 +2028,7 @@ describe "Users API", type: :request do
 
     context "an admin user" do
       it "is able to update a user" do
-        birthday = Time.now
+        birthday = Time.zone.now
         json = api_call(:put, @path, @path_options, {
                           user: {
                             name: "Tobias Funke",

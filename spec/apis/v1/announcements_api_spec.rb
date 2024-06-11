@@ -45,7 +45,7 @@ describe "Announcements API", type: :request do
     @course2 = @course
     @ann2 = @course2.announcements.build title: "Announcement 2", message: "2"
     @ann2.workflow_state = "post_delayed"
-    @ann2.posted_at = Time.now
+    @ann2.posted_at = Time.zone.now
     @ann2.delayed_post_at = 21.days.from_now
     @ann2.save!
 

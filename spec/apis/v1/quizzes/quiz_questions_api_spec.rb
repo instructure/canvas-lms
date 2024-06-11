@@ -346,7 +346,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
       course_with_student active_all: true
 
       @quiz = @course.quizzes.create!(title: "quiz")
-      @quiz.published_at = Time.now
+      @quiz.published_at = Time.zone.now
       @quiz.workflow_state = "available"
       @quiz.save!
     end

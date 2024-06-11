@@ -1766,7 +1766,7 @@ describe Canvas::LiveEvents do
       context_module = course.context_modules.create!
       context_module_progression = context_module.context_module_progressions.create!(user_id: user.id)
       context_module_progression.workflow_state = "completed"
-      context_module_progression.completed_at = Time.now
+      context_module_progression.completed_at = Time.zone.now
       context_module_progression.requirements_met = ["all of them"]
 
       allow(Rails.env).to receive(:production?).and_return(true)
@@ -1778,7 +1778,7 @@ describe Canvas::LiveEvents do
       singleton = "course_progress_course_#{cmp_id}_user_#{context_module_progression.global_user_id}"
       job = Delayed::Job.find_by(singleton:)
       expect(job).not_to be_nil
-      expect(job.run_at).to be > Time.now
+      expect(job.run_at).to be > Time.zone.now
       expect(job.max_concurrent).to eq 1
       expect(job.tag).to eq "CourseProgress.dispatch_live_event"
     end

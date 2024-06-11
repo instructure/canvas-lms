@@ -1408,7 +1408,7 @@ describe Types::UserType do
 
       it "can get createdAt" do
         query_result = teacher_type.resolve("viewableSubmissionsConnection { nodes { commentsConnection { nodes { createdAt }} }  }")
-        retrieved_values = query_result[0].map { |string_date| Time.parse(string_date) }
+        retrieved_values = query_result[0].map { |string_date| Time.zone.parse(string_date) }
         expect(retrieved_values).to all(be_within(1.minute).of(@sc1.created_at))
       end
 

@@ -886,7 +886,7 @@ describe CoursePacesController do
       Progress.destroy_all
       6.times do
         pace = course_pace_model(course: @course, course_section: @course.course_sections.create!)
-        pace.create_publish_progress(run_at: Time.now)
+        pace.create_publish_progress(run_at: Time.zone.now)
       end
 
       post :publish, params: { course_id: @course.id, id: @course_pace.id }

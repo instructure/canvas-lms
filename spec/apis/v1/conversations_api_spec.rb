@@ -449,7 +449,7 @@ describe ConversationsController, type: :request do
 
     context "sent scope" do
       it "sorts by last authored date" do
-        expected_times = 5.times.to_a.reverse.map { |h| Time.parse((Time.now.utc - h.hours).to_s) }
+        expected_times = 5.times.to_a.reverse.map { |h| Time.zone.parse((Time.now.utc - h.hours).to_s) }
         Timecop.travel(expected_times[0]) do
           @c1 = conversation(@bob)
         end

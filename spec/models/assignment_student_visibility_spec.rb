@@ -54,7 +54,7 @@ describe "differentiated_assignments" do
   end
 
   def assignment_with_false_only_visible_to_overrides
-    make_assignment({ date: Time.now, ovto: false })
+    make_assignment({ date: Time.zone.now, ovto: false })
   end
 
   def group_assignment_with_true_only_visible_to_overrides(opts = {})

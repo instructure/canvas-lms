@@ -1115,7 +1115,7 @@ describe DiscussionTopicsController do
         course_topic(user: @teacher, with_assignment: true)
         @section = @course.course_sections.create!(name: "I <3 Discusions")
         @override = assignment_override_model(assignment: @topic.assignment,
-                                              due_at: Time.now,
+                                              due_at: Time.zone.now,
                                               set: @section)
       end
 
@@ -2785,7 +2785,7 @@ describe DiscussionTopicsController do
       @topic.delayed_post_at = nil
       @topic.locked = false
       @topic.save!
-      delayed_post_time = Time.new(2018, 4, 15)
+      delayed_post_time = Time.zone.local(2018, 4, 15)
       put("update", params: { course_id: @course.id,
                               topic_id: @topic.id,
                               title: "Updated Topic",

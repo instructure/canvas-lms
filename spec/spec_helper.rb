@@ -160,14 +160,18 @@ module RSpec::Core::Hooks
   end
 end
 
-Time.class_eval do
-  def compare_with_round(other)
-    other = Time.at(other.to_i, other.usec) if other.respond_to?(:usec)
-    Time.at(to_i, usec).compare_without_round(other)
+module TimeComparisonWithRounding
+  # ignore nanoseconds, since the database doesn't persist them
+  def <=>(other)
+    other = other.change(usec: other.usec) if other.respond_to?(:usec)
+    if nsec % 1_000 == 0
+      super
+    else
+      change(usec: usec) <=> other
+    end
   end
-  alias_method :compare_without_round, :<=>
-  alias_method :<=>, :compare_with_round
 end
+Time.prepend(TimeComparisonWithRounding)
 
 # we use ivars too extensively for factories; prevent them from
 # being propagated to views in view specs

@@ -51,7 +51,7 @@ module TestDatabaseUtils
     def reset_database!
       return unless truncate_all_tables? || randomize_sequences?
 
-      start = Time.now
+      start = Time.zone.now
 
       # this won't create/migrate them, but it will let us with_each_shard any
       # persistent ones that already exist
@@ -66,7 +66,7 @@ module TestDatabaseUtils
       Shard.default(reload: true)
 
       # RSpecQ fails when using json formatter due to this output. Don't output when running on RSpecQ
-      puts "finished resetting test db in #{Time.now - start} seconds" unless ENV["SUPPRESS_OUTPUT"] == "1"
+      puts "finished resetting test db in #{Time.zone.now - start} seconds" unless ENV["SUPPRESS_OUTPUT"] == "1"
     end
 
     # Like ActiveRecord::Base.connection.reset_pk_sequence! but handles the

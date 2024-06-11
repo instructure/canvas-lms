@@ -141,8 +141,8 @@ describe SIS::CSV::EnrollmentImporter do
     expect(course.users.where(enrollments: { type: "DesignerEnrollment" }).first.name).to eq "User Cinco"
     siete = course.teacher_enrollments.detect { |e| e.user.name == "User Siete" }
     expect(siete).not_to be_nil
-    expect(siete.start_at).to eq Time.new(1985, 8, 24)
-    expect(siete.end_at).to eq Time.new(2011, 8, 29)
+    expect(siete.start_at).to eq Time.zone.local(1985, 8, 24)
+    expect(siete.end_at).to eq Time.zone.local(2011, 8, 29)
   end
 
   it "enrolls users by integration id" do
