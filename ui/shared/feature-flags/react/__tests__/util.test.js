@@ -69,30 +69,64 @@ describe('feature_flags:util', () => {
   })
 
   describe('buildDescription', () => {
-    it('generates the right things with allowsDefaults', () => {
-      expect(util.buildDescription(sampleData.offFeature.feature_flag, true)).toEqual(
-        'Disabled for all subaccounts/courses'
+    it('generates the right things with allowsDefaults for context type account', () => {
+      expect(util.buildDescription(sampleData.offFeature.feature_flag, true, 'Account')).toEqual(
+        'Disabled for all subaccounts'
       )
-      expect(util.buildDescription(sampleData.allowedFeature.feature_flag, true)).toEqual(
-        'Allowed for subaccounts/courses, default off'
-      )
-      expect(util.buildDescription(sampleData.allowedOnFeature.feature_flag, true)).toEqual(
-        'Allowed for subaccounts/courses, default on'
-      )
-      expect(util.buildDescription(sampleData.onFeature.feature_flag, true)).toEqual(
-        'Enabled for all subaccounts/courses'
+      expect(
+        util.buildDescription(sampleData.allowedFeature.feature_flag, true, 'Account')
+      ).toEqual('Allowed for subaccounts, default off')
+      expect(
+        util.buildDescription(sampleData.allowedOnFeature.feature_flag, true, 'Account')
+      ).toEqual('Allowed for subaccounts, default on')
+      expect(util.buildDescription(sampleData.onFeature.feature_flag, true, 'Account')).toEqual(
+        'Enabled for all subaccounts'
       )
     })
 
-    it('generates the right things with no allowsDefaults', () => {
-      expect(util.buildDescription(sampleData.offFeature.feature_flag, false)).toEqual('Disabled')
-      expect(util.buildDescription(sampleData.allowedFeature.feature_flag, false)).toEqual(
+    it('generates the right things with allowsDefaults for context type course', () => {
+      expect(util.buildDescription(sampleData.offFeature.feature_flag, true, 'Course')).toEqual(
+        'Disabled for all courses'
+      )
+      expect(util.buildDescription(sampleData.allowedFeature.feature_flag, true, 'Course')).toEqual(
+        'Allowed for courses, default off'
+      )
+      expect(
+        util.buildDescription(sampleData.allowedOnFeature.feature_flag, true, 'Course')
+      ).toEqual('Allowed for courses, default on')
+      expect(util.buildDescription(sampleData.onFeature.feature_flag, true, 'Course')).toEqual(
+        'Enabled for all courses'
+      )
+    })
+
+    it('generates the right things with no allowsDefaults for context type account', () => {
+      expect(util.buildDescription(sampleData.offFeature.feature_flag, false, 'Account')).toEqual(
         'Disabled'
       )
-      expect(util.buildDescription(sampleData.allowedOnFeature.feature_flag, false)).toEqual(
+      expect(
+        util.buildDescription(sampleData.allowedFeature.feature_flag, false, 'Account')
+      ).toEqual('Disabled')
+      expect(
+        util.buildDescription(sampleData.allowedOnFeature.feature_flag, false, 'Account')
+      ).toEqual('Enabled')
+      expect(util.buildDescription(sampleData.onFeature.feature_flag, false, 'Account')).toEqual(
         'Enabled'
       )
-      expect(util.buildDescription(sampleData.onFeature.feature_flag, false)).toEqual('Enabled')
+    })
+
+    it('generates the right things with no allowsDefaults for context type course', () => {
+      expect(util.buildDescription(sampleData.offFeature.feature_flag, false, 'Course')).toEqual(
+        'Disabled'
+      )
+      expect(
+        util.buildDescription(sampleData.allowedFeature.feature_flag, false, 'Course')
+      ).toEqual('Optional in course, default off')
+      expect(
+        util.buildDescription(sampleData.allowedOnFeature.feature_flag, false, 'Course')
+      ).toEqual('Optional in course, default on')
+      expect(util.buildDescription(sampleData.onFeature.feature_flag, false, 'Course')).toEqual(
+        'Enabled'
+      )
     })
   })
 
