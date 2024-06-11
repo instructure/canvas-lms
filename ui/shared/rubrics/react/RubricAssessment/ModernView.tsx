@@ -30,6 +30,7 @@ import {TextArea} from '@instructure/ui-text-area'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {CommentLibrary} from './CommentLibrary'
 import {CriteriaReadonlyComment} from './CriteriaReadonlyComment'
+import {htmlEscapeCriteriaLongDescription} from './utils/rubricUtils'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
@@ -226,14 +227,17 @@ export const CriterionRow = ({
         </Text>
       </View>
       <View as="div" margin="xx-small 0 0 0" themeOverride={{marginXxSmall: '.25rem'}}>
-        <Text size="small" weight="normal" themeOverride={{fontSizeXSmall: '0.875rem'}}>
-          {criterion.longDescription}
-        </Text>
+        <Text
+          size="small"
+          weight="normal"
+          themeOverride={{fontSizeXSmall: '0.875rem'}}
+          dangerouslySetInnerHTML={htmlEscapeCriteriaLongDescription(criterion)}
+        />
       </View>
       <View as="div" margin="small 0 0 0">
         {!isFreeFormCriterionComments && renderButtonDisplay()}
       </View>
-      <View as="div" margin="small 0 0 0">
+      <View as="div" margin="small 0 0 0" overflowX="hidden" overflowY="hidden">
         {isFreeFormCriterionComments ? (
           <Flex direction="column">
             {!isPreviewMode && !isPeerReview && rubricSavedComments.length > 0 && (
@@ -254,7 +258,12 @@ export const CriterionRow = ({
             <Flex.Item margin={rubricSavedComments.length > 0 ? 'medium 0 0 0' : '0 0 0 0'}>
               <Text weight="bold">{I18n.t('Comment')}</Text>
             </Flex.Item>
-            <Flex.Item margin="x-small 0 0 0" shouldGrow={true}>
+            <Flex.Item
+              margin="x-small 0 0 0"
+              shouldGrow={true}
+              overflowX="hidden"
+              overflowY="hidden"
+            >
               <TextArea
                 label={<ScreenReaderContent>{I18n.t('Criterion Comment')}</ScreenReaderContent>}
                 readOnly={isPreviewMode}
@@ -283,7 +292,12 @@ export const CriterionRow = ({
           </Flex>
         ) : (
           <Flex direction="column">
-            <Flex.Item margin="x-small 0 0 0" shouldGrow={true}>
+            <Flex.Item
+              margin="x-small 0 0 0"
+              shouldGrow={true}
+              overflowX="hidden"
+              overflowY="hidden"
+            >
               {isPreviewMode ? (
                 <CriteriaReadonlyComment commentText={commentText} />
               ) : (

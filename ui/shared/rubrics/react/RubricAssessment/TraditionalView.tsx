@@ -32,6 +32,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {CommentLibrary} from './CommentLibrary'
 import {CriteriaReadonlyComment} from './CriteriaReadonlyComment'
 import {Button} from '@instructure/ui-buttons'
+import {escapeNewLineText, htmlEscapeCriteriaLongDescription} from './utils/rubricUtils'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 const {licorice} = colors
@@ -225,7 +226,15 @@ const CriterionRow = ({
             height="13.75rem"
             overflowY="auto"
           >
-            <Text weight="bold">{criterion.description}</Text>
+            <View as="div">
+              <Text weight="bold">{criterion.description}</Text>
+            </View>
+            <View as="div" margin="small 0 0 0">
+              <Text
+                size="small"
+                dangerouslySetInnerHTML={htmlEscapeCriteriaLongDescription(criterion)}
+              />
+            </View>
           </View>
         </Flex.Item>
         {isFreeFormCriterionComments ? (
@@ -355,8 +364,15 @@ const CriterionRow = ({
                             <Flex.Item>
                               <Text weight="bold">{rating.description}</Text>
                             </Flex.Item>
-                            <Flex.Item margin="small 0 0 0" shouldGrow={true}>
-                              <Text size="small">{rating.longDescription}</Text>
+                            <Flex.Item margin="small 0 0 0" shouldGrow={true} textAlign="start">
+                              <View as="div" maxHeight="9.531rem">
+                                <Text
+                                  size="small"
+                                  dangerouslySetInnerHTML={escapeNewLineText(
+                                    rating.longDescription
+                                  )}
+                                />
+                              </View>
                             </Flex.Item>
                             <Flex.Item>
                               <View
