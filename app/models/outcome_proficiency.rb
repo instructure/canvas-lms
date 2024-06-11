@@ -31,7 +31,7 @@ class OutcomeProficiency < ApplicationRecord
            dependent: :destroy,
            inverse_of: :outcome_proficiency,
            autosave: true
-  belongs_to :context, polymorphic: %i[account course], required: true
+  belongs_to :context, polymorphic: %i[account course], optional: false
 
   validates :outcome_proficiency_ratings, presence: { message: t("Missing required ratings") }, unless: :deleted?
   validate :single_mastery_rating, unless: :deleted?
