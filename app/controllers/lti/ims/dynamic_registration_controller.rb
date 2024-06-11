@@ -263,7 +263,8 @@ module Lti
             { claims: [] },
             :target_link_uri,
             { custom_parameters: ArbitraryStrongishParams::ANYTHING },
-            "https://#{Lti::IMS::Registration::CANVAS_EXTENSION_LABEL}/lti/privacy_level"
+            "https://#{Lti::IMS::Registration::CANVAS_EXTENSION_LABEL}/lti/privacy_level",
+            "https://#{Lti::IMS::Registration::CANVAS_EXTENSION_LABEL}/lti/tool_id"
           ] },
           :client_uri,
           :logo_uri,

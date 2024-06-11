@@ -194,7 +194,7 @@ module Lti::IMS
                 "platform" => "canvas.instructure.com",
                 "text" => "Example Tool",
               },
-              "tool_id" => "Example Tool"
+              "tool_id" => nil
             }],
             "oidc_initiation_url" => "http://example.com/login",
             "privacy_level" => "anonymous",
@@ -487,6 +487,39 @@ module Lti::IMS
         end
       end
 
+      describe "when a tool_id is not supplied" do
+        let(:lti_tool_configuration) do
+          {
+            domain: "example.com",
+            messages: [],
+            claims: []
+          }
+        end
+
+        subject { registration.canvas_configuration["extensions"][0]["tool_id"] }
+
+        it "it is nil" do
+          expect(subject).to be_nil
+        end
+      end
+
+      describe "when a tool_id is supplied" do
+        let(:lti_tool_configuration) do
+          {
+            domain: "example.com",
+            messages: [],
+            claims: [],
+            "https://canvas.instructure.com/lti/tool_id": "ToolV2"
+          }
+        end
+
+        subject { registration.canvas_configuration["extensions"][0]["tool_id"] }
+
+        it "it is extracted from the claim" do
+          expect(subject).to eq "ToolV2"
+        end
+      end
+
       describe "importable_configuration" do
         subject { registration.importable_configuration }
         let(:lti_tool_configuration) do
@@ -543,7 +576,7 @@ module Lti::IMS
                   "platform" => "canvas.instructure.com",
                   "text" => "Example Tool"
                 },
-                "tool_id" => "Example Tool"
+                "tool_id" => nil
               }],
               "lti_version" => "1.3",
               "oidc_initiation_url" => "http://example.com/login",
@@ -553,7 +586,7 @@ module Lti::IMS
               "scopes" => [],
               "target_link_uri" => nil,
               "title" => "Example Tool",
-              "tool_id" => "Example Tool",
+              "tool_id" => nil,
               "url" => nil,
               "settings" => {
                 "course_navigation" => {
@@ -603,25 +636,59 @@ module Lti::IMS
     describe "registration_configuration" do
       subject { registration.registration_configuration }
 
-      it "formats the configuration correctly" do
-        config = registration.lti_tool_configuration.with_indifferent_access
+      context "when no explicit tool_id is set" do
+        it "formats the configuration correctly with tool_id being nil" do
+          config = registration.lti_tool_configuration.with_indifferent_access
+          expect(subject).to eq(
+            {
+              name: registration.client_name,
+              description: config[:description],
+              domain: config[:domain],
+              custom_fields: config[:custom_parameters],
+              target_link_uri: config[:target_link_uri],
+              privacy_level: registration.privacy_level,
+              icon_url: config[:icon_uri],
+              oidc_initiation_url: registration.initiate_login_uri,
+              redirect_uris: registration.redirect_uris,
+              public_jwk_url: registration.jwks_uri,
+              scopes: registration.overlaid_scopes,
+              placements: registration.placements,
+              tool_id: nil
+            }.with_indifferent_access
+          )
+        end
+      end
 
-        expect(subject).to eq(
+      context "when an explicit tool_id is set" do
+        let(:lti_tool_configuration) do
           {
-            name: registration.client_name,
-            description: config[:description],
-            domain: config[:domain],
-            custom_fields: config[:custom_parameters],
-            target_link_uri: config[:target_link_uri],
-            privacy_level: registration.privacy_level,
-            icon_url: config[:icon_uri],
-            oidc_initiation_url: registration.initiate_login_uri,
-            redirect_uris: registration.redirect_uris,
-            public_jwk_url: registration.jwks_uri,
-            scopes: registration.overlaid_scopes,
-            placements: registration.placements,
-          }.with_indifferent_access
-        )
+            domain: "example.com",
+            messages: [],
+            claims: [],
+            "https://canvas.instructure.com/lti/tool_id": "ToolV2"
+          }
+        end
+
+        it "formats the configuration correctly with tool_id" do
+          config = registration.lti_tool_configuration.with_indifferent_access
+          expect(subject).to eq(
+            {
+              name: registration.client_name,
+              description: config[:description],
+              domain: config[:domain],
+              custom_fields: config[:custom_parameters],
+              target_link_uri: config[:target_link_uri],
+              privacy_level: registration.privacy_level,
+              icon_url: config[:icon_uri],
+              oidc_initiation_url: registration.initiate_login_uri,
+              redirect_uris: registration.redirect_uris,
+              public_jwk_url: registration.jwks_uri,
+              scopes: registration.overlaid_scopes,
+              placements: registration.placements,
+              tool_id: "ToolV2"
+            }.with_indifferent_access
+          )
+        end
       end
     end
 
