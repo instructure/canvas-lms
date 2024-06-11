@@ -108,7 +108,7 @@ export default function FilterNavDateModal({
             messages={startDateMessages}
             onSelectedDateChange={(inputObj: MomentInput) => {
               if (inputObj instanceof Date) {
-                const startDate_ = isoDateFromInput('start-date', inputObj)
+                const startDate_ = isoDateFromInput('start-date', inputObj, ENV?.TIMEZONE)
                 if (endDateValue && startDate_ > endDateValue) {
                   setStartDateMessages([
                     {
@@ -142,7 +142,7 @@ export default function FilterNavDateModal({
             messages={endDateMessages}
             onSelectedDateChange={(inputObj: MomentInput) => {
               if (inputObj instanceof Date) {
-                const endDate_ = isoDateFromInput('end-date', inputObj)
+                const endDate_ = isoDateFromInput('end-date', inputObj, ENV?.TIMEZONE)
                 if (startDateValue && endDate_ < startDateValue) {
                   setEndDateMessages([
                     {
