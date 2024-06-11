@@ -295,7 +295,7 @@ class CoursePace < ActiveRecord::Base
 
     enrollment_start_date = student_enrollment&.start_at || [student_enrollment&.effective_start_at, student_enrollment&.created_at].compact.max
     date = enrollment_start_date || course_section&.start_at || valid_date_range.start_at[:date]
-    today = Date.today
+    today = course.time_zone.today
 
     # always put pace plan dates in the course time zone
     if with_context

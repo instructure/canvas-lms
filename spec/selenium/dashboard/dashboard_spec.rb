@@ -161,8 +161,8 @@ describe "dashboard" do
       announcement = @course.account.announcements.create!(message: "blah blah http://random-survey-startup.ly/?some_GET_parameter_by_which_to_differentiate_results={{ACCOUNT_DOMAIN}}",
                                                            subject: "test",
                                                            user: User.create!,
-                                                           start_at: Date.today,
-                                                           end_at: Date.today + 1.day)
+                                                           start_at: Time.zone.today,
+                                                           end_at: Time.zone.today + 1.day)
 
       get "/"
       expect(fj("#dashboard .account_notification .notification_message").text).to eq announcement.message.gsub("{{ACCOUNT_DOMAIN}}", @course.account.domain)
@@ -172,8 +172,8 @@ describe "dashboard" do
       announcement = @course.account.announcements.create!(message: "blah blah http://random-survey-startup.ly/?surveys_are_not_really_anonymous={{CANVAS_USER_ID}}",
                                                            subject: "test",
                                                            user: User.create!,
-                                                           start_at: Date.today,
-                                                           end_at: Date.today + 1.day)
+                                                           start_at: Time.zone.today,
+                                                           end_at: Time.zone.today + 1.day)
       get "/"
       expect(fj("#dashboard .account_notification .notification_message").text).to eq announcement.message.gsub("{{CANVAS_USER_ID}}", @user.global_id.to_s)
     end

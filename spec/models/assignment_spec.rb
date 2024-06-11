@@ -4465,34 +4465,34 @@ describe Assignment do
     end
 
     it "determines date from due_at's timezone" do
-      @assignment.due_at = Date.today.in_time_zone("Baghdad") + 1.hour # 01:00:00 AST +03:00 today
+      @assignment.due_at = Time.zone.today.in_time_zone("Baghdad") + 1.hour # 01:00:00 AST +03:00 today
       @assignment.time_zone_edited = "Baghdad"
       @assignment.save!
-      expect(@assignment.all_day_date).to eq Date.today
+      expect(@assignment.all_day_date).to eq Time.zone.today
 
       @assignment.due_at = @assignment.due_at.in_time_zone("Alaska") - 2.hours # 12:00:00 AKDT -08:00 previous day
       @assignment.time_zone_edited = "Alaska"
       @assignment.save!
-      expect(@assignment.all_day_date).to eq Date.today - 1.day
+      expect(@assignment.all_day_date).to eq Time.zone.today - 1.day
     end
 
     it "preserves all-day date when only changing time zone" do
-      @assignment.due_at = Date.today.in_time_zone("Baghdad") # 00:00:00 AST +03:00 today
+      @assignment.due_at = Time.zone.today.in_time_zone("Baghdad") # 00:00:00 AST +03:00 today
       @assignment.time_zone_edited = "Baghdad"
       @assignment.save!
       @assignment.due_at = @assignment.due_at.in_time_zone("Alaska") # 13:00:00 AKDT -08:00 previous day
       @assignment.time_zone_edited = "Alaska"
       @assignment.save!
-      expect(@assignment.all_day_date).to eq Date.today
+      expect(@assignment.all_day_date).to eq Time.zone.today
     end
 
     it "preserves non-all-day date when only changing time zone" do
-      @assignment.due_at = Date.today.in_time_zone("Alaska") - 11.hours # 13:00:00 AKDT -08:00 previous day
+      @assignment.due_at = Time.zone.today.in_time_zone("Alaska") - 11.hours # 13:00:00 AKDT -08:00 previous day
       @assignment.save!
       @assignment.due_at = @assignment.due_at.in_time_zone("Baghdad") # 00:00:00 AST +03:00 today
       @assignment.time_zone_edited = "Baghdad"
       @assignment.save!
-      expect(@assignment.all_day_date).to eq Date.today - 1.day
+      expect(@assignment.all_day_date).to eq Time.zone.today - 1.day
     end
   end
 
