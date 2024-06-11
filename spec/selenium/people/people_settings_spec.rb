@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../common"
+require_relative "pages/course_people_modal"
 
 describe "course people" do
   include_context "in-process server selenium tests"
@@ -123,7 +124,7 @@ describe "course people" do
       # open dialog
       use_edit_sections_dialog(@student) do
         # choose section
-        select_from_auto_complete(section_name, "section_input")
+        CoursePeople.select_from_section_autocomplete(section_name)
       end
       # expect
       expect(f("#user_#{@student.id}")).to include_text(section_name)
@@ -161,7 +162,7 @@ describe "course people" do
       # open dialog
       use_edit_sections_dialog(@student) do
         # choose section
-        select_from_auto_complete(section_name, "section_input")
+        CoursePeople.select_from_section_autocomplete(section_name)
       end
       # expect
       expect(f("#user_#{@student.id}")).to include_text(section_name)

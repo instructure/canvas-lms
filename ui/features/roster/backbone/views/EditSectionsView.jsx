@@ -15,15 +15,17 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import SectionSelector from '../../react/SectionSelector'
+
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {map, reject, difference, filter, includes, extend as lodashExtend} from 'lodash'
 import DialogBaseView from '@canvas/dialog-base-view'
 import RosterDialogMixin from './RosterDialogMixin'
 import editSectionsViewTemplate from '../../jst/EditSectionsView.handlebars'
-import sectionTemplate from '../../jst/section.handlebars'
-import h from '@instructure/html-escape'
-import '../../jquery/ContextSearch'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
 
@@ -32,8 +34,6 @@ const I18n = useI18nScope('course_settings')
 export default class EditSectionsView extends DialogBaseView {
   static initClass() {
     this.mixin(RosterDialogMixin)
-
-    this.prototype.events = {'click #user_sections li a': 'removeSection'}
 
     this.prototype.dialogOptions = {
       id: 'edit_sections',
@@ -49,86 +49,32 @@ export default class EditSectionsView extends DialogBaseView {
         sectionsUrl: ENV.SEARCH_URL,
       })
     )
-    this.setupContextSearch()
+    super.render()
     return this
   }
 
-  setupContextSearch() {
-    this.$('#section_input').contextSearch({
-      contexts: ENV.CONTEXTS,
-      placeholder: I18n.t('edit_sections_placeholder', 'Enter a section name'),
-      title: I18n.t('edit_sections_title', 'Section name'),
-      onNewToken: this.onNewToken.bind(this),
-      added: (data, $token, _newToken) => {
-        return this.$('#user_sections').append($token)
-      },
-      selector: {
-        baseData: {
-          type: 'section',
-          context: `course_${ENV.course.id}_sections`,
-          exclude: map(
-            this.model.sectionEditableEnrollments(),
-            e => `section_${e.course_section_id}`
-          ).concat(ENV.CONCLUDED_SECTIONS),
-        },
-        noExpand: true,
-        browser: {
-          data: {
-            per_page: 100,
-            types: ['section'],
-            search_all_contexts: true,
-          },
-        },
-      },
-    })
-    this.input = this.$('#section_input').data('token_input')
-    this.input.$fakeInput.css('width', '100%')
-    this.input.tokenValues = () => {
-      return Array.from(this.$('#user_sections input')).map(input => input.value)
-    }
+  afterRender() {
+    const enrollments = this.model.sectionEditableEnrollments()
 
-    const $sections = this.$('#user_sections')
-    return (() => {
-      const result = []
-      for (const e of Array.from(this.model.sectionEditableEnrollments())) {
-        let section
-        if ((section = ENV.CONTEXTS.sections[e.course_section_id])) {
-          result.push(
-            $sections.append(
-              sectionTemplate({
-                id: section.id,
-                name: section.name,
-                role: e.role,
-                can_be_removed: e.can_be_removed,
-              })
-            )
-          )
-        } else {
-          result.push(undefined)
-        }
+    const excludeSections = enrollments.map(enrollment => {
+      const section = ENV.CONTEXTS.sections[enrollment.course_section_id]
+
+      return {
+        id: section.id,
+        name: section.name,
+        role: enrollment.role,
+        can_be_removed: enrollment.can_be_removed,
       }
-      return result
-    })()
+    })
+
+    ReactDOM.render(
+      <QueryClientProvider client={new QueryClient()}>
+        <SectionSelector courseId={ENV.current_context.id} initialSections={excludeSections} />
+      </QueryClientProvider>,
+      document.getElementById('react_section_input')
+    )
   }
 
-  onNewToken($token) {
-    const $link = $token.find('a')
-    $link.attr('href', '#')
-    $link.attr(
-      'title',
-      I18n.t('remove_user_from_course_section', 'Remove user from %{course_section}', {
-        course_section: $token.find('div').attr('title'),
-      })
-    )
-    const $screenreader_span = $('<span class="screenreader-only"></span>').append(
-      h(
-        I18n.t('remove_user_from_course_section', 'Remove user from %{course_section}', {
-          course_section: h($token.find('div').attr('title')),
-        })
-      )
-    )
-    return $link.append($screenreader_span)
-  }
 
   update(e) {
     let url
@@ -192,15 +138,6 @@ export default class EditSectionsView extends DialogBaseView {
         )
         .always(() => this.close())
     )
-  }
-
-  removeSection(e) {
-    e.preventDefault()
-    const $token = $(e.currentTarget).closest('li')
-    if ($token.closest('ul').children().length > 1) {
-      $token.remove()
-    }
-    return this.input.$input.focus()
   }
 }
 EditSectionsView.initClass()
