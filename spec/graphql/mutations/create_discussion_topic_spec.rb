@@ -47,6 +47,12 @@ describe Mutations::CreateDiscussionTopic do
             podcastEnabled
             podcastHasStudentPosts
             isSectionSpecific
+            ungradedDiscussionOverrides {
+              nodes {
+                _id
+                title
+              }
+            }
             groupSet {
               _id
             }
@@ -1388,6 +1394,79 @@ describe Mutations::CreateDiscussionTopic do
       student_ids = assignment_override.assignment_override_students.pluck(:user_id)
 
       expect(student_ids).to match_array [student1.id, student2.id]
+    end
+  end
+
+  context "with selective_release_ui_api flag ON" do
+    before do
+      Account.site_admin.enable_feature!(:selective_release_ui_api)
+    end
+
+    after do
+      Account.site_admin.disable_feature!(:selective_release_ui_api)
+    end
+
+    it "successfully creates a ungraded discussion topic with override" do
+      context_type = "Course"
+      title = "Ungraded Discussion"
+      message = "Lorem ipsum..."
+      published = true
+      student1 = @course.enroll_student(User.create!, enrollment_state: "active").user
+      student2 = @course.enroll_student(User.create!, enrollment_state: "active").user
+
+      query = <<~GQL
+        contextId: "#{@course.id}"
+        contextType: #{context_type}
+        title: "#{title}"
+        message: "#{message}"
+        published: #{published}
+        ungradedDiscussionOverrides: {
+          studentIds: [#{student1.id}, #{student2.id}]
+        }
+      GQL
+
+      result = execute_with_input(query)
+      discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+      override = DiscussionTopic.last.active_assignment_overrides.first
+      aggregate_failures do
+        expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+        expect(discussion_topic["ungradedDiscussionOverrides"]["nodes"]).to match([{ "_id" => override.id.to_s, "title" => override.title }])
+        expect(override.set_type).to eq("ADHOC")
+        expect(override.set_id).to be_nil
+        expect(override.set.map(&:id)).to match_array([student1.id, student2.id])
+        expect(override.workflow_state).to eq "active"
+      end
+    end
+
+    it "does not create a ungraded discussion topic with override if flag is off" do
+      Account.site_admin.disable_feature!(:selective_release_ui_api)
+
+      context_type = "Course"
+      title = "Ungraded Discussion"
+      message = "Lorem ipsum..."
+      published = true
+      student1 = @course.enroll_student(User.create!, enrollment_state: "active").user
+      student2 = @course.enroll_student(User.create!, enrollment_state: "active").user
+
+      query = <<~GQL
+        contextId: "#{@course.id}"
+        contextType: #{context_type}
+        title: "#{title}"
+        message: "#{message}"
+        published: #{published}
+        ungradedDiscussionOverrides: {
+          studentIds: [#{student1.id}, #{student2.id}]
+        }
+      GQL
+
+      result = execute_with_input(query)
+      discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+      override = DiscussionTopic.last.active_assignment_overrides.first
+      aggregate_failures do
+        expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+        expect(discussion_topic["ungradedDiscussionOverrides"]).to be_nil
+        expect(override).to be_nil
+      end
     end
   end
 end

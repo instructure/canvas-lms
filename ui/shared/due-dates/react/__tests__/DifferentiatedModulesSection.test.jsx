@@ -59,9 +59,9 @@ describe('DifferentiatedModulesSection', () => {
     defaultSectionId: 0,
   }
 
-  const SECTIONS_URL = `/api/v1/courses/${COURSE_ID}/sections`
-  const STUDENTS_URL = `api/v1/courses/${COURSE_ID}/users?enrollment_type=student`
-  const DATE_DETAILS = `/api/v1/courses/${COURSE_ID}/assignments/${ASSIGNMENT_ID}/date_details`
+  const SECTIONS_URL = `/api/v1/courses/${COURSE_ID}/sections?per_page=100`
+  const STUDENTS_URL = `api/v1/courses/${COURSE_ID}/users?per_page=100&enrollment_type=student`
+  const DATE_DETAILS = `/api/v1/courses/${COURSE_ID}/assignments/${ASSIGNMENT_ID}/date_details?per_page=100`
 
   beforeAll(() => {
     window.ENV ||= {}
@@ -172,8 +172,23 @@ describe('DifferentiatedModulesSection', () => {
       }
     })
 
-    it('does not render the option for non-assignment items', () => {
+    it('renders the option for assignment items', () => {
+      const {queryByTestId} = render(<DifferentiatedModulesSection {...props} type="assignment" />)
+      expect(queryByTestId('important_dates')).toBeInTheDocument()
+    })
+
+    it('renders the option for discussion items', () => {
+      const {queryByTestId} = render(<DifferentiatedModulesSection {...props} type="discussion" />)
+      expect(queryByTestId('important_dates')).toBeInTheDocument()
+    })
+
+    it('renders the option for quiz items', () => {
       const {queryByTestId} = render(<DifferentiatedModulesSection {...props} type="quiz" />)
+      expect(queryByTestId('important_dates')).toBeInTheDocument()
+    })
+
+    it('does not render the option for non-supported items', () => {
+      const {queryByTestId} = render(<DifferentiatedModulesSection {...props} type="module" />)
 
       expect(queryByTestId('important_dates')).not.toBeInTheDocument()
     })

@@ -43,6 +43,7 @@ import {
 } from '../util/differentiatedModulesUtil'
 import {uid} from '@instructure/uid'
 import {Pill} from '@instructure/ui-pill'
+import types from '@canvas/theme-editor/react/PropTypes'
 
 const I18n = useI18nScope('DueDateOverrideView')
 
@@ -78,6 +79,11 @@ const DifferentiatedModulesSection = ({
   const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
   const [moduleAssignees, setModuleAssignees] = useState([])
   const linkRef = useRef()
+
+  const shouldRenderImportantDates = useMemo(
+    () => type === 'assignment' || type === 'discussion' || type === 'quiz',
+    [type]
+  )
 
   const formData = useMemo(
     () => ({
@@ -486,7 +492,7 @@ const DifferentiatedModulesSection = ({
           </View>
         </Link>
       </View>
-      {(type === 'assignment' || type === 'discussion') && importantDatesCheckbox()}
+      {shouldRenderImportantDates && importantDatesCheckbox()}
       <ItemAssignToTray
         open={open}
         onClose={handleClose}
