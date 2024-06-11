@@ -45,7 +45,7 @@ class OutcomeCalculationMethod < ApplicationRecord
     "average" => [].freeze,
   }.freeze
 
-  belongs_to :context, polymorphic: [:account, :course], required: true
+  belongs_to :context, polymorphic: [:account, :course], optional: false
   resolves_root_account through: :context
 
   validates :context, presence: true
