@@ -5709,11 +5709,11 @@ describe Assignment do
       res = @assignment.to_ics(in_own_calendar: false)
       expect(res).not_to be_nil
       expect(res.dtstart.tz_utc).to be true
-      expect(res.dtstart.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+      expect(res.dtstart.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").utc.strftime("%Y-%m-%dT%H:%M:00")
       expect(res.dtend.tz_utc).to be true
-      expect(res.dtend.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+      expect(res.dtend.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").utc.strftime("%Y-%m-%dT%H:%M:00")
       expect(res.dtstamp.tz_utc).to be true
-      expect(res.dtstamp.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+      expect(res.dtstamp.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:05pm").utc.strftime("%Y-%m-%dT%H:%M:00")
     end
 
     it ".to_ics should return data for assignments with due dates in correct tz" do
@@ -5724,11 +5724,11 @@ describe Assignment do
       res = @assignment.to_ics(in_own_calendar: false)
       expect(res).not_to be_nil
       expect(res.dtstart.tz_utc).to be true
-      expect(res.dtstart.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+      expect(res.dtstart.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").utc.strftime("%Y-%m-%dT%H:%M:00")
       expect(res.dtend.tz_utc).to be true
-      expect(res.dtend.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+      expect(res.dtend.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").utc.strftime("%Y-%m-%dT%H:%M:00")
       expect(res.dtstamp.tz_utc).to be true
-      expect(res.dtstamp.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+      expect(res.dtstamp.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:05pm").utc.strftime("%Y-%m-%dT%H:%M:00")
     end
 
     it ".to_ics should return string dates for all_day events" do

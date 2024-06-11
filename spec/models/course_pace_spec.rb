@@ -195,7 +195,7 @@ describe CoursePace do
 
   context "publish" do
     def fancy_midnight_rounded_to_last_second(date)
-      CanvasTime.fancy_midnight(date.to_datetime).to_time.in_time_zone("UTC")
+      CanvasTime.fancy_midnight(date.to_datetime).to_time.utc
     end
 
     before :once do
@@ -216,11 +216,11 @@ describe CoursePace do
       @course_pace.reload.publish
       mt_due_at = @course.reload.assignments.last.assignment_overrides.last.due_at
 
-      expected_abu_due_at = CanvasTime.fancy_midnight(Date.parse(@course.start_at.to_s).in_time_zone("UTC")) - 4.hours
-      expected_br_due_at  = CanvasTime.fancy_midnight(Date.parse(@course.start_at.to_s).in_time_zone("UTC")) + 3.hours
+      expected_abu_due_at = CanvasTime.fancy_midnight(Time.parse(@course.start_at.to_s).utc) - 4.hours
+      expected_br_due_at  = CanvasTime.fancy_midnight(Time.parse(@course.start_at.to_s).utc) + 3.hours
 
       # DST, otherwise it'd be +7 (-0700)
-      expected_mt_due_at  = CanvasTime.fancy_midnight(Date.parse(@course.start_at.to_s).in_time_zone("UTC")) + 6.hours
+      expected_mt_due_at  = CanvasTime.fancy_midnight(Time.parse(@course.start_at.to_s).utc) + 6.hours
 
       expect([abu_due_at, br_due_at, mt_due_at]).to eq([expected_abu_due_at, expected_br_due_at, expected_mt_due_at])
     end
