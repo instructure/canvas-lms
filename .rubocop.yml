@@ -286,9 +286,6 @@ Rails/DuplicateAssociation:
 Rails/EagerEvaluationLogMessage:
   Severity: convention
   AutoCorrect: false
-Rails/EnumHash:
-  Severity: convention
-  AutoCorrect: false
 Rails/FindEach:
   Severity: convention
   AutoCorrect: false
