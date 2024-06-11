@@ -104,7 +104,7 @@ describe SIS::CSV::GroupImporter do
     expect(batch1.roll_back_data.where(previous_workflow_state: "non-existent").count).to eq 1
     expect(batch3.roll_back_data.where(updated_workflow_state: "deleted").count).to eq 2
     batch3.restore_states_for_batch
-    expect(@account.all_groups.where(sis_source_id: "G001").take.workflow_state).to eq "available"
+    expect(@account.all_groups.find_by(sis_source_id: "G001").workflow_state).to eq "available"
   end
 
   it "updates group attributes" do
@@ -143,8 +143,8 @@ describe SIS::CSV::GroupImporter do
       "G001,,Group 1,available,Gc001",
       "G002,,Group 2,available,Gc002"
     )
-    group1 = Group.where(sis_source_id: "G001").take
-    group2 = Group.where(sis_source_id: "G002").take
+    group1 = Group.find_by(sis_source_id: "G001")
+    group2 = Group.find_by(sis_source_id: "G002")
     groups = [group1, group2]
     expect(groups.map(&:account)).to eq [@account, sub]
     expect(groups.map(&:group_category)).to eq GroupCategory.order(:id).to_a
@@ -156,7 +156,7 @@ describe SIS::CSV::GroupImporter do
       "group_id,course_id,name,status",
       "G001,c001,Group 1,available"
     )
-    expect(Group.where(sis_source_id: "G001").take.context).to eq course
+    expect(Group.find_by(sis_source_id: "G001").context).to eq course
   end
 
   it "does not allow changing course_id with group_memberships" do

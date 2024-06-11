@@ -5552,7 +5552,7 @@ describe Course do
       e1.conclude
       @course.sync_homeroom_enrollments
       expect(@course.enrollments.where(user_id: @student.id).size).to eq 2
-      e2 = @course.enrollments.where(user_id: @student.id, role_id: role.id).take
+      e2 = @course.enrollments.find_by(user_id: @student.id, role_id: role.id)
       expect(e2.role_id).to eq role.id
       expect(e2.start_at).to eq e1.start_at
       expect(e2.end_at).to eq e1.end_at

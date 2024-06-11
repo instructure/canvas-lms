@@ -487,7 +487,7 @@ class CommunicationChannel < ActiveRecord::Base
     if build_pseudonym_on_confirm && active?
       self.build_pseudonym_on_confirm = false
       pseudonym = Account.default.pseudonyms.build(unique_id: path, user:)
-      existing_pseudonym = Account.default.pseudonyms.active.where(user_id: user).take
+      existing_pseudonym = Account.default.pseudonyms.active.find_by(user_id: user)
       if existing_pseudonym
         pseudonym.password_salt = existing_pseudonym.password_salt
         pseudonym.crypted_password = existing_pseudonym.crypted_password

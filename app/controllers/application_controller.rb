@@ -1415,7 +1415,7 @@ class ApplicationController < ActionController::Base
     badge_counts = {}
     ["Submission"].each do |type|
       participation_count = context.content_participation_counts
-                                   .where(user_id: user.id, content_type: type).take
+                                   .find_by(user_id: user.id, content_type: type)
       participation_count ||= content_participation_count(context, type, user)
       badge_counts[type.underscore.pluralize] = participation_count.unread_count
     end
@@ -1556,7 +1556,7 @@ class ApplicationController < ActionController::Base
   end
 
   def find_user_from_uuid(uuid)
-    @current_user = UserPastLtiId.where(user_uuid: uuid).take&.user
+    @current_user = UserPastLtiId.find_by(user_uuid: uuid)&.user
     @current_user ||= User.where(uuid:).first
   end
 

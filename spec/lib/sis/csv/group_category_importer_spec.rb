@@ -57,31 +57,31 @@ describe SIS::CSV::GroupCategoryImporter do
   end
 
   it "creates group categories" do
-    sub = Account.where(sis_source_id: "A001").take
+    sub = Account.find_by(sis_source_id: "A001")
     process_csv_data_cleanly(
       "group_category_id,account_id,course_id,category_name,status",
       "Gc001,,\"\",Group Cat 1,active",
       "Gc002,A001,,Group Cat 2,active"
     )
-    group_category = GroupCategory.where(sis_source_id: "Gc001").take
+    group_category = GroupCategory.find_by(sis_source_id: "Gc001")
     expect(group_category.context_id).to eq @account.id
     expect(group_category.sis_source_id).to eq "Gc001"
     expect(group_category.name).to eq "Group Cat 1"
     expect(group_category.deleted_at).to be_nil
-    group_category2 = GroupCategory.where(sis_source_id: "Gc002").take
+    group_category2 = GroupCategory.find_by(sis_source_id: "Gc002")
     expect(group_category2.context_id).to eq sub.id
   end
 
   it "allows moving group categories" do
-    sub = Account.where(sis_source_id: "A001").take
+    sub = Account.find_by(sis_source_id: "A001")
     process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",
       "Gc001,,Group Cat 1,active",
       "Gc002,A001,Group Cat 2,active"
     )
-    group_category = GroupCategory.where(sis_source_id: "Gc001").take
+    group_category = GroupCategory.find_by(sis_source_id: "Gc001")
     expect(group_category.context_id).to eq @account.id
-    group_category2 = GroupCategory.where(sis_source_id: "Gc002").take
+    group_category2 = GroupCategory.find_by(sis_source_id: "Gc002")
     expect(group_category2.context_id).to eq sub.id
 
     process_csv_data_cleanly(
@@ -108,7 +108,7 @@ describe SIS::CSV::GroupCategoryImporter do
       "group_category_id,course_id,category_name,status",
       "Gc001,c01,Group Cat 1,active"
     )
-    expect(GroupCategory.where(sis_source_id: "Gc001").take.context).to eq course
+    expect(GroupCategory.find_by(sis_source_id: "Gc001").context).to eq course
   end
 
   it "does not allow moving a group category with groups" do
@@ -128,9 +128,9 @@ describe SIS::CSV::GroupCategoryImporter do
       "Gc001,,Group Cat 1,active",
       "Gc002,A001,Group Cat 2,deleted"
     )
-    group_category = GroupCategory.where(sis_source_id: "Gc001").take
+    group_category = GroupCategory.find_by(sis_source_id: "Gc001")
     expect(group_category.deleted_at).to be_nil
-    group_category2 = GroupCategory.where(sis_source_id: "Gc002").take
+    group_category2 = GroupCategory.find_by(sis_source_id: "Gc002")
     expect(group_category2.deleted_at).to_not be_nil
 
     process_csv_data_cleanly(
@@ -173,7 +173,7 @@ describe SIS::CSV::GroupCategoryImporter do
     expect(batch2.roll_back_data.where(updated_workflow_state: "deleted").count).to eq 1
     expect(batch3.roll_back_data.where(updated_workflow_state: "active").count).to eq 1
     batch3.restore_states_for_batch
-    expect(@account.all_group_categories.where(sis_source_id: "Gc003").take.deleted_at).not_to be_nil
+    expect(@account.all_group_categories.find_by(sis_source_id: "Gc003").deleted_at).not_to be_nil
   end
 
   context "group integration" do

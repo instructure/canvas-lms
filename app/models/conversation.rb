@@ -568,7 +568,7 @@ class Conversation < ActiveRecord::Base
 
     existing = shard.activate do
       ConversationParticipant.unscoped do
-        ConversationParticipant.where(private_hash:).take&.conversation
+        ConversationParticipant.find_by(private_hash:)&.conversation
       end
     end
     if existing

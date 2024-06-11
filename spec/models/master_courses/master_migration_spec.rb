@@ -2050,15 +2050,15 @@ describe MasterCourses::MasterMigration do
       topic.save!
       run_master_migration
 
-      topic_to = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).take
+      topic_to = @copy_to.discussion_topics.find_by(migration_id: mig_id(topic))
       assignment_to = topic_to.assignment
       topic_to.assignment = nil
       topic_to.save!
 
       expect(assignment_to.reload).to be_deleted
-      topic_tag = MasterCourses::ChildContentTag.where(content_type: "DiscussionTopic", content_id: topic_to.id).take
+      topic_tag = MasterCourses::ChildContentTag.find_by(content_type: "DiscussionTopic", content_id: topic_to.id)
       expect(topic_tag.downstream_changes).to include "assignment_id"
-      assign_tag = MasterCourses::ChildContentTag.where(content_type: "Assignment", content_id: assignment_to.id).take
+      assign_tag = MasterCourses::ChildContentTag.find_by(content_type: "Assignment", content_id: assignment_to.id)
       expect(assign_tag.downstream_changes).to include "workflow_state"
 
       Timecop.travel(1.hour.from_now) do
@@ -2079,11 +2079,11 @@ describe MasterCourses::MasterMigration do
       topic = @copy_from.discussion_topics.create!
       run_master_migration
 
-      topic_to = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).take
+      topic_to = @copy_to.discussion_topics.find_by(migration_id: mig_id(topic))
       topic_to.assignment = @copy_to.assignments.build(due_at: 1.month.from_now)
       topic_to.save!
 
-      topic_tag = MasterCourses::ChildContentTag.where(content_type: "DiscussionTopic", content_id: topic_to.id).take
+      topic_tag = MasterCourses::ChildContentTag.find_by(content_type: "DiscussionTopic", content_id: topic_to.id)
       expect(topic_tag.downstream_changes).to include "assignment_id"
 
       Timecop.travel(1.hour.from_now) do
@@ -2343,7 +2343,7 @@ describe MasterCourses::MasterMigration do
 
       att2_tag = nil
       Timecop.travel(5.minutes.ago) do
-        associated_folder = @copy_to.folders.where(cloned_item_id: blueprint_folder.cloned_item_id).take
+        associated_folder = @copy_to.folders.find_by(cloned_item_id: blueprint_folder.cloned_item_id)
         associated_folder.destroy
 
         blueprint_folder.update(name: "folder RENAMED", locked: true)
@@ -2793,7 +2793,7 @@ describe MasterCourses::MasterMigration do
       mm = run_master_migration
       expect(mm.migration_results.first.content_migration.warnings).to be_empty
 
-      quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).take
+      quiz_to = @copy_to.quizzes.find_by(migration_id: mig_id(quiz))
       qg_to = quiz_to.quiz_groups.first # NOTE: it's migration_id isn't mig_id(group) because qti_generator is an oddball. oh well.
 
       expect(qg_to.question_points).to eq 2.0
@@ -3027,9 +3027,9 @@ describe MasterCourses::MasterMigration do
       tag = mod2.add_item type: "assignment", id: assmt.id
       run_master_migration
 
-      mod1_to = @copy_to.context_modules.where(migration_id: mig_id(mod1)).take
-      mod2_to = @copy_to.context_modules.where(migration_id: mig_id(mod2)).take
-      tag_to = @copy_to.context_module_tags.where(migration_id: mig_id(tag)).take
+      mod1_to = @copy_to.context_modules.find_by(migration_id: mig_id(mod1))
+      mod2_to = @copy_to.context_modules.find_by(migration_id: mig_id(mod2))
+      tag_to = @copy_to.context_module_tags.find_by(migration_id: mig_id(tag))
       mod2_to.prerequisites = mod1_to.asset_string
       mod2_to.completion_requirements = [{ id: tag_to.id, type: "must_submit" }]
       mod2_to.requirement_count = 1
@@ -3222,10 +3222,10 @@ describe MasterCourses::MasterMigration do
       sub = @template.add_child_course!(copy_to)
       topic = @copy_from.discussion_topics.create!(lock_at: date1)
       run_master_migration
-      topic_to = copy_to.discussion_topics.where(migration_id: mig_id(topic)).take
+      topic_to = copy_to.discussion_topics.find_by(migration_id: mig_id(topic))
 
       # ensure schedule_delayed_transitions does not cause a spurious downstream change record
-      expect(sub.child_content_tags.where(content: topic_to).take.downstream_changes).to eq([])
+      expect(sub.child_content_tags.find_by(content: topic_to).downstream_changes).to eq([])
 
       Timecop.travel(5.minutes.from_now) do
         # now actually make a downstream change
@@ -3234,7 +3234,7 @@ describe MasterCourses::MasterMigration do
         topic_to.save!
         run_master_migration
         expect(topic_to.reload.lock_at).to eq date2
-        expect(sub.child_content_tags.where(content: topic_to).take.downstream_changes).to eq(["lock_at"])
+        expect(sub.child_content_tags.find_by(content: topic_to).downstream_changes).to eq(["lock_at"])
       end
 
       # lock the availability dates and ensure the downstream change is overwritten
@@ -3242,7 +3242,7 @@ describe MasterCourses::MasterMigration do
         @template.content_tag_for(topic).update_attribute(:restrictions, { availability_dates: true })
         topic.touch
         run_master_migration
-        expect(sub.child_content_tags.where(content: topic_to).take.downstream_changes).to eq([])
+        expect(sub.child_content_tags.find_by(content: topic_to).downstream_changes).to eq([])
         expect(topic_to.reload.lock_at).to eq date1
       end
     end
@@ -3256,7 +3256,7 @@ describe MasterCourses::MasterMigration do
 
         run_master_migration
 
-        att_to = @copy_to.attachments.where(migration_id: mig_id(att)).take
+        att_to = @copy_to.attachments.find_by(migration_id: mig_id(att))
 
         @other_copy_from = course_factory(active_all: true)
         run_course_copy(@copy_from, @other_copy_from)
@@ -3294,7 +3294,7 @@ describe MasterCourses::MasterMigration do
 
         run_master_migration
 
-        att_to = @copy_to.attachments.where(migration_id: mig_id(att)).take
+        att_to = @copy_to.attachments.find_by(migration_id: mig_id(att))
 
         import_package(@copy_to)
         expect(att_to.reload.migration_id).to eq mig_id(att) # should not have changed

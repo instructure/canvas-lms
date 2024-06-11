@@ -31,14 +31,14 @@ describe ContentMigration do
     end
 
     def migrated_assignments(*original_assignments)
-      original_assignments.map { |a| @copy_to.assignments.where(migration_id: mig_id(a)).take }
+      original_assignments.map { |a| @copy_to.assignments.find_by(migration_id: mig_id(a)) }
     end
 
     it "copies everything by default" do
       run_course_copy
 
       rule_to = @copy_to.conditional_release_rules.first
-      expect(rule_to.trigger_assignment).to eq @copy_to.assignments.where(migration_id: mig_id(@trigger_assmt)).take
+      expect(rule_to.trigger_assignment).to eq @copy_to.assignments.find_by(migration_id: mig_id(@trigger_assmt))
       expect(rule_to.scoring_ranges.count).to eq 3
       expect(rule_to.scoring_ranges.map(&:upper_bound)).to eq [1.0, 0.7, 0.4]
       expect(rule_to.scoring_ranges.map(&:lower_bound)).to eq [0.7, 0.4, 0.0]
@@ -111,13 +111,13 @@ describe ContentMigration do
       )
 
       run_course_copy
-      trigger_assmt_to = @copy_to.assignments.where(migration_id: mig_id(@trigger_assmt)).take
+      trigger_assmt_to = @copy_to.assignments.find_by(migration_id: mig_id(@trigger_assmt))
       rule_to = trigger_assmt_to.conditional_release_rules.first
       expect(rule_to.scoring_ranges.count).to eq 1
       range_to = rule_to.scoring_ranges.first
       expect(range_to.lower_bound).to eq 0.2
       expect(range_to.upper_bound).to eq 0.6
-      released_to = @copy_to.assignments.where(migration_id: mig_id(@set1_assmt1)).take
+      released_to = @copy_to.assignments.find_by(migration_id: mig_id(@set1_assmt1))
       expect(range_to.assignment_sets.first.assignment_set_associations.first.assignment).to eq released_to
     end
   end

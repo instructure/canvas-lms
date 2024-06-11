@@ -822,7 +822,7 @@ RSpec.describe ApplicationController do
         allow(controller).to receive(:params).and_return({ file_id: @attachment.id, id: @attachment.id })
         allow(controller.request).to receive(:path).and_return("/files/#{@attachment.id}")
         controller.send(:log_participation, @student)
-        expect(AssetUserAccess.where(user: @student, asset_code: @attachment.asset_string).take.context).to eq @course
+        expect(AssetUserAccess.find_by(user: @student, asset_code: @attachment.asset_string).context).to eq @course
       end
 
       it "does not error on non-standard context for file" do

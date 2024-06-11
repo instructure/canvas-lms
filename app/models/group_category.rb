@@ -215,7 +215,7 @@ class GroupCategory < ActiveRecord::Base
 
   def group_for(user)
     shard.activate do
-      groups.active.where(GroupMembership.active.where("group_id=groups.id").where(user_id: user).arel.exists).take
+      groups.active.find_by(GroupMembership.active.where("group_id=groups.id").where(user_id: user).arel.exists)
     end
   end
 

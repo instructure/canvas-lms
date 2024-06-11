@@ -1948,7 +1948,7 @@ describe "Default Account Reports" do
                                    "other_shard",
                                    "student",
                                    student_role(root_account_id: @account.id).id.to_s,
-                                   @course1.enrollments.where(user_id: @user1).take.course_section_id.to_s,
+                                   @course1.enrollments.find_by(user_id: @user1).course_section_id.to_s,
                                    nil,
                                    "invited",
                                    nil,

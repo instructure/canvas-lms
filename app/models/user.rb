@@ -991,7 +991,7 @@ class User < ActiveRecord::Base
   # which also depends on the current context.
   def lookup_lti_id(context)
     old_lti_id = context.shard.activate do
-      past_lti_ids.where(context:).take&.user_lti_id
+      past_lti_ids.find_by(context:)&.user_lti_id
     end
     old_lti_id || self.lti_id
   end
@@ -3378,7 +3378,7 @@ class User < ActiveRecord::Base
   end
 
   def authenticate_one_time_password(code)
-    result = one_time_passwords.where(code:, used: false).take
+    result = one_time_passwords.find_by(code:, used: false)
     return unless result
     # atomically update used
     return unless one_time_passwords.where(used: false, id: result).update_all(used: true, updated_at: Time.now.utc) == 1

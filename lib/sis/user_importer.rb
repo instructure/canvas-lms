@@ -124,7 +124,7 @@ module SIS
 
         until @batched_users.empty?
           user_row = @batched_users.shift
-          pseudo = @root_account.pseudonyms.where(sis_user_id: user_row.user_id.to_s).take
+          pseudo = @root_account.pseudonyms.find_by(sis_user_id: user_row.user_id.to_s)
           if user_row.authentication_provider_id.present?
             unless @authentication_providers.key?(user_row.authentication_provider_id)
               begin
@@ -134,12 +134,12 @@ module SIS
                 @authentication_providers[user_row.authentication_provider_id] = nil
               end
             end
-            pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(user_row.login_id).where(authentication_provider_id: @authentication_providers[user_row.authentication_provider_id]).take
+            pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(user_row.login_id).find_by(authentication_provider_id: @authentication_providers[user_row.authentication_provider_id])
           else
             pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(user_row.login_id).take
           end
           pseudo_by_integration = nil
-          pseudo_by_integration = @root_account.pseudonyms.where(integration_id: user_row.integration_id.to_s).take if user_row.integration_id.present?
+          pseudo_by_integration = @root_account.pseudonyms.find_by(integration_id: user_row.integration_id.to_s) if user_row.integration_id.present?
           status = user_row.status.downcase
           status = "active" unless VALID_STATUSES.include?(status)
           pseudo ||= pseudo_by_login
@@ -451,7 +451,7 @@ module SIS
         root_account.shard.activate do
           login = nil
           user_row.login_hash.each do |attr, value|
-            login ||= root_account.pseudonyms.active.where(attr => value).take
+            login ||= root_account.pseudonyms.active.find_by(attr => value)
           end
           login
         end

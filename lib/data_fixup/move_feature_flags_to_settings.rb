@@ -62,7 +62,7 @@ module DataFixup::MoveFeatureFlagsToSettings
     override = if context.feature_flags.loaded?
                  context.feature_flags.detect { |ff| ff.feature == feature_flag_name.to_s }
                else
-                 context.feature_flags.where(feature: feature_flag_name.to_s).take
+                 context.feature_flags.find_by(feature: feature_flag_name.to_s)
                end
     override_value = nil
     locked = true

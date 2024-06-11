@@ -41,7 +41,7 @@ describe UserMerge do
       merger = user_model
       mergeme = UserMerge.from(user2)
       mergeme.into(user1, merger:, source: "this spec")
-      expect(mergeme.merge_data.items.where(item_type: "logs").take.item).to eq "{:merger_id=>#{merger.id}, :source=>\"this spec\"}"
+      expect(mergeme.merge_data.items.find_by(item_type: "logs").item).to eq "{:merger_id=>#{merger.id}, :source=>\"this spec\"}"
     end
 
     it "marks as failed on merge failures" do
@@ -50,7 +50,7 @@ describe UserMerge do
       allow(mergeme).to receive(:copy_favorites).and_raise("boom")
       expect { mergeme.into(user1) }.to raise_error("boom")
       expect(mergeme.merge_data.workflow_state).to eq "failed"
-      expect(mergeme.merge_data.items.where(item_type: "merge_error").take.item.first).to eq "boom"
+      expect(mergeme.merge_data.items.find_by(item_type: "merge_error").item.first).to eq "boom"
     end
 
     it "records where the user was merged to" do
@@ -83,8 +83,8 @@ describe UserMerge do
       user3 = user_model
       Lti::Asset.opaque_identifier_for(user3)
       UserMerge.from(user1).into(user3)
-      expect(user3.reload.past_lti_ids.where(context_id: course1).take.user_lti_id).to eq user_1_old_lti
-      expect(user3.past_lti_ids.where(context_id: course2).take.user_lti_id).to eq old_lti
+      expect(user3.reload.past_lti_ids.find_by(context_id: course1).user_lti_id).to eq user_1_old_lti
+      expect(user3.past_lti_ids.find_by(context_id: course2).user_lti_id).to eq old_lti
     end
 
     it "moves past_lti_id to the new user multiple merges with conflict" do
@@ -147,12 +147,12 @@ describe UserMerge do
         submission_types: "online_text_entry",
         due_at: due_date_timestamp
       )
-      expect(Submission.where(user_id: user2.id, assignment_id: assignment.id).take.cached_due_date)
+      expect(Submission.find_by(user_id: user2.id, assignment_id: assignment.id).cached_due_date)
         .to eq due_date_timestamp
 
       UserMerge.from(user2).into(user1)
 
-      submission = Submission.where(user_id: user1.id, assignment_id: assignment.id).take
+      submission = Submission.find_by(user_id: user1.id, assignment_id: assignment.id)
       expect(submission.cached_due_date).to eq due_date_timestamp
       expect(submission.workflow_state).to eq "unsubmitted"
     end
@@ -174,12 +174,12 @@ describe UserMerge do
       )
       override.assignment_override_students.create!(user: user2)
       assignment.update(due_at: nil, only_visible_to_overrides: true)
-      expect(Submission.where(user_id: user2.id, assignment_id: assignment.id).take.cached_due_date)
+      expect(Submission.find_by(user_id: user2.id, assignment_id: assignment.id).cached_due_date)
         .to eq due_date_timestamp
 
       UserMerge.from(user2).into(user1)
 
-      submission = Submission.where(user_id: user1.id, assignment_id: assignment.id).take
+      submission = Submission.find_by(user_id: user1.id, assignment_id: assignment.id)
       expect(submission.cached_due_date).to eq due_date_timestamp
       expect(submission.workflow_state).to eq "unsubmitted"
     end
@@ -431,9 +431,9 @@ describe UserMerge do
       UserMerge.from(user1).into(user2)
       user1.reload
       user2.reload
-      records = UserMergeData.where(user_id: user2).take.records
+      records = UserMergeData.find_by(user_id: user2).records
       expect(records.count).to eq 8
-      record = records.where(context_id: cc1).take
+      record = records.find_by(context_id: cc1)
       expect(record.previous_user_id).to eq user1.id
       expect(record.previous_workflow_state).to eq "active"
       expect(record.context_type).to eq "CommunicationChannel"
@@ -882,7 +882,7 @@ describe UserMerge do
       )
       UserMerge.from(user2).into(@user1)
       expect(
-        UserPastLtiId.shard(course).where(user_id: @user1).take.user_lti_id
+        UserPastLtiId.shard(course).find_by(user_id: @user1).user_lti_id
       ).to eq "fake_lti_id_from_old_merge"
     end
 
@@ -1005,7 +1005,7 @@ describe UserMerge do
       user1 = user_model
       UserMerge.from(@user2).into(user1)
       expect(user1.favorites.size).to eq 2
-      expect(user1.favorites.where(context_type: "Course").take.context).to eq @shard_course
+      expect(user1.favorites.find_by(context_type: "Course").context).to eq @shard_course
       expect(user1.favorites.where(context_type: "Group").count).to eq 1
     end
 

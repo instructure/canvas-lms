@@ -1637,7 +1637,7 @@ describe EnrollmentsApiController, type: :request do
             section = @course.course_sections.create!(name: "other_section")
             e = section.enroll_user(@teacher, "TeacherEnrollment")
             # generally these are populated from a sis_import
-            Enrollment.where(id: e).update_all(sis_pseudonym_id: @teacher.pseudonyms.where(sis_user_id: "1234").take.id)
+            Enrollment.where(id: e).update_all(sis_pseudonym_id: @teacher.pseudonyms.find_by(sis_user_id: "1234").id)
             @params[:sis_user_id] = "1234"
             @params[:created_for_sis_id] = true
             json = api_call(:get, @path, @params)

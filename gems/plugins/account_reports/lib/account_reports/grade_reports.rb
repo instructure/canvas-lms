@@ -193,7 +193,7 @@ module AccountReports
     end
 
     def mgp_grade_export_runner(runner)
-      term = root_account.enrollment_terms.where(id: root_account.all_courses.where(id: runner.batch_items.first).select(:enrollment_term_id)).take
+      term = root_account.enrollment_terms.find_by(id: root_account.all_courses.where(id: runner.batch_items.first).select(:enrollment_term_id))
       gp_set = term.grading_period_group
       grading_periods = gp_set.grading_periods.active.order(:start_date)
       return unless grading_periods

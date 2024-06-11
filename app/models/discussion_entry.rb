@@ -254,7 +254,7 @@ class DiscussionEntry < ActiveRecord::Base
   def update_topic_submission
     if discussion_topic.for_assignment?
       entries = discussion_topic.discussion_entries.where(user_id:, workflow_state: "active")
-      submission = discussion_topic.assignment.submissions.where(user_id:).take
+      submission = discussion_topic.assignment.submissions.find_by(user_id:)
       return unless submission
 
       if entries.any?
