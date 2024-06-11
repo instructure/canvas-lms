@@ -193,6 +193,37 @@ describe('DifferentiatedModulesSection', () => {
       expect(queryByTestId('important_dates')).not.toBeInTheDocument()
     })
 
+    describe('if supportDueDates is false', () => {
+      it('does not render the option for assignment items', () => {
+        const {queryByTestId} = render(
+          <DifferentiatedModulesSection {...props} type="assignment" supportDueDates={false} />
+        )
+        expect(queryByTestId('important_dates')).not.toBeInTheDocument()
+      })
+
+      it('does not render the option for discussion items', () => {
+        const {queryByTestId} = render(
+          <DifferentiatedModulesSection {...props} type="discussion" supportDueDates={false} />
+        )
+        expect(queryByTestId('important_dates')).not.toBeInTheDocument()
+      })
+
+      it('does not render the option for quiz items', () => {
+        const {queryByTestId} = render(
+          <DifferentiatedModulesSection {...props} type="quiz" supportDueDates={false} />
+        )
+        expect(queryByTestId('important_dates')).not.toBeInTheDocument()
+      })
+
+      it('does not render the option for non-supported items', () => {
+        const {queryByTestId} = render(
+          <DifferentiatedModulesSection {...props} type="module" supportDueDates={false} />
+        )
+
+        expect(queryByTestId('important_dates')).not.toBeInTheDocument()
+      })
+    })
+
     it('calls onSync with the importantDates flag when checking/unchecking the option', () => {
       const onSyncMock = jest.fn()
       const {getByTestId} = render(<DifferentiatedModulesSection {...props} onSync={onSyncMock} />)
