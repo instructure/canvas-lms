@@ -93,7 +93,9 @@ export const RubricAssessmentContainer = ({
     const calculateDistance = () => {
       if (containerRef.current) {
         const rect = (containerRef.current as HTMLElement).getBoundingClientRect()
-        const distance = window.innerHeight - rect.bottom
+        const isMasquerade = !!document.querySelector('body.is-masquerading-or-student-view')
+        const masqueradeHeight = isMasquerade ? 50 : 0
+        const distance = window.innerHeight - rect.bottom - masqueradeHeight
         setDistanceToBottom(distance)
       }
     }
