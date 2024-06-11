@@ -128,6 +128,8 @@ Rails/I18nLocaleTexts:
     - "**/spec_canvas/**/*.rb"
 Rails/NegateInclude:
   Enabled: false # exclude? isn't as intuitive as !include?
+Rails/Output:
+  AutoCorrect: false # Force the developer to think about what to do; don't just silently convert it to a debug log
 Rails/Present:
   UnlessBlank: false # allow `unless foo.blank?`
 Rails/RedundantPresenceValidationOnBelongsTo:
@@ -288,9 +290,6 @@ Rails/InverseOf:
   Severity: convention
 Rails/LexicallyScopedActionFilter:
   Severity: convention
-Rails/Output:
-  Severity: convention
-  AutoCorrect: false
 Rails/OutputSafety:
   Severity: convention
 Rails/PluckInWhere:

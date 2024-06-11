@@ -24,7 +24,7 @@ module GlobalLookups
     # can be overidden easily in plugins by having
     # modules prepend themselves to override what "DevUtils" does.
     def initialize_ddb_for_development!(recreate: false)
-      puts("Nothing to do for global lookups stub")
+      warn("Nothing to do for global lookups stub")
     end
 
     def self.initialize_ddb_for_development!(recreate: false)
