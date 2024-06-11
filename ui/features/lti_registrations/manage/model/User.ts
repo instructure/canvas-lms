@@ -17,23 +17,17 @@
  */
 
 import {z} from 'zod'
-import {ZLtiRegistrationId} from './LtiRegistrationId'
+
 import {ZUserId} from './UserId'
-import {ZAccountId} from './AccountId'
-import {ZUser} from './User'
 
-export const ZLtiRegistrationAccountBindingId = z.string().brand('LtiRegistrationAccountBindingId')
-export type LtiRegistrationAccountBindingId = z.infer<typeof ZLtiRegistrationAccountBindingId>
-
-export const ZLtiRegistrationAccountBinding = z.object({
-  id: ZLtiRegistrationAccountBindingId,
-  account_id: ZAccountId,
-  registration_id: ZLtiRegistrationId,
-  workflow_state: z.string(),
+export const ZUser = z.object({
   created_at: z.coerce.date(),
-  updated_at: z.coerce.date(),
-  created_by: ZUser.optional().nullable(),
-  updated_by: ZUser.optional().nullable(),
+  id: ZUserId,
+  integration_id: z.string().optional().nullable(),
+  login_id: z.string().optional().nullable(),
+  name: z.string(),
+  short_name: z.string(),
+  sis_import_id: z.string().optional().nullable(),
+  sis_user_id: z.string().optional().nullable(),
+  sortable_name: z.string(),
 })
-
-export type LtiRegistrationAccountBinding = z.infer<typeof ZLtiRegistrationAccountBinding>

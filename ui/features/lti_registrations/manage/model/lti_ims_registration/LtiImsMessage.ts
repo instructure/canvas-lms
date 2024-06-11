@@ -20,13 +20,16 @@ import {ZLtiMessageType} from '../LtiMessageType'
 
 export const ZLtiImsMessage = z.object({
   type: ZLtiMessageType,
-  label: z.string(),
-  roles: z.array(z.string()),
-  icon_uri: z.string(),
-  placements: z.array(z.string()).optional(),
-  target_link_uri: z.string(),
-  custom_parameters: z.record(z.string()).optional(),
-  'https://canvas.instructure.com/lti/course_navigation/default_enabled': z.boolean().optional(),
+  label: z.string().optional().nullable(),
+  roles: z.array(z.string()).optional().nullable(),
+  icon_uri: z.string().optional().nullable(),
+  placements: z.array(z.string()).optional().nullable(),
+  target_link_uri: z.string().optional().nullable(),
+  custom_parameters: z.record(z.string()).optional().nullable(),
+  'https://canvas.instructure.com/lti/course_navigation/default_enabled': z
+    .boolean()
+    .optional()
+    .nullable(),
 })
 
 export type LtiImsMessage = z.infer<typeof ZLtiImsMessage>

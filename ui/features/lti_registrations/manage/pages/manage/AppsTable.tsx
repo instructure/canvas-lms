@@ -61,26 +61,37 @@ type Column = {
   ) => React.ReactNode
 }
 
+const ellispsisStyles = {overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}
+
 const Columns: ReadonlyArray<Column> = [
   {
     id: 'name',
     header: I18n.t('App Name'),
-    width: '26%',
+    width: '182px',
     sortable: true,
     render: r => (
       <Flex>
-        <img
-          alt={r.name}
-          style={{
-            height: 27,
-            width: 27,
-            marginRight: 12,
-            borderRadius: '4.5px',
-            border: '0.75px solid #C7CDD1',
-          }}
-          src={r.icon_url}
-        />
-        <div style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
+        {r.icon_url ? (
+          <img
+            alt={r.name}
+            style={{
+              height: 27,
+              width: 27,
+              marginRight: 12,
+              borderRadius: '4.5px',
+              border: '0.75px solid #C7CDD1',
+            }}
+            src={r.icon_url}
+          />
+        ) : (
+          <img
+            alt={r.name}
+            style={{height: 27, width: 27, marginRight: 12}}
+            src={`/lti/tool_default_icon?id=${r.id}&name=${r.name}`}
+          />
+        )}
+
+        <div style={ellispsisStyles}>
           <Link to={`/manage/${r.id}`} as={RouterLink} isWithinText={false}>
             {r.name}
           </Link>
@@ -91,45 +102,48 @@ const Columns: ReadonlyArray<Column> = [
   {
     id: 'nickname',
     header: I18n.t('Nickname'),
-    width: '20.64%',
+    width: '220px',
     sortable: true,
-    render: r => (
-      <div style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
-        {r.admin_nickname}
-      </div>
-    ),
+    render: r => <div style={ellispsisStyles}>{r.admin_nickname}</div>,
   },
   {
     id: 'lti_version',
     sortable: true,
     header: I18n.t('Version'),
-    width: '8.44%',
+    width: '90px',
     render: r => <div>{'legacy_configuration_id' in r ? '1.1' : '1.3'}</div>,
   },
   {
     id: 'installed',
     header: I18n.t('Installed On'),
-    width: '14.5%',
+    width: '132px',
     sortable: true,
     render: r => <div>{tz.format(r.created_at, 'date.formats.medium')}</div>,
   },
   {
     id: 'installed_by',
     header: I18n.t('Installed By'),
-    width: '16.98%',
+    width: '132px',
     sortable: true,
-    render: r => <div>{r.created_by}</div>,
+    render: r => <div style={ellispsisStyles}>{r.created_by?.short_name}</div>,
+  },
+  {
+    id: 'updated_by',
+    header: I18n.t('Updated By'),
+    width: '132px',
+    sortable: true,
+    render: r => <div style={ellispsisStyles}>{r.updated_by?.short_name}</div>,
   },
   {
     id: 'on',
     header: I18n.t('On/Off'),
-    width: '8.44%',
+    width: '90px',
     sortable: true,
     render: r => <div>{r.workflow_state === 'active' ? I18n.t('On') : I18n.t('Off')}</div>,
   },
   {
     id: 'actions',
-    width: '62px',
+    width: '80px',
     render: (r, {deleteApp}) => (
       <Menu
         trigger={

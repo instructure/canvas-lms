@@ -29,7 +29,7 @@ export const ZLtiConfiguration = z.object({
   description: z.string().optional().nullable(),
   target_link_uri: z.string(),
   oidc_initiation_url: z.string(),
-  custom_fields: z.record(z.string()),
+  custom_fields: z.record(z.string()).optional().nullable(),
   oidc_initiation_urls: z.record(z.unknown()).optional().nullable(),
   public_jwk_url: z.string().optional(),
   is_lti_key: z.boolean().optional(),
