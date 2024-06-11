@@ -118,6 +118,9 @@ export default class GenericErrorPage extends React.Component {
         display="block"
       >
         <ErrorPageHeader imageUrl={this.props.imageUrl} />
+        {process.env.NODE_ENV === 'development' && (
+          <pre style={{textAlign: 'left'}}>{this.props.errorMessage}</pre>
+        )}
         <View margin="small" display="block">
           {!this.state.commentPosted && (
             <>
