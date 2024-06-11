@@ -87,12 +87,12 @@ describe OverrideListPresenter do
 
     context "lock_at and unlock_at" do
       it "returns returns datetime_string of not all day but date present" do
-        due_date_hash = { lock_at: Time.now, unlock_at: Time.now - 1.day }
+        due_date_hash = { lock_at: Time.now, unlock_at: 1.day.ago }
         expect(presenter.formatted_date_string(:lock_at, due_date_hash)).to eq(
           datetime_string(Time.now)
         )
         expect(presenter.formatted_date_string(:unlock_at, due_date_hash)).to eq(
-          datetime_string(Time.now - 1.day)
+          datetime_string(1.day.ago)
         )
       end
 
@@ -205,9 +205,9 @@ describe OverrideListPresenter do
     def dates_visible_to_user
       [
         { due_at: "", lock_at: nil, unlock_at: nil, set_type: "CourseSection" },
-        { due_at: Time.now + 1.day, lock_at: nil, unlock_at: nil, set_type: "CourseSection" },
-        { due_at: Time.now + 2.days, lock_at: nil, unlock_at: nil, set_type: "CourseSection" },
-        { due_at: Time.now - 2.days, lock_at: nil, unlock_at: nil, base: true }
+        { due_at: 1.day.from_now, lock_at: nil, unlock_at: nil, set_type: "CourseSection" },
+        { due_at: 2.days.from_now, lock_at: nil, unlock_at: nil, set_type: "CourseSection" },
+        { due_at: 2.days.ago, lock_at: nil, unlock_at: nil, base: true }
       ]
     end
 

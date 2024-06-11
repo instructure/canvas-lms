@@ -357,7 +357,7 @@ RSpec.describe SubmissionComment do
     @se = @course.enroll_student(user_factory)
     @assignment.reload
     @submission = @assignment.submit_homework(@se.user, body: "some message")
-    @submission.created_at = Time.now - 60
+    @submission.created_at = 1.minute.ago
     @submission.save
   end
 

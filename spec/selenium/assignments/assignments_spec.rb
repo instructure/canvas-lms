@@ -352,7 +352,7 @@ describe "assignments" do
 
     it "only allows an assignment editor to edit points and title if assignment has multiple due dates" do
       middle_number = "15"
-      expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
+      expected_date = 1.month.ago.strftime("%b #{middle_number}")
       @assignment = @course.assignments.create!(
         title: "VDD Test Assignment",
         due_at: expected_date
@@ -450,7 +450,7 @@ describe "assignments" do
     it "keeps erased field on more options click", priority: "2" do
       enable_cache do
         middle_number = "15"
-        expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
+        expected_date = 1.month.ago.strftime("%b #{middle_number}")
         @assignment = @course.assignments.create!(
           title: "Test Assignment",
           points_possible: 10,

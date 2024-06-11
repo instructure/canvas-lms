@@ -6257,7 +6257,7 @@ describe Assignment do
       it "creates a message when an assignment due date has changed" do
         assignment_model(title: "Assignment with unstable due date", course: @course)
         @a.created_at = 1.month.ago
-        @a.due_at = Time.now + 60
+        @a.due_at = 1.minute.from_now
         @a.save!
         expect(@a.messages_sent).to include("Assignment Due Date Changed")
         expect(@a.messages_sent["Assignment Due Date Changed"].first.from_name).to eq @course.name
@@ -7188,7 +7188,7 @@ describe Assignment do
     end
 
     before do
-      @results = @course.assignments.due_between_with_overrides(Time.now - 1.day, Time.now + 1.day)
+      @results = @course.assignments.due_between_with_overrides(1.day.ago, 1.day.from_now)
     end
 
     it "returns assignments between the given dates" do

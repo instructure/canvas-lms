@@ -530,7 +530,7 @@ class Attachment < ActiveRecord::Base
   end
   protected :flag_as_recently_created
   def recently_created?
-    @recently_created || (created_at && created_at > Time.now - (60 * 5))
+    @recently_created || (created_at && created_at > 5.minutes.ago)
   end
 
   def after_extension

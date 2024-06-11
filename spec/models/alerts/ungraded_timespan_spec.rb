@@ -44,7 +44,7 @@ module Alerts
 
       it "returns false when the student submissions is past the threshold" do
         submission = @assignment.submit_homework(@user, @opts)
-        submission.submitted_at = Time.now - 10.days
+        submission.submitted_at = 10.days.ago
         submission.save!
 
         ungraded_timespan = Alerts::UngradedTimespan.new(@course, [@student.id])

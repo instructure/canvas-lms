@@ -45,7 +45,7 @@ describe "dashboard" do
       notification_model(name: "Assignment Due Date Changed")
       notification_policy_model(notification_id: @notification.id)
       assignment = assignment_model({ submission_types: "online_text_entry", course: @course })
-      assignment.due_at = Time.now + 60
+      assignment.due_at = 1.minute.from_now
       assignment.created_at = 1.month.ago
       assignment.save!
 
@@ -64,7 +64,7 @@ describe "dashboard" do
       notification_model(name: "Assignment Due Date Changed")
       notification_policy_model(notification_id: @notification.id)
       assignment = assignment_model({ submission_types: "online_text_entry", course: @course })
-      assignment.due_at = Time.now + 60
+      assignment.due_at = 1.minute.from_now
       assignment.created_at = 1.month.ago
       assignment.save!
 
