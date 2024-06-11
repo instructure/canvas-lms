@@ -176,6 +176,11 @@
 #           "description": "Optional: The user's bio.",
 #           "example": "I like the Muppets.",
 #           "type": "string"
+#         },
+#         "pronouns": {
+#           "description": "Optional: This field is only returned if pronouns are enabled, and will return the pronouns of the user.",
+#           "example": "he/him",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -391,7 +396,7 @@ class UsersController < ApplicationController
   end
 
   # @API List users in account
-  # A paginated list of of users associated with this account.
+  # A paginated list of users associated with this account.
   #
   # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the
