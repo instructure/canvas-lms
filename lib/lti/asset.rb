@@ -70,7 +70,7 @@ module Lti
               id.context_id == context.id && id.context_type == context.class_name
             end&.user_lti_context_id
           else
-            asset.past_lti_ids.shard(context.shard).where(context:).pluck(:user_lti_context_id).first
+            asset.past_lti_ids.shard(context.shard).where(context:).pick(:user_lti_context_id)
           end
         end
       end

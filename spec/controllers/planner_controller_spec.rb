@@ -152,7 +152,7 @@ describe PlannerController do
         json = json_parse(response.body)
         event_ids = json.select { |thing| thing["plannable_type"] == "calendar_event" }.pluck("plannable_id")
 
-        my_event_id = @course.default_section.calendar_events.where(parent_calendar_event_id: event).pluck(:id).first
+        my_event_id = @course.default_section.calendar_events.where(parent_calendar_event_id: event).pick(:id)
         expect(event_ids).not_to include event.id
         expect(event_ids).to include my_event_id
 

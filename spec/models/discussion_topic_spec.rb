@@ -159,7 +159,7 @@ describe DiscussionTopic do
     end
 
     let(:values) do
-      DiscussionTopic.where(id: @topic).pluck(
+      DiscussionTopic.where(id: @topic).pick(
         :could_be_locked,
         :podcast_enabled,
         :podcast_has_student_posts,
@@ -169,7 +169,7 @@ describe DiscussionTopic do
         :allow_rating,
         :only_graders_can_rate,
         :sort_by_rating
-      ).first
+      )
     end
 
     it "saves boolean attributes as false if they are set to nil" do
