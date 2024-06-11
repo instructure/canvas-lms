@@ -22,7 +22,7 @@ import type {LtiRegistration} from '../../model/LtiRegistration'
 import type {ManageSearchParams} from './ManageSearchParams'
 import type {FetchRegistrations, DeleteRegistration} from '../../api/registrations'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {genericError} from '../../../common/lib/apiResult/ApiResult'
+import {genericError, formatApiResultError} from '../../../common/lib/apiResult/ApiResult'
 import type {AccountId} from '../../model/AccountId'
 
 export const MANAGE_APPS_PAGE_LIMIT = 15
@@ -120,7 +120,7 @@ export const mkUseManagePageState =
                   }
                 : {
                     _type: 'error',
-                    message: result._type === 'Exception' ? result.error.message : result.message,
+                    message: formatApiResultError(result),
                   }
             } else {
               return prev

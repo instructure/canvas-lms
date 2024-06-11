@@ -28,7 +28,7 @@ import {
   type RegistrationOverlayStore,
 } from '../registration_wizard/registration_settings/RegistrationOverlayState'
 import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
-import type {ApiResult} from '../../common/lib/apiResult/ApiResult'
+import {formatApiResultError, type ApiResult} from '../../common/lib/apiResult/ApiResult'
 import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 
 /**
@@ -96,8 +96,6 @@ interface DynamicRegistrationActions {
     prevState: ConfirmationStateType,
     newState: ConfirmationStateType
   ): void
-
-  error: (error?: Error) => void
 }
 
 /**
@@ -122,7 +120,7 @@ export type DynamicRegistrationWizardState =
     }
   | {
       _type: 'Error'
-      error?: Error | string
+      message: string
     }
   | ConfirmationState<'PermissionConfirmation'>
   | ConfirmationState<'PrivacyLevelConfirmation'>
@@ -149,19 +147,9 @@ type ConfirmationState<Tag extends string> = {
   reviewing: boolean
 }
 
-const errorState = (
-  error?:
-    | {
-        _type: 'ApiParseError' | 'GenericError'
-        message: string
-      }
-    | {
-        _type: 'Exception'
-        error: Error
-      }
-): DynamicRegistrationWizardState => ({
+const errorState = (message: string): DynamicRegistrationWizardState => ({
   _type: 'Error',
-  error: error ? (error._type === 'Exception' ? error.error : error.message) : undefined,
+  message,
 })
 
 /**
@@ -289,16 +277,14 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
                     )
                     set(stateFor(confirmationState('PermissionConfirmation')(reg.data, store)))
                   } else {
-                    set(stateFor(errorState(reg)))
+                    set(stateFor(errorState(formatApiResultError(reg))))
                   }
                 })
               }
             }
             global.addEventListener('message', onMessage)
-          } else if (resp._type === 'Exception') {
-            set(stateFor(errorState(resp)))
           } else {
-            set(stateFor({_type: 'Error'}))
+            set(stateFor(errorState(formatApiResultError(resp))))
           }
         })
       },
@@ -317,18 +303,18 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
           service.updateAdminNickname(accountId, registrationId, adminNickname),
         ])
         if (a._type !== 'success') {
-          set(stateFor(errorState(a)))
+          set(stateFor(errorState(formatApiResultError(a))))
         } else if (b._type !== 'success') {
-          set(stateFor(errorState(b)))
+          set(stateFor(errorState(formatApiResultError(b))))
         } else if (c._type !== 'success') {
-          set(stateFor(errorState(c)))
+          set(stateFor(errorState(formatApiResultError(c))))
         }
       },
       deleteKey: async (prevState: ReviewingStateType, developerKeyId: DeveloperKeyId) => {
         set(stateFrom(prevState)(state => deleting(state.registration, state.overlayStore)))
         const result = await service.deleteDeveloperKey(developerKeyId)
         if (result._type !== 'success') {
-          set(stateFor(errorState(result)))
+          set(stateFor(errorState(formatApiResultError(result))))
         }
         return result
       },
@@ -341,14 +327,6 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
             ...a,
             _type: newState,
           }))
-        ),
-
-      error: (error?: Error) =>
-        set(
-          stateFor({
-            _type: 'Error',
-            error,
-          })
         ),
     })
   )
