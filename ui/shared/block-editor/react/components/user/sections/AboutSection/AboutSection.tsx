@@ -22,8 +22,9 @@ import {Element, useEditor} from '@craftjs/core'
 import {Container} from '../../blocks/Container'
 import {AboutTextHalf} from './AboutTextHalf'
 import {ImageBlock} from '../../blocks/ImageBlock'
-import {NoSections} from '../ColumnsSection/NoSections'
-import {useClassNames, white, black, getContrastingColor} from '../../../../utils'
+import {NoSections} from '../../common'
+import {useClassNames, getContrastingColor} from '../../../../utils'
+import {SectionMenu} from '../../../editor/SectionMenu'
 
 type AboutSectionProps = {
   background?: string
@@ -56,8 +57,6 @@ export const AboutSection = ({background}: AboutSectionProps) => {
         id={`${cid}_about-nosection1`}
         is={NoSections}
         canvas={true}
-        variant="fixed"
-        columns={2}
         className="about-section__inner-end"
       >
         <Element
@@ -72,8 +71,6 @@ export const AboutSection = ({background}: AboutSectionProps) => {
         id={`${cid}_about-no-section2`}
         is={NoSections}
         canvas={true}
-        variant="fixed"
-        columns={2}
         className="about-section__inner-start"
       >
         <Element id={`${cid}_text`} is={AboutTextHalf} canvas={true} color={textColor} />
@@ -90,5 +87,7 @@ AboutSection.craft = {
   custom: {
     isSection: true,
   },
-  related: {},
+  related: {
+    sectionMenu: SectionMenu,
+  },
 }

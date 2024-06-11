@@ -28,7 +28,7 @@ function triggerScrollEvent() {
 }
 
 type SectionMenuProps = {
-  onEditSection: (node: Node) => void
+  onEditSection?: (node: Node) => void
   onDuplicateSection?: (node: Node) => void
   onMoveUp?: (node: Node) => void
   onMoveDown?: (node: Node) => void
@@ -125,7 +125,7 @@ const SectionMenu = ({
 
   return (
     <Menu show={true} onToggle={() => {}}>
-      <Menu.Item onSelect={handleEditSection}>EditSection</Menu.Item>
+      {onEditSection ? <Menu.Item onSelect={handleEditSection}>EditSection</Menu.Item> : null}
       <Menu.Item onSelect={handleDuplicateSection}>Duplicate</Menu.Item>
       <Menu.Item onSelect={handleMoveUp}>Move Up</Menu.Item>
       <Menu.Item onSelect={handleMoveDown}>Move Down</Menu.Item>

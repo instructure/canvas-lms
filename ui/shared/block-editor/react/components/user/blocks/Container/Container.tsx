@@ -49,7 +49,7 @@ export const Container = ({
     <div
       id={id}
       className={clazz}
-      data-placeholder={rest['data-placeholder']}
+      data-placeholder={rest['data-placeholder'] || 'Drop blocks here'}
       ref={el => el && connect(drag(el))}
       style={{
         background,

@@ -21,7 +21,7 @@ import {useNode} from '@craftjs/core'
 import {IconButton} from '@instructure/ui-buttons'
 import {Menu, type MenuItemProps, type MenuItem} from '@instructure/ui-menu'
 import {IconCheckLine} from '@instructure/ui-icons'
-import {type ColumnsSectionVariant} from './NoSections'
+import {type ColumnsSectionVariant} from './types'
 import {ColumnCountPopup} from './ColumnCountPopup'
 
 const ColumnsSectionToolbar = () => {

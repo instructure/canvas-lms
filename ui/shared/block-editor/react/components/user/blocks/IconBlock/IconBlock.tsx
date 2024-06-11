@@ -19,7 +19,7 @@
 import React, {useEffect, useState} from 'react'
 import {useNode} from '@craftjs/core'
 import {getIcon, IconAlarm, type IconSize} from '../../../../assets/icons'
-import {IconBlockSettings} from './IconBlockSettings'
+import {IconBlockToolbar} from './IconBlockToolbar'
 
 export type IconBlockProps = {
   iconName: string
@@ -48,7 +48,7 @@ IconBlock.craft = {
     size: 'small',
   },
   related: {
-    settings: IconBlockSettings,
+    toolbar: IconBlockToolbar,
   },
 }
 

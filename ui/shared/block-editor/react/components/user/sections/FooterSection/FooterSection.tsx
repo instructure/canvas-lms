@@ -22,7 +22,8 @@ import {Container} from '../../blocks/Container'
 import {ButtonBlock} from '../../blocks/ButtonBlock'
 import {SVGImageBlock} from '../../blocks/SVGImageBlock'
 import canvas_logo from '../../../../assets/logos/canvas_logo_left'
-import {NoSections} from '../ColumnsSection'
+import {NoSections} from '../../common'
+import {SectionMenu} from '../../../editor/SectionMenu'
 
 import {useClassNames, getContrastingColor, getContrastingButtonColor} from '../../../../utils'
 
@@ -47,7 +48,6 @@ const FooterSection = ({background}: FooterSectionProps) => {
         id={`${cid}__footer-no-section`}
         is={NoSections}
         canvas={true}
-        variant="fixed"
         className="footer-section__inner"
       >
         <Element
@@ -80,6 +80,9 @@ FooterSection.craft = {
   },
   custom: {
     isSection: true,
+  },
+  related: {
+    sectionMenu: SectionMenu,
   },
 }
 

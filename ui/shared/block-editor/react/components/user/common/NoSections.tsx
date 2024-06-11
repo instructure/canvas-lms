@@ -18,18 +18,14 @@
 
 import React from 'react'
 import {useEditor, useNode, type Node} from '@craftjs/core'
-import {useClassNames} from '../../../../utils'
-
-export type ColumnsSectionVariant = 'fixed' | 'fluid'
+import {useClassNames} from '../../../utils'
 
 export type NoSectionsProps = {
-  columns?: number
   className?: string
-  variant: ColumnsSectionVariant
   children?: React.ReactNode
 }
 
-export const NoSections = ({columns = 1, variant, className = '', children}: NoSectionsProps) => {
+export const NoSections = ({className = '', children}: NoSectionsProps) => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))

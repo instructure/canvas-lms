@@ -87,7 +87,7 @@ const ButtonBlock = ({
   if (variant === 'condensed') {
     return (
       <CondensedButton
-        elementRef={el => el && connect(drag(el))}
+        elementRef={el => el && connect(drag(el as HTMLElement))}
         size={size}
         color={color}
         href={href?.trim() || '#'}
@@ -95,14 +95,14 @@ const ButtonBlock = ({
         themeOverride={themeOverride}
         onClick={handleClick}
       >
-        {text}
+        <span style={{whiteSpace: 'nowrap'}}>{text.trim()}</span>
       </CondensedButton>
     )
   } else {
     return (
       <Button
         themeOverride={themeOverride}
-        elementRef={el => el && connect(drag(el))}
+        elementRef={el => el && connect(drag(el as HTMLElement))}
         size={size}
         color={colorProp}
         withBackground={withBackground}
@@ -110,7 +110,7 @@ const ButtonBlock = ({
         renderIcon={iconName ? renderIcon : undefined}
         onClick={handleClick}
       >
-        {text.trim()}
+        <span style={{whiteSpace: 'nowrap'}}>{text.trim()}</span>
       </Button>
     )
   }

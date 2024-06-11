@@ -21,8 +21,9 @@ import {Element, useEditor} from '@craftjs/core'
 import {Container} from '../../blocks/Container'
 import {HeroTextHalf} from './HeroTextHalf'
 import {ImageBlock} from '../../blocks/ImageBlock'
-import {NoSections} from '../ColumnsSection/NoSections'
+import {NoSections} from '../../common'
 import {useClassNames, getContrastingColor} from '../../../../utils'
+import {SectionMenu} from '../../../editor/SectionMenu'
 
 type HeroSectionProps = {
   background?: string
@@ -55,8 +56,6 @@ export const HeroSection = ({background}: HeroSectionProps) => {
         id={`${cid}_nosection1`}
         is={NoSections}
         canvas={true}
-        variant="fixed"
-        columns={2}
         className="hero-section__inner-start"
       >
         <Element id={`${cid}_text`} is={HeroTextHalf} canvas={true} color={textColor} />
@@ -65,8 +64,6 @@ export const HeroSection = ({background}: HeroSectionProps) => {
         id={`${cid}_nosection2`}
         is={NoSections}
         canvas={true}
-        variant="fixed"
-        columns={2}
         className="hero-section__inner-end"
       >
         <Element
@@ -89,5 +86,7 @@ HeroSection.craft = {
   custom: {
     isSection: true,
   },
-  related: {},
+  related: {
+    sectionMenu: SectionMenu,
+  },
 }
