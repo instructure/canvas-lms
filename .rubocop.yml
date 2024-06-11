@@ -308,9 +308,6 @@ Rails/Output:
   AutoCorrect: false
 Rails/OutputSafety:
   Severity: convention
-Rails/Pick:
-  Severity: convention
-  AutoCorrect: false
 Rails/PluckInWhere:
   Severity: convention
   AutoCorrect: false

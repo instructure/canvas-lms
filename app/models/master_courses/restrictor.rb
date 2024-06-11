@@ -269,7 +269,7 @@ module MasterCourses::Restrictor
     if @importing_migration
       @importing_migration.master_course_subscription.master_template.find_preloaded_restriction(migration_id) # for extra speeds on import
     else
-      MasterCourses::MasterContentTag.where(migration_id:).pluck(:restrictions).first
+      MasterCourses::MasterContentTag.where(migration_id:).pick(:restrictions)
     end
   end
 

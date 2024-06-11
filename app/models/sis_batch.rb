@@ -639,7 +639,7 @@ class SisBatch < ActiveRecord::Base
   def remove_previous_imports
     # we should not try to cleanup if the batch didn't work out, we could delete
     # stuff we still need
-    current_workflow_state = self.class.where(id:).pluck(:workflow_state).first.to_s
+    current_workflow_state = self.class.where(id:).pick(:workflow_state).to_s
     # ^reloading the whole batch can be a problem because we might be tracking data
     # we haven't persisted yet on model attributes...
     if %w[failed failed_with_messages aborted].include?(current_workflow_state)

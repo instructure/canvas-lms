@@ -258,7 +258,7 @@ class DiscussionEntry < ActiveRecord::Base
       return unless submission
 
       if entries.any?
-        submission_date = entries.order(:created_at).limit(1).pluck(:created_at).first
+        submission_date = entries.order(:created_at).limit(1).pick(:created_at)
         if submission_date > created_at
           submission.submitted_at = submission_date
           submission.save!
