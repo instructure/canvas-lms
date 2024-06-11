@@ -93,7 +93,7 @@ describe SIS::CSV::SectionImporter do
       "section_id,course_id,name,status",
       "section,C001,,deleted"
     )
-    expect(CourseSection.where(sis_source_id: "section").take.workflow_state).to eq "deleted"
+    expect(CourseSection.find_by(sis_source_id: "section").workflow_state).to eq "deleted"
   end
 
   it "still requires a name for new deleted sections" do
@@ -141,8 +141,8 @@ describe SIS::CSV::SectionImporter do
       "C001,U001,student,1B,active"
     )
 
-    g = Course.where(sis_source_id: "C001").take.groups.create!(name: "group")
-    g.group_memberships.create!(user: Pseudonym.where(sis_user_id: "U001").take.user)
+    g = Course.find_by(sis_source_id: "C001").groups.create!(name: "group")
+    g.group_memberships.create!(user: Pseudonym.find_by(sis_user_id: "U001").user)
     process_csv_data_cleanly(
       "section_id,course_id,name,start_date,end_date,status",
       "1B,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,deleted",

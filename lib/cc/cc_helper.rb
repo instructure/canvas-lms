@@ -482,7 +482,7 @@ module CC
       end
       source_attachment = Attachment.find_by(id: obj.attachment_id) if obj.attachment_id
       related_attachment_ids = [source_attachment.id] + source_attachment.related_attachments.pluck(:id) if source_attachment
-      attachment = course && related_attachment_ids && course.attachments.not_deleted.where(id: related_attachment_ids).take
+      attachment = course && related_attachment_ids && course.attachments.not_deleted.find_by(id: related_attachment_ids)
       path = if attachment
                # if the media object is associated with a file in the course, use the file's path in the export, to avoid exporting it twice
                attachment.full_display_path.sub(/^#{Regexp.quote(Folder::ROOT_FOLDER_NAME)}/, "")

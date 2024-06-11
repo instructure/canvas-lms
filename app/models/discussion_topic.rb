@@ -388,7 +388,7 @@ class DiscussionTopic < ActiveRecord::Base
       # prevent future syncs from recreating the deleted assignment
       if is_child_content?
         old_assignment.submission_types = "none"
-        own_tag = MasterCourses::ChildContentTag.where(content: self).take
+        own_tag = MasterCourses::ChildContentTag.find_by(content: self)
         own_tag&.child_subscription&.create_content_tag_for!(old_assignment, downstream_changes: ["workflow_state"])
       end
     elsif assignment && @saved_by != :assignment && !root_topic_id
@@ -672,13 +672,13 @@ class DiscussionTopic < ActiveRecord::Base
     return false unless current_user # default for logged out user
 
     if root_topic?
-      participant = DiscussionTopicParticipant.where(user_id: current_user.id,
-                                                     discussion_topic_id: child_topics.pluck(:id)).take
+      participant = DiscussionTopicParticipant.find_by(user_id: current_user.id,
+                                                       discussion_topic_id: child_topics.pluck(:id))
     end
     participant ||= if opts[:use_preload] && association(:discussion_topic_participants).loaded?
                       discussion_topic_participants.find { |dtp| dtp.user_id == current_user.id }
                     else
-                      discussion_topic_participants.where(user_id: current_user).take
+                      discussion_topic_participants.find_by(user_id: current_user)
                     end
     if participant
       if participant.subscribed.nil?

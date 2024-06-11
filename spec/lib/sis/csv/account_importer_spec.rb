@@ -259,8 +259,8 @@ describe SIS::CSV::AccountImporter do
     )
     expect(batch1.roll_back_data.where(previous_workflow_state: "non-existent").count).to eq 2
     expect(batch2.roll_back_data.count).to eq 1
-    expect(@account.all_accounts.where(sis_source_id: "A2").take.workflow_state).to eq "deleted"
+    expect(@account.all_accounts.find_by(sis_source_id: "A2").workflow_state).to eq "deleted"
     batch2.restore_states_for_batch
-    expect(@account.all_accounts.where(sis_source_id: "A2").take.workflow_state).to eq "active"
+    expect(@account.all_accounts.find_by(sis_source_id: "A2").workflow_state).to eq "active"
   end
 end

@@ -227,11 +227,11 @@ class MediaTracksController < ApplicationController
 
   def find_or_create_track(locale:, attachment:, new_params:)
     track = if @attachment.present?
-              @attachment.media_tracks.where(media_object: @media_object, locale:).take
+              @attachment.media_tracks.find_by(media_object: @media_object, locale:)
             else
-              @media_object.media_tracks.where(user: @current_user,
-                                               locale:,
-                                               attachment_id: [nil, @media_object.attachment_id]).take
+              @media_object.media_tracks.find_by(user: @current_user,
+                                                 locale:,
+                                                 attachment_id: [nil, @media_object.attachment_id])
             end
     track ||= @media_object.media_tracks.new(user: @current_user, locale:)
     track.update!(attachment:, **new_params.permit(*TRACK_SETTABLE_ATTRIBUTES))

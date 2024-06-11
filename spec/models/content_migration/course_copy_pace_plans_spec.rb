@@ -62,9 +62,9 @@ describe ContentMigration do
       it "copies course pace module item durations" do
         run_course_copy
 
-        tag1_to = @copy_to.context_module_tags.where(migration_id: mig_id(@tag1)).take
-        tag2_to = @copy_to.context_module_tags.where(migration_id: mig_id(@tag2)).take
-        course_pace_to = @copy_to.course_paces.where(workflow_state: "unpublished").take
+        tag1_to = @copy_to.context_module_tags.find_by(migration_id: mig_id(@tag1))
+        tag2_to = @copy_to.context_module_tags.find_by(migration_id: mig_id(@tag2))
+        course_pace_to = @copy_to.course_paces.find_by(workflow_state: "unpublished")
 
         expect(course_pace_to.course_pace_module_items.find_by(module_item_id: tag1_to.id).duration).to eq 1
         expect(course_pace_to.course_pace_module_items.find_by(module_item_id: tag2_to.id).duration).to eq 2
@@ -77,7 +77,7 @@ describe ContentMigration do
         }
         run_course_copy
 
-        course_pace_to = @copy_to.course_paces.where(workflow_state: "unpublished").take
+        course_pace_to = @copy_to.course_paces.find_by(workflow_state: "unpublished")
         expect(course_pace_to.course_pace_module_items.count).to eq 1
       end
 

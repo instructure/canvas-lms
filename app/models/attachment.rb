@@ -1874,7 +1874,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def resurrect_from_purgatory
-    p = Purgatory.where(attachment_id: id).take
+    p = Purgatory.find_by(attachment_id: id)
     raise "must have been sent to purgatory first" unless p
     raise "purgatory record has expired" if p.workflow_state == "expired"
 

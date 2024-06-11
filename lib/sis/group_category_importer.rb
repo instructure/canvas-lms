@@ -54,19 +54,19 @@ module SIS
         context = nil
         if account_id
           context = @accounts_cache[account_id]
-          context ||= @root_account.all_accounts.active.where(sis_source_id: account_id).take
+          context ||= @root_account.all_accounts.active.find_by(sis_source_id: account_id)
           raise ImportError, "Account with id \"#{account_id}\" didn't exist for group category #{sis_id}" unless context
 
           @accounts_cache[context.sis_source_id] = context
         end
 
         if course_id
-          context = @root_account.all_courses.active.where(sis_source_id: course_id).take
+          context = @root_account.all_courses.active.find_by(sis_source_id: course_id)
           raise ImportError, "Course with id \"#{course_id}\" didn't exist for group category #{sis_id}" unless context
         end
         context ||= @root_account
 
-        gc = @root_account.all_group_categories.where(sis_source_id: sis_id).take
+        gc = @root_account.all_group_categories.find_by(sis_source_id: sis_id)
 
         if gc && gc.groups.active.exists? && !(context.id == gc.context_id && context.class.base_class.name == gc.context_type)
           raise ImportError, "Cannot move group category #{sis_id} because it has groups in it."

@@ -74,7 +74,7 @@ module SIS
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         Course.unique_constraint_retry do
-          course = @root_account.all_courses.where(sis_source_id: course_id).take
+          course = @root_account.all_courses.find_by(sis_source_id: course_id)
           if course.nil?
             course = Course.new
             state_changes << :created
@@ -84,14 +84,14 @@ module SIS
           course.saved_by = :sis_import
           course_enrollment_term_id_stuck = course.stuck_sis_fields.include?(:enrollment_term_id)
           if !course_enrollment_term_id_stuck && term_id
-            term = @root_account.enrollment_terms.active.where(sis_source_id: term_id).take
+            term = @root_account.enrollment_terms.active.find_by(sis_source_id: term_id)
           end
           course.enrollment_term = term if term
           course.root_account = @root_account
 
           account = nil
-          account = @root_account.all_accounts.where(sis_source_id: account_id).take if account_id.present?
-          account ||= @root_account.all_accounts.where(sis_source_id: fallback_account_id).take if fallback_account_id.present?
+          account = @root_account.all_accounts.find_by(sis_source_id: account_id) if account_id.present?
+          account ||= @root_account.all_accounts.find_by(sis_source_id: fallback_account_id) if fallback_account_id.present?
           if account_id.present? && !account
             raise ImportError, "Account not found \"#{account_id}\" for course #{course_id}"
           end
@@ -156,7 +156,7 @@ module SIS
 
           abstract_course = nil
           if abstract_course_id.present?
-            abstract_course = @root_account.root_abstract_courses.where(sis_source_id: abstract_course_id).take
+            abstract_course = @root_account.root_abstract_courses.find_by(sis_source_id: abstract_course_id)
             @messages << "unknown abstract course id #{abstract_course_id}, ignoring abstract course reference" unless abstract_course
           end
 
@@ -264,7 +264,7 @@ module SIS
           if blueprint_course_id && !course.deleted?
             case blueprint_course_id
             when "dissociate"
-              MasterCourses::ChildSubscription.active.where(child_course_id: course.id).take&.destroy
+              MasterCourses::ChildSubscription.active.find_by(child_course_id: course.id)&.destroy
             else
               @blueprint_associations[blueprint_course_id] ||= []
               @blueprint_associations[blueprint_course_id] << course_id

@@ -125,7 +125,7 @@ class SubmissionCommentsApiController < ApplicationController
         assignment = api_find(@context.assignments.active, params[:assignment_id])
         author = assignment.shard.activate { api_find(User.active, params[:author_id]) }
         user = api_find(@context.all_current_users, params[:user_id])
-        submission = assignment.submissions.where(user_id: user).take
+        submission = assignment.submissions.find_by(user_id: user)
         unless submission
           return render json: { error: "Couldn't find Submission for user with API id #{params[:user_id]}" },
                         status: :bad_request

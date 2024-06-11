@@ -876,7 +876,7 @@ describe UsersController do
                                    user: { name: "happy gilmore", terms_of_use: "1", self_enrollment_code: @course.self_enrollment_code + " ", initial_enrollment_type: "student" },
                                    self_enrollment: "1" }
           expect(response).to be_successful
-          u = User.where(name: "happy gilmore").take
+          u = User.find_by(name: "happy gilmore")
           expect(u.root_account_ids).to eq [Account.default.id]
         end
 

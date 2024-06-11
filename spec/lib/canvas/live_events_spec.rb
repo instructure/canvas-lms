@@ -1763,7 +1763,7 @@ describe Canvas::LiveEvents do
 
       cmp_id = context_module_progression.context_module.global_context_id
       singleton = "course_progress_course_#{cmp_id}_user_#{context_module_progression.global_user_id}"
-      job = Delayed::Job.where(singleton:).take
+      job = Delayed::Job.find_by(singleton:)
       expect(job).not_to be_nil
       expect(job.run_at).to be > Time.now
       expect(job.max_concurrent).to eq 1

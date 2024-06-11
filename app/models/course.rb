@@ -641,7 +641,7 @@ class Course < ActiveRecord::Base
   def image
     @image ||= if image_id.present?
                  shard.activate do
-                   attachments.active.where(id: image_id).take&.public_download_url(1.week)
+                   attachments.active.find_by(id: image_id)&.public_download_url(1.week)
                  end
                elsif image_url
                  image_url
@@ -651,7 +651,7 @@ class Course < ActiveRecord::Base
   def banner_image
     @banner_image ||= if banner_image_id.present?
                         shard.activate do
-                          attachments.active.where(id: banner_image_id).take&.public_download_url(1.week)
+                          attachments.active.find_by(id: banner_image_id)&.public_download_url(1.week)
                         end
                       elsif banner_image_url
                         banner_image_url

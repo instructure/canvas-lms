@@ -116,7 +116,7 @@ module Lti
 
     def user
       if params[:user_id].present?
-        @_user ||= User.joins(:past_lti_ids).where(user_past_lti_ids: { user_lti_context_id: params[:user_id] }).take ||
+        @_user ||= User.joins(:past_lti_ids).find_by(user_past_lti_ids: { user_lti_context_id: params[:user_id] }) ||
                    User.active.find_by(lti_context_id: params[:user_id]) ||
                    User.active.find(params[:user_id])
         raise ActiveRecord::RecordNotFound unless @_user

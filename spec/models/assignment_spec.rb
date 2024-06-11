@@ -9453,7 +9453,7 @@ describe Assignment do
 
       describe "refresh unread_count for content participation counts" do
         def student_unread_count_counts
-          @course.reload.content_participation_counts.where(user_id: student1.id, content_type: "Submission").take&.unread_count
+          @course.reload.content_participation_counts.find_by(user_id: student1.id, content_type: "Submission")&.unread_count
         end
 
         context "when posting submissions" do

@@ -359,7 +359,7 @@ class Folder < ActiveRecord::Base
     folder = nil
     context.shard.activate do
       Folder.unique_constraint_retry do
-        folder = context.folders.active.where(unique_type:).take
+        folder = context.folders.active.find_by(unique_type:)
         folder ||= context.folders.create!(unique_type:,
                                            name: default_name_proc.call,
                                            parent_folder_id: Folder.root_folders(context).first,

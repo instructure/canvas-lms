@@ -169,9 +169,9 @@ module SIS
           end
 
           pseudo = if enrollment_info.user_integration_id.blank?
-                     root_account.pseudonyms.where(sis_user_id: enrollment_info.user_id).take
+                     root_account.pseudonyms.find_by(sis_user_id: enrollment_info.user_id)
                    else
-                     root_account.pseudonyms.where(integration_id: enrollment_info.user_integration_id).take
+                     root_account.pseudonyms.find_by(integration_id: enrollment_info.user_integration_id)
                    end
 
           unless pseudo
@@ -188,8 +188,8 @@ module SIS
             next
           end
 
-          @course ||= @root_account.all_courses.where(sis_source_id: enrollment_info.course_id).take unless enrollment_info.course_id.blank?
-          @section ||= @root_account.course_sections.where(sis_source_id: enrollment_info.section_id).take unless enrollment_info.section_id.blank?
+          @course ||= @root_account.all_courses.find_by(sis_source_id: enrollment_info.course_id) unless enrollment_info.course_id.blank?
+          @section ||= @root_account.course_sections.find_by(sis_source_id: enrollment_info.section_id) unless enrollment_info.section_id.blank?
           if @course.nil? && @section.nil?
             message = "Neither course nor section existed for user enrollment " \
                       "(Course ID: #{enrollment_info.course_id}, Section ID: #{enrollment_info.section_id}, User ID: #{enrollment_info.user_id})"
@@ -274,7 +274,7 @@ module SIS
           role ||= Role.get_built_in_role(type, root_account_id: @root_account.id)
 
           if enrollment_info.associated_user_id && type == "ObserverEnrollment"
-            a_pseudo = root_account.pseudonyms.where(sis_user_id: enrollment_info.associated_user_id).take
+            a_pseudo = root_account.pseudonyms.find_by(sis_user_id: enrollment_info.associated_user_id)
             if a_pseudo
               associated_user_id = a_pseudo.user_id
             else
@@ -285,7 +285,7 @@ module SIS
           end
 
           if enrollment_info.temporary_enrollment_source_user_id
-            a_pseudo = root_account.pseudonyms.where(sis_user_id: enrollment_info.temporary_enrollment_source_user_id).take
+            a_pseudo = root_account.pseudonyms.find_by(sis_user_id: enrollment_info.temporary_enrollment_source_user_id)
             if a_pseudo
               temporary_enrollment_source_user_id = a_pseudo.user_id
             else
@@ -295,11 +295,11 @@ module SIS
             end
           end
 
-          enrollment = @section.all_enrollments.where(user_id: user,
-                                                      type:,
-                                                      associated_user_id:,
-                                                      temporary_enrollment_source_user_id:,
-                                                      role_id: role).take
+          enrollment = @section.all_enrollments.find_by(user_id: user,
+                                                        type:,
+                                                        associated_user_id:,
+                                                        temporary_enrollment_source_user_id:,
+                                                        role_id: role)
 
           enrollment ||= Enrollment.typed_enrollment(type).new
           enrollment.root_account = @root_account

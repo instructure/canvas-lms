@@ -1062,7 +1062,7 @@ class FilesController < ApplicationController
 
     overwritten_instfs_uuid = nil
     @attachment = if params.key?(:precreated_attachment_id)
-                    att = Attachment.where(id: params[:precreated_attachment_id]).take
+                    att = Attachment.find_by(id: params[:precreated_attachment_id])
                     if att.nil?
                       reject! "Requested to use precreated attachment, but attachment with id #{params[:precreated_attachment_id]} doesn't exist", 422
                     else

@@ -147,7 +147,7 @@ class Role < ActiveRecord::Base
     return nil unless id
     return nil if id.is_a?(String) && id !~ Api::ID_REGEX
 
-    Role.where(id:).take # giving up on built-in role caching because it's silly now and we should just preload more
+    Role.find_by(id:) # giving up on built-in role caching because it's silly now and we should just preload more
   end
 
   def self.get_built_in_role(name, root_account_id:)
