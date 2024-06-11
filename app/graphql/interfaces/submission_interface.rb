@@ -161,13 +161,14 @@ module Interfaces::SubmissionInterface
              Types::SubmissionCommentsSortOrderType,
              required: false,
              default_value: nil
+    argument :include_draft_comments, Boolean, required: false, default_value: false
   end
-  def comments_connection(filter:, sort_order:)
+  def comments_connection(filter:, sort_order:, include_draft_comments:)
     filter = filter.to_h
     all_comments, for_attempt, peer_review = filter.values_at(:all_comments, :for_attempt, :peer_review)
 
     load_association(:assignment).then do
-      scope = submission.comments_excluding_drafts_for(current_user)
+      scope = include_draft_comments ? submission.comments_including_drafts_for(current_user) : submission.comments_excluding_drafts_for(current_user)
       unless all_comments
         target_attempt = for_attempt || submission.attempt || 0
         if target_attempt <= 1

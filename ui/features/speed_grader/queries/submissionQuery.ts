@@ -48,12 +48,13 @@ export const SUBMISSION_FRAGMENT = gql`
     submittedAt
     submissionType
     secondsLate
-    commentsConnection {
+    commentsConnection(includeDraftComments: true) {
       nodes {
         id
         comment
         attempt
         createdAt
+        draft
         author {
           name
           updatedAt

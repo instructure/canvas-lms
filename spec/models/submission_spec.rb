@@ -7045,7 +7045,7 @@ describe Submission do
     end
   end
 
-  describe "#comments_excluding_drafts_for" do
+  context "draft comments" do
     before do
       @teacher = course_with_user("TeacherEnrollment", course: @course, name: "Teacher", active_all: true).user
       ta = course_with_user("TaEnrollment", course: @course, name: "First Ta", active_all: true).user
@@ -7058,18 +7058,37 @@ describe Submission do
       @ta_comment = @submission.add_comment(author: ta, comment: "Ta comment")
     end
 
-    it "returns non-draft comments, filtering out draft comments" do
-      comments = @submission.comments_excluding_drafts_for(@teacher)
-      expect(comments).to include @student_comment, @ta_comment
-      expect(comments).not_to include @teacher_comment
-    end
-
-    context "when comments are preloaded" do
+    describe "#comments_excluding_drafts_for" do
       it "returns non-draft comments, filtering out draft comments" do
-        preloaded_submission = Submission.where(id: @submission.id).preload(:submission_comments).first
-        comments = preloaded_submission.comments_excluding_drafts_for(@teacher)
+        comments = @submission.comments_excluding_drafts_for(@teacher)
         expect(comments).to include @student_comment, @ta_comment
         expect(comments).not_to include @teacher_comment
+      end
+
+      context "when comments are preloaded" do
+        it "returns non-draft comments, filtering out draft comments" do
+          preloaded_submission = Submission.where(id: @submission.id).preload(:submission_comments).first
+          comments = preloaded_submission.comments_excluding_drafts_for(@teacher)
+          expect(comments).to include @student_comment, @ta_comment
+          expect(comments).not_to include @teacher_comment
+        end
+      end
+    end
+
+    describe "#comments_including_drafts_for" do
+      it "returns draft comments, filtering out draft comments" do
+        comments = @submission.comments_including_drafts_for(@teacher)
+        expect(comments).to include @student_comment, @ta_comment
+        expect(comments).to include @teacher_comment
+      end
+
+      context "when comments are preloaded" do
+        it "returns non-draft comments, filtering out draft comments" do
+          preloaded_submission = Submission.where(id: @submission.id).preload(:submission_comments).first
+          comments = preloaded_submission.comments_including_drafts_for(@teacher)
+          expect(comments).to include @student_comment, @ta_comment
+          expect(comments).to include @teacher_comment
+        end
       end
     end
   end

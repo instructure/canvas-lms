@@ -413,6 +413,32 @@ describe Types::SubmissionType do
         ).to eq [student_2_comment.id.to_s]
       end
     end
+
+    context "draft comments" do
+      before(:once) do
+        @draft_comment = @submission.add_comment(author: @teacher, comment: "draft", draft_comment: true)
+      end
+
+      it "returns draft comments for the current user" do
+        expect(
+          submission_type.resolve("commentsConnection(includeDraftComments: true) { nodes { _id }}")
+        ).to eq [@comment2.id.to_s, @draft_comment.id.to_s]
+      end
+
+      it "does not return draft comments for other users" do
+        other_teacher = teacher_in_course(course: @course).user
+        expect(
+          submission_type.resolve("commentsConnection { nodes { _id }}", current_user: other_teacher)
+        ).to eq [@comment2.id.to_s]
+      end
+
+      it "does not return draft comments for other users when expecting drafts" do
+        other_teacher = teacher_in_course(course: @course).user
+        expect(
+          submission_type.resolve("commentsConnection(includeDraftComments: true) { nodes { _id }}", current_user: other_teacher)
+        ).to eq [@comment2.id.to_s]
+      end
+    end
   end
 
   describe "submission_drafts" do
