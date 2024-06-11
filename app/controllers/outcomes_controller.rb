@@ -135,7 +135,7 @@ class OutcomesController < ApplicationController
             when Course
               @context.users.find(user_id)
             else
-              @context.all_users.find_by!(id: user_id)
+              @context.all_users.find(user_id)
             end
 
     return unless authorized_action(@context, @current_user, :manage)

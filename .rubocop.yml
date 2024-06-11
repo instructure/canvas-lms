@@ -289,9 +289,6 @@ Rails/EagerEvaluationLogMessage:
 Rails/EnumHash:
   Severity: convention
   AutoCorrect: false
-Rails/FindById:
-  Severity: convention
-  AutoCorrect: false
 Rails/FindEach:
   Severity: convention
   AutoCorrect: false
