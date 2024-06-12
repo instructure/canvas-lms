@@ -538,6 +538,10 @@ class Account < ActiveRecord::Base
     root_account.feature_enabled?(:allow_limited_access_for_students) && settings[:enable_limited_access_for_students]
   end
 
+  def limited_access_for_user?(user)
+    limited_access_for_students? && user.active_student_enrollments_in_account?(self)
+  end
+
   def conditional_release?
     conditional_release[:value]
   end
@@ -1523,6 +1527,11 @@ class Account < ActiveRecord::Base
         (account_calendar_visible || grants_right?(user, :manage_account_calendar_visibility))
     end
     can :view_account_calendar_details
+
+    given do |user|
+      limited_access_for_user?(user)
+    end
+    can :make_submission_comments
   end
 
   def reload(*)

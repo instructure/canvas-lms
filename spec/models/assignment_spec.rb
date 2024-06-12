@@ -5311,6 +5311,13 @@ describe Assignment do
         @assignment.save!
         expect(@assignment.grants_right?(@student, :attach_submission_comment_files)).to be true
       end
+
+      it "is false when user is student in a limited access account" do
+        @course.account.root_account.enable_feature!(:allow_limited_access_for_students)
+        @course.account.settings[:enable_limited_access_for_students] = true
+        @course.account.save!
+        expect(@assignment.grants_right?(@student, :attach_submission_comment_files)).to be false
+      end
     end
 
     context "to submit" do

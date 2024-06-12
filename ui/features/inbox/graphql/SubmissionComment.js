@@ -30,6 +30,7 @@ export const SubmissionComment = {
       submissionId
       createdAt
       attempt
+      canReply
       author {
         ...User
       }
@@ -53,6 +54,7 @@ export const SubmissionComment = {
     submissionId: string,
     createdAt: string,
     attempt: number,
+    canReply: bool,
     author: User.shape,
     assignment: Assignment.shape,
     comment: string,
@@ -66,6 +68,7 @@ export const SubmissionComment = {
     submissionId = '15',
     createdAt = '2022-02-15T06:50:54-07:00',
     attempt = 0,
+    canReply = true,
     author = User.mock(),
     assignment = Assignment.mock(),
     comment = 'Hey!',
@@ -77,6 +80,7 @@ export const SubmissionComment = {
     submissionId,
     createdAt,
     attempt,
+    canReply,
     author,
     assignment,
     comment,

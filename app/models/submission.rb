@@ -522,7 +522,16 @@ class Submission < ActiveRecord::Base
         user.id == user_id &&
         assignment.published?
     end
-    can :read and can :comment and can :make_group_comment and can :submit and can :mark_item_read and can :read_comments
+    can :read and can :make_group_comment and can :submit and can :mark_item_read and can :read_comments
+
+    # non-deleted students in accounts with limited access setting enabled should not be able to comment on submissions
+    given do |user|
+      user &&
+        user.id == user_id &&
+        assignment.published? &&
+        !course.account.limited_access_for_user?(user)
+    end
+    can :comment
 
     # see user_can_read_grade? before editing :read_grade permissions
     given do |user|
