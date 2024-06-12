@@ -1940,7 +1940,8 @@ class AbstractAssignment < ActiveRecord::Base
     given do |user, session|
       (submittable_type? || %w[discussion_topic online_quiz none not_graded].include?(submission_types)) &&
         context.grants_right?(user, session, :participate_as_student) &&
-        visible_to_user?(user)
+        visible_to_user?(user) &&
+        !course.account.limited_access_for_user?(user)
     end
     can :attach_submission_comment_files
 

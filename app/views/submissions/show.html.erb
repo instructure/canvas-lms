@@ -394,55 +394,57 @@
             <div class="media_recording">
             </div>
           </div>
-          <div style="padding: 10px; <%= hidden unless can_do(@submission, @current_user, :comment) %>" id="add_comment_form">
-            <label class="add_a_comment">
-              <strong><%= before_label('add_a_comment', 'Add a Comment') %></strong>
-              <div id="textarea-container">
-                <textarea class="ic-Input grading_comment"></textarea>
-                <span id="emoji-picker-container"></span>
+          <% unless @context.account.grants_right?(@current_user, :make_submission_comments) %>
+            <div style="padding: 10px; <%= hidden unless can_do(@submission, @current_user, :comment) %>" id="add_comment_form">
+              <label class="add_a_comment">
+                <strong><%= before_label('add_a_comment', 'Add a Comment') %></strong>
+                <div id="textarea-container">
+                  <textarea class="ic-Input grading_comment"></textarea>
+                  <span id="emoji-picker-container"></span>
+                </div>
+                <div id="emoji-quick-picker-container"></div>
+              </label>
+              <div class="comment_attachments">
               </div>
-              <div id="emoji-quick-picker-container"></div>
-            </label>
-            <div class="comment_attachments">
-            </div>
-            <div class="clearfix" style="text-align: <%= direction('right') %>;">
-              <% if feature_enabled?(:kaltura) %>
-                <a href="#" class="media_comment_link media-comment pull-left"><%= t('media_comment', 'Media Comment') %></a>
-              <% end %>
-              <a href="#" style="float: <%= direction('right') %>;" class="attach_comment_file_link"><%= t('attach_file', 'Attach File') %></a>
-              <div class="clear"></div>
-            </div>
-            <% if @assignment.has_group_category? && can_do(@submission, @current_user, :make_group_comment) %>
-              <% if @assignment.grade_as_group? %>
-                <span><%= t("All comments are sent to the whole group.") %></span>
-                <input type="checkbox" name="submission[group_comment]" id="submission_group_comment" style="display:none" checked />
-              <% else %>
-                <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
-                  <div class="ic-Form-control ic-Form-control--radio">
-                    <div class="ic-Radio">
-                      <input type="radio" name="submission[group_comment]" id="not_submission_group_comment" value="0" checked />
-                      <label class="ic-Label" for="not_submission_group_comment">
-                        <% if can_do(@submission, @current_user, :grade) %>
-                          <%= t('Send comment to this student only') %>
-                        <% else %>
-                          <%= t('Send comment to instructor only') %>
-                        <% end %>
-                      </label>
+              <div class="clearfix" style="text-align: <%= direction('right') %>;">
+                <% if feature_enabled?(:kaltura) %>
+                  <a href="#" class="media_comment_link media-comment pull-left"><%= t('media_comment', 'Media Comment') %></a>
+                <% end %>
+                <a href="#" style="float: <%= direction('right') %>;" class="attach_comment_file_link"><%= t('attach_file', 'Attach File') %></a>
+                <div class="clear"></div>
+              </div>
+              <% if @assignment.has_group_category? && can_do(@submission, @current_user, :make_group_comment) %>
+                <% if @assignment.grade_as_group? %>
+                  <span><%= t("All comments are sent to the whole group.") %></span>
+                  <input type="checkbox" name="submission[group_comment]" id="submission_group_comment" style="display:none" checked />
+                <% else %>
+                  <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+                    <div class="ic-Form-control ic-Form-control--radio">
+                      <div class="ic-Radio">
+                        <input type="radio" name="submission[group_comment]" id="not_submission_group_comment" value="0" checked />
+                        <label class="ic-Label" for="not_submission_group_comment">
+                          <% if can_do(@submission, @current_user, :grade) %>
+                            <%= t('Send comment to this student only') %>
+                          <% else %>
+                            <%= t('Send comment to instructor only') %>
+                          <% end %>
+                        </label>
+                      </div>
+                      <div class="ic-Radio">
+                        <input type="radio" name="submission[group_comment]" id="submission_group_comment" value="1" />
+                        <label class="ic-Label" for="submission_group_comment">
+                          <%= t('sent_to_whole_group', 'Send comment to the whole group') %>
+                        </label>
+                      </div>
                     </div>
-                    <div class="ic-Radio">
-                      <input type="radio" name="submission[group_comment]" id="submission_group_comment" value="1" />
-                      <label class="ic-Label" for="submission_group_comment">
-                        <%= t('sent_to_whole_group', 'Send comment to the whole group') %>
-                      </label>
-                    </div>
-                  </div>
-                </fieldset>
+                  </fieldset>
+                <% end %>
               <% end %>
-            <% end %>
-            <div class="button-container">
-              <button type="button" class="Button Button--primary save_comment_button"><%= t('buttons.save', 'Save') %></button>
+              <div class="button-container">
+                <button type="button" class="Button Button--primary save_comment_button"><%= t('buttons.save', 'Save') %></button>
+              </div>
             </div>
-          </div>
+          <% end %>
         </div>
       </div>
     </div>

@@ -57,18 +57,20 @@
         </td>
       </tr>
       <% end %>
-      <tr>
-        <td colspan="2">
-          <div class="textarea-emoji-container">
-            <div class="textarea-container">
-              <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
-              <span class="emoji-picker-container" style="display: none;"></span>
+      <% unless @context.account.grants_right?(@current_user, :make_submission_comments) %>
+        <tr>
+          <td colspan="2">
+            <div class="textarea-emoji-container">
+              <div class="textarea-container">
+                <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
+                <span class="emoji-picker-container" style="display: none;"></span>
+              </div>
+              <div class="emoji-quick-picker-container" style="display: none;"></div>
             </div>
-            <div class="emoji-quick-picker-container" style="display: none;"></div>
-          </div>
-        </td>
-      </tr>
-      <%= render :partial => "group_comment" %>
+          </td>
+        </tr>
+        <%= render :partial => "group_comment" %>
+      <% end %>
       <% if @assignment.turnitin_enabled? %>
         <%= render :partial => "turnitin" %>
       <% end %>

@@ -28,22 +28,26 @@
         <%= t 'instructions.online_text_entry', "Copy and paste or type your submission right here." %>
             <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
         </td>
-      </tr><tr>
+      </tr>
+      <tr>
         <td>
           <%= text_area :submission, :body, :style => "width: 100%; height: 250px;" %>
         </td>
-      </tr><tr>
-        <td>
-          <div class="textarea-emoji-container">
-            <div class="textarea-container">
-              <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
-              <span class="emoji-picker-container" style="display: none;"></span>
-            </div>
-            <div class="emoji-quick-picker-container" style="display: none;"></div>
-          </div>
-        </td>
       </tr>
-      <%= render :partial => "group_comment" %>
+      <% unless @context.account.grants_right?(@current_user, :make_submission_comments) %>
+        <tr>
+          <td>
+            <div class="textarea-emoji-container">
+              <div class="textarea-container">
+                <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
+                <span class="emoji-picker-container" style="display: none;"></span>
+              </div>
+              <div class="emoji-quick-picker-container" style="display: none;"></div>
+            </div>
+          </td>
+        </tr>
+        <%= render :partial => "group_comment" %>
+      <% end %>
       <% if @assignment.turnitin_enabled? %>
         <%= render :partial => "turnitin" %>
       <% end %>
