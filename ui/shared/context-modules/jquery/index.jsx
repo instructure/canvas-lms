@@ -2252,6 +2252,9 @@ $(document).ready(function () {
   if (!ENV.disable_keyboard_shortcuts) {
     const $document = $(document)
     $document.keycodes('k up', _event => {
+      // If the vertical kebob pop-up menu is open then ignore the shortcut
+      if ($('.ui-menu.ui-state-open').length) return
+
       const params = {
         selectWhenModuleFocused: {
           item:
@@ -2270,6 +2273,9 @@ $(document).ready(function () {
 
     // "j" and "down arrow" move the focus down between modules and module items
     $document.keycodes('j down', _event => {
+      // If the vertical kebob pop-up menu is open then ignore the shortcut
+      if ($('.ui-menu.ui-state-open').length) return
+
       const params = {
         selectWhenModuleFocused: {
           item: $currentElem && $currentElem.find('.context_module_item:visible:first'),
