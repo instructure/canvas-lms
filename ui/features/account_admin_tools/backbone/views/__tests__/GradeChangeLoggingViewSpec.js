@@ -20,8 +20,8 @@ import GradeChangeLoggingCollection from '../../collections/GradeChangeLoggingCo
 import GradeChangeLoggingContentView from '../GradeChangeLoggingContentView'
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from 'helpers/fakeENV'
-import assertions from 'helpers/assertions'
+import fakeENV from '@canvas/common/fakeENV'
+import assertions from '@canvas/common/assertionsSpec'
 
 const buildEvent = options => {
   if (options == null) {

@@ -22,8 +22,8 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import GroupCategory from '@canvas/groups/backbone/models/GroupCategory'
 import GroupCategoryEditView from '@canvas/groups/backbone/views/GroupCategoryEditView'
-import fakeENV from 'helpers/fakeENV'
-import assertions from 'helpers/assertions'
+import fakeENV from '@canvas/common/fakeENV'
+import assertions from '@canvas/common/assertionsSpec'
 
 let view = null
 let groupCategory = null

@@ -23,7 +23,7 @@ import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
 import OutcomeResultCollection from '../../collections/OutcomeResultCollection'
 import OutcomeLineGraphView from '../OutcomeLineGraphView'
 import * as tz from '@instructure/moment-utils'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 QUnit.module('OutcomeLineGraphViewSpec', {
   setup() {

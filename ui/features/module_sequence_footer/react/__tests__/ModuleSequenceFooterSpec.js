@@ -17,7 +17,7 @@
  */
 
 import {renderModuleSequenceFooter} from '../index'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 QUnit.module('renderModuleSequenceFooter', hooks => {
   let $container

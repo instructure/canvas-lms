@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Fixtures from '../../../../../../spec/javascripts/jsx/gradebook-history/Fixtures'
+import Fixtures from '@canvas/grading/Fixtures'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
 import reducer from '../SearchFormReducer'
 import {

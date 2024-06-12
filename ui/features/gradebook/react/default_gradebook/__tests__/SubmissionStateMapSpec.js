@@ -20,7 +20,7 @@ import {fromJS} from 'immutable'
 import moment from 'moment'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 import {createGradebook} from './GradebookSpecHelper'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 const studentWithoutSubmission = {
   id: '1',

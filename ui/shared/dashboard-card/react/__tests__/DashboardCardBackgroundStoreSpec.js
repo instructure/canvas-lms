@@ -18,7 +18,7 @@
 
 import fetchMock from 'fetch-mock'
 import DashboardCardBackgroundStore from '../DashboardCardBackgroundStore'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 const TEST_COLORS = {
   '#008400': '#008400',

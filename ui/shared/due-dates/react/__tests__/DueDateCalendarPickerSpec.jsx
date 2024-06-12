@@ -22,7 +22,7 @@ import chicago from 'timezone/America/Chicago'
 import DueDateCalendarPicker from '../DueDateCalendarPicker'
 import * as tz from '@instructure/moment-utils'
 import tzInTest from '@instructure/moment-utils/specHelpers'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 QUnit.module('DueDateCalendarPicker', suiteHooks => {
   let clock

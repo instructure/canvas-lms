@@ -19,7 +19,7 @@
 import Filterable from '../Filterable'
 import {Collection, View} from '@canvas/backbone'
 import CollectionView from '@canvas/backbone-collection-view'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 let view = null
 

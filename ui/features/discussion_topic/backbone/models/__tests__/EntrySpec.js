@@ -17,7 +17,7 @@
  */
 
 import Entry from '../Entry'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 QUnit.module('Entry', {
   setup() {

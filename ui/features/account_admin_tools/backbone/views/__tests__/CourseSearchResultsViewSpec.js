@@ -21,7 +21,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import CourseSearchResultsView from '../CourseSearchResultsView'
 import CourseRestore from '../../models/CourseRestore'
-import assertions from 'helpers/assertions'
+import assertions from '@canvas/common/assertionsSpec'
 import {initFlashContainer} from '@canvas/rails-flash-notifications'
 
 const errorMessageJSON = {

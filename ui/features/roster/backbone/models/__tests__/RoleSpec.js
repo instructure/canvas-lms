@@ -17,7 +17,7 @@
  */
 
 import Role from '../Role'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 import {clone, omit} from 'lodash'
 import Backbone from '@canvas/backbone'
 

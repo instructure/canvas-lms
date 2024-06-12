@@ -21,7 +21,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import ProfileShow from '../ProfileShow'
-import assertions from 'helpers/assertions'
+import assertions from '@canvas/common/assertionsSpec'
 
 QUnit.module('ProfileShow', {
   setup() {

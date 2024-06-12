@@ -17,7 +17,7 @@
  */
 
 import * as GradeInputHelper from '../GradeInputHelper'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 QUnit.module('GradeInputHelper', suiteHooks => {
   suiteHooks.beforeEach(() => {

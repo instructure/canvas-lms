@@ -21,7 +21,7 @@ import TestUtils from 'react-dom/test-utils'
 import TimeBlockSelectRow from '../TimeBlockSelectRow'
 import london from 'timezone/Europe/London'
 import * as tz from '@instructure/moment-utils'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 let props
 let tzSnapshot

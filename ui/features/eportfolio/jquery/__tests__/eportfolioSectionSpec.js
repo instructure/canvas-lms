@@ -17,7 +17,7 @@
  */
 
 import {fetchContent} from '../eportfolio_section'
-import fixtures from 'helpers/fixtures'
+import fixtures from '@canvas/common/fixtures'
 
 let $section = null
 

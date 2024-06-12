@@ -24,7 +24,7 @@ import OutcomePopoverView from '../OutcomePopoverView'
 import OutcomeDialogView from '../OutcomeDialogView'
 import OutcomeView from '../OutcomeView'
 import ProgressBarView from '../ProgressBarView'
-import assertions from 'helpers/assertions'
+import assertions from '@canvas/common/assertionsSpec'
 
 QUnit.module('OutcomeViewSpec', {
   setup() {

@@ -22,7 +22,7 @@ import QuizItemGroupView from '../QuizItemGroupView'
 import NoQuizzesView from '../NoQuizzesView'
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 import '@canvas/jquery/jquery.simulate'
 import ReactDOM from 'react-dom'
 

@@ -17,7 +17,7 @@
  */
 
 import NoQuizzesView from '../NoQuizzesView'
-import assertions from 'helpers/assertions'
+import assertions from '@canvas/common/assertionsSpec'
 import '@canvas/jquery/jquery.simulate'
 
 QUnit.module('NoQuizzesView', {

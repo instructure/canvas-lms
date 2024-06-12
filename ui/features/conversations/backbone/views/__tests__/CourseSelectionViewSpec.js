@@ -21,8 +21,8 @@ import CourseSelectionView from '../CourseSelectionView'
 import CourseCollection from '../../collections/CourseCollection'
 import FavoriteCourseCollection from '../../collections/FavoriteCourseCollection'
 import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection'
-import fakeENV from 'helpers/fakeENV'
-import assertions from 'helpers/assertions'
+import fakeENV from '@canvas/common/fakeENV'
+import assertions from '@canvas/common/assertionsSpec'
 import {fudgeDateForProfileTimezone} from '@instructure/moment-utils'
 
 const courseSelectionView = function () {

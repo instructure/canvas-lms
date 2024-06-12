@@ -30,10 +30,11 @@ import juneau from 'timezone/America/Juneau'
 import french from 'timezone/fr_FR'
 import AgendaView from '../AgendaView'
 import EventDataSource from '@canvas/calendar/jquery/EventDataSource'
-import eventResponse from 'helpers/ajax_mocks/api/v1/calendarEvents'
-import plannerItemsResponse from 'helpers/ajax_mocks/api/planner/items'
-import assignmentResponse from 'helpers/ajax_mocks/api/v1/calendarAssignments'
-import fakeENV from 'helpers/fakeENV'
+import eventResponse from './calendarEvents'
+import assignmentResponse from './calendarAssignments'
+import fakeENV from '@canvas/common/fakeENV'
+
+const plannerItemsResponse = `[]`
 
 const loadEventPage = (server, includeNext = false) =>
   sendCustomEvents(server, eventResponse, assignmentResponse, plannerItemsResponse, includeNext)

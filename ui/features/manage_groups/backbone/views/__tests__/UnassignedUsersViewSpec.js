@@ -24,7 +24,7 @@ import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection
 import UnassignedGroupUserCollection from '@canvas/groups/backbone/collections/UnassignedGroupUserCollection'
 import Group from '@canvas/groups/backbone/models/Group'
 import GroupCategory from '@canvas/groups/backbone/models/GroupCategory'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 import '@canvas/jquery/jquery.simulate'
 
 let clock = null

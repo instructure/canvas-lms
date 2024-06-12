@@ -27,7 +27,7 @@ import fetchMock from 'fetch-mock'
 import DashboardCard from '../DashboardCard'
 import getDroppableDashboardCardBox from '../getDroppableDashboardCardBox'
 import CourseActivitySummaryStore from '../CourseActivitySummaryStore'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 QUnit.module('DashboardCardBox', suiteHooks => {
   let $container

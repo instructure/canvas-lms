@@ -24,9 +24,9 @@ import 'jqueryui/tooltip'
 import Quiz from '@canvas/quizzes/backbone/models/Quiz'
 import QuizItemView from '../QuizItemView'
 import PublishIconView from '@canvas/publish-icon-view'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
-import assertions from 'helpers/assertions'
+import assertions from '@canvas/common/assertionsSpec'
 
 const createQuiz = function (options = {}) {
   const permissions = {

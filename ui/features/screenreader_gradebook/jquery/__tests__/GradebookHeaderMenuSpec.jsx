@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 import GradebookHeaderMenu from '../GradebookHeaderMenu'
 import SetDefaultGradeDialog from '@canvas/grading/jquery/SetDefaultGradeDialog'
 import CurveGradesDialog from '@canvas/grading/jquery/CurveGradesDialog'

@@ -18,7 +18,7 @@
 
 import CalendarEvent from '../CalendarEvent'
 import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
-import {waitFor} from '../../../../../../spec/javascripts/jsx/support/Waiters'
+import {waitFor} from '@canvas/common/Waiters'
 
 QUnit.module('Calendar', () => {
   QUnit.module('CalendarEvent', () => {
