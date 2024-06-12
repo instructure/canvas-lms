@@ -33,7 +33,7 @@ const I18n = useI18nScope('terms.index')
 const dateOpts = {format: 'full'}
 
 $(document).ready(() => {
-  initializeTopNavPortal(document.getElementById('react-instui-topnav'))
+  initializeTopNavPortal()
 
   $('.submit_button').click(function (_event) {
     const $term = $(this).closest('.term')

@@ -21,9 +21,9 @@ import ready from '@instructure/ready'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import WebZipExportApp from './react/App'
-import { initializeTopNavPortal } from '@canvas/top-navigation/react/TopNavPortal'
+import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
 ready(() => {
-  initializeTopNavPortal(document.getElementById('react-instui-topnav'))
+  initializeTopNavPortal()
   ReactDOM.render(<WebZipExportApp />, $('#course-webzip-export-app')[0])
 })

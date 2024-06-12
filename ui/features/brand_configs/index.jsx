@@ -23,7 +23,7 @@ import ready from '@instructure/ready'
 import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
 ready(() => {
-  initializeTopNavPortal(document.getElementById('react-instui-topnav'))
+  initializeTopNavPortal()
   ReactDOM.render(
     <CollectionView {...window.ENV.brandConfigStuff} />,
     document.getElementById('content')

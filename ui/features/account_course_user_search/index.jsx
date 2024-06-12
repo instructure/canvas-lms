@@ -68,9 +68,7 @@ ready(() => {
     setBreadCrumb = f?.setCrumbs || (() => {})
   }
 
-  initializeTopNavPortal(document.getElementById('react-instui-topnav'), {
-    getBreadCrumbSetter: setFunction,
-  })
+  initializeTopNavPortal({getBreadCrumbSetter: setFunction})
 
   const content = document.getElementById('content')
   store.subscribe(() => {
