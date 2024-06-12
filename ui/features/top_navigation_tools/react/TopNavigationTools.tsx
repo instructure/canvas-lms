@@ -23,6 +23,7 @@ import {IconLtiLine} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Flex} from '@instructure/ui-flex'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {Tool} from '@canvas/global/env/EnvCommon'
 
@@ -57,14 +58,16 @@ export function TopNavigationTools(props: TopNavigationToolsProps) {
       {pinned_tools.map((tool: Tool) => {
         return (
           <Flex.Item key={tool.id}>
-            <Button
-              renderIcon={getToolIcon(tool)}
-              onClick={e =>
-                handleToolClick(e.target.dataset.toolId, pinned_tools, props.handleToolLaunch)
-              }
-              data-tool-id={tool.id}
-              title={tool.title}
-            />
+            <Tooltip renderTip={tool.title}>
+              <IconButton
+                renderIcon={getToolIcon(tool)}
+                onClick={e =>
+                  handleToolClick(e.target.dataset.toolId, pinned_tools, props.handleToolLaunch)
+                }
+                data-tool-id={tool.id}
+                screenReaderLabel={tool.title}
+              />
+            </Tooltip>
           </Flex.Item>
         )
       })}

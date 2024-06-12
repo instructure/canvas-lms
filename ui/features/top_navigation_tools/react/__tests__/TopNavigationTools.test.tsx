@@ -110,7 +110,7 @@ describe('handleToolClick', () => {
     const wrapper = shallow(
       <TopNavigationTools tools={[tool]} handleToolLaunch={handleToolLaunch} />
     )
-    wrapper.find('Button').simulate('click', {target: {dataset: {toolId: '1'}}})
+    wrapper.find('IconButton').simulate('click', {target: {dataset: {toolId: '1'}}})
     expect(handleToolLaunch).toHaveBeenCalledWith(tool)
   })
 })
