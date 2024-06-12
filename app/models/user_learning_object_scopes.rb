@@ -453,8 +453,7 @@ module UserLearningObjectScopes
     objects_needing("WikiPage", "viewing", :student, params, 120.minutes, **opts) do |wiki_pages_context, shard_course_ids, shard_group_ids|
       wiki_pages_context
         .available_to_planner
-        .visible_to_user(self)
-        .for_courses_and_groups(shard_course_ids, shard_group_ids)
+        .visible_to_user_in_courses_and_groups(self, shard_course_ids, shard_group_ids)
         .todo_date_between(due_after, due_before)
     end
   end
