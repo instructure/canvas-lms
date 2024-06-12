@@ -23,11 +23,8 @@ import type {DynamicRegistrationWizardService} from '../DynamicRegistrationWizar
 import {success} from '../../../common/lib/apiResult/ApiResult'
 import userEvent from '@testing-library/user-event'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {LtiScopes, i18nLtiScope} from '../../model/LtiScope'
-import type {LtiConfiguration} from '../../model/lti_tool_configuration/LtiConfiguration'
-import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
-import {ZLtiImsRegistrationId} from '../../model/lti_ims_registration/LtiImsRegistrationId'
-import {ZDeveloperKeyId} from '../../model/developer_key/DeveloperKeyId'
+import {i18nLtiScope} from '../../model/LtiScope'
+import {mockRegistration} from './helpers'
 import {htmlEscape} from '@instructure/html-escape'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
@@ -43,53 +40,6 @@ const mockService = (
   updateDeveloperKeyWorkflowState: jest.fn(),
   updateRegistrationOverlay: jest.fn(),
   ...mocked,
-})
-
-const mockToolConfiguration = (config?: Partial<LtiConfiguration>): LtiConfiguration => ({
-  title: '',
-  target_link_uri: '',
-  oidc_initiation_url: '',
-  custom_fields: {},
-  is_lti_key: true,
-  scopes: [],
-  extensions: [],
-  ...config,
-})
-
-const mockRegistration = (
-  reg?: Partial<LtiImsRegistration>,
-  config?: LtiConfiguration
-): LtiImsRegistration => ({
-  id: ZLtiImsRegistrationId.parse('1'),
-  lti_tool_configuration: {
-    claims: [],
-    domain: '',
-    messages: [],
-    target_link_uri: '',
-  },
-  developer_key_id: ZDeveloperKeyId.parse('1'),
-  overlay: null,
-  grant_types: [],
-  response_types: [],
-  redirect_uris: [],
-  initiate_login_uri: '',
-  client_name: '',
-  jwks_uri: '',
-  token_endpoint_auth_method: '',
-  contacts: [],
-  scopes: [...Object.values(LtiScopes)],
-  created_at: '',
-  updated_at: '',
-  guid: '',
-  /**
-   * Tool configuration with overlay applied
-   */
-  tool_configuration: mockToolConfiguration(config),
-  /**
-   * The configuration without the overlay applied
-   */
-  default_configuration: mockToolConfiguration(config),
-  ...reg,
 })
 
 describe('DynamicRegistrationWizard', () => {

@@ -30,7 +30,7 @@ export const LtiPrivacyLevels = {
   Public: 'public',
 } as const
 
-const AllLtiPrivacyLevels = [
+export const AllLtiPrivacyLevels = [
   LtiPrivacyLevels.Anonymous,
   LtiPrivacyLevels.NameOnly,
   LtiPrivacyLevels.EmailOnly,
@@ -54,12 +54,31 @@ const LtiPrivacyLevelTranslations: Record<LtiPrivacyLevel, string> = {
   [LtiPrivacyLevels.Anonymous]: I18n.t('None (Anonymized)'),
 }
 
+const LtiPrivacyLevelDescriptions: Record<LtiPrivacyLevel, string> = {
+  [LtiPrivacyLevels.Public]: I18n.t(
+    'Includes: Canvas ID, Name, First Name, Last Name, SIS ID, Avatar, and Email Address'
+  ),
+  [LtiPrivacyLevels.NameOnly]: I18n.t(
+    'Includes: Canvas ID, Name, First Name, Last Name, SIS ID, and Avatar'
+  ),
+  [LtiPrivacyLevels.EmailOnly]: I18n.t('Includes: Canvas ID and Email Address'),
+  [LtiPrivacyLevels.Anonymous]: I18n.t('Includes: Canvas ID'),
+}
+
 /**
  * Returns the translation for the given LTI privacy level.
  * @param level
  * @returns string that contains a human readable translation
  */
 export const i18nLtiPrivacyLevel = (level: LtiPrivacyLevel) => LtiPrivacyLevelTranslations[level]
+
+/**
+ * Returns the description for the given LTI privacy level.
+ * @param level
+ * @returns string that contains a human readable description of what information a privacy level includes
+ */
+export const i18nLtiPrivacyLevelDescription = (level: LtiPrivacyLevel) =>
+  LtiPrivacyLevelDescriptions[level]
 
 /**
  * Identifier for an LTI privacy setting.
