@@ -1251,7 +1251,7 @@ describe WikiPage do
     end
   end
 
-  describe "visible_ids_by_user and visible_to_user" do
+  describe "visible_ids_by_user and visible_to_user_in_courses_and_groups" do
     before :once do
       @course1 = course_factory(active_all: true)
       @page1 = @course1.wiki_pages.create!(title: "page1")
@@ -1264,7 +1264,7 @@ describe WikiPage do
 
     def assert_visible(user, pages)
       visible_ids_by_user = WikiPage.visible_ids_by_user({ user_id: [user.id], course_id: [@course1.id] })
-      visible_to_user = WikiPage.visible_to_user(user.id).pluck(:id)
+      visible_to_user = WikiPage.visible_to_user_in_courses_and_groups(user.id, [@course1.id], []).pluck(:id)
       expect(visible_ids_by_user[user.id]).to contain_exactly(*pages.map(&:id))
       expect(visible_to_user).to contain_exactly(*pages.map(&:id))
     end
@@ -1295,10 +1295,19 @@ describe WikiPage do
       expect(visible_ids_by_user[@student1.id]).to contain_exactly(@page1.id)
     end
 
-    it "includes group pages" do
-      group = group_model(context: @course1)
-      group_page = group.wiki_pages.create!(title: "group page")
-      expect(WikiPage.visible_to_user(@student1.id)).to include(group_page)
+    context "group pages" do
+      before :once do
+        @group = group_model(context: @course1)
+        @group_page = @group.wiki_pages.create!(title: "group page")
+      end
+
+      it "includes group pages" do
+        expect(WikiPage.visible_to_user_in_courses_and_groups(@student1.id, [@course1.id], [@group.id])).to include(@group_page)
+      end
+
+      it "does not include group pages not in group_ids" do
+        expect(WikiPage.visible_to_user_in_courses_and_groups(@student1.id, [@course1.id], [])).not_to include(@group_page)
+      end
     end
 
     context "with selective_release_backend disabled" do
@@ -1345,6 +1354,16 @@ describe WikiPage do
         @page1.update!(assignment_id: assignment.id)
         assert_visible(@student1, [])
         assert_visible(@student2, [])
+      end
+
+      it "does not include pages from another course" do
+        course2 = course_factory(active_all: true)
+        course2.wiki_pages.create!(title: "page3")
+        student_in_course(course: course2, user: @student1, active_all: true)
+        page4 = course2.wiki_pages.create!(title: "page2")
+        assignment = course2.assignments.create!(title: "assignment")
+        page4.update!(assignment_id: assignment.id)
+        assert_visible(@student1, [@page1])
       end
     end
   end
