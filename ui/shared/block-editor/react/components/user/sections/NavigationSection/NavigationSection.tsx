@@ -22,6 +22,7 @@ import {Container} from '../../blocks/Container'
 import {ButtonBlock} from '../../blocks/ButtonBlock'
 import {useClassNames, getContrastingColor} from '../../../../utils'
 import {SectionMenu} from '../../../editor/SectionMenu'
+import {SectionToolbar} from '../../common/SectionToolbar'
 
 export type NavigationSectionInnerProps = {
   children?: React.ReactNode
@@ -125,6 +126,7 @@ NavigationSection.craft = {
   },
   related: {
     sectionMenu: SectionMenu,
+    toolbar: SectionToolbar,
   },
 }
 

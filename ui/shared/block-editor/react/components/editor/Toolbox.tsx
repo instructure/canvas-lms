@@ -46,8 +46,6 @@ import {QuizSection, QuizSectionIcon} from '../user/sections/QuizSection'
 import {FooterSection, FooterSectionIcon} from '../user/sections/FooterSection'
 import {BlankSection, BlankSectionIcon} from '../user/sections/BlankSection'
 
-import {getTrayHeight} from '../../utils'
-
 type ToolboxProps = {
   open: boolean
   onClose: () => void
@@ -117,64 +115,63 @@ export const Toolbox = ({open, onClose}: ToolboxProps) => {
     <Tray
       contentRef={el => setTrayRef(el)}
       label="Toolbox"
+      mountNode={document.querySelector('.block-editor-editor') as HTMLElement}
       open={open}
       placement="end"
       size="small"
       onClose={handleCloseTray}
     >
-      <Flex direction="column" height={getTrayHeight()}>
-        <Flex.Item shouldGrow={true} shouldShrink={true}>
-          <CloseButton placement="end" onClick={handleCloseTray} screenReaderLabel="Close" />
-          <Tabs onRequestTabChange={handleTabChange}>
-            <Tabs.Panel renderTitle="Blocks" isSelected={activeTab === 0}>
-              <Flex
-                gap="x-small"
-                justifyItems="space-between"
-                alignItems="center"
-                wrap="wrap"
-                padding="x-small"
-              >
-                {renderBox('Button', ButtonBlockIcon, <ButtonBlock text="Click me" />)}
-                {renderBox('Text', TextBlockIcon, <TextBlock text="" />)}
-                {renderBox('RCE', RCEBlockIcon, <RCEBlock text="" />)}
-                {/* renderBox(
+      <View as="div">
+        <CloseButton placement="end" onClick={handleCloseTray} screenReaderLabel="Close" />
+        <Tabs onRequestTabChange={handleTabChange}>
+          <Tabs.Panel renderTitle="Blocks" isSelected={activeTab === 0}>
+            <Flex
+              gap="x-small"
+              justifyItems="space-between"
+              alignItems="center"
+              wrap="wrap"
+              padding="x-small"
+            >
+              {renderBox('Button', ButtonBlockIcon, <ButtonBlock text="Click me" />)}
+              {renderBox('Text', TextBlockIcon, <TextBlock text="" />)}
+              {renderBox('RCE', RCEBlockIcon, <RCEBlock text="" />)}
+              {/* renderBox(
                   'Container',
                   ContainerIcon,
                   <Element is={Container} background="#fff" canvas={true} layout="row" />
                 ) */}
-                {renderBox('Icon', IconBlockIcon, <IconBlock iconName="apple" />)}
-                {renderBox('Heading', HeadingBlockIcon, <HeadingBlock />)}
-                {renderBox('Resource Card', ResourceCardIcon, <ResourceCard />)}
-                {renderBox('Image', ImageBlockIcon, <ImageBlock />)}
-                {renderBox('Iframe', IframeBlockIcon, <IframeBlock />)}
-              </Flex>
-            </Tabs.Panel>
-            <Tabs.Panel renderTitle="Sections" isSelected={activeTab === 1}>
-              <Flex
-                gap="x-small"
-                justifyItems="space-between"
-                alignItems="center"
-                wrap="wrap"
-                width="320px"
-                padding="x-small"
-              >
-                {renderBox('Resources', ResourcesSectionIcon, <ResourcesSection />)}
-                {renderBox(
-                  'Columns',
-                  ColumnsSectionIcon,
-                  <ColumnsSection columns={2} variant="fixed" />
-                )}
-                {renderBox('Blank', BlankSectionIcon, <BlankSection />)}
-                {renderBox('Hero', ImageBlockIcon, <HeroSection />)}
-                {renderBox('Navigation', NavigationSectionIcon, <NavigationSection />)}
-                {renderBox('About', AboutSectionIcon, <AboutSection />)}
-                {renderBox('Quiz', QuizSectionIcon, <QuizSection />)}
-                {renderBox('Footer', FooterSectionIcon, <FooterSection />)}
-              </Flex>
-            </Tabs.Panel>
-          </Tabs>
-        </Flex.Item>
-      </Flex>
+              {renderBox('Icon', IconBlockIcon, <IconBlock iconName="apple" />)}
+              {renderBox('Heading', HeadingBlockIcon, <HeadingBlock />)}
+              {renderBox('Resource Card', ResourceCardIcon, <ResourceCard />)}
+              {renderBox('Image', ImageBlockIcon, <ImageBlock />)}
+              {renderBox('Iframe', IframeBlockIcon, <IframeBlock />)}
+            </Flex>
+          </Tabs.Panel>
+          <Tabs.Panel renderTitle="Sections" isSelected={activeTab === 1}>
+            <Flex
+              gap="x-small"
+              justifyItems="space-between"
+              alignItems="center"
+              wrap="wrap"
+              width="320px"
+              padding="x-small"
+            >
+              {renderBox('Resources', ResourcesSectionIcon, <ResourcesSection />)}
+              {renderBox(
+                'Columns',
+                ColumnsSectionIcon,
+                <ColumnsSection columns={2} variant="fixed" />
+              )}
+              {renderBox('Blank', BlankSectionIcon, <BlankSection />)}
+              {renderBox('Hero', ImageBlockIcon, <HeroSection />)}
+              {renderBox('Navigation', NavigationSectionIcon, <NavigationSection />)}
+              {renderBox('About', AboutSectionIcon, <AboutSection />)}
+              {renderBox('Quiz', QuizSectionIcon, <QuizSection />)}
+              {renderBox('Footer', FooterSectionIcon, <FooterSection />)}
+            </Flex>
+          </Tabs.Panel>
+        </Tabs>
+      </View>
     </Tray>
   )
 }

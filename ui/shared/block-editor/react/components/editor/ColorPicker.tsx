@@ -20,10 +20,11 @@ import React, {useCallback, useState} from 'react'
 import tinycolor from 'tinycolor2'
 import {ColorIndicator, ColorMixer, ColorPreset} from '@instructure/ui-color-picker'
 import {FormFieldGroup, type FormMessage} from '@instructure/ui-form-field'
-import {TextInput} from '@instructure/ui-text-input'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {TextInput, type TextInputOwnProps} from '@instructure/ui-text-input'
 
 type ColorPickerProps = {
-  label: string
+  label: React.ReactNode
   disabled: boolean
   value: string
   onChange: (color: string) => void
@@ -57,7 +58,7 @@ const ColorPicker = ({label, disabled, value, onChange}: ColorPickerProps) => {
   )
 
   const handleHexKey = useCallback(
-    (event: React.KeyboardEvent<HTMLInputElement>) => {
+    (event: React.KeyboardEvent<TextInputOwnProps>) => {
       if (event.key === 'Enter') {
         const color = tinycolor(typedColor)
         if (color.isValid(typedColor)) {
@@ -79,7 +80,7 @@ const ColorPicker = ({label, disabled, value, onChange}: ColorPickerProps) => {
   return (
     <FormFieldGroup layout="stacked" description={label} rowSpacing="small">
       <TextInput
-        renderLabel="Enter a color"
+        renderLabel={<ScreenReaderContent>Custom color</ScreenReaderContent>}
         interaction={disabled ? 'disabled' : 'enabled'}
         value={typedColor}
         messages={messages}
