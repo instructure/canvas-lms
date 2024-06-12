@@ -127,9 +127,6 @@ html * {
 }
 
 .container-block {
-  /* display: flex;
-  flex-wrap: wrap;
-  gap: 16px; */
   position: relative;
   padding: .25rem;
   min-height: 2.5rem;
@@ -137,7 +134,21 @@ html * {
   &.empty {
     border: 1px dotted #ababab;
   }
+  &.row-layout {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+  }
+  &.column-layout {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
 }
+
 
 .paragraph-block {
   min-height: 1.5rem;
@@ -286,7 +297,7 @@ html * {
   max-width: 100%;
   text-wrap: balance;
   &.enabled {
-    text-wrap: stable;
+    text-wrap: wrap; /* stable; only firefox supports stable */
   }
 }
 

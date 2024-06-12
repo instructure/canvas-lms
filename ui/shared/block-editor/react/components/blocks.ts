@@ -25,7 +25,6 @@ import {ResourceCard} from './user/blocks/ResourceCard'
 import {IconBlock} from './user/blocks/IconBlock'
 import {PageBlock} from './user/blocks/PageBlock'
 import {ImageBlock} from './user/blocks/ImageBlock'
-import {SVGImageBlock} from './user/blocks/SVGImageBlock'
 import {IframeBlock} from './user/blocks/IframeBlock'
 import {RCEBlock} from './user/blocks/RCEBlock'
 
@@ -52,7 +51,6 @@ const blocks = {
   ResourceCard,
   IconBlock,
   ImageBlock,
-  SVGImageBlock,
   IframeBlock,
   RCEBlock,
   QuizSection,

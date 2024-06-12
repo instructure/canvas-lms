@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
-import {useEditor, useNode} from '@craftjs/core'
+import React from 'react'
+import {useNode} from '@craftjs/core'
 
 import {Img} from '@instructure/ui-img'
 
@@ -39,10 +39,6 @@ const ImageBlock = ({src, width, height, constraint}: ImageBlockProps) => {
     connectors: {connect, drag},
   } = useNode()
 
-  const handleGetImage = useCallback(() => {
-    console.log('Get Image')
-  }, [])
-
   if (!src) {
     return (
       <div className="image-block__empty" ref={el => el && connect(drag(el as HTMLImageElement))} />
@@ -54,8 +50,8 @@ const ImageBlock = ({src, width, height, constraint}: ImageBlockProps) => {
         elementRef={el => el && connect(drag(el as HTMLImageElement))}
         src={src || ImageBlock.craft.defaultProps.imageSrc}
         constrain={constraint || ImageBlock.craft.defaultProps.constraint}
-        width={width}
-        height={height}
+        width={`${width}px`}
+        height={`${height}px`}
       />
     )
   }
