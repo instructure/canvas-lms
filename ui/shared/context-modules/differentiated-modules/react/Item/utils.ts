@@ -24,6 +24,8 @@ import type {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = useI18nScope('differentiated_modules')
 
+const fancyMidnightDueTime = '23:59:00'
+
 type UseDatesHookArgs = {
   due_at: string | null
   unlock_at: string | null
@@ -46,9 +48,17 @@ type UseDatesHookResult = [
 
 function setTimeToStringDate(time: string, date: string | undefined): string | undefined {
   const [hour, minute, second] = time.split(':').map(Number)
-  const chosenDate = moment.tz(date, ENV.TIMEZONE)
+  const chosenDate = moment.tz(date, ENV.TIMEZONE || 'UTC')
   chosenDate.set({hour, minute, second})
   return chosenDate.isValid() ? chosenDate.utc().toISOString() : date
+}
+
+function isFancyMidnightNeeded(value: string | undefined) {
+  const chosenDueTime = moment
+    .utc(value)
+    .tz(ENV.TIMEZONE || 'UTC')
+    .format('HH:mm:00')
+  return chosenDueTime === '00:00:00' && chosenDueTime !== fancyMidnightDueTime
 }
 
 export function generateMessages(
@@ -138,6 +148,13 @@ export function useDates({
         setDueDate(newDueDate || null)
       } else {
         setTimeout(() => setDueDate(newDueDate || null), 0)
+      }
+
+      if (isFancyMidnightNeeded(newDueDate)) {
+        setTimeout(
+          () => setDueDate(setTimeToStringDate(fancyMidnightDueTime, newDueDate) || null),
+          200
+        )
       }
     },
     [dueDate]
