@@ -456,8 +456,14 @@ class Lti::RegistrationsController < ApplicationController
 
   # @API List LTI Registrations in an account
   # Returns all LTI registrations in the specified account.
+  # Includes registrations created in this account, those set to 'allow' from a
+  # parent root account (like Site Admin) and 'on' for this account,
+  # and those enabled 'on' at the parent root account level.
   #
-  # @returns [Lti::Registration]
+  # @argument per_page [integer] The number of registrations to return per page. Defaults to 15.
+  # @argument page [integer] The page number to return. Defaults to 1.
+  #
+  # @returns {"total": "integer", data: [Lti::Registration] }
   #
   # @example_request
   #
@@ -499,18 +505,15 @@ class Lti::RegistrationsController < ApplicationController
       end.flatten
 
       all_registrations = account_registrations + forced_on_in_site_admin + inherited_on_registrations
-      # somewhat hacky here; we need to sort them again after combining all of these separately-queried registrations
-      # together into all_registrations, since the overall batch will not be in created_at order.
-      all_registrations.sort! { |first, second| second.created_at - first.created_at }
-      paginated_registrations = Api.jsonapi_paginate(all_registrations, self, url_for(controller: "lti/registrations", action: "list"), { per_page: 15 })
-      render json: lti_registrations_json(
-        # jsonapi_paginate returns tuple; [0]th item has results, [1]nd item has pagination metadata
-        paginated_registrations.first,
-        @current_user,
-        session,
-        @context,
-        includes: [:account_binding]
-      )
+
+      # always sort by created_at descending for now
+      sorted_registrations = all_registrations.sort { |first, second| second.created_at - first.created_at }
+
+      paginated_registrations, _metadata = Api.jsonapi_paginate(sorted_registrations, self, url_for(controller: "lti/registrations", action: "list"), { per_page: params[:per_page] || 15 })
+      render json: {
+        total: all_registrations.size,
+        data: lti_registrations_json(paginated_registrations, @current_user, session, @context, includes: [:account_binding])
+      }
     end
   rescue => e
     report_error(e)

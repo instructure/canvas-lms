@@ -143,21 +143,26 @@ describe Lti::RegistrationsController do
           expect(response).to be_successful
         end
 
+        it "returns the total count of registrations" do
+          subject
+          expect(response_json[:total]).to eq(4)
+        end
+
         it "returns a list of registrations" do
           subject
-          expect(response_json.length).to eq(4)
+          expect(response_json[:data].length).to eq(4)
         end
 
         it "has the expected fields in the results" do
           subject
 
-          expect(response_json.first)
+          expect(response_json[:data].first)
             .to include({ account_id: an_instance_of(Integer), name: an_instance_of(String) })
 
-          expect(response_json.first[:account_binding])
+          expect(response_json[:data].first[:account_binding])
             .to include({ workflow_state: an_instance_of(String) })
 
-          expect(response_json.first[:account_binding][:created_by])
+          expect(response_json[:data].first[:account_binding][:created_by])
             .to include({ id: an_instance_of(Integer) })
         end
 
@@ -166,8 +171,8 @@ describe Lti::RegistrationsController do
           lti_registration_model(account:, name: "created an hour ago", created_at: 1.hour.ago)
 
           subject
-          expect(response_json.first["name"]).to eq("created just now")
-          expect(response_json.last["name"]).to eq("created an hour ago")
+          expect(response_json[:data].first["name"]).to eq("created just now")
+          expect(response_json[:data].last["name"]).to eq("created an hour ago")
         end
       end
 
@@ -231,7 +236,7 @@ describe Lti::RegistrationsController do
 
         it "puts results on one page and does not give a 'next' page in the Link header" do
           subject
-          expect(response_json.length).to eq(15)
+          expect(response_json[:data].length).to eq(15)
 
           # Expect the current pagination link to be given as rel=first, rel=last, and rel=current
           # in the header.
@@ -262,10 +267,15 @@ describe Lti::RegistrationsController do
             end
           end
 
+          it "returns the total count" do
+            subject
+            expect(response_json[:total]).to eq(20)
+          end
+
           it "returns five results on page 2 and says that is the last page" do
             get "#{url}?page=2"
 
-            expect(response_json.length).to eq(5)
+            expect(response_json[:data].length).to eq(5)
 
             %w[current last].each do |link_rel|
               expect(link_header_values).to include("<#{current_pagination_link}>; rel=\"#{link_rel}\"")
