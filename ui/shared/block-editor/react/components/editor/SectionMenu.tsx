@@ -19,12 +19,12 @@
 import React, {useCallback} from 'react'
 import {useEditor, type Node} from '@craftjs/core'
 import {Menu} from '@instructure/ui-menu'
-import {getCloneTree, scrollIntoViewWithCallback} from '../../utils'
+import {getCloneTree, scrollIntoViewWithCallback, getScrollParent} from '../../utils'
 
 function triggerScrollEvent() {
-  const scroller = document.getElementById('drawer-layout-content') || document
+  const scrollingContainer = getScrollParent()
   const scrollEvent = new Event('scroll')
-  scroller.dispatchEvent(scrollEvent)
+  scrollingContainer.dispatchEvent(scrollEvent)
 }
 
 type SectionMenuProps = {
@@ -49,7 +49,9 @@ const SectionMenu = ({
   })
 
   const handleEditSection = useCallback(() => {
-    onEditSection(selected.get())
+    if (onEditSection) {
+      onEditSection(selected.get())
+    }
   }, [onEditSection, selected])
 
   const handleDuplicateSection = useCallback(() => {
@@ -118,8 +120,10 @@ const SectionMenu = ({
   const handleRemove = useCallback(() => {
     if (onRemove) {
       onRemove(selected.get())
-    } else {
-      actions.delete(selected.get().id)
+    } else if (selected.get()?.id) {
+      window.setTimeout(() => {
+        actions.delete(selected.get().id)
+      }, 0)
     }
   }, [actions, onRemove, selected])
 

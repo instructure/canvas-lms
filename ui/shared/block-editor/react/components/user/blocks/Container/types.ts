@@ -16,8 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import IconUndo from './undo'
-import IconRedo from './redo'
-import IconBackgroundColor from './background-color'
+import React from 'react'
 
-export {IconUndo, IconRedo, IconBackgroundColor}
+export type ContainerLayout = 'default' | 'row' | 'column'
+export type ContainerProps = {
+  id?: string
+  className?: string
+  'data-placeholder'?: string
+  background?: string
+  style?: React.CSSProperties
+  layout?: ContainerLayout
+  children?: React.ReactNode
+}

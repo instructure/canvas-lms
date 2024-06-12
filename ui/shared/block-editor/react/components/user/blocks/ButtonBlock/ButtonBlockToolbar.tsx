@@ -30,7 +30,7 @@ import {
 } from '@instructure/ui-icons'
 
 import {LinkModal} from '../../../editor/LinkModal'
-import {ColorModal} from './ColorModal'
+import {ColorModal} from '../../common/ColorModal'
 
 import {isInstuiButtonColor} from './common'
 import type {ButtonBlockProps, ButtonSize, ButtonVariant} from './common'
@@ -196,6 +196,7 @@ const ButtonBlockToolbar = () => {
       <ColorModal
         open={colorModalOpen}
         color={props.color}
+        variant="button"
         onClose={handleCloseColorModal}
         onSubmit={handleColorChange}
       />

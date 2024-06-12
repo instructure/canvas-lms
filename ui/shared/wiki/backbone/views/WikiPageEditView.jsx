@@ -233,7 +233,11 @@ export default class WikiPageEditView extends ValidatedFormView {
       }
       ReactDOM.render(
         <Suspense fallback={<div>{I18n.t('Loading...')}</div>}>
-          <BlockEditor version={blockEditorData.version} content={blockEditorData.blocks[0].data} />
+          <BlockEditor
+            version={blockEditorData.version}
+            content={blockEditorData.blocks[0].data}
+            onCancel={this.cancel.bind(this)}
+          />
         </Suspense>,
         document.getElementById('block_editor')
       )

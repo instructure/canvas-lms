@@ -39,7 +39,7 @@ import {useNode} from '@craftjs/core'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Menu, type MenuItemProps, type MenuItem} from '@instructure/ui-menu'
-import {IconArrowOpenDownLine} from '@instructure/ui-icons'
+import {IconMiniArrowDownLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {type ViewOwnProps} from '@instructure/ui-view'
 
@@ -68,20 +68,35 @@ const HeadingBlockToolbar = () => {
       label="Heading level"
       trigger={
         <Button size="small">
-          <Flex gap="small">
+          <Flex gap="x-small">
             <Text size="small">Level</Text>
-            <IconArrowOpenDownLine size="x-small" />
+            <IconMiniArrowDownLine size="x-small" />
           </Flex>
         </Button>
       }
     >
-      <Menu.Item value="h2" onSelect={handleLevelChange}>
+      <Menu.Item
+        type="checkbox"
+        value="h2"
+        onSelect={handleLevelChange}
+        selected={props.level === 'h2'}
+      >
         <Text size="small">Heading 2</Text>
       </Menu.Item>
-      <Menu.Item value="h3" onSelect={handleLevelChange}>
+      <Menu.Item
+        type="checkbox"
+        value="h3"
+        onSelect={handleLevelChange}
+        selected={props.level === 'h3'}
+      >
         <Text size="small">Heading 3</Text>
       </Menu.Item>
-      <Menu.Item value="h4" onSelect={handleLevelChange}>
+      <Menu.Item
+        type="checkbox"
+        value="h4"
+        onSelect={handleLevelChange}
+        selected={props.level === 'h4'}
+      >
         <Text size="small">Heading 4</Text>
       </Menu.Item>
     </Menu>

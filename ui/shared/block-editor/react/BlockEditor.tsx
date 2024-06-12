@@ -50,11 +50,17 @@ type BlockEditorProps = {
   enabled?: boolean
   version: string
   content: string
+  onCancel: () => void
 }
 
-export default function BlockEditor({enabled = true, version, content}: BlockEditorProps) {
+export default function BlockEditor({
+  enabled = true,
+  version,
+  content,
+  onCancel,
+}: BlockEditorProps) {
   const [json] = useState(content || DEFAULT_CONTENT)
-  const [toolboxOpen, setToolboxOpen] = useState(true)
+  const [toolboxOpen, setToolboxOpen] = useState(false)
   const [stepperOpen, setStepperOpen] = useState(!content)
 
   useEffect(() => {
@@ -80,7 +86,13 @@ export default function BlockEditor({enabled = true, version, content}: BlockEdi
 
   const handleCloseStepper = useCallback(() => {
     setStepperOpen(false)
+    setToolboxOpen(true)
   }, [])
+
+  const handleCancelStepper = useCallback(() => {
+    setStepperOpen(false)
+    onCancel()
+  }, [onCancel])
 
   return (
     <View
@@ -101,16 +113,20 @@ export default function BlockEditor({enabled = true, version, content}: BlockEdi
         onRender={RenderNode}
       >
         <Flex direction="column" alignItems="stretch" justifyItems="start" gap="small" width="100%">
-          <Flex.Item shouldGrow={false}>
+          <div style={{position: 'sticky', top: 0, zIndex: 9999}}>
             <Topbar onToolboxChange={handleOpenToolbox} toolboxOpen={toolboxOpen} />
-          </Flex.Item>
+          </div>
           <Flex.Item id="editor-area" shouldGrow={true}>
             <Frame data={json} />
           </Flex.Item>
         </Flex>
 
         <Toolbox open={toolboxOpen} onClose={handleCloseToolbox} />
-        <NewPageStepper open={stepperOpen} onDismiss={handleCloseStepper} />
+        <NewPageStepper
+          open={stepperOpen}
+          onFinish={handleCloseStepper}
+          onCancel={handleCancelStepper}
+        />
       </Editor>
     </View>
   )
