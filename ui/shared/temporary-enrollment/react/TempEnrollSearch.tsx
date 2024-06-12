@@ -310,7 +310,9 @@ export function TempEnrollSearch(props: Props) {
             </Table.Head>
             <Table.Body>
               <Table.Row>
-                <Table.RowHeader>{userDetails.name}</Table.RowHeader>
+                <Table.RowHeader>
+                  <TempEnrollAvatar user={userDetails} />
+                </Table.RowHeader>
                 <Table.Cell>{userDetails.primary_email}</Table.Cell>
                 <Table.Cell>{userDetails.login_id}</Table.Cell>
                 {props.canReadSIS ? <Table.Cell>{userDetails.sis_user_id}</Table.Cell> : null}

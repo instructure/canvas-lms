@@ -183,7 +183,7 @@ describe('enrollment api', () => {
               state: ['current_future_and_restricted'],
               per_page: ITEMS_PER_PAGE,
               temporary_enrollments_for_recipient: true,
-              include: 'temporary_enrollment_providers',
+              include: ['avatar_url', 'temporary_enrollment_providers'],
             }),
           })
         )
