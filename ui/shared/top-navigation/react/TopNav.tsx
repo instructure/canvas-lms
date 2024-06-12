@@ -108,18 +108,20 @@ const TopNav: React.FC<ITopNavProps> = ({actionItems, getBreadCrumbSetter}) => {
             dropdownMenuLabel: 'Main Menu',
           }}
           renderBreadcrumb={
-            <TopNavBar.Breadcrumb onClick={() => handleToggleGlobalNav()}>
-              <Breadcrumb label="test">
-                {breadCrumbs?.map(crumb => {
-                  const url = crumb.url ?? undefined
-                  return (
-                    <Breadcrumb.Link key={crumb.name} href={url}>
-                      {crumb.name}
-                    </Breadcrumb.Link>
-                  )
-                })}
-              </Breadcrumb>
-            </TopNavBar.Breadcrumb>
+            breadCrumbs?.length > 1 ? (
+              <TopNavBar.Breadcrumb onClick={() => handleToggleGlobalNav()}>
+                <Breadcrumb label="test">
+                  {breadCrumbs?.map(crumb => {
+                    const url = crumb.url ?? undefined
+                    return (
+                      <Breadcrumb.Link key={crumb.name} href={url}>
+                        {crumb.name}
+                      </Breadcrumb.Link>
+                    )
+                  })}
+                </Breadcrumb>
+              </TopNavBar.Breadcrumb>
+            ) : undefined
           }
           renderActionItems={
             <TopNavBar.ActionItems
