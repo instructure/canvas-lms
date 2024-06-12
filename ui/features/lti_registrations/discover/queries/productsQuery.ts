@@ -66,6 +66,28 @@ const mockProducts: Array<Product> = [
         'Learning Tools Interoperability (LTI)® v.1.3 Core Specification',
         'Learning Tools Interoperability (LTI)® v.1.1 Core Specification',
       ],
+      placements: [
+        'Account Navigation',
+        'Assignment Edit',
+        'Assignment Group Menu',
+        'Assignment Index Menu',
+        'Assignment Menu',
+        'Assignment Selection',
+        'Collaboration',
+        'Course Assignments Menu',
+      ],
+      services: [
+        'Assignment and Grade Services v2.0 (AGS)',
+        'Name and Role Provisioning Services v2.0 (NRPS)',
+        'Deep Linking v2.0 (DL)',
+        'Dynamic Registration 1.0',
+        'Submission Review 1.0',
+        'Caliper Analytics Connector 1.0',
+        'Course Group Service 1.0',
+        'Proctering Service 1.0',
+      ],
+      description:
+        'This LTI version uses Dynamic Registration to support Canvas placement. Support documentation can be found via the help docs on StarBrightLearning.com/helpdocs or within the implementation section of this portal',
     },
     countries: ['USA', 'France', 'Netherlands', 'India', 'China', 'Mexico'],
     badges: [
@@ -115,6 +137,20 @@ const mockProducts: Array<Product> = [
     lti: {
       versions: ['v1.1'],
       title: ['Learning Tools Interoperability (LTI)® v.1.1 Core Specification'],
+      placements: [
+        'Assignment Menu',
+        'Assignment Selection',
+        'Collaboration',
+        'Course Assignments Menu',
+      ],
+      services: [
+        'Assignment and Grade Services v2.0 (AGS)',
+        'Name and Role Provisioning Services v2.0 (NRPS)',
+        'Course Group Service 1.0',
+        'Proctering Service 1.0',
+      ],
+      description:
+        'This LTI v1.3 utilizes Dynamic Registration to support Canvas placement. Support documentation can be found via the help docs on StarBrightLearning.com/helpdocs or within the implementation section of this portal',
     },
     countries: ['USA', 'India', 'China', 'Mexico'],
     badges: [
@@ -159,6 +195,17 @@ const mockProducts: Array<Product> = [
         'Learning Tools Interoperability (LTI)® v.1.3 Core Specification',
         'Learning Tools Interoperability (LTI)® v.1.1 Core Specification',
       ],
+      placements: ['Assignment Selection', 'Collaboration', 'Course Assignments Menu'],
+      services: [
+        'Assignment and Grade Services v2.0 (AGS)',
+        'Dynamic Registration 1.0',
+        'Submission Review 1.0',
+        'Caliper Analytics Connector 1.0',
+        'Course Group Service 1.0',
+        'Proctering Service 1.0',
+      ],
+      description:
+        'This LTI v1.3 utilizes Dynamic Registration to support Canvas placement. Support documentation can be found via the help docs on StarBrightLearning.com/helpdocs or within the implementation section of this portal',
     },
     countries: ['USA', 'France', 'India', 'China', 'Mexico'],
     badges: [
@@ -204,6 +251,28 @@ const mockProducts: Array<Product> = [
         'Learning Tools Interoperability (LTI)® v.1.3 Core Specification',
         'Learning Tools Interoperability (LTI)® v.1.1 Core Specification',
       ],
+      placements: [
+        'Account Navigation',
+        'Assignment Edit',
+        'Assignment Group Menu',
+        'Assignment Index Menu',
+        'Assignment Menu',
+        'Assignment Selection',
+        'Collaboration',
+        'Course Assignments Menu',
+      ],
+      services: [
+        'Assignment and Grade Services v2.0 (AGS)',
+        'Name and Role Provisioning Services v2.0 (NRPS)',
+        'Deep Linking v2.0 (DL)',
+        'Dynamic Registration 1.0',
+        'Submission Review 1.0',
+        'Caliper Analytics Connector 1.0',
+        'Course Group Service 1.0',
+        'Proctering Service 1.0',
+      ],
+      description:
+        'This LTI v1.3 utilizes Dynamic Registration to support Canvas placement. Support documentation can be found via the help docs on StarBrightLearning.com/helpdocs or within the implementation section of this portal',
     },
     countries: ['USA', 'France', 'Netherlands'],
     badges: [
@@ -254,6 +323,20 @@ const mockProducts: Array<Product> = [
         'Learning Tools Interoperability (LTI)® v.1.3 Core Specification',
         'Learning Tools Interoperability (LTI)® v.1.1 Core Specification',
       ],
+      placements: [
+        'Account Navigation',
+        'Assignment Edit',
+        'Assignment Group Menu',
+        'Assignment Index Menu',
+      ],
+      services: [
+        'Assignment and Grade Services v2.0 (AGS)',
+        'Name and Role Provisioning Services v2.0 (NRPS)',
+        'Deep Linking v2.0 (DL)',
+        'Dynamic Registration 1.0',
+      ],
+      description:
+        'This LTI v1.3 utilizes Dynamic Registration to support Canvas placement. Support documentation can be found via the help docs on StarBrightLearning.com/helpdocs or within the implementation section of this portal',
     },
     countries: ['USA', 'Mexico'],
     badges: [
@@ -310,6 +393,28 @@ const mockProducts: Array<Product> = [
         'Learning Tools Interoperability (LTI)® v.1.3 Core Specification',
         'Learning Tools Interoperability (LTI)® v.1.1 Core Specification',
       ],
+      placements: [
+        'Account Navigation',
+        'Assignment Edit',
+        'Assignment Group Menu',
+        'Assignment Index Menu',
+        'Assignment Menu',
+        'Assignment Selection',
+        'Collaboration',
+        'Course Assignments Menu',
+      ],
+      services: [
+        'Assignment and Grade Services v2.0 (AGS)',
+        'Name and Role Provisioning Services v2.0 (NRPS)',
+        'Deep Linking v2.0 (DL)',
+        'Dynamic Registration 1.0',
+        'Submission Review 1.0',
+        'Caliper Analytics Connector 1.0',
+        'Course Group Service 1.0',
+        'Proctering Service 1.0',
+      ],
+      description:
+        'This LTI v1.3 utilizes Dynamic Registration to support Canvas placement. Support documentation can be found via the help docs on StarBrightLearning.com/helpdocs or within the implementation section of this portal',
     },
     countries: ['France', 'Netherlands'],
     badges: [
@@ -355,6 +460,19 @@ const mockProducts: Array<Product> = [
         'Learning Tools Interoperability (LTI)® v.1.3 Core Specification',
         'Learning Tools Interoperability (LTI)® v.1.1 Core Specification',
       ],
+      placements: [
+        'Account Navigation',
+        'Assignment Edit',
+        'Assignment Group Menu',
+        'Assignment Index Menu',
+        'Assignment Menu',
+        'Assignment Selection',
+        'Collaboration',
+        'Course Assignments Menu',
+      ],
+      services: ['Assignment and Grade Services v2.0 (AGS)'],
+      description:
+        'This LTI v1.3 utilizes Dynamic Registration to support Canvas placement. Support documentation can be found via the help docs on StarBrightLearning.com/helpdocs or within the implementation section of this portal',
     },
     countries: ['USA', 'France', 'Netherlands', 'India', 'China', 'Mexico'],
     badges: [
@@ -405,6 +523,21 @@ const mockProducts: Array<Product> = [
         'Learning Tools Interoperability (LTI)® v.1.3 Core Specification',
         'Learning Tools Interoperability (LTI)® v.1.1 Core Specification',
       ],
+      placements: [
+        'Account Navigation',
+        'Assignment Edit',
+        'Assignment Group Menu',
+        'Assignment Index Menu',
+        'Assignment Menu',
+        'Collaboration',
+        'Course Assignments Menu',
+      ],
+      services: [
+        'Assignment and Grade Services v2.0 (AGS)',
+        'Name and Role Provisioning Services v2.0 (NRPS)',
+      ],
+      description:
+        'This LTI v1.3 utilizes Dynamic Registration to support Canvas placement. Support documentation can be found via the help docs on StarBrightLearning.com/helpdocs or within the implementation section of this portal',
     },
     countries: ['USA'],
     badges: [

@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {useLocation} from 'react-router-dom'
 import {fetchProductDetails, fetchProducts} from '../../queries/productsQuery'
 import {useQuery} from '@tanstack/react-query'
+import LtiDetailModal from './LtiDetailModal'
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
@@ -40,6 +41,9 @@ import ProductCard from '../ProductCard/ProductCard'
 import type {Product} from '../../model/Product'
 
 const ProductDetail = () => {
+  const [isModalOpen, setModalOpen] = useState(false)
+  const [clickedLtiTitle, setClickedLtiTitle] = useState('')
+
   const location = useLocation()
   const currentProductId = location.pathname.replace('/product_detail/', '') as String
 
@@ -91,6 +95,22 @@ const ProductDetail = () => {
     ))
   }
 
+  const renderLtiVersions = () => {
+    return product?.lti.versions.map(version => <Pill margin="0 x-small 0 0">{version}</Pill>)
+  }
+  const ltiDataClickHandle = (title: string) => {
+    setModalOpen(true)
+    setClickedLtiTitle(title)
+  }
+  const renderLtiTitle = () => {
+    return product?.lti.title.map(title => (
+      <Flex.Item margin="0 0 small 0">
+        <Link onClick={() => ltiDataClickHandle(title)} isWithinText={false}>
+          <Text weight="bold">{title}</Text>
+        </Link>
+      </Flex.Item>
+    ))
+  }
   return (
     <div>
       {product && product.lti && product.company && product.countries ? (
@@ -126,18 +146,13 @@ const ProductDetail = () => {
             </Flex.Item>
           </Flex>
           <Flex padding="small 0 0 x-small" margin="0 medium medium medium">
-            <Flex.Item padding="0 small 0 xx-large">
+            <Flex.Item padding="0 x-small 0 xx-large">
               <Pill>{product.toolType}</Pill>
             </Flex.Item>
             <Flex.Item padding="0 x-small 0 0">
               <Pill>{product.demographic}</Pill>
             </Flex.Item>
-            <Flex.Item padding="0 x-small 0 0">
-              <Pill>{product.lti.versions[0]}</Pill>
-            </Flex.Item>
-            <Flex.Item padding="0 x-small 0 0">
-              <Pill>{product.lti.versions[1]}</Pill>
-            </Flex.Item>
+            <Flex.Item padding="0 0 0 0">{renderLtiVersions()}</Flex.Item>
           </Flex>
           <ImageCarousel screenshots={product.screenshots} />
           <Flex margin="medium 0 0 0">
@@ -232,19 +247,8 @@ const ProductDetail = () => {
           <Text weight="bold" size="medium">
             Integrations
           </Text>
-          <Flex>
-            <Flex.Item margin="small 0 small 0">
-              <Link href={product.company.company_url} isWithinText={false}>
-                <Text weight="bold">{product.lti.title[0]}</Text>
-              </Link>
-            </Flex.Item>
-          </Flex>
-          <Flex>
-            <Flex.Item margin="0 0 small 0">
-              <Link href={product.company.company_url} isWithinText={false}>
-                <Text weight="bold">{product.lti.title[1]}</Text>
-              </Link>
-            </Flex.Item>
+          <Flex direction="column" margin="small 0 0 0">
+            {renderLtiTitle()}
           </Flex>
           <Flex>
             <Flex.Item margin="0 0 small 0">
@@ -294,6 +298,13 @@ const ProductDetail = () => {
       <Flex direction="row" gap="small">
         {renderProducts()}
       </Flex>
+
+      <LtiDetailModal
+        ltiTitle={clickedLtiTitle}
+        integrationData={product?.lti}
+        isModalOpen={isModalOpen}
+        setModalOpen={setModalOpen}
+      />
     </div>
   )
 }

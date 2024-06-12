@@ -26,7 +26,7 @@ export type Product = {
   updatedAt?: string
   toolType?: string
   demographic?: string
-  lti?: Lti
+  lti: Lti
   countries?: string[]
   badges: Badges[]
   screenshots: string[]
@@ -41,6 +41,9 @@ export type Company = {
 export type Lti = {
   versions: string[]
   title: string[]
+  placements: string[]
+  services: string[]
+  description: string
 }
 
 export type Badges = {
