@@ -3234,11 +3234,7 @@ class ApplicationController < ActionController::Base
   end
 
   def react_discussions_post_enabled_for_preferences_use?
-    if @context.instance_of?(UserProfile) && Account.default.feature_enabled?(:react_discussions_post)
-      return true
-    end
-
-    @context.respond_to?(:feature_enabled?) && @context.feature_enabled?(:react_discussions_post)
+    !!@domain_root_account&.feature_enabled?(:discussions_reporting)
   end
   helper_method :react_discussions_post_enabled_for_preferences_use?
 end

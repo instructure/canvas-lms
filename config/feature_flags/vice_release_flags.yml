@@ -38,6 +38,15 @@ react_discussions_post:
       in the Canvas Community
   applies_to: Course
 
+discussions_reporting:
+  state: hidden
+  beta: true
+  display_name: Discussions Redesign - Reporting
+  description: |-
+    This feature flag enables Discussions Reporting inside the new
+    Discussions Redesign work.
+  applies_to: RootAccount
+
 draft_discussions:
   state: hidden
   beta: true

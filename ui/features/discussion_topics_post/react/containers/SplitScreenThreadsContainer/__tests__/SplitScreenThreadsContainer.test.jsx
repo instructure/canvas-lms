@@ -243,6 +243,10 @@ describe('SplitScreenThreadsContainer', () => {
   })
 
   describe('Report Reply', () => {
+    beforeAll(() => {
+      window.ENV.discussions_reporting = true
+    })
+
     it('show Report', () => {
       const {getByTestId, queryByText} = setup(defaultProps())
 
