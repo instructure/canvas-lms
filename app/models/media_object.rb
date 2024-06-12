@@ -416,6 +416,15 @@ class MediaObject < ActiveRecord::Base
     updated_attachment.save!
   end
 
+  def thumbnail_url
+    kaltura_config = CanvasKaltura::ClientV3.config
+    if kaltura_config
+      kaltura_settings = kaltura_config.try(:slice, "resource_domain", "partner_id")
+      domain = "https://#{kaltura_settings["resource_domain"]}"
+      "#{domain}/p/#{kaltura_settings["partner_id"]}/thumbnail/entry_id/#{media_id}/width/140/height/100/bgcolor/000000/type/2/vid_sec/5"
+    end
+  end
+
   def deleted?
     workflow_state == "deleted"
   end
