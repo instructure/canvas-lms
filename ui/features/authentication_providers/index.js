@@ -21,6 +21,4 @@ import './jquery/authentication_provider_debugging'
 import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 import ready from '@instructure/ready'
 
-ready(() => {
-  initializeTopNavPortal(document.getElementById('react-instui-topnav'))
-})
+ready(() => initializeTopNavPortal())

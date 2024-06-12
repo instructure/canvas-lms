@@ -19,6 +19,4 @@
 import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 import ready from '@instructure/ready'
 
-ready(() => {
-  initializeTopNavPortal(document.getElementById('react-instui-topnav') as Element)
-})
+ready(() => initializeTopNavPortal())

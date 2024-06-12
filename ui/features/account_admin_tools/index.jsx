@@ -50,7 +50,7 @@ const messagesUsers = new AccountUserCollection(null, {account_id: ENV.ACCOUNT_I
 const loggingUsers = new AccountUserCollection(null, {account_id: ENV.ACCOUNT_ID})
 
 ready(() => {
-  initializeTopNavPortal(document.getElementById('react-instui-topnav'))
+  initializeTopNavPortal()
 
   const messagesContentView = new CommMessagesContentPaneView({
     searchForm: new UserDateRangeSearchFormView({
