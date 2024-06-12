@@ -138,30 +138,40 @@ exports[`TopNavigationTools renders 1`] = `
     shouldGrow={false}
     shouldShrink={false}
   >
-    <Button
-      as="button"
-      color="secondary"
-      cursor="pointer"
-      data-tool-id="1"
-      display="inline-block"
-      margin="0"
-      onClick={[Function]}
-      renderIcon={
-        <Img
-          alt="Tool 1"
-          display="inline-block"
-          height="1rem"
-          src="https://instructure.com"
-          withBlur={false}
-          withGrayscale={false}
-        />
-      }
-      size="medium"
-      textAlign="center"
-      title="Tool 1"
-      type="button"
-      withBackground={true}
-    />
+    <Tooltip
+      color="primary"
+      constrain="window"
+      defaultIsShowingContent={false}
+      offsetX={0}
+      offsetY={0}
+      placement="top"
+      renderTip="Tool 1"
+    >
+      <IconButton
+        as="button"
+        color="secondary"
+        cursor="pointer"
+        data-tool-id="1"
+        margin="0"
+        onClick={[Function]}
+        renderIcon={
+          <Img
+            alt="Tool 1"
+            display="inline-block"
+            height="1rem"
+            src="https://instructure.com"
+            withBlur={false}
+            withGrayscale={false}
+          />
+        }
+        screenReaderLabel="Tool 1"
+        shape="rectangle"
+        size="medium"
+        type="button"
+        withBackground={true}
+        withBorder={true}
+      />
+    </Tooltip>
   </Item>
   <Item
     as="span"
