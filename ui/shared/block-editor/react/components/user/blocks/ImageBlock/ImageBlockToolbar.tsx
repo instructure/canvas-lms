@@ -27,6 +27,7 @@ import {IconArrowOpenDownLine, IconUploadLine} from '@instructure/ui-icons'
 import {type ViewOwnProps} from '@instructure/ui-view'
 
 import {UploadFileModal} from '../../../../FileUpload/UploadFileModal'
+import {IconSizePopup} from './ImageSizePopup'
 
 const ImageBlockToolbar = () => {
   const {
@@ -103,6 +104,9 @@ const ImageBlockToolbar = () => {
           <Text size="small">Contain</Text>
         </Menu.Item>
       </Menu>
+
+      <IconSizePopup width={props.width} height={props.height} />
+
       <UploadFileModal
         imageUrl={null}
         open={showUploadModal}

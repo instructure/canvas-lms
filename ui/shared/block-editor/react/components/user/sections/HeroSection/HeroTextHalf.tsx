@@ -25,8 +25,7 @@ import {HeadingBlock} from '../../blocks/HeadingBlock'
 import {TextBlock} from '../../blocks/TextBlock'
 import {ButtonBlock} from '../../blocks/ButtonBlock'
 import {black} from '../../../../utils'
-import {SVGImageBlock} from '../../blocks/SVGImageBlock'
-import canvas_logo from '../../../../assets/logos/canvas_logo_left'
+import {ImageBlock} from '../../blocks/ImageBlock'
 
 type HeroTextHalfProps = {
   id?: string
@@ -48,14 +47,13 @@ const HeroTextHalf = ({
   return (
     <Container className="hero-section__text" id={id}>
       <Element id={`${id}__no-section`} is={NoSections} canvas={true} className="text-half__inner">
-        <SVGImageBlock src={canvas_logo} />
+        <ImageBlock src="/images/block_editor/canvas_logo_black.svg" width={113} height={28} />
         <Element
           id={`${id}__title`}
           is={HeadingBlock}
           text={title}
           level="h2"
           custom={{
-            displayName: 'Hero Heading',
             themeOverride: {
               h2FontFamily:
                 'Georgia, LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif',
@@ -65,14 +63,7 @@ const HeroTextHalf = ({
             },
           }}
         />
-        <Element
-          id={`${id}__text`}
-          is={TextBlock}
-          text={text}
-          textAlign="start"
-          color={color}
-          custom={{displayName: 'Hero Text'}}
-        />
+        <Element id={`${id}__text`} is={TextBlock} text={text} textAlign="start" color={color} />
         <Element
           id={`${id}__link`}
           is={ButtonBlock}
@@ -94,6 +85,9 @@ HeroTextHalf.craft = {
     isDeletable: () => {
       return false
     },
+  },
+  custom: {
+    noToolbar: true,
   },
 }
 

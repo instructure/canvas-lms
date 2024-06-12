@@ -47,7 +47,6 @@ const AboutTextHalf = ({
           text={title}
           level="h2"
           custom={{
-            displayName: 'About Heading',
             themeOverride: {
               h2FontFamily:
                 'Georgia, LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif',

@@ -20,8 +20,7 @@ import React, {useState} from 'react'
 import {Element, useEditor} from '@craftjs/core'
 import {Container} from '../../blocks/Container'
 import {ButtonBlock} from '../../blocks/ButtonBlock'
-import {SVGImageBlock} from '../../blocks/SVGImageBlock'
-import canvas_logo from '../../../../assets/logos/canvas_logo_left'
+import {ImageBlock} from '../../blocks/ImageBlock'
 import {NoSections} from '../../common'
 import {SectionMenu} from '../../../editor/SectionMenu'
 
@@ -52,10 +51,11 @@ const FooterSection = ({background}: FooterSectionProps) => {
       >
         <Element
           id={`${cid}__footer-canvas-icon`}
-          is={SVGImageBlock}
+          is={ImageBlock}
           canvas={true}
-          src={canvas_logo}
-          color={textColor}
+          src="/images/block_editor/canvas_logo_white.svg"
+          width={113}
+          height={28}
         />
         <Element
           id={`${cid}__footer-canvas-to-top`}

@@ -139,7 +139,7 @@ const QuizSection = ({questionId}: QuizSectionProps) => {
         <Button
           color="secondary"
           onClick={handleSubmit}
-          interaction={questionId ? 'enabled' : 'disabled'}
+          interaction={!enabled && questionId ? 'enabled' : 'disabled'}
         >
           Submit
         </Button>
