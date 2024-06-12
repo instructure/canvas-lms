@@ -131,6 +131,8 @@ describe "Discussion Topic Show" do
 
     it "Displays when all features are turned on" do
       Account.site_admin.enable_feature! :react_discussions_post
+      @course.root_account.enable_feature! :discussions_reporting
+      Account.site_admin.enable_feature! :discussion_checkpoints
 
       gc = @course.account.group_categories.create(name: "Group Category")
       group = group_model(name: "Group", group_category: gc, context: @course.account)

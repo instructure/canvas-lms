@@ -428,7 +428,7 @@ class DiscussionTopicsController < ApplicationController
             read_as_admin: @context.grants_right?(@current_user, session, :read_as_admin),
           },
           discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
-          student_reporting_enabled: @context.feature_enabled?(:react_discussions_post),
+          student_reporting_enabled: @domain_root_account.feature_enabled?(:discussions_reporting),
           discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
           discussion_topic_index_menu_tools: external_tools_display_hashes(:discussion_topic_index_menu),
           show_additional_speed_grader_links: Account.site_admin.feature_enabled?(:additional_speedgrader_links),

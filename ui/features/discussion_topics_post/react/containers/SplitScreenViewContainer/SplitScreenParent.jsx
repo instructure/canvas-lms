@@ -238,6 +238,7 @@ export const SplitScreenParent = props => {
                             : null
                         }
                         onReport={
+                          ENV.discussions_reporting &&
                           props.discussionTopic.permissions?.studentReporting
                             ? () => {
                                 setShowReportModal(true)
