@@ -4078,13 +4078,13 @@ class CoursesController < ApplicationController
   end
 
   def offline_web_exports
-    page_has_instui_topnav
     return render status: :not_found, template: "shared/errors/404_message" unless allow_web_export_download?
 
     if authorized_action(WebZipExport.new(course: @context), @current_user, :create)
       title = t("Exported Package History")
       @page_title = title
       add_crumb(title)
+      page_has_instui_topnav
       js_bundle :webzip_export
       css_bundle :webzip_export
       render html: '<div id="course-webzip-export-app"></div>'.html_safe, layout: true
