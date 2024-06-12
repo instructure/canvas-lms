@@ -24,6 +24,10 @@ export const ZLtiPlacementOverlay = z.object({
   label: z.string().optional().nullable(),
   launch_height: z.string().optional().nullable(),
   launch_width: z.string().optional().nullable(),
+  /**
+   * See LtiPlacementConfig.default for more information on this obtuse parameter.
+   */
+  default: z.enum(['enabled', 'disabled']).optional().nullable(),
 })
 
 export type LtiPlacementOverlay = z.infer<typeof ZLtiPlacementOverlay>

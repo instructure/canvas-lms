@@ -28,7 +28,7 @@ import {
   type RegistrationOverlayStore,
 } from '../registration_wizard/registration_settings/RegistrationOverlayState'
 import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
-import type {ApiResult} from 'features/lti_registrations/common/lib/apiResult/ApiResult'
+import type {ApiResult} from '../../common/lib/apiResult/ApiResult'
 
 /**
  * Steps are:

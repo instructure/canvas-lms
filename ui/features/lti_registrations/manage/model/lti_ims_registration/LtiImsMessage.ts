@@ -17,16 +17,16 @@
  */
 import * as z from 'zod'
 import {ZLtiMessageType} from '../LtiMessageType'
-import {ZLtiPlacement} from '../LtiPlacement'
 
 export const ZLtiImsMessage = z.object({
   type: ZLtiMessageType,
   label: z.string(),
   roles: z.array(z.string()),
   icon_uri: z.string(),
-  placements: z.array(ZLtiPlacement).optional(),
+  placements: z.array(z.string()).optional(),
   target_link_uri: z.string(),
   custom_parameters: z.record(z.string()).optional(),
+  'https://canvas.instructure.com/lti/course_navigation/default_enabled': z.boolean().optional(),
 })
 
 export type LtiImsMessage = z.infer<typeof ZLtiImsMessage>
