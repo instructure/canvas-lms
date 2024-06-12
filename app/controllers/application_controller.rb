@@ -399,6 +399,8 @@ class ApplicationController < ActionController::Base
     enhanced_developer_keys_tables
     lti_registrations_discover_page
     enhanced_rubrics
+    account_level_mastery_scales
+    non_scoring_rubrics
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
