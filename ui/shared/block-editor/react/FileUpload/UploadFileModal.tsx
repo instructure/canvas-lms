@@ -242,7 +242,7 @@ const UploadFileModal = ({imageUrl, open, variant, onDismiss, onSave}: UploadFil
                     <Text>Drag and drop, or upload from your computer</Text>
                   </View>
                   <View as="div" margin="small 0">
-                    <Text>Supported formats: JPG, PNG, GIF</Text>
+                    <Text>Supported formats: JPG, PNG, GIF, SVG</Text>
                   </View>
                 </>
               }

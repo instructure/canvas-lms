@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 // components/Toolbox.js
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {Element, useEditor} from '@craftjs/core'
 
 import {CloseButton} from '@instructure/ui-buttons'
@@ -27,18 +27,15 @@ import {Tray} from '@instructure/ui-tray'
 import {View, type ViewOwnProps} from '@instructure/ui-view'
 import {SVGIcon} from '@instructure/ui-svg-images'
 
-// import {PageBlock} from '../user/blocks/PageBlock/PageBlock'
-import {Container, ContainerIcon} from '../user/blocks/Container'
+// import {Container, ContainerIcon} from '../user/blocks/Container'
 import {ButtonBlock, ButtonBlockIcon} from '../user/blocks/ButtonBlock'
 import {TextBlock, TextBlockIcon} from '../user/blocks/TextBlock'
 import {HeadingBlock, HeadingBlockIcon} from '../user/blocks/HeadingBlock'
 import {ResourceCard, ResourceCardIcon} from '../user/blocks/ResourceCard'
 import {ImageBlock, ImageBlockIcon} from '../user/blocks/ImageBlock'
 import {IconBlock, IconBlockIcon} from '../user/blocks/IconBlock'
-import {SVGImageBlock, SVGImageBlockIcon} from '../user/blocks/SVGImageBlock'
 import {IframeBlock, IframeBlockIcon} from '../user/blocks/IframeBlock'
 import {RCEBlock, RCEBlockIcon} from '../user/blocks/RCEBlock'
-// import {Card} from '../user/Card'
 
 import {ResourcesSection, ResourcesSectionIcon} from '../user/sections/ResourcesSection'
 import {ColumnsSection, ColumnsSectionIcon} from '../user/sections/ColumnsSection'
@@ -137,29 +134,18 @@ export const Toolbox = ({open, onClose}: ToolboxProps) => {
                 wrap="wrap"
                 padding="x-small"
               >
-                {/*
-                <View shadow="resting" width="78px" height="78px" className="toolbox-item" textAlign="center"
-                  elementRef={(ref: Element | null) =>
-                    ref && connectors.create(ref as HTMLElement, <PageBlock />)
-                  }
-
-                >
-                  Page
-                </View>
-                */}
                 {renderBox('Button', ButtonBlockIcon, <ButtonBlock text="Click me" />)}
                 {renderBox('Text', TextBlockIcon, <TextBlock text="" />)}
                 {renderBox('RCE', RCEBlockIcon, <RCEBlock text="" />)}
-                {renderBox(
+                {/* renderBox(
                   'Container',
                   ContainerIcon,
-                  <Element is={Container} background="#fff" canvas={true} />
-                )}
+                  <Element is={Container} background="#fff" canvas={true} layout="row" />
+                ) */}
                 {renderBox('Icon', IconBlockIcon, <IconBlock iconName="apple" />)}
                 {renderBox('Heading', HeadingBlockIcon, <HeadingBlock />)}
                 {renderBox('Resource Card', ResourceCardIcon, <ResourceCard />)}
                 {renderBox('Image', ImageBlockIcon, <ImageBlock />)}
-                {renderBox('SVG Image', SVGImageBlockIcon, <SVGImageBlock />)}
                 {renderBox('Iframe', IframeBlockIcon, <IframeBlock />)}
               </Flex>
             </Tabs.Panel>

@@ -20,12 +20,14 @@ import {useEditor, useNode} from '@craftjs/core'
 import {useClassNames} from '../../../../utils'
 import {ContainerSettings} from './ContainerSettings'
 
+export type ContainerLayout = 'default' | 'row' | 'column'
 export type ContainerProps = {
   id?: string
   className?: string
   'data-placeholder'?: string
   background?: string
   style?: React.CSSProperties
+  layout?: ContainerLayout
   children?: React.ReactNode
 }
 
@@ -34,6 +36,7 @@ export const Container = ({
   className = '',
   background = 'transparent',
   style = {},
+  layout = 'default',
   children,
   ...rest
 }: ContainerProps) => {
@@ -43,7 +46,11 @@ export const Container = ({
   const {
     connectors: {connect, drag},
   } = useNode()
-  const clazz = useClassNames(enabled, {empty: !children}, ['container-block', className])
+  const clazz = useClassNames(enabled, {empty: !children}, [
+    'container-block',
+    `${layout}-layout`,
+    className,
+  ])
 
   return (
     <div

@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useRef, useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
-import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {quizQuestions} from '../../../../assets/data/quizQuestions'
 
 type QuizModalProps = {
@@ -32,10 +32,17 @@ type QuizModalProps = {
 
 const QuizModal = ({open, currentQuestionId, onClose, onSelect}: QuizModalProps) => {
   const [questionId, setQuestionId] = useState<string | undefined>(currentQuestionId)
+  const parser = useRef(new DOMParser())
 
   const handleQuestionChange = useCallback(
-    (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-      setQuestionId(value)
+    (
+      _event: React.SyntheticEvent,
+      data: {
+        value?: string | number
+        id?: string
+      }
+    ) => {
+      setQuestionId(data.value as string)
     },
     []
   )
@@ -53,28 +60,21 @@ const QuizModal = ({open, currentQuestionId, onClose, onSelect}: QuizModalProps)
         <CloseButton placement="end" onClick={onClose} screenReaderLabel="Close" />
       </Modal.Header>
       <Modal.Body>
-        <RadioInputGroup
-          description="Select a question"
+        <SimpleSelect
+          renderLabel="Select a question"
+          assistiveText="Use arrow keys to navigate options"
           onChange={handleQuestionChange}
-          name="level"
-          size="small"
           value={questionId}
         >
           {quizQuestions.entries.map((question: any) => {
+            const qbodydoc = parser.current.parseFromString(question.entry.item_body, 'text/html')
             return (
-              <RadioInput
-                key={question.id}
-                value={question.id}
-                label={
-                  <div
-                    className="question-option"
-                    dangerouslySetInnerHTML={{__html: question.entry.item_body}}
-                  />
-                }
-              />
+              <SimpleSelect.Option id={question.id} key={question.id} value={question.id}>
+                {qbodydoc.body.textContent as string}
+              </SimpleSelect.Option>
             )
           })}
-        </RadioInputGroup>
+        </SimpleSelect>
       </Modal.Body>
       <Modal.Footer>
         <Button color="secondary" onClick={onClose}>
