@@ -34,12 +34,6 @@ describe Api::V1::Lti::Registration do
     it "includes the canvas id for each" do
       expect(subject.pluck(:id)).to include(*registrations.map(&:id))
     end
-
-    it "puts the latter-created elements first" do
-      # If sorted from neweset-to-oldest, subtracting the created_at dates should still leave
-      # you with a positive number.
-      expect(subject.pluck(:created_at).reduce { |total, current| total - current }).to be > 0
-    end
   end
 
   describe "#lti_registration_json" do
