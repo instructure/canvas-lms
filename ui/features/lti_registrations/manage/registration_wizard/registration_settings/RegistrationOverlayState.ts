@@ -25,6 +25,7 @@ import type {LtiConfiguration} from '../../model/lti_tool_configuration/LtiConfi
 import type {LtiPrivacyLevel} from '../../model/LtiPrivacyLevel'
 import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
 import type {LtiPlacementConfig} from '../../model/lti_tool_configuration/LtiPlacementConfig'
+import type {Extension} from '../../model/lti_tool_configuration/Extension'
 
 interface RegistrationOverlayActions {
   updateDevKeyName: (name: string) => void
@@ -190,7 +191,7 @@ const initialOverlayStateFromLtiRegistration = (
   }
 }
 
-export const canvasPlatformSettings = (configuration: LtiConfiguration) =>
+export const canvasPlatformSettings = (configuration: LtiConfiguration): Extension | undefined =>
   configuration.extensions?.find(e => e.platform === 'canvas.instructure.com')
 
 const placementsWithOverlay = (
@@ -211,8 +212,9 @@ const initialPlacementOverlayStateFromPlacementConfig =
       // TODO: include launch height/width here when it's available via a canvas extension
       // launch_height: developerKey.lti_registration.lti_tool_configuration.launch_height,
       // launch_width: developerKey.lti_registration.lti_tool_configuration.launch_width,
-      type: placementConfig.placement,
+      type: placementConfig.placement as LtiPlacement,
       launch_height: placementOverlay?.launch_height || undefined,
       launch_width: placementOverlay?.launch_width || undefined,
+      default: placementConfig.default,
     }
   }

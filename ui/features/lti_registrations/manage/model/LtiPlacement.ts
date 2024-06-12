@@ -24,6 +24,13 @@ const I18n = useI18nScope('external_tools')
 // We should consolidate some of the lti "models" into a shared package that both features depend on
 
 /**
+ * Within an { @see LtiImsRegistration }, all Canvas-specific placements are prefixed by this string.
+ * Note that the { @see LtiToolConfiguration } does *not* have this prefix, as any placements within that
+ * object are known to be Canvas-specific already.
+ */
+export const canvasPlacementPrefix = 'https://canvas.instructure.com/lti/'
+
+/**
  * A record where the keys are placement identifiers
  * and the values are the internationalized human-readable
  * names of those placements
@@ -117,13 +124,16 @@ export const LtiPlacements = {
   SubmissionTypeSelection: 'submission_type_selection',
   StudentContextCard: 'student_context_card',
   ToolConfiguration: 'tool_configuration',
+  TopNavigation: 'top_navigation',
   UserNavigation: 'user_navigation',
   WikiPageMenu: 'wiki_page_menu',
   WikiIndexMenu: 'wiki_index_menu',
   DefaultPlacements: 'default_placements',
+  ContentArea: 'ContentArea',
+  RichTextEditor: 'RichTextEditor',
 } as const
 
-const AllLtiPlacements = [
+export const AllLtiPlacements = [
   LtiPlacements.AccountNavigation,
   LtiPlacements.AssignmentEdit,
   LtiPlacements.AssignmentSelection,
@@ -158,10 +168,13 @@ const AllLtiPlacements = [
   LtiPlacements.SubmissionTypeSelection,
   LtiPlacements.StudentContextCard,
   LtiPlacements.ToolConfiguration,
+  LtiPlacements.TopNavigation,
   LtiPlacements.UserNavigation,
   LtiPlacements.WikiPageMenu,
   LtiPlacements.WikiIndexMenu,
   LtiPlacements.DefaultPlacements,
+  LtiPlacements.ContentArea,
+  LtiPlacements.RichTextEditor,
 ] as const
 
 export const ZLtiPlacement = z.enum(AllLtiPlacements)
@@ -202,10 +215,13 @@ const LtiPlacementTranslations: Record<LtiPlacement, string> = {
   submission_type_selection: I18n.t('Submission Type Selection'),
   student_context_card: I18n.t('Student Context Card'),
   tool_configuration: I18n.t('Tool Configuration'),
+  top_navigation: I18n.t('Top Navigation'),
   user_navigation: I18n.t('User Navigation'),
   wiki_page_menu: I18n.t('Page Menu'),
   wiki_index_menu: I18n.t('Pages Index Menu'),
   default_placements: I18n.t('Assignment and Link Selection'),
+  ContentArea: I18n.t('Content Area'),
+  RichTextEditor: I18n.t('Rich Text Editor'),
 }
 
 export const i18nLtiPlacement = (placement: LtiPlacement): string =>

@@ -28,4 +28,11 @@ export const ZPlacementConfig = z.object({
   text: z.string().optional(),
   icon_url: z.string().optional(),
   custom_fields: z.record(z.string()).optional(),
+  /**
+   * This supports a very old parameter (hence the obtuse name) that only applies to the course navigation placement. It hides the
+   * tool from the course navigation by default. Teachers can still add the tool to the course navigation using the course
+   * settings page if they'd like.
+   * If this value is enabled, it will show the tool. If it's disabled, it will hide the tool.
+   */
+  default: z.enum(['disabled', 'enabled']).optional(),
 })

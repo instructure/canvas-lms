@@ -28,6 +28,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {PermissionConfirmation} from './components/PermissionConfirmation'
 import {PrivacyConfirmation} from './components/PrivacyConfirmation'
+import {PlacementsConfirmation} from './components/PlacementsConfirmation'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -86,7 +87,12 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
               openid_configuration: state.registrationToken.oidc_configuration_url,
               registration_token: state.registrationToken.token,
             })}
-            style={{width: '100%', height: '600px', border: '0', display: 'block'}}
+            style={{
+              width: '100%',
+              height: '600px',
+              border: '0',
+              display: 'block',
+            }}
             title={I18n.t('Register App')}
             data-testid="dynamic-reg-wizard-iframe"
           />
@@ -173,6 +179,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
           </Modal.Body>
           <Modal.Footer>
             <Button
+              margin="small"
               color="secondary"
               type="submit"
               onClick={() => {
@@ -201,7 +208,44 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
         </>
       )
     case 'PlacementsConfirmation':
-      return <div>Placements Confirmation</div>
+      return (
+        <>
+          <Modal.Body>
+            <PlacementsConfirmation
+              registration={state.registration}
+              overlayStore={state.overlayStore}
+            />
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              margin="small"
+              color="secondary"
+              type="submit"
+              onClick={() => {
+                dynamicRegistrationWizardState.transitionToConfirmationState(
+                  state._type,
+                  'PrivacyLevelConfirmation'
+                )
+              }}
+            >
+              {I18n.t('Previous')}
+            </Button>
+            <Button
+              margin="small"
+              color="primary"
+              type="submit"
+              onClick={() => {
+                dynamicRegistrationWizardState.transitionToConfirmationState(
+                  state._type,
+                  'NamingConfirmation'
+                )
+              }}
+            >
+              {I18n.t('Next')}
+            </Button>
+          </Modal.Footer>
+        </>
+      )
     case 'NamingConfirmation':
       return <div>Naming Confirmation</div>
     case 'IconConfirmation':
