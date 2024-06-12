@@ -27,6 +27,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {PermissionConfirmation} from './components/PermissionConfirmation'
+import {PrivacyConfirmation} from './components/PrivacyConfirmation'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -165,7 +166,10 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
       return (
         <>
           <Modal.Body>
-            <div>Privacy Confirmation</div>
+            <PrivacyConfirmation
+              overlayStore={state.overlayStore}
+              toolName={state.registration.client_name}
+            />
           </Modal.Body>
           <Modal.Footer>
             <Button
