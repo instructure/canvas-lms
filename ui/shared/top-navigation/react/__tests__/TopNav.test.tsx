@@ -127,4 +127,15 @@ describe('TopNav', () => {
     expect(getByText('button1')).toBeInTheDocument()
     expect(getByText('button2')).toBeInTheDocument()
   })
+
+  it('should not show a breadCrumb when there is one or less', () => {
+    window.ENV.breadcrumbs = [{name: 'crumb', url: 'crumb'}]
+    const {queryByText} = render(
+      <QueryClientProvider client={queryClient}>
+        <TopNav />
+      </QueryClientProvider>
+    )
+
+    expect(queryByText('crumb')).not.toBeInTheDocument()
+  })
 })
