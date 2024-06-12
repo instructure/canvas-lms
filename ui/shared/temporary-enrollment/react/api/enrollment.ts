@@ -45,9 +45,10 @@ export async function fetchTemporaryEnrollments(
     per_page: ITEMS_PER_PAGE,
   }
 
+  params.include = ['avatar_url']
   if (isRecipient) {
     params.temporary_enrollments_for_recipient = true
-    params.include = 'temporary_enrollment_providers'
+    params.include.push('temporary_enrollment_providers')
   } else {
     params.temporary_enrollment_recipients_for_provider = true
   }

@@ -332,7 +332,7 @@ module Api::V1::User
       end
       if includes.include?("temporary_enrollment_providers") && enrollment.temporary_enrollment_source_user_id
         provider = api_find(User, enrollment.temporary_enrollment_source_user_id)
-        json[:temporary_enrollment_provider] = user_json(provider, user, session) unless provider.deleted?
+        json[:temporary_enrollment_provider] = user_json(provider, user, session, user_includes) unless provider.deleted?
       end
     end
   end
