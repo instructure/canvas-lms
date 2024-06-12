@@ -20,7 +20,7 @@
   form_submission_delay = Setting.get("interop_8200_delay_form_submit_#{@domain_root_account.global_id}", nil)
   if form_submission_delay.present?
     js_env({
-      INTEROP_8200_DELAY_FORM_SUBMIT: form_submission_delay.to_i
+      LTI_FORM_SUBMIT_DELAY: form_submission_delay,
     })
   end
 %>
