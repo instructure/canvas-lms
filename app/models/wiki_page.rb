@@ -103,23 +103,21 @@ class WikiPage < ActiveRecord::Base
     where.not(Ignore.where(asset_type: "WikiPage", user_id: user, purpose:).where("asset_id=wiki_pages.id").arel.exists)
   }
   scope :todo_date_between, ->(starting, ending) { where(todo_date: starting...ending) }
-  scope :for_courses_and_groups, lambda { |course_ids, group_ids|
+
+  scope :visible_to_user_in_courses_and_groups, lambda { |user_id, course_ids, group_ids|
     wiki_ids = []
     wiki_ids += Course.where(id: course_ids).pluck(:wiki_id) if course_ids.any?
     wiki_ids += Group.where(id: group_ids).pluck(:wiki_id) if group_ids.any?
-    where(wiki_id: wiki_ids)
-  }
-
-  scope :visible_to_user, lambda { |user_id|
+    context_pages = where(wiki_id: wiki_ids)
     if Account.site_admin.feature_enabled?(:selective_release_backend)
-      scope_assignments = where.not(assignment_id: nil).pluck(:assignment_id)
-      visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_student_by_pages(user_id:, wiki_page_ids: ids).map(&:wiki_page_id)
+      scope_assignments = context_pages.where.not(assignment_id: nil).pluck(:assignment_id)
+      visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_student_in_courses(user_id:, course_ids:).map(&:wiki_page_id)
       visible_assignments = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_student_by_assignment(user_id:, assignment_ids: scope_assignments).map(&:assignment_id)
 
-      where("wiki_pages.assignment_id IS NULL AND (wiki_pages.id IN (?) OR wiki_pages.context_type = 'Group')", visible_wiki_pages)
-        .or(where("wiki_pages.assignment_id IS NOT NULL AND wiki_pages.assignment_id IN (?)", visible_assignments))
+      context_pages.where("wiki_pages.assignment_id IS NULL AND (wiki_pages.id IN (?) OR wiki_pages.context_type = 'Group')", visible_wiki_pages)
+                   .or(context_pages.where("wiki_pages.assignment_id IS NOT NULL AND wiki_pages.assignment_id IN (?)", visible_assignments))
     else
-      where("wiki_pages.assignment_id IS NULL OR EXISTS (SELECT 1 FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?)", user_id)
+      context_pages.where("wiki_pages.assignment_id IS NULL OR EXISTS (SELECT 1 FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?)", user_id)
     end
   }
 
