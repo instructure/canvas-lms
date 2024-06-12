@@ -274,6 +274,8 @@ export type RootAccountFeatureId =
   | 'scheduled_page_publication'
   | 'send_usage_metrics'
   | 'usage_rights_discussion_topics'
+  | 'account_level_mastery_scales'
+  | 'non_scoring_rubrics'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES

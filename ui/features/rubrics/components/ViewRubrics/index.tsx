@@ -56,9 +56,10 @@ export const TABS = {
 
 export type ViewRubricsProps = {
   canManageRubrics?: boolean
+  showHeader?: boolean
 }
 
-export const ViewRubrics = ({canManageRubrics = false}: ViewRubricsProps) => {
+export const ViewRubrics = ({canManageRubrics = false, showHeader = true}: ViewRubricsProps) => {
   const navigate = useNavigate()
   const {accountId, courseId} = useParams()
   const isAccount = !!accountId
@@ -231,9 +232,11 @@ export const ViewRubrics = ({canManageRubrics = false}: ViewRubricsProps) => {
     <View as="div">
       <Flex>
         <FlexItem shouldShrink={true} shouldGrow={true}>
-          <Heading level="h1" themeOverride={{h1FontWeight: 700}} margin="medium 0 0 0">
-            {I18n.t('Rubrics')}
-          </Heading>
+          {showHeader && (
+            <Heading level="h1" themeOverride={{h1FontWeight: 700}} margin="medium 0 0 0">
+              {I18n.t('Rubrics')}
+            </Heading>
+          )}
         </FlexItem>
         <FlexItem>
           <TextInput
