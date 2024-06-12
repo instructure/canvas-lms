@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-#
 # Copyright (C) 2024 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -17,34 +16,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class DiscussionTopicSummary
-  class Feedback < ActiveRecord::Base
-    belongs_to :root_account, class_name: "Account"
-    belongs_to :discussion_topic_summary, inverse_of: :feedback
-    belongs_to :user
+class DeleteRegeneratedFromDiscussionSummaryFeedback < ActiveRecord::Migration[7.0]
+  tag :postdeploy
 
-    before_validation :set_root_account
-
-    self.ignored_columns += ["regenerated"]
-
-    def set_root_account
-      self.root_account ||= discussion_topic_summary.root_account
-    end
-
-    def like
-      update!(liked: true, disliked: false)
-    end
-
-    def dislike
-      update!(liked: false, disliked: true)
-    end
-
-    def reset_like
-      update!(liked: false, disliked: false)
-    end
-
-    def disable_summary
-      update!(summary_disabled: true)
+  def change
+    change_table :discussion_topic_summary_feedback, bulk: true do |t|
+      t.remove :regenerated, type: :boolean, null: false, default: false
     end
   end
 end

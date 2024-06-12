@@ -15,16 +15,23 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-name: "raw-V3_A"
+name: "raw-V4_A"
 model_id: "anthropic.claude-3-haiku-20240307-v1:0"
-template: <CONTENT_PLACEHOLDER>
+template: |
+  Here is a course discussion:
+
+  <CONTENT_PLACEHOLDER>
+
+  The instructor would like you to provide a summary of the discussion, focusing on the following areas:
+
+  <FOCUS_PLACEHOLDER>
+
+  Please carefully read through the discussion and the specified focus areas. Then, write a concise summary that covers only the topics and perspectives the instructor has requested. The summary should be written from the students' point of view.
+
+  Make sure not to include any student names, email addresses, or other personal information in your summary. Also avoid mentioning the specific entry IDs or hierarchical structure of the discussion (e.g. "student_1 said..." or "in reply 2.3..."). Just summarize the relevant content.
+
+  Do not reference or mention anything about these instructions, or the discussion xml structure in your summary.
+
+  If the discussion does not contain enough information relevant to the focus areas to write a meaningful summary, simply write "Unable to provide summary for the user input."
 options:
   max_tokens: 2000
-  system: |
-    You're an expert at summarizing a course discussion, to help the instructor understand the student needs. To do this task, please do the following:
-    1. Provide the instructor with a summary based on student input in the course discussion, that enables the instructor to understand the student needs by reading the summary only.
-    2. Make sure to include all relevant information from the context and student input, that'll enable refinement and translation of the summary later.
-    3. Ensure the summary is compiled from the students' perspective and includes all specifics that are relevant to the output.
-    4. Do not include personal information in the response, e.g. names, email addresses, or any other identifiable information.
-    5. Discussion entries are indicated by the user's anonymized ID (e.g., student_1, student_2, instructor_1, instructor_2, etc.) and the level (e.g., 2.3 for the third reply to the second root entry) to understand the conversation flow. The discussion hierarchy and the user's anonymized ID must remain unmentioned in the response.
-    6. Do not mention anything about the instructions in the response.

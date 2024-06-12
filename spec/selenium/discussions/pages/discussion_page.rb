@@ -94,6 +94,11 @@ class Discussion
     def summary_disable_button_selector
       "[data-testid='summary-disable-button']"
     end
+
+    def summary_user_input_selector
+      "[data-testid='summary-user-input']"
+    end
+
     # ---------------------- Elements ----------------------
 
     def discussion_page_body
@@ -171,6 +176,11 @@ class Discussion
     def summary_disable_button
       f(summary_disable_button_selector)
     end
+
+    def summary_user_input
+      f(summary_user_input_selector)
+    end
+
     # ---------------------- Actions ----------------------
 
     def topic_title_input
@@ -233,6 +243,10 @@ class Discussion
 
     def click_summary_disable_button
       summary_disable_button.click
+    end
+
+    def update_summary_user_input(user_input)
+      summary_user_input.send_keys(user_input)
     end
 
     def pending_changes_pill_exists?

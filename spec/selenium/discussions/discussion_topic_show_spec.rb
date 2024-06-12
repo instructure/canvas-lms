@@ -602,6 +602,65 @@ describe "Discussion Topic Show" do
         expect(Discussion.summary_text).to include_text("refined_summary_2")
       end
 
+      it "allows teacher to regenerate a summary with user input" do
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "raw_summary_1" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "refined_summary_1" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+
+        Discussion.click_summarize_button
+
+        expect(Discussion.summary_text).to include_text("refined_summary_1")
+
+        user_input = "focus on student feedback"
+        Discussion.update_summary_user_input(user_input)
+
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "raw_summary_2" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "refined_summary_2" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+
+        Discussion.click_summary_regenerate_button
+
+        expect(Discussion.summary_text).to include_text("refined_summary_2")
+      end
+
       it "shows an error message when summarization fails" do
         expect(@inst_llm).to receive(:chat).and_raise(InstLLM::ThrottlingError)
 

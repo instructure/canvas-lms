@@ -203,19 +203,23 @@ describe DiscussionTopicsApiController do
           @raw_summary = @topic.summaries.create!(
             summary: "raw_summary",
             dynamic_content_hash: Digest::SHA256.hexdigest({
-              CONTENT: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary
+              CONTENT: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary,
+              FOCUS: DiscussionTopic::PromptPresenter.focus_for_summary(user_input: nil),
             }.to_json),
-            llm_config_version: "raw-V1_A"
+            llm_config_version: "raw-V1_A",
+            user: @teacher
           )
           @refined_summary = @topic.summaries.create!(
             summary: "refined_summary",
             dynamic_content_hash: Digest::SHA256.hexdigest({
-              CONTENT: @raw_summary.summary,
+              CONTENT: DiscussionTopic::PromptPresenter.raw_summary_for_refinement(raw_summary: @raw_summary.summary),
+              FOCUS: DiscussionTopic::PromptPresenter.focus_for_summary(user_input: ""),
               LOCALE: "English (United States)"
             }.to_json),
             llm_config_version: "refined-V1_A",
             parent: @raw_summary,
-            locale: "en"
+            locale: "en",
+            user: @teacher
           )
         end
 
@@ -378,19 +382,23 @@ describe DiscussionTopicsApiController do
       @raw_summary = @topic.summaries.create!(
         summary: "summary",
         dynamic_content_hash: Digest::SHA256.hexdigest({
-          CONTENT: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary
+          CONTENT: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary,
+          FOCUS: DiscussionTopic::PromptPresenter.focus_for_summary(user_input: "student feedback"),
         }.to_json),
-        llm_config_version: "raw-V1_A"
+        llm_config_version: "raw-V1_A",
+        user: @teacher
       )
       @refined_summary = @topic.summaries.create!(
         summary: "summary",
         dynamic_content_hash: Digest::SHA256.hexdigest({
-          CONTENT: @raw_summary.summary,
+          CONTENT: DiscussionTopic::PromptPresenter.raw_summary_for_refinement(raw_summary: @raw_summary.summary),
+          FOCUS: DiscussionTopic::PromptPresenter.focus_for_summary(user_input: "student feedback"),
           LOCALE: "English (United States)"
         }.to_json),
         llm_config_version: "refined-V1_A",
         parent: @raw_summary,
-        locale: "en"
+        locale: "en",
+        user: @teacher
       )
 
       user_session(@teacher)
