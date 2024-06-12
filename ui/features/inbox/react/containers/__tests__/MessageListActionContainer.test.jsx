@@ -24,6 +24,12 @@ import {mswClient} from '../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
+import {responsiveQuerySizes} from '../../../util/utils'
+
+jest.mock('../../../util/utils', () => ({
+  ...jest.requireActual('../../../util/utils'),
+  responsiveQuerySizes: jest.fn(),
+}))
 
 describe('MessageListActionContainer', () => {
   const server = mswServer(handlers)
@@ -41,6 +47,10 @@ describe('MessageListActionContainer', () => {
       }
     })
   })
+
+  responsiveQuerySizes.mockImplementation(() => ({
+    desktop: {minWidth: '768px'},
+  }))
 
   afterEach(() => {
     server.resetHandlers()
