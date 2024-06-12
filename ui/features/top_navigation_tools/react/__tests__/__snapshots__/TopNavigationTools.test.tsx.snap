@@ -123,7 +123,7 @@ exports[`MobileTopNavigationTools renders 1`] = `
 exports[`TopNavigationTools renders 1`] = `
 <Flex
   as="div"
-  direction="row"
+  direction="row-reverse"
   display="flex"
   gap="small"
   height="100%"
@@ -132,47 +132,6 @@ exports[`TopNavigationTools renders 1`] = `
   withVisualDebug={false}
   wrap="no-wrap"
 >
-  <Item
-    as="span"
-    key="1"
-    shouldGrow={false}
-    shouldShrink={false}
-  >
-    <Tooltip
-      color="primary"
-      constrain="window"
-      defaultIsShowingContent={false}
-      offsetX={0}
-      offsetY={0}
-      placement="top"
-      renderTip="Tool 1"
-    >
-      <IconButton
-        as="button"
-        color="secondary"
-        cursor="pointer"
-        data-tool-id="1"
-        margin="0"
-        onClick={[Function]}
-        renderIcon={
-          <Img
-            alt="Tool 1"
-            display="inline-block"
-            height="1rem"
-            src="https://instructure.com"
-            withBlur={false}
-            withGrayscale={false}
-          />
-        }
-        screenReaderLabel="Tool 1"
-        shape="rectangle"
-        size="medium"
-        type="button"
-        withBackground={true}
-        withBorder={true}
-      />
-    </Tooltip>
-  </Item>
   <Item
     as="span"
     shouldGrow={false}
@@ -247,13 +206,54 @@ exports[`TopNavigationTools renders 1`] = `
       </MenuItem>
     </Menu>
   </Item>
+  <Item
+    as="span"
+    key="1"
+    shouldGrow={false}
+    shouldShrink={false}
+  >
+    <Tooltip
+      color="primary"
+      constrain="window"
+      defaultIsShowingContent={false}
+      offsetX={0}
+      offsetY={0}
+      placement="top"
+      renderTip="Tool 1"
+    >
+      <IconButton
+        as="button"
+        color="secondary"
+        cursor="pointer"
+        data-tool-id="1"
+        margin="0"
+        onClick={[Function]}
+        renderIcon={
+          <Img
+            alt="Tool 1"
+            display="inline-block"
+            height="1rem"
+            src="https://instructure.com"
+            withBlur={false}
+            withGrayscale={false}
+          />
+        }
+        screenReaderLabel="Tool 1"
+        shape="rectangle"
+        size="medium"
+        type="button"
+        withBackground={true}
+        withBorder={true}
+      />
+    </Tooltip>
+  </Item>
 </Flex>
 `;
 
 exports[`TopNavigationTools renders with no pinned tools 1`] = `
 <Flex
   as="div"
-  direction="row"
+  direction="row-reverse"
   display="flex"
   gap="small"
   height="100%"
@@ -390,7 +390,7 @@ exports[`TopNavigationTools renders with no pinned tools 1`] = `
 exports[`TopNavigationTools renders with no tools 1`] = `
 <Flex
   as="div"
-  direction="row"
+  direction="row-reverse"
   display="flex"
   gap="small"
   height="100%"
