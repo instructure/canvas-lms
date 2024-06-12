@@ -20,8 +20,8 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import SelectContentView from '../SelectContentView'
 import ProgressingMigration from '../../models/ProgressingContentMigration'
-import fakeENV from 'helpers/fakeENV'
-import assertions from 'helpers/assertions'
+import fakeENV from '@canvas/common/fakeENV'
+import assertions from '@canvas/common/assertionsSpec'
 import '@canvas/jquery/jquery.simulate'
 
 class SelectContentHelper {

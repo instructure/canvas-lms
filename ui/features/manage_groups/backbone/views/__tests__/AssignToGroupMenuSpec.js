@@ -25,7 +25,7 @@ import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection
 import Group from '@canvas/groups/backbone/models/Group'
 import GroupUser from '@canvas/groups/backbone/models/GroupUser'
 import GroupCategory from '@canvas/groups/backbone/models/GroupCategory'
-import assertions from 'helpers/assertions'
+import assertions from '@canvas/common/assertionsSpec'
 
 let view = null
 let user = null

@@ -20,8 +20,8 @@ import Conference from '../../models/Conference'
 import ConferenceView from '../ConferenceView'
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from 'helpers/fakeENV'
-import assertions from 'helpers/assertions'
+import fakeENV from '@canvas/common/fakeENV'
+import assertions from '@canvas/common/assertionsSpec'
 import '@canvas/jquery/jquery.simulate'
 
 const conferenceView = function (conferenceOpts = {}) {

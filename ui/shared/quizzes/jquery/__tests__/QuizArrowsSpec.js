@@ -17,7 +17,7 @@
  */
 
 import QuizArrowApplicator from '../quiz_arrows'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 QUnit.module('QuizArrowApplicator', {
   setup() {

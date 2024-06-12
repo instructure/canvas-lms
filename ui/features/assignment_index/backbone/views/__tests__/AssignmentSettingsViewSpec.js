@@ -23,8 +23,8 @@ import AssignmentSettingsView from '../AssignmentSettingsView'
 import AssignmentGroupWeightsView from '../AssignmentGroupWeightsView'
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from 'helpers/fakeENV'
-import assertions from 'helpers/assertions'
+import fakeENV from '@canvas/common/fakeENV'
+import assertions from '@canvas/common/assertionsSpec'
 import '@canvas/jquery/jquery.simulate'
 
 const group = (opts = {}) => new AssignmentGroup({group_weight: 50, ...opts})

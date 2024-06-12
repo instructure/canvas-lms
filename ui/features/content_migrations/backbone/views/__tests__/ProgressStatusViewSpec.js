@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import ProgressStatusView from '../ProgressStatusView'
 import ProgressingModel from '../../models/ProgressingContentMigration'
-import assertions from 'helpers/assertions'
+import assertions from '@canvas/common/assertionsSpec'
 
 QUnit.module('ProgressStatusViewSpec', {
   setup() {

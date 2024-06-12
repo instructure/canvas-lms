@@ -22,7 +22,7 @@ import WikiPageIndexView from '../WikiPageIndexView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import '@canvas/jquery/jquery.disableWhileLoading'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 import {ltiState} from '@canvas/lti/jquery/messages'
 import * as ConfirmDeleteModal from '../../../react/ConfirmDeleteModal'
 

@@ -25,7 +25,7 @@ import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
 import kolkata from 'timezone/Asia/Kolkata'
 import portuguese from 'timezone/pt_PT'
-import I18nStubber from 'helpers/I18nStubber'
+import I18nStubber from '@canvas/common/I18nStubber'
 import {
   dateString,
   datetimeString,

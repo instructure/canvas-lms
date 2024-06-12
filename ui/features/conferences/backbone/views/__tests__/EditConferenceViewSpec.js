@@ -21,7 +21,7 @@ import Conference from '../../models/Conference'
 import timezone from 'timezone'
 import tzInTest from '@instructure/moment-utils/specHelpers'
 import french from 'timezone/fr_FR'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 QUnit.module('EditConferenceView', {
   setup() {

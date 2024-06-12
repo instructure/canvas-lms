@@ -18,8 +18,8 @@
 
 import Backbone from '@canvas/backbone'
 import CourseFindSelectView from '../CourseFindSelectView'
-import fakeENV from 'helpers/fakeENV'
-import assertions from 'helpers/assertions'
+import fakeENV from '@canvas/common/fakeENV'
+import assertions from '@canvas/common/assertionsSpec'
 
 QUnit.module('CourseFindSelectView: #setSourceCourseId', {
   setup() {

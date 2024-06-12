@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import helpDialog from '../enableHelpDialog'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 import 'jquery-tinypubsub'
 
 // more tests are in spec/selenium/help_dialog_spec.rb

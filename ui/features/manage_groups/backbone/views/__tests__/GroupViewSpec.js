@@ -25,8 +25,8 @@ import GroupUsersView from '../GroupUsersView'
 import GroupDetailView from '../GroupDetailView'
 import GroupUserCollection from '@canvas/groups/backbone/collections/GroupUserCollection'
 import Group from '@canvas/groups/backbone/models/Group'
-import fakeENV from 'helpers/fakeENV'
-import assertions from 'helpers/assertions'
+import fakeENV from '@canvas/common/fakeENV'
+import assertions from '@canvas/common/assertionsSpec'
 
 let view = null
 let group = null

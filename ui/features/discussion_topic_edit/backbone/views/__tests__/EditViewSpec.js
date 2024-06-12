@@ -28,8 +28,8 @@ import Announcement from '@canvas/discussions/backbone/models/Announcement'
 import DueDateOverrideView from '@canvas/due-dates'
 import EditView from '../EditView'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
-import fakeENV from 'helpers/fakeENV'
-import assertions from 'helpers/assertions'
+import fakeENV from '@canvas/common/fakeENV'
+import assertions from '@canvas/common/assertionsSpec'
 import '@canvas/jquery/jquery.simulate'
 
 const currentOrigin = window.location.origin

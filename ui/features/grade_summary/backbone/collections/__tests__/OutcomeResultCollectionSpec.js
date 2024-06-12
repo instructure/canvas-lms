@@ -19,7 +19,7 @@
 import Backbone from '@canvas/backbone'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
 import OutcomeResultCollection from '../OutcomeResultCollection'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 import * as tz from '@instructure/moment-utils'
 
 QUnit.module('OutcomeResultCollectionSpec', {

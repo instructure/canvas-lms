@@ -20,7 +20,7 @@ import Backbone from '@canvas/backbone'
 import ExternalContentFileSubmissionView from '../ExternalContentFileSubmissionView'
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 import axios from '@canvas/axios'
 
 const contentItem = {

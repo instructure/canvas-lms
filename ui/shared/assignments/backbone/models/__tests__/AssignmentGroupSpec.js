@@ -18,7 +18,7 @@
 
 import Assignment from '../Assignment'
 import AssignmentGroup from '../AssignmentGroup'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 QUnit.module('AssignmentGroup')
 

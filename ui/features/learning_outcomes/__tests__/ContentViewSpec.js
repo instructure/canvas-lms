@@ -22,9 +22,9 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import ContentView from '@canvas/outcomes/content-view/backbone/views/index'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 import instructionsTemplate from '../jst/mainInstructions.handlebars'
-import assertions from 'helpers/assertions'
+import assertions from '@canvas/common/assertionsSpec'
 import {publish} from 'jquery-tinypubsub'
 
 QUnit.module('CollectionView', {

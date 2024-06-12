@@ -22,8 +22,6 @@ const {DefinePlugin, EnvironmentPlugin, ProvidePlugin} = require('webpack')
 const PluginSpecsRunner = require('./PluginSpecsRunner')
 const {canvasDir} = require('../params')
 
-const CONTEXT_COFFEESCRIPT_SPEC = 'spec/coffeescripts'
-const CONTEXT_JSX_SPEC = 'spec/javascripts/jsx'
 const UI_FEATURES_SPEC = 'ui/features'
 const UI_SHARED_SPEC = 'ui/shared'
 const QUNIT_SPEC = /Spec$/
@@ -50,12 +48,7 @@ module.exports = {
       },
       {
         test: /\.(js|jsx|ts|tsx)$/,
-        include: [
-          path.join(canvasDir, 'ui'),
-          path.join(canvasDir, 'spec/javascripts/jsx'),
-          path.join(canvasDir, 'spec/coffeescripts'),
-          /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//,
-        ],
+        include: [path.join(canvasDir, 'ui'), /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//],
         exclude: [/node_modules/],
         parser: {
           requireInclude: 'allow',
@@ -120,11 +113,7 @@ module.exports = {
       // s/test/qunit.test/ and s/module/qunit.module/
       {
         test: /\.(js|jsx|ts|tsx)$/,
-        include: [
-          path.join(canvasDir, 'spec/coffeescripts'),
-          path.join(canvasDir, 'spec/javascripts/jsx'),
-          path.join(canvasDir, 'ui'),
-        ].concat(
+        include: [path.join(canvasDir, 'ui')].concat(
           glob.sync('gems/plugins/*/spec_canvas/coffeescripts/', {
             cwd: canvasDir,
             absolute: true,
@@ -139,14 +128,11 @@ module.exports = {
     alias: {
       'node_modules-version-of-backbone$': require.resolve('backbone'),
       'node_modules-version-of-react-modal$': require.resolve('react-modal'),
-      'spec/jsx': path.join(canvasDir, 'spec/javascripts/jsx'),
       'ui/boot/initializers': path.join(canvasDir, 'ui/boot/initializers'),
       'ui/ext': path.join(canvasDir, 'ui/ext'),
       'ui/features': path.join(canvasDir, 'ui/features'),
-      [CONTEXT_COFFEESCRIPT_SPEC]: path.join(canvasDir, CONTEXT_COFFEESCRIPT_SPEC),
       [UI_FEATURES_SPEC]: path.join(canvasDir, UI_FEATURES_SPEC),
       [UI_SHARED_SPEC]: path.join(canvasDir, UI_SHARED_SPEC),
-      [CONTEXT_JSX_SPEC]: path.join(canvasDir, CONTEXT_JSX_SPEC),
 
       // need to explicitly point this out for whatwg-url otherwise you get an
       // error like:
@@ -165,7 +151,6 @@ module.exports = {
     modules: [
       path.join(canvasDir, 'public/javascripts'),
       path.join(canvasDir, 'gems/plugins'),
-      path.join(canvasDir, 'spec/coffeescripts'),
       'node_modules',
     ],
   },
@@ -176,10 +161,8 @@ module.exports = {
 
   plugins: [
     new DefinePlugin({
-      CONTEXT_COFFEESCRIPT_SPEC: JSON.stringify(CONTEXT_COFFEESCRIPT_SPEC),
       UI_FEATURES_SPEC: JSON.stringify(UI_FEATURES_SPEC),
       UI_SHARED_SPEC: JSON.stringify(UI_SHARED_SPEC),
-      CONTEXT_JSX_SPEC: JSON.stringify(CONTEXT_JSX_SPEC),
       CI_NODE_TOTAL: JSON.stringify(process.env.CI_NODE_TOTAL),
       CI_NODE_INDEX: JSON.stringify(process.env.CI_NODE_INDEX),
       QUNIT_SPEC,

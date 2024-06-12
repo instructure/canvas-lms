@@ -96,7 +96,9 @@ module.exports = {
         "This module depends on a module that cannot be found ('resolved to disk'). If it's an npm " +
         'module: add it to your package.json. In all other cases you likely already know what to do.',
       severity: 'error',
-      from: {},
+      from: {
+        pathNot: ['ui/shared/common/__tests__/momentSpec.js'],
+      },
       to: {
         couldNotResolve: true,
       },
@@ -223,6 +225,8 @@ module.exports = {
 
     includeOnly: ['ui', 'packages'],
 
+    exclude: ['ui/shared/common/__tests__/momentSpec.js'],
+
     /* false (the default): ignore dependencies that only exist before typescript-to-javascript compilation
        true: also detect dependencies that only exist before typescript-to-javascript compilation
        "specify": for each dependency identify whether it only exists before compilation or also after
@@ -261,7 +265,7 @@ module.exports = {
          up the most expensive step in dependency cruising (module resolution)
           quite a bit.
        */
-      extensions: [".js", ".jsx", ".ts", ".tsx", ".d.ts"],
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.d.ts'],
 
       /* What to consider a 'main' field in package.json */
       // if you migrate to ESM (or are in an ESM environment already) you will want to

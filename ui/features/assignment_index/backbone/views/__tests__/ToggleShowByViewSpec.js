@@ -22,8 +22,8 @@ import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/
 import ToggleShowByView from '../ToggleShowByView'
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from 'helpers/fakeENV'
-import assertions from 'helpers/assertions'
+import fakeENV from '@canvas/common/fakeENV'
+import assertions from '@canvas/common/assertionsSpec'
 
 const COURSE_SUBMISSIONS_URL = '/courses/1/submissions'
 

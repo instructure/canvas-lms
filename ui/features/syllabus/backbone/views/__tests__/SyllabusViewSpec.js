@@ -31,8 +31,8 @@ import SyllabusCalendarEventsCollection from '../../collections/SyllabusCalendar
 import SyllabusAppointmentGroupsCollection from '../../collections/SyllabusAppointmentGroupsCollection'
 import SyllabusPlannerCollection from '../../collections/SyllabusPlannerCollection'
 import SyllabusView from '../SyllabusView'
-import SyllabusViewPrerendered from '../../../../../../spec/coffeescripts/views/SyllabusViewPrerendered'
-import fakeENV from 'helpers/fakeENV'
+import SyllabusViewPrerendered from '@canvas/syllabus/SyllabusViewPrerendered'
+import fakeENV from '@canvas/common/fakeENV'
 import '@canvas/jquery/jquery.simulate'
 import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 

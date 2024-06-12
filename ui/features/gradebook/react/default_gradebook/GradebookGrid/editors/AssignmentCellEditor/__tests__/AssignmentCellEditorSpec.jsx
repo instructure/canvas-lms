@@ -21,7 +21,7 @@ import AssignmentRowCellPropFactory from '../AssignmentRowCellPropFactory'
 import AssignmentCellEditor from '../index'
 import GridEvent from '../../../GridSupport/GridEvent'
 import {createGradebook} from '../../../../__tests__/GradebookSpecHelper'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 QUnit.module('GradebookGrid AssignmentCellEditor', suiteHooks => {
   let $container

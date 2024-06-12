@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 import MessageFormDialog from '../MessageFormDialog'
 import FavoriteCourseCollection from '../../collections/FavoriteCourseCollection'
 import CourseCollection from '../../collections/CourseCollection'

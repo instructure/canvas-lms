@@ -21,7 +21,7 @@ import 'jquery-migrate'
 import {createGradebook} from './GradebookSpecHelper'
 import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 QUnit.module('Gradebook Grading', () => {
   let gradebook

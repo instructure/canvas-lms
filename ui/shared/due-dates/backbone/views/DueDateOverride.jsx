@@ -112,6 +112,7 @@ DueDateOverrideView.prototype.render = function () {
           }
           return null
         },
+        // eslint-disable-next-line no-dupe-keys
         isOnlyVisibleToOverrides: this.model.assignment.isOnlyVisibleToOverrides(),
         type: this.model.assignment.objectType().toLowerCase(),
         importantDates: this.model.assignment.get('important_dates'),

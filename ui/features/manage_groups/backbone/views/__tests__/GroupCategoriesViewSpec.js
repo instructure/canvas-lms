@@ -21,7 +21,7 @@ import 'jquery-migrate'
 import GroupCategoriesView from '../GroupCategoriesView'
 import GroupCategoryCollection from '@canvas/groups/backbone/collections/GroupCategoryCollection'
 import GroupCategory from '@canvas/groups/backbone/models/GroupCategory'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 let clock = null
 let view = null

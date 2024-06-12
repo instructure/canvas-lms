@@ -20,7 +20,7 @@ import Backbone from '@canvas/backbone'
 import ExternalContentLtiLinkSubmissionView from '../ExternalContentLtiLinkSubmissionView'
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 QUnit.module('ExternalContentLtiLinkSubmissionView', {
   setup() {

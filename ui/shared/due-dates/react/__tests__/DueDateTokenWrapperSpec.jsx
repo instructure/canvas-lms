@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import DueDateTokenWrapper from '../DueDateTokenWrapper'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 QUnit.module('DueDateTokenWrapper', {
   setup() {

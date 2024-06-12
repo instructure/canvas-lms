@@ -22,7 +22,7 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import Assignment from '../Assignment'
 import Submission from '../Submission'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 
 QUnit.module('Assignment#initialize with ENV.POST_TO_SIS set to false', {
   setup() {

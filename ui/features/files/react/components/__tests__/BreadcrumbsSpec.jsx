@@ -23,7 +23,7 @@ import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import Breadcrumbs from '../Breadcrumbs'
 import Folder from '@canvas/files/backbone/models/Folder'
-import fakeENV from '../../../../../../spec/coffeescripts/helpers/fakeENV'
+import fakeENV from '@canvas/common/fakeENV'
 import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 QUnit.module('Files Breadcrumbs Component', {

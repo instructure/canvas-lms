@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
 import ExternalToolLaunchView from '../ExternalToolLaunchView'
-import assertions from 'helpers/assertions'
+import assertions from '@canvas/common/assertionsSpec'
 
 QUnit.module('ExternalToolLaunchView', {
   setup() {
