@@ -112,7 +112,13 @@ class DiscussionTopicsApiController < ApplicationController
       return render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity)
     end
 
-    raw_dynamic_content = { CONTENT: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary }
+    user_input = params[:userInput]
+    focus = DiscussionTopic::PromptPresenter.focus_for_summary(user_input:)
+
+    raw_dynamic_content = {
+      CONTENT: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary,
+      FOCUS: focus
+    }
     raw_dynamic_content_hash = Digest::SHA256.hexdigest(raw_dynamic_content.to_json)
 
     forced = params[:force] == "true"
@@ -125,17 +131,23 @@ class DiscussionTopicsApiController < ApplicationController
       llm_config: llm_config_raw,
       dynamic_content: raw_dynamic_content,
       dynamic_content_hash: raw_dynamic_content_hash,
+      user_input:,
       forced:
     )
 
     locale = @current_user.locale || I18n.default_locale.to_s
     pretty_locale = available_locales[locale] || "English"
-    refined_dynamic_content = { CONTENT: raw_summary.summary, LOCALE: pretty_locale }
+    refined_dynamic_content = {
+      CONTENT: DiscussionTopic::PromptPresenter.raw_summary_for_refinement(raw_summary: raw_summary.summary),
+      FOCUS: focus,
+      LOCALE: pretty_locale
+    }
     refined_dynamic_content_hash = Digest::SHA256.hexdigest(refined_dynamic_content.to_json)
     refined_summary = fetch_or_create_summary(
       llm_config: llm_config_refined,
       dynamic_content: refined_dynamic_content,
       dynamic_content_hash: refined_dynamic_content_hash,
+      user_input:,
       forced:,
       parent_summary: raw_summary,
       locale:
@@ -227,8 +239,6 @@ class DiscussionTopicsApiController < ApplicationController
       feedback.dislike
     when :reset_like
       feedback.reset_like
-    when :regenerate
-      feedback.regenerate
     when :disable_summary
       feedback.disable_summary
     else
@@ -1026,9 +1036,9 @@ class DiscussionTopicsApiController < ApplicationController
     true
   end
 
-  def fetch_or_create_summary(llm_config:, dynamic_content:, dynamic_content_hash:, forced:, parent_summary: nil, locale: nil)
+  def fetch_or_create_summary(llm_config:, dynamic_content:, dynamic_content_hash:, forced:, user_input:, parent_summary: nil, locale: nil)
     unless forced
-      summary = @topic.summaries.where(llm_config_version: llm_config.name, dynamic_content_hash:, parent: parent_summary, locale:)
+      summary = @topic.summaries.where(llm_config_version: llm_config.name, dynamic_content_hash:, parent: parent_summary)
                       .order(created_at: :desc)
                       .first
       return summary if summary
@@ -1040,6 +1050,8 @@ class DiscussionTopicsApiController < ApplicationController
     @topic.summaries.create!(
       llm_config_version: llm_config.name,
       dynamic_content_hash:,
+      user: @current_user,
+      user_input:,
       summary: content,
       input_tokens:,
       output_tokens:,

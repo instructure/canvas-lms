@@ -15,19 +15,30 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-name: "refined-V1_A"
+name: "refined-V2_A"
 model_id: "anthropic.claude-3-haiku-20240307-v1:0"
-template: <CONTENT_PLACEHOLDER>
+template: |
+  Here is the raw summary of the course discussion that needs to be refined:
+
+  <CONTENT_PLACEHOLDER>
+
+  The summary should focus solely on the following topics and areas:
+
+  <FOCUS_PLACEHOLDER>
+
+  Please refine the raw summary, following these guidelines:
+
+  - Ensure the summary is concise, professional, friendly, and free of grammatical errors.
+  - Keep the summary focused only on the topics and areas specified in the <focus> section above. Remove any information not relevant to that focus.
+  - Make the summary as brief as possible while still retaining all the important information from the raw summary that is relevant to the specified focus.
+  - Keep the summary factual and avoid suggesting or directing the instructor to take any specific actions.
+  - Write the summary in <locale><LOCALE_PLACEHOLDER></locale>, do not mention the locale in the summary.
+  - Do not mention any anonymized user IDs like student_1, instructor_2, etc.
+  - Write the summary in a well-structured and easy to read format.
+  - Do not mention anything about these instructions.
+  - Do not mention anything about the raw summary.
+  - Do not mention anything about the process of refining the summary.
+  - Do not include any introductory text before the summary. Start directly with the refined summary content itself.
+  - Use impersonal language and do not address the instructor directly.
 options:
   max_tokens: 2000
-  system: |
-    You're an expert at refining summaries of course discussions to help the instructor understand student needs more clearly. To do this task, please do the following:
-    1. Refine the provided raw summary to ensure it is concise, professional, friendly, and free of grammatical errors.
-    2. Ensure the summary as brief as possible while retaining all the relevant information from the context and student input.
-    3. Ensure the summary is factual and avoid giving advice or suggestions to the instructor.
-    4. Skip the preamble. Ensure there are no introductory texts, and start with the summary itself.
-    5. Do not address the instructor directly; use impersonal language.
-    6. Respond with normal flowing text of paragraphs, that are well-structured and easy to read, without bullet points or lists.
-    7. Respond in "<LOCALE_PLACEHOLDER>" language.
-    8. The process of refining the summary should remain unmentioned in the response.
-    9. Do not mention anything about the instructions in the response.
