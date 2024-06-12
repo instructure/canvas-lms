@@ -48,8 +48,9 @@ import {ROOT_NODE} from '@craftjs/utils'
 import {IconArrowUpLine, IconTrashLine, IconDragHandleLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
-import {type ViewProps} from '@instructure/ui-view'
+import {View, type ViewProps} from '@instructure/ui-view'
 import {ToolbarSeparator} from './ToolbarSeparator'
+import {getScrollParent} from '../../utils'
 
 const findUpNode = (node: Node, query: any): Node | undefined => {
   let upnode = node.data.parent ? query.node(node.data.parent).get() : undefined
@@ -68,11 +69,17 @@ const findContainingSection = (node: Node, query: any): Node | undefined => {
   return upnode && upnode.data.custom?.isSection ? upnode : undefined
 }
 
-type RenderNodeProps = {
+interface RenderNodeProps {
   render: React.ReactElement
 }
 
-export const RenderNode = ({render}: RenderNodeProps) => {
+interface RenderNodeComponent extends React.FC<RenderNodeProps> {
+  globals: {
+    selectedSectionId: string
+  }
+}
+
+export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   const {actions, query} = useEditor(state => {
     if (state.events.selected.size === 0) {
       RenderNode.globals.selectedSectionId = ''
@@ -100,7 +107,7 @@ export const RenderNode = ({render}: RenderNodeProps) => {
     props: n.data.props,
   }))
 
-  const [currentToolbarRef, setCurrentToolbarRef] = useState<HTMLDivElement | null>(null)
+  const [currentToolbarOrTagRef, setCurrentToolbarOrTagRef] = useState<HTMLDivElement | null>(null)
   const [currentMenuRef, setCurrentMenuRef] = useState<HTMLDivElement | null>(null)
   const [upnodeId] = useState<string | undefined>(findUpNode(node, query)?.id)
 
@@ -150,16 +157,21 @@ export const RenderNode = ({render}: RenderNodeProps) => {
 
   const getToolbarPos = useCallback(
     (domNode: HTMLElement | null) => {
-      const {top, left, bottom} = domNode
+      const {top, left, height} = domNode
         ? domNode.getBoundingClientRect()
-        : {top: 0, left: 0, bottom: 0}
-      const offset = currentToolbarRef ? currentToolbarRef.getBoundingClientRect().height : 0
+        : {top: 0, left: 0, height: 0}
+      const bottom = top + height
+
+      // 5 is the offset of the hover/focus rings
+      const offset = currentToolbarOrTagRef
+        ? currentToolbarOrTagRef.getBoundingClientRect().height + 5
+        : 0
       return {
         top: `${top > 0 ? top - offset : bottom - offset}px`,
         left: `${left}px`,
       }
     },
-    [currentToolbarRef]
+    [currentToolbarOrTagRef]
   )
   const getMenuPos = useCallback(
     (domNode: HTMLElement | null) => {
@@ -181,19 +193,19 @@ export const RenderNode = ({render}: RenderNodeProps) => {
       currentMenuRef.style.top = top
       currentMenuRef.style.left = left
     }
-    if (currentToolbarRef) {
+    if (currentToolbarOrTagRef) {
       const {top, left} = getToolbarPos(dom)
-      currentToolbarRef.style.top = top
-      currentToolbarRef.style.left = left
+      currentToolbarOrTagRef.style.top = top
+      currentToolbarOrTagRef.style.left = left
     }
-  }, [currentMenuRef, currentToolbarRef, dom, getMenuPos, getToolbarPos])
+  }, [currentMenuRef, currentToolbarOrTagRef, dom, getMenuPos, getToolbarPos])
 
   useEffect(() => {
-    const scroller = document.getElementById('drawer-layout-content') || document
-    scroller.addEventListener('scroll', scroll)
+    const scrollingContainer = getScrollParent()
+    scrollingContainer.addEventListener('scroll', scroll)
 
     return () => {
-      scroller.removeEventListener('scroll', scroll)
+      scrollingContainer.removeEventListener('scroll', scroll)
     }
   }, [dom, scroll])
 
@@ -222,15 +234,16 @@ export const RenderNode = ({render}: RenderNodeProps) => {
 
     return ReactDOM.createPortal(
       <div
-        ref={(el: HTMLDivElement) => setCurrentToolbarRef(el)}
+        ref={(el: HTMLDivElement) => setCurrentToolbarOrTagRef(el)}
         className="block-toolbar"
         style={{
           left: getToolbarPos(dom).left,
           top: getToolbarPos(dom).top,
         }}
-        data-timestamp={Date.now()}
       >
-        <Text size="small">{name}</Text>
+        <View as="div" background="brand" padding="0 xx-small" borderRadius="small">
+          <Text size="small">{name}</Text>
+        </View>
         {moveable ? (
           <IconButton
             cursor="move"
@@ -302,6 +315,35 @@ export const RenderNode = ({render}: RenderNodeProps) => {
       : null
   }
 
+  const renderHoverTag = () => {
+    if (node.data?.custom?.noToolbar) return null
+
+    const parentSection = findContainingSection(node, query)
+    if (!parentSection) return null
+
+    const isMySectionSelected = RenderNode.globals.selectedSectionId === parentSection.id
+    if (!isMySectionSelected) return null
+
+    const mountPoint = document.querySelector('.block-editor-editor')
+    if (!mountPoint) return null
+
+    return ReactDOM.createPortal(
+      <div
+        ref={(el: HTMLDivElement) => setCurrentToolbarOrTagRef(el)}
+        className="block-tag"
+        style={{
+          left: getToolbarPos(dom).left,
+          top: getToolbarPos(dom).top,
+        }}
+      >
+        <View as="div" background="secondary" padding="0 xx-small" borderRadius="small">
+          <Text size="small">{name}</Text>
+        </View>
+      </div>,
+      mountPoint
+    )
+  }
+
   const renderRelated = () => {
     return (
       <>
@@ -314,6 +356,7 @@ export const RenderNode = ({render}: RenderNodeProps) => {
   return (
     <>
       {selected && node.related && renderRelated()}
+      {!selected && hovered && renderHoverTag()}
       {render}
     </>
   )

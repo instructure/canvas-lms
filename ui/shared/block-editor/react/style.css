@@ -16,8 +16,14 @@
 }
 
 
-.toolbox-item:hover {
-  outline: 1px solid var(--ic-brand-primary);
+.toolbox-item {
+  cursor: grab;
+  &:hover {
+    outline: 1px solid var(--ic-brand-primary);
+  }
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 .font0 {font-family: lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;}
@@ -54,7 +60,7 @@
   border-style: solid solid solid none;
 }
 
-.block-editor-editor .block-toolbar {
+.block-editor-editor .block-toolbar, .block-editor-editor .block-tag {
   position: fixed;
   display: flex;
   gap: 0.25rem;

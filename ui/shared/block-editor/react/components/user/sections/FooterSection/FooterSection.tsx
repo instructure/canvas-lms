@@ -52,7 +52,6 @@ const FooterSection = ({background}: FooterSectionProps) => {
         <Element
           id={`${cid}__footer-canvas-icon`}
           is={ImageBlock}
-          canvas={true}
           src="/images/block_editor/canvas_logo_white.svg"
           width={113}
           height={28}
@@ -60,7 +59,6 @@ const FooterSection = ({background}: FooterSectionProps) => {
         <Element
           id={`${cid}__footer-canvas-to-top`}
           is={ButtonBlock}
-          canvas={true}
           text="Back to top"
           variant="condensed"
           color={buttonColor}

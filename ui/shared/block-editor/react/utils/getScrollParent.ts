@@ -16,14 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export function getScrollParent(node: Element | null) {
-  if (node == null) {
-    return null
-  }
+// export function getScrollParent(node: Element | null) {
+//   if (node == null) {
+//     return null
+//   }
 
-  if (node.scrollHeight > node.clientHeight) {
-    return node
-  } else {
-    return getScrollParent(node.parentNode as Element | null)
-  }
+//   if (node.scrollHeight > node.clientHeight) {
+//     return node
+//   } else {
+//     return getScrollParent(node.parentNode as Element | null)
+//   }
+// }
+
+export function getScrollParent() {
+  // depends on whether new user tutorial is enabled or not
+  return document.getElementById('drawer-layout-content') || document.documentElement
 }

@@ -17,7 +17,7 @@
  */
 import React, {useCallback, useEffect} from 'react'
 import {useEditor, useNode, type Node} from '@craftjs/core'
-import {useClassNames} from '../../../../utils'
+import {useClassNames, getScrollParent} from '../../../../utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export type PageBlockProps = {
@@ -36,6 +36,20 @@ export const PageBlock = ({children}: PageBlockProps) => {
     connectors: {connect},
   } = useNode()
   const clazz = useClassNames(enabled, {empty: !children}, ['page-block'])
+
+  // So that a section newly dropped in the editor gets selected,
+  // RenderNode selects them on initial render. As a side-effect this also
+  // happens as the initial json is loaded.
+  // This unselects whatever was last and scrolls to the top.
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      // @ts-expect-error (null is allowed)
+      actions.selectNode(null)
+      const scrollingContainer = getScrollParent()
+      scrollingContainer.scrollTo({top: 0, behavior: 'instant'})
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handlePagekey = useCallback(
     (e: KeyboardEvent) => {

@@ -30,15 +30,16 @@ import {PageSections} from './PageSections'
 import {ColorPalette} from './ColorPalette'
 import {FontPairings} from './FontPairings'
 import {PageTemplates} from './PageTemplates'
-import {buildPageContent} from '../../../utils'
+import {buildPageContent, getScrollParent} from '../../../utils'
 import {type PageSection} from './types'
 
 type NewPageStepperProps = {
   open: boolean
-  onDismiss: () => void
+  onFinish: () => void
+  onCancel: () => void
 }
 
-const NewPageStepper = ({open, onDismiss}: NewPageStepperProps) => {
+const NewPageStepper = ({open, onFinish, onCancel}: NewPageStepperProps) => {
   const {actions, query} = useEditor()
   const [step, setStep] = useState(0)
   const [startingPoint, setStartingPoint] = useState<Step1Selection>('scratch')
@@ -51,9 +52,20 @@ const NewPageStepper = ({open, onDismiss}: NewPageStepperProps) => {
       setStep(step + 1)
     } else {
       buildPageContent(actions, query, selectedSections, paletteId, fontName)
-      onDismiss()
+      onFinish()
     }
-  }, [actions, fontName, onDismiss, paletteId, query, selectedSections, step])
+  }, [actions, fontName, onFinish, paletteId, query, selectedSections, step])
+
+  // buildPageContent returns before the Editor renders all the new stuff.
+  // I think that because of javascript's single-threaded nature, onDismiss doesn't
+  // unmount the modal until craftjs is finished rendering all the new nodes.
+  // Use that opportunity to unselect the last created node and scroll to the top
+  const handleClosed = useCallback(() => {
+    // @ts-expect-error (null is OK)
+    actions.selectNode(null)
+    const scrollingContainer = getScrollParent()
+    scrollingContainer.scrollTo({top: 0, behavior: 'instant'})
+  }, [actions])
 
   const handlePrevStep = useCallback(() => {
     setStep(step - 1)
@@ -100,12 +112,12 @@ const NewPageStepper = ({open, onDismiss}: NewPageStepperProps) => {
   }
 
   return (
-    <Modal open={open} label="Create a new page" onDismiss={onDismiss}>
+    <Modal open={open} label="Create a new page" onDismiss={onCancel} onClose={handleClosed}>
       <Modal.Header>
         <Heading>Create a new page</Heading>
         <CloseButton
           data-instui-modal-close-button="true"
-          onClick={onDismiss}
+          onClick={onCancel}
           screenReaderLabel="Close"
           placement="end"
           offset="medium"
@@ -126,7 +138,7 @@ const NewPageStepper = ({open, onDismiss}: NewPageStepperProps) => {
         </View>
       </Modal.Body>
       <Modal.Footer>
-        <Button color="secondary" onClick={onDismiss}>
+        <Button color="secondary" onClick={onCancel}>
           Cancel
         </Button>
         <Button color="primary" margin="0 0 0 small" onClick={handleNextStep}>
