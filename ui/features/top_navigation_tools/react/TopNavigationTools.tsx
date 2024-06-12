@@ -54,23 +54,7 @@ export function TopNavigationTools(props: TopNavigationToolsProps) {
   const menu_tools = props.tools.filter(tool => !tool.pinned)
 
   return (
-    <Flex as="div" gap="small" width="100%" height="100%">
-      {pinned_tools.map((tool: Tool) => {
-        return (
-          <Flex.Item key={tool.id}>
-            <Tooltip renderTip={tool.title}>
-              <IconButton
-                renderIcon={getToolIcon(tool)}
-                onClick={e =>
-                  handleToolClick(e.target.dataset.toolId, pinned_tools, props.handleToolLaunch)
-                }
-                data-tool-id={tool.id}
-                screenReaderLabel={tool.title}
-              />
-            </Tooltip>
-          </Flex.Item>
-        )
-      })}
+    <Flex as="div" gap="small" width="100%" height="100%" direction="row-reverse">
       {menu_tools.length > 0 && (
         <Flex.Item>
           <Menu
@@ -97,6 +81,22 @@ export function TopNavigationTools(props: TopNavigationToolsProps) {
           </Menu>
         </Flex.Item>
       )}
+      {pinned_tools.map((tool: Tool) => {
+        return (
+          <Flex.Item key={tool.id}>
+            <Tooltip renderTip={tool.title}>
+              <IconButton
+                renderIcon={getToolIcon(tool)}
+                onClick={e =>
+                  handleToolClick(e.target.dataset.toolId, pinned_tools, props.handleToolLaunch)
+                }
+                data-tool-id={tool.id}
+                screenReaderLabel={tool.title}
+              />
+            </Tooltip>
+          </Flex.Item>
+        )
+      })}
     </Flex>
   )
 }
