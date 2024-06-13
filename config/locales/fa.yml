@@ -17754,6 +17754,10 @@ fa:
         upload_ui_conf: "شناسه پیکربندی واسط کاربر بارگذاری کننده"
         user_secret_key: "رمز کاربر"
       ui_conf_ids: "برای مشتریانی که توسط Kaltura میزبانی می شوند، می توانید از Kaltura بخواهید این شناسه ها را در اختیار شما قرار دهد. نمونه های میزبانی شده توسط خود می توانند این مقادیر را در جدول ui_confs بیابند."
+    learn_platform_settings: 
+      labels: 
+        base_url: "نشانی اینترنتی پایه"
+        token: "نشانه دسترسی"
     linked_in: 
       description: "یکپارچه‌سازی لینکدین"
     linked_in_settings: 
@@ -19924,6 +19928,7 @@ fa:
       create_group: "ایجاد گروه"
       create_question: "ایجاد پرسش"
       creating_group: "درحال ایجاد گروه..."
+      generate: ایجاد
       generating: "در حال ایجاد..."
       generating_combinations_progress: "در حال ایجاد... (%{done}/%{total})"
       save: "ذخیره سازی"
@@ -21553,7 +21558,7 @@ fa:
         mastery_level: "درصدی که بالاتر از آن تسلط تعیین می شود"
         select_and_add_criterion: "انتخاب و افرودن معیار"
     flash_notices: 
-      close: بستن
+      close: Close
     footer_links: 
       facebook: "فیس بوک"
       privacy_policy: "سیاست حریم خصوصی"
