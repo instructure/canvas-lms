@@ -24,8 +24,8 @@ QUnit.module('beforeCheck', {
   setup() {
     window.ENV = {} || window.ENV
     window.ENV.url_for_high_contrast_tinymce_editor_css = [
-      '/base/spec/javascripts/fixtures/a11yCheckerTest1.css',
-      '/base/spec/javascripts/fixtures/a11yCheckerTest2.css',
+      '/base/spec/fixtures/a11yCheckerTest1.css',
+      '/base/spec/fixtures/a11yCheckerTest2.css',
     ]
 
     fakeEditor = {

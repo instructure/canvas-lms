@@ -29,7 +29,7 @@ import '@canvas/test-utils/spec-support/timezoneBackwardsCompatLayer'
 import {up as configureDateTime} from '@canvas/datetime/configureDateTime'
 import {up as configureDateTimeMomentParser} from '@canvas/datetime/configureDateTimeMomentParser'
 import {useTranslations} from '@canvas/i18n'
-import CoreTranslations from 'translations/en.json'
+import CoreTranslations from '../../public/javascripts/translations/en.json'
 
 useTranslations('en', CoreTranslations)
 

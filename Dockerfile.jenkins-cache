@@ -110,7 +110,7 @@ RUN --mount=target=/tmp/src \
         jest \
         packages \
         public \
-        spec/javascripts \
+        spec/fixtures \
         tmp \
         ui \
         ui-build \
