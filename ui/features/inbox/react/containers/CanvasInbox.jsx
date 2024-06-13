@@ -58,9 +58,25 @@ import InboxSettingsModalContainer, {
 
 const I18n = useI18nScope('conversations_2')
 
+const validFilters = ['inbox', 'unread', 'starred', 'sent', 'archived', 'submission_comments']
+
+const parseFilterHash = hash => {
+  const hashParams = hash.substring('#filter='.length)
+  const hashData = decodeQueryString(hashParams)
+  const filterType = hashData.filter(i => i.type !== undefined)[0]?.type
+  const courseSelection = hashData.filter(i => i.course !== undefined)[0]?.course
+
+  return {
+    filterType: validFilters.includes(filterType) ? filterType : null,
+    courseSelection: courseSelection || null,
+  }
+}
+
 const CanvasInbox = () => {
-  const [scope, setScope] = useState('inbox')
-  const [courseFilter, setCourseFilter] = useState()
+  const urlFilters = parseFilterHash(window.location.hash)
+
+  const [scope, setScope] = useState(urlFilters.filterType || 'inbox')
+  const [courseFilter, setCourseFilter] = useState(urlFilters.courseSelection)
   const [userFilter, setUserFilter] = useState()
   const [selectedConversations, setSelectedConversations] = useState([])
   const [selectedConversationMessage, setSelectedConversationMessage] = useState()
@@ -89,19 +105,10 @@ const CanvasInbox = () => {
   const inboxSettingsFeature = inboxSignatureBlock || inboxAutoResponse
 
   const setFilterStateToCurrentWindowHash = () => {
-    const validFilters = ['inbox', 'unread', 'starred', 'sent', 'archived', 'submission_comments']
+    const {filterType, courseSelection} = parseFilterHash(window.location.hash)
 
-    const urlHash = window.location.hash
-    const hashParams = urlHash.substring('#filter='.length)
-    const hashData = decodeQueryString(hashParams)
-    const filterType = hashData.filter(i => i.type !== undefined)[0]?.type
-    const courseSelection = hashData.filter(i => i.course !== undefined)[0]?.course
-
-    const newCourseFilter = courseSelection || null
-    setCourseFilter(newCourseFilter)
-
-    const isValidFilter = filterType && validFilters.includes(filterType)
-    if (isValidFilter) setScope(filterType)
+    setCourseFilter(courseSelection)
+    if (filterType) setScope(filterType)
   }
 
   const setUrlUserRecepientFromUrlParam = () => {
