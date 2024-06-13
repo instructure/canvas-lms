@@ -695,6 +695,93 @@ describe Course do
             expect(result).to eq expected
           end
 
+          it "correctly shows assignment not in a module with another assignment in a module" do
+            @assignment2.only_visible_to_overrides = false
+            @assignment2.save!
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1, @assignment2)
+            result = edd.to_hash
+            expected = {
+              @assignment1.id => {
+                @student1.id => {
+                  due_at: @assignment1.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: @module_override.id,
+                  override_source: "ADHOC"
+                }
+              },
+              @assignment2.id => {
+                @student1.id => {
+                  due_at: @assignment2.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
+                },
+                @student2.id => {
+                  due_at: @assignment2.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
+                },
+                @student3.id => {
+                  due_at: @assignment2.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
+                }
+              }
+            }
+            expect(result).to eq expected
+          end
+
+          it "correctly shows quiz not in a module with another assignment in a module" do
+            @assignment2.only_visible_to_overrides = false
+            @assignment2.save!
+            @quiz = quiz_model(course: @test_course, assignment: @assignment2)
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1, @assignment2)
+            result = edd.to_hash
+            expected = {
+              @assignment1.id => {
+                @student1.id => {
+                  due_at: @assignment1.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: @module_override.id,
+                  override_source: "ADHOC"
+                }
+              },
+              @assignment2.id => {
+                @student1.id => {
+                  due_at: @assignment2.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
+                },
+                @student2.id => {
+                  due_at: @assignment2.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
+                },
+                @student3.id => {
+                  due_at: @assignment2.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
+                }
+              }
+            }
+            expect(result).to eq expected
+          end
+
           it "applies unpublished context module adhoc overrides" do
             @module.workflow_state = "unpublished"
             @module.save!
