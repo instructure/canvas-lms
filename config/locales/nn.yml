@@ -18887,6 +18887,10 @@ nn:
         upload_ui_conf: "Filopplastar UI konf. ID"
         user_secret_key: Brukarhemmelegheit
       ui_conf_ids: "Som kunde hos Kaltura kan du be om å få desse ID-ane. Har du eigne førekomstar av Kaltura, finn du verdiane i ui_confs-tabellen."
+    learn_platform_settings: 
+      labels: 
+        base_url: "Primær URL"
+        token: Tilgangstoken
     linked_in: 
       description: LinkedIn-integrering
     linked_in_settings: 
@@ -20918,6 +20922,7 @@ nn:
       create_group: "Opprett gruppe"
       create_question: "Opprett spørsmål"
       creating_group: "Opprettar gruppe..."
+      generate: Generer
       generating: Genererer...
       generating_combinations_progress: "Genererer... (%{done}/%{total})"
       save: Lagre
