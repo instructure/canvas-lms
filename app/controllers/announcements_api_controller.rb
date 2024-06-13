@@ -119,9 +119,10 @@ class AnnouncementsApiController < ApplicationController
           *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS,
           :manage_content,
           *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
-        )
+        ) || User.observing_full_course(course).where(id: @current_user).any?
       end
-      scope = scope.visible_to_ungraded_discussion_student_visibilities(@current_user) unless skip_section_filtering
+
+      scope = scope.visible_to_ungraded_discussion_student_visibilities(@current_user, courses) unless skip_section_filtering
       scope
     end
 

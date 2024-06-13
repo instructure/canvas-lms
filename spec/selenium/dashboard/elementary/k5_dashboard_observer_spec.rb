@@ -70,6 +70,18 @@ describe "observer k5 dashboard" do
       expect(announcement_title(announcement_heading1)).to be_displayed
     end
 
+    it "shows the announcements for class observers with selective release" do
+      Account.site_admin.enable_feature!(:selective_release_backend)
+      announcement_heading1 = "K5 Do this"
+      announcement_content1 = "So happy to see all of you."
+      new_announcement(@homeroom_course, announcement_heading1, announcement_content1)
+
+      @observer.enrollments.where(course_id: @homeroom_course.id).first.update!(associated_user_id: nil)
+
+      get "/"
+      expect(announcement_title(announcement_heading1)).to be_displayed
+    end
+
     it "show the grades progress bar with the appropriate progress" do
       skip "FOO-3808 (10/6/2023)"
       subject_grade = "75"

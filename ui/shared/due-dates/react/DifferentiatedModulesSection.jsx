@@ -43,7 +43,6 @@ import {
 } from '../util/differentiatedModulesUtil'
 import {uid} from '@instructure/uid'
 import {Pill} from '@instructure/ui-pill'
-import types from '@canvas/theme-editor/react/PropTypes'
 
 const I18n = useI18nScope('DueDateOverrideView')
 
@@ -59,7 +58,7 @@ const DifferentiatedModulesSection = ({
   importantDates,
   onTrayOpen,
   onTrayClose,
-  removeDueDateInput = false,
+  supportDueDates = true,
 }) => {
   const [open, setOpen] = useState(false)
   // stagedCards are the itemAssignToCards that will be saved when the assignment is saved
@@ -203,8 +202,8 @@ const DifferentiatedModulesSection = ({
   }, [stagedCards])
 
   const handleOpen = useCallback(() => {
-    if(onTrayOpen !== undefined){
-      if(!onTrayOpen()) return;
+    if (onTrayOpen !== undefined) {
+      if (!onTrayOpen()) return
     }
     setOpen(true)
   }, [onTrayOpen])
@@ -441,14 +440,17 @@ const DifferentiatedModulesSection = ({
     handleClose(false)
   }
 
-  const handleImportantDatesChange = event => {
-    const newImportantDatesValue = event.target.checked
-    onSync(undefined, newImportantDatesValue)
-    setStagedImportantDates(newImportantDatesValue)
-  }
+  const handleImportantDatesChange = useCallback(
+    event => {
+      const newImportantDatesValue = event.target.checked
+      onSync(undefined, newImportantDatesValue)
+      setStagedImportantDates(newImportantDatesValue)
+    },
+    [onSync]
+  )
 
-  const importantDatesCheckbox = () => {
-    if (ENV.K5_SUBJECT_COURSE || ENV.K5_HOMEROOM_COURSE) {
+  const importantDatesCheckbox = useCallback(() => {
+    if (supportDueDates && (ENV.K5_SUBJECT_COURSE || ENV.K5_HOMEROOM_COURSE)) {
       const disabled = !preSavedOverrides?.some(override => override.due_at)
       const checked = !disabled && stagedImportantDates
       return (
@@ -467,7 +469,7 @@ const DifferentiatedModulesSection = ({
         </div>
       )
     }
-  }
+  }, [handleImportantDatesChange, preSavedOverrides, supportDueDates, stagedImportantDates])
 
   return (
     <>
@@ -516,7 +518,7 @@ const DifferentiatedModulesSection = ({
         onAssigneesChange={handleChange}
         onDatesChange={handleDatesUpdate}
         onCardRemove={handleCardRemove}
-        removeDueDateInput={removeDueDateInput}
+        removeDueDateInput={!supportDueDates}
       />
     </>
   )
@@ -534,7 +536,7 @@ DifferentiatedModulesSection.propTypes = {
   getGroupCategoryId: func,
   onTrayOpen: func,
   onTrayClose: func,
-  removeDueDateInput: bool,
+  supportDueDates: bool,
 }
 
 export default DifferentiatedModulesSection
