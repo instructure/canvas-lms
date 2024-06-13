@@ -1438,6 +1438,35 @@ describe Mutations::CreateDiscussionTopic do
       end
     end
 
+    it "does not create overrides on a group discussion topic" do
+      group = @course.groups.create!
+      student_in_group = student_in_course(course: @course, active_all: true).user
+      group.group_memberships.create!(user: student_in_group)
+
+      context_type = "Group"
+      title = "Group Discussion"
+      message = "Lorem ipsum..."
+      published = true
+
+      query = <<~GQL
+        contextId: "#{group.id}"
+        contextType: #{context_type}
+        title: "#{title}"
+        message: "#{message}"
+        published: #{published}
+        ungradedDiscussionOverrides: {
+          studentIds: [#{student_in_group.id}]
+        }
+      GQL
+
+      result = execute_with_input(query)
+      override = DiscussionTopic.last.active_assignment_overrides.first
+      aggregate_failures do
+        expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+        expect(override).to be_nil
+      end
+    end
+
     it "does not create a ungraded discussion topic with override if flag is off" do
       Account.site_admin.disable_feature!(:selective_release_ui_api)
 

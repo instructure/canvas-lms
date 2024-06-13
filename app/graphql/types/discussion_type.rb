@@ -370,7 +370,7 @@ module Types
 
     field :ungraded_discussion_overrides, Types::AssignmentOverrideType.connection_type, null: true
     def ungraded_discussion_overrides
-      return nil if object.assignment.present? || !Account.site_admin.feature_enabled?(:selective_release_ui_api)
+      return nil if object.assignment.present? || object.context_type == "Group" || !Account.site_admin.feature_enabled?(:selective_release_ui_api)
 
       overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(object, current_user)
 
