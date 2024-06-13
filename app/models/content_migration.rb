@@ -1186,11 +1186,14 @@ class ContentMigration < ActiveRecord::Base
 
   MIGRATION_DATA_FIELDS = {
     "WikiPage" => %i[url current_lookup_id],
-    "Attachment" => %i[media_entry_id uuid]
+    "Attachment" => %i[media_entry_id]
   }.freeze
 
   def migration_data_fields_for(asset_type)
-    MIGRATION_DATA_FIELDS["Attachment"] << :uuid if context.root_account.feature_enabled?(:file_verifiers_for_quiz_links)
+    if asset_type == "Attachment" && context.root_account.feature_enabled?(:file_verifiers_for_quiz_links)
+      return MIGRATION_DATA_FIELDS[asset_type].clone << :uuid
+    end
+
     MIGRATION_DATA_FIELDS[asset_type] || []
   end
 
