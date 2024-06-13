@@ -10161,6 +10161,10 @@ ko:
         upload_ui_conf: "업로더 UI 구성 ID"
         user_secret_key: "사용자 시크릿"
       ui_conf_ids: "Kaltura 호스팅 고객은 이 ID를 Kaltura에 요청할 수 있습니다. 자체 호스팅 인스턴스는 ui_confs 테이블에서 이 값을 찾을 수 있습니다."
+    learn_platform_settings: 
+      labels: 
+        base_url: "기준 URL"
+        token: "액세스 토큰"
     linked_in: 
       description: "LinkedIn 통합"
     linked_in_settings: 
@@ -11685,6 +11689,7 @@ ko:
       create_group: "그룹 만들기"
       create_question: "문제 만들기"
       creating_group: "그룹 만드는 중..."
+      generate: 생성
       generating: "만드는 중..."
       generating_combinations_progress: "만드는 중... (%{done}/%{total})"
       save: 저장
