@@ -25,6 +25,14 @@ class Types::DiscussionCheckpointDateType < Types::BaseEnum
   value "override"
 end
 
+class Types::CheckpointLabelType < Types::BaseEnum
+  graphql_name "CheckpointLabelType"
+  description "Valid labels for discussion checkpoint types"
+
+  value CheckpointLabels::REPLY_TO_TOPIC
+  value CheckpointLabels::REPLY_TO_ENTRY
+end
+
 class Types::DiscussionCheckpointDateSetType < Types::BaseEnum
   graphql_name "DiscussionCheckpointDateSetType"
   description "Types of date set that can be set for discussion checkpoints"
@@ -58,7 +66,7 @@ class Mutations::DiscussionCheckpointDate < GraphQL::Schema::InputObject
 end
 
 class Mutations::DiscussionCheckpoints < GraphQL::Schema::InputObject
-  argument :checkpoint_label, String, required: true
+  argument :checkpoint_label, Types::CheckpointLabelType, required: true
   argument :dates, [Mutations::DiscussionCheckpointDate], required: true
   argument :points_possible, Integer, required: true
   argument :replies_required, Integer, required: false

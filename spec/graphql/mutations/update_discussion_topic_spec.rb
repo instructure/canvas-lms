@@ -164,7 +164,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     checkpoints_out = []
     checkpoints.each do |checkpoint|
       args = []
-      args << "checkpointLabel: \"#{checkpoint[:checkpointLabel]}\""
+      args << "checkpointLabel: #{checkpoint[:checkpointLabel]}"
       args << "pointsPossible: #{checkpoint[:pointsPossible]}"
       args << "repliesRequired: #{checkpoint[:repliesRequired]}" if checkpoint[:repliesRequired]
       args << checkpoints_dates_str(checkpoint[:dates])

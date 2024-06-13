@@ -1125,12 +1125,12 @@ describe Mutations::CreateDiscussionTopic do
         }
         checkpoints: [
           {
-            checkpointLabel: "reply_to_topic",
+            checkpointLabel: reply_to_topic,
             pointsPossible: 10,
             dates: [{ type: everyone, dueAt: "#{5.days.from_now.iso8601}" }]
           },
           {
-            checkpointLabel: "reply_to_entry",
+            checkpointLabel: reply_to_entry,
             pointsPossible: 15,
             dates: [{ type: everyone, dueAt: "#{10.days.from_now.iso8601}" }],
             repliesRequired: 3
@@ -1175,12 +1175,12 @@ describe Mutations::CreateDiscussionTopic do
         }
         checkpoints: [
           {
-            checkpointLabel: "reply_to_topic",
+            checkpointLabel: reply_to_topic,
             pointsPossible: 10,
             dates: [{ type: everyone, dueAt: "#{due_at.iso8601}", lockAt: "#{lock_at.iso8601}", unlockAt: "#{unlock_at.iso8601}" }]
           },
           {
-            checkpointLabel: "reply_to_entry",
+            checkpointLabel: reply_to_entry,
             pointsPossible: 15,
             dates: [{ type: everyone, dueAt: "#{10.days.from_now.iso8601}" }],
             repliesRequired: 3
@@ -1222,12 +1222,12 @@ describe Mutations::CreateDiscussionTopic do
         }
         checkpoints: [
           {
-            checkpointLabel: "reply_to_topic",
+            checkpointLabel: reply_to_topic,
             pointsPossible: 10,
             dates: [{ type: everyone, dueAt: "#{5.days.from_now.iso8601}" }]
           },
           {
-            checkpointLabel: "reply_to_entry",
+            checkpointLabel: reply_to_entry,
             pointsPossible: 15,
             dates: [
               { type: everyone, dueAt: "#{10.days.from_now.iso8601}" },
@@ -1290,12 +1290,12 @@ describe Mutations::CreateDiscussionTopic do
         }
         checkpoints: [
           {
-            checkpointLabel: "reply_to_topic",
+            checkpointLabel: reply_to_topic,
             pointsPossible: 10,
             dates: [{ type: everyone, dueAt: "#{5.days.from_now.iso8601}" }]
           },
           {
-            checkpointLabel: "reply_to_entry",
+            checkpointLabel: reply_to_entry,
             pointsPossible: 15,
             dates: [
               { type: everyone, dueAt: "#{10.days.from_now.iso8601}" },
@@ -1353,12 +1353,12 @@ describe Mutations::CreateDiscussionTopic do
         }
         checkpoints: [
           {
-            checkpointLabel: "reply_to_topic",
+            checkpointLabel: reply_to_topic,
             pointsPossible: 10,
             dates: [{ type: everyone, dueAt: "#{5.days.from_now.iso8601}" }]
           },
           {
-            checkpointLabel: "reply_to_entry",
+            checkpointLabel: reply_to_entry,
             pointsPossible: 15,
             dates: [
               { type: everyone, dueAt: "#{10.days.from_now.iso8601}" },
