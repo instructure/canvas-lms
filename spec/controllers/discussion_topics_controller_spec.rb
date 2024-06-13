@@ -196,6 +196,37 @@ describe DiscussionTopicsController do
       end
     end
 
+    context "only_announcement param is set to true" do
+      before do
+        @active_ann1 = @course.announcements.create!(title: "announcement1", message: "Test without lock_at or unlock_at set", user: @teacher)
+        @active_ann2 = @course.announcements.create!(title: "announcement2", message: "Test with lock_at in thepast and unlock_at in the future", user: @teacher, unlock_at: 1.day.ago, lock_at: 1.day.from_now)
+        @inactive_ann1 = @course.announcements.create!(title: "announcement3", message: "Test with both lock_at and unlock_at in the future", user: @teacher, unlock_at: 1.day.from_now, lock_at: 2.days.from_now)
+        @inactive_ann2 = @course.announcements.create!(title: "announcement4", message: "Test with both lock_at and unlock_at in the past", user: @teacher, unlock_at: 2.days.ago, lock_at: 1.day.ago)
+
+        user_session(@student)
+      end
+
+      it "returns the only active announcements for a student" do
+        get :index, params: { course_id: @course.id, only_announcements: true }, format: :json
+        expect(assigns["topics"].size).to eq(2)
+        expect(assigns["topics"]).to include(@active_ann1)
+        expect(assigns["topics"]).to include(@active_ann2)
+        expect(assigns["topics"]).not_to include(@inactive_ann1)
+        expect(assigns["topics"]).not_to include(@inactive_ann2)
+      end
+
+      it "returns both active and inactive announcements for a teacher" do
+        user_session(@teacher)
+
+        get :index, params: { course_id: @course.id, only_announcements: true }, format: :json
+        expect(assigns["topics"].size).to eq(4)
+        expect(assigns["topics"]).to include(@active_ann1)
+        expect(assigns["topics"]).to include(@active_ann2)
+        expect(assigns["topics"]).to include(@inactive_ann1)
+        expect(assigns["topics"]).to include(@inactive_ann2)
+      end
+    end
+
     context "cross-sharding" do
       specs_require_sharding
 

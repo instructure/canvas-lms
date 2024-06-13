@@ -147,25 +147,6 @@
           {{/if}}
           {{#if contextIsCourse}}
           {{#if isAnnouncement}}
-          <div><label class="checkbox short-label delay_post_at_date" for="delay_posting">
-              {{checkbox "delay_posting"
-              checked=delayed_post_at
-              class="element_toggler"
-              aria-controls="discussion_topic_delay_post_container"}}
-              {{#t "delay_posting"}}Delay posting{{/t}}
-            </label></div>
-          <label class="screenreader-only" id="discussion_topic_delay_post_accessible_label">
-            {{#t}}Delay posting this topic until{{/t}}
-            {{datepickerScreenreaderPrompt}}
-          </label>
-          <div><label id="discussion_topic_delay_post_container" style="{{hiddenUnless delayed_post_at}}"
-              class="checkbox short-label">
-              {{#t "post_at"}}Post At{{/t}}
-              <input type="text" class="datetime_field input-medium delay_post_at_date" name="delayed_post_at"
-                value="{{datetimeFormattedWithTz delayed_post_at}}"
-                aria-labelledby="discussion_topic_delay_post_accessible_label"
-                data-tooltip='{"position":"top","force_position":"true"}' title="{{accessibleDateFormat}}" />
-            </label></div>
           {{#unless announcementsLocked}}
           {{#unless homeroomCourse}}
           <div><label class="checkbox short-label" for="allow_user_comments">
@@ -269,8 +250,10 @@
     <div id="group_category_options" class="control-group" style="width: 295px"></div>
     {{/if}}
     {{/unless}}
+    {{/if}}
 
-    {{#if contextIsCourse}}
+
+    {{#ifAny contextIsCourse isAnnouncement}}
     <div id="availability_options" style="{{hiddenIf set_assignment}}">
       <fieldset>
         <div class="control-group" style="margin-left: -66px">
@@ -278,11 +261,15 @@
             {{#t "available_from"}}Available From{{/t}}
           </label>
           <label class="screenreader-only" id="discussion_topic_available_from_accessible_label">
+            {{#if isAnnouncement}}
+            {{#t}}Announcement will be available starting at{{/t}}
+            {{else}}
             {{#t}}Discussion Topic will be available starting at{{/t}}
+            {{/if}}
             {{datepickerScreenreaderPrompt}}
           </label>
           <div class="controls">
-            <input type="text" class="datetime_field input-medium" style="width: 150px" name="delayed_post_at"
+            <input type="text" class="datetime_field input-medium delay_post_at_date" style="width: 150px" name="delayed_post_at"
               id="delayed_post_at" aria-labelledby="discussion_topic_available_from_accessible_label" {{! TODO: what
               would be the best way to get this formatted right? }} value="{{datetimeFormatted delayed_post_at}}"
               data-tooltip='{"position":"top","force_position":"true"}' {{#unless lockedItems.availability_dates}}
@@ -291,12 +278,16 @@
         </div>
       </fieldset>
 
-      {{#if isTopic}}
+      {{#ifAny isTopic isAnnouncement}}
       <fieldset>
         <div class="control-group" style="margin-left: -66px">
           <label class="control-label" for="lock_at">{{#t "until"}}Until{{/t}}</label>
           <label class="screenreader-only" id="discussion_topic_available_until_accessible_label">
+            {{#if isAnnouncement}}
+            {{#t}}Announcement will be available until{{/t}}
+            {{else}}
             {{#t}}Discussion Topic will be available until{{/t}}
+            {{/if}}
             {{datepickerScreenreaderPrompt}}
           </label>
           <div class="controls">
@@ -308,10 +299,9 @@
           </div>
         </div>
       </fieldset>
-      {{/if}}
+      {{/ifAny}}
     </div>
-    {{/if}}
-    {{/if}}
+    {{/ifAny}}
 
     {{#if showAssignment}}
     <div id="assignment_options" style="{{hiddenUnless set_assignment}}">
