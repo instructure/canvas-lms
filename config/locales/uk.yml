@@ -12876,6 +12876,10 @@ uk:
         upload_ui_conf: "Ідентифікатор конфігурації додавання UI "
         user_secret_key: "Ключ користувача"
       ui_conf_ids: "Для клієнтів, що обслуговуються Kaltura, ви можете попросити Kaltura надати вам ці ідентифікатори. Самостійні приклади можуть знаходити ці значення в таблиці ui_confs."
+    learn_platform_settings: 
+      labels: 
+        base_url: "Основний URL"
+        token: "Маркер доступу"
     linked_in: 
       description: "LinkedIn інтеграція"
     linked_in_settings: 
@@ -14701,6 +14705,7 @@ uk:
       create_group: "Створити групу"
       create_question: "Створити запитання"
       creating_group: "Створення групи..."
+      generate: Генерувати
       generating: Генерується...
       generating_combinations_progress: "Генерується... (%{done}/%{total})"
       save: Зберегти
@@ -15881,6 +15886,8 @@ uk:
       titles: 
         mastery_level: "вищий відсоток, який встановлює майстерність"
         select_and_add_criterion: "Обрати та додати критерій"
+    flash_notices: 
+      close: Закрити
     footer_links: 
       facebook: Facebook
       privacy_policy: "Політика конфіденційності"
