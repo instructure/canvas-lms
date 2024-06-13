@@ -168,22 +168,25 @@ module Interfaces::SubmissionInterface
     all_comments, for_attempt, peer_review = filter.values_at(:all_comments, :for_attempt, :peer_review)
 
     load_association(:assignment).then do
-      scope = include_draft_comments ? submission.comments_including_drafts_for(current_user) : submission.comments_excluding_drafts_for(current_user)
-      unless all_comments
-        target_attempt = for_attempt || submission.attempt || 0
-        if target_attempt <= 1
-          target_attempt = [nil, 0, 1] # Submission 0 and 1 share comments
-        end
-        scope = scope.where(attempt: target_attempt)
+      load_association(:submission_comments).then do
+        comments = include_draft_comments ? submission.comments_including_drafts_for(current_user) : submission.comments_excluding_drafts_for(current_user)
 
-        if peer_review
-          scope = scope.where(author: current_user)
-        end
+        comments = comments.select { |comment| comment.attempt.in?(attempt_filter(for_attempt)) } unless all_comments
+        comments = comments.select { |comment| comment.author == current_user } if peer_review && !all_comments
+        comments = comments.sort_by { |comment| [comment.created_at.to_i, comment.id] } if sort_order.present?
+        comments.reverse! if sort_order.to_s.casecmp("desc").zero?
+
+        comments.select { |comment| comment.grants_right?(current_user, :read) }
       end
-      scope = scope.reorder(created_at: sort_order) if sort_order
-      scope.select { |comment| comment.grants_right?(current_user, :read) }
     end
   end
+
+  def attempt_filter(for_attempt)
+    target_attempt = for_attempt || submission.attempt || 0
+    target_attempt = [nil, 0, 1] if target_attempt <= 1 # Submission 0 and 1 share comments
+    target_attempt.is_a?(Array) ? target_attempt : [target_attempt]
+  end
+  private :attempt_filter
 
   field :score, Float, null: true
   def score
@@ -450,8 +453,6 @@ module Interfaces::SubmissionInterface
 
   field :word_count, Float, null: true
   delegate :word_count, to: :object
-
-  private
 
   def version_query_param(submission)
     if submission.attempt.present? && submission.attempt > 0
