@@ -42,7 +42,7 @@ QUnit.module('UploadFileView', {
     this.file = (function () {
       const dfd = $.Deferred()
       const xhr = new XMLHttpRequest()
-      xhr.open('GET', '/base/spec/javascripts/fixtures/pug.jpg')
+      xhr.open('GET', '/base/spec/fixtures/pug.jpg')
       xhr.responseType = 'blob'
       xhr.onload = function (e) {
         const response = BlobFactory.fromXHR(this.response, 'image/jpeg')

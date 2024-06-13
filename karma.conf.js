@@ -113,12 +113,12 @@ const karmaConfig = {
   singleRun: false,
 
   files: [
-    {pattern: 'spec/javascripts/webpack_spec_index.js', included: true, served: true},
-    {pattern: 'spec/javascripts/fixtures/*', included: false, served: true},
+    {pattern: 'ui-build/webpack-for-karma/webpack_spec_index.js', included: true, served: true},
+    {pattern: 'spec/fixtures/*', included: false, served: true},
   ].concat(process.env.JSPEC_PATH ? process.env.JSPEC_PATH.split(' ') : []),
 
   preprocessors: {
-    'spec/javascripts/webpack_spec_index.js': ['webpack'],
+    'ui-build/webpack-for-karma/webpack_spec_index.js': ['webpack'],
     '**/*Spec.js': ['webpack'],
     '**/*Spec.jsx': ['webpack'],
   },
