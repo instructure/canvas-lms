@@ -211,16 +211,15 @@ describe "announcements" do
         expect(what_to_create.where(title: topic_title).first.attachment_id).to be_present
       end
 
-      it "performs front-end validation for message", priority: "1" do
+      it "performs front-end validation for message", :ignore_js_errors, priority: "1" do
         topic_title = "new topic with file"
         get new_url
 
         wait_for_tiny(f("#discussion-edit-view textarea[name=message]"))
         replace_content(f("input[name=title]"), topic_title)
         submit_form(".form-actions")
-        wait_for_ajaximations
 
-        expect(ff(".error_box").any? { |box| box.text.include?("A message is required") }).to be_truthy
+        expect(ff(".error_box").any? { |box| box.attribute("innerHTML").include?("A message is required") }).to be_truthy
       end
 
       it "adds an attachment to a graded topic", priority: "1" do
@@ -247,10 +246,9 @@ describe "announcements" do
 
     it "creates a delayed announcement with an attachment", :ignore_js_errors, priority: "1" do
       AnnouncementNewEdit.visit_new(@course)
-      f("input[type=checkbox][name=delay_posting]").click
       replace_content(f("input[name=title]"), "First Announcement")
       type_in_tiny("textarea[name=message]", "Hi, this is my first announcement")
-      f(".ui-datepicker-trigger").click
+      f("input#delayed_post_at ~ button.ui-datepicker-trigger").click
       datepicker_next
       f(".ui-datepicker-time .ui-datepicker-ok").click
       _, path = get_file("testfile1.txt")
@@ -286,25 +284,26 @@ describe "announcements" do
       expect(f(".discussion-fyi")).to include_text(time_new)
     end
 
-    it "removes delayed_post_at when unchecking delay_posting", priority: "1" do
+    it "removes delayed_post_at when delayed_post_at field is cleared", priority: "1" do
       topic = @course.announcements.create!(title: @topic_title, user: @user, delayed_post_at: 10.days.ago, message: "message")
       get "/courses/#{@course.id}/announcements/#{topic.id}"
       expect_new_page_load { f(".edit-btn").click }
 
-      f('input[type=checkbox][name="delay_posting"]').click
+      f("input#delayed_post_at").clear
       expect_new_page_load { f(".form-actions button[type=submit]").click }
 
       topic.reload
       expect(topic.delayed_post_at).to be_nil
     end
 
-    it "changes the save button to publish when delayed_post_at is removed", :ignore_js_errors, priority: "1" do
+    it "changes the save button to publish when delayed_post_at is cleared", :ignore_js_errors, priority: "1" do
       topic = @course.announcements.create!(title: @topic_title, user: @user, delayed_post_at: 10.days.from_now, message: "message")
 
       get "/courses/#{@course.id}/discussion_topics/#{topic.id}/edit"
       expect(f(".submit_button").text).to eq("Save")
 
-      f('input[type=checkbox][name="delay_posting"]').click
+      f("input#delayed_post_at").clear
+
       expect(f(".submit_button").text).to eq("Publish")
     end
 

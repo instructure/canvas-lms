@@ -353,7 +353,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     if params[:only_announcements] && !@context.grants_any_right?(@current_user, :manage, :read_course_content)
-      scope = scope.active.where("(unlock_at IS NULL AND delayed_post_at IS NULL) OR (unlock_at<? OR delayed_post_at<?)", Time.now.utc, Time.now.utc)
+      scope = scope.active.where("((unlock_at IS NULL AND delayed_post_at IS NULL) OR (unlock_at<? OR delayed_post_at<?)) AND ( lock_at IS NULL OR lock_at>?)", Time.now.utc, Time.now.utc, Time.now.utc)
     end
 
     per_page = params[:per_page] || 100
