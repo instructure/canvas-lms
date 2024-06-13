@@ -2808,7 +2808,7 @@ class User < ActiveRecord::Base
   end
 
   def self.default_storage_quota
-    Setting.get("user_default_quota", 50.megabytes.to_s).to_i
+    Setting.get("user_default_quota", 50.decimal_megabytes.to_s).to_i
   end
 
   def update_last_user_note

@@ -1703,13 +1703,13 @@ describe Account do
 
       expect(Account).to receive(:invalidate_inherited_caches).once
 
-      account.default_storage_quota = 10.megabytes
+      account.default_storage_quota = 10.decimal_megabytes
       account.save! # clear here
 
       account.reload
       account.save!
 
-      account.default_storage_quota = 10.megabytes
+      account.default_storage_quota = 10.decimal_megabytes
       account.save!
     end
 
@@ -1717,21 +1717,21 @@ describe Account do
       enable_cache do
         account = account_model
 
-        account.default_storage_quota = 10.megabytes
+        account.default_storage_quota = 10.decimal_megabytes
         account.save!
 
         subaccount = account.sub_accounts.create!
-        expect(subaccount.default_storage_quota).to eq 10.megabytes
+        expect(subaccount.default_storage_quota).to eq 10.decimal_megabytes
 
-        account.default_storage_quota = 20.megabytes
+        account.default_storage_quota = 20.decimal_megabytes
         account.save!
 
         # should clear caches
         account = Account.find(account.id)
-        expect(account.default_storage_quota).to eq 20.megabytes
+        expect(account.default_storage_quota).to eq 20.decimal_megabytes
 
         subaccount = Account.find(subaccount.id)
-        expect(subaccount.default_storage_quota).to eq 20.megabytes
+        expect(subaccount.default_storage_quota).to eq 20.decimal_megabytes
       end
     end
 
@@ -1741,7 +1741,7 @@ describe Account do
 
         sub1 = account.sub_accounts.create!
         sub2 = account.sub_accounts.create!
-        sub2.update(default_storage_quota: 10.megabytes)
+        sub2.update(default_storage_quota: 10.decimal_megabytes)
 
         to_be_subaccount = sub1.sub_accounts.create!
         expect(to_be_subaccount.default_storage_quota).to eq Account::DEFAULT_STORAGE_QUOTA
@@ -1750,7 +1750,7 @@ describe Account do
         Timecop.travel(1.second.from_now) do
           to_be_subaccount.update(parent_account: sub2)
           to_be_subaccount = Account.find(to_be_subaccount.id)
-          expect(to_be_subaccount.default_storage_quota).to eq 10.megabytes
+          expect(to_be_subaccount.default_storage_quota).to eq 10.decimal_megabytes
         end
       end
     end

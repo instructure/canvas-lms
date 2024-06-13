@@ -786,7 +786,7 @@ class Attachment < ActiveRecord::Base
   end
 
   MINIMUM_SIZE_FOR_QUOTA = 512
-  CONTEXT_DEFAULT_QUOTA = 50.megabytes
+  CONTEXT_DEFAULT_QUOTA = 50.decimal_megabytes
 
   def self.get_quota(context)
     quota = 0
