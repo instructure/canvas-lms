@@ -75,7 +75,7 @@
     "@instructure/ui-spinner": "^8",
     "@instructure/ui-svg-images": "^8",
     "@instructure/ui-table": "^8",
-    "@instructure/ui-tabs": "^8",
+    "@instructure/ui-tabs": "^8.56.1",
     "@instructure/ui-tag": "^8",
     "@instructure/ui-text": "^8",
     "@instructure/ui-text-area": "^8",
