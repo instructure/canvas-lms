@@ -51,7 +51,16 @@ module Api::V1::WikiPage
     end
     locked_json(hash, wiki_page, current_user, "page", deep_check_if_needed: opts[:deep_check_if_needed])
     if include_body && !hash["locked_for_user"] && !hash["lock_info"]
-      hash["body"] = api_user_content(wiki_page.body, wiki_page.context)
+      if @context.account.feature_enabled?(:block_editor)
+        block_editor = wiki_page.block_editor
+        hash["block_editor_attributes"] = {
+          id: block_editor&.id,
+          version: block_editor&.editor_version,
+          blocks: block_editor&.blocks
+        }
+      else
+        hash["body"] = api_user_content(wiki_page.body, wiki_page.context)
+      end
       wiki_page.context_module_action(current_user, wiki_page.context, :read)
     end
     if opts[:master_course_status]

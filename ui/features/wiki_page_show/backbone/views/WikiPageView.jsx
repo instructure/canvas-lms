@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react'
+import React, {Suspense} from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import 'jquery-scroll-to-visible'
@@ -37,6 +37,8 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {renderFrontPagePill} from '@canvas/wiki/react/renderFrontPagePill'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+
+import {renderBlockEditorView} from '@canvas/block-editor'
 
 const I18n = useI18nScope('pages')
 
@@ -190,8 +192,18 @@ export default class WikiPageView extends Backbone.View {
     }
   }
 
+  renderBlockEditorContent() {
+    if (ENV.BLOCK_EDITOR && this.model.get('block_editor_attributes')?.blocks?.[0]?.data) {
+      const container = document.getElementById('block-editor-content')
+      container.classList.add('block-editor-view')
+      const content = JSON.parse(this.model.get('block_editor_attributes').blocks[0].data)
+      renderBlockEditorView(content, container)
+    }
+  }
+
   afterRender() {
     super.afterRender(...arguments)
+    this.renderBlockEditorContent()
     this.navigateToLinkAnchor()
     this.reloadView = new WikiPageReloadView({
       el: this.$pageChangedAlert,
@@ -321,6 +333,14 @@ export default class WikiPageView extends Backbone.View {
   toJSON() {
     const json = super.toJSON(...arguments)
     json.page_id = this.model.get('page_id')
+    if (ENV.BLOCK_EDITOR && json.block_editor_attributes?.blocks?.[0]?.data) {
+      json.body = '<div id="block-editor-content"></div>'
+      // json.body = `<pre>${JSON.stringify(
+      //   JSON.parse(json.block_editor_attributes.blocks[0].data),
+      //   null,
+      //   2
+      // )}</pre>`
+    }
     json.modules_path = this.modules_path
     json.wiki_pages_path = this.wiki_pages_path
     json.wiki_page_edit_path = this.wiki_page_edit_path

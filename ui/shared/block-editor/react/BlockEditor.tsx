@@ -16,80 +16,102 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
+import {Editor, Frame} from '@craftjs/core'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import EditorJS from '@editorjs/editorjs'
-import Header from '@editorjs/header'
-// @ts-expect-error
-import NestedList from '@editorjs/nested-list'
-// @ts-expect-error
-import Paragraph from '@editorjs/paragraph'
-// @ts-expect-error // todo fix these type errors plz
-import Quote from '@editorjs/quote'
-
+import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
+import {Toolbox} from './components/editor/Toolbox'
+import {Topbar} from './components/editor/Topbar'
+import {blocks} from './components/blocks'
+import {NewPageStepper} from './components/editor/NewPageStepper'
+import {RenderNode} from './components/editor/RenderNode'
+
+import './style.css'
 
 const I18n = useI18nScope('block-editor')
 
-export default function BlockEditor() {
-  const editor = useRef<EditorJS | null>(null)
+const DEFAULT_CONTENT = JSON.stringify({
+  ROOT: {
+    type: {
+      resolvedName: 'PageBlock',
+    },
+    isCanvas: true,
+    props: {},
+    displayName: 'Page',
+    custom: {},
+    hidden: false,
+    nodes: [],
+    linkedNodes: {},
+  },
+})
 
-  React.useEffect(() => {
-    editor.current = new EditorJS({
-      holder: 'canvas-block-editor',
-      tools: {
-        header: {
-          // @ts-expect-error
-          class: Header,
-          inlineToolbar: true,
-        },
-        list: {
-          class: NestedList,
-          inlineToolbar: true,
-          config: {
-            defaultStyle: 'unordered',
-          },
-        },
-        paragraph: {
-          class: Paragraph,
-          inlineToolbar: false,
-        },
-        quote: {
-          class: Quote,
-          config: {
-            quotePlaceholder: 'Enter your quote here',
-          },
-        },
-      },
-      defaultBlock: 'paragraph',
-      placeholder: I18n.t('Press tab for more options'),
-    })
-    window.block_editor = editor.current
+type BlockEditorProps = {
+  enabled?: boolean
+  version: string
+  content: string
+}
+
+export default function BlockEditor({enabled = true, version, content}: BlockEditorProps) {
+  const [json] = useState(content || DEFAULT_CONTENT)
+  const [toolboxOpen, setToolboxOpen] = useState(true)
+  const [stepperOpen, setStepperOpen] = useState(!content)
+
+  useEffect(() => {
+    if (version !== '1') {
+      // eslint-disable-next-line no-alert
+      alert('wrong version, mayhem may ensue')
+    }
+  }, [json, version])
+
+  const handleNodesChange = useCallback(query => {
+    window.block_editor = query
+    // const json = query.serialize()
+    // console.log(JSON.parse(json))
+  }, [])
+
+  const handleCloseToolbox = useCallback(() => {
+    setToolboxOpen(false)
+  }, [])
+
+  const handleOpenToolbox = useCallback((open: boolean) => {
+    setToolboxOpen(open)
+  }, [])
+
+  const handleCloseStepper = useCallback(() => {
+    setStepperOpen(false)
   }, [])
 
   return (
     <View
-      as="span"
+      as="div"
+      className="block-editor-editor"
       display="inline-block"
+      position="relative"
       width="100%"
       maxWidth="100%"
-      margin="small"
       padding="small"
-      background="primary"
       shadow="above"
       borderRadius="large large none none"
     >
-      <style>
-        {`
-        .ce-block__content {
-          max-width: 95%;
-        }
-        .ce-toolbar__content {
-          max-width: 95%;
-        }
-      `}
-      </style>
-      <div id="canvas-block-editor" data-testid="canvas-block-editor" />
+      <Editor
+        enabled={enabled}
+        resolver={blocks}
+        onNodesChange={handleNodesChange}
+        onRender={RenderNode}
+      >
+        <Flex direction="column" alignItems="stretch" justifyItems="start" gap="small" width="100%">
+          <Flex.Item shouldGrow={false}>
+            <Topbar onToolboxChange={handleOpenToolbox} toolboxOpen={toolboxOpen} />
+          </Flex.Item>
+          <Flex.Item id="editor-area" shouldGrow={true}>
+            <Frame data={json} />
+          </Flex.Item>
+        </Flex>
+
+        <Toolbox open={toolboxOpen} onClose={handleCloseToolbox} />
+        <NewPageStepper open={stepperOpen} onDismiss={handleCloseStepper} />
+      </Editor>
     </View>
   )
 }
