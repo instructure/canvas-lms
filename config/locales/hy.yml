@@ -12140,6 +12140,10 @@ hy:
         upload_ui_conf: "UI կոնֆիգուրացիայի բեռնիչի նույնականացուցիչ"
         user_secret_key: "Օգտատիրոջ գաղտնի բանալի"
       ui_conf_ids: "Kaltura-ում տեղադրած հաճախորդները կարող են դիմել Kaltura-ին՝ տրամադրելու այդ նույնականացուցիչները: Ինքնուրույն կերպով տեղադրված օրինակների համար այդ մեծությունները հասանելի են ui_confs աղյուսակում: "
+    learn_platform_settings: 
+      labels: 
+        base_url: "Բազային URL-հասցե"
+        token: "Հասանելիության token "
     linked_in: 
       description: "LinkedIn ինտեգրում"
     linked_in_settings: 
@@ -14061,6 +14065,7 @@ hy:
       create_group: "Ստեղծել խումբ"
       create_question: "Ստեղծել հարց"
       creating_group: "Ստեղծվում է խումբ..."
+      generate: Ստեղծել
       generating: "Գեներացվում է..."
       generating_combinations_progress: "Ստեղծվում է ... (%{done}/%{total})"
       save: Պահպանել
