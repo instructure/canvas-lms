@@ -184,12 +184,14 @@ class EffectiveDueDates
 
       modules AS (
         SELECT
+          a.id AS item_assignment_id,
           m.id
         FROM
+          models a,
           tags t
         INNER JOIN #{ContextModule.quoted_table_name} m ON m.id = COALESCE(t.context_module_id, t.quiz_context_module_id, t.discussion_context_module_id)
-        WHERE
-          m.workflow_state <>'deleted'
+        WHERE m.workflow_state <>'deleted'
+          AND a.id = COALESCE(t.content_id, t.quiz_assignment_id, t.discussion_assignment_id)
       ),
 
       module_overrides AS (
@@ -217,7 +219,9 @@ class EffectiveDueDates
 
   def visible_to_everyone
     if Account.site_admin.feature_enabled?(:selective_release_backend)
-      "a.only_visible_to_overrides IS NOT TRUE AND (NOT EXISTS (SELECT * FROM modules) OR EXISTS (
+      "a.only_visible_to_overrides IS NOT TRUE AND (NOT EXISTS (
+        SELECT 1 FROM modules m WHERE m.item_assignment_id = a.id AND m.id IS NOT NULL
+        ) OR EXISTS (
         SELECT
           *
         FROM
