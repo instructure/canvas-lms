@@ -14443,6 +14443,10 @@ tr:
         upload_ui_conf: "UI Conf ID Yükleyicisi"
         user_secret_key: "User Secret"
       ui_conf_ids: "Kaltura'da hesabı olan müşterile için, Kaltura'dan size bu id'leri vermesini isteyebilirsiniz. Kendi kaltura sunucusu olanlar bu değerleri ui_confs tablosunda bulabilirler."
+    learn_platform_settings: 
+      labels: 
+        base_url: "Temel URL"
+        token: "Erişim Anahtarı"
     linked_in: 
       description: "LinkedIn entegrasyonu"
     linked_in_settings: 
@@ -16473,6 +16477,7 @@ tr:
       create_group: "Grup Oluştur"
       create_question: "Soru Yarat"
       creating_group: "Grup Oluşturuluyor..."
+      generate: Oluştur
       generating: Oluşturuluyor...
       generating_combinations_progress: "Üretiliyor...(%{done}/%{total})"
       save: Kaydet
