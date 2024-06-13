@@ -74,10 +74,13 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
   end
 
   def find_suitable_content_export(source, cm)
+    return unless cm.user_id.nil?
+
     candidate_exports = source.content_exports
                               .where(export_type: ContentExport::COURSE_COPY,
                                      workflow_state: "exported_for_course_copy",
-                                     created_at: source.updated_at..)
+                                     created_at: source.updated_at..,
+                                     user_id: nil)
                               .order(id: :desc)
                               .limit(5)
                               .to_a
