@@ -10882,6 +10882,10 @@ el:
         upload_ui_conf: "ID Ρύθμισης Uploader UI"
         user_secret_key: "Μυστικό Χρήστη"
       ui_conf_ids: "<mrk mid=\"2397\" mtype=\"seg\">Για πελάτες που φιλοξενούνται στο Kaltura, μπορείτε να ζητήσετε από το Kaltura να σας δώσει αυτά τα id.</mrk> <mrk mid=\"2398\" mtype=\"seg\">Για αυτόνομες συνδέσεις, αυτά τα id μπορούν να βρεθούν στον πίνακα ui_confs.</mrk>"
+    learn_platform_settings: 
+      labels: 
+        base_url: "URL βάσης"
+        token: "Token Πρόσβασης"
     linked_in: 
       description: "Ενσωμάτωση LinkedIn"
     linked_in_settings: 
@@ -12562,6 +12566,7 @@ el:
       create_group: "Δημιουργία Ομάδας"
       create_question: "Δημιουργία Ερώτησης"
       creating_group: "Γίνεται δημιουργία Ομάδας..."
+      generate: Δημιουργία
       generating: Δημιουργία...
       generating_combinations_progress: "<mrk mid=\"2593\" mtype=\"seg\">Δημιουργία...</mrk> <mrk mid=\"2594\" mtype=\"seg\">(%{done}/%{total})</mrk>"
       save: Αποθήκευση
@@ -13538,6 +13543,8 @@ el:
       titles: 
         mastery_level: "ποσοστό πάνω από το οποίο ορίζεται το επίπεδο επιδεξιότητας"
         select_and_add_criterion: "Επιλογή και Προσθήκη Κριτηρίου"
+    flash_notices: 
+      close: Κλείσιμο
     footer_links: 
       facebook: Facebook
       privacy_policy: "Πολιτική Απορρήτου"
