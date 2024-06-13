@@ -18092,6 +18092,10 @@ hu:
         upload_ui_conf: "Feltöltő UI Conf ID"
         user_secret_key: "Felhasználói titkos kód"
       ui_conf_ids: "A Kaltura által hosztolt ügyfelek részére a Kaltura biztosítja ezeket az azonosítókat. A saját üzemeltetésű rendszerek esetén ezek az értékek a  ui_confs táblában találhatóak."
+    learn_platform_settings: 
+      labels: 
+        base_url: "Alap URL"
+        token: "Hozzáférési token"
     linked_in: 
       description: LinkedIn-integráció
     linked_in_settings: 
@@ -19901,6 +19905,7 @@ hu:
       create_group: "Csoport készítése"
       create_question: "Kérdés létrehozása"
       creating_group: "Csoport létrehozása..."
+      generate: Generálás
       generating: Generálás...
       generating_combinations_progress: "Generálás... (%{done}/%{total})"
       save: Mentés
@@ -21138,6 +21143,8 @@ hu:
       titles: 
         mastery_level: "százalék, ami felett a jártassági szint beállítható"
         select_and_add_criterion: "Kritérium kiválasztása és hozzáadása"
+    flash_notices: 
+      close: Bezár
     footer_links: 
       facebook: Facebook
       privacy_policy: "Adatvédelmi irányelvek"
