@@ -16,25 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gql from 'graphql-tag'
-import {CourseDashboardCard} from './CourseDashboardCard'
+interface HasPosition {
+  position: number | undefined
+}
 
-const dashcard_query_enabled = !!ENV?.FEATURES?.dashboard_graphql_integration
-
-export const LOAD_DASHBOARD_CARDS_QUERY = gql`
-  query GetDashboardCards($userID: ID!, $observedUserId: ID = null) {
-    legacyNode(_id: $userID, type: User) {
-      ... on User {
-        favoriteCoursesConnection {
-          nodes {
-            _id
-            dashboardCard(dashboardFilter: {observedUserId: $observedUserId}) {
-              ...CourseDashboardCard @include(if: ${dashcard_query_enabled})
-            }
-          }
-        }
-      }
-    }
-  }
-  ${CourseDashboardCard.fragment}
-`
+export function sortByPosition(a: HasPosition, b: HasPosition) {
+  const positionA = a.position !== undefined ? a.position : Infinity
+  const positionB = b.position !== undefined ? b.position : Infinity
+  if (positionA === positionB) return 0
+  return positionA - positionB
+}

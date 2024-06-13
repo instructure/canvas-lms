@@ -35,18 +35,18 @@ export async function fetchDashboardCardsAsync(params: DashboardQueryKeyParams):
   }
 
   const data = await executeQuery<any>(LOAD_DASHBOARD_CARDS_QUERY, {userID, observedUserID})
-
   return data
 }
 
 export function mapDashboardResponseToCard(data: any): Card[] {
-  return data.legacyNode.enrollments.map((enrollment: any) => {
-    const card = enrollment.course.dashboardCard
+  return data?.legacyNode?.favoriteCoursesConnection.nodes.map((node: any) => {
+    const course_id = node._id
+    const card = node.dashboardCard
     return {
       shortName: card.shortName,
       originalName: card.originalName,
       courseCode: card.courseCode,
-      id: enrollment.course._id,
+      id: course_id,
       href: card.href,
       links: card.links,
       term: card.term.name !== 'Default Term' ? card.term.name : null,
