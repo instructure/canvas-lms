@@ -22,9 +22,9 @@ import RichContentEditor from '../RichContentEditor'
 import * as RceCommandShim from '@canvas/rce-command-shim'
 import RCELoader from '../serviceRCELoader'
 import Sidebar from '../Sidebar'
-import fakeENV from '@canvas/common/fakeENV'
-import editorUtils from '@canvas/common/editorUtils'
-import fixtures from '@canvas/common/fixtures'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import editorUtils from '@canvas/rce/editorUtils'
+import fixtures from '@canvas/test-utils/fixtures'
 
 QUnit.module('RichContentEditor - helper function:')
 

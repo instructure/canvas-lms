@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
 import PaginatedCollection from '../PaginatedCollection'
-import getFakePage from '@canvas/common/getFakePage'
+import getFakePage from '@canvas/test-utils/getFakePage'
 
 QUnit.module('PaginatedCollection', {
   setup() {

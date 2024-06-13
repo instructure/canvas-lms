@@ -23,7 +23,7 @@ import ContentMigration from '@canvas/content-migrations/backbone/models/Content
 import CopyCourseView from '../CopyCourseView'
 import DateShiftView from '@canvas/content-migrations/backbone/views/DateShiftView'
 import SelectContentCheckboxView from '@canvas/content-migrations/backbone/views/subviews/SelectContentCheckboxView'
-import assertions from '@canvas/common/assertionsSpec'
+import assertions from '@canvas/test-utils/assertionsSpec'
 
 QUnit.module('CopyCourseView: Initializer', {
   setup() {

@@ -30,7 +30,7 @@ import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import moment from 'moment'
 
 const challenger = new Date('1986-01-28T16:39:00Z')

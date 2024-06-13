@@ -32,7 +32,7 @@ import SyllabusAppointmentGroupsCollection from '../../collections/SyllabusAppoi
 import SyllabusPlannerCollection from '../../collections/SyllabusPlannerCollection'
 import SyllabusView from '../SyllabusView'
 import SyllabusViewPrerendered from '@canvas/syllabus/SyllabusViewPrerendered'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.simulate'
 import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 

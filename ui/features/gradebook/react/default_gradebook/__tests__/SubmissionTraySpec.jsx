@@ -17,13 +17,13 @@
  */
 
 import moxios from 'moxios'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import 'jquery-migrate'
 import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
 import GradebookApi from '../apis/GradebookApi'
-import {waitFor} from '@canvas/common/Waiters'
+import {waitFor} from '@canvas/test-utils/Waiters'
 
 const $fixtures = document.getElementById('fixtures')
 

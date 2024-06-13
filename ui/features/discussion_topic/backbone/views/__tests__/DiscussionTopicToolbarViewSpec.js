@@ -21,7 +21,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import assertions from '@canvas/common/assertionsSpec'
+import assertions from '@canvas/test-utils/assertionsSpec'
 import DiscussionTopicToolbarView from '../DiscussionTopicToolbarView'
 
 const fixture = `\

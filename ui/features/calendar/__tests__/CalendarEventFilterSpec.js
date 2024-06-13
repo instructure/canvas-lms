@@ -18,7 +18,7 @@
 
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import CalendarEventFilter from '../CalendarEventFilter'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const test_events = (
   can_edit,

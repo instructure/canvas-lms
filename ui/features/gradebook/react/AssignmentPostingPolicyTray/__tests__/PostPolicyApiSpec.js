@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import MockCanvasClient from '@canvas/common/MockCanvasClient'
+import MockCanvasClient from '@canvas/test-utils/MockCanvasClient'
 import * as PostPolicyApi from '../../default_gradebook/PostPolicies/PostPolicyApi'
 
 QUnit.module('PostPolicyApi', () => {

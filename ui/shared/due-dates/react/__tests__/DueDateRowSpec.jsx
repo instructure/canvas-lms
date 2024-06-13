@@ -21,7 +21,7 @@ import 'jquery-migrate'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import DueDateRow from '../DueDateRow'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 QUnit.module('DueDateRow with empty props and canDelete true', {
   setup() {

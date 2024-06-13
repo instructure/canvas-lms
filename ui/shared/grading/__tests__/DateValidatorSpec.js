@@ -17,7 +17,7 @@
  */
 
 import DateValidator from '../DateValidator'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const DATE_IN_CLOSED_PERIOD = '2015-07-23T03:59:59Z'
 const DATE_IN_OPEN_PERIOD = '2015-09-23T03:59:59Z'

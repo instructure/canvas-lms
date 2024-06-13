@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import InvitationsView from '../InvitationsView'
 import RosterUser from '../../models/RosterUser'
-import assertions from '@canvas/common/assertionsSpec'
+import assertions from '@canvas/test-utils/assertionsSpec'
 
 QUnit.module('InvitationsView', {
   setup() {

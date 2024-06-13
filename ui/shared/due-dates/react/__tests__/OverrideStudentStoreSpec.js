@@ -18,7 +18,7 @@
 
 import _ from 'lodash'
 import OverrideStudentStore from '../OverrideStudentStore'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 QUnit.module('OverrideStudentStore', {
   setup() {

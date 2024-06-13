@@ -21,8 +21,8 @@ import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
 import PaginatedCollection from '../../collections/PaginatedCollection'
 import PaginatedCollectionView from '../PaginatedCollectionView'
-import fakePage from '@canvas/common/getFakePage'
-import fakeENV from '@canvas/common/fakeENV'
+import fakePage from '@canvas/test-utils/getFakePage'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 let server = null
 let clock = null

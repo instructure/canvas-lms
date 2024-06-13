@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import EditPlannerNoteDetails from '../EditPlannerNoteDetails'
 import tzInTest from '@instructure/moment-utils/specHelpers'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 
 const fixtures = $('#fixtures')

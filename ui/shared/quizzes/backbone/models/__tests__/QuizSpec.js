@@ -22,7 +22,7 @@ import Quiz from '../Quiz'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
 import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 QUnit.module('Quiz', {

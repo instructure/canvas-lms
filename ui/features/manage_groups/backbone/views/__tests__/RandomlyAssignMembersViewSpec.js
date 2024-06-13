@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import GroupCategoryView from '../GroupCategoryView'
 import GroupCategory from '@canvas/groups/backbone/models/GroupCategory'
-import '@canvas/common/fakeENV'
+import '@canvas/test-utils/fakeENV'
 
 let server = null
 let view = null

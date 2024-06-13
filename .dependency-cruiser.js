@@ -97,7 +97,7 @@ module.exports = {
         'module: add it to your package.json. In all other cases you likely already know what to do.',
       severity: 'error',
       from: {
-        pathNot: ['ui/shared/common/__tests__/momentSpec.js'],
+        pathNot: ['ui/shared/datetime/__tests__/momentSpec.js'],
       },
       to: {
         couldNotResolve: true,
@@ -225,7 +225,7 @@ module.exports = {
 
     includeOnly: ['ui', 'packages'],
 
-    exclude: ['ui/shared/common/__tests__/momentSpec.js'],
+    exclude: ['ui/shared/datetime/__tests__/momentSpec.js'],
 
     /* false (the default): ignore dependencies that only exist before typescript-to-javascript compilation
        true: also detect dependencies that only exist before typescript-to-javascript compilation

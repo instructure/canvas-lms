@@ -21,7 +21,7 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 /* eslint-disable object-shorthand */
 QUnit.module('GroupCategorySelector selection', {

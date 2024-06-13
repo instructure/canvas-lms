@@ -22,7 +22,7 @@ import coupleTimeFields from '../coupleTimeFields'
 import DatetimeField, {PARSE_RESULTS} from '@canvas/datetime/jquery/DatetimeField'
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 // make sure this is on today date but without seconds/milliseconds, so we
 // don't get screwed by dates shifting and seconds truncated during

@@ -21,9 +21,9 @@ import 'jquery-migrate'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import EditHeaderView from '../EditHeaderView'
 import editViewTemplate from '../../../jst/EditView.handlebars'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import Backbone from '@canvas/backbone'
-import assertions from '@canvas/common/assertionsSpec'
+import assertions from '@canvas/test-utils/assertionsSpec'
 
 const editHeaderView = function (
   assignmentOptions = {},

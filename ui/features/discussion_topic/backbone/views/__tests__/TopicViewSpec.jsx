@@ -18,7 +18,7 @@
 
 import TopicView from '../TopicView'
 import Backbone from '@canvas/backbone'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import DiscussionFilterState from '../../models/DiscussionFilterState'
 import ReactDOM from 'react-dom'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'

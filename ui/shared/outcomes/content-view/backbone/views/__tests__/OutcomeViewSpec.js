@@ -18,12 +18,12 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 import OutcomeContentBase from '../OutcomeContentBase'
 import Outcome from '../../../../backbone/models/Outcome'
 import OutcomeView from '../OutcomeView'
-import I18nStubber from '@canvas/common/I18nStubber'
+import I18nStubber from '@canvas/test-utils/I18nStubber'
 
 // stub function that creates the RCE to avoid
 // its async initializationa

@@ -28,10 +28,10 @@ import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
 import juneau from 'timezone/America/Juneau'
 import french from 'timezone/fr_FR'
-import I18nStubber from '@canvas/common/I18nStubber'
-import fakeENV from '@canvas/common/fakeENV'
+import I18nStubber from '@canvas/test-utils/I18nStubber'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
-import assertions from '@canvas/common/assertionsSpec'
+import assertions from '@canvas/test-utils/assertionsSpec'
 import '@canvas/jquery/jquery.simulate'
 
 let screenreaderText = null

@@ -18,7 +18,7 @@
 
 import Course from '@canvas/courses/backbone/models/Course'
 import AssignmentSyncSettingsView from '../AssignmentSyncSettingsView'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const createView = function (opts = {}) {
   const course = new Course()

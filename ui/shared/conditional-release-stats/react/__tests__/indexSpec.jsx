@@ -20,7 +20,7 @@ import React from 'react'
 
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import CyoeStats from '../index'
 
 const defaultEnv = () => ({

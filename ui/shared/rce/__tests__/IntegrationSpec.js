@@ -21,8 +21,8 @@ import RichContentEditor from '../RichContentEditor'
 import RCELoader from '../serviceRCELoader'
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from '@canvas/common/fakeENV'
-import editorUtils from '@canvas/common/editorUtils'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import editorUtils from '@canvas/rce/editorUtils'
 
 QUnit.module('Rce Abstraction - integration', {
   setup() {

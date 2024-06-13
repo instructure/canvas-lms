@@ -17,7 +17,7 @@
  */
 
 import numberHelper from '../numberHelper'
-import I18nStubber from '@canvas/common/I18nStubber'
+import I18nStubber from '@canvas/test-utils/I18nStubber'
 
 let input, output, delimiter, separator
 

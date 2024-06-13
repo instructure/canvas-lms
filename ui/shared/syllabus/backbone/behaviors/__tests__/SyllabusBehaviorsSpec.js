@@ -18,8 +18,8 @@
 
 import SyllabusBehaviors from '../SyllabusBehaviors'
 import Sidebar from '@canvas/rce/Sidebar'
-import editorUtils from '@canvas/common/editorUtils'
-import fixtures from '@canvas/common/fixtures'
+import editorUtils from '@canvas/rce/editorUtils'
+import fixtures from '@canvas/test-utils/fixtures'
 import $ from 'jquery'
 import 'jquery-migrate'
 import RichContentEditor from '@canvas/rce/RichContentEditor'

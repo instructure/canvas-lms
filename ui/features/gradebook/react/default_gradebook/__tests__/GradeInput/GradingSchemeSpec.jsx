@@ -21,7 +21,7 @@ import {render} from '@testing-library/react'
 
 import GradeInput from '../../components/GradeInput'
 import GradeInputDriver from './GradeInputDriver'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHooks => {
   let $container

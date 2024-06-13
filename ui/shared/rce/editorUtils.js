@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import RCELoader from '@canvas/rce/serviceRCELoader'
-import Sidebar from '@canvas/rce/Sidebar'
+import RCELoader from './serviceRCELoader'
+import Sidebar from './Sidebar'
 
 export default {
   resetRCE: () => {

@@ -18,7 +18,7 @@
 
 import Backbone from '@canvas/backbone'
 import mixing from '@canvas/backbone/mixin'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 QUnit.module('View', {
   setup() {

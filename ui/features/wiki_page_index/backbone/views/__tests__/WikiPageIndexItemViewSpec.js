@@ -18,7 +18,7 @@
 
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
 import WikiPageIndexItemView from '../WikiPageIndexItemView'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 QUnit.module('WikiPageIndexItemView', {
   setup() {

@@ -20,7 +20,7 @@ import CourseRestore from '../../models/CourseRestore'
 import CourseSearchFormView from '../CourseSearchFormView'
 import $ from 'jquery'
 import 'jquery-migrate'
-import assertions from '@canvas/common/assertionsSpec'
+import assertions from '@canvas/test-utils/assertionsSpec'
 
 QUnit.module('CourseSearchFormView', {
   setup() {
