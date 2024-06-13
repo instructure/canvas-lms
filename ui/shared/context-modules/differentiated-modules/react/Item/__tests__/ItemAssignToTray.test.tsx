@@ -816,4 +816,32 @@ describe('ItemAssignToTray', () => {
       expect(fetchMock.calls(SECTIONS_URL).length).toBe(0)
     })
   })
+
+  describe('required due dates', () => {
+    beforeEach(() => {
+      global.ENV = {
+        ...global.ENV,
+        POST_TO_SIS: true,
+        DUE_DATE_REQUIRED_FOR_ACCOUNT: true,
+      }
+    })
+
+    it('validates if required due dates are set before applying changes', async () => {
+      const {getByTestId, queryByTestId, findAllByTestId, getByText, getAllByText, findByText} =
+        renderComponent()
+      // wait until the cards are loaded
+      const cards = await findAllByTestId('item-assign-to-card')
+      expect(cards[0]).toBeInTheDocument()
+
+      const addCardBtn = getByTestId('add-card')
+      act(() => addCardBtn.click())
+
+      getByTestId('differentiated_modules_save_button').click()
+
+      expect(getAllByText('Please add a due date')[0]).toBeInTheDocument()
+      expect(getByText('Please fix errors before continuing')).toBeInTheDocument()
+      // tray stays open
+      expect(getByText('Assignment | 10 pts')).toBeInTheDocument()
+    })
+  })
 })
