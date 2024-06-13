@@ -26,6 +26,7 @@ import {asJson, checkStatus, getPrefetchedXHR} from '@canvas/util/xhr'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {Card} from './types'
 import {fetchDashboardCardsAsync, mapDashboardResponseToCard} from './dashboardCardsQuery'
+import {sortByPosition} from './util/dashboardUtils'
 
 const I18n = useI18nScope('load_card_dashboard')
 
@@ -76,7 +77,8 @@ export class CardDashboardLoader {
       fetchDashboardCardsAsync(queryKey)
         .then(data => {
           const mappedDashboardCards = mapDashboardResponseToCard(data)
-          renderFn(mappedDashboardCards)
+          const sortedDashCards = mappedDashboardCards.sort(sortByPosition)
+          renderFn(sortedDashCards)
         })
         .catch(e => {
           this.showError(e)

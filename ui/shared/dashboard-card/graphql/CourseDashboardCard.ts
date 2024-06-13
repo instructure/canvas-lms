@@ -46,7 +46,6 @@ export const CourseDashboardCard = {
       isHomeroom
       isFavorited
       image
-      id
       href
       frontPageTitle
       enrollmentType
@@ -72,7 +71,6 @@ export const CourseDashboardCard = {
     enrollmentType: string,
     frontPageTitle: string,
     href: string,
-    id: string.isRequired,
     image: string,
     isFavorited: bool,
     isHomeroom: bool,
@@ -97,7 +95,6 @@ export const CourseDashboardCard = {
     term: shape({
       name: string,
       id: string,
-      _id: string,
     }),
     useClassicFont: bool,
   }),
@@ -113,7 +110,6 @@ export const CourseDashboardCard = {
     enrollmentType = 'StudentEnrollment',
     frontPageTitle = 'Course Overview',
     href = '/courses/1',
-    id = '1',
     image = 'https://example.com/image.jpg',
     isFavorited = false,
     isHomeroom = false,
@@ -159,7 +155,6 @@ export const CourseDashboardCard = {
     enrollmentType,
     frontPageTitle,
     href,
-    id,
     image,
     isFavorited,
     isHomeroom,

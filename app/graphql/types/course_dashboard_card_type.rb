@@ -42,15 +42,12 @@ module Types
     graphql_name "CourseDashboardCard"
 
     description "A card on the course dashboard"
-    global_id_field :id
-
     alias_method :course, :object
 
-    # Initialize the presenter and current enrollment loader
+    # Initialize the presenter
     def initialize(object, context)
       super
       @presenter = initialize_presenter
-      @current_enrollment_loader = initialize_current_enrollment_loader
     end
 
     field :long_name, String, null: true
@@ -90,37 +87,22 @@ module Types
 
     field :subtitle, String, null: true
     def subtitle
-      @current_enrollment_loader.then do |enrollment|
-        label = if enrollment_state == "invited"
-                  before_label("#shared.menu_enrollment.labels.invited_as", "invited as")
-                else
-                  before_label("#shared.menu_enrollment.labels.enrolled_as", "enrolled as")
-                end
-        [label, enrollment&.sis_role].join(" ")
-      end
+      @presenter[:subtitle]
     end
 
     field :enrollment_state, String, null: true
     def enrollment_state
-      @current_enrollment_loader.then do |enrollment|
-        enrollment&.state
-      end
+      @presenter[:enrollmentState]
     end
 
     field :enrollment_type, String, null: true
     def enrollment_type
-      @current_enrollment_loader.then do |enrollment|
-        enrollment&.type
-      end
+      @presenter[:enrollmentType]
     end
 
     field :observee, String, null: true
     def observee
-      @current_enrollment_loader.then do |enrollment|
-        if enrollment&.type == "ObserverEnrollment"
-          ObserverEnrollment.observed_students(course, current_user)&.keys&.map(&:name)&.join(", ")
-        end
-      end
+      @presenter[:observee]
     end
 
     field :is_favorited, Boolean, null: true
@@ -236,12 +218,6 @@ module Types
         session,
         opts
       ).to_h
-    end
-
-    def initialize_current_enrollment_loader
-      Loaders::UserCourseEnrollmentLoader.for(course_ids: [course.id]).load(context[:current_user].id).then do |enrollments|
-        enrollments.find { |enrollment| enrollment.course_id == course.id }
-      end
     end
   end
 end

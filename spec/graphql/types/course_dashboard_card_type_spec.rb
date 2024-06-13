@@ -165,9 +165,10 @@ describe Types::CourseDashboardCardType do
 
       dashboard_filter = { observed_user_id: @student.id.to_s }
       context = { current_user: cur_user, domain_root_account: account, session: {}, dashboard_filter: }
-      cur_resolver = GraphQLTypeTester.new(course, context)
-      expect(cur_resolver.resolve("dashboardCard { enrollmentType }")).to eq "ObserverEnrollment"
-      expect(cur_resolver.resolve("dashboardCard { observee }")).to eq @student.name
+      # Need to use favoriteCoursesConnection here because this is where the enrollment gets loaded
+      user_type = GraphQLTypeTester.new(cur_user, context)
+      expect(user_type.resolve("favoriteCoursesConnection { nodes { dashboardCard { enrollmentType } } }")).to eq ["ObserverEnrollment"]
+      expect(user_type.resolve("favoriteCoursesConnection { nodes { dashboardCard { observee } } }")).to eq [@student.name]
     end
   end
 
