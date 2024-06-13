@@ -19,7 +19,7 @@
 import _ from 'lodash'
 
 import ProcessGradebookUpload from '../process_gradebook_upload'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const oldAssignment1 = {id: 1, title: 'Old Assignment 1', points_possible: 25, published: true}
 

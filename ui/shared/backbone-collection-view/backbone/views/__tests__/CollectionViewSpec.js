@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
 import CollectionView from '../index'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 let collection = null
 let view = null

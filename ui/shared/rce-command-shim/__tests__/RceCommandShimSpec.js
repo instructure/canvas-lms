@@ -17,7 +17,7 @@
  */
 
 import * as RceCommandShim from '../RceCommandShim'
-import fixtures from '@canvas/common/fixtures'
+import fixtures from '@canvas/test-utils/fixtures'
 
 let remoteEditor = null
 

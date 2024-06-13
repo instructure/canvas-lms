@@ -18,11 +18,11 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import OutcomeContentBase from '../OutcomeContentBase'
 import OutcomeGroup from '../../../../backbone/models/OutcomeGroup'
 import OutcomeGroupView from '../OutcomeGroupView'
-import fixtures from '@canvas/common/fixtures'
+import fixtures from '@canvas/test-utils/fixtures'
 
 // stub function that creates the RCE to avoid
 // its async initializationa

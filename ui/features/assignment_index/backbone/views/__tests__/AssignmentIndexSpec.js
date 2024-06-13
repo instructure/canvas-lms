@@ -27,8 +27,8 @@ import IndexView from '../IndexView'
 import ToggleShowByView from '../ToggleShowByView'
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from '@canvas/common/fakeENV'
-import assertions from '@canvas/common/assertionsSpec'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import assertions from '@canvas/test-utils/assertionsSpec'
 import '@canvas/jquery/jquery.simulate'
 
 const fixtures = $('#fixtures')

@@ -22,7 +22,7 @@ import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
 import 'jquery-migrate'
 import GradingPeriodCollection from '../gradingPeriodCollection'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
 QUnit.module('GradingPeriodCollection', {

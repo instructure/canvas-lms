@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import store from '../ExternalAppsStore'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 QUnit.module('ExternalApps.ExternalAppsStore', {
   setup() {

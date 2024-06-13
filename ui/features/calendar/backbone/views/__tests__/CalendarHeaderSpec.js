@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import CalendarHeader from '../CalendarHeader'
-import assertions from '@canvas/common/assertionsSpec'
+import assertions from '@canvas/test-utils/assertionsSpec'
 
 QUnit.module('CalendarHeader', {
   setup() {

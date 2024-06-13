@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 
 import {setup, teardown} from '../index'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 QUnit.module('submissions', {

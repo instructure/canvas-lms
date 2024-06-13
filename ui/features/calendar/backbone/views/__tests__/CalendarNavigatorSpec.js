@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import CalendarNavigator from '../CalendarNavigator'
-import assertions from '@canvas/common/assertionsSpec'
+import assertions from '@canvas/test-utils/assertionsSpec'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 
 QUnit.module('CalendarNavigator', {

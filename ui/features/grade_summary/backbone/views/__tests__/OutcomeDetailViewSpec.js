@@ -22,7 +22,7 @@ import OutcomeResultCollection from '../../collections/OutcomeResultCollection'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
 import Group from '../../models/Group'
 import OutcomeDetailView from '../OutcomeDetailView'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 QUnit.module('OutcomeDetailViewSpec', {
   setup() {

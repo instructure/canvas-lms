@@ -32,7 +32,7 @@ import AgendaView from '../AgendaView'
 import EventDataSource from '@canvas/calendar/jquery/EventDataSource'
 import eventResponse from './calendarEvents'
 import assignmentResponse from './calendarAssignments'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const plannerItemsResponse = `[]`
 

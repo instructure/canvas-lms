@@ -17,7 +17,7 @@
  */
 
 import EditRubricPage from '../EditRubricPage'
-import assertions from '@canvas/common/assertionsSpec'
+import assertions from '@canvas/test-utils/assertionsSpec'
 
 QUnit.module('RubricEdit')
 

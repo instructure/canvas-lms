@@ -21,7 +21,7 @@ import CheckboxView from '../ContentCheckboxView'
 import CheckboxModel from '../../models/ContentCheckbox'
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.simulate'
 
 class CheckboxHelper {

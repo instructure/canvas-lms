@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import SubmissionDetailsDialog from '../SubmissionDetailsDialog'
 
 let assignment

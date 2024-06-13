@@ -20,7 +20,7 @@ import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import 'jquery-migrate'
 import AdminToolsView from '../AdminToolsView'
-import assertions from '@canvas/common/assertionsSpec'
+import assertions from '@canvas/test-utils/assertionsSpec'
 
 QUnit.module('AdminToolsViewSpec', {
   setup() {

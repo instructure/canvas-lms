@@ -26,7 +26,7 @@ import {act, cleanup, render, waitFor} from '@testing-library/react'
 
 import DashboardCard from '../DashboardCard'
 import CourseActivitySummaryStore from '../CourseActivitySummaryStore'
-import assertions from '@canvas/common/assertionsSpec'
+import assertions from '@canvas/test-utils/assertionsSpec'
 
 QUnit.module('DashboardCard', {
   setup() {

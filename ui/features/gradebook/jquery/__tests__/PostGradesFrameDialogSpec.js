@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import PostGradesFrameDialog from '../PostGradesFrameDialog'
 
 QUnit.module('Gradebook > PostGradesFrameDialog', suiteHooks => {

@@ -22,7 +22,7 @@ import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
 import 'jquery-migrate'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
-import I18nStubber from '@canvas/common/I18nStubber'
+import I18nStubber from '@canvas/test-utils/I18nStubber'
 
 QUnit.module('FriendlyDatetime', {
   setup() {

@@ -18,7 +18,7 @@
 
 import Backbone from '@canvas/backbone'
 import ImportQuizzesNextView from '../ImportQuizzesNextView'
-import assertions from '@canvas/common/assertionsSpec'
+import assertions from '@canvas/test-utils/assertionsSpec'
 
 QUnit.module('Import Quizzes Next', {})
 

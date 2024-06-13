@@ -22,8 +22,8 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import Entry from '../../models/Entry'
 import EntryView from '../EntryView'
-import fakeENV from '@canvas/common/fakeENV'
-import assertions from '@canvas/common/assertionsSpec'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import assertions from '@canvas/test-utils/assertionsSpec'
 
 QUnit.module('EntryView', {
   setup() {

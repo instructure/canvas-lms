@@ -23,7 +23,7 @@ import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import BreadcrumbCollapsedContainer from '../BreadcrumbCollapsedContainer'
 import Folder from '@canvas/files/backbone/models/Folder'
-import stubRouterContext from '@canvas/common/stubRouterContext'
+import stubRouterContext from '@canvas/test-utils/stubRouterContext'
 
 const simulate = TestUtils.Simulate
 const simulateNative = TestUtils.SimulateNative

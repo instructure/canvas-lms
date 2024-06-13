@@ -20,7 +20,7 @@ import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import Course from '@canvas/courses/backbone/models/Course'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {saveObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 
 const COURSE_SUBMISSIONS_URL = '/courses/1/submissions'

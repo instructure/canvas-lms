@@ -26,7 +26,7 @@ import DueDates from '../DueDates'
 import OverrideStudentStore from '../OverrideStudentStore'
 import StudentGroupStore from '../StudentGroupStore'
 import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const findAllByTag = TestUtils.scryRenderedDOMComponentsWithTag
 const findAllByClass = TestUtils.scryRenderedDOMComponentsWithClass

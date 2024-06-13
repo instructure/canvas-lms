@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
 import DialogFormView from '../DialogFormView'
-import assert from '@canvas/common/assertionsSpec'
+import assert from '@canvas/test-utils/assertionsSpec'
 import '@canvas/jquery/jquery.simulate'
 
 export function closeDialog() {

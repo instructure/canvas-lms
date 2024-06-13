@@ -23,7 +23,7 @@ import Group from '@canvas/groups/backbone/models/Group'
 import AddUnassignedMenu from '../AddUnassignedMenu'
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 let clock = null
 let server = null

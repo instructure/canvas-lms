@@ -17,7 +17,7 @@
  */
 
 import commonEventFactory from '../index'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 QUnit.module('CommonEvent', {
   setup() {},

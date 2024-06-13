@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import ExternalContentReturnView from '../ExternalContentReturnView'
 import ExternalTool from '../../models/ExternalTool'
 

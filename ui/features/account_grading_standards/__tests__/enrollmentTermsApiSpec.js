@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import api from '../enrollmentTermsApi'
 import '@canvas/jquery/jquery.ajaxJSON'
 

@@ -19,9 +19,9 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import RCELoader from '../serviceRCELoader'
-import editorUtils from '@canvas/common/editorUtils'
-import fakeENV from '@canvas/common/fakeENV'
-import fixtures from '@canvas/common/fixtures'
+import editorUtils from '@canvas/rce/editorUtils'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import fixtures from '@canvas/test-utils/fixtures'
 
 QUnit.module('loadRCE', {
   setup() {

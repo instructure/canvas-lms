@@ -22,7 +22,7 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DeleteGroupView from '../DeleteGroupView'
 import $ from 'jquery'
 import 'jquery-migrate'
-import assertions from '@canvas/common/assertionsSpec'
+import assertions from '@canvas/test-utils/assertionsSpec'
 import '@canvas/jquery/jquery.simulate'
 
 const group = (assignments = true, id) =>

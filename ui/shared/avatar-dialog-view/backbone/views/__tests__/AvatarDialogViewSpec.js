@@ -21,7 +21,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import AvatarDialogView from '../AvatarDialogView'
-import assertions from '@canvas/common/assertionsSpec'
+import assertions from '@canvas/test-utils/assertionsSpec'
 
 QUnit.module('AvatarDialogView#onPreflight', {
   setup() {

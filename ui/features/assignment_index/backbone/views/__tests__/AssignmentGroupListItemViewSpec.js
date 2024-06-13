@@ -22,7 +22,7 @@ import AssignmentGroupListItemView from '../AssignmentGroupListItemView'
 import AssignmentGroupListView from '../AssignmentGroupListView'
 import $ from 'jquery'
 import 'jquery-migrate'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import elementToggler from '@canvas/common/activateElementToggler'
 
 const assignment1 = function () {

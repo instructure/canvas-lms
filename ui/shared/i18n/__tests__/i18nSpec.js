@@ -20,7 +20,7 @@
 // for a little bit though
 
 import I18n, {useScope} from '..'
-import I18nStubber from '@canvas/common/I18nStubber'
+import I18nStubber from '@canvas/test-utils/I18nStubber'
 import {raw} from '@instructure/html-escape'
 
 const scope = useScope('foo')

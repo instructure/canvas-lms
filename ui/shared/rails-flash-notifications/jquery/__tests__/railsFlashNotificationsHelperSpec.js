@@ -21,7 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import 'jquery-migrate'
 import htmlEscape from '@instructure/html-escape'
-import NotificationsHelper from '@canvas/rails-flash-notifications/jquery/helper'
+import NotificationsHelper from '../helper'
 
 const I18n = useI18nScope('shared.flash_notices')
 

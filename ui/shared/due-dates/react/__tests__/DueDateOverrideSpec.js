@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import DateValidator from '@canvas/grading/DateValidator'
 import DueDateOverrideView from '@canvas/due-dates'
-import fakeENV from '@canvas/common/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import StudentGroupStore from '../StudentGroupStore'
 import '@canvas/jquery/jquery.instructure_forms' // errorBox
 
