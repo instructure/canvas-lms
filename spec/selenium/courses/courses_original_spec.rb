@@ -175,12 +175,12 @@ describe "courses" do
     it "saves quota when not changed" do
       # then try just saving it (without resetting it)
       course_with_admin_logged_in
-      @course.update!(storage_quota: 10.megabytes)
+      @course.update!(storage_quota: 10.decimal_megabytes)
       get "/courses/#{@course.id}/settings"
       form = f("#course_form")
       submit_form(form)
       value = @course.storage_quota
-      expect(value).to eq 10.megabytes
+      expect(value).to eq 10.decimal_megabytes
     end
 
     it "redirects to the gradebook when switching courses when viewing a students grades" do

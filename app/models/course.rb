@@ -1683,21 +1683,21 @@ class Course < ActiveRecord::Base
   end
 
   def storage_quota_mb
-    storage_quota / 1.megabyte
+    storage_quota / 1.decimal_megabytes
   end
 
   def storage_quota_mb=(val)
-    self.storage_quota = val.try(:to_i).try(:megabytes)
+    self.storage_quota = val.try(:to_i).try(:decimal_megabytes)
   end
 
   def storage_quota_used_mb
-    Attachment.get_quota(self)[:quota_used].to_f / 1.megabyte
+    Attachment.get_quota(self)[:quota_used].to_f / 1.decimal_megabytes
   end
 
   def storage_quota
     read_attribute(:storage_quota) ||
       (account.default_storage_quota rescue nil) ||
-      Setting.get("course_default_quota", 500.megabytes.to_s).to_i
+      Setting.get("course_default_quota", 500.decimal_megabytes.to_s).to_i
   end
 
   def storage_quota=(val)

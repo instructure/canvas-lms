@@ -897,7 +897,7 @@ class Account < ActiveRecord::Base
     end
   end
 
-  DEFAULT_STORAGE_QUOTA = 500.megabytes
+  DEFAULT_STORAGE_QUOTA = 500.decimal_megabytes
 
   def quota
     return storage_quota if read_attribute(:storage_quote)
@@ -922,11 +922,11 @@ class Account < ActiveRecord::Base
   end
 
   def default_storage_quota_mb
-    default_storage_quota / 1.megabyte
+    default_storage_quota / 1.decimal_megabytes
   end
 
   def default_storage_quota_mb=(val)
-    self.default_storage_quota = val.try(:to_i).try(:megabytes)
+    self.default_storage_quota = val.try(:to_i).try(:decimal_megabytes)
   end
 
   def default_storage_quota=(val)
@@ -952,11 +952,11 @@ class Account < ActiveRecord::Base
   end
 
   def default_user_storage_quota_mb
-    default_user_storage_quota / 1.megabyte
+    default_user_storage_quota / 1.decimal_megabytes
   end
 
   def default_user_storage_quota_mb=(val)
-    self.default_user_storage_quota = val.try(:to_i).try(:megabytes)
+    self.default_user_storage_quota = val.try(:to_i).try(:decimal_megabytes)
   end
 
   def default_group_storage_quota
@@ -980,11 +980,11 @@ class Account < ActiveRecord::Base
   end
 
   def default_group_storage_quota_mb
-    default_group_storage_quota / 1.megabyte
+    default_group_storage_quota / 1.decimal_megabytes
   end
 
   def default_group_storage_quota_mb=(val)
-    self.default_group_storage_quota = val.try(:to_i).try(:megabytes)
+    self.default_group_storage_quota = val.try(:to_i).try(:decimal_megabytes)
   end
 
   def turnitin_shared_secret=(secret)
