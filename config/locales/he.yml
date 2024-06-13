@@ -14380,6 +14380,10 @@ he:
         upload_ui_conf: "דף מזהה ממשק המשתמש של \"מעלה קבצים\""
         user_secret_key: "מלה סודית של משתמש"
       ui_conf_ids: "על לקוחות מבוססי מערכת Kaltura לבקש מ Kaltura לספק לכם את המזהים האלה. מופעים המתארחים במחשב מקומי יוכלו למצוא ערכים אלו בטבלת ה ui_confs "
+    learn_platform_settings: 
+      labels: 
+        base_url: "כתובת דף בסיס"
+        token: "אסימון גישה"
     linked_in: 
       description: "אינטגרציה עם לינקדאין"
     linked_in_settings: 
@@ -16417,6 +16421,7 @@ he:
       create_group: "יצירת קבוצה "
       create_question: "יצירת שאלה"
       creating_group: "יצירת קבוצה..."
+      generate: יצירה
       generating: "מייצר:"
       generating_combinations_progress: "מבצע... (%{done}/%{total})"
       save: "שמירה "
