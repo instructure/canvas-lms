@@ -3550,4 +3550,9 @@ class User < ActiveRecord::Base
     ].cache_key
   end
   private :adminable_account_ids_cache_key
+
+  def student_in_limited_access_account?
+    accounts = Account.where(id: student_enrollments.active.joins(:course).select("#{Course.quoted_table_name}.account_id"))
+    accounts.any?(&:limited_access_for_students?)
+  end
 end

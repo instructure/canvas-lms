@@ -4617,4 +4617,27 @@ describe User do
       expect(@user.active_student_enrollments_in_account?(@account)).to be false
     end
   end
+
+  describe "#student_in_limited_access_account??" do
+    before(:once) do
+      @limited_access_account = Account.default
+      @account_other = Account.create!
+
+      @limited_access_account.root_account.enable_feature!(:allow_limited_access_for_students)
+      @limited_access_account.settings[:enable_limited_access_for_students] = true
+      @limited_access_account.save!
+
+      @user = user_with_pseudonym
+      course_with_user("StudentEnrollment", { user: @user, account: @account_other })
+    end
+
+    it "returns true if user has active student enrollment in locked down account" do
+      course_with_user("StudentEnrollment", { user: @user, account: @limited_access_account })
+      expect(@user.student_in_limited_access_account?).to be true
+    end
+
+    it "returns false if user has no active student enrollments in locked down accounts" do
+      expect(@user.student_in_limited_access_account?).to be false
+    end
+  end
 end

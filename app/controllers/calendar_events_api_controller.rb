@@ -325,6 +325,7 @@ class CalendarEventsApiController < ApplicationController
   before_action :get_calendar_context, only: :create
   before_action :require_user_or_observer, only: [:user_index]
   before_action :require_authorization, only: %w[index user_index]
+  before_action :check_limited_access_for_students, only: %w[index create show update]
 
   RECURRING_EVENT_LIMIT = 200
 
