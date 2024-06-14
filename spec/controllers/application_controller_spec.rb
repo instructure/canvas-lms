@@ -784,6 +784,40 @@ RSpec.describe ApplicationController do
       end
     end
 
+    describe "#context_account" do
+      it "returns context if context is Account" do
+        controller.instance_variable_set(:@context, account_model)
+        expect(controller.send(:context_account)).to eq @account
+      end
+
+      it "returns course's account if context is Course" do
+        controller.instance_variable_set(:@context, course_model)
+        expect(controller.send(:context_account)).to eq @course.account
+      end
+
+      it "returns group's account if context is Group" do
+        controller.instance_variable_set(:@context, group_model)
+        expect(controller.send(:context_account)).to eq @group.account
+      end
+
+      it "returns course section if context is a CourseSection" do
+        course_model
+        add_section("section 1", { course: @course })
+        controller.instance_variable_set(:@context, @course_section)
+        expect(controller.send(:context_account)).to eq @course.account
+      end
+
+      it "raises error if context is a User" do
+        controller.instance_variable_set(:@context, user_model)
+        expect { controller.send(:context_account) }.to raise_error("Account can't be derived from a User context")
+      end
+
+      it "raises error if an account can't be derived from context" do
+        controller.instance_variable_set(:@context, assignment_model)
+        expect { controller.send(:context_account) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
     describe "#log_asset_access" do
       before :once do
         course_model
@@ -1929,6 +1963,43 @@ RSpec.describe ApplicationController do
         allow(controller.request).to receive(:path).and_return("/api/endpoint")
         controller.instance_variable_set(:@pseudonym_session, nil)
         expect { controller.send(:verify_authenticity_token) }.not_to raise_exception
+      end
+    end
+
+    describe "#check_limited_access_for_students" do
+      context "feature flag is enabled on root account" do
+        before do
+          @account = Account.default
+          @account.enable_feature!(:allow_limited_access_for_students)
+          controller.instance_variable_set(:@domain_root_account, @account)
+        end
+
+        it "renders unauthorized if context is a user and a student in account with limited access" do
+          user_factory
+          controller.instance_variable_set(:@context, @user)
+          allow(@user).to receive(:student_in_limited_access_account?).and_return(true)
+          expect(controller).to receive(:render_unauthorized_action)
+          controller.send(:check_limited_access_for_students)
+        end
+
+        it "renders unauthorized if context is account with limited access and user is a student in that account" do
+          controller.instance_variable_set(:@context, @account)
+          allow(@account).to receive(:limited_access_for_user?).and_return(true)
+          expect(controller).to receive(:render_unauthorized_action)
+          controller.send(:check_limited_access_for_students)
+        end
+
+        it "does nothing if context and current_user are not set" do
+          expect(controller).not_to receive(:render_unauthorized_action)
+          expect(controller.send(:check_limited_access_for_students)).to be_nil
+        end
+      end
+
+      context "feature flag is disabled on root account" do
+        it "does nothing" do
+          expect(controller).not_to receive(:render_unauthorized_action)
+          expect(controller.send(:check_limited_access_for_students)).to be_nil
+        end
       end
     end
   end

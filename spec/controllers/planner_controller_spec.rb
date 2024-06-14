@@ -56,6 +56,14 @@ describe PlannerController do
         expect(response).to be_successful
       end
 
+      it "renders unauthorized if student in limited access account" do
+        @course.root_account.enable_feature!(:allow_limited_access_for_students)
+        @course.account.settings[:enable_limited_access_for_students] = true
+        @course.account.save!
+        get :index
+        expect(response.code.to_i).to be 401
+      end
+
       it "checks the planner cache" do
         found_planner_meta_request = false
         found_planner_items_request = false

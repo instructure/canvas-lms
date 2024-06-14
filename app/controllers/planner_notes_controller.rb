@@ -92,6 +92,7 @@ class PlannerNotesController < ApplicationController
   include Api::V1::PlannerNote
 
   before_action :require_user
+  before_action :check_limited_access_for_students, only: %i[index show create update destroy]
 
   # @API List planner notes
   #
