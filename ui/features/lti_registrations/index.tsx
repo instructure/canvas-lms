@@ -52,14 +52,6 @@ const router = createBrowserRouter(
         </QueryClientProvider>
       ),
     },
-    {
-      path: 'product_detail/:id',
-      element: (
-        <QueryClientProvider client={queryClient}>
-          <ProductDetail />
-        </QueryClientProvider>
-      ),
-    },
   ],
 
   {
