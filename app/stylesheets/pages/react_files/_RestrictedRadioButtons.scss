@@ -28,7 +28,7 @@
 
 .RestrictedRadioButtons__wrapper {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 
   label.control-label.label-offline {
     text-align: #{direction(left)};
@@ -42,5 +42,14 @@
 
   >div.RestrictedRadioButtons__visibility_wrapper {
     flex: 0 1;
+  }
+
+  .RestrictedRadioButtons__dates_wrapper {
+    padding-left: 25px;
+    margin-top: 15px
+  }
+
+  .RestrictedRadioButtons__dates_wrapper_hidden {
+    display: none;
   }
 }
