@@ -57,6 +57,13 @@ class AccessToken < ActiveRecord::Base
   end
 
   set_policy do
+    given do |user|
+      !user.account.feature_enabled?(:admin_manage_access_tokens) ||
+        !user.account.limit_personal_access_tokens? ||
+        self.user.check_accounts_right?(user, :manage_access_tokens)
+    end
+    can :create and can :update
+
     given { |user| user.id == user_id }
     can :delete
 
