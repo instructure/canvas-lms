@@ -103,5 +103,21 @@ describe Api::V1::Course do
         expect(hash["banner_image_download_url"]).not_to be_present
       end
     end
+
+    describe "post_manually" do
+      before :once do
+        course_factory
+      end
+
+      it "is included when requested" do
+        hash = course_json(@course, nil, nil, ["post_manually"], nil)
+        expect(hash["post_manually"]).to be false
+      end
+
+      it "is not included when post_manually is not present in includes parameter" do
+        hash = course_json(@course, nil, nil, [], nil)
+        expect(hash["post_manually"]).not_to be_present
+      end
+    end
   end
 end

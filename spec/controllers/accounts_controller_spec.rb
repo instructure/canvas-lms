@@ -1345,6 +1345,24 @@ describe AccountsController do
       expect(response.body).to match(/#{@c2.id}/)
     end
 
+    context "post_manually" do
+      it "gets of a list of courses with post_manually populated if included in the includes param" do
+        admin_logged_in(@account)
+        get "courses_api", params: { account_id: @account.id, include: ["post_manually"] }
+
+        expect(response).to be_successful
+        expect(response.body).to match(/"post_manually":false/)
+      end
+
+      it "gets a list of courses without post_manually populated if it is not included in the includes param" do
+        admin_logged_in(@account)
+        get "courses_api", params: { account_id: @account.id }
+
+        expect(response).to be_successful
+        expect(response.body).not_to match(/"post_manually":false/)
+      end
+    end
+
     it "does not set pagination total_pages/last page link" do
       admin_logged_in(@account)
       get "courses_api", params: { account_id: @account.id, per_page: 1 }
