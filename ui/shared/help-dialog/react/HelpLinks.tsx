@@ -30,7 +30,7 @@ import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-con
 import tourPubSub from '@canvas/tour-pubsub'
 import {useQuery} from '@canvas/query'
 import helpLinksQuery from '../queries/helpLinksQuery'
-import type {HelpLink} from '../../../../api.d'
+import type {HelpLink} from '../../../api.d'
 
 const I18n = useI18nScope('HelpLinks')
 
