@@ -214,12 +214,13 @@ if (ENV.badge_counts) {
   import('./boot/initializers/showBadgeCounts')
 }
 
-// Load and then display the Canvas help dialog if the user has requested it
+// Decorate the help link with the React/InstUI dialog from the navigation sidenav
 async function openHelpDialog(event: Event): Promise<void> {
+  const helpLink = event.target as Element
   event.preventDefault()
   try {
-    const {default: helpDialog} = await import('@canvas/common/enableHelpDialog')
-    helpDialog.open()
+    const {renderLoginHelp} = await import('@canvas/help-dialog')
+    renderLoginHelp(helpLink)
   } catch (e) {
     /* eslint-disable no-console */
     console.error('Help dialog could not be displayed')

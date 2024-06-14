@@ -40,7 +40,7 @@ import {
   IconHomeLine,
 } from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import HelpDialog from './HelpDialog/index'
+import HelpDialog from '@canvas/help-dialog'
 import {Link} from '@instructure/ui-link'
 import CoursesList from './lists/CoursesList'
 import GroupsList from './lists/GroupsList'

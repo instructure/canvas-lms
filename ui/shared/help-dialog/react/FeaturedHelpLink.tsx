@@ -23,8 +23,8 @@ import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 // @ts-expect-error
-import PandaMapSVGURL from '../../images/panda-map.svg'
-import type {HelpLink} from '../../../../api.d'
+import PandaMapSVGURL from '../images/panda-map.svg'
+import type {HelpLink} from '../../../api.d'
 
 type Props = {
   featuredLink: HelpLink
