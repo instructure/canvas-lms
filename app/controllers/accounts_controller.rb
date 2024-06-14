@@ -669,7 +669,7 @@ class AccountsController < ApplicationController
   # @argument search_term [String]
   #   The partial course name, code, or full ID to match and return in the results list. Must be at least 3 characters.
   #
-  # @argument include[] [String, "syllabus_body"|"term"|"course_progress"|"storage_quota_used_mb"|"total_students"|"teachers"|"account_name"|"concluded"]
+  # @argument include[] [String, "syllabus_body"|"term"|"course_progress"|"storage_quota_used_mb"|"total_students"|"teachers"|"account_name"|"concluded"|"post_manually"]
   #   - All explanations can be seen in the {api:CoursesController#index Course API index documentation}
   #   - "sections", "needs_grading_count" and "total_scores" are not valid options at the account level
   #
@@ -869,7 +869,10 @@ class AccountsController < ApplicationController
     GuardRail.activate(:secondary) do
       @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
 
-      ActiveRecord::Associations.preload(@courses, [:account, :root_account, { course_account_associations: :account }])
+      course_preloads = [:account, :root_account, { course_account_associations: :account }]
+      course_preloads << :default_post_policy if includes.include?("post_manually")
+      ActiveRecord::Associations.preload(@courses, course_preloads)
+
       preload_teachers(@courses) if includes.include?("teachers")
       preload_teachers(@courses) if includes.include?("active_teachers")
       ActiveRecord::Associations.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?("concluded")
