@@ -105,8 +105,8 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
 
   enableDateField() {
     if (this.event.endDate) {
-      this.$el.find('#assignment_due_at').val(this.event.endDate().format('ddd ll'))
-      this.$el.find('#assignment_override_due_at').val(this.event.endDate().format('ddd ll'))
+      this.$el.find('#assignment_due_at').val(this.event.endDate()?.format('ddd ll'))
+      this.$el.find('#assignment_override_due_at').val(this.event.endDate()?.format('ddd ll'))
     }
     this.$el.find('#assignment_due_at').prop('disabled', false)
     this.$el.find('#assignment_override_due_at').prop('disabled', false)
