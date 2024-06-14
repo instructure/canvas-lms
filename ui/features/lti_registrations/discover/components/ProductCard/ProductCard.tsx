@@ -18,13 +18,14 @@
 
 import React from 'react'
 import type {Product} from '../../model/Product'
-import {Link as DetailLink} from 'react-router-dom'
+import {Link} from '@instructure/ui-link'
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import {Tag} from '@instructure/ui-tag'
+import {ZAccountId} from '../../../manage/model/AccountId'
 
 type ProductCardProps = {
   product: Product
@@ -32,6 +33,7 @@ type ProductCardProps = {
 
 const ProductCard = (props: ProductCardProps) => {
   const {product} = props
+  const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
 
   return (
     <Flex.Item>
@@ -52,7 +54,13 @@ const ProductCard = (props: ProductCardProps) => {
             </div>
             <div>
               <Text weight="bold" size="large">
-                <DetailLink to={`/product_detail/${product.id}`}>{product.name}</DetailLink>
+                <Link
+                  isWithinText={false}
+                  themeOverride={{fontWeight: 700, color: 'black'}}
+                  href={`/accounts/${accountId}/apps/product_detail/${product.id}`}
+                >
+                  {product.name}
+                </Link>
               </Text>
               <div>
                 by{' '}
