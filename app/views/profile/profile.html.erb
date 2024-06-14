@@ -446,8 +446,12 @@ TEXT
     </table>
   </div>
   <% unless @real_current_user %>
-    <div style="margin-top: 10px;">
-      <a href="#" class="btn btn-primary add_access_token_link"><i class="icon-plus" aria-hidden="true"></i> <%= t('buttons.new_access_token', "New Access Token") %></a>
+    <% prohibit_token_creation = !@current_user.access_tokens.temp_record.grants_right?(@current_user, :create) %>
+    <% prohibit_info_text = t("Your Canvas administrators have chosen to limit your ability to generate your own access token. Please reach out to your Canvas administrators to have them generate an access token on your behalf.") %>
+    <div style="margin-top: 10px;" title="<%= prohibit_token_creation ? prohibit_info_text : nil %>" >
+      <a href="#" class="btn btn-primary add_access_token_link" <%= prohibit_token_creation ? "disabled" : nil %> >
+        <i class="icon-plus" aria-hidden="true"></i> <%= t('buttons.new_access_token', "New Access Token") %>
+      </a>
     </div>
   <% end %>
   <div id="token_details_dialog" style="display: none;" title="<%= t('titles.access_token_details', "Access Token Details") %>">
@@ -489,7 +493,7 @@ TEXT
           <th scope="row"><%= before_label(:token_expires, "Expires") %></th>
           <td class="expires">&nbsp;</td>
         </tr>
-        <% unless @real_current_user %>
+        <% unless @real_current_user || !@current_user.access_tokens.temp_record.grants_right?(@current_user, :update) %>
           <tr class="refresh_token">
             <td colspan="2">
               <div class="button-container">

@@ -31,6 +31,8 @@ class TokensController < ApplicationController
   end
 
   def create
+    return render_unauthorized_action unless @current_user.access_tokens.temp_record.grants_right?(@current_user, :create)
+
     token_params = access_token_params
     token_params[:developer_key] = DeveloperKey.default
     @token = @current_user.access_tokens.build(token_params)
@@ -42,6 +44,8 @@ class TokensController < ApplicationController
   end
 
   def update
+    return render_unauthorized_action unless @current_user.access_tokens.temp_record.grants_right?(@current_user, :update)
+
     @token = @current_user.access_tokens.find(params[:id])
     if @token.update(access_token_params)
       render json: @token.as_json(include_root: false, methods: [:app_name, :visible_token])
