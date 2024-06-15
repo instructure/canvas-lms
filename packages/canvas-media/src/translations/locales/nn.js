@@ -25,6 +25,9 @@ const locale = {
   "armenian_12da6118": { "message": "Armensk" },
   "belarusian_b2f19c76": { "message": "Kviterussisk" },
   "bulgarian_feccab7e": { "message": "Bulgarsk" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "Underoverskrifter som er arva frå eit anna emne kan ikkje fjernast"
+  },
   "catalan_16f6b78f": { "message": "Katalansk" },
   "chinese_111d37f6": { "message": "Kinesisk" },
   "chinese_simplified_7f0bd370": { "message": "Kinesisk, forenkla" },
