@@ -110,8 +110,17 @@ describe('DiscussionTopicForm', () => {
     expect(document.queryAllByText('Until')).toBeTruthy()
 
     // Hides announcement options
-    expect(document.queryByLabelText('Delay Posting')).not.toBeInTheDocument()
     expect(document.queryByLabelText('Allow Participants to Comment')).not.toBeInTheDocument()
+  })
+
+  it('renders reset buttons for availability dates when creating/editing a discussion topic', () => {
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
+
+    const document = setup()
+
+    expect(document.queryAllByTestId('reset-available-from-button').length).toBe(1)
+    expect(document.queryAllByTestId('reset-available-until-button').length).toBe(1)
   })
 
   it('renders expected default teacher announcement options', () => {
@@ -124,19 +133,30 @@ describe('DiscussionTopicForm', () => {
     expect(document.getByText('Topic Title')).toBeInTheDocument()
     expect(document.queryByText('Attach')).toBeTruthy()
     expect(document.queryByTestId('section-select')).toBeTruthy()
-    expect(document.queryByLabelText('Delay Posting')).toBeInTheDocument()
     expect(document.queryByLabelText('Allow Participants to Comment')).toBeInTheDocument()
     expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
     expect(document.queryByLabelText('Enable podcast feed')).toBeInTheDocument()
     expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
+    expect(document.queryByTestId('non-graded-date-options')).toBeTruthy()
+    expect(document.queryAllByText('Available from')).toBeTruthy()
+    expect(document.queryAllByText('Until')).toBeTruthy()
 
     // Hides discussion only options
     expect(document.queryByLabelText('Add to student to-do')).not.toBeInTheDocument()
     expect(document.queryByText('Anonymous Discussion')).not.toBeTruthy()
     expect(document.queryByTestId('graded-checkbox')).not.toBeTruthy()
     expect(document.queryByTestId('group-discussion-checkbox')).not.toBeTruthy()
-    expect(document.queryByText('Available from')).not.toBeTruthy()
-    expect(document.queryByText('Until')).not.toBeTruthy()
+  })
+
+  it('renders reset buttons for availability dates when creating/editing an announcement', () => {
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+
+    const document = setup()
+
+    expect(document.queryAllByTestId('reset-available-from-button').length).toBe(1)
+    expect(document.queryAllByTestId('reset-available-until-button').length).toBe(1)
   })
 
   describe('assignment edit placement', () => {

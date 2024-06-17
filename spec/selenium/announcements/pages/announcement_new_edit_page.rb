@@ -44,6 +44,18 @@ class AnnouncementNewEdit
 
     # -------------------- discussion_create + react_discussions_post flag elements -----------------
 
+    def available_from_reset_button
+      f("button[data-testid=reset-available-from-button]")
+    end
+
+    def available_until_reset_button
+      f("button[data-testid=reset-available-until-button]")
+    end
+
+    def submit_button
+      f("button[data-testid=announcement-submit-button]")
+    end
+
     def publish_button
       fj("button:contains('Publish')")
     end

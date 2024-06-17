@@ -120,7 +120,7 @@ export const useShouldShowContent = (
   const shouldShowPartialAnonymousSelector =
     !isEditing && discussionAnonymousState === 'partial_anonymity' && isStudent
 
-  const shouldShowAvailabilityOptions = !isAnnouncement && !isGroupContext
+  const shouldShowAvailabilityOptions = !isGroupContext
 
   /* discussion moderators viewing a new or still unpublished discussion */
   const shouldShowSaveAndPublishButton =
