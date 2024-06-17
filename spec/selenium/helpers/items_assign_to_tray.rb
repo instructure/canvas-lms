@@ -73,6 +73,10 @@ module ItemsAssignToTray
     "//*[@data-testid = 'clearable-date-time-input']//*[contains(@class, '-select')]//input"
   end
 
+  def bp_locked_alert_text_selector(alert_text = "Due Dates & Availability Dates")
+    "//*[. = '#{alert_text}']"
+  end
+
   def cancel_button_selector
     "//*[@data-testid = 'module-item-edit-tray']//button[.//*[contains(text(), 'Cancel')]]"
   end
@@ -187,6 +191,10 @@ module ItemsAssignToTray
     position = exclude_due_date ? 1 : 2
     number_of_fields = exclude_due_date ? 2 : 3
     assign_to_time[position + (card_number * number_of_fields)]
+  end
+
+  def bp_locked_alert_text
+    fxpath(bp_locked_alert_text_selector)
   end
 
   def cancel_button
