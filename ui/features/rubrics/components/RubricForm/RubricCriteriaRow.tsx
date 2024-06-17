@@ -27,6 +27,7 @@ import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Pill} from '@instructure/ui-pill'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {IconButton} from '@instructure/ui-buttons'
 import {
   IconArrowOpenDownLine,
@@ -34,7 +35,9 @@ import {
   IconDragHandleLine,
   IconDuplicateLine,
   IconEditLine,
+  IconOutcomesLine,
   IconTrashLine,
+  IconLockLine,
 } from '@instructure/ui-icons'
 import {Draggable} from 'react-beautiful-dnd'
 import './drag-and-drop/styles.css'
@@ -88,8 +91,12 @@ export const RubricCriteriaRow = ({
                     <View as="div">
                       <Tag
                         text={
-                          <AccessibleContent alt="Remove outcome">
-                            <Text>{outcome?.displayName || outcome?.title}</Text>
+                          <AccessibleContent alt={I18n.t('View outcome')}>
+                            <Text>
+                              {I18n.t('%{display_name}', {
+                                display_name: outcome?.title,
+                              })}
+                            </Text>
                           </AccessibleContent>
                         }
                         size="small"
@@ -100,14 +107,23 @@ export const RubricCriteriaRow = ({
                         }}
                         data-testid="rubric-criteria-row-outcome-tag"
                       />
+                      <Tooltip
+                        renderTip={I18n.t("An outcome can't be edited")}
+                        data-testid={`outcome-tooltip-${criterion.id}`}
+                      >
+                        <IconLockLine
+                          style={{marginLeft: 12}}
+                          data-testid={`outcome-lock-icon-${criterion.id}`}
+                        />
+                      </Tooltip>
                     </View>
                     {outcome?.displayName && (
                       <View
                         as="div"
                         margin="small 0 0 0"
-                        data-testid="rubric-criteria-outcome-title"
+                        data-testid="rubric-criteria-outcome-subtitle"
                       >
-                        <Text weight="bold">{outcome?.title}</Text>
+                        <Text weight="bold">{outcome?.displayName}</Text>
                       </View>
                     )}
                     <View
@@ -151,14 +167,17 @@ export const RubricCriteriaRow = ({
                   <IconButton
                     withBackground={false}
                     withBorder={false}
-                    screenReaderLabel={I18n.t('Edit Criterion')}
+                    screenReaderLabel={
+                      learningOutcomeId
+                        ? I18n.t('View Outcome Criterion')
+                        : I18n.t('Edit Criterion')
+                    }
                     onClick={onEditCriterion}
-                    disabled={!unassessed && !!learningOutcomeId}
                     size="small"
                     themeOverride={{smallHeight: '18px'}}
                     data-testid="rubric-criteria-row-edit-button"
                   >
-                    <IconEditLine />
+                    {learningOutcomeId ? <IconOutcomesLine /> : <IconEditLine />}
                   </IconButton>
                 </View>
 

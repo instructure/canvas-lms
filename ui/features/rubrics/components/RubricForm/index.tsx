@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -123,8 +123,8 @@ export const RubricForm = ({
   const [isCriterionModalOpen, setIsCriterionModalOpen] = useState(false)
   const [isOutcomeCriterionModalOpen, setIsOutcomeCriterionModalOpen] = useState(false)
   const [isPreviewTrayOpen, setIsPreviewTrayOpen] = useState(false)
-  const [outcomeDialog, setOutcomeDialog] = useState<FindDialog | null>(null)
   const [outcomeDialogOpen, setOutcomeDialogOpen] = useState(false)
+  const criteriaRef = useRef(rubricForm.criteria)
 
   const header = rubricId ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
 
@@ -151,12 +151,12 @@ export const RubricForm = ({
     },
   })
 
-  const setRubricFormField = <K extends keyof RubricFormProps>(
-    key: K,
-    value: RubricFormProps[K]
-  ) => {
-    setRubricForm(prevState => ({...prevState, [key]: value}))
-  }
+  const setRubricFormField = useCallback(
+    <K extends keyof RubricFormProps>(key: K, value: RubricFormProps[K]) => {
+      setRubricForm(prevState => ({...prevState, [key]: value}))
+    },
+    [setRubricForm]
+  )
 
   const formValid = () => {
     return rubricForm.title.trim().length > 0 && rubricForm.criteria.length > 0
@@ -185,7 +185,7 @@ export const RubricForm = ({
   }
 
   const handleSaveCriterion = (updatedCriteria: RubricCriterion) => {
-    const criteria = [...rubricForm.criteria]
+    const criteria = [...criteriaRef.current]
 
     const criterionIndexToUpdate = criteria.findIndex(c => c.id === updatedCriteria.id)
 
@@ -247,8 +247,7 @@ export const RubricForm = ({
         rootOutcomeGroup: new OutcomeGroup(rootOutcomeGroup),
         url: '/outcomes/find_dialog',
       })
-      setOutcomeDialog(dialog)
-      outcomeDialog?.show()
+      dialog?.show()
       ;(dialog as any).on('import', (outcomeData: any) => {
         const newOutcomeCriteria = {
           id: Date.now().toString(),
@@ -265,7 +264,7 @@ export const RubricForm = ({
           ratings: outcomeData.attributes.ratings,
           learningOutcomeId: outcomeData.outcomeLink.outcome.id,
         }
-        const criteria = [...rubricForm.criteria]
+        const criteria = [...criteriaRef.current]
         // Check if the outcome has already been added to this rubric
         const hasDuplicateLearningOutcomeId = criteria.some(
           criterion => criterion.learningOutcomeId === newOutcomeCriteria.learningOutcomeId
@@ -287,7 +286,11 @@ export const RubricForm = ({
       })
       setOutcomeDialogOpen(false)
     }
-  }, [outcomeDialog, outcomeDialogOpen, rootOutcomeGroup, rubricForm.criteria])
+  }, [outcomeDialogOpen, rootOutcomeGroup, setRubricFormField])
+
+  useEffect(() => {
+    criteriaRef.current = rubricForm.criteria
+  }, [rubricForm.criteria])
 
   useEffect(() => {
     if (!rubricId) {
@@ -503,7 +506,6 @@ export const RubricForm = ({
         criterion={selectedCriterion}
         isOpen={isOutcomeCriterionModalOpen}
         onDismiss={() => setIsOutcomeCriterionModalOpen(false)}
-        onSave={(updatedCriteria: RubricCriterion) => handleSaveCriterion(updatedCriteria)}
       />
       <RubricAssessmentTray
         isOpen={isPreviewTrayOpen}

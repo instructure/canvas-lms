@@ -938,7 +938,7 @@ describe "threaded discussions" do
 
     context "replies reporting" do
       it "lets users report replies" do
-        skip "FOO-3823"
+        @course.root_account.enable_feature! :discussions_reporting
         @topic.discussion_entries.create!(
           user: @student,
           message: "this is offensive content"
@@ -951,16 +951,16 @@ describe "threaded discussions" do
         expect(fj("h2:contains('Report Reply')")).to be_present
 
         # side test, click away from modal and make sure it closes
-        force_click("button[data-testid='discussion-topic-reply']")
+        move_to_click("input[data-testid='search-filter']")
         expect(f("body")).not_to contain_jqcss("h2:contains('Report Reply')")
 
         # resume main test
-        f("button[data-testid='thread-actions-menu']").click
+        move_to_click("button[data-testid='thread-actions-menu']")
         fj("li:contains('Report')").click
-        force_click("input[value='offensive']")
+        move_to_click("input[value='offensive']")
         f("button[data-testid='report-reply-submit-button']").click
         wait_for_ajaximations
-        f("button[data-testid='thread-actions-menu']").click
+        move_to_click("button[data-testid='thread-actions-menu']")
         expect(fj("li:contains('Reported')")).to be_present
       end
     end

@@ -277,6 +277,7 @@ describe DiscussionTopicsController do
 
     it "sets discussions reporting and anonymity when their flags are enabled" do
       Account.site_admin.enable_feature! :react_discussions_post
+      @course.root_account.enable_feature! :discussions_reporting
 
       user_session(@teacher)
       get "index", params: { course_id: @course.id }
