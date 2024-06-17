@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/instructure/rspecq.git
-  revision: d7fa5536da01cccb5109ba05c9e236d6660da593
+  revision: 34c2f3c2d7cbc6d546c347e6bffb82ef91e7429d
   specs:
     rspecq (0.7.1)
       redis (>= 4.0, < 6.0)
@@ -681,7 +681,7 @@ GEM
     iso8601 (0.13.0)
     jira_ref_parser (1.0.1)
     jmespath (1.6.2)
-    json (2.7.1)
+    json (2.7.2)
     json-jwt (1.16.6)
       activesupport (>= 4.2)
       aes_key_wrap
