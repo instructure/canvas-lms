@@ -228,11 +228,12 @@ export const GradingSchemesSelector = ({
   async function openGradingSchemeViewModal() {
     setSelectedGradingScheme(undefined)
     try {
-      const scheme = selectedGradingSchemeId
+      const schemeId = selectedGradingSchemeId || courseDefaultSchemeId
+      const scheme = schemeId
         ? await loadGradingScheme(
             contextType,
             contextId,
-            selectedGradingSchemeId,
+            schemeId,
             archivedGradingSchemesEnabled ? assignmentId : null
           )
         : defaultCanvasGradingScheme
