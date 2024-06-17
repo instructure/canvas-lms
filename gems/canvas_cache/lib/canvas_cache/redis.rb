@@ -51,7 +51,7 @@ module CanvasCache
 
     module Cluster
       def disconnect_if_idle(since_when)
-        @router.instance_variable_get(:@node).clients.each { |c| c.disconnect_if_idle(since_when) }
+        @router.instance_variable_get(:@node)&.clients&.each { |c| c.disconnect_if_idle(since_when) }
       end
     end
 

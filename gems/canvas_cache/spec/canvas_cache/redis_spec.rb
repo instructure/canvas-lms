@@ -352,5 +352,10 @@ describe CanvasCache::Redis do
 
       include_examples "disconnect_if_idle"
     end
+
+    it "works with a cluster that hasn't connected yet" do
+      r = Redis::Cluster.new(nodes: ["rediss://somewhere:6379"])
+      r._client.disconnect_if_idle(1)
+    end
   end
 end
