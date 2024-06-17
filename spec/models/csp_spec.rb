@@ -182,10 +182,15 @@ describe Csp do
 
   describe "tool whitelist" do
     before :once do
-      @root = Account.create!
-      @root.enable_csp!
-      @sub1 = @root.sub_accounts.create!
-      @sub2 = @sub1.sub_accounts.create!
+      @root, @sub1, @sub2 = create_accounts
+    end
+
+    def create_accounts
+      root = Account.create!
+      root.enable_csp!
+      sub1 = root.sub_accounts.create!
+      sub2 = sub1.sub_accounts.create!
+      [root, sub1, sub2]
     end
 
     def create_some_tools
@@ -196,11 +201,15 @@ describe Csp do
       ]
     end
 
+    def example_domains(*numbers)
+      numbers.flat_map { |n| ["*.example#{n}.com", "example#{n}.com"] }
+    end
+
     it "gets all tool domains in the chain" do
       create_some_tools
 
-      expect(@sub1.cached_tool_domains).to match_array(["example1.com", "*.example1.com", "example2.com", "*.example2.com"])
-      expect(@sub2.cached_tool_domains).to match_array(["example1.com", "*.example1.com", "example2.com", "*.example2.com", "example3.com", "*.example3.com"])
+      expect(@sub1.cached_tool_domains).to match_array example_domains(1, 2)
+      expect(@sub2.cached_tool_domains).to match_array example_domains(1, 2, 3)
     end
 
     context "when internal_service_only: true is passed in" do
@@ -209,8 +218,37 @@ describe Csp do
         t2.update! developer_key: DeveloperKey.create!(account: @sub1)
         t3.update! developer_key: DeveloperKey.create!(account: @sub2, internal_service: true)
 
-        expect(@sub2.cached_tool_domains(internal_service_only: false)).to match_array(["example1.com", "*.example1.com", "example2.com", "*.example2.com", "example3.com", "*.example3.com"])
-        expect(@sub2.cached_tool_domains(internal_service_only: true)).to match_array(["example3.com", "*.example3.com"])
+        expect(@sub2.cached_tool_domains(internal_service_only: false)).to match_array example_domains(1, 2, 3)
+        expect(@sub2.cached_tool_domains(internal_service_only: true)).to match_array example_domains(3)
+      end
+
+      context "when the developer key is on another shard" do
+        specs_require_sharding
+
+        def create_dk(shard, account, internal_service)
+          shard.activate { DeveloperKey.create!(account:, internal_service:) }
+        end
+
+        it "gets only tools with dev keys with internal_service=true" do
+          sa_shard = Account.site_admin.shard
+          non_sa_shard = ([@shard1, @shard2] - [sa_shard]).first
+
+          root, sub1, _sub2 = non_sa_shard.activate { create_accounts }
+          dk1 = create_dk(sa_shard, Account.site_admin, false)
+          dk2 = create_dk(sa_shard, Account.site_admin, true)
+          dk3 = create_dk(non_sa_shard, root, false)
+          dk4 = create_dk(non_sa_shard, root, true)
+
+          non_sa_shard.activate do
+            create_tool(sub1, domain: "example1.com", developer_key: dk1)
+            create_tool(sub1, domain: "example2.com", developer_key: dk2)
+            create_tool(sub1, domain: "example3.com", developer_key: dk3)
+            create_tool(sub1, domain: "example4.com", developer_key: dk4)
+
+            expect(sub1.cached_tool_domains(internal_service_only: false)).to match_array example_domains(1, 2, 3, 4)
+            expect(sub1.cached_tool_domains(internal_service_only: true)).to match_array example_domains(2, 4)
+          end
+        end
       end
     end
 
