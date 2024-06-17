@@ -190,6 +190,16 @@ describe FilesController do
       expect(assigns[:js_env][:FILES_CONTEXTS][0][:file_menu_tools]).to eq []
     end
 
+    it "redirects to course homepage if context is course in limited access account" do
+      @course.account.root_account.enable_feature!(:allow_limited_access_for_students)
+      @course.account.settings[:enable_limited_access_for_students] = true
+      @course.account.save!
+
+      user_session(@student)
+      get "index", params: { course_id: @course.id }
+      expect(response).to redirect_to(course_path(@course))
+    end
+
     context "file menu tool visibility" do
       before do
         course_factory(active_all: true)
