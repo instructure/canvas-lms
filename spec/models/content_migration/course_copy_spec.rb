@@ -1274,6 +1274,13 @@ describe ContentMigration do
           expect(@copy_to.wiki_pages.where(title: "two")).to exist
         end
       end
+
+      it "finds the ContentMigration's ContentExport via source course and attachment id" do
+        run_course_copy
+        export = @cm.content_export
+        export.update! content_migration_id: nil
+        expect(ContentMigration.find(@cm.id).content_export).to eq export
+      end
     end
 
     context "with late policy" do
