@@ -204,10 +204,6 @@ function DiscussionTopicForm({
     currentDiscussionTopic?.groupSet?._id || null
   )
   const [groupCategorySelectError, setGroupCategorySelectError] = useState([])
-  const [delayPosting, setDelayPosting] = useState(
-    (!!currentDiscussionTopic?.delayedPostAt && isAnnouncement) || false
-  )
-
   const [locked, setLocked] = useState((currentDiscussionTopic.locked && isAnnouncement) || false)
 
   const [availableFrom, setAvailableFrom] = useState(currentDiscussionTopic?.delayedPostAt || null)
@@ -334,14 +330,14 @@ function DiscussionTopicForm({
   }
 
   useEffect(() => {
-    if (delayPosting) {
+    if (isAnnouncement && availableFrom) {
       const rightNow = new Date()
       const availableFromIntoDate = new Date(availableFrom)
       setWillAnnouncementPostRightAway(availableFromIntoDate <= rightNow)
     } else {
       setWillAnnouncementPostRightAway(true)
     }
-  }, [availableFrom, delayPosting])
+  }, [availableFrom, isAnnouncement])
 
   useEffect(() => {
     if (!isGroupDiscussion) setGroupCategoryId(null)
@@ -452,7 +448,8 @@ function DiscussionTopicForm({
     if (
       !isGraded &&
       !currentDiscussionTopic?.assignment &&
-      ENV.FEATURES?.selective_release_ui_api
+      ENV.FEATURES?.selective_release_ui_api &&
+      !isAnnouncement
     ) {
       delete payload.specificSections
       Object.assign(
@@ -632,7 +629,7 @@ function DiscussionTopicForm({
   }
 
   const renderAvailabilityOptions = useCallback(() => {
-    if (isGraded) {
+    if (isGraded && !isAnnouncement) {
       return (
         <View as="div" data-testid="assignment-settings-section">
           <DiscussionDueDatesContext.Provider value={assignmentDueDateContext}>
@@ -673,19 +670,21 @@ function DiscussionTopicForm({
       )
     } else {
       return (
-        <NonGradedDateOptions
-          availableFrom={availableFrom}
-          setAvailableFrom={setAvailableFrom}
-          availableUntil={availableUntil}
-          setAvailableUntil={setAvailableUntil}
-          isGraded={isGraded}
-          setAvailabilityValidationMessages={setAvailabilityValidationMessages}
-          availabilityValidationMessages={availabilityValidationMessages}
-          inputWidth={inputWidth}
-          setDateInputRef={ref => {
-            dateInputRef.current = ref
-          }}
-        />
+        <View as="div" data-testid="non-graded-date-options">
+          <NonGradedDateOptions
+            availableFrom={availableFrom}
+            setAvailableFrom={setAvailableFrom}
+            availableUntil={availableUntil}
+            setAvailableUntil={setAvailableUntil}
+            isGraded={isGraded}
+            setAvailabilityValidationMessages={setAvailabilityValidationMessages}
+            availabilityValidationMessages={availabilityValidationMessages}
+            inputWidth={inputWidth}
+            setDateInputRef={ref => {
+              dateInputRef.current = ref
+            }}
+          />
+        </View>
       )
     }
   }, [
@@ -698,6 +697,7 @@ function DiscussionTopicForm({
     displayGradeAs,
     gradingSchemeId,
     intraGroupPeerReviews,
+    isAnnouncement,
     isCheckpoints,
     isGraded,
     peerReviewAssignment,
@@ -816,33 +816,6 @@ function DiscussionTopicForm({
           />
         )}
         <FormFieldGroup description="" rowSpacing="small">
-          {shouldShowAnnouncementOnlyOptions && (
-            <Checkbox
-              id="delay-posting-cb"
-              label={I18n.t('Delay Posting')}
-              value="enable-delay-posting"
-              checked={delayPosting}
-              onChange={() => {
-                setDelayPosting(!delayPosting)
-                setAvailableFrom(null)
-              }}
-            />
-          )}
-          {delayPosting && shouldShowAnnouncementOnlyOptions && (
-            <DateTimeInput
-              timezone={ENV.TIMEZONE}
-              description={I18n.t('Post At')}
-              prevMonthLabel={I18n.t('previous')}
-              nextMonthLabel={I18n.t('next')}
-              onChange={(_event, newDate) => setAvailableFrom(newDate)}
-              value={availableFrom}
-              invalidDateTimeMessage={I18n.t('Invalid date and time')}
-              layout="columns"
-              datePlaceholder={I18n.t('Select Date')}
-              dateRenderLabel={I18n.t('Date')}
-              timeRenderLabel={I18n.t('Time')}
-            />
-          )}
           {shouldShowAnnouncementOnlyOptions && (
             <Checkbox
               label={I18n.t('Allow Participants to Comment')}
@@ -1081,8 +1054,8 @@ function DiscussionTopicForm({
           published={published}
           shouldShowSaveAndPublishButton={shouldShowSaveAndPublishButton}
           submitForm={publish => {
-            if (isAnnouncement && isEditing && !delayPosting) {
-              // remember  publish value for SendEditNotificationModal later
+            if (isAnnouncement && isEditing && willAnnouncementPostRightAway) {
+              // remember publish value for SendEditNotificationModal later
               setShowEditAnnouncementModal(true)
               setShouldPublish(publish)
             } else {

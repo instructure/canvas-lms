@@ -108,13 +108,13 @@ describe "announcements" do
       end
 
       it "for delayed posting notification sending is not available", :ignore_js_errors do
+        @announcement.delayed_post_at = 1.day.from_now
+        @announcement.save!
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
 
         type_in_tiny("#discussion-topic-message-body", "Hi, this is my EDITED message")
 
-        f('label[for="delay-posting-cb"]').click
-
-        expect_new_page_load { AnnouncementNewEdit.publish_button.click }
+        expect_new_page_load { AnnouncementNewEdit.submit_button.click }
       end
 
       it "should not send notifications at all if we hit Cancel", :ignore_js_errors do
@@ -124,6 +124,47 @@ describe "announcements" do
         AnnouncementNewEdit.notification_modal_cancel.click
 
         expect(AnnouncementNewEdit.publish_button).to be_displayed
+      end
+
+      it "removes delayed_post_at when Available from field is cleared", :ignore_js_errors do
+        @announcement.delayed_post_at = 10.days.from_now
+        @announcement.save!
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
+
+        AnnouncementNewEdit.available_from_reset_button.click
+        expect_new_page_load do
+          AnnouncementNewEdit.submit_button.click
+          AnnouncementNewEdit.notification_modal_send.click
+        end
+
+        @announcement.reload
+        expect(@announcement.delayed_post_at).to be_nil
+      end
+
+      it "changes the save button to publish when delayed_post_at is cleared", :ignore_js_errors do
+        @announcement.delayed_post_at = 10.days.from_now
+        @announcement.save!
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
+
+        expect(AnnouncementNewEdit.submit_button.text).to eq("Save")
+
+        AnnouncementNewEdit.available_from_reset_button.click
+        expect(AnnouncementNewEdit.submit_button.text).to eq("Publish")
+      end
+
+      it "removes lock_at when Available until field is cleared", :ignore_js_errors do
+        @announcement.lock_at = 10.days.from_now
+        @announcement.save!
+
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
+        AnnouncementNewEdit.available_until_reset_button.click
+        expect_new_page_load do
+          AnnouncementNewEdit.submit_button.click
+          AnnouncementNewEdit.notification_modal_send.click
+        end
+
+        @announcement.reload
+        expect(@announcement.lock_at).to be_nil
       end
     end
 
