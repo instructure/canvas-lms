@@ -485,7 +485,14 @@ const CriterionRow = ({
               <>
                 <Flex.Item>
                   <View margin="0 0 0 small" themeOverride={{marginSmall: '1rem'}}>
-                    <Button color="secondary" onClick={() => setCommentText('')}>
+                    <Button
+                      color="secondary"
+                      onClick={() => {
+                        setCommentText('')
+                        updateAssessmentData({comments: ''})
+                      }}
+                      data-testid={`clear-comment-button-${criterion.id}`}
+                    >
                       {I18n.t('Clear')}
                     </Button>
                   </View>

@@ -217,14 +217,19 @@ const ViewModeSelect = ({
       data-testid="rubric-assessment-view-mode-select"
       onChange={(_e, {value}) => handleSelect(value as string)}
     >
-      <SimpleSelect.Option id="traditional" value="traditional" isDisabled={disableTraditionalView}>
+      <SimpleSelect.Option
+        id="traditional"
+        value="traditional"
+        isDisabled={disableTraditionalView}
+        data-testid="traditional-view-option"
+      >
         {I18n.t('Traditional')}
       </SimpleSelect.Option>
-      <SimpleSelect.Option id="horizontal" value="horizontal">
+      <SimpleSelect.Option id="horizontal" value="horizontal" data-testid="horizontal-view-option">
         {I18n.t('Horizontal')}
       </SimpleSelect.Option>
       {!isFreeFormCriterionComments && (
-        <SimpleSelect.Option id="vertical" value="vertical">
+        <SimpleSelect.Option id="vertical" value="vertical" data-testid="vertical-view-option">
           {I18n.t('Vertical')}
         </SimpleSelect.Option>
       )}

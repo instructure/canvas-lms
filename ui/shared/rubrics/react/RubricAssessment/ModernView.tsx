@@ -221,6 +221,7 @@ export const CriterionRow = ({
                 onChange={(_e, value) => {
                   setPoints(value)
                 }}
+                data-testid="modern-view-points-input"
               />
             )}
           </Flex.Item>
@@ -313,6 +314,7 @@ export const CriterionRow = ({
                   onChange={e => setCommentText(e.target.value)}
                   onBlur={() => updateAssessmentData({comments: commentText})}
                   placeholder={I18n.t('Leave a comment')}
+                  data-testid={`comment-text-area-${criterion.id}`}
                 />
               )}
             </Flex.Item>
