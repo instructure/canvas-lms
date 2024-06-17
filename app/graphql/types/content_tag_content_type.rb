@@ -18,15 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module Types
-  class ContentTagConnection < GraphQL::Types::Relay::BaseConnection
-    edge_type(Types::ContentTagType)
-
-    def edges
-      @object.edge_nodes
-    end
-
-    def nodes
-      Loaders::AssociationLoader.for(ContentTagContentType, :content).load_many(edges)
-    end
+  class ContentTagContentType < Types::BaseUnion
+    description "Content of a Content Tag"
+    possible_types Types::LearningOutcomeType
   end
 end
