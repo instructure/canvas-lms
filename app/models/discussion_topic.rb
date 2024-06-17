@@ -869,7 +869,7 @@ class DiscussionTopic < ActiveRecord::Base
     end
 
     user_ids = Array(users) | observed_student_ids
-    visible_differentiated_topic_ids = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible_to_students_by_topics(user_ids:, discussion_topic_ids: ids).map(&:discussion_topic_id)
+    visible_differentiated_topic_ids = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible_to_students(user_ids:).map(&:discussion_topic_id)
     merge(DiscussionTopic.where.not(context_type: "Course")
     .or(DiscussionTopic.where(id: visible_topic_ids))
     .or(DiscussionTopic.where(id: visible_differentiated_topic_ids, is_section_specific: false))

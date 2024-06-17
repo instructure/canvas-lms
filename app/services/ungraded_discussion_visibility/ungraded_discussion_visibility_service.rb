@@ -20,13 +20,20 @@
 module UngradedDiscussionVisibility
   class UngradedDiscussionVisibilityService
     class << self
-      def discussion_topics_visible_to_student(course_id:, user_id:)
+      def discussion_topics_visible_to_student_in_course(course_id:, user_id:)
         raise ArgumentError, "course_id cannot be nil" if course_id.nil?
         raise ArgumentError, "course_id must not be an array" if course_id.is_a?(Array)
         raise ArgumentError, "user_id cannot be nil" if user_id.nil?
         raise ArgumentError, "user_id must not be an array" if user_id.is_a?(Array)
 
-        discussion_topics_visible_to_students(course_id_params: course_id, user_id_params: user_id)
+        discussion_topics_visible(course_id_params: course_id, user_id_params: user_id)
+      end
+
+      def discussion_topics_visible_to_students(user_ids:)
+        raise ArgumentError, "user_id cannot be nil" if user_ids.nil?
+        raise ArgumentError, "user_id must be an array" unless user_ids.is_a?(Array)
+
+        discussion_topics_visible(user_id_params: user_ids)
       end
 
       def discussion_topics_visible_to_students_in_courses(course_ids:, user_ids:)
@@ -35,7 +42,7 @@ module UngradedDiscussionVisibility
         raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
         raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
 
-        discussion_topics_visible_to_students(course_id_params: course_ids, user_id_params: user_ids)
+        discussion_topics_visible(course_id_params: course_ids, user_id_params: user_ids)
       end
 
       def discussion_topics_visible_to_students_in_course(course_id:, user_ids:)
@@ -44,7 +51,7 @@ module UngradedDiscussionVisibility
         raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
         raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
 
-        discussion_topics_visible_to_students(course_id_params: course_id, user_id_params: user_ids)
+        discussion_topics_visible(course_id_params: course_id, user_id_params: user_ids)
       end
 
       def discussion_topic_visible_to_student(discussion_topic_id:, user_id:)
@@ -53,7 +60,7 @@ module UngradedDiscussionVisibility
         raise ArgumentError, "user_id cannot be nil" if user_id.nil?
         raise ArgumentError, "user_id must not be an array" if user_id.is_a?(Array)
 
-        discussion_topics_visible_to_students(discussion_topic_id_params: discussion_topic_id, user_id_params: user_id)
+        discussion_topics_visible(discussion_topic_id_params: discussion_topic_id, user_id_params: user_id)
       end
 
       def discussion_topic_visible_to_students(discussion_topic_id:, user_ids:)
@@ -62,7 +69,7 @@ module UngradedDiscussionVisibility
         raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
         raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
 
-        discussion_topics_visible_to_students(discussion_topic_id_params: discussion_topic_id, user_id_params: user_ids)
+        discussion_topics_visible(discussion_topic_id_params: discussion_topic_id, user_id_params: user_ids)
       end
 
       def discussion_topics_visible_to_students_by_topics(discussion_topic_ids:, user_ids:)
@@ -71,7 +78,7 @@ module UngradedDiscussionVisibility
         raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
         raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
 
-        discussion_topics_visible_to_students(discussion_topic_id_params: discussion_topic_ids, user_id_params: user_ids)
+        discussion_topics_visible(discussion_topic_id_params: discussion_topic_ids, user_id_params: user_ids)
       end
 
       def discussion_topic_visible_to_students_in_course(discussion_topic_id:, user_ids:, course_id:)
@@ -82,7 +89,7 @@ module UngradedDiscussionVisibility
         raise ArgumentError, "user_ids cannot be nil" if user_ids.nil?
         raise ArgumentError, "user_ids must be an array" unless user_ids.is_a?(Array)
 
-        discussion_topics_visible_to_students(course_id_params: course_id, discussion_topic_id_params: discussion_topic_id, user_id_params: user_ids)
+        discussion_topics_visible(course_id_params: course_id, discussion_topic_id_params: discussion_topic_id, user_id_params: user_ids)
       end
 
       def discussion_topic_visible_in_course(discussion_topic_id:, course_id:)
@@ -91,12 +98,12 @@ module UngradedDiscussionVisibility
         raise ArgumentError, "discussion_topic_id cannot be nil" if discussion_topic_id.nil?
         raise ArgumentError, "discussion_topic_id must not be an array" if discussion_topic_id.is_a?(Array)
 
-        discussion_topics_visible_to_students(course_id_params: course_id, discussion_topic_id_params: discussion_topic_id)
+        discussion_topics_visible(course_id_params: course_id, discussion_topic_id_params: discussion_topic_id)
       end
 
       private
 
-      def discussion_topics_visible_to_students(course_id_params: nil, user_id_params: nil, discussion_topic_id_params: nil)
+      def discussion_topics_visible(course_id_params: nil, user_id_params: nil, discussion_topic_id_params: nil)
         if course_id_params.nil? && user_id_params.nil? && discussion_topic_id_params.nil?
           raise ArgumentError, "at least one non nil course_id, user_id, or discussion_topic_id_params is required (for query performance reasons)"
         end
