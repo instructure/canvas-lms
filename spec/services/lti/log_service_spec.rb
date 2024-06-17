@@ -23,7 +23,7 @@ describe Lti::LogService do
   end
 
   let_once(:session_id) { SecureRandom.hex }
-  let_once(:tool) { external_tool_model }
+  let_once(:tool) { external_tool_model(opts: { unified_tool_id: "unified_tool_id" }) }
   let_once(:user) { user_model }
   let_once(:account) { account_model }
   let_once(:context) { course_model(root_account: account) }
@@ -113,7 +113,7 @@ describe Lti::LogService do
 
     it "includes the correct data" do
       expect(subject).to eq({
-                              unified_tool_id: nil,
+                              unified_tool_id: tool.unified_tool_id,
                               tool_id: tool.id.to_s,
                               tool_provided_id: tool.tool_id,
                               tool_domain: tool.domain,
