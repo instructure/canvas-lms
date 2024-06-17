@@ -44,7 +44,9 @@ const convertSubmittedAssessment = (assessments: RubricAssessmentData[]): any =>
     data[pre + '[comments]'] = assessment.comments
     data[pre + '[save_comment]'] = assessment.saveCommentsForLater ? '1' : '0'
     data[pre + '[description]'] = assessment.description
-    data[pre + '[rating_id]'] = assessment.id ?? '-1'
+    if (assessment.id) {
+      data[pre + '[rating_id]'] = assessment.id
+    }
   })
 
   return data

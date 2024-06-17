@@ -20,6 +20,7 @@ import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
 import {possibleString} from '@canvas/rubrics/react/Points'
+import {escapeNewLineText} from '@canvas/rubrics/react/RubricAssessment'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
@@ -114,7 +115,8 @@ export const RubricCriteriaRow = ({
                       margin="small 0 0 0"
                       data-testid="rubric-criteria-row-description"
                     >
-                      <Text>{description}</Text>
+                      {/* html sanitized by server */}
+                      <Text dangerouslySetInnerHTML={{__html: description}} />
                     </View>
                   </>
                 ) : (
@@ -297,7 +299,7 @@ const RatingScaleAccordionItem = ({rating, scale, spacing}: RatingScaleAccordion
         </Flex.Item>
         <Flex.Item shouldShrink={true} shouldGrow={true} align="start">
           <View as="div">
-            <Text>{rating.longDescription}</Text>
+            <Text dangerouslySetInnerHTML={escapeNewLineText(rating.longDescription)} />
           </View>
         </Flex.Item>
         <Flex.Item align="start">
