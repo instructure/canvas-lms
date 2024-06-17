@@ -64,28 +64,31 @@ module Factories
   def largest_rubric_data
     [
       { description: "small Crit1",
+        long_description: "This is a long description 1",
         points: 10,
         id: "crit3",
         ratings: [
-          { description: "A", points: 10, id: "rat1", criterion_id: "crit3" },
-          { description: "B", points: 7, id: "rat2", criterion_id: "crit3" },
-          { description: "F", points: 0, id: "rat3", criterion_id: "crit3" }
+          { description: "A", points: 10, id: "rat1-1", criterion_id: "crit3" },
+          { description: "B", points: 7, id: "rat2-1", criterion_id: "crit3" },
+          { description: "F", points: 0, id: "rat3-1", criterion_id: "crit3" }
         ] },
       { description: "samll Crit2",
+        long_description: "This is a long description 2",
         points: 10,
         id: "crit4",
         ratings: [
-          { description: "A", points: 10, id: "rat1", criterion_id: "crit4" },
-          { description: "B", points: 7, id: "rat2", criterion_id: "crit4" },
-          { description: "F", points: 0, id: "rat3", criterion_id: "crit4" }
+          { description: "A", points: 10, id: "rat1-2", criterion_id: "crit4" },
+          { description: "B", points: 7, id: "rat2-2", criterion_id: "crit4" },
+          { description: "F", points: 0, id: "rat3-2", criterion_id: "crit4" }
         ] },
       { description: "samll Crit2",
+        long_description: "This is a long description 3",
         points: 10,
         id: "crit5",
         ratings: [
-          { description: "A", points: 10, id: "rat1", criterion_id: "crit5" },
-          { description: "B", points: 7, id: "rat2", criterion_id: "crit5" },
-          { description: "F", points: 0, id: "rat3", criterion_id: "crit5" }
+          { description: "A", points: 10, id: "rat1-3", criterion_id: "crit5" },
+          { description: "B", points: 7, id: "rat2-3", criterion_id: "crit5" },
+          { description: "F", points: 0, id: "rat3-3", criterion_id: "crit5" }
         ] },
     ]
   end
