@@ -613,7 +613,12 @@ describe GradingSchemesJsonController, type: :request do
 
         expect(locations.size).to eq(1)
         expect(locations.first["id"]).to eq(@course.id)
-        expect(locations.first["assignments"].size).to eq(3)
+        expect(locations.first["assignments"].size).to eq(0)
+
+        get "/accounts/#{@account.id}/grading_schemes/#{@grading_standard.id}/used_locations/#{@course.id}", as: :json
+        assignment_locations = response.parsed_body
+
+        expect(assignment_locations.size).to eq(3)
       end
 
       it "does not return courses without graded assignments" do
@@ -642,6 +647,36 @@ describe GradingSchemesJsonController, type: :request do
         course_ids = locations.pluck("id")
         expect(course_ids).to include(another_course.id)
       end
+
+      it "ignore course if is deleted" do
+        @course.destroy!
+        user_session(@admin)
+        get "/accounts/#{@account.id}/grading_schemes/#{@grading_standard.id}/used_locations", as: :json
+        locations = response.parsed_body
+
+        expect(locations.size).to eq(0)
+      end
+    end
+  end
+
+  describe "#account_used_locations" do
+    let_once(:data) { [["A", 94], ["F", 0]] }
+
+    before(:once) do
+      @root_account = Account.default
+      @grading_standard = GradingStandard.create(context: @root_account, workflow_state: "active", data:)
+      @root_account.update(grading_standard_id: @grading_standard.id)
+      @sub_account = @root_account.sub_accounts.create!
+      @admin = account_admin_user(account: @root_account)
+    end
+
+    it "returns root account where the grading standard is related" do
+      user_session(@admin)
+      get "/accounts/#{@root_account.id}/grading_schemes/#{@grading_standard.id}/account_used_locations", as: :json
+      locations = response.parsed_body
+
+      expect(locations.size).to eq(1)
+      expect(locations[0]["id"]).to eq(@root_account.id)
     end
   end
 

@@ -467,6 +467,10 @@ describe GradingStandard do
       end
 
       context "without submissions" do
+        before(:once) do
+          Account.site_admin.disable_feature!(:archived_grading_schemes)
+        end
+
         it "is false" do
           expect(@gs).not_to be_assessed_assignment
         end
@@ -475,6 +479,7 @@ describe GradingStandard do
       context "with submissions" do
         before(:once) do
           @submission = @assignment.submit_homework(@student, body: "done!")
+          Account.site_admin.disable_feature!(:archived_grading_schemes)
         end
 
         it "is false if no submissions are graded" do

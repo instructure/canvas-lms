@@ -25,15 +25,6 @@ class GradingStandard < ActiveRecord::Base
   belongs_to :user
   has_many :assignments
   has_many :courses
-  has_many :assessed_course_assignments,
-           lambda {
-             where(grading_standard_id: nil, grading_type: ["letter_grade", "gpa_scale"])
-               .joins(:submissions)
-               .where("submissions.workflow_state='graded'")
-           },
-           through: :courses,
-           source: :assignments
-
   has_many :accounts, inverse_of: :grading_standard, dependent: :nullify
 
   validates :workflow_state, presence: true
@@ -267,20 +258,12 @@ class GradingStandard < ActiveRecord::Base
         return assignments.active.joins(:submissions).where("submissions.workflow_state='graded'").exists?
       end
 
-      return true if assessed_course_assignments.exists? || assessed_assignments.exists?
+      return true if assignments.active.count > 0
+      return true if courses.active.count > 0
+      return true if accounts.active.count > 0
 
       false
     end
-  end
-
-  def used_locations
-    assessed_assignments.union(assessed_course_assignments)
-  end
-
-  def assessed_assignments
-    assignments
-      .except(:order).joins(:submissions)
-      .where("submissions.workflow_state='graded'")
   end
 
   delegate :name, to: :context, prefix: true
@@ -376,7 +359,7 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def used_as_default?
-    courses.any? || accounts.any?
+    courses.active.any? || accounts.active.any? || assignments.active.any?
   end
 
   private
