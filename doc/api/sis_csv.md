@@ -1121,7 +1121,7 @@ admins.csv
 <td>text</td>
 <td>✓</td>
 <td></td>
-<td>The account identifier from accounts.csv. Uses the root_account if left blank. The collumn is required even when importing for the root_account and the value is blank.</td>
+<td>The account identifier from accounts.csv. Uses the root_account if left blank. The column is required even when importing for the root_account and the value is blank.</td>
 </tr>
 <tr>
 <td>role_id</td>
