@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import {act, fireEvent, render, waitFor, screen} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import ItemAssignToTray, {type ItemAssignToTrayProps} from '../ItemAssignToTray'
@@ -828,8 +828,7 @@ describe('ItemAssignToTray', () => {
     })
 
     it('validates if required due dates are set before applying changes', async () => {
-      const {getByTestId, queryByTestId, findAllByTestId, getByText, getAllByText, findByText} =
-        renderComponent()
+      const {getByTestId, findAllByTestId, getByText, getAllByText} = renderComponent()
       // wait until the cards are loaded
       const cards = await findAllByTestId('item-assign-to-card')
       expect(cards[0]).toBeInTheDocument()
@@ -843,6 +842,67 @@ describe('ItemAssignToTray', () => {
       expect(getByText('Please fix errors before continuing')).toBeInTheDocument()
       // tray stays open
       expect(getByText('Assignment | 10 pts')).toBeInTheDocument()
+    })
+  })
+
+  describe('mastery paths option', () => {
+    beforeEach(() => {
+      fetchMock.getOnce(
+        '/api/v1/courses/1/settings',
+        {conditional_release: true},
+        {overwriteRoutes: true}
+      )
+      ;['assignments', 'quizzes', 'discussion_topics', 'pages'].forEach(itemType => {
+        fetchMock.getOnce(
+          `/api/v1/courses/1/${itemType}/23/date_details?per_page=100`,
+          {
+            only_visible_to_overrides: false,
+            visible_to_everyone: true,
+            overrides: [],
+          },
+          {overwriteRoutes: true}
+        )
+      })
+    })
+
+    it('does not render mastery path option for ungraded discussions', async () => {
+      renderComponent({itemType: 'discussion', removeDueDateInput: true})
+      const assignToInput = await screen.findByTestId('assignee_selector')
+      await userEvent.click(assignToInput)
+      expect(await screen.findByText('Ben')).toBeInTheDocument()
+      expect(screen.queryByText('Mastery Paths')).not.toBeInTheDocument()
+    })
+
+    it('does render mastery path option for graded discussions', async () => {
+      renderComponent({itemType: 'discussion', removeDueDateInput: false})
+      const assignToInput = await screen.findByTestId('assignee_selector')
+      await userEvent.click(assignToInput)
+      expect(await screen.findByText('Ben')).toBeInTheDocument()
+      expect(screen.getByText('Mastery Paths')).toBeInTheDocument()
+    })
+
+    it('does render mastery path option for pages', async () => {
+      renderComponent({itemType: 'wiki_page', removeDueDateInput: true})
+      const assignToInput = await screen.findByTestId('assignee_selector')
+      await userEvent.click(assignToInput)
+      expect(await screen.findByText('Ben')).toBeInTheDocument()
+      expect(screen.getByText('Mastery Paths')).toBeInTheDocument()
+    })
+
+    it('does render mastery path option for assignments', async () => {
+      renderComponent({itemType: 'assignment', removeDueDateInput: false})
+      const assignToInput = await screen.findByTestId('assignee_selector')
+      await userEvent.click(assignToInput)
+      expect(await screen.findByText('Ben')).toBeInTheDocument()
+      expect(screen.getByText('Mastery Paths')).toBeInTheDocument()
+    })
+
+    it('does render mastery path option for quizzes', async () => {
+      renderComponent({itemType: 'quiz', removeDueDateInput: false})
+      const assignToInput = await screen.findByTestId('assignee_selector')
+      await userEvent.click(assignToInput)
+      expect(await screen.findByText('Ben')).toBeInTheDocument()
+      expect(screen.getByText('Mastery Paths')).toBeInTheDocument()
     })
   })
 })

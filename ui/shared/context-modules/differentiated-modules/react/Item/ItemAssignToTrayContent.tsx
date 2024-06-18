@@ -37,7 +37,6 @@ import type {
   ItemAssignToCardSpec,
 } from './types'
 import ItemAssignToCard, {type ItemAssignToCardRef} from './ItemAssignToCard'
-import useFetchAssignees from '../../utils/hooks/useFetchAssignees'
 import {getOverriddenAssignees, itemTypeToApiURL} from '../../utils/assignToHelper'
 import {getEveryoneOption, ItemAssignToTrayProps} from './ItemAssignToTray'
 
