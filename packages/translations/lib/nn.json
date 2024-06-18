@@ -737,6 +737,9 @@
     "external_link_d3f9e62a": {
         "message": "Ekstern lenke"
     },
+    "external_tool_frame_70b32473": {
+        "message": "Ekstern verktøyramme"
+    },
     "external_tools_6e77821": {
         "message": "Eksterne verktøy"
     },
@@ -1970,6 +1973,9 @@
     "show_link_options_545338fd": {
         "message": "Vis lenkealternativ"
     },
+    "show_studio_media_options_a0c748c6": {
+        "message": "Vis medievalg for studio"
+    },
     "show_video_options_6ed3721a": {
         "message": "Vis videoalternativ"
     },
@@ -2074,6 +2080,9 @@
     },
     "steel_blue_14296f08": {
         "message": "Stålblå"
+    },
+    "studio_media_options_ee504361": {
+        "message": "Medieval for studio"
     },
     "styles_2aa721ef": {
         "message": "Stilar"
@@ -2299,6 +2308,9 @@
     },
     "up_c553575d": {
         "message": "Opp"
+    },
+    "updated_link_a827e441": {
+        "message": "Oppdatert lenke"
     },
     "upload_document_253f0478": {
         "message": "Last opp dokument frå disk"
