@@ -512,7 +512,8 @@ class Lti::RegistrationsController < ApplicationController
       # always sort by created_at descending for now
       sorted_registrations = all_registrations.sort { |first, second| second.created_at - first.created_at }
 
-      paginated_registrations, _metadata = Api.jsonapi_paginate(sorted_registrations, self, url_for, { per_page: params[:per_page] || 15 })
+      per_page = Api.per_page_for(self, default: 15)
+      paginated_registrations, _metadata = Api.jsonapi_paginate(sorted_registrations, self, url_for, { per_page: })
       render json: {
         total: all_registrations.size,
         data: lti_registrations_json(paginated_registrations, @current_user, session, @context, includes: [:account_binding])

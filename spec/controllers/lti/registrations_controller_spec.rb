@@ -287,6 +287,19 @@ describe Lti::RegistrationsController do
           expect(link_header_values.length).to eq(3)
         end
 
+        context "with per_page over max" do
+          subject { get url + "?per_page=5" }
+
+          before do
+            stub_const("Api::MAX_PER_PAGE", 3)
+          end
+
+          it "returns max amount" do
+            subject
+            expect(response_json[:data].length).to eq(3)
+          end
+        end
+
         context "with 20 registrations present" do
           # create 5 additional registrations on top of the existing 15
           before do
