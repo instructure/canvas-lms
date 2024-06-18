@@ -68,6 +68,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       Attachment => [],
       AttachmentAssociation => %i[course group submission attachment], # attachment is last, only used if context is a ConversationMessage
       CalendarEvent => %i[context_course context_group context_course_section],
+      Collaboration => :context,
       CommunicationChannel => [], # has override
       ContentMigration => %i[account course group],
       ContentParticipation => :content,

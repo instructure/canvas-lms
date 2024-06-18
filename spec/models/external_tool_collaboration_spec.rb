@@ -59,6 +59,7 @@ describe ExternalToolCollaboration do
       external_tool_collaboration_model(
         context: course,
         title: "Indirect Collaboration",
+        root_account_id: course.root_account_id,
         url:
       )
     end
@@ -73,6 +74,7 @@ describe ExternalToolCollaboration do
       external_tool_collaboration_model(
         context: course,
         title: "Indirect Collaboration",
+        root_account_id: course.root_account_id,
         url: "http://tool2.other.com"
       )
     end
@@ -81,6 +83,7 @@ describe ExternalToolCollaboration do
       external_tool_collaboration_model(
         context: other_course,
         title: "Other Course - Indirect Collaboration",
+        root_account_id: other_course.root_account_id,
         url:
       )
     end

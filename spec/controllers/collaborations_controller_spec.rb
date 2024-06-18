@@ -350,6 +350,7 @@ describe CollaborationsController do
       post "create", params: { course_id: @course.id, collaboration: { collaboration_type: "EtherPad", title: "My Collab" } }
       expect(response).to be_redirect
       expect(assigns[:collaboration]).not_to be_nil
+      expect(assigns[:collaboration].root_account_id).to eq(@course.root_account_id)
       expect(assigns[:collaboration].class).to eql(EtherpadCollaboration)
       expect(assigns[:collaboration].collaboration_type).to eql("EtherPad")
       expect(Collaboration.find(assigns[:collaboration].id)).to be_is_a(EtherpadCollaboration)
