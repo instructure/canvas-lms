@@ -42,10 +42,9 @@ export type DynamicRegistrationWizardProps = {
 
 export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps) => {
   const {accountId, dynamicRegistrationUrl, service} = props
-  const useDynamicRegistrationWizardState = React.useMemo(
-    () => mkUseDynamicRegistrationWizardState(service),
-    [service]
-  )
+  const useDynamicRegistrationWizardState = React.useMemo(() => {
+    return mkUseDynamicRegistrationWizardState(service)
+  }, [service])
   const dynamicRegistrationWizardState = useDynamicRegistrationWizardState()
 
   const {loadRegistrationToken} = dynamicRegistrationWizardState

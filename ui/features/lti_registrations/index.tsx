@@ -24,6 +24,8 @@ import {LtiAppsLayout} from './layout/LtiAppsLayout'
 import {DiscoverRoute} from './discover/components'
 import {ManageRoutes} from './manage'
 import ProductDetail from './discover/components/ProductDetail/ProductDetail'
+import {ZAccountId} from './manage/model/AccountId'
+import {RegistrationWizardModal} from './manage/registration_wizard/RegistrationWizardModal'
 
 const getBasename = () => {
   const path = window.location.pathname
@@ -46,11 +48,7 @@ const router = createBrowserRouter(
     },
     {
       path: 'product_detail/:id',
-      element: (
-        <QueryClientProvider client={queryClient}>
-          <ProductDetail />
-        </QueryClientProvider>
-      ),
+      element: <ProductDetail />,
     },
   ],
 
@@ -59,4 +57,12 @@ const router = createBrowserRouter(
   }
 )
 
-ReactDOM.render(<RouterProvider router={router} />, document.getElementById('reactContent'))
+const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
+
+ReactDOM.render(
+  <QueryClientProvider client={queryClient}>
+    <RegistrationWizardModal accountId={accountId} />
+    <RouterProvider router={router} />
+  </QueryClientProvider>,
+  document.getElementById('reactContent')
+)
