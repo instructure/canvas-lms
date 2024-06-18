@@ -173,6 +173,11 @@ module Api::V1::StreamItem
   end
 
   def api_render_stream_summary(opts)
+    items = calculate_stream_summary(opts)
+    render json: items
+  end
+
+  def calculate_stream_summary(opts)
     items = []
 
     GuardRail.activate(:secondary) do
@@ -227,7 +232,7 @@ module Api::V1::StreamItem
         items.sort_by! { |i| i[:type] }
       end
     end
-    render json: items
+    items
   end
 
   def cross_shard_stream_item_counts(opts)

@@ -1318,4 +1318,78 @@ describe Types::UserType do
       expect(user_type.resolve("inboxLabels")).to eq []
     end
   end
+
+  context "ActivityStream" do
+    it "returns the activity stream summary" do
+      @context = @course
+      discussion_topic_model
+      discussion_topic_model(user: @user)
+      announcement_model
+      conversation(User.create, @user)
+      Notification.create(name: "Assignment Due Date Changed", category: "TestImmediately")
+      allow_any_instance_of(Assignment).to receive(:created_at).and_return(4.hours.ago)
+      assignment_model(course: @course)
+      @assignment.update_attribute(:due_at, 1.week.from_now)
+
+      cur_resolver = GraphQLTypeTester.new(@user, current_user: @user, domain_root_account: @course.account.root_account, request: ActionDispatch::TestRequest.create)
+      expect(cur_resolver.resolve("activityStream { summary { type } } ")).to match_array %w[Announcement Conversation DiscussionTopic Message]
+      expect(cur_resolver.resolve("activityStream { summary { count } } ")).to match_array [1, 1, 2, 1]
+      expect(cur_resolver.resolve("activityStream { summary { unreadCount } } ")).to match_array [1, 0, 1, 0]
+      expect(cur_resolver.resolve("activityStream { summary { notificationCategory } } ")).to match_array [nil, nil, nil, "TestImmediately"]
+    end
+  end
+
+  context "Cross-Shard ActivityStream Summary" do
+    specs_require_sharding
+    it "returns the activity stream summary with cross-shard items" do
+      @student = user_factory(active_all: true)
+      @shard1.activate do
+        @account = Account.create!
+        course_factory(active_all: true, account: @account)
+        @course.enroll_student(@student).accept!
+        @context = @course
+        discussion_topic_model
+        discussion_topic_model(user: @user)
+        announcement_model
+        conversation(User.create, @user)
+        Notification.create(name: "Assignment Due Date Changed", category: "TestImmediately")
+        allow_any_instance_of(Assignment).to receive(:created_at).and_return(4.hours.ago)
+        assignment_model(course: @course)
+        @assignment.update_attribute(:due_at, 1.week.from_now)
+        @assignment.update_attribute(:due_at, 2.weeks.from_now)
+      end
+      cur_resolver = GraphQLTypeTester.new(@user, current_user: @user, domain_root_account: @course.account.root_account, request: ActionDispatch::TestRequest.create)
+      expect(cur_resolver.resolve("activityStream { summary { type } } ")).to match_array %w[Announcement Conversation DiscussionTopic Message]
+      expect(cur_resolver.resolve("activityStream { summary { count } } ")).to match_array [1, 1, 2, 2]
+      expect(cur_resolver.resolve("activityStream { summary { unreadCount } } ")).to match_array [1, 0, 1, 0]
+      expect(cur_resolver.resolve("activityStream { summary { notificationCategory } } ")).to match_array [nil, nil, nil, "TestImmediately"]
+    end
+
+    it "filters the activity stream summary to currently active courses if requested" do
+      @student = user_factory(active_all: true)
+      @shard1.activate do
+        @account = Account.create!
+        @course1 = course_factory(active_all: true, account: @account)
+        @course1.enroll_student(@student).accept!
+        @course2 = course_factory(active_all: true, account: @account)
+        course2_enrollment = @course2.enroll_student(@student)
+        course2_enrollment.accept!
+        @dt1 = discussion_topic_model(context: @course1)
+        @dt2 = discussion_topic_model(context: @course2)
+        course2_enrollment.destroy!
+      end
+      cur_resolver = GraphQLTypeTester.new(@user, current_user: @user, domain_root_account: @course.account.root_account, request: ActionDispatch::TestRequest.create)
+      # without filtering to active courses
+      expect(cur_resolver.resolve("activityStream { summary { type } } ")).to match_array ["DiscussionTopic"]
+      expect(cur_resolver.resolve("activityStream { summary { count } } ")).to match_array [2]
+      expect(cur_resolver.resolve("activityStream { summary { unreadCount } } ")).to match_array [2]
+      expect(cur_resolver.resolve("activityStream { summary { notificationCategory } } ")).to match_array [nil]
+
+      # with filtering to active courses
+      expect(cur_resolver.resolve("activityStream(onlyActiveCourses: true) { summary { type } } ")).to match_array ["DiscussionTopic"]
+      expect(cur_resolver.resolve("activityStream(onlyActiveCourses: true) { summary { count } } ")).to match_array [1]
+      expect(cur_resolver.resolve("activityStream(onlyActiveCourses: true) { summary { unreadCount } } ")).to match_array [1]
+      expect(cur_resolver.resolve("activityStream(onlyActiveCourses: true) { summary { notificationCategory } } ")).to match_array [nil]
+    end
+  end
 end
