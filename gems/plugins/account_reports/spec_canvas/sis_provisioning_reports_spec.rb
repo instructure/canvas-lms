@@ -1833,7 +1833,7 @@ describe "Default Account Reports" do
           )
         end
 
-        it "returns temporary enrollments data with feature enabled" do
+        it "returns data with feature enabled" do
           parameters = {}
           parameters["enrollments"] = true
           parameters["enrollment_filter"] = "TeacherEnrollment"
@@ -1855,7 +1855,6 @@ describe "Default Account Reports" do
                                           "TeacherEnrollment",
                                           "false",
                                           @enrollment9.id.to_s,
-                                          nil,
                                           nil],
                                          [@course1.id.to_s,
                                           "SIS_COURSE_ID_1",
@@ -1872,11 +1871,10 @@ describe "Default Account Reports" do
                                           "TeacherEnrollment",
                                           "false",
                                           @enrollment.id.to_s,
-                                          @user4.id.to_s,
-                                          @user4.pseudonyms.first.sis_user_id]]
+                                          @user4.id.to_s]]
         end
 
-        it "does not return temporary enrollments data with feature disabled" do
+        it "does not return data with feature disabled" do
           @account.disable_feature!(:temporary_enrollments)
           parameters = {}
           parameters["enrollments"] = true

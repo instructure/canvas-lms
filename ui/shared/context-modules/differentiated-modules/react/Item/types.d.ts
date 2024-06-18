@@ -115,3 +115,19 @@ export type CustomDateTimeInputProps = {
   locale?: string
   timezone?: string
 }
+
+export interface AssigneeOption {
+  id: string
+  value: string
+  sisID?: string
+  groupCategoryId?: string
+  overrideId?: string
+  group?: string
+}
+
+export type UseFetchAssigneesResult = {
+  allOptions: AssigneeOption[]
+  isLoading: boolean
+  loadedAssignees: boolean
+  setSearchTerm
+}

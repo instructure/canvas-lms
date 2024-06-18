@@ -21,4 +21,7 @@ module Lti
   def self.table_name_prefix
     "lti_"
   end
+
+  V1P3 = "1.3"
+  V1P1 = "1.1"
 end

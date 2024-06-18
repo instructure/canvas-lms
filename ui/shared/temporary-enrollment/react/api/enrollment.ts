@@ -41,7 +41,7 @@ export async function fetchTemporaryEnrollments(
   isRecipient: boolean
 ): Promise<Enrollment[]> {
   const params: Record<string, any> = {
-    state: ['current_and_future'],
+    state: ['current_future_and_restricted'],
     per_page: ITEMS_PER_PAGE,
   }
 

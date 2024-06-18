@@ -61,7 +61,7 @@ GEM
       nokogiri (>= 1.12.0)
     method_source (1.1.0)
     mini_portile2 (2.8.6)
-    minitest (5.23.0)
+    minitest (5.23.1)
     net-http (0.4.1)
       uri
     nokogiri (1.16.5)
@@ -140,4 +140,4 @@ RUBY VERSION
    ruby 3.1.2p20
 
 BUNDLED WITH
-   2.5.9
+   2.5.10

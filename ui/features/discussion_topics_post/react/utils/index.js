@@ -278,7 +278,7 @@ export const getOptimisticResponse = ({
   if (quotedEntry && Object.keys(quotedEntry).length !== 0) {
     quotedEntry = {
       createdAt: quotedEntry.createdAt,
-      previewMessage: quotedEntry.previewMessage,
+      message: quotedEntry.message,
       author: {
         shortName: quotedEntry.author.shortName,
         __typename: 'User',
@@ -394,7 +394,7 @@ export const buildQuotedReply = (nodes, previewId) => {
         id: previewId,
         author: {shortName: getDisplayName(reply)},
         createdAt: reply.createdAt,
-        previewMessage: reply.message,
+        message: reply.message,
       }
       return false
     }

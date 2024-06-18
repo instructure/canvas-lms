@@ -31,6 +31,7 @@ const I18n = useI18nScope('rubrics-list-table')
 const {Head, Row, Cell, ColHeader, Body} = Table
 
 export type RubricTableProps = {
+  canManageRubrics: boolean
   rubrics: Rubric[]
   onLocationsClick: (rubricId: string) => void
   onPreviewClick: (rubricId: string) => void
@@ -39,6 +40,7 @@ export type RubricTableProps = {
 }
 
 export const RubricTable = ({
+  canManageRubrics,
   rubrics,
   handleArchiveRubricChange,
   active,
@@ -94,6 +96,7 @@ export const RubricTable = ({
             stackedSortByLabel={I18n.t('Rubric Name')}
             onRequestSort={() => handleSort('Title')}
             sortDirection={sortedColumn === 'Title' ? sortDirection : undefined}
+            data-testid="rubric-name-header"
           >
             {I18n.t('Rubric Name')}
           </ColHeader>
@@ -102,6 +105,7 @@ export const RubricTable = ({
             stackedSortByLabel={I18n.t('Total Points')}
             onRequestSort={() => handleSort('TotalPoints')}
             sortDirection={sortedColumn === 'TotalPoints' ? sortDirection : undefined}
+            data-testid="rubric-points-header"
           >
             {I18n.t('Total Points')}
           </ColHeader>
@@ -110,6 +114,7 @@ export const RubricTable = ({
             stackedSortByLabel={I18n.t('Criterion')}
             onRequestSort={() => handleSort('Criterion')}
             sortDirection={sortedColumn === 'Criterion' ? sortDirection : undefined}
+            data-testid="rubric-criterion-header"
           >
             {I18n.t('Criterion')}
           </ColHeader>
@@ -118,6 +123,7 @@ export const RubricTable = ({
             stackedSortByLabel={I18n.t('Location Used')}
             onRequestSort={() => handleSort('LocationUsed')}
             sortDirection={sortedColumn === 'LocationUsed' ? sortDirection : undefined}
+            data-testid="rubric-locations-header"
           >
             {I18n.t('Location Used')}
           </ColHeader>
@@ -154,21 +160,23 @@ export const RubricTable = ({
               )}
             </Cell>
             <Cell data-testid={`rubric-options-${rubric.id}`}>
-              <RubricPopover
-                id={rubric.id}
-                title={rubric.title}
-                accountId={accountId}
-                courseId={courseId}
-                hidePoints={rubric.hidePoints}
-                criteria={rubric.criteria}
-                pointsPossible={rubric.pointsPossible}
-                buttonDisplay={rubric.buttonDisplay}
-                ratingOrder={rubric.ratingOrder}
-                freeFormCriterionComments={rubric.freeFormCriterionComments}
-                hasRubricAssociations={rubric.hasRubricAssociations}
-                onArchiveRubricChange={() => handleArchiveRubricChange(rubric.id)}
-                active={active}
-              />
+              {canManageRubrics && (
+                <RubricPopover
+                  id={rubric.id}
+                  title={rubric.title}
+                  accountId={accountId}
+                  courseId={courseId}
+                  hidePoints={rubric.hidePoints}
+                  criteria={rubric.criteria}
+                  pointsPossible={rubric.pointsPossible}
+                  buttonDisplay={rubric.buttonDisplay}
+                  ratingOrder={rubric.ratingOrder}
+                  freeFormCriterionComments={rubric.freeFormCriterionComments}
+                  hasRubricAssociations={rubric.hasRubricAssociations}
+                  onArchiveRubricChange={() => handleArchiveRubricChange(rubric.id)}
+                  active={active}
+                />
+              )}
             </Cell>
           </Row>
         ))}

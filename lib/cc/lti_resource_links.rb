@@ -37,21 +37,27 @@ module CC
                        .union(@course.lti_resource_links)
                        .active
                        .find_each do |resource_link|
-        tool = resource_link.current_external_tool(@course)
-        next if tool.blank?
+        process_resource_link(resource_link)
+      end
+    end
 
-        migration_id = create_key(resource_link)
+    def process_resource_link(resource_link)
+      return unless export_object?(resource_link.context)
 
-        rl_document = create_resource_link_document(migration_id)
+      tool = resource_link.current_external_tool(@course)
+      return if tool.blank?
 
-        add_lti_resource_link(resource_link, tool, rl_document.document)
+      migration_id = create_key(resource_link)
 
-        rl_document.file.close
+      rl_document = create_resource_link_document(migration_id)
 
-        # Add a resource element to the root of the manifest
-        @resources.resource(identifier: migration_id, type: CCHelper::BASIC_LTI_1_DOT_3) do |res|
-          res.file(href: "#{CCHelper::RESOURCE_LINK_FOLDER}/#{rl_document.file_name}")
-        end
+      add_lti_resource_link(resource_link, tool, rl_document.document)
+
+      rl_document.file.close
+
+      # Add a resource element to the root of the manifest
+      @resources.resource(identifier: migration_id, type: CCHelper::BASIC_LTI_1_DOT_3) do |res|
+        res.file(href: "#{CCHelper::RESOURCE_LINK_FOLDER}/#{rl_document.file_name}")
       end
     end
 

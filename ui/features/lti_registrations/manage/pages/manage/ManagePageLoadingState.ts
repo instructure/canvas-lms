@@ -20,9 +20,13 @@ import React from 'react'
 import type {PaginatedList} from '../../api/PaginatedList'
 import type {LtiRegistration} from '../../model/LtiRegistration'
 import type {ManageSearchParams} from './ManageSearchParams'
-import type {FetchRegistrations} from '../../api/registrations'
+import type {FetchRegistrations, DeleteRegistration} from '../../api/registrations'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import {error} from '../../api/ApiResult'
 
 export const MANAGE_EXTENSIONS_PAGE_LIMIT = 15
+
+const I18n = useI18nScope('lti_registrations')
 
 export type ManagePageLoadingState =
   | {
@@ -75,13 +79,19 @@ const LIMIT = 15
  * @returns
  */
 export const mkUseManagePageState =
-  (fetchRegistrations: FetchRegistrations) => (params: ManageSearchParams) => {
+  (apiFetchRegistrations: FetchRegistrations, apiDeleteRegistration: DeleteRegistration) =>
+  (params: ManageSearchParams) => {
     const {q, sort, dir, page} = params
     const [state, setState] = React.useState<ManagePageLoadingState>({
       _type: 'not_requested',
     })
 
-    React.useEffect(() => {
+    // Using a ref ensures that the refresh closure called by deleteRegistration()
+    // will have up-to-date search params, even if the search params changed since
+    // the delete started
+    // returns a promise that resolves once load is complete
+    const refreshRef = React.useRef<() => void>()
+    refreshRef.current = React.useCallback(() => {
       const requested = Date.now()
       setState(prev => ({
         _type: 'reloading',
@@ -89,7 +99,7 @@ export const mkUseManagePageState =
         items: 'items' in prev ? prev.items : undefined,
       }))
 
-      fetchRegistrations({
+      return apiFetchRegistrations({
         sort,
         dir,
         query: q || '',
@@ -115,10 +125,16 @@ export const mkUseManagePageState =
         .catch(() => {
           setState({
             _type: 'error',
-            message: `Error retrieving registrations`,
+            message: I18n.t(`Error retrieving registrations`),
           })
         })
     }, [sort, dir, q, page])
+
+    // Refresh whenever search params (and thus refreshRef.current) change
+    React.useEffect(() => {
+      refreshRef.current?.()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [refreshRef.current])
 
     const setStale = React.useCallback(() => {
       setState(prev => {
@@ -135,5 +151,28 @@ export const mkUseManagePageState =
       })
     }, [])
 
-    return [state, {setStale}] as const
+    /**
+     * Deletes a registration and refreshes the list
+     * @param registrationId
+     * @returns Promise On error, the promise will resolve to an error result.
+     */
+    const deleteRegistration = React.useCallback(
+      (registration: LtiRegistration) => {
+        setStale()
+
+        return apiDeleteRegistration(registration.id)
+          .catch(() =>
+            error(
+              // TODO: log more info about the error? send to Sentry?
+              // we could also consider returning the Error object, which
+              // FlashAlert.findDetailMessage() expounds upon
+              I18n.t('Error deleting app “%{appName}”', {appName: registration.name})
+            )
+          )
+          .finally(() => refreshRef.current?.())
+      },
+      [setStale]
+    )
+
+    return [state, {setStale, deleteRegistration}] as const
   }

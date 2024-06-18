@@ -168,7 +168,7 @@ describe "context modules" do
     end
 
     it "adds links to newly created modules" do
-      Account.site_admin.disable_feature! :differentiated_modules
+      Account.site_admin.disable_feature! :selective_release_ui_api
       get "/courses/#{@course.id}/modules"
       f(".add_module_link").click
       wait_for_ajaximations

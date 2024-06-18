@@ -166,6 +166,7 @@ ko:
     root_account_cant_have_sis_id: "루트 계정에 SIS ID를 설정할 수 없음"
     sis_id_in_use: "SIS ID \"%{sis_id}\"이(가) 이미 사용 중임"
     tab_admin_tools: "관리 도구"
+    tab_apps: 확장
     tab_authentication: 인증
     tab_brand_configs: 테마
     tab_courses: 과목
@@ -1061,6 +1062,7 @@ ko:
       turnitin_pledge_help: "학생이 이 서약에 동의하는 것을 인정하는 상자에 체크해야 함"
       turnitin_settings_title: "Turnitin 설정"
       update_settings_button: "업데이트 설정"
+    settings_crumb: 설정
     show: 
       courses_crumb: 과목
       no_courses_account_message: "이 계정에 과목 없음"
@@ -1384,6 +1386,7 @@ ko:
   adding_efca307a: "추가 중..."
   adding_rss_feed_f1202567: "RSS 피드 추가하기"
   adjust_events_and_due_dates_879744fc: "행사와 기한 조정"
+  admin_tools_9e2c9268: "관리 도구"
   after_date_981cd41b: "%{date} 이후"
   after_last_attempt_c9168da2: "마지막 시도 이후"
   agenda_b010136d: 안건
@@ -1579,7 +1582,7 @@ ko:
       invalid_course_section: "유효하지 않은 과목 섹션"
       invalid_group_category: "유효하지 않은 그룹 범주"
       missing_group_category: "그룹 약속은 그룹 범주를 가지고 있어야 함"
-  apps_54d24a47: 앱
+  apps_54d24a47: 확장
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "앱은 Canvas에 새 기능을 추가하는 쉬운 방법입니다. 개별 과목이나 계정에 있는 모든 과목에 추가할 수 있습니다. 구성을 마치면 과목 모듈을 통해 연결하거나고 평가 도구를 위한 과제를 만들 수 있습니다."
   appt_calendar_event_dialog: 
     invalid_participants: "한 명 이상의 참가자를 허용해야 함"
@@ -2350,6 +2353,7 @@ ko:
     sso_settings_form: 
       change_password_url_help: "기본 Canvas 동작을 사용하려면 비워 둠"
       login_handle_name_description: "레이블은 고유한 로그인 식별자에 사용됩니다. 예: 로그인, 사용자 이름, 학생 ID 등."
+  authentication_settings_5c2078a3: "인증 설정"
   authnrequest_sent_to_idp_74e030fc: "IdP로 전송된 AuthnRequest"
   authnresponse_from_idp_185037e9: "IdP에서 반환된 AuthnResponse"
   author_215203d2: 작성자
@@ -10157,6 +10161,10 @@ ko:
         upload_ui_conf: "업로더 UI 구성 ID"
         user_secret_key: "사용자 시크릿"
       ui_conf_ids: "Kaltura 호스팅 고객은 이 ID를 Kaltura에 요청할 수 있습니다. 자체 호스팅 인스턴스는 ui_confs 테이블에서 이 값을 찾을 수 있습니다."
+    learn_platform_settings: 
+      labels: 
+        base_url: "기준 URL"
+        token: "액세스 토큰"
     linked_in: 
       description: "LinkedIn 통합"
     linked_in_settings: 
@@ -11681,6 +11689,7 @@ ko:
       create_group: "그룹 만들기"
       create_question: "문제 만들기"
       creating_group: "그룹 만드는 중..."
+      generate: 생성
       generating: "만드는 중..."
       generating_combinations_progress: "만드는 중... (%{done}/%{total})"
       save: 저장
@@ -13138,6 +13147,8 @@ ko:
     sub_accounts_count: 
       one: "하위 계정 %{count}개"
       other: "하위 계정 %{count}개"
+    titles: 
+      sub_accounts: "하위 계정"
   subject_reply_to: "Re: %{subject}"
   submission: 
     atom_no_author: "작성자 없음"

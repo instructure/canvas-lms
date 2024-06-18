@@ -99,7 +99,7 @@ describe('AnnouncementRow', () => {
     const tomorrow = new Date()
     const dateOptions = {
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric',
       timeZone: 'UTC',
     }

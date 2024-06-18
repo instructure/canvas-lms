@@ -428,7 +428,7 @@ class DiscussionTopicsController < ApplicationController
             read_as_admin: @context.grants_right?(@current_user, session, :read_as_admin),
           },
           discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
-          student_reporting_enabled: @context.feature_enabled?(:react_discussions_post),
+          student_reporting_enabled: @domain_root_account.feature_enabled?(:discussions_reporting),
           discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
           discussion_topic_index_menu_tools: external_tools_display_hashes(:discussion_topic_index_menu),
           show_additional_speed_grader_links: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
@@ -527,7 +527,9 @@ class DiscussionTopicsController < ApplicationController
         CAN_SET_GROUP: can_set_group_category,
         CAN_EDIT_GRADES: can_do(@context, @current_user, :manage_grades),
         # if not a course content manager, or if topic is graded, do not show add to todo list checkbox
-        CAN_MANAGE_CONTENT: @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add)
+        CAN_MANAGE_CONTENT: @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add),
+        CAN_MANAGE_ASSIGN_TO_GRADED: @context.discussion_topics.temp_record(assignment_id: 0).grants_right?(@current_user, session, @topic.new_record? ? :create_assign_to : :manage_assign_to),
+        CAN_MANAGE_ASSIGN_TO_UNGRADED: @context.discussion_topics.temp_record(assignment_id: nil).grants_right?(@current_user, session, @topic.new_record? ? :create_assign_to : :manage_assign_to),
       }
     }
 

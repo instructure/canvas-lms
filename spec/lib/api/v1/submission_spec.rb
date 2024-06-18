@@ -51,7 +51,7 @@ describe Api::V1::Submission do
 
   describe "#provisional_grade_json" do
     describe "speedgrader_url" do
-      it "links to the speed grader for a student's submission" do
+      it "links to SpeedGrader for a student's submission" do
         expect(assignment).to receive(:can_view_student_names?).with(user).and_return true
         json = fake_controller.provisional_grade_json(
           course:,
@@ -65,7 +65,7 @@ describe Api::V1::Submission do
         expect(json.fetch("speedgrader_url")).to match_path(path).and_query(query)
       end
 
-      it "links to the speed grader for a student's anonymous submission when grader cannot view student names" do
+      it "links to SpeedGrader for a student's anonymous submission when grader cannot view student names" do
         expect(assignment).to receive(:can_view_student_names?).with(user).and_return false
         json = fake_controller.provisional_grade_json(
           course:,

@@ -237,7 +237,8 @@ export type SiteAdminFeatureId =
   | 'account_level_blackout_dates'
   | 'course_paces_for_students'
   | 'course_paces_redesign'
-  | 'differentiated_modules'
+  | 'selective_release_backend'
+  | 'selective_release_ui_api'
   | 'enhanced_course_creation_account_fetching'
   | 'enhanced_rubrics'
   | 'explicit_latex_typesetting'
@@ -251,6 +252,8 @@ export type SiteAdminFeatureId =
   | 'render_both_to_do_lists'
   | 'instui_header'
   | 'lti_registrations_discover_page'
+  | 'courses_popout_sisid'
+  | 'dashboard_graphql_integration'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES

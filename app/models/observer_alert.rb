@@ -53,7 +53,7 @@ class ObserverAlert < ActiveRecord::Base
   end
 
   def self.clean_up_old_alerts
-    ObserverAlert.where("created_at < ?", 6.months.ago).in_batches(of: 10_000).delete_all
+    ObserverAlert.where(created_at: ...6.months.ago).in_batches(of: 10_000).delete_all
   end
 
   def self.create_assignment_missing_alerts

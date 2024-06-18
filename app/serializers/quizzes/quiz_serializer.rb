@@ -245,7 +245,7 @@ module Quizzes
     end
 
     def filter(keys)
-      super(keys).select do |key|
+      super.select do |key|
         case key
         when :all_dates
           include_all_dates?

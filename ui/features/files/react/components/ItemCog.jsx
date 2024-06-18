@@ -305,7 +305,6 @@ class ItemCog extends React.Component {
           className="al-trigger al-trigger-gray btn btn-link"
           aria-label={I18n.t('Actions')}
           data-popup-within="#application"
-          data-append-to-body={true}
         >
           <i className="icon-more" />
         </button>

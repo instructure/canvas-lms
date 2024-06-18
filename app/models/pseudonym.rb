@@ -276,7 +276,7 @@ class Pseudonym < ActiveRecord::Base
 
   def password=(new_pass)
     self.password_auto_generated = false
-    super(new_pass)
+    super
   end
 
   def communication_channel
@@ -387,6 +387,14 @@ class Pseudonym < ActiveRecord::Base
     state :active
     state :deleted
     state :suspended
+
+    state :active do
+      event :suspend!, transitions_to: :suspended
+    end
+
+    state :suspended do
+      event :unsuspend!, transitions_to: :active
+    end
   end
 
   set_policy do

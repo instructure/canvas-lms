@@ -20,7 +20,7 @@ import {render, fireEvent, screen} from '@testing-library/react'
 import React from 'react'
 import {AssignmentDueDatesManager} from '../AssignmentDueDatesManager'
 import {
-  GradedDiscussionDueDatesContext,
+  DiscussionDueDatesContext,
   defaultEveryoneOption,
   defaultEveryoneElseOption,
   masteryPathsOption,
@@ -58,7 +58,7 @@ const setup = ({
   setImportantDates = () => {},
 } = {}) => {
   return render(
-    <GradedDiscussionDueDatesContext.Provider
+    <DiscussionDueDatesContext.Provider
       value={{
         assignedInfoList,
         setAssignedInfoList,
@@ -72,7 +72,7 @@ const setup = ({
       }}
     >
       <AssignmentDueDatesManager />
-    </GradedDiscussionDueDatesContext.Provider>
+    </DiscussionDueDatesContext.Provider>
   )
 }
 

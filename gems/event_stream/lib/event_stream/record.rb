@@ -34,7 +34,7 @@ EventStream::Record = Struct.new(:attributes) do
              :event_type
 
   def initialize(*args)
-    super(*args)
+    super
 
     if (request_id = attributes["request_id"])
       attributes["request_id"] = request_id.to_s
@@ -69,7 +69,7 @@ EventStream::Record = Struct.new(:attributes) do
     new(attributes)
   end
 
-  def as_json(*a)
-    attributes.as_json(*a)
+  def as_json(...)
+    attributes.as_json(...)
   end
 end

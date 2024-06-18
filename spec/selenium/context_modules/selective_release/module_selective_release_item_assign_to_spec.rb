@@ -123,7 +123,7 @@ describe "selective_release module item assign to tray" do
     end
 
     it "does not show tray when flag if off after item indent" do
-      Account.site_admin.disable_feature! :differentiated_modules
+      Account.site_admin.disable_feature! :selective_release_ui_api
       go_to_modules
       add_new_module_item_and_yield("#quizs_select", "Quiz", "[ Create Quiz ]", "A Classic Quiz") do
         f("label[for=classic_quizzes_radio]").click
@@ -135,6 +135,21 @@ describe "selective_release module item assign to tray" do
       manage_module_item_button(module_item).click
 
       expect(element_exists?(manage_module_item_assign_to_selector(module_item.id))).to be_falsey
+    end
+
+    it "shows the assign to option for newly-created items that a teacher can manage" do
+      go_to_modules
+      add_new_module_item_and_yield("#assignments_select", "Assignment", "[ Create Assignment ]", "New Assignment Title")
+      item = ContentTag.last
+      manage_module_item_button(item).click
+      expect(module_item(item.id)).to include_text("Assign To...")
+
+      RoleOverride.create!(context: @course.account, permission: "manage_assignments_edit", role: teacher_role, enabled: false)
+      go_to_modules
+      add_new_module_item_and_yield("#assignments_select", "Assignment", "[ Create Assignment ]", "New Assignment Title")
+      item = ContentTag.last
+      manage_module_item_button(item).click
+      expect(module_item(item.id)).not_to include_text("Assign To...")
     end
   end
 
@@ -545,5 +560,46 @@ describe "selective_release module item assign to tray" do
     end
 
     it_behaves_like "module item assign to tray", :canvas_for_elementary
+  end
+
+  context "permissions" do
+    before(:once) do
+      module_setup
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    def assert_permission_toggles_item_visibility(item, permission)
+      go_to_modules
+      manage_module_item_button(item).click
+      expect(module_item(item.id)).to include_text("Assign To...")
+
+      RoleOverride.create!(context: @course.account, permission:, role: teacher_role, enabled: false)
+      go_to_modules
+      manage_module_item_button(item).click
+      expect(module_item(item.id)).not_to include_text("Assign To...")
+    end
+
+    it "shows assign to option for assignment module items based off manage_assignments_edit permission" do
+      item = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "Assignment", content_id: @assignment1.id)
+      assert_permission_toggles_item_visibility(item, "manage_assignments_edit")
+    end
+
+    it "shows assign to option for quiz module items based off manage_assignments_edit permission" do
+      item = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "Quizzes::Quiz", content_id: @quiz.id)
+      assert_permission_toggles_item_visibility(item, "manage_assignments_edit")
+    end
+
+    it "shows assign to option for page module items based off manage_wiki_update permission" do
+      item = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "WikiPage", content_id: @wiki.id)
+      assert_permission_toggles_item_visibility(item, "manage_wiki_update")
+    end
+
+    it "shows assign to option for graded discussion module items based off moderate_forum permission" do
+      item = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "DiscussionTopic", content_id: @discussion.id)
+      assert_permission_toggles_item_visibility(item, "moderate_forum")
+    end
   end
 end

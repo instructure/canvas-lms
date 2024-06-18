@@ -111,7 +111,7 @@ class CommunicationChannel
 
       def filter(ccs)
         ccs = ccs.where("bounce_count > 0").order(last_bounce_at: order)
-        ccs = ccs.where("last_bounce_at < ?", before) if before
+        ccs = ccs.where(last_bounce_at: ...before) if before
         ccs = ccs.where("last_bounce_at > ?", after) if after
         ccs
       end
@@ -139,7 +139,7 @@ class CommunicationChannel
 
       def filter(ccs)
         ccs = ccs.where(workflow_state: "unconfirmed").order(created_at: order)
-        ccs = ccs.where("created_at < ?", before) if before
+        ccs = ccs.where(created_at: ...before) if before
         ccs = ccs.where("created_at > ?", after) if after
         ccs
       end

@@ -1029,10 +1029,10 @@ figure {
   margin-#{direction(right)}: 0 !important;
 }
 
-// even though we show no headers in speed grader, we want the
+// even though we show no headers in SpeedGrader, we want the
 // masquerade bar to always show if someone is masquerading
 // (#masquerade_bar is set to 'display: none !important' for
-// body.no-headers at the top level _layout.scss, and speed grader
+// body.no-headers at the top level _layout.scss, and SpeedGrader
 // uses body.no-headers to hide the standard canvas headers/footer)
 body.no-headers {
   #masquerade_bar {
@@ -1046,4 +1046,14 @@ body.no-headers {
 
 #enhanced-rubric-assessment-tray div[class*="-tray__content"] {
   min-height: calc(100vh - 50px) !important;
+}
+
+body.is-masquerading-or-student-view {
+  #enhanced-rubric-assessment-tray div[class*="-tray__content"] {
+    min-height: calc(100vh - 100px) !important;
+  }
+
+  #enhanced-rubric-assessment-tray {
+    margin-bottom: 50px;
+  }
 }

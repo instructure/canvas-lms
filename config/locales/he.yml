@@ -229,6 +229,7 @@ he:
     root_account_cant_have_sis_id: "מזהי SIS אינם יכולים להיות מוגדרים בחשבון המשתמש הבסיסי "
     sis_id_in_use: "מזהה SIS \"%{sis_id}\" כבר נמצא בשימוש"
     tab_admin_tools: "כלים ניהוליים"
+    tab_apps: תוספות
     tab_authentication: הזדהות
     tab_brand_configs: "ערכות נושא"
     tab_courses: קורסים
@@ -1470,6 +1471,7 @@ he:
       turnitin_pledge_help: "תלמידים צריכים לסמן תיבה המאשרת כי הם מסכימים עם הצהרה זו"
       turnitin_settings_title: "הגדרות Turnitin"
       update_settings_button: "עדכון הגדרות"
+    settings_crumb: הגדרות
     show: 
       courses_crumb: קורסים
       no_courses_account_message: "אין קורסים בחשבון זה"
@@ -2021,6 +2023,7 @@ he:
   admin_4d3ba42f: "מנהל המערכת"
   admin_csv_f8d1b3eb: "קובץ CSV של מנהל המערכת"
   admin_navigation_menu_77b801a2: "תפריט ניווט למנהל"
+  admin_tools_9e2c9268: "כלי מנהל המערכת"
   admin_tools_grade_change_logs_d804833f: "כלי ניהול המערכת (לוג של שינויי ציונים)"
   admin_tools_logging_tab_680698f3: "כלי ניהול המערכת (טאב רישום הפעילויות)"
   admin_tools_restore_courses_tab_b07bbfa7: "כלי ניהול המערכת (טאב שיחזור קורסים)"
@@ -2390,7 +2393,7 @@ he:
   appointments_dcb41d23: פגישות
   approved_c3b285d4: אושר
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} עם דיוק של  %{precision}"
-  apps_54d24a47: אפליקציות
+  apps_54d24a47: תוספות
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "אפליקציות הנן דרך נוחה להוסיף תכונות חדשות לקנבס. הן יכולות להתווסף לקורסים מסוימים או לכל הקורסים בחשבון. עם הגדרתן, תוכלו להתקשר אליהם דרך המודולים של הקורס וליצור משימות עבור כלי הערכה."
   appt_calendar_event_dialog: 
     invalid_participants: "יש לאפשר לפחות למשתמש אחד להשתתף"
@@ -3394,6 +3397,7 @@ he:
       discovery_url_description: "אם הוגדרה כתובת דף discovery , קנבס ינתב את כל המשתמשים לכתובת זו באם יש צורך בהזדהות. דף זה יצטרך להנחות את המשתמשים היכן מבצעים את הלוג-אין. אם לא הוגדרה הכתובת, הקונפיגורציה הראשונית תשמש כנסיון לאמת את זהות המשתמש."
       login_handle_name_description: "הכיתוב המשמש למזהי התחברות יחודיים. לדוגמא: מזהה משתמש, שם משתמש, מספר תלמיד וכו'."
       unknown_user_url_description: "כתובת הדף לניתוב כאשר משתמש מזוהה לא אותר במערכת קנבס."
+  authentication_settings_5c2078a3: "הגדרות הזדהות"
   authentication_with_provider_was_successful_but_no_6a194137: "ההזדהות עם %{provider} הצליחה, אך לא סופק מזהה ייחודי לכניסה לקנבס."
   authnrequest_sent_to_idp_74e030fc: "בקשת הזדהות נשלחה למנגנון ההזדהות"
   authnresponse_from_idp_185037e9: "תשובת ההזדהות ממנגנון ההזדהות"
@@ -14376,6 +14380,10 @@ he:
         upload_ui_conf: "דף מזהה ממשק המשתמש של \"מעלה קבצים\""
         user_secret_key: "מלה סודית של משתמש"
       ui_conf_ids: "על לקוחות מבוססי מערכת Kaltura לבקש מ Kaltura לספק לכם את המזהים האלה. מופעים המתארחים במחשב מקומי יוכלו למצוא ערכים אלו בטבלת ה ui_confs "
+    learn_platform_settings: 
+      labels: 
+        base_url: "כתובת דף בסיס"
+        token: "אסימון גישה"
     linked_in: 
       description: "אינטגרציה עם לינקדאין"
     linked_in_settings: 
@@ -16413,6 +16421,7 @@ he:
       create_group: "יצירת קבוצה "
       create_question: "יצירת שאלה"
       creating_group: "יצירת קבוצה..."
+      generate: יצירה
       generating: "מייצר:"
       generating_combinations_progress: "מבצע... (%{done}/%{total})"
       save: "שמירה "
@@ -18606,6 +18615,8 @@ he:
       one: "חשבון משנה אחד"
       other: "%{count} חשבונות משנה"
       two: "%{count} חשבונות משנה"
+    titles: 
+      sub_accounts: "חשבונות משנה"
   subaccount_91f4c279: "חשבון משנה"
   subdomain_url_1e43b6f0: "כתובת דף של דומיין משנה"
   subject_114b2e98: נושא

@@ -269,6 +269,24 @@ describe "Announcements API", type: :request do
     end
   end
 
+  context "as observer" do
+    before :once do
+      @observer = observer_in_course(name: "bob's mom", course: @course, active_all: true).user
+      observer_in_course(user: @observer, associated_user_id: @student, course: @course1, active_all: true)
+      Account.site_admin.enable_feature!(:selective_release_backend)
+    end
+
+    it "orders by reverse chronological order" do
+      json = api_call_as_user(@observer,
+                              :get,
+                              "/api/v1/announcements",
+                              @params.merge(context_codes: ["course_#{@observer.enrollments.first.course_id}", "course_#{@observer.enrollments.second.course_id}"]))
+      expect(json.length).to eq 6
+      expect(json[0]["context_code"]).to eq "course_#{@course1.id}"
+      expect(json.pluck("id")).to eq @anns.map(&:id).reverse << @ann1.id
+    end
+  end
+
   context "as student" do
     it "excludes delayed-post announcements" do
       start_date = 10.days.ago.iso8601

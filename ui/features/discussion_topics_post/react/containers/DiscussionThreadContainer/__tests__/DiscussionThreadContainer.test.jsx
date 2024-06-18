@@ -422,45 +422,59 @@ describe('DiscussionThreadContainer', () => {
   })
 
   describe('Report Reply', () => {
-    it('show Report', () => {
+    it('does not show Report', () => {
       const {getByTestId, queryByText} = setup(defaultProps())
 
       fireEvent.click(getByTestId('thread-actions-menu'))
 
-      expect(queryByText('Report')).toBeTruthy()
+      expect(queryByText('Report')).toBeNull()
     })
 
-    it('show Reported', () => {
-      const {getByTestId, queryByText} = setup(
-        defaultProps({
-          discussionEntryOverrides: {
-            entryParticipant: {
-              reportType: 'other',
+    describe('when feature flag and setting is enabled', () => {
+      beforeAll(() => {
+        window.ENV.discussions_reporting = true
+      })
+
+      it('show Report', () => {
+        const {getByTestId, queryByText} = setup(defaultProps())
+
+        fireEvent.click(getByTestId('thread-actions-menu'))
+
+        expect(queryByText('Report')).toBeTruthy()
+      })
+
+      it('show Reported', () => {
+        const {getByTestId, queryByText} = setup(
+          defaultProps({
+            discussionEntryOverrides: {
+              entryParticipant: {
+                reportType: 'other',
+              },
             },
-          },
+          })
+        )
+
+        fireEvent.click(getByTestId('thread-actions-menu'))
+
+        expect(queryByText('Reported')).toBeTruthy()
+      })
+
+      it('can Report', async () => {
+        const {getByTestId, queryByText} = setup(
+          defaultProps(),
+          updateDiscussionEntryParticipantMock({
+            reportType: 'other',
+          })
+        )
+
+        fireEvent.click(getByTestId('thread-actions-menu'))
+        fireEvent.click(queryByText('Report'))
+        fireEvent.click(queryByText('Other'))
+        fireEvent.click(getByTestId('report-reply-submit-button'))
+
+        await waitFor(() => {
+          expect(onSuccessStub).toHaveBeenCalledWith('You have reported this reply.', false)
         })
-      )
-
-      fireEvent.click(getByTestId('thread-actions-menu'))
-
-      expect(queryByText('Reported')).toBeTruthy()
-    })
-
-    it('can Report', async () => {
-      const {getByTestId, queryByText} = setup(
-        defaultProps(),
-        updateDiscussionEntryParticipantMock({
-          reportType: 'other',
-        })
-      )
-
-      fireEvent.click(getByTestId('thread-actions-menu'))
-      fireEvent.click(queryByText('Report'))
-      fireEvent.click(queryByText('Other'))
-      fireEvent.click(getByTestId('report-reply-submit-button'))
-
-      await waitFor(() => {
-        expect(onSuccessStub).toHaveBeenCalledWith('You have reported this reply.', false)
       })
     })
   })

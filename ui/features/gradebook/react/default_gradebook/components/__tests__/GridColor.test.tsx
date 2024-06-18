@@ -17,9 +17,16 @@
  */
 
 import React from 'react'
-import {darken} from '../../constants/colors'
 import {render} from '@testing-library/react'
 import GridColor from '../GridColor'
+import {darken, defaultColors, statusColors} from '../../constants/colors'
+
+function defaultProps(props = {}) {
+  return {
+    colors: statusColors(),
+    ...props,
+  }
+}
 
 const colors = {
   dropped: '#FEF0E5',
@@ -90,5 +97,48 @@ describe('GridColor', () => {
     const {getByTestId} = render(<GridColor statuses={[]} colors={colors} />)
     const styleTag = getByTestId('grid-color')
     expect(styleTag).toHaveTextContent('')
+  })
+
+  it('it renders style', function () {
+    render(<GridColor {...defaultProps()} />)
+    expect(document.querySelector('style[type="text/css"]')).toBeInTheDocument()
+  })
+
+  it('it has proper default colors', function () {
+    render(<GridColor {...defaultProps()} />)
+    const rules = document.querySelector('style[type="text/css"]')!.innerHTML
+    expect(rules.includes(defaultColors.blue)).toBe(true)
+    expect(rules.includes(defaultColors.salmon)).toBe(true)
+    expect(rules.includes(defaultColors.green)).toBe(true)
+    expect(rules.includes(defaultColors.orange)).toBe(true)
+    expect(rules.includes(defaultColors.yellow)).toBe(true)
+    expect(rules.includes(darken(defaultColors.blue, 5))).toBe(true)
+    expect(rules.includes(darken(defaultColors.salmon, 5))).toBe(true)
+    expect(rules.includes(darken(defaultColors.green, 5))).toBe(true)
+    expect(rules.includes(darken(defaultColors.orange, 5))).toBe(true)
+    expect(rules.includes(darken(defaultColors.yellow, 5))).toBe(true)
+  })
+
+  test('rules are for .gradebook-cell and .`statuses`', () => {
+    render(<GridColor {...defaultProps()} {...{statuses: ['late']}} />)
+    const rules = document.querySelector('style[type="text/css"]')!.innerHTML
+    expect(rules).toEqual(
+      `.even .gradebook-cell.late { background-color: ${defaultColors.blue}; }` +
+        `.odd .gradebook-cell.late { background-color: ${darken(defaultColors.blue, 5)}; }` +
+        `.slick-cell.editable .gradebook-cell.late { background-color: white; }`
+    )
+  })
+
+  test('multiple state rules are concatenated', () => {
+    render(<GridColor {...defaultProps()} {...{statuses: ['late', 'missing']}} />)
+    const rules = document.querySelector('style[type="text/css"]')!.innerHTML
+    expect(rules).toEqual(
+      `.even .gradebook-cell.late { background-color: ${defaultColors.blue}; }` +
+        `.odd .gradebook-cell.late { background-color: ${darken(defaultColors.blue, 5)}; }` +
+        '.slick-cell.editable .gradebook-cell.late { background-color: white; }' +
+        `.even .gradebook-cell.missing { background-color: ${defaultColors.salmon}; }` +
+        `.odd .gradebook-cell.missing { background-color: ${darken(defaultColors.salmon, 5)}; }` +
+        '.slick-cell.editable .gradebook-cell.missing { background-color: white; }'
+    )
   })
 })

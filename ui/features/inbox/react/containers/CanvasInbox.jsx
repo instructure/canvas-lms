@@ -84,7 +84,9 @@ const CanvasInbox = () => {
   const [maxGroupRecipientsMet, setMaxGroupRecipientsMet] = useState(false)
   const [conversationIdToGoBackTo, setConversationIdToGoBackTo] = useState(null)
 
-  const inboxSettingsFeature = !!ENV.CONVERSATIONS.INBOX_SETTINGS_ENABLED
+  const inboxSignatureBlock = !!ENV.CONVERSATIONS.INBOX_SIGNATURE_BLOCK_ENABLED
+  const inboxAutoResponse = !!ENV.CONVERSATIONS.INBOX_AUTO_RESPONSE_ENABLED
+  const inboxSettingsFeature = inboxSignatureBlock || inboxAutoResponse
 
   const setFilterStateToCurrentWindowHash = () => {
     const validFilters = ['inbox', 'unread', 'starred', 'sent', 'archived', 'submission_comments']
@@ -880,7 +882,11 @@ const CanvasInbox = () => {
             </Flex.Item>
           </Flex>
           {inboxSettingsFeature && inboxSettingsModal && (
-            <InboxSettingsModalContainer onDismissWithAlert={handleDismissWithAlert} />
+            <InboxSettingsModalContainer
+              onDismissWithAlert={handleDismissWithAlert}
+              inboxSignatureBlock={inboxSignatureBlock}
+              inboxAutoResponse={inboxAutoResponse}
+            />
           )}
           <ComposeModalManager
             conversation={selectedConversations[0]}
@@ -903,7 +909,7 @@ const CanvasInbox = () => {
             contextIdFromUrl={urlContextId}
             maxGroupRecipientsMet={maxGroupRecipientsMet}
             currentCourseFilter={courseFilter}
-            inboxSettingsFeature={inboxSettingsFeature}
+            inboxSignatureBlock={inboxSignatureBlock}
           />
           <ManageUserLabels
             open={manageLabels}

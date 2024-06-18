@@ -131,7 +131,8 @@ class Quizzes::QuizzesController < ApplicationController
         PERMISSIONS: {
           create: can_do(@context.quizzes.temp_record, @current_user, :create),
           manage: can_manage,
-          read_question_banks: can_manage || can_do(@context, @current_user, :read_question_banks)
+          read_question_banks: can_manage || can_do(@context, @current_user, :read_question_banks),
+          manage_assign_to: can_do(@context.quizzes.temp_record, @current_user, :manage_assign_to),
         },
         FLAGS: {
           question_banks: feature_enabled?(:question_banks),

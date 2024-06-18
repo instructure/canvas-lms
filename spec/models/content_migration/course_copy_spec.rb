@@ -814,6 +814,16 @@ describe ContentMigration do
         allow(CanvasKaltura::ClientV3).to receive_messages(config: true, new: kaltura_double)
       end
 
+      it "updates media comment even if original attachment is deleted" do
+        og_att = attachment_model(display_name: "test.mp4", context: @copy_from, media_entry_id: "0_l4l5n0wt")
+        MediaObject.create! media_id: "0_l4l5n0wt", attachment: og_att
+        @copy_from.syllabus_body = "<a id=\"media_comment_0_l4l5n0wt\" class=\"instructure_inline_media_comment video_comment\" href=\"/media_objects/0_l4l5n0wt\"></a>"
+        og_att.destroy
+        run_course_copy
+        expect(Attachment.find_by(migration_id: mig_id(og_att)).file_state).to eq("available")
+        expect(@copy_to.syllabus_body).to include("src=\"/media_attachments_iframe/#{@copy_to.attachments.find_by(media_entry_id: "0_l4l5n0wt").id}?embedded=true&amp;type=video\"")
+      end
+
       it "updates media comment links to be media attachment links" do
         attachment_model(display_name: "test.mp4", context: @copy_from, media_entry_id: "0_l4l5n0wt")
         attachment_model(display_name: "test2.mp4", context: @copy_from, media_entry_id: "0_12345678")

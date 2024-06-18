@@ -229,7 +229,28 @@ describe "Modules API", type: :request do
         expect(json.map { |mod| mod["items"].size }).to eq [5, 2, 0]
       end
 
+      it "only fetches visibility information once with selective_release_backend on" do
+        Account.site_admin.enable_feature!(:selective_release_backend)
+        student_in_course(course: @course)
+        @user = @student
+
+        assmt2 = @course.assignments.create!(name: "another assmt", workflow_state: "published")
+        @module2.add_item(id: assmt2.id, type: "assignment")
+
+        expect(AssignmentVisibility::AssignmentVisibilityService).to receive(:visible_assignment_ids_in_course_by_user).once.and_call_original
+
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/modules?include[]=items",
+                        controller: "context_modules_api",
+                        action: "index",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        include: %w[items])
+        expect(json.map { |mod| mod["items"].size }).to eq [4, 3]
+      end
+
       it "only fetches visibility information once" do
+        Account.site_admin.disable_feature!(:selective_release_backend)
         student_in_course(course: @course)
         @user = @student
 
@@ -1331,9 +1352,9 @@ describe "Modules API", type: :request do
                { expected_status: 401 })
     end
 
-    context "with the differentiated_modules flag enabled" do
+    context "with the selective_release_backend flag enabled" do
       before :once do
-        Account.site_admin.enable_feature!(:differentiated_modules)
+        Account.site_admin.enable_feature!(:selective_release_backend)
         @module2.assignment_overrides.create!
       end
 

@@ -161,7 +161,7 @@ describe('enrollment api', () => {
           expect.objectContaining({
             path: '/api/v1/users/1/enrollments',
             params: expect.objectContaining({
-              state: ['current_and_future'],
+              state: ['current_future_and_restricted'],
               per_page: ITEMS_PER_PAGE,
               temporary_enrollment_recipients_for_provider: true,
             }),
@@ -180,7 +180,7 @@ describe('enrollment api', () => {
           expect.objectContaining({
             path: '/api/v1/users/1/enrollments',
             params: expect.objectContaining({
-              state: ['current_and_future'],
+              state: ['current_future_and_restricted'],
               per_page: ITEMS_PER_PAGE,
               temporary_enrollments_for_recipient: true,
               include: 'temporary_enrollment_providers',

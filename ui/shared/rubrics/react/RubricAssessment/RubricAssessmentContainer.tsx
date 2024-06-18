@@ -93,7 +93,9 @@ export const RubricAssessmentContainer = ({
     const calculateDistance = () => {
       if (containerRef.current) {
         const rect = (containerRef.current as HTMLElement).getBoundingClientRect()
-        const distance = window.innerHeight - rect.bottom
+        const isMasquerade = !!document.querySelector('body.is-masquerading-or-student-view')
+        const masqueradeHeight = isMasquerade ? 50 : 0
+        const distance = window.innerHeight - rect.bottom - masqueradeHeight
         setDistanceToBottom(distance)
       }
     }
@@ -107,6 +109,7 @@ export const RubricAssessmentContainer = ({
         <TraditionalView
           criteria={criteria}
           hidePoints={hidePoints}
+          ratingOrder={ratingOrder}
           rubricAssessmentData={rubricAssessmentData}
           rubricTitle={rubricTitle}
           rubricSavedComments={rubricSavedComments}
@@ -345,7 +348,12 @@ const AssessmentHeader = ({
   selectedViewMode,
 }: AssessmentHeaderProps) => {
   return (
-    <View as="div" padding={isTraditionalView ? '0 0 medium 0' : '0'}>
+    <View
+      as="div"
+      padding={isTraditionalView ? '0 0 medium 0' : '0'}
+      overflowX="hidden"
+      overflowY="hidden"
+    >
       <Flex>
         <Flex.Item align="end">
           <Text weight="bold" size="large" data-testid="rubric-assessment-header">

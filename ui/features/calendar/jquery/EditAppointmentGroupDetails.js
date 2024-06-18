@@ -32,7 +32,7 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/jquery/jquery.instructure_forms'
 import {CommonEventShowError} from '@canvas/calendar/jquery/CommonEvent/CommonEvent'
-import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
+import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 
 const I18n = useI18nScope('EditAppointmentGroupDetails')
 

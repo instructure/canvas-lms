@@ -24,16 +24,28 @@
 
   /* Column widths are based on these cells */
   .course-list-star-column {
-    width: 3%;
+    width: 10%;
     &.course-list-favorite-icon {
       color: $ic-color-icon-disabled;
+    }
+  }
+  .course-list-sort-icon {
+    color: #C7CDD1;
+    &.sorted {
+      color: $ic-font-color-dark;
+    }
+  }
+  .course-list-column-header {
+    a {
+      color: $ic-font-color-dark;
+      text-decoration: none;
     }
   }
   .course-list-term-column,
   .course-list-enrolled-as-column {
     width: 15%;
   }
-.course-list-published-column {
+  .course-list-published-column {
     width: 7%;
   }
   .course-list-nickname-column {

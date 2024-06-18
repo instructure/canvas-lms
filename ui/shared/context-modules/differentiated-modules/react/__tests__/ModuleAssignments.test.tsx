@@ -28,11 +28,11 @@ const props: ModuleAssignmentsProps = {
   defaultValues: [],
 }
 
-const SECTIONS_URL = `/api/v1/courses/${props.courseId}/sections`
-const STUDENTS_URL = `api/v1/courses/${props.courseId}/users?enrollment_type=student`
-const FILTERED_SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?search_term=.+/
+const SECTIONS_URL = `/api/v1/courses/${props.courseId}/sections?per_page=100`
+const STUDENTS_URL = `api/v1/courses/${props.courseId}/users?per_page=100&enrollment_type=student`
+const FILTERED_SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=100&search_term=.+/
 const FILTERED_STUDENTS_URL =
-  /\/api\/v1\/courses\/.+\/users\?search_term=.+&enrollment_type=student/
+  /\/api\/v1\/courses\/.+\/users\?per_page=100&search_term=.+&enrollment_type=student/
 
 describe('ModuleAssignments', () => {
   beforeAll(() => {

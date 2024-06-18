@@ -56,10 +56,12 @@ class DeveloperKey < ActiveRecord::Base
   before_save :protect_default_key
   before_save :set_require_scopes
   before_save :set_root_account
+  after_create :create_lti_registration
+  after_create :create_default_account_binding
   after_save :clear_cache
   after_update :invalidate_access_tokens_if_scopes_removed!
   after_update :destroy_external_tools!, if: :destroy_external_tools?
-  after_create :create_default_account_binding
+  after_update :update_lti_registration
 
   validates_as_url :redirect_uri, :oidc_initiation_url, :public_jwk_url, allowed_schemes: nil
   validate :validate_redirect_uris
@@ -68,6 +70,7 @@ class DeveloperKey < ActiveRecord::Base
   validate :validate_flag_combinations
 
   attr_reader :private_jwk
+  attr_accessor :skip_lti_sync, :current_user
 
   scope :nondeleted, -> { where("workflow_state<>'deleted'") }
   scope :not_active, -> { where("workflow_state<>'active'") } # search for deleted & inactive keys
@@ -123,7 +126,7 @@ class DeveloperKey < ActiveRecord::Base
 
   def redirect_uris=(value)
     value = value.split if value.is_a?(String)
-    super(value)
+    super
   end
 
   def ims_registration?
@@ -253,12 +256,7 @@ class DeveloperKey < ActiveRecord::Base
     return true if account_id.blank?
     return true if target_account.id == account_id
 
-    include_federated_parent_id =
-      if target_account.feature_enabled?(:developer_key_consortia_fix_inheritance_logic)
-        !target_account.root_account.primary_settings_root_account?
-      else
-        !target_account.primary_settings_root_account?
-      end
+    include_federated_parent_id = !target_account.root_account.primary_settings_root_account?
 
     target_account.account_chain_ids(include_federated_parent_id:).include?(account_id)
   end
@@ -303,16 +301,11 @@ class DeveloperKey < ActiveRecord::Base
 
     # Search for bindings in the account chain starting with the highest account,
     # and include consortium parent if necessary
-    include_federated_parent =
-      if binding_account.root_account.feature_enabled?(:developer_key_consortia_fix_inheritance_logic)
-        !binding_account.root_account.primary_settings_root_account?
-      else
-        !binding_account.primary_settings_root_account?
-      end
+    include_federated_parent = !binding_account.root_account.primary_settings_root_account?
     accounts = binding_account.account_chain(include_federated_parent:).reverse
     binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, self)
 
-    # If no explicity set bindings were found check for 'allow' bindings
+    # If no explicitly set bindings were found check for 'allow' bindings
     binding ||= DeveloperKeyAccountBinding.find_in_account_priority(accounts.reverse, self, explicitly_set: false)
 
     binding
@@ -413,6 +406,39 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   private
+
+  def create_lti_registration
+    return unless is_lti_key?
+    return if skip_lti_sync
+    return if tool_configuration.blank?
+
+    lti_registration = Lti::Registration.new(developer_key: self,
+                                             account: account || Account.site_admin,
+                                             created_by: current_user,
+                                             updated_by: current_user,
+                                             admin_nickname: name,
+                                             name: tool_configuration.settings["title"],
+                                             workflow_state:,
+                                             ims_registration:,
+                                             skip_lti_sync: true)
+    lti_registration.save!
+  end
+
+  def update_lti_registration
+    return unless is_lti_key?
+    return if skip_lti_sync
+
+    if lti_registration.blank?
+      create_lti_registration
+      return
+    end
+
+    lti_registration.update!(name: tool_configuration.settings["title"],
+                             admin_nickname: name,
+                             updated_by: current_user,
+                             workflow_state:,
+                             skip_lti_sync: true)
+  end
 
   def validate_lti_fields
     return unless is_lti_key?

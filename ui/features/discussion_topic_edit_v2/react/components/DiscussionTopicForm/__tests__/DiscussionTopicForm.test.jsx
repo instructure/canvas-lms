@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, waitFor, fireEvent} from '@testing-library/react'
+import {render, waitFor, fireEvent, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import DiscussionTopicForm, {isGuidDataValid, getAbGuidArray} from '../DiscussionTopicForm'
@@ -63,6 +63,8 @@ describe('DiscussionTopicForm', () => {
           CAN_MODERATE: true,
           CAN_CREATE_ASSIGNMENT: true,
           CAN_SET_GROUP: true,
+          CAN_MANAGE_ASSIGN_TO_GRADED: true,
+          CAN_MANAGE_ASSIGN_TO_UNGRADED: true,
         },
         ATTRIBUTES: {},
       },
@@ -77,6 +79,30 @@ describe('DiscussionTopicForm', () => {
       ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS: false,
       context_is_not_group: true,
     }
+  })
+
+  describe('instui_nav feature flag is enabled', () => {
+    const oldEnv = window.ENV
+    beforeEach(() => {
+      window.ENV.FEATURES =  {instui_nav: true}
+    })
+
+    afterEach(() => {
+      window.ENV = oldEnv
+    })
+
+    it('renders title if came from Announcements page', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+      const document = setup()
+      expect(document.getAllByText('Create Announcement').length).toBe(1)
+    })
+
+    it('renders title if came from Discussion page', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
+      const document = setup()
+      expect(document.getAllByText('Create Discussion').length).toBe(1)
+    })
+
   })
 
   it('renders', () => {
@@ -321,6 +347,7 @@ describe('DiscussionTopicForm', () => {
 
     it('hides post to section, student ToDo, and ungraded options when Graded', () => {
       ENV = {
+        FEATURES: {},
         STUDENT_PLANNER_ENABLED: true,
         DISCUSSION_TOPIC: {
           PERMISSIONS: {
@@ -718,6 +745,62 @@ describe('DiscussionTopicForm', () => {
           const numberInputAdditionalRepliesRequired = getByTestId('reply-to-entry-required-count')
           expect(numberInputAdditionalRepliesRequired.value).toBe('5')
         })
+      })
+    })
+  })
+
+  describe('Ungraded', () => {
+    describe('selective_release_ui_api flag is ON', () => {
+      beforeAll(() => {
+        window.ENV.FEATURES.selective_release_ui_api = true
+      })
+
+      it('renders expected default teacher discussion options', () => {
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT = true
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_UPDATE_ASSIGNMENT = true
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
+
+        const document = setup()
+        // Default teacher options in order top to bottom
+        expect(document.getByText('Topic Title')).toBeInTheDocument()
+        expect(document.queryByText('Attach')).toBeTruthy()
+        expect(document.queryByTestId('section-select')).toBeTruthy()
+        expect(document.queryAllByText('Anonymous Discussion')).toBeTruthy()
+        expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
+        expect(document.queryByLabelText('Enable podcast feed')).toBeInTheDocument()
+        expect(document.queryByTestId('graded-checkbox')).toBeTruthy()
+        expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
+        expect(document.queryByLabelText('Add to student to-do')).toBeInTheDocument()
+        expect(document.queryByTestId('group-discussion-checkbox')).toBeTruthy()
+        expect(document.queryAllByText('Manage Assign To')).toBeTruthy()
+
+        // Hides announcement options
+        expect(document.queryByLabelText('Delay Posting')).not.toBeInTheDocument()
+        expect(document.queryByLabelText('Allow Participants to Comment')).not.toBeInTheDocument()
+      })
+
+      it('renders expected default student discussion options', () => {
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT = false
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_UPDATE_ASSIGNMENT = false
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = false
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = false
+
+        const document = setup()
+        // Default teacher options in order top to bottom
+        expect(document.getByText('Topic Title')).toBeInTheDocument()
+        expect(document.queryByText('Attach')).toBeTruthy()
+        expect(document.queryByTestId('section-select')).toBeTruthy()
+        expect(document.queryAllByText('Anonymous Discussion')).toBeTruthy()
+        expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
+        expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
+        expect(document.queryByTestId('group-discussion-checkbox')).toBeTruthy()
+        expect(document.queryAllByText('Available from')).toBeTruthy()
+        expect(document.queryAllByText('Until')).toBeTruthy()
+
+        // Hides announcement options
+        expect(document.queryByLabelText('Delay Posting')).not.toBeInTheDocument()
+        expect(document.queryByLabelText('Allow Participants to Comment')).not.toBeInTheDocument()
       })
     })
   })

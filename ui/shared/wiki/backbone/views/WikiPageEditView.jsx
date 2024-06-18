@@ -26,7 +26,7 @@ import WikiPageDeleteDialog from './WikiPageDeleteDialog'
 import WikiPageReloadView from './WikiPageReloadView'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
-import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
+import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import renderWikiPageTitle from '../../react/renderWikiPageTitle'
 import {renderAssignToTray} from '../../react/renderAssignToTray'
@@ -60,7 +60,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     this.prototype.template = template
     this.prototype.className = 'form-horizontal edit-form validated-form-view'
     this.prototype.dontRenableAfterSaveSuccess = true
-    if (window.ENV.FEATURES?.differentiated_modules) {
+    if (window.ENV.FEATURES?.selective_release_ui_api) {
       this.prototype.disablingDfd = new $.Deferred()
     }
     this.optionProperty('wiki_pages_path')
@@ -72,7 +72,10 @@ export default class WikiPageEditView extends ValidatedFormView {
     super.initialize(...arguments)
     if (!this.WIKI_RIGHTS) this.WIKI_RIGHTS = {}
     if (!this.PAGE_RIGHTS) this.PAGE_RIGHTS = {}
-    this.enableAssignTo = window.ENV.FEATURES?.differentiated_modules && ENV.COURSE_ID != null
+    this.enableAssignTo =
+      window.ENV.FEATURES?.selective_release_ui_api &&
+      ENV.COURSE_ID != null &&
+      ENV.WIKI_RIGHTS.manage_assign_to
     const redirect = () => {
       window.location.href = this.model.get('html_url')
     }
@@ -139,7 +142,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     json.assignment = json.assignment != null ? json.assignment.toView() : undefined
 
     json.content_is_locked = this.lockedItems.content
-    json.differentiated_modules = this.enableAssignTo
+    json.show_assign_to = this.enableAssignTo
 
     return json
   }
@@ -223,7 +226,14 @@ export default class WikiPageEditView extends ValidatedFormView {
       renderAssignToTray(mountElement, {pageId, onSync, pageName})
     }
     if (window.ENV.BLOCK_EDITOR) {
-      ReactDOM.render(<BlockEditor />, document.getElementById('block_editor'))
+      const blockEditorData = ENV.WIKI_PAGE?.block_editor_attributes || {
+        version: '1',
+        blocks: [{data: undefined}],
+      }
+      ReactDOM.render(
+        <BlockEditor version={blockEditorData.version} content={blockEditorData.blocks[0].data} />,
+        document.getElementById('block_editor')
+      )
     } else {
       RichContentEditor.loadNewEditor(this.$wikiPageBody, {
         focus: true,
@@ -365,11 +375,11 @@ export default class WikiPageEditView extends ValidatedFormView {
       }
     }
     if (window.block_editor) {
-      let blockEditorData
-      await window.block_editor.save().then(outputData => {
-        blockEditorData = outputData
-      })
-      this.blockEditorData = blockEditorData
+      this.blockEditorData = {
+        time: Date.now(),
+        version: '1',
+        blocks: [{data: window.block_editor.serialize()}],
+      }
     }
 
     if (this.reloadView != null) {

@@ -113,7 +113,7 @@ class Attachments::GarbageCollector
           WHERE content_exports.attachment_id = attachments.id
         )")
       end
-      scope = scope.where("created_at < ?", older_than) if older_than
+      scope = scope.where(created_at: ...older_than) if older_than
       scope
     end
 

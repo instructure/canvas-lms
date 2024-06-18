@@ -20,9 +20,9 @@ import {useEffect, useState} from 'react'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {type AssigneeOption} from '../../react/AssigneeSelector'
 import {uniqBy} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {AssigneeOption} from '../../react/Item/types'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -35,12 +35,18 @@ interface Props {
   defaultValues: AssigneeOption[]
   customAllOptions?: AssigneeOption[]
   customIsLoading?: boolean
+  requiredOptions?: string[]
   customSetSearchTerm?: (term: string) => void
   onError?: () => void
 }
 
-const processResult = (
-  result: PromiseSettledResult<{json: Record<string, string>[]}> | null,
+type JSONResult = Record<string, string>[]
+
+const processResult = async (
+  result: PromiseSettledResult<{
+    json: JSONResult
+    link?: {next: {url: string}}
+  }> | null,
   key: string,
   groupKey: string,
   allOptions: AssigneeOption[],
@@ -48,7 +54,10 @@ const processResult = (
 ) => {
   let resultParsedResult: AssigneeOption[] = []
   if (result && result.status === 'fulfilled') {
-    const resultJSON = result.value.json
+    let resultJSON = result.value.json
+    if (result.value.link?.next) {
+      resultJSON = await fetchNextPages(result.value.link.next, resultJSON)
+    }
     resultParsedResult =
       resultJSON?.map(({id, name, group_category_id: groupCategoryId}) => {
         const parsedId = `${key.toLowerCase()}-${id}`
@@ -71,6 +80,18 @@ const processResult = (
   return resultParsedResult
 }
 
+const fetchNextPages = async (next: {url: string}, results: Record<string, any>[]) => {
+  let mergedResults = results
+  const {json, link} = await doFetchApi({
+    path: next.url,
+  })
+  mergedResults = [...mergedResults, ...json]
+  if (link?.next) {
+    mergedResults = await fetchNextPages(link.next, mergedResults)
+  }
+  return mergedResults
+}
+
 const useFetchAssignees = ({
   courseId,
   defaultValues,
@@ -80,6 +101,7 @@ const useFetchAssignees = ({
   checkMasteryPaths = false,
   customAllOptions,
   customIsLoading,
+  requiredOptions,
   customSetSearchTerm,
   onError = () => {},
 }: Props) => {
@@ -90,7 +112,7 @@ const useFetchAssignees = ({
   const [hasErrors, setHasErrors] = useState(false)
 
   useEffect(() => {
-    const params: Record<string, string> = {}
+    const params: Record<string, string | number> = {per_page: 100}
     const shouldSearchTerm = searchTerm.length > 2
     if (
       (shouldSearchTerm || searchTerm === '') &&
@@ -108,11 +130,16 @@ const useFetchAssignees = ({
           path: `/api/v1/courses/${courseId}/sections`,
           params,
         })
+      const students =
+        requiredOptions?.filter(o => o.includes('student'))?.map(o => o.split('-')[1]) ?? []
       const fetchStudents =
         (!loaded || searchTerm !== '') &&
         doFetchApi({
           path: `/api/v1/courses/${courseId}/users`,
-          params: {...params, enrollment_type: 'student'},
+          params:
+            students.length > 0 && searchTerm === ''
+              ? {...params, enrollment_type: 'student', user_ids: students.join(',')}
+              : {...params, enrollment_type: 'student'},
         })
 
       const fetchCourseSettings =
@@ -132,12 +159,12 @@ const useFetchAssignees = ({
       Promise.allSettled(
         [fetchSections, fetchStudents, fetchCourseSettings, fetchGroups].filter(Boolean)
       )
-        .then(results => {
+        .then(async results => {
           const sectionsResult = fetchSections ? results[0] : null
           const studentsResult = fetchStudents ? results[1] : null
           const courseSettingsResult = fetchCourseSettings ? results[2] : null
           const groupsResult = fetchGroups ? (loaded ? results[0] : results[3]) : null
-          const sectionsParsedResult: AssigneeOption[] = processResult(
+          const sectionsParsedResult: AssigneeOption[] = await processResult(
             sectionsResult,
             'section',
             'Sections',
@@ -145,7 +172,7 @@ const useFetchAssignees = ({
             setHasErrors
           )
           let studentsParsedResult: AssigneeOption[] = []
-          const groupsParsedResult: AssigneeOption[] = processResult(
+          const groupsParsedResult: AssigneeOption[] = await processResult(
             groupsResult,
             'group',
             'Groups',
@@ -153,9 +180,11 @@ const useFetchAssignees = ({
             setHasErrors
           )
           let masteryPathsOption
-
           if (studentsResult && studentsResult.status === 'fulfilled') {
-            const studentsJSON = studentsResult.value.json as Record<string, string>[]
+            let studentsJSON = studentsResult.value.json as JSONResult
+            if (studentsResult.value.link?.next) {
+              studentsJSON = await fetchNextPages(studentsResult.value.link.next, studentsJSON)
+            }
             studentsParsedResult =
               studentsJSON?.map(({id, name, sis_user_id}: any) => {
                 const parsedId = `student-${id}`

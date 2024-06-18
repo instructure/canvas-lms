@@ -261,8 +261,7 @@ module Lti::IMS
         # 5xx and other unexpected errors
         return render_error(err_message, :internal_server_error)
       end
-
-      submit_homework(attachments) if new_submission?
+      submit_homework(attachments) if new_submission? && activity_started?
       update_or_create_result
       json[:resultUrl] = result_url
 
@@ -272,7 +271,7 @@ module Lti::IMS
     private
 
     def old_create
-      submit_homework if new_submission? && !has_content_items?
+      submit_homework if new_submission? && !has_content_items? && activity_started?
       update_or_create_result
       json = { resultUrl: result_url }
 
@@ -623,6 +622,10 @@ module Lti::IMS
       parsed = Time.zone.iso8601(t) rescue nil
       parsed ||= (Time.zone.parse(t) rescue nil) if Setting.get("enforce_iso8601_for_lti_scores", "false") == "false"
       parsed
+    end
+
+    def activity_started?
+      params[:activityProgress] != "Initialized"
     end
   end
 end

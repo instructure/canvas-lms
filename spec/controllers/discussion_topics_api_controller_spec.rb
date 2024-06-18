@@ -172,6 +172,7 @@ describe DiscussionTopicsApiController do
   context "summary" do
     before do
       course_with_teacher(active_course: true)
+      @teacher.update!(locale: "en")
       @topic = @course.discussion_topics.create!(title: "discussion", summary_enabled: true)
       user_session(@teacher)
 
@@ -183,8 +184,9 @@ describe DiscussionTopicsApiController do
       before do
         expect(LLMConfigs).to receive(:config_for).and_return(
           LLMConfig.new(
-            name: "V0_A",
-            model_id: "model"
+            name: "V1_A",
+            model_id: "model",
+            template: "<CONTENT_PLACEHOLDER>"
           )
         )
       end
@@ -193,8 +195,11 @@ describe DiscussionTopicsApiController do
         before do
           @summary = @topic.summaries.create!(
             summary: "summary",
-            dynamic_content_hash: "fcfa768511b6a7a5881d017dae0d5aaa8dd8615937c1b89ea680c4dbb9af2a51",
-            llm_config_version: "V0_A"
+            dynamic_content_hash: Digest::SHA256.hexdigest({
+              content: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary,
+              locale: "English (United States)"
+            }.to_json),
+            llm_config_version: "V1_A"
           )
         end
 
@@ -225,6 +230,29 @@ describe DiscussionTopicsApiController do
           )
 
           get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, force: true }, format: "json"
+
+          expect(response).to be_successful
+          expect(@topic.reload.summary_enabled).to be_truthy
+          expect(response.parsed_body["id"]).not_to eq(@summary.id)
+        end
+
+        it "returns a new summary if locale has changed" do
+          expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+          @teacher.update!(locale: "es")
+
+          expect(@inst_llm).to receive(:chat).and_return(
+            InstLLM::Response::ChatResponse.new(
+              model: "model",
+              message: { role: :assistant, content: "summary_1" },
+              stop_reason: "stop_reason",
+              usage: {
+                input_tokens: 10,
+                output_tokens: 20,
+              }
+            )
+          )
+
+          get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
           expect(response).to be_successful
           expect(@topic.reload.summary_enabled).to be_truthy
@@ -300,7 +328,7 @@ describe DiscussionTopicsApiController do
       @summary = @topic.summaries.create!(
         summary: "summary",
         dynamic_content_hash: "fcfa768511b6a7a5881d017dae0d5aaa8dd8615937c1b89ea680c4dbb9af2a51",
-        llm_config_version: "V0_A"
+        llm_config_version: "V1_A"
       )
       user_session(@teacher)
     end

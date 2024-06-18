@@ -207,6 +207,7 @@ uk:
     root_account_cant_have_sis_id: "SIS ідентифікатори не можуть бути встановлені для кореневих облікових записів"
     sis_id_in_use: "Ідентифікатор SIS \"%{sis_id}\" вже використовується"
     tab_admin_tools: "Інструменти адміністратора"
+    tab_apps: Застосунки
     tab_authentication: Аутентифікація
     tab_brand_configs: Теми
     tab_courses: Курси
@@ -1345,6 +1346,7 @@ uk:
       turnitin_pledge_help: "студенти мають поставити позначку в діалоговому вікні, підтверджуючи, що вони згодні з цими правилами"
       turnitin_settings_title: "Turnitin налаштування"
       update_settings_button: "Налаштування оновлення"
+    settings_crumb: Налаштування
     show: 
       courses_crumb: Курси
       no_courses_account_message: "Для цього облікового запису курси відсутні"
@@ -1865,6 +1867,7 @@ uk:
   admin_4d3ba42f: Адміністратор
   admin_csv_f8d1b3eb: "Адміністратор CSV"
   admin_navigation_menu_77b801a2: "Меню навігації адміністратора"
+  admin_tools_9e2c9268: "Інструменти адміністратора "
   admin_user_name_29dd115a: admin_user_name
   administrator_f325c186: Адміністратор
   admins_3e1dce15: Адміністратори
@@ -3098,6 +3101,7 @@ uk:
       discovery_url_description: "Якщо встановлено URL-адресу для відкриття, Canvas пересилає всіх користувачів на цю URL-адресу, коли вони потребують аутентифікації. Ця сторінка повинна допомогти користувачеві з'ясувати, куди вони повинні зайти, щоб увійти в систему. Якщо URL-адреси відкриття не налаштовано, перша конфігурація буде використана для спроби аутентифікації користувача."
       login_handle_name_description: "Позначка використовується для унікальних ідентифікаторів входу в систему. Наприклад: Вхід, Ім'я користувача, студентський ID тощо."
       unknown_user_url_description: "URL-адреса для перенаправлення, коли ідентифікований користувач не знайдений в Canvas."
+  authentication_settings_5c2078a3: "Налаштування аутентифікації"
   authentication_with_provider_was_successful_but_no_6a194137: "Аутентифікація з %{provider} була успішною, але неунікальний ідентифікатор для входу в систему Canvas був наданий."
   authnrequest_sent_to_idp_74e030fc: "AuthnRequest відправлено IdP"
   authnresponse_from_idp_185037e9: "AuthnResponse від IdP"
@@ -12872,6 +12876,10 @@ uk:
         upload_ui_conf: "Ідентифікатор конфігурації додавання UI "
         user_secret_key: "Ключ користувача"
       ui_conf_ids: "Для клієнтів, що обслуговуються Kaltura, ви можете попросити Kaltura надати вам ці ідентифікатори. Самостійні приклади можуть знаходити ці значення в таблиці ui_confs."
+    learn_platform_settings: 
+      labels: 
+        base_url: "Основний URL"
+        token: "Маркер доступу"
     linked_in: 
       description: "LinkedIn інтеграція"
     linked_in_settings: 
@@ -14697,6 +14705,7 @@ uk:
       create_group: "Створити групу"
       create_question: "Створити запитання"
       creating_group: "Створення групи..."
+      generate: Генерувати
       generating: Генерується...
       generating_combinations_progress: "Генерується... (%{done}/%{total})"
       save: Зберегти
@@ -15877,6 +15886,8 @@ uk:
       titles: 
         mastery_level: "вищий відсоток, який встановлює майстерність"
         select_and_add_criterion: "Обрати та додати критерій"
+    flash_notices: 
+      close: Закрити
     footer_links: 
       facebook: Facebook
       privacy_policy: "Політика конфіденційності"
@@ -16722,6 +16733,8 @@ uk:
       many: "%{count} додаткових облікових записів"
       one: "1 додатковий обліковий запис"
       other: "%{count} додаткових облікових записів"
+    titles: 
+      sub_accounts: "Додаткові облікові записи"
   subaccount_91f4c279: "Додатковий обліковий запис"
   subdomain_url_1e43b6f0: "Субдомен URL"
   subject_114b2e98: Тема

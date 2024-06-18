@@ -1219,6 +1219,16 @@ describe UserLearningObjectScopes do
       expect(student2.wiki_pages_needing_viewing(**opts)).to eq [@course_page]
     end
 
+    it "does not show wiki pages that are not visible to the user" do
+      Account.site_admin.enable_feature! :selective_release_backend
+      @course_page.update!(todo_date: 1.day.from_now, only_visible_to_overrides: true)
+      section2 = add_section("Section 2")
+      student2 = student_in_section(section2)
+      @course_page.assignment_overrides.create!(set: section2)
+      expect(@student.wiki_pages_needing_viewing(**opts)).to eq []
+      expect(student2.wiki_pages_needing_viewing(**opts)).to eq [@course_page]
+    end
+
     context "include_concluded" do
       before :once do
         @u = User.create!

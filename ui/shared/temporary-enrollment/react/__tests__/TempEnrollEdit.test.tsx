@@ -88,6 +88,7 @@ describe('TempEnrollEdit component', () => {
       expect(screen.getByText('Recipient Name')).toBeInTheDocument()
       expect(screen.getByText('Recipient Enrollment Period')).toBeInTheDocument()
       expect(screen.getByText('Recipient Enrollment Type')).toBeInTheDocument()
+      expect(screen.getByText('Status')).toBeInTheDocument()
       expect(screen.getByText('Temporary enrollment option links')).toBeInTheDocument()
     })
 
@@ -97,6 +98,7 @@ describe('TempEnrollEdit component', () => {
       expect(screen.getByText('Provider Name')).toBeInTheDocument()
       expect(screen.getByText('Recipient Enrollment Period')).toBeInTheDocument()
       expect(screen.getByText('Recipient Enrollment Type')).toBeInTheDocument()
+      expect(screen.getByText('Status')).toBeInTheDocument()
       expect(screen.getByText('Temporary enrollment option links')).toBeInTheDocument()
     })
 
@@ -113,6 +115,57 @@ describe('TempEnrollEdit component', () => {
       render(<TempEnrollEdit {...newProps} />)
 
       expect(screen.queryByText('Temporary enrollment option links')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('renderEnrollmentPairingStatus', () => {
+    it('returns a Pill with "Future" status for future enrollments', () => {
+      const futureDate = new Date()
+      futureDate.setFullYear(futureDate.getFullYear() + 1)
+      const newProps = {
+        ...props,
+        enrollments: [
+          {
+            ...props.enrollments[0],
+            start_at: futureDate.toISOString(),
+          },
+        ],
+      }
+
+      const {getByText} = render(<TempEnrollEdit {...newProps} />)
+      expect(getByText('Future')).toBeInTheDocument()
+    })
+
+    it('returns a Pill with "Active" status for past enrollments', () => {
+      const pastDate = new Date()
+      pastDate.setFullYear(pastDate.getFullYear() - 1)
+      const newProps = {
+        ...props,
+        enrollments: [
+          {
+            ...props.enrollments[0],
+            start_at: pastDate.toISOString(),
+          },
+        ],
+      }
+
+      const {getByText} = render(<TempEnrollEdit {...newProps} />)
+      expect(getByText('Active')).toBeInTheDocument()
+    })
+
+    it('returns a Pill with "Active" status when start_at is not present', () => {
+      const newProps = {
+        ...props,
+        enrollments: [
+          {
+            ...props.enrollments[0],
+            start_at: null,
+          },
+        ],
+      }
+
+      const {getByText} = render(<TempEnrollEdit {...newProps} />)
+      expect(getByText('Active')).toBeInTheDocument()
     })
   })
 

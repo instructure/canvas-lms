@@ -345,7 +345,11 @@ class AssignmentGroupsController < ApplicationController
 
   def assignment_visibilities(course, assignments)
     if include_visibility?
-      AssignmentStudentVisibility.assignments_with_user_visibilities(course, assignments)
+      if Account.site_admin.feature_enabled?(:selective_release_backend)
+        AssignmentVisibility::AssignmentVisibilityService.assignments_with_user_visibilities(course, assignments)
+      else
+        AssignmentStudentVisibility.assignments_with_user_visibilities(course, assignments)
+      end
     else
       params.fetch(:include, []).delete("assignment_visibility")
       AssignmentStudentVisibility.none

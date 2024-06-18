@@ -18,27 +18,32 @@
 
 import detroit from 'timezone/America/Detroit'
 import timezone from 'timezone'
-import {configureAndRestoreLater, epoch, moonwalk, restore} from '../specHelpers'
-import {isMidnight as subject} from '..'
+import {isMidnight} from '@instructure/moment-utils'
+import {
+  configureAndRestoreLater,
+  epoch,
+  moonwalk,
+  restore,
+} from '@instructure/moment-utils/specHelpers'
 
 describe('isMidnight', () => {
   afterEach(restore)
 
   test('is false when no argument given.', () => {
-    expect(subject()).toEqual(false)
+    expect(isMidnight()).toEqual(false)
   })
 
   test('is false when invalid date is given.', () => {
     const date = new Date('invalid date')
-    expect(subject(date)).toEqual(false)
+    expect(isMidnight(date)).toEqual(false)
   })
 
   test('is true when date given is at midnight.', () => {
-    expect(subject(epoch)).toEqual(true)
+    expect(isMidnight(epoch)).toEqual(true)
   })
 
   test("is false when date given isn't at midnight.", () => {
-    expect(subject(moonwalk)).toEqual(false)
+    expect(isMidnight(moonwalk)).toEqual(false)
   })
 
   test('is false when date is midnight in a different zone.', () => {
@@ -49,6 +54,6 @@ describe('isMidnight', () => {
       },
     })
 
-    expect(subject(epoch)).toEqual(false)
+    expect(isMidnight(epoch)).toEqual(false)
   })
 })

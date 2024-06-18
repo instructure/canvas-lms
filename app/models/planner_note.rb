@@ -35,6 +35,6 @@ class PlannerNote < ActiveRecord::Base
   scope :for_course, ->(course) { where(course:) }
   scope :exclude_deleted_courses, -> { left_joins(:course).where("courses IS NULL OR courses.workflow_state <> 'deleted'") }
 
-  scope :before, ->(end_at) { where("todo_date <= ?", end_at) }
-  scope :after, ->(start_at) { where("todo_date >= ?", start_at) }
+  scope :before, ->(end_at) { where(todo_date: ..end_at) }
+  scope :after, ->(start_at) { where(todo_date: start_at..) }
 end

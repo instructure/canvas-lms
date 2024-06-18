@@ -108,7 +108,7 @@ Rails.configuration.after_initialize do
     Delayed::Periodic.cron "ActiveRecord::SessionStore::Session.delete_all", "*/5 * * * *" do
       callback = -> { Canvas::Errors.capture_exception(:periodic_job, $ERROR_INFO) }
       Shard.with_each_shard(exception: callback) do
-        ActiveRecord::SessionStore::Session.where("updated_at < ?", expire_after.seconds.ago).delete_all
+        ActiveRecord::SessionStore::Session.where(updated_at: ...expire_after.seconds.ago).delete_all
       end
     end
   end

@@ -25,10 +25,6 @@ module EventStream::IndexStrategy
       @index = index_obj
     end
 
-    def insert(_record, _key)
-      # no-op because the DB has indexes
-    end
-
     def find_with(args, options)
       for_ar_scope(args, options)
     end
@@ -38,14 +34,14 @@ module EventStream::IndexStrategy
     end
 
     def for_ar_scope(args, options = {})
-      ar_type = index.event_stream.active_record_type
+      ar_type = index.event_stream.record_type
       index_scope = index.ar_scope_proc.call(*args)
       self.class.for_ar_scope(ar_type, index_scope, options)
     end
 
     def self.for_ar_scope(ar_type, index_scope, options)
-      index_scope = index_scope.where("created_at >= ?", options[:oldest]) if options[:oldest].present?
-      index_scope = index_scope.where("created_at <= ?", options[:newest]) if options[:newest].present?
+      index_scope = index_scope.where(created_at: options[:oldest]..) if options[:oldest].present?
+      index_scope = index_scope.where(created_at: ..options[:newest]) if options[:newest].present?
       index_scope = index_scope.select(:id, :created_at) if options[:just_ids] == true
       event_bookmarker = EventStream::IndexStrategy::ActiveRecord::Bookmarker.new(ar_type)
       BookmarkedCollection.build(event_bookmarker) do |pager|
@@ -59,7 +55,7 @@ module EventStream::IndexStrategy
     def self.pager_to_records(index_scope, pager)
       bookmark_scope = index_scope
       if (bookmark = pager.current_bookmark)
-        bookmark_scope = bookmark_scope.where("created_at < ?", Time.zone.parse(bookmark))
+        bookmark_scope = bookmark_scope.where(created_at: ...Time.zone.parse(bookmark))
       end
       bookmark_scope = bookmark_scope.order("created_at DESC")
       bookmark_scope.paginate(page: 1, per_page: pager.per_page)

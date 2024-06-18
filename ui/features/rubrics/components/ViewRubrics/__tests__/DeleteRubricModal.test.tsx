@@ -90,7 +90,7 @@ describe('RubricForm Tests', () => {
       .spyOn(ViewRubricQueries, 'deleteRubric')
       .mockImplementation(() => Promise.resolve({id: '1', title: 'Rubric 1', pointsPossible: 10}))
     const {getByTestId} = renderComponent()
-    const deleteButton = getByTestId('delete-rubric-button')
+    const deleteButton = getByTestId('delete-rubric-modal-button')
     deleteButton?.click()
     await new Promise(resolve => setTimeout(resolve, 0))
     expect(getSRAlert()).toEqual('Rubric deleted successfully')

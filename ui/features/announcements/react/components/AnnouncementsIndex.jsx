@@ -30,7 +30,6 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Pagination} from '@instructure/ui-pagination'
 
 import AnnouncementRow from '@canvas/announcements/react/components/AnnouncementRow'
-import {ConnectedIndexHeader} from './IndexHeader'
 import AnnouncementEmptyState from './AnnouncementEmptyState'
 import {showConfirmDelete} from './ConfirmDeleteModal'
 
@@ -40,6 +39,7 @@ import {announcementList} from '@canvas/announcements/react/proptypes/announceme
 import masterCourseDataShape from '@canvas/courses/react/proptypes/masterCourseData'
 import actions from '../actions'
 import propTypes from '../propTypes'
+import {ConnectedIndexHeader} from './IndexHeader'
 
 const I18n = useI18nScope('announcements_v2')
 

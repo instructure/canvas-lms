@@ -9,7 +9,7 @@
       {{/unless}}
     </form>
     {{#if speedGraderUrl }}
-      <a class="more-details-link" target="_blank" href="{{speedGraderUrl}}">{{#t "more_details_in_the_speedgrader"}}More details in the SpeedGrader{{/t}}</a>
+      <a class="more-details-link" target="_blank" href="{{speedGraderUrl}}">{{#t}}More details in SpeedGrader{{/t}}</a>
     {{/if}}
     <div>
       <h2>
@@ -30,7 +30,7 @@
         {{> ui/features/screenreader_gradebook/jst/_submission_detail.handlebars}}
       {{/each}}
       {{#if rubric_assessment}}
-        <div class="rubric-link"><a class="rubric" href="{{speedGraderUrl}}">{{#t "view_rubric_assessment_in_the_speedgrader"}}View Rubric Assessment in the SpeedGrader{{/t}}</a></div>
+        <div class="rubric-link"><a class="rubric" href="{{speedGraderUrl}}">{{#t}}View Rubric Assessment in SpeedGrader{{/t}}</a></div>
       {{/if}}
     </div>
   </section>

@@ -21,6 +21,7 @@ import React, {useState} from 'react'
 import {bool, func, shape, string} from 'prop-types'
 import {Select} from '@instructure/ui-select'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('gradebook')
 
@@ -101,6 +102,8 @@ export default function CompleteIncompleteGradeInput(props) {
     ]
   }
 
+  const label = I18n.t('Grade')
+
   return (
     <Select
       {...selectProps}
@@ -110,7 +113,15 @@ export default function CompleteIncompleteGradeInput(props) {
       onRequestHighlightOption={handleHighlightOption}
       onRequestSelectOption={handleSelectOption}
       onRequestShowOptions={() => setIsShowingOptions(true)}
-      renderLabel={() => I18n.t('Grade')}
+      renderLabel={() =>
+        props.hasHeader ? (
+          <Text size="x-small" weight="normal">
+            {label}
+          </Text>
+        ) : (
+          label
+        )
+      }
     >
       {options.map(option => (
         <Select.Option
@@ -137,4 +148,5 @@ CompleteIncompleteGradeInput.propTypes = {
   isBusy: bool.isRequired,
   isDisabled: bool.isRequired,
   onChange: func.isRequired,
+  hasHeader: bool.isRequired,
 }

@@ -19,6 +19,8 @@ import * as uploadFileModule from '@canvas/upload-file'
 
 import {addAttachmentsFn, removeAttachmentFn} from '../attachments'
 
+jest.mock('@canvas/upload-file')
+
 const fileInput = {
   currentTarget: {
     files: [
@@ -54,8 +56,7 @@ const getAddAttachments = ({
   )
 }
 
-// VICE-4065 - remove or rewrite to remove spies on uploadFileModule import
-describe.skip('addAttachmentsFn', () => {
+describe('addAttachmentsFn', () => {
   beforeEach(() => {
     uploadFileModule.uploadFiles = jest.fn().mockResolvedValue([])
   })

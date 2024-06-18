@@ -207,11 +207,6 @@ export const CONVERSATIONS_QUERY = gql`
                     name
                     shortName
                   }
-                  recipients {
-                    id
-                    _id
-                    name
-                  }
                 }
               }
             }

@@ -162,9 +162,11 @@ export const AuthorInfo = props => {
                         data-testid="pill-container"
                       />
                     </Flex.Item>
-                    {props.reportTypeCounts && props.reportTypeCounts.total && (
-                      <ReportsSummaryBadge reportTypeCounts={props.reportTypeCounts} />
-                    )}
+                    {ENV.discussions_reporting &&
+                      props.reportTypeCounts &&
+                      props.reportTypeCounts.total && (
+                        <ReportsSummaryBadge reportTypeCounts={props.reportTypeCounts} />
+                      )}
                   </Flex>
                 </Flex.Item>
               )}

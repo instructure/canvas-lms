@@ -21,7 +21,7 @@ class CSVWithI18n < CSV
 
   def initialize(data, **options)
     @include_bom = options.delete(:include_bom)
-    super(data, **options)
+    super
     raise "include_bom and write_headers cannot both be true" if write_headers? && @include_bom
   end
 
@@ -30,7 +30,7 @@ class CSVWithI18n < CSV
       @io.write(BYTE_ORDER_MARK)
       @bom_written = true
     end
-    super(row)
+    super
   end
 
   def self.csv_i18n_settings(user, options = {})

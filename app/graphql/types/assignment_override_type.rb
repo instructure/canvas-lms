@@ -66,9 +66,13 @@ module Types
   class AssignmentOverrideType < ApplicationObjectType
     graphql_name "AssignmentOverride"
 
-    implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
-    implements Interfaces::LegacyIDInterface
+
+    # IDs could be nil since DiscussionTopicSectionVisibilities are not persisted
+    # So we use expect null IDs instead of implementing Interfaces::LegacyIDInterface
+    # and GraphQL::Types::Relay::Node
+    field :_id, ID, "legacy canvas id", method: :id, null: true
+    field :id, ID, resolver_method: :default_global_id, null: true
 
     alias_method :override, :object
 
@@ -102,6 +106,18 @@ module Types
     field :context_module, ModuleType, null: true
     def context_module
       load_association(:context_module)
+    end
+
+    # GraphQL::Types::Relay::Node uses Types::Relay::NodeBehaviors#default_global_id
+    # to resolve the id field. For non-persisted overrides, the ones that we use
+    # for representing DiscussionTopicSectionVisibility with dummy objects, we get
+    # the same id for all, so we need to add this validation instead.
+    def default_global_id
+      if object.id.nil?
+        nil
+      else
+        context.schema.id_from_object(object, self.class, context)
+      end
     end
   end
 end

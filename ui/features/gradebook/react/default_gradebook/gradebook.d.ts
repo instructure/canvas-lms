@@ -269,6 +269,7 @@ export type PendingGradeInfo = {
   score: number | null
   userId?: string
   valid: boolean
+  subAssignmentTag?: string
 }
 
 export type InitialActionStates = {

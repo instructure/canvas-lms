@@ -132,7 +132,7 @@ class Linter
 
   def generate_comments
     if custom_comment_generation
-      generate_comment_proc.call(changes:, auto_correct:)
+      generate_comment_proc.call(changes:, auto_correct:, diff: dr_diff&.parsed_diff)
     else
       comments
     end
@@ -140,7 +140,6 @@ class Linter
 
   def publish_comments
     processed_comments = comment_post_processing.call(generate_comments)
-
     if processed_comments.empty?
       puts "-- -- -- -- -- -- -- -- -- -- --"
       puts "No relevant #{linter_name} errors found!"
@@ -151,7 +150,7 @@ class Linter
     if gerrit_patchset
       if boyscout_mode
         processed_comments.each do |comment|
-          comment[:severity] = "error"
+          comment[:severity] = "error" unless comment[:ignore_boyscout_severity_change]
         end
       end
       publish_gergich_comments(processed_comments)

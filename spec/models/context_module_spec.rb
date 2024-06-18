@@ -236,7 +236,7 @@ describe ContextModule do
 
   describe "update_assignment_submissions" do
     before :once do
-      Account.site_admin.enable_feature!(:differentiated_modules)
+      Account.site_admin.enable_feature!(:selective_release_backend)
       course_module
       @student1 = student_in_course(active_all: true, name: "Student 1").user
       @assignment = @course.assignments.create!(title: "some assignment")
@@ -1876,7 +1876,28 @@ describe ContextModule do
     expect(m.grants_right?(@teacher, :manage_course_content_delete)).to be false
   end
 
+  it "only loads visibility and progression information once when calculating prerequisites with selective_release_backend on" do
+    Account.site_admin.enable_feature!(:selective_release_backend)
+    course_factory(active_all: true)
+    student_in_course(course: @course)
+    m1 = @course.context_modules.create!(name: "m1")
+    m2 = @course.context_modules.create!(name: "m2", prerequisites: [{ id: m1.id, type: "context_module", name: m1.name }])
+
+    [m1, m2].each do |m|
+      assmt = @course.assignments.create!(title: "assmt", submission_types: "online_text_entry")
+      assmt.submit_homework(@student, body: "bloop")
+      tag = m.add_item({ id: assmt.id, type: "assignment" })
+      m.update_attribute(:completion_requirements, { tag.id => { type: "must_submit" } })
+    end
+
+    expect(AssignmentVisibility::AssignmentVisibilityService).to receive(:visible_assignment_ids_in_course_by_user).once.and_call_original
+    expect(ContextModuleProgressions::Finder).to receive(:find_or_create_for_context_and_user).once.and_call_original
+
+    m2.evaluate_for(@student)
+  end
+
   it "only loads visibility and progression information once when calculating prerequisites" do
+    Account.site_admin.disable_feature!(:selective_release_backend)
     course_factory(active_all: true)
     student_in_course(course: @course)
     m1 = @course.context_modules.create!(name: "m1")

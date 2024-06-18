@@ -51,6 +51,30 @@ RSpec.describe DeveloperKeyAccountBinding do
       )
     end
 
+    it "creates and updates the corresponding lti registration account binding" do
+      user = user_model
+      user2 = user_model
+      lti_registration = Lti::Registration.create!(
+        name: "an lti registration",
+        account:,
+        created_by: user,
+        updated_by: user
+      )
+      dev_key_binding.lti_registration_account_binding = Lti::RegistrationAccountBinding.create!(
+        workflow_state: dev_key_binding.workflow_state,
+        account: dev_key_binding.account,
+        registration: lti_registration
+      )
+      dev_key_binding.save!
+      expect(dev_key_binding.lti_registration_account_binding).to be_persisted
+
+      dev_key_binding.update!(workflow_state: :on, current_user: user2)
+
+      lrab = dev_key_binding.lti_registration_account_binding
+      expect(lrab.workflow_state).to eq("on")
+      expect(lrab.updated_by).to eq(user2)
+    end
+
     describe "workflow state" do
       it 'allows "off"' do
         dev_key_binding.workflow_state = "off"

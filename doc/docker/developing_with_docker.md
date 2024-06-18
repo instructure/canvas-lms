@@ -305,19 +305,6 @@ colorized rails log and a browser screenshot taken at the time of the failure.
 
 ## Extra Services
 
-### Cassandra
-
-If you're using the analytics package, you'll also need Cassandra. The
-Cassandra configuration isn't enabled by default. Add `docker-compose/cassandra.override.yml` to your `COMPOSE_FILE` var in `.env`
-
-Then:
-- Uncomment configuration in config/cassandra.yml
-- See config/cassandra.yml.example for further setup instructions
-- to invoke cqlsh as directed in cassandra.yml.example use:
-```sh
-docker-compose exec cassandra cqlsh
-```
-
 ### Mail Catcher
 
 To enable Mail Catcher: Add `docker-compose/mailcatcher.override.yml` to your `COMPOSE_FILE` var in `.env`.

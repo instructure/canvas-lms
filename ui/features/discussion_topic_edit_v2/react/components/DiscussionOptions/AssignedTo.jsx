@@ -24,7 +24,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Select} from '@instructure/ui-select'
 import {IconCheckSolid} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
-import {GradedDiscussionDueDatesContext} from '../../util/constants'
+import {DiscussionDueDatesContext} from '../../util/constants'
 
 const I18n = useI18nScope('discussion_create')
 const liveRegion = () => document.getElementById('flash_screenreader_holder')
@@ -56,9 +56,8 @@ export const AssignedTo = ({
       .find(option => initialAssignedToInformation.includes(option.assetCode)) || []
   )
 
-  const {groupCategoryId, groups, gradedDiscussionRefMap, setGradedDiscussionRefMap} = useContext(
-    GradedDiscussionDueDatesContext
-  )
+  const {groupCategoryId, groups, gradedDiscussionRefMap, setGradedDiscussionRefMap} =
+    useContext(DiscussionDueDatesContext)
 
   // Add the checkmark icon to the selected options
   const addIconToOption = (option, isSelected) => ({

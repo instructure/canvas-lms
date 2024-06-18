@@ -140,7 +140,7 @@ class AssignmentGroup < ActiveRecord::Base
       # time that this group was last modified, that assignment was deleted
       # along with this group. This might help avoid undeleting assignments that
       # were deleted earlier.
-      to_restore = to_restore.where("updated_at >= ?", updated_at.utc)
+      to_restore = to_restore.where(updated_at: updated_at.utc..)
     end
     undestroy(active_state: "available")
     restore_scores

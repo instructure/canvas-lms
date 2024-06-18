@@ -206,6 +206,15 @@ describe ProfileController do
       expect(flash[:success]).to be_falsey
     end
 
+    it "alert is set to failed when user profile validation fails" do
+      pronunciation = "a" * 1000
+      put "update_profile",
+          params: { user: { short_name: "Monsturd", name: "Jenkins" },
+                    user_profile: { bio: "...", title: "!!!", pronunciation: } },
+          format: "json"
+      expect(flash[:success]).to be_falsey
+    end
+
     it "lets you change your short_name and profile information" do
       put "update_profile",
           params: { user: { short_name: "Monsturd", name: "Jenkins" },
@@ -394,15 +403,15 @@ describe ProfileController do
     end
 
     describe "js_env" do
-      it "sets discussions_reporting to falsey if react_discussions_post is off" do
-        Account.default.disable_feature! :react_discussions_post
+      it "sets discussions_reporting to falsey if discussions_reporting is off" do
+        Account.default.disable_feature! :discussions_reporting
         user_session(@user)
         get "communication"
         expect(assigns[:js_env][:discussions_reporting]).to be_falsey
       end
 
-      it "sets discussions_reporting to truthy if react_discussions_post is on" do
-        Account.default.enable_feature! :react_discussions_post
+      it "sets discussions_reporting to truthy if discussions_reporting is on" do
+        Account.default.enable_feature! :discussions_reporting
         user_session(@user)
         get "communication"
         expect(assigns[:js_env][:discussions_reporting]).to be_truthy

@@ -177,6 +177,16 @@ const preparePeerReviewPayload = (
       }
 }
 
+const setOnlyVisibleToOverrides = (assignedInfoList, everyoneOverride) => {
+  const hasDefaultEveryone = !!Object.keys(everyoneOverride).length
+  if (ENV.FEATURES?.selective_release_ui_api) {
+    const contextModuleOverrides = assignedInfoList.filter(info => info.context_module_id != null)
+    return !(hasDefaultEveryone || contextModuleOverrides.length === assignedInfoList.length)
+  } else {
+    return !hasDefaultEveryone
+  }
+}
+
 export const prepareCheckpointsPayload = (
   pointsPossibleReplyToTopic,
   pointsPossibleReplyToEntry,
@@ -200,6 +210,17 @@ export const prepareCheckpointsPayload = (
       ]
     : []
 }
+
+const prepareEveryoneOrEveryoneElseOverride = (
+  assignedInfoList,
+  defaultEveryoneOption,
+  defaultEveryoneElseOption
+) =>
+  assignedInfoList.find(
+    info =>
+      info.assignedList.includes(defaultEveryoneOption.assetCode) ||
+      info.assignedList.includes(defaultEveryoneElseOption.assetCode)
+  ) || {}
 
 export const prepareAssignmentPayload = (
   abGuid,
@@ -230,12 +251,11 @@ export const prepareAssignmentPayload = (
   */
   if (!isGraded && !existingAssignment) return null
 
-  const everyoneOverride =
-    assignedInfoList.find(
-      info =>
-        info.assignedList.includes(defaultEveryoneOption.assetCode) ||
-        info.assignedList.includes(defaultEveryoneElseOption.assetCode)
-    ) || {}
+  const everyoneOverride = prepareEveryoneOrEveryoneElseOverride(
+    assignedInfoList,
+    defaultEveryoneOption,
+    defaultEveryoneElseOption
+  )
   // Common payload properties for graded assignments
   let payload = {
     postToSis,
@@ -254,7 +274,7 @@ export const prepareAssignmentPayload = (
       defaultEveryoneOption,
       masteryPathsOption
     ),
-    onlyVisibleToOverrides: !Object.keys(everyoneOverride).length,
+    onlyVisibleToOverrides: setOnlyVisibleToOverrides(assignedInfoList, everyoneOverride),
     gradingStandardId: gradingSchemeId || null,
     forCheckpoints: isCheckpoints,
   }
@@ -290,4 +310,29 @@ export const prepareAssignmentPayload = (
     }
   }
   return payload
+}
+
+export const prepareUngradedDiscussionOverridesPayload = (
+  assignedInfoList,
+  defaultEveryoneOption,
+  defaultEveryoneElseOption,
+  masteryPathsOption
+) => {
+  const everyoneOverride = prepareEveryoneOrEveryoneElseOverride(
+    assignedInfoList,
+    defaultEveryoneOption,
+    defaultEveryoneElseOption
+  )
+
+  return {
+    dueAt: everyoneOverride.dueDate || null,
+    lockAt: everyoneOverride.availableUntil || null,
+    delayedPostAt: everyoneOverride.availableFrom || null,
+    onlyVisibleToOverrides: setOnlyVisibleToOverrides(assignedInfoList, everyoneOverride),
+    ungradedDiscussionOverrides: prepareAssignmentOverridesPayload(
+      assignedInfoList,
+      defaultEveryoneOption,
+      masteryPathsOption
+    ),
+  }
 }

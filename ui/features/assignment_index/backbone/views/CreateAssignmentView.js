@@ -36,8 +36,9 @@ import {
   dateString,
   timeString,
   unfudgeDateForProfileTimezone,
-} from '@canvas/datetime/date-functions'
-import * as tz from '@canvas/datetime'
+  isMidnight,
+} from '@instructure/moment-utils'
+import * as tz from '@instructure/moment-utils'
 import {encodeQueryString} from '@canvas/query-string-encoding'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
@@ -235,7 +236,7 @@ CreateAssignmentView.prototype.openAgain = function () {
       const trimmedInput = $.trim(e.target.value)
       newDate = timeField.data('unfudged-date')
       newDate = trimmedInput === '' ? null : newDate
-      if (tz.isMidnight(newDate)) {
+      if (isMidnight(newDate)) {
         if (ENV.DEFAULT_DUE_TIME) {
           newDate = tz.parse(tz.format(newDate, '%F ' + ENV.DEFAULT_DUE_TIME))
         } else {

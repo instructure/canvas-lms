@@ -20,8 +20,8 @@ import timezone from 'timezone/index'
 import french from 'timezone/fr_FR'
 import AmericaDenver from 'timezone/America/Denver'
 import AmericaChicago from 'timezone/America/Chicago'
-import * as tz from '..'
-import {configure} from '..'
+import * as tz from '@instructure/moment-utils'
+import {configure} from '@instructure/moment-utils'
 import {moonwalk, epoch} from './helpers'
 
 describe('format::', () => {

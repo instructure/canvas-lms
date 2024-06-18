@@ -151,5 +151,11 @@ describe Types::FileType do
       expect(resp).not_to be_nil
       expect(resp.start_with?("/api/v1/canvadoc_session")).to be true
     end
+
+    it "returns nil when no id is passed" do
+      allow(Canvadocs).to receive(:enabled?).and_return true
+      resp = @resolver.resolve("submissionPreviewUrl")
+      expect(resp).to be_nil
+    end
   end
 end

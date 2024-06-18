@@ -86,7 +86,7 @@ module GemOverride
     if File.directory?(vendor_path)
       super(name, path: vendor_path, **kwargs)
     else
-      super(name, *version, path:, **kwargs)
+      super
     end
   end
 end

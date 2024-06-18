@@ -302,7 +302,7 @@ EditView.prototype.initialize = function (options) {
   this.assignment = this.model
   this.setDefaultsIfNew()
   this.dueDateOverrideView = options.views['js-assignment-overrides']
-  if (ENV.FEATURES?.differentiated_modules) {
+  if (ENV.FEATURES?.selective_release_ui_api) {
     this.listenTo(this.dueDateOverrideView, 'tray:open', () =>
       // Disables all Save, Save & Publish and Build buttons
       this.$el
@@ -1238,7 +1238,7 @@ EditView.prototype.toJSON = function () {
       (typeof ENV !== 'undefined' && ENV !== null
         ? ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED
         : void 0) || false,
-    differentiatedModulesEnabled: ENV.FEATURES.differentiated_modules,
+    differentiatedModulesEnabled: ENV.FEATURES.selective_release_ui_api,
   })
 }
 
@@ -1309,7 +1309,7 @@ EditView.prototype.getFormData = function () {
     data.lock_at = null
     data.unlock_at = null
   }
-  data.only_visible_to_overrides = !this.dueDateOverrideView.overridesContainDefault()
+  data.only_visible_to_overrides = this.dueDateOverrideView.setOnlyVisibleToOverrides()
   data.assignment_overrides = this.dueDateOverrideView.getOverrides()
   if (this.shouldPublish) {
     data.published = true

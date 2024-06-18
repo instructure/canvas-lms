@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
+import {Pill} from '@instructure/ui-pill'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconPlusLine, IconTrashLine} from '@instructure/ui-icons'
@@ -151,6 +152,14 @@ export function TempEnrollEdit(props: Props) {
     }
   }
 
+  const renderEnrollmentPairingStatus = (enrollments: Enrollment[]) => {
+    const timestamp = enrollments[0].start_at ? new Date(enrollments[0].start_at).getTime() : 0
+    const status: string = timestamp >= Date.now() ? I18n.t('Future') : I18n.t('Active')
+    const color = status === 'Active' ? 'success' : 'info'
+
+    return <Pill color={color}>{status}</Pill>
+  }
+
   const renderActionIcons = (enrollments: Enrollment[]) => (
     <Flex gap="xxx-small" wrap="no-wrap" justifyItems="end">
       {canEdit && (
@@ -226,6 +235,7 @@ export function TempEnrollEdit(props: Props) {
               <Table.ColHeader id="usertable-loginid">
                 {I18n.t('Recipient Enrollment Type')}
               </Table.ColHeader>
+              <Table.ColHeader id="usertable-status">{I18n.t('Status')}</Table.ColHeader>
               {(canEdit || canDelete) && (
                 <Table.ColHeader id="header-user-option-links">
                   <ScreenReaderContent>
@@ -247,6 +257,7 @@ export function TempEnrollEdit(props: Props) {
                     )}`}
                   </Table.Cell>
                   <Table.Cell>{firstEnrollment.type}</Table.Cell>
+                  <Table.Cell>{renderEnrollmentPairingStatus(enrollmentGroup)}</Table.Cell>
                   {canEditOrDelete && <Table.Cell>{renderActionIcons(enrollmentGroup)}</Table.Cell>}
                 </Table.Row>
               )

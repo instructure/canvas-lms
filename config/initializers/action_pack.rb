@@ -20,7 +20,7 @@
 module TimeZoneFormImprovements
   def time_zone_options_for_select(selected = nil, priority_zones = nil, model = I18nTimeZone)
     selected = selected.name if selected.is_a?(ActiveSupport::TimeZone)
-    result = super(selected, priority_zones, model)
+    result = super
 
     # the current value isn't one of Rails' friendly zones; just add it to the top
     # of the list literally

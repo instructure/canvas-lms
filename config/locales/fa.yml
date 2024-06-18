@@ -280,6 +280,7 @@ fa:
     root_account_cant_have_sis_id: "شناسه های سامانه اطلاعات دانشجو را نمی توان روی حساب‌های ریشه تنظیم کرد"
     sis_id_in_use: "شناسه سامانه اطلاعات دانشجو \"%{sis_id}\" اکنون در حال استفاده است"
     tab_admin_tools: "ابزارهای مدیر"
+    tab_apps: پسوندها
     tab_authentication: اعتبارسنجی
     tab_brand_configs: "زمینه ها"
     tab_courses: درس‌ها
@@ -1570,6 +1571,7 @@ fa:
       turnitin_pledge_help: "دانشجویان باید یک کادر که تصدیق می کند با این تعهدنامه موافق هستند را علامتگذاری کنند."
       turnitin_settings_title: "تنظیمات Turnitin"
       update_settings_button: "بهنگام سازی تنظیمات"
+    settings_crumb: Settings
     show: 
       courses_crumb: "درس ها"
       no_courses_account_message: "هیچ درسی در این حساب موجود نیست"
@@ -2192,6 +2194,7 @@ fa:
   admin_4d3ba42f: مدیر
   admin_csv_f8d1b3eb: "فایل CSV مدیر"
   admin_navigation_menu_77b801a2: "منوی پیمایش مدیر"
+  admin_tools_9e2c9268: "ابزارهای مدیر"
   admin_tools_grade_change_logs_d804833f: "ابزارهای مدیر (گزارش‌های تغییر نمره)"
   admin_tools_logging_tab_680698f3: "ابزارهای مدیر (زبانه در حال ورود)"
   admin_tools_notifications_tab_120d6cdf: "ابزارهای مدیر (زبانه اطلاعیه ها)"
@@ -2975,6 +2978,7 @@ fa:
   announcements_tutorial_tray_994287d6: "سینی خودآموز اطلاعیه ها"
   announcements_unlocked_successfully_1432da9d: "اطلاعیه‌ها با موفقیت قفل گشایی شدند."
   announcements_view_1019d00d: "مشاهده - اطلاعیه‌ها"
+  anonymity_settings_are_locked_due_to_a_posted_repl_54e2c2d1: "شما نمی توانید وضعیت ناشناس یک بحث را به روز کنید"
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "ناشناس گذاشتن تمام یادآوری های ساخته شده توسط مربیان درباره موردهای ارسالی برای این تکلیف در برنامه نمره گذاری سریع"
   anonymize_all_annotations_made_by_instructors_on_s_5540bc09: "ناشناس گذاشتن تمام یادآوری های ساخته شده توسط مربیان درباره موردهای ارسالی برای این تکلیف در مستندساز"
   anonymize_all_instructor_comments_and_annotations__713924c9: "ناشناس گذاشتن تمام نظرات مربیان و یادداشت‌های داخل مستندساز "
@@ -3122,7 +3126,7 @@ fa:
   appointments_dcb41d23: "قرارهای ملاقات"
   approved_c3b285d4: "تأیید شده"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} با دقت %{precision}"
-  apps_54d24a47: "برنامه ها"
+  apps_54d24a47: پسوندها
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "برنامه های کاربردی راه آسانی برای افزودن ویژگی های جدید به کانواس هستند. آنها می توانند به هر درس یا به همه درس های یک حساب اضافه شوند. پس از پیکربندی، می توانید از طریق ماژول های درس به آنها پیوند دهید و برای ابزارهای ارزیابی، تکلیف ایجاد کنید."
   appt_calendar_event_dialog: 
     invalid_participants: "باید حداقل به یک کاربر اجازه حضور بدهید"
@@ -4271,6 +4275,7 @@ fa:
       login_handle_name_description: "برچسب استفاده شده برای شناسه های یکتای ورود. به‌عنوان مثال: ورود، نام کاربری، شناسه دانشجو و غیره."
       unknown_user_url_description: "نشانی اینترنتی برای هدایت به آن در صورتی که یک کاربر اعتبارسنجی شده در کانواس موجود نباشد."
   authentication_providers_9e8e0e84: "ارائه دهنده‌های اعتبارسنجی"
+  authentication_settings_5c2078a3: "تنظیمات اعتبارسنجی"
   authentication_with_provider_was_successful_but_no_6a194137: "اعتبارسنجی توسط %{provider} موفقیت آمیز بود، اما هیچ شناسه یکتایی برای ورود به کانواس ارائه نشد."
   authentications_log_ca16ce81: "گزارش‌ اعتبارسنجی‌ها"
   authnrequest_sent_to_idp_74e030fc: "درخواست اعتبارسنجی برای IdP فرستاده شد"
@@ -9786,6 +9791,7 @@ fa:
     default_content: "هیچ محتوایی هنوز افزوده نشده است"
     default_name: "نام صفحه"
   eportfolio_id_c69233c1: "شناسه مجموعه اسناد الکترونیکی"
+  eportfolio_moderation_73848a00: "مدیریت نمونه کارها الکترونیکی"
   eportfolio_moderation_feb0ffd3: "مدیریت نمونه کارها الکترونیکی"
   eportfolio_name_fd4b9e13: "نام مجموعه اسناد الکترونیکی"
   eportfolio_report_140b417f: "گزارش مجموعه اسناد الکترونیکی"
@@ -17748,6 +17754,10 @@ fa:
         upload_ui_conf: "شناسه پیکربندی واسط کاربر بارگذاری کننده"
         user_secret_key: "رمز کاربر"
       ui_conf_ids: "برای مشتریانی که توسط Kaltura میزبانی می شوند، می توانید از Kaltura بخواهید این شناسه ها را در اختیار شما قرار دهد. نمونه های میزبانی شده توسط خود می توانند این مقادیر را در جدول ui_confs بیابند."
+    learn_platform_settings: 
+      labels: 
+        base_url: "نشانی اینترنتی پایه"
+        token: "نشانه دسترسی"
     linked_in: 
       description: "یکپارچه‌سازی لینکدین"
     linked_in_settings: 
@@ -19918,6 +19928,7 @@ fa:
       create_group: "ایجاد گروه"
       create_question: "ایجاد پرسش"
       creating_group: "درحال ایجاد گروه..."
+      generate: ایجاد
       generating: "در حال ایجاد..."
       generating_combinations_progress: "در حال ایجاد... (%{done}/%{total})"
       save: "ذخیره سازی"
@@ -21547,7 +21558,7 @@ fa:
         mastery_level: "درصدی که بالاتر از آن تسلط تعیین می شود"
         select_and_add_criterion: "انتخاب و افرودن معیار"
     flash_notices: 
-      close: بستن
+      close: Close
     footer_links: 
       facebook: "فیس بوک"
       privacy_policy: "سیاست حریم خصوصی"
@@ -22718,6 +22729,8 @@ fa:
     sub_accounts_count: 
       one: "%{count} زیر حساب"
       other: "%{count} زیر حساب"
+    titles: 
+      sub_accounts: "زیر حساب ها"
   subaccount_91f4c279: زیرحساب
   subaccount_navigation_account_settings_add9eff9: "پیمایش زیر حساب (تنظیمات حساب)"
   subaccount_settings_8549eff7: "تنظیمات زیر حساب"

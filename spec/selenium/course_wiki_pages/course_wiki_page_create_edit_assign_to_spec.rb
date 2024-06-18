@@ -168,4 +168,14 @@ describe "wiki pages edit page assign to" do
     ConditionalReleaseObjects.last_add_assignment_button.click
     expect(ConditionalReleaseObjects.assignment_selection_modal).to include_text("new_page")
   end
+
+  it "does not show the button when the user does not have the manage_wiki_update permission even if they can edit" do
+    @page.update!(editing_roles: "teachers,students")
+    visit_wiki_edit_page(@course.id, @page.title)
+    expect(element_exists?(assign_to_link_selector)).to be_truthy
+
+    RoleOverride.create!(context: @course.account, permission: "manage_wiki_update", role: teacher_role, enabled: false)
+    visit_wiki_edit_page(@course.id, @page.title)
+    expect(element_exists?(assign_to_link_selector)).to be_falsey
+  end
 end

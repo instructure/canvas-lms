@@ -160,6 +160,7 @@ describe "differentiated_assignments" do
 
   context "table" do
     before do
+      Account.site_admin.disable_feature!(:selective_release_backend)
       course_with_differentiated_assignments_enabled
       add_multiple_sections
       assignment_with_true_only_visible_to_overrides
@@ -174,6 +175,7 @@ describe "differentiated_assignments" do
 
   context "course_with_differentiated_assignments_enabled" do
     before do
+      Account.site_admin.disable_feature!(:selective_release_backend)
       course_with_differentiated_assignments_enabled
       add_multiple_sections
     end
@@ -395,266 +397,6 @@ describe "differentiated_assignments" do
         end
       end
 
-      context "module overrides" do
-        before do
-          Account.site_admin.enable_feature!(:differentiated_modules)
-          Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
-          AssignmentStudentVisibility.reset_table_name
-        end
-
-        it "includes everyone else if there no modules and no overrides" do
-          assignment_with_false_only_visible_to_overrides
-          ensure_user_sees_assignment
-        end
-
-        it "includes everyone else if part of an unpublished module with overrides" do
-          assignment_with_false_only_visible_to_overrides
-
-          module1 = @course.context_modules.create!(name: "Module 1", workflow_state: "unpublished")
-          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
-
-          module2 = @course.context_modules.create!(name: "Module 2")
-          module2.assignment_overrides.create!
-          @assignment.context_module_tags.create! context_module: module2, context: @course, tag_type: "context_module"
-
-          ensure_user_sees_assignment
-        end
-
-        it "does not apply context module overrides that don't apply to user" do
-          assignment_with_false_only_visible_to_overrides
-
-          module1 = @course.context_modules.create!(name: "Module 1")
-          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
-
-          module1.assignment_overrides.create!
-
-          ensure_user_does_not_see_assignment
-        end
-
-        it "applies context module adhoc overrides" do
-          assignment_with_true_only_visible_to_overrides
-
-          module1 = @course.context_modules.create!(name: "Module 1")
-          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
-
-          module_override = module1.assignment_overrides.create!
-          module_override.assignment_override_students.create!(user: @user)
-
-          ensure_user_sees_assignment
-        end
-
-        it "applies context module section overrides" do
-          assignment_with_true_only_visible_to_overrides
-          enroller_user_in_section(@section_foo)
-          module1 = @course.context_modules.create!(name: "Module 1")
-          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
-
-          module_override = module1.assignment_overrides.create!
-
-          module_override.set_type = "CourseSection"
-          module_override.set_id = @section_foo
-          module_override.save!
-
-          ensure_user_sees_assignment
-        end
-
-        it "does not apply context module section overrides student is not enrolled in" do
-          assignment_with_false_only_visible_to_overrides
-
-          module1 = @course.context_modules.create!(name: "Module 1")
-          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
-
-          module_override = module1.assignment_overrides.create!
-
-          module_override.set_type = "CourseSection"
-          module_override.set_id = @section_foo
-          module_override.save!
-
-          ensure_user_does_not_see_assignment
-        end
-
-        it "does not apply context module adhoc overrides with flag off" do
-          Account.site_admin.disable_feature!(:differentiated_modules)
-          Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
-          AssignmentStudentVisibility.reset_table_name
-
-          assignment_with_true_only_visible_to_overrides
-
-          module1 = @course.context_modules.create!(name: "Module 1")
-          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
-
-          module_override = module1.assignment_overrides.create!
-          module_override.assignment_override_students.create!(user: @user)
-
-          ensure_user_does_not_see_assignment
-        end
-
-        it "applies an assignment's quiz's module overrides" do
-          quiz = quiz_model(course: @course)
-          quiz.update!(only_visible_to_overrides: true)
-          quiz.assignment.update!(only_visible_to_overrides: true)
-
-          module1 = @course.context_modules.create!(name: "Module 1")
-          module_override = module1.assignment_overrides.create!
-          module_override.assignment_override_students.create!(user: @user)
-
-          quiz.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
-
-          expect(AssignmentStudentVisibility.where(assignment_id: quiz.assignment).pluck(:user_id)).to include @user.id
-        end
-
-        it "applies overrides from unpublished modules" do
-          assignment_with_true_only_visible_to_overrides
-
-          module1 = @course.context_modules.create!(name: "Module 1", workflow_state: "unpublished")
-          module_override = module1.assignment_overrides.create!
-          module_override.assignment_override_students.create!(user: @user)
-
-          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
-
-          ensure_user_sees_assignment
-        end
-
-        it "does not apply overrides from deleted modules" do
-          assignment_with_true_only_visible_to_overrides
-
-          module1 = @course.context_modules.create!(name: "Module 1", workflow_state: "deleted")
-          module_override = module1.assignment_overrides.create!
-          module_override.assignment_override_students.create!(user: @user)
-
-          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
-
-          ensure_user_does_not_see_assignment
-        end
-
-        it "does not apply module overrides if the content tag is deleted" do
-          assignment_with_true_only_visible_to_overrides
-
-          module1 = @course.context_modules.create!(name: "Module 1")
-          module_override = module1.assignment_overrides.create!
-          module_override.assignment_override_students.create!(user: @user)
-
-          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module", workflow_state: "deleted"
-
-          ensure_user_does_not_see_assignment
-        end
-      end
-
-      context "unassign item overrides" do
-        before do
-          Account.site_admin.enable_feature!(:differentiated_modules)
-          Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
-          AssignmentStudentVisibility.reset_table_name
-          assignment_with_true_only_visible_to_overrides
-        end
-
-        it "is not visible with an unassigned adhoc override" do
-          student_in_course_with_adhoc_override(@assignment, { unassign_item: "true" })
-          ensure_user_does_not_see_assignment
-        end
-
-        it "is not visible with an unassigned section override" do
-          enroller_user_in_section(@section_foo)
-          give_section_due_date(@assignment, @section_foo, { unassign_item: "true" })
-          ensure_user_does_not_see_assignment
-        end
-
-        it "is not visible with an unassigned adhoc override and assigned section override" do
-          enroller_user_in_section(@section_foo)
-          give_section_due_date(@assignment, @section_foo)
-          student_in_course_with_adhoc_override(@assignment, { unassign_item: "true" })
-          ensure_user_does_not_see_assignment
-        end
-
-        it "is visible with an unassigned section override and assigned adhoc override" do
-          enroller_user_in_section(@section_foo)
-          give_section_due_date(@assignment, @section_foo, { unassign_item: "true" })
-          student_in_course_with_adhoc_override(@assignment)
-          ensure_user_sees_assignment
-        end
-
-        it "does not apply context module section override with an unassigned section override" do
-          enroller_user_in_section(@section_foo)
-          module1 = @course.context_modules.create!(name: "Module 1")
-          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
-
-          module_override = module1.assignment_overrides.create!
-
-          module_override.set_type = "CourseSection"
-          module_override.set_id = @section_foo
-          module_override.save!
-
-          give_section_due_date(@assignment, @section_foo, { unassign_item: "true" })
-
-          ensure_user_does_not_see_assignment
-        end
-
-        it "does not apply context module adhoc overrides with an unassigned adhoc override" do
-          module1 = @course.context_modules.create!(name: "Module 1")
-          @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
-
-          module_override = module1.assignment_overrides.create!
-          module_override.assignment_override_students.create!(user: @user)
-
-          student_in_course_with_adhoc_override(@assignment, { unassign_item: "true" })
-          ensure_user_does_not_see_assignment
-        end
-
-        it "does not unassign if the flag is off" do
-          Account.site_admin.disable_feature!(:differentiated_modules)
-          Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
-          AssignmentStudentVisibility.reset_table_name
-          student_in_course_with_adhoc_override(@assignment, { unassign: "true" })
-          ensure_user_sees_assignment
-        end
-      end
-
-      context "course overrides" do
-        before do
-          Account.site_admin.enable_feature!(:differentiated_modules)
-          Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
-          AssignmentStudentVisibility.reset_table_name
-          assignment_with_true_only_visible_to_overrides
-          give_course_due_date(@assignment)
-        end
-
-        it "shows the assignment to users in the course" do
-          ensure_user_sees_assignment
-        end
-
-        it "does not show unpublished assignments" do
-          @assignment.workflow_state = "unpublished"
-          @assignment.save!
-          ensure_user_does_not_see_assignment
-        end
-
-        it "updates when enrollments are destroyed" do
-          ensure_user_sees_assignment
-          enrollments = StudentEnrollment.where(user_id: @user.id, course_id: @course.id)
-          enrollments.destroy_all
-          ensure_user_does_not_see_assignment
-        end
-
-        it "updates when enrollments are inactive" do
-          ensure_user_sees_assignment
-          @user.enrollments.where(course_id: @course.id).first.deactivate
-          ensure_user_does_not_see_assignment
-        end
-
-        it "updates when the override is deleted" do
-          ensure_user_sees_assignment
-          @assignment.assignment_overrides.each(&:destroy!)
-          ensure_user_does_not_see_assignment
-        end
-
-        it "does not show the assignment to users in the course with flag off" do
-          Account.site_admin.disable_feature!(:differentiated_modules)
-          Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
-          AssignmentStudentVisibility.reset_table_name
-          ensure_user_does_not_see_assignment
-        end
-      end
-
       context "assignment with false only_visible_to_overrides" do
         before do
           assignment_with_false_only_visible_to_overrides
@@ -723,6 +465,10 @@ describe "differentiated_assignments" do
     let(:first_student) { User.create! }
     let(:second_student) { User.create! }
     let(:fake_student) { User.create! }
+
+    before do
+      Account.site_admin.disable_feature!(:selective_release_backend)
+    end
 
     describe ".assignments_visible_to_all_students" do
       let(:assignments_visible_to_all_students) do

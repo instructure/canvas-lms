@@ -212,7 +212,7 @@ module CanvasRails
             config = config.dup
             config[:prepared_statements] = false
           end
-          super(connection, logger, connection_parameters, config)
+          super
         end
       else
         def initialize(config)
@@ -220,7 +220,7 @@ module CanvasRails
             config = config.dup
             config[:prepared_statements] = false
           end
-          super(config)
+          super
         end
       end
 

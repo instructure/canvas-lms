@@ -33,7 +33,7 @@ class SisBatchRollBackData < ActiveRecord::Base
                                        pseudonym
                                        user_observer]
 
-  scope :expired_data, -> { where("created_at < ?", 30.days.ago) }
+  scope :expired_data, -> { where(created_at: ...30.days.ago) }
   scope :active, -> { where(workflow_state: "active") }
   scope :restored, -> { where(workflow_state: "restored") }
 

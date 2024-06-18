@@ -109,6 +109,7 @@ export const CriterionModal = ({
   const [criterionUseRange, setCriterionUseRange] = useState(false)
   const [savingCriterion, setSavingCriterion] = useState(false)
   const [dragging, setDragging] = useState(false)
+  const [checkValidation, setCheckValidation] = useState(false)
 
   const addRating = (index: number) => {
     const isFirstIndex = index === 0
@@ -143,6 +144,8 @@ export const CriterionModal = ({
     criterionUseRange: existingCriterionUseRange,
   } = criterion ?? {}
 
+  const modalTitle = existingDescription ? I18n.t('Edit Criterion') : I18n.t('Create New Criterion')
+
   useEffect(() => {
     if (isOpen) {
       setCriterionDescription(existingDescription ?? '')
@@ -151,6 +154,7 @@ export const CriterionModal = ({
       const defaultRatings = JSON.parse(JSON.stringify(DEFAULT_RUBRIC_RATINGS))
       setRatings(existingRatings ?? defaultRatings)
       setSavingCriterion(false)
+      setCheckValidation(false)
     }
   }, [
     existingCriterionUseRange,
@@ -210,7 +214,12 @@ export const CriterionModal = ({
   }
 
   const saveChanges = async () => {
-    if (savingCriterion) return
+    setCheckValidation(true)
+
+    if (savingCriterion || !isValid()) {
+      return
+    }
+
     setSavingCriterion(true)
     const newCriterion: RubricCriterion = {
       id: criterion?.id ?? Date.now().toString(),
@@ -233,9 +242,10 @@ export const CriterionModal = ({
     )
   }
 
-  const criterionDescriptionErrorMessage: FormMessage[] = criterionDescription.trim().length
-    ? []
-    : [{text: 'Criteria Name Required', type: 'error'}]
+  const criterionDescriptionErrorMessage: FormMessage[] =
+    !criterionDescription.trim().length && checkValidation
+      ? [{text: 'Criteria Name Required', type: 'error'}]
+      : []
 
   const maxRatingPoints = ratings.length ? Math.max(...ratings.map(r => r.points), 0) : '--'
 
@@ -251,7 +261,7 @@ export const CriterionModal = ({
     >
       <Modal.Header>
         <CloseButton placement="end" offset="small" onClick={onDismiss} screenReaderLabel="Close" />
-        <Heading>{I18n.t('Create New Criterion')}</Heading>
+        <Heading>{modalTitle}</Heading>
       </Modal.Header>
       <Modal.Body>
         <View as="div" margin="0">
@@ -352,8 +362,10 @@ export const CriterionModal = ({
                           />
                           <RatingRow
                             index={index}
+                            checkValidation={checkValidation}
                             rating={rating}
                             scale={scale}
+                            showRemoveButton={ratings.length > 1}
                             criterionUseRange={criterionUseRange}
                             rangeStart={rangeStart}
                             unassessed={unassessed}
@@ -380,7 +392,7 @@ export const CriterionModal = ({
       <Modal.Footer>
         <Flex width="100%">
           <Flex.Item shouldShrink={true} shouldGrow={true}>
-            <Checkbox label={I18n.t('Save this rating scale as default')} value="medium" />
+            {/* <Checkbox label={I18n.t('Save this rating scale as default')} value="medium" /> */}
           </Flex.Item>
           <Flex.Item>
             <Button
@@ -395,7 +407,7 @@ export const CriterionModal = ({
             <Button
               color="primary"
               type="submit"
-              disabled={!isValid() || savingCriterion}
+              disabled={savingCriterion}
               onClick={() => saveChanges()}
               data-testid="rubric-criterion-save"
             >
@@ -409,22 +421,26 @@ export const CriterionModal = ({
 }
 
 type RatingRowProps = {
+  checkValidation: boolean
   criterionUseRange: boolean
   index: number
   rangeStart?: number
   rating: RubricRating
   scale: number
+  showRemoveButton: boolean
   unassessed: boolean
   onChange: (rating: RubricRating) => void
   onRemove: () => void
   onPointsBlur: () => void
 }
 const RatingRow = ({
+  checkValidation,
   criterionUseRange,
   rangeStart,
   index,
   rating,
   scale,
+  showRemoveButton,
   unassessed,
   onChange,
   onRemove,
@@ -440,70 +456,76 @@ const RatingRow = ({
     return value < 0 ? 0 : value > 100 ? 100 : value
   }
 
-  const errorMessage: FormMessage[] = rating.description.trim().length
-    ? []
-    : [{text: 'Rating Name Required', type: 'error'}]
+  const errorMessage: FormMessage[] =
+    !rating.description.trim().length && checkValidation
+      ? [{text: 'Rating Name Required', type: 'error'}]
+      : []
 
   return (
     <Flex>
-      <Flex>
-        <Flex.Item align="start">
-          <View as="div" width="4.125rem">
-            <TextInput
-              renderLabel={<ScreenReaderContent>{I18n.t('Rating Display')}</ScreenReaderContent>}
-              display="inline-block"
-              width="3.125rem"
-              disabled={true}
-              textAlign="center"
-              value={scale.toString()}
-              onChange={() => {}}
-              data-testid="rating-scale"
-            />
-          </View>
-        </Flex.Item>
-        <Flex.Item align="start">
-          <View as="div" width={criterionUseRange ? '9.375rem' : '5.938rem'}>
-            <Flex alignItems="end" height="2.375rem">
-              {criterionUseRange && (
-                <Flex.Item width="3.438rem" textAlign="end" margin="0 0 x-small 0">
-                  <View as="span" margin="0 small 0 0">
-                    {rangeStart ? `${rangeStart} to ` : `--`}
-                  </View>
-                </Flex.Item>
-              )}
-              {unassessed ? (
-                <Flex.Item>
-                  <NumberInput
-                    renderLabel={
-                      <ScreenReaderContent>{I18n.t('Rating Points')}</ScreenReaderContent>
-                    }
-                    value={rating.points}
-                    onIncrement={() => setRatingForm('points', setNumber(rating.points + 1))}
-                    onDecrement={() => setRatingForm('points', setNumber(rating.points - 1))}
-                    onChange={(e, value) => setRatingForm('points', setNumber(Number(value ?? 0)))}
-                    data-testid="rating-points"
-                    width="4.938rem"
-                    onBlur={onPointsBlur}
-                  />
-                </Flex.Item>
-              ) : (
-                <Flex.Item margin="0 0 x-small 0">
-                  <View as="span" data-testid="rating-points-assessed">
-                    {rating.points}
-                  </View>
-                </Flex.Item>
-              )}
-            </Flex>
-          </View>
-        </Flex.Item>
-      </Flex>
+      <Flex.Item align="start">
+        <Flex>
+          <Flex.Item align="start">
+            <View as="div" width="4.125rem">
+              <TextInput
+                renderLabel={<ScreenReaderContent>{I18n.t('Rating Display')}</ScreenReaderContent>}
+                display="inline-block"
+                width="3.125rem"
+                disabled={true}
+                textAlign="center"
+                value={scale.toString()}
+                onChange={() => {}}
+                data-testid="rating-scale"
+              />
+            </View>
+          </Flex.Item>
+          <Flex.Item align="start">
+            <View as="div" width={criterionUseRange ? '9.375rem' : '5.938rem'}>
+              <Flex alignItems="end" height="2.375rem">
+                {criterionUseRange && (
+                  <Flex.Item width="3.438rem" textAlign="end" margin="0 0 x-small 0">
+                    <View as="span" margin="0 small 0 0">
+                      {rangeStart ? `${rangeStart} to ` : `--`}
+                    </View>
+                  </Flex.Item>
+                )}
+                {unassessed ? (
+                  <Flex.Item>
+                    <NumberInput
+                      renderLabel={
+                        <ScreenReaderContent>{I18n.t('Rating Points')}</ScreenReaderContent>
+                      }
+                      value={rating.points}
+                      onIncrement={() => setRatingForm('points', setNumber(rating.points + 1))}
+                      onDecrement={() => setRatingForm('points', setNumber(rating.points - 1))}
+                      onChange={(e, value) =>
+                        setRatingForm('points', setNumber(Number(value ?? 0)))
+                      }
+                      data-testid="rating-points"
+                      width="4.938rem"
+                      onBlur={onPointsBlur}
+                    />
+                  </Flex.Item>
+                ) : (
+                  <Flex.Item margin="0 0 x-small 0">
+                    <View as="span" data-testid="rating-points-assessed">
+                      {rating.points}
+                    </View>
+                  </Flex.Item>
+                )}
+              </Flex>
+            </View>
+          </Flex.Item>
+        </Flex>
+      </Flex.Item>
+
       <div style={{width: '100%'}}>
         <Draggable draggableId={rating.id} index={index}>
           {provided => {
             return (
               <div ref={provided.innerRef} {...provided.draggableProps}>
                 <Flex>
-                  <Flex.Item align="center" draggable={unassessed} data-testid="rating-drag-handle">
+                  <Flex.Item align="start" draggable={unassessed} data-testid="rating-drag-handle">
                     <View
                       as="div"
                       width="3rem"
@@ -516,7 +538,7 @@ const RatingRow = ({
                       </div>
                     </View>
                   </Flex.Item>
-                  <Flex.Item align="center">
+                  <Flex.Item align="start">
                     <View as="div" width="8.875rem">
                       <TextInput
                         renderLabel={
@@ -530,7 +552,7 @@ const RatingRow = ({
                       />
                     </View>
                   </Flex.Item>
-                  <Flex.Item shouldGrow={true} shouldShrink={true} align="center">
+                  <Flex.Item shouldGrow={true} shouldShrink={true} align="start">
                     <View as="div" margin="0 small" themeOverride={{marginSmall: '1rem'}}>
                       <TextArea
                         label={
@@ -546,15 +568,17 @@ const RatingRow = ({
                     </View>
                   </Flex.Item>
                   {unassessed && (
-                    <Flex.Item align="center">
-                      <View as="div">
-                        <IconButton
-                          screenReaderLabel={I18n.t('Remove Rating')}
-                          onClick={onRemove}
-                          data-testid="remove-rating"
-                        >
-                          <IconTrashLine />
-                        </IconButton>
+                    <Flex.Item align="start">
+                      <View as="div" width="2.375rem">
+                        {showRemoveButton && (
+                          <IconButton
+                            screenReaderLabel={I18n.t('Remove Rating')}
+                            onClick={onRemove}
+                            data-testid="remove-rating"
+                          >
+                            <IconTrashLine />
+                          </IconButton>
+                        )}
                       </View>
                     </Flex.Item>
                   )}

@@ -88,7 +88,7 @@ import {map, keyBy, values, find, includes, reject, some, isEqual, filter} from 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import qs from 'qs'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/moment-utils'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import userSettings from '@canvas/user-settings'
 import htmlEscape from '@instructure/html-escape'
@@ -1305,7 +1305,7 @@ EG = {
         window.alert(
           I18n.t(
             'alerts.no_students_in_groups_close',
-            "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to close this window."
+            "Sorry, submissions for this assignment cannot be graded in SpeedGrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to close this window."
           )
         )
         window.close()
@@ -1314,7 +1314,7 @@ EG = {
         window.alert(
           I18n.t(
             'alerts.no_students_in_groups_back',
-            "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to go back."
+            "Sorry, submissions for this assignment cannot be graded in SpeedGrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to go back."
           )
         )
         SpeedgraderHelpers.getHistory().back()

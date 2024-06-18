@@ -107,8 +107,10 @@ class Attachment < ActiveRecord::Base
   belongs_to :media_object_by_media_id, class_name: "MediaObject", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :attachments_by_media_id
   has_many :media_tracks, dependent: :destroy
   has_many :submission_draft_attachments, inverse_of: :attachment
+  # don't use this association it only works for url submission types
   has_many :submissions, -> { active }
   has_many :attachment_associations
+  has_many :assignment_submissions, through: :attachment_associations, source: :context, source_type: "Submission"
   belongs_to :root_attachment, class_name: "Attachment"
   belongs_to :replacement_attachment, class_name: "Attachment", inverse_of: :replaced_attachments
   has_many :replaced_attachments, class_name: "Attachment", foreign_key: "replacement_attachment_id", inverse_of: :replacement_attachment
@@ -1231,7 +1233,7 @@ class Attachment < ActiveRecord::Base
 
       file_batches.each do |count, attachment_id, last_updated_at, display_name, context_id, context_type|
         # clear the need_notify flag for this batch
-        Attachment.where(need_notify: true, context_id:, context_type:).where("updated_at <= ?", last_updated_at)
+        Attachment.where(need_notify: true, context_id:, context_type:).where(updated_at: ..last_updated_at)
                   .in_batches(of: 10_000).update_all(need_notify: nil)
 
         # skip the notification if this batch is too old to be timely
@@ -1301,7 +1303,7 @@ class Attachment < ActiveRecord::Base
     # infer a display name without round-tripping through truncated CGI-escaped filename
     # (which reduces the length of unicode filenames to as few as 28 characters)
     self.display_name ||= Attachment.truncate_filename(name, 255)
-    super(name)
+    super
   end
 
   def thumbnail
@@ -1420,7 +1422,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def associated_with_submission?
-    @associated_with_submission ||= attachment_associations.where(context_type: "Submission").exists?
+    @associated_with_submission ||= assignment_submissions.exists?
   end
 
   def can_read_through_assignment?(user, session)
@@ -1526,6 +1528,14 @@ class Attachment < ActiveRecord::Base
       context_type == "Assignment" && user == owner
     end
     can :attach_to_submission_comment
+
+    given do |user, session|
+      user &&
+        context.is_a?(Course) &&
+        context.grants_right?(user, session, :manage_files_edit) &&
+        Account.site_admin.feature_enabled?(:differentiated_files)
+    end
+    can :manage_assign_to
   end
 
   def clear_permissions(run_at)

@@ -20,6 +20,7 @@ import {sendMessageStudentsWho} from './shared/grading/messageStudentsWhoHelper'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {GlobalInst} from '@canvas/global/inst/GlobalInst'
 import {GlobalRemotes} from '@canvas/global/remotes/GlobalRemotes'
+import EditorJS from '@editorjs/editorjs'
 
 declare global {
   interface Global {
@@ -63,6 +64,7 @@ declare global {
     bundles: string[]
     deferredBundles: string[]
     canvasReadyState?: 'loading' | 'complete'
+    block_editor?: EditorJS
   }
 
   /**

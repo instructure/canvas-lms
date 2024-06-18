@@ -52,7 +52,7 @@ import deparam from 'deparam'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 import '@canvas/jquery/jquery.ajaxJSON'
-import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
+import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */
 import 'jqueryui/dialog'
@@ -136,7 +136,7 @@ const renderDueDates = lockedItems => {
       courseId: ENV.COURSE_ID,
     })
 
-    if (ENV.FEATURES?.differentiated_modules) {
+    if (ENV.FEATURES?.selective_release_ui_api) {
       overrideView.bind('tray:open', () => {
         $('#quiz_edit_wrapper .btn.save_quiz_button').prop('disabled', true)
         $('#quiz_edit_wrapper .btn.save_and_publish').prop('disabled', true)
@@ -2268,7 +2268,7 @@ ready(function () {
       data.allowed_attempts = attempts
       data['quiz[allowed_attempts]'] = attempts
       let overrides = overrideView.getOverrides()
-      data['quiz[only_visible_to_overrides]'] = !overrideView.overridesContainDefault()
+      data['quiz[only_visible_to_overrides]'] = overrideView.setOnlyVisibleToOverrides()
       if (overrideView.containsSectionsWithoutOverrides() && !hasCheckedOverrides) {
         const sections = overrideView.sectionsWithoutOverrides()
         var missingDateView = new MissingDateDialog({

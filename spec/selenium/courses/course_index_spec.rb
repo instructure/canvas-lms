@@ -177,4 +177,200 @@ describe "course index" do
       expect(fj('h2:contains("Create Course")')).to be_displayed
     end
   end
+
+  context "sorting" do
+    it "by favorite column lists favorited courses first when ascending and last when descending" do
+      favorite_course = @current_courses[0]
+      @user.favorites.create!(context: favorite_course)
+      get "/courses"
+      # ascending
+      favorites_column_header(current_enrollments_selector).click
+      wait_for_ajaximations
+
+      sorted_courses = table_rows(current_enrollments_selector)
+      # remove header row
+      sorted_courses.shift
+      expect(sorted_courses.first).to eq row_with_text(favorite_course.name)
+
+      # descending
+      favorites_column_header(current_enrollments_selector).click
+      wait_for_ajaximations
+
+      sorted_courses = table_rows(current_enrollments_selector)
+      # remove header row
+      sorted_courses.shift
+      expect(sorted_courses.last).to eq row_with_text(favorite_course.name)
+    end
+
+    it "by course column lists alphabetically when ascending and reverse when descending" do
+      course_name = "Classic Course (Current)"
+
+      # Selenium is having trouble clicking the nickname column header, even though it
+      # works fine in the UI. To test sorting, we just load the page with the
+      # url params to test nickname column sorting.
+      # Otherwise we would test it the same way as the other headers:
+      #   get "/courses"
+      #   title_column_header(current_enrollments_selector).click
+      #   wait_for_ajaximations
+      get "/courses?cc_sort=course"
+
+      sorted_courses = table_rows(current_enrollments_selector)
+      # remove header row
+      sorted_courses.shift
+      expect(sorted_courses.first).to eq row_with_text(course_name)
+
+      # descending
+      get "/courses?cc_order=desc&cc_sort=course"
+
+      sorted_courses = table_rows(current_enrollments_selector)
+      # remove header row
+      sorted_courses.shift
+      expect(sorted_courses.last).to eq row_with_text(course_name)
+    end
+
+    it "by nickname column lists alphabetically when ascending and reverse when descending" do
+      course_nickname = "Classic Course Nickname (Current)"
+      course = @current_courses[0]
+      @user.set_preference(:course_nicknames, course.id, course_nickname)
+
+      # Selenium is having trouble clicking the term column header, even though it
+      # works fine in the UI. To test sorting, we just load the page with the
+      # url params to test term column sorting.
+      # Otherwise we would test it the same way as the other headers:
+      #   get "/courses"
+      #   nickname_column_header(current_enrollments_selector).click
+      #   wait_for_ajaximations
+      get "/courses?cc_sort=nickname"
+
+      sorted_courses = table_rows(current_enrollments_selector)
+      # remove header row
+      sorted_courses.shift
+      expect(sorted_courses.first).to eq row_with_text(course_nickname)
+
+      # descending
+      get "/courses?cc_order=desc&cc_sort=nickname"
+
+      sorted_courses = table_rows(current_enrollments_selector)
+      # remove header row
+      sorted_courses.shift
+      expect(sorted_courses.last).to eq row_with_text(course_nickname)
+    end
+
+    it "by term column lists alphabetically when ascending and reverse when descending" do
+      course = @current_courses[0]
+      term = course.root_account.enrollment_terms.create!(name: "Term 1")
+      course.enrollment_term = term
+      course.save!
+
+      # Selenium is having trouble clicking the term column header, even though it
+      # works fine in the UI. To test sorting, we just load the page with the
+      # url params to test term column sorting.
+      # Otherwise we would test it the same way as the other headers:
+      #   get "/courses"
+      #   term_column_header(current_enrollments_selector).click
+      #   wait_for_ajaximations
+      get "/courses?cc_sort=term"
+
+      sorted_courses = table_rows(current_enrollments_selector)
+      # remove header row
+      sorted_courses.shift
+      expect(sorted_courses.first).to eq row_with_text(course.name)
+
+      # descending
+      get "/courses?cc_order=desc&cc_sort=term"
+
+      sorted_courses = table_rows(current_enrollments_selector)
+      # remove header row
+      sorted_courses.shift
+      expect(sorted_courses.last).to eq row_with_text(course.name)
+    end
+
+    it "by enrolled as column lists alphabetically when ascending and reverse when descending" do
+      @current_courses << course_with_ta(course_name: "Classic Course 2 (Current)", account: @classic_account, user: @user, active_all: true).course
+      get "/courses"
+      # ascending
+      enrolled_as_column_header(current_enrollments_selector).click
+      wait_for_ajaximations
+
+      sorted_courses = table_rows(current_enrollments_selector)
+      # remove header row
+      sorted_courses.shift
+      expect(sorted_courses.first.text.include?("Student")).to be true
+      expect(sorted_courses.last.text.include?("TA")).to be true
+
+      # descending
+      enrolled_as_column_header(current_enrollments_selector).click
+      wait_for_ajaximations
+
+      sorted_courses = table_rows(current_enrollments_selector)
+      # remove header row
+      sorted_courses.shift
+      expect(sorted_courses.first.text.include?("TA")).to be true
+      expect(sorted_courses.last.text.include?("Student")).to be true
+    end
+
+    it "by published column lists published first when ascending and non-published first when descending" do
+      @current_courses << course_with_student(course_name: "Classic Course 2 (Current)", account: @classic_account, user: @user, active_all: true).course
+      unpublished_course = @current_courses[2]
+      unpublished_course.workflow_state = "created"
+      unpublished_course.save!
+
+      get "/courses"
+      # sorted by published (ascending) by default
+      sorted_courses = table_rows(current_enrollments_selector)
+      # remove header row
+      sorted_courses.shift
+      expect(sorted_courses.last).to eq row_with_text(unpublished_course.name)
+
+      # descending
+      published_column_header(current_enrollments_selector).click
+      wait_for_ajaximations
+
+      sorted_courses = table_rows(current_enrollments_selector)
+      # remove header row
+      sorted_courses.shift
+      expect(sorted_courses.first).to eq row_with_text(unpublished_course.name)
+    end
+
+    it "is independent across tables" do
+      @current_courses << course_with_student(course_name: "Classic Course 2 (Current)", account: @classic_account, user: @user, active_all: true).course
+      unpublished_course = @current_courses[2]
+      unpublished_course.workflow_state = "created"
+      unpublished_course.save!
+
+      @past_courses << course_with_ta(course_name: "Classic Course 3 (Current)", account: @classic_account, user: @user, active_all: true).course
+      course_as_ta = @past_courses[2]
+      course_as_ta.complete!
+
+      favorite_course = @future_courses[0]
+      @user.favorites.create!(context: favorite_course)
+
+      get "/courses"
+
+      # sort the current courses by published (desc) column
+      published_column_header(current_enrollments_selector).click
+      wait_for_ajaximations
+
+      # sort the past courses by enrolled as column
+      enrolled_as_column_header(past_enrollments_selector).click
+      wait_for_ajaximations
+
+      # sort the future courses by favorites column
+      favorites_column_header(future_enrollments_selector).click
+      wait_for_ajaximations
+
+      sorted_current_courses = table_rows(current_enrollments_selector)
+      sorted_past_courses = table_rows(past_enrollments_selector)
+      sorted_future_courses = table_rows(future_enrollments_selector)
+
+      # remove header rows
+      sorted_current_courses.shift
+      sorted_past_courses.shift
+      sorted_future_courses.shift
+
+      expect(sorted_current_courses.first).to eq row_with_text(unpublished_course.name)
+      expect(sorted_past_courses.last).to eq row_with_text(course_as_ta.name)
+      expect(sorted_future_courses.first).to eq row_with_text(favorite_course.name)
+    end
+  end
 end

@@ -45,7 +45,7 @@ export const Component = () => {
       </Portal>
       <Portal open={true} mountNode={mountPoint}>
         <ApolloProvider client={createClient()}>
-          <ViewRubrics />
+          <ViewRubrics canManageRubrics={ENV.PERMISSIONS?.manage_rubrics} />
         </ApolloProvider>
       </Portal>
     </>

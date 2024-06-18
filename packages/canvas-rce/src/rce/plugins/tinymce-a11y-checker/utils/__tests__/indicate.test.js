@@ -88,4 +88,8 @@ describe('clearIndicators', () => {
     clearIndicators(document)
     expect(document.getElementById(A11Y_CHECKER_STYLE_ELEM_ID).textContent).toEqual('')
   })
+
+  it('does not throw when doc null', () => {
+    expect(() => clearIndicators(null)).not.toThrow()
+  })
 })

@@ -42,7 +42,7 @@ module Quizzes
     end
 
     def initialize(object, options)
-      super(object, options)
+      super
 
       @quiz = options.fetch(:quiz)
       # QuizSubmissions should be preloaded by the controller and provided to

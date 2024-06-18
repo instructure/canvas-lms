@@ -162,6 +162,10 @@ module SmartSearch
       end
     end
 
+    def up_to_date?(course)
+      smart_search_available?(course) && course.search_embedding_version == SmartSearch::EMBEDDING_VERSION
+    end
+
     # returns [ready, progress]
     # progress may be < 100 while ready if upgrading embeddings
     def check_course(course)
@@ -220,6 +224,46 @@ module SmartSearch
       end
 
       (indexed * 100.0 / total).to_i
+    end
+
+    def copy_embeddings(content_migration)
+      return unless content_migration.for_course_copy? &&
+                    content_migration.source_course&.search_embedding_version == EMBEDDING_VERSION &&
+                    SmartSearch.smart_search_available?(content_migration.context)
+
+      content_migration.imported_asset_id_map&.each do |class_name, id_mapping|
+        klass = class_name.constantize
+        next unless klass.respond_to?(:embedding_class)
+
+        fk = klass.embedding_foreign_key # i.e. :wiki_page_id
+
+        content_migration.context.shard.activate do
+          klass.embedding_class
+               .where(:version => EMBEDDING_VERSION, fk => id_mapping.values)
+               .in_batches
+               .delete_all
+        end
+
+        content_migration.source_course.shard.activate do
+          klass.embedding_class.where(:version => EMBEDDING_VERSION, fk => id_mapping.keys)
+               .find_in_batches(batch_size: 50) do |src_embeddings|
+            dest_embeddings = src_embeddings.map do |src_embedding|
+              {
+                :embedding => src_embedding.embedding,
+                fk => id_mapping[src_embedding[fk]],
+                :version => EMBEDDING_VERSION,
+                :root_account_id => content_migration.context.root_account_id,
+                :created_at => Time.now.utc,
+                :updated_at => Time.now.utc
+              }
+            end
+
+            content_migration.context.shard.activate do
+              klass.embedding_class.insert_all(dest_embeddings)
+            end
+          end
+        end
+      end
     end
   end
 end

@@ -37,6 +37,14 @@ export default class DueDateList {
     return this.overrides.containsDefaultDueDate()
   }
 
+  onlyContainsModuleOverrides = () => {
+    return this.overrides.onlyContainsModuleOverrides()
+  }
+
+  contextModuleIDs = () => {
+    return this.overrides.contextModuleIDs()
+  }
+
   containsSectionsWithoutOverrides = () => {
     if (this.overrides.containsDefaultDueDate()) return false
     return this.sectionsWithOverrides().length < this.courseSectionsLength
@@ -77,7 +85,6 @@ export default class DueDateList {
   }
 
   _addOverrideForDefaultSectionIfNeeded = () => {
-    const idk = this._overrideCourseIds()
     if (
       this._onlyVisibleToOverrides() ||
       this._overrideCourseIds().some(elem => elem !== undefined)

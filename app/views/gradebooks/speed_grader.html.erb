@@ -166,7 +166,7 @@
           </div>
           <div id="submission_details" class="content_box">
             <div style="display: flex;">
-              <div id="multiple_submissions" style="display:flex; flex: 1"></div>
+              <div id="multiple_submissions" style="display:flex; flex: 1; gap: 3px;"></div>
               <div id="speed_grader_edit_status_mount_point"></div>
             </div>
             <div id="submission_not_newest_notice" title='<%= t('titles.not_newest', "use the dropdown above to change which submission to look at") %>'><%= t(:not_newest_notice, "Note: This is not the most recent submission") %></div>
@@ -457,7 +457,7 @@
           <% if force_anonymous_grading?(@assignment) %>disabled<% end %>
         />
         <label for="hide_student_names">
-          <%= t('labels.hide_names', "Hide student names in the SpeedGrader") %>
+          <%= t('labels.hide_names', "Hide student names in SpeedGrader") %>
         </label>
         <% if force_anonymous_grading?(@assignment) %>
           <i class="icon-info" aria-hidden="true"

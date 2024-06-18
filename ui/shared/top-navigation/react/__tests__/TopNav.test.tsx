@@ -17,6 +17,7 @@ import {render} from '@testing-library/react'
 import TopNav from '../TopNav'
 import React from 'react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {TopNavBar} from '@instructure/ui-top-nav-bar'
 
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 const queryClient = new QueryClient()
@@ -54,5 +55,24 @@ describe('TopNav', () => {
     )
 
     expect(getByText('crumb')).toBeInTheDocument()
+  })
+  it('shows action buttons when sent through prop', () => {
+    const {getByText} = render(
+      <QueryClientProvider client={queryClient}>
+        <TopNav
+          actionItems={[
+            <TopNavBar.Item id="button1" key="button1">
+              button1
+            </TopNavBar.Item>,
+            <TopNavBar.Item id="button2" key="button2">
+              button2
+            </TopNavBar.Item>,
+          ]}
+        />
+      </QueryClientProvider>
+    )
+
+    expect(getByText('button1')).toBeInTheDocument()
+    expect(getByText('button2')).toBeInTheDocument()
   })
 })

@@ -284,8 +284,21 @@ export function updateProgressionState($module) {
   })
   $module = $('#context_module_' + data.context_module_id)
   let progression_state = data.workflow_state
-  const progression_state_capitalized =
-    progression_state && progression_state.charAt(0).toUpperCase() + progression_state.substring(1)
+
+  // I18n.t() requires a string literal, so we can't just pass a computed value
+  const progression_state_capitalized = (() => {
+    switch (progression_state) {
+      case 'completed':
+        return I18n.t('Completed')
+      case 'started':
+        return I18n.t('Started')
+      default:
+        return (
+          progression_state &&
+          progression_state.charAt(0).toUpperCase() + progression_state.substring(1)
+        )
+    }
+  })()
 
   $module.addClass(progression_state)
 

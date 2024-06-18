@@ -17,7 +17,7 @@
  */
 
 import {isUndefined, each} from 'lodash'
-import * as tz from './index'
+import * as tz from '@instructure/moment-utils'
 import {datetimeString, dateString, discussionsDatetimeString} from './date-functions'
 
 const DateHelper = {
@@ -39,10 +39,6 @@ const DateHelper = {
 
   formatDateForDisplay(date, format = 'medium', timezone = ENV.CONTEXT_TIMEZONE) {
     return dateString(date, {format, timezone})
-  },
-
-  isMidnight(date) {
-    return tz.isMidnight(date)
   },
 }
 

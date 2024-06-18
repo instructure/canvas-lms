@@ -80,6 +80,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
       DUPLICATE: !!this.WIKI_RIGHTS.create_page && this.contextName === 'courses',
       UPDATE: !!this.WIKI_RIGHTS.update,
       DELETE: !!this.WIKI_RIGHTS.delete_page,
+      MANAGE_ASSIGN_TO: !!this.WIKI_RIGHTS.manage_assign_to,
     }
 
     json.DIRECT_SHARE_ENABLED = ENV.DIRECT_SHARE_ENABLED
@@ -91,8 +92,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
       json.cannot_edit_by_master_course = json.master_course_restrictions.content
     }
 
-    json.differentiated_modules =
-      !!ENV.FEATURES?.differentiated_modules && this.contextName === 'courses'
+    json.show_assign_to = !!ENV.FEATURES?.selective_release_ui_api && this.contextName === 'courses'
     json.wiki_page_menu_tools = ENV.wiki_page_menu_tools || []
     json.wiki_page_menu_tools.forEach(tool => {
       return (tool.url = tool.base_url + `&pages[]=${this.model.get('page_id')}`)

@@ -26,7 +26,7 @@ module Qti
     DEFAULT_ANSWER_TEXT = "No answer text provided."
 
     def initialize(opts)
-      super(opts)
+      super
       @is_really_stupid_likert = opts[:interaction_type] == "stupid_likert_scale_question"
       @use_set_var_set_as_correct = @flavor == Qti::Flavors::RESPONDUS
     end

@@ -25,7 +25,7 @@ module DynamoDBDateSupport
     if obj.respond_to?(:iso8601)
       { s: obj.iso8601 }
     else
-      super(obj)
+      super
     end
   end
 end

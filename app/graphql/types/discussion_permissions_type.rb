@@ -110,6 +110,11 @@ module Types
       ).load(:manage_course_content_delete)
     end
 
+    field :manage_assign_to, Boolean, null: true
+    def manage_assign_to
+      object[:loader].load(:manage_assign_to)
+    end
+
     field :rate, Boolean, null: true
     def rate
       object[:loader].load(:rate)

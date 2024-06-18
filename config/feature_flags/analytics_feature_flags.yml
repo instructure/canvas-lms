@@ -56,14 +56,6 @@ course_analytics_dap_model:
   shadow: true
 
 # Intelligent Insights - Provided through K20 LTI App
-k20_course_readiness_alpha_testing:
-  state: hidden
-  applies_to: Account
-  display_name: K20 - Course Readiness Alpha Testing
-  description:
-    k20_course_readiness_alpha_testing_description: This flag is for institutions participating in Intelligent Insights Alpha testing. This flag enables the Course Readiness dashboard for these institutions.
-  root_opt_in: true
-  beta: true
 k20_course_readiness:
   state: hidden
   applies_to: Account
@@ -91,15 +83,6 @@ k20_lti_usage:
   root_opt_in: true
   beta: true
   shadow: true
-k20_beta:
-  state: hidden
-  applies_to: Account
-  display_name: Advanced Analytics - Course Readiness and Students in Need of Attention
-  description:
-    k20_beta_description: Enables the Course Readiness and Students in Need of Attention dashboards for closed beta customers. Will be deprecated in favor of Intelligent Insights Feature Flags.
-  root_opt_in: true
-  beta: true
-
 
 # Intelligent Insights - Provided through Ask Your Data LTI App
 advanced_analytics_ask_questions:
@@ -115,9 +98,12 @@ advanced_analytics_ask_questions:
 # Analytics Hub
 analytics_hub:
   state: hidden
-  applies_to: SiteAdmin
+  applies_to: Account
   display_name: "Analytics Hub"
   description: This feature provides a new Analytics Hub platform experience.
+  root_opt_in: true
+  beta: true
+  shadow: true
   environments:
     ci:
       state: allowed_on

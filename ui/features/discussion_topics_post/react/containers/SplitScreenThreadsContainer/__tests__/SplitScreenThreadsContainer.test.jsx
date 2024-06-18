@@ -210,7 +210,7 @@ describe('SplitScreenThreadsContainer', () => {
       expect(onDelete).toHaveBeenCalled()
     })
 
-    it('only shows the speed grader option if you have permission', async () => {
+    it('only shows the SpeedGrader option if you have permission', async () => {
       const props = defaultProps({overrides: {onOpenInSpeedGrader: jest.fn()}})
       props.discussionTopic.permissions.speedGrader = false
       const {queryByTestId, findAllByTestId} = setup(props)
@@ -243,6 +243,10 @@ describe('SplitScreenThreadsContainer', () => {
   })
 
   describe('Report Reply', () => {
+    beforeAll(() => {
+      window.ENV.discussions_reporting = true
+    })
+
     it('show Report', () => {
       const {getByTestId, queryByText} = setup(defaultProps())
 
@@ -349,7 +353,7 @@ describe('SplitScreenThreadsContainer', () => {
         rootEntryId: '50',
         quotedEntry: {
           ...DiscussionEntry.mock({_id: '100'}),
-          previewMessage: '<p>This is the quoted reply</p>',
+          message: '<p>This is the quoted reply</p>',
         },
       },
       overrides: {onOpenSplitScreenView},

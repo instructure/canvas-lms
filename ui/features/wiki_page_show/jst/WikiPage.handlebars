@@ -46,8 +46,8 @@
           </div>
           {{/unless}}
           <div class="buttons">
-            {{#if differentiated_modules}}
-              {{#if CAN.UPDATE}}
+            {{#if show_assign_to}}
+              {{#if CAN.MANAGE_ASSIGN_TO}}
                 <button class="btn assign-to-button"><i class="icon-permissions"></i><span class="hide-when-small"> {{#t 'buttons.assign_to'}}Assign To{{/t}}</span></button>
               {{/if}}
             {{/if}}

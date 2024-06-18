@@ -235,7 +235,7 @@ describe('DiscussionTopicContainer', () => {
   it('Should be able to open SpeedGrader', async () => {
     const {getByTestId, getByText} = setup({discussionTopic: Discussion.mock()})
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-    fireEvent.click(getByText('Open in Speedgrader'))
+    fireEvent.click(getByText('Open in SpeedGrader'))
 
     await waitFor(() => {
       expect(openMock).toHaveBeenCalledWith(getSpeedGraderUrl(), '_blank')

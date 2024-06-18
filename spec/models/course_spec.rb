@@ -6840,9 +6840,9 @@ describe Course do
       expect(@course.modules_visible_to(@teacher).pluck(:name)).to contain_exactly("published 1", "published 2", "unpublished")
     end
 
-    context "when the differentiated_modules flag is enabled" do
+    context "when the selective_release_backend flag is enabled" do
       before :once do
-        Account.site_admin.enable_feature! :differentiated_modules
+        Account.site_admin.enable_feature! :selective_release_backend
         @m2.assignment_overrides.create!
       end
 

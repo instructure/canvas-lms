@@ -25,6 +25,7 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
     state :off
     state :on
     state :allow
+    state :deleted
   end
 
   belongs_to :account, inverse_of: :lti_registration_account_bindings, optional: false
@@ -35,4 +36,52 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
   belongs_to :developer_key_account_binding, inverse_of: :lti_registration_account_binding
 
   resolves_root_account through: :account
+
+  # -- BEGIN SoftDeleteable --
+  # adapting SoftDeleteable, but with no "active" state
+  scope :active, -> { where.not(workflow_state: :deleted) }
+
+  alias_method :destroy_permanently!, :destroy
+  def destroy
+    return true if deleted?
+
+    self.workflow_state = :deleted
+    run_callbacks(:destroy) { save! }
+  end
+
+  def undestroy(active_state: "off")
+    self.workflow_state = active_state
+    save!
+    true
+  end
+  # -- END SoftDeleteable --
+
+  # The skip_lime_sync attribute should be set when this this model is being updated
+  # by the developer_key_account_binding's after_save method. If it is set, this model
+  # should skip its own update_developer_key_account_binding method. This is to prevent
+  # a loop between the two models' after_saves.
+  attr_accessor :skip_lime_sync
+
+  after_save :update_developer_key_account_binding
+
+  private
+
+  def update_developer_key_account_binding
+    if skip_lime_sync
+      self.skip_lime_sync = false
+      return
+    end
+
+    if developer_key_account_binding
+      developer_key_account_binding.update!(workflow_state:, skip_lime_sync: true)
+    elsif registration.developer_key
+      DeveloperKeyAccountBinding.create!(
+        account:,
+        workflow_state:,
+        developer_key: registration.developer_key,
+        lti_registration_account_binding: self,
+        skip_lime_sync: true
+      )
+    end
+  end
 end

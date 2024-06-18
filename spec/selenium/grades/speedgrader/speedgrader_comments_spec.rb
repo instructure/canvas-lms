@@ -22,8 +22,8 @@ require_relative "../../helpers/assignments_common"
 require_relative "../pages/speedgrader_page"
 
 # EVAL-2664 - These tests have become flaky with a ChunkLoadError: Loading chunk xxxxx failed
-# error. We have javascript tests for speed grader comments for now until the ChunkLoadError issue is resolved
-describe "speed grader" do
+# error. We have javascript tests for SpeedGrader comments for now until the ChunkLoadError issue is resolved
+describe "SpeedGrader" do
   include_context "in-process server selenium tests"
   include AssignmentsCommon
 

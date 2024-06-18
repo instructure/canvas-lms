@@ -77,7 +77,7 @@ GEM
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
     mini_portile2 (2.8.6)
-    minitest (5.23.0)
+    minitest (5.23.1)
     mutex_m (0.2.0)
     nokogiri (1.16.5)
       mini_portile2 (~> 2.8.2)
@@ -121,7 +121,7 @@ GEM
       psych (>= 4.0.0)
     redis (5.2.0)
       redis-client (>= 0.22.0)
-    redis-client (0.22.1)
+    redis-client (0.22.2)
       connection_pool
     redis-cluster-client (0.10.0)
       redis-client (~> 0.22)
@@ -173,4 +173,4 @@ RUBY VERSION
    ruby 3.1.2p20
 
 BUNDLED WITH
-   2.5.9
+   2.5.10

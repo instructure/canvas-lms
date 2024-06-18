@@ -57,6 +57,10 @@ class JwtsController < ApplicationController
   # @argument context_uuid [Optional, String]
   #   The uuid of the context in case a specified workflow uses it to consuming the service.
   #
+  # @argument canvas_audience [Optional, Boolean]
+  #   Defaults to true. If false, the JWT will be signed, but not encrypted, for use in downstream services. The
+  #   default encrypted behaviour can be used to talk to canvas itself.
+  #
   # @example_request
   #   curl 'https://<canvas>/api/v1/jwts' \
   #         -X POST \
@@ -66,6 +70,7 @@ class JwtsController < ApplicationController
   # @returns JWT
   def create
     workflows = params[:workflows]
+
     if workflows_require_context?(workflows)
       init_context
       return render json: { error: @error }, status: :bad_request if @error
@@ -81,7 +86,8 @@ class JwtsController < ApplicationController
       real_user: @real_current_user,
       workflows:,
       context: @context,
-      symmetric:
+      symmetric:,
+      encrypt: encrypt?
     )
     render json: { token: services_jwt }
   end
@@ -189,5 +195,9 @@ class JwtsController < ApplicationController
       json: { errors: { jwt: "invalid refresh" } },
       status: :bad_request
     )
+  end
+
+  def encrypt?
+    params[:canvas_audience].nil? ? true : value_to_boolean(params[:canvas_audience])
   end
 end

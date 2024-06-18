@@ -30,7 +30,7 @@ import AssignmentOverrideCollection from '../collections/AssignmentOverrideColle
 import DateGroupCollection from '@canvas/date-group/backbone/collections/DateGroupCollection'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/moment-utils'
 import numberHelper from '@canvas/i18n/numberHelper'
 import PandaPubPoller from '@canvas/panda-pub-poller'
 import {matchingToolUrls} from './LtiAssignmentHelpers'
@@ -123,6 +123,7 @@ function Assignment() {
   this.groupCategoryId = this.groupCategoryId.bind(this)
   this.hasDueDate = this.hasDueDate.bind(this)
   this.hasPointsPossible = this.hasPointsPossible.bind(this)
+  this.hasSubAssignments = this.hasSubAssignments.bind(this)
   this.hasSubmittedSubmissions = this.hasSubmittedSubmissions.bind(this)
   this.hideInGradebook = this.hideInGradebook.bind(this)
   this.hideZeroPointQuizzesOptionEnabled = this.hideZeroPointQuizzesOptionEnabled.bind(this)
@@ -1071,6 +1072,10 @@ Assignment.prototype.hasPointsPossible = function () {
   return !this.isQuiz() && !this.isPage()
 }
 
+Assignment.prototype.hasSubAssignments = function () {
+  return this.get('has_sub_assignments')
+}
+
 Assignment.prototype.nonBaseDates = function () {
   const dateGroups = this.get('all_dates')
   if (!dateGroups) {
@@ -1234,6 +1239,7 @@ Assignment.prototype.toView = function () {
     'groupCategoryId',
     'hasDueDate',
     'hasPointsPossible',
+    'hasSubAssignments',
     'hideInGradebook',
     'hideZeroPointQuizzesOptionEnabled',
     'htmlBuildUrl',
@@ -1604,7 +1610,7 @@ Assignment.prototype.pollUntilFinished = function (interval, isFinished) {
 
 Assignment.prototype.isOnlyVisibleToOverrides = function (override_flag) {
   if (!(arguments.length > 0)) {
-    if (ENV.FEATURES?.differentiated_modules && this.get('visible_to_everyone') != null) {
+    if (ENV.FEATURES?.selective_release_ui_api && this.get('visible_to_everyone') != null) {
       return !this.get('visible_to_everyone')
     }
     return this.get('only_visible_to_overrides') || false

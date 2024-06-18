@@ -144,7 +144,7 @@ describe('RubricForm Tests', () => {
       .spyOn(ViewRubricQueries, 'duplicateRubric')
       .mockImplementation(() => Promise.resolve({id: '1', title: 'Rubric 1', pointsPossible: 10}))
     const {getByTestId} = renderComponent()
-    const duplicateButton = getByTestId('duplicate-rubric-button')
+    const duplicateButton = getByTestId('duplicate-rubric-modal-button')
     duplicateButton?.click()
     await new Promise(resolve => setTimeout(resolve, 0))
     expect(getSRAlert()).toEqual('Rubric duplicated successfully')

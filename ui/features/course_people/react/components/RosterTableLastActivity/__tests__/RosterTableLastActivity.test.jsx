@@ -22,8 +22,8 @@ import RosterTableLastActivity from '../RosterTableLastActivity'
 import tz from 'timezone'
 import chicago from 'timezone/America/Chicago'
 import detroit from 'timezone/America/Detroit'
-import tzInTest from '@canvas/datetime/specHelpers'
-import {getI18nFormats} from '../../../../../../boot/initializers/configureDateTime'
+import tzInTest from '@instructure/moment-utils/specHelpers'
+import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 
 const observerEnrollment = {
   id: '1',

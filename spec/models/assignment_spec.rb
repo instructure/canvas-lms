@@ -671,7 +671,7 @@ describe Assignment do
   describe "#visible_to_students_in_course_with_da" do
     let(:student_enrollment) { @course.enrollments.find_by(user: @student) }
     let(:visible_assignments) do
-      Assignment.visible_to_students_in_course_with_da(@student.id, @course.id)
+      Assignment.visible_to_students_in_course_with_da([@student.id], [@course.id])
     end
 
     it "excludes unpublished assignments" do
@@ -9245,7 +9245,7 @@ describe Assignment do
       )
     end
 
-    it "returns false when the course does not allow speed grader" do
+    it "returns false when the course does not allow SpeedGrader" do
       expect(@assignment.context).to receive(:allows_speed_grader?).and_return false
       expect(@assignment.can_view_speed_grader?(@teacher)).to be false
     end
@@ -9257,7 +9257,7 @@ describe Assignment do
       expect(@assignment.can_view_speed_grader?(@teacher)).to be false
     end
 
-    it "returns true when the course allows speed grader and user can manage grades" do
+    it "returns true when the course allows SpeedGrader and user can manage grades" do
       expect(@assignment.context).to receive(:allows_speed_grader?).and_return true
       expect(@assignment.can_view_speed_grader?(@teacher)).to be true
     end

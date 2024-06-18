@@ -46,7 +46,7 @@ class AnnouncementIndex
 
     # ---------------------- Controls ----------------------
     def filter_dropdown
-      f('select[name="filter-dropdown"]')
+      f('input[name="filter-dropdown"]')
     end
 
     def filter_item(item_name)
@@ -122,7 +122,7 @@ class AnnouncementIndex
     # ---------------------- Actions ----------------------
     def select_filter(filter_name)
       filter_dropdown.click
-      filter_item(filter_name).click
+      click_option(filter_dropdown, filter_name)
     end
 
     def enter_search(title)

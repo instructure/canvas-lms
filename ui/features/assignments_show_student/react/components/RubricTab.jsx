@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useState} from 'react'
-import {arrayOf, bool} from 'prop-types'
+import {arrayOf, bool, func} from 'prop-types'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -109,6 +109,7 @@ export default function RubricTab(props) {
         isPreviewMode={true}
         isFreeFormCriterionComments={props.rubric.free_form_criterion_comments}
         onUpdateAssessmentData={() => {}}
+        ratingOrder={props.rubric.ratingOrder}
         rubricTitle={props.rubric.title}
         rubricAssessmentData={rubricAssessmentData}
       />
@@ -215,6 +216,8 @@ RubricTab.propTypes = {
   rubric: Rubric.shape,
   rubricAssociation: RubricAssociation.shape,
   peerReviewModeEnabled: bool,
+  rubricExpanded: bool,
+  toggleRubricExpanded: func,
 }
 
 RubricTab.defaultProps = {

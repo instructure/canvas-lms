@@ -18,10 +18,12 @@
 
 import '@instructure/canvas-theme'
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render, screen} from '@testing-library/react'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import IndexHeader from '../IndexHeader'
 
-const hasText = text => node => node.text() === text
+const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
+
 const defaultPermissions = () => ({
   create: false,
   manage_course_content_edit: false,
@@ -44,26 +46,105 @@ const defaultProps = () => ({
   announcementsLocked: false,
 })
 
-test('renders', () => {
-  const tree = shallow(<IndexHeader {...defaultProps()} />)
-  expect(tree.exists()).toBe(true)
-})
+describe('IndexHeader', () => {
+  it('renders', () => {
+    expect(() => {
+      render(<IndexHeader {...defaultProps()} />)
+    }).not.toThrow()
+  })
 
-test('lets me add an announcement when I have the permission', () => {
-  const tree = shallow(
-    <IndexHeader {...defaultProps()} permissions={{...defaultPermissions(), create: true}} />
-  )
+  it('does not render title', () => {
+    render(<IndexHeader {...defaultProps()} />)
+    expect(screen.queryByText('All Announcements')).not.toBeInTheDocument()
+  })
 
-  expect(tree.findWhere(hasText('Add announcement'))).toHaveLength(2)
-})
+  it('does not render icon dropdown next to title', () => {
+    render(<IndexHeader {...defaultProps()} />)
+    expect(screen.queryByRole('button', {name: 'Announcement Filter'})).not.toBeInTheDocument()
+  })
 
-test('lets me delete an announcement when I have the permission', () => {
-  const tree = shallow(
-    <IndexHeader
-      {...defaultProps()}
-      permissions={{...defaultPermissions(), manage_course_content_delete: true}}
-    />
-  )
+  it('renders filter dropdown', () => {
+    render(<IndexHeader {...defaultProps()} />)
+    expect(screen.getByRole('combobox', {name: 'Announcement Filter'})).toBeInTheDocument()
+  })
 
-  expect(tree.findWhere(hasText('Delete Selected Announcements'))).toHaveLength(2)
+  it('renders search input', () => {
+    render(<IndexHeader {...defaultProps()} />)
+    expect(screen.getByRole('textbox', {name: 'Search announcements by title'})).toBeInTheDocument()
+  })
+
+  it('lets me add an announcement when I have the permission', () => {
+    render(
+      <IndexHeader {...defaultProps()} permissions={{...defaultPermissions(), create: true}} />
+    )
+    expect(screen.getByText('Add announcement')).toBeInTheDocument()
+  })
+
+  it('lets me lock an announcement when I have the permission and it is unlocked', () => {
+    render(
+      <IndexHeader
+        {...defaultProps()}
+        isToggleLocking={true}
+        permissions={{...defaultPermissions(), manage_course_content_edit: true}}
+      />
+    )
+    expect(screen.getByText('Lock Selected Announcements')).toBeInTheDocument()
+  })
+
+  it('lets me unlock an announcement when I have the permission and it is locked', () => {
+    render(
+      <IndexHeader
+        {...defaultProps()}
+        permissions={{...defaultPermissions(), manage_course_content_edit: true}}
+      />
+    )
+    expect(screen.getByText('Unlock Selected Announcements')).toBeInTheDocument()
+  })
+
+  it('lets me delete an announcement when I have the permission', () => {
+    render(
+      <IndexHeader
+        {...defaultProps()}
+        permissions={{...defaultPermissions(), manage_course_content_delete: true}}
+      />
+    )
+    expect(screen.getByText('Delete Selected Announcements')).toBeInTheDocument()
+  })
+
+  describe('instui_nav feature flag is enabled', () => {
+    const oldEnv = window.ENV
+
+    beforeAll(() => {
+      window.ENV = {FEATURES: {instui_nav: true}}
+    })
+
+    afterAll(() => {
+      window.ENV = oldEnv
+    })
+
+    it('renders title', () => {
+      render(<IndexHeader {...defaultProps()} />)
+      expect(screen.getByText('All Announcements')).toBeInTheDocument()
+    })
+
+    it('renders icon dropdown next to title', () => {
+      render(<IndexHeader {...defaultProps()} />)
+      expect(screen.getByRole('button', {name: 'Announcement Filter'})).toBeInTheDocument()
+    })
+
+    it('renders different title when another filter is selected from dropdown', async () => {
+      render(<IndexHeader {...defaultProps()} />)
+      expect(screen.queryByText('Unread Announcements')).not.toBeInTheDocument()
+
+      const filterButton = screen.getByRole('button', {name: 'Announcement Filter'})
+      await user.click(filterButton)
+
+      const filterMenu = screen.getAllByRole('menu')[1]
+      const allKeys = filterMenu.querySelectorAll('li')
+      expect(allKeys.length).toBe(2)
+
+      await user.click(allKeys[1])
+      expect(screen.getByText('Unread Announcements')).toBeInTheDocument()
+    })
+  })
 })

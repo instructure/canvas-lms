@@ -581,7 +581,7 @@ module AccountReports
       unless enrollment.temporary_enrollment_source_user_id.nil?
         temporary_enrollment_provider_pseudonym = loaded_pseudonym(pseudonyms, users_by_id[enrollment.temporary_enrollment_source_user_id], include_deleted: @include_deleted)
       end
-      row << temporary_enrollment_provider_pseudonym&.sis_user_id if @temp_enroll_feature_enabled
+      row << temporary_enrollment_provider_pseudonym&.sis_user_id if @temp_enroll_feature_enabled && @sis_format
       row << HostUrl.context_host(pseud.account) if include_other_roots
       row
     end
@@ -658,9 +658,8 @@ module AccountReports
         headers << "base_role_type"
         headers << "limit_section_privileges"
         headers << "canvas_enrollment_id"
+        headers << "canvas_temporary_enrollment_source_user_id" if @temp_enroll_feature_enabled
       end
-      headers << "canvas_temporary_enrollment_source_user_id" if @temp_enroll_feature_enabled
-      headers << "temporary_enrollment_source_user_id" if @temp_enroll_feature_enabled
       headers << "root_account" if include_other_roots
       headers
     end

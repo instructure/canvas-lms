@@ -32,6 +32,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {CommentLibrary} from './CommentLibrary'
 import {CriteriaReadonlyComment} from './CriteriaReadonlyComment'
 import {Button} from '@instructure/ui-buttons'
+import {escapeNewLineText, htmlEscapeCriteriaLongDescription} from './utils/rubricUtils'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 const {licorice} = colors
@@ -42,6 +43,7 @@ type TraditionalViewProps = {
   isPreviewMode: boolean
   isPeerReview?: boolean
   isFreeFormCriterionComments: boolean
+  ratingOrder?: string
   rubricAssessmentData: RubricAssessmentData[]
   rubricTitle: string
   rubricSavedComments?: Record<string, string[]>
@@ -53,6 +55,7 @@ export const TraditionalView = ({
   isPreviewMode,
   isPeerReview,
   isFreeFormCriterionComments,
+  ratingOrder = 'descending',
   rubricAssessmentData,
   rubricTitle,
   rubricSavedComments,
@@ -131,6 +134,7 @@ export const TraditionalView = ({
             key={`criterion-${criterion.id}-${index}`}
             criterion={criterion}
             criterionAssessment={criterionAssessment}
+            ratingOrder={ratingOrder}
             rubricSavedComments={rubricSavedComments?.[criterion.id] ?? []}
             isPreviewMode={isPreviewMode}
             isPeerReview={isPeerReview}
@@ -152,6 +156,7 @@ type CriterionRowProps = {
   isPeerReview?: boolean
   isFreeFormCriterionComments: boolean
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
+  ratingOrder: string
   rubricSavedComments: string[]
 }
 const CriterionRow = ({
@@ -162,13 +167,19 @@ const CriterionRow = ({
   isPeerReview,
   isFreeFormCriterionComments,
   onUpdateAssessmentData,
+  ratingOrder,
   rubricSavedComments,
 }: CriterionRowProps) => {
   const [hoveredRatingIndex, setHoveredRatingIndex] = useState<number>()
   const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
   const [isSaveCommentChecked, setIsSaveCommentChecked] = useState(false)
 
-  const selectedRatingIndex = criterion.ratings.findIndex(
+  const criterionRatings = [...criterion.ratings]
+  if (ratingOrder === 'ascending') {
+    criterionRatings.reverse()
+  }
+
+  const selectedRatingIndex = criterionRatings.findIndex(
     rating => rating.points === criterionAssessment?.points
   )
 
@@ -193,7 +204,7 @@ const CriterionRow = ({
       return
     }
 
-    const selectedRating = criterion.ratings.find(rating => rating.points === points)
+    const selectedRating = criterionRatings.find(rating => rating.points === points)
 
     updateAssessmentData({
       points,
@@ -215,7 +226,15 @@ const CriterionRow = ({
             height="13.75rem"
             overflowY="auto"
           >
-            <Text weight="bold">{criterion.description}</Text>
+            <View as="div">
+              <Text weight="bold">{criterion.description}</Text>
+            </View>
+            <View as="div" margin="small 0 0 0">
+              <Text
+                size="small"
+                dangerouslySetInnerHTML={htmlEscapeCriteriaLongDescription(criterion)}
+              />
+            </View>
           </View>
         </Flex.Item>
         {isFreeFormCriterionComments ? (
@@ -294,7 +313,7 @@ const CriterionRow = ({
             <View height="13.75rem">
               <Grid>
                 <Grid.Row colSpacing="none">
-                  {criterion.ratings.map((rating, index) => {
+                  {criterionRatings.map((rating, index) => {
                     const highlightedBorder = 'medium'
 
                     const isHovered = hoveredRatingIndex === index
@@ -345,8 +364,15 @@ const CriterionRow = ({
                             <Flex.Item>
                               <Text weight="bold">{rating.description}</Text>
                             </Flex.Item>
-                            <Flex.Item margin="small 0 0 0" shouldGrow={true}>
-                              <Text size="small">{rating.longDescription}</Text>
+                            <Flex.Item margin="small 0 0 0" shouldGrow={true} textAlign="start">
+                              <View as="div" maxHeight="9.531rem">
+                                <Text
+                                  size="small"
+                                  dangerouslySetInnerHTML={escapeNewLineText(
+                                    rating.longDescription
+                                  )}
+                                />
+                              </View>
                             </Flex.Item>
                             <Flex.Item>
                               <View

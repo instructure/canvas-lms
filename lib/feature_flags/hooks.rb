@@ -108,13 +108,6 @@ module FeatureFlags
       end
     end
 
-    def self.differentiated_modules_setting_hook(_user, _context, _old_state, new_state)
-      # this is a temporary hook to allow us to check the flag's state when booting
-      # canvas. The setting will be checked in app/models/quiz_student_visibility and
-      # app/models/assignment_student_visibility.rb
-      Setting.set("differentiated_modules_setting", (new_state == "on") ? "true" : "false")
-    end
-
     def self.archive_outcomes_after_change_hook(_user, context, _old_state, new_state)
       # Get all root accounts that isn't the site admin account
       root_accounts = Account.active.excluding(context).where(parent_account_id: nil)

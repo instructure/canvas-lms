@@ -200,6 +200,9 @@
     "cap_product_3a5265a6": {
         "message": "Kupak termék"
     },
+    "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+        "message": "Captions inherited from a parent course cannot be removed."
+    },
     "catalan_16f6b78f": {
         "message": "Katalán"
     },
@@ -655,6 +658,9 @@
     },
     "external_link_d3f9e62a": {
         "message": "külső hivatkozás"
+    },
+    "external_tool_frame_70b32473": {
+        "message": "External tool frame"
     },
     "external_tools_6e77821": {
         "message": "Külső eszközök"
@@ -2144,6 +2150,9 @@
     "wiki_home_9cd54d0": {
         "message": "Wiki kezdőlap"
     },
+    "word_count_c77fe3a6": {
+        "message": "Word Count"
+    },
     "wreath_product_200b38ef": {
         "message": "Koszorú termék"
     },
@@ -2155,6 +2164,9 @@
     },
     "yiddish_f96986df": {
         "message": "Jiddis"
+    },
+    "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+        "message": "You can replace by uploading a new caption file."
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "Nem mentett módosítások vannak az Ikonkészítő tálcán. Folytatja a változtatások mentése nélkül?"

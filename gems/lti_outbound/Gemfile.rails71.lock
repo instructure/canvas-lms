@@ -29,7 +29,7 @@ GEM
     hashie (5.0.0)
     i18n (1.14.5)
       concurrent-ruby (~> 1.0)
-    minitest (5.23.0)
+    minitest (5.23.1)
     mutex_m (0.2.0)
     oauth (1.1.0)
       oauth-tty (~> 1.0, >= 1.0.1)
@@ -82,4 +82,4 @@ RUBY VERSION
    ruby 3.1.2p20
 
 BUNDLED WITH
-   2.5.9
+   2.5.10

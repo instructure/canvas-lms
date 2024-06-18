@@ -132,7 +132,7 @@ describe "context modules" do
 
     context "when adding new module without differentiated modules" do
       before :once do
-        Account.site_admin.disable_feature! :differentiated_modules
+        Account.site_admin.disable_feature! :selective_release_ui_api
       end
 
       before do

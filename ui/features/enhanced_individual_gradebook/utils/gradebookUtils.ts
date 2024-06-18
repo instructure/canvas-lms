@@ -25,7 +25,7 @@ import type {
 } from '@canvas/grading/grading.d'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/moment-utils'
 import userSettings from '@canvas/user-settings'
 
 import {ApiCallStatus, GradebookSortOrder} from '../types'

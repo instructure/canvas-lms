@@ -106,7 +106,7 @@ class Submission::ShowPresenter
         return @submission.entered_grade
       end
 
-      grade = @assignment.score_to_grade(@submission.score, nil, true)
+      grade = @assignment.score_to_grade(@submission.score, nil, true) if @submission.score
       replace_dash_with_minus(grade)
     elsif @assignment.grading_type == "letter_grade"
       replace_dash_with_minus(@submission.entered_grade)

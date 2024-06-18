@@ -22,7 +22,7 @@ import {BrowserRouter} from 'react-router-dom'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {RUBRICS_QUERY_RESPONSE, RUBRIC_PREVIEW_QUERY_RESPONSE} from './fixtures'
 import {QueryProvider, queryClient} from '@canvas/query'
-import {ViewRubrics} from '../index'
+import {ViewRubrics, type ViewRubricsProps} from '../index'
 import * as ViewRubricQueries from '../../../queries/ViewRubricQueries'
 
 jest.mock('react-router', () => ({
@@ -39,11 +39,11 @@ jest.mock('../../../queries/ViewRubricQueries', () => ({
 }))
 
 describe('ViewRubrics Tests', () => {
-  const renderComponent = () => {
+  const renderComponent = (props?: Partial<ViewRubricsProps>) => {
     return render(
       <QueryProvider>
         <BrowserRouter>
-          <ViewRubrics />
+          <ViewRubrics canManageRubrics={true} {...props} />
         </BrowserRouter>
       </QueryProvider>
     )
@@ -57,6 +57,8 @@ describe('ViewRubrics Tests', () => {
     it('renders the ViewRubrics component with all rubric data split rubrics by workflow state', () => {
       queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
       const {getByTestId, getByText} = renderComponent()
+
+      expect(getByTestId('create-new-rubric-button')).toBeInTheDocument()
 
       // total rubrics length per workflow state + header row
       expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toEqual(3)
@@ -598,6 +600,16 @@ describe('ViewRubrics Tests', () => {
       getByText('Saved').click()
       expect(getByTestId('rubric-row-2')).toHaveTextContent('Rubric 2')
       expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toEqual(4)
+    })
+  })
+
+  describe('canManageRubrics permissions is false', () => {
+    it('should not render popover or create button', () => {
+      queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {queryByTestId} = renderComponent({canManageRubrics: false})
+
+      expect(queryByTestId('rubric-options-1-button')).toBeNull()
+      expect(queryByTestId('create-new-rubric-button')).not.toBeInTheDocument()
     })
   })
 })

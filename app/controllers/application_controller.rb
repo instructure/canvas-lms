@@ -363,7 +363,8 @@ class ApplicationController < ActionController::Base
     explicit_latex_typesetting
     media_links_use_attachment_id
     permanent_page_links
-    differentiated_modules
+    selective_release_backend
+    selective_release_ui_api
     enhanced_course_creation_account_fetching
     instui_for_import_page
     multiselect_gradebook_filters
@@ -371,6 +372,9 @@ class ApplicationController < ActionController::Base
     platform_service_speedgrader
     instui_header
     rce_find_replace
+    courses_popout_sisid
+    dashboard_graphql_integration
+    discussion_checkpoints
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
@@ -1217,7 +1221,8 @@ class ApplicationController < ActionController::Base
           @context_membership = @context_enrollment
           check_for_readonly_enrollment_state
         elsif params[:account_id] || (is_a?(AccountsController) && (params[:account_id] = params[:id]))
-          @context = api_find(Account.active, params[:account_id])
+          account_scope = (params.dig(:account, :event) && params[:account][:event] == "restore") ? Account : Account.active
+          @context = api_find(account_scope, params[:account_id])
           params[:context_id] = @context.id
           params[:context_type] = "Account"
           @context_enrollment = @context.account_users.active.where(user_id: @current_user.id).first if @context && @current_user
@@ -1748,7 +1753,7 @@ class ApplicationController < ActionController::Base
     elsif @page_view && !@page_view.new_record?
       @page_view.destroy
     end
-  rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
+  rescue => e
     Canvas::Errors.capture_exception(:page_view, e)
     logger.error "Pageview error!"
     raise e if Rails.env.development?
@@ -2954,7 +2959,8 @@ class ApplicationController < ActionController::Base
       [assignment.id,
        {
          update: assignment.user_can_update?(@current_user, session),
-         delete: assignment.grants_right?(@current_user, :delete)
+         delete: assignment.grants_right?(@current_user, :delete),
+         manage_assign_to: assignment.grants_right?(@current_user, :manage_assign_to)
        }]
     end
 
@@ -2965,6 +2971,7 @@ class ApplicationController < ActionController::Base
                    include: [
                      "assignments",
                      "discussion_topic",
+                     Account.site_admin.feature_enabled?(:discussion_checkpoints) && "checkpoints",
                      (permissions[:manage] || current_user_has_been_observer_in_this_course) && "all_dates",
                      permissions[:manage] && "module_ids",
                      peer_reviews_for_a2_enabled? && "assessment_requests"
@@ -3227,11 +3234,7 @@ class ApplicationController < ActionController::Base
   end
 
   def react_discussions_post_enabled_for_preferences_use?
-    if @context.instance_of?(UserProfile) && Account.default.feature_enabled?(:react_discussions_post)
-      return true
-    end
-
-    @context.respond_to?(:feature_enabled?) && @context.feature_enabled?(:react_discussions_post)
+    !!@domain_root_account&.feature_enabled?(:discussions_reporting)
   end
   helper_method :react_discussions_post_enabled_for_preferences_use?
 end

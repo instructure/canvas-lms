@@ -22,7 +22,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {AssignedTo} from './AssignedTo'
-import {GradedDiscussionDueDatesContext} from '../../util/constants'
+import {DiscussionDueDatesContext} from '../../util/constants'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -38,9 +38,7 @@ export const AssignmentDueDate = ({
   const [dueDateErrorMessage, setDueDateErrorMessage] = useState([])
   const [availableFromAndUntilErrorMessage, setAvailableFromAndUntilErrorMessage] = useState([])
 
-  const {gradedDiscussionRefMap, setGradedDiscussionRefMap} = useContext(
-    GradedDiscussionDueDatesContext
-  )
+  const {gradedDiscussionRefMap, setGradedDiscussionRefMap} = useContext(DiscussionDueDatesContext)
 
   const validateDueDate = (dueDate, availableFrom, availableUntil) => {
     const due = new Date(dueDate)

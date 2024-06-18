@@ -10,7 +10,7 @@ push() {
     return 0
   fi
 
-  OUTPUT=$( git push origin sync-translations-media:refs/for/master%submit,t=learning-materials,l=Verified+1 2>&1 )
+  OUTPUT=$( git push origin sync-translations-media:refs/for/master%submit,l=Verified+1 2>&1 )
   return $?
 }
 

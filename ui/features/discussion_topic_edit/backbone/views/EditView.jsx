@@ -46,7 +46,7 @@ import UsageRightsIndicator from '@canvas/files/react/components/UsageRightsIndi
 import setUsageRights from '@canvas/files/util/setUsageRights'
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import 'jqueryui/tabs'
-import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
+import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
 const I18n = useI18nScope('discussion_topics')
@@ -863,6 +863,11 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
       },
     ]
   }
+
+  if (Object.keys(errors).length === 0 && data.anonymous_state != null) {
+    data.set_assignment = false
+  }
+
   return errors
 }
 

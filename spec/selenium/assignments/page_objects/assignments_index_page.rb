@@ -24,6 +24,10 @@ module AssignmentsIndexPage
   def assignment_row_selector(assignment_id)
     "#assignment_#{assignment_id}"
   end
+
+  def assign_to_menu_link_selector(assignment_id)
+    "#assign_to_#{assignment_id}_link"
+  end
   #------------------------------ Elements ------------------------------
 
   def assignment_index_menu_tool_link(tool_text)
@@ -43,7 +47,7 @@ module AssignmentsIndexPage
   end
 
   def assign_to_menu_link(assignment_id)
-    f("#assign_to_#{assignment_id}_link")
+    f(assign_to_menu_link_selector(assignment_id))
   end
 
   def assignment_settings_menu(assignment_id)

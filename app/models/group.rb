@@ -809,7 +809,7 @@ class Group < ActiveRecord::Base
   end
 
   def as_json(options = nil)
-    json = super(options)
+    json = super
     if json && json["group"]
       # remove anything coming automatically from deprecated db column
       json["group"].delete("category")

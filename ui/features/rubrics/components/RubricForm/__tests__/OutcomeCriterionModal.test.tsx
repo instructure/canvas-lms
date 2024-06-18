@@ -17,11 +17,10 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import {OutcomeCriterionModal, type OutcomeCriterionModalProps} from '../OutcomeCriterionModal'
 
 describe('OutcomeCriterionModal', () => {
-  const onSaveMock = jest.fn()
   const onDismissMock = jest.fn()
 
   const criterion = {
@@ -50,7 +49,6 @@ describe('OutcomeCriterionModal', () => {
       <OutcomeCriterionModal
         criterion={criterion}
         isOpen={true}
-        onSave={onSaveMock}
         onDismiss={onDismissMock}
         {...props}
       />
@@ -60,7 +58,7 @@ describe('OutcomeCriterionModal', () => {
   it('renders with correct props', () => {
     const {getByText, getByTestId} = renderComponent()
 
-    expect(getByText('Edit Criterion from Outcome')).toBeInTheDocument()
+    expect(getByText('View Outcome')).toBeInTheDocument()
     expect(getByTestId('outcome-rubric-criterion-modal')).toBeInTheDocument()
   })
 
@@ -72,65 +70,33 @@ describe('OutcomeCriterionModal', () => {
     expect(getByTestId('outcome-description').textContent).toEqual(criterion.description)
   })
 
-  it('should reorder ratings when a rating is changed to be higher than the top rating', () => {
+  it('displays points and description for outcome criteria', () => {
     const {queryAllByTestId} = renderComponent()
 
-    const ratingPoints = queryAllByTestId(`rating-points`)[2] as HTMLInputElement
+    expect(queryAllByTestId('outcome-rating-points')[0].textContent).toEqual(
+      criterion.ratings[0].points.toString()
+    )
+    expect(queryAllByTestId('outcome-rating-points')[1].textContent).toEqual(
+      criterion.ratings[1].points.toString()
+    )
+    expect(queryAllByTestId('outcome-rating-points')[2].textContent).toEqual(
+      criterion.ratings[2].points.toString()
+    )
+    expect(queryAllByTestId('outcome-rating-points')[3].textContent).toEqual(
+      criterion.ratings[3].points.toString()
+    )
 
-    fireEvent.change(ratingPoints, {target: {value: '20'}})
-    fireEvent.blur(ratingPoints)
-
-    const outcomeDescriptions = queryAllByTestId('outcome-rating-description') as HTMLInputElement[]
-    expect(outcomeDescriptions[0].textContent).toEqual(criterion.ratings[0].description)
-    expect(outcomeDescriptions[1].textContent).toEqual(criterion.ratings[1].description)
-    expect(outcomeDescriptions[2].textContent).toEqual(criterion.ratings[2].description)
-    expect(outcomeDescriptions[3].textContent).toEqual(criterion.ratings[3].description)
-
-    const totalRatingPoints = queryAllByTestId('rating-points') as HTMLInputElement[]
-    expect(totalRatingPoints[0].value).toEqual('20')
-    expect(totalRatingPoints[1].value).toEqual('10')
-    expect(totalRatingPoints[2].value).toEqual('8')
-    expect(totalRatingPoints[3].value).toEqual('4')
-  })
-
-  it('should reorder ratings when a rating is changed to be lower than a previous rating', () => {
-    const {queryAllByTestId} = renderComponent()
-
-    const ratingPoints = queryAllByTestId(`rating-points`)[0] as HTMLInputElement
-
-    fireEvent.change(ratingPoints, {target: {value: '2'}})
-    fireEvent.blur(ratingPoints)
-
-    const outcomeDescriptions = queryAllByTestId('outcome-rating-description') as HTMLInputElement[]
-    expect(outcomeDescriptions[0].textContent).toEqual(criterion.ratings[0].description)
-    expect(outcomeDescriptions[1].textContent).toEqual(criterion.ratings[1].description)
-    expect(outcomeDescriptions[2].textContent).toEqual(criterion.ratings[2].description)
-    expect(outcomeDescriptions[3].textContent).toEqual(criterion.ratings[3].description)
-
-    const totalRatingPoints = queryAllByTestId('rating-points') as HTMLInputElement[]
-    expect(totalRatingPoints[0].value).toEqual('8')
-    expect(totalRatingPoints[1].value).toEqual('6')
-    expect(totalRatingPoints[2].value).toEqual('4')
-    expect(totalRatingPoints[3].value).toEqual('2')
-  })
-
-  it('calls onSave when save button is clicked', async () => {
-    const {getByTestId} = renderComponent()
-
-    const saveButton = getByTestId('outcome-rubric-criterion-save')
-    fireEvent.click(saveButton)
-
-    await waitFor(() => {
-      expect(onSaveMock).toHaveBeenCalledTimes(1)
-    })
-  })
-
-  it('calls onDismiss when cancel button is clicked', () => {
-    const {getByTestId} = renderComponent()
-
-    const cancelButton = getByTestId('outcome-rubric-criterion-cancel')
-    fireEvent.click(cancelButton)
-
-    expect(onDismissMock).toHaveBeenCalledTimes(1)
+    expect(queryAllByTestId('outcome-rating-description')[0].textContent).toEqual(
+      criterion.ratings[0].description
+    )
+    expect(queryAllByTestId('outcome-rating-description')[1].textContent).toEqual(
+      criterion.ratings[1].description
+    )
+    expect(queryAllByTestId('outcome-rating-description')[2].textContent).toEqual(
+      criterion.ratings[2].description
+    )
+    expect(queryAllByTestId('outcome-rating-description')[3].textContent).toEqual(
+      criterion.ratings[3].description
+    )
   })
 })

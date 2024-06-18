@@ -30,14 +30,10 @@
         <%= render :partial => 'submissions/submission_download' %>
         <a href="<%= context_url(@context, :context_assignment_submissions_url, @assignment.id, :zip => 1) %>"
           id="download_submission_button"
-          class="download_submissions_link icon-download">
-          <%= t 'links.download_submissions', "Download Submissions" %>
-        </a>
+          class="download_submissions_link icon-download"><%= t 'links.download_submissions', "Download Submissions" %></a>
 
         <% if @can_grade %>
-          <a href="#" class="upload_submissions_link icon-upload" style="<%= hidden unless @assignment.submissions_downloaded? %>">
-            <%= t 'links.reupload_submissions', "Re-Upload Submissions" %>
-          </a>
+          <a href="#" class="upload_submissions_link icon-upload" style="<%= hidden unless @assignment.submissions_downloaded? %>"><%= t 'links.reupload_submissions', "Re-Upload Submissions" %></a>
           <%= form_tag context_url(@context, :submissions_upload_context_gradebook_url, @assignment.id), {:id => "re_upload_submissions_form", :multipart => true, :style => "margin-top: 10px; display: none;"} do %>
             <div style="font-size: 0.8em;">
               <%= mt <<-EOT
@@ -63,18 +59,14 @@
 
   <% if @can_grade && @assignment.submission_reupload_progress.present? %>
     <li>
-      <a href="<%= context_url(@context, :show_submissions_upload_context_gradebook_url, @assignment) %>" class="icon-clock">
-        <%= t "View Uploads Status" %>
-      </a>
+      <a href="<%= context_url(@context, :show_submissions_upload_context_gradebook_url, @assignment) %>" class="icon-clock"><%= t "View Uploads Status" %></a>
     </li>
   <% end %>
 
   <% if @can_grade && @assignment.has_peer_reviews? %>
     <li>
       <a href="<%= context_url(@context, :context_assignment_peer_reviews_url, @assignment.id) %>"
-        class="assignment_peer_reviews_link icon-peer-review">
-        <%= t 'links.peer_reviews', "Peer Reviews" %>
-      </a>
+        class="assignment_peer_reviews_link icon-peer-review"><%= t 'links.peer_reviews', "Peer Reviews" %></a>
     </li>
   <% end %>
 </ul>

@@ -150,6 +150,9 @@
   padding: direction-sides($ic-sp 0 0 0);
   line-height: 1.25;
 }
+.profile-tip {
+  @include fontSize(14px);
+}
 .stats {
   text-align: direction(left);
   width: 100%;

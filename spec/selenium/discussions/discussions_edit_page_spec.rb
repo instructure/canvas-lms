@@ -523,6 +523,19 @@ describe "discussions" do
             expect_new_page_load { f(".form-actions button[type=submit]").click }
             expect(fj("span:contains('anonymous topic title')")).to be_present
           end
+
+          it "able to save anon, not graded, quick added from assignments", :ignore_js_errors do
+            get "/courses/#{course.id}/assignments"
+
+            f(".add_assignment").click
+            click_option(f('[name="submission_types"]'), "Discussion")
+            f(".create_assignment_dialog input[type=text]").send_keys("anon disc from assignment")
+            f(".more_options").click
+
+            f("input[type=radio][value=partial_anonymity]").click
+            f("input#use_for_grading").click
+            expect_new_page_load { f("button.save_and_publish").click }
+          end
         end
       end
     end
@@ -682,6 +695,27 @@ describe "discussions" do
           wait_for_ajaximations
           expect(driver.current_url).not_to include("edit")
           expect(driver.current_url).to include("?embed=true")
+        end
+
+        context "with selective_release_backend and selective_release_ui_api enabled" do
+          before :once do
+            Account.site_admin.enable_feature!(:selective_release_backend)
+            Account.site_admin.enable_feature!(:selective_release_ui_api)
+          end
+
+          it "does not show the assign to UI when the user does not have permission even if user can access edit page" do
+            # i.e., they have moderate_forum permission but not admin or unrestricted student enrollment
+            RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: student_role, enabled: true)
+            student_in_course(active_all: true)
+            user_session(@student)
+            get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
+            expect(element_exists?(Discussion.assign_to_button_selector)).to be_truthy
+
+            enrollment = @course.enrollments.find_by(user: @student)
+            enrollment.update!(limit_privileges_to_course_section: true)
+            get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
+            expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
+          end
         end
       end
 
@@ -1182,7 +1216,9 @@ describe "discussions" do
             wait_for_ajaximations
 
             assignment = Assignment.last
+            assignment.reload
             expect(assignment.assignment_overrides.active.count).to eq 0
+            expect(assignment.only_visible_to_overrides).to be_falsey
           end
 
           it "displays module overrides correctly" do
@@ -1274,11 +1310,12 @@ describe "discussions" do
             wait_for_ajaximations
 
             assignment = graded_discussion.assignment
-
+            assignment.reload
             # Expect the existing override to be the module override
             expect(assignment.assignment_overrides.active.count).to eq 1
             expect(assignment.all_assignment_overrides.active.count).to eq 2
             expect(assignment.assignment_overrides.first.set_type).to eq "Course"
+            expect(assignment.only_visible_to_overrides).to be_truthy
           end
 
           it "does not display module override if an unassigned override exists" do
@@ -1332,11 +1369,12 @@ describe "discussions" do
             wait_for_ajaximations
 
             assignment = graded_discussion.assignment
-
+            assignment.reload
             # Expect the existing override to be the module override
             expect(assignment.assignment_overrides.active.count).to eq 0
             expect(assignment.all_assignment_overrides.active.count).to eq 1
             expect(assignment.all_assignment_overrides.first.context_module_id).to eq module1.id
+            expect(assignment.only_visible_to_overrides).to be_falsey
           end
 
           it "displays highighted cards correctly" do
@@ -1421,6 +1459,17 @@ describe "discussions" do
             assignment = Assignment.last
 
             expect(assignment.important_dates).to be(true)
+          end
+
+          it "does not show the assign to UI when the user does not have permission even if user can access edit page" do
+            # i.e., they have moderate_forum permission but not manage_assignments_edit
+            discussion = create_graded_discussion(course)
+            get "/courses/#{course.id}/discussion_topics/#{discussion.id}/edit"
+            expect(element_exists?(Discussion.assign_to_button_selector)).to be_truthy
+
+            RoleOverride.create!(context: @course.account, permission: "manage_assignments_edit", role: teacher_role, enabled: false)
+            get "/courses/#{course.id}/discussion_topics/#{discussion.id}/edit"
+            expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
           end
         end
 

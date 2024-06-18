@@ -137,7 +137,7 @@ export default class StudentsSearcher extends React.Component {
         formatOutput={this.readGradeableSubmissionsCount}
       >
         <Button renderIcon={IconSpeedGraderLine} href={speedgraderLink} target="_blank">
-          {I18n.t('Speedgrader')}
+          {I18n.t('SpeedGrader')}
         </Button>
       </Badge>
     )

@@ -27,8 +27,8 @@ describe "WikiPageStudentVisibility" do
   end
 
   before :once do
-    Account.site_admin.enable_feature!(:differentiated_modules)
-    Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:differentiated_modules) ? "true" : "false")
+    Account.site_admin.enable_feature!(:selective_release_backend)
+    Setting.set("differentiated_modules_setting", Account.site_admin.feature_enabled?(:selective_release_backend) ? "true" : "false")
     AssignmentStudentVisibility.reset_table_name
 
     course_factory(active_all: true)
@@ -58,29 +58,6 @@ describe "WikiPageStudentVisibility" do
       @page1.workflow_state = "unpublished"
       @page1.save!
       expect(ids_visible_to_user(@student1, "wiki_page")).to contain_exactly(@page2.id)
-    end
-  end
-
-  context "wiki page with assignment visibility" do
-    before :once do
-      @module1 = @course.context_modules.create!(name: "Module 1")
-      @module2 = @course.context_modules.create!(name: "Module 2")
-      @page1.context_module_tags.create! context_module: @module1, context: @course, tag_type: "context_module"
-    end
-
-    it "gives the same visibilities for a wiki page's assignment" do
-      page1_assignment = @course.assignments.create!
-      page2_assignment = @course.assignments.create!
-      @page1.update!(assignment: page1_assignment)
-      @page2.update!(assignment: page2_assignment)
-
-      override = @module1.assignment_overrides.create!
-      override.assignment_override_students.create!(user: @student1)
-      expect(ids_visible_to_user(@student1, "wiki_page")).to contain_exactly(@page1.id, @page2.id)
-      expect(ids_visible_to_user(@student2, "wiki_page")).to contain_exactly(@page2.id)
-
-      expect(assignment_ids_visible_to_user(@student1)).to contain_exactly(@page1.assignment.id, @page2.assignment.id)
-      expect(assignment_ids_visible_to_user(@student2)).to contain_exactly(@page2.assignment.id)
     end
   end
 end

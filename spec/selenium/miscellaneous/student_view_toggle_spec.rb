@@ -42,7 +42,7 @@ describe "student view toggle" do
   it "is visible from course home with text in button" do
     get "/courses/#{@course.id}"
     expect(student_view_toggle).to be_displayed
-    expect(student_view_toggle).to include_text("Student View")
+    expect(student_view_toggle).to include_text("View as Student")
   end
 
   it "redirects to student view on click from assignments index" do

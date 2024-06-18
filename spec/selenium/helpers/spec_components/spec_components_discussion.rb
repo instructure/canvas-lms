@@ -53,11 +53,11 @@ module SpecComponents
     private
 
     def add_assignment_override_for_student(opts)
-      super(opts) { |assignment_override| assignment_override.assignment = @component_discussion }
+      super { |assignment_override| assignment_override.assignment = @component_discussion }
     end
 
     def add_assignment_override_for_section(opts)
-      super(opts) { |assignment_override| assignment_override.assignment = @component_discussion }
+      super { |assignment_override| assignment_override.assignment = @component_discussion }
     end
   end
 end

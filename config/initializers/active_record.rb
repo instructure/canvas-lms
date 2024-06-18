@@ -84,7 +84,7 @@ class ActiveRecord::Base
 
   # See ActiveModel#serializable_add_includes
   def serializable_add_includes(options = {})
-    super(options) do |association, records, opts|
+    super do |association, records, opts|
       yield association, records, opts.reverse_merge(include_root: options[:include_root])
     end
   end

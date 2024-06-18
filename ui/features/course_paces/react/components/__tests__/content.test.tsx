@@ -32,7 +32,7 @@ import PaceContent from '../content'
 import fetchMock from 'fetch-mock'
 import {actions as uiActions} from '../../actions/ui'
 import {APIPaceContextTypes, Pace, PaceContextsState} from '../../types'
-import * as tz from '@canvas/datetime'
+import * as tz from '@instructure/moment-utils'
 
 jest.mock('../../actions/ui', () => ({
   ...jest.requireActual('../../actions/ui'),

@@ -281,7 +281,7 @@ describe "context modules" do
     end
 
     it "does not have a prerequisites section when creating the first module" do
-      Account.site_admin.disable_feature! :differentiated_modules
+      Account.site_admin.disable_feature! :selective_release_ui_api
       get "/courses/#{@course.id}/modules"
 
       form = new_module_form
@@ -313,7 +313,7 @@ describe "context modules" do
     end
 
     it "validates locking a module item display functionality without differentiated modules" do
-      Account.site_admin.disable_feature! :differentiated_modules
+      Account.site_admin.disable_feature! :selective_release_ui_api
 
       get "/courses/#{@course.id}/modules"
       add_form = new_module_form

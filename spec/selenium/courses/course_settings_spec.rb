@@ -73,7 +73,7 @@ describe "course settings" do
 
       sync_checkbox = f(".sync_enrollments_from_homeroom_checkbox")
       expect(sync_checkbox).to be_displayed
-
+      sync_checkbox.location_once_scrolled_into_view
       sync_checkbox.click
 
       homeroom_selection = f("#course_homeroom_course_id")
@@ -186,6 +186,7 @@ describe "course settings" do
 
       it "does not show archived grading schemes" do
         get "/courses/#{@course.id}/settings"
+        scroll_into_view(".grading_standard_checkbox")
         f(".grading_standard_checkbox").click unless is_checked(".grading_standard_checkbox")
         f("[data-testid='grading-schemes-selector-dropdown']").click
         expect(f("[data-testid='grading-schemes-selector-option-#{@active_grading_standard.id}']")).to include_text(@active_grading_standard.title)
@@ -197,16 +198,19 @@ describe "course settings" do
         get "/courses/#{@course.id}/settings"
         f(".grading_standard_checkbox").click unless is_checked(".grading_standard_checkbox")
         expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("value")).to eq(@archived_grading_standard.title)
+        scroll_into_view("[data-testid='grading-schemes-selector-dropdown']")
         f("[data-testid='grading-schemes-selector-dropdown']").click
         expect(f("[data-testid='grading-schemes-selector-option-#{@course.grading_standard.id}']")).to include_text(@course.grading_standard.title)
       end
 
       it "doesn't let you edit an account level grading scheme" do
         get "/courses/#{@course.id}/settings"
+        scroll_into_view(".grading_standard_checkbox")
         f(".grading_standard_checkbox").click unless is_checked(".grading_standard_checkbox")
         f("[data-testid='grading-schemes-selector-dropdown']").click
         expect(f("[data-testid='grading-schemes-selector-option-#{@account_grading_standard.id}']")).to include_text(@account_grading_standard.title)
         f("[data-testid='grading-schemes-selector-option-#{@account_grading_standard.id}']").click
+        scroll_into_view("[data-testid='grading-schemes-selector-view-button']")
         f("[data-testid='grading-schemes-selector-view-button']").click
         wait_for_ajaximations
         expect(f("[data-testid='grading-scheme-#{@account_grading_standard.id}-edit-button']").attribute("disabled")).to eq("true")
@@ -216,8 +220,10 @@ describe "course settings" do
         @course.update!(grading_standard_id: @active_grading_standard.id)
         get "/courses/#{@course.id}/settings"
         f(".grading_standard_checkbox").click unless is_checked(".grading_standard_checkbox")
+        scroll_into_view("[data-testid='grading-schemes-selector-dropdown']")
         f("[data-testid='grading-schemes-selector-dropdown']").click
         f("[data-testid='grading-schemes-selector-option-#{@course.grading_standard.id}']").click
+        scroll_into_view("[data-testid='grading-schemes-selector-view-button']")
         f("[data-testid='grading-schemes-selector-view-button']").click
         wait_for_ajaximations
         f("[data-testid='grading-scheme-#{@course.grading_standard.id}-edit-button']").click
@@ -234,6 +240,7 @@ describe "course settings" do
         archived_gs2 = @course.grading_standards.create!(title: "Archived Grading Scheme 2", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
         archived_gs3 = @course.grading_standards.create!(title: "Archived Grading Scheme 3", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
         get "/courses/#{@course.id}/settings"
+        scroll_into_view(".grading_standard_checkbox")
         f(".grading_standard_checkbox").click unless is_checked(".grading_standard_checkbox")
         f("[data-testid='manage-all-grading-schemes-button']").click
         wait_for_ajaximations
@@ -259,7 +266,9 @@ describe "course settings" do
       a.settings[:self_enrollment] = "manually_created"
       a.save!
       get "/courses/#{@course.id}/settings"
-      f("#course_self_enrollment").click
+      el = f("#course_self_enrollment")
+      el.location_once_scrolled_into_view
+      el.click
       wait_for_ajaximations
       wait_for_new_page_load { submit_form("#course_form") }
 
@@ -299,6 +308,7 @@ describe "course settings" do
       expect(is_checked(course_show_announcements_on_home_page)).not_to be_truthy
       expect(home_page_announcement_limit).to be_disabled
 
+      course_show_announcements_on_home_page.location_once_scrolled_into_view
       course_show_announcements_on_home_page.click
       expect(home_page_announcement_limit).not_to be_disabled
     end
@@ -316,7 +326,7 @@ describe "course settings" do
 
           caution_text = "Course Pacing is in active development."
           course_paces_checkbox = f("#course_enable_course_paces")
-
+          course_paces_checkbox.location_once_scrolled_into_view
           course_paces_checkbox.click
           wait_for_ajaximations
           expect(f(".course-paces-row")).to include_text caution_text

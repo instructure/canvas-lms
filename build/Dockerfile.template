@@ -1,10 +1,10 @@
 <%= generation_message %>
 ARG RUBY=3.1
 
-<% if development? -%>
-FROM instructure/ruby-passenger:$RUBY
-<% else -%>
+<% if jenkins? -%>
 FROM starlord.inscloudgate.net/jenkins/ruby-passenger:$RUBY
+<% else -%>
+FROM instructure/ruby-passenger:$RUBY
 <% end -%>
 LABEL maintainer="Instructure"
 
@@ -16,6 +16,9 @@ ENV RAILS_ENV development
 <% else -%>
 ENV RAILS_ENV production
 ENV SASS_STYLE compressed
+<% end -%>
+<% if production? -%>
+env RAILS_LOAD_ALL_LOCALES=1
 <% end -%>
 ENV NGINX_MAX_UPLOAD_SIZE 10g
 ENV LANG en_US.UTF-8
@@ -71,7 +74,7 @@ RUN mkdir -p /etc/apt/keyrings \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 
-RUN gem install bundler --no-document -v 2.5.9 \
+RUN gem install bundler --no-document -v 2.5.10 \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 RUN npm install -g npm@9.8.1 && npm cache clean --force
 
@@ -81,4 +84,16 @@ USER docker
 RUN set -eux; \
   mkdir -p \
     <%= docker_compose_volume_paths.join(" \\\n    ") %>
+<% end -%>
+<% if production? -%>
+COPY --chown=docker:docker . /usr/src/app
+RUN mkdir -p tmp/files
+ENV COMPILE_ASSETS_BRAND_CONFIGS=0
+ENV COMPILE_ASSETS_NPM_INSTALL=0
+RUN unset RUBY && bundle config --global build.nokogiri --use-system-libraries && \
+  bundle config --global build.ffi --enable-system-libffi && \
+  bundle install
+RUN yarn install --frozen-lockfile || yarn install --frozen-lockfile --network-concurrency 1 && \
+  bin/rails canvas:compile_assets --trace && \
+  rm -rf node_modules
 <% end -%>

@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import CalendarNavigator from 'ui/features/calendar/backbone/views/CalendarNavigator'
 import assertions from 'helpers/assertions'
-import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
+import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 
 QUnit.module('CalendarNavigator', {
   setup() {

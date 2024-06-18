@@ -936,15 +936,15 @@ module ApplicationHelper
   end
 
   def dashboard_url(opts = {})
-    return super(opts) if opts[:login_success] || opts[:become_user_id] || @domain_root_account.nil?
+    return super if opts[:login_success] || opts[:become_user_id] || @domain_root_account.nil?
 
-    custom_dashboard_url || super(opts)
+    custom_dashboard_url || super
   end
 
   def dashboard_path(opts = {})
-    return super(opts) if opts[:login_success] || opts[:become_user_id] || @domain_root_account.nil?
+    return super if opts[:login_success] || opts[:become_user_id] || @domain_root_account.nil?
 
-    custom_dashboard_url || super(opts)
+    custom_dashboard_url || super
   end
 
   def custom_dashboard_url

@@ -79,4 +79,160 @@ describe Lti::RegistrationsController do
       expect(assigns[:active_tab]).to eq("extensions")
     end
   end
+
+  describe "GET show" do
+    subject { get :show, params: { account_id: account.id, id: registration.id }, format: :json }
+
+    let(:account) { account_model }
+    let(:admin) { account_admin_user(account:) }
+    let(:registration) { lti_registration_model(account:) }
+    let(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
+    let(:response_json) { response.parsed_body.with_indifferent_access }
+
+    before do
+      user_session(admin)
+      account.enable_feature!(:lti_registrations_page)
+      account_binding
+    end
+
+    context "without user session" do
+      before do
+        remove_user_session
+      end
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before do
+        user_session(student)
+      end
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with flag disabled" do
+      before do
+        account.disable_feature!(:lti_registrations_page)
+      end
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    context "for nonexistent registration" do
+      it "returns 404" do
+        get :show, params: { account_id: account.id, id: registration.id + 1 }, format: :json
+        expect(response).to be_not_found
+      end
+    end
+
+    it "is successful" do
+      subject
+      expect(response).to be_successful
+    end
+
+    it "returns the registration" do
+      subject
+      expect(response_json).to include({
+                                         id: registration.id,
+                                       })
+    end
+
+    it "includes the account binding" do
+      subject
+      expect(response_json).to have_key(:account_binding)
+    end
+
+    it "includes the configuration" do
+      subject
+      expect(response_json).to have_key(:configuration)
+    end
+  end
+
+  describe "DELETE destroy" do
+    subject { delete :destroy, params: { account_id: account.id, id: registration.id }, format: :json }
+
+    let(:account) { account_model }
+    let(:admin) { account_admin_user(account:) }
+    let(:registration) { lti_registration_model(account:) }
+    let(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
+
+    before do
+      ims_registration
+      user_session(admin)
+      account.enable_feature!(:lti_registrations_page)
+    end
+
+    context "without user session" do
+      before do
+        remove_user_session
+      end
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before do
+        user_session(student)
+      end
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with flag disabled" do
+      before do
+        account.disable_feature!(:lti_registrations_page)
+      end
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    context "with non-dynamic registration" do
+      before do
+        ims_registration.update!(lti_registration: nil)
+      end
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it "does not delete the registration" do
+        subject
+        expect(registration.reload).not_to be_deleted
+      end
+    end
+
+    it "is successful" do
+      subject
+      expect(response).to be_successful
+    end
+
+    it "deletes the registration" do
+      subject
+      expect(registration.reload).to be_deleted
+    end
+  end
 end

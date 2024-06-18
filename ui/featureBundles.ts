@@ -82,6 +82,7 @@ const featureBundles: {
   course_statistics: () => import('./features/course_statistics/index'),
   course_wizard: () => import('./features/course_wizard/index'),
   course: () => import('./features/course/index'),
+  courses: () => import('./features/courses/index'),
   dashboard: () => import('./features/dashboard/index'),
   deep_linking_response: () => import('./features/deep_linking_response/index'),
   developer_keys_v2: () => import('./features/developer_keys_v2/index'),

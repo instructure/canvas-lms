@@ -29,6 +29,7 @@ import {IconAddLine} from '@instructure/ui-icons'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {
+  AssigneeOption,
   BaseDateDetails,
   DateLockTypes,
   exportedOverride,
@@ -36,7 +37,6 @@ import type {
   ItemAssignToCardSpec,
 } from './types'
 import ItemAssignToCard, {type ItemAssignToCardRef} from './ItemAssignToCard'
-import type {AssigneeOption} from '../AssigneeSelector'
 import useFetchAssignees from '../../utils/hooks/useFetchAssignees'
 import {getOverriddenAssignees, itemTypeToApiURL} from '../../utils/assignToHelper'
 import {getEveryoneOption, ItemAssignToTrayProps} from './ItemAssignToTray'
@@ -56,6 +56,15 @@ export interface ItemAssignToTrayContentProps
   disabledOptionIds: string[]
   setDisabledOptionIds: (options: string[]) => void
   defaultGroupCategoryId: string | null
+  initialLoadRef: React.MutableRefObject<boolean>
+  allOptions: AssigneeOption[]
+  isLoadingAssignees: boolean
+  isLoading: boolean
+  loadedAssignees: boolean
+  setSearchTerm: (term: string) => void
+  everyoneOption: AssigneeOption
+  setGroupCategoryId: (id: string | null) => void
+  setOverridesFetched: (flag: boolean) => void
   cardsRefs: React.MutableRefObject<{
     [cardId: string]: ItemAssignToCardRef
   }>
@@ -68,6 +77,7 @@ function makeCardId(): string {
 const ItemAssignToTrayContent = ({
   open,
   assignToCards,
+  initialLoadRef,
   setAssignToCards,
   courseId,
   itemType,
@@ -94,28 +104,34 @@ const ItemAssignToTrayContent = ({
   disabledOptionIds,
   setDisabledOptionIds,
   defaultGroupCategoryId,
+  allOptions,
+  setSearchTerm,
+  isLoadingAssignees,
+  isLoading,
+  loadedAssignees,
+  everyoneOption,
+  setGroupCategoryId,
+  setOverridesFetched,
 }: ItemAssignToTrayContentProps) => {
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
-  const [groupCategoryId, setGroupCategoryId] = useState<string | null>(defaultGroupCategoryId)
-  const [overridesFetched, setOverridesFetched] = useState(defaultCards !== undefined)
 
   const lastPerformedAction = useRef<{action: 'add' | 'delete'; index?: number} | null>(null)
   const addCardButtonRef = useRef<Element | null>(null)
-  const everyoneOption = useMemo(() => {
-    const hasOverrides =
-      (disabledOptionIds.length === 1 && !disabledOptionIds.includes('everyone')) ||
-      disabledOptionIds.length > 1 ||
-      assignToCards.length > 1
-    return getEveryoneOption(hasOverrides)
-  }, [disabledOptionIds, assignToCards])
 
   useEffect(() => {
-    if (defaultCards === undefined || !itemContentId || itemType !== 'assignment') return
+    if (
+      defaultCards === undefined ||
+      !itemContentId ||
+      itemType !== 'assignment' ||
+      initialLoadRef.current
+    )
+      return
 
     setFetchInFlight(true)
     doFetchApi({
       path: itemTypeToApiURL(courseId, itemType, itemContentId),
+      params: {per_page: 100},
     })
       .then((response: FetchDueDatesResponse) => {
         const dateDetailsApiResponse = response.json
@@ -127,23 +143,14 @@ const ItemAssignToTrayContent = ({
       })
       .finally(() => {
         setFetchInFlight(false)
+        initialLoadRef.current = true
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const {allOptions, isLoading, loadedAssignees, setSearchTerm} = useFetchAssignees({
-    courseId,
-    groupCategoryId,
-    disableFetch: !overridesFetched,
-    everyoneOption,
-    checkMasteryPaths: true,
-    defaultValues: [],
-    onError: handleDismiss,
-  })
-
   useEffect(() => {
     setGroupCategoryId(defaultGroupCategoryId)
-  }, [defaultGroupCategoryId])
+  }, [defaultGroupCategoryId, setGroupCategoryId])
 
   useEffect(() => {
     if (assignToCards.length === 0 && !lastPerformedAction.current) return
@@ -196,6 +203,7 @@ const ItemAssignToTrayContent = ({
     setFetchInFlight(true)
     doFetchApi({
       path: itemTypeToApiURL(courseId, itemType, itemContentId),
+      params: {per_page: 100},
     })
       .then((response: FetchDueDatesResponse) => {
         // TODO: exhaust pagination
@@ -308,6 +316,7 @@ const ItemAssignToTrayContent = ({
       })
       .finally(() => {
         setFetchInFlight(false)
+        initialLoadRef.current = true
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId, itemContentId, itemType, JSON.stringify(defaultCards)])
@@ -515,7 +524,7 @@ const ItemAssignToTrayContent = ({
             everyoneOption={everyoneOption}
             selectedAssigneeIds={card.selectedAssigneeIds}
             customAllOptions={allOptions}
-            customIsLoading={isLoading}
+            customIsLoading={isLoadingAssignees}
             customSetSearchTerm={setSearchTerm}
             highlightCard={card.highlightCard}
             blueprintDateLocks={blueprintDateLocks}
@@ -527,7 +536,7 @@ const ItemAssignToTrayContent = ({
 
   return (
     <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
-      {fetchInFlight || !loadedAssignees ? (
+      {fetchInFlight || !loadedAssignees || isLoading ? (
         <Mask>
           <Spinner data-testid="cards-loading" renderTitle={I18n.t('Loading')} />
         </Mask>

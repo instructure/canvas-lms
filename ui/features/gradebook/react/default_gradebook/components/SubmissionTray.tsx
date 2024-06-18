@@ -255,8 +255,7 @@ export default class SubmissionTray extends React.Component<
           </Alert>
         )}
         <View as="div" textAlign="center">
-          <Button {...buttonProps}>
-            <IconSpeedGraderLine />
+          <Button {...buttonProps} renderIcon={IconSpeedGraderLine}>
             {I18n.t('SpeedGrader')}
           </Button>
         </View>
@@ -388,6 +387,78 @@ export default class SubmissionTray extends React.Component<
       }
     }
 
+    const renderGradeInputForCheckpoints = (
+      hasCheckpoints,
+      props,
+      subAssignmentTag,
+      submission,
+      header
+    ) => {
+      return (
+        hasCheckpoints && (
+          <GradeInput
+            assignment={getSubAssignment(hasCheckpoints, props.assignment, subAssignmentTag)}
+            disabled={props.gradingDisabled}
+            enterGradesAs={props.enterGradesAs}
+            gradingScheme={props.gradingScheme}
+            pointsBasedGradingScheme={props.pointsBasedGradingScheme}
+            pendingGradeInfo={props.pendingGradeInfo}
+            onSubmissionUpdate={props.onGradeSubmission}
+            submission={submission}
+            submissionUpdating={props.submissionUpdating}
+            subAssignmentTag={subAssignmentTag}
+            header={header}
+          />
+        )
+      )
+    }
+
+    const getSubAssignmentSubmission = (hasCheckpoints, submission, subAssignmentTag) => {
+      if (!hasCheckpoints) {
+        return null
+      }
+
+      const subAssignmentSubmission = submission.subAssignmentSubmissions.find(
+        sub => sub.sub_assignment_tag === subAssignmentTag
+      )
+
+      return {
+        ...submission,
+        ...{
+          enteredGrade: subAssignmentSubmission.entered_grade,
+          enteredScore: subAssignmentSubmission.entered_score,
+          grade: subAssignmentSubmission.grade,
+          score: subAssignmentSubmission.score,
+        },
+      }
+    }
+
+    const getSubAssignment = (hasCheckpoints, assignment, subAssignmentTag) => {
+      if (!hasCheckpoints) {
+        return assignment
+      }
+
+      const subAssignment = assignment.checkpoints.find(sub => sub.tag === subAssignmentTag)
+
+      return {
+        ...assignment,
+        pointsPossible: subAssignment.points_possible,
+      }
+    }
+
+    const hasCheckpoints =
+      this.props.assignment.hasSubAssignments && this.props.assignment.checkpoints.length > 0
+    const replyToTopicSubmission = getSubAssignmentSubmission(
+      hasCheckpoints,
+      this.props.submission,
+      'reply_to_topic'
+    )
+    const replyToEntrySubmission = getSubAssignmentSubmission(
+      hasCheckpoints,
+      this.props.submission,
+      'reply_to_entry'
+    )
+
     return (
       <ApolloProvider client={createClient()}>
         <Tray
@@ -471,9 +542,23 @@ export default class SubmissionTray extends React.Component<
                   isNotCountedForScore={this.props.isNotCountedForScore}
                   submission={this.props.submission}
                 />
+                {renderGradeInputForCheckpoints(
+                  hasCheckpoints,
+                  this.props,
+                  'reply_to_topic',
+                  replyToTopicSubmission,
+                  I18n.t('Reply to Topic')
+                )}
+                {renderGradeInputForCheckpoints(
+                  hasCheckpoints,
+                  this.props,
+                  'reply_to_entry',
+                  replyToEntrySubmission,
+                  I18n.t('Required Replies')
+                )}
                 <GradeInput
                   assignment={this.props.assignment}
-                  disabled={this.props.gradingDisabled}
+                  disabled={this.props.gradingDisabled || hasCheckpoints}
                   enterGradesAs={this.props.enterGradesAs}
                   gradingScheme={this.props.gradingScheme}
                   pointsBasedGradingScheme={this.props.pointsBasedGradingScheme}
@@ -481,6 +566,7 @@ export default class SubmissionTray extends React.Component<
                   onSubmissionUpdate={this.props.onGradeSubmission}
                   submission={this.props.submission}
                   submissionUpdating={this.props.submissionUpdating}
+                  header={hasCheckpoints ? I18n.t('Current Total') : undefined}
                 />
                 {!!this.props.submission.pointsDeducted && (
                   <View as="div" margin="small 0 0 0">

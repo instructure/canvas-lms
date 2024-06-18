@@ -2,6 +2,5 @@
   "name": "@canvas/datetime",
   "private": true,
   "version": "1.0.0",
-  "author": "neme",
-  "main": "./index.js"
+  "author": "neme"
 }

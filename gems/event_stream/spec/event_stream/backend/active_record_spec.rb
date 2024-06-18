@@ -59,25 +59,23 @@ describe EventStream::Backend::ActiveRecord do
         def active?
           true
         end
+
+        def table_name
+          "test_table"
+        end
       end
     end
   end
 
   let(:stream) do
     ar_cls = ar_type
-    s = EventStream::Stream.new do
-      backend_strategy :active_record
-      table "test_table"
-      active_record_type ar_cls
+    EventStream::Stream.new do
+      record_type ar_cls
       add_index :optional_index do
-        table :items_by_optional_index
-        entry_proc ->(record) { [record.field, record.id] if record.id > 0 }
-        key_proc ->(i1, i2) { [i1, i2] }
         ar_scope_proc ->(_v1, _v2) { ar_cls.where({ key: :val }) }
       end
+      self.raise_on_error = true
     end
-    s.raise_on_error = true
-    s
   end
 
   describe "executing operations" do
@@ -88,14 +86,14 @@ describe EventStream::Backend::ActiveRecord do
     end
 
     it "proxies calls through provided AR model" do
-      event_record = OpenStruct.new(field: "value", id: 2)
+      event_record = double(field: "value", id: 2)
       ar_backend = EventStream::Backend::ActiveRecord.new(stream)
       ar_backend.execute(:insert, event_record)
       expect(ar_type.written_recs.first).to eq(event_record)
     end
 
     it "only indexes items for which there is an entry" do
-      event_record = OpenStruct.new(field: "value", id: -2)
+      event_record = double(field: "value", id: -2)
       ar_backend = EventStream::Backend::ActiveRecord.new(stream)
       expect { ar_backend.execute(:insert, event_record) }.to_not raise_error
       expect(ar_type.written_recs.first).to eq(event_record)

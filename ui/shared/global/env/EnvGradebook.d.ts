@@ -112,7 +112,7 @@ export interface EnvGradebookSpeedGrader {
   can_delete_attachments: boolean
   media_comment_asset_string: string
   late_policy?: {
-    late_submission_interval?: 'hour' | 'day' | string
+    late_submission_interval?: 'hour' | 'day'
   }
   assignment_missing_shortcut: boolean
 

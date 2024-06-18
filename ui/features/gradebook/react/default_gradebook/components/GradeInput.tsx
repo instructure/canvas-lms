@@ -144,6 +144,8 @@ type Props = {
   pendingGradeInfo: PendingGradeInfo
   submission: SubmissionData
   submissionUpdating: boolean
+  subAssignmentTag?: string
+  header?: string
 }
 
 type State = {
@@ -219,6 +221,7 @@ export default class GradeInput extends Component<Props, State> {
       gradingScheme: this.props.gradingScheme,
       pointsBasedGradingScheme: this.props.pointsBasedGradingScheme,
       pointsPossible: this.props.assignment.pointsPossible,
+      subAssignmentTag: this.props.subAssignmentTag,
     })
 
     this.props.onSubmissionUpdate(this.props.submission, gradeInfo)
@@ -237,7 +240,10 @@ export default class GradeInput extends Component<Props, State> {
     const isBusy = this.props.submissionUpdating
 
     let currentGradeInfo: PendingGradeInfo
-    if (this.props.pendingGradeInfo) {
+    if (
+      this.props.pendingGradeInfo &&
+      this.props.pendingGradeInfo.subAssignmentTag === this.props.subAssignmentTag
+    ) {
       currentGradeInfo = this.props.pendingGradeInfo
     } else if (this.props.submission.excused) {
       currentGradeInfo = {
@@ -253,18 +259,29 @@ export default class GradeInput extends Component<Props, State> {
         gradingScheme: this.props.gradingScheme,
         pointsBasedGradingScheme: this.props.pointsBasedGradingScheme,
         pointsPossible: this.props.assignment.pointsPossible,
+        subAssignmentTag: this.props.subAssignmentTag,
       })
     }
 
+    const hasHeader = !!this.props.header
+
     if (this.props.enterGradesAs === 'passFail') {
       return (
-        <CompleteIncompleteGradeInput
-          anonymizeStudents={this.props.assignment.anonymizeStudents}
-          gradeInfo={currentGradeInfo}
-          isBusy={isBusy}
-          isDisabled={isDisabled}
-          onChange={this.handleSelectChange}
-        />
+        <div>
+          {hasHeader && (
+            <Text size="small" weight="bold">
+              {this.props.header}
+            </Text>
+          )}
+          <CompleteIncompleteGradeInput
+            anonymizeStudents={this.props.assignment.anonymizeStudents}
+            gradeInfo={currentGradeInfo}
+            isBusy={isBusy}
+            isDisabled={isDisabled}
+            onChange={this.handleSelectChange}
+            hasHeader={hasHeader}
+          />
+        </div>
       )
     }
 
@@ -277,7 +294,11 @@ export default class GradeInput extends Component<Props, State> {
 
     const messages: Message[] = []
     const score = this.props.submission.enteredScore
-    if (this.props.pendingGradeInfo && !this.props.pendingGradeInfo.valid) {
+    if (
+      this.props.pendingGradeInfo &&
+      !this.props.pendingGradeInfo.valid &&
+      this.props.pendingGradeInfo.subAssignmentTag === this.props.subAssignmentTag
+    ) {
       messages.push({type: 'error', text: I18n.t('This is not a valid grade')})
     } else if (typeof score === 'number' && score < 0) {
       messages.push({type: 'hint', text: I18n.t('This grade has negative points')})
@@ -285,19 +306,36 @@ export default class GradeInput extends Component<Props, State> {
       messages.push({type: 'hint', text: I18n.t('This grade is unusually high')})
     }
 
+    const label = assignmentLabel(this.props.assignment, this.props.enterGradesAs)
+
     return (
-      <TextInput
-        display="inline-block"
-        id="grade-detail-tray--grade-input"
-        interaction={interaction}
-        messages={messages}
-        onInput={this.handleTextChange}
-        onChange={this.handleTextChange}
-        onBlur={this.handleTextBlur}
-        placeholder="–"
-        renderLabel={() => assignmentLabel(this.props.assignment, this.props.enterGradesAs)}
-        value={this.state.formattedGrade}
-      />
+      <div>
+        {hasHeader && (
+          <Text size="small" weight="bold">
+            {this.props.header}
+          </Text>
+        )}
+        <TextInput
+          display="inline-block"
+          id="grade-detail-tray--grade-input"
+          interaction={interaction}
+          messages={messages}
+          onInput={this.handleTextChange}
+          onChange={this.handleTextChange}
+          onBlur={this.handleTextBlur}
+          placeholder="–"
+          renderLabel={() =>
+            hasHeader ? (
+              <Text size="x-small" weight="normal">
+                {label}
+              </Text>
+            ) : (
+              label
+            )
+          }
+          value={this.state.formattedGrade}
+        />
+      </div>
     )
   }
 }

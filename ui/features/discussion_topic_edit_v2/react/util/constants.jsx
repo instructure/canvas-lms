@@ -34,7 +34,7 @@ export const masteryPathsOption = {
   label: I18n.t('Mastery Paths'),
 }
 
-const GradedDiscussionDueDateDefaultValues = {
+const DiscussionDueDateDefaultValues = {
   assignedInfoList: [],
   setAssignedInfoList: () => {},
   studentEnrollments: [],
@@ -52,9 +52,7 @@ const GradedDiscussionDueDateDefaultValues = {
   setImportantDates: newImportantDatesValue => {},
 }
 
-export const GradedDiscussionDueDatesContext = React.createContext(
-  GradedDiscussionDueDateDefaultValues
-)
+export const DiscussionDueDatesContext = React.createContext(DiscussionDueDateDefaultValues)
 
 export const ASSIGNMENT_OVERRIDE_GRAPHQL_TYPENAMES = {
   ADHOC: 'AdhocStudents',
@@ -85,7 +83,11 @@ export const useShouldShowContent = (
     ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_CONTENT &&
     ENV.STUDENT_PLANNER_ENABLED
 
-  const shouldShowPostToSectionOption = !isGraded && !isGroupDiscussion && !isGroupContext
+  const shouldShowPostToSectionOption =
+    !isGraded &&
+    !isGroupDiscussion &&
+    !isGroupContext &&
+    !(ENV.FEATURES.selective_release_ui_api && !isAnnouncement)
 
   const shouldShowAnonymousOptions =
     !isGroupContext &&
@@ -129,6 +131,17 @@ export const useShouldShowContent = (
 
   const shouldShowCheckpointsOptions = isGraded && ENV.DISCUSSION_CHECKPOINTS_ENABLED
 
+  const canCreateGradedDiscussion =
+    !isEditing && ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_CREATE_ASSIGNMENT
+  const canEditDiscussionAssignment =
+    isEditing && ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_UPDATE_ASSIGNMENT
+
+  const shouldShowAssignToForUngradedDiscussions =
+    !isAnnouncement &&
+    !isGraded &&
+    ENV.FEATURES?.selective_release_ui_api &&
+    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_ASSIGN_TO_UNGRADED
+
   return {
     shouldShowTodoSettings,
     shouldShowPostToSectionOption,
@@ -143,5 +156,6 @@ export const useShouldShowContent = (
     shouldShowSaveAndPublishButton,
     shouldShowPodcastFeedOption,
     shouldShowCheckpointsOptions,
+    shouldShowAssignToForUngradedDiscussions,
   }
 }

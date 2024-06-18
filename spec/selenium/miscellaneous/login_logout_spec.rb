@@ -46,7 +46,7 @@ describe "login logout test" do
   it "shows error message if wrong credentials are used", priority: "2" do
     get "/login"
     fill_in_login_form("fake@user.com", "fakepass")
-    assert_flash_error_message("Invalid username")
+    assert_flash_error_message("Please verify your username or password and try again.")
   end
 
   it "shows invalid password message if password is nil", priority: "2" do

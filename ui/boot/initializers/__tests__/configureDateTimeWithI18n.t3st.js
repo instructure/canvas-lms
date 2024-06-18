@@ -39,10 +39,9 @@ import '../../../ext/custom_moment_locales/mi_nz'
 import '../../../ext/custom_moment_locales/hy_am'
 import '../../../ext/custom_moment_locales/sl'
 
-import {parse, format, hasMeridiem} from '@canvas/datetime'
-import {dateString} from '@canvas/datetime/date-functions'
-import * as configureDateTime from '../configureDateTime'
-import * as configureDateTimeMomentParser from '../configureDateTimeMomentParser'
+import {parse, format, hasMeridiem, dateString} from '@instructure/moment-utils'
+import * as configureDateTime from '@canvas/datetime/configureDateTime'
+import * as configureDateTimeMomentParser from '@canvas/datetime/configureDateTimeMomentParser'
 // eslint-disable-next-line import/no-nodejs-modules
 import fs from 'fs'
 import I18n, {useTranslations} from '@canvas/i18n'

@@ -21,7 +21,7 @@ require_relative "../../common"
 require_relative "../../helpers/assignments_common"
 require_relative "../pages/speedgrader_page"
 
-describe "speed grader" do
+describe "SpeedGrader" do
   include_context "in-process server selenium tests"
   include AssignmentsCommon
 

@@ -25,6 +25,7 @@ class DiscussionTopicsApiController < ApplicationController
   include Api::V1::DiscussionTopics
   include Api::V1::User
   include SubmittableHelper
+  include LocaleSelection
 
   before_action :require_context_and_read_access
   before_action :require_topic
@@ -108,8 +109,11 @@ class DiscussionTopicsApiController < ApplicationController
       return render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity)
     end
 
-    dynamic_content = DiscussionTopic::PromptPresenter.new(@topic).dynamic_content_for_summary
-    dynamic_content_hash = Digest::SHA256.hexdigest(dynamic_content)
+    dynamic_content = {
+      content: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary,
+      locale: available_locales[@current_user.locale || I18n.default_locale.to_s]
+    }
+    dynamic_content_hash = Digest::SHA256.hexdigest(dynamic_content.to_json)
 
     forced = params[:force] == "true"
     unless @topic.summary_enabled
@@ -129,10 +133,17 @@ class DiscussionTopicsApiController < ApplicationController
 
     response = nil
     begin
+      prompt, options = llm_config.generate_prompt_and_options(
+        substitutions: {
+          CONTENT: dynamic_content[:content],
+          LOCALE: dynamic_content[:locale]
+        }
+      )
+
       time = Benchmark.measure do
         response = InstLLMHelper.client(llm_config.model_id).chat(
-          [{ role: "user", content: llm_config.generate_prompt(dynamic_content:) }],
-          **llm_config.options.symbolize_keys
+          [{ role: "user", content: prompt }],
+          **options.symbolize_keys
         )
       end
     rescue => e

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../cassandra_spec_helper"
-
 describe PageViewsController do
   # Factory-like thing for page views.
   def page_view(user, url, options = {})
@@ -79,22 +77,6 @@ describe PageViewsController do
     end
 
     include_examples "GET 'index' as csv"
-  end
-
-  context "with cassandra page views" do
-    include_examples "cassandra page views"
-    include_examples "GET 'index' as csv"
-
-    context "POST 'update'" do
-      it "catches a cassandra error" do
-        allow(PageView).to receive(:find_for_update).and_raise(CassandraCQL::Error::InvalidRequestException)
-        pv = page_view(@student, "/somewhere/in/app/1", created_at: 1.day.ago)
-
-        user_session(@student)
-        put "update", params: { id: pv.token, interaction_seconds: "5", page_view_token: pv.token }, xhr: true
-        expect(response).to have_http_status :ok
-      end
-    end
   end
 
   context "pv4" do

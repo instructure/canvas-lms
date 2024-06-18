@@ -186,7 +186,7 @@
               <% else %>
                 <%= assignment.title %>
               <% end %>
-              <% if assignment_presenter.group %>
+              <% if assignment_presenter.assignment.special_class != "group_total" && assignment_presenter.group %>
                 <div class="context"><%= assignment_presenter.group.name %></div>
               <% end %>
             </th>

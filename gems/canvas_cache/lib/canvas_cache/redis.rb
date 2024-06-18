@@ -56,10 +56,12 @@ module CanvasCache
     end
 
     module IgnorePipelinedKey
+      # rubocop:disable Style/ArgumentsForwarding
       def pipelined(_key = nil, **kwargs, &)
         # ignore key; only useful for distributed
         super(**kwargs, &)
       end
+      # rubocop:enable Style/ArgumentsForwarding
     end
 
     module Distributed

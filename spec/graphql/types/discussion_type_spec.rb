@@ -906,9 +906,13 @@ describe Types::DiscussionType do
     end
   end
 
-  context "differentiated modules" do
+  context "selective release" do
     before do
-      Account.site_admin.enable_feature! :differentiated_modules
+      Account.site_admin.enable_feature! :selective_release_ui_api
+    end
+
+    after do
+      Account.site_admin.disable_feature! :selective_release_ui_api
     end
 
     context "ungraded discussions" do
@@ -926,36 +930,74 @@ describe Types::DiscussionType do
         @teacher1_type = GraphQLTypeTester.new(@topic, current_user: @teacher1)
       end
 
-      it "is visible only to the assigned student" do
-        override = @topic.assignment_overrides.create!
-        override.assignment_override_students.create!(user: @student1)
+      context "visibility" do
+        before do
+          Account.site_admin.enable_feature! :selective_release_backend
+        end
 
-        expect(@student1_type.resolve("_id")).to be_truthy
-        expect(@student2_type.resolve("_id")).to be_nil
-        expect(@teacher1_type.resolve("_id")).to be_truthy
+        after do
+          Account.site_admin.disable_feature! :selective_release_backend
+        end
+
+        it "is visible only to the assigned student" do
+          override = @topic.assignment_overrides.create!
+          override.assignment_override_students.create!(user: @student1)
+
+          expect(@student1_type.resolve("_id")).to be_truthy
+          expect(@student2_type.resolve("_id")).to be_nil
+          expect(@teacher1_type.resolve("_id")).to be_truthy
+        end
+
+        it "is visible only to users who can access the assigned section" do
+          @topic.assignment_overrides.create!(set: @course_section)
+
+          expect(@student1_type.resolve("_id")).to be_nil
+          expect(@student2_type.resolve("_id")).to be_truthy
+          expect(@teacher1_type.resolve("_id")).to be_truthy
+        end
+
+        it "is visible only to students in module override section" do
+          context_module = @course.context_modules.create!(name: "module")
+          context_module.content_tags.create!(content: @topic, context: @course)
+
+          override2 = @topic.assignment_overrides.create!(unlock_at: "2022-02-01T01:00:00Z",
+                                                          unlock_at_overridden: true,
+                                                          lock_at: "2022-02-02T01:00:00Z",
+                                                          lock_at_overridden: true)
+          override2.assignment_override_students.create!(user: @student1)
+
+          expect(@student1_type.resolve("_id")).to be_truthy
+          expect(@student2_type.resolve("_id")).to be_nil
+          expect(@teacher1_type.resolve("_id")).to be_truthy
+        end
       end
 
-      it "is visible only to users who can access the assigned section" do
-        @topic.assignment_overrides.create!(set: @course_section)
+      context "overrides" do
+        before do
+          Account.site_admin.enable_feature! :selective_release_ui_api
+        end
 
-        expect(@student1_type.resolve("_id")).to be_nil
-        expect(@student2_type.resolve("_id")).to be_truthy
-        expect(@teacher1_type.resolve("_id")).to be_truthy
-      end
+        after do
+          Account.site_admin.disable_feature! :selective_release_ui_api
+        end
 
-      it "is visible only to students in module override section" do
-        context_module = @course.context_modules.create!(name: "module")
-        context_module.content_tags.create!(content: @topic, context: @course)
+        it "returns data" do
+          override = @topic.assignment_overrides.create!
+          override.assignment_override_students.create!(user: @student1)
 
-        override2 = @topic.assignment_overrides.create!(unlock_at: "2022-02-01T01:00:00Z",
-                                                        unlock_at_overridden: true,
-                                                        lock_at: "2022-02-02T01:00:00Z",
-                                                        lock_at_overridden: true)
-        override2.assignment_override_students.create!(user: @student1)
+          expect(@student1_type.resolve("ungradedDiscussionOverrides { nodes { _id } }")).to match([override.id.to_s])
+          expect(@student1_type.resolve("ungradedDiscussionOverrides { nodes { title } }")).to match([override.title])
+        end
 
-        expect(@student1_type.resolve("_id")).to be_truthy
-        expect(@student2_type.resolve("_id")).to be_nil
-        expect(@teacher1_type.resolve("_id")).to be_truthy
+        it "does not return data if flag is off" do
+          Account.site_admin.disable_feature!(:selective_release_ui_api)
+
+          override = @topic.assignment_overrides.create!
+          override.assignment_override_students.create!(user: @student1)
+
+          expect(@student1_type.resolve("ungradedDiscussionOverrides { nodes { _id } }")).to be_nil
+          expect(@student1_type.resolve("ungradedDiscussionOverrides { nodes { title } }")).to be_nil
+        end
       end
     end
   end

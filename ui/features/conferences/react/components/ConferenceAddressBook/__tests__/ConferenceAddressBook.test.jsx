@@ -65,6 +65,14 @@ describe('ConferenceAddressBook', () => {
     expect(item).toBeFalsy()
   })
 
+  it('should filter case-insensitive', () => {
+    const container = setup()
+    const input = container.getByTestId('address-input')
+    fireEvent.change(input, {target: {value: 'caleb'}})
+    const item = container.queryByText('Caleb')
+    expect(item).toBeTruthy()
+  })
+
   it('should add tag when user is selected', () => {
     const container = setup()
     const input = container.getByTestId('address-input')

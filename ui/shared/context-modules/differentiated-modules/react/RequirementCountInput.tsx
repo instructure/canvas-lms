@@ -54,8 +54,8 @@ export default function RequirementCountInput({
       name="requirement-count"
       description={<ScreenReaderContent>{I18n.t('Select Requirement Count')}</ScreenReaderContent>}
     >
-      <Flex>
-        <Flex.Item align="start">
+      <View display="flex">
+        <View>
           <RadioInput
             ref={defaultRadioInput}
             data-testid="complete-all-radio"
@@ -65,8 +65,8 @@ export default function RequirementCountInput({
             onClick={() => onChangeRequirementCount('all')}
             aria-describedby="complete-all-subtitle"
           />
-        </Flex.Item>
-        <Flex.Item>
+        </View>
+        <View>
           <Text>{I18n.t('Complete all')}</Text>
           <View as="div">
             <Text color="secondary" size="small" id="complete-all-subtitle">
@@ -83,8 +83,8 @@ export default function RequirementCountInput({
               />
             </View>
           )}
-        </Flex.Item>
-      </Flex>
+        </View>
+      </View>
       <Flex>
         <Flex.Item align="start">
           <RadioInput

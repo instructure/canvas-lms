@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -24,6 +24,7 @@ import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import LoadingIndicator from '@canvas/loading-indicator/react'
 import {useQuery, useMutation, queryClient} from '@canvas/query'
 import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+import {colors} from '@instructure/canvas-theme'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
@@ -100,10 +101,15 @@ const stripPTags = (htmlString: string) => {
 
 type RubricFormComponentProp = {
   rootOutcomeGroup: GroupOutcome
+  canManageRubrics?: boolean
   onLoadRubric?: (rubricTitle: string) => void
 }
 
-export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponentProp) => {
+export const RubricForm = ({
+  canManageRubrics = false,
+  rootOutcomeGroup,
+  onLoadRubric,
+}: RubricFormComponentProp) => {
   const {rubricId, accountId, courseId} = useParams()
   const navigate = useNavigate()
   const navigateUrl = accountId ? `/accounts/${accountId}/rubrics` : `/courses/${courseId}/rubrics`
@@ -117,15 +123,15 @@ export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponent
   const [isCriterionModalOpen, setIsCriterionModalOpen] = useState(false)
   const [isOutcomeCriterionModalOpen, setIsOutcomeCriterionModalOpen] = useState(false)
   const [isPreviewTrayOpen, setIsPreviewTrayOpen] = useState(false)
-  const [outcomeDialog, setOutcomeDialog] = useState<FindDialog | null>(null)
   const [outcomeDialogOpen, setOutcomeDialogOpen] = useState(false)
+  const criteriaRef = useRef(rubricForm.criteria)
 
   const header = rubricId ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
 
   const {data, isLoading} = useQuery({
     queryKey: [`fetch-rubric-${rubricId}`],
     queryFn: async () => fetchRubric(rubricId),
-    enabled: !!rubricId,
+    enabled: !!rubricId && canManageRubrics,
   })
 
   const {
@@ -145,16 +151,15 @@ export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponent
     },
   })
 
-  const setRubricFormField = <K extends keyof RubricFormProps>(
-    key: K,
-    value: RubricFormProps[K]
-  ) => {
-    setRubricForm(prevState => ({...prevState, [key]: value}))
-  }
+  const setRubricFormField = useCallback(
+    <K extends keyof RubricFormProps>(key: K, value: RubricFormProps[K]) => {
+      setRubricForm(prevState => ({...prevState, [key]: value}))
+    },
+    [setRubricForm]
+  )
 
   const formValid = () => {
-    // Add more form validation here
-    return rubricForm.title.trim().length > 0
+    return rubricForm.title.trim().length > 0 && rubricForm.criteria.length > 0
   }
 
   const openCriterionModal = (criterion?: RubricCriterion) => {
@@ -180,7 +185,7 @@ export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponent
   }
 
   const handleSaveCriterion = (updatedCriteria: RubricCriterion) => {
-    const criteria = [...rubricForm.criteria]
+    const criteria = [...criteriaRef.current]
 
     const criterionIndexToUpdate = criteria.findIndex(c => c.id === updatedCriteria.id)
 
@@ -242,14 +247,13 @@ export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponent
         rootOutcomeGroup: new OutcomeGroup(rootOutcomeGroup),
         url: '/outcomes/find_dialog',
       })
-      setOutcomeDialog(dialog)
-      outcomeDialog?.show()
+      dialog?.show()
       ;(dialog as any).on('import', (outcomeData: any) => {
         const newOutcomeCriteria = {
           id: Date.now().toString(),
           points: outcomeData.attributes.points_possible,
-          description: stripPTags(outcomeData.attributes.description),
-          longDescription: '',
+          description: outcomeData.outcomeLink.outcome.title,
+          longDescription: stripPTags(outcomeData.attributes.description),
           outcome: {
             displayName: outcomeData.attributes.display_name,
             title: outcomeData.outcomeLink.outcome.title,
@@ -260,7 +264,7 @@ export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponent
           ratings: outcomeData.attributes.ratings,
           learningOutcomeId: outcomeData.outcomeLink.outcome.id,
         }
-        const criteria = [...rubricForm.criteria]
+        const criteria = [...criteriaRef.current]
         // Check if the outcome has already been added to this rubric
         const hasDuplicateLearningOutcomeId = criteria.some(
           criterion => criterion.learningOutcomeId === newOutcomeCriteria.learningOutcomeId
@@ -282,7 +286,11 @@ export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponent
       })
       setOutcomeDialogOpen(false)
     }
-  }, [outcomeDialog, outcomeDialogOpen, rootOutcomeGroup, rubricForm.criteria])
+  }, [outcomeDialogOpen, rootOutcomeGroup, setRubricFormField])
+
+  useEffect(() => {
+    criteriaRef.current = rubricForm.criteria
+  }, [rubricForm.criteria])
 
   useEffect(() => {
     if (!rubricId) {
@@ -303,38 +311,19 @@ export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponent
     }
   }, [navigate, navigateUrl, saveSuccess])
 
-  const [distanceToBottom, setDistanceToBottom] = useState<number>(0)
-  const containerRef = useRef<HTMLElement>()
-
   useEffect(() => {
-    const calculateDistance = () => {
-      if (containerRef.current) {
-        const rect = (containerRef.current as HTMLElement).getBoundingClientRect()
-        const distance = window.innerHeight - rect.bottom
-        setDistanceToBottom(distance)
-      }
+    if (!canManageRubrics) {
+      navigate(navigateUrl)
     }
-
-    calculateDistance()
-  }, [containerRef, isLoading])
+  }, [canManageRubrics, navigate, navigateUrl])
 
   if (isLoading && !!rubricId) {
     return <LoadingIndicator />
   }
 
   return (
-    <View as="div">
-      <Flex
-        height={`${distanceToBottom}px`}
-        as="div"
-        direction="column"
-        elementRef={elRef => {
-          if (elRef instanceof HTMLElement) {
-            containerRef.current = elRef
-          }
-        }}
-        style={{minHeight: '100%'}}
-      >
+    <View as="div" margin="0 0 medium 0">
+      <Flex as="div" direction="column" style={{minHeight: '100%'}}>
         <Flex.Item>
           {saveError && (
             <Alert
@@ -452,11 +441,15 @@ export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponent
             )}
           </View>
         </Flex.Item>
+      </Flex>
 
-        <Flex.Item as="footer" height="75px">
-          <View as="hr" margin="0 0 small 0" />
-
-          <Flex justifyItems="end" margin="0 0 medium 0">
+      <div id="enhanced-rubric-builder-footer" style={{backgroundColor: colors.white}}>
+        <View
+          as="div"
+          margin="small large"
+          themeOverride={{marginLarge: '48px', marginSmall: '12px'}}
+        >
+          <Flex justifyItems="end">
             <Flex.Item margin="0 medium 0 0">
               <Button onClick={() => navigate(navigateUrl)}>{I18n.t('Cancel')}</Button>
 
@@ -499,8 +492,8 @@ export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponent
               </View>
             </Flex.Item>
           </Flex>
-        </Flex.Item>
-      </Flex>
+        </View>
+      </div>
 
       <CriterionModal
         criterion={selectedCriterion}
@@ -513,7 +506,6 @@ export const RubricForm = ({rootOutcomeGroup, onLoadRubric}: RubricFormComponent
         criterion={selectedCriterion}
         isOpen={isOutcomeCriterionModalOpen}
         onDismiss={() => setIsOutcomeCriterionModalOpen(false)}
-        onSave={(updatedCriteria: RubricCriterion) => handleSaveCriterion(updatedCriteria)}
       />
       <RubricAssessmentTray
         isOpen={isPreviewTrayOpen}

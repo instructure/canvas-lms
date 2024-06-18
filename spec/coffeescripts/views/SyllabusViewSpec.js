@@ -21,7 +21,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import _ from 'lodash'
-import tzInTest from '@canvas/datetime/specHelpers'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
 import denver from 'timezone/America/Denver'
 import newYork from 'timezone/America/New_York'
@@ -34,7 +34,7 @@ import SyllabusView from 'ui/features/syllabus/backbone/views/SyllabusView'
 import SyllabusViewPrerendered from './SyllabusViewPrerendered'
 import fakeENV from 'helpers/fakeENV'
 import '@canvas/jquery/jquery.simulate'
-import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
+import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 
 function setupServerResponses() {
   const server = sinon.fakeServer.create()

@@ -40,9 +40,10 @@ module Canvas
 
     def self.default_policy
       {
-        # :max_repeats => nil,
-        # :max_sequence => nil,
-        # :disallow_common_passwords => false,
+        # max_repeats: nil,
+        # max_sequence: nil,
+        # disallow_common_passwords: false,
+        # allow_login_suspension: false,
         min_length: 8,
         max_attempts: DEFAULT_MAX_ATTEMPTS
       }

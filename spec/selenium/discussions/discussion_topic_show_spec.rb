@@ -94,7 +94,7 @@ describe "Discussion Topic Show" do
       expect(f("body")).not_to contain_css(Discussion.summarize_button_selector)
     end
 
-    context "group discussions in a group context" do
+    context "group discussions in a course context" do
       it "loads without errors" do
         @group_discussion_topic = group_discussion_assignment
         get "/courses/#{@course.id}/discussion_topics/#{@group_discussion_topic.id}"
@@ -106,10 +106,33 @@ describe "Discussion Topic Show" do
         expect(fj("h1:contains('topic - group 1')")).to be_present
         expect_no_flash_message :error
       end
+
+      it "truncates long group names in the middle" do
+        group_category = @course.group_categories.create!(name: "category")
+        group1 = @course.groups.create!(name: "justasmalltowngirllivinginalonelyworldshetookthemidnighttraingoinganywhere first", group_category:)
+        group2 = @course.groups.create!(name: "justasmalltowngirllivinginalonelyworldshetookthemidnighttraingoinganywhere second", group_category:)
+        topic = @course.discussion_topics.build(title: "topic")
+        topic.group_category = group_category
+        topic.save!
+
+        get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+        f("button[data-testid='groups-menu-btn']").click
+        menu_items = ff("[data-testid='groups-menu-item']")
+        truncated_menu_items = ["justasmall…here first\n0 Unread", "justasmal…e second\n0 Unread"]
+        menu_items.each do |item|
+          expect(truncated_menu_items).to include item.text
+          hover(item)
+          # check tooltip text
+          expect(fj("span:contains('#{group1.name}')")).to be_present if item.text.include? "first"
+          expect(fj("span:contains('#{group2.name}')")).to be_present if item.text.include? "second"
+        end
+      end
     end
 
     it "Displays when all features are turned on" do
       Account.site_admin.enable_feature! :react_discussions_post
+      @course.root_account.enable_feature! :discussions_reporting
+      Account.site_admin.enable_feature! :discussion_checkpoints
 
       gc = @course.account.group_categories.create(name: "Group Category")
       group = group_model(name: "Group", group_category: gc, context: @course.account)
@@ -368,6 +391,15 @@ describe "Discussion Topic Show" do
         Discussion.click_assign_to_button
         wait_for_assign_to_tray_spinner
         expect(module_item_assign_to_card.last).to contain_css(due_date_input_selector)
+      end
+
+      it "does not show the button when the user does not have the moderate_forum permission" do
+        get "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
+        expect(element_exists?(Discussion.assign_to_button_selector)).to be_truthy
+
+        RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: teacher_role, enabled: false)
+        get "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
+        expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
       end
     end
 

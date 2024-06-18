@@ -221,7 +221,7 @@ module UserLearningObjectScopes
       if opts[:course_ids].present?
         active_enrollment_course_ids = Enrollment.where(Enrollment.active_student_conditions)
                                                  .where(user_id: id, course_id: opts[:course_ids]).pluck(:course_id)
-        assignments = assignments.visible_to_students_in_course_with_da(id, active_enrollment_course_ids)
+        assignments = assignments.visible_to_students_in_course_with_da([id], active_enrollment_course_ids)
       end
 
       assignments = assignments.need_submitting_info(id, limit) if purpose == "submitting"
@@ -315,7 +315,7 @@ module UserLearningObjectScopes
                          .merge(Assignment.published.where(peer_reviews: true))
 
       if due_before
-        ar_scope = ar_scope.where("assessor_asset.cached_due_date <= ?", due_before)
+        ar_scope = ar_scope.where(assessor_asset: { cached_due_date: ..due_before })
       end
 
       if due_after
@@ -453,8 +453,7 @@ module UserLearningObjectScopes
     objects_needing("WikiPage", "viewing", :student, params, 120.minutes, **opts) do |wiki_pages_context, shard_course_ids, shard_group_ids|
       wiki_pages_context
         .available_to_planner
-        .visible_to_user(self)
-        .for_courses_and_groups(shard_course_ids, shard_group_ids)
+        .visible_to_user_in_courses_and_groups(self, shard_course_ids, shard_group_ids)
         .todo_date_between(due_after, due_before)
     end
   end

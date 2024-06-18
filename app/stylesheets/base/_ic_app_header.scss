@@ -61,106 +61,6 @@ $ic-tooltip-arrow-size: 0.375rem;
   width: $ic-header-primary-width - 30;
   z-index: 100;
   background-color: var(--ic-brand-global-nav-bgd);
-
-  nav {
-    overflow: hidden;
-
-    /** New SideNav CSS */
-    .ic-sidenav-tray,
-    .ic-user-tray {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      width: 100% !important;
-      height: 40.96px !important;
-    }
-
-    .ic-user-tray {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      width: 100% !important;
-      height: 44px !important;
-      margin-bottom: 3px !important;
-    }
-
-    .ic-logo-tray {
-      width: 100% !important;
-      height: 75px !important;
-    }
-
-    .ic-sidenav-tray:hover,
-    .ic-user-tray:hover {
-      text-decoration: inherit;
-      color: var(--ic-brand-global-nav-menu-item__text-color);
-      background-color: rgba(0, 0, 0, 0.2);
-    }
-
-    .ic-sidenav-tray>div:first-child {
-      display: flex;
-      justify-content: center;
-
-      >svg {
-        width: 1.625rem !important;
-        height: 1.625rem !important;
-      }
-    }
-
-    .ic-svg-external-tool>div:first-child {
-      svg>path {
-        transform: scale(0.4);
-      }
-    }
-
-    .ic-sidenav-tray[data-selected="true"]:hover,
-    .ic-user-tray[data-selected="true"]:hover {
-      color: var(--ic-brand-primary) !important;
-      background-color: var(--ic-brand-global-nav-menu-item__text-color) !important;
-    }
-
-    .ic-logo-tray:hover {
-      color: var(--ic-brand-global-nav-menu-item__text-color) !important;
-    }
-
-    .ic-canvas-logo {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 72px;
-    }
-
-    .ic-canvas-logo>svg {
-      width: 1.695rem !important;
-      height: 1.695rem !important;
-    }
-
-    .ic-brand-logo {
-      margin: 0.275rem 0 -0.275rem 0;
-    }
-
-    .ic-user-avatar {
-      width: 1.875rem;
-      height: 1.875rem;
-    }
-
-    .ic-collapse-div {
-      display: flex;
-      align-items: end;
-      overflow: auto !important;
-      width: 100%;
-      height: 100%;
-    }
-
-    .ic-collapse-button {
-      width: 100%;
-      height: 44.96px !important;
-      padding: 0.75rem !important;
-    }
-
-    /** New SideNav CSS */
-  }
 }
 
 .ic-app-header__main-navigation {
@@ -436,91 +336,63 @@ button.ic-app-header__menu-list-link {
   padding: 0.5625rem 0;
 }
 
+#instui-sidenav {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+
+  li {
+    [id$="-tray"] {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      height: 40.95px;
+
+      &:hover {
+        color: var(--ic-brand-global-nav-menu-item__text-color);
+      }
+
+      &[data-selected="true"]:hover {
+        color: var(--ic-brand-global-nav-menu-item__text-color--active);
+      }
+    }
+
+    #user-tray {
+      height: 44px;
+    }
+
+    #logo-tray {
+      height: 75px;
+
+      &:hover {
+        svg {
+          fill: var(--ic-brand-global-nav-menu-item__text-color);
+        }
+      }
+    }
+
+    a::after {
+      color: var(--ic-brand-global-nav-menu-item__text-color);
+
+      &:hover {
+        color: var(--ic-brand-global-nav-menu-item__text-color);
+      }
+
+      &[data-selected="true"]:hover {
+        color: var(--ic-brand-global-nav-menu-item__text-color--active);
+      }
+    }
+  }
+}
+
 // stuff that changes when the nav is expanded
 body.primary-nav-expanded {
   .ic-app-header {
     width: $ic-header-primary-width;
     overflow-y: auto;
     -ms-overflow-style: none; // IE11 and below was throwing on scrollbars no matter if needed or not
-
-
-    nav {
-      overflow: hidden;
-
-      /** New SideNav CSS */
-      .ic-sidenav-tray,
-      .ic-user-tray {
-        gap: 0.2rem !important;
-        width: 100% !important;
-        min-height: 63.55px !important;
-        height: 100% !important;
-      }
-
-      .ic-user-tray {
-        height: 72.59px !important;
-      }
-
-      .ic-logo-tray {
-        width: 100% !important;
-        height: 85px !important;
-      }
-
-      .ic-sidenav-tray:hover,
-      .ic-user-tray:hover {
-        text-decoration: inherit;
-        color: var(--ic-brand-global-nav-menu-item__text-color) !important;
-        background-color: rgba(0, 0, 0, 0.2) !important;
-      }
-
-      .ic-sidenav-tray>div:first-child {
-        display: flex;
-        justify-content: center;
-
-        >svg {
-          width: 1.625rem !important;
-          height: 1.625rem !important;
-        }
-      }
-
-      .ic-svg-external-tool>div:first-child {
-        svg>path {
-          transform: scale(0.4);
-        }
-      }
-
-      .ic-sidenav-tray[data-selected="true"]:hover,
-      .ic-user-tray[data-selected="true"]:hover {
-        color: var(--ic-brand-primary) !important;
-        background-color: var(--ic-brand-global-nav-menu-item__text-color) !important;
-      }
-
-      .ic-logo-tray:hover {
-        color: var(--ic-brand-global-nav-menu-item__text-color) !important;
-      }
-
-      .ic-canvas-logo {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 85px;
-      }
-
-      .ic-canvas-logo>svg {
-        width: 2.63rem !important;
-        height: 2.63rem !important;
-      }
-
-      .ic-brand-logo {
-        margin: -0.4rem 0 -0.905rem 0;
-      }
-
-      .ic-user-avatar {
-        width: 2.25rem;
-        height: 2.25rem;
-      }
-
-      /** New SideNav CSS */
-    }
   }
 
   .ic-app-header__secondary-navigation {
@@ -578,6 +450,27 @@ body.primary-nav-expanded {
 
     &::after {
       display: none;
+    }
+  }
+
+  #instui-sidenav {
+    li {
+      [id$="-tray"] {
+        height: 63.55px;
+      }
+
+      [id$="-external-tool-tray"] {
+        min-height: 63.55px;
+        height: 100%;
+      }
+
+      #user-tray {
+        height: 72.59px;
+      }
+
+      #logo-tray {
+        height: 85px;
+      }
     }
   }
 }

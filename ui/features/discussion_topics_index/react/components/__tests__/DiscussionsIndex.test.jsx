@@ -67,7 +67,7 @@ describe('DiscussionIndex', () => {
   const oldEnv = window.ENV
 
   beforeEach(() => {
-    window.ENV.FEATURES.differentiated_modules = true
+    window.ENV.FEATURES.selective_release_ui_api = true
   })
 
   afterEach(() => {
@@ -125,7 +125,7 @@ describe('DiscussionIndex', () => {
           subscribed: false,
           can_lock: true,
           user_count: 5,
-          permissions: {delete: true, update: true},
+          permissions: {delete: true, update: true, manage_assign_to: true},
           author: {id: '1', display_name: 'bar', name: 'bar', html_url: ''},
         },
       ],

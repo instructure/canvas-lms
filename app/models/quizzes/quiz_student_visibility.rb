@@ -22,17 +22,22 @@ class Quizzes::QuizStudentVisibility < ActiveRecord::Base
 
   include VisibilityPluckingHelper
 
-  # we are temporarily using a setting here because the feature flag
-  # is not able to be directly checked when canvas boots
-  def self.reset_table_name
-    return super unless Setting.get("differentiated_modules_setting", "false") == "true"
-
-    self.table_name = "quiz_student_visibilities_v2"
-  end
-
   # create_or_update checks for !readonly? before persisting
   def readonly?
     true
+  end
+
+  def self.where_with_guard(*args)
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      raise StandardError, "QuizStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use QuizVisibilityService instead"
+    end
+
+    where_without_guard(*args)
+  end
+
+  class << self
+    alias_method :where_without_guard, :where
+    alias_method :where, :where_with_guard
   end
 
   def self.visible_quiz_ids_in_course_by_user(opts)

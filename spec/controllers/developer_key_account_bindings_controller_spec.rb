@@ -23,7 +23,21 @@ RSpec.describe DeveloperKeyAccountBindingsController do
   let(:root_account_admin) { account_admin_user(account: root_account) }
   let(:sub_account) { account_model(parent_account: root_account) }
   let(:sub_account_admin) { account_admin_user(account: sub_account) }
-  let(:root_account_developer_key) { DeveloperKey.create!(account: root_account) }
+  let(:root_account_developer_key) do
+    DeveloperKey.create!(
+      account: root_account,
+      lti_registration: root_account_lti_registration
+    )
+  end
+  let(:root_account_lti_registration) do
+    Lti::Registration.create!(
+      account: root_account,
+      name: "lti registration",
+      admin_nickname: "lti registration",
+      created_by: sub_account_admin,
+      updated_by: sub_account_admin
+    )
+  end
 
   let(:valid_parameters) do
     {
@@ -58,8 +72,16 @@ RSpec.describe DeveloperKeyAccountBindingsController do
       user_session(authorized_admin)
       post(:create_or_update, params:)
       expect(created_binding.account).to eq expected_account
-      expect(created_binding.developer_key_id).to eq params[:developer_key_id]
+      expect(created_binding.developer_key.global_id).to eq params[:developer_key_id]
       expect(created_binding.workflow_state).to eq params.dig(:developer_key_account_binding, :workflow_state)
+    end
+
+    it "creates a corresponding Lti::RegistrationAccountBinding" do
+      user_session(authorized_admin)
+      post(:create_or_update, params:)
+
+      new_lrab = Lti::RegistrationAccountBinding.last
+      expect(new_lrab.updated_by).to eq(authorized_admin)
     end
 
     it "renders a properly formatted developer key account binding" do
@@ -102,6 +124,17 @@ RSpec.describe DeveloperKeyAccountBindingsController do
       user_session(authorized_admin)
       post(:create_or_update, params:)
       expect(json_parse.keys).to match_array(expected_keys)
+    end
+
+    it "updates the corresponding Lti::RegistrationAccountBinding" do
+      user_session(authorized_admin)
+
+      params[:developer_key_account_binding][:workflow_state] = "allow"
+      post(:create_or_update, params:)
+
+      updated_binding.lti_registration_account_binding.reload
+      expect(updated_binding.lti_registration_account_binding.workflow_state).to eq("allow")
+      expect(updated_binding.lti_registration_account_binding.updated_by).to eq(authorized_admin)
     end
   end
 

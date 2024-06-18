@@ -17,7 +17,7 @@
  */
 
 import React, {useContext, useEffect, useState} from 'react'
-import {GradedDiscussionDueDatesContext} from '../../util/constants'
+import {DiscussionDueDatesContext} from '../../util/constants'
 import DifferentiatedModulesSection from '@canvas/due-dates/react/DifferentiatedModulesSection'
 import LoadingIndicator from '@canvas/loading-indicator'
 
@@ -32,7 +32,8 @@ export const ItemAssignToTrayWrapper = () => {
     importantDates,
     setImportantDates,
     pointsPossible,
-  } = useContext(GradedDiscussionDueDatesContext)
+    isGraded,
+  } = useContext(DiscussionDueDatesContext)
 
   const [overrides, setOverrides] = useState([])
   const [loading, setLoading] = useState(true)
@@ -186,6 +187,7 @@ export const ItemAssignToTrayWrapper = () => {
       type="discussion"
       importantDates={importantDates}
       defaultSectionId={DEFAULT_SECTION_ID}
+      supportDueDates={isGraded}
     />
   )
 }

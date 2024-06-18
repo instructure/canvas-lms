@@ -17,9 +17,9 @@
 
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import * as tz from '../index'
-import {fudgeDateForProfileTimezone} from '../date-functions'
-import {changeTimezone} from '../changeTimezone'
+import * as tz from '@instructure/moment-utils'
+import {fudgeDateForProfileTimezone} from '@instructure/moment-utils'
+import {changeTimezone} from '@instructure/moment-utils/changeTimezone'
 import 'jqueryui/datepicker'
 import '@canvas/jquery-keycodes'
 import renderDatepickerTime from '../react/components/render-datepicker-time'

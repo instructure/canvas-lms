@@ -40,6 +40,12 @@ module Canvas::Security
       Canvas.redis
     end
 
+    WARNING_ATTEMPTS = {
+      remaining_attempts_2: 2,
+      remaining_attempts_1: 1,
+      final_attempt: 0,
+    }.freeze
+
     ##
     # this is the expected interface for the rest of the application.
     # When a pseudonym tries to login, it should be run through this method.
@@ -51,9 +57,16 @@ module Canvas::Security
     # @param [Pseudonym] pseudonym Pseudonym model instance with global_id and unique_id methods
     # @param [Boolean] valid_password whether the provided credentials were valid for this user
     #
-    # @return [:too_many_attempts, :too_recent_login, nil] :too_many_attempts if login is prohibited, nil if it's fine to proceed
+    # @return [:too_many_attempts, :too_recent_login, nil] :too_many_attempts if login is prohibited,
+    # :too_recent_login if too many successful logins in succession, nil if it's fine to proceed
     def self.audit_login(pseudonym, valid_password)
-      return :too_many_attempts unless allow_login_attempt?(pseudonym)
+      if pseudonym&.account&.allow_login_suspension?
+        attempt = allow_login_attempt?(pseudonym)
+
+        return attempt if WARNING_ATTEMPTS.key?(attempt)
+      else
+        return :too_many_attempts unless allow_login_attempt?(pseudonym)
+      end
 
       if valid_password
         return :too_recent_login if recently_logged_in?(pseudonym)
@@ -77,7 +90,26 @@ module Canvas::Security
       end
 
       total, _count = redis.hmget(login_attempts_key(pseudonym), "total", failsafe: nil)
-      !total || total.to_i < max_attempts
+      total = total.to_i
+
+      if pseudonym.account.allow_login_suspension?
+        return :final_attempt if total > max_attempts
+
+        difference = (max_attempts - total).abs
+        case difference
+        when 3
+          failed_login!(pseudonym)
+          return :remaining_attempts_2
+        when 2
+          failed_login!(pseudonym)
+          return :remaining_attempts_1
+        when 1
+          pseudonym.suspend! if pseudonym.active?
+          return :final_attempt
+        end
+      end
+
+      total < max_attempts
     end
 
     def self.recently_logged_in?(pseudonym)

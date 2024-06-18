@@ -47,7 +47,7 @@ describe DiscussionTopic::PromptPresenter do
     end
   end
 
-  describe "#dynamic_content_for_summary" do
+  describe "#content_for_summary" do
     it "generates correct discussion summary" do
       expected_output = <<~TEXT
         DISCUSSION BY instructor_1 WITH TITLE:
@@ -76,7 +76,7 @@ describe DiscussionTopic::PromptPresenter do
         '''
       TEXT
 
-      expect(@presenter.dynamic_content_for_summary.strip).to eq(expected_output.strip)
+      expect(@presenter.content_for_summary.strip).to eq(expected_output.strip)
     end
   end
 end
