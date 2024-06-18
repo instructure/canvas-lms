@@ -96,6 +96,7 @@ export const VerticalButtonDisplay = ({
                     <View as="div" display="block">
                       <Text
                         size="x-small"
+                        themeOverride={{paragraphMargin: 0}}
                         dangerouslySetInnerHTML={escapeNewLineText(rating.longDescription)}
                       />
                     </View>
