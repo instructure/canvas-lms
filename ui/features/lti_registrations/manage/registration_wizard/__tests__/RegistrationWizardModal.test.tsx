@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {RegistrationWizardModal} from '../RegistrationWizardModal'
 import {ZAccountId} from '../../model/AccountId'
 import {
+  openDynamicRegistrationWizard,
   openRegistrationWizard,
   useRegistrationModalWizardState,
 } from '../RegistrationWizardModalState'
@@ -50,61 +51,88 @@ describe('RegistrationWizardModal', () => {
     console.warn = warn
   })
 
-  beforeEach(() => {
-    openRegistrationWizard({
-      dynamicRegistrationUrl: '',
-      lti_version: '1p3',
-      method: 'dynamic_registration',
-      registering: false,
-      progress: 0,
-      progressMax: 100,
+  describe('When opened normally', () => {
+    beforeEach(() => {
+      openRegistrationWizard({
+        dynamicRegistrationUrl: '',
+        lti_version: '1p3',
+        method: 'dynamic_registration',
+        registering: false,
+        progress: 0,
+        progressMax: 100,
+        exitOnCancel: false,
+      })
+    })
+
+    afterEach(() => {
+      useRegistrationModalWizardState.getState().close()
+    })
+
+    it('should render the modal title', () => {
+      const accountId = ZAccountId.parse('123')
+      render(<RegistrationWizardModal accountId={accountId} />)
+      const headerText = screen.getByText(/Install App/i)
+      expect(headerText).toBeInTheDocument()
+    })
+
+    it('should disable the next button when there is no dynamic registration url', () => {
+      const accountId = ZAccountId.parse('123')
+      render(<RegistrationWizardModal accountId={accountId} />)
+      const nextButton = screen.getByRole('button', {
+        name: /Next/i,
+      })
+      expect(nextButton).toBeInTheDocument()
+      expect(nextButton).toBeDisabled()
+    })
+
+    it('should enable the next button when there is a valid url in the dynamic registration input', () => {
+      const accountId = ZAccountId.parse('123')
+      render(<RegistrationWizardModal accountId={accountId} />)
+      const urlInput = screen.getByLabelText(/Dynamic Registration URL/i, {selector: 'input'})
+      fireEvent.change(urlInput, {target: {value: 'https://example.com'}})
+      const nextButton = screen.getByRole('button', {
+        name: /Next/i,
+      })
+      expect(nextButton).toBeInTheDocument()
+      expect(nextButton).toBeEnabled()
+    })
+
+    it('should render the dynamic registration wizard when dynamic registration is selected', () => {
+      const accountId = ZAccountId.parse('123')
+      const screen = render(<RegistrationWizardModal accountId={accountId} />)
+      const urlInput = screen.getByLabelText(/Dynamic Registration URL/i, {selector: 'input'})
+      fireEvent.change(urlInput, {target: {value: 'https://example.com'}})
+      const nextButton = screen.getByRole('button', {
+        name: /Next/i,
+      })
+      fireEvent.click(nextButton)
+      // expect the dynamic registration wizard to be rendered
+      const el = screen.getByText(/Loading/i, {ignore: 'title'})
+      expect(el).toBeInTheDocument()
     })
   })
 
-  afterEach(() => {
-    useRegistrationModalWizardState.getState().close()
-  })
-
-  it('should render the modal title', () => {
-    const accountId = ZAccountId.parse('123')
-    render(<RegistrationWizardModal accountId={accountId} />)
-    const headerText = screen.getByText(/Install App/i)
-    expect(headerText).toBeInTheDocument()
-  })
-
-  it('should disable the next button when there is no dynamic registration url', () => {
-    const accountId = ZAccountId.parse('123')
-    render(<RegistrationWizardModal accountId={accountId} />)
-    const nextButton = screen.getByRole('button', {
-      name: /Next/i,
+  describe('when pre-opened with dynamic registration', () => {
+    it('should exit the modal when the cancel button is clicked & exitOnCancel is true', async () => {
+      openRegistrationWizard({
+        dynamicRegistrationUrl: 'http://example.com',
+        lti_version: '1p3',
+        method: 'dynamic_registration',
+        registering: true,
+        progress: 0,
+        progressMax: 100,
+        exitOnCancel: true,
+      })
+      const accountId = ZAccountId.parse('123')
+      const screen = render(<RegistrationWizardModal accountId={accountId} />)
+      screen.debug()
+      const cancelButton = screen.getByRole('button', {
+        name: /Cancel/i,
+      })
+      fireEvent.click(cancelButton)
+      await waitFor(() => {
+        expect(screen.queryByText(/Install App/i)).not.toBeInTheDocument()
+      })
     })
-    expect(nextButton).toBeInTheDocument()
-    expect(nextButton).toBeDisabled()
-  })
-
-  it('should enable the next button when there is a valid url in the dynamic registration input', () => {
-    const accountId = ZAccountId.parse('123')
-    render(<RegistrationWizardModal accountId={accountId} />)
-    const urlInput = screen.getByLabelText(/Dynamic Registration URL/i, {selector: 'input'})
-    fireEvent.change(urlInput, {target: {value: 'https://example.com'}})
-    const nextButton = screen.getByRole('button', {
-      name: /Next/i,
-    })
-    expect(nextButton).toBeInTheDocument()
-    expect(nextButton).toBeEnabled()
-  })
-
-  it('should render the dynamic registration wizard when dynamic registration is selected', () => {
-    const accountId = ZAccountId.parse('123')
-    const screen = render(<RegistrationWizardModal accountId={accountId} />)
-    const urlInput = screen.getByLabelText(/Dynamic Registration URL/i, {selector: 'input'})
-    fireEvent.change(urlInput, {target: {value: 'https://example.com'}})
-    const nextButton = screen.getByRole('button', {
-      name: /Next/i,
-    })
-    fireEvent.click(nextButton)
-    // expect the dynamic registration wizard to be rendered
-    const el = screen.getByText(/Loading/i, {ignore: 'title'})
-    expect(el).toBeInTheDocument()
   })
 })

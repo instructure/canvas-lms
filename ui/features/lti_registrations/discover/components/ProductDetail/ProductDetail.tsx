@@ -17,28 +17,29 @@
  */
 
 import React, {useState} from 'react'
-import {useLocation} from 'react-router-dom'
-import {fetchProductDetails, fetchProducts} from '../../queries/productsQuery'
-import {useQuery} from '@tanstack/react-query'
-import LtiDetailModal from './LtiDetailModal'
-import {Flex} from '@instructure/ui-flex'
-import {Img} from '@instructure/ui-img'
-import {Text} from '@instructure/ui-text'
-import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
-import {Pill} from '@instructure/ui-pill'
+import {Flex} from '@instructure/ui-flex'
 import {
+  IconA11yLine,
   IconExpandStartLine,
   IconExternalLinkLine,
   IconEyeLine,
-  IconQuizTitleLine,
-  IconA11yLine,
   IconMessageLine,
+  IconQuizTitleLine,
 } from '@instructure/ui-icons'
+import {Img} from '@instructure/ui-img'
+import {Link} from '@instructure/ui-link'
+import {Pill} from '@instructure/ui-pill'
+import {Text} from '@instructure/ui-text'
+import {useQuery} from '@tanstack/react-query'
+import {useLocation} from 'react-router-dom'
+import {fetchProductDetails, fetchProducts} from '../../queries/productsQuery'
 import ImageCarousel from './ImageCarousel'
+import LtiDetailModal from './LtiDetailModal'
 
-import ProductCard from '../ProductCard/ProductCard'
+import {openDynamicRegistrationWizard} from '../../../manage/registration_wizard/RegistrationWizardModalState'
 import type {Product} from '../../model/Product'
+import ProductCard from '../ProductCard/ProductCard'
 
 const ProductDetail = () => {
   const [isModalOpen, setModalOpen] = useState(false)
@@ -134,7 +135,16 @@ const ProductDetail = () => {
               </Flex.Item>
             </Flex.Item>
             <Flex.Item align="start">
-              <Button color="primary">Configure</Button>
+              <Button
+                color="primary"
+                onClick={() => {
+                  // todo: replace the url with the actual dynamic registration url
+                  // from Product listing API
+                  openDynamicRegistrationWizard('http://yaltt.inst.test/dynamic-registration')
+                }}
+              >
+                Configure
+              </Button>
             </Flex.Item>
           </Flex>
           <Flex margin="0 0 0 xx-large">

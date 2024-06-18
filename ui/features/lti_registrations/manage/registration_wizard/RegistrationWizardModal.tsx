@@ -38,6 +38,7 @@ import {
   updateRegistrationOverlay,
 } from '../api/ltiImsRegistration'
 import {deleteDeveloperKey, updateDeveloperKeyWorkflowState} from '../api/developerKey'
+import type {DynamicRegistrationWizardService} from '../dynamic_registration_wizard/DynamicRegistrationWizardService'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -71,10 +72,17 @@ export const RegistrationWizardModal = (props: RegistrationWizardModalProps) => 
         }}
         margin="0 0 small"
       />
-
       <ModalBodyWrapper state={state} accountId={props.accountId} />
     </Modal>
   )
+}
+
+const dynamicRegistrationWizardService: DynamicRegistrationWizardService = {
+  deleteDeveloperKey,
+  fetchRegistrationToken,
+  getRegistrationByUUID,
+  updateDeveloperKeyWorkflowState,
+  updateRegistrationOverlay,
 }
 
 const ModalBodyWrapper = ({
@@ -86,13 +94,7 @@ const ModalBodyWrapper = ({
 }) => {
   return state.registering && state.method === 'dynamic_registration' ? (
     <DynamicRegistrationWizard
-      service={{
-        deleteDeveloperKey,
-        fetchRegistrationToken,
-        getRegistrationByUUID,
-        updateDeveloperKeyWorkflowState,
-        updateRegistrationOverlay,
-      }}
+      service={dynamicRegistrationWizardService}
       dynamicRegistrationUrl={state.dynamicRegistrationUrl}
       accountId={accountId}
       unregister={state.unregister}
