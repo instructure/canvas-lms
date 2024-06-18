@@ -80,10 +80,11 @@ describe('ItemAssignToCard', () => {
       isCheckpointed: true,
     })
     expect(getByLabelText('Reply to Topic Due Date')).toBeInTheDocument()
+    expect(getByLabelText('Required Replies Due Date')).toBeInTheDocument()
     expect(getByLabelText('Available from')).toBeInTheDocument()
     expect(getByLabelText('Until')).toBeInTheDocument()
-    // rather than query for not due date, notice length remains 3
-    expect(getAllByLabelText('Time').length).toBe(3)
+    // rather than query for not due date, notice length remains 4
+    expect(getAllByLabelText('Time').length).toBe(4)
   })
 
   describe('describes the render order', () => {
@@ -108,8 +109,20 @@ describe('ItemAssignToCard', () => {
       expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM')
     })
 
+    it('renders the Required Replies Due Date 2nd from the top', () => {
+      window.ENV.DEFAULT_DUE_TIME = '08:00:00'
+      const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({
+        due_at: undefined,
+        isCheckpointed: true,
+      })
+      const dateInput = getByLabelText('Required Replies Due Date')
+      fireEvent.change(dateInput, {target: {value: 'Nov 10, 2020'}})
+      getByRole('option', {name: /10 november 2020/i}).click()
+      expect(getAllByLabelText('Time')[1]).toHaveValue('8:00 AM')
+    })
+
     describe('isCheckpointed is true', () => {
-      it.skip('renders the Available From 3rd from the top', () => {
+      it('renders the Available From 3rd from the top', () => {
         const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({
           due_at: undefined,
           isCheckpointed: true,
@@ -120,7 +133,7 @@ describe('ItemAssignToCard', () => {
         expect(getAllByLabelText('Time')[2]).toHaveValue('12:00 AM')
       })
 
-      it.skip('renders the Available Until 4th from the top', () => {
+      it('renders the Available Until 4th from the top', () => {
         const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({
           due_at: undefined,
           isCheckpointed: true,
@@ -151,6 +164,11 @@ describe('ItemAssignToCard', () => {
   it('does not render the reply to topic input if removeDueDateInput is set & isCheckpointed is not set', () => {
     const {queryByLabelText} = renderComponent({removeDueDateInput: true, isCheckpointed: false})
     expect(queryByLabelText('Reply to Topic Due Date')).not.toBeInTheDocument()
+  })
+
+  it('does not render the required replies input if removeDueDateInput is set & isCheckpointed is not set', () => {
+    const {queryByLabelText} = renderComponent({removeDueDateInput: true, isCheckpointed: false})
+    expect(queryByLabelText('Required Replies Due Date')).not.toBeInTheDocument()
   })
 
   it('renders the delete button when onDelete is provided', () => {
@@ -557,7 +575,10 @@ describe('ItemAssignToCard', () => {
     describe('isCheckpointed is true', () => {
       it('labels the clear buttons on cards with no pills', () => {
         renderComponent({isCheckpointed: true})
-        const labels = ['Clear reply to topic due date/time']
+        const labels = [
+          'Clear reply to topic due date/time',
+          'Clear required replies due date/time'
+        ]
         labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
       })
 
@@ -567,7 +588,10 @@ describe('ItemAssignToCard', () => {
           selectedAssigneeIds: ['student-1'],
           isCheckpointed: true,
         })
-        const labels = ['Clear reply to topic due date/time for John']
+        const labels = [
+          'Clear reply to topic due date/time for John',
+          'Clear required replies due date/time for John'
+        ]
         labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
       })
 
@@ -580,7 +604,10 @@ describe('ItemAssignToCard', () => {
           selectedAssigneeIds: ['student-1', 'student-2'],
           isCheckpointed: true,
         })
-        const labels = ['Clear reply to topic due date/time for John and Alice']
+        const labels = [
+          'Clear reply to topic due date/time for John and Alice',
+          'Clear required replies due date/time for John and Alice'
+        ]
         labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
       })
 
@@ -594,7 +621,10 @@ describe('ItemAssignToCard', () => {
           selectedAssigneeIds: ['student-1', 'student-2', 'student-3'],
           isCheckpointed: true,
         })
-        const labels = ['Clear reply to topic due date/time for John, Alice, and Linda']
+        const labels = [
+          'Clear reply to topic due date/time for John, Alice, and Linda',
+          'Clear required replies due date/time for John, Alice, and Linda'
+        ]
         labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
       })
 
@@ -609,7 +639,10 @@ describe('ItemAssignToCard', () => {
           selectedAssigneeIds: ['student-1', 'student-2', 'student-3', 'student-4'],
           isCheckpointed: true,
         })
-        const labels = ['Clear reply to topic due date/time for John, Alice, and 2 others']
+        const labels = [
+          'Clear reply to topic due date/time for John, Alice, and 2 others',
+          'Clear required replies due date/time for John, Alice, and 2 others'
+        ]
         labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
       })
     })
