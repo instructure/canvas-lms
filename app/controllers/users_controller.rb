@@ -227,6 +227,7 @@ class UsersController < ApplicationController
                                                        masquerade]
   skip_before_action :load_user, only: [:create_self_registered_user]
   before_action :require_self_registration, only: %i[new create create_self_registered_user]
+  before_action :check_limited_access_for_students, only: %i[create_file]
 
   def grades
     @user = User.where(id: params[:user_id]).first if params[:user_id].present?

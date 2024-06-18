@@ -141,6 +141,12 @@ describe FilesController do
   end
 
   describe "GET 'index'" do
+    def enable_limited_access_for_students
+      @course.account.root_account.enable_feature!(:allow_limited_access_for_students)
+      @course.account.settings[:enable_limited_access_for_students] = true
+      @course.account.save!
+    end
+
     it "requires authorization" do
       get "index", params: { course_id: @course.id }
       assert_unauthorized
@@ -190,14 +196,31 @@ describe FilesController do
       expect(assigns[:js_env][:FILES_CONTEXTS][0][:file_menu_tools]).to eq []
     end
 
-    it "redirects to course homepage if context is course in limited access account" do
-      @course.account.root_account.enable_feature!(:allow_limited_access_for_students)
-      @course.account.settings[:enable_limited_access_for_students] = true
-      @course.account.save!
+    it "redirects to course homepage if context is course in limited access for students account" do
+      enable_limited_access_for_students
 
       user_session(@student)
       get "index", params: { course_id: @course.id }
       expect(response).to redirect_to(course_path(@course))
+    end
+
+    it "renders unauthorized if context is a User enrolled as student in a limited access for students account" do
+      enable_limited_access_for_students
+
+      user_session(@student)
+      get "index", params: { user_id: @student.id }
+      expect(response.code.to_i).to be 401
+    end
+
+    it "renders unauthorized if context is a Group and user is student in a limited access for students account" do
+      enable_limited_access_for_students
+
+      category = group_category
+      @group = category.groups.create(context: @course)
+
+      user_session(@student)
+      get "index", params: { group_id: @group.id }
+      expect(response.code.to_i).to be 401
     end
 
     context "file menu tool visibility" do
