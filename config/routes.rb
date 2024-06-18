@@ -974,7 +974,7 @@ CanvasRails::Application.routes.draw do
   get "message_templates" => "messages#templates"
   resource :profile, controller: :profile, only: [:show, :update] do
     resources :pseudonyms, except: :index
-    resources :tokens, except: :index
+    resources :tokens, except: [:index, :destroy]
     member do
       put :update_profile
       get :communication
@@ -1275,6 +1275,10 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/terms", action: :create
       put "accounts/:account_id/terms/:id", action: :update
       delete "accounts/:account_id/terms/:id", action: :destroy
+    end
+
+    scope(controller: :tokens) do
+      delete "users/:user_id/tokens/:id", action: :destroy, as: "token"
     end
 
     scope(controller: :authentication_audit_api) do

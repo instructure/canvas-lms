@@ -56,6 +56,14 @@ class AccessToken < ActiveRecord::Base
     end
   end
 
+  set_policy do
+    given { |user| user.id == user_id }
+    can :delete
+
+    given { |user| self.user.check_accounts_right?(user, :manage_access_tokens) }
+    can :delete
+  end
+
   # For user-generated tokens, purpose can be manually set.
   # For app-generated tokens, this should be generated based
   # on the scope defined in the auth process (scope has not
@@ -66,6 +74,7 @@ class AccessToken < ActiveRecord::Base
 
   TOKEN_SIZE = 64
   TOKEN_TYPES = [:crypted_token, :crypted_refresh_token].freeze
+  HINT_LENGTH = 5
 
   before_create :generate_token
   before_create :generate_refresh_token
@@ -103,6 +112,13 @@ class AccessToken < ActiveRecord::Base
     # However, what we're essentially looking for is a hash of the token
     # "signed" or concatenated with the secret encryption key, so this is perfect.
     Canvas::Security.hmac_sha1(token, key)
+  end
+
+  # @return [String, false]
+  #   the de-mangled token hint that should match the database if the id is a
+  #   valid token hint, false otherwise
+  def self.token_hint?(id)
+    id.is_a?(String) && id.length == HINT_LENGTH && id
   end
 
   def self.all_hashed_tokens(token)
@@ -194,7 +210,7 @@ class AccessToken < ActiveRecord::Base
   def token=(new_token)
     self.crypted_token = AccessToken.hashed_token(new_token)
     @full_token = new_token
-    self.token_hint = new_token[0, 5]
+    self.token_hint = new_token[0, HINT_LENGTH]
   end
 
   def clear_full_token!
