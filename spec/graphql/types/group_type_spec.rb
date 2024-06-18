@@ -124,4 +124,20 @@ describe Types::GroupType do
       expect(tester.resolve("sisId")).to be_nil
     end
   end
+
+  context "ActivityStream" do
+    it "returns the activity stream summary" do
+      course_with_teacher(active_all: true, user: user_with_pseudonym)
+      @group = @course.groups.create!(name: "Group 1")
+      @group.users << @user
+      @context = @group
+      @topic1 = discussion_topic_model
+
+      cur_resolver = GraphQLTypeTester.new(@group, current_user: @user)
+      expect(cur_resolver.resolve("activityStream { summary { type } }")).to match_array %w[DiscussionTopic]
+      expect(cur_resolver.resolve("activityStream { summary { count } } ")).to match_array [1]
+      expect(cur_resolver.resolve("activityStream { summary { unreadCount } } ")).to match_array [1]
+      expect(cur_resolver.resolve("activityStream { summary { notificationCategory } } ")).to match_array [nil]
+    end
+  end
 end
