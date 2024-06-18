@@ -673,7 +673,7 @@ class AccountsController < ApplicationController
   #   - All explanations can be seen in the {api:CoursesController#index Course API index documentation}
   #   - "sections", "needs_grading_count" and "total_scores" are not valid options at the account level
   #
-  # @argument sort [String, "course_name"|"sis_course_id"|"teacher"|"account_name"]
+  # @argument sort [String, "course_status"|"course_name"|"sis_course_id"|"teacher"|"account_name"]
   #   The column to sort results by.
   #
   # @argument order [String, "asc"|"desc"]
@@ -716,6 +716,12 @@ class AccountsController < ApplicationController
     sortable_name_col = User.sortable_name_order_by_clause("users")
 
     order = case params[:sort]
+            when "course_status"
+              "(CASE
+                WHEN workflow_state = 'available' THEN 1
+                WHEN workflow_state = 'completed' THEN 2
+                ELSE 0
+              END)"
             when "course_name"
               Course.best_unicode_collation_key("courses.name").to_s
             when "sis_course_id"

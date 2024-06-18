@@ -35,8 +35,14 @@ export default function CoursesList(props) {
     <Table margin="small 0" caption={I18n.t('Courses')}>
       <Table.Head>
         <Table.Row>
-          <Table.ColHeader id="header-status" width="1">
-            {I18n.t('Status')}
+          <Table.ColHeader id="header-course-status">
+            <CoursesListHeader
+              {...props}
+              id="course_status"
+              label={I18n.t('Status')}
+              tipDesc={I18n.t('Click to sort by status ascending')}
+              tipAsc={I18n.t('Click to sort by status descending')}
+            />
           </Table.ColHeader>
           <Table.ColHeader id="header-course-name">
             <CoursesListHeader

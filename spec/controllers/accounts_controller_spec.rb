@@ -1373,6 +1373,33 @@ describe AccountsController do
       expect(response.body).not_to match(/sections/)
     end
 
+    context "sort by course status" do
+      before do
+        @c1.workflow_state = "created"
+        @c1.save
+        @c2.workflow_state = "available"
+        @c2.save
+        @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
+        @c3.workflow_state = "completed"
+        @c3.save
+        admin_logged_in(@account)
+      end
+
+      it "is able to sort by status ascending" do
+        get "courses_api", params: { account_id: @account.id, sort: "course_status", order: "asc" }
+
+        expect(response).to be_successful
+        expect(response.body).to match(/"name":"foo".+"name":"bar".+"name":"apple"/)
+      end
+
+      it "is able to sort by status descending" do
+        get "courses_api", params: { account_id: @account.id, sort: "course_status", order: "desc" }
+
+        expect(response).to be_successful
+        expect(response.body).to match(/"name":"apple".+"name":"bar".+"name":"foo"/)
+      end
+    end
+
     it "is able to sort courses by name ascending" do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
       @c4 = course_factory(account: @account, course_name: "xylophone", sis_source_id: 52)
