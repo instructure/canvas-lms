@@ -2225,3 +2225,5 @@
   path: /api/v1/accounts/:account_id/learn_platform/products/:id
 - verb: GET
   path: /api/v1/accounts/:account_id/learn_platform/filters
+- verb: DELETE
+  path: /api/v1/users/:user_id/tokens/:id

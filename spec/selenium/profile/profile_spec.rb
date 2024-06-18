@@ -331,11 +331,11 @@ describe "profile" do
       @token1 = @user.access_tokens.create! purpose: "token_one"
       @token2 = @user.access_tokens.create! purpose: "token_two"
       get "/profile/settings"
-      fj(".delete_key_link[rel$=#{@token2.id}]").click
+      fj(".delete_key_link[rel$='#{@token2.token_hint}']").click
       expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      check_element_has_focus fj(".delete_key_link[rel$=#{@token1.id}]")
+      check_element_has_focus fj(".delete_key_link[rel$='#{@token1.token_hint}']")
     end
   end
 
