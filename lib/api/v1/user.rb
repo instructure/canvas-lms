@@ -229,10 +229,11 @@ module Api::V1::User
       display_name: user.short_name,
       avatar_image_url: avatar_url_for_user(user),
       html_url: participant_url,
-      pronouns: user.pronouns
+      pronouns: user.pronouns,
     }
     hash[:avatar_is_fallback] = user.avatar_image_url.nil? if includes.include?(:avatar_is_fallback) && avatars_enabled_for_user?(user)
     hash[:fake_student] = true if user.fake_student?
+    hash[:email] = user.email if user.email.present? && includes.include?(:email)
     hash
   end
 
