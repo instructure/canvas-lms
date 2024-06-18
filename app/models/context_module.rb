@@ -269,6 +269,10 @@ class ContextModule < ActiveRecord::Base
     assignment_overrides.active.exists?
   end
 
+  def visible_to_everyone
+    !only_visible_to_overrides
+  end
+
   def duplicate
     copy_title = get_copy_title(self, t("Copy"), name)
     new_module = duplicate_base_model(copy_title)

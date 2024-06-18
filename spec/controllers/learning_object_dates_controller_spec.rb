@@ -111,6 +111,7 @@ describe LearningObjectDatesController do
                                  "id" => context_module.id,
                                  "unlock_at" => nil,
                                  "only_visible_to_overrides" => true,
+                                 "visible_to_everyone" => false,
                                  "graded" => false,
                                  "overrides" => [{
                                    "id" => @override.id,

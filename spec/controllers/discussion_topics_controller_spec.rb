@@ -457,7 +457,9 @@ describe DiscussionTopicsController do
         end
 
         it "is visible only to students in module override section" do
-          create_module_and_assign_topic(@topic, @student2)
+          @topic.only_visible_to_overrides = false
+          @topic.save
+          create_module_and_module_override(@topic, @student2)
 
           user_session(@student2)
           get "index", params: { course_id: @course.id }, format: :json
@@ -505,7 +507,9 @@ describe DiscussionTopicsController do
         end
 
         it "shows observers module overridden topics for their students" do
-          create_module_and_assign_topic(@topic, @student2)
+          @topic.only_visible_to_overrides = false
+          @topic.save
+          create_module_and_module_override(@topic, @student2)
 
           @observer_enrollment.associated_user = @student2
           @observer_enrollment.save
@@ -576,14 +580,11 @@ describe DiscussionTopicsController do
         topic.assignment_overrides.create!(set: section)
       end
 
-      def create_module_and_assign_topic(topic, student)
+      def create_module_and_module_override(topic, student)
         context_module = @course.context_modules.create!(name: "module")
-        context_module.content_tags.create!(content: topic, context: @course)
+        context_module.add_item({ id: topic.id, type: "discussion_topic" })
 
-        override = topic.assignment_overrides.create!(unlock_at: "2022-02-01T01:00:00Z",
-                                                      unlock_at_overridden: true,
-                                                      lock_at: "2022-02-02T01:00:00Z",
-                                                      lock_at_overridden: true)
+        override = context_module.assignment_overrides.create!(set_type: "ADHOC")
         override.assignment_override_students.create!(user: student)
       end
     end
@@ -976,6 +977,37 @@ describe DiscussionTopicsController do
       end
 
       it "is not visible to students not in specific section discussions" do
+        user_session(@student2)
+        get("show", params: { course_id: @course.id, id: @discussion.id })
+        expect(response).to be_redirect
+        expect(response.location).to eq course_discussion_topics_url @course
+      end
+    end
+
+    context "ungraded discussions with module overrides" do
+      before(:once) do
+        course_with_teacher(active_course: true)
+
+        @discussion = @course.discussion_topics.create!(user: @teacher, message: "hello my favorite section!")
+
+        @student1, @student2 = create_users(2, return_type: :record)
+        @course.enroll_student(@student1, enrollment_state: "active")
+        @course.enroll_student(@student2, enrollment_state: "active")
+
+        @context_module = @course.context_modules.create!(name: "module")
+        @context_module.add_item({ id: @discussion.id, type: "discussion_topic" })
+
+        override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
+        override.assignment_override_students.create!(user: @student1)
+      end
+
+      it "is visible to students with module override" do
+        user_session(@student1)
+        get "show", params: { course_id: @course.id, id: @discussion.id }
+        expect(response).to be_successful
+      end
+
+      it "is not visible to students without module override" do
         user_session(@student2)
         get("show", params: { course_id: @course.id, id: @discussion.id })
         expect(response).to be_redirect
