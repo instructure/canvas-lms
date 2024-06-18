@@ -41,6 +41,7 @@ export const CREATE_SUBMISSION_COMMENT = gql`
         id
         comment
         read
+        draft
         author {
           _id
           id
