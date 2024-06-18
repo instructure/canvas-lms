@@ -18,26 +18,31 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import ready from '@instructure/ready'
-import speedGrader from './jquery/speed_grader'
-import {getCurrentTheme} from '@instructure/theme-registry'
+
 import {captureException} from '@sentry/browser'
+import {Spinner} from '@instructure/ui-spinner'
+import ready from '@instructure/ready'
+import {getCurrentTheme} from '@instructure/theme-registry'
+
 import {getAssignment} from './queries/assignmentQuery'
 import {getCourse} from './queries/courseQuery'
 import {getSectionsByAssignment} from './queries/sectionsByAssignmentQuery'
 import {getSubmission} from './queries/submissionQuery'
 import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
+
 import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
 import {hideAssignmentGradesForSections} from './mutations/hideAssignmentGradesForSectionsMutation'
+import {postDraftSubmissionComment} from './mutations/postDraftSubmissionCommentMutation'
 import {
   postAssignmentGradesForSections,
   resolvePostAssignmentGradesStatus,
 } from './mutations/postAssignmentGradesForSectionsMutation'
+
+import {useScope as useI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import speedGrader from './jquery/speed_grader'
 
 const I18n = useI18nScope('speed_grader')
 
@@ -65,6 +70,7 @@ ready(() => {
             createSubmissionComment,
             hideAssignmentGradesForSections,
             postAssignmentGradesForSections,
+            postDraftSubmissionComment,
           },
           context: {
             courseId: window.ENV.course_id,
