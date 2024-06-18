@@ -203,6 +203,18 @@ class StudentAssignmentPageV2
       f("div[data-testid='rubric-tab']")
     end
 
+    def peer_review_prompt_modal
+      f('[data-testid="peer-review-prompt-modal"]')
+    end
+
+    def peer_review_prompt_modal_close_button
+      f('[data-testid="peer-review-modal-close-button"]')
+    end
+
+    def view_rubric_button
+      f("button[data-testid='view-rubric-button']")
+    end
+
     def similarity_pledge_checkbox
       f("input[data-testid='similarity-pledge-checkbox']")
     end
@@ -294,6 +306,10 @@ class StudentAssignmentPageV2
 
     def select_grader(grader)
       click_INSTUI_Select_option(f('[data-testid="select-grader-dropdown"]'), grader)
+    end
+
+    def grader_select_dropdown
+      f('[data-testid="select-grader-dropdown"]')
     end
 
     def rubric_comments
