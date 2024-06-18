@@ -437,6 +437,240 @@ describe ConversationMessage do
     end
   end
 
+  context "check_for_out_of_office_recipients" do
+    before do
+      allow(ConversationMessage).to receive(:delay_if_production)
+      course_with_teacher
+      @student1 = student_in_course.user
+      @student1_inbox_settings = Inbox::InboxService.inbox_settings_for_user(user_id: @student1.id, root_account_id: Account.default.id)
+      @teacher_inbox_settings = Inbox::InboxService.update_inbox_settings_for_user(
+        user_id: @teacher.id,
+        root_account_id: Account.default.id,
+        use_signature: true,
+        signature: "",
+        use_out_of_office: true,
+        out_of_office_first_date: Time.zone.today,
+        out_of_office_last_date: Time.zone.tomorrow,
+        out_of_office_subject: "OOO",
+        out_of_office_message: "Out of Office"
+      )
+      @conversation = @student1.initiate_conversation([@student1, @teacher])
+    end
+
+    it "does not trigger an OOO auto response if inbox_settings FF is disabled" do
+      expect(ConversationMessage.count).to eq(0)
+      @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+      expect(ConversationMessage.count).to eq(1)
+    end
+
+    it "does not trigger an OOO auto response if enable_inbox_auto_response setting is disabled" do
+      Account.site_admin.enable_feature! :inbox_settings
+      expect(ConversationMessage.count).to eq(0)
+      @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+      expect(ConversationMessage.count).to eq(1)
+    end
+
+    context "with inbox_settings FF and enable_inbox_auto_response setting is enabled" do
+      before do
+        Account.site_admin.enable_feature! :inbox_settings
+        Account.default.settings[:enable_inbox_auto_response] = true
+        Account.default.save!
+      end
+
+      it "triggers an OOO auto response in a new conversation" do
+        expect(Conversation.count).to eq(1)
+        expect(ConversationMessage.count).to eq(0)
+        @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+        expect(ConversationMessage.count).to eq(2)
+        expect(Conversation.count).to eq(2)
+        expect(ConversationMessage.last.body).to eq("Out of Office")
+      end
+
+      it "does not send message to sender if sender and recipient are both out of office" do
+        Inbox::InboxService.update_inbox_settings_for_user(
+          user_id: @student1.id,
+          root_account_id: Account.default.id,
+          use_signature: false,
+          signature: "",
+          use_out_of_office: true,
+          out_of_office_first_date: Time.zone.today,
+          out_of_office_last_date: Time.zone.tomorrow,
+          out_of_office_subject: "OOO",
+          out_of_office_message: "Out of Office"
+        )
+
+        expect(Conversation.count).to eq(1)
+        expect(ConversationMessage.count).to eq(0)
+        @conversation.add_message("Messaging you even though we are both OOO", root_account_id: Account.default.id, recipients: [@teacher])
+
+        # If it creates a loop, then there would be 3 conversations with 3 total conversations
+        # Let's make sure that there are only 2 conversations with 2 total messages
+        expect(ConversationMessage.count).to eq(2)
+        expect(Conversation.count).to eq(2)
+      end
+
+      it "does not trigger an OOO auto response if use_out_of_office inbox setting is false" do
+        @teacher_inbox_settings = Inbox::InboxService.update_inbox_settings_for_user(
+          user_id: @teacher.id,
+          root_account_id: Account.default.id,
+          use_signature: false,
+          signature: "",
+          use_out_of_office: false,
+          out_of_office_first_date: Time.zone.today,
+          out_of_office_last_date: Time.zone.tomorrow,
+          out_of_office_subject: "OOO",
+          out_of_office_message: "Out of Office"
+        )
+        expect(ConversationMessage.count).to eq(0)
+        @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+        expect(ConversationMessage.count).to eq(1)
+        expect(ConversationMessage.last.body).to eq("hi!")
+      end
+
+      it "does not trigger an OOO auto response if not in OOO range" do
+        @teacher_inbox_settings = Inbox::InboxService.update_inbox_settings_for_user(
+          user_id: @teacher.id,
+          root_account_id: Account.default.id,
+          use_signature: false,
+          signature: "",
+          use_out_of_office: true,
+          out_of_office_first_date: Time.zone.today,
+          out_of_office_last_date: Time.zone.tomorrow,
+          out_of_office_subject: "OOO",
+          out_of_office_message: "Out of Office"
+        )
+
+        # Move out of date range
+        Timecop.travel(3.days) do
+          expect(ConversationMessage.count).to eq(0)
+          @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+
+          # If auto-response message was sent, then the count of messages in conversation would be 2
+          expect(ConversationMessage.count).to eq(1)
+          expect(ConversationMessage.last.body).to eq("hi!")
+        end
+      end
+
+      it "does not trigger a second OOO auto response" do
+        expect(ConversationMessage.count).to eq(0)
+        @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+        expect(ConversationMessage.count).to eq(2)
+        @conversation.add_message("hi again!", root_account_id: Account.default.id, recipients: [@teacher])
+        expect(ConversationMessage.count).to eq(3)
+        expect(ConversationMessage.last.body).to eq("hi again!")
+      end
+
+      it "does not trigger a second OOO auto response if the inbox settings were updated but not the OOO settings" do
+        expect(ConversationMessage.count).to eq(0)
+        @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+        expect(ConversationMessage.count).to eq(2)
+        @teacher_inbox_settings = Inbox::InboxService.update_inbox_settings_for_user(
+          user_id: @teacher.id,
+          root_account_id: Account.default.id,
+          use_signature: true,
+          signature: "New signature!",
+          use_out_of_office: true,
+          out_of_office_first_date: Time.zone.today,
+          out_of_office_last_date: Time.zone.tomorrow,
+          out_of_office_subject: "OOO",
+          out_of_office_message: "Out of Office"
+        )
+        @conversation.add_message("hi again!", root_account_id: Account.default.id, recipients: [@teacher])
+        expect(ConversationMessage.count).to eq(3)
+        expect(ConversationMessage.last.body).to eq("hi again!")
+      end
+
+      it "triggers a second OOO auto response if there was an update to the OOO settings" do
+        expect(ConversationMessage.count).to eq(0)
+        @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+        expect(ConversationMessage.count).to eq(2)
+        expect(ConversationMessage.last.body).to eq("Out of Office")
+        @teacher_inbox_settings = Inbox::InboxService.update_inbox_settings_for_user(
+          user_id: @teacher.id,
+          root_account_id: Account.default.id,
+          use_signature: true,
+          signature: "",
+          use_out_of_office: true,
+          out_of_office_first_date: Time.zone.today,
+          out_of_office_last_date: Time.zone.tomorrow,
+          out_of_office_subject: "OOO - For Real",
+          out_of_office_message: "Out of Office - updated"
+        )
+        @conversation.add_message("hi again!", root_account_id: Account.default.id, recipients: [@teacher])
+        expect(ConversationMessage.count).to eq(4)
+        expect(ConversationMessage.last.body).to eq("Out of Office - updated")
+      end
+
+      it "triggers multiple OOO auto responses if multiple participants are OOO" do
+        student2 = student_in_course.user
+        Inbox::InboxService.inbox_settings_for_user(user_id: student2.id, root_account_id: Account.default.id)
+        Inbox::InboxService.update_inbox_settings_for_user(
+          user_id: student2.id,
+          root_account_id: Account.default.id,
+          use_signature: false,
+          signature: "",
+          use_out_of_office: true,
+          out_of_office_first_date: Time.zone.today,
+          out_of_office_last_date: Time.zone.tomorrow,
+          out_of_office_subject: "OOO too!",
+          out_of_office_message: "Out of Office too!"
+        )
+        conversation = @student1.initiate_conversation([@teacher, @student1, student2])
+        expect(Conversation.count).to eq(2)
+        expect(ConversationMessage.count).to eq(0)
+        conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher, student2])
+
+        # Should spawn two new conversations to send the OOO auto responses to
+        expect(Conversation.count).to eq(4)
+        expect(ConversationMessage.count).to eq(3)
+
+        # Make sure that the correct messages go through
+        messages = ConversationMessage.all.map(&:body)
+        expect(messages.include?("Out of Office")).to be_truthy
+        expect(messages.include?("Out of Office too!")).to be_truthy
+      end
+
+      context "with inbox signature enabled" do
+        before do
+          Account.default.settings[:enable_inbox_signature_block] = true
+          Account.default.save!
+        end
+
+        it "appends Inbox Signature to message body if 'use_signature' is true" do
+          @teacher_inbox_settings = Inbox::InboxService.update_inbox_settings_for_user(
+            user_id: @teacher.id,
+            root_account_id: Account.default.id,
+            use_signature: true,
+            signature: "Teacher\n\nUniversity",
+            use_out_of_office: true,
+            out_of_office_first_date: Time.zone.today,
+            out_of_office_last_date: Time.zone.tomorrow,
+            out_of_office_subject: "OOO",
+            out_of_office_message: "Out of Office"
+          )
+          @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+          expect(ConversationMessage.last.body).to eq("Out of Office\n\n---\nTeacher\n\nUniversity")
+        end
+
+        it "does not append Inbox Signature to message body if 'use_signature' is false" do
+          @teacher_inbox_settings = Inbox::InboxService.update_inbox_settings_for_user(
+            user_id: @teacher.id,
+            root_account_id: Account.default.id,
+            use_signature: false,
+            signature: "Teacher\n\nUniversity",
+            use_out_of_office: true,
+            out_of_office_first_date: Time.zone.today,
+            out_of_office_last_date: Time.zone.tomorrow,
+            out_of_office_subject: "OOO",
+            out_of_office_message: "Out of Office"
+          )
+          @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+          expect(ConversationMessage.last.body).to eq("Out of Office")
+        end
+      end
+    end
+  end
+
   describe "reply_from" do
     before do
       course_with_teacher

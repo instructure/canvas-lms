@@ -48,9 +48,7 @@ module Lti
 
     def log_data
       {
-        # We'll need this column in the near future but don't have the values for it yet.
-        # We're including it to make everyone's life easier when we do have the values.
-        unified_tool_id: nil,
+        unified_tool_id: @tool.unified_tool_id,
         tool_id: @tool.id.to_s,
         tool_provided_id: @tool.tool_id,
         tool_domain: @tool.domain,
