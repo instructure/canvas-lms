@@ -36,6 +36,7 @@ import {
   escapeNewLineText,
   htmlEscapeCriteriaLongDescription,
   rangingFrom,
+  findCriterionMatchingRatingIndex,
 } from './utils/rubricUtils'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
@@ -176,6 +177,7 @@ const CriterionRow = ({
 }: CriterionRowProps) => {
   const [hoveredRatingIndex, setHoveredRatingIndex] = useState<number>()
   const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
+  const [pointTextInput, setPointTextInput] = useState('')
   const [isSaveCommentChecked, setIsSaveCommentChecked] = useState(false)
 
   const criterionRatings = [...criterion.ratings]
@@ -183,8 +185,10 @@ const CriterionRow = ({
     criterionRatings.reverse()
   }
 
-  const selectedRatingIndex = criterionRatings.findIndex(
-    rating => rating.points === criterionAssessment?.points
+  const selectedRatingIndex = findCriterionMatchingRatingIndex(
+    criterionRatings,
+    criterionAssessment?.points,
+    criterion.criterionUseRange
   )
 
   const updateAssessmentData = (params: Partial<UpdateAssessmentData>) => {
@@ -198,6 +202,7 @@ const CriterionRow = ({
 
   useEffect(() => {
     setCommentText(criterionAssessment?.comments ?? '')
+    setPointTextInput(criterionAssessment?.points?.toString() ?? '')
   }, [criterionAssessment, isFreeFormCriterionComments])
 
   const setPoints = (value: string) => {
@@ -450,12 +455,12 @@ const CriterionRow = ({
                         <ScreenReaderContent>{I18n.t('Criterion Score')}</ScreenReaderContent>
                       }
                       readOnly={isPreviewMode}
-                      data-testid={`comment-score-${criterion.id}`}
+                      data-testid={`criterion-score-${criterion.id}`}
                       placeholder="--"
-                      width="2.688rem"
+                      width="3.375rem"
                       height="2.375rem"
-                      value={criterionAssessment?.points?.toString() || ''}
-                      onChange={e => setPoints(e.target.value)}
+                      value={pointTextInput}
+                      onChange={e => setPointTextInput(e.target.value)}
                       onBlur={e => setPoints(e.target.value)}
                     />
                   </Flex.Item>

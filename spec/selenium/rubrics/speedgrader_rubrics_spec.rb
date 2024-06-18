@@ -113,9 +113,9 @@ describe "Rubrics in speedgrader" do
       expect(RubricAssessmentTray.rating_details(@rubric.data[0][:ratings][0][:id])).to include_text(@rubric.data[0][:ratings][0][:description])
       expect(RubricAssessmentTray.rating_details(@rubric.data[1][:ratings][1][:id])).to include_text(@rubric.data[1][:ratings][1][:description])
       expect(RubricAssessmentTray.rating_details(@rubric.data[2][:ratings][2][:id])).to include_text(@rubric.data[2][:ratings][2][:description])
-      expect(RubricAssessmentTray.modern_criterion_points_inputs[0].attribute(:value)).to eq(@rubric.data[0][:ratings][0][:points].to_s)
-      expect(RubricAssessmentTray.modern_criterion_points_inputs[1].attribute(:value)).to eq(@rubric.data[1][:ratings][1][:points].to_s)
-      expect(RubricAssessmentTray.modern_criterion_points_inputs[2].attribute(:value)).to eq(@rubric.data[2][:ratings][2][:points].to_s)
+      expect(RubricAssessmentTray.modern_criterion_points_inputs(@rubric.data[0][:id]).attribute(:value)).to eq(@rubric.data[0][:ratings][0][:points].to_s)
+      expect(RubricAssessmentTray.modern_criterion_points_inputs(@rubric.data[1][:id]).attribute(:value)).to eq(@rubric.data[1][:ratings][1][:points].to_s)
+      expect(RubricAssessmentTray.modern_criterion_points_inputs(@rubric.data[2][:id]).attribute(:value)).to eq(@rubric.data[2][:ratings][2][:points].to_s)
     end
 
     it "allows assessing a submission in horizontal view by selecting ratings and clicking submit assessment" do
@@ -208,9 +208,9 @@ describe "Rubrics in speedgrader" do
       RubricAssessmentTray.rubric_assessment_view_mode_select.click
       RubricAssessmentTray.rubric_horizontal_view_option.click
 
-      RubricAssessmentTray.modern_view_points_inputs[0].send_keys("10")
-      RubricAssessmentTray.modern_view_points_inputs[1].send_keys("3")
-      RubricAssessmentTray.modern_view_points_inputs[2].send_keys("1")
+      RubricAssessmentTray.modern_view_points_inputs(@rubric.data[0][:id]).send_keys("10")
+      RubricAssessmentTray.modern_view_points_inputs(@rubric.data[1][:id]).send_keys("3")
+      RubricAssessmentTray.modern_view_points_inputs(@rubric.data[2][:id]).send_keys("1")
       RubricAssessmentTray.submit_rubric_assessment_button.click
 
       expect(Speedgrader.rating_tiers[0]).to include_text(@rubric.data[0][:ratings][0][:points].to_s)
@@ -225,9 +225,9 @@ describe "Rubrics in speedgrader" do
       RubricAssessmentTray.rubric_assessment_view_mode_select.click
       RubricAssessmentTray.rubric_vertical_view_option.click
 
-      RubricAssessmentTray.modern_view_points_inputs[0].send_keys("10")
-      RubricAssessmentTray.modern_view_points_inputs[1].send_keys("3")
-      RubricAssessmentTray.modern_view_points_inputs[2].send_keys("1")
+      RubricAssessmentTray.modern_view_points_inputs(@rubric.data[0][:id]).send_keys("10")
+      RubricAssessmentTray.modern_view_points_inputs(@rubric.data[1][:id]).send_keys("3")
+      RubricAssessmentTray.modern_view_points_inputs(@rubric.data[2][:id]).send_keys("1")
       RubricAssessmentTray.submit_rubric_assessment_button.click
 
       expect(Speedgrader.rating_tiers[0]).to include_text(@rubric.data[0][:ratings][0][:points].to_s)
@@ -291,9 +291,9 @@ describe "Rubrics in speedgrader" do
       RubricAssessmentTray.free_form_comment_area(@rubric.data[0][:id]).send_keys("Criterion 1 comment")
       RubricAssessmentTray.free_form_comment_area(@rubric.data[1][:id]).send_keys("Criterion 2 comment")
       RubricAssessmentTray.free_form_comment_area(@rubric.data[2][:id]).send_keys("Criterion 3 comment")
-      RubricAssessmentTray.modern_view_points_inputs[0].send_keys("10")
-      RubricAssessmentTray.modern_view_points_inputs[1].send_keys("3")
-      RubricAssessmentTray.modern_view_points_inputs[2].send_keys("1")
+      RubricAssessmentTray.modern_view_points_inputs(@rubric.data[0][:id]).send_keys("10")
+      RubricAssessmentTray.modern_view_points_inputs(@rubric.data[1][:id]).send_keys("3")
+      RubricAssessmentTray.modern_view_points_inputs(@rubric.data[2][:id]).send_keys("1")
       RubricAssessmentTray.submit_rubric_assessment_button.click
 
       expect(Speedgrader.free_form_comment_ratings[0]).to include_text("Criterion 1 comment")

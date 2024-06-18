@@ -27,6 +27,7 @@ import type {
   RubricAssessmentSelect,
   UpdateAssessmentData,
 } from '../types/rubric'
+import {findCriterionMatchingRatingIndex} from './utils/rubricUtils'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
@@ -80,9 +81,13 @@ export const RubricAssessmentTray = ({
 
     const ratingDescription = description ?? ''
 
-    const matchingRating = rubric?.criteria
-      ?.find(c => c.id === criterionId)
-      ?.ratings.find(r => r.points === points)
+    const matchingCriteria = rubric?.criteria?.find(c => c.id === criterionId)
+    const matchingRatingIndex = findCriterionMatchingRatingIndex(
+      matchingCriteria?.ratings ?? [],
+      points,
+      matchingCriteria?.criterionUseRange
+    )
+    const matchingRating = matchingCriteria?.ratings?.[matchingRatingIndex]
 
     const matchingRatingId = matchingRating?.id ?? ''
 

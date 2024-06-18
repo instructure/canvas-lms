@@ -63,8 +63,8 @@ class RubricAssessmentTray
       f("[data-testid='vertical-view-option']")
     end
 
-    def modern_criterion_points_inputs
-      ff("[data-testid='modern-view-points-input']")
+    def modern_criterion_points_inputs(criterion_id)
+      f("[data-testid='criterion-score-#{criterion_id}']")
     end
 
     def rating_details(rating_id)
@@ -76,11 +76,11 @@ class RubricAssessmentTray
     end
 
     def criterion_score_input(criterion_id)
-      f("[data-testid='comment-score-#{criterion_id}']")
+      f("[data-testid='criterion-score-#{criterion_id}']")
     end
 
-    def modern_view_points_inputs
-      ff("[data-testid='modern-view-points-input']")
+    def modern_view_points_inputs(criterion_id)
+      f("[data-testid='criterion-score-#{criterion_id}']")
     end
 
     def free_form_comment_area(criterion_id)

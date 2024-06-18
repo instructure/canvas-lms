@@ -30,7 +30,10 @@ import {TextArea} from '@instructure/ui-text-area'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {CommentLibrary} from './CommentLibrary'
 import {CriteriaReadonlyComment} from './CriteriaReadonlyComment'
-import {htmlEscapeCriteriaLongDescription} from './utils/rubricUtils'
+import {
+  findCriterionMatchingRatingIndex,
+  htmlEscapeCriteriaLongDescription,
+} from './utils/rubricUtils'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
@@ -118,8 +121,10 @@ export const CriterionRow = ({
   onUpdateAssessmentData,
 }: CriterionRowProps) => {
   const {ratings} = criterion
-  const selectedRatingIndex = criterion.ratings.findIndex(
-    rating => rating.points === criterionAssessment?.points
+  const selectedRatingIndex = findCriterionMatchingRatingIndex(
+    criterion.ratings,
+    criterionAssessment?.points,
+    criterion.criterionUseRange
   )
 
   const [pointsInput, setPointsInput] = useState<string>()
@@ -215,13 +220,12 @@ export const CriterionRow = ({
                   <ScreenReaderContent>{I18n.t('Instructor Points')}</ScreenReaderContent>
                 }
                 placeholder="--"
-                width="2.688rem"
+                width="3.375rem"
                 height="2.375rem"
+                data-testid={`criterion-score-${criterion.id}`}
                 value={pointsInput?.toString() ?? ''}
-                onChange={(_e, value) => {
-                  setPoints(value)
-                }}
-                data-testid="modern-view-points-input"
+                onChange={e => setPointsInput(e.target.value)}
+                onBlur={e => setPoints(e.target.value)}
               />
             )}
           </Flex.Item>
