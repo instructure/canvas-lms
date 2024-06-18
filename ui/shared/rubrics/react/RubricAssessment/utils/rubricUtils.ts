@@ -39,3 +39,16 @@ export const rangingFrom = (ratings: RubricRating[], index: number, ratingOrder?
   }
   return index < ratings.length - 1 ? ratings[index + 1].points + 0.1 : undefined
 }
+
+export const findCriterionMatchingRatingIndex = (
+  ratings: RubricRating[],
+  points?: number,
+  criterionUseRange = false
+): number => {
+  if (points == null) {
+    return -1
+  }
+  return criterionUseRange
+    ? ratings.findLastIndex(rating => rating.points >= points)
+    : ratings.findIndex(rating => rating.points === points)
+}

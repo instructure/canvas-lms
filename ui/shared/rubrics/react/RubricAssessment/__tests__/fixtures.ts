@@ -65,7 +65,7 @@ export const RUBRIC_DATA: Pick<Rubric, 'title' | 'ratingOrder'> & {criteria: Rub
     {
       id: '2',
       description: 'Criteria 2',
-      criterionUseRange: true,
+      criterionUseRange: false,
       ignoreForScoring: false,
       longDescription: '',
       masteryPoints: 0,
