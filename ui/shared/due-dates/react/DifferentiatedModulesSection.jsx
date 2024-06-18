@@ -206,6 +206,7 @@ const DifferentiatedModulesSection = ({
         due_at: dates.due_at,
         unlock_at: dates.unlock_at,
         reply_to_topic_due_at: dates.reply_to_topic_due_at,
+        required_replies_due_at: dates.required_replies_due_at,
         lock_at: dates.lock_at,
         selectedAssigneeIds: uniqueIds,
         defaultOptions: uniqueIds,

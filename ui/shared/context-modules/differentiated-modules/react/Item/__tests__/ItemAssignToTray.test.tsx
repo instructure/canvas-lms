@@ -550,6 +550,7 @@ describe('ItemAssignToTray', () => {
       const expectedPayload = JSON.stringify({
         ...payloadValues,
         reply_to_topic_due_at: null,
+        required_replies_due_at: null,
         only_visible_to_overrides,
         assignment_overrides: [
           {

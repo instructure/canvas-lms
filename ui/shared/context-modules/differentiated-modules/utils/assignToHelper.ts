@@ -80,6 +80,7 @@ export const generateDateDetailsPayload = (
     payload.unlock_at = everyoneCard.unlock_at || null
     payload.lock_at = everyoneCard.lock_at || null
     payload.reply_to_topic_due_at = everyoneCard.reply_to_topic_due_at || null
+    payload.required_replies_due_at = everyoneCard.required_replies_due_at || null
   }
 
   if (
