@@ -155,8 +155,15 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def content_export
-    if persisted? && !association(:content_export).loaded? && source_course_id && Shard.shard_for(source_course_id) != shard
-      association(:content_export).target = Shard.shard_for(source_course_id).activate { ContentExport.where(content_migration_id: self).first }
+    if persisted? && !association(:content_export).loaded? && source_course_id
+      association(:content_export).target = Shard.shard_for(source_course_id).activate do
+        ContentExport.where(content_migration_id: self).first ||
+          # since reusing content_exports in multiple content_migrations breaks the nominal 1:1 association
+          # find the content_export by source_course_id and attachment_id instead
+          (attachment_id && ContentExport.where(context_type: "Course",
+                                                context_id: source_course_id,
+                                                attachment_id:).first)
+      end
     end
     super
   end
