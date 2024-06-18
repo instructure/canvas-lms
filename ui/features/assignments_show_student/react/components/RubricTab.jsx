@@ -130,7 +130,7 @@ export default function RubricTab(props) {
     <div data-testid="rubric-tab">
       <View as="div" margin="none none medium">
         {props.peerReviewModeEnabled && !hasSubmittedAssessment && (
-          <Alert variant="info" hasShadow={false}>
+          <Alert variant="info" hasShadow={false} data-testid="peer-review-rubric-alert">
             {I18n.t(
               'Fill out the rubric below after reviewing the student submission to complete this review.'
             )}
@@ -139,7 +139,10 @@ export default function RubricTab(props) {
 
         {showEnhancedRubricPeerReview ? (
           <View as="div" margin="small 0 0 0">
-            <Button onClick={() => setRubricTrayOpen(!rubricTrayOpen)}>
+            <Button
+              onClick={() => setRubricTrayOpen(!rubricTrayOpen)}
+              data-testid="view-rubric-button"
+            >
               {hasSubmittedAssessment ? I18n.t('View Rubric') : I18n.t('Fill Out Rubric')}
             </Button>
             <RubricAssessmentTray
