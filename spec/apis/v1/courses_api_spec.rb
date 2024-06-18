@@ -4576,6 +4576,24 @@ describe CoursesController, type: :request do
                  expected_status: 401)
       end
 
+      context "student in limited access account and has file creation permission" do
+        before do
+          @user = student_in_course(course: @course, active_all: true).user
+        end
+
+        it "should render unauthorized if account setting is enabled" do
+          @course.root_account.enable_feature!(:allow_limited_access_for_students)
+          @course.account.settings[:enable_limited_access_for_students] = true
+          @course.account.save!
+          api_call(:post,
+                   "/api/v1/courses/#{@course.id}/files",
+                   { controller: "courses", action: "create_file", format: "json", course_id: @course.to_param, },
+                   { name: "failboat.txt" },
+                   {},
+                   expected_status: 401)
+        end
+      end
+
       it "creates the file in unlocked state if :usage_rights_required is disabled" do
         @course.usage_rights_required = false
         @course.save!

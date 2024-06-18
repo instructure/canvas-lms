@@ -169,7 +169,8 @@ class FilesController < ApplicationController
   before_action :verify_api_id, only: %i[
     api_show api_create_success api_file_status api_update destroy icon_metadata reset_verifier
   ]
-  before_action :handle_limited_access_contexts, only: %i[index]
+  before_action :check_limited_access_contexts, only: %i[index]
+  before_action :check_limited_access_for_students, only: %i[show api_index api_show]
 
   include Api::V1::Attachment
   include Api::V1::Avatar
@@ -183,9 +184,11 @@ class FilesController < ApplicationController
     raise ActiveRecord::RecordNotFound unless Api::ID_REGEX.match?(params[:id])
   end
 
-  def handle_limited_access_contexts
+  def check_limited_access_contexts
     if @context.is_a?(Course) && @context&.account&.limited_access_for_user?(@current_user)
       redirect_to course_path(@context)
+    else
+      check_limited_access_for_students
     end
   end
 

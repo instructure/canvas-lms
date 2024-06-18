@@ -21,6 +21,7 @@ class FilePreviewsController < ApplicationController
   include AttachmentHelper
 
   before_action :get_context
+  before_action :check_limited_access_for_students, only: %i[show]
 
   # renders (or redirects to) appropriate content for the file, such as
   # canvadocs, crocodoc, inline image, etc.

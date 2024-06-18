@@ -219,6 +219,7 @@ class SubmissionsApiController < ApplicationController
                                              rubric_assessments_read_state
                                              mark_rubric_assessments_read
                                              mark_submission_item_read]
+  before_action :check_limited_access_for_students, only: %i[create_file]
   include Api::V1::Progress
   include Api::V1::Submission
   include Submissions::ShowHelper

@@ -5590,6 +5590,16 @@ describe "Submissions API", type: :request do
           expect(job.handler).to include Services::SubmitHomeworkService::CopyWorker.name
         end
       end
+
+      context "student in limited access account" do
+        it "renders unauthorized" do
+          @course.root_account.enable_feature!(:allow_limited_access_for_students)
+          @course.account.settings[:enable_limited_access_for_students] = true
+          @course.account.save!
+          preflight({ name: "test.txt", size: 12_345, content_type: "text/plain" })
+          assert_status(401)
+        end
+      end
     end
 
     it "rejects invalid urls" do

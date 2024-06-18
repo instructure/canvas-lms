@@ -2679,6 +2679,24 @@ describe "Users API", type: :request do
                {},
                expected_status: 401)
     end
+
+    context "student in limited access account" do
+      before do
+        @user = course_with_student.user
+        @course.root_account.enable_feature!(:allow_limited_access_for_students)
+        @course.account.settings[:enable_limited_access_for_students] = true
+        @course.account.save!
+      end
+
+      it "renders unauthorized" do
+        api_call(:post,
+                 "/api/v1/users/#{@user.id}/files",
+                 { controller: "users", action: "create_file", format: "json", user_id: @user.to_param, },
+                 { name: "my_essay.doc" },
+                 {},
+                 expected_status: 401)
+      end
+    end
   end
 
   describe "user merge and split" do
