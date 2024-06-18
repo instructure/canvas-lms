@@ -340,6 +340,7 @@ const locale = {
   },
   "expand_to_see_types_f5d29352": { "message": "Vis og sjå { types }" },
   "external_link_d3f9e62a": { "message": "Ekstern lenke" },
+  "external_tool_frame_70b32473": { "message": "Ekstern verktøyramme" },
   "external_tools_6e77821": { "message": "Eksterne verktøy" },
   "extra_large_b6cdf1ff": { "message": "Ekstra stor" },
   "extra_small_9ae33252": { "message": "Svært liten" },
@@ -890,6 +891,9 @@ const locale = {
   "show_audio_options_b489926b": { "message": "Vis lydalternativ" },
   "show_image_options_1e2ecc6b": { "message": "Vis alternativ for bilde" },
   "show_link_options_545338fd": { "message": "Vis lenkealternativ" },
+  "show_studio_media_options_a0c748c6": {
+    "message": "Vis medievalg for studio"
+  },
   "show_video_options_6ed3721a": { "message": "Vis videoalternativ" },
   "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
     "message": "Personer med normalt syn navigerer nettsider raskt ved å sjå etter store eller utheva titlar. Skjermlesarar brukar titlar for å forstå konteksten. Titlar burde bruke riktig struktur."
@@ -938,6 +942,7 @@ const locale = {
   "start_over_f7552aa9": { "message": "Start på nytt" },
   "start_recording_9a65141a": { "message": "Start opptak" },
   "steel_blue_14296f08": { "message": "Stålblå" },
+  "studio_media_options_ee504361": { "message": "Medieval for studio" },
   "styles_2aa721ef": { "message": "Stilar" },
   "submit_a3cc6859": { "message": "Send!" },
   "subscript_59744f96": { "message": "Senka skrift" },
@@ -1046,6 +1051,7 @@ const locale = {
     "message": "Diagonal pil opp til høgre"
   },
   "up_c553575d": { "message": "Opp" },
+  "updated_link_a827e441": { "message": "Oppdatert lenke" },
   "upload_document_253f0478": { "message": "Last opp dokument frå disk" },
   "upload_file_fd2361b8": { "message": "Last opp fil" },
   "upload_image_6120b609": { "message": "Last opp bilde frå disk" },
