@@ -4812,6 +4812,7 @@ describe Assignment do
       end
 
       it "disabling intra group peer review shouldn't gum things up if some people don't have a group" do
+        srand(1) # this isn't really necessary but given the random nature i wanted to make it fail consistently without the code fix
         # i.e. people with no group shouldn't be considered by the selection algorithm to be in the same group
         @submissions = []
         gc = @course.group_categories.create! name: "Groupy McGroupface"
@@ -4829,7 +4830,7 @@ describe Assignment do
         end
 
         @a.peer_review_count = 2
-        srand(1) # this isn't really necessary but given the random nature i wanted to make it fail consistently without the code fix
+
         res = @a.assign_peer_reviews
         expect(res.group_by(&:user_id).values.map(&:count).uniq).to eq [2] # everybody should get 2 reviews
       end
