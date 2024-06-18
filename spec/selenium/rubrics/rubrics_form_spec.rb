@@ -20,6 +20,7 @@
 require_relative "../helpers/rubrics_common"
 require_relative "pages/rubrics_index_page"
 require_relative "pages/rubrics_form_page"
+require_relative "pages/rubrics_assessment_tray"
 
 describe "Rubric form page" do
   include_context "in-process server selenium tests"
@@ -31,9 +32,8 @@ describe "Rubric form page" do
     @assignment = @course.assignments.create!(name: "Assignment 1", points_possible: 30)
     @submission = @assignment.find_or_create_submission(@student)
     @rubric1 = @course.rubrics.create!(title: "Rubric 1", user: @user, context: @course, data: larger_rubric_data, points_possible: 12)
-    @rubric2 = @course.rubrics.create!(title: "Rubric 2", user: @user, context: @course, data: smallest_rubric_data, points_possible: 10)
+    @rubric2 = @course.rubrics.create!(title: "Rubric 2", user: @user, context: @course, data: smallest_rubric_data, points_possible: 10, free_form_criterion_comments: true)
     RubricAssociation.create!(rubric: @rubric1, context: @course, association_object: @course, purpose: "bookmark")
-    # ra_params = rubric_association_params_for_assignment(@assignment, use_for_grading: "1")
     rubric_assoc = RubricAssociation.generate(@teacher, @rubric2, @course, ActiveSupport::HashWithIndifferentAccess.new({
                                                                                                                           hide_score_total: "0",
                                                                                                                           purpose: "grading",
@@ -332,5 +332,37 @@ describe "Rubric form page" do
     RubricsForm.criterion_row_edit_buttons[0].click
 
     expect(RubricsForm.rating_description_inputs[0]).to_not be_disabled
+  end
+
+  it "allows previewing a rubric" do
+    RubricsIndex.create_rubric_button.click
+    RubricsForm.rubric_title_input.send_keys("Rubric 4")
+    RubricsForm.add_criterion_button.click
+    RubricsForm.criterion_name_input.send_keys("Criterion 1")
+    RubricsForm.save_criterion_button.click
+    RubricsForm.preview_rubric_button.click
+
+    expect(RubricsForm.traditional_grid_rating_button(0)).to include_text("Exceeds")
+    expect(RubricsForm.traditional_grid_rating_button(0)).to include_text("4 pts")
+    expect(RubricsForm.traditional_grid_rating_button(4)).to include_text("No Evidence")
+    expect(RubricsForm.traditional_grid_rating_button(4)).to include_text("0 pts")
+  end
+
+  it "allows free form comment rubrics to be previewed" do
+    RubricsIndex.rubric_popover(@rubric2.id).click
+    RubricsIndex.edit_rubric_button.click
+    RubricsForm.preview_rubric_button.click
+
+    expect(RubricAssessmentTray.free_form_comment_area(@rubric2.data[0][:id])).to be_displayed
+    expect(RubricAssessmentTray.save_comment_checkbox(@rubric2.data[0][:id])).to be_displayed
+  end
+
+  it "preview mode allows input and updates the instructor score" do
+    RubricsIndex.rubric_popover(@rubric1.id).click
+    RubricsIndex.edit_rubric_button.click
+    RubricsForm.preview_rubric_button.click
+    RubricAssessmentTray.traditional_grid_rating_button(@rubric1.data[0][:id], 0).click
+
+    expect(RubricAssessmentTray.rubric_assessment_instructor_score).to include_text("10 pts")
   end
 end
