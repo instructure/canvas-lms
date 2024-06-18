@@ -106,12 +106,12 @@ module DatesOverridable
   end
 
   def assignment_context_modules
-    if is_a?(Assignment) && quiz.present?
+    if is_a?(AbstractAssignment) && quiz.present?
       # if it's another learning object's assignment, the context module content tags are attached to the learning object
       ContextModule.not_deleted.where(id: quiz.context_module_tags.select(:context_module_id))
-    elsif is_a?(Assignment) && discussion_topic.present?
+    elsif is_a?(AbstractAssignment) && discussion_topic.present?
       ContextModule.not_deleted.where(id: discussion_topic.context_module_tags.select(:context_module_id))
-    elsif is_a?(Assignment) && wiki_page.present? # wiki pages can have assignments through mastery paths
+    elsif is_a?(AbstractAssignment) && wiki_page.present? # wiki pages can have assignments through mastery paths
       ContextModule.not_deleted.where(id: wiki_page.context_module_tags.select(:context_module_id))
     else
       ContextModule.not_deleted.where(id: context_module_tags.select(:context_module_id))
@@ -270,7 +270,7 @@ module DatesOverridable
 
   def due_date_hash
     hash = { due_at:, unlock_at:, lock_at: }
-    if is_a?(Assignment)
+    if is_a?(AbstractAssignment)
       hash[:all_day] = all_day
       hash[:all_day_date] = all_day_date
     elsif assignment
@@ -316,7 +316,7 @@ module DatesOverridable
 
     if user && tag_info[:due_date]
       if tag_info[:due_date] < Time.now &&
-         (is_a?(Quizzes::Quiz) || (is_a?(Assignment) && expects_submission?)) &&
+         (is_a?(Quizzes::Quiz) || (is_a?(AbstractAssignment) && expects_submission?)) &&
          !has_submission
         tag_info[:past_due] = true
       end

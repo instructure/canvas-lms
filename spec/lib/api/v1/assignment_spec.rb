@@ -331,6 +331,41 @@ describe "Api::V1::Assignment" do
       end
     end
 
+    context "include_all_dates" do
+      describe "checkpointed assignments" do
+        before do
+          @student1 = student_in_course(course: @course, active_all: true).user
+          @course.root_account.enable_feature!(:discussion_checkpoints)
+
+          @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: [{ type: "everyone", due_at: 2.days.from_now }, { type: "override", set_type: "ADHOC", student_ids: [@student1.id], due_at: 3.days.from_now }],
+            points_possible: 4
+          )
+
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+            dates: [{ type: "everyone", due_at: 3.days.from_now }, { type: "override", set_type: "ADHOC", student_ids: [@student1.id], due_at: 10.days.from_now }],
+            points_possible: 7
+          )
+        end
+
+        it "returns all_dates associated with a checkpointed assignment's sub_assignments" do
+          json = api.assignment_json(@topic.assignment, @teacher, session, { include_all_dates: true, include_discussion_topic: false })
+
+          # Should return dates for sub_assignment overrides and the checkpointed due dates
+          expect(json["all_dates"].length).to eq 4
+          due_dates = @topic.assignment.sub_assignments.flat_map do |sub_assignment|
+            [sub_assignment.due_at] + sub_assignment.assignment_overrides.pluck(:due_at)
+          end
+          expect(json["all_dates"].pluck(:due_at)).to contain_exactly(*due_dates)
+        end
+      end
+    end
+
     context "for a quiz" do
       before do
         @assignment = assignment_model
