@@ -22,7 +22,7 @@ class GradingSchemesJsonController < ApplicationController
   extend GradingSchemeSerializer
 
   GRADING_SCHEMES_LIMIT = 100
-  USED_LOCATIONS_PER_PAGE = 100
+  USED_LOCATIONS_PER_PAGE = 50
   before_action :require_context
   before_action :require_user
   before_action :validate_read_permission, only: %i[grouped_list detail_list summary_list show]
@@ -159,7 +159,36 @@ class GradingSchemesJsonController < ApplicationController
     grading_standard = grading_standards_for_context.find(params[:id])
     return unless authorized_action(grading_standard, @current_user, :manage)
 
-    render json: used_locations_for(grading_standard)
+    render json: courses_using(grading_standard)
+  end
+
+  def used_locations_for_course
+    grading_standard = grading_standards_for_context.find(params[:id])
+    return unless authorized_action(grading_standard, @current_user, :manage)
+
+    scope = grading_standard.assignments
+                            .where(context_id: params[:course_id], context_type: Course.to_s)
+                            .active
+                            .select(:title, :context_id, :id)
+                            .order(:title)
+
+    assignments = Api.paginate(
+      scope,
+      self,
+      account_grading_schemes_used_locations_for_course_path(
+        account_id: @context.id, id: grading_standard.id, course_id: params[:course_id]
+      ),
+      per_page: USED_LOCATIONS_PER_PAGE
+    )
+
+    render json: assignments.map { |assignment| assignment.as_json(only: [:id, :title], include_root: false) }
+  end
+
+  def account_used_locations
+    grading_standard = grading_standards_for_context.find(params[:id])
+    return unless authorized_action(grading_standard, @current_user, :manage)
+
+    render json: accounts_using(grading_standard)
   end
 
   def archive
@@ -211,13 +240,23 @@ class GradingSchemesJsonController < ApplicationController
     end
   end
 
-  def used_locations_for(grading_standard)
+  def accounts_using(grading_standard)
     GuardRail.activate(:secondary) do
-      scope = grading_standard.used_locations
-                              .joins("INNER JOIN #{Course.quoted_table_name} ON assignments.context_type = 'Course' AND assignments.context_id = courses.id")
-                              .order("courses.name ASC, title ASC")
+      grading_standard.accounts.order(:name).select(:id, :name).map do |account|
+        account.as_json(only: [:id, :name], include_root: false)
+      end
+    end
+  end
 
-      used_locations = Api.paginate(
+  def courses_using(grading_standard)
+    GuardRail.activate(:secondary) do
+      courses_ids = grading_standard.courses.active.pluck(:id)
+      assignments_courses_ids = grading_standard.assignments.active.pluck(:context_id)
+      all_courses_ids = (assignments_courses_ids + courses_ids).compact.uniq
+
+      scope = Course.where(id: all_courses_ids).active.order(:name)
+
+      courses = Api.paginate(
         scope,
         self,
         account_grading_schemes_used_locations_path(
@@ -226,15 +265,12 @@ class GradingSchemesJsonController < ApplicationController
         per_page: USED_LOCATIONS_PER_PAGE
       )
 
-      used_locations_to_json(used_locations)
-    end
-  end
-
-  def used_locations_to_json(used_locations)
-    used_locations.group_by(&:context).map do |course, assignments|
-      course_json = course.as_json(only: [:id, :name], methods: [:concluded?], include_root: false)
-      course_json[:assignments] = assignments.as_json(only: [:id, :title], include_root: false)
-      course_json
+      courses.map do |course|
+        course_json = course.as_json(only: [:id, :name], methods: [:concluded?], include_root: false)
+        course_json[:with_assignments] = assignments_courses_ids.include?(course.id)
+        course_json[:assignments] = []
+        course_json
+      end
     end
   end
 

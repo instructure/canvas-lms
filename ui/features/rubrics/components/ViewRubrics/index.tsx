@@ -43,7 +43,7 @@ import {
 } from '../../queries/ViewRubricQueries'
 import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {UsedLocationsModal, type FetchUsedLocationResponse} from '@canvas/grading-scheme'
+import {type FetchUsedLocationResponse, UsedLocationsModal} from './UsedLocationsModal'
 
 const {Item: FlexItem} = Flex
 

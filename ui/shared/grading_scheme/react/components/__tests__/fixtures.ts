@@ -264,6 +264,14 @@ export const ExtraGradingSchemeCards: GradingSchemeCardData[] = ExtraGradingSche
   editing: false,
 }))
 
+export const courseWithAsyncAssignments = {
+  id: '99',
+  name: 'Test async assignment loading',
+  'concluded?': false,
+  assignments: [],
+  with_assignments: true,
+}
+
 export const DefaultUsedLocations: UsedLocation[] = [
   {
     id: '2',
@@ -354,24 +362,10 @@ export const DefaultUsedLocations: UsedLocation[] = [
       },
     ],
   },
+  courseWithAsyncAssignments,
 ]
 
 export const secondUsedLocations = [
-  {
-    id: '1',
-    name: 'Temp',
-    'concluded?': false,
-    assignments: [
-      {
-        id: '2',
-        title: 'Sample 2',
-      },
-      {
-        id: '3',
-        title: 'Sample 3',
-      },
-    ],
-  },
   {
     id: '6',
     name: 'Course 6',
@@ -382,6 +376,30 @@ export const secondUsedLocations = [
         title: 'Assignment 7',
       },
     ],
+  },
+]
+
+export const DefaultAccountUsedLocations = [
+  {
+    id: '1',
+    name: 'Test account',
+  },
+  {
+    id: '2',
+    name: 'Test account 2',
+  },
+]
+
+export const DefaultAssignmentUsedLocations = [
+  {
+    id: '100',
+    title: 'Sample 1',
+  },
+]
+export const SecondAssignmentUsedLocations = [
+  {
+    id: '101',
+    title: 'Sample 2',
   },
 ]
 
