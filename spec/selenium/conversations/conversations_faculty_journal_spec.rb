@@ -47,11 +47,7 @@ describe "conversations new" do
       Account.site_admin.disable_feature!(:deprecate_faculty_journal)
     end
 
-    context "when react_inbox feature flag is ON", :ignore_js_errors do
-      before do
-        Account.default.enable_feature! :react_inbox
-      end
-
+    context "react_inbox", :ignore_js_errors do
       it "can faculty journalize a message sent to a student that has common courses" do
         user_session(@teacher)
         get conversations_path

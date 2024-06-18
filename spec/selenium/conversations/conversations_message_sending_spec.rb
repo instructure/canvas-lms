@@ -37,11 +37,7 @@ describe "conversations new" do
   end
 
   describe "message sending" do
-    context "when react_inbox feature flag is on", :ignore_js_errors do
-      before do
-        Account.default.enable_feature! :react_inbox
-      end
-
+    context "react_inbox", :ignore_js_errors do
       context "date restricted courses" do
         before do
           @course.restrict_enrollments_to_course_dates = true

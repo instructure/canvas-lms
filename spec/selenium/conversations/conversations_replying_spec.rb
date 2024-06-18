@@ -43,11 +43,7 @@ describe "conversations new" do
       @convo.add_message(@s2, "I need the homework too.")
     end
 
-    context "when react_inbox feature flag is on" do
-      before do
-        Account.default.set_feature_flag! :react_inbox, "on"
-      end
-
+    context "react_inbox" do
       it "doesn't allow replying with no recipients", :ignore_js_errors do
         get "/conversations"
         f("div[data-testid='conversation']").click
