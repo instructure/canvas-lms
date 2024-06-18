@@ -3223,6 +3223,9 @@ class AbstractAssignment < ActiveRecord::Base
   scope :unpublished, -> { where(workflow_state: "unpublished") }
   scope :published, -> { where(workflow_state: "published") }
 
+  scope :has_sub_assignments, -> { where(has_sub_assignments: true) }
+  scope :has_no_sub_assignments, -> { where(has_sub_assignments: false) }
+
   scope :duplicating_for_too_long, lambda {
     where(
       "workflow_state = 'duplicating' AND duplication_started_at < ?",
