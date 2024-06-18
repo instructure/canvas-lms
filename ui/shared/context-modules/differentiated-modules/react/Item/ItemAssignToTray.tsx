@@ -213,6 +213,10 @@ export default function ItemAssignToTray({
     onDismiss()
   }, [defaultCards, onDismiss])
 
+  const masteryPathsAllowed = !(
+    ['discussion', 'discussion_topic'].includes(itemType) && removeDueDateInput
+  )
+
   const {
     allOptions,
     isLoading: isLoadingAssignees,
@@ -223,7 +227,7 @@ export default function ItemAssignToTray({
     groupCategoryId,
     disableFetch: !overridesFetched || isPacedCourse,
     everyoneOption,
-    checkMasteryPaths: true,
+    checkMasteryPaths: masteryPathsAllowed,
     defaultValues: [],
     requiredOptions: disabledOptionIds,
     onError: handleDismiss,
