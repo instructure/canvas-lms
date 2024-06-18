@@ -1735,7 +1735,9 @@ class DiscussionTopic < ActiveRecord::Base
       # assignment exists and isn't assigned to user (differentiated assignments)
       if for_assignment?
         next false unless assignment.visible_to_user?(user)
-      elsif Account.site_admin.feature_enabled?(:selective_release_backend)
+      # Announcements can be section specific, but that is already handled above.
+      # Eventually is_section_specific will be replaced with assignment overrides, and then announcements will need to be handled
+      elsif !is_announcement && Account.site_admin.feature_enabled?(:selective_release_backend)
         next false unless visible_to_user?(user)
       end
 

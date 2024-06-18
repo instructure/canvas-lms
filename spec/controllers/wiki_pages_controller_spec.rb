@@ -73,6 +73,27 @@ describe WikiPagesController do
             override.assignment_override_students.create!(user: @student)
             expect(response).to have_http_status :ok
           end
+
+          it "does not allow access if page has only_visible_to_overrides=false but user does not have module override" do
+            @page.update!(only_visible_to_overrides: false)
+            module1 = @course.context_modules.create!(name: "module1")
+            module1.add_item(id: @page.id, type: "wiki_page")
+            module1.assignment_overrides.create!(set_type: "ADHOC")
+
+            expect(response).to be_redirect
+            expect(response.location).to eq course_wiki_pages_url(@course)
+          end
+
+          it "allows access if page has only_visible_to_overrides=false and user does have module override" do
+            @page.update!(only_visible_to_overrides: false)
+            module1 = @course.context_modules.create!(name: "module1")
+            module1.add_item(id: @page.id, type: "wiki_page")
+
+            adhoc_override = module1.assignment_overrides.create!(set_type: "ADHOC")
+            adhoc_override.assignment_override_students.create!(user: @student)
+
+            expect(response).to have_http_status :ok
+          end
         end
 
         context "pages with an assignment" do
