@@ -30,11 +30,7 @@ describe "conversations new" do
   end
 
   # the js errors caught in here are captured by VICE-2507
-  context "when react_inbox feature flag is ON", :ignore_js_errors do
-    before do
-      Account.default.set_feature_flag! :react_inbox, "on"
-    end
-
+  context "react_inbox", :ignore_js_errors do
     it "shows no conversations selected ui" do
       get "/conversations"
       expect(fj("span:contains('No Conversations to Show')")).to be_present

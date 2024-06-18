@@ -277,10 +277,6 @@ describe ConversationsController do
     end
 
     context "react-inbox" do
-      before do
-        Account.default.enable_feature! :react_inbox
-      end
-
       context "metrics" do
         it "does not increment visit count if not authorized to open inbox" do
           get "index"
