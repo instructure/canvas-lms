@@ -29,7 +29,6 @@ export type Rubric = {
   title: string
   workflowState?: string
   hasRubricAssociations?: boolean
-  freeFormCriterionComments?: boolean
 }
 
 export type RubricCriterion = {

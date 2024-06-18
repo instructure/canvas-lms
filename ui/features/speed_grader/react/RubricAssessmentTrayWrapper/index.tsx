@@ -23,6 +23,7 @@ import type {RubricAssessmentData} from '@canvas/rubrics/react/types/rubric'
 import {
   mapRubricAssessmentDataUnderscoredKeysToCamelCase,
   mapRubricUnderscoredKeysToCamelCase,
+  type RubricOutcomeUnderscore,
   type RubricUnderscoreType,
 } from './utils'
 
@@ -54,10 +55,16 @@ const convertSubmittedAssessment = (assessments: RubricAssessmentData[]): any =>
 
 type RubricAssessmentTrayWrapperProps = {
   rubric: RubricUnderscoreType
+  rubricOutcomeData?: RubricOutcomeUnderscore[]
   onAccessorChange: (assessorId: string) => void
   onSave: (assessmentData: any) => void
 }
-export default ({rubric, onAccessorChange, onSave}: RubricAssessmentTrayWrapperProps) => {
+export default ({
+  rubric,
+  rubricOutcomeData,
+  onAccessorChange,
+  onSave,
+}: RubricAssessmentTrayWrapperProps) => {
   const {
     rubricAssessmentTrayOpen,
     studentAssessment,
@@ -81,7 +88,7 @@ export default ({rubric, onAccessorChange, onSave}: RubricAssessmentTrayWrapperP
       isOpen={rubricAssessmentTrayOpen}
       isPreviewMode={isPreviewPeerMode}
       isPeerReview={isPreviewPeerMode}
-      rubric={mapRubricUnderscoredKeysToCamelCase(rubric)}
+      rubric={mapRubricUnderscoredKeysToCamelCase(rubric, rubricOutcomeData)}
       rubricAssessmentData={mapRubricAssessmentDataUnderscoredKeysToCamelCase(
         studentAssessment?.data ?? []
       )}

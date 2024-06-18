@@ -157,6 +157,7 @@ import replaceTags from '@canvas/util/replaceTags'
 import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 import type {
   RubricAssessmentUnderscore,
+  RubricOutcomeUnderscore,
   RubricUnderscoreType,
 } from '../react/RubricAssessmentTrayWrapper/utils'
 
@@ -1910,6 +1911,7 @@ EG = {
     ReactDOM.render(
       <RubricAssessmentTrayWrapper
         rubric={ENV.rubric as RubricUnderscoreType}
+        rubricOutcomeData={ENV.rubric_outcome_data as RubricOutcomeUnderscore[]}
         onAccessorChange={accessorId => {
           $('#rubric_assessments_select').val(accessorId)
           handleSelectedRubricAssessmentChanged()

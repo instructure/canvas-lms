@@ -108,6 +108,12 @@ const RUBRIC_PREVIEW_QUERY = gql`
         longDescription
         description
         criterionUseRange
+        learningOutcomeId
+        masteryPoints
+        outcome {
+          displayName
+          title
+        }
       }
       title
       ratingOrder

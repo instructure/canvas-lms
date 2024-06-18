@@ -25,6 +25,7 @@ import {Modal} from '@instructure/ui-modal'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Table} from '@instructure/ui-table'
+import {possibleString} from '@canvas/rubrics/react/Points'
 
 const I18n = useI18nScope('rubrics-criterion-modal')
 
@@ -83,15 +84,22 @@ export const OutcomeCriterionModal = ({
             </View>
           </View>
         </View>
+        <View as="div" margin="small 0 0 small">
+          <Text data-testid="outcome-mastery-points">
+            {I18n.t('Threshold: %{threshold}', {
+              threshold: possibleString(criterion?.masteryPoints),
+            })}
+          </Text>
+        </View>
         <View as="div" margin="medium 0 0 0" display="flex">
           <Table caption={I18n.t('Outcome Criterion Edit')}>
             <Table.Head>
               <Table.Row>
                 <Table.ColHeader id="Display" textAlign="center">
-                  Display
+                  {I18n.t('Display')}
                 </Table.ColHeader>
-                <Table.ColHeader id="Title">Points</Table.ColHeader>
-                <Table.ColHeader id="Year">Rating Name</Table.ColHeader>
+                <Table.ColHeader id="Title">{I18n.t('Points')}</Table.ColHeader>
+                <Table.ColHeader id="Year">{I18n.t('Rating Name')}</Table.ColHeader>
               </Table.Row>
             </Table.Head>
             <Table.Body>
