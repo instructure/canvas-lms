@@ -25,6 +25,8 @@ require_relative "../helpers/admin_settings_common"
 require_relative "../rcs/pages/rce_next_page"
 require_relative "../helpers/wiki_and_tiny_common"
 require_relative "../../helpers/selective_release_common"
+require_relative "../helpers/items_assign_to_tray"
+require_relative "page_objects/quizzes_edit_page"
 
 describe "creating a quiz" do
   include_context "in-process server selenium tests"
@@ -35,6 +37,8 @@ describe "creating a quiz" do
   include RCENextPage
   include WikiAndTinyCommon
   include SelectiveReleaseCommon
+  include ItemsAssignToTray
+  include QuizzesEditPage
 
   context "as a teacher" do
     before do
@@ -192,8 +196,8 @@ describe "creating a quiz" do
       let(:title) { "My Title" }
       let(:error_text) { "'Please add a due date'" }
       let(:error) { fj(".error_box div:contains(#{error_text})") }
+      let(:due_date) { Time.zone.now }
       let(:due_date_input_fields) { ff(".DueDateInput") }
-      let(:save_button) { f(".save_quiz_button") }
       let(:sync_sis_button) { f("#quiz_post_to_sis") }
       let(:section_to_set) { "Section B" }
 
@@ -208,13 +212,8 @@ describe "creating a quiz" do
       end
 
       def submit_blocked_with_errors
-        save_button.click
+        click_quiz_save_button
         expect(error).not_to be_nil
-      end
-
-      def submit_page
-        wait_for_new_page_load { save_button.click }
-        expect(driver.current_url).not_to include("edit")
       end
 
       def last_override(name)
@@ -246,9 +245,40 @@ describe "creating a quiz" do
           submit_page
         end
 
-        describe "and differentiated" do
-          it "does not block with base due date and override" do
+        describe "with selective release flags on" do
+          before(:once) do
+            differentiated_modules_on
+          end
+
+          it "does not block with base due date and override", :ignore_js_errors do
+            @course.course_sections.create!(name: section_to_set)
+            new_quiz
+
+            click_manage_assign_to_button
+
+            wait_for_assign_to_tray_spinner
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
+            update_due_time(0, "11:59 PM")
+
+            click_add_assign_to_card
+            select_module_item_assignee(1, section_to_set)
+            update_due_date(1, format_date_for_view(due_date, "%-m/%-d/%Y"))
+            update_due_time(1, "11:59 PM")
+            click_save_button("Apply")
+            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+            submit_page
+          end
+        end
+
+        describe "with selective release flags off" do
+          before(:once) do
             differentiated_modules_off
+          end
+
+          it "does not block with base due date and override" do
             @course.course_sections.create!(name: section_to_set)
             new_quiz
             add_override
@@ -259,33 +289,106 @@ describe "creating a quiz" do
       end
 
       context "without due dates" do
-        it "blocks when enabled" do
-          differentiated_modules_off
-
-          @course.course_sections.create!(name: section_to_set)
-          new_quiz
-          select_last_override_section(section_to_set)
-          set_value(due_date_input_fields.first, "")
-          submit_blocked_with_errors
-        end
-
-        it "does not block when disabled" do
-          new_quiz
-          set_value(sync_sis_button, false)
-          submit_page
-        end
-
-        it "blocks with base set with override not" do
-          differentiated_modules_off
-
-          @course.course_sections.create!(name: section_to_set)
-          new_quiz
-          Timecop.freeze(7.days.from_now) do
-            set_value(due_date_input_fields.first, Time.zone.now)
+        describe "with selective release flags on" do
+          before(:once) do
+            differentiated_modules_on
           end
-          add_override
-          select_last_override_section(section_to_set)
-          submit_blocked_with_errors
+
+          it "blocks when enabled", :ignore_js_errors do
+            @course.course_sections.create!(name: section_to_set)
+            new_quiz
+
+            click_manage_assign_to_button
+
+            wait_for_assign_to_tray_spinner
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+            click_duedate_clear_button(0)
+            click_save_button("Apply")
+            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+            click_quiz_save_button
+            # LX-1857: Does not show any error, but not submits, we should verify an error here
+            expect(driver.current_url).to include("edit")
+          end
+
+          it "does not block when disabled" do
+            new_quiz
+            set_value(sync_sis_button, false)
+
+            submit_page
+          end
+
+          it "blocks with base set with override not", :ignore_js_errors do
+            @course.course_sections.create!(name: section_to_set)
+            new_quiz
+
+            click_manage_assign_to_button
+
+            wait_for_assign_to_tray_spinner
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+            update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
+            update_due_time(0, "11:59 PM")
+
+            click_add_assign_to_card
+            select_module_item_assignee(1, section_to_set)
+            click_save_button("Apply")
+            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+            click_quiz_save_button
+            # LX-1857: Does not show any error, but not submits, we should verify an error here
+            expect(driver.current_url).to include("edit")
+          end
+
+          it "does not block with base set with override not when disabled", :ignore_js_errors do
+            skip("LX-1856: Tray is not using the checkbox value")
+            @course.course_sections.create!(name: section_to_set)
+            new_quiz
+            set_value(sync_sis_button, false)
+
+            click_manage_assign_to_button
+
+            wait_for_assign_to_tray_spinner
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+            click_add_assign_to_card
+            select_module_item_assignee(1, section_to_set)
+            click_save_button("Apply")
+            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+            click_quiz_save_button
+            # LX-1857: Does not show any error, but not submits, we should verify an error here
+            expect(driver.current_url).to include("edit")
+          end
+        end
+
+        describe "with selective release flags off" do
+          before(:once) do
+            differentiated_modules_off
+          end
+
+          it "blocks when enabled" do
+            @course.course_sections.create!(name: section_to_set)
+            new_quiz
+            select_last_override_section(section_to_set)
+            set_value(due_date_input_fields.first, "")
+            submit_blocked_with_errors
+          end
+
+          it "does not block when disabled" do
+            new_quiz
+            set_value(sync_sis_button, false)
+            submit_page
+          end
+
+          it "blocks with base set with override not" do
+            @course.course_sections.create!(name: section_to_set)
+            new_quiz
+            Timecop.freeze(7.days.from_now) do
+              set_value(due_date_input_fields.first, Time.zone.now)
+            end
+            add_override
+            select_last_override_section(section_to_set)
+            submit_blocked_with_errors
+          end
         end
       end
     end
