@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'jquery-migrate'
 import slickgrid from 'slickgrid'
 import GridSupport from '../index'
 
