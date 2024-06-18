@@ -21,6 +21,7 @@ import type React from 'react'
 import {useState, useCallback, useEffect} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {FormMessage} from '@instructure/ui-form-field'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -180,10 +181,15 @@ export function useDates({
       }
 
       if (isFancyMidnightNeeded(newDueDate)) {
-        setTimeout(
-          () => setDueDate(setTimeToStringDate(fancyMidnightDueTime, newDueDate) || null),
-          200
-        )
+        showFlashAlert({
+          message: I18n.t('Due date was automatically changed to 11:59 PM'),
+          type: 'info',
+          srOnly: true,
+          politeness: 'polite',
+        })
+        setTimeout(() => {
+          setDueDate(setTimeToStringDate(fancyMidnightDueTime, newDueDate) || null)
+        }, 200)
       }
     },
     [dueDate]
@@ -262,7 +268,9 @@ export const generateCardActionLabels = (selected: string[]) => {
       return {
         removeCard: I18n.t('Remove card for %{pillA}', {pillA: selected[0]}),
         clearDueAt: I18n.t('Clear due date/time for %{pillA}', {pillA: selected[0]}),
-        clearReplyToTopicDueAt: I18n.t('Clear reply to topic due date/time for %{pillA}', {pillA: selected[0]}),
+        clearReplyToTopicDueAt: I18n.t('Clear reply to topic due date/time for %{pillA}', {
+          pillA: selected[0],
+        }),
         clearAvailableFrom: I18n.t('Clear available from date/time for %{pillA}', {
           pillA: selected[0],
         }),
@@ -278,10 +286,13 @@ export const generateCardActionLabels = (selected: string[]) => {
           pillA: selected[0],
           pillB: selected[1],
         }),
-        clearReplyToTopicDueAt: I18n.t('Clear reply to topic due date/time for %{pillA} and %{pillB}', {
-          pillA: selected[0],
-          pillB: selected[1],
-        }),
+        clearReplyToTopicDueAt: I18n.t(
+          'Clear reply to topic due date/time for %{pillA} and %{pillB}',
+          {
+            pillA: selected[0],
+            pillB: selected[1],
+          }
+        ),
         clearAvailableFrom: I18n.t('Clear available from date/time for %{pillA} and %{pillB}', {
           pillA: selected[0],
           pillB: selected[1],
@@ -303,11 +314,14 @@ export const generateCardActionLabels = (selected: string[]) => {
           pillB: selected[1],
           pillC: selected[2],
         }),
-        clearReplyToTopicDueAt: I18n.t('Clear reply to topic due date/time for %{pillA}, %{pillB}, and %{pillC}', {
-          pillA: selected[0],
-          pillB: selected[1],
-          pillC: selected[2],
-        }),
+        clearReplyToTopicDueAt: I18n.t(
+          'Clear reply to topic due date/time for %{pillA}, %{pillB}, and %{pillC}',
+          {
+            pillA: selected[0],
+            pillB: selected[1],
+            pillC: selected[2],
+          }
+        ),
         clearAvailableFrom: I18n.t(
           'Clear available from date/time for %{pillA}, %{pillB}, and %{pillC}',
           {pillA: selected[0], pillB: selected[1], pillC: selected[2]}
@@ -330,11 +344,14 @@ export const generateCardActionLabels = (selected: string[]) => {
           pillB: selected[1],
           n: selected.length - 2,
         }),
-        clearReplyToTopicDueAt: I18n.t('Clear reply to topic due date/time for %{pillA}, %{pillB}, and %{n} others', {
-          pillA: selected[0],
-          pillB: selected[1],
-          n: selected.length - 2,
-        }),
+        clearReplyToTopicDueAt: I18n.t(
+          'Clear reply to topic due date/time for %{pillA}, %{pillB}, and %{n} others',
+          {
+            pillA: selected[0],
+            pillB: selected[1],
+            n: selected.length - 2,
+          }
+        ),
         clearAvailableFrom: I18n.t(
           'Clear available from date/time for %{pillA}, %{pillB}, and %{n} others',
           {pillA: selected[0], pillB: selected[1], n: selected.length - 2}
