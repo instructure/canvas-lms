@@ -60,6 +60,10 @@ class AnnouncementNewEdit
       fj("button:contains('Publish')")
     end
 
+    def save_button
+      fj("button:contains('Save')")
+    end
+
     def notification_modal
       f('form[data-testid="send-notification-modal"]')
     end
