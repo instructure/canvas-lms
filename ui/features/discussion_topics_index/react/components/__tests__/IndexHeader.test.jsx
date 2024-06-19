@@ -23,6 +23,7 @@ import IndexHeader from '../IndexHeader'
 import merge from 'lodash/merge'
 
 const user = userEvent.setup()
+const SEARCH_FIELD_PLACEHOLDER = 'Search by title or author...'
 
 describe('IndexHeader', () => {
   const makeProps = (props = {}) =>
@@ -59,7 +60,7 @@ describe('IndexHeader', () => {
   it('renders the search input', () => {
     const props = makeProps()
     render(<IndexHeader {...props} />)
-    expect(screen.getByPlaceholderText('Search...')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(SEARCH_FIELD_PLACEHOLDER)).toBeInTheDocument()
   })
 
   it('renders the filter input', () => {
@@ -88,7 +89,7 @@ describe('IndexHeader', () => {
     const props = makeProps({searchDiscussions: searchMock()})
 
     render(<IndexHeader {...props} />)
-    const input = screen.getByPlaceholderText('Search...')
+    const input = screen.getByPlaceholderText(SEARCH_FIELD_PLACEHOLDER)
     user.type(input, 'foobar')
 
     await waitFor(() => expect(searchMock).toHaveBeenCalled())
@@ -129,7 +130,7 @@ describe('IndexHeader', () => {
 
     it('renders title', () => {
       render(<IndexHeader {...makeProps()} />)
-      expect(screen.getByText('All Discussions')).toBeInTheDocument()
+      expect(screen.getByText('Discussions')).toBeInTheDocument()
     })
   })
 })

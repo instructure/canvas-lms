@@ -28,6 +28,7 @@ export const BREAKPOINTS = {
   desktopNavOpen: {minWidth: '1140px'},
   desktopOnly: {minWidth: '768px'},
   mobileOnly: {maxWidth: '767px'},
+  ICEDesktop: {minWidth: '1025px'},
 }
 
 const convertMatchesToProp = (matches: string[] | undefined) => {

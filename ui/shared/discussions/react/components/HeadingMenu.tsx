@@ -35,10 +35,12 @@ interface SelectedObject {
 
 type Props = {
   name: string
-  filters: Record<string, string>
+  filters: Record<string, Record<string, string>>
   defaultSelectedFilter: string
   onSelectFilter: (data: SelectedObject) => void
   filterDelay?: number
+  fittedView?: boolean
+  mobileHeader?: boolean
 }
 
 export const HeadingMenu: React.FC<Props> = ({
@@ -47,6 +49,8 @@ export const HeadingMenu: React.FC<Props> = ({
   defaultSelectedFilter,
   onSelectFilter,
   filterDelay = DEFAULT_SEARCH_DELAY,
+  fittedView = false,
+  mobileHeader = false,
 }) => {
   const [filter_opened, setFilterOpened] = useState<boolean>(false)
   const [selected_filter, setSelectedFilter] = useState<string>(defaultSelectedFilter)
@@ -65,9 +69,11 @@ export const HeadingMenu: React.FC<Props> = ({
     [onSelectFilter]
   )
 
-  const handleFilterSelect = (filter: string) => {
-    setSelectedFilter(filter)
-    onSelectFilter({value: filter, id: filter})
+  const handleFilterSelect = (filter: string | number | undefined) => {
+    if (filter && typeof filter === 'string') {
+      setSelectedFilter(filter)
+      onSelectFilter({value: filter, id: filter})
+    }
   }
 
   useEffect(() => {
@@ -80,13 +86,13 @@ export const HeadingMenu: React.FC<Props> = ({
     <Flex
       as="div"
       direction="row"
-      justifyItems="start"
+      justifyItems={fittedView ? 'space-between' : 'start'}
       alignItems="center"
-      width="98%"
       data-testid="heading-menu"
+      gap="small"
     >
-      <Flex.Item margin="0 x-small 0 0">
-        <Heading level="h1">{filters[selected_filter]}</Heading>
+      <Flex.Item width={mobileHeader ? 'min-content' : 'auto'}>
+        <Heading level="h1">{filters[selected_filter].title}</Heading>
       </Flex.Item>
       <Flex.Item>
         <Menu
@@ -105,14 +111,14 @@ export const HeadingMenu: React.FC<Props> = ({
           <Menu.Group
             selected={[selected_filter]}
             onSelect={(_, selected) => {
-              handleFilterSelect(selected[0] as string)
+              handleFilterSelect(selected[0])
             }}
             label={I18n.t('View')}
             data-testid="filter-menu"
           >
             {Object.keys(filters).map(filter => (
               <Menu.Item key={filter} value={filter} data-testid={`menu-filter-${filter}`}>
-                {filters[filter]}
+                {filters[filter].name}
               </Menu.Item>
             ))}
           </Menu.Group>
