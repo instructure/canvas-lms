@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
+import 'jquery-migrate' // required
 import 'jqueryui/position'
 
 describe('jQuery UI Position Tests', () => {

@@ -18,7 +18,7 @@
 
 import UploadMediaTrackForm from '../UploadMediaTrackForm'
 import $ from 'jquery'
-import 'jquery-migrate'
+import 'jquery-migrate' // required
 
 $.migrateMute = true
 

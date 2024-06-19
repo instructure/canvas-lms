@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import moveMultipleQuestionBanks from '../moveMultipleQuestionBanks'
 
 describe('Move Multiple Question Banks', () => {

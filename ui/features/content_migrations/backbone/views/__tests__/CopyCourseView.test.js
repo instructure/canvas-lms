@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
 import ContentMigration from '@canvas/content-migrations/backbone/models/ContentMigration'
 import CopyCourseView from '../CopyCourseView'

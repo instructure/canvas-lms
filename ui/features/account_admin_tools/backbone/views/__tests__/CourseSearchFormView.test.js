@@ -19,7 +19,6 @@
 import CourseRestore from '../../models/CourseRestore'
 import CourseSearchFormView from '../CourseSearchFormView'
 import $ from 'jquery'
-import 'jquery-migrate'
 import {isAccessible} from '@canvas/test-utils/jestAssertions'
 import sinon from 'sinon'
 

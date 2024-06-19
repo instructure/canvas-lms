@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import ContentMigration from '../../../models/ContentMigration'
 import SelectContentCheckbox from '../SelectContentCheckboxView'
 

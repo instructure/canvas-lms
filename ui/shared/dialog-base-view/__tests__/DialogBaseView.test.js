@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import DialogBaseView from '../index'
 
 describe('DialogBaseView', () => {

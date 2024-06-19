@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
+import 'jquery-migrate' // required
 import openModerateStudentDialog from '../openModerateStudentDialog'
 
 describe('openModerateStudentDialog', () => {

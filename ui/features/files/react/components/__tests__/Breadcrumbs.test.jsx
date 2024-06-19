@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'jquery-migrate'
 import React from 'react'
 import {render, screen, cleanup} from '@testing-library/react'
 import Breadcrumbs from '../Breadcrumbs'

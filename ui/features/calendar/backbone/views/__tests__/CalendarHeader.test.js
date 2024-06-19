@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import CalendarHeader from '../CalendarHeader'
 import {isAccessible} from '@canvas/test-utils/jestAssertions'
 

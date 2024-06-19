@@ -18,7 +18,6 @@
 
 import GradingForm from '../grading_form'
 import $ from 'jquery'
-import 'jquery-migrate'
 import sinon from 'sinon'
 
 const ok = x => expect(x).toBeTruthy()

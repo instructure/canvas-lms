@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import CheckboxView from '../CheckboxView'
 
 describe('gradebook/CheckboxView', () => {

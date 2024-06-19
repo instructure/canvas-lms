@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import ProgressStatusView from '../ProgressStatusView'
 import ProgressingModel from '../../models/ProgressingContentMigration'
 import {isAccessible} from '@canvas/test-utils/jestAssertions'

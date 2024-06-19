@@ -20,7 +20,6 @@ import $ from 'jquery'
 import Subject from '../question_flagged'
 import K from '../../constants'
 import sinon from 'sinon'
-import 'jquery-migrate'
 
 const ok = value => expect(value).toBeTruthy()
 const equal = (value, expected) => expect(value).toEqual(expected)

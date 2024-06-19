@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import '../jquery.serializeForm'
 
 const $sampleForm = $(`

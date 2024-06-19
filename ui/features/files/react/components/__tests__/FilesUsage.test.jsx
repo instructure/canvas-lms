@@ -20,7 +20,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
-import 'jquery-migrate'
 import FilesUsage from '../FilesUsage'
 import sinon from 'sinon'
 

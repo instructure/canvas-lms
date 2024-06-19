@@ -18,7 +18,7 @@
 
 import QuizRubric from '../quiz_rubric'
 import $ from 'jquery'
-import 'jquery-migrate'
+import 'jquery-migrate' // required
 
 const ok = value => expect(value).toBeTruthy()
 
