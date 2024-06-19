@@ -82,10 +82,11 @@ export default createReactClass({
       }
     })
 
-    // eslint-disable-next-line react/no-is-mounted
-    if (this.isMounted()) {
+    try {
       this.setState({fields}, this.validateConfig)
       this.refs.addTool.focus()
+    } catch (err) {
+      console.error(err)
     }
   },
 

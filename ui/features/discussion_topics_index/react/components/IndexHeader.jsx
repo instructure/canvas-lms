@@ -53,8 +53,8 @@ const getFilters = () => ({
 export default class IndexHeader extends Component {
   static propTypes = {
     breakpoints: breakpointsShape.isRequired,
-    contextId: string.isRequired,
-    contextType: string.isRequired,
+    contextId: string,
+    contextType: string,
     courseSettings: propTypes.courseSettings,
     discussionTopicIndexMenuTools: arrayOf(propTypes.discussionTopicMenuTools),
     fetchCourseSettings: func.isRequired,

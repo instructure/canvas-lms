@@ -59,8 +59,8 @@ const getFilters = () => ({
 export default class IndexHeader extends Component {
   static propTypes = {
     breakpoints: breakpointsShape.isRequired,
-    contextType: string.isRequired,
-    contextId: string.isRequired,
+    contextType: string,
+    contextId: string,
     isBusy: bool,
     selectedCount: number,
     isToggleLocking: bool.isRequired,
