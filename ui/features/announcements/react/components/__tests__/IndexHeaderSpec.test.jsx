@@ -97,8 +97,8 @@ describe('"Announcement Filter" select', () => {
 
     await userEvent.click(filterDDown)
 
-    expect(screen.getByText(/All/)).toBeInTheDocument()
-    expect(screen.getByText(/Unread/i)).toBeInTheDocument()
+    expect(screen.getByText('All')).toBeInTheDocument()
+    expect(screen.getByText('Unread')).toBeInTheDocument()
   })
 
   test('calls the searchAnnouncements prop when selecting a filter option with the selected value', async () => {

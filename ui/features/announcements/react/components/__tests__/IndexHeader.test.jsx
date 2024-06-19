@@ -120,7 +120,7 @@ describe('IndexHeader', () => {
 
     it('renders title', () => {
       render(<IndexHeader {...defaultProps()} />)
-      expect(screen.getByText('All Announcements')).toBeInTheDocument()
+      expect(screen.getByText('Announcements')).toBeInTheDocument()
     })
 
     it('renders icon dropdown next to title', () => {
