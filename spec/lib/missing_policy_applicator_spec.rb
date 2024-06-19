@@ -262,28 +262,50 @@ describe MissingPolicyApplicator do
       expect(submission.grade).to be_nil
     end
 
-    # as of VICE-4313, sub_assignments are igonred by the missing policy applicator
-    # TODO: determine if sub_assignments should be included in the missing policy applicator
-    # since we are now excluding parent assignments
     it "does not apply deductions to submissions for parents in checkpointed assignments" do
       @course.root_account.enable_feature!(:discussion_checkpoints)
       late_policy_missing_enabled
       create_recent_assignment
       assignment = Assignment.last
       assignment.has_sub_assignments = true
+      assignment.submission_types = "discussion_topic"
+      d = @course.discussion_topics.create!(title: "Test Topic", assignment:)
+      d.publish!
       assignment.save!
 
       submission = @course.submissions.find { |s| s.assignment&.has_sub_assignments? }
       submission.update_columns(score: nil, grade: nil, workflow_state: "unsubmitted")
 
-      assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 1.hour.ago(now))
-      assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 1.hour.ago(now))
+      checkpoint1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: d,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 1.hour.ago(now) }],
+        points_possible: 5
+      )
+      checkpoint1_submission = checkpoint1.submissions.find_by(user_id: submission.user_id)
 
+      checkpoint2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: d,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 1.hour.ago(now) }],
+        points_possible: 5,
+        replies_required: 2
+      )
+      checkpoint2_submission = checkpoint2.submissions.find_by(user_id: submission.user_id)
       applicator.apply_missing_deductions
 
+      checkpoint1_submission.reload
+      expect(checkpoint1_submission.score).to eq 1.25
+      expect(checkpoint1_submission.grade).to eq "F"
+
+      checkpoint2_submission.reload
+      expect(checkpoint2_submission.score).to eq 1.25
+      expect(checkpoint2_submission.grade).to eq "F"
+
       submission.reload
-      expect(submission.score).to be_nil
-      expect(submission.grade).to be_nil
+      # submission score is the sum of the already missing policy applied checkpoint scores
+      expect(submission.score).to eq 2.5
+      expect(submission.grade).to eq "F"
     end
 
     it "does not apply deductions to assignments expecting on paper submissions if the due date is past" do

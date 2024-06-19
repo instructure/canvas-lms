@@ -3069,14 +3069,14 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  private
-
   def aggregate_checkpoint_submissions
     Checkpoints::SubmissionAggregatorService.call(
       assignment: assignment.parent_assignment,
       student: user
     )
   end
+
+  private
 
   def checkpoint_changes?
     checkpoint_submission? && checkpoint_attributes_changed?
