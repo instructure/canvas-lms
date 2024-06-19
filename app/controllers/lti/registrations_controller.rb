@@ -506,10 +506,13 @@ class Lti::RegistrationsController < ApplicationController
 
       all_registrations = account_registrations + forced_on_in_site_admin + inherited_on_registrations
 
+      search_terms = params[:query]&.downcase&.split
+      all_registrations = filter_registrations_by_search_query(all_registrations, search_terms) if search_terms
+
       # always sort by created_at descending for now
       sorted_registrations = all_registrations.sort { |first, second| second.created_at - first.created_at }
 
-      paginated_registrations, _metadata = Api.jsonapi_paginate(sorted_registrations, self, url_for(controller: "lti/registrations", action: "list"), { per_page: params[:per_page] || 15 })
+      paginated_registrations, _metadata = Api.jsonapi_paginate(sorted_registrations, self, url_for, { per_page: params[:per_page] || 15 })
       render json: {
         total: all_registrations.size,
         data: lti_registrations_json(paginated_registrations, @current_user, session, @context, includes: [:account_binding])
@@ -675,5 +678,23 @@ class Lti::RegistrationsController < ApplicationController
   def report_error(exception, code = nil)
     code ||= response_code_for_rescue(exception) if exception
     InstStatsd::Statsd.increment("canvas.lti_registrations_controller.request_error", tags: { action: action_name, code: })
+  end
+
+  def filter_registrations_by_search_query(registrations, search_terms)
+    # all search terms must appear, but each can be in either the name,
+    # admin_nickname, or vendor name. Remove the search terms from the list
+    # as they are found -- keep the registration as a matching result if the
+    # list is empty at the end.
+    registrations.select do |registration|
+      terms_to_find = search_terms.dup
+      terms_to_find.delete_if do |term|
+        attributes = %i[name admin_nickname vendor]
+        attributes.any? do |attribute|
+          registration[attribute]&.downcase&.include?(term)
+        end
+      end
+
+      terms_to_find.empty?
+    end
   end
 end

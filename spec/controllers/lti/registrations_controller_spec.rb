@@ -174,6 +174,45 @@ describe Lti::RegistrationsController do
           expect(response_json[:data].first["name"]).to eq("created just now")
           expect(response_json[:data].last["name"]).to eq("created an hour ago")
         end
+
+        context "with a search query param matching no results" do
+          let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations?query=searchterm" }
+
+          it "finds no registrations" do
+            subject
+            expect(response_json[:data].length).to eq(0)
+          end
+        end
+
+        context "with a search query param matching some results" do
+          # search for "registration no" which should find "Registration no. 1" etc.
+          let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations?query=registration%20no" }
+
+          it "finds matching registrations" do
+            subject
+            # searching "registration no" should find the three registrations titled
+            # "Registration no. N"
+            expect(response_json[:data].length).to eq(3)
+          end
+
+          it "rejects registrations that do not match all terms" do
+            # The name "registration" alone is not enough to match search terms "registration no"
+            incomplete_match = lti_registration_model(account:, name: "registration")
+            subject
+            expect(response_json[:data].pluck(:id)).not_to include(incomplete_match.id)
+          end
+
+          it "finds registrations with matching terms across different model attributes" do
+            multi_attribute_match = lti_registration_model(account:, name: "registration", vendor: "no")
+            subject
+            expect(response_json[:data].pluck(:id)).to include(multi_attribute_match.id)
+          end
+
+          it "includes the current search parameters in the Link header" do
+            subject
+            expect(response.headers["Link"]).to include("?query=registration+no")
+          end
+        end
       end
 
       context "without user session" do
