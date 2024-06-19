@@ -142,7 +142,7 @@ describe('GradingSchemesSelector', () => {
       expect(getByTestId('grading-scheme-view-modal')).toBeInTheDocument()
     })
 
-    it('opened viow modal data should match course default (if any) if no other is selected', async () => {
+    it('opened view modal data should match course default (if any) if no other is selected', async () => {
       const {getByTestId} = renderGradingSchemesSelector({courseDefaultSchemeId: '3'})
       await new Promise(resolve => setTimeout(resolve, 0))
       const dropdown = getByTestId('grading-schemes-selector-dropdown')
