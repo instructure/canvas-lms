@@ -30,6 +30,10 @@ module Api::V1::Lti::Registration
   # Serializes a list of LTI registrations.
   # @param includes [Array<Symbol>] Accepted values: [:configuration, :account_binding]
   def lti_registrations_json(registrations, user, session, context, includes: [])
+    if includes.include?(:account_binding)
+      Lti::Registration.preload_account_bindings(registrations, context)
+    end
+
     registrations.map { |r| lti_registration_json(r, user, session, context, includes:) }
   end
 
