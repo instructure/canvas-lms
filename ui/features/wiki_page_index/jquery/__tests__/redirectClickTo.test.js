@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import '../redirectClickTo' // Assuming this adds a method to jQuery objects
 
 describe('redirectClickTo', () => {

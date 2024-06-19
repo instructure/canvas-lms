@@ -17,7 +17,6 @@
  */
 
 import jQuery from 'jquery'
-import 'jquery-migrate'
 import '../jquery.instructure_misc_plugins'
 
 const ok = value => expect(value).toBeTruthy()

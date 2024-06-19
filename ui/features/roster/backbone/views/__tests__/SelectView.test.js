@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
 import SelectView from '../SelectView'
 import '@canvas/jquery/jquery.simulate'

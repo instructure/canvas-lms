@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import UnassignedUsersView from '../UnassignedUsersView'
 import AssignToGroupMenu from '../AssignToGroupMenu'
 import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection'

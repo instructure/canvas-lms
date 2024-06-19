@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import AvatarDialogView from '../AvatarDialogView'
 import {isAccessible} from '@canvas/test-utils/jestAssertions'
 import sinon from 'sinon'

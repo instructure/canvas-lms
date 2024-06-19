@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import Entry from '../../models/Entry'
 import EntryView from '../EntryView'
 import fakeENV from '@canvas/test-utils/fakeENV'

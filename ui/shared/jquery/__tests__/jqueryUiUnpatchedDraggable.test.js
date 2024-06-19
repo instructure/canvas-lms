@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import 'jquery-ui-touch-punch'
-import 'jquery-migrate'
 import 'jqueryui/droppable'
 import 'jqueryui/draggable'
 import 'jqueryui/mouse'

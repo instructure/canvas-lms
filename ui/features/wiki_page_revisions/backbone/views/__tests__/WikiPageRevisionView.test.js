@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import WikiPageRevision from '@canvas/wiki/backbone/models/WikiPageRevision'
 import WikiPageRevisionsCollection from '../../collections/WikiPageRevisionsCollection'
 import WikiPageRevisionView from '../WikiPageRevisionView'

@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 
 describe('JQuery', () => {
   beforeEach(() => {

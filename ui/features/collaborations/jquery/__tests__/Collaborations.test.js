@@ -18,7 +18,7 @@
 
 import collaborations from '../index'
 import $ from 'jquery'
-import 'jquery-migrate'
+import 'jquery-migrate' // required
 import '@canvas/jquery/jquery.ajaxJSON'
 import sinon from 'sinon'
 

@@ -19,7 +19,6 @@
 import Subject from '../question_viewed'
 import K from '../../constants'
 import $ from 'jquery'
-import 'jquery-migrate'
 import sinon from 'sinon'
 
 const equal = (x, y) => expect(x).toBe(y)

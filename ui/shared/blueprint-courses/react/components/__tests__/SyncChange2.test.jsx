@@ -23,7 +23,6 @@ import {Pill} from '@instructure/ui-pill'
 import getSampleData from '../../../getSampleData'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import 'jquery-migrate'
 
 const ok = x => expect(x).toBeTruthy()
 const equal = (x, y) => expect(x).toBe(y)

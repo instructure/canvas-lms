@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import kalturaAnalytics from '../kalturaAnalytics'
 import mejs from '@canvas/mediaelement'
 import 'jquery.cookie'

@@ -19,7 +19,6 @@
 import Subject from '../page_focused'
 import K from '../../constants'
 import $ from 'jquery'
-import 'jquery-migrate'
 import sinon from 'sinon'
 
 const capture = sinon.spy()

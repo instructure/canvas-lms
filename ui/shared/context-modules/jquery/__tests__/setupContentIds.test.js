@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import setupContentIds from '../setupContentIds'
 
 describe('Modules Utilities: setupContentIds', () => {

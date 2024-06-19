@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import $ from 'jquery'
-import 'jquery-migrate'
 import JQuerySelectorCache from '../JQuerySelectorCache'
 import sinon from 'sinon'
 

@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import inlineMediaComment from '../loadInlineMediaComments'
 
 const container = document.createElement('div')

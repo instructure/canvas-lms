@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
 import ExternalToolLaunchView from '../ExternalToolLaunchView'
 import {isAccessible} from '@canvas/test-utils/jestAssertions'

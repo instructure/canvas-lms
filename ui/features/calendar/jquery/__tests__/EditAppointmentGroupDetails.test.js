@@ -17,10 +17,8 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import EditAppointmentGroupDetails from '../EditAppointmentGroupDetails'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
-import * as tz from '@instructure/moment-utils'
 
 const equal = (x, y) => expect(x).toBe(y)
 

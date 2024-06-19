@@ -19,7 +19,6 @@
 import React from 'react'
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import {render, screen} from '@testing-library/react'
 import CourseTabContainer from '../CourseTabContainer'
 

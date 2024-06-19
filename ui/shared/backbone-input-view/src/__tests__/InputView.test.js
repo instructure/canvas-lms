@@ -18,7 +18,6 @@
 
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import 'jquery-migrate'
 import InputView from '../index'
 
 const equal = (x, y) => expect(x).toBe(y)

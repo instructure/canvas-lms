@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import ContentView from '@canvas/outcomes/content-view/backbone/views/index'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import instructionsTemplate from '../jst/mainInstructions.handlebars'

@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import {isAccessible} from '@canvas/test-utils/jestAssertions'
 import DiscussionTopicToolbarView from '../DiscussionTopicToolbarView'
 

@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import updateSubnavMenuToggle from '../updateSubnavMenuToggle'
 
 const container = $('<div id="fixtures"></div>')
