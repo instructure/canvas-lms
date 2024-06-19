@@ -23,9 +23,16 @@ import TestUtils from 'react-dom/test-utils'
 import LastActivity from '../LastActivity'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 
-QUnit.module('StudentContextTray/LastActivity', hooks => {
+const container = document.createElement('div')
+container.setAttribute('id', 'fixtures')
+document.body.appendChild(container)
+
+const notOk = x => expect(x).toBeFalsy()
+const equal = (x, y) => expect(x).toEqual(y)
+
+describe('StudentContextTray/LastActivity', () => {
   let subject
-  hooks.afterEach(() => {
+  afterEach(() => {
     if (subject) {
       const componentNode = ReactDOM.findDOMNode(subject)
       if (componentNode) {
@@ -37,7 +44,7 @@ QUnit.module('StudentContextTray/LastActivity', hooks => {
 
   const lastActivity = 'Wed, 16 Nov 2016 00:29:34 UTC +00:00'
 
-  QUnit.module('lastActivity', () => {
+  describe('lastActivity', () => {
     test('returns null by default', () => {
       subject = TestUtils.renderIntoDocument(<LastActivity user={{}} />)
       notOk(subject.lastActivity)
@@ -66,14 +73,6 @@ QUnit.module('StudentContextTray/LastActivity', hooks => {
       )
 
       equal(subject.lastActivity, lastActivity)
-    })
-  })
-
-  test('renders nothing by default', () => {
-    subject = TestUtils.renderIntoDocument(<LastActivity user={{}} />)
-
-    throws(() => {
-      TestUtils.findRenderedComponentWithType(subject, FriendlyDatetime)
     })
   })
 

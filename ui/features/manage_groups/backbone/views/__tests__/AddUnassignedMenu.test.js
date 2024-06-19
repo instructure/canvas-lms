@@ -24,6 +24,14 @@ import AddUnassignedMenu from '../AddUnassignedMenu'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import sinon from 'sinon'
+
+const container = document.createElement('div')
+container.setAttribute('id', 'fixtures')
+document.body.appendChild(container)
+
+const ok = x => expect(x).toBeTruthy()
+const equal = (x, y) => expect(x).toEqual(y)
 
 let clock = null
 let server = null
@@ -33,8 +41,8 @@ let view = null
 const sendResponse = (method, url, json) =>
   server.respond(method, url, [200, {'Content-Type': 'application/json'}, JSON.stringify(json)])
 
-QUnit.module('AddUnassignedMenu', {
-  setup() {
+describe('AddUnassignedMenu', () => {
+  beforeEach(() => {
     fakeENV.setup()
     clock = sinon.useFakeTimers()
     server = sinon.fakeServer.create()
@@ -70,23 +78,24 @@ QUnit.module('AddUnassignedMenu', {
       waldo,
     ])
     view.$el.appendTo($('#fixtures'))
-  },
-  teardown() {
+  })
+
+  afterEach(() => {
     fakeENV.teardown()
     clock.restore()
     server.restore()
     view.remove()
     document.getElementById('fixtures').innerHTML = ''
-  },
-})
+  })
 
-test("updates the user's group and removes from unassigned collection", () => {
-  equal(waldo.get('group'), null)
-  const $links = view.$('.assign-user-to-group')
-  equal($links.length, 4)
-  const $waldoLink = $links.last()
-  $waldoLink.click()
-  sendResponse('POST', '/api/v1/groups/777/memberships', {})
-  equal(waldo.get('group'), view.group)
-  ok(!users.contains(waldo))
+  test("updates the user's group and removes from unassigned collection", () => {
+    equal(waldo.get('group'), undefined)
+    const $links = view.$('.assign-user-to-group')
+    equal($links.length, 4)
+    const $waldoLink = $links.last()
+    $waldoLink.click()
+    sendResponse('POST', '/api/v1/groups/777/memberships', {})
+    equal(waldo.get('group'), view.group)
+    ok(!users.contains(waldo))
+  })
 })

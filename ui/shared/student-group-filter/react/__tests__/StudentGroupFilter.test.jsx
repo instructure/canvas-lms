@@ -17,28 +17,26 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-
+import {render, cleanup, screen} from '@testing-library/react'
 import StudentGroupFilter from '../index'
+import '@testing-library/jest-dom/extend-expect'
 
-QUnit.module('StudentGroupFilter', suiteHooks => {
-  let $container
+describe('StudentGroupFilter', () => {
   let context
 
-  function mountComponent() {
-    ReactDOM.render(<StudentGroupFilter {...context} />, $container)
+  const renderComponent = (props = {}) => {
+    render(<StudentGroupFilter {...context} {...props} />)
   }
 
-  function getOptions() {
-    return [...getSelect().querySelectorAll('option')]
+  const getOptions = () => {
+    return [...screen.getByRole('combobox').querySelectorAll('option')]
   }
 
-  function getSelect() {
-    return $container.querySelector('select')
+  const getSelect = () => {
+    return screen.getByRole('combobox')
   }
 
-  suiteHooks.beforeEach(() => {
-    $container = document.body.appendChild(document.createElement('div'))
+  beforeEach(() => {
     context = {
       categories: [
         {
@@ -48,53 +46,51 @@ QUnit.module('StudentGroupFilter', suiteHooks => {
         },
       ],
       label: 'Select a student group',
-      onChange: sinon.spy(),
+      onChange: jest.fn(),
       value: '2101',
     }
   })
 
-  suiteHooks.afterEach(() => {
-    ReactDOM.unmountComponentAtNode($container)
-    $container.remove()
+  afterEach(() => {
+    cleanup()
   })
 
   test('renders a select', () => {
-    mountComponent()
-    ok(getSelect())
+    renderComponent()
+    expect(getSelect()).toBeInTheDocument()
   })
 
   test('renders the group categories', () => {
-    mountComponent()
-    const categories = [...getSelect().querySelectorAll('optgroup')].map(category => category.label)
-    deepEqual(categories, ['group category 1'])
+    renderComponent()
+    const categories = [...screen.getAllByRole('group')].map(category => category.label)
+    expect(categories).toEqual(['group category 1'])
   })
 
   test('renders the groups', () => {
-    mountComponent()
-    const groups = getOptions().map(option => option.innerText)
-    deepEqual(groups, ['Select One', 'group 1'])
+    renderComponent()
+    const groups = getOptions().map(option => option.textContent)
+    expect(groups).toEqual(['Select One', 'group 1'])
   })
 
   test('the "Select One" option is disabled', () => {
-    mountComponent()
-    const option = getOptions().find(opt => opt.innerText === 'Select One')
-    strictEqual(option.disabled, true)
+    renderComponent()
+    const option = getOptions().find(opt => opt.textContent === 'Select One')
+    expect(option).toBeDisabled()
   })
 
   test('the "Select One" option has a value of "0"', () => {
-    mountComponent()
-    const option = getOptions().find(opt => opt.innerText === 'Select One')
-    strictEqual(option.value, '0')
+    renderComponent()
+    const option = getOptions().find(opt => opt.textContent === 'Select One')
+    expect(option).toHaveValue('0')
   })
 
   test('select is set to value that is passed in', () => {
-    mountComponent()
-    strictEqual(getSelect().value, '2101')
+    renderComponent()
+    expect(getSelect().value).toBe('2101')
   })
 
   test('select is set to value "0" when no value is passed in', () => {
-    context.value = null
-    mountComponent()
-    strictEqual(getSelect().value, '0')
+    renderComponent({value: null})
+    expect(getSelect().value).toBe('0')
   })
 })

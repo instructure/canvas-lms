@@ -21,6 +21,13 @@ import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import MoveToDialog from '../MoveToDialog'
 
+const ok = a => expect(a).toBeTruthy()
+const strictEqual = (a, b) => expect(a).toBe(b)
+
+const container = document.createElement('div')
+container.setAttribute('id', 'fixtures')
+document.body.appendChild(container)
+
 let root
 let appRoot
 let applicationElement
@@ -42,8 +49,8 @@ const mountDialog = (opts = {}) => {
   return dialog
 }
 
-QUnit.module('MoveToDialog', {
-  setup() {
+describe('MoveToDialog', () => {
+  beforeEach(() => {
     root = document.createElement('div')
     appRoot = document.createElement('div')
     applicationElement = document.createElement('div')
@@ -51,52 +58,47 @@ QUnit.module('MoveToDialog', {
     document.getElementById('fixtures').appendChild(root)
     document.getElementById('fixtures').appendChild(appRoot)
     document.getElementById('fixtures').appendChild(applicationElement)
-  },
+  })
 
-  teardown() {
+  afterEach(() => {
     ReactDOM.unmountComponentAtNode(root)
     appRoot.removeAttribute('aria-hidden')
     document.getElementById('fixtures').innerHTML = ''
-  },
-})
-
-test('calls onMove with a destination id when selected', assert => {
-  const done = assert.async()
-  mountDialog({
-    onMove: val => {
-      strictEqual(val, '1')
-      done()
-    },
   })
-  const button = document.getElementById('MoveToDialog__move')
-  TestUtils.Simulate.click(button)
-})
 
-QUnit.skip('does not call onMove when cancelled via close button', assert => {
-  const done = assert.async(2)
-  mountDialog({
-    onMove: _val => {
-      ok(false)
-    },
-    onClose: () => {
-      // eslint-disable-next-line jest/valid-expect, qunit/no-global-expect
-      expect(0)
-      done()
-    },
+  test('calls onMove with a destination id when selected', done => {
+    mountDialog({
+      onMove: val => {
+        strictEqual(val, '1')
+        done()
+      },
+    })
+    const button = document.getElementById('MoveToDialog__move')
+    TestUtils.Simulate.click(button)
   })
-  const button = document.getElementById('MoveToDialog__cancel')
-  TestUtils.Simulate.click(button)
-})
 
-QUnit.skip('does not fail when no onMove is specified', assert => {
-  const done = assert.async(2)
-  mountDialog({
-    onClose: () => {
-      // eslint-disable-next-line jest/valid-expect, qunit/no-global-expect
-      expect(0)
-      done()
-    },
+  test('does not call onMove when cancelled via close button', done => {
+    mountDialog({
+      onMove: _val => {
+        ok(false)
+      },
+      onClose: () => {
+        ok(true)
+        done()
+      },
+    })
+    const button = document.getElementById('MoveToDialog__cancel')
+    TestUtils.Simulate.click(button)
   })
-  const button = document.getElementById('MoveToDialog__move')
-  TestUtils.Simulate.click(button)
+
+  test('does not fail when no onMove is specified', done => {
+    mountDialog({
+      onClose: () => {
+        ok(true)
+        done()
+      },
+    })
+    const button = document.getElementById('MoveToDialog__move')
+    TestUtils.Simulate.click(button)
+  })
 })

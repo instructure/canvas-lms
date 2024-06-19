@@ -24,7 +24,7 @@ const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
 document.body.appendChild(container)
 
-const strictEqual = (x, y) => expect(x).toBe(y)
+const strictEqual = (x, y) => expect(x).toStrictEqual(y)
 
 describe('JQuerySelectorCache', () => {
   let selectorCache

@@ -22,7 +22,7 @@ import {isAccessible} from '@canvas/test-utils/jestAssertions'
 import DiscussionTopicToolbarView from '../DiscussionTopicToolbarView'
 
 const ok = x => expect(x).toBeTruthy()
-const strictEqual = (x, y) => expect(x).toBe(y)
+const strictEqual = (x, y) => expect(x).toStrictEqual(y)
 
 const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')

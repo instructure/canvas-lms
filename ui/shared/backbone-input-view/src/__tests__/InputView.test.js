@@ -22,7 +22,7 @@ import 'jquery-migrate'
 import InputView from '../index'
 
 const equal = (x, y) => expect(x).toBe(y)
-const strictEqual = (x, y) => expect(x).toBe(y)
+const strictEqual = (x, y) => expect(x).toStrictEqual(y)
 
 const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')

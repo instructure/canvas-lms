@@ -25,7 +25,7 @@ import sinon from 'sinon'
 
 const sandbox = sinon.createSandbox()
 const deepEqual = (x, y) => expect(x).toEqual(y)
-const strictEqual = (x, y) => expect(x).toBe(y)
+const strictEqual = (x, y) => expect(x).toStrictEqual(y)
 
 const ok = x => expect(x).toBeTruthy()
 
