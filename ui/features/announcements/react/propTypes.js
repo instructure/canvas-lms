@@ -21,10 +21,10 @@ import {shape, bool, string, number} from 'prop-types'
 const propTypes = {}
 
 propTypes.permissions = shape({
-  create: bool.isRequired,
-  manage_course_content_edit: bool.isRequired,
-  manage_course_content_delete: bool.isRequired,
-  moderate: bool.isRequired,
+  create: bool,
+  manage_course_content_edit: bool,
+  manage_course_content_delete: bool,
+  moderate: bool,
 })
 
 propTypes.rssFeed = shape({

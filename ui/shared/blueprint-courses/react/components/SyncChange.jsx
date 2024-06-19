@@ -112,6 +112,7 @@ class SyncChange extends Component {
             <ToggleDetails
               summary={<ScreenReaderContent>{I18n.t('Show exceptions')}</ScreenReaderContent>}
               expanded={this.state.isExpanded}
+              onToggle={() => {}}
             >
               {this.renderExceptions()}
             </ToggleDetails>

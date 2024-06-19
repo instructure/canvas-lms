@@ -604,5 +604,3 @@ test(' ', () => {
   deepEqual(newState.usersToBeEnrolled, INITIAL_STATE.usersToBeEnrolled, 'usersToBeEnrolled')
   equal(newState.usersEnrolled, INITIAL_STATE.usersEnrolled, 'usersEnrolled')
 })
-
-// dummy data

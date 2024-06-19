@@ -22,7 +22,6 @@ import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import axios from '@canvas/axios'
-import {setupCache} from 'axios-cache-adapter/src/index'
 import 'jqueryui/tabs'
 import globalAnnouncements from './global_announcements'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -323,17 +322,7 @@ $(document).ready(function () {
             $('#tab-reports').text(I18n.t('There are no reports for you to view.'))
           })
       } else if (tabId === 'tab-security-link') {
-        // Set up axios and send a prefetch request to get the data we need,
-        // this should make things appear to be much quicker once the bundle
-        // loads in.
-        const cache = setupCache({
-          maxAge: 0.5 * 60 * 1000, // Hold onto the data for 30 seconds
-          debug: true,
-        })
-
-        const api = axios.create({
-          adapter: cache.adapter,
-        })
+        const api = axios.create({})
 
         const splitContext = window.ENV.context_asset_string.split('_')
 
