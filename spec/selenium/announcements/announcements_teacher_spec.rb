@@ -79,7 +79,7 @@ describe "announcements" do
 
         type_in_tiny("#discussion-topic-message-body", "Hi, this is my EDITED message")
 
-        AnnouncementNewEdit.publish_button.click
+        AnnouncementNewEdit.save_button.click
 
         # Expect Modal to appear with proper header
         expect(AnnouncementNewEdit.notification_modal).to be_displayed
@@ -95,7 +95,7 @@ describe "announcements" do
 
         type_in_tiny("#discussion-topic-message-body", "Hi, this is my EDITED message")
 
-        AnnouncementNewEdit.publish_button.click
+        AnnouncementNewEdit.save_button.click
 
         # Expect Modal to appear with proper header
         expect(AnnouncementNewEdit.notification_modal).to be_displayed
@@ -120,10 +120,10 @@ describe "announcements" do
       it "should not send notifications at all if we hit Cancel", :ignore_js_errors do
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
 
-        AnnouncementNewEdit.publish_button.click
+        AnnouncementNewEdit.save_button.click
         AnnouncementNewEdit.notification_modal_cancel.click
 
-        expect(AnnouncementNewEdit.publish_button).to be_displayed
+        expect(AnnouncementNewEdit.save_button).to be_displayed
       end
 
       it "removes delayed_post_at when Available from field is cleared", :ignore_js_errors do
@@ -139,17 +139,6 @@ describe "announcements" do
 
         @announcement.reload
         expect(@announcement.delayed_post_at).to be_nil
-      end
-
-      it "changes the save button to publish when delayed_post_at is cleared", :ignore_js_errors do
-        @announcement.delayed_post_at = 10.days.from_now
-        @announcement.save!
-        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
-
-        expect(AnnouncementNewEdit.submit_button.text).to eq("Save")
-
-        AnnouncementNewEdit.available_from_reset_button.click
-        expect(AnnouncementNewEdit.submit_button.text).to eq("Publish")
       end
 
       it "removes lock_at when Available until field is cleared", :ignore_js_errors do
