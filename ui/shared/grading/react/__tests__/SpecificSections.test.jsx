@@ -18,26 +18,30 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-
+import sinon from 'sinon'
 import SpecificSections from '../SpecificSections'
 
-QUnit.module('SpecificSections', suiteHooks => {
-  let $container
-  let context
+const ok = x => expect(x).toBeTruthy()
+const notOk = x => expect(x).toBeFalsy()
+const strictEqual = (x, y) => expect(x).toBe(y)
 
-  function getLabel(text) {
-    return [...$container.querySelectorAll('label')].find($label => $label.textContent === text)
-  }
+let $container
+let context
 
-  function getSectionToggleInput() {
-    return document.getElementById(getLabel('Specific Sections').htmlFor)
-  }
+function getLabel(text) {
+  return [...$container.querySelectorAll('label')].find($label => $label.textContent === text)
+}
 
-  function mountComponent() {
-    ReactDOM.render(<SpecificSections {...context} />, $container)
-  }
+function getSectionToggleInput() {
+  return document.getElementById(getLabel('Specific Sections').htmlFor)
+}
 
-  suiteHooks.beforeEach(() => {
+function mountComponent() {
+  ReactDOM.render(<SpecificSections {...context} />, $container)
+}
+
+describe('SpecificSections', () => {
+  beforeEach(() => {
     $container = document.body.appendChild(document.createElement('div'))
 
     context = {
@@ -53,7 +57,7 @@ QUnit.module('SpecificSections', suiteHooks => {
     }
   })
 
-  suiteHooks.afterEach(() => {
+  afterEach(() => {
     ReactDOM.unmountComponentAtNode($container)
     $container.remove()
   })
@@ -92,8 +96,8 @@ QUnit.module('SpecificSections', suiteHooks => {
     strictEqual(sectionSelectionChangedSpy.callCount, 1)
   })
 
-  QUnit.module('when disabled', contextHooks => {
-    contextHooks.beforeEach(() => {
+  describe('when disabled', () => {
+    beforeEach(() => {
       context.disabled = true
     })
 

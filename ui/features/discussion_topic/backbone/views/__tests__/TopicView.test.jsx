@@ -23,9 +23,13 @@ import DiscussionFilterState from '../../models/DiscussionFilterState'
 import ReactDOM from 'react-dom'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
+import sinon from 'sinon'
 
-QUnit.module('TopicView', hooks => {
-  hooks.beforeEach(() => {
+const equal = (x, y) => expect(x).toEqual(y)
+const deepEqual = (x, y) => expect(x).toEqual(y)
+
+describe('TopicView', () => {
+  beforeEach(() => {
     sinon.stub(ReactDOM, 'render')
     fakeENV.setup()
     ENV.DISCUSSION = {
@@ -47,14 +51,14 @@ QUnit.module('TopicView', hooks => {
     ENV.COURSE_ID = '1'
   })
 
-  hooks.afterEach(() => {
+  afterEach(() => {
     fakeENV.teardown()
     ReactDOM.render.restore()
   })
 
   // These tests cheat a bit by calling methods on the view directly. For now this was easier than
   // trying to get this old view to actually render.
-  QUnit.module('Direct Share', () => {
+  describe('Direct Share', () => {
     test('opens direct share send modal', () => {
       const view = new TopicView({
         model: new Backbone.Model(),

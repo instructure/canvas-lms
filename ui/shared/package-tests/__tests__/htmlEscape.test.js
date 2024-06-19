@@ -19,8 +19,11 @@
 import $ from 'jquery'
 import htmlEscape, {unescape} from '@instructure/html-escape'
 
-QUnit.module('htmlEscape', () => {
-  QUnit.module('.htmlEscape()', () => {
+const equal = (a, b) => expect(a).toBe(b)
+const strictEqual = (a, b) => expect(a).toBe(b)
+
+describe('htmlEscape', () => {
+  describe('.htmlEscape()', () => {
     test('replaces "&" with "&amp;"', () => {
       equal(htmlEscape('foo & bar'), 'foo &amp; bar')
     })
@@ -58,12 +61,12 @@ QUnit.module('htmlEscape', () => {
       equal(htmlEscape(value), '&amp; &lt; &gt; &quot; &#x27; &#x2F; &#x60; &#x3D;')
     })
 
-    test('htmlEscape with jQuery object', function (assert) {
+    test('htmlEscape with jQuery object', function () {
       const $regradeInfoSpan = $('<span id="regrade_info_span">This is a test</span>')
       // attempt to escape jQuery object, this should be a no-op
       const result = htmlEscape($regradeInfoSpan)
 
-      assert.strictEqual(
+      strictEqual(
         result,
         $regradeInfoSpan,
         `Passing a jQuery object should return ${$regradeInfoSpan}`
@@ -71,7 +74,7 @@ QUnit.module('htmlEscape', () => {
     })
   })
 
-  QUnit.module('.unescape()', () => {
+  describe('.unescape()', () => {
     test('replaces "&amp;" with "&"', () => {
       equal(unescape('foo &amp; bar'), 'foo & bar')
     })

@@ -20,7 +20,7 @@ import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import ChooseMasterPath from '../choose-mastery-path'
 
-QUnit.module('Choose Mastery Path')
+const equal = (x, y) => expect(x).toEqual(y)
 
 const defaultProps = () => ({
   options: [
@@ -85,18 +85,20 @@ const defaultProps = () => ({
 
 const renderComponent = props => TestUtils.renderIntoDocument(<ChooseMasterPath {...props} />)
 
-test('renders component', () => {
-  const props = defaultProps()
-  const component = renderComponent(props)
+describe('Choose Mastery Path', () => {
+  test('renders component', () => {
+    const props = defaultProps()
+    const component = renderComponent(props)
 
-  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'cmp-wrapper')
-  equal(renderedList.length, 1, 'renders component')
-})
+    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'cmp-wrapper')
+    equal(renderedList.length, 1, 'renders component')
+  })
 
-test('renders all options', () => {
-  const props = defaultProps()
-  const component = renderComponent(props)
+  test('renders all options', () => {
+    const props = defaultProps()
+    const component = renderComponent(props)
 
-  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'cmp-option')
-  equal(renderedList.length, 2, 'renders assignments')
+    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'cmp-option')
+    equal(renderedList.length, 2, 'renders assignments')
+  })
 })

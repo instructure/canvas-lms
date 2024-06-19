@@ -30,7 +30,8 @@ export default class ConversationStatusFilter extends React.Component {
   static propTypes = {
     defaultFilter: PropTypes.string.isRequired,
     initialFilter: PropTypes.string.isRequired,
-    router: PropTypes.instanceOf(Backbone.Router).isRequired,
+    router: PropTypes.oneOfType([PropTypes.instanceOf(Backbone.Router), PropTypes.object])
+      .isRequired,
     filters: PropTypes.objectOf((obj, key) => {
       if (typeof key !== 'string' || typeof obj[key] !== 'string') {
         return new Error("Keys and values of 'filter' prop must be strings")

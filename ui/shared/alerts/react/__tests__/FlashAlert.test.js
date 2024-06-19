@@ -21,7 +21,7 @@ import sinon from 'sinon'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 
 const ok = x => expect(x).toBeTruthy()
-const strictEqual = (x, y) => expect(x).toBe(y)
+const strictEqual = (x, y) => expect(x).toStrictEqual(y)
 const notStrictEqual = (x, y) => expect(x).not.toBe(y)
 
 injectGlobalAlertContainers()
