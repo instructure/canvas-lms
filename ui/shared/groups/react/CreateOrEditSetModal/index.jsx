@@ -227,6 +227,24 @@ export const CreateOrEditSetModal = ({
     return nameSectionValid && structureSectionValid
   }
 
+  async function handleApiCall({path, body, method}) {
+    try {
+      return await apiCall({path, body, method})
+    } catch (e) {
+      if (e?.response instanceof Response) {
+        const response = await e.response.json()
+
+        const errors = response?.errors && Object.values(response.errors)[0]
+
+        if (errors?.length && errors[0]?.message) {
+          // we can only show 1 error, we might lose the other errors
+          throw new Error(errors[0]?.message)
+        }
+      }
+      throw e
+    }
+  }
+
   async function handleSubmit() {
     if (!isInputValid()) {
       const div = topElement.current?.parentElement
@@ -241,13 +259,13 @@ export const CreateOrEditSetModal = ({
       const contextStem = context === 'course' ? 'courses' : 'accounts'
       const path = `/api/v1/${contextStem}/${contextId}/group_categories`
       dispatch({ev: 'api-change', to: 'submitting'})
-      const {json} = await apiCall({path, body, method: 'POST'})
+      const {json} = await handleApiCall({path, body, method: 'POST'})
       showFlashSuccess(I18n.t('Group Set was successfully created'))()
       if (body.assign_async) {
         step = I18n.t('assigning members to the new groups')
         const assignPath = `/api/v1/group_categories/${json.id}/assign_unassigned_members`
         const assignBody = {group_by_section: body.group_by_section}
-        const {json: assignJson} = await apiCall({
+        const {json: assignJson} = await handleApiCall({
           path: assignPath,
           body: assignBody,
           method: 'POST',

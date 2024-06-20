@@ -18,3 +18,7 @@
 
 import './jquery/account_authorization_configs'
 import './jquery/authentication_provider_debugging'
+import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
+import ready from '@instructure/ready'
+
+ready(() => initializeTopNavPortal())

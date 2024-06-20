@@ -20,6 +20,7 @@
 // or a base URL makes testing difficult, esp since window.location is "about:blank"
 // in mocha tests.
 import {parse, format} from 'url'
+import RCEGlobals from '../rce/RCEGlobals'
 
 function parseCanvasUrl(url, canvasOrigin = window.location.origin) {
   if (!url) {
@@ -92,7 +93,14 @@ export function fixupFileUrl(contextType, contextId, fileInfo, canvasOrigin) {
     parsed = changeDownloadToWrapParams(parsed)
     parsed = addContext(parsed, contextType, contextId)
     // if this is a user file, add the verifier
-    if (fileInfo.uuid && contextType.includes('user')) {
+    // if this is in New Quizzes and the feature flag is enabled, add the verifier
+    if (
+      fileInfo.uuid &&
+      (contextType.includes('user') ||
+        (!!canvasOrigin &&
+          canvasOrigin !== window.location.origin &&
+          RCEGlobals.getFeatures()?.file_verifiers_for_quiz_links))
+    ) {
       delete parsed.search
       parsed.query.verifier = fileInfo.uuid
     } else {

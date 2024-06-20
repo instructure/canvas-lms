@@ -824,7 +824,7 @@ describe Pseudonym do
     end
 
     it "allows the user to migrate to the new login attribute via the emailed code" do
-      message = @user.messages.where(notification_name: "Account Verification").take
+      message = @user.messages.find_by(notification_name: "Account Verification")
       expect(message).to be_present
       code = message.body.match(/use the following code to complete your login: (\w+)/)[1]
       expect(@pseudonym.migrate_login_attribute(code:)).to be true

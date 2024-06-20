@@ -23,6 +23,7 @@ import {
   prepEmbedSrc,
   prepLinkedSrc,
 } from '../fileUrl'
+import RCEGlobals from '../../rce/RCEGlobals'
 
 describe('Common file url utils', () => {
   describe('absoluteToRelativeUrl', () => {
@@ -97,9 +98,14 @@ describe('Common file url utils', () => {
     describe('for files with an href', () => {
       beforeEach(() => {
         fileInfo = {
-          href: '/files/17/download?download_frd=1',
+          href: '/files/17/download?download_frd=1&verifier=u17',
           uuid: 'xyzzy',
         }
+        RCEGlobals.getFeatures = jest.fn().mockReturnValue({file_verifiers_for_quiz_links: true})
+      })
+
+      afterEach(() => {
+        RCEGlobals.getFeatures.mockRestore()
       })
 
       it('skips swizzling the url if from a different host', () => {
@@ -108,11 +114,20 @@ describe('Common file url utils', () => {
         expect(result.href).toEqual(fileInfo.href)
       })
 
-      it('transforms urls if from the specified canvas origin', () => {
+      it('does not add file verifiers to Canvas file URLs if the origin is not Canvas and the feature flag is off', () => {
+        RCEGlobals.getFeatures = jest.fn().mockReturnValue({file_verifiers_for_quiz_links: false})
         fileInfo.href = 'http://instructure.com/files/17/download?download_frd=1'
         const result = fixupFileUrl('course', 2, fileInfo, 'http://instructure.com')
         expect(result.href).toEqual(
           'http://instructure.com/courses/2/files/17?wrap=1'
+        )
+      })
+
+      it('adds file verifiers to all Canvas file URLs if the origin is not Canvas and the feature flag is on', () => {
+        fileInfo.href = 'http://instructure.com/files/17/download?download_frd=1'
+        const result = fixupFileUrl('course', 2, fileInfo, 'http://instructure.com')
+        expect(result.href).toEqual(
+          'http://instructure.com/courses/2/files/17?wrap=1&verifier=xyzzy'
         )
       })
 
@@ -125,7 +140,7 @@ describe('Common file url utils', () => {
       it('adds the verifier to user files', () => {
         // while removing download_frd
         const result = fixupFileUrl('user', 2, fileInfo)
-        expect(result.href).toEqual('/users/2/files/17?wrap=1&verifier=xyzzy')
+        expect(result.href).toEqual('/users/2/files/17?verifier=xyzzy&wrap=1')
       })
     })
 

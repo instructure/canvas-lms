@@ -442,15 +442,82 @@ class Lti::RegistrationsController < ApplicationController
   before_action :require_account_context_instrumented
   before_action :require_feature_flag
   before_action :require_manage_lti_registrations
-  before_action :require_dynamic_registration, only: [:destroy]
+  before_action :require_dynamic_registration, only: [:destroy, :update]
+  before_action :validate_workflow_state, only: :bind
 
   include Api::V1::Lti::Registration
 
   def index
-    set_active_tab "extensions"
-    add_crumb t("#crumbs.apps", "Extensions")
+    set_active_tab "apps"
+    add_crumb t("#crumbs.apps", "Apps")
 
     render :index
+  end
+
+  # @API List LTI Registrations in an account
+  # Returns all LTI registrations in the specified account.
+  # Includes registrations created in this account, those set to 'allow' from a
+  # parent root account (like Site Admin) and 'on' for this account,
+  # and those enabled 'on' at the parent root account level.
+  #
+  # @argument per_page [integer] The number of registrations to return per page. Defaults to 15.
+  # @argument page [integer] The page number to return. Defaults to 1.
+  #
+  # @returns {"total": "integer", data: [Lti::Registration] }
+  #
+  # @example_request
+  #
+  #   This would return the specified LTI registration
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/registrations' \
+  #        -H "Authorization: Bearer <token>"
+  def list
+    GuardRail.activate(:secondary) do
+      eager_load_models = [
+        { lti_registration_account_bindings: [:created_by, :updated_by] },
+        :created_by, # registration's created_by
+        :updated_by  # registration's updated_by
+      ]
+
+      # Get all registrations on this account, regardless of their bindings
+      account_registrations = Lti::Registration.active
+                                               .where(account_id: params[:account_id])
+                                               .eager_load(eager_load_models)
+
+      # Get all registration account bindings that are bound to the site admin account and that are "on,"
+      # since they will apply to this account (and all accounts)
+      forced_on_in_site_admin = Shard.default.activate do
+        Lti::Registration.active
+                         .where(account: Account.site_admin)
+                         .where(lti_registration_account_bindings: { workflow_state: "on", account_id: Account.site_admin.id })
+                         .eager_load(eager_load_models)
+      end
+
+      # Get all registration account bindings in this account, then fetch the registrations from their own shards
+      # Omit registrations that were found in the "account_registrations" list; we're only looking for ones that
+      # are uniquely being inherited from a different account.
+      inherited_on_registration_bindings = Lti::RegistrationAccountBinding.where(workflow_state: "on")
+                                                                          .where(account_id: params[:account_id])
+                                                                          .where.not(registration_id: account_registrations.map(&:id))
+
+      registration_ids = inherited_on_registration_bindings.map(&:registration_id)
+      inherited_on_registrations = Shard.partition_by_shard(registration_ids) do |registration_ids_for_shard|
+        Lti::Registration.where(id: registration_ids_for_shard).eager_load(eager_load_models)
+      end.flatten
+
+      all_registrations = account_registrations + forced_on_in_site_admin + inherited_on_registrations
+
+      # always sort by created_at descending for now
+      sorted_registrations = all_registrations.sort { |first, second| second.created_at - first.created_at }
+
+      paginated_registrations, _metadata = Api.jsonapi_paginate(sorted_registrations, self, url_for(controller: "lti/registrations", action: "list"), { per_page: params[:per_page] || 15 })
+      render json: {
+        total: all_registrations.size,
+        data: lti_registrations_json(paginated_registrations, @current_user, session, @context, includes: [:account_binding])
+      }
+    end
+  rescue => e
+    report_error(e)
+    raise e
   end
 
   # @API Show an LTI Registration
@@ -463,12 +530,33 @@ class Lti::RegistrationsController < ApplicationController
   #
   #   This would return the specified LTI registration
   #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/registrations/<registration_id>' \
-  #        -H "Authorization: Bearer <token
+  #        -H "Authorization: Bearer <token>"
   def show
     GuardRail.activate(:secondary) do
       registration = Lti::Registration.active.find(params[:id])
       render json: lti_registration_json(registration, @current_user, session, @context, includes: [:account_binding, :configuration])
     end
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
+  # @API Update an LTI Registration
+  # Update the specified LTI registration with the provided parameters
+  #
+  # @argument admin_nickname [String] The admin-configured friendly display name for the registration
+  #
+  # @example_request
+  #
+  #   This would update the specified LTI registration
+  #   curl -X PUT 'https://<canvas>/api/v1/accounts/<account_id>/registrations/<registration_id>' \
+  #       -H "Authorization: Bearer <token>" \
+  #       -d 'admin_nickname=A New Nickname'
+  #
+  # @returns Lti::Registration
+  def update
+    registration.update!(update_params)
+    render json: lti_registration_json(registration, @current_user, session, @context)
   rescue => e
     report_error(e)
     raise e
@@ -492,12 +580,72 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
+  # @API Bind an LTI Registration to an Account
+  # Enable or disable the specified LTI registration for the specified account.
+  # To enable an inherited registration (eg from Site Admin), pass the registration's global ID.
+  #
+  # Only allowed for root accounts.
+  #
+  # <b>Specifics for Site Admin:</b>
+  # "on" enables and locks the registration on for all root accounts.
+  # "off" disables and hides the registration for all root accounts.
+  # "allow" makes the registration visible to all root accounts, but accounts must bind it to use it.
+  #
+  # <b>Specifics for centrally-managed/federated consortia:</b>
+  # Child root accounts may only bind registrations created in the same account.
+  # For parent root account, binding also applies to all child root accounts.
+  #
+  # @argument workflow_state [Required, String, "on"|"off"|"allow"]
+  #   The desired state for this registration/account binding. "allow" is only valid for Site Admin registrations.
+  #
+  # @returns Lti::RegistrationAccountBinding
+  #
+  # @example_request
+  #
+  #   This would enable the specified LTI registration for the specified account
+  #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/registrations/<registration_id>/bind' \
+  #        -H "Authorization: Bearer <token>" \
+  #        -H "Content-Type: application/json" \
+  #        -d '{"workflow_state": "on"}'
+  def bind
+    account_binding = Lti::RegistrationAccountBinding.find_or_initialize_by(account: @context, registration:)
+
+    if account_binding.new_record?
+      account_binding.created_by = @current_user
+    end
+
+    account_binding.updated_by = @current_user
+    account_binding.workflow_state = params[:workflow_state]
+
+    if account_binding.save
+      render json: lti_registration_account_binding_json(account_binding, @current_user, session, @context)
+    else
+      render json: account_binding.errors, status: :unprocessable_entity
+    end
+  end
+
   private
+
+  def update_params
+    params.permit(:admin_nickname).merge({ updated_by: @current_user })
+  end
+
+  # At the model level, setting an invalid workflow_state will silently change it to the
+  # initial state ("off") without complaining, so enforce this here as part of the API contract.
+  def validate_workflow_state
+    return if %w[on off allow].include?(params.require(:workflow_state))
+
+    render_error(:invalid_workflow_state, "workflow_state must be one of 'on', 'off', or 'allow'")
+  end
 
   def require_dynamic_registration
     return if registration.dynamic_registration?
 
-    render json: { errors: [{ message: "Temporarily, only Registrations created using LTI Dynamic Registration can be modified" }] }, status: :unprocessable_entity
+    render_error(:dynamic_registration_required, "Temporarily, only Registrations created using LTI Dynamic Registration can be modified")
+  end
+
+  def render_error(code, message, status: :unprocessable_entity)
+    render json: { errors: [{ code:, message: }] }, status:
   end
 
   def registration
@@ -512,10 +660,10 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   def require_feature_flag
-    unless @context.feature_enabled?(:lti_registrations_page)
+    unless @context.root_account.feature_enabled?(:lti_registrations_page)
       respond_to do |format|
         format.html { render "shared/errors/404_message", status: :not_found }
-        format.json { render json: { errors: [{ message: "The specified resource does not exist." }] }, status: :not_found }
+        format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
       end
     end
   end

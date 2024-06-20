@@ -58,7 +58,7 @@ describe "scheduler" do
     it "reserves appointment groups via Find Appointment mode" do
       my_course = @course
       create_appointment_group(contexts: [my_course])
-      get "/calendar2#view_name=week&view_start=#{(Date.today + 1.day).strftime}"
+      get "/calendar2#view_name=week&view_start=#{(Time.zone.today + 1.day).strftime}"
       find_appointment_button.click
       f('[role="dialog"][aria-label="Select Course"] button[type="submit"]').click
       wait_for_ajaximations
@@ -78,7 +78,7 @@ describe "scheduler" do
       group = gc.groups.create! name: "Blah Group", context: @course
       group.add_user @student
       create_appointment_group(sub_context_codes: [gc.asset_string], title: "Bleh Group Thing")
-      get "/calendar2#view_name=week&view_start=#{(Date.today + 1.day).strftime}"
+      get "/calendar2#view_name=week&view_start=#{(Time.zone.today + 1.day).strftime}"
       find_appointment_button.click
       f('[role="dialog"][aria-label="Select Course"] button[type="submit"]').click
       wait_for_ajaximations

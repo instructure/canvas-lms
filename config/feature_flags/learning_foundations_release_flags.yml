@@ -202,6 +202,11 @@ selective_release_backend:
     feature is backwards-compatible, and exists to ensure that the backend changes
     are performant.
   applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on # enable for automated testings builds and local testing
+    development:
+      state: allowed_on # enable for local development
 
 selective_release_ui_api:
   state: hidden
@@ -213,6 +218,11 @@ selective_release_ui_api:
     the UI and API that allow users to create module-type AssignmentOverrides will be
     enabled, and thus the feature will be fully functional.
   applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on # enable for automated testings builds and local testing
+    development:
+      state: allowed_on # enable for local development
 
 differentiated_files:
   state: hidden

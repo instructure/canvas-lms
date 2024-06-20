@@ -79,6 +79,7 @@ describe('DiscussionSummary', () => {
       expect(doFetchApi).toHaveBeenCalledWith({
         method: 'GET',
         path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
+        params: {force: false, userInput: ''},
       })
       await waitFor(() => {
         expect(getByTestId('summary-error')).toHaveTextContent(
@@ -101,6 +102,7 @@ describe('DiscussionSummary', () => {
       expect(doFetchApi).toHaveBeenCalledWith({
         method: 'GET',
         path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
+        params: {force: false, userInput: ''},
       })
       await waitFor(() => {
         expect(getByTestId('summary-error')).toHaveTextContent('Some error message.')
@@ -117,6 +119,7 @@ describe('DiscussionSummary', () => {
       expect(doFetchApi).toHaveBeenCalledWith({
         method: 'GET',
         path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
+        params: {force: false, userInput: ''},
       })
       await waitFor(() => {
         expect(getByTestId('summary-text')).toHaveTextContent('This is a discussion summary')
@@ -147,6 +150,7 @@ describe('DiscussionSummary', () => {
       expect(doFetchApi).toHaveBeenCalledWith({
         method: 'GET',
         path: `/api/v1/groups/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
+        params: {force: false, userInput: ''},
       })
       await waitFor(() => {
         expect(getByTestId('summary-text')).toHaveTextContent('This is a discussion summary')
@@ -188,6 +192,7 @@ describe('DiscussionSummary', () => {
           {
             method: 'GET',
             path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
+            params: {force: false, userInput: ''},
           },
         ],
         [
@@ -219,7 +224,6 @@ describe('DiscussionSummary', () => {
 
     it('should regenerate summary when regenerate button is clicked', async () => {
       doFetchApi.mockResolvedValueOnce({json: {liked: false, disliked: false}})
-      doFetchApi.mockResolvedValueOnce({json: {liked: false, disliked: false}})
       doFetchApi.mockResolvedValueOnce({
         json: {id: 2, text: 'This is some other discussion summary'},
       })
@@ -227,11 +231,13 @@ describe('DiscussionSummary', () => {
 
       const {getByTestId} = setup()
 
-      let regenerateButton
+      let regenerateButton, userInput
       await waitFor(() => {
         regenerateButton = getByTestId('summary-regenerate-button')
+        userInput = getByTestId('summary-user-input')
       })
       await waitFor(() => {
+        fireEvent.change(userInput, {target: {value: 'focus on student feedback'}})
         fireEvent.click(regenerateButton)
       })
 
@@ -240,6 +246,7 @@ describe('DiscussionSummary', () => {
           {
             method: 'GET',
             path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
+            params: {force: false, userInput: ''},
           },
         ],
         [
@@ -253,17 +260,8 @@ describe('DiscussionSummary', () => {
         ],
         [
           {
-            method: 'POST',
-            path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries/1/feedback`,
-            body: {
-              _action: 'regenerate',
-            },
-          },
-        ],
-        [
-          {
             method: 'GET',
-            params: {force: true},
+            params: {force: true, userInput: 'focus on student feedback'},
             path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
           },
         ],
@@ -307,6 +305,7 @@ describe('DiscussionSummary', () => {
           {
             method: 'GET',
             path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
+            params: {force: false, userInput: ''},
           },
         ],
         [
@@ -361,6 +360,7 @@ describe('DiscussionSummary', () => {
           {
             method: 'GET',
             path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
+            params: {force: false, userInput: ''},
           },
         ],
         [

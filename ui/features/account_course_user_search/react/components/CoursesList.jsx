@@ -35,8 +35,8 @@ export default function CoursesList(props) {
     <Table margin="small 0" caption={I18n.t('Courses')}>
       <Table.Head>
         <Table.Row>
-          <Table.ColHeader id="header-published" width="1">
-            {I18n.t('Published')}
+          <Table.ColHeader id="header-status" width="1">
+            {I18n.t('Status')}
           </Table.ColHeader>
           <Table.ColHeader id="header-course-name">
             <CoursesListHeader

@@ -65,6 +65,9 @@ export const DiscussionTopic = {
           ...AssignmentOverride
         }
       }
+      entryCounts {
+        repliesCount
+      }
     }
     ${Attachment.fragment}
     ${Assignment.fragment}

@@ -52,10 +52,6 @@ export function getRelevantUserFromEnrollment(enrollment: Enrollment) {
   return enrollment.temporary_enrollment_provider ?? enrollment.user
 }
 
-export function getEnrollmentUserDisplayName(enrollment: Enrollment) {
-  return getRelevantUserFromEnrollment(enrollment).name
-}
-
 export function groupEnrollmentsByPairingId(enrollments: Enrollment[]) {
   return enrollments.reduce((groupedById, enrollment) => {
     const groupId = enrollment.temporary_enrollment_pairing_id
@@ -250,7 +246,9 @@ export function TempEnrollEdit(props: Props) {
               const firstEnrollment: Enrollment = enrollmentGroup[0]
               return (
                 <Table.Row key={pairingId}>
-                  <Table.RowHeader>{getEnrollmentUserDisplayName(firstEnrollment)}</Table.RowHeader>
+                  <Table.RowHeader>
+                    <TempEnrollAvatar user={getRelevantUserFromEnrollment(firstEnrollment)} />
+                  </Table.RowHeader>
                   <Table.Cell>
                     {`${formatDateTime(firstEnrollment.start_at)} - ${formatDateTime(
                       firstEnrollment.end_at

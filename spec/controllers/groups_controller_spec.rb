@@ -614,7 +614,7 @@ describe GroupsController do
 
     describe "quota" do
       before do
-        Setting.set("group_default_quota", 11.megabytes)
+        Setting.set("group_default_quota", 11.decimal_megabytes)
       end
 
       context "teacher" do

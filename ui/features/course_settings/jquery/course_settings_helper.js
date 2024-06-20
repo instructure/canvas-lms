@@ -24,7 +24,7 @@ export function tabIdFromElement(el) {
       if (!tabId.match(/context|lti\/message_handler_/)) {
         tabId = parseInt(tabId, 10)
       }
-      return tabId
+      return String(tabId)
     }
   }
   return null

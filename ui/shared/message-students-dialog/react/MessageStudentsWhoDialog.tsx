@@ -61,6 +61,7 @@ import {
   removeAttachmentFn,
 } from '@canvas/message-attachments'
 import type {CamelizedAssignment} from '@canvas/grading/grading.d'
+import {View} from '@instructure/ui-view'
 
 export enum MSWLaunchContext {
   ASSIGNMENT_CONTEXT,
@@ -703,8 +704,8 @@ const MessageStudentsWhoDialog = ({
         </Modal.Header>
 
         <Modal.Body>
-          <Flex alignItems="end">
-            <Flex.Item>
+          <View as="div" width="19.75em">
+            <View as="div" padding="0 0 small 0">
               <SimpleSelect
                 renderLabel={I18n.t('For students who…')}
                 onChange={handleCriterionSelected}
@@ -722,9 +723,9 @@ const MessageStudentsWhoDialog = ({
                   </SimpleSelect.Option>
                 ))}
               </SimpleSelect>
-            </Flex.Item>
+            </View>
             {selectedCriterion.requiresCutoff && (
-              <Flex.Item margin="0 0 0 small">
+              <>
                 <NumberInput
                   value={cutoff}
                   onChange={(_e, value) => {
@@ -744,57 +745,52 @@ const MessageStudentsWhoDialog = ({
                     }
                   }}
                   showArrows={false}
-                  renderLabel={
-                    <ScreenReaderContent>{I18n.t('Enter score cutoff')}</ScreenReaderContent>
-                  }
-                  width="5em"
+                  renderLabel={I18n.t('Cutoff Value')}
+                  data-testid="cutoff-input"
                 />
-              </Flex.Item>
+                <Text size="small" data-testid="cutoff-footnote">
+                  {I18n.t(
+                    'This is based on values seen in this grade book. It may not be the same values students see.'
+                  )}
+                </Text>
+              </>
             )}
-          </Flex>
-          <br />
-          {selectedCriterion.value === 'submitted' && (
-            <>
-              <Flex>
-                <RadioInputGroup
-                  description=""
-                  defaultValue="all"
-                  name="include-students"
-                  data-testid="include-student-radio-group"
-                >
-                  <RadioInput
-                    label={I18n.t('All submissions')}
-                    value="all"
-                    onClick={() => onSubmissionRadioSelect('submitted')}
-                    data-testid="all-students-radio-button"
-                  />
-                  <RadioInput
-                    label={I18n.t('Graded submissions')}
-                    value="graded"
-                    onClick={() => onSubmissionRadioSelect('submitted_and_graded')}
-                    data-testid="graded-students-radio-button"
-                  />
-                  <RadioInput
-                    label={I18n.t('Not graded submissions')}
-                    value="not_graded"
-                    onClick={() => onSubmissionRadioSelect('submitted_and_not_graded')}
-                    data-testid="not-graded-students-radio-button"
-                  />
-                </RadioInputGroup>
-              </Flex>
-              <br />
-            </>
-          )}
-          {selectedCriterion.value === 'unsubmitted' && (
-            <>
+            {selectedCriterion.value === 'submitted' && (
+              <RadioInputGroup
+                description=""
+                defaultValue="all"
+                name="include-students"
+                data-testid="include-student-radio-group"
+              >
+                <RadioInput
+                  label={I18n.t('All submissions')}
+                  value="all"
+                  onClick={() => onSubmissionRadioSelect('submitted')}
+                  data-testid="all-students-radio-button"
+                />
+                <RadioInput
+                  label={I18n.t('Graded submissions')}
+                  value="graded"
+                  onClick={() => onSubmissionRadioSelect('submitted_and_graded')}
+                  data-testid="graded-students-radio-button"
+                />
+                <RadioInput
+                  label={I18n.t('Not graded submissions')}
+                  value="not_graded"
+                  onClick={() => onSubmissionRadioSelect('submitted_and_not_graded')}
+                  data-testid="not-graded-students-radio-button"
+                />
+              </RadioInputGroup>
+            )}
+            {selectedCriterion.value === 'unsubmitted' && (
               <Checkbox
                 onChange={onExcusedCheckBoxChange}
                 data-testid="skip-excused-checkbox"
                 label={<Text>{I18n.t('Skip excused students when messaging')}</Text>}
               />
-              <br />
-            </>
-          )}
+            )}
+          </View>
+          <br />
           <Flex>
             <Flex.Item>
               <Text weight="bold">{I18n.t('Send Message To:')}</Text>

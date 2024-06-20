@@ -125,14 +125,6 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
   const isK5User = window.ENV.K5_USER
   const helpIcon = window.ENV.help_link_icon
 
-  const navItemThemeOverride = {
-    iconSize: '26px',
-    iconColor: 'white',
-    contentPadding: '7px 0',
-    fontWeight: 400,
-    linkTextDecoration: 'inherit',
-  }
-
   const getHelpIcon = (): JSX.Element => {
     switch (helpIcon) {
       case InformationIconEnum.INFORMATION:
@@ -220,12 +212,14 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
         data-testid="sidenav-container"
       >
         <SideNavBar.Item
-          id="logo-tray"
+          id="logomark"
           icon={
             !logoUrl ? (
               <IconCanvasLogoSolid
                 data-testid="sidenav-canvas-logo"
                 size={collapseSideNav ? 'small' : 'medium'}
+                // unsure why this is necessary?
+                style={{display: 'none'}}
               />
             ) : (
               <Img
@@ -238,12 +232,6 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
           }
           label={<ScreenReaderContent>{I18n.t('Home')}</ScreenReaderContent>}
           href="/"
-          themeOverride={{
-            ...navItemThemeOverride,
-            backgroundColor: 'transparent',
-            hoverBackgroundColor: 'transparent',
-            contentPadding: '0',
-          }}
           minimized={collapseSideNav}
           data-testid="sidenav-header-logo"
         />
@@ -281,8 +269,8 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
                 themeOverride={{
                   background: 'transparent',
                   borderColor: '#ffffff',
-                  borderWidthSmall: '0.15em',
-                  borderWidthMedium: '0.15rem',
+                  borderWidthSmall: '2px',
+                  borderWidthMedium: '2px',
                 }}
               />
             </Badge>
@@ -295,7 +283,9 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
           }}
           selected={selectedNavItem === 'profile'}
           data-selected={selectedNavItem === 'profile'}
-          themeOverride={navItemThemeOverride}
+          themeOverride={{
+            fontWeight: 400,
+          }}
           minimized={collapseSideNav}
         />
         <SideNavBar.Item
@@ -309,7 +299,9 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
           }}
           selected={selectedNavItem === 'accounts'}
           data-selected={selectedNavItem === 'accounts'}
-          themeOverride={navItemThemeOverride}
+          themeOverride={{
+            fontWeight: 400,
+          }}
           minimized={collapseSideNav}
         />
         <SideNavBar.Item
@@ -320,7 +312,9 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
           onClick={() => handleActiveTray('dashboard')}
           selected={selectedNavItem === 'dashboard' || selectedNavItem === ''}
           data-selected={selectedNavItem === 'dashboard' || selectedNavItem === ''}
-          themeOverride={navItemThemeOverride}
+          themeOverride={{
+            fontWeight: 400,
+          }}
           minimized={collapseSideNav}
         />
         <SideNavBar.Item
@@ -334,7 +328,9 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
           }}
           selected={selectedNavItem === 'courses'}
           data-selected={selectedNavItem === 'courses'}
-          themeOverride={navItemThemeOverride}
+          themeOverride={{
+            fontWeight: 400,
+          }}
           minimized={collapseSideNav}
         />
         <SideNavBar.Item
@@ -345,7 +341,9 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
           onClick={() => handleActiveTray('calendar')}
           selected={selectedNavItem === 'calendar'}
           data-selected={selectedNavItem === 'calendar'}
-          themeOverride={navItemThemeOverride}
+          themeOverride={{
+            fontWeight: 400,
+          }}
           minimized={collapseSideNav}
         />
         <SideNavBar.Item
@@ -379,7 +377,9 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
           onClick={() => handleActiveTray('conversations')}
           selected={selectedNavItem === 'conversations'}
           data-selected={selectedNavItem === 'conversations'}
-          themeOverride={navItemThemeOverride}
+          themeOverride={{
+            fontWeight: 400,
+          }}
           minimized={collapseSideNav}
         />
         <SideNavBar.Item
@@ -393,7 +393,9 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
           }}
           selected={selectedNavItem === 'history'}
           data-selected={selectedNavItem === 'history'}
-          themeOverride={navItemThemeOverride}
+          themeOverride={{
+            fontWeight: 400,
+          }}
           minimized={collapseSideNav}
         />
 
@@ -413,11 +415,13 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
                   )
                 }
                 label={tool.label}
-                href={tool.href?.toString()}
+                href={`${tool.href?.toString()}&toolId=${toolId}`}
                 onClick={() => handleActiveTray(toolId)}
                 selected={selectedNavItem === toolId}
                 data-selected={selectedNavItem === toolId}
-                themeOverride={navItemThemeOverride}
+                themeOverride={{
+                  fontWeight: 400,
+                }}
                 minimized={collapseSideNav}
               />
             )
@@ -456,7 +460,9 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
           }}
           selected={selectedNavItem === 'help'}
           data-selected={selectedNavItem === 'help'}
-          themeOverride={navItemThemeOverride}
+          themeOverride={{
+            fontWeight: 400,
+          }}
           minimized={collapseSideNav}
         />
       </SideNavBar>

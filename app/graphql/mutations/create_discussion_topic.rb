@@ -25,14 +25,6 @@ class Types::DiscussionTopicContextType < Types::BaseEnum
   value "Group"
 end
 
-class Types::DiscussionTopicAnonymousStateType < Types::BaseEnum
-  graphql_name "DiscussionTopicAnonymousStateType"
-  description "Anonymous states for discussionTopics"
-  value "partial_anonymity"
-  value "full_anonymity"
-  value "off"
-end
-
 class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
   include Api
   include Api::V1::AssignmentOverride

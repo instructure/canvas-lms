@@ -40,7 +40,7 @@ describe Mutations::CreateSubmissionComment do
     stringify ? "\"#{value}\"" : value
   end
 
-  def mutation_str(submission_id: nil, attempt: nil, comment: "hello", file_ids: [], media_object_id: nil, media_object_type: nil, reviewer_submission_id: nil, group_comment: false)
+  def mutation_str(submission_id: nil, attempt: nil, comment: "hello", file_ids: [], media_object_id: nil, media_object_type: nil, reviewer_submission_id: nil, group_comment: false, draft_comment: false)
     <<~GQL
       mutation {
         createSubmissionComment(input: {
@@ -52,11 +52,13 @@ describe Mutations::CreateSubmissionComment do
           mediaObjectType: #{value_or_null(media_object_type)}
           submissionId: #{value_or_null(submission_id || @submission.id)}
           reviewerSubmissionId: #{value_or_null(reviewer_submission_id)}
+          draftComment: #{draft_comment}
         }) {
           submissionComment {
             _id
             attempt
             comment
+            draft
             attachments {
               _id
             }
@@ -116,6 +118,22 @@ describe Mutations::CreateSubmissionComment do
       expect(
         result.dig(:data, :createSubmissionComment, :submissionComment, :comment)
       ).to eq "dogs and cats"
+    end
+
+    context "draft comment" do
+      it "is saved as a draft comment" do
+        result = run_mutation(draft_comment: true)
+        expect(
+          result.dig(:data, :createSubmissionComment, :submissionComment, :draft)
+        ).to be true
+      end
+
+      it "is not saved as a draft comment" do
+        result = run_mutation(draft_comment: false)
+        expect(
+          result.dig(:data, :createSubmissionComment, :submissionComment, :draft)
+        ).to be false
+      end
     end
   end
 

@@ -51,6 +51,7 @@ import {
 import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
+import {useUpdateDiscussionThread} from '../../hooks/useUpdateDiscussionThread'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -222,7 +223,10 @@ const SplitScreenThreadContainer = props => {
   const {setReplyFromId} = useContext(DiscussionManagerUtilityContext)
   const {filter} = useContext(SearchContext)
   const [threadRefCurrent, setThreadRefCurrent] = useState(null)
-
+  const {toggleUnread} = useUpdateDiscussionThread({
+    discussionEntry: props.discussionEntry,
+    discussionTopic: props.discussionTopic,
+  })
   const onThreadRefCurrentSet = useCallback(refCurrent => {
     setThreadRefCurrent(refCurrent)
   }, [])
@@ -356,6 +360,7 @@ const SplitScreenThreadContainer = props => {
                     discussionTopic={props.discussionTopic}
                     discussionEntry={props.discussionEntry}
                     isTopic={false}
+                    toggleUnread={toggleUnread}
                     postUtilities={
                       <ThreadActions
                         authorName={getDisplayName(props.discussionEntry)}

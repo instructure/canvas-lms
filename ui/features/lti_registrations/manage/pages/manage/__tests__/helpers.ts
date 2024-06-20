@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {LtiRegistration} from 'features/lti_registrations/manage/model/LtiRegistration'
-import type {LtiRegistrationId} from 'features/lti_registrations/manage/model/LtiRegistrationId'
-import type {AccountId} from 'features/lti_registrations/manage/model/AccountId'
-import type {DeveloperKeyId} from 'features/lti_registrations/manage/model/DeveloperKeyId'
-import type {LtiRegistrationAccountBindingId} from 'features/lti_registrations/manage/model/LtiRegistrationAccountBinding'
-import type {UserId} from 'features/lti_registrations/manage/model/UserId'
-import type {PaginatedList} from 'features/lti_registrations/manage/api/PaginatedList'
+import type {PaginatedList} from '../../../api/PaginatedList'
+import type {AccountId} from '../../../model/AccountId'
+import type {LtiRegistration} from '../../../model/LtiRegistration'
+import type {LtiRegistrationAccountBindingId} from '../../../model/LtiRegistrationAccountBinding'
+import type {LtiRegistrationId} from '../../../model/LtiRegistrationId'
+import type {UserId} from '../../../model/UserId'
+import type {DeveloperKeyId} from '../../../model/developer_key/DeveloperKeyId'
 
 export const mockPageOfRegistrations = (
   ...names: Array<string>

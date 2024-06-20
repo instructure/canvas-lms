@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import MockCanvasClient from '../../../../../spec/javascripts/support/MockCanvasClient'
+import MockCanvasClient from '@canvas/test-utils/MockCanvasClient'
 import * as Api from '../Api'
 
 QUnit.module('HideAssignmentGradesTray Api', suiteHooks => {

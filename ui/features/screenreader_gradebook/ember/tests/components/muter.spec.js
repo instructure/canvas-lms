@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import 'jquery'
+import 'jquery-migrate'
 import Ember from 'ember'
 import startApp from '../start_app'
 import fixtures from '../ajax_fixtures'

@@ -153,8 +153,8 @@ describe ContentMigration do
       att = @copy_from.attachments.create!(filename: "videro.mov", uploaded_data: StringIO.new("..."), folder: Folder.root_folders(@copy_from).first)
       page = @copy_from.wiki_pages.create!(title: "watch this y'all", body: %(<iframe data-media-type="video" src="/media_objects_iframe?mediahref=/courses/#{@copy_from.id}/files/#{att.id}/download" data-media-id="#{att.id}"/>))
       run_course_copy
-      att_to = @copy_to.attachments.where(migration_id: mig_id(att)).take
-      page_to = @copy_to.wiki_pages.where(migration_id: mig_id(page)).take
+      att_to = @copy_to.attachments.find_by(migration_id: mig_id(att))
+      page_to = @copy_to.wiki_pages.find_by(migration_id: mig_id(page))
       expect(page_to.body).to include %(src="/media_attachments_iframe/#{att_to.id}?type=video&embedded=true")
     end
 

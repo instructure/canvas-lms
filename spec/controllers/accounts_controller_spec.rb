@@ -683,7 +683,7 @@ describe AccountsController do
         @account.default_storage_quota_mb = 123
         @account.default_user_storage_quota_mb = 45
         @account.default_group_storage_quota_mb = 9001
-        @account.storage_quota = 555.megabytes
+        @account.storage_quota = 555.decimal_megabytes
         @account.save!
       end
 
@@ -719,19 +719,19 @@ describe AccountsController do
         it "allows setting default quota (bytes)" do
           post "update", params: { id: @account.id,
                                    account: {
-                                     default_storage_quota: 101.megabytes,
+                                     default_storage_quota: 101.decimal_megabytes,
                                    } }
           @account.reload
-          expect(@account.default_storage_quota).to eq 101.megabytes
+          expect(@account.default_storage_quota).to eq 101.decimal_megabytes
         end
 
         it "allows setting storage quota" do
           post "update", params: { id: @account.id,
                                    account: {
-                                     storage_quota: 777.megabytes
+                                     storage_quota: 777.decimal_megabytes
                                    } }
           @account.reload
-          expect(@account.storage_quota).to eq 777.megabytes
+          expect(@account.storage_quota).to eq 777.decimal_megabytes
         end
       end
 
@@ -762,22 +762,22 @@ describe AccountsController do
         it "disallows setting default quota (bytes)" do
           post "update", params: { id: @account.id,
                                    account: {
-                                     default_storage_quota: 101.megabytes,
+                                     default_storage_quota: 101.decimal_megabytes,
                                      default_time_zone: "Alaska"
                                    } }
           @account.reload
-          expect(@account.default_storage_quota).to eq 123.megabytes
+          expect(@account.default_storage_quota).to eq 123.decimal_megabytes
           expect(@account.default_time_zone.name).to eq "Alaska"
         end
 
         it "disallows setting storage quota" do
           post "update", params: { id: @account.id,
                                    account: {
-                                     storage_quota: 777.megabytes,
+                                     storage_quota: 777.decimal_megabytes,
                                      default_time_zone: "Alaska"
                                    } }
           @account.reload
-          expect(@account.storage_quota).to eq 555.megabytes
+          expect(@account.storage_quota).to eq 555.decimal_megabytes
           expect(@account.default_time_zone.name).to eq "Alaska"
         end
       end

@@ -59,7 +59,7 @@ describe('IndexHeader', () => {
   it('renders the search input', () => {
     const props = makeProps()
     render(<IndexHeader {...props} />)
-    expect(screen.getByPlaceholderText('Search by title or author...')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search...')).toBeInTheDocument()
   })
 
   it('renders the filter input', () => {
@@ -88,7 +88,7 @@ describe('IndexHeader', () => {
     const props = makeProps({searchDiscussions: searchMock()})
 
     render(<IndexHeader {...props} />)
-    const input = screen.getByPlaceholderText('Search by title or author...')
+    const input = screen.getByPlaceholderText('Search...')
     user.type(input, 'foobar')
 
     await waitFor(() => expect(searchMock).toHaveBeenCalled())
@@ -113,6 +113,23 @@ describe('IndexHeader', () => {
 
     await waitFor(() => {
       return expect(filterMock).toHaveBeenCalledWith()
+    })
+  })
+
+  describe('instui_nav feature flag is enabled', () => {
+    const oldEnv = window.ENV
+
+    beforeEach(() => {
+      window.ENV = {FEATURES: {instui_nav: true}}
+    })
+
+    afterEach(() => {
+      window.ENV = oldEnv
+    })
+
+    it('renders title', () => {
+      render(<IndexHeader {...makeProps()} />)
+      expect(screen.getByText('All Discussions')).toBeInTheDocument()
     })
   })
 })

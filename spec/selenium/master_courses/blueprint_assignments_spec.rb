@@ -18,6 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../helpers/blueprint_common"
+require_relative "../../helpers/selective_release_common"
+require_relative "../helpers/items_assign_to_tray"
+require_relative "../assignments/page_objects/assignment_create_edit_page"
 
 shared_context "blueprint courses assignment context" do
   def assignment_options
@@ -36,6 +39,8 @@ describe "blueprint courses assignments" do
   include_context "blueprint courses files context"
   include_context "blueprint courses assignment context"
   include BlueprintCourseCommon
+  include SelectiveReleaseCommon
+  include ItemsAssignToTray
 
   context "as a blueprint teacher" do
     before :once do
@@ -57,6 +62,7 @@ describe "blueprint courses assignments" do
     end
 
     it "can lock down associated course's assignment fields", priority: "1" do
+      differentiated_modules_off
       change_blueprint_settings(@master, points: true, due_dates: true, availability_dates: true)
       get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
       f(".bpc-lock-toggle button").click
@@ -144,6 +150,7 @@ describe "blueprint courses assignments" do
     end
 
     it "does not allow editing of restricted items" do
+      differentiated_modules_off
       # restrict everything
       @tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: true })
 
@@ -157,6 +164,84 @@ describe "blueprint courses assignments" do
       expect(f("#lock_at").attribute("readonly")).to eq "true"
       expect(f("#assignment_grading_type")).to contain_css('option[value="points"]')
       expect(f("#assignment_grading_type")).not_to contain_css('option[value="not_graded"]')
+    end
+
+    it "does not allow editing of restricted due dates and availability dates in SR tray" do
+      # restrict everything
+      @tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: true })
+
+      get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
+
+      expect(f("#assignment_name").tag_name).to eq "h1"
+      expect(f("#assignment_description").tag_name).to eq "div"
+      expect(f("#assignment_points_possible").attribute("readonly")).to eq "true"
+      expect(f("#assignment_grading_type")).to contain_css('option[value="points"]')
+      expect(f("#assignment_grading_type")).not_to contain_css('option[value="not_graded"]')
+
+      AssignmentCreateEditPage.click_manage_assign_to_button
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      expect(assign_to_due_date(0).enabled?).to be_falsey
+      expect(assign_to_due_time(0).enabled?).to be_falsey
+      expect(assign_to_available_from_date(0).enabled?).to be_falsey
+      expect(assign_to_available_from_time(0).enabled?).to be_falsey
+      expect(assign_to_until_date(0).enabled?).to be_falsey
+      expect(assign_to_until_time(0).enabled?).to be_falsey
+
+      expect(element_exists?(bp_locked_alert_text_selector("Due Dates & Availability Dates"), true)).to be_truthy
+    end
+
+    it "does not allow editing of restricted due dates in SR tray" do
+      # restrict everything
+      @tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: false })
+
+      get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
+
+      expect(f("#assignment_name").tag_name).to eq "h1"
+      expect(f("#assignment_description").tag_name).to eq "div"
+      expect(f("#assignment_points_possible").attribute("readonly")).to eq "true"
+      expect(f("#assignment_grading_type")).to contain_css('option[value="points"]')
+      expect(f("#assignment_grading_type")).not_to contain_css('option[value="not_graded"]')
+
+      AssignmentCreateEditPage.click_manage_assign_to_button
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      expect(assign_to_due_date(0).enabled?).to be_falsey
+      expect(assign_to_due_time(0).enabled?).to be_falsey
+      expect(assign_to_available_from_date(0).enabled?).to be_truthy
+      expect(assign_to_available_from_time(0).enabled?).to be_truthy
+      expect(assign_to_until_date(0).enabled?).to be_truthy
+      expect(assign_to_until_time(0).enabled?).to be_truthy
+
+      expect(element_exists?(bp_locked_alert_text_selector("Due Dates"), true)).to be_truthy
+    end
+
+    it "does not allow editing of restricted availability dates in SR tray" do
+      # restrict everything
+      @tag.update(restrictions: { content: true, points: true, due_dates: false, availability_dates: true })
+
+      get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
+
+      expect(f("#assignment_name").tag_name).to eq "h1"
+      expect(f("#assignment_description").tag_name).to eq "div"
+      expect(f("#assignment_points_possible").attribute("readonly")).to eq "true"
+      expect(f("#assignment_grading_type")).to contain_css('option[value="points"]')
+      expect(f("#assignment_grading_type")).not_to contain_css('option[value="not_graded"]')
+
+      AssignmentCreateEditPage.click_manage_assign_to_button
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      expect(assign_to_due_date(0).enabled?).to be_truthy
+      expect(assign_to_due_time(0).enabled?).to be_truthy
+      expect(assign_to_available_from_date(0).enabled?).to be_falsey
+      expect(assign_to_available_from_time(0).enabled?).to be_falsey
+      expect(assign_to_until_date(0).enabled?).to be_falsey
+      expect(assign_to_until_time(0).enabled?).to be_falsey
+
+      expect(element_exists?(bp_locked_alert_text_selector("Availability Dates"), true)).to be_truthy
     end
 
     it "does not allow making a non-graded assignment graded when points are locked" do

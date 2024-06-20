@@ -18,14 +18,13 @@
 
 import React from 'react'
 import {Button} from '@instructure/ui-buttons'
-import {IconRefreshSolid} from '@instructure/ui-icons'
+import {IconSyllabusLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 
 interface DiscussionSummaryRegenerateButtonProps {
   onClick: () => void
   isEnabled: boolean
   buttonText: string
-  showText: boolean
 }
 
 export const DiscussionSummaryRegenerateButton: React.FC<
@@ -35,11 +34,11 @@ export const DiscussionSummaryRegenerateButton: React.FC<
     <Tooltip renderTip={props.buttonText} width="48px" data-testid="summary-regenerate-tooltip">
       <Button
         onClick={props.onClick}
-        renderIcon={IconRefreshSolid}
+        renderIcon={IconSyllabusLine}
         data-testid="summary-regenerate-button"
         disabled={!props.isEnabled}
       >
-        {props.showText && props.buttonText}
+        {props.buttonText}
       </Button>
     </Tooltip>
   )

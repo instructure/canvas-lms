@@ -18,9 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "student_visibility/student_visibility_common"
+require_relative "../helpers/selective_release_common"
 
 describe "differentiated_assignments" do
   include StudentVisibilityCommon
+  include SelectiveReleaseCommon
 
   def course_with_differentiated_assignments_enabled
     @course = Course.create!
@@ -137,6 +139,7 @@ describe "differentiated_assignments" do
 
   context "course_with_differentiated_assignments_enabled" do
     before do
+      differentiated_modules_off
       course_with_differentiated_assignments_enabled
       add_multiple_sections
     end

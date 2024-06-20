@@ -397,7 +397,7 @@ describe "recurring events" do
 
     before do
       user_session(@teacher)
-      today = Date.today
+      today = Time.zone.today
       start_at = Date.new(today.year, today.month, 15)
       create_calendar_event_series(@course, "event in a series", start_at)
     end
@@ -639,7 +639,7 @@ describe "recurring events" do
 
     before do
       user_session(@teacher)
-      today = Date.today
+      today = Time.zone.today
       start_at = Date.new(today.year, today.month, 15)
       create_calendar_event_series(@course, "event in a series", start_at)
     end

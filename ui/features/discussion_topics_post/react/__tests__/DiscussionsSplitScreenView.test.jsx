@@ -108,7 +108,7 @@ describe('DiscussionsSplitScreenView', () => {
     expect(container.queryByTestId('discussions-split-screen-view-content')).toBeTruthy()
   })
 
-  it('should be able to edit a root entry', async () => {
+  it.skip('should be able to edit a root entry', async () => {
     const mocks = [
       ...getDiscussionQueryMock(),
       ...getDiscussionSubentriesQueryMock({

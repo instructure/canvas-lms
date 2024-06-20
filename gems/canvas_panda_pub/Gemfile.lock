@@ -75,8 +75,8 @@ GEM
     base64 (0.2.0)
     bigdecimal (3.1.8)
     bindata (2.5.0)
-    builder (3.2.4)
-    concurrent-ruby (1.2.3)
+    builder (3.3.0)
+    concurrent-ruby (1.3.3)
     connection_pool (2.4.1)
     crack (1.0.0)
       bigdecimal
@@ -85,7 +85,7 @@ GEM
     diff-lcs (1.5.1)
     digest-murmurhash (1.1.1)
     erubi (1.12.0)
-    faraday (2.9.0)
+    faraday (2.9.1)
       faraday-net_http (>= 2.0, < 3.2)
     faraday-follow_redirects (0.3.0)
       faraday (>= 1, < 3)
@@ -110,8 +110,8 @@ GEM
     method_source (1.1.0)
     mime-types (3.5.2)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2024.0507)
-    mini_portile2 (2.8.6)
+    mime-types-data (3.2024.0604)
+    mini_portile2 (2.8.7)
     minitest (5.23.1)
     net-http (0.4.1)
       uri
@@ -157,8 +157,8 @@ GEM
       redis-cluster-client (>= 0.7.11)
     redis-scripting (1.0.1)
       redis (>= 3.0)
-    rexml (3.2.8)
-      strscan (>= 3.0.9)
+    rexml (3.2.9)
+      strscan
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -178,11 +178,11 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uri (0.13.0)
-    webmock (3.23.0)
+    webmock (3.23.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    zeitwerk (2.6.14)
+    zeitwerk (2.6.15)
 
 PLATFORMS
   aarch64-linux

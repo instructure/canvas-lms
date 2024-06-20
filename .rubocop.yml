@@ -3,6 +3,8 @@ require:
   - rubocop-graphql
   - rubocop-rails
   - rubocop-rake
+  - rubocop-rspec
+  #- rubocop-rspec_rails
   # this odd relative path is so that rubocop works when run without "bundle
   # exec", such as from most editors/IDEs.
   - ./gems/rubocop-canvas/lib/rubocop_canvas
@@ -18,9 +20,6 @@ AllCops:
 
 Bundler:
   Severity: error
-
-Capybara:
-  Enabled: false # we don't use capybara (it's automatically included by rubocop-rspec until they hit 3.0)
 
 FactoryBot:
   Severity: error
@@ -98,6 +97,8 @@ Rails:
   Exclude:
     - "bin/**/*"
     - "gems/google_drive/**/*"
+Rails/ActionControllerFlashBeforeRender:
+  AutoCorrect: false # auto-correct just changes it to `flash.now`, when that may not be appropriate
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
 Rails/Blank:
@@ -127,6 +128,8 @@ Rails/I18nLocaleTexts:
     - "**/spec_canvas/**/*.rb"
 Rails/NegateInclude:
   Enabled: false # exclude? isn't as intuitive as !include?
+Rails/Output:
+  AutoCorrect: false # Force the developer to think about what to do; don't just silently convert it to a debug log
 Rails/Present:
   UnlessBlank: false # allow `unless foo.blank?`
 Rails/RedundantPresenceValidationOnBelongsTo:
@@ -144,8 +147,6 @@ RSpec:
   Severity: error
 RSpec/AnyInstance:
   Enabled: false # while using an instance double would be preferable, it's a pain
-RSpec/FilePath:
-  Enabled: false # superceded by RSpec/SpecFilePathSuffix and RSpec/SpecFilePathFormat
 RSpec/IndexedLet:
   Enabled: false
 RSpec/InstanceVariable:
@@ -155,11 +156,8 @@ RSpec/MultipleMemoizedHelpers:
 RSpec/SubjectStub:
   Enabled: false # yes, canvas is big and complicated sometimes
 
-RSpec/Capybara:
-  Enabled: false # we don't use capybara
-
-RSpec/Rails:
-  Severity: error
+#RSpec/Rails:
+#  Severity: error
 
 Security:
   Severity: error
@@ -263,9 +261,6 @@ Naming/VariableName:
 Naming/VariableNumber:
   Enabled: false
 
-Rails/ActionControllerFlashBeforeRender:
-  Severity: convention
-  AutoCorrect: false
 Rails/ActionOrder:
   Severity: convention
   AutoCorrect: false
@@ -280,26 +275,9 @@ Rails/ActiveSupportOnLoad:
 Rails/ApplicationMailer:
   Severity: convention
   AutoCorrect: false
-Rails/BelongsTo:
-  Severity: convention
-  AutoCorrect: false
-Rails/Date:
-  Enabled: false
-  AutoCorrect: false
 Rails/DeprecatedActiveModelErrorsMethods:
   AutoCorrect: false
-Rails/DuplicateAssociation:
-  AutoCorrect: false
 Rails/EagerEvaluationLogMessage:
-  Severity: convention
-  AutoCorrect: false
-Rails/EnumHash:
-  Severity: convention
-  AutoCorrect: false
-Rails/FindBy:
-  Severity: convention
-  AutoCorrect: false
-Rails/FindById:
   Severity: convention
   AutoCorrect: false
 Rails/FindEach:
@@ -309,17 +287,8 @@ Rails/InverseOf:
   Severity: convention
 Rails/LexicallyScopedActionFilter:
   Severity: convention
-Rails/Output:
-  Severity: convention
-  AutoCorrect: false
 Rails/OutputSafety:
   Severity: convention
-Rails/Pick:
-  Severity: convention
-  AutoCorrect: false
-Rails/PluckInWhere:
-  Severity: convention
-  AutoCorrect: false
 Rails/RakeEnvironment:
   Severity: convention
   AutoCorrect: false

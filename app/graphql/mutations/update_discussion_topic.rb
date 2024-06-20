@@ -24,18 +24,31 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
 
   graphql_name "UpdateDiscussionTopic"
 
+  # rubocop:disable GraphQL/ExtractInputType
+  argument :anonymous_state, Types::DiscussionTopicAnonymousStateType, required: false
   argument :discussion_topic_id, GraphQL::Schema::Object::ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
   argument :remove_attachment, Boolean, required: false
   argument :assignment, Mutations::AssignmentBase::AssignmentUpdate, required: false
+  # sets in-memory (not persisiting) flag to decide when to notify users about announcement changes
+  argument :notify_users, Boolean, required: false
   argument :set_checkpoints, Boolean, required: false
   argument :ungraded_discussion_overrides, [Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate], required: false
+  # rubocop:enable GraphQL/ExtractInputType
 
-  field :discussion_topic, Types::DiscussionType, null: false
+  field :discussion_topic, Types::DiscussionType
   def resolve(input:)
     @current_user = current_user
 
     discussion_topic = DiscussionTopic.find(input[:discussion_topic_id])
     raise GraphQL::ExecutionError, "insufficient permission" unless discussion_topic.grants_right?(current_user, :update)
+
+    if input[:anonymous_state].present? && discussion_topic.discussion_subentry_count > 0
+      return validation_error(I18n.t("Anonymity settings are locked due to a posted reply"))
+    end
+
+    unless input[:anonymous_state].nil?
+      discussion_topic.anonymous_state = (input[:anonymous_state] == "off") ? nil : input[:anonymous_state]
+    end
 
     unless input[:published].nil?
       input[:published] ? discussion_topic.publish! : discussion_topic.unpublish!
@@ -126,6 +139,10 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
           )
         end
       end
+    end
+
+    if input[:notify_users]
+      discussion_topic.notify_users = true
     end
 
     # Determine if the checkpoints are being deleted

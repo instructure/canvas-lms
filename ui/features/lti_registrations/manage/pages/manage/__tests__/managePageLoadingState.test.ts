@@ -17,11 +17,11 @@
  */
 
 import {act, waitFor} from '@testing-library/react'
-import {mkUseManagePageState, type ManagePageLoadingState} from '../ManagePageLoadingState'
-import type {FetchRegistrations} from 'features/lti_registrations/manage/api/registrations'
 import {renderHook, type RenderResult} from '@testing-library/react-hooks/dom'
-import {mockRegistration, mockPageOfRegistrations} from './helpers'
-import type {ApiResult} from 'features/lti_registrations/manage/api/ApiResult'
+import type {ApiResult} from '../../../../common/lib/apiResult/ApiResult'
+import type {FetchRegistrations} from '../../../api/registrations'
+import {mkUseManagePageState, type ManagePageLoadingState} from '../ManagePageLoadingState'
+import {mockPageOfRegistrations, mockRegistration} from './helpers'
 
 // #region helpers
 const mockFetchRegistrations = (
@@ -351,7 +351,7 @@ describe('deleteRegistration', () => {
 
     req2.resolve()
     expect(await deletionPromise).toEqual({
-      _type: 'error',
+      _type: 'GenericError',
       message: 'Error deleting app “Foo”',
     })
   })

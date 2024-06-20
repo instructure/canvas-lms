@@ -363,7 +363,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
   return (
     <>
       {/* EVAL-3711 Remove Evaluate ICE feature flag */}
-      {window.ENV.FEATURES.instui_nav && !ENV.disable_keyboard_shortcuts && (
+      {window.ENV.FEATURES?.instui_nav && !ENV.disable_keyboard_shortcuts && (
         <Button
           data-testid="keyboard-shortcuts"
           margin="0 small 0 0"

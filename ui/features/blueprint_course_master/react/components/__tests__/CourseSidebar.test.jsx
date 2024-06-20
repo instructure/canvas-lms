@@ -18,7 +18,7 @@
 
 import React from 'react'
 import $ from 'jquery'
-import 'jquery-migrate'
+import 'jquery-migrate' // required
 import {Provider} from 'react-redux'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'

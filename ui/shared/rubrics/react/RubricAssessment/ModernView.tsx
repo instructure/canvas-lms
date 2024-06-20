@@ -30,7 +30,10 @@ import {TextArea} from '@instructure/ui-text-area'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {CommentLibrary} from './CommentLibrary'
 import {CriteriaReadonlyComment} from './CriteriaReadonlyComment'
-import {htmlEscapeCriteriaLongDescription} from './utils/rubricUtils'
+import {
+  findCriterionMatchingRatingIndex,
+  htmlEscapeCriteriaLongDescription,
+} from './utils/rubricUtils'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
@@ -76,6 +79,7 @@ export const ModernView = ({
             isPreviewMode={isPreviewMode}
             isPeerReview={isPeerReview}
             ratingOrder={ratingOrder}
+            criterionUseRange={criterion.criterionUseRange}
             criterionAssessment={criterionAssessment}
             selectedViewMode={selectedViewMode}
             rubricSavedComments={rubricSavedComments?.[criterion.id] ?? []}
@@ -96,6 +100,7 @@ type CriterionRowProps = {
   isPeerReview: boolean
   isFreeFormCriterionComments: boolean
   ratingOrder: string
+  criterionUseRange: boolean
   criterionAssessment?: RubricAssessmentData
   selectedViewMode: ModernViewModes
   rubricSavedComments: string[]
@@ -109,14 +114,17 @@ export const CriterionRow = ({
   isPeerReview,
   isFreeFormCriterionComments,
   ratingOrder,
+  criterionUseRange,
   criterionAssessment,
   selectedViewMode,
   rubricSavedComments,
   onUpdateAssessmentData,
 }: CriterionRowProps) => {
   const {ratings} = criterion
-  const selectedRatingIndex = criterion.ratings.findIndex(
-    rating => rating.points === criterionAssessment?.points
+  const selectedRatingIndex = findCriterionMatchingRatingIndex(
+    criterion.ratings,
+    criterionAssessment?.points,
+    criterion.criterionUseRange
   )
 
   const [pointsInput, setPointsInput] = useState<string>()
@@ -175,6 +183,7 @@ export const CriterionRow = ({
           ratingOrder={ratingOrder}
           selectedRatingIndex={selectedRatingIndex}
           onSelectRating={selectRating}
+          criterionUseRange={criterionUseRange}
         />
       )
     }
@@ -186,6 +195,7 @@ export const CriterionRow = ({
         ratingOrder={ratingOrder}
         selectedRatingIndex={selectedRatingIndex}
         onSelectRating={selectRating}
+        criterionUseRange={criterionUseRange}
       />
     )
   }
@@ -210,12 +220,12 @@ export const CriterionRow = ({
                   <ScreenReaderContent>{I18n.t('Instructor Points')}</ScreenReaderContent>
                 }
                 placeholder="--"
-                width="2.688rem"
+                width="3.375rem"
                 height="2.375rem"
+                data-testid={`criterion-score-${criterion.id}`}
                 value={pointsInput?.toString() ?? ''}
-                onChange={(_e, value) => {
-                  setPoints(value)
-                }}
+                onChange={e => setPointsInput(e.target.value)}
+                onBlur={e => setPoints(e.target.value)}
               />
             )}
           </Flex.Item>
@@ -308,6 +318,7 @@ export const CriterionRow = ({
                   onChange={e => setCommentText(e.target.value)}
                   onBlur={() => updateAssessmentData({comments: commentText})}
                   placeholder={I18n.t('Leave a comment')}
+                  data-testid={`comment-text-area-${criterion.id}`}
                 />
               )}
             </Flex.Item>

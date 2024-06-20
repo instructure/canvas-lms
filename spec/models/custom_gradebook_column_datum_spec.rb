@@ -57,7 +57,7 @@ describe CustomGradebookColumnDatum do
 
     let(:first_student_data) do
       @course.custom_gradebook_columns
-             .find_by!(id: @first_col.id)
+             .find(@first_col.id)
              .custom_gradebook_column_data
              .find_by(user_id: @first_student.id)
     end
@@ -68,7 +68,7 @@ describe CustomGradebookColumnDatum do
 
     it "adds a datum for a matching student and column" do
       data = @course.custom_gradebook_columns
-                    .find_by!(id: @first_col.id)
+                    .find(@first_col.id)
                     .custom_gradebook_column_data
                     .where(user_id: @first_student.id)
       expect(data.count).to be 1
@@ -79,7 +79,7 @@ describe CustomGradebookColumnDatum do
     end
 
     it "adds data for multiple students for a column" do
-      data = @course.custom_gradebook_columns.find_by!(id: @first_col.id).custom_gradebook_column_data
+      data = @course.custom_gradebook_columns.find(@first_col.id).custom_gradebook_column_data
       expect(data.count).to be 2
     end
 
@@ -110,7 +110,7 @@ describe CustomGradebookColumnDatum do
                                                                       }
                                                                     ])
 
-      data = @course.custom_gradebook_columns.find_by!(id: @second_col.id)
+      data = @course.custom_gradebook_columns.find(@second_col.id)
                     .custom_gradebook_column_data.find_by!(user_id: @second_student.id).content
       expect(data).to eql "2, 2"
     end
@@ -124,17 +124,17 @@ describe CustomGradebookColumnDatum do
                                                                       }
                                                                     ])
 
-      data = @course.custom_gradebook_columns.find_by!(id: @second_col.id)
+      data = @course.custom_gradebook_columns.find(@second_col.id)
                     .custom_gradebook_column_data.find_by!(user_id: @second_student.id).content
       expect(data).to eql "2, 2"
     end
 
     it "does not update content in deleted columns" do
-      @course.custom_gradebook_columns.find_by!(id: @second_col.id)
+      @course.custom_gradebook_columns.find(@second_col.id)
              .custom_gradebook_column_data.find_by!(user_id: @first_student.id).delete
-      @course.custom_gradebook_columns.find_by!(id: @second_col.id)
+      @course.custom_gradebook_columns.find(@second_col.id)
              .custom_gradebook_column_data.find_by!(user_id: @second_student.id).delete
-      @course.custom_gradebook_columns.find_by!(id: @second_col.id).delete
+      @course.custom_gradebook_columns.find(@second_col.id).delete
 
       CustomGradebookColumnDatum.process_bulk_update_custom_columns({}, @course, [
                                                                       {

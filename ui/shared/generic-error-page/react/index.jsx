@@ -83,6 +83,7 @@ export default class GenericErrorPage extends React.Component {
       error: {
         subject: this.props.errorSubject,
         category: this.props.errorCategory,
+        exception_message: this.props.errorMessage,
         message: this.props.errorMessage,
         url: window.location.href,
         comments: this.state.textAreaComment,
@@ -118,6 +119,9 @@ export default class GenericErrorPage extends React.Component {
         display="block"
       >
         <ErrorPageHeader imageUrl={this.props.imageUrl} />
+        {process.env.NODE_ENV === 'development' && (
+          <pre style={{textAlign: 'left'}}>{this.props.errorMessage}</pre>
+        )}
         <View margin="small" display="block">
           {!this.state.commentPosted && (
             <>

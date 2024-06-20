@@ -62,7 +62,7 @@ function populateDialog(data_points, axis, $link) {
 }
 
 $(document).ready(() => {
-  initializeTopNavPortal(document.getElementById('react-instui-topnav'))
+  initializeTopNavPortal()
   $(document).on('click', '.over_time_link', function (event) {
     event.preventDefault()
     const $link = $(this)

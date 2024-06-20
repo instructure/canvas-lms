@@ -58,6 +58,7 @@ ready(() => {
     model: content_migration,
     quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED,
     migrationDefault: ENV.NEW_QUIZZES_MIGRATION_DEFAULT,
+    disableNQMigrationCheckbox: !ENV.QUIZZES_NEXT_ENABLED || ENV.NEW_QUIZZES_MIGRATION_REQUIRED,
     questionBank: null,
   })
   $('#new_quizzes_migrate').html(importQuizzesNextView.render().el)

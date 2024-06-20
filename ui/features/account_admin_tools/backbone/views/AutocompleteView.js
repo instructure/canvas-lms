@@ -20,9 +20,9 @@ import $ from 'jquery'
 import template from '../../jst/autocomplete.handlebars'
 import 'jqueryui/menu'
 import 'jqueryui/autocomplete'
-import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
+import {extend} from '@canvas/backbone/utils'
 
-_inherits(AutocompleteView, Backbone.View)
+extend(AutocompleteView, Backbone.View)
 
 export default function AutocompleteView(options) {
   this.options = options

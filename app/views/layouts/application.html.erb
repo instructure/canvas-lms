@@ -136,17 +136,17 @@
           <% end %>
 
           <div class="right-of-crumbs">
-            <%if @domain_root_account&.feature_enabled?(:top_navigation_placement) %>
-              <div id="top-nav-tools-mount-point"></div>
-            <% end %>
             <% if tutorials_enabled? %>
               <div class="TutorialToggleHolder"></div>
+            <% end %>
+            <%if @domain_root_account&.feature_enabled?(:top_navigation_placement) %>
+              <div id="top-nav-tools-mount-point"></div>
             <% end %>
             <% if show_immersive_reader? %>
               <div id="immersive_reader_mount_point"></div>
             <% end %>
             <% if show_student_view_button? %>
-              <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn", :id => "easy_student_view", :method => :post do %>
+              <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn btn-top-nav", :id => "easy_student_view", :method => :post do %>
                 <i class="icon-student-view"></i> <%= t('View as Student') %>
               <% end %>
             <% end %>

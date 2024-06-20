@@ -28,7 +28,7 @@ describe "help dialog" do
       get("/login")
       f("#footer .help_dialog_trigger").click
       wait_for_ajaximations
-      expect(f("#help-dialog-options")).to be_displayed
+      expect(f('[data-testid="login-help-close-button"]')).to be_displayed
     end
 
     it "no longer shows a browser warning for IE" do

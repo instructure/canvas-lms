@@ -25,6 +25,7 @@ export interface BaseDateDetails {
   due_at: string | null
   unlock_at: string | null
   lock_at: string | null
+  reply_to_topic_due_at: string | null
   group_category_id: string | null
   only_visible_to_overrides: boolean
   visible_to_everyone: boolean
@@ -61,6 +62,7 @@ export interface DateDetailsOverride {
   group_id?: string
   due_at: string | null
   unlock_at: string | null
+  reply_to_topic_due_at: string | null
   lock_at: string | null
   all_day?: boolean
   all_day_date?: string | null
@@ -78,6 +80,7 @@ export interface ItemAssignToCardSpec {
   hasAssignees: boolean
   due_at: string | null
   unlock_at: string | null
+  reply_to_topic_due_at: string | null
   lock_at: string | null
   selectedAssigneeIds: string[]
   defaultOptions?: string[]

@@ -54,15 +54,17 @@ module Submissions
                                           @assignment.anonymous_instructor_annotations
 
       unless @assignment.visible_to_user?(@current_user)
-        flash[:notice] = t("This assignment will no longer count towards your grade.")
+        flash_message = t("This assignment will no longer count towards your grade.")
       end
 
       @headers = false
       if authorized_action(@submission, @current_user, :read)
         if redirect? && @assignment&.quiz&.id
+          flash[:notice] = flash_message if flash_message
           redirect_to(named_context_url(@context, redirect_path_name, @assignment.quiz.id, redirect_params))
         else
           @anonymize_students = anonymize_students?
+          flash.now[:notice] = flash_message if flash_message
           render template: "submissions/show_preview", locals: {
             anonymize_students: @anonymize_students
           }

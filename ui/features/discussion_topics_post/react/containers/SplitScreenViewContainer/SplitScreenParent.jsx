@@ -36,13 +36,13 @@ import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {
   UPDATE_SPLIT_SCREEN_VIEW_DEEPLY_NESTED_ALERT,
-  UPDATE_DISCUSSION_THREAD_READ_STATE,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
 } from '../../../graphql/Mutations'
-import {useMutation, useApolloClient} from 'react-apollo'
+import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {useUpdateDiscussionThread} from '../../hooks/useUpdateDiscussionThread'
 
 const I18n = useI18nScope('discussion_posts')
 
@@ -50,14 +50,9 @@ export const SplitScreenParent = props => {
   const [updateSplitScreenViewDeeplyNestedAlert] = useMutation(
     UPDATE_SPLIT_SCREEN_VIEW_DEEPLY_NESTED_ALERT
   )
-
-  const client = useApolloClient()
-  const resetDiscussionCache = () => {
-    client.resetStore()
-  }
-
-  const [updateDiscussionThreadReadState] = useMutation(UPDATE_DISCUSSION_THREAD_READ_STATE, {
-    update: resetDiscussionCache,
+  const {toggleUnread, updateDiscussionThreadReadState} = useUpdateDiscussionThread({
+    discussionEntry: props.discussionEntry,
+    discussionTopic: props.discussionTopic,
   })
 
   const {setOnSuccess} = useContext(AlertManagerContext)
@@ -199,6 +194,7 @@ export const SplitScreenParent = props => {
                     discussionEntry={props.discussionEntry}
                     isTopic={false}
                     threadParent={true}
+                    toggleUnread={toggleUnread}
                     postUtilities={
                       <ThreadActions
                         authorName={getDisplayName(props.discussionEntry)}

@@ -652,12 +652,11 @@ describe('SubmissionTray', () => {
       expect(findGradeInput()?.inputIsDisabled).toBe(false)
     })
 
-    test('receives the "onGradeSubmission" callback given to the Tray', () => {
+    test('receives the "onGradeSubmission" callback given to the Tray', async () => {
       const onGradeSubmission = jest.fn()
       mountComponent({onGradeSubmission})
       const gradeInput = findGradeInput()
-      gradeInput?.inputValue('EX')
-      gradeInput?.blurInput()
+      await gradeInput?.inputValueAndBlur('EX')
       expect(onGradeSubmission).toHaveBeenCalledTimes(1)
     })
 

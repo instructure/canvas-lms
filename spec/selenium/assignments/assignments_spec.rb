@@ -23,15 +23,22 @@ require_relative "../helpers/public_courses_context"
 require_relative "../helpers/files_common"
 require_relative "../helpers/admin_settings_common"
 require_relative "../../helpers/k5_common"
+require_relative "../helpers/context_modules_common"
+require_relative "../helpers/items_assign_to_tray"
+require_relative "page_objects/assignment_create_edit_page"
+require_relative "../../helpers/selective_release_common"
 
 describe "assignments" do
   include_context "in-process server selenium tests"
   include FilesCommon
   include AssignmentsCommon
   include AdminSettingsCommon
+  include ContextModulesCommon
   include CustomScreenActions
   include CustomSeleniumActions
   include K5Common
+  include ItemsAssignToTray
+  include SelectiveReleaseCommon
 
   # NOTE: due date testing can be found in assignments_overrides_spec
 
@@ -292,16 +299,20 @@ describe "assignments" do
         ["#assignment_text_entry", "#assignment_online_url", "#assignment_online_upload"].each do |element|
           f(element).click
         end
-        replace_content(f(".DueDateInput"), due_at)
+        unless Account.site_admin.feature_enabled?(:selective_release_ui_api)
+          replace_content(f(".DueDateInput"), due_at)
+        end
 
         submit_assignment_form
         wait_for_ajaximations
         # confirm all our settings were saved and are now displayed
         expect(f("h1.title")).to include_text(assignment_name)
         expect(f("#assignment_show .points_possible")).to include_text("10")
-        expect(f("#assignment_show fieldset")).to include_text("a text entry box, a website url, or a file upload")
 
-        expect(f(".assignment_dates")).to include_text(due_at)
+        expect(f("#assignment_show fieldset")).to include_text("a text entry box, a website url, or a file upload")
+        unless Account.site_admin.feature_enabled?(:selective_release_ui_api)
+          expect(f(".assignment_dates")).to include_text(due_at)
+        end
       end
     end
 
@@ -322,7 +333,9 @@ describe "assignments" do
         ["#assignment_text_entry", "#assignment_online_url", "#assignment_online_upload"].each do |element|
           f(element).click
         end
-        replace_content(f(".DueDateInput"), due_at)
+        unless Account.site_admin.feature_enabled?(:selective_release_ui_api)
+          replace_content(f(".DueDateInput"), due_at)
+        end
 
         submit_assignment_form
         wait_for_ajaximations
@@ -331,7 +344,9 @@ describe "assignments" do
         expect(f("#assignment_show .points_possible")).to include_text("10")
         expect(f("#assignment_show fieldset")).to include_text("a text entry box, a website url, or a file upload")
 
-        expect(f(".assignment_dates")).to include_text(due_at)
+        unless Account.site_admin.feature_enabled?(:selective_release_ui_api)
+          expect(f(".assignment_dates")).to include_text(due_at)
+        end
       end
     end
 
@@ -406,8 +421,16 @@ describe "assignments" do
           expect_new_page_load { f(".more_options").click }
           expect(f("#assignment_name").attribute(:value)).to include(expected_text)
           expect(f("#assignment_points_possible").attribute(:value)).to include(points)
-          due_at_field = fj(".date_field[data-date-type='due_at']:first")
-          expect(due_at_field).to have_value due_at
+
+          if Account.site_admin.feature_enabled?(:selective_release_ui_api)
+            AssignmentCreateEditPage.click_manage_assign_to_button
+            expect(element_value_for_attr(assign_to_due_date, "value") + ", " + element_value_for_attr(assign_to_due_time, "value")).to eq due_at
+            click_cancel_button
+          else
+            due_at_field = fj(".date_field[data-date-type='due_at']:first")
+            expect(due_at_field).to have_value due_at
+          end
+
           click_option("#assignment_submission_type", "No Submission")
           submit_assignment_form
           expect(@course.assignments.count).to eq 1
@@ -446,10 +469,16 @@ describe "assignments" do
         expect(f("#assignment_name").text).to match ""
         expect(f("#assignment_points_possible").text).to match ""
 
-        first_input_val = driver.execute_script("return $('.DueDateInput__Container:first input').val();")
-        expect(first_input_val).to match expected_date
-        second_input_val = driver.execute_script("return $('.DueDateInput__Container:last input').val();")
-        expect(second_input_val).to match ""
+        if Account.site_admin.feature_enabled?(:selective_release_ui_api)
+          AssignmentCreateEditPage.click_manage_assign_to_button
+          expect(element_value_for_attr(assign_to_due_date, "value")).to match expected_date
+          expect(element_value_for_attr(assign_to_due_date(1), "value")).to eq("")
+        else
+          first_input_val = driver.execute_script("return $('.DueDateInput__Container:first input').val();")
+          expect(first_input_val).to match expected_date
+          second_input_val = driver.execute_script("return $('.DueDateInput__Container:last input').val();")
+          expect(second_input_val).to match ""
+        end
       end
     end
 
@@ -671,9 +700,24 @@ describe "assignments" do
       end
 
       it "allows editing the due date even if completely frozen", priority: "2" do
+        differentiated_modules_off
         old_due_at = @frozen_assign.due_at
         run_assignment_edit(@frozen_assign) do
           replace_and_proceed(f(".datePickerDateField[data-date-type='due_at']"), "Sep 20, 2012")
+        end
+
+        expect(f(".assignment_dates").text).to match(/Sep 20, 2012/)
+        # some sort of time zone issue is occurring with Sep 20, 2012 - it rolls back a day and an hour locally.
+        expect(@frozen_assign.reload.due_at.to_i).not_to eq old_due_at.to_i
+      end
+
+      it "allows editing the due date even if completely frozen", :ignore_js_errors do
+        differentiated_modules_on
+        old_due_at = @frozen_assign.due_at
+        run_assignment_edit(@frozen_assign) do
+          AssignmentCreateEditPage.click_manage_assign_to_button
+          update_due_date(0, "Sep 20, 2012")
+          click_save_button("Apply")
         end
 
         expect(f(".assignment_dates").text).to match(/Sep 20, 2012/)

@@ -22,11 +22,11 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import axios from '@canvas/axios'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import numberHelper from '@canvas/i18n/numberHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import GradeSummary from '../index'
-import {createCourseGradesWithGradingPeriods} from '../../../../../spec/javascripts/jsx/gradebook/GradeCalculatorSpecHelper'
+import {createCourseGradesWithGradingPeriods} from '@canvas/grading/GradeCalculatorSpecHelper'
 import useStore from '../../react/stores'
 
 const I18n = useI18nScope('gradingGradeSummary')

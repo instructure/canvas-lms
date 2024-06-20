@@ -175,7 +175,7 @@ module Lti
       def require_context_update_rights
         return unless create_resources_from_content_items?
 
-        authorized_action(@context, @current_user, %i[manage_content update])
+        authorized_action(@context, @current_user, %i[manage_content manage_course_content_add update])
       end
 
       def require_tool

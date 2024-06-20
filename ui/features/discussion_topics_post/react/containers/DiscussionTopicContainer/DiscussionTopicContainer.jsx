@@ -511,10 +511,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                       margin="0 0 small 0"
                     >
                       <Flex direction="column" padding={responsiveProps?.container?.padding}>
-                        <DiscussionSummary
-                          onDisableSummaryClick={() => props.setIsSummaryEnabled(false)}
-                          showButtonText={!matches.includes('mobile')}
-                        />
+                        <DiscussionSummary onDisableSummaryClick={() => props.setIsSummaryEnabled(false)}/>
                       </Flex>
                     </View>
                   </Flex.Item>

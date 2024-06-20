@@ -1,0 +1,113 @@
+//------------------------------------------------------------------------------
+// SideNav.tsx styles and InstUI overrides
+//------------------------------------------------------------------------------
+
+#instui-sidenav {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+
+  li {
+    a::after {
+      color: var(--ic-brand-global-nav-menu-item__text-color);
+
+      &:hover {
+        color: var(--ic-brand-global-nav-menu-item__text-color);
+      }
+
+      &[data-selected="true"]:hover {
+        color: var(--ic-brand-global-nav-menu-item__text-color--active);
+      }
+    }
+  }
+}
+
+#logomark {
+  background: var(--ic-brand-global-nav-logo-bgd) 50% / contain no-repeat var(--ic-brand-header-image);
+  display: block;
+  height: 75px;
+  overflow: hidden;
+  transition: transform 0.3s;
+
+  &:focus {
+    box-shadow: inset 0 0 0 1px var(--ic-brand-global-nav-bgd),
+    inset 0 0 0 2px var(--ic-brand-global-nav-menu-item__text-color);
+    outline-style: none;
+  }
+
+  body.primary-nav-expanded & {
+    height: 85px;
+  }
+}
+
+#user-avatar {
+  --size: 30px;
+  box-sizing: border-box;
+  height: var(--size);
+  width: var(--size);
+
+  body.primary-nav-expanded & {
+    --size: 36px;
+  }
+}
+
+// 06/11/24 React’s className not allowed on SideNavBar.Item
+// !important unavoidable due to external-tool-tray items
+#profile-tray,
+#accounts-tray,
+#dashboard-tray,
+#courses-tray,
+#calendar-tray,
+#conversations-tray,
+#history-tray,
+#help-tray,
+[id$="-external-tool-tray"] {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4px 0 !important;
+  text-decoration: none;
+
+  // icon/image container
+  > :first-child {
+    font-size: 1rem;
+
+    svg {
+      fill: var(--ic-brand-global-nav-ic-icon-svg-fill);
+      font-size: 1.625rem;
+    }
+  }
+
+  body.primary-nav-expanded & {
+    // label container
+    > :last-child {
+      line-height: 1.4;
+      margin-top: 3px;
+    }
+  }
+
+  &:hover,
+  &:focus {
+    background-color: $ic-global-nav-link-hover !important;
+    color: var(--ic-brand-global-nav-menu-item__text-color);
+    text-decoration: none;
+  }
+
+  &[data-selected="true"] {
+    svg {
+      fill: var(--ic-brand-global-nav-ic-icon-svg-fill--active);
+    }
+
+    &:hover,
+    &:focus {
+      background: $ic-color-light !important;
+      color: var(--ic-brand-global-nav-menu-item__text-color--active);
+    }
+  }
+
+  @media (min-height: 400px) {
+    padding: 7px 0 !important;
+  }
+}

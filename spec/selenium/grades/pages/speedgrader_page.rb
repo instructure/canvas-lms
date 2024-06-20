@@ -560,6 +560,10 @@ class Speedgrader
     end
 
     # rubric
+    def rubric_grid
+      f(".react-rubric")
+    end
+
     def view_rubric_button
       f("button.toggle_full_rubric")
     end
@@ -582,6 +586,10 @@ class Speedgrader
 
     def rating_tiers
       ff(".rating-tier")
+    end
+
+    def free_form_comment_ratings
+      ff(".rubric-freeform")
     end
 
     def rating_by_text(rating_text)

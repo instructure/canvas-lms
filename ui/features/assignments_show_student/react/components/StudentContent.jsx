@@ -145,7 +145,7 @@ function renderContentBaseOnAvailability(
     // EVAL-3711 Remove ICE Feature Flag
     return (
       <>
-        {!window.ENV.FEATURES.instui_nav &&
+        {!window.ENV.FEATURES?.instui_nav &&
           !assignment.env.peerReviewModeEnabled &&
           renderAttemptsAndAvailability(assignment)}
         <AssignmentToggleDetails description={assignment.description} />
@@ -167,7 +167,7 @@ function renderContentBaseOnAvailability(
         <Flex margin="medium 0 0 0" alignItems="start">
           <div style={{flexGrow: 1}}>
             {/* EVAL-3711 Remove ICE Feature Flag */}
-            {!window.ENV.FEATURES.instui_nav &&
+            {!window.ENV.FEATURES?.instui_nav &&
               !assignment.env.peerReviewModeEnabled &&
               renderAttemptsAndAvailability(assignment)}
             {assignment.submissionTypes.includes('student_annotation') && (

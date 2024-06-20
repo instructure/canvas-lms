@@ -29,8 +29,7 @@ const I18n = useI18nScope('discussion_create')
 type Props = {
   discussionAnonymousState: string
   setDiscussionAnonymousState: (value: string) => void
-  isEditing: boolean
-  isGraded: boolean
+  isSelectDisabled: boolean
   setIsGraded: (value: boolean) => void
   setIsGroupDiscussion: (value: boolean) => void
   setGroupCategoryId: (value: string | null) => void
@@ -41,8 +40,7 @@ type Props = {
 export const AnonymousSelector = ({
   discussionAnonymousState,
   setDiscussionAnonymousState,
-  isEditing,
-  isGraded,
+  isSelectDisabled,
   setIsGraded,
   setIsGroupDiscussion,
   setGroupCategoryId,
@@ -63,7 +61,7 @@ export const AnonymousSelector = ({
           }
           setDiscussionAnonymousState(value)
         }}
-        disabled={isEditing || isGraded}
+        disabled={isSelectDisabled}
       >
         <RadioInput
           key="off"

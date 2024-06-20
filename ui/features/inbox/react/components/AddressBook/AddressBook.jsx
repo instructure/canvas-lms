@@ -324,6 +324,7 @@ export const AddressBook = ({
           isKeyboardFocus={focusType === KEYBOARD_FOCUS_TYPE}
           observerEnrollments={observerEnrollments}
           isOnObserverSubmenu={isOnObserverSubmenu}
+          pronouns =  {ENV?.SETTINGS?.can_add_pronouns && itemType === USER_TYPE ? menuItem.pronouns : null}
         >
           {menuItemName}
         </AddressBookItem>

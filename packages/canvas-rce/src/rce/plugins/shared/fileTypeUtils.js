@@ -108,7 +108,11 @@ export function mediaPlayerURLFromFile(file, canvasOrigin) {
     const url = parse(`/media_attachments_iframe/${file.id}`, true)
     url.query.type = type
     url.query.embedded = true
-    if (file.uuid && file.contextType == 'User') {
+    if (file.uuid && (file.contextType == 'User' ||
+      (!!canvasOrigin &&
+        canvasOrigin !== window.location.origin &&
+        RCEGlobals.getFeatures()?.file_verifiers_for_quiz_links))
+    ) {
       url.query.verifier = file.uuid
     } else if (file.url || file.href) {
       const parsed_url = parse(file.url || file.href, true)

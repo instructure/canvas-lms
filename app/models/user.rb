@@ -179,7 +179,6 @@ class User < ActiveRecord::Base
   has_many :eportfolios, dependent: :destroy
   has_many :quiz_submissions, dependent: :destroy, class_name: "Quizzes::QuizSubmission"
   has_many :dashboard_messages, -> { where(to: "dashboard", workflow_state: "dashboard").order("created_at DESC") }, class_name: "Message", dependent: :destroy
-  has_many :collaborations, -> { order("created_at DESC") }
   has_many :user_services, -> { order("created_at") }, dependent: :destroy
   has_many :rubric_associations, -> { preload(:rubric).order(created_at: :desc) }, as: :context, inverse_of: :context
   has_many :rubrics
@@ -991,7 +990,7 @@ class User < ActiveRecord::Base
   # which also depends on the current context.
   def lookup_lti_id(context)
     old_lti_id = context.shard.activate do
-      past_lti_ids.where(context:).take&.user_lti_id
+      past_lti_ids.find_by(context:)&.user_lti_id
     end
     old_lti_id || self.lti_id
   end
@@ -1070,7 +1069,7 @@ class User < ActiveRecord::Base
   def gmail_channel
     addr = user_services
            .where(service_domain: "google.com")
-           .limit(1).pluck(:service_user_id).first
+           .limit(1).pick(:service_user_id)
     communication_channels.email.by_path(addr).first
   end
 
@@ -1091,7 +1090,7 @@ class User < ActiveRecord::Base
 
   def google_service_address(service_name)
     user_services.where(service: service_name)
-                 .limit(1).pluck((service_name == "google_drive") ? :service_user_name : :service_user_id).first
+                 .limit(1).pick((service_name == "google_drive") ? :service_user_name : :service_user_id)
   end
 
   def email=(e)
@@ -2809,7 +2808,7 @@ class User < ActiveRecord::Base
   end
 
   def self.default_storage_quota
-    Setting.get("user_default_quota", 50.megabytes.to_s).to_i
+    Setting.get("user_default_quota", 50.decimal_megabytes.to_s).to_i
   end
 
   def update_last_user_note
@@ -3378,7 +3377,7 @@ class User < ActiveRecord::Base
   end
 
   def authenticate_one_time_password(code)
-    result = one_time_passwords.where(code:, used: false).take
+    result = one_time_passwords.find_by(code:, used: false)
     return unless result
     # atomically update used
     return unless one_time_passwords.where(used: false, id: result).update_all(used: true, updated_at: Time.now.utc) == 1

@@ -1197,6 +1197,10 @@ class ContentMigration < ActiveRecord::Base
   }.freeze
 
   def migration_data_fields_for(asset_type)
+    if asset_type == "Attachment" && context.root_account.feature_enabled?(:file_verifiers_for_quiz_links)
+      return MIGRATION_DATA_FIELDS[asset_type].clone << :uuid
+    end
+
     MIGRATION_DATA_FIELDS[asset_type] || []
   end
 
@@ -1254,6 +1258,14 @@ class ContentMigration < ActiveRecord::Base
         migration_data_fields_for(asset_type).each do |field|
           mig_id_to_dest_id[o.migration_id.to_s][field] = o.send(field)
         end
+      end
+
+      if key == "files" && context.root_account.feature_enabled?(:file_verifiers_for_quiz_links)
+        dest_id_to_dest_uuid = {}
+        scope.each do |file|
+          dest_id_to_dest_uuid[file.id] = file.uuid
+        end
+        mapping["verifiers"] = dest_id_to_dest_uuid unless dest_id_to_dest_uuid.empty?
       end
 
       next if mig_id_to_dest_id.empty?

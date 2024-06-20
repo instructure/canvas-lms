@@ -63,9 +63,9 @@ describe "new account user search" do
       expect(act_as_label).to include_text @user.name
     end
 
-    it "opens the conversation page when clicking the send message button", priority: "1" do
+    it "opens the inbox page when clicking the send message button", priority: "1" do
       click_message_button(@user.name)
-      expect(f(".message-header-input .ac-token")).to include_text @user.name
+      expect(f("span[data-testid='address-book-tag']")).to include_text @user.name
     end
 
     it "searches but not find bogus user", priority: "1" do

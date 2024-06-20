@@ -27,7 +27,7 @@ import fetchMock from 'fetch-mock'
 import DashboardCard from '../DashboardCard'
 import getDroppableDashboardCardBox from '../getDroppableDashboardCardBox'
 import CourseActivitySummaryStore from '../CourseActivitySummaryStore'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 QUnit.module('DashboardCardBox', suiteHooks => {
   let $container
@@ -71,6 +71,7 @@ QUnit.module('DashboardCardBox', suiteHooks => {
     ReactDOM.unmountComponentAtNode($container)
     $container.remove()
     server.restore()
+    fetchMock.reset()
     fakeENV.teardown()
   })
 

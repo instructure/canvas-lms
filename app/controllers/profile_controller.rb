@@ -224,11 +224,13 @@ class ProfileController < ApplicationController
         @user.reload
         show_tutorial_ff_to_user = @domain_root_account&.feature_enabled?(:new_user_tutorial) &&
                                    @user.participating_instructor_course_ids.any?
-        add_crumb(t(:crumb, "%{user}'s settings", user: @user.short_name), settings_profile_path)
+        add_crumb(@user.short_name, profile_path)
+        add_crumb(t("Settings"))
         js_env(
           NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT: show_tutorial_ff_to_user,
           CONTEXT_BASE_URL: "/users/#{@user.id}"
         )
+        page_has_instui_topnav
         render :profile
       end
       format.json do
@@ -411,8 +413,10 @@ class ProfileController < ApplicationController
           if change_password == "1" && pseudonym_to_update && !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
             error_msg = t("errors.invalid_old_passowrd", "Invalid old password for the login %{pseudonym}", pseudonym: pseudonym_to_update.unique_id)
             pseudonymed = true
-            flash[:error] = error_msg
-            format.html { redirect_to user_profile_url(@current_user) }
+            format.html do
+              flash[:error] = error_msg
+              redirect_to user_profile_url(@current_user)
+            end
             format.json { render json: { errors: { old_password: error_msg } }, status: :bad_request }
           end
           if change_password != "1" || !pseudonym_to_update || !pseudonym_to_update.valid_arbitrary_credentials?(old_password)

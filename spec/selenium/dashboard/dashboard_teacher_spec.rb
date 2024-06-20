@@ -19,9 +19,13 @@
 
 require_relative "../common"
 require_relative "../helpers/notifications_common"
+require_relative "../assignments/page_objects/assignment_create_edit_page"
+require_relative "../helpers/items_assign_to_tray"
 
 describe "dashboard" do
   include NotificationsCommon
+  include ItemsAssignToTray
+
   include_context "in-process server selenium tests"
 
   context "as a teacher" do
@@ -133,7 +137,7 @@ describe "dashboard" do
       end
 
       # EVAL-3711 Remove this test when instui_nav feature flag is removed
-      it "does not show an unpublished assignment under recent activity under dashboard", priority: "2" do
+      it "does not show an unpublished assignment under recent activity under dashboard", :ignore_js_errors do
         # manually creating assignment as assignment created through backend are published by default
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
@@ -143,7 +147,15 @@ describe "dashboard" do
         wait_for_ajaximations
         f("#assignment_name").send_keys("unpublished assignment")
         f("input[type=checkbox][id=assignment_text_entry]").click
-        f(".datePickerDateField[data-date-type='due_at']").send_keys(1.day.from_now)
+
+        if Account.site_admin.feature_enabled?(:selective_release_ui_api)
+          AssignmentCreateEditPage.click_manage_assign_to_button
+          formatted_date = format_date_for_view(1.day.from_now(Time.zone.now), "%m/%d/%Y")
+          update_due_date(0, formatted_date)
+          click_save_button("Apply")
+        else
+          f(".datePickerDateField[data-date-type='due_at']").send_keys(1.day.from_now)
+        end
 
         expect_new_page_load { f(".btn-primary[type=submit]").click }
         wait_for_ajaximations
@@ -154,7 +166,7 @@ describe "dashboard" do
         expect(f(".no_recent_messages")).to be_truthy
       end
 
-      it "does not show an unpublished assignment under recent activity under dashboard with the instui nav feature flag on", priority: "2" do
+      it "does not show an unpublished assignment under recent activity under dashboard with the instui nav feature flag on", :ignore_js_errors do
         @course.root_account.enable_feature!(:instui_nav)
         # manually creating assignment as assignment created through backend are published by default
         get "/courses/#{@course.id}/assignments"
@@ -165,7 +177,15 @@ describe "dashboard" do
         wait_for_ajaximations
         f("#assignment_name").send_keys("unpublished assignment")
         f("input[type=checkbox][id=assignment_text_entry]").click
-        f(".datePickerDateField[data-date-type='due_at']").send_keys(1.day.from_now)
+
+        if Account.site_admin.feature_enabled?(:selective_release_ui_api)
+          AssignmentCreateEditPage.click_manage_assign_to_button
+          formatted_date = format_date_for_view(1.day.from_now(Time.zone.now), "%m/%d/%Y")
+          update_due_date(0, formatted_date)
+          click_save_button("Apply")
+        else
+          f(".datePickerDateField[data-date-type='due_at']").send_keys(1.day.from_now)
+        end
 
         expect_new_page_load { f(".btn-primary[type=submit]").click }
         wait_for_ajaximations

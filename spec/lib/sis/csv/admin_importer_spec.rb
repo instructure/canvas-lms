@@ -76,7 +76,7 @@ describe SIS::CSV::AdminImporter do
       "U001,,AccountAdmin,active"
     )
     expect(AccountUser.active.count).to eq before_count + 1
-    expect(@sub_account.account_users.where(user_id: u1).take.workflow_state).to eq "deleted"
+    expect(@sub_account.account_users.find_by(user_id: u1).workflow_state).to eq "deleted"
     expect(@account.account_users.where(user_id: u1).count).to eq 1
   end
 
@@ -127,8 +127,8 @@ describe SIS::CSV::AdminImporter do
     )
     expect(batch2.roll_back_data.first.updated_workflow_state).to eq "deleted"
     batch2.restore_states_for_batch
-    user = @account.pseudonyms.where(sis_user_id: "U001").take.user
-    admin = @account.account_users.where(user_id: user).take
+    user = @account.pseudonyms.find_by(sis_user_id: "U001").user
+    admin = @account.account_users.find_by(user_id: user)
     expect(admin.workflow_state).to eq "active"
   end
 

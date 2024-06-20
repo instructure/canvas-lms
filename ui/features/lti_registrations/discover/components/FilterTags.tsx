@@ -16,66 +16,58 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useMemo} from 'react'
-import type {FilterItem, LtiFilter} from '../model/Filter'
+import React from 'react'
+import type {FilterItem} from '../model/Filter'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
-import {useSearchParams} from 'react-router-dom'
-import {Heading} from '@instructure/ui-heading'
+import type {DiscoverParams} from './Discover'
 
 const I18n = useI18nScope('lti_registrations')
 
-export default function FilterTags(props: {numberOfResults: number}) {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const [filters, setFilters] = useState<LtiFilter>({companies: [], versions: [], audience: []})
-  const isAnyFilter = useMemo(() => {
-    return Object.values(filters).flat().length > 0
-  }, [filters])
-
-  useEffect(() => {
-    const queryParams = searchParams.get('filter')
-    const params = queryParams
-      ? JSON.parse(queryParams)
-      : {companies: [], versions: [], audience: []}
-    setFilters(params as unknown as LtiFilter)
-  }, [searchParams])
-
+export default function FilterTags(props: {
+  numberOfResults: number
+  queryParams: DiscoverParams
+  updateQueryParams: (params: Partial<DiscoverParams>) => void
+}) {
   const removeFilter = (filter: FilterItem) => {
     const newFilters = Object.fromEntries(
-      Object.entries(filters).map(([key, value]) => [key, value.filter(f => f.id !== filter.id)])
+      Object.entries(props.queryParams.filters).map(([key, value]) => [
+        key,
+        value.filter(f => f.id !== filter.id),
+      ])
     )
-    setSearchParams({
-      search: searchParams.get('search') ?? '',
-      filter: JSON.stringify(newFilters),
+    props.updateQueryParams({
+      filters: newFilters,
+      page: 1,
     })
   }
 
   return (
     <>
-      {isAnyFilter && (
-        <>
-          <Heading level="h2">{I18n.t('Search Results')}</Heading>
-          <Flex gap="x-small" wrap="no-wrap" margin="0 0 medium 0">
-            <p>
-              {props.numberOfResults} {I18n.t('result(s) filtered by')}
-            </p>
-            {Object.values(filters)
-              .flat()
-              .map(filter => {
-                return (
-                  <Flex.Item padding="0 small 0 0" key={filter.id}>
-                    <Tag
-                      text={filter.name}
-                      dismissible={true}
-                      onClick={() => removeFilter(filter)}
-                    />
-                  </Flex.Item>
-                )
-              })}
-          </Flex>
-        </>
-      )}
+      <Flex gap="x-small" wrap="no-wrap" margin="0 0 medium 0">
+        <p>
+          {props.numberOfResults} {I18n.t('results filtered by')}
+        </p>
+        {Object.values(props.queryParams.filters)
+          .flat()
+          .map(filter => {
+            return (
+              <Flex.Item padding="0 small 0 0" key={filter.id}>
+                <Tag text={filter.name} dismissible={true} onClick={() => removeFilter(filter)} />
+              </Flex.Item>
+            )
+          })}
+        {props.queryParams.search && (
+          <Flex.Item padding="0 small 0 0">
+            <Tag
+              text={'"' + props.queryParams.search + '"'}
+              dismissible={true}
+              onClick={() => props.updateQueryParams({search: '', page: 1})}
+            />
+          </Flex.Item>
+        )}
+      </Flex>
     </>
   )
 }

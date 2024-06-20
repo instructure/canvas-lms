@@ -18,7 +18,6 @@
 
 import React from 'react'
 import $ from 'jquery'
-import 'jquery-migrate'
 import {fireEvent, render, screen} from '@testing-library/react'
 import chicago from 'timezone/America/Chicago'
 import * as tz from '@instructure/moment-utils'

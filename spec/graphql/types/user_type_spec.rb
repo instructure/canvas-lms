@@ -930,6 +930,23 @@ describe Types::UserType do
       result = type.resolve("favoriteCoursesConnection { nodes { _id } }")
       expect(result).to match_array([@course1.id.to_s])
     end
+
+    context "dashboard_card" do
+      before do
+        Account.site_admin.enable_feature! :dashboard_graphql_integration
+      end
+
+      it "returns the correct dashboard cards if there are no favorite courses" do
+        result = type.resolve("favoriteCoursesConnection { nodes { dashboardCard { assetString } } }")
+        expect(result).to match_array([@course1.asset_string, @course2.asset_string])
+      end
+
+      it "returns the correct dashboard cards if there are favorite courses" do
+        @student.favorites.create!(context: @course1)
+        result = type.resolve("favoriteCoursesConnection { nodes { dashboardCard { assetString } } }")
+        expect(result).to match_array([@course1.asset_string])
+      end
+    end
   end
 
   context "favorite_groups" do

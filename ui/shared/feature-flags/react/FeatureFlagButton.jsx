@@ -53,7 +53,7 @@ function removeFlag(flagName) {
   })
 }
 
-function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
+function FeatureFlagButton({featureFlag, disableDefaults, displayName, appliesTo}) {
   const [updatedFlag, setUpdatedFlag] = useState(undefined)
   const [apiBusy, setApiBusy] = useState(false)
   const enclosingDivEl = useRef(null)
@@ -102,7 +102,7 @@ function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
   // Show the appropriate text depending
   // Also if we are in a course context then our FFs can't ever be inherited
   const allowsDefaults = flagUtils.doesAllowDefaults(effectiveFlag, disableDefaults)
-  const description = flagUtils.buildDescription(effectiveFlag, allowsDefaults)
+  const description = flagUtils.buildDescription(effectiveFlag, allowsDefaults, appliesTo)
 
   const isLocked = flagUtils.isLocked(effectiveFlag)
 
@@ -199,6 +199,7 @@ FeatureFlagButton.propTypes = {
   featureFlag: object.isRequired,
   displayName: string,
   disableDefaults: bool,
+  appliesTo: string,
 }
 
 export default React.memo(FeatureFlagButton)

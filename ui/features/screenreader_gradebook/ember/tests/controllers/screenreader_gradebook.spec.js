@@ -16,12 +16,14 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
+import 'jquery'
+import 'jquery-migrate'
 import {map, find, forEach} from 'lodash'
 import ajax from 'ic-ajax'
 import startApp from '../start_app'
 import Ember, {ObjectProxy} from 'ember'
 import fixtures from '../ajax_fixtures'
-import {createCourseGradesWithGradingPeriods} from 'spec/jsx/gradebook/GradeCalculatorSpecHelper'
+import {createCourseGradesWithGradingPeriods} from '@canvas/grading/GradeCalculatorSpecHelper'
 import SRGBController from '../../controllers/screenreader_gradebook_controller'
 import userSettings from '@canvas/user-settings'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'

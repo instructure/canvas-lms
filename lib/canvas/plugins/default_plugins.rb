@@ -356,6 +356,16 @@ module Canvas::Plugins::DefaultPlugins
                               },
                               validator: "AppCenterValidator"
                             })
+    Canvas::Plugin.register("learnplatform", nil, {
+                              name: -> { t :name, "LearnPlatform" },
+                              description: -> { t :description, "Enable access to the LearnPlatform API to pull product information" },
+                              author: "Instructure",
+                              settings_partial: "plugins/learn_platform_settings",
+                              settings: {
+                                base_url: "https://app.learnplatform.com",
+                              },
+                              encrypted_settings: [:token]
+                            })
     Canvas::Plugin.register("pandapub", nil, {
                               name: -> { t :name, "PandaPub" },
                               description: -> { t :description, "Pub/Sub service" },

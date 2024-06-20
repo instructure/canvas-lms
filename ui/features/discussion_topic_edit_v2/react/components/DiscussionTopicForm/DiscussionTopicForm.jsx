@@ -76,10 +76,9 @@ import {
 } from '../../util/utils'
 import {MissingSectionsWarningModal} from '../MissingSectionsWarningModal/MissingSectionsWarningModal'
 import {flushSync} from 'react-dom'
-import {SavingDiscussionTopicOverlay} from '../SavingDiscussionTopicOverlay/SavingDiscussionTopicOverlay'
-import {Heading} from '@instructure/ui-heading'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import {ItemAssignToTrayWrapper} from '../DiscussionOptions/ItemAssignToTrayWrapper'
+import {SendEditNotificationModal} from '../SendEditNotificationModal'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -121,7 +120,6 @@ function DiscussionTopicForm({
   apolloClient,
   isSubmitting,
   setIsSubmitting,
-  breakpoints,
 }) {
   const rceRef = useRef()
   const textInputRef = useRef()
@@ -134,7 +132,6 @@ function DiscussionTopicForm({
   const isAnnouncement = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
   const isUnpublishedAnnouncement =
     isAnnouncement && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published
-  const isEditingAnnouncement = isAnnouncement && ENV?.DISCUSSION_TOPIC?.ATTRIBUTES.id
   const published = currentDiscussionTopic?.published ?? false
 
   const announcementAlertProps = () => {
@@ -145,15 +142,6 @@ function DiscussionTopicForm({
         variant: 'warning',
         text: I18n.t(
           'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Delay Posting option and set to publish on a future date.'
-        ),
-      }
-    } else if (isEditingAnnouncement) {
-      return {
-        id: 'announcement-no-notification-on-edit',
-        key: 'announcement-no-notification-on-edit',
-        variant: 'info',
-        text: I18n.t(
-          'Users do not receive updated notifications when editing an announcement. If you wish to have users notified of this update via their notification settings, you will need to create a new announcement.'
         ),
       }
     } else {
@@ -173,6 +161,7 @@ function DiscussionTopicForm({
   const [titleValidationMessages, setTitleValidationMessages] = useState([
     {text: '', type: 'success'},
   ])
+
   const [postToValidationMessages, setPostToValidationMessages] = useState([])
 
   const [rceContent, setRceContent] = useState(currentDiscussionTopic?.message || '')
@@ -215,9 +204,6 @@ function DiscussionTopicForm({
     currentDiscussionTopic?.groupSet?._id || null
   )
   const [groupCategorySelectError, setGroupCategorySelectError] = useState([])
-  const [delayPosting, setDelayPosting] = useState(
-    (!!currentDiscussionTopic?.delayedPostAt && isAnnouncement) || false
-  )
   const [locked, setLocked] = useState((currentDiscussionTopic.locked && isAnnouncement) || false)
 
   const [availableFrom, setAvailableFrom] = useState(currentDiscussionTopic?.delayedPostAt || null)
@@ -306,6 +292,7 @@ function DiscussionTopicForm({
     setImportantDates,
     pointsPossible,
     isGraded,
+    isCheckpoints,
   }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
@@ -335,20 +322,23 @@ function DiscussionTopicForm({
   const [missingSections, setMissingSections] = useState([])
   const [shouldShowMissingSectionsWarning, setShouldShowMissingSectionsWarning] = useState(false)
 
+  const [showEditAnnouncementModal, setShowEditAnnouncementModal] = useState(false)
+  const [shouldPublish, setShouldPublish] = useState(false)
+
   const handleSettingUsageRightsData = data => {
     setUsageRightsErrorState(false)
     setUsageRightsData(data)
   }
 
   useEffect(() => {
-    if (delayPosting) {
+    if (isAnnouncement && availableFrom) {
       const rightNow = new Date()
       const availableFromIntoDate = new Date(availableFrom)
       setWillAnnouncementPostRightAway(availableFromIntoDate <= rightNow)
     } else {
       setWillAnnouncementPostRightAway(true)
     }
-  }, [availableFrom, delayPosting])
+  }, [availableFrom, isAnnouncement])
 
   useEffect(() => {
     if (!isGroupDiscussion) setGroupCategoryId(null)
@@ -459,7 +449,8 @@ function DiscussionTopicForm({
     if (
       !isGraded &&
       !currentDiscussionTopic?.assignment &&
-      ENV.FEATURES?.selective_release_ui_api
+      ENV.FEATURES?.selective_release_ui_api &&
+      !isAnnouncement
     ) {
       delete payload.specificSections
       Object.assign(
@@ -473,6 +464,10 @@ function DiscussionTopicForm({
       )
     }
 
+    const previousAnonymousState = !currentDiscussionTopic?.anonymousState
+      ? 'off'
+      : currentDiscussionTopic.anonymousState
+
     // Additional properties for editing mode
     if (isEditing) {
       const editingPayload = {
@@ -480,6 +475,9 @@ function DiscussionTopicForm({
         discussionTopicId: currentDiscussionTopic._id,
         published: shouldPublish,
         removeAttachment: !attachment?._id,
+        ...(previousAnonymousState !== discussionAnonymousState && {
+          anonymousState: discussionAnonymousState,
+        }),
       }
 
       if (currentDiscussionTopic?.assignment?.hasSubAssignments && isGraded) {
@@ -503,7 +501,7 @@ function DiscussionTopicForm({
     }
   }
 
-  const continueSubmitForm = shouldPublish => {
+  const continueSubmitForm = (shouldPublish, shouldNotifyUsers = false) => {
     setTimeout(() => {
       setIsSubmitting(true)
     }, 0)
@@ -534,7 +532,7 @@ function DiscussionTopicForm({
       )
     ) {
       const payload = createSubmitPayload(shouldPublish)
-      onSubmit(payload)
+      onSubmit(payload, shouldNotifyUsers)
       return true
     }
 
@@ -545,7 +543,7 @@ function DiscussionTopicForm({
     return false
   }
 
-  const submitForm = shouldPublish => {
+  const submitForm = (shouldPublish, shouldNotifyUsers = false) => {
     if (shouldShowAvailabilityOptions) {
       const selectedAssignedTo = assignedInfoList.map(info => info.assignedList).flatMap(x => x)
       const isEveryoneOrEveryoneElseSelected = selectedAssignedTo.some(
@@ -573,10 +571,14 @@ function DiscussionTopicForm({
       }
     }
 
-    return continueSubmitForm(shouldPublish)
+    return continueSubmitForm(shouldPublish, shouldNotifyUsers)
   }
 
   const renderLabelWithPublishStatus = () => {
+    if (instUINavEnabled()) {
+      return <></>
+    }
+
     const publishStatus = published ? (
       <Text color="success" weight="normal">
         <IconPublishSolid /> {I18n.t('Published')}
@@ -627,25 +629,8 @@ function DiscussionTopicForm({
     })
   }
 
-  const renderHeading = () => {
-    const itemMargin = breakpoints.desktopOnly ? '0 0 large' : '0 0 medium'
-    const headerText = isAnnouncement ? I18n.t('Create Announcement') : I18n.t('Create Discussion')
-    const titleContent = title ?? headerText
-    return instUINavEnabled() ? (
-      <Flex direction="column" as="div">
-        <Flex.Item margin={itemMargin} overflow="hidden">
-          <Heading level="h1">{headerText}</Heading>
-        </Flex.Item>
-      </Flex>
-    ) : (
-      <ScreenReaderContent>
-        <h1>{titleContent}</h1>
-      </ScreenReaderContent>
-    )
-  }
-
   const renderAvailabilityOptions = useCallback(() => {
-    if (isGraded) {
+    if (isGraded && !isAnnouncement) {
       return (
         <View as="div" data-testid="assignment-settings-section">
           <DiscussionDueDatesContext.Provider value={assignmentDueDateContext}>
@@ -686,19 +671,21 @@ function DiscussionTopicForm({
       )
     } else {
       return (
-        <NonGradedDateOptions
-          availableFrom={availableFrom}
-          setAvailableFrom={setAvailableFrom}
-          availableUntil={availableUntil}
-          setAvailableUntil={setAvailableUntil}
-          isGraded={isGraded}
-          setAvailabilityValidationMessages={setAvailabilityValidationMessages}
-          availabilityValidationMessages={availabilityValidationMessages}
-          inputWidth={inputWidth}
-          setDateInputRef={ref => {
-            dateInputRef.current = ref
-          }}
-        />
+        <View as="div" data-testid="non-graded-date-options">
+          <NonGradedDateOptions
+            availableFrom={availableFrom}
+            setAvailableFrom={setAvailableFrom}
+            availableUntil={availableUntil}
+            setAvailableUntil={setAvailableUntil}
+            isGraded={isGraded}
+            setAvailabilityValidationMessages={setAvailabilityValidationMessages}
+            availabilityValidationMessages={availabilityValidationMessages}
+            inputWidth={inputWidth}
+            setDateInputRef={ref => {
+              dateInputRef.current = ref
+            }}
+          />
+        </View>
       )
     }
   }, [
@@ -711,6 +698,7 @@ function DiscussionTopicForm({
     displayGradeAs,
     gradingSchemeId,
     intraGroupPeerReviews,
+    isAnnouncement,
     isCheckpoints,
     isGraded,
     peerReviewAssignment,
@@ -723,9 +711,8 @@ function DiscussionTopicForm({
 
   return (
     <>
-      {renderHeading()}
       <FormFieldGroup description="" rowSpacing="small">
-        {(isUnpublishedAnnouncement || isEditingAnnouncement) && (
+        {isUnpublishedAnnouncement && (
           <Alert variant={announcementAlertProps().variant}>{announcementAlertProps().text}</Alert>
         )}
         <TextInput
@@ -819,8 +806,9 @@ function DiscussionTopicForm({
           <AnonymousSelector
             discussionAnonymousState={discussionAnonymousState}
             setDiscussionAnonymousState={setDiscussionAnonymousState}
-            isEditing={isEditing}
-            isGraded={isGraded}
+            isSelectDisabled={
+              (isEditing && currentDiscussionTopic?.entryCounts?.repliesCount) || isGraded
+            }
             setIsGraded={setIsGraded}
             setIsGroupDiscussion={setIsGroupDiscussion}
             setGroupCategoryId={setGroupCategoryId}
@@ -829,32 +817,6 @@ function DiscussionTopicForm({
           />
         )}
         <FormFieldGroup description="" rowSpacing="small">
-          {shouldShowAnnouncementOnlyOptions && (
-            <Checkbox
-              label={I18n.t('Delay Posting')}
-              value="enable-delay-posting"
-              checked={delayPosting}
-              onChange={() => {
-                setDelayPosting(!delayPosting)
-                setAvailableFrom(null)
-              }}
-            />
-          )}
-          {delayPosting && shouldShowAnnouncementOnlyOptions && (
-            <DateTimeInput
-              timezone={ENV.TIMEZONE}
-              description={I18n.t('Post At')}
-              prevMonthLabel={I18n.t('previous')}
-              nextMonthLabel={I18n.t('next')}
-              onChange={(_event, newDate) => setAvailableFrom(newDate)}
-              value={availableFrom}
-              invalidDateTimeMessage={I18n.t('Invalid date and time')}
-              layout="columns"
-              datePlaceholder={I18n.t('Select Date')}
-              dateRenderLabel={I18n.t('Date')}
-              timeRenderLabel={I18n.t('Time')}
-            />
-          )}
           {shouldShowAnnouncementOnlyOptions && (
             <Checkbox
               label={I18n.t('Allow Participants to Comment')}
@@ -904,7 +866,12 @@ function DiscussionTopicForm({
               label={I18n.t('Graded')}
               value="graded"
               checked={isGraded}
-              onChange={() => setIsGraded(!isGraded)}
+              onChange={() => {
+                  if(isGraded){
+                    setIsCheckpoints(false)
+                  }
+                  setIsGraded(!isGraded)
+              }}
               // disabled={sectionIdsToPostTo === [allSectionsOption._id]}
             />
           )}
@@ -1092,7 +1059,15 @@ function DiscussionTopicForm({
           isEditing={isEditing}
           published={published}
           shouldShowSaveAndPublishButton={shouldShowSaveAndPublishButton}
-          submitForm={submitForm}
+          submitForm={publish => {
+            if (isAnnouncement && isEditing && willAnnouncementPostRightAway) {
+              // remember publish value for SendEditNotificationModal later
+              setShowEditAnnouncementModal(true)
+              setShouldPublish(publish)
+            } else {
+              submitForm(publish)
+            }
+          }}
           isSubmitting={isSubmitting}
           willAnnouncementPostRightAway={willAnnouncementPostRightAway}
         />
@@ -1107,7 +1082,14 @@ function DiscussionTopicForm({
           }}
         />
       )}
-      <SavingDiscussionTopicOverlay open={isSubmitting} />
+      {showEditAnnouncementModal && (
+        <SendEditNotificationModal
+          onClose={() => setShowEditAnnouncementModal(false)}
+          submitForm={shouldNotify => {
+            submitForm(shouldPublish, shouldNotify)
+          }}
+        />
+      )}
     </>
   )
 }

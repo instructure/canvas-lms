@@ -342,41 +342,37 @@ describe "Outcome Groups API", type: :request do
     end
 
     context "assessed trait on outcome link object" do
-      let(:check_outcome) do
-        lambda do |outcome, can_edit|
-          expect(outcome).to include({
-                                       "id" => @outcome.id,
-                                       "vendor_guid" => @outcome.vendor_guid,
-                                       "context_type" => @account.class.to_s,
-                                       "context_id" => @account.id,
-                                       "title" => @outcome.title.to_s,
-                                       "display_name" => nil,
-                                       "url" => api_v1_outcome_path(id: @outcome.id),
-                                       "can_edit" => can_edit,
-                                       "has_updateable_rubrics" => false
-                                     })
-        end
+      def check_outcome(outcome, can_edit)
+        expect(outcome).to include({
+                                     "id" => @outcome.id,
+                                     "vendor_guid" => @outcome.vendor_guid,
+                                     "context_type" => @account.class.to_s,
+                                     "context_id" => @account.id,
+                                     "title" => @outcome.title.to_s,
+                                     "display_name" => nil,
+                                     "url" => api_v1_outcome_path(id: @outcome.id),
+                                     "can_edit" => can_edit,
+                                     "has_updateable_rubrics" => false
+                                   })
       end
 
-      let(:check_outcome_link) do
-        lambda do |outcome_link, context, group, assessed, can_edit, can_unlink|
-          expect(outcome_link).to include({
-                                            "context_type" => context.class.to_s,
-                                            "context_id" => context.id,
-                                            "url" => polymorphic_path([:api_v1, context, :outcome_link], id: group.id, outcome_id: @outcome.id),
-                                            "assessed" => assessed,
-                                            "can_unlink" => can_unlink,
-                                            "outcome_group" => {
-                                              "id" => group.id,
-                                              "title" => group.title,
-                                              "vendor_guid" => group.vendor_guid,
-                                              "url" => polymorphic_path([:api_v1, context, :outcome_group], id: group.id),
-                                              "subgroups_url" => polymorphic_path([:api_v1, context, :outcome_group_subgroups], id: group.id),
-                                              "outcomes_url" => polymorphic_path([:api_v1, context, :outcome_group_outcomes], id: group.id),
-                                              "can_edit" => can_edit
-                                            }
-                                          })
-        end
+      def check_outcome_link(outcome_link, context, group, assessed, can_edit, can_unlink)
+        expect(outcome_link).to include({
+                                          "context_type" => context.class.to_s,
+                                          "context_id" => context.id,
+                                          "url" => polymorphic_path([:api_v1, context, :outcome_link], id: group.id, outcome_id: @outcome.id),
+                                          "assessed" => assessed,
+                                          "can_unlink" => can_unlink,
+                                          "outcome_group" => {
+                                            "id" => group.id,
+                                            "title" => group.title,
+                                            "vendor_guid" => group.vendor_guid,
+                                            "url" => polymorphic_path([:api_v1, context, :outcome_group], id: group.id),
+                                            "subgroups_url" => polymorphic_path([:api_v1, context, :outcome_group_subgroups], id: group.id),
+                                            "outcomes_url" => polymorphic_path([:api_v1, context, :outcome_group_outcomes], id: group.id),
+                                            "can_edit" => can_edit
+                                          }
+                                        })
       end
 
       it "outcome is not assessed" do
@@ -389,9 +385,9 @@ describe "Outcome Groups API", type: :request do
                         account_id: @account.id,
                         format: "json")
 
-        check_outcome.call(json.last["outcome"], true)
+        check_outcome(json.last["outcome"], true)
 
-        check_outcome_link.call(
+        check_outcome_link(
           json.last.tap { |j| j.delete("outcome") },
           @account,
           @group,
@@ -421,8 +417,8 @@ describe "Outcome Groups API", type: :request do
                           course_id: @course.id,
                           format: "json")
 
-          check_outcome.call(json.last["outcome"], false)
-          check_outcome_link.call(
+          check_outcome(json.last["outcome"], false)
+          check_outcome_link(
             json.last.tap { |j| j.delete("outcome") },
             @course,
             @course.root_outcome_group,
@@ -441,8 +437,8 @@ describe "Outcome Groups API", type: :request do
                           course_id: @course.id,
                           format: "json")
 
-          check_outcome.call(json.last["outcome"], false)
-          check_outcome_link.call(
+          check_outcome(json.last["outcome"], false)
+          check_outcome_link(
             json.last.tap { |j| j.delete("outcome") },
             @course,
             @course.root_outcome_group,
@@ -461,7 +457,7 @@ describe "Outcome Groups API", type: :request do
                           account_id: @account.id,
                           format: "json")
 
-          check_outcome_link.call(
+          check_outcome_link(
             json.last.tap { |j| j.delete("outcome") },
             @account,
             @account.root_outcome_group,
@@ -1079,41 +1075,37 @@ describe "Outcome Groups API", type: :request do
     end
 
     context "assessed trait on outcome link object" do
-      let(:check_outcome) do
-        lambda do |outcome|
-          expect(outcome).to include({
-                                       "id" => @outcome.id,
-                                       "vendor_guid" => @outcome.vendor_guid,
-                                       "context_type" => @account.class.to_s,
-                                       "context_id" => @account.id,
-                                       "title" => @outcome.title.to_s,
-                                       "display_name" => nil,
-                                       "url" => api_v1_outcome_path(id: @outcome.id),
-                                       "can_edit" => !LearningOutcome.find(@outcome.id).assessed?,
-                                       "has_updateable_rubrics" => @outcome.updateable_rubrics?
-                                     })
-        end
+      def check_outcome(outcome)
+        expect(outcome).to include({
+                                     "id" => @outcome.id,
+                                     "vendor_guid" => @outcome.vendor_guid,
+                                     "context_type" => @account.class.to_s,
+                                     "context_id" => @account.id,
+                                     "title" => @outcome.title.to_s,
+                                     "display_name" => nil,
+                                     "url" => api_v1_outcome_path(id: @outcome.id),
+                                     "can_edit" => !LearningOutcome.find(@outcome.id).assessed?,
+                                     "has_updateable_rubrics" => @outcome.updateable_rubrics?
+                                   })
       end
 
-      let(:check_outcome_link) do
-        lambda do |outcome_link, context, group, assessed, can_unlink|
-          expect(outcome_link).to include({
-                                            "context_type" => context.class.to_s,
-                                            "context_id" => context.id,
-                                            "url" => polymorphic_path([:api_v1, context, :outcome_link], id: group.id, outcome_id: @outcome.id),
-                                            "assessed" => assessed,
-                                            "can_unlink" => can_unlink,
-                                            "outcome_group" => {
-                                              "id" => group.id,
-                                              "title" => group.title,
-                                              "vendor_guid" => group.vendor_guid,
-                                              "url" => polymorphic_path([:api_v1, context, :outcome_group], id: group.id),
-                                              "subgroups_url" => polymorphic_path([:api_v1, context, :outcome_group_subgroups], id: group.id),
-                                              "outcomes_url" => polymorphic_path([:api_v1, context, :outcome_group_outcomes], id: group.id),
-                                              "can_edit" => !assessed
-                                            }
-                                          })
-        end
+      def check_outcome_link(outcome_link, context, group, assessed, can_unlink)
+        expect(outcome_link).to include({
+                                          "context_type" => context.class.to_s,
+                                          "context_id" => context.id,
+                                          "url" => polymorphic_path([:api_v1, context, :outcome_link], id: group.id, outcome_id: @outcome.id),
+                                          "assessed" => assessed,
+                                          "can_unlink" => can_unlink,
+                                          "outcome_group" => {
+                                            "id" => group.id,
+                                            "title" => group.title,
+                                            "vendor_guid" => group.vendor_guid,
+                                            "url" => polymorphic_path([:api_v1, context, :outcome_group], id: group.id),
+                                            "subgroups_url" => polymorphic_path([:api_v1, context, :outcome_group_subgroups], id: group.id),
+                                            "outcomes_url" => polymorphic_path([:api_v1, context, :outcome_group_outcomes], id: group.id),
+                                            "can_edit" => !assessed
+                                          }
+                                        })
       end
 
       it "outcome is not assessed" do
@@ -1130,8 +1122,8 @@ describe "Outcome Groups API", type: :request do
           format: "json"
         )
 
-        check_outcome.call(json.first["outcome"])
-        check_outcome_link.call(json.first.tap { |j| j.delete("outcome") }, @account, @group, false, true)
+        check_outcome(json.first["outcome"])
+        check_outcome_link(json.first.tap { |j| j.delete("outcome") }, @account, @group, false, true)
       end
 
       it "outcome is assessed" do
@@ -1158,9 +1150,9 @@ describe "Outcome Groups API", type: :request do
           format: "json"
         )
 
-        check_outcome.call(json.first["outcome"])
+        check_outcome(json.first["outcome"])
 
-        check_outcome_link.call(
+        check_outcome_link(
           json.first.tap { |j| j.delete("outcome") },
           @course,
           @course.root_outcome_group,
@@ -1188,7 +1180,7 @@ describe "Outcome Groups API", type: :request do
           format: "json"
         )
 
-        check_outcome_link.call(
+        check_outcome_link(
           json.first.tap { |j| j.delete("outcome") },
           @course,
           @course.root_outcome_group,

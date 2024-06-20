@@ -429,7 +429,7 @@ module Context
 
     final_scope = scopes.first if scopes.length == 1
     final_scope ||= scopes.first.union(*scopes[1..], from: true)
-    final_scope.order(updated_at: :desc).limit(1).pluck(:updated_at)&.first
+    final_scope.order(updated_at: :desc).limit(1).pick(:updated_at)
   end
 
   def resolved_root_account_id

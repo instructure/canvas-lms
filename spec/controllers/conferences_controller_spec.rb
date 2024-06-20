@@ -282,8 +282,8 @@ describe ConferencesController do
 
       it "creates a calendar event when calendar_event is set, with start_at and end_at params" do
         user_session(@teacher)
-        start_time = Date.today
-        end_time = Date.today + 1.day
+        start_time = Time.zone.today
+        end_time = Time.zone.today + 1.day
 
         post "create", params: { course_id: @course.id, web_conference: { title: "My Conference", conference_type: "Wimba", calendar_event: "1", start_at: start_time, end_at: end_time } }, format: "json"
         created_conference = WebConference.last
@@ -447,8 +447,8 @@ describe ConferencesController do
                          enabled?: true)]
       )
 
-      start_time = Date.today
-      end_time = Date.today + 1.day
+      start_time = Time.zone.today
+      end_time = Time.zone.today + 1.day
       @conference = @course.web_conferences.create!(conference_type: "BigBlueButton", user: @teacher)
 
       params = {

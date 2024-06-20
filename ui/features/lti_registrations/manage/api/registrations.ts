@@ -17,12 +17,12 @@
  */
 
 import {ZLtiRegistration, type LtiRegistration} from '../model/LtiRegistration'
-import {success, error, type ApiResult} from './ApiResult'
+import {success, apiParseError, type ApiResult} from '../../common/lib/apiResult/ApiResult'
 import {ZPaginatedList, type PaginatedList} from './PaginatedList'
 import {type LtiRegistrationId} from '../model/LtiRegistrationId'
 import {mockFetchSampleLtiRegistrations, mockDeleteRegistration} from './sampleLtiRegistrations'
 
-export type ExtensionsSortProperty =
+export type AppsSortProperty =
   | 'name'
   | 'nickname'
   | 'lti_version'
@@ -30,12 +30,12 @@ export type ExtensionsSortProperty =
   | 'installed_by'
   | 'on'
 
-export type ExtensionsSortDirection = 'asc' | 'desc'
+export type AppsSortDirection = 'asc' | 'desc'
 
 export type FetchRegistrations = (options: {
   query: string
-  sort: ExtensionsSortProperty
-  dir: ExtensionsSortDirection
+  sort: AppsSortProperty
+  dir: AppsSortDirection
   offset: number
   limit: number
 }) => Promise<ApiResult<PaginatedList<LtiRegistration>>>
@@ -47,7 +47,7 @@ export const fetchRegistrations: FetchRegistrations = options => {
     .then(result => {
       return result.success
         ? success(result.data)
-        : error(result.error.errors.map(e => e.message).join('\n\n'))
+        : apiParseError(result.error.errors.map(e => e.message).join('\n\n'))
     })
 }
 

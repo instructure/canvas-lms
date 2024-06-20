@@ -16,30 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {useLocation} from 'react-router-dom'
 import {fetchProductDetails, fetchProducts} from '../../queries/productsQuery'
 import {useQuery} from '@tanstack/react-query'
+import LtiDetailModal from './LtiDetailModal'
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
 import {Pill} from '@instructure/ui-pill'
-import {View} from '@instructure/ui-view'
 import {
   IconExpandStartLine,
-  IconArrowUpSolid,
+  IconExternalLinkLine,
   IconEyeLine,
   IconQuizTitleLine,
   IconA11yLine,
   IconMessageLine,
 } from '@instructure/ui-icons'
+import ImageCarousel from './ImageCarousel'
 
 import ProductCard from '../ProductCard/ProductCard'
 import type {Product} from '../../model/Product'
 
 const ProductDetail = () => {
+  const [isModalOpen, setModalOpen] = useState(false)
+  const [clickedLtiTitle, setClickedLtiTitle] = useState('')
+
   const location = useLocation()
   const currentProductId = location.pathname.replace('/product_detail/', '') as String
 
@@ -54,22 +58,24 @@ const ProductDetail = () => {
     }
   }
 
-  const {data: lti_product_info} = useQuery({
-    queryKey: ['lti_product_info', product?.company],
+  const {data: otherProductsByCompany} = useQuery({
+    queryKey: ['lti_similar_products_by_company', product?.company],
     queryFn: () => fetchProducts(params()),
   })
 
-  const excludeCurrentProduct = lti_product_info?.tools.filter(
+  const excludeCurrentProduct = otherProductsByCompany?.tools.filter(
     otherProducts => otherProducts.id !== currentProductId
   )
 
   const renderProducts = () => {
-    return excludeCurrentProduct?.map((products: Product) => <ProductCard product={products} />)
+    return excludeCurrentProduct?.map((products: Product, i) => (
+      <ProductCard key={`${i + 1}`} product={products} />
+    ))
   }
 
   const renderBadges = () => {
-    return product?.badges.map(badge => (
-      <Flex margin="0 0 large 0">
+    return product?.badges.map((badge, i) => (
+      <Flex key={`${i + 1}`} margin="0 0 large 0">
         <Flex.Item>
           <div>
             <Img src={badge.image_url} width={50} height={50} />
@@ -82,7 +88,9 @@ const ProductDetail = () => {
           <Flex.Item>
             <div>
               <Link href={badge.badge_url} isWithinText={false}>
-                <Text weight="bold">Learn More</Text>
+                <Text weight="bold">
+                  Learn More <IconExternalLinkLine />
+                </Text>
               </Link>
             </div>
           </Flex.Item>
@@ -91,9 +99,25 @@ const ProductDetail = () => {
     ))
   }
 
+  const renderLtiVersions = () => {
+    return product?.lti.versions.map(version => <Pill margin="0 x-small 0 0">{version}</Pill>)
+  }
+  const ltiDataClickHandle = (title: string) => {
+    setModalOpen(true)
+    setClickedLtiTitle(title)
+  }
+  const renderLtiTitle = () => {
+    return product?.lti.title.map(title => (
+      <Flex.Item margin="0 0 small 0">
+        <Link onClick={() => ltiDataClickHandle(title)} isWithinText={false}>
+          <Text weight="bold">{title}</Text>
+        </Link>
+      </Flex.Item>
+    ))
+  }
   return (
     <div>
-      {product && product.lti && product.company && product.countries ? (
+      {product ? (
         <>
           <Flex>
             <Flex.Item>
@@ -110,74 +134,25 @@ const ProductDetail = () => {
               </Flex.Item>
             </Flex.Item>
             <Flex.Item align="start">
-              <Button color="secondary" margin="0 small 0 0">
-                Deploy
-              </Button>
               <Button color="primary">Configure</Button>
             </Flex.Item>
           </Flex>
           <Flex margin="0 0 0 xx-large">
             <Flex.Item padding="0 0 0 x-small" margin="0 0 0 medium">
-              by{' '}
-              <Link isWithinText={false} href={product.company.company_url}>
-                <Text color="secondary">{product.company.name}</Text>
-              </Link>{' '}
-              | Updated: {product.updatedAt}
+              <Text color="secondary">by {product.company.name}</Text> |{' '}
+              <Text color="secondary">Updated: {product.updatedAt}</Text>
             </Flex.Item>
           </Flex>
           <Flex padding="small 0 0 x-small" margin="0 medium medium medium">
-            <Flex.Item padding="0 small 0 xx-large">
+            <Flex.Item padding="0 x-small 0 xx-large">
               <Pill>{product.toolType}</Pill>
             </Flex.Item>
             <Flex.Item padding="0 x-small 0 0">
               <Pill>{product.demographic}</Pill>
             </Flex.Item>
-            <Flex.Item padding="0 x-small 0 0">
-              <Pill>{product.lti.versions[0]}</Pill>
-            </Flex.Item>
-            <Flex.Item padding="0 x-small 0 0">
-              <Pill>{product.lti.versions[1]}</Pill>
-            </Flex.Item>
+            <Flex.Item padding="0 0 0 0">{renderLtiVersions()}</Flex.Item>
           </Flex>
-          <View
-            as="span"
-            display="inline-block"
-            maxWidth="10rem"
-            height={265}
-            minWidth={340}
-            margin="0 medium small 0"
-            padding="medium"
-            background="primary"
-            shadow="above"
-          >
-            placeholder
-          </View>
-          <View
-            as="span"
-            display="inline-block"
-            maxWidth="10rem"
-            height={265}
-            minWidth={340}
-            margin="0 medium small 0"
-            padding="medium"
-            background="primary"
-            shadow="above"
-          >
-            placeholder
-          </View>
-          <View
-            as="span"
-            display="inline-block"
-            maxWidth="10rem"
-            height={265}
-            minWidth={340}
-            margin="0 0 small 0"
-            padding="medium"
-            background="primary"
-            shadow="above"
-          >
-            placeholder
-          </View>
+          <ImageCarousel screenshots={product.screenshots} />
           <Flex margin="medium 0 0 0">
             <Flex.Item>
               <Text weight="bold" size="large">
@@ -208,7 +183,6 @@ const ProductDetail = () => {
                 renderIcon={<IconExpandStartLine />}
               >
                 <Text weight="bold">Website</Text>
-                <IconArrowUpSolid />
               </Link>
             </Flex.Item>
             <Flex.Item margin="0 0 0 large">
@@ -218,7 +192,6 @@ const ProductDetail = () => {
                 renderIcon={<IconEyeLine />}
               >
                 <Text weight="bold">Privacy Policy</Text>
-                <IconArrowUpSolid />
               </Link>
             </Flex.Item>
             <Flex.Item margin="0 0 0 large">
@@ -228,7 +201,6 @@ const ProductDetail = () => {
                 renderIcon={<IconQuizTitleLine />}
               >
                 <Text weight="bold">Terms of Service</Text>
-                <IconArrowUpSolid />
               </Link>
             </Flex.Item>
             <Flex.Item margin="0 0 0 large">
@@ -238,7 +210,6 @@ const ProductDetail = () => {
                 renderIcon={<IconA11yLine />}
               >
                 <Text weight="bold">Accessibility</Text>
-                <IconArrowUpSolid />
               </Link>
             </Flex.Item>
             <Flex.Item margin="0 0 0 large">
@@ -248,18 +219,9 @@ const ProductDetail = () => {
                 renderIcon={<IconMessageLine />}
               >
                 <Text weight="bold">Contact</Text>
-                <IconArrowUpSolid />
               </Link>
             </Flex.Item>
           </Flex>
-          <Flex>
-            <Flex.Item margin="medium 0 medium 0">
-              <Text weight="bold" size="large">
-                Hosting Countries
-              </Text>
-            </Flex.Item>
-          </Flex>
-          <Text>{product.countries.join(', ')}</Text>
           <Flex>
             <Flex.Item margin="medium 0 medium 0">
               <Text weight="bold" size="large">
@@ -270,19 +232,8 @@ const ProductDetail = () => {
           <Text weight="bold" size="medium">
             Integrations
           </Text>
-          <Flex>
-            <Flex.Item margin="small 0 small 0">
-              <Link href={product.company.company_url} isWithinText={false}>
-                <Text weight="bold">{product.lti.title[0]}</Text>
-              </Link>
-            </Flex.Item>
-          </Flex>
-          <Flex>
-            <Flex.Item margin="0 0 small 0">
-              <Link href={product.company.company_url} isWithinText={false}>
-                <Text weight="bold">{product.lti.title[1]}</Text>
-              </Link>
-            </Flex.Item>
+          <Flex direction="column" margin="small 0 0 0">
+            {renderLtiTitle()}
           </Flex>
           <Flex>
             <Flex.Item margin="0 0 small 0">
@@ -292,10 +243,11 @@ const ProductDetail = () => {
             </Flex.Item>
           </Flex>
           <Flex>
-            <Flex.Item margin="0 0 0 0">
+            <Flex.Item>
               <Link href={product.company.company_url} isWithinText={false}>
-                <Text weight="bold">Subscription Information</Text>
-                <IconArrowUpSolid />
+                <Text weight="bold">
+                  Subscription Information <IconExternalLinkLine />
+                </Text>
               </Link>
             </Flex.Item>
           </Flex>
@@ -332,6 +284,13 @@ const ProductDetail = () => {
       <Flex direction="row" gap="small">
         {renderProducts()}
       </Flex>
+
+      <LtiDetailModal
+        ltiTitle={clickedLtiTitle}
+        integrationData={product?.lti}
+        isModalOpen={isModalOpen}
+        setModalOpen={setModalOpen}
+      />
     </div>
   )
 }

@@ -32,7 +32,7 @@ describe "DataFixup::AddRoleOverridesForPermissionCombination" do
       old_permissions: %i[view_all_grades read_roster],
       new_permission: :view_admin_analytics
     )
-    new_ro = Account.default.role_overrides.where(permission: :view_admin_analytics, role_id: admin_role).take
+    new_ro = Account.default.role_overrides.find_by(permission: :view_admin_analytics, role_id: admin_role)
     expect(new_ro.enabled).to be true
   end
 
@@ -42,7 +42,7 @@ describe "DataFixup::AddRoleOverridesForPermissionCombination" do
       old_permissions: %i[view_all_grades read_roster],
       new_permission: :view_admin_analytics
     )
-    new_ro = Account.default.role_overrides.where(permission: :view_admin_analytics, role_id: admin_role).take
+    new_ro = Account.default.role_overrides.find_by(permission: :view_admin_analytics, role_id: admin_role)
     expect(new_ro.enabled).to be true
   end
 
@@ -52,7 +52,7 @@ describe "DataFixup::AddRoleOverridesForPermissionCombination" do
       old_permissions: %i[view_all_grades read_roster],
       new_permission: :view_admin_analytics
     )
-    new_ro = Account.default.role_overrides.where(permission: :view_admin_analytics, role_id: admin_role).take
+    new_ro = Account.default.role_overrides.find_by(permission: :view_admin_analytics, role_id: admin_role)
     expect(new_ro.enabled).to be false
   end
 
@@ -99,7 +99,7 @@ describe "DataFixup::AddRoleOverridesForPermissionCombination" do
       old_permissions: %i[view_all_grades read_roster],
       new_permission: :view_admin_analytics
     )
-    new_ro = Account.default.role_overrides.where(permission: :view_admin_analytics, role_id: admin_role).take
+    new_ro = Account.default.role_overrides.find_by(permission: :view_admin_analytics, role_id: admin_role)
     expect(new_ro.enabled).to be true
     expect(new_ro.applies_to_self).to be false
     expect(new_ro.applies_to_descendants).to be true
@@ -114,10 +114,10 @@ describe "DataFixup::AddRoleOverridesForPermissionCombination" do
       old_permissions: %i[view_all_grades read_roster],
       new_permission: :view_admin_analytics
     )
-    admin_ro = Account.default.role_overrides.where(permission: :view_admin_analytics, role_id: admin_role).take
+    admin_ro = Account.default.role_overrides.find_by(permission: :view_admin_analytics, role_id: admin_role)
     expect(admin_ro.enabled).to be true
     expect(admin_ro.locked).to be false
-    teacher_ro = Account.default.role_overrides.where(permission: :view_admin_analytics, role_id: teacher_role).take
+    teacher_ro = Account.default.role_overrides.find_by(permission: :view_admin_analytics, role_id: teacher_role)
     expect(teacher_ro.enabled).to be false
     expect(teacher_ro.locked).to be true
   end

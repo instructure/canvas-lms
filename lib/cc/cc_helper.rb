@@ -350,7 +350,8 @@ module CC
                              file
                            elsif obj.attachment
                              attachment = obj.attachment.clone_for(@course)
-                             attachment.save
+                             attachment.save!
+                             attachment.handle_duplicates(:rename)
                              attachment
                            else
                              obj.attachment = @course.attachments.create!(media_entry_id: obj.media_id, filename: obj.guaranteed_title, content_type: "unknown/unknown")
@@ -429,10 +430,10 @@ module CC
         end
 
         # process RCE media object iframes
-        doc.css("iframe[data-media-id]").each do |iframe|
-          next if iframe["src"].include?("/media_attachments_iframe/") || iframe["src"].include?(WEB_CONTENT_TOKEN)
+        doc.css("iframe[src*='media_objects']").each do |iframe|
+          next if iframe["src"].include?(WEB_CONTENT_TOKEN)
 
-          media_id = iframe["data-media-id"]
+          media_id = iframe["src"].match(%r{media_objects(?:_iframe)?/([^?.]+)})&.[](1) || iframe["data-media-id"]
           path = media_object_export_path(media_id)
           iframe["src"] = path if path
         end
@@ -484,7 +485,7 @@ module CC
       end
       source_attachment = Attachment.find_by(id: obj.attachment_id) if obj.attachment_id
       related_attachment_ids = [source_attachment.id] + source_attachment.related_attachments.pluck(:id) if source_attachment
-      attachment = course && related_attachment_ids && course.attachments.not_deleted.where(id: related_attachment_ids).take
+      attachment = course && related_attachment_ids && course.attachments.not_deleted.find_by(id: related_attachment_ids)
       path = if attachment
                # if the media object is associated with a file in the course, use the file's path in the export, to avoid exporting it twice
                attachment.full_display_path.sub(/^#{Regexp.quote(Folder::ROOT_FOLDER_NAME)}/, "")

@@ -24,7 +24,7 @@ import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
 import {useQuery} from 'react-apollo'
 import {useSearchParams} from 'react-router-dom'
-import type {AssignmentGroupCriteriaMap} from '../../../../shared/grading/grading.d'
+import type {AssignmentGroupCriteriaMap} from '@canvas/grading/grading.d'
 import {GRADEBOOK_QUERY} from '../../queries/Queries'
 import type {
   CustomColumn,

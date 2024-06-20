@@ -108,7 +108,7 @@ describe SIS::CSV::GroupMembershipImporter do
     expect(batch1.roll_back_data.where(previous_workflow_state: "non-existent").count).to eq 1
     expect(batch2.roll_back_data.first.updated_workflow_state).to eq "deleted"
     batch2.restore_states_for_batch
-    expect(@account.all_groups.where(sis_source_id: "G001").take.group_memberships.take.workflow_state).to eq "accepted"
+    expect(@account.all_groups.find_by(sis_source_id: "G001").group_memberships.take.workflow_state).to eq "accepted"
   end
 
   it "handles unique constraint errors rolling back data" do
@@ -126,12 +126,12 @@ describe SIS::CSV::GroupMembershipImporter do
       "G001,U002,deleted",
       batch: batch2
     )
-    group = @account.all_groups.where(sis_source_id: "G001").take
-    deleted_gm = GroupMembership.where(group_id: group, user_id: @user1).take
+    group = @account.all_groups.find_by(sis_source_id: "G001")
+    deleted_gm = GroupMembership.find_by(group_id: group, user_id: @user1)
     group.group_memberships.create!(workflow_state: "accepted", user: @user1)
     batch2.restore_states_for_batch
     expect(batch2.sis_batch_errors.last.message).to include("Couldn't rollback SIS batch data for row")
-    expect(batch2.roll_back_data.where(context_type: "GroupMembership", context_id: deleted_gm.id).take.workflow_state).to eq "failed"
-    expect(group.group_memberships.where(user_id: @user2).take.workflow_state).to eq "accepted" # should restore the one still
+    expect(batch2.roll_back_data.find_by(context_type: "GroupMembership", context_id: deleted_gm.id).workflow_state).to eq "failed"
+    expect(group.group_memberships.find_by(user_id: @user2).workflow_state).to eq "accepted" # should restore the one still
   end
 end

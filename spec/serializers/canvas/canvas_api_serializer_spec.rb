@@ -146,17 +146,17 @@ describe Canvas::APISerializer do
         # rubocop:enable RSpec/RemoveConst
       end
 
-      let :object do
-        Foo.new(1, "Bob").tap do |object|
-          expect(object).to receive(:bar).and_return Bar.new(1, "Alice")
-        end
-      end
+      let(:object) { Foo.new(1, "Bob") }
 
       let :controller do
         ActiveModel::FakeController.new({
                                           accepts_jsonapi: true,
                                           stringify_json_ids: true
                                         })
+      end
+
+      before do
+        expect(object).to receive(:bar).and_return Bar.new(1, "Alice")
       end
 
       it "uses objects for embed: :object, embed_in_root: true" do

@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, waitFor, fireEvent, screen} from '@testing-library/react'
+import {render, waitFor, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import DiscussionTopicForm, {isGuidDataValid, getAbGuidArray} from '../DiscussionTopicForm'
@@ -81,30 +81,6 @@ describe('DiscussionTopicForm', () => {
     }
   })
 
-  describe('instui_nav feature flag is enabled', () => {
-    const oldEnv = window.ENV
-    beforeEach(() => {
-      window.ENV.FEATURES =  {instui_nav: true}
-    })
-
-    afterEach(() => {
-      window.ENV = oldEnv
-    })
-
-    it('renders title if came from Announcements page', () => {
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
-      const document = setup()
-      expect(document.getAllByText('Create Announcement').length).toBe(1)
-    })
-
-    it('renders title if came from Discussion page', () => {
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
-      const document = setup()
-      expect(document.getAllByText('Create Discussion').length).toBe(1)
-    })
-
-  })
-
   it('renders', () => {
     const document = setup()
     expect(document.getByText('Topic Title')).toBeInTheDocument()
@@ -134,8 +110,17 @@ describe('DiscussionTopicForm', () => {
     expect(document.queryAllByText('Until')).toBeTruthy()
 
     // Hides announcement options
-    expect(document.queryByLabelText('Delay Posting')).not.toBeInTheDocument()
     expect(document.queryByLabelText('Allow Participants to Comment')).not.toBeInTheDocument()
+  })
+
+  it('renders reset buttons for availability dates when creating/editing a discussion topic', () => {
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
+
+    const document = setup()
+
+    expect(document.queryAllByTestId('reset-available-from-button').length).toBe(1)
+    expect(document.queryAllByTestId('reset-available-until-button').length).toBe(1)
   })
 
   it('renders expected default teacher announcement options', () => {
@@ -148,19 +133,30 @@ describe('DiscussionTopicForm', () => {
     expect(document.getByText('Topic Title')).toBeInTheDocument()
     expect(document.queryByText('Attach')).toBeTruthy()
     expect(document.queryByTestId('section-select')).toBeTruthy()
-    expect(document.queryByLabelText('Delay Posting')).toBeInTheDocument()
     expect(document.queryByLabelText('Allow Participants to Comment')).toBeInTheDocument()
     expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
     expect(document.queryByLabelText('Enable podcast feed')).toBeInTheDocument()
     expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
+    expect(document.queryByTestId('non-graded-date-options')).toBeTruthy()
+    expect(document.queryAllByText('Available from')).toBeTruthy()
+    expect(document.queryAllByText('Until')).toBeTruthy()
 
     // Hides discussion only options
     expect(document.queryByLabelText('Add to student to-do')).not.toBeInTheDocument()
     expect(document.queryByText('Anonymous Discussion')).not.toBeTruthy()
     expect(document.queryByTestId('graded-checkbox')).not.toBeTruthy()
     expect(document.queryByTestId('group-discussion-checkbox')).not.toBeTruthy()
-    expect(document.queryByText('Available from')).not.toBeTruthy()
-    expect(document.queryByText('Until')).not.toBeTruthy()
+  })
+
+  it('renders reset buttons for availability dates when creating/editing an announcement', () => {
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+
+    const document = setup()
+
+    expect(document.queryAllByTestId('reset-available-from-button').length).toBe(1)
+    expect(document.queryAllByTestId('reset-available-until-button').length).toBe(1)
   })
 
   describe('assignment edit placement', () => {
@@ -250,21 +246,6 @@ describe('DiscussionTopicForm', () => {
       expect(
         document.getByText(
           'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Delay Posting option and set to publish on a future date.'
-        )
-      ).toBeInTheDocument()
-    })
-
-    it('shows an alert when editing an announcement in an published course', () => {
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES = {
-        id: 5000,
-        is_announcement: true,
-        course_published: true,
-      }
-
-      const document = setup()
-      expect(
-        document.getByText(
-          'Users do not receive updated notifications when editing an announcement. If you wish to have users notified of this update via their notification settings, you will need to create a new announcement.'
         )
       ).toBeInTheDocument()
     })
@@ -585,6 +566,21 @@ describe('DiscussionTopicForm', () => {
         checkbox.click()
         expect(checkbox.checked).toBe(false)
       })
+
+      it('unchecks the checkpoints checkbox when graded is unchecked', () => {
+        const {getByTestId, getByLabelText} = setup()
+
+        getByLabelText('Graded').click()
+        getByTestId('checkpoints-checkbox').click()
+        expect(getByTestId('checkpoints-checkbox').checked).toBe(true)
+
+        // 1st graded click will uncheck checkpoints. but it also hides from document.
+        // 2nd graded click will render checkpoints, notice its unchecked.
+        getByLabelText('Graded').click()
+        getByLabelText('Graded').click()
+        expect(getByTestId('checkpoints-checkbox').checked).toBe(false)
+      })
+
       it('renders the checkpoints checkbox as selected when there are existing checkpoints', () => {
         const {getByTestId} = setup({
           currentDiscussionTopic: DiscussionTopic.mock({

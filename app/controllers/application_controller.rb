@@ -254,6 +254,7 @@ class ApplicationController < ActionController::Base
             open_registration: @domain_root_account&.open_registration?,
             collapse_global_nav: @current_user&.collapse_global_nav?,
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
+            can_add_pronouns: @domain_root_account&.can_add_pronouns?
           },
           RAILS_ENVIRONMENT: Canvas.environment,
         }
@@ -381,6 +382,7 @@ class ApplicationController < ActionController::Base
     usage_rights_discussion_topics
     granular_permissions_manage_users
     create_course_subaccount_picker
+    file_verifiers_for_quiz_links
     lti_deep_linking_module_index_menu_modal
     lti_dynamic_registration
     lti_multiple_assignment_deep_linking
@@ -397,6 +399,8 @@ class ApplicationController < ActionController::Base
     enhanced_developer_keys_tables
     lti_registrations_discover_page
     enhanced_rubrics
+    account_level_mastery_scales
+    non_scoring_rubrics
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -546,27 +550,32 @@ class ApplicationController < ActionController::Base
   helper_method :external_tools_display_hashes
 
   def external_tool_display_hash(tool, type, url_params = {}, context = @context, custom_settings = [])
-    url_params = {
-      id: tool.id,
-      launch_type: type
-    }.merge(url_params)
-
     hash = {
       id: tool.id,
       title: tool.label_for(type, I18n.locale),
-      base_url: polymorphic_url([context, :external_tool], url_params),
-    }
-    hash[:tool_id] = tool.tool_id if tool.tool_id.present?
+      base_url: polymorphic_url(
+        [context, :external_tool],
+        { id: tool.id, launch_type: type }.merge(url_params)
+      ),
+      tool_id: tool.tool_id.presence
+    }.compact
 
     extension_settings = [:icon_url, :canvas_icon_class] | custom_settings
     extension_settings.each do |setting|
       hash[setting] = tool.extension_setting(type, setting)
     end
+
     hash[:base_title] = tool.default_label(I18n.locale) if custom_settings.include?(:base_title)
     hash[:external_url] = tool.url if custom_settings.include?(:external_url)
-    if type == :submission_type_selection && tool.submission_type_selection[:description].present?
-      hash[:description] = tool.submission_type_selection[:description]
+
+    if type == :submission_type_selection
+      hash.merge!({
+        description: tool.submission_type_selection[:description].presence,
+        require_resource_selection:
+          tool.submission_type_selection[:require_resource_selection]
+      }.compact)
     end
+
     if type == :top_navigation
       hash[:pinned] = tool.placement_pinned?(type)
     end
@@ -1413,7 +1422,7 @@ class ApplicationController < ActionController::Base
     badge_counts = {}
     ["Submission"].each do |type|
       participation_count = context.content_participation_counts
-                                   .where(user_id: user.id, content_type: type).take
+                                   .find_by(user_id: user.id, content_type: type)
       participation_count ||= content_participation_count(context, type, user)
       badge_counts[type.underscore.pluralize] = participation_count.unread_count
     end
@@ -1475,8 +1484,10 @@ class ApplicationController < ActionController::Base
                 t "#application.errors.quota_exceeded", "Storage quota exceeded"
               end
       respond_to do |format|
-        flash[:error] = error unless request.format.to_s == "text/plain"
-        format.html { redirect_to redirect }
+        format.html do
+          flash[:error] = error
+          redirect_to redirect
+        end
         format.json { render json: { errors: { base: error } }, status: :bad_request }
         format.text { render json: { errors: { base: error } }, status: :bad_request }
       end
@@ -1552,7 +1563,7 @@ class ApplicationController < ActionController::Base
   end
 
   def find_user_from_uuid(uuid)
-    @current_user = UserPastLtiId.where(user_uuid: uuid).take&.user
+    @current_user = UserPastLtiId.find_by(user_uuid: uuid)&.user
     @current_user ||= User.where(uuid:).first
   end
 

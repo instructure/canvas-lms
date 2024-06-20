@@ -16,6 +16,8 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
+import 'jquery'
+import 'jquery-migrate'
 import * as FinalGradeOverrideApi from '@canvas/grading/FinalGradeOverrideApi'
 import ScreenreaderGradebookRoute from '../../routes/screenreader_gradebook_route'
 

@@ -28,7 +28,7 @@ import {setContainScrollBehavior} from '../utils/assignToHelper'
 import useFetchAssignees from '../utils/hooks/useFetchAssignees'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {AssigneeOption} from './Item/types'
+import type {AssigneeOption} from './Item/types'
 
 const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
 

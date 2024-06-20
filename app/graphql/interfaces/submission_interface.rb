@@ -161,13 +161,14 @@ module Interfaces::SubmissionInterface
              Types::SubmissionCommentsSortOrderType,
              required: false,
              default_value: nil
+    argument :include_draft_comments, Boolean, required: false, default_value: false
   end
-  def comments_connection(filter:, sort_order:)
+  def comments_connection(filter:, sort_order:, include_draft_comments:)
     filter = filter.to_h
     all_comments, for_attempt, peer_review = filter.values_at(:all_comments, :for_attempt, :peer_review)
 
     load_association(:assignment).then do
-      scope = submission.comments_excluding_drafts_for(current_user)
+      scope = include_draft_comments ? submission.comments_including_drafts_for(current_user) : submission.comments_excluding_drafts_for(current_user)
       unless all_comments
         target_attempt = for_attempt || submission.attempt || 0
         if target_attempt <= 1
@@ -229,6 +230,8 @@ module Interfaces::SubmissionInterface
   field :submitted_at, Types::DateTimeType, null: true
   field :graded_at, Types::DateTimeType, null: true
   field :posted_at, Types::DateTimeType, null: true
+  field :cached_due_date, Types::DateTimeType, null: true
+  field :seconds_late, Float, null: true
   field :posted, Boolean, method: :posted?, null: false
   field :state, Types::SubmissionStateType, method: :workflow_state, null: false
 
@@ -428,18 +431,16 @@ module Interfaces::SubmissionInterface
     Loaders::SubmissionGroupIdLoader.load(object).then { |group_id| group_id }
   end
 
-  field :preview_url, String, null: true
+  field :preview_url, String, "This field is currently under development and its return value is subject to change.", null: true
   def preview_url
-    Loaders::SubmissionVersionNumberLoader.load(object).then do |version_number|
-      GraphQLHelpers::UrlHelpers.course_assignment_submission_url(
-        object.course_id,
-        object.assignment_id,
-        object.user_id,
-        host: context[:request].host_with_port,
-        preview: 1,
-        version: version_number
-      )
-    end
+    GraphQLHelpers::UrlHelpers.course_assignment_submission_url(
+      object.course_id,
+      object.assignment_id,
+      object.user_id,
+      host: context[:request].host_with_port,
+      preview: 1,
+      version: version_query_param(object)
+    )
   end
 
   field :submission_comment_download_url, String, null: true
@@ -449,4 +450,14 @@ module Interfaces::SubmissionInterface
 
   field :word_count, Float, null: true
   delegate :word_count, to: :object
+
+  private
+
+  def version_query_param(submission)
+    if submission.attempt.present? && submission.attempt > 0
+      submission.attempt - 1
+    else
+      submission.attempt
+    end
+  end
 end

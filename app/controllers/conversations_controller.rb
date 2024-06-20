@@ -328,27 +328,16 @@ class ConversationsController < ApplicationController
                  inbox_translation_languages: @current_user.feature_enabled?(:translate_inbox_messages) ? Translation.languages : [],
                  inbox_translation_enabled: @current_user.feature_enabled?(:translate_inbox_messages)
                })
-        if @domain_root_account.feature_enabled?(:react_inbox)
-          @page_title = t("Inbox")
-          InstStatsd::Statsd.increment("inbox.visit.react")
-          InstStatsd::Statsd.count("inbox.visit.scope.inbox.count.react", @current_user.conversations.default.size)
-          InstStatsd::Statsd.count("inbox.visit.scope.sent.count.react", @current_user.all_conversations.sent.size)
-          InstStatsd::Statsd.count("inbox.visit.scope.unread.count.react", @current_user.conversations.unread.size)
-          InstStatsd::Statsd.count("inbox.visit.scope.starred.count.react", @current_user.starred_conversations.size)
-          InstStatsd::Statsd.count("inbox.visit.scope.archived.count.react", @current_user.conversations.archived.size)
-          css_bundle :canvas_inbox
-          js_bundle :inbox
-          render html: "", layout: true
-          return
-        end
-
-        InstStatsd::Statsd.count("inbox.visit.scope.inbox.count.legacy", @current_user.conversations.default.size)
-        InstStatsd::Statsd.count("inbox.visit.scope.sent.count.legacy", @current_user.all_conversations.sent.size)
-        InstStatsd::Statsd.count("inbox.visit.scope.unread.count.legacy", @current_user.conversations.unread.size)
-        InstStatsd::Statsd.count("inbox.visit.scope.starred.count.legacy", @current_user.starred_conversations.size)
-        InstStatsd::Statsd.count("inbox.visit.scope.archived.count.legacy", @current_user.conversations.archived.size)
-        InstStatsd::Statsd.increment("inbox.visit.legacy")
-        render :index_new
+        @page_title = t("Inbox")
+        InstStatsd::Statsd.increment("inbox.visit.react")
+        InstStatsd::Statsd.count("inbox.visit.scope.inbox.count.react", @current_user.conversations.default.size)
+        InstStatsd::Statsd.count("inbox.visit.scope.sent.count.react", @current_user.all_conversations.sent.size)
+        InstStatsd::Statsd.count("inbox.visit.scope.unread.count.react", @current_user.conversations.unread.size)
+        InstStatsd::Statsd.count("inbox.visit.scope.starred.count.react", @current_user.starred_conversations.size)
+        InstStatsd::Statsd.count("inbox.visit.scope.archived.count.react", @current_user.conversations.archived.size)
+        css_bundle :canvas_inbox
+        js_bundle :inbox
+        render html: "", layout: true
       end
     end
   end

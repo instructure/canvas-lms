@@ -176,6 +176,11 @@
 #           "description": "Optional: The user's bio.",
 #           "example": "I like the Muppets.",
 #           "type": "string"
+#         },
+#         "pronouns": {
+#           "description": "Optional: This field is only returned if pronouns are enabled, and will return the pronouns of the user.",
+#           "example": "he/him",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -391,7 +396,7 @@ class UsersController < ApplicationController
   end
 
   # @API List users in account
-  # A paginated list of of users associated with this account.
+  # A paginated list of users associated with this account.
   #
   # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the
@@ -1397,13 +1402,36 @@ class UsersController < ApplicationController
       respond_to do |format|
         format.html do
           @body_classes << "full-width"
-          js_env(
-            CONTEXT_USER_DISPLAY_NAME: @user.short_name,
-            USER_ID: @user.id,
-            PERMISSIONS: {
-              can_manage_sis_pseudonyms: @context_account.root_account.grants_right?(@current_user, :manage_sis)
-            }
-          )
+
+          js_permissions = {
+            can_manage_sis_pseudonyms: @context_account.root_account.grants_right?(@current_user, :manage_sis),
+          }
+          if @context_account.root_account.feature_enabled?(:temporary_enrollments)
+            js_permissions[:can_read_sis] = @context_account.grants_right?(@current_user, session, :read_sis)
+            js_permissions[:can_add_temporary_enrollments] = @context_account.grants_right?(@current_user, session, :temporary_enrollments_add)
+            js_permissions[:can_edit_temporary_enrollments] = @context_account.grants_right?(@current_user, session, :temporary_enrollments_edit)
+            js_permissions[:can_delete_temporary_enrollments] = @context_account.grants_right?(@current_user, session, :temporary_enrollments_delete)
+            js_permissions[:can_view_temporary_enrollments] =
+              @context_account.grants_any_right?(@current_user, session, *RoleOverride::MANAGE_TEMPORARY_ENROLLMENT_PERMISSIONS)
+            if @context_account.root_account.feature_enabled?(:granular_permissions_manage_users)
+              js_permissions[:can_allow_course_admin_actions] = @context_account.grants_right?(@current_user, session, :allow_course_admin_actions)
+              js_permissions[:can_add_ta] = @context_account.grants_right?(@current_user, session, :add_ta_to_course)
+              js_permissions[:can_add_student] = @context_account.grants_right?(@current_user, session, :add_student_to_course)
+              js_permissions[:can_add_teacher] = @context_account.grants_right?(@current_user, session, :add_teacher_to_course)
+              js_permissions[:can_add_designer] = @context_account.grants_right?(@current_user, session, :add_designer_to_course)
+              js_permissions[:can_add_observer] = @context_account.grants_right?(@current_user, session, :add_observer_to_course)
+            else
+              js_permissions[:can_manage_admin_users] = @context_account.grants_right?(@current_user, session, :manage_admin_users)
+            end
+          end
+
+          js_env({
+                   CONTEXT_USER_DISPLAY_NAME: @user.short_name,
+                   USER_ID: @user.id,
+                   COURSE_ROLES: Role.course_role_data_for_account(@context_account, @current_user),
+                   PERMISSIONS: js_permissions,
+                   ROOT_ACCOUNT_ID: @context_account.root_account.id,
+                 })
           render status:
         end
         format.json do

@@ -510,23 +510,24 @@ describe DiscussionTopicsController, type: :request do
       expect(@topic["anonymous_state"]).to eq "full_anonymity"
     end
 
-    it "update to anonymous_state returns 403" do
+    it "update to anonymous_state returns 200 if there is no reply" do
       api_call(:put,
                "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
                { anonymous_state: nil },
                {},
-               { expected_status: 400 })
+               { expected_status: 200 })
     end
 
-    it "not able to update the anonymous state of an existing topic" do
+    it "able to update the anonymous state of an existing topic if there is no reply" do
       api_call(:put,
                "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
-               { anonymous_state: nil },
+               { anonymous_state: "partial_anonymity" },
                {},
-               { expected_status: 400 })
-      expect(@topic["anonymous_state"]).to eq "full_anonymity"
+               { expected_status: 200 })
+      @topic.reload
+      expect(@topic["anonymous_state"]).to eq "partial_anonymity"
     end
 
     context "student permissions" do
@@ -628,6 +629,22 @@ describe DiscussionTopicsController, type: :request do
                  } },
                {},
                { expected_status: 400 })
+    end
+
+    it "not able to update the anonymous state if there is at least 1 reply" do
+      @entry = create_entry(@topic, message: "top-level entry")
+      @reply = create_reply(@entry, message: "test reply")
+      @topic.anonymous_state = "full_anonymity"
+      @topic.save!
+      api_call(:put,
+               "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+               { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
+               { anonymous_state: nil },
+               {},
+               { expected_status: 400 })
+
+      @topic.reload
+      expect(@topic["anonymous_state"]).to eq "full_anonymity"
     end
   end
 
@@ -4282,34 +4299,30 @@ describe DiscussionTopicsController, type: :request do
     end
 
     context "should be shown" do
-      let(:check_access) do
-        lambda do |json|
-          expect(json["new_entries"]).not_to be_nil
-          expect(json["new_entries"].count).to eq(2)
-          expect(json["new_entries"].first["user_id"]).to eq(@student1.id)
-          expect(json["new_entries"].second["user_id"]).to eq(@student2.id)
-        end
+      def check_access(json)
+        expect(json["new_entries"]).not_to be_nil
+        expect(json["new_entries"].count).to eq(2)
+        expect(json["new_entries"].first["user_id"]).to eq(@student1.id)
+        expect(json["new_entries"].second["user_id"]).to eq(@student2.id)
       end
 
       it "shows student comments to students" do
-        check_access.call(announcements_view_api.call(@student1, @course.id, @announcement.id))
+        check_access(announcements_view_api.call(@student1, @course.id, @announcement.id))
       end
 
       it "shows student comments to teachers" do
-        check_access.call(announcements_view_api.call(@teacher, @course.id, @announcement.id))
+        check_access(announcements_view_api.call(@teacher, @course.id, @announcement.id))
       end
 
       it "shows student comments to admins" do
-        check_access.call(announcements_view_api.call(@admin, @course.id, @announcement.id))
+        check_access(announcements_view_api.call(@admin, @course.id, @announcement.id))
       end
     end
 
     context "should not be shown" do
-      let(:check_access) do
-        lambda do |json|
-          expect(json["new_entries"]).to be_nil
-          expect(%w[unauthorized unauthenticated]).to include(json["status"])
-        end
+      def check_access(json)
+        expect(json["new_entries"]).to be_nil
+        expect(%w[unauthorized unauthenticated]).to include(json["status"])
       end
 
       before do
@@ -4320,15 +4333,15 @@ describe DiscussionTopicsController, type: :request do
       end
 
       it "does not show student comments to unauthenticated users" do
-        check_access.call(announcements_view_api.call(nil, @course.id, @announcement.id, 401))
+        check_access(announcements_view_api.call(nil, @course.id, @announcement.id, 401))
       end
 
       it "does not show student comments to other students not in the course" do
-        check_access.call(announcements_view_api.call(@student, @course.id, @announcement.id, 401))
+        check_access(announcements_view_api.call(@student, @course.id, @announcement.id, 401))
       end
 
       it "does not show student comments to other teachers not in the course" do
-        check_access.call(announcements_view_api.call(@teacher, @course.id, @announcement.id, 401))
+        check_access(announcements_view_api.call(@teacher, @course.id, @announcement.id, 401))
       end
     end
   end

@@ -1,7 +1,5 @@
 version: "2.3"
 services:
   canvas:
-    environment:
-      JSPEC_GROUP: $JSPEC_GROUP
     image: $KARMA_RUNNER_IMAGE
     init: true

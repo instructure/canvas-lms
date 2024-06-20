@@ -1501,7 +1501,8 @@ class ExternalToolsController < ApplicationController
       respond_to do |format|
         format.html do
           flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
-          return redirect_to named_context_url(@context, :context_url)
+          redirect_to named_context_url(@context, :context_url)
+          return
         end
         format.json { render json: { errors: { external_tool: "Unable to find a matching external tool" } } and return }
       end

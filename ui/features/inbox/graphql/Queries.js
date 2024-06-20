@@ -54,6 +54,7 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
               id
               name
               shortName
+              pronouns
               observerEnrollmentsConnection(contextCode: $courseContextCode) {
                 nodes {
                   associatedUser {
@@ -105,6 +106,7 @@ export const ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES = gql`
               id
               name
               shortName
+              pronouns
               commonCoursesConnection {
                 nodes {
                   _id

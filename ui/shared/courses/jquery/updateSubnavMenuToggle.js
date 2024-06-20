@@ -74,6 +74,9 @@ const updateSubnavMenuToggle = function (pathname = window.location.pathname) {
   }
 
   const subnavMenuToggle = document.getElementById('courseMenuToggle')
+  if (!(subnavMenuToggle instanceof HTMLElement)) {
+    throw new Error('courseMenuToggle element not found')
+  }
   subnavMenuToggle.setAttribute('aria-label', subnavMenuToggleText)
   subnavMenuToggle.setAttribute('title', subnavMenuToggleText)
 }

@@ -577,7 +577,9 @@ describe "student planner" do
         f("#student_planner_checkbox").click
         wait_for_ajaximations
         replace_content(f('input[name="student_todo_at"]'), format_date_for_view(Time.zone.now).to_s, tab_out: true)
-        expect_new_page_load { fj('button:contains("Save")').click }
+        scroll_into_view(fj('button:contains("Save")'))
+
+        expect_new_page_load { hover_and_click('button:contains("Save")') }
         get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
         expect(get_value('input[name="student_todo_at"]')).to eq format_date_for_view(Time.zone.today, "%b %-d, %Y, 11:59 PM")
       end
@@ -597,7 +599,8 @@ describe "student planner" do
       f("#student_planner_checkbox").click
       wait_for_ajaximations
       replace_content(f('input[name="student_todo_at"]'), format_date_for_view(Time.zone.now).to_s, tab_out: true)
-      expect_new_page_load { fj('button:contains("Save")').click }
+      scroll_into_view(fj('button:contains("Save")'))
+      expect_new_page_load { hover_and_click('button:contains("Save")') }
       expect(@wiki.reload.todo_date).to be_present
     end
 
@@ -614,7 +617,7 @@ describe "student planner" do
       get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
       f("#student_planner_checkbox").click
       replace_content(f('input[name="student_todo_at"]'), format_date_for_view(Time.zone.now).to_s, tab_out: true)
-      expect_new_page_load { fj('button:contains("Save")').click }
+      expect_new_page_load { hover_and_click('button:contains("Save")') }
       expect(@wiki.reload.todo_date).to be_present
     end
 

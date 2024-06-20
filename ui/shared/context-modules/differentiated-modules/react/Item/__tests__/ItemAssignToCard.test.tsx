@@ -33,6 +33,7 @@ const props: ItemAssignToCardProps = {
   lock_at: null,
   onDelete: undefined,
   removeDueDateInput: false,
+  isCheckpointed: false,
   onValidityChange: () => {},
 }
 
@@ -74,6 +75,64 @@ describe('ItemAssignToCard', () => {
     expect(getByLabelText('Until')).toBeInTheDocument()
   })
 
+  it('renders checkpoints fields and not Due Date', () => {
+    const {getByLabelText, getAllByLabelText, getByTestId, queryByRole} = renderComponent({
+      isCheckpointed: true,
+    })
+    expect(getByLabelText('Reply to Topic Due Date')).toBeInTheDocument()
+    expect(getByLabelText('Available from')).toBeInTheDocument()
+    expect(getByLabelText('Until')).toBeInTheDocument()
+    // rather than query for not due date, notice length remains 3
+    expect(getAllByLabelText('Time').length).toBe(3)
+  })
+
+  describe('describes the render order', () => {
+    it('renders the Due Date 1st from the top', () => {
+      window.ENV.DEFAULT_DUE_TIME = '08:00:00'
+      const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({due_at: undefined})
+      const dateInput = getByLabelText('Due Date')
+      fireEvent.change(dateInput, {target: {value: 'Nov 10, 2020'}})
+      getByRole('option', {name: /10 november 2020/i}).click()
+      expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM')
+    })
+
+    it('renders the Reply to Topic Due Date 1st from the top', () => {
+      window.ENV.DEFAULT_DUE_TIME = '08:00:00'
+      const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({
+        due_at: undefined,
+        isCheckpointed: true,
+      })
+      const dateInput = getByLabelText('Reply to Topic Due Date')
+      fireEvent.change(dateInput, {target: {value: 'Nov 10, 2020'}})
+      getByRole('option', {name: /10 november 2020/i}).click()
+      expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM')
+    })
+
+    describe('isCheckpointed is true', () => {
+      it.skip('renders the Available From 3rd from the top', () => {
+        const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({
+          due_at: undefined,
+          isCheckpointed: true,
+        })
+        const dateInput = getByLabelText('Available from')
+        fireEvent.change(dateInput, {target: {value: 'Nov 10, 2020'}})
+        getByRole('option', {name: /10 november 2020/i}).click()
+        expect(getAllByLabelText('Time')[2]).toHaveValue('12:00 AM')
+      })
+
+      it.skip('renders the Available Until 4th from the top', () => {
+        const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({
+          due_at: undefined,
+          isCheckpointed: true,
+        })
+        const dateInput = getByLabelText('Until')
+        fireEvent.change(dateInput, {target: {value: 'Nov 14, 2020'}})
+        getByRole('option', {name: /14 november 2020/i}).click()
+        expect(getAllByLabelText('Time')[3]).toHaveValue('11:59 PM')
+      })
+    })
+  })
+
   it('renders with the given dates', () => {
     const due_at = '2023-10-05T12:00:00Z'
     const unlock_at = '2023-10-03T12:00:00Z'
@@ -87,6 +146,11 @@ describe('ItemAssignToCard', () => {
   it('does not render the due date input if removeDueDateInput is set', () => {
     const {queryByLabelText} = renderComponent({removeDueDateInput: true})
     expect(queryByLabelText('Due Date')).not.toBeInTheDocument()
+  })
+
+  it('does not render the reply to topic input if removeDueDateInput is set & isCheckpointed is not set', () => {
+    const {queryByLabelText} = renderComponent({removeDueDateInput: true, isCheckpointed: false})
+    expect(queryByLabelText('Reply to Topic Due Date')).not.toBeInTheDocument()
   })
 
   it('renders the delete button when onDelete is provided', () => {
@@ -349,6 +413,35 @@ describe('ItemAssignToCard', () => {
       expect(getAllByText('Course: Tue, Nov 10, 2020, 5:00 AM').length).toBeGreaterThanOrEqual(1)
     })
 
+    it('changes to fancy midnight for due dates from dates if it is set to 12:00 AM', async () => {
+      window.ENV.DEFAULT_DUE_TIME = '00:00:00'
+      const {getByLabelText, getAllByText, getByText} = renderComponent({
+        due_at: undefined,
+      })
+      const dateInput = getByLabelText('Due Date')
+      fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
+      fireEvent.click(getByText('10 November 2020'))
+      await waitFor(async () => {
+        expect(getAllByText('Local: Tue, Nov 10, 2020, 11:59 PM').length).toBeGreaterThanOrEqual(1)
+      })
+    })
+
+    it('changes to fancy midnight for due dates when user manually set time to 12:00 AM', async () => {
+      window.ENV.DEFAULT_DUE_TIME = '09:00:00'
+      const {getAllByLabelText, getByText, getByLabelText} = renderComponent()
+      const dateInput = getByLabelText('Due Date')
+      fireEvent.change(dateInput, {target: {value: 'Nov 9, 2024'}})
+      fireEvent.click(getByText('9 November 2024'))
+      const timeInput = getAllByLabelText('Time')[0]
+      expect(timeInput).toHaveValue('9:00 AM')
+
+      await fireEvent.change(timeInput, {target: {value: '12:00 AM'}})
+      await fireEvent.click(getByText('12:00 AM'))
+      await waitFor(async () => {
+        expect(timeInput).toHaveValue('11:59 PM')
+      })
+    })
+
     it('defaults to midnight for available from dates if it is null', () => {
       const {getByLabelText, getByRole, getAllByText} = renderComponent()
       const dateInput = getByLabelText('Available from')
@@ -459,6 +552,66 @@ describe('ItemAssignToCard', () => {
         'Clear until date/time for John, Alice, and 2 others',
       ]
       labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
+    })
+
+    describe('isCheckpointed is true', () => {
+      it('labels the clear buttons on cards with no pills', () => {
+        renderComponent({isCheckpointed: true})
+        const labels = ['Clear reply to topic due date/time']
+        labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
+      })
+
+      it('labels the clear buttons on cards with 1 pill', () => {
+        renderComponent({
+          customAllOptions: [{id: 'student-1', value: 'John'}],
+          selectedAssigneeIds: ['student-1'],
+          isCheckpointed: true,
+        })
+        const labels = ['Clear reply to topic due date/time for John']
+        labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
+      })
+
+      it('labels the clear buttons on cards with 2 pills', () => {
+        renderComponent({
+          customAllOptions: [
+            {id: 'student-1', value: 'John'},
+            {id: 'student-2', value: 'Alice'},
+          ],
+          selectedAssigneeIds: ['student-1', 'student-2'],
+          isCheckpointed: true,
+        })
+        const labels = ['Clear reply to topic due date/time for John and Alice']
+        labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
+      })
+
+      it('labels the clear buttons on cards with 3 pills', () => {
+        renderComponent({
+          customAllOptions: [
+            {id: 'student-1', value: 'John'},
+            {id: 'student-2', value: 'Alice'},
+            {id: 'student-3', value: 'Linda'},
+          ],
+          selectedAssigneeIds: ['student-1', 'student-2', 'student-3'],
+          isCheckpointed: true,
+        })
+        const labels = ['Clear reply to topic due date/time for John, Alice, and Linda']
+        labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
+      })
+
+      it('labels the clear buttons on cards with more than 3 pills', () => {
+        renderComponent({
+          customAllOptions: [
+            {id: 'student-1', value: 'John'},
+            {id: 'student-2', value: 'Alice'},
+            {id: 'student-3', value: 'Linda'},
+            {id: 'student-4', value: 'Bob'},
+          ],
+          selectedAssigneeIds: ['student-1', 'student-2', 'student-3', 'student-4'],
+          isCheckpointed: true,
+        })
+        const labels = ['Clear reply to topic due date/time for John, Alice, and 2 others']
+        labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
+      })
     })
   })
 })

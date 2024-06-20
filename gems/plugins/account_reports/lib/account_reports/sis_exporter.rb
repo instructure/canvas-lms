@@ -590,7 +590,8 @@ module AccountReports
       if @include_deleted
         enrol.where!("enrollments.workflow_state<>'deleted' OR enrollments.sis_batch_id IS NOT NULL")
       else
-        enrol.where!("enrollments.workflow_state<>'deleted' AND enrollments.workflow_state<>'completed'")
+        enrol.where!("enrollments.workflow_state<>'deleted' AND enrollments.workflow_state<>'completed'
+                        AND es.state<>'completed'")
       end
 
       if @sis_format
@@ -614,6 +615,7 @@ module AccountReports
                 cs.sis_source_id AS course_section_sis_id,
                 CASE WHEN cs.workflow_state = 'deleted' THEN 'deleted'
                      WHEN courses.workflow_state = 'deleted' THEN 'deleted'
+                     WHEN es.state = 'completed' THEN 'concluded'
                      WHEN enrollments.workflow_state = 'invited' THEN 'invited'
                      WHEN enrollments.workflow_state = 'creation_pending' THEN 'invited'
                      WHEN enrollments.workflow_state = 'active' THEN 'active'
@@ -622,6 +624,7 @@ module AccountReports
                      WHEN enrollments.workflow_state = 'deleted' THEN 'deleted'
                      WHEN enrollments.workflow_state = 'rejected' THEN 'rejected' END AS enroll_state")
                           .joins("INNER JOIN #{CourseSection.quoted_table_name} cs ON cs.id = enrollments.course_section_id
+               INNER JOIN #{EnrollmentState.quoted_table_name} AS es ON enrollments.id = es.enrollment_id
                INNER JOIN #{Course.quoted_table_name} ON courses.id = cs.course_id")
                           .where("enrollments.type <> 'StudentViewEnrollment'")
       enrol = enrol.where.not(enrollments: { sis_batch_id: nil }) if @created_by_sis

@@ -50,7 +50,7 @@ class DiscussionTopic < ActiveRecord::Base
   restrict_assignment_columns
 
   attr_writer :can_unpublish, :preloaded_subentry_count, :sections_changed
-  attr_accessor :user_has_posted, :saved_by, :total_root_discussion_entries
+  attr_accessor :user_has_posted, :saved_by, :total_root_discussion_entries, :notify_users
 
   module DiscussionTypes
     SIDE_COMMENT = "side_comment"
@@ -63,7 +63,7 @@ class DiscussionTopic < ActiveRecord::Base
     class LockBeforeDueDate < StandardError; end
   end
 
-  attr_readonly :context_id, :context_type, :user_id, :anonymous_state, :is_anonymous_author
+  attr_readonly :context_id, :context_type, :user_id, :is_anonymous_author
 
   has_many :discussion_entries, -> { order(:created_at) }, dependent: :destroy, inverse_of: :discussion_topic
   has_many :discussion_entry_drafts, dependent: :destroy, inverse_of: :discussion_topic
@@ -388,7 +388,7 @@ class DiscussionTopic < ActiveRecord::Base
       # prevent future syncs from recreating the deleted assignment
       if is_child_content?
         old_assignment.submission_types = "none"
-        own_tag = MasterCourses::ChildContentTag.where(content: self).take
+        own_tag = MasterCourses::ChildContentTag.find_by(content: self)
         own_tag&.child_subscription&.create_content_tag_for!(old_assignment, downstream_changes: ["workflow_state"])
       end
     elsif assignment && @saved_by != :assignment && !root_topic_id
@@ -672,13 +672,13 @@ class DiscussionTopic < ActiveRecord::Base
     return false unless current_user # default for logged out user
 
     if root_topic?
-      participant = DiscussionTopicParticipant.where(user_id: current_user.id,
-                                                     discussion_topic_id: child_topics.pluck(:id)).take
+      participant = DiscussionTopicParticipant.find_by(user_id: current_user.id,
+                                                       discussion_topic_id: child_topics.pluck(:id))
     end
     participant ||= if opts[:use_preload] && association(:discussion_topic_participants).loaded?
                       discussion_topic_participants.find { |dtp| dtp.user_id == current_user.id }
                     else
-                      discussion_topic_participants.where(user_id: current_user).take
+                      discussion_topic_participants.find_by(user_id: current_user)
                     end
     if participant
       if participant.subscribed.nil?
@@ -833,11 +833,14 @@ class DiscussionTopic < ActiveRecord::Base
 
   scope :discussion_topic_section_visibility_scope, lambda { |student|
     DiscussionTopicSectionVisibility
+      .select(1)
       .active
       .where("discussion_topic_section_visibilities.discussion_topic_id = discussion_topics.id")
       .where(
         Enrollment.active_or_pending.where(user_id: student)
+          .select(1)
           .where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id")
+          .limit(1)
           .arel.exists
       )
   }

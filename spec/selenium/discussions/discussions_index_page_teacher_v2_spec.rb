@@ -21,12 +21,14 @@ require_relative "pages/discussions_index_page"
 require_relative "../helpers/discussions_common"
 require_relative "../helpers/context_modules_common"
 require_relative "../helpers/items_assign_to_tray"
+require_relative "../../helpers/selective_release_common"
 
 describe "discussions index" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
   include ItemsAssignToTray
   include DiscussionsCommon
+  include SelectiveReleaseCommon
 
   context "as a teacher" do
     discussion1_title = "Meaning of life"

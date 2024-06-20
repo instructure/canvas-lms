@@ -16,11 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% add_crumb t(:eportfolio_moderation_crumb, "Eportfolio Moderation") %>
 <% set_active_tab "eportfolio_moderation" %>
 <% css_bundle :eportfolio_moderation %>
 <% provide :page_title do %>
-  <%= t(:page_title, "Eportfolio Moderation") %>
+  <%= @page_title %>
 <% end %>
 
 <div>
@@ -105,3 +104,5 @@
     </tbody>
   </table>
 </div>
+
+<% js_bundle :eportfolio_moderation %>

@@ -49,7 +49,7 @@ class Mutations::UpdateDiscussionEntryParticipant < Mutations::BaseMutation
 
     unless input[:read].nil?
       opt = input[:forced_read_state].nil? ? {} : { forced: input[:forced_read_state] }
-      input[:read] ? discussion_entry.change_read_state("read", current_user, opt) : discussion_entry.change_read_state("unread", current_user, opt)
+      discussion_entry.change_read_state(input[:read] ? "read" : "unread", current_user, opt)
     end
 
     unless input[:rating].nil?

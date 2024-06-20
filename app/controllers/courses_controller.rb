@@ -2358,7 +2358,7 @@ class CoursesController < ApplicationController
           @recent_feedback = @current_user.recent_feedback(contexts: @contexts) || []
         end
 
-        flash[:notice] = t("notices.updated", "Course was successfully updated.") if params[:for_reload]
+        flash.now[:notice] = t("notices.updated", "Course was successfully updated.") if params[:for_reload]
 
         can_see_admin_tools = @context.grants_any_right?(
           @current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
@@ -2716,6 +2716,7 @@ class CoursesController < ApplicationController
     js_env(NEW_QUIZZES_IMPORT: new_quizzes_import_enabled?)
     js_env(NEW_QUIZZES_MIGRATION: new_quizzes_migration_enabled?)
     js_env(NEW_QUIZZES_MIGRATION_DEFAULT: new_quizzes_migration_default)
+    js_env(NEW_QUIZZES_MIGRATION_REQUIRED: new_quizzes_require_migration?)
   end
 
   def copy_course
@@ -4078,13 +4079,13 @@ class CoursesController < ApplicationController
   end
 
   def offline_web_exports
-    page_has_instui_topnav
     return render status: :not_found, template: "shared/errors/404_message" unless allow_web_export_download?
 
     if authorized_action(WebZipExport.new(course: @context), @current_user, :create)
       title = t("Exported Package History")
       @page_title = title
       add_crumb(title)
+      page_has_instui_topnav
       js_bundle :webzip_export
       css_bundle :webzip_export
       render html: '<div id="course-webzip-export-app"></div>'.html_safe, layout: true

@@ -210,6 +210,11 @@ export default class DueDates extends React.Component {
     })
   }
 
+  // for QUnit tests
+  sortedRowKeys = () => sortedRowKeys(this.state.rows)
+
+  getAllOverrides = () => getAllOverrides(this.state.rows)
+
   canRemoveRow = () => sortedRowKeys(this.state.rows).length > 1
 
   focusRow = rowKey => {

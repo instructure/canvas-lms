@@ -29,6 +29,7 @@ const numberFormat = {
     if (typeof n !== 'number' || Number.isNaN(Number(n))) {
       return n
     }
+    // @ts-expect-error
     return I18n.n(n, options)
   },
 

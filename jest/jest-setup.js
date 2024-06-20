@@ -60,7 +60,6 @@ const globalWarn = global.console.warn
 const ignoredWarnings = [
   /JQMIGRATE:/, // ignore warnings about jquery migrate; these are muted globally when not in a jest test
   /componentWillReceiveProps/, // ignore warnings about componentWillReceiveProps; this method is deprecated and will be removed with react upgrades
-  /The prop `[\w]+` is defined at 2 or more breakpoints which are currently applied at the same time/, // https://instructure.atlassian.net/browse/VICE-4257
 ]
 
 global.console = {
@@ -289,5 +288,21 @@ if (!('Worker' in window)) {
         this.dispatchEvent = () => {}
       }
     },
+  })
+}
+
+if (!Range.prototype.getBoundingClientRect) {
+  Range.prototype.getBoundingClientRect = () => ({
+    bottom: 0,
+    height: 0,
+    left: 0,
+    right: 0,
+    top: 0,
+    width: 0,
+  })
+  Range.prototype.getClientRects = () => ({
+    item: () => null,
+    length: 0,
+    [Symbol.iterator]: jest.fn(),
   })
 }

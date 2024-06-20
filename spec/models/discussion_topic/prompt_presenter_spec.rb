@@ -50,33 +50,58 @@ describe DiscussionTopic::PromptPresenter do
   describe "#content_for_summary" do
     it "generates correct discussion summary" do
       expected_output = <<~TEXT
-        DISCUSSION BY instructor_1 WITH TITLE:
-        '''
-        #{@topic.title}
-        '''
-
-        DISCUSSION MESSAGE:
-        '''
-        #{@topic.message}
-        '''
-
-        DISCUSSION ENTRY BY student_1 ON THREAD LEVEL 1:
-        '''
-        I liked the course.
-        '''
-
-        DISCUSSION ENTRY BY student_2 ON THREAD LEVEL 2:
-        '''
-        I felt the course was too hard.
-        '''
-
-        DISCUSSION ENTRY BY instructor_1 ON THREAD LEVEL 2.1:
-        '''
-        I'm sorry to hear that. Could you please provide more details?
-        '''
+        <discussion>
+          <topic user="instructor_1">
+            <title>
+        Discussion Topic Title    </title>
+            <message>
+        Discussion Topic Message    </message>
+          </topic>
+          <entries>
+        <entry user="student_1" index="1">
+        I liked the course.</entry>
+        <entry user="student_2" index="2">
+        I felt the course was too hard.</entry>
+        <entry user="instructor_1" index="2.1">
+        I'm sorry to hear that. Could you please provide more details?</entry>
+          </entries>
+        </discussion>
       TEXT
 
       expect(@presenter.content_for_summary.strip).to eq(expected_output.strip)
+    end
+
+    describe ".focus_for_summary" do
+      it "generates focus XML with user input" do
+        user_input = "specific focus"
+        expected_output = <<~XML
+          <focus>specific focus</focus>
+        XML
+
+        result = DiscussionTopic::PromptPresenter.focus_for_summary(user_input:)
+        expect(result.strip).to eq(expected_output.strip)
+      end
+
+      it "generates focus XML with default focus" do
+        expected_output = <<~XML
+          <focus>general summary</focus>
+        XML
+
+        result = DiscussionTopic::PromptPresenter.focus_for_summary(user_input: nil)
+        expect(result.strip).to eq(expected_output.strip)
+      end
+    end
+
+    describe ".raw_summary_for_refinement" do
+      it "generates raw summary XML" do
+        raw_summary = "This is the raw summary."
+        expected_output = <<~XML
+          <raw_summary>This is the raw summary.</raw_summary>
+        XML
+
+        result = DiscussionTopic::PromptPresenter.raw_summary_for_refinement(raw_summary:)
+        expect(result.strip).to eq(expected_output.strip)
+      end
     end
   end
 end

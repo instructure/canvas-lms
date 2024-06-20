@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useState} from 'react'
+import {useCallback, useEffect, useState} from 'react'
 
 // import {setSetting} from 'features/navigation_header/react/queries/settingsQuery'
 
@@ -28,6 +28,16 @@ const useToggleCourseNav = (): IUseToggleCourseNav => {
   const body = document.querySelector('body')
   const leftSideElement = document.getElementById('left-side')
   const WIDE_BREAKPOINT = 1200
+
+  // https://instructure.atlassian.net/browse/INSTUI-4018
+  const updateAriaAttributes = useCallback((): void => {
+    const hamburgerButton = document.getElementById('iconItem')
+    if (!hamburgerButton) return
+    const isCourseMenuExpanded = body?.classList.contains('course-menu-expanded') ?? false
+    const ariaLabel = isCourseMenuExpanded ? 'Collapse menu' : 'Expand menu'
+    hamburgerButton.setAttribute('aria-label', ariaLabel)
+    hamburgerButton.setAttribute('aria-expanded', isCourseMenuExpanded.toString())
+  }, [body])
 
   const toggle = (): boolean => {
     const sectionTabLinks = document.querySelectorAll('#section-tabs li a')
@@ -61,11 +71,24 @@ const useToggleCourseNav = (): IUseToggleCourseNav => {
       }
     }
 
+    updateAriaAttributes()
+
     return !!isCourseMenuExpanded
     // setSetting({setting: 'collapse_course_nav', newState: !isCourseMenuExpanded})
-
-    // TO DO: Update aria-label for hamburger button (evaluate options)
   }
+
+  // check for hamburger button and update aria-label on mount
+  useEffect(() => {
+    const checkAndUpdateAriaAttributes = (): void => {
+      const hamburgerButton = document.getElementById('iconItem')
+      if (hamburgerButton) {
+        updateAriaAttributes()
+      } else {
+        requestAnimationFrame(checkAndUpdateAriaAttributes)
+      }
+    }
+    checkAndUpdateAriaAttributes()
+  }, [updateAriaAttributes])
 
   return {
     toggle,
