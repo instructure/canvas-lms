@@ -97,7 +97,8 @@ describe "context modules" do
         wait_for_ajax_requests
         expect(tag.reload).to be_published
         refresh_page
-        driver.action.move_to(f("i.icon-unpublish")).perform
+        f("#course_publish_button button").click
+        f("ul[role='menu'][aria-label='course_publish_menu'] button:not([aria-disabled])").click
         expect(f("span.publish-icon.published.publish-icon-published")).to be_displayed
         expect(tag).to be_published
       end
