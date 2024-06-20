@@ -58,7 +58,8 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       input[:locked] ? discussion_topic.lock! : discussion_topic.unlock!
     end
 
-    if !input.key?(:ungraded_discussion_overrides) && !Account.site_admin.feature_enabled?(:selective_release_ui_api)
+    if (!input.key?(:ungraded_discussion_overrides) && !Account.site_admin.feature_enabled?(:selective_release_ui_api)) || discussion_topic.is_announcement
+      # TODO: deprecate discussion_topic_section_visibilities for assignment_overrides LX-1498
       set_sections(input[:specific_sections], discussion_topic)
       invalid_sections = verify_specific_section_visibilities(discussion_topic) || []
 
