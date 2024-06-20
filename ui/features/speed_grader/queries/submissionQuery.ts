@@ -61,6 +61,12 @@ export const SUBMISSION_FRAGMENT = gql`
           updatedAt
           avatarUrl
         }
+        attachments {
+          _id
+          displayName
+          url
+          mimeClass
+        }
       }
     }
     attachments {

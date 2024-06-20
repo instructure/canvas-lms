@@ -88,6 +88,7 @@ ready(() => {
             hrefs: {
               heroIcon: `/courses/${window.ENV.course_id}/gradebook`,
             },
+            emojisDenyList: window.ENV.EMOJI_DENY_LIST?.split(','),
           },
           features: {
             extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
@@ -95,6 +96,7 @@ ready(() => {
               supported: window.ENV.GRADE_BY_QUESTION_SUPPORTED,
               enabled: window.ENV.GRADE_BY_QUESTION,
             },
+            emojisEnabled: !!window.ENV.EMOJIS_ENABLED,
           },
         })
       })
