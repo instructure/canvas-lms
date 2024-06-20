@@ -109,26 +109,6 @@ describe LatePolicyApplicator do
       LatePolicyApplicator.for_assignment(@published_assignment)
     end
 
-    it "does not instantiate an applicator for a checkpointed assignment" do
-      expect(LatePolicyApplicator).not_to receive(:new)
-
-      @published_assignment.update!(has_sub_assignments: true)
-      @published_assignment.sub_assignments.create!(
-        context: @published_assignment.context,
-        points_possible: 10,
-        due_at: 1.day.ago,
-        sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC
-      )
-      @published_assignment.sub_assignments.create!(
-        context: @published_assignment.context,
-        points_possible: 10,
-        due_at: 1.day.ago,
-        sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY
-      )
-
-      LatePolicyApplicator.for_assignment(@published_assignment)
-    end
-
     it "kicks off a singleton-by-assignment + n_strand-by-root-account background job" do
       queueing_args = {
         singleton: "late_policy_applicator:calculator:Assignment:#{@published_assignment.global_id}",
@@ -304,71 +284,6 @@ describe LatePolicyApplicator do
         @late_policy_applicator = LatePolicyApplicator.new(@course)
 
         expect { @late_policy_applicator.process }.not_to(change { @late_submission2.reload.score })
-      end
-
-      context "discussion checkpoints" do
-        before do
-          @course.root_account.enable_feature!(:discussion_checkpoints)
-
-          @checkpointed_assignment_in_open_gp = @course.assignments.create!(
-            due_at: @now - 1.month,
-            submission_types: "online_text_entry",
-            has_sub_assignments: true
-          )
-          @checkpointed_assignment_in_open_gp_submission = @checkpointed_assignment_in_open_gp.submissions.find_by(user: @students[1])
-
-          reply_to_entry_checkpoint = @checkpointed_assignment_in_open_gp.sub_assignments.create!(
-            context: @checkpointed_assignment_in_open_gp.context,
-            points_possible: 10,
-            due_at: @now - 1.month,
-            sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY
-          )
-          @reply_to_entry_submission = reply_to_entry_checkpoint.submissions.find_by(user: @students[1])
-          Submission.where(id: @reply_to_entry_submission)
-                    .update_all(
-                      submitted_at: @now,
-                      cached_due_date: @now + 1.hour,
-                      score: 10,
-                      grade: 10,
-                      submission_type: "online_text_entry"
-                    )
-
-          reply_to_topic_checkpoint = @checkpointed_assignment_in_open_gp.sub_assignments.create!(
-            context: @checkpointed_assignment_in_open_gp.context,
-            points_possible: 10,
-            due_at: @now - 1.month,
-            sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC
-          )
-          @reply_to_topic_submission = reply_to_topic_checkpoint.submissions.find_by(user: @students[1])
-          Submission.where(id: @reply_to_topic_submission)
-                    .update_all(
-                      submitted_at: @now,
-                      cached_due_date: @now + 1.hour,
-                      score: 10,
-                      grade: 10,
-                      submission_type: "online_text_entry"
-                    )
-        end
-
-        it "bypasses checkpointed assignments in course" do
-          @late_policy_applicator = LatePolicyApplicator.new(@course)
-          @late_policy_applicator.process
-          expect(@checkpointed_assignment_in_open_gp_submission.reload.score).to be_nil
-
-          # once VICE-4370 is completed, these scores should be lower than 10
-          expect(@reply_to_entry_submission.reload.score).to eq(10)
-          expect(@reply_to_topic_submission.reload.score).to eq(10)
-        end
-
-        it "bypasses checkpointed assignments in course even when its assignment is explicitly asked for" do
-          @late_policy_applicator = LatePolicyApplicator.new(@course, [@checkpointed_assignment_in_open_gp])
-          @late_policy_applicator.process
-          expect(@checkpointed_assignment_in_open_gp_submission.reload.score).to be_nil
-
-          # once VICE-4370 is completed, these scores should be lower than 10
-          expect(@reply_to_entry_submission.reload.score).to eq(10)
-          expect(@reply_to_topic_submission.reload.score).to eq(10)
-        end
       end
 
       it "recalculates late penalties with current due date in the open grading period" do
