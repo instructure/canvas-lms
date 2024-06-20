@@ -40,7 +40,7 @@ import {
 } from './utils/rubricUtils'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
-const {licorice} = colors
+const {licorice, tiara} = colors
 
 type TraditionalViewProps = {
   criteria: RubricCriterion[]
@@ -84,7 +84,7 @@ export const TraditionalView = ({
           <View
             as="div"
             background="secondary"
-            borderWidth="small"
+            borderWidth="small small 0 small"
             height="100%"
             padding="x-small 0 0 small"
             themeOverride={{paddingXSmall: '0.438rem'}}
@@ -92,31 +92,23 @@ export const TraditionalView = ({
             <Text weight="bold">{I18n.t('Criteria')}</Text>
           </View>
         </Flex.Item>
-        <Flex.Item shouldGrow={true}>
+        <Flex.Item shouldGrow={true} height="2.375rem">
           <View
             as="div"
             background="secondary"
-            borderWidth="small 0"
+            borderWidth="small small 0 0"
             height="2.375rem"
             padding="x-small 0 0 small"
           >
             {isFreeFormCriterionComments && <Text weight="bold">{I18n.t('Comments')}</Text>}
           </View>
         </Flex.Item>
-        <Flex.Item width="8.875rem" height="2.375rem">
-          <View
-            as="div"
-            background="secondary"
-            borderWidth="small small small 0"
-            height="2.375rem"
-          />
-        </Flex.Item>
         {!hidePoints && (
           <Flex.Item width="8.875rem" height="2.375rem">
             <View
               as="div"
               background="secondary"
-              borderWidth="small small small 0"
+              borderWidth="small small 0 0"
               height="100%"
               padding="x-small 0 0 small"
               themeOverride={{paddingXSmall: '0.438rem'}}
@@ -132,6 +124,8 @@ export const TraditionalView = ({
           data => data.criterionId === criterion.id
         )
 
+        const isLastIndex = criteria.length - 1 === index
+
         return (
           <CriterionRow
             // we use the array index because rating may not have an id
@@ -141,6 +135,7 @@ export const TraditionalView = ({
             criterionAssessment={criterionAssessment}
             ratingOrder={ratingOrder}
             rubricSavedComments={rubricSavedComments?.[criterion.id] ?? []}
+            isLastIndex={isLastIndex}
             isPreviewMode={isPreviewMode}
             isPeerReview={isPeerReview}
             onUpdateAssessmentData={onUpdateAssessmentData}
@@ -159,6 +154,7 @@ type CriterionRowProps = {
   hidePoints: boolean
   isPreviewMode: boolean
   isPeerReview?: boolean
+  isLastIndex: boolean
   isFreeFormCriterionComments: boolean
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
   ratingOrder: string
@@ -168,6 +164,7 @@ const CriterionRow = ({
   criterion,
   criterionAssessment,
   hidePoints,
+  isLastIndex,
   isPreviewMode,
   isPeerReview,
   isFreeFormCriterionComments,
@@ -227,11 +224,11 @@ const CriterionRow = ({
   return (
     <View as="div" maxWidth="100%">
       <Flex>
-        <Flex.Item width="11.25rem" align="start">
+        <Flex.Item width="11.2rem" align="start">
           <View
             as="div"
             padding="xxx-small x-small"
-            borderWidth="0 small small small"
+            borderWidth="small 0 small small"
             height="13.75rem"
             overflowY="auto"
           >
@@ -256,7 +253,7 @@ const CriterionRow = ({
                       as="div"
                       height="13.75rem"
                       padding="x-small small 0 small"
-                      borderWidth="0 small small 0"
+                      borderWidth="small"
                       overflowY="auto"
                     >
                       <Flex direction="column">
@@ -323,13 +320,10 @@ const CriterionRow = ({
               <Grid>
                 <Grid.Row colSpacing="none">
                   {criterionRatings.map((rating, index) => {
-                    const highlightedBorder = 'medium'
-
                     const isHovered = hoveredRatingIndex === index
                     const isSelected = selectedRatingIndex === index
+                    const isLastIndex = criterionRatings.length - 1 === index
 
-                    const borderWidth =
-                      isHovered || isSelected ? highlightedBorder : '0 small small 0'
                     const borderColor = isHovered || isSelected ? 'brand' : 'primary'
 
                     const onClickRating = (ratingIndex: number) => {
@@ -347,88 +341,106 @@ const CriterionRow = ({
                       ? rangingFrom(criterionRatings, index, ratingOrder)
                       : undefined
 
+                    const primaryBorderColor = `${tiara} ${
+                      isLastIndex ? tiara : 'transparent'
+                    } ${tiara} ${tiara}`
+
                     return (
                       // we use the array index because rating may not have an id
                       /* eslint-disable-next-line react/no-array-index-key */
                       <Grid.Col key={`criterion-${criterion.id}-ratings-${index}`}>
                         <View
-                          as="button"
-                          disabled={isPreviewMode}
-                          tabIndex={0}
-                          background="transparent"
-                          height="13.75rem"
-                          width="100%"
-                          borderWidth={borderWidth}
+                          as="div"
                           borderColor={borderColor}
-                          overflowY="auto"
-                          overflowX="hidden"
-                          cursor={isPreviewMode ? 'not-allowed' : 'pointer'}
-                          padding="xxx-small x-small 0 x-small"
-                          onMouseOver={() => setHoveredRatingIndex(isPreviewMode ? -1 : index)}
-                          onMouseOut={() => setHoveredRatingIndex(undefined)}
-                          onClick={() => onClickRating(index)}
+                          borderWidth="small"
+                          height="13.75rem"
+                          padding="0"
+                          margin="0"
                           themeOverride={{
-                            borderWidthMedium: isSelected ? '0.188rem' : '0.125rem',
                             borderColorBrand: licorice,
+                            borderColorPrimary: primaryBorderColor,
                           }}
-                          data-testid={`traditional-criterion-${criterion.id}-ratings-${index}`}
                         >
-                          <Flex direction="column" height="100%">
-                            <Flex.Item>
-                              <Text weight="bold">{rating.description}</Text>
-                            </Flex.Item>
-                            <Flex.Item margin="small 0 0 0" shouldGrow={true} textAlign="start">
-                              <View as="div" maxHeight="9.531rem">
-                                <Text
-                                  size="small"
-                                  dangerouslySetInnerHTML={escapeNewLineText(
-                                    rating.longDescription
-                                  )}
-                                />
-                              </View>
-                            </Flex.Item>
-                            <Flex.Item>
-                              <View
-                                as="div"
-                                textAlign="end"
-                                position="relative"
-                                padding="0 0 x-small 0"
-                                overflowX="hidden"
-                                overflowY="hidden"
-                                minHeight="1.875rem"
-                              >
-                                <View>
+                          <View
+                            as="button"
+                            disabled={isPreviewMode}
+                            tabIndex={0}
+                            background="transparent"
+                            height="100%"
+                            width="100%"
+                            borderWidth="small"
+                            borderColor={borderColor}
+                            overflowY="auto"
+                            overflowX="hidden"
+                            cursor={isPreviewMode ? 'not-allowed' : 'pointer'}
+                            padding="xxx-small x-small 0 x-small"
+                            onMouseOver={() => setHoveredRatingIndex(isPreviewMode ? -1 : index)}
+                            onMouseOut={() => setHoveredRatingIndex(undefined)}
+                            onClick={() => onClickRating(index)}
+                            themeOverride={{
+                              borderWidthSmall: '0.125rem',
+                              borderColorBrand: licorice,
+                              borderColorPrimary: 'transparent',
+                            }}
+                            data-testid={`traditional-criterion-${criterion.id}-ratings-${index}`}
+                          >
+                            <Flex direction="column" height="100%">
+                              <Flex.Item>
+                                <Text weight="bold">{rating.description}</Text>
+                              </Flex.Item>
+                              <Flex.Item margin="small 0 0 0" shouldGrow={true} textAlign="start">
+                                <View as="div" maxHeight="9.531rem">
                                   <Text
                                     size="small"
-                                    weight="bold"
-                                    data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-points`}
-                                  >
-                                    {!hidePoints &&
-                                      (min != null
-                                        ? possibleStringRange(min, rating.points)
-                                        : possibleString(rating.points))}
-                                  </Text>
-                                </View>
-
-                                {isSelected && (
-                                  <div
-                                    data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-selected`}
-                                    style={{
-                                      position: 'absolute',
-                                      bottom: '0',
-                                      height: '0',
-                                      width: '0',
-                                      left: '50%',
-                                      borderLeft: '12px solid transparent',
-                                      borderRight: '12px solid transparent',
-                                      borderBottom: `12px solid ${licorice}`,
-                                      transform: 'translateX(-50%)',
-                                    }}
+                                    dangerouslySetInnerHTML={escapeNewLineText(
+                                      rating.longDescription
+                                    )}
                                   />
-                                )}
-                              </View>
-                            </Flex.Item>
-                          </Flex>
+                                </View>
+                              </Flex.Item>
+                              <Flex.Item>
+                                <View
+                                  as="div"
+                                  textAlign="end"
+                                  position="relative"
+                                  padding="0 0 x-small 0"
+                                  overflowX="hidden"
+                                  overflowY="hidden"
+                                  minHeight="1.875rem"
+                                >
+                                  <View>
+                                    <Text
+                                      size="small"
+                                      weight="bold"
+                                      data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-points`}
+                                    >
+                                      {!hidePoints &&
+                                        (min != null
+                                          ? possibleStringRange(min, rating.points)
+                                          : possibleString(rating.points))}
+                                    </Text>
+                                  </View>
+
+                                  {isSelected && (
+                                    <div
+                                      data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-selected`}
+                                      style={{
+                                        position: 'absolute',
+                                        bottom: '0',
+                                        height: '0',
+                                        width: '0',
+                                        left: '50%',
+                                        borderLeft: '12px solid transparent',
+                                        borderRight: '12px solid transparent',
+                                        borderBottom: `12px solid ${licorice}`,
+                                        transform: 'translateX(-50%)',
+                                      }}
+                                    />
+                                  )}
+                                </View>
+                              </Flex.Item>
+                            </Flex>
+                          </View>
                         </View>
                       </Grid.Col>
                     )
@@ -443,7 +455,7 @@ const CriterionRow = ({
             <View
               as="div"
               padding="xxx-small x-small"
-              borderWidth="0 small small 0"
+              borderWidth="small small small 0"
               height="13.75rem"
               overflowY="auto"
             >
@@ -478,7 +490,7 @@ const CriterionRow = ({
           as="div"
           padding="small"
           width="100%"
-          borderWidth="0 small small small"
+          borderWidth={`0 small ${isLastIndex ? 'small' : '0'} small`}
           themeOverride={{paddingMedium: '1.125rem'}}
         >
           <Flex direction="row-reverse">
