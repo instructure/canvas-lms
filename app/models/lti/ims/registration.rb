@@ -184,6 +184,14 @@ class Lti::IMS::Registration < ApplicationRecord
     text = apply_overlay ? (placement_overlay["label"] || message["label"]) : message["label"]
     icon_url = apply_overlay ? (placement_overlay["icon_url"] || message["icon_uri"]) : message["icon_uri"]
     enabled = apply_overlay ? !placement_disabled?(placement_type) : true
+    default = if apply_overlay && placement_name == "course_navigation"
+                # The placement overlay stores everything in the Canvas proprietary format, in which
+                # default is either 'enabled' or 'disabled', so we can fetch the
+                # default value directly from the overlay
+                placement_overlay["default"] || fetch_default_enabled_setting(message, placement_name)
+              else
+                fetch_default_enabled_setting(message, placement_name)
+              end
 
     [
       {
@@ -196,10 +204,7 @@ class Lti::IMS::Registration < ApplicationRecord
         custom_fields: message["custom_parameters"],
         display_type:,
         windowTarget: window_target,
-        # This supports a very old parameter (hence the obtuse name) that only applies to the course navigation placement. It hides the
-        # tool from the course navigation by default. Teachers can still add the tool to the course navigation using the course
-        # settings page if they'd like.
-        default: (message[COURSE_NAV_DEFAULT_ENABLED_EXTENSION] == false && placement_name == "course_navigation") ? "disabled" : nil,
+        default:,
         visibility: placement_visibility(message),
       }.merge(width_and_height_settings(message, placement_name)).compact
     ]
@@ -212,6 +217,14 @@ class Lti::IMS::Registration < ApplicationRecord
     else
       nil
     end
+  end
+
+  # This supports a very old parameter (hence the obtuse name) that *only* applies to the course navigation placement. It hides the
+  # tool from the course navigation by default. Teachers can still add the tool to the course navigation using the course
+  # settings page if they'd like. The IMS Message stores this value as a boolean, but the Canvas config expects a string
+  # value of "enabled" or "disabled" (nil/not present is equivalent to "enabled").
+  def fetch_default_enabled_setting(message, placement_name)
+    (message[COURSE_NAV_DEFAULT_ENABLED_EXTENSION] == false && placement_name == "course_navigation") ? "disabled" : nil
   end
 
   def lookup_placement_overlay(placement_type)
