@@ -176,32 +176,34 @@ module CanvasRails
 
     module PostgreSQLEarlyExtensions
       module ConnectionHandling
-        def postgresql_connection(config)
-          conn_params = config.symbolize_keys
+        if $canvas_rails == "7.0"
+          def postgresql_connection(config)
+            conn_params = config.symbolize_keys
 
-          hosts = Array(conn_params[:host]).presence || [nil]
-          hosts.each_with_index do |host, index|
-            conn_params[:host] = host
+            hosts = Array(conn_params[:host]).presence || [nil]
+            hosts.each_with_index do |host, index|
+              conn_params[:host] = host
 
-            begin
-              return super(conn_params)
-            rescue ::ActiveRecord::ActiveRecordError, ::PG::Error => e
-              # If exception occurs using parameters from a predefined pg service, retry without
-              if conn_params.key?(:service)
-                CanvasErrors.capture(e, { tags: { pg_service: conn_params[:service] } }, :warn)
-                Rails.logger.warn("Error connecting to database using pg service `#{conn_params[:service]}`; retrying without... (error: #{e.message})")
-                conn_params.delete(:service)
-                conn_params[:sslmode] = "disable"
-                retry
-              else
-                raise
+              begin
+                return super(conn_params)
+              rescue ::ActiveRecord::ActiveRecordError, ::PG::Error => e
+                # If exception occurs using parameters from a predefined pg service, retry without
+                if conn_params.key?(:service)
+                  CanvasErrors.capture(e, { tags: { pg_service: conn_params[:service] } }, :warn)
+                  Rails.logger.warn("Error connecting to database using pg service `#{conn_params[:service]}`; retrying without... (error: #{e.message})")
+                  conn_params.delete(:service)
+                  conn_params[:sslmode] = "disable"
+                  retry
+                else
+                  raise
+                end
               end
+              # we _shouldn't_ be catching a NoDatabaseError, but that's what Rails raises
+              # for an error where the database name is in the message (i.e. a hostname lookup failure)
+            rescue ::ActiveRecord::NoDatabaseError, ::ActiveRecord::ConnectionNotEstablished
+              raise if index == hosts.length - 1
+              # else try next host
             end
-            # we _shouldn't_ be catching a NoDatabaseError, but that's what Rails raises
-            # for an error where the database name is in the message (i.e. a hostname lookup failure)
-          rescue ::ActiveRecord::NoDatabaseError, ::ActiveRecord::ConnectionNotEstablished
-            raise if index == hosts.length - 1
-            # else try next host
           end
         end
       end
@@ -236,7 +238,7 @@ module CanvasRails
             else
               @raw_connection = PG::Connection.connect(connection_parameters)
             end
-          rescue ::ActiveRecord::ActiveRecordError, ::PG::Error => e
+          rescue ::ActiveRecord::ActiveRecordError, ::ActiveRecord::ConnectionFailed, ::PG::Error => e
             # If exception occurs using parameters from a predefined pg service, retry without
             if connection_parameters.key?(:service)
               CanvasErrors.capture(e, { tags: { pg_service: connection_parameters[:service] } }, :warn)
