@@ -350,7 +350,8 @@ module CC
                              file
                            elsif obj.attachment
                              attachment = obj.attachment.clone_for(@course)
-                             attachment.save
+                             attachment.save!
+                             attachment.handle_duplicates(:rename)
                              attachment
                            else
                              obj.attachment = @course.attachments.create!(media_entry_id: obj.media_id, filename: obj.guaranteed_title, content_type: "unknown/unknown")
@@ -429,10 +430,10 @@ module CC
         end
 
         # process RCE media object iframes
-        doc.css("iframe[data-media-id]").each do |iframe|
-          next if iframe["src"].include?("/media_attachments_iframe/") || iframe["src"].include?(WEB_CONTENT_TOKEN)
+        doc.css("iframe[src*='media_objects']").each do |iframe|
+          next if iframe["src"].include?(WEB_CONTENT_TOKEN)
 
-          media_id = iframe["data-media-id"]
+          media_id = iframe["src"].match(%r{media_objects(?:_iframe)?/([^?.]+)})&.[](1) || iframe["data-media-id"]
           path = media_object_export_path(media_id)
           iframe["src"] = path if path
         end

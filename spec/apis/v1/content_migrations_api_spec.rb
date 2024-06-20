@@ -923,7 +923,7 @@ describe ContentMigrationsController, type: :request do
       @user = @dst.teachers.first
     end
 
-    def test_asset_id_mapping(json)
+    def test_asset_id_mapping(json, verifiers: true)
       expect(@dst.announcements.find(json["announcements"][@ann.id.to_s]).title).to eq "ann"
       expect(@dst.assignments.find(json["assignments"][@assign.id.to_s]).name).to eq "assign"
       expect(@dst.assignments.find(json["assignments"][@shell_assign.id.to_s]).description).to eq "assigned"
@@ -933,11 +933,17 @@ describe ContentMigrationsController, type: :request do
       expect(@dst.discussion_topics.find(json["discussion_topics"][@topic.id.to_s]).message).to eq "some topic"
       expect(@dst.discussion_topics.find(json["discussion_topics"][@assign_topic.id.to_s]).message).to eq "assigned"
       expect(@dst.quizzes.find(json["quizzes"][@quiz.id.to_s]).title).to eq "a quiz"
-      expect(@dst.attachments.find(json["files"][@file.id.to_s]).filename).to eq "teh_file.txt"
+      dst_attachment = @dst.attachments.find(json["files"][@file.id.to_s])
+      expect(dst_attachment.filename).to eq "teh_file.txt"
+      if verifiers
+        expect(json["verifiers"][dst_attachment.id.to_s]).to eq dst_attachment.uuid
+      else
+        expect(json["verifiers"]).to be_nil
+      end
     end
 
     # accepts block which should return the migration id
-    def test_asset_migration_id_mapping(json)
+    def test_asset_migration_id_mapping(json, verifiers: true)
       expect(@dst.announcements.find(json["announcements"][yield(@ann)]["destination"]["id"]).title).to eq "ann"
       expect(@dst.assignments.find(json["assignments"][yield(@assign)]["destination"]["id"]).name).to eq "assign"
       expect(@dst.assignments.find(json["assignments"][yield(@shell_assign)]["destination"]["id"]).description).to eq "assigned"
@@ -958,6 +964,17 @@ describe ContentMigrationsController, type: :request do
       dst_media_attachment = @dst.attachments.find(json["files"][yield(@media_file)]["destination"]["id"])
       expect(dst_media_attachment.filename).to eq "fish_and_wildlife.mp4"
       expect(json["files"][yield(@media_file)]["destination"]["media_entry_id"]).to eq "m1234_fish_and_wildlife"
+
+      if verifiers
+        file_verifier = @dst.attachments.find(json["files"][yield(@file)]["destination"]["id"]).uuid
+        expect(json["files"][yield(@file)]["destination"]["uuid"]).to eq file_verifier
+
+        media_verifier = @dst.attachments.find(json["files"][yield(@media_file)]["destination"]["id"]).uuid
+        expect(json["files"][yield(@media_file)]["destination"]["uuid"]).to eq media_verifier
+      else
+        expect(json["files"][yield(@file)]["destination"]["uuid"]).to be_nil
+        expect(json["files"][yield(@media_file)]["destination"]["uuid"]).to be_nil
+      end
     end
 
     def test_asset_migration_id_mapping_nil(json)
@@ -1010,6 +1027,19 @@ describe ContentMigrationsController, type: :request do
         test_asset_id_mapping(json)
       end
 
+      it "doesn't add verifiers to the asset map if the file_verifiers_for_quiz_links flag is off" do
+        @dst.root_account.disable_feature!(:file_verifiers_for_quiz_links)
+        json = api_call(:get,
+                        "/api/v1/courses/#{@dst.to_param}/content_migrations/#{@migration.to_param}/asset_id_mapping",
+                        { controller: "content_migrations",
+                          action: "asset_id_mapping",
+                          format: "json",
+                          course_id: @dst.to_param,
+                          id: @migration.to_param })
+        test_asset_id_mapping(json, verifiers: false)
+        @dst.root_account.enable_feature!(:file_verifiers_for_quiz_links)
+      end
+
       context "with the :content_migration_asset_map_v2 flag on" do
         it "maps migration_ids to a hash containing the destination id" do
           Account.site_admin.enable_feature!(:content_migration_asset_map_v2)
@@ -1024,6 +1054,23 @@ describe ContentMigrationsController, type: :request do
             migration_id(asset)
           end
           Account.site_admin.disable_feature!(:content_migration_asset_map_v2)
+        end
+
+        it "doesn't add verifiers to migration_ids hash if the file_verifiers_for_quiz_links flag is off" do
+          @dst.root_account.disable_feature!(:file_verifiers_for_quiz_links)
+          Account.site_admin.enable_feature!(:content_migration_asset_map_v2)
+          json = api_call(:get,
+                          "/api/v1/courses/#{@dst.to_param}/content_migrations/#{@migration.to_param}/asset_id_mapping",
+                          { controller: "content_migrations",
+                            action: "asset_id_mapping",
+                            format: "json",
+                            course_id: @dst.to_param,
+                            id: @migration.to_param })
+          test_asset_migration_id_mapping(json, verifiers: false) do |asset|
+            migration_id(asset)
+          end
+          Account.site_admin.disable_feature!(:content_migration_asset_map_v2)
+          @dst.root_account.enable_feature!(:file_verifiers_for_quiz_links)
         end
       end
 
@@ -1086,6 +1133,19 @@ describe ContentMigrationsController, type: :request do
                           course_id: @dst.to_param,
                           id: @migration.to_param })
         test_asset_id_mapping(json)
+      end
+
+      it "doesn't add verifiers to the asset map if the file_verifiers_for_quiz_links flag is off" do
+        @dst.root_account.disable_feature!(:file_verifiers_for_quiz_links)
+        json = api_call(:get,
+                        "/api/v1/courses/#{@dst.to_param}/content_migrations/#{@migration.to_param}/asset_id_mapping",
+                        { controller: "content_migrations",
+                          action: "asset_id_mapping",
+                          format: "json",
+                          course_id: @dst.to_param,
+                          id: @migration.to_param })
+        test_asset_id_mapping(json, verifiers: false)
+        @dst.root_account.enable_feature!(:file_verifiers_for_quiz_links)
       end
 
       context "with the :content_migration_asset_map_v2 on" do
