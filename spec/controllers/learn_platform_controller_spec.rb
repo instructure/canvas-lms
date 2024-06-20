@@ -25,13 +25,12 @@ describe LearnPlatformController do
     account_model
     default_settings = api.learnplatform.default_settings
     default_settings["base_url"] = "http://www.example.com"
-    default_settings["token"] = "ABCDEFG1234567"
+    default_settings["username"] = "user"
+    default_settings["password"] = "pass"
     PluginSetting.create!(name: api.learnplatform.id, settings: default_settings)
   end
 
   include WebMock::API
-
-  let(:account) { Account.create! }
 
   describe "index" do
     it "gets index with LearnPlatform as a source" do
@@ -58,13 +57,35 @@ describe LearnPlatformController do
                      "Content-Length" => response_fixture.size
                    })
 
-      get :index, params: { account_id: account.id }
+      get :index, params: { account_id: @account.id }
       expect(response).to have_http_status(:success)
       json = json_parse(response.body)
       expect(json["tools"]).to be_present
 
       tool = json["tools"].first
       expect(tool["name"]).to be_present
+    end
+
+    it "responds with error when LearnPlatform returns an error" do
+      response_fixture = {
+        errors: [
+          { content: "Unauthorized - must include correct username and password" }
+        ]
+      }.to_json
+      stub_request(:get, %r{api/v2/lti/tools})
+        .to_return(body: response_fixture,
+                   status: 401,
+                   headers: {
+                     "Content-Type" => "application/json",
+                     "Content-Length" => response_fixture.size
+                   })
+
+      get :index, params: { account_id: @account.id }
+      expect(response).to have_http_status(:internal_server_error)
+      json = json_parse(response.body)
+      expect(json["lp_server_error"]).to be true
+      expect(json["errors"]).to be_present
+      expect(json["errors"].first["content"]).to be_present
     end
   end
 
@@ -98,7 +119,7 @@ describe LearnPlatformController do
                      "Content-Length" => response_fixture.size
                    })
 
-      get :index_by_category, params: { account_id: account.id }
+      get :index_by_category, params: { account_id: @account.id }
       expect(response).to have_http_status(:success)
 
       json = json_parse(response.body)
@@ -108,6 +129,28 @@ describe LearnPlatformController do
       expect(category["tag_group"]).to be_present
       expect(category["tools"]).to be_present
       expect(category["tools"].length).to eq(2)
+    end
+
+    it "responds with error when LearnPlatform returns an error" do
+      response_fixture = {
+        errors: [
+          { content: "Unauthorized - must include correct username and password" }
+        ]
+      }.to_json
+      stub_request(:get, %r{api/v2/lti/tools_by_display_group})
+        .to_return(body: response_fixture,
+                   status: 401,
+                   headers: {
+                     "Content-Type" => "application/json",
+                     "Content-Length" => response_fixture.size
+                   })
+
+      get :index_by_category, params: { account_id: @account.id }
+      expect(response).to have_http_status(:internal_server_error)
+      json = json_parse(response.body)
+      expect(json["lp_server_error"]).to be true
+      expect(json["errors"]).to be_present
+      expect(json["errors"].first["content"]).to be_present
     end
   end
 
@@ -122,12 +165,34 @@ describe LearnPlatformController do
                      "Content-Length" => response_fixture.size
                    })
 
-      get :show, params: { account_id: account.id, id: 1 }
+      get :show, params: { account_id: @account.id, id: 1 }
       expect(response).to have_http_status(:success)
 
       json = json_parse(response.body)
       expect(json["id"]).to be_present
       expect(json["name"]).to be_present
+    end
+
+    it "responds with error when LearnPlatform returns an error" do
+      response_fixture = {
+        errors: [
+          { content: "Unauthorized - must include correct username and password" }
+        ]
+      }.to_json
+      stub_request(:get, %r{api/v2/lti/tools/1})
+        .to_return(body: response_fixture,
+                   status: 401,
+                   headers: {
+                     "Content-Type" => "application/json",
+                     "Content-Length" => response_fixture.size
+                   })
+
+      get :show, params: { account_id: @account.id, id: 1 }
+      expect(response).to have_http_status(:internal_server_error)
+      json = json_parse(response.body)
+      expect(json["lp_server_error"]).to be true
+      expect(json["errors"]).to be_present
+      expect(json["errors"].first["content"]).to be_present
     end
   end
 
@@ -163,12 +228,34 @@ describe LearnPlatformController do
                      "Content-Length" => response_fixture.size
                    })
 
-      get :filters, params: { account_id: account.id }
+      get :filters, params: { account_id: @account.id }
       expect(response).to have_http_status(:success)
 
       json = json_parse(response.body)
       expect(json["companies"]).to be_present
       expect(json["versions"]).to be_present
+    end
+
+    it "responds with error when LearnPlatform returns an error" do
+      response_fixture = {
+        errors: [
+          { content: "Unauthorized - must include correct username and password" }
+        ]
+      }.to_json
+      stub_request(:get, %r{api/v2/lti/filters})
+        .to_return(body: response_fixture,
+                   status: 401,
+                   headers: {
+                     "Content-Type" => "application/json",
+                     "Content-Length" => response_fixture.size
+                   })
+
+      get :filters, params: { account_id: @account.id }
+      expect(response).to have_http_status(:internal_server_error)
+      json = json_parse(response.body)
+      expect(json["lp_server_error"]).to be true
+      expect(json["errors"]).to be_present
+      expect(json["errors"].first["content"]).to be_present
     end
   end
 end

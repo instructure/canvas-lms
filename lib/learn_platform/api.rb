@@ -26,29 +26,32 @@ module LearnPlatform
     end
 
     def valid_learnplatform?
-      @learnplatform&.enabled? && !@learnplatform.settings["token"].empty?
+      @learnplatform&.enabled? && !@learnplatform.settings["username"].empty? && !@learnplatform.settings["password"].empty?
     end
 
     def fetch_learnplatform_response(endpoint, expires, params = {})
-      return {} unless valid_learnplatform?
-
       base_url = @learnplatform.settings["base_url"]
-      access_token = @learnplatform.settings["token"]
-
-      params["access_token"] = access_token
+      name = @learnplatform.settings["username"]
+      pass = @learnplatform.settings["password"]
+      authorization = "Basic #{Base64.encode64("#{name}:#{pass}")}"
 
       begin
-        cache_key = ["learnplatform", endpoint, access_token].cache_key
-        response = Rails.cache.fetch(cache_key, expires_in: expires) do
+        cache_key = ["learnplatform", endpoint, authorization, params].cache_key
+        json = Rails.cache.fetch(cache_key, expires_in: expires) do
           uri = URI.parse("#{base_url}#{endpoint}")
           uri.query = URI.encode_www_form(params)
-          CanvasHttp.get(uri.to_s).body
-        end
+          response = CanvasHttp.get(uri.to_s, { Authorization: authorization })
+          json = JSON.parse(response.body)
 
-        json = JSON.parse(response)
+          unless response.code.to_i / 100 == 2
+            json = { lp_server_error: true, code: response.code, errors: json["errors"], json: }
+          end
+          json
+        end
       rescue
         json = {}
         Rails.cache.delete cache_key
+        raise
       end
 
       json

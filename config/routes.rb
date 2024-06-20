@@ -2305,7 +2305,7 @@ CanvasRails::Application.routes.draw do
       get  "#{prefix}/products", action: :index
       get  "#{prefix}/products_categories", action: :index_by_category
       get  "#{prefix}/products/:id", action: :show
-      get  "#{prefix}/products/filters", action: :filters
+      get  "#{prefix}/filters", action: :filters
     end
 
     scope(controller: :feature_flags) do
