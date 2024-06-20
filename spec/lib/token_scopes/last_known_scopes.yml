@@ -2224,4 +2224,4 @@
 - verb: GET
   path: /api/v1/accounts/:account_id/learn_platform/products/:id
 - verb: GET
-  path: /api/v1/accounts/:account_id/learn_platform/products/filters
+  path: /api/v1/accounts/:account_id/learn_platform/filters

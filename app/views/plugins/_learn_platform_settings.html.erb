@@ -32,9 +32,15 @@
       </td>
     </tr>
     <tr>
-      <td><%= f.blabel :token, :en => "Access Token" %></td>
+      <td><%= f.blabel :username, :en => "Username" %></td>
       <td>
-        <%= f.password_field :token, autocomplete: false %>
+        <%= f.password_field :username, autocomplete: false %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :password, :en => "Password" %></td>
+      <td>
+        <%= f.password_field :password, autocomplete: false %>
       </td>
     </tr>
   </table>

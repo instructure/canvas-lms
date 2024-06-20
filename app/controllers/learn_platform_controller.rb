@@ -31,22 +31,34 @@ class LearnPlatformController < ApplicationController
       filters: params[:filters]
     }
 
-    response = learnplatform_api.products(options) || {}
+    response = learnplatform_api.products(options)
+
+    return render json: response, status: :internal_server_error if response.key?(:lp_server_error)
+
     render json: response
   end
 
   def index_by_category
-    response = learnplatform_api.products_by_category || {}
+    response = learnplatform_api.products_by_category
+
+    return render json: response, status: :internal_server_error if response.key?(:lp_server_error)
+
     render json: response
   end
 
   def show
-    response = learnplatform_api.product(params[:id]) || {}
+    response = learnplatform_api.product(params[:id])
+
+    return render json: response, status: :internal_server_error if response.key?(:lp_server_error)
+
     render json: response
   end
 
   def filters
-    response = learnplatform_api.product_filters || {}
+    response = learnplatform_api.product_filters
+
+    return render json: response, status: :internal_server_error if response.key?(:lp_server_error)
+
     render json: response
   end
 end
