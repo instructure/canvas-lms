@@ -49,4 +49,21 @@ describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter do
     expect(indexes.select(&:unique)).to_not eq([])
     expect(indexes.reject(&:unique)).to_not eq([])
   end
+
+  it "can handle an array of hosts, falling back to a successful connection" do
+    db_config = ActiveRecord::Base.connection_pool.db_config
+    config = db_config.configuration_hash.dup
+    # host might be nil on purpose so can't use Array(), but it might also be an array,
+    # so we need to flatten
+    config[:host] = (["nonexistent"] + [config[:host]]).flatten
+    db_config = ActiveRecord::DatabaseConfigurations::HashConfig.new(db_config.env_name, db_config.name, config)
+    conn = if $canvas_rails == "7.2"
+             db_config.new_connection
+           else
+             ActiveRecord::Base.public_send(db_config.adapter_method, db_config.configuration_hash)
+           end
+    conn.execute("SELECT 1")
+  ensure
+    conn&.disconnect!
+  end
 end
