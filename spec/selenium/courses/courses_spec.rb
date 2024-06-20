@@ -47,7 +47,7 @@ describe "courses" do
         wait_for(method: nil, timeout: 5) do
           assert_flash_notice_message("successfully updated")
         end
-        expect(unpublish_btn).to have_class("disabled")
+        expect(unpublish_btn).to have_attribute("aria-disabled", "true")
       end
 
       it "loads the users page using ajax", custom_timeout: 30 do

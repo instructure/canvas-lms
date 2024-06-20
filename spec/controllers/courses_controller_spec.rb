@@ -2238,6 +2238,24 @@ describe CoursesController do
       end
     end
 
+    context "COURSE.is_published" do
+      before do
+        user_session(@teacher)
+      end
+
+      it "is set to true if the course is published" do
+        get "show", params: { id: @course.id }
+        expect(controller.js_env[:COURSE][:is_published]).to be(true)
+      end
+
+      it "is set to false if the course is not published" do
+        @course.workflow_state = "claimed"
+        @course.save!
+        get "show", params: { id: @course.id }
+        expect(controller.js_env[:COURSE][:is_published]).to be(false)
+      end
+    end
+
     context "when logged in as an observer with multiple student associations" do
       before do
         @student2 = User.create!
