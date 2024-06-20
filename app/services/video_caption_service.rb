@@ -36,19 +36,15 @@ class VideoCaptionService < ApplicationService
     @media_id = handoff
     return update_status(:failed_handoff) unless @media_id
 
-    # tell Notorious to start generating captions -- must be complete with handoff first
-    captions_request_successful = poll_for_caption_request
-    return update_status(:failed_request) unless captions_request_successful
+    if @skip_polling
+      # tell Notorious to start generating captions -- must be complete with handoff first
+      request_caption_response = request_caption
+      return update_status(:failed_request) unless (200..299).cover?(request_caption_response.code)
 
-    # check if captions are available and what language was detected by whisper
-    @srclang = poll_for_captions_ready
-    return update_status(:failed_captions) unless @srclang
-
-    # grab the captions once they're ready
-    captions = grab_captions
-
-    # create media_track with the caption
-    save_media_track(captions)
+      process_captions_ready
+    else
+      delay.poll_caption_request
+    end
   end
 
   private
@@ -58,14 +54,15 @@ class VideoCaptionService < ApplicationService
     return false unless auth_token.present?
     return false unless @type.include?("video")
     return false unless @media_id
+    return false if @media_object.media_tracks.where(kind: "subtitles").exists?
     return false if url.nil?
 
     true
   end
 
-  def save_media_track(content)
+  def save_media_track(content, srclang)
     if content.present?
-      @media_object.media_tracks.first_or_create(user: @media_object.user, locale: @srclang, kind: "subtitles", content:)
+      @media_object.media_tracks.first_or_create(user: @media_object.user, locale: srclang, kind: "subtitles", content:)
       update_status(:complete)
     else
       update_status(:failed_to_pull)
@@ -77,44 +74,8 @@ class VideoCaptionService < ApplicationService
     response&.dig("media", "id")
   end
 
-  def poll_for_caption_request
-    if @skip_polling
-      return request_caption
-    end
-
-    10.times do |i|
-      response = request_caption
-      if (200..299).cover?(response.code)
-        return response
-      end
-
-      sleep(1.minute * (i + 1))
-    end
-    nil
-  end
-
-  def poll_for_captions_ready
-    if @skip_polling
-      response = media
-      return response.dig("media", "captions", 0, "language")
-    end
-
-    10.times do |i|
-      response = media
-      if response.dig("media", "captions", 0, "language") && response.dig("media", "captions", 0, "status") == "succeeded"
-        src_lang = response.dig("media", "captions", 0, "language")
-        # dont' proceed if the language is not detected as English
-        src_lang = nil unless src_lang.start_with?("en")
-        return src_lang
-      end
-
-      sleep(1.minute * (i + 1))
-    end
-    nil
-  end
-
-  def grab_captions
-    response = collect_captions
+  def grab_captions(srclang)
+    response = collect_captions(srclang)
     if (200..299).cover?(response.code)
       return response.body
     end
@@ -144,8 +105,8 @@ class VideoCaptionService < ApplicationService
     "#{notorious_host}/api/media/#{@media_id}"
   end
 
-  def caption_collect_url
-    "#{notorious_host}/api/media/#{@media_id}/captions/#{@srclang}?provider=whisper"
+  def caption_collect_url(srclang)
+    "#{notorious_host}/api/media/#{@media_id}/captions/#{srclang}?provider=whisper"
   end
 
   def notorious_host
@@ -172,8 +133,8 @@ class VideoCaptionService < ApplicationService
     HTTParty.get(media_url, headers: request_headers)
   end
 
-  def collect_captions
-    HTTParty.get(caption_collect_url, headers: request_headers)
+  def collect_captions(srclang)
+    HTTParty.get(caption_collect_url(srclang), headers: request_headers)
   end
 
   def config
@@ -181,6 +142,48 @@ class VideoCaptionService < ApplicationService
   end
 
   def update_status(status)
-    @media_object.update_attribute(:auto_caption_status, MediaObject::AUTO_CAPTION_STATUSES[status])
+    @media_object.update_attribute(:auto_caption_status, status)
+  end
+
+  def process_captions_ready
+    response = media
+    if response.dig("media", "captions", 0, "language") && response.dig("media", "captions", 0, "status") == "succeeded"
+      srclang = response.dig("media", "captions", 0, "language")
+      srclang = nil unless srclang.start_with?("en")
+      return update_status(:non_english_captions) unless srclang
+
+      save_media_track(grab_captions(srclang), srclang)
+    else
+      update_status(:failed_captions)
+    end
+  end
+
+  def poll_caption_request(attempts = 1)
+    response = request_caption
+    if (200..299).cover?(response.code)
+      PollCaptionsReadyJob.delay.perform(self)
+    elsif attempts < 10
+      delay.poll_caption_request(attempts + 1)
+    else
+      update_status(:failed_request)
+    end
+  end
+
+  def poll_captions_ready(attempts = 1)
+    response = media
+    response_succeeded = response.dig("media", "captions", 0, "status") == "succeeded"
+    language_detected = response.dig("media", "captions", 0, "language")
+
+    if response_succeeded && language_detected
+      if language_detected.start_with?("en")
+        save_media_track(grab_captions(language_detected), language_detected)
+      else
+        update_status(:non_english_captions)
+      end
+    elsif attempts < 10
+      delay.poll_captions_ready(attempts + 1)
+    else
+      update_status(:failed_captions)
+    end
   end
 end
