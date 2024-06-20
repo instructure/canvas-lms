@@ -2426,11 +2426,7 @@ class Course < ActiveRecord::Base
   def score_to_grade(score, user: nil)
     return nil unless (grading_standard_enabled? || restrict_quantitative_data?(user)) && score
 
-    if default_grading_standard
-      default_grading_standard.score_to_grade(score)
-    else
-      GradingStandard.default_instance.score_to_grade(score)
-    end
+    grading_standard_or_default.score_to_grade(score)
   end
 
   def active_course_level_observers

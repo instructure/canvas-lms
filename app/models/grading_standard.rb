@@ -192,6 +192,7 @@ class GradingStandard < ActiveRecord::Base
   # e.g. convert 89.7 to B+
   def score_to_grade(score)
     score = 0 if score < 0
+    score = scale_score(score) if points_based?
     # assign the highest grade whose min cutoff is less than the score
     # if score is less than all scheme cutoffs, assign the lowest grade
     if points_based
@@ -376,6 +377,14 @@ class GradingStandard < ActiveRecord::Base
   end
 
   private
+
+  def scale_score(score)
+    return score if scaling_factor == 100 || scaling_factor <= 0
+
+    scaled = score.to_d / (100 / scaling_factor)
+    rounded = scaled.round(2)
+    (rounded / scaling_factor) * 100
+  end
 
   def minus_grade?(grade)
     !!grade && /.+−$/.match?(grade)
