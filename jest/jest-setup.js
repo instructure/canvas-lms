@@ -64,8 +64,11 @@ const ignoredWarnings = [
 
 global.console = {
   log: console.log,
-  error: error => {
-    if (ignoredErrors.some(regex => regex.test(error))) {
+  error: (error, ...rest) => {
+    if (
+      ignoredErrors.some(regex => regex.test(error)) ||
+      ignoredErrors.some(regex => regex.test(rest))
+    ) {
       return
     }
     globalError(error)
@@ -209,7 +212,11 @@ if (!('scrollIntoView' in window.HTMLElement.prototype)) {
 }
 
 // Suppress errors for APIs that exist in JSDOM but aren't implemented
-Object.defineProperty(window, 'scrollTo', {configurable: true, writable: true, value: () => {}})
+Object.defineProperty(window, 'scrollTo', {
+  configurable: true,
+  writable: true,
+  value: () => {},
+})
 
 const locationProperties = Object.getOwnPropertyDescriptors(window.location)
 Object.defineProperty(window, 'location', {
