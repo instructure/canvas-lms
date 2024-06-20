@@ -1176,7 +1176,9 @@ class CoursesController < ApplicationController
         if includes.include?("enrollments")
           enrollment_scope = @context.enrollments
                                      .where(user_id: users)
-                                     .preload(:course, :scores)
+                                     .preload(:course, :scores, :course_section)
+                                     .joins(:course_section)
+                                     .order("course_sections.name")
 
           enrollment_scope = if search_params[:enrollment_state]
                                enrollment_scope.where(workflow_state: search_params[:enrollment_state])
