@@ -437,6 +437,13 @@ module Lti::IMS
             expect(subject.find { |p| p[:placement] == "course_navigation" }).to eq(canvas_placement_hash.merge(placement: "course_navigation", default: "disabled", selection_width: 200, selection_height: 300))
             expect(subject.count { |p| p[:default] == "disabled" }).to be(1)
           end
+
+          it "prefers the default_enabled value from the overlay" do
+            lti_tool_configuration[:messages].first[Registration::COURSE_NAV_DEFAULT_ENABLED_EXTENSION] = true
+            registration.registration_overlay["placements"] = [{ "type" => "course_navigation", "default" => "disabled" }]
+
+            expect(subject.find { |p| p[:placement] == "course_navigation" }[:default]).to eq("disabled")
+          end
         end
       end
 
