@@ -5835,6 +5835,7 @@ nn:
   canvas_course_tutorial_video_5205c1c1: "Opplæringsvideo for Canvasemne"
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Canvas sine dashbord-lenker navigerer til dashbordet for katalogen"
   canvas_default_7f81a6b8: "Canvas standard"
+  canvas_default_grading_scheme_c7b0ee2: "Canvas standard vurderingsskjema"
   canvas_demo_7a005cf3: Canvasdemo
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas kjenner ikkje att identitetsleverandøren din"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas har ingen konto for brukar: %{user}"
@@ -5895,9 +5896,12 @@ nn:
   cas_server_rejected_ticket_message_code_a6ef4093: "CAS-server forkasta informasjonen: %{message} (%{code})"
   cas_url_4ba2843e: CAS-URL
   catalan_16f6b78f: Katalansk
+  catalog_account_not_found_c786ce35: "Katalogkonto ikkje funne"
+  catalog_account_to_copy_fa180ff4: "Katalogkonto å kopiere"
   catalog_already_enabled_56478a3c: "Katalog er allereie aktivert"
   catalog_manage_f57e50f3: "Katalog - administrer"
   catalog_name_46d37909: Katalognamn
+  catalog_settings_already_exist_515f0f7d: "Kataloginnstillingar finst allereie"
   catalog_settings_deleted_a868698b: "Innstillinger for katalog sletta."
   catalog_url_a01655dd: Katalog-URL
   catalog_users_already_exist_2894b8c4: "Katalogbrukarar finst allereie"
@@ -6111,6 +6115,8 @@ nn:
   client_id_is_required_1afd54d1: "Klient-ID er obligatorisk"
   clone_group_set_c2a40e15: "Klon gruppesett"
   clone_groupcategoryname_ef85ddb8: "(Klon) %{groupCategoryName}"
+  cloning_alignments_of_original_assignment_name_2fc7dae2: "Dupliserer justeringar av \"%{original_assignment_name}\""
+  cloning_alignments_of_originalassignmentname_deafb852: "Dupliserrer justeringar av \"%{originalAssignmentName}\""
   cloning_group_set_813b06f5: "Klonar gruppesett"
   close_17f50799: lukk
   close_and_return_to_canvas_80544344: "Lukk og returner til Canvas"
@@ -6123,6 +6129,7 @@ nn:
   close_for_comments_37783f56: "Steng for kommentarar"
   close_for_comments_ce0e5d00: "Stengt for kommentarar"
   close_grade_info_58ef5a20: "Lukk vurderingsinformasjon"
+  close_help_dialog_653a6549: "Lukk hjelpemeny"
   close_move_tray_8609e988: "lukk flyttmeny"
   close_opportunity_center_popup_9907d981: "Lukk popup-menyen med val"
   close_sidebar_10b0fbb4: "Lukk sidestolpe"
@@ -7554,6 +7561,7 @@ nn:
   couldn_t_find_valid_settings_for_this_link_resourc_24bd1e7a: "Kunne ikkje finne gyldige innstillingar for denne koplinga: Ressurslenke ikkje funne"
   couldn_t_generate_diff_message_a0528b20: "Kan ikkje generere diff: %{message}"
   couldn_t_load_course_options_7cb4716c: "Kunne ikkje laste emneval"
+  couldn_t_load_folder_options_cdf418f3: "Kunne ikkje laste mappeval"
   couldn_t_load_migrators_a399c113: "Kunne ikkje laste migratorar"
   couldn_t_update_content_migrations_68777765: "Kunne ikkje oppdatere innhaldsmigrasjonar"
   couldn_t_update_standards_for_authority_auth_81206187: "Kan ikkje oppdatere standardar for autoriteten %{auth}"
@@ -8791,6 +8799,7 @@ nn:
   create_account_263ec6: "Opprett konto"
   create_an_ba36d171: "Opprett ein"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Opprett og administrer online quizar og undersøkingar, både vurderte og ikkje-vurderte. "
+  create_and_edit_scores_4177662c: "Opprett og endre resultat"
   create_announcement_7ebf0845: "Opprett kunngjering"
   create_announcements_above_1c36202b: "Opprett kunngjeringar over"
   create_anonymous_discussion_topics_d573e88e: "Opprett anonyme diskusjonsemne"
@@ -8829,9 +8838,11 @@ nn:
   create_groups_later_6ce36058: "Opprett grupper seinare"
   create_groups_now_d59bf70b: "Opprett grupper no"
   create_interactive_course_content_76665336: "Lag interaktivt emneinnhald"
+  create_live_events_subscriptions_9c7f53cc: "Opprett abonnement for direktesendingar"
   create_lookup_7ceb6d90: "Lag oppslag"
   create_new_assignment_d77dfc4: "Opprett ny oppgåve"
   create_new_attempt_19c96c03: "Opprett nytt forsøk"
+  create_new_calendar_event_f933f209: "Opprett ny kalenderhending"
   create_new_course_e3ef9cd0: "Opprett nytt emne"
   create_new_criterion_1a4efd4: "Opprett nytt kriterium"
   create_new_discussions_6ab69da2: "Opprett nye diskusjonar"
@@ -9193,6 +9204,7 @@ nn:
   date_4e62ac59: dato
   date_adjustments_331bb009: Datojustering
   date_at_time_25a04cd2: "%{date} %{time}"
+  date_cannot_be_empty_1e8daeb7: "Dato kan ikkje stå tom"
   date_created_87e265bc: "Dato oppretta"
   date_created_createdat_265a0dfa: "dato oppretta: %{createdAt}"
   date_ee500367: Dato
@@ -9540,6 +9552,7 @@ nn:
   designers_add_fe7e1ea9: "Designarar - Legg til"
   designers_remove_39f50ec9: "Designarar - fjern"
   designers_remove_3e590bff: "Designarar - Fjern"
+  destination_account_not_found_274f33d4: "Mottakarkonto ikkje funne"
   details_98a31b68: Detaljar
   details_a6f427c3: "Detaljar:"
   determined_by_course_end_date_5e3ffb4f: "Fastsatt av emnets sluttdato"
@@ -10085,6 +10098,7 @@ nn:
   display_as_e2a5c383: "Vis som"
   display_as_percentage_3e755dc: "Vis som prosent"
   display_as_points_63084235: "Vis som poeng"
+  display_course_calculation_options_11890a89: "Vis val for emneberekningar"
   display_course_catalog: "Vis ei søkeliste med emne for denne rotkontoen med \"Inkluder dette emnet i offentleg emneliste\" aktivert."
   display_e6546241: Vis
   display_grade_as_7b5376a6: "Vis vurderingsresultat som"
@@ -10168,6 +10182,7 @@ nn:
   don_t_move_lti_query_params_to_post_body_5c80e037: "Ikkje flytt LTI-spørjeparametrar til POST-meldingstekst"
   don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: "Ikkje post resultat av læringsmål til vurderingsoversikta for meistringslæring"
   don_t_show_again_8c7b7297: "Ikkje vis igjen"
+  don_t_show_this_again_2c3ba281: "Ikkje vis dette igjen"
   done_54e3d4b6: Fullført
   done_8af51c9b: Fullført.
   done_editing_9f7379d9: "Redigering fullført"
@@ -10717,6 +10732,7 @@ nn:
   enter_a_course_to_narrow_results_e992f93: "Skriv eit emne for å snevre inn søkeresultatet"
   enter_a_filename_for_the_photo_4f0fc10e: "Sett inn filnavn for bildet"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Oppgi ei hex-kode slik at du kan bruke eigendefinert farge."
+  enter_a_letter_grade_536a8cef: "Skriv inn bokstavkarakter"
   enter_a_score_to_test_c6f89f4a: "Oppgi eit resultat du vil teste"
   enter_a_student_pairing_code_below_to_add_a_studen_15789251: "Skriv inn ein paringskode under for å leggje til ein student å observere"
   enter_a_valid_date_46d77547: "Legg inn ein gyldig dato"
@@ -13656,6 +13672,7 @@ nn:
   i_cb2f5130: i
   i_have_obtained_permission_to_use_this_file_6386f087: "Eg har løyve til å bruke denne fila"
   i_hold_the_copyright_71ee91b1: "Eg er rettshavar"
+  i_like_this_result_100bc747: "Eg liker dette resultatet"
   i_ll_write_free_form_comments_when_assessing_stude_5cf50d06: "Eg skriv kommentarar i fritekst når eg vurderer studentane"
   i_need_some_help_but_it_is_not_urgent_d967ea0a: "Eg treng hjelp, men det er ikkje akutt"
   i_understand_5c85e920: "Eg forstår"
@@ -14888,6 +14905,7 @@ nn:
   list_expanded_efec2d0: "Liste er utvida."
   list_external_tools_ac2aaf90: "Vis eksterne verktøy"
   list_feature_flags_6be9c646: "Vis funksjonsflagg"
+  list_live_events_subscriptions_55ba2893: "Vis liste over abonnement for direktesendingar"
   list_of_pseudonyms_to_get_report_for_af38e1c6: "Rapport hentar liste over pseudonymer"
   list_of_students_and_observers_f7f1a58a: "Liste over studentar og observatørar"
   list_of_the_currently_attainable_trophies_959b2518: "Liste over tilgjengelege trofé"
@@ -15230,6 +15248,7 @@ nn:
   lti_delete_ee5f1bef: "LTI - slett"
   lti_dynamic_registration_8592edb0: "LTI dynamisk registrering"
   lti_edit_83a27850: "LTI - rediger"
+  lti_extensions_discover_page_93e4d9e0: "Utforsk-side for LTI-utvidingar"
   lti_extensions_page_4269b418: "Side for LTI-utvidingar"
   lti_key_14ad02b1: LTI-nøkkel
   lti_keys_5677ba9e: LTI-nøklar
@@ -15283,6 +15302,7 @@ nn:
   maltese_916925e8: Maltesisk
   manage_a_library_of_custom_icons_from_the_rce_fff6fe2e: "Administrer eit bibliotek av tilpassa ikonar frå editoren"
   manage_access_bd923d8d: "Administrer tilgang"
+  manage_access_token_edceae1: "Administrer tilgangstoken"
   manage_account_calendars_89dce020: "Administrer kontokalendrar"
   manage_account_level_course_actions_1a9d2385: "Administrer emneaktivitetar på kontonivå"
   manage_add_edit_delete_18963dbc: "Administrer (legg til / rediger / slett)"
@@ -19877,6 +19897,7 @@ nn:
   points_possible_1c0b3445: "Moglege poeng"
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points} / %{possible}"
+  points_possible_additional_replies_d84680b8: "Mogelege poeng: Ekstra svar"
   points_possible_e57d5613: "Moglege poeng"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Moglege poeng må vere 0 eller meir for valde typar karaktersetjing"
   points_possible_points_fda3b111: "%{points_possible} poeng"
@@ -20322,6 +20343,7 @@ nn:
   profile_6bd2baed: Profil
   profile_photo_save_failed_too_many_times_e1ebda5: "Lagring av profilbilde har mislukkast for mange gonger"
   profile_pictures_15953851: Profilbilde
+  profile_save_was_unsuccessful_6e27fb5e: "Lagring av profil mislukkast"
   profile_tray_bcec5044: Profilmeny
   profiles: 
     avatar_dialog: 
@@ -22082,6 +22104,7 @@ nn:
   remove_avatar_picture_aba765eb: "Fjern avatarbilde"
   remove_c_name_section_d8eabd3a: "Fjern klassa %{c.name}"
   remove_card_51785acc: "Fjern kort"
+  remove_card_for_pilla_c22d7423: "Fjern kort for %{pillA}"
   remove_certificate_4e979eee: "Fjern sertifikat"
   remove_collaborationtitle_c3e81adb: "Fjern \"%{collaborationTitle}\"?"
   remove_condition_9cf94f7f: "Fjern krav"
@@ -22214,6 +22237,7 @@ nn:
   reply_to_this_message_in_canvas_7ec72dce: "svar på denne meldinga i Canvas."
   reply_to_title_f227303f: "Svar til %{title}"
   reply_to_topic_12412b0f: "Svar til emne"
+  reply_to_topic_eb374959: "Svar til emne"
   replycount_replies_2775aca1: 
     one: "%{replyCount}svar"
     other: "%{replyCount} svar"
@@ -22284,6 +22308,7 @@ nn:
   required_peer_review_index_b186729c: "Påkrevd fagfellevurdering %{index}"
   required_peer_reviews_23bea465: "Fagfellevurderingar påkrevd"
   required_replies_8ec3e238: "Svar påkrevd"
+  required_replies_requiredreplies_d91bed30: "Naudsynte svar (%{requiredReplies})"
   required_to_view_quiz_results_dba7368b: "Nødvendig for å vise quizresultat"
   required_values_1eb5841f: "Etterspurde verdiar"
   requirement_f5b75da1: Krav
@@ -22299,6 +22324,8 @@ nn:
   reset_95a81614: TIlbakestill
   reset_all_6e5e040a: "Tilbakestill alt"
   reset_all_unpublished_changes_243f179f: "Tilbakestill alle upubliserte endringar?"
+  reset_available_from_102b946: "Tilbakestilling tilgjengeleg frå"
+  reset_available_until_db5b42d6: "Tilbakestilling tilgjengeleg til"
   reset_courses_fe29ddf9: "Tilbakestill emne"
   reset_multi_factor_authentication_2b63a558: "Tilbakestill godkjenning med fleire faktorar"
   reset_name_6a0aa0f: "Tilbakestill \"%{name}\""
@@ -22581,6 +22608,7 @@ nn:
     unknown_user: "Ukjend brukar"
   rubric_assessment_5f0e8a83: Vurderingsskjemavurdering
   rubric_assessment_tray_df17d20b: "Many for vurderingsskjema-vurdering"
+  rubric_assessment_view_mode_1038db: "Visningsmodus for vurderingsskjema-vurdering"
   rubric_association: 
     no_details: "Ingen detaljar"
   rubric_created_64980593: "Vurderingsskjema er oppretta"
@@ -22593,6 +22621,9 @@ nn:
   rubric_fc39da76: Vurderingsskjema
   rubric_name_e11b76de: "Namn på vurderingsskjema"
   rubric_options_c92d7130: "Alternativ for vurderingsskjema"
+  rubric_read_states_changed_4e4959a5: 
+    one: "Lesestatus for vurderingsskjema endra!"
+    other: "Lesestatusar for vurderingsskjema endra!"
   rubric_saved_successfully_e6373e24: "Lagring av vurderingsskjema vellukka"
   rubric_un_archived_successfully_68655423: "Vellukka henting av vurderingsskjema frå arkiv"
   rubric_updated_103e24dc: "Vurderingsskjema er oppretta"
@@ -23095,6 +23126,7 @@ nn:
   select_a_date_optional_d60168d0: "Vel ein dato (valfri)"
   select_a_grading_period_5ea50f1: "Vel ei karaktersetjingsperiode..."
   select_a_grading_period_aab25483: "Vel ei karaktersetjingsperiode"
+  select_a_grading_scheme_1a21b2e8: "Vel vurderingsskjema"
   select_a_group_category_295f7a34: "Vel ein gruppekategori"
   select_a_group_to_reveal_outcomes_here_91883028: "Vel ei gruppe for å sjå læringsmål her"
   select_a_homeroom_bd9ec5d5: "Vel ei heimeside"
@@ -23112,6 +23144,7 @@ nn:
   select_a_student_to_view_281d17b9: "Vel ein student du vil sjå på"
   select_a_student_to_view_additional_information_he_c371e40c: "Vel ein student for å sjå meir informasjon."
   select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: "Vel ein student for å sjå. Sida vil oppdaterast automatisk."
+  select_a_template_account_e0c03ee8: "Vel malkonto"
   select_a_type_to_restore_de2c0d04: "Vel ein type å gjenopprette"
   select_all_assignments_bd07b919: "Vel alle oppgåver"
   select_all_count_courses_4fc63811: 
@@ -24307,6 +24340,7 @@ nn:
   sign_up_dafdee18: "Meld deg på"
   signature_8d0141c8: Signatur
   signature_af6ce34e: Signatur*
+  signature_cannot_be_empty_cf8e46d5: "Signatur kan ikkje stå tom"
   signature_off_2662bc87: "Signatur av"
   signature_on_27323234: "Signatur på"
   signature_on_off_2ed1cad1: "Signatur På/Av"
@@ -24966,6 +25000,7 @@ nn:
   subject_114b2e98: Tittel
   subject_1bc03dea: "Meldingstittel:"
   subject_6772d8e: Emne*
+  subject_cannot_be_empty_962955ac: "Emne kan ikkje stå tom"
   subject_details_12405b1: Emnedetaljar
   subject_home_8e593f72: "Emne Heim"
   subject_home_page_41226803: "Emnet si heimeside"
@@ -25452,6 +25487,7 @@ nn:
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Forklar oss korleis og når du vil motta meldingar om hendingar i Canvas."
   tempe_grade_export_c611da01: "Tempe vurderingseksport"
   template_account_21ac8f4f: Malkonto
+  template_account_not_found_7144542c: "Malkonto ikkje funne"
   templates_4ca13d07: Malar
   temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Midlertidig melde ein brukar på i eitt emne. Denne midlertidige påmeldinga er tilknytta ei anna påmelding i emnet."
   temporary_9c54e959: "Midlertidig:"
@@ -27090,6 +27126,7 @@ nn:
   tool_supports_deep_linking_at_this_placement_561e1874: "Verktøyet støttar dyplenking frå denne plasseringa"
   tool_toolname_found_for_client_id_clientid_would_y_13f35b91: "Fann verktøy \"%{toolName}\" for klient-ID %{clientId}. Vil du installere det?"
   tool_type_afa58fcb: "Type verktøy"
+  tool_type_tool_configured_tool_id_251c2959: "Verktøytype (verktøy-konfigurert \"tool_id\")"
   toolname_logo_6b639926: "%{toolName} Logo"
   tooltips: 
     finished: fullført
@@ -27109,9 +27146,12 @@ nn:
   total_activity_21022e7c: "Total aktivitet"
   total_column_options_4e6a6032: "Kolonnealternativ totalt"
   total_grade_b0c33841: "Total: %{grade}"
+  total_grade_higher_than_4c546517: "Total vurdering høgare enn"
+  total_grade_lower_than_98891fe4: "Total vurdering lågare enn"
   total_messages_af025be6: "Meldingar totalt"
   total_options_351e2682: "Alle alternativ"
   total_points_44d76792: Totalpoeng
+  total_points_possible_totalpoints_afe246a1: "Mogelege poeng totalt: %{totalPoints}"
   total_points_total_f41b2cff: "Totalresultat: %{total}"
   total_points_total_out_of_possible_9056fdb4: "Totalresultat: %{total} av %{possible}"
   total_range_45c8549a: "Totalt spenn"
@@ -27511,6 +27551,7 @@ nn:
   update_important_info_bcc01d6a: "Oppdater viktig info"
   update_inbox_page_to_use_react_instui_4d343fd: "Oppdater Meldingar til å bruke react/instui"
   update_link_b7cab181: "Oppdater lenke"
+  update_live_events_subscriptions_e9c618b0: "Oppdater abonnement for direktehendingar"
   update_module_b984c2e5: "Oppdater modul"
   update_name_6581781d: "Oppdater %{name}"
   update_pages_c91d7ba: "Oppdater sider"
@@ -27693,6 +27734,7 @@ nn:
   user_fields_included_dd0fd52: "Brukarfelt inkludert:"
   user_files_78e21703: Brukarfiler
   user_found_ef98a328: "Brukar funnen"
+  user_found_not_deleted_d7ea6da2: "Brukar funne (ikkje sletta)"
   user_groups_query_error_bba6a6b7: "Brukargruppe spørjefeil"
   user_id_8256faeb: user_id
   user_id_b5bcb066: "Brukar-ID:"
