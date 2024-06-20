@@ -23,14 +23,14 @@ export type Card = {
   id: string
   href: string
   links: any
-  term: string
+  term: string | null
   assetString: string
   color: string
   image: string
   isFavorited: boolean
   enrollmentType: string
   enrollmentState: string
-  observee: string
+  observee: string | null
   position: number
   published: boolean
   canChangeCoursePublishState: boolean
@@ -39,4 +39,16 @@ export type Card = {
   frontPageTitle: string
   isK5Subject: boolean
   isHomeroom: boolean
+}
+
+export type ActivityStreamSummary = {
+  id: string
+  summary: StreamSummaryItem[]
+}
+
+export type StreamSummaryItem = {
+  count: number
+  notificationCategory: string | null
+  type: string
+  unreadCount: number
 }

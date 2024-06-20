@@ -18,6 +18,7 @@
 
 import gql from 'graphql-tag'
 import {CourseDashboardCard} from './CourseDashboardCard'
+import {ActivityStreamSummary} from './ActivityStream'
 
 const dashcard_query_enabled = !!ENV?.FEATURES?.dashboard_graphql_integration
 
@@ -37,4 +38,22 @@ export const LOAD_DASHBOARD_CARDS_QUERY = gql`
     }
   }
   ${CourseDashboardCard.fragment}
+`
+
+export const DASHBOARD_ACTIVITY_STREAM_SUMMARY_QUERY = gql`
+  query GetDashboardActivityStreamSummary($userID: ID!) {
+    legacyNode(_id: $userID, type: User) {
+      ... on User {
+        favoriteCoursesConnection {
+          nodes {
+            _id
+            activityStream {
+              ...ActivityStreamSummary @include(if: ${dashcard_query_enabled})
+            }
+          }
+        }
+      }
+    }
+  }
+  ${ActivityStreamSummary.fragment}
 `
