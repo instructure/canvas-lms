@@ -74,6 +74,8 @@ describe CC::CCHelper do
                                                                                       },
                                                                                     ])
       allow(@kaltura).to receive(:flavorAssetGetOriginalAsset).and_return(@kaltura.flavorAssetGetByEntryId("abcde").first)
+      allow(CanvasKaltura::ClientV3).to receive_messages(new: @kaltura)
+      allow(@kaltura).to receive_messages(media_sources: {})
     end
 
     shared_examples "media_attachments_iframes examples" do
@@ -210,7 +212,7 @@ describe CC::CCHelper do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
       translated = @exporter.html_content(html)
-      expect(translated).to include %(src="$IMS-CC-FILEBASE$/media_objects/abcde.mp4")
+      expect(translated).to include %(src="$IMS-CC-FILEBASE$/Uploaded Media/some_media.mp4")
     end
 
     it "leaves sources unchanged for media iframes with unknown media id" do

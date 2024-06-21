@@ -365,10 +365,13 @@ module AttachmentFu # :nodoc:
         # a new unique filename for this file so any children of this attachment
         # will still be able to get at the original.
         unless new_record?
+          # if the file doesn't have a filename for some reason, it often pulls from the root attachment
+          # but if you remove the root attachment, you lose the filename, so we're saving it first
+          orig_filename = filename
           self.root_attachment = nil
           self.root_attachment_id = nil
           self.workflow_state = nil
-          self.filename = filename.sub(/\A\d+_\d+__/, "")
+          self.filename = orig_filename.sub(/\A\d+_\d+__/, "")
           self.filename = "#{Time.now.to_i}_#{rand(999)}__#{filename}" if filename
         end
         unless attachment_options[:skip_sis]
