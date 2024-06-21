@@ -24,7 +24,7 @@
 #    send messages to the embedding (trusted) tool (usually set in js_env to
 #    the value of parent_frame_origin)
 # 2. Add the embedding tool's host to the Content-Security-Policy (CSP)
-#    header's frame-ancestor directive to allow the page to me loaded in an
+#    header's frame-ancestor directive to allow the page to be loaded in an
 #    iframe embedded in the embedding tool. For this, call
 #    set_extra_csp_frame_ancestor!
 module Lti::Concerns

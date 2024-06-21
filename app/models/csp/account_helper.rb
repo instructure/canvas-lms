@@ -129,6 +129,7 @@ module Csp::AccountHelper
     domains += Setting.get("csp.global_whitelist", "").split(",").map(&:strip)
     domains += cached_tool_domains if include_tools
     domains += csp_files_domains(request) if include_files
+    domains += csp_dynamic_registration_domain(request)
     domains.compact.uniq.sort
   end
 
@@ -200,5 +201,14 @@ module Csp::AccountHelper
 
   def csp_logging_config
     @config ||= Rails.application.credentials.csp_logging || {}
+  end
+
+  private
+
+  def csp_dynamic_registration_domain(request)
+    return [] unless request.respond_to?(:env)
+    return [] unless request.env&.[]("dynamic_reg_url_csp")
+
+    [URI.parse(request.env["dynamic_reg_url_csp"]).host]
   end
 end

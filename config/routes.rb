@@ -2862,6 +2862,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/registration_token", action: :registration_token
       get "accounts/:account_id/registrations/uuid/:registration_uuid", action: :registration_by_uuid
       put "accounts/:account_id/registrations/:registration_id/overlay", action: :update_registration_overlay
+      get "accounts/:account_id/dr_iframe", action: :dr_iframe
       get "registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config
       post "registrations", action: :create, as: :create_lti_registration
     end
