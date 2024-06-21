@@ -25,6 +25,7 @@ import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
 import {Pill} from '@instructure/ui-pill'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -247,32 +248,11 @@ const RatingScaleAccordion = ({ratings, criterionUseRange}: RatingScaleAccordion
       padding="small 0 0 large"
       themeOverride={{paddingMedium: '1.5rem', paddingLarge: '3.35rem'}}
     >
-      <View
-        as="button"
-        cursor="pointer"
-        onClick={() => setRatingsOpen(!ratingsOpen)}
-        background="transparent"
-        display="block"
-        borderWidth="none"
-        textAlign="start"
-        type="button"
-        position="relative"
+      <ToggleDetails
+        data-testid="criterion-row-rating-accordion"
+        summary={`${I18n.t('Rating Scale: %{ratingsLength}', {ratingsLength: ratings.length})}`}
       >
-        {ratingsOpen ? (
-          <IconArrowOpenDownLine width="18" height="18" />
-        ) : (
-          <IconArrowOpenEndLine width="18" height="18" />
-        )}
-
-        <View as="span" margin="0 0 0 small" data-testid="criterion-row-rating-accordion">
-          <Text>
-            {I18n.t('Rating Scale')}: {ratings.length}
-          </Text>
-        </View>
-      </View>
-
-      {ratingsOpen &&
-        ratings.map((rating, index) => {
+        {ratings.map((rating, index) => {
           const scale = ratings.length - (index + 1)
           const spacing = index === 0 ? '1.5rem' : '2.25rem'
           const min = criterionUseRange ? rangingFrom(ratings, index) : undefined
@@ -287,6 +267,7 @@ const RatingScaleAccordion = ({ratings, criterionUseRange}: RatingScaleAccordion
             />
           )
         })}
+      </ToggleDetails>
     </View>
   )
 }
