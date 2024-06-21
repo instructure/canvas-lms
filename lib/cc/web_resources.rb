@@ -202,29 +202,6 @@ module CC
       end
     end
 
-    def process_media_tracks_without_feature_flag(tracks, media_file_migration_id, media_obj, video_path)
-      media_obj.media_tracks.each do |mt|
-        track_id = create_key(mt.content)
-        mt_path = video_path + ".#{mt.locale}.#{mt.kind}"
-        @zip_file.get_output_stream(mt_path) do |stream|
-          stream.write mt.content
-        end
-        @resources.resource(
-          "type" => CCHelper::WEBCONTENT,
-          :identifier => track_id,
-          :href => mt_path
-        ) do |res|
-          res.file(href: mt_path)
-        end
-        tracks[media_file_migration_id] ||= []
-        tracks[media_file_migration_id] << {
-          kind: mt.kind,
-          locale: mt.locale,
-          identifierref: track_id
-        }
-      end
-    end
-
     def add_tracks(track_map)
       tracks_file = File.new(File.join(@canvas_resource_dir, CCHelper::MEDIA_TRACKS), "w")
       document = Builder::XmlMarkup.new(target: tracks_file, indent: 2)
@@ -262,73 +239,6 @@ module CC
 
     def export_media_objects?
       CanvasKaltura::ClientV3.config && !for_course_copy
-    end
-
-    def media_object_path(path)
-      File.join(CCHelper::WEB_RESOURCES_FOLDER, path)
-    end
-
-    MAX_MEDIA_OBJECT_SIZE = 4.gigabytes
-    def add_media_objects(html_content_exporter = @html_exporter)
-      return unless export_media_objects?
-
-      # check to make sure we don't export more than 4 gigabytes of media objects
-      total_size = 0
-      html_content_exporter.used_media_objects.each do |obj|
-        next if @added_attachments&.key?(obj.attachment_id)
-
-        info = html_content_exporter.media_object_infos[obj.id]
-        next unless info && info[:asset] && info[:asset][:size]
-
-        total_size += info[:asset][:size].to_i.kilobytes
-      end
-      if total_size > MAX_MEDIA_OBJECT_SIZE
-        add_error(I18n.t("course_exports.errors.media_files_too_large",
-                         "Media files were not exported because the total file size was too large."))
-        return
-      end
-
-      client = CC::CCHelper.kaltura_admin_session
-      tracks = {}
-      html_content_exporter.used_media_objects.each do |obj|
-        migration_id = create_key(obj.attachment)
-        info = html_content_exporter.media_object_infos[obj.id]
-        next unless info && info[:asset]
-
-        path = media_object_path(info[:path])
-
-        # download from kaltura if the file wasn't already exported here in add_course_files
-        if !@added_attachments || @added_attachments[obj.attachment_id] != path
-          unless CanvasKaltura::ClientV3::ASSET_STATUSES[info[:asset][:status]] == :READY &&
-                 (url = client.flavorAssetGetPlaylistUrl(obj.media_id, info[:asset][:id]) || client.flavorAssetGetDownloadUrl(info[:asset][:id]))
-            add_error(I18n.t("course_exports.errors.media_file", "A media file failed to export"))
-            next
-          end
-
-          CanvasHttp.get(url) do |http_response|
-            raise CanvasHttp::InvalidResponseCodeError, http_response.code.to_i unless http_response.code.to_i == 200
-
-            @zip_file.get_output_stream(path) do |stream|
-              http_response.read_body(stream)
-            end
-          end
-
-          @resources.resource(
-            "type" => CCHelper::WEBCONTENT,
-            :identifier => migration_id,
-            :href => path
-          ) do |res|
-            res.file(href: path)
-          end
-        end
-
-        unless Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
-          process_media_tracks_without_feature_flag(tracks, migration_id, obj, path)
-        end
-      rescue
-        add_error(I18n.t("course_exports.errors.media_file", "A media file failed to export"), $!)
-      end
-      add_tracks(tracks) if @canvas_resource_dir && !Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
     end
   end
 end
