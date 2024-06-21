@@ -36,8 +36,12 @@ describe Lti::Messages::JwtMessage do
       }
     )
   end
+  let(:nonce) { SecureRandom.uuid }
+  let(:post_payload) do
+    jwt_message.generate_post_payload.to_json
+  end
   let(:decoded_jwt) do
-    jws = Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
+    jws = Lti::Messages::JwtMessage.generate_id_token(Lti::Messages::JwtMessage.cached_hash_to_launch(JSON.parse(post_payload), nonce))
     JSON::JWT.decode(jws[:id_token], pub_key)
   end
   let(:pub_key) do
@@ -1020,7 +1024,7 @@ describe Lti::Messages::JwtMessage do
       let!(:associated_1_1_tool) { external_tool_model(context: course, opts: { url: "http://www.example.com/basic_lti" }) }
 
       before do
-        allow(Lti::Helpers::JwtMessageHelper).to receive(:generate_oauth_consumer_key_sign).and_return("avalidsignature")
+        allow(Lti::Helpers::JwtMessageHelper).to receive(:generate_oauth_consumer_key_sign).and_return("a_valid_signature")
       end
 
       context "the include_oauth_consumer_key_in_lti_launch flag is enabled" do
@@ -1030,7 +1034,7 @@ describe Lti::Messages::JwtMessage do
 
         it "includes the oauth_consumer_key related claims" do
           expect(subject["oauth_consumer_key"]).to eq associated_1_1_tool.consumer_key
-          expect(subject["oauth_consumer_key_sign"]).to eq "avalidsignature"
+          expect(subject["oauth_consumer_key_sign"]).to eq "a_valid_signature"
         end
       end
 

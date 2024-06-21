@@ -82,7 +82,24 @@ module Lti::Messages
     end
 
     def generate_post_payload
-      generate_post_payload_message.to_h
+      post_payload = generate_post_payload_message.to_h
+      assoc_tool_data = {
+        shared_secret: associated_1_1_tool&.shared_secret,
+        consumer_key: associated_1_1_tool&.consumer_key
+      }
+      { post_payload:, assoc_tool_data: }
+    end
+
+    def self.cached_hash_to_launch(launch_payload, nonce)
+      post_payload = launch_payload["post_payload"]
+      assoc_tool_data = launch_payload["assoc_tool_data"]
+      if assoc_tool_data["consumer_key"].present?
+        post_payload["nonce"] = nonce
+        signature = Lti::Helpers::JwtMessageHelper.generate_oauth_consumer_key_sign(assoc_tool_data, post_payload, nonce)
+        post_payload["https://purl.imsglobal.org/spec/lti/claim/lti1p1"]["oauth_consumer_key"] = assoc_tool_data["consumer_key"]
+        post_payload["https://purl.imsglobal.org/spec/lti/claim/lti1p1"]["oauth_consumer_key_sign"] = signature
+      end
+      post_payload
     end
 
     private
@@ -174,11 +191,8 @@ module Lti::Messages
     end
 
     def add_lti1p1_claims!
+      # The oauth_consumer_key_sign will be written later in the process (in `cached_hash_to_launch`) once we have the nonce
       @message.lti1p1.user_id = @user&.lti_context_id
-      if associated_1_1_tool.present?
-        @message.lti1p1.oauth_consumer_key = associated_1_1_tool.consumer_key
-        @message.lti1p1.oauth_consumer_key_sign = Lti::Helpers::JwtMessageHelper.generate_oauth_consumer_key_sign(associated_1_1_tool, @message)
-      end
     end
 
     # Following the spec https://www.imsglobal.org/spec/lti/v1p3/migr#remapping-parameters

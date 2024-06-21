@@ -87,7 +87,7 @@ describe Lti::LtiAdvantageAdapter do
     let(:student_id) { "123" }
 
     it "includes extension lti_student_id claim in the id_token" do
-      expect(params["https://www.instructure.com/lti_student_id"]).to eq(student_id)
+      expect(params["post_payload"]["https://www.instructure.com/lti_student_id"]).to eq(student_id)
     end
   end
 
@@ -105,7 +105,7 @@ describe Lti::LtiAdvantageAdapter do
       end
 
       it "caches a deep linking request" do
-        expect(params["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiDeepLinkingRequest"
+        expect(params["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiDeepLinkingRequest"
       end
 
       context "and the placement does not support LtiDeepLinkingRequest" do
@@ -140,7 +140,7 @@ describe Lti::LtiAdvantageAdapter do
       end
 
       it "sets the target_link_uri in the id_token" do
-        expect(params["https://purl.imsglobal.org/spec/lti/claim/target_link_uri"]).to eq launch_url
+        expect(params["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/target_link_uri"]).to eq launch_url
       end
     end
 
@@ -153,7 +153,7 @@ describe Lti::LtiAdvantageAdapter do
     end
 
     it "generates a resource link request if the tool's resource type setting is 'LtiResourceLinkRequest'" do
-      expect(params["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+      expect(params["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
     end
 
     it "creates a login message" do
