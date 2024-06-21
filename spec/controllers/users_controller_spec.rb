@@ -166,7 +166,7 @@ describe UsersController do
       end
 
       it "caches the LTI 1.3 launch" do
-        expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+        expect(cached_launch["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
       end
 
       it "does not use the oidc_initiation_url as the resource_url" do

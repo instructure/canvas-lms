@@ -40,7 +40,7 @@ describe Lti::Messages::DeepLinkingRequest do
   it_behaves_like "lti 1.3 message initialization"
 
   describe "#generate_post_payload_message" do
-    subject { jws["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"] }
+    subject { jws[:post_payload]["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"] }
 
     it 'sets the "deep_link_return_url"' do
       expect(subject["deep_link_return_url"]).to eq deep_linking_return_url
