@@ -75,6 +75,6 @@ class TranslationController < ApplicationController
   end
 
   def require_inbox_translation
-    render_unauthorized_action unless Translation.available?(@current_user, :translate_inbox_messages)
+    render_unauthorized_action unless Translation.available?(@domain_root_account, :translate_inbox_messages)
   end
 end
