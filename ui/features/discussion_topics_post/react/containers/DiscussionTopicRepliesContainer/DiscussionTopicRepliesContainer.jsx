@@ -96,12 +96,6 @@ export const DiscussionTopicRepliesContainer = props => {
             discussionEntryIds: entryIds,
             read: true,
           },
-          optimisticResponse: {
-            updateDiscussionEntriesReadState: {
-              discussionEntries: entries,
-              __typename: 'UpdateDiscussionEntriesReadStatePayload',
-            },
-          },
         })
       }, AUTO_MARK_AS_READ_DELAY)
 
