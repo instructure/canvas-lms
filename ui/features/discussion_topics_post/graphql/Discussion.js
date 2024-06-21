@@ -58,6 +58,7 @@ export const Discussion = {
       userCount
       replyToEntryRequiredCount
       contextType
+      lockInformation
       editor {
         ...User
       }
@@ -127,6 +128,7 @@ export const Discussion = {
     userCount: number,
     replyToEntryRequiredCount: number,
     contextType: string,
+    lockInformation: string,
     entryCounts: shape({
       unreadCount: number,
       repliesCount: number,
@@ -172,6 +174,7 @@ export const Discussion = {
     userCount = 4,
     replyToEntryRequiredCount = 2,
     contextType = 'Course',
+    lockInformation = 'This topic is locked.',
     entryCounts = {
       unreadCount: 2,
       repliesCount: 56,
@@ -220,6 +223,7 @@ export const Discussion = {
     userCount,
     replyToEntryRequiredCount,
     contextType,
+    lockInformation,
     author,
     anonymousAuthor,
     editor,
