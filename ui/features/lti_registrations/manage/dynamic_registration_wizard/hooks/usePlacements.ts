@@ -16,22 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {
-  deleteDeveloperKey,
-  updateAdminNickname,
-  updateDeveloperKeyWorkflowState,
-} from '../api/developerKey'
-import type {
-  fetchRegistrationToken,
-  getRegistrationByUUID,
-  updateRegistrationOverlay,
-} from '../api/ltiImsRegistration'
+import React from 'react'
+import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
+import {canvasPlatformSettings} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
+import {type LtiPlacement} from '../../model/LtiPlacement'
 
-export interface DynamicRegistrationWizardService {
-  fetchRegistrationToken: typeof fetchRegistrationToken
-  getRegistrationByUUID: typeof getRegistrationByUUID
-  updateRegistrationOverlay: typeof updateRegistrationOverlay
-  updateDeveloperKeyWorkflowState: typeof updateDeveloperKeyWorkflowState
-  updateAdminNickname: typeof updateAdminNickname
-  deleteDeveloperKey: typeof deleteDeveloperKey
+export const usePlacements = (registration: LtiImsRegistration): LtiPlacement[] => {
+  return React.useMemo(() => {
+    return (
+      canvasPlatformSettings(registration.default_configuration)?.settings.placements.map(
+        p => p.placement
+      ) ?? []
+    )
+  }, [registration.default_configuration])
 }

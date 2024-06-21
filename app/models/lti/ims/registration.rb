@@ -270,7 +270,8 @@ class Lti::IMS::Registration < ApplicationRecord
   def as_json(options = {})
     {
       id: global_id.to_s,
-      developer_key_id: developer_key.global_id.to_s,
+      lti_registration_id: Shard.global_id_for(lti_registration_id).to_s,
+      developer_key_id: Shard.global_id_for(developer_key_id).to_s,
       overlay: registration_overlay,
       lti_tool_configuration:,
       application_type: REQUIRED_APPLICATION_TYPE,

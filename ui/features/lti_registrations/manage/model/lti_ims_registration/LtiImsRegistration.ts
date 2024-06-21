@@ -22,10 +22,12 @@ import {ZLtiConfiguration} from '../lti_tool_configuration/LtiConfiguration'
 import {ZLtiImsToolConfiguration} from './LtiImsToolConfiguration'
 import {ZLtiImsRegistrationId} from './LtiImsRegistrationId'
 import {ZDeveloperKeyId} from '../developer_key/DeveloperKeyId'
+import {ZLtiRegistrationId} from '../LtiRegistrationId'
 
 export const ZLtiImsRegistration = z.object({
   id: ZLtiImsRegistrationId,
   lti_tool_configuration: ZLtiImsToolConfiguration,
+  lti_registration_id: ZLtiRegistrationId,
   developer_key_id: ZDeveloperKeyId,
   overlay: ZRegistrationOverlay.nullable(),
   application_type: z.string().optional(),

@@ -27,7 +27,7 @@ import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRe
 import type {LtiPlacementConfig} from '../../model/lti_tool_configuration/LtiPlacementConfig'
 import type {Extension} from '../../model/lti_tool_configuration/Extension'
 
-interface RegistrationOverlayActions {
+export interface RegistrationOverlayActions {
   updateDevKeyName: (name: string) => void
   updateRegistrationTitle: (s: string) => void
   toggleDisabledScope: (scope: LtiScope) => void
@@ -45,10 +45,13 @@ interface RegistrationOverlayActions {
    */
   resetOverlays: (configuration: LtiConfiguration) => void
   updatePrivacyLevel: (placement_type: LtiPrivacyLevel) => void
+  updateDescription: (description: string) => void
+  updateAdminNickname: (nickname: string) => void
 }
 
 export type RegistrationOverlayState = {
   developerKeyName?: string
+  adminNickname?: string
   registration: RegistrationOverlay
 }
 
@@ -113,6 +116,12 @@ const updateRegistrationIconUrl = (s: string) => updateRegistrationKey('icon_url
 const updateRegistrationLaunchHeight = (s: string) =>
   updateRegistrationKey('launch_height')(() => s)
 const updateRegistrationLaunchWidth = (s: string) => updateRegistrationKey('launch_width')(() => s)
+const updateDescription = (description: string) =>
+  updateRegistrationKey('description')(() => description)
+const updateAdminNickname = (nickname: string) =>
+  updateState(state => {
+    return {...state, adminNickname: nickname}
+  })
 // const updateRegistrationPlacements = (s: string) => updateRegistrationKey('placements')(() => s)
 const resetOverlays = (configuration: LtiConfiguration) =>
   updateState(state =>
@@ -161,6 +170,8 @@ export const createRegistrationOverlayStore = (
         (fn: (placementOverlay: LtiPlacementOverlay) => LtiPlacementOverlay) =>
           set(updatePlacement(placement_type)(fn)),
       updatePrivacyLevel: (privacyLevel: LtiPrivacyLevel) => set(updatePrivacyLevel(privacyLevel)),
+      updateDescription: (description: string) => set(updateDescription(description)),
+      updateAdminNickname: (nickname: string) => set(updateAdminNickname(nickname)),
     }))
   )
 
@@ -215,6 +226,6 @@ const initialPlacementOverlayStateFromPlacementConfig =
       type: placementConfig.placement as LtiPlacement,
       launch_height: placementOverlay?.launch_height || undefined,
       launch_width: placementOverlay?.launch_width || undefined,
-      default: placementConfig.default,
+      default: placementConfig.default || undefined,
     }
   }

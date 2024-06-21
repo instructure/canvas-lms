@@ -16,13 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ZLtiRegistrationId} from '../../model/LtiRegistrationId'
 import {LtiScopes} from '../../model/LtiScope'
 import {ZDeveloperKeyId} from '../../model/developer_key/DeveloperKeyId'
 import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
 import {ZLtiImsRegistrationId} from '../../model/lti_ims_registration/LtiImsRegistrationId'
-import type {LtiImsToolConfiguration} from '../../model/lti_ims_registration/LtiImsToolConfiguration'
 import type {LtiConfiguration} from '../../model/lti_tool_configuration/LtiConfiguration'
+import type {DynamicRegistrationWizardService} from '../DynamicRegistrationWizardService'
 
+export const mockService = (
+  mocked?: Partial<DynamicRegistrationWizardService>
+): DynamicRegistrationWizardService => ({
+  fetchRegistrationToken: jest.fn(),
+  deleteDeveloperKey: jest.fn(),
+  getRegistrationByUUID: jest.fn(),
+  updateDeveloperKeyWorkflowState: jest.fn(),
+  updateRegistrationOverlay: jest.fn(),
+  updateAdminNickname: jest.fn(),
+  ...mocked,
+})
 export const mockToolConfiguration = (config?: Partial<LtiConfiguration>): LtiConfiguration => ({
   title: '',
   target_link_uri: '',
@@ -39,6 +51,7 @@ export const mockRegistration = (
   config?: Partial<LtiConfiguration>
 ): LtiImsRegistration => ({
   id: ZLtiImsRegistrationId.parse('1'),
+  lti_registration_id: ZLtiRegistrationId.parse('1'),
   lti_tool_configuration: {
     claims: [],
     domain: '',
@@ -70,3 +83,20 @@ export const mockRegistration = (
   default_configuration: mockToolConfiguration(config),
   ...reg,
 })
+
+export const mockConfigWithPlacements = (placements: string[]): Partial<LtiConfiguration> => {
+  return {
+    extensions: [
+      {
+        platform: 'canvas.instructure.com',
+        settings: {
+          text: '',
+          placements: placements.map(placement => ({
+            placement,
+            message_type: 'LtiResourceLinkRequest',
+          })),
+        },
+      },
+    ],
+  }
+}

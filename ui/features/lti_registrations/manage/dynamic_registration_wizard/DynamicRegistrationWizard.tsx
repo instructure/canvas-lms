@@ -29,6 +29,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {PermissionConfirmation} from './components/PermissionConfirmation'
 import {PrivacyConfirmation} from './components/PrivacyConfirmation'
 import {PlacementsConfirmation} from './components/PlacementsConfirmation'
+import {NamingConfirmation} from './components/NamingConfirmation'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -247,7 +248,43 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
         </>
       )
     case 'NamingConfirmation':
-      return <div>Naming Confirmation</div>
+      return (
+        <>
+          <Modal.Body>
+            <NamingConfirmation
+              registration={state.registration}
+              overlayStore={state.overlayStore}
+            />
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              color="secondary"
+              type="submit"
+              onClick={() => {
+                dynamicRegistrationWizardState.transitionToConfirmationState(
+                  state._type,
+                  'PlacementsConfirmation'
+                )
+              }}
+            >
+              {I18n.t('Previous')}
+            </Button>
+            <Button
+              margin="small"
+              color="primary"
+              type="submit"
+              onClick={() => {
+                dynamicRegistrationWizardState.transitionToConfirmationState(
+                  state._type,
+                  'IconConfirmation'
+                )
+              }}
+            >
+              {I18n.t('Next')}
+            </Button>
+          </Modal.Footer>
+        </>
+      )
     case 'IconConfirmation':
       return <div>Icon Confirmation</div>
     case 'Reviewing':

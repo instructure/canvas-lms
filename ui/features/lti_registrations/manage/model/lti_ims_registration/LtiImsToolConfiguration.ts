@@ -24,6 +24,7 @@ export const ZLtiImsToolConfiguration = z.object({
   domain: z.string(),
   messages: z.array(ZLtiImsMessage),
   target_link_uri: z.string(),
+  description: z.string().optional(),
   'https://canvas.instructure.com/lti/privacy_level': ZLtiPrivacyLevel.optional(),
 })
 

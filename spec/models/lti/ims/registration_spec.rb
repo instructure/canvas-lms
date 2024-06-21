@@ -624,5 +624,40 @@ module Lti::IMS
         )
       end
     end
+
+    describe "as_json" do
+      subject { registration.as_json }
+
+      it "includes the correct attributes" do
+        expect(subject.keys).to eq(
+          %w[
+            id
+            lti_registration_id
+            developer_key_id
+            overlay
+            lti_tool_configuration
+            application_type
+            grant_types
+            response_types
+            redirect_uris
+            initiate_login_uri
+            client_name
+            jwks_uri
+            logo_uri
+            token_endpoint_auth_method
+            contacts
+            client_uri
+            policy_uri
+            tos_uri
+            scopes
+            created_at
+            updated_at
+            guid
+            tool_configuration
+            default_configuration
+          ]
+        )
+      end
+    end
   end
 end

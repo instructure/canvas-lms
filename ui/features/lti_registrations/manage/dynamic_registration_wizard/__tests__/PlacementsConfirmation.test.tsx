@@ -15,35 +15,17 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {mockRegistration} from './helpers'
-import {type LtiConfiguration} from '../../model/lti_tool_configuration/LtiConfiguration'
+import {mockConfigWithPlacements, mockRegistration} from './helpers'
 import {PlacementsConfirmation} from '../components/PlacementsConfirmation'
-import React from 'react'
 import {createRegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
-import {type LtiPlacement, LtiPlacements, i18nLtiPlacement} from '../../model/LtiPlacement'
-
-const makeConfig = (placements: LtiPlacement[]): Partial<LtiConfiguration> => {
-  return {
-    extensions: [
-      {
-        platform: 'canvas.instructure.com',
-        settings: {
-          text: '',
-          placements: placements.map(placement => ({
-            placement,
-            message_type: 'LtiResourceLinkRequest',
-          })),
-        },
-      },
-    ],
-  }
-}
+import {LtiPlacements, i18nLtiPlacement} from '../../model/LtiPlacement'
 
 describe('PlacementsConfirmation', () => {
   it('renders the PlacementsConfirmation', () => {
-    const config = makeConfig([LtiPlacements.AccountNavigation])
+    const config = mockConfigWithPlacements([LtiPlacements.AccountNavigation])
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
@@ -53,7 +35,7 @@ describe('PlacementsConfirmation', () => {
   })
 
   it("renders a helpful message if the tool doesn't provide placements", () => {
-    const config = makeConfig([])
+    const config = mockConfigWithPlacements([])
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
 
@@ -65,7 +47,7 @@ describe('PlacementsConfirmation', () => {
   })
 
   it("let's users toggle placements", async () => {
-    const config = makeConfig([
+    const config = mockConfigWithPlacements([
       LtiPlacements.CourseNavigation,
       LtiPlacements.AccountNavigation,
       LtiPlacements.TopNavigation,
@@ -86,7 +68,7 @@ describe('PlacementsConfirmation', () => {
   })
 
   it('renders a default disabled checkbox only for course navigation', () => {
-    const config = makeConfig([
+    const config = mockConfigWithPlacements([
       LtiPlacements.CourseNavigation,
       LtiPlacements.AccountNavigation,
       LtiPlacements.RichTextEditor,
@@ -100,7 +82,7 @@ describe('PlacementsConfirmation', () => {
   })
 
   it("renders the default disabled checkbox as on when the registration has default='disabled'", () => {
-    const config = makeConfig([LtiPlacements.CourseNavigation])
+    const config = mockConfigWithPlacements([LtiPlacements.CourseNavigation])
     config.extensions![0].settings.placements[0].default = 'disabled'
 
     const reg = mockRegistration({}, config)
@@ -114,7 +96,7 @@ describe('PlacementsConfirmation', () => {
   })
 
   it("renders the default disabled checkbox as on when the overlay has default='disabled'", () => {
-    const config = makeConfig([LtiPlacements.CourseNavigation])
+    const config = mockConfigWithPlacements([LtiPlacements.CourseNavigation])
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
     overlayStore.getState().updatePlacement(LtiPlacements.CourseNavigation)(p => ({
@@ -130,7 +112,7 @@ describe('PlacementsConfirmation', () => {
   })
 
   it('renders the default disabled checkbox as off when the overlay has default="enabled" but the registration has the opposite', () => {
-    const config = makeConfig([LtiPlacements.CourseNavigation])
+    const config = mockConfigWithPlacements([LtiPlacements.CourseNavigation])
     config.extensions![0].settings.placements[0].default = 'disabled'
 
     const reg = mockRegistration({}, config)
@@ -148,7 +130,7 @@ describe('PlacementsConfirmation', () => {
   })
 
   it("doesn't render a default disabled checkbox when course navigation is disabled", () => {
-    const config = makeConfig([LtiPlacements.CourseNavigation])
+    const config = mockConfigWithPlacements([LtiPlacements.CourseNavigation])
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
     overlayStore.getState().toggleDisabledPlacement(LtiPlacements.CourseNavigation)
@@ -164,7 +146,7 @@ describe('PlacementsConfirmation', () => {
       LtiPlacements.AssignmentSelection,
       LtiPlacements.ContentArea,
     ]
-    const config = makeConfig(placements)
+    const config = mockConfigWithPlacements(placements)
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
     render(<PlacementsConfirmation registration={reg} overlayStore={overlayStore} />)
