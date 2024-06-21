@@ -407,6 +407,52 @@ describe "Discussion Topic Show" do
       end
     end
 
+    context "student availability" do
+      before :once do
+        student_in_course(active_all: true)
+        @topic.update!(message: "a very cool discussion")
+      end
+
+      before do
+        user_session(@student)
+      end
+
+      it "shows discussion body for unlocked discussions" do
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        expect(Discussion.discussion_page_body).to include_text("a very cool discussion")
+      end
+
+      it "shows lock indication for discussions locked by discussion's unlock_at date" do
+        @topic.update!(unlock_at: 1.day.from_now)
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        expect(Discussion.discussion_page_body).to include_text("This topic is locked until")
+        expect(Discussion.discussion_page_body).not_to include_text("a very cool discussion")
+      end
+
+      it "shows lock indication for discussions locked by discussion's lock_at date" do
+        @topic.update!(lock_at: 1.day.ago)
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        expect(Discussion.discussion_page_body).to include_text("This topic is closed for comments")
+        expect(Discussion.discussion_page_body).to include_text("a very cool discussion")
+      end
+
+      it "shows lock indication for discussions locked by student override unlock_at" do
+        ao = @topic.assignment_overrides.create!(unlock_at: 1.day.from_now, unlock_at_overridden: true)
+        ao.assignment_override_students.create!(user: @student)
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        expect(Discussion.discussion_page_body).to include_text("This topic is locked until")
+        expect(Discussion.discussion_page_body).not_to include_text("a very cool discussion")
+      end
+
+      it "shows lock indication for discussions locked by student override lock_at" do
+        ao = @topic.assignment_overrides.create!(lock_at: 1.day.ago, lock_at_overridden: true)
+        ao.assignment_override_students.create!(user: @student)
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        expect(Discussion.discussion_page_body).to include_text("This topic is closed for comments")
+        expect(Discussion.discussion_page_body).to include_text("a very cool discussion")
+      end
+    end
+
     context "when Discussion Summary feature flag is ON" do
       before do
         Account.default.enable_feature!(:discussion_summary)

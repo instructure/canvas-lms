@@ -3573,4 +3573,146 @@ describe DiscussionTopic do
       expect(@topic.user_can_summarize?(@student)).to be false
     end
   end
+
+  describe "low_level_locked_for?" do
+    before :once do
+      @topic = @course.discussion_topics.create!(title: "topic")
+    end
+
+    it "is unlocked by default" do
+      expect(@topic.low_level_locked_for?(@student)).to be_falsey
+    end
+
+    it "is unlocked for past unlock_at date" do
+      @topic.update(unlock_at: 1.week.ago)
+      expect(@topic.locked_for?(@student)).to be_falsey
+    end
+
+    it "is unlocked for future lock_at date" do
+      @topic.update(lock_at: 1.week.from_now)
+      expect(@topic.locked_for?(@student)).to be_falsey
+    end
+
+    it "is locked for future unlock_at date" do
+      timestamp = 1.week.from_now
+      @topic.update(unlock_at: timestamp)
+      lock_info = @topic.locked_for?(@student)
+      expect(lock_info).to be_truthy
+      expect(lock_info[:unlock_at]).to eq timestamp
+    end
+
+    it "is locked for future delayed_post_at date" do
+      timestamp = 1.week.from_now
+      @topic.update(delayed_post_at: timestamp)
+      lock_info = @topic.locked_for?(@student)
+      expect(lock_info).to be_truthy
+      expect(lock_info[:unlock_at]).to eq timestamp
+    end
+
+    it "is locked for past lock_at date" do
+      timestamp = 1.week.ago
+      @topic.update(lock_at: timestamp)
+      lock_info = @topic.locked_for?(@student)
+      expect(lock_info).to be_truthy
+      expect(lock_info[:lock_at]).to eq timestamp
+    end
+
+    it "locks for unpublished module" do
+      cm = @course.context_modules.create!(name: "module", workflow_state: "unpublished")
+      cm.add_item(type: "discussion_topic", id: @topic.id)
+      @topic.update!(could_be_locked: true)
+      lock_info = @topic.locked_for?(@student)
+      expect(lock_info).to be_truthy
+    end
+
+    it "locks for student with override" do
+      timestamp = 1.week.from_now
+      ao = @topic.assignment_overrides.create!(unlock_at: timestamp, unlock_at_overridden: true)
+      ao.assignment_override_students.create!(user: @student)
+      lock_info = @topic.locked_for?(@student)
+      expect(lock_info).to be_truthy
+      expect(lock_info[:unlock_at]).to eq timestamp
+    end
+
+    it "unlocks for student with override" do
+      @topic.update(lock_at: 1.week.ago)
+      ao = @topic.assignment_overrides.create!(lock_at: 1.week.from_now, lock_at_overridden: true)
+      ao.assignment_override_students.create!(user: @student)
+      lock_info = @topic.locked_for?(@student)
+      expect(lock_info).to be_falsey
+    end
+
+    it "does not fall back to base delayed_post_at for student with override" do
+      @topic.update!(delayed_post_at: 1.week.from_now)
+      ao = @topic.assignment_overrides.create!(unlock_at: 1.week.ago, unlock_at_overridden: true)
+      ao.assignment_override_students.create!(user: @student)
+      expect(@topic.locked_for?(@student)).to be_falsey
+    end
+
+    it "is unlocked for teacher regardless of dates" do
+      @topic.update(lock_at: 1.week.ago)
+      expect(@topic.locked_for?(@teacher, check_policies: true)).to be_falsey
+      expect(@topic.locked_for?(@student, check_policies: true)).to be_truthy
+    end
+
+    it "is unlocked for students with moderate_forum regardless of dates" do
+      @topic.update(lock_at: 1.week.ago)
+      expect(@topic.locked_for?(@student, check_policies: true)).to be_truthy
+      RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: student_role, enabled: true)
+      AdheresToPolicy::Cache.clear
+      expect(@topic.locked_for?(@student, check_policies: true)).to be_falsey
+    end
+
+    it "is locked if locked column is true" do
+      @topic.update(locked: true)
+      expect(@topic.locked_for?(@student)).to be_truthy
+    end
+
+    context "with an assignment" do
+      before :once do
+        @assignment = @course.assignments.create!(title: "assignment")
+        @topic.update!(assignment: @assignment)
+      end
+
+      it "is unlocked by default" do
+        expect(@topic.locked_for?(@student)).to be_falsey
+      end
+
+      it "still enforces the topic's dates" do
+        @topic.update(unlock_at: 1.week.from_now)
+        expect(@topic.locked_for?(@student)).to be_truthy
+      end
+
+      it "does not enforce the topic's overrides" do
+        ao = @topic.assignment_overrides.create!(unlock_at: 1.week.from_now, unlock_at_overridden: true)
+        ao.assignment_override_students.create!(user: @student)
+        expect(@topic.locked_for?(@student)).to be_falsey
+      end
+
+      it "respects assignment's unlock_at" do
+        timestamp = 1.week.from_now
+        @assignment.update!(unlock_at: timestamp)
+        lock_info = @topic.locked_for?(@student)
+        expect(lock_info).to be_truthy
+        expect(lock_info[:unlock_at]).to eq timestamp
+      end
+
+      it "respects assignment's lock_at" do
+        timestamp = 1.week.ago
+        @assignment.update!(lock_at: timestamp)
+        lock_info = @topic.locked_for?(@student)
+        expect(lock_info).to be_truthy
+        expect(lock_info[:lock_at]).to eq timestamp
+      end
+
+      it "respects assignment's overrides" do
+        timestamp = 1.week.from_now
+        ao = @assignment.assignment_overrides.create!(unlock_at: timestamp, unlock_at_overridden: true)
+        ao.assignment_override_students.create!(user: @student)
+        lock_info = @topic.locked_for?(@student)
+        expect(lock_info).to be_truthy
+        expect(lock_info[:unlock_at]).to eq timestamp
+      end
+    end
+  end
 end
