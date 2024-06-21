@@ -7,7 +7,7 @@ translation:
   beta: true
 translate_inbox_messages:
   state: hidden
-  applies_to: User
+  applies_to: RootAccount
   display_name: Enable Translation in Inbox Compose and Inbound Messages
   description: Will translate inbound messages, and allow users to include translated versions of their outbound messages
   beta: true
