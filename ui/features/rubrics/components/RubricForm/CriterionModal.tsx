@@ -573,7 +573,9 @@ const RatingRow = ({
                       <View as="div" width="2.375rem">
                         {showRemoveButton && (
                           <IconButton
-                            screenReaderLabel={I18n.t('Remove Rating')}
+                            screenReaderLabel={I18n.t('Remove %{ratingName} Rating', {
+                              ratingName: rating.description,
+                            })}
                             onClick={onRemove}
                             data-testid="remove-rating"
                           >
@@ -608,11 +610,22 @@ const AddRatingRow = ({unassessed, onClick, isDragging}: AddRatingRowProps) => {
       textAlign="center"
       margin="0"
       height="1.688rem"
+      width="100%"
+      tabIndex={0}
+      position="relative"
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onClick()
+        }
+      }}
+      label="Add New Rating"
+      onFocus={() => setIsHovered(true)}
       onMouseOver={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {isHovered && unassessed && !isDragging && (
-        <View as="div" cursor="pointer" onClick={onClick}>
+        <View as="div" cursor="pointer" onClick={onClick} onBlur={() => setIsHovered(false)}>
           <IconButton
             screenReaderLabel={I18n.t('Add new rating')}
             shape="circle"

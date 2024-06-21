@@ -322,7 +322,7 @@ export const RubricForm = ({
   }
 
   return (
-    <View as="div" margin="0 0 medium 0">
+    <View as="div" margin="0 0 medium 0" overflowY="hidden" overflowX="hidden">
       <Flex as="div" direction="column" style={{minHeight: '100%'}}>
         <Flex.Item>
           {saveError && (
@@ -358,7 +358,7 @@ export const RubricForm = ({
           </Flex.Item>
         )}
 
-        <Flex.Item>
+        <Flex.Item overflowX="hidden" overflowY="hidden">
           <Flex margin="large 0 0 0">
             <Flex.Item shouldGrow={true} shouldShrink={true}>
               <TextInput
