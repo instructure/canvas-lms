@@ -30,6 +30,7 @@ export const ZRegistrationOverlay = z.object({
   launch_width: z.string().optional().nullable(),
   disabledPlacements: z.array(ZLtiPlacement).optional(),
   placements: z.array(ZLtiPlacementOverlay).optional(),
+  description: z.string().optional(),
   privacy_level: ZLtiPrivacyLevel.optional(),
 })
 

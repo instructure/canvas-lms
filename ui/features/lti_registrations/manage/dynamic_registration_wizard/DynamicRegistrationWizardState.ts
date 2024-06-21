@@ -29,6 +29,7 @@ import {
 } from '../registration_wizard/registration_settings/RegistrationOverlayState'
 import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
 import type {ApiResult} from '../../common/lib/apiResult/ApiResult'
+import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 
 /**
  * Steps are:
@@ -63,9 +64,11 @@ interface DynamicRegistrationActions {
    */
   enableAndClose: (
     accountId: AccountId,
-    registrationId: LtiImsRegistrationId,
+    imsRegistrationId: LtiImsRegistrationId,
+    registrationId: LtiRegistrationId,
     developerKeyId: DeveloperKeyId,
-    overlay: RegistrationOverlay
+    overlay: RegistrationOverlay,
+    adminNickname: string
   ) => Promise<unknown>
 
   /**
@@ -93,6 +96,7 @@ interface DynamicRegistrationActions {
     prevState: ConfirmationStateType,
     newState: ConfirmationStateType
   ): void
+
   error: (error?: Error) => void
 }
 
@@ -300,19 +304,24 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
       },
       enableAndClose: async (
         accountId: AccountId,
-        registrationId: LtiImsRegistrationId,
+        imsRegistrationId: LtiImsRegistrationId,
+        registrationId: LtiRegistrationId,
         developerKeyId: DeveloperKeyId,
-        overlay: RegistrationOverlay
+        overlay: RegistrationOverlay,
+        adminNickname: string
       ) => {
         set(stateFrom('Reviewing')(state => enabling(state.registration, state.overlayStore)))
-        const [a, b] = await Promise.all([
-          service.updateRegistrationOverlay(accountId, registrationId, overlay),
+        const [a, b, c] = await Promise.all([
+          service.updateRegistrationOverlay(accountId, imsRegistrationId, overlay),
           service.updateDeveloperKeyWorkflowState(accountId, developerKeyId, 'on'),
+          service.updateAdminNickname(accountId, registrationId, adminNickname),
         ])
         if (a._type !== 'success') {
           set(stateFor(errorState(a)))
         } else if (b._type !== 'success') {
           set(stateFor(errorState(b)))
+        } else if (c._type !== 'success') {
+          set(stateFor(errorState(c)))
         }
       },
       deleteKey: async (prevState: ReviewingStateType, developerKeyId: DeveloperKeyId) => {
@@ -333,6 +342,7 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
             _type: newState,
           }))
         ),
+
       error: (error?: Error) =>
         set(
           stateFor({

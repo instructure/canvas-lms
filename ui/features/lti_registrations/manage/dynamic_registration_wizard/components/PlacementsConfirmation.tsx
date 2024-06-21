@@ -22,13 +22,7 @@ import {
   type RegistrationOverlayStore,
 } from '../../registration_wizard/registration_settings/RegistrationOverlayState'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {
-  AllLtiPlacements,
-  LtiPlacements,
-  canvasPlacementPrefix,
-  i18nLtiPlacement,
-  type LtiPlacement,
-} from '../../model/LtiPlacement'
+import {LtiPlacements, i18nLtiPlacement, type LtiPlacement} from '../../model/LtiPlacement'
 import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
@@ -42,6 +36,8 @@ import {IconInfoLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Img} from '@instructure/ui-img'
 import {Responsive} from '@instructure/ui-responsive'
+import {useOverlayStore} from '../hooks/useOverlayStore'
+import {usePlacements} from '../hooks/usePlacements'
 
 export type PlacementsConfirmationProps = {
   registration: LtiImsRegistration
@@ -54,24 +50,14 @@ export const PlacementsConfirmation = ({
   registration,
   overlayStore,
 }: PlacementsConfirmationProps) => {
-  const [{state, ...actions}, setState] = React.useState(overlayStore.getState())
-
-  React.useEffect(() => overlayStore.subscribe(setState), [overlayStore])
-  const placements = React.useMemo(() =>
-    // Ignore placements that are not part of Canvas and strip out the prefix
-    {
-      return (
-        canvasPlatformSettings(registration.default_configuration)?.settings.placements.map(
-          p => p.placement
-        ) ?? []
-      )
-    }, [registration.default_configuration])
+  const [overlayState, actions] = useOverlayStore(overlayStore)
+  const placements = usePlacements(registration)
 
   const renderPlacementCheckbox = (placement: LtiPlacement) => {
     const registrationPlacement = canvasPlatformSettings(
       registration.default_configuration
     )?.settings.placements.find(p => p.placement === placement)
-    const overlayPlacement = state.registration.placements?.find(p => p.type === placement)
+    const overlayPlacement = overlayState.registration.placements?.find(p => p.type === placement)
     const checkbox = (
       <Flex direction="row" gap="x-small" key={placement}>
         <Flex.Item>
@@ -82,7 +68,7 @@ export const PlacementsConfirmation = ({
                 <Text>{i18nLtiPlacement(placement)}</Text>
               </Flex>
             }
-            checked={!state.registration.disabledPlacements?.includes(placement)}
+            checked={!overlayState.registration.disabledPlacements?.includes(placement)}
             onChange={() => {
               actions.toggleDisabledPlacement(placement)
             }}
@@ -150,7 +136,7 @@ export const PlacementsConfirmation = ({
           }
         >
           {checkbox}
-          {!state.registration.disabledPlacements?.includes(placement) && (
+          {!overlayState.registration.disabledPlacements?.includes(placement) && (
             <View padding="0 0 0 medium" display="block" as="div">
               <Checkbox
                 checked={checked}

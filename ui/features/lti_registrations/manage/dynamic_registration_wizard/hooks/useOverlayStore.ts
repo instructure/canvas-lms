@@ -16,22 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import type {
-  deleteDeveloperKey,
-  updateAdminNickname,
-  updateDeveloperKeyWorkflowState,
-} from '../api/developerKey'
-import type {
-  fetchRegistrationToken,
-  getRegistrationByUUID,
-  updateRegistrationOverlay,
-} from '../api/ltiImsRegistration'
+  RegistrationOverlayActions,
+  RegistrationOverlayState,
+  RegistrationOverlayStore,
+} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
 
-export interface DynamicRegistrationWizardService {
-  fetchRegistrationToken: typeof fetchRegistrationToken
-  getRegistrationByUUID: typeof getRegistrationByUUID
-  updateRegistrationOverlay: typeof updateRegistrationOverlay
-  updateDeveloperKeyWorkflowState: typeof updateDeveloperKeyWorkflowState
-  updateAdminNickname: typeof updateAdminNickname
-  deleteDeveloperKey: typeof deleteDeveloperKey
+export const useOverlayStore = (
+  overlayStore: RegistrationOverlayStore
+): [RegistrationOverlayState, RegistrationOverlayActions] => {
+  const [{state, ...actions}, setState] = React.useState(overlayStore.getState())
+
+  React.useEffect(() => overlayStore.subscribe(setState), [overlayStore])
+
+  return [state, actions]
 }
