@@ -233,10 +233,10 @@ module CanvasRails
           connection_parameters[:host] = host
 
           begin
-            if Rails.version < "7.1"
-              @connection = PG::Connection.connect(connection_parameters)
+            if $canvas_rails < "7.1"
+              @connection = self.class.new_client(connection_parameters)
             else
-              @raw_connection = PG::Connection.connect(connection_parameters)
+              @raw_connection = self.class.new_client(connection_parameters)
             end
           rescue ::ActiveRecord::ActiveRecordError, ::ActiveRecord::ConnectionFailed, ::PG::Error => e
             # If exception occurs using parameters from a predefined pg service, retry without
@@ -251,7 +251,13 @@ module CanvasRails
             end
           end
 
-          configure_connection
+          if $canvas_rails < "7.1"
+            # Rails 7.1 handles this in AbstractAdapter#reconnect!; we don't want to do it
+            # unnecessarily and mess up the dirty state of any pending lazy transactions
+            configure_connection
+            add_pg_encoders
+            add_pg_decoders
+          end
 
           raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00 # rubocop:disable Style/NumericLiterals
 
