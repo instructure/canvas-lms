@@ -16,10 +16,9 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import React from 'react'
+import React, {lazy, Suspense} from 'react'
 import ReactDOM from 'react-dom'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
-import {BlockEditor} from '@canvas/block-editor'
 import template from '../../jst/WikiPageEdit.handlebars'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import WikiPageDeleteDialog from './WikiPageDeleteDialog'
@@ -226,12 +225,16 @@ export default class WikiPageEditView extends ValidatedFormView {
       renderAssignToTray(mountElement, {pageId, onSync, pageName})
     }
     if (window.ENV.BLOCK_EDITOR) {
+      const BlockEditor = lazy(() => import('@canvas/block-editor'))
+
       const blockEditorData = ENV.WIKI_PAGE?.block_editor_attributes || {
         version: '1',
         blocks: [{data: undefined}],
       }
       ReactDOM.render(
-        <BlockEditor version={blockEditorData.version} content={blockEditorData.blocks[0].data} />,
+        <Suspense fallback={<div>{I18n.t('Loading...')}</div>}>
+          <BlockEditor version={blockEditorData.version} content={blockEditorData.blocks[0].data} />
+        </Suspense>,
         document.getElementById('block_editor')
       )
     } else {
