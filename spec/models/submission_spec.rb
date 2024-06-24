@@ -1090,6 +1090,34 @@ describe Submission do
           submission.score
         }.from(5).to(3)
       end
+
+      it "deducts nothing if the submission is for a checkpointed discussion" do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        cd = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: cd,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 3.hours.ago(@date) }],
+          points_possible: 5
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: cd,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 3.hours.ago(@date) }],
+          points_possible: 5,
+          replies_required: 1
+        )
+        cd_submission = cd.assignment.submissions.find_by!(user: @student)
+
+        Timecop.freeze(@date) do
+          cd.discussion_entries.create!(user: @student, message: "reply to topic")
+          cd.discussion_entries.create!(user: @student, message: "reply to entry", parent_id: cd.discussion_entries.first.id)
+          cd_submission.score = 10
+          cd_submission.save!
+          expect(cd_submission.points_deducted).to be_nil
+        end
+      end
     end
 
     it "deducts nothing if grading period is closed" do

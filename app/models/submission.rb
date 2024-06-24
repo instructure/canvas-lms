@@ -1704,6 +1704,7 @@ class Submission < ActiveRecord::Base
   def late_policy_relevant_changes?
     return true if @regraded
     return false if grade_matches_current_submission == false # nil is treated as true
+    return false if assignment.has_sub_assignments?
 
     changes.slice(:score, :submitted_at, :seconds_late_override, :late_policy_status, :custom_grade_status_id).any?
   end
