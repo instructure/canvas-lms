@@ -445,45 +445,12 @@ describe "Discussion Topic Show" do
         expect(Discussion.summary_text).to include_text("refined_summary_1")
         expect(Discussion.summary_like_button).to be_present
         expect(Discussion.summary_dislike_button).to be_present
-        expect(Discussion.summary_regenerate_button).to be_present
+        expect(Discussion.summary_generate_button).to be_present
         expect(Discussion.summary_disable_button).to be_present
         expect(f("body")).not_to contain_css(Discussion.summarize_button_selector)
 
         Discussion.click_summary_like_button
         Discussion.click_summary_dislike_button
-
-        expect(@inst_llm).to receive(:chat).and_return(
-          InstLLM::Response::ChatResponse.new(
-            model: "model",
-            message: { role: :assistant, content: "raw_summary_2" },
-            stop_reason: "stop_reason",
-            usage: {
-              input_tokens: 10,
-              output_tokens: 20,
-            }
-          )
-        )
-        expect(@inst_llm).to receive(:chat).and_return(
-          InstLLM::Response::ChatResponse.new(
-            model: "model",
-            message: { role: :assistant, content: "refined_summary_2" },
-            stop_reason: "stop_reason",
-            usage: {
-              input_tokens: 10,
-              output_tokens: 20,
-            }
-          )
-        )
-
-        Discussion.click_summary_regenerate_button
-
-        expect(Discussion.summary_text).to include_text("refined_summary_2")
-        expect(Discussion.summary_like_button).to be_present
-        expect(Discussion.summary_dislike_button).to be_present
-        expect(Discussion.summary_regenerate_button).to be_present
-        expect(Discussion.summary_disable_button).to be_present
-        expect(f("body")).not_to contain_css(Discussion.summarize_button_selector)
-
         Discussion.click_summary_disable_button
 
         expect(f("body")).not_to contain_css(Discussion.summary_text_selector)
@@ -603,7 +570,7 @@ describe "Discussion Topic Show" do
         expect(Discussion.summary_text).to include_text("refined_summary_2")
       end
 
-      it "allows teacher to regenerate a summary with user input" do
+      it "allows teacher to generate a summary with user input" do
         expect(@inst_llm).to receive(:chat).and_return(
           InstLLM::Response::ChatResponse.new(
             model: "model",
@@ -657,7 +624,7 @@ describe "Discussion Topic Show" do
           )
         )
 
-        Discussion.click_summary_regenerate_button
+        Discussion.click_summary_generate_button
 
         expect(Discussion.summary_text).to include_text("refined_summary_2")
       end

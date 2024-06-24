@@ -17,28 +17,32 @@
  */
 
 import React from 'react'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconSyllabusLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 
-interface DiscussionSummaryRegenerateButtonProps {
+interface DiscussionSummaryGenerateButtonProps {
   onClick: () => void
   isEnabled: boolean
-  buttonText: string
 }
 
-export const DiscussionSummaryRegenerateButton: React.FC<
-  DiscussionSummaryRegenerateButtonProps
+const I18n = useI18nScope('discussions_posts')
+
+export const DiscussionSummaryGenerateButton: React.FC<
+  DiscussionSummaryGenerateButtonProps
 > = props => {
+  const buttonText = I18n.t('Generate Summary')
+
   return (
-    <Tooltip renderTip={props.buttonText} width="48px" data-testid="summary-regenerate-tooltip">
+    <Tooltip renderTip={buttonText} width="48px" data-testid="summary-generate-tooltip">
       <Button
         onClick={props.onClick}
         renderIcon={IconSyllabusLine}
-        data-testid="summary-regenerate-button"
+        data-testid="summary-generate-button"
         disabled={!props.isEnabled}
       >
-        {props.buttonText}
+        {buttonText}
       </Button>
     </Tooltip>
   )

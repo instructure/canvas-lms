@@ -234,39 +234,6 @@ describe DiscussionTopicsApiController do
           expect(response.parsed_body["id"]).to eq(@refined_summary.id)
         end
 
-        it "returns a new summary if forced" do
-          expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
-
-          expect(@inst_llm).to receive(:chat).and_return(
-            InstLLM::Response::ChatResponse.new(
-              model: "model",
-              message: { role: :assistant, content: "raw_summary" },
-              stop_reason: "stop_reason",
-              usage: {
-                input_tokens: 10,
-                output_tokens: 20,
-              }
-            )
-          )
-          expect(@inst_llm).to receive(:chat).and_return(
-            InstLLM::Response::ChatResponse.new(
-              model: "model",
-              message: { role: :assistant, content: "refined_summary" },
-              stop_reason: "stop_reason",
-              usage: {
-                input_tokens: 10,
-                output_tokens: 20,
-              }
-            )
-          )
-
-          get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, force: true }, format: "json"
-
-          expect(response).to be_successful
-          expect(@topic.reload.summary_enabled).to be_truthy
-          expect(response.parsed_body["id"]).not_to eq(@refined_summary.id)
-        end
-
         it "returns a new summary if locale has changed" do
           expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
           @teacher.update!(locale: "es")
@@ -354,6 +321,33 @@ describe DiscussionTopicsApiController do
         expect(response).to be_successful
         expect(@topic.reload.summary_enabled).to be_truthy
       end
+    end
+
+    it "returns rate limit exceeded error if the user has reached the max number of summaries for the day" do
+      cache_key = ["inst_llm_helper", "rate_limit", @teacher.uuid, "raw-V1_A", Time.now.utc.strftime("%Y%m%d")].cache_key
+      Canvas.redis.incr(cache_key)
+
+      allow_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+      expect(LLMConfigs).to receive(:config_for).and_return(
+        LLMConfig.new(
+          name: "raw-V1_A",
+          model_id: "model",
+          rate_limit: { limit: 1, period: "day" },
+          template: "<CONTENT_PLACEHOLDER>"
+        )
+      )
+      expect(LLMConfigs).to receive(:config_for).and_return(
+        LLMConfig.new(
+          name: "refined-V1_A",
+          model_id: "model",
+          template: "<CONTENT_PLACEHOLDER>"
+        )
+      )
+
+      get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, userInput: "rejected by rate limit" }, format: "json"
+
+      expect(response.status).to eq(429)
+      expect(response.parsed_body["error"]).to include("1")
     end
 
     it "returns an error if the user can't summarize" do
