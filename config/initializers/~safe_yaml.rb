@@ -34,7 +34,8 @@ ADDITIONAL_ALLOWED_CLASSES = [
   Symbol,
   Time,
   URI::HTTP,
-  URI::HTTPS
+  URI::HTTPS,
+  WeakParameters
 ].freeze
 
 # SafeYAML-like interface, but vanilla Psych
