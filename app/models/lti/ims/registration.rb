@@ -98,7 +98,7 @@ class Lti::IMS::Registration < ApplicationRecord
         privacy_level:,
         settings: {
           text: client_name,
-          icon_url: config["icon_uri"],
+          icon_url: logo_uri,
           platform: "canvas.instructure.com",
           placements: placements(apply_overlay:)
         }
@@ -119,7 +119,7 @@ class Lti::IMS::Registration < ApplicationRecord
       custom_fields: config["custom_parameters"],
       target_link_uri: config["target_link_uri"],
       privacy_level:,
-      icon_url: config["icon_uri"],
+      icon_url: logo_uri,
       oidc_initiation_url: initiate_login_uri,
       redirect_uris:,
       public_jwk_url: jwks_uri,

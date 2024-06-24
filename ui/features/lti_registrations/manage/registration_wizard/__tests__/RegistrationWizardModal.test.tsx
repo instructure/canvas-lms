@@ -124,8 +124,7 @@ describe('RegistrationWizardModal', () => {
         exitOnCancel: true,
       })
       const accountId = ZAccountId.parse('123')
-      const screen = render(<RegistrationWizardModal accountId={accountId} />)
-      screen.debug()
+      render(<RegistrationWizardModal accountId={accountId} />)
       const cancelButton = screen.getByRole('button', {
         name: /Cancel/i,
       })

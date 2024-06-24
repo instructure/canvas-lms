@@ -180,6 +180,19 @@ export const AllLtiPlacements = [
 export const ZLtiPlacement = z.enum(AllLtiPlacements)
 export type LtiPlacement = z.infer<typeof ZLtiPlacement>
 
+export const LtiPlacementsWithIcons = [
+  LtiPlacements.GlobalNavigation,
+  LtiPlacements.CourseHomeSubNavigation,
+  LtiPlacements.AssignmentIndexMenu,
+  LtiPlacements.CourseSettingsSubNavigation,
+  LtiPlacements.DiscussionTopicMenu,
+  LtiPlacements.DiscussionTopicIndexMenu,
+  LtiPlacements.EditorButton,
+  LtiPlacements.FileIndexMenu,
+] as const
+
+export type LtiPlacementWithIcon = (typeof LtiPlacementsWithIcons)[number]
+
 const LtiPlacementTranslations: Record<LtiPlacement, string> = {
   account_navigation: I18n.t('Account Navigation'),
   assignment_edit: I18n.t('Assignment Edit'),

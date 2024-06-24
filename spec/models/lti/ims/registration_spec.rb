@@ -189,7 +189,7 @@ module Lti::IMS
               "platform" => "canvas.instructure.com",
               "privacy_level" => "anonymous",
               "settings" => {
-                "icon_url" => nil,
+                "icon_url" => registration.logo_uri,
                 "placements" => [],
                 "platform" => "canvas.instructure.com",
                 "text" => "Example Tool",
@@ -554,7 +554,7 @@ module Lti::IMS
                 "platform" => "canvas.instructure.com",
                 "privacy_level" => "anonymous",
                 "settings" => {
-                  "icon_url" => nil,
+                  "icon_url" => registration.logo_uri,
                   "placements" => [
                     {
                       "custom_fields" => { "foo" => "bar" },
@@ -605,7 +605,7 @@ module Lti::IMS
                   "placement" => "global_navigation",
                   "target_link_uri" => "http://example.com/launch"
                 },
-                "icon_url" => nil,
+                "icon_url" => registration.logo_uri,
                 "placements" => [
                   {
                     "custom_fields" => { "foo" => "bar" },
@@ -808,7 +808,7 @@ module Lti::IMS
               custom_fields: config[:custom_parameters],
               target_link_uri: config[:target_link_uri],
               privacy_level: registration.privacy_level,
-              icon_url: config[:icon_uri],
+              icon_url: registration.logo_uri,
               oidc_initiation_url: registration.initiate_login_uri,
               redirect_uris: registration.redirect_uris,
               public_jwk_url: registration.jwks_uri,
@@ -840,7 +840,7 @@ module Lti::IMS
               custom_fields: config[:custom_parameters],
               target_link_uri: config[:target_link_uri],
               privacy_level: registration.privacy_level,
-              icon_url: config[:icon_uri],
+              icon_url: registration.logo_uri,
               oidc_initiation_url: registration.initiate_login_uri,
               redirect_uris: registration.redirect_uris,
               public_jwk_url: registration.jwks_uri,
