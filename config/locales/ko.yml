@@ -10164,7 +10164,9 @@ ko:
     learn_platform_settings: 
       labels: 
         base_url: "기준 URL"
+        password: 암호
         token: "액세스 토큰"
+        username: "사용자 이름"
     linked_in: 
       description: "LinkedIn 통합"
     linked_in_settings: 
