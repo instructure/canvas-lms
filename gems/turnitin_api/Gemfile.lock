@@ -22,8 +22,8 @@ GEM
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
-    addressable (2.8.6)
-      public_suffix (>= 2.0.2, < 6.0)
+    addressable (2.8.7)
+      public_suffix (>= 2.0.2, < 7.0)
     aroi (1.0.0)
       activerecord (>= 5.2)
       activesupport (>= 5.2)
@@ -53,7 +53,7 @@ GEM
     multipart-post (2.4.1)
     net-http (0.4.1)
       uri
-    public_suffix (5.0.5)
+    public_suffix (6.0.0)
     rake (13.2.1)
     rexml (3.2.9)
       strscan

@@ -7,8 +7,8 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.8.6)
-      public_suffix (>= 2.0.2, < 6.0)
+    addressable (2.8.7)
+      public_suffix (>= 2.0.2, < 7.0)
     base64 (0.2.0)
     bigdecimal (3.1.8)
     crack (1.0.0)
@@ -57,7 +57,7 @@ GEM
     os (1.1.4)
     psych (5.1.2)
       stringio
-    public_suffix (5.0.5)
+    public_suffix (6.0.0)
     rake (13.2.1)
     rdoc (6.7.0)
       psych (>= 4.0.0)
