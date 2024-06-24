@@ -26,6 +26,7 @@ import {
   STUDENTS_DATA,
   FIRST_GROUP_CATEGORY_DATA,
   SECOND_GROUP_CATEGORY_DATA,
+  ADHOC_WITHOUT_STUDENTS,
 } from '../../__tests__/mocks'
 
 const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
@@ -625,6 +626,32 @@ describe('ItemAssignToTray', () => {
       const save = getByTestId('differentiated_modules_save_button')
       await user.click(save)
       expect(getByTestId('cards-loading')).toBeInTheDocument()
+    })
+
+    it('does not show cards for ADHOC override with no students', async () => {
+      fetchMock.get(OVERRIDES_URL, ADHOC_WITHOUT_STUDENTS, {
+        overwriteRoutes: true,
+      })
+      const {findAllByTestId} = renderComponent()
+      const cards = await findAllByTestId('item-assign-to-card')
+      expect(cards).toHaveLength(1)
+    })
+
+    it('does not include ADHOC overrides without students when saving', async () => {
+      fetchMock.get(OVERRIDES_URL, ADHOC_WITHOUT_STUDENTS, {
+        overwriteRoutes: true,
+      })
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
+      const {findByTestId, findAllByText, findAllByTestId} = renderComponent()
+      const cards = await findAllByTestId('item-assign-to-card')
+      // renders only 1 valid card
+      expect(cards).toHaveLength(1)
+      const save = await findByTestId('differentiated_modules_save_button')
+      await user.click(save)
+      expect((await findAllByText(`${props.itemName} updated`))[0]).toBeInTheDocument()
+      const requestBody = JSON.parse(fetchMock.lastOptions(DATE_DETAILS)?.body)
+      // filters out invalid overrides
+      expect(requestBody.assignment_overrides).toHaveLength(1)
     })
   })
 

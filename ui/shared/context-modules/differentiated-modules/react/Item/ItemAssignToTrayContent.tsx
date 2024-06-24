@@ -276,6 +276,7 @@ const ItemAssignToTrayContent = ({
             if (override.group_id) {
               defaultOptions.push(`group-${override.group_id}`)
             }
+            removeCard = removeCard || override.student_ids?.length === 0
             if (
               removeCard ||
               (override.context_module_id &&
