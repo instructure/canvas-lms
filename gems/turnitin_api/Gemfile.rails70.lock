@@ -1,0 +1,102 @@
+PATH
+  remote: .
+  specs:
+    turnitin_api (0.1.0)
+      activesupport
+      faraday (~> 2.7)
+      faraday-follow_redirects (~> 0.3)
+      faraday-multipart (~> 1.0)
+      inst_statsd
+      simple_oauth (~> 0.3)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activemodel (7.0.8)
+      activesupport (= 7.0.8)
+    activerecord (7.0.8)
+      activemodel (= 7.0.8)
+      activesupport (= 7.0.8)
+    activesupport (7.0.8)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
+    addressable (2.8.7)
+      public_suffix (>= 2.0.2, < 7.0)
+    aroi (1.0.0)
+      activerecord (>= 5.2)
+      activesupport (>= 5.2)
+    bigdecimal (3.1.8)
+    concurrent-ruby (1.3.3)
+    crack (1.0.0)
+      bigdecimal
+      rexml
+    diff-lcs (1.5.1)
+    dogstatsd-ruby (5.6.1)
+    faraday (2.9.2)
+      faraday-net_http (>= 2.0, < 3.2)
+    faraday-follow_redirects (0.3.0)
+      faraday (>= 1, < 3)
+    faraday-multipart (1.0.4)
+      multipart-post (~> 2)
+    faraday-net_http (3.1.0)
+      net-http
+    hashdiff (1.1.0)
+    i18n (1.14.5)
+      concurrent-ruby (~> 1.0)
+    inst_statsd (3.0.4)
+      aroi (>= 0.0.7)
+      dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
+      statsd-ruby (~> 1.0)
+    minitest (5.24.0)
+    multipart-post (2.4.1)
+    net-http (0.4.1)
+      uri
+    public_suffix (6.0.0)
+    rake (13.2.1)
+    rexml (3.3.0)
+      strscan
+    rspec (3.13.0)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.0)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.1)
+    simple_oauth (0.3.1)
+    statsd-ruby (1.5.0)
+    strscan (3.1.0)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
+    uri (0.13.0)
+    webmock (3.23.1)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
+
+PLATFORMS
+  aarch64-linux
+  arm64-darwin
+  ruby
+  x86_64-darwin
+  x86_64-linux
+
+DEPENDENCIES
+  bundler (~> 2.2)
+  rake
+  rspec (~> 3.12)
+  turnitin_api!
+  webmock (~> 3.0)
+
+RUBY VERSION
+   ruby 3.1.2p20
+
+BUNDLED WITH
+   2.5.10

@@ -1,0 +1,175 @@
+PATH
+  remote: ../bookmarked_collection
+  specs:
+    bookmarked_collection (1.0.0)
+      activerecord (>= 3.2)
+      folio-pagination (~> 0.0.12)
+      json_token
+      paginated_collection
+      railties (>= 3.2)
+      will_paginate (>= 3.0, < 5.0)
+
+PATH
+  remote: ../config_file
+  specs:
+    config_file (0.1.0)
+      railties (>= 5.0)
+
+PATH
+  remote: ../json_token
+  specs:
+    json_token (0.0.1)
+      json
+
+PATH
+  remote: ../paginated_collection
+  specs:
+    paginated_collection (1.0.0)
+      folio-pagination (~> 0.0.12)
+      will_paginate (>= 3.0, < 5.0)
+
+PATH
+  remote: .
+  specs:
+    event_stream (0.1.0)
+      activerecord (>= 4.2)
+      bookmarked_collection
+      inst_statsd
+      json_token
+      paginated_collection
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    actionpack (7.0.8)
+      actionview (= 7.0.8)
+      activesupport (= 7.0.8)
+      rack (~> 2.0, >= 2.2.4)
+      rack-test (>= 0.6.3)
+      rails-dom-testing (~> 2.0)
+      rails-html-sanitizer (~> 1.0, >= 1.2.0)
+    actionview (7.0.8)
+      activesupport (= 7.0.8)
+      builder (~> 3.1)
+      erubi (~> 1.4)
+      rails-dom-testing (~> 2.0)
+      rails-html-sanitizer (~> 1.1, >= 1.2.0)
+    activemodel (7.0.8)
+      activesupport (= 7.0.8)
+    activerecord (7.0.8)
+      activemodel (= 7.0.8)
+      activesupport (= 7.0.8)
+    activesupport (7.0.8)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
+    aroi (1.0.0)
+      activerecord (>= 5.2)
+      activesupport (>= 5.2)
+    builder (3.3.0)
+    concurrent-ruby (1.3.3)
+    crass (1.0.6)
+    diff-lcs (1.5.1)
+    docile (1.4.0)
+    dogstatsd-ruby (5.6.1)
+    erubi (1.13.0)
+    folio-pagination (0.0.12)
+    i18n (1.14.5)
+      concurrent-ruby (~> 1.0)
+    inst_statsd (3.0.4)
+      aroi (>= 0.0.7)
+      dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
+      statsd-ruby (~> 1.0)
+    json (2.7.2)
+    loofah (2.22.0)
+      crass (~> 1.0.2)
+      nokogiri (>= 1.12.0)
+    method_source (1.1.0)
+    mini_portile2 (2.8.7)
+    minitest (5.24.0)
+    nokogiri (1.16.6)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
+    nokogiri (1.16.6-aarch64-linux)
+      racc (~> 1.4)
+    nokogiri (1.16.6-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.16.6-x86_64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.16.6-x86_64-linux)
+      racc (~> 1.4)
+    racc (1.8.0)
+    rack (2.2.9)
+    rack-test (2.1.0)
+      rack (>= 1.3)
+    rails-dom-testing (2.2.0)
+      activesupport (>= 5.0.0)
+      minitest
+      nokogiri (>= 1.6)
+    rails-html-sanitizer (1.6.0)
+      loofah (~> 2.21)
+      nokogiri (~> 1.14)
+    railties (7.0.8)
+      actionpack (= 7.0.8)
+      activesupport (= 7.0.8)
+      method_source
+      rake (>= 12.2)
+      thor (~> 1.0)
+      zeitwerk (~> 2.5)
+    rake (13.2.1)
+    rspec (3.13.0)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.0)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.1)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.12.3)
+    simplecov_json_formatter (0.1.4)
+    sqlite3 (1.7.3)
+      mini_portile2 (~> 2.8.0)
+    sqlite3 (1.7.3-aarch64-linux)
+    sqlite3 (1.7.3-arm64-darwin)
+    sqlite3 (1.7.3-x86_64-darwin)
+    sqlite3 (1.7.3-x86_64-linux)
+    statsd-ruby (1.5.0)
+    thor (1.3.1)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
+    will_paginate (4.0.1)
+    zeitwerk (2.6.16)
+
+PLATFORMS
+  aarch64-linux
+  arm64-darwin
+  ruby
+  x86_64-darwin
+  x86_64-linux
+
+DEPENDENCIES
+  bookmarked_collection!
+  bundler (~> 2.2)
+  config_file!
+  event_stream!
+  json_token!
+  paginated_collection!
+  rspec (~> 3.12)
+  simplecov (~> 0.22)
+  sqlite3
+
+RUBY VERSION
+   ruby 3.1.2p20
+
+BUNDLED WITH
+   2.5.10
