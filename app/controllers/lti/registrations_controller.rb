@@ -461,7 +461,15 @@ class Lti::RegistrationsController < ApplicationController
   # and those enabled 'on' at the parent root account level.
   #
   # @argument per_page [integer] The number of registrations to return per page. Defaults to 15.
+  #
   # @argument page [integer] The page number to return. Defaults to 1.
+  #
+  # @argument sort [String]
+  #   The field to sort by. Choices are: name, nickname, lti_version, installed,
+  #   installed_by, updated_by, and on. Defaults to installed.
+  #
+  # @argument dir [String, "asc"|"dsc"]
+  #   The order to sort the given column by. Defaults to dsc.
   #
   # @returns {"total": "integer", data: [Lti::Registration] }
   #
@@ -509,8 +517,29 @@ class Lti::RegistrationsController < ApplicationController
       search_terms = params[:query]&.downcase&.split
       all_registrations = filter_registrations_by_search_query(all_registrations, search_terms) if search_terms
 
-      # always sort by created_at descending for now
-      sorted_registrations = all_registrations.sort { |first, second| second.created_at - first.created_at }
+      # sort by the 'sort' parameter, or installed (a.k.a. created_at) if no parameter was given
+      sort_field = params[:sort]&.to_sym || :installed
+
+      sorted_registrations = all_registrations.sort_by do |reg|
+        case sort_field
+        when :name
+          reg.name.downcase
+        when :nickname
+          reg.admin_nickname&.downcase || ""
+        when :lti_version
+          reg.lti_version
+        when :installed
+          reg.created_at
+        when :installed_by
+          reg.created_by&.name&.downcase || ""
+        when :updated_by
+          reg.updated_by&.name&.downcase || ""
+        when :on
+          reg.account_binding_for(@account).workflow_state
+        end
+      end
+
+      sorted_registrations.reverse! unless params[:dir] == "asc"
 
       per_page = Api.per_page_for(self, default: 15)
       paginated_registrations, _metadata = Api.jsonapi_paginate(sorted_registrations, self, url_for, { per_page: })
