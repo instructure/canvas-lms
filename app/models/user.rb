@@ -264,6 +264,7 @@ class User < ActiveRecord::Base
 
   has_many :gradebook_filters, inverse_of: :user, dependent: :destroy
   has_many :quiz_migration_alerts, dependent: :destroy
+  has_many :custom_data, class_name: "CustomData"
 
   belongs_to :otp_communication_channel, class_name: "CommunicationChannel"
 
