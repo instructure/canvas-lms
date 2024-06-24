@@ -18,11 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class LLMConfig
-  attr_reader :name, :model_id, :template, :options
+  attr_reader :name, :model_id, :rate_limit, :template, :options
 
-  def initialize(name:, model_id:, template: nil, options: nil)
+  def initialize(name:, model_id:, rate_limit: nil, template: nil, options: nil)
     @name = name
     @model_id = model_id
+    @rate_limit = rate_limit&.transform_keys(&:to_sym)
     @template = template
     @options = options || {}
     validate!
@@ -61,6 +62,7 @@ class LLMConfig
   def validate!
     raise ArgumentError, "Name must be a string" unless @name.is_a?(String)
     raise ArgumentError, "Model ID must be a string" unless @model_id.is_a?(String)
+    raise ArgumentError, "Rate limit must be either nil, or hash with :limit and :period keys" unless @rate_limit.nil? || (@rate_limit.is_a?(Hash) && @rate_limit.keys == %i[limit period])
     raise ArgumentError, "Template must be a string" unless @template.is_a?(String)
     raise ArgumentError, "Options must be a hash" unless @options.is_a?(Hash)
   end
