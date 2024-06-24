@@ -10885,7 +10885,9 @@ el:
     learn_platform_settings: 
       labels: 
         base_url: "URL βάσης"
+        password: "Κωδικός πρόσβασης"
         token: "Token Πρόσβασης"
+        username: "Όνομα Χρήστη"
     linked_in: 
       description: "Ενσωμάτωση LinkedIn"
     linked_in_settings: 
