@@ -26,7 +26,7 @@ describe Lti::RegistrationsController do
 
   describe "GET index" do
     let_once(:account) { account_model }
-    let_once(:admin) { account_admin_user(account:) }
+    let_once(:admin) { account_admin_user(name: "A User", account:) }
 
     before do
       user_session(admin)
@@ -166,13 +166,73 @@ describe Lti::RegistrationsController do
             .to include({ id: an_instance_of(Integer) })
         end
 
-        it "sorts the results by newest first" do
+        it "sorts the results by newest first by default" do
           lti_registration_model(account:, name: "created just now")
           lti_registration_model(account:, name: "created an hour ago", created_at: 1.hour.ago)
 
           subject
           expect(response_json[:data].first["name"]).to eq("created just now")
           expect(response_json[:data].last["name"]).to eq("created an hour ago")
+        end
+
+        context "when sorting by installed_by" do
+          subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=installed_by" }
+
+          before do
+            # Other admin is "A User" -- registrations with an LRAB by B User should be last
+            admin2 = account_admin_user(name: "B User", account:)
+            lti_registration_model(name: "Created by B User", created_by: admin2, account:)
+          end
+
+          it "sorts by the lti_registration_account_binding.created_by" do
+            subject
+            expect(response_json[:data].last["name"]).to eq("Created by B User")
+          end
+
+          context "with the dir=asc parameter" do
+            subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=installed_by&dir=asc" }
+
+            it "puts the results in ascending order" do
+              subject
+              expect(response_json[:data].first["name"]).to eq("Created by B User")
+            end
+          end
+        end
+
+        context "when sorting by name" do
+          subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=name" }
+
+          before do
+            lti_registration_model(account:, name: "AAA registration")
+            lti_registration_model(account:, name: "ZZZ registration")
+          end
+
+          it "sorts by name" do
+            subject
+            expect(response_json[:data].first["name"]).to eq("ZZZ registration")
+            expect(response_json[:data].last["name"]).to eq("AAA registration")
+          end
+
+          context "with the dir=asc parameter" do
+            subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=name&dir=asc" }
+
+            it "puts the results in ascending order" do
+              subject
+              expect(response_json[:data].first["name"]).to eq("AAA registration")
+              expect(response_json[:data].last["name"]).to eq("ZZZ registration")
+            end
+          end
+        end
+
+        context "when sorting by a nil attribute" do
+          subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=nickname" }
+
+          it "treats nil like an empty value" do
+            lti_registration_model(admin_nickname: "a nickname", account:)
+            lti_registration_model(admin_nickname: nil, account:)
+            subject
+            expect(response_json[:data].first["admin_nickname"]).to eq("a nickname")
+          end
         end
 
         context "with a search query param matching no results" do
