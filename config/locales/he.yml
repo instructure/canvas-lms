@@ -14383,7 +14383,9 @@ he:
     learn_platform_settings: 
       labels: 
         base_url: "כתובת דף בסיס"
+        password: "סיסמה "
         token: "אסימון גישה"
+        username: "שם משתמש "
     linked_in: 
       description: "אינטגרציה עם לינקדאין"
     linked_in_settings: 
