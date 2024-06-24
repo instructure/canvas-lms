@@ -14446,7 +14446,9 @@ tr:
     learn_platform_settings: 
       labels: 
         base_url: "Temel URL"
+        password: Şifre
         token: "Erişim Anahtarı"
+        username: "Kullanıcı Adı"
     linked_in: 
       description: "LinkedIn entegrasyonu"
     linked_in_settings: 

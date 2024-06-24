@@ -17757,7 +17757,9 @@ fa:
     learn_platform_settings: 
       labels: 
         base_url: "نشانی اینترنتی پایه"
+        password: Password
         token: "نشانه دسترسی"
+        username: "نام کاربری"
     linked_in: 
       description: "یکپارچه‌سازی لینکدین"
     linked_in_settings: 
