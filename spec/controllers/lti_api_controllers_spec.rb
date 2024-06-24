@@ -301,6 +301,14 @@ describe LtiApiController, type: :request do
       expect(xml.at_css("imsx_POXBody *:first").name).to eq "replaceResultResponse"
     end
 
+    it "works with a content-type of application/xml with a charset present" do
+      make_call(
+        "content-type" => "application/xml; charset=utf-8",
+        "body" => replace_result(score: "0.6")
+      )
+      check_success
+    end
+
     it "allows updating the submission score" do
       expect(@assignment.submissions.not_placeholder.where(user_id: @student)).not_to be_exists
       make_call("body" => replace_result(score: "0.6"))
