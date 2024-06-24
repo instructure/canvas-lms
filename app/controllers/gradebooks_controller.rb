@@ -828,13 +828,7 @@ class GradebooksController < ApplicationController
         return
       end
 
-      submissions = if $canvas_rails == "7.1"
-                      params[:submissions] ? params[:submissions].values : [params[:submission]]
-                    elsif params[:submissions]
-                      params[:submissions].values.map { |s| ActionController::Parameters.new(s) }
-                    else
-                      [params[:submission]]
-                    end
+      submissions = params[:submissions] ? params[:submissions].values : [params[:submission]]
 
       # decorate submissions with user_ids if not present
       submissions_without_user_ids = submissions.select { |s| s[:user_id].blank? }

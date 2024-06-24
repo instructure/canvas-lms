@@ -160,14 +160,12 @@ unless $canvas_tasks_loaded
   namespace :db do
     desc "Shows pending db migrations."
     task pending_migrations: :environment do
-      migrations = ActiveRecord::Base.connection.migration_context.migrations
-      args = [:up, migrations, ActiveRecord::Base.connection.schema_migration]
-      if $canvas_rails == "7.1"
-        internal_metadata = ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection)
-        args << internal_metadata
-      end
-      pending_migrations = ActiveRecord::Migrator.new(*args).pending_migrations
-      pending_migrations.each do |pending_migration|
+      ActiveRecord::Migrator.new(
+        :up,
+        ActiveRecord::Base.connection.migration_context.migrations,
+        ActiveRecord::Base.connection.schema_migration,
+        ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection)
+      ).pending_migrations.each do |pending_migration|
         tags = pending_migration.tags
         tags = " (#{tags.join(", ")})" unless tags.empty?
         puts "  %4d %s%s" % [pending_migration.version, pending_migration.name, tags]
@@ -176,14 +174,10 @@ unless $canvas_tasks_loaded
 
     desc "Shows skipped db migrations."
     task skipped_migrations: :environment do
-      migrations = ActiveRecord::Base.connection.migration_context.migrations
-      args = [:up, migrations, ActiveRecord::Base.connection.schema_migration]
-      if $canvas_rails == "7.1"
-        internal_metadata = ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection)
-        args << internal_metadata
-      end
-      skipped_migrations = ActiveRecord::Migrator.new(*args).skipped_migrations
-      skipped_migrations.each do |skipped_migration|
+      ActiveRecord::Migrator.new(:up,
+                                 ActiveRecord::Base.connection.migration_context.migrations,
+                                 ActiveRecord::Base.connection.schema_migration,
+                                 ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection)).skipped_migrations.each do |skipped_migration|
         tags = skipped_migration.tags
         tags = " (#{tags.join(", ")})" unless tags.empty?
         puts "  %4d %s%s" % [skipped_migration.version, skipped_migration.name, tags]
@@ -199,12 +193,11 @@ unless $canvas_tasks_loaded
       task predeploy: [:environment, :load_config] do
         migrations = ActiveRecord::Base.connection.migration_context.migrations
         migrations = migrations.select { |m| m.tags.include?(:predeploy) }
-        args = [:up, migrations, ActiveRecord::Base.connection.schema_migration]
-        if $canvas_rails == "7.1"
-          internal_metadata = ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection)
-          args << internal_metadata
-        end
-        ActiveRecord::Migrator.new(*args).migrate
+        ActiveRecord::Migrator.new(:up,
+                                   migrations,
+                                   ActiveRecord::Base.connection.schema_migration,
+                                   ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection))
+                              .migrate
       end
     end
 

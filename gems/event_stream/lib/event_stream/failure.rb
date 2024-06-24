@@ -21,13 +21,8 @@
 class EventStream::Failure < ActiveRecord::Base
   self.table_name = :event_stream_failures
 
-  if Rails.version < "7.1"
-    serialize :payload, Hash
-    serialize :backtrace, Array
-  else
-    serialize :payload, type: Hash
-    serialize :backtrace, type: Array
-  end
+  serialize :payload, type: Hash
+  serialize :backtrace, type: Array
 
   def self.log!(operation, stream, record, exception)
     return if stream.raise_on_error
