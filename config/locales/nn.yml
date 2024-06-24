@@ -19735,7 +19735,9 @@ nn:
     learn_platform_settings: 
       labels: 
         base_url: "Primær URL"
+        password: Passord
         token: Tilgangstoken
+        username: Brukarnamn
     learnplatform: 
       name: LearnPlatform
     linked_in: 
@@ -23309,6 +23311,8 @@ nn:
   select_type_of_prerequisite_8d6fa902: "Vel type føresetnad"
   select_users_who_can_create_new_courses_75f92743: "Vel brukarar som kan opprette nye emne"
   select_video_file_35b61d4e: "Vel videofil"
+  select_view_a3fa73b3: "Vel visning"
+  select_what_data_toolname_has_access_to_38001bf2: "Vel kva slags data *%{toolName}* har tilgang til"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Vel kva du vil vise på startsida."
   select_whether_to_post_for_all_submissions_or_only_b18d681f: "Vel å poste for alle innleveringar eller kun til dei som er vurderte."
   selectable_outcomes_during_course_content_migratio_3f108a1a: "Valbare resultat under migrering av emneinnhald"
@@ -23332,6 +23336,21 @@ nn:
   selection_start_date_2e4a4dca: "Startdato for val"
   selection_width_183acd79: "Utval breidde"
   selective_import_aff12a7c: "Selektiv import"
+  selective_release_backend_changes_b102489c: "Selektiv publisering - endringar for backend"
+  selective_release_files_74fbd63e: "Selektiv publisering - Filar"
+  selective_release_is_a_feature_that_allows_modules_2d393f0b: |-
+      Selektiv publisering er ein funksjonalitet som gjer at modular og modulemelement kan
+      bli gjort tilgjengeleg for spesifikke personar og gruppar. Dette er det første av to funskjonalitetsflagg
+      som må vere slått på for at denne funksjonen skal tre i kraft. Når dette flagget er slått på så vil
+      dei gjennomgåande backendendringane som støtter det å tilegne moduler og moduleelement
+      bli slått på. Så lenge ingen modul av type Oppgåve overstyring fins, så vil det å slå på denne funksjonaliteten vere kompatibel tilbake i tid, og eksistere for å sørge for at backendendringane fungerar.
+  selective_release_is_a_feature_that_allows_modules_c3cd5cc4: |-
+      Selektiv publisering er ein funksjonalitet som gjer at modular og modulelement kan
+      bli gjort tilgjengeleg for spesifikke personar og gruppar. Flagget for selective_release_backend
+      MÅ vere slått på før dette flagget kan slås på. Når dette flagget er slått på
+      vil brukergrensesnittet og APIet som tillet brukarane å opprette modular av type Oppgåve Overstyring bli
+      slått på, og dermed vil funksjonaliteten fungere som planlagt
+  selective_release_ui_api_changes_a60b681a: "Selektiv publisering - UI/API endringar"
   self_enrollments: 
     already_enrolled: 
       already_enrolled: "Du er allereie påmeld **%{course}**."
@@ -23385,6 +23404,7 @@ nn:
   send_a_message_to_this_student_ec46b8dd: "Send ei melding til denne studenten"
   send_an_individual_message_to_each_recipient_e9ddaeb8: "Send ei individuell melding til kvar mottakar"
   send_assignment_name_to_another_user_e2ca494d: "Send oppgåve %{name} til ein annan brukar"
+  send_automatic_replies_to_incoming_mail_c18da8eb: "Send automatiske svar til innkommende meldingar"
   send_comment_4e05f2fb: "Send kommentar"
   send_comment_to_instructor_only_4295a109: "Send kommentar berre til underviser"
   send_comment_to_the_whole_group_8d41e63a: "Send kommentar til heile gruppa"
@@ -23414,6 +23434,7 @@ nn:
   send_to_b940900a: "Send til..."
   send_to_ce05b460: "Send til"
   send_usage_metrics_cecc7a7d: "Send brukarstatistikk"
+  send_user_avatar_to_bigbluebutton_17cda2f6: "Send brukeravatar til BigBlueButton"
   sending_bf324366: Sender...
   sending_message_75923692: "Sender melding"
   sending_message_8ac5bc90: "Sender melding..."
@@ -23445,6 +23466,7 @@ nn:
   set_a_random_student_as_group_leader_663dcfd5: "Oppgi ein tilfeldig student som gruppeleiar"
   set_as_default_email_address_bd3b9b8f: "Vel som standard e-postadresse"
   set_as_leader_f710dcec: "Oppgi som leiar"
+  set_assign_to_for_title_6c959e5d: "Sett tildel til for %{title}"
   set_course_color_to_a_custom_hexadecimal_code_c8a50918: "Vel ein emnefarge blant dei tilpassa hexadesimale kodane"
   set_course_color_to_a_preset_hexadecimal_color_cod_97608d8: "Vel ein emnefarge blant dei forhånsvalde hexadesimale fargekodane. Bruk ventre og høgre piltast for å velje. "
   set_created_createdat_895e2243: "Sett oppretta %{createdAt}"
@@ -23900,7 +23922,9 @@ nn:
       name: Namn
       name_pronunciation: "Uttale av namn"
       name_pronunciation_header: "Uttale av namn:"
+      name_pronunciation_header_tip: "For å bekrefte korrekt uttale av namnet ditt kan du skrive inn dei fonetiske tegna"
       name_pronunciation_label: "Uttale av namn"
+      name_pronunciation_label_tip: "For å bekrefte korrekt uttale av namnet ditt kan du skrive inn dei fonetiske tegna"
       no_links: "%{name} har ikkje lagt til lenker"
       nothing_in_common: "De har ingenting felles"
       save_profile: "Lagre profil"
@@ -24271,6 +24295,7 @@ nn:
   show_account_calendar_for_name_c79359a0: "Vis kontokalender for %{name}"
   show_account_navigation_menu_d97270a9: "Vis meny for kontonavigasjon"
   show_account_setting_to_allow_viewing_and_exportin_8f51281f: "Vis kontoinnstillingar for å sjå og eksportere studentane sine fornamn og etternamn i separate kolonnar i vurderingsoversikta"
+  show_additional_results_that_may_be_less_relevant_d578fa5c: "Vis andre resultat som kan vere mindre relevante"
   show_admin_navigation_menu_92fb579f: "Vis admin-navigeringsmeny "
   show_all_967a90f0: "Vis alt"
   show_all_ae37d610: "Vis alt"
@@ -24390,6 +24415,7 @@ nn:
   signature_off_2662bc87: "Signatur av"
   signature_on_27323234: "Signatur på"
   signature_on_off_2ed1cad1: "Signatur På/Av"
+  signature_will_be_added_at_the_end_of_all_messagin_a6713c7c: "Signaturen vil bli lagt til på alle meldingar"
   signup_type_8b4506f3: Påmeldingstype
   similarity_detection_dcada48: Likskapskontroll
   similarity_detection_platform_9e424d70: "Plattform for likskapskontroll"
@@ -24495,6 +24521,7 @@ nn:
   size_size_a77bd760: "storleik: %{size}"
   skillcode_685526a6: ferdigheitskode
   skip_bcb86160: "Hopp over"
+  skip_excused_students_when_messaging_b3cec90c: "Hopp over studentar med gyldig unntak når du sender ut melding"
   skip_to_content_22ad1d00: "Hopp til innhald"
   skip_weekends_13cbd889: "Hopp over helgedagane"
   skipped_file_filename_due_to_error_94f0194: "Hoppa over fila %{filename} på grunn av feil"
@@ -24511,9 +24538,11 @@ nn:
       forward: Vidaresend
   slovak_69f48e1b: Slovakisk
   slovenian_30ae5208: Slovensk
+  smaller_numbers_mean_higher_priority_c69f4d0a: "Lavare tall betyr høg prioritet"
   smart_alerts_44db622e: Smart-varsel
   smart_assignment_alerts_abc2224: "Smart oppgåvevarsel"
   smart_search_fd7cd4: Smart-søk
+  smart_search_is_a_feature_of_canvas_that_is_curren_31f7d35d: "Smart Search er ein ny funksjonalitet som er under utvikling. Ved bruk av semantiske algoritmar og KI så forstår den nye Smart Search-funksjonen konteksten til spørsmåla, og gir meir korrekte og relevante søkeresultat utan behov for tradisjonelle boolske operatørar eller andre søkeverktøy"
   smartbanner: 
     android_banner_author: "Instructure Inc."
     android_banner_in_google_play: "I Google Play"
@@ -24526,9 +24555,11 @@ nn:
   snapshots_6e1806b4: Snapshots
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "Snapshots er backup-versjonar av Canvas-utprøvinga di. Ved å ta ein snapshot opprettast det eit augneblinksbilde frå der du var i utprøvinga då du tok snapshot-en. "
   social_studies_13fa30c7: Samfunnsvitskap
+  some_assignments_are_associated_with_an_archived_o_e1856b65: "Enkelte oppgåver er assosiert med eit arkivert eller sletta karaktersystem, og vurderingsskjemaet kan ikkje bli eksportert"
   some_assignments_could_not_be_created_because_they_d91f2f21: "Nokre oppgåver kunne ikkje opprettast fordi dei fell innanfor ein lukka karaktersetjingsperiode."
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Nokre av konferansane på denne sida er skjulte på grunn av feil under korrigering av status"
   some_custom_columns_could_not_be_changed_because_t_88abc9be: "Nokre eigendefinerte kolonnar er ikkje endra fordi dei berre er lesbare; endringar i desse konlonnane er ignorert."
+  some_institutions_have_very_strict_policies_regard_9abd5243: "Enkelte institusjonar har svært strenge reglar om passord. Denne funksjonaliteten gjer det mogleg å tilpasse passordkrav og alternativ for denne tilbyderen av autentisering. Modifisering av passordval vil forme passordkonfigureringsteksten som vist under."
   some_module_items_could_not_be_published_e4be3c0: "Nokre modulelement kunne ikkje publiserast"
   some_of_the_outcomes_that_you_have_selected_cannot_4a42634a: "Nokre av læringsmåla du har valt kan ikkje fjernast fordi dei er knytt til anna innhold i denne kontoen. Ønsker du å fjerna dei læringsmåla som ikkje har slik tilknytting?"
   some_of_the_outcomes_that_you_have_selected_cannot_c417625: "Nokre av læringsmåla du har valt kan ikkje fjernast fordi dei er knytt til anna innhold i dette emnet. Ønsker du å fjerna dei læringsmåla som ikkje har slik tilknytting?"
@@ -24548,11 +24579,13 @@ nn:
   something_went_wrong_creating_course_please_try_ag_5198931d: "Noko gjekk gale under oppretting av emnet. Prøv på nytt seinare."
   something_went_wrong_creating_the_course_please_tr_431adff5: "Noko gjekk gale under oppretting av emnet. Prøv på nytt seinare."
   something_went_wrong_d238c551: "Noko gjekk gale"
+  something_went_wrong_deleting_the_registration_the_a6b8ca28: "Noko gjekk galt når registreringa skulle slettast. Registreringa kan fortsatt bli sletta manuelt under innstillingar"
   something_went_wrong_downloading_submissions_pleas_6d069a09: "Noko gjekk galt ved nedlasting av innleveringane. Prøv på nytt seinare."
   something_went_wrong_loading_equella_f7e3907c: "Noko gikk feil ved lasting av Equella"
   something_went_wrong_loading_the_equation_editor_62bca61c: "Noko gikk feil ved lasting av editoren for likningar"
   something_went_wrong_loading_the_file_previewer_3fb369e8: "Noko gikk feil ved lasting av førehandsvisning for filar"
   something_went_wrong_loading_the_violations_try_re_9461d057: "Noko gjekk galt under lasting av brudd. Prøv å last inn sida på ny."
+  something_went_wrong_monitoring_the_work_s_progres_d3e63d50: "Noko gjekk gale ved oversyn av prosessen. Prøv å laste sida på nytt."
   something_went_wrong_please_try_refreshing_the_pag_3f651814: "Noko gjekk gale. Prøv å laste sida på nytt. Dersom problemet held fram, kan du prøve å laste ei studentgruppe om gongen i SpeedGrader ved å bruke *Stort emne-innstilling*."
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Noko gjekk gale. Prøv å laste sida på nytt. Dersom problemet held fram, kan det vere at det er for mange innleveringar knytta til \"%{assignmentTitle}\" som skal lastast inn i SpeedGrader."
   something_went_wrong_please_try_refreshing_the_pag_689be273: "Noko gjekk gale. Prøv å laste sida på nytt."
@@ -24560,13 +24593,19 @@ nn:
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Noko gjekk gale under oppdateringa av brukaren si rolle. Prøv på nytt seinare."
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Noko gjekk gale under synkronisering av vurderingar til studentinformasjonssystemet. Prøv på nytt seinare."
   something_went_wrong_while_deactivating_the_user_p_8ff3e261: "Noko gjekk gale under deaktiveringa av brukaren. Prøv på nytt seinare."
+  something_went_wrong_while_fetching_data_76b3ce71: "Noko gjekk gale når data skulle hentas"
   sorry_but_we_couldn_t_automatically_log_you_into_p_e1518750: "Vi kunne ikkje logge deg automatisk inn i %{provider}."
   sorry_but_we_couldn_t_automatically_log_you_into_t_9e77ce17: "Vi kunne ikkje logge deg automatisk inn i nettsamfunnet."
   sorry_something_broke_91c15918: "Orsak, noko gjekk galt"
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "Orsak, handlinga som er utført på innspelinga feila. Prøv igjen seinare"
+  sorry_the_service_is_currently_busy_please_try_aga_cfc7e0df: "Beklager, tjenesten er ikkje tilgjengeleg no. Prøv på nytt seinare."
+  sorry_we_are_currently_experiencing_high_demand_pl_a3eb8506: "Beklager, vi opplever for tida stor trafikk. Prøv på nytt seinare."
+  sorry_we_are_unable_to_summarize_this_discussion_a_25fbc4d2: "Beklager, vi er ikkje i stand til å oppsummere diskusjonen akkurat no. Prøv på nytt seinare"
+  sorry_we_are_unable_to_summarize_this_discussion_a_47e02f: "Beklager, vi er ikkje i stand til å oppsummere diskusjonen da den er for lang."
   sorry_we_couldn_t_find_anything_that_matched_91793bb7: "Vi kunne dessverre ikkje finne noko som passa."
   sort_15eac63f: Sorter
   sort_40afa70: "Sorter: "
+  sort_and_filter_developer_keys_tables_fa8d31b3: "Sorter og filtrer tabell for utviklarnøklar"
   sort_assignments_da00656: "Sorter oppgåver"
   sort_by_72dbba9c: "Sorter etter"
   sort_by_client_id_4c5ea42b: "Sorter etter klient ID"
@@ -24757,6 +24796,7 @@ nn:
   start_date_for_enroll_3c2e1f94: "Startdato for %{enroll}"
   start_date_from_20503757: "Startdato frå:"
   start_date_must_be_before_end_date_a00be892: "Startdato må være før sluttdato"
+  start_date_start_date_end_date_end_date_a85cffa7: "Startdato: %{start_date} | Sluttdato: %{end_date}"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} til %{end_time}"
   start_date_time_must_be_before_the_end_date_time_6be0c57f: "Startdato/tid må være før sluttdato/tid"
   start_date_to_1e6e6bbe: "Startdato til:"
@@ -24824,6 +24864,7 @@ nn:
   step: Trinn
   still_having_difficulty_get_more_help_here_3cdc8de1: "Har du framleis problem? Få meir hjelp her:"
   stop_acting_as_user_8809a97f: "Slutt å opptre som brukar"
+  stop_button_click_to_discontinue_processing_422fea42: "Stoppknapp. Trykk for å avslutte prosessen."
   stop_fd9822ab: Stopp
   storage_quotas_manage_6ca14bbb: "Lagrinskvote - administrer"
   storage_used_in_mb_c75fbd9c: "lagringskapasitet brukt i MB"
@@ -24966,6 +25007,7 @@ nn:
   students_have_already_submitted_to_this_discussion_f55db744: "Studentar har allereie sendt innlegg til diskusjonen og gruppeinnstillingar kan difor ikkje endrast."
   students_have_either_already_taken_or_started_taki_a076336: "Studentar har enten gjennomført eller er i gang med å ta denne quizen. Ver forsiktig med å redigere han. Dersom du gjer store endringar i quiz-spørsmåla, bør du tenkje på å vurdere dei studentane som svarte på den tidlegare versjonen av quizen på nytt."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Studentar har mogleheit til å svara anonymt. Nokre namn og profilbilde kan vere skjulte."
+  students_in_need_of_attention_6aa63dc2: "Studentar som treng meire oppmerksomheit"
   students_must_complete_all_of_these_requirements_15fa97f7: "Studentane må fullføre alle desse krava"
   students_must_complete_all_of_these_requirements_e7268cf9: "Studentar må fullfør alle desse krava"
   students_must_complete_one_of_these_requirements_10db0d1b: "Studentar må fullføre eitt av desse krava"
@@ -25315,6 +25357,7 @@ nn:
   substitution_713c65b9: Erstatning
   subtitle_ee60ca78: Undertekst
   subtitles_could_not_be_imported_from_file_5de6da0b: "Undertekstar kunne ikkje importerast frå %{file}"
+  subtitles_lang_could_not_be_imported_for_file_4d1be2e3: "Undertekstar (%{lang}) kunne ikkje bli importert for %{file}"
   success_a5aeb7: Ferdig!
   success_file_uploaded_8174e93f: "Vellukka: fil lasta opp"
   success_grades_have_been_hidden_for_assignmentname_4ed03c00: "Vurderingar er skjulte for %{assignmentName}"
@@ -25371,6 +25414,7 @@ nn:
       student_support: "NetAcad-støtte - Student"
       student_support_description: "Faglærar eller administrasjon er første kontaktpunkt. Dei kan enten svare på spørsmål eller kontakte brukarstøtte for deg. Ta kontakt via Meldingar. "
       support_desk_livechat: "Brukarstøtte direkte"
+  support_exporting_new_quizzes_in_qti_format_ba09b465: "Støttar å eksportere New Quizzes i QTI format"
   support_favorite_lti_tools_in_the_rce_1680436d: "Støtte for favoritter av LTI-verktøy i teksteditoren"
   support_latex_math_equations_almost_everywhere_6ce8ca24: "Gi støtte for LaTeX-uttrykk nesten over alt"
   support_sharing_settings_4ad422d8: "Innstilling for støttedeling"
@@ -25433,6 +25477,12 @@ nn:
   syncing_e67b8a9f: Synkroniserer
   syncing_grades_to_sis_d63112e0: "Synkroniserer vurderingar til SIS..."
   syncing_message_416fdc58: "Synkroniserer: %{message}"
+  syncing_microsoft_group_to_have_n_owners_or_member_f5582683: "Synkroniserar microsoftgruppar slik at dei har %{n_owners_or_members}medlemmar (inkudert eigarane)"
+  syncing_microsoft_group_to_have_n_owners_owners_135916e8: "Synkroniserar microsoftgruppar til å ha %{n_owners} eigarar"
+  syncing_microsoft_group_to_have_no_members_c7b45435: "Synkroniserar microsoftgruppar til å ha ingen medlemmar"
+  syncing_microsoft_group_to_have_no_owners_973482a1: "Synkroniserar microsoftgruppar til å ha ingen eigarar"
+  syncing_microsoft_group_to_have_one_member_includi_951c42e1: "Synkroniserar microsoftgruppar til å ha eitt medlem (inkludert eigar)"
+  syncing_microsoft_group_to_have_one_owner_a788ebac: "Synkroniserar microsoftgruppar til å ha ein eigar"
   synergetic_grade_passback_e7f54b63: "Synergetisk vurderingstilbakeføring"
   system_and_user_generated_events_84bc4c8a: "System- og brukargenererte hendingar"
   system_default_language_28a1052d: "Systemstandard (%{language})"
@@ -25518,6 +25568,7 @@ nn:
   teacher_count_teachers_a92f7199: "%{teacher_count} faglærarar"
   teacher_dashboard_custom_report_6d20bef2: "Lærardashbord eigendefinert rapport"
   teacher_engagement_report_ec03613d: Faglæraraktivitetsrapport
+  teacher_notes_must_be_true_or_false_271e7fe6: "lærar_notatar må vere sann eller usann"
   teacher_s_fdefb2c: Faglærar(ar)
   teacher_to_do_19d00df5: "Faglærar gjeremål"
   teacher_tour_26282921: Faglærarvegvisar
@@ -25533,6 +25584,8 @@ nn:
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Forklar oss korleis og når du vil motta meldingar om hendingar i Canvas."
   tempe_grade_export_c611da01: "Tempe vurderingseksport"
   template_account_21ac8f4f: Malkonto
+  template_account_is_not_a_root_account_83ae89bc: "Malkonto er ikkje en rotkonto"
+  template_account_is_not_a_template_account_d80200ae: "Malkonto er ikkje ein malkonto"
   template_account_not_found_7144542c: "Malkonto ikkje funne"
   templates_4ca13d07: Malar
   temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Midlertidig melde ein brukar på i eitt emne. Denne midlertidige påmeldinga er tilknytta ei anna påmelding i emnet."
@@ -25561,6 +25614,7 @@ nn:
   term_sis_bfe0ae01: Semester-SIS
   term_sis_id_4613e944: semester-SIS-ID
   term_start_b8c2aad1: semesterstart
+  term_start_date_start_date_term_end_date_end_date_dd895ab2: "Semester Startdato: %{start_date} | Semester Sluttdato: %{end_date}"
   term_starting_5bd5e070: "Semester startar"
   terms: 
     errors: 
@@ -25769,6 +25823,7 @@ nn:
   the_course_id_for_the_export_data_a99f37d: "Emne id for eksport av data"
   the_course_id_for_the_grade_export_data_d20f4ed: "Emne id for eksport av vurderingsdata"
   the_course_id_to_report_on_eb4ad5d2: "ID for emnet rapporten er for"
+  the_course_is_associated_with_an_archived_or_delet_43b836a9: "Emnet er assosiert med eit arkivert eller sletta karaktersystem, og vurderingsskjemaet kan ikkje bli eksportert"
   the_course_link_validator_searches_course_content__563fa215: "Lenkesjekkeren søker gjennom alt emneinnhald etter ugyldige eller utilgjengelege lenker og bilder. "
   the_course_link_validator_searches_through_course__76f0bc63: "Emnekoplingsvalidatoren søker i emneinnhaldet og returnerer alle lenker som er ugyldige eller ikkje responderer. Merk at nokre av koblingane som merkast som ikkje responsive kun er utilgjengeleg frå våre serverar og vil fortsatt vere gyldig for studentar."
   the_course_state_manage_permission_allows_users_to_67e16652: "Løyvet 'Emnestatus - administrer' tillet brukarar å publisere emne som ikkje inneheld modular. For å publisere/avpublisere modulinnhald, må 'Emneinnhald - legg til / endre / slett' vere slått på."
@@ -25795,6 +25850,13 @@ nn:
       kan ta litt tid for store emne. Du kan forlate
       sida og får ein e-post når nedlastinga
       er fullført.
+  the_email_address_email_was_used_to_log_into_canva_4ef05773: |-
+      Epostadressa %{email} vart brukt til å logge inn på Canvas via %{website}.
+      Bruk føgjande kode for å fullføre innloggingsprosessen din: %{code}
+      MERK: koden er kun gyldig i 15 minutt.
+      
+      Om du ikkje forsøkte å logge deg inn på Canvas se bort frå denne meldinga.
+  the_email_address_email_was_used_to_log_into_canva_d76c2a77: "Epostadressa %{email} vart brukt for å logge inn på Canvas via %{website}."
   the_end_date_for_841d2ecd: "Sluttdato for"
   the_end_date_for_default_to_end_of_yesterday_d8ebec31: "Sluttdato for (standard satt til gårsdagens slutt)"
   the_end_date_for_discussion_entries_6ac1b0d9: "Sluttdato for diskusjonsinnlegg"
@@ -25859,6 +25921,7 @@ nn:
   the_imported_question_text_for_this_question_was_t_83b4e6fb: "Den importerte spørsmålsteksten for dette spørsmålet er for lang."
   the_importer_will_be_migrating_from_api_v3_to_v4_1_e7550082: "Importøren vil migrerast frå API v3 til v4.1. Brukarnamn og passord vil ikkje endrast, men du bør sørge for at kontoen din har tilgang til v4.1 innan febraur 2021."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "Institusjonen der du logga på er ikkje konfigurert på denne kontoen."
+  the_intention_is_to_expand_this_scope_as_the_smart_80a6ff62: "Intensjonen er å utvide dette nedslagsfeltet medan Smart Search verktøyet vert utvikla. "
   the_launched_tool_returned_an_invalid_resource_for_24512878: "Det oppstarta verktøyet returnerte ein ugyldig ressurs for denne oppgåva"
   the_link_you_used_has_expired_click_forgot_passwor_80569899: "Lenka du har brukt er utgått. Klikk \"Gløymd passord?\" for å få ei ny lenke for å tilbakestille passord."
   the_list_below_is_content_that_has_been_shared_wit_2b2648bc: "Lista nedanfor viser innhald som er delt med deg. Du kan førehandsvise innhald, importere det til emnet ditt, eller fjerne det frå lista. "
