@@ -108,7 +108,7 @@ GEM
     i18n (1.14.5)
       concurrent-ruby (~> 1.0)
     io-console (0.7.2)
-    irb (1.13.1)
+    irb (1.13.2)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json-jwt (1.16.6)
@@ -181,7 +181,7 @@ GEM
       redis-cluster-client (>= 0.7.11)
     redis-scripting (1.0.1)
       redis (>= 3.0)
-    reline (0.5.8)
+    reline (0.5.9)
       io-console (~> 0.5)
     rexml (3.2.9)
       strscan
