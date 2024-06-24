@@ -50,7 +50,7 @@ gem "canvas_webex", "0.18.2"
 gem "cld", "~> 0.13"
 gem "crocodoc-ruby", "0.0.1", require: false
 gem "code_ownership", "~> 1.33"
-gem "ddtrace", "~> 1.13", require: false
+gem "datadog", "~> 2.1", require: false
 gem "docx", "~> 0.8"
 gem "encrypted_cookie_store-instructure", "~> 1.2", require: "encrypted_cookie_store"
 gem "gepub", "~> 1.0"
