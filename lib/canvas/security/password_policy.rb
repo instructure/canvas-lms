@@ -17,14 +17,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Canvas
+module Canvas::Security
   module PasswordPolicy
+    MIN_CHARACTER_LENGTH = "8"
+    MAX_CHARACTER_LENGTH = "255"
+    MIN_LOGIN_ATTEMPTS = "3"
+    MAX_LOGIN_ATTEMPTS = "20"
+
+    DEFAULT_CHARACTER_LENGTH = "8"
+    DEFAULT_LOGIN_ATTEMPTS = "10"
+
     def self.validate(record, attr, value)
       policy = record.account.password_policy
       value = value.to_s
-      record.errors.add attr, "too_short" if policy[:min_length] > value.length
-      record.errors.add attr, "too_long" if value.length > Setting.get("password_policy_max_length", "255").to_i
-      record.errors.add attr, "common" if policy[:disallow_common_passwords] && COMMON_PASSWORDS.include?(value.downcase)
+      record.errors.add attr, "too_short" if value.length < policy[:minimum_character_length].to_i
+      record.errors.add attr, "too_long" if value.length > MAX_CHARACTER_LENGTH.to_i
       # same char repeated
       record.errors.add attr, "repeated" if policy[:max_repeats] && value =~ /(.)\1{#{policy[:max_repeats]},}/
       # long sequence/run of chars
@@ -34,18 +41,28 @@ module Canvas
         end
         record.errors.add attr, "sequence" if candidates.any? { |candidate| SEQUENCES.grep(candidate).present? }
       end
+      if Canvas::Plugin.value_to_boolean(policy[:disallow_common_passwords])
+        record.errors.add attr, "common" if COMMON_PASSWORDS.include?(value.downcase)
+      end
+      if Canvas::Plugin.value_to_boolean(policy[:require_number_characters])
+        record.errors.add attr, "no_digits" unless /\d/.match?(value)
+      end
+      if Canvas::Plugin.value_to_boolean(policy[:require_symbol_characters])
+        symbol_regex = %r{[\!\@\#\$\%\^\&\*\(\)\_\+\-\=\[\]\{\}\|\;\:\'\"\<\>\,\.\?/]}
+        record.errors.add attr, "no_symbols" unless symbol_regex.match?(value)
+      end
     end
-
-    DEFAULT_MAX_ATTEMPTS = 10
 
     def self.default_policy
       {
         # max_repeats: nil,
         # max_sequence: nil,
         # disallow_common_passwords: false,
+        # require_number_characters: false,
+        # require_symbol_characters: false,
         # allow_login_suspension: false,
-        min_length: 8,
-        max_attempts: DEFAULT_MAX_ATTEMPTS
+        minimum_character_length: DEFAULT_CHARACTER_LENGTH,
+        maximum_login_attempts: DEFAULT_LOGIN_ATTEMPTS
       }
     end
 

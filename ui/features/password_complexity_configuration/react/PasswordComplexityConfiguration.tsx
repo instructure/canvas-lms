@@ -132,7 +132,7 @@ const PasswordComplexityConfiguration = () => {
             </Alert>
             <View as="div" margin="medium medium small medium">
               <Checkbox
-                label={I18n.t('Minimum character length (minimum: 8 | maximum: 120)')}
+                label={I18n.t('Minimum character length (minimum: 8 | maximum: 255)')}
                 checked={minimumCharacterLengthEnabled}
                 onChange={() => setMinimumCharacterLengthEnabled(!minimumCharacterLengthEnabled)}
                 defaultChecked={true}
@@ -143,7 +143,7 @@ const PasswordComplexityConfiguration = () => {
               <View as="div" margin="0 medium medium medium">
                 <NumberInputControlled
                   minimum={8}
-                  maximum={120}
+                  maximum={255}
                   defaultValue={8}
                   disabled={!minimumCharacterLengthEnabled}
                   data-testid="minimumCharacterLengthInput"

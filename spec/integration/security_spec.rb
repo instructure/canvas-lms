@@ -307,7 +307,7 @@ describe "security" do
                                 password: "asdfasdf"
         u.save!
         @account = @pseudonym.account
-        @account.settings[:password_policy] = { max_attempts: 1 }
+        @account.settings[:password_policy] = { maximum_login_attempts: 1 }
         @account.save!
       end
 
@@ -347,7 +347,7 @@ describe "security" do
         allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([account.id])
         @pseudonym.account = account
         @pseudonym.save!
-        @pseudonym.account.settings[:password_policy] = { max_attempts: 2 }
+        @pseudonym.account.settings[:password_policy] = { maximum_login_attempts: 2 }
         @pseudonym.account.save!
         bad_login("5.5.5.5")
         expect(response.body).to match(/Please verify your username or password and try again/)
