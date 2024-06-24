@@ -51,6 +51,7 @@ export const SUBMISSION_FRAGMENT = gql`
     commentsConnection(includeDraftComments: true) {
       nodes {
         id
+        _id
         comment
         attempt
         createdAt
