@@ -51,4 +51,84 @@ describe InstLLMHelper do
       expect(InstLLMHelper.client(model_id)).to eq(client)
     end
   end
+
+  describe ".with_rate_limit" do
+    let(:user) { double(uuid: "user123") }
+    let(:llm_config) { double(rate_limit: { limit: 10, period: "day" }, name: "test") }
+
+    before do
+      allow(Canvas.redis).to receive(:multi).and_yield(double("multi", incr: true, expire: true))
+    end
+
+    it "yields if rate limit is not set" do
+      llm_config = double(rate_limit: nil)
+      expect { |b| InstLLMHelper.with_rate_limit(user:, llm_config:, &b) }.to yield_control
+    end
+
+    it "raises an error if Redis is not enabled" do
+      allow(Canvas).to receive(:redis).and_return(nil)
+      expect do
+        InstLLMHelper.with_rate_limit(user:, llm_config:) do
+          true
+        end
+      end.to raise_error("InstLLMHelper rate limiting requires Redis to be enabled for the Canvas instance. You may remove the 'rate_limit' option from the LLMConfig to disable rate limiting.")
+    end
+
+    it "raises an error if period is not 'day'" do
+      llm_config = double(rate_limit: { limit: 10, period: "hour" })
+      expect do
+        InstLLMHelper.with_rate_limit(user:, llm_config:) do
+          true
+        end
+      end.to raise_error(NotImplementedError, "Only 'day' is supported as a rate limit period.")
+    end
+
+    it "raises an error if rate limit is exceeded" do
+      cache_key = [
+        "inst_llm_helper",
+        "rate_limit",
+        user.uuid,
+        llm_config.name,
+        Time.now.utc.strftime("%Y%m%d")
+      ].cache_key
+      allow(Canvas.redis).to receive(:get).with(cache_key).and_return("10")
+      expect do
+        InstLLMHelper.with_rate_limit(user:, llm_config:) do
+          true
+        end
+      end.to raise_error(InstLLMHelper::RateLimitExceededError, "Rate limit exceeded: 10")
+    end
+
+    it "increments the cache key and yields control" do
+      cache_key = [
+        "inst_llm_helper",
+        "rate_limit",
+        user.uuid,
+        llm_config.name,
+        Time.now.utc.strftime("%Y%m%d")
+      ].cache_key
+      allow(Canvas.redis).to receive(:get).with(cache_key).and_return("5")
+      expect(Canvas.redis).to receive(:multi)
+      expect { |b| InstLLMHelper.with_rate_limit(user:, llm_config:, &b) }.to yield_control
+    end
+
+    it "decrements the cache key if an error is raised" do
+      cache_key = [
+        "inst_llm_helper",
+        "rate_limit",
+        user.uuid,
+        llm_config.name,
+        Time.now.utc.strftime("%Y%m%d")
+      ].cache_key
+      allow(Canvas.redis).to receive(:get).with(cache_key).and_return("5")
+      expect(Canvas.redis).to receive(:multi)
+      expect(Canvas.redis).to receive(:decr).with(cache_key)
+
+      expect do
+        InstLLMHelper.with_rate_limit(user:, llm_config:) do
+          raise StandardError, "test error"
+        end
+      end.to raise_error(StandardError, "test error")
+    end
+  end
 end

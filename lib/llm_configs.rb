@@ -28,6 +28,7 @@ module LLMConfigs
         config_item = LLMConfig.new(
           name: config_data["name"],
           model_id: config_data["model_id"],
+          rate_limit: config_data["rate_limit"],
           template: config_data["template"],
           options: config_data["options"]
         )

@@ -86,9 +86,8 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # Generates a summary for a discussion topic.
   #
-  # @argument force [Boolean]
-  #   If set to true, forces the generation of a summary,
-  #   even if a previous one for the given input params exists.
+  # @argument userInput [String]
+  #   Areas or topics for the summary to focus on.
   #
   # @example_request
   #
@@ -120,19 +119,11 @@ class DiscussionTopicsApiController < ApplicationController
       FOCUS: focus
     }
     raw_dynamic_content_hash = Digest::SHA256.hexdigest(raw_dynamic_content.to_json)
-
-    forced = params[:force] == "true"
-    unless @topic.summary_enabled
-      @topic.update!(summary_enabled: true)
-      forced = true
-    end
-
     raw_summary = fetch_or_create_summary(
       llm_config: llm_config_raw,
       dynamic_content: raw_dynamic_content,
       dynamic_content_hash: raw_dynamic_content_hash,
-      user_input:,
-      forced:
+      user_input:
     )
 
     locale = @current_user.locale || I18n.default_locale.to_s
@@ -148,10 +139,13 @@ class DiscussionTopicsApiController < ApplicationController
       dynamic_content: refined_dynamic_content,
       dynamic_content_hash: refined_dynamic_content_hash,
       user_input:,
-      forced:,
       parent_summary: raw_summary,
       locale:
     )
+
+    unless @topic.summary_enabled
+      @topic.update!(summary_enabled: true)
+    end
 
     render(json: { id: refined_summary.id, text: refined_summary.summary })
   rescue => e
@@ -166,6 +160,8 @@ class DiscussionTopicsApiController < ApplicationController
       render(json: { error: t("Sorry, we are unable to summarize this discussion as it is too long.") }, status: :unprocessable_entity)
     when InstLLM::ValidationError
       render(json: { error: t("Oops! There was an error validating the service request. Please try again later.") }, status: :unprocessable_entity)
+    when InstLLMHelper::RateLimitExceededError
+      render(json: { error: t("Sorry, you have reached the maximum number of summaries allowed per day (%{limit}). Please try again Tomorrow.", limit: e.limit) }, status: :too_many_requests)
     else
       render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity)
     end
@@ -1036,13 +1032,11 @@ class DiscussionTopicsApiController < ApplicationController
     true
   end
 
-  def fetch_or_create_summary(llm_config:, dynamic_content:, dynamic_content_hash:, forced:, user_input:, parent_summary: nil, locale: nil)
-    unless forced
-      summary = @topic.summaries.where(llm_config_version: llm_config.name, dynamic_content_hash:, parent: parent_summary)
-                      .order(created_at: :desc)
-                      .first
-      return summary if summary
-    end
+  def fetch_or_create_summary(llm_config:, dynamic_content:, dynamic_content_hash:, user_input:, parent_summary: nil, locale: nil)
+    summary = @topic.summaries.where(llm_config_version: llm_config.name, dynamic_content_hash:, parent: parent_summary)
+                    .order(created_at: :desc)
+                    .first
+    return summary if summary
 
     prompt, options = llm_config.generate_prompt_and_options(substitutions: dynamic_content)
     content, input_tokens, output_tokens, generation_time = generate_llm_response(llm_config, prompt, options)
@@ -1064,10 +1058,12 @@ class DiscussionTopicsApiController < ApplicationController
   def generate_llm_response(llm_config, prompt, options)
     response = nil
     time = Benchmark.measure do
-      response = InstLLMHelper.client(llm_config.model_id).chat(
-        [{ role: "user", content: prompt }],
-        **options.symbolize_keys
-      )
+      InstLLMHelper.with_rate_limit(user: @current_user, llm_config:) do
+        response = InstLLMHelper.client(llm_config.model_id).chat(
+          [{ role: "user", content: prompt }],
+          **options.symbolize_keys
+        )
+      end
     end
 
     [

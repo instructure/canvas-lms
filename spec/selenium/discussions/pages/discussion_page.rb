@@ -87,8 +87,8 @@ class Discussion
       "[data-testid='summary-dislike-button']"
     end
 
-    def summary_regenerate_button_selector
-      "[data-testid='summary-regenerate-button']"
+    def summary_generate_button_selector
+      "[data-testid='summary-generate-button']"
     end
 
     def summary_disable_button_selector
@@ -169,8 +169,8 @@ class Discussion
       f(summary_dislike_button_selector)
     end
 
-    def summary_regenerate_button
-      f(summary_regenerate_button_selector)
+    def summary_generate_button
+      f(summary_generate_button_selector)
     end
 
     def summary_disable_button
@@ -237,8 +237,8 @@ class Discussion
       summary_dislike_button.click
     end
 
-    def click_summary_regenerate_button
-      summary_regenerate_button.click
+    def click_summary_generate_button
+      summary_generate_button.click
     end
 
     def click_summary_disable_button
