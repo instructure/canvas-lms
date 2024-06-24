@@ -18,11 +18,16 @@
 
 class AddAutoCaptionStatusToMediaObjects < ActiveRecord::Migration[7.0]
   tag :predeploy
+  disable_ddl_transaction!
 
   def change
     change_table :media_objects, bulk: true do |t|
-      t.string :auto_caption_status, limit: 255
-      t.check_constraint "auto_caption_status IN ('Complete', 'Processing', 'Error - Something went wrong', 'Error - Failed to communicate with captioning service', 'Error - Failed to request', 'Error - Caption request failed', 'Error - Captions not found')", name: "chk_auto_caption_status_enum"
+      t.string :auto_caption_status, limit: 255, if_not_exists: true
+      t.check_constraint "auto_caption_status IN ('Complete', 'Processing', 'Error - Something went wrong', 'Error - Failed to communicate with captioning service', 'Error - Failed to request', 'Error - Caption request failed', 'Error - Captions not found')",
+                         name: "chk_auto_caption_status_enum",
+                         validate: false,
+                         if_not_exists: true
     end
+    validate_check_constraint :media_objects, name: "chk_auto_caption_status_enum"
   end
 end
