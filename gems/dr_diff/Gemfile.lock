@@ -21,7 +21,7 @@ GEM
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
     io-console (0.7.2)
-    irb (1.13.1)
+    irb (1.13.2)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     mini_mime (1.1.5)
@@ -32,7 +32,7 @@ GEM
       stringio
     rdoc (6.7.0)
       psych (>= 4.0.0)
-    reline (0.5.8)
+    reline (0.5.9)
       io-console (~> 0.5)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
