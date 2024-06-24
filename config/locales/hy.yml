@@ -12143,7 +12143,9 @@ hy:
     learn_platform_settings: 
       labels: 
         base_url: "Բազային URL-հասցե"
+        password: Գաղտնաբառ
         token: "Հասանելիության token "
+        username: "Օգտատիրոջ անուն"
     linked_in: 
       description: "LinkedIn ինտեգրում"
     linked_in_settings: 
