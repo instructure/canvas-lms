@@ -34,7 +34,7 @@ class LtiApiController < ApplicationController
   def grade_passback
     verify_oauth
 
-    if request.content_type != "application/xml"
+    if request.media_type != "application/xml"
       raise BasicLTI::BasicOutcomes::InvalidRequest, "Content-Type must be 'application/xml'"
     end
 
