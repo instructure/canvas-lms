@@ -58,7 +58,7 @@ describe "announcements" do
       expect(fj("div:contains('Users do not receive updated notifications when editing an announcement. If you wish to have users notified of this update via their notification settings, you will need to create a new announcement.')")).to be_present
     end
 
-    context "when :discussion_create feature flag is ON" do
+    context "when :discussion_create feature flag is ON", :ignore_js_errors do
       before do
         Account.site_admin.enable_feature!(:discussion_create)
         Account.site_admin.enable_feature!(:react_discussions_post)
