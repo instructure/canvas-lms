@@ -630,20 +630,18 @@ describe ActiveRecord::Base do
 
     let_once(:u) { User.create!(name: "abcdefg") }
 
-    let(:exec_query_method) { ($canvas_rails == "7.0") ? :exec_query : :internal_exec_query }
-
     def assert_bare_update
-      allow(User.connection).to receive(exec_query_method).and_call_original
+      allow(User.connection).to receive(:internal_exec_query).and_call_original
       expect(User.connection).to receive(:exec_update).once.and_call_original
       yield
-      expect(User.connection).not_to have_received(exec_query_method)
+      expect(User.connection).not_to have_received(:internal_exec_query)
     end
 
     def assert_multi_stage_update
-      allow(User.connection).to receive(exec_query_method).and_call_original
+      allow(User.connection).to receive(:internal_exec_query).and_call_original
       expect(User.connection).to receive(:exec_update).once.and_call_original
       yield
-      expect(User.connection).to have_received(exec_query_method).once
+      expect(User.connection).to have_received(:internal_exec_query).once
     end
 
     it "just does a bare update, instead of an ordered select and then update" do

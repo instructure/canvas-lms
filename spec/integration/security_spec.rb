@@ -67,7 +67,6 @@ describe "security" do
                                       "pseudonym_session[password]" => "asdfasdf" }
       assert_response :found
       lines = response["Set-Cookie"]
-      lines = lines.lines if $canvas_rails == "7.0"
       c = lines.grep(/\A_normandy_session=/).first
       expect(c).not_to match(/expires=/)
       reset!
@@ -79,7 +78,6 @@ describe "security" do
                                       "pseudonym_session[remember_me]" => "1" }
       assert_response :found
       lines = response["Set-Cookie"]
-      lines = lines.lines if $canvas_rails == "7.0"
       c = lines.grep(/\A_normandy_session=/).first
       expect(c).not_to match(/expires=/)
     end
@@ -94,7 +92,6 @@ describe "security" do
                                       "pseudonym_session[password]" => "asdfasdf" }
       assert_response :found
       lines = response["Set-Cookie"]
-      lines = lines.lines if $canvas_rails == "7.0"
       c1 = lines.grep(/\Apseudonym_credentials=/).first
       c2 = lines.grep(/\A_normandy_session=/).first
       expect(c1).not_to be_present
