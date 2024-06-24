@@ -582,7 +582,7 @@ describe "discussions" do
       end
     end
 
-    context "when :discussion_create feature flag is ON" do
+    context "when :discussion_create feature flag is ON", :ignore_js_errors do
       before do
         Account.site_admin.enable_feature!(:discussion_create)
         Account.site_admin.enable_feature!(:react_discussions_post)
@@ -1841,6 +1841,96 @@ describe "discussions" do
             expect(assignment.sub_assignments.count).to eq 0
             expect(Assignment.last.has_sub_assignments).to be(false)
             expect(DiscussionTopic.last.assignment).to be_nil
+          end
+        end
+
+        context "mastery paths aka cyoe ake conditional release" do
+          def create_assignment(course, title, points_possible = 10)
+            course.assignments.create!(
+              title: "#{title} #{SecureRandom.alphanumeric(10)}",
+              description: "General Assignment",
+              points_possible:,
+              submission_types: "online_text_entry",
+              workflow_state: "published"
+            )
+          end
+
+          def create_discussion(course, creator, workflow_state = "published")
+            discussion_assignment = create_assignment(@course, "Discussion Assignment", 10)
+            course.discussion_topics.create!(
+              user: creator,
+              title: "Discussion Topic #{SecureRandom.alphanumeric(10)}",
+              message: "Discussion topic message",
+              assignment: discussion_assignment,
+              workflow_state:
+            )
+          end
+
+          it "loads connected mastery paths immediately is requested in url" do
+            course_with_teacher_logged_in
+            @course.conditional_release = true
+            @course.save!
+
+            @trigger_assignment = create_assignment(@course, "Mastery Path Main Assignment", 10)
+            @set1_assmt1 = create_assignment(@course, "Set 1 Assessment 1", 10)
+            @set2_assmt1 = create_assignment(@course, "Set 2 Assessment 1", 10)
+            @set2_assmt2 = create_assignment(@course, "Set 2 Assessment 2", 10)
+            @set3a_assmt = create_assignment(@course, "Set 3a Assessment", 10)
+            @set3b_assmt = create_assignment(@course, "Set 3b Assessment", 10)
+
+            graded_discussion = create_discussion(@course, @teacher)
+
+            course_module = @course.context_modules.create!(name: "Mastery Path Module")
+            course_module.add_item(id: @trigger_assignment.id, type: "assignment")
+            course_module.add_item(id: @set1_assmt1.id, type: "assignment")
+            course_module.add_item(id: graded_discussion.id, type: "discussion_topic")
+            course_module.add_item(id: @set2_assmt1.id, type: "assignment")
+            course_module.add_item(id: @set2_assmt2.id, type: "assignment")
+            course_module.add_item(id: @set3a_assmt.id, type: "assignment")
+            course_module.add_item(id: @set3b_assmt.id, type: "assignment")
+
+            ranges = [
+              ConditionalRelease::ScoringRange.new(lower_bound: 0.7, upper_bound: 1.0, assignment_sets: [
+                                                     ConditionalRelease::AssignmentSet.new(assignment_set_associations: [
+                                                                                             ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set1_assmt1.id),
+                                                                                             ConditionalRelease::AssignmentSetAssociation.new(assignment_id: graded_discussion.assignment_id)
+                                                                                           ])
+                                                   ]),
+              ConditionalRelease::ScoringRange.new(lower_bound: 0.4, upper_bound: 0.7, assignment_sets: [
+                                                     ConditionalRelease::AssignmentSet.new(assignment_set_associations: [
+                                                                                             ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set2_assmt1.id),
+                                                                                             ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set2_assmt2.id)
+                                                                                           ])
+                                                   ]),
+              ConditionalRelease::ScoringRange.new(lower_bound: 0, upper_bound: 0.4, assignment_sets: [
+                                                     ConditionalRelease::AssignmentSet.new(
+                                                       assignment_set_associations: [ConditionalRelease::AssignmentSetAssociation.new(
+                                                         assignment_id: @set3a_assmt.id
+                                                       )]
+                                                     ),
+                                                     ConditionalRelease::AssignmentSet.new(
+                                                       assignment_set_associations: [ConditionalRelease::AssignmentSetAssociation.new(
+                                                         assignment_id: @set3b_assmt.id
+                                                       )]
+                                                     )
+                                                   ])
+            ]
+            @rule = @course.conditional_release_rules.create!(trigger_assignment: @trigger_assignment, scoring_ranges: ranges)
+
+            mp_discussion = @course.discussion_topics.create!(assignment: @trigger_assignment, title: "graded discussion")
+
+            get "/courses/#{@course.id}/discussion_topics/#{mp_discussion.id}/edit#mastery-paths-editor"
+            fj("div[role='tab']:contains('Mastery Paths')").click
+
+            ui_ranges = ff("div.cr-scoring-range")
+            expect(ui_ranges[0].text).to include @set1_assmt1.title
+            expect(ui_ranges[0].text).to include graded_discussion.title
+
+            expect(ui_ranges[1].text).to include @set2_assmt1.title
+            expect(ui_ranges[1].text).to include @set2_assmt2.title
+
+            expect(ui_ranges[2].text).to include @set3a_assmt.title
+            expect(ui_ranges[2].text).to include @set3b_assmt.title
           end
         end
       end

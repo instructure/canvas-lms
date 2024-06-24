@@ -80,6 +80,7 @@ import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import {ItemAssignToTrayWrapper} from '../DiscussionOptions/ItemAssignToTrayWrapper'
 import {SendEditNotificationModal} from '../SendEditNotificationModal'
 import {Views, DiscussionTopicFormViewSelector} from './DiscussionTopicFormViewSelector'
+import {MasteryPathsReactWrapper} from '@canvas/conditional-release-editor/react/MasteryPathsReactWrapper'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -159,7 +160,10 @@ function DiscussionTopicForm({
 
   const inputWidth = '100%'
 
-  const [selectedView, setSelectedView] = useState(Views.Details)
+  const initialSelectedView = window.location.hash.includes('mastery-paths-editor')
+    ? Views.MasteryPaths
+    : Views.Details
+  const [selectedView, setSelectedView] = useState(initialSelectedView)
 
   const [title, setTitle] = useState(currentDiscussionTopic?.title || '')
   const [titleValidationMessages, setTitleValidationMessages] = useState([
@@ -719,7 +723,7 @@ function DiscussionTopicForm({
         selectedView={selectedView}
         setSelectedView={setSelectedView}
         breakpoints={breakpoints}
-        shouldMasteryPathsBeVisible={ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED}
+        shouldMasteryPathsBeVisible={ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !isAnnouncement}
         shouldMasteryPathsBeEnabled={isGraded}
       />
       <div style={{display: selectedView === Views.Details ? 'block' : 'none'}}>
@@ -1073,7 +1077,12 @@ function DiscussionTopicForm({
         </FormFieldGroup>
       </div>
       <div style={{display: selectedView === Views.MasteryPaths ? 'block' : 'none'}}>
-        TODO: Mastery Paths
+        {ENV.CONDITIONAL_RELEASE_ENV && (
+          <MasteryPathsReactWrapper
+            type={I18n.t('discussion topic')}
+            env={ENV.CONDITIONAL_RELEASE_ENV}
+          />
+        )}
       </div>
       <FormFieldGroup description="" rowSpacing="small">
         <FormControlButtons

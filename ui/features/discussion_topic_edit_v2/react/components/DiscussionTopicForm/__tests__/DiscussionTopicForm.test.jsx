@@ -127,6 +127,7 @@ describe('DiscussionTopicForm', () => {
     window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
     window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
     window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+    window.ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
 
     const document = setup()
     // Default teacher options in order top to bottom
@@ -146,6 +147,9 @@ describe('DiscussionTopicForm', () => {
     expect(document.queryByText('Anonymous Discussion')).not.toBeTruthy()
     expect(document.queryByTestId('graded-checkbox')).not.toBeTruthy()
     expect(document.queryByTestId('group-discussion-checkbox')).not.toBeTruthy()
+
+    // hides mastery paths
+    expect(document.queryByText('Mastery Paths')).toBeFalsy()
   })
 
   it('renders reset buttons for availability dates when creating/editing an announcement', () => {
