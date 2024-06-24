@@ -58,6 +58,11 @@ describe CustomData do
       @custom_data.set_data("kewl/skope", "ohai")
       expect { @custom_data.set_data("kewl/skope/plus/more", "bad idea dood") }.to raise_error(CustomData::WriteConflict)
     end
+
+    it "is able to write legacy WeakParameters data" do
+      @custom_data.set_data("scope", WeakParameters.new({}))
+      @custom_data.save!
+    end
   end
 
   context "#delete_data" do
