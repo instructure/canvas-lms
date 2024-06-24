@@ -54,6 +54,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   module DiscussionTypes
     SIDE_COMMENT = "side_comment"
+    NOT_THREADED = "not_threaded"
     THREADED     = "threaded"
     FLAT         = "flat"
     TYPES        = DiscussionTypes.constants.map { |c| DiscussionTypes.const_get(c) }
@@ -213,16 +214,16 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def threaded=(v)
-    self.discussion_type = Canvas::Plugin.value_to_boolean(v) ? DiscussionTypes::THREADED : DiscussionTypes::SIDE_COMMENT
+    self.discussion_type = Canvas::Plugin.value_to_boolean(v) ? DiscussionTypes::THREADED : DiscussionTypes::NOT_THREADED
   end
 
   def threaded?
-    discussion_type == DiscussionTypes::THREADED || context.feature_enabled?("react_discussions_post")
+    discussion_type == DiscussionTypes::THREADED || (root_account&.feature_enabled?(:discussion_checkpoints) && checkpoints?)
   end
   alias_method :threaded, :threaded?
 
   def discussion_type
-    read_attribute(:discussion_type) || DiscussionTypes::SIDE_COMMENT
+    read_attribute(:discussion_type) || DiscussionTypes::NOT_THREADED
   end
 
   def validate_draft_state_change
@@ -243,7 +244,7 @@ class DiscussionTopic < ActiveRecord::Base
     end
 
     d_type = read_attribute(:discussion_type)
-    d_type ||= context.feature_enabled?("react_discussions_post") ? DiscussionTypes::THREADED : DiscussionTypes::SIDE_COMMENT
+    d_type ||= context.feature_enabled?("react_discussions_post") ? DiscussionTypes::THREADED : DiscussionTypes::NOT_THREADED
     self.discussion_type = d_type
 
     @content_changed = message_changed? || title_changed?
