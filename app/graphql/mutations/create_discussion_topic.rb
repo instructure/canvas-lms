@@ -31,6 +31,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
 
   graphql_name "CreateDiscussionTopic"
 
+  argument :discussion_type, Types::DiscussionTopicDiscussionType, required: false
   argument :is_announcement, Boolean, required: false
   argument :is_anonymous_author, Boolean, required: false
   argument :anonymous_state, Types::DiscussionTopicAnonymousStateType, required: false
@@ -91,6 +92,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
     discussion_topic.context_type = input[:context_type]
     discussion_topic.user = current_user
     discussion_topic.workflow_state = (input[:published] || is_announcement) ? "active" : "unpublished"
+    discussion_topic.discussion_type = input[:discussion_type] || DiscussionTopic::DiscussionTypes::THREADED
 
     verify_authorized_action!(discussion_topic, :create)
 

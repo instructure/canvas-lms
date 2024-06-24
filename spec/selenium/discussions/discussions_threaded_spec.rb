@@ -289,6 +289,23 @@ describe "threaded discussions" do
   context "when discussions redesign feature flag is ON", :ignore_js_errors do
     before :once do
       Account.site_admin.enable_feature! :react_discussions_post
+      Account.site_admin.enable_feature! :discussion_create
+    end
+
+    context "not-threaded discussion" do
+      before do
+        user_session(@student)
+        @topic = create_discussion("not_threaded discussion", "not_threaded")
+        @first_reply = @topic.discussion_entries.create!(
+          user: @student,
+          message: "1st level reply"
+        )
+        Discussion.visit(@course, @topic)
+      end
+
+      it "does not display reply button in threading toolbar" do
+        expect(f("body")).not_to contain_jqcss("button[data-testid='threading-toolbar-reply']:contains('Reply')")
+      end
     end
 
     context "reply flow" do

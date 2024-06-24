@@ -189,7 +189,7 @@ describe('DiscussionThreadContainer', () => {
       window.location = {assign: jest.fn()}
       const setHighlightEntryId = jest.fn()
       const {getByTestId, getAllByText} = setup(
-        defaultProps({propOverrides: {setHighlightEntryId}}),
+        defaultProps({propOverrides: {setHighlightEntryId}, discussionOverrides: {discussionType: "threaded"},}),
         updateDiscussionThreadReadStateMock({
           discussionEntryId: 'DiscussionEntry-default-mock',
           read: false,
@@ -204,6 +204,18 @@ describe('DiscussionThreadContainer', () => {
       fireEvent.click(getAllByText('Mark Thread as Unread')[0])
       expect(setHighlightEntryId.mock.calls.length).toBe(1)
       expect(setHighlightEntryId).toHaveBeenCalledWith('DiscussionEntry-default-mock')
+    })
+
+    it('Should not render Mark Thread as Unread and Read', () => {
+      const {getByTestId, queryByTestId} = setup(
+        defaultProps({
+          discussionOverrides: {discussionType: "not_threaded"},
+        })
+      )
+
+      fireEvent.click(getByTestId('thread-actions-menu'))
+      expect(queryByTestId('markThreadAsRead')).toBeNull()
+      expect(queryByTestId('markThreadAsUnRead')).toBeNull()
     })
 
     describe('error handling', () => {

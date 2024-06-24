@@ -189,6 +189,9 @@ function DiscussionTopicForm({
   const [anonymousAuthorState, setAnonymousAuthorState] = useState(
     currentDiscussionTopic?.isAnonymousAuthor || true
   )
+  const [isThreaded, setIsThreaded] = useState(
+    currentDiscussionTopic?.discussionType === "threaded" || Object.keys(currentDiscussionTopic).length === 0
+  )
   const [requireInitialPost, setRequireInitialPost] = useState(
     currentDiscussionTopic?.requireInitialPost || false
   )
@@ -423,6 +426,7 @@ function DiscussionTopicForm({
       title,
       message: rceContent,
       podcastEnabled: enablePodcastFeed,
+      discussionType: isThreaded ? 'threaded' : 'not_threaded',
       podcastHasStudentPosts: includeRepliesInFeed,
       published: shouldPublish,
       isAnnouncement,
@@ -865,6 +869,20 @@ function DiscussionTopicForm({
                 }}
               />
             )}
+
+            {!isStudent && (
+              <Checkbox
+                data-testid="disallow_threaded_replies"
+                label={I18n.t('Disallow threaded replies')}
+                value="disallow-threaded-replies"
+                checked={!isThreaded}
+                onChange={() => {
+                  setIsThreaded(!isThreaded)
+                }}
+                disabled={isCheckpoints || ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.has_threaded_replies}
+              />
+            )}
+
             {!isGroupContext && (
               <Checkbox
                 data-testid="require-initial-post-checkbox"
@@ -922,7 +940,10 @@ function DiscussionTopicForm({
                     label={I18n.t('Assign graded checkpoints')}
                     value="checkpoints"
                     checked={isCheckpoints}
-                    onChange={() => setIsCheckpoints(!isCheckpoints)}
+                    onChange={() => {
+                      setIsCheckpoints(!isCheckpoints)
+                      setIsThreaded(true)
+                    }}
                   />
                 </View>
                 <Tooltip renderTip={checkpointsToolTipText} on={['hover', 'focus']} color="primary">

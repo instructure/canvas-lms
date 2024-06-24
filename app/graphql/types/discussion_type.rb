@@ -42,6 +42,15 @@ module Types
     value "off"
   end
 
+  class Types::DiscussionTopicDiscussionType < Types::BaseEnum
+    graphql_name "DiscussionTopicDiscussionType"
+    description "Discussion type for discussionTopics"
+    value "not_threaded"
+    value "threaded"
+    value "flat"
+    value "side_comment"
+  end
+
   class DiscussionType < ApplicationObjectType
     graphql_name "Discussion"
 
@@ -55,6 +64,7 @@ module Types
 
     global_id_field :id
     field :anonymous_state, DiscussionTopicAnonymousStateType, null: true
+    field :discussion_type, DiscussionTopicDiscussionType, null: true
     field :title, String, null: true
     field :context_id, ID, null: false
     field :context_type, String, null: false
@@ -65,7 +75,6 @@ module Types
     field :posted_at, Types::DateTimeType, null: true
     field :podcast_enabled, Boolean, null: true
     field :podcast_has_student_posts, Boolean, null: true
-    field :discussion_type, String, null: true
     field :is_anonymous_author, Boolean, null: true
     field :position, Int, null: true
     field :allow_rating, Boolean, null: true

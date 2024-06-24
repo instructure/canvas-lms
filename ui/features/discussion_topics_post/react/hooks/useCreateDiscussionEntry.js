@@ -30,6 +30,10 @@ export default function useCreateDiscussionEntry(onCompleteCallback, updateCache
 
   const [createDiscussionEntry, {data, loading, error}] = useMutation(CREATE_DISCUSSION_ENTRY, {
     onCompleted: completionData => {
+      if (completionData.createDiscussionEntry.errors) {
+        setOnFailure(completionData.createDiscussionEntry.errors[0].message)
+        return
+      }
       // Common onCompletion handling logic here.
       setOnSuccess(I18n.t('The discussion entry was successfully created.'))
 

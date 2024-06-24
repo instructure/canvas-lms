@@ -495,7 +495,7 @@ export const DiscussionThreadContainer = props => {
                                 }
                               : null
                           }
-                          onMarkThreadAsRead={readState => {
+                          onMarkThreadAsRead={props.discussionTopic.discussionType !== 'threaded' ? undefined : readState => {
                             window['ENV'].discussions_deep_link = {
                               root_entry_id: props.discussionEntry.rootEntryId,
                               parent_id: props.discussionEntry.parentId,
