@@ -109,6 +109,9 @@
             </div>
           {{/if}}
         {{/if}}
+        {{#if isCheckpoint}}
+          <div id="assignment_teacher_checkpoint_info_{{id}}"></div>
+        {{/if}}
         {{#if showAvailability}}
         <div class="ig-details__item assignment-date-available" data-view="date-available">
         </div>
@@ -117,25 +120,25 @@
           <div class="ig-details__item assignment-date-due" data-view="date-due">
           </div>
         {{/if}}
-        {{#unless restrict_quantitative_data}}
-            {{#if pointsPossible}}
-              <div class="ig-details__item js-score">
-                <span class="screenreader-only">
-                  {{#t}}{{n pointsPossible}} Points Possible{{/t}}
-                </span>
-                <span class="non-screenreader" aria-hidden="true">
-                  {{#t}}{{n pointsPossible}} pts{{/t}}
-                </span>
-              </div>
-            {{else}}
-              <span class="js-score screenreader-only">
-                {{#t}}No Points Possible{{/t}}
-              </span>
-            {{/if}}
+        {{#if (or isCheckpoint restrict_quantitative_data)}}
+          <div class="ig-details__item js-score">
+          </div>
         {{else}}
+          {{#if pointsPossible}}
             <div class="ig-details__item js-score">
+              <span class="screenreader-only">
+                {{#t}}{{n pointsPossible}} Points Possible{{/t}}
+              </span>
+              <span class="non-screenreader" aria-hidden="true">
+                {{#t}}{{n pointsPossible}} pts{{/t}}
+              </span>
             </div>
-        {{/unless}}
+          {{else}}
+            <span class="js-score screenreader-only">
+              {{#t}}No Points Possible{{/t}}
+            </span>
+          {{/if}}
+        {{/if}}
         {{#if isMasteryConnectTool}}
           <div class="ig-details__item mc-objectives">{{externalToolData.objectives}}</div>
         {{/if}}

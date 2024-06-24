@@ -25,6 +25,7 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ListViewCheckpoints} from '@canvas/list-view-checkpoints/react/ListViewCheckpoints'
+import {TeacherCheckpointsInfo} from '@canvas/list-view-checkpoints/react/TeacherCheckpointsInfo'
 import LockIconView from '@canvas/lock-icon'
 import * as MoveItem from '@canvas/move-item-tray'
 import PublishIconView from '@canvas/publish-icon-view'
@@ -328,11 +329,11 @@ export default AssignmentListItemView = (function () {
       const {assessment_requests: assessmentRequests, checkpoints} = attributes
 
       if (checkpoints && checkpoints.length && !this.canManage()) {
-        const checkpointsElem =
-          this.$el.find(`#assignment_student_checkpoints_${this.model.id}`) ?? []
-        const mountPoint = checkpointsElem[0]
-
         try {
+          const checkpointsElem =
+          this.$el.find(`#assignment_student_checkpoints_${this.model.id}`) ?? []
+          const mountPoint = checkpointsElem[0]
+
           ReactDOM.render(
             React.createElement(ListViewCheckpoints, {
               assignment: attributes,
@@ -344,6 +345,23 @@ export default AssignmentListItemView = (function () {
           // eslint-disable-next-line no-console
           console.error(errorMessage, error)
           captureException(new Error(errorMessage), error)
+        }
+      } else if(checkpoints && checkpoints.length && this.canManage()) {
+        const checkpointsElem = this.$el.find(`#assignment_teacher_checkpoint_info_${this.model.id}`)
+        const mountPoint = checkpointsElem[0]
+        if (mountPoint) {
+          try {
+            ReactDOM.render(
+              React.createElement(TeacherCheckpointsInfo, {
+                assignment: this.model.attributes,
+              }),
+              mountPoint
+            )
+          } catch (error) {
+            const errorMessage = I18n.t('Checkpoints mount point element not found')
+            console.error(errorMessage, error)
+            captureException(new Error(errorMessage), error)
+          }
         }
       }
 
@@ -415,10 +433,13 @@ export default AssignmentListItemView = (function () {
       data.canDuplicate = this.canDuplicate()
       data.canManageAssignTo = this.canManageAssignTo()
       data.is_locked = this.model.isRestrictedByMasterCourse()
+      data.isCheckpoint = this.model.get('checkpoints') && this.model.get('checkpoints').length > 0
       data.showAvailability =
+        !data.isCheckpoint &&
         !(this.model.inPacedCourse() && this.canManage()) &&
         (this.model.multipleDueDates() || !this.model.defaultDates().available())
       data.showDueDate =
+        !data.isCheckpoint &&
         !(this.model.inPacedCourse() && this.canManage()) &&
         (this.model.multipleDueDates() || this.model.singleSectionDueDate())
 
