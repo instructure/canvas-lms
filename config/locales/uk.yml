@@ -12879,6 +12879,7 @@ uk:
     learn_platform_settings: 
       labels: 
         base_url: "Основний URL"
+        password: Пароль
         token: "Маркер доступу"
     linked_in: 
       description: "LinkedIn інтеграція"
