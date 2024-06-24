@@ -18424,7 +18424,9 @@ hu:
     learn_platform_settings: 
       labels: 
         base_url: "Alap URL"
+        password: Jelszó
         token: "Hozzáférési token"
+        username: Felhasználónév
     learnplatform: 
       description: "Engedélyezze a hozzáférést a LearnPlatform API-hoz a termékinformációk lekéréséhez"
       name: LearnPlatform
