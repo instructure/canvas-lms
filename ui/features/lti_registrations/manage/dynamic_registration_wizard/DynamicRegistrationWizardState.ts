@@ -96,6 +96,7 @@ interface DynamicRegistrationActions {
     prevState: ConfirmationStateType,
     newState: ConfirmationStateType
   ): void
+  transitionToReviewingState(prevState: ConfirmationStateType): void
 }
 
 /**
@@ -131,7 +132,7 @@ export type DynamicRegistrationWizardState =
   | ConfirmationState<'Enabling'>
   | ConfirmationState<'DeletingDevKey'>
 
-type ConfirmationStateType = Exclude<
+export type ConfirmationStateType = Exclude<
   DynamicRegistrationWizardState['_type'],
   'RequestingToken' | 'WaitingForTool' | 'LoadingRegistration' | 'Error'
 >
@@ -140,7 +141,7 @@ type ReviewingStateType = Exclude<ConfirmationStateType, 'Enabling' | 'DeletingD
 /**
  * Helper for constructing a 'confirmation' state (a substate of the confirmation screen)
  */
-type ConfirmationState<Tag extends string> = {
+export type ConfirmationState<Tag extends string> = {
   _type: Tag
   registration: LtiImsRegistration
   overlayStore: RegistrationOverlayStore
@@ -326,6 +327,13 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
           stateFrom(prevState)(a => ({
             ...a,
             _type: newState,
+          }))
+        ),
+      transitionToReviewingState: prevState =>
+        set(
+          stateFrom(prevState)(a => ({
+            ...a,
+            _type: 'Reviewing',
           }))
         ),
     })

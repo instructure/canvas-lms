@@ -47,6 +47,7 @@ export interface RegistrationOverlayActions {
   updatePrivacyLevel: (placement_type: LtiPrivacyLevel) => void
   updateDescription: (description: string) => void
   updateAdminNickname: (nickname: string) => void
+  updateIconUrl: (placement: LtiPlacement, iconUrl?: string) => void
 }
 
 export type RegistrationOverlayState = {
@@ -172,6 +173,13 @@ export const createRegistrationOverlayStore = (
       updatePrivacyLevel: (privacyLevel: LtiPrivacyLevel) => set(updatePrivacyLevel(privacyLevel)),
       updateDescription: (description: string) => set(updateDescription(description)),
       updateAdminNickname: (nickname: string) => set(updateAdminNickname(nickname)),
+      updateIconUrl: (placement: LtiPlacement, iconUrl?: string) =>
+        set(state =>
+          updatePlacement(placement)(placementOverlay => ({
+            ...placementOverlay,
+            icon_url: iconUrl,
+          }))(state)
+        ),
     }))
   )
 

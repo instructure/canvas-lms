@@ -32,6 +32,7 @@ import {PrivacyConfirmation} from './components/PrivacyConfirmation'
 import {PlacementsConfirmation} from './components/PlacementsConfirmation'
 import {NamingConfirmation} from './components/NamingConfirmation'
 import GenericErrorPage from '@canvas/generic-error-page/react'
+import {IconConfirmation} from './components/IconConfirmation'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -287,7 +288,16 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
         </>
       )
     case 'IconConfirmation':
-      return <div>Icon Confirmation</div>
+      return (
+        <IconConfirmation
+          overlayStore={state.overlayStore}
+          registration={state.registration}
+          transitionToConfirmationState={
+            dynamicRegistrationWizardState.transitionToConfirmationState
+          }
+          transitionToReviewingState={dynamicRegistrationWizardState.transitionToReviewingState}
+        />
+      )
     case 'Reviewing':
       return <div>Reviewing</div>
     case 'DeletingDevKey':

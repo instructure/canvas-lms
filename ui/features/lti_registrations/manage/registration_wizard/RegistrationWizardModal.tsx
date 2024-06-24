@@ -43,6 +43,7 @@ import {
   updateDeveloperKeyWorkflowState,
 } from '../api/developerKey'
 import type {DynamicRegistrationWizardService} from '../dynamic_registration_wizard/DynamicRegistrationWizardService'
+import {isValidHttpUrl} from '../../common/lib/validators/isValidHttpUrl'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -51,7 +52,7 @@ export type RegistrationWizardModalProps = {
 }
 
 export const RegistrationWizardModal = (props: RegistrationWizardModalProps) => {
-  const state = useRegistrationModalWizardState(state => state)
+  const state = useRegistrationModalWizardState(s => s)
 
   return (
     <Modal label={I18n.t('Install App')} open={state.open} size="medium">
@@ -125,6 +126,7 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
               if (value === '1p3' || value === '1p1') {
                 props.state.updateLtiVersion(value)
               } else {
+                // eslint-disable-next-line no-console
                 console.warn(`Invalid value for lti_version: ${value}`)
               }
             }}
@@ -181,7 +183,7 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
         <Button
           color="primary"
           type="submit"
-          disabled={validForm(props.state) == false}
+          disabled={validForm(props.state) === false}
           onClick={() => {
             props.state.register()
           }}
@@ -197,15 +199,6 @@ const validForm = (state: RegistrationWizardModalState) => {
   if (state.lti_version === '1p3') {
     return isValidHttpUrl(state.dynamicRegistrationUrl)
   } else {
-    return false
-  }
-}
-
-const isValidHttpUrl = (str: string) => {
-  try {
-    const url = new URL(str)
-    return url.protocol === 'http:' || url.protocol === 'https:'
-  } catch (_) {
     return false
   }
 }
