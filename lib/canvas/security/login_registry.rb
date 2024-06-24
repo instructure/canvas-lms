@@ -81,12 +81,12 @@ module Canvas::Security
     def self.allow_login_attempt?(pseudonym)
       return true unless Canvas.redis_enabled? && pseudonym
 
-      max_attempts_hard_limit = Setting.get("max_attempts_hard_limit", "20").to_i
-      max_attempts = pseudonym.account.password_policy[:max_attempts].to_i
+      max_attempts_hard_limit = Canvas::Security::PasswordPolicy::MAX_LOGIN_ATTEMPTS.to_i
+      max_attempts = pseudonym.account.password_policy[:maximum_login_attempts].to_i
 
       # if the lower or upper bound setting is invalid, fall back to the default value
       if max_attempts <= 0 || max_attempts > max_attempts_hard_limit
-        max_attempts = Canvas::PasswordPolicy::DEFAULT_MAX_ATTEMPTS
+        max_attempts = Canvas::Security::PasswordPolicy::DEFAULT_LOGIN_ATTEMPTS.to_i
       end
 
       total, _count = redis.hmget(login_attempts_key(pseudonym), "total", failsafe: nil)

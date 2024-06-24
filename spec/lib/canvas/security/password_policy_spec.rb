@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe Canvas::PasswordPolicy do
+describe Canvas::Security::PasswordPolicy do
   describe "validations" do
     def pseudonym_with_policy(policy)
       account = Account.default
@@ -53,7 +53,7 @@ describe Canvas::PasswordPolicy do
     end
 
     it "enforces minimum length" do
-      pseudonym_with_policy(min_length: 10)
+      pseudonym_with_policy(minimum_character_length: 10)
       @pseudonym.password = @pseudonym.password_confirmation = "asdfg"
       expect(@pseudonym).not_to be_valid
 
@@ -94,6 +94,34 @@ describe Canvas::PasswordPolicy do
       expect(@pseudonym).to be_valid
       @pseudonym.password = @pseudonym.password_confirmation = "a" * 256
       expect(@pseudonym).not_to be_valid
+    end
+
+    context "when requiring at least one number" do
+      it "is invalid without a number" do
+        pseudonym_with_policy({ require_number_characters: "true" })
+        @pseudonym.password = @pseudonym.password_confirmation = "Password"
+        expect(@pseudonym).not_to be_valid
+      end
+
+      it "is valid with at least one number" do
+        pseudonym_with_policy({ require_number_characters: "true" })
+        @pseudonym.password = @pseudonym.password_confirmation = "Password1"
+        expect(@pseudonym).to be_valid
+      end
+    end
+
+    context "when requiring at least one symbol" do
+      it "is invalid without a symbol" do
+        pseudonym_with_policy({ require_symbol_characters: "true" })
+        @pseudonym.password = @pseudonym.password_confirmation = "Password"
+        expect(@pseudonym).not_to be_valid
+      end
+
+      it "is valid with at least one symbol" do
+        pseudonym_with_policy({ require_symbol_characters: "true" })
+        @pseudonym.password = @pseudonym.password_confirmation = "Password!"
+        expect(@pseudonym).to be_valid
+      end
     end
   end
 end
