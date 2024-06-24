@@ -41,7 +41,7 @@ import gql from 'graphql-tag'
 export const POST_DRAFT_SUBMISSION_COMMENT = gql`
   mutation PostDraftSubmissionComment($submissionCommentId: ID!) {
     __typename
-    PostDraftSubmissionComment(input: {submissionCommentId: $submissionCommentId}) {
+    postDraftSubmissionComment(input: {submissionCommentId: $submissionCommentId}) {
       submissionComment {
         _id
         id
