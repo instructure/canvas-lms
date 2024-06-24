@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class VideoCaptionService < ApplicationService
+  class VideoCaptionServiceError < Delayed::RetriableError; end
+
   def initialize(media_object, skip_polling: false)
     super()
 
@@ -35,19 +37,8 @@ class VideoCaptionService < ApplicationService
     @media_id = handoff
     return unless @media_id
 
-    # tell Notorious to start generating captions -- must be complete with handoff first
-    captions_request_successful = poll_for_caption_request
-    return unless captions_request_successful
-
-    # check if captions are available and what language was detected by whisper
-    @srclang = poll_for_captions_ready
-    return unless @srclang
-
-    # grab the captions once they're ready
-    captions = grab_captions
-
-    # create media_track with the caption
-    save_media_track(captions)
+    # On error, the job is scheduled again in 5 seconds + N ** 4, where N is the number of attempts
+    delay_if_production(max_attempts: 10).generate_captions
   end
 
   private
@@ -62,9 +53,9 @@ class VideoCaptionService < ApplicationService
     true
   end
 
-  def save_media_track(content)
+  def save_media_track(content, src_lang)
     if content.present?
-      @media_object.media_tracks.first_or_create(user: @media_object.user, locale: @srclang, kind: "subtitles", content:)
+      @media_object.media_tracks.first_or_create(user: @media_object.user, locale: src_lang, kind: "subtitles", content:)
     end
   end
 
@@ -73,49 +64,33 @@ class VideoCaptionService < ApplicationService
     response&.dig("media", "id")
   end
 
-  def poll_for_caption_request
-    if @skip_polling
-      return request_caption
+  def generate_captions
+    response = request_caption
+    if (200..299).cover?(response.code)
+      delay_if_production(max_attempts: 10).poll_for_captions_ready
+    else
+      raise VideoCaptionServiceError, "Failed to tell Notorious to start generating captions"
     end
-
-    10.times do |i|
-      response = request_caption
-      if (200..299).cover?(response.code)
-        return response
-      end
-
-      sleep(1.minute * (i + 1))
-    end
-    nil
   end
 
   def poll_for_captions_ready
-    if @skip_polling
-      response = media
-      return response.dig("media", "captions", 0, "language")
-    end
-
-    10.times do |i|
-      response = media
-      if response.dig("media", "captions", 0, "language") && response.dig("media", "captions", 0, "status") == "succeeded"
-        src_lang = response.dig("media", "captions", 0, "language")
-        # dont' proceed if the language is not detected as English
-        src_lang = nil unless src_lang.start_with?("en")
-        return src_lang
+    response = media
+    if response.dig("media", "captions", 0, "language") && response.dig("media", "captions", 0, "status") == "succeeded"
+      src_lang = response.dig("media", "captions", 0, "language")
+      # dont' proceed if the language is not detected as English
+      if src_lang.start_with?("en")
+        grab_captions(src_lang)
       end
-
-      sleep(1.minute * (i + 1))
+    else
+      raise VideoCaptionServiceError, "Failed to get captions from Notorious"
     end
-    nil
   end
 
-  def grab_captions
-    response = collect_captions
+  def grab_captions(src_lang)
+    response = collect_captions(src_lang)
     if (200..299).cover?(response.code)
-      return response.body
+      save_media_track(response.body, src_lang)
     end
-
-    nil
   end
 
   def url
@@ -133,15 +108,15 @@ class VideoCaptionService < ApplicationService
   end
 
   def caption_request_url
-    "#{notorious_host}/api/media/#{@media_id}/captions?provider=whisper"
+    "#{notorious_host}/api/media/#{@media_id}/captions"
   end
 
   def media_url
     "#{notorious_host}/api/media/#{@media_id}"
   end
 
-  def caption_collect_url
-    "#{notorious_host}/api/media/#{@media_id}/captions/#{@srclang}?provider=whisper"
+  def caption_collect_url(src_lang)
+    "#{notorious_host}/api/media/#{@media_id}/captions/#{src_lang}"
   end
 
   def notorious_host
@@ -168,8 +143,8 @@ class VideoCaptionService < ApplicationService
     HTTParty.get(media_url, headers: request_headers)
   end
 
-  def collect_captions
-    HTTParty.get(caption_collect_url, headers: request_headers)
+  def collect_captions(src_lang)
+    HTTParty.get(caption_collect_url(src_lang), headers: request_headers)
   end
 
   def config

@@ -23,7 +23,15 @@ RSpec.describe VideoCaptionService, type: :service do
   describe "#call" do
     context "when media type is video and media id is present" do
       before do
-        allow(service).to receive_messages(url: "https://example.com/video.mp4", request_handoff: { "media" => { "id" => "1234" } }, poll_for_caption_request: true, poll_for_captions_ready: "en", collect_captions: double("Response", code: 200, body: "Captions for the video"), config: { "app-host" => "https://example.com" }, auth_token: "token")
+        allow(service).to receive_messages(
+          url: "https://example.com/video.mp4",
+          request_handoff: { "media" => { "id" => "1234" } },
+          request_caption: double("Response", code: 200, body: "Captions requested"),
+          media: { "media" => { "captions" => [{ "language" => "en", "status" => "succeeded" }] } },
+          collect_captions: double("Response", code: 200, body: "Captions for the video"),
+          config: { "app-host" => "https://example.com" },
+          auth_token: "token"
+        )
       end
 
       it "creates a media track with captions" do
