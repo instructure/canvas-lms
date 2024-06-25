@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './useClassNames'
-export * from './kb'
-export * from './dom'
-export * from './buildPageContent'
-export * from './constants'
-export * from './getScrollParent'
-export * from './getCloneTree'
-export * from './colorUtils'
-export * from './getNodeIndex'
+import {type Node} from '@craftjs/core'
+
+export function getNodeIndex(node: Node, query: any) {
+  const parentId = node.data.parent || 'ROOT'
+  const siblings = query.node(parentId).descendants()
+  const myIndex = siblings.indexOf(node.id)
+  return myIndex
+}

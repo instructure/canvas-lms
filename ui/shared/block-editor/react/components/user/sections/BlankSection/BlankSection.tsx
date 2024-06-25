@@ -33,23 +33,20 @@ export const BlankSection = ({children}: BlankSectionProps) => {
   const [cid] = useState<string>('blank-section') // uid('columns-section', 2)
   const clazz = useClassNames(enabled, {empty: false}, ['section', 'blank-section'])
 
-  if (enabled) {
-    return (
-      <Container className={clazz}>
-        <Element
-          id={`${cid}_nosection1`}
-          is={NoSections}
-          canvas={true}
-          className="blank-section__inner"
-        />
-      </Container>
-    )
-  }
-  return <div className="section blank-section__inner">{children}</div>
+  return (
+    <Container className={clazz}>
+      <Element
+        id={`${cid}_nosection1`}
+        is={NoSections}
+        canvas={true}
+        className="blank-section__inner"
+      />
+    </Container>
+  )
 }
 
 BlankSection.craft = {
-  displayName: 'Section',
+  displayName: 'Blank Section',
   custom: {
     isSection: true,
   },

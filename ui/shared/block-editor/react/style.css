@@ -15,7 +15,6 @@
   container-name: block-editor-view;
 }
 
-
 .toolbox-item {
   cursor: grab;
   &:hover {
@@ -23,6 +22,26 @@
   }
   &:active {
     cursor: grabbing;
+  }
+}
+
+.section-adder {
+  position: relative;
+  text-align: center;
+  margin: 8px 0;
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    border-top: 1px solid var(--ic-brand-primary);
+    transform: translateY(-50%);
+    z-index: -1;
+  }
+  &>span {
+    background: #fff;
+    padding: 8px 16px;
   }
 }
 
@@ -282,6 +301,7 @@
   display: flex;
   flex-wrap: nowrap;
   gap: 16px;
+  align-items: center;
 }
 
 
