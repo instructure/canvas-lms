@@ -330,7 +330,7 @@ export const CriterionRow = ({
           </Flex>
         )}
       </View>
-      {displayHr && <View as="hr" margin="medium 0" />}
+      {displayHr && <View as="hr" margin="medium 0" aria-hidden={true} />}
     </View>
   )
 }

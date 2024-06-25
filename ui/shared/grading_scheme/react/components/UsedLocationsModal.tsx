@@ -233,7 +233,7 @@ export const UsedLocationsModal = ({
         <Flex justifyItems="end">
           <Flex.Item>
             <Button onClick={onClose} margin="0 x-small 0 x-small">
-              {I18n.t('Cancel')}
+              {I18n.t('Close')}
             </Button>
           </Flex.Item>
         </Flex>

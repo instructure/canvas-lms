@@ -65,11 +65,11 @@ describe('CriterionModal tests', () => {
       for (let i = 0; i < DEFAULT_RUBRIC_RATINGS.length; i++) {
         const ratingName = queryAllByTestId(`rating-name`)[i] as HTMLInputElement
         const ratingPoints = queryAllByTestId(`rating-points`)[i] as HTMLInputElement
-        const ratingScale = queryAllByTestId(`rating-scale`)[i] as HTMLInputElement
+        const ratingScale = queryAllByTestId(`rating-scale`)[i] as HTMLElement
         const expectedRatingScale = DEFAULT_RUBRIC_RATINGS.length - (i + 1)
         expect(ratingPoints.value).toEqual(DEFAULT_RUBRIC_RATINGS[i].points.toString())
         expect(ratingName.value).toEqual(DEFAULT_RUBRIC_RATINGS[i].description.toString())
-        expect(ratingScale.value).toEqual(expectedRatingScale.toString())
+        expect(ratingScale.textContent).toEqual(expectedRatingScale.toString())
       }
     })
 
@@ -85,10 +85,10 @@ describe('CriterionModal tests', () => {
 
       const ratingName = totalRatingNames[1] as HTMLInputElement
       const ratingPoints = queryAllByTestId(`rating-points`)[1] as HTMLInputElement
-      const ratingScale = queryAllByTestId(`rating-scale`)[1] as HTMLInputElement
+      const ratingScale = queryAllByTestId(`rating-scale`)[1] as HTMLElement
       expect(ratingPoints.value).toEqual(DEFAULT_RUBRIC_RATINGS[0].points.toString())
       expect(ratingName.value).toEqual('')
-      expect(ratingScale.value).toEqual((DEFAULT_RUBRIC_RATINGS.length - 1).toString())
+      expect(ratingScale.textContent).toEqual((DEFAULT_RUBRIC_RATINGS.length - 1).toString())
     })
 
     it('should add a new rating to the end of the list', () => {
@@ -104,10 +104,10 @@ describe('CriterionModal tests', () => {
       const newLastIndex = totalRatingNames.length - 1
       const ratingName = totalRatingNames[newLastIndex] as HTMLInputElement
       const ratingPoints = queryAllByTestId(`rating-points`)[newLastIndex] as HTMLInputElement
-      const ratingScale = queryAllByTestId(`rating-scale`)[newLastIndex] as HTMLInputElement
+      const ratingScale = queryAllByTestId(`rating-scale`)[newLastIndex] as HTMLElement
       expect(ratingPoints.value).toEqual('0')
       expect(ratingName.value).toEqual('')
-      expect(ratingScale.value).toEqual('0')
+      expect(ratingScale.textContent).toEqual('0')
     })
 
     it('should remove a rating at specified index', () => {

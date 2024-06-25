@@ -28,6 +28,7 @@ import {IconDragHandleLine, IconPlusLine, IconTrashLine} from '@instructure/ui-i
 import {Modal} from '@instructure/ui-modal'
 import {NumberInput} from '@instructure/ui-number-input'
 import {TextInput} from '@instructure/ui-text-input'
+import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {TextArea} from '@instructure/ui-text-area'
@@ -467,17 +468,12 @@ const RatingRow = ({
       <Flex.Item align="start">
         <Flex>
           <Flex.Item align="start">
-            <View as="div" width="4.125rem">
-              <TextInput
-                renderLabel={<ScreenReaderContent>{I18n.t('Rating Display')}</ScreenReaderContent>}
-                display="inline-block"
-                width="3.125rem"
-                disabled={true}
-                textAlign="center"
-                value={scale.toString()}
-                onChange={() => {}}
-                data-testid="rating-scale"
-              />
+            <View as="div" width="4.125rem" margin="x-small 0 0 0">
+              <View margin="0 0 0 medium">
+                <Text aria-label={I18n.t('Rating Display')} data-testid="rating-scale">
+                  {scale.toString()}
+                </Text>
+              </View>
             </View>
           </Flex.Item>
           <Flex.Item align="start">

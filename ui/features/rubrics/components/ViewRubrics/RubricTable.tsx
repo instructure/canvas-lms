@@ -88,7 +88,7 @@ export const RubricTable = ({
   })
 
   return (
-    <Table caption="Set text-align for columns">
+    <Table caption={I18n.t('Rubrics')}>
       <Head renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
         <Row>
           <ColHeader
@@ -127,7 +127,9 @@ export const RubricTable = ({
           >
             {I18n.t('Location Used')}
           </ColHeader>
-          <ColHeader id="Rating" />
+          <ColHeader id="Actions" tabIndex={0} data-testid="rubric-actions-header">
+            {I18n.t('Actions')}
+          </ColHeader>
         </Row>
       </Head>
       <Body>
