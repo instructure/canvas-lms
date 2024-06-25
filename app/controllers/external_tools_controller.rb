@@ -1225,7 +1225,7 @@ class ExternalToolsController < ApplicationController
     @tool = @context.context_external_tools.active.find(params[:id] || params[:external_tool_id])
     if authorized_action(@tool, @current_user, :update_manually)
       external_tool_params = (params[:external_tool] || params).to_unsafe_h
-      if request.content_type == "application/x-www-form-urlencoded"
+      if request.media_type == "application/x-www-form-urlencoded"
         custom_fields = Lti::AppUtil.custom_params(request.raw_post)
         external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
       end
