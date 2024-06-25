@@ -493,13 +493,24 @@ const CriterionRow = ({
           borderWidth={`0 small ${isLastIndex ? 'small' : '0'} small`}
           themeOverride={{paddingMedium: '1.125rem'}}
         >
-          <Flex direction="row-reverse">
+          <Flex>
             {isPreviewMode ? (
               <Flex.Item shouldGrow={true}>
                 <CriteriaReadonlyComment commentText={commentText} />
               </Flex.Item>
             ) : (
               <>
+                <Flex.Item shouldGrow={true}>
+                  <TextArea
+                    label={I18n.t('Comment')}
+                    placeholder={I18n.t('Leave a comment')}
+                    data-testid={`comment-text-area-${criterion.id}`}
+                    width="100%"
+                    value={commentText}
+                    onChange={e => setCommentText(e.target.value)}
+                    onBlur={e => updateAssessmentData({comments: e.target.value})}
+                  />
+                </Flex.Item>
                 <Flex.Item>
                   <View margin="0 0 0 small" themeOverride={{marginSmall: '1rem'}}>
                     <Button
@@ -513,17 +524,6 @@ const CriterionRow = ({
                       {I18n.t('Clear')}
                     </Button>
                   </View>
-                </Flex.Item>
-                <Flex.Item shouldGrow={true}>
-                  <TextArea
-                    label={I18n.t('Comment')}
-                    placeholder={I18n.t('Leave a comment')}
-                    data-testid={`comment-text-area-${criterion.id}`}
-                    width="100%"
-                    value={commentText}
-                    onChange={e => setCommentText(e.target.value)}
-                    onBlur={e => updateAssessmentData({comments: e.target.value})}
-                  />
                 </Flex.Item>
               </>
             )}
