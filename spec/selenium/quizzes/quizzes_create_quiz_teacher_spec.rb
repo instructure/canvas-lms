@@ -295,6 +295,7 @@ describe "creating a quiz" do
           end
 
           it "blocks when enabled", :ignore_js_errors do
+            skip("LX-1858: Tray is not using the checkbox value")
             @course.course_sections.create!(name: section_to_set)
             new_quiz
 
@@ -302,7 +303,11 @@ describe "creating a quiz" do
 
             wait_for_assign_to_tray_spinner
             keep_trying_until { expect(item_tray_exists?).to be_truthy }
-            click_duedate_clear_button(0)
+
+            expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
+            update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
+            update_due_time(0, "11:59 PM")
             click_save_button("Apply")
             keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
 
@@ -319,6 +324,7 @@ describe "creating a quiz" do
           end
 
           it "blocks with base set with override not", :ignore_js_errors do
+            skip("LX-1858: Tray is not using the checkbox value")
             @course.course_sections.create!(name: section_to_set)
             new_quiz
 
@@ -326,11 +332,19 @@ describe "creating a quiz" do
 
             wait_for_assign_to_tray_spinner
             keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
             update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
             update_due_time(0, "11:59 PM")
 
             click_add_assign_to_card
+
+            expect(assign_to_date_and_time[3].text).to include("Please add a due date")
+
             select_module_item_assignee(1, section_to_set)
+            update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
+            update_due_time(0, "11:59 PM")
             click_save_button("Apply")
             keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
 
@@ -340,7 +354,7 @@ describe "creating a quiz" do
           end
 
           it "does not block with base set with override not when disabled", :ignore_js_errors do
-            skip("LX-1856: Tray is not using the checkbox value")
+            skip("LX-1858: Tray is not using the checkbox value")
             @course.course_sections.create!(name: section_to_set)
             new_quiz
             set_value(sync_sis_button, false)

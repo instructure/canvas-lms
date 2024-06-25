@@ -67,6 +67,7 @@ export interface ItemAssignToTrayContentProps
   cardsRefs: React.MutableRefObject<{
     [cardId: string]: ItemAssignToCardRef
   }>
+  postToSIS?: boolean
 }
 
 function makeCardId(): string {
@@ -112,6 +113,7 @@ const ItemAssignToTrayContent = ({
   everyoneOption,
   setGroupCategoryId,
   setOverridesFetched,
+  postToSIS = false,
 }: ItemAssignToTrayContentProps) => {
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
@@ -538,6 +540,7 @@ const ItemAssignToTrayContent = ({
             customSetSearchTerm={setSearchTerm}
             highlightCard={card.highlightCard}
             blueprintDateLocks={blueprintDateLocks}
+            postToSIS={postToSIS}
           />
         </View>
       )

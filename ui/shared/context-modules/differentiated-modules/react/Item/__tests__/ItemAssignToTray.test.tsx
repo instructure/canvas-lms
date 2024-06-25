@@ -819,13 +819,14 @@ describe('ItemAssignToTray', () => {
     beforeEach(() => {
       global.ENV = {
         ...global.ENV,
-        POST_TO_SIS: true,
         DUE_DATE_REQUIRED_FOR_ACCOUNT: true,
       }
     })
 
     it('validates if required due dates are set before applying changes', async () => {
-      const {getByTestId, findAllByTestId, getByText, getAllByText} = renderComponent()
+      const {getByTestId, findAllByTestId, getByText, getAllByText} = renderComponent({
+        postToSIS: true,
+      })
       // wait until the cards are loaded
       const cards = await findAllByTestId('item-assign-to-card')
       expect(cards[0]).toBeInTheDocument()

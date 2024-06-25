@@ -188,6 +188,39 @@ describe "assignments sync to sis" do
           check_due_date_table("Everyone")
         end
 
+        it "validates due date when user checks/unchecks the box", :ignore_js_errors do
+          # LX-1857: Does not show any error, but not submits, we should verify an error here
+          AssignmentCreateEditPage.save_assignment
+
+          AssignmentCreateEditPage.select_post_to_sis_checkbox
+          AssignmentCreateEditPage.click_manage_assign_to_button
+
+          wait_for_assign_to_tray_spinner
+          keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+          expect(assign_to_date_and_time[0].text).not_to include("Please add a due date")
+
+          click_save_button("Apply")
+          keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+          AssignmentCreateEditPage.select_post_to_sis_checkbox
+          AssignmentCreateEditPage.click_manage_assign_to_button
+
+          wait_for_assign_to_tray_spinner
+          keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+          expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
+          update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
+          update_due_time(0, "11:59 PM")
+          click_save_button("Apply")
+          keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+          AssignmentCreateEditPage.save_assignment
+
+          check_due_date_table("Everyone", short_date)
+        end
+
         describe "differentiated assignment" do
           let(:differentiate) { true }
           let(:section_to_set) { "Section B" }

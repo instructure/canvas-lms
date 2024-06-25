@@ -62,6 +62,7 @@ const DifferentiatedModulesSection = ({
   onTrayClose,
   supportDueDates = true,
   isCheckpointed,
+  postToSIS = false,
 }) => {
   const [open, setOpen] = useState(false)
   // stagedCards are the itemAssignToCards that will be saved when the assignment is saved
@@ -81,14 +82,16 @@ const DifferentiatedModulesSection = ({
   const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
   const [moduleAssignees, setModuleAssignees] = useState([])
   const linkRef = useRef()
-  const dateValidator = useRef(
-    new DateValidator({
-      date_range: {...ENV.VALID_DATE_RANGE},
-      hasGradingPeriods: ENV.HAS_GRADING_PERIODS,
-      gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods),
-      userIsAdmin: ENV.current_user_is_admin,
-      postToSIS: ENV.POST_TO_SIS && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT,
-    })
+  const dateValidator = useMemo(
+    () =>
+      new DateValidator({
+        date_range: {...ENV.VALID_DATE_RANGE},
+        hasGradingPeriods: ENV.HAS_GRADING_PERIODS,
+        gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods),
+        userIsAdmin: ENV.current_user_is_admin,
+        postToSIS,
+      }),
+    [postToSIS]
   )
 
   const shouldRenderImportantDates = useMemo(
@@ -197,7 +200,7 @@ const DifferentiatedModulesSection = ({
         unlock_at: dates.unlock_at,
         lock_at: dates.lock_at,
       }
-      const dateErrors = dateValidator.current.validateDatetimes(data)
+      const dateErrors = dateValidator.validateDatetimes(data)
       return {
         key: cardId,
         isValid: uniqueIds.length > 0 && Object.keys(dateErrors).length === 0,
@@ -542,6 +545,7 @@ const DifferentiatedModulesSection = ({
         onCardRemove={handleCardRemove}
         removeDueDateInput={!supportDueDates}
         isCheckpointed={isCheckpointed}
+        postToSIS={postToSIS}
       />
     </>
   )
@@ -561,6 +565,7 @@ DifferentiatedModulesSection.propTypes = {
   onTrayClose: func,
   supportDueDates: bool,
   isCheckpointed: bool,
+  postToSIS: bool,
 }
 
 export default DifferentiatedModulesSection

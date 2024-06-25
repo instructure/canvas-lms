@@ -105,6 +105,7 @@ const ASSIGNMENT_POINTS_POSSIBLE = '#assignment_points_possible'
 const ASSIGNMENT_POINTS_CHANGE_WARN = '#point_change_warning'
 const SECURE_PARAMS = '#secure_params'
 const PEER_REVIEWS_BOX = '#assignment_peer_reviews'
+const POST_TO_SIS_BOX = '#assignment_post_to_sis'
 const INTRA_GROUP_PEER_REVIEWS = '#intra_group_peer_reviews_toggle'
 const GROUP_CATEGORY_BOX = '#has_group_category'
 const CONDITIONAL_RELEASE_TARGET = '#conditional_release_target'
@@ -253,6 +254,7 @@ EditView.prototype.els = {
     els['' + SIMILARITY_DETECTION_TOOLS] = '$similarityDetectionTools'
     els['' + SECURE_PARAMS] = '$secureParams'
     els['' + ANONYMOUS_GRADING_BOX] = '$anonymousGradingBox'
+    els['' + POST_TO_SIS_BOX] = '$postToSisBox'
     els['' + ASSIGNMENT_EXTERNAL_TOOLS] = '$assignmentExternalTools'
     els['' + HIDE_ZERO_POINT_QUIZZES_BOX] = '$hideZeroPointQuizzesBox'
     els['' + HIDE_ZERO_POINT_QUIZZES_OPTION] = '$hideZeroPointQuizzesOption'
@@ -279,6 +281,7 @@ EditView.prototype.events = {
     events['click ' + EXTERNAL_TOOLS_URL + '_find'] = 'showExternalToolsDialog'
     events['change #assignment_points_possible'] = 'handlePointsChange'
     events['change ' + PEER_REVIEWS_BOX] = 'togglePeerReviewsAndGroupCategoryEnabled'
+    events['change ' + POST_TO_SIS_BOX] = 'handlePostToSisBoxChange'
     events['change ' + GROUP_CATEGORY_BOX] = 'handleGroupCategoryChange'
     events['change ' + ANONYMOUS_GRADING_BOX] = 'handleAnonymousGradingChange'
     events['change ' + HIDE_ZERO_POINT_QUIZZES_BOX] = 'handleHideZeroPointQuizChange'
@@ -504,6 +507,14 @@ EditView.prototype.handleAnonymousGradingChange = function () {
     } else if (this.model.canGroup()) {
       return this.enableCheckbox(this.$groupCategoryBox)
     }
+  }
+}
+
+EditView.prototype.handlePostToSisBoxChange = function () {
+  if (ENV.FEATURES?.selective_release_ui_api) {
+    const postToSISChecked = this.$postToSisBox.prop('checked')
+    this.model.set('post_to_sis', postToSISChecked)
+    this.dueDateOverrideView.render()
   }
 }
 
