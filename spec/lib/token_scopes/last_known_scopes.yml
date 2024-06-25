@@ -1754,6 +1754,10 @@
 - verb: PUT
   path: "/api/v1/planner_notes/:id"
 - verb: GET
+  path: "/api/v1/plugins/:id"
+- verb: PUT
+  path: "/api/v1/plugins/:id"
+- verb: GET
   path: "/api/v1/poll_sessions/closed"
 - verb: GET
   path: "/api/v1/poll_sessions/opened"
