@@ -272,6 +272,23 @@ describe Lti::RegistrationsController do
             subject
             expect(response.headers["Link"]).to include("?query=registration+no")
           end
+
+          context "query param validations" do
+            it "returns a 422 if the page param isn't an integer" do
+              get "/api/v1/accounts/#{account.id}/lti_registrations?page=bad"
+              expect(response_json["errors"].first["message"]).to eq("page param should be an integer")
+            end
+
+            it "returns a 422 if the dir param isn't valid" do
+              get "/api/v1/accounts/#{account.id}/lti_registrations?dir=bad"
+              expect(response_json["errors"].first["message"]).to eq("dir param should be asc, dsc, or empty")
+            end
+
+            it "returns a 422 if the sort param isn't valid" do
+              get "/api/v1/accounts/#{account.id}/lti_registrations?sort=bad"
+              expect(response_json["errors"].first["message"]).to eq("bad is not a valid field for sorting")
+            end
+          end
         end
       end
 
