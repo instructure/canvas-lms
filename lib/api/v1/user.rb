@@ -233,7 +233,7 @@ module Api::V1::User
     }
     hash[:avatar_is_fallback] = user.avatar_image_url.nil? if includes.include?(:avatar_is_fallback) && avatars_enabled_for_user?(user)
     hash[:fake_student] = true if user.fake_student?
-    hash[:email] = user.email if user.email.present? && includes.include?(:email)
+    hash[:email] = user.email if includes.include?(:email) && user.email.present?
     hash
   end
 
