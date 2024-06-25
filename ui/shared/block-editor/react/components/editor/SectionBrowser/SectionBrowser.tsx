@@ -35,6 +35,7 @@ import {AboutSection, AboutSectionIcon} from '../../user/sections/AboutSection'
 import {QuizSection, QuizSectionIcon} from '../../user/sections/QuizSection'
 import {FooterSection, FooterSectionIcon} from '../../user/sections/FooterSection'
 import {BlankSection, BlankSectionIcon} from '../../user/sections/BlankSection'
+import {AnnouncementSection, AnnouncementSectionIcon} from '../../user/sections/AnnouncementSection'
 
 import {getNodeIndex} from '../../../utils'
 
@@ -52,6 +53,8 @@ const nameToSection = (name: string) => {
       return <AboutSection />
     case 'Quiz':
       return <QuizSection />
+    case 'Announcement':
+      return <AnnouncementSection />
     case 'Footer':
       return <FooterSection />
     case 'Blank':
@@ -190,6 +193,11 @@ const SectionBrowser = ({open, where, onClose}: SectionBrowserProps) => {
             'Quiz',
             'section-quiz.png',
             'The quiz section is where you can add a quiz to your page.'
+          )}
+          {renderBox(
+            'Announcement',
+            'section-announcement.png',
+            'The announcement section is a great way to share important information with your students.'
           )}
           {renderBox(
             'Footer',
