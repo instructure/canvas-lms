@@ -25,7 +25,6 @@ import {ResourceCard} from './user/blocks/ResourceCard'
 import {IconBlock} from './user/blocks/IconBlock'
 import {PageBlock} from './user/blocks/PageBlock'
 import {ImageBlock} from './user/blocks/ImageBlock'
-import {IframeBlock} from './user/blocks/IframeBlock'
 import {RCEBlock} from './user/blocks/RCEBlock'
 
 // sections
@@ -40,8 +39,6 @@ import {BlankSection} from './user/sections/BlankSection'
 
 import {NoSections} from './user/common'
 
-// import {Card, CardTop, CardBottom} from './user/Card'
-
 const blocks = {
   PageBlock,
   ButtonBlock,
@@ -51,7 +48,6 @@ const blocks = {
   ResourceCard,
   IconBlock,
   ImageBlock,
-  IframeBlock,
   RCEBlock,
   QuizSection,
   ResourcesSection,
@@ -66,8 +62,6 @@ const blocks = {
   AboutTextHalf,
   FooterSection,
   BlankSection,
-
-  // Card,  CardTop,  CardBottom,
 }
 
 export {blocks}

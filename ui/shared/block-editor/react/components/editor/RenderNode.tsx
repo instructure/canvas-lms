@@ -45,12 +45,18 @@ import ReactDOM from 'react-dom'
 import {useNode, useEditor, type Node} from '@craftjs/core'
 import {ROOT_NODE} from '@craftjs/utils'
 
-import {IconArrowUpLine, IconTrashLine, IconDragHandleLine} from '@instructure/ui-icons'
-import {IconButton} from '@instructure/ui-buttons'
+import {
+  IconArrowUpLine,
+  IconPlusLine,
+  IconTrashLine,
+  IconDragHandleLine,
+} from '@instructure/ui-icons'
+import {CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View, type ViewProps} from '@instructure/ui-view'
 import {ToolbarSeparator} from './ToolbarSeparator'
-import {getScrollParent} from '../../utils'
+import {getScrollParent, getNodeIndex} from '../../utils'
+import {BlankSection} from '../user/sections/BlankSection'
 
 const findUpNode = (node: Node, query: any): Node | undefined => {
   let upnode = node.data.parent ? query.node(node.data.parent).get() : undefined
@@ -226,6 +232,18 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     [actions, node.id]
   )
 
+  const handleAppendSection = useCallback(() => {
+    const parentId = node.data.parent || 'ROOT'
+    const myIndex = getNodeIndex(node, query)
+    const nodeTree = query.parseReactElement(<BlankSection />).toNodeTree()
+    actions.addNodeTree(nodeTree, parentId, myIndex + 1)
+  }, [actions, node, query])
+
+  const handlePrependSection = useCallback(() => {
+    const nodeTree = query.parseReactElement(<BlankSection />).toNodeTree()
+    actions.addNodeTree(nodeTree, 'ROOT', 0)
+  }, [actions, query])
+
   // TODO: this should be role="toolbar" and nav with arrow keys
   const renderBlockToolbar = () => {
     if (node.data?.custom?.noToolbar) return null
@@ -353,11 +371,32 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     )
   }
 
+  const sectionIsFirst = () => {
+    return getNodeIndex(node, query) === 0
+  }
+
+  const renderSectionAdder = (isBefore: boolean) => {
+    return (
+      <div className="section-adder">
+        <span>
+          <CondensedButton
+            onClick={isBefore ? handlePrependSection : handleAppendSection}
+            renderIcon={<IconPlusLine size="x-small" />}
+          >
+            Section
+          </CondensedButton>
+        </span>
+      </div>
+    )
+  }
+
   return (
     <>
+      {node.data.custom?.isSection && sectionIsFirst() && renderSectionAdder(true)}
       {selected && node.related && renderRelated()}
       {!selected && hovered && renderHoverTag()}
       {render}
+      {node.data.custom?.isSection && renderSectionAdder()}
     </>
   )
 }
