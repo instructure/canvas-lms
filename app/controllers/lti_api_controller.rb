@@ -96,7 +96,7 @@ class LtiApiController < ApplicationController
     token = Lti::AnalyticsService::Token.parse_and_validate(params[:token])
     verify_oauth(token.tool)
 
-    if request.content_type != "application/json"
+    if request.media_type != "application/json"
       return head :unsupported_media_type
     end
 
