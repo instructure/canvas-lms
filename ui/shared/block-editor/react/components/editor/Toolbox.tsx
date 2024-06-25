@@ -34,7 +34,6 @@ import {HeadingBlock, HeadingBlockIcon} from '../user/blocks/HeadingBlock'
 import {ResourceCard, ResourceCardIcon} from '../user/blocks/ResourceCard'
 import {ImageBlock, ImageBlockIcon} from '../user/blocks/ImageBlock'
 import {IconBlock, IconBlockIcon} from '../user/blocks/IconBlock'
-import {IframeBlock, IframeBlockIcon} from '../user/blocks/IframeBlock'
 import {RCEBlock, RCEBlockIcon} from '../user/blocks/RCEBlock'
 
 import {ResourcesSection, ResourcesSectionIcon} from '../user/sections/ResourcesSection'
@@ -144,7 +143,6 @@ export const Toolbox = ({open, onClose}: ToolboxProps) => {
               {renderBox('Heading', HeadingBlockIcon, <HeadingBlock />)}
               {renderBox('Resource Card', ResourceCardIcon, <ResourceCard />)}
               {renderBox('Image', ImageBlockIcon, <ImageBlock />)}
-              {renderBox('Iframe', IframeBlockIcon, <IframeBlock />)}
             </Flex>
           </Tabs.Panel>
           <Tabs.Panel renderTitle="Sections" isSelected={activeTab === 1}>

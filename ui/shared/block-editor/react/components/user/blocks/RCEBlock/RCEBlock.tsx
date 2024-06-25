@@ -72,7 +72,7 @@ export const RCEBlock = ({
     [setProp]
   )
 
-  if (enabled) {
+  if (enabled && selected) {
     return (
       // eslint-disable-next-line jsx-a11y/interactive-supports-focus, jsx-a11y/click-events-have-key-events
       <div
@@ -111,5 +111,5 @@ export const RCEBlock = ({
 }
 
 RCEBlock.craft = {
-  displayName: 'Text',
+  displayName: 'Rich Text',
 }
