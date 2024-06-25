@@ -17,16 +17,15 @@
  */
 // components/Toolbox.js
 import React, {useCallback, useEffect, useState} from 'react'
-import {Element, useEditor} from '@craftjs/core'
+import {useEditor} from '@craftjs/core'
 
-import {CloseButton, CondensedButton} from '@instructure/ui-buttons'
+import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Tray} from '@instructure/ui-tray'
 import {View, type ViewOwnProps} from '@instructure/ui-view'
 import {SVGIcon} from '@instructure/ui-svg-images'
-import {IconOpenFolderLine} from '@instructure/ui-icons'
 
 // import {Container, ContainerIcon} from '../user/blocks/Container'
 import {ButtonBlock, ButtonBlockIcon} from '../user/blocks/ButtonBlock'
@@ -36,15 +35,6 @@ import {ResourceCard, ResourceCardIcon} from '../user/blocks/ResourceCard'
 import {ImageBlock, ImageBlockIcon} from '../user/blocks/ImageBlock'
 import {IconBlock, IconBlockIcon} from '../user/blocks/IconBlock'
 import {RCEBlock, RCEBlockIcon} from '../user/blocks/RCEBlock'
-
-import {ResourcesSection, ResourcesSectionIcon} from '../user/sections/ResourcesSection'
-import {ColumnsSection, ColumnsSectionIcon} from '../user/sections/ColumnsSection'
-import {HeroSection, HeroSectionIcon} from '../user/sections/HeroSection'
-import {NavigationSection, NavigationSectionIcon} from '../user/sections/NavigationSection'
-import {AboutSection, AboutSectionIcon} from '../user/sections/AboutSection'
-import {QuizSection, QuizSectionIcon} from '../user/sections/QuizSection'
-import {FooterSection, FooterSectionIcon} from '../user/sections/FooterSection'
-import {BlankSection, BlankSectionIcon} from '../user/sections/BlankSection'
 
 type ToolboxProps = {
   open: boolean
@@ -89,16 +79,6 @@ export const Toolbox = ({open, container, onClose}: ToolboxProps) => {
       ed.style.transition = containerStyle.transition || ''
     }
   }, [containerStyle, open, trayRef])
-
-  const handleTabChange = useCallback(
-    (
-      _event: React.MouseEvent<ViewOwnProps> | React.KeyboardEvent<ViewOwnProps>,
-      tabData: {index: number; id?: string}
-    ) => {
-      setActiveTab(tabData.index)
-    },
-    []
-  )
 
   const handleCloseTray = useCallback(() => {
     onClose()

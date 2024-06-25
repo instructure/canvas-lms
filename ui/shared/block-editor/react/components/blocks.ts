@@ -35,6 +35,7 @@ import {NavigationSection, NavigationSectionInner} from './user/sections/Navigat
 import {AboutSection, AboutTextHalf} from './user/sections/AboutSection'
 import {FooterSection} from './user/sections/FooterSection'
 import {QuizSection} from './user/sections/QuizSection'
+import {AnnouncementSection} from './user/sections/AnnouncementSection'
 import {BlankSection} from './user/sections/BlankSection'
 
 import {NoSections} from './user/common'
@@ -50,6 +51,7 @@ const blocks = {
   ImageBlock,
   RCEBlock,
   QuizSection,
+  AnnouncementSection,
   ResourcesSection,
   ResourcesSectionInner,
   ColumnsSection,
