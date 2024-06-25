@@ -8455,6 +8455,7 @@ hu:
   data_services_c47a8130: Adatszolgáltatások
   data_services_manage_9b8f96da: "Adat szolgáltatások - kezelés"
   data_set_identifier_data_set_id_c228b5df: "Adathalmaz-azonosító: %{data_set_id}"
+  data_sharing_c6b26f60: "Adat Megosztás"
   database_error_3d543659: "Adatbázis hiba"
   database_error_err_6393d244: "Adatbázis hiba (%{err})"
   database_error_please_try_again_if_it_continues_to_3767972c: "Adatbázis hiba. Kérlek próbálja újra. Ha továbbra is sikertelen, kérjük, lépjen kapcsolatba velünk a Slackben, a #canvas-sre cím használatával."
@@ -9455,6 +9456,7 @@ hu:
   downloading_course_content_allows_access_to_conten_164d9336: "A kurzustartalom letöltése lehetővé teszi, hogy minden tartalomhoz offline is hozzáférjen. A tartalom magában foglalhat fájlokat, oldalakat, feladatokat, fórumtémákat és kvízeket. Kattintson a \"ePub generálása\"-ra minden kurzusnál és a megtekintéshez nyissa meg bármely eReader szoftverrel."
   draft_83493fcd: Piszkozat
   draft_92507c72: (piszkozat)
+  draft_b5dcd279: VÁZLAT
   draft_comment_b2376ea4: "A megjegyzés piszkozata"
   draft_comment_warning_modal_in_speedgrader_ded232c1: "Piszkozat megjegyzés figyelmeztetési mód a Gyorsértékelőben"
   draft_discussion_entries_98d93a9d: "Vázlat fórumbejegyzések"
@@ -9516,6 +9518,7 @@ hu:
   due_date_newest_to_oldest_35cffef9: "Határidő - A legújabbtól a legrégebbiig"
   due_date_oldest_to_newest_73e62815: "Határidő - A legrégebbitől a legújabbig"
   due_date_set_1c6364db: "Határidő beállítása"
+  due_date_was_automatically_changed_to_11_59_pm_b4aeefdf: "A határidő automatikusan 23:59-re módosult"
   due_dates_520a6c08: Határidők
   due_dates_are_being_compressed_based_on_your_start_917df12d: "A határidők a kezdési és befejezési dátumok alapján tömörítésre kerülnek"
   due_dates_changed_exceptions_ddb028: "A határidők megváltozott kivételei:"
