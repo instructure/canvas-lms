@@ -23,7 +23,6 @@ import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import React from 'react'
 import htmlEscape from '@instructure/html-escape'
 import type {RegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
@@ -99,7 +98,7 @@ export const NamingConfirmation = ({registration, overlayStore}: NamingConfirmat
                 <TextInput
                   key={placement}
                   renderLabel={i18nLtiPlacement(placement)}
-                  value={overlayPlacement?.label ?? registration.client_name}
+                  value={overlayPlacement?.label ?? ''}
                   onChange={(_, value) =>
                     actions.updatePlacement(placement)(p => ({...p, label: value}))
                   }

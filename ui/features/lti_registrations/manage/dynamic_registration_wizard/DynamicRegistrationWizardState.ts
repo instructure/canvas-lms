@@ -42,7 +42,7 @@ import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 /**
  * Actions for the dynamic registration modal
  */
-interface DynamicRegistrationActions {
+export interface DynamicRegistrationActions {
   /**
    * Loads a registration token from the BE for the given account.
    * Changes states to keep track of the loading process.
@@ -68,7 +68,8 @@ interface DynamicRegistrationActions {
     registrationId: LtiRegistrationId,
     developerKeyId: DeveloperKeyId,
     overlay: RegistrationOverlay,
-    adminNickname: string
+    adminNickname: string,
+    onSuccess: () => void
   ) => Promise<unknown>
 
   /**
@@ -295,7 +296,8 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
         registrationId: LtiRegistrationId,
         developerKeyId: DeveloperKeyId,
         overlay: RegistrationOverlay,
-        adminNickname: string
+        adminNickname: string,
+        onSuccess: () => void
       ) => {
         set(stateFrom('Reviewing')(state => enabling(state.registration, state.overlayStore)))
         const [a, b, c] = await Promise.all([
@@ -309,6 +311,8 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
           set(stateFor(errorState(formatApiResultError(b))))
         } else if (c._type !== 'success') {
           set(stateFor(errorState(formatApiResultError(c))))
+        } else {
+          onSuccess()
         }
       },
       deleteKey: async (prevState: ReviewingStateType, developerKeyId: DeveloperKeyId) => {
@@ -329,11 +333,12 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
             _type: newState,
           }))
         ),
-      transitionToReviewingState: prevState =>
+      transitionToReviewingState: (prevState: ConfirmationStateType) =>
         set(
           stateFrom(prevState)(a => ({
             ...a,
             _type: 'Reviewing',
+            reviewing: true,
           }))
         ),
     })

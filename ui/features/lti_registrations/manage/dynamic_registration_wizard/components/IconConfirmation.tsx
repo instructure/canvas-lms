@@ -43,12 +43,12 @@ import {isValidHttpUrl} from '../../../common/lib/validators/isValidHttpUrl'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {useDebouncedCallback} from 'use-debounce'
 import {Img} from '@instructure/ui-img'
-import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('lti_registration.wizard')
 export type IconConfirmationProps = {
   overlayStore: RegistrationOverlayStore
   registration: LtiImsRegistration
+  reviewing: boolean
   transitionToConfirmationState: (from: ConfirmationStateType, to: ConfirmationStateType) => void
   transitionToReviewingState: (from: ConfirmationStateType) => void
 }
@@ -56,6 +56,7 @@ export type IconConfirmationProps = {
 export const IconConfirmation = ({
   overlayStore,
   registration,
+  reviewing,
   transitionToConfirmationState,
   transitionToReviewingState,
 }: IconConfirmationProps) => {
@@ -217,7 +218,7 @@ export const IconConfirmation = ({
           }
           onClick={() => transitionToReviewingState('IconConfirmation')}
         >
-          {I18n.t('Next')}
+          {reviewing ? I18n.t('Back to Review') : I18n.t('Next')}
         </Button>
       </Modal.Footer>
     </>
