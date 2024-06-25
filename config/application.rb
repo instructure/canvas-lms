@@ -262,8 +262,10 @@ module CanvasRails
           raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00 # rubocop:disable Style/NumericLiterals
 
           break
-        rescue ActiveRecord::DatabaseConnectionError, ::PG::Error => e
-          if e.message.include?("does not exist")
+          # we _shouldn't_ be catching a NoDatabaseError, but that's what Rails raises
+          # for an error where the database name is in the message (i.e. a hostname lookup failure)
+        rescue ActiveRecord::NoDatabaseError, ActiveRecord::ConnectionNotEstablished, ::PG::Error => e
+          if e.is_a?(::PG::Error) && e.message.include?("does not exist")
             raise ActiveRecord::NoDatabaseError, e.message
           elsif index == hosts.length - 1
             raise
