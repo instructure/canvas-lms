@@ -41,6 +41,10 @@ export const updateDeveloperKeyWorkflowState = (
       {
         ...defaultFetchOptions(),
         method: 'POST',
+        headers: {
+          ...defaultFetchOptions().headers,
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           developer_key_account_binding: {
             workflow_state: workflowState,
@@ -72,6 +76,10 @@ export const updateAdminNickname = (
     fetch(`/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`, {
       ...defaultFetchOptions(),
       method: 'PUT',
+      headers: {
+        ...defaultFetchOptions().headers,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         admin_nickname,
       }),

@@ -101,7 +101,7 @@ describe('NamingConfirmation', () => {
     for (const placement of placements) {
       const el = screen.getByLabelText(i18nLtiPlacement(placement))
       expect(el).toBeInTheDocument()
-      expect(el).toHaveValue(reg.client_name)
+      expect(el).toHaveValue('')
       // eslint-disable-next-line no-await-in-loop
       await userEvent.clear(el)
       // eslint-disable-next-line no-await-in-loop

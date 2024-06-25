@@ -48,6 +48,7 @@ describe('IconConfirmation', () => {
       <IconConfirmation
         registration={reg}
         overlayStore={overlayStore}
+        reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />
@@ -68,6 +69,7 @@ describe('IconConfirmation', () => {
       <IconConfirmation
         registration={reg}
         overlayStore={overlayStore}
+        reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />
@@ -94,6 +96,7 @@ describe('IconConfirmation', () => {
       <IconConfirmation
         registration={reg}
         overlayStore={overlayStore}
+        reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />
@@ -125,6 +128,7 @@ describe('IconConfirmation', () => {
       <IconConfirmation
         registration={reg}
         overlayStore={overlayStore}
+        reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />
@@ -155,6 +159,7 @@ describe('IconConfirmation', () => {
       <IconConfirmation
         registration={reg}
         overlayStore={overlayStore}
+        reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />
@@ -184,6 +189,7 @@ describe('IconConfirmation', () => {
       <IconConfirmation
         registration={reg}
         overlayStore={overlayStore}
+        reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />
@@ -216,6 +222,7 @@ describe('IconConfirmation', () => {
       <IconConfirmation
         registration={reg}
         overlayStore={overlayStore}
+        reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />
@@ -254,6 +261,7 @@ describe('IconConfirmation', () => {
       <IconConfirmation
         registration={reg}
         overlayStore={overlayStore}
+        reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />
@@ -285,6 +293,7 @@ describe('IconConfirmation', () => {
       <IconConfirmation
         registration={reg}
         overlayStore={overlayStore}
+        reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />
@@ -320,6 +329,7 @@ describe('IconConfirmation', () => {
       <IconConfirmation
         registration={reg}
         overlayStore={overlayStore}
+        reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />
@@ -341,5 +351,55 @@ describe('IconConfirmation', () => {
       'src',
       'http://example.com/icon.png'
     )
+  })
+
+  it("should move to 'Reviewing' when the user clicks 'Next'", async () => {
+    const config = mockConfigWithPlacements([
+      LtiPlacements.GlobalNavigation,
+      LtiPlacements.FileIndexMenu,
+    ])
+
+    const reg = mockRegistration({}, config)
+    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const mockTransition = jest.fn()
+
+    render(
+      <IconConfirmation
+        overlayStore={overlayStore}
+        registration={reg}
+        reviewing={false}
+        transitionToConfirmationState={jest.fn()}
+        transitionToReviewingState={mockTransition}
+      />
+    )
+
+    const nextButton = screen.getByRole('button', {name: /next/i})
+    await userEvent.click(nextButton)
+
+    expect(mockTransition).toHaveBeenCalled()
+  })
+
+  it('should render a Back to Review button when the user is reviewing', () => {
+    const config = mockConfigWithPlacements([
+      LtiPlacements.GlobalNavigation,
+      LtiPlacements.FileIndexMenu,
+    ])
+
+    const reg = mockRegistration({}, config)
+    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+    const mockTransition = jest.fn()
+
+    render(
+      <IconConfirmation
+        overlayStore={overlayStore}
+        registration={reg}
+        reviewing={true}
+        transitionToConfirmationState={jest.fn()}
+        transitionToReviewingState={mockTransition}
+      />
+    )
+
+    const backButton = screen.getByRole('button', {name: /back to review/i})
+    expect(backButton).toBeInTheDocument()
   })
 })

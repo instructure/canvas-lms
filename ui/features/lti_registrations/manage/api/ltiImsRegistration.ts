@@ -76,6 +76,10 @@ export const updateRegistrationOverlay = (
     fetch(`/api/lti/accounts/${accountId}/registrations/${registrationId}/overlay`, {
       ...defaultFetchOptions(),
       method: 'PUT',
+      headers: {
+        ...defaultFetchOptions().headers,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(overlay),
     })
   )
