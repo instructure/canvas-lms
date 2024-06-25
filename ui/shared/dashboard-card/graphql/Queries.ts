@@ -26,10 +26,10 @@ export const LOAD_DASHBOARD_CARDS_QUERY = gql`
   query GetDashboardCards($userID: ID!, $observedUserId: ID = null) {
     legacyNode(_id: $userID, type: User) {
       ... on User {
-        favoriteCoursesConnection {
+        favoriteCoursesConnection(dashboardFilter: {observedUserId: $observedUserId}) {
           nodes {
             _id
-            dashboardCard(dashboardFilter: {observedUserId: $observedUserId}) {
+            dashboardCard {
               ...CourseDashboardCard @include(if: ${dashcard_query_enabled})
             }
           }

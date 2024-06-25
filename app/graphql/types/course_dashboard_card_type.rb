@@ -47,7 +47,7 @@ module Types
     field :short_name, String, null: true
     def short_name
       Loaders::AssociationLoader.for(User, :user_preference_values).load(current_user).then do
-        current_user.get_preference(:course_nicknames, course.id)
+        course.nickname_for(current_user)
       end
     end
 

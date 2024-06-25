@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
 import classnames from 'classnames'
-import {bool, func, string, object, oneOf} from 'prop-types'
+import {bool, func, string, object, oneOf, arrayOf} from 'prop-types'
 import {
   initializePlanner,
   loadPlannerDashboard,
@@ -53,7 +53,7 @@ const [show, hide] = ['block', 'none'].map(displayVal => id => {
   if (el) el.style.display = displayVal
 })
 
-const observerMode = () => ENV.current_user_roles?.includes('observer')
+export const observerMode = () => ENV.current_user_roles?.includes('observer')
 
 /**
  * This component renders the header and the to do sidebar for the user
@@ -70,6 +70,7 @@ class DashboardHeader extends React.Component {
     responsiveSize: oneOf(['small', 'medium', 'large']),
     startNewCourseVisible: bool,
     viewGradesUrl: string,
+    preloadedCards: arrayOf(object) || null, // Card[]
   }
 
   static defaultProps = {
@@ -151,9 +152,9 @@ class DashboardHeader extends React.Component {
     loadPlannerDashboard()
   }
 
-  loadCardDashboard(observedUserId) {
+  loadCardDashboard(observedUserId, preloadedCards) {
     // I put this in so I can spy on the imported function in a spec :'(
-    this.cardDashboardLoader.loadCardDashboard(undefined, observedUserId)
+    this.cardDashboardLoader.loadCardDashboard(undefined, observedUserId, preloadedCards)
   }
 
   loadStreamItemDashboard(observedUserId) {
@@ -205,7 +206,7 @@ class DashboardHeader extends React.Component {
           showFlashAlert({message: I18n.t('Failed initializing dashboard'), type: 'error'})
         })
     } else if (newView === 'cards') {
-      this.loadCardDashboard(this.state.selectedObserveeId)
+      this.loadCardDashboard(this.state.selectedObserveeId, this.props.preloadedCards)
     } else if (newView === 'activity') {
       this.loadStreamItemDashboard(this.state.selectedObserveeId)
     }
