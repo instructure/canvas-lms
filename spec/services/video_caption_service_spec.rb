@@ -23,7 +23,15 @@ RSpec.describe VideoCaptionService, type: :service do
   describe "#call" do
     context "when media type is video and media id is present" do
       before do
-        allow(service).to receive_messages(url: "https://example.com/video.mp4", request_handoff: { "media" => { "id" => "1234" } }, poll_for_caption_request: true, poll_for_captions_ready: "en", collect_captions: double("Response", code: 200, body: "Captions for the video"), config: { "app-host" => "https://example.com" }, auth_token: "token")
+        allow(service).to receive_messages(
+          url: "https://example.com/video.mp4",
+          request_handoff: { "media" => { "id" => "1234" } },
+          request_caption: double("Response", code: 200),
+          media: { "media" => { "captions" => [{ "language" => "en", "status" => "succeeded" }] } },
+          grab_captions: "Captions for the video",
+          config: { "app-host" => "https://example.com" },
+          auth_token: "token"
+        )
       end
 
       it "creates a media track with captions" do
@@ -37,7 +45,7 @@ RSpec.describe VideoCaptionService, type: :service do
 
       it "sets auto_caption_status to complete" do
         service.call
-        expect(media_object.auto_caption_status).to eq("Complete")
+        expect(media_object.auto_caption_status).to eq("complete")
       end
     end
 
@@ -52,7 +60,7 @@ RSpec.describe VideoCaptionService, type: :service do
 
       it "sets auto_caption_status to failed_initial_validation" do
         service.call
-        expect(media_object.auto_caption_status).to eq("Error - Something went wrong")
+        expect(media_object.auto_caption_status).to eq("failed_initial_validation")
       end
     end
 
@@ -67,7 +75,7 @@ RSpec.describe VideoCaptionService, type: :service do
 
       it "sets auto_caption_status to failed_initial_validation" do
         service.call
-        expect(media_object.auto_caption_status).to eq("Error - Something went wrong")
+        expect(media_object.auto_caption_status).to eq("failed_initial_validation")
       end
     end
 
@@ -82,7 +90,7 @@ RSpec.describe VideoCaptionService, type: :service do
 
       it "sets auto_caption_status to failed_initial_validation" do
         service.call
-        expect(media_object.auto_caption_status).to eq("Error - Something went wrong")
+        expect(media_object.auto_caption_status).to eq("failed_initial_validation")
       end
     end
 
@@ -91,7 +99,6 @@ RSpec.describe VideoCaptionService, type: :service do
         allow(service).to receive_messages(
           url: "https://example.com/video.mp4",
           request_handoff: nil,
-          poll_for_captions_ready: "en",
           config: { "app-host" => "https://example.com" },
           auth_token: "token"
         )
@@ -104,7 +111,7 @@ RSpec.describe VideoCaptionService, type: :service do
 
       it "sets auto_caption_status to failed_handoff" do
         service.call
-        expect(media_object.auto_caption_status).to eq("Error - Failed to communicate with captioning service")
+        expect(media_object.auto_caption_status).to eq("failed_handoff")
       end
     end
 
@@ -113,7 +120,7 @@ RSpec.describe VideoCaptionService, type: :service do
         allow(service).to receive_messages(
           url: "https://example.com/video.mp4",
           request_handoff: { "media" => { "id" => "1234" } },
-          poll_for_caption_request: false,
+          request_caption: double("Response", code: 500),
           config: { "app-host" => "https://example.com" },
           auth_token: "token"
         )
@@ -126,7 +133,7 @@ RSpec.describe VideoCaptionService, type: :service do
 
       it "sets auto_caption_status to failed_request" do
         service.call
-        expect(media_object.auto_caption_status).to eq("Error - Failed to request")
+        expect(media_object.auto_caption_status).to eq("failed_request")
       end
     end
 
@@ -135,8 +142,8 @@ RSpec.describe VideoCaptionService, type: :service do
         allow(service).to receive_messages(
           url: "https://example.com/video.mp4",
           request_handoff: { "media" => { "id" => "1234" } },
-          poll_for_caption_request: true,
-          poll_for_captions_ready: nil,
+          request_caption: double("Response", code: 200),
+          media: { "media" => { "captions" => [{ "status" => "in_progress" }] } },
           config: { "app-host" => "https://example.com" },
           auth_token: "token"
         )
@@ -149,7 +156,30 @@ RSpec.describe VideoCaptionService, type: :service do
 
       it "sets auto_caption_status to failed_captions" do
         service.call
-        expect(media_object.auto_caption_status).to eq("Error - Caption request failed")
+        expect(media_object.auto_caption_status).to eq("failed_captions")
+      end
+    end
+
+    context "when non-English language is detected" do
+      before do
+        allow(service).to receive_messages(
+          url: "https://example.com/video.mp4",
+          request_handoff: { "media" => { "id" => "1234" } },
+          request_caption: double("Response", code: 200),
+          media: { "media" => { "captions" => [{ "language" => "es", "status" => "succeeded" }] } },
+          config: { "app-host" => "https://example.com" },
+          auth_token: "token"
+        )
+        allow(media_object).to receive_messages(media_type: "video", media_id: "valid_media_id")
+      end
+
+      it "does not create a media track" do
+        expect { service.call }.not_to change { MediaTrack.count }
+      end
+
+      it "sets auto_caption_status to non_english_captions" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("non_english_captions")
       end
     end
 
@@ -158,9 +188,9 @@ RSpec.describe VideoCaptionService, type: :service do
         allow(service).to receive_messages(
           url: "https://example.com/video.mp4",
           request_handoff: { "media" => { "id" => "1234" } },
-          poll_for_caption_request: true,
-          poll_for_captions_ready: "en",
-          collect_captions: double("Response", code: 500, body: ""),
+          request_caption: double("Response", code: 200),
+          media: { "media" => { "captions" => [{ "language" => "en", "status" => "succeeded" }] } },
+          grab_captions: nil,
           config: { "app-host" => "https://example.com" },
           auth_token: "token"
         )
@@ -173,7 +203,7 @@ RSpec.describe VideoCaptionService, type: :service do
 
       it "sets auto_caption_status to failed_to_pull" do
         service.call
-        expect(media_object.auto_caption_status).to eq("Error - Captions not found")
+        expect(media_object.auto_caption_status).to eq("failed_to_pull")
       end
     end
   end
