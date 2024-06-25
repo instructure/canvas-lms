@@ -45,8 +45,8 @@ export const ItemAssignToTrayWrapper = () => {
     if (assignedInfoList.length > 0) {
       const newOverrides = assignedInfoList.map(convertToOverrideObject)
       setOverrides(newOverrides)
-      setLoading(false) // Data is loaded and processed
     }
+    setLoading(false)
   }, [assignedInfoList])
 
   // Convert the assignedInfoList to the expected shape for the DifferentiatedModulesSection
