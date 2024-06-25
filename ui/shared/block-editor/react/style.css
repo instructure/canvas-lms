@@ -357,7 +357,24 @@
   justify-content: center;
   align-items: center;
   padding: 1rem;
+}
 
+.announcement-section__empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+.announcement-section {
+  border: 1px solid #1A2729;
+  border-radius: 1rem;
+  margin: 0.5rem 0;
+  overflow: hidden;
+  .announcement-section__body {
+    padding: 0.5rem;
+    border-radius: 1rem;
+  }
 }
 
 .matching-question__question {
