@@ -2679,6 +2679,11 @@ CanvasRails::Application.routes.draw do
     scope(controller: "user_notes") do
       put "users/:user_id/user_notes/suppress_deprecation_notice", action: :suppress_deprecation_notice
     end
+
+    scope(controller: :plugins) do
+      put "plugins/:id", action: :update
+      get "plugins/:id", action: :show
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or

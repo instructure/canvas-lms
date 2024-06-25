@@ -19,6 +19,8 @@
 #
 
 class PluginsController < ApplicationController
+  include Api::V1::Plugin
+
   before_action :require_setting_site_admin, :set_site_admin_context, :set_navigation
 
   def index
@@ -30,10 +32,18 @@ class PluginsController < ApplicationController
       if @plugin_setting.new_record?
         clear_encrypted_plugin_settings
       end
-      @settings = @plugin.settings
+      respond_to do |format|
+        format.html { @settings = @plugin.settings }
+        format.json { render json: plugin_json(@plugin, @plugin_setting, @current_user, session), status: :ok }
+      end
     else
-      flash[:notice] = t("errors.plugin_doesnt_exist", "The plugin %{id} doesn't exist.", id: params[:id])
-      redirect_to plugins_path
+      respond_to do |format|
+        format.html do
+          flash[:notice] = t("errors.plugin_doesnt_exist", "The plugin %{id} doesn't exist.", id: params[:id])
+          redirect_to plugins_path
+        end
+        format.json { render json: { message: "The plugin #{params[:id]} doesn't exist" }, status: :bad_request }
+      end
     end
   end
 
@@ -42,16 +52,31 @@ class PluginsController < ApplicationController
       @plugin_setting.disabled = value_to_boolean(params[:plugin_setting][:disabled]) if params[:plugin_setting] && !params[:plugin_setting][:disabled].nil?
       @plugin_setting.posted_settings = params[:settings]&.to_unsafe_h || {} unless @plugin_setting.disabled
       if @plugin_setting.save
-        flash[:notice] = t("notices.settings_updated", "Plugin settings successfully updated.")
-        redirect_to plugin_path(@plugin.id)
+        respond_to do |format|
+          format.html do
+            flash[:notice] = t("notices.settings_updated", "Plugin settings successfully updated.")
+            redirect_to plugin_path(@plugin.id)
+          end
+          format.json { render json: { message: "Plugin settings successfully updated." }, status: :ok }
+        end
       else
-        @settings = @plugin.settings
-        flash[:error] = t("errors.setting_update_failed", "There was an error saving the plugin settings.")
-        render :show
+        respond_to do |format|
+          format.html do
+            @settings = @plugin.settings
+            flash[:error] = t("errors.setting_update_failed", "There was an error saving the plugin settings.")
+            render :show
+          end
+          format.json { render json: { message: "error saving plugin" }, status: :bad_request }
+        end
       end
     else
-      flash[:error] = t("errors.plugin_doesnt_exist", "The plugin %{id} doesn't exist.", id: params[:id])
-      redirect_to plugins_path
+      respond_to do |format|
+        format.html do
+          flash[:error] = t("errors.plugin_doesnt_exist", "The plugin %{id} doesn't exist.", id: params[:id])
+          redirect_to plugins_path
+        end
+        format.json { render json: { message: "The plugin doesn't exist" }, status: :bad_request }
+      end
     end
   end
 
