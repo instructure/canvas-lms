@@ -200,30 +200,35 @@ export const CriterionRow = ({
     )
   }
 
+  const pointsInputValue = pointsInput?.toString() ?? ''
+  const totalPointsValue = criterion.points.toString()
+  const instructorPointsText = I18n.t(
+    'Instructor Points %{pointsInputValue} out of %{totalPointsValue}',
+    {pointsInputValue, totalPointsValue}
+  )
+
   return (
     <View as="div" margin="0 0 small 0">
       {!hidePoints && (
         <Flex direction="row-reverse" data-testid="modern-view-out-of-points">
           <Flex.Item margin={isPreviewMode ? '0' : '0 0 0 x-small'}>
-            <Text size="small" weight="bold">
+            <Text size="small" weight="bold" aria-hidden={true}>
               /{criterion.points}
             </Text>
           </Flex.Item>
           <Flex.Item margin={isPreviewMode ? '0 0 0 x-small' : '0'}>
             {isPreviewMode ? (
-              <Text size="small" weight="bold">
-                {pointsInput?.toString() ?? ''}
+              <Text size="small" weight="bold" aria-label={instructorPointsText}>
+                {pointsInputValue}
               </Text>
             ) : (
               <TextInput
-                renderLabel={
-                  <ScreenReaderContent>{I18n.t('Instructor Points')}</ScreenReaderContent>
-                }
+                renderLabel={<ScreenReaderContent>{instructorPointsText}</ScreenReaderContent>}
                 placeholder="--"
                 width="3.375rem"
                 height="2.375rem"
                 data-testid={`criterion-score-${criterion.id}`}
-                value={pointsInput?.toString() ?? ''}
+                value={pointsInputValue}
                 onChange={e => setPointsInput(e.target.value)}
                 onBlur={e => setPoints(e.target.value)}
               />

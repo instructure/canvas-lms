@@ -41,6 +41,7 @@ export const RatingButton = ({
   onClick,
 }: RatingButtonProps) => {
   const unselectedColor = isPreviewMode ? tiara : licorice
+  const selectedText = isSelected ? I18n.t('Selected') : ''
 
   return (
     <View
@@ -53,7 +54,10 @@ export const RatingButton = ({
     >
       <View as="div" position="relative">
         <IconButton
-          screenReaderLabel={I18n.t('Rating Button %{buttonDisplay}', {buttonDisplay})}
+          screenReaderLabel={I18n.t('Rating Button %{buttonDisplay} %{selectedText}', {
+            buttonDisplay,
+            selectedText,
+          })}
           size="large"
           color="primary-inverse"
           onClick={onClick}
