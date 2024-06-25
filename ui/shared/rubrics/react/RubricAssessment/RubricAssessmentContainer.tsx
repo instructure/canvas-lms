@@ -375,7 +375,7 @@ const AssessmentHeader = ({
         </Flex.Item>
       </Flex>
 
-      <View as="hr" margin="x-small 0 small" />
+      <View as="hr" margin="x-small 0 small" aria-hidden={true} />
       <Flex>
         <Flex.Item shouldGrow={true} shouldShrink={true}>
           <ViewModeSelect
@@ -447,7 +447,7 @@ const AssessmentHeader = ({
             </Flex.Item>
           )}
 
-          <View as="hr" margin="medium 0 medium 0" />
+          <View as="hr" margin="medium 0 medium 0" aria-hidden={true} />
         </>
       )}
     </View>

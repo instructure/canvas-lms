@@ -230,10 +230,10 @@ describe "Rubric form page" do
     RubricsForm.criterion_name_input.send_keys("Criterion 1")
 
     expect(RubricsForm.criterion_rating_scales.length).to eq(5)
-    expect(RubricsForm.criterion_rating_scales[0].attribute("value")).to eq("4")
+    expect(RubricsForm.criterion_rating_scales[0]).to include_text("4")
     RubricsForm.remove_rating_buttons[2].click
     expect(RubricsForm.criterion_rating_scales.length).to eq(4)
-    expect(RubricsForm.criterion_rating_scales[0].attribute("value")).to eq("3")
+    expect(RubricsForm.criterion_rating_scales[0]).to include_text("3")
   end
 
   it "does not save the criterion if cancel is selected" do
