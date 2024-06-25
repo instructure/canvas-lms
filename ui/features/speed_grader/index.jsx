@@ -57,7 +57,7 @@ ready(() => {
       .then(module => {
         module.render(mountPoint, {
           theme,
-          queries: {
+          queryFns: {
             getCourse,
             getAssignment,
             getSubmission,
@@ -65,7 +65,7 @@ ready(() => {
             getSectionsByAssignment,
             resolvePostAssignmentGradesStatus,
           },
-          mutations: {
+          mutationFns: {
             updateSubmissionGrade,
             createSubmissionComment,
             hideAssignmentGradesForSections,
