@@ -25,8 +25,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {asJson, checkStatus, getPrefetchedXHR} from '@canvas/util/xhr'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {Card} from './types'
-import {fetchDashboardCardsAsync} from './dashboardCardQueries'
-import {sortByPosition, mapDashboardResponseToCard} from './util/dashboardUtils'
+import {sortByPosition} from './util/dashboardUtils'
 
 const I18n = useI18nScope('load_card_dashboard')
 
@@ -67,22 +66,22 @@ export class CardDashboardLoader {
     )
   }
 
-  async loadCardDashboard(renderFn = this.renderIntoDOM, observedUserId: string) {
+  async loadCardDashboard(
+    renderFn = this.renderIntoDOM,
+    observedUserId: string,
+    preloadedCards?: Card[] | null
+  ) {
     if (observedUserId) {
       this.observedUserId = observedUserId
     }
 
-    if (!!window?.ENV?.FEATURES?.dashboard_graphql_integration && ENV?.current_user_id) {
-      const queryKey = {userID: ENV.current_user_id, observedUserID: observedUserId}
-      fetchDashboardCardsAsync(queryKey)
-        .then(data => {
-          const mappedDashboardCards = mapDashboardResponseToCard(data)
-          const sortedDashCards = mappedDashboardCards.sort(sortByPosition)
-          renderFn(sortedDashCards)
-        })
-        .catch(e => {
-          this.showError(e)
-        })
+    if (window?.ENV?.FEATURES?.dashboard_graphql_integration && preloadedCards) {
+      try {
+        const sortedCards = preloadedCards.sort(sortByPosition)
+        renderFn(sortedCards)
+      } catch (e) {
+        this.showError(e as Error)
+      }
     } else if (observedUserId && CardDashboardLoader.observedUsersDashboardCards[observedUserId]) {
       // @ts-expect-error
       renderFn(CardDashboardLoader.observedUsersDashboardCards[observedUserId], true)

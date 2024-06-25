@@ -32,6 +32,7 @@ import AccountsTreeStore from '../store/AccountsTreeStore'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import preventDefault from '@canvas/util/preventDefault'
 import {flatten} from 'lodash'
+import {clearDashboardCache} from '../../../../shared/dashboard-card'
 
 const I18n = useI18nScope('account_course_user_search')
 
@@ -86,6 +87,9 @@ export default function NewCourseModal({terms, children}) {
           </Text>
         ),
       })
+      if (window?.ENV?.FEATURES?.dashboard_graphql_integration) {
+        clearDashboardCache()
+      }
     }
 
     const errorHandler = showFlashError(

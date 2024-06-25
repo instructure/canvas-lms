@@ -21,14 +21,35 @@ import {
   LOAD_DASHBOARD_CARDS_QUERY,
   DASHBOARD_ACTIVITY_STREAM_SUMMARY_QUERY,
 } from './graphql/Queries'
+import {queryClient, useQuery} from '@canvas/query'
+
+const DASHBOARD_CARD_QUERY_KEY = 'dashboard_cards'
+
+export function clearDashboardCache() {
+  queryClient.removeQueries({queryKey: [DASHBOARD_CARD_QUERY_KEY]})
+}
+
+export const useFetchDashboardCards = (userID: string | null, observedUserID: string | null) => {
+  return useQuery({
+    queryKey: ['dashboard_cards', {userID, observedUserID}] as DashboardQueryKey,
+    queryFn: fetchDashboardCardsAsync,
+    enabled: userID !== null && !!ENV?.FEATURES?.dashboard_graphql_integration,
+  })
+}
 
 interface DashboardQueryKeyParams {
   userID: string | null
   observedUserID: string | null
 }
 
-export async function fetchDashboardCardsAsync(params: DashboardQueryKeyParams): Promise<any> {
-  const {userID, observedUserID} = params
+type DashboardQueryKey = [string, DashboardQueryKeyParams]
+
+export async function fetchDashboardCardsAsync({
+  queryKey,
+}: {
+  queryKey: DashboardQueryKey
+}): Promise<any> {
+  const {userID, observedUserID} = queryKey[1]
   if (!userID) {
     throw new Error('User ID is required')
   }
