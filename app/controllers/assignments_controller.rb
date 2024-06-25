@@ -253,11 +253,7 @@ class AssignmentsController < ApplicationController
     GuardRail.activate(:secondary) do
       @assignment ||= @context.assignments.find(params[:id])
 
-      js_env({
-               ASSIGNMENT_POINTS_POSSIBLE: nil,
-               POST_TO_SIS: Assignment.sis_grade_export_enabled?(@context),
-               DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context)
-             })
+      js_env({ ASSIGNMENT_POINTS_POSSIBLE: nil })
 
       if @assignment.deleted?
         flash[:notice] = t "notices.assignment_delete", "This assignment has been deleted"

@@ -97,6 +97,7 @@ export type ItemAssignToCardProps = {
   removeDueDateInput?: boolean
   isCheckpointed?: boolean
   blueprintDateLocks?: DateLockTypes[]
+  postToSIS?: boolean
 }
 
 export type ItemAssignToCardRef = {
@@ -129,6 +130,7 @@ export default forwardRef(function ItemAssignToCard(
     removeDueDateInput,
     isCheckpointed,
     original_due_at,
+    postToSIS,
   } = props
   const [
     requiredRepliesDueDate,
@@ -163,7 +165,7 @@ export default forwardRef(function ItemAssignToCard(
       hasGradingPeriods: ENV.HAS_GRADING_PERIODS,
       gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods),
       userIsAdmin: ENV.current_user_is_admin,
-      postToSIS: ENV.POST_TO_SIS && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT,
+      postToSIS,
     })
   )
 
@@ -243,7 +245,13 @@ export default forwardRef(function ItemAssignToCard(
         return
       }
 
-      const dateInputKeys = ['required_replies_due_at','reply_to_topic_due_at', 'due_at', 'unlock_at', 'lock_at']
+      const dateInputKeys = [
+        'required_replies_due_at',
+        'reply_to_topic_due_at',
+        'due_at',
+        'unlock_at',
+        'lock_at',
+      ]
       let key
       if (Object.keys(validationErrors).length > 0) {
         key = dateInputKeys.find(k => validationErrors[k] !== undefined)
