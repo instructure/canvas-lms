@@ -608,7 +608,7 @@ window.modules = (function () {
       // and again after the api request returns. The second time we have
       // all the real data, including the module item's id. Wait until then
       // to add the option.
-      if ('id' in data && data.can_manage_assign_to) {
+      if ('id' in data && data.can_manage_assign_to && data.content_type !== 'Attachment') {
         const $assignToMenuItem = $item.find('.assign-to-option')
         if ($assignToMenuItem.length) {
           $assignToMenuItem.removeClass('hidden')
