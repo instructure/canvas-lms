@@ -16,16 +16,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class UpdateAutoCaptionStatusConstraint < ActiveRecord::Migration[7.0]
-  tag :predeploy
-  disable_ddl_transaction!
-
-  def change
-    remove_check_constraint :media_objects, name: "chk_auto_caption_status_enum", if_exists: true
-
-    DataFixup::NullOutAutoCaptionStatus.run
-    add_check_constraint :media_objects, "auto_caption_status IN ('complete', 'processing', 'failed_initial_validation', 'failed_handoff', 'failed_request', 'non_english_captions', 'failed_captions', 'failed_to_pull')", name: "chk_auto_caption_status_enum", validate: false
-
-    validate_check_constraint :media_objects, name: "chk_auto_caption_status_enum"
+module DataFixup::NullOutAutoCaptionStatus
+  def self.run
+    MediaObject.where.not(auto_caption_status: nil).in_batches.update_all(auto_caption_status: nil)
   end
 end
