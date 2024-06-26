@@ -1353,7 +1353,7 @@ DEPENDENCIES
   prosopite (~> 1.3)
   puma (~> 6.3)
   qti_exporter!
-  rack (~> 3.0)
+  rack (~> 3.0.11)
   rack3-brotli (~> 1.0)
   rails (~> 7.1.3)
   rails-controller-testing (= 1.0.5)
@@ -1400,6 +1400,7 @@ DEPENDENCIES
   spring-commands-parallel-rspec (= 1.1.0)
   spring-commands-rspec (= 1.0.4)
   spring-commands-rubocop (~> 0.4)
+  sqlite3 (~> 1.7)
   stackprof (~> 0.2)
   stormbreaker (~> 1.0)
   stringify_ids!
