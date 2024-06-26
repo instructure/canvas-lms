@@ -31,8 +31,6 @@ import {Pill} from '@instructure/ui-pill'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconButton} from '@instructure/ui-buttons'
 import {
-  IconArrowOpenDownLine,
-  IconArrowOpenEndLine,
   IconDragHandleLine,
   IconDuplicateLine,
   IconEditLine,
@@ -133,7 +131,7 @@ export const RubricCriteriaRow = ({
                       data-testid="rubric-criteria-row-description"
                     >
                       {/* html sanitized by server */}
-                      <Text dangerouslySetInnerHTML={{__html: description}} />
+                      <Text dangerouslySetInnerHTML={{__html: longDescription ?? ''}} />
                     </View>
                   </>
                 ) : (
