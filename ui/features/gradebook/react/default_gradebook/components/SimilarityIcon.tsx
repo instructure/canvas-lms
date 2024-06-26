@@ -30,17 +30,17 @@ import {
 export default function SimilarityIcon({similarityScore, status}) {
   if (status === 'scored' && similarityScore != null) {
     if (similarityScore <= 20) {
-      return <IconCertifiedSolid color="success" />
+      return <IconCertifiedSolid color="success" data-testid="similarity-icon" />
     } else if (similarityScore <= 60) {
-      return <IconOvalHalfLine color="error" />
+      return <IconOvalHalfLine color="error" data-testid="similarity-icon" />
     } else {
-      return <IconEmptySolid color="error" />
+      return <IconEmptySolid color="error" data-testid="similarity-icon" />
     }
   } else if (status === 'pending') {
-    return <IconClockLine />
+    return <IconClockLine data-testid="similarity-clock-icon" />
   }
 
-  return <IconWarningLine />
+  return <IconWarningLine data-testid="similarity-icon" />
 }
 
 SimilarityIcon.propTypes = {
