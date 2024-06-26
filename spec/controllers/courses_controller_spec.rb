@@ -2519,6 +2519,38 @@ describe CoursesController do
       expect(Course.find(json["id"]).grade_passback_setting).to eq "nightly_sync"
     end
 
+    describe "post policy" do
+      it "sets to true" do
+        post "create",
+             params: {
+               account_id: @account.id,
+               course: {
+                 name: "new course with post policy set to true",
+                 post_manually: true
+               }
+             },
+             format: :json
+
+        json = response.parsed_body
+        expect(Course.find(json["id"]).post_manually?).to be true
+      end
+
+      it "sets to false" do
+        post "create",
+             params: {
+               account_id: @account.id,
+               course: {
+                 name: "new course with post policy set to false",
+                 post_manually: false
+               }
+             },
+             format: :json
+
+        json = response.parsed_body
+        expect(Course.find(json["id"]).post_manually?).to be false
+      end
+    end
+
     it "does not allow visibility to be set when we don't have permission" do
       @visperm.enabled = false
       @visperm.save
@@ -3015,6 +3047,24 @@ describe CoursesController do
 
       @course.reload
       expect(@course.account_id).to eq account2.id
+    end
+
+    describe "post policy" do
+      before do
+        user_session(@teacher)
+      end
+
+      it "updates to true" do
+        put "update", params: { id: @course.id, course: { post_manually: true } }
+        @course.reload
+        expect(@course.post_manually?).to be true
+      end
+
+      it "updates to false" do
+        put "update", params: { id: @course.id, course: { post_manually: false } }
+        @course.reload
+        expect(@course.post_manually?).to be false
+      end
     end
 
     describe "touching content when public visibility changes" do

@@ -23,7 +23,7 @@ require_relative "../graphql_spec_helper"
 
 describe Mutations::SetCoursePostPolicy do
   let(:assignment) { course.assignments.create! }
-  let(:course) { Course.create!(workflow_state: "available") }
+  let(:course) { Course.create!(workflow_state: "available", root_account: Account.default) }
   let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
   let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
 
@@ -56,7 +56,7 @@ describe Mutations::SetCoursePostPolicy do
     CanvasSchema.execute(mutation_str, context:)
   end
 
-  context "when user has manage_grades permission" do
+  context "when user has permission (aka teacher role)" do
     let(:context) { { current_user: teacher } }
 
     it "requires that courseId be passed in the query" do
@@ -79,7 +79,7 @@ describe Mutations::SetCoursePostPolicy do
     end
 
     it "returns the related post policy" do
-      result = execute_query(mutation_str(course_id: course.id, post_manually: true), context)
+      result = execute_query(mutation_str(course_id: course.id, post_manually: true), { current_user: teacher })
       policy = PostPolicy.find_by(course:, assignment: nil)
       expect(result.dig("data", "setCoursePostPolicy", "postPolicy", "_id").to_i).to be policy.id
     end
@@ -139,17 +139,34 @@ describe Mutations::SetCoursePostPolicy do
     end
   end
 
-  context "when user does not have manage_grades permission" do
-    let(:context) { { current_user: student } }
+  context "when user does not have proper permissions" do
+    shared_examples "user cannot interact with endpoint" do
+      it "returns an error" do
+        result = execute_query(mutation_str(course_id: course.id, post_manually: true), context)
+        expect(result.dig("errors", 0, "message")).to eql "not found"
+      end
 
-    it "returns an error" do
-      result = execute_query(mutation_str(course_id: course.id, post_manually: true), context)
-      expect(result.dig("errors", 0, "message")).to eql "not found"
+      it "does not return data for the related post policy" do
+        result = execute_query(mutation_str(course_id: course.id, post_manually: true), context)
+        expect(result.dig("data", "setCoursePostPolicy")).to be_nil
+      end
     end
 
-    it "does not return data for the related post policy" do
-      result = execute_query(mutation_str(course_id: course.id, post_manually: true), context)
-      expect(result.dig("data", "setCoursePostPolicy")).to be_nil
+    describe "when user is a student" do
+      let(:context) { { current_user: student } }
+
+      it_behaves_like "user cannot interact with endpoint"
+    end
+
+    describe "when user is a teacher" do
+      let(:context) { { current_user: teacher } }
+
+      before do
+        Account.default.role_overrides.create!(role: Role.find_by(name: "TeacherEnrollment"), permission: "manage_content", enabled: false)
+        Account.default.role_overrides.create!(role: Role.find_by(name: "TeacherEnrollment"), permission: "manage_course_content_edit", enabled: false)
+      end
+
+      it_behaves_like "user cannot interact with endpoint"
     end
   end
 end
