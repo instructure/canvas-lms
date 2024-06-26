@@ -19,7 +19,11 @@
   css_bundle(:instructure_eportfolio) if @eportfolio_view === true
   css_bundle(:new_user_tutorials) if tutorials_enabled?
   js_bundle(:navigation_header) unless @headers == false
-  js_bundle(:top_navigation_tools) if @domain_root_account&.feature_enabled?(:top_navigation_placement)
+
+  if @domain_root_account&.feature_enabled?(:top_navigation_placement)
+    js_env INIT_DRAWER_LAYOUT_MUTEX: "init-drawer-layout"
+    js_bundle(:top_navigation_tools)
+end
 
   load_blueprint_courses_ui
   @has_content_notices = load_content_notices

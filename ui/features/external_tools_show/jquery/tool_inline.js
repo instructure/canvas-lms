@@ -23,9 +23,11 @@ import MarkAsDone from '@canvas/util/jquery/markAsDone'
 import ToolLaunchResizer from '@canvas/lti/jquery/tool_launch_resizer'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import ready from '@instructure/ready'
+import MutexManager from '@canvas/mutex-manager/MutexManager'
 
 ready(() => {
   const formSubmissionDelay = window.ENV.LTI_FORM_SUBMIT_DELAY
+  const formSubmissionMutex = window.ENV.INIT_DRAWER_LAYOUT_MUTEX
 
   let toolFormId = '#tool_form'
   let toolIframeId = '#tool_content'
@@ -38,16 +40,22 @@ ready(() => {
   const submitForm = function (submitFn) {
     if (formSubmissionDelay) {
       setTimeout(() => {
+        MutexManager.awaitMutex(formSubmissionMutex, () => {
+          if (submitFn) {
+            $toolForm.submit(submitFn)
+          } else {
+            $toolForm.submit()
+          }
+        })
+      }, formSubmissionDelay)
+    } else {
+      MutexManager.awaitMutex(formSubmissionMutex, () => {
         if (submitFn) {
           $toolForm.submit(submitFn)
         } else {
           $toolForm.submit()
         }
-      }, formSubmissionDelay)
-    } else if (submitFn) {
-      $toolForm.submit(submitFn)
-    } else {
-      $toolForm.submit()
+      })
     }
   }
 

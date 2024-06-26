@@ -27,6 +27,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
+import MutexManager from '@canvas/mutex-manager/MutexManager'
 import type {Tool} from '@canvas/global/env/EnvCommon'
 
 type Props = {
@@ -62,6 +63,7 @@ export default function ContentTypeExternalToolDrawer({
   const toolIconAlt = toolTitle ? `${toolTitle} Icon` : 'Tool Icon'
   const iframeRef = useRef()
   const pageContentRef = useRef()
+  const initDrawerLayoutMutex = window.ENV.INIT_DRAWER_LAYOUT_MUTEX
 
   useEffect(
     // setup DrawerLayout content
@@ -70,8 +72,15 @@ export default function ContentTypeExternalToolDrawer({
       if (pageContentRef.current && pageContent) {
         pageContentRef.current.appendChild(pageContent)
       }
+      /* Reparenting causes iFrames to reload or cancel load.
+       * This ensures that any tool launch iFrames are not loaded
+       * until after we complete reparenting.
+       */
+      if (initDrawerLayoutMutex) {
+        MutexManager.releaseMutex(initDrawerLayoutMutex)
+      }
     },
-    [pageContent]
+    [pageContent, initDrawerLayoutMutex]
   )
 
   useEffect(() => {
