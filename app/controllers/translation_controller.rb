@@ -30,6 +30,9 @@ class TranslationController < ApplicationController
     # Don't allow users that can't access, or if translation is not available
     return render_unauthorized_action unless Translation.available?(@context, :translation) && @context.grants_right?(@current_user, session, :read)
 
+    # This action is used for dicussions
+    InstStatsd::Statsd.increment("translation.discussions")
+
     # Call the translation service.
     render json: { translated_text: Translation.create(src_lang: required_params[:src_lang],
                                                        tgt_lang: required_params[:tgt_lang],
@@ -55,6 +58,9 @@ class TranslationController < ApplicationController
       text.append(passage.join)
     end
 
+    # This action is used for inbox_compose
+    InstStatsd::Statsd.increment("translation.inbox_compose")
+
     render json: { translated_text: text.join("\n") }
   end
 
@@ -63,6 +69,9 @@ class TranslationController < ApplicationController
     if Translation.language_matches_user_locale?(@current_user, required_params[:text])
       return render json: { status: "language_matches" }
     end
+
+    # This action is used for inbox inbound messages
+    InstStatsd::Statsd.increment("translation.inbox")
 
     # Translate the message
     render json: { translated_text: Translation.translate_message(text: required_params[:text], user: @current_user) }
