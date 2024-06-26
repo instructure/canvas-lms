@@ -147,7 +147,7 @@ GEM
       redis-cluster-client (>= 0.7.11)
     redis-scripting (1.0.1)
       redis (>= 3.0)
-    rexml (3.3.0)
+    rexml (3.3.1)
       strscan
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
