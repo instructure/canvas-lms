@@ -26,6 +26,7 @@ require_relative "../../helpers/k5_common"
 require_relative "../dashboard/pages/k5_important_dates_section_page"
 require_relative "../dashboard/pages/k5_dashboard_common_page"
 require_relative "../../helpers/selective_release_common"
+require_relative "../conditional_release/page_objects/conditional_release_objects"
 
 describe "discussions" do
   include_context "in-process server selenium tests"
@@ -954,6 +955,46 @@ describe "discussions" do
 
           # Verify that the discussion topic redirected the page to the new discussion topic
           expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/#{dt.id}")
+        end
+      end
+
+      context "mastery paths" do
+        before do
+          course.conditional_release = true
+          course.save!
+
+          @assignment_for_mp = assignment_model(course: @course, points_possible: 0, title: "Assignment for MP")
+        end
+
+        it "allows creating a discussion with mastery paths" do
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          title = "Graded Discussion w/Mastery Paths"
+
+          f("input[placeholder='Topic Title']").send_keys title
+
+          force_click_native('input[type=checkbox][value="graded"]')
+          wait_for_ajaximations
+
+          f("input[data-testid='points-possible-input']").send_keys "10"
+          fj("div[role='tab']:contains('Mastery Paths')").click
+
+          ConditionalReleaseObjects.last_add_assignment_button.click
+          ConditionalReleaseObjects.mp_assignment_checkbox(@assignment_for_mp.title).click
+          ConditionalReleaseObjects.add_items_button.click
+
+          expect(ConditionalReleaseObjects.assignment_card_exists?(@assignment_for_mp.title)).to be(true)
+
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          dt = DiscussionTopic.last
+          rule = ConditionalRelease::Rule.last
+          rule_assignment = rule.trigger_assignment
+          rule_first_assignment = rule.assignment_set_associations.first.assignment
+
+          expect(rule_assignment.id).to eq(dt.assignment.id)
+          expect(rule_first_assignment.id).to eq(@assignment_for_mp.id)
         end
       end
     end

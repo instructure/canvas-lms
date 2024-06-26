@@ -62,6 +62,10 @@ class Editor extends React.Component {
     }
   }
 
+  updateAssignmentFromEvent = event => {
+    this.updateAssignment(event.detail.assignmentInfo)
+  }
+
   updateAssignment = (newAttributes = {}) => {
     if (!this.state.editor) {
       return
@@ -77,6 +81,12 @@ class Editor extends React.Component {
       id: newAttributes.id,
       points_possible: newAttributes.points_possible,
       submission_types: newAttributes.submission_types,
+    })
+  }
+
+  saveFromEvent = () => {
+    this.save().then(() => {
+      window.dispatchEvent(new CustomEvent('navigateToDiscussionTopic'))
     })
   }
 
@@ -129,6 +139,9 @@ class Editor extends React.Component {
 
   componentDidMount() {
     this.createNativeEditor()
+
+    window.addEventListener('triggerMasteryPathsUpdateAssignment', this.updateAssignmentFromEvent)
+    window.addEventListener('triggerMasteryPathsSave', this.saveFromEvent)
   }
 
   render() {

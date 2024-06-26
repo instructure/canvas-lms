@@ -125,6 +125,9 @@ export const CREATE_DISCUSSION_TOPIC = gql`
             pointsPossible
             tag
           }
+          gradingStandard {
+            _id
+          }
         }
         attachment {
           ...Attachment

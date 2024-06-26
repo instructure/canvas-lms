@@ -375,6 +375,20 @@ function DiscussionTopicForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    const assignmentInfo = {
+      id: null,
+      grading_standard_id: gradingSchemeId,
+      grading_type: displayGradeAs,
+      points_possible: pointsPossible,
+      submission_types: 'discussion_topic',
+    }
+
+    window.dispatchEvent(
+      new CustomEvent('triggerMasteryPathsUpdateAssignment', {detail: {assignmentInfo}})
+    )
+  }, [gradingSchemeId, displayGradeAs, pointsPossible, isGraded])
+
   const {
     shouldShowTodoSettings,
     shouldShowPostToSectionOption,
@@ -1084,7 +1098,7 @@ function DiscussionTopicForm({
       <div style={{display: selectedView === Views.MasteryPaths ? 'block' : 'none'}}>
         {ENV.CONDITIONAL_RELEASE_ENV && (
           <MasteryPathsReactWrapper
-            type={I18n.t('discussion topic')}
+            type="discussion topic"
             env={ENV.CONDITIONAL_RELEASE_ENV}
           />
         )}
