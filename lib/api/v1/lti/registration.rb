@@ -47,6 +47,7 @@ module Api::V1::Lti::Registration
       json["lti_version"] = registration.lti_version
       json["icon_url"] = registration.icon_url
       json["dynamic_registration"] = true if registration.dynamic_registration?
+      json["developer_key_id"] = registration.developer_key&.global_id
 
       if registration.created_by.present?
         json["created_by"] = user_json(registration.created_by, user, session, [], context)
