@@ -65,10 +65,8 @@ polyfills in your own app, you can put this in your html above the script that i
 `@instructure/canvas-rce`:
 
 ```
-<script src="https://cdn.polyfill.io/v2/polyfill.min.js?rum=0"></script>
+<script src="https://cdnjs.cloudflare.com/polyfill/v2/polyfill.min.js"></script>
 ```
-
-(See https://polyfill.io/v2/docs/ for more info)
 
 ## Development
 
