@@ -23,10 +23,7 @@ import {Container} from '../../blocks/Container'
 import {SectionMenu} from '../../../editor/SectionMenu'
 import {useClassNames} from '../../../../utils'
 
-type BlankSectionProps = {
-  children?: React.ReactNode
-}
-export const BlankSection = ({children}: BlankSectionProps) => {
+export const BlankSection = () => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))

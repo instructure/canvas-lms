@@ -371,11 +371,7 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     )
   }
 
-  const sectionIsFirst = () => {
-    return getNodeIndex(node, query) === 0
-  }
-
-  const renderSectionAdder = (isBefore: boolean) => {
+  const renderSectionAdder = (isBefore: boolean = false) => {
     return (
       <div className="section-adder">
         <span>
@@ -392,7 +388,7 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
 
   return (
     <>
-      {node.data.custom?.isSection && sectionIsFirst() && renderSectionAdder(true)}
+      {node.data.name === 'PageBlock' && renderSectionAdder(true)}
       {selected && node.related && renderRelated()}
       {!selected && hovered && renderHoverTag()}
       {render}

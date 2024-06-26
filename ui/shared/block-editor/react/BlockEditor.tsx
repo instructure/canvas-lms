@@ -48,6 +48,7 @@ const DEFAULT_CONTENT = JSON.stringify({
 
 type BlockEditorProps = {
   enabled?: boolean
+  container: HTMLElement // the element that will shrink when drawers open
   version: string
   content: string
   onCancel: () => void
@@ -55,6 +56,7 @@ type BlockEditorProps = {
 
 export default function BlockEditor({
   enabled = true,
+  container,
   version,
   content,
   onCancel,
@@ -121,7 +123,7 @@ export default function BlockEditor({
           </Flex.Item>
         </Flex>
 
-        <Toolbox open={toolboxOpen} onClose={handleCloseToolbox} />
+        <Toolbox open={toolboxOpen} container={container} onClose={handleCloseToolbox} />
         <NewPageStepper
           open={stepperOpen}
           onFinish={handleCloseStepper}

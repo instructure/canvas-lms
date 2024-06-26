@@ -130,7 +130,7 @@ const SectionMenu = ({
   return (
     <Menu show={true} onToggle={() => {}}>
       {onEditSection ? <Menu.Item onSelect={handleEditSection}>EditSection</Menu.Item> : null}
-      <Menu.Item onSelect={handleDuplicateSection}>Duplicate</Menu.Item>
+      {/* <Menu.Item onSelect={handleDuplicateSection}>Duplicate</Menu.Item> */}
       <Menu.Item onSelect={handleMoveUp}>Move Up</Menu.Item>
       <Menu.Item onSelect={handleMoveDown}>Move Down</Menu.Item>
       <Menu.Item onSelect={handleRemove} disabled={!selected.isDeletable()}>
