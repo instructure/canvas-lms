@@ -47,11 +47,12 @@ type Props = {
   type: string
   env: env
 }
+let conditionalReleaseEditor: any
 
 export const MasteryPathsReactWrapper = (props: Props) => {
   useEffect(() => {
-    if (document.querySelector('#conditional-release-target')) {
-      ConditionalRelease.attach(
+    if (!conditionalReleaseEditor && document.querySelector('#conditional-release-target')) {
+      conditionalReleaseEditor = ConditionalRelease.attach(
         document.querySelector('#conditional-release-target'),
         props.type,
         props.env
