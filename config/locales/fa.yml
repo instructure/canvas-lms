@@ -6977,6 +6977,7 @@ fa:
   count_participations_ac8f82b7: 
     one: "%{count} شرکت کننده"
     other: "%{count} شرکت کننده"
+  count_people_489946e7: "%{count} نفر"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{count} فرد در *%{course_name}* با موفقیت ثبت نام شدند."
     other: "%{count} فرد در *%{course_name}* با موفقیت ثبت نام شدند."
@@ -7420,6 +7421,7 @@ fa:
     greater_than_three: "لطفا یک عبارت جستجو با سه یا چند نویسه وارد نمایید"
     unknown_error: "جستجوی شما با اشکال مواجه شد، لطفا دوباره سعی کنید."
   course_visibility_options_ca8ab3a8: "گزینه‌های قابلیت دید درس"
+  course_was_successfully_updated_1ab0e9f8: "درس با موفقیت بهنگام سازی شد"
   course_with_canvas_id_id_not_found_1ff06bec: "دوره با شناسه ی %{id} کانواس یافت نشد"
   course_wizard_31c87552: "راهنمای گام به گام درس"
   coursecontext_label_d563be4c: "%{courseContext}%{label}"
@@ -9711,6 +9713,7 @@ fa:
   enter_a_filename_for_the_photo_4f0fc10e: "یک نام فایل برای عکس وارد کنید"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "در اینجا یک کد هگزا برای استفاده از رنگ سفارشی وارد نمایید."
   enter_a_score_to_test_c6f89f4a: "وارد کردن یک نمره برای آزمایش"
+  enter_a_section_name_adbe3099: "نام بخش را وارد کنید"
   enter_a_student_pairing_code_below_to_add_a_studen_15789251: "یک کد جفت سازی دانش آموز را در زیر وارد کنید تا دانش آموزی برای مشاهده اضافه شود."
   enter_a_valid_date_46d77547: "یک تاریخ معتبر وارد کنید"
   enter_a_what_if_score_668c91a3: "یک نمره احتمالی وارد کنید."
@@ -16119,6 +16122,7 @@ fa:
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: "چند مورد به عنوان \"زمینه فعلی\" علامت‌گذاری شده است، زیرا مقادیر یکسان تحت چند نام ذخیره شده‌اند، یعنی هر یک با آنچه در حال حاضر اعمال شده یکسان هستند"
   multiple_ba5220cd: "چند مورد"
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "چند حساب کانواس با Clever District %{district_id} در ارتباط است"
+  multiple_dates_e3a122f7: "چند تاریخ"
   multiple_dropdowns_read_surrounding_text_f61274b3: "دارای چند منوی بازشونده، متن‌های اطراف را بخوانید"
   multiple_due_dates_283dd861: "چند تاریخ مهلت"
   multiple_due_dates_47416f7a: "(سررسید چندگانه)"
