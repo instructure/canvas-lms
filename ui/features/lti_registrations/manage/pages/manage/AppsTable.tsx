@@ -35,6 +35,7 @@ import type {AppsSortDirection, AppsSortProperty} from '../../api/registrations'
 import type {LtiRegistration} from '../../model/LtiRegistration'
 import {useManageSearchParams, type ManageSearchParams} from './ManageSearchParams'
 import {colors} from '@instructure/canvas-theme'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 type CallbackWithRegistration = (registration: LtiRegistration) => void
 
@@ -144,26 +145,52 @@ const Columns: ReadonlyArray<Column> = [
   {
     id: 'actions',
     width: '80px',
-    render: (r, {deleteApp}) => (
-      <Menu
-        trigger={
-          <IconButton
-            withBackground={false}
-            withBorder={false}
-            screenReaderLabel={I18n.t('More Registration Options')}
-          >
-            <IconMoreLine />
-          </IconButton>
-        }
-      >
-        <Menu.Item
-          themeOverride={{labelColor: colors.textDanger, activeBackground: colors.backgroundDanger}}
-          onClick={() => deleteApp(r)}
+    render: (r, {deleteApp}) => {
+      const developer_key_id = r.developer_key_id
+      return (
+        <Menu
+          trigger={
+            <IconButton
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel={I18n.t('More Registration Options')}
+            >
+              <IconMoreLine />
+            </IconButton>
+          }
         >
-          {I18n.t('Delete App')}
-        </Menu.Item>
-      </Menu>
-    ),
+          {developer_key_id ? (
+            <Menu.Item
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(developer_key_id)
+                  showFlashAlert({
+                    type: 'info',
+                    message: I18n.t('Client ID copied'),
+                  })
+                } catch (error) {
+                  showFlashAlert({
+                    type: 'error',
+                    message: I18n.t('There was an issue copying the client ID'),
+                  })
+                }
+              }}
+            >
+              {I18n.t('Copy Client ID')}
+            </Menu.Item>
+          ) : null}
+          <Menu.Item
+            themeOverride={{
+              labelColor: colors.textDanger,
+              activeBackground: colors.backgroundDanger,
+            }}
+            onClick={() => deleteApp(r)}
+          >
+            {I18n.t('Delete App')}
+          </Menu.Item>
+        </Menu>
+      )
+    },
   },
 ]
 
