@@ -3961,6 +3961,7 @@ ko:
     other: "%{count}분"
     zero: "1분 이내"
   count_minutes_ago_c1b7d7ef: "%{count}분 전"
+  count_people_489946e7: "%{count}명"
   count_points_4735a2e8: 
     one: "%{count} 점"
     other: "%{count} 점"
@@ -4152,6 +4153,7 @@ ko:
   course_users: 
     greater_than_three: "3자 이상으로 된 검색어를 입력하시기 바랍니다."
     unknown_error: "검색에 오류가 발생했습니다. 다시 시도하시기 바랍니다."
+  course_was_successfully_updated_1ab0e9f8: "과목이 성공적으로 업데이트되었습니다."
   courses: 
     assignments_needing_grading: 
       headings: 
@@ -5415,6 +5417,7 @@ ko:
   enrollments_students: 학생
   enrollments_tas: 조교
   enrollments_teachers: 교사
+  enter_a_section_name_adbe3099: "섹션 이름 입력"
   enter_the_date_you_would_like_to_navigate_to_a712de47: "탐색하려는 날짜를 입력하십시오."
   eportfolio: 
     buttons: 
@@ -9404,6 +9407,7 @@ ko:
   move_name_to_a_new_group_acabed4e: "%{name}을(를) 새 그룹으로 이동"
   move_to_1c208ae5: "다음으로 이동..."
   multi_factor_authentication_configured_865b1bde: "다단계 인증 구성"
+  multiple_dates_e3a122f7: "여러 날짜"
   must_be_255_characters_or_less_e8e7f25e: "255글자보다 적어야 함"
   mute_dialog: 
     curving_assignments: "과제 상대 평가"
