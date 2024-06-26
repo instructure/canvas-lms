@@ -29,7 +29,7 @@
   css_bundle :tinymce
   js_env({
     :SUBMIT_ASSIGNMENT => {
-      :ALLOWED_EXTENSIONS => (@assignment.allowed_extensions || []),
+      :ALLOWED_EXTENSIONS => (@assignment.submission_types && @assignment.submission_types.match(/online_upload/) ? @assignment.allowed_extensions : []),
       :ID => @assignment.id,
       :GROUP_ID_FOR_USER => @assignment.group_category.try(:group_for, @current_user).try(:id)
     }
