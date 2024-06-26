@@ -271,6 +271,10 @@ module Bundler
 
                   dependency_changes ||= spec != parent_spec
 
+                  if spec.source != parent_spec.source
+                    parent_spec = parent_spec.dup
+                    parent_spec.source = spec.source
+                  end
                   parent_spec
                 end
 
