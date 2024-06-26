@@ -5778,6 +5778,7 @@ tr:
   count_participations_ac8f82b7: 
     one: "1 katılım"
     other: "%{count} katılım"
+  count_people_489946e7: "%{count} katılımcı"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{user_name} başarılı bir şekilde *%{course_name}* dersine kaydoldu."
     other: "%{count} kişi başarılı bir şekilde *%{course_name}* dersine kaydoldu."
@@ -6143,6 +6144,7 @@ tr:
     greater_than_three: "Lütfen üç veya daha fazla karakter içeren bir arama terimi girin"
     unknown_error: "Aramanız esnasında bazı şeyler yanlış gitti, lütfen tekrar deneyiniz."
   course_visibility_options_ca8ab3a8: "Ders Görülebilirlik Seçenekleri"
+  course_was_successfully_updated_1ab0e9f8: "Ders başarılı bir şekilde güncellendi."
   courses: 
     assignments_needing_grading: 
       headings: 
@@ -8025,6 +8027,7 @@ tr:
   enrollments_teachers: Öğretmenler
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "İsteğe bağlı bir renk kullanmak için bir hexcode girin."
   enter_a_score_to_test_c6f89f4a: "Teste bir puan gir"
+  enter_a_section_name_adbe3099: "Bir bölüm adı giriniz"
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Kullanıcının kök hesabı alan adını değiştireceğiniz \"{{ACCOUNT_DOMAIN}}\" i girin."
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Kullanıcının özel Canvas Kimliğini değiştireceğiniz \"{{CANVAS_USER_ID}}\" i girin."
   enter_grades_as_e113e606: "Notları şu şekilde gir"
@@ -13204,6 +13207,7 @@ tr:
   move_to_front_bf6f0194: "Öne Taşı"
   moving_a4d552df: Taşınıyor...
   multi_factor_authentication_configured_865b1bde: "Çoklu kimlik doğrulama yapılandırıldı"
+  multiple_dates_e3a122f7: "Çoklu Tarih"
   multiple_due_dates_6b0d75c6: "Çoklu bitiş tarihleri"
   multiple_modules_930713d4: "Çoklu Modüller"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
