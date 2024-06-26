@@ -1925,7 +1925,8 @@ describe "Module Items API", type: :request do
           expect(json["items"][0]["next"]["id"]).to eq quiz_tag.id
         end
 
-        it "does not omit a wiki page item if CYOE is disabled" do
+        it "does not omit a wiki page item if CYOE is disabled and selective release is disabled" do
+          Account.site_admin.disable_feature! :selective_release_backend
           allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
           module_with_page = @course.context_modules.create!(name: "new module")
           assignment = @course.assignments.create!(
