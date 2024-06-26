@@ -799,6 +799,15 @@ Ignored for any role other than observer</td>
 <td>If true, a notification will be sent to the enrolled user. Notifications are
  not sent by default. </td>
 </tr>
+<tr>
+<td>temporary_enrollment_source_user_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>The User identifier from users.csv of a provider in a temporary enrollment.
+ If included, the created enrollment is a temporary enrollment.
+ <em>Requires Temporary Enrollments feature option.</em></td>
+</tr>
 </table>
 
 &#42; course_id or section_id is required, role or role_id is required, and
