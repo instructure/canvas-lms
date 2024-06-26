@@ -19,6 +19,7 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import ContentTypeExternalToolDrawer from '../ContentTypeExternalToolDrawer'
+import MutexManager from '@canvas/mutex-manager/MutexManager'
 
 describe('ContentTypeExternalToolDrawer', () => {
   const tool = {
@@ -124,5 +125,25 @@ describe('ContentTypeExternalToolDrawer', () => {
       />
     )
     expect(queryByTestId('ltiIframe')).toBeNull()
+  })
+
+  describe('when ENV.INIT_DRAWER_LAYOUT_MUTEX is set', () => {
+    const origEnv = {...window.ENV}
+    const mutex = 'init-drawer-layout'
+
+    beforeAll(() => {
+      window.ENV.INIT_DRAWER_LAYOUT_MUTEX = mutex
+      MutexManager.createMutex(mutex)
+    })
+
+    afterAll(() => (window.ENV = origEnv))
+
+    it('releases the mutex after reparenting content', () => {
+      expect(MutexManager.mutexes[mutex]).toBeDefined()
+
+      renderTray()
+
+      expect(MutexManager.mutexes[mutex]).toBeUndefined()
+    })
   })
 })
