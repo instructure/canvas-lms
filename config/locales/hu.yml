@@ -7172,6 +7172,7 @@ hu:
   count_participations_ac8f82b7: 
     one: "1 részvétel"
     other: "%{count} részvétel"
+  count_people_489946e7: "%{count} résztvevő"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{user_name} sikeresen beiratkozott a *%{course_name}* kurzusra."
     other: "%{count} ember sikeresen iratkozott be a *%{course_name}* kurzusra."
@@ -7658,6 +7659,7 @@ hu:
     greater_than_three: "Kérjük, olyan keresési kifejezést írjon be, ami három vagy több karakterből áll"
     unknown_error: "Hiba történt a keresése közben, kérjük, próbálja újra!"
   course_visibility_options_ca8ab3a8: "Kurzus láthatósági opciók"
+  course_was_successfully_updated_1ab0e9f8: "A kurzus frissítése sikeres."
   course_with_canvas_id_id_not_found_1ff06bec: "A %{id} azonosítójú kurzus nem található"
   course_wizard_31c87552: "Kurzus varázsló"
   coursecontext_label_d563be4c: "%{courseContext} %{label}"
@@ -9975,6 +9977,7 @@ hu:
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Írjon be egy hexadecimális kódot ahhoz, hogy egyedi színt használhasson"
   enter_a_letter_grade_536a8cef: "Adjon meg egy betűjeles osztályzatot"
   enter_a_score_to_test_c6f89f4a: "Írjon be egy pontszámot a teszteléshez"
+  enter_a_section_name_adbe3099: "Adjon meg egy szekció nevet"
   enter_a_student_pairing_code_below_to_add_a_studen_15789251: "Adjon meg egy hallgatópárosítási kódot alább, ha egy hallgatót szeretne megfigyelni."
   enter_a_what_if_score_668c91a3: "Adja meg a Mi lenne, ha pontszámát."
   enter_a_workflow_state_to_narrow_results_162903af: "Adjon meg egy munkafolyamat-állapotot az eredmények szűkítéséhez"
@@ -16427,6 +16430,7 @@ hu:
                 mindegyik ugyanaz, mint amit jelenleg alkalmaznak.
   multiple_ba5220cd: Többszörös
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "Több Canvas-fiók tartozik %{district_id} Clever-körzetbe"
+  multiple_dates_e3a122f7: "Többes határidő"
   multiple_dropdowns_read_surrounding_text_f61274b3: "Több legördülő menü, olvassa el a környező szöveget"
   multiple_due_dates_283dd861: "Több határidő"
   multiple_due_dates_47416f7a: "(Többszörös esedékességi időpontok)"
