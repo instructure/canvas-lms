@@ -148,12 +148,12 @@ describe('InboxSettingsModalContainer', () => {
       })
     })
 
-    // cf. VICE-4399
-    it.skip('calls onDismissWithAlert with SAVE_SETTINGS_FAIL when GraphQL mutation fails', async () => {
+    it('calls onDismissWithAlert with SAVE_SETTINGS_FAIL when GraphQL mutation fails', async () => {
       server.use(...inboxSettingsHandlers(1))
       const {getByText} = setup({...defaultProps()})
       await waitForApolloLoading()
       fireEvent.click(getByText('Save'))
+      await waitForApolloLoading()
       await waitFor(() => {
         expect(onDismissWithAlertMock).toHaveBeenCalledWith(SAVE_SETTINGS_FAIL)
       })
