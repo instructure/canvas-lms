@@ -1382,6 +1382,7 @@ DEPENDENCIES
   spring-commands-parallel-rspec (= 1.1.0)
   spring-commands-rspec (= 1.0.4)
   spring-commands-rubocop (~> 0.4)
+  sqlite3 (~> 1.7)
   stackprof (~> 0.2)
   stormbreaker (~> 1.0)
   stringify_ids!
