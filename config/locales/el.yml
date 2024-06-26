@@ -4365,6 +4365,7 @@ el:
     zero: "λιγότερο από 1 λεπτό"
   count_minutes_ago_c1b7d7ef: "%{count} λεπτά πριν"
   count_more_beba6428: "%{count} περισσότερα"
+  count_people_489946e7: "%{count} άτομα"
   count_points_4735a2e8: 
     one: "1 μόριο"
     other: "%{count} μόρια"
@@ -4615,6 +4616,7 @@ el:
   course_users: 
     greater_than_three: "Παρακαλώ εισαγάγετε κάποιον όρο αναζήτησης με τρεις ή περισσότερους χαρακτήρες"
     unknown_error: "Κάτι δεν πήγε σωστά με την εύρεσή σας, παρακαλώ δοκιμάστε ξανά."
+  course_was_successfully_updated_1ab0e9f8: "Το μάθημα ενημερώθηκε με επιτυχία."
   courses: 
     confirm_action: 
       buttons: 
@@ -5995,6 +5997,7 @@ el:
   enrollments_teachers: Καθηγητές
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Εισάγετε έναν εξαψήφιο κωδικό/hex εδώ για να χρησιμοποιήσετε ένα προσαρμοσμένο χρώμα."
   enter_a_score_to_test_c6f89f4a: "Εισαγωγή βαθμολογίας για έλεγχο"
+  enter_a_section_name_adbe3099: "Εισάγετε ένα όνομα τμήματος"
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Εισαγάγετε «{{ACCOUNT_DOMAIN}}» για να υποκαταστήσετε τον τομέα λογαριασμού ρίζας του χρήστη"
   enter_or_find_an_external_tool_url_6aebbd0d: "Εισαγωγή ή εύρεση URL Εξωτερικού Εργαλείου"
   enter_the_date_you_would_like_to_navigate_to_a712de47: "Εισαγάγετε την ημερομηνία στην οποία θα θέλατε να πλοηγηθείτε."
@@ -9884,6 +9887,7 @@ el:
   move_to_dde1a5e1: "Μεταφορά Προς..."
   moving_a4d552df: Μετακίνηση...
   multi_factor_authentication_configured_865b1bde: "Ρυθμίστηκε ο έλεγχος ταυτότητας πολλών παραγόντων "
+  multiple_dates_e3a122f7: "Πολλαπλές Ημερομηνίες"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
     one: "<mrk mid=\"8203\" mtype=\"seg\">Πρέπει να επιτύχετε μαεστρία τουλάχιστον μία φορά.</mrk> <mrk mid=\"8204\" mtype=\"seg\">Για τις βαθμολογίες πάνω από το επίπεδο μαεστρίας, θα χρησιμοποιηθεί ο μέσος όρος τους για τον υπολογισμό της τελικής βαθμολογίας.</mrk>"
     other: "Πρέπει να επιτύχετε επιδεξιότητα τουλάχιστον %{count} φορές. Για τις βαθμολογίες πάνω από το επίπεδο επιδεξιότητας, θα χρησιμοποιηθεί ο μέσος όρος τους για τον υπολογισμό της τελικής βαθμολογίας."
