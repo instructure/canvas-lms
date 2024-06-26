@@ -193,6 +193,9 @@ const locale = {
   "congruent_5a244acd": { "message": "Iomchuí" },
   "contains_311f37b7": { "message": "Tá an méid seo ann" },
   "content_1440204b": { "message": "Ábhar" },
+  "content_in_the_editor_will_be_changed_press_cancel_d5bf3357": {
+    "message": "Athrófar ábhar san eagarthóir. Brúigh Cealaigh chun an t-ábhar bunaidh a choinneáil."
+  },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "Tá an ábhar fós á uaslódáil, má leanann tú ar aghaidh ní bheidh sé leabaithe i gceart."
   },
@@ -340,6 +343,10 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Cuir isteach 3 charachtar ar a laghad le cuardaigh"
   },
+  "enter_replacement_text_17631bbc": {
+    "message": "cuir isteach téacs athsholáthair"
+  },
+  "enter_search_text_26cb4459": { "message": "cuir isteach téacs cuardaigh" },
   "epsilon_54bb8afa": { "message": "Eipsealón" },
   "epsilon_variant_d31f1e77": { "message": "Eipsealón (Athraithe)" },
   "equals_sign_c51bdc58": { "message": "Comhartha Comhionann" },
@@ -384,6 +391,8 @@ const locale = {
   },
   "files_c300e900": { "message": "Comhaid" },
   "files_index_af7c662b": { "message": "Innéacs Comhaid" },
+  "find_8d605019": { "message": "Aimsigh" },
+  "find_and_replace_6e345933": { "message": "Aimsigh agus Athraigh" },
   "finish_bc343002": { "message": "Críochnaigh" },
   "fix_heading_hierarchy_f60884c4": {
     "message": "Deisigh ordlathas ceannteidil"
@@ -508,6 +517,7 @@ const locale = {
   "in_element_of_19ca2f33": { "message": "I (Gné De)" },
   "increase_indent_6af90f7c": { "message": "Méadaigh Eangach" },
   "indefinite_integral_6623307e": { "message": "Slánuimhreach Éiginnte" },
+  "index_of_max_80dcf7a5": { "message": "{ index } de { max }" },
   "indigo_2035fc55": { "message": "Indeagó" },
   "inference_fed5c960": { "message": "Tátal" },
   "infinity_7a10f206": { "message": "Iliomad" },
@@ -683,6 +693,7 @@ const locale = {
   "nested_less_than_27d17e58": { "message": "Neadaithe Níos lú ná" },
   "new_quiz_34aacba6": { "message": "Quiz Nua" },
   "next_40e12421": { "message": "Ar aghaidh" },
+  "next_findtext_9d69f0fe": { "message": "An chéad { findText } eile" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Níor aimsíodh aon saincheisteanna inrochtaineachta."
   },
@@ -720,6 +731,7 @@ const locale = {
   },
   "no_quizzes_found_c80c537a": { "message": "Níor aimsíodh aon quizeanna." },
   "no_results_940393cf": { "message": "Gan torthaí." },
+  "no_results_found_58717065": { "message": "Níor aimsíodh aon toradh" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Níor aimsíodh aon torthaí le haghaidh { filterTerm }"
   },
@@ -806,11 +818,16 @@ const locale = {
   "precedes_196b9aef": { "message": "Tagann sé Roimh" },
   "precedes_equal_20701e84": { "message": "Tagann sé Roimh Comhionann" },
   "preformatted_d0670862": { "message": "Réamhfhormáidithe" },
+  "prepend_findtext_append_8e0e769a": {
+    "message": "{ prepend }{ findText }{ append }"
+  },
   "prev_f82cbc48": { "message": "Roimhe seo" },
   "preview_53003fd2": { "message": "Réamhamharc" },
   "preview_a3f8f854": { "message": "RÉAMHAMHARC" },
   "preview_in_overlay_ed772c46": { "message": "Réamhamharc i bhforleagan" },
   "preview_inline_9787330": { "message": "Réamhamharc inlíne" },
+  "previous_bd2ac015": { "message": "Roimhe Seo" },
+  "previous_findtext_8dfbfd30": { "message": "Roimhe Seo { findText }" },
   "prime_917ea60e": { "message": "Príomha" },
   "prime_numbers_13464f61": { "message": "Príomhuimhreacha" },
   "product_39cf144f": { "message": "Táirge" },
@@ -839,12 +856,27 @@ const locale = {
   "religion_icon_246e0be1": { "message": "Deilbhín Creideamh" },
   "remove_heading_style_5fdc8855": { "message": "Bain stíl ceannteidil" },
   "remove_link_d1f2f4d0": { "message": "Bain Nasc" },
+  "replace_all_d3d68b3": { "message": "Athraigh Gach Rud" },
+  "replace_all_findtext_with_replacetext_da574b32": {
+    "message": "Athraigh { findText } ar fad le { replaceText }"
+  },
   "replace_e61834a7": { "message": "Ionadaigh" },
+  "replace_findtext_with_replacetext_7b5c7fb3": {
+    "message": "Athraigh { findText } le { replaceText }"
+  },
+  "replace_with_eeff01ad": { "message": "Athraigh le" },
+  "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+    "message": "Athraíodh { alertFindText } le { alertReplaceText }"
+  },
+  "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+    "message": "Athraíodh { alertFindText } ar fad le { alertReplaceText }"
+  },
   "reset_95a81614": { "message": "Athshocraigh" },
   "resize_ec83d538": { "message": "Athraigh méid" },
   "restore_auto_save_deccd84b": {
     "message": "Athchóirigh sábháil uathoibríoch?"
   },
+  "result_index_of_max_7db5ad8b": { "message": "Toradh { index } de { max }." },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Cas an Geata Droim ar Ais (Ní Ghéilltear)"
   },
