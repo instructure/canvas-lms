@@ -18,6 +18,8 @@
 
 import FileOptionsCollection from '../FileOptionsCollection'
 
+const equal = (a, b) => expect(a).toEqual(b)
+
 const mockFile = (name, type = 'application/image') => ({
   get(attr) {
     if (attr === 'display_name') return name
@@ -48,33 +50,29 @@ function createFileOption(fileName, dup, optionName) {
   return options
 }
 
-QUnit.module(
-  'FileOptionsCollection',
-  {
-    setup() {
-      FileOptionsCollection.resetState()
-    },
-    teardown() {
-      FileOptionsCollection.resetState()
-    },
-  },
+describe('FileOptionsCollection', () => {
+  beforeEach(() => {
+    FileOptionsCollection.resetState()
+  })
+
+  afterEach(() => {
+    FileOptionsCollection.resetState()
+  })
 
   test('findMatchingFile correctly finds existing files by display_name', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
-    ok(FileOptionsCollection.findMatchingFile('foo'))
-  }),
+    expect(FileOptionsCollection.findMatchingFile('foo')).toBeTruthy()
+  })
 
   test('findMatchingFile correctly finds existing files without model attribute', () => {
     setupModelLessFolderWith(['foo', 'bar', 'baz'])
-    ok(FileOptionsCollection.findMatchingFile('foo'))
-  }),
+    expect(FileOptionsCollection.findMatchingFile('foo')).toBeTruthy()
+  })
 
   test('findMatchingFile returns falsy value when no matching file exists', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
-    // eslint-disable-next-line qunit/no-compare-relation-boolean
     equal(FileOptionsCollection.findMatchingFile('xyz') != null, false)
-  }),
-
+  })
   test('segregateOptionBuckets divides files into collision and resolved buckets', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
     const one = createFileOption('file_name.txt', 'overwrite', 'option_name.txt')
@@ -83,7 +81,7 @@ QUnit.module(
     equal(collisions.length, 1)
     equal(resolved.length, 1)
     equal(collisions[0].file.name, 'foo')
-  }),
+  })
 
   test('segregateOptionBuckets uses fileOptions name over actual file name', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
@@ -92,7 +90,8 @@ QUnit.module(
     equal(collisions.length, 1)
     equal(resolved.length, 0)
     equal(collisions[0].file.name, 'file_name.txt')
-  }),
+  })
+
   test('segregateOptionBuckets name conflicts marked as overwrite are considered resolved', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
     const one = createFileOption('foo', 'overwrite')
@@ -100,7 +99,7 @@ QUnit.module(
     equal(collisions.length, 0)
     equal(resolved.length, 1)
     equal(resolved[0].file.name, 'foo')
-  }),
+  })
 
   test('segregateOptionBuckets detects zip files', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
@@ -109,7 +108,7 @@ QUnit.module(
     const {resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
     equal(resolved.length, 0)
     equal(zips[0].file.name, 'other.zip')
-  }),
+  })
 
   test('segregateOptionBuckets ignores zip files that have an expandZip option', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
@@ -119,7 +118,7 @@ QUnit.module(
     const {resolved, zips} = FileOptionsCollection.segregateOptionBuckets([one])
     equal(resolved.length, 1)
     equal(zips.length, 0)
-  }),
+  })
 
   test('segregateOptionBuckets ignores zip file names when expandZip option is true', () => {
     setupFolderWith(['other.zip', 'bar', 'baz'])
@@ -130,7 +129,7 @@ QUnit.module(
     equal(resolved.length, 1)
     equal(collisions.length, 0)
     equal(zips.length, 0)
-  }),
+  })
 
   test('segregateOptionBuckets skips files', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
@@ -138,7 +137,7 @@ QUnit.module(
     const {collisions, resolved} = FileOptionsCollection.segregateOptionBuckets([one])
     equal(collisions.length, 0)
     equal(resolved.length, 0)
-  }),
+  })
 
   test('segregateOptionBuckets treats zip files like regular files if alwaysUploadZips is true', () => {
     setupFolderWith(['other.zip', 'bar', 'baz'])
@@ -149,7 +148,7 @@ QUnit.module(
     equal(resolved.length, 0)
     equal(collisions.length, 1)
     equal(zips.length, 0)
-  }),
+  })
 
   test('segregateOptionBuckets automaticaly renames files when alwaysRename is true', () => {
     setupFolderWith(['foo', 'bar', 'baz'])
@@ -160,4 +159,4 @@ QUnit.module(
     equal(collisions.length, 0)
     equal(zips.length, 0)
   })
-)
+})

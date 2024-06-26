@@ -20,8 +20,6 @@ import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import BreakdownGraph from '../breakdown-graphs'
 
-QUnit.module('Breakdown Graph')
-
 const defaultProps = () => ({
   ranges: [
     {
@@ -81,37 +79,42 @@ const defaultProps = () => ({
 
 const renderComponent = props => TestUtils.renderIntoDocument(<BreakdownGraph {...props} />)
 
-test('renders three bar components correctly', () => {
-  const component = renderComponent(defaultProps())
+describe('Breakdown Graph', () => {
+  test('renders three bar components correctly', () => {
+    const component = renderComponent(defaultProps())
 
-  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-bar__container')
-  equal(renderedList.length, 3, 'renders bar components')
-})
+    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
+      component,
+      'crs-bar__container'
+    )
+    expect(renderedList.length).toBe(3)
+  })
 
-test('renders bar inner-components correctly', () => {
-  const component = renderComponent(defaultProps())
+  test('renders bar inner-components correctly', () => {
+    const component = renderComponent(defaultProps())
 
-  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-link-button')
-  equal(renderedList.length, 3, 'renders links to sidebar')
-})
+    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-link-button')
+    expect(renderedList.length).toBe(3)
+  })
 
-test('renders lower bound correctly', () => {
-  const component = renderComponent(defaultProps())
+  test('renders lower bound correctly', () => {
+    const component = renderComponent(defaultProps())
 
-  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-bar__info')
-  equal(renderedList[2].textContent, '0 pts+ to 6 pts', 'renders bottom scores')
-})
+    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-bar__info')
+    expect(renderedList[2].textContent).toBe('0 pts+ to 6 pts')
+  })
 
-test('renders upper bound correctly', () => {
-  const component = renderComponent(defaultProps())
+  test('renders upper bound correctly', () => {
+    const component = renderComponent(defaultProps())
 
-  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-bar__info')
-  equal(renderedList[0].textContent, '10.5 pts+ to 15 pts', 'renders upper scores')
-})
+    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-bar__info')
+    expect(renderedList[0].textContent).toBe('10.5 pts+ to 15 pts')
+  })
 
-test('renders enrolled correctly', () => {
-  const component = renderComponent(defaultProps())
+  test('renders enrolled correctly', () => {
+    const component = renderComponent(defaultProps())
 
-  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-link-button')
-  equal(renderedList[0].textContent, '0 out of 10 students', 'renders upper scores')
+    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-link-button')
+    expect(renderedList[0].textContent).toBe('0 out of 10 students')
+  })
 })
