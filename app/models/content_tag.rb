@@ -591,16 +591,22 @@ class ContentTag < ActiveRecord::Base
     differentiable_classes = ["Assignment", "DiscussionTopic", "Quiz", "Quizzes::Quiz", "WikiPage"]
     scope = for_non_differentiable_classes(course_ids, differentiable_classes)
 
-    cyoe_courses, non_cyoe_courses = Course.where(id: course_ids).partition { |course| ConditionalRelease::Service.enabled_in_context?(course) }
-    if non_cyoe_courses.any?
-      scope = scope.union(where(context_id: non_cyoe_courses, context_type: "Course", content_type: "WikiPage"))
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      visible_page_ids = WikiPage.visible_to_students_in_course_with_da(user_ids, course_ids).select(:id)
+      scope = scope.union(where(content_id: visible_page_ids, context_id: course_ids, context_type: "Course", content_type: "WikiPage"))
+    else
+      cyoe_courses, non_cyoe_courses = Course.where(id: course_ids).partition { |course| ConditionalRelease::Service.enabled_in_context?(course) }
+      if non_cyoe_courses.any?
+        scope = scope.union(where(context_id: non_cyoe_courses, context_type: "Course", content_type: "WikiPage"))
+      end
+      if cyoe_courses.any?
+        scope = scope.union(
+          for_non_differentiable_wiki_pages(cyoe_courses.map(&:id)),
+          for_differentiable_wiki_pages(user_ids, cyoe_courses.map(&:id))
+        )
+      end
     end
-    if cyoe_courses.any?
-      scope = scope.union(
-        for_non_differentiable_wiki_pages(cyoe_courses.map(&:id)),
-        for_differentiable_wiki_pages(user_ids, cyoe_courses.map(&:id))
-      )
-    end
+
     scope.union(
       for_non_differentiable_discussions(course_ids)
         .merge(DiscussionTopic.visible_to_ungraded_discussion_student_visibilities(user_ids)),
@@ -625,6 +631,7 @@ class ContentTag < ActiveRecord::Base
   }
 
   scope :for_non_differentiable_wiki_pages, lambda { |course_ids|
+    # remove with selective_release_backend
     joins("JOIN #{WikiPage.quoted_table_name} as wp ON wp.id = content_tags.content_id")
       .where("content_tags.context_id IN (?)
              AND content_tags.context_type = 'Course'
@@ -696,6 +703,7 @@ class ContentTag < ActiveRecord::Base
   }
 
   scope :for_differentiable_wiki_pages, lambda { |user_ids, course_ids|
+    # remove with selective_release_backend
     if Account.site_admin.feature_enabled?(:selective_release_backend) # TODO: I feel like this could be better
       unfiltered_page_ids = where(content_type: "WikiPage").pluck(:content_id)
       assignment_ids = WikiPage.where(id: unfiltered_page_ids).where.not(assignment_id: nil).pluck(:assignment_id)
