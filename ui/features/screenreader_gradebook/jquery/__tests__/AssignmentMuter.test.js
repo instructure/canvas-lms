@@ -19,12 +19,16 @@
 import AssignmentMuter from '../AssignmentMuter'
 import $ from 'jquery'
 import 'jquery-migrate'
+import sinon from 'sinon'
 
-QUnit.module('AssignmentMuter', suiteHooks => {
+const ok = x => expect(x).toBeTruthy()
+const strictEqual = (x, y) => expect(x).toBe(y)
+
+describe('AssignmentMuter', () => {
   let assignment
   let responseAssignment
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     assignment = {id: '1', name: 'foo', anonymize_students: false, muted: false}
     responseAssignment = {id: '1', name: 'foo', anonymize_students: true, muted: true}
   })
@@ -35,12 +39,12 @@ QUnit.module('AssignmentMuter', suiteHooks => {
     return muter
   }
 
-  QUnit.module('#afterUpdate', hooks => {
-    hooks.beforeEach(() => {
+  describe('#afterUpdate', () => {
+    beforeEach(() => {
       sinon.stub($, 'publish')
     })
 
-    hooks.afterEach(() => {
+    afterEach(() => {
       $.publish.restore()
     })
 
@@ -51,7 +55,7 @@ QUnit.module('AssignmentMuter', suiteHooks => {
       ok(muter.$dialog.dialog.calledWith('close'))
     })
 
-    QUnit.module('when not passed a setter function', () => {
+    describe('when not passed a setter function', () => {
       test('sets anonymize_students on the assignment', () => {
         const muter = createAssignmentMuter()
         muter.afterUpdate({assignment: responseAssignment})
@@ -85,7 +89,7 @@ QUnit.module('AssignmentMuter', suiteHooks => {
       })
     })
 
-    QUnit.module('when passed a setter function', () => {
+    describe('when passed a setter function', () => {
       test('sets anonymize_students via the setter function', () => {
         const setterFn = sinon.stub()
         const muter = createAssignmentMuter(setterFn)
