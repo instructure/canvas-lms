@@ -38,7 +38,7 @@ import {RCEBlock, RCEBlockIcon} from '../user/blocks/RCEBlock'
 
 import {ResourcesSection, ResourcesSectionIcon} from '../user/sections/ResourcesSection'
 import {ColumnsSection, ColumnsSectionIcon} from '../user/sections/ColumnsSection'
-import {HeroSection} from '../user/sections/HeroSection'
+import {HeroSection, HeroSectionIcon} from '../user/sections/HeroSection'
 import {NavigationSection, NavigationSectionIcon} from '../user/sections/NavigationSection'
 import {AboutSection, AboutSectionIcon} from '../user/sections/AboutSection'
 import {QuizSection, QuizSectionIcon} from '../user/sections/QuizSection'
@@ -47,32 +47,48 @@ import {BlankSection, BlankSectionIcon} from '../user/sections/BlankSection'
 
 type ToolboxProps = {
   open: boolean
+  container: HTMLElement
   onClose: () => void
 }
 
-export const Toolbox = ({open, onClose}: ToolboxProps) => {
+export const Toolbox = ({open, container, onClose}: ToolboxProps) => {
   const {connectors} = useEditor()
   const [activeTab, setActiveTab] = useState(1)
   const [trayRef, setTrayRef] = useState<HTMLElement | null>(null)
+  const [containerStyle] = useState<Partial<CSSStyleDeclaration>>(() => {
+    if (container) {
+      const s = window.getComputedStyle(container)
+      return {
+        width: s.width,
+        boxSizing: s.boxSizing,
+        transition: s.transition,
+      } as Partial<CSSStyleDeclaration>
+    }
+    return {}
+  })
 
   useEffect(() => {
-    // if (!hasOpened) return
+    const shrinking_selector = '#content' // '.block-editor-editor'
 
     if (open && trayRef) {
-      const ed = document.querySelector('.block-editor-editor') as HTMLElement | null
-      if (!ed) return
+      const ed = document.querySelector(shrinking_selector) as HTMLElement | null
 
+      if (!ed) return
+      const edstyle = window.getComputedStyle(ed)
       const ed_rect = ed.getBoundingClientRect()
+      const padding = parseInt(edstyle.paddingRight, 10)
       const tray_left = window.innerWidth - trayRef.offsetWidth
       if (ed_rect.right > tray_left) {
-        ed.style.width = `${ed_rect.width - (ed_rect.right - tray_left)}px`
+        ed.style.width = `${ed_rect.width - (ed_rect.right - tray_left - padding)}px`
       }
     } else {
-      const ed = document.querySelector('.block-editor-editor') as HTMLElement | null
+      const ed = document.querySelector(shrinking_selector) as HTMLElement | null
       if (!ed) return
-      ed.style.width = ''
+      ed.style.boxSizing = containerStyle.boxSizing || ''
+      ed.style.width = containerStyle.width || ''
+      ed.style.transition = containerStyle.transition || ''
     }
-  }, [open, trayRef])
+  }, [containerStyle, open, trayRef])
 
   const handleTabChange = useCallback(
     (
@@ -161,7 +177,7 @@ export const Toolbox = ({open, onClose}: ToolboxProps) => {
                 <ColumnsSection columns={2} variant="fixed" />
               )}
               {renderBox('Blank', BlankSectionIcon, <BlankSection />)}
-              {renderBox('Hero', ImageBlockIcon, <HeroSection />)}
+              {renderBox('Hero', HeroSectionIcon, <HeroSection />)}
               {renderBox('Navigation', NavigationSectionIcon, <NavigationSection />)}
               {renderBox('About', AboutSectionIcon, <AboutSection />)}
               {renderBox('Quiz', QuizSectionIcon, <QuizSection />)}

@@ -43,8 +43,7 @@ export const PageBlock = ({children}: PageBlockProps) => {
   // This unselects whatever was last and scrolls to the top.
   useEffect(() => {
     requestAnimationFrame(() => {
-      // @ts-expect-error (null is allowed)
-      actions.selectNode(null)
+      actions.selectNode()
       const scrollingContainer = getScrollParent()
       scrollingContainer.scrollTo({top: 0, behavior: 'instant'})
     })
@@ -54,8 +53,7 @@ export const PageBlock = ({children}: PageBlockProps) => {
   const handlePagekey = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        // @ts-expect-error (null is allowed)
-        actions.selectNode(null)
+        actions.selectNode()
       }
     },
     [actions]
