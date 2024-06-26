@@ -5546,6 +5546,7 @@ he:
     one: "1 השתתפות"
     other: "%{count} השתתפויות"
     two: "%{count} השתתפויות"
+  count_people_489946e7: "%{count} אנשים"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     many: "%{count} אנשים נרשמו בהצלחה ל *%{course_name}*."
     one: "%{user_name} נרשם בהצלחה ל *%{course_name}*."
@@ -5905,6 +5906,7 @@ he:
     greater_than_three: "מונח החיפוש צריך להיות בעל שלשה תוים ומעלה."
     unknown_error: "החיפוש שלך השתבש. יש לנסות שוב."
   course_visibility_options_ca8ab3a8: "אפשרויות ניראות הקורס"
+  course_was_successfully_updated_1ab0e9f8: "הקורס עודכן בהצלחה"
   courses: 
     canvasnet_instructor: 
       avatar_url: אוואטאר
@@ -7760,6 +7762,7 @@ he:
   enrollments_teachers: מורים
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "יש להזין כאן hexcode כדי לקבל צבע בעצוב ייחודי."
   enter_a_score_to_test_c6f89f4a: "הזנת ציון לניסוי"
+  enter_a_section_name_adbe3099: "הזנת שם הקבצה"
   enter_a_what_if_score_668c91a3: "הקלדת ציון ל\"מה יקרה אם\""
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "הקלד/י \"{{ACCOUNT_DOMAIN}}\" כדי להחליף את חשבון הבסיס של דומיין המשתמש"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "הקלד/י \"{{ACCOUNT_DOMAIN}}\" כדי להחליף את המזהה היחודי של קנבס למשתמש"
@@ -13112,6 +13115,7 @@ he:
   multi_factor_authentication_configured_865b1bde: "הזדהות רב מימדית קונפגה"
   multiple_ba5220cd: מרובים
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "חשבונות קנבס מרובים משויכים לאיזור ה Clever %{district_id}"
+  multiple_dates_e3a122f7: "תאריכים מרובים"
   multiple_due_dates_283dd861: "תאריכי יעד מרובים"
   multiple_due_dates_6b0d75c6: "תאריכי יעד מרובים"
   multiple_modules_930713d4: "מודולים מרובים"
