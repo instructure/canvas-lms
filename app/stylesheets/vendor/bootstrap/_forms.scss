@@ -417,12 +417,11 @@ This is the standard form actions button bar at the bottom of every content form
 
 .sticky-footer {
   background: #F5F5F5;
-  position: fixed;
+  position: sticky;
   z-index: 999;
   right: 0;
-  left: 270px;
+  left: 0;
   bottom: 0;
-  padding: 0;
 }
 
 .form-actions-sticky-footer {
