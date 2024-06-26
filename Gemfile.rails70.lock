@@ -746,7 +746,7 @@ GEM
       bigdecimal (~> 3.1)
     multipart-post (2.4.1)
     mustache (1.1.1)
-    neighbor (0.3.2)
+    neighbor (0.4.0)
       activerecord (>= 6.1)
     net-http (0.4.1)
       uri
