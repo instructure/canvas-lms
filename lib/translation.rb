@@ -73,6 +73,8 @@ module Translation
         tgt_lang = trim_locale(user.locale)
       end
 
+      InstStatsd::Statsd.increment("translation.create.#{src_lang}.#{tgt_lang}")
+
       # TODO: Error handling of invoke endpoint.
       response = sagemaker_client.invoke_endpoint(
         endpoint_name: @endpoint,
@@ -195,15 +197,33 @@ module Translation
       return languages if user.locale.nil?
 
       locale = trim_locale(user.locale)
-      # Don't translate unless the browser locale is different for the current user.
+      language_cache_key = ["translated_languages", locale].cache_key
+
+      # The controls are in English, don't translate anything
       if locale == "en"
         return languages
       end
 
+      # Check if Redis is present. If yes, then we try to read the key from Redis
+      if Canvas.redis
+        # Try to read the key
+        cached_languages = Canvas.redis.get(language_cache_key)
+        unless cached_languages.nil?
+          return JSON.parse(cached_languages)
+        end
+      end
+
+      # Translate our language controls
       translated = []
       languages.each do |language|
         language[:name] = create(src_lang: "en", tgt_lang: locale, text: language[:name])
         translated << language
+      end
+
+      # Cache the translation for new loads
+      if Canvas.redis
+        Rails.logger.info "Caching supported language translation: #{locale}}}}"
+        Canvas.redis.set(language_cache_key, translated.to_json)
       end
 
       translated
