@@ -188,6 +188,33 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
           created_at: new Date().toISOString(),
         })
       })
+      if (typeof initialColumnFilterSettings.grading_period_id === 'string') {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value: initialColumnFilterSettings.grading_period_id,
+          type: 'grading-period',
+          created_at: new Date().toISOString(),
+        })
+      }
+      if (
+        initialColumnFilterSettings.start_date &&
+        initialColumnFilterSettings.start_date !== '0'
+      ) {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value: initialColumnFilterSettings.start_date,
+          type: 'start-date',
+          created_at: new Date().toISOString(),
+        })
+      }
+      if (initialColumnFilterSettings.end_date && initialColumnFilterSettings.end_date !== '0') {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value: initialColumnFilterSettings.end_date,
+          type: 'end-date',
+          created_at: new Date().toISOString(),
+        })
+      }
       // NOTE: all "saved" filters will be wiped out when multi select
       // filters are enabled, could look into preserving this when
       // the feature gets turned on if it is an issue
