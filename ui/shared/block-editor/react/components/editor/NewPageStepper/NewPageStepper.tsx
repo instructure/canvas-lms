@@ -61,8 +61,9 @@ const NewPageStepper = ({open, onFinish, onCancel}: NewPageStepperProps) => {
   // unmount the modal until craftjs is finished rendering all the new nodes.
   // Use that opportunity to unselect the last created node and scroll to the top
   const handleClosed = useCallback(() => {
-    // @ts-expect-error (null is OK)
-    actions.selectNode(null)
+    window.setTimeout(() => {
+      actions.selectNode()
+    }, 0)
     const scrollingContainer = getScrollParent()
     scrollingContainer.scrollTo({top: 0, behavior: 'instant'})
   }, [actions])

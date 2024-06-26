@@ -23,6 +23,7 @@ import {NavigationSection} from '../components/user/sections/NavigationSection'
 import {AboutSection} from '../components/user/sections/AboutSection'
 import {FooterSection} from '../components/user/sections/FooterSection'
 import {QuizSection} from '../components/user/sections/QuizSection'
+import {BlankSection} from '../components/user/sections/BlankSection'
 
 import {type PageSection} from '../components/editor/NewPageStepper/types'
 
@@ -33,6 +34,11 @@ export const buildPageContent = (
   _paletteName: string,
   _fontName: string
 ) => {
+  if (selectedSections.length === 0) {
+    const nodeTree = query.parseReactElement(<BlankSection />).toNodeTree()
+    actions.addNodeTree(nodeTree, 'ROOT')
+    return
+  }
   selectedSections.forEach(section => {
     let nodeTree
     switch (section) {

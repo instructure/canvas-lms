@@ -35,7 +35,11 @@ export const NoSections = ({className = '', children}: NoSectionsProps) => {
   const clazz = useClassNames(enabled, {empty: !children}, [className])
 
   return (
-    <div ref={el => el && connect(el)} className={clazz} data-placeholder="Drop blocks here">
+    <div
+      ref={el => el && connect(el)}
+      className={clazz}
+      data-placeholder="Drag a block to add it to this section"
+    >
       {children}
     </div>
   )
