@@ -756,7 +756,7 @@ GEM
     multipart-post (2.4.1)
     mustache (1.1.1)
     mutex_m (0.2.0)
-    neighbor (0.3.2)
+    neighbor (0.4.0)
       activerecord (>= 6.1)
     net-http (0.4.1)
       uri
