@@ -19,13 +19,14 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {Element, useEditor} from '@craftjs/core'
 
-import {CloseButton} from '@instructure/ui-buttons'
+import {CloseButton, CondensedButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {Tabs} from '@instructure/ui-tabs'
+import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Tray} from '@instructure/ui-tray'
 import {View, type ViewOwnProps} from '@instructure/ui-view'
 import {SVGIcon} from '@instructure/ui-svg-images'
+import {IconOpenFolderLine} from '@instructure/ui-icons'
 
 // import {Container, ContainerIcon} from '../user/blocks/Container'
 import {ButtonBlock, ButtonBlockIcon} from '../user/blocks/ButtonBlock'
@@ -57,11 +58,10 @@ export const Toolbox = ({open, container, onClose}: ToolboxProps) => {
   const [trayRef, setTrayRef] = useState<HTMLElement | null>(null)
   const [containerStyle] = useState<Partial<CSSStyleDeclaration>>(() => {
     if (container) {
-      const s = window.getComputedStyle(container)
       return {
-        width: s.width,
-        boxSizing: s.boxSizing,
-        transition: s.transition,
+        width: container.style.width,
+        boxSizing: container.style.boxSizing,
+        transition: container.style.transition,
       } as Partial<CSSStyleDeclaration>
     }
     return {}
@@ -136,55 +136,32 @@ export const Toolbox = ({open, container, onClose}: ToolboxProps) => {
       size="small"
       onClose={handleCloseTray}
     >
-      <View as="div">
-        <CloseButton placement="end" onClick={handleCloseTray} screenReaderLabel="Close" />
-        <Tabs onRequestTabChange={handleTabChange}>
-          <Tabs.Panel renderTitle="Blocks" isSelected={activeTab === 0}>
-            <Flex
-              gap="x-small"
-              justifyItems="space-between"
-              alignItems="center"
-              wrap="wrap"
-              padding="x-small"
-            >
-              {renderBox('Button', ButtonBlockIcon, <ButtonBlock text="Click me" />)}
-              {renderBox('Text', TextBlockIcon, <TextBlock text="" />)}
-              {renderBox('RCE', RCEBlockIcon, <RCEBlock text="" />)}
-              {/* renderBox(
+      <View as="div" margin="small">
+        <Flex margin="0 0 small" gap="medium">
+          <CloseButton placement="end" onClick={handleCloseTray} screenReaderLabel="Close" />
+          <Heading level="h3">Blocks</Heading>
+          {/* <CondensedButton renderIcon={IconOpenFolderLine}>Section Browser</CondensedButton> */}
+        </Flex>
+        <Flex
+          gap="x-small"
+          justifyItems="space-between"
+          alignItems="center"
+          wrap="wrap"
+          padding="x-small"
+        >
+          {renderBox('Button', ButtonBlockIcon, <ButtonBlock text="Click me" />)}
+          {renderBox('Text', TextBlockIcon, <TextBlock text="" />)}
+          {renderBox('RCE', RCEBlockIcon, <RCEBlock text="" />)}
+          {/* renderBox(
                   'Container',
                   ContainerIcon,
                   <Element is={Container} background="#fff" canvas={true} layout="row" />
                 ) */}
-              {renderBox('Icon', IconBlockIcon, <IconBlock iconName="apple" />)}
-              {renderBox('Heading', HeadingBlockIcon, <HeadingBlock />)}
-              {renderBox('Resource Card', ResourceCardIcon, <ResourceCard />)}
-              {renderBox('Image', ImageBlockIcon, <ImageBlock />)}
-            </Flex>
-          </Tabs.Panel>
-          <Tabs.Panel renderTitle="Sections" isSelected={activeTab === 1}>
-            <Flex
-              gap="x-small"
-              justifyItems="space-between"
-              alignItems="center"
-              wrap="wrap"
-              width="320px"
-              padding="x-small"
-            >
-              {renderBox('Resources', ResourcesSectionIcon, <ResourcesSection />)}
-              {renderBox(
-                'Columns',
-                ColumnsSectionIcon,
-                <ColumnsSection columns={2} variant="fixed" />
-              )}
-              {renderBox('Blank', BlankSectionIcon, <BlankSection />)}
-              {renderBox('Hero', HeroSectionIcon, <HeroSection />)}
-              {renderBox('Navigation', NavigationSectionIcon, <NavigationSection />)}
-              {renderBox('About', AboutSectionIcon, <AboutSection />)}
-              {renderBox('Quiz', QuizSectionIcon, <QuizSection />)}
-              {renderBox('Footer', FooterSectionIcon, <FooterSection />)}
-            </Flex>
-          </Tabs.Panel>
-        </Tabs>
+          {renderBox('Icon', IconBlockIcon, <IconBlock iconName="apple" />)}
+          {renderBox('Heading', HeadingBlockIcon, <HeadingBlock />)}
+          {renderBox('Resource Card', ResourceCardIcon, <ResourceCard />)}
+          {renderBox('Image', ImageBlockIcon, <ImageBlock />)}
+        </Flex>
       </View>
     </Tray>
   )

@@ -58,6 +58,8 @@ import {ToolbarSeparator} from './ToolbarSeparator'
 import {getScrollParent, getNodeIndex} from '../../utils'
 import {BlankSection} from '../user/sections/BlankSection'
 
+import {SectionBrowser} from './SectionBrowser'
+
 const findUpNode = (node: Node, query: any): Node | undefined => {
   let upnode = node.data.parent ? query.node(node.data.parent).get() : undefined
   while (upnode && upnode.data.parent && upnode.data.custom?.noToolbar) {
@@ -116,6 +118,7 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   const [currentToolbarOrTagRef, setCurrentToolbarOrTagRef] = useState<HTMLDivElement | null>(null)
   const [currentMenuRef, setCurrentMenuRef] = useState<HTMLDivElement | null>(null)
   const [upnodeId] = useState<string | undefined>(findUpNode(node, query)?.id)
+  const [sectionBrowserOpen, setSectionBrowserOpen] = useState(false)
 
   useEffect(() => {
     // get a newly dropped block selected
@@ -231,18 +234,6 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     },
     [actions, node.id]
   )
-
-  const handleAppendSection = useCallback(() => {
-    const parentId = node.data.parent || 'ROOT'
-    const myIndex = getNodeIndex(node, query)
-    const nodeTree = query.parseReactElement(<BlankSection />).toNodeTree()
-    actions.addNodeTree(nodeTree, parentId, myIndex + 1)
-  }, [actions, node, query])
-
-  const handlePrependSection = useCallback(() => {
-    const nodeTree = query.parseReactElement(<BlankSection />).toNodeTree()
-    actions.addNodeTree(nodeTree, 'ROOT', 0)
-  }, [actions, query])
 
   // TODO: this should be role="toolbar" and nav with arrow keys
   const renderBlockToolbar = () => {
@@ -371,17 +362,25 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     )
   }
 
+  const handleAddSection = useCallback(() => {
+    setSectionBrowserOpen(true)
+  }, [])
+
   const renderSectionAdder = (isBefore: boolean = false) => {
     return (
       <div className="section-adder">
         <span>
-          <CondensedButton
-            onClick={isBefore ? handlePrependSection : handleAppendSection}
-            renderIcon={<IconPlusLine size="x-small" />}
-          >
+          <CondensedButton onClick={handleAddSection} renderIcon={<IconPlusLine size="x-small" />}>
             Section
           </CondensedButton>
         </span>
+        {sectionBrowserOpen && (
+          <SectionBrowser
+            open={sectionBrowserOpen}
+            onClose={() => setSectionBrowserOpen(false)}
+            where={isBefore ? 'prepend' : 'append'}
+          />
+        )}
       </div>
     )
   }
