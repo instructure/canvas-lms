@@ -37,16 +37,16 @@ describe('DifferentiatedModulesTray', () => {
 
   const OVERRIDES_URL = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides`
 
-  it('renders', () => {
-    const {getByText} = renderComponent()
-    expect(getByText('Edit Module Settings')).toBeInTheDocument()
-  })
-
   it('calls onDismiss when close button is clicked', () => {
     const onDismiss = jest.fn()
     const {getByRole} = renderComponent({onDismiss})
     getByRole('button', {name: /close/i}).click()
     expect(onDismiss).toHaveBeenCalled()
+  })
+
+  it('renders', () => {
+    const {getByText} = renderComponent()
+    expect(getByText('Edit Module Settings')).toBeInTheDocument()
   })
 
   it('renders tabs when moduleId is set', () => {
