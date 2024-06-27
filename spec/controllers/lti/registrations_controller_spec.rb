@@ -84,6 +84,25 @@ describe Lti::RegistrationsController do
       get :index, params: { account_id: account.id }
       expect(assigns[:active_tab]).to eq("apps")
     end
+
+    it "does not set temp_dr_url in ENV" do
+      get :index, params: { account_id: account.id }
+      expect(assigns.dig(:js_env, :dynamicRegistrationUrl)).to be_nil
+    end
+
+    context "with temp_dr_url" do
+      let(:temp_dr_url) { "http://example.com" }
+
+      before do
+        allow(Setting).to receive(:get).and_call_original
+        allow(Setting).to receive(:get).with("lti_discover_page_dyn_reg_url", anything).and_return(temp_dr_url)
+      end
+
+      it "sets temp_dr_url in ENV" do
+        get :index, params: { account_id: account.id }
+        expect(assigns.dig(:js_env, :dynamicRegistrationUrl)).to eq(temp_dr_url)
+      end
+    end
   end
 
   describe "GET list", type: :request do

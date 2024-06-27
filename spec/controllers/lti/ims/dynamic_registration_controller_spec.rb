@@ -105,6 +105,7 @@ describe Lti::IMS::DynamicRegistrationController do
           initiated_at: 1.minute.ago,
           root_account_global_id: Account.default.global_id,
           uuid: SecureRandom.uuid,
+          unified_tool_id: "asdf"
         }
       end
       let(:valid_token) do
@@ -140,6 +141,7 @@ describe Lti::IMS::DynamicRegistrationController do
           expect(created_registration).not_to be_nil
           expect(parsed_body["https://purl.imsglobal.org/spec/lti-tool-configuration"]["https://canvas.instructure.com/lti/registration_config_url"]).to eq "http://test.host/api/lti/registrations/#{created_registration.global_id}/view"
           expect(created_registration.canvas_configuration["custom_fields"]).to eq({ "global_foo" => "global_bar" })
+          expect(created_registration.unified_tool_id).to eq("asdf")
         end
 
         it "fills in values on the developer key" do
@@ -266,6 +268,8 @@ describe Lti::IMS::DynamicRegistrationController do
       get :registration_token, params: { account_id: Account.default.id }
     end
 
+    let(:token) { JSON::JWT.decode(response.parsed_body["token"], :skip_verification) }
+
     before do
       account_admin_user(account: Account.default)
       user_session(@admin)
@@ -279,6 +283,31 @@ describe Lti::IMS::DynamicRegistrationController do
     it "uses iss domain in config url" do
       subject
       expect(response.parsed_body["oidc_configuration_url"]).to include(Canvas::Security.config["lti_iss"])
+    end
+
+    it "does not include unified_tool_id in token" do
+      subject
+      expect(token[:unified_tool_id]).to be_nil
+    end
+
+    context "with unified_tool_id parameter" do
+      subject { get :registration_token, params: { account_id: Account.default.id, unified_tool_id: } }
+
+      let(:unified_tool_id) { "asdf" }
+
+      it "includes unified_tool_id in token" do
+        subject
+        expect(token[:unified_tool_id]).to eq(unified_tool_id)
+      end
+
+      context "is empty string" do
+        let(:unified_tool_id) { "" }
+
+        it "includes nil in token" do
+          subject
+          expect(token[:unified_tool_id]).to be_nil
+        end
+      end
     end
 
     context "in local dev" do

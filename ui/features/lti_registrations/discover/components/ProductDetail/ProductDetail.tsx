@@ -33,6 +33,7 @@ import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
 import {useQuery} from '@tanstack/react-query'
 import {useLocation, useNavigate} from 'react-router-dom'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {fetchProductDetails, fetchProducts} from '../../queries/productsQuery'
 import ImageCarousel from './ImageCarousel'
 import LtiDetailModal from './LtiDetailModal'
@@ -40,6 +41,8 @@ import LtiDetailModal from './LtiDetailModal'
 import {openDynamicRegistrationWizard} from '../../../manage/registration_wizard/RegistrationWizardModalState'
 import type {Product} from '../../model/Product'
 import ProductCard from '../ProductCard/ProductCard'
+
+declare const ENV: GlobalEnv
 
 const ProductDetail = () => {
   const [isModalOpen, setModalOpen] = useState(false)
@@ -142,13 +145,14 @@ const ProductDetail = () => {
                 onClick={() => {
                   // todo: replace the url with the actual dynamic registration url
                   // from Product listing API
-                  openDynamicRegistrationWizard(
-                    'http://yaltt.inst.test/apps/1/dynamic-registration-simple',
-                    () => {
-                      // redirect to apps page
-                      navigate('/manage')
-                    }
-                  )
+                  const dynamicRegistrationUrl =
+                    ENV.dynamicRegistrationUrl || 'http://yaltt.paulgray.net/dynamic-registration'
+                  // todo: replace with actual unified tool id from Product listing API
+                  const unifiedToolId = 'unified_tool_id'
+                  openDynamicRegistrationWizard(dynamicRegistrationUrl, unifiedToolId, () => {
+                    // redirect to apps page
+                    navigate('/manage')
+                  })
                 }}
               >
                 Configure
