@@ -9522,6 +9522,7 @@ uk:
           send_to_sms: "Відправити текстове повідомлення на %{phone_number}"
         labels: 
           carrier: Кур'єр
+          otp_communication_channel_id: "Номер телефону"
           phone_number: "Номер телефону"
           remember_me: "Запам'ятати цей комп'ютер"
           verification_code: "Код підтвердження"
@@ -11631,6 +11632,7 @@ uk:
   move_to_end_c6bfbcf5: "Перейти в кінець"
   move_to_front_bf6f0194: "Перемістити на передній план"
   moving_a4d552df: Переміщення...
+  multi_factor_authentication_1a6b3b3d: "Багатофакторна аутентифікація"
   multi_factor_authentication_backup_codes_4d781044: "Резервні коди багатофакторної аутентифікації"
   multi_factor_authentication_configured_865b1bde: "Багатофакторна аутентифікація налаштована"
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: "Декілька позначено як \"Поточна тема\" , тому що однакове значення було збержене під різними іменами—тобто , вони всі однакові, у поточному застосуванні"
@@ -12636,6 +12638,7 @@ uk:
   please_enter_a_name_for_this_link_318f01a4: "Будь ласка, введіть назву для цього посилання."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Будь ласка. введіть пошукові терміни з трьома і більше символами"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Будь ласка, введіть правильний URL. Протокол потрібен (e.g. http://, https://, ftp://, tel:, mailto:)."
+  please_enter_the_verification_code_shown_by_your_t_acc7c404: "Будь ласка, введіть код підтвердження, показаний вашим токеном."
   please_enter_your_label_name_7745272d: "Будь ласка, введіть ваше %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Будь ласка, введіть ваш %{label_name} і пароль:"
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Будь ласка, дайте їм знати, яку сторінку ви переглядаєте і посилання, на якому ви натиснули."
@@ -16323,6 +16326,7 @@ uk:
   shift_dates_746698a5: "Зсунути дати"
   short_name_42f454a1: "Коротке ім'я"
   short_name_ad9bf84f: "коротке ім'я"
+  should_be_10_digit_number_d30ef02d: "має бути 10-значний номер"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "ID Canvas звітуючого користувача повинен бути самоочевидним"
   show_76c0ed1c: Показати
   show_account_navigation_menu_d97270a9: "Показати Меню навігації облікового запису"
@@ -18346,6 +18350,7 @@ uk:
   vericite_similarity_score_more_information_7df9ea5c: "Оцінка подібності VeriCite - більше інформації"
   vericite_similarity_score_see_detailed_report_390ab687: "Оцінка подібності VeriCite - Дивись детальний звіт"
   verification_code_5acd64ef: "Код підтвердження"
+  verify_3dd8f159: Перевірити
   version_5599c321: Версія
   video_b9f27375: Відео
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Відео контент не підтримується вашим пристроєм або додатком."
