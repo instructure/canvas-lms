@@ -62,8 +62,10 @@ class TokensController < ApplicationController
   #
   def destroy
     get_context
-    column = (hint = AccessToken.token_hint?(params[:id])) ? :token_hint : :id
-    token = @context.access_tokens.find_by!(column => hint || params[:id])
+    if (hint = AccessToken.token_hint?(params[:id]))
+      token = @context.access_tokens.find_by(token_hint: hint)
+    end
+    token ||= @context.access_tokens.find(params[:id])
 
     # this is a unique API where we check against the real current user first if masquerading,
     # since that's currently the only way that an admin can view another user's tokens at the moment
