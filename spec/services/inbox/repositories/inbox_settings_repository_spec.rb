@@ -213,8 +213,8 @@ describe Inbox::Repositories::InboxSettingsRepository do
         out_of_office_subject: "OOO",
         out_of_office_message: "Out of Office"
       )
-      first_snapshot = inbox_settings_repo.create_inbox_settings_ooo_snapshot(user_id:, root_account_id:)
-      second_snapshot = inbox_settings_repo.create_inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+      first_snapshot = inbox_settings_repo.create_inbox_settings_ooo_hash(user_id:, root_account_id:)
+      second_snapshot = inbox_settings_repo.create_inbox_settings_ooo_hash(user_id:, root_account_id:)
 
       expect(first_snapshot == second_snapshot).to be_truthy
     end
@@ -231,7 +231,7 @@ describe Inbox::Repositories::InboxSettingsRepository do
         out_of_office_subject: "OOO",
         out_of_office_message: "Out of Office"
       )
-      first_snapshot = inbox_settings_repo.create_inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+      first_snapshot = inbox_settings_repo.create_inbox_settings_ooo_hash(user_id:, root_account_id:)
 
       # Change a relevant field in the settings
       inbox_settings_repo.save_inbox_settings(
@@ -245,7 +245,7 @@ describe Inbox::Repositories::InboxSettingsRepository do
         out_of_office_subject: "OOO - Updated",
         out_of_office_message: "Out of Office"
       )
-      second_snapshot = inbox_settings_repo.create_inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+      second_snapshot = inbox_settings_repo.create_inbox_settings_ooo_hash(user_id:, root_account_id:)
 
       expect(first_snapshot != second_snapshot).to be_truthy
     end
@@ -262,7 +262,7 @@ describe Inbox::Repositories::InboxSettingsRepository do
         out_of_office_subject: "OOO",
         out_of_office_message: "Out of Office"
       )
-      first_snapshot = inbox_settings_repo.create_inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+      first_snapshot = inbox_settings_repo.create_inbox_settings_ooo_hash(user_id:, root_account_id:)
 
       # Change the signature (not relevant to OOO settings snapshot)
       inbox_settings_repo.save_inbox_settings(
@@ -276,9 +276,13 @@ describe Inbox::Repositories::InboxSettingsRepository do
         out_of_office_subject: "OOO",
         out_of_office_message: "Out of Office"
       )
-      second_snapshot = inbox_settings_repo.create_inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+      second_snapshot = inbox_settings_repo.create_inbox_settings_ooo_hash(user_id:, root_account_id:)
 
       expect(first_snapshot == second_snapshot).to be_truthy
+    end
+
+    it "hash snapshot returns nil if settings are not present" do
+      expect(inbox_settings_repo.create_inbox_settings_ooo_hash(user_id:, root_account_id:)).to be_nil
     end
   end
 end

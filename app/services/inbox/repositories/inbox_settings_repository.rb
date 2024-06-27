@@ -65,17 +65,20 @@ module Inbox
           )
         end
 
-        def create_inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+        def create_inbox_settings_ooo_hash(user_id:, root_account_id:)
           settings = InboxSettingsRecord.find_by(user_id:, root_account_id:)
+
+          return nil unless settings
+
           # Grab specific settings to include in hash snapshot
-          ooo_first_date = settings&.out_of_office_first_date.present? ? settings.out_of_office_first_date.strftime("%FT%T%:z") : ""
-          ooo_last_date = settings&.out_of_office_last_date.present? ? settings.out_of_office_last_date.strftime("%FT%T%:z") : ""
-          ooo_subject = settings&.out_of_office_subject || ""
-          ooo_message = settings&.out_of_office_message || ""
+          ooo_first_date = settings.out_of_office_first_date.present? ? settings.out_of_office_first_date.strftime("%FT%T%:z") : ""
+          ooo_last_date = settings.out_of_office_last_date.present? ? settings.out_of_office_last_date.strftime("%FT%T%:z") : ""
+          ooo_subject = settings.out_of_office_subject || ""
+          ooo_message = settings.out_of_office_message || ""
 
           hash_str = user_id.to_s + ooo_first_date + ooo_last_date + ooo_subject + ooo_message
 
-          hash_str.hash
+          Digest::SHA1.hexdigest(hash_str)
         end
 
         private
