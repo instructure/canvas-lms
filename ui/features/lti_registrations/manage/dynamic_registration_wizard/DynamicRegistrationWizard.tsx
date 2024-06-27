@@ -45,13 +45,14 @@ const I18n = useI18nScope('lti_registrations')
 export type DynamicRegistrationWizardProps = {
   dynamicRegistrationUrl: string
   accountId: AccountId
+  unifiedToolId?: string
   unregister: () => void
   onSuccessfulRegistration: () => void
   service: DynamicRegistrationWizardService
 }
 
 export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps) => {
-  const {accountId, dynamicRegistrationUrl, service} = props
+  const {accountId, dynamicRegistrationUrl, service, unifiedToolId} = props
   const useDynamicRegistrationWizardState = React.useMemo(() => {
     return mkUseDynamicRegistrationWizardState(service)
   }, [service])
@@ -60,8 +61,8 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
   const {loadRegistrationToken} = dynamicRegistrationWizardState
 
   React.useEffect(() => {
-    loadRegistrationToken(accountId, dynamicRegistrationUrl)
-  }, [accountId, dynamicRegistrationUrl, loadRegistrationToken])
+    loadRegistrationToken(accountId, dynamicRegistrationUrl, unifiedToolId)
+  }, [accountId, dynamicRegistrationUrl, loadRegistrationToken, unifiedToolId])
 
   const state = dynamicRegistrationWizardState.state
 

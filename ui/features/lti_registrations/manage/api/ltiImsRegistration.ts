@@ -31,11 +31,15 @@ import {defaultFetchOptions} from '@canvas/util/xhr'
  * after it's created by the tool.
  *
  * @param accountId
+ * @param unifiedToolId included in token. optional.
  * @returns
  */
-export const fetchRegistrationToken = (accountId: AccountId) =>
+export const fetchRegistrationToken = (accountId: AccountId, unifiedToolId: string = '') =>
   parseFetchResult(ZDynamicRegistrationToken)(
-    fetch(`/api/lti/accounts/${accountId}/registration_token`, defaultFetchOptions())
+    fetch(
+      `/api/lti/accounts/${accountId}/registration_token?unified_tool_id=${unifiedToolId}`,
+      defaultFetchOptions()
+    )
   )
 
 /**

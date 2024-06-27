@@ -56,11 +56,14 @@ module Lti
         current_time = DateTime.now.iso8601
         user_id = @current_user.id
         root_account_global_id = account_context.global_id
+        unified_tool_id = params[:unified_tool_id].presence
+
         token = Canvas::Security.create_jwt(
           {
             uuid:,
             initiated_at: current_time,
             user_id:,
+            unified_tool_id:,
             root_account_global_id:
           },
           REGISTRATION_TOKEN_EXPIRATION.from_now
@@ -109,7 +112,7 @@ module Lti
         access_token = AuthenticationMethods.access_token(request)
         jwt = Canvas::Security.decode_jwt(access_token)
 
-        expected_jwt_keys = %w[user_id initiated_at root_account_global_id exp uuid]
+        expected_jwt_keys = %w[user_id initiated_at root_account_global_id exp uuid unified_tool_id]
 
         if jwt.keys.sort != expected_jwt_keys.sort
           respond_with_error(:unauthorized, "JWT did not include expected contents")
@@ -157,6 +160,7 @@ module Lti
             root_account_id: root_account.id,
             scopes:,
             guid: jwt["uuid"],
+            unified_tool_id: jwt["unified_tool_id"],
             **registration_params
           )
 

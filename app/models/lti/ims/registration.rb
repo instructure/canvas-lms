@@ -134,7 +134,7 @@ class Lti::IMS::Registration < ApplicationRecord
   end
 
   def configuration_to_cet_settings_map
-    { url: configuration["target_link_uri"], lti_version: "1.3" }
+    { url: configuration["target_link_uri"], lti_version: "1.3", unified_tool_id: }
   end
 
   def privacy_level

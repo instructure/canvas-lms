@@ -50,9 +50,14 @@ export interface DynamicRegistrationActions {
    * @param accountId The account id the tool is being registered for
    *    can be a account id, shard-relative id, or the string 'site_admin'
    * @param dynamicRegistrationUrl The url to use for dynamic registration
+   * @param unifiedToolId Included in token if provided
    * @returns
    */
-  loadRegistrationToken: (accountId: AccountId, dynamicRegistrationUrl: string) => void
+  loadRegistrationToken: (
+    accountId: AccountId,
+    dynamicRegistrationUrl: string,
+    unifiedToolId?: string
+  ) => void
   /**
    * Enables the developer key for the given registration
    * and closes the modal
@@ -251,11 +256,16 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
        *
        * @param accountId
        * @param dynamicRegistrationUrl
+       * @param unifiedToolId included in token. optional.
        */
-      loadRegistrationToken: (accountId: AccountId, dynamicRegistrationUrl: string) => {
+      loadRegistrationToken: (
+        accountId: AccountId,
+        dynamicRegistrationUrl: string,
+        unifiedToolId: string = ''
+      ) => {
         set(stateFor({_type: 'RequestingToken'}))
         // eslint-disable-next-line promise/catch-or-return
-        service.fetchRegistrationToken(accountId).then(resp => {
+        service.fetchRegistrationToken(accountId, unifiedToolId).then(resp => {
           if (resp._type === 'success') {
             set(stateFor({_type: 'WaitingForTool', registrationToken: resp.data}))
             const onMessage = (message: MessageEvent) => {
