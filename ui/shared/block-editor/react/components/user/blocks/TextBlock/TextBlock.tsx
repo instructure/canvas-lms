@@ -39,9 +39,9 @@ type TextBlockProps = {
 
 export const TextBlock = ({
   text = '',
-  fontSize = '12pt',
-  textAlign = 'start',
-  color = black,
+  fontSize = TextBlock.craft.defaultProps.fontSize,
+  textAlign = TextBlock.craft.defaultProps.textAlign,
+  color = TextBlock.craft.defaultProps.color,
 }: TextBlockProps) => {
   const {actions, enabled, query} = useEditor(state => ({
     enabled: state.options.enabled,
@@ -141,6 +141,11 @@ export const TextBlock = ({
 
 TextBlock.craft = {
   displayName: 'Text',
+  defaultProps: {
+    fontSize: '12pt',
+    textAlign: 'start',
+    color: 'var(--ic-brand-font-color-dark)',
+  },
   related: {
     toolbar: TextBlockToolbar,
   },
