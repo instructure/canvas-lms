@@ -38,7 +38,7 @@ export const NoSections = ({className = '', children}: NoSectionsProps) => {
     <div
       ref={el => el && connect(el)}
       className={clazz}
-      data-placeholder="Drag a block to add it to this section"
+      data-placeholder="Drop a block to add it to this section"
     >
       {children}
     </div>

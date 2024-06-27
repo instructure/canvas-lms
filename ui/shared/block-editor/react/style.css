@@ -337,22 +337,22 @@
   }
 }
 
-.question-block {
+.quiz-section {
   border: 1px solid #1A2729;
   border-radius: 1rem;
   margin: 0.5rem 0;
   overflow: hidden;
-  .question-block__body {
+  .quiz-section__body {
     padding: 0.5rem;
     border-radius: 1rem;
   }
 }
 /* when displayed as a RadioInput label */
-.question-block p, .question-option p {
+.quiz-section p, .question-option p {
   margin: 0;
 }
 
-.queston-block__empty {
+.quiz-section__empty {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -459,6 +459,9 @@
     }
   }
 }
+.columns-section__inner.empty::before {
+  content: "Drop a block to add it to this column";
+}
 
 @container block-editor-view (width <= 320px) {
   .page-block {
@@ -493,7 +496,7 @@
       }
     }
   }
-  .question-block {
+  .quiz-section {
     .matching-question__question {
       flex-wrap: wrap;
       .matching-question__center {
