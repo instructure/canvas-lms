@@ -131,7 +131,8 @@ export const Toolbox = ({open, container, onClose}: ToolboxProps) => {
         >
           {renderBox('Button', ButtonBlockIcon, <ButtonBlock text="Click me" />)}
           {renderBox('Text', TextBlockIcon, <TextBlock text="" />)}
-          {renderBox('RCE', RCEBlockIcon, <RCEBlock text="" />)}
+          {window.location.search.includes('showrce') &&
+            renderBox('RCE', RCEBlockIcon, <RCEBlock text="" />)}
           {/* renderBox(
                   'Container',
                   ContainerIcon,

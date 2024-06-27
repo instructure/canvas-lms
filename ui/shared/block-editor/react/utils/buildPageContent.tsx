@@ -24,6 +24,7 @@ import {AboutSection} from '../components/user/sections/AboutSection'
 import {FooterSection} from '../components/user/sections/FooterSection'
 import {QuizSection} from '../components/user/sections/QuizSection'
 import {BlankSection} from '../components/user/sections/BlankSection'
+import {AnnouncementSection} from '../components/user/sections/AnnouncementSection'
 
 import {type PageSection} from '../components/editor/NewPageStepper/types'
 
@@ -59,6 +60,9 @@ export const buildPageContent = (
         break
       case 'question':
         nodeTree = query.parseReactElement(<QuizSection />).toNodeTree()
+        break
+      case 'announcement':
+        nodeTree = query.parseReactElement(<AnnouncementSection />).toNodeTree()
         break
     }
     if (nodeTree) {

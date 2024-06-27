@@ -17,11 +17,12 @@
  */
 
 import React from 'react'
-import {useNode} from '@craftjs/core'
+import {useEditor, useNode} from '@craftjs/core'
 
 import {Img} from '@instructure/ui-img'
 
 import {ImageBlockToolbar} from './ImageBlockToolbar'
+import {useClassNames} from '../../../../utils'
 
 export type ImageConstraint = 'cover' | 'contain'
 export type ImageVariant = 'default' | 'hero'
@@ -35,24 +36,27 @@ type ImageBlockProps = {
 }
 
 const ImageBlock = ({src, width, height, constraint}: ImageBlockProps) => {
+  const {enabled} = useEditor(state => ({
+    enabled: state.options.enabled,
+  }))
   const {
     connectors: {connect, drag},
   } = useNode()
+  const clazz = useClassNames(enabled, {empty: !src}, 'image-block')
 
   if (!src) {
-    return (
-      <div className="image-block__empty" ref={el => el && connect(drag(el as HTMLImageElement))} />
-    )
+    return <div className={clazz} ref={el => el && connect(drag(el as HTMLDivElement))} />
   } else {
     return (
-      <Img
-        display="inline-block"
-        elementRef={el => el && connect(drag(el as HTMLImageElement))}
-        src={src || ImageBlock.craft.defaultProps.imageSrc}
-        constrain={constraint || ImageBlock.craft.defaultProps.constraint}
-        width={`${width}px`}
-        height={`${height}px`}
-      />
+      <div className={clazz} ref={el => el && connect(drag(el as HTMLDivElement))}>
+        <Img
+          display="inline-block"
+          src={src || ImageBlock.craft.defaultProps.imageSrc}
+          constrain={constraint || ImageBlock.craft.defaultProps.constraint}
+          width={`${width}px`}
+          height={`${height}px`}
+        />
+      </div>
     )
   }
 }

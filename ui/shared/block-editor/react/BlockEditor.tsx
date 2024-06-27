@@ -26,6 +26,7 @@ import {Topbar} from './components/editor/Topbar'
 import {blocks} from './components/blocks'
 import {NewPageStepper} from './components/editor/NewPageStepper'
 import {RenderNode} from './components/editor/RenderNode'
+import {ErrorBoundary} from './components/editor/ErrorBoundary'
 
 import './style.css'
 
@@ -73,9 +74,9 @@ export default function BlockEditor({
   }, [json, version])
 
   const handleNodesChange = useCallback(query => {
+    // @ts-expect-error
     window.block_editor = query
-    // const json = query.serialize()
-    // console.log(JSON.parse(json))
+    // console.log(JSON.parse(query.serialize()))
   }, [])
 
   const handleCloseToolbox = useCallback(() => {
@@ -108,28 +109,36 @@ export default function BlockEditor({
       shadow="above"
       borderRadius="large large none none"
     >
-      <Editor
-        enabled={enabled}
-        resolver={blocks}
-        onNodesChange={handleNodesChange}
-        onRender={RenderNode}
-      >
-        <Flex direction="column" alignItems="stretch" justifyItems="start" gap="small" width="100%">
-          <div style={{position: 'sticky', top: 0, zIndex: 9999}}>
-            <Topbar onToolboxChange={handleOpenToolbox} toolboxOpen={toolboxOpen} />
-          </div>
-          <Flex.Item id="editor-area" shouldGrow={true}>
-            <Frame data={json} />
-          </Flex.Item>
-        </Flex>
+      <ErrorBoundary>
+        <Editor
+          enabled={enabled}
+          resolver={blocks}
+          onNodesChange={handleNodesChange}
+          onRender={RenderNode}
+        >
+          <Flex
+            direction="column"
+            alignItems="stretch"
+            justifyItems="start"
+            gap="small"
+            width="100%"
+          >
+            <div style={{position: 'sticky', top: 0, zIndex: 9999}}>
+              <Topbar onToolboxChange={handleOpenToolbox} toolboxOpen={toolboxOpen} />
+            </div>
+            <Flex.Item id="editor-area" shouldGrow={true}>
+              <Frame data={json} />
+            </Flex.Item>
+          </Flex>
 
-        <Toolbox open={toolboxOpen} container={container} onClose={handleCloseToolbox} />
-        <NewPageStepper
-          open={stepperOpen}
-          onFinish={handleCloseStepper}
-          onCancel={handleCancelStepper}
-        />
-      </Editor>
+          <Toolbox open={toolboxOpen} container={container} onClose={handleCloseToolbox} />
+          <NewPageStepper
+            open={stepperOpen}
+            onFinish={handleCloseStepper}
+            onCancel={handleCancelStepper}
+          />
+        </Editor>
+      </ErrorBoundary>
     </View>
   )
 }

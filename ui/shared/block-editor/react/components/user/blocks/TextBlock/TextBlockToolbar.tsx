@@ -34,7 +34,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React, {useCallback, useState} from 'react'
 import {useNode} from '@craftjs/core'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {
@@ -43,6 +43,7 @@ import {
   IconUnderlineLine,
   IconStrikethroughLine,
   IconMiniArrowDownLine,
+  IconTextColorLine,
 } from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {Menu, type MenuItemProps, type MenuItem} from '@instructure/ui-menu'
@@ -55,6 +56,8 @@ import {
   unstyleSelection,
   unboldElement,
 } from '../../../../utils'
+import {ColorModal} from '../../common/ColorModal'
+import {type TextBlockProps} from './common'
 
 const TextBlockToolbar = () => {
   const {
@@ -65,6 +68,7 @@ const TextBlockToolbar = () => {
     node,
     props: node.data.props,
   }))
+  const [colorModalOpen, setColorModalOpen] = useState(false)
 
   const handleBold = useCallback(() => {
     if (isSelectionAllStyled(isElementBold)) {
@@ -72,7 +76,7 @@ const TextBlockToolbar = () => {
     } else {
       makeSelectionBold()
     }
-    setProp(prps => (prps.text = node.dom?.firstElementChild?.innerHTML))
+    setProp((prps: TextBlockProps) => (prps.text = node.dom?.firstElementChild?.innerHTML))
   }, [node.dom, setProp])
 
   const handleFontSizeChange = useCallback(
@@ -82,10 +86,26 @@ const TextBlockToolbar = () => {
       _selected: MenuItemProps['selected'],
       _args: MenuItem
     ) => {
-      setProp(prps => (prps.fontSize = value))
+      setProp((prps: TextBlockProps) => (prps.fontSize = value as string))
     },
     [setProp]
   )
+
+  const handleColorChange = useCallback(
+    (color: string) => {
+      setProp((prps: TextBlockProps) => (prps.color = color))
+      setColorModalOpen(false)
+    },
+    [setProp]
+  )
+
+  const handleColorButtonClick = useCallback(() => {
+    setColorModalOpen(true)
+  }, [])
+
+  const handleCloseColorModal = useCallback(() => {
+    setColorModalOpen(false)
+  }, [])
 
   return (
     <>
@@ -117,7 +137,7 @@ const TextBlockToolbar = () => {
           </Button>
         }
       >
-        {['8pt', '10pt', '12pt', '14pt', '18ps', '24pt', '36pt'].map(size => (
+        {['8pt', '10pt', '12pt', '14pt', '18pt', '24pt', '36pt'].map(size => (
           <Menu.Item
             type="checkbox"
             key={size}
@@ -125,10 +145,29 @@ const TextBlockToolbar = () => {
             onSelect={handleFontSizeChange}
             selected={props.fontSize === size}
           >
-            <Text size="small">{size}pt</Text>
+            <Text size="small">{size}</Text>
           </Menu.Item>
         ))}
       </Menu>
+
+      <IconButton
+        size="small"
+        withBackground={false}
+        withBorder={false}
+        screenReaderLabel="Color"
+        disabled={props.variant === 'condensed'}
+        onClick={handleColorButtonClick}
+      >
+        <IconTextColorLine size="x-small" />
+      </IconButton>
+
+      <ColorModal
+        open={colorModalOpen}
+        color={props.color}
+        variant="button"
+        onClose={handleCloseColorModal}
+        onSubmit={handleColorChange}
+      />
     </>
   )
 }
