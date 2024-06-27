@@ -18,11 +18,13 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-
 import Layout from '../Layout'
 import {EVERYONE} from '../PostTypes'
 
-QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
+const ok = x => expect(x).toBeTruthy()
+const notOk = x => expect(x).toBeFalsy()
+
+describe('PostAssignmentGradesTray Layout', () => {
   let $container
 
   function getHeader() {
@@ -77,11 +79,11 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
     ReactDOM.render(<Layout {...layoutProps(props)} />, $container)
   }
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     $container = document.body.appendChild(document.createElement('div'))
   })
 
-  suiteHooks.afterEach(() => {
+  afterEach(() => {
     ReactDOM.unmountComponentAtNode($container)
     $container.remove()
   })
@@ -91,7 +93,7 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
     ok(getHeader())
   })
 
-  QUnit.module('"Unrelease grades" message behavior', () => {
+  describe('"Unrelease grades" message behavior', () => {
     test('when "gradesPublished" is false, unreleased grades message is present', () => {
       mountComponent({assignment: {gradesPublished: false}})
       ok(getUnreleasedGradesAlertText())
@@ -103,11 +105,11 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
     })
   })
 
-  QUnit.module('"will refresh your browser" text behavior', contextHooks => {
+  describe('"will refresh your browser" text behavior', () => {
     let assignment
     let containerName
 
-    contextHooks.beforeEach(() => {
+    beforeEach(() => {
       assignment = {anonymousGrading: true, gradesPublished: true}
       containerName = 'SPEED_GRADER'
     })
@@ -136,10 +138,10 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
     })
   })
 
-  QUnit.module('"Post for everyone when assignment is anonymous" text behavior', contextHooks => {
+  describe('"Post for everyone when assignment is anonymous" text behavior', () => {
     let assignment
 
-    contextHooks.beforeEach(() => {
+    beforeEach(() => {
       assignment = {
         gradesPublished: true,
         anonymousGrading: true,
