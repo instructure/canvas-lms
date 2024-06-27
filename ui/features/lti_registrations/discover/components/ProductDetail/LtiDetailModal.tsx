@@ -16,26 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import {Outlet} from 'react-router-dom'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Tabs} from '@instructure/ui-tabs'
 import {List} from '@instructure/ui-list'
 import {Button} from '@instructure/ui-buttons'
-import type {Lti} from '../../model/Product'
+import type {LtiDetail} from '../../model/Product'
 
+const I18n = useI18nScope('lti_registrations')
 interface LtiDetailModalProps {
   ltiTitle: string
-  integrationData: Lti | undefined
+  integrationData: LtiDetail | undefined
   isModalOpen: boolean
   setModalOpen: Function
 }
 
 const LtiDetailModal = (props: LtiDetailModalProps) => {
   const [tab, setTab] = useState('placements' as string | undefined)
+  const renderPerLtiType =
+    props.ltiTitle === 'Learning Tools Interoperability (LTI)® v.1.3 Core Specification'
+      ? props.integrationData?.lti_13
+      : props.integrationData?.lti_11
 
   const renderPlacements = () => {
-    return props.integrationData?.placements.map((placement, i) => {
+    return renderPerLtiType?.placements.map((placement, i) => {
       const backgroundColor = i % 2 !== 0 ? '#F5F5F5' : '#FFFFFF'
       return (
         <div style={{backgroundColor}}>
@@ -46,7 +52,7 @@ const LtiDetailModal = (props: LtiDetailModalProps) => {
   }
 
   const renderServices = () => {
-    return props.integrationData?.services.map((service, i) => {
+    return renderPerLtiType?.services.map((service, i) => {
       const backgroundColor = i % 2 !== 0 ? '#F5F5F5' : '#FFFFFF'
       return (
         <div style={{backgroundColor}}>
@@ -69,7 +75,7 @@ const LtiDetailModal = (props: LtiDetailModalProps) => {
           id="placements"
           padding="medium 0 0 0"
           isSelected={tab === 'placements'}
-          renderTitle="Placements"
+          renderTitle={I18n.t('Placements')}
         >
           <Outlet />
           <div style={{border: 'solid', borderWidth: 1, borderRadius: 5, borderColor: '#C7CDD1'}}>
@@ -83,7 +89,7 @@ const LtiDetailModal = (props: LtiDetailModalProps) => {
           padding="medium 0 0 0"
           isSelected={tab === 'services'}
           active={true}
-          renderTitle="Services"
+          renderTitle={I18n.t('Services')}
         >
           <Outlet />
           <div style={{border: 'solid', borderWidth: 1, borderRadius: 5, borderColor: '#C7CDD1'}}>
@@ -97,10 +103,11 @@ const LtiDetailModal = (props: LtiDetailModalProps) => {
           padding="medium 0 0 0"
           isSelected={tab === 'description'}
           active={true}
-          renderTitle="Description"
+          renderTitle={I18n.t('Description')}
         >
           <Outlet />
-          {props.integrationData?.description}
+          {/* TODO: Determine where description is sourced/if it is present in LP */}
+          {/* {props.integrationData?.description}  */}
         </Tabs.Panel>
       </Tabs>
     )
