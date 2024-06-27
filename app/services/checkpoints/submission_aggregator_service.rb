@@ -19,11 +19,13 @@
 
 class Checkpoints::SubmissionAggregatorService < Checkpoints::AggregatorService
   AggregateSubmission = Struct.new(
+    :excused,
     :grade,
     :graded_at,
     :graded_anonymously,
     :grader_id,
     :grade_matches_current_submission,
+    :late_policy_status,
     :published_grade,
     :published_score,
     :posted_at,
@@ -67,7 +69,9 @@ class Checkpoints::SubmissionAggregatorService < Checkpoints::AggregatorService
       submission.grader_id = most_recently_graded.grader_id
     end
 
+    submission.excused = submissions.any?(&:excused)
     submission.grade = grade(submissions, submission.score)
+    submission.late_policy_status = calculate_late_policy_status(submissions)
     submission.published_grade = grade(submissions, submission.published_score)
     submission.grade_matches_current_submission = calculate_grade_matches_current_submission(submissions)
     submission.posted_at = max_if_all_present(submissions, :posted_at)
@@ -102,6 +106,16 @@ class Checkpoints::SubmissionAggregatorService < Checkpoints::AggregatorService
   def calculate_grade_matches_current_submission(submissions)
     values = submissions.pluck(:grade_matches_current_submission)
     values.any?(false) ? false : values.compact.first
+  end
+
+  def calculate_late_policy_status(submissions)
+    values = submissions.pluck(:late_policy_status)
+    return "late" if values.include?("late")
+    return "missing" if values.include?("missing")
+    return "extended" if values.include?("extended")
+    return "none" if values.include?("none")
+
+    nil
   end
 
   def shared_attribute(submissions, field_name, default)
