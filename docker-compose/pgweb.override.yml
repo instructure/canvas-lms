@@ -1,0 +1,18 @@
+# to use this add docker-compose/pgweb.override.yml
+# to your COMPOSE_FILE var in .env
+
+services:
+  web:
+    links:
+      - pgweb
+
+  pgweb:
+    image: sosedoff/pgweb:latest
+    command: [
+      /usr/bin/pgweb, --bind=0.0.0.0, --ssl=disable, --db=canvas_development,
+      --host=postgres, --user=postgres, --pass=sekret
+    ]
+    environment:
+      VIRTUAL_HOST: pgweb.canvas.docker
+    links:
+      - postgres

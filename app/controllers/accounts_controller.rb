@@ -1699,6 +1699,12 @@ class AccountsController < ApplicationController
     redirect_to course_url(params[:id])
   end
 
+  def can_create_dsr
+    Feature.definitions["enable_dsr_requests"] &&
+      @account.root_account&.feature_enabled?(:enable_dsr_requests) &&
+      @account.grants_any_right?(@current_user, session, :manage_dsr_requests)
+  end
+
   def course_user_search
     return unless authorized_action(@account, @current_user, :read)
 
@@ -1723,6 +1729,7 @@ class AccountsController < ApplicationController
     js_permissions = {
       can_read_course_list:,
       can_read_roster:,
+      can_create_dsr:,
       can_create_courses: @account.grants_any_right?(@current_user, session, :manage_courses, :create_courses),
       can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
       analytics: @account.service_enabled?(:analytics),

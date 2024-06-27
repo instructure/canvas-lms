@@ -320,6 +320,18 @@ Rails.application.config.to_prepare do
           "AccountAdmin"
         ]
       },
+      manage_dsr_requests: {
+        label: -> { I18n.t("permissions.manage_dsr_requests", "Create DSR Exports for Users") },
+        label_v2: -> { I18n.t("Users - create DSR export") },
+        available_to: [
+          "AccountAdmin",
+          "AccountMembership"
+        ],
+        account_only: :root,
+        true_for: [
+          "AccountAdmin"
+        ]
+      },
       manage_user_observers: {
         label: -> { I18n.t("permissions.manage_user_observers", "Manage observers for users") },
         label_v2: -> { I18n.t("Users - manage observers") },
