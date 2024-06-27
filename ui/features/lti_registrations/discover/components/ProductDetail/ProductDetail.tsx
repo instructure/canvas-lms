@@ -16,40 +16,45 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
-import {Button} from '@instructure/ui-buttons'
+import {useLocation, useNavigate} from 'react-router-dom'
+import {fetchProductDetails, fetchProducts} from '../../queries/productsQuery'
+import {useQuery} from '@tanstack/react-query'
+import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
+import {Tag} from '@instructure/ui-tag'
+import {Button} from '@instructure/ui-buttons'
+import TruncateWithTooltip from '../common/TruncateWithTooltip'
 import {
   IconA11yLine,
   IconExpandStartLine,
-  IconExternalLinkLine,
   IconEyeLine,
   IconMessageLine,
   IconQuizTitleLine,
 } from '@instructure/ui-icons'
-import {Img} from '@instructure/ui-img'
-import {Link} from '@instructure/ui-link'
-import {Pill} from '@instructure/ui-pill'
-import {Text} from '@instructure/ui-text'
-import {useQuery} from '@tanstack/react-query'
-import {useLocation, useNavigate} from 'react-router-dom'
-import {fetchProductDetails, fetchProducts} from '../../queries/productsQuery'
-import ImageCarousel from './ImageCarousel'
-// import LtiDetailModal from './LtiDetailModal'
+import LtiDetailModal from './LtiDetailModal'
+import ProductCarousel from '../common/ProductCarousel'
+import ImageCarousel from '../common/ImageCarousel'
+import BadgeCarousel from '../common/BadgeCarousel'
 
 import {openDynamicRegistrationWizard} from '../../../manage/registration_wizard/RegistrationWizardModalState'
-import type {Product} from '../../model/Product'
-import ProductCard from '../ProductCard/ProductCard'
+
+import type {DiscoverParams} from '../useDiscoverQueryParams'
+
+const I18n = useI18nScope('lti_registrations')
 
 const ProductDetail = () => {
-  // TODO: Reimplement LtiDetailModal
   const [isModalOpen, setModalOpen] = useState(false)
   const [clickedLtiTitle, setClickedLtiTitle] = useState('')
 
   const navigate = useNavigate()
-
   const location = useLocation()
+
   const currentProductId = location.pathname.replace('/product_detail/', '') as String
+  const previousPath = window.location.pathname.replace(/\product_detail.*/, '')
 
   const {data: product} = useQuery({
     queryKey: ['lti_product_detail'],
@@ -64,50 +69,16 @@ const ProductDetail = () => {
 
   const {data: otherProductsByCompany} = useQuery({
     queryKey: ['lti_similar_products_by_company', product?.company],
-    queryFn: () => fetchProducts(params()),
+    queryFn: () => fetchProducts(params() as unknown as DiscoverParams),
   })
 
   const excludeCurrentProduct = otherProductsByCompany?.tools.filter(
-    otherProducts => otherProducts.id !== currentProductId
+    otherProducts => otherProducts.global_product_id !== currentProductId
   )
-
-  const renderProducts = () => {
-    return excludeCurrentProduct?.map((products: Product, i) => (
-      <ProductCard key={`${i + 1}`} product={products} />
-    ))
-  }
-
-  const renderBadges = () => {
-    return product?.badges.map((badge, i) => (
-      <Flex key={`${i + 1}`} margin="0 0 large 0">
-        <Flex.Item>
-          <div>
-            <Img src={badge.image_url} width={50} height={50} />
-          </div>
-        </Flex.Item>
-        <Flex.Item padding="0 0 0 small">
-          <Text weight="bold" size="medium">
-            {badge.name}
-          </Text>
-          <Flex.Item>
-            <div>
-              <Link href={badge.link} isWithinText={false}>
-                <Text weight="bold">
-                  Learn More <IconExternalLinkLine />
-                </Text>
-              </Link>
-            </div>
-          </Flex.Item>
-        </Flex.Item>
-      </Flex>
-    ))
-  }
 
   const renderTags = () => {
     return product?.tags.map((t, i) => (
-      <Pill margin="0 x-small 0 0" key={`${i + 1}`}>
-        {t.name}
-      </Pill>
+      <Tag text={t.name} margin="0 x-small 0 0" key={`${i + 1}`} />
     ))
   }
 
@@ -127,8 +98,8 @@ const ProductDetail = () => {
       version.push('Learning Tools Interoperability (LTI)® v.1.1 Core Specification')
     }
 
-    return version.map(title => (
-      <Flex.Item margin="0 0 small 0">
+    return version.map((title, i) => (
+      <Flex.Item margin="0 0 small 0" key={`${i + 1}`}>
         <Link onClick={() => ltiDataClickHandle(title)} isWithinText={false}>
           <Text weight="bold">{title}</Text>
         </Link>
@@ -137,7 +108,7 @@ const ProductDetail = () => {
   }
 
   const formattedUpdatedAt = () => {
-    const date = new Date(product?.updated_at)
+    const date = new Date(product?.updated_at as string)
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -151,23 +122,41 @@ const ProductDetail = () => {
 
   return (
     <div>
-      {product ? (
+      {product && (
         <>
-          <Flex>
+          <Breadcrumb label={I18n.t('Apps')}>
+            <Breadcrumb.Link href={previousPath}>{I18n.t('Apps')}</Breadcrumb.Link>
+            <Breadcrumb.Link>{product.name}</Breadcrumb.Link>
+          </Breadcrumb>
+          <Flex margin="small 0 0 0">
             <Flex.Item>
-              <div>
-                <Img src={product.logo_url} width={80} height={80} />
+              <div style={{borderRadius: '8px'}}>
+                <img
+                  alt=""
+                  src={product.logo_url}
+                  width={80}
+                  height={80}
+                  style={{borderRadius: 8}}
+                />
               </div>
             </Flex.Item>
-            <Flex.Item shouldGrow={true} shouldShrink={true} padding="0 0 0 small">
+            <Flex.Item shouldGrow={true} shouldShrink={true} padding="small 0 0 small">
               <Text weight="bold" size="x-large">
                 {product.name}
               </Text>
               <Flex.Item shouldGrow={true} shouldShrink={true}>
-                <div style={{marginBottom: '.5rem'}}>{product.tagline}</div>
+                <div style={{marginBottom: '.5rem'}}>
+                  <TruncateWithTooltip
+                    linesAllowed={2}
+                    horizontalOffset={-150}
+                    backgroundColor="primary"
+                  >
+                    <Text>{product.tagline}</Text>
+                  </TruncateWithTooltip>
+                </div>
               </Flex.Item>
             </Flex.Item>
-            <Flex.Item align="start">
+            <Flex.Item align="start" margin="small 0 0 0">
               <Button
                 color="primary"
                 interaction={dynamicRegistrationInformation ? 'enabled' : 'disabled'}
@@ -184,14 +173,19 @@ const ProductDetail = () => {
                   )
                 }}
               >
-                Configure
+                {I18n.t('Configure')}
               </Button>
             </Flex.Item>
           </Flex>
           <Flex margin="0 0 0 xx-large">
             <Flex.Item padding="0 0 0 x-small" margin="0 0 0 medium">
-              <Text color="secondary">by {product.company.name}</Text> |{' '}
-              <Text color="secondary">Updated: {formattedUpdatedAt()}</Text>
+              <Text color="secondary">
+                {I18n.t('by')} {product.company.name}
+              </Text>{' '}
+              |{' '}
+              <Text color="secondary">
+                {I18n.t('Updated')}: {formattedUpdatedAt()}
+              </Text>
             </Flex.Item>
           </Flex>
           <Flex padding="small 0 0 small" margin="0 medium large xx-large">
@@ -201,141 +195,104 @@ const ProductDetail = () => {
           <Flex margin="medium 0 0 0">
             <Flex.Item>
               <Text weight="bold" size="large">
-                Overview
+                {I18n.t('Overview')}
               </Text>
             </Flex.Item>
           </Flex>
           <Flex>
-            <Flex.Item margin="medium 0 small 0">
+            <Flex.Item margin="small 0 small 0">
               <Text dangerouslySetInnerHTML={{__html: product.description}} />
             </Flex.Item>
           </Flex>
-          <Link href={product.company.company_url} isWithinText={false}>
-            <Text weight="bold">See more</Text>
-          </Link>
           <Flex>
             <Flex.Item margin="medium 0 small 0">
               <Text weight="bold" size="large">
-                Links
+                {I18n.t('External Links')}
               </Text>
             </Flex.Item>
           </Flex>
           <Flex>
-            <Flex.Item>
-              <Link
-                href={product.company.company_url}
-                isWithinText={false}
-                renderIcon={<IconExpandStartLine />}
-              >
-                <Text weight="bold">Website</Text>
-              </Link>
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 large">
-              <Link
-                href={product.company.company_url}
-                isWithinText={false}
-                renderIcon={<IconEyeLine />}
-              >
-                <Text weight="bold">Privacy Policy</Text>
-              </Link>
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 large">
-              <Link
-                href={product.company.company_url}
-                isWithinText={false}
-                renderIcon={<IconQuizTitleLine />}
-              >
-                <Text weight="bold">Terms of Service</Text>
-              </Link>
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 large">
-              <Link
-                href={product.company.company_url}
-                isWithinText={false}
-                renderIcon={<IconA11yLine />}
-              >
-                <Text weight="bold">Accessibility</Text>
-              </Link>
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 large">
-              <Link
-                href={product.company.company_url}
-                isWithinText={false}
-                renderIcon={<IconMessageLine />}
-              >
-                <Text weight="bold">Contact</Text>
-              </Link>
-            </Flex.Item>
+            {product.company.company_url && (
+              <Flex.Item margin="0 large 0 0">
+                <Link
+                  href={product.company.company_url}
+                  isWithinText={false}
+                  renderIcon={<IconExpandStartLine />}
+                >
+                  <Text weight="bold">{I18n.t('Website')}</Text>
+                </Link>
+              </Flex.Item>
+            )}
+            {product.privacy_policy_url && (
+              <Flex.Item>
+                <Link
+                  href={product.privacy_policy_url}
+                  isWithinText={false}
+                  renderIcon={<IconEyeLine />}
+                >
+                  <Text weight="bold">{I18n.t('Privacy Policy')}</Text>
+                </Link>
+              </Flex.Item>
+            )}
+            {product.terms_of_service_url && (
+              <Flex.Item margin="0 0 0 large">
+                <Link
+                  href={product.terms_of_service_url}
+                  isWithinText={false}
+                  renderIcon={<IconQuizTitleLine />}
+                >
+                  <Text weight="bold">{I18n.t('Terms of Service')}</Text>
+                </Link>
+              </Flex.Item>
+            )}
+            {product.accessibility_url && (
+              <Flex.Item margin="0 0 0 large">
+                <Link
+                  href={product.accessibility_url}
+                  isWithinText={false}
+                  renderIcon={<IconA11yLine />}
+                >
+                  <Text weight="bold">{I18n.t('Accessibility')}</Text>
+                </Link>
+              </Flex.Item>
+            )}
+            {product.support_link && (
+              <Flex.Item margin="0 0 0 large">
+                <Link
+                  href={product.support_link}
+                  isWithinText={false}
+                  renderIcon={<IconMessageLine />}
+                >
+                  <Text weight="bold">{I18n.t('Contact')}</Text>
+                </Link>
+              </Flex.Item>
+            )}
           </Flex>
           <Flex>
-            <Flex.Item margin="medium 0 medium 0">
+            <Flex.Item margin="medium 0 small 0">
               <Text weight="bold" size="large">
-                Resources and Documents
+                {I18n.t('Resources and Documents')}
               </Text>
             </Flex.Item>
           </Flex>
           <Text weight="bold" size="medium">
-            Integrations
+            {I18n.t('Integrations')}
           </Text>
           <Flex direction="column" margin="small 0 0 0">
             {renderLtiTitle()}
           </Flex>
-          <Flex>
-            <Flex.Item margin="0 0 small 0">
-              <Text weight="bold" size="medium">
-                Other
-              </Text>
-            </Flex.Item>
-          </Flex>
-          <Flex>
-            <Flex.Item>
-              <Link href={product.company.company_url} isWithinText={false}>
-                <Text weight="bold">
-                  Subscription Information <IconExternalLinkLine />
-                </Text>
-              </Link>
-            </Flex.Item>
-          </Flex>
-          <Flex>
-            <Flex.Item margin="medium 0 medium 0">
-              <Text weight="bold" size="large">
-                Badges
-              </Text>
-            </Flex.Item>
-          </Flex>
-          <Flex direction="row" gap="xx-large">
-            {renderBadges()}
-          </Flex>
-          {excludeCurrentProduct?.length ? (
-            <Flex justifyItems="space-between" margin="0 0 medium 0">
-              <Flex.Item>
-                <Text weight="bold" size="large">
-                  More Products by {product.company.name}
-                </Text>
-              </Flex.Item>
-              <Flex.Item>
-                <Link href={product.company.company_url} isWithinText={false}>
-                  <Text weight="bold">See All</Text>
-                </Link>
-              </Flex.Item>
-            </Flex>
-          ) : (
-            <div />
-          )}{' '}
+          {product.badges.length > 0 && <BadgeCarousel badges={product?.badges} />}
+          {(excludeCurrentProduct?.length ?? 0) > 0 && (
+            <ProductCarousel products={excludeCurrentProduct} companyName={product.company.name} />
+          )}
         </>
-      ) : (
-        <div />
       )}
-      <Flex direction="row" gap="small">
-        {renderProducts()}
-      </Flex>
-      {/* TODO: Reimplement LtiDetailModal */}
-      {/* <LtiDetailModal
+      <LtiDetailModal
         ltiTitle={clickedLtiTitle}
-        integrationData={product?.lti}
+        integrationData={product?.lti_configurations}
         isModalOpen={isModalOpen}
         setModalOpen={setModalOpen}
-      /> */}
+      />
     </div>
   )
 }

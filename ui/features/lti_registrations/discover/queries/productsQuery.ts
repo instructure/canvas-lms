@@ -25,7 +25,6 @@ import type {LtiFilters} from '../model/Filter'
 const accountId = window.location.pathname.split('/')[2]
 
 // TODO: add actual type
-type Params = any
 type Meta = {
   count: number
   total_count: number
