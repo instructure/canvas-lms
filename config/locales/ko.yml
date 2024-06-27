@@ -7432,6 +7432,7 @@ ko:
           send_to_sms: "%{phone_number}로 문자 메시지 전송"
         labels: 
           carrier: 통신사
+          otp_communication_channel_id: "전화 번호"
           phone_number: "전화 번호"
           remember_me: "이 컴퓨터 기억하기"
           verification_code: "인증 코드"
@@ -9406,6 +9407,7 @@ ko:
     move_to_end: "-- 아래에 --"
   move_name_to_a_new_group_acabed4e: "%{name}을(를) 새 그룹으로 이동"
   move_to_1c208ae5: "다음으로 이동..."
+  multi_factor_authentication_1a6b3b3d: "다단계 인증"
   multi_factor_authentication_configured_865b1bde: "다단계 인증 구성"
   multiple_dates_e3a122f7: "여러 날짜"
   must_be_255_characters_or_less_e8e7f25e: "255글자보다 적어야 함"
@@ -9991,6 +9993,7 @@ ko:
   play_media_comment_8614d30f: "미디어 설명 재생"
   playback: 
     statistics: 통계
+  please_enter_the_verification_code_shown_by_your_t_acc7c404: "토큰에 의해 표시되는 인증 코드를 입력하시기 바랍니다."
   plugins: 
     academic_benchmark_importer: 
       description: "이를 사용하면 Academic Benchmark 표준을 Canvas로 가져올 수 있습니다."
@@ -12943,6 +12946,7 @@ ko:
     errors: 
       none_to_update: "업데이트할 내용 없음"
   shared_secret_892c88f2: "공유 시크릿"
+  should_be_10_digit_number_d30ef02d: "10자리 숫자이어야 함"
   show_all_details_9879980c: "모든 세부 정보 표시하기"
   show_all_sections_190203e8: "모든 섹션 보기"
   show_by_709f525b: 정렬
@@ -14187,6 +14191,7 @@ ko:
     is_required: "이 필드가 필요함"
   validation_error_3b943100: "유효성 검사 오류"
   verification_code_5acd64ef: "인증 코드"
+  verify_3dd8f159: 확인
   version_5599c321: 버전
   view_app_center_6c89a3fe: "앱 센터 보기"
   view_app_configurations_52b52441: "앱 구성 보기"
