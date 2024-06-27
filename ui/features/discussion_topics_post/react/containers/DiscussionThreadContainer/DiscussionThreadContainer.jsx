@@ -120,22 +120,24 @@ export const DiscussionThreadContainer = props => {
     addReplyToAllRootEntries(cache, newDiscussionEntry)
     addSubentriesCountToParentEntry(cache, newDiscussionEntry)
     props.setHighlightEntryId(newDiscussionEntry._id)
-
-    // It is a known issue that the first reply of a sub reply has not initiated the sub query call,
-    // as a result we cannot add an entry to it. Before we had expand buttons for each sub-entry,
-    // now we must manually trigger the first one.
-    // See addReplyToDiscussionEntry definition for more details.
-    if (
-      result.data.createDiscussionEntry.discussionEntry.parentId === props.discussionEntry._id &&
-      !props.discussionEntry.subentriesCount
-    ) {
-      setFirstSubReply(true)
-    }
   }
 
-  const onEntryCreationCompletion = data => {
-    setExpandReplies(true)
-    props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
+  const onEntryCreationCompletion = (data, success) => {
+    if (success) {
+      // It is a known issue that the first reply of a sub reply has not initiated the sub query call,
+      // as a result we cannot add an entry to it. Before we had expand buttons for each sub-entry,
+      // now we must manually trigger the first one.
+      // See addReplyToDiscussionEntry definition for more details.
+      if (
+        data.createDiscussionEntry.discussionEntry.parentId === props.discussionEntry._id &&
+        !props.discussionEntry.subentriesCount
+      ) {
+        setFirstSubReply(true)
+      }
+      setExpandReplies(true)
+      props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
+      setEditorExpanded(false)
+    }
   }
 
   const {createDiscussionEntry} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
@@ -402,7 +404,6 @@ export const DiscussionThreadContainer = props => {
     createDiscussionEntry({variables, optimisticResponse})
 
     props.setHighlightEntryId('DISCUSSION_ENTRY_PLACEHOLDER')
-    setEditorExpanded(false)
   }
 
   return (
