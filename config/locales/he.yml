@@ -10891,6 +10891,7 @@ he:
           send_to_sms: "שליחת הודעות טקסט אל %{phone_number}"
         labels: 
           carrier: "ספק תקשורת"
+          otp_communication_channel_id: "מספר טלפון"
           phone_number: "מספר טלפון"
           remember_me: "זכור מחשב זה"
           verification_code: "קוד אימות"
@@ -13112,6 +13113,7 @@ he:
   move_to_the_beginning_636b342c: "העברה להתחלה"
   move_to_the_end_bc05abf6: "העברה לסוף"
   moving_a4d552df: העברה...
+  multi_factor_authentication_1a6b3b3d: "אימות זיהוי רב-מרכיבים"
   multi_factor_authentication_configured_865b1bde: "הזדהות רב מימדית קונפגה"
   multiple_ba5220cd: מרובים
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "חשבונות קנבס מרובים משויכים לאיזור ה Clever %{district_id}"
@@ -14116,6 +14118,7 @@ he:
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "בבקשה להקליד מונח חיפוש עם 3 תווים ומעלה "
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "בבקשה להקליד כתובת אינטרנט תקינה כולל קידומת, למשל.  ( http://, https://, ftp://, tel:, mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "בבקשה לספק כתובת אינטרנט תקינה, כוול הקידומת (כגון http://, https://, ftp://)."
+  please_enter_the_verification_code_shown_by_your_t_acc7c404: "נא להזין את קוד האימות אשר האסימון שלך מראה."
   please_enter_your_label_name_7745272d: "בבקשה לספק את ה %{label_name}: שלך"
   please_enter_your_label_name_and_password_5c56be80: "בבקשה לספק את ה %{label_name}  והסיסמה שלך"
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "נא לאפשר להם לדעת באיזה דף עיינת והקישור עליו הקלקת. "
@@ -18182,6 +18185,7 @@ he:
   shift_dates_746698a5: "הזזת תאריכים"
   short_name_42f454a1: "שם מקוצר"
   short_name_ad9bf84f: "שם מוקצר"
+  should_be_10_digit_number_d30ef02d: "חייב להיות מספר בן 10 ספרות"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "צריך להיות מובן מאליו, מזהה הקנבס של המשתמש המדווח"
   show_account_navigation_menu_d97270a9: "הצגת תפריט ניווט חשבונות"
   show_admin_navigation_menu_92fb579f: "הצגת תפריט ניווט של מנהלי מערכת"
@@ -20220,6 +20224,7 @@ he:
   vericite_similarity_score_more_information_7df9ea5c: "ניקוד תאימות של VeriCite - מידע נוסף"
   vericite_similarity_score_see_detailed_report_390ab687: "ניקוד תאימות של VeriCite - ניתן לעיין בפרטי הדו\"ח."
   verification_code_5acd64ef: "קוד אימות"
+  verify_3dd8f159: וודא/י
   version_5599c321: גירסה
   video_b9f27375: וידאו
   video_content_is_not_supported_by_your_device_or_a_25214f57: "תוכן הוידאו אינו נתמך במכשיר או האפליקציה שלך."
