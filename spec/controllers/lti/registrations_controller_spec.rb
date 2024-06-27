@@ -281,7 +281,7 @@ describe Lti::RegistrationsController do
 
             it "returns a 422 if the dir param isn't valid" do
               get "/api/v1/accounts/#{account.id}/lti_registrations?dir=bad"
-              expect(response_json["errors"].first["message"]).to eq("dir param should be asc, dsc, or empty")
+              expect(response_json["errors"].first["message"]).to eq("dir param should be asc, desc, or empty")
             end
 
             it "returns a 422 if the sort param isn't valid" do
