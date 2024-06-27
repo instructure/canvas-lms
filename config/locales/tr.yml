@@ -10909,6 +10909,7 @@ tr:
           send_to_sms: "%{phone_number} telefon numarasına metin mesajı yolla"
         labels: 
           carrier: Taşıyıcı
+          otp_communication_channel_id: "Telefon Numarası"
           phone_number: "Telefon Numarası"
           remember_me: "Bu bilgisayarı hatırla"
           verification_code: "Doğrulama Kodu"
@@ -13206,6 +13207,7 @@ tr:
   move_to_front_7eae2e90: "Öne taşı"
   move_to_front_bf6f0194: "Öne Taşı"
   moving_a4d552df: Taşınıyor...
+  multi_factor_authentication_1a6b3b3d: "Çoklu Kimlik Doğrulama"
   multi_factor_authentication_configured_865b1bde: "Çoklu kimlik doğrulama yapılandırıldı"
   multiple_dates_e3a122f7: "Çoklu Tarih"
   multiple_due_dates_6b0d75c6: "Çoklu bitiş tarihleri"
@@ -14173,6 +14175,7 @@ tr:
   please_add_at_least_one_non_blank_answer_213c2c8e: "Lütfen en az bir tane boş olmayan cevap ekleyin."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Lütfen her değişken için en az bir tane boş olmayan cevap ekleyin."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Lütfen üç veya daha fazla karakter içeren bir arama terimi girin"
+  please_enter_the_verification_code_shown_by_your_t_acc7c404: "Token'da gözüken doğrulama kodunu giriniz"
   please_enter_your_label_name_7745272d: "Lütfen %{label_name} inizi girin:"
   please_enter_your_label_name_and_password_5c56be80: "Lütfen %{label_name} Eposta adresiniz ve şifrenizi girin:"
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Lütfen hangi sayfayı görüntülediğinizi ve hangi bağlantıya tıkladığınızı bildirin."
@@ -18132,6 +18135,7 @@ tr:
   shared_secret_892c88f2: "Paylaşım Anahtarı"
   shift_dates_746698a5: "Günler arası geçiş yap"
   short_name_ad9bf84f: "kısa isim"
+  should_be_10_digit_number_d30ef02d: "10 haneli bir sayı olmalıdır"
   show_all_details_9879980c: "Tüm Ayrıntıları Göster"
   show_attendance_columns_4d160e16: "Devam Sütununu Göster"
   show_by_date_e3967761: "Tarihe Göre Göster"
@@ -19889,6 +19893,7 @@ tr:
   venezuela_58_959d01f7: "Venezuella (+58)"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite benzerlik puanı -- daha fazla bilgi"
   verification_code_5acd64ef: "Doğrulama Kodu"
+  verify_3dd8f159: Onay
   version_5599c321: Versiyon
   video_b9f27375: Video
   video_player_b371005: "Video Oynatıcı"
