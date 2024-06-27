@@ -633,6 +633,167 @@ module Lti::IMS
       end
     end
 
+    describe "#new_external_tool" do
+      subject { registration.new_external_tool(context) }
+
+      let(:lti_tool_configuration) do
+        {
+          :domain => "example.com",
+          :messages => [
+            {
+              type: "LtiResourceLinkRequest",
+              target_link_uri:,
+              placements: ["course_navigation", "account_navigation"],
+              icon_uri:,
+              label:,
+              custom_parameters:
+            }
+          ],
+          :claims => [],
+          :target_link_uri => target_link_uri,
+          :description => description,
+          :custom_parameters => custom_parameters,
+          :icon_uri => icon_uri,
+          Lti::IMS::Registration::PRIVACY_LEVEL_EXTENSION => privacy_level
+        }
+      end
+      let(:privacy_level) { "public" }
+      let(:target_link_uri) { "http://example.com/launch" }
+      let(:description) { "Example Tool" }
+      let(:custom_parameters) { { "has_expansion" => "$Canvas.user.id", "no_expansion" => "foo" } }
+      let(:icon_uri) { "http://example.com/icon.png" }
+      let(:label) { "Course Navigation" }
+
+      let(:context) { account_model }
+
+      context 'when "disabled_placements" is set' do
+        before { registration.registration_overlay["disabledPlacements"] = ["course_navigation"] }
+
+        it "does not set the disabled placements" do
+          expect(subject.settings.keys).not_to include "course_navigation"
+        end
+
+        it "does set placements that are not disabled" do
+          expect(subject.settings.keys).to include "account_navigation"
+        end
+      end
+
+      context "when no privacy level is set" do
+        let(:privacy_level) { nil }
+
+        it 'sets the workflow_state to "anonymous"' do
+          expect(subject.workflow_state).to eq "anonymous"
+        end
+      end
+
+      context "when existing_tool is provided" do
+        subject { registration.new_external_tool(context, existing_tool:) }
+
+        let(:existing_tool) { registration.new_external_tool(context) }
+
+        context "and existing tool is disabled" do
+          let(:state) { "disabled" }
+
+          before do
+            existing_tool.update!(workflow_state: state)
+          end
+
+          it "uses the existing workflow_state" do
+            expect(subject.workflow_state).to eq state
+          end
+        end
+
+        context "and tool state is different from configuration state" do
+          let(:state) { "anonymous" }
+
+          before do
+            existing_tool.update!(workflow_state: state)
+          end
+
+          it "overwrites existing workflow_state" do
+            expect(subject.workflow_state).to eq privacy_level
+          end
+        end
+      end
+
+      it "sets the correct default workflow_state" do
+        expect(subject.workflow_state).to eq "public"
+      end
+
+      it "sets the correct placements" do
+        expect(subject.settings.keys).to include "account_navigation"
+        expect(subject.settings.keys).to include "course_navigation"
+      end
+
+      it "uses the correct launch url" do
+        expect(subject.url).to eq target_link_uri
+      end
+
+      it "uses the correct domain" do
+        expect(subject.domain).to eq lti_tool_configuration[:domain]
+      end
+
+      it "uses the correct context" do
+        expect(subject.context).to eq context
+      end
+
+      it "uses the correct description" do
+        expect(subject.description).to eq description
+      end
+
+      it "uses the correct name" do
+        expect(subject.name).to eq client_name
+      end
+
+      it "uses the correct top-level custom params" do
+        expect(subject.custom_fields).to eq custom_parameters
+      end
+
+      it "uses the correct icon url" do
+        expect(subject.icon_url).to eq icon_uri
+      end
+
+      it "uses the correct text" do
+        expect(subject.text).to eq client_name
+      end
+
+      it "sets the developer key" do
+        expect(subject.developer_key).to eq developer_key
+      end
+
+      it "sets the lti_version" do
+        expect(subject.lti_version).to eq "1.3"
+      end
+
+      context "placements" do
+        subject { registration.new_external_tool(context).settings["course_navigation"] }
+
+        it "uses the correct icon url" do
+          expect(subject["icon_url"]).to eq icon_uri
+        end
+
+        it "uses the correct message type" do
+          expect(subject["message_type"]).to eq "LtiResourceLinkRequest"
+        end
+
+        it "uses the correct text" do
+          expect(subject["text"]).to eq label
+        end
+
+        it "uses the correct target_link_uri" do
+          expect(subject["target_link_uri"]).to eq target_link_uri
+        end
+
+        it "uses the correct value for enabled" do
+          expect(subject["enabled"]).to be true
+        end
+
+        it "uses the correct custom fields" do
+          expect(subject["custom_fields"]).to eq custom_parameters
+        end
+      end
+    end
+
     describe "registration_configuration" do
       subject { registration.registration_configuration }
 
