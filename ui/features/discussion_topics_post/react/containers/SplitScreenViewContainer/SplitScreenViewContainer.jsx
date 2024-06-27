@@ -63,6 +63,7 @@ export const SplitScreenViewContainer = props => {
   const {replyFromId, setReplyFromId} = useContext(DiscussionManagerUtilityContext)
   const [fetchingMoreOlderReplies, setFetchingMoreOlderReplies] = useState(false)
   const [fetchingMoreNewerReplies, setFetchingMoreNewerReplies] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
   const closeButtonRef = useRef()
 
   const replyButtonRef = useRef()
@@ -114,6 +115,7 @@ export const SplitScreenViewContainer = props => {
     onCompleted: data => {
       if (!data.updateDiscussionEntry.errors) {
         setOnSuccess(I18n.t('The reply was successfully updated.'))
+        setIsEditing(false)
       } else {
         setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
       }
@@ -429,6 +431,8 @@ export const SplitScreenViewContainer = props => {
           }
           onToggleRating={() => toggleRating(splitScreenEntryOlderDirection.data.legacyNode)}
           onSave={onUpdate}
+          isEditing={isEditing}
+          setIsEditing={setIsEditing}
           onOpenSplitScreenView={props.onOpenSplitScreenView}
           setRCEOpen={props.setRCEOpen}
           RCEOpen={props.RCEOpen}

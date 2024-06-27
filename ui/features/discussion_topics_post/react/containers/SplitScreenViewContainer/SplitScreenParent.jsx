@@ -46,7 +46,7 @@ import {useUpdateDiscussionThread} from '../../hooks/useUpdateDiscussionThread'
 
 const I18n = useI18nScope('discussion_posts')
 
-export const SplitScreenParent = props => {
+export const SplitScreenParent = ({isEditing, setIsEditing, ...props}) => {
   const [updateSplitScreenViewDeeplyNestedAlert] = useMutation(
     UPDATE_SPLIT_SCREEN_VIEW_DEEPLY_NESTED_ALERT
   )
@@ -57,7 +57,6 @@ export const SplitScreenParent = props => {
 
   const {setOnSuccess} = useContext(AlertManagerContext)
   const {setReplyFromId} = useContext(DiscussionManagerUtilityContext)
-  const [isEditing, setIsEditing] = useState(false)
   const [showReportModal, setShowReportModal] = useState(false)
   const [reportModalIsLoading, setReportModalIsLoading] = useState(false)
   const [reportingError, setReportingError] = useState(false)
@@ -252,7 +251,6 @@ export const SplitScreenParent = props => {
                     onSave={(message, _quotedEntryId, file) => {
                       if (props.onSave) {
                         props.onSave(props.discussionEntry, message, file)
-                        setIsEditing(false)
                       }
                     }}
                     onCancel={() => {
