@@ -536,7 +536,7 @@ class Lti::RegistrationsController < ApplicationController
         when :updated_by
           reg.updated_by&.name&.downcase || ""
         when :on
-          reg.account_binding_for(@account).workflow_state
+          reg.account_binding_for(@account)&.workflow_state || ""
         end
       end
 

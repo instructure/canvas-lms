@@ -235,6 +235,19 @@ describe Lti::RegistrationsController do
           end
         end
 
+        context "when sorting by a workflow_state" do
+          subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=on" }
+
+          it "does not error if the account binding is nil" do
+            reg = lti_registration_model(account:, name: "no account bindings")
+            # expect it to have no account bindings, just in case we start automatically
+            # creating a default one in the future.
+            expect(reg.lti_registration_account_bindings).to eq([])
+            subject
+            expect(response_json[:data].last["name"]).to eq("no account bindings")
+          end
+        end
+
         context "with a search query param matching no results" do
           let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations?query=searchterm" }
 
