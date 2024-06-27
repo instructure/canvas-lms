@@ -19,6 +19,7 @@
 
 require_relative "../helpers/discussions_common"
 require_relative "pages/discussion_page"
+require_relative "../rcs/pages/rce_next_page"
 
 describe "threaded discussions" do
   include_context "in-process server selenium tests"
@@ -331,6 +332,58 @@ describe "threaded discussions" do
           get "/courses/#{@course.id}/discussion_topics/#{@threaded_topic.id}"
         end
 
+        describe "Discussion replies with network interruptions" do
+          after do
+            turn_on_network
+          end
+
+          it "preserves reply content to discussion topic reply when network is interrupted" do
+            # Click reply button
+            f("button[data-testid='discussion-topic-reply']").click
+            wait_for_ajaximations
+
+            # Type content
+            reply_content = "This is a reply to topic that should not be lost."
+            type_in_tiny("textarea", reply_content)
+
+            # Simulate offline mode
+            turn_off_network
+
+            # Try to submit the reply
+            f("button[data-testid='DiscussionEdit-submit']").click
+
+            # Expect error to occur
+            expect(fj("div:contains('There was an unexpected error creating the discussion entry.')")).to be_present
+            # Expect RCE to still be open
+            expect(f("div[data-testid='DiscussionEdit-container']")).to be_present
+            # Expect the typed content to still be there
+            in_frame f(".tox-editor-container iframe")["id"] do
+              expect(f("body")).to include_text("This is a reply to topic that should not be lost.")
+            end
+          end
+
+          it "preserves reply content to discussion entry reply when network is interrupted" do
+            f("button[data-testid='threading-toolbar-reply']").click
+            wait_for_ajaximations
+            type_in_tiny("textarea", "This is a reply to a 1st level reply that should not be lost.")
+
+            # Simulate offline mode
+            turn_off_network
+
+            # Try to submit the reply
+            f("button[data-testid='DiscussionEdit-submit']").click
+
+            # Expect error to occur
+            expect(fj("div:contains('There was an unexpected error creating the discussion entry.')")).to be_present
+            # Expect RCE to still be open
+            expect(f("div[data-testid='DiscussionEdit-container']")).to be_present
+            # Expect the typed content to still be there
+            in_frame f(".tox-editor-container iframe")["id"] do
+              expect(f("body")).to include_text("This is a reply to a 1st level reply that should not be lost.")
+            end
+          end
+        end
+
         it "replies correctly to discussion topic" do
           f("button[data-testid='discussion-topic-reply']").click
           wait_for_ajaximations
@@ -570,6 +623,60 @@ describe "threaded discussions" do
         before do
           user_session(@student)
           get "/courses/#{@course.id}/discussion_topics/#{@threaded_topic.id}"
+        end
+
+        describe "Discussion replies with network interruptions" do
+          after do
+            turn_on_network
+          end
+
+          it "preserves reply content to 1st level discussion entry reply that has no existing subEntries when network is interrupted" do
+            @second_first_level_reply = @threaded_topic.discussion_entries.create!(
+              user: @student,
+              message: "2nd - 1st level reply"
+            )
+            get "/courses/#{@course.id}/discussion_topics/#{@threaded_topic.id}"
+
+            ff("button[data-testid='threading-toolbar-reply']")[0].click
+            wait_for_ajaximations
+            type_in_tiny("textarea", "This is a reply to a 1st level reply that should not be lost.")
+
+            # Simulate offline mode
+            turn_off_network
+
+            # Try to submit the reply
+            f("button[data-testid='DiscussionEdit-submit']").click
+
+            # Expect error to occur
+            expect(fj("div:contains('There was an unexpected error creating the discussion entry.')")).to be_present
+            # Expect RCE to still be open
+            expect(f("div[data-testid='DiscussionEdit-container']")).to be_present
+            # Expect the typed content to still be there
+            in_frame f(".tox-editor-container iframe")["id"] do
+              expect(f("body")).to include_text("This is a reply to a 1st level reply that should not be lost.")
+            end
+          end
+
+          it "preserves reply content to discussion entry reply when network is interrupted" do
+            f("button[data-testid='threading-toolbar-reply']").click
+            wait_for_ajaximations
+            type_in_tiny("textarea", "This is a reply to a 1st level reply that should not be lost.")
+
+            # Simulate offline mode
+            turn_off_network
+
+            # Try to submit the reply
+            f("button[data-testid='DiscussionEdit-submit']").click
+
+            # Expect error to occur
+            expect(fj("div:contains('There was an unexpected error creating the discussion entry.')")).to be_present
+            # Expect RCE to still be open
+            expect(f("div[data-testid='DiscussionEdit-container']")).to be_present
+            # Expect the typed content to still be there
+            in_frame f(".tox-editor-container iframe")["id"] do
+              expect(f("body")).to include_text("This is a reply to a 1st level reply that should not be lost.")
+            end
+          end
         end
 
         it "expands and collapses all correctly" do

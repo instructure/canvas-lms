@@ -56,6 +56,8 @@ const DiscussionTopicManager = props => {
   const [searchPageNumber, setSearchPageNumber] = useState(0)
   const [allThreadsStatus, setAllThreadsStatus] = useState(AllThreadsState.None)
   const [expandedThreads, setExpandedThreads] = useState([])
+  // This state is used to control the state of the topic RCE
+  const [expandedTopicReply, setExpandedTopicReply] = useState(false)
   const translationEnabled = useRef(ENV?.discussion_translation_available ?? false)
   const translationLanguages = useRef(ENV?.discussion_translation_languages ?? [])
   const [showTranslationControl, setShowTranslationControl] = useState(false)
@@ -109,7 +111,7 @@ const DiscussionTopicManager = props => {
   const [highlightEntryId, setHighlightEntryId] = useState(ENV.discussions_deep_link?.entry_id)
   const [relativeEntryId, setRelativeEntryId] = useState(null)
 
-  const [replyToTopicSubmission, setReplytoTopicSubmission] = useState({})
+  const [replyToTopicSubmission, setReplyToTopicSubmission] = useState({})
   const [replyToEntrySubmission, setReplyToEntrySubmission] = useState({})
 
   const [isUserMissingInitialPost, setIsUserMissingInitialPost] = useState(null)
@@ -249,7 +251,7 @@ const DiscussionTopicManager = props => {
       const submissionsArray =
         discussionTopicQuery?.data?.legacyNode?.assignment?.mySubAssignmentSubmissionsConnection
           ?.nodes || []
-      setReplytoTopicSubmission(getSubmissionObject(submissionsArray, REPLY_TO_TOPIC))
+      setReplyToTopicSubmission(getSubmissionObject(submissionsArray, REPLY_TO_TOPIC))
       setReplyToEntrySubmission(getSubmissionObject(submissionsArray, REPLY_TO_ENTRY))
     }, 0)
   }, [discussionTopicQuery])
@@ -293,19 +295,22 @@ const DiscussionTopicManager = props => {
     }
   }
 
-  const onEntryCreationCompletion = data => {
-    setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
-    setReplytoTopicSubmission(getCheckpointSubmission(data, REPLY_TO_TOPIC))
-    setReplyToEntrySubmission(getCheckpointSubmission(data, REPLY_TO_ENTRY))
-
-    if (sort === 'asc') {
-      setPageNumber(discussionTopicQuery.data.legacyNode.entriesTotalPages - 1)
-    }
-    if (
-      discussionTopicQuery.data.legacyNode.availableForUser &&
-      discussionTopicQuery.data.legacyNode.initialPostRequiredForCurrentUser
-    ) {
-      discussionTopicQuery.refetch(variables)
+  const onEntryCreationCompletion = (data, success) => {
+    if(success) {
+      setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
+      setReplyToTopicSubmission(getCheckpointSubmission(data, REPLY_TO_TOPIC))
+      setReplyToEntrySubmission(getCheckpointSubmission(data, REPLY_TO_ENTRY))
+  
+      if (sort === 'asc') {
+        setPageNumber(discussionTopicQuery.data.legacyNode.entriesTotalPages - 1)
+      }
+      if (
+        discussionTopicQuery.data.legacyNode.availableForUser &&
+        discussionTopicQuery.data.legacyNode.initialPostRequiredForCurrentUser
+      ) {
+        discussionTopicQuery.refetch(variables)
+      }
+      setExpandedTopicReply(false)
     }
   }
 
@@ -375,6 +380,8 @@ const DiscussionTopicManager = props => {
                     />
                     <DiscussionTopicContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}
+                      expandedTopicReply={expandedTopicReply}
+                      setExpandedTopicReply={setExpandedTopicReply}
                       createDiscussionEntry={(message, file, isAnonymousAuthor) => {
                         createDiscussionEntry({
                           variables: {
@@ -453,7 +460,7 @@ const DiscussionTopicManager = props => {
                         highlightEntryId={highlightEntryId}
                         setHighlightEntryId={setHighlightEntryId}
                         isTrayFinishedOpening={isTrayFinishedOpening}
-                        setReplytoTopicSubmission={setReplytoTopicSubmission}
+                        setReplyToTopicSubmission={setReplyToTopicSubmission}
                         setReplyToEntrySubmission={setReplyToEntrySubmission}
                       />
                     </View>

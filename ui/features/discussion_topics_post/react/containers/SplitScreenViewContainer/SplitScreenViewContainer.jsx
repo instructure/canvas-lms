@@ -83,15 +83,18 @@ export const SplitScreenViewContainer = props => {
     props.setHighlightEntryId(newDiscussionEntry._id)
   }
 
-  const onEntryCreationCompletion = data => {
-    props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
-    if (splitScreenEntryOlderDirection.data.legacyNode.depth > 3) {
-      props.onOpenSplitScreenView(data.createDiscussionEntry.discussionEntry.rootEntryId, false)
-    } else if (splitScreenEntryOlderDirection.data.legacyNode.depth === 3) {
-      props.onOpenSplitScreenView(data.createDiscussionEntry.discussionEntry.parentId, false)
+  const onEntryCreationCompletion = (data, success) => {
+    if (success) {
+      props.setRCEOpen(false)
+      props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
+      if (splitScreenEntryOlderDirection.data.legacyNode.depth > 3) {
+        props.onOpenSplitScreenView(data.createDiscussionEntry.discussionEntry.rootEntryId, false)
+      } else if (splitScreenEntryOlderDirection.data.legacyNode.depth === 3) {
+        props.onOpenSplitScreenView(data.createDiscussionEntry.discussionEntry.parentId, false)
+      }
+      props.setReplyToTopicSubmission(getCheckpointSubmission(data, REPLY_TO_TOPIC))
+      props.setReplyToEntrySubmission(getCheckpointSubmission(data, REPLY_TO_ENTRY))
     }
-    props.setReplytoTopicSubmission(getCheckpointSubmission(data, REPLY_TO_TOPIC))
-    props.setReplyToEntrySubmission(getCheckpointSubmission(data, REPLY_TO_ENTRY))
   }
 
   const {createDiscussionEntry} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
@@ -448,7 +451,6 @@ export const SplitScreenViewContainer = props => {
                 canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
                 onSubmit={(message, quotedEntryId, file, anonymousAuthorState) => {
                   onReplySubmit(message, file, quotedEntryId, anonymousAuthorState)
-                  props.setRCEOpen(false)
                 }}
                 onCancel={() => {
                   props.setRCEOpen(false)
@@ -565,7 +567,7 @@ SplitScreenViewContainer.propTypes = {
   setHighlightEntryId: PropTypes.func,
   relativeEntryId: PropTypes.string,
   isTrayFinishedOpening: PropTypes.bool,
-  setReplytoTopicSubmission: PropTypes.func,
+  setReplyToTopicSubmission: PropTypes.func,
   setReplyToEntrySubmission: PropTypes.func,
 }
 
