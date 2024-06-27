@@ -8941,6 +8941,7 @@ hy:
           send_to_sms: "Ուղարկեք տեքստային հաղորդագրություններ %{phone_number}-ին"
         labels: 
           carrier: "Կապի օպերատոր"
+          otp_communication_channel_id: Հեռախոսահամար
           phone_number: Հեռախոսահամար
           remember_me: "Հիշել այս համակարգիչը"
           verification_code: "Ստուգման կոդ"
@@ -11126,6 +11127,7 @@ hy:
   move_to_front_7eae2e90: "Տեղափոխել սկիզբ"
   move_to_front_bf6f0194: "Տեղափոխել սկիզբ"
   moving_a4d552df: "Տեղափոխում է..."
+  multi_factor_authentication_1a6b3b3d: "Իսկության բազմաֆակտորային ստուգում"
   multi_factor_authentication_configured_865b1bde: "Բազմագործոնային իսկության ստուգումը կարգաբերված է"
   multiple_dates_e3a122f7: "Մի քանի ամսաթվեր"
   multiple_due_dates_6b0d75c6: "Կատարման մի քանի վերջնաժամկետ"
@@ -11891,6 +11893,7 @@ hy:
     video: Վիդեո
   please_add_at_least_one_non_blank_answer_213c2c8e: "Ավելացրեք առնվազն մեկ լրացված պատասխան"
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Խնդրում ենք ավելացնել առնվազն մեկ լրացված պատասխան յուրաքանչյուր փոփոխականի համար:"
+  please_enter_the_verification_code_shown_by_your_t_acc7c404: "Մուտքագրեք ձեր token-ում ցույց տրված հաստատման կոդը"
   please_enter_your_label_name_7745272d: "Մուտքագրեք ձեր  %{label_name}՝"
   please_enter_your_label_name_and_password_5c56be80: "Մուտքագրեք ձեր  %{label_name} և գաղտնաբառը՝"
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Տեղեկացրեք նրանց, որ էջն եք դիտում և որ հղումով անցաք այդտեղ:"
@@ -15645,6 +15648,7 @@ hy:
       none_to_update: "Թարմացման համար օբյեկտ չկա"
   shared_secret_892c88f2: "Ընդհանուր գաղտնի բանալի"
   shift_dates_746698a5: "Տեղափոխել ամսաթվերը"
+  should_be_10_digit_number_d30ef02d: "պետք է 10-նիշ թիվ լինի"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "պետք է ակնառու լինի, հաշվետու օգտատիրոջ Canvas ID"
   show_and_hide_courses_menu_9e09d1d0: "Ցույց տալ և թաքցնել դասընթացների մենյուն"
   show_by_date_e3967761: "Ցույց տալ ըստ ամսաթվերի"
@@ -17256,6 +17260,7 @@ hy:
   validate_links_in_content_b1630fba: "Հաստատել բովանդակության մեջ ներառված  հղումները"
   validation_error_3b943100: "Իսկության հաստատման սխալ"
   verification_code_5acd64ef: "Ստուգման կոդ"
+  verify_3dd8f159: "Ստուգել "
   version_5599c321: Տարբերակ
   video_b9f27375: Վիդեո
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Տեսաձայնագրության բովանդակությունը հնարավոր չէ տեսնել Ձեր կողմից ընտրված սարքի կամ հավելվածի միջոցով:"

@@ -7953,6 +7953,7 @@ el:
           send_to_sms: "Αποστολή μηνυμάτων κειμένου στον τηλεφωνικό αριθμό %{phone_number}"
         labels: 
           carrier: "Πάροχος Κινητής Τηλεφωνίας"
+          otp_communication_channel_id: "Αριθμός τηλεφώνου"
           phone_number: "Αριθμός τηλεφώνου"
           remember_me: "Απομνημόνευση αυτού του υπολογιστή"
           verification_code: "Κωδικός Επιβεβαίωσης"
