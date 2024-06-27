@@ -15192,6 +15192,7 @@ nn:
           send_to_sms: "Send tekstmeldingar til %{phone_number}"
         labels: 
           carrier: Operatør
+          otp_communication_channel_id: Telefonnummer
           phone_number: Telefonnummer
           remember_me: "Hugs denne datamaskina"
           verification_code: Stadfestingskode
@@ -17701,6 +17702,7 @@ nn:
   mp3_c21c0f5f: MP3
   mp4_5c789afc: MP4
   msg_680333e2: "%{msg}"
+  multi_factor_authentication_1a6b3b3d: "Godkjenning med fleire faktorar"
   multi_factor_authentication_backup_codes_4d781044: "Backup-kodar for fleirfaktorautentisering"
   multi_factor_authentication_configured_865b1bde: "Godkjenning med fleire faktorar"
   multi_select_gradebook_filters_95dbb4fc: "Vel fleire filter i vurderingsoversikta"
@@ -19402,6 +19404,7 @@ nn:
   please_enter_a_valid_url_e_g_https_example_com_87675bca: "Skriv inn ein gyldig URL (til dømes https://example.com)"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Skriv inn gyldig URL. Protokoll er nødvendig (f.eks. http://, https://, ftp://, tel:, mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "Skriv inn gyldig URL. Protokoll er nødvendig (f.eks. http://, https://, ftp://)."
+  please_enter_the_verification_code_shown_by_your_t_acc7c404: "Oppgi godkjenningskoden vist av token."
   please_enter_your_label_name_7745272d: "Oppgi %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Oppgi %{label_name} og passord:"
   please_fix_errors_before_continuing_b1c13e7d: "Vennligst rett feil før du fortsetter"
@@ -24288,6 +24291,7 @@ nn:
   shift_due_dates_and_assignment_availability_dates__c5ad272: "Flytt innleveringsfristar og oppgåvetilgjengelegheit fram eit antal dagar."
   short_name_42f454a1: "Kort namn"
   short_name_ad9bf84f: "kort namn"
+  should_be_10_digit_number_d30ef02d: "skal vere eit nummer med ti siffer"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "Må vere sjølvforklarande, Canvas-ID-en til rapporteringsbrukaren"
   should_not_have_gotten_here_2d75f28a: "Skulle ikkje ha kome hit"
   show_76c0ed1c: Vis
@@ -28391,6 +28395,7 @@ nn:
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite likskapsresultat – meir informasjon"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite likskapsresultat – sjå detaljrapport"
   verification_code_5acd64ef: Stadfestingskode
+  verify_3dd8f159: Stadfest
   verify_ldap_tls_certificates_70241d8e: "Verifiser LDAP TLS-sertifikat"
   verify_tls_certificate_9cfa26d1: "Verifiser TLS-sertifikat"
   version_5599c321: Versjon
