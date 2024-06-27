@@ -415,8 +415,8 @@ describe Lti::RegistrationsController do
     end
   end
 
-  describe "GET show" do
-    subject { get :show, params: { account_id: account.id, id: registration.id }, format: :json }
+  describe "GET show", type: :request do
+    subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}" }
 
     let_once(:account) { account_model }
     let_once(:admin) { account_admin_user(account:) }
@@ -466,7 +466,7 @@ describe Lti::RegistrationsController do
 
     context "for nonexistent registration" do
       it "returns 404" do
-        get :show, params: { account_id: account.id, id: registration.id + 1 }, format: :json
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id + 1}"
         expect(response).to be_not_found
       end
     end
@@ -494,8 +494,8 @@ describe Lti::RegistrationsController do
     end
   end
 
-  describe "PUT update" do
-    subject { put :update, params: { account_id: account.id, id: registration.id, admin_nickname: }, format: :json }
+  describe "PUT update", type: :request do
+    subject { put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}", params: { admin_nickname: } }
 
     let_once(:account) { account_model }
     let_once(:other_admin) { account_admin_user(account:) }
@@ -576,8 +576,8 @@ describe Lti::RegistrationsController do
     end
   end
 
-  describe "DELETE destroy" do
-    subject { delete :destroy, params: { account_id: account.id, id: registration.id }, format: :json }
+  describe "DELETE destroy", type: :request do
+    subject { delete "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}" }
 
     let_once(:account) { account_model }
     let_once(:admin) { account_admin_user(account:) }
@@ -652,8 +652,8 @@ describe Lti::RegistrationsController do
     end
   end
 
-  describe "POST bind" do
-    subject { post :bind, params: { account_id: account.id, id: registration.id, workflow_state: }, format: :json }
+  describe "POST bind", type: :request do
+    subject { post "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/bind", params: { workflow_state: } }
 
     let(:root_account) { account_model }
     let(:account) { root_account }
