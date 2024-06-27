@@ -587,6 +587,7 @@ module Lti::IMS
               "target_link_uri" => nil,
               "title" => "Example Tool",
               "tool_id" => nil,
+              "unified_tool_id" => nil,
               "url" => nil,
               "settings" => {
                 "course_navigation" => {
@@ -763,6 +764,18 @@ module Lti::IMS
 
       it "sets the lti_version" do
         expect(subject.lti_version).to eq "1.3"
+      end
+
+      context "when registration has unified_tool_id" do
+        let(:unified_tool_id) { "tool_id" }
+
+        before do
+          registration.unified_tool_id = unified_tool_id
+        end
+
+        it "sets the unified_tool_id" do
+          expect(subject.unified_tool_id).to eq unified_tool_id
+        end
       end
 
       context "placements" do

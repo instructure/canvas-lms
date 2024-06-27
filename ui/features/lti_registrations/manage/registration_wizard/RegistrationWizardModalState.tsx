@@ -33,6 +33,7 @@ export type RegistrationWizardModalState = {
   lti_version: '1p3' | '1p1'
   method: 'dynamic_registration' | 'manual' | 'json'
   dynamicRegistrationUrl: string
+  unifiedToolId: string
   /**
    * Controls whether the modal should close when the user
    * clicks "cancel" Should be true when the modal is
@@ -60,6 +61,7 @@ export const useRegistrationModalWizardState = create<
   progressMax: 100,
   method: 'dynamic_registration',
   dynamicRegistrationUrl: '',
+  unifiedToolId: '',
   registering: false,
   exitOnCancel: false,
   updateLtiVersion: version => set({lti_version: version}),
@@ -92,9 +94,11 @@ export const openRegistrationWizard = (
  * Opens the registration wizard with the dynamic registration URL
  * already populated and the registration flow started
  * @param dynamicRegistrationUrl The URL to use for dynamic registration
+ * @param unifiedToolId Correlates all installations of the same tool. Optional.
  */
 export const openDynamicRegistrationWizard = (
   dynamicRegistrationUrl: string,
+  unifiedToolId: string = '',
   onSuccessfulInstallation?: () => void
 ) => {
   openRegistrationWizard({
@@ -104,5 +108,6 @@ export const openDynamicRegistrationWizard = (
     registering: true,
     exitOnCancel: true,
     onSuccessfulInstallation,
+    unifiedToolId,
   })
 }

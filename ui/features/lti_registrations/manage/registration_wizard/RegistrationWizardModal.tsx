@@ -111,6 +111,7 @@ const ModalBodyWrapper = ({
       service={dynamicRegistrationWizardService}
       dynamicRegistrationUrl={state.dynamicRegistrationUrl}
       accountId={accountId}
+      unifiedToolId={state.unifiedToolId}
       unregister={state.unregister}
       onSuccessfulRegistration={() => {
         state.unregister()
