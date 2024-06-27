@@ -16,29 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
-import type {HelpLink} from '../../../../api.d'
+import type {HelpLink} from '../../../api.d'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 export default function helpLinksQuery(): Promise<HelpLink[]> {
   return new Promise((resolve, reject) => {
     const data: HelpLink[] = []
     const firstPageUrl = '/help_links'
 
-    function load(url: string) {
-      $.getJSON(
-        url,
-        (newData: HelpLink[], _: any, xhr: XMLHttpRequest) => {
-          data.push(...newData)
-          const link = parseLinkHeader(xhr)
-          if (link.next) {
-            load(link.next)
-          } else {
-            resolve(data)
-          }
-        },
-        reject
-      )
+    async function load(path: string) {
+      try {
+        const {json, link} = await doFetchApi<HelpLink[]>({path})
+        if (json) data.push(...json)
+        if (link?.next?.url) await load(link.next.url)
+        else resolve(data)
+      } catch (e) {
+        reject(e)
+      }
     }
     load(firstPageUrl)
   })

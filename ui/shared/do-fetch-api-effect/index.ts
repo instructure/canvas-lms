@@ -18,7 +18,7 @@
  */
 
 import getCookie from '@instructure/get-cookie'
-import parseLinkHeader from '@canvas/parse-link-header'
+import parseLinkHeader, {type Links} from '@canvas/parse-link-header'
 import {defaultFetchOptions} from '@canvas/util/xhr'
 import {toQueryString} from '@canvas/query-string-encoding'
 import type {QueryParameterRecord} from '@canvas/query-string-encoding'
@@ -53,7 +53,7 @@ export type DoFetchApiOpts = {
 export type DoFetchApiResults<T> = {
   json?: T
   response: Response
-  link?: parseLinkHeader.Links
+  link?: Links
 }
 
 // NOTE: we do NOT deep-merge customFetchOptions.headers, they should be passed

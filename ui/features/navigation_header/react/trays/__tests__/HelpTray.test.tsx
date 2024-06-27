@@ -20,6 +20,10 @@ import React from 'react'
 import {render as testingLibraryRender} from '@testing-library/react'
 import HelpTray from '../HelpTray'
 import {QueryProvider, queryClient} from '@canvas/query'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+
+// Mock the API call
+jest.mock('@canvas/do-fetch-api-effect')
 
 const render = (children: unknown) =>
   testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
@@ -52,6 +56,7 @@ describe('HelpTray', () => {
   beforeEach(() => {
     // @ts-expect-error
     window.ENV = {FEATURES: {featured_help_links: true}}
+    ;(doFetchApi as jest.Mock).mockResolvedValueOnce({response: {status: 200, ok: true}})
   })
 
   afterEach(() => {

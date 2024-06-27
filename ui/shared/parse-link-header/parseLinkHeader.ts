@@ -22,6 +22,14 @@ type LinkInfo = {
   [key: string]: string
 }
 
+type Links = {
+  first?: LinkInfo
+  prev?: LinkInfo
+  current?: LinkInfo
+  next?: LinkInfo
+  last?: LinkInfo
+}
+
 function parseQueryParams(linkUrl: string): {[key: string]: string} {
   const queryParams: {[key: string]: string} = {}
   const urlParts = linkUrl.split('?')
@@ -64,10 +72,26 @@ function hasRel(x: LinkInfo | null): x is LinkInfo {
   return x !== null && 'rel' in x
 }
 
-function intoRels(acc: {[rel: string]: LinkInfo}, x: LinkInfo): {[rel: string]: LinkInfo} {
+function intoRels(acc: Links, x: LinkInfo): Links {
   x.rel.split(/\s+/).forEach(rel => {
     const {...rest} = x
-    acc[rel] = rest
+    switch (rel) {
+      case 'first':
+        acc.first = rest
+        break
+      case 'prev':
+        acc.prev = rest
+        break
+      case 'current':
+        acc.current = rest
+        break
+      case 'next':
+        acc.next = rest
+        break
+      case 'last':
+        acc.last = rest
+        break
+    }
   })
 
   return acc
@@ -92,7 +116,7 @@ function checkHeader(linkHeader: string | undefined): boolean {
   return true
 }
 
-export default function parseLinkHeader(linkHeader: string): {[rel: string]: LinkInfo} | null {
+export default function parseLinkHeader(linkHeader: string): Links | null {
   if (!checkHeader(linkHeader)) return null
 
   return linkHeader
