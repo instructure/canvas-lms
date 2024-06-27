@@ -3402,7 +3402,7 @@ ga:
       page_title: Piarmheasúnaithe
       reviews_per_user: "%{count} athbhreithniú in aghaidh an úsáideora"
       submitted: "curtha isteach"
-      title: "%{assignment} Piarmheasúnú"
+      title: "%{assignment} Piarmheasúnaithe"
       titles: 
         automatically_assign_reviews: "Sann Athbhreithniú go huathoibríoch"
         remind: "Cuir i gcuimhne do %{assessor} faoi Tasc, a fógraíodh go deireanach %{time}"
