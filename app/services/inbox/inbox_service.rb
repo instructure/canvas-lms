@@ -49,8 +49,8 @@ module Inbox
         )
       end
 
-      def inbox_settings_ooo_snapshot(user_id:, root_account_id:)
-        Inbox::Repositories::InboxSettingsRepository.create_inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+      def inbox_settings_ooo_hash(user_id:, root_account_id:)
+        Inbox::Repositories::InboxSettingsRepository.create_inbox_settings_ooo_hash(user_id:, root_account_id:)
       end
 
       def users_out_of_office(user_ids:, root_account_id:, date:)
