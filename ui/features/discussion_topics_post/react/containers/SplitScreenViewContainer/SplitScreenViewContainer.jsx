@@ -169,7 +169,7 @@ export const SplitScreenViewContainer = props => {
     updateDiscussionEntryParticipant({
       variables: {
         discussionEntryId: discussionEntry._id,
-        rating: discussionEntry.entryParticipants?.rating ? 'not_liked' : 'liked',
+        rating: discussionEntry.entryParticipant?.rating ? 'not_liked' : 'liked',
       },
     })
   }
