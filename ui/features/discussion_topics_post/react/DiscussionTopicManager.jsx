@@ -19,6 +19,7 @@
 import {DISCUSSION_QUERY} from '../graphql/Queries'
 import {DiscussionTopicToolbarContainer} from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
 import {DiscussionTopicRepliesContainer} from './containers/DiscussionTopicRepliesContainer/DiscussionTopicRepliesContainer'
+import {DiscussionTopicHeaderContainer} from './containers/DiscussionTopicHeaderContainer/DiscussionTopicHeaderContainer'
 import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
@@ -370,6 +371,9 @@ const DiscussionTopicManager = props => {
                     padding="medium medium 0 small"
                     height={isModuleItem ? '85vh' : '90vh'}
                   >
+                    <DiscussionTopicHeaderContainer
+                      discussionTopicTitle={discussionTopicQuery.data.legacyNode.title}
+                    />
                     <DiscussionTopicToolbarContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}
                       setUserSplitScreenPreference={setUserSplitScreenPreference}
