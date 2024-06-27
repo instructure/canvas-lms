@@ -382,6 +382,30 @@ describe "threaded discussions" do
               expect(f("body")).to include_text("This is a reply to a 1st level reply that should not be lost.")
             end
           end
+
+          it "preserves edit content to discussion entry edit when network is interrupted" do
+            f("button[data-testid='expand-button']").click
+            wait_for_ajaximations
+            ff("button[data-testid='thread-actions-menu']").second.click
+            f("span[data-testid='edit']").click
+            wait_for_ajaximations
+            type_in_tiny("textarea", "This is an edit that should not be lost.")
+
+            # Simulate offline mode
+            turn_off_network
+
+            # Try to submit the reply
+            f("button[data-testid='DiscussionEdit-submit']").click
+
+            # Expect error to occur
+            expect(fj("div:contains('There was an unexpected error while updating the reply.')")).to be_present
+            # Expect RCE to still be open
+            expect(f("div[data-testid='DiscussionEdit-container']")).to be_present
+            # Expect the typed content to still be there
+            in_frame f(".tox-editor-container iframe")["id"] do
+              expect(f("body")).to include_text(@first_reply.message + "This is an edit that should not be lost.")
+            end
+          end
         end
 
         it "replies correctly to discussion topic" do
