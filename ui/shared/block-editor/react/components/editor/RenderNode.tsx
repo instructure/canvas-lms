@@ -165,58 +165,48 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   }, [dom, selected, hovered])
 
   const getToolbarPos = useCallback(
-    (domNode: HTMLElement | null) => {
-      const {top, left, height} = domNode
-        ? domNode.getBoundingClientRect()
-        : {top: 0, left: 0, height: 0}
-      const bottom = top + height
+    (domNode: HTMLElement | null, mountPoint: HTMLElement) => {
+      if (!domNode) return {top: 0, left: 0}
+
+      const nodeRect = domNode.getBoundingClientRect()
+      const ntop = nodeRect.top
+      const nleft = nodeRect.left
+
+      const refRect = mountPoint.getBoundingClientRect()
+      const ptop = refRect.top
+      const pleft = refRect.left
 
       // 5 is the offset of the hover/focus rings
       const offset = currentToolbarOrTagRef
         ? currentToolbarOrTagRef.getBoundingClientRect().height + 5
         : 0
+
       return {
-        top: `${top > 0 ? top - offset : bottom - offset}px`,
-        left: `${left}px`,
+        top: `${ntop - ptop - offset}px`,
+        left: `${nleft - pleft - 5}px`,
       }
     },
     [currentToolbarOrTagRef]
   )
+
   const getMenuPos = useCallback(
-    (domNode: HTMLElement | null) => {
-      const {top, left, bottom, width} = domNode
-        ? domNode.getBoundingClientRect()
-        : {top: 0, left: 0, bottom: 0, width: 0}
-      const offset = currentMenuRef ? width - currentMenuRef.getBoundingClientRect().width : 0
+    (domNode: HTMLElement | null, mountPoint: HTMLElement) => {
+      if (!domNode) return {top: 0, left: 0}
+
+      const nodeRect = domNode.getBoundingClientRect()
+      const refRect = mountPoint.getBoundingClientRect()
+
+      const top = nodeRect.top - refRect.top
+      const menuWidth = currentMenuRef ? currentMenuRef.getBoundingClientRect().width : 0
+      const left = nodeRect.left + nodeRect.width - refRect.left - menuWidth
+
       return {
-        top: `${top > 0 ? top : bottom}px`,
-        left: `${left + offset}px`,
+        top: `${top}px`,
+        left: `${left}px`,
       }
     },
     [currentMenuRef]
   )
-
-  const scroll = useCallback(() => {
-    if (currentMenuRef) {
-      const {top, left} = getMenuPos(dom)
-      currentMenuRef.style.top = top
-      currentMenuRef.style.left = left
-    }
-    if (currentToolbarOrTagRef) {
-      const {top, left} = getToolbarPos(dom)
-      currentToolbarOrTagRef.style.top = top
-      currentToolbarOrTagRef.style.left = left
-    }
-  }, [currentMenuRef, currentToolbarOrTagRef, dom, getMenuPos, getToolbarPos])
-
-  useEffect(() => {
-    const scrollingContainer = getScrollParent()
-    scrollingContainer.addEventListener('scroll', scroll)
-
-    return () => {
-      scrollingContainer.removeEventListener('scroll', scroll)
-    }
-  }, [dom, scroll])
 
   // TODO: maybe setState the upnode so we know whether to show the up button or not
   const handleGoUp = useCallback(
@@ -246,8 +236,8 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
         ref={(el: HTMLDivElement) => setCurrentToolbarOrTagRef(el)}
         className="block-toolbar"
         style={{
-          left: getToolbarPos(dom).left,
-          top: getToolbarPos(dom).top,
+          left: getToolbarPos(dom, mountPoint).left,
+          top: getToolbarPos(dom, mountPoint).top,
         }}
       >
         <View as="div" background="brand" padding="0 xx-small" borderRadius="small">
@@ -305,23 +295,23 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   }
 
   const renderSectionMenu = () => {
-    const mountPoint = document.querySelector('.block-editor-editor')
+    const mountPoint = document.querySelector('.block-editor-editor') as HTMLElement | null
     if (!mountPoint) return null
-    return node.related?.sectionMenu
-      ? ReactDOM.createPortal(
-          <div
-            ref={(el: HTMLDivElement) => setCurrentMenuRef(el)}
-            className="block-menu"
-            style={{
-              left: getMenuPos(dom).left,
-              top: getMenuPos(dom).top,
-            }}
-          >
-            {React.createElement(node.related.sectionMenu)}
-          </div>,
-          mountPoint
-        )
-      : null
+    if (node.related?.sectionMenu) {
+      const {left, top} = getMenuPos(dom, mountPoint)
+
+      return ReactDOM.createPortal(
+        <div
+          ref={(el: HTMLDivElement) => setCurrentMenuRef(el)}
+          className="section-menu"
+          style={{left, top}}
+        >
+          {React.createElement(node.related.sectionMenu)}
+        </div>,
+        mountPoint
+      )
+    }
+    return null
   }
 
   const renderHoverTag = () => {
@@ -333,17 +323,15 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     const isMySectionSelected = RenderNode.globals.selectedSectionId === parentSection.id
     if (!isMySectionSelected) return null
 
-    const mountPoint = document.querySelector('.block-editor-editor')
+    const mountPoint = document.querySelector('.block-editor-editor') as HTMLElement | null
     if (!mountPoint) return null
 
+    const {left, top} = getToolbarPos(dom, mountPoint)
     return ReactDOM.createPortal(
       <div
         ref={(el: HTMLDivElement) => setCurrentToolbarOrTagRef(el)}
         className="block-tag"
-        style={{
-          left: getToolbarPos(dom).left,
-          top: getToolbarPos(dom).top,
-        }}
+        style={{left, top}}
       >
         <View as="div" background="secondary" padding="0 xx-small" borderRadius="small">
           <Text size="small">{name}</Text>

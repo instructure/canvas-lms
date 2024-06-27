@@ -26,16 +26,9 @@ import {
   addNewNodeAsNextSibling,
   deleteNodeAndSelectPrevSibling,
   removeLastParagraphTag,
-  black,
 } from '../../../../utils'
 import {TextBlockToolbar} from './TextBlockToolbar'
-
-type TextBlockProps = {
-  text?: string
-  fontSize?: string
-  textAlign?: string
-  color?: string
-}
+import {type TextBlockProps} from './common'
 
 export const TextBlock = ({
   text = '',

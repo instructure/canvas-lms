@@ -61,7 +61,7 @@ export const HeroSection = ({background}: HeroSectionProps) => {
           id={`${cid}_image`}
           is={ImageBlock}
           constraint="contain"
-          src="/images/block_editor/default_hero_image.png"
+          src="/images/block_editor/default_hero_image.svg"
         />
       </Element>
     </Container>

@@ -64,7 +64,7 @@ export const AboutSection = ({background}: AboutSectionProps) => {
           id={`${cid}_image`}
           is={ImageBlock}
           constraint="contain"
-          src="/images/block_editor/default_about_image.png"
+          src="/images/block_editor/default_about_image.svg"
         />
       </Element>
       <Element
