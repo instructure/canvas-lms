@@ -4,6 +4,12 @@
   <div class="sticky-toolbar-with-right-side" data-sticky>
     <div class="header-bar">
       <div class="header-bar-right">
+        {{#if block_editor}}
+          <label class="checkbox" for="toggle_block_editor" style="margin-inline-end: 4px;">
+            <input type="checkbox" value="1" id="toggle_block_editor" aria-label="toggle block editor" checked>
+            {{#t}}Use block Editor{{/t}}
+          </label>
+        {{/if}}
         {{#if CAN.DELETE}}
           <button class="btn delete_pages" tabindex="0" aria-label="{{#t}}Delete selected pages{{/t}}" disabled>
             <i class="icon-trash" role="presentation"></i>

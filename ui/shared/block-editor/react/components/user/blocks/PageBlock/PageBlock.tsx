@@ -75,7 +75,7 @@ export const PageBlock = ({children}: PageBlockProps) => {
   return (
     <div
       className={clazz}
-      data-placeholder="Drop a section here"
+      data-placeholder="Add a section to start your page"
       ref={el => el && connect(el)}
       onPaste={handlePaste}
     >

@@ -16,27 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {type Node} from '@craftjs/core'
-
-export function getNodeIndex(node: Node, query: any) {
-  const parentId = node.data.parent || 'ROOT'
-  const siblings = query.node(parentId).descendants()
-  const myIndex = siblings.indexOf(node.id)
-  return myIndex
-}
-
-export type SectionLocation = 'top' | 'bottom' | 'middle' | 'alone'
-export function getSectionLocation(node: Node, query: any): SectionLocation {
-  const sections = query.node('ROOT').descendants()
-  if (sections.length === 1) {
-    return 'alone'
-  }
-  const index = getNodeIndex(node, query)
-  if (index === 0) {
-    return 'top'
-  }
-  if (index === sections.length - 1) {
-    return 'bottom'
-  }
-  return 'middle'
+export type TextBlockProps = {
+  text?: string
+  fontSize?: string
+  textAlign?: string
+  color?: string
 }

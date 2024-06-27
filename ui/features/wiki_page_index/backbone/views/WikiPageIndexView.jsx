@@ -48,6 +48,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         'click .header-row a[data-sort-field]': 'sort',
         'click .header-bar-right .menu_tool_link': 'openExternalTool',
         'click .pages-mobile-header a[data-sort-mobile-field]': 'sortBySelect',
+        'click #toggle_block_editor': 'toggleBlockEditor',
       },
 
       els: {
@@ -187,6 +188,10 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     if (this.lastFocusField) {
       $(`[data-sort-field='${this.lastFocusField}']`).focus()
     }
+  }
+
+  toggleBlockEditor(ev) {
+    ENV.BLOCK_EDITOR = ev.target.checked
   }
 
   confirmDeletePages(ev) {
@@ -384,6 +389,8 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     json.collectionHasTodoDate = this.collectionHasTodoDate()
     json.hasWikiIndexPlacements = this.wikiIndexPlacements.length > 0
     json.wikiIndexPlacements = this.wikiIndexPlacements
+
+    json.block_editor = ENV.BLOCK_EDITOR
     return json
   }
 }
