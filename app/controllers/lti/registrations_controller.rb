@@ -469,8 +469,8 @@ class Lti::RegistrationsController < ApplicationController
   #   The field to sort by. Choices are: name, nickname, lti_version, installed,
   #   installed_by, updated_by, and on. Defaults to installed.
   #
-  # @argument dir [String, "asc"|"dsc"]
-  #   The order to sort the given column by. Defaults to dsc.
+  # @argument dir [String, "asc"|"desc"]
+  #   The order to sort the given column by. Defaults to desc.
   #
   # @returns {"total": "integer", data: [Lti::Registration] }
   #
@@ -675,7 +675,7 @@ class Lti::RegistrationsController < ApplicationController
   def validate_list_params
     # Calling to_i on a non-number returns 0. This does mean we'll accept something like 10.5, though
     render_error("invalid_page", "page param should be an integer") unless params[:page].nil? || params[:page].to_i > 0
-    render_error("invalid_dir", "dir param should be asc, dsc, or empty") unless ["asc", "dsc", nil].include?(params[:dir])
+    render_error("invalid_dir", "dir param should be asc, desc, or empty") unless ["asc", "desc", nil].include?(params[:dir])
 
     valid_sort_fields = %w[name nickname lti_version installed installed_by updated_by on]
     render_error("invalid_sort", "#{params[:sort]} is not a valid field for sorting") unless [*valid_sort_fields, nil].include?(params[:sort])
