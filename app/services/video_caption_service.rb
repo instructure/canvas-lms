@@ -98,7 +98,7 @@ class VideoCaptionService < ApplicationService
   end
 
   def caption_request_url
-    "#{notorious_host}/api/media/#{@media_id}/captions?provider=whisper"
+    "#{notorious_host}/api/media/#{@media_id}/captions"
   end
 
   def media_url
@@ -106,7 +106,7 @@ class VideoCaptionService < ApplicationService
   end
 
   def caption_collect_url(srclang)
-    "#{notorious_host}/api/media/#{@media_id}/captions/#{srclang}?provider=whisper"
+    "#{notorious_host}/api/media/#{@media_id}/captions/#{srclang}"
   end
 
   def notorious_host
@@ -161,7 +161,7 @@ class VideoCaptionService < ApplicationService
   def poll_caption_request(attempts = 1)
     response = request_caption
     if (200..299).cover?(response.code)
-      PollCaptionsReadyJob.delay.perform(self)
+      delay.poll_captions_ready
     elsif attempts < 10
       delay.poll_caption_request(attempts + 1)
     else
