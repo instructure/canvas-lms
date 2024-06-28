@@ -123,7 +123,7 @@ module Lti
     # app/controllers/lti/ims/authentication_controller.rb
     def generate_post_payload_for_student_context_card(student_id:)
       @opts[:student_id] = student_id
-      login_request(resource_link_request.generate_post_payload)
+      login_request(resource_link_request.to_cached_hash)
     end
 
     # Generates a login request pointing to a general-use
@@ -170,12 +170,12 @@ module Lti
     def generate_lti_params
       if resource_type&.to_sym == :course_assignments_menu &&
          !@context.root_account.feature_enabled?(:lti_multiple_assignment_deep_linking)
-        return resource_link_request.generate_post_payload
+        return resource_link_request.to_cached_hash
       end
 
       if resource_type&.to_sym == :module_index_menu_modal &&
          !@context.root_account.feature_enabled?(:lti_deep_linking_module_index_menu_modal)
-        return resource_link_request.generate_post_payload
+        return resource_link_request.to_cached_hash
       end
 
       message_type = @tool.extension_setting(resource_type, :message_type)
@@ -186,9 +186,9 @@ module Lti
         raise e
       end
       if message_type == LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE
-        deep_linking_request.generate_post_payload
+        deep_linking_request.to_cached_hash
       else
-        resource_link_request.generate_post_payload
+        resource_link_request.to_cached_hash
       end
     end
 

@@ -44,12 +44,12 @@ module Lti::Messages
 
     def generate_post_payload_for_assignment(assignment, _outcome_service_url, _legacy_outcome_service_url, _lti_turnitin_outcomes_placement_url)
       @assignment = assignment
-      generate_post_payload
+      to_cached_hash
     end
 
     def generate_post_payload_for_homework_submission(assignment)
       @assignment = assignment
-      generate_post_payload
+      to_cached_hash
     end
 
     private

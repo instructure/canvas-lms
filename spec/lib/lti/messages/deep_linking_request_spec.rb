@@ -35,7 +35,7 @@ describe Lti::Messages::DeepLinkingRequest do
     )
   end
 
-  let(:jws) { jwt_message.generate_post_payload }
+  let(:jws) { jwt_message.to_cached_hash }
 
   it_behaves_like "lti 1.3 message initialization"
 

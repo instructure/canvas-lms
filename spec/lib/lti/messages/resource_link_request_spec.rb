@@ -33,7 +33,7 @@ describe Lti::Messages::ResourceLinkRequest do
   end
 
   describe "#initialize" do
-    let(:jws) { jwt_message.generate_post_payload }
+    let(:jws) { jwt_message.to_cached_hash }
 
     it "sets the resource link id" do
       expect_course_resource_link_id(jws[:post_payload])
@@ -119,7 +119,7 @@ describe Lti::Messages::ResourceLinkRequest do
   shared_examples "assignment resource link id check" do
     let(:launch_error) { Lti::IMS::AdvantageErrors::InvalidLaunchError }
     let(:api_message) { raise "set in example" }
-    let(:course_jws) { jwt_message.generate_post_payload }
+    let(:course_jws) { jwt_message.to_cached_hash }
 
     shared_examples "launch error check" do
       it "raises launch error" do
@@ -298,7 +298,7 @@ describe Lti::Messages::ResourceLinkRequest do
           t
         end
 
-        context "but the tool is associated with the assignment (i.e. an upgrade or reinstallation occured)" do
+        context "but the tool is associated with the assignment (i.e. an upgrade or reinstallation occurred)" do
           before do
             assignment.line_items
                       .find(&:assignment_line_item?)

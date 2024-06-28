@@ -38,7 +38,7 @@ describe Lti::Messages::JwtMessage do
   end
   let(:nonce) { SecureRandom.uuid }
   let(:post_payload) do
-    jwt_message.generate_post_payload.to_json
+    jwt_message.to_cached_hash.to_json
   end
   let(:decoded_jwt) do
     jws = Lti::Messages::JwtMessage.generate_id_token(Lti::Messages::JwtMessage.cached_hash_to_launch(JSON.parse(post_payload), nonce))
@@ -91,7 +91,7 @@ describe Lti::Messages::JwtMessage do
 
   describe "signing" do
     it "signs the id token with the current canvas private key" do
-      jws = Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
+      jws = Lti::Messages::JwtMessage.generate_id_token(jwt_message.to_cached_hash)
 
       expect do
         JSON::JWT.decode(jws[:id_token], pub_key)
@@ -128,7 +128,7 @@ describe Lti::Messages::JwtMessage do
 
     it 'sets the "nonce" claim to a unique ID' do
       first_nonce = decoded_jwt["nonce"]
-      jws = Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
+      jws = Lti::Messages::JwtMessage.generate_id_token(jwt_message.to_cached_hash)
       second_nonce = JSON::JWT.decode(jws[:id_token], pub_key)["nonce"]
 
       expect(first_nonce).not_to eq second_nonce
@@ -707,12 +707,12 @@ describe Lti::Messages::JwtMessage do
     end
 
     it "adds placement-specific custom parameters" do
-      Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
+      Lti::Messages::JwtMessage.generate_id_token(jwt_message.to_cached_hash)
       expect(message_custom["no_expansion"]).to eq "foo"
     end
 
     it "expands variable expansions" do
-      Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
+      Lti::Messages::JwtMessage.generate_id_token(jwt_message.to_cached_hash)
       expect(message_custom["has_expansion"]).to eq user.id.to_s
     end
 
@@ -800,7 +800,7 @@ describe Lti::Messages::JwtMessage do
       expect(decoded_jwt.dig("https://purl.imsglobal.org/spec/lti/claim/lis", "person_sourcedid")).to eq "$Person.sourcedId"
     end
 
-    it "adds the coures offering sourcedid" do
+    it "adds the courses offering sourcedid" do
       course.update!(sis_source_id: SecureRandom.uuid)
       expect(decoded_jwt.dig("https://purl.imsglobal.org/spec/lti/claim/lis", "course_offering_sourcedid")).to eq course.sis_source_id
     end
@@ -892,7 +892,7 @@ describe Lti::Messages::JwtMessage do
       end
 
       let(:account_jwt) do
-        jws = Lti::Messages::JwtMessage.generate_id_token(account_jwt_message.generate_post_payload)
+        jws = Lti::Messages::JwtMessage.generate_id_token(account_jwt_message.to_cached_hash)
         JSON::JWT.decode(jws[:id_token], pub_key)
       end
     end

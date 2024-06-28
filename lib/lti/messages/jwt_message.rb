@@ -81,7 +81,7 @@ module Lti::Messages
       @message
     end
 
-    def generate_post_payload
+    def to_cached_hash
       post_payload = generate_post_payload_message.to_h
       assoc_tool_data = {
         shared_secret: associated_1_1_tool&.shared_secret,
@@ -154,7 +154,7 @@ module Lti::Messages
 
     def add_i18n_claims!
       # Repeated as @message.launch_presentation.locale above. Separated b/c often want one or the other but not both,
-      # e.g. NRPS v2 only wants this one and none of the launch_presention fields.
+      # e.g. NRPS v2 only wants this one and none of the launch_presentation fields.
       @message.locale = I18n.locale || I18n.default_locale.to_s
     end
 
