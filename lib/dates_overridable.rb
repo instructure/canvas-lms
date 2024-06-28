@@ -88,7 +88,9 @@ module DatesOverridable
   end
 
   def context_module_overrides
-    AssignmentOverride.active.where(context_module_id: assignment_context_modules.select(:id))
+    # plucking module IDs is important else we'll end up with a query with several nested subqueries
+    # that runs a full scan
+    AssignmentOverride.active.where(context_module_id: assignment_context_modules.pluck(:id))
   end
 
   def visible_to_everyone
