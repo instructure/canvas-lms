@@ -24,6 +24,7 @@ import {ImageBlock} from '../../blocks/ImageBlock'
 import {NoSections} from '../../common'
 import {useClassNames, getContrastingColor} from '../../../../utils'
 import {SectionMenu} from '../../../editor/SectionMenu'
+import {SectionToolbar} from '../../common/SectionToolbar'
 
 type HeroSectionProps = {
   background?: string
@@ -52,26 +53,15 @@ export const HeroSection = ({background}: HeroSectionProps) => {
   // what's already there.
   return (
     <Container className={clazz} background={backgroundColor}>
-      <Element
-        id={`${cid}_nosection1`}
-        is={NoSections}
-        canvas={true}
-        className="hero-section__inner-start"
-      >
-        <Element id={`${cid}_text`} is={HeroTextHalf} canvas={true} color={textColor} />
+      <Element id={`${cid}_nosection1`} is={NoSections} className="hero-section__inner-start">
+        <Element id={`${cid}_text`} is={HeroTextHalf} color={textColor} />
       </Element>
-      <Element
-        id={`${cid}_nosection2`}
-        is={NoSections}
-        canvas={true}
-        className="hero-section__inner-end"
-      >
+      <Element id={`${cid}_nosection2`} is={NoSections} className="hero-section__inner-end">
         <Element
           id={`${cid}_image`}
           is={ImageBlock}
-          canvas={true}
           constraint="contain"
-          src="/images/block_editor/default_hero_image.png"
+          src="/images/block_editor/default_hero_image.svg"
         />
       </Element>
     </Container>
@@ -88,5 +78,6 @@ HeroSection.craft = {
   },
   related: {
     sectionMenu: SectionMenu,
+    toolbar: SectionToolbar,
   },
 }

@@ -16,15 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {useEditor, type Node} from '@craftjs/core'
 import {Menu} from '@instructure/ui-menu'
-import {getCloneTree, scrollIntoViewWithCallback} from '../../utils'
+import {
+  getCloneTree,
+  scrollIntoViewWithCallback,
+  getScrollParent,
+  getSectionLocation,
+  type SectionLocation,
+} from '../../utils'
 
 function triggerScrollEvent() {
-  const scroller = document.getElementById('drawer-layout-content') || document
+  const scrollingContainer = getScrollParent()
   const scrollEvent = new Event('scroll')
-  scroller.dispatchEvent(scrollEvent)
+  scrollingContainer.dispatchEvent(scrollEvent)
 }
 
 type SectionMenuProps = {
@@ -47,9 +53,23 @@ const SectionMenu = ({
       selected: qry.node(currentNodeId),
     }
   })
+  const [sectionLocation, setSectionLocation] = useState<SectionLocation>(() => {
+    if (selected.get()) {
+      return getSectionLocation(selected.get(), query)
+    }
+    return 'middle'
+  })
+
+  useEffect(() => {
+    if (selected.get()) {
+      setSectionLocation(getSectionLocation(selected.get(), query))
+    }
+  }, [selected, query])
 
   const handleEditSection = useCallback(() => {
-    onEditSection(selected.get())
+    if (onEditSection) {
+      onEditSection(selected.get())
+    }
   }, [onEditSection, selected])
 
   const handleDuplicateSection = useCallback(() => {
@@ -118,17 +138,29 @@ const SectionMenu = ({
   const handleRemove = useCallback(() => {
     if (onRemove) {
       onRemove(selected.get())
-    } else {
-      actions.delete(selected.get().id)
+    } else if (selected.get()?.id) {
+      window.setTimeout(() => {
+        actions.delete(selected.get().id)
+      }, 0)
     }
   }, [actions, onRemove, selected])
 
   return (
     <Menu show={true} onToggle={() => {}}>
       {onEditSection ? <Menu.Item onSelect={handleEditSection}>EditSection</Menu.Item> : null}
-      <Menu.Item onSelect={handleDuplicateSection}>Duplicate</Menu.Item>
-      <Menu.Item onSelect={handleMoveUp}>Move Up</Menu.Item>
-      <Menu.Item onSelect={handleMoveDown}>Move Down</Menu.Item>
+      {/* <Menu.Item onSelect={handleDuplicateSection}>Duplicate</Menu.Item> */}
+      <Menu.Item
+        onSelect={handleMoveUp}
+        disabled={sectionLocation === 'top' || sectionLocation === 'alone'}
+      >
+        Move Up
+      </Menu.Item>
+      <Menu.Item
+        onSelect={handleMoveDown}
+        disabled={sectionLocation === 'bottom' || sectionLocation === 'alone'}
+      >
+        Move Down
+      </Menu.Item>
       <Menu.Item onSelect={handleRemove} disabled={!selected.isDeletable()}>
         Remove
       </Menu.Item>

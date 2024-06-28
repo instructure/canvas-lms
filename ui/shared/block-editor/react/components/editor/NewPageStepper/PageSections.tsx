@@ -103,7 +103,6 @@ const PageSections = ({selectedSections, onSelectSections}: PageSectionsProps) =
               value="announcement"
               checked={selectedSections.includes('announcement')}
               onChange={handleChangeSelections}
-              disabled={true}
             />
             <Checkbox
               label="Discussion topic"

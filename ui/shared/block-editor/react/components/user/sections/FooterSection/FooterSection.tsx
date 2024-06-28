@@ -35,7 +35,7 @@ const FooterSection = ({background}: FooterSectionProps) => {
     enabled: state.options.enabled,
   }))
   const [cid] = useState<string>('hero-section')
-  const clazz = useClassNames(enabled, {empty: false}, ['footer-section'])
+  const clazz = useClassNames(enabled, {empty: false}, ['section, footer-section'])
 
   const backgroundColor = background || FooterSection.craft.defaultProps.background
   const textColor = getContrastingColor(backgroundColor)
@@ -52,7 +52,6 @@ const FooterSection = ({background}: FooterSectionProps) => {
         <Element
           id={`${cid}__footer-canvas-icon`}
           is={ImageBlock}
-          canvas={true}
           src="/images/block_editor/canvas_logo_white.svg"
           width={113}
           height={28}
@@ -60,7 +59,6 @@ const FooterSection = ({background}: FooterSectionProps) => {
         <Element
           id={`${cid}__footer-canvas-to-top`}
           is={ButtonBlock}
-          canvas={true}
           text="Back to top"
           variant="condensed"
           color={buttonColor}

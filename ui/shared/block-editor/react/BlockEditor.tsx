@@ -26,6 +26,7 @@ import {Topbar} from './components/editor/Topbar'
 import {blocks} from './components/blocks'
 import {NewPageStepper} from './components/editor/NewPageStepper'
 import {RenderNode} from './components/editor/RenderNode'
+import {ErrorBoundary} from './components/editor/ErrorBoundary'
 
 import './style.css'
 
@@ -48,13 +49,21 @@ const DEFAULT_CONTENT = JSON.stringify({
 
 type BlockEditorProps = {
   enabled?: boolean
+  container: HTMLElement // the element that will shrink when drawers open
   version: string
   content: string
+  onCancel: () => void
 }
 
-export default function BlockEditor({enabled = true, version, content}: BlockEditorProps) {
+export default function BlockEditor({
+  enabled = true,
+  container,
+  version,
+  content,
+  onCancel,
+}: BlockEditorProps) {
   const [json] = useState(content || DEFAULT_CONTENT)
-  const [toolboxOpen, setToolboxOpen] = useState(true)
+  const [toolboxOpen, setToolboxOpen] = useState(false)
   const [stepperOpen, setStepperOpen] = useState(!content)
 
   useEffect(() => {
@@ -65,9 +74,9 @@ export default function BlockEditor({enabled = true, version, content}: BlockEdi
   }, [json, version])
 
   const handleNodesChange = useCallback(query => {
+    // @ts-expect-error
     window.block_editor = query
-    // const json = query.serialize()
-    // console.log(JSON.parse(json))
+    // console.log(JSON.parse(query.serialize()))
   }, [])
 
   const handleCloseToolbox = useCallback(() => {
@@ -80,7 +89,13 @@ export default function BlockEditor({enabled = true, version, content}: BlockEdi
 
   const handleCloseStepper = useCallback(() => {
     setStepperOpen(false)
+    setToolboxOpen(true)
   }, [])
+
+  const handleCancelStepper = useCallback(() => {
+    setStepperOpen(false)
+    onCancel()
+  }, [onCancel])
 
   return (
     <View
@@ -94,24 +109,36 @@ export default function BlockEditor({enabled = true, version, content}: BlockEdi
       shadow="above"
       borderRadius="large large none none"
     >
-      <Editor
-        enabled={enabled}
-        resolver={blocks}
-        onNodesChange={handleNodesChange}
-        onRender={RenderNode}
-      >
-        <Flex direction="column" alignItems="stretch" justifyItems="start" gap="small" width="100%">
-          <Flex.Item shouldGrow={false}>
-            <Topbar onToolboxChange={handleOpenToolbox} toolboxOpen={toolboxOpen} />
-          </Flex.Item>
-          <Flex.Item id="editor-area" shouldGrow={true}>
-            <Frame data={json} />
-          </Flex.Item>
-        </Flex>
+      <ErrorBoundary>
+        <Editor
+          enabled={enabled}
+          resolver={blocks}
+          onNodesChange={handleNodesChange}
+          onRender={RenderNode}
+        >
+          <Flex
+            direction="column"
+            alignItems="stretch"
+            justifyItems="start"
+            gap="small"
+            width="100%"
+          >
+            <div style={{position: 'sticky', top: 0, zIndex: 9999}}>
+              <Topbar onToolboxChange={handleOpenToolbox} toolboxOpen={toolboxOpen} />
+            </div>
+            <Flex.Item id="editor-area" shouldGrow={true}>
+              <Frame data={json} />
+            </Flex.Item>
+          </Flex>
 
-        <Toolbox open={toolboxOpen} onClose={handleCloseToolbox} />
-        <NewPageStepper open={stepperOpen} onDismiss={handleCloseStepper} />
-      </Editor>
+          <Toolbox open={toolboxOpen} container={container} onClose={handleCloseToolbox} />
+          <NewPageStepper
+            open={stepperOpen}
+            onFinish={handleCloseStepper}
+            onCancel={handleCancelStepper}
+          />
+        </Editor>
+      </ErrorBoundary>
     </View>
   )
 }

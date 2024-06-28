@@ -29,6 +29,7 @@ import {TrueFalseQuestion} from './questions/TrueFalseQuestion'
 import {MatchingQuestion} from './questions/MatchingQuestion'
 import {quizQuestions} from '../../../../assets/data/quizQuestions'
 import {IconQuizSolid} from '@instructure/ui-icons'
+import {useClassNames} from '../../../../utils'
 import {QuizSectionMenu} from './QuizSectionMenu'
 import {QuizModal} from './QuizModal'
 
@@ -40,7 +41,7 @@ type QuizSectionProps = {
 }
 
 const QuizSection = ({questionId}: QuizSectionProps) => {
-  const {actions, query, enabled} = useEditor(state => {
+  const {enabled} = useEditor(state => {
     return {
       enabled: state.options.enabled,
     }
@@ -56,6 +57,7 @@ const QuizSection = ({questionId}: QuizSectionProps) => {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [showResult, setShowResult] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
+  const clazz = useClassNames(enabled, {empty: false}, ['section', 'quiz-section'])
 
   useEffect(() => {
     const q = quizQuestions.entries.find((entry: any) => entry.id === questionId)
@@ -102,7 +104,7 @@ const QuizSection = ({questionId}: QuizSectionProps) => {
       }
     } else {
       return (
-        <div className="queston-block__empty">
+        <div className="quiz-section__empty">
           {enabled ? (
             <Button onClick={showModal} color="primary">
               Select a question
@@ -117,7 +119,7 @@ const QuizSection = ({questionId}: QuizSectionProps) => {
 
   return (
     <div
-      className="question-block"
+      className={clazz}
       ref={ref => {
         ref && connect(drag(ref))
       }}

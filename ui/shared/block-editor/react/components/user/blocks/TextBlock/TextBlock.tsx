@@ -26,22 +26,15 @@ import {
   addNewNodeAsNextSibling,
   deleteNodeAndSelectPrevSibling,
   removeLastParagraphTag,
-  black,
 } from '../../../../utils'
 import {TextBlockToolbar} from './TextBlockToolbar'
-
-type TextBlockProps = {
-  text?: string
-  fontSize?: number
-  textAlign?: string
-  color?: string
-}
+import {type TextBlockProps} from './common'
 
 export const TextBlock = ({
   text = '',
-  fontSize,
-  textAlign = 'start',
-  color = black,
+  fontSize = TextBlock.craft.defaultProps.fontSize,
+  textAlign = TextBlock.craft.defaultProps.textAlign,
+  color = TextBlock.craft.defaultProps.color,
 }: TextBlockProps) => {
   const {actions, enabled, query} = useEditor(state => ({
     enabled: state.options.enabled,
@@ -124,7 +117,7 @@ export const TextBlock = ({
           onChange={handleChange}
           onKeyUp={handleKey}
           tagName="div"
-          style={{fontSize: `${fontSize}px`, textAlign, color}}
+          style={{fontSize, textAlign, color}}
         />
       </div>
     )
@@ -132,7 +125,7 @@ export const TextBlock = ({
     return (
       <div
         className={clazz}
-        style={{fontSize: `${fontSize}px`, textAlign, color}}
+        style={{fontSize, textAlign, color}}
         dangerouslySetInnerHTML={{__html: text}}
       />
     )
@@ -141,6 +134,11 @@ export const TextBlock = ({
 
 TextBlock.craft = {
   displayName: 'Text',
+  defaultProps: {
+    fontSize: '12pt',
+    textAlign: 'start',
+    color: 'var(--ic-brand-font-color-dark)',
+  },
   related: {
     toolbar: TextBlockToolbar,
   },

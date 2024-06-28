@@ -17,11 +17,11 @@
  */
 // components/Toolbox.js
 import React, {useCallback, useEffect, useState} from 'react'
-import {Element, useEditor} from '@craftjs/core'
+import {useEditor} from '@craftjs/core'
 
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {Tabs} from '@instructure/ui-tabs'
+import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Tray} from '@instructure/ui-tray'
 import {View, type ViewOwnProps} from '@instructure/ui-view'
@@ -34,58 +34,51 @@ import {HeadingBlock, HeadingBlockIcon} from '../user/blocks/HeadingBlock'
 import {ResourceCard, ResourceCardIcon} from '../user/blocks/ResourceCard'
 import {ImageBlock, ImageBlockIcon} from '../user/blocks/ImageBlock'
 import {IconBlock, IconBlockIcon} from '../user/blocks/IconBlock'
-import {IframeBlock, IframeBlockIcon} from '../user/blocks/IframeBlock'
 import {RCEBlock, RCEBlockIcon} from '../user/blocks/RCEBlock'
-
-import {ResourcesSection, ResourcesSectionIcon} from '../user/sections/ResourcesSection'
-import {ColumnsSection, ColumnsSectionIcon} from '../user/sections/ColumnsSection'
-import {HeroSection} from '../user/sections/HeroSection'
-import {NavigationSection, NavigationSectionIcon} from '../user/sections/NavigationSection'
-import {AboutSection, AboutSectionIcon} from '../user/sections/AboutSection'
-import {QuizSection, QuizSectionIcon} from '../user/sections/QuizSection'
-import {FooterSection, FooterSectionIcon} from '../user/sections/FooterSection'
-import {BlankSection, BlankSectionIcon} from '../user/sections/BlankSection'
-
-import {getTrayHeight} from '../../utils'
 
 type ToolboxProps = {
   open: boolean
+  container: HTMLElement
   onClose: () => void
 }
 
-export const Toolbox = ({open, onClose}: ToolboxProps) => {
+export const Toolbox = ({open, container, onClose}: ToolboxProps) => {
   const {connectors} = useEditor()
   const [activeTab, setActiveTab] = useState(1)
   const [trayRef, setTrayRef] = useState<HTMLElement | null>(null)
+  const [containerStyle] = useState<Partial<CSSStyleDeclaration>>(() => {
+    if (container) {
+      return {
+        width: container.style.width,
+        boxSizing: container.style.boxSizing,
+        transition: container.style.transition,
+      } as Partial<CSSStyleDeclaration>
+    }
+    return {}
+  })
 
   useEffect(() => {
-    // if (!hasOpened) return
+    const shrinking_selector = '#content' // '.block-editor-editor'
 
     if (open && trayRef) {
-      const ed = document.querySelector('.block-editor-editor') as HTMLElement | null
-      if (!ed) return
+      const ed = document.querySelector(shrinking_selector) as HTMLElement | null
 
+      if (!ed) return
+      const edstyle = window.getComputedStyle(ed)
       const ed_rect = ed.getBoundingClientRect()
+      const padding = parseInt(edstyle.paddingRight, 10)
       const tray_left = window.innerWidth - trayRef.offsetWidth
       if (ed_rect.right > tray_left) {
-        ed.style.width = `${ed_rect.width - (ed_rect.right - tray_left)}px`
+        ed.style.width = `${ed_rect.width - (ed_rect.right - tray_left - padding)}px`
       }
     } else {
-      const ed = document.querySelector('.block-editor-editor') as HTMLElement | null
+      const ed = document.querySelector(shrinking_selector) as HTMLElement | null
       if (!ed) return
-      ed.style.width = ''
+      ed.style.boxSizing = containerStyle.boxSizing || ''
+      ed.style.width = containerStyle.width || ''
+      ed.style.transition = containerStyle.transition || ''
     }
-  }, [open, trayRef])
-
-  const handleTabChange = useCallback(
-    (
-      _event: React.MouseEvent<ViewOwnProps> | React.KeyboardEvent<ViewOwnProps>,
-      tabData: {index: number; id?: string}
-    ) => {
-      setActiveTab(tabData.index)
-    },
-    []
-  )
+  }, [containerStyle, open, trayRef])
 
   const handleCloseTray = useCallback(() => {
     onClose()
@@ -117,64 +110,40 @@ export const Toolbox = ({open, onClose}: ToolboxProps) => {
     <Tray
       contentRef={el => setTrayRef(el)}
       label="Toolbox"
+      mountNode={document.querySelector('.block-editor-editor') as HTMLElement}
       open={open}
       placement="end"
       size="small"
       onClose={handleCloseTray}
     >
-      <Flex direction="column" height={getTrayHeight()}>
-        <Flex.Item shouldGrow={true} shouldShrink={true}>
+      <View as="div" margin="small">
+        <Flex margin="0 0 small" gap="medium">
           <CloseButton placement="end" onClick={handleCloseTray} screenReaderLabel="Close" />
-          <Tabs onRequestTabChange={handleTabChange}>
-            <Tabs.Panel renderTitle="Blocks" isSelected={activeTab === 0}>
-              <Flex
-                gap="x-small"
-                justifyItems="space-between"
-                alignItems="center"
-                wrap="wrap"
-                padding="x-small"
-              >
-                {renderBox('Button', ButtonBlockIcon, <ButtonBlock text="Click me" />)}
-                {renderBox('Text', TextBlockIcon, <TextBlock text="" />)}
-                {renderBox('RCE', RCEBlockIcon, <RCEBlock text="" />)}
-                {/* renderBox(
+          <Heading level="h3">Blocks</Heading>
+          {/* <CondensedButton renderIcon={IconOpenFolderLine}>Section Browser</CondensedButton> */}
+        </Flex>
+        <Flex
+          gap="x-small"
+          justifyItems="space-between"
+          alignItems="center"
+          wrap="wrap"
+          padding="x-small"
+        >
+          {renderBox('Button', ButtonBlockIcon, <ButtonBlock text="Click me" />)}
+          {renderBox('Text', TextBlockIcon, <TextBlock text="" />)}
+          {window.location.search.includes('showrce') &&
+            renderBox('RCE', RCEBlockIcon, <RCEBlock text="" />)}
+          {/* renderBox(
                   'Container',
                   ContainerIcon,
                   <Element is={Container} background="#fff" canvas={true} layout="row" />
                 ) */}
-                {renderBox('Icon', IconBlockIcon, <IconBlock iconName="apple" />)}
-                {renderBox('Heading', HeadingBlockIcon, <HeadingBlock />)}
-                {renderBox('Resource Card', ResourceCardIcon, <ResourceCard />)}
-                {renderBox('Image', ImageBlockIcon, <ImageBlock />)}
-                {renderBox('Iframe', IframeBlockIcon, <IframeBlock />)}
-              </Flex>
-            </Tabs.Panel>
-            <Tabs.Panel renderTitle="Sections" isSelected={activeTab === 1}>
-              <Flex
-                gap="x-small"
-                justifyItems="space-between"
-                alignItems="center"
-                wrap="wrap"
-                width="320px"
-                padding="x-small"
-              >
-                {renderBox('Resources', ResourcesSectionIcon, <ResourcesSection />)}
-                {renderBox(
-                  'Columns',
-                  ColumnsSectionIcon,
-                  <ColumnsSection columns={2} variant="fixed" />
-                )}
-                {renderBox('Blank', BlankSectionIcon, <BlankSection />)}
-                {renderBox('Hero', ImageBlockIcon, <HeroSection />)}
-                {renderBox('Navigation', NavigationSectionIcon, <NavigationSection />)}
-                {renderBox('About', AboutSectionIcon, <AboutSection />)}
-                {renderBox('Quiz', QuizSectionIcon, <QuizSection />)}
-                {renderBox('Footer', FooterSectionIcon, <FooterSection />)}
-              </Flex>
-            </Tabs.Panel>
-          </Tabs>
-        </Flex.Item>
-      </Flex>
+          {renderBox('Icon', IconBlockIcon, <IconBlock iconName="apple" />)}
+          {renderBox('Heading', HeadingBlockIcon, <HeadingBlock />)}
+          {renderBox('Resource Card', ResourceCardIcon, <ResourceCard />)}
+          {renderBox('Image', ImageBlockIcon, <ImageBlock />)}
+        </Flex>
+      </View>
     </Tray>
   )
 }
