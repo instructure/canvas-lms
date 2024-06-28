@@ -143,26 +143,16 @@ as either module items or assignments, based on the presence or absence of the `
 property.
 
 #### Assignment Selection Deep Linking
-
-When a tool is launched from the `assignment_selection` placement, properties
-from the deep linking response will overwrite existing settings on the
-assignment create/edit page. However, the following properties in the deep
-linking response behave uniquely:
-
-* `lineItem.label` or `title` (corresponding to the assignment name)
-* `lineItem.scoreMaximum` (corresponding to the assignment's "points possible")
-* `text` (corresponding to the assignment description body)
-
-Existing values for these corresponding assignment settings will *not* be
-overwritten in the following cases:
-
-* The deep linking response omits one of the properties. Leaving out a property
-  will not erase an existing value.
-* The feature flag "LTI Deep Linking Line Items on Assignment create/edit page"
-  (`lti_assignment_page_line_items`) is disabled. This flag, enabled by
-  default since August 2023, can be disabled by institution admins. (Note that,
-  if the corresponding assignment settings are empty, the values from the
-  deep linking response are used regardless of the feature flag.)
+When a tool is launched from the `assignment_selection` placement, any previous
+LTI parameters (URL, iframe width, etc.) are overwritten with the information
+in the Deep Linking Response. In addition, if the following properties are
+present and non-empty in the content item in the Deep Linking Response, they
+will set the following fields, potentially overwriting user-inputted values:
+- `text` sets/overwrites the assignment description
+- `lineItem.scoreMaximum` sets/overwrites the maximum score for the assignment
+- `lineItem.label` or `title` sets the assignment name, and overwrites unless 
+  `"https://canvas.instructure.com/lti/preserveExistingAssignmentName": true`
+  is given in the content item.
 
 ### HTML fragment
 Full support for required properties.

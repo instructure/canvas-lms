@@ -37,6 +37,7 @@ export type ResourceLinkContentItem = {
     startDateTime?: string
     endDateTime?: string
   }
+  ['https://canvas.instructure.com/lti/preserveExistingAssignmentName']?: boolean
 }
 
 const ltiEndpointParams = (lookupUuid?: string | null | undefined) => {

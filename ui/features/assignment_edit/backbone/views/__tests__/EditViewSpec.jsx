@@ -474,17 +474,36 @@ const lastSubmissionTypeContainerProps = function () {
   return calls[calls.length - 1].args[1]
 }
 
-test('when a submission_type_selection tool chosen and a resource selected: sets selectedTool and title', function () {
-  const view = editViewWithSubmissionTypeSelection()
-  view.$submissionType.val('external_tool_placement_123')
-  view.$submissionType.trigger('change')
-  view.handleContentItem({
+const makeResourceLinkContentItem = function(overrides={}) {
+  return {
     type: 'ltiResourceLink',
     custom: {},
     url: 'http://example.com',
     title: 'someResource',
     lineItem: {},
+    ...overrides,
+  }
+}
+
+test("when a submission_type_selection sends back title and preserveExistingAssignmentName: shows resource and doesn't overwrite title", function () {
+  const view = editViewWithSubmissionTypeSelection()
+  view.$submissionType.val('external_tool_placement_123')
+  view.$submissionType.trigger('change')
+  view.$('#assignment_name').val('Test Assignment')
+  const contentItem = makeResourceLinkContentItem({
+    'https://canvas.instructure.com/lti/preserveExistingAssignmentName': true
   })
+  view.handleContentItem(contentItem)
+
+  equal(view.$('#assignment_name').val(), 'Test Assignment')
+  equal(view.$externalToolsTitle.val(), 'someResource')
+})
+
+test('when a submission_type_selection tool chosen and a resource selected: sets selectedTool, title, assignment name', function () {
+  const view = editViewWithSubmissionTypeSelection()
+  view.$submissionType.val('external_tool_placement_123')
+  view.$submissionType.trigger('change')
+  view.handleContentItem(makeResourceLinkContentItem())
   const formData = view.getFormData()
 
   ok(view.selectedTool.require_resource_selection)
@@ -492,6 +511,7 @@ test('when a submission_type_selection tool chosen and a resource selected: sets
 
   // Card is shown (props include title):
   equal(lastSubmissionTypeContainerProps().resource.title, 'someResource')
+  equal(view.$('#assignment_name').val(), 'someResource')
 })
 
 test('when a submission_type_selection tool chosen, a resource selected, and the resource removed: keeps selectedTool but clears out title', function () {
@@ -499,13 +519,7 @@ test('when a submission_type_selection tool chosen, a resource selected, and the
   view.$submissionType.val('external_tool_placement_123')
   view.$submissionType.trigger('change')
 
-  view.handleContentItem({
-    type: 'ltiResourceLink',
-    custom: {},
-    url: 'http://example.com',
-    title: 'someResourceLinkTitle',
-    lineItem: {},
-  })
+  view.handleContentItem(makeResourceLinkContentItem())
   view.handleRemoveResource()
 
   const formData = view.getFormData()
@@ -524,13 +538,7 @@ test('when a submission_type_select tool chosen but changed back to generic "Ext
   const view = editViewWithSubmissionTypeSelection()
   view.$submissionType.val('external_tool_placement_123')
   view.$submissionType.trigger('change')
-  view.handleContentItem({
-    type: 'ltiResourceLink',
-    custom: {},
-    url: 'http://example.com',
-    title: 'someResourceLinkTitle',
-    lineItem: {},
-  })
+  view.handleContentItem(makeResourceLinkContentItem())
 
   const formData = view.getFormData()
   ok(view.selectedTool)
@@ -1612,6 +1620,7 @@ QUnit.skip(
       'item[available]':
         '{"startDateTime": "2023-04-13T00:00:00.000Z", "endDateTime": "2023-04-14T00:00:00.000Z"}',
       'item[description]': 'todo_fix_me',
+      'item[preserveExistingAssignmentName]': 'true',
     }
     const view = editView()
 

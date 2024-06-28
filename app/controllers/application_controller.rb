@@ -392,7 +392,6 @@ class ApplicationController < ActionController::Base
     scheduled_page_publication
     send_usage_metrics
     rce_transform_loaded_content
-    lti_assignment_page_line_items
     mobile_offline_mode
     react_discussions_post
     instui_nav
