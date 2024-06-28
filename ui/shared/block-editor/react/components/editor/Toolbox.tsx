@@ -129,13 +129,9 @@ export const Toolbox = ({open, container, onClose}: ToolboxProps) => {
         >
           {renderBox('Button', ButtonBlockIcon, <ButtonBlock text="Click me" />)}
           {renderBox('Text', TextBlockIcon, <TextBlock text="" />)}
-          {window.location.search.includes('showrce') &&
+          {/* @ts-expect-error */}
+          {window.ENV.RICH_CONTENT_AI_TEXT_TOOLS &&
             renderBox('RCE', RCEBlockIcon, <RCEBlock text="" />)}
-          {/* renderBox(
-                  'Container',
-                  ContainerIcon,
-                  <Element is={Container} background="#fff" canvas={true} layout="row" />
-                ) */}
           {renderBox('Icon', IconBlockIcon, <IconBlock iconName="apple" />)}
           {renderBox('Heading', HeadingBlockIcon, <HeadingBlock />)}
           {renderBox('Resource Card', ResourceCardIcon, <ResourceCard />)}
