@@ -62,8 +62,7 @@ class ContentExportsController < ApplicationController
           export.selected_content = params[:copy].to_unsafe_h
         else
           export.export_type = ContentExport::COMMON_CARTRIDGE
-          export.set_contains_new_quizzes_settings
-          export.mark_waiting_for_external_tool if export.contains_new_quizzes?
+          export.prepare_new_quizzes_export
           export.selected_content = { everything: true }
         end
       when User
