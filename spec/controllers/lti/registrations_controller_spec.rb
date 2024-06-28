@@ -23,6 +23,9 @@ describe Lti::RegistrationsController do
     body = response.parsed_body
     body.is_a?(Array) ? body.map(&:with_indifferent_access) : body.with_indifferent_access
   end
+  let(:response_data) do
+    response_json[:data]
+  end
 
   describe "GET index" do
     let_once(:account) { account_model }
@@ -150,19 +153,19 @@ describe Lti::RegistrationsController do
 
         it "returns a list of registrations" do
           subject
-          expect(response_json[:data].length).to eq(4)
+          expect(response_data.length).to eq(4)
         end
 
         it "has the expected fields in the results" do
           subject
 
-          expect(response_json[:data].first)
+          expect(response_data.first)
             .to include({ account_id: an_instance_of(Integer), name: an_instance_of(String) })
 
-          expect(response_json[:data].first[:account_binding])
+          expect(response_data.first[:account_binding])
             .to include({ workflow_state: an_instance_of(String) })
 
-          expect(response_json[:data].first[:account_binding][:created_by])
+          expect(response_data.first[:account_binding][:created_by])
             .to include({ id: an_instance_of(Integer) })
         end
 
@@ -171,8 +174,8 @@ describe Lti::RegistrationsController do
           lti_registration_model(account:, name: "created an hour ago", created_at: 1.hour.ago)
 
           subject
-          expect(response_json[:data].first["name"]).to eq("created just now")
-          expect(response_json[:data].last["name"]).to eq("created an hour ago")
+          expect(response_data.first["name"]).to eq("created just now")
+          expect(response_data.last["name"]).to eq("created an hour ago")
         end
 
         context "when sorting by installed_by" do
@@ -186,7 +189,7 @@ describe Lti::RegistrationsController do
 
           it "sorts by the lti_registration_account_binding.created_by" do
             subject
-            expect(response_json[:data].last["name"]).to eq("Created by B User")
+            expect(response_data.last["name"]).to eq("Created by B User")
           end
 
           context "with the dir=asc parameter" do
@@ -194,7 +197,7 @@ describe Lti::RegistrationsController do
 
             it "puts the results in ascending order" do
               subject
-              expect(response_json[:data].first["name"]).to eq("Created by B User")
+              expect(response_data.first["name"]).to eq("Created by B User")
             end
           end
         end
@@ -209,8 +212,8 @@ describe Lti::RegistrationsController do
 
           it "sorts by name" do
             subject
-            expect(response_json[:data].first["name"]).to eq("ZZZ registration")
-            expect(response_json[:data].last["name"]).to eq("AAA registration")
+            expect(response_data.first["name"]).to eq("ZZZ registration")
+            expect(response_data.last["name"]).to eq("AAA registration")
           end
 
           context "with the dir=asc parameter" do
@@ -218,8 +221,8 @@ describe Lti::RegistrationsController do
 
             it "puts the results in ascending order" do
               subject
-              expect(response_json[:data].first["name"]).to eq("AAA registration")
-              expect(response_json[:data].last["name"]).to eq("ZZZ registration")
+              expect(response_data.first["name"]).to eq("AAA registration")
+              expect(response_data.last["name"]).to eq("ZZZ registration")
             end
           end
         end
@@ -231,7 +234,7 @@ describe Lti::RegistrationsController do
             lti_registration_model(admin_nickname: "a nickname", account:)
             lti_registration_model(admin_nickname: nil, account:)
             subject
-            expect(response_json[:data].first["admin_nickname"]).to eq("a nickname")
+            expect(response_data.first["admin_nickname"]).to eq("a nickname")
           end
         end
 
@@ -244,7 +247,7 @@ describe Lti::RegistrationsController do
             # creating a default one in the future.
             expect(reg.lti_registration_account_bindings).to eq([])
             subject
-            expect(response_json[:data].last["name"]).to eq("no account bindings")
+            expect(response_data.last["name"]).to eq("no account bindings")
           end
         end
 
@@ -253,7 +256,7 @@ describe Lti::RegistrationsController do
 
           it "finds no registrations" do
             subject
-            expect(response_json[:data].length).to eq(0)
+            expect(response_data.length).to eq(0)
           end
         end
 
@@ -265,20 +268,20 @@ describe Lti::RegistrationsController do
             subject
             # searching "registration no" should find the three registrations titled
             # "Registration no. N"
-            expect(response_json[:data].length).to eq(3)
+            expect(response_data.length).to eq(3)
           end
 
           it "rejects registrations that do not match all terms" do
             # The name "registration" alone is not enough to match search terms "registration no"
             incomplete_match = lti_registration_model(account:, name: "registration")
             subject
-            expect(response_json[:data].pluck(:id)).not_to include(incomplete_match.id)
+            expect(response_data.pluck(:id)).not_to include(incomplete_match.id)
           end
 
           it "finds registrations with matching terms across different model attributes" do
             multi_attribute_match = lti_registration_model(account:, name: "registration", vendor: "no")
             subject
-            expect(response_json[:data].pluck(:id)).to include(multi_attribute_match.id)
+            expect(response_data.pluck(:id)).to include(multi_attribute_match.id)
           end
 
           it "includes the current search parameters in the Link header" do
@@ -365,7 +368,7 @@ describe Lti::RegistrationsController do
 
         it "puts results on one page and does not give a 'next' page in the Link header" do
           subject
-          expect(response_json[:data].length).to eq(15)
+          expect(response_data.length).to eq(15)
 
           # Expect the current pagination link to be given as rel=first, rel=last, and rel=current
           # in the header.
@@ -386,7 +389,7 @@ describe Lti::RegistrationsController do
 
           it "returns max amount" do
             subject
-            expect(response_json[:data].length).to eq(3)
+            expect(response_data.length).to eq(3)
           end
         end
 
@@ -417,7 +420,7 @@ describe Lti::RegistrationsController do
           it "returns five results on page 2 and says that is the last page" do
             get "#{url}?page=2"
 
-            expect(response_json[:data].length).to eq(5)
+            expect(response_data.length).to eq(5)
 
             %w[current last].each do |link_rel|
               expect(link_header_values).to include("<#{current_pagination_link}>; rel=\"#{link_rel}\"")
