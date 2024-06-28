@@ -3348,6 +3348,7 @@ nn:
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Ein eksisterande Canvas-brukar med SIS-ID %{user_id}har allereie gjort krav på %{other_user_id} sin integration_id"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "Ein eksisterande brukar matchar ingen brukar-ID-ar som skal nyttast til innlogging med SIS-ID %{user_id}, hoppar over"
   an_export_is_already_in_progress_54270f01: "Ein eksport er allereie i gang."
+  an_integer_value_is_required_e073bd46: "Ein heiltalverdi er nødvendig"
   an_internal_error_occurred_83b8a685: "Det oppstod ein feil"
   an_item_named_name_already_exists_in_this_location_147b7312: "Eit element med namnet \"%{name}\" finst allereie.\" Vil du erstatte den eksisterande fila?"
   an_object_of_type_graphql_type_was_hidden_due_to_i_60998e99: "Eit objekt av typen %{graphql_type} er skjult på grunn av omfangsavgrensing på tilgangstoken"
@@ -28383,6 +28384,7 @@ nn:
   value_d842f16d: Verdi
   value_is_not_a_valid_date_23c2d0a2: "%{value} er ikkje ein gyldig dato"
   value_is_not_valid_563afee6: "%{value} er ikkje gyldig"
+  value_must_be_positive_3e086d5a: "Verdien skal vere positiv"
   value_removed_bba9430c: "%{value} fjerna"
   vanity_url_76f93382: "Personleg URL"
   vendor_code_lti_2_ef36207b: "Leverandørkode (LTI 2):"
