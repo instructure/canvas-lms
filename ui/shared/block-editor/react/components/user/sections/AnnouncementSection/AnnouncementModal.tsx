@@ -21,26 +21,31 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {quizQuestions} from '../../../../assets/data/quizQuestions'
+import {type Announcement, announcements} from '../../../../assets/data/announcements'
 
-type QuizModalProps = {
+type AnnouncementModalProps = {
   open: boolean
-  currentQuestionId: string | undefined
+  currentAnnouncementId: string | undefined
   onClose: () => void
   onSelect: (questionId: string) => void
 }
 
-const QuizModal = ({open, currentQuestionId, onClose, onSelect}: QuizModalProps) => {
-  const [questionId, setQuestionId] = useState<string | undefined>(currentQuestionId)
+const AnnouncementModal = ({
+  open,
+  currentAnnouncementId,
+  onClose,
+  onSelect,
+}: AnnouncementModalProps) => {
+  const [announcementId, setAnnouncementId] = useState<string | undefined>(currentAnnouncementId)
   const parser = useRef(new DOMParser())
 
   useEffect(() => {
-    if (!questionId && quizQuestions.entries.length > 0) {
-      setQuestionId(quizQuestions.entries[0].id)
+    if (!announcementId && announcements.length > 0) {
+      setAnnouncementId(announcements[0].id)
     }
-  }, [questionId])
+  }, [announcementId])
 
-  const handleQuestionChange = useCallback(
+  const handleAnnouncementChange = useCallback(
     (
       _event: React.SyntheticEvent,
       data: {
@@ -48,35 +53,39 @@ const QuizModal = ({open, currentQuestionId, onClose, onSelect}: QuizModalProps)
         id?: string
       }
     ) => {
-      setQuestionId(data.value as string)
+      setAnnouncementId(data.value as string)
     },
     []
   )
 
-  const handleChooseQuestion = useCallback(() => {
-    if (!questionId) return
-    onSelect(questionId)
+  const handleChooseAnnouncement = useCallback(() => {
+    if (!announcementId) return
+    onSelect(announcementId)
     onClose()
-  }, [onClose, onSelect, questionId])
+  }, [onClose, onSelect, announcementId])
 
   return (
-    <Modal open={open} label="Select a question" onDismiss={onClose}>
+    <Modal open={open} label="Select an announcement" onDismiss={onClose}>
       <Modal.Header>
-        <Heading>Select a question</Heading>
+        <Heading>Select an announcement</Heading>
         <CloseButton placement="end" onClick={onClose} screenReaderLabel="Close" />
       </Modal.Header>
       <Modal.Body>
         <SimpleSelect
-          renderLabel="Select a question"
+          renderLabel="Select an announcement"
           assistiveText="Use arrow keys to navigate options"
-          onChange={handleQuestionChange}
-          value={questionId}
+          onChange={handleAnnouncementChange}
+          value={announcementId}
         >
-          {quizQuestions.entries.map((question: any) => {
-            const qbodydoc = parser.current.parseFromString(question.entry.item_body, 'text/html')
+          {announcements.map((announcement: Announcement) => {
+            const atitledoc = parser.current.parseFromString(announcement.title, 'text/html')
             return (
-              <SimpleSelect.Option id={question.id} key={question.id} value={question.id}>
-                {qbodydoc.body.textContent as string}
+              <SimpleSelect.Option
+                id={announcement.id}
+                key={announcement.id}
+                value={announcement.id}
+              >
+                {atitledoc.body.textContent as string}
               </SimpleSelect.Option>
             )
           })}
@@ -87,9 +96,9 @@ const QuizModal = ({open, currentQuestionId, onClose, onSelect}: QuizModalProps)
           Cancel
         </Button>
         <Button
-          onClick={handleChooseQuestion}
+          onClick={handleChooseAnnouncement}
           color="primary"
-          interaction={questionId ? 'enabled' : 'disabled'}
+          interaction={announcementId ? 'enabled' : 'disabled'}
           margin="0 0 0 x-small"
         >
           Add to Section
@@ -99,4 +108,4 @@ const QuizModal = ({open, currentQuestionId, onClose, onSelect}: QuizModalProps)
   )
 }
 
-export {QuizModal}
+export {AnnouncementModal}
