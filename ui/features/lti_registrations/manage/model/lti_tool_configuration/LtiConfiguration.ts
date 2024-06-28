@@ -31,9 +31,9 @@ export const ZLtiConfiguration = z.object({
   oidc_initiation_url: z.string(),
   custom_fields: z.record(z.string()).optional().nullable(),
   oidc_initiation_urls: z.record(z.unknown()).optional().nullable(),
-  public_jwk_url: z.string().optional(),
-  is_lti_key: z.boolean().optional(),
-  icon_url: z.string().optional(),
+  public_jwk_url: z.string().optional().nullable(),
+  is_lti_key: z.boolean().optional().nullable(),
+  icon_url: z.string().optional().nullable(),
   scopes: z.array(ZLtiScope),
   extensions: z.array(ZExtension),
 })
