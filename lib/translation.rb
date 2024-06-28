@@ -205,7 +205,7 @@ module Translation
       end
 
       # Check if Redis is present. If yes, then we try to read the key from Redis
-      if Canvas.redis
+      if Canvas.redis_enabled?
         # Try to read the key
         cached_languages = Canvas.redis.get(language_cache_key)
         unless cached_languages.nil?
@@ -221,7 +221,7 @@ module Translation
       end
 
       # Cache the translation for new loads
-      if Canvas.redis
+      if Canvas.redis_enabled?
         Rails.logger.info "Caching supported language translation: #{locale}}}}"
         Canvas.redis.set(language_cache_key, translated.to_json)
       end
