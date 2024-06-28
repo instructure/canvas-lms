@@ -21,20 +21,24 @@ import {Button} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import React from 'react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import type {AccountId} from '../model/AccountId'
+import {
+  mkUseDynamicRegistrationWizardState,
+  type DynamicRegistrationWizardState,
+} from './DynamicRegistrationWizardState'
+import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import type {AccountId} from '../model/AccountId'
-import {mkUseDynamicRegistrationWizardState} from './DynamicRegistrationWizardState'
-import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
 import {PermissionConfirmation} from './components/PermissionConfirmation'
 import {PrivacyConfirmation} from './components/PrivacyConfirmation'
 import {PlacementsConfirmation} from './components/PlacementsConfirmation'
 import {NamingConfirmation} from './components/NamingConfirmation'
 import {IconConfirmation} from './components/IconConfirmation'
 import {ReviewScreen} from './components/ReviewScreen'
+import {ProgressBar} from '@instructure/ui-progress'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -64,6 +68,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
     case 'RequestingToken':
       return (
         <>
+          {progressBar(state)}
           <Modal.Body>
             <View as="div" height="20rem" data-testid="dynamic-reg-modal-loading-registration">
               <Flex justifyItems="center" alignItems="center" height="100%">
@@ -87,6 +92,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
     case 'WaitingForTool':
       return (
         <>
+          {progressBar(state)}
           <iframe
             src={addParams(props.dynamicRegistrationUrl, {
               openid_configuration: state.registrationToken.oidc_configuration_url,
@@ -113,20 +119,24 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
       )
     case 'LoadingRegistration':
       return (
-        <Modal.Body>
-          <View as="div" height="20rem" data-testid="dynamic-reg-modal-loading-registration">
-            <Flex justifyItems="center" alignItems="center" height="100%">
-              <Flex.Item>
-                <Spinner renderTitle={I18n.t('Loading')} />
-              </Flex.Item>
-              <Flex.Item>{I18n.t('Loading Registration')}</Flex.Item>
-            </Flex>
-          </View>
-        </Modal.Body>
+        <>
+          {progressBar(state)}
+          <Modal.Body>
+            <View as="div" height="20rem" data-testid="dynamic-reg-modal-loading-registration">
+              <Flex justifyItems="center" alignItems="center" height="100%">
+                <Flex.Item>
+                  <Spinner renderTitle={I18n.t('Loading')} />
+                </Flex.Item>
+                <Flex.Item>{I18n.t('Loading Registration')}</Flex.Item>
+              </Flex>
+            </View>
+          </Modal.Body>
+        </>
       )
     case 'PermissionConfirmation':
       return (
         <>
+          {progressBar(state)}
           <Modal.Body>
             <PermissionConfirmation
               registration={state.registration}
@@ -183,6 +193,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
     case 'PrivacyLevelConfirmation':
       return (
         <>
+          {progressBar(state)}
           <Modal.Body>
             <PrivacyConfirmation
               overlayStore={state.overlayStore}
@@ -229,6 +240,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
     case 'PlacementsConfirmation':
       return (
         <>
+          {progressBar(state)}
           <Modal.Body>
             <PlacementsConfirmation
               registration={state.registration}
@@ -275,6 +287,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
     case 'NamingConfirmation':
       return (
         <>
+          {progressBar(state)}
           <Modal.Body>
             <NamingConfirmation
               registration={state.registration}
@@ -320,19 +333,23 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
       )
     case 'IconConfirmation':
       return (
-        <IconConfirmation
-          overlayStore={state.overlayStore}
-          registration={state.registration}
-          reviewing={state.reviewing}
-          transitionToConfirmationState={
-            dynamicRegistrationWizardState.transitionToConfirmationState
-          }
-          transitionToReviewingState={dynamicRegistrationWizardState.transitionToReviewingState}
-        />
+        <>
+          {progressBar(state)}
+          <IconConfirmation
+            overlayStore={state.overlayStore}
+            registration={state.registration}
+            reviewing={state.reviewing}
+            transitionToConfirmationState={
+              dynamicRegistrationWizardState.transitionToConfirmationState
+            }
+            transitionToReviewingState={dynamicRegistrationWizardState.transitionToReviewingState}
+          />
+        </>
       )
     case 'Reviewing':
       return (
         <>
+          {progressBar(state)}
           <Modal.Body>
             <ReviewScreen
               overlayStore={state.overlayStore}
@@ -392,16 +409,19 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
       )
     case 'Enabling':
       return (
-        <Modal.Body>
-          <View as="div" height="20rem" data-testid="dynamic-reg-modal-loading-registration">
-            <Flex justifyItems="center" alignItems="center" height="100%">
-              <Flex.Item>
-                <Spinner renderTitle={I18n.t('Enabling Registration')} />
-              </Flex.Item>
-              <Flex.Item>{I18n.t('Enabling Registration')}</Flex.Item>
-            </Flex>
-          </View>
-        </Modal.Body>
+        <>
+          {progressBar(state)}
+          <Modal.Body>
+            <View as="div" height="20rem" data-testid="dynamic-reg-modal-loading-registration">
+              <Flex justifyItems="center" alignItems="center" height="100%">
+                <Flex.Item>
+                  <Spinner renderTitle={I18n.t('Enabling Registration')} />
+                </Flex.Item>
+                <Flex.Item>{I18n.t('Enabling Registration')}</Flex.Item>
+              </Flex>
+            </View>
+          </Modal.Body>
+        </>
       )
     case 'Error':
       return (
@@ -424,3 +444,35 @@ const addParams = (url: string, params: Record<string, string>) => {
   })
   return u.toString()
 }
+
+const TotalProgressLevels = 7
+
+const ProgressLevels = {
+  RequestingToken: 0,
+  WaitingForTool: 1,
+  LoadingRegistration: 1,
+  PermissionConfirmation: 2,
+  PrivacyLevelConfirmation: 3,
+  PlacementsConfirmation: 4,
+  NamingConfirmation: 5,
+  IconConfirmation: 6,
+  Reviewing: 7,
+  Enabling: 7,
+  DeletingDevKey: 7,
+  Error: 0,
+}
+
+const progressBar = (state: DynamicRegistrationWizardState) => (
+  <ProgressBar
+    meterColor="info"
+    shouldAnimate={true}
+    size="x-small"
+    screenReaderLabel={I18n.t('Installation Progress')}
+    valueNow={ProgressLevels[state._type]}
+    valueMax={TotalProgressLevels}
+    themeOverride={{
+      trackBottomBorderWidth: '0',
+    }}
+    margin="0"
+  />
+)
