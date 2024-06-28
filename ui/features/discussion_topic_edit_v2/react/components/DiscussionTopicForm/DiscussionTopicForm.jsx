@@ -282,7 +282,6 @@ function DiscussionTopicForm({
 
   const [attachment, setAttachment] = useState(currentDiscussionTopic?.attachment || null)
   const [attachmentToUpload, setAttachmentToUpload] = useState(false)
-  const affectUserFileQuota = false
 
   const [usageRightsData, setUsageRightsData] = useState(
     currentDiscussionTopic?.attachment?.usageRights || {}
@@ -779,7 +778,7 @@ function DiscussionTopicForm({
               setAttachmentToUpload={setAttachmentToUpload}
               attachmentToUpload={attachmentToUpload}
               responsiveQuerySizes={responsiveQuerySizes}
-              isGradedDiscussion={!affectUserFileQuota}
+              checkContextQuota={true}
               canAttach={ENV.DISCUSSION_TOPIC?.PERMISSIONS.CAN_ATTACH}
             />
           )}
