@@ -31,6 +31,10 @@ module QuizzesEditPage
     ".save_quiz_button"
   end
 
+  def post_to_sis_checkbox_selector
+    "#quiz_post_to_sis"
+  end
+
   # ---------------------------------Elements-----------------------------------
 
   def course_pacing_notice
@@ -57,6 +61,10 @@ module QuizzesEditPage
     f(quiz_save_button_selector)
   end
 
+  def post_to_sis_checkbox
+    f(post_to_sis_checkbox_selector)
+  end
+
   # ---------------------------------Methods------------------------------------
 
   def click_manage_assign_to_button
@@ -79,5 +87,9 @@ module QuizzesEditPage
   def submit_page
     wait_for_new_page_load { click_quiz_save_button }
     expect(driver.current_url).not_to include("edit")
+  end
+
+  def select_post_to_sis_checkbox
+    post_to_sis_checkbox.click
   end
 end

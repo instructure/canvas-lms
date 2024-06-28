@@ -124,6 +124,7 @@ const renderDueDates = lockedItems => {
     sectionList = new SectionList(ENV.SECTION_LIST)
 
     dueDateList = new DueDateList(quizModel.get('assignment_overrides'), sectionList, quizModel)
+    quizModel.set('post_to_sis', $('#quiz_post_to_sis').prop('checked'))
 
     overrideView = window.overrideView = new DueDateOverrideView({
       el: '.js-assignment-overrides',
@@ -145,6 +146,12 @@ const renderDueDates = lockedItems => {
       overrideView.bind('tray:close', () => {
         $('#quiz_edit_wrapper .btn.save_quiz_button').prop('disabled', false)
         $('#quiz_edit_wrapper .btn.save_and_publish').prop('disabled', false)
+      })
+
+      $('#quiz_post_to_sis').on('change', e => {
+        const postToSISChecked = e.target.checked
+        quizModel.set('post_to_sis', postToSISChecked)
+        overrideView.render()
       })
     }
 
