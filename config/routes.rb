@@ -2684,6 +2684,10 @@ CanvasRails::Application.routes.draw do
       put "plugins/:id", action: :update
       get "plugins/:id", action: :show
     end
+
+    scope(controller: :rich_content_api) do
+      post "rich_content/generate", action: :generate
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or

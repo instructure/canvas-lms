@@ -1831,6 +1831,8 @@
   path: "/api/v1/release_notes/latest"
 - verb: GET
   path: "/api/v1/release_notes/unread_count"
+- verb: POST
+  path: "/api/v1/rich_content/generate"
 - verb: GET
   path: "/api/v1/search/all_courses"
 - verb: GET
