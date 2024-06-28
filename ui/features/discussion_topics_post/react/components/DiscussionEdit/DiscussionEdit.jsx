@@ -219,7 +219,8 @@ export const DiscussionEdit = props => {
                     setAttachmentToUpload={setAttachmentToUpload}
                     attachmentToUpload={attachmentToUpload}
                     responsiveQuerySizes={responsiveQuerySizes}
-                    isGradedDiscussion={isGradedDiscussion}
+                    attachmentFolderId={ENV?.DISCUSSION?.ATTACHMENTS_FOLDER_ID}
+                    checkContextQuota={!isGradedDiscussion}
                     canAttach={ENV.can_attach_entries}
                   />
                 </View>
@@ -235,7 +236,8 @@ export const DiscussionEdit = props => {
                       setAttachmentToUpload={setAttachmentToUpload}
                       attachmentToUpload={attachmentToUpload}
                       responsiveQuerySizes={responsiveQuerySizes}
-                      isGradedDiscussion={isGradedDiscussion}
+                      attachmentFolderId={ENV?.DISCUSSION?.ATTACHMENTS_FOLDER_ID}
+                      checkContextQuota={!isGradedDiscussion}
                       canAttach={ENV.can_attach_entries}
                     />
                   </View>
