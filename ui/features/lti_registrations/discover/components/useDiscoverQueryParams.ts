@@ -18,12 +18,12 @@
 
 import {useCallback, useMemo} from 'react'
 import {useSearchParams} from 'react-router-dom'
-import type {LtiFilter} from '../model/Filter'
+import type {LtiFilters} from '../model/Filter'
 
 export type DiscoverParams = {
   search: string
   page: number
-  filters: LtiFilter
+  filters: LtiFilters
 }
 
 const useDiscoverQueryParams = () => {
@@ -32,7 +32,7 @@ const useDiscoverQueryParams = () => {
   const parseUrlParams = (params: URLSearchParams): DiscoverParams => {
     let search = ''
     let page = 1
-    let filters: LtiFilter = {}
+    let filters: LtiFilters = {}
 
     try {
       search = params.get('search') || ''

@@ -26,66 +26,19 @@ import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
+import {Grid} from '@instructure/ui-grid'
 import LtiFilterTray from './LtiFilterTray'
 import FilterTags from './FilterTags'
 import ProductCard from './ProductCard/ProductCard'
-import {fetchProducts, fetchToolsByDisplayGroups} from '../queries/productsQuery'
-import type {Product} from '../model/Product'
-import type {FilterItem, LtiFilter} from '../model/Filter'
+import {fetchLtiFilters, fetchProducts, fetchToolsByDisplayGroups} from '../queries/productsQuery'
+import type {Product, TagGroup} from '../model/Product'
 import {Heading} from '@instructure/ui-heading'
 import {Pagination} from '@instructure/ui-pagination'
 import useDebouncedSearch from './useDebouncedSearch'
 import useDiscoverQueryParams from './useDiscoverQueryParams'
-
-// TODO: remove mock data
-const filterValues: LtiFilter = {
-  companies: [
-    {
-      id: '19a',
-      name: 'Vendor Test Company',
-    },
-    {
-      id: '9a',
-      name: 'Smart Sparrow',
-    },
-    {
-      id: '1a',
-      name: 'Khan11',
-    },
-    {
-      id: '6a',
-      name: 'Test',
-    },
-    {
-      id: '17a',
-      name: 'NEW COMPANY',
-    },
-    {
-      id: '101a',
-      name: "Tom's Education Company",
-    },
-  ],
-  versions: [
-    {
-      id: '9465',
-      name: 'LTI v1.1',
-    },
-    {
-      id: '9494',
-      name: 'LTI v1.3',
-    },
-  ],
-  audience: [
-    {
-      id: '387',
-      name: 'HiEd',
-    },
-    {
-      id: '9495',
-      name: 'K-12',
-    },
-  ],
-}
+import {uniqueId} from 'lodash'
+import {breakpoints} from './breakpoints'
+import {useMedia} from 'react-use'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -102,29 +55,76 @@ export const Discover = () => {
     [queryParams]
   )
 
-  const params = () => {
-    return {
-      filters: queryParams.filters,
-      name_cont: queryParams.search,
-      page: queryParams.page,
-    }
-  }
-
-  const {data, isLoading} = useQuery({
+  const {
+    data: {tools = [], meta = {total_count: 0, current_page: 1, num_pages: 1}} = {},
+    isLoading,
+  } = useQuery({
     queryKey: ['lti_product_info', queryParams],
-    queryFn: () => fetchProducts(params()),
+    queryFn: () => fetchProducts(queryParams),
+    enabled: isFilterApplied,
   })
 
   const {data: displayGroupsData, isLoading: isLoadingDisplayGroups} = useQuery({
     queryKey: ['lti_tool_display_groups'],
     queryFn: () => fetchToolsByDisplayGroups(),
+    enabled: !isFilterApplied,
   })
 
-  const renderProducts = () => {
-    return data?.tools.map((product: Product) => <ProductCard product={product} />)
+  const {data: filterData} = useQuery({
+    queryKey: ['lti_filters'],
+    queryFn: () => fetchLtiFilters(),
+  })
+
+  const isLarge = useMedia(`(min-width: ${breakpoints.large})`)
+  const isMobile = useMedia(`(max-width: ${breakpoints.mobile})`)
+
+  const renderProducts = (products: Product[]) => {
+    if (!isLarge) {
+      return (
+        <Flex gap="medium" wrap="wrap" alignItems="stretch">
+          {products.map((product: Product) => (
+            <Flex.Item key={product.id} width="100%">
+              <ProductCard product={product} />
+            </Flex.Item>
+          ))}
+        </Flex>
+      )
+    }
+
+    // Group products into chunks of 3
+    const productChunks = products.reduce((resultArray, item, index) => {
+      const chunkIndex = Math.floor(index / 3)
+
+      if (!resultArray[chunkIndex]) {
+        resultArray[chunkIndex] = [] // start a new chunk
+      }
+
+      resultArray[chunkIndex].push(item)
+      return resultArray
+    }, [] as Product[][])
+
+    return (
+      <Grid vAlign="stretch">
+        {productChunks.map(chunk => (
+          <Grid.Row key={chunk[0].id}>
+            {chunk.map((product: Product) => (
+              <Grid.Col key={product.id}>
+                <ProductCard product={product} />
+              </Grid.Col>
+            ))}
+            {/* Calculate and render empty Grid.Col components if needed */}
+            {Array(3 - chunk.length)
+              .fill(null)
+              .map(_ => (
+                <Grid.Col key={uniqueId('empty')} />
+              ))}
+          </Grid.Row>
+        ))}
+      </Grid>
+    )
   }
 
-  const setTag = (tag: FilterItem) => {
+  const setTag = (tag: TagGroup) => {
     setQueryParams({
       filters: {tags: [tag]},
     })
@@ -132,16 +132,14 @@ export const Discover = () => {
 
   return (
     <div>
-      <Flex gap="small" margin="0 0 small 0">
+      <Flex gap="small" margin="0 0 small 0" direction={isMobile ? 'column-reverse' : 'row'}>
         <Flex.Item shouldGrow={true}>
           <View as="div">
             <TextInput
               renderLabel={
-                <ScreenReaderContent>
-                  {I18n.t('Search by app name & company name')}
-                </ScreenReaderContent>
+                <ScreenReaderContent>{I18n.t('Search by app or company name')}</ScreenReaderContent>
               }
-              placeholder="Search by extension name & company name"
+              placeholder="Search by app or company name"
               value={searchValue}
               onChange={handleSearchInputChange}
               renderBeforeInput={<IconSearchLine inline={false} />}
@@ -173,19 +171,17 @@ export const Discover = () => {
 
       {isFilterApplied && (
         <FilterTags
-          numberOfResults={data?.meta.count ?? 0}
+          numberOfResults={meta.total_count}
           queryParams={queryParams}
           updateQueryParams={updateQueryParams}
         />
       )}
 
-      {isLoading || isLoadingDisplayGroups ? (
+      {(isFilterApplied && isLoading) || (!isFilterApplied && isLoadingDisplayGroups) ? (
         <Spinner />
       ) : isFilterApplied ? (
         <>
-          <Flex gap="medium" wrap="wrap" alignItems="stretch">
-            {renderProducts()}
-          </Flex>
+          {renderProducts(tools)}
           <Pagination
             as="nav"
             margin="small"
@@ -193,7 +189,7 @@ export const Discover = () => {
             labelNext={I18n.t('Next Page')}
             labelPrev={I18n.t('Previous Page')}
           >
-            {Array.from(Array(data?.meta.num_pages)).map((_, i) => (
+            {Array.from(Array(meta.num_pages)).map((_, i) => (
               <Pagination.Page
                 // eslint-disable-next-line react/no-array-index-key
                 key={i}
@@ -208,32 +204,33 @@ export const Discover = () => {
       ) : (
         displayGroupsData?.map(group => {
           return (
-            <div key={group.tag.id}>
-              <Heading level="h3" as="h2" margin="medium 0 0 0">
-                {group.display_name}
+            <div key={group.tag_group.id}>
+              <Heading level="h3" as="h2" margin="large 0 0 0">
+                {group.tag_group.name}
               </Heading>
               <Flex justifyItems="space-between">
-                <p>{group.description}</p>
-                <CondensedButton onClick={() => setTag(group.tag)}>
+                <View margin="x-small 0 small 0" padding="0 small 0 0">
+                  {group.tag_group.description}
+                </View>
+                <CondensedButton onClick={() => setTag(group.tag_group)}>
                   {I18n.t('See All')}
                 </CondensedButton>
               </Flex>
-              <Flex gap="medium" wrap="wrap" alignItems="stretch">
-                {group.tools.map(product => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </Flex>
+              {renderProducts(group.tools.slice(0, 3))}
             </div>
           )
         })
       )}
-      <LtiFilterTray
-        isTrayOpen={isTrayOpen}
-        setIsTrayOpen={setIsTrayOpen}
-        filterValues={filterValues}
-        queryParams={queryParams}
-        setQueryParams={setQueryParams}
-      />
+
+      {filterData && (
+        <LtiFilterTray
+          isTrayOpen={isTrayOpen}
+          setIsTrayOpen={setIsTrayOpen}
+          filterValues={filterData}
+          queryParams={queryParams}
+          setQueryParams={setQueryParams}
+        />
+      )}
     </div>
   )
 }

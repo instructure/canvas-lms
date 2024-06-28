@@ -21,7 +21,7 @@ import type {FilterItem} from '../model/Filter'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
-import type {DiscoverParams} from './Discover'
+import type {DiscoverParams} from './useDiscoverQueryParams'
 
 const I18n = useI18nScope('lti_registrations')
 

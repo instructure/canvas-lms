@@ -80,7 +80,7 @@ module LearnPlatform
     def product_filters
       return {} unless valid_learnplatform?
 
-      endpoint = "/api/v2/lti/filters"
+      endpoint = "/api/v2/lti/tools_filters"
       fetch_learnplatform_response(endpoint, 1.hour)
     end
   end

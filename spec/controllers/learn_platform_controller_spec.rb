@@ -253,7 +253,7 @@ describe LearnPlatformController do
           },
         ],
       }.to_json
-      stub_request(:get, %r{api/v2/lti/filters})
+      stub_request(:get, %r{api/v2/lti/tools_filters})
         .to_return(body: response_fixture,
                    status: 200,
                    headers: {
@@ -275,7 +275,7 @@ describe LearnPlatformController do
           { content: "Unauthorized - must include correct username and password" }
         ]
       }.to_json
-      stub_request(:get, %r{api/v2/lti/filters})
+      stub_request(:get, %r{api/v2/lti/tools_filters})
         .to_return(body: response_fixture,
                    status: 401,
                    headers: {

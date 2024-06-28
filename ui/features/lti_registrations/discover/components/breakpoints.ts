@@ -16,11 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type FilterItem = {
-  id: string
-  name: string
-}
-
-export type LtiFilters = {
-  [key: string]: Array<FilterItem>
+export const breakpoints = {
+  large: '1200px',
+  mobile: '767px',
 }
