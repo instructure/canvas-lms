@@ -23,6 +23,7 @@ require_relative "page_objects/quizzes_landing_page"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "../helpers/context_modules_common"
 require_relative "../../helpers/selective_release_common"
+require_relative "../helpers/admin_settings_common"
 
 describe "quiz edit page assign to" do
   include_context "in-process server selenium tests"
@@ -174,5 +175,49 @@ describe "quiz edit page assign to" do
     keep_trying_until { expect(item_tray_exists?).to be_truthy }
 
     check_element_has_focus close_button
+  end
+
+  context "sync to sis" do
+    include AdminSettingsCommon
+    include ItemsAssignToTray
+
+    let(:due_date) { 3.years.from_now }
+
+    before do
+      account_model
+      @account.set_feature_flag! "post_grades", "on"
+      course_with_teacher_logged_in(active_all: true, account: @account)
+      turn_on_sis_settings(@account)
+      @account.settings[:sis_require_assignment_due_date] = { value: true }
+      @account.save!
+      @quiz = course_quiz
+      @quiz.post_to_sis = "1"
+    end
+
+    it "validates due date inputs when sync to sis is enabled", :ignore_js_errors do
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+
+      click_manage_assign_to_button
+
+      wait_for_assign_to_tray_spinner
+
+      expect(assign_to_date_and_time[0].text).not_to include("Please add a due date")
+
+      click_save_button("Apply")
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      select_post_to_sis_checkbox
+      click_manage_assign_to_button
+
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
+      update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
+      update_due_time(0, "11:59 PM")
+      click_save_button("Apply")
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+    end
   end
 end
