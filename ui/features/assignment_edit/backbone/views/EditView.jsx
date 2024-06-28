@@ -640,6 +640,7 @@ EditView.prototype.handleAssignmentSelectionSubmit = function (data) {
       height: data['item[iframe][height]'],
     },
     lineItem: tryJsonParse(data['item[line_item]']),
+    'https://canvas.instructure.com/lti/preserveExistingAssignmentName': tryJsonParse(data['item[preserveExistingAssignmentName]']),
   }
   this.handleContentItem(contentItem)
 }
@@ -651,7 +652,6 @@ EditView.prototype.handleAssignmentSelectionSubmit = function (data) {
  * @param {ResourceLinkContentItem} item
  */
 EditView.prototype.handleContentItem = function (item) {
-  const line_items_enabled = !!window.ENV.FEATURES.lti_assignment_page_line_items
   this.$externalToolsCustomParams.val(JSON.stringify(item.custom))
   this.$externalToolsContentType.val(item.type)
   this.$externalToolsContentId.val(item.id || this.selectedTool?.id)
@@ -661,33 +661,22 @@ EditView.prototype.handleContentItem = function (item) {
   this.$externalToolsIframeWidth.val(item.iframe?.width)
   this.$externalToolsIframeHeight.val(item.iframe?.height)
 
-  const line_item = item.lineItem
-  if (line_item) {
-    this.$externalToolsLineItem.val(JSON.stringify(line_item))
-    if (
-      'scoreMaximum' in line_item &&
-      (line_items_enabled || this.$assignmentPointsPossible.val() === '0')
-    ) {
-      this.$assignmentPointsPossible.val(line_item.scoreMaximum)
-    }
-    const new_assignment_name = 'label' in line_item ? line_item.label : item.title
-
-    if (new_assignment_name && (line_items_enabled || this.$name.val() === '')) {
-      this.$name.val(new_assignment_name)
-    }
-  } else {
-    const new_assignment_name = item.title
-    if (new_assignment_name && (line_items_enabled || this.$name.val() === '')) {
-      this.$name.val(new_assignment_name)
+  const lineItem = item.lineItem
+  if (lineItem) {
+    this.$externalToolsLineItem.val(JSON.stringify(lineItem))
+    if ('scoreMaximum' in lineItem) {
+      this.$assignmentPointsPossible.val(lineItem.scoreMaximum)
     }
   }
 
-  const description = item.text
-  if (description) {
-    const existing_desc = RichContentEditor.callOnRCE(this.$description, 'get_code')
-    if (line_items_enabled || existing_desc === '') {
-      RichContentEditor.callOnRCE(this.$description, 'set_code', description)
-    }
+  const newAssignmentName = (lineItem && 'label' in lineItem) ? lineItem.label : item.title
+  const replaceAssignmentName = !item['https://canvas.instructure.com/lti/preserveExistingAssignmentName']
+  if (newAssignmentName && (replaceAssignmentName || this.$name.val() === '')) {
+    this.$name.val(newAssignmentName)
+  }
+
+  if (item.text) {
+    RichContentEditor.callOnRCE(this.$description, 'set_code', item.text)
   }
 
   this.renderAssignmentSubmissionTypeContainer()
