@@ -106,6 +106,16 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
     setEndDate(null)
   }
 
+  const endDateErrors = (startDate, endDate) => {
+    if(endDate < startDate){
+      return [{
+        type: 'error',
+        text: I18n.t('The end date can not occur before the start date.')
+      }]
+    }
+    return []
+  }
+
   return (
     <div className="CourseAvailabilityOptions">
       <FormFieldGroup
@@ -195,6 +205,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
             <Flex.Item padding="xx-small">
               <ScreenReaderContent>{I18n.t('Course End Date')}</ScreenReaderContent>
               <CanvasDateInput
+                messages={endDateErrors(startDate, endDate)}
                 renderLabel={I18n.t('End')}
                 formatDate={formatDate}
                 interaction={datesInteraction()}

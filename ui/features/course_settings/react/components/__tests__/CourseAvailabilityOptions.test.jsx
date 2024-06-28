@@ -303,6 +303,27 @@ describe('CourseAvailabilityOptions', () => {
     })
   })
 
+  describe('end date warning', () => {
+    const warningText =
+      'The end date can not occur before the start date.'
+
+    it('is not shown if end date is greater than the start date', () => {
+      const {queryByText} = renderComponent(wrapper, {
+        course_start_at: moment('2020-10-16T12:00:00Z').toISOString(),
+        course_conclude_at: moment('2020-10-17T12:00:00Z').toISOString(),
+      })
+      expect(queryByText(warningText)).not.toBeInTheDocument()
+    })
+
+    it('is shown if end date is less than the start date', () => {
+      const {queryByText} = renderComponent(wrapper, {
+        course_start_at: moment('2020-10-16T12:00:00Z').toISOString(),
+        course_conclude_at: moment('2020-10-15T12:00:00Z').toISOString(),
+      })
+      expect(queryByText(warningText)).toBeInTheDocument()
+    })
+  })
+
   describe('shows local and course time', () => {
     it('shows local and course time for the start date', () => {
       const {getByLabelText, getByText} = renderComponent(wrapper, {
