@@ -1458,6 +1458,7 @@ ko:
   allow_self_sign_up_7520f8c5: "직접 등록 허용"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "달력 행사 복제 허용하기"
   always_3a59e701: 항상
+  an_integer_value_is_required_e073bd46: "정수 값이 필요함"
   analytics: 
     course: 
       analytics: 분석
@@ -14190,6 +14191,7 @@ ko:
   validate: 
     is_required: "이 필드가 필요함"
   validation_error_3b943100: "유효성 검사 오류"
+  value_must_be_positive_3e086d5a: "값이 양수이어야 함"
   verification_code_5acd64ef: "인증 코드"
   verify_3dd8f159: 확인
   version_5599c321: 버전
