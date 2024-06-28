@@ -3108,12 +3108,12 @@ ga:
   assignment_graded_grade_on_assignment_name_in_cour_5082fd1: "Tasc marcáilte: %{grade} ar %{assignment_name} i %{course_code}"
   assignment_grades_have_already_been_released_4c8a91b: "Tá marcanna taisc eisithe cheana féin."
   assignment_grades_will_be_visible_to_students_as_s_62975ef6: "\n\
-      \x20           Beidh marcanna taisc le feiceáil ag mic léinn a luaithe a chuirtear isteach iad.\n\
-      \x20           Fanfaidh na marcanna atá curtha i bhfolach cheana i bhfolach.\n\
+      \x20           Beidh marcanna na dtasacanna le feiceáil ag mic léinn chomh luath is a chuirfear ann iad.\n\
+      \x20           Marcanna atá ceilte cheana féin, fanfaidh siad faoi cheilt.\n\
       \x20         "
   assignment_grades_will_be_visible_to_students_as_s_bfbea571: "\n\
-      \x20         Beidh marcanna taisc le feiceáil ag mic léinn a luaithe a chuirtear isteach iad.\n\
-      \x20         Fanfaidh na marcanna atá curtha i bhfolach cheana i bhfolach.\n\
+      \x20         Beidh marcanna na dtasacanna le feiceáil ag mic léinn chomh luath is a chuirfear ann iad.\n\
+      \x20         Marcanna atá ceilte cheana féin, fanfaidh siad faoi cheilt.\n\
       \x20       "
   assignment_grading_type: 
     gpa_scale_explainer: "Cad é Marcáil Scála GPA?"
@@ -3174,7 +3174,7 @@ ga:
     unmute_button: "Díbhalbhaigh an Tasc"
     unmuting_assignment: "Tasc á dhíbhalbhú..."
   assignment_name_12eadcbd: "Ainm an taisc"
-  assignment_name_a_z_aeefaa36: "Ainm an Taisc - AZ"
+  assignment_name_a_z_aeefaa36: "Ainm an Taisc - A-Z"
   assignment_name_b2d87383: "Ainm an Taisc"
   assignment_name_course_name_override_is_now_due_ed5ce1e: "%{assignment_name}, %{course_name} (%{override}) dlite anois"
   assignment_name_course_name_override_no_longer_has_5a94da2b: "Níl dáta dlite ag %{assignment_name}, %{course_name} (%{override}) a thuilleadh"
@@ -3183,7 +3183,7 @@ ga:
   assignment_name_is_required_9d17311b: "Tá ainm an taisc riachtanach"
   assignment_name_options_43b1795: "roghanna sannadh %{name}"
   assignment_name_z_a_34f92f4b: "Ainm an Taisc - Z-A"
-  assignment_names_858b1880: "Ainmneacha Tascanna"
+  assignment_names_858b1880: "Ainmneacha na dTascanna"
   assignment_options_1e5b7074: "Roghanna Sannacháin"
   assignment_override: 
     student_count: 
@@ -3852,8 +3852,8 @@ ga:
   auto_subscribe_a7da0dff: "Liostáil uathoibríoch"
   autodetect_field_separators_in_compatible_spreadsh_768067e1: "Braith go huathoibríoch deighilteoirí réimse in easpórtálacha scarbhileog comhoiriúnacha"
   automatic_mobile_app_login_3724af59: "Logáil isteach Uathoibríoch Aip Soghluaiste"
-  automatically_apply_deduction_to_late_submissions_2b68166e: "Cuir asbhaint i bhfeidhm go huathoibríoch ar uaslódálacha déanacha"
-  automatically_apply_grade_for_missing_submissions_2b5c1a72: "Cuir marc a chur i bhfeidhm go huathoibríoch do uaslódálacha atá ar iarraidh"
+  automatically_apply_deduction_to_late_submissions_2b68166e: "Cuir laghdú i bhfeidhm i gcás uaslódáil dhéanach"
+  automatically_apply_grade_for_missing_submissions_2b5c1a72: "Cuir marc isteach go huathoibríoch agus uaslódálacha ar iarraidh"
   automatically_assign_709c6ddb: "Sannadh go huathoibríoch"
   automatically_assign_a_student_group_leader_29448649: "Sann ceannaire grúpa mac léinn go huathoibríoch"
   automatically_dff02416: "Go huathoibríoch"
@@ -7622,7 +7622,7 @@ ga:
   december_acc47508: Nollaig
   decrease_indent_d9cf469d: "Laghdaigh Eangú"
   decrease_indent_de6343ab: "Laghdaigh eang"
-  deduction_interval_e18bd51: "Eatramh asbhainte"
+  deduction_interval_e18bd51: "Tréimhse Laghdaithe"
   deep_purple_bb3e2907: Dúchorcra
   deeply_nested_replies_are_no_longer_supported_your_cfe125da: "Ní thacaítear a thuilleadh le freagraí atá neadaithe go domhain. Beidh do fhreagra le feiceáil ar an leathanach ar a bhfuil tú faoi láthair."
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Ní thacaítear a thuilleadh le freagraí atá neadaithe go domhain. Beidh do fhreagra le feiceáil ar an gcéad leathanach den snáithe seo."
@@ -7640,7 +7640,7 @@ ga:
   default_grade_for_1283e89b: "Marc Réamhshocraithe le haghaidh"
   default_grading_scheme_894a0eb: "Scéim Marcála Réamhshocraithe"
   default_grading_scheme_for_accounts_6c9df019: "Scéim Marcála Réamhshocraithe le haghaidh Cuntas"
-  default_order_8c409051: "Dreo Réamhshocraithe"
+  default_order_8c409051: "Ord Réamhshocraithe"
   default_question_bank_c7bcc5e7: "Banc Ceisteanna Réamhshocraithe"
   default_question_name: Ceist
   default_question_text: "Téacs ceiste"
@@ -8271,7 +8271,7 @@ ga:
   dropdown_changed_state_to_expanded_517689c2: "D’athraigh clár anuas staid go %{expanded}."
   dropdown_option_1_e6ff2fc: "Rogha clár anuas 1"
   dropdown_option_2_9766a346: "Rogha clár anuas 2"
-  dropped_38031953: Scaoilte
+  dropped_38031953: "Imithe (ón gcúrsa)"
   dropped_for_grading_purposes_46256461: "Scaoilte chun críocha marcála"
   dropping_subject_1d68ccf4: "Ag Scaoileadh ábhar"
   due_5d7267be: "Dlite:"
@@ -8304,8 +8304,8 @@ ga:
   due_date_must_be_before_the_until_date_740484c5: "Caithfidh an dáta dlite a bheith roimh an dáta Go dtí"
   due_date_must_not_be_after_the_available_until_dat_b77b0dcd: "Níor cheart go mbeadh an dáta dlite tar éis an dáta Ar Fáil Go Dtí."
   due_date_must_not_be_before_the_available_from_dat_1ea9ca: "Níor cheart go mbeadh an dáta dlite roimh an dáta Ar Fáil Ó."
-  due_date_newest_to_oldest_35cffef9: "Dáta Dlite - Is Nuaí go Is Sine"
-  due_date_oldest_to_newest_73e62815: "Dáta Dlite - Ó Is Sine go dtí is Nuaí"
+  due_date_newest_to_oldest_35cffef9: "Dáta Dlite - ó Nua go Sean"
+  due_date_oldest_to_newest_73e62815: "Dáta Dlite - ó Shean go Nua"
   due_date_set_1c6364db: "Socraíodh Dáta Dlite"
   due_dates_520a6c08: "Dátaí Dlite"
   due_dates_are_being_compressed_based_on_your_start_917df12d: "Tá Dátaí Dlite á gcomhbhrú bunaithe ar do dhátaí tosaigh agus deiridh"
@@ -9214,7 +9214,7 @@ ga:
   exciting_discussion_9f67bd0a: "Fóram spreagúil"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Fág amach aon sonraí nár nuashonraíodh ón dáta tugtha"
   excuse_this_assignment_for_the_selected_student_af04e132: "Ná bac leis an Tasc Seo don Mac Léinn Roghnaithe"
-  excused_3aab77: leithscéal
+  excused_3aab77: "Leithscéal faighte"
   excused_5877183c: "Ní bhacfar leis/léi!"
   excused_cf8792eb: Maoinithe
   exit_d0c7b013: Scoir
@@ -9240,9 +9240,9 @@ ga:
   explanation_of_statuses_90a26d07: "Míniú ar stádais:"
   explicit_latex_typesetting_c1c569c9: "Clóchur LaTeX follasach"
   export_course_content_f4774b74: "Easpórtáil Ábhar an Chúrsa"
-  export_current_gradebook_view_6cb376a3: "Easpórtáil Amharc Reatha Leabhar na Marcanna"
+  export_current_gradebook_view_6cb376a3: "Easpórtáil an Radharc Reatha ar Leabhar na Marcanna"
   export_de71cd8e: Easpórtáil
-  export_entire_gradebook_e980d946: "Easpórtáil Leabhar na Marcanna ina Iomlán"
+  export_entire_gradebook_e980d946: "Easpórtáil Leabhar iomlán na Marcanna"
   export_failed_5d615d6d: "Theip ar easpórtáil"
   export_in_progress_70db262a: "Easpórtáil ar siúl"
   export_pairing_codes_5749f6f1: "Easpórtáil Cóid Péireála"
@@ -9863,7 +9863,7 @@ ga:
   grade_for_assignment_acd954e9: "Grád le haghaidh %{assignment}"
   grade_for_ce7621f0: "Marc le haghaidh"
   grade_for_course_ccc8513c: "Marc le haghaidh %{course}"
-  grade_for_missing_submissions_56f91c83: "Marc do sheachadadh atá ar iarraidh"
+  grade_for_missing_submissions_56f91c83: "An marc i gcás uaslódálacha atá ar iarraidh"
   grade_for_name_b9df168a: "Marc le haghaidh: %{name}"
   grade_for_student_assignment_80fea704: "Marc le haghaidh %{student} - %{assignment}"
   grade_for_studentname_d124b199: "Marc le haghaidh %{studentName}"
@@ -9875,9 +9875,9 @@ ga:
   grade_low_to_high_1678b713: "Marc - Íseal go hArd"
   grade_out_of_percentage_1972bf52: "Marc as %{percentage}"
   grade_out_of_points_d401b79d: "Marc as %{points}"
-  grade_posting_policy_42c8a94b: "Polasaí Postála Marc"
-  grade_posting_policy_name_a6d6f178: "Polasaí Postála Marc: %{name}"
-  grade_posting_policy_tray_c929cfd: "Tráidire polasaí postála Marc"
+  grade_posting_policy_42c8a94b: "Polasaí Postála Marcanna"
+  grade_posting_policy_name_a6d6f178: "Polasaí Postála Marcanna: %{name}"
+  grade_posting_policy_tray_c929cfd: "Tráidire polasaí postála Marcanna"
   grade_saved_300616e9: "Sábháladh an Marc"
   grade_saved_ab539b53: "Sábháladh an Marc."
   grade_selection_table_dcf9d1ea: "Tábla Roghnúcháin Marc"
@@ -10151,12 +10151,12 @@ ga:
   grades_view_change_logs_6bc1b959: "Marcanna - féach ar logaí athruithe"
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Eisíodh na Marcanna go rathúil go leabhar na Marcanna."
   grades_will_be_hidden_by_default_any_grades_that_h_53a7fb03: "\n\
-      \x20         Beidh Marcanna curtha i bhfolach de réir réamhshocraithe. Fanfaidh aon mharcanna atá postáilte cheana féin le feiceáil.\n\
-      \x20         Roghnaigh cathain is ceart Marcanna a phostáil don tasc seo i leabhar na Marcanna.\n\
+      \x20         Ceilfear marcanna mar réamhshocrú. Marcanna ar bith atá postáilte, beidh siadsan le feiceáil.\n\
+      \x20         Roghnaigh cathain a phostálfar marcanna le haghaidh gach taisc ar gach colún i Leabhar na Marcanna.\n\
       \x20       "
   grades_will_be_hidden_by_default_any_grades_that_h_b6fac5e5: "\n\
-      \x20           Beidh Marcanna i bhfolach de réir réamhshocraithe. Fanfaidh aon mharcanna atá postáilte cheana féin le feiceáil.\n\
-      \x20           Roghnaigh cathain is ceart Marcanna a phostáil do gach tasc ar gach colún i leabhar na Marcanna.\n\
+      \x20           Ceilfear marcanna mar réamhshocrú. Marcanna ar bith atá postáilte, beidh siadsan le feiceáil.\n\
+      \x20           Roghnaigh cathain a phostálfar marcanna le haghaidh gach taisc ar gach colún i Leabhar na Marcanna.\n\
       \x20         "
   grading_aa6de9: Marcáil
   grading_and_groups_are_not_supported_in_anonymous__36b53a84: "Ní thacaítear le Marcáil agus Grúpaí i bhFóraim Anaithnid."
@@ -10688,7 +10688,7 @@ ga:
   hide_all_artifacts_d654fbd5: "Folaigh Gach Déantán"
   hide_all_details_61d7ebb: "Folaigh Gach Sonraí"
   hide_all_recipients_1ca02da6: "Folaigh gach faighteoir"
-  hide_assignment_group_totals_f4fb8660: "Folaigh Iomlánaí Grúpa Taisc"
+  hide_assignment_group_totals_f4fb8660: "Ceil Iomláin an Ghrúpa Taisc"
   hide_correct_answers_at_2421b0aa: "Folaigh Freagraí Cearta ag"
   hide_correct_answers_at_b1a59408: "Folaigh Freagraí Cearta Ag"
   hide_count_missing_items_d0f25329: 
@@ -10717,7 +10717,7 @@ ga:
   hide_student_names_3e59e862: "Folaigh Ainmneacha na Mic Léinn"
   hide_sub_accounts_for_account_name_a6de98bd: "Folaigh Fo-Chuntais le haghaidh %{account_name}"
   hide_total_and_override_columns_6fde3e25: "Cuir Iomlán i bhFolach agus Sáraigh Colúin"
-  hide_total_column_6911831e: "Folaigh Colún Iomlán"
+  hide_total_column_6911831e: "Ceil Colún na nIomlán"
   hide_translate_text_1003ba9e: "Folaigh Téacs Aistrithe"
   hide_unassessed_outcomes_a20aa7fd: "Folaigh Torthaí Neamhmheasúnaithe"
   hide_zero_point_new_quizzes_from_the_student_and_t_b4c22d88: "Folaigh quizeanna nua pointe náid ó Leabhar na Marcanna an mhic léinn agus an mhúinteora"
@@ -11679,14 +11679,14 @@ ga:
     other: "Pionós Déanach: lúide %{count} Pointe"
     zero: "Pionós Déanach: Ceann ar bith"
   late_percent_b91d01b3: "Déanach: %{percent}"
-  late_policies_42bac80: "Polasaithe Déanacha"
+  late_policies_42bac80: "Polasaithe déanacha"
   late_policies_fd5dced6: "Beartais Mallaithe"
   late_policy_9d0e76b5: "Polasaí Déanach"
   late_policy_d3f95a91: "Polasaí Déanach:"
   late_policy_minus_count_points_1a945541: 
     one: "Beartas Déanach: lúide Pointe 1"
     other: "Polasaí Déanach: lúide %{count} Pointe"
-  late_submission_deduction_5d7fa3cb: "Asbhaint uaslódáila déanach"
+  late_submission_deduction_5d7fa3cb: "Laghdú na nUaslódálacha Déanacha"
   late_submission_deduction_must_be_numeric_5b3f468e: "Ní mór asbhaint uaslódáila déanach a bheith uimhriúil"
   latest_assessment_a85280ef: "Tasc is Déanaí"
   latest_f604a75: "Is déanaí"
@@ -12214,7 +12214,7 @@ ga:
   lower_limit_of_range_6ddd4983: "Teorainn raoin ísle"
   lower_quartile_c7fceee8: "Ceathairíl Íochtarach:"
   lowerbound_to_upperbound_352a3c0b: "%{lowerBound}+ go %{upperBound}"
-  lowest_possible_grade_ae5510be: "An Marc is ísle is féidir"
+  lowest_possible_grade_ae5510be: "An Marc is Ísle"
   lowest_possible_grade_must_be_numeric_3d97659d: "Caithfidh an Marc is ísle a bheith uimhriúil"
   lti: 
     launch_iframe: 
@@ -12357,7 +12357,7 @@ ga:
   manual_syncs_are_available_every_cooldown_minutes__e47de0a8: "Tá sioncronaithe láimhe ar fáil gach %{coolDown} nóiméad. Fán le do thoil %{minutesRemaining} nóiméad le sioncronú arís."
   manually_9de23e1f: "De Láimh"
   manually_mark_replies_as_read_580adc59: "Marcáil freagraí mar léite de láimh"
-  manually_post_grades_18248306: "Postáil Marcanna De Láimh"
+  manually_post_grades_18248306: "Postáil Marcanna de Láimh"
   march_bbe310ee: Márta
   mark_all_as_read_8f3bdf57: "Marcáil iad Go Léir mar Léite"
   mark_all_as_read_a995ffbe: "Marcáil go léir mar léite"
@@ -14181,7 +14181,7 @@ ga:
   minimum_score_e6d1c134: "Scór Íosta"
   minutes_4aee5a41: Nóiméad
   minutes_per_slot_5b7169e5: "Nóiméad in aghaidh an sliotán"
-  missing_1a256b3b: "ar Iarraidh"
+  missing_1a256b3b: "Ar iarraidh"
   missing_count_or_until_62ad480c: "COMHAIREAMH ar iarraidh nó GO DTÍ"
   missing_d59852a7: "ar iarraidh"
   missing_eaddacbd: "AR IARRAIDH"
@@ -14254,7 +14254,7 @@ ga:
   module_and_items_unpublished_e953ba4f: "Modúl agus míreanna neamhfhoilsithe"
   module_completed_50c50762: "Modúl Críochnaithe"
   module_filter_63b17d11: "Scagaire Modúil"
-  module_first_to_last_6921f3ec: "Modúl - An Chéad go dtí an Deireadh"
+  module_first_to_last_6921f3ec: "Modúl - ó Thús go Deireadh"
   module_in_progress_fa600662: "Modúl ar Siúl"
   module_item_has_been_completed_by_scoring_at_least_70bcdbcc: "Tá mír an mhodúil curtha i gcrích ag scóráil ar a laghad %{score}"
   module_item_has_been_viewed_and_is_complete_6d180117: "Breathnaíodh ar mhír an mhodúil agus tá sé críochnaithe"
@@ -14263,7 +14263,7 @@ ga:
   module_item_module_item_name_was_successfully_dele_8626d846: "Scriosadh mír an mhodúil %{module_item_name} go rathúil."
   module_item_submitted_and_is_complete_d61a909f: "Tá mír an mhodúil curtha isteach agus tá sé críochnaithe"
   module_items_cannot_be_unpublished_if_there_are_st_7a80507c: "Ní féidir míreanna modúl a bheith neamhfhoilsithe má tá uaslódálacha mac léinn ann."
-  module_last_to_first_8cdb7a8e: "Modúl - Deireadh go dtí an chéad"
+  module_last_to_first_8cdb7a8e: "Modúl - ó Dheireadh go Tús"
   module_locked_f6a7ea9d: "Modúl Faoi Ghlas"
   module_menu_3201af4e: "Roghchlár Modúl"
   module_menu_modal_6b20c03: "Roghchlár Modúl (Modhach)"
@@ -16361,9 +16361,9 @@ ga:
   points_for_mastery_level_position_points_9e72ac3f: "Pointí le haghaidh leibhéal forlámhais %{position}: %{points}"
   points_for_rating_tier_index_not_present_338d94e6: "Pointí don tsraith rátála %{index} nach bhfuil i láthair"
   points_for_tier_index_must_be_less_than_points_for_9683c02: "Pointí don tsraith %{index} caithfidh sé a bheith níos lú ná pointí don tsraith roimhe (tá %{points} níos mó ná %{prior})"
-  points_highest_to_lowest_87f1b143: "Pointí - Ó is airde go dtí is ísle"
+  points_highest_to_lowest_87f1b143: "Pointí - ó Íseal go hArd"
   points_is_required_9a9d05b2: "Pointí ag teastáil"
-  points_lowest_to_highest_45089e82: "Pointí - Ó is ísle go dtí is airde"
+  points_lowest_to_highest_45089e82: "Pointí - ó Ard go hÍseal"
   points_must_0_3bff353: "Ní mór do phointí a bheith >= 0"
   points_must_be_a_number_0_daa4f7dc: "Ní mór go mbeadh pointí ina n-uimhir >= 0"
   points_must_be_less_than_previous_rating_bc627bec: "Ní mór na pointí a bheith níos lú ná an rátáil roimhe seo"
@@ -20408,7 +20408,7 @@ ga:
   statistics_for_name_f4b7b0fc: "Staitisticí le haghaidh %{name}"
   statistics_view_b19458: "Staitisticí - amharc"
   stats_9272cef3: Staitisticí
-  status_color_1c4ce650: "Dath Stádas"
+  status_color_1c4ce650: "Dath an Stádais"
   status_color_picker_9ea0156b: "%{status} Roghnóir Dathanna"
   status_e7fdbe06: Stádas
   status_for_key_keyname_47668960: "%{status} le haghaidh eochair: %{keyName}"
