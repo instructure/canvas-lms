@@ -94,7 +94,7 @@ export const DiscussionEdit = props => {
               }}
             />
           </View>
-          <ReplyPreview {...props.quotedEntry} />
+          {!props.isEdit && <ReplyPreview {...props.quotedEntry} />}
         </span>
       )}
       {props.discussionAnonymousState && props.canReplyAnonymously && !props.isEdit && (
@@ -193,7 +193,7 @@ export const DiscussionEdit = props => {
                         )
                         props.onSubmit(
                           rceContent,
-                          includeQuotedReply ? props.quotedEntry.id : null,
+                          includeQuotedReply ? props.quotedEntry._id : null,
                           attachment,
                           anonymousAuthorState
                         )

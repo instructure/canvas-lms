@@ -195,13 +195,16 @@ export const SplitScreenViewContainer = props => {
     }
   }
 
-  const onUpdate = (discussionEntry, message, file) => {
+  const onUpdate = (message, quotedEntryId, file) => {
+    const discussionEntry = splitScreenEntryOlderDirection.data.legacyNode
+
     updateDiscussionEntry({
       variables: {
         discussionEntryId: discussionEntry._id,
         message,
         fileId: file?._id,
         removeAttachment: !file?._id,
+        quotedEntryId,
       },
     })
   }
