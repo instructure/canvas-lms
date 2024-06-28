@@ -1732,6 +1732,87 @@ describe "discussions" do
               expect(module_item_assign_to_card.last).to contain_css(required_replies_due_date_input_selector)
             end
           end
+
+          context "post to sis" do
+            before do
+              course.account.set_feature_flag! "post_grades", "on"
+              course.account.set_feature_flag! :new_sis_integrations, "on"
+              course.account.settings[:sis_syncing] = { value: true, locked: false }
+              course.account.settings[:sis_require_assignment_due_date] = { value: true }
+              course.account.save!
+            end
+
+            it "blocks when enabled", :ignore_js_errors do
+              graded_discussion = create_graded_discussion(course)
+              get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+              Discussion.click_sync_to_sis_checkbox
+              Discussion.save_button.click
+              wait_for_ajaximations
+
+              expect(driver.current_url).to include("edit")
+              expect_instui_flash_message("Please set a due date or change your selection for the “Sync to SIS” option.")
+
+              Discussion.click_assign_to_button
+
+              wait_for_assign_to_tray_spinner
+              keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+              expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
+              update_due_date(0, format_date_for_view(Time.zone.now, "%-m/%-d/%Y"))
+              update_due_time(0, "11:59 PM")
+              click_save_button("Apply")
+              keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+              expect_new_page_load { Discussion.save_button.click }
+              expect(driver.current_url).not_to include("edit")
+              expect(graded_discussion.reload.assignment.post_to_sis).to be_truthy
+              get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+              expect(is_checked(Discussion.sync_to_sis_checkbox_selector)).to be_truthy
+            end
+
+            it "does not block when disabled" do
+              graded_discussion = create_graded_discussion(course)
+              get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+
+              expect_new_page_load { Discussion.save_button.click }
+              expect(driver.current_url).not_to include("edit")
+              expect(graded_discussion.reload.assignment.post_to_sis).to be_falsey
+
+              get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+              expect(is_checked(Discussion.sync_to_sis_checkbox_selector)).to be_falsey
+            end
+
+            it "validates due date when user checks/unchecks the box", :ignore_js_errors do
+              graded_discussion = create_graded_discussion(course)
+              get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+
+              Discussion.click_assign_to_button
+              wait_for_assign_to_tray_spinner
+              keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+              expect(assign_to_date_and_time[0].text).not_to include("Please add a due date")
+
+              click_cancel_button
+              keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+              Discussion.click_sync_to_sis_checkbox
+              Discussion.click_assign_to_button
+              wait_for_assign_to_tray_spinner
+              keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+              expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
+              update_due_date(0, format_date_for_view(Time.zone.now, "%-m/%-d/%Y"))
+              update_due_time(0, "11:59 PM")
+              click_save_button("Apply")
+              keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+              expect_new_page_load { Discussion.save_button.click }
+              expect(driver.current_url).not_to include("edit")
+              expect(graded_discussion.reload.assignment.post_to_sis).to be_truthy
+            end
+          end
         end
 
         context "checkpoints" do

@@ -102,9 +102,29 @@ const validatePostToSections = (shouldShowPostToSectionOption, sectionIdsToPostT
   }
 }
 
-const validateGradedDiscussionFields = (gradedDiscussionRefMap, gradedDiscussionRef, isGraded) => {
+const validateGradedDiscussionFields = (
+  gradedDiscussionRefMap,
+  gradedDiscussionRef,
+  isGraded,
+  assignedInfoList,
+  postToSis,
+  showPostToSisError
+) => {
   if (!isGraded) {
     return true
+  }
+
+  if (
+    ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT &&
+    ENV.FEATURES?.selective_release_ui_api &&
+    assignedInfoList &&
+    postToSis
+  ) {
+    const aDueDateMissing = assignedInfoList.some(assignee => !assignee.dueDate)
+    if (aDueDateMissing) {
+      showPostToSisError()
+      return false
+    }
   }
 
   for (const refMap of gradedDiscussionRefMap.values()) {
@@ -140,7 +160,10 @@ export const validateFormFields = (
   setTitleValidationMessages,
   setAvailabilityValidationMessages,
   shouldShowPostToSectionOption,
-  sectionIdsToPostTo
+  sectionIdsToPostTo,
+  assignedInfoList,
+  postToSis,
+  showPostToSisError
 ) => {
   let isValid = true
 
@@ -174,7 +197,10 @@ export const validateFormFields = (
       validationFunction: validateGradedDiscussionFields(
         gradedDiscussionRefMap,
         gradedDiscussionRef,
-        isGraded
+        isGraded,
+        assignedInfoList,
+        postToSis,
+        showPostToSisError
       ),
       ref: gradedDiscussionRef.current,
     },

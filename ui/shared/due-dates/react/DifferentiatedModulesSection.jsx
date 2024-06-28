@@ -503,6 +503,7 @@ const DifferentiatedModulesSection = ({
           <IconEditLine size="x-small" color="primary" />
         </View>
         <Link
+          id="manage-assign-to"
           margin="medium none"
           data-testid="manage-assign-to"
           isWithinText={false}

@@ -81,6 +81,7 @@ import {ItemAssignToTrayWrapper} from '../DiscussionOptions/ItemAssignToTrayWrap
 import {SendEditNotificationModal} from '../SendEditNotificationModal'
 import {Views, DiscussionTopicFormViewSelector} from './DiscussionTopicFormViewSelector'
 import {MasteryPathsReactWrapper} from '@canvas/conditional-release-editor/react/MasteryPathsReactWrapper'
+import {showPostToSisFlashAlert} from '@canvas/due-dates/util/differentiatedModulesUtil'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -277,31 +278,6 @@ function DiscussionTopicForm({
     currentDiscussionTopic?.replyToEntryRequiredCount || 1
   )
 
-  const assignmentDueDateContext = {
-    assignedInfoList,
-    setAssignedInfoList,
-    studentEnrollments,
-    sections,
-    groups:
-      groupCategories.find(groupCategory => groupCategory._id === groupCategoryId)?.groupsConnection
-        ?.nodes || [],
-    groupCategoryId,
-    gradedDiscussionRefMap,
-    setGradedDiscussionRefMap,
-    pointsPossibleReplyToTopic,
-    setPointsPossibleReplyToTopic,
-    pointsPossibleReplyToEntry,
-    setPointsPossibleReplyToEntry,
-    replyToEntryRequiredCount,
-    setReplyToEntryRequiredCount,
-    title,
-    assignmentID: currentDiscussionTopic?.assignment?._id || null,
-    importantDates,
-    setImportantDates,
-    pointsPossible,
-    isGraded,
-    isCheckpoints,
-  }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
   const [attachment, setAttachment] = useState(currentDiscussionTopic?.attachment || null)
@@ -336,6 +312,33 @@ function DiscussionTopicForm({
   const handleSettingUsageRightsData = data => {
     setUsageRightsErrorState(false)
     setUsageRightsData(data)
+  }
+
+  const assignmentDueDateContext = {
+    assignedInfoList,
+    setAssignedInfoList,
+    studentEnrollments,
+    sections,
+    groups:
+      groupCategories.find(groupCategory => groupCategory._id === groupCategoryId)?.groupsConnection
+        ?.nodes || [],
+    groupCategoryId,
+    gradedDiscussionRefMap,
+    setGradedDiscussionRefMap,
+    pointsPossibleReplyToTopic,
+    setPointsPossibleReplyToTopic,
+    pointsPossibleReplyToEntry,
+    setPointsPossibleReplyToEntry,
+    replyToEntryRequiredCount,
+    setReplyToEntryRequiredCount,
+    title,
+    assignmentID: currentDiscussionTopic?.assignment?._id || null,
+    importantDates,
+    setImportantDates,
+    pointsPossible,
+    isGraded,
+    isCheckpoints,
+    postToSis,
   }
 
   useEffect(() => {
@@ -536,7 +539,10 @@ function DiscussionTopicForm({
         setTitleValidationMessages,
         setAvailabilityValidationMessages,
         shouldShowPostToSectionOption,
-        sectionIdsToPostTo
+        sectionIdsToPostTo,
+        assignedInfoList,
+        postToSis,
+        showPostToSisFlashAlert('manage-assign-to')
       )
     ) {
       const payload = createSubmitPayload(shouldPublish)
