@@ -30,6 +30,7 @@ import {HeroSection} from '../user/sections/HeroSection'
 import {NavigationSection} from '../user/sections/NavigationSection'
 import {AboutSection} from '../user/sections/AboutSection'
 import {QuizSection} from '../user/sections/QuizSection'
+import {AnnouncementSection} from '../user/sections/AnnouncementSection'
 import {FooterSection} from '../user/sections/FooterSection'
 import {BlankSection} from '../user/sections/BlankSection'
 import {getNodeIndex} from '../../utils'
@@ -49,6 +50,8 @@ const nameToSection = (name: string) => {
       return <AboutSection />
     case 'Quiz':
       return <QuizSection />
+    case 'Announcement':
+      return <AnnouncementSection />
     case 'Footer':
       return <FooterSection />
     case 'Blank':
@@ -184,6 +187,11 @@ const SectionBrowser = ({open, where, onClose}: SectionBrowserProps) => {
             'Quiz',
             'section-quiz.png',
             'The quiz section is where you can add a quiz to your page.'
+          )}
+          {renderBox(
+            'Announcement',
+            'section-announcement.png',
+            'The announcement section is where you can add an announcement to your page.'
           )}
           {renderBox(
             'Footer',
