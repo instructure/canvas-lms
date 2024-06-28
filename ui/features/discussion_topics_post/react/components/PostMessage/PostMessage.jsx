@@ -60,8 +60,10 @@ export function PostMessage({...props}) {
 
   // Shouldn't fire if not feature flagged.
   useEffect(() => {
-    // This is another change
     if (translateTargetLanguage == null) {
+      // Since the SearchSpan depends on translatedMessage, we want to make sure that it gets set to the latest props.message
+      // Value if it changes, even if no translation occurs.
+      setTranslatedMessage(props.message)
       return
     }
 
@@ -72,7 +74,7 @@ export function PostMessage({...props}) {
       setTranslatedMessage,
       setIsTranslating
     )
-  }, [translateTargetLanguage])
+  }, [translateTargetLanguage, props.message])
 
   return (
     <Responsive
