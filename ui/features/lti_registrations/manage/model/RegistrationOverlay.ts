@@ -22,16 +22,16 @@ import {ZLtiScope} from './LtiScope'
 import {ZLtiPlacementOverlay} from './PlacementOverlay'
 
 export const ZRegistrationOverlay = z.object({
-  title: z.string().optional(),
-  disabledScopes: z.array(ZLtiScope).optional(),
-  disabledSubs: z.array(z.string()).optional(),
+  title: z.string().optional().nullable(),
+  disabledScopes: z.array(ZLtiScope).optional().nullable(),
+  disabledSubs: z.array(z.string()).optional().nullable(),
   icon_url: z.string().optional().nullable(),
   launch_height: z.string().optional().nullable(),
   launch_width: z.string().optional().nullable(),
-  disabledPlacements: z.array(ZLtiPlacement).optional(),
-  placements: z.array(ZLtiPlacementOverlay).optional(),
-  description: z.string().optional(),
-  privacy_level: ZLtiPrivacyLevel.optional(),
+  disabledPlacements: z.array(ZLtiPlacement).optional().nullable(),
+  placements: z.array(ZLtiPlacementOverlay).optional().nullable(),
+  description: z.string().optional().nullable(),
+  privacy_level: ZLtiPrivacyLevel.optional().nullable(),
 })
 
 export type RegistrationOverlay = z.infer<typeof ZRegistrationOverlay>
