@@ -239,8 +239,30 @@ describe Api do
       expect(@api.api_find(Account, "uuid:#{account.uuid}")).to eq account
     end
 
-    it "finds user by uuid" do
+    it "finds user by uuid (40 alpha-numeric character)" do
       expect(@api.api_find(User, "uuid:#{@user.uuid}")).to eq @user
+    end
+
+    context "when the user has a V4 UUID" do
+      let(:user) { @user }
+      let(:uuid) { SecureRandom.uuid }
+
+      before { @user.update!(uuid:) }
+
+      it "finds user by uuid" do
+        expect(@api.api_find(User, "uuid:#{uuid}")).to eq @user
+      end
+    end
+
+    context "when the user has a 50-character UUID" do
+      let(:user) { @user }
+      let(:uuid) { "806bd5b3988e0182c042bbe0c6554f191c781985-ua3871307" }
+
+      before { @user.update!(uuid:) }
+
+      it "finds user by uuid" do
+        expect(@api.api_find(User, "uuid:#{uuid}")).to eq @user
+      end
     end
 
     it "finds course by uuid" do
