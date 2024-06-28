@@ -44,15 +44,14 @@ type ToolsByDisplayGroupResponse = Array<{
 // TODO: remove when backend hooked up
 const mockProducts: Array<Product> = [
   {
-    id: '3a',
-    name: 'Achieve3000',
-    tagline:
-      "Reading comprehension program that delivers news articles at students' reading levels ",
+    id: 'powernotes',
+    name: 'Powernotes',
+    tagline: 'Stay organized, save time, and improve your writing & research.',
     description:
       'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam voluptatem.',
     company: {
-      id: '19a',
-      name: 'Vendor Test Company',
+      id: 'powernotes',
+      name: 'Powernotes',
       company_url: 'https://google.com',
     },
     logo_url:

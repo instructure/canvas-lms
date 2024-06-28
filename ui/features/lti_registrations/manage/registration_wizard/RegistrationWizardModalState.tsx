@@ -31,8 +31,6 @@ export type RegistrationWizardModalState = {
    */
   registering: boolean
   lti_version: '1p3' | '1p1'
-  progress: number
-  progressMax: number
   method: 'dynamic_registration' | 'manual' | 'json'
   dynamicRegistrationUrl: string
   /**
@@ -47,7 +45,6 @@ export type RegistrationWizardModalStateActions = {
   updateLtiVersion: (version: '1p3' | '1p1') => void
   updateMethod: (method: 'dynamic_registration' | 'manual' | 'json') => void
   updateDynamicRegistrationUrl: (url: string) => void
-  updateProgress: (progress: number, progressMax: number) => void
   register: () => void
   unregister: () => void
   close: () => void
@@ -67,7 +64,6 @@ export const useRegistrationModalWizardState = create<
   updateLtiVersion: version => set({lti_version: version}),
   updateMethod: method => set({method}),
   updateDynamicRegistrationUrl: url => set({dynamicRegistrationUrl: url}),
-  updateProgress: (progress, progressMax) => set({progress, progressMax}),
   register: () => set({registering: true}),
   unregister: () => {
     // todo: if we've already returned from the tool,
@@ -102,8 +98,6 @@ export const openDynamicRegistrationWizard = (dynamicRegistrationUrl: string) =>
     lti_version: '1p3',
     method: 'dynamic_registration',
     registering: true,
-    progress: 0,
-    progressMax: 100,
     exitOnCancel: true,
   })
 }

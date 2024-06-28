@@ -65,18 +65,20 @@ export const RegistrationWizardModal = (props: RegistrationWizardModalProps) => 
         />
         <Heading>{I18n.t('Install App')}</Heading>
       </Modal.Header>
-      <ProgressBar
-        meterColor="info"
-        shouldAnimate={true}
-        size="x-small"
-        screenReaderLabel={I18n.t('Installation Progress')}
-        valueNow={state.progress}
-        valueMax={state.progressMax}
-        themeOverride={{
-          trackBottomBorderWidth: '0',
-        }}
-        margin="0 0 small"
-      />
+      {!state.registering ? (
+        <ProgressBar
+          meterColor="info"
+          shouldAnimate={true}
+          size="x-small"
+          screenReaderLabel={I18n.t('Installation Progress')}
+          valueNow={0}
+          valueMax={100}
+          themeOverride={{
+            trackBottomBorderWidth: '0',
+          }}
+          margin="0 0 small"
+        />
+      ) : null}
 
       <ModalBodyWrapper state={state} accountId={props.accountId} />
     </Modal>
