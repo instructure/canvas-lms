@@ -1765,6 +1765,7 @@ el:
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Παρουσιάστηκε σφάλμα κατά τον ορισμό του δικαιώματος χρήσης του αρχείου %{filename}"
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Ένα σφάλμα συνέβη κατά την αφαίρεση της ομάδας ραντεβού."
   an_export_is_already_in_progress_54270f01: "Μια εξαγωγή δεδομέων βρίσκεται σε εξέλιξη."
+  an_integer_value_is_required_e073bd46: "Μια τιμή ακέραιου απαιτείται"
   an_internal_error_occurred_83b8a685: "Παρουσιάστηκε ένα εσωτερικό σφάλμα"
   an_item_named_name_already_exists_in_this_location_147b7312: "Ένα στοιχείο που ονομάζεται «%{name}» υπάρχει ήδη σε αυτή την τοποθεσία. Θέλετε να αντικαταστήσετε το υπάρχον αρχείο;"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Συνέβη ένα άγνωστο σφάλμα διακομιστή. Παρακαλούμε ξαναπροσπαθήστε."
@@ -9887,6 +9888,7 @@ el:
   move_to_1c208ae5: "Μεταφορά Προς..."
   move_to_dde1a5e1: "Μεταφορά Προς..."
   moving_a4d552df: Μετακίνηση...
+  multi_factor_authentication_1a6b3b3d: "Έλεγχος Ταυτότητας Πολλών Παραγόντων"
   multi_factor_authentication_configured_865b1bde: "Ρυθμίστηκε ο έλεγχος ταυτότητας πολλών παραγόντων "
   multiple_dates_e3a122f7: "Πολλαπλές Ημερομηνίες"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -10654,6 +10656,7 @@ el:
     video: "Αρχείο Βίντεο"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Παρακαλώ προσθέστε τουλάχιστον μια όχι κενή απάντηση."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Παρακαλώ προσθέστε τουλάχιστον μια όχι κενή απάντηση για κάθε μεταβλητή."
+  please_enter_the_verification_code_shown_by_your_t_acc7c404: "Παρακαλώ, εισαγάγετε τον κωδικό επιβεβαίωσης που εμφανίζει το token σας."
   please_enter_your_label_name_7745272d: "Παρακαλώ, πληκτρολογήστε το %{label_name} σας:"
   please_enter_your_label_name_and_password_5c56be80: "Παρακαλώ πληκτρολογήστε το %{label_name} σας και συνθηματικό:"
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Παρακαλώ ενημερώστε τους για το ποιες σελίδες προβάλατε και ποιον σύνδεσμο πατήσατε."
@@ -13954,6 +13957,7 @@ el:
       none_to_update: "Δεν υπάρχουν δεδομένα προς ενημέρωση"
   shared_secret_892c88f2: "Διαμοιρασμένο Μυστικό"
   shift_dates_746698a5: "Αλλαγή ημερομηνιών"
+  should_be_10_digit_number_d30ef02d: "πρέπει να είναι 10ψήφιος αριθμός"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "θα πρέπει να είναι αυταπόδεικτο, το ID στο Canvas του χρήστη που αναφέρει το σφάλμα"
   show_and_hide_courses_menu_9e09d1d0: "Εμφάνιση και απόκρυψη μενού μαθημάτων"
   show_by_date_e3967761: "Εμφάνιση βάσει Ημερομηνίας"
@@ -15446,8 +15450,10 @@ el:
     is_required: "Αυτό το πεδίο είναι υποχρεωτικό"
   validate_links_in_content_b1630fba: "Επικύρωση Συνδέσμων στο Περιεχόμενο"
   validation_error_3b943100: "Λάθος στην Επικύρωση"
+  value_must_be_positive_3e086d5a: "Η τιμή πρέπει να είναι θετική"
   vanity_url_76f93382: "Vanity URL"
   verification_code_5acd64ef: "Κωδικός Επιβεβαίωσης"
+  verify_3dd8f159: Επιβεβαίωση
   version_5599c321: Έκδοση
   video_b9f27375: "Αρχείο Βίντεο"
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Το περιεχόμενο του βίντεο δεν υποστηρίζεται από τη συσκευή ή την εφαρμογή σας."
