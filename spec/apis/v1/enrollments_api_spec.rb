@@ -3534,6 +3534,7 @@ describe EnrollmentsApiController, type: :request do
       Account.default.enable_feature!(:temporary_enrollments)
       @provider = user_factory(active_all: true)
       @recipient = user_factory(active_all: true)
+      @user = user_factory(active_all: true)
       course1 = course_with_teacher(active_all: true, user: @provider).course
       course2 = course_with_teacher(active_all: true, user: @provider).course
       temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default, created_by: account_admin_user)
@@ -3559,6 +3560,16 @@ describe EnrollmentsApiController, type: :request do
           end_at:
         }
       )
+      enrollment = course1.enroll_user(
+        @user,
+        "TeacherEnrollment",
+        {
+          role: teacher_role,
+          start_at:,
+          end_at:
+        }
+      )
+      enrollment.accept
     end
 
     it "returns appropriate status for a provider" do
@@ -3568,9 +3579,10 @@ describe EnrollmentsApiController, type: :request do
                       user_id: @provider.id,
                       format: "json" }
       json = api_call_as_user(account_admin_user, :get, user_path, user_params)
-      expect(json.length).to eq(2)
+      expect(json.length).to eq(3)
       expect(json["is_provider"]).to be_truthy
       expect(json["is_recipient"]).to be_falsey
+      expect(json["can_provide"]).to be_truthy
     end
 
     it "returns appropriate status for a recipient" do
@@ -3580,9 +3592,23 @@ describe EnrollmentsApiController, type: :request do
                       user_id: @recipient.id,
                       format: "json" }
       json = api_call_as_user(account_admin_user, :get, user_path, user_params)
-      expect(json.length).to eq(2)
+      expect(json.length).to eq(3)
       expect(json["is_provider"]).to be_falsey
       expect(json["is_recipient"]).to be_truthy
+      expect(json["can_provide"]).to be_truthy
+    end
+
+    it "returns appropriate status for a user that can provide" do
+      user_path = "/api/v1/users/#{@user.id}/temporary_enrollment_status"
+      user_params = { controller: "enrollments_api",
+                      action: "show_temporary_enrollment_status",
+                      user_id: @user.id,
+                      format: "json" }
+      json = api_call_as_user(account_admin_user, :get, user_path, user_params)
+      expect(json.length).to eq(3)
+      expect(json["is_provider"]).to be_falsey
+      expect(json["is_recipient"]).to be_falsey
+      expect(json["can_provide"]).to be_truthy
     end
   end
 end
