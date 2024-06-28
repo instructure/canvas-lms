@@ -22,7 +22,7 @@ import {Tray} from '@instructure/ui-tray'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import type {FilterItem, LtiFilter} from '../model/Filter'
+import type {FilterItem, LtiFilters} from '../model/Filter'
 import FilterOptions from './FilterOptions'
 import {View} from '@instructure/ui-view'
 import type {DiscoverParams} from './useDiscoverQueryParams'
@@ -32,7 +32,7 @@ const I18n = useI18nScope('lti_registrations')
 export type LtiFilterTrayProps = {
   isTrayOpen: boolean
   setIsTrayOpen: (isOpen: boolean) => void
-  filterValues: LtiFilter
+  filterValues: LtiFilters
   setQueryParams: (params: Partial<DiscoverParams>) => void
   queryParams: DiscoverParams
 }
@@ -46,7 +46,7 @@ export default function LtiFilterTray({
 }: LtiFilterTrayProps) {
   const closeRef = useRef<HTMLElement>()
   // Need to duplicate for the apply button's behaviour
-  const [localFilters, setLocalFilters] = useState<LtiFilter>({})
+  const [localFilters, setLocalFilters] = useState<LtiFilters>({})
 
   const setFilterValue = (filterItem: FilterItem, value: boolean, category: string) => {
     if (value) {
