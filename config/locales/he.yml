@@ -2207,6 +2207,7 @@ he:
   an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "משתמש קנבס קיים  %{user_id} %{other_user_id}'של user_id כבר ביקש מידע על קוד הכניסה. מתעלם. "
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "משתמש קנבס קיים %{user_id} כבר ביקש את %{other_user_id}' integration_id, מתעלם."
   an_export_is_already_in_progress_54270f01: "תהליך ייצוא כבר בפעולה"
+  an_integer_value_is_required_e073bd46: "נדרש ערך של מספר שלם"
   an_internal_error_occurred_83b8a685: "אירעה תקלה פנימית"
   an_item_named_name_already_exists_in_this_location_147b7312: "פריט בשם  \"%{name}\"  כבר קיים במיקום זה. האם בכוונתך להחליף את הקובץ הקיים?"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "אירעה שגיאת שרת לא ידועה. נא לנסות שוב."
@@ -20214,6 +20215,7 @@ he:
     is_required: "חובה למלא שדה זה"
   validate_links_in_content_b1630fba: "בדיקת תקינות הקישורים שבתוכן."
   validation_error_3b943100: "שגיאת ואלידציה"
+  value_must_be_positive_3e086d5a: "הערך חייב להיות חיובי"
   vanity_url_76f93382: "כתובת דף קלה לזכירה"
   vendor_code_lti_2_ef36207b: "קוד ספק  (LTI 2):"
   vericite: 
