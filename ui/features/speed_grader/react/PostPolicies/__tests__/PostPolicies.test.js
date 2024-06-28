@@ -19,8 +19,13 @@
 import {unmountComponentAtNode} from 'react-dom'
 import PostPolicies from '../index'
 import SpeedGraderHelpers from '../../../jquery/speed_grader_helpers'
+import sinon from 'sinon'
 
-QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
+const ok = x => expect(x).toBeTruthy()
+const strictEqual = (x, y) => expect(x).toEqual(y)
+const deepEqual = (x, y) => expect(x).toEqual(y)
+
+describe('SpeedGrader PostPolicies', () => {
   let $hideTrayMountPoint
   let $postTrayMountPoint
   let afterUpdateSubmission
@@ -36,7 +41,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
     }
   }
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     $hideTrayMountPoint = document.createElement('div')
     $postTrayMountPoint = document.createElement('div')
     $hideTrayMountPoint.id = 'hide-assignment-grades-tray'
@@ -59,7 +64,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
     })
   })
 
-  suiteHooks.afterEach(() => {
+  afterEach(() => {
     postPolicies.destroy()
     $postTrayMountPoint.remove()
     $hideTrayMountPoint.remove()
@@ -77,7 +82,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
     strictEqual(unmounted, true)
   })
 
-  QUnit.module('#destroy', () => {
+  describe('#destroy', () => {
     test('unmounts the "Hide Assignment Grades" tray', () => {
       postPolicies.destroy()
       const $trayContainer = document.getElementById('hide-assignment-grades-tray')
@@ -93,12 +98,12 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
     })
   })
 
-  QUnit.module('#showHideAssignmentGradesTray', hooks => {
+  describe('#showHideAssignmentGradesTray', () => {
     function hideGradesShowArgs() {
       return postPolicies._hideAssignmentGradesTray.show.firstCall.args[0]
     }
 
-    hooks.beforeEach(() => {
+    beforeEach(() => {
       sinon.stub(postPolicies._hideAssignmentGradesTray, 'show')
     })
 
@@ -188,12 +193,12 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
     })
   })
 
-  QUnit.module('#showPostAssignmentGradesTray', hooks => {
+  describe('#showPostAssignmentGradesTray', () => {
     function postGradesShowArgs() {
       return postPolicies._postAssignmentGradesTray.show.firstCall.args[0]
     }
 
-    hooks.beforeEach(() => {
+    beforeEach(() => {
       sinon.stub(postPolicies._postAssignmentGradesTray, 'show')
     })
 

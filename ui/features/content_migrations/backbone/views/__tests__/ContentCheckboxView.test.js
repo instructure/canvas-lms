@@ -23,6 +23,12 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.simulate'
+import sinon from 'sinon'
+import '@canvas/jquery/jquery.disableWhileLoading'
+
+const fixturesDiv = document.createElement('div')
+fixturesDiv.id = 'fixtures'
+document.body.appendChild(fixturesDiv)
 
 class CheckboxHelper {
   static initClass() {
@@ -51,7 +57,7 @@ class CheckboxHelper {
     if (!checkboxModel.type) {
       checkboxModel.type = 'assignments'
     }
-    const checkboxCollection = new CheckboxCollection([checkboxModel], {isTopLevel: true})
+    new CheckboxCollection([checkboxModel], {isTopLevel: true})
     this.checkboxView = new CheckboxView({model: checkboxModel})
     return this.$fixtures.html(this.checkboxView.render().el)
   }
@@ -109,58 +115,58 @@ class CheckboxHelper {
 }
 CheckboxHelper.initClass()
 
-QUnit.module('Content Checkbox Behaviors', {
-  teardown() {
-    return CheckboxHelper.teardown()
-  },
+describe('Content Checkbox Behaviors', () => {
+  afterEach(() => {
+    CheckboxHelper.teardown()
+  })
+
+  test('renders a checkbox with name set from model property', () => {
+    CheckboxHelper.renderView({property: 'copy[all_assignments]'})
+    const nameValue = CheckboxHelper.$checkbox().prop('name')
+    expect(nameValue).toBe('copy[all_assignments]')
+  })
 })
 
-test('renders a checkbox with name set from model property', () => {
-  CheckboxHelper.renderView({property: 'copy[all_assignments]'})
-  const nameValue = CheckboxHelper.$checkbox().prop('name')
-  equal(nameValue, 'copy[all_assignments]', 'Adds the correct name attribute from property')
+describe('#getIconClass', () => {
+  afterEach(() => {
+    CheckboxHelper.teardown()
+  })
+
+  test('returns lti icon class for tool profiles', () => {
+    CheckboxHelper.renderView()
+    CheckboxHelper.checkboxView.model.set({type: 'tool_profiles'})
+    expect(CheckboxHelper.checkboxView.getIconClass()).toBe('icon-lti')
+  })
 })
 
-QUnit.module('#getIconClass', {
-  teardown() {
-    return CheckboxHelper.teardown()
-  },
-})
+describe('Sublevel Content Checkbox and Carrot Behaviors', () => {
+  let server
+  const url = '/api/v1/courses/42/content_migrations/5/selective_data?type=assignments'
 
-test('returns lti icon class for tool profiles', () => {
-  CheckboxHelper.renderView()
-  CheckboxHelper.checkboxView.model.set({type: 'tool_profiles'})
-  equal(CheckboxHelper.checkboxView.getIconClass(), 'icon-lti')
-})
-
-QUnit.module('Sublevel Content Checkbox and Carrot Behaviors', {
-  setup() {
+  beforeEach(() => {
     fakeENV.setup()
-    this.url = '/api/v1/courses/42/content_migrations/5/selective_data?type=assignments'
-    this.clock = sinon.useFakeTimers()
-    this.server = sinon.fakeServer.create()
-    this.server.respondWith('GET', this.url, CheckboxHelper.serverResponse())
-    CheckboxHelper.renderView({sub_items_url: this.url})
+    server = sinon.fakeServer.create()
+    server.respondWith('GET', url, CheckboxHelper.serverResponse())
+    CheckboxHelper.renderView({sub_items_url: url})
     CheckboxHelper.checkboxView.$el.trigger('fetchCheckboxes')
-    this.server.respond()
-    this.clock.tick(15)
-    return CheckboxHelper.checkboxView.$el.find("[data-state='closed']").show()
-  },
-  teardown() {
+    server.respond()
+    CheckboxHelper.checkboxView.$el.find("[data-state='closed']").show()
+  })
+
+  afterEach(() => {
     fakeENV.teardown()
-    this.server.restore()
-    this.clock.restore()
-    return CheckboxHelper.teardown()
-  },
+    server.restore()
+    CheckboxHelper.teardown()
+  })
+
+  test('renders sublevel checkboxes', () => {
+    expect(CheckboxHelper.$sublevelCheckboxes().length).toBe(3)
+  })
+
+  test('checkboxes with sublevel checkboxes and no url only display labels', () => {
+    expect(
+      CheckboxHelper.checkboxView.$el.find('label[title=Assignments]').siblings('[type=checkbox]')
+        .length
+    ).toBe(0)
+  })
 })
-
-test('renders sublevel checkboxes', () =>
-  equal(CheckboxHelper.$sublevelCheckboxes().length, 3, 'Renders all sublevel checkboxes'))
-
-test('checkboxes with sublevel checkboxes and no url only display labels', () =>
-  equal(
-    CheckboxHelper.checkboxView.$el.find('label[title=Assignments]').siblings('[type=checkbox]')
-      .length,
-    0,
-    "Doesn't include checkbox"
-  ))
