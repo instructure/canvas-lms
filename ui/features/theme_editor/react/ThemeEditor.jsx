@@ -80,8 +80,8 @@ const notComplete = progress => progress.completion !== 100
 export default class ThemeEditor extends React.Component {
   static propTypes = {
     brandConfig: customTypes.brandConfig,
-    isDefaultConfig: PropTypes.bool.isRequired,
-    hasUnsavedChanges: PropTypes.bool.isRequired,
+    isDefaultConfig: PropTypes.bool,
+    hasUnsavedChanges: PropTypes.bool,
     variableSchema: customTypes.variableSchema,
     allowGlobalIncludes: PropTypes.bool,
     accountID: PropTypes.string,

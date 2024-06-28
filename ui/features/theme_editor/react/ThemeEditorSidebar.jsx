@@ -169,7 +169,7 @@ ThemeEditorSidebar.propTypes = {
   getDisplayValue: func.isRequired,
   changeSomething: func.isRequired,
   changedValues: object,
-  themeState: object.isRequired,
+  themeState: object,
   handleThemeStateChange: func.isRequired,
 }
 
