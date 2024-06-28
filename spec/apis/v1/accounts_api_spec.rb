@@ -2118,6 +2118,35 @@ describe "Accounts API", type: :request do
       expect(json["microsoft_sync_enabled"]).to be(true)
       expect(json["microsoft_sync_tenant"]).to eq("testtenant.com")
     end
+
+    context "password complexity" do
+      let_once(:policy_settings) do
+        {
+          allow_login_suspension: "true",
+          require_number_characters: "true",
+          require_symbol_characters: "true",
+          minimum_character_length: "10",
+          maximum_login_attempts: "3",
+        }
+      end
+
+      it "exposes password policy settings when feature is enabled" do
+        @a1.enable_feature!(:password_complexity)
+        @a1.settings = { password_policy: policy_settings }
+        @a1.save!
+        json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
+        expect(json["password_policy"]).to be_present
+        expect(json["password_policy"]).to eq policy_settings.stringify_keys
+      end
+
+      it "does not return password policy settings when feature is not enabled" do
+        @a1.disable_feature!(:password_complexity)
+        @a1.settings = { password_policy: policy_settings }
+        @a1.save!
+        json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
+        expect(json["password_policy"]).not_to be_present
+      end
+    end
   end
 
   context "account api extension" do

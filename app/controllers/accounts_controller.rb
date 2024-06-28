@@ -479,6 +479,7 @@ class AccountsController < ApplicationController
                       microsoft_sync_login_attribute
                       microsoft_sync_login_attribute_suffix
                       microsoft_sync_remote_attribute]
+    public_attrs << :password_policy if @account.password_complexity_enabled? && !@account.site_admin?
 
     render json: public_attrs.index_with { |key| @account.settings[key] }.compact
   end
