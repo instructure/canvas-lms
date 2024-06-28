@@ -2037,6 +2037,7 @@ uk:
   an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "Існуючий користувач Canvas з  %{user_id} вже вимагав запитану вхідну інформацію для користувача з user_id %{other_user_id}, пропустити"
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Існуючий користувач Canvas з %{user_id} вже вимагав запитуваний integration_id %{other_user_id}, пропустити"
   an_export_is_already_in_progress_54270f01: "Експорт вже триває."
+  an_integer_value_is_required_e073bd46: "Вимагається ціле значення"
   an_internal_error_occurred_83b8a685: "Відбулася внутрішня помилка"
   an_item_named_name_already_exists_in_this_location_147b7312: "Елемент з ім'ям \"%{name}\" вже існує в цьому розташуванны. Ви хочете замінити існуючий файл?"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Виникла невідома помилка сервера. Будь ласка спробуйте ще раз."
@@ -18339,6 +18340,7 @@ uk:
   validate_links_in_content_b1630fba: "Перевірка посилань у вмісті"
   validation_error_3b943100: "Помилка перевірки"
   value_d842f16d: Значення
+  value_must_be_positive_3e086d5a: "Значення має бути позитивним"
   vanity_url_76f93382: "URL марнославства"
   vendor_code_lti_2_ef36207b: "Код постачальника (LTI 2):"
   venezuela_58_959d01f7: "Венесуела (+58)"
