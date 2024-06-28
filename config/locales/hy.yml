@@ -1766,6 +1766,7 @@ hy:
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Թեմայի ստեղծման ժամանակ սխալ է տեղի ունեցել, խնդրում ենք փորձել կրկին:"
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Ներբեռնմանը պատրաստվելու ժամանակ սխալ է տեղի ունեցել, փորձեք կրկին:"
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Սխալ է տեղի ունեցել %{filename} -ի օգտագործման իրավունքը սահմանելիս"
+  an_integer_value_is_required_e073bd46: "Պահանջվում է մուտքագրել ամբողջ թիվ"
   an_item_named_name_already_exists_in_this_location_147b7312: "\"%{name}\" անունը կրող տարր արդեն իսկ առկա է: Արդյո՚ք Դուք ցանկանում եք փոխարինել արդեն իսկ առկա ֆայլը նոր ֆայլով: "
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Սերվերի անհայտ սխալ: Կրկին փորձեք:"
   an_update_is_available_for_toolname_bba3fa2: "%{toolName} համար տեղի է ունեցել թարմացում"
@@ -17259,6 +17260,7 @@ hy:
     is_required: "Անհրաժեշտ է լրացնել այս դաշտը"
   validate_links_in_content_b1630fba: "Հաստատել բովանդակության մեջ ներառված  հղումները"
   validation_error_3b943100: "Իսկության հաստատման սխալ"
+  value_must_be_positive_3e086d5a: "Պետք է դրական մեծություն լինի"
   verification_code_5acd64ef: "Ստուգման կոդ"
   verify_3dd8f159: "Ստուգել "
   version_5599c321: Տարբերակ
