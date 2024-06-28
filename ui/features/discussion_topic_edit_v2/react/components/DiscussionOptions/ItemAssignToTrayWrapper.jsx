@@ -20,7 +20,6 @@ import React, {useContext, useEffect, useState} from 'react'
 import {DiscussionDueDatesContext} from '../../util/constants'
 import DifferentiatedModulesSection from '@canvas/due-dates/react/DifferentiatedModulesSection'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {string, func, array, number, oneOfType, bool} from 'prop-types'
 
 const DEFAULT_SECTION_ID = '0'
 
@@ -35,6 +34,7 @@ export const ItemAssignToTrayWrapper = () => {
     pointsPossible,
     isGraded,
     isCheckpoints,
+    postToSis,
   } = useContext(DiscussionDueDatesContext)
 
   const [overrides, setOverrides] = useState([])
@@ -197,12 +197,11 @@ export const ItemAssignToTrayWrapper = () => {
       defaultSectionId={DEFAULT_SECTION_ID}
       supportDueDates={isGraded}
       isCheckpointed={isCheckpoints}
+      postToSIS={postToSis}
     />
   )
 }
 
-ItemAssignToTrayWrapper.propTypes = {
-  isCheckpoints: bool,
-}
+ItemAssignToTrayWrapper.propTypes = {}
 
 ItemAssignToTrayWrapper.defaultProps = {}

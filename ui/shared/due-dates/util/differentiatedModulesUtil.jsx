@@ -16,9 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import _ from 'underscore'
 import {map} from 'lodash'
 import {getOverriddenAssignees} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {View} from '@instructure/ui-view'
+import {Link} from '@instructure/ui-link'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import {IconEditLine} from '@instructure/ui-icons'
+
+const I18n = useI18nScope('DueDateOverrideView')
 
 export const cloneObject = object => JSON.parse(JSON.stringify(object))
 
@@ -239,3 +247,26 @@ export const processModuleOverrides = (overrides, lastCheckpoint) => {
 
   return withoutModuleOverrides
 }
+
+export const showPostToSisFlashAlert = assignToButtonId => () =>
+  showFlashAlert({
+    message: (
+      <>
+        {I18n.t('Please set a due date or change your selection for the “Sync to SIS” option.')}
+        <br />
+        <View display="flex">
+          <View as="div" margin="xx-small none none none" width="25px">
+            <IconEditLine size="x-small" color="primary" />
+          </View>
+          <Link
+            margin="xx-small none none none"
+            isWithinText={false}
+            onClick={() => document.getElementById(assignToButtonId)?.click()}
+          >
+            {I18n.t('Manage Assign To')}
+          </Link>
+        </View>
+      </>
+    ),
+    type: 'error',
+  })
