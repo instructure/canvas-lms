@@ -307,13 +307,14 @@ export const DiscussionThreadContainer = props => {
     }
   }
 
-  const onUpdate = (message, _quotedEntryId, file) => {
+  const onUpdate = (message, quotedEntryId, file) => {
     updateDiscussionEntry({
       variables: {
         discussionEntryId: props.discussionEntry._id,
         message,
         fileId: file?._id,
         removeAttachment: !file?._id,
+        quotedEntryId,
       },
     })
   }
