@@ -133,6 +133,7 @@ const CanvasRce = forwardRef(function CanvasRce(
       use_rce_icon_maker={shouldUseFeature(Feature.IconMaker, window.ENV)}
       resourceType={resourceType}
       resourceId={resourceId}
+      ai_text_tools={window.ENV?.RICH_CONTENT_AI_TEXT_TOOLS}
       externalToolsConfig={{
         ltiIframeAllowances: window.ENV?.LTI_LAUNCH_FRAME_ALLOWANCES,
         isA2StudentView: window.ENV?.a2_student_view,

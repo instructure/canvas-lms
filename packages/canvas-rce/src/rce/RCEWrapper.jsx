@@ -447,8 +447,15 @@ class RCEWrapper extends React.Component {
   }
 
   replaceCode(code) {
-    if (code !== "" && window.confirm(formatMessage('Content in the editor will be changed. Press Cancel to keep the original content.'))) {
-      this.mceInstance().setContent(code);
+    if (
+      code !== '' &&
+      window.confirm(
+        formatMessage(
+          'Content in the editor will be changed. Press Cancel to keep the original content.'
+        )
+      )
+    ) {
+      this.mceInstance().setContent(code)
     }
   }
 
@@ -613,7 +620,7 @@ class RCEWrapper extends React.Component {
     return this.state.id
   }
 
-   getHtmlEditorStorage() {
+  getHtmlEditorStorage() {
     const cookieValue = getCookie('rce.htmleditor')
     if (cookieValue) {
       document.cookie = `rce.htmleditor=${cookieValue};path=/;max-age=0`
@@ -1030,6 +1037,7 @@ class RCEWrapper extends React.Component {
       })
     }
   }
+
   /**
    * Fix keyboard navigation in the expanded toolbar
    *
@@ -1909,6 +1917,7 @@ class RCEWrapper extends React.Component {
                     launchWordcountModal(this.mceInstance(), document, {skipEditorFocus: true})
                   }
                   disabledPlugins={this.pluginsToExclude}
+                  ai_text_tools={this.props.ai_text_tools}
                 />
                 {this.props.trayProps?.containingContext && (
                   <CanvasContentTray

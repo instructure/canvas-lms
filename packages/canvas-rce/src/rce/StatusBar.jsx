@@ -63,6 +63,7 @@ StatusBar.propTypes = {
   a11yErrorsCount: number,
   onWordcountModalOpen: func.isRequired,
   disabledPlugins: arrayOf(string),
+  ai_text_tools: bool,
 }
 
 StatusBar.defaultProps = {
@@ -175,7 +176,11 @@ export default function StatusBar(props) {
   }
 
   function renderPath() {
-    return <View data-testid="whole-status-bar-path" style={{display: 'flex'}}>{renderPathString(props)}</View>
+    return (
+      <View data-testid="whole-status-bar-path" style={{display: 'flex'}}>
+        {renderPathString(props)}
+      </View>
+    )
   }
 
   function renderA11yButton() {
