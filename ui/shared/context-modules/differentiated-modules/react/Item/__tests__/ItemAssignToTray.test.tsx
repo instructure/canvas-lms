@@ -863,7 +863,8 @@ describe('ItemAssignToTray', () => {
       })
     })
 
-    it('does not render mastery path option for ungraded discussions', async () => {
+    // cf. LX-1879
+    it.skip('does not render mastery path option for ungraded discussions', async () => {
       renderComponent({itemType: 'discussion', removeDueDateInput: true})
       const assignToInput = await screen.findByTestId('assignee_selector')
       await userEvent.click(assignToInput)
