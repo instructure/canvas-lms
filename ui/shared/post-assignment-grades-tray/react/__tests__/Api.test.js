@@ -18,14 +18,18 @@
 
 import MockCanvasClient from '@canvas/test-utils/MockCanvasClient'
 import * as Api from '../Api'
+import sinon from 'sinon'
 
-QUnit.module('PostAssignmentGradesTray Api', suiteHooks => {
+const deepEqual = (x, y) => expect(x).toEqual(y)
+const strictEqual = (x, y) => expect(x).toBe(y)
+
+describe('PostAssignmentGradesTray Api', () => {
   const ASSIGNMENT_ID = '23'
   const BAD_ASSIGNMENT_ID = '24'
   const PROGRESS_ID = 7331
   const SECTION_IDS = ['2001', '2002', '2003']
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     MockCanvasClient.install([
       {
         request: {
@@ -122,11 +126,11 @@ QUnit.module('PostAssignmentGradesTray Api', suiteHooks => {
     ])
   })
 
-  suiteHooks.afterEach(() => {
+  afterEach(() => {
     MockCanvasClient.uninstall()
   })
 
-  QUnit.module('.postAssignmentGrades()', () => {
+  describe('.postAssignmentGrades()', () => {
     test('accepts an optional gradedOnly argument', async () => {
       const progress = await Api.postAssignmentGrades(ASSIGNMENT_ID, {gradedOnly: true})
       const expectedProgress = {id: PROGRESS_ID, workflowState: 'queued'}
@@ -148,7 +152,7 @@ QUnit.module('PostAssignmentGradesTray Api', suiteHooks => {
     })
   })
 
-  QUnit.module('.postAssignmentGradesForSections()', () => {
+  describe('.postAssignmentGradesForSections()', () => {
     test('accepts an optional gradedOnly argument', async () => {
       const progress = await Api.postAssignmentGradesForSections(ASSIGNMENT_ID, SECTION_IDS, {
         gradedOnly: true,
@@ -172,15 +176,15 @@ QUnit.module('PostAssignmentGradesTray Api', suiteHooks => {
     })
   })
 
-  QUnit.module('.resolvePostAssignmentGradesStatus', contextHooks => {
+  describe('.resolvePostAssignmentGradesStatus', () => {
     let server
 
-    contextHooks.beforeEach(() => {
+    beforeEach(() => {
       server = sinon.createFakeServer()
       server.respondImmediately = true
     })
 
-    contextHooks.afterEach(() => {
+    afterEach(() => {
       server.restore()
     })
 
