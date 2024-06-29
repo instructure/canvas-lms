@@ -5,3 +5,11 @@ file_verifiers_for_quiz_links:
   description: |-
     Links to Canvas files created in New Quizzes will always add file verifiers to allow authentication
   applies_to: RootAccount
+
+ai_text_tools:
+  applies_to: Account
+  state: hidden
+  display_name: AI Text Tools
+  description: |-
+    Enable AI text tools in the Rich Content Editor
+  beta: true
