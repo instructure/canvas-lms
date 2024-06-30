@@ -19,21 +19,28 @@
 import type {HelpLink} from '../../../api.d'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
-export default function helpLinksQuery(): Promise<HelpLink[]> {
+import type {QueryFunctionContext} from '@tanstack/react-query'
+
+export default function helpLinksQuery({signal}: QueryFunctionContext): Promise<HelpLink[]> {
   return new Promise((resolve, reject) => {
     const data: HelpLink[] = []
-    const firstPageUrl = '/help_links'
+    const fetchOpts = {signal}
 
-    async function load(path: string) {
+    async function load(initialPath: string) {
+      let path = initialPath
+
       try {
-        const {json, link} = await doFetchApi<HelpLink[]>({path})
-        if (json) data.push(...json)
-        if (link?.next?.url) await load(link.next.url)
-        else resolve(data)
+        while (path) {
+          // eslint-disable-next-line no-await-in-loop
+          const {json, link} = await doFetchApi<HelpLink[]>({path, fetchOpts})
+          if (json) data.push(...json)
+          path = link?.next?.url || null
+        }
+        resolve(data)
       } catch (e) {
         reject(e)
       }
     }
-    load(firstPageUrl)
+    load('/help_links')
   })
 }
