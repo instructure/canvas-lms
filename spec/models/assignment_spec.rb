@@ -4591,23 +4591,46 @@ describe Assignment do
   end
 
   describe "#peer_reviews_assigned" do
-    before :once do
+    before do
       @assignment = assignment_model(course: @course)
       @assignment.peer_reviews = true
       @assignment.automatic_peer_reviews = true
-      @assignment.due_at = 1.day.ago
-      @assignment.peer_reviews_assigned = true
-      @assignment.save!
+      @assignment.peer_review_count = 1
+      @assignment.peer_reviews_assign_at = nil
     end
 
     it "is set to `true` when all peer reviews have been assigned" do
+      @assignment.due_at = 1.day.ago
+      @assignment.peer_reviews_assigned = true
+      @assignment.save!
       @assignment.assign_peer_reviews
       expect(@assignment.peer_reviews_assigned).to be true
     end
 
     it "is set to `false` when the #assign_at time changes" do
+      @assignment.due_at = 1.day.ago
+      @assignment.peer_reviews_assigned = true
+      @assignment.save!
       @assignment.assign_peer_reviews
       @assignment.peer_reviews_assign_at = 1.day.from_now
+      @assignment.save!
+      expect(@assignment.peer_reviews_assigned).to be false
+    end
+
+    it "is set to 'false' when the due_date passes even though peer_reviews_assign_at did not change" do
+      @assignment.due_at = 1.day.from_now
+      @assignment.peer_reviews_assigned = true
+      @assignment.save!
+      @assignment.due_at = 1.day.ago
+      @assignment.save!
+      expect(@assignment.peer_reviews_assigned).to be false
+    end
+
+    it "is set to 'false' when the due_date passes with initial peer_reviews_assigned as false" do
+      @assignment.due_at = 1.day.from_now
+      @assignment.peer_reviews_assigned = false
+      @assignment.save!
+      @assignment.due_at = 1.day.ago
       @assignment.save!
       expect(@assignment.peer_reviews_assigned).to be false
     end

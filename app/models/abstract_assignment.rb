@@ -1056,7 +1056,14 @@ class AbstractAssignment < ActiveRecord::Base
     if will_save_change_to_submission_types? && ["none", "on_paper"].include?(self.submission_types)
       self.allowed_attempts = nil
     end
-    self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
+
+    peer_review_assign_changed = peer_reviews_due_at_changed?
+    due_at_changed_with_no_peer_review_assign_date = peer_reviews_due_at.nil? && due_at_changed? && due_at.present? && next_auto_peer_review_date(Time.zone.now)
+
+    if peer_review_assign_changed || due_at_changed_with_no_peer_review_assign_date
+      self.peer_reviews_assigned = false
+    end
+
     %i[
       all_day
       could_be_locked
