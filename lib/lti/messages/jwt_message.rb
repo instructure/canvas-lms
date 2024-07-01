@@ -225,8 +225,6 @@ module Lti::Messages
     end
 
     def associated_1_1_tool
-      return nil unless Account.site_admin.feature_enabled?(:include_oauth_consumer_key_in_lti_launch)
-
       @associated_1_1_tool ||= @tool&.associated_1_1_tool(@context, target_link_uri)
     end
 
