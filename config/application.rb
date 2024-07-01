@@ -191,7 +191,7 @@ module CanvasRails
         super
 
         raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00 # rubocop:disable Style/NumericLiterals
-      rescue ::ActiveRecord::ActiveRecordError, ::ActiveRecord::ConnectionFailed, ::PG::Error => e
+      rescue ::ActiveRecord::ActiveRecordError, ::ActiveRecord::ConnectionFailed, ::ActiveRecord::ConnectionNotEstablished, ::PG::Error => e
         # If exception occurs using parameters from a predefined pg service, retry without
         if @connection_parameters.key?(:service)
           CanvasErrors.capture(e, { tags: { pg_service: @connection_parameters[:service] } }, :warn)
