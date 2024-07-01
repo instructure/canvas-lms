@@ -150,6 +150,14 @@ lti_assignment_page_line_items:
   display_name: LTI Deep Linking Line Items on Assignment create/edit page
   description: If enabled, prefills the assignment form with values from deep link messages on the assignment create/edit page.
   applies_to: RootAccount
+lti_before_assignment_results:
+  state: hidden
+  display_name: Display LTI placement before assignment description after submitting.
+  description: |-
+    If enabled, the assignment_view LTI placement iframe will be shown above the assignment description if the student has a submission
+    and can view the assignment. This can be used to make the placement more prominent for tools that require action after an assignment
+    has been submitted.
+  applies_to: RootAccount
 lti_deep_linking_line_items:
   state: hidden
   display_name: LTI Deep Linking Line Items
