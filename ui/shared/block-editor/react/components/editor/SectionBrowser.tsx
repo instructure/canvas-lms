@@ -24,19 +24,20 @@ import {Modal} from '@instructure/ui-modal'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {ResourcesSection, ResourcesSectionIcon} from '../user/sections/ResourcesSection'
-import {ColumnsSection, ColumnsSectionIcon} from '../user/sections/ColumnsSection'
-import {HeroSection, HeroSectionIcon} from '../user/sections/HeroSection'
-import {NavigationSection, NavigationSectionIcon} from '../user/sections/NavigationSection'
-import {AboutSection, AboutSectionIcon} from '../user/sections/AboutSection'
-import {QuizSection, QuizSectionIcon} from '../user/sections/QuizSection'
-import {FooterSection, FooterSectionIcon} from '../user/sections/FooterSection'
-import {BlankSection, BlankSectionIcon} from '../user/sections/BlankSection'
+import {ResourcesSection} from '../user/sections/ResourcesSection'
+import {ColumnsSection} from '../user/sections/ColumnsSection'
+import {HeroSection} from '../user/sections/HeroSection'
+import {NavigationSection} from '../user/sections/NavigationSection'
+import {AboutSection} from '../user/sections/AboutSection'
+import {QuizSection} from '../user/sections/QuizSection'
+import {FooterSection} from '../user/sections/FooterSection'
+import {BlankSection} from '../user/sections/BlankSection'
 import {getNodeIndex} from '../../utils'
+import {type AddSectionPlacement} from './types'
 
 const nameToSection = (name: string) => {
   switch (name) {
-    case 'Resources':
+    case 'Callout Cards':
       return <ResourcesSection />
     case 'Columns':
       return <ColumnsSection columns={2} variant="fixed" />
@@ -58,7 +59,7 @@ const nameToSection = (name: string) => {
 }
 type SectionBrowserProps = {
   open: boolean
-  where: 'prepend' | 'append'
+  where: AddSectionPlacement
   onClose: () => void
 }
 const SectionBrowser = ({open, where, onClose}: SectionBrowserProps) => {
@@ -66,23 +67,30 @@ const SectionBrowser = ({open, where, onClose}: SectionBrowserProps) => {
   const {node} = useNode((n: Node) => ({
     node: n,
   }))
+
+  const handleAddSection = useCallback(
+    (name: string, index: number) => {
+      const section = nameToSection(name)
+      const nodeTree = query.parseReactElement(section).toNodeTree()
+      const parentId = node.data.parent || 'ROOT'
+      actions.addNodeTree(nodeTree, parentId, index)
+    },
+    [actions, node.data.parent, query]
+  )
+
   const handleAppendSection = useCallback(
     (name: string) => {
-      const section = nameToSection(name)
-      const parentId = node.data.parent || 'ROOT'
       const myIndex = getNodeIndex(node, query)
-      const nodeTree = query.parseReactElement(section).toNodeTree()
-      actions.addNodeTree(nodeTree, parentId, myIndex + 1)
+      handleAddSection(name, myIndex + 1)
     },
-    [actions, node, query]
+    [handleAddSection, node, query]
   )
   const handlePrependSection = useCallback(
     (name: string) => {
-      const section = nameToSection(name)
-      const nodeTree = query.parseReactElement(section).toNodeTree()
-      actions.addNodeTree(nodeTree, 'ROOT', 0)
+      const myIndex = getNodeIndex(node, query)
+      handleAddSection(name, myIndex)
     },
-    [actions, query]
+    [handleAddSection, node, query]
   )
   const handleSelectSection = useCallback(
     (sectionName: string) => {
