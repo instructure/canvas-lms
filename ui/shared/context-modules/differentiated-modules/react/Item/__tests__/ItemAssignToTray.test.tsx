@@ -163,6 +163,19 @@ describe('ItemAssignToTray', () => {
     expect(icon).toBeInTheDocument()
   })
 
+  it('does not render header or footer if not a tray', async () => {
+    const {getByTestId, queryByText, queryByLabelText, findAllByTestId} = renderComponent({
+      isTray: false,
+    })
+    expect(queryByText('Item Name')).not.toBeInTheDocument()
+    expect(queryByText('Assignment | 10 pts')).not.toBeInTheDocument()
+    expect(queryByLabelText('Edit assignment Item Name')).not.toBeInTheDocument()
+    expect(queryByText('Save')).not.toBeInTheDocument()
+    // the tray is mocking an api response that makes 2 cards
+    const cards = await findAllByTestId('item-assign-to-card')
+    expect(cards).toHaveLength(2)
+  })
+
   it('renders a quiz', () => {
     const {getByTestId, getByText} = renderComponent({itemType: 'quiz', iconType: 'quiz'})
     expect(getByText('Quiz | 10 pts')).toBeInTheDocument()

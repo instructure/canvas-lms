@@ -152,6 +152,7 @@ export interface ItemAssignToTrayProps {
   onCardRemove?: (cardId: string) => void
   onInitialStateSet?: (cards: ItemAssignToCardSpec[]) => void
   postToSIS?: boolean
+  isTray?: boolean
 }
 
 export default function ItemAssignToTray({
@@ -182,6 +183,7 @@ export default function ItemAssignToTray({
   isCheckpointed = false,
   onInitialStateSet,
   postToSIS = false,
+  isTray = true,
 }: ItemAssignToTrayProps) {
   const isPacedCourse = ENV.IN_PACED_COURSE
   const initialLoadRef = useRef(false)
@@ -391,7 +393,7 @@ export default function ItemAssignToTray({
     )
   }
 
-  return (
+  const trayView = (
     <Tray
       data-testid="module-item-edit-tray"
       onClose={onClose}
@@ -454,10 +456,77 @@ export default function ItemAssignToTray({
             postToSIS={postToSIS}
             assignToCardsRef={assignToCardsRef}
             disabledOptionIdsRef={disabledOptionIdsRef}
+            isTray={isTray}
           />
         )}
         {Footer()}
       </Flex>
     </Tray>
   )
+
+  const sectionView = (
+    <View width="100%" display="block">
+      {blueprintDateLocks && blueprintDateLocks.length > 0 ? (
+        <Alert liveRegion={getLiveRegion} variant="info" margin="small 0 0">
+          <Text weight="bold" size="small">
+            {I18n.t('Locked: ')}
+          </Text>
+          <Text size="small">{blueprintDateLocks.map(i => lockLabels[i]).join(' & ')}</Text>
+        </Alert>
+      ) : null}
+      {isPacedCourse ? (
+        <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
+          <CoursePacingNotice courseId={courseId} />
+        </Flex.Item>
+      ) : (
+        <ItemAssignToTrayContent
+          open={open}
+          initialLoadRef={initialLoadRef}
+          onClose={onClose}
+          onDismiss={onDismiss}
+          courseId={courseId}
+          itemType={itemType}
+          itemContentId={itemContentId}
+          locale={locale}
+          timezone={timezone}
+          initHasModuleOverrides={initHasModuleOverrides}
+          removeDueDateInput={removeDueDateInput}
+          isCheckpointed={isCheckpointed}
+          onInitialStateSet={onInitialStateSet}
+          defaultCards={defaultCards}
+          defaultSectionId={defaultSectionId}
+          defaultDisabledOptionIds={defaultDisabledOptionIds}
+          onSave={onSave}
+          onAddCard={onAddCard}
+          onAssigneesChange={onAssigneesChange}
+          onDatesChange={onDatesChange}
+          onCardRemove={onCardRemove}
+          assignToCards={assignToCards}
+          setAssignToCards={setAssignToCards}
+          blueprintDateLocks={blueprintDateLocks}
+          setBlueprintDateLocks={setBlueprintDateLocks}
+          handleDismiss={handleDismiss}
+          hasModuleOverrides={hasModuleOverrides}
+          setHasModuleOverrides={setHasModuleOverrides}
+          cardsRefs={cardsRefs}
+          setModuleAssignees={setModuleAssignees}
+          defaultGroupCategoryId={defaultGroupCategoryId}
+          allOptions={allOptions}
+          isLoadingAssignees={isLoadingAssignees}
+          isLoading={isLoading}
+          loadedAssignees={loadedAssignees}
+          setSearchTerm={setSearchTerm}
+          everyoneOption={everyoneOption}
+          setGroupCategoryId={setGroupCategoryId}
+          setOverridesFetched={setOverridesFetched}
+          postToSIS={postToSIS}
+          assignToCardsRef={assignToCardsRef}
+          disabledOptionIdsRef={disabledOptionIdsRef}
+          isTray={isTray}
+        />
+      )}
+    </View>
+  )
+
+  return <>{isTray ? trayView : sectionView}</>
 }

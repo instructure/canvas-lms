@@ -40,6 +40,7 @@ $assign-border-color: #ccc;
   display: inline-block;
   margin-#{direction(left)}: 20px;
   margin-top: -15px;
+  max-width: 478px;
 }
 
 .Button.Button--add-row {

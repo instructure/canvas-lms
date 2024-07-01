@@ -241,6 +241,7 @@ export type SiteAdminFeatureId =
   | 'selective_release_backend'
   | 'selective_release_ui_api'
   | 'selective_release_optimized_tray'
+  | 'selective_release_edit_page'
   | 'enhanced_course_creation_account_fetching'
   | 'enhanced_rubrics'
   | 'explicit_latex_typesetting'
