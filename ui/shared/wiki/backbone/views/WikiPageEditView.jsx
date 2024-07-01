@@ -299,7 +299,9 @@ export default class WikiPageEditView extends ValidatedFormView {
   destroyEditor() {
     // hack fix for LF-1134
     try {
-      RichContentEditor.destroyRCE(this.$wikiPageBody)
+      if (!window.ENV.BLOCK_EDITOR) {
+        RichContentEditor.destroyRCE(this.$wikiPageBody)
+      }
     } catch (e) {
       console.warn(e)
     } finally {
@@ -449,7 +451,9 @@ export default class WikiPageEditView extends ValidatedFormView {
     // eslint-disable-next-line no-alert
     if (!this.hasUnsavedChanges() || window.confirm(this.unsavedWarning())) {
       this.checkUnsavedOnLeave = false
-      RichContentEditor.closeRCE(this.$wikiPageBody)
+      if (!window.ENV.BLOCK_EDITOR) {
+        RichContentEditor.closeRCE(this.$wikiPageBody)
+      }
       return this.trigger('cancel')
     }
   }

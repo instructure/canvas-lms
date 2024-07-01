@@ -164,7 +164,7 @@ const TextBlockToolbar = () => {
       <ColorModal
         open={colorModalOpen}
         color={props.color}
-        variant="button"
+        variant="textcolor"
         onClose={handleCloseColorModal}
         onSubmit={handleColorChange}
       />

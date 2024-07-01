@@ -15,10 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import React, {useCallback} from 'react'
 import {useEditor, useNode, type Node} from '@craftjs/core'
-
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -26,18 +24,15 @@ import {Modal} from '@instructure/ui-modal'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-
-import {ResourcesSection, ResourcesSectionIcon} from '../../user/sections/ResourcesSection'
-import {ColumnsSection, ColumnsSectionIcon} from '../../user/sections/ColumnsSection'
-import {HeroSection, HeroSectionIcon} from '../../user/sections/HeroSection'
-import {NavigationSection, NavigationSectionIcon} from '../../user/sections/NavigationSection'
-import {AboutSection, AboutSectionIcon} from '../../user/sections/AboutSection'
-import {QuizSection, QuizSectionIcon} from '../../user/sections/QuizSection'
-import {FooterSection, FooterSectionIcon} from '../../user/sections/FooterSection'
-import {BlankSection, BlankSectionIcon} from '../../user/sections/BlankSection'
-import {AnnouncementSection, AnnouncementSectionIcon} from '../../user/sections/AnnouncementSection'
-
-import {getNodeIndex} from '../../../utils'
+import {ResourcesSection, ResourcesSectionIcon} from '../user/sections/ResourcesSection'
+import {ColumnsSection, ColumnsSectionIcon} from '../user/sections/ColumnsSection'
+import {HeroSection, HeroSectionIcon} from '../user/sections/HeroSection'
+import {NavigationSection, NavigationSectionIcon} from '../user/sections/NavigationSection'
+import {AboutSection, AboutSectionIcon} from '../user/sections/AboutSection'
+import {QuizSection, QuizSectionIcon} from '../user/sections/QuizSection'
+import {FooterSection, FooterSectionIcon} from '../user/sections/FooterSection'
+import {BlankSection, BlankSectionIcon} from '../user/sections/BlankSection'
+import {getNodeIndex} from '../../utils'
 
 const nameToSection = (name: string) => {
   switch (name) {
@@ -53,8 +48,6 @@ const nameToSection = (name: string) => {
       return <AboutSection />
     case 'Quiz':
       return <QuizSection />
-    case 'Announcement':
-      return <AnnouncementSection />
     case 'Footer':
       return <FooterSection />
     case 'Blank':
@@ -63,19 +56,16 @@ const nameToSection = (name: string) => {
       return <BlankSection />
   }
 }
-
 type SectionBrowserProps = {
   open: boolean
   where: 'prepend' | 'append'
   onClose: () => void
 }
-
 const SectionBrowser = ({open, where, onClose}: SectionBrowserProps) => {
   const {actions, query} = useEditor()
   const {node} = useNode((n: Node) => ({
     node: n,
   }))
-
   const handleAppendSection = useCallback(
     (name: string) => {
       const section = nameToSection(name)
@@ -86,7 +76,6 @@ const SectionBrowser = ({open, where, onClose}: SectionBrowserProps) => {
     },
     [actions, node, query]
   )
-
   const handlePrependSection = useCallback(
     (name: string) => {
       const section = nameToSection(name)
@@ -95,7 +84,6 @@ const SectionBrowser = ({open, where, onClose}: SectionBrowserProps) => {
     },
     [actions, query]
   )
-
   const handleSelectSection = useCallback(
     (sectionName: string) => {
       if (!sectionName) return
@@ -108,7 +96,6 @@ const SectionBrowser = ({open, where, onClose}: SectionBrowserProps) => {
     },
     [handleAppendSection, handlePrependSection, onClose, where]
   )
-
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       const sectionName = e.currentTarget.getAttribute('data-section')
@@ -118,7 +105,6 @@ const SectionBrowser = ({open, where, onClose}: SectionBrowserProps) => {
     },
     [handleSelectSection]
   )
-
   const handleKey = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (e.key === 'Enter') {
@@ -132,7 +118,6 @@ const SectionBrowser = ({open, where, onClose}: SectionBrowserProps) => {
     },
     [handleSelectSection]
   )
-
   const renderBox = (name: string, thumbnail: string, description: string) => {
     return (
       <div
@@ -153,7 +138,6 @@ const SectionBrowser = ({open, where, onClose}: SectionBrowserProps) => {
       </div>
     )
   }
-
   return (
     <Modal
       open={open}
@@ -188,16 +172,10 @@ const SectionBrowser = ({open, where, onClose}: SectionBrowserProps) => {
             'section-resources.png',
             'Callout cards guide page viewers to important information. An effective callout card provides a short summary of what visitors can find along with a button or link to additional content.'
           )}
-
           {renderBox(
             'Quiz',
             'section-quiz.png',
             'The quiz section is where you can add a quiz to your page.'
-          )}
-          {renderBox(
-            'Announcement',
-            'section-announcement.png',
-            'The announcement section is a great way to share important information with your students.'
           )}
           {renderBox(
             'Footer',
@@ -219,5 +197,4 @@ const SectionBrowser = ({open, where, onClose}: SectionBrowserProps) => {
     </Modal>
   )
 }
-
 export {SectionBrowser}
