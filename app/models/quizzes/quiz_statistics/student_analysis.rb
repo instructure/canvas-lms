@@ -183,9 +183,9 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     end
   end
 
-  def to_csv
+  def to_csv(csv_options = {})
     include_root_accounts = quiz.context.root_account.trust_exists?
-    CSV.generate do |csv|
+    CSVWithI18n.generate(**csv_options) do |csv|
       context = quiz.context
 
       # write columns to csv
