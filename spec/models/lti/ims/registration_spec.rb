@@ -750,7 +750,7 @@ module Lti::IMS
       end
 
       it "uses the correct icon url" do
-        expect(subject.icon_url).to eq icon_uri
+        expect(subject.icon_url).to eq logo_uri
       end
 
       it "uses the correct text" do
