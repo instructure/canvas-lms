@@ -1027,32 +1027,9 @@ describe Lti::Messages::JwtMessage do
         allow(Lti::Helpers::JwtMessageHelper).to receive(:generate_oauth_consumer_key_sign).and_return("a_valid_signature")
       end
 
-      context "the include_oauth_consumer_key_in_lti_launch flag is enabled" do
-        before do
-          Account.site_admin.enable_feature!(:include_oauth_consumer_key_in_lti_launch)
-        end
-
-        it "includes the oauth_consumer_key related claims" do
-          expect(subject["oauth_consumer_key"]).to eq associated_1_1_tool.consumer_key
-          expect(subject["oauth_consumer_key_sign"]).to eq "a_valid_signature"
-        end
-      end
-
-      context "the include_oauth_consumer_key_in_lti_launch flag is disabled" do
-        before do
-          Account.site_admin.disable_feature!(:include_oauth_consumer_key_in_lti_launch)
-        end
-
-        it "doesn't include the oauth_consumer_key related claims" do
-          expect(subject).not_to include "oauth_consumer_key"
-          expect(subject).not_to include "oauth_consumer_key_sign"
-        end
-
-        it "doesn't attempt to perform any lookups" do
-          expect_any_instance_of(ContextExternalTool).not_to receive(:associated_1_1_tool)
-          expect(subject).not_to include "oauth_consumer_key"
-          expect(subject).not_to include "oauth_consumer_key_sign"
-        end
+      it "includes the oauth_consumer_key related claims" do
+        expect(subject["oauth_consumer_key"]).to eq associated_1_1_tool.consumer_key
+        expect(subject["oauth_consumer_key_sign"]).to eq "a_valid_signature"
       end
     end
 
