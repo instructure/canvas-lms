@@ -32,7 +32,7 @@ GEM
       sexp_processor (~> 4.10)
       ya2yaml (= 0.31)
     mini_portile2 (2.8.7)
-    minitest (5.24.0)
+    minitest (5.24.1)
     nokogiri (1.16.6)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)

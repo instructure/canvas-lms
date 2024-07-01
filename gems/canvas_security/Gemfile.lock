@@ -135,7 +135,7 @@ GEM
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    minitest (5.24.0)
+    minitest (5.24.1)
     mutex_m (0.2.0)
     net-http (0.4.1)
       uri
