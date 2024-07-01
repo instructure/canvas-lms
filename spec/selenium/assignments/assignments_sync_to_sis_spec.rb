@@ -253,6 +253,35 @@ describe "assignments sync to sis" do
             check_due_date_table(section_to_set, short_date)
           end
 
+          it "checks due date when first add cards then fill fields", :ignore_js_errors do
+            # LX-1857: Does not show any error, but not submits, we should verify an error here
+            AssignmentCreateEditPage.save_assignment
+
+            AssignmentCreateEditPage.click_manage_assign_to_button
+
+            wait_for_assign_to_tray_spinner
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
+            click_add_assign_to_card
+
+            update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
+            update_due_time(0, "11:59 PM")
+
+            expect(assign_to_date_and_time[3].text).to include("Please add a due date")
+
+            select_module_item_assignee(1, section_to_set)
+            update_due_date(1, format_date_for_view(due_date, "%-m/%-d/%Y"))
+            update_due_time(1, "11:59 PM")
+            click_save_button("Apply")
+            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+            AssignmentCreateEditPage.save_assignment
+
+            check_due_date_table(section_to_set, short_date)
+          end
+
           it "does not check when sis is off", :ignore_js_errors do
             skip("LX-1856: Tray is not using the checkbox value")
             AssignmentCreateEditPage.select_post_to_sis_checkbox
