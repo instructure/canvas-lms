@@ -20,7 +20,7 @@
 class MakeExtraneousIMSRegistrationFieldsNullable < ActiveRecord::Migration[7.0]
   tag :predeploy
   def change
-    change_table :lti_ims_registrations do |t|
+    change_table :lti_ims_registrations, bulk: true do |t|
       t.change_null :application_type, true
       t.change_null :grant_types, true
       t.change_null :response_types, true
