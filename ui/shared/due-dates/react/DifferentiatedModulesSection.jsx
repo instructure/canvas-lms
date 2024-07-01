@@ -341,6 +341,14 @@ const DifferentiatedModulesSection = ({
     const newDates = _.extend(oldDates, tmp)
 
     updateCard(cardId, newOverrides, newDates)
+
+    const updatedOverrides = [...stagedOverrides]
+    updatedOverrides.forEach(override => {
+      if (String(override.rowKey) === String(cardId)) {
+        override[dateType] = newDate
+      }
+    })
+    setStagedOverrides(updatedOverrides)
   }
 
   const handleAssigneeAddition = (cardId, newAssignee) => {
