@@ -18,7 +18,7 @@
 
 import React, {useCallback, useState} from 'react'
 import {useNode} from '@craftjs/core'
-import {IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {Popover} from '@instructure/ui-popover'
 import {IconImageLine} from '@instructure/ui-icons'
 import {IconPicker} from '../blocks/IconBlock'
@@ -55,14 +55,9 @@ const IconPopup = ({iconName}: IconPopupProps) => {
   return (
     <Popover
       renderTrigger={
-        <IconButton
-          size="small"
-          withBackground={false}
-          withBorder={false}
-          screenReaderLabel="Button Icon"
-        >
-          <IconImageLine size="x-small" />
-        </IconButton>
+        <Button size="small" withBackground={false}>
+          Select Icon
+        </Button>
       }
       isShowingContent={isShowingContent}
       onShowContent={handleShowContent}

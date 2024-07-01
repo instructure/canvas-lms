@@ -22,9 +22,9 @@ import {FormFieldGroup, type FormMessage} from '@instructure/ui-form-field'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {RangeInput} from '@instructure/ui-range-input'
 import {Popover} from '@instructure/ui-popover'
-import {IconCompassLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
+import {IconResize} from '../../../../assets/internal-icons'
 
 type IconSizePopupProps = {
   width: number
@@ -103,7 +103,7 @@ const IconSizePopup = ({width, height}: IconSizePopupProps) => {
           withBorder={false}
           screenReaderLabel="Button Icon"
         >
-          <IconCompassLine size="x-small" />
+          <IconResize size="x-small" />
         </IconButton>
       }
       isShowingContent={isShowingContent}
