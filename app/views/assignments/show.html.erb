@@ -157,6 +157,10 @@
 
   <div class="clear"></div>
 
+  <% if @current_user_submission&.has_submission? && @domain_root_account&.feature_enabled?(:lti_before_assignment_results) %>
+  <div id="assignment_external_tools"></div>
+  <% end %>
+
   <% description = @assignment.description.present? ? public_user_content(@assignment.description) : t("No additional details were added for this assignment.") %>
 
   <% if @assignment.annotated_document? %>
