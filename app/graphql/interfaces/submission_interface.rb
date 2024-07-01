@@ -436,7 +436,7 @@ module Interfaces::SubmissionInterface
 
   field :preview_url, String, "This field is currently under development and its return value is subject to change.", null: true
   def preview_url
-    load_association(:assignment).then do
+    load_association(:assignment).then do |assignment|
       if submission.not_submitted?
         nil
       elsif submission.submission_type == "basic_lti_launch"
@@ -446,6 +446,13 @@ module Interfaces::SubmissionInterface
           url: submission.external_tool_url(query_params: submission.tool_default_query_params(current_user)),
           display: "borderless",
           host: context[:request].host_with_port
+        )
+      elsif submission.submission_type == "discussion_topic"
+        GraphQLHelpers::UrlHelpers.course_discussion_topic_url(
+          submission.course_id,
+          assignment.discussion_topic.id,
+          host: context[:request].host_with_port,
+          embed: true
         )
       else
         GraphQLHelpers::UrlHelpers.course_assignment_submission_url(

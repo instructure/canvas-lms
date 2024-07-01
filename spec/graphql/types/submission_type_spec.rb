@@ -874,6 +874,18 @@ describe Types::SubmissionType do
         expect(submission_type.resolve("previewUrl")).to eq expected_url
       end
     end
+
+    context "whent the assignment is a discussion topic" do
+      before do
+        @assignment.update!(submission_types: "discussion_topic")
+        @discussion_topic = @assignment.discussion_topic
+      end
+
+      it "returns the preview URL for the discussion topic" do
+        @discussion_topic.discussion_entries.create!(user: @student, message: "I have a lot to say about this topic")
+        expect(preview_url).to eq "http://test.host/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}?embed=true"
+      end
+    end
   end
 
   describe "wordCount" do
