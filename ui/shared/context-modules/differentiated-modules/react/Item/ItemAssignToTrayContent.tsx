@@ -80,6 +80,7 @@ export interface ItemAssignToTrayContentProps
   postToSIS?: boolean
   assignToCardsRef: React.MutableRefObject<ItemAssignToCardSpec[]>
   disabledOptionIdsRef: React.MutableRefObject<string[]>
+  isTray: boolean
 }
 
 const MAX_PAGES = 10
@@ -152,6 +153,7 @@ const ItemAssignToTrayContent = ({
   postToSIS = false,
   assignToCardsRef,
   disabledOptionIdsRef,
+  isTray,
 }: ItemAssignToTrayContentProps) => {
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
@@ -735,9 +737,13 @@ const ItemAssignToTrayContent = ({
   return (
     <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
       {fetchInFlight || !loadedAssignees || isLoading ? (
-        <Mask>
+        isTray ? (
+          <Mask>
+            <Spinner data-testid="cards-loading" renderTitle={I18n.t('Loading')} />
+          </Mask>
+        ) : (
           <Spinner data-testid="cards-loading" renderTitle={I18n.t('Loading')} />
-        </Mask>
+        )
       ) : (
         <ApplyLocale locale={locale} timezone={timezone}>
           {ENV.FEATURES?.selective_release_optimized_tray
@@ -745,8 +751,8 @@ const ItemAssignToTrayContent = ({
             : renderCards(open)}
         </ApplyLocale>
       )}
-
       <Button
+        display={isTray ? undefined : 'block'}
         onClick={handleAddCard}
         data-testid="add-card"
         margin="small 0 0 0"
@@ -754,7 +760,7 @@ const ItemAssignToTrayContent = ({
         interaction={!allCardsAssigned() || !!blueprintDateLocks?.length ? 'disabled' : 'enabled'}
         elementRef={el => (addCardButtonRef.current = el)}
       >
-        {I18n.t('Add')}
+        {isTray ? I18n.t('Add') : I18n.t('Assign To')}
       </Button>
     </Flex.Item>
   )
