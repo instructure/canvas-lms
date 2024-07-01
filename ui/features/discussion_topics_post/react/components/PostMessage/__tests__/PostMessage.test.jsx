@@ -112,10 +112,10 @@ describe('PostMessage', () => {
 
     it('updates the displayed message when the message prop changes', async () => {
       const { rerender } = setup({ message: 'Initial message' })
-      
+
       // Check initial render
       expect(screen.getByText('Initial message')).toBeInTheDocument()
-  
+
       // Rerender with new props
       await act(async () => {
         rerender(
@@ -129,7 +129,7 @@ describe('PostMessage', () => {
           </SearchContext.Provider>
         )
       })
-  
+
       // Check if the new message is displayed
       expect(screen.getByText('Updated message')).toBeInTheDocument()
       expect(screen.queryByText('Initial message')).not.toBeInTheDocument()
