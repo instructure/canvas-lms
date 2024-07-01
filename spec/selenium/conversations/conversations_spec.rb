@@ -175,6 +175,23 @@ describe "conversations new" do
         expect(f("body")).not_to contain_jqcss "div[data-testid='conversation']"
       end
 
+      it "archives convo then checks availability after a new message" do
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        f("button[data-testid='more-options']").click
+        fj("li:contains('Archive')").click
+        driver.switch_to.alert.accept
+        wait_for_ajaximations
+        expect(f("body")).not_to contain_jqcss "div[data-testid='conversation']"
+
+        @convo.add_message(@s[0], "second Message")
+        @convo.save!
+        get "/conversations"
+        wait_for_ajaximations
+        expect(f("body")).to contain_jqcss "div[data-testid='conversation']"
+      end
+
       it "does not have archive options button when in sent scope" do
         get "/conversations#filter=type=sent"
         f("div[data-testid='conversation']").click
