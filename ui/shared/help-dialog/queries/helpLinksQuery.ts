@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {HelpLink} from '../../../api.d'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import type {QueryFunctionContext} from '@tanstack/react-query'
+import type {HelpLink} from '../../../api.d'
 
 const HELP_LINKS_PATH = '/help_links'
 
