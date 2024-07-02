@@ -49,7 +49,8 @@ const prepareOverride = (
 const prepareAssignmentOverridesPayload = (
   assignedInfoList,
   defaultEveryoneOption,
-  masteryPathsOption
+  masteryPathsOption,
+  noDueDates = false
 ) => {
   const onlyVisibleToEveryone = assignedInfoList.every(
     info =>
@@ -70,6 +71,9 @@ const prepareAssignmentOverridesPayload = (
 
     // If the override is a module override, don't update it
     if (contextModuleId) return null
+
+    // remove due date if unsuported
+    if (noDueDates) info.dueDate = null
 
     // override for student ids
     if (studentIds.length > 0) {
@@ -449,7 +453,8 @@ export const prepareUngradedDiscussionOverridesPayload = (
     ungradedDiscussionOverrides: prepareAssignmentOverridesPayload(
       assignedInfoList,
       defaultEveryoneOption,
-      masteryPathsOption
+      masteryPathsOption,
+      true
     ),
   }
 }
