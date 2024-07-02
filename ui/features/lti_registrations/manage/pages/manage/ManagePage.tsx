@@ -20,24 +20,23 @@ import {debounce} from 'lodash'
 import React from 'react'
 import {AppsSearchBar} from './AppsSearchBar'
 
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
 import {Flex} from '@instructure/ui-flex'
-import {Pagination} from '@instructure/ui-pagination'
 import {Spinner} from '@instructure/ui-spinner'
-import {
-  fetchRegistrations as apiFetchRegistrations,
-  deleteRegistration as apiDeleteRegistration,
-} from '../../api/registrations'
-import {AppsTable} from './AppsTable'
-import {MANAGE_APPS_PAGE_LIMIT, mkUseManagePageState} from './ManagePageLoadingState'
-import {type ManageSearchParams, useManageSearchParams} from './ManageSearchParams'
 import {formatSearchParamErrorMessages} from '../../../common/lib/useZodParams/ParamsParseResult'
-import type {LtiRegistration} from '../../model/LtiRegistration'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {
+  deleteRegistration as apiDeleteRegistration,
+  fetchRegistrations as apiFetchRegistrations,
+} from '../../api/registrations'
 import {ZAccountId, type AccountId} from '../../model/AccountId'
+import type {LtiRegistration} from '../../model/LtiRegistration'
+import {AppsTable} from './AppsTable'
+import {mkUseManagePageState} from './ManagePageLoadingState'
+import {useManageSearchParams, type ManageSearchParams} from './ManageSearchParams'
 
 const SEARCH_DEBOUNCE_MS = 250
 
@@ -167,29 +166,8 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
                 dir={dir}
                 updateSearchParams={updateSearchParams}
                 deleteApp={deleteApp}
+                page={page}
               />
-              <Pagination
-                as="nav"
-                margin="small"
-                variant="compact"
-                labelNext={I18n.t('Next Page')}
-                labelPrev={I18n.t('Previous Page')}
-              >
-                {Array.from(Array(Math.ceil(apps.items.total / MANAGE_APPS_PAGE_LIMIT))).map(
-                  (_, i) => (
-                    <Pagination.Page
-                      // eslint-disable-next-line react/no-array-index-key
-                      key={i}
-                      current={i === page - 1}
-                      onClick={() => {
-                        setManageSearchParams({page: (i + 1).toString()})
-                      }}
-                    >
-                      {i + 1}
-                    </Pagination.Page>
-                  )
-                )}
-              </Pagination>
             </>
           )
         } else {

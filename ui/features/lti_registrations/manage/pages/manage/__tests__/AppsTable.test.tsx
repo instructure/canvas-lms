@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {AppsTableInner} from '../AppsTable'
 import {mockPageOfRegistrations} from './helpers'
 import {BrowserRouter} from 'react-router-dom'
@@ -37,6 +37,7 @@ describe('AppsTableInner', () => {
             sort: 'name',
             updateSearchParams: () => {},
             deleteApp,
+            page: 1,
           }}
           responsiveProps={undefined}
         />
@@ -50,5 +51,44 @@ describe('AppsTableInner', () => {
     expect(deleteApp).not.toHaveBeenCalled()
     fireEvent.click(deleteButton)
     expect(deleteApp).toHaveBeenCalled()
+  })
+
+  it('shows the current page and total count', async () => {
+    const wrapper = render(
+      <BrowserRouter>
+        <AppsTableInner
+          tableProps={{
+            apps: mockPageOfRegistrations(
+              '1',
+              '2',
+              '3',
+              '4',
+              '5',
+              '6',
+              '7',
+              '8',
+              '9',
+              '10',
+              '11',
+              '12',
+              '13',
+              '14',
+              '15',
+              '16',
+              '17'
+            ),
+            dir: 'asc',
+            sort: 'name',
+            updateSearchParams: () => {},
+            deleteApp: () => {},
+            page: 2,
+          }}
+          responsiveProps={undefined}
+        />
+      </BrowserRouter>
+    )
+    await waitFor(() => {
+      expect(wrapper.getByText('16 - 17 of 17 displayed')).toBeInTheDocument()
+    })
   })
 })
