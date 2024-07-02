@@ -59,9 +59,19 @@ describe('AssignmentSubmissionTypeContainer', () => {
   it('renders the resource link card when a resource is available and the user has not clicked the resource close button', () => {
     const resource = {title: 'Resource Title'}
     renderComponent(resource)
-    expect(
-      screen.getByTestId('assignment-submission-type-selection-resource-link-card')
-    ).toBeTruthy()
+    const el = screen.getByTestId('assignment-submission-type-selection-resource-link-card')
+    expect(el).toBeTruthy()
+    // check text:
+    expect(el).toHaveTextContent('Resource Title')
+    expect(screen.queryByTestId('assignment_submission_type_selection_launch_button')).toBeFalsy()
+  })
+
+  it('renders the resource link card with "Unnamed Document" when a resource is available but it has no title', () => {
+    const resource = {}
+    renderComponent(resource)
+    const el = screen.getByTestId('assignment-submission-type-selection-resource-link-card')
+    expect(el).toBeTruthy()
+    expect(el).toHaveTextContent('Unnamed Document')
     expect(screen.queryByTestId('assignment_submission_type_selection_launch_button')).toBeFalsy()
   })
 
