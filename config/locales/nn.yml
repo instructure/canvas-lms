@@ -14379,6 +14379,7 @@ nn:
   invalid_timestamp_timestamp_in_future_5bc855d7: "Ugyldig tidspunkt - tidspunkt er i framtida"
   invalid_timestamp_timestamp_not_parseable_dae79e92: "Ugyldig tidsmerking - tidsmerke lar seg ikkje parse"
   invalid_until_until_date_55f29c82: "Ugyldig UNTIL '%{until_date}'"
+  invalid_url_cbde79f: "Ugyldig URL"
   invalid_url_in_xml: "Ugyldig URL i xml. Må unngå bruk av ampersand (&-teiknet)."
   invalid_username_or_password_b60aa240: "Ugyldig brukarnamn eller passord"
   invalid_username_or_password_trouble_logging_in_ch_7699399c: "Ugyldig brukarnamn eller passord. Problem med innlogging? *Sjå vår Login FAQs*."
