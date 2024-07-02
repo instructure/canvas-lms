@@ -21,6 +21,7 @@ import {CREATE_DISCUSSION_ENTRY} from '../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {captureException} from '@sentry/react'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -40,6 +41,10 @@ export default function useCreateDiscussionEntry(onCompleteCallback, updateCache
     onError: errorData => {
       // Common onError handling logic here.
       setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
+
+      captureException(
+        new Error(`Error received when creating the discussion entry: ${errorData.message}`)
+      )
 
       if (onCompleteCallback) {
         // Additional, component-specific completion handling logic here.

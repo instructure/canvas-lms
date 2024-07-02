@@ -44,6 +44,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import {View} from '@instructure/ui-view'
 import useCreateDiscussionEntry from './hooks/useCreateDiscussionEntry'
 import {flushSync} from 'react-dom'
+import {captureException} from '@sentry/react'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -296,11 +297,11 @@ const DiscussionTopicManager = props => {
   }
 
   const onEntryCreationCompletion = (data, success) => {
-    if(success) {
+    if (success) {
       setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
       setReplyToTopicSubmission(getCheckpointSubmission(data, REPLY_TO_TOPIC))
       setReplyToEntrySubmission(getCheckpointSubmission(data, REPLY_TO_ENTRY))
-  
+
       if (sort === 'asc') {
         setPageNumber(discussionTopicQuery.data.legacyNode.entriesTotalPages - 1)
       }
@@ -331,6 +332,8 @@ const DiscussionTopicManager = props => {
   }
 
   if (discussionTopicQuery.error || !discussionTopicQuery?.data?.legacyNode) {
+    captureException(new Error(`Error received from discussionTopicQuery: ${discussionTopicQuery.error}`))
+
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
