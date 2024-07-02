@@ -432,6 +432,19 @@ describe "profile" do
     expect(fj("h1:contains('User Profile')").attribute("class")).to eq "screenreader-only"
   end
 
+  it "renders empty state messages when missing information in profile" do
+    user_logged_in
+    account = Account.default
+    account.settings[:enable_profiles] = true
+    account.settings[:enable_name_pronunciation] = true
+    account.save!
+    get "/profile"
+
+    expect(f("#name_pronunciation_empty_message").text).to eq "No name pronunciation provided"
+    expect(f("#biography_empty_message").text).to eq "No biography has been added"
+    expect(f("#links_empty_message").text).to eq "No links have been added"
+  end
+
   describe "profile pictures s3 tests" do
     # TODO: reimplement per CNVS-29611, but make sure we're testing at the right level
     it "should successfully upload profile pictures"
