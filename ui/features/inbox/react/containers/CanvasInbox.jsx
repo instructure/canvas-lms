@@ -307,7 +307,6 @@ const CanvasInbox = () => {
         variables: {
           conversationIds: selectedConversations.map(convo => convo._id),
           workflowState: 'archived',
-          subscribed: false,
         },
       })
     } else {
