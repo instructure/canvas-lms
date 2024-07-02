@@ -44,6 +44,7 @@ type Props = {
   readonly delUrl: string
   readonly isRepeating: boolean
   readonly isSeriesHead: boolean
+  readonly eventType: string
 }
 
 const DeleteCalendarEventDialog = ({
@@ -55,6 +56,7 @@ const DeleteCalendarEventDialog = ({
   delUrl,
   isRepeating,
   isSeriesHead,
+  eventType,
 }: Props) => {
   const [which, setWhich] = useState<Which>('one')
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
@@ -154,7 +156,15 @@ const DeleteCalendarEventDialog = ({
   }
 
   const renderOne = (): JSX.Element => {
-    return <Text>{I18n.t('Are you sure you want to delete this event?')}</Text>
+    return (
+      <Text>
+        {eventType === 'assignment'
+          ? I18n.t(
+              'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment.'
+            )
+          : I18n.t('Are you sure you want to delete this event?')}
+      </Text>
+    )
   }
 
   return (
