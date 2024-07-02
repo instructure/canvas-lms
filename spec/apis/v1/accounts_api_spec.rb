@@ -195,6 +195,29 @@ describe "Accounts API", type: :request do
                                         "Account 2"]
     end
 
+    it "includes course count if requested" do
+      2.times { course_factory(active_all: true, account: @a1.sub_accounts.find_by(name: "subby")) }
+      json = api_call(:get,
+                      "/api/v1/accounts/#{@a1.id}/sub_accounts?include[]=course_count",
+                      { controller: "accounts",
+                        action: "sub_accounts",
+                        account_id: @a1.id.to_s,
+                        format: "json",
+                        include: ["course_count"] })
+      expect(json.pluck("course_count")).to match_array([2, 0, 0, 0])
+    end
+
+    it "includes sub-account count if requested" do
+      json = api_call(:get,
+                      "/api/v1/accounts/#{@a1.id}/sub_accounts?include[]=sub_account_count",
+                      { controller: "accounts",
+                        action: "sub_accounts",
+                        account_id: @a1.id.to_s,
+                        format: "json",
+                        include: ["sub_account_count"] })
+      expect(json.pluck("sub_account_count")).to match_array([0, 0, 3, 3])
+    end
+
     it "adds sub account" do
       previous_sub_count = @a1.sub_accounts.size
       api_call(:post,
@@ -330,6 +353,23 @@ describe "Accounts API", type: :request do
                       { controller: "accounts", action: "index", format: "json", include: ["lti_guid"] },
                       {})
       expect(json[0]["lti_guid"]).to eq "hey"
+    end
+
+    it "includes course count if requested" do
+      2.times { course_factory(active_all: true, account: @a1) }
+      json = api_call(:get,
+                      "/api/v1/accounts?include[]=course_count",
+                      { controller: "accounts", action: "index", format: "json", include: ["course_count"] },
+                      {})
+      expect(json.pluck("course_count")).to match_array([2, 0])
+    end
+
+    it "includes sub-account count if requested" do
+      json = api_call(:get,
+                      "/api/v1/accounts?include[]=sub_account_count",
+                      { controller: "accounts", action: "index", format: "json", include: ["sub_account_count"] },
+                      {})
+      expect(json.pluck("sub_account_count")).to match_array([0, 2])
     end
 
     context "when the includes query param includes 'global_id'" do
