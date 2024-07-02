@@ -459,7 +459,6 @@ function DiscussionTopicForm({
 
     if (
       !isGraded &&
-      !currentDiscussionTopic?.assignment &&
       ENV.FEATURES?.selective_release_ui_api &&
       !isAnnouncement
     ) {
