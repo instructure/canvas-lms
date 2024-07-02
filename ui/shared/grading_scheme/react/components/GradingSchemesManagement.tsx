@@ -60,6 +60,9 @@ import {useGradingSchemeArchive} from '../hooks/useGradingSchemeArchive'
 import {useGradingSchemeUnarchive} from '../hooks/useGradingSchemeUnarchive'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {useAccountDefaultGradingScheme} from '../hooks/useAccountDefaultGradingScheme'
+import {useAccountDefaultGradingSchemeUpdate} from '../hooks/useAccountDefaultGradingSchemeUpdate'
+import {AccountDefaultSelector} from './form/AccountDefaultSelector'
 
 const I18n = useI18nScope('GradingSchemeManagement')
 
@@ -73,6 +76,7 @@ export interface GradingSchemesManagementProps {
   contextType: 'Account' | 'Course'
   onGradingSchemesChanged?: () => any
   archivedGradingSchemesEnabled: boolean
+  defaultAccountGradingSchemeEnabled?: boolean
   showCourseSchemesOnly?: boolean
 }
 
@@ -81,6 +85,7 @@ export const GradingSchemesManagement = ({
   contextId,
   onGradingSchemesChanged,
   archivedGradingSchemesEnabled,
+  defaultAccountGradingSchemeEnabled = false, // default to false since course grading scheme management doesn't need this
   showCourseSchemesOnly = false,
 }: GradingSchemesManagementProps) => {
   const {createGradingScheme /* createGradingSchemeStatus */} = useGradingSchemeCreate()
@@ -88,6 +93,8 @@ export const GradingSchemesManagement = ({
   const {updateGradingScheme /* deleteGradingSchemeStatus */} = useGradingSchemeUpdate()
   const {archiveGradingScheme} = useGradingSchemeArchive()
   const {unarchiveGradingScheme} = useGradingSchemeUnarchive()
+  const {loadAccountDefaultGradingScheme} = useAccountDefaultGradingScheme()
+  const {updateAccountDefaultGradingScheme} = useAccountDefaultGradingSchemeUpdate()
 
   const [gradingSchemeCards, setGradingSchemeCards] = useState<GradingSchemeCardData[] | undefined>(
     undefined
@@ -114,8 +121,12 @@ export const GradingSchemesManagement = ({
     undefined
   )
 
+  const [accountDefaultGradingScheme, setAccountDefaultGradingScheme] =
+    useState<GradingScheme | null>(null)
+
   const gradingSchemeCreateRef = useRef<GradingSchemeInputHandle>(null)
   const gradingSchemeUpdateRef = useRef<GradingSchemeInputHandle>(null)
+
   useEffect(() => {
     loadGradingSchemes(contextType, contextId, archivedGradingSchemesEnabled)
       .then(gradingSchemes => {
@@ -141,13 +152,24 @@ export const GradingSchemesManagement = ({
       .catch(error => {
         showFlashError(I18n.t('There was an error while loading the default grading scheme'))(error)
       })
+    if (defaultAccountGradingSchemeEnabled) {
+      loadAccountDefaultGradingScheme(contextId)
+        .then(accountDefault => setAccountDefaultGradingScheme(accountDefault))
+        .catch(error => {
+          showFlashError(I18n.t('There was an error while loading the default grading scheme'))(
+            error
+          )
+        })
+    }
   }, [
     loadGradingSchemes,
     loadDefaultGradingScheme,
     contextType,
     contextId,
+    loadAccountDefaultGradingScheme,
     archivedGradingSchemesEnabled,
     showCourseSchemesOnly,
+    defaultAccountGradingSchemeEnabled,
   ])
 
   const handleGradingSchemeDelete = async (gradingSchemeId: string) => {
@@ -336,6 +358,41 @@ export const GradingSchemesManagement = ({
     }
   }
 
+  const handleLoadingGradingSchemes = async () => {
+    try {
+      const gradingSchemes = await loadGradingSchemes(
+        contextType,
+        contextId,
+        archivedGradingSchemesEnabled
+      )
+      setGradingSchemeCards(
+        gradingSchemes
+          .filter(scheme => !showCourseSchemesOnly || scheme.context_type === 'Course')
+          .map(scheme => {
+            return {
+              gradingScheme: scheme,
+              editing: false,
+              creating: false,
+            } as GradingSchemeCardData
+          })
+      )
+    } catch (e) {
+      showFlashError(I18n.t('There was an error while loading grading schemes'))(e)
+    }
+  }
+
+  const handleChangeDefaultAccountGradingScheme = async (gradingSchemeId: string) => {
+    const id = gradingSchemeId === '0' ? null : gradingSchemeId
+    try {
+      const res = await updateAccountDefaultGradingScheme(contextId, id)
+      showFlashSuccess(I18n.t('Account default grading scheme was successfully saved.'))()
+      setAccountDefaultGradingScheme(res)
+      handleLoadingGradingSchemes()
+    } catch (e) {
+      showFlashError(I18n.t('There was an error while updating the default grading scheme'))(e)
+    }
+  }
+
   const addNewGradingScheme = () => {
     if (!gradingSchemeCards || !defaultGradingScheme) return
     const newStandard: GradingSchemeTemplateCardData = {
@@ -435,10 +492,23 @@ export const GradingSchemesManagement = ({
     }
     return !gradingScheme.assessed_assignment
   }
+
   return (
     <>
       <View>
-        <Flex justifyItems="end">
+        <Flex justifyItems="end" alignItems="end">
+          {defaultAccountGradingSchemeEnabled && contextType === 'Account' && (
+            <Flex.Item shouldGrow={true}>
+              <AccountDefaultSelector
+                defaultGradingSchemeId={accountDefaultGradingScheme?.id}
+                onChange={handleChangeDefaultAccountGradingScheme}
+                gradingSchemes={(gradingSchemeCards || [])
+                  .map(gradingSchemeCard => gradingSchemeCard.gradingScheme)
+                  .filter(scheme => scheme.workflow_state !== 'archived')}
+                data-testid="account-default-selector"
+              />
+            </Flex.Item>
+          )}
           {archivedGradingSchemesEnabled && (
             <Flex.Item margin="medium small 0 0" shouldShrink={true}>
               <TextInput
@@ -541,6 +611,7 @@ export const GradingSchemesManagement = ({
                 archiveOrUnarchiveScheme={handleArchiveScheme}
                 defaultScheme={true}
                 showUsedLocations={false}
+                defaultAccountGradingSchemeEnabled={defaultAccountGradingSchemeEnabled}
               />
               <Heading
                 level="h2"
@@ -565,6 +636,7 @@ export const GradingSchemesManagement = ({
                 openDeleteModal={openDeleteModal}
                 archiveOrUnarchiveScheme={handleArchiveScheme}
                 showUsedLocations={!showCourseSchemesOnly}
+                defaultAccountGradingSchemeEnabled={defaultAccountGradingSchemeEnabled}
               />
 
               <Heading
@@ -603,6 +675,7 @@ export const GradingSchemesManagement = ({
                 archiveOrUnarchiveScheme={handleUnarchiveScheme}
                 archivedSchemes={true}
                 showUsedLocations={!showCourseSchemesOnly}
+                defaultAccountGradingSchemeEnabled={defaultAccountGradingSchemeEnabled}
               />
               <GradingSchemeViewModal
                 open={
@@ -732,7 +805,11 @@ export const GradingSchemesManagement = ({
                       <GradingSchemeView
                         gradingScheme={gradingSchemeCard.gradingScheme}
                         archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
-                        disableDelete={!canManageScheme(gradingSchemeCard.gradingScheme)}
+                        disableDelete={
+                          !canManageScheme(gradingSchemeCard.gradingScheme) ||
+                          (defaultAccountGradingSchemeEnabled &&
+                            gradingSchemeCard.gradingScheme.used_as_default)
+                        }
                         disableEdit={!canManageScheme(gradingSchemeCard.gradingScheme)}
                         onDeleteRequested={() =>
                           handleGradingSchemeDelete(gradingSchemeCard.gradingScheme.id)
