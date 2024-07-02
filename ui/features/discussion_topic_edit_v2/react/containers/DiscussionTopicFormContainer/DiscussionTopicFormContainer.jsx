@@ -177,7 +177,7 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
     }
 
     return (
-      <Pill margin="small 0 0 0" variant="primary" {...pillProps}>
+      <Pill data-testid="publish-status-pill" margin="small 0 0 0" variant="primary" {...pillProps}>
         {published ? I18n.t('Published') : I18n.t('Unpublished')}
       </Pill>
     )
