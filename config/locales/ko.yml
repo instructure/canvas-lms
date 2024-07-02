@@ -7136,6 +7136,7 @@ ko:
   invalid_date_8a221445: "유효하지 않은 날짜"
   invalid_domain_e810c1d: "올바르지 않은 도메인"
   invalid_file_type_881cc9b2: "유효하지 않은 파일 유형"
+  invalid_url_cbde79f: "잘못된 URL"
   invalid_url_in_xml: "XML에 잘못된 URL이 있습니다. 앰퍼샌드는 이스케이프 처리를 해야 합니다."
   invalid_xml_syntax: "유효하지 않은 XML 구문"
   invite_5b1fcbcd: 초대
