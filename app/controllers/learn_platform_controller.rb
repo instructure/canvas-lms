@@ -20,7 +20,7 @@
 
 class LearnPlatformController < ApplicationController
   def learnplatform_api
-    @learnplatform_api ||= LearnPlatform::Api.new(@context)
+    @learnplatform_api ||= LearnPlatform::Api.new
   end
 
   def index
