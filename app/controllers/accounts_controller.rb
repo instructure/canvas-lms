@@ -87,6 +87,16 @@
 #           "example": "12",
 #           "type": "integer"
 #         },
+#         "course_count": {
+#           "description": "The number of courses directly under the account (available via include)",
+#           "example": "10",
+#           "type": "integer"
+#         },
+#         "sub_account_count": {
+#           "description": "The number of sub-accounts directly under the account (available via include)",
+#           "example": "10",
+#           "type": "integer"
+#         },
 #         "lti_guid": {
 #           "description": "The account's identifier that is sent as context_id in LTI launches.",
 #           "example": "123xyz",
@@ -314,12 +324,14 @@ class AccountsController < ApplicationController
   # Typically, students and even teachers will get an empty list in response,
   # only account admins can view the accounts that they are in.
   #
-  # @argument include[] [String, "lti_guid"|"registration_settings"|"services"]
+  # @argument include[] [String, "lti_guid"|"registration_settings"|"services"|"course_count"|"sub_account_count"]
   #   Array of additional information to include.
   #
   #   "lti_guid":: the 'tool_consumer_instance_guid' that will be sent for this account on LTI launches
   #   "registration_settings":: returns info about the privacy policy and terms of use
   #   "services":: returns services and whether they are enabled (requires account management permissions)
+  #   "course_count":: returns the number of courses directly under each account
+  #   "sub_account_count":: returns the number of sub-accounts directly under each account
   #
   # @returns [Account]
   def index
@@ -538,6 +550,12 @@ class AccountsController < ApplicationController
   #   this account will be returned (though still paginated). If false, only
   #   direct sub-accounts of this account will be returned. Defaults to false.
   #
+  # @argument include[] [String, "course_count"|"sub_account_count"]
+  #   Array of additional information to include.
+  #
+  #   "course_count":: returns the number of courses directly under each account
+  #   "sub_account_count":: returns the number of sub-accounts directly under each account
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/accounts/<account_id>/sub_accounts \
   #          -H 'Authorization: Bearer <token>'
@@ -569,8 +587,11 @@ class AccountsController < ApplicationController
                              api_v1_sub_accounts_url,
                              total_entries: recursive ? nil : @accounts.count)
 
+    supported_includes = %w[course_count sub_account_count]
+    includes = (supported_includes.any? { |i| params[:include]&.include?(i) }) ? supported_includes : []
+
     ActiveRecord::Associations.preload(@accounts, [:root_account, :parent_account])
-    render json: @accounts.map { |a| account_json(a, @current_user, session, []) }
+    render json: @accounts.map { |a| account_json(a, @current_user, session, includes) }
   end
 
   # @API Get the Terms of Service

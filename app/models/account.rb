@@ -1841,11 +1841,11 @@ class Account < ActiveRecord::Base
   end
 
   def course_count
-    courses.active.count
+    courses.active.size
   end
 
   def sub_account_count
-    sub_accounts.active.count
+    sub_accounts.active.size
   end
 
   def user_count
