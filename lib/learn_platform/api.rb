@@ -20,19 +20,18 @@ module LearnPlatform
   class Api
     attr_reader :learnplatform
 
-    def initialize(context)
+    def initialize
       @learnplatform = Canvas::Plugin.find(:learnplatform)
-      @context ||= context
     end
 
     def valid_learnplatform?
-      @learnplatform&.enabled? && !@learnplatform.settings["username"].empty? && !@learnplatform.settings["password"].empty?
+      learnplatform&.enabled? && !learnplatform.settings["username"].empty? && !learnplatform.settings["password"].empty?
     end
 
     def fetch_learnplatform_response(endpoint, expires, params = {})
-      base_url = @learnplatform.settings["base_url"]
-      name = @learnplatform.settings["username"]
-      pass = @learnplatform.settings["password"]
+      base_url = learnplatform.settings["base_url"]
+      name = learnplatform.settings["username_dec"]
+      pass = learnplatform.settings["password_dec"]
       authorization = "Basic #{Base64.encode64("#{name}:#{pass}")}"
 
       begin

@@ -19,7 +19,7 @@
 #
 
 describe LearnPlatformController do
-  let(:api) { LearnPlatform::Api.new(@account) }
+  let(:api) { LearnPlatform::Api.new }
 
   before do
     account_model
