@@ -805,6 +805,8 @@ CanvasRails::Application.routes.draw do
     post "grading_schemes/:id/archive" => "grading_schemes_json#archive"
     post "grading_schemes/:id/unarchive" => "grading_schemes_json#unarchive"
     post "grading_schemes" => "grading_schemes_json#create"
+    get "grading_schemes/account_default" => "grading_schemes_json#show_account_default_grading_scheme"
+    put "grading_schemes/account_default" => "grading_schemes_json#update_account_default_grading_scheme"
     delete "grading_schemes/:id" => "grading_schemes_json#destroy"
     put "grading_schemes/:id" => "grading_schemes_json#update"
     get "grading_schemes/:id/used_locations" => "grading_schemes_json#used_locations", :as => :grading_schemes_used_locations

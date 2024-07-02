@@ -677,4 +677,39 @@ describe GradingStandard do
         .to_not be_nil
     end
   end
+
+  describe "#used_as_default?" do
+    before do
+      @root_account = Account.create!
+      @subaccount = Account.create(root_account: @root_account)
+      @course = Course.create(account: @root_account)
+      data = [["A", 94], ["F", 0]]
+      @grading_standard = GradingStandard.new(context: @root_account, workflow_state: "active", data:)
+    end
+
+    it "returns true if used as the account default grading scheme" do
+      @root_account.grading_standard = @grading_standard
+      @root_account.save!
+
+      expect(@grading_standard.used_as_default?).to be true
+    end
+
+    it "returns true if used as the account default grading scheme in a sub-account" do
+      @subaccount.grading_standard = @grading_standard
+      @subaccount.save!
+
+      expect(@grading_standard.used_as_default?).to be true
+    end
+
+    it "returns true if used as a course default grading scheme" do
+      @course.grading_standard = @grading_standard
+      @course.save!
+
+      expect(@grading_standard.used_as_default?).to be true
+    end
+
+    it "returns false if not used as an account or course default grading scheme" do
+      expect(@grading_standard.used_as_default?).to be false
+    end
+  end
 end

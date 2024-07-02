@@ -32,6 +32,7 @@ export const AccountGradingSchemes: GradingScheme[] = [
     scaling_factor: 1,
     title: 'Grading Scheme 1',
     workflow_state: 'active',
+    used_as_default: false,
   },
   {
     assessed_assignment: false,
@@ -45,6 +46,7 @@ export const AccountGradingSchemes: GradingScheme[] = [
     scaling_factor: 1,
     title: 'Grading Scheme 2',
     workflow_state: 'active',
+    used_as_default: false,
   },
   {
     assessed_assignment: false,
@@ -58,6 +60,7 @@ export const AccountGradingSchemes: GradingScheme[] = [
     scaling_factor: 1,
     title: 'Grading Scheme 3',
     workflow_state: 'archived',
+    used_as_default: true,
   },
 ]
 
@@ -75,6 +78,7 @@ export const ExtraGradingSchemes: GradingScheme[] = [
     scaling_factor: 1,
     title: 'Grading Scheme 4',
     workflow_state: 'active',
+    used_as_default: false,
   },
   {
     assessed_assignment: false,
@@ -88,6 +92,7 @@ export const ExtraGradingSchemes: GradingScheme[] = [
     scaling_factor: 1,
     title: 'Grading Scheme 5',
     workflow_state: 'active',
+    used_as_default: false,
   },
   {
     assessed_assignment: false,
@@ -101,6 +106,7 @@ export const ExtraGradingSchemes: GradingScheme[] = [
     scaling_factor: 1,
     title: 'Grading Scheme 6',
     workflow_state: 'active',
+    used_as_default: false,
   },
   {
     assessed_assignment: false,
@@ -114,6 +120,7 @@ export const ExtraGradingSchemes: GradingScheme[] = [
     scaling_factor: 1,
     title: 'Grading Scheme 7',
     workflow_state: 'active',
+    used_as_default: false,
   },
   {
     assessed_assignment: false,
@@ -127,6 +134,7 @@ export const ExtraGradingSchemes: GradingScheme[] = [
     scaling_factor: 1,
     title: 'Grading Scheme 8',
     workflow_state: 'active',
+    used_as_default: false,
   },
   {
     assessed_assignment: false,
@@ -140,6 +148,7 @@ export const ExtraGradingSchemes: GradingScheme[] = [
     scaling_factor: 1,
     title: 'Grading Scheme 9',
     workflow_state: 'archived',
+    used_as_default: false,
   },
   {
     assessed_assignment: false,
@@ -153,6 +162,7 @@ export const ExtraGradingSchemes: GradingScheme[] = [
     scaling_factor: 1,
     title: 'Grading Scheme 10',
     workflow_state: 'active',
+    used_as_default: false,
   },
   {
     assessed_assignment: false,
@@ -166,6 +176,7 @@ export const ExtraGradingSchemes: GradingScheme[] = [
     scaling_factor: 1,
     title: 'Grading Scheme 11',
     workflow_state: 'archived',
+    used_as_default: false,
   },
 ]
 
@@ -238,6 +249,7 @@ export const DefaultGradingScheme: GradingScheme = {
     },
   ],
   assessed_assignment: false,
+  used_as_default: false,
 }
 
 export const AccountGradingSchemeCards: GradingSchemeCardData[] = AccountGradingSchemes.map(
