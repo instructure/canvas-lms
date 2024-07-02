@@ -18,7 +18,7 @@
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
-import {QueryFunctionContext} from '@tanstack/react-query'
+import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {ReleaseNote} from '../../../../api.d'
 
 const RELEASE_NOTES_PATH = '/api/v1/release_notes/latest'
