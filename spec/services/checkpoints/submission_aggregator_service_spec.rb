@@ -715,6 +715,44 @@ describe Checkpoints::SubmissionAggregatorService do
       end
     end
 
+    describe "grading_period_id" do
+      before :once do
+        gpg = GradingPeriodGroup.create! title: "asdf",
+                                         root_account: @course.root_account
+        @course.enrollment_term.update grading_period_group: gpg
+        @term1 = gpg.grading_periods.create! title: "past grading period",
+                                             start_date: 2.weeks.ago,
+                                             end_date: 1.week.ago
+        @term2 = gpg.grading_periods.create! title: "current grading period",
+                                             start_date: 2.days.ago,
+                                             end_date: 2.days.from_now
+      end
+
+      it "sets the grading_period_id to the grading_period_id shared by both checkpoints" do
+        submission.grading_period_id = nil
+        submission.save!
+
+        # before running the service, make sure checkpoint submissions are still in @term2
+        expect(sub_assignment_submissions.first.grading_period_id).to eq @term2.id
+        expect(sub_assignment_submissions.last.grading_period_id).to eq @term2.id
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.reload.grading_period_id).to eq @term2.id
+      end
+
+      it "sets the grading_period_id to nil when checkpoints are in different grading periods" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          sub_assignment_submissions.first.update!(grading_period_id: @term1.id)
+          sub_assignment_submissions.last.update!(grading_period_id: @term2.id)
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.reload.grading_period_id).to be_nil
+      end
+    end
+
     describe "late_policy_status" do
       it "computes late + late = late" do
         Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do

@@ -25,6 +25,7 @@ class Checkpoints::SubmissionAggregatorService < Checkpoints::AggregatorService
     :graded_anonymously,
     :grader_id,
     :grade_matches_current_submission,
+    :grading_period_id,
     :late_policy_status,
     :published_grade,
     :published_score,
@@ -71,6 +72,7 @@ class Checkpoints::SubmissionAggregatorService < Checkpoints::AggregatorService
 
     submission.excused = submissions.any?(&:excused)
     submission.grade = grade(submissions, submission.score)
+    submission.grading_period_id = shared_attribute(submissions, :grading_period_id, nil)
     submission.late_policy_status = calculate_late_policy_status(submissions)
     submission.published_grade = grade(submissions, submission.published_score)
     submission.grade_matches_current_submission = calculate_grade_matches_current_submission(submissions)
