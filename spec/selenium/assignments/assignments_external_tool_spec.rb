@@ -169,9 +169,9 @@ describe "external tool assignments" do
       get "/courses/#{@course.id}/assignments/#{assmt.id}/edit"
       selected = first_selected_option(f("#assignment_submission_type"))
       expect(selected.text.strip).to eq @t1.name
-      button = f("#assignment_submission_type_selection_launch_button")
-      expect(button).to be_displayed
-      expect(button.text).to include("link to #{@t1.name} or whatever") # the launch button uses the placement text
+      card = f("#assignment-submission-type-selection-resource-link-card")
+      expect(card).to be_displayed
+      expect(card.text).to include("link to #{@t1.name} or whatever") # the launch button uses the placement text
     end
 
     it "displays external data for mastery connect" do

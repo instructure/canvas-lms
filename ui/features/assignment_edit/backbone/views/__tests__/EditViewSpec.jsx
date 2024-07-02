@@ -386,13 +386,14 @@ test('does not allow blank external tool url', function () {
 
 // #region "tests regarding Submission Type Selection"
 
-test('does not allow submission_type_selection tools (selectedTool set) with require_resource_selection=true with no resource title', function () {
+test('does not allow submission_type_selection tools (selectedTool set) with require_resource_selection=true when content type is context_external_tool', function () {
   const view = this.editView()
   view.selectedTool = {require_resource_selection: true}
   const data = {
     submission_type: 'external_tool',
     external_tool_tag_attributes: {
       content_type: 'context_external_tool',
+      title: "shouldn't look at this"
     },
   }
   const errors = view._validateExternalTool(data, [])
@@ -419,7 +420,7 @@ test('allows submission_type_selection tools with require_resource_selection=tru
   const data = {
     submission_type: 'external_tool',
     external_tool_tag_attributes: {
-      content_type: 'context_external_tool',
+      content_type: 'ltiResourceLink',
       title: 'some title',
     },
   }
@@ -452,7 +453,7 @@ function editViewWithSubmissionTypeSelection() {
   return view
 }
 
-test('when submission_type_selection tool chosen: sets selectedTool and leaves title empty', function () {
+test('when submission_type_selection tool chosen: sets selectedTool and sets content_type to context_external_tool', function () {
   const view = editViewWithSubmissionTypeSelection()
   view.$submissionType.val('external_tool_placement_123')
   view.$submissionType.trigger('change')
@@ -464,7 +465,7 @@ test('when submission_type_selection tool chosen: sets selectedTool and leaves t
   deepEqual(formData.submission_types, ['external_tool'])
 
   ok(view.selectedTool.require_resource_selection)
-  notOk(formData.external_tool_tag_attributes.title)
+  equal(formData.external_tool_tag_attributes.content_type, 'context_external_tool')
 })
 
 const lastSubmissionTypeContainerProps = function () {
@@ -499,7 +500,7 @@ test("when a submission_type_selection sends back title and preserveExistingAssi
   equal(view.$externalToolsTitle.val(), 'someResource')
 })
 
-test('when a submission_type_selection tool chosen and a resource selected: sets selectedTool, title, assignment name', function () {
+test('when a submission_type_selection tool is chosen and a resource selected: sets selectedTool, title, assignment name', function () {
   const view = editViewWithSubmissionTypeSelection()
   view.$submissionType.val('external_tool_placement_123')
   view.$submissionType.trigger('change')
@@ -514,7 +515,18 @@ test('when a submission_type_selection tool chosen and a resource selected: sets
   equal(view.$('#assignment_name').val(), 'someResource')
 })
 
-test('when a submission_type_selection tool chosen, a resource selected, and the resource removed: keeps selectedTool but clears out title', function () {
+test('when a submission_type_selection tool is chosen and a resource w/o title selected: sets selectedTool and sets content type to ltiResourceLink', function () {
+  const view = editViewWithSubmissionTypeSelection()
+  view.$submissionType.val('external_tool_placement_123')
+  view.$submissionType.trigger('change')
+  equal(view.$externalToolsContentType.val(), 'context_external_tool')
+  view.handleContentItem(makeResourceLinkContentItem({title: null}))
+  equal(view.$externalToolsContentType.val(), 'ltiResourceLink')
+  ok(view.selectedTool.require_resource_selection)
+  notOk(lastSubmissionTypeContainerProps().resource.title)
+})
+
+test('when a submission_type_selection tool chosen, a resource selected, and the resource removed: keeps selectedTool but clears out title and content type', function () {
   const view = editViewWithSubmissionTypeSelection()
   view.$submissionType.val('external_tool_placement_123')
   view.$submissionType.trigger('change')
@@ -525,12 +537,13 @@ test('when a submission_type_selection tool chosen, a resource selected, and the
   const formData = view.getFormData()
   ok(view.selectedTool.require_resource_selection)
   notOk(formData.external_tool_tag_attributes.title)
+  equal(formData.external_tool_tag_attributes.content_type, 'context_external_tool')
 
   // Card is NOT shown:
-  notOk(lastSubmissionTypeContainerProps().resource.title)
+  notOk(lastSubmissionTypeContainerProps().resource)
 })
 
-test('when a submission_type_select tool chosen but changed back to generic "External Tool": URL reset', function () {
+test('when a submission_type_selection tool chosen but changed back to generic "External Tool": URL and content type are reset', function () {
   // Moving from a submission_type_placement tool to generic
   // clear out URL & selectedTool -- shouldn't carry over selectedTool
   // and prefill external_tool URL
@@ -543,6 +556,7 @@ test('when a submission_type_select tool chosen but changed back to generic "Ext
   const formData = view.getFormData()
   ok(view.selectedTool)
   ok(formData.external_tool_tag_attributes.url)
+  equal(formData.external_tool_tag_attributes.content_type, 'ltiResourceLink')
 
   view.$submissionType.val('external_tool')
   view.$submissionType.trigger('change')
@@ -551,6 +565,7 @@ test('when a submission_type_select tool chosen but changed back to generic "Ext
 
   notOk(view.selectedTool)
   notOk(newFormData.external_tool_tag_attributes.url)
+  equal(newFormData.external_tool_tag_attributes.content_type, 'context_external_tool')
 })
 
 test('does not validate allowed extensions if file uploads is not a submission type', function () {
