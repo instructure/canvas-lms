@@ -91,7 +91,11 @@
       <% if @domain_root_account.settings[:enable_name_pronunciation] %>
         <div class="hide-if-editing">
           <h3 class="profileHeader"><%= t('name_pronunciation', 'Name Pronunciation') %></h3>
-          <p><%= @user_data[:pronunciation] %></p>
+          <% if @user_data[:pronunciation].present? && @user_data[:pronunciation] != "" %>
+            <p id="name_pronunciation"><%= @user_data[:pronunciation] %></p>
+          <% else %>
+            <p id="name_pronunciation_empty_message"><%= t('no_name_pronunciation', 'No name pronunciation provided') %></p>
+          <% end %>
         </div>
       <% end %>
 
@@ -143,10 +147,10 @@
 
       <div>
         <h3 id="profile_bio_label" class="profileHeader"><%= t :bio, "Biography" %></h3>
-        <% if @user_data[:bio] %>
-          <div class="hide-if-editing"><%= raw format_message(@user_data[:bio]).first %></div>
+        <% if @user_data[:bio] && @user_data[:bio] != "" %>
+          <div id="biography" class="hide-if-editing"><%= raw format_message(@user_data[:bio]).first %></div>
         <% else %>
-          <p class="hide-if-editing"><%= t('user_has_no_bio', "%{user} hasn't added a bio", :user => @user_data[:short_name]) %></p>
+          <p id="biography_empty_message" class="hide-if-editing"><%= t('user_has_no_bio', "No biography has been added") %></p>
         <% end %>
         <% if @user_data[:can_edit] %>
           <div class="show-if-editing">
@@ -185,7 +189,7 @@
               <% end %>
             </ul>
           <% else %>
-            <p><%= t  :no_links, "%{name} hasn't added any links", :name => @user_data[:short_name] %></p>
+            <p id="links_empty_message"><%= t  :no_links, "No links have been added" %></p>
           <% end %>
         </div>
 
