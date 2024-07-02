@@ -894,8 +894,6 @@ describe "discussions" do
           end
 
           it "transitions from graded to ungraded and overrides are ok", :ignore_js_errors do
-            skip("LX-1761 this test should work but doesn't right now")
-
             discussion_assignment_options = {
               name: "assignment",
               points_possible: 10,
@@ -930,10 +928,10 @@ describe "discussions" do
             keep_trying_until { expect(item_tray_exists?).to be_truthy }
 
             expect(assign_to_date_and_time[1].text).not_to include("Due Date")
-            expect(assign_to_available_from_date(1, false).attribute("value")).to eq(format_date_for_view(available_from, "%b %-e, %Y"))
-            expect(assign_to_available_from_time(1, false).attribute("value")).to eq(available_from.strftime("%-l:%M %p"))
-            expect(assign_to_until_date(1, false).attribute("value")).to eq(format_date_for_view(available_until, "%b %-e, %Y"))
-            expect(assign_to_until_time(1, false).attribute("value")).to eq(available_until.strftime("%-l:%M %p"))
+            expect(assign_to_available_from_date(1, true).attribute("value")).to eq(format_date_for_view(available_from, "%b %-e, %Y"))
+            expect(assign_to_available_from_time(1, true).attribute("value")).to eq(available_from.strftime("%-l:%M %p"))
+            expect(assign_to_until_date(1, true).attribute("value")).to eq(format_date_for_view(available_until, "%b %-e, %Y"))
+            expect(assign_to_until_time(1, true).attribute("value")).to eq(available_until.strftime("%-l:%M %p"))
           end
         end
       end
