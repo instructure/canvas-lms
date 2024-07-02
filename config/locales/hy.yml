@@ -8553,6 +8553,7 @@ hy:
   invalid_file_type_881cc9b2: "Ֆայլի անընդունելի տեսակ"
   invalid_recipient_name_56b22b86: "Ստացողի անունը սխալ է"
   invalid_state_parameter_7a5aa108: "Վիճակի սխալ պարամետր"
+  invalid_url_cbde79f: "Սխալ URL"
   invalid_url_in_xml: "Սխալ Url -հասցե xml-ում: Անհրաժեշտ է խուսափել Ampersands-ից: "
   invalid_utf_8_13c76a6: "Սխալ UTF-8"
   invalid_xml_syntax: "xml-ի սխալ սինտաքս"
