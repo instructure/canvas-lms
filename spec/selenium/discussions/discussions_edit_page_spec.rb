@@ -1728,8 +1728,39 @@ describe "discussions" do
               get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}/edit"
               Discussion.assign_to_button.click
 
+              reply_to_topic_date = format_date_for_view(3.days.from_now(Time.zone.now), "%m/%d/%Y")
+              update_reply_to_topic_date(0, reply_to_topic_date)
+              update_reply_to_topic_time(0, "5:00 PM")
+
+              # required replies
+              required_replies_date = format_date_for_view(4.days.from_now(Time.zone.now), "%m/%d/%Y")
+              update_required_replies_date(0, required_replies_date)
+              update_required_replies_time(0, "5:00 PM")
+
+              # available from
+              available_from_date = format_date_for_view(2.days.from_now(Time.zone.now), "%m/%d/%Y")
+              update_available_date(0, available_from_date, true, false)
+              update_available_time(0, "5:00 PM", true, false)
+
+              # available until
+              until_date = format_date_for_view(5.days.from_now(Time.zone.now), "%m/%d/%Y")
+              update_until_date(0, until_date, true, false)
+              update_until_time(0, "5:00 PM", true, false)
+
+              click_save_button("Apply")
+
               wait_for_assign_to_tray_spinner
-              expect(module_item_assign_to_card.last).to contain_css(required_replies_due_date_input_selector)
+              fj("button:contains('Save')").click
+              wait_for_ajaximations
+
+              graded_discussion = DiscussionTopic.last
+              sub_assignments = graded_discussion.sub_assignments
+              sub_assignment1 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+              sub_assignment2 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+              expect(graded_discussion.assignment.sub_assignments.count).to eq(2)
+              expect(format_date_for_view(sub_assignment1.due_at, "%m/%d/%Y")).to eq(reply_to_topic_date)
+              expect(format_date_for_view(sub_assignment2.due_at, "%m/%d/%Y")).to eq(required_replies_date)
             end
           end
 
