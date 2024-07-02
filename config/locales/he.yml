@@ -10371,6 +10371,7 @@ he:
   invalid_restrictions_316cd740: "הגבלות לא תקינות"
   invalid_sis_sync_status_b68db497: "סטטוס סינכרון עם SIS אינו תקין"
   invalid_state_parameter_7a5aa108: "פרמטר מצב אינו תקין"
+  invalid_url_cbde79f: "כתובת דף אינטרנט לא תקינה"
   invalid_url_in_xml: "כתובת אינטרנט שגויה ב XML. אין לכלול אמפרסנדים - &"
   invalid_username_or_password_b60aa240: "שם משתמש או סיסמה שגויים"
   invalid_utf_8_13c76a6: "UTF-8 לא תקין"
