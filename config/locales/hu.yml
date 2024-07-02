@@ -13172,6 +13172,7 @@ hu:
   invalid_timestamp_timestamp_in_future_5bc855d7: "Érvénytelen időbélyeg - időbélyeg a jövőben"
   invalid_timestamp_timestamp_not_parseable_dae79e92: "Érvénytelen időbélyeg - az időbélyeg nem elemezhető"
   invalid_until_until_date_55f29c82: "Érvénytelen AMÍG '%{until_date}'"
+  invalid_url_cbde79f: "Helytelen webcím"
   invalid_url_in_xml: "Hibás url az xml-ben. Az és jeleket escapelni kell."
   invalid_username_or_password_b60aa240: "Helytelen felhasználói név vagy jelszó"
   invalid_utf_8_13c76a6: "Érvénytelen UTF-8"

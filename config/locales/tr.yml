@@ -10444,6 +10444,7 @@ tr:
   invalid_recipient_name_56b22b86: "Geçersiz alıcı adı."
   invalid_restrictions_316cd740: "Geçersiz kısıtlamalar"
   invalid_state_parameter_7a5aa108: "Geçersiz durum parametresi"
+  invalid_url_cbde79f: "Geçersiz bağlantı"
   invalid_url_in_xml: "xml dosyasında geçersiz url. & işaretleri kullanılmamalı."
   invalid_username_or_password_b60aa240: "Geçersiz kullanıcı adı ve şifre"
   invalid_utf_8_13c76a6: "UTF-8 Geçersiz"
