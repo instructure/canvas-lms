@@ -22,6 +22,8 @@ class MediaObject < ActiveRecord::Base
   include Workflow
   include SearchTermHelper
 
+  class VideoCaptionServiceError < Delayed::RetriableError; end
+
   AUTO_CAPTION_STATUSES = {
     processing: -> { I18n.t("Processing") },
     failed_initial_validation: -> { I18n.t("Error - Something went wrong") },
@@ -53,6 +55,7 @@ class MediaObject < ActiveRecord::Base
   has_many :attachments_by_media_id, class_name: "Attachment", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :media_object_by_media_id
   before_create :create_attachment
   after_create :retrieve_details_later
+  after_create :generate_captions
   after_save :update_title_on_kaltura_later
   serialize :data
 
@@ -243,7 +246,6 @@ class MediaObject < ActiveRecord::Base
 
   def retrieve_details_ensure_codecs(attempt = 0)
     retrieve_details
-    request_captions
     if !transcoded_details && created_at > 6.hours.ago
       if attempt < 10
         delay(run_at: (5 * attempt).minutes.from_now).retrieve_details_ensure_codecs(attempt + 1)
@@ -343,8 +345,15 @@ class MediaObject < ActiveRecord::Base
     save!
   end
 
-  def request_captions
+  def generate_captions
     return unless Account.site_admin.feature_enabled?(:speedgrader_studio_media_capture)
+
+    # On error, the job is scheduled again in 5 seconds + N ** 4, where N is the number of attempts
+    delay(max_attempts: 10).request_captions
+  end
+
+  def request_captions
+    raise VideoCaptionServiceError unless media_sources.any?
 
     VideoCaptionService.call(self)
   end
