@@ -104,17 +104,20 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     moveable,
     deletable,
     connectors: {drag},
-  } = useNode((n: Node) => ({
-    nodeActions: actions,
-    node: n,
-    hovered: n.events.hovered,
-    selected: n.events.selected,
-    dom: n.dom,
-    name: n.data.custom.displayName || n.data.displayName,
-    moveable: query.node(n.id).isDraggable(),
-    deletable: query.node(n.id).isDeletable(),
-    props: n.data.props,
-  }))
+  } = useNode((n: Node) => {
+    const node_helpers = query.node(n.id)
+    return {
+      nodeActions: actions,
+      node: n,
+      hovered: n.events.hovered,
+      selected: n.events.selected,
+      dom: n.dom,
+      name: n.data.custom.displayName || n.data.displayName,
+      moveable: node_helpers.isDraggable(),
+      deletable: n.data.custom?.isDeletable?.(n.id, query) && node_helpers.isDeletable(),
+      props: n.data.props,
+    }
+  })
 
   const [currentToolbarOrTagRef, setCurrentToolbarOrTagRef] = useState<HTMLDivElement | null>(null)
   const [currentMenuRef, setCurrentMenuRef] = useState<HTMLDivElement | null>(null)
@@ -229,7 +232,7 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   // TODO: this should be role="toolbar" and nav with arrow keys
   const renderBlockToolbar = () => {
     if (node.data?.custom?.noToolbar) return null
-    const mountPoint = document.querySelector('.block-editor-editor')
+    const mountPoint = document.querySelector('.block-editor-editor') as HTMLElement | null
     if (!mountPoint) return null
 
     return ReactDOM.createPortal(

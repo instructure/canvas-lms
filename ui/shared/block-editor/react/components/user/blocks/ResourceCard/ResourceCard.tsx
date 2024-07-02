@@ -91,19 +91,14 @@ ResourceCard.craft = {
   defaultProps: {
     id: uid('resource-card', 2),
   },
-  rules: {
-    isDeletable: () => {
-      // const node = query.node(id)
-      // if (!node.isDeletable()) {
-      //   return false
-      // }
-
-      // const target = query.node(id)
-      // const ancestors = target.ancestors()
-      // const parent = query.node(ancestors[0])
-      // if (parent.get().rules?.canMoveOut) {
-      //   return parent.get().rules.canMoveOut([node.get()], parent.get())
-      // }
+  custom: {
+    isDeletable: (myId: Node, query: any) => {
+      const target = query.node(myId).get()
+      const ancestors = query.node(myId).ancestors()
+      const parent = query.node(ancestors[0])
+      if (parent.get().rules?.canMoveOut) {
+        return parent.get().rules.canMoveOut([target], parent.get())
+      }
       return true
     },
   },
