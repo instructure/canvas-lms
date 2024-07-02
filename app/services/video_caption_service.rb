@@ -168,6 +168,7 @@ class VideoCaptionService < ApplicationService
       update_status(:failed_request)
     end
   end
+  alias_method :generate_captions, :poll_caption_request
 
   def poll_captions_ready(attempts = 1)
     response = media
@@ -186,4 +187,5 @@ class VideoCaptionService < ApplicationService
       update_status(:failed_captions)
     end
   end
+  alias_method :poll_for_captions_ready, :poll_captions_ready
 end
