@@ -440,6 +440,7 @@ function DiscussionTopicForm({
         currentDiscussionTopic?.assignment
       ),
       checkpoints: prepareCheckpointsPayload(
+        assignedInfoList,
         pointsPossibleReplyToTopic,
         pointsPossibleReplyToEntry,
         replyToEntryRequiredCount,

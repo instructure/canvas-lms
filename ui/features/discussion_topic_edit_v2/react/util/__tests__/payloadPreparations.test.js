@@ -17,7 +17,10 @@
  */
 
 import {defaultEveryoneElseOption, defaultEveryoneOption, masteryPathsOption} from '../constants'
-import {prepareUngradedDiscussionOverridesPayload} from '../payloadPreparations'
+import {
+  prepareUngradedDiscussionOverridesPayload,
+  convertToCheckpointsData,
+} from '../payloadPreparations'
 
 describe('prepareUngradedDiscussionOverridesPayload', () => {
   it('returns payload only for everyone', () => {
@@ -122,5 +125,158 @@ describe('prepareUngradedDiscussionOverridesPayload', () => {
         },
       ],
     })
+  })
+})
+
+describe('convertToCheckpointsData', () => {
+  it('returns payload multiple assignee types', () => {
+    const assignedInfoList = [
+      {
+        dueDateId: '4',
+        assignedList: ['user_17', 'user_35', 'user_20'],
+        replyToTopicDueDate: '2024-07-19T05:59:00.000Z',
+        requiredRepliesDueDate: '2024-07-20T05:59:00.000Z',
+        dueDate: null,
+        availableFrom: '2024-07-16T06:00:00.000Z',
+        availableUntil: '2024-07-21T05:59:00.000Z',
+        unassignItem: false,
+        context_module_id: null,
+        context_module_name: null,
+        stagedOverrideId: 'ufxVuamCDDk2',
+        rowKey: '4',
+      },
+      {
+        dueDateId: '6MYPvf68JHKH4u4kGbpav',
+        assignedList: ['course_section_197'],
+        replyToTopicDueDate: '2024-07-12T05:59:00.000Z',
+        requiredRepliesDueDate: '2024-07-13T05:59:00.000Z',
+        dueDate: null,
+        availableFrom: '2024-07-09T06:00:00.000Z',
+        availableUntil: '2024-07-14T05:59:00.000Z',
+        unassignItem: false,
+        context_module_id: null,
+        context_module_name: null,
+        stagedOverrideId: 'ufpeGx3umU3a',
+        rowKey: '6MYPvf68JHKH4u4kGbpav',
+      },
+      {
+        dueDateId: '6MYPvf68JHKH4u4kGbpav',
+        assignedList: ['course_section_10'],
+        replyToTopicDueDate: '2024-07-12T05:59:00.000Z',
+        requiredRepliesDueDate: '2024-07-13T05:59:00.000Z',
+        dueDate: null,
+        availableFrom: '2024-07-09T06:00:00.000Z',
+        availableUntil: '2024-07-14T05:59:00.000Z',
+        unassignItem: false,
+        context_module_id: null,
+        context_module_name: null,
+        stagedOverrideId: 'uLVOgmOHmLLn',
+        rowKey: '6MYPvf68JHKH4u4kGbpav',
+      },
+    ]
+
+    const expected_result = [
+      {
+        checkpoint_label: 'reply_to_topic',
+        dates: [
+          {
+            dueAt: '2024-07-19T05:59:00.000Z',
+            lockAt: '2024-07-21T05:59:00.000Z',
+            setType: 'ADHOC',
+            studentIds: [17, 35, 20],
+            type: 'override',
+            unlockAt: '2024-07-16T06:00:00.000Z',
+          },
+          {
+            dueAt: '2024-07-12T05:59:00.000Z',
+            lockAt: '2024-07-14T05:59:00.000Z',
+            setId: 197,
+            setType: 'CourseSection',
+            type: 'override',
+            unlockAt: '2024-07-09T06:00:00.000Z',
+          },
+          {
+            dueAt: '2024-07-12T05:59:00.000Z',
+            lockAt: '2024-07-14T05:59:00.000Z',
+            setId: 10,
+            setType: 'CourseSection',
+            type: 'override',
+            unlockAt: '2024-07-09T06:00:00.000Z',
+          },
+        ],
+      },
+      {
+        checkpoint_label: 'reply_to_entry',
+        dates: [
+          {
+            dueAt: '2024-07-20T05:59:00.000Z',
+            lockAt: '2024-07-21T05:59:00.000Z',
+            setType: 'ADHOC',
+            studentIds: [17, 35, 20],
+            type: 'override',
+            unlockAt: '2024-07-16T06:00:00.000Z',
+          },
+          {
+            dueAt: '2024-07-13T05:59:00.000Z',
+            lockAt: '2024-07-14T05:59:00.000Z',
+            setId: 197,
+            setType: 'CourseSection',
+            type: 'override',
+            unlockAt: '2024-07-09T06:00:00.000Z',
+          },
+          {
+            dueAt: '2024-07-13T05:59:00.000Z',
+            lockAt: '2024-07-14T05:59:00.000Z',
+            setId: 10,
+            setType: 'CourseSection',
+            type: 'override',
+            unlockAt: '2024-07-09T06:00:00.000Z',
+          },
+        ],
+      },
+    ]
+
+    const payload = convertToCheckpointsData(assignedInfoList)
+    expect(payload).toEqual(expected_result)
+  })
+
+  it('returns payload for empty assign to tray', () => {
+    const assignedInfoList = [
+      {
+        dueDateId: 'OzGie8Lw-oQntWhDdwN4U',
+        assignedList: ['everyone'],
+        dueDate: '',
+        availableFrom: '',
+        availableUntil: '',
+      },
+    ]
+
+    const expected_result = [
+      {
+        checkpoint_label: 'reply_to_topic',
+        dates: [
+          {
+            type: 'everyone',
+            dueAt: null,
+            unlockAt: null,
+            lockAt: null,
+          },
+        ],
+      },
+      {
+        checkpoint_label: 'reply_to_entry',
+        dates: [
+          {
+            type: 'everyone',
+            dueAt: null,
+            unlockAt: null,
+            lockAt: null,
+          },
+        ],
+      },
+    ]
+
+    const payload = convertToCheckpointsData(assignedInfoList)
+    expect(payload).toEqual(expected_result)
   })
 })
