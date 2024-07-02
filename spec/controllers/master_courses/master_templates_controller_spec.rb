@@ -78,6 +78,7 @@ describe MasterCourses::MasterTemplatesController do
         end
 
         it "works with media tracks" do
+          expect(Account.site_admin).to receive(:feature_enabled?).and_call_original
           expect(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return(true)
           media = media_object
           attachment = media.attachment

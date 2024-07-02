@@ -163,7 +163,7 @@ class VideoCaptionService < ApplicationService
     if (200..299).cover?(response.code)
       delay.poll_captions_ready
     elsif attempts < 10
-      delay.poll_caption_request(attempts + 1)
+      delay(run_at: reschedule_time(attempts)).poll_caption_request(attempts + 1)
     else
       update_status(:failed_request)
     end
@@ -182,10 +182,15 @@ class VideoCaptionService < ApplicationService
         update_status(:non_english_captions)
       end
     elsif attempts < 10
-      delay.poll_captions_ready(attempts + 1)
+      delay(run_at: reschedule_time(attempts)).poll_captions_ready(attempts + 1)
     else
       update_status(:failed_captions)
     end
   end
   alias_method :poll_for_captions_ready, :poll_captions_ready
+
+  def reschedule_time(attempt)
+    # This mimics the exponential backoff algorithm used by inst jobs
+    (5 + (attempt**4)).seconds.from_now
+  end
 end
