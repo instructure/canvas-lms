@@ -16,30 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+
+import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {Account} from '../../../../api.d'
 
-export default function accountsQuery(): Promise<Account[]> {
-  return new Promise((resolve, reject) => {
-    const data: Account[] = []
-    const firstPageUrl = '/api/v1/accounts'
+const ACCOUNTS_PATH = '/api/v1/accounts'
 
-    function load(url: string) {
-      $.getJSON(
-        url,
-        (newData: Account[], _: any, xhr: XMLHttpRequest) => {
-          data.push(...newData)
-          const link = parseLinkHeader(xhr)
-          if (link.next) {
-            load(link.next)
-          } else {
-            resolve(data)
-          }
-        },
-        reject
-      )
-    }
-    load(firstPageUrl)
-  })
+export default async function accountsQuery({signal}: QueryFunctionContext): Promise<Account[]> {
+  const data: Array<Account> = []
+  const fetchOpts = {signal}
+  let path = ACCOUNTS_PATH
+
+  while (path) {
+    // eslint-disable-next-line no-await-in-loop
+    const {json, link} = await doFetchApi<Account[]>({path, fetchOpts})
+    if (json) data.push(...json)
+    path = link?.next?.url || null
+  }
+  return data
 }
