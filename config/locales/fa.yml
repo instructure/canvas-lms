@@ -12924,6 +12924,7 @@ fa:
   invalid_submission_file_type_cda6742a: "نوع فایل ارسالی نامعتبر است"
   invalid_timestamp_timestamp_in_future_5bc855d7: "تاریخ و زمان نامعتبر - تاریخ و زمان در آینده "
   invalid_timestamp_timestamp_not_parseable_dae79e92: "تاریخ و زمان نامعتبر - تاریخ و زمان قابل تجزیه نیست"
+  invalid_url_cbde79f: "نشانی اینترنتی معتبر نیست"
   invalid_url_in_xml: "نشانی اینترنتی در xml معتبر نیست. نویسه & نباید در آن باشد."
   invalid_username_or_password_b60aa240: "نام کاربری یا رمز عبور معتبر نیست"
   invalid_utf_8_13c76a6: "UTF-8 معتبر نیست"
