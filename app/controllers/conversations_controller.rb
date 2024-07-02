@@ -169,7 +169,7 @@ class ConversationsController < ApplicationController
   # Returns the paginated list of conversations for the current user, most
   # recent ones first.
   #
-  # @argument scope [String, "unread"|"starred"|"archived"]
+  # @argument scope [String, "unread"|"starred"|"archived"|"sent"]
   #   When set, only return conversations of the specified type. For example,
   #   set to "unread" to return only conversations that haven't been read.
   #   The default behavior is to return all non-archived conversations (i.e.
