@@ -9033,6 +9033,7 @@ uk:
   invalid_restrictions_316cd740: "Неприпустимі обмеження"
   invalid_sis_sync_status_b68db497: "Невірний статус синхронізації SIS"
   invalid_state_parameter_7a5aa108: "Неприпустимий параметр стану"
+  invalid_url_cbde79f: "Невірний URL"
   invalid_url_in_xml: "Невірний url в xml. Амперсанди повинні були видалені."
   invalid_username_or_password_b60aa240: "Невірний логін або пароль."
   invalid_utf_8_13c76a6: "Невірний UTF-8"
