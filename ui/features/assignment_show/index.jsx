@@ -38,7 +38,6 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissionsHelper'
 import ready from '@instructure/ready'
-import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 import {captureException} from '@sentry/browser'
 
@@ -50,7 +49,6 @@ ready(() => {
   const lockManager = new LockManager()
   lockManager.init({itemType: 'assignment', page: 'show'})
   renderCoursePacingNotice()
-  monitorLtiMessages()
 })
 
 let studentGroupSelectionRequestTrackers = []

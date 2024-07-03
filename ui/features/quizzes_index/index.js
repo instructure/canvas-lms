@@ -26,7 +26,6 @@ import IndexView from './backbone/views/IndexView'
 import QuizCollection from './backbone/collections/QuizCollection'
 import QuizOverrideLoader from './backbone/models/QuizOverrideLoader'
 import vddTooltip from '@canvas/due-dates/jquery/vddTooltip'
-import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import ready from '@instructure/ready'
 
 const I18n = useI18nScope('quizzes_index')
@@ -123,5 +122,4 @@ ready(() => {
   Backbone.history.start()
 
   vddTooltip()
-  monitorLtiMessages()
 })

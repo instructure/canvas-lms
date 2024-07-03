@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import router from './router'
 import ready from '@instructure/ready'
+import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 ready(() => {
-  router.start()
+  monitorLtiMessages()
 })

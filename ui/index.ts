@@ -208,6 +208,8 @@ if (ENV.INCOMPLETE_REGISTRATION) {
   import('./boot/initializers/warnOnIncompleteRegistration')
 }
 
+import('./boot/initializers/monitorLtiMessages')
+
 // TODO: remove the need for this
 // it is only used in submissions
 if (ENV.badge_counts) {
