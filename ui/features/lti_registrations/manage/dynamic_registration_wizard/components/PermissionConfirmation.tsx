@@ -26,6 +26,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import type {RegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
 import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRegistration'
 import htmlEscape from '@instructure/html-escape'
+import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('lti_registration.wizard')
 
@@ -48,32 +49,47 @@ export const PermissionConfirmation = ({
   )
 
   return (
-    <Flex direction="column" alignItems="start" gap="medium">
-      <Heading>{I18n.t('Permissions')}</Heading>
-      <Text
-        dangerouslySetInnerHTML={{
-          __html: I18n.t(
-            "*%{toolName}* is requesting permission to perform the following actions. We have chosen the app's recommended default settings. Please note that altering these defaults might impact the app's performance.",
-            {toolName: htmlEscape(registration.client_name), wrapper: '<strong>$1</strong>'}
-          ),
-        }}
-      />
-      <Flex direction="column" alignItems="center" gap="small">
-        {registration.scopes.map(scope => {
-          return (
-            <Checkbox
-              data-testid={scope}
-              key={scope}
-              variant="toggle"
-              label={i18nLtiScope(scope)}
-              checked={!state.registration.disabledScopes?.includes(scope)}
-              onChange={() => {
-                actions.toggleDisabledScope(scope)
-              }}
-            />
-          )
-        })}
-      </Flex>
-    </Flex>
+    <>
+      <Heading level="h3" margin="0 0 x-small 0">
+        {I18n.t('Permissions')}
+      </Heading>
+      {registration.scopes.length === 0 ? (
+        <Text
+          dangerouslySetInnerHTML={{
+            __html: I18n.t("*%{toolName}* hasn't requested any permissions.", {
+              wrapper: '<strong>$1</strong>',
+              toolName: htmlEscape(registration.client_name),
+            }),
+          }}
+        />
+      ) : (
+        <>
+          <Text
+            dangerouslySetInnerHTML={{
+              __html: I18n.t(
+                "*%{toolName}* is requesting permission to perform the following actions. We have chosen the app's recommended default settings. Please note that altering these defaults might impact the app's performance.",
+                {toolName: htmlEscape(registration.client_name), wrapper: '<strong>$1</strong>'}
+              ),
+            }}
+          />
+          <Flex direction="column" alignItems="center" gap="small" margin="medium 0 medium 0">
+            {registration.scopes.map(scope => {
+              return (
+                <Checkbox
+                  data-testid={scope}
+                  key={scope}
+                  variant="toggle"
+                  label={i18nLtiScope(scope)}
+                  checked={!state.registration.disabledScopes?.includes(scope)}
+                  onChange={() => {
+                    actions.toggleDisabledScope(scope)
+                  }}
+                />
+              )
+            })}
+          </Flex>
+        </>
+      )}
+    </>
   )
 }

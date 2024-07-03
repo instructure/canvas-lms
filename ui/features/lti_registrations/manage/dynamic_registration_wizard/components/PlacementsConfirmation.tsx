@@ -46,6 +46,22 @@ export type PlacementsConfirmationProps = {
 
 const I18n = useI18nScope('lti_registration.wizard')
 
+/**
+ * These placements currently don't have a corresponding image in the API docs. Additionally,
+ * some of them are also locked down to only Instructure-allowed tools to prevent abuse,
+ * namely top_navigation and submission_type_selection. As such, we're going to avoid showing a tooltip for them.
+ *
+ * @todo Update/Remove this list once INTEROP-8713 is finished as part of INTEROP-8714
+ */
+export const UNDOCUMENTED_PLACEMENTS = [
+  LtiPlacements.TopNavigation,
+  LtiPlacements.ConferenceSelection,
+  LtiPlacements.ModuleGroupMenu,
+  LtiPlacements.ModuleMenuModal,
+  LtiPlacements.SubmissionTypeSelection,
+  LtiPlacements.SimilarityDetection,
+]
+
 export const PlacementsConfirmation = ({
   registration,
   overlayStore,
@@ -59,63 +75,65 @@ export const PlacementsConfirmation = ({
     )?.settings.placements.find(p => p.placement === placement)
     const overlayPlacement = overlayState.registration.placements?.find(p => p.type === placement)
     const checkbox = (
-      <Flex direction="row" gap="x-small" key={placement}>
+      <Flex direction="row" gap="x-small" justifyItems="start" alignItems="center" key={placement}>
         <Flex.Item>
           <Checkbox
             labelPlacement="end"
-            label={
-              <Flex gap="small">
-                <Text>{i18nLtiPlacement(placement)}</Text>
-              </Flex>
-            }
+            label={<Text>{i18nLtiPlacement(placement)}</Text>}
             checked={!overlayState.registration.disabledPlacements?.includes(placement)}
             onChange={() => {
               actions.toggleDisabledPlacement(placement)
             }}
           />
         </Flex.Item>
-        <Flex.Item>
-          <Tooltip
-            placement="top"
-            constrain="parent"
-            renderTip={
-              <Responsive
-                match="media"
-                query={{
-                  small: {maxWidth: 500},
-                  medium: {minWidth: 500},
-                  large: {minWidth: 1000},
-                }}
-                props={{
-                  small: {width: '15rem'},
-                  medium: {width: '30rem'},
-                  large: {width: '35rem'},
-                }}
-                render={props => {
-                  return (
-                    <Img
-                      {...props}
-                      constrain="contain"
-                      src={`/doc/api/images/placements/${placement}.png`}
-                      alt={I18n.t('An image showing the %{placement} placement within Canvas', {
-                        placement,
-                      })}
-                    />
-                  )
-                }}
+        {!UNDOCUMENTED_PLACEMENTS.includes(
+          placement as (typeof UNDOCUMENTED_PLACEMENTS)[number]
+        ) && (
+          <Flex.Item>
+            <Tooltip
+              placement="top"
+              constrain="parent"
+              renderTip={
+                <Responsive
+                  match="media"
+                  query={{
+                    small: {maxWidth: 500},
+                    medium: {minWidth: 500},
+                    large: {minWidth: 1000},
+                  }}
+                  props={{
+                    small: {width: '15rem'},
+                    medium: {width: '30rem'},
+                    large: {width: '35rem'},
+                  }}
+                  render={props => {
+                    return (
+                      <Img
+                        {...props}
+                        data-testid={`placement-img-${placement}`}
+                        constrain="contain"
+                        src={`/doc/api/images/placements/${placement}.png`}
+                        alt={I18n.t('An image showing the %{placement} placement within Canvas', {
+                          placement: i18nLtiPlacement(placement),
+                        })}
+                      />
+                    )
+                  }}
+                />
+              }
+            >
+              <IconButton
+                withBackground={false}
+                withBorder={false}
+                renderIcon={IconInfoLine}
+                size="small"
+                screenReaderLabel={I18n.t('Tooltip for the %{placement} placement', {
+                  placement,
+                })}
               />
-            }
-          >
-            <IconButton
-              withBackground={false}
-              withBorder={false}
-              renderIcon={IconInfoLine}
-              screenReaderLabel={I18n.t('Tooltip for the %{placement} placement', {
-                placement,
-              })}
-            />
-          </Tooltip>
-        </Flex.Item>
+            </Tooltip>
+          </Flex.Item>
+        )}
       </Flex>
     )
     if (placement === LtiPlacements.CourseNavigation) {
@@ -124,7 +142,7 @@ export const PlacementsConfirmation = ({
         (overlayPlacement?.default ?? registrationPlacement?.default ?? 'enabled') === 'disabled'
       return (
         <FormFieldGroup
-          rowSpacing="small"
+          rowSpacing="medium"
           key={placement}
           name={`${placement}-toggle`}
           description={
@@ -157,8 +175,10 @@ export const PlacementsConfirmation = ({
   }
 
   return (
-    <Flex direction="column" gap="small">
-      <Heading>{I18n.t('Placements')}</Heading>
+    <>
+      <Heading level="h3" margin="0 0 x-small 0">
+        {I18n.t('Placements')}
+      </Heading>
       <Text
         dangerouslySetInnerHTML={{
           __html: I18n.t(
@@ -167,7 +187,7 @@ export const PlacementsConfirmation = ({
               toolName: registration.client_name,
               wrappers: [
                 '<strong>$1</strong>',
-                "<a href='https://canvas.instructure.com/doc/api/file.placements_overview.html' style='text-decoration: underline'>$1</a>",
+                "<a href='https://canvas.instructure.com/doc/api/file.placements_overview.html' style='text-decoration: underline' target='_blank'>$1</a>",
               ],
             }
           ),
@@ -180,10 +200,10 @@ export const PlacementsConfirmation = ({
           )}
         </Text>
       ) : (
-        <Flex gap="small" direction="column">
+        <Flex gap="medium" direction="column" margin="medium 0 medium 0">
           {placements.map(renderPlacementCheckbox)}
         </Flex>
       )}
-    </Flex>
+    </>
   )
 }

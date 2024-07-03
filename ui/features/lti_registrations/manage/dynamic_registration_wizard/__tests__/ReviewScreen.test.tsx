@@ -67,7 +67,9 @@ describe('ReviewScreen', () => {
 
     expect(screen.getByText('Permissions')).toBeInTheDocument()
 
-    expect(screen.getByText(reg.scopes.map(s => i18nLtiScope(s)).join(', '))).toBeInTheDocument()
+    for (const scope of reg.scopes) {
+      expect(screen.getByText(i18nLtiScope(scope))).toBeInTheDocument()
+    }
     expect(screen.getByRole('button', {name: 'Edit Permissions'})).toBeInTheDocument()
   })
 

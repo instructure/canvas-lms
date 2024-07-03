@@ -31,7 +31,7 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {ProgressBar} from '@instructure/ui-progress'
 import {DynamicRegistrationWizard} from '../dynamic_registration_wizard/DynamicRegistrationWizard'
-import {ZAccountId, type AccountId} from '../model/AccountId'
+import {type AccountId} from '../model/AccountId'
 import {
   fetchRegistrationToken,
   getRegistrationByUUID,
@@ -44,8 +44,12 @@ import {
 } from '../api/developerKey'
 import type {DynamicRegistrationWizardService} from '../dynamic_registration_wizard/DynamicRegistrationWizardService'
 import {isValidHttpUrl} from '../../common/lib/validators/isValidHttpUrl'
+import {RegistrationModalBody} from './RegistrationModalBody'
+import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('lti_registrations')
+
+export const MODAL_BODY_HEIGHT = '50vh'
 
 export type RegistrationWizardModalProps = {
   accountId: AccountId
@@ -107,6 +111,10 @@ const ModalBodyWrapper = ({
       dynamicRegistrationUrl={state.dynamicRegistrationUrl}
       accountId={accountId}
       unregister={state.unregister}
+      onSuccessfulRegistration={() => {
+        state.unregister()
+        showFlashSuccess(I18n.t('App installed successfully!'))()
+      }}
     />
   ) : (
     <InitializationModalBody state={state} />
@@ -120,7 +128,7 @@ export type InitializationModalBodyProps = {
 const InitializationModalBody = (props: InitializationModalBodyProps) => {
   return (
     <>
-      <Modal.Body>
+      <RegistrationModalBody>
         <View display="block" margin="0 0 medium 0">
           <RadioInputGroup
             description={I18n.t('Select LTI Version')}
@@ -179,12 +187,13 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
             )}
           </>
         )}
-      </Modal.Body>
+      </RegistrationModalBody>
 
       <Modal.Footer>
         <Button
           color="primary"
           type="submit"
+          margin="small"
           disabled={validForm(props.state) === false}
           onClick={() => {
             props.state.register()
