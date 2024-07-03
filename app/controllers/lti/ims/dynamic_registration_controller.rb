@@ -134,7 +134,10 @@ module Lti
         registration_params = params.permit(*expected_registration_params)
         registration_params["lti_tool_configuration"] = registration_params["https://purl.imsglobal.org/spec/lti-tool-configuration"]
         registration_params.delete("https://purl.imsglobal.org/spec/lti-tool-configuration")
-        scopes = registration_params["scope"].split
+        scopes = []
+        if registration_params["scope"]
+          scopes = registration_params["scope"].split
+        end
         registration_params.delete("scope")
         error_messages = validate_registration_params(registration_params)
 

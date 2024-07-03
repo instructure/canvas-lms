@@ -70,7 +70,7 @@ describe Lti::IMS::DynamicRegistrationController do
         "client_name" => "the client name",
         "jwks_uri" => "https://example.com/api/jwks",
         "token_endpoint_auth_method" => "private_key_jwt",
-        "scope" => scopes.join(" "),
+
         "logo_uri" => "https://example.com/logo.jpg",
         "https://purl.imsglobal.org/spec/lti-tool-configuration" => {
           "domain" => "example.com",
@@ -95,7 +95,9 @@ describe Lti::IMS::DynamicRegistrationController do
           "target_link_uri" => "https://example.com/launch",
           "https://canvas.instructure.com/lti/privacy_level" => "email_only",
         },
-      }
+      }.merge(
+        scopes ? { "scope" => scopes.join(" ") } : {}
+      )
     end
 
     context "with a valid token" do
@@ -110,6 +112,20 @@ describe Lti::IMS::DynamicRegistrationController do
       end
       let(:valid_token) do
         Canvas::Security.create_jwt(token_hash, 1.hour.from_now)
+      end
+
+      context "with no scopes" do
+        subject do
+          request.headers["Authorization"] = "Bearer #{valid_token}"
+          post :create, params: { **registration_params }
+        end
+
+        let(:scopes) { nil }
+
+        it "accepts registrations" do
+          subject
+          expect(response).to have_http_status(:ok)
+        end
       end
 
       context "and with valid registration params" do
