@@ -36,7 +36,7 @@ type Props = {
   pageContentTitle: string
   pageContentMinWidth: string
   pageContentHeight: string
-  trayPlacement: string
+  trayPlacement: 'start' | 'end'
   onDismiss: any
   onResize: any
   onExternalContentReady?: any
@@ -104,14 +104,14 @@ export default function ContentTypeExternalToolDrawer({
           <div ref={pageContentRef} />
         </DrawerLayout.Content>
         <DrawerLayout.Tray
-          label="Right Side Tray"
+          label={toolTitle}
           open={open}
           placement={trayPlacement}
           onDismiss={onDismiss}
           data-testid="drawer-layout-tray"
           shouldCloseOnDocumentClick={false}
           themeOverride={{
-            zIndex: '50',
+            zIndex: 50,
           }}
         >
           <Flex height="100%" direction="column" padding="none none none none">
@@ -122,19 +122,20 @@ export default function ContentTypeExternalToolDrawer({
                 alignItems="center"
                 padding="medium small medium small"
                 width="320px"
+                direction="row-reverse"
               >
-                <Flex.Item padding="none small none none">
-                  {(toolIconUrl && <Img src={toolIconUrl} height="1rem" alt={toolIconAlt} />) || (
-                    <IconLtiLine />
-                  )}
+                <Flex.Item padding="none none none small">
+                  <CloseButton size="small" onClick={onDismiss} screenReaderLabel="Close" />
                 </Flex.Item>
                 <Flex.Item shouldShrink={true} shouldGrow={true}>
-                  <Heading level="h4">
+                  <Heading level="h4" as="h2">
                     <TruncateText>{toolTitle}</TruncateText>
                   </Heading>
                 </Flex.Item>
-                <Flex.Item padding="none none none small">
-                  <CloseButton size="small" onClick={onDismiss} screenReaderLabel="Close" />
+                <Flex.Item padding="none small none none">
+                  {(toolIconUrl && <Img src={toolIconUrl} height="1rem" alt={toolIconAlt} />) || (
+                    <IconLtiLine alt={toolIconAlt} />
+                  )}
                 </Flex.Item>
               </Flex>
             </Flex.Item>
