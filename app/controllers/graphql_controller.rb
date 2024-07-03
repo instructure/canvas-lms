@@ -37,6 +37,9 @@ class GraphQLController < ApplicationController
     result = execute_on(CanvasSchema)
     prep_page_view_for_submit
     prep_page_view_for_create_discussion_entry
+
+    RequestContext::Generator.add_meta_header("ge", result["errors"].blank? ? "f" : "t")
+
     render json: result
   end
 
