@@ -35,7 +35,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
             data-testid="drawer-layout-tray"
           >
             <div
-              aria-label="Right Side Tray"
+              aria-label="First LTI"
               class="css-1kfxijb-drawerTray__content"
               role="region"
             >
@@ -50,54 +50,11 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                   dir="ltr"
                 >
                   <span
-                    class="css-5r0nwc-view--flex-flex"
+                    class="css-zh6k45-view--flex-flex"
                     dir="ltr"
-                    direction="row"
+                    direction="row-reverse"
                     wrap="no-wrap"
                   >
-                    <span
-                      class="css-1x4wvy9-view-flexItem"
-                      dir="ltr"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        class="css-1uh2md0-inlineSVG-svgIcon"
-                        focusable="false"
-                        height="1em"
-                        name="IconLti"
-                        role="presentation"
-                        rotate="0"
-                        style="width: 1em; height: 1em;"
-                        viewBox="0 0 1920 1920"
-                        width="1em"
-                      >
-                        <g
-                          role="presentation"
-                        >
-                          <path
-                            d="M1581.235 734.118c0 217.976-177.317 395.294-395.294 395.294H960.06c-217.977 0-395.294-177.318-395.294-395.294V564.706h1016.47v169.412Zm225.883-282.353h-338.824V0h-112.941v451.765H790.647V0H677.706v451.765H338.882v112.94h112.942v169.413c0 280.207 228.028 508.235 508.235 508.235h56.47v395.294c0 93.402-76.009 169.412-169.411 169.412-93.403 0-169.412-76.01-169.412-169.412 0-155.633-126.72-282.353-282.353-282.353S113 1482.014 113 1637.647V1920h112.941v-282.353c0-93.402 76.01-169.412 169.412-169.412s169.412 76.01 169.412 169.412c0 155.633 126.72 282.353 282.353 282.353 155.746 0 282.353-126.72 282.353-282.353v-395.294h56.47c280.207 0 508.235-228.028 508.235-508.235V564.706h112.942V451.765Z"
-                            fill-rule="evenodd"
-                          />
-                        </g>
-                      </svg>
-                    </span>
-                    <span
-                      class="css-zqmt0g-view-flexItem"
-                      dir="ltr"
-                    >
-                      <h4
-                        class="css-13kv4mx-view-heading"
-                        dir="ltr"
-                      >
-                        <span
-                          class="css-1lvij29-truncateText"
-                        >
-                          <span>
-                            First LTI
-                          </span>
-                        </span>
-                      </h4>
-                    </span>
                     <span
                       class="css-1mruz11-view-flexItem"
                       dir="ltr"
@@ -156,6 +113,50 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                         </button>
                       </span>
                     </span>
+                    <span
+                      class="css-zqmt0g-view-flexItem"
+                      dir="ltr"
+                    >
+                      <h2
+                        class="css-13kv4mx-view-heading"
+                        dir="ltr"
+                      >
+                        <span
+                          class="css-1lvij29-truncateText"
+                        >
+                          <span>
+                            First LTI
+                          </span>
+                        </span>
+                      </h2>
+                    </span>
+                    <span
+                      class="css-1x4wvy9-view-flexItem"
+                      dir="ltr"
+                    >
+                      <svg
+                        alt="First LTI Icon"
+                        aria-hidden="true"
+                        class="css-1uh2md0-inlineSVG-svgIcon"
+                        focusable="false"
+                        height="1em"
+                        name="IconLti"
+                        role="presentation"
+                        rotate="0"
+                        style="width: 1em; height: 1em;"
+                        viewBox="0 0 1920 1920"
+                        width="1em"
+                      >
+                        <g
+                          role="presentation"
+                        >
+                          <path
+                            d="M1581.235 734.118c0 217.976-177.317 395.294-395.294 395.294H960.06c-217.977 0-395.294-177.318-395.294-395.294V564.706h1016.47v169.412Zm225.883-282.353h-338.824V0h-112.941v451.765H790.647V0H677.706v451.765H338.882v112.94h112.942v169.413c0 280.207 228.028 508.235 508.235 508.235h56.47v395.294c0 93.402-76.009 169.412-169.411 169.412-93.403 0-169.412-76.01-169.412-169.412 0-155.633-126.72-282.353-282.353-282.353S113 1482.014 113 1637.647V1920h112.941v-282.353c0-93.402 76.01-169.412 169.412-169.412s169.412 76.01 169.412 169.412c0 155.633 126.72 282.353 282.353 282.353 155.746 0 282.353-126.72 282.353-282.353v-395.294h56.47c280.207 0 508.235-228.028 508.235-508.235V564.706h112.942V451.765Z"
+                            fill-rule="evenodd"
+                          />
+                        </g>
+                      </svg>
+                    </span>
                   </span>
                 </span>
                 <span
@@ -208,7 +209,7 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
           data-testid="drawer-layout-tray"
         >
           <div
-            aria-label="Right Side Tray"
+            aria-label="First LTI"
             class="css-1kfxijb-drawerTray__content"
             role="region"
           >
@@ -223,54 +224,11 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                 dir="ltr"
               >
                 <span
-                  class="css-5r0nwc-view--flex-flex"
+                  class="css-zh6k45-view--flex-flex"
                   dir="ltr"
-                  direction="row"
+                  direction="row-reverse"
                   wrap="no-wrap"
                 >
-                  <span
-                    class="css-1x4wvy9-view-flexItem"
-                    dir="ltr"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      class="css-1uh2md0-inlineSVG-svgIcon"
-                      focusable="false"
-                      height="1em"
-                      name="IconLti"
-                      role="presentation"
-                      rotate="0"
-                      style="width: 1em; height: 1em;"
-                      viewBox="0 0 1920 1920"
-                      width="1em"
-                    >
-                      <g
-                        role="presentation"
-                      >
-                        <path
-                          d="M1581.235 734.118c0 217.976-177.317 395.294-395.294 395.294H960.06c-217.977 0-395.294-177.318-395.294-395.294V564.706h1016.47v169.412Zm225.883-282.353h-338.824V0h-112.941v451.765H790.647V0H677.706v451.765H338.882v112.94h112.942v169.413c0 280.207 228.028 508.235 508.235 508.235h56.47v395.294c0 93.402-76.009 169.412-169.411 169.412-93.403 0-169.412-76.01-169.412-169.412 0-155.633-126.72-282.353-282.353-282.353S113 1482.014 113 1637.647V1920h112.941v-282.353c0-93.402 76.01-169.412 169.412-169.412s169.412 76.01 169.412 169.412c0 155.633 126.72 282.353 282.353 282.353 155.746 0 282.353-126.72 282.353-282.353v-395.294h56.47c280.207 0 508.235-228.028 508.235-508.235V564.706h112.942V451.765Z"
-                          fill-rule="evenodd"
-                        />
-                      </g>
-                    </svg>
-                  </span>
-                  <span
-                    class="css-zqmt0g-view-flexItem"
-                    dir="ltr"
-                  >
-                    <h4
-                      class="css-13kv4mx-view-heading"
-                      dir="ltr"
-                    >
-                      <span
-                        class="css-1lvij29-truncateText"
-                      >
-                        <span>
-                          First LTI
-                        </span>
-                      </span>
-                    </h4>
-                  </span>
                   <span
                     class="css-1mruz11-view-flexItem"
                     dir="ltr"
@@ -328,6 +286,50 @@ exports[`ContentTypeExternalToolDrawer renders 1`] = `
                         </span>
                       </button>
                     </span>
+                  </span>
+                  <span
+                    class="css-zqmt0g-view-flexItem"
+                    dir="ltr"
+                  >
+                    <h2
+                      class="css-13kv4mx-view-heading"
+                      dir="ltr"
+                    >
+                      <span
+                        class="css-1lvij29-truncateText"
+                      >
+                        <span>
+                          First LTI
+                        </span>
+                      </span>
+                    </h2>
+                  </span>
+                  <span
+                    class="css-1x4wvy9-view-flexItem"
+                    dir="ltr"
+                  >
+                    <svg
+                      alt="First LTI Icon"
+                      aria-hidden="true"
+                      class="css-1uh2md0-inlineSVG-svgIcon"
+                      focusable="false"
+                      height="1em"
+                      name="IconLti"
+                      role="presentation"
+                      rotate="0"
+                      style="width: 1em; height: 1em;"
+                      viewBox="0 0 1920 1920"
+                      width="1em"
+                    >
+                      <g
+                        role="presentation"
+                      >
+                        <path
+                          d="M1581.235 734.118c0 217.976-177.317 395.294-395.294 395.294H960.06c-217.977 0-395.294-177.318-395.294-395.294V564.706h1016.47v169.412Zm225.883-282.353h-338.824V0h-112.941v451.765H790.647V0H677.706v451.765H338.882v112.94h112.942v169.413c0 280.207 228.028 508.235 508.235 508.235h56.47v395.294c0 93.402-76.009 169.412-169.411 169.412-93.403 0-169.412-76.01-169.412-169.412 0-155.633-126.72-282.353-282.353-282.353S113 1482.014 113 1637.647V1920h112.941v-282.353c0-93.402 76.01-169.412 169.412-169.412s169.412 76.01 169.412 169.412c0 155.633 126.72 282.353 282.353 282.353 155.746 0 282.353-126.72 282.353-282.353v-395.294h56.47c280.207 0 508.235-228.028 508.235-508.235V564.706h112.942V451.765Z"
+                          fill-rule="evenodd"
+                        />
+                      </g>
+                    </svg>
                   </span>
                 </span>
               </span>
