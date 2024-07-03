@@ -51,10 +51,8 @@ module InstLLMHelper
         raise RateLimitExceededError.new(limit:)
       end
 
-      Canvas.redis.multi do |multi|
-        multi.incr(cache_key)
-        multi.expire(cache_key, 24.hours.to_i)
-      end
+      Canvas.redis.incr(cache_key)
+      Canvas.redis.expire(cache_key, 24.hours.to_i)
 
       begin
         yield
