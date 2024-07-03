@@ -37,6 +37,6 @@ describe('course_settings_helper', () => {
     const externalTool = document.createElement('li')
     externalTool.id = 'nav_edit_tab_id_4'
     const tabId = tabIdFromElement(externalTool)
-    expect(tabId).toBe('4')
+    expect(tabId).toBe(4)
   })
 })
