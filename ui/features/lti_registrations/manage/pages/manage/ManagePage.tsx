@@ -110,7 +110,7 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
         showFlashAlert({
           type,
           message:
-            deleteResult._type === 'success'
+            deleteResult._type !== 'success'
               ? I18n.t('There was an error deleting “%{appName}”', {appName: app.name})
               : I18n.t('App “%{appName}” successfully deleted', {appName: app.name}),
         })
