@@ -36,6 +36,7 @@ import type {LtiRegistration} from '../../model/LtiRegistration'
 import {useManageSearchParams, type ManageSearchParams} from './ManageSearchParams'
 import {colors} from '@instructure/canvas-theme'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 type CallbackWithRegistration = (registration: LtiRegistration) => void
 
@@ -91,11 +92,11 @@ const Columns: ReadonlyArray<Column> = [
             src={`/lti/tool_default_icon?id=${r.id}&name=${r.name}`}
           />
         )}
-
-        <div style={ellispsisStyles}>
-          <Link to={`/manage/${r.id}`} as={RouterLink} isWithinText={false}>
-            {r.name}
-          </Link>
+        <div style={ellispsisStyles} title={r.name}>
+          {/* TODO: comment these in when we have a manage app screen */}
+          {/* <Link to={`/manage/${r.id}`} as={RouterLink} isWithinText={false}> */}
+          {r.name}
+          {/* </Link> */}
         </div>
       </Flex>
     ),
@@ -105,7 +106,12 @@ const Columns: ReadonlyArray<Column> = [
     header: I18n.t('Nickname'),
     width: '220px',
     sortable: true,
-    render: r => <div style={ellispsisStyles}>{r.admin_nickname}</div>,
+    render: r =>
+      r.admin_nickname ? (
+        <div style={ellispsisStyles} title={r.admin_nickname}>
+          {r.admin_nickname}
+        </div>
+      ) : null,
   },
   {
     id: 'lti_version',
@@ -126,19 +132,37 @@ const Columns: ReadonlyArray<Column> = [
     header: I18n.t('Installed By'),
     width: '132px',
     sortable: true,
-    render: r => <div style={ellispsisStyles}>{r.created_by?.short_name}</div>,
+    render: r =>
+      r.created_by ? (
+        <div style={ellispsisStyles}>{r.created_by.short_name}</div>
+      ) : (
+        <div>
+          <Tooltip renderTip={I18n.t('Historical data lacks records for "installed by."')}>
+            <div style={{fontStyle: 'oblique'}}>{I18n.t('N/A')}</div>
+          </Tooltip>
+        </div>
+      ),
   },
   {
     id: 'updated_by',
     header: I18n.t('Updated By'),
     width: '132px',
     sortable: true,
-    render: r => <div style={ellispsisStyles}>{r.updated_by?.short_name}</div>,
+    render: r =>
+      r.updated_by ? (
+        <div style={ellispsisStyles}>{r.updated_by.short_name}</div>
+      ) : (
+        <div>
+          <Tooltip renderTip={I18n.t('Historical data lacks records for "updated by."')}>
+            <div style={{fontStyle: 'oblique'}}>{I18n.t('N/A')}</div>
+          </Tooltip>
+        </div>
+      ),
   },
   {
     id: 'on',
     header: I18n.t('On/Off'),
-    width: '90px',
+    width: '96px',
     sortable: true,
     render: r => <div>{r.workflow_state === 'active' ? I18n.t('On') : I18n.t('Off')}</div>,
   },
@@ -213,10 +237,10 @@ const renderHeaderRow = (props: {
               stackedSortByLabel: header,
               onRequestSort: (_e, val) => {
                 // this removes parameters if they are the default (name for sort, and asc for dir)
-                const sort = val.id === 'name' ? undefined : val.id
+                const sort = val.id === 'installed' ? undefined : val.id
                 props.updateSearchParams({
                   sort,
-                  dir: val.id === props.sort && props.dir === 'asc' ? 'desc' : undefined,
+                  dir: val.id === props.sort && props.dir === 'desc' ? 'asc' : undefined,
                   page: undefined,
                 })
               },

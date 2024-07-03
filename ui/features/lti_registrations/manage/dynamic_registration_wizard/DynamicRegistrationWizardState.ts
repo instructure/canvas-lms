@@ -242,7 +242,7 @@ type StateUpdater = (
  */
 export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistrationWizardService) =>
   create<{state: DynamicRegistrationWizardState} & DynamicRegistrationActions>(
-    (set: StateUpdater) => ({
+    (set: StateUpdater, get) => ({
       state: {_type: 'RequestingToken'},
       /**
        * Fetches a registration token from the dynamic registration URL

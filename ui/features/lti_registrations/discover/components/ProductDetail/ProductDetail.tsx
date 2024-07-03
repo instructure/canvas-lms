@@ -32,7 +32,7 @@ import {Link} from '@instructure/ui-link'
 import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
 import {useQuery} from '@tanstack/react-query'
-import {useLocation} from 'react-router-dom'
+import {useLocation, useNavigate} from 'react-router-dom'
 import {fetchProductDetails, fetchProducts} from '../../queries/productsQuery'
 import ImageCarousel from './ImageCarousel'
 import LtiDetailModal from './LtiDetailModal'
@@ -44,6 +44,8 @@ import ProductCard from '../ProductCard/ProductCard'
 const ProductDetail = () => {
   const [isModalOpen, setModalOpen] = useState(false)
   const [clickedLtiTitle, setClickedLtiTitle] = useState('')
+
+  const navigate = useNavigate()
 
   const location = useLocation()
   const currentProductId = location.pathname.replace('/product_detail/', '') as String
@@ -140,7 +142,13 @@ const ProductDetail = () => {
                 onClick={() => {
                   // todo: replace the url with the actual dynamic registration url
                   // from Product listing API
-                  openDynamicRegistrationWizard('http://yaltt.inst.test/dynamic-registration')
+                  openDynamicRegistrationWizard(
+                    'http://yaltt.inst.test/apps/1/dynamic-registration-simple',
+                    () => {
+                      // redirect to apps page
+                      navigate('/manage')
+                    }
+                  )
                 }}
               >
                 Configure

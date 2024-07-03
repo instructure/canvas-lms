@@ -46,6 +46,7 @@ import type {DynamicRegistrationWizardService} from '../dynamic_registration_wiz
 import {isValidHttpUrl} from '../../common/lib/validators/isValidHttpUrl'
 import {RegistrationModalBody} from './RegistrationModalBody'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {refreshRegistrations} from '../pages/manage/ManagePageLoadingState'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -114,6 +115,7 @@ const ModalBodyWrapper = ({
       onSuccessfulRegistration={() => {
         state.unregister()
         showFlashSuccess(I18n.t('App installed successfully!'))()
+        state.onSuccessfulInstallation?.()
       }}
     />
   ) : (
