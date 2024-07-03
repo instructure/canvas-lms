@@ -19,7 +19,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {mockConfigWithPlacements, mockRegistration} from './helpers'
-import {PlacementsConfirmation} from '../components/PlacementsConfirmation'
+import {PlacementsConfirmation, UNDOCUMENTED_PLACEMENTS} from '../components/PlacementsConfirmation'
 import {createRegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
 import {LtiPlacements, i18nLtiPlacement} from '../../model/LtiPlacement'
 
@@ -44,6 +44,40 @@ describe('PlacementsConfirmation', () => {
     expect(
       screen.getByText(/This tool has not requested access to any placements/i)
     ).toBeInTheDocument()
+  })
+
+  it("doesn't render a tooltip for the undocumented placements", () => {
+    const placements = mockConfigWithPlacements([
+      ...UNDOCUMENTED_PLACEMENTS,
+      LtiPlacements.CourseNavigation,
+    ])
+
+    const reg = mockRegistration({}, placements)
+    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+
+    render(<PlacementsConfirmation registration={reg} overlayStore={overlayStore} />)
+
+    UNDOCUMENTED_PLACEMENTS.forEach(placement => {
+      expect(screen.queryByTestId(`placement-img-${placement}`)).not.toBeInTheDocument()
+    })
+
+    expect(
+      screen.getByTestId(`placement-img-${LtiPlacements.CourseNavigation}`)
+    ).toBeInTheDocument()
+  })
+
+  it('renders a tooltip for the placements', () => {
+    const placements = [LtiPlacements.CourseNavigation, LtiPlacements.AccountNavigation]
+    const config = mockConfigWithPlacements(placements)
+
+    const reg = mockRegistration({}, config)
+    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+
+    render(<PlacementsConfirmation registration={reg} overlayStore={overlayStore} />)
+
+    placements.forEach(placement => {
+      expect(screen.getByTestId(`placement-img-${placement}`)).toBeInTheDocument()
+    })
   })
 
   it("let's users toggle placements", async () => {

@@ -28,6 +28,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {usePlacements} from '../hooks/usePlacements'
 import {TextInput} from '@instructure/ui-text-input'
+import pageNotFoundPandaUrl from '@canvas/images/PageNotFoundPanda.svg'
 import {IconImageLine} from '@instructure/ui-icons'
 import {
   LtiPlacements,
@@ -38,19 +39,20 @@ import {
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import {Button} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
-import type {ConfirmationStateType} from '../DynamicRegistrationWizardState'
+import type {DynamicRegistrationActions} from '../DynamicRegistrationWizardState'
 import {isValidHttpUrl} from '../../../common/lib/validators/isValidHttpUrl'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {useDebouncedCallback} from 'use-debounce'
 import {Img} from '@instructure/ui-img'
+import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 
 const I18n = useI18nScope('lti_registration.wizard')
 export type IconConfirmationProps = {
   overlayStore: RegistrationOverlayStore
   registration: LtiImsRegistration
   reviewing: boolean
-  transitionToConfirmationState: (from: ConfirmationStateType, to: ConfirmationStateType) => void
-  transitionToReviewingState: (from: ConfirmationStateType) => void
+  transitionToConfirmationState: DynamicRegistrationActions['transitionToConfirmationState']
+  transitionToReviewingState: DynamicRegistrationActions['transitionToReviewingState']
 }
 
 export const IconConfirmation = ({
@@ -138,13 +140,39 @@ export const IconConfirmation = ({
               <div
                 style={{
                   overflow: 'hidden',
-                  margin: '0.5rem 0 0.5rem 0',
+                  margin: '0.5rem 0',
+                  padding: '0.25rem',
                 }}
               >
-                <Img src={src} alt={imgTitle} loading="lazy" height="2rem" width="2rem" />
+                <Img
+                  src={src}
+                  alt={imgTitle}
+                  loading="lazy"
+                  height="2rem"
+                  width="2rem"
+                  elementRef={ref => {
+                    if (ref instanceof HTMLImageElement) {
+                      ref.onerror = () => {
+                        ref.src = pageNotFoundPandaUrl
+                      }
+                    }
+                  }}
+                />
               </div>
             ) : (
-              <IconImageLine width="3rem" height="3rem" title={imgTitle} />
+              <div
+                style={{
+                  // The styling here ensures the icon, even with the bonus background from the padding,
+                  // appears to be the same size as an actual tool icon
+                  padding: '0.25rem',
+                  color: 'white',
+                  backgroundColor: 'gray',
+                  borderRadius: '0.25rem',
+                  margin: '0.75rem 0.25rem',
+                }}
+              >
+                <IconImageLine width="1.5rem" height="1.5rem" title={imgTitle} />
+              </div>
             )
           }
           value={inputUrl ?? ''}
@@ -163,46 +191,28 @@ export const IconConfirmation = ({
 
   return (
     <>
-      <Modal.Body>
-        <>
-          <Heading level="h3">{I18n.t('Icon URLs')}</Heading>
-          <Flex direction="row" gap="small" alignItems="center" justifyItems="space-between">
+      <RegistrationModalBody>
+        <Heading level="h3" margin="0 0 x-small 0">
+          {I18n.t('Icon URLs')}
+        </Heading>
+        {iconPlacements.length > 0 ? (
+          <>
             <Text>{I18n.t('Choose what icon displays in each placement (optional).')}</Text>
-            <Button
-              color="primary"
-              onClick={() => {
-                canvasPlatformSettings(
-                  registration.tool_configuration
-                )!.settings.placements?.forEach(p => {
-                  if (LtiPlacementsWithIcons.includes(p.placement as LtiPlacementWithIcon)) {
-                    actions.updateIconUrl(p.placement, p.icon_url ?? undefined)
-                    setActualInputValues(prev => ({
-                      ...prev,
-                      [p.placement]: p.icon_url ?? undefined,
-                    }))
-                  }
-                })
-              }}
-            >
-              <Text>{I18n.t('Reset to Default Icons')}</Text>
-            </Button>
-          </Flex>
-
-          {iconPlacements.length > 0 ? (
-            <Flex direction="column" gap="small" margin="medium 0 medium 0">
+            <Flex direction="column" gap="medium" margin="medium 0 medium 0">
               {iconPlacements.map(renderIconInput)}
             </Flex>
-          ) : (
-            <Text>{I18n.t("This tool doesn't have any placements with configurable icons.")}</Text>
-          )}
-        </>
-      </Modal.Body>
+          </>
+        ) : (
+          <Text>{I18n.t("This tool doesn't have any placements with configurable icons.")}</Text>
+        )}
+      </RegistrationModalBody>
       <Modal.Footer>
         <Button
+          margin="small"
           color="secondary"
           type="submit"
           onClick={() => {
-            transitionToConfirmationState('IconConfirmation', 'NamingConfirmation')
+            transitionToConfirmationState('IconConfirmation', 'NamingConfirmation', false)
           }}
         >
           {I18n.t('Previous')}

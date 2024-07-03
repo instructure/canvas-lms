@@ -64,8 +64,10 @@ export const PrivacyConfirmation = ({toolName, overlayStore}: PrivacyConfirmatio
     : []
 
   return (
-    <Flex direction="column" gap="small">
-      <Heading>{I18n.t('Data Sharing')}</Heading>
+    <>
+      <Heading level="h3" margin="0 0 x-small 0">
+        {I18n.t('Data Sharing')}
+      </Heading>
       <Text
         dangerouslySetInnerHTML={{
           __html: I18n.t('Select what data *%{toolName}* has access to.', {
@@ -74,7 +76,7 @@ export const PrivacyConfirmation = ({toolName, overlayStore}: PrivacyConfirmatio
           }),
         }}
       />
-      <View margin="small 0 0 0">
+      <View margin="medium 0 medium 0" as="div">
         <SimpleSelect
           messages={messages}
           renderLabel={I18n.t('User Data Shared With This App')}
@@ -92,6 +94,6 @@ export const PrivacyConfirmation = ({toolName, overlayStore}: PrivacyConfirmatio
           ))}
         </SimpleSelect>
       </View>
-    </Flex>
+    </>
   )
 }

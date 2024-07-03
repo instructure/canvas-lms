@@ -208,47 +208,6 @@ describe('IconConfirmation', () => {
     expect(screen.getByText(/no icon will display/i)).toBeInTheDocument()
   })
 
-  it("should let user's reset to the default icons", async () => {
-    const config = mockConfigWithPlacements([
-      LtiPlacements.GlobalNavigation,
-      LtiPlacements.FileIndexMenu,
-    ])
-    config.extensions![0].settings.placements.forEach(p => {
-      p.icon_url = 'http://example.com/icon.png'
-    })
-    const reg = mockRegistration({}, config)
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
-    render(
-      <IconConfirmation
-        registration={reg}
-        overlayStore={overlayStore}
-        reviewing={false}
-        transitionToConfirmationState={mockTransitionToConfirmationState}
-        transitionToReviewingState={mockTransitionToReviewingState}
-      />
-    )
-
-    const iconPlacement = LtiPlacements.GlobalNavigation
-    const input = screen.getByLabelText(new RegExp(i18nLtiPlacement(iconPlacement)), {
-      selector: 'input',
-    })
-
-    await userEvent.clear(input)
-    await userEvent.click(input)
-    await userEvent.paste('http://yaltt.inst.test/icon.png')
-
-    expect(input).toHaveValue('http://yaltt.inst.test/icon.png')
-
-    const resetButton = screen.getByRole('button', {name: /reset to default icons/i})
-    await userEvent.click(resetButton)
-
-    expect(input).toHaveValue('http://example.com/icon.png')
-    expect(screen.getByAltText('Global Navigation icon')).toHaveProperty(
-      'src',
-      'http://example.com/icon.png'
-    )
-  })
-
   it("shouldn't allow invalid URLs and warn the user about them", async () => {
     const config = mockConfigWithPlacements([
       LtiPlacements.GlobalNavigation,

@@ -45,7 +45,9 @@ export const NamingConfirmation = ({registration, overlayStore}: NamingConfirmat
   return (
     <Flex direction="column">
       <>
-        <Heading level="h3">{I18n.t('Nickname')}</Heading>
+        <Heading level="h3" margin="0 0 x-small 0">
+          {I18n.t('Nickname')}
+        </Heading>
         <Text
           dangerouslySetInnerHTML={{
             __html: I18n.t('Choose a nickname for *%{toolName}*.', {
@@ -54,7 +56,7 @@ export const NamingConfirmation = ({registration, overlayStore}: NamingConfirmat
             }),
           }}
         />
-        <View margin="medium 0 0 0">
+        <View margin="medium 0 0 0" as="div">
           <TextInput
             renderLabel={I18n.t('Administration Nickname')}
             value={overlayState.adminNickname ?? registration.client_name}
@@ -65,8 +67,10 @@ export const NamingConfirmation = ({registration, overlayStore}: NamingConfirmat
           </Text>
         </View>
       </>
-      <View margin="medium 0 0 0">
-        <Heading level="h3">{I18n.t('Description')}</Heading>
+      <View margin="medium 0 medium 0" as="div">
+        <Heading level="h3" margin="0 0 x-small 0">
+          {I18n.t('Description')}
+        </Heading>
         <TextArea
           label={
             <Text weight="normal">
@@ -86,10 +90,12 @@ export const NamingConfirmation = ({registration, overlayStore}: NamingConfirmat
         />
       </View>
       {placements.length > 0 && (
-        <View margin="medium 0 0 0">
-          <Heading level="h3">{I18n.t('Placement Names')}</Heading>
+        <>
+          <Heading level="h3" margin="0 0 x-small 0">
+            {I18n.t('Placement Names')}
+          </Heading>
           <Text>{I18n.t('Choose a name override for each placement (optional).')}</Text>
-          <Flex direction="column" gap="medium" margin="small 0 small 0">
+          <Flex direction="column" gap="medium" margin="medium 0 medium 0">
             {placements.map(placement => {
               const overlayPlacement = overlayState.registration.placements?.find(
                 p => p.type === placement
@@ -106,7 +112,7 @@ export const NamingConfirmation = ({registration, overlayStore}: NamingConfirmat
               )
             })}
           </Flex>
-        </View>
+        </>
       )}
     </Flex>
   )

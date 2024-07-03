@@ -95,7 +95,8 @@ export interface DynamicRegistrationActions {
    */
   transitionToConfirmationState(
     prevState: ConfirmationStateType,
-    newState: ConfirmationStateType
+    newState: ConfirmationStateType,
+    reviewing?: boolean
   ): void
   transitionToReviewingState(prevState: ConfirmationStateType): void
 }
@@ -325,11 +326,13 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
       },
       transitionToConfirmationState: (
         prevState: ConfirmationStateType,
-        newState: ConfirmationStateType
+        newState: ConfirmationStateType,
+        reviewing?: boolean
       ) =>
         set(
           stateFrom(prevState)(a => ({
             ...a,
+            reviewing: reviewing ?? a.reviewing,
             _type: newState,
           }))
         ),
