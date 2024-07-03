@@ -150,19 +150,28 @@ exports[`TopNavigationTools renders 1`] = `
       shouldFocusTriggerOnClose={true}
       shouldHideOnSelect={true}
       trigger={
-        <Button
-          as="button"
-          color="secondary"
-          cursor="pointer"
-          display="inline-block"
-          margin="0"
-          renderIcon={[Function]}
-          size="medium"
-          textAlign="center"
-          title="LTI Tools Menu"
-          type="button"
-          withBackground={true}
-        />
+        <Tooltip
+          color="primary"
+          constrain="window"
+          defaultIsShowingContent={false}
+          offsetX={0}
+          offsetY={0}
+          placement="top"
+          renderTip="LTI Tools Menu"
+        >
+          <Button
+            as="button"
+            color="secondary"
+            cursor="pointer"
+            display="inline-block"
+            margin="0"
+            renderIcon={[Function]}
+            size="medium"
+            textAlign="center"
+            type="button"
+            withBackground={true}
+          />
+        </Tooltip>
       }
       withArrow={true}
     >
@@ -280,19 +289,28 @@ exports[`TopNavigationTools renders with no pinned tools 1`] = `
       shouldFocusTriggerOnClose={true}
       shouldHideOnSelect={true}
       trigger={
-        <Button
-          as="button"
-          color="secondary"
-          cursor="pointer"
-          display="inline-block"
-          margin="0"
-          renderIcon={[Function]}
-          size="medium"
-          textAlign="center"
-          title="LTI Tools Menu"
-          type="button"
-          withBackground={true}
-        />
+        <Tooltip
+          color="primary"
+          constrain="window"
+          defaultIsShowingContent={false}
+          offsetX={0}
+          offsetY={0}
+          placement="top"
+          renderTip="LTI Tools Menu"
+        >
+          <Button
+            as="button"
+            color="secondary"
+            cursor="pointer"
+            display="inline-block"
+            margin="0"
+            renderIcon={[Function]}
+            size="medium"
+            textAlign="center"
+            type="button"
+            withBackground={true}
+          />
+        </Tooltip>
       }
       withArrow={true}
     >

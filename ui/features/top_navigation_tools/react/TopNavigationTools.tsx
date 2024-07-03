@@ -59,7 +59,11 @@ export function TopNavigationTools(props: TopNavigationToolsProps) {
         <Flex.Item>
           <Menu
             placement="bottom end"
-            trigger={<Button renderIcon={IconLtiLine} title={I18n.t('LTI Tools Menu')} />}
+            trigger={
+              <Tooltip renderTip={I18n.t('LTI Tools Menu')}>
+                <Button renderIcon={IconLtiLine} />
+              </Tooltip>
+            }
             key="menu"
             label={I18n.t('LTI Tools Menu')}
           >
