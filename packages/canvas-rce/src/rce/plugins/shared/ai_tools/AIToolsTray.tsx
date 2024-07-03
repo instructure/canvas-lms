@@ -38,7 +38,7 @@ import doFetchApi, {type DoFetchApiResults} from '../do-fetch-api-effect'
 import {AIWandSVG, AIAvatarSVG, InsertSVG, CopySVG, RefreshSVG, DislikeSVG} from './aiicons'
 import {AIResponseModal} from './AIResponseModal'
 
-const msgid = () => uid('msg', 2)
+const msgid = () => uid('msg', 3)
 
 type AIToolsTrayContent = {
   type: 'selection' | 'full'
@@ -106,41 +106,16 @@ export const AIToolsTray = ({
     return currentContent.content.trim().length > 0 ? 'modify' : 'generate'
   })
   const [userPrompt, setUserPrompt] = useState<string>('')
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(() => {
-    if (task === 'modify') {
-      return [
-        {
-          id: msgid(),
-          type: 'message',
-          message:
-            currentContent.type === 'selection' ? modifySelectionTaskMessage : modifyAllTaskMessage,
-        },
-      ]
-    } else {
-      return [{id: msgid(), type: 'message', message: generateTaskMessage}]
-    }
-  })
   const [waitingForResponse, setWaitingForResponse] = useState<boolean>(false)
   const [responseHtml, setResponseHtml] = useState<string>('')
   const chatContainerRef = useRef<HTMLDivElement | null>(null)
-
-  useLayoutEffect(() => {
-    if (chatContainerRef.current) {
-      const lastbox = chatContainerRef.current.querySelector('.ai-chat-box:last-child')
-      lastbox?.scrollIntoView({behavior: 'smooth', block: 'nearest'})
-    }
-  }, [trayRef, chatMessages])
-
-  useEffect(() => {
-    setTask(currentContent.content.trim().length > 0 ? 'modify' : 'generate')
-  }, [currentContent.content])
 
   const getModifyTaskMessage = useCallback(() => {
     return currentContent.type === 'selection' ? modifySelectionTaskMessage : modifyAllTaskMessage
   }, [currentContent.type])
 
-  const reset = useCallback(() => {
-    setChatMessages([
+  const initChatMessages = useCallback((): ChatMessage[] => {
+    return [
       task === 'modify'
         ? {
             id: msgid(),
@@ -148,10 +123,25 @@ export const AIToolsTray = ({
             message: getModifyTaskMessage(),
           }
         : {id: msgid(), type: 'message', message: generateTaskMessage},
-    ])
+    ]
+  }, [getModifyTaskMessage, task])
+
+  const chatMessagesRef = useRef<ChatMessage[]>(initChatMessages())
+
+  const reset = useCallback(() => {
+    chatMessagesRef.current = initChatMessages()
     setWaitingForResponse(false)
     setUserPrompt('')
-  }, [getModifyTaskMessage, task])
+  }, [initChatMessages])
+
+  useLayoutEffect(() => {
+    const lastbox = chatContainerRef.current?.querySelector('.ai-chat-box:last-child')
+    lastbox?.scrollIntoView({behavior: 'smooth', block: 'nearest'})
+  }, [trayRef, chatMessagesRef.current.length])
+
+  useEffect(() => {
+    setTask(currentContent.content.trim().length > 0 ? 'modify' : 'generate')
+  }, [currentContent.content])
 
   useEffect(() => {
     if (open !== isOpen) {
@@ -206,69 +196,37 @@ export const AIToolsTray = ({
         .then((result: DoFetchApiResults<any>) => {
           const {json} = result
           if (json.error) {
-            setChatMessages([
-              ...chatMessages,
-              {id: msgid(), type: 'error', message: formatMessage(json.error)},
-            ])
+            chatMessagesRef.current.push({
+              id: msgid(),
+              type: 'error',
+              message: formatMessage(json.error),
+            })
           } else {
-            setChatMessages([
-              ...chatMessages,
-              {id: msgid(), type: 'response', message: json.content},
-            ])
+            chatMessagesRef.current.push({id: msgid(), type: 'response', message: json.content})
           }
         })
         .catch(async (err: DoFetchError) => {
           const err_result = await err.response.json()
           const msg = err_result.error || formatMessage('An error occurred processing your request')
-          setChatMessages([
-            ...chatMessages,
-            {
-              id: msgid(),
-              type: 'error',
-              message: msg,
-            },
-          ])
+          chatMessagesRef.current.push({
+            id: msgid(),
+            type: 'error',
+            message: msg,
+          })
         })
         .finally(() => {
           setWaitingForResponse(false)
         })
     },
-    [chatMessages, contextId, currentContent, task]
+    [contextId, currentContent, task]
   )
-
-  // const getResponse = useCallback(
-  //   (prompt: string) => {
-  //     setWaitingForResponse(true)
-  //     setTimeout(() => {
-  //       setChatMessages([
-  //         ...chatMessages,
-  //         prompt === 'error'
-  //           ? {id: msgid(), type: 'error', message: 'An error occurred'}
-  //           : {
-  //               id: msgid(),
-  //               type: 'response',
-  //               message: `
-  //           <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. In mollis nunc sed id. Sapien et ligula ullamcorper malesuada proin libero nunc consequat. Hendrerit dolor magna eget est lorem. Turpis massa tincidunt dui ut ornare lectus sit amet. Id diam maecenas ultricies mi eget mauris pharetra. Mauris cursus mattis molestie a iaculis. Est ultricies integer quis auctor elit sed vulputate mi. Risus nullam eget felis eget nunc lobortis mattis. Massa ultricies mi quis hendrerit dolor magna.</p>
-  //           <p>Cras adipiscing enim eu turpis egestas pretium. Dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Purus semper eget duis at tellus at. Velit egestas dui id ornare arcu odio ut sem nulla. Tellus molestie nunc non blandit massa enim. Faucibus interdum posuere lorem ipsum dolor sit amet consectetur. Lectus quam id leo in vitae turpis massa. Fringilla est ullamcorper eget nulla facilisi etiam. In tellus integer feugiat scelerisque varius. Vestibulum lectus mauris ultrices eros in cursus turpis massa.</p>
-  //           <p>${new Date()}</p>
-  //           `,
-  //             },
-  //       ])
-  //       setWaitingForResponse(false)
-  //     }, 2000)
-  //   },
-  //   [chatMessages]
-  // )
-
   const handleCloseTray = useCallback(() => {
     onClose()
-    setChatMessages([
-      {
-        id: msgid(),
-        type: 'message',
-        message: task === 'modify' ? getModifyTaskMessage() : generateTaskMessage,
-      },
-    ])
+    chatMessagesRef.current.push({
+      id: msgid(),
+      type: 'message',
+      message: task === 'modify' ? getModifyTaskMessage() : generateTaskMessage,
+    })
     setUserPrompt('')
   }, [getModifyTaskMessage, onClose, task])
 
@@ -282,13 +240,11 @@ export const AIToolsTray = ({
     ) => {
       setTask(data.value as AITask)
       setWaitingForResponse(false)
-      setChatMessages([
-        {
-          id: msgid(),
-          type: 'message',
-          message: data.value === 'modify' ? getModifyTaskMessage() : generateTaskMessage,
-        },
-      ])
+      chatMessagesRef.current.push({
+        id: msgid(),
+        type: 'message',
+        message: data.value === 'modify' ? getModifyTaskMessage() : generateTaskMessage,
+      })
     },
     [getModifyTaskMessage]
   )
@@ -298,10 +254,10 @@ export const AIToolsTray = ({
   }, [])
 
   const handleSubmitPrompt = useCallback(() => {
-    setChatMessages([...chatMessages, {id: msgid(), type: 'user', message: userPrompt.trim()}])
+    chatMessagesRef.current.push({id: msgid(), type: 'user', message: userPrompt.trim()})
     getResponse(userPrompt)
     setUserPrompt('')
-  }, [chatMessages, getResponse, userPrompt])
+  }, [getResponse, userPrompt])
 
   const handleInsertResponse = useCallback(
     (responseText: string) => {
@@ -347,12 +303,12 @@ export const AIToolsTray = ({
   const handleShowWholeResponse = useCallback(
     (event: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) => {
       const msgId = (event.target as HTMLElement).dataset.messageId
-      const message = chatMessages.find(msg => msg.id === msgId)
+      const message = chatMessagesRef.current.find(msg => msg.id === msgId)
       if (message) {
         setResponseHtml(message.message)
       }
     },
-    [chatMessages]
+    []
   )
 
   const handleCloseResponseModal = useCallback(() => {
@@ -379,7 +335,7 @@ export const AIToolsTray = ({
   }
 
   const renderResponse = (msgId: string) => {
-    const message = chatMessages.find(msg => msg.id === msgId)
+    const message = chatMessagesRef.current.find(msg => msg.id === msgId)
     if (!message) {
       return <span>{formatMessage("I'm sorry, but I cannot find the AI's answer")}</span>
     }
@@ -480,7 +436,7 @@ export const AIToolsTray = ({
   }
 
   const renderChatMessages = () => {
-    const messages = chatMessages.map((message: ChatMessage) => {
+    const messages = chatMessagesRef.current.map((message: ChatMessage) => {
       return renderChatBox(message, message.id)
     })
     if (waitingForResponse) {
