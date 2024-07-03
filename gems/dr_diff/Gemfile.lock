@@ -13,7 +13,7 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     diff-lcs (1.5.1)
-    gergich (2.2.0)
+    gergich (2.2.1)
       httparty (~> 0.17)
       sqlite3 (>= 1.4, < 3.0)
     httparty (0.22.0)
