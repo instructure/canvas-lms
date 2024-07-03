@@ -163,6 +163,7 @@ class DiscussionTopicsApiController < ApplicationController
     when InstLLMHelper::RateLimitExceededError
       render(json: { error: t("Sorry, you have reached the maximum number of summary generations allowed (%{limit}) for now. Please try again later.", limit: e.limit) }, status: :too_many_requests)
     else
+      Canvas::Errors.capture_exception(:discussion_summary, e, :error)
       render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity)
     end
   end
