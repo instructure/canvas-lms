@@ -36,6 +36,7 @@ Placements are the "entry points" into an External Tool. They determine where an
 - [Tool Configuration](#tool-configuration)
 - [Page Menu](#page-menu)
 - [Pages Index Menu](#pages-index-menu)
+- [Top Navigation](#top-navigation)
 
 # Global Navigation
 name: global_navigation
@@ -196,3 +197,10 @@ name: wiki_page_menu
 name: wiki_index_menu
 
 <img style="max-width: 600px; width: 100%" src="./images/placements/wiki_index_menu.png" alt="Pages Index Menu Screenshot">
+
+# Top Navigation
+name: top_navigation
+
+This is a restricted placement, contact your CSM (Customers) or [Developer Relations](mailto:dev-relations@instructure.com) (Partners) for more information.
+
+<img style="max-width: 600px; width: 100%" src="./images/placements/top_navigation.png" alt="Top Navigation Screenshot">

@@ -2,11 +2,13 @@ Navigation Tools
 =================
 Canvas allows External Tools to be surfaced in a variety of navigation menus.
 The primary use case for using a navigation placement is to permit SSO to
-display a dashboard of some type.
+display a dashboard of some type. The Top Navigation placement launches in a
+drawer which allows the tool to be displayed alongside Canvas content.
 
 - [Course Navigation Placement](#course_navigation)
 - [Account Navigation Placement](#account_navigation)
 - [User Navigation Placement](#user_navigation)
+- [Top Navigation Placement](#top_navigation)
 
 <a name="course_navigation"></a>
 Course Navigation Placement
@@ -330,3 +332,80 @@ All of these settings are contained under "user_navigation"
 -   visibility: 'public', 'members', 'admins' (optional, 'public' by default)
 
     This specifies what types of users will see the link in the user navigation. "public" and "members" means anyone will see it, and "admins" means only account admins will see the link.
+
+<a name="top_navigation"></a>
+Top Navigation Placement
+==============
+
+External tools can be configured to appear in the Top Navigation menu and will
+launch in a drawer alongside the Canvas content. A preview of this can be seen in
+[Placements Overview](file.placements_overview.html).
+
+### Configuring
+To use the top navigation placement, the following requirements must be met:
+* The feature flag top_navigation_placement needs to be enabled.
+* The tool that will use the placement must be added to the allow list for the placement either
+ by Global Developer Key ID or by the Launch Domain.
+* The tool is configured with a placement entry for top_navigation.
+
+The tool will then show up in the Top Navigation tool menu with both the icon_url and text
+ properties. If no icon_url is provided, a default icon generated from the first letter of the
+ tool title will be used instead. Up to two tools can also be "pinned" which promotes them from
+ the Tool Menu to a dedicated button (icon only) alongside the menu. This pinning is done per
+ Account and can be managed by a user with manage tools permission in the Apps tab of the account
+ settings.
+
+Please contact your CSM (Customers) or [Developer Relations](mailto:dev-relations@instructure.com)
+(Partners) to inquire about adding your tool to the allow list.
+
+### Settings
+All of these settings are present for the **top_navigation** placement:
+
+-   url: &lt;url&gt; (required if not set on main tool configuration)
+
+    This is the URL that will be POSTed to when users click the launch button. It can
+     be the same as the tool's URL, or something different. Domain and URL
+     matching are not enforced for top_navigation launches. In order to prevent
+     security warnings for users, it is recommended that URLs be over SSL (https).
+     This setting is required if a url is not set on the main tool configuration.
+
+-   text: &lt;text&gt; (required if not set on main tool configuration)
+
+    This is the default text that will be shown on the hover-over tip and menu entry.
+
+-   icon_url &lt;url&gt; (optional)
+
+    The URL for an icon that identifies your tool in the toolbar. The icon
+    will be shown at 16x16 pixels. It is recommended that this icon be in
+    PNG or SVG format. The url must be an https (SSL) URL.
+
+    If a tool does not provide an icon_url on the, a default icon
+    based on the first letter of the tool's name will be used.
+
+-   selection_width: &lt;pixels&gt; (optional)
+
+    This currently has no effect as the Drawer size is a fixed width of 320px.
+
+-   selection_height: &lt;pixels&gt; (optional)
+
+    This currently has no effect as the Drawer height is fixed to the available space of the
+    browser viewport minus the tool title header and close button.
+
+### Post Message API
+We have also introduced two new postMessage functions to enhance the Top Navigation placement.
+ The first, **lti.getPageContent**, allows an LTI tool to request the content of the current page,
+ providing valuable context data directly from the front end without the need for a REST API
+ call. The second, **lti.getPageSettings**, returns an object containing locale, timezone, and
+ theme information, enabling tools to match Canvas's appearance for improved accessibility and
+ cohesion.
+
+Currently, only `Assignments` and `Wiki Pages` are supported by getPageContent, but support for
+ additional pages is planned. Further documentation for making use of Canvas Post Message
+ functions is located in the Using window.postMessage in LTI Tools section of the Canvas REST
+ API and Extensions Documentation.
+
+#### Security
+
+To control access to the **lti.getPageContent** postMessage function, we have introduced a new LTI
+ scope `http://canvas.instructure.com/lti/page_content/show`, tools without this scope will not
+ be able to invoke the postMessage function.
