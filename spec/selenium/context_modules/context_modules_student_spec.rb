@@ -740,4 +740,88 @@ describe "context modules" do
       end
     end
   end
+
+  context "discussion_checkpoints" do
+    before :once do
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      modules = create_modules(1, true)
+
+      @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
+      @c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 5.years.ago }, { type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 10.days.from_now }],
+        points_possible: 5
+      )
+      @c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 5.years.ago }, { type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 10.days.from_now }],
+        points_possible: 5,
+        replies_required: 2
+      )
+      modules[0].add_item({ id: @topic.id, type: "discussion_topic" })
+    end
+
+    it "shows checkpoints (with applicable override for student) as child items in checkpointed discussions" do
+      user_session(@student)
+      go_to_modules
+      checkpoints = ff("div[data-testid='checkpoint']")
+      expect(checkpoints[0].text).to include("Reply to Topic\n#{datetime_string(@c1.overridden_for(@student).due_at)}")
+      expect(checkpoints[1].text).to include("Required Replies (#{@topic.reply_to_entry_required_count})\n#{datetime_string(@c2.overridden_for(@student).due_at)}")
+    end
+
+    it "shows checkpoints (with default due date only when applicable) as child items in checkpointed discussions" do
+      Checkpoints::DiscussionCheckpointUpdaterService.call(
+        discussion_topic: @topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 5.years.ago }],
+        points_possible: 6
+      )
+
+      Checkpoints::DiscussionCheckpointUpdaterService.call(
+        discussion_topic: @topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 5.years.ago }],
+        points_possible: 6
+      )
+
+      user_session(@student)
+      go_to_modules
+
+      checkpoints = ff("div[data-testid='checkpoint']")
+      expect(checkpoints[0].text).to include("Reply to Topic\n#{datetime_string(@c1.due_at)}")
+      expect(checkpoints[1].text).to include("Required Replies (#{@topic.reply_to_entry_required_count})\n#{datetime_string(@c2.due_at)}")
+    end
+
+    it "shows checkpoints (with applicable due date override when there is nothing but overrides)" do
+      Checkpoints::DiscussionCheckpointDeleterService.call(
+        discussion_topic: @topic
+      )
+
+      @c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 10.days.from_now }],
+        points_possible: 5
+      )
+      @c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 10.days.from_now }],
+        points_possible: 5,
+        replies_required: 2
+      )
+
+      # verify the setup is correct
+      expect([@c1, @c2].none?(&:due_at)).to be_truthy
+
+      user_session(@student)
+      go_to_modules
+
+      checkpoints = ff("div[data-testid='checkpoint']")
+      expect(checkpoints[0].text).to include("Reply to Topic\n#{datetime_string(@c1.overridden_for(@student).due_at)}")
+      expect(checkpoints[1].text).to include("Required Replies (#{@topic.reply_to_entry_required_count})\n#{datetime_string(@c2.overridden_for(@student).due_at)}")
+    end
+  end
 end

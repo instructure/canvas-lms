@@ -788,5 +788,38 @@ describe "context modules" do
         expect(ContentTag.last.content.is_a?(Assignment)).to be_truthy
       end
     end
+
+    context "with discussion_checkpoints enabled" do
+      before :once do
+        @course.root_account.enable_feature! :discussion_checkpoints
+        modules = create_modules(1, true)
+
+        @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
+        @c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 5.years.ago }],
+          points_possible: 5
+        )
+        @c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 5.years.ago }],
+          points_possible: 5,
+          replies_required: 2
+        )
+        modules[0].add_item({ id: @topic.id, type: "discussion_topic" })
+      end
+
+      it "shows checkpoint data in module item info section" do
+        get "/courses/#{@course.id}/modules"
+        expect(f("span.item_name").text).to include @topic.title
+        details = f("div.ig-details").text
+        expect(details).to include "Reply to Topic"
+        expect(details).to include datetime_string(@c1.due_at)
+        expect(details).to include "Required Replies (#{@topic.reply_to_entry_required_count})"
+        expect(details).to include datetime_string(@c2.due_at)
+      end
+    end
   end
 end
