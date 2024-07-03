@@ -56,10 +56,6 @@ describe InstLLMHelper do
     let(:user) { double(uuid: "user123") }
     let(:llm_config) { double(rate_limit: { limit: 10, period: "day" }, name: "test") }
 
-    before do
-      allow(Canvas.redis).to receive(:multi).and_yield(double("multi", incr: true, expire: true))
-    end
-
     it "yields if rate limit is not set" do
       llm_config = double(rate_limit: nil)
       expect { |b| InstLLMHelper.with_rate_limit(user:, llm_config:, &b) }.to yield_control
@@ -108,7 +104,6 @@ describe InstLLMHelper do
         Time.now.utc.strftime("%Y%m%d")
       ].cache_key
       allow(Canvas.redis).to receive(:get).with(cache_key).and_return("5")
-      expect(Canvas.redis).to receive(:multi)
       expect { |b| InstLLMHelper.with_rate_limit(user:, llm_config:, &b) }.to yield_control
     end
 
@@ -121,7 +116,6 @@ describe InstLLMHelper do
         Time.now.utc.strftime("%Y%m%d")
       ].cache_key
       allow(Canvas.redis).to receive(:get).with(cache_key).and_return("5")
-      expect(Canvas.redis).to receive(:multi)
       expect(Canvas.redis).to receive(:decr).with(cache_key)
 
       expect do
