@@ -1590,9 +1590,16 @@ EG = {
   updateHistoryForCurrentStudent(behavior) {
     const studentId = this.currentStudent[anonymizableId]
     const stateHash = {[anonymizableStudentId]: studentId}
-    const url = encodeURI(
-      `?assignment_id=${ENV.assignment_id}&${anonymizableStudentId}=${studentId}`
-    )
+
+    // Get the current URL parameters
+    const currentParams = new URLSearchParams(window.location.search)
+
+    // Update or add the assignment_id and student_id parameters
+    currentParams.set('assignment_id', ENV.assignment_id)
+    currentParams.set(anonymizableStudentId, studentId)
+
+    // Construct the new URL
+    const url = `?${currentParams.toString()}`
 
     if (behavior === HISTORY_PUSH) {
       SpeedgraderHelpers.getHistory().pushState(stateHash, '', url)
