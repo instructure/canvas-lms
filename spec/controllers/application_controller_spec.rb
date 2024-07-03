@@ -339,16 +339,17 @@ RSpec.describe ApplicationController do
       end
 
       it "gets appropriate settings from the root account" do
-        root_account = double(global_id: 1, id: 1, feature_enabled?: false, open_registration?: true, settings: {}, cache_key: "key", uuid: "bleh", salesforce_id: "blah")
+        root_account = double(global_id: 1, id: 1, feature_enabled?: false, open_registration?: true, can_add_pronouns?: true, settings: {}, cache_key: "key", uuid: "bleh", salesforce_id: "blah")
         allow(root_account).to receive(:kill_joy?).and_return(false)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
         expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy
+        expect(controller.js_env[:SETTINGS][:can_add_pronouns]).to be_truthy
         expect(controller.js_env[:KILL_JOY]).to be_falsey
       end
 
       it "disables fun when set" do
-        root_account = double(global_id: 1, id: 1, feature_enabled?: false, open_registration?: true, settings: {}, cache_key: "key", uuid: "blah", salesforce_id: "bleh")
+        root_account = double(global_id: 1, id: 1, feature_enabled?: false, open_registration?: true, can_add_pronouns?: true, settings: {}, cache_key: "key", uuid: "blah", salesforce_id: "bleh")
         allow(root_account).to receive(:kill_joy?).and_return(true)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
@@ -821,7 +822,7 @@ RSpec.describe ApplicationController do
         allow(controller).to receive(:params).and_return({ file_id: @attachment.id, id: @attachment.id })
         allow(controller.request).to receive(:path).and_return("/files/#{@attachment.id}")
         controller.send(:log_participation, @student)
-        expect(AssetUserAccess.where(user: @student, asset_code: @attachment.asset_string).take.context).to eq @course
+        expect(AssetUserAccess.find_by(user: @student, asset_code: @attachment.asset_string).context).to eq @course
       end
 
       it "does not error on non-standard context for file" do

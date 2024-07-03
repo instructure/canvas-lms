@@ -23,14 +23,15 @@ import {FormFieldGroup, type FormMessageType} from '@instructure/ui-form-field'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 
 import {validateAvailability} from '../../util/formValidation'
+import {Button} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('discussion_create')
 
 type Props = {
   availableFrom: string
-  setAvailableFrom: (value: string) => void
+  setAvailableFrom: (value: string | null) => void
   availableUntil: string
-  setAvailableUntil: (value: string) => void
+  setAvailableUntil: (value: string | null) => void
   isGraded: boolean
   availabilityValidationMessages: {text: string; type: FormMessageType}[]
   setAvailabilityValidationMessages: (value: {text: string; type: string}[]) => void
@@ -72,6 +73,17 @@ export const NonGradedDateOptions = ({
         invalidDateTimeMessage={I18n.t('Invalid date and time')}
         layout="columns"
       />
+      <Button
+        type="button"
+        color="secondary"
+        onClick={() => {
+          setAvailableFrom(null)
+        }}
+        aria-label={I18n.t('Reset available from')}
+        data-testid="reset-available-from-button"
+      >
+        {I18n.t('Reset')}
+      </Button>
       <DateTimeInput
         timezone={ENV.TIMEZONE}
         description={I18n.t('Until')}
@@ -95,6 +107,17 @@ export const NonGradedDateOptions = ({
         layout="columns"
         dateInputRef={setDateInputRef}
       />
+      <Button
+        type="button"
+        color="secondary"
+        onClick={() => {
+          setAvailableUntil(null)
+        }}
+        aria-label={I18n.t('Reset available until')}
+        data-testid="reset-available-until-button"
+      >
+        {I18n.t('Reset')}
+      </Button>
     </FormFieldGroup>
   )
 }

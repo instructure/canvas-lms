@@ -59,7 +59,7 @@ module Translation
 
       # If source lang was not set, then detect the language.
       if src_lang.nil?
-        result = CLD.detect_language(text)[:code][0..2]
+        result = trim_locale(CLD.detect_language(text)[:code])
         if result == "un" # Unknown language code.
           logger.warn("Could not detect language from src text, defaulting to English")
           src_lang = "en"
@@ -70,13 +70,10 @@ module Translation
 
       # If target lang was nil, then user must be set. Try to get locale from the user.
       if tgt_lang.nil?
-        tgt_lang = if user.locale.nil?
-                     # Go ahead and use english as the target language. It is the system default for Canvas.
-                     "en"
-                   else
-                     user.locale[0..2]
-                   end
+        tgt_lang = trim_locale(user.locale)
       end
+
+      InstStatsd::Statsd.increment("translation.create.#{src_lang}.#{tgt_lang}")
 
       # TODO: Error handling of invoke endpoint.
       response = sagemaker_client.invoke_endpoint(
@@ -199,16 +196,34 @@ module Translation
       # For translating into the target locale.
       return languages if user.locale.nil?
 
-      locale = user.locale[0..2]
-      # Don't translate unless the browser locale is different for the current user.
+      locale = trim_locale(user.locale)
+      language_cache_key = ["translated_languages", locale].cache_key
+
+      # The controls are in English, don't translate anything
       if locale == "en"
         return languages
       end
 
+      # Check if Redis is present. If yes, then we try to read the key from Redis
+      if Canvas.redis
+        # Try to read the key
+        cached_languages = Canvas.redis.get(language_cache_key)
+        unless cached_languages.nil?
+          return JSON.parse(cached_languages)
+        end
+      end
+
+      # Translate our language controls
       translated = []
       languages.each do |language|
         language[:name] = create(src_lang: "en", tgt_lang: locale, text: language[:name])
         translated << language
+      end
+
+      # Cache the translation for new loads
+      if Canvas.redis
+        Rails.logger.info "Caching supported language translation: #{locale}}}}"
+        Canvas.redis.set(language_cache_key, translated.to_json)
       end
 
       translated
@@ -218,19 +233,19 @@ module Translation
       locale = if user.locale.nil?
                  "en"
                else
-                 user.locale[0..2]
+                 trim_locale(user.locale)
                end
-      result = CLD.detect_language(text)[:code][0..2]
+      result = trim_locale(CLD.detect_language(text)[:code])
       result == locale
     end
 
     def translate_message(text:, user:)
       translated_text = []
-      src_lang = CLD.detect_language(text)[:code][0..2]
+      src_lang = trim_locale(CLD.detect_language(text)[:code])
       tgt_lang = if user.locale.nil?
                    "en"
                  else
-                   user.locale[0..2]
+                   trim_locale(user.locale)
                  end
 
       text.split("\n").map do |paragraph|
@@ -243,6 +258,12 @@ module Translation
       end
 
       translated_text.join("\n")
+    end
+
+    private
+
+    def trim_locale(locale)
+      locale[0..1]
     end
   end
 end

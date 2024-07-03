@@ -505,7 +505,7 @@ describe OAuth2ProviderController do
       it_behaves_like "common oauth2 token checks" do
         let(:success_params) { { code: valid_code } }
         let(:success_setup) do
-          expect(redis).to receive(:del).with(valid_code_redis_key).at_least(:once)
+          expect(redis).to receive(:del).with(valid_code_redis_key).at_least(:once) # rubocop:disable RSpec/ExpectInLet
         end
         let(:success_token_keys) { %w[access_token refresh_token user expires_in token_type canvas_region] }
       end

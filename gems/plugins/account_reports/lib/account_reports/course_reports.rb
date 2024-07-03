@@ -83,7 +83,7 @@ module AccountReports
           scope = c.attachments.active
           min = Attachment::MINIMUM_SIZE_FOR_QUOTA
           all_course_files_size = scope.sum("COALESCE(CASE when size < #{min} THEN #{min} ELSE size END, 0)").to_i
-          row << (all_course_files_size.to_f / 1.megabyte).round(2)
+          row << (all_course_files_size.to_f / 1.decimal_megabytes).round(2)
           csv << row
         end
       end

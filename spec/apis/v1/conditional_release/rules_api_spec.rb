@@ -345,11 +345,11 @@ module ConditionalRelease
                  { expected_status: 200 })
 
         rule.reload
-        changed_assoc = rule.assignment_set_associations.where(assignment_id: changed_assignment.id).take
+        changed_assoc = rule.assignment_set_associations.find_by(assignment_id: changed_assignment.id)
         expect(changed_assoc).not_to be_nil
-        new_assoc = rule.assignment_set_associations.where(assignment_id: new_assignment.id).take
+        new_assoc = rule.assignment_set_associations.find_by(assignment_id: new_assignment.id)
         expect(new_assoc).not_to be_nil
-        deleted_assoc = rule.assignment_set_associations.where(assignment_id: deleted_assignment_id).take
+        deleted_assoc = rule.assignment_set_associations.find_by(assignment_id: deleted_assignment_id)
         expect(deleted_assoc).to be_nil
         expect(rule.assignment_set_associations.count).to be 4
 

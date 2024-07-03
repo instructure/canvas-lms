@@ -70,7 +70,7 @@ describe "Rubric index page" do
     expect(RubricsIndex.used_location_modal).to include_text(@course.name)
   end
 
-  it "allows sorting by rubric name assending/decending" do
+  it "allows sorting by rubric name ascending/descending" do
     RubricsIndex.rubric_name_header.click
     expect(RubricsIndex.rubric_title(0)).to include_text(@rubric1.title)
     expect(RubricsIndex.rubric_title(1)).to include_text(@rubric2.title)
@@ -80,7 +80,7 @@ describe "Rubric index page" do
     expect(RubricsIndex.rubric_title(1)).to include_text(@rubric1.title)
   end
 
-  it "allows sorting by total points assending/decending" do
+  it "allows sorting by total points ascending/descending" do
     RubricsIndex.rubric_points_header.click
     expect(RubricsIndex.rubric_total_points(0)).to include_text(@rubric1.points_possible.to_i.to_s)
     expect(RubricsIndex.rubric_total_points(1)).to include_text(@rubric2.points_possible.to_i.to_s)
@@ -90,7 +90,7 @@ describe "Rubric index page" do
     expect(RubricsIndex.rubric_total_points(1)).to include_text(@rubric1.points_possible.to_i.to_s)
   end
 
-  it "allows sorting by criterion count assending/decending" do
+  it "allows sorting by criterion count ascending/descending" do
     RubricsIndex.rubric_criterion_header.click
     expect(RubricsIndex.rubric_criterion_count(0)).to include_text(@rubric1.data.length.to_s)
     expect(RubricsIndex.rubric_criterion_count(1)).to include_text(@rubric2.data.length.to_s)
@@ -100,7 +100,7 @@ describe "Rubric index page" do
     expect(RubricsIndex.rubric_criterion_count(1)).to include_text(@rubric1.data.length.to_s)
   end
 
-  it "allows sorting by locations used assending/decending" do
+  it "allows sorting by locations used ascending/descending" do
     RubricsIndex.rubric_locations_header.click
     expect(RubricsIndex.rubric_locations(0)).to include_text("courses and assignments")
     expect(RubricsIndex.rubric_locations(1)).to include_text("-")

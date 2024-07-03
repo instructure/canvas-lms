@@ -235,13 +235,19 @@ class AccountNotificationsController < ApplicationController
         if api_request?
           format.json { render json: account_notification_json(@notification, @current_user, session) }
         else
-          flash[:notice] = t("Announcement successfully created")
-          format.html { redirect_to account_settings_path(@account, anchor: "tab-announcements") }
+          format.html do
+            flash[:notice] = t("Announcement successfully created")
+            redirect_to account_settings_path(@account, anchor: "tab-announcements")
+          end
           format.json { render json: @notification }
         end
       else
-        flash[:error] = t("Announcement creation failed")
-        format.html { redirect_to account_settings_path(@account, anchor: "tab-announcements") } unless api_request?
+        unless api_request?
+          format.html do
+            flash[:error] = t("Announcement creation failed")
+            redirect_to account_settings_path(@account, anchor: "tab-announcements")
+          end
+        end
         format.json { render json: @notification.errors, status: :bad_request }
       end
     end
@@ -331,8 +337,10 @@ class AccountNotificationsController < ApplicationController
     @notification = @account.announcements.find(params[:id])
     @notification.destroy
     respond_to do |format|
-      flash[:message] = t(:announcement_deleted_notice, "Announcement successfully deleted")
-      format.html { redirect_to account_settings_path(@account, anchor: "tab-announcements") }
+      format.html do
+        flash[:message] = t(:announcement_deleted_notice, "Announcement successfully deleted")
+        redirect_to account_settings_path(@account, anchor: "tab-announcements")
+      end
       format.json { render json: @notification }
     end
   end

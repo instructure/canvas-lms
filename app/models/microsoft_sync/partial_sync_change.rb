@@ -75,7 +75,7 @@ class MicrosoftSync::PartialSyncChange < ApplicationRecord
   # which uses the postgres server time (NOW())
   def self.delete_all_replicated_to_secondary_for_course(course_id, batch_size = 1000)
     last_replicated_updated_at = GuardRail.activate(:secondary) do
-      where(course_id:).order(updated_at: :desc).limit(1).pluck(:updated_at).first
+      where(course_id:).order(updated_at: :desc).limit(1).pick(:updated_at)
     end
 
     while where(course_id:)

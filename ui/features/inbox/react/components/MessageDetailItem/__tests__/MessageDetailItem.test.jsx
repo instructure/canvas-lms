@@ -28,7 +28,7 @@ jest.mock('../../../../util/utils', () => ({
 
 const defaultProps = {
   conversationMessage: {
-    author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+    author: {name: 'Tom Thompson', shortName: 'Tom Thompson', pronouns: 'he/him'},
     recipients: [
       {name: 'Tom Thompson', shortName: 'Tom Thompson'},
       {name: 'Billy Harris', shortName: 'Billy Harris'},
@@ -235,6 +235,47 @@ describe('MessageDetailItem', () => {
     fireEvent.click(moreOptionsButton)
     fireEvent.click(getByText('Forward'))
     expect(props.onForward).toHaveBeenCalled()
+  })
+
+  describe('Pronouns', () => {
+    describe('can_add_pronouns disabled', () => {
+      it('do not show up pronouns', () => {
+        const {queryByText} = setup()
+        expect(queryByText('he/him')).not.toBeInTheDocument()
+      })
+
+    })
+    describe('can_add_pronouns enabled', () => {
+      beforeEach(() => {
+        ENV = {
+          SETTINGS: {
+            can_add_pronouns: true
+          }
+        }
+      })
+
+      it('Show up pronouns if pronouns is not null', () => {
+        const {getByText} = setup()
+        expect(getByText('he/him')).toBeInTheDocument()
+      })
+
+      it('Do not show up pronouns if pronouns is null', () => {
+        const props = {
+          conversationMessage: {
+            author: {name: 'Tom Thompson', shortName: 'Tom Thompson', pronouns: null},
+            recipients: [
+              {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+              {name: 'Billy Harris', shortName: 'Billy Harris'},
+            ],
+            createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
+            body: 'This is the body text for the message.',
+          },
+          contextName: 'Fake Course 1',
+        }
+        const {queryByText} = setup(props)
+        expect(queryByText('he/him')).not.toBeInTheDocument()
+      })
+    })
   })
 
   describe('Responsive', () => {

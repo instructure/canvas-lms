@@ -16,8 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+
 <% if tool[:canvas_icon_class] %>
   <i class="<%= tool[:canvas_icon_class] %>"></i>
 <% elsif tool[:icon_url] %>
-  <img class="icon" alt="" src="<%= tool[:icon_url] %>" />
+  <img class="icon lti_tool_icon" alt="" src="<%= tool[:icon_url] %>" />
 <% end %>
+
+
+

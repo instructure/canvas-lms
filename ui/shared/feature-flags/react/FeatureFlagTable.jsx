@@ -115,6 +115,7 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
                   displayName={feature.display_name}
                   featureFlag={feature.feature_flag}
                   disableDefaults={disableDefaults}
+                  appliesTo={feature.applies_to}
                 />
               </Cell>
             </Row>

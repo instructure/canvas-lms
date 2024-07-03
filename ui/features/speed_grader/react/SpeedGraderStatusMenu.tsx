@@ -42,7 +42,7 @@ type Props = {
   secondsLate: number
   selection: string
   updateSubmission: (data: any) => void
-  cachedDueDate?: string
+  cachedDueDate?: string | null
   customStatuses?: Array<any>
 }
 
@@ -81,25 +81,13 @@ export default function SpeedGraderStatusMenu({
   }
 
   const optionValues = ['late', 'missing', 'excused']
-  if (ENV.FEATURES && ENV.FEATURES.extended_submission_state) {
+  if (ENV.FEATURES?.extended_submission_state) {
     optionValues.push('extended')
   }
   customStatuses?.forEach(status => {
     optionValues.push(status.id)
   })
   optionValues.push('none')
-
-  const menuOptions = optionValues.map(status => (
-    <Menu.Item
-      key={status}
-      value={status}
-      data-testid={`speedGraderStatusMenu-${status}`}
-      selected={selection === status}
-      onSelect={(_, newSelection) => handleSelection(String(newSelection))}
-    >
-      {statusesMap.get(status)}
-    </Menu.Item>
-  ))
 
   return (
     <>
@@ -120,7 +108,17 @@ export default function SpeedGraderStatusMenu({
             }
           >
             <Menu.Group label={<ScreenReaderContent>{I18n.t('Menu options')}</ScreenReaderContent>}>
-              {menuOptions}
+              {optionValues.map(status => (
+                <Menu.Item
+                  key={status}
+                  value={status}
+                  data-testid={`speedGraderStatusMenu-${status}`}
+                  selected={selection === status}
+                  onSelect={(_, newSelection) => handleSelection(String(newSelection))}
+                >
+                  {statusesMap.get(status)}
+                </Menu.Item>
+              ))}
             </Menu.Group>
           </Menu>
         </Flex.Item>

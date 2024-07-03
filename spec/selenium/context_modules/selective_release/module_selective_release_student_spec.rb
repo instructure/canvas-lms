@@ -26,6 +26,7 @@ require_relative "../../../helpers/k5_common"
 require_relative "../shared_examples/module_selective_release_shared_examples"
 require_relative "../../assignments/page_objects/assignments_index_page"
 require_relative "../../quizzes/page_objects/quizzes_index_page"
+require_relative "../../../helpers/selective_release_common"
 
 describe "selective_release modules for students" do
   include_context "in-process server selenium tests"
@@ -36,6 +37,7 @@ describe "selective_release modules for students" do
   include K5DashboardCommonPageObject
   include K5Common
   include QuizzesIndexPage
+  include SelectiveReleaseCommon
 
   context "provides modules for correct students" do
     before(:once) do

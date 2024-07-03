@@ -39,10 +39,10 @@ import pluginBundles from 'plugin-bundles-generated'
 // so they have to be ran before any other app code runs.
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms'
-import './boot/initializers/ajax_errors'
-import './boot/initializers/activateKeyClicks'
-import './boot/initializers/activateTooltips'
-import './boot/initializers/injectAuthTokenIntoForms'
+import '@canvas/common/ajax_errors'
+import '@canvas/common/activateKeyClicks'
+import '@canvas/common/activateTooltips'
+import '@canvas/common/injectAuthTokenIntoForms'
 
 interface CustomWindow extends Window {
   bundles: string[]
@@ -214,12 +214,13 @@ if (ENV.badge_counts) {
   import('./boot/initializers/showBadgeCounts')
 }
 
-// Load and then display the Canvas help dialog if the user has requested it
+// Decorate the help link with the React/InstUI dialog from the navigation sidenav
 async function openHelpDialog(event: Event): Promise<void> {
+  const helpLink = event.target as Element
   event.preventDefault()
   try {
-    const {default: helpDialog} = await import('./boot/initializers/enableHelpDialog')
-    helpDialog.open()
+    const {renderLoginHelp} = await import('@canvas/help-dialog')
+    renderLoginHelp(helpLink)
   } catch (e) {
     /* eslint-disable no-console */
     console.error('Help dialog could not be displayed')
@@ -239,6 +240,8 @@ async function loadNewUserTutorials() {
     const {default: initializeNewUserTutorials} = await import('./features/new_user_tutorial/index')
 
     initializeNewUserTutorials()
+  } else {
+    document.getElementsByClassName('TutorialToggleHolder')[0]?.remove() // inherited margin from parent leaves a gap
   }
 }
 

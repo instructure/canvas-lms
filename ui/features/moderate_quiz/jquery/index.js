@@ -31,7 +31,7 @@ import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData' /* fillTemplateData */
-import 'date-js'
+import '@instructure/date-js'
 import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('quizzes.moderate')

@@ -18,11 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "student_visibility/student_visibility_common"
+require_relative "../helpers/selective_release_common"
 
 describe "ModuleStudentVisibility" do
   include StudentVisibilityCommon
+  include SelectiveReleaseCommon
 
   before :once do
+    differentiated_modules_off
     course_factory(active_all: true)
     @section1 = @course.default_section
     @section2 = @course.course_sections.create!(name: "Section 2")

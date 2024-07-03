@@ -26,9 +26,9 @@ RSpec.describe VideoCaptionService, type: :service do
         allow(service).to receive_messages(
           url: "https://example.com/video.mp4",
           request_handoff: { "media" => { "id" => "1234" } },
-          request_caption: double("Response", code: 200, body: "Captions requested"),
+          request_caption: double("Response", code: 200),
           media: { "media" => { "captions" => [{ "language" => "en", "status" => "succeeded" }] } },
-          collect_captions: double("Response", code: 200, body: "Captions for the video"),
+          grab_captions: "Captions for the video",
           config: { "app-host" => "https://example.com" },
           auth_token: "token"
         )
@@ -42,6 +42,11 @@ RSpec.describe VideoCaptionService, type: :service do
         expect { service.call }.to change { MediaTrack.count }.by(1)
         expect { service.call }.not_to change { MediaTrack.count }
       end
+
+      it "sets auto_caption_status to complete" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("complete")
+      end
     end
 
     context "when media type is not video" do
@@ -51,6 +56,11 @@ RSpec.describe VideoCaptionService, type: :service do
 
       it "does not create a media track" do
         expect { service.call }.not_to change { MediaTrack.count }
+      end
+
+      it "sets auto_caption_status to failed_initial_validation" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("failed_initial_validation")
       end
     end
 
@@ -62,6 +72,11 @@ RSpec.describe VideoCaptionService, type: :service do
       it "does not create a media track" do
         expect { service.call }.not_to change { MediaTrack.count }
       end
+
+      it "sets auto_caption_status to failed_initial_validation" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("failed_initial_validation")
+      end
     end
 
     context "when URL is not available" do
@@ -72,25 +87,123 @@ RSpec.describe VideoCaptionService, type: :service do
       it "does not create a media track" do
         expect { service.call }.not_to change { MediaTrack.count }
       end
+
+      it "sets auto_caption_status to failed_initial_validation" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("failed_initial_validation")
+      end
     end
 
     context "when handoff request fails" do
       before do
-        allow(service).to receive_messages(url: "https://example.com/video.mp4", poll_for_captions_ready: "en", request_handoff: nil)
+        allow(service).to receive_messages(
+          url: "https://example.com/video.mp4",
+          request_handoff: nil,
+          config: { "app-host" => "https://example.com" },
+          auth_token: "token"
+        )
+        allow(media_object).to receive_messages(media_type: "video", media_id: "valid_media_id")
       end
 
       it "does not create a media track" do
         expect { service.call }.not_to change { MediaTrack.count }
+      end
+
+      it "sets auto_caption_status to failed_handoff" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("failed_handoff")
       end
     end
 
     context "when caption request fails" do
       before do
-        allow(service).to receive_messages(url: "https://example.com/video.mp4", request_handoff: { "media" => { "id" => "1234" } }, poll_for_caption_request: false)
+        allow(service).to receive_messages(
+          url: "https://example.com/video.mp4",
+          request_handoff: { "media" => { "id" => "1234" } },
+          request_caption: double("Response", code: 500),
+          config: { "app-host" => "https://example.com" },
+          auth_token: "token"
+        )
+        allow(media_object).to receive_messages(media_type: "video", media_id: "valid_media_id")
       end
 
       it "does not create a media track" do
         expect { service.call }.not_to change { MediaTrack.count }
+      end
+
+      it "sets auto_caption_status to failed_request" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("failed_request")
+      end
+    end
+
+    context "when captions are not ready" do
+      before do
+        allow(service).to receive_messages(
+          url: "https://example.com/video.mp4",
+          request_handoff: { "media" => { "id" => "1234" } },
+          request_caption: double("Response", code: 200),
+          media: { "media" => { "captions" => [{ "status" => "in_progress" }] } },
+          config: { "app-host" => "https://example.com" },
+          auth_token: "token"
+        )
+        allow(media_object).to receive_messages(media_type: "video", media_id: "valid_media_id")
+      end
+
+      it "does not create a media track" do
+        expect { service.call }.not_to change { MediaTrack.count }
+      end
+
+      it "sets auto_caption_status to failed_captions" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("failed_captions")
+      end
+    end
+
+    context "when non-English language is detected" do
+      before do
+        allow(service).to receive_messages(
+          url: "https://example.com/video.mp4",
+          request_handoff: { "media" => { "id" => "1234" } },
+          request_caption: double("Response", code: 200),
+          media: { "media" => { "captions" => [{ "language" => "es", "status" => "succeeded" }] } },
+          config: { "app-host" => "https://example.com" },
+          auth_token: "token"
+        )
+        allow(media_object).to receive_messages(media_type: "video", media_id: "valid_media_id")
+      end
+
+      it "does not create a media track" do
+        expect { service.call }.not_to change { MediaTrack.count }
+      end
+
+      it "sets auto_caption_status to non_english_captions" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("non_english_captions")
+      end
+    end
+
+    context "when captions cannot be pulled" do
+      before do
+        allow(service).to receive_messages(
+          url: "https://example.com/video.mp4",
+          request_handoff: { "media" => { "id" => "1234" } },
+          request_caption: double("Response", code: 200),
+          media: { "media" => { "captions" => [{ "language" => "en", "status" => "succeeded" }] } },
+          grab_captions: nil,
+          config: { "app-host" => "https://example.com" },
+          auth_token: "token"
+        )
+        allow(media_object).to receive_messages(media_type: "video", media_id: "valid_media_id")
+      end
+
+      it "does not create a media track" do
+        expect { service.call }.not_to change { MediaTrack.count }
+      end
+
+      it "sets auto_caption_status to failed_to_pull" do
+        service.call
+        expect(media_object.auto_caption_status).to eq("failed_to_pull")
       end
     end
   end

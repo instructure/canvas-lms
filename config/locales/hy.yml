@@ -1766,6 +1766,7 @@ hy:
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Թեմայի ստեղծման ժամանակ սխալ է տեղի ունեցել, խնդրում ենք փորձել կրկին:"
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Ներբեռնմանը պատրաստվելու ժամանակ սխալ է տեղի ունեցել, փորձեք կրկին:"
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Սխալ է տեղի ունեցել %{filename} -ի օգտագործման իրավունքը սահմանելիս"
+  an_integer_value_is_required_e073bd46: "Պահանջվում է մուտքագրել ամբողջ թիվ"
   an_item_named_name_already_exists_in_this_location_147b7312: "\"%{name}\" անունը կրող տարր արդեն իսկ առկա է: Արդյո՚ք Դուք ցանկանում եք փոխարինել արդեն իսկ առկա ֆայլը նոր ֆայլով: "
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Սերվերի անհայտ սխալ: Կրկին փորձեք:"
   an_update_is_available_for_toolname_bba3fa2: "%{toolName} համար տեղի է ունեցել թարմացում"
@@ -4610,6 +4611,7 @@ hy:
   count_participations_ac8f82b7: 
     one: "1 մասնակից"
     other: "%{count} մասնակից"
+  count_people_489946e7: "%{count} մարդ"
   count_students_30e46120: 
     one: "1 ուսանող"
     other: "%{count} ունկնդիր"
@@ -4881,6 +4883,7 @@ hy:
   course_users: 
     greater_than_three: "Որոնման համար մուտքագրեք երեք կամ ավելի նիշից կազմված բառը: "
     unknown_error: "Ձեր որոնումների ժամանակ ինչ-որ բան սխալ է եղել, փորձեք նորից:"
+  course_was_successfully_updated_1ab0e9f8: "Դասընթացը հաջողությամբ թարմացվել է:"
   courses: 
     assignments_needing_grading: 
       headings: 
@@ -6462,6 +6465,7 @@ hy:
   enrollments_teachers: Դասավանդողներ
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Մուտքագրել hexcode լրացուցիչ գույն օգտագործելու համար"
   enter_a_score_to_test_c6f89f4a: "Մուտքագրեք գնահատականը թեստի համար"
+  enter_a_section_name_adbe3099: "Մուտքագրել բաժնի անվանումը"
   enter_the_date_you_would_like_to_navigate_to_a712de47: "Մուտքագրեք այն ամսաթիվը, որին կցանկանայիք անցնել"
   enter_your_question_and_multiple_answers_31370054: "Մուտքագրեք Ձեր հարցը եւ պատասխանների տարբերակները:"
   enter_your_question_text_4729b886: "Մուտքագրեք Ձեր հարցը"
@@ -8549,6 +8553,7 @@ hy:
   invalid_file_type_881cc9b2: "Ֆայլի անընդունելի տեսակ"
   invalid_recipient_name_56b22b86: "Ստացողի անունը սխալ է"
   invalid_state_parameter_7a5aa108: "Վիճակի սխալ պարամետր"
+  invalid_url_cbde79f: "Սխալ URL"
   invalid_url_in_xml: "Սխալ Url -հասցե xml-ում: Անհրաժեշտ է խուսափել Ampersands-ից: "
   invalid_utf_8_13c76a6: "Սխալ UTF-8"
   invalid_xml_syntax: "xml-ի սխալ սինտաքս"
@@ -8938,6 +8943,7 @@ hy:
           send_to_sms: "Ուղարկեք տեքստային հաղորդագրություններ %{phone_number}-ին"
         labels: 
           carrier: "Կապի օպերատոր"
+          otp_communication_channel_id: Հեռախոսահամար
           phone_number: Հեռախոսահամար
           remember_me: "Հիշել այս համակարգիչը"
           verification_code: "Ստուգման կոդ"
@@ -11123,7 +11129,9 @@ hy:
   move_to_front_7eae2e90: "Տեղափոխել սկիզբ"
   move_to_front_bf6f0194: "Տեղափոխել սկիզբ"
   moving_a4d552df: "Տեղափոխում է..."
+  multi_factor_authentication_1a6b3b3d: "Իսկության բազմաֆակտորային ստուգում"
   multi_factor_authentication_configured_865b1bde: "Բազմագործոնային իսկության ստուգումը կարգաբերված է"
+  multiple_dates_e3a122f7: "Մի քանի ամսաթվեր"
   multiple_due_dates_6b0d75c6: "Կատարման մի քանի վերջնաժամկետ"
   must_be_255_characters_or_less_e8e7f25e: "Պետք է լինի մինչև 255 նիշ"
   must_mark_as_done_91cff799: "Անհրաժեշտ է նշել որպես կատարված"
@@ -11887,6 +11895,7 @@ hy:
     video: Վիդեո
   please_add_at_least_one_non_blank_answer_213c2c8e: "Ավելացրեք առնվազն մեկ լրացված պատասխան"
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Խնդրում ենք ավելացնել առնվազն մեկ լրացված պատասխան յուրաքանչյուր փոփոխականի համար:"
+  please_enter_the_verification_code_shown_by_your_t_acc7c404: "Մուտքագրեք ձեր token-ում ցույց տրված հաստատման կոդը"
   please_enter_your_label_name_7745272d: "Մուտքագրեք ձեր  %{label_name}՝"
   please_enter_your_label_name_and_password_5c56be80: "Մուտքագրեք ձեր  %{label_name} և գաղտնաբառը՝"
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Տեղեկացրեք նրանց, որ էջն եք դիտում և որ հղումով անցաք այդտեղ:"
@@ -12143,7 +12152,9 @@ hy:
     learn_platform_settings: 
       labels: 
         base_url: "Բազային URL-հասցե"
+        password: Գաղտնաբառ
         token: "Հասանելիության token "
+        username: "Օգտատիրոջ անուն"
     linked_in: 
       description: "LinkedIn ինտեգրում"
     linked_in_settings: 
@@ -15639,6 +15650,7 @@ hy:
       none_to_update: "Թարմացման համար օբյեկտ չկա"
   shared_secret_892c88f2: "Ընդհանուր գաղտնի բանալի"
   shift_dates_746698a5: "Տեղափոխել ամսաթվերը"
+  should_be_10_digit_number_d30ef02d: "պետք է 10-նիշ թիվ լինի"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "պետք է ակնառու լինի, հաշվետու օգտատիրոջ Canvas ID"
   show_and_hide_courses_menu_9e09d1d0: "Ցույց տալ և թաքցնել դասընթացների մենյուն"
   show_by_date_e3967761: "Ցույց տալ ըստ ամսաթվերի"
@@ -17249,7 +17261,9 @@ hy:
     is_required: "Անհրաժեշտ է լրացնել այս դաշտը"
   validate_links_in_content_b1630fba: "Հաստատել բովանդակության մեջ ներառված  հղումները"
   validation_error_3b943100: "Իսկության հաստատման սխալ"
+  value_must_be_positive_3e086d5a: "Պետք է դրական մեծություն լինի"
   verification_code_5acd64ef: "Ստուգման կոդ"
+  verify_3dd8f159: "Ստուգել "
   version_5599c321: Տարբերակ
   video_b9f27375: Վիդեո
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Տեսաձայնագրության բովանդակությունը հնարավոր չէ տեսնել Ձեր կողմից ընտրված սարքի կամ հավելվածի միջոցով:"

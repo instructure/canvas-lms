@@ -39,7 +39,7 @@ describe('TempEnrollSearch', () => {
     account_id: '',
   }
   const mockSame = {users: [{userTemplate, user_id: '1', address: ''}]}
-  const mockNoUser = {users: []}
+  const mockNoUser = {users: [], duplicates: []}
   const mockUserList = {
     users: [
       {
@@ -51,6 +51,7 @@ describe('TempEnrollSearch', () => {
   }
   const mockFindUser = {
     id: '2',
+    name: 'user2',
     sis_user_id: 'user_sis',
     primary_email: 'user@email.com',
     login_id: 'user_login',
@@ -100,8 +101,8 @@ describe('TempEnrollSearch', () => {
 
   it('displays error message when no user is returned', async () => {
     fetchMock.post(`/accounts/1/user_lists.json?user_list=&v2=true&search_type=cc_path`, mockNoUser)
-    const {queryAllByText} = render(<TempEnrollSearch page={1} {...props} />)
-    await waitFor(() => expect(queryAllByText('User could not be found.')).toBeTruthy())
+    const {queryByText} = render(<TempEnrollSearch page={1} {...props} />)
+    await waitFor(() => expect(queryByText('User could not be found.')).toBeTruthy())
   })
 
   it('displays new page when user is found', async () => {
@@ -109,7 +110,7 @@ describe('TempEnrollSearch', () => {
       `/accounts/1/user_lists.json?user_list=&v2=true&search_type=cc_path`,
       mockUserList
     )
-    userDetailsUriMock(mockFindUser.id, {})
+    userDetailsUriMock(mockFindUser.id, mockFindUser)
     const {queryByText} = render(<TempEnrollSearch page={1} {...props} />)
     await waitFor(() =>
       expect(queryByText(/is ready to be assigned temporary enrollments/)).toBeTruthy()

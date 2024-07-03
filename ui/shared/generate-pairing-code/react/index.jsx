@@ -94,7 +94,7 @@ export default class GeneratePairingCode extends Component {
     or after one use.`)
     return (
       <div>
-        <Button onClick={this.openModal} display="block" textAlign="start">
+        <Button onClick={this.openModal} display="block" textAlign="start" margin='x-small 0'>
           <IconGroupLine />
           {I18n.t('Pair with Observer')}
         </Button>

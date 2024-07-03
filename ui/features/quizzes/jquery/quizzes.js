@@ -4958,7 +4958,7 @@ $.fn.formulaQuestion = function () {
     const mod = 0
     const finished = function () {
       $question.find('.supercalc').superCalc('clear_cached_finds')
-      $button.text('Generate').prop('disabled', false)
+      $button.text(I18n.t('buttons.generate', 'Generate')).prop('disabled', false)
       if (succeeded == 0) {
         alert(
           I18n.t(

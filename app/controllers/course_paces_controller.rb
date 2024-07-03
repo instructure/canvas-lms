@@ -417,8 +417,8 @@ class CoursePacesController < ApplicationController
                       { user_id: @context.user }
                     end
       # Duplicate a published plan if one exists for the plan or for the course
-      published_course_pace = @course.course_paces.published.where(pace_params).take
-      published_course_pace ||= @course.course_paces.published.where(course_section_id: @context.course_section_id).take if @context.is_a?(Enrollment)
+      published_course_pace = @course.course_paces.published.find_by(pace_params)
+      published_course_pace ||= @course.course_paces.published.find_by(course_section_id: @context.course_section_id) if @context.is_a?(Enrollment)
       published_course_pace ||= @course.course_paces.primary.published.take
       if published_course_pace
         @course_pace = published_course_pace.duplicate(pace_params)

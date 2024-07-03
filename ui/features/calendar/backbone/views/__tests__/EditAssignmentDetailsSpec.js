@@ -24,7 +24,7 @@ import timezone from 'timezone'
 import tzInTest from '@instructure/moment-utils/specHelpers'
 import detroit from 'timezone/America/Detroit'
 import french from 'timezone/fr_FR'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 

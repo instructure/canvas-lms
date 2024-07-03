@@ -33,7 +33,6 @@ ready(() => {
   document
     .querySelector('.ic-app-nav-toggle-and-crumbs.no-print')
     ?.setAttribute('style', 'margin: 0 0 0 24px')
-  document.querySelector('#easy_student_view')?.setAttribute('style', 'margin: 0 24px')
 })
 const urlParams = new URLSearchParams(window.location.search)
 if (ENV.SEQUENCE != null && !urlParams.get('embed')) {

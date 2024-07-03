@@ -19,7 +19,6 @@
 import React from 'react'
 
 import $ from 'jquery'
-import 'jquery-migrate'
 import axios from '@canvas/axios'
 import {render, screen} from '@testing-library/react'
 import AccountTabContainer from '../AccountTabContainer'

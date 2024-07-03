@@ -35,7 +35,7 @@ class CollaborationsList extends React.Component {
     return (
       <div className="CollaborationsList">
         <LoadMore
-          isLoading={this.props.collaborationsState.listCollaborationsPending}
+          isLoading={Boolean(this.props.collaborationsState.listCollaborationsPending)}
           hasMore={!!this.props.collaborationsState.nextPage}
           loadMore={this.loadMoreCollaborations}
         >
@@ -54,9 +54,9 @@ class CollaborationsList extends React.Component {
 }
 
 CollaborationsList.propTypes = {
-  collaborationsState: PropTypes.object.isRequired,
-  deleteCollaboration: PropTypes.func.isRequired,
-  getCollaborations: PropTypes.func.isRequired,
+  collaborationsState: PropTypes.object,
+  deleteCollaboration: PropTypes.func,
+  getCollaborations: PropTypes.func,
 }
 
 export default CollaborationsList

@@ -28,6 +28,16 @@ describe('DateUtils', () => {
   })
 
   describe('isoDateFromInput', () => {
+    describe('timezones', () => {
+      it('handles timezone input', () => {
+        const result = isoDateFromInput(
+          'start-date',
+          new Date('2022-02-05T10:18:34'),
+          'Europe/Budapest'
+        )
+        expect(result).toEqual('2022-02-04T23:00:00.000Z')
+      })
+    })
     describe('start dates', () => {
       it('returns an ISO string representing the beginning of the day', () => {
         const result = isoDateFromInput('start-date', new Date('2022-02-05T10:18:34'))

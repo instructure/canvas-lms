@@ -1065,6 +1065,29 @@
       "note": ""
     },
     {
+      "warning_type": "Remote Code Execution",
+      "warning_code": 119,
+      "fingerprint": "ac7f2592c16706e89d16ac41a7507f8abeaec4c0a0df52da89ede40d10d42cab",
+      "check_name": "UnsafeReflectionMethods",
+      "message": "Unsafe reflection method `method` called with model attribute",
+      "file": "app/controllers/grading_periods_controller.rb",
+      "line": 208,
+      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
+      "code": "method(:\"#{Account.active.find_by(:id => GradingPeriodGroup.active.select(:account_id).where(:id => params[:set_id])).class.to_s.downcase}_batch_update\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GradingPeriodsController",
+        "method": "batch_update"
+      },
+      "user_input": "Account.active.find_by(:id => GradingPeriodGroup.active.select(:account_id).where(:id => params[:set_id]))",
+      "confidence": "Medium",
+      "cwe_id": [
+        470
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "acb766c09a1b84e9ea08d27d1677bf0c0cce0c66003733bb303d7ac71a89ee82",
@@ -1536,29 +1559,6 @@
       "confidence": "Medium",
       "cwe_id": [
         89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "Remote Code Execution",
-      "warning_code": 119,
-      "fingerprint": "f0ce9e6c59ff5a02e7830e209ac7bd6b64afd67f4bf02e067e3f2c5d12d05c31",
-      "check_name": "UnsafeReflectionMethods",
-      "message": "Unsafe reflection method `method` called with model attribute",
-      "file": "app/controllers/grading_periods_controller.rb",
-      "line": 208,
-      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
-      "code": "method(:\"#{Account.active.where(:id => GradingPeriodGroup.active.select(:account_id).where(:id => params[:set_id])).take.class.to_s.downcase}_batch_update\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "GradingPeriodsController",
-        "method": "batch_update"
-      },
-      "user_input": "Account.active.where(:id => GradingPeriodGroup.active.select(:account_id).where(:id => params[:set_id]))",
-      "confidence": "Medium",
-      "cwe_id": [
-        470
       ],
       "note": ""
     },

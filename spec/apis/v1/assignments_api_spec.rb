@@ -349,7 +349,7 @@ describe AssignmentsApiController, type: :request do
             a.due_at = due_at
             a.save!
           end
-          assignment_override_model(assignment: @course.assignments.where(title: "assignment4").take,
+          assignment_override_model(assignment: @course.assignments.find_by(title: "assignment4"),
                                     set: @section1,
                                     due_at: 2.months.from_now)
 
@@ -358,10 +358,10 @@ describe AssignmentsApiController, type: :request do
             a.due_at = due_at
             a.save!
           end
-          assignment_override_model(assignment: @course.assignments.where(title: "assignment3").take,
+          assignment_override_model(assignment: @course.assignments.find_by(title: "assignment3"),
                                     set: @section2,
                                     due_at: 2.months.ago)
-          assignment_override_model(assignment: @course.assignments.where(title: "assignment3").take,
+          assignment_override_model(assignment: @course.assignments.find_by(title: "assignment3"),
                                     set: @course.default_section,
                                     due_at: 3.months.from_now)
 

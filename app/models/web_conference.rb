@@ -48,7 +48,7 @@ class WebConference < ActiveRecord::Base
 
   scope :for_context_codes, ->(context_codes) { where(context_code: context_codes) }
 
-  scope :with_config_for, ->(context:) { where(conference_type: WebConference.conference_types(context).pluck("conference_type")) }
+  scope :with_config_for, ->(context:) { where(conference_type: WebConference.conference_types(context).pluck("conference_type")) } # rubocop:disable Rails/PluckInWhere
 
   scope :live, -> { where("web_conferences.started_at BETWEEN (NOW() - interval '1 day') AND NOW() AND (web_conferences.ended_at IS NULL OR web_conferences.ended_at > NOW())") }
 

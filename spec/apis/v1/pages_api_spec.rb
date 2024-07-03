@@ -19,10 +19,12 @@
 
 require_relative "../api_spec_helper"
 require_relative "../locked_examples"
+require_relative "../../helpers/selective_release_common"
 
 describe "Pages API", type: :request do
   include Api::V1::User
   include AvatarHelper
+  include SelectiveReleaseCommon
 
   context "locked api item" do
     let(:item_type) { "page" }
@@ -890,6 +892,7 @@ describe "Pages API", type: :request do
         end
 
         it "if setting is enabled" do
+          differentiated_modules_off
           @course.conditional_release = true
           @course.save!
           expect(page.assignment).not_to be_nil
@@ -1234,6 +1237,7 @@ describe "Pages API", type: :request do
 
       context "feature enabled" do
         before do
+          differentiated_modules_off
           @course.conditional_release = true
           @course.save!
         end
@@ -2336,6 +2340,7 @@ describe "Pages API", type: :request do
 
     context "with selective_release_backend disabled and conditional release disabled" do
       before :once do
+        differentiated_modules_off
         @course.update!(conditional_release: false)
       end
 

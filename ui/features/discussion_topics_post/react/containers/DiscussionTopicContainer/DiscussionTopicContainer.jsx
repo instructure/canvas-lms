@@ -58,11 +58,10 @@ const I18n = useI18nScope('discussion_posts')
 
 import('@canvas/rubrics/jquery/rubricEditBinding')
 
-export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
+export const DiscussionTopicContainer = ({createDiscussionEntry, setExpandedTopicReply, expandedTopicReply, ...props}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [sendToOpen, setSendToOpen] = useState(false)
   const [copyToOpen, setCopyToOpen] = useState(false)
-  const [expandedReply, setExpandedReply] = useState(false)
   const [lastMarkAllAction, setLastMarkAllAction] = useState('')
 
   const {searchTerm, filter} = useContext(SearchContext)
@@ -422,7 +421,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                 {I18n.t('This topic is closed for comments.')}
                               </Text>
                             )}
-                            {props.discussionTopic.permissions?.reply && !expandedReply && (
+                            {props.discussionTopic.permissions?.reply && !expandedTopicReply && (
                               <>
                                 <View
                                   as="div"
@@ -434,7 +433,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                       display={responsiveProps?.replyButton?.display}
                                       color="primary"
                                       onClick={() => {
-                                        setExpandedReply(!expandedReply)
+                                        setExpandedTopicReply(!expandedTopicReply)
                                       }}
                                       data-testid="discussion-topic-reply"
                                     >
@@ -464,27 +463,26 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                           shouldShrink={true}
                           shouldGrow={true}
                           padding={
-                            expandedReply
+                            expandedTopicReply
                               ? responsiveProps?.RCE?.paddingOpen
                               : responsiveProps?.RCE?.paddingClosed
                           }
                           overflowX="hidden"
                           overflowY="hidden"
                         >
-                          {expandedReply && (
+                          {expandedTopicReply && (
                             <DiscussionEdit
                               rceIdentifier="root"
                               discussionAnonymousState={props.discussionTopic.anonymousState}
                               canReplyAnonymously={props.discussionTopic.canReplyAnonymously}
-                              show={expandedReply}
+                              show={expandedTopicReply}
                               onSubmit={(message, _quotedEntryId, file, anonymousAuthorState) => {
                                 if (createDiscussionEntry) {
                                   createDiscussionEntry(message, file, anonymousAuthorState)
-                                  setExpandedReply(false)
                                 }
                               }}
                               onCancel={() => {
-                                setExpandedReply(false)
+                                setExpandedTopicReply(false)
                                 setTimeout(() => {
                                   document
                                     .querySelector('.discussion-topic-reply-button button')
@@ -511,10 +509,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                       margin="0 0 small 0"
                     >
                       <Flex direction="column" padding={responsiveProps?.container?.padding}>
-                        <DiscussionSummary
-                          onDisableSummaryClick={() => props.setIsSummaryEnabled(false)}
-                          showButtonText={!matches.includes('mobile')}
-                        />
+                        <DiscussionSummary onDisableSummaryClick={() => props.setIsSummaryEnabled(false)}/>
                       </Flex>
                     </View>
                   </Flex.Item>

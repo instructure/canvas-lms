@@ -44,7 +44,119 @@ class RubricsForm
     end
 
     def criterion_name_input
-      f("[data-testid='rubric-criterion-description']")
+      f("[data-testid='rubric-criterion-name-input']")
+    end
+
+    def criteria_row_names
+      ff("[data-testid='rubric-criteria-row-description']")
+    end
+
+    def cancel_rubric_button
+      f("[data-testid='cancel-rubric-save-button']")
+    end
+
+    def save_as_draft_button
+      f("[data-testid='save-as-draft-button']")
+    end
+
+    def preview_rubric_button
+      f("[data-testid='preview-rubric-button']")
+    end
+
+    def rubric_rating_order_select
+      f("[data-testid='rubric-rating-order-select']")
+    end
+
+    def high_low_rating_order
+      f("[data-testid='high_low_rating_order']")
+    end
+
+    def low_high_rating_order
+      f("[data-testid='low_high_rating_order']")
+    end
+
+    def traditional_grid_rating_button(index)
+      f("[data-testid^='traditional-criterion-'][data-testid$='-ratings-#{index}']")
+    end
+
+    def criterion_description_input
+      f("[data-testid='rubric-criterion-description-input']")
+    end
+
+    def criteria_row_description
+      f("[data-testid='rubric-criteria-row-long-description']")
+    end
+
+    def criterion_row_rating_accordion
+      f("[data-testid='criterion-row-rating-accordion']")
+    end
+
+    def criterion_rating_scale_accordion_items
+      ff("[data-testid='rating-scale-accordion-item']")
+    end
+
+    def create_from_outcome_button
+      f("[data-testid='create-from-outcome-button']")
+    end
+
+    def outcome_link
+      f("[class='outcome-link']")
+    end
+
+    def import_outcome_button
+      ff("[class='btn-primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only']")[0]
+    end
+
+    def rubric_criteria_row_outcome_tag
+      f("[data-testid='rubric-criteria-row-outcome-tag']")
+    end
+
+    def add_rating_row_button
+      f("[data-testid='add-rating-row']")
+    end
+
+    def rating_name_inputs
+      ff("[data-testid='rating-name']")
+    end
+
+    def rating_description_inputs
+      ff("[data-testid='rating-description']")
+    end
+
+    def remove_rating_buttons
+      ff("[data-testid='remove-rating']")
+    end
+
+    def rubric_criteria_row_delete_button
+      f("[data-testid='rubric-criteria-row-delete-button']")
+    end
+
+    def criterion_rating_scales
+      ff("[data-testid='rating-scale']")
+    end
+
+    def criterion_rating_points_inputs
+      ff("[data-testid='rating-points']")
+    end
+
+    def criterion_row_edit_buttons
+      ff("[data-testid='rubric-criteria-row-edit-button']")
+    end
+
+    def cancel_criterion_button
+      f("[data-testid='rubric-criterion-cancel']")
+    end
+
+    def rubric_criteria_row_duplicate_buttons
+      ff("[data-testid='rubric-criteria-row-duplicate-button']")
+    end
+
+    def limited_edit_mode_message
+      f("[data-testid='rubric-limited-edit-mode-alert']")
+    end
+
+    def non_editable_rating_points
+      ff("[data-testid='rating-points-assessed']")
     end
   end
 end

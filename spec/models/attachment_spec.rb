@@ -858,7 +858,7 @@ describe Attachment do
         old_file_state = a.file_state
         old_workflow_state = a.workflow_state
         a.destroy_content_and_replace
-        purgatory = Purgatory.where(attachment_id: a).take
+        purgatory = Purgatory.find_by(attachment_id: a)
         expect(purgatory.old_filename).to eq old_filename
         expect(purgatory.old_display_name).to eq old_filename
         expect(purgatory.old_content_type).to eq old_content_type

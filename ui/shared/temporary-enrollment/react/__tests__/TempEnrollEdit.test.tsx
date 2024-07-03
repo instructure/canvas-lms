@@ -17,7 +17,6 @@
  */
 
 import {
-  getEnrollmentUserDisplayName,
   getRelevantUserFromEnrollment,
   groupEnrollmentsByPairingId,
   TempEnrollEdit,
@@ -27,42 +26,44 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {type Enrollment, PROVIDER, RECIPIENT, type User} from '../types'
 
 describe('TempEnrollEdit component', () => {
-  let props: any
-
   window.confirm = jest.fn(() => true)
 
-  beforeEach(() => {
-    props = {
-      enrollments: [
-        {
-          id: '1',
-          course_id: '1',
-          user: {
-            name: 'Recipient User',
-            avatar_url: 'https://someurl.com/avatar.png',
-            id: '6789',
-          },
-          start_at: '2021-01-01T00:00:00Z',
-          end_at: '2021-02-01T00:00:00Z',
-          type: 'TeacherEnrollment',
-        },
-      ] as Enrollment[],
-      user: {
-        name: 'Provider User',
-        avatar_url: 'https://someurl.com/avatar.png',
-        id: '1234',
-      },
-      onEdit: jest.fn(),
-      onDelete: jest.fn(),
-      onAddNew: jest.fn(),
-      enrollmentType: PROVIDER,
-      tempEnrollPermissions: {
-        canAdd: true,
-        canDelete: true,
-        canEdit: true,
-      },
-    }
-  })
+  const defaultProvider = {
+    name: 'Provider User',
+    avatar_url: 'https://someurl.com/avatar.png',
+    id: '1234',
+  }
+
+  const defaultRecipient = {
+    name: 'Recipient User',
+    id: '6789',
+  }
+
+  const defaultEnrollments = [
+    {
+      id: '1',
+      course_id: '1',
+      user: defaultRecipient,
+      temporary_enrollment_pairing_id: 10,
+      start_at: '2021-01-01T00:00:00Z',
+      end_at: '2021-02-01T00:00:00Z',
+      type: 'TeacherEnrollment',
+    },
+  ] as Enrollment[]
+
+  const props = {
+    enrollments: defaultEnrollments,
+    user: defaultProvider,
+    onEdit: jest.fn(),
+    onDelete: jest.fn(),
+    onAddNew: jest.fn(),
+    enrollmentType: PROVIDER,
+    tempEnrollPermissions: {
+      canAdd: true,
+      canDelete: true,
+      canEdit: true,
+    },
+  }
 
   afterEach(() => {
     jest.clearAllMocks()
@@ -325,13 +326,6 @@ describe('TempEnrollEdit component', () => {
         }
         const enrollmentUser = getRelevantUserFromEnrollment(tempEnrollment)
         expect(enrollmentUser).toBe(tempEnrollment.user)
-      })
-    })
-
-    describe('getEnrollmentUserDisplayName', () => {
-      it('returns the name of the relevant user', () => {
-        const displayName = getEnrollmentUserDisplayName(mockTempEnrollment)
-        expect(displayName).toBe(mockTempEnrollment.temporary_enrollment_provider!.name)
       })
     })
 

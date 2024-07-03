@@ -345,8 +345,12 @@ export const RubricForm = ({
         </Flex.Item>
 
         {!rubricForm.unassessed && (
-          <Flex.Item>
-            <Alert variant="info" margin="medium 0 0 0">
+          <Flex.Item data-testid="rubric-limited-edit-mode-alert">
+            <Alert
+              variant="info"
+              margin="medium 0 0 0"
+              data-testid="rubric-limited-edit-mode-alert"
+            >
               {I18n.t(
                 'Editing is limited for this rubric as it has already been used for grading.'
               )}
@@ -451,7 +455,9 @@ export const RubricForm = ({
         >
           <Flex justifyItems="end">
             <Flex.Item margin="0 medium 0 0">
-              <Button onClick={() => navigate(navigateUrl)}>{I18n.t('Cancel')}</Button>
+              <Button onClick={() => navigate(navigateUrl)} data-testid="cancel-rubric-save-button">
+                {I18n.t('Cancel')}
+              </Button>
 
               {!rubricForm.hasRubricAssociations && (
                 <Button
@@ -483,6 +489,7 @@ export const RubricForm = ({
               >
                 <Link
                   as="button"
+                  data-testid="preview-rubric-button"
                   isWithinText={false}
                   margin="x-small 0 0 0"
                   onClick={() => setIsPreviewTrayOpen(true)}
@@ -563,10 +570,18 @@ const RubricRatingOrderSelect = ({ratingOrder, onChangeOrder}: RubricRatingOrder
       onChange={(e, {value}) => onChange(value !== undefined ? value.toString() : '')}
       data-testid="rubric-rating-order-select"
     >
-      <SimpleSelectOption id="highToLowOption" value="descending">
+      <SimpleSelectOption
+        id="highToLowOption"
+        value="descending"
+        data-testid="high_low_rating_order"
+      >
         {I18n.t('High < Low')}
       </SimpleSelectOption>
-      <SimpleSelectOption id="lowToHighOption" value="ascending">
+      <SimpleSelectOption
+        id="lowToHighOption"
+        value="ascending"
+        data-testid="low_high_rating_order"
+      >
         {I18n.t('Low < High')}
       </SimpleSelectOption>
     </SimpleSelect>

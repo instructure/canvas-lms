@@ -62,7 +62,7 @@ describe MicrosoftSync::UserMapping do
 
     %w[completed deleted inactive invited rejected].each do |state|
       it "excludes #{state} enrollments" do
-        course.enrollments.where(user: users.first).take.update!(workflow_state: state)
+        course.enrollments.find_by(user: users.first).update!(workflow_state: state)
         calls_results = []
         described_class.find_enrolled_user_ids_without_mappings(
           course:, batch_size: 2

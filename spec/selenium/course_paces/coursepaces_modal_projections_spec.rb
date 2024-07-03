@@ -45,8 +45,8 @@ describe "course pacing page" do
 
   context "course pacing dates visibility" do
     it "shows start and end dates" do
-      @course.start_at = Date.today
-      @course.conclude_at = Date.today + 1.month
+      @course.start_at = Time.zone.today
+      @course.conclude_at = Time.zone.today + 1.month
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
       visit_course_paces_page
@@ -60,7 +60,7 @@ describe "course pacing page" do
       @course_module = create_course_module("New Module", "active")
       @assignment = create_assignment(@course, "Module Assignment", "Module Assignment Description", 10, "published")
       @module_item = @course_module.add_item(id: @assignment.id, type: "assignment")
-      today = Date.today
+      today = Time.zone.today
       @course.start_at = today
       @course.conclude_at = today + 10.days
       @course.restrict_enrollments_to_course_dates = true

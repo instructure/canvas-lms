@@ -160,6 +160,40 @@ describe('RubricAssessmentTray Tests', () => {
       expect(getByTestId('traditional-criterion-2-ratings-0-selected')).toBeInTheDocument()
     })
 
+    it('should select a rating matching user entered points', () => {
+      const {getByTestId} = renderComponent()
+      expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
+      const input = getByTestId('criterion-score-2') as HTMLInputElement
+      fireEvent.change(input, {target: {value: '10'}})
+      fireEvent.blur(input)
+
+      expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('10 pts')
+      expect(getByTestId('traditional-criterion-2-ratings-0-selected')).toBeInTheDocument()
+    })
+
+    it('should not select a rating when user entered points do not match a rating points value', () => {
+      const {getByTestId, queryByTestId} = renderComponent()
+      expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
+      const input = getByTestId('criterion-score-2') as HTMLInputElement
+      fireEvent.change(input, {target: {value: '20'}})
+      fireEvent.blur(input)
+
+      expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('20 pts')
+      expect(queryByTestId('traditional-criterion-2-ratings-0-selected')).not.toBeInTheDocument()
+      expect(queryByTestId('traditional-criterion-2-ratings-1-selected')).not.toBeInTheDocument()
+    })
+
+    it('should select a rating matching user entered points for ranged rubrics', () => {
+      const {getByTestId} = renderComponent()
+      expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
+      const input = getByTestId('criterion-score-1') as HTMLInputElement
+      fireEvent.change(input, {target: {value: '2.5'}})
+      fireEvent.blur(input)
+
+      expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('2.5 pts')
+      expect(getByTestId('traditional-criterion-1-ratings-1-selected')).toBeInTheDocument()
+    })
+
     it('should display the comments section', () => {
       const {getByTestId} = renderComponent()
       expect(getByTestId('comment-text-area-1')).toBeInTheDocument()
@@ -233,7 +267,7 @@ describe('RubricAssessmentTray Tests', () => {
       it('should render point inputs within the points column of the rubric grid', () => {
         const {getByTestId} = renderFreeformComponent({})
 
-        expect(getByTestId('comment-score-1')).toBeInTheDocument()
+        expect(getByTestId('criterion-score-1')).toBeInTheDocument()
       })
 
       it('should not render the comment icon button in the points column', () => {
@@ -244,13 +278,13 @@ describe('RubricAssessmentTray Tests', () => {
 
       it('should update the instructor score when a point input is changed within the points column', () => {
         const {getByTestId} = renderFreeformComponent({})
-        const input = getByTestId('comment-score-1') as HTMLInputElement
+        const input = getByTestId('criterion-score-1') as HTMLInputElement
         fireEvent.change(input, {target: {value: '4'}})
         fireEvent.blur(input)
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('4 pts')
 
-        const input2 = getByTestId('comment-score-2') as HTMLInputElement
+        const input2 = getByTestId('criterion-score-2') as HTMLInputElement
         fireEvent.change(input2, {target: {value: '5'}})
         fireEvent.blur(input2)
 
@@ -323,6 +357,44 @@ describe('RubricAssessmentTray Tests', () => {
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('14 pts')
         expect(getModernSelectedDiv(newRatingDiv)).toBeInTheDocument()
         expect(getModernSelectedDiv(oldRatingDiv)).toBeInTheDocument()
+      })
+
+      it('should select a rating matching user entered points', () => {
+        const {getByTestId} = renderComponentModern('Horizontal')
+        expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
+        const input = getByTestId('criterion-score-2') as HTMLInputElement
+        fireEvent.change(input, {target: {value: '10'}})
+        fireEvent.blur(input)
+
+        expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('10 pts')
+        const ratingDiv = getByTestId('rating-button-10-0')
+        expect(getModernSelectedDiv(ratingDiv)).toBeInTheDocument()
+      })
+
+      it('should not select a rating when user entered points do not match a rating points value', () => {
+        const {getByTestId, queryByTestId} = renderComponentModern('Horizontal')
+        expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
+        const input = getByTestId('criterion-score-2') as HTMLInputElement
+        fireEvent.change(input, {target: {value: '20'}})
+        fireEvent.blur(input)
+
+        expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('20 pts')
+        const ratingDiv1 = getByTestId('rating-button-10-0')
+        const ratingDiv2 = getByTestId('rating-button-00-1')
+        expect(getModernSelectedDiv(ratingDiv1)).not.toBeInTheDocument()
+        expect(getModernSelectedDiv(ratingDiv2)).not.toBeInTheDocument()
+      })
+
+      it('should select a rating matching user entered points for ranged rubrics', () => {
+        const {getByTestId} = renderComponentModern('Horizontal')
+        expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
+        const input = getByTestId('criterion-score-1') as HTMLInputElement
+        fireEvent.change(input, {target: {value: '2.5'}})
+        fireEvent.blur(input)
+
+        expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('2.5 pts')
+        const ratingDiv = getByTestId('rating-button-3-1')
+        expect(getModernSelectedDiv(ratingDiv)).toBeInTheDocument()
       })
 
       describe('Free Form Comments', () => {

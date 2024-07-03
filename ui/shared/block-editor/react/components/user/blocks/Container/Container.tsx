@@ -19,17 +19,7 @@ import React from 'react'
 import {useEditor, useNode} from '@craftjs/core'
 import {useClassNames} from '../../../../utils'
 import {ContainerSettings} from './ContainerSettings'
-
-export type ContainerLayout = 'default' | 'row' | 'column'
-export type ContainerProps = {
-  id?: string
-  className?: string
-  'data-placeholder'?: string
-  background?: string
-  style?: React.CSSProperties
-  layout?: ContainerLayout
-  children?: React.ReactNode
-}
+import {type ContainerProps} from './types'
 
 export const Container = ({
   id,

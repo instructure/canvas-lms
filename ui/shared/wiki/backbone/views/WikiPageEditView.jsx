@@ -231,9 +231,20 @@ export default class WikiPageEditView extends ValidatedFormView {
         version: '1',
         blocks: [{data: undefined}],
       }
+
+      const container = document.getElementById('content')
+      container.style.boxSizing = 'border-box'
+      container.style.width = '100%'
+      container.style.transition = 'width 0.3s ease-in-out'
+
       ReactDOM.render(
         <Suspense fallback={<div>{I18n.t('Loading...')}</div>}>
-          <BlockEditor version={blockEditorData.version} content={blockEditorData.blocks[0].data} />
+          <BlockEditor
+            container={container}
+            version={blockEditorData.version}
+            content={blockEditorData.blocks[0].data}
+            onCancel={this.cancel.bind(this)}
+          />
         </Suspense>,
         document.getElementById('block_editor')
       )

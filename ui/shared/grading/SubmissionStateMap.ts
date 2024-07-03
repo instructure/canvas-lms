@@ -63,7 +63,6 @@ class SubmissionStateMap {
       this.submissionCellMap[student.id] = {}
       this.studentSubmissionMap[student.id] = {}
       Object.values(assignments).forEach(assignment => {
-        // @ts-expect-error
         const submission = student[`assignment_${assignment.id}`] as Submission
         this.setSubmissionCellState(student, assignment, submission)
       })

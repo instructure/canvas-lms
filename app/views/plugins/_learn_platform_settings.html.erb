@@ -1,0 +1,41 @@
+<%
+# Copyright (C) 2024 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%= fields_for :settings do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p><%= t "LearnPlatform provides product information. " +
+                 "The URL provided below should point to a valid LearnPlatform environment (for example, %{url} -- be sure to omit the trailing slash",
+                 url: "https://app.learnplatform.com" %></p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :base_url, :en => "Base URL" %></td>
+      <td>
+        <%= f.text_field :base_url, value: settings[:base_url] %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :token, :en => "Access Token" %></td>
+      <td>
+        <%= f.password_field :token, autocomplete: false %>
+      </td>
+    </tr>
+  </table>
+<% end %>

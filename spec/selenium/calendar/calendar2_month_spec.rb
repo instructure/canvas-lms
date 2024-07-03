@@ -358,7 +358,7 @@ describe "calendar2" do
       it "shows section-level events, but not the parent event" do
         @course.default_section.update_attribute(:name, "default section!")
         s2 = @course.course_sections.create!(name: "other section!")
-        date = Date.today
+        date = Time.zone.today
         e1 = @course.calendar_events.build title: "ohai",
                                            child_event_data: [
                                              { start_at: "#{date} 12:00:00", end_at: "#{date} 13:00:00", context_code: @course.default_section.asset_string },

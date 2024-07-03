@@ -24,6 +24,7 @@ require_relative "../../dashboard/pages/k5_dashboard_page"
 require_relative "../../dashboard/pages/k5_dashboard_common_page"
 require_relative "../../../helpers/k5_common"
 require_relative "../shared_examples/module_selective_release_shared_examples"
+require_relative "../../../helpers/selective_release_common"
 
 describe "selective_release module set up" do
   include_context "in-process server selenium tests"
@@ -33,6 +34,7 @@ describe "selective_release module set up" do
   include K5DashboardPageObject
   include K5DashboardCommonPageObject
   include K5Common
+  include SelectiveReleaseCommon
 
   context "using tray to update settings" do
     before(:once) do

@@ -67,7 +67,7 @@ class MasterCourses::FolderHelper
 
     updated_folders = content_export.context.folders.where("updated_at>?", cutoff_time).where.not(cloned_item_id: nil).preload(:parent_folder)
     updated_folders.each do |source_folder|
-      dest_folder = child_course.folders.active.where(cloned_item_id: source_folder.cloned_item_id).take
+      dest_folder = child_course.folders.active.find_by(cloned_item_id: source_folder.cloned_item_id)
       sync_folder_location(child_course, dest_folder, source_folder) if dest_folder
       if dest_folder && %i[name workflow_state locked lock_at unlock_at].any? { |attr| dest_folder.send(attr) != source_folder.send(attr) }
         %i[name workflow_state locked lock_at unlock_at].each do |attr|
@@ -86,7 +86,7 @@ class MasterCourses::FolderHelper
     return unless source_parent_folder.cloned_item_id.present?
 
     if dest_folder.parent_folder.cloned_item_id != source_parent_folder.cloned_item_id
-      new_parent = dest_course.folders.where(cloned_item_id: source_parent_folder.cloned_item_id).take
+      new_parent = dest_course.folders.find_by(cloned_item_id: source_parent_folder.cloned_item_id)
       dest_folder.parent_folder = new_parent if new_parent
     end
   end

@@ -180,6 +180,8 @@ export type Assignment = Readonly<{
   automatic_peer_reviews: boolean
   can_duplicate: boolean
   course_id: string
+  checkpoints: Checkpoint[]
+  discussion_topic: DiscussionTopic
   due_date_required: boolean
   final_grader_id: null | string
   grade_group_students_individually: boolean
@@ -645,4 +647,28 @@ export type ReleaseNote = {
   url: string
   date: string
   new: boolean
+}
+
+export type DiscussionTopic = {
+  reply_to_entry_required_count: number
+}
+
+export type Checkpoint = {
+  due_at: string | null
+  name: string
+  only_visible_to_overrides: boolean
+  overrides: CheckpointOverride[]
+  points_possible: number
+  tag: string
+}
+
+export type CheckpointOverride = {
+  all_day: boolean
+  all_day_date: string
+  assignment_id: string
+  due_at: string
+  id: string
+  student_ids: string[]
+  title: string
+  unassign_item: boolean
 }

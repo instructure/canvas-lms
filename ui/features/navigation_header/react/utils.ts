@@ -17,6 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
+import axios from 'axios'
 
 const I18n = useI18nScope('Navigation')
 
@@ -32,6 +33,34 @@ type SvgTool = CommonProperties & {svgPath: string}
 type ImgTool = CommonProperties & {imgSrc: string}
 
 export type ExternalTool = SvgTool | ImgTool
+
+export const getExternalApps = async (): Promise<ExternalTool[]> => {
+  const externalApps: ExternalTool[] = []
+
+  const {data: tools} = await axios.get(
+    `/api/v1/accounts/${window.ENV.ACCOUNT_ID}/lti_apps?per_page=50`
+  )
+
+  if (!Array.isArray(tools)) return externalApps
+
+  const values = await Promise.all(
+    tools.map(async (tool: any) => {
+      const {data: detailsData} = await axios.get(
+        `/api/v1/${tool.context.toLowerCase()}s/${tool.context_id}/external_tools/${tool.app_id}`
+      )
+      const externalApp = {
+        href: detailsData?.custom_fields?.url ?? detailsData?.global_navigation?.url,
+        isActive: detailsData?.global_navigation?.enabled,
+        label: detailsData?.global_navigation?.label,
+        svgPath: detailsData?.global_navigation?.icon_svg_path_64,
+        imgSrc: detailsData?.global_navigation?.icon_url,
+      }
+      return externalApp as ExternalTool
+    })
+  )
+
+  return values
+}
 
 export function getExternalTools(): ExternalTool[] {
   return Array.from(document.querySelectorAll('.globalNavExternalTool')).map(el => {
@@ -80,8 +109,9 @@ const ACTIVE_ROUTE_REGEX =
   /^\/(courses|groups|accounts|grades|calendar|conversations|profile)|^#history/
 export function getActiveItem(): ActiveTray | '' {
   const path = window.location.pathname
+  const toolId = window.location.search.split('toolId=')
   const matchData = path.match(EXTERNAL_TOOLS_REGEX) || path.match(ACTIVE_ROUTE_REGEX)
-  return (matchData && (matchData[1] as ActiveTray)) || ''
+  return (toolId && (toolId[1] as ActiveTray)) ?? (matchData && (matchData[1] as ActiveTray)) ?? ''
 }
 
 export function getTrayLabel(type: string | null) {

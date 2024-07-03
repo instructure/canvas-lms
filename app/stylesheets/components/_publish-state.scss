@@ -111,4 +111,19 @@
     font-weight: normal;
     color: $ic-color-alert;
   }
+
+  &.published-course {
+    font-weight: bold;
+    color: $shamrock;
+  }
+
+  &.unpublished-course {
+    font-weight: bold;
+    color: $ic-color-dark;
+  }
+
+  &.completed-course {
+    font-weight: bold;
+    color: $electric;
+  }
 }

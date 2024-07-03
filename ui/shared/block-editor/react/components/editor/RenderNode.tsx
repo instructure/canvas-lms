@@ -45,11 +45,20 @@ import ReactDOM from 'react-dom'
 import {useNode, useEditor, type Node} from '@craftjs/core'
 import {ROOT_NODE} from '@craftjs/utils'
 
-import {IconArrowUpLine, IconTrashLine, IconDragHandleLine} from '@instructure/ui-icons'
-import {IconButton} from '@instructure/ui-buttons'
+import {
+  IconArrowUpLine,
+  IconPlusLine,
+  IconTrashLine,
+  IconDragHandleLine,
+} from '@instructure/ui-icons'
+import {CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
-import {type ViewProps} from '@instructure/ui-view'
+import {View, type ViewProps} from '@instructure/ui-view'
 import {ToolbarSeparator} from './ToolbarSeparator'
+import {getScrollParent, getNodeIndex} from '../../utils'
+import {BlankSection} from '../user/sections/BlankSection'
+
+import {SectionBrowser} from './SectionBrowser'
 
 const findUpNode = (node: Node, query: any): Node | undefined => {
   let upnode = node.data.parent ? query.node(node.data.parent).get() : undefined
@@ -68,11 +77,17 @@ const findContainingSection = (node: Node, query: any): Node | undefined => {
   return upnode && upnode.data.custom?.isSection ? upnode : undefined
 }
 
-type RenderNodeProps = {
+interface RenderNodeProps {
   render: React.ReactElement
 }
 
-export const RenderNode = ({render}: RenderNodeProps) => {
+interface RenderNodeComponent extends React.FC<RenderNodeProps> {
+  globals: {
+    selectedSectionId: string
+  }
+}
+
+export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   const {actions, query} = useEditor(state => {
     if (state.events.selected.size === 0) {
       RenderNode.globals.selectedSectionId = ''
@@ -100,9 +115,10 @@ export const RenderNode = ({render}: RenderNodeProps) => {
     props: n.data.props,
   }))
 
-  const [currentToolbarRef, setCurrentToolbarRef] = useState<HTMLDivElement | null>(null)
+  const [currentToolbarOrTagRef, setCurrentToolbarOrTagRef] = useState<HTMLDivElement | null>(null)
   const [currentMenuRef, setCurrentMenuRef] = useState<HTMLDivElement | null>(null)
   const [upnodeId] = useState<string | undefined>(findUpNode(node, query)?.id)
+  const [sectionBrowserOpen, setSectionBrowserOpen] = useState(false)
 
   useEffect(() => {
     // get a newly dropped block selected
@@ -149,53 +165,48 @@ export const RenderNode = ({render}: RenderNodeProps) => {
   }, [dom, selected, hovered])
 
   const getToolbarPos = useCallback(
-    (domNode: HTMLElement | null) => {
-      const {top, left, bottom} = domNode
-        ? domNode.getBoundingClientRect()
-        : {top: 0, left: 0, bottom: 0}
-      const offset = currentToolbarRef ? currentToolbarRef.getBoundingClientRect().height : 0
+    (domNode: HTMLElement | null, mountPoint: HTMLElement) => {
+      if (!domNode) return {top: 0, left: 0}
+
+      const nodeRect = domNode.getBoundingClientRect()
+      const ntop = nodeRect.top
+      const nleft = nodeRect.left
+
+      const refRect = mountPoint.getBoundingClientRect()
+      const ptop = refRect.top
+      const pleft = refRect.left
+
+      // 5 is the offset of the hover/focus rings
+      const offset = currentToolbarOrTagRef
+        ? currentToolbarOrTagRef.getBoundingClientRect().height + 5
+        : 0
+
       return {
-        top: `${top > 0 ? top - offset : bottom - offset}px`,
-        left: `${left}px`,
+        top: `${ntop - ptop - offset}px`,
+        left: `${nleft - pleft - 5}px`,
       }
     },
-    [currentToolbarRef]
+    [currentToolbarOrTagRef]
   )
+
   const getMenuPos = useCallback(
-    (domNode: HTMLElement | null) => {
-      const {top, left, bottom, width} = domNode
-        ? domNode.getBoundingClientRect()
-        : {top: 0, left: 0, bottom: 0, width: 0}
-      const offset = currentMenuRef ? width - currentMenuRef.getBoundingClientRect().width : 0
+    (domNode: HTMLElement | null, mountPoint: HTMLElement) => {
+      if (!domNode) return {top: 0, left: 0}
+
+      const nodeRect = domNode.getBoundingClientRect()
+      const refRect = mountPoint.getBoundingClientRect()
+
+      const top = nodeRect.top - refRect.top
+      const menuWidth = currentMenuRef ? currentMenuRef.getBoundingClientRect().width : 0
+      const left = nodeRect.left + nodeRect.width - refRect.left - menuWidth
+
       return {
-        top: `${top > 0 ? top : bottom}px`,
-        left: `${left + offset}px`,
+        top: `${top}px`,
+        left: `${left}px`,
       }
     },
     [currentMenuRef]
   )
-
-  const scroll = useCallback(() => {
-    if (currentMenuRef) {
-      const {top, left} = getMenuPos(dom)
-      currentMenuRef.style.top = top
-      currentMenuRef.style.left = left
-    }
-    if (currentToolbarRef) {
-      const {top, left} = getToolbarPos(dom)
-      currentToolbarRef.style.top = top
-      currentToolbarRef.style.left = left
-    }
-  }, [currentMenuRef, currentToolbarRef, dom, getMenuPos, getToolbarPos])
-
-  useEffect(() => {
-    const scroller = document.getElementById('drawer-layout-content') || document
-    scroller.addEventListener('scroll', scroll)
-
-    return () => {
-      scroller.removeEventListener('scroll', scroll)
-    }
-  }, [dom, scroll])
 
   // TODO: maybe setState the upnode so we know whether to show the up button or not
   const handleGoUp = useCallback(
@@ -222,15 +233,16 @@ export const RenderNode = ({render}: RenderNodeProps) => {
 
     return ReactDOM.createPortal(
       <div
-        ref={(el: HTMLDivElement) => setCurrentToolbarRef(el)}
+        ref={(el: HTMLDivElement) => setCurrentToolbarOrTagRef(el)}
         className="block-toolbar"
         style={{
-          left: getToolbarPos(dom).left,
-          top: getToolbarPos(dom).top,
+          left: getToolbarPos(dom, mountPoint).left,
+          top: getToolbarPos(dom, mountPoint).top,
         }}
-        data-timestamp={Date.now()}
       >
-        <Text size="small">{name}</Text>
+        <View as="div" background="brand" padding="0 xx-small" borderRadius="small">
+          <Text size="small">{name}</Text>
+        </View>
         {moveable ? (
           <IconButton
             cursor="move"
@@ -283,23 +295,50 @@ export const RenderNode = ({render}: RenderNodeProps) => {
   }
 
   const renderSectionMenu = () => {
-    const mountPoint = document.querySelector('.block-editor-editor')
+    const mountPoint = document.querySelector('.block-editor-editor') as HTMLElement | null
     if (!mountPoint) return null
-    return node.related?.sectionMenu
-      ? ReactDOM.createPortal(
-          <div
-            ref={(el: HTMLDivElement) => setCurrentMenuRef(el)}
-            className="block-menu"
-            style={{
-              left: getMenuPos(dom).left,
-              top: getMenuPos(dom).top,
-            }}
-          >
-            {React.createElement(node.related.sectionMenu)}
-          </div>,
-          mountPoint
-        )
-      : null
+    if (node.related?.sectionMenu) {
+      const {left, top} = getMenuPos(dom, mountPoint)
+
+      return ReactDOM.createPortal(
+        <div
+          ref={(el: HTMLDivElement) => setCurrentMenuRef(el)}
+          className="section-menu"
+          style={{left, top}}
+        >
+          {React.createElement(node.related.sectionMenu)}
+        </div>,
+        mountPoint
+      )
+    }
+    return null
+  }
+
+  const renderHoverTag = () => {
+    if (node.data?.custom?.noToolbar) return null
+
+    const parentSection = findContainingSection(node, query)
+    if (!parentSection) return null
+
+    const isMySectionSelected = RenderNode.globals.selectedSectionId === parentSection.id
+    if (!isMySectionSelected) return null
+
+    const mountPoint = document.querySelector('.block-editor-editor') as HTMLElement | null
+    if (!mountPoint) return null
+
+    const {left, top} = getToolbarPos(dom, mountPoint)
+    return ReactDOM.createPortal(
+      <div
+        ref={(el: HTMLDivElement) => setCurrentToolbarOrTagRef(el)}
+        className="block-tag"
+        style={{left, top}}
+      >
+        <View as="div" background="secondary" padding="0 xx-small" borderRadius="small">
+          <Text size="small">{name}</Text>
+        </View>
+      </div>,
+      mountPoint
+    )
   }
 
   const renderRelated = () => {
@@ -311,10 +350,36 @@ export const RenderNode = ({render}: RenderNodeProps) => {
     )
   }
 
+  const handleAddSection = useCallback(() => {
+    setSectionBrowserOpen(true)
+  }, [])
+
+  const renderSectionAdder = (isBefore: boolean = false) => {
+    return (
+      <div className="section-adder">
+        <span>
+          <CondensedButton onClick={handleAddSection} renderIcon={<IconPlusLine size="x-small" />}>
+            Section
+          </CondensedButton>
+        </span>
+        {sectionBrowserOpen && (
+          <SectionBrowser
+            open={sectionBrowserOpen}
+            onClose={() => setSectionBrowserOpen(false)}
+            where={isBefore ? 'prepend' : 'append'}
+          />
+        )}
+      </div>
+    )
+  }
+
   return (
     <>
+      {node.data.name === 'PageBlock' && renderSectionAdder(true)}
       {selected && node.related && renderRelated()}
+      {!selected && hovered && renderHoverTag()}
       {render}
+      {node.data.custom?.isSection && renderSectionAdder()}
     </>
   )
 }

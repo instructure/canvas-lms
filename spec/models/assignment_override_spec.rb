@@ -665,34 +665,34 @@ describe AssignmentOverride do
     end
 
     it "determines date from due_at's timezone" do
-      @override.due_at = Date.today.in_time_zone("Baghdad") + 1.hour # 01:00:00 AST +03:00 today
-      expect(@override.all_day_date).to eq Date.today
+      @override.due_at = Time.zone.today.in_time_zone("Baghdad") + 1.hour # 01:00:00 AST +03:00 today
+      expect(@override.all_day_date).to eq Time.zone.today
 
       @override.due_at = @override.due_at.in_time_zone("Alaska") - 2.hours # 12:00:00 AKDT -08:00 previous day
-      expect(@override.all_day_date).to eq Date.today - 1.day
+      expect(@override.all_day_date).to eq Time.zone.today - 1.day
     end
 
     it "preserves all-day date when only changing time zone" do
-      @override.due_at = Date.today.in_time_zone("Baghdad") # 00:00:00 AST +03:00 today
+      @override.due_at = Time.zone.today.in_time_zone("Baghdad") # 00:00:00 AST +03:00 today
       @override.due_at = @override.due_at.in_time_zone("Alaska") # 13:00:00 AKDT -08:00 previous day
-      expect(@override.all_day_date).to eq Date.today
+      expect(@override.all_day_date).to eq Time.zone.today
     end
 
     it "preserves non-all-day date when only changing time zone" do
       Timecop.freeze(Time.utc(2013, 3, 10, 0, 0)) do
-        @override.due_at = Date.today.in_time_zone("Alaska") - 11.hours # 13:00:00 AKDT -08:00 previous day
+        @override.due_at = Time.zone.today.in_time_zone("Alaska") - 11.hours # 13:00:00 AKDT -08:00 previous day
         @override.due_at = @override.due_at.in_time_zone("Baghdad") # 00:00:00 AST +03:00 today
-        expect(@override.all_day_date).to eq Date.today - 1.day
+        expect(@override.all_day_date).to eq Time.zone.today - 1.day
       end
     end
 
     it "sets the date to 11:59 PM of the same day when the date is 12:00 am" do
-      @override.due_at = Date.today.in_time_zone("Alaska").midnight
-      expect(@override.due_at).to eq Date.today.in_time_zone("Alaska").end_of_day
+      @override.due_at = Time.zone.today.in_time_zone("Alaska").midnight
+      expect(@override.due_at).to eq Time.zone.today.in_time_zone("Alaska").end_of_day
     end
 
     it "sets the date to the date given when date is not 12:00 AM" do
-      expected_time = Date.today.in_time_zone("Alaska") - 11.hours
+      expected_time = Time.zone.today.in_time_zone("Alaska") - 11.hours
       @override.unlock_at = expected_time
       expect(@override.unlock_at).to eq expected_time
     end
@@ -704,12 +704,12 @@ describe AssignmentOverride do
     end
 
     it "sets the date to 11:59 PM of the same day when the date is 12:00 AM" do
-      @override.lock_at = Date.today.in_time_zone("Alaska").midnight
-      expect(@override.lock_at).to eq Date.today.in_time_zone("Alaska").end_of_day
+      @override.lock_at = Time.zone.today.in_time_zone("Alaska").midnight
+      expect(@override.lock_at).to eq Time.zone.today.in_time_zone("Alaska").end_of_day
     end
 
     it "sets the date to the date given when date is not 12:00 AM" do
-      expected_time = Date.today.in_time_zone("Alaska") - 11.hours
+      expected_time = Time.zone.today.in_time_zone("Alaska") - 11.hours
       @override.lock_at = expected_time
       expect(@override.lock_at).to eq expected_time
       @override.lock_at = nil

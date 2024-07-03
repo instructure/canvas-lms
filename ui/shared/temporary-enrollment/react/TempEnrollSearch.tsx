@@ -135,12 +135,15 @@ export function TempEnrollSearch(props: Props) {
     } else if (response.duplicates.length > 0) {
       setDuplicateUsers(response.duplicates[0])
       setLoading(false)
+    } else {
+      setMessage(I18n.t('User could not be found.'))
+      props.searchFail()
+      setLoading(false)
     }
   }
 
   useEffect(() => {
     if (props.wasReset) {
-      setMessage('')
       setSelectedDuplicateUser({user_id: '', user_name: ''})
       setUserDetails(EMPTY_USER)
     }
@@ -310,7 +313,9 @@ export function TempEnrollSearch(props: Props) {
             </Table.Head>
             <Table.Body>
               <Table.Row>
-                <Table.RowHeader>{userDetails.name}</Table.RowHeader>
+                <Table.RowHeader>
+                  <TempEnrollAvatar user={userDetails} />
+                </Table.RowHeader>
                 <Table.Cell>{userDetails.primary_email}</Table.Cell>
                 <Table.Cell>{userDetails.login_id}</Table.Cell>
                 {props.canReadSIS ? <Table.Cell>{userDetails.sis_user_id}</Table.Cell> : null}

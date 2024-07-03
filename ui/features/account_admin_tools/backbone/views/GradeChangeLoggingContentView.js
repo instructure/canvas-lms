@@ -25,9 +25,9 @@ import GradeChangeLoggingItemView from './GradeChangeLoggingItemView'
 import GradeChangeLoggingCollection from '../collections/GradeChangeLoggingCollection'
 import template from '../../jst/gradeChangeLoggingContent.handlebars'
 import gradeChangeLoggingResultsTemplate from '../../jst/gradeChangeLoggingResults.handlebars'
-import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
+import {extend} from '@canvas/backbone/utils'
 
-_inherits(GradeChangeLoggingContentView, Backbone.View)
+extend(GradeChangeLoggingContentView, Backbone.View)
 
 export default function GradeChangeLoggingContentView(options) {
   this.fetch = this.fetch.bind(this)

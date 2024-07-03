@@ -19,8 +19,10 @@
 #
 
 require_relative "../graphql_spec_helper"
+require_relative "../../helpers/selective_release_common"
 
 RSpec.describe Mutations::UpdateDiscussionTopic do
+  include SelectiveReleaseCommon
   before(:once) do
     course_with_teacher(active_all: true)
     @attachment = attachment_with_context(@teacher)
@@ -43,7 +45,8 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     checkpoints: nil,
     set_checkpoints: nil,
     group_category_id: nil,
-    ungraded_discussion_overrides: nil
+    ungraded_discussion_overrides: nil,
+    anonymous_state: nil
   )
     <<~GQL
       mutation {
@@ -64,6 +67,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
           #{checkpoints_str(checkpoints)}
           #{"setCheckpoints: #{set_checkpoints}" unless set_checkpoints.nil?}
           #{"ungradedDiscussionOverrides: #{ungraded_discussion_overrides_str(ungraded_discussion_overrides)}" unless ungraded_discussion_overrides.nil?}
+          #{"anonymousState: #{anonymous_state}" unless anonymous_state.nil?}
         }) {
           discussionTopic {
             _id
@@ -82,6 +86,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
                 updatedAt
               }
             }
+            anonymousState
             assignment {
               _id
               pointsPossible
@@ -161,7 +166,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     checkpoints_out = []
     checkpoints.each do |checkpoint|
       args = []
-      args << "checkpointLabel: \"#{checkpoint[:checkpointLabel]}\""
+      args << "checkpointLabel: #{checkpoint[:checkpointLabel]}"
       args << "pointsPossible: #{checkpoint[:pointsPossible]}"
       args << "repliesRequired: #{checkpoint[:repliesRequired]}" if checkpoint[:repliesRequired]
       args << checkpoints_dates_str(checkpoint[:dates])
@@ -282,6 +287,45 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(result["errors"]).to be_nil
       expect(@topic.reload.attachment_id).to eq attachment.id
     end
+  end
+
+  it "allow to update the anonymous state if there is no reply" do
+    @topic.anonymous_state = nil
+    @topic.save!
+    result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity" })
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "anonymousState")).to eq "full_anonymity"
+    @topic.reload
+    expect(@topic.anonymous_state).to eq "full_anonymity"
+  end
+
+  it "should save the anonymous state as NULL when the input value is 'off'" do
+    @topic.anonymous_state = "full_anonymity"
+    @topic.save!
+    result = run_mutation({ id: @topic.id, anonymous_state: "off" })
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "anonymousState")).to be_nil
+    @topic.reload
+    expect(@topic.anonymous_state).to be_nil
+  end
+
+  it "should keep the previous anonymous state if the input value is nil" do
+    @topic.anonymous_state = "full_anonymity"
+    @topic.save!
+    result = run_mutation({ id: @topic.id, anonymous_state: nil })
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "anonymousState")).to eq "full_anonymity"
+    @topic.reload
+    expect(@topic.anonymous_state).to eq "full_anonymity"
+  end
+
+  it "does not allow to update the anonymous state if there is a reply" do
+    create_valid_discussion_entry
+    @topic.anonymous_state = nil
+    @topic.save!
+    result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity" })
+    expect(result.dig("data", "updateDiscussionTopic", "discussionTopic")).to be_nil
+    expect(@topic.anonymous_state).to be_nil
   end
 
   it "publishes the discussion topic" do
@@ -513,6 +557,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     end
 
     it "can turn graded topic into ungraded section-specific topic in one edit" do
+      differentiated_modules_off
       section1 = @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
 

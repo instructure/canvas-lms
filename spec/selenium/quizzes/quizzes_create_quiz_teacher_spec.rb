@@ -24,6 +24,7 @@ require_relative "../helpers/files_common"
 require_relative "../helpers/admin_settings_common"
 require_relative "../rcs/pages/rce_next_page"
 require_relative "../helpers/wiki_and_tiny_common"
+require_relative "../../helpers/selective_release_common"
 
 describe "creating a quiz" do
   include_context "in-process server selenium tests"
@@ -33,6 +34,7 @@ describe "creating a quiz" do
   include AdminSettingsCommon
   include RCENextPage
   include WikiAndTinyCommon
+  include SelectiveReleaseCommon
 
   context "as a teacher" do
     before do
@@ -42,6 +44,8 @@ describe "creating a quiz" do
 
     context "when the course has two sections" do
       before do
+        differentiated_modules_off
+
         @section_a = @course.course_sections.first
         @section_b = @course.course_sections.create!(name: "Section B")
         course_quiz(active: true)
@@ -92,6 +96,8 @@ describe "creating a quiz" do
     end
 
     it "prevents assigning a quiz to no one", priority: 1 do
+      differentiated_modules_off
+
       course_quiz(active: true)
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
       assign_quiz_to_no_one
@@ -225,6 +231,7 @@ describe "creating a quiz" do
       end
 
       it "blocks with only overrides" do
+        differentiated_modules_off
         @course.course_sections.create!(name: section_to_set)
         new_quiz
         assign_quiz_to_no_one
@@ -241,6 +248,7 @@ describe "creating a quiz" do
 
         describe "and differentiated" do
           it "does not block with base due date and override" do
+            differentiated_modules_off
             @course.course_sections.create!(name: section_to_set)
             new_quiz
             add_override
@@ -252,6 +260,8 @@ describe "creating a quiz" do
 
       context "without due dates" do
         it "blocks when enabled" do
+          differentiated_modules_off
+
           @course.course_sections.create!(name: section_to_set)
           new_quiz
           select_last_override_section(section_to_set)
@@ -266,6 +276,8 @@ describe "creating a quiz" do
         end
 
         it "blocks with base set with override not" do
+          differentiated_modules_off
+
           @course.course_sections.create!(name: section_to_set)
           new_quiz
           Timecop.freeze(7.days.from_now) do

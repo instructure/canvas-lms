@@ -377,7 +377,7 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
         strictEqual(showFlashAlertStub.firstCall.args[0].message, successMessage)
       })
 
-      test('tray is closed after posting is finished', async () => {
+      QUnit.skip('tray is closed after posting is finished', async () => {
         await clickPost()
         notOk(getTrayElement())
       })

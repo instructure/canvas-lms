@@ -206,7 +206,7 @@ describe Types::CourseType do
         @term1_assignment1 = course.assignments.create! name: "asdf",
                                                         due_at: 1.5.weeks.ago
         @term2_assignment1 = course.assignments.create! name: ";lkj",
-                                                        due_at: Date.today
+                                                        due_at: Time.zone.today
       end
 
       it "only returns assignments for the current grading period" do

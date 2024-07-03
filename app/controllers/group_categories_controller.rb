@@ -371,7 +371,6 @@ class GroupCategoriesController < ApplicationController
         if api_request?
           render json: group_category_json(@group_category, @current_user, session)
         else
-          flash[:notice] = t("notices.delete_category_success", "Category successfully deleted")
           render json: { deleted: true }
         end
       elsif api_request?

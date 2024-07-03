@@ -23,7 +23,8 @@ import {Flex} from '@instructure/ui-flex'
 import {RatingButton} from './RatingButton'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {escapeNewLineText} from './utils/rubricUtils'
+import {escapeNewLineText, rangingFrom} from './utils/rubricUtils'
+import {possibleString, possibleStringRange} from '../Points'
 
 const {licorice} = colors
 
@@ -33,6 +34,7 @@ type HorizontalButtonDisplayProps = {
   ratingOrder: string
   selectedRatingIndex?: number
   onSelectRating: (index: number) => void
+  criterionUseRange: boolean
 }
 export const HorizontalButtonDisplay = ({
   isPreviewMode,
@@ -40,8 +42,10 @@ export const HorizontalButtonDisplay = ({
   ratingOrder,
   selectedRatingIndex = -1,
   onSelectRating,
+  criterionUseRange,
 }: HorizontalButtonDisplayProps) => {
   const selectedRating = ratings[selectedRatingIndex]
+  const min = criterionUseRange ? rangingFrom(ratings, selectedRatingIndex) : undefined
   return (
     <View as="div" data-testid="rubric-assessment-horizontal-display">
       {selectedRatingIndex >= 0 && (
@@ -65,6 +69,13 @@ export const HorizontalButtonDisplay = ({
               size="x-small"
               dangerouslySetInnerHTML={escapeNewLineText(selectedRating?.longDescription)}
             />
+          </View>
+          <View as="div" textAlign="end">
+            <Text size="x-small" weight="bold">
+              {min != null
+                ? possibleStringRange(min, ratings[selectedRatingIndex]?.points)
+                : possibleString(ratings[selectedRatingIndex]?.points)}
+            </Text>
           </View>
         </View>
       )}

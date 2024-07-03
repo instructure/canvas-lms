@@ -111,7 +111,7 @@ describe "courses/_settings_sidebar" do
         render
         doc = Nokogiri::HTML5(response.body)
         tool_link = doc.at_css(".course-settings-sub-navigation-lti")
-        expect(tool_link.to_html).to include("<img class=\"icon\" alt=\"\" src=\"/images/delete.png\">external tool")
+        expect(tool_link.to_html).to include("<img class=\"icon lti_tool_icon\" alt=\"\" src=\"/images/delete.png\">external tool")
       end
     end
   end

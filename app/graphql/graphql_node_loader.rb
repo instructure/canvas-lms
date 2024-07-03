@@ -105,7 +105,7 @@ module GraphQLNodeLoader
     when "InternalSettingByName"
       return nil unless Account.site_admin.grants_right?(ctx[:current_user], ctx[:session], :manage_internal_settings)
 
-      Setting.where(name: id).take
+      Setting.find_by(name: id)
     when "MyInboxSettings"
       return nil unless Account.site_admin.feature_enabled?(:inbox_settings)
       return nil unless !id.nil? && !ctx[:domain_root_account].nil?

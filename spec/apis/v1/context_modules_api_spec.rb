@@ -1200,7 +1200,7 @@ describe "Modules API", type: :request do
         )
       end
 
-      it "sould include lock information" do
+      it "should include lock information" do
         expect(assignment_details).to include(
           "locked_for_user" => false
         )
@@ -1211,7 +1211,9 @@ describe "Modules API", type: :request do
           "locked_for_user" => true
         )
         expect(wiki_page_details["lock_info"]).to include(
-          "asset_string" => @wiki_page.asset_string,
+          "asset_string" => @wiki_page.asset_string
+        )
+        expect(wiki_page_details["lock_info"]["context_module"]).to include(
           "unlock_at" => @christmas.as_json
         )
       end

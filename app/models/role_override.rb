@@ -132,6 +132,14 @@ class RoleOverride < ActiveRecord::Base
         true_for: %w[AccountAdmin],
         available_to: %w[AccountAdmin AccountMembership],
       },
+      manage_access_tokens: {
+        label: -> { t("Manage Access Token") },
+        label_v2: -> { t("Access Token - manage") },
+        account_only: :root,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
+        account_allows: ->(a) { a.feature_enabled?(:admin_manage_access_tokens) }
+      },
       manage_account_memberships: {
         label: -> { t("permissions.manage_account_memberships", "Add/remove other admins for the account") },
         label_v2: -> { t("Admins - add / remove") },

@@ -240,14 +240,14 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def last_export_started_at
     unless defined?(@last_export_started_at)
-      @last_export_started_at = master_migrations.where(workflow_state: "completed").order("id DESC").limit(1).pluck(:exports_started_at).first
+      @last_export_started_at = master_migrations.where(workflow_state: "completed").order("id DESC").limit(1).pick(:exports_started_at)
     end
     @last_export_started_at
   end
 
   def last_export_completed_at
     unless defined?(@last_export_completed_at)
-      @last_export_completed_at = master_migrations.where(workflow_state: "completed").order("id DESC").limit(1).pluck(:imports_completed_at).first
+      @last_export_completed_at = master_migrations.where(workflow_state: "completed").order("id DESC").limit(1).pick(:imports_completed_at)
     end
     @last_export_completed_at
   end

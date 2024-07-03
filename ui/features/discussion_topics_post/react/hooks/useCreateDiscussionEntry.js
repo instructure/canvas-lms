@@ -21,26 +21,37 @@ import {CREATE_DISCUSSION_ENTRY} from '../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {captureException} from '@sentry/react'
 
 const I18n = useI18nScope('discussion_topics_post')
 
 export default function useCreateDiscussionEntry(onCompleteCallback, updateCacheCallback) {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
 
-  const [createDiscussionEntry, {data, loading}] = useMutation(CREATE_DISCUSSION_ENTRY, {
+  const [createDiscussionEntry, {data, loading, error}] = useMutation(CREATE_DISCUSSION_ENTRY, {
     onCompleted: completionData => {
       // Common onCompletion handling logic here.
       setOnSuccess(I18n.t('The discussion entry was successfully created.'))
 
       if (onCompleteCallback) {
         // Additional, component-specific completion handling logic here.
-        onCompleteCallback(completionData)
+        onCompleteCallback(completionData, true)
       }
     },
-    onError: () => {
-      // Common error handling logic here.
+    onError: errorData => {
+      // Common onError handling logic here.
       setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
+
+      captureException(
+        new Error(`Error received when creating the discussion entry: ${errorData.message}`)
+      )
+
+      if (onCompleteCallback) {
+        // Additional, component-specific completion handling logic here.
+        onCompleteCallback(errorData, false)
+      }
     },
+
     // Pass in caching update logic
     update: updateCacheCallback,
   })
@@ -49,5 +60,6 @@ export default function useCreateDiscussionEntry(onCompleteCallback, updateCache
     createDiscussionEntry,
     data,
     loading,
+    error,
   }
 }

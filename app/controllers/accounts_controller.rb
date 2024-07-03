@@ -299,7 +299,7 @@ class AccountsController < ApplicationController
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
-  before_action :page_has_instui_topnav, only: %i[show users statistics settings]
+  before_action :page_has_instui_topnav, only: %i[show users]
 
   include Api::V1::Account
   include CustomSidebarLinksHelper
@@ -952,7 +952,7 @@ class AccountsController < ApplicationController
             quota_value = quota_settings[quota_type].to_s.strip
             if INTEGER_REGEX.match?(quota_value.to_s)
               @account.errors.add(quota_type, t(:quota_must_be_positive, "Value must be positive")) if quota_value.to_i < 0
-              @account.errors.add(quota_type, t(:quota_too_large, "Value too large")) if quota_value.to_i >= (2**62) / 1.megabytes
+              @account.errors.add(quota_type, t(:quota_too_large, "Value too large")) if quota_value.to_i >= (2**62) / 1.decimal_megabytes
             else
               @account.errors.add(quota_type, t(:quota_integer_required, "An integer value is required"))
             end
@@ -1298,6 +1298,8 @@ class AccountsController < ApplicationController
 
   def settings
     if authorized_action(@account, @current_user, :read_as_admin)
+      add_crumb t(:settings_crumb, "Settings")
+      page_has_instui_topnav
       @account_users = @account.account_users.active
       @account_user_permissions_cache = AccountUser.create_permissions_cache(@account_users, @current_user, session)
       ActiveRecord::Associations.preload(@account_users, user: :communication_channels)
@@ -1369,6 +1371,9 @@ class AccountsController < ApplicationController
     unless @account.can_see_admin_tools_tab?(@current_user)
       return render_unauthorized_action
     end
+
+    add_crumb t("Admin tools")
+    page_has_instui_topnav
 
     authentication_logging = @account.grants_any_right?(@current_user, :view_statistics, :manage_user_logins)
     grade_change_logging = @account.grants_right?(@current_user, :view_grade_changes)
@@ -1486,6 +1491,11 @@ class AccountsController < ApplicationController
 
   def eportfolio_moderation
     if authorized_action(@account, @current_user, :moderate_user_content)
+
+      @page_title = t("Eportfolio Moderation")
+      add_crumb @page_title
+      page_has_instui_topnav
+
       spam_status_order = "CASE spam_status WHEN 'flagged_as_possible_spam' THEN 0 WHEN 'marked_as_spam' THEN 1 WHEN 'marked_as_safe' THEN 2 ELSE 3 END"
       @eportfolios = Eportfolio.active.preload(:user)
                                .joins(:user)
@@ -1516,7 +1526,8 @@ class AccountsController < ApplicationController
 
   def statistics
     if authorized_action(@account, @current_user, :view_statistics)
-      add_crumb(t(:crumb_statistics, "Statistics"), statistics_account_url(@account))
+      add_crumb(t(:crumb_statistics, "Statistics"))
+      page_has_instui_topnav
       if @account.grants_right?(@current_user, :read_course_list)
         @recently_started_courses = @account.associated_courses.active.recently_started
         @recently_ended_courses = @account.associated_courses.active.recently_ended

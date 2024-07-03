@@ -298,6 +298,7 @@ EditView.prototype.toJSON = function () {
     allow_todo_date: data.todo_date != null,
     unlocked: data.locked === void 0 ? !this.isAnnouncement() : !data.locked,
     announcementsLocked: this.announcementsLocked,
+    isCreate: !this.options.isEditing,
   })
   json.assignment = json.assignment.toView()
   return json

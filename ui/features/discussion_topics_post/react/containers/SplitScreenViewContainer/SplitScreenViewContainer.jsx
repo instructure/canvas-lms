@@ -63,6 +63,7 @@ export const SplitScreenViewContainer = props => {
   const {replyFromId, setReplyFromId} = useContext(DiscussionManagerUtilityContext)
   const [fetchingMoreOlderReplies, setFetchingMoreOlderReplies] = useState(false)
   const [fetchingMoreNewerReplies, setFetchingMoreNewerReplies] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
   const closeButtonRef = useRef()
 
   const replyButtonRef = useRef()
@@ -83,15 +84,18 @@ export const SplitScreenViewContainer = props => {
     props.setHighlightEntryId(newDiscussionEntry._id)
   }
 
-  const onEntryCreationCompletion = data => {
-    props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
-    if (splitScreenEntryOlderDirection.data.legacyNode.depth > 3) {
-      props.onOpenSplitScreenView(data.createDiscussionEntry.discussionEntry.rootEntryId, false)
-    } else if (splitScreenEntryOlderDirection.data.legacyNode.depth === 3) {
-      props.onOpenSplitScreenView(data.createDiscussionEntry.discussionEntry.parentId, false)
+  const onEntryCreationCompletion = (data, success) => {
+    if (success) {
+      props.setRCEOpen(false)
+      props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
+      if (splitScreenEntryOlderDirection.data.legacyNode.depth > 3) {
+        props.onOpenSplitScreenView(data.createDiscussionEntry.discussionEntry.rootEntryId, false)
+      } else if (splitScreenEntryOlderDirection.data.legacyNode.depth === 3) {
+        props.onOpenSplitScreenView(data.createDiscussionEntry.discussionEntry.parentId, false)
+      }
+      props.setReplyToTopicSubmission(getCheckpointSubmission(data, REPLY_TO_TOPIC))
+      props.setReplyToEntrySubmission(getCheckpointSubmission(data, REPLY_TO_ENTRY))
     }
-    props.setReplytoTopicSubmission(getCheckpointSubmission(data, REPLY_TO_TOPIC))
-    props.setReplyToEntrySubmission(getCheckpointSubmission(data, REPLY_TO_ENTRY))
   }
 
   const {createDiscussionEntry} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
@@ -111,6 +115,7 @@ export const SplitScreenViewContainer = props => {
     onCompleted: data => {
       if (!data.updateDiscussionEntry.errors) {
         setOnSuccess(I18n.t('The reply was successfully updated.'))
+        setIsEditing(false)
       } else {
         setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
       }
@@ -426,6 +431,8 @@ export const SplitScreenViewContainer = props => {
           }
           onToggleRating={() => toggleRating(splitScreenEntryOlderDirection.data.legacyNode)}
           onSave={onUpdate}
+          isEditing={isEditing}
+          setIsEditing={setIsEditing}
           onOpenSplitScreenView={props.onOpenSplitScreenView}
           setRCEOpen={props.setRCEOpen}
           RCEOpen={props.RCEOpen}
@@ -448,7 +455,6 @@ export const SplitScreenViewContainer = props => {
                 canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
                 onSubmit={(message, quotedEntryId, file, anonymousAuthorState) => {
                   onReplySubmit(message, file, quotedEntryId, anonymousAuthorState)
-                  props.setRCEOpen(false)
                 }}
                 onCancel={() => {
                   props.setRCEOpen(false)
@@ -565,7 +571,7 @@ SplitScreenViewContainer.propTypes = {
   setHighlightEntryId: PropTypes.func,
   relativeEntryId: PropTypes.string,
   isTrayFinishedOpening: PropTypes.bool,
-  setReplytoTopicSubmission: PropTypes.func,
+  setReplyToTopicSubmission: PropTypes.func,
   setReplyToEntrySubmission: PropTypes.func,
 }
 

@@ -29,11 +29,14 @@ export type Card = {
   image: string
   isFavorited: boolean
   enrollmentType: string
-  observee: boolean
+  enrollmentState: string
+  observee: string
   position: number
   published: boolean
   canChangeCoursePublishState: boolean
   defaultView: string
   pagesUrl: string
   frontPageTitle: string
+  isK5Subject: boolean
+  isHomeroom: boolean
 }

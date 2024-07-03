@@ -4061,9 +4061,9 @@ describe CoursesController do
 
       describe "create" do
         it "sets storage_quota" do
-          post "create", params: { account_id: @account.id, course: { name: "xyzzy", storage_quota: 111.megabytes } }
+          post "create", params: { account_id: @account.id, course: { name: "xyzzy", storage_quota: 111.decimal_megabytes } }
           @course = @account.courses.where(name: "xyzzy").first
-          expect(@course.storage_quota).to eq 111.megabytes
+          expect(@course.storage_quota).to eq 111.decimal_megabytes
         end
 
         it "sets storage_quota_mb" do
@@ -4079,8 +4079,8 @@ describe CoursesController do
         end
 
         it "sets storage_quota" do
-          post "update", params: { id: @course.id, course: { storage_quota: 111.megabytes } }
-          expect(@course.reload.storage_quota).to eq 111.megabytes
+          post "update", params: { id: @course.id, course: { storage_quota: 111.decimal_megabytes } }
+          expect(@course.reload.storage_quota).to eq 111.decimal_megabytes
         end
 
         it "sets storage_quota_mb" do
@@ -4108,7 +4108,7 @@ describe CoursesController do
         end
 
         it "ignores storage_quota" do
-          post "create", params: { account_id: @account.id, course: { name: "xyzzy", storage_quota: 111.megabytes } }
+          post "create", params: { account_id: @account.id, course: { name: "xyzzy", storage_quota: 111.decimal_megabytes } }
           @course = @account.courses.where(name: "xyzzy").first
           expect(@course.storage_quota).to eq @account.default_storage_quota
         end
@@ -4116,7 +4116,7 @@ describe CoursesController do
         it "ignores storage_quota_mb" do
           post "create", params: { account_id: @account.id, course: { name: "xyzpdq", storage_quota_mb: 111 } }
           @course = @account.courses.where(name: "xyzpdq").first
-          expect(@course.storage_quota_mb).to eq @account.default_storage_quota / 1.megabyte
+          expect(@course.storage_quota_mb).to eq @account.default_storage_quota / 1.decimal_megabytes
         end
       end
 
@@ -4142,7 +4142,7 @@ describe CoursesController do
                  account_id: @account.id,
                  course: {
                    name: "xyzzy",
-                   storage_quota: 111.megabytes
+                   storage_quota: 111.decimal_megabytes
                  }
                }
           @course = @account.courses.where(name: "xyzzy").first
@@ -4159,7 +4159,7 @@ describe CoursesController do
                  }
                }
           @course = @account.courses.where(name: "xyzpdq").first
-          expect(@course.storage_quota_mb).to eq @account.default_storage_quota / 1.megabyte
+          expect(@course.storage_quota_mb).to eq @account.default_storage_quota / 1.decimal_megabytes
         end
       end
 
@@ -4172,7 +4172,7 @@ describe CoursesController do
         before { user_session(@teacher) }
 
         it "ignores storage_quota" do
-          post "update", params: { id: @course.id, course: { public_description: "wat", storage_quota: 111.megabytes } }
+          post "update", params: { id: @course.id, course: { public_description: "wat", storage_quota: 111.decimal_megabytes } }
           @course.reload
           expect(@course.public_description).to eq "wat"
           expect(@course.storage_quota).to eq @account.default_storage_quota
@@ -4182,7 +4182,7 @@ describe CoursesController do
           post "update", params: { id: @course.id, course: { public_description: "wat", storage_quota_mb: 111 } }
           @course.reload
           expect(@course.public_description).to eq "wat"
-          expect(@course.storage_quota_mb).to eq @account.default_storage_quota / 1.megabyte
+          expect(@course.storage_quota_mb).to eq @account.default_storage_quota / 1.decimal_megabytes
         end
       end
     end

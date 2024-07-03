@@ -33,6 +33,7 @@ module ContextModulesHelper
                          can_delete,
                          is_student,
                          can_view_unpublished,
+                         @module_ids_with_overrides&.include?(context_module.id),
                          true,
                          Time.zone,
                          Digest::SHA256.hexdigest([visible_assignments, @section_visibility].join("/"))]

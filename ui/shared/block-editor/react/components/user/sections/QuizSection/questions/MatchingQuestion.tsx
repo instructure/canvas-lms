@@ -100,7 +100,7 @@ const MatchingQuestion = ({question, onAnswerChange}: MatchingQuestionProps) => 
   }
 
   return (
-    <div className="question-block__body">
+    <div className="quiz-section__body">
       <div style={{margin: '0 0 .75rem'}} dangerouslySetInnerHTML={{__html: question.item_body}} />
       {renderChoices()}
     </div>

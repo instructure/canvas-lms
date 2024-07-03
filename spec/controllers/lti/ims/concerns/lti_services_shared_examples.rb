@@ -127,7 +127,7 @@ shared_examples_for "lti services" do
       let(:before_send_request) do
         lambda do
           allow(Canvas::Security::JwtValidator).to receive(:new).and_return(jwt_validator)
-          expect(jwt_validator).to receive(:valid?).and_raise(StandardError)
+          expect(jwt_validator).to receive(:valid?).and_raise(StandardError) # rubocop:disable RSpec/ExpectInLet
         end
       end
 

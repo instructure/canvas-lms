@@ -320,14 +320,14 @@ describe Course do
       params = { copy: { "assignments" => { "gf455e2add230724ba190bb20c1491aa9" => true } } }
       migration = build_migration(@course, params)
       setup_import(@course, "discussion_assignments.json", migration)
-      a1 = @course.assignments.where(migration_id: "gf455e2add230724ba190bb20c1491aa9").take
+      a1 = @course.assignments.find_by(migration_id: "gf455e2add230724ba190bb20c1491aa9")
       a1.assignment_group.destroy!
 
       # import again but just the discus
       params = { copy: { "discussion_topics" => { "g8bacee869e70bf19cd6784db3efade7e" => true } } }
       migration = build_migration(@course, params)
       setup_import(@course, "discussion_assignments.json", migration)
-      dt = @course.discussion_topics.where(migration_id: "g8bacee869e70bf19cd6784db3efade7e").take
+      dt = @course.discussion_topics.find_by(migration_id: "g8bacee869e70bf19cd6784db3efade7e")
       expect(dt.assignment.assignment_group).to eq a1.assignment_group
       expect(dt.assignment.assignment_group).to_not be_deleted
       expect(a1.reload).to be_deleted # didn't restore the previously deleted assignment too
@@ -688,7 +688,7 @@ describe Course do
     it "puts a new assignment into assignment group" do
       @course.assignments.create! title: "other", assignment_group: @new_group
       Importers::CourseContentImporter.import_content(@course, @data, @params, @migration)
-      new_assign = @course.assignments.where(migration_id: "1865116014002").take
+      new_assign = @course.assignments.find_by(migration_id: "1865116014002")
       expect(new_assign.assignment_group_id).to eq @new_group.id
     end
 
@@ -701,7 +701,7 @@ describe Course do
 
     it "moves classic quiz assignment into new group" do
       Importers::CourseContentImporter.import_content(@course, @data, @params, @migration)
-      quiz = @course.quizzes.where(migration_id: "1865116160002").take
+      quiz = @course.quizzes.find_by(migration_id: "1865116160002")
       expect(quiz.reload.assignment_group_id).to eq @new_group.id
       expect(quiz.assignment.reload.assignment_group_id).to eq @new_group.id
     end

@@ -317,7 +317,7 @@ describe "root account basic settings" do
 
     # ensure the account was updated properly
     account.reload
-    expect(account.default_user_storage_quota).to eq user_quota * 1_048_576
+    expect(account.default_user_storage_quota).to eq user_quota * 1_000_000
 
     # ensure the new value is reflected after a refresh
     get account_settings_url

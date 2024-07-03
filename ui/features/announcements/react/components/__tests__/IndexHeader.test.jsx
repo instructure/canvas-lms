@@ -44,6 +44,7 @@ const defaultProps = () => ({
   deleteSelectedAnnouncements: () => Promise.reject(new Error('Not Implemented')),
   searchInputRef: null,
   announcementsLocked: false,
+  markAllAnnouncementRead: jest.fn(),
 })
 
 describe('IndexHeader', () => {
@@ -66,11 +67,6 @@ describe('IndexHeader', () => {
   it('renders filter dropdown', () => {
     render(<IndexHeader {...defaultProps()} />)
     expect(screen.getByRole('combobox', {name: 'Announcement Filter'})).toBeInTheDocument()
-  })
-
-  it('renders search input', () => {
-    render(<IndexHeader {...defaultProps()} />)
-    expect(screen.getByRole('textbox', {name: 'Search announcements by title'})).toBeInTheDocument()
   })
 
   it('lets me add an announcement when I have the permission', () => {

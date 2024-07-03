@@ -746,11 +746,11 @@ describe Group do
 
     it "is overridden by the account's default_group_storage_quota" do
       a = @group.account
-      a.default_group_storage_quota = 10.megabytes
+      a.default_group_storage_quota = 10.decimal_megabytes
       a.save!
 
       @group.reload
-      expect(@group.quota).to eq 10.megabytes
+      expect(@group.quota).to eq 10.decimal_megabytes
     end
 
     it "inherits from a parent account's default_group_storage_quota" do
@@ -758,20 +758,20 @@ describe Group do
         account = account_model
         subaccount = account.sub_accounts.create!
 
-        account.default_group_storage_quota = 10.megabytes
+        account.default_group_storage_quota = 10.decimal_megabytes
         account.save!
 
         course_factory(account: subaccount)
         @group = group(group_context: @course)
 
-        expect(@group.quota).to eq 10.megabytes
+        expect(@group.quota).to eq 10.decimal_megabytes
 
         # should reload
-        account.default_group_storage_quota = 20.megabytes
+        account.default_group_storage_quota = 20.decimal_megabytes
         account.save!
         @group = Group.find(@group.id)
 
-        expect(@group.quota).to eq 20.megabytes
+        expect(@group.quota).to eq 20.decimal_megabytes
       end
     end
   end

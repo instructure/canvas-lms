@@ -2334,6 +2334,7 @@ tr:
   an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "%{user_id} ÖBS ID'li varolan bir Canvas kullanıcısı önceden %{other_user_id}'nın user_id oturum açma bilgisi isteğinde bulundu, atlanıyor"
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "%{user_id} ÖBS ID'li varolan bir Canvas kullanıcısı önceden %{other_user_id}'nın  integration_id isteğinde bulundu, atlanıyor"
   an_export_is_already_in_progress_54270f01: "Bir dışa aktarım işlemi zaten devam ediyor."
+  an_integer_value_is_required_e073bd46: "Bir tamsayı değeri gerekiyor"
   an_internal_error_occurred_83b8a685: "Dahili bir hata oluştu"
   an_item_named_name_already_exists_in_this_location_147b7312: "\"%{name}\" adına bir öğe zaten bu konumda mevcut. Var olan dosyayı değiştirmek ister misiniz?"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Bilinmeyen sunucu hatası oluştu. Lütfen tekrar deneyin."
@@ -5778,6 +5779,7 @@ tr:
   count_participations_ac8f82b7: 
     one: "1 katılım"
     other: "%{count} katılım"
+  count_people_489946e7: "%{count} katılımcı"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{user_name} başarılı bir şekilde *%{course_name}* dersine kaydoldu."
     other: "%{count} kişi başarılı bir şekilde *%{course_name}* dersine kaydoldu."
@@ -6143,6 +6145,7 @@ tr:
     greater_than_three: "Lütfen üç veya daha fazla karakter içeren bir arama terimi girin"
     unknown_error: "Aramanız esnasında bazı şeyler yanlış gitti, lütfen tekrar deneyiniz."
   course_visibility_options_ca8ab3a8: "Ders Görülebilirlik Seçenekleri"
+  course_was_successfully_updated_1ab0e9f8: "Ders başarılı bir şekilde güncellendi."
   courses: 
     assignments_needing_grading: 
       headings: 
@@ -8025,6 +8028,7 @@ tr:
   enrollments_teachers: Öğretmenler
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "İsteğe bağlı bir renk kullanmak için bir hexcode girin."
   enter_a_score_to_test_c6f89f4a: "Teste bir puan gir"
+  enter_a_section_name_adbe3099: "Bir bölüm adı giriniz"
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Kullanıcının kök hesabı alan adını değiştireceğiniz \"{{ACCOUNT_DOMAIN}}\" i girin."
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Kullanıcının özel Canvas Kimliğini değiştireceğiniz \"{{CANVAS_USER_ID}}\" i girin."
   enter_grades_as_e113e606: "Notları şu şekilde gir"
@@ -10440,6 +10444,7 @@ tr:
   invalid_recipient_name_56b22b86: "Geçersiz alıcı adı."
   invalid_restrictions_316cd740: "Geçersiz kısıtlamalar"
   invalid_state_parameter_7a5aa108: "Geçersiz durum parametresi"
+  invalid_url_cbde79f: "Geçersiz bağlantı"
   invalid_url_in_xml: "xml dosyasında geçersiz url. & işaretleri kullanılmamalı."
   invalid_username_or_password_b60aa240: "Geçersiz kullanıcı adı ve şifre"
   invalid_utf_8_13c76a6: "UTF-8 Geçersiz"
@@ -10906,6 +10911,7 @@ tr:
           send_to_sms: "%{phone_number} telefon numarasına metin mesajı yolla"
         labels: 
           carrier: Taşıyıcı
+          otp_communication_channel_id: "Telefon Numarası"
           phone_number: "Telefon Numarası"
           remember_me: "Bu bilgisayarı hatırla"
           verification_code: "Doğrulama Kodu"
@@ -13203,7 +13209,9 @@ tr:
   move_to_front_7eae2e90: "Öne taşı"
   move_to_front_bf6f0194: "Öne Taşı"
   moving_a4d552df: Taşınıyor...
+  multi_factor_authentication_1a6b3b3d: "Çoklu Kimlik Doğrulama"
   multi_factor_authentication_configured_865b1bde: "Çoklu kimlik doğrulama yapılandırıldı"
+  multiple_dates_e3a122f7: "Çoklu Tarih"
   multiple_due_dates_6b0d75c6: "Çoklu bitiş tarihleri"
   multiple_modules_930713d4: "Çoklu Modüller"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -14169,6 +14177,7 @@ tr:
   please_add_at_least_one_non_blank_answer_213c2c8e: "Lütfen en az bir tane boş olmayan cevap ekleyin."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Lütfen her değişken için en az bir tane boş olmayan cevap ekleyin."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Lütfen üç veya daha fazla karakter içeren bir arama terimi girin"
+  please_enter_the_verification_code_shown_by_your_t_acc7c404: "Token'da gözüken doğrulama kodunu giriniz"
   please_enter_your_label_name_7745272d: "Lütfen %{label_name} inizi girin:"
   please_enter_your_label_name_and_password_5c56be80: "Lütfen %{label_name} Eposta adresiniz ve şifrenizi girin:"
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Lütfen hangi sayfayı görüntülediğinizi ve hangi bağlantıya tıkladığınızı bildirin."
@@ -14446,7 +14455,9 @@ tr:
     learn_platform_settings: 
       labels: 
         base_url: "Temel URL"
+        password: Şifre
         token: "Erişim Anahtarı"
+        username: "Kullanıcı Adı"
     linked_in: 
       description: "LinkedIn entegrasyonu"
     linked_in_settings: 
@@ -18126,6 +18137,7 @@ tr:
   shared_secret_892c88f2: "Paylaşım Anahtarı"
   shift_dates_746698a5: "Günler arası geçiş yap"
   short_name_ad9bf84f: "kısa isim"
+  should_be_10_digit_number_d30ef02d: "10 haneli bir sayı olmalıdır"
   show_all_details_9879980c: "Tüm Ayrıntıları Göster"
   show_attendance_columns_4d160e16: "Devam Sütununu Göster"
   show_by_date_e3967761: "Tarihe Göre Göster"
@@ -19880,9 +19892,11 @@ tr:
     is_required: "Bu alan zorunludur"
   validate_links_in_content_b1630fba: "İçerikteki Bağlantıları Doğrula"
   validation_error_3b943100: "Doğrulama Hatası"
+  value_must_be_positive_3e086d5a: "Değer pozitif olmalıdır"
   venezuela_58_959d01f7: "Venezuella (+58)"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite benzerlik puanı -- daha fazla bilgi"
   verification_code_5acd64ef: "Doğrulama Kodu"
+  verify_3dd8f159: Onay
   version_5599c321: Versiyon
   video_b9f27375: Video
   video_player_b371005: "Video Oynatıcı"

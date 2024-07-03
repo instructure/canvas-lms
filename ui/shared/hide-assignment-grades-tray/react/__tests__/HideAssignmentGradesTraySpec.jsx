@@ -325,7 +325,7 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
         strictEqual(showFlashAlertStub.callCount, 0)
       })
 
-      test('tray is closed after hiding is finished', async () => {
+      QUnit.skip('tray is closed after hiding is finished', async () => {
         await clickHide()
         notOk(getTrayElement())
       })

@@ -53,7 +53,7 @@ export default function FilterOptions(props: {
             <View as="div" padding="0 0 x-small 0" key={option.id}>
               <Checkbox
                 label={option.name}
-                checked={props.filterIds.includes(option.id)}
+                checked={!!props.filterIds && props.filterIds.includes(option.id)}
                 onChange={event => {
                   props.setFilterValue(option, event.target.checked)
                 }}

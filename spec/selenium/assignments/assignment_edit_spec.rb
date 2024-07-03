@@ -20,8 +20,10 @@
 require_relative "../common"
 require_relative "page_objects/assignment_create_edit_page"
 require_relative "page_objects/assignment_page"
+require_relative "../../helpers/selective_release_common"
 
 describe "assignment" do
+  include SelectiveReleaseCommon
   include_context "in-process server selenium tests"
 
   context "for submission limited attempts" do
@@ -159,6 +161,7 @@ describe "assignment" do
     end
 
     it "fills the due date field from a selection in the popup calendar" do
+      differentiated_modules_off
       time = DateTime.new(2023, 8, 9, 12, 0, 0, 0, 0) # this is a Wednesday
       Timecop.freeze(time) do
         @assignment = @course.assignments.create!(due_at: time, points_possible: 10)

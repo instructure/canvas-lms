@@ -417,7 +417,7 @@ describe SIS::CSV::EnrollmentImporter do
       "course_id,user_id,role,status",
       "C001,U001,student,active"
     )
-    enrollment = Enrollment.where(course_id: course.id, user_id: user.id).take
+    enrollment = Enrollment.find_by(course_id: course.id, user_id: user.id)
     expect(enrollment.sis_batch_id).to eq importer.batch.id
     importer = process_csv_data_cleanly(
       "course_id,user_id,role,status",
@@ -987,9 +987,9 @@ describe SIS::CSV::EnrollmentImporter do
       "test_1,observer_user,observer,,active,student_user",
       batch: batch1
     )
-    course = @account.all_courses.where(sis_source_id: "test_1").take
+    course = @account.all_courses.find_by(sis_source_id: "test_1")
     g = course.groups.create!(name: "group")
-    g.group_memberships.create!(user: Pseudonym.where(sis_user_id: "student_user").take.user)
+    g.group_memberships.create!(user: Pseudonym.find_by(sis_user_id: "student_user").user)
     batch2 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "course_id,user_id,role,section_id,status,associated_user_id",

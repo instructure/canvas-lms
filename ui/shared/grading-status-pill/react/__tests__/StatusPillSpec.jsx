@@ -19,7 +19,7 @@
 import 'react'
 import ReactDOM from 'react-dom'
 import {Pill} from '@instructure/ui-pill'
-import StatusPill from '..'
+import StatusPill from '../index'
 
 const wrapper = document.getElementById('fixtures')
 
@@ -83,17 +83,20 @@ test('renderPills mounts a <Pill /> with correct text to each .submission-excuse
 test('renderPills mounts a <Pill /> with correct text to each .submission-custom-grade-status-pill-id', () => {
   const stubbedRender = sandbox.stub(ReactDOM, 'render')
   const spans = [1, 2, 3].map(elem => addSpan(`submission-custom-grade-status-pill-${elem}`))
-  const statuses = {
-    1: {
+  const statuses = [
+    {
+      id: '1',
       name: 'status one',
     },
-    2: {
+    {
+      id: '2',
       name: 'status two',
     },
-    3: {
+    {
+      id: '3',
       name: 'status three',
     },
-  }
+  ]
   StatusPill.renderPills(statuses)
 
   const calls = spans.map((_span, idx) => stubbedRender.getCall(idx))

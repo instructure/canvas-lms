@@ -19,10 +19,12 @@
 
 require_relative "../common"
 require_relative "../helpers/context_modules_common"
+require_relative "../../helpers/selective_release_common"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
+  include SelectiveReleaseCommon
 
   before :once do
     @course = course_model.tap(&:offer!)

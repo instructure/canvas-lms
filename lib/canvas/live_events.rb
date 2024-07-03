@@ -825,6 +825,8 @@ module Canvas::LiveEvents
       id: result.id,
       learning_outcome_id: result.learning_outcome_id,
       learning_outcome_context_uuid: get_learning_outcome_context_uuid(result.learning_outcome_id),
+      result_context_id: result.context_id,
+      result_context_type: result.context_type,
       result_context_uuid: result&.context&.uuid,
       mastery: result.mastery,
       score: result.score,

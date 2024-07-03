@@ -83,7 +83,7 @@ class GradeCalculator
     user_ids = Array(user_ids).uniq.map(&:to_i)
     return if user_ids.empty?
 
-    course = course_id.is_a?(Course) ? course_id : Course.active.where(id: course_id).take
+    course = course_id.is_a?(Course) ? course_id : Course.active.find_by(id: course_id)
     return unless course
 
     assignments = compute_score_opts[:assignments] || course.assignments.published.gradeable.to_a

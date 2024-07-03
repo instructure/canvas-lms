@@ -27,7 +27,7 @@ import {
   IconAnnouncementLine,
   IconDocumentLine,
 } from '@instructure/ui-icons'
-import formatMessage from 'format-message'
+import formatMessage from '../../../format-message'
 
 export const IconBlank = props => {
   return (

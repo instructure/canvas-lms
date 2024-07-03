@@ -64,13 +64,13 @@ export default function EnhancedIndividualGradebookWrapper() {
       />
       <ApolloProvider client={client}>
         {/* EVAL-3711 Remove ICE Feature Flag */}
-        <View as="div" margin={window.ENV.FEATURES.instui_nav ? 'small 0 large 0' : '0'}>
-          {!window.ENV.FEATURES.instui_nav && (
+        <View as="div" margin={window.ENV.FEATURES?.instui_nav ? 'small 0 large 0' : '0'}>
+          {!window.ENV.FEATURES?.instui_nav && (
             <View as="h1">{I18n.t('Gradebook: Individual View')}</View>
           )}
           {/* Was not able to manually change lineHeight in View so used div to modify lineHeight */}
           <div style={{lineHeight: 1.25}}>
-            <Text size={window.ENV.FEATURES.instui_nav ? 'large' : 'medium'}>
+            <Text size={window.ENV.FEATURES?.instui_nav ? 'large' : 'medium'}>
               {I18n.t(
                 'Note: Grades and notes will be saved automatically after moving out of the field.'
               )}

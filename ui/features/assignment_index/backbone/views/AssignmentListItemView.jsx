@@ -24,6 +24,7 @@ import DirectShareCourseTray from '@canvas/direct-sharing/react/components/Direc
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {ListViewCheckpoints} from '@canvas/list-view-checkpoints/react/ListViewCheckpoints'
 import LockIconView from '@canvas/lock-icon'
 import * as MoveItem from '@canvas/move-item-tray'
 import PublishIconView from '@canvas/publish-icon-view'
@@ -43,6 +44,7 @@ import scoreTemplate from '../../jst/_assignmentListItemScore.handlebars'
 import AssignmentKeyBindingsMixin from '../mixins/AssignmentKeyBindingsMixin'
 import CreateAssignmentView from './CreateAssignmentView'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import {captureException} from '@sentry/browser'
 
 const I18n = useI18nScope('AssignmentListItemView')
 
@@ -323,7 +325,28 @@ export default AssignmentListItemView = (function () {
       }
 
       const {attributes = {}} = this.model
-      const {assessment_requests: assessmentRequests} = attributes
+      const {assessment_requests: assessmentRequests, checkpoints} = attributes
+
+      if (checkpoints && checkpoints.length && !this.canManage()) {
+        const checkpointsElem =
+          this.$el.find(`#assignment_student_checkpoints_${this.model.id}`) ?? []
+        const mountPoint = checkpointsElem[0]
+
+        try {
+          ReactDOM.render(
+            React.createElement(ListViewCheckpoints, {
+              assignment: attributes,
+            }),
+            mountPoint
+          )
+        } catch (error) {
+          const errorMessage = I18n.t('Checkpoints mount point element not found')
+          // eslint-disable-next-line no-console
+          console.error(errorMessage, error)
+          captureException(new Error(errorMessage), error)
+        }
+      }
+
       if (assessmentRequests && assessmentRequests.length) {
         const peerReviewElem =
           this.$el.find(`#assignment_student_peer_review_${this.model.id}`) ?? []

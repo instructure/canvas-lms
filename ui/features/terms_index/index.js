@@ -26,12 +26,15 @@ import replaceTags from '@canvas/util/replaceTags'
 import {underscoreString} from '@canvas/convert-case'
 import {dateString} from '@instructure/moment-utils'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
+import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
 const I18n = useI18nScope('terms.index')
 
 const dateOpts = {format: 'full'}
 
 $(document).ready(() => {
+  initializeTopNavPortal()
+
   $('.submit_button').click(function (_event) {
     const $term = $(this).closest('.term')
     return $term.find('.enrollment_term_form').submit()

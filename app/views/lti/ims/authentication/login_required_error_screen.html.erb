@@ -22,5 +22,16 @@
 
   <h1><%= t('Launch Error') %></h1>
   <p><%= t("We apologize for the inconvenience, but an error occurred while launching the tool. Please try launching the tool again. If the issue persists, please contact support. You can do so by reaching out to your institution or click on the 'Help' button in the Canvas sidebar for assistance.") %></p>
+
+  <% if Rails.env.development? %>
+    <p>
+      <%= t do %>
+        If you're seeing this with a local dev or HTTP version of Canvas, it's likely because
+        <a href="https://www.chromium.org/updates/same-site/" target="_blank">Chrome blocks Same-Site cookies that aren't Secure</a>,
+        so the LTI launch process in the iframe can't see the Canvas session cookie.
+      <% end %>
+    </p>
+    <p><%= t("We suggest using Firefox to test LTI 1.3 tools with HTTP Canvas.") %></p>
+  <% end %>
 </div>
 

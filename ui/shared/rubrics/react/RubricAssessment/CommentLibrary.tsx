@@ -57,6 +57,7 @@ export const CommentLibrary = ({
       id={`${slug(comment).slice(-6)}_${index}`}
       value={truncate(comment)}
       label={truncate(comment)}
+      data-testid={`comment-library-option-${criterionId}-${index}`}
     >
       {truncate(comment)}
     </SimpleSelect.Option>

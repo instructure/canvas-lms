@@ -19,25 +19,20 @@
 import {bindActionCreators} from 'redux'
 import {bool, func, number, string} from 'prop-types'
 import {connect} from 'react-redux'
-import {debounce} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {FormField} from '@instructure/ui-form-field'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Menu} from '@instructure/ui-menu'
 import {
-  IconArrowOpenDownLine,
-  IconArrowOpenUpLine,
   IconLockLine,
   IconPlusLine,
-  IconSearchLine,
   IconTrashLine,
   IconUnlockLine,
+  IconInvitationLine,
 } from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {TextInput} from '@instructure/ui-text-input'
 
 import actions from '../actions'
 import ExternalFeedsTray from './ExternalFeedsTray'
@@ -45,8 +40,9 @@ import propTypes from '../propTypes'
 import select from '@canvas/obj-select'
 import {showConfirmDelete} from './ConfirmDeleteModal'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {Heading} from '@instructure/ui-heading'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {HeadingMenu} from '@canvas/discussions/react/components/HeadingMenu'
+import {SearchField} from '@canvas/discussions/react/components/SearchField'
 
 const I18n = useI18nScope('announcements_v2')
 
@@ -54,7 +50,7 @@ const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 
 // Delay the search so as not to overzealously read out the number
 // of search results to the user
-export const SEARCH_TIME_DELAY = 750
+
 const getFilters = () => ({
   all: instUINavEnabled() ? I18n.t('All Announcements') : I18n.t('All'),
   unread: instUINavEnabled() ? I18n.t('Unread Announcements') : I18n.t('Unread'),
@@ -63,8 +59,8 @@ const getFilters = () => ({
 export default class IndexHeader extends Component {
   static propTypes = {
     breakpoints: breakpointsShape.isRequired,
-    contextType: string.isRequired,
-    contextId: string.isRequired,
+    contextType: string,
+    contextId: string,
     isBusy: bool,
     selectedCount: number,
     isToggleLocking: bool.isRequired,
@@ -74,6 +70,7 @@ export default class IndexHeader extends Component {
     toggleSelectedAnnouncementsLock: func.isRequired,
     deleteSelectedAnnouncements: func.isRequired,
     searchInputRef: func,
+    markAllAnnouncementRead: func.isRequired,
     announcementsLocked: bool.isRequired,
   }
 
@@ -83,27 +80,6 @@ export default class IndexHeader extends Component {
     selectedCount: 0,
     searchInputRef: null,
     breakpoints: {},
-  }
-
-  onSearch = debounce(
-    () => {
-      const term = this.searchInput.value
-      this.props.searchAnnouncements({term})
-    },
-    SEARCH_TIME_DELAY,
-    {
-      leading: false,
-      trailing: true,
-    }
-  )
-
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      selectedAnnouncementFilter: 'all',
-      announcementFilterOpened: false,
-    }
   }
 
   onDelete = () => {
@@ -124,9 +100,12 @@ export default class IndexHeader extends Component {
     })
   }
 
-  searchInputRef = input => {
-    this.searchInput = input
-    if (this.props.searchInputRef) this.props.searchInputRef(input)
+  onFilterChange = data => {
+    this.props.searchAnnouncements({filter: data.value})
+  }
+
+  onSearchChange = data => {
+    this.props.searchAnnouncements({term: data.searchTerm})
   }
 
   renderLockToggleButton(icon, label, screenReaderLabel, responsiveStyles) {
@@ -135,7 +114,6 @@ export default class IndexHeader extends Component {
         disabled={this.props.isBusy || this.props.selectedCount === 0}
         size="medium"
         display={responsiveStyles.buttonDisplay}
-        margin={responsiveStyles.lockButtonMargin}
         id="lock_announcements"
         data-testid="lock_announcements"
         onClick={this.props.toggleSelectedAnnouncementsLock}
@@ -170,7 +148,6 @@ export default class IndexHeader extends Component {
             disabled={this.props.isBusy || this.props.selectedCount === 0}
             size="medium"
             display={responsiveStyles.buttonDisplay}
-            margin={responsiveStyles.buttonMargin}
             id="delete_announcements"
             data-testid="delete-announcements-button"
             onClick={this.onDelete}
@@ -183,12 +160,22 @@ export default class IndexHeader extends Component {
             <ScreenReaderContent>{I18n.t('Delete Selected Announcements')}</ScreenReaderContent>
           </Button>
         )}
+        <Button
+          id="mark_all_announcement_read"
+          data-testid="mark-all-announcement-read"
+          renderIcon={IconInvitationLine}
+          display={responsiveStyles.buttonDisplay}
+          onClick={this.props.markAllAnnouncementRead}
+          disabled={this.props.isBusy}
+        >
+          <ScreenReaderContent>{I18n.t('Mark all announcement read')}</ScreenReaderContent>
+          <PresentationContent>{I18n.t('Mark all as read')}</PresentationContent>
+        </Button>
         {this.props.permissions.create && (
           <Button
             href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new?is_announcement=true`}
             color="primary"
             display={responsiveStyles.buttonDisplay}
-            margin={responsiveStyles.buttonMargin}
             id="add_announcement"
             renderIcon={IconPlusLine}
           >
@@ -200,24 +187,10 @@ export default class IndexHeader extends Component {
     )
   }
 
-  renderSearchField() {
-    return (
-      <TextInput
-        renderLabel={
-          <ScreenReaderContent>{I18n.t('Search announcements by title')}</ScreenReaderContent>
-        }
-        placeholder={I18n.t('Search...')}
-        renderBeforeInput={<IconSearchLine />}
-        ref={this.searchInputRef}
-        onChange={this.onSearch}
-        name="announcements_search"
-      />
-    )
-  }
-
   renderOldHeader(breakpoints) {
     const ddSize = breakpoints.desktopOnly ? '100px' : '100%'
     const containerSize = breakpoints.tablet ? 'auto' : '100%'
+    const {searchInputRef} = this.props
 
     return (
       <View>
@@ -245,13 +218,19 @@ export default class IndexHeader extends Component {
               </FormField>
             </Flex.Item>
             <Flex.Item size={containerSize} shouldGrow={true} shouldShrink={true}>
-              {this.renderSearchField()}
+              <SearchField
+                name="announcements_search"
+                searchInputRef={searchInputRef}
+                onSearchEvent={this.onSearchChange}
+              />
             </Flex.Item>
             <Flex.Item>
-              {this.renderActionButtons({
-                buttonDisplay: 'inline-block',
-                buttonMargin: '0 0 0 small',
-              })}
+              <Flex wrap="wrap" gap="small">
+                {this.renderActionButtons({
+                  buttonDisplay: 'inline-block',
+                  buttonMargin: '0 0 0 small',
+                })}
+              </Flex>
             </Flex.Item>
           </Flex>
         </View>
@@ -263,50 +242,8 @@ export default class IndexHeader extends Component {
     )
   }
 
-  renderMenu() {
-    return (
-      <Menu
-        trigger={
-          <IconButton
-            size="small"
-            withBackground={false}
-            withBorder={false}
-            renderIcon={
-              this.state.announcementFilterOpened ? (
-                <IconArrowOpenUpLine />
-              ) : (
-                <IconArrowOpenDownLine />
-              )
-            }
-            screenReaderLabel={I18n.t('Announcement Filter')}
-          />
-        }
-        onToggle={() =>
-          this.setState({
-            announcementFilterOpened: !this.state.announcementFilterOpened,
-          })
-        }
-      >
-        <Menu.Group
-          selected={[this.state.selectedAnnouncementFilter]}
-          onSelect={(_, selected) => {
-            this.setState({selectedAnnouncementFilter: selected[0]})
-            this.props.searchAnnouncements({filter: selected[0]})
-          }}
-          label={I18n.t('View')}
-        >
-          {Object.keys(getFilters()).map(filter => (
-            <Menu.Item key={filter} value={filter}>
-              {getFilters()[filter]}
-            </Menu.Item>
-          ))}
-        </Menu.Group>
-      </Menu>
-    )
-  }
-
   render() {
-    const {breakpoints} = this.props
+    const {breakpoints, searchInputRef} = this.props
 
     if (!instUINavEnabled()) {
       return this.renderOldHeader(breakpoints)
@@ -314,42 +251,42 @@ export default class IndexHeader extends Component {
 
     let flexBasis = 'auto'
     let buttonDisplay = 'inline-block'
-    let buttonMargin = '0 0 0 small'
-    let lockButtonMargin = '0 0 0 0'
     let flexDirection = 'row'
     let headerShrink = false
 
     if (breakpoints.mobileOnly) {
       flexBasis = '100%'
       buttonDisplay = 'block'
-      buttonMargin = 'small 0 0 0'
-      lockButtonMargin = 'small 0 0 0'
       flexDirection = 'column-reverse'
       headerShrink = true
     }
 
     return (
       <Flex direction="column" as="div" gap="medium">
-        <Flex.Item dmargin="0 0 large" overflow="hidden">
+        <Flex.Item overflow="hidden">
           <Flex as="div" direction="row" justifyItems="space-between" wrap="wrap" gap="small">
-            <Flex.Item width={flexBasis} shouldGrow={true} shouldShrink={false}>
-              <Flex as="div" direction="row" justifyItems="start" alignItems="center" width="98%">
-                <Flex.Item margin="0 x-small 0 0" shouldShrink={headerShrink}>
-                  <Heading level="h1">
-                    {getFilters()[this.state.selectedAnnouncementFilter]}
-                  </Heading>
-                </Flex.Item>
-                <Flex.Item>{this.renderMenu()}</Flex.Item>
-              </Flex>
+            <Flex.Item width={flexBasis} shouldGrow={true} shouldShrink={headerShrink}>
+              <HeadingMenu
+                name={I18n.t('Announcement Filter')}
+                filters={getFilters()}
+                defaultSelectedFilter="all"
+                onSelectFilter={this.onFilterChange}
+              />
             </Flex.Item>
             <Flex.Item width={flexBasis} overflowX="hidden" overflowY="hidden">
-              <Flex direction={flexDirection}>
-                {this.renderActionButtons({buttonDisplay, buttonMargin, lockButtonMargin})}
+              <Flex direction={flexDirection} wrap="wrap" gap="small">
+                {this.renderActionButtons({
+                  buttonDisplay,
+                })}
               </Flex>
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        {this.renderSearchField()}
+        <SearchField
+          name="announcements_search"
+          searchInputRef={searchInputRef}
+          onSearchEvent={this.onSearchChange}
+        />
         <Flex.Item margin="large 0 0 0">
           <ExternalFeedsTray
             atomFeedUrl={this.props.atomFeedUrl}
@@ -362,7 +299,7 @@ export default class IndexHeader extends Component {
 }
 
 const connectState = state => ({
-  isBusy: state.isLockingAnnouncements || state.isDeletingAnnouncements,
+  isBusy: state.isLockingAnnouncements || state.isDeletingAnnouncements || state.isMarkingAllRead,
   selectedCount: state.selectedAnnouncements.length,
   isToggleLocking: state.isToggleLocking,
   ...select(state, [
@@ -377,6 +314,7 @@ const selectedActions = [
   'searchAnnouncements',
   'toggleSelectedAnnouncementsLock',
   'deleteSelectedAnnouncements',
+  'markAllAnnouncementRead',
 ]
 
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)

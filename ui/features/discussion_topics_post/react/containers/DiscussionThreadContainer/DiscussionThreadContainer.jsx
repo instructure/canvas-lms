@@ -19,7 +19,6 @@
 import {
   addReplyToDiscussionEntry,
   getSpeedGraderUrl,
-  updateDiscussionEntryRootEntryCounts,
   updateDiscussionTopicEntryCounts,
   responsiveQuerySizes,
   isTopicAuthor,
@@ -32,7 +31,6 @@ import {
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {
   DELETE_DISCUSSION_ENTRY,
-  UPDATE_DISCUSSION_THREAD_READ_STATE,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
   UPDATE_DISCUSSION_ENTRY,
 } from '../../../graphql/Mutations'
@@ -59,11 +57,12 @@ import {Responsive} from '@instructure/ui-responsive'
 import theme from '@instructure/canvas-theme'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
-import {useMutation, useQuery, useApolloClient} from 'react-apollo'
+import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
 import {Text} from '@instructure/ui-text'
 import useCreateDiscussionEntry from '../../hooks/useCreateDiscussionEntry'
+import {useUpdateDiscussionThread} from '../../hooks/useUpdateDiscussionThread'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -96,40 +95,16 @@ export const DiscussionThreadContainer = props => {
   const [reportModalIsLoading, setReportModalIsLoading] = useState(false)
   const [reportingError, setReportingError] = useState(false)
   const [firstSubReply, setFirstSubReply] = useState(false)
-
-  const updateLoadedSubentry = updatedEntry => {
-    // if it's a subentry then we need to update the loadedSubentry.
-    if (props.setLoadedSubentries) {
-      props.setLoadedSubentries(loadedSubentries => {
-        return loadedSubentries.map(entry =>
-          !!updatedEntry.rootEntryId && entry.id === updatedEntry.id ? updatedEntry : entry
-        )
-      })
-    }
-  }
-
-  const updateDiscussionEntryParticipantCache = (cache, result) => {
-    if (
-      props.discussionEntry.entryParticipant?.read !==
-      result.data.updateDiscussionEntryParticipant.discussionEntry.entryParticipant?.read
-    ) {
-      const discussionUnreadCountChange = result.data.updateDiscussionEntryParticipant
-        .discussionEntry.entryParticipant?.read
-        ? -1
-        : 1
-      updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
-        unreadCountChange: discussionUnreadCountChange,
-      })
-
-      if (result.data.updateDiscussionEntryParticipant.discussionEntry.rootEntryId) {
-        updateDiscussionEntryRootEntryCounts(
-          cache,
-          result.data.updateDiscussionEntryParticipant.discussionEntry,
-          discussionUnreadCountChange
-        )
-      }
-    }
-  }
+  const {
+    updateLoadedSubentry,
+    updateDiscussionEntryParticipant,
+    updateDiscussionThreadReadState,
+    toggleUnread,
+  } = useUpdateDiscussionThread({
+    discussionEntry: props.discussionEntry,
+    discussionTopic: props.discussionTopic,
+    setLoadedSubentries: props.setLoadedSubentries,
+  })
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
@@ -145,22 +120,24 @@ export const DiscussionThreadContainer = props => {
     addReplyToAllRootEntries(cache, newDiscussionEntry)
     addSubentriesCountToParentEntry(cache, newDiscussionEntry)
     props.setHighlightEntryId(newDiscussionEntry._id)
-
-    // It is a known issue that the first reply of a sub reply has not initiated the sub query call,
-    // as a result we cannot add an entry to it. Before we had expand buttons for each sub-entry,
-    // now we must manually trigger the first one.
-    // See addReplyToDiscussionEntry definition for more details.
-    if (
-      result.data.createDiscussionEntry.discussionEntry.parentId === props.discussionEntry._id &&
-      !props.discussionEntry.subentriesCount
-    ) {
-      setFirstSubReply(true)
-    }
   }
 
-  const onEntryCreationCompletion = data => {
-    setExpandReplies(true)
-    props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
+  const onEntryCreationCompletion = (data, success) => {
+    if (success) {
+      // It is a known issue that the first reply of a sub reply has not initiated the sub query call,
+      // as a result we cannot add an entry to it. Before we had expand buttons for each sub-entry,
+      // now we must manually trigger the first one.
+      // See addReplyToDiscussionEntry definition for more details.
+      if (
+        data.createDiscussionEntry.discussionEntry.parentId === props.discussionEntry._id &&
+        !props.discussionEntry.subentriesCount
+      ) {
+        setFirstSubReply(true)
+      }
+      setExpandReplies(true)
+      props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
+      setEditorExpanded(false)
+    }
   }
 
   const {createDiscussionEntry} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
@@ -194,20 +171,6 @@ export const DiscussionThreadContainer = props => {
     },
   })
 
-  const [updateDiscussionEntryParticipant] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
-    update: updateDiscussionEntryParticipantCache,
-    onCompleted: data => {
-      if (!data || !data.updateDiscussionEntryParticipant) {
-        return null
-      }
-      updateLoadedSubentry(data.updateDiscussionEntryParticipant.discussionEntry)
-      setOnSuccess(I18n.t('The reply was successfully updated.'))
-    },
-    onError: () => {
-      setOnFailure(I18n.t('There was an unexpected error updating the reply.'))
-    },
-  })
-
   const [updateDiscussionEntryReported] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
     onCompleted: data => {
       if (!data || !data.updateDiscussionEntryParticipant) {
@@ -236,16 +199,6 @@ export const DiscussionThreadContainer = props => {
     })
   }
 
-  const toggleUnread = () => {
-    updateDiscussionEntryParticipant({
-      variables: {
-        discussionEntryId: props.discussionEntry._id,
-        read: !props.discussionEntry.entryParticipant?.read,
-        forcedReadState: true,
-      },
-    })
-  }
-
   const getReplyLeftMargin = responsiveProp => {
     // If the entry is in threadMode, then we want the RCE to be aligned with the authorInfo
     const threadMode = props.discussionEntry?.depth > 1
@@ -266,15 +219,6 @@ export const DiscussionThreadContainer = props => {
 
     return `calc(${theme.variables.spacing.xxLarge} * ${props.depth} + ${discussionEntryContainerLeftPadding} + ${discussionEditLeftPadding})`
   }
-
-  const client = useApolloClient()
-  const resetDiscussionCache = () => {
-    client.resetStore()
-  }
-
-  const [updateDiscussionThreadReadState] = useMutation(UPDATE_DISCUSSION_THREAD_READ_STATE, {
-    update: resetDiscussionCache,
-  })
 
   // Condense SplitScreen to one variable & link with the SplitScreenButton
   const splitScreenOn = props.userSplitScreenPreference
@@ -460,7 +404,6 @@ export const DiscussionThreadContainer = props => {
     createDiscussionEntry({variables, optimisticResponse})
 
     props.setHighlightEntryId('DISCUSSION_ENTRY_PLACEHOLDER')
-    setEditorExpanded(false)
   }
 
   return (
@@ -489,6 +432,7 @@ export const DiscussionThreadContainer = props => {
                   <DiscussionEntryContainer
                     discussionTopic={props.discussionTopic}
                     discussionEntry={props.discussionEntry}
+                    toggleUnread={toggleUnread}
                     isTopic={false}
                     postUtilities={
                       !props.discussionEntry.deleted ? (
@@ -572,10 +516,7 @@ export const DiscussionThreadContainer = props => {
                     }}
                     isSplitView={false}
                     editor={props.discussionEntry.editor}
-                    isUnread={
-                      !props.discussionEntry.entryParticipant?.read ||
-                      !!props.discussionEntry?.rootEntryParticipantCounts?.unreadCount
-                    }
+                    isUnread={!props.discussionEntry.entryParticipant?.read}
                     isForcedRead={props.discussionEntry.entryParticipant?.forcedReadState}
                     createdAt={props.discussionEntry.createdAt}
                     updatedAt={props.discussionEntry.updatedAt}

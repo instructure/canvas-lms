@@ -58,7 +58,7 @@ describe FileInContext do
         attachment.update(md5: @md5)
 
         # Making sure no additions to before blocks mess this up
-        expect(@course.attachments.where(md5: @sha512).take).to be_falsey
+        expect(@course.attachments.find_by(md5: @sha512)).to be_falsey
 
         FileInContext.attach(@course, @filename, folder: @folder, md5: @sha512)
         expect(@course.attachments.count).to eq 1
@@ -69,7 +69,7 @@ describe FileInContext do
         attachment.update(md5: @sha512)
 
         # Making sure no additions to before blocks mess this up
-        expect(@course.attachments.where(md5: @md5).take).to be_falsey
+        expect(@course.attachments.find_by(md5: @md5)).to be_falsey
 
         FileInContext.attach(@course, @filename, folder: @folder, md5: @md5)
         expect(@course.attachments.count).to eq 1

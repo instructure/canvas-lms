@@ -23,6 +23,8 @@ module Lti
   class InvalidMessageTypeForPlacementError < StandardError; end
 
   class ResourcePlacement < ActiveRecord::Base
+    CANVAS_PLACEMENT_EXTENSION_PREFIX = "https://canvas.instructure.com/lti/"
+
     ACCOUNT_NAVIGATION = "account_navigation"
     ASSIGNMENT_EDIT = "assignment_edit"
     ASSIGNMENT_SELECTION = "assignment_selection"
@@ -33,6 +35,11 @@ module Lti
     RESOURCE_SELECTION = "resource_selection"
     SIMILARITY_DETECTION = "similarity_detection"
     GLOBAL_NAVIGATION = "global_navigation"
+
+    # These placements are defined in the Dynamic Registration spec
+    # https://www.imsglobal.org/spec/lti-dr/v1p0
+    CONTENT_AREA = "ContentArea"
+    RICH_TEXT_EDITOR = "RichTextEditor"
 
     SIMILARITY_DETECTION_LTI2 = "Canvas.placements.similarityDetection"
 
@@ -123,6 +130,10 @@ module Lti
     validates :message_handler, :placement, presence: true
 
     validates :placement, inclusion: { in: PLACEMENT_LOOKUP.values }
+
+    def self.add_extension_prefix(placement)
+      "#{CANVAS_PLACEMENT_EXTENSION_PREFIX}#{placement}"
+    end
 
     def self.valid_placements(_root_account)
       PLACEMENTS.dup.tap do |p|

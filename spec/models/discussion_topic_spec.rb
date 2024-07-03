@@ -17,8 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require_relative "../helpers/selective_release_common"
 
 describe DiscussionTopic do
+  include SelectiveReleaseCommon
   before :once do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
@@ -159,7 +161,7 @@ describe DiscussionTopic do
     end
 
     let(:values) do
-      DiscussionTopic.where(id: @topic).pluck(
+      DiscussionTopic.where(id: @topic).pick(
         :could_be_locked,
         :podcast_enabled,
         :podcast_has_student_posts,
@@ -169,7 +171,7 @@ describe DiscussionTopic do
         :allow_rating,
         :only_graders_can_rate,
         :sort_by_rating
-      ).first
+      )
     end
 
     it "saves boolean attributes as false if they are set to nil" do
@@ -3391,6 +3393,7 @@ describe DiscussionTopic do
       end
 
       it "filters section specific topics properly for multiple users" do
+        differentiated_modules_off
         course = course_factory(active_all: true)
         section1 = course.course_sections.create!(name: "section 1")
         section2 = course.course_sections.create!(name: "section 2")

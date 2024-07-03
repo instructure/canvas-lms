@@ -415,3 +415,9 @@ input[type="button"] {
     @include beta-tag;
   }
 }
+
+// This is all deprecated but needed a quick fix for Student View button
+.btn-top-nav {
+  white-space: nowrap;
+  border-radius: 4px;
+}

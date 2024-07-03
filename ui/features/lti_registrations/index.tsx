@@ -28,7 +28,7 @@ import ProductDetail from './discover/components/ProductDetail/ProductDetail'
 const getBasename = () => {
   const path = window.location.pathname
   const parts = path.split('/')
-  return parts.slice(0, parts.indexOf('extensions') + 1).join('/')
+  return parts.slice(0, parts.indexOf('apps') + 1).join('/')
 }
 
 const queryClient = new QueryClient()
@@ -43,14 +43,6 @@ const router = createBrowserRouter(
       children: window.ENV.FEATURES.lti_registrations_discover_page
         ? [DiscoverRoute, ...ManageRoutes]
         : [...ManageRoutes],
-    },
-    {
-      path: 'product_detail/:id',
-      element: (
-        <QueryClientProvider client={queryClient}>
-          <ProductDetail />
-        </QueryClientProvider>
-      ),
     },
     {
       path: 'product_detail/:id',

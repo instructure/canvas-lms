@@ -72,7 +72,7 @@ class UserPreferenceValue < ActiveRecord::Base
     def get_preference(key, sub_key = nil)
       value = preferences[key]
       if value == EXTERNAL
-        id, value = user_preference_values.where(key:, sub_key:).pluck(:id, :value).first
+        id, value = user_preference_values.where(key:, sub_key:).pick(:id, :value)
         mark_preference_row(key, sub_key) if id # if we know there's a row
         value
       elsif sub_key

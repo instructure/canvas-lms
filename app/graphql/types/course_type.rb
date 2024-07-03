@@ -434,10 +434,14 @@ module Types
 
     field :grade_statuses, [CourseGradeStatus], null: false
 
-    field :dashboard_card, CourseDashboardCardType, "returns dashboard card information for this course", null: true
-    def dashboard_card
+    field :dashboard_card, CourseDashboardCardType, "returns dashboard card information for this course", null: true do
+      argument :dashboard_filter, DashboardObserveeFilterInputType, required: false
+    end
+
+    def dashboard_card(dashboard_filter: nil)
       return unless Account.site_admin.feature_enabled?(:dashboard_graphql_integration)
 
+      context.scoped_set!(:dashboard_filter, dashboard_filter)
       object
     end
   end

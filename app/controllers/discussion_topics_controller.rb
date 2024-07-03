@@ -353,7 +353,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     if params[:only_announcements] && !@context.grants_any_right?(@current_user, :manage, :read_course_content)
-      scope = scope.active.where("(unlock_at IS NULL AND delayed_post_at IS NULL) OR (unlock_at<? OR delayed_post_at<?)", Time.now.utc, Time.now.utc)
+      scope = scope.active.where("((unlock_at IS NULL AND delayed_post_at IS NULL) OR (unlock_at<? OR delayed_post_at<?)) AND ( lock_at IS NULL OR lock_at>?)", Time.now.utc, Time.now.utc, Time.now.utc)
     end
 
     per_page = params[:per_page] || 100
@@ -1441,15 +1441,16 @@ class DiscussionTopicsController < ApplicationController
       end
     else
       @topic = @context.send(model_type).active.find(params[:id] || params[:topic_id])
-      if params.include?(:anonymous_state) && @topic.anonymous_state != params[:anonymous_state]
-        @errors[:anonymous_state] = t(:error_anonymous_state_unauthorized_update,
-                                      "You are not able to update the anonymous state of a discussion")
+
+      prior_version = DiscussionTopic.find(@topic.id)
+      if params.include?(:anonymous_state) && prior_version.anonymous_state != params[:anonymous_state] && prior_version.discussion_subentry_count > 0
+        @errors[:anonymous_state] = { "message" => t(:error_anonymous_state_unauthorized_update,
+                                                     "Anonymity settings are locked due to a posted reply") }
       end
       if ANONYMOUS_STATES.include?(@topic.anonymous_state) && params[:group_category_id]
         @errors[:anonymous_state] = t(:error_anonymous_state_groups_update,
                                       "Group discussions cannot be anonymous.")
       end
-      prior_version = DiscussionTopic.find(@topic.id)
       verify_specific_section_visibilities # Make sure user actually has perms to modify this
     end
 

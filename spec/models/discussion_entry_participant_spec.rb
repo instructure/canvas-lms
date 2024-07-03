@@ -47,7 +47,7 @@ describe DiscussionEntryParticipant do
       it "when inappropriate" do
         user = user_model
         DiscussionEntryParticipant.upsert_for_entries(@entry, user, report_type: "inappropriate")
-        discussion_entry_participant = DiscussionEntryParticipant.where(discussion_entry: @entry, user_id: user).take
+        discussion_entry_participant = DiscussionEntryParticipant.find_by(discussion_entry: @entry, user_id: user)
 
         expect(discussion_entry_participant.report_type).to eq("inappropriate")
       end
@@ -55,7 +55,7 @@ describe DiscussionEntryParticipant do
       it "when offensive" do
         user = user_model
         DiscussionEntryParticipant.upsert_for_entries(@entry, user, report_type: "offensive")
-        discussion_entry_participant = DiscussionEntryParticipant.where(discussion_entry: @entry, user_id: user).take
+        discussion_entry_participant = DiscussionEntryParticipant.find_by(discussion_entry: @entry, user_id: user)
 
         expect(discussion_entry_participant.report_type).to eq("offensive")
       end
@@ -63,7 +63,7 @@ describe DiscussionEntryParticipant do
       it "when other" do
         user = user_model
         DiscussionEntryParticipant.upsert_for_entries(@entry, user, report_type: "other")
-        discussion_entry_participant = DiscussionEntryParticipant.where(discussion_entry: @entry, user_id: user).take
+        discussion_entry_participant = DiscussionEntryParticipant.find_by(discussion_entry: @entry, user_id: user)
 
         expect(discussion_entry_participant.report_type).to eq("other")
       end

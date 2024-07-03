@@ -74,7 +74,7 @@ export const RegistrationOverlayForm = (props: {
       <Flex justifyItems="space-between" alignItems="center">
         <Flex.Item>
           <Text as="div" size="x-large" transform="capitalize">
-            {state.developerKeyName} {I18n.t('Settings')}
+            {state.nickname} {I18n.t('Settings')}
           </Text>
         </Flex.Item>
         <Flex.Item>

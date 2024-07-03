@@ -17,6 +17,7 @@
  */
 
 // code copied from https://github.com/prevwong/craft.js/issues/209#issuecomment-795221484
+// but with a couple modifications
 
 import {type Node} from '@craftjs/core'
 import {uid} from '@instructure/uid'
@@ -26,13 +27,13 @@ export const getCloneTree = (idToClone: string, query: any) => {
   const newNodes: Record<string, Node> = {}
 
   const changeNodeId = (node: Node, newParentId?: string) => {
-    let newNodeId = uid('node', 2)
+    const newNodeId = uid('node', 2)
     const childNodes = node.data.nodes.map(childId => changeNodeId(tree.nodes[childId], newNodeId))
     const linkedNodes = Object.keys(node.data.linkedNodes).reduce((accum, id) => {
-      newNodeId = changeNodeId(tree.nodes[node.data.linkedNodes[id]], newNodeId)
+      const linkedNodeId = changeNodeId(tree.nodes[node.data.linkedNodes[id]], newNodeId)
       return {
         ...accum,
-        [id]: newNodeId,
+        [id]: linkedNodeId,
       }
     }, {})
 

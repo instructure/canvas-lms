@@ -87,7 +87,7 @@ export const FormControlButtons = ({
           data-testid="announcement-submit-button"
           disabled={isSubmitting}
         >
-          {willAnnouncementPostRightAway ? I18n.t('Publish') : I18n.t('Save')}
+          {willAnnouncementPostRightAway && !isEditing ? I18n.t('Publish') : I18n.t('Save')}
         </Button>
       ) : (
         <Button

@@ -2012,7 +2012,7 @@ describe CoursesController, type: :request do
         end
 
         it "is not able to update the storage quota (bytes)" do
-          api_call(:put, @path, @params, course: { storage_quota: 123.megabytes })
+          api_call(:put, @path, @params, course: { storage_quota: 123.decimal_megabytes })
           @course.reload
           expect(@course.storage_quota).to eq @course.account.default_storage_quota
         end

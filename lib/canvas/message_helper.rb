@@ -86,7 +86,7 @@ module Canvas::MessageHelper
       if n.new_record?
         raise "New notification '#{using[:name]}' creation failed. Message: #{e.message}"
       else
-        puts "#{name} failed to update"
+        logger.error("#{name} failed to update")
       end
     end
     n

@@ -71,6 +71,13 @@ export function deleteAnnouncements({contextType, contextId}, announcements) {
   )
 }
 
+export function markAllAnnouncementRead({contextType, contextId}) {
+  const queryString = encodeQueryString({
+    only_announcements: true,
+  })
+  return axios.put(`/api/v1/${contextType}s/${contextId}/discussion_topics/read_all?${queryString}`)
+}
+
 export function getExternalFeeds({contextType, contextId}) {
   const params = encodeQueryString([{per_page: 100}])
   return axios.get(`/api/v1/${contextType}s/${contextId}/external_feeds?${params}`)

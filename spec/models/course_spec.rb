@@ -5552,7 +5552,7 @@ describe Course do
       e1.conclude
       @course.sync_homeroom_enrollments
       expect(@course.enrollments.where(user_id: @student.id).size).to eq 2
-      e2 = @course.enrollments.where(user_id: @student.id, role_id: role.id).take
+      e2 = @course.enrollments.find_by(user_id: @student.id, role_id: role.id)
       expect(e2.role_id).to eq role.id
       expect(e2.start_at).to eq e1.start_at
       expect(e2.end_at).to eq e1.end_at
@@ -7945,6 +7945,16 @@ describe Course do
           Account.default.save!
           crs = Course.create!(account: Account.default)
           expect(crs.restrict_quantitative_data).to be true
+        end
+
+        it "creates course account association for newly created courses when account setting is true and locked" do
+          @sub_account = Account.create(parent_account: @root, name: "English")
+          @root.settings[:restrict_quantitative_data] = { locked: true, value: true }
+          @root.save!
+
+          crs = Course.create!(account: @sub_account)
+          associated = @sub_account.associated_courses.first
+          expect(associated.id).to eq crs.id
         end
 
         it "does not set restrict_quantitative_data for newly created courses when account setting is true and not locked" do

@@ -116,7 +116,7 @@ module Canvas
 
       def log(msg)
         full_msg = "#{self.class} - #{msg}"
-        Rails.logger ? Rails.logger.debug(full_msg) : puts(full_msg)
+        Rails.logger ? Rails.logger.debug(full_msg) : puts(full_msg) # rubocop:disable Rails/Output
       end
     end
   end

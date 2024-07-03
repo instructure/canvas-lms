@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 
 import {buildSvg} from '../../svg'
 import checkerboardStyle from '../../../shared/CheckerboardStyling'
-import formatMessage from 'format-message'
+import formatMessage from '../../../../../format-message'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const SQUARE_SIZE = 8

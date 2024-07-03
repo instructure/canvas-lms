@@ -40,6 +40,12 @@ export const possibleString = possible =>
     possible: I18n.toNumber(possible, {precision: 2, strip_insignificant_zeros: true}),
   })
 
+export const possibleStringRange = (min, possible) =>
+  I18n.t('%{min} to %{possible} pts', {
+    possible: I18n.toNumber(possible, {precision: 2, strip_insignificant_zeros: true}),
+    min: I18n.toNumber(min, {precision: 2, strip_insignificant_zeros: true}),
+  })
+
 export const scoreString = (points, possible) =>
   I18n.t('%{points} / %{possible}', {
     points: pointString(points),

@@ -21,7 +21,7 @@
 class GradingStandard < ActiveRecord::Base
   include Canvas::SoftDeletable
 
-  belongs_to :context, polymorphic: [:account, :course], required: true
+  belongs_to :context, polymorphic: [:account, :course], optional: false
   belongs_to :user
   has_many :assignments
   has_many :courses

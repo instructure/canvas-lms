@@ -583,7 +583,7 @@ describe "Groups API", type: :request do
   describe "quota" do
     before :once do
       @account = Account.default
-      Setting.set("group_default_quota", 11.megabytes)
+      Setting.set("group_default_quota", 11.decimal_megabytes)
     end
 
     context "with manage_storage_quotas permission" do

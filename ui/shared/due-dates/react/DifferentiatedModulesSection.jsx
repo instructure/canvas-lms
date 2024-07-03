@@ -43,6 +43,8 @@ import {
 } from '../util/differentiatedModulesUtil'
 import {uid} from '@instructure/uid'
 import {Pill} from '@instructure/ui-pill'
+import DateValidator from '@canvas/grading/DateValidator'
+import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 
 const I18n = useI18nScope('DueDateOverrideView')
 
@@ -59,6 +61,7 @@ const DifferentiatedModulesSection = ({
   onTrayOpen,
   onTrayClose,
   supportDueDates = true,
+  isCheckpointed,
 }) => {
   const [open, setOpen] = useState(false)
   // stagedCards are the itemAssignToCards that will be saved when the assignment is saved
@@ -78,6 +81,15 @@ const DifferentiatedModulesSection = ({
   const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
   const [moduleAssignees, setModuleAssignees] = useState([])
   const linkRef = useRef()
+  const dateValidator = useRef(
+    new DateValidator({
+      date_range: {...ENV.VALID_DATE_RANGE},
+      hasGradingPeriods: ENV.HAS_GRADING_PERIODS,
+      gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods),
+      userIsAdmin: ENV.current_user_is_admin,
+      postToSIS: ENV.POST_TO_SIS && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT,
+    })
+  )
 
   const shouldRenderImportantDates = useMemo(
     () => type === 'assignment' || type === 'discussion' || type === 'quiz',
@@ -178,13 +190,22 @@ const DifferentiatedModulesSection = ({
       const uniqueIds = [...new Set(defaultOptions)]
       const preSavedCard = initialState[cardId]
       const isPersisted = areCardsEqual(preSavedCard, card)
+
+      const data = {
+        ...card,
+        due_at: dates.due_at,
+        unlock_at: dates.unlock_at,
+        lock_at: dates.lock_at,
+      }
+      const dateErrors = dateValidator.current.validateDatetimes(data)
       return {
         key: cardId,
-        isValid: uniqueIds.length > 0,
+        isValid: uniqueIds.length > 0 && Object.keys(dateErrors).length === 0,
         highlightCard: !isPersisted,
         hasAssignees: uniqueIds.length > 0,
         due_at: dates.due_at,
         unlock_at: dates.unlock_at,
+        reply_to_topic_due_at: dates.reply_to_topic_due_at,
         lock_at: dates.lock_at,
         selectedAssigneeIds: uniqueIds,
         defaultOptions: uniqueIds,
@@ -519,6 +540,7 @@ const DifferentiatedModulesSection = ({
         onDatesChange={handleDatesUpdate}
         onCardRemove={handleCardRemove}
         removeDueDateInput={!supportDueDates}
+        isCheckpointed={isCheckpointed}
       />
     </>
   )
@@ -537,6 +559,7 @@ DifferentiatedModulesSection.propTypes = {
   onTrayOpen: func,
   onTrayClose: func,
   supportDueDates: bool,
+  isCheckpointed: bool,
 }
 
 export default DifferentiatedModulesSection

@@ -19,9 +19,9 @@ import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import EditorToggle from '@canvas/editor-toggle'
 import {send} from '@canvas/rce-command-shim'
-import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
+import {extend} from '@canvas/backbone/utils'
 
-_inherits(MultipleChoiceToggle, EditorToggle)
+extend(MultipleChoiceToggle, EditorToggle)
 // #
 // Toggles a multiple choice quiz answer between an editor and an element
 

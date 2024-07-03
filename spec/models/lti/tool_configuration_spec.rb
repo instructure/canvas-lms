@@ -37,6 +37,17 @@ module Lti
     let(:tool_configuration) { described_class.new(settings:) }
     let(:developer_key) { DeveloperKey.create }
 
+    def make_placement(type, message_type, extra = {})
+      {
+        "target_link_uri" => "http://example.com/launch?placement=#{type}",
+        "text" => "Test Title",
+        "message_type" => message_type,
+        "icon_url" => "https://static.thenounproject.com/png/131630-211.png",
+        "placement" => type.to_s,
+        **extra
+      }
+    end
+
     describe "validations" do
       subject { tool_configuration.save }
 
@@ -50,20 +61,27 @@ module Lti
 
         context "with a description property at the submission_type_selection placement" do
           let(:settings) do
-            res = super()
+            super().tap do |res|
+              res["extensions"].first["settings"]["placements"] << make_placement(
+                :submission_type_selection,
+                "LtiDeepLinkingRequest",
+                "description" => "Test Description"
+              )
+            end
+          end
 
-            res["extensions"].first["settings"]["placements"].push(
-              {
-                "target_link_uri" => "http://example.com/launch?placement=submission_type_selection",
-                "text" => "Test Title",
-                "message_type" => "LtiResourceLinkRequest",
-                "icon_url" => "https://static.thenounproject.com/png/131630-211.png",
-                "description" => "Test Description",
-                "placement" => "submission_type_selection",
-              }
-            )
+          it { is_expected.to be true }
+        end
 
-            res
+        context "with a require_resource_selection property at the submission_type_selection placement" do
+          let(:settings) do
+            super().tap do |res|
+              res["extensions"].first["settings"]["placements"] << make_placement(
+                :submission_type_selection,
+                "LtiDeepLinkingRequest",
+                "require_resource_selection" => true
+              )
+            end
           end
 
           it { is_expected.to be true }
@@ -92,20 +110,27 @@ module Lti
 
         context "when the submission_type_selection description is longer than 255 characters" do
           let(:settings) do
-            s = super()
+            super().tap do |s|
+              s["extensions"].first["settings"]["placements"] << make_placement(
+                :submission_type_selection,
+                "LtiDeepLinkingRequest",
+                "description" => "a" * 256
+              )
+            end
+          end
 
-            s["extensions"].first["settings"]["placements"].push(
-              {
-                "target_link_uri" => "http://example.com/launch?placement=submission_type_selection",
-                "text" => "Test Title",
-                "message_type" => "LtiResourceLinkRequest",
-                "icon_url" => "https://static.thenounproject.com/png/131630-211.png",
-                "description" => "a" * 256,
-                "placement" => "submission_type_selection",
-              }
-            )
+          it { is_expected.to be false }
+        end
 
-            s
+        context "when the submission_type_selection require_resource_selection is of the wrong type" do
+          let(:settings) do
+            super().tap do |s|
+              s["extensions"].first["settings"]["placements"] << make_placement(
+                :submission_type_selection,
+                "LtiDeepLinkingRequest",
+                "require_resource_selection" => "true"
+              )
+            end
           end
 
           it { is_expected.to be false }
@@ -702,15 +727,10 @@ module Lti
 
           context "when the configuration has a #{placement} placement" do
             let(:tool_configuration) do
-              tc = super()
-
-              tc.settings["extensions"].first["settings"]["placements"] << {
-                "placement" => placement,
-                "message_type" => "LtiResourceLinkRequest",
-                "target_link_uri" => "http://example.com/launch?placement=#{placement}"
-              }
-
-              tc
+              super().tap do |tc|
+                tc.settings["extensions"].first["settings"]["placements"] <<
+                  make_placement(placement, "LtiResourceLinkRequest")
+              end
             end
 
             it { is_expected.to include("Warning").and include(placement) }

@@ -43,11 +43,7 @@ describe "conversations new" do
       @convo.add_message(@s2, "I need the homework too.")
     end
 
-    context "when react_inbox feature flag is on" do
-      before do
-        Account.default.set_feature_flag! :react_inbox, "on"
-      end
-
+    context "react_inbox" do
       it "doesn't allow replying with no recipients", :ignore_js_errors do
         get "/conversations"
         f("div[data-testid='conversation']").click
@@ -210,133 +206,6 @@ describe "conversations new" do
         wait_for_ajaximations
 
         expect(ConversationMessage.last.body).to eq "all good"
-      end
-    end
-
-    context "when react_inbox feature flag is off" do
-      before do
-        Account.default.set_feature_flag! :react_inbox, "off"
-      end
-
-      it "maintains context and subject", priority: "1" do
-        go_to_inbox_and_select_message
-        f("#reply-btn").click
-        expect(f("#compose-message-course")).to be_disabled
-        expect(f(".message_course_ro").text).to eq @group.name
-        expect(f("input[name=context_code]")).to have_value @group.asset_string
-        expect(f("#compose-message-subject")).to be_disabled
-        expect(f("#compose-message-subject")).not_to be_displayed
-        expect(f("#compose-message-subject")).to have_value(@convo.subject)
-        expect(f(".message_subject_ro")).to be_displayed
-        expect(f(".message_subject_ro").text).to eq @convo.subject
-      end
-
-      it "adds new messages to the conversation", priority: "1" do
-        initial_message_count = @convo.conversation_messages.length
-        go_to_inbox_and_select_message
-        f("#reply-btn").click
-        write_message_body("Read chapters five and six.")
-        click_send
-        wait_for_ajaximations
-        expect(ff(".message-item-view").length).to eq initial_message_count + 1
-        @convo.reload
-        expect(@convo.conversation_messages.length).to eq initial_message_count + 1
-      end
-
-      it "does not allow adding recipients to private messages", priority: "2" do
-        @convo.update_attribute(:private_hash, "12345")
-        go_to_inbox_and_select_message
-        f("#reply-btn").click
-        expect(f("#recipient-row")).to have_attribute(:style, "display: none;")
-      end
-
-      context "reply and reply all" do
-        it "addresses replies to the most recent author by default from the icon at the top of the page", priority: "2" do
-          go_to_inbox_and_select_message
-          f("#reply-btn").click
-          assert_number_of_recipients(1)
-        end
-
-        it "replies to all users from the reply all icon on the top of the page", priority: "2" do
-          go_to_inbox_and_select_message
-          f("#reply-all-btn").click
-          assert_number_of_recipients(2)
-        end
-
-        it "replies to message from the reply icon next to the message", priority: "2" do
-          go_to_inbox_and_select_message
-          f(".message-detail-actions .reply-btn").click
-          assert_number_of_recipients(1)
-        end
-
-        it "replies to all users from the settings icon next to the message", priority: "2" do
-          go_to_inbox_and_select_message
-          f(".message-detail-actions .icon-settings").click
-          f(".ui-menu-item .reply-all-btn").click
-          assert_number_of_recipients(2)
-        end
-      end
-
-      it "does not let a student reply to a student conversation if they lose messaging permissions" do
-        @convo.conversation_participants.where(user_id: @teacher).delete_all
-        @convo.update_attribute(:context, @course)
-        user_session(@s1)
-        go_to_inbox_and_select_message
-        expect(f("#reply-btn")).to_not be_disabled
-
-        @course.account.role_overrides.create!(permission: :send_messages, role: student_role, enabled: false)
-        go_to_inbox_and_select_message
-        expect(f("#reply-btn")).to be_disabled
-      end
-
-      it "lets a student reply to a conversation including a teacher even if they lose messaging permissions" do
-        @convo.update_attribute(:context, @course)
-        user_session(@s1)
-        @course.account.role_overrides.create!(permission: :send_messages, role: student_role, enabled: false)
-        go_to_inbox_and_select_message
-        expect(f("#reply-btn")).to_not be_disabled
-      end
-
-      context "hard concluded course" do
-        before do
-          @course.complete!
-          @course.save!
-        end
-
-        it "does not allow teachers to reply to a conversation", :ignore_js_errors do
-          user_session(@teacher)
-          go_to_inbox_and_select_message
-          expect(f("#reply-btn")).to be_disabled
-        end
-
-        it "does not allow students to reply to a conversation", :ignore_js_errors do
-          user_session(@s1)
-          go_to_inbox_and_select_message
-          expect(f("#reply-btn")).to be_disabled
-        end
-      end
-
-      context "soft concluded course" do
-        before do
-          @course.enrollment_term.start_at = 2.days.ago
-          @course.enrollment_term.end_at = 1.day.ago
-          @course.enrollment_term.set_overrides(Account.default, "TeacherEnrollment" => { start_at: 1.day.ago, end_at: 2.days.ago })
-          @course.enrollment_term.set_overrides(Account.default, "StudentEnrollment" => { start_at: 1.day.ago, end_at: 2.days.ago })
-          @course.save!
-          @course.enrollment_term.save!
-        end
-
-        it "does not allow teachers to reply to a conversation", :ignore_js_errors do
-          user_session(@teacher)
-          go_to_inbox_and_select_message
-          expect(f("#reply-btn")).to be_disabled
-        end
-
-        it "does not allow student to reply to a conversation", :ignore_js_errors do
-          user_session(@s1)
-          go_to_inbox_and_select_message
-          expect(f("#reply-btn")).to be_disabled
-        end
       end
     end
   end

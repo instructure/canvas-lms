@@ -767,15 +767,15 @@ class Group < ActiveRecord::Base
   end
 
   def self.default_storage_quota
-    Setting.get("group_default_quota", 50.megabytes.to_s).to_i
+    Setting.get("group_default_quota", 50.decimal_megabytes.to_s).to_i
   end
 
   def storage_quota_mb
-    quota / 1.megabyte
+    quota / 1.decimal_megabytes
   end
 
   def storage_quota_mb=(val)
-    self.storage_quota = val.try(:to_i).try(:megabytes)
+    self.storage_quota = val.try(:to_i).try(:decimal_megabytes)
   end
 
   TAB_HOME, TAB_PAGES, TAB_PEOPLE, TAB_DISCUSSIONS, TAB_FILES,

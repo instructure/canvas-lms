@@ -2643,6 +2643,15 @@ class Submission < ActiveRecord::Base
     comments.loaded? ? comments.reject(&:draft?) : comments.published
   end
 
+  def comments_including_drafts_for(user)
+    comments = user_can_read_grade?(user) ? submission_comments : visible_submission_comments
+    if comments.loaded?
+      comments.select { |comment| comment.non_draft_or_authored_by(user) }
+    else
+      comments.authored_by(user.id)
+    end
+  end
+
   def filter_attributes_for_user(hash, user, session)
     unless user_can_read_grade?(user, session)
       %w[score grade published_score published_grade entered_score entered_grade].each do |secret_attr|

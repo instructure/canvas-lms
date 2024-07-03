@@ -201,7 +201,7 @@ module Lti
         end
       end
     rescue StandError => e
-      puts e.message
+      logger.warn e.message
     end
 
     # @API Edit an Originality Report

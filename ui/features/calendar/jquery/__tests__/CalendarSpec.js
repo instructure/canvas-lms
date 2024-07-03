@@ -24,11 +24,11 @@ import moment from 'moment'
 import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
 import denver from 'timezone/America/Denver'
-import fixtures from 'helpers/fixtures'
+import fixtures from '@canvas/test-utils/fixtures'
 import $ from 'jquery'
 import 'jquery-migrate'
 import {subscribe} from 'jquery-tinypubsub'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const I18n = useI18nScope('calendar')
 

@@ -22,7 +22,7 @@ module ConditionalRelease
     include BoundsValidations
     include Deletion
 
-    belongs_to :rule, required: true
+    belongs_to :rule, optional: false
     belongs_to :root_account, class_name: "Account"
     has_many :assignment_sets, -> { active.order(position: :asc) }, inverse_of: :scoring_range, dependent: :destroy
     has_many :assignment_set_associations, -> { active.order(position: :asc) }, through: :assignment_sets

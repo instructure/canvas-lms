@@ -19,18 +19,12 @@
 const path = require('path')
 const glob = require('glob')
 const {DefinePlugin, EnvironmentPlugin, ProvidePlugin} = require('webpack')
-const partitioning = require('./partitioning')
 const PluginSpecsRunner = require('./PluginSpecsRunner')
 const {canvasDir} = require('../params')
 
-const {
-  CONTEXT_COFFEESCRIPT_SPEC,
-  CONTEXT_EMBER_GRADEBOOK_SPEC,
-  CONTEXT_JSX_SPEC,
-  RESOURCE_COFFEESCRIPT_SPEC,
-  RESOURCE_EMBER_GRADEBOOK_SPEC,
-  RESOURCE_JSX_SPEC,
-} = partitioning
+const UI_FEATURES_SPEC = 'ui/features'
+const UI_SHARED_SPEC = 'ui/shared'
+const QUNIT_SPEC = /Spec$/
 
 const WEBPACK_PLUGIN_SPECS = path.join(canvasDir, 'tmp/webpack-plugin-specs.js')
 
@@ -54,12 +48,7 @@ module.exports = {
       },
       {
         test: /\.(js|jsx|ts|tsx)$/,
-        include: [
-          path.join(canvasDir, 'ui'),
-          path.join(canvasDir, 'spec/javascripts/jsx'),
-          path.join(canvasDir, 'spec/coffeescripts'),
-          /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//,
-        ],
+        include: [path.join(canvasDir, 'ui'), /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//],
         exclude: [/node_modules/],
         parser: {
           requireInclude: 'allow',
@@ -124,10 +113,7 @@ module.exports = {
       // s/test/qunit.test/ and s/module/qunit.module/
       {
         test: /\.(js|jsx|ts|tsx)$/,
-        include: [
-          path.join(canvasDir, 'spec/coffeescripts'),
-          path.join(canvasDir, 'spec/javascripts/jsx'),
-        ].concat(
+        include: [path.join(canvasDir, 'ui')].concat(
           glob.sync('gems/plugins/*/spec_canvas/coffeescripts/', {
             cwd: canvasDir,
             absolute: true,
@@ -142,13 +128,11 @@ module.exports = {
     alias: {
       'node_modules-version-of-backbone$': require.resolve('backbone'),
       'node_modules-version-of-react-modal$': require.resolve('react-modal'),
-      'spec/jsx': path.join(canvasDir, 'spec/javascripts/jsx'),
       'ui/boot/initializers': path.join(canvasDir, 'ui/boot/initializers'),
       'ui/ext': path.join(canvasDir, 'ui/ext'),
       'ui/features': path.join(canvasDir, 'ui/features'),
-      [CONTEXT_COFFEESCRIPT_SPEC]: path.join(canvasDir, CONTEXT_COFFEESCRIPT_SPEC),
-      [CONTEXT_EMBER_GRADEBOOK_SPEC]: path.join(canvasDir, CONTEXT_EMBER_GRADEBOOK_SPEC),
-      [CONTEXT_JSX_SPEC]: path.join(canvasDir, CONTEXT_JSX_SPEC),
+      [UI_FEATURES_SPEC]: path.join(canvasDir, UI_FEATURES_SPEC),
+      [UI_SHARED_SPEC]: path.join(canvasDir, UI_SHARED_SPEC),
 
       // need to explicitly point this out for whatwg-url otherwise you get an
       // error like:
@@ -167,7 +151,6 @@ module.exports = {
     modules: [
       path.join(canvasDir, 'public/javascripts'),
       path.join(canvasDir, 'gems/plugins'),
-      path.join(canvasDir, 'spec/coffeescripts'),
       'node_modules',
     ],
   },
@@ -178,19 +161,17 @@ module.exports = {
 
   plugins: [
     new DefinePlugin({
-      CONTEXT_COFFEESCRIPT_SPEC: JSON.stringify(CONTEXT_COFFEESCRIPT_SPEC),
-      CONTEXT_EMBER_GRADEBOOK_SPEC: JSON.stringify(CONTEXT_EMBER_GRADEBOOK_SPEC),
-      CONTEXT_JSX_SPEC: JSON.stringify(CONTEXT_JSX_SPEC),
-      RESOURCE_COFFEESCRIPT_SPEC,
-      RESOURCE_EMBER_GRADEBOOK_SPEC,
-      RESOURCE_JSX_SPEC,
+      UI_FEATURES_SPEC: JSON.stringify(UI_FEATURES_SPEC),
+      UI_SHARED_SPEC: JSON.stringify(UI_SHARED_SPEC),
+      CI_NODE_TOTAL: JSON.stringify(process.env.CI_NODE_TOTAL),
+      CI_NODE_INDEX: JSON.stringify(process.env.CI_NODE_INDEX),
+      QUNIT_SPEC,
       WEBPACK_PLUGIN_SPECS: JSON.stringify(WEBPACK_PLUGIN_SPECS),
       process: {browser: true, env: {}},
     }),
 
     new EnvironmentPlugin({
       JSPEC_PATH: null,
-      JSPEC_GROUP: null,
       JSPEC_RECURSE: '1',
       JSPEC_VERBOSE: '0',
       A11Y_REPORT: false,
@@ -210,15 +191,5 @@ module.exports = {
       jQuery: 'jquery',
       'window.jQuery': 'jquery',
     }),
-  ].concat(
-    process.env.JSPEC_GROUP
-      ? [
-          partitioning.createPlugin({
-            group: process.env.JSPEC_GROUP,
-            nodeIndex: +process.env.CI_NODE_INDEX,
-            nodeTotal: +process.env.CI_NODE_TOTAL,
-          }),
-        ]
-      : []
-  ),
+  ],
 }

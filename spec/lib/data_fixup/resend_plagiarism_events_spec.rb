@@ -57,7 +57,7 @@ describe DataFixup::ResendPlagiarismEvents do
         Timecop.freeze do
           DataFixup::ResendPlagiarismEvents.run(only_errors: true)
           expect(Delayed::Job.where(tag: "DataFixup::ResendPlagiarismEvents.trigger_plagiarism_resubmit_by_time").count).to eq 1
-          dj = Delayed::Job.where(tag: "DataFixup::ResendPlagiarismEvents.trigger_plagiarism_resubmit_by_time").take
+          dj = Delayed::Job.find_by(tag: "DataFixup::ResendPlagiarismEvents.trigger_plagiarism_resubmit_by_time")
           expect(dj.payload_object.args).to eq([@submission_three.submitted_at, Time.zone.now, true])
           expect(dj.run_at).to eq(3.minutes.from_now)
         end

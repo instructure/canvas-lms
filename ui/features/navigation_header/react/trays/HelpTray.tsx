@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
-import HelpDialog from '../HelpDialog/index'
+import HelpDialog from '@canvas/help-dialog'
 import ReleaseNotesList from '../lists/ReleaseNotesList'
 
 const I18n = useI18nScope('HelpTray')

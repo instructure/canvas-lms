@@ -81,7 +81,7 @@ describe('MobileTopNavigationTools', () => {
         id: '1',
         title: 'Tool 1',
         icon_url: 'https://instructure.com',
-        pinned: true,
+        pinned: false,
       },
       {
         id: '2',

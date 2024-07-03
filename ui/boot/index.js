@@ -28,7 +28,7 @@ import {up as configureDateTimeMomentParser} from '@canvas/datetime/configureDat
 import {up as configureDateTime} from '@canvas/datetime/configureDateTime'
 import {initSentry} from './initializers/initSentry'
 import {up as renderRailsFlashNotifications} from './initializers/renderRailsFlashNotifications'
-import {up as activateCourseMenuToggler} from './initializers/activateCourseMenuToggler'
+import {up as activateCourseMenuToggler} from '@canvas/common/activateCourseMenuToggler'
 
 // Import is required, workaround for ARC-8398
 // eslint-disable-next-line import/no-nodejs-modules

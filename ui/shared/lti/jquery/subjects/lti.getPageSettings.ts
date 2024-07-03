@@ -23,6 +23,7 @@ interface pageSettings {
   time_zone: string
   use_high_contrast: boolean
   active_brand_config_json_url: string
+  window_width: number
 }
 
 const getPageSettings: LtiMessageHandler = ({responseMessages}) => {
@@ -31,6 +32,7 @@ const getPageSettings: LtiMessageHandler = ({responseMessages}) => {
     time_zone: ENV.TIMEZONE || '',
     use_high_contrast: !!ENV.use_high_contrast,
     active_brand_config_json_url: ENV.active_brand_config_json_url || '',
+    window_width: window.innerWidth,
   }
 
   responseMessages.sendResponse({pageSettings})

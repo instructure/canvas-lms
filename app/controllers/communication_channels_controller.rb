@@ -279,14 +279,17 @@ class CommunicationChannelsController < ApplicationController
         unless @current_user == @user
           session[:return_to] = request.url
           flash[:notice] = t "notices.login_to_confirm", "Please log in to confirm your e-mail address"
-          return redirect_to login_url(pseudonym_session: { unique_id: @user.pseudonym.try(:unique_id) }, expected_user_id: @user.id)
+          redirect_to login_url(pseudonym_session: { unique_id: @user.pseudonym.try(:unique_id) }, expected_user_id: @user.id)
+          return
         end
 
         cc.confirm
         @user.touch
-        flash[:notice] = t "notices.registration_confirmed", "Registration confirmed!"
         return respond_to do |format|
-          format.html { redirect_to redirect_back_or_default(user_profile_url(@current_user)) }
+          format.html do
+            flash[:notice] = t "notices.registration_confirmed", "Registration confirmed!"
+            redirect_to redirect_back_or_default(user_profile_url(@current_user))
+          end
           format.json { render json: cc.as_json(except: [:confirmation_code]) }
         end
       end
@@ -502,11 +505,13 @@ class CommunicationChannelsController < ApplicationController
   end
 
   def redirect_with_success_flash
-    flash[:notice] = t "notices.registration_confirmed", "Registration confirmed!"
     @current_user ||= @user # since dashboard_url may need it
     default_url = confirmation_redirect_url(@communication_channel) || dashboard_url
     respond_to do |format|
-      format.html { redirect_to(@enrollment ? course_url(@course) : redirect_back_or_default(default_url)) }
+      format.html do
+        flash[:notice] = t "notices.registration_confirmed", "Registration confirmed!"
+        redirect_to(@enrollment ? course_url(@course) : redirect_back_or_default(default_url))
+      end
       format.json { render json: { url: @enrollment ? course_url(@course) : default_url } }
     end
   end

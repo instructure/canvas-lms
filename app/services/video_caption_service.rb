@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class VideoCaptionService < ApplicationService
-  class VideoCaptionServiceError < Delayed::RetriableError; end
-
   def initialize(media_object, skip_polling: false)
     super()
 
@@ -31,14 +29,22 @@ class VideoCaptionService < ApplicationService
   end
 
   def call
-    return unless pass_initial_checks
+    update_status(:processing)
+    return update_status(:failed_initial_validation) unless pass_initial_checks
 
     # send to Notorious so it can process the media; grab and use the media_id from the handoff response
     @media_id = handoff
-    return unless @media_id
+    return update_status(:failed_handoff) unless @media_id
 
-    # On error, the job is scheduled again in 5 seconds + N ** 4, where N is the number of attempts
-    delay_if_production(max_attempts: 10).generate_captions
+    if @skip_polling
+      # tell Notorious to start generating captions -- must be complete with handoff first
+      request_caption_response = request_caption
+      return update_status(:failed_request) unless (200..299).cover?(request_caption_response.code)
+
+      process_captions_ready
+    else
+      delay.poll_caption_request
+    end
   end
 
   private
@@ -48,14 +54,18 @@ class VideoCaptionService < ApplicationService
     return false unless auth_token.present?
     return false unless @type.include?("video")
     return false unless @media_id
+    return false if @media_object.media_tracks.where(kind: "subtitles").exists?
     return false if url.nil?
 
     true
   end
 
-  def save_media_track(content, src_lang)
+  def save_media_track(content, srclang)
     if content.present?
-      @media_object.media_tracks.first_or_create(user: @media_object.user, locale: src_lang, kind: "subtitles", content:)
+      @media_object.media_tracks.first_or_create(user: @media_object.user, locale: srclang, kind: "subtitles", content:)
+      update_status(:complete)
+    else
+      update_status(:failed_to_pull)
     end
   end
 
@@ -64,33 +74,13 @@ class VideoCaptionService < ApplicationService
     response&.dig("media", "id")
   end
 
-  def generate_captions
-    response = request_caption
+  def grab_captions(srclang)
+    response = collect_captions(srclang)
     if (200..299).cover?(response.code)
-      delay_if_production(max_attempts: 10).poll_for_captions_ready
-    else
-      raise VideoCaptionServiceError, "Failed to tell Notorious to start generating captions"
+      return response.body
     end
-  end
 
-  def poll_for_captions_ready
-    response = media
-    if response.dig("media", "captions", 0, "language") && response.dig("media", "captions", 0, "status") == "succeeded"
-      src_lang = response.dig("media", "captions", 0, "language")
-      # dont' proceed if the language is not detected as English
-      if src_lang.start_with?("en")
-        grab_captions(src_lang)
-      end
-    else
-      raise VideoCaptionServiceError, "Failed to get captions from Notorious"
-    end
-  end
-
-  def grab_captions(src_lang)
-    response = collect_captions(src_lang)
-    if (200..299).cover?(response.code)
-      save_media_track(response.body, src_lang)
-    end
+    nil
   end
 
   def url
@@ -115,8 +105,8 @@ class VideoCaptionService < ApplicationService
     "#{notorious_host}/api/media/#{@media_id}"
   end
 
-  def caption_collect_url(src_lang)
-    "#{notorious_host}/api/media/#{@media_id}/captions/#{src_lang}"
+  def caption_collect_url(srclang)
+    "#{notorious_host}/api/media/#{@media_id}/captions/#{srclang}"
   end
 
   def notorious_host
@@ -143,11 +133,64 @@ class VideoCaptionService < ApplicationService
     HTTParty.get(media_url, headers: request_headers)
   end
 
-  def collect_captions(src_lang)
-    HTTParty.get(caption_collect_url(src_lang), headers: request_headers)
+  def collect_captions(srclang)
+    HTTParty.get(caption_collect_url(srclang), headers: request_headers)
   end
 
   def config
     @config ||= DynamicSettings.find("notorious-admin", tree: :private) || {}
+  end
+
+  def update_status(status)
+    @media_object.update_attribute(:auto_caption_status, status)
+  end
+
+  def process_captions_ready
+    response = media
+    if response.dig("media", "captions", 0, "language") && response.dig("media", "captions", 0, "status") == "succeeded"
+      srclang = response.dig("media", "captions", 0, "language")
+      srclang = nil unless srclang.start_with?("en")
+      return update_status(:non_english_captions) unless srclang
+
+      save_media_track(grab_captions(srclang), srclang)
+    else
+      update_status(:failed_captions)
+    end
+  end
+
+  def poll_caption_request(attempts = 1)
+    response = request_caption
+    if (200..299).cover?(response.code)
+      delay.poll_captions_ready
+    elsif attempts < 10
+      delay(run_at: reschedule_time(attempts)).poll_caption_request(attempts + 1)
+    else
+      update_status(:failed_request)
+    end
+  end
+  alias_method :generate_captions, :poll_caption_request
+
+  def poll_captions_ready(attempts = 1)
+    response = media
+    response_succeeded = response.dig("media", "captions", 0, "status") == "succeeded"
+    language_detected = response.dig("media", "captions", 0, "language")
+
+    if response_succeeded && language_detected
+      if language_detected.start_with?("en")
+        save_media_track(grab_captions(language_detected), language_detected)
+      else
+        update_status(:non_english_captions)
+      end
+    elsif attempts < 10
+      delay(run_at: reschedule_time(attempts)).poll_captions_ready(attempts + 1)
+    else
+      update_status(:failed_captions)
+    end
+  end
+  alias_method :poll_for_captions_ready, :poll_captions_ready
+
+  def reschedule_time(attempt)
+    # This mimics the exponential backoff algorithm used by inst jobs
+    (5 + (attempt**4)).seconds.from_now
   end
 end

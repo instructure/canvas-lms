@@ -25,9 +25,9 @@ import AuthLoggingItemView from './AuthLoggingItemView'
 import authLoggingResultsTemplate from '../../jst/authLoggingSearchResults.handlebars'
 import usersTemplate from '../../jst/usersList.handlebars'
 import template from '../../jst/authLoggingContentPane.handlebars'
-import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
+import {extend} from '@canvas/backbone/utils'
 
-_inherits(AuthLoggingContentPaneView, Backbone.View)
+extend(AuthLoggingContentPaneView, Backbone.View)
 
 export default function AuthLoggingContentPaneView(options) {
   this.fetch = this.fetch.bind(this)

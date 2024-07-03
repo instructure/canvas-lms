@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import React, {Suspense} from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import 'jquery-scroll-to-visible'
@@ -37,8 +37,6 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {renderFrontPagePill} from '@canvas/wiki/react/renderFrontPagePill'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
-
-import {renderBlockEditorView} from '@canvas/block-editor'
 
 const I18n = useI18nScope('pages')
 
@@ -194,10 +192,16 @@ export default class WikiPageView extends Backbone.View {
 
   renderBlockEditorContent() {
     if (ENV.BLOCK_EDITOR && this.model.get('block_editor_attributes')?.blocks?.[0]?.data) {
-      const container = document.getElementById('block-editor-content')
-      container.classList.add('block-editor-view')
-      const content = JSON.parse(this.model.get('block_editor_attributes').blocks[0].data)
-      renderBlockEditorView(content, container)
+      import('@canvas/block-editor')
+        .then(({renderBlockEditorView}) => {
+          const container = document.getElementById('block-editor-content')
+          container.classList.add('block-editor-view')
+          const content = JSON.parse(this.model.get('block_editor_attributes').blocks[0].data)
+          renderBlockEditorView(content, container)
+        })
+        .catch(e => {
+          window.alert('Error loading block editor content')
+        })
     }
   }
 
@@ -368,7 +372,7 @@ export default class WikiPageView extends Backbone.View {
       json.CAN.ACCESS_GEAR_MENU
     json.recent_announcements_enabled = !!ENV.SHOW_ANNOUNCEMENTS
     json.explicit_latex_typesetting = !!ENV.FEATURES?.explicit_latex_typesetting
-    json.show_assign_to = !!ENV.FEATURES.selective_release_ui_api && !!this.course_id
+    json.show_assign_to = !!ENV.FEATURES?.selective_release_ui_api && !!this.course_id
 
     if (json.lock_info) {
       json.lock_info = clone(json.lock_info)

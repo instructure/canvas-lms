@@ -106,12 +106,7 @@ RSpec.describe SecurityController, type: :request do
                                         },
                                         5.minutes.from_now)
 
-      messages = Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE.keys.map(&:to_s).map do |message_type|
-        {
-          "type" => message_type,
-          "placements" => Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE[message_type].reject { |p| p == :resource_selection }.map(&:to_s)
-        }
-      end
+      messages = SecurityController.messages_supported
 
       get "/api/lti/security/openid-configuration?registration_token=#{jwt}"
       expect(response).to have_http_status :ok

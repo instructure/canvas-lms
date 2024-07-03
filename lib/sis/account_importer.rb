@@ -55,7 +55,7 @@ module SIS
         parent = nil
         unless parent_account_id.blank?
           parent = @accounts_cache[parent_account_id]
-          parent ||= @root_account.all_accounts.where(sis_source_id: parent_account_id).take
+          parent ||= @root_account.all_accounts.find_by(sis_source_id: parent_account_id)
           raise ImportError, "Parent account didn't exist for #{account_id}" unless parent
           raise ImportError, "Cannot restore sub_account with ID: #{account_id} because parent_account with ID: #{parent_account_id} has been deleted." if parent.workflow_state == "deleted"
 
@@ -63,7 +63,7 @@ module SIS
         end
 
         account = @accounts_cache[account_id]
-        account ||= @root_account.all_accounts.where(sis_source_id: account_id).take
+        account ||= @root_account.all_accounts.find_by(sis_source_id: account_id)
         if account.nil?
           raise ImportError, "No name given for account #{account_id}, skipping" if name.blank?
           raise ImportError, "Improper status \"#{status}\" for account #{account_id}, skipping" unless /\A(active|deleted)/i.match?(status)

@@ -28,7 +28,9 @@ import {
   IconPlusLine,
   IconSettingsLine,
   IconStatsLine,
-  IconPublishLine,
+  IconPublishSolid,
+  IconUnpublishedLine,
+  IconCheckSolid,
 } from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
@@ -181,11 +183,36 @@ export default class CoursesListRow extends React.Component {
     }
   }
 
+  renderCourseStatusIcon = () => {
+    const {workflow_state} = this.props
+    let tooltip = I18n.t('Unpublished')
+    let classname = 'unpublished-course'
+    let statusIcon = <IconUnpublishedLine size="x-small" />
+
+    if (workflow_state === 'available') {
+      tooltip = I18n.t('Published')
+      classname = 'published-course'
+      statusIcon = <IconPublishSolid size="x-small" />
+    } else if (workflow_state === 'completed') {
+      tooltip = I18n.t('Concluded')
+      classname = 'completed-course'
+      statusIcon = <IconCheckSolid size="x-small" />
+    }
+
+    return (
+      <span className={`published-status ${classname}`}>
+        <Tooltip renderTip={tooltip}>
+          {statusIcon}
+          <ScreenReaderContent>{tooltip}</ScreenReaderContent>
+        </Tooltip>
+      </span>
+    )
+  }
+
   render() {
     const {
       id,
       name,
-      workflow_state,
       sis_course_id,
       total_students,
       teachers,
@@ -200,7 +227,6 @@ export default class CoursesListRow extends React.Component {
     const {teachersToShow, newlyEnrolledStudents} = this.state
     const url = `/courses/${id}`
     const sub_url = `/accounts/${subaccount_id}`
-    const isPublished = workflow_state !== 'unpublished'
 
     const blueprintTip = I18n.t('This is a blueprint course')
     const statsTip = I18n.t('Statistics for %{name}', {name})
@@ -210,16 +236,7 @@ export default class CoursesListRow extends React.Component {
     return (
       <Table.Row>
         <Table.RowHeader textAlign="center">
-          {isPublished ? (
-            <span className="published-status published">
-              <IconPublishLine size="x-small" />
-              <ScreenReaderContent>{I18n.t('yes')}</ScreenReaderContent>
-            </span>
-          ) : (
-            <span className="published-status unpublished">
-              <ScreenReaderContent>{I18n.t('no')}</ScreenReaderContent>
-            </span>
-          )}
+          {this.renderCourseStatusIcon()}
         </Table.RowHeader>
         <Table.Cell>
           <a href={url}>

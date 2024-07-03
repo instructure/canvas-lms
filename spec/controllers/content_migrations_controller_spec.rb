@@ -75,6 +75,7 @@ describe ContentMigrationsController do
           expect(assigns[:js_env][:NEW_QUIZZES_IMPORT]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION_DEFAULT]).not_to be_nil
+          expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION_REQUIRED]).not_to be_nil
           expect(assigns[:js_env][:SHOW_SELECTABLE_OUTCOMES_IN_IMPORT]).not_to be_nil
         end
 
@@ -93,6 +94,7 @@ describe ContentMigrationsController do
           expect(assigns[:js_env][:NEW_QUIZZES_IMPORT]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION_DEFAULT]).not_to be_nil
+          expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION_REQUIRED]).not_to be_nil
           expect(assigns[:js_env][:SHOW_SELECTABLE_OUTCOMES_IN_IMPORT]).to be_nil
         end
       end

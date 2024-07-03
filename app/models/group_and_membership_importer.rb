@@ -117,10 +117,10 @@ class GroupAndMembershipImporter < ActiveRecord::Base
     login_id = row["login_id"]
     user = nil
     user_scope = group_category.context.students.where.not(enrollments: { type: "StudentViewEnrollment" })
-    user = user_scope.where(id: user_id).take if user_id
+    user = user_scope.find_by(id: user_id) if user_id
     pseudonym_scope = Pseudonym.active.where(account_id: group_category.root_account_id)
-    user ||= user_scope.where(id: pseudonym_scope.where(sis_user_id: user_sis_id).limit(1).select(:user_id)).take if user_sis_id
-    user ||= user_scope.where(id: pseudonym_scope.by_unique_id(login_id).limit(1).select(:user_id)).take if login_id
+    user ||= user_scope.find_by(id: pseudonym_scope.where(sis_user_id: user_sis_id).limit(1).select(:user_id)) if user_sis_id
+    user ||= user_scope.find_by(id: pseudonym_scope.by_unique_id(login_id).limit(1).select(:user_id)) if login_id
     user
   end
 
@@ -132,11 +132,11 @@ class GroupAndMembershipImporter < ActiveRecord::Base
     return unless key
 
     group = seen_groups[key]
-    group ||= group_category.groups.where(id: group_id).take if group_id
-    group ||= group_category.groups.where(sis_source_id: group_sis_id).take if group_sis_id
+    group ||= group_category.groups.find_by(id: group_id) if group_id
+    group ||= group_category.groups.find_by(sis_source_id: group_sis_id) if group_sis_id
     restore_group(group) if group&.deleted?
     if group_name
-      group ||= group_category.groups.active.where(name: group_name).take
+      group ||= group_category.groups.active.find_by(name: group_name)
       group ||= create_new_group(group_name)
     end
     seen_groups[key] ||= group

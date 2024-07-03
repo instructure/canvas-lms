@@ -169,12 +169,7 @@ exports.emberHandlebars = {
 // i.e. process.env.CRYSTALBALL_MAP === '1'
 exports.istanbul = {
   test: /\.(js|jsx|ts|tsx)$/,
-  include: [
-    resolve(canvasDir, 'ui'),
-    resolve(canvasDir, 'spec/javascripts/jsx'),
-    resolve(canvasDir, 'spec/coffeescripts'),
-    ...globPlugins('app/{jsx,coffeescripts}/'),
-  ],
+  include: [resolve(canvasDir, 'ui'), ...globPlugins('app/{jsx,coffeescripts}/')],
   exclude: [/test\//, /spec/],
   use: {
     loader: 'coverage-istanbul-loader',

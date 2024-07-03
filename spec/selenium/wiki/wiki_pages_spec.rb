@@ -221,7 +221,7 @@ describe "Wiki Pages" do
       wait_for_ajaximations
       # validation
       lock_explanation = f(".lock_explanation").text
-      expect(lock_explanation).to include "This page is locked until"
+      expect(lock_explanation).to include "This page is part of the module #{mod2.name} and hasn't been unlocked yet."
       expect(lock_explanation).to include "The following requirements need to be completed before this page will be unlocked:"
     end
 

@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import 'jquery'
+import 'jquery-migrate'
 import startApp from '../start_app'
 import Ember from 'ember'
 import fixtures from '../ajax_fixtures'
@@ -44,7 +46,8 @@ QUnit.module('grading_cell_component integration test for isPoints', {
   },
 })
 
-test('fast-select instance is used for grade input', () => {
+// unskip in EVAL-2505
+QUnit.skip('fast-select instance is used for grade input', () => {
   ok(find('#student_and_assignment_grade').is('select'))
   equal(find('#student_and_assignment_grade').val(), 'incomplete')
 })

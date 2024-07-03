@@ -466,7 +466,7 @@ describe "admin_tools" do
       @events = []
       (1..5).each do |index|
         @course.name = "Course #{index}"
-        @course.start_at = Date.today + index.days
+        @course.start_at = Time.zone.today + index.days
         @course.conclude_at = @course.start_at + 7.days
         Timecop.freeze(index.seconds.from_now) do
           @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)

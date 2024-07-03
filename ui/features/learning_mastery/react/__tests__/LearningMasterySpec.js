@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import LearningMastery from '../LearningMastery'
 import FakeServer, {
   formBodyFromRequest,
 } from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
-import ContentFilterDriver from '../../../../../spec/javascripts/jsx/gradebook/default_gradebook/components/content-filters/ContentFilterDriver'
+import ContentFilterDriver from '@canvas/grading/content-filters/ContentFilterDriver'
 
 QUnit.module('Learning Mastery > LearningMastery', suiteHooks => {
   let $container

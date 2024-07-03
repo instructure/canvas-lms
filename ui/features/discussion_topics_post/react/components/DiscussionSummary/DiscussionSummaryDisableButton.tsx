@@ -25,7 +25,6 @@ import {Tooltip} from '@instructure/ui-tooltip'
 interface DiscussionSummaryDisableButtonProps {
   onClick: () => void
   isEnabled: boolean
-  showText: boolean
 }
 
 const I18n = useI18nScope('discussions_posts')
@@ -43,7 +42,7 @@ export const DiscussionSummaryDisableButton: React.FC<
         data-testid="summary-disable-button"
         disabled={!props.isEnabled}
       >
-        {props.showText && buttonText}
+        {buttonText}
       </Button>
     </Tooltip>
   )

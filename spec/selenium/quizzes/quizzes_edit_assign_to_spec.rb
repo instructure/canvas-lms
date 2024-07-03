@@ -22,6 +22,7 @@ require_relative "page_objects/quizzes_edit_page"
 require_relative "page_objects/quizzes_landing_page"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "../helpers/context_modules_common"
+require_relative "../../helpers/selective_release_common"
 
 describe "quiz edit page assign to" do
   include_context "in-process server selenium tests"
@@ -30,6 +31,7 @@ describe "quiz edit page assign to" do
   include ItemsAssignToTray
   include ContextModulesCommon
   include QuizzesCommon
+  include SelectiveReleaseCommon
 
   before :once do
     differentiated_modules_on

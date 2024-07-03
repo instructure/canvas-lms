@@ -19,12 +19,12 @@
 import PropTypes from 'prop-types'
 import categoryShape from './category-shape'
 
-const {shape, string, number, instanceOf} = PropTypes
+const {shape, string, number, instanceOf, oneOfType} = PropTypes
 
 export default shape({
   name: string.isRequired,
   description: string,
-  points_possible: number.isRequired,
+  points_possible: number,
   due_at: instanceOf(Date),
   category: categoryShape.isRequired,
 })

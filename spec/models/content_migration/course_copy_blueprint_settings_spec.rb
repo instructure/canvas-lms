@@ -64,22 +64,22 @@ describe ContentMigration do
       expect(template_to.default_restrictions).to eq(@template.default_restrictions)
       expect(template_to.default_restrictions_by_type).to eq(@template.default_restrictions_by_type)
 
-      assign_to = @copy_to.assignments.where(migration_id: mig_id(@assignment)).take
+      assign_to = @copy_to.assignments.find_by(migration_id: mig_id(@assignment))
       mt = template_to.content_tag_for(assign_to)
       expect(mt.restrictions).to eq({ content: true, points: true, due_dates: false, availability_dates: false })
       expect(mt.use_default_restrictions).to be true
 
-      topic_to = @copy_to.discussion_topics.where(migration_id: mig_id(@topic)).take
+      topic_to = @copy_to.discussion_topics.find_by(migration_id: mig_id(@topic))
       mt = template_to.content_tag_for(topic_to)
       expect(mt.restrictions).to eq({ content: false, points: false, due_dates: true, availability_dates: true })
       expect(mt.use_default_restrictions).to be false
 
-      page_to = @copy_to.wiki_pages.where(migration_id: mig_id(@page)).take
+      page_to = @copy_to.wiki_pages.find_by(migration_id: mig_id(@page))
       mt = template_to.content_tag_for(page_to)
       expect(mt.restrictions).to eq({ content: false })
       expect(mt.use_default_restrictions).to be true
 
-      unlocked_assign_to = @copy_to.assignments.where(migration_id: mig_id(@unlocked_assign)).take
+      unlocked_assign_to = @copy_to.assignments.find_by(migration_id: mig_id(@unlocked_assign))
       expect(template_to.content_tag_for(unlocked_assign_to).restrictions).to eq({})
     end
 

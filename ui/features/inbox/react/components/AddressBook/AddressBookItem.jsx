@@ -40,6 +40,7 @@ export const AddressBookItem = ({
   menuRef,
   observerEnrollments,
   isOnObserverSubmenu,
+  pronouns,
 }) => {
   const itemRef = useRef()
   const [observeesAreTruncated, setObserveesAreTruncated] = useState(false)
@@ -109,6 +110,9 @@ export const AddressBookItem = ({
               <TruncateText>
                 <Text color={isSelected ? 'primary-inverse' : null}>{children}</Text>
               </TruncateText>
+              {pronouns &&
+                <Text weight="light" size="small">{pronouns}</Text>
+              }
               {isOnObserverSubmenu && observerEnrollments && observerEnrollments.length > 0 && (
                 <Text size="small" color={isSelected ? 'secondary-inverse' : 'secondary'}>
                   <TruncateText onUpdate={updateObserveesAreTruncated}>
@@ -205,6 +209,11 @@ AddressBookItem.propTypes = {
    * Is the AddressBookContainer on an Observer submenu?
    */
   isOnObserverSubmenu: PropTypes.bool,
+  /**
+   * User pronouns to be displayed if 'Enable Personal Pronouns'
+   * is enabled in Account Settings
+   */
+  pronouns: PropTypes.string,
 }
 
 AddressBookItem.defaultProps = {

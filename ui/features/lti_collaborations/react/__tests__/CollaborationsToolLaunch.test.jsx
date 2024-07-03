@@ -16,11 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import 'jquery-migrate'
 import React from 'react'
 import {render} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import CollaborationsToolLaunch from '../CollaborationsToolLaunch'
 
 let fixtures

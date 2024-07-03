@@ -607,7 +607,7 @@ describe "Feature Flags API", type: :request do
                            {},
                            {},
                            { expected_status: 200 })
-          expect(t_sub_account.feature_flags.where(feature: "hidden_feature").take).to be_enabled
+          expect(t_sub_account.feature_flags.find_by(feature: "hidden_feature")).to be_enabled
         end
       end
 

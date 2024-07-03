@@ -357,10 +357,10 @@ export default class Calendar {
     const startDate = event.startDate()
     const endDate = event.endDate()
     const timeString = (() => {
-      if (!endDate || +startDate === +endDate || event.blackout_date) {
+      if (startDate && (!endDate || +startDate === +endDate || event.blackout_date)) {
         startDate.locale(calendarDefaults.lang)
         return startDate.format('LT')
-      } else {
+      } else if (startDate && endDate) {
         startDate.locale(calendarDefaults.lang)
         endDate.locale(calendarDefaults.lang)
         return $.fullCalendar.formatRange(startDate, endDate, 'LT')
@@ -418,9 +418,9 @@ export default class Calendar {
       const time = element.find('.fc-time')
       let html = time.html()
       // the time element also contains the title for calendar events
-      html = html && html.replace(/^\d+:\d+\w?/, event.startDate().format('h:mmt'))
+      html = html && html.replace(/^\d+:\d+\w?/, event.startDate()?.format('h:mmt'))
       time.html(html)
-      time.attr('data-start', event.startDate().format('h:mm'))
+      time.attr('data-start', event.startDate()?.format('h:mm'))
     }
     if (event.eventType.match(/assignment/) && view.name === 'agendaWeek') {
       element

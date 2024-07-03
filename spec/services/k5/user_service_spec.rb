@@ -84,7 +84,7 @@ describe K5::UserService do
     end
 
     it "returns false if all k5 enrollments are concluded" do
-      @student1.enrollments.where(course_id: @course.id).take.complete
+      @student1.enrollments.find_by(course_id: @course.id).complete
       service = K5::UserService.new(@student1, @root_account, nil)
       expect(service.send(:k5_user?)).to be false
     end

@@ -20,6 +20,8 @@
 import queryString from 'query-string'
 import getCookie from '@instructure/get-cookie'
 import type {Product} from '../model/Product'
+import type {FilterItem} from '../model/Filter'
+import {isEmpty} from 'lodash'
 
 // TODO: add actual type
 type Params = any
@@ -33,6 +35,11 @@ type ProductResponse = {
     per_page: number
   }
 }
+type ToolsByDisplayGroupResponse = Array<{
+  display_name: string
+  tag: FilterItem
+  tools: Array<Product>
+}>
 
 // TODO: remove when backend hooked up
 const mockProducts: Array<Product> = [
@@ -59,6 +66,28 @@ const mockProducts: Array<Product> = [
         'Learning Tools Interoperability (LTI)® v.1.3 Core Specification',
         'Learning Tools Interoperability (LTI)® v.1.1 Core Specification',
       ],
+      placements: [
+        'Account Navigation',
+        'Assignment Edit',
+        'Assignment Group Menu',
+        'Assignment Index Menu',
+        'Assignment Menu',
+        'Assignment Selection',
+        'Collaboration',
+        'Course Assignments Menu',
+      ],
+      services: [
+        'Assignment and Grade Services v2.0 (AGS)',
+        'Name and Role Provisioning Services v2.0 (NRPS)',
+        'Deep Linking v2.0 (DL)',
+        'Dynamic Registration 1.0',
+        'Submission Review 1.0',
+        'Caliper Analytics Connector 1.0',
+        'Course Group Service 1.0',
+        'Proctering Service 1.0',
+      ],
+      description:
+        'This LTI version uses Dynamic Registration to support Canvas placement. Support documentation can be found via the help docs on StarBrightLearning.com/helpdocs or within the implementation section of this portal',
     },
     countries: ['USA', 'France', 'Netherlands', 'India', 'China', 'Mexico'],
     badges: [
@@ -84,6 +113,10 @@ const mockProducts: Array<Product> = [
         badge_url: 'https://www.cast.org/learn/credentials-certifications',
       },
     ],
+    screenshots: [
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+    ],
   },
   {
     id: '3ff',
@@ -104,6 +137,20 @@ const mockProducts: Array<Product> = [
     lti: {
       versions: ['v1.1'],
       title: ['Learning Tools Interoperability (LTI)® v.1.1 Core Specification'],
+      placements: [
+        'Assignment Menu',
+        'Assignment Selection',
+        'Collaboration',
+        'Course Assignments Menu',
+      ],
+      services: [
+        'Assignment and Grade Services v2.0 (AGS)',
+        'Name and Role Provisioning Services v2.0 (NRPS)',
+        'Course Group Service 1.0',
+        'Proctering Service 1.0',
+      ],
+      description:
+        'This LTI v1.3 utilizes Dynamic Registration to support Canvas placement. Support documentation can be found via the help docs on StarBrightLearning.com/helpdocs or within the implementation section of this portal',
     },
     countries: ['USA', 'India', 'China', 'Mexico'],
     badges: [
@@ -123,6 +170,7 @@ const mockProducts: Array<Product> = [
         badge_url: 'https://www.cast.org/learn/credentials-certifications',
       },
     ],
+    screenshots: ['https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png'],
   },
   {
     id: '5a',
@@ -147,6 +195,17 @@ const mockProducts: Array<Product> = [
         'Learning Tools Interoperability (LTI)® v.1.3 Core Specification',
         'Learning Tools Interoperability (LTI)® v.1.1 Core Specification',
       ],
+      placements: ['Assignment Selection', 'Collaboration', 'Course Assignments Menu'],
+      services: [
+        'Assignment and Grade Services v2.0 (AGS)',
+        'Dynamic Registration 1.0',
+        'Submission Review 1.0',
+        'Caliper Analytics Connector 1.0',
+        'Course Group Service 1.0',
+        'Proctering Service 1.0',
+      ],
+      description:
+        'This LTI v1.3 utilizes Dynamic Registration to support Canvas placement. Support documentation can be found via the help docs on StarBrightLearning.com/helpdocs or within the implementation section of this portal',
     },
     countries: ['USA', 'France', 'India', 'China', 'Mexico'],
     badges: [
@@ -160,6 +219,14 @@ const mockProducts: Array<Product> = [
         image_url: 'https://api.badgr.io/public/badges/X4bcdw10TL6nEKSAuIS3aA/image',
         badge_url: 'https://digitalpromise.org/initiative/educator-micro-credentials/',
       },
+    ],
+    screenshots: [
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
     ],
   },
   {
@@ -184,6 +251,28 @@ const mockProducts: Array<Product> = [
         'Learning Tools Interoperability (LTI)® v.1.3 Core Specification',
         'Learning Tools Interoperability (LTI)® v.1.1 Core Specification',
       ],
+      placements: [
+        'Account Navigation',
+        'Assignment Edit',
+        'Assignment Group Menu',
+        'Assignment Index Menu',
+        'Assignment Menu',
+        'Assignment Selection',
+        'Collaboration',
+        'Course Assignments Menu',
+      ],
+      services: [
+        'Assignment and Grade Services v2.0 (AGS)',
+        'Name and Role Provisioning Services v2.0 (NRPS)',
+        'Deep Linking v2.0 (DL)',
+        'Dynamic Registration 1.0',
+        'Submission Review 1.0',
+        'Caliper Analytics Connector 1.0',
+        'Course Group Service 1.0',
+        'Proctering Service 1.0',
+      ],
+      description:
+        'This LTI v1.3 utilizes Dynamic Registration to support Canvas placement. Support documentation can be found via the help docs on StarBrightLearning.com/helpdocs or within the implementation section of this portal',
     },
     countries: ['USA', 'France', 'Netherlands'],
     badges: [
@@ -202,6 +291,14 @@ const mockProducts: Array<Product> = [
         image_url: 'https://index.edsurge.com/images/udlProductCertification-badge_updated.png',
         badge_url: 'https://www.cast.org/learn/credentials-certifications',
       },
+    ],
+    screenshots: [
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
     ],
   },
   {
@@ -226,6 +323,20 @@ const mockProducts: Array<Product> = [
         'Learning Tools Interoperability (LTI)® v.1.3 Core Specification',
         'Learning Tools Interoperability (LTI)® v.1.1 Core Specification',
       ],
+      placements: [
+        'Account Navigation',
+        'Assignment Edit',
+        'Assignment Group Menu',
+        'Assignment Index Menu',
+      ],
+      services: [
+        'Assignment and Grade Services v2.0 (AGS)',
+        'Name and Role Provisioning Services v2.0 (NRPS)',
+        'Deep Linking v2.0 (DL)',
+        'Dynamic Registration 1.0',
+      ],
+      description:
+        'This LTI v1.3 utilizes Dynamic Registration to support Canvas placement. Support documentation can be found via the help docs on StarBrightLearning.com/helpdocs or within the implementation section of this portal',
     },
     countries: ['USA', 'Mexico'],
     badges: [
@@ -251,6 +362,14 @@ const mockProducts: Array<Product> = [
         badge_url: 'https://www.cast.org/learn/credentials-certifications',
       },
     ],
+    screenshots: [
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
+    ],
   },
   {
     id: '118a',
@@ -274,6 +393,28 @@ const mockProducts: Array<Product> = [
         'Learning Tools Interoperability (LTI)® v.1.3 Core Specification',
         'Learning Tools Interoperability (LTI)® v.1.1 Core Specification',
       ],
+      placements: [
+        'Account Navigation',
+        'Assignment Edit',
+        'Assignment Group Menu',
+        'Assignment Index Menu',
+        'Assignment Menu',
+        'Assignment Selection',
+        'Collaboration',
+        'Course Assignments Menu',
+      ],
+      services: [
+        'Assignment and Grade Services v2.0 (AGS)',
+        'Name and Role Provisioning Services v2.0 (NRPS)',
+        'Deep Linking v2.0 (DL)',
+        'Dynamic Registration 1.0',
+        'Submission Review 1.0',
+        'Caliper Analytics Connector 1.0',
+        'Course Group Service 1.0',
+        'Proctering Service 1.0',
+      ],
+      description:
+        'This LTI v1.3 utilizes Dynamic Registration to support Canvas placement. Support documentation can be found via the help docs on StarBrightLearning.com/helpdocs or within the implementation section of this portal',
     },
     countries: ['France', 'Netherlands'],
     badges: [
@@ -288,6 +429,14 @@ const mockProducts: Array<Product> = [
         image_url: 'https://index.edsurge.com/images/udlProductCertification-badge_updated.png',
         badge_url: 'https://www.cast.org/learn/credentials-certifications',
       },
+    ],
+    screenshots: [
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
     ],
   },
   {
@@ -311,6 +460,19 @@ const mockProducts: Array<Product> = [
         'Learning Tools Interoperability (LTI)® v.1.3 Core Specification',
         'Learning Tools Interoperability (LTI)® v.1.1 Core Specification',
       ],
+      placements: [
+        'Account Navigation',
+        'Assignment Edit',
+        'Assignment Group Menu',
+        'Assignment Index Menu',
+        'Assignment Menu',
+        'Assignment Selection',
+        'Collaboration',
+        'Course Assignments Menu',
+      ],
+      services: ['Assignment and Grade Services v2.0 (AGS)'],
+      description:
+        'This LTI v1.3 utilizes Dynamic Registration to support Canvas placement. Support documentation can be found via the help docs on StarBrightLearning.com/helpdocs or within the implementation section of this portal',
     },
     countries: ['USA', 'France', 'Netherlands', 'India', 'China', 'Mexico'],
     badges: [
@@ -330,6 +492,14 @@ const mockProducts: Array<Product> = [
         image_url: 'https://index.edsurge.com/images/udlProductCertification-badge_updated.png',
         badge_url: 'https://www.cast.org/learn/credentials-certifications',
       },
+    ],
+    screenshots: [
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
     ],
   },
   {
@@ -353,6 +523,21 @@ const mockProducts: Array<Product> = [
         'Learning Tools Interoperability (LTI)® v.1.3 Core Specification',
         'Learning Tools Interoperability (LTI)® v.1.1 Core Specification',
       ],
+      placements: [
+        'Account Navigation',
+        'Assignment Edit',
+        'Assignment Group Menu',
+        'Assignment Index Menu',
+        'Assignment Menu',
+        'Collaboration',
+        'Course Assignments Menu',
+      ],
+      services: [
+        'Assignment and Grade Services v2.0 (AGS)',
+        'Name and Role Provisioning Services v2.0 (NRPS)',
+      ],
+      description:
+        'This LTI v1.3 utilizes Dynamic Registration to support Canvas placement. Support documentation can be found via the help docs on StarBrightLearning.com/helpdocs or within the implementation section of this portal',
     },
     countries: ['USA'],
     badges: [
@@ -378,12 +563,31 @@ const mockProducts: Array<Product> = [
         badge_url: 'https://www.cast.org/learn/credentials-certifications',
       },
     ],
+    screenshots: [
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Student-Teacher-View.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-Duplicate-1.png',
+      'https://nearpod.com/blog/wp-content/uploads/2017/11/Project-a-2nd.jpg',
+    ],
+  },
+]
+
+export const mockTags: Array<FilterItem> = [
+  {
+    id: '1',
+    name: '1EdTEch Trusted App Certified',
+  },
+  {
+    id: '2',
+    name: 'LTI 1.3 Supported',
   },
 ]
 
 export const fetchProducts = async (params: Params): Promise<ProductResponse> => {
   let tools = [...mockProducts]
-  if (params.filters.companies.length > 0) {
+  if (!isEmpty(params.filters.companies)) {
     tools = tools.filter(product =>
       params.filters.companies.map((c: {id: any}) => c.id).includes(product.company.id)
     )
@@ -395,12 +599,18 @@ export const fetchProducts = async (params: Params): Promise<ProductResponse> =>
     )
   }
 
+  if (params.page) {
+    const start = (params.page - 1) * (params.per_page || 3)
+    const end = start + (params.per_page || 3)
+    tools = tools.slice(start, end)
+  }
+
   const meta = {
     count: tools.length,
-    total_count: tools.length,
-    current_page: 1,
-    num_pages: 1,
-    per_page: 20,
+    total_count: mockProducts.length,
+    current_page: params.page || 1,
+    num_pages: 3,
+    per_page: 3,
   }
   return {tools, meta}
 
@@ -448,4 +658,25 @@ export const fetchProductDetails = async (id: String): Promise<Product | null> =
   // const {product} = await response.json()
 
   // return product
+}
+
+export const fetchToolsByDisplayGroups = async (): Promise<ToolsByDisplayGroupResponse> => {
+  return [
+    {
+      display_name: '1EdTEch Trusted App Certified',
+      tag: {
+        id: '1',
+        name: '1EdTEch Trusted App Certified',
+      },
+      tools: mockProducts.slice(0, 3),
+    },
+    {
+      display_name: 'LTI 1.3 Supported',
+      tag: {
+        id: '2',
+        name: 'LTI 1.3 Supported',
+      },
+      tools: mockProducts.slice(3, 6),
+    },
+  ]
 }

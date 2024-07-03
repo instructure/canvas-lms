@@ -245,6 +245,9 @@ class AuthenticationProvidersController < ApplicationController
       render json: aacs_json(@account.authentication_providers.active)
     else
       @presenter = AuthenticationProvidersPresenter.new(@account)
+      @page_title = t("Authentication Settings")
+      add_crumb @page_title
+      page_has_instui_topnav
     end
   end
 

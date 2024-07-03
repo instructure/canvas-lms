@@ -401,14 +401,6 @@ module ContextModulesCommon
     move_to_click("label[for=unlock_module_at]")
   end
 
-  def differentiated_modules_on
-    Account.site_admin.enable_feature!(:selective_release_backend)
-    Account.site_admin.enable_feature!(:selective_release_ui_api)
-    Setting.set("differentiated_modules_setting", "true")
-    AssignmentStudentVisibility.reset_table_name
-    Quizzes::QuizStudentVisibility.reset_table_name
-  end
-
   # Ugly page retrieval for when footer doesn't show up in flakey_spec_catcher mode
   def get_page_with_footer(url)
     max_attempts = 20

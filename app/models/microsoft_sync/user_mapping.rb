@@ -134,7 +134,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
   end
 
   private_class_method def self.account_microsoft_sync_settings_changed?(root_account)
-    current_settings = Account.where(id: root_account.id).take.settings
+    current_settings = Account.find_by(id: root_account.id).settings
     DEPENDED_ON_ACCOUNT_SETTINGS.any? { |key| root_account.settings[key] != current_settings[key] }
   end
 

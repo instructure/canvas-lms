@@ -37,7 +37,6 @@ import type {
   ItemAssignToCardSpec,
 } from './types'
 import ItemAssignToCard, {type ItemAssignToCardRef} from './ItemAssignToCard'
-import useFetchAssignees from '../../utils/hooks/useFetchAssignees'
 import {getOverriddenAssignees, itemTypeToApiURL} from '../../utils/assignToHelper'
 import {getEveryoneOption, ItemAssignToTrayProps} from './ItemAssignToTray'
 
@@ -93,6 +92,7 @@ const ItemAssignToTrayContent = ({
   onCardRemove,
   defaultSectionId,
   removeDueDateInput = false,
+  isCheckpointed = false,
   onInitialStateSet,
   blueprintDateLocks,
   setBlueprintDateLocks,
@@ -228,6 +228,7 @@ const ItemAssignToTrayContent = ({
             isValid: true,
             hasAssignees: true,
             due_at: baseDates.due_at,
+            reply_to_topic_due_at: null,
             original_due_at: baseDates.due_at,
             unlock_at: baseDates.unlock_at,
             lock_at: baseDates.lock_at,
@@ -288,6 +289,7 @@ const ItemAssignToTrayContent = ({
               isValid: true,
               hasAssignees: true,
               due_at: override.due_at,
+              reply_to_topic_due_at: null,
               original_due_at: override.due_at,
               unlock_at: override.unlock_at,
               lock_at: override.lock_at,
@@ -333,6 +335,7 @@ const ItemAssignToTrayContent = ({
         key: cardId,
         isValid: true,
         hasAssignees: false,
+        reply_to_topic_due_at: null,
         due_at: null,
         unlock_at: null,
         lock_at: null,
@@ -510,7 +513,9 @@ const ItemAssignToTrayContent = ({
             contextModuleId={card.contextModuleId}
             contextModuleName={card.contextModuleName}
             removeDueDateInput={removeDueDateInput}
+            isCheckpointed={isCheckpointed}
             cardId={card.key}
+            reply_to_topic_due_at={card.reply_to_topic_due_at}
             due_at={card.due_at}
             original_due_at={card.original_due_at}
             unlock_at={card.unlock_at}

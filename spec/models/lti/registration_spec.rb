@@ -115,7 +115,7 @@ RSpec.describe Lti::Registration do
   describe "#account_binding_for" do
     subject { registration.account_binding_for(account) }
 
-    let(:registration) { lti_registration_model }
+    let(:registration) { lti_registration_model(account:) }
     let(:account) { account_model }
     let(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
 
@@ -215,7 +215,7 @@ RSpec.describe Lti::Registration do
     end
 
     context "with a developer key" do
-      let(:developer_key) { developer_key_model(lti_registration: registration) }
+      let(:developer_key) { developer_key_model(lti_registration: registration, account: registration.account) }
 
       before do
         developer_key # instantiate before test runs
@@ -285,7 +285,7 @@ RSpec.describe Lti::Registration do
     end
 
     context "with a developer key" do
-      let(:developer_key) { developer_key_model(lti_registration: registration) }
+      let(:developer_key) { developer_key_model(lti_registration: registration, account: registration.account) }
 
       before do
         developer_key.destroy

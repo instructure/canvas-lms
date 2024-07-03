@@ -466,6 +466,7 @@ export const handlers = [
               id: 'TWVzc2FnZWFibGVVc2VyLTQx',
               name: 'Frederick Dukes',
               shortName: 'Frederick Dukes',
+              pronouns: 'he/him',
               __typename: 'MessageableUser',
               commonCoursesConnection: {
                 nodes: [
@@ -509,6 +510,7 @@ export const handlers = [
               id: 'TWVzc2FnZWFibGVVc2VyLTQx',
               name: 'Frederick Dukes',
               shortName: 'Frederick Dukes',
+              pronouns: 'he/him',
               __typename: 'MessageableUser',
               commonCoursesConnection: {
                 nodes: [
@@ -559,6 +561,7 @@ export const handlers = [
               id: 'TWVzc2FnZWFibGVVc2VyLTQx',
               name: 'Frederick Dukes',
               shortName: 'Frederick Dukes',
+              pronouns: 'he/him',
               __typename: 'MessageableUser',
               commonCoursesConnection: {
                 nodes: [
@@ -585,6 +588,7 @@ export const handlers = [
               id: 'TWVzc2FnZWFibGVVc2VyLTY1',
               name: 'Trevor Fitzroy',
               shortName: 'Trevor Fitzroy',
+              pronouns: 'he/him',
               __typename: 'MessageableUser',
               commonCoursesConnection: {
                 nodes: [
@@ -611,6 +615,7 @@ export const handlers = [
               id: 'TWVzc2FnZWFibGVVc2VyLTMy',
               name: 'Null Forge',
               shortName: 'Null Forge',
+              pronouns: 'he/him',
               __typename: 'MessageableUser',
               commonCoursesConnection: {
                 nodes: [

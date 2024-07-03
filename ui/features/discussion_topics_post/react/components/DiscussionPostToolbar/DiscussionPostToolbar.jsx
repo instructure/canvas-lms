@@ -277,17 +277,17 @@ export const DiscussionPostToolbar = props => {
                     <ExpandCollapseThreadsButton showText={!matches.includes('mobile')} />
                   </Flex.Item>
                 )}
-                {translationLanguages.current.length > 0 && (
-                  <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
-                    <MoreMenuButton />
-                  </Flex.Item>
-                )}
                 {ENV.user_can_summarize && !props.isSummaryEnabled && (
                   <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                     <SummarizeButton
                       onClick={props.onSummarizeClick}
                       showText={!matches.includes('mobile')}
                     />
+                  </Flex.Item>
+                )}
+                {translationLanguages.current.length > 0 && (
+                  <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
+                    <MoreMenuButton />
                   </Flex.Item>
                 )}
                 {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (

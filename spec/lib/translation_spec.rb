@@ -27,7 +27,7 @@ NO_SRC_LANG = {
 
 USER_LOCALE_SET = {
   endpoint_name: "translation-endpoint",
-  body: { inputs: { src_lang: "es", tgt_lang: "hu", text: "¿Dónde está el baño?" } }.to_json,
+  body: { inputs: { src_lang: "es", tgt_lang: "sv", text: "¿Dónde está el baño?" } }.to_json,
   content_type: "application/json",
   accept: "application/json"
 }.freeze
@@ -52,6 +52,9 @@ describe "Translation" do
     allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
     allow(DynamicSettings).to receive(:find).with(tree: :private).and_return({ "sagemaker.yml" => { "endpoint_name" => "translation-endpoint" }.to_yaml })
 
+    # Mock statsd to allow it to receive what we expect
+    allow(InstStatsd::Statsd).to receive(:increment)
+
     # Mock the runtime and the credential provider
     @runtime_mock = instance_double("Aws::SageMakerRuntime::Client")
     allow(Canvas::AwsCredentialProvider).to receive(:new).and_return(MockCredentials.new)
@@ -72,14 +75,25 @@ describe "Translation" do
       expect(@runtime_mock).to have_received(:invoke_endpoint).with(NO_SRC_LANG)
     end
 
+    it "trims locale for src_lang" do
+      expect(CLD).to receive(:detect_language).and_return({ code: "es-ES" })
+      Translation.create(tgt_lang: "en", text: "¿Dónde está el baño?")
+      expect(@runtime_mock).to have_received(:invoke_endpoint).with(NO_SRC_LANG)
+    end
+
     it "requires user or tgt lang set" do
       expect(Translation.create(text: "hello, world")).to be_nil
     end
 
-    it "uses user locale if tgt_lang not set" do
-      @user.locale = "hu"
+    it "uses trimmed user locale if tgt_lang not set" do
+      @user.locale = "sv-x-k12"
       Translation.create(user: @user, src_lang: "es", text: "¿Dónde está el baño?")
       expect(@runtime_mock).to have_received(:invoke_endpoint).with(USER_LOCALE_SET)
+    end
+
+    it "increments the translation metric" do
+      Translation.create(tgt_lang: "en", text: "¿Dónde está el baño?")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("translation.create.es.en")
     end
   end
 
@@ -102,6 +116,30 @@ describe "Translation" do
       allow(Translation).to receive(:create)
       Translation.translated_languages(@user)
       expect(Translation).to have_received(:create).exactly(Translation.languages.length).times
+    end
+
+    it "uses the cache if key is present" do
+      # Arrange
+      @user.locale = "es"
+      allow(Canvas.redis).to receive(:get).with(["translated_languages", @user.locale].cache_key).and_return({ language: "languages" }.to_json)
+
+      # Act
+      resp = Translation.translated_languages(@user)
+
+      # Assert
+      expect(resp).to eq({ "language" => "languages" })
+    end
+
+    it "caches the translation results" do
+      # Arrange
+      allow(Canvas.redis).to receive(:set)
+      @user.locale = "es"
+
+      # Act
+      Translation.translated_languages(@user)
+
+      # Assert
+      expect(Canvas.redis).to have_received(:set).exactly(1)
     end
   end
 

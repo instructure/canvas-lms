@@ -28,10 +28,11 @@ class DiscussionTopicsApiController < ApplicationController
   include LocaleSelection
 
   before_action :require_context_and_read_access
-  before_action :require_topic
+  before_action :require_topic, except: %i[mark_all_topic_read]
   before_action :require_initial_post, except: %i[add_entry
                                                   mark_topic_read
                                                   mark_topic_unread
+                                                  mark_all_topic_read
                                                   show
                                                   unsubscribe_topic]
   before_action only: %i[replies
@@ -85,9 +86,8 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # Generates a summary for a discussion topic.
   #
-  # @argument force [Boolean]
-  #   If set to true, forces the generation of a summary,
-  #   even if a previous one for the given input params exists.
+  # @argument userInput [String]
+  #   Areas or topics for the summary to focus on.
   #
   # @example_request
   #
@@ -103,77 +103,68 @@ class DiscussionTopicsApiController < ApplicationController
   def summary
     return render_unauthorized_action unless @topic.user_can_summarize?(@current_user)
 
-    llm_config = LLMConfigs.config_for("discussion_topic_summary")
-    if llm_config.nil?
+    llm_config_raw = LLMConfigs.config_for("discussion_topic_summary_raw")
+    llm_config_refined = LLMConfigs.config_for("discussion_topic_summary_refined")
+
+    if llm_config_raw.nil? || llm_config_refined.nil?
       logger.error("No LLM config found for discussion topic summary")
       return render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity)
     end
 
-    dynamic_content = {
-      content: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary,
-      locale: available_locales[@current_user.locale || I18n.default_locale.to_s]
+    user_input = params[:userInput]
+    focus = DiscussionTopic::PromptPresenter.focus_for_summary(user_input:)
+
+    raw_dynamic_content = {
+      CONTENT: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary,
+      FOCUS: focus
     }
-    dynamic_content_hash = Digest::SHA256.hexdigest(dynamic_content.to_json)
-
-    forced = params[:force] == "true"
-    unless @topic.summary_enabled
-      @topic.update!(summary_enabled: true)
-      forced = true
-    end
-
-    unless forced
-      dts = @topic.summaries.where(discussion_topic: @topic, llm_config_version: llm_config.name, dynamic_content_hash:)
-                  .order(created_at: :desc)
-                  .first
-
-      if dts
-        return render(json: { id: dts.id, text: dts.summary })
-      end
-    end
-
-    response = nil
-    begin
-      prompt, options = llm_config.generate_prompt_and_options(
-        substitutions: {
-          CONTENT: dynamic_content[:content],
-          LOCALE: dynamic_content[:locale]
-        }
-      )
-
-      time = Benchmark.measure do
-        response = InstLLMHelper.client(llm_config.model_id).chat(
-          [{ role: "user", content: prompt }],
-          **options.symbolize_keys
-        )
-      end
-    rescue => e
-      logger.error("Error summarizing discussion topic: #{e.class} - #{e.message}")
-
-      case e
-      when InstLLM::ServiceQuotaExceededError
-        return render(json: { error: t("Sorry, we are currently experiencing high demand. Please try again later.") }, status: :service_unavailable)
-      when InstLLM::ThrottlingError
-        return render(json: { error: t("Sorry, the service is currently busy. Please try again later.") }, status: :service_unavailable)
-      when InstLLM::ValidationTooLongError
-        return render(json: { error: t("Sorry, we are unable to summarize this discussion as it is too long.") }, status: :unprocessable_entity)
-      when InstLLM::ValidationError
-        return render(json: { error: t("Oops! There was an error validating the service request. Please try again later.") }, status: :unprocessable_entity)
-      else
-        return render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity)
-      end
-    end
-
-    summary = response.message[:content]
-    dts = @topic.summaries.create!(
-      llm_config_version: llm_config.name,
-      dynamic_content_hash:,
-      summary:,
-      input_tokens: response.usage[:input_tokens],
-      output_tokens: response.usage[:output_tokens],
-      generation_time: time.real.round(2)
+    raw_dynamic_content_hash = Digest::SHA256.hexdigest(raw_dynamic_content.to_json)
+    raw_summary = fetch_or_create_summary(
+      llm_config: llm_config_raw,
+      dynamic_content: raw_dynamic_content,
+      dynamic_content_hash: raw_dynamic_content_hash,
+      user_input:
     )
 
-    render(json: { id: dts.id, text: dts.summary })
+    locale = @current_user.locale || I18n.default_locale.to_s
+    pretty_locale = available_locales[locale] || "English"
+    refined_dynamic_content = {
+      CONTENT: DiscussionTopic::PromptPresenter.raw_summary_for_refinement(raw_summary: raw_summary.summary),
+      FOCUS: focus,
+      LOCALE: pretty_locale
+    }
+    refined_dynamic_content_hash = Digest::SHA256.hexdigest(refined_dynamic_content.to_json)
+    refined_summary = fetch_or_create_summary(
+      llm_config: llm_config_refined,
+      dynamic_content: refined_dynamic_content,
+      dynamic_content_hash: refined_dynamic_content_hash,
+      user_input:,
+      parent_summary: raw_summary,
+      locale:
+    )
+
+    unless @topic.summary_enabled
+      @topic.update!(summary_enabled: true)
+    end
+
+    render(json: { id: refined_summary.id, text: refined_summary.summary })
+  rescue => e
+    logger.error("Error summarizing discussion topic: #{e.class} - #{e.message}")
+
+    case e
+    when InstLLM::ServiceQuotaExceededError
+      render(json: { error: t("Sorry, we are currently experiencing high demand. Please try again later.") }, status: :service_unavailable)
+    when InstLLM::ThrottlingError
+      render(json: { error: t("Sorry, the service is currently busy. Please try again later.") }, status: :service_unavailable)
+    when InstLLM::ValidationTooLongError
+      render(json: { error: t("Sorry, we are unable to summarize this discussion as it is too long.") }, status: :unprocessable_entity)
+    when InstLLM::ValidationError
+      render(json: { error: t("Oops! There was an error validating the service request. Please try again later.") }, status: :unprocessable_entity)
+    when InstLLMHelper::RateLimitExceededError
+      render(json: { error: t("Sorry, you have reached the maximum number of summaries allowed per day (%{limit}). Please try again Tomorrow.", limit: e.limit) }, status: :too_many_requests)
+    else
+      render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity)
+    end
   end
 
   # @API Disable summary
@@ -244,8 +235,6 @@ class DiscussionTopicsApiController < ApplicationController
       feedback.dislike
     when :reset_like
       feedback.reset_like
-    when :regenerate
-      feedback.regenerate
     when :disable_summary
       feedback.disable_summary
     else
@@ -719,6 +708,37 @@ class DiscussionTopicsApiController < ApplicationController
     change_topic_read_state("read")
   end
 
+  # @API Mark all topic as read
+  # Mark the initial text of all the discussion topics as read in  the context.
+  #
+  # No request fields are necessary.
+  #
+  # On success, the response will be 204 No Content with an empty body.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/read_all' \
+  #        -X POST \
+  #        -H "Authorization: Bearer <token>" \
+  #        -H "Content-Length: 0"
+  def mark_all_topic_read
+    scope = if params[:only_announcements] == "true"
+              @context.announcements
+            else
+              @context.discussion_topics.only_discussion_topics.published
+            end
+
+    scope = scope.unread_for(@current_user)
+                 .where.not("unlock_at > ?", Time.now)
+                 .or(scope.where(unlock_at: nil))
+
+    scope.each do |announcement|
+      announcement.change_read_state("read", @current_user)
+    end
+
+    head :no_content
+  end
+
   # @API Mark topic as unread
   # Mark the initial text of the discussion topic as unread.
   #
@@ -1010,5 +1030,47 @@ class DiscussionTopicsApiController < ApplicationController
     end
 
     true
+  end
+
+  def fetch_or_create_summary(llm_config:, dynamic_content:, dynamic_content_hash:, user_input:, parent_summary: nil, locale: nil)
+    summary = @topic.summaries.where(llm_config_version: llm_config.name, dynamic_content_hash:, parent: parent_summary)
+                    .order(created_at: :desc)
+                    .first
+    return summary if summary
+
+    prompt, options = llm_config.generate_prompt_and_options(substitutions: dynamic_content)
+    content, input_tokens, output_tokens, generation_time = generate_llm_response(llm_config, prompt, options)
+
+    @topic.summaries.create!(
+      llm_config_version: llm_config.name,
+      dynamic_content_hash:,
+      user: @current_user,
+      user_input:,
+      summary: content,
+      input_tokens:,
+      output_tokens:,
+      generation_time:,
+      parent: parent_summary,
+      locale:
+    )
+  end
+
+  def generate_llm_response(llm_config, prompt, options)
+    response = nil
+    time = Benchmark.measure do
+      InstLLMHelper.with_rate_limit(user: @current_user, llm_config:) do
+        response = InstLLMHelper.client(llm_config.model_id).chat(
+          [{ role: "user", content: prompt }],
+          **options.symbolize_keys
+        )
+      end
+    end
+
+    [
+      response.message[:content],
+      response.usage[:input_tokens],
+      response.usage[:output_tokens],
+      time.real.round(2)
+    ]
   end
 end

@@ -24,7 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
-import {possibleString} from '../Points'
+import {possibleString, possibleStringRange} from '../Points'
 import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '../types/rubric'
 import {Grid} from '@instructure/ui-grid'
 import {TextInput} from '@instructure/ui-text-input'
@@ -32,7 +32,12 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {CommentLibrary} from './CommentLibrary'
 import {CriteriaReadonlyComment} from './CriteriaReadonlyComment'
 import {Button} from '@instructure/ui-buttons'
-import {escapeNewLineText, htmlEscapeCriteriaLongDescription} from './utils/rubricUtils'
+import {
+  escapeNewLineText,
+  htmlEscapeCriteriaLongDescription,
+  rangingFrom,
+  findCriterionMatchingRatingIndex,
+} from './utils/rubricUtils'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 const {licorice} = colors
@@ -172,6 +177,7 @@ const CriterionRow = ({
 }: CriterionRowProps) => {
   const [hoveredRatingIndex, setHoveredRatingIndex] = useState<number>()
   const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
+  const [pointTextInput, setPointTextInput] = useState('')
   const [isSaveCommentChecked, setIsSaveCommentChecked] = useState(false)
 
   const criterionRatings = [...criterion.ratings]
@@ -179,8 +185,10 @@ const CriterionRow = ({
     criterionRatings.reverse()
   }
 
-  const selectedRatingIndex = criterionRatings.findIndex(
-    rating => rating.points === criterionAssessment?.points
+  const selectedRatingIndex = findCriterionMatchingRatingIndex(
+    criterionRatings,
+    criterionAssessment?.points,
+    criterion.criterionUseRange
   )
 
   const updateAssessmentData = (params: Partial<UpdateAssessmentData>) => {
@@ -194,6 +202,7 @@ const CriterionRow = ({
 
   useEffect(() => {
     setCommentText(criterionAssessment?.comments ?? '')
+    setPointTextInput(criterionAssessment?.points?.toString() ?? '')
   }, [criterionAssessment, isFreeFormCriterionComments])
 
   const setPoints = (value: string) => {
@@ -334,6 +343,10 @@ const CriterionRow = ({
                       }
                     }
 
+                    const min = criterion.criterionUseRange
+                      ? rangingFrom(criterionRatings, index, ratingOrder)
+                      : undefined
+
                     return (
                       // we use the array index because rating may not have an id
                       /* eslint-disable-next-line react/no-array-index-key */
@@ -390,7 +403,10 @@ const CriterionRow = ({
                                     weight="bold"
                                     data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-points`}
                                   >
-                                    {!hidePoints && possibleString(rating.points)}
+                                    {!hidePoints &&
+                                      (min != null
+                                        ? possibleStringRange(min, rating.points)
+                                        : possibleString(rating.points))}
                                   </Text>
                                 </View>
 
@@ -439,12 +455,12 @@ const CriterionRow = ({
                         <ScreenReaderContent>{I18n.t('Criterion Score')}</ScreenReaderContent>
                       }
                       readOnly={isPreviewMode}
-                      data-testid={`comment-score-${criterion.id}`}
+                      data-testid={`criterion-score-${criterion.id}`}
                       placeholder="--"
-                      width="2.688rem"
+                      width="3.375rem"
                       height="2.375rem"
-                      value={criterionAssessment?.points?.toString() || ''}
-                      onChange={e => setPoints(e.target.value)}
+                      value={pointTextInput}
+                      onChange={e => setPointTextInput(e.target.value)}
                       onBlur={e => setPoints(e.target.value)}
                     />
                   </Flex.Item>
@@ -474,7 +490,14 @@ const CriterionRow = ({
               <>
                 <Flex.Item>
                   <View margin="0 0 0 small" themeOverride={{marginSmall: '1rem'}}>
-                    <Button color="secondary" onClick={() => setCommentText('')}>
+                    <Button
+                      color="secondary"
+                      onClick={() => {
+                        setCommentText('')
+                        updateAssessmentData({comments: ''})
+                      }}
+                      data-testid={`clear-comment-button-${criterion.id}`}
+                    >
                       {I18n.t('Clear')}
                     </Button>
                   </View>

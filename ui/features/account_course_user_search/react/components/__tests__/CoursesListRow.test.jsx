@@ -39,7 +39,7 @@ const props = {
   term: {
     name: 'A Term',
   },
-  workflow_state: 'alive',
+  workflow_state: 'available',
   concluded: false,
 }
 
@@ -145,4 +145,31 @@ it('does not show add-enrollment when not allowed', () => {
 it('shows the teacher count when needed', () => {
   const wrapper = mount(renderRow(<CoursesListRow {...props} teacher_count={3} teachers={null} />))
   expect(wrapper.text()).toContain('3 teachers')
+})
+
+it('shows published icon and tooltip for published course', () => {
+  const tooltip = 'Tooltip[renderTip="Published"] IconPublishSolid'
+  expect(
+    shallow(<CoursesListRow {...props} />)
+      .find(tooltip)
+      .exists()
+  ).toBe(true)
+})
+
+it('shows unpublished icon and tooltip for unpublished course', () => {
+  const tooltip = 'Tooltip[renderTip="Unpublished"] IconUnpublishedLine'
+  expect(
+    shallow(<CoursesListRow {...props} workflow_state={"unpublished"} />)
+      .find(tooltip)
+      .exists()
+  ).toBe(true)
+})
+
+it('shows completed icon and tooltip for concluded course', () => {
+  const tooltip = 'Tooltip[renderTip="Concluded"] IconCheckSolid'
+  expect(
+    shallow(<CoursesListRow {...props} workflow_state={"completed"} />)
+      .find(tooltip)
+      .exists()
+  ).toBe(true)
 })

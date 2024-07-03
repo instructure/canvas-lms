@@ -484,7 +484,12 @@ class DiscussionRow extends Component {
     } else if (menuTool.icon_url) {
       return (
         <span>
-          <img className="icon" alt="" src={menuTool.icon_url} />
+          <img
+            className="icon"
+            alt=""
+            src={menuTool.icon_url}
+            style={{width: '1.2rem', 'margin-right': '0.25rem'}}
+          />
           &nbsp;&nbsp;{menuTool.title}
         </span>
       )

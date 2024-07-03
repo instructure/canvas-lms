@@ -50,7 +50,7 @@ import '@canvas/jquery/jquery.simulate'
 import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
-import 'date-js' /* Date.parse */
+import '@instructure/date-js' /* Date.parse */
 import 'jqueryui/sortable'
 import '@canvas/rails-flash-notifications'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
@@ -103,7 +103,7 @@ window.modules = (function () {
     },
 
     addModule(callback = () => {}) {
-      if (ENV.FEATURES.selective_release_ui_api) {
+      if (ENV.FEATURES?.selective_release_ui_api) {
         const options = {initialTab: 'settings'}
         const settings = {
           moduleList: parseModuleList(),
@@ -2252,6 +2252,9 @@ $(document).ready(function () {
   if (!ENV.disable_keyboard_shortcuts) {
     const $document = $(document)
     $document.keycodes('k up', _event => {
+      // If the vertical kebob pop-up menu is open then ignore the shortcut
+      if ($('.ui-menu.ui-state-open').length) return
+
       const params = {
         selectWhenModuleFocused: {
           item:
@@ -2270,6 +2273,9 @@ $(document).ready(function () {
 
     // "j" and "down arrow" move the focus down between modules and module items
     $document.keycodes('j down', _event => {
+      // If the vertical kebob pop-up menu is open then ignore the shortcut
+      if ($('.ui-menu.ui-state-open').length) return
+
       const params = {
         selectWhenModuleFocused: {
           item: $currentElem && $currentElem.find('.context_module_item:visible:first'),
@@ -2485,7 +2491,7 @@ $(document).ready(function () {
 
   $(document).on('click', '.edit_module_link', function (event) {
     event.preventDefault()
-    if (ENV.FEATURES.selective_release_ui_api) {
+    if (ENV.FEATURES?.selective_release_ui_api) {
       const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
       const moduleElement = $(event.target).parents('.context_module')[0]
       const settingsProps = parseModule(moduleElement)

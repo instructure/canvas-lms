@@ -140,6 +140,7 @@ export interface ItemAssignToTrayProps {
   defaultSectionId?: string
   useApplyButton?: boolean
   removeDueDateInput?: boolean
+  isCheckpointed?: boolean
   onAddCard?: () => void
   onAssigneesChange?: (
     cardId: string,
@@ -176,6 +177,7 @@ export default function ItemAssignToTray({
   defaultSectionId,
   useApplyButton = false,
   removeDueDateInput = false,
+  isCheckpointed = false,
   onInitialStateSet,
 }: ItemAssignToTrayProps) {
   const isPacedCourse = ENV.IN_PACED_COURSE
@@ -211,6 +213,10 @@ export default function ItemAssignToTray({
     onDismiss()
   }, [defaultCards, onDismiss])
 
+  const masteryPathsAllowed = !(
+    ['discussion', 'discussion_topic'].includes(itemType) && removeDueDateInput
+  )
+
   const {
     allOptions,
     isLoading: isLoadingAssignees,
@@ -221,7 +227,7 @@ export default function ItemAssignToTray({
     groupCategoryId,
     disableFetch: !overridesFetched || isPacedCourse,
     everyoneOption,
-    checkMasteryPaths: true,
+    checkMasteryPaths: masteryPathsAllowed,
     defaultValues: [],
     requiredOptions: disabledOptionIds,
     onError: handleDismiss,
@@ -381,6 +387,7 @@ export default function ItemAssignToTray({
             timezone={timezone}
             initHasModuleOverrides={initHasModuleOverrides}
             removeDueDateInput={removeDueDateInput}
+            isCheckpointed={isCheckpointed}
             onInitialStateSet={onInitialStateSet}
             defaultCards={defaultCards}
             defaultSectionId={defaultSectionId}

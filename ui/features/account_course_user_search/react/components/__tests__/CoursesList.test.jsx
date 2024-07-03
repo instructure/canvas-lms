@@ -28,7 +28,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
         id: '1',
         name: 'A',
         sis_course_id: 'SIS 1',
-        workflow_state: 'alive',
+        workflow_state: 'available',
         total_students: 6,
         subaccount_name: 'subaccount name',
         subaccount_id: '1',
@@ -46,7 +46,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
         id: '2',
         name: 'Ba',
         sis_course_id: 'SIS Ba',
-        workflow_state: 'alive',
+        workflow_state: 'available',
         total_students: 7,
         subaccount_name: 'subaccount name',
         subaccount_id: '2',
@@ -64,7 +64,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
         id: '3',
         name: 'Bb',
         sis_course_id: 'SIS Bb',
-        workflow_state: 'alive',
+        workflow_state: 'available',
         total_students: 6,
         subaccount_name: 'subaccount name',
         subaccount_id: '3',
@@ -82,7 +82,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
         id: '4',
         name: 'C',
         sis_course_id: 'SIS C',
-        workflow_state: 'alive',
+        workflow_state: 'available',
         total_students: 6,
         subaccount_name: 'subaccount name',
         subaccount_id: '4',
@@ -100,7 +100,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
         id: '5',
         name: 'De',
         sis_course_id: 'SIS De',
-        workflow_state: 'alive',
+        workflow_state: 'available',
         total_students: 11,
         subaccount_name: 'subaccount name',
         subaccount_id: '5',
@@ -118,7 +118,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
         id: '6',
         name: 'Dz',
         sis_course_id: 'SIS Dz',
-        workflow_state: 'alive',
+        workflow_state: 'available',
         subaccount_name: 'subaccount name',
         subaccount_id: '6',
         total_students: 10,
@@ -244,5 +244,10 @@ describe('Account Course User Search CoursesList Sorting', () => {
     expect(nodes[3]).toHaveTextContent('C Term')
     expect(nodes[4]).toHaveTextContent('De Term')
     expect(nodes[5]).toHaveTextContent('Dz Term')
+  })
+
+  test('displays status column', () => {
+    const wrapper = render(<CoursesList {...coursesProps} />)
+    expect(wrapper.getByText('Status')).toBeInTheDocument()
   })
 })

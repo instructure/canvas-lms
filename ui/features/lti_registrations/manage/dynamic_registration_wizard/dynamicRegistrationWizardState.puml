@@ -1,0 +1,59 @@
+@startuml Dynamic Registration Wizard
+Initiating: Choose 1.1/1.3/Dynamic Reg
+RequestingDynRegToken: FE is loading a DynReg token
+
+state WaitingForTool #lightblue : FE has tool Dyn Reg view in iframe\n,and is waiing for postMessage after install
+LoadingRegistration: Tool has returned, and FE is\nloading the registration details from BE
+
+PermissionConfirmation: Admin is confirming the permissions for the tool
+PrivacyLevelConfirmation: Admin is confirming the privacy level of the tool
+PlacementsConfirmation: Admin is confirming the placements of the tool
+NamingConfirmation: Admin is confirming the Nickname of the tool and name of the placements
+IconConfirmation: Admin is confirming the icon of the tool and placements
+
+Reviewing: Admin is reviewing configurations
+DeletingDevKey: Admin has canceled aftert dyn reg,\nDev Key is being deleted
+Enabling: Admin has clicked "Install Dev Key", and request 
+
+
+[*] --> Initiating
+Initiating --> [*] : cancel
+Initiating --> RequestingDynRegToken
+RequestingDynRegToken --> WaitingForTool
+WaitingForTool --> [*] : cancel
+WaitingForTool --> LoadingRegistration
+LoadingRegistration --> PermissionConfirmation
+
+
+PermissionConfirmation -> PrivacyLevelConfirmation
+PrivacyLevelConfirmation -> PermissionConfirmation
+
+PrivacyLevelConfirmation -> PlacementsConfirmation
+PlacementsConfirmation -> PrivacyLevelConfirmation
+
+PlacementsConfirmation -> NamingConfirmation
+NamingConfirmation -> PlacementsConfirmation
+
+NamingConfirmation -> IconConfirmation
+IconConfirmation -> NamingConfirmation
+
+IconConfirmation --> Reviewing
+Reviewing --> IconConfirmation
+
+
+Reviewing --> PlacementsConfirmation
+Reviewing --> PrivacyLevelConfirmation
+Reviewing --> PermissionConfirmation
+
+Reviewing --> Enabling : Save
+Enabling --> [*]
+
+PermissionConfirmation --> DeletingDevKey : cancel
+PrivacyLevelConfirmation --> DeletingDevKey : cancel
+PlacementsConfirmation --> DeletingDevKey : cancel
+NamingConfirmation --> DeletingDevKey : cancel
+IconConfirmation --> DeletingDevKey : cancel
+Reviewing --> DeletingDevKey : cancel
+
+DeletingDevKey --> [*]
+@enduml

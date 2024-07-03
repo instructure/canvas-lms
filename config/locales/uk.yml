@@ -2037,6 +2037,7 @@ uk:
   an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "Існуючий користувач Canvas з  %{user_id} вже вимагав запитану вхідну інформацію для користувача з user_id %{other_user_id}, пропустити"
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Існуючий користувач Canvas з %{user_id} вже вимагав запитуваний integration_id %{other_user_id}, пропустити"
   an_export_is_already_in_progress_54270f01: "Експорт вже триває."
+  an_integer_value_is_required_e073bd46: "Вимагається ціле значення"
   an_internal_error_occurred_83b8a685: "Відбулася внутрішня помилка"
   an_item_named_name_already_exists_in_this_location_147b7312: "Елемент з ім'ям \"%{name}\" вже існує в цьому розташуванны. Ви хочете замінити існуючий файл?"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Виникла невідома помилка сервера. Будь ласка спробуйте ще раз."
@@ -5085,6 +5086,7 @@ uk:
     many: "%{count} взаємодій"
     one: "1 участь"
     other: "%{count}участей"
+  count_people_489946e7: "%{count}людей"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     few: "%{count} людей зараховано на *%{course_name}*."
     many: "%{count} людей зараховано на *%{course_name}*."
@@ -5416,6 +5418,7 @@ uk:
     greater_than_three: "Будь ласка. введіть пошукові терміни з трьома і більше символами"
     unknown_error: "Щось пішло не так з Вашим пошуком, будь ласка, спробуйте ще раз"
   course_visibility_options_ca8ab3a8: "Параметри видимості курсу"
+  course_was_successfully_updated_1ab0e9f8: "Курс успішно оновлено."
   courses: 
     confirm_action: 
       buttons: 
@@ -7086,6 +7089,7 @@ uk:
   enrollments_teachers: Викладачі
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Введіть шістнадцятковий код тут, щоб використовувати власний колір."
   enter_a_score_to_test_c6f89f4a: "Введіть оцінку для тестування"
+  enter_a_section_name_adbe3099: "Введіть назву розділу"
   enter_a_what_if_score_668c91a3: "Введіть оцінку Що-якщо "
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Введіть \"{{ACCOUNT_DOMAIN}}\" для заміни домену кореневого облікового запису користувача"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Введіть \"{{CANVAS_USER_ID}}\" для заміни унікального Canvas ID користувача"
@@ -9029,6 +9033,7 @@ uk:
   invalid_restrictions_316cd740: "Неприпустимі обмеження"
   invalid_sis_sync_status_b68db497: "Невірний статус синхронізації SIS"
   invalid_state_parameter_7a5aa108: "Неприпустимий параметр стану"
+  invalid_url_cbde79f: "Невірний URL"
   invalid_url_in_xml: "Невірний url в xml. Амперсанди повинні були видалені."
   invalid_username_or_password_b60aa240: "Невірний логін або пароль."
   invalid_utf_8_13c76a6: "Невірний UTF-8"
@@ -9519,6 +9524,7 @@ uk:
           send_to_sms: "Відправити текстове повідомлення на %{phone_number}"
         labels: 
           carrier: Кур'єр
+          otp_communication_channel_id: "Номер телефону"
           phone_number: "Номер телефону"
           remember_me: "Запам'ятати цей комп'ютер"
           verification_code: "Код підтвердження"
@@ -11628,11 +11634,13 @@ uk:
   move_to_end_c6bfbcf5: "Перейти в кінець"
   move_to_front_bf6f0194: "Перемістити на передній план"
   moving_a4d552df: Переміщення...
+  multi_factor_authentication_1a6b3b3d: "Багатофакторна аутентифікація"
   multi_factor_authentication_backup_codes_4d781044: "Резервні коди багатофакторної аутентифікації"
   multi_factor_authentication_configured_865b1bde: "Багатофакторна аутентифікація налаштована"
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: "Декілька позначено як \"Поточна тема\" , тому що однакове значення було збержене під різними іменами—тобто , вони всі однакові, у поточному застосуванні"
   multiple_ba5220cd: Множинний
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "Декілька облікових записів Canvas пов'язано з Clever District %{district_id}"
+  multiple_dates_e3a122f7: "Кілька дат"
   multiple_due_dates_283dd861: "Кілька термінів"
   multiple_modules_930713d4: "Кілька модулів"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -12632,6 +12640,7 @@ uk:
   please_enter_a_name_for_this_link_318f01a4: "Будь ласка, введіть назву для цього посилання."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Будь ласка. введіть пошукові терміни з трьома і більше символами"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Будь ласка, введіть правильний URL. Протокол потрібен (e.g. http://, https://, ftp://, tel:, mailto:)."
+  please_enter_the_verification_code_shown_by_your_t_acc7c404: "Будь ласка, введіть код підтвердження, показаний вашим токеном."
   please_enter_your_label_name_7745272d: "Будь ласка, введіть ваше %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Будь ласка, введіть ваш %{label_name} і пароль:"
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Будь ласка, дайте їм знати, яку сторінку ви переглядаєте і посилання, на якому ви натиснули."
@@ -12879,6 +12888,7 @@ uk:
     learn_platform_settings: 
       labels: 
         base_url: "Основний URL"
+        password: Пароль
         token: "Маркер доступу"
     linked_in: 
       description: "LinkedIn інтеграція"
@@ -16318,6 +16328,7 @@ uk:
   shift_dates_746698a5: "Зсунути дати"
   short_name_42f454a1: "Коротке ім'я"
   short_name_ad9bf84f: "коротке ім'я"
+  should_be_10_digit_number_d30ef02d: "має бути 10-значний номер"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "ID Canvas звітуючого користувача повинен бути самоочевидним"
   show_76c0ed1c: Показати
   show_account_navigation_menu_d97270a9: "Показати Меню навігації облікового запису"
@@ -18330,6 +18341,7 @@ uk:
   validate_links_in_content_b1630fba: "Перевірка посилань у вмісті"
   validation_error_3b943100: "Помилка перевірки"
   value_d842f16d: Значення
+  value_must_be_positive_3e086d5a: "Значення має бути позитивним"
   vanity_url_76f93382: "URL марнославства"
   vendor_code_lti_2_ef36207b: "Код постачальника (LTI 2):"
   venezuela_58_959d01f7: "Венесуела (+58)"
@@ -18341,6 +18353,7 @@ uk:
   vericite_similarity_score_more_information_7df9ea5c: "Оцінка подібності VeriCite - більше інформації"
   vericite_similarity_score_see_detailed_report_390ab687: "Оцінка подібності VeriCite - Дивись детальний звіт"
   verification_code_5acd64ef: "Код підтвердження"
+  verify_3dd8f159: Перевірити
   version_5599c321: Версія
   video_b9f27375: Відео
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Відео контент не підтримується вашим пристроєм або додатком."

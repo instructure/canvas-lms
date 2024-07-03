@@ -69,7 +69,7 @@ export default function GradebookMenu({
 
   const getMenuTrigger = () => {
     // EVAL-3711 Remove Evaluate ICE feature flag
-    const trigger = window.ENV.FEATURES.instui_nav ? (
+    const trigger = window.ENV.FEATURES?.instui_nav ? (
       <IconButton
         size="small"
         margin="0 0 0 x-small"
@@ -94,7 +94,7 @@ export default function GradebookMenu({
     <>
       <Flex>
         {/* EVAL-3711 Remove Evaluate ICE feature flag */}
-        {window.ENV.FEATURES.instui_nav && (
+        {window.ENV.FEATURES?.instui_nav && (
           <Heading
             level="h1"
             data-testid="gradebook-title"
@@ -107,7 +107,7 @@ export default function GradebookMenu({
         {/* EVAL-3711 Remove Evaluate ICE feature flag */}
         <Menu
           trigger={menuTrigger}
-          onToggle={window.ENV.FEATURES.instui_nav ? handleRenderArrowIcon : undefined}
+          onToggle={window.ENV.FEATURES?.instui_nav ? handleRenderArrowIcon : undefined}
         >
           <Menu.Group
             selected={[variant]}

@@ -147,10 +147,10 @@ class SplitUsers
       UserPastLtiId.where(user: source_user, user_lti_id: restored_user.lti_id).delete_all
     end
     source_user.shard.activate do
-      ConversationParticipant.where(id: merge_data.items.where(item_type: "conversation_ids").take&.item).find_each { |c| c.move_to_user(restored_user) }
+      ConversationParticipant.where(id: merge_data.items.find_by(item_type: "conversation_ids")&.item).find_each { |c| c.move_to_user(restored_user) }
     end
     MERGE_ITEM_TYPES.each do |klass, user_attr|
-      ids = merge_data.items.where(item_type: klass.to_s + "_ids").take&.item
+      ids = merge_data.items.find_by(item_type: klass.to_s + "_ids")&.item
       Shard.partition_by_shard(ids) { |shard_ids| klass.to_s.classify.constantize.where(id: shard_ids).update_all(user_attr => restored_user.id) } if ids
     end
   end
@@ -321,9 +321,9 @@ class SplitUsers
     pseudonyms = Pseudonym.where(id: pseudonyms_ids)
     # the where.not needs to be used incase that user is actually deleted
     name =
-      merge_data.items.where.not(user_id: source_user).where(item_type: "user_name").take&.item
+      merge_data.items.where.not(user_id: source_user).find_by(item_type: "user_name")&.item
     prefs =
-      merge_data.items.where.not(user_id: source_user).where(item_type: "user_preferences").take&.item
+      merge_data.items.where.not(user_id: source_user).find_by(item_type: "user_preferences")&.item
     @restored_user ||= User.new
     @restored_user.name = name || pseudonyms.first&.unique_id || "restored user"
     @restored_user.preferences = prefs if prefs
@@ -340,17 +340,17 @@ class SplitUsers
 
   def restore_source_user
     %i[avatar_image_source avatar_image_url avatar_image_updated_at avatar_state].each do |attr|
-      avatar_item = merge_data.items.where.not(user_id: source_user).where(item_type: attr).take&.item
+      avatar_item = merge_data.items.where.not(user_id: source_user).find_by(item_type: attr)&.item
       # we only move avatar items if there were no avatar on the source_user,
       # so now we only restore it if they match what was on the from_user.
       source_user[attr] = avatar_item if source_user[attr] == avatar_item
     end
-    source_user.name = merge_data.items.where(user_id: source_user, item_type: "user_name").take&.item
+    source_user.name = merge_data.items.find_by(user_id: source_user, item_type: "user_name")&.item
     # we will leave the merged preferences on the user, most of them are for a
     # specific context that will not be there, but it will keep new
     # preferences except for terms_of_use.
     source_user.preferences[:accepted_terms] = merge_data.items
-                                                         .where(user_id: source_user).where(item_type: "user_preferences").take&.item&.dig(:accepted_terms)
+                                                         .where(user_id: source_user).find_by(item_type: "user_preferences")&.item&.dig(:accepted_terms)
     source_user.preferences = {} if source_user.preferences == { accepted_terms: nil }
     source_user.save! if source_user.changed?
   end

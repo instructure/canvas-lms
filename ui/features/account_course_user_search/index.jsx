@@ -47,7 +47,7 @@ const props = {
 // either the "Courses" or "People" tabs on the left, it highlights the right
 // tab and updates the crumb and document title
 const originalDocumentTitle = document.title
-function updateDocumentTitleBreadcrumbAndActiveTab(activeTab) {
+function updateDocumentTitleBreadcrumbAndActiveTab(activeTab, setCrumb) {
   // give the correct left nav item an active class
   $('#section-tabs .section a').each(function () {
     const $tab = $(this)
@@ -59,14 +59,22 @@ function updateDocumentTitleBreadcrumbAndActiveTab(activeTab) {
 
   // toggle the breadcrumb between "Corses" and "People"
   $('#breadcrumbs a:last span').text(activeTab.title)
+  setCrumb()({name: activeTab.title, href: activeTab.href})
 }
+
 ready(() => {
-  initializeTopNavPortal(document.getElementById('react-instui-topnav'))
+  let setBreadCrumb = () => {}
+  const setFunction = f => {
+    setBreadCrumb = f?.setCrumbs || (() => {})
+  }
+
+  initializeTopNavPortal({getBreadCrumbSetter: setFunction})
+
   const content = document.getElementById('content')
   store.subscribe(() => {
     const tabState = store.getState().tabList
     const selectedTab = tabState.tabs[tabState.selected]
-    updateDocumentTitleBreadcrumbAndActiveTab(selectedTab)
+    updateDocumentTitleBreadcrumbAndActiveTab(selectedTab, () => setBreadCrumb)
 
     ReactDOM.render(<App {...props} />, content)
   })

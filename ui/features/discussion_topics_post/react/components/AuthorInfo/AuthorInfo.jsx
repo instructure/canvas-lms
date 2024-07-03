@@ -39,6 +39,7 @@ import {DiscussionEntryVersion} from '../../../graphql/DiscussionEntryVersion'
 import {DiscussionEntryVersionHistory} from '../DiscussionEntryVersionHistory/DiscussionEntryVersionHistory'
 import {ReportsSummaryBadge} from '../ReportsSummaryBadge/ReportsSummaryBadge'
 import theme from '@instructure/canvas-theme'
+import {CondensedButton} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('discussion_posts')
 
@@ -99,14 +100,19 @@ export const AuthorInfo = props => {
                 data-testid="is-unread"
                 data-isforcedread={props.isForcedRead}
               >
-                <Badge
-                  type="notification"
-                  placement="start center"
-                  standalone={true}
-                  formatOutput={() => (
-                    <ScreenReaderContent>{I18n.t('Unread post')}</ScreenReaderContent>
-                  )}
-                />
+                <CondensedButton
+                  onClick={() => props.toggleUnread()}
+                  title={I18n.t('Mark as read')}
+                >
+                  <Badge
+                    type="notification"
+                    placement="start center"
+                    standalone={true}
+                    formatOutput={() => (
+                      <ScreenReaderContent>{I18n.t('Mark post as read')}</ScreenReaderContent>
+                    )}
+                  />
+                </CondensedButton>
               </div>
             )}
             {hasAuthor && !isAnonymous(props) && (
@@ -253,6 +259,7 @@ AuthorInfo.propTypes = {
   reportTypeCounts: PropTypes.object,
   threadMode: PropTypes.bool,
   threadParent: PropTypes.bool,
+  toggleUnread: PropTypes.func,
 }
 
 const Timestamps = props => {

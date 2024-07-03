@@ -1040,7 +1040,8 @@ class GradebooksController < ApplicationController
   def speed_grader
     unless @context.allows_speed_grader?
       flash[:notice] = t(:speed_grader_disabled, "SpeedGrader is disabled for this course")
-      return redirect_to(course_gradebook_path(@context))
+      redirect_to(course_gradebook_path(@context))
+      return
     end
 
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
@@ -1050,7 +1051,8 @@ class GradebooksController < ApplicationController
     if @assignment.unpublished?
       flash[:notice] = t(:speedgrader_enabled_only_for_published_content,
                          "SpeedGrader is enabled only for published content.")
-      return redirect_to polymorphic_url([@context, @assignment])
+      redirect_to polymorphic_url([@context, @assignment])
+      return
     end
 
     if @assignment.moderated_grading? && !@assignment.user_is_moderation_grader?(@current_user)

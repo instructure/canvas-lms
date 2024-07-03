@@ -18,7 +18,7 @@
 
 import {isEqual} from 'lodash'
 import Grid from '..'
-import fakeENV from 'helpers/fakeENV'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 QUnit.module('OutcomeGradebookGrid', {
   setup() {

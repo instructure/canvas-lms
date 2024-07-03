@@ -35,6 +35,7 @@ describe('generateDateDetailsPayload', () => {
     ]
     const expectedPayload = <DateDetailsPayload>{
       due_at: null,
+      reply_to_topic_due_at: null,
       unlock_at: null,
       lock_at: null,
       assignment_overrides: [] as DateDetailsOverride[],

@@ -61,7 +61,7 @@ k20_course_readiness:
   applies_to: Account
   display_name: Intelligent Insights - Course Readiness
   description:
-    k20_course_readiness: Enables the Course Readiness for closed beta customers.
+    k20_course_readiness: Enables the Intelligent Insights - Course Readiness feature and accompanying permission.
   root_opt_in: true
   beta: true
   shadow: true
@@ -70,16 +70,16 @@ k20_students_in_need_of_attention:
   applies_to: Account
   display_name: Intelligent Insights - Students in Need of Attention
   description:
-    k20_students_in_need_of_attention: Enables the Students in Need of Attention dashboards for closed beta customers.
+    k20_students_in_need_of_attention: Enables the Intelligent Insights - Students in Need of Attention feature and accompanying permission.
   root_opt_in: true
   beta: true
   shadow: true
 k20_lti_usage:
   state: hidden
   applies_to: Account
-  display_name: Intelligent Insights - LTI Usage
+  display_name: Intelligent Insights - LTI Usage Dashboard
   description:
-    k20_lti_usage: Enables the LTI Usage dashboards for closed beta customers.
+    k20_lti_usage:  Enables the LTI Usage Dashboard and accompanying permission.
   root_opt_in: true
   beta: true
   shadow: true

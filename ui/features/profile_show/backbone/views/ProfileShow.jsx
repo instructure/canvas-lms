@@ -26,7 +26,6 @@ import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDi
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Alert} from '@instructure/ui-alerts'
-import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('user_profile')
 
@@ -214,8 +213,14 @@ export default class ProfileShow extends Backbone.View {
             return I18n.t('profile_bio_too_long', 'Bio is too long')
           }
         },
-        'link_urls[]': function (value) {
-          if (value && /\s/.test(value)) {
+        'link_urls[]': function (input) {
+          if (Array.isArray(input)) {
+            for (const url of input) {
+              if (url && /\s/.test(url)) {
+                return I18n.t('invalid_url', 'Invalid URL')
+              }
+            }
+          } else if (input && /\s/.test(input)) {
             return I18n.t('invalid_url', 'Invalid URL')
           }
         },

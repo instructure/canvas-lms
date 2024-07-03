@@ -91,6 +91,7 @@ class SubmissionComment < ActiveRecord::Base
   scope :for_assignment_id, ->(assignment_id) { where(submissions: { assignment_id: }).joins(:submission) }
   scope :for_groups, -> { where.not(group_comment_id: nil) }
   scope :not_for_groups, -> { where(group_comment_id: nil) }
+  scope :authored_by, ->(user_id) { where(draft: false).or(where(author_id: user_id)) }
 
   workflow do
     state :active
@@ -456,6 +457,10 @@ class SubmissionComment < ActiveRecord::Base
     methods = []
     methods << :avatar_path if context.root_account.service_enabled?(:avatars)
     methods
+  end
+
+  def non_draft_or_authored_by(user)
+    !draft? || user.id == author_id
   end
 
   def publishable_for?(user)

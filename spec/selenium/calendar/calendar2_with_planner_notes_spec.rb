@@ -170,7 +170,7 @@ describe "calendar2" do
     end
 
     it "edits a todo page" do
-      page = @course.wiki_pages.create!(title: "Page1", todo_date: Date.today)
+      page = @course.wiki_pages.create!(title: "Page1", todo_date: Time.zone.today)
       get "/calendar2"
       wait_for_ajax_requests
       f(".fc-content").click
@@ -185,7 +185,7 @@ describe "calendar2" do
     end
 
     it "deletes a todo page" do
-      page = @course.wiki_pages.create!(title: "Page1", todo_date: Date.today)
+      page = @course.wiki_pages.create!(title: "Page1", todo_date: Time.zone.today)
       get "/calendar2"
       wait_for_ajax_requests
       f(".fc-content").click
@@ -199,7 +199,7 @@ describe "calendar2" do
       discussion = @course.discussion_topics.create!(user: @teacher,
                                                      title: "topic 1",
                                                      message: "somebody topic message",
-                                                     todo_date: Date.today)
+                                                     todo_date: Time.zone.today)
       get "/calendar2"
       wait_for_ajax_requests
       f(".fc-content").click
@@ -217,7 +217,7 @@ describe "calendar2" do
       discussion = @course.discussion_topics.create!(user: @teacher,
                                                      title: "topic 1",
                                                      message: "somebody topic message",
-                                                     todo_date: Date.today)
+                                                     todo_date: Time.zone.today)
       get "/calendar2"
       wait_for_ajax_requests
       f(".fc-content").click

@@ -35,7 +35,7 @@ import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 const I18n = useI18nScope('account_settings_jsx_bundle')
 
 ready(() => {
-  initializeTopNavPortal(document.getElementById('react-instui-topnav'))
+  initializeTopNavPortal()
 
   ReactDOM.render(<FeatureFlags />, document.getElementById('tab-features'))
 

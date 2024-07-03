@@ -34,10 +34,10 @@ const I18n = useI18nScope('external_tools')
 
 export default class ExternalToolsTable extends React.Component {
   static propTypes = {
-    canAdd: PropTypes.bool.isRequired,
-    canEdit: PropTypes.bool.isRequired,
-    canDelete: PropTypes.bool.isRequired,
-    canAddEdit: PropTypes.bool.isRequired,
+    canAdd: PropTypes.bool,
+    canEdit: PropTypes.bool,
+    canDelete: PropTypes.bool,
+    canAddEdit: PropTypes.bool,
     setFocusAbove: PropTypes.func.isRequired,
   }
 

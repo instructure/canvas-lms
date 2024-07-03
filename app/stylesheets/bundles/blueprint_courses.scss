@@ -430,28 +430,6 @@
   }
 }
 
-/* Move easy student view button to the left when the document body uses the full screen to avoid the button being overlapped by blueprint icon */
-body.outcomes #easy_student_view.mr3, body.full-width #easy_student_view.mr3 {
-  margin-right: 3rem;
-}
-
- /* Make sure the Easy Student button is not overlapped by the blueprint icon when screen width is equal or less than 1500px */
-@media (max-width: 1500px) {
-  #easy_student_view.mr3 {
-    margin-right: 1rem;
-  }
-  @media (max-width: 1480px) {
-    #easy_student_view.mr3 {
-      margin-right: 2rem;
-    }
-    @media (max-width: 1460px) {
-      #easy_student_view.mr3 {
-        margin-right: 3rem;
-      }
-    }
-  }
-}
-
 .bpc-lock-toggle-wrapper {
   display: inline-block;
   vertical-align: middle;

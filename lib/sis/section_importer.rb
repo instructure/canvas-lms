@@ -78,10 +78,10 @@ module SIS
         raise ImportError, "Improper status \"#{status}\" for section #{section_id} in course #{course_id}" unless /\Aactive|\Adeleted/i.match?(status)
         return if @batch.skip_deletes? && status =~ /deleted/i
 
-        course = @root_account.all_courses.where(sis_source_id: course_id).take
+        course = @root_account.all_courses.find_by(sis_source_id: course_id)
         raise ImportError, "Section #{section_id} references course #{course_id} which doesn't exist" unless course
 
-        section = @root_account.course_sections.where(sis_source_id: section_id).take
+        section = @root_account.course_sections.find_by(sis_source_id: section_id)
         section ||= course.course_sections.where(sis_source_id: section_id).first_or_initialize
         section.root_account = @root_account
         # this is an easy way to load up the cache with data we already have

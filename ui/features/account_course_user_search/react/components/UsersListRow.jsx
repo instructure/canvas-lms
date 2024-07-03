@@ -45,6 +45,7 @@ export default function UsersListRow({
           avatarName={user.short_name}
           name={user.sortable_name}
           avatar_url={user.avatar_url}
+          pronouns={user.pronouns}
           size="x-small"
         />
       </Table.RowHeader>

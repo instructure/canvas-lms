@@ -131,7 +131,7 @@ describe "calendar2" do
       it "shows section-level events for the student's section" do
         @course.default_section.update_attribute(:name, "default section!")
         s2 = @course.course_sections.create!(name: "other section!")
-        date = Date.today
+        date = Time.zone.today
         e1 = @course.calendar_events.build title: "ohai",
                                            child_event_data: [
                                              { start_at: "#{date} 12:00:00", end_at: "#{date} 13:00:00", context_code: s2.asset_string },
@@ -228,7 +228,7 @@ describe "calendar2" do
         skip("RAILS_LOAD_ALL_LOCALES=true") unless ENV["RAILS_LOAD_ALL_LOCALES"]
         get "/calendar2"
         # Get the spanish text for the current month/year
-        expect_month_year = I18n.l(Date.today, format: "%B %Y", locale: "es")
+        expect_month_year = I18n.l(Time.zone.today, format: "%B %Y", locale: "es")
         expect(fj("#minical h2").text).to eq expect_month_year.downcase
       end
     end

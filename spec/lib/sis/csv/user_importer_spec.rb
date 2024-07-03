@@ -800,7 +800,7 @@ describe SIS::CSV::UserImporter do
           "user_id,login_id,first_name,last_name,email,status",
           "user_1,user1,User,Uno,user1@example.com,active"
         )
-        @cc = Pseudonym.where(account_id: @account, sis_user_id: "user_1").take.communication_channels.take
+        @cc = Pseudonym.find_by(account_id: @account, sis_user_id: "user_1").communication_channels.take
         @cc.bounce_count = 3
         @cc.save!
         expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.email).to eq "user1@example.com"
@@ -1368,7 +1368,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,active"
     )
-    u = @account.pseudonyms.where(sis_user_id: "user_1").take.user
+    u = @account.pseudonyms.find_by(sis_user_id: "user_1").user
     pseudonym2 = u.pseudonyms.create!(account: @account, unique_id: "other_login@example.com")
     process_csv_data_cleanly(
       "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
@@ -1521,7 +1521,7 @@ describe SIS::CSV::UserImporter do
     )
     c = @account.courses.where(sis_source_id: "test_1").first
     g = c.groups.create(name: "group1")
-    p = @account.pseudonyms.where(sis_user_id: "user_1").take
+    p = @account.pseudonyms.find_by(sis_user_id: "user_1")
     u = p.user
     gm = g.group_memberships.create(user: u, workflow_state: "accepted")
     expect(gm.workflow_state).to eq "accepted"

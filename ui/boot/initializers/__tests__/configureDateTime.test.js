@@ -21,7 +21,7 @@ import fr_FR from 'timezone/fr_FR'
 import zh_CN from 'timezone/zh_CN'
 import en_US from 'timezone/en_US'
 import MockDate from 'mockdate'
-import I18nStubber from '../../../../spec/coffeescripts/helpers/I18nStubber'
+import I18nStubber from '@canvas/test-utils/I18nStubber'
 import {up as configureDateTime, down as resetDateTime} from '@canvas/datetime/configureDateTime'
 import {
   up as configureDateTimeMomentParser,

@@ -184,7 +184,14 @@ describe DiscussionTopicsApiController do
       before do
         expect(LLMConfigs).to receive(:config_for).and_return(
           LLMConfig.new(
-            name: "V1_A",
+            name: "raw-V1_A",
+            model_id: "model",
+            template: "<CONTENT_PLACEHOLDER>"
+          )
+        )
+        expect(LLMConfigs).to receive(:config_for).and_return(
+          LLMConfig.new(
+            name: "refined-V1_A",
             model_id: "model",
             template: "<CONTENT_PLACEHOLDER>"
           )
@@ -193,13 +200,26 @@ describe DiscussionTopicsApiController do
 
       context "with a previous summary" do
         before do
-          @summary = @topic.summaries.create!(
-            summary: "summary",
+          @raw_summary = @topic.summaries.create!(
+            summary: "raw_summary",
             dynamic_content_hash: Digest::SHA256.hexdigest({
-              content: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary,
-              locale: "English (United States)"
+              CONTENT: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary,
+              FOCUS: DiscussionTopic::PromptPresenter.focus_for_summary(user_input: nil),
             }.to_json),
-            llm_config_version: "V1_A"
+            llm_config_version: "raw-V1_A",
+            user: @teacher
+          )
+          @refined_summary = @topic.summaries.create!(
+            summary: "refined_summary",
+            dynamic_content_hash: Digest::SHA256.hexdigest({
+              CONTENT: DiscussionTopic::PromptPresenter.raw_summary_for_refinement(raw_summary: @raw_summary.summary),
+              FOCUS: DiscussionTopic::PromptPresenter.focus_for_summary(user_input: ""),
+              LOCALE: "English (United States)"
+            }.to_json),
+            llm_config_version: "refined-V1_A",
+            parent: @raw_summary,
+            locale: "en",
+            user: @teacher
           )
         end
 
@@ -211,29 +231,7 @@ describe DiscussionTopicsApiController do
           get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
           expect(response).to be_successful
-          expect(response.parsed_body["id"]).to eq(@summary.id)
-        end
-
-        it "returns a new summary if forced" do
-          expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
-
-          expect(@inst_llm).to receive(:chat).and_return(
-            InstLLM::Response::ChatResponse.new(
-              model: "model",
-              message: { role: :assistant, content: "summary_1" },
-              stop_reason: "stop_reason",
-              usage: {
-                input_tokens: 10,
-                output_tokens: 20,
-              }
-            )
-          )
-
-          get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, force: true }, format: "json"
-
-          expect(response).to be_successful
-          expect(@topic.reload.summary_enabled).to be_truthy
-          expect(response.parsed_body["id"]).not_to eq(@summary.id)
+          expect(response.parsed_body["id"]).to eq(@refined_summary.id)
         end
 
         it "returns a new summary if locale has changed" do
@@ -243,7 +241,7 @@ describe DiscussionTopicsApiController do
           expect(@inst_llm).to receive(:chat).and_return(
             InstLLM::Response::ChatResponse.new(
               model: "model",
-              message: { role: :assistant, content: "summary_1" },
+              message: { role: :assistant, content: "refined_summary" },
               stop_reason: "stop_reason",
               usage: {
                 input_tokens: 10,
@@ -256,7 +254,7 @@ describe DiscussionTopicsApiController do
 
           expect(response).to be_successful
           expect(@topic.reload.summary_enabled).to be_truthy
-          expect(response.parsed_body["id"]).not_to eq(@summary.id)
+          expect(response.parsed_body["id"]).not_to eq(@refined_summary.id)
         end
       end
 
@@ -266,7 +264,18 @@ describe DiscussionTopicsApiController do
         expect(@inst_llm).to receive(:chat).and_return(
           InstLLM::Response::ChatResponse.new(
             model: "model",
-            message: { role: :assistant, content: "summary_1" },
+            message: { role: :assistant, content: "raw_summary" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "refined_summary" },
             stop_reason: "stop_reason",
             usage: {
               input_tokens: 10,
@@ -287,7 +296,18 @@ describe DiscussionTopicsApiController do
         expect(@inst_llm).to receive(:chat).and_return(
           InstLLM::Response::ChatResponse.new(
             model: "model",
-            message: { role: :assistant, content: "summary_1" },
+            message: { role: :assistant, content: "raw_summary" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "refined_summary" },
             stop_reason: "stop_reason",
             usage: {
               input_tokens: 10,
@@ -303,6 +323,33 @@ describe DiscussionTopicsApiController do
       end
     end
 
+    it "returns rate limit exceeded error if the user has reached the max number of summaries for the day" do
+      cache_key = ["inst_llm_helper", "rate_limit", @teacher.uuid, "raw-V1_A", Time.now.utc.strftime("%Y%m%d")].cache_key
+      Canvas.redis.incr(cache_key)
+
+      allow_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+      expect(LLMConfigs).to receive(:config_for).and_return(
+        LLMConfig.new(
+          name: "raw-V1_A",
+          model_id: "model",
+          rate_limit: { limit: 1, period: "day" },
+          template: "<CONTENT_PLACEHOLDER>"
+        )
+      )
+      expect(LLMConfigs).to receive(:config_for).and_return(
+        LLMConfig.new(
+          name: "refined-V1_A",
+          model_id: "model",
+          template: "<CONTENT_PLACEHOLDER>"
+        )
+      )
+
+      get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, userInput: "rejected by rate limit" }, format: "json"
+
+      expect(response.status).to eq(429)
+      expect(response.parsed_body["error"]).to include("1")
+    end
+
     it "returns an error if the user can't summarize" do
       expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(false)
 
@@ -313,6 +360,7 @@ describe DiscussionTopicsApiController do
 
     it "returns an error if there is no llm config" do
       expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+      expect(LLMConfigs).to receive(:config_for).and_return(nil)
       expect(LLMConfigs).to receive(:config_for).and_return(nil)
 
       get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
@@ -325,18 +373,35 @@ describe DiscussionTopicsApiController do
     before do
       course_with_teacher(active_course: true)
       @topic = @course.discussion_topics.create!(title: "discussion")
-      @summary = @topic.summaries.create!(
+      @raw_summary = @topic.summaries.create!(
         summary: "summary",
-        dynamic_content_hash: "fcfa768511b6a7a5881d017dae0d5aaa8dd8615937c1b89ea680c4dbb9af2a51",
-        llm_config_version: "V1_A"
+        dynamic_content_hash: Digest::SHA256.hexdigest({
+          CONTENT: DiscussionTopic::PromptPresenter.new(@topic).content_for_summary,
+          FOCUS: DiscussionTopic::PromptPresenter.focus_for_summary(user_input: "student feedback"),
+        }.to_json),
+        llm_config_version: "raw-V1_A",
+        user: @teacher
       )
+      @refined_summary = @topic.summaries.create!(
+        summary: "summary",
+        dynamic_content_hash: Digest::SHA256.hexdigest({
+          CONTENT: DiscussionTopic::PromptPresenter.raw_summary_for_refinement(raw_summary: @raw_summary.summary),
+          FOCUS: DiscussionTopic::PromptPresenter.focus_for_summary(user_input: "student feedback"),
+          LOCALE: "English (United States)"
+        }.to_json),
+        llm_config_version: "refined-V1_A",
+        parent: @raw_summary,
+        locale: "en",
+        user: @teacher
+      )
+
       user_session(@teacher)
     end
 
     it "returns an error if the user can't summarize" do
       allow_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(false)
 
-      post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @summary.id, _action: "like" }, format: "json"
+      post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @refined_summary.id, _action: "like" }, format: "json"
 
       expect(response).to be_unauthorized
     end
@@ -352,7 +417,7 @@ describe DiscussionTopicsApiController do
     it "returns an error if the action is invalid" do
       allow_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
 
-      post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @summary.id, _action: "invalid" }, format: "json"
+      post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @refined_summary.id, _action: "invalid" }, format: "json"
 
       expect(response).to be_bad_request
     end
@@ -361,7 +426,7 @@ describe DiscussionTopicsApiController do
       allow_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
       another_topic = @course.discussion_topics.create!(title: "discussion")
 
-      post "summary_feedback", params: { topic_id: another_topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @summary.id, _action: "like" }, format: "json"
+      post "summary_feedback", params: { topic_id: another_topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @refined_summary.id, _action: "like" }, format: "json"
 
       expect(response).to be_not_found
     end
@@ -369,7 +434,7 @@ describe DiscussionTopicsApiController do
     it "creates feedback" do
       allow_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
 
-      post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @summary.id, _action: "like" }, format: "json"
+      post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @refined_summary.id, _action: "like" }, format: "json"
 
       expect(response).to be_successful
       expect(response.parsed_body["liked"]).to be_truthy
@@ -400,6 +465,69 @@ describe DiscussionTopicsApiController do
 
       expect(response).to be_successful
       expect(@topic.reload.summary_enabled).to be_falsey
+    end
+  end
+
+  context "mark_all_topic_read" do
+    before do
+      course_with_teacher(active_course: true)
+      user_session(@teacher)
+    end
+
+    it "marks all topic read, but not the announcements" do
+      topic1 = @course.discussion_topics.create!(title: "discussion")
+      topic2 = @course.discussion_topics.create!(title: "discussion", unlock_at: 1.day.ago)
+      announcement1 = @course.announcements.create!(title: "announcement", message: "test")
+      # announcement is a discussion topic
+
+      expect(topic1.reload.read_state(@teacher)).to eq("unread")
+      expect(topic2.reload.read_state(@teacher)).to eq("unread")
+      expect(announcement1.reload.read_state(@teacher)).to eq("unread")
+
+      put "mark_all_topic_read", params: { course_id: @course.id }, format: "json"
+
+      expect(response).to be_successful
+      expect(topic1.reload.read_state(@teacher)).to eq("read")
+      expect(topic2.reload.read_state(@teacher)).to eq("read")
+      expect(announcement1.reload.read_state(@teacher)).to eq("unread")
+    end
+
+    it "does not mark unpublished topics read" do
+      topic = @course.discussion_topics.create!(title: "discussion", workflow_state: "unpublished")
+      expect(topic.reload.read_state(@teacher)).to eq("unread")
+
+      put "mark_all_topic_read", params: { course_id: @course.id }, format: "json"
+
+      expect(response).to be_successful
+      expect(topic.reload.read_state(@teacher)).to eq("unread")
+    end
+
+    it "marks announcements read if only_announcements is true" do
+      announcement1 = @course.announcements.create!(title: "announcement", message: "test")
+      announcement2 = @course.announcements.create!(title: "announcement", message: "test", unlock_at: 1.day.ago)
+      topic1 = @course.discussion_topics.create!(title: "discussion")
+
+      expect(announcement1.reload.read_state(@teacher)).to eq("unread")
+      expect(announcement2.reload.read_state(@teacher)).to eq("unread")
+      expect(topic1.reload.read_state(@teacher)).to eq("unread")
+
+      put "mark_all_topic_read", params: { course_id: @course.id, only_announcements: true }, format: "json"
+
+      expect(response).to be_successful
+      expect(announcement1.reload.read_state(@teacher)).to eq("read")
+      expect(announcement2.reload.read_state(@teacher)).to eq("read")
+      expect(topic1.reload.read_state(@teacher)).to eq("unread")
+    end
+
+    it "does not mark a topic read if the unlock_at is in the future" do
+      topic = @course.discussion_topics.create!(title: "discussion", unlock_at: 1.day.from_now)
+
+      expect(topic.reload.read_state(@teacher)).to eq("unread")
+
+      put "mark_all_topic_read", params: { course_id: @course.id }, format: "json"
+
+      expect(response).to be_successful
+      expect(topic.reload.read_state(@teacher)).to eq("unread")
     end
   end
 end

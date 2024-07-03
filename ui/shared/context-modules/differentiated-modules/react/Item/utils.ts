@@ -24,7 +24,10 @@ import type {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = useI18nScope('differentiated_modules')
 
+const fancyMidnightDueTime = '23:59:00'
+
 type UseDatesHookArgs = {
+  reply_to_topic_due_at: string | null
   due_at: string | null
   unlock_at: string | null
   lock_at: string | null
@@ -34,6 +37,7 @@ type UseDatesHookArgs = {
 
 type UseDatesHookResult = [
   string | null,
+  (replyToTopicDueDate: string | null) => void,
   (dueDate: string | null) => void,
   (_event: React.SyntheticEvent, value: string | undefined) => void,
   string | null,
@@ -46,9 +50,17 @@ type UseDatesHookResult = [
 
 function setTimeToStringDate(time: string, date: string | undefined): string | undefined {
   const [hour, minute, second] = time.split(':').map(Number)
-  const chosenDate = moment.tz(date, ENV.TIMEZONE)
+  const chosenDate = moment.tz(date, ENV.TIMEZONE || 'UTC')
   chosenDate.set({hour, minute, second})
   return chosenDate.isValid() ? chosenDate.utc().toISOString() : date
+}
+
+function isFancyMidnightNeeded(value: string | undefined) {
+  const chosenDueTime = moment
+    .utc(value)
+    .tz(ENV.TIMEZONE || 'UTC')
+    .format('HH:mm:00')
+  return chosenDueTime === '00:00:00' && chosenDueTime !== fancyMidnightDueTime
 }
 
 export function generateMessages(
@@ -100,15 +112,24 @@ export function generateWrapperStyleProps(
 }
 
 export function useDates({
+  reply_to_topic_due_at,
   due_at,
   unlock_at,
   lock_at,
   cardId,
   onCardDatesChange,
 }: UseDatesHookArgs): UseDatesHookResult {
+  const [replyToTopicDueDate, setReplyToTopicDueDate] = useState<string | null>(
+    reply_to_topic_due_at
+  )
   const [dueDate, setDueDate] = useState<string | null>(due_at)
   const [availableFromDate, setAvailableFromDate] = useState<string | null>(unlock_at)
   const [availableToDate, setAvailableToDate] = useState<string | null>(lock_at)
+
+  useEffect(() => {
+    onCardDatesChange?.(cardId, 'reply_to_topic_due_at', replyToTopicDueDate)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [replyToTopicDueDate])
 
   useEffect(() => {
     onCardDatesChange?.(cardId, 'due_at', dueDate)
@@ -125,6 +146,24 @@ export function useDates({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availableToDate])
 
+  const handleReplyToTopicDueDateChange = useCallback(
+    (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => {
+      const defaultReplyToTopicDueDate = ENV.DEFAULT_DUE_TIME ?? '23:59:00'
+      const newReplyToTopicDueDate = replyToTopicDueDate
+        ? value
+        : timeValue === ''
+        ? setTimeToStringDate(defaultReplyToTopicDueDate, value)
+        : value
+      // When user uses calendar pop-up type is "click", but for KB is "blur"
+      if (_event.type !== 'blur') {
+        setReplyToTopicDueDate(newReplyToTopicDueDate || null)
+      } else {
+        setTimeout(() => setReplyToTopicDueDate(newReplyToTopicDueDate || null), 0)
+      }
+    },
+    [replyToTopicDueDate]
+  )
+
   const handleDueDateChange = useCallback(
     (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => {
       const defaultDueTime = ENV.DEFAULT_DUE_TIME ?? '23:59:00'
@@ -138,6 +177,13 @@ export function useDates({
         setDueDate(newDueDate || null)
       } else {
         setTimeout(() => setDueDate(newDueDate || null), 0)
+      }
+
+      if (isFancyMidnightNeeded(newDueDate)) {
+        setTimeout(
+          () => setDueDate(setTimeToStringDate(fancyMidnightDueTime, newDueDate) || null),
+          200
+        )
       }
     },
     [dueDate]
@@ -178,6 +224,9 @@ export function useDates({
   )
 
   return [
+    replyToTopicDueDate,
+    setReplyToTopicDueDate,
+    handleReplyToTopicDueDateChange,
     dueDate,
     setDueDate,
     handleDueDateChange,
@@ -204,6 +253,7 @@ export const generateCardActionLabels = (selected: string[]) => {
       return {
         removeCard: I18n.t('Remove card'),
         clearDueAt: I18n.t('Clear due date/time'),
+        clearReplyToTopicDueAt: I18n.t('Clear reply to topic due date/time'),
         clearAvailableFrom: I18n.t('Clear available from date/time'),
         clearAvailableTo: I18n.t('Clear until date/time'),
       }
@@ -212,6 +262,7 @@ export const generateCardActionLabels = (selected: string[]) => {
       return {
         removeCard: I18n.t('Remove card for %{pillA}', {pillA: selected[0]}),
         clearDueAt: I18n.t('Clear due date/time for %{pillA}', {pillA: selected[0]}),
+        clearReplyToTopicDueAt: I18n.t('Clear reply to topic due date/time for %{pillA}', {pillA: selected[0]}),
         clearAvailableFrom: I18n.t('Clear available from date/time for %{pillA}', {
           pillA: selected[0],
         }),
@@ -224,6 +275,10 @@ export const generateCardActionLabels = (selected: string[]) => {
           pillB: selected[1],
         }),
         clearDueAt: I18n.t('Clear due date/time for %{pillA} and %{pillB}', {
+          pillA: selected[0],
+          pillB: selected[1],
+        }),
+        clearReplyToTopicDueAt: I18n.t('Clear reply to topic due date/time for %{pillA} and %{pillB}', {
           pillA: selected[0],
           pillB: selected[1],
         }),
@@ -248,6 +303,11 @@ export const generateCardActionLabels = (selected: string[]) => {
           pillB: selected[1],
           pillC: selected[2],
         }),
+        clearReplyToTopicDueAt: I18n.t('Clear reply to topic due date/time for %{pillA}, %{pillB}, and %{pillC}', {
+          pillA: selected[0],
+          pillB: selected[1],
+          pillC: selected[2],
+        }),
         clearAvailableFrom: I18n.t(
           'Clear available from date/time for %{pillA}, %{pillB}, and %{pillC}',
           {pillA: selected[0], pillB: selected[1], pillC: selected[2]}
@@ -266,6 +326,11 @@ export const generateCardActionLabels = (selected: string[]) => {
           n: selected.length - 2,
         }),
         clearDueAt: I18n.t('Clear due date/time for %{pillA}, %{pillB}, and %{n} others', {
+          pillA: selected[0],
+          pillB: selected[1],
+          n: selected.length - 2,
+        }),
+        clearReplyToTopicDueAt: I18n.t('Clear reply to topic due date/time for %{pillA}, %{pillB}, and %{n} others', {
           pillA: selected[0],
           pillB: selected[1],
           n: selected.length - 2,

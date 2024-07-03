@@ -109,9 +109,9 @@ shared_examples_for "settings basic tests" do
       # ensure the account was updated properly
       account.reload
       expect(account.default_storage_quota_mb).to eq course_quota
-      expect(account.default_storage_quota).to eq course_quota * 1_048_576
+      expect(account.default_storage_quota).to eq course_quota * 1_000_000
       expect(account.default_group_storage_quota_mb).to eq group_quota
-      expect(account.default_group_storage_quota).to eq group_quota * 1_048_576
+      expect(account.default_group_storage_quota).to eq group_quota * 1_000_000
 
       # ensure the new value is reflected after a refresh
       get account_settings_url

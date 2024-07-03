@@ -310,7 +310,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read) && tab_enabled?(@context.class::TAB_QUIZZES)
       log_api_asset_access(["quizzes", @context], "quizzes", "other")
-      updated = @context.quizzes.active.reorder("updated_at DESC").limit(1).pluck(:updated_at).first
+      updated = @context.quizzes.active.reorder("updated_at DESC").limit(1).pick(:updated_at)
       cache_key = ["quizzes",
                    @context.id,
                    @context.quizzes.active.size,

@@ -79,8 +79,8 @@ export default function AssignmentDetails({assignment, submission}) {
     <>
       <Flex direction="column">
         <div style={{lineHeight: 1.05}}>
-          <Flex.Item padding={window.ENV.FEATURES.instui_nav ? '0' : 'xxx-small 0 0'}>
-            {window.ENV.FEATURES.instui_nav ? (
+          <Flex.Item padding={window.ENV.FEATURES?.instui_nav ? '0' : 'xxx-small 0 0'}>
+            {window.ENV.FEATURES?.instui_nav ? (
               <Text weight="bold" size="xx-large" wrap="break-word" data-testid="title">
                 {assignment.name}
               </Text>
@@ -96,14 +96,14 @@ export default function AssignmentDetails({assignment, submission}) {
           assignment.unlockAt ||
           assignment.env.peerReviewModeEnabled) && (
           <Flex.Item
-            margin={window.ENV.FEATURES.instui_nav ? 'small 0 0 0' : '0'}
+            margin={window.ENV.FEATURES?.instui_nav ? 'small 0 0 0' : '0'}
             themeOverride={{lineHeight: 1}}
           >
             <div style={{lineHeight: 1}}>
               <Text
                 size="small"
-                color={window.ENV.FEATURES.instui_nav ? 'secondary' : null}
-                weight={window.ENV.FEATURES.instui_nav ? null : 'bold'}
+                color={window.ENV.FEATURES?.instui_nav ? 'secondary' : null}
+                weight={window.ENV.FEATURES?.instui_nav ? null : 'bold'}
                 data-testid="assignment-sub-header"
               >
                 {assignment.env.peerReviewModeEnabled &&
@@ -120,13 +120,13 @@ export default function AssignmentDetails({assignment, submission}) {
                   </>
                 )}
               </Text>
-              {window.ENV.FEATURES.instui_nav &&
+              {window.ENV.FEATURES?.instui_nav &&
                 !assignment.env.peerReviewModeEnabled &&
                 renderAvailability(assignment)}
             </div>
           </Flex.Item>
         )}
-        {window.ENV.FEATURES.instui_nav && !assignment.env.peerReviewModeEnabled && (
+        {window.ENV.FEATURES?.instui_nav && !assignment.env.peerReviewModeEnabled && (
           <Flex margin="small 0 0 0">
             <Flex.Item>
               <SubmissionStatusPill

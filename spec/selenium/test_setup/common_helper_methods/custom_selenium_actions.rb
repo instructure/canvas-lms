@@ -726,4 +726,13 @@ module CustomSeleniumActions
   rescue
     click_repeat(element)
   end
+
+  # If you want to simulate a user's internet connection turning offline, use these methods.
+  def turn_off_network
+    driver.network_conditions = { offline: true, latency: 0, throughput: 0 }
+  end
+
+  def turn_on_network
+    driver.network_conditions = { offline: false, latency: 0, throughput: -1 }
+  end
 end

@@ -18,21 +18,21 @@
 
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
-import {ExtensionsTableInner} from '../ExtensionsTable'
+import {AppsTableInner} from '../AppsTable'
 import {mockPageOfRegistrations} from './helpers'
 import {BrowserRouter} from 'react-router-dom'
 
-// Need to use ExtensionsTableInner because ExtensionsTable uses Responsive
+// Need to use AppsTableInner because AppsTable uses Responsive
 // which doesn't seem to work in these tests -- both media queries are
 // satisfied and the component gets two "layout" properties
-describe('ExensionsTableInner', () => {
+describe('AppsTableInner', () => {
   it('calls the deleteApp callback when the Delete App menu item is clicked', async () => {
     const deleteApp = jest.fn()
     const wrapper = render(
       <BrowserRouter>
-        <ExtensionsTableInner
+        <AppsTableInner
           tableProps={{
-            extensions: mockPageOfRegistrations('Hello', 'World'),
+            apps: mockPageOfRegistrations('Hello', 'World'),
             dir: 'asc',
             sort: 'name',
             updateSearchParams: () => {},

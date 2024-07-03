@@ -39,7 +39,7 @@ const TrueFalseQuestion = ({question, onAnswerChange}: TrueFalseQuestionProps) =
   )
 
   return (
-    <div className="question-block__body">
+    <div className="quiz-section__body">
       <div style={{margin: '0 0 .75rem'}} dangerouslySetInnerHTML={{__html: question.item_body}} />
       <RadioInputGroup
         description={<ScreenReaderContent>Choose one</ScreenReaderContent>}

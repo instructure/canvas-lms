@@ -472,28 +472,49 @@ describe.skip('MessageStudentsWhoDialog', () => {
     it('is shown only when "Scored more than" or "Scored less than" is selected', async () => {
       const mocks = await makeMocks()
 
-      const {getByLabelText, getByRole, queryByLabelText} = render(
+      const {getByRole, findByTestId, getByTestId, queryByTestId} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
         </MockedProvider>
       )
       await waitFor(() => {
-        expect(queryByLabelText('Enter score cutoff')).not.toBeInTheDocument()
+        expect(queryByTestId('cutoff-input')).not.toBeInTheDocument()
       })
 
-      const selector = getByLabelText(/For students who/)
+      const selector = await findByTestId('criterion-dropdown')
 
       fireEvent.click(selector)
       fireEvent.click(getByRole('option', {name: 'Scored more than'}))
-      expect(getByLabelText('Enter score cutoff')).toBeInTheDocument()
+      expect(getByTestId('cutoff-input')).toBeInTheDocument()
 
       fireEvent.click(selector)
       fireEvent.click(getByRole('option', {name: 'Scored less than'}))
-      expect(getByLabelText('Enter score cutoff')).toBeInTheDocument()
+      expect(getByTestId('cutoff-input')).toBeInTheDocument()
 
       fireEvent.click(selector)
       fireEvent.click(getByRole('option', {name: 'Reassigned'}))
-      expect(queryByLabelText('Enter score cutoff')).not.toBeInTheDocument()
+      expect(queryByTestId('cutoff-input')).not.toBeInTheDocument()
+    })
+
+    it('foot-note is rendered along with the cutoff-input', async () => {
+      const mocks = await makeMocks()
+
+      const {findByTestId, getByText, getByTestId, queryByTestId} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      await waitFor(() => {
+        expect(queryByTestId('cutoff-footnote')).not.toBeInTheDocument()
+      })
+
+      const selector = await findByTestId('criterion-dropdown')
+
+      fireEvent.click(selector)
+      fireEvent.click(getByText('Scored more than'))
+
+      expect(getByTestId('cutoff-footnote')).toBeInTheDocument()
     })
   })
 

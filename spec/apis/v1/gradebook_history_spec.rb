@@ -117,7 +117,7 @@ describe Api::V1::GradebookHistory do
       harness = GradebookHistoryHarness.new
       harness.instance_variable_set(:@domain_root_account, Account.default)
       days = harness.days_json(course, api_context)
-      expect(days.pluck(:date).first).to eq yesterday.to_date.as_json
+      expect(days.pick(:date)).to eq yesterday.to_date.as_json
     end
   end
 

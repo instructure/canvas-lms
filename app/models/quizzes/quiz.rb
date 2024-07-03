@@ -1040,7 +1040,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     last_quiz_activity = [
       published_at || created_at,
-      quiz_submissions.completed.order("updated_at DESC").limit(1).pluck(:updated_at).first
+      quiz_submissions.completed.order("updated_at DESC").limit(1).pick(:updated_at)
     ].compact.max
 
     candidate_stats = quiz_statistics.report_type(report_type).where(quiz_stats_opts).last

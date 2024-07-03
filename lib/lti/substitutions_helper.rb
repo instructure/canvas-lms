@@ -283,7 +283,7 @@ module Lti
       return "" unless @context.is_a?(Course)
 
       # now find all parents for locked folders
-      last_migration_id = @context.content_migrations.where(workflow_state: :imported).order(id: :desc).limit(1).pluck(:id).first
+      last_migration_id = @context.content_migrations.where(workflow_state: :imported).order(id: :desc).limit(1).pick(:id)
       return "" unless last_migration_id
 
       use_alternate_settings = @root_account.feature_enabled?(:tune_lti_context_id_history_query)

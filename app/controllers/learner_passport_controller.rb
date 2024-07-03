@@ -832,7 +832,7 @@ class LearnerPassportController < ApplicationController
     return render json: { message: "Pathway not found" }, status: :not_found if pathway.nil?
 
     pathway.replace(JSON.parse(params[:pathway]).transform_keys(&:to_sym))
-    pathway[:published] = (params[:draft] == "true") ? nil : Date.today.to_s
+    pathway[:published] = (params[:draft] == "true") ? nil : Time.zone.today.to_s
     Rails.cache.write(current_pathways_key, current_pathways, expires_in: CACHE_EXPIRATION)
 
     render json: pathway

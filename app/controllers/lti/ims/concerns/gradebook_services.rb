@@ -85,7 +85,7 @@ module Lti::IMS::Concerns
     end
 
     def verify_line_item_in_context
-      line_item_context_id = Assignment.where(id: line_item.assignment_id).pluck(:context_id).first
+      line_item_context_id = Assignment.where(id: line_item.assignment_id).pick(:context_id)
       raise ActiveRecord::RecordNotFound if line_item_context_id != params[:course_id].to_i || context.blank?
       return if params[:resourceLinkId].blank? || line_item.resource_link.resource_link_uuid == params[:resourceLinkId]
 

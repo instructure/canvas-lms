@@ -19,7 +19,9 @@
 #
 require "spec_helper"
 require_relative "../graphql_spec_helper"
+require_relative "../../helpers/selective_release_common"
 describe Mutations::CreateDiscussionTopic do
+  include SelectiveReleaseCommon
   before(:once) do
     course_with_teacher(active_all: true)
   end
@@ -682,6 +684,7 @@ describe Mutations::CreateDiscussionTopic do
     end
 
     it "successfully creates the discussion topic is_section_specific true" do
+      differentiated_modules_off
       context_type = "Course"
       title = "Test Title"
       message = "A message"
@@ -716,6 +719,7 @@ describe Mutations::CreateDiscussionTopic do
     end
 
     it "does not allow creation of disuccions to sections that are not visible to the user" do
+      differentiated_modules_off
       # This teacher does not have permission for section 2
       course2 =  course_factory(active_course: true)
       section1 = @course.course_sections.create!(name: "Section 1")
@@ -1125,12 +1129,12 @@ describe Mutations::CreateDiscussionTopic do
         }
         checkpoints: [
           {
-            checkpointLabel: "reply_to_topic",
+            checkpointLabel: reply_to_topic,
             pointsPossible: 10,
             dates: [{ type: everyone, dueAt: "#{5.days.from_now.iso8601}" }]
           },
           {
-            checkpointLabel: "reply_to_entry",
+            checkpointLabel: reply_to_entry,
             pointsPossible: 15,
             dates: [{ type: everyone, dueAt: "#{10.days.from_now.iso8601}" }],
             repliesRequired: 3
@@ -1175,12 +1179,12 @@ describe Mutations::CreateDiscussionTopic do
         }
         checkpoints: [
           {
-            checkpointLabel: "reply_to_topic",
+            checkpointLabel: reply_to_topic,
             pointsPossible: 10,
             dates: [{ type: everyone, dueAt: "#{due_at.iso8601}", lockAt: "#{lock_at.iso8601}", unlockAt: "#{unlock_at.iso8601}" }]
           },
           {
-            checkpointLabel: "reply_to_entry",
+            checkpointLabel: reply_to_entry,
             pointsPossible: 15,
             dates: [{ type: everyone, dueAt: "#{10.days.from_now.iso8601}" }],
             repliesRequired: 3
@@ -1222,12 +1226,12 @@ describe Mutations::CreateDiscussionTopic do
         }
         checkpoints: [
           {
-            checkpointLabel: "reply_to_topic",
+            checkpointLabel: reply_to_topic,
             pointsPossible: 10,
             dates: [{ type: everyone, dueAt: "#{5.days.from_now.iso8601}" }]
           },
           {
-            checkpointLabel: "reply_to_entry",
+            checkpointLabel: reply_to_entry,
             pointsPossible: 15,
             dates: [
               { type: everyone, dueAt: "#{10.days.from_now.iso8601}" },
@@ -1290,12 +1294,12 @@ describe Mutations::CreateDiscussionTopic do
         }
         checkpoints: [
           {
-            checkpointLabel: "reply_to_topic",
+            checkpointLabel: reply_to_topic,
             pointsPossible: 10,
             dates: [{ type: everyone, dueAt: "#{5.days.from_now.iso8601}" }]
           },
           {
-            checkpointLabel: "reply_to_entry",
+            checkpointLabel: reply_to_entry,
             pointsPossible: 15,
             dates: [
               { type: everyone, dueAt: "#{10.days.from_now.iso8601}" },
@@ -1353,12 +1357,12 @@ describe Mutations::CreateDiscussionTopic do
         }
         checkpoints: [
           {
-            checkpointLabel: "reply_to_topic",
+            checkpointLabel: reply_to_topic,
             pointsPossible: 10,
             dates: [{ type: everyone, dueAt: "#{5.days.from_now.iso8601}" }]
           },
           {
-            checkpointLabel: "reply_to_entry",
+            checkpointLabel: reply_to_entry,
             pointsPossible: 15,
             dates: [
               { type: everyone, dueAt: "#{10.days.from_now.iso8601}" },
@@ -1435,6 +1439,35 @@ describe Mutations::CreateDiscussionTopic do
         expect(override.set_id).to be_nil
         expect(override.set.map(&:id)).to match_array([student1.id, student2.id])
         expect(override.workflow_state).to eq "active"
+      end
+    end
+
+    it "does not create overrides on a group discussion topic" do
+      group = @course.groups.create!
+      student_in_group = student_in_course(course: @course, active_all: true).user
+      group.group_memberships.create!(user: student_in_group)
+
+      context_type = "Group"
+      title = "Group Discussion"
+      message = "Lorem ipsum..."
+      published = true
+
+      query = <<~GQL
+        contextId: "#{group.id}"
+        contextType: #{context_type}
+        title: "#{title}"
+        message: "#{message}"
+        published: #{published}
+        ungradedDiscussionOverrides: {
+          studentIds: [#{student_in_group.id}]
+        }
+      GQL
+
+      result = execute_with_input(query)
+      override = DiscussionTopic.last.active_assignment_overrides.first
+      aggregate_failures do
+        expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+        expect(override).to be_nil
       end
     end
 

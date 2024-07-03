@@ -31,7 +31,7 @@ describe Quizzes::Quiz do
     end
 
     let(:default_false_values) do
-      Quizzes::Quiz.where(id: @quiz).pluck(
+      Quizzes::Quiz.where(id: @quiz).pick(
         :shuffle_answers,
         :disable_timer_autosubmission,
         :could_be_locked,
@@ -44,7 +44,7 @@ describe Quizzes::Quiz do
         :only_visible_to_overrides,
         :one_time_results,
         :show_correct_answers_last_attempt
-      ).first
+      )
     end
 
     it "saves boolean attributes as false if they are set to nil" do

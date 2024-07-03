@@ -53,8 +53,6 @@ module.exports = {
         test: /\.(js|jsx|ts|tsx)$/,
         include: [
           path.resolve(canvasDir, 'ui'),
-          path.resolve(canvasDir, 'spec/javascripts/jsx'),
-          path.resolve(canvasDir, 'spec/coffeescripts'),
           path.resolve(canvasDir, '.storybook'),
           ...globPlugins('app/{jsx,coffeescripts}/'),
         ],

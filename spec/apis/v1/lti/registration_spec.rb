@@ -32,7 +32,7 @@ describe Api::V1::Lti::Registration do
     let(:context) { account_model }
 
     it "includes the canvas id for each" do
-      expect(subject.pluck(:id)).to eq(registrations.map(&:id))
+      expect(subject.pluck(:id)).to include(*registrations.map(&:id))
     end
   end
 

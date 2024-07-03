@@ -2864,6 +2864,7 @@ fa:
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "یک کاربر کانواس موجود با شناسه %{user_id} قبلا شناسه_یکپارچه سازی درخواست شده %{other_user_id} را ادعا کرده است، از قلم انداختن"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "یک کاربر موجود با کاربران موجود ارائه شده برای ورود به سیستم با شناسه سامانه اطلاعات دانشجو %{user_id} مطابقت ندارد، نادیده گرفتن"
   an_export_is_already_in_progress_54270f01: "یک صدور در حال انجام است."
+  an_integer_value_is_required_e073bd46: "یک مقدار صحیح لازم است"
   an_internal_error_occurred_83b8a685: "یک خطای داخلی رخ داد"
   an_item_named_name_already_exists_in_this_location_147b7312: "یک مورد با عنوان \"%{name}\" در این محل موجود است. می خواهید با فایل موجود جایگزین شود؟"
   an_object_of_type_graphql_type_was_hidden_due_to_i_60998e99: "یک شیء ار نوع %{graphql_type} به دلیل محدوده‌ی ناکافی روی نشانه دسترسی پنهان شده است. "
@@ -6977,6 +6978,7 @@ fa:
   count_participations_ac8f82b7: 
     one: "%{count} شرکت کننده"
     other: "%{count} شرکت کننده"
+  count_people_489946e7: "%{count} نفر"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{count} فرد در *%{course_name}* با موفقیت ثبت نام شدند."
     other: "%{count} فرد در *%{course_name}* با موفقیت ثبت نام شدند."
@@ -7420,6 +7422,7 @@ fa:
     greater_than_three: "لطفا یک عبارت جستجو با سه یا چند نویسه وارد نمایید"
     unknown_error: "جستجوی شما با اشکال مواجه شد، لطفا دوباره سعی کنید."
   course_visibility_options_ca8ab3a8: "گزینه‌های قابلیت دید درس"
+  course_was_successfully_updated_1ab0e9f8: "درس با موفقیت بهنگام سازی شد"
   course_with_canvas_id_id_not_found_1ff06bec: "دوره با شناسه ی %{id} کانواس یافت نشد"
   course_wizard_31c87552: "راهنمای گام به گام درس"
   coursecontext_label_d563be4c: "%{courseContext}%{label}"
@@ -9711,6 +9714,7 @@ fa:
   enter_a_filename_for_the_photo_4f0fc10e: "یک نام فایل برای عکس وارد کنید"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "در اینجا یک کد هگزا برای استفاده از رنگ سفارشی وارد نمایید."
   enter_a_score_to_test_c6f89f4a: "وارد کردن یک نمره برای آزمایش"
+  enter_a_section_name_adbe3099: "نام بخش را وارد کنید"
   enter_a_student_pairing_code_below_to_add_a_studen_15789251: "یک کد جفت سازی دانش آموز را در زیر وارد کنید تا دانش آموزی برای مشاهده اضافه شود."
   enter_a_valid_date_46d77547: "یک تاریخ معتبر وارد کنید"
   enter_a_what_if_score_668c91a3: "یک نمره احتمالی وارد کنید."
@@ -12920,6 +12924,7 @@ fa:
   invalid_submission_file_type_cda6742a: "نوع فایل ارسالی نامعتبر است"
   invalid_timestamp_timestamp_in_future_5bc855d7: "تاریخ و زمان نامعتبر - تاریخ و زمان در آینده "
   invalid_timestamp_timestamp_not_parseable_dae79e92: "تاریخ و زمان نامعتبر - تاریخ و زمان قابل تجزیه نیست"
+  invalid_url_cbde79f: "نشانی اینترنتی معتبر نیست"
   invalid_url_in_xml: "نشانی اینترنتی در xml معتبر نیست. نویسه & نباید در آن باشد."
   invalid_username_or_password_b60aa240: "نام کاربری یا رمز عبور معتبر نیست"
   invalid_utf_8_13c76a6: "UTF-8 معتبر نیست"
@@ -13585,6 +13590,7 @@ fa:
           send_to_sms: "ارسال پیام های متنی به  %{phone_number}"
         labels: 
           carrier: حامل
+          otp_communication_channel_id: "شماره تلفن"
           phone_number: "شماره تلفن"
           remember_me: "این رایانه به خاطر سپرده شود"
           verification_code: "رمز تأیید"
@@ -16114,11 +16120,13 @@ fa:
   mp3_c21c0f5f: MP3
   mp4_5c789afc: MP4
   msg_680333e2: "%{msg}"
+  multi_factor_authentication_1a6b3b3d: "اعتبارسنجی چند عاملی"
   multi_factor_authentication_backup_codes_4d781044: "کدهای پشتیبان احراز هویت چند عاملی"
   multi_factor_authentication_configured_865b1bde: "اعتبارسنجی چند عاملی پیکربندی شد"
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: "چند مورد به عنوان \"زمینه فعلی\" علامت‌گذاری شده است، زیرا مقادیر یکسان تحت چند نام ذخیره شده‌اند، یعنی هر یک با آنچه در حال حاضر اعمال شده یکسان هستند"
   multiple_ba5220cd: "چند مورد"
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "چند حساب کانواس با Clever District %{district_id} در ارتباط است"
+  multiple_dates_e3a122f7: "چند تاریخ"
   multiple_dropdowns_read_surrounding_text_f61274b3: "دارای چند منوی بازشونده، متن‌های اطراف را بخوانید"
   multiple_due_dates_283dd861: "چند تاریخ مهلت"
   multiple_due_dates_47416f7a: "(سررسید چندگانه)"
@@ -17482,6 +17490,7 @@ fa:
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "لطفا یک عبارت جستجو با سه نویسه یا بیشتر وارد نمایید"
   please_enter_a_url_d2c868b5: "لطفا یک نشانی اینترنتی وارد کنید"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "لطفا یک نشانی اینترنتی معتبر وارد کنید. پروتکل لازم است (به عنوان مثال http: //، https: //، ftp: //، tel :، mailto :)."
+  please_enter_the_verification_code_shown_by_your_t_acc7c404: "لطفا رمز تأیید نشان داده شده توسط نشانه خود را وارد کنید."
   please_enter_your_label_name_7745272d: "لطفا %{label_name} خود را وارد کنید:"
   please_enter_your_label_name_and_password_5c56be80: "لطفا %{label_name} و رمز عبور خود را وارد کنید:"
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "لطفا به آنها اطلاع دهید کدام صفحه را مشاهده می کردید و روی کدام پیوند کلیک کردید."
@@ -17757,7 +17766,9 @@ fa:
     learn_platform_settings: 
       labels: 
         base_url: "نشانی اینترنتی پایه"
+        password: Password
         token: "نشانه دسترسی"
+        username: "نام کاربری"
     linked_in: 
       description: "یکپارچه‌سازی لینکدین"
     linked_in_settings: 
@@ -22081,6 +22092,7 @@ fa:
   shift_dates_b5a7b7a1: "تاریخ های شیفت"
   short_name_42f454a1: "نام کوتاه"
   short_name_ad9bf84f: "نام کوتاه"
+  should_be_10_digit_number_d30ef02d: "باید شماره 10 رقمی باشد"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "باید خود آشکار باشد، شناسه کانواس کاربر گزارش دهنده"
   show_76c0ed1c: نمایش
   show_account_navigation_menu_d97270a9: "نمایش منوی پیمایش حساب"
@@ -25156,6 +25168,7 @@ fa:
   value_added_1846cc30: "%{value} اضافه شده"
   value_d842f16d: مقدار
   value_is_not_a_valid_date_23c2d0a2: "%{value} یک تاریخ معتبر نیست."
+  value_must_be_positive_3e086d5a: "مقدار باید مثبت باشد"
   value_removed_bba9430c: "%{value} حذف شده"
   vanity_url_76f93382: "نشانی اینترنتی منحصربفرد تارنما برای مقاصد بازاریابی"
   vendor_code_lti_2_ef36207b: "رمز فروشنده (LTI 2)"
@@ -25168,6 +25181,7 @@ fa:
   vericite_similarity_score_more_information_7df9ea5c: "نمره تشابه VeriCite -- اطلاعات بیشتر"
   vericite_similarity_score_see_detailed_report_390ab687: "نمره تشابه VeriCite - جزئیات گزارش را ببینید"
   verification_code_5acd64ef: "رمز تأیید"
+  verify_3dd8f159: تأیید
   version_5599c321: نسخه
   video_78335c71: ویدئو
   video_b9f27375: تصویر

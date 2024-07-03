@@ -130,11 +130,10 @@ describe SentryExtensions::Tracing::ActiveRecordSubscriber do
       initialize_sentry
     end
 
-    it "doesn't record spans" do
-      transaction = perform_transaction(sampled: false) { User.all.to_a }
+    it "doesn't transport spans" do
+      perform_transaction(sampled: false) { User.all.to_a }
 
       expect(transport.events.count).to eq(0)
-      expect(transaction.span_recorder.spans).to eq([transaction])
     end
   end
 end

@@ -59,7 +59,7 @@ class ContextModulesController < ApplicationController
                            "all_context_modules_draft_10",
                            collection_cache_key(@modules),
                            Time.zone,
-                           Digest::SHA256.hexdigest([visible_assignments, @section_visibility].join("/"))]
+                           Digest::SHA256.hexdigest([visible_assignments, @section_visibility, @module_ids_with_overrides].join("/"))]
         cache_key = cache_key_items.join("/")
         cache_key = add_menu_tools_to_cache_key(cache_key)
         add_mastery_paths_to_cache_key(cache_key, @context, @current_user)

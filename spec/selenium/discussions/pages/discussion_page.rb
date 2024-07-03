@@ -39,6 +39,10 @@ class Discussion
       "input[placeholder='Topic Title']"
     end
 
+    def pending_changes_pill_selector
+      "[data-testid='pending_changes_pill']"
+    end
+
     def points_possible_input_selector
       "input[data-testid='points-possible-input']"
     end
@@ -51,8 +55,16 @@ class Discussion
       "[data-testid='save-button']"
     end
 
+    def select_date_selector
+      "input[placeholder='Select Date']"
+    end
+
     def section_warning_continue_selector
       "button[data-testid='continue-button']"
+    end
+
+    def section_selection_selector
+      "input[data-testid='section-select']"
     end
 
     def summarize_button_selector
@@ -75,13 +87,18 @@ class Discussion
       "[data-testid='summary-dislike-button']"
     end
 
-    def summary_regenerate_button_selector
-      "[data-testid='summary-regenerate-button']"
+    def summary_generate_button_selector
+      "[data-testid='summary-generate-button']"
     end
 
     def summary_disable_button_selector
       "[data-testid='summary-disable-button']"
     end
+
+    def summary_user_input_selector
+      "[data-testid='summary-user-input']"
+    end
+
     # ---------------------- Elements ----------------------
 
     def discussion_page_body
@@ -90,6 +107,10 @@ class Discussion
 
     def create_reply_button
       f(".discussion-reply-box")
+    end
+
+    def graded_checkbox
+      f(grade_checkbox_selector)
     end
 
     def post_reply_button
@@ -148,13 +169,18 @@ class Discussion
       f(summary_dislike_button_selector)
     end
 
-    def summary_regenerate_button
-      f(summary_regenerate_button_selector)
+    def summary_generate_button
+      f(summary_generate_button_selector)
     end
 
     def summary_disable_button
       f(summary_disable_button_selector)
     end
+
+    def summary_user_input
+      f(summary_user_input_selector)
+    end
+
     # ---------------------- Actions ----------------------
 
     def topic_title_input
@@ -195,6 +221,10 @@ class Discussion
       assign_to_button.click
     end
 
+    def click_graded_checkbox
+      force_click_native(grade_checkbox_selector)
+    end
+
     def click_summarize_button
       summarize_button.click
     end
@@ -207,12 +237,28 @@ class Discussion
       summary_dislike_button.click
     end
 
-    def click_summary_regenerate_button
-      summary_regenerate_button.click
+    def click_summary_generate_button
+      summary_generate_button.click
     end
 
     def click_summary_disable_button
       summary_disable_button.click
+    end
+
+    def update_summary_user_input(user_input)
+      summary_user_input.send_keys(user_input)
+    end
+
+    def pending_changes_pill_exists?
+      element_exists?(pending_changes_pill_selector)
+    end
+
+    def select_date_input_exists?
+      element_exists?(select_date_selector)
+    end
+
+    def section_selection_input_exists?
+      element_exists?(section_selection_selector)
     end
 
     def start_new_discussion(course_id)

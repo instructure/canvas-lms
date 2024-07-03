@@ -65,6 +65,9 @@ const types = [
   'DELETE_ANNOUNCEMENTS_SUCCESS',
   'DELETE_ANNOUNCEMENTS_FAIL',
   'SET_ANNOUNCEMENTS_IS_LOCKING',
+  'MARK_ALL_ANNOUNCEMENTS_READ_START',
+  'MARK_ALL_ANNOUNCEMENTS_READ_SUCCESS',
+  'MARK_ALL_ANNOUNCEMENTS_READ_FAIL',
 ]
 
 const actions = Object.assign(createActions(...types), announcementActions.actionCreators)
@@ -273,6 +276,35 @@ actions.addExternalFeed = function (payload) {
           })
         )
       })
+  }
+}
+
+actions.markAllAnnouncementRead = function () {
+  return async (dispatch, getState) => {
+    try {
+      dispatch(actions.markAllAnnouncementsReadStart())
+      const state = getState()
+      const pageState = state.announcements
+
+      await apiClient.markAllAnnouncementRead(state)
+      dispatch(
+        notificationActions.notifyInfo({
+          message: I18n.t('Announcements marked as read successfully'),
+        })
+      )
+      dispatch(
+        actions.clearAnnouncementsPage({
+          pages: range(pageState.currentPage, pageState.lastPage + 1),
+        })
+      )
+      dispatch(actions.markAllAnnouncementsReadSuccess())
+      dispatch(actions.getAnnouncements({page: pageState.currentPage, select: true}))
+    } catch (error) {
+      dispatch(actions.markAllAnnouncementsReadFail())
+      dispatch(
+        notificationActions.notifyError({message: I18n.t('Failed to mark announcements as read')})
+      )
+    }
   }
 }
 

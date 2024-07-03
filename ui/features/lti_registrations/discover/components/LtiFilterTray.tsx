@@ -24,8 +24,8 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import type {FilterItem, LtiFilter} from '../model/Filter'
 import FilterOptions from './FilterOptions'
-import {useSearchParams} from 'react-router-dom'
 import {View} from '@instructure/ui-view'
+import type {DiscoverParams} from './useDiscoverQueryParams'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -33,65 +33,56 @@ export type LtiFilterTrayProps = {
   isTrayOpen: boolean
   setIsTrayOpen: (isOpen: boolean) => void
   filterValues: LtiFilter
+  setQueryParams: (params: Partial<DiscoverParams>) => void
+  queryParams: DiscoverParams
 }
 
 export default function LtiFilterTray({
   isTrayOpen,
   setIsTrayOpen,
   filterValues,
+  setQueryParams,
+  queryParams,
 }: LtiFilterTrayProps) {
   const closeRef = useRef<HTMLElement>()
-  const [searchParams, setSearchParams] = useSearchParams()
   // Need to duplicate for the apply button's behaviour
-  const [localFilters, setLocalFilters] = useState<LtiFilter>({
-    companies: [],
-    versions: [],
-    audience: [],
-  })
+  const [localFilters, setLocalFilters] = useState<LtiFilter>({})
 
   const setFilterValue = (filterItem: FilterItem, value: boolean, category: string) => {
     if (value) {
-      setLocalFilters({...localFilters, [category]: [...localFilters[category], filterItem]})
+      setLocalFilters(prev => {
+        return {
+          ...prev,
+          [category]: prev[category] ? [...prev[category], filterItem] : [filterItem],
+        }
+      })
     } else {
-      setLocalFilters({
-        ...localFilters,
-        [category]: localFilters[category].filter(filter => filter.id !== filterItem.id),
+      setLocalFilters(prev => {
+        return {...prev, [category]: prev[category].filter(filter => filter.id !== filterItem.id)}
       })
     }
   }
 
   const applyFilters = () => {
-    setSearchParams({filter: JSON.stringify(localFilters)})
+    setQueryParams({filters: localFilters})
     setIsTrayOpen(false)
   }
 
   const resetFilterValues = () => {
-    setLocalFilters({
-      companies: [],
-      versions: [],
-      audience: [],
-    })
-    setSearchParams({search: searchParams.get('search') ?? ''})
+    setLocalFilters({})
+    setQueryParams({search: queryParams.search})
   }
 
   const cancelClick = () => {
-    const queryParams = searchParams.get('filter')
-    const params = queryParams
-      ? JSON.parse(queryParams)
-      : {companies: [], versions: [], audience: []}
-    setLocalFilters(params as unknown as LtiFilter)
+    setLocalFilters(queryParams.filters)
     setIsTrayOpen(false)
   }
 
   useEffect(() => {
     if (isTrayOpen) {
-      const queryParams = searchParams.get('filter')
-      const params = queryParams
-        ? JSON.parse(queryParams)
-        : {companies: [], versions: [], audience: []}
-      setLocalFilters(params as unknown as LtiFilter)
+      setLocalFilters(queryParams.filters)
     }
-  }, [isTrayOpen, searchParams])
+  }, [isTrayOpen, queryParams])
 
   return (
     <Tray
@@ -134,7 +125,7 @@ export default function LtiFilterTray({
                 key={category}
                 categoryName={category}
                 options={filterValues[category]}
-                filterIds={localFilters[category].map(f => f.id)}
+                filterIds={!!localFilters[category] && localFilters[category].map(f => f.id)}
                 setFilterValue={(filterItem: FilterItem, value: boolean) =>
                   setFilterValue(filterItem, value, category)
                 }

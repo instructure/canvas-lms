@@ -48,7 +48,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To manage associated courses, Courses - view list and Courses - add must also be enabled.'
+        'To manage associated courses, Courses - view list and Courses - manage / update must also be enabled.'
       ),
     },
     {

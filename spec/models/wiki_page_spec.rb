@@ -943,7 +943,7 @@ describe WikiPage do
       mod.add_item type: "wiki_page", id: page.id
       mod.workflow_state = "unpublished"
       mod.save!
-      expect(page.reload.locked_for?(@student)[:unlock_at]).to eq mod.unlock_at
+      expect(page.reload.locked_for?(@student)[:context_module]["unlock_at"]).to eq mod.unlock_at
     end
 
     it "doesn't reference an expired unlock-at date" do
@@ -1311,6 +1311,10 @@ describe WikiPage do
     end
 
     context "with selective_release_backend disabled" do
+      before :once do
+        Account.site_admin.disable_feature!(:selective_release_backend)
+      end
+
       it "does not consider WikiPageStudentVisibility" do
         @page1.update!(only_visible_to_overrides: true)
         assert_visible(@student1, [@page1])

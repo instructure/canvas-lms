@@ -25,7 +25,8 @@ class MissingPolicyApplicator
   def apply_missing_deductions
     GuardRail.activate(:secondary) do
       recently_missing_submissions.find_in_batches do |submissions|
-        filtered_submissions = submissions.reject { |s| s.grading_period&.closed? }
+        filtered_submissions = submissions.reject { |s| s.grading_period&.closed? || s.assignment&.has_sub_assignments? }
+
         filtered_submissions.group_by(&:assignment).each { |k, v| apply_missing_deduction(k, v) }
       end
     end

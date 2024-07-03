@@ -21,10 +21,20 @@ import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
 
 export const CREATE_SUBMISSION_COMMENT = gql`
-  mutation CreateSubmissionComment($submissionId: ID!, $comment: String!, $groupComment: Boolean!) {
+  mutation CreateSubmissionComment(
+    $submissionId: ID!
+    $comment: String!
+    $groupComment: Boolean!
+    $draftComment: Boolean
+  ) {
     __typename
     createSubmissionComment(
-      input: {submissionId: $submissionId, comment: $comment, groupComment: $groupComment}
+      input: {
+        submissionId: $submissionId
+        comment: $comment
+        groupComment: $groupComment
+        draftComment: $draftComment
+      }
     ) {
       submissionComment {
         _id

@@ -16,11 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% add_crumb t(:page_title, "Authentication Settings") %>
 <% set_active_tab "authentication" %>
 <%- css_bundle(:federated_attributes) %>
 <% provide :page_title do %>
-  <%= t(:page_title, "Authentication Settings")%>
+  <%= @page_title %>
 <% end %>
 
 <% provide :right_side do %>

@@ -30,30 +30,62 @@ import {PageSections} from './PageSections'
 import {ColorPalette} from './ColorPalette'
 import {FontPairings} from './FontPairings'
 import {PageTemplates} from './PageTemplates'
-import {buildPageContent} from '../../../utils'
+import {buildPageContent, getScrollParent} from '../../../utils'
 import {type PageSection} from './types'
+import {getTemplate} from '../../../assets/templates'
 
 type NewPageStepperProps = {
   open: boolean
-  onDismiss: () => void
+  onFinish: () => void
+  onCancel: () => void
 }
 
-const NewPageStepper = ({open, onDismiss}: NewPageStepperProps) => {
+const NewPageStepper = ({open, onFinish, onCancel}: NewPageStepperProps) => {
   const {actions, query} = useEditor()
   const [step, setStep] = useState(0)
   const [startingPoint, setStartingPoint] = useState<Step1Selection>('scratch')
   const [selectedSections, setSelectedSections] = useState<PageSection[]>([])
   const [paletteId, setpaletteId] = useState<string>('palette0')
   const [fontName, setFontName] = useState<string>('font0')
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('template-1')
+
+  const isTemplateSelection = startingPoint === 'template' && step === 1
+  const isTemplateButtonDisabled = isTemplateSelection && selectedTemplate === ''
 
   const handleNextStep = useCallback(() => {
-    if (step < 3) {
+    if (isTemplateSelection) {
+      const template = getTemplate(selectedTemplate)
+      actions.deserialize(template)
+      onFinish()
+    } else if (step < 3) {
       setStep(step + 1)
     } else {
       buildPageContent(actions, query, selectedSections, paletteId, fontName)
-      onDismiss()
+      onFinish()
     }
-  }, [actions, fontName, onDismiss, paletteId, query, selectedSections, step])
+  }, [
+    actions,
+    fontName,
+    isTemplateSelection,
+    onFinish,
+    paletteId,
+    query,
+    selectedSections,
+    selectedTemplate,
+    step,
+  ])
+
+  // buildPageContent returns before the Editor renders all the new stuff.
+  // I think that because of javascript's single-threaded nature, onDismiss doesn't
+  // unmount the modal until craftjs is finished rendering all the new nodes.
+  // Use that opportunity to unselect the last created node and scroll to the top
+  const handleClosed = useCallback(() => {
+    window.setTimeout(() => {
+      actions.selectNode()
+    }, 0)
+    const scrollingContainer = getScrollParent()
+    scrollingContainer.scrollTo({top: 0, behavior: 'instant'})
+  }, [actions])
 
   const handlePrevStep = useCallback(() => {
     setStep(step - 1)
@@ -75,6 +107,10 @@ const NewPageStepper = ({open, onDismiss}: NewPageStepperProps) => {
     setFontName(newFontName)
   }, [])
 
+  const handleSelectTemplate = useCallback((template: string) => {
+    setSelectedTemplate(template)
+  }, [])
+
   const renderActiveStep = () => {
     switch (step) {
       case 0:
@@ -88,7 +124,12 @@ const NewPageStepper = ({open, onDismiss}: NewPageStepperProps) => {
             />
           )
         } else {
-          return <PageTemplates />
+          return (
+            <PageTemplates
+              onSelectTemplate={handleSelectTemplate}
+              selectedTemplate={selectedTemplate}
+            />
+          )
         }
       case 2:
         return <ColorPalette paletteId={paletteId} onSelectPalette={handleSelectPalette} />
@@ -100,12 +141,12 @@ const NewPageStepper = ({open, onDismiss}: NewPageStepperProps) => {
   }
 
   return (
-    <Modal open={open} label="Create a new page" onDismiss={onDismiss}>
+    <Modal open={open} label="Create a new page" onDismiss={onCancel} onClose={handleClosed}>
       <Modal.Header>
         <Heading>Create a new page</Heading>
         <CloseButton
           data-instui-modal-close-button="true"
-          onClick={onDismiss}
+          onClick={onCancel}
           screenReaderLabel="Close"
           placement="end"
           offset="medium"
@@ -126,11 +167,16 @@ const NewPageStepper = ({open, onDismiss}: NewPageStepperProps) => {
         </View>
       </Modal.Body>
       <Modal.Footer>
-        <Button color="secondary" onClick={onDismiss}>
+        <Button color="secondary" onClick={onCancel}>
           Cancel
         </Button>
-        <Button color="primary" margin="0 0 0 small" onClick={handleNextStep}>
-          {step < 3 ? 'Next' : 'Start Creating'}
+        <Button
+          color="primary"
+          margin="0 0 0 small"
+          onClick={handleNextStep}
+          interaction={isTemplateButtonDisabled ? 'disabled' : 'enabled'}
+        >
+          {isTemplateSelection ? 'Start Editing' : step < 3 ? 'Next' : 'Start Creating'}
         </Button>
       </Modal.Footer>
     </Modal>

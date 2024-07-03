@@ -81,8 +81,9 @@ class Announcement < DiscussionTopic
     dispatch :new_announcement
     to { users_with_permissions(active_participants_include_tas_and_teachers(true) - [user]) }
     whenever do |record|
-      record.send_notification_for_context? and
-        ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
+      is_new_announcement = (record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed)
+
+      record.send_notification_for_context? && (is_new_announcement || record.notify_users)
     end
     data { course_broadcast_data }
 

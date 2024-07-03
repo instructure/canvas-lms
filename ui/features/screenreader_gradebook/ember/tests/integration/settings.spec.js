@@ -19,6 +19,7 @@ import startApp from '../start_app'
 import Ember from 'ember'
 import fixtures from '../ajax_fixtures'
 import $ from 'jquery'
+import 'jquery-migrate'
 import 'jquery-tinypubsub'
 
 let App = null

@@ -24,7 +24,7 @@ import userSettings from '@canvas/user-settings'
 import {View} from '@instructure/ui-view'
 import gradingHelpers from '@canvas/grading/AssignmentGroupGradeCalculator'
 
-import type {AssignmentGroupCriteriaMap} from '../../../../shared/grading/grading.d'
+import type {AssignmentGroupCriteriaMap} from '@canvas/grading/grading.d'
 import AssignmentInformation from './AssignmentInformation'
 import ContentSelection from './ContentSelection'
 import GlobalSettings from './GlobalSettings'

@@ -34,7 +34,7 @@ import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 const I18n = useI18nScope('sub_accounts')
 
 ready(() => {
-  initializeTopNavPortal(document.getElementById('react-instui-topnav'))
+  initializeTopNavPortal()
 
   $('.add_sub_account_link').click(function () {
     $("<li class='sub_account'/>")

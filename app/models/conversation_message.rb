@@ -253,7 +253,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def log_conversation_message_metrics
-    stat = (context || Account.site_admin).root_account.feature_enabled?(:react_inbox) ? "inbox.message.created.react" : "inbox.message.created.legacy"
+    stat = "inbox.message.created.react"
     InstStatsd::Statsd.increment(stat)
   end
 

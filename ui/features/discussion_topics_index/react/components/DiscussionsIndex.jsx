@@ -61,8 +61,8 @@ export default class DiscussionsIndex extends Component {
   static propTypes = {
     arrangePinnedDiscussions: func.isRequired,
     closedForCommentsDiscussions: discussionList.isRequired,
-    contextId: string.isRequired,
-    contextType: string.isRequired,
+    contextId: string,
+    contextType: string,
     deleteDiscussion: func.isRequired,
     getDiscussions: func.isRequired,
     setCopyToOpen: func.isRequired,

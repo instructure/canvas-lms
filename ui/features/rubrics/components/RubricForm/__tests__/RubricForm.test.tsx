@@ -143,7 +143,7 @@ describe('RubricForm Tests', () => {
       fireEvent.click(getByTestId('add-criterion-button'))
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
-      fireEvent.change(getByTestId('rubric-criterion-description'), {
+      fireEvent.change(getByTestId('rubric-criterion-name-input'), {
         target: {value: 'New Criterion Test'},
       })
       fireEvent.click(getByTestId('rubric-criterion-save'))
@@ -169,7 +169,7 @@ describe('RubricForm Tests', () => {
       fireEvent.click(getByTestId('add-criterion-button'))
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
-      fireEvent.change(getByTestId('rubric-criterion-description'), {
+      fireEvent.change(getByTestId('rubric-criterion-name-input'), {
         target: {value: 'New Criterion Test'},
       })
       fireEvent.click(getByTestId('rubric-criterion-save'))
@@ -448,7 +448,7 @@ describe('RubricForm Tests', () => {
         fireEvent.click(getByTestId('add-criterion-button'))
         await new Promise(resolve => setTimeout(resolve, 0))
         expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
-        fireEvent.change(getByTestId('rubric-criterion-description'), {
+        fireEvent.change(getByTestId('rubric-criterion-name-input'), {
           target: {value: 'New Criterion Test'},
         })
         fireEvent.click(getByTestId('rubric-criterion-cancel'))
@@ -464,7 +464,7 @@ describe('RubricForm Tests', () => {
         fireEvent.click(getByTestId('add-criterion-button'))
         await new Promise(resolve => setTimeout(resolve, 0))
         expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
-        fireEvent.change(getByTestId('rubric-criterion-description'), {
+        fireEvent.change(getByTestId('rubric-criterion-name-input'), {
           target: {value: 'New Criterion Test'},
         })
         fireEvent.click(getByTestId('rubric-criterion-save'))
@@ -483,7 +483,7 @@ describe('RubricForm Tests', () => {
         fireEvent.click(queryAllByTestId('rubric-criteria-row-edit-button')[0])
         await new Promise(resolve => setTimeout(resolve, 0))
         expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
-        fireEvent.change(getByTestId('rubric-criterion-description'), {
+        fireEvent.change(getByTestId('rubric-criterion-name-input'), {
           target: {value: 'Updated Criterion Test'},
         })
         fireEvent.click(getByTestId('rubric-criterion-save'))
@@ -502,7 +502,7 @@ describe('RubricForm Tests', () => {
         fireEvent.click(queryAllByTestId('rubric-criteria-row-edit-button')[0])
         await new Promise(resolve => setTimeout(resolve, 0))
         expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
-        fireEvent.change(getByTestId('rubric-criterion-description'), {
+        fireEvent.change(getByTestId('rubric-criterion-name-input'), {
           target: {value: 'Updated Criterion Test'},
         })
         fireEvent.click(getByTestId('rubric-criterion-cancel'))

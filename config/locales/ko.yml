@@ -1458,6 +1458,7 @@ ko:
   allow_self_sign_up_7520f8c5: "직접 등록 허용"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "달력 행사 복제 허용하기"
   always_3a59e701: 항상
+  an_integer_value_is_required_e073bd46: "정수 값이 필요함"
   analytics: 
     course: 
       analytics: 분석
@@ -3961,6 +3962,7 @@ ko:
     other: "%{count}분"
     zero: "1분 이내"
   count_minutes_ago_c1b7d7ef: "%{count}분 전"
+  count_people_489946e7: "%{count}명"
   count_points_4735a2e8: 
     one: "%{count} 점"
     other: "%{count} 점"
@@ -4152,6 +4154,7 @@ ko:
   course_users: 
     greater_than_three: "3자 이상으로 된 검색어를 입력하시기 바랍니다."
     unknown_error: "검색에 오류가 발생했습니다. 다시 시도하시기 바랍니다."
+  course_was_successfully_updated_1ab0e9f8: "과목이 성공적으로 업데이트되었습니다."
   courses: 
     assignments_needing_grading: 
       headings: 
@@ -5415,6 +5418,7 @@ ko:
   enrollments_students: 학생
   enrollments_tas: 조교
   enrollments_teachers: 교사
+  enter_a_section_name_adbe3099: "섹션 이름 입력"
   enter_the_date_you_would_like_to_navigate_to_a712de47: "탐색하려는 날짜를 입력하십시오."
   eportfolio: 
     buttons: 
@@ -7132,6 +7136,7 @@ ko:
   invalid_date_8a221445: "유효하지 않은 날짜"
   invalid_domain_e810c1d: "올바르지 않은 도메인"
   invalid_file_type_881cc9b2: "유효하지 않은 파일 유형"
+  invalid_url_cbde79f: "잘못된 URL"
   invalid_url_in_xml: "XML에 잘못된 URL이 있습니다. 앰퍼샌드는 이스케이프 처리를 해야 합니다."
   invalid_xml_syntax: "유효하지 않은 XML 구문"
   invite_5b1fcbcd: 초대
@@ -7429,6 +7434,7 @@ ko:
           send_to_sms: "%{phone_number}로 문자 메시지 전송"
         labels: 
           carrier: 통신사
+          otp_communication_channel_id: "전화 번호"
           phone_number: "전화 번호"
           remember_me: "이 컴퓨터 기억하기"
           verification_code: "인증 코드"
@@ -9403,7 +9409,9 @@ ko:
     move_to_end: "-- 아래에 --"
   move_name_to_a_new_group_acabed4e: "%{name}을(를) 새 그룹으로 이동"
   move_to_1c208ae5: "다음으로 이동..."
+  multi_factor_authentication_1a6b3b3d: "다단계 인증"
   multi_factor_authentication_configured_865b1bde: "다단계 인증 구성"
+  multiple_dates_e3a122f7: "여러 날짜"
   must_be_255_characters_or_less_e8e7f25e: "255글자보다 적어야 함"
   mute_dialog: 
     curving_assignments: "과제 상대 평가"
@@ -9987,6 +9995,7 @@ ko:
   play_media_comment_8614d30f: "미디어 설명 재생"
   playback: 
     statistics: 통계
+  please_enter_the_verification_code_shown_by_your_t_acc7c404: "토큰에 의해 표시되는 인증 코드를 입력하시기 바랍니다."
   plugins: 
     academic_benchmark_importer: 
       description: "이를 사용하면 Academic Benchmark 표준을 Canvas로 가져올 수 있습니다."
@@ -10164,7 +10173,9 @@ ko:
     learn_platform_settings: 
       labels: 
         base_url: "기준 URL"
+        password: 암호
         token: "액세스 토큰"
+        username: "사용자 이름"
     linked_in: 
       description: "LinkedIn 통합"
     linked_in_settings: 
@@ -12937,6 +12948,7 @@ ko:
     errors: 
       none_to_update: "업데이트할 내용 없음"
   shared_secret_892c88f2: "공유 시크릿"
+  should_be_10_digit_number_d30ef02d: "10자리 숫자이어야 함"
   show_all_details_9879980c: "모든 세부 정보 표시하기"
   show_all_sections_190203e8: "모든 섹션 보기"
   show_by_709f525b: 정렬
@@ -14180,7 +14192,9 @@ ko:
   validate: 
     is_required: "이 필드가 필요함"
   validation_error_3b943100: "유효성 검사 오류"
+  value_must_be_positive_3e086d5a: "값이 양수이어야 함"
   verification_code_5acd64ef: "인증 코드"
+  verify_3dd8f159: 확인
   version_5599c321: 버전
   view_app_center_6c89a3fe: "앱 센터 보기"
   view_app_configurations_52b52441: "앱 구성 보기"

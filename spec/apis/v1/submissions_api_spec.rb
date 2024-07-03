@@ -130,7 +130,7 @@ describe "Submissions API", type: :request do
 
     shared_examples_for "enrollment_state" do
       it "scopes call to enrollment_state" do
-        e = @section.enrollments.where(user_id: @student1.id).take
+        e = @section.enrollments.find_by(user_id: @student1.id)
         json = api_call(:get,
                         "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
                         { controller: "submissions_api",

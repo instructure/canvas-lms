@@ -335,7 +335,7 @@ describe BasicLTI::BasicOutcomes do
       end
 
       it "replace_result succeeds when section dates override course dates" do
-        cs = CourseSection.where(id: @course.enrollments.where(user_id: @user).pluck(:course_section_id)).take
+        cs = CourseSection.find_by(id: @course.enrollments.where(user_id: @user).pluck(:course_section_id))
         cs.start_at = 1.day.ago
         cs.end_at = 1.day.from_now
         cs.restrict_enrollments_to_section_dates = true

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
@@ -24,7 +24,7 @@ import {AssignmentSubmissionTypeSelectionResourceLinkCard} from './AssignmentSub
 import {AssignmentSubmissionTypeSelectionLaunchButton} from './AssignmentSubmissionTypeSelectionLaunchButton'
 
 export type AssignmentSubmissionTypeContainerProps = {
-  tool: {
+  tool?: {
     developer_key?: {
       global_id: string
     }
@@ -44,43 +44,25 @@ declare const ENV: GlobalEnv & {
   ASSIGNMENT_SUBMISSION_TYPE_CARD_ENABLED: boolean
 }
 
-export function AssignmentSubmissionTypeContainer(props: AssignmentSubmissionTypeContainerProps) {
-  const {resource, tool, onLaunchButtonClick, onRemoveResource} = props
-
-  const [removedResource, setRemovedResource] = useState(false)
-
-  return (
-    <>
-      {ENV.ASSIGNMENT_SUBMISSION_TYPE_CARD_ENABLED ? (
-        <>
-          {resource?.title && !removedResource ? (
-            <AssignmentSubmissionTypeSelectionResourceLinkCard
-              tool={tool}
-              resourceTitle={resource.title}
-              onCloseButton={() => {
-                setRemovedResource(true)
-                onRemoveResource()
-              }}
-            />
-          ) : (
-            <AssignmentSubmissionTypeSelectionLaunchButton
-              tool={tool}
-              onClick={() => {
-                setRemovedResource(false)
-                onLaunchButtonClick()
-              }}
-            />
-          )}
-        </>
-      ) : (
-        <AssignmentSubmissionTypeSelectionLaunchButton
-          tool={tool}
-          onClick={() => {
-            setRemovedResource(false)
-            onLaunchButtonClick()
-          }}
-        />
-      )}
-    </>
-  )
+export function AssignmentSubmissionTypeContainer(
+  props: AssignmentSubmissionTypeContainerProps
+): React.ReactElement | null {
+  if (!props.tool) {
+    return null
+  } else if (ENV.ASSIGNMENT_SUBMISSION_TYPE_CARD_ENABLED && props.resource?.title) {
+    return (
+      <AssignmentSubmissionTypeSelectionResourceLinkCard
+        tool={props.tool}
+        resourceTitle={props.resource.title}
+        onCloseButton={props.onRemoveResource}
+      />
+    )
+  } else {
+    return (
+      <AssignmentSubmissionTypeSelectionLaunchButton
+        tool={props.tool}
+        onClick={props.onLaunchButtonClick}
+      />
+    )
+  }
 }

@@ -55,11 +55,11 @@ module SIS
         raise ImportError, "Improper status \"#{status}\" for a cross-listing" unless /\A(active|deleted)\z/i.match?(status)
         return if @batch.skip_deletes? && status =~ /deleted/i
 
-        section = @root_account.course_sections.where(sis_source_id: section_id).take
+        section = @root_account.course_sections.find_by(sis_source_id: section_id)
         raise ImportError, "A cross-listing referenced a non-existent section #{section_id}" unless section
 
         unless @course && @course.sis_source_id == xlist_course_id
-          @course = @root_account.all_courses.where(sis_source_id: xlist_course_id).take
+          @course = @root_account.all_courses.find_by(sis_source_id: xlist_course_id)
           if !@course && status =~ /\Aactive\z/i
             # no course with this crosslist id found, make a new course,
             # using the section's current course as a template

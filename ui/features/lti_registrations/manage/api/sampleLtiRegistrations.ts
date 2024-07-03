@@ -18,7 +18,7 @@
 
 import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 import type {PaginatedList} from './PaginatedList'
-import type {ExtensionsSortDirection, ExtensionsSortProperty} from './registrations'
+import type {AppsSortDirection, AppsSortProperty} from './registrations'
 
 export const sampleAppNames = [
   'Aa reallly long name that is very long and has a lot of characters',
@@ -221,8 +221,8 @@ function getRandomInt(min: number, max: number) {
 
 const getSampleRegistrationDb = async (options: {
   query: string
-  sort: ExtensionsSortProperty
-  dir: ExtensionsSortDirection
+  sort: AppsSortProperty
+  dir: AppsSortDirection
   limit: number
   offset: number
 }): Promise<PaginatedList<any>> => {
@@ -264,8 +264,8 @@ const getSampleRegistrationDb = async (options: {
 
 export const mockFetchSampleLtiRegistrations = async (options: {
   query: string
-  sort: ExtensionsSortProperty
-  dir: ExtensionsSortDirection
+  sort: AppsSortProperty
+  dir: AppsSortDirection
   offset: number
   limit: number
 }): Promise<PaginatedList<any>> => {

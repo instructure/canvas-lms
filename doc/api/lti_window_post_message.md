@@ -72,7 +72,7 @@ window.parent.postMessage({subject: 'lti.capabilities'}, '*')
 
 ## lti.getPageSettings
 
-Responds with an object containing page settings. This includes the current locale, time zome, contrast settings, and url to the active branding configuration file.
+Responds with an object containing page settings. This includes the current locale, time zome, contrast settings, url to the active branding configuration file, and the width of the parent (Canvas) window.
 This is the same json file url provided by the [Brand Configs API](https://canvas.instructure.com/doc/api/brand_configs.html).
 
 **Required properties:**
@@ -91,7 +91,7 @@ Returning postMessage includes the following properties:
   - time_zone
   - use_high_contrast
   - active_brand_config_json_url
-
+  - window_width
 
 ```js
 {
@@ -99,7 +99,8 @@ Returning postMessage includes the following properties:
     locale: 'en',
     time_zone: 'Etc/UTC',
     use_high_contrast: false,
-    active_brand_config_json_url: 'https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/default/variables-7dd4b80918af0e0218ec0229e4bd5873.json'
+    active_brand_config_json_url: 'https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/default/variables-7dd4b80918af0e0218ec0229e4bd5873.json',
+    window_width: 1024
   }
 }
 ```

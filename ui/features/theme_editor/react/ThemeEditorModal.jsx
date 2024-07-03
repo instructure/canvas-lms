@@ -52,7 +52,11 @@ export default function ThemeEditorModal(props) {
   const modalIsOpen = props.showProgressModal || props.showSubAccountProgress
 
   return (
-    <Modal open={modalIsOpen} size={props.showProgressModal ? 'small' : 'medium'}>
+    <Modal
+      open={modalIsOpen}
+      size={props.showProgressModal ? 'small' : 'medium'}
+      label={I18n.t('Applying new styles to subaccounts')}
+    >
       <Modal.Header>
         <Heading>
           {props.showProgressModal

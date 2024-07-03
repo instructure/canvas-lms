@@ -25,7 +25,7 @@ import {
   selectContentDialog,
 } from '../jquery/select_content_dialog'
 import $ from 'jquery'
-import 'jquery-migrate'
+import 'jquery-migrate' // required
 
 // The tests here, and the code they test, use jQuery's is(":visible") method. This is necessary to make them work as expected with jest.
 // https://stackoverflow.com/questions/64136050/visible-selector-not-working-in-jquery-jest/

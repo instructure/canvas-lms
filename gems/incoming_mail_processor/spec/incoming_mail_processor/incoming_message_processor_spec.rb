@@ -35,7 +35,7 @@ end
 
 module IncomingMailProcessor
   describe IncomingMessageProcessor do
-    let(:logger) { double("logger").tap { |l| expect(l).to receive(:warn).at_least(1).with(kind_of(String)) } }
+    let(:logger) { double("logger").tap { |l| expect(l).to receive(:warn).at_least(1).with(kind_of(String)) } } # rubocop:disable RSpec/ExpectInLet
     let(:mock_message_handler) do
       Class.new do
         attr_reader :account, :body, :html_body, :incoming_message, :address_tag

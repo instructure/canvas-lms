@@ -78,7 +78,7 @@ module Lti
     private
 
     def user
-      @_user ||= User.joins(:past_lti_ids).where(user_past_lti_ids: { user_lti_context_id: params[:id] }).take ||
+      @_user ||= User.joins(:past_lti_ids).find_by(user_past_lti_ids: { user_lti_context_id: params[:id] }) ||
                  User.active.find_by(lti_context_id: params[:id]) ||
                  User.active.find(params[:id])
     end

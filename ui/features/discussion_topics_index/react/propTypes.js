@@ -21,9 +21,9 @@ import {shape, bool, number, string} from 'prop-types'
 const propTypes = {}
 
 propTypes.permissions = shape({
-  create: bool.isRequired,
-  manage_content: bool.isRequired,
-  moderate: bool.isRequired,
+  create: bool,
+  manage_content: bool,
+  moderate: bool,
 })
 
 propTypes.discussionTopicMenuTools = shape({

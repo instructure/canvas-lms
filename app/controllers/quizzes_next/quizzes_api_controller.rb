@@ -84,8 +84,8 @@ class QuizzesNext::QuizzesApiController < ApplicationController
   def latest_updated_at
     return @_latest_updated_at if defined?(@_latest_updated_at)
 
-    quiz_updated = @context.quizzes.active.reorder("updated_at DESC").limit(1).pluck(:updated_at).first
-    assignment_updated = @context.assignments.active.reorder("updated_at DESC").limit(1).pluck(:updated_at).first
+    quiz_updated = @context.quizzes.active.reorder("updated_at DESC").limit(1).pick(:updated_at)
+    assignment_updated = @context.assignments.active.reorder("updated_at DESC").limit(1).pick(:updated_at)
     @_latest_updated_at = [quiz_updated, assignment_updated].compact.max
   end
 end

@@ -889,9 +889,9 @@ describe ContentMigration do
         a2 = assignment_model(context: @copy_from, title: "a2", submission_types: "wiki_page", only_visible_to_overrides: false)
         a2.build_wiki_page(title: a2.title, context: a2.context).save!
         run_course_copy
-        a1_to = @copy_to.assignments.where(migration_id: mig_id(a1)).take
+        a1_to = @copy_to.assignments.find_by(migration_id: mig_id(a1))
         expect(a1_to.only_visible_to_overrides).to be true
-        a2_to = @copy_to.assignments.where(migration_id: mig_id(a2)).take
+        a2_to = @copy_to.assignments.find_by(migration_id: mig_id(a2))
         expect(a2_to.only_visible_to_overrides).to be false
       end
 
@@ -899,7 +899,7 @@ describe ContentMigration do
         a1 = assignment_model(context: @copy_from, title: "a1", submission_types: "wiki_page", only_visible_to_overrides: true)
         a1.build_wiki_page(title: a1.title, context: a1.context).save!
         run_course_copy
-        page_to = @copy_to.wiki_pages.where(migration_id: mig_id(a1.wiki_page)).take
+        page_to = @copy_to.wiki_pages.find_by(migration_id: mig_id(a1.wiki_page))
         expect(page_to.assignment).to be_nil
         expect(@copy_to.assignments.where(migration_id: mig_id(a1)).exists?).to be false
       end

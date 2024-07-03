@@ -52,16 +52,16 @@ module SIS
         raise ImportError, "Improper status \"#{status}\" for abstract course #{abstract_course_id}" unless /\Aactive|\Adeleted/i.match?(status)
         return if @batch.skip_deletes? && status =~ /deleted/i
 
-        course = AbstractCourse.where(root_account_id: @root_account, sis_source_id: abstract_course_id).take
+        course = AbstractCourse.find_by(root_account_id: @root_account, sis_source_id: abstract_course_id)
         course ||= AbstractCourse.new
         unless course.stuck_sis_fields.include?(:enrollment_term_id)
-          course.enrollment_term = @root_account.enrollment_terms.where(sis_source_id: term_id).take || @root_account.default_enrollment_term
+          course.enrollment_term = @root_account.enrollment_terms.find_by(sis_source_id: term_id) || @root_account.default_enrollment_term
         end
         course.root_account = @root_account
 
         account = nil
-        account = @root_account.all_accounts.where(sis_source_id: account_id).take if account_id.present?
-        account ||= @root_account.all_accounts.where(sis_source_id: fallback_account_id).take if fallback_account_id.present?
+        account = @root_account.all_accounts.find_by(sis_source_id: account_id) if account_id.present?
+        account ||= @root_account.all_accounts.find_by(sis_source_id: fallback_account_id) if fallback_account_id.present?
         course.account = account if account
         course.account ||= @root_account
 

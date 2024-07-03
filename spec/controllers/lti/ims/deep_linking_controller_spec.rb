@@ -759,6 +759,30 @@ module Lti
                     subject
                     expect(ContentTag.where(context: course).last.workflow_state).to eq("unpublished")
                   end
+
+                  it "returns access denied if user does not have manage_course_content_add permission" do
+                    department_admin_role = custom_role("AccountMembership", "Test Admin", { account: })
+                    account_admin_user_with_role_changes(
+                      account:,
+                      role: department_admin_role,
+                      role_changes: { manage_content: false, manage_course_content_add: false }
+                    )
+                    user_session(@user)
+                    subject
+                    expect(response).to have_http_status(:unauthorized)
+                  end
+
+                  it "returns ok if user has manage_course_content_add permission" do
+                    department_admin_role = custom_role("AccountMembership", "Department Admin", { account: })
+                    account_admin_user_with_role_changes(
+                      account:,
+                      role: department_admin_role,
+                      role_changes: { manage_content: false, manage_course_content_add: true }
+                    )
+                    user_session(@user)
+                    subject
+                    expect(response).to have_http_status(:ok)
+                  end
                 end
               end
             end

@@ -27,9 +27,9 @@ import template from '../../jst/courseLoggingContent.handlebars'
 import courseLoggingResultsTemplate from '../../jst/courseLoggingResults.handlebars'
 import detailsTemplate from '../../jst/courseLoggingDetails.handlebars'
 import 'jqueryui/dialog'
-import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
+import {extend} from '@canvas/backbone/utils'
 
-_inherits(CourseLoggingContentView, Backbone.View)
+extend(CourseLoggingContentView, Backbone.View)
 
 export default function CourseLoggingContentView(options) {
   this.fetch = this.fetch.bind(this)

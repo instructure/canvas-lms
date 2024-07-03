@@ -25,6 +25,7 @@ import {ImageBlock} from '../../blocks/ImageBlock'
 import {NoSections} from '../../common'
 import {useClassNames, getContrastingColor} from '../../../../utils'
 import {SectionMenu} from '../../../editor/SectionMenu'
+import {SectionToolbar} from '../../common/SectionToolbar'
 
 type AboutSectionProps = {
   background?: string
@@ -62,9 +63,8 @@ export const AboutSection = ({background}: AboutSectionProps) => {
         <Element
           id={`${cid}_image`}
           is={ImageBlock}
-          canvas={true}
           constraint="contain"
-          src="/images/block_editor/default_about_image.png"
+          src="/images/block_editor/default_about_image.svg"
         />
       </Element>
       <Element
@@ -73,7 +73,7 @@ export const AboutSection = ({background}: AboutSectionProps) => {
         canvas={true}
         className="about-section__inner-start"
       >
-        <Element id={`${cid}_text`} is={AboutTextHalf} canvas={true} color={textColor} />
+        <Element id={`${cid}_text`} is={AboutTextHalf} color={textColor} />
       </Element>
     </Container>
   )
@@ -89,5 +89,6 @@ AboutSection.craft = {
   },
   related: {
     sectionMenu: SectionMenu,
+    toolbar: SectionToolbar,
   },
 }
