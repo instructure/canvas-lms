@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react'
 import formatMessage from '../../../../format-message'
 
 import {Button, CloseButton, CondensedButton, IconButton} from '@instructure/ui-buttons'
@@ -122,6 +122,14 @@ export const AIToolsTray = ({
   })
   const [waitingForResponse, setWaitingForResponse] = useState<boolean>(false)
   const [responseHtml, setResponseHtml] = useState<string>('')
+  const chatContainerRef = useRef<HTMLDivElement | null>(null)
+
+  useLayoutEffect(() => {
+    if (chatContainerRef.current) {
+      const lastbox = chatContainerRef.current.querySelector('.ai-chat-box:last-child')
+      lastbox?.scrollIntoView({behavior: 'smooth', block: 'nearest'})
+    }
+  }, [trayRef, chatMessages])
 
   useEffect(() => {
     setTask(currentContent.content.trim().length > 0 ? 'modify' : 'generate')
@@ -292,6 +300,7 @@ export const AIToolsTray = ({
   const handleSubmitPrompt = useCallback(() => {
     setChatMessages([...chatMessages, {id: msgid(), type: 'user', message: userPrompt.trim()}])
     getResponse(userPrompt)
+    setUserPrompt('')
   }, [chatMessages, getResponse, userPrompt])
 
   const handleInsertResponse = useCallback(
@@ -392,6 +401,8 @@ export const AIToolsTray = ({
   const renderChatBox = (message: ChatMessage, key: string) => {
     return (
       <div
+        id={message.id}
+        className="ai-chat-box"
         key={key}
         style={{display: 'flex', flexDirection: 'column', justifyContent: 'start', rowGap: '4px'}}
       >
@@ -469,14 +480,14 @@ export const AIToolsTray = ({
   }
 
   const renderChatMessages = () => {
-    const messages = chatMessages.map((message, index) => {
-      return renderChatBox(message, `chat-message-${index}`)
+    const messages = chatMessages.map((message: ChatMessage) => {
+      return renderChatBox(message, message.id)
     })
     if (waitingForResponse) {
       messages.push(
         renderChatBox(
           {id: msgid(), type: 'waiting', message: formatMessage('Waiting for response')},
-          'ai-response'
+          'ai-waiting-message'
         )
       )
     }
@@ -527,6 +538,7 @@ export const AIToolsTray = ({
           </SimpleSelect>
           <div style={{flexGrow: 1, overflowY: 'auto'}}>
             <div
+              ref={chatContainerRef}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
