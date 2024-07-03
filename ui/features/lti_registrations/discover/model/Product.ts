@@ -18,16 +18,15 @@
 
 export type Product = {
   id: string
+  global_product_id: string
   name: string
   company: Company
   logo_url: string
   tagline: string
   description: string
-  updatedAt?: string
-  toolType?: string
-  demographic?: string
-  lti: Lti
-  countries?: string[]
+  updated_at: any
+  tool_integration_configurations: Lti
+  tags: {id: number; name: string}[]
   badges: Badges[]
   screenshots: string[]
 }
@@ -39,15 +38,12 @@ export type Company = {
 }
 
 export type Lti = {
-  versions: string[]
-  title: string[]
-  placements: string[]
-  services: string[]
-  description: string
+  lti_13?: {id: number; integration_type: string; url: string; unified_tool_id: string}[]
+  lti_11?: {id: number; integration_type: string; url: string; unified_tool_id: string}[]
 }
 
 export type Badges = {
   name: string
   image_url: string
-  badge_url: string
+  link: string
 }
