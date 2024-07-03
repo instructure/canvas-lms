@@ -184,7 +184,7 @@ export const mkUseManagePageState =
       (registration: LtiRegistration) => {
         setStale()
 
-        return apiDeleteRegistration(registration.id)
+        return apiDeleteRegistration(registration.account_id, registration.id)
           .catch(() =>
             genericError(
               // TODO: log more info about the error? send to Sentry?

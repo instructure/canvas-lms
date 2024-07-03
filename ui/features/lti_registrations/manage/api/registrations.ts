@@ -23,6 +23,7 @@ import {type LtiRegistrationId} from '../model/LtiRegistrationId'
 import {mockFetchSampleLtiRegistrations, mockDeleteRegistration} from './sampleLtiRegistrations'
 import type {AccountId} from '../model/AccountId'
 import {defaultFetchOptions} from '@canvas/util/xhr'
+import * as z from 'zod'
 
 export type AppsSortProperty =
   | 'name'
@@ -58,8 +59,21 @@ export const fetchRegistrations: FetchRegistrations = options =>
     )
   )
 
-export type DeleteRegistration = (id: LtiRegistrationId) => Promise<ApiResult<void>>
+export type DeleteRegistration = (
+  accountId: AccountId,
+  id: LtiRegistrationId
+) => Promise<ApiResult<unknown>>
 
-// todo: implement this with the actual delete call
-export const deleteRegistration: DeleteRegistration = id =>
-  mockDeleteRegistration(id).then(() => success(undefined))
+/**
+ * Deletes an LTI registration
+ * @param accountId
+ * @param registrationId
+ * @returns
+ */
+export const deleteRegistration: DeleteRegistration = (accountId, registrationId) =>
+  parseFetchResult(z.unknown())(
+    fetch(`/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`, {
+      ...defaultFetchOptions(),
+      method: 'DELETE',
+    })
+  )
