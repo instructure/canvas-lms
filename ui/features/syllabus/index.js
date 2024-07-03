@@ -24,7 +24,6 @@ import SyllabusCalendarEventsCollection from './backbone/collections/SyllabusCal
 import SyllabusAppointmentGroupsCollection from './backbone/collections/SyllabusAppointmentGroupsCollection'
 import SyllabusPlannerCollection from './backbone/collections/SyllabusPlannerCollection'
 import SyllabusView from './backbone/views/SyllabusView'
-import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import {attachImmersiveReaderButton} from './util/utils'
 import ready from '@instructure/ready'
 
@@ -134,8 +133,6 @@ ready(() => {
   SyllabusBehaviors.bindToEditSyllabus(true)
   SyllabusBehaviors.bindToMiniCalendar()
 })
-
-monitorLtiMessages()
 
 function renderCoursePacingNotice() {
   const contextInfo = ENV.context_asset_string.split('_')
