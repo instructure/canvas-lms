@@ -21,6 +21,9 @@ import Backbone from '@canvas/backbone'
 import registrationErrors from '@canvas/normalize-registration-errors'
 import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.ajaxJSON'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('self_enrollment')
 
 export default class SelfEnrollmentForm extends Backbone.View {
   static initClass() {
@@ -38,27 +41,42 @@ export default class SelfEnrollmentForm extends Backbone.View {
       .find('input[type=hidden][name=initial_action]')
       .val()
 
-    if (ENV.ACCOUNT.recaptcha_key) {
+    const retryCount = 5
+    function loadCaptcha(attempts) {
       const that = this
-      $(window).on('load', function () {
-        if (typeof grecaptcha !== 'undefined') {
-          // eslint-disable-next-line no-undef
-          that.dataCaptchaId = grecaptcha.render(that.$el.find('.g-recaptcha')[0], {
-            sitekey: ENV.ACCOUNT.recaptcha_key,
-            callback: () => {
-              that.recaptchaPassed = true
-              that.$el.find('#submit_button').prop('disabled', false)
-            },
-            'expired-callback': () => {
-              that.recaptchaPassed = false
-              that.$el.find('#submit_button').prop('disabled', true)
-            },
-          })
+
+      if (!window.hasOwnProperty('grecaptcha')) {
+        if (attempts < retryCount) {
+          setTimeout(() => loadCaptcha(attempts + 1), 500)
+        } else {
+          $.flashError(I18n.t('Captcha failed to load'))
         }
+        return
+      }
+
+      // this code will not be reached unless grecaptcha is defined
+      // eslint-disable-next-line no-undef
+      grecaptcha.ready(function () {
+        // eslint-disable-next-line no-undef
+        that.dataCaptchaId = grecaptcha.render(that.$el.find('.g-recaptcha')[0], {
+          sitekey: ENV.ACCOUNT.recaptcha_key,
+          callback: () => {
+            that.recaptchaPassed = true
+            that.$el.find('#submit_button').prop('disabled', false)
+          },
+          'expired-callback': () => {
+            that.recaptchaPassed = false
+            that.$el.find('#submit_button').prop('disabled', true)
+          },
+        })
       })
+    }
+
+    if (ENV.ACCOUNT.recaptcha_key) {
       if (this.action === 'create') {
         this.$el.find('#submit_button').prop('disabled', true)
       }
+      loadCaptcha(0)
     }
     return this.$el.formSubmit({
       beforeSubmit: data => this.beforeSubmit(data),
