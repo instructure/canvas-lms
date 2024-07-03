@@ -25,6 +25,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Tabs} from '@instructure/ui-tabs'
 import {Link, Outlet, useMatch, useNavigate} from 'react-router-dom'
 import {openRegistrationWizard} from '../manage/registration_wizard/RegistrationWizardModalState'
+import {refreshRegistrations} from '../manage/pages/manage/ManagePageLoadingState'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -48,6 +49,9 @@ export const LtiAppsLayout = React.memo(() => {
       progress: 0,
       progressMax: 100,
       exitOnCancel: true,
+      onSuccessfulInstallation: () => {
+        refreshRegistrations()
+      },
     })
   }, [])
 

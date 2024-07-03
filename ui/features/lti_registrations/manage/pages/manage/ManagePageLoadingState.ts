@@ -29,6 +29,12 @@ export const MANAGE_APPS_PAGE_LIMIT = 15
 
 const I18n = useI18nScope('lti_registrations')
 
+export const refreshRegistrations = () => {
+  window.dispatchEvent(new Event(REFRESH_LTI_REGISTRATIONS_EVENT_TYPE))
+}
+
+const REFRESH_LTI_REGISTRATIONS_EVENT_TYPE = 'refresh_lti_registrations'
+
 export type ManagePageLoadingState =
   | {
       _type: 'not_requested'
@@ -134,6 +140,19 @@ export const mkUseManagePageState =
           })
         })
     }, [accountId, sort, dir, q, page])
+
+    // Todo: this is a technique to refresh the list from outside the component
+    // if this state gets refactored to a zustand store, then we can remove this
+    React.useEffect(() => {
+      const listener = () => {
+        console.log('refreshing')
+        refreshRef.current?.()
+      }
+      window.addEventListener(REFRESH_LTI_REGISTRATIONS_EVENT_TYPE, listener)
+      return () => {
+        window.removeEventListener(REFRESH_LTI_REGISTRATIONS_EVENT_TYPE, listener)
+      }
+    }, [])
 
     // Refresh whenever search params (and thus refreshRef.current) change
     React.useEffect(() => {

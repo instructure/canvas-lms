@@ -39,6 +39,7 @@ export type RegistrationWizardModalState = {
    * launched from the Product Detail page
    */
   exitOnCancel: boolean
+  onSuccessfulInstallation?: () => void
 }
 
 export type RegistrationWizardModalStateActions = {
@@ -92,12 +93,16 @@ export const openRegistrationWizard = (
  * already populated and the registration flow started
  * @param dynamicRegistrationUrl The URL to use for dynamic registration
  */
-export const openDynamicRegistrationWizard = (dynamicRegistrationUrl: string) => {
+export const openDynamicRegistrationWizard = (
+  dynamicRegistrationUrl: string,
+  onSuccessfulInstallation?: () => void
+) => {
   openRegistrationWizard({
     dynamicRegistrationUrl,
     lti_version: '1p3',
     method: 'dynamic_registration',
     registering: true,
     exitOnCancel: true,
+    onSuccessfulInstallation,
   })
 }
