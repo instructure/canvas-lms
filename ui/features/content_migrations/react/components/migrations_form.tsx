@@ -100,18 +100,21 @@ export const ContentMigrationsForm = ({
 }) => {
   const [migrators, setMigrators] = useState<any>([])
   const [chosenMigrator, setChosenMigrator] = useState<string | null>(null)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleFileProgress = (json: any, {loaded, total}: AttachmentProgressResponse) => {
-    setFileUploadProgress(Math.trunc((loaded / total) * 100))
-    if (loaded === total) {
-      onResetForm()
-      setMigrations(prevMigrations => [json as ContentMigrationItem].concat(prevMigrations))
-    }
-  }
+
   const [fileUploadProgress, setFileUploadProgress] = useState<number | null>(null)
 
   const onResetForm = useCallback(() => setChosenMigrator(null), [])
 
+  const handleFileProgress = useCallback(
+    (json: ContentMigrationItem, {loaded, total}: AttachmentProgressResponse) => {
+      setFileUploadProgress(Math.trunc((loaded / total) * 100))
+      if (loaded === total) {
+        onResetForm()
+        setMigrations(prevMigrations => [json].concat(prevMigrations))
+      }
+    },
+    [setFileUploadProgress, onResetForm, setMigrations]
+  )
   const onSubmitForm: onSubmitMigrationFormCallback = useCallback(
     async (formData, preAttachmentFile) => {
       const courseId = window.ENV.COURSE_ID
