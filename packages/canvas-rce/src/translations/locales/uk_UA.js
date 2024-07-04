@@ -77,6 +77,7 @@ const locale = {
     "message": "Вміст все ще завантажується, якщо ви продовжите, він не буде вбудований належним чином."
   },
   "content_type_2cf90d95": { "message": "Тип вмісту" },
+  "copy_9748f9f": { "message": "Копіювати" },
   "copyright_holder_66ee111": { "message": "Правовласник:" },
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
@@ -199,6 +200,7 @@ const locale = {
   "relationships_6602af70": { "message": "Зв''язки" },
   "replace_e61834a7": { "message": "Замінити" },
   "reset_95a81614": { "message": "Скинути" },
+  "retry_ebd5f8ba": { "message": "Спробувати ще раз" },
   "rich_content_editor_2708ef21": {
     "message": "Редактор збагаченого контенту"
   },
