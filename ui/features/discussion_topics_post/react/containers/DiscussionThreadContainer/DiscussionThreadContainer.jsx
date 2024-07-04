@@ -260,6 +260,16 @@ export const DiscussionThreadContainer = props => {
     )
   }
 
+  threadActions.push(
+    <ThreadingToolbar.MarkAsRead
+      key={`mark-as-read-${props.discussionEntry._id}`}
+      delimiterKey={`mark-as-read-delimiter-${props.discussionEntry._id}`}
+      isRead={props.discussionEntry.entryParticipant?.read}
+      authorName={getDisplayName(props.discussionEntry)}
+      onClick={toggleUnread}
+    />
+  )
+
   if (props.depth === 0 && props.discussionEntry.lastReply) {
     threadActions.push(
       <ThreadingToolbar.Expansion
