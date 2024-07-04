@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useCallback} from 'react'
-import type {ContentMigrationItem} from './types'
+import type {ContentMigrationItem, ProgressWorkflowState} from './types'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
@@ -56,7 +56,7 @@ type CompletionProgressResponse = {
   user_id: number
   tag: string
   completion: number
-  workflow_state: 'queued' | 'running' | 'completed' | 'failed'
+  workflow_state: ProgressWorkflowState
   created_at: string
   updated_at: string
   message: string | null

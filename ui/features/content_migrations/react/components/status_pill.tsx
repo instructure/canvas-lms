@@ -19,17 +19,17 @@
 import React from 'react'
 import {Pill} from '@instructure/ui-pill'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import type {ContentMigrationWorkflowState} from './types'
 
 const I18n = useI18nScope('content_migrations_redesign')
 export type Color = 'primary' | 'success' | 'danger' | 'info' | 'warning' | 'alert'
 
-export const StatusPill = ({
-  hasIssues,
-  workflowState,
-}: {
+export type StatusPillProps = {
   hasIssues: boolean
-  workflowState: string
-}) => {
+  workflowState: ContentMigrationWorkflowState
+}
+
+export const StatusPill: React.FC<StatusPillProps> = ({hasIssues, workflowState}) => {
   let color: Color = 'primary'
   if (workflowState === 'completed') {
     if (hasIssues) {

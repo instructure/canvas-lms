@@ -34,8 +34,12 @@ export type ContentMigrationItemAttachment = {
   url: string
 }
 
+export type ProgressWorkflowState = 'queued' | 'running' | 'completed' | 'failed'
+
 export type ContentMigrationWorkflowState =
   | 'pre_processing'
+  | 'pre_processed'
+  | 'queued'
   | 'failed'
   | 'waiting_for_select'
   | 'running'
