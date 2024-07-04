@@ -1743,15 +1743,15 @@ class DiscussionTopic < ActiveRecord::Base
       end
 
       # topic is not published
-      if !published?
-        next false
-      elsif is_announcement && (unlock_at = available_from_for(user))
-        # unlock date exists and has passed
-        next unlock_at < Time.now.utc
-      # everything else
-      else
-        next true
+      next false unless published?
+
+      # unlock_at and lock_at determine visibility for announcements
+      if is_announcement
+        next false if lock_at && Time.now.utc > lock_at
+        next false if unlock_at && unlock_at > Time.now.utc
       end
+
+      next true
     end
   end
 

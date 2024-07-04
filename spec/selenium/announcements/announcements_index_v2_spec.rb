@@ -33,6 +33,7 @@ describe "announcements index v2" do
 
     @announcement1_title = "Free food!"
     @announcement2_title = "Flu Shot"
+    @announcement3_title = " Graduation ceremomy"
 
     # Announcement attributes: title, message, delayed_post_at, allow_rating, user
     @announcement1 = @course.announcements.create!(
@@ -44,6 +45,13 @@ describe "announcements index v2" do
       title: @announcement2_title,
       message: "In the cafe!",
       delayed_post_at: 1.day.from_now,
+      user: @teacher
+    )
+
+    @announcement3 = @course.announcements.create!(
+      title: @announcement3_title,
+      message: "In the cafe!",
+      lock_at: 1.day.ago,
       user: @teacher
     )
 
@@ -145,6 +153,12 @@ describe "announcements index v2" do
       AnnouncementIndex.visit_announcements(@course.id)
       expect(ff('[data-testid="announcement-reply"]').count).to eq 1
       expect(f("#content")).not_to contain_jqcss(AnnouncementIndex.announcement_title_css(@announcement2_title))
+    end
+
+    it "does not display locked announcement to student", priority: "1" do
+      AnnouncementIndex.visit_announcements(@course.id)
+      expect(ff('[data-testid="announcement-reply"]').count).to eq 1
+      expect(f("#content")).not_to contain_jqcss(AnnouncementIndex.announcement_title_css(@announcement3_title))
     end
 
     it "does not reply button to use without reply permissions", priority: "1" do
