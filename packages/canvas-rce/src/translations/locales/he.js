@@ -61,6 +61,7 @@ const locale = {
   "collaborations_5c56c15f": { "message": "שיתופי פעולה" },
   "content_1440204b": { "message": "תוכן" },
   "content_type_2cf90d95": { "message": "סוג תוכן" },
+  "copy_9748f9f": { "message": "העתקה" },
   "copyright_holder_66ee111": { "message": "בעלים של זכויות יוצרים:" },
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {}\n    two {}\n  other {}\n}"
@@ -171,6 +172,7 @@ const locale = {
   "relationships_6602af70": { "message": "יחסים" },
   "replace_e61834a7": { "message": "החלפה" },
   "reset_95a81614": { "message": "חזרה למצב ברירת מחדל" },
+  "retry_ebd5f8ba": { "message": "נסה/י שוב" },
   "rich_content_editor_2708ef21": { "message": "עורך תוכן עשיר" },
   "save_11a80ec3": { "message": "שמירה " },
   "search_280d00bd": { "message": "חיפוש" },

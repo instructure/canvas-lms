@@ -176,6 +176,7 @@ const locale = {
   "column_e1ae5c64": { "message": "kollonne" },
   "column_group_1c062368": { "message": "kollonnegruppe" },
   "complex_numbers_a543d004": { "message": "Komplekse tal" },
+  "compose_44c904f4": { "message": "Komponere" },
   "computer_1d7dfa6f": { "message": "Datamaskin" },
   "congruent_5a244acd": { "message": "Kongruent" },
   "contains_311f37b7": { "message": "Inneheld" },
@@ -189,6 +190,7 @@ const locale = {
   "content_subtype_5ce35e88": { "message": "Innhald underkategori" },
   "content_type_2cf90d95": { "message": "Innhaldstype" },
   "coproduct_e7838082": { "message": "Koprodukt" },
+  "copy_9748f9f": { "message": "Kopi" },
   "copyright_holder_66ee111": { "message": "Rettshavar:" },
   "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
     "message": "Kunne ikkje sette inn innhald: \"{ itemType }\" er for augneblinken ikkje støtta i Canvas"
@@ -817,6 +819,7 @@ const locale = {
   "result_index_of_max_7db5ad8b": {
     "message": "Resultat { index } av { max }."
   },
+  "retry_ebd5f8ba": { "message": "Prøv på nytt" },
   "rho_a0244a36": { "message": "Rho" },
   "rho_variant_415245cd": { "message": "Rho (Variant)" },
   "rich_content_editor_2708ef21": {
@@ -888,6 +891,7 @@ const locale = {
     "message": "Bruk Shift-O for å opne den pene HTML-editoren."
   },
   "shortcut_911d6255": { "message": "Snarveg" },
+  "show_all_967a90f0": { "message": "Vis alt" },
   "show_audio_options_b489926b": { "message": "Vis lydalternativ" },
   "show_image_options_1e2ecc6b": { "message": "Vis alternativ for bilde" },
   "show_link_options_545338fd": { "message": "Vis lenkealternativ" },
