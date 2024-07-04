@@ -66,11 +66,13 @@ describe('Like', () => {
   it('displays like count', () => {
     const {getByText} = setup({likeCount: 2})
     expect(getByText('Like count: 2')).toBeTruthy()
+    expect(getByText('2 Likes')).toBeTruthy()
   })
 
-  it('does not display a like count below 1', () => {
-    const {queryByTestId} = setup({likeCount: 0})
-    expect(queryByTestId('like-count')).toBeFalsy()
+  it('displays 1 like', () => {
+    const {getByText} = setup({likeCount: 1})
+    expect(getByText('Like count: 1')).toBeTruthy()
+    expect(getByText('1 Like')).toBeTruthy()
   })
 
   it('indicates like status', () => {

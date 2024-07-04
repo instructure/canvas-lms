@@ -101,17 +101,17 @@ describe('DiscussionThreadContainer', () => {
   })
 
   it('should not render reply button if reply permission is false', () => {
-    const {queryByTestId} = setup(
+    const {container} = setup(
       defaultProps({
         discussionEntryOverrides: {permissions: DiscussionEntryPermissions.mock({reply: false})},
       })
     )
-    expect(queryByTestId('threading-toolbar-reply')).not.toBeInTheDocument()
+    expect(container.querySelector('svg[name="IconDiscussionReply2"]')).not.toBeInTheDocument()
   })
 
   it('should render reply button if reply permission is true', () => {
-    const {queryByTestId} = setup(defaultProps())
-    expect(queryByTestId('threading-toolbar-reply')).toBeInTheDocument()
+    const {container} = setup(defaultProps())
+    expect(container.querySelector('svg[name="IconDiscussionReply2"]')).toBeInTheDocument()
   })
 
   it('should not render quote button if reply permission is false', () => {

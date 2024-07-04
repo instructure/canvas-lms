@@ -431,7 +431,7 @@ describe('SplitScreenViewContainer', () => {
 
   it('disables the reply and enables the expand buttons if the RCE is open', async () => {
     const setRCEOpen = jest.fn()
-    const {findByTestId} = setup(
+    const {findByTestId, findAllByTestId} = setup(
       defaultProps({RCEOpen: true, setRCEOpen}),
       getDiscussionSubentriesQueryMock({
         last: split_screen_view_initial_page_size,
@@ -440,8 +440,8 @@ describe('SplitScreenViewContainer', () => {
     )
 
     expect(await findByTestId('DiscussionEdit-container')).toBeInTheDocument()
-    const reply = await findByTestId('threading-toolbar-reply')
-    expect(reply.hasAttribute('aria-disabled')).toBe(true)
+    const reply = await findAllByTestId('threading-toolbar-reply')
+    expect(reply[0].hasAttribute('aria-disabled')).toBe(true)
     expect(await findByTestId('expand-button')).toBeEnabled()
   })
 

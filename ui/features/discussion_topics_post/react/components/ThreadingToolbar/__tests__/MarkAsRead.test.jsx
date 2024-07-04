@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,8 +18,8 @@
 
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
-import {Reply} from '../Reply'
 import {responsiveQuerySizes} from '../../../utils'
+import {MarkAsRead} from '../MarkAsRead'
 
 jest.mock('../../../utils')
 
@@ -43,33 +43,32 @@ beforeEach(() => {
 
 const setup = props => {
   return render(
-    <Reply onClick={Function.prototype} delimiterKey="reply" authorName="Nikita" {...props} />
+    <MarkAsRead onClick={Function.prototype} isRead={false} isSplitScreenView={false} {...props} />
   )
 }
 
-describe('Reply', () => {
-  it('uses authorName for screenreaders', () => {
-    const {getByText} = setup()
-    expect(getByText('Reply to post from Nikita')).toBeTruthy()
+describe('MarkAsRead', () => {
+  it('renders text for desktop view', () => {
+    const {getAllByText} = setup()
+    expect(getAllByText('Mark as Read')).toBeTruthy()
   })
 
-  it('renders quote when in split screen view', () => {
-    const {getByText} = setup({isSplitView: true})
-    expect(getByText('Quote')).toBeTruthy()
+  it('renders unread text for desktop view', () => {
+    const {getAllByText} = setup({isRead: true})
+    expect(getAllByText('Mark as Unread')).toBeTruthy()
+  })
+
+  it('does not render text for split screen view', () => {
+    const {queryByText} = setup({isSplitScreenView: true})
+    expect(queryByText('Mark as Read')).toBeFalsy()
   })
 
   it('calls provided callback when clicked', () => {
     const onClickMock = jest.fn()
-    const {getByText} = setup({onClick: onClickMock})
+    const {getAllByText} = setup({onClick: onClickMock})
     expect(onClickMock.mock.calls.length).toBe(0)
-    fireEvent.click(getByText('Reply'))
+    fireEvent.click(getAllByText('Mark as Read')[0])
     expect(onClickMock.mock.calls.length).toBe(1)
-  })
-
-  it('shows icon on desktop view', () => {
-    const {container} = setup()
-    const icon = container.querySelector('svg')
-    expect(icon).toBeTruthy()
   })
 
   describe('Mobile', () => {
@@ -79,18 +78,9 @@ describe('Reply', () => {
       }))
     })
 
-    it('uses mobile prop values', () => {
-      const container = setup()
-
-      expect(container.getByTestId('threading-toolbar-reply').parentNode).toHaveStyle(
-        'margin: 0px 0.75rem 0px 0px'
-      )
-    })
-
-    it('does not show icon on desktop view', () => {
-      const {container} = setup()
-      const icon = container.querySelector('svg')
-      expect(icon).toBeFalsy()
+    it('does not render text', () => {
+      const {queryByText} = setup()
+      expect(queryByText('Mark as Read')).toBeFalsy()
     })
   })
 })

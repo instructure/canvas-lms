@@ -93,8 +93,8 @@ describe('DiscussionsSplitScreenView', () => {
   it('should render split screen view view container', async () => {
     const mocks = [...getDiscussionQueryMock()]
     const container = setup(mocks)
-    const replyButton = await container.findByTestId('threading-toolbar-reply')
-    fireEvent.click(replyButton)
+    const buttons = await container.findAllByTestId('threading-toolbar-reply')
+    fireEvent.click(buttons[0])
     expect(container.queryByTestId('discussions-split-screen-view-content')).toBeTruthy()
   })
 
@@ -102,8 +102,8 @@ describe('DiscussionsSplitScreenView', () => {
     window.ENV.isolated_view = true
     const mocks = [...getDiscussionQueryMock()]
     const container = setup(mocks)
-    const replyButton = await container.findByTestId('threading-toolbar-reply')
-    fireEvent.click(replyButton)
+    const buttons = await container.findAllByTestId('threading-toolbar-reply')
+    fireEvent.click(buttons[0])
     expect(container.queryByTestId('isolated-view-container')).toBeNull()
     expect(container.queryByTestId('discussions-split-screen-view-content')).toBeTruthy()
   })
