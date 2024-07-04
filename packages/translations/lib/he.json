@@ -92,6 +92,9 @@
     "content_type_2cf90d95": {
         "message": "סוג תוכן"
     },
+    "copy_9748f9f": {
+        "message": "העתקה"
+    },
     "copyright_holder_66ee111": {
         "message": "בעלים של זכויות יוצרים:"
     },
@@ -379,6 +382,9 @@
     },
     "reset_95a81614": {
         "message": "חזרה למצב ברירת מחדל"
+    },
+    "retry_ebd5f8ba": {
+        "message": "נסה/י שוב"
     },
     "rich_content_editor_2708ef21": {
         "message": "עורך תוכן עשיר"

@@ -49,6 +49,7 @@
   "computer_1d7dfa6f": { "message": "کامپیوتر" },
   "content_1440204b": { "message": "محتوا" },
   "content_type_2cf90d95": { "message": "نوع محتوا" },
+  "copy_9748f9f": { "message": "کپی کردن" },
   "copyright_holder_66ee111": { "message": "دارنده حق نشر:" },
   "count_40eced3b": { "message": "تعداد" },
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
@@ -184,6 +185,7 @@
   "relationships_6602af70": { "message": "روابط" },
   "replace_e61834a7": { "message": "جایگزین کردن" },
   "reset_95a81614": { "message": "بازنشانی" },
+  "retry_ebd5f8ba": { "message": "تلاش دوباره" },
   "rich_content_editor_2708ef21": { "message": "ویرایشگر محتوای غنی" },
   "save_11a80ec3": { "message": "ذخیره سازی" },
   "search_280d00bd": { "message": "جستجو" },

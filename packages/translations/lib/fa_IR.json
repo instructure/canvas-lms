@@ -143,6 +143,9 @@
     "content_type_2cf90d95": {
         "message": "نوع محتوا"
     },
+    "copy_9748f9f": {
+        "message": "کپی کردن"
+    },
     "copyright_holder_66ee111": {
         "message": "دارنده حق نشر:"
     },
@@ -601,6 +604,9 @@
     },
     "reset_95a81614": {
         "message": "بازنشانی"
+    },
+    "retry_ebd5f8ba": {
+        "message": "تلاش دوباره"
     },
     "rich_content_editor_2708ef21": {
         "message": "ویرایشگر محتوای غنی"
