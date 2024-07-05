@@ -97,12 +97,6 @@ module CC
                 res.file(href: path)
               end
             end
-
-            begin
-              Resource.new(self, manifest_node, resources).add_media_objects(@html_exporter)
-            rescue
-              add_error(I18n.t("course_exports.errors.resources", "Failed to link some resources."), $!)
-            end
           end
         end # manifest
 

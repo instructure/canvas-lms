@@ -59,8 +59,7 @@ class MediaObject < ActiveRecord::Base
   after_save :update_title_on_kaltura_later
   serialize :data
 
-  attr_accessor :podcast_associated_asset
-  attr_accessor :current_attachment
+  attr_accessor :podcast_associated_asset, :current_attachment
 
   def user_entered_title=(val)
     @push_user_title = true
@@ -390,26 +389,30 @@ class MediaObject < ActiveRecord::Base
                               file_state: "hidden",
                               workflow_state: "pending_upload"
                             )
+    attachment.handle_duplicates(:rename)
   end
 
   def ensure_attachment_media_info
     create_attachment
-    return unless (current_attachment || attachment_id) && attachment.workflow_state == "pending_upload"
-
     # if there are multiple attachments attached to the media_object, we need to update the right one
     updated_attachment = current_attachment || attachment
+    return unless updated_attachment && ["pending_upload", "errored"].include?(updated_attachment.workflow_state)
 
     file_state = updated_attachment.file_state
     sources = media_sources
     return unless sources.present?
 
     url = self.data[:download_url]
-    url = sources.find { |s| s[:isOriginal] == "1" }&.dig(:url) if url.blank?
-    url = sources.min_by { |a| a[:bitrate].to_i }&.dig(:url) if url.blank?
+    ext, url = sources.find { |s| s[:isOriginal] == "1" }&.slice(:fileExt, :url)&.values if url.blank?
+    ext, url = sources.min_by { |a| a[:bitrate].to_i }&.slice(:fileExt, :url)&.values if url.blank?
 
     updated_attachment.clone_url(url, :rename, false) # no check_quota because the bits are in kaltura
     updated_attachment.file_state = file_state
+    if ext.present? && File.mime_type(updated_attachment.display_name) == "unknown/unknown"
+      updated_attachment.display_name = "#{updated_attachment.display_name}.#{ext}"
+    end
     updated_attachment.workflow_state = "processed"
+    updated_attachment.media_entry_id = media_id
     updated_attachment.save!
   end
 
