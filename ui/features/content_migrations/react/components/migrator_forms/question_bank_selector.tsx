@@ -41,9 +41,14 @@ export type QuestionBankSettings = {
 type QuestionBankSelectorProps = {
   onChange: (settings: QuestionBankSettings | null) => void
   questionBankError: boolean
+  disable?: boolean
 }
 
-const QuestionBankSelector = ({onChange, questionBankError}: QuestionBankSelectorProps) => {
+const QuestionBankSelector = ({
+  onChange,
+  questionBankError,
+  disable = false,
+}: QuestionBankSelectorProps) => {
   const [showQuestionInput, setShowQuestionInput] = useState<boolean>(false)
   const questionBanks = ENV.QUESTION_BANKS || []
 
@@ -71,6 +76,7 @@ const QuestionBankSelector = ({onChange, questionBankError}: QuestionBankSelecto
           renderLabel={I18n.t('Default Question bank')}
           assistiveText={I18n.t('Select a question bank')}
           onChange={handleChange}
+          disabled={disable}
         >
           <SimpleSelect.Option id="selectQuestion" value="">
             {I18n.t('Select question bank')}
@@ -88,6 +94,7 @@ const QuestionBankSelector = ({onChange, questionBankError}: QuestionBankSelecto
       {showQuestionInput && (
         <View as="div" maxWidth="22.5rem">
           <TextInput
+            disabled={disable}
             messages={
               questionBankError
                 ? [

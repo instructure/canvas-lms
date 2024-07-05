@@ -30,9 +30,15 @@ type QTIZipImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
   fileUploadProgress: number | null
+  isSubmitting: boolean
 }
 
-const QTIZipImporter = ({onSubmit, onCancel, fileUploadProgress}: QTIZipImporterProps) => {
+const QTIZipImporter = ({
+  onSubmit,
+  onCancel,
+  fileUploadProgress,
+  isSubmitting,
+}: QTIZipImporterProps) => {
   const [file, setFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<boolean>(false)
   const [questionBankSettings, setQuestionBankSettings] = useState<QuestionBankSettings | null>()
@@ -65,7 +71,11 @@ const QTIZipImporter = ({onSubmit, onCancel, fileUploadProgress}: QTIZipImporter
 
   return (
     <>
-      <MigrationFileInput fileUploadProgress={fileUploadProgress} onChange={setFile} />
+      <MigrationFileInput
+        fileUploadProgress={fileUploadProgress}
+        onChange={setFile}
+        isSubmitting={isSubmitting}
+      />
       {fileError && (
         <p>
           <Text color="danger">{I18n.t('You must select a file to import content from')}</Text>
@@ -74,9 +84,11 @@ const QTIZipImporter = ({onSubmit, onCancel, fileUploadProgress}: QTIZipImporter
       <QuestionBankSelector
         onChange={setQuestionBankSettings}
         questionBankError={questionBankError}
+        disable={isSubmitting}
       />
       <CommonMigratorControls
         fileUploadProgress={fileUploadProgress}
+        isSubmitting={isSubmitting}
         canImportAsNewQuizzes={ENV.NEW_QUIZZES_IMPORT}
         canOverwriteAssessmentContent={true}
         onSubmit={handleSubmit}
