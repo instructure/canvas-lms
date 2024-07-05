@@ -1767,23 +1767,27 @@ describe "discussions" do
               get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}/edit"
               Discussion.assign_to_button.click
 
-              reply_to_topic_date = format_date_for_view(3.days.from_now(Time.zone.now), "%m/%d/%Y")
-              update_reply_to_topic_date(0, reply_to_topic_date)
+              reply_to_topic_date = 3.days.from_now(Time.zone.now).to_date + 17.hours
+              reply_to_topic_date_formatted = format_date_for_view(reply_to_topic_date, "%m/%d/%Y")
+              update_reply_to_topic_date(0, reply_to_topic_date_formatted)
               update_reply_to_topic_time(0, "5:00 PM")
 
               # required replies
-              required_replies_date = format_date_for_view(4.days.from_now(Time.zone.now), "%m/%d/%Y")
-              update_required_replies_date(0, required_replies_date)
+              required_replies_date = 4.days.from_now(Time.zone.now).to_date + 17.hours
+              required_replies_date_formatted = format_date_for_view(required_replies_date, "%m/%d/%Y")
+              update_required_replies_date(0, required_replies_date_formatted)
               update_required_replies_time(0, "5:00 PM")
 
               # available from
-              available_from_date = format_date_for_view(2.days.from_now(Time.zone.now), "%m/%d/%Y")
-              update_available_date(0, available_from_date, true, false)
+              available_from_date = 2.days.from_now(Time.zone.now).to_date + 17.hours
+              available_from_date_formatted = format_date_for_view(available_from_date, "%m/%d/%Y")
+              update_available_date(0, available_from_date_formatted, true, false)
               update_available_time(0, "5:00 PM", true, false)
 
               # available until
-              until_date = format_date_for_view(5.days.from_now(Time.zone.now), "%m/%d/%Y")
-              update_until_date(0, until_date, true, false)
+              until_date = 5.days.from_now(Time.zone.now).to_date + 17.hours
+              until_date_formatted = format_date_for_view(until_date, "%m/%d/%Y")
+              update_until_date(0, until_date_formatted, true, false)
               update_until_time(0, "5:00 PM", true, false)
 
               click_save_button("Apply")
@@ -1798,8 +1802,19 @@ describe "discussions" do
               sub_assignment2 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
 
               expect(graded_discussion.assignment.sub_assignments.count).to eq(2)
-              expect(format_date_for_view(sub_assignment1.due_at, "%m/%d/%Y")).to eq(reply_to_topic_date)
-              expect(format_date_for_view(sub_assignment2.due_at, "%m/%d/%Y")).to eq(required_replies_date)
+              expect(format_date_for_view(sub_assignment1.due_at, "%m/%d/%Y")).to eq(reply_to_topic_date_formatted)
+              expect(format_date_for_view(sub_assignment2.due_at, "%m/%d/%Y")).to eq(required_replies_date_formatted)
+
+              # renders update
+              get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}/edit"
+              Discussion.assign_to_button.click
+
+              displayed_override_dates = all_displayed_assign_to_date_and_time
+              # Check that the due dates are correctly displayed
+              expect(displayed_override_dates.include?(reply_to_topic_date)).to be_truthy
+              expect(displayed_override_dates.include?(required_replies_date)).to be_truthy
+              expect(displayed_override_dates.include?(available_from_date)).to be_truthy
+              expect(displayed_override_dates.include?(until_date)).to be_truthy
             end
           end
 
