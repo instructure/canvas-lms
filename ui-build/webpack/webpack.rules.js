@@ -139,6 +139,12 @@ exports.swc = [
         env: {
           targets: browserTargets,
         },
+        transform: {
+          react: {
+            development: process.env.NODE_ENV === 'development',
+            refresh: process.env.NODE_ENV === 'development',
+          },
+        },
       },
     },
   },

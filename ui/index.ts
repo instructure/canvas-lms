@@ -249,3 +249,10 @@ async function loadNewUserTutorials() {
   await import('./boot/initializers/runOnEveryPageButDontBlockAnythingElse')
   advanceReadiness('asyncInitializers')
 })
+
+// Allows for HMR in development without needing to mark
+// each module with this line. Once we switch pages to using react-router
+// we can remove this, as the setup for HMR is taken care of for us.
+if (typeof module !== 'undefined') {
+  module?.hot?.accept()
+}
