@@ -39,9 +39,10 @@ type CourseOption = {
 type CourseCopyImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
+  isSubmitting: boolean
 }
 
-export const CourseCopyImporter = ({onSubmit, onCancel}: CourseCopyImporterProps) => {
+export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCopyImporterProps) => {
   const [searchParam, setSearchParam] = useState<string>('')
   const [courseOptions, setCourseOptions] = useState<any>([])
   const [selectedCourse, setSelectedCourse] = useState<any>(false)
@@ -115,6 +116,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel}: CourseCopyImporterProps
       <View as="div" margin="medium none none none" width="100%" maxWidth="22.5rem">
         <Select
           inputValue={selectedCourse ? selectedCourse.label : searchParam}
+          interaction={isSubmitting ? 'disabled' : 'enabled'}
           onInputChange={getCourseOptions}
           onRequestSelectOption={(_e: any, data: {id?: string | undefined}) => {
             const course_id = data.id as string
@@ -157,6 +159,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel}: CourseCopyImporterProps
       </View>
       <View as="div" margin="small none none none">
         <Checkbox
+          disabled={isSubmitting}
           name="include_completed_courses"
           label={I18n.t('Include completed courses')}
           onChange={(e: React.SyntheticEvent<Element, Event>) => {
@@ -167,6 +170,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel}: CourseCopyImporterProps
       </View>
       <CommonMigratorControls
         canSelectContent={true}
+        isSubmitting={isSubmitting}
         canImportAsNewQuizzes={ENV.NEW_QUIZZES_MIGRATION}
         canAdjustDates={true}
         fileUploadProgress={null}

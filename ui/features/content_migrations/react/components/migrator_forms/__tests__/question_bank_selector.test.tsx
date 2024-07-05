@@ -74,4 +74,12 @@ describe('QuestionBankSelector', () => {
 
     expect(onChange).toHaveBeenCalledWith(null)
   })
+
+  it('disable question bank fields', async () => {
+    window.ENV.QUESTION_BANKS = [{assessment_question_bank: {id: 1, title: 'My Question Bank'}}]
+
+    renderComponent({disable: true})
+
+    expect(screen.getByRole('combobox', {name: 'Default Question bank'})).toBeDisabled()
+  })
 })

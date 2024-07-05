@@ -32,9 +32,15 @@ type MigrationFileInputProps = {
   onChange: (file: File | null) => void
   accepts?: string | undefined
   fileUploadProgress: number | null
+  isSubmitting?: boolean
 }
 
-const MigrationFileInput = ({onChange, accepts, fileUploadProgress}: MigrationFileInputProps) => {
+const MigrationFileInput = ({
+  onChange,
+  accepts,
+  fileUploadProgress,
+  isSubmitting,
+}: MigrationFileInputProps) => {
   const fileInput = createRef<HTMLInputElement>()
   const [file, setFile] = useState<File | null>(null)
 
@@ -78,11 +84,7 @@ const MigrationFileInput = ({onChange, accepts, fileUploadProgress}: MigrationFi
         onChange={handleSelectFile}
         style={{display: 'none'}}
       />
-      <Button
-        color="secondary"
-        disabled={!!(fileUploadProgress && fileUploadProgress < 100)}
-        onClick={() => fileInput.current?.click()}
-      >
+      <Button color="secondary" disabled={isSubmitting} onClick={() => fileInput.current?.click()}>
         <IconUploadLine />
         &nbsp;
         {I18n.t('Choose File')}
@@ -90,7 +92,7 @@ const MigrationFileInput = ({onChange, accepts, fileUploadProgress}: MigrationFi
       <View margin="none none none medium">
         <Text>{file ? file.name : I18n.t('No file chosen')}</Text>
       </View>
-      {fileUploadProgress && fileUploadProgress < 100 && (
+      {isSubmitting && (
         <View as="div" margin="small 0 0" style={{position: 'relative'}}>
           {I18n.t('Uploading File')}
           <ProgressBar
