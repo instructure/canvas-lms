@@ -25,11 +25,10 @@ class LearnPlatformController < ApplicationController
 
   def index
     options = {
-      q: params[:q],
-      page: params[:page],
-      per_page: params[:per_page],
-      filters: params[:filters]
+      page: params[:page] || 1,
+      per_page: params[:per_page] || 20
     }
+    options[:q] = params[:q].to_unsafe_h if params[:q]
 
     response = learnplatform_api.products(options)
 
