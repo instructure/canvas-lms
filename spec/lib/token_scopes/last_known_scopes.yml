@@ -139,6 +139,10 @@
   path: "/api/v1/accounts/:account_id/external_tools/rce_favorites/:id"
 - verb: GET
   path: "/api/v1/accounts/:account_id/external_tools/sessionless_launch"
+- verb: DELETE
+  path: "/api/v1/accounts/:account_id/external_tools/top_nav_favorites/:id"
+- verb: POST
+  path: "/api/v1/accounts/:account_id/external_tools/top_nav_favorites/:id"
 - verb: GET
   path: "/api/v1/accounts/:account_id/features"
 - verb: GET

@@ -415,11 +415,12 @@ RSpec.describe ApplicationController do
             icon_url: nil,
             base_url: domain,
             title: "a",
-            pinned: tool.placement_pinned?(:top_navigation),
+            pinned: tool.top_nav_favorite_in_context?(controller.context)
           }
         end
 
         before do
+          controller.instance_variable_set(:@context, Account.default)
           Setting.set("top_navigation_allowed_dev_keys", developer_key.id.to_s)
           Setting.set("top_navigation_allowed_launch_domains", domain)
           allow(Lti::ContextToolFinder).to receive(:all_tools_for).and_return([devkey_tool, domain_tool, unauth_tool])

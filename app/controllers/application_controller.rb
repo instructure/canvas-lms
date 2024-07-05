@@ -578,7 +578,7 @@ class ApplicationController < ActionController::Base
     end
 
     if type == :top_navigation
-      hash[:pinned] = tool.placement_pinned?(type)
+      hash[:pinned] = tool.top_nav_favorite_in_context?(context)
     end
 
     # Add the tool's postmessage scopes to the JS environment, if present.
