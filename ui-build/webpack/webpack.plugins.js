@@ -23,7 +23,6 @@ const {
   EnvironmentPlugin,
   SwcJsMinimizerRspackPlugin,
 } = require('@rspack/core')
-const {resolve} = require('path')
 const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin')
 const {WebpackManifestPlugin} = require('rspack-manifest-plugin')
 const {RetryChunkLoadPlugin} = require('webpack-retry-chunk-load-plugin')
@@ -35,8 +34,6 @@ const {fetchSpeedGraderLibrary, fetchAnalyticsHub} = require('./remotes')
 
 // determines which folder public assets are compiled to
 const webpackPublicPath = require('./webpackPublicPath')
-
-const {canvasDir} = require('../params')
 
 exports.provideJQuery = new ProvidePlugin({
   $: 'jquery',
@@ -126,6 +123,7 @@ exports.webpackManifest = new WebpackManifestPlugin({
   fileName: 'webpack-manifest.json',
   publicPath: '',
   useEntryKeys: true,
+  writeToFileEmit: process.env.NODE_ENV === 'development',
 })
 
 exports.minimizeCode = new SwcJsMinimizerRspackPlugin({
