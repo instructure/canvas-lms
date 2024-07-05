@@ -53,7 +53,19 @@ export default class ToolConfigurationForm extends React.Component {
   }
 
   valid = () => {
-    return this.manualConfigRef.valid()
+    if (this.isManual()) {
+      return this.manualConfigRef.valid()
+    } else if (this.isJson()) {
+      return !this.props.invalidJson
+    }
+  }
+
+  isManual = () => {
+    return this.props.configurationMethod === 'manual'
+  }
+
+  isJson = () => {
+    return this.props.configurationMethod === 'json'
   }
 
   updatePastedJson = e => {
@@ -66,6 +78,9 @@ export default class ToolConfigurationForm extends React.Component {
 
   handleConfigTypeChange = (e, option) => {
     this.props.updateConfigurationMethod(option.value)
+    if (option.value === 'json') {
+      this.props.updatePastedJson(this.toolConfiguration, true)
+    }
   }
 
   setManualConfigRef = node => (this.manualConfigRef = node)
