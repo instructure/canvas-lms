@@ -588,7 +588,7 @@ function DiscussionTopicForm({
           section => !selectedSectionIds.includes(section.id)
         )
 
-        if (missingSectionObjs.length > 0) {
+        if (missingSectionObjs.length > 0 && isGraded) {
           setLastShouldPublish(shouldPublish)
           setMissingSections(missingSectionObjs)
           setShouldShowMissingSectionsWarning(true)
