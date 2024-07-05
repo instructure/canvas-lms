@@ -150,11 +150,12 @@ export const PacePicker = ({
 
   const trigger: JSX.Element = (
     <TextInput
+      key={selectedContextKey}
+      defaultValue={selectedContextName}
       renderLabel={I18n.t('Course Pacing')}
       renderAfterInput={
         open ? <IconArrowOpenUpSolid inline={false} /> : <IconArrowOpenDownSolid inline={false} />
       }
-      defaultValue={selectedContextName}
       data-testid="course-pace-picker"
       interaction="readonly"
       role="button"
