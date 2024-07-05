@@ -106,6 +106,11 @@ describe('ToolConfigurationForm', () => {
       expect(elem1).not.toBeVisible()
       expect(elem2).not.toBeVisible()
     })
+
+    it('validates the JSON syntax', async () => {
+      const {ref} = mountForm({invalidJson: '{invalid json text}'})
+      expect(ref.current.valid()).toBeFalsy()
+    })
   })
 
   describe('when configuration method is by URL', () => {
@@ -116,12 +121,16 @@ describe('ToolConfigurationForm', () => {
     })
 
     it('transitions to configuring by JSON when the json option is selected', () => {
-      const {ref} = renderToolConfigurationForm({configurationMethod: 'url'})
+      const {ref} = renderToolConfigurationForm({
+        configurationMethod: 'url',
+        updatePastedJson: jest.fn(),
+      })
 
       fireEvent.click(screen.getByRole('combobox', {name: /method/i}))
       fireEvent.click(document.querySelector('[value="json"]'))
 
       expect(ref.current.props.updateConfigurationMethod).toHaveBeenCalled()
+      expect(ref.current.props.updatePastedJson).toHaveBeenCalled()
     })
   })
 

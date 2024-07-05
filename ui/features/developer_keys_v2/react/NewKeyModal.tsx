@@ -18,6 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
+import _ from 'lodash'
 
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -91,7 +92,7 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
     return {...this.props.createOrEditDeveloperKeyState.developerKey, ...this.state.developerKey}
   }
 
-  get manualForm() {
+  get toolConfigForm() {
     return this.newForm
       ? this.newForm
       : {
@@ -244,23 +245,24 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
     let settings: {
       scopes?: unknown
     } = {}
+
     if (this.isJsonConfig) {
-      if (!this.state.toolConfiguration) {
-        // TODO: I don't think this code is called as we initialize
-        // toolConfiguration to an empty object, which is truthy. Fixing this
-        // correctly with regards to invalid JSON is a bit more involved,
-        // though, and simply enabling this has the effect of doing nothing
-        // when the JSON is unchanged
+      if (!this.state.toolConfiguration || _.isEmpty(this.state.toolConfiguration)) {
+        this.setState({submitted: true})
+        $.flashError(I18n.t('Configuration JSON cannot be empty.'))
+        return
+      }
+      if (!this.toolConfigForm.valid()) {
         this.setState({submitted: true})
         return
       }
       settings = this.state.toolConfiguration
     } else if (this.isManualConfig) {
-      if (!this.manualForm.valid()) {
+      if (!this.toolConfigForm.valid()) {
         this.setState({submitted: true})
         return
       }
-      settings = this.manualForm.generateToolConfiguration()
+      settings = this.toolConfigForm.generateToolConfiguration()
       this.setState({toolConfiguration: settings})
     }
     developer_key.scopes = settings.scopes
