@@ -70,55 +70,6 @@ export const NewCriteriaRow = ({rowIndex, onEditCriterion, onAddOutcome}: NewCri
             {I18n.t('Create From Outcome')}
           </Button>
         </Flex.Item>
-        <Flex.Item align="start">
-          <Pill
-            color="info"
-            themeOverride={{
-              background: '#C7CDD1',
-              infoColor: 'white',
-            }}
-          >
-            <Text size="x-small">-- pts</Text>
-          </Pill>
-          <View as="span" margin="0 0 0 medium">
-            <IconButton
-              disabled={true}
-              withBackground={false}
-              withBorder={false}
-              screenReaderLabel=""
-              themeOverride={{smallHeight: '18px'}}
-              size="small"
-            >
-              <IconEditLine />
-            </IconButton>
-          </View>
-
-          <View as="span" margin="0 0 0 medium">
-            <IconButton
-              disabled={true}
-              withBackground={false}
-              withBorder={false}
-              screenReaderLabel=""
-              themeOverride={{smallHeight: '18px'}}
-              size="small"
-            >
-              <IconTrashLine />
-            </IconButton>
-          </View>
-
-          <View as="span" margin="0 0 0 medium">
-            <IconButton
-              disabled={true}
-              withBackground={false}
-              withBorder={false}
-              screenReaderLabel=""
-              themeOverride={{smallHeight: '18px'}}
-              size="small"
-            >
-              <IconDuplicateLine />
-            </IconButton>
-          </View>
-        </Flex.Item>
       </Flex>
     </View>
   )

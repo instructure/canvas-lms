@@ -32,7 +32,7 @@ describe Canvas::Security::LoginRegistry do
 
   describe ".audit_login" do
     before do
-      @p.account.settings[:password_policy] = { max_attempts: 2 }
+      @p.account.settings[:password_policy] = { maximum_login_attempts: 2 }
       @p.account.save!
     end
 
@@ -44,41 +44,36 @@ describe Canvas::Security::LoginRegistry do
       expect(registry.audit_login(@p, false)).to be_nil
     end
 
-    it "will stop too many logins in too short a time" do
-      2.times { registry.failed_login!(@p) }
-      expect(registry.audit_login(@p, true)).to eq(:too_many_attempts)
+    it "prohibits rapid fire successful logins beyond the set limit (defaults to 5)" do
+      6.times { registry.audit_login(@p, true) }
+      expect(registry.audit_login(@p, true)).to be :too_recent_login
+      expect(registry.audit_login(@p, false)).to be_nil
     end
 
     it "allows 3 rapid fire successful logins" do
       3.times { expect(registry.audit_login(@p, true)).to be_nil }
     end
 
-    it "falls back to the default max_attempts if the account setting is missing" do
-      # default max attempts is currently set at 10
+    it "falls back to the default maximum_login_attempts if the account setting is missing" do
+      # default maximum login attempts is currently set at 10
       @p.account.settings.delete(:password_policy)
       @p.account.save!
       9.times { registry.failed_login!(@p) }
       expect(registry.audit_login(@p, true)).to be_nil
     end
 
-    it "falls back to the default if max_attempts is set beyond allowed threshold" do
-      @p.account.settings[:password_policy] = { max_attempts: 30 }
+    it "falls back to the default if maximum_login_attempts is set beyond allowed threshold" do
+      @p.account.settings[:password_policy] = { maximum_login_attempts: 30 }
       @p.account.save!
       10.times { registry.failed_login!(@p) }
       expect(registry.audit_login(@p, true)).to eq(:too_many_attempts)
     end
 
-    it "falls back to the default if max_attempts is not greater than 0" do
-      @p.account.settings[:password_policy] = { max_attempts: 0 }
+    it "falls back to the default if maximum_login_attempts is not greater than 0" do
+      @p.account.settings[:password_policy] = { maximum_login_attempts: 0 }
       @p.account.save!
       # allows authentication to proceed as the fallback is used
       expect(registry.audit_login(@p, true)).to be_nil
-    end
-
-    it "prohibits rapid fire successful logins beyond the set limit (defaults to 5)" do
-      6.times { registry.audit_login(@p, true) }
-      expect(registry.audit_login(@p, true)).to be :too_recent_login
-      expect(registry.audit_login(@p, false)).to be_nil
     end
 
     it "timeouts the login block after a waiting period" do
@@ -92,33 +87,28 @@ describe Canvas::Security::LoginRegistry do
   describe ".allow_login_attempt?" do
     subject { registry.allow_login_attempt?(@p) }
 
-    before do
-      @p.account.settings[:password_policy] = { max_attempts: 3 }
-      @p.account.save!
-    end
-
     context "with login suspension enabled" do
       before do
         @p.account.enable_feature!(:password_complexity)
-        @p.account.settings[:password_policy] = { max_attempts: 3, allow_login_suspension: true }
+        @p.account.settings[:password_policy] = { maximum_login_attempts: "3", allow_login_suspension: true }
         @p.account.save!
       end
 
-      it "returns :final_attempt when total is greater than max_attempts" do
+      it "returns :final_attempt when total is greater than maximum_login_attempts" do
         4.times { registry.failed_login!(@p) }
         expect(subject).to eq(:final_attempt)
       end
 
-      it "returns :remaining_attempts_2 when total is less than max_attempts by 3" do
+      it "returns :remaining_attempts_2 when total is less than maximum_login_attempts by 3" do
         expect(registry.audit_login(@p, false)).to eq(:remaining_attempts_2)
       end
 
-      it "returns :remaining_attempts_1 when total is less than max_attempts by 2" do
+      it "returns :remaining_attempts_1 when total is less than maximum_login_attempts by 2" do
         registry.audit_login(@p, false)
         expect(registry.audit_login(@p, false)).to eq(:remaining_attempts_1)
       end
 
-      it "returns :final_attempt when total is less than max_attempts by 1" do
+      it "returns :final_attempt when total is less than maximum_login_attempts by 1" do
         2.times { registry.audit_login(@p, false) }
         expect(registry.audit_login(@p, false)).to eq(:final_attempt)
       end
@@ -128,8 +118,8 @@ describe Canvas::Security::LoginRegistry do
         expect(@p.reload.workflow_state).to eq "suspended"
       end
 
-      it "allows up to max_attempts of failed login attempts before suspending the user" do
-        @p.account.settings[:password_policy] = { max_attempts: 10, allow_login_suspension: true }
+      it "allows up to maximum_login_attempts of failed login attempts before suspending the user" do
+        @p.account.settings[:password_policy] = { maximum_login_attempts: "10", allow_login_suspension: true }
         @p.account.save!
 
         7.times { registry.failed_login!(@p) }

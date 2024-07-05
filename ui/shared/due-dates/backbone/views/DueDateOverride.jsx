@@ -116,6 +116,7 @@ DueDateOverrideView.prototype.render = function () {
         isOnlyVisibleToOverrides: this.model.assignment.isOnlyVisibleToOverrides(),
         type: this.model.assignment.objectType().toLowerCase(),
         importantDates: this.model.assignment.get('important_dates'),
+        postToSIS: this.model.assignment.get('post_to_sis'),
         onTrayOpen: () => {
           const isGroupAssignment = document.getElementById('has_group_category')?.checked
           if (!isGroupAssignment) {

@@ -31,6 +31,8 @@ export interface EnvGradingStandardsCommon {
   GRADING_SCHEME_UPDATES_ENABLED: boolean
   CUSTOM_GRADEBOOK_STATUSES_ENABLED: boolean
   ARCHIVED_GRADING_SCHEMES_ENABLED: boolean
+  DEFAULT_ACCOUNT_GRADING_SCHEME_ENABLED: boolean
+
   /**
    * NOTE: Only present if the context is not Account
    */

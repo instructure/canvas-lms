@@ -41,6 +41,7 @@ export const CREATE_SUBMISSION_COMMENT = gql`
         id
         comment
         read
+        draft
         author {
           _id
           id
@@ -55,6 +56,7 @@ export const ZCreateSubmissionCommentParams = z.object({
   submissionId: z.string(),
   comment: z.string(),
   groupComment: z.boolean(),
+  draftComment: z.boolean().optional(),
 })
 
 type CreateSubmissionCommentParams = z.infer<typeof ZCreateSubmissionCommentParams>
@@ -63,11 +65,13 @@ export async function createSubmissionComment({
   submissionId,
   comment,
   groupComment,
+  draftComment,
 }: CreateSubmissionCommentParams): Promise<any> {
   const result = executeQuery<any>(CREATE_SUBMISSION_COMMENT, {
     submissionId,
     comment,
     groupComment,
+    draftComment,
   })
 
   return result

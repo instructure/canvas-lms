@@ -51,7 +51,7 @@ export const GradingSchemeView: React.FC<ComponentProps> = ({
   archivedGradingSchemesDisableEdit = false,
   onEditRequested,
   onDeleteRequested,
-}) => {
+}: ComponentProps) => {
   return (
     <View
       as="div"

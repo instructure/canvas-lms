@@ -99,6 +99,10 @@ class Discussion
       "[data-testid='summary-user-input']"
     end
 
+    def sync_to_sis_checkbox_selector
+      "input[type=checkbox][value='post_to_sis']"
+    end
+
     # ---------------------- Elements ----------------------
 
     def discussion_page_body
@@ -181,6 +185,10 @@ class Discussion
       f(summary_user_input_selector)
     end
 
+    def sync_to_sis_checkbox
+      f(sync_to_sis_checkbox_selector)
+    end
+
     # ---------------------- Actions ----------------------
 
     def topic_title_input
@@ -243,6 +251,10 @@ class Discussion
 
     def click_summary_disable_button
       summary_disable_button.click
+    end
+
+    def click_sync_to_sis_checkbox
+      force_click_native(sync_to_sis_checkbox_selector)
     end
 
     def update_summary_user_input(user_input)

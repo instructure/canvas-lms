@@ -47,6 +47,7 @@ import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
 import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
 import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup'
 import type {GroupOutcome} from '@canvas/global/env/EnvCommon'
+import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 
 const I18n = useI18nScope('rubrics-form')
 
@@ -172,7 +173,15 @@ export const RubricForm = ({
   }
 
   const duplicateCriterion = (criterion: RubricCriterion) => {
-    const newCriterion = {...criterion, id: ``}
+    const newCriterion: RubricCriterion = {
+      ...criterion,
+      id: ``,
+      outcome: undefined,
+      learningOutcomeId: undefined,
+      description: stripHtmlTags(criterion.description) ?? '',
+      longDescription: stripHtmlTags(criterion.longDescription) ?? '',
+    }
+
     setSelectedCriterion(newCriterion)
     setIsCriterionModalOpen(true)
   }
@@ -322,7 +331,7 @@ export const RubricForm = ({
   }
 
   return (
-    <View as="div" margin="0 0 medium 0">
+    <View as="div" margin="0 0 medium 0" overflowY="hidden" overflowX="hidden">
       <Flex as="div" direction="column" style={{minHeight: '100%'}}>
         <Flex.Item>
           {saveError && (
@@ -358,7 +367,7 @@ export const RubricForm = ({
           </Flex.Item>
         )}
 
-        <Flex.Item>
+        <Flex.Item overflowX="hidden" overflowY="hidden">
           <Flex margin="large 0 0 0">
             <Flex.Item shouldGrow={true} shouldShrink={true}>
               <TextInput

@@ -234,6 +234,22 @@ describe('Should load <AddressBookContainer> normally', () => {
       expect(items.length).toBe(2)
     })
 
+    it('clears input when submenu is chosen', async () => {
+      jest.useFakeTimers()
+      const {container} = setup()
+      const input = container.querySelector('input')
+
+      fireEvent.change(input, {target: {value: 'Testing'}})
+      await act(async () => jest.advanceTimersByTime(1000))
+
+      const items = await screen.findAllByTestId('address-book-item')
+      // Click the courses submenu
+      fireEvent.mouseDown(items[1])
+
+      // Input should be cleared after selecting a submenu
+      expect(container.querySelector('input').value).toBe('')
+    })
+
     it('Should be able to select only 1 tags when limit is 1', async () => {
       setup({limitTagCount: 1, open: true})
       // Find initial courses and users sub-menu

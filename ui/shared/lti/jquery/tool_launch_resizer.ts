@@ -52,8 +52,10 @@ export default class ToolLaunchResizer {
       setHeight = this.minToolHeight
     }
     const toolWrapper = container || this.tool_content_wrapper()
-    if (force_height) toolWrapper.height(setHeight)
-    else
-      toolWrapper.height(!height || this.minToolHeight > setHeight ? this.minToolHeight : setHeight)
+
+    const iframe = toolWrapper.find('iframe')
+
+    if (force_height) iframe.height(setHeight)
+    else iframe.height(!height || this.minToolHeight > setHeight ? this.minToolHeight : setHeight)
   }
 }

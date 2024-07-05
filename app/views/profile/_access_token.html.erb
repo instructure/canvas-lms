@@ -35,8 +35,8 @@
     <a href="#" aria-label="<%= t('%{appName} Details', appName: access_token&.app_name) %>" rel="<%= profile_token_url(access_token || "{{ id }}") %>" class="show_token_link"><%= t('links.token_details', "details") %></a>
   </td>
   <td class="links">
-    <% unless @real_current_user %>
-      <a href="#" aria-label="<%= t('Delete %{appName} Token', appName: access_token&.app_name) %>" class="delete_key_link" rel="<%= profile_token_url(access_token || "{{ id }}") %>" title="<%= t('titles.delete_this_token', "Delete this Token") %>"><i class="icon-trash" role="presentation"></i></a>
+    <% if access_token.nil? || @real_current_user && access_token.grants_right?(@real_current_user, :delete) || access_token.grants_right?(@current_user, :delete) %>
+      <a href="#" aria-label="<%= t('Delete %{appName} Token', appName: access_token&.app_name) %>" class="delete_key_link" rel="<%= api_v1_token_url("self", access_token&.token_hint || "{{ id }}") %>" title="<%= t('titles.delete_this_token', "Delete this Token") %>"><i class="icon-trash" role="presentation"></i></a>
     <% end %>
   </td>
 </tr>

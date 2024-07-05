@@ -1170,13 +1170,15 @@ class GradebooksController < ApplicationController
           )
         end
 
-        if Account.site_admin.feature_enabled?(:platform_service_speedgrader) && value_to_boolean(params[:platform_sg])
+        if Account.site_admin.feature_enabled?(:platform_service_speedgrader) &&
+           (params[:platform_sg].nil? || value_to_boolean(params[:platform_sg]))
 
           @page_title = t("SpeedGrader")
           @body_classes << "full-width padless-content"
 
           remote_env(speedgrader: Services::PlatformServiceSpeedgrader.launch_url)
 
+          env[:GRADE_BY_QUESTION_SUPPORTED] = @assignment.supports_grade_by_question?
           js_env(env)
           deferred_js_bundle :platform_speedgrader
 

@@ -20,13 +20,12 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import {getDiscussionSubentriesQueryMock} from '../../../../graphql/Mocks'
+import {getDiscussionSubentriesQueryMock, updateDiscussionEntryParticipantMock} from '../../../../graphql/Mocks'
 import {SplitScreenViewContainer} from '../SplitScreenViewContainer'
 import {MockedProvider} from '@apollo/react-testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
-
 injectGlobalAlertContainers()
 
 jest.mock('@canvas/rce/react/CanvasRce')
@@ -432,7 +431,7 @@ describe('SplitScreenViewContainer', () => {
 
   it('disables the reply and enables the expand buttons if the RCE is open', async () => {
     const setRCEOpen = jest.fn()
-    const {findByTestId} = setup(
+    const {findByTestId, findAllByTestId} = setup(
       defaultProps({RCEOpen: true, setRCEOpen}),
       getDiscussionSubentriesQueryMock({
         last: split_screen_view_initial_page_size,
@@ -441,8 +440,8 @@ describe('SplitScreenViewContainer', () => {
     )
 
     expect(await findByTestId('DiscussionEdit-container')).toBeInTheDocument()
-    const reply = await findByTestId('threading-toolbar-reply')
-    expect(reply.hasAttribute('aria-disabled')).toBe(true)
+    const reply = await findAllByTestId('threading-toolbar-reply')
+    expect(reply[0].hasAttribute('aria-disabled')).toBe(true)
     expect(await findByTestId('expand-button')).toBeEnabled()
   })
 
@@ -516,5 +515,64 @@ describe('SplitScreenViewContainer', () => {
       )
       await waitFor(() => expect(container.getAllByText('Sorry, Something Broke')).toBeTruthy())
     })
+  })
+
+  describe('rating', () => {
+    it('should react on liked', async() => {
+      const mocks = [
+          ...updateDiscussionEntryParticipantMock({
+          rating: 'liked',
+        }),
+        ...getDiscussionSubentriesQueryMock({
+          last: split_screen_view_initial_page_size,
+          includeRelativeEntry: false,
+        })
+      ]
+
+      const {findAllByTestId,queryByTestId} = setup(defaultProps(), mocks)
+      const likeButtons = await findAllByTestId('like-button')
+
+      expect(likeButtons.length).toBe(2);
+      expect(queryByTestId('liked-icon')).toBeFalsy()
+      fireEvent.click(likeButtons[0])
+      await waitFor(() => {
+        expect(setOnSuccess.mock.calls.length).toBe(1)
+        expect(setOnFailure.mock.calls.length).toBe(0)
+      })
+      expect(queryByTestId('liked-icon')).toBeTruthy()
+    })
+
+    it('should react on not_liked', async() => {
+      const mocks = [
+        ...updateDiscussionEntryParticipantMock({
+          rating: 'not_liked',
+        }),
+        ...getDiscussionSubentriesQueryMock({
+          last: split_screen_view_initial_page_size,
+          includeRelativeEntry: true,
+          relativeEntryId: '10',
+        }),
+        ...getDiscussionSubentriesQueryMock({
+          first: 0,
+          includeRelativeEntry: false,
+          beforeRelativeEntry: false,
+          relativeEntryId: '10',
+        }),
+      ]
+      mocks[2].result.data.legacyNode.entryParticipant.rating=true
+
+      const {findAllByTestId,queryByTestId} = setup(defaultProps({relativeEntryId: '10'}), mocks)
+      const likeButtons = await findAllByTestId('like-button')
+
+      expect(likeButtons.length).toBe(2);
+      expect(queryByTestId('liked-icon')).toBeTruthy()
+      fireEvent.click(queryByTestId('liked-icon'))
+      await waitFor(() => {
+        expect(setOnSuccess.mock.calls.length).toBe(1)
+        expect(setOnFailure.mock.calls.length).toBe(0)
+      })
+      expect(queryByTestId('liked-icon')).toBeFalsy()
+    })
+
   })
 })

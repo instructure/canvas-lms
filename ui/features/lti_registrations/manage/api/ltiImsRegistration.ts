@@ -22,6 +22,7 @@ import {ZLtiImsRegistration} from '../model/lti_ims_registration/LtiImsRegistrat
 import {type AccountId} from '../model/AccountId'
 import type {DynamicRegistrationTokenUUID} from '../model/DynamicRegistrationTokenUUID'
 import type {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsRegistrationId'
+import {defaultFetchOptions} from '@canvas/util/xhr'
 
 /**
  * Fetch a newly generated registration token which will
@@ -34,7 +35,7 @@ import type {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsReg
  */
 export const fetchRegistrationToken = (accountId: AccountId) =>
   parseFetchResult(ZDynamicRegistrationToken)(
-    fetch(`/api/lti/accounts/${accountId}/registration_token`)
+    fetch(`/api/lti/accounts/${accountId}/registration_token`, defaultFetchOptions())
   )
 
 /**
@@ -53,7 +54,10 @@ export const getRegistrationByUUID = (
   registrationUuid: DynamicRegistrationTokenUUID
 ) =>
   parseFetchResult(ZLtiImsRegistration)(
-    fetch(`/api/lti/accounts/${accountId}/registrations/uuid/${registrationUuid}`)
+    fetch(
+      `/api/lti/accounts/${accountId}/registrations/uuid/${registrationUuid}`,
+      defaultFetchOptions()
+    )
   )
 
 /**
@@ -70,7 +74,12 @@ export const updateRegistrationOverlay = (
 ) =>
   parseFetchResult(ZLtiImsRegistration)(
     fetch(`/api/lti/accounts/${accountId}/registrations/${registrationId}/overlay`, {
+      ...defaultFetchOptions(),
       method: 'PUT',
+      headers: {
+        ...defaultFetchOptions().headers,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(overlay),
     })
   )

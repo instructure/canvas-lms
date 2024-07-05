@@ -88,20 +88,20 @@ test("Does not default to '.tool_content_wrapper' if more than one tool is prese
 test('does not allow setting a height smaller than the min tool height', () => {
   const launchResizer = new ToolLaunchResizer(100)
   launchResizer.resize_tool_content_wrapper(50, $('#second-wrapper'))
-  equal($('#second-wrapper').height(), 100)
+  equal($('#second-wrapper iframe').height(), 100)
 })
 
 test('resizes the specified container', () => {
   const launchResizer = new ToolLaunchResizer(100)
   launchResizer.resize_tool_content_wrapper(500, $('#second-wrapper'))
-  equal($('#second-wrapper').height(), 500)
+  equal($('#second-wrapper iframe').height(), 500)
 })
 
 test('resizes the first container if no container is specified and only one container exists', () => {
   document.querySelector('#second-wrapper').className = ''
   const launchResizer = new ToolLaunchResizer(100)
   launchResizer.resize_tool_content_wrapper(500)
-  equal($('.tool_content_wrapper').height(), 500)
+  equal($('.tool_content_wrapper iframe').height(), 500)
   document.querySelector('#second-wrapper').className = 'tool_content_wrapper'
 })
 
@@ -109,7 +109,7 @@ test('does not resize any other container', () => {
   const launchResizer = new ToolLaunchResizer(100)
   launchResizer.resize_tool_content_wrapper(300, $('.tool_content_wrapper'))
   launchResizer.resize_tool_content_wrapper(500, $('#second-wrapper'))
-  equal($('.tool_content_wrapper').height(), 300)
+  equal($('.tool_content_wrapper iframe').height(), 300)
 })
 
 test('defaults the resize height to 450px if no `#tool_content` is found', () => {
@@ -119,7 +119,7 @@ test('defaults the resize height to 450px if no `#tool_content` is found', () =>
   })
   const launchResizer = new ToolLaunchResizer()
   launchResizer.resize_tool_content_wrapper()
-  equal($('.tool_content_wrapper').height(), 450)
+  equal($('.tool_content_wrapper iframe').height(), 450)
   document.querySelectorAll('#another_tool_content').forEach(element => {
     element.id = 'tool_content'
   })
@@ -133,7 +133,7 @@ test('defaults the resize height to 450px if non numeric value passed and no `#t
   })
   const launchResizer = new ToolLaunchResizer()
   launchResizer.resize_tool_content_wrapper({a: 1})
-  equal($('.tool_content_wrapper').height(), 450)
+  equal($('.tool_content_wrapper iframe').height(), 450)
   document.querySelectorAll('#another_tool_content').forEach(element => {
     element.id = 'tool_content'
   })

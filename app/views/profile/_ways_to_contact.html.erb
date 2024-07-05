@@ -179,7 +179,9 @@
 <div id="communication_channels" style="display: none;">
 <ul>
   <li><a href="#register_email_address"><%= t('links.email', "Email") %></a></li>
+  <% if otp_via_sms_in_us_region? %>
   <li><a href="#register_sms_number"><%= t('links.text_sms', "Text (SMS)") %></a></li>
+  <% end %>
   <% if @user.account.feature_enabled?(:slack_notifications)%>
     <li><a href="#register_slack_handle"><%= t("Slack Email") %></a></li>
   <% end %>
@@ -224,59 +226,32 @@
   <% end %>
 <% end %>
 
-<%= form_tag communication_channels_url, {:id => "register_sms_number", :class => 'form-horizontal'} do %>
-    <input type="hidden" name="communication_channel[type]" value="sms"/>
-
-    <% if @user.account.feature_enabled?(:international_sms) %>
-      <div class="control-group">
-        <label for="communication_channel_sms_country" class='control-label'><%=t('Country or Region') %></label>
-        <div class="controls">
-          <select class="user_selected country" id="communication_channel_sms_country" name="communication_channel_sms_country">
-            <option value="undecided">[<%= t('Select Country or Region') %>]</option>
-            <% CommunicationChannel.country_codes.each do |(numeric_code, name, use_email)| %>
-              <option value="<%= numeric_code %>" data-use-email="<%= use_email %>"><%= name %></option>
-            <% end %>
-          </select>
-        </div>
-      </div>
-    <% end %>
+<% if otp_via_sms_in_us_region? %>
+  <%= form_tag communication_channels_url, {:id => "register_sms_number", :class => 'form-horizontal'} do %>
+    <input type="hidden" name="communication_channel[type]" value="sms">
 
     <div class="control-group">
-      <p class="Text"><%= t('SMS is only used for Multi-Factor Authentication (if enabled for your account).')%><p>
-      <label for='communication_channel_sms_number' class='control-label'><%= t('labels.cell_number', 'Cell Number') %></label>
+      <p class="text"><%= t("SMS is only used for Multi-Factor Authentication (if enabled for your account).")%><p>
+
+      <label for="communication_channel_sms_number" class="control-label">
+        <%= t("Mobile Number") %>
+      </label>
+
       <div class="controls">
-        <input type="tel" name="communication_channel_sms_number" id='communication_channel_sms_number' class="user_selected sms_number" aria-describedby="communication_channel_sms_number_description" /><br/>
-        <span style="font-size: 0.8em; color: #a44" id='communication_channel_sms_number_description' class="should_be_10_digits">
-          <%= t('validations.should_be_10_digits', "should be 10-digit number") %>
-        </span>
-        <span class="intl_rates_may_apply">
-          <%= t('International text messaging rates may apply.') %>
+        <input type="tel" name="communication_channel_sms_number" id="communication_channel_sms_number" class="user_selected sms_number" aria-describedby="communication_channel_sms_number_description">
+
+        <br>
+
+        <span style="font-size: 0.8em; color: #a44; display: none;" id="communication_channel_sms_number_description" class="should_be_10_digits">
+          <%= t("should be 10-digit number") %>
         </span>
       </div>
     </div>
 
-    <div class="control-group sms_email_group">
-      <label for='communication_channel_carrier' class='control-label'><%= t('labels.carrier', 'Carrier') %></label>
-      <div class="controls">
-        <select class="user_selected carrier" id='communication_channel_carrier'>
-          <option value="other"><%= t(:default_carrier_option, '[Select Carrier]') %></option>
-          <% CommunicationChannel.sms_carriers_by_name.each do |(carrier, domain)| %>
-            <option value="#@<%= domain %>"><%= carrier %></option>
-          <% end %>
-          <option value="other"><%= t('Other Carrier') %></option>
-        </select>
-      </div>
-    </div>
-
-    <div class="control-group sms_email_group">
-      <label for='communication_channel_sms_email' class='control-label'><%= t('labels.sms_email', 'SMS Email') %></label>
-      <div class="controls">
-        <input type="email" name="communication_channel_sms_email" class="sms_email" id="communication_channel_sms_email" aria-describedby="communication_channel_sms_number communication_channel_carrier" />
-      </div>
-    </div>
     <div class="form-actions">
       <button type="submit" class="btn btn-primary"><%= t('buttons.register_sms', "Register SMS") %></button>
     </div>
+  <% end %>
 <% end %>
 
 </div>

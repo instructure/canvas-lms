@@ -96,6 +96,18 @@ describe "assignments show page assign to" do
     expect(assign_to_in_tray("Remove #{@student1.name}")[0]).to be_displayed
   end
 
+  it "does not show cards for ADHOC override with no students" do
+    @assignment1.assignment_overrides.create!(set_type: "ADHOC")
+
+    get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
+
+    AssignmentPage.click_assign_to_button
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+    # only renders the everyone card
+    expect(module_item_assign_to_card.length).to be(1)
+  end
+
   it "saves and shows override updates when tray reaccessed" do
     get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
 

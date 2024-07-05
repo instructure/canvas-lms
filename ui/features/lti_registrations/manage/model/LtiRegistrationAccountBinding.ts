@@ -20,6 +20,7 @@ import {z} from 'zod'
 import {ZLtiRegistrationId} from './LtiRegistrationId'
 import {ZUserId} from './UserId'
 import {ZAccountId} from './AccountId'
+import {ZUser} from './User'
 
 export const ZLtiRegistrationAccountBindingId = z.string().brand('LtiRegistrationAccountBindingId')
 export type LtiRegistrationAccountBindingId = z.infer<typeof ZLtiRegistrationAccountBindingId>
@@ -31,8 +32,8 @@ export const ZLtiRegistrationAccountBinding = z.object({
   workflow_state: z.string(),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
-  created_by: ZUserId,
-  updated_by: ZUserId,
+  created_by: ZUser.optional().nullable(),
+  updated_by: ZUser.optional().nullable(),
 })
 
 export type LtiRegistrationAccountBinding = z.infer<typeof ZLtiRegistrationAccountBinding>

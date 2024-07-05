@@ -43,6 +43,7 @@ describe('Grading Schemes Management Tests', () => {
         contextId="1"
         contextType="Course"
         archivedGradingSchemesEnabled={false}
+        defaultAccountGradingSchemeEnabled={false}
         onGradingSchemesChanged={() => {}}
         {...props}
       />
@@ -151,6 +152,23 @@ describe('Grading Schemes Management Tests', () => {
         fireEvent.change(input, {target: {value: 'Carrot Potato Scheme'}})
         expect(getByTestId('grading-scheme-row-')).toBeInTheDocument()
       })
+    })
+  })
+
+  describe('default account grading scheme FF enabled', () => {
+    it('shows the default account grading scheme selector if the context is an account', () => {
+      const {getByText} = renderGradingSchemesManagement({
+        defaultAccountGradingSchemeEnabled: true,
+        contextType: 'Account',
+      })
+      expect(getByText('Account default grading scheme')).toBeInTheDocument()
+    })
+
+    it('does not show the default account grading scheme selector if the context is a course', () => {
+      const {queryByText} = renderGradingSchemesManagement({
+        defaultAccountGradingSchemeEnabled: true,
+      })
+      expect(queryByText('Account default grading scheme')).not.toBeInTheDocument()
     })
   })
 })

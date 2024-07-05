@@ -210,7 +210,7 @@ describe('RubricForm Tests', () => {
       const criteriaRowIndexes = queryAllByTestId('rubric-criteria-row-index')
       expect(criteriaRows.length).toEqual(2)
       expect(criteriaRowDescriptions[0]).toHaveTextContent(criteria[0].description)
-      expect(criteriaRowDescriptions[1]).toHaveTextContent(criteria[1].description ?? '')
+      expect(criteriaRowDescriptions[1]).toHaveTextContent(criteria[1].longDescription ?? '')
       expect(criteriaRowLongDescriptions[0]).toHaveTextContent(criteria[0].longDescription ?? '')
       expect(criteriaRowPoints[0]).toHaveTextContent(criteria[0].points.toString())
       expect(criteriaRowPoints[1]).toHaveTextContent(criteria[1].points.toString())

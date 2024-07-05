@@ -344,6 +344,9 @@
     "complex_numbers_a543d004": {
         "message": "Komplekse tal"
     },
+    "compose_44c904f4": {
+        "message": "Komponere"
+    },
     "computer_1d7dfa6f": {
         "message": "Datamaskin"
     },
@@ -370,6 +373,9 @@
     },
     "coproduct_e7838082": {
         "message": "Koprodukt"
+    },
+    "copy_9748f9f": {
+        "message": "Kopi"
     },
     "copyright_holder_66ee111": {
         "message": "Rettshavar:"
@@ -1814,6 +1820,9 @@
     "result_index_of_max_7db5ad8b": {
         "message": "Resultat { index } av { max }."
     },
+    "retry_ebd5f8ba": {
+        "message": "Prøv på nytt"
+    },
     "rho_a0244a36": {
         "message": "Rho"
     },
@@ -1963,6 +1972,9 @@
     },
     "shortcut_911d6255": {
         "message": "Snarveg"
+    },
+    "show_all_967a90f0": {
+        "message": "Vis alt"
     },
     "show_audio_options_b489926b": {
         "message": "Vis lydalternativ"

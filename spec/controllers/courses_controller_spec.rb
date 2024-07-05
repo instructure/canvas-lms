@@ -2238,6 +2238,24 @@ describe CoursesController do
       end
     end
 
+    context "COURSE.is_published" do
+      before do
+        user_session(@teacher)
+      end
+
+      it "is set to true if the course is published" do
+        get "show", params: { id: @course.id }
+        expect(controller.js_env[:COURSE][:is_published]).to be(true)
+      end
+
+      it "is set to false if the course is not published" do
+        @course.workflow_state = "claimed"
+        @course.save!
+        get "show", params: { id: @course.id }
+        expect(controller.js_env[:COURSE][:is_published]).to be(false)
+      end
+    end
+
     context "when logged in as an observer with multiple student associations" do
       before do
         @student2 = User.create!
@@ -4350,6 +4368,12 @@ describe CoursesController do
       group.reload
     end
 
+    let(:section1) { course.course_sections.create!(name: "a") }
+    let(:section2) { course.course_sections.create!(name: "b") }
+    let(:section3) { course.course_sections.create!(name: "c") }
+    let(:section4) { course.course_sections.create!(name: "d") }
+    let(:section5) { course.course_sections.create!(name: "e") }
+
     it "does not set pagination total_pages/last page link" do
       user_session(teacher)
       # need two pages or the first page will also be the last_page
@@ -4407,6 +4431,35 @@ describe CoursesController do
       json = json_parse(response.body)
       expect(json[0]).to include({ "id" => student2.id })
       expect(json[1]).to include({ "id" => student1.id })
+    end
+
+    it "list sections alphabetically" do
+      user_session(teacher)
+      course.enroll_student(student1, section: section5, enrollment_state: "active", allow_multiple_enrollments: true)
+      course.enroll_student(student1, section: section4, enrollment_state: "active", allow_multiple_enrollments: true)
+      course.enroll_student(student1, section: section3, enrollment_state: "active", allow_multiple_enrollments: true)
+      course.enroll_student(student1, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
+      course.enroll_student(student1, section: section1, enrollment_state: "active", allow_multiple_enrollments: true)
+
+      get "users", params: {
+        course_id: course.id,
+        format: "json",
+        include: ["enrollments"],
+      }
+
+      json = json_parse(response.body)
+      section_ids = json.first["enrollments"].map { |enrollment| enrollment["course_section_id"] } # rubocop:disable Rails/Pluck
+      # excluding the last element since it corresponds to the default section for the course
+      # with section name "Unnamed Course"
+      expect(section_ids.first(5)).to eq(
+        [
+          section1.id,
+          section2.id,
+          section3.id,
+          section4.id,
+          section5.id
+        ]
+      )
     end
   end
 

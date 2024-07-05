@@ -43,6 +43,11 @@
       padding:.2em .4em;
       line-height:1.5;
       zoom:1;
+      color: $ic-color-dark;
+
+      .secondary {
+        color: $ic-color-medium-lighter;
+      }
 
       &.ui-state-hover,
       &.ui-state-active,
@@ -51,6 +56,10 @@
         font-weight: normal;
         margin: -1px;
         color: white;
+
+        .secondary {
+          color: white;
+        }
       }
     }
   }

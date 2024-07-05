@@ -260,6 +260,16 @@ export const DiscussionThreadContainer = props => {
     )
   }
 
+  threadActions.push(
+    <ThreadingToolbar.MarkAsRead
+      key={`mark-as-read-${props.discussionEntry._id}`}
+      delimiterKey={`mark-as-read-delimiter-${props.discussionEntry._id}`}
+      isRead={props.discussionEntry.entryParticipant?.read}
+      authorName={getDisplayName(props.discussionEntry)}
+      onClick={toggleUnread}
+    />
+  )
+
   if (props.depth === 0 && props.discussionEntry.lastReply) {
     threadActions.push(
       <ThreadingToolbar.Expansion
@@ -676,11 +686,14 @@ const DiscussionSubentries = props => {
     if (subentries.length > 0 && subentriesIds !== loadedSubentriesIds) {
       if (loadedSubentries.length < subentries.length) {
         setTimeout(() => {
-          setLoadedSubentries(previousloadedSubentries =>
-            previousloadedSubentries.concat(
-              subentries.slice(loadedSubentries.length, loadedSubentries.length + 10)
-            )
-          )
+          setLoadedSubentries(previousLoadedSubentries => {
+            const previousLoadedSubentriesIds = previousLoadedSubentries.map(({_id}) => _id)
+            const newLoadedSubentries = subentries
+              .slice(loadedSubentries.length, loadedSubentries.length + 10)
+              .filter(({_id}) => !previousLoadedSubentriesIds.includes(_id))
+
+            return [...previousLoadedSubentries, ...newLoadedSubentries]
+          })
         }, 500)
       } else {
         // There is a mismatch of IDs, so we need to reset the loadedSubentries

@@ -37,7 +37,7 @@ module InstLLMHelper
         return
       end
 
-      raise "InstLLMHelper rate limiting requires Redis to be enabled for the Canvas instance. You may remove the 'rate_limit' option from the LLMConfig to disable rate limiting." unless Canvas.redis
+      raise "InstLLMHelper rate limiting requires Redis to be enabled for the Canvas instance. You may remove the 'rate_limit' option from the LLMConfig to disable rate limiting." unless Canvas.redis_enabled?
 
       limit = llm_config.rate_limit[:limit]
       period = llm_config.rate_limit[:period]

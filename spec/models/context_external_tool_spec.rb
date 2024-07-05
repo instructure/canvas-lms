@@ -3689,6 +3689,7 @@ describe ContextExternalTool do
         external_tool_collaboration_model(
           context: course,
           title: "Indirect Collaboration",
+          root_account_id: course.root_account_id,
           url:
         )
       end

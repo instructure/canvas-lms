@@ -22,22 +22,24 @@ import {ZLtiConfiguration} from '../lti_tool_configuration/LtiConfiguration'
 import {ZLtiImsToolConfiguration} from './LtiImsToolConfiguration'
 import {ZLtiImsRegistrationId} from './LtiImsRegistrationId'
 import {ZDeveloperKeyId} from '../developer_key/DeveloperKeyId'
+import {ZLtiRegistrationId} from '../LtiRegistrationId'
 
 export const ZLtiImsRegistration = z.object({
   id: ZLtiImsRegistrationId,
   lti_tool_configuration: ZLtiImsToolConfiguration,
+  lti_registration_id: ZLtiRegistrationId,
   developer_key_id: ZDeveloperKeyId,
-  overlay: ZRegistrationOverlay.nullable(),
-  application_type: z.string().optional(),
+  overlay: ZRegistrationOverlay.optional().nullable(),
+  application_type: z.string().optional().nullable(),
   grant_types: z.array(z.string()),
   response_types: z.array(z.string()),
   redirect_uris: z.array(z.string()),
   initiate_login_uri: z.string(),
   client_name: z.string(),
   jwks_uri: z.string(),
-  logo_uri: z.string().optional(),
+  logo_uri: z.string().optional().nullable(),
   token_endpoint_auth_method: z.string(),
-  contacts: z.array(z.string()),
+  contacts: z.array(z.string()).optional().nullable(),
   client_uri: z.string().optional().nullable(),
   policy_uri: z.string().optional().nullable(),
   tos_uri: z.string().optional().nullable(),

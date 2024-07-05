@@ -74,7 +74,7 @@ const IconPicker = ({iconName, onSelect}: IconPickerProps) => {
   }
 
   return (
-    <View as="div" margin="small" background="secondary" borderWidth="small" maxWidth="17rem">
+    <View as="div" margin="small" borderWidth="small" maxWidth="17rem">
       <Flex wrap="wrap" gap="small" justifyItems="space-between" margin="x-small">
         {Object.keys(iconMap).map(icon => {
           const Icon = iconMap[icon]

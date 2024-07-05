@@ -298,6 +298,7 @@ export const AddressBookContainer = props => {
       addFilterHistory({
         context: {contextID: item.id, contextName: item.name, totalRecipientCount: item.userCount},
       })
+      setInputValue('')
     } else if (isSubmenu) {
       addFilterHistory({
         context: null,

@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../common"
+require_relative "pages/course_people_modal"
 
 describe "people" do
   include_context "in-process server selenium tests"
@@ -565,11 +566,7 @@ describe "people" do
       get "/courses/#{@course.id}/users"
       f(".StudentEnrollment .icon-more").click
       fln("Edit Sections").click
-      f(".token_input.browsable").click
-      section_input_element = driver.find_element(:name, "token_capture")
-      section_input_element.send_keys("section2")
-      f(".last.context").click
-      wait_for_ajaximations
+      CoursePeople.select_from_section_autocomplete("section2")
       ff(".ui-button-text")[1].click
       wait_for_ajaximations
       expect(ff(".StudentEnrollment")[0]).to include_text("section2")
@@ -582,7 +579,7 @@ describe "people" do
       get "/courses/#{@course.id}/users"
       f(".StudentEnrollment .icon-more").click
       fln("Edit Sections").click
-      fln("Remove user from section2").click
+      find_button("Remove user from section2").click
       ff(".ui-button-text")[1].click
       wait_for_ajaximations
       expect(ff(".StudentEnrollment")[0]).not_to include_text("section2")
@@ -594,11 +591,7 @@ describe "people" do
       get "/courses/#{@course.id}/users"
       f(".DesignerEnrollment .icon-more").click
       fln("Edit Sections").click
-      f(".token_input.browsable").click
-      section_input_element = driver.find_element(:name, "token_capture")
-      section_input_element.send_keys("section2")
-      f(".last.context").click
-      wait_for_ajaximations
+      CoursePeople.select_from_section_autocomplete("section2")
       ff(".ui-button-text")[1].click
       wait_for_ajaximations
       expect(ff(".DesignerEnrollment")[0]).to include_text("section2")
@@ -634,19 +627,16 @@ describe "people" do
       expect(f("#user_sections li.cannot_remove").text).to include @course.default_section.name
 
       # add another section (not via SIS) and ensure it remains editable
-      f(".token_input.browsable").click
-      section_input_element = driver.find_element(:name, "token_capture")
-      section_input_element.send_keys("section2")
-      f(".last.context").click
-      wait_for_ajaximations
-      expect(f("a[title='Remove user from section2']")).not_to be_nil
+      CoursePeople.select_from_section_autocomplete("section2")
+      find_button("Remove user from section2")
+      expect(find_button("Remove user from section2")).not_to be_nil
       f(".ui-dialog-buttonset .btn-primary").click
       wait_for_ajaximations
 
       ff(".icon-more")[1].click
       fln("Edit Sections").click
       expect(f("#user_sections li.cannot_remove").text).to include @course.default_section.name
-      expect(f("a[title='Remove user from section2']")).not_to be_nil
+      expect(find_button("Remove user from section2")).not_to be_nil
     end
   end
 

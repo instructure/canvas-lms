@@ -682,6 +682,17 @@ describe DeveloperKey do
       expect(newly_added_routes).to be_empty, error_message
     end
 
+    it "ensures scopes are sorted" do
+      error_message = <<~TEXT
+        The scopes in spec/lib/token_scopes/last_known_accepted_scopes.rb are not sorted.
+
+        Please sort them by path and then by verb.
+      TEXT
+
+      scopes = TokenScopesHelper::SpecHelper.last_known_accepted_scopes
+      expect(scopes).to eql(scopes.sort_by { |s| [s[1], s[0]] }), error_message
+    end
+
     context "when api token scoping FF is enabled" do
       let(:valid_scopes) do
         %w[url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code

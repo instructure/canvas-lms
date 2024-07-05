@@ -108,6 +108,7 @@ export default ({
           color="primary"
           onClick={onClose}
           screenReaderLabel={I18n.t('Close')}
+          data-testid="peer-review-modal-close-button"
         />
         <View as="div">
           <View as="div" margin="small 0" textAlign="center">

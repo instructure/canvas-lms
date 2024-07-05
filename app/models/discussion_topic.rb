@@ -1735,7 +1735,9 @@ class DiscussionTopic < ActiveRecord::Base
       # assignment exists and isn't assigned to user (differentiated assignments)
       if for_assignment?
         next false unless assignment.visible_to_user?(user)
-      elsif Account.site_admin.feature_enabled?(:selective_release_backend)
+      # Announcements can be section specific, but that is already handled above.
+      # Eventually is_section_specific will be replaced with assignment overrides, and then announcements will need to be handled
+      elsif !is_announcement && Account.site_admin.feature_enabled?(:selective_release_backend)
         next false unless visible_to_user?(user)
       end
 
@@ -1772,22 +1774,49 @@ class DiscussionTopic < ActiveRecord::Base
   def low_level_locked_for?(user, opts = {})
     return false if opts[:check_policies] && grants_right?(user, :read_as_admin)
 
-    RequestCache.cache(locked_request_cache_key(user)) do
-      locked = false
-      if delayed_post_at && delayed_post_at > Time.now
-        locked = { object: self, unlock_at: delayed_post_at }
-      elsif lock_at && lock_at < Time.now
-        locked = { object: self, lock_at:, can_view: true }
-      elsif !opts[:skip_assignment] && (l = assignment&.low_level_locked_for?(user, opts))
-        locked = l
-      elsif could_be_locked && (item = locked_by_module_item?(user, opts))
-        locked = { object: self, module: item.context_module }
-      elsif locked? # nothing more specific, it's just locked
-        locked = { object: self, can_view: true }
-      elsif (l = root_topic&.low_level_locked_for?(user, opts)) # rubocop:disable Lint/DuplicateBranch
-        locked = l
+    if Account.site_admin.feature_enabled?(:selective_release_backend)
+      RequestCache.cache(locked_request_cache_key(user)) do
+        locked = false
+        # if graded, we only care to check the topic's base dates, then defer to checking if the assignment is locked
+        # if ungraded, there's no assignment, and thus we want the topic's overridden availability dates for the user
+        topic_for_user = assignment.present? ? self : overridden_for(user)
+        # prefer unlock_at, but fall back to delayed_post_at for DiscussionTopics until the latter is removed
+        overridden_unlock_at = topic_for_user.unlock_at
+        overridden_unlock_at ||= topic_for_user.delayed_post_at if topic_for_user.respond_to?(:delayed_post_at)
+        overridden_lock_at = topic_for_user.lock_at
+        if overridden_unlock_at && overridden_unlock_at > Time.now
+          locked = { object: self, unlock_at: overridden_unlock_at }
+        elsif overridden_lock_at && overridden_lock_at < Time.now
+          locked = { object: self, lock_at: overridden_lock_at, can_view: true }
+        elsif !opts[:skip_assignment] && (l = assignment&.low_level_locked_for?(user, opts))
+          locked = l
+        elsif could_be_locked && (item = locked_by_module_item?(user, opts))
+          locked = { object: self, module: item.context_module }
+        elsif locked? # nothing more specific, it's just locked
+          locked = { object: self, can_view: true }
+        elsif (l = root_topic&.low_level_locked_for?(user, opts)) # rubocop:disable Lint/DuplicateBranch
+          locked = l
+        end
+        locked
       end
-      locked
+    else
+      RequestCache.cache(locked_request_cache_key(user)) do
+        locked = false
+        if delayed_post_at && delayed_post_at > Time.now
+          locked = { object: self, unlock_at: delayed_post_at }
+        elsif lock_at && lock_at < Time.now
+          locked = { object: self, lock_at:, can_view: true }
+        elsif !opts[:skip_assignment] && (l = assignment&.low_level_locked_for?(user, opts))
+          locked = l
+        elsif could_be_locked && (item = locked_by_module_item?(user, opts))
+          locked = { object: self, module: item.context_module }
+        elsif locked? # nothing more specific, it's just locked
+          locked = { object: self, can_view: true }
+        elsif (l = root_topic&.low_level_locked_for?(user, opts)) # rubocop:disable Lint/DuplicateBranch
+          locked = l
+        end
+        locked
+      end
     end
   end
 

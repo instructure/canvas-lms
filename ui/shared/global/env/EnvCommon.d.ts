@@ -201,6 +201,7 @@ export interface EnvCommon {
   K5_HOMEROOM_COURSE: string
   K5_SUBJECT_COURSE: string
   LOCALE_TRANSLATION_FILE: string
+  DEFAULT_DUE_TIME?: string
 
   FEATURES: Partial<
     Record<

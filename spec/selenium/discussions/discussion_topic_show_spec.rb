@@ -375,6 +375,7 @@ describe "Discussion Topic Show" do
         wait_for_assign_to_tray_spinner
         expect(module_item_assign_to_card.last).not_to contain_css(due_date_input_selector)
         expect(module_item_assign_to_card.last).not_to contain_css(reply_to_topic_due_date_input_selector)
+        expect(module_item_assign_to_card.last).not_to contain_css(required_replies_due_date_input_selector)
       end
 
       it "shows due date inputs on graded discussion" do
@@ -403,6 +404,52 @@ describe "Discussion Topic Show" do
         RoleOverride.create!(context: @course.account, permission: "moderate_forum", role: teacher_role, enabled: false)
         get "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
         expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
+      end
+    end
+
+    context "student availability" do
+      before :once do
+        student_in_course(active_all: true)
+        @topic.update!(message: "a very cool discussion")
+      end
+
+      before do
+        user_session(@student)
+      end
+
+      it "shows discussion body for unlocked discussions" do
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        expect(Discussion.discussion_page_body).to include_text("a very cool discussion")
+      end
+
+      it "shows lock indication for discussions locked by discussion's unlock_at date" do
+        @topic.update!(unlock_at: 1.day.from_now)
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        expect(Discussion.discussion_page_body).to include_text("This topic is locked until")
+        expect(Discussion.discussion_page_body).not_to include_text("a very cool discussion")
+      end
+
+      it "shows lock indication for discussions locked by discussion's lock_at date" do
+        @topic.update!(lock_at: 1.day.ago)
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        expect(Discussion.discussion_page_body).to include_text("This topic is closed for comments")
+        expect(Discussion.discussion_page_body).to include_text("a very cool discussion")
+      end
+
+      it "shows lock indication for discussions locked by student override unlock_at" do
+        ao = @topic.assignment_overrides.create!(unlock_at: 1.day.from_now, unlock_at_overridden: true)
+        ao.assignment_override_students.create!(user: @student)
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        expect(Discussion.discussion_page_body).to include_text("This topic is locked until")
+        expect(Discussion.discussion_page_body).not_to include_text("a very cool discussion")
+      end
+
+      it "shows lock indication for discussions locked by student override lock_at" do
+        ao = @topic.assignment_overrides.create!(lock_at: 1.day.ago, lock_at_overridden: true)
+        ao.assignment_override_students.create!(user: @student)
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        expect(Discussion.discussion_page_body).to include_text("This topic is closed for comments")
+        expect(Discussion.discussion_page_body).to include_text("a very cool discussion")
       end
     end
 

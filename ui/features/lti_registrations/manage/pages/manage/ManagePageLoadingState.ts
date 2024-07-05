@@ -22,11 +22,18 @@ import type {LtiRegistration} from '../../model/LtiRegistration'
 import type {ManageSearchParams} from './ManageSearchParams'
 import type {FetchRegistrations, DeleteRegistration} from '../../api/registrations'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {genericError} from '../../../common/lib/apiResult/ApiResult'
+import {genericError, formatApiResultError} from '../../../common/lib/apiResult/ApiResult'
+import type {AccountId} from '../../model/AccountId'
 
 export const MANAGE_APPS_PAGE_LIMIT = 15
 
 const I18n = useI18nScope('lti_registrations')
+
+export const refreshRegistrations = () => {
+  window.dispatchEvent(new Event(REFRESH_LTI_REGISTRATIONS_EVENT_TYPE))
+}
+
+const REFRESH_LTI_REGISTRATIONS_EVENT_TYPE = 'refresh_lti_registrations'
 
 export type ManagePageLoadingState =
   | {
@@ -80,8 +87,8 @@ const LIMIT = 15
  */
 export const mkUseManagePageState =
   (apiFetchRegistrations: FetchRegistrations, apiDeleteRegistration: DeleteRegistration) =>
-  (params: ManageSearchParams) => {
-    const {q, sort, dir, page} = params
+  (params: ManageSearchParams & {accountId: AccountId}) => {
+    const {accountId, q, sort, dir, page} = params
     const [state, setState] = React.useState<ManagePageLoadingState>({
       _type: 'not_requested',
     })
@@ -100,10 +107,11 @@ export const mkUseManagePageState =
       }))
 
       return apiFetchRegistrations({
+        accountId,
         sort,
         dir,
         query: q || '',
-        offset: (page - 1) * LIMIT,
+        page,
         limit: LIMIT,
       })
         .then(result => {
@@ -118,7 +126,7 @@ export const mkUseManagePageState =
                   }
                 : {
                     _type: 'error',
-                    message: result._type === 'Exception' ? result.error.message : result.message,
+                    message: formatApiResultError(result),
                   }
             } else {
               return prev
@@ -131,7 +139,20 @@ export const mkUseManagePageState =
             message: I18n.t(`Error retrieving registrations`),
           })
         })
-    }, [sort, dir, q, page])
+    }, [accountId, sort, dir, q, page])
+
+    // Todo: this is a technique to refresh the list from outside the component
+    // if this state gets refactored to a zustand store, then we can remove this
+    React.useEffect(() => {
+      const listener = () => {
+        console.log('refreshing')
+        refreshRef.current?.()
+      }
+      window.addEventListener(REFRESH_LTI_REGISTRATIONS_EVENT_TYPE, listener)
+      return () => {
+        window.removeEventListener(REFRESH_LTI_REGISTRATIONS_EVENT_TYPE, listener)
+      }
+    }, [])
 
     // Refresh whenever search params (and thus refreshRef.current) change
     React.useEffect(() => {
@@ -163,7 +184,7 @@ export const mkUseManagePageState =
       (registration: LtiRegistration) => {
         setStale()
 
-        return apiDeleteRegistration(registration.id)
+        return apiDeleteRegistration(registration.account_id, registration.id)
           .catch(() =>
             genericError(
               // TODO: log more info about the error? send to Sentry?

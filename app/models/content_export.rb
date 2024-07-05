@@ -602,6 +602,11 @@ class ContentExport < ActiveRecord::Base
     end
   end
 
+  def prepare_new_quizzes_export
+    set_contains_new_quizzes_settings
+    mark_waiting_for_external_tool if contains_new_quizzes?
+  end
+
   def set_contains_new_quizzes_settings
     settings[:contains_new_quizzes] = contains_new_quizzes?
   end

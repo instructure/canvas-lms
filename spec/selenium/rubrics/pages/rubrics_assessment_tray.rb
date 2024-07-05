@@ -27,6 +27,10 @@ class RubricAssessmentTray
       f("[data-testid='enhanced-rubric-assessment-tray']")
     end
 
+    def traditional_grid_rubric_assessment_view
+      f("[data-testid='rubric-assessment-traditional-view']")
+    end
+
     def traditional_grid_rating_button(criterion_id, rating_index)
       f("[data-testid^='traditional-criterion-#{criterion_id}'][data-testid$='-ratings-#{rating_index}']")
     end

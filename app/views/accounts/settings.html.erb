@@ -445,22 +445,45 @@
             <% end %>
           </fieldset>
         <% end %>
-        <% if !@account.site_admin? && @account.primary_settings_root_account? %>
+        <% if @account.primary_settings_root_account? %>
           <fieldset>
-            <legend><%= t("Personal Pronouns") %></legend>
+            <legend><%= t("Personal Profile Settings") %></legend>
             <%= f.fields_for :settings do |settings| %>
-              <%= settings.check_box :can_add_pronouns, :checked => @account.settings[:can_add_pronouns], class: "element_toggler", "aria-controls": "personal_pronouns_options" %>
-              <%= settings.label :can_add_pronouns, en: "Enable Personal Pronouns" %>
-              <div id="personal_pronouns_options" <%= hidden(true) unless @account.settings[:can_add_pronouns] %>>
-                <%= settings.check_box :can_change_pronouns, :checked => @account.can_change_pronouns? %>
-                <%= settings.label :can_change_pronouns, en: "Allow users to change their pronouns in Canvas" %>
-                <% js_env(PRONOUNS_LIST: ((@account.pronouns.presence || Pronouns.default_pronouns)))
-                js_bundle :available_pronouns_list %>
+              <% if @account.grants_right?(@current_user, :manage_site_settings) %>
+                <div>
+                  <%= settings.check_box :enable_profiles, :checked => @account.settings[:enable_profiles] %>
+                  <%= settings.label :enable_profiles, :en => "Enable Profiles" %>
+                </div>
+              <% end %>
+              <% if !@account.site_admin? && @account.root_account? %>
+                <div>
+                  <%= settings.check_box :enable_name_pronunciation, :checked => @account.enable_name_pronunciation? %>
+                  <%= settings.label :enable_name_pronunciation, :en => "Enable name pronunciation" %>
+                </div>
+              <% end %>
+              <% if !@account.site_admin?  %>
+                <%= settings.check_box :can_add_pronouns, :checked => @account.settings[:can_add_pronouns], class: "element_toggler", "aria-controls": "personal_pronouns_options" %>
+                <%= settings.label :can_add_pronouns, en: "Enable Personal Pronouns" %>
+                <div id="personal_pronouns_options" <%= hidden(true) unless @account.settings[:can_add_pronouns] %>>
+                  <div id="change_personal_pronouns">
+                    <%= settings.check_box :can_change_pronouns, :checked => @account.can_change_pronouns? %>
+                    <%= settings.label :can_change_pronouns, en: "Allow users to change their pronouns in Canvas" %>
+                  </div>
+                    <% js_env(PRONOUNS_LIST: ((@account.pronouns.presence || Pronouns.default_pronouns)))
+                    js_bundle :available_pronouns_list %>
+                </div>
+              <% end %>
+              <div>
+                <%= settings.check_box :users_can_edit_name, :checked => @account.users_can_edit_name? %>
+                <%= settings.label :users_can_edit_name, :en => "Users can edit their name" %>
+              </div>
+              <div>
+                <%= settings.check_box :users_can_edit_profile, :checked => @account.users_can_edit_profile? %>
+                <%= settings.label :users_can_edit_profile, :en => "Users can edit their profile" %>
               </div>
             <% end %>
           </fieldset>
         <% end %>
-
         <% if !@account.site_admin? && @account.root_account? && @account.grants_right?(@current_user, :manage_site_settings) %>
           <% TermsOfService.ensure_terms_for_account(@account) %>
           <% js_bundle :terms_of_service_modal%>
@@ -654,16 +677,11 @@
                   <%= settings.label :show_scheduler, :en => "Enable Scheduler" %>
                 </div>
                 <div>
-                  <%= settings.check_box :enable_profiles, :checked => @account.settings[:enable_profiles] %>
-                  <%= settings.label :enable_profiles, :en => "Enable Profiles" %>
-                </div>
-                <div>
                   <%= settings.check_box :limit_parent_app_web_access, :checked => @account.settings[:limit_parent_app_web_access] %>
                   <%= settings.label :limit_parent_app_web_access, :en => "Limit access to Canvas web from the Canvas Parent app" %>
                 </div>
               <% end %>
               <%# end of :manage_site_settings %>
-
               <div>
                 <%= settings.check_box :sub_account_includes, checked: @account.settings[:sub_account_includes] %>
                 <%= settings.label :sub_account_includes, :en => "Let sub-accounts use the Theme Editor to customize their own branding" %>
@@ -719,25 +737,10 @@
                   </tr>
                 </table>
               <% end %>
-              <% if !@account.site_admin? && @account.root_account? %>
-                <div>
-                  <%= settings.check_box :enable_name_pronunciation, :checked => @account.enable_name_pronunciation? %>
-                  <%= settings.label :enable_name_pronunciation, :en => "Enable name pronunciation" %>
-                </div>
-              <% end %>
-              <div>
-                <%= settings.check_box :users_can_edit_name, :checked => @account.users_can_edit_name? %>
-                <%= settings.label :users_can_edit_name, :en => "Users can edit their name" %>
-              </div>
-              <div>
-                <%= settings.check_box :users_can_edit_profile, :checked => @account.users_can_edit_profile? %>
-                <%= settings.label :users_can_edit_profile, :en => "Users can edit their profile" %>
-              </div>
               <div>
                 <%= settings.check_box :users_can_edit_comm_channels, :checked => @account.users_can_edit_comm_channels? %>
                 <%= settings.label :users_can_edit_comm_channels, :en => "Users can edit their communication channels" %>
               </div>
-
               <div>
                 <%= settings.check_box :edit_institution_email, :checked => @account.edit_institution_email? %>
                 <%= settings.label     :edit_institution_email, :en => "Users can delete their institution-assigned email address" %>

@@ -123,13 +123,13 @@ export default class CanvasMediaRecorder extends React.Component {
     this.removeIndicatorBar()
     this.toggleBackgroundItems(false)
     const closeButton = dialog.querySelector('a.ui-dialog-titlebar-close')
-    closeButton.click()
+    closeButton?.click()
   }
 
   handleFinishClick = () => {
     const dialog = this.dialogRef.current
     const finishButton = dialog.querySelector('#screen_capture_finish_button')
-    finishButton.click()
+    finishButton?.click()
     this.showModal()
     this.dialogRef.current = null
     this.removeIndicatorBar()
@@ -137,8 +137,10 @@ export default class CanvasMediaRecorder extends React.Component {
 
   showModal = () => {
     const dialog = this.dialogRef.current
-    dialog.style.display = 'block'
-    this.toggleBackgroundItems(false)
+    if (dialog) {
+      dialog.style.display = 'block'
+      this.toggleBackgroundItems(false)
+    }
   }
 
   hideModal = () => {
@@ -162,6 +164,13 @@ export default class CanvasMediaRecorder extends React.Component {
     }
   }
 
+  handleStopShareClick = (status) => {
+    if (status === "PREVIEWSAVE") {
+      this.showModal()
+      this.removeIndicatorBar()
+    }
+  }
+
   render() {
     if (ENV.studio_media_capture_enabled) {
       return (
@@ -170,6 +179,7 @@ export default class CanvasMediaRecorder extends React.Component {
             <ScreenCapture
               translations={translations}
               onCompleted={this.saveFile}
+              onChange={this.handleStopShareClick}
               // give the finish button time to render, that's how we tell if it's a screen share
               onStreamInitialized={() => setTimeout(this.onRecordingStart, 250)}
               // allows you to include the current tab in the screen share

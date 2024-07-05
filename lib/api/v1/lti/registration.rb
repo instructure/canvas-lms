@@ -30,6 +30,10 @@ module Api::V1::Lti::Registration
   # Serializes a list of LTI registrations.
   # @param includes [Array<Symbol>] Accepted values: [:configuration, :account_binding]
   def lti_registrations_json(registrations, user, session, context, includes: [])
+    if includes.include?(:account_binding)
+      Lti::Registration.preload_account_bindings(registrations, context)
+    end
+
     registrations.map { |r| lti_registration_json(r, user, session, context, includes:) }
   end
 
@@ -43,6 +47,7 @@ module Api::V1::Lti::Registration
       json["lti_version"] = registration.lti_version
       json["icon_url"] = registration.icon_url
       json["dynamic_registration"] = true if registration.dynamic_registration?
+      json["developer_key_id"] = registration.developer_key&.global_id
 
       if registration.created_by.present?
         json["created_by"] = user_json(registration.created_by, user, session, [], context)

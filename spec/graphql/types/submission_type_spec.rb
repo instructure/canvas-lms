@@ -23,7 +23,7 @@ require_relative "../graphql_spec_helper"
 describe Types::SubmissionType do
   before(:once) do
     student_in_course(active_all: true)
-    @assignment = @course.assignments.create! name: "asdf", points_possible: 10
+    @assignment = @course.assignments.create!(name: "asdf", submission_types: "online_text_entry", points_possible: 10)
     @submission = @assignment.grade_student(@student, score: 8, grader: @teacher, student_entered_score: 13).first
   end
 
@@ -802,9 +802,65 @@ describe Types::SubmissionType do
   end
 
   describe "previewUrl" do
-    it "returns the preview URL" do
-      expected_url = "http://test.host/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?preview=1"
-      expect(submission_type.resolve("previewUrl")).to eq expected_url
+    let(:preview_url) { submission_type.resolve("previewUrl") }
+
+    it "returns the preview URL when a student has submitted" do
+      @assignment.submit_homework(@student, body: "test")
+      expected_url = "http://test.host/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?preview=1&version=0"
+      expect(preview_url).to eq expected_url
+    end
+
+    it "returns nil when the student has not submitted and has not been graded" do
+      expect(preview_url).to be_nil
+    end
+
+    it "returns nil when the student has not submitted but has been graded" do
+      @assignment.grade_student(@student, score: 8, grader: @teacher)
+      expect(preview_url).to be_nil
+    end
+
+    context "external tool submissions" do
+      before do
+        @assignment.update!(submission_types: "external_tool")
+      end
+
+      let(:query_params) { Rack::Utils.parse_query(URI(preview_url).query).with_indifferent_access }
+
+      it "returns the external tool URL" do
+        @assignment.submit_homework(
+          @student,
+          submission_type: "basic_lti_launch",
+          url: "http://anexternaltoolsubmission.com"
+        )
+        expect(preview_url).to include "/courses/#{@course.id}/external_tools/retrieve"
+      end
+
+      it "includes the grade_by_question_enabled query param when it's a new quiz" do
+        tool = @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://somenewquiz.com/launch"
+        )
+        @assignment.update!(external_tool_tag_attributes: { content: tool })
+        url = "http://anexternaltoolsubmission.com"
+        @assignment.submit_homework(
+          @student,
+          submission_type: "basic_lti_launch",
+          url:
+        )
+        expect(query_params[:url]).to eq "#{url}?grade_by_question_enabled=false"
+      end
+
+      it "excludes the grade_by_question_enabled query param when it's not a new quiz" do
+        @assignment.submit_homework(
+          @student,
+          submission_type: "basic_lti_launch",
+          url: "http://anexternaltoolsubmission.com"
+        )
+        expect(query_params[:url]).not_to include "grade_by_question_enabled"
+      end
     end
 
     it "includes a 'version' query param that corresponds to the attempt number - 1 (and NOT the associated submission version number)" do
@@ -816,6 +872,18 @@ describe Types::SubmissionType do
         expect(@submission.attempt).to eq 1
         expect(@submission.versions.maximum(:number)).to eq 2
         expect(submission_type.resolve("previewUrl")).to eq expected_url
+      end
+    end
+
+    context "whent the assignment is a discussion topic" do
+      before do
+        @assignment.update!(submission_types: "discussion_topic")
+        @discussion_topic = @assignment.discussion_topic
+      end
+
+      it "returns the preview URL for the discussion topic" do
+        @discussion_topic.discussion_entries.create!(user: @student, message: "I have a lot to say about this topic")
+        expect(preview_url).to eq "http://test.host/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}?embed=true"
       end
     end
   end

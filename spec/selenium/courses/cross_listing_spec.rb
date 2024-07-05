@@ -31,7 +31,7 @@ describe "cross-listing" do
       active_enrollment: true
     ).course
 
-    @course2.update_attribute(:name, "my course")
+    @course2.update_attribute(:name, "Course 2")
     @section = @course1.course_sections.first
     get "/courses/#{@course1.id}/sections/#{@section.id}"
   end
@@ -130,5 +130,44 @@ describe "cross-listing" do
     expect(f("#uncrosslist_form")).to be_displayed
     submit_form("#uncrosslist_form")
     keep_trying_until { driver.current_url.match(%r{courses/#{course.id}}) }
+  end
+
+  context "course search results" do
+    it "displays course name and term name when course does not have SIS ID" do
+      f(".crosslist_link").click
+
+      # search for course
+      search_field = f("#course_autocomplete_id_lookup")
+      search_field.click
+      search_field.clear
+      search_field.send_keys(@course2.name)
+
+      search_results = f("#ui-id-1")
+      first_search_result = search_results.find_elements(tag_name: "li")[0]
+
+      # Sample search result:
+      # Course 2
+      # Term: Default Term
+      expect(first_search_result.text).to match(/#{@course2.name}\nTerm: #{@course2.enrollment_term.name}/)
+    end
+
+    it "displays course name, term name and SIS ID when course has SIS ID" do
+      @course2.update_attribute(:sis_source_id, "123")
+      f(".crosslist_link").click
+
+      # search for course
+      search_field = f("#course_autocomplete_id_lookup")
+      search_field.click
+      search_field.clear
+      search_field.send_keys(@course2.name)
+
+      search_results = f("#ui-id-1")
+      first_search_result = search_results.find_elements(tag_name: "li")[0]
+
+      # Sample search result:
+      # Course 2
+      # SID ID: 123 | Term: Default Term
+      expect(first_search_result.text).to match(/#{@course2.name}\nSID ID: #{@course2.sis_source_id} | Term: #{@course2.enrollment_term.name}/)
+    end
   end
 end

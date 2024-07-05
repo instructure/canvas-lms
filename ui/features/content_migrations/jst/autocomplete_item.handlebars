@@ -1,6 +1,14 @@
-<li aria-label="{{label}} ({{term}})">
+<li aria-label="{{label}} {{sis_id}} ({{term}})">
   <a>
     <div>{{label}}</div>
-    <div><small><em>{{term}}</em></small></div>
+    {{#if sis_id}}
+      {{#if term}}
+        <div class="secondary"><small>{{#t}}SIS ID:{{/t}} {{sis_id}} | {{#t}}Term:{{/t}} {{term}}</small></div>
+      {{else}}
+        <div class="secondary"><small>{{#t}}SIS ID:{{/t}} {{sis_id}}</small></div>
+      {{/if}}
+    {{else}}
+      <div class="secondary"><small>{{#t}}Term:{{/t}} {{term}}</small></div>
+    {{/if}}
   </a>
 </li>

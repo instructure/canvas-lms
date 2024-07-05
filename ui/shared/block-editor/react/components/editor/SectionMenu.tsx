@@ -20,12 +20,13 @@ import React, {useCallback, useEffect, useState} from 'react'
 import {useEditor, type Node} from '@craftjs/core'
 import {Menu} from '@instructure/ui-menu'
 import {
-  getCloneTree,
+  // getCloneTree,
   scrollIntoViewWithCallback,
   getScrollParent,
   getSectionLocation,
   type SectionLocation,
 } from '../../utils'
+import {type AddSectionPlacement} from './types'
 
 function triggerScrollEvent() {
   const scrollingContainer = getScrollParent()
@@ -33,16 +34,18 @@ function triggerScrollEvent() {
   scrollingContainer.dispatchEvent(scrollEvent)
 }
 
-type SectionMenuProps = {
+export type SectionMenuProps = {
   onEditSection?: (node: Node) => void
-  onDuplicateSection?: (node: Node) => void
+  onAddSection: (placement: AddSectionPlacement) => void
+  // onDuplicateSection?: (node: Node) => void
   onMoveUp?: (node: Node) => void
   onMoveDown?: (node: Node) => void
   onRemove?: (node: Node) => void
 }
 const SectionMenu = ({
   onEditSection,
-  onDuplicateSection,
+  onAddSection,
+  // onDuplicateSection,
   onMoveUp,
   onMoveDown,
   onRemove,
@@ -72,28 +75,28 @@ const SectionMenu = ({
     }
   }, [onEditSection, selected])
 
-  const handleDuplicateSection = useCallback(() => {
-    if (onDuplicateSection) {
-      onDuplicateSection(selected.get())
-    } else {
-      const currentNode = selected.get()
-      const parentId = currentNode.data.parent
-      if (!parentId) return
+  // const handleDuplicateSection = useCallback(() => {
+  //   if (onDuplicateSection) {
+  //     onDuplicateSection(selected.get())
+  //   } else {
+  //     const currentNode = selected.get()
+  //     const parentId = currentNode.data.parent
+  //     if (!parentId) return
 
-      const newTree = getCloneTree(currentNode.id, query)
-      const siblings = query.node(parentId).descendants()
-      const myIndex = siblings.indexOf(currentNode.id)
-      actions.addNodeTree(newTree, parentId, myIndex + 1)
-      actions.selectNode(newTree.rootNodeId)
-      requestAnimationFrame(() => {
-        scrollIntoViewWithCallback(
-          query.node(newTree.rootNodeId).get().dom,
-          {block: 'nearest'},
-          triggerScrollEvent
-        )
-      })
-    }
-  }, [actions, onDuplicateSection, query, selected])
+  //     const newTree = getCloneTree(currentNode.id, query)
+  //     const siblings = query.node(parentId).descendants()
+  //     const myIndex = siblings.indexOf(currentNode.id)
+  //     actions.addNodeTree(newTree, parentId, myIndex + 1)
+  //     actions.selectNode(newTree.rootNodeId)
+  //     requestAnimationFrame(() => {
+  //       scrollIntoViewWithCallback(
+  //         query.node(newTree.rootNodeId).get().dom,
+  //         {block: 'nearest'},
+  //         triggerScrollEvent
+  //       )
+  //     })
+  //   }
+  // }, [actions, onDuplicateSection, query, selected])
 
   const handleMoveUp = useCallback(() => {
     if (onMoveUp) {
@@ -145,10 +148,19 @@ const SectionMenu = ({
     }
   }, [actions, onRemove, selected])
 
+  const handleAddSection = useCallback(
+    (where: 'prepend' | 'append') => {
+      onAddSection(where)
+    },
+    [onAddSection]
+  )
+
   return (
     <Menu show={true} onToggle={() => {}}>
       {onEditSection ? <Menu.Item onSelect={handleEditSection}>EditSection</Menu.Item> : null}
       {/* <Menu.Item onSelect={handleDuplicateSection}>Duplicate</Menu.Item> */}
+      <Menu.Item onSelect={handleAddSection.bind(null, 'prepend')}>+ Section Above</Menu.Item>
+      <Menu.Item onSelect={handleAddSection.bind(null, 'append')}>+ Section Below</Menu.Item>
       <Menu.Item
         onSelect={handleMoveUp}
         disabled={sectionLocation === 'top' || sectionLocation === 'alone'}

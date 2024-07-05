@@ -953,7 +953,7 @@ class EnrollmentsApiController < ApplicationController
   #
   # @example_response
   #   {
-  #     "is_provider": false, "is_recipient": true
+  #     "is_provider": false, "is_recipient": true, "can_provide": false
   #   }
   def show_temporary_enrollment_status
     GuardRail.activate(:secondary) do
@@ -968,8 +968,10 @@ class EnrollmentsApiController < ApplicationController
             end
           is_provider = enrollment_scope.temporary_enrollment_recipients_for_provider(user).exists?
           is_recipient = enrollment_scope.temporary_enrollments_for_recipient(user).exists?
+          # mirror provider enrollments listed in temp enrollment assign modal
+          can_provide = enrollment_scope.active_by_date.for_user(user.id).present?
 
-          render json: { is_provider:, is_recipient: }
+          render json: { is_provider:, is_recipient:, can_provide: }
         else
           render_unauthorized_action and return false
         end

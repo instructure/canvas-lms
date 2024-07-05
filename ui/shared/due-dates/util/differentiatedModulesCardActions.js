@@ -187,6 +187,8 @@ const CardActions = {
       unlock_at_overridden: !!dates.unlock_at,
       reply_to_topic_due_at: dates.reply_to_topic_due_at,
       reply_to_topic_due_at_overridden: !!dates.reply_to_topic_due_at,
+      required_replies_due_at: dates.required_replies_due_at,
+      required_replies_due_at_overridden: !!dates.required_replies_due_at,
       rowKey,
     }
 

@@ -1833,7 +1833,7 @@ describe "Default Account Reports" do
           )
         end
 
-        it "returns data with feature enabled" do
+        it "returns data with feature enabled in provisioning report" do
           parameters = {}
           parameters["enrollments"] = true
           parameters["enrollment_filter"] = "TeacherEnrollment"
@@ -1874,7 +1874,7 @@ describe "Default Account Reports" do
                                           @user4.id.to_s]]
         end
 
-        it "does not return data with feature disabled" do
+        it "does not return data with feature disabled in provisioning report" do
           @account.disable_feature!(:temporary_enrollments)
           parameters = {}
           parameters["enrollments"] = true
@@ -1912,6 +1912,60 @@ describe "Default Account Reports" do
                                           "TeacherEnrollment",
                                           "false",
                                           @enrollment.id.to_s]]
+        end
+
+        it "returns data with feature enabled in SIS export" do
+          parameters = {}
+          parameters["enrollments"] = true
+          parameters["enrollment_filter"] = "TeacherEnrollment"
+          parsed = read_report("sis_export_csv", { params: parameters, order: [1, 0] })
+
+          expect(parsed.length).to eq 2
+          expect(parsed).to match_array [["SIS_COURSE_ID_1",
+                                          @user2.pseudonyms.first.sis_user_id,
+                                          "teacher",
+                                          teacher_role(root_account_id: @account.id).id.to_s,
+                                          nil,
+                                          "active",
+                                          nil,
+                                          "false",
+                                          @user4.pseudonyms.first.sis_user_id],
+                                         ["SIS_COURSE_ID_1",
+                                          @user4.pseudonyms.first.sis_user_id,
+                                          "teacher",
+                                          teacher_role(root_account_id: @account.id).id.to_s,
+                                          @section1.sis_source_id,
+                                          "active",
+                                          nil,
+                                          "false",
+                                          nil]]
+        end
+
+        it "does not return data with feature disabled in SIS export" do
+          @account.disable_feature!(:temporary_enrollments)
+
+          parameters = {}
+          parameters["enrollments"] = true
+          parameters["enrollment_filter"] = "TeacherEnrollment"
+          parsed = read_report("sis_export_csv", { params: parameters, order: [1, 0] })
+
+          expect(parsed.length).to eq 2
+          expect(parsed).to match_array [["SIS_COURSE_ID_1",
+                                          @user2.pseudonyms.first.sis_user_id,
+                                          "teacher",
+                                          teacher_role(root_account_id: @account.id).id.to_s,
+                                          nil,
+                                          "active",
+                                          nil,
+                                          "false"],
+                                         ["SIS_COURSE_ID_1",
+                                          @user4.pseudonyms.first.sis_user_id,
+                                          "teacher",
+                                          teacher_role(root_account_id: @account.id).id.to_s,
+                                          @section1.sis_source_id,
+                                          "active",
+                                          nil,
+                                          "false"]]
         end
       end
 

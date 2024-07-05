@@ -201,6 +201,22 @@ export const CommonMigratorControls = ({
     return result
   }, [canImportAsNewQuizzes, canOverwriteAssessmentContent, canAdjustDates, dateAdjustments])
 
+  const allContentText = (
+    <>
+      <Text size="medium" color="primary">
+        {I18n.t('All content')}
+      </Text>
+      <br />
+      <View as="div" margin="x-small 0 0 0">
+        <Text size="small" color="primary">
+          {I18n.t(
+            'Note the following content types will be imported: Course Settings, Syllabus Body, Modules, Assignments, Quizzes, Question Banks, Discussion Topics, Pages, Announcements, Rubrics, Files, and Calendar Events.'
+          )}
+        </Text>
+      </View>
+    </>
+  )
+
   return (
     <>
       {canSelectContent && (
@@ -213,7 +229,7 @@ export const CommonMigratorControls = ({
             <RadioInput
               name="selective_import"
               value="non_selective"
-              label={I18n.t('All content')}
+              label={allContentText}
               onChange={(e: React.SyntheticEvent<Element, Event>) => {
                 const target = e.target as HTMLInputElement
                 setSelectiveImport(!target.checked)

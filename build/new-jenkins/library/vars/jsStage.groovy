@@ -18,7 +18,7 @@
 
 import groovy.transform.Field
 
-@Field static final KARMA_NODE_COUNT = 7
+@Field static final KARMA_NODE_COUNT = 4
 @Field static final JEST_NODE_COUNT = 5
 
 def jestNodeRequirementsTemplate(index) {

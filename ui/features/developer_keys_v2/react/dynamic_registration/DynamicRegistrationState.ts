@@ -267,7 +267,8 @@ export const useDynamicRegistrationState = create<
         const onMessage = (message: MessageEvent) => {
           if (
             message.data.subject === 'org.imsglobal.lti.close' &&
-            message.origin === originOfUrl(state.dynamicRegistrationUrl)
+            // Message is coming from an iframe in an iframe to handle CSP restrictions. (dr_iframe / lti tool iframe)
+            message.origin === window.location.origin
           ) {
             window.removeEventListener('message', onMessage)
             loadingRegistration(registrationToken, state.dynamicRegistrationUrl)

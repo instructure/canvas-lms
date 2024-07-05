@@ -26,6 +26,7 @@ import {Link} from '@instructure/ui-link'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {IconDiscussionReply2Line} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('discussion_posts')
 
@@ -40,10 +41,12 @@ export function Reply({...props}) {
         mobile: {
           textSize: 'small',
           itemSpacing: 'none small 0 none',
+          isMobile: true,
         },
         desktop: {
           textSize: undefined,
           itemSpacing: undefined,
+          isMobile: false,
         },
       }}
       render={responsiveProps => (
@@ -55,6 +58,9 @@ export function Reply({...props}) {
             data-testid="threading-toolbar-reply"
             interaction={props.isReadOnly ? 'disabled' : 'enabled'}
             ref={props.replyButtonRef}
+            renderIcon={
+              !responsiveProps.isMobile && !props.isSplitScreenView && <IconDiscussionReply2Line />
+            }
           >
             <AccessibleContent
               alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}
@@ -102,4 +108,5 @@ Reply.propTypes = {
    */
   isSplitView: PropTypes.bool,
   replyButtonRef: PropTypes.any,
+  isSplitScreenView: PropTypes.bool,
 }

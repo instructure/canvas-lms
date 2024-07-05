@@ -24,6 +24,11 @@ module Factories
     params[:updated_by] ||= params[:created_by]
     params[:account] ||= account_model
     params[:name] ||= "Test Registration"
+    include_binding = params.delete(:bound)
     @lti_registration = Lti::Registration.create!(params)
+    if include_binding
+      lti_registration_account_binding_model(registration: @lti_registration, account: @lti_registration.account, workflow_state: :on)
+    end
+    @lti_registration
   end
 end

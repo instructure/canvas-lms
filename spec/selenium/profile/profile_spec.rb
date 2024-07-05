@@ -109,18 +109,11 @@ describe "profile" do
     end
 
     it "adds a new email address on profile settings page" do
-      @user.account.enable_feature!(:international_sms)
       notification_model(category: "Grading")
       notification_policy_model(notification_id: @notification.id)
 
       get "/profile/settings"
       add_email_link
-
-      f('#communication_channels a[href="#register_sms_number"]').click
-
-      click_option("#communication_channel_sms_country", "United States (+1)")
-      replace_content(f("#register_sms_number #communication_channel_sms_email"), "test@example.com")
-      expect(f('#register_sms_number button[type="submit"]')).to be_displayed
       f('#communication_channels a[href="#register_email_address"]').click
       form = f("#register_email_address")
       test_email = "nobody+1234@example.com"
@@ -207,20 +200,39 @@ describe "profile" do
       end
     end
 
-    it "adds another contact method - sms" do
-      @user.account.enable_feature!(:international_sms)
-      test_cell_number = "8017121011"
-      get "/profile/settings"
-      f(".add_contact_link").click
-      click_option("#communication_channel_sms_country", "United States (+1)")
-      register_form = f("#register_sms_number")
-      register_form.find_element(:css, ".sms_number").send_keys(test_cell_number)
-      click_option("select.user_selected.carrier", "AT&T")
-      driver.action.send_keys(:tab).perform
-      submit_form(register_form)
-      wait_for_ajaximations
-      close_visible_dialog
-      expect(f(".other_channels .path")).to include_text(test_cell_number)
+    describe "adding SMS contact method" do
+      let(:original_region) { Shard.current.database_server.config[:region] }
+
+      after do
+        # reset to original region after each test
+        Shard.current.database_server.config[:region] = original_region
+      end
+
+      it "shows the SMS number registration form when in US region" do
+        # temporarily set to a US region needed for SMS tab to appear
+        Shard.current.database_server.config[:region] = "us-west-2"
+        test_cell_number = "8017121011"
+        get "/profile/settings"
+        f(".add_contact_link").click
+        register_form = f("#register_sms_number")
+        register_form.find_element(:css, ".sms_number").send_keys(test_cell_number)
+        driver.action.send_keys(:tab).perform
+        submit_form(register_form)
+        wait_for_ajaximations
+        close_visible_dialog
+        expect(f(".other_channels .path")).to include_text(test_cell_number)
+      end
+
+      it "shows the email address registration form when not in US region" do
+        # set to a non-US region
+        Shard.current.database_server.config[:region] = "eu-central-1"
+        get "/profile/settings"
+        f(".add_contact_link").click
+        # ensure sms number registration form is not present
+        expect(element_exists?("#register_sms_number")).to be false
+        # ensure email address registration form is shown
+        expect(f("#register_email_address")).to be_present
+      end
     end
 
     it "adds another contact method - slack" do
@@ -331,11 +343,11 @@ describe "profile" do
       @token1 = @user.access_tokens.create! purpose: "token_one"
       @token2 = @user.access_tokens.create! purpose: "token_two"
       get "/profile/settings"
-      fj(".delete_key_link[rel$=#{@token2.id}]").click
+      fj(".delete_key_link[rel$='#{@token2.token_hint}']").click
       expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      check_element_has_focus fj(".delete_key_link[rel$=#{@token1.id}]")
+      check_element_has_focus fj(".delete_key_link[rel$='#{@token1.token_hint}']")
     end
   end
 

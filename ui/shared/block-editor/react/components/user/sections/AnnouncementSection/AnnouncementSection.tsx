@@ -23,9 +23,13 @@ import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
+import {AnnouncementModal} from './AnnouncementModal'
+import {AnnouncementSectionMenu} from './AnnouncementSectionMenu'
+import {AnnouncementView} from './AnnouncementView'
 
 import {IconAnnouncementSolid} from '@instructure/ui-icons'
-import {SectionMenu} from '../../../editor/SectionMenu'
+import {useClassNames} from '@canvas/block-editor/react/utils'
+import {announcements} from '../../../../assets/data/announcements'
 
 const WIDTH = 'auto'
 const HEIGHT = 'auto'
@@ -45,21 +49,57 @@ const AnnouncementSection = ({announcementId}: AnnouncementSectionProps) => {
     connectors: {connect, drag},
   } = useNode()
 
+  const [announcement, setAnnouncement] = useState(() => {
+    const a = announcements.find((entry: any) => entry.id === announcementId)
+    return a
+  })
+
+  const [modalOpen, setModalOpen] = useState(false)
+  const clazz = useClassNames(enabled, {empty: false}, ['section', 'announcement-section'])
+
+  useEffect(() => {
+    const a = announcements.find((entry: any) => entry.id === announcementId)
+    setAnnouncement(a)
+  }, [announcementId])
+
+  const showModal = useCallback(() => {
+    setModalOpen(true)
+  }, [])
+
+  const handleSelectAnnouncement = useCallback(
+    (newAnnouncementId: string) => {
+      setProp((prps: {announcementId: string}) => {
+        prps.announcementId = newAnnouncementId
+      })
+      setModalOpen(false)
+    },
+    [setProp]
+  )
   const renderAnnouncement = () => {
-    return (
-      <div className="announcement-section__empty">
-        {enabled ? (
-          <Button color="primary">Select Announcement</Button>
-        ) : (
-          <Text>No announcement has been selected</Text>
-        )}
-      </div>
-    )
+    if (announcement) {
+      return (
+        <div className="announcement-section__content">
+          <AnnouncementView announcement={announcement} />
+        </div>
+      )
+    } else {
+      return (
+        <div className="announcement-section__empty">
+          {enabled ? (
+            <Button onClick={showModal} color="primary">
+              Select Announcement
+            </Button>
+          ) : (
+            <Text>No announcement has been selected</Text>
+          )}
+        </div>
+      )
+    }
   }
 
   return (
     <div
-      className="announcement-section"
+      className={clazz}
       ref={ref => {
         ref && connect(drag(ref))
       }}
@@ -70,20 +110,28 @@ const AnnouncementSection = ({announcementId}: AnnouncementSectionProps) => {
         <span className="block-header-title">Announcement</span>
       </div>
       {renderAnnouncement()}
-      <Flex justifyItems="space-between" padding="small">
-        <Flex.Item shouldGrow={true} />
-      </Flex>
+      {enabled && (
+        <AnnouncementModal
+          open={modalOpen}
+          currentAnnouncementId={announcementId}
+          onClose={() => setModalOpen(false)}
+          onSelect={handleSelectAnnouncement}
+        />
+      )}
     </div>
   )
 }
 
 AnnouncementSection.craft = {
   displayName: 'Announcement',
+  defaultProps: {
+    announcementId: undefined,
+  },
   custom: {
     isSection: true,
   },
   related: {
-    sectionMenu: SectionMenu,
+    sectionMenu: AnnouncementSectionMenu,
   },
 }
 

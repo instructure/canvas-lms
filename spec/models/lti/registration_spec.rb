@@ -129,6 +129,16 @@ RSpec.describe Lti::Registration do
       end
     end
 
+    context "when account is not root account" do
+      subject { registration.account_binding_for(subaccount) }
+
+      let(:subaccount) { account_model(parent_account: account) }
+
+      it "returns the binding for the nearest root account" do
+        expect(subject).to eq(account_binding)
+      end
+    end
+
     context "when account is the registration's account" do
       it "returns the correct account_binding" do
         expect(subject).to eq(account_binding)
@@ -140,6 +150,100 @@ RSpec.describe Lti::Registration do
 
       it "returns nil" do
         expect(subject).to be_nil
+      end
+    end
+
+    context "with site admin registration" do
+      specs_require_sharding
+
+      let(:registration) { Shard.default.activate { lti_registration_model(account: Account.site_admin) } }
+      let(:site_admin_binding) { Shard.default.activate { lti_registration_account_binding_model(registration:, workflow_state: "on", account: Account.site_admin) } }
+      let(:account) { @shard2.activate { account_model } }
+
+      before do
+        site_admin_binding # instantiate before test runs
+      end
+
+      it "prefers site admin binding" do
+        expect(@shard2.activate { subject }).to eq(site_admin_binding)
+      end
+
+      context "when site admin binding is allow" do
+        before do
+          site_admin_binding.update!(workflow_state: "allow")
+        end
+
+        it "ignores site admin binding" do
+          expect(@shard2.activate { subject }).to be_nil
+        end
+      end
+    end
+  end
+
+  describe ".preload_account_bindings" do
+    subject { Lti::Registration.preload_account_bindings(registrations, account) }
+
+    let(:account) { account_model }
+    let(:registrations) { [] }
+
+    context "when account is nil" do
+      let(:account) { nil }
+
+      it "returns nil" do
+        expect(subject).to be_nil
+      end
+    end
+
+    context "when account is not root account" do
+      let(:root_account) { account_model }
+      let(:account) { account_model(parent_account: root_account) }
+
+      let(:registrations) { [lti_registration_model(account: root_account, bound: true)] }
+
+      it "preloads bindings for nearest root account" do
+        subject
+        expect(registrations).to all(have_attributes(account_binding: be_present))
+      end
+    end
+
+    context "with account-level registrations" do
+      let(:registrations) do
+        [
+          lti_registration_model(account:, bound: true, name: "first"),
+          lti_registration_model(account:, bound: true, name: "second")
+        ]
+      end
+
+      it "preloads account_binding on registrations" do
+        subject
+        expect(registrations).to all(have_attributes(account_binding: be_present))
+      end
+    end
+
+    context "with site admin registrations" do
+      let(:registrations) do
+        [
+          lti_registration_model(account:, bound: true, name: "first"),
+          lti_registration_model(account: Account.site_admin, bound: true, name: "second")
+        ]
+      end
+
+      it "preloads bindings from site admin registrations" do
+        subject
+        expect(registrations).to all(have_attributes(account_binding: be_present))
+      end
+
+      context "with sharding" do
+        specs_require_sharding
+
+        let(:account_registration) { @shard2.activate { lti_registration_model(account:, bound: true, name: "account") } }
+        let(:site_admin_registration) { Shard.default.activate { lti_registration_model(account: Account.site_admin, bound: true, name: "site admin") } }
+        let(:registrations) { [account_registration, site_admin_registration] }
+
+        it "preloads bindings from site admin registrations" do
+          @shard2.activate { subject }
+          expect(registrations).to all(have_attributes(account_binding: be_present))
+        end
       end
     end
   end

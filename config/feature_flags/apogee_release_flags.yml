@@ -58,6 +58,9 @@ enhanced_gradebook_filters:
       this flag is enabled, early access to ongoing improvements will be displayed
       automatically with every release. For full details, please see the *Gradebook
       Filters User Group* in the Canvas Community.
+  environments:
+    development:
+      state: on # enable for local development
 message_observers_of_students_who:
   state: hidden
   applies_to: SiteAdmin
@@ -328,7 +331,7 @@ customizable_default_due_time:
       state: allowed_on
 platform_service_speedgrader:
   state: hidden
-  applies_to: SiteAdmin
+  applies_to: Course
   display_name: "SpeedGrader 2: Steel Thread"
   description: This feature provides a new SpeedGrader platform experience.
   environments:

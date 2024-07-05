@@ -23,20 +23,21 @@ describe Lti::RegistrationsController do
     body = response.parsed_body
     body.is_a?(Array) ? body.map(&:with_indifferent_access) : body.with_indifferent_access
   end
+  let(:response_data) do
+    response_json[:data]
+  end
+
+  let_once(:account) { account_model }
+  let_once(:admin) { account_admin_user(name: "A User", account:) }
+
+  before do
+    user_session(admin)
+    account.enable_feature!(:lti_registrations_page)
+  end
 
   describe "GET index" do
-    let_once(:account) { account_model }
-    let_once(:admin) { account_admin_user(account:) }
-
-    before do
-      user_session(admin)
-      account.enable_feature!(:lti_registrations_page)
-    end
-
     context "without user session" do
-      before do
-        remove_user_session
-      end
+      before { remove_user_session }
 
       it "redirects to login page" do
         get :index, params: { account_id: account.id }
@@ -89,12 +90,6 @@ describe Lti::RegistrationsController do
     subject { get url }
 
     let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations" }
-    let(:account) { account_model }
-    let(:admin) { account_admin_user(account:) }
-
-    before do
-      account.enable_feature!(:lti_registrations_page)
-    end
 
     context "correctness verifications" do
       before do
@@ -133,11 +128,6 @@ describe Lti::RegistrationsController do
       end
 
       context "with a user session" do
-        before do
-          user_session(admin)
-          account.enable_feature!(:lti_registrations_page)
-        end
-
         it "is successful" do
           subject
           expect(response).to be_successful
@@ -150,33 +140,164 @@ describe Lti::RegistrationsController do
 
         it "returns a list of registrations" do
           subject
-          expect(response_json[:data].length).to eq(4)
+          expect(response_data.length).to eq(4)
         end
 
         it "has the expected fields in the results" do
           subject
 
-          expect(response_json[:data].first)
+          expect(response_data.first)
             .to include({ account_id: an_instance_of(Integer), name: an_instance_of(String) })
 
-          expect(response_json[:data].first[:account_binding])
+          expect(response_data.first[:account_binding])
             .to include({ workflow_state: an_instance_of(String) })
 
-          expect(response_json[:data].first[:account_binding][:created_by])
+          expect(response_data.first[:account_binding][:created_by])
             .to include({ id: an_instance_of(Integer) })
         end
 
-        it "sorts the results by newest first" do
+        it "sorts the results by newest first by default" do
           lti_registration_model(account:, name: "created just now")
           lti_registration_model(account:, name: "created an hour ago", created_at: 1.hour.ago)
 
           subject
-          expect(response_json[:data].first["name"]).to eq("created just now")
-          expect(response_json[:data].last["name"]).to eq("created an hour ago")
+          expect(response_data.first["name"]).to eq("created just now")
+          expect(response_data.last["name"]).to eq("created an hour ago")
+        end
+
+        context "when sorting by installed_by" do
+          subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=installed_by" }
+
+          before do
+            # Other admin is "A User" -- registrations with an LRAB by B User should be last
+            admin2 = account_admin_user(name: "B User", account:)
+            lti_registration_model(name: "Created by B User", created_by: admin2, account:)
+          end
+
+          it "sorts by the lti_registration_account_binding.created_by" do
+            subject
+            expect(response_data.last["name"]).to eq("Created by B User")
+          end
+
+          context "with the dir=asc parameter" do
+            subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=installed_by&dir=asc" }
+
+            it "puts the results in ascending order" do
+              subject
+              expect(response_data.first["name"]).to eq("Created by B User")
+            end
+          end
+        end
+
+        context "when sorting by name" do
+          subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=name" }
+
+          before do
+            lti_registration_model(account:, name: "AAA registration")
+            lti_registration_model(account:, name: "ZZZ registration")
+          end
+
+          it "sorts by name" do
+            subject
+            expect(response_data.first["name"]).to eq("ZZZ registration")
+            expect(response_data.last["name"]).to eq("AAA registration")
+          end
+
+          context "with the dir=asc parameter" do
+            subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=name&dir=asc" }
+
+            it "puts the results in ascending order" do
+              subject
+              expect(response_data.first["name"]).to eq("AAA registration")
+              expect(response_data.last["name"]).to eq("ZZZ registration")
+            end
+          end
+        end
+
+        context "when sorting by a nil attribute" do
+          subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=nickname" }
+
+          it "treats nil like an empty value" do
+            lti_registration_model(admin_nickname: "a nickname", account:)
+            lti_registration_model(admin_nickname: nil, account:)
+            subject
+            expect(response_data.first["admin_nickname"]).to eq("a nickname")
+          end
+        end
+
+        context "when sorting by a workflow_state" do
+          subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=on" }
+
+          it "does not error if the account binding is nil" do
+            reg = lti_registration_model(account:, name: "no account bindings")
+            # expect it to have no account bindings, just in case we start automatically
+            # creating a default one in the future.
+            expect(reg.lti_registration_account_bindings).to eq([])
+            subject
+            expect(response_data.last["name"]).to eq("no account bindings")
+          end
+        end
+
+        context "with a search query param matching no results" do
+          let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations?query=searchterm" }
+
+          it "finds no registrations" do
+            subject
+            expect(response_data.length).to eq(0)
+          end
+        end
+
+        context "with a search query param matching some results" do
+          # search for "registration no" which should find "Registration no. 1" etc.
+          let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations?query=registration%20no" }
+
+          it "finds matching registrations" do
+            subject
+            # searching "registration no" should find the three registrations titled
+            # "Registration no. N"
+            expect(response_data.length).to eq(3)
+          end
+
+          it "rejects registrations that do not match all terms" do
+            # The name "registration" alone is not enough to match search terms "registration no"
+            incomplete_match = lti_registration_model(account:, name: "registration")
+            subject
+            expect(response_data.pluck(:id)).not_to include(incomplete_match.id)
+          end
+
+          it "finds registrations with matching terms across different model attributes" do
+            multi_attribute_match = lti_registration_model(account:, name: "registration", vendor: "no")
+            subject
+            expect(response_data.pluck(:id)).to include(multi_attribute_match.id)
+          end
+
+          it "includes the current search parameters in the Link header" do
+            subject
+            expect(response.headers["Link"]).to include("?query=registration+no")
+          end
+
+          context "query param validations" do
+            it "returns a 422 if the page param isn't an integer" do
+              get "/api/v1/accounts/#{account.id}/lti_registrations?page=bad"
+              expect(response_json["errors"].first["message"]).to eq("page param should be an integer")
+            end
+
+            it "returns a 422 if the dir param isn't valid" do
+              get "/api/v1/accounts/#{account.id}/lti_registrations?dir=bad"
+              expect(response_json["errors"].first["message"]).to eq("dir param should be asc, desc, or empty")
+            end
+
+            it "returns a 422 if the sort param isn't valid" do
+              get "/api/v1/accounts/#{account.id}/lti_registrations?sort=bad"
+              expect(response_json["errors"].first["message"]).to eq("bad is not a valid field for sorting")
+            end
+          end
         end
       end
 
       context "without user session" do
+        before { remove_user_session }
+
         it "returns 401" do
           subject
           expect(response).to be_unauthorized
@@ -184,9 +305,7 @@ describe Lti::RegistrationsController do
       end
 
       context "with non-admin user" do
-        before do
-          user_session(student_in_course(account:).user)
-        end
+        before { user_session(student_in_course(account:).user) }
 
         it "returns 401" do
           subject
@@ -195,9 +314,7 @@ describe Lti::RegistrationsController do
       end
 
       context "with flag disabled" do
-        before do
-          account.disable_feature!(:lti_registrations_page)
-        end
+        before { account.disable_feature!(:lti_registrations_page) }
 
         it "returns 404" do
           subject
@@ -214,8 +331,6 @@ describe Lti::RegistrationsController do
 
       context "with exactly 15 registrations present" do
         before do
-          user_session(admin)
-
           10.times do |number|
             registration = lti_registration_model(account:, name: "Registration no. #{number}")
             lti_registration_account_binding_model(registration:, account:, workflow_state: "on", created_by: admin)
@@ -236,7 +351,7 @@ describe Lti::RegistrationsController do
 
         it "puts results on one page and does not give a 'next' page in the Link header" do
           subject
-          expect(response_json[:data].length).to eq(15)
+          expect(response_data.length).to eq(15)
 
           # Expect the current pagination link to be given as rel=first, rel=last, and rel=current
           # in the header.
@@ -246,6 +361,19 @@ describe Lti::RegistrationsController do
 
           # Should only be three items in the list (i.e. no "next").
           expect(link_header_values.length).to eq(3)
+        end
+
+        context "with per_page over max" do
+          subject { get url + "?per_page=5" }
+
+          before do
+            stub_const("Api::MAX_PER_PAGE", 3)
+          end
+
+          it "returns max amount" do
+            subject
+            expect(response_data.length).to eq(3)
+          end
         end
 
         context "with 20 registrations present" do
@@ -275,7 +403,7 @@ describe Lti::RegistrationsController do
           it "returns five results on page 2 and says that is the last page" do
             get "#{url}?page=2"
 
-            expect(response_json[:data].length).to eq(5)
+            expect(response_data.length).to eq(5)
 
             %w[current last].each do |link_rel|
               expect(link_header_values).to include("<#{current_pagination_link}>; rel=\"#{link_rel}\"")
@@ -286,24 +414,16 @@ describe Lti::RegistrationsController do
     end
   end
 
-  describe "GET show" do
-    subject { get :show, params: { account_id: account.id, id: registration.id }, format: :json }
+  describe "GET show", type: :request do
+    subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}" }
 
-    let_once(:account) { account_model }
-    let_once(:admin) { account_admin_user(account:) }
     let_once(:registration) { lti_registration_model(account:) }
     let_once(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
 
-    before do
-      user_session(admin)
-      account.enable_feature!(:lti_registrations_page)
-      account_binding
-    end
+    before { account_binding }
 
     context "without user session" do
-      before do
-        remove_user_session
-      end
+      before { remove_user_session }
 
       it "returns 401" do
         subject
@@ -314,9 +434,7 @@ describe Lti::RegistrationsController do
     context "with non-admin user" do
       let(:student) { student_in_course(account:).user }
 
-      before do
-        user_session(student)
-      end
+      before { user_session(student) }
 
       it "returns 401" do
         subject
@@ -325,9 +443,7 @@ describe Lti::RegistrationsController do
     end
 
     context "with flag disabled" do
-      before do
-        account.disable_feature!(:lti_registrations_page)
-      end
+      before { account.disable_feature!(:lti_registrations_page) }
 
       it "returns 404" do
         subject
@@ -337,7 +453,7 @@ describe Lti::RegistrationsController do
 
     context "for nonexistent registration" do
       it "returns 404" do
-        get :show, params: { account_id: account.id, id: registration.id + 1 }, format: :json
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id + 1}"
         expect(response).to be_not_found
       end
     end
@@ -365,21 +481,15 @@ describe Lti::RegistrationsController do
     end
   end
 
-  describe "PUT update" do
-    subject { put :update, params: { account_id: account.id, id: registration.id, admin_nickname: }, format: :json }
+  describe "PUT update", type: :request do
+    subject { put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}", params: { admin_nickname: } }
 
-    let_once(:account) { account_model }
     let_once(:other_admin) { account_admin_user(account:) }
-    let_once(:admin) { account_admin_user(account:) }
     let_once(:registration) { lti_registration_model(account:, created_by: other_admin, updated_by: other_admin) }
     let_once(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
     let_once(:admin_nickname) { "New Name" }
 
-    before do
-      ims_registration
-      user_session(admin)
-      account.enable_feature!(:lti_registrations_page)
-    end
+    before { ims_registration }
 
     it "is successful" do
       subject
@@ -389,9 +499,7 @@ describe Lti::RegistrationsController do
     end
 
     context "without user session" do
-      before do
-        remove_user_session
-      end
+      before { remove_user_session }
 
       it "returns 401" do
         subject
@@ -402,9 +510,7 @@ describe Lti::RegistrationsController do
     context "with non-admin user" do
       let(:student) { student_in_course(account:).user }
 
-      before do
-        user_session(student)
-      end
+      before { user_session(student) }
 
       it "returns 401" do
         subject
@@ -413,9 +519,7 @@ describe Lti::RegistrationsController do
     end
 
     context "with flag disabled" do
-      before do
-        account.disable_feature!(:lti_registrations_page)
-      end
+      before { account.disable_feature!(:lti_registrations_page) }
 
       it "returns 404" do
         subject
@@ -424,9 +528,7 @@ describe Lti::RegistrationsController do
     end
 
     context "with non-dynamic registration" do
-      before do
-        ims_registration.update!(lti_registration: nil)
-      end
+      before { ims_registration.update!(lti_registration: nil) }
 
       it "returns 422" do
         subject
@@ -447,24 +549,16 @@ describe Lti::RegistrationsController do
     end
   end
 
-  describe "DELETE destroy" do
-    subject { delete :destroy, params: { account_id: account.id, id: registration.id }, format: :json }
+  describe "DELETE destroy", type: :request do
+    subject { delete "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}" }
 
-    let_once(:account) { account_model }
-    let_once(:admin) { account_admin_user(account:) }
     let_once(:registration) { lti_registration_model(account:) }
     let_once(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
 
-    before do
-      ims_registration
-      user_session(admin)
-      account.enable_feature!(:lti_registrations_page)
-    end
+    before { ims_registration }
 
     context "without user session" do
-      before do
-        remove_user_session
-      end
+      before { remove_user_session }
 
       it "returns 401" do
         subject
@@ -475,9 +569,7 @@ describe Lti::RegistrationsController do
     context "with non-admin user" do
       let(:student) { student_in_course(account:).user }
 
-      before do
-        user_session(student)
-      end
+      before { user_session(student) }
 
       it "returns 401" do
         subject
@@ -486,9 +578,7 @@ describe Lti::RegistrationsController do
     end
 
     context "with flag disabled" do
-      before do
-        account.disable_feature!(:lti_registrations_page)
-      end
+      before { account.disable_feature!(:lti_registrations_page) }
 
       it "returns 404" do
         subject
@@ -497,9 +587,7 @@ describe Lti::RegistrationsController do
     end
 
     context "with non-dynamic registration" do
-      before do
-        ims_registration.update!(lti_registration: nil)
-      end
+      before { ims_registration.update!(lti_registration: nil) }
 
       it "returns 422" do
         subject
@@ -523,24 +611,14 @@ describe Lti::RegistrationsController do
     end
   end
 
-  describe "POST bind" do
-    subject { post :bind, params: { account_id: account.id, id: registration.id, workflow_state: }, format: :json }
+  describe "POST bind", type: :request do
+    subject { post "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/bind", params: { workflow_state: } }
 
-    let(:root_account) { account_model }
-    let(:account) { root_account }
-    let(:admin) { account_admin_user(account:) }
     let(:registration) { lti_registration_model(account:) }
     let(:workflow_state) { "off" }
 
-    before do
-      user_session(admin)
-      root_account.enable_feature!(:lti_registrations_page)
-    end
-
     context "without user session" do
-      before do
-        remove_user_session
-      end
+      before { remove_user_session }
 
       it "returns 401" do
         subject
@@ -551,9 +629,7 @@ describe Lti::RegistrationsController do
     context "with non-admin user" do
       let(:student) { student_in_course(account:).user }
 
-      before do
-        user_session(student)
-      end
+      before { user_session(student) }
 
       it "returns 401" do
         subject
@@ -562,9 +638,7 @@ describe Lti::RegistrationsController do
     end
 
     context "with flag disabled" do
-      before do
-        account.disable_feature!(:lti_registrations_page)
-      end
+      before { account.disable_feature!(:lti_registrations_page) }
 
       it "returns 404" do
         subject
@@ -574,7 +648,10 @@ describe Lti::RegistrationsController do
 
     context "when model-level validations fail" do
       # for example, when the account is not a root account
-      let(:account) { account_model(parent_account: root_account) }
+      subject { post "/api/v1/accounts/#{child_account.id}/lti_registrations/#{registration.id}/bind", params: { workflow_state: } }
+
+      let(:child_account) { account_model(parent_account: account) }
+      let(:registration) { lti_registration_model(account: child_account) }
 
       it "returns 422" do
         subject
@@ -609,7 +686,7 @@ describe Lti::RegistrationsController do
         expect(account_binding.workflow_state).to eq(workflow_state)
         expect(account_binding.created_by).to eq(admin)
         expect(account_binding.updated_by).to eq(admin)
-        expect(account_binding.root_account_id).to eq(root_account.id)
+        expect(account_binding.root_account_id).to eq(account.id)
       end
     end
 

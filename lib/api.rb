@@ -185,7 +185,7 @@ module Api
   MAX_ID_LENGTH = MAX_ID.to_s.length
   MAX_ID_RANGE = (-MAX_ID...MAX_ID)
   ID_REGEX = /\A\d{1,#{MAX_ID_LENGTH}}\z/
-  UUID_REGEX = /\Auuid:(\w{40,})\z/
+  UUID_REGEX = /\Auuid:([\w|-]{36,})\z/
 
   def self.not_scoped_to_account?(columns, sis_mapping)
     flattened_array_of_columns = [columns].flatten

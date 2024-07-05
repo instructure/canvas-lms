@@ -260,6 +260,9 @@ module Bundler
                   spec_precedences[spec.name] = precedence || :parent
                 end
 
+                lockfile.sources.map! do |source|
+                  parent_lockfile.sources.find { |s| s == source } || source
+                end
                 # replace any duplicate specs with what's in the parent lockfile
                 lockfile.specs.map! do |spec|
                   parent_spec = cache.find_matching_spec(parent_specs, spec)
@@ -268,9 +271,11 @@ module Bundler
 
                   dependency_changes ||= spec != parent_spec
 
-                  new_spec = parent_spec.dup
-                  new_spec.source = spec.source
-                  new_spec
+                  if spec.source != parent_spec.source
+                    parent_spec = parent_spec.dup
+                    parent_spec.source = spec.source
+                  end
+                  parent_spec
                 end
 
                 lockfile.platforms.replace(parent_lockfile.platforms).uniq!
@@ -483,6 +488,13 @@ module Bundler
         # from someone else
         if current_lockfile.exist? && install
           Bundler.settings.temporary(frozen: true) do
+            # it keeps the same sources as the builder, which now shares with
+            # `definition` above; give it its own copy to avoid stomping on it
+            builder.instance_variable_set(
+              :@sources,
+              builder.instance_variable_get(:@sources).dup
+            )
+
             current_definition = builder.to_definition(current_lockfile, {})
             # if something has changed, we skip this step; it's unlocking anyway
             next unless current_definition.no_resolve_needed?
@@ -504,6 +516,14 @@ module Bundler
           previous_ui_level = Bundler.ui.level
           Bundler.ui.level = "warn"
           begin
+            # force a remote resolution if intermediate gems are missing
+            if definition.instance_variable_get(:@locked_spec_with_missing_deps) ||
+               definition.instance_variable_get(:@locked_spec_with_invalid_deps) ||
+               definition.instance_variable_get(:@missing_lockfile_dep) ||
+               definition.instance_variable_get(:@invalid_lockfile_dep)
+              raise SolveFailure
+            end
+
             # this is a horrible hack, to fix what I consider to be a Bundler bug.
             # basically, if you have multiple platform specific gems in your
             # lockfile, and that gem gets unlocked, Bundler will only search

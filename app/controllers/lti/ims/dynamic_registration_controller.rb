@@ -174,6 +174,29 @@ module Lti
         redirect_to account_developer_key_view_url(registration.root_account_id, registration.developer_key_id)
       end
 
+      def dr_iframe
+        @dr_url = params.require(:url)
+        token = CGI.parse(URI.parse(@dr_url).query)["registration_token"].first
+        jwt = Canvas::Security.decode_jwt(token)
+
+        if jwt["root_account_global_id"] != @context.global_id
+          render status: :unauthorized,
+                 json: {
+                   errorMessage: "Invalid root_account_id in registration_token"
+                 }
+          return
+        end
+        if jwt["user_id"] != @current_user.id
+          render status: :unauthorized,
+                 json: {
+                   errorMessage: "registration_token was created for a different user"
+                 }
+          return
+        end
+        request.env["dynamic_reg_url_csp"] = @dr_url
+        render("lti/ims/dynamic_registration/dr_iframe", layout: false, formats: :html)
+      end
+
       private
 
       def render_registration(registration, developer_key)
@@ -263,7 +286,8 @@ module Lti
             { claims: [] },
             :target_link_uri,
             { custom_parameters: ArbitraryStrongishParams::ANYTHING },
-            "https://#{Lti::IMS::Registration::CANVAS_EXTENSION_LABEL}/lti/privacy_level"
+            "https://#{Lti::IMS::Registration::CANVAS_EXTENSION_LABEL}/lti/privacy_level",
+            "https://#{Lti::IMS::Registration::CANVAS_EXTENSION_LABEL}/lti/tool_id"
           ] },
           :client_uri,
           :logo_uri,

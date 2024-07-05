@@ -23,6 +23,7 @@ import {uid} from '@instructure/uid'
 import {Container} from '../../blocks/Container'
 import {ResourceCard} from '../../blocks/ResourceCard'
 import {SectionMenu} from '../../../editor/SectionMenu'
+import {SectionToolbar} from '../../common/SectionToolbar'
 
 type ResourcesSectionInnerProps = {
   children: React.ReactNode
@@ -56,19 +57,23 @@ ResourcesSectionInner.craft = {
   },
 }
 
-// type ResourcesSectionProps = BlockProps
+type ResourcesSectionProps = {
+  background?: string
+}
 
-const ResourcesSection = () => {
+const ResourcesSection = ({background}: ResourcesSectionProps) => {
   const [myId] = useState('resources') // id || uid('resources', 2))
   const [card1Id] = useState(uid('resources__resource-card', 2))
   const [card2Id] = useState(uid('resources__resource-card', 2))
   const [card3Id] = useState(uid('resources__resource-card', 2))
 
+  const backgroundColor = background || ResourcesSection.craft.defaultProps.background
+
   return (
     <Container
       id={myId}
       className="section resources-section"
-      background="#CEF5EA"
+      background={backgroundColor}
       style={{marginBlockEnd: '0.5rem'}}
     >
       <Element id={`${myId}__inner`} is={ResourcesSectionInner} canvas={true}>
@@ -103,11 +108,15 @@ const ResourcesSection = () => {
 
 ResourcesSection.craft = {
   displayName: 'Highlights or services',
+  defaultProps: {
+    background: '#CEF5EA',
+  },
   custom: {
     isSection: true,
   },
   related: {
     sectionMenu: SectionMenu,
+    toolbar: SectionToolbar,
   },
 }
 

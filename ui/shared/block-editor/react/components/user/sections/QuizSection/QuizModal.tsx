@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
@@ -33,6 +33,12 @@ type QuizModalProps = {
 const QuizModal = ({open, currentQuestionId, onClose, onSelect}: QuizModalProps) => {
   const [questionId, setQuestionId] = useState<string | undefined>(currentQuestionId)
   const parser = useRef(new DOMParser())
+
+  useEffect(() => {
+    if (!questionId && quizQuestions.entries.length > 0) {
+      setQuestionId(quizQuestions.entries[0].id)
+    }
+  }, [questionId])
 
   const handleQuestionChange = useCallback(
     (

@@ -28,7 +28,7 @@ describe TokensController do
       end
 
       it "requires being logged in to delete an access token" do
-        delete "destroy", params: { id: 5 }
+        delete "destroy", params: { user_id: "self", id: 5 }
         expect(response).to be_redirect
       end
 
@@ -79,9 +79,9 @@ describe TokensController do
       it "allows deleting an access token" do
         token = @user.access_tokens.create!
         expect(token.user_id).to eq @user.id
-        delete "destroy", params: { id: token.id }
+        delete "destroy", params: { user_id: "self", id: token.id }
         expect(response).to be_successful
-        expect(assigns[:token]).to be_deleted
+        expect(token.reload).to be_deleted
       end
 
       it "does not allow deleting an access token while masquerading" do
@@ -90,7 +90,7 @@ describe TokensController do
         Account.site_admin.account_users.create!(user: @user)
         session[:become_user_id] = user_with_pseudonym.id
 
-        delete "destroy", params: { id: token.id }
+        delete "destroy", params: { user_id: "self", id: token.id }
         assert_status(401)
       end
 
@@ -98,7 +98,7 @@ describe TokensController do
         user2 = User.create!
         token = user2.access_tokens.create!
         expect(token.user_id).to eq user2.id
-        delete "destroy", params: { id: token.id }
+        delete "destroy", params: { user_id: "self", id: token.id }
         assert_status(404)
       end
 

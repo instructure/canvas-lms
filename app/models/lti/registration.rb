@@ -21,7 +21,7 @@ class Lti::Registration < ActiveRecord::Base
   extend RootAccountResolver
   include Canvas::SoftDeletable
 
-  attr_accessor :skip_lti_sync
+  attr_accessor :skip_lti_sync, :account_binding
 
   belongs_to :account, inverse_of: :lti_registrations, optional: false
   belongs_to :created_by, class_name: "User", inverse_of: :created_lti_registrations, optional: true
@@ -41,11 +41,59 @@ class Lti::Registration < ActiveRecord::Base
 
   before_destroy :destroy_associations
 
-  # TODO: this will eventually need to perform the same function as DeveloperKey#account_binding_for,
-  # including checking parent root accounts and Site Admin
+  # Searches for an applicable binding for this Registration and Account in
+  # the given root account, its parent root account (for federated consortia), and Site Admin.
+  # Searches on the current shard, not the Registration's shard.
+  #
+  # @return [Lti::RegistrationAccountBinding | nil]
   def account_binding_for(account)
-    lti_registration_account_bindings.find_by(account: account || self.account)
+    return nil unless account
+    return account_binding if account_binding
+
+    # If subaccount support/bindings are needed in the future, reference
+    # DeveloperKey#account_binding_for and DeveloperKeyAccountBinding#find_in_account_priority
+    # for the correct priority searching logic.
+    unless account.root_account?
+      account = account.root_account
+    end
+
+    account_binding = Lti::RegistrationAccountBinding.find_in_site_admin(self)
+    return account_binding if account_binding
+
+    unless account.primary_settings_root_account?
+      account_binding = account_binding_for_federated_parent(account)
+      return account_binding if account_binding
+    end
+
+    Lti::RegistrationAccountBinding.find_by(registration: self, account:)
   end
+
+  def self.preload_account_bindings(registrations, account)
+    return nil unless account
+
+    # If subaccount support/bindings are needed in the future, reference
+    # DeveloperKey#account_binding_for and DeveloperKeyAccountBinding#find_in_account_priority
+    # for the correct priority searching logic.
+    unless account.root_account?
+      account = account.root_account
+    end
+
+    account_bindings = Lti::RegistrationAccountBinding.where(account:, registration: registrations) +
+                       Lti::RegistrationAccountBinding.find_all_in_site_admin(registrations)
+
+    associate_bindings(registrations, account_bindings)
+  end
+
+  def self.associate_bindings(registrations, account_bindings)
+    registrations_by_id = registrations.index_by(&:global_id)
+
+    account_bindings.each do |acct_binding|
+      global_registration_id = Shard.global_id_for(acct_binding.registration_id, Shard.current)
+      registration = registrations_by_id[global_registration_id]
+      registration.account_binding = acct_binding
+    end
+  end
+  private_class_method :associate_bindings
 
   # Returns true if this Registration is from a different account than the given account.
   #
@@ -99,5 +147,10 @@ class Lti::Registration < ActiveRecord::Base
     developer_key&.update!(name: admin_nickname,
                            workflow_state:,
                            skip_lti_sync: true)
+  end
+
+  # Overridden in MRA, where federated consortia are supported
+  def account_binding_for_federated_parent(_account)
+    nil
   end
 end

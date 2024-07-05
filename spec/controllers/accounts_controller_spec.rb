@@ -1345,6 +1345,24 @@ describe AccountsController do
       expect(response.body).to match(/#{@c2.id}/)
     end
 
+    context "post_manually" do
+      it "gets of a list of courses with post_manually populated if included in the includes param" do
+        admin_logged_in(@account)
+        get "courses_api", params: { account_id: @account.id, include: ["post_manually"] }
+
+        expect(response).to be_successful
+        expect(response.body).to match(/"post_manually":false/)
+      end
+
+      it "gets a list of courses without post_manually populated if it is not included in the includes param" do
+        admin_logged_in(@account)
+        get "courses_api", params: { account_id: @account.id }
+
+        expect(response).to be_successful
+        expect(response.body).not_to match(/"post_manually":false/)
+      end
+    end
+
     it "does not set pagination total_pages/last page link" do
       admin_logged_in(@account)
       get "courses_api", params: { account_id: @account.id, per_page: 1 }
@@ -1371,6 +1389,33 @@ describe AccountsController do
 
       expect(response).to be_successful
       expect(response.body).not_to match(/sections/)
+    end
+
+    context "sort by course status" do
+      before do
+        @c1.workflow_state = "created"
+        @c1.save
+        @c2.workflow_state = "available"
+        @c2.save
+        @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
+        @c3.workflow_state = "completed"
+        @c3.save
+        admin_logged_in(@account)
+      end
+
+      it "is able to sort by status ascending" do
+        get "courses_api", params: { account_id: @account.id, sort: "course_status", order: "asc" }
+
+        expect(response).to be_successful
+        expect(response.body).to match(/"name":"foo".+"name":"bar".+"name":"apple"/)
+      end
+
+      it "is able to sort by status descending" do
+        get "courses_api", params: { account_id: @account.id, sort: "course_status", order: "desc" }
+
+        expect(response).to be_successful
+        expect(response.body).to match(/"name":"apple".+"name":"bar".+"name":"foo"/)
+      end
     end
 
     it "is able to sort courses by name ascending" do

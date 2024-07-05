@@ -81,7 +81,7 @@ describe "discussion assignments" do
       end
     end
 
-    context "when discussion_create feature flag is ON" do
+    context "when discussion_create feature flag is ON", :ignore_js_errors do
       before do
         Account.site_admin.enable_feature!(:discussion_create)
         Account.site_admin.enable_feature!(:react_discussions_post)

@@ -163,7 +163,8 @@ curl \
 | description                                                   | string                                                             | no       | A short description of the tool.                                                                        |
 | messages                                                      | Array<[message](#lti-message-schema)>                              | yes      | Messages supported by the tool.                                                                         |
 | claims                                                        | Array<string>                                                      | yes      | An array of claims to be included in each launch token.                                                 |
-| ht<span>tps://</span>canvas.instructure.com/lti/privacy_level | "public" &#124; "name_only" &#124; "email_only" &#124; "anonymous" | no       | The tool's default privacy level, (determines the PII fields the tool is sent.) defaults to "anonymous" |
+| <span>https://</span>canvas.instructure.com/lti/privacy_level | "public" &#124; "name_only" &#124; "email_only" &#124; "anonymous" | no       | The tool's default privacy level, (determines the PII fields the tool is sent.) defaults to "anonymous" |
+| <span>https://</span>canvas.instructure.com/lti/tool_id | string | no       | This is a tool-provided value that can be anything, and tools often use it to correlate themselves across deployments. Same as the `tool_id` field within the `extensions` array in the [LTI 1.3 manual configuration](file.lti_dev_key_config.html) JSON.|
 
 #### LTI Message schema
 
@@ -222,6 +223,7 @@ example LTI Registration body:
       }
     ],
     "target_link_uri": "http://tool.com/launch",
+    "https://canvas.instructure.com/lti/tool_id": "toolid-123",
     "https://canvas.instructure.com/lti/privacy_level": "public"
   }
 }

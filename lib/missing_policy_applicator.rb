@@ -40,7 +40,7 @@ class MissingPolicyApplicator
               .joins(assignment: { course: [:late_policy, :enrollments] })
               .where("enrollments.user_id = submissions.user_id")
               .preload(:grading_period, assignment: :post_policy, course: [:late_policy, :default_post_policy])
-              .merge(Assignment.published)
+              .merge(AbstractAssignment.published)
               .merge(Enrollment.all_active_or_pending)
               .missing
               .where(score: nil,
@@ -71,6 +71,10 @@ class MissingPolicyApplicator
         updated_at: now,
         workflow_state: "graded"
       )
+
+      if assignment.checkpoint?
+        submissions.each(&:aggregate_checkpoint_submissions)
+      end
 
       if assignment.course.root_account.feature_enabled?(:missing_policy_applicator_emits_live_events)
         Canvas::LiveEvents.delay_if_production.submissions_bulk_updated(submissions)

@@ -23,7 +23,7 @@ class EportfoliosController < ApplicationController
   before_action :require_user, only: [:index, :user_index]
   before_action :reject_student_view_student
   before_action :verified_user_check, only: %i[index user_index create]
-  before_action :get_eportfolio, except: %i[index user_index create]
+  before_action :find_eportfolio, except: %i[index user_index create]
 
   def index
     user_index
@@ -39,26 +39,6 @@ class EportfoliosController < ApplicationController
     add_crumb(t(:crumb, "ePortfolios"))
     @portfolios = @current_user.eportfolios.active.order(:updated_at).to_a
     render :user_index
-  end
-
-  def create
-    if authorized_action(Eportfolio.new, @current_user, :create)
-      @portfolio = @current_user.eportfolios.build(eportfolio_params)
-      respond_to do |format|
-        if @portfolio.save
-          @portfolio.ensure_defaults
-          flash[:notice] = t("notices.created", "ePortfolio successfully created")
-          format.html { redirect_to eportfolio_url(@portfolio) }
-          format.json { render json: @portfolio.as_json(permissions: { user: @current_user, session: }) }
-        else
-          format.html do
-            rce_js_env
-            render :new
-          end
-          format.json { render json: @portfolio.errors, status: :bad_request }
-        end
-      end
-    end
   end
 
   def show
@@ -103,6 +83,26 @@ class EportfoliosController < ApplicationController
         content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom, verifier: @portfolio.uuid), { title: t("titles.feed", "Eportfolio Atom Feed") })
       elsif @portfolio.public
         content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom), { title: t("titles.feed", "Eportfolio Atom Feed") })
+      end
+    end
+  end
+
+  def create
+    if authorized_action(Eportfolio.new, @current_user, :create)
+      @portfolio = @current_user.eportfolios.build(eportfolio_params)
+      respond_to do |format|
+        if @portfolio.save
+          @portfolio.ensure_defaults
+          flash[:notice] = t("notices.created", "ePortfolio successfully created")
+          format.html { redirect_to eportfolio_url(@portfolio) }
+          format.json { render json: @portfolio.as_json(permissions: { user: @current_user, session: }) }
+        else
+          format.html do
+            rce_js_env
+            render :new
+          end
+          format.json { render json: @portfolio.errors, status: :bad_request }
+        end
       end
     end
   end
@@ -241,7 +241,7 @@ class EportfoliosController < ApplicationController
     params.require(:eportfolio).permit(:spam_status)
   end
 
-  def get_eportfolio
+  def find_eportfolio
     @portfolio = Eportfolio.active.find(params[:eportfolio_id] || params[:id])
   end
 

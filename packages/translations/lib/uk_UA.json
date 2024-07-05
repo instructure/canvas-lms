@@ -116,6 +116,9 @@
     "content_type_2cf90d95": {
         "message": "Тип вмісту"
     },
+    "copy_9748f9f": {
+        "message": "Копіювати"
+    },
     "copyright_holder_66ee111": {
         "message": "Правовласник:"
     },
@@ -415,6 +418,9 @@
     },
     "reset_95a81614": {
         "message": "Скинути"
+    },
+    "retry_ebd5f8ba": {
+        "message": "Спробувати ще раз"
     },
     "rich_content_editor_2708ef21": {
         "message": "Редактор збагаченого контенту"

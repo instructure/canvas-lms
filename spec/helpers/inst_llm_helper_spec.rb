@@ -62,7 +62,7 @@ describe InstLLMHelper do
     end
 
     it "raises an error if Redis is not enabled" do
-      allow(Canvas).to receive(:redis).and_return(nil)
+      allow(Canvas).to receive(:redis_enabled?).and_return(false)
       expect do
         InstLLMHelper.with_rate_limit(user:, llm_config:) do
           true

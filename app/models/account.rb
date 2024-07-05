@@ -29,6 +29,7 @@ class Account < ActiveRecord::Base
 
   include Workflow
   include BrandConfigHelpers
+  include Canvas::Security::PasswordPolicyAccountSettingValidator
   belongs_to :root_account, class_name: "Account"
   belongs_to :parent_account, class_name: "Account"
 
@@ -401,6 +402,13 @@ class Account < ActiveRecord::Base
   add_setting :disable_inbox_signature_block_for_students, boolean: true, root_only: true, default: false
   add_setting :enable_inbox_auto_response, boolean: true, root_only: true, default: false
   add_setting :disable_inbox_auto_response_for_students, boolean: true, root_only: true, default: false
+
+  # Password Policy settings
+  add_setting :password_policy, root_only: true, hash: true, values: %i[allow_login_suspension
+                                                                        require_number_characters
+                                                                        require_symbol_characters
+                                                                        minimum_character_length
+                                                                        maximum_login_attempts]
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
@@ -1554,7 +1562,7 @@ class Account < ActiveRecord::Base
   attr_accessor :email_pseudonyms
 
   def password_policy
-    Canvas::PasswordPolicy.default_policy.merge(settings[:password_policy] || {})
+    Canvas::Security::PasswordPolicy.default_policy.merge(settings[:password_policy] || {})
   end
 
   def password_complexity_enabled?
@@ -1833,11 +1841,11 @@ class Account < ActiveRecord::Base
   end
 
   def course_count
-    courses.active.count
+    courses.active.size
   end
 
   def sub_account_count
-    sub_accounts.active.count
+    sub_accounts.active.size
   end
 
   def user_count

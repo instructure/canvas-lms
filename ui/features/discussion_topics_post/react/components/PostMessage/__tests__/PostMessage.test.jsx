@@ -18,7 +18,7 @@
 
 import {PostMessage} from '../PostMessage'
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, screen, act} from '@testing-library/react'
 import {SearchContext} from '../../../utils/constants'
 import {User} from '../../../../graphql/User'
 import {responsiveQuerySizes} from '../../../utils'
@@ -108,6 +108,31 @@ describe('PostMessage', () => {
         {searchTerm: 'here'}
       )
       expect(queryAllByTestId('highlighted-search-item').length).toBe(2)
+    })
+
+    it('updates the displayed message when the message prop changes', async () => {
+      const { rerender } = setup({ message: 'Initial message' })
+
+      // Check initial render
+      expect(screen.getByText('Initial message')).toBeInTheDocument()
+
+      // Rerender with new props
+      await act(async () => {
+        rerender(
+          <SearchContext.Provider value={{ searchTerm: '' }}>
+            <PostMessage
+              author={User.mock()}
+              timingDisplay="Jan 1 2000"
+              message="Updated message"
+              title="Thoughts"
+            />
+          </SearchContext.Provider>
+        )
+      })
+
+      // Check if the new message is displayed
+      expect(screen.getByText('Updated message')).toBeInTheDocument()
+      expect(screen.queryByText('Initial message')).not.toBeInTheDocument()
     })
   })
 })

@@ -34,6 +34,7 @@ export function Component() {
       contextType="Account"
       contextId={pathMatch.params.accountId}
       archivedGradingSchemesEnabled={!!ENV.ARCHIVED_GRADING_SCHEMES_ENABLED}
+      defaultAccountGradingSchemeEnabled={!!ENV.DEFAULT_ACCOUNT_GRADING_SCHEME_ENABLED}
     />
   )
 }

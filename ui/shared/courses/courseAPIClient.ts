@@ -41,7 +41,7 @@ export const publishCourse = ({
       }
     })
     .catch(e => {
-      if (e.response.status === 401 && e.response.data.status === 'unverified') {
+      if (e.response?.status === 401 && e.response?.data.status === 'unverified') {
         $.flashWarning(
           I18n.t(
             'Complete registration by clicking the “finish the registration process” link sent to your email.'
@@ -50,6 +50,29 @@ export const publishCourse = ({
       } else {
         $.flashError(I18n.t('An error ocurred while publishing course'))
       }
+    })
+}
+
+export const unpublishCourse = ({
+  courseId,
+  onSuccess = null,
+}: {
+  courseId: string
+  onSuccess?: null | (() => void)
+}) => {
+  axios
+    .put(`/api/v1/courses/${courseId}`, {
+      course: {event: 'claim'},
+    })
+    .then(() => {
+      if (onSuccess) {
+        onSuccess()
+      } else {
+        window.location.search += 'for_reload=1'
+      }
+    })
+    .catch(_e => {
+      $.flashError(I18n.t('An error occurred while unpublishing course'))
     })
 }
 

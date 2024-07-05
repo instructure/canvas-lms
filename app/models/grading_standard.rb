@@ -371,6 +371,10 @@ class GradingStandard < ActiveRecord::Base
     self.root_account_id ||= context.is_a?(Account) ? context.resolved_root_account_id : context.root_account_id
   end
 
+  def used_as_default?
+    courses.any? || accounts.any?
+  end
+
   private
 
   def minus_grade?(grade)

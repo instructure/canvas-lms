@@ -150,6 +150,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
   }
 
   Object.entries({
+    course_status: 'Status',
     course_name: 'Course',
     sis_course_id: 'SIS ID',
     term: 'Term',

@@ -488,6 +488,17 @@ module Types
 
       object.inbox_labels
     end
+
+    field :activity_stream, ActivityStreamType, null: true do
+      argument :only_active_courses, Boolean, required: false
+    end
+    def activity_stream(only_active_courses: false)
+      return unless object == current_user
+
+      context.scoped_set!(:only_active_courses, only_active_courses)
+      context.scoped_set!(:context_type, "User")
+      object
+    end
   end
 end
 

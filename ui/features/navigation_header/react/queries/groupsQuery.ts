@@ -16,33 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+
+import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {AccessibleGroup} from '../../../../api.d'
+
+const GROUPS_PATH = '/api/v1/users/self/groups?include[]=can_access'
 
 export const groupFilter = (group: {can_access?: boolean; concluded: boolean}) =>
   group.can_access && !group.concluded
 
-export default function groupsQuery(): Promise<AccessibleGroup[]> {
-  return new Promise((resolve, reject) => {
-    const data: AccessibleGroup[] = []
-    const firstPageUrl = '/api/v1/users/self/groups?include[]=can_access'
+async function groupsQuery({signal}: QueryFunctionContext): Promise<AccessibleGroup[]> {
+  const data: Array<AccessibleGroup> = []
+  const fetchOpts = {signal}
+  let path = GROUPS_PATH
 
-    function load(url: string) {
-      $.getJSON(
-        url,
-        (newData: AccessibleGroup[], _: any, xhr: XMLHttpRequest) => {
-          data.push(...newData.filter(groupFilter))
-          const link = parseLinkHeader(xhr)
-          if (link.next) {
-            load(link.next)
-          } else {
-            resolve(data)
-          }
-        },
-        reject
-      )
-    }
-    load(firstPageUrl)
-  })
+  while (path) {
+    // eslint-disable-next-line no-await-in-loop
+    const {json, link} = await doFetchApi<AccessibleGroup[]>({path, fetchOpts})
+    if (json) data.push(...json.filter(groupFilter))
+    path = link?.next?.url || null
+  }
+  return data
 }
+
+export default groupsQuery

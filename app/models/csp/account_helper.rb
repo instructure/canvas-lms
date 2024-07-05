@@ -129,6 +129,7 @@ module Csp::AccountHelper
     domains += Setting.get("csp.global_whitelist", "").split(",").map(&:strip)
     domains += cached_tool_domains if include_tools
     domains += csp_files_domains(request) if include_files
+    domains += csp_dynamic_registration_domain(request)
     domains.compact.uniq.sort
   end
 
@@ -153,7 +154,9 @@ module Csp::AccountHelper
     csp_tool_scope = ContextExternalTool.where(context_type: "Account", context_id: account_chain_ids).active
 
     if internal_service_only
-      csp_tool_scope = csp_tool_scope.joins(:developer_key).where(developer_keys: { internal_service: true })
+      unique_dev_keys = csp_tool_scope.distinct.pluck(:developer_key_id)
+      internal_service_dev_keys = DeveloperKey.where(id: unique_dev_keys, internal_service: true).pluck(:id)
+      csp_tool_scope = csp_tool_scope.where(developer_key_id: internal_service_dev_keys)
     end
 
     csp_tool_scope.each_with_object({}) do |tool, hash|
@@ -198,5 +201,14 @@ module Csp::AccountHelper
 
   def csp_logging_config
     @config ||= Rails.application.credentials.csp_logging || {}
+  end
+
+  private
+
+  def csp_dynamic_registration_domain(request)
+    return [] unless request.respond_to?(:env)
+    return [] unless request.env&.[]("dynamic_reg_url_csp")
+
+    [URI.parse(request.env["dynamic_reg_url_csp"]).host]
   end
 end

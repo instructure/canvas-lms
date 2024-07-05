@@ -17,37 +17,35 @@
  */
 import create from 'zustand'
 
-export type RegistrationWizardModalState = (
-  | {
-      open: true
-      /**
-       * True is the user has selected the registration type
-       * and method and clicked "next"
-       * (this can only be true if the modal is open)
-       *
-       * When we launch the registration wizard from
-       * other places, this will be true immediately
-       * when launched (i.e. when a user clicks "install"
-       * from the Discover page, and the dyn reg url is
-       * already known)
-       */
-      registering: boolean
-    }
-  | {open: false}
-) & {
+export type RegistrationWizardModalState = {
+  open: boolean
+  /**
+   * True is the user has selected the registration type
+   * and method and clicked "next"
+   *
+   * When we launch the registration wizard from
+   * other places, this will be true immediately
+   * when launched (i.e. when a user clicks "install"
+   * from the Discover page, and the dyn reg url is
+   * already known)
+   */
+  registering: boolean
   lti_version: '1p3' | '1p1'
-  progress: number
-  progressMax: number
   method: 'dynamic_registration' | 'manual' | 'json'
   dynamicRegistrationUrl: string
-  registering: boolean
+  /**
+   * Controls whether the modal should close when the user
+   * clicks "cancel" Should be true when the modal is
+   * launched from the Product Detail page
+   */
+  exitOnCancel: boolean
+  onSuccessfulInstallation?: () => void
 }
 
 export type RegistrationWizardModalStateActions = {
   updateLtiVersion: (version: '1p3' | '1p1') => void
   updateMethod: (method: 'dynamic_registration' | 'manual' | 'json') => void
   updateDynamicRegistrationUrl: (url: string) => void
-  updateProgress: (progress: number, progressMax: number) => void
   register: () => void
   unregister: () => void
   close: () => void
@@ -63,12 +61,21 @@ export const useRegistrationModalWizardState = create<
   method: 'dynamic_registration',
   dynamicRegistrationUrl: '',
   registering: false,
+  exitOnCancel: false,
   updateLtiVersion: version => set({lti_version: version}),
   updateMethod: method => set({method}),
   updateDynamicRegistrationUrl: url => set({dynamicRegistrationUrl: url}),
-  updateProgress: (progress, progressMax) => set({progress, progressMax}),
   register: () => set({registering: true}),
-  unregister: () => set({registering: false}),
+  unregister: () => {
+    // todo: if we've already returned from the tool,
+    // we need to delete the registration we created
+    set(prev => {
+      return {
+        open: !prev.exitOnCancel,
+        registering: prev.exitOnCancel,
+      }
+    })
+  },
   close: () => set({open: false}),
 }))
 
@@ -78,5 +85,24 @@ export const openRegistrationWizard = (
   useRegistrationModalWizardState.setState({
     ...initialState,
     open: true,
+  })
+}
+
+/**
+ * Opens the registration wizard with the dynamic registration URL
+ * already populated and the registration flow started
+ * @param dynamicRegistrationUrl The URL to use for dynamic registration
+ */
+export const openDynamicRegistrationWizard = (
+  dynamicRegistrationUrl: string,
+  onSuccessfulInstallation?: () => void
+) => {
+  openRegistrationWizard({
+    dynamicRegistrationUrl,
+    lti_version: '1p3',
+    method: 'dynamic_registration',
+    registering: true,
+    exitOnCancel: true,
+    onSuccessfulInstallation,
   })
 }

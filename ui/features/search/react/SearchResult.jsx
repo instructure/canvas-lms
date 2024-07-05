@@ -72,7 +72,7 @@ export default function SearchResult({onExplain, onLike, onDislike, result, sear
     const searchTerms = searchTerm.split(' ');
 
     // Filter out single character search terms and common words
-    const validSearchTerms = searchTerms.filter(term => term.length > 1 && !stopwords.includes(term))
+    const validSearchTerms = searchTerms.filter(term => term.length > 1 && !stopwords.includes(term.toLowerCase()))
 
     // Escape each searchTerm and join them with '|'
     const escapedSearchTerms = validSearchTerms.map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');

@@ -24,23 +24,12 @@ import {success} from '../../../common/lib/apiResult/ApiResult'
 import userEvent from '@testing-library/user-event'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {i18nLtiScope} from '../../model/LtiScope'
-import {mockRegistration} from './helpers'
+import {mockRegistration, mockService} from './helpers'
 import {htmlEscape} from '@instructure/html-escape'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 
 const mockAlert = showFlashAlert as jest.Mock<typeof showFlashAlert>
-
-const mockService = (
-  mocked?: Partial<DynamicRegistrationWizardService>
-): DynamicRegistrationWizardService => ({
-  fetchRegistrationToken: jest.fn(),
-  deleteDeveloperKey: jest.fn(),
-  getRegistrationByUUID: jest.fn(),
-  updateDeveloperKeyWorkflowState: jest.fn(),
-  updateRegistrationOverlay: jest.fn(),
-  ...mocked,
-})
 
 describe('DynamicRegistrationWizard', () => {
   it('renders a loading screen when fetching the registration token', () => {

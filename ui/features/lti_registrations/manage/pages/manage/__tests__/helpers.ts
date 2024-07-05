@@ -21,7 +21,7 @@ import type {AccountId} from '../../../model/AccountId'
 import type {LtiRegistration} from '../../../model/LtiRegistration'
 import type {LtiRegistrationAccountBindingId} from '../../../model/LtiRegistrationAccountBinding'
 import type {LtiRegistrationId} from '../../../model/LtiRegistrationId'
-import type {UserId} from '../../../model/UserId'
+import {ZUserId} from '../../../model/UserId'
 import type {DeveloperKeyId} from '../../../model/developer_key/DeveloperKeyId'
 
 export const mockPageOfRegistrations = (
@@ -39,12 +39,23 @@ const mockRegistrations = (...names: Array<string>): Array<LtiRegistration> =>
 export const mockRegistration = (n: string, i: number): LtiRegistration => {
   const id = i.toString()
   const date = new Date()
+  const user = {
+    created_at: date,
+    id: ZUserId.parse(id),
+    integration_id: id,
+    login_id: id,
+    name: 'User Name',
+    short_name: 'Short User Name',
+    sis_import_id: id,
+    sis_user_id: id,
+    sortable_name: 'Sortable User Name',
+  }
   const common = {
     account_id: id as AccountId,
     created_at: date,
-    created_by: id as UserId,
+    created_by: user,
     updated_at: date,
-    updated_by: id as UserId,
+    updated_by: user,
     workflow_state: 'on',
   }
   return {

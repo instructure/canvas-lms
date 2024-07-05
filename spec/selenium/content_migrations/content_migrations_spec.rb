@@ -341,7 +341,7 @@ describe "content migrations", :non_parallel do
       expect(ContentMigrationPage.ui_auto_complete).to be_displayed
 
       expect(ContentMigrationPage.course_search_results[0].text).to eq @copy_from.name
-      expect(ContentMigrationPage.course_search_results[1].text).to eq @copy_from.enrollment_term.name
+      expect(ContentMigrationPage.course_search_results[1].text).to eq "Term: #{@copy_from.enrollment_term.name}"
       ContentMigrationPage.course_search_link.click
 
       ContentMigrationPage.selective_imports(0).click

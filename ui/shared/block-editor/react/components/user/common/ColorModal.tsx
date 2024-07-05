@@ -26,9 +26,8 @@ import {View} from '@instructure/ui-view'
 import {isInstuiButtonColor} from '../blocks/ButtonBlock/common'
 import {ColorPicker} from '../../editor/ColorPicker'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-export type ColorModalVariant = 'background' | 'button'
+export type ColorModalVariant = 'background' | 'button' | 'textcolor'
 type ColorModalProps = {
   open: boolean
   color: string
@@ -57,10 +56,14 @@ const ColorModal = ({open, color, variant, onClose, onSubmit}: ColorModalProps) 
 
   const renderModalHeading = () => {
     switch (variant) {
+      case 'textcolor':
+        return <Heading level="h2">Select Text Color</Heading>
       case 'button':
         return <Heading level="h2">Select a Button Color</Heading>
       case 'background':
         return <Heading level="h2">Select a Background Color</Heading>
+      default:
+        return <Heading level="h2">Select a color</Heading>
     }
   }
 

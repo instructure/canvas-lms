@@ -17,10 +17,13 @@
  */
 
 import {ZLtiRegistration, type LtiRegistration} from '../model/LtiRegistration'
-import {success, apiParseError, type ApiResult} from '../../common/lib/apiResult/ApiResult'
+import {success, type ApiResult, parseFetchResult} from '../../common/lib/apiResult/ApiResult'
 import {ZPaginatedList, type PaginatedList} from './PaginatedList'
 import {type LtiRegistrationId} from '../model/LtiRegistrationId'
 import {mockFetchSampleLtiRegistrations, mockDeleteRegistration} from './sampleLtiRegistrations'
+import type {AccountId} from '../model/AccountId'
+import {defaultFetchOptions} from '@canvas/util/xhr'
+import * as z from 'zod'
 
 export type AppsSortProperty =
   | 'name'
@@ -33,26 +36,44 @@ export type AppsSortProperty =
 export type AppsSortDirection = 'asc' | 'desc'
 
 export type FetchRegistrations = (options: {
+  accountId: AccountId
   query: string
   sort: AppsSortProperty
   dir: AppsSortDirection
-  offset: number
+  page: number
   limit: number
 }) => Promise<ApiResult<PaginatedList<LtiRegistration>>>
 
-export const fetchRegistrations: FetchRegistrations = options => {
-  // todo: implement this with the actual fetch call
-  return mockFetchSampleLtiRegistrations(options)
-    .then(ZPaginatedList(ZLtiRegistration).safeParse)
-    .then(result => {
-      return result.success
-        ? success(result.data)
-        : apiParseError(result.error.errors.map(e => e.message).join('\n\n'))
+export const fetchRegistrations: FetchRegistrations = options =>
+  parseFetchResult(ZPaginatedList(ZLtiRegistration))(
+    fetch(
+      `/api/v1/accounts/${options.accountId}/lti_registrations?` +
+        new URLSearchParams({
+          query: options.query,
+          sort: options.sort,
+          dir: options.dir,
+          page: options.page.toString(),
+          per_page: options.limit.toString(),
+        }),
+      defaultFetchOptions()
+    )
+  )
+
+export type DeleteRegistration = (
+  accountId: AccountId,
+  id: LtiRegistrationId
+) => Promise<ApiResult<unknown>>
+
+/**
+ * Deletes an LTI registration
+ * @param accountId
+ * @param registrationId
+ * @returns
+ */
+export const deleteRegistration: DeleteRegistration = (accountId, registrationId) =>
+  parseFetchResult(z.unknown())(
+    fetch(`/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`, {
+      ...defaultFetchOptions(),
+      method: 'DELETE',
     })
-}
-
-export type DeleteRegistration = (id: LtiRegistrationId) => Promise<ApiResult<void>>
-
-// todo: implement this with the actual delete call
-export const deleteRegistration: DeleteRegistration = id =>
-  mockDeleteRegistration(id).then(() => success(undefined))
+  )

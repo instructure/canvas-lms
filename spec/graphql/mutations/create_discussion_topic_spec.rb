@@ -259,6 +259,39 @@ describe Mutations::CreateDiscussionTopic do
     expect(announcement.workflow_state).to eq "active"
   end
 
+  it "successfully creates a section specific announcement" do
+    is_announcement = true
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = true
+    require_initial_post = true
+
+    section = add_section("New Section")
+
+    query = <<~GQL
+      isAnnouncement: #{is_announcement}
+      contextId: "#{@course.id}"
+      contextType: #{context_type}
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      requireInitialPost: #{require_initial_post}
+      anonymousState: off
+      specificSections: "#{section.id}"
+    GQL
+
+    result = execute_with_input(query)
+    created_announcement = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+
+    expect(Announcement.where("id = #{created_announcement["_id"]}").count).to eq 1
+    expect(created_announcement["isSectionSpecific"]).to be true
+    expect(created_announcement["courseSections"][0]["name"]).to eq("New Section")
+  end
+
   it "creates an allow_rating discussion topic" do
     query = <<~GQL
       contextId: "#{@course.id}"

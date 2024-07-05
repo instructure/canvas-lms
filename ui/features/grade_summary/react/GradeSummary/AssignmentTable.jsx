@@ -86,6 +86,8 @@ const AssignmentTable = ({
       activeWhatIfScores
     )
   )
+  const overrideGrade =
+    queryData?.usersConnection?.nodes[0]?.enrollments[0]?.grades.overrideGrade || null
 
   useEffect(() => {
     const grades = calculateCourseGrade(
@@ -219,7 +221,8 @@ const AssignmentTable = ({
               courseGrades?.current,
               courseGrades?.final,
               activeWhatIfScores
-            )
+            ),
+            overrideGrade
           )}
       </Table.Body>
     </Table>
@@ -230,8 +233,10 @@ AssignmentTable.propTypes = {
   queryData: PropTypes.object,
   layout: PropTypes.string,
   handleReadStateChange: PropTypes.func,
+  handleRubricReadStateChange: PropTypes.func,
   setSubmissionAssignmentId: PropTypes.func,
   submissionAssignmentId: PropTypes.string,
+  hideTotalRow: PropTypes.bool,
 }
 
 export default AssignmentTable

@@ -365,6 +365,110 @@ describe ContentExportsApiController, type: :request do
       expect(export.attachment).not_to be_nil
     end
 
+    context "when the feature flag new_quizzes_common_cartridge is turned on" do
+      before do
+        Account.site_admin.enable_feature!(:new_quizzes_common_cartridge)
+      end
+
+      context "and the course contains new quizzes" do
+        before do
+          allow(t_course).to receive(:feature_enabled?).and_call_original
+
+          assignment_model(submission_types: "external_tool", course: @course)
+          tool = @c.context_external_tools.create!(
+            name: "Quizzes.Next",
+            consumer_key: "test_key",
+            shared_secret: "test_secret",
+            tool_id: "Quizzes 2",
+            url: "http://example.com/launch"
+          )
+          @a.external_tool_tag_attributes = { content: tool }
+          @a.save!
+        end
+
+        it "creates a common cartridge export with new quizzes" do
+          json = api_call_as_user(t_teacher,
+                                  :post,
+                                  "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                  { controller: "content_exports_api", action: "create", format: "json", course_id: t_course.to_param, export_type: "common_cartridge" })
+          export = t_course.content_exports.where(id: json["id"]).first
+
+          expect(export.workflow_state).to eql "waiting_for_external_tool"
+          expect(export.export_type).to eql "common_cartridge"
+          expect(export.settings["selected_content"]["everything"]).to be_truthy
+          expect(export.settings["contains_new_quizzes"]).to be true
+
+          run_jobs
+
+          export.reload
+          expect(export.workflow_state).to eql "exported"
+          expect(export.job_progress).to be_completed
+          expect(export.attachment).not_to be_nil
+        end
+      end
+
+      context "and the course does not contain new quizzes" do
+        it "creates a common cartridge export without new quizzes" do
+          json = api_call_as_user(t_teacher,
+                                  :post,
+                                  "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                  { controller: "content_exports_api", action: "create", format: "json", course_id: t_course.to_param, export_type: "common_cartridge" })
+          export = t_course.content_exports.where(id: json["id"]).first
+
+          expect(export.workflow_state).to eql "created"
+          expect(export.export_type).to eql "common_cartridge"
+          expect(export.settings["selected_content"]["everything"]).to be_truthy
+          expect(export.settings["contains_new_quizzes"]).to be_falsey
+
+          run_jobs
+
+          export.reload
+          expect(export.workflow_state).to eql "exported"
+          expect(export.job_progress).to be_completed
+          expect(export.attachment).not_to be_nil
+        end
+      end
+    end
+
+    context "when the feature flag new_quizzes_common_cartridge is turned off" do
+      context "even when the course contains new quizzes" do
+        before do
+          allow(t_course).to receive(:feature_enabled?).and_call_original
+
+          assignment_model(submission_types: "external_tool", course: @course)
+          tool = @c.context_external_tools.create!(
+            name: "Quizzes.Next",
+            consumer_key: "test_key",
+            shared_secret: "test_secret",
+            tool_id: "Quizzes 2",
+            url: "http://example.com/launch"
+          )
+          @a.external_tool_tag_attributes = { content: tool }
+          @a.save!
+        end
+
+        it "creates a common cartridge export without new quizzes in XML format" do
+          json = api_call_as_user(t_teacher,
+                                  :post,
+                                  "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                  { controller: "content_exports_api", action: "create", format: "json", course_id: t_course.to_param, export_type: "common_cartridge" })
+          export = t_course.content_exports.where(id: json["id"]).first
+
+          expect(export.workflow_state).to eql "created"
+          expect(export.export_type).to eql "common_cartridge"
+          expect(export.settings["selected_content"]["everything"]).to be_truthy
+          expect(export.settings["contains_new_quizzes"]).to be false
+
+          run_jobs
+
+          export.reload
+          expect(export.workflow_state).to eql "exported"
+          expect(export.job_progress).to be_completed
+          expect(export.attachment).not_to be_nil
+        end
+      end
+    end
+
     it "creates a 1.3 common cartridge if specified" do
       t_course.assignments.create! name: "teh assignment", description: "<b>what</b>", points_possible: 11, submission_types: "online_text_entry"
       json = api_call_as_user(t_teacher,

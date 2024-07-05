@@ -29,7 +29,7 @@ export default class SaveThemeButton extends Component {
   static propTypes = {
     accountID: PropTypes.string.isRequired,
     brandConfigMd5: customTypes.md5,
-    isDefaultConfig: PropTypes.bool.isRequired,
+    isDefaultConfig: PropTypes.bool,
     sharedBrandConfigBeingEdited: customTypes.sharedBrandConfig.isRequired,
     onSave: PropTypes.func.isRequired,
   }

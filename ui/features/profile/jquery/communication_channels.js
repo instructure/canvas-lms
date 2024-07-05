@@ -32,21 +32,16 @@ import replaceTags from '@canvas/util/replaceTags'
 const I18n = useI18nScope('profile')
 
 $(document).ready(function () {
-  $('#communication_channels').tabs()
-  $('#communication_channels').bind('tabsshow', function (_event) {
-    let channelInputField
-    if ($(this).css('display') !== 'none') {
-      // TODO: This is always undefined - where did this come from?
-      const idx = $(this).data('selected.tabs')
-      // eslint-disable-next-line eqeqeq
-      if (idx == 0) {
-        channelInputField = $('#register_email_address').find(':text:first')
-      } else {
-        channelInputField = $('#register_sms_number').find('input[type=tel]:first')
+  $('#communication_channels')
+    .tabs()
+    .on('tabsactivate', function (_event, ui) {
+      // check if the tabs are visible
+      if ($(this).css('display') !== 'none') {
+        // pass id of the active tab panel
+        formatTabs(ui.newPanel.attr('id'))
       }
-    }
-    formatTabs(channelInputField)
-  })
+    })
+
   $('.channel_list tr').hover(
     function () {
       if ($(this).hasClass('unconfirmed')) {
@@ -69,61 +64,48 @@ $(document).ready(function () {
       $(this).find('a.path').parent().attr('title', $(this).find('a.path').text())
     }
   )
-  $('.add_email_link,.add_contact_link').click(function (event) {
+
+  $('.add_email_link, .add_contact_link').on('click', function (event) {
+    const $communicationChannels = $('#communication_channels')
+    const $registerSmsNumber = $('#register_sms_number')
     event.preventDefault()
-    $('#communication_channels')
-      .show()
-      .dialog({
-        title: I18n.t('titles.register_communication', 'Register Communication'),
-        width: 600,
-        resizable: false,
-        modal: true,
-        zIndex: 1000,
-      })
-    if ($(this).hasClass('add_contact_link')) {
-      $('#communication_channels').tabs('select', '#register_sms_number')
-    } else {
-      $('#communication_channels').tabs('select', '#register_email_address')
-    }
+    $communicationChannels.show().dialog({
+      title: I18n.t('titles.register_communication', 'Register Communication'),
+      width: 600,
+      resizable: false,
+      modal: true,
+      zIndex: 1000,
+    })
+
+    // if user clicked add contact link and sms number tab exists, show it (otherwise show email tab)
+    const tabIndex =
+      $(this).hasClass('add_contact_link') && $registerSmsNumber.length > 0
+        ? $communicationChannels.find('a[href="#register_sms_number"]').parent().index()
+        : 0
+
+    $communicationChannels.tabs('option', 'active', tabIndex)
+    $communicationChannels.find('ul.ui-tabs-nav > li').eq(tabIndex).find('a').trigger('focus')
   })
 
-  const formatTabs = function (tabs) {
-    const $form = $(tabs).parents('#register_sms_number')
-    const sms_number = $form.find('.sms_number').val().replace(/[^\d]/g, '')
-
-    const useEmail =
-      !ENV.INTERNATIONAL_SMS_ENABLED || $form.find('.country option:selected').data('useEmail')
-
-    // Don't show the 10-digit warning if we're not expecting a U.S. number
-    $form.find('.should_be_10_digits').showIf(useEmail && sms_number && sms_number.length !== 10)
-
-    // Show the "international text messaging rates may apply" warning if international SMS is enabled, the user has
-    // selected a country, and that country is not the U.S.
-    $form
-      .find('.intl_rates_may_apply')
-      .showIf(
-        ENV.INTERNATIONAL_SMS_ENABLED &&
-          !useEmail &&
-          $form.find('.country option:selected').val() !== 'undecided'
-      )
-
-    if (useEmail) {
-      $form.find('.sms_email_group').show()
-      let email = $form.find('.carrier').val()
-      $form.find('.sms_email').prop('disabled', email !== 'other')
-      if (email === 'other') {
-        return
-      }
-      email = email.replace('#', sms_number)
-      $form.find('.sms_email').val(email)
-    } else {
-      $form.find('.sms_email_group').hide()
+  const formatTabs = function (id) {
+    const $form = $('#' + id)
+    if (!$form.length) return
+    if (id === 'register_sms_number') {
+      // convert number from 555-555-5555 to 5555555555
+      const sms_number = $form.find('.sms_number').val().replace(/\D/g, '')
+      // update the form input with only digits
+      $form.find('.sms_number').val(sms_number)
+      // display an error message if the number is not 10 digits
+      $form.find('.should_be_10_digits').showIf(sms_number && sms_number.length !== 10)
     }
   }
 
-  $('#register_sms_number .user_selected').bind('change blur keyup focus', function () {
-    formatTabs(this)
-  })
+  const $smsNumber = $('#register_sms_number .user_selected')
+  if ($smsNumber.length > 0) {
+    $smsNumber.on('change blur keyup focus', function () {
+      formatTabs('register_sms_number')
+    })
+  }
 
   $('#register_sms_number,#register_email_address,#register_slack_handle').formSubmit({
     object_name: 'communication_channel',
@@ -131,39 +113,18 @@ $(document).ready(function () {
       let address
       let type
       if (data['communication_channel[type]'] === 'email') {
-        // Email channel
         type = 'email'
         address = data.communication_channel_email
       } else if (data['communication_channel[type]'] === 'slack') {
-        // Slack channel
         type = 'slack'
         address = data.communication_channel_slack
-      } else if (
-        ENV.INTERNATIONAL_SMS_ENABLED &&
-        $('#communication_channel_sms_country').val() === 'undecided'
-      ) {
-        // Haven't selected a country yet
-        $(this).formErrors({
-          communication_channel_sms_country: I18n.t('Country or Region is required'),
-        })
-        return false
-      } else if (
-        !ENV.INTERNATIONAL_SMS_ENABLED ||
-        $('#communication_channel_sms_country option:selected').data('useEmail')
-      ) {
-        // SMS channel using an email address
-        type = 'sms_email'
-        address = data.communication_channel_sms_email
       } else {
-        // SMS channel using a phone number
+        // sms channel using a phone number in the USA
         type = 'sms_number'
-        address =
-          '+' + data.communication_channel_sms_country + data.communication_channel_sms_number
+        address = data.communication_channel_sms_number
       }
 
-      delete data.communication_channel_sms_country
-
-      if (type === 'email' || type === 'sms_email' || type === 'slack') {
+      if (type === 'email' || type === 'slack') {
         // Make sure it's a valid email address
         const match = address.match(
           /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
@@ -174,8 +135,6 @@ $(document).ready(function () {
             address === '' ? I18n.t('Email is required') : I18n.t('Email is invalid!')
           if (type === 'email') {
             $(this).formErrors({communication_channel_email: errorMessage})
-          } else {
-            $(this).formErrors({communication_channel_sms_email: errorMessage})
           }
           return false
         }
@@ -195,7 +154,6 @@ $(document).ready(function () {
 
       // Don't need these anymore
       delete data.communication_channel_sms_number
-      delete data.communication_channel_sms_email
       delete data.communication_channel_slack
 
       data['communication_channel[address]'] = address
@@ -408,7 +366,7 @@ $(document).ready(function () {
     },
     error(_data) {
       $(this).find('.status_message').css('visibility', 'hidden')
-      $.flashError(I18n.t('Confirmation failed.  Please try again.'))
+      $.flashError(I18n.t('Confirmation failed. Please try again.'))
     },
   })
   $('.channel_list .channel .default_link').click(function (event) {

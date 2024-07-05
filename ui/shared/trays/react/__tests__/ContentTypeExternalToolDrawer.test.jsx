@@ -19,6 +19,7 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import ContentTypeExternalToolDrawer from '../ContentTypeExternalToolDrawer'
+import MutexManager from '@canvas/mutex-manager/MutexManager'
 
 describe('ContentTypeExternalToolDrawer', () => {
   const tool = {
@@ -30,7 +31,6 @@ describe('ContentTypeExternalToolDrawer', () => {
   }
   const onDismiss = jest.fn()
   const onExternalContentReady = jest.fn()
-  const extraQueryParams = {key1: 'value1', key2: 'value2'}
   const pageContent = (() => {
     const el = document.createElement('div')
     el.setAttribute('id', 'page-content-id')
@@ -54,6 +54,11 @@ describe('ContentTypeExternalToolDrawer', () => {
       />
     )
   }
+
+  it('renders', () => {
+    const wrapper = renderTray()
+    expect(wrapper).toMatchSnapshot()
+  })
 
   it('labels page content with LTI title', () => {
     const {getByLabelText} = renderTray()
@@ -108,5 +113,42 @@ describe('ContentTypeExternalToolDrawer', () => {
     const {getByTestId} = renderTray()
     const src = getByTestId('ltiIframe').src
     expect(src).toContain(`${tool.base_url}?`)
+    expect(getByTestId('ltiIframe')).toBeInTheDocument()
+  })
+
+  it('does not render ToolLaunchIframe when there is no tool', () => {
+    const {queryByTestId} = render(
+      <ContentTypeExternalToolDrawer
+        tool={null}
+        pageContent={pageContent}
+        pageContentTitle={pageContentTitle}
+        pageContentMinWidth="40rem"
+        trayPlacement="end"
+        onDismiss={onDismiss}
+        onExternalContentReady={onExternalContentReady}
+        open={true}
+      />
+    )
+    expect(queryByTestId('ltiIframe')).toBeNull()
+  })
+
+  describe('when ENV.INIT_DRAWER_LAYOUT_MUTEX is set', () => {
+    const origEnv = {...window.ENV}
+    const mutex = 'init-drawer-layout'
+
+    beforeAll(() => {
+      window.ENV.INIT_DRAWER_LAYOUT_MUTEX = mutex
+      MutexManager.createMutex(mutex)
+    })
+
+    afterAll(() => (window.ENV = origEnv))
+
+    it('releases the mutex after reparenting content', () => {
+      expect(MutexManager.mutexes[mutex]).toBeDefined()
+
+      renderTray()
+
+      expect(MutexManager.mutexes[mutex]).toBeUndefined()
+    })
   })
 })
