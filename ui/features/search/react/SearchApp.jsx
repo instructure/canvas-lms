@@ -227,7 +227,7 @@ export default function SearchApp() {
           <Flex.Item>
             {I18n.t('Smart Search')}
             <Pill color="alert" margin="0 0 0 small" themeOverride={{background: 'alert'}}>
-              {I18n.t('Beta')}
+              {I18n.t('Feature Preview')}
             </Pill>
           </Flex.Item>
           <Flex.Item>
@@ -293,17 +293,14 @@ export default function SearchApp() {
               />
             </Flex.Item>
             <Flex.Item>
-              <h3>{I18n.t('What is Smart Search?')}</h3>
-              <p>{I18n.t('Smart Search is a feature of Canvas that is currently in development.  Leveraging semantic algorithms and AI, the new Smart Search feature understands the context of queries, providing more accurate and relevant results without the need for traditional boolean operators or other search tools.')}</p>
-              <h3>{I18n.t('How do I use the Search feature?')}</h3>
-              <p>{I18n.t('Our Smart Search feature relies on an AI-adjacent technology called “embeddings.” This technology “reads” the course content and creates a complex mathematical representation of each piece of content. When you perform a search, the technology “reads” your query and converts it into a complex mathematical representation. The tool then compares the mathematical representations of both your search and course content to return relevant results.')}</p>
-              <p>{I18n.t('Because Smart Search operates on “understanding” both the content and the queries, you can type in keyword(s), content, or just give a general gist of what you are looking for (“guitar”, “what are the steps of photosynthesis?”, “math to turn a function into frequencies“). We think you will be surprised at how well the system understands the intent of your queries and returns results accordingly.')}</p>
-              <p>{I18n.t('Additionally, the AI model we are using to power this feature is multilingual. This means that you can search in whatever language you like, and the most relevant content will be returned no matter what language it was written in. Give it a try!')}</p>
-              <h3>{I18n.t('What content is searchable?')}</h3>
-              <p>{I18n.t('As of June 1, 2024, the Smart Search feature is querying the following items (including titles) within a course: content pages, announcements, discussion prompts, assignment descriptions.')}</p>
-              <p>{I18n.t('The intention is to expand this scope as the Smart Search tool continues development.')}</p>
-              <h3>{I18n.t('How can I help with the development of this feature?')}</h3>
-              <p>{I18n.t('Ultimately, this feature is still classified as an experimental beta. We want to provide opportunities for participants to provide feedback. Clicking thumbs up and thumbs down on your search results and telling us why the results are good or bad will help us determine when results should or shouldn’t be shown to you. You can also provide feedback in our Canvas Community space for Smart Search Beta.')}</p>
+              <h3>{I18n.t('About Smart Search')}</h3>
+              <p>{I18n.t('Smart Search, currently in development for Canvas, uses semantic algorithms and AI to understand query context and semantic meaning, not just keyword matching.')}</p>
+              <h3>{I18n.t('Using Smart Search')}</h3>
+              <p>{I18n.t('Smart Search employs "embeddings" to mathematically represent content and queries for comparison, understanding keywords or general queries in any language, thanks to its multilingual AI model. Write search queries using keywords, questions, sentences, or whatever is most natural for you to describe what you are trying to find.')}</p>
+              <h3>{I18n.t('Searchable Content')}</h3>
+              <p>{I18n.t('As of June 1, 2024, searchable items include content pages, announcements, discussion prompts, and assignment descriptions, with plans to expand.')}</p>
+              <h3>{I18n.t('Contributing to Development')}</h3>
+              <p>{I18n.t('Smart Search is in feature preview. Feedback can be provided through result ratings and the Canvas Community space for Smart Search Beta. Canvas community space can be found here: ')}<a href="https://community.canvaslms.com/t5/Smart-Search/gh-p/smart_search" target="_blank">{I18n.t('Smart Search Community')}</a></p>
             </Flex.Item>
           </Flex>
         </View>
