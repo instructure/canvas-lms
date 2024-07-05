@@ -51,7 +51,8 @@ module RuboCop
         end
 
         def refs_ticket?(reason)
-          reason =~ /#{JiraRefParser::IssueIdRegex}/o
+          reason = reason.value if reason.is_a?(RuboCop::AST::StrNode)
+          reason.match?(/#{JiraRefParser::IssueIdRegex}/o)
         end
       end
     end
