@@ -161,7 +161,6 @@ describe "assignments sync to sis" do
         end
 
         it "validates due date while sis is on", :ignore_js_errors do
-          # LX-1857: Does not show any error, but not submits, we should verify an error here
           AssignmentCreateEditPage.save_assignment
 
           AssignmentCreateEditPage.click_manage_assign_to_button
@@ -182,17 +181,16 @@ describe "assignments sync to sis" do
         end
 
         it "does not validate when sis is off" do
-          AssignmentCreateEditPage.select_post_to_sis_checkbox
+          AssignmentCreateEditPage.click_post_to_sis_checkbox
           AssignmentCreateEditPage.save_assignment
 
           check_due_date_table("Everyone")
         end
 
         it "validates due date when user checks/unchecks the box", :ignore_js_errors do
-          # LX-1857: Does not show any error, but not submits, we should verify an error here
           AssignmentCreateEditPage.save_assignment
 
-          AssignmentCreateEditPage.select_post_to_sis_checkbox
+          AssignmentCreateEditPage.click_post_to_sis_checkbox
           AssignmentCreateEditPage.click_manage_assign_to_button
 
           wait_for_assign_to_tray_spinner
@@ -203,7 +201,7 @@ describe "assignments sync to sis" do
           click_save_button("Apply")
           keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
 
-          AssignmentCreateEditPage.select_post_to_sis_checkbox
+          AssignmentCreateEditPage.click_post_to_sis_checkbox
           AssignmentCreateEditPage.click_manage_assign_to_button
 
           wait_for_assign_to_tray_spinner
@@ -226,7 +224,6 @@ describe "assignments sync to sis" do
           let(:section_to_set) { "Section B" }
 
           it "checks each due date when on", :ignore_js_errors do
-            # LX-1857: Does not show any error, but not submits, we should verify an error here
             AssignmentCreateEditPage.save_assignment
 
             AssignmentCreateEditPage.click_manage_assign_to_button
@@ -254,7 +251,6 @@ describe "assignments sync to sis" do
           end
 
           it "checks due date when first add cards then fill fields", :ignore_js_errors do
-            # LX-1857: Does not show any error, but not submits, we should verify an error here
             AssignmentCreateEditPage.save_assignment
 
             AssignmentCreateEditPage.click_manage_assign_to_button
@@ -283,8 +279,7 @@ describe "assignments sync to sis" do
           end
 
           it "does not check when sis is off", :ignore_js_errors do
-            skip("LX-1856: Tray is not using the checkbox value")
-            AssignmentCreateEditPage.select_post_to_sis_checkbox
+            AssignmentCreateEditPage.click_post_to_sis_checkbox
             AssignmentCreateEditPage.click_manage_assign_to_button
 
             wait_for_assign_to_tray_spinner

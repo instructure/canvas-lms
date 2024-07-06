@@ -89,7 +89,7 @@ module QuizzesEditPage
     expect(driver.current_url).not_to include("edit")
   end
 
-  def select_post_to_sis_checkbox
+  def click_post_to_sis_checkbox
     post_to_sis_checkbox.click
   end
 end

@@ -312,7 +312,6 @@ describe "creating a quiz" do
             keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
 
             click_quiz_save_button
-            # LX-1857: Does not show any error, but not submits, we should verify an error here
             expect(driver.current_url).to include("edit")
           end
 
@@ -349,7 +348,6 @@ describe "creating a quiz" do
             keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
 
             click_quiz_save_button
-            # LX-1857: Does not show any error, but not submits, we should verify an error here
             expect(driver.current_url).to include("edit")
           end
 
@@ -369,7 +367,6 @@ describe "creating a quiz" do
             keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
 
             click_quiz_save_button
-            # LX-1857: Does not show any error, but not submits, we should verify an error here
             expect(driver.current_url).to include("edit")
           end
         end
