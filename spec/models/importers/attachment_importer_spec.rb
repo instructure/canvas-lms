@@ -21,55 +21,39 @@
 module Importers
   describe AttachmentImporter do
     describe "#process_migration", :no_retry do
-      let(:course) { ::Course.new }
-      let(:course_id) { 1 }
-      let(:migration) { ContentMigration.new(context: course) }
       let(:migration_id) { "123" }
-      let(:attachment_id) { 456 }
-      let(:attachment) do
-        double(:context= => true,
-               :migration_id= => true,
-               :migration_id => migration_id,
-               :save_without_broadcasting! => true,
-               :set_publish_state_for_usage_rights => nil,
-               :mark_as_importing! => nil,
-               :handle_duplicates => nil)
-      end
 
       before do
-        allow(course).to receive(:id).and_return(course_id)
-        allow(migration).to receive(:import_object?).with("attachments", migration_id).and_return(true)
+        course_model
+        @migration = @course.content_migrations.create!
+        attachment_model(context: @course, migration_id:)
       end
 
       it "imports an attachment" do
         data = {
           "file_map" => {
             "a" => {
-              id: attachment_id,
+              id: @attachment.id,
               migration_id:
             }
           }
         }
 
-        expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: attachment))
-        expect(migration).to receive(:import_object?).with("attachments", migration_id).and_return(true)
-        expect(attachment).to receive(:context=).with(course)
-        expect(attachment).to receive(:migration_id=).with(migration_id)
-        expect(attachment).not_to receive(:locked=)
-        expect(attachment).not_to receive(:file_state=)
-        expect(attachment).not_to receive(:display_name=)
-        expect(attachment).to receive(:save_without_broadcasting!)
+        display_name = @attachment.display_name
 
-        Importers::AttachmentImporter.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, @migration)
 
-        expect(migration.imported_migration_items).to eq [attachment]
+        expect(@migration.imported_migration_items).to eq [@attachment]
+        expect(@attachment.context).to eq @course
+        expect(@attachment.locked).to be_falsy
+        expect(@attachment.display_name).to eq display_name
       end
 
       it "imports attachments when the migration id is in the files_to_import hash" do
         data = {
           "file_map" => {
             "a" => {
-              id: attachment_id,
+              id: @attachment.id,
               migration_id:,
               files_to_import: {
                 migration_id => true
@@ -78,75 +62,62 @@ module Importers
           }
         }
 
-        expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: attachment))
-        expect(migration).to receive(:import_object?).with("attachments", migration_id).and_return(true)
-        expect(attachment).to receive(:save_without_broadcasting!)
+        expect(@migration).to receive(:import_object?).with("attachments", migration_id).and_return(true)
 
-        Importers::AttachmentImporter.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, @migration)
       end
 
       it "finds attachments by migration id" do
         data = {
           "file_map" => {
             "a" => {
-              id: attachment_id,
               migration_id:,
             }
           }
         }
 
-        expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: nil))
-        expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, migration_id:).and_return(double(first: attachment))
-        expect(migration).to receive(:import_object?).with("attachments", migration_id).and_return(true)
-        expect(attachment).to receive(:save_without_broadcasting!)
+        expect(@migration).to receive(:import_object?).with("attachments", migration_id).and_return(true)
 
-        Importers::AttachmentImporter.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, @migration)
       end
 
       it "finds attachment from the path" do
         data = {
           "file_map" => {
             "a" => {
-              id: attachment_id,
               migration_id:,
               path_name: "path/to/file"
             }
           }
         }
 
-        expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: nil))
-        expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, migration_id:).and_return(double(first: nil))
-        expect(::Attachment).to receive(:find_from_path).with("path/to/file", course).and_return(attachment)
-        expect(migration).to receive(:import_object?).with("attachments", migration_id).and_return(true)
-        expect(attachment).to receive(:save_without_broadcasting!)
+        @attachment.update(migration_id: nil)
+        expect(@migration).to receive(:import_object?).with("attachments", migration_id).and_return(true)
 
-        Importers::AttachmentImporter.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, @migration)
       end
 
       it "uses files if attachments are not found on the migration" do
         data = {
           "file_map" => {
             "a" => {
-              id: attachment_id,
+              id: @attachment.id,
               migration_id:
             }
           }
         }
 
-        expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: attachment))
-        allow(migration).to receive(:import_object?).with("attachments", migration_id).and_return(false)
-        allow(migration).to receive(:import_object?).with("files", migration_id).and_return(true)
+        expect(@migration).to receive(:import_object?).with("attachments", migration_id).and_return(false)
+        expect(@migration).to receive(:import_object?).with("files", migration_id).and_return(true)
 
-        expect(attachment).to receive(:save_without_broadcasting!)
-
-        Importers::AttachmentImporter.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, @migration)
       end
 
       it "does not import files that are not part of the migration" do
         data = {
           "file_map" => {
             "a" => {
-              id: attachment_id,
+              id: @attachment.id,
               migration_id:,
               files_to_import: {}
             }
@@ -155,14 +126,14 @@ module Importers
 
         expect(::Attachment).not_to receive(:where)
 
-        Importers::AttachmentImporter.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, @migration)
       end
 
       it "sets locked, file_state, and display_name when present" do
         data = {
           "file_map" => {
             "a" => {
-              id: attachment_id,
+              id: @attachment.id,
               migration_id:,
               locked: true,
               hidden: true,
@@ -171,12 +142,10 @@ module Importers
           }
         }
 
-        expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: attachment))
-        expect(attachment).to receive(:locked=).with(true)
-        expect(attachment).to receive(:file_state=).with("hidden")
-        expect(attachment).to receive(:display_name=).with("display name")
-
-        Importers::AttachmentImporter.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, @migration)
+        expect(@attachment.reload.locked).to be_truthy
+        expect(@attachment.hidden).to be_truthy
+        expect(@attachment.display_name).to eq "display name"
       end
 
       it "locks folders" do
@@ -187,15 +156,10 @@ module Importers
           ]
         }
 
-        active_folders_association = double
-        expect(course).to receive(:active_folders).and_return(active_folders_association).twice
-        folder = double
-        allow(active_folders_association).to receive(:where).with(full_name: "course files/path1/foo").and_return(double(first: folder))
-        allow(active_folders_association).to receive(:where).with(full_name: "course files/path2/bar").and_return(double(first: nil))
-        expect(folder).to receive(:locked=).with(true)
-        expect(folder).to receive(:save)
+        folder = Folder.root_folders(@course).first.sub_folders.create!(name: "path1", context: @course).sub_folders.create!(name: "foo", context: @course)
 
-        Importers::AttachmentImporter.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, @migration)
+        expect(folder.reload.locked).to be_truthy
       end
 
       it "hidden_folders" do
@@ -206,15 +170,29 @@ module Importers
           ]
         }
 
-        active_folders_association = double
-        expect(course).to receive(:active_folders).and_return(active_folders_association).twice
-        folder = double
-        allow(active_folders_association).to receive(:where).with(full_name: "course files/path1/foo").and_return(double(first: folder))
-        allow(active_folders_association).to receive(:where).with(full_name: "course files/path2/bar").and_return(double(first: nil))
-        expect(folder).to receive(:workflow_state=).with("hidden")
-        expect(folder).to receive(:save)
+        folder = Folder.root_folders(@course).first.sub_folders.create!(name: "path1", context: @course).sub_folders.create!(name: "foo", context: @course)
 
-        Importers::AttachmentImporter.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, @migration)
+        expect(folder.reload.workflow_state).to eq "hidden"
+      end
+
+      it "re-activates deleted files that are imported" do
+        MediaObject.create!(media_id: "maybe")
+        attachment_model(uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4"), context: @course, media_entry_id: "maybe")
+
+        data = {
+          "file_map" => {
+            "test.m4v" => {
+              id: @attachment.id,
+              migration_id:,
+              display_name: "test.m4v"
+            }
+          }
+        }
+
+        @attachment.destroy
+        Importers::AttachmentImporter.process_migration(data, @migration)
+        expect(@attachment.reload.file_state).to eq "available"
       end
 
       describe "saving import failures" do
@@ -222,7 +200,7 @@ module Importers
           data = {
             "file_map" => {
               "a" => {
-                id: attachment_id,
+                id: @attachment.id,
                 migration_id:,
                 display_name: "foo"
               }
@@ -231,16 +209,16 @@ module Importers
 
           error = RuntimeError.new
           expect(::Attachment).to receive(:where).and_raise(error)
-          expect(migration).to receive(:add_import_warning).with(I18n.t("#migration.file_type", "File"), "foo", error)
 
-          Importers::AttachmentImporter.process_migration(data, migration)
+          Importers::AttachmentImporter.process_migration(data, @migration)
+          expect(@migration.reload.migration_issues.pluck(:description)).to include("Import Error: File - \"foo\"")
         end
 
         it "saves import failures with path name" do
           data = {
             "file_map" => {
               "a" => {
-                id: attachment_id,
+                id: @attachment.id,
                 migration_id:,
                 path_name: "bar"
               }
@@ -249,9 +227,9 @@ module Importers
 
           error = RuntimeError.new
           expect(::Attachment).to receive(:where).and_raise(error)
-          expect(migration).to receive(:add_import_warning).with(I18n.t("#migration.file_type", "File"), "bar", error)
 
-          Importers::AttachmentImporter.process_migration(data, migration)
+          Importers::AttachmentImporter.process_migration(data, @migration)
+          expect(@migration.reload.migration_issues.pluck(:description)).to include("Import Error: File - \"bar\"")
         end
       end
     end
