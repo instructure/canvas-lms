@@ -221,7 +221,7 @@ describe "quiz edit page assign to" do
       click_save_button("Apply")
       keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
 
-      select_post_to_sis_checkbox
+      click_post_to_sis_checkbox
       click_manage_assign_to_button
 
       wait_for_assign_to_tray_spinner
@@ -233,6 +233,73 @@ describe "quiz edit page assign to" do
       update_due_time(0, "11:59 PM")
       click_save_button("Apply")
       keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+    end
+
+    it "blocks saving empty due dates when enabled", :ignore_js_errors do
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+
+      click_post_to_sis_checkbox
+
+      wait_for_ajaximations
+
+      expect(driver.current_url).to include("edit")
+
+      click_quiz_save_button
+
+      expect_instui_flash_message("Please set a due date or change your selection for the “Sync to SIS” option.")
+
+      click_manage_assign_to_button
+
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
+      update_due_date(0, format_date_for_view(Time.zone.now, "%-m/%-d/%Y"))
+      update_due_time(0, "11:59 PM")
+      click_save_button("Apply")
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      expect(is_checked(post_to_sis_checkbox_selector)).to be_truthy
+    end
+
+    it "does not block empty due dates when disabled" do
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+
+      expect(is_checked(post_to_sis_checkbox_selector)).to be_falsey
+      click_quiz_save_button
+      expect(driver.current_url).not_to include("edit")
+
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+      expect(is_checked(post_to_sis_checkbox_selector)).to be_falsey
+    end
+
+    it "validates due date when user checks/unchecks the option", :ignore_js_errors do
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+
+      click_manage_assign_to_button
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      expect(assign_to_date_and_time[0].text).not_to include("Please add a due date")
+
+      click_cancel_button
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      click_post_to_sis_checkbox
+      click_manage_assign_to_button
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
+      update_due_date(0, format_date_for_view(Time.zone.now, "%-m/%-d/%Y"))
+      update_due_time(0, "11:59 PM")
+      click_save_button("Apply")
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      click_quiz_save_button
+      expect(driver.current_url).not_to include("edit")
     end
   end
 end

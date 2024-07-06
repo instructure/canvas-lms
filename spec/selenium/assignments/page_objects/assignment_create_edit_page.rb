@@ -256,7 +256,7 @@ class AssignmentCreateEditPage
       option_element.click
     end
 
-    def select_post_to_sis_checkbox
+    def click_post_to_sis_checkbox
       post_to_sis_checkbox.click
     end
   end
