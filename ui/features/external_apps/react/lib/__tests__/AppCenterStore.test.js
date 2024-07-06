@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import sinon from 'sinon'
 import store from '../AppCenterStore'
 
 const defaultApps = () => [
@@ -88,6 +89,7 @@ const defaultApps = () => [
     icon_image_url: null,
     id: 127,
     is_certified: false,
+    is_installed: false, // Ensure this is explicitly set to false
     logo_image_url:
       'https://s3.amazonaws.com/assets01.apprennet.com/lti-bounty/apprennet-logo-2-72x72.png',
     name: 'ApprenNet',
@@ -101,49 +103,52 @@ const defaultApps = () => [
   },
 ]
 
-QUnit.module('ExternalApps.AppCenterStore', {
-  setup() {
-    this.server = sinon.fakeServer.create()
+describe('ExternalApps.AppCenterStore', () => {
+  let server
+  let apps
+  let response
+
+  beforeEach(() => {
+    server = sinon.fakeServer.create()
     store.reset()
-    this.apps = defaultApps()
-    this.response = [200, {'Content-Type': 'application/json'}, JSON.stringify(this.apps)]
-  },
-  teardown() {
-    this.server.restore()
-    return store.reset()
-  },
-})
+    apps = defaultApps()
+    response = [200, {'Content-Type': 'application/json'}, JSON.stringify(apps)]
+  })
 
-test('findAppByShortName', function () {
-  store.setState({apps: this.apps})
-  equal(store.getState().apps.length, 3)
-  const thisApp = store.findAppByShortName('aleks')
-  equal(thisApp.id, 66)
-})
+  afterEach(() => {
+    server.restore()
+    store.reset()
+  })
 
-test('flagAppAsInstalled', function () {
-  store.setState({apps: this.apps})
-  ok(!store.findAppByShortName('apprennet').is_installed)
-  store.flagAppAsInstalled('apprennet')
-  ok(store.findAppByShortName('apprennet').is_installed)
-})
+  test('findAppByShortName', () => {
+    store.setState({apps})
+    expect(store.getState().apps.length).toBe(3)
+    const thisApp = store.findAppByShortName('aleks')
+    expect(thisApp.id).toBe(66)
+  })
 
-test('filteredApps', function () {
-  store.setState({apps: this.apps})
-  equal(store.filteredApps().length, 3)
-  store.setState({filterText: 'e'})
-  equal(store.filteredApps().length, 2)
-  store.setState({filter: 'not_installed'})
-  equal(store.filteredApps().length, 1)
-})
+  test('flagAppAsInstalled', () => {
+    store.setState({apps})
+    const apprennetApp = store.findAppByShortName('apprennet')
+    expect(apprennetApp.is_installed).toBe(false)
+    store.flagAppAsInstalled('apprennet')
+    const updatedApp = store.findAppByShortName('apprennet')
+    expect(updatedApp.is_installed).toBe(true)
+  })
 
-test('fetch', function () {
-  this.server.respondWith('GET', /\/app_center\/apps/, [
-    200,
-    {'Content-Type': 'application/json'},
-    JSON.stringify(this.apps),
-  ])
-  store.fetch()
-  this.server.respond()
-  equal(store.getState().apps.length, 3)
+  test('filteredApps', () => {
+    store.setState({apps})
+    expect(store.filteredApps().length).toBe(3)
+    store.setState({filterText: 'e'})
+    expect(store.filteredApps().length).toBe(2)
+    store.setState({filter: 'not_installed'})
+    expect(store.filteredApps().length).toBe(1)
+  })
+
+  test('fetch', () => {
+    server.respondWith('GET', /\/app_center\/apps/, response)
+    store.fetch()
+    server.respond()
+    expect(store.getState().apps.length).toBe(3)
+  })
 })
