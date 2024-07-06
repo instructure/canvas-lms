@@ -20,13 +20,13 @@ import CalendarEvent from '../CalendarEvent'
 import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 import {waitFor} from '@canvas/test-utils/Waiters'
 
-QUnit.module('Calendar', () => {
-  QUnit.module('CalendarEvent', () => {
-    QUnit.module('#fetch()', hooks => {
+describe('Calendar', () => {
+  describe('CalendarEvent', () => {
+    describe('#fetch()', () => {
       let calendarEvent
       let server
 
-      hooks.beforeEach(() => {
+      beforeEach(() => {
         server = new FakeServer()
 
         server.for('/sections').respond([
@@ -36,12 +36,12 @@ QUnit.module('Calendar', () => {
 
         calendarEvent = new CalendarEvent({sections_url: '/sections'})
 
-        sinon.stub(calendarEvent, 'showSpinner')
-        sinon.stub(calendarEvent, 'hideSpinner')
-        sinon.stub(calendarEvent, 'loadFailure')
+        jest.spyOn(calendarEvent, 'showSpinner')
+        jest.spyOn(calendarEvent, 'hideSpinner')
+        jest.spyOn(calendarEvent, 'loadFailure')
       })
 
-      hooks.afterEach(() => {
+      afterEach(() => {
         server.teardown()
       })
 
@@ -49,39 +49,40 @@ QUnit.module('Calendar', () => {
         calendarEvent.fetch()
         await waitFor(
           () =>
-            calendarEvent.hideSpinner.callCount === 1 || calendarEvent.loadFailure.callCount === 1
+            calendarEvent.hideSpinner.mock.calls.length === 1 ||
+            calendarEvent.loadFailure.mock.calls.length === 1
         )
       }
 
       test('requests all pages', async () => {
         await fetch()
         const requests = server.filterRequests('/sections')
-        strictEqual(requests.length, 2)
+        expect(requests.length).toBe(2)
         requests.forEach(r => {
-          ok(r.url.includes('include[]=permissions'))
+          expect(r.url).toContain('include[]=permissions')
         })
       })
 
       test('hides spinner when all requests succeed', async () => {
         await fetch()
-        strictEqual(calendarEvent.hideSpinner.callCount, 1)
+        expect(calendarEvent.hideSpinner.mock.calls.length).toBe(1)
       })
     })
 
-    QUnit.module('#url()', () => {
+    describe('#url()', () => {
       test('url for a new event', () => {
         const calendarEvent = new CalendarEvent()
-        strictEqual(calendarEvent.url(), '/api/v1/calendar_events/')
+        expect(calendarEvent.url()).toBe('/api/v1/calendar_events/')
       })
 
       test('url for an existing event', () => {
         const calendarEvent = new CalendarEvent({id: 1})
-        strictEqual(calendarEvent.url(), '/api/v1/calendar_events/1')
+        expect(calendarEvent.url()).toBe('/api/v1/calendar_events/1')
       })
 
       test('url for an existing event in a series', () => {
         const calendarEvent = new CalendarEvent({id: 1, which: 'all'})
-        strictEqual(calendarEvent.url(), '/api/v1/calendar_events/1?which=all')
+        expect(calendarEvent.url()).toBe('/api/v1/calendar_events/1?which=all')
       })
     })
   })

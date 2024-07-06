@@ -18,24 +18,24 @@
 
 import {createGradebook, setFixtureHtml} from '../GradebookSpecHelper'
 
-QUnit.module('Gradebook > Students', suiteHooks => {
-  let $container
+describe('Gradebook > Students', () => {
+  let container
   let gradebook
 
-  suiteHooks.beforeEach(() => {
-    $container = document.body.appendChild(document.createElement('div'))
-    setFixtureHtml($container)
+  beforeEach(() => {
+    container = document.body.appendChild(document.createElement('div'))
+    setFixtureHtml(container)
   })
 
-  suiteHooks.afterEach(() => {
+  afterEach(() => {
     gradebook.destroy()
-    $container.remove()
+    container.remove()
   })
 
-  QUnit.module('#updateGradingPeriodAssignments()', hooks => {
+  describe('#updateGradingPeriodAssignments()', () => {
     let gradingPeriodAssignments
 
-    hooks.beforeEach(() => {
+    beforeEach(() => {
       gradebook = createGradebook()
       gradingPeriodAssignments = {
         1501: ['2301', '2303'],
@@ -45,45 +45,45 @@ QUnit.module('Gradebook > Students', suiteHooks => {
 
     test('stores the given grading period assignments', () => {
       gradebook.updateGradingPeriodAssignments(gradingPeriodAssignments)
-      deepEqual(gradebook.courseContent.gradingPeriodAssignments, gradingPeriodAssignments)
+      expect(gradebook.courseContent.gradingPeriodAssignments).toEqual(gradingPeriodAssignments)
     })
 
     test('sets the grading period assignments loaded status to true', () => {
       gradebook.updateGradingPeriodAssignments(gradingPeriodAssignments)
-      strictEqual(gradebook.contentLoadStates.gradingPeriodAssignmentsLoaded, true)
+      expect(gradebook.contentLoadStates.gradingPeriodAssignmentsLoaded).toBe(true)
     })
 
     test('updates columns when the grid has rendered', () => {
-      sinon.stub(gradebook, '_gridHasRendered').returns(true)
-      sinon.stub(gradebook, 'updateColumns')
+      jest.spyOn(gradebook, '_gridHasRendered').mockReturnValue(true)
+      jest.spyOn(gradebook, 'updateColumns')
       gradebook.updateGradingPeriodAssignments(gradingPeriodAssignments)
-      strictEqual(gradebook.updateColumns.callCount, 1)
+      expect(gradebook.updateColumns).toHaveBeenCalledTimes(1)
     })
 
     test('updates columns after storing grading period assignments', () => {
-      sinon.stub(gradebook, '_gridHasRendered').returns(true)
-      sinon.stub(gradebook, 'updateColumns').callsFake(() => {
-        deepEqual(gradebook.courseContent.gradingPeriodAssignments, gradingPeriodAssignments)
+      jest.spyOn(gradebook, '_gridHasRendered').mockReturnValue(true)
+      jest.spyOn(gradebook, 'updateColumns').mockImplementation(() => {
+        expect(gradebook.courseContent.gradingPeriodAssignments).toEqual(gradingPeriodAssignments)
       })
       gradebook.updateGradingPeriodAssignments(gradingPeriodAssignments)
     })
 
     test('does not update columns when the grid has not yet rendered', () => {
-      sinon.stub(gradebook, '_gridHasRendered').returns(false)
-      sinon.stub(gradebook, 'updateColumns')
+      jest.spyOn(gradebook, '_gridHasRendered').mockReturnValue(false)
+      jest.spyOn(gradebook, 'updateColumns')
       gradebook.updateGradingPeriodAssignments(gradingPeriodAssignments)
-      strictEqual(gradebook.updateColumns.callCount, 0)
+      expect(gradebook.updateColumns).not.toHaveBeenCalled()
     })
 
     test('updates essential data load status', () => {
-      sinon.spy(gradebook, '_updateEssentialDataLoaded')
+      jest.spyOn(gradebook, '_updateEssentialDataLoaded')
       gradebook.updateGradingPeriodAssignments(gradingPeriodAssignments)
-      strictEqual(gradebook._updateEssentialDataLoaded.callCount, 1)
+      expect(gradebook._updateEssentialDataLoaded).toHaveBeenCalledTimes(1)
     })
 
     test('updates essential data load status after updating the grading period assignments loaded status', () => {
-      sinon.stub(gradebook, '_updateEssentialDataLoaded').callsFake(() => {
-        strictEqual(gradebook.contentLoadStates.gradingPeriodAssignmentsLoaded, true)
+      jest.spyOn(gradebook, '_updateEssentialDataLoaded').mockImplementation(() => {
+        expect(gradebook.contentLoadStates.gradingPeriodAssignmentsLoaded).toBe(true)
       })
       gradebook.updateGradingPeriodAssignments(gradingPeriodAssignments)
     })
