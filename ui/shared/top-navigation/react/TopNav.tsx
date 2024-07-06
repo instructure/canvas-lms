@@ -33,6 +33,9 @@ const {porcelain} = getCurrentTheme()?.colors ?? {porcelain: 'white'}
 const overrides = {
   desktopBackgroundInverse: porcelain,
   smallViewportBackgroundInverse: porcelain,
+  desktopZIndex: 99,
+  smallViewportZIndex: 99,
+  smallViewportTrayZIndex: 99,
 }
 
 export interface ITopNavProps {
