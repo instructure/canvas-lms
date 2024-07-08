@@ -142,9 +142,7 @@ const SectionMenu = ({
     if (onRemove) {
       onRemove(selected.get())
     } else if (selected.get()?.id) {
-      window.setTimeout(() => {
-        actions.delete(selected.get().id)
-      }, 0)
+      actions.delete(selected.get().id)
     }
   }, [actions, onRemove, selected])
 
