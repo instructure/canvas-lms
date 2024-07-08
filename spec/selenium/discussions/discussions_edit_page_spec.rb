@@ -1816,6 +1816,74 @@ describe "discussions" do
               expect(displayed_override_dates.include?(available_from_date)).to be_truthy
               expect(displayed_override_dates.include?(until_date)).to be_truthy
             end
+
+            it "displays an error when the availability date is after the due date" do
+              Account.site_admin.enable_feature!(:discussion_checkpoints)
+              @course.root_account.enable_feature!(:discussion_checkpoints)
+              assignment = @course.assignments.create!(
+                name: "Assignment",
+                submission_types: ["online_text_entry"],
+                points_possible: 20
+              )
+              assignment.update!(has_sub_assignments: true)
+              assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 10, due_at: 3.days.from_now)
+              assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+              graded_discussion = @course.discussion_topics.create!(
+                title: "Graded Discussion",
+                discussion_type: "threaded",
+                posted_at: "2017-07-09 16:32:34",
+                user: @teacher,
+                assignment:,
+                reply_to_entry_required_count: 1
+              )
+
+              # Open page and assignTo tray
+              get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}/edit"
+              Discussion.assign_to_button.click
+
+              reply_to_topic_date_formatted = format_date_for_view(1.day.from_now(Time.zone.now).to_date, "%m/%d/%Y")
+              update_reply_to_topic_date(0, reply_to_topic_date_formatted)
+              update_reply_to_topic_time(0, "5:00 PM")
+
+              # available from
+              available_from_date_formatted = format_date_for_view(2.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
+              update_available_date(0, available_from_date_formatted, true, false)
+              update_available_time(0, "5:00 PM", true, false)
+              expect(assign_to_date_and_time[2].text).to include("Unlock date cannot be after reply to topic due date")
+
+              # correct reply to topic
+              reply_to_topic_date_formatted = format_date_for_view(3.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
+              update_reply_to_topic_date(0, reply_to_topic_date_formatted)
+              update_reply_to_topic_time(0, "5:00 PM")
+
+              # required replies
+              required_replies_date_formatted = format_date_for_view(1.day.from_now(Time.zone.now).to_date, "%m/%d/%Y")
+              update_required_replies_date(0, required_replies_date_formatted)
+              update_required_replies_time(0, "5:00 PM")
+              expect(assign_to_date_and_time[2].text).to include("Unlock date cannot be after required replies due date")
+
+              # available until
+              until_date = 5.days.from_now(Time.zone.now).to_date + 17.hours
+              until_date_formatted = format_date_for_view(until_date, "%m/%d/%Y")
+              update_until_date(0, until_date_formatted, true, false)
+              update_until_time(0, "5:00 PM", true, false)
+
+              reply_to_topic_date_formatted = format_date_for_view(6.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
+              update_reply_to_topic_date(0, reply_to_topic_date_formatted)
+              update_reply_to_topic_time(0, "5:00 PM")
+              expect(assign_to_date_and_time[3].text).to include("Lock date cannot be before reply to topic due date")
+
+              # correct reply to topic
+              reply_to_topic_date_formatted = format_date_for_view(3.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
+              update_reply_to_topic_date(0, reply_to_topic_date_formatted)
+              update_reply_to_topic_time(0, "5:00 PM")
+
+              # required replies
+              required_replies_date_formatted = format_date_for_view(6.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
+              update_required_replies_date(0, required_replies_date_formatted)
+              update_required_replies_time(0, "5:00 PM")
+              expect(assign_to_date_and_time[3].text).to include("Lock date cannot be before required replies due date")
+            end
           end
 
           context "post to sis" do
