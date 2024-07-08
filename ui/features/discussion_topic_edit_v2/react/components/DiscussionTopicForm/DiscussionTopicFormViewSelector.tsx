@@ -71,6 +71,7 @@ export const DiscussionTopicFormViewSelector = ({
       </Tabs>
     )
   }
+
   const renderSelect = () => {
     return (
       <Flex.Item margin="0 0 medium 0">
@@ -84,18 +85,21 @@ export const DiscussionTopicFormViewSelector = ({
           renderLabel={<ScreenReaderContent>{I18n.t('Select View')}</ScreenReaderContent>}
           data-testid="view-select"
         >
-          <SimpleSelect.Group renderLabel={I18n.t('View')}>
-            <SimpleSelect.Option id="details" value={Views.Details}>
+          <SimpleSelect.Group renderLabel={I18n.t('View')} key="view-group">
+            <SimpleSelect.Option id="details" key={Views.Details} value={Views.Details}>
               {I18n.t('Details')}
             </SimpleSelect.Option>
-            {shouldMasteryPathsBeVisible && (
+            {shouldMasteryPathsBeVisible ? (
               <SimpleSelect.Option
                 id="mastery-paths"
+                key={Views.MasteryPaths}
                 value={Views.MasteryPaths}
                 isDisabled={!shouldMasteryPathsBeEnabled}
               >
                 {I18n.t('Mastery Paths')}
               </SimpleSelect.Option>
+            ) : (
+              <></>
             )}
           </SimpleSelect.Group>
         </SimpleSelect>
