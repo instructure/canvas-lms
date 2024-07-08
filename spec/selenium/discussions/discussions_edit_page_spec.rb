@@ -767,6 +767,14 @@ describe "discussions" do
             expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
           end
 
+          it "does not display 'Assign To' section for an ungraded group discussion" do
+            group = course.groups.create!(name: "group")
+            group_ungraded = course.discussion_topics.create!(title: "no options enabled - topic", group_category: group.group_category)
+            get "/courses/#{course.id}/discussion_topics/#{group_ungraded.id}/edit"
+            expect(Discussion.select_date_input_exists?).to be_truthy
+            expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
+          end
+
           it "does not display 'Post To' section and Available From/Until inputs" do
             get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
             expect(Discussion.select_date_input_exists?).to be_falsey

@@ -327,6 +327,17 @@ describe "discussions index" do
         expect(DiscussionsIndex.manage_discussions_menu).not_to include_text("Assign To")
       end
 
+      it "does not render assign to tray in course context with ungraded group discussions index" do
+        group = @course.groups.create!(name: "Group 1")
+        discussion = @course.discussion_topics.create!(title: "group topic", group_category: group.group_category)
+        user_session(@teacher)
+        get("/courses/#{@course.id}/discussion_topics/")
+        wait_for_ajaximations
+        DiscussionsIndex.discussion_menu(discussion.title).click
+        expect(DiscussionsIndex.manage_discussions_menu).to include_text("Delete")
+        expect(DiscussionsIndex.manage_discussions_menu).not_to include_text("Assign To")
+      end
+
       it "does not show the option when the user does not have the moderate_forum permission" do
         discussion = create_graded_discussion(@course)
         login_and_visit_course(@teacher, @course)
