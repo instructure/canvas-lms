@@ -169,11 +169,11 @@ export default class IndexMenu extends React.Component<Props, State> {
     }
   }
 
-  iconForTrayTool(tool: {canvas_icon_class: string; icon_url: string}) {
+  iconForTrayTool(tool: {canvas_icon_class: string; icon_url: string; title: string}) {
     if (tool.canvas_icon_class) {
       return <i className={tool.canvas_icon_class} />
     } else if (tool.icon_url) {
-      return <img className="icon lti_tool_icon" alt="" src={tool.icon_url} />
+      return <img className="icon lti_tool_icon" alt={tool.title} src={tool.icon_url} />
     }
   }
 

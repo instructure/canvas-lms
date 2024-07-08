@@ -129,8 +129,12 @@ iframe.tool_launch {
 }
 
 .lti_tool_icon {
-  width: 1.2rem;
   margin-right: 0.25rem;
+  max-width: 1.2rem;
+ }
+
+.lti_tool_icon_large {
+  max-width: 3rem;
  }
 
 #assignment_external_tools {
