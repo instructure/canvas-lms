@@ -22,7 +22,8 @@ import {NumberInput} from '@instructure/ui-number-input'
 interface NumberInputControlledProps {
   minimum: number
   maximum: number
-  defaultValue: number
+  currentValue: number
+  updateCurrentValue: Function
   disabled: boolean
   'data-testid': string
 }
@@ -30,11 +31,12 @@ interface NumberInputControlledProps {
 const NumberInputControlled: React.FC<NumberInputControlledProps> = ({
   minimum,
   maximum,
-  defaultValue,
   disabled,
+  currentValue,
+  updateCurrentValue,
   'data-testid': dataTestid,
 }) => {
-  const [number, setNumber] = useState(defaultValue)
+  const [number, setNumber] = useState(currentValue)
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setNumber(value ? Number(value) : 0) // Replace null with 0
   }
@@ -60,7 +62,10 @@ const NumberInputControlled: React.FC<NumberInputControlledProps> = ({
   const setBoundedNumber = (n: number) => {
     if (n < minimum) setNumber(minimum)
     else if (n > maximum) setNumber(maximum)
-    else setNumber(n)
+    else {
+      setNumber(n)
+      updateCurrentValue(n)
+    }
   }
 
   return (

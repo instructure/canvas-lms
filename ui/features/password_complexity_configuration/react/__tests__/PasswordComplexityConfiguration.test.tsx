@@ -18,7 +18,10 @@
 
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
+import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import PasswordComplexityConfiguration from '../PasswordComplexityConfiguration'
+
+jest.mock('@canvas/do-fetch-api-effect/apiRequest')
 
 describe('PasswordComplexityConfiguration', () => {
   it('opens the Tray when "View Options" button is clicked', () => {
@@ -89,5 +92,28 @@ describe('PasswordComplexityConfiguration', () => {
     const cancelButton = await findByTestId('cancelButton')
     fireEvent.click(cancelButton)
     expect(queryByText('Password Options Tray')).not.toBeInTheDocument()
+  })
+
+  it('makes a PUT request with the correct method and path', async () => {
+    const {getByText, findByTestId} = render(<PasswordComplexityConfiguration />)
+    fireEvent.click(getByText('View Options'))
+    const saveButton = await findByTestId('saveButton')
+    fireEvent.click(saveButton)
+    expect(executeApiRequest).toHaveBeenCalledWith({
+      method: 'PUT',
+      body: {
+        account: {
+          settings: {
+            password_policy: {
+              allow_login_suspension: false,
+              minimum_character_length: 8,
+              require_number_characters: true,
+              require_symbol_characters: true,
+            },
+          },
+        },
+      },
+      path: '/api/v1/accounts/undefined/',
+    })
   })
 })
