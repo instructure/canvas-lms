@@ -673,7 +673,7 @@ function DiscussionTopicForm({
           </DiscussionDueDatesContext.Provider>
         </View>
       )
-    } else if (shouldShowAssignToForUngradedDiscussions) {
+    } else if (shouldShowAssignToForUngradedDiscussions && !isGroupDiscussion) {
       return (
         <View as="div" data-testid="assignment-settings-section">
           <Text weight="bold">{I18n.t('Assign Access')}</Text>
