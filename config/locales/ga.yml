@@ -21521,7 +21521,14 @@ ga:
                 tamall a ghlacadh le haghaidh cúrsaí móra. Is féidir leat an
                 leathanach a fhágáil agus gheobhaidh tú fógra nuair a bheidh an íoslódáil
                 críochnaithe.
-  the_email_address_email_was_used_to_log_into_canva_d76c2a77: "Úsáideadh %{email}%{website}an seoladh ríomhphoist  chun logáil isteach go Canvas ag ."
+  the_email_address_email_was_used_to_log_into_canva_4ef05773: |-
+      Úsáideadh an seoladh ríomhphoist %{email} chun logáil isteach go Canvas ag %{website}.
+      
+      Bain úsáid as an gcód seo a leanas chun do logáil isteach a chríochnú: %{code}
+      NÓTA: Rachaidh an cód seo in éag i gceann 15 nóiméad.
+      
+      Mura ndearna tú iarracht logáil isteach i Canvas, déan neamhaird den teachtaireacht seo.
+  the_email_address_email_was_used_to_log_into_canva_d76c2a77: "Úsáideadh %{email} an seoladh ríomhphoist chun logáil isteach go Canvas ag %{website}."
   the_end_date_for_841d2ecd: "An dáta deiridh le haghaidh "
   the_end_date_for_default_to_end_of_yesterday_d8ebec31: "An dáta deiridh le haghaidh (réamhshocraithe go deireadh an lae inné)"
   the_end_date_for_discussion_entries_6ac1b0d9: "An dáta deiridh le haghaidh Iontrálacha Fóram"
@@ -21603,6 +21610,11 @@ ga:
       Tacaíocht Canvas
   the_message_you_sent_with_the_subject_line_subject_8157a1ff: |-
       Níor seachadadh an teachtaireacht a sheol tú le líne ábhair "%{subject}" toisc go bhfuil do chuntas curtha ar fionraí.
+      
+      Go raibh maith agat,
+      Tacaíocht Canvas
+  the_message_you_sent_with_the_subject_line_subject_8511b0dd: |-
+      Níor seachadadh an teachtaireacht a sheol tú leis an líne ábhair "%{subject}" toisc nach rannpháirtí bailí thú sa chomhrá.
       
       Go raibh maith agat,
       Tacaíocht Canvas
