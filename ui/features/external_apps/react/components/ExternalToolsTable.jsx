@@ -124,6 +124,7 @@ export default class ExternalToolsTable extends React.Component {
       /^account_/.test(ENV.context_asset_string) &&
       !ENV.ACCOUNT?.site_admin &&
       (this.props.canAdd || this.props.canEdit || this.props.canDelete || this.props.canAddEdit)
+    const show_top_nav_toggles = !!ENV.FEATURES?.top_navigation_placement
 
     return (
       <div className="ExternalToolsTable">
@@ -144,7 +145,7 @@ export default class ExternalToolsTable extends React.Component {
                   <ScreenReaderContent>{I18n.t('Status')}</ScreenReaderContent>
                 </th>
                 <th scope="col">{I18n.t('Name')}</th>
-                {show_lti_favorite_toggles && (
+                {show_lti_favorite_toggles && show_top_nav_toggles && (
                   <th scope="col" style={{width: '12rem', whiteSpace: 'nowrap'}}>
                     {I18n.t('Pin to Top Navigation')}
                     <Tooltip
