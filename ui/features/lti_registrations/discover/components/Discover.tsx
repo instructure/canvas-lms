@@ -213,7 +213,7 @@ export const Discover = () => {
                 {group.display_name}
               </Heading>
               <Flex justifyItems="space-between">
-                <p>TODO</p>
+                <p>{group.description}</p>
                 <CondensedButton onClick={() => setTag(group.tag)}>
                   {I18n.t('See All')}
                 </CondensedButton>

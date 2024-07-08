@@ -33,18 +33,16 @@ import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
 import {useQuery} from '@tanstack/react-query'
 import {useLocation, useNavigate} from 'react-router-dom'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {fetchProductDetails, fetchProducts} from '../../queries/productsQuery'
 import ImageCarousel from './ImageCarousel'
-import LtiDetailModal from './LtiDetailModal'
+// import LtiDetailModal from './LtiDetailModal'
 
 import {openDynamicRegistrationWizard} from '../../../manage/registration_wizard/RegistrationWizardModalState'
 import type {Product} from '../../model/Product'
 import ProductCard from '../ProductCard/ProductCard'
 
-declare const ENV: GlobalEnv
-
 const ProductDetail = () => {
+  // TODO: Reimplement LtiDetailModal
   const [isModalOpen, setModalOpen] = useState(false)
   const [clickedLtiTitle, setClickedLtiTitle] = useState('')
 
@@ -93,7 +91,7 @@ const ProductDetail = () => {
           </Text>
           <Flex.Item>
             <div>
-              <Link href={badge.badge_url} isWithinText={false}>
+              <Link href={badge.link} isWithinText={false}>
                 <Text weight="bold">
                   Learn More <IconExternalLinkLine />
                 </Text>
@@ -105,15 +103,31 @@ const ProductDetail = () => {
     ))
   }
 
-  const renderLtiVersions = () => {
-    return product?.lti.versions.map(version => <Pill margin="0 x-small 0 0">{version}</Pill>)
+  const renderTags = () => {
+    return product?.tags.map((t, i) => (
+      <Pill margin="0 x-small 0 0" key={`${i + 1}`}>
+        {t.name}
+      </Pill>
+    ))
   }
+
   const ltiDataClickHandle = (title: string) => {
     setModalOpen(true)
     setClickedLtiTitle(title)
   }
+
   const renderLtiTitle = () => {
-    return product?.lti.title.map(title => (
+    const lti = product?.tool_integration_configurations
+    const version: string[] = []
+
+    if (lti?.hasOwnProperty('lti_13')) {
+      version.push('Learning Tools Interoperability (LTI)® v.1.3 Core Specification')
+    }
+    if (lti?.hasOwnProperty('lti_11')) {
+      version.push('Learning Tools Interoperability (LTI)® v.1.1 Core Specification')
+    }
+
+    return version.map(title => (
       <Flex.Item margin="0 0 small 0">
         <Link onClick={() => ltiDataClickHandle(title)} isWithinText={false}>
           <Text weight="bold">{title}</Text>
@@ -121,6 +135,20 @@ const ProductDetail = () => {
       </Flex.Item>
     ))
   }
+
+  const formattedUpdatedAt = () => {
+    const date = new Date(product?.updated_at)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
+  }
+
+  const dynamicRegistrationInformation = product?.tool_integration_configurations?.lti_13?.find(
+    configuration => configuration.integration_type === 'lti_13_dynamic_registration'
+  )
+
   return (
     <div>
       {product ? (
@@ -142,17 +170,18 @@ const ProductDetail = () => {
             <Flex.Item align="start">
               <Button
                 color="primary"
+                interaction={dynamicRegistrationInformation ? 'enabled' : 'disabled'}
                 onClick={() => {
-                  // todo: replace the url with the actual dynamic registration url
-                  // from Product listing API
-                  const dynamicRegistrationUrl =
-                    ENV.dynamicRegistrationUrl || 'http://yaltt.paulgray.net/dynamic-registration'
-                  // todo: replace with actual unified tool id from Product listing API
-                  const unifiedToolId = 'unified_tool_id'
-                  openDynamicRegistrationWizard(dynamicRegistrationUrl, unifiedToolId, () => {
-                    // redirect to apps page
-                    navigate('/manage')
-                  })
+                  if (!dynamicRegistrationInformation) return null
+
+                  openDynamicRegistrationWizard(
+                    dynamicRegistrationInformation.url,
+                    dynamicRegistrationInformation.unified_tool_id,
+                    () => {
+                      // redirect to apps page
+                      navigate('/manage')
+                    }
+                  )
                 }}
               >
                 Configure
@@ -162,17 +191,11 @@ const ProductDetail = () => {
           <Flex margin="0 0 0 xx-large">
             <Flex.Item padding="0 0 0 x-small" margin="0 0 0 medium">
               <Text color="secondary">by {product.company.name}</Text> |{' '}
-              <Text color="secondary">Updated: {product.updatedAt}</Text>
+              <Text color="secondary">Updated: {formattedUpdatedAt()}</Text>
             </Flex.Item>
           </Flex>
-          <Flex padding="small 0 0 x-small" margin="0 medium medium medium">
-            <Flex.Item padding="0 x-small 0 xx-large">
-              <Pill>{product.toolType}</Pill>
-            </Flex.Item>
-            <Flex.Item padding="0 x-small 0 0">
-              <Pill>{product.demographic}</Pill>
-            </Flex.Item>
-            <Flex.Item padding="0 0 0 0">{renderLtiVersions()}</Flex.Item>
+          <Flex padding="small 0 0 small" margin="0 medium large xx-large">
+            <Flex.Item margin="0 0 0 small">{renderTags()}</Flex.Item>
           </Flex>
           <ImageCarousel screenshots={product.screenshots} />
           <Flex margin="medium 0 0 0">
@@ -184,7 +207,7 @@ const ProductDetail = () => {
           </Flex>
           <Flex>
             <Flex.Item margin="medium 0 small 0">
-              <Text>{product.description}</Text>
+              <Text dangerouslySetInnerHTML={{__html: product.description}} />
             </Flex.Item>
           </Flex>
           <Link href={product.company.company_url} isWithinText={false}>
@@ -306,13 +329,13 @@ const ProductDetail = () => {
       <Flex direction="row" gap="small">
         {renderProducts()}
       </Flex>
-
-      <LtiDetailModal
+      {/* TODO: Reimplement LtiDetailModal */}
+      {/* <LtiDetailModal
         ltiTitle={clickedLtiTitle}
         integrationData={product?.lti}
         isModalOpen={isModalOpen}
         setModalOpen={setModalOpen}
-      />
+      /> */}
     </div>
   )
 }

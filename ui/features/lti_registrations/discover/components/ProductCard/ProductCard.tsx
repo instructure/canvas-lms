@@ -57,7 +57,7 @@ const ProductCard = (props: ProductCardProps) => {
                 <Link
                   isWithinText={false}
                   themeOverride={{fontWeight: 700, color: 'black'}}
-                  href={`/accounts/${accountId}/apps/product_detail/${product.id}`}
+                  href={`/accounts/${accountId}/apps/product_detail/${product.global_product_id}`}
                 >
                   {product.name}
                 </Link>
@@ -78,7 +78,7 @@ const ProductCard = (props: ProductCardProps) => {
             </Text>
           </View>
           <View as="div" margin="auto 0 0 0">
-            {product.badges.map(badge => (
+            {product?.tags?.map(badge => (
               <Tag key={badge.name} text={badge.name} size="small" margin="0 xx-small 0 0" />
             ))}
           </View>
