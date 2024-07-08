@@ -48,7 +48,7 @@ export type ActivityStreamSummary = {
 
 export type StreamSummaryItem = {
   count: number
-  notificationCategory: string | null
+  notification_category: string | null
   type: string
-  unreadCount: number
+  unread_count: number
 }

@@ -18,6 +18,9 @@
 
 import {defaultFetchOptions, asJson} from '@canvas/util/xhr'
 import createStore, {type CanvasStore} from '@canvas/backbone/createStore'
+import {fetchActivityStreamSummariesAsync} from '../dashboardCardQueries'
+import {mapActivityStreamSummaries} from '../util/dashboardUtils'
+import type {ActivityStreamSummary} from '../types'
 
 type Stream = unknown[]
 
@@ -25,18 +28,28 @@ type Streams = Record<string, {stream?: Stream}>
 
 const CourseActivitySummaryStore: CanvasStore<{
   streams: Streams
+  isFetching?: boolean
 }> & {
   _fetchForCourse?: (courseId: string) => Promise<void>
   getStateForCourse?: (courseId: string) => {streams: Streams} | {stream?: Stream} | undefined
+  _batchLoadSummaries?: (userID: string) => void
+  _fetchActivityStreamSummaries?: (userID: string) => Promise<void>
 } = createStore({streams: {}})
 
 CourseActivitySummaryStore.getStateForCourse = function (courseId?: string) {
   if (typeof courseId === 'undefined') return CourseActivitySummaryStore.getState()
 
-  const {streams} = CourseActivitySummaryStore.getState()
+  const {streams, isFetching} = CourseActivitySummaryStore.getState()
   if (!(courseId in streams)) {
     streams[courseId] = {}
-    CourseActivitySummaryStore._fetchForCourse?.(courseId)
+
+    if (ENV.FEATURES?.dashboard_graphql_integration && ENV?.current_user_id) {
+      if (!isFetching) {
+        CourseActivitySummaryStore._batchLoadSummaries?.(ENV.current_user_id)
+      }
+    } else {
+      CourseActivitySummaryStore._fetchForCourse?.(courseId)
+    }
   }
   return streams[courseId]
 }
@@ -50,6 +63,27 @@ CourseActivitySummaryStore._fetchForCourse = function (courseId: string) {
     state.streams[courseId] = {stream}
     CourseActivitySummaryStore.setState(state)
   })
+}
+
+CourseActivitySummaryStore._batchLoadSummaries = function (userID: string) {
+  const state = CourseActivitySummaryStore.getState()
+  state.isFetching = true
+  CourseActivitySummaryStore.setState(state)
+  CourseActivitySummaryStore._fetchActivityStreamSummaries?.(userID).then((response: any) => {
+    const newStreams: Streams = {}
+    mapActivityStreamSummaries(response).forEach((courseSummary: ActivityStreamSummary) => {
+      newStreams[courseSummary.id] = {stream: courseSummary.summary}
+    })
+    CourseActivitySummaryStore.setState({
+      streams: newStreams,
+      isFetching: false,
+    })
+  })
+}
+
+// for spy purposes
+CourseActivitySummaryStore._fetchActivityStreamSummaries = function (userID: string) {
+  return fetchActivityStreamSummariesAsync({userID})
 }
 
 export default CourseActivitySummaryStore

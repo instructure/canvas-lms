@@ -88,9 +88,9 @@ describe('mapActivityStreamSummaries', () => {
         id: '123',
         summary: mockedStreamItems.map((item: any) => ({
           count: item.count,
-          notificationCategory: item.notificationCategory,
+          notification_category: item.notificationCategory,
           type: item.type,
-          unreadCount: item.unreadCount,
+          unread_count: item.unreadCount,
         })),
       },
     ]
