@@ -17,6 +17,7 @@
  */
 
 import CourseActivitySummaryStore from '../CourseActivitySummaryStore'
+import {ActivityStreamSummary as ActivityStreamSummaryType} from '../../graphql/ActivityStream'
 import wait from 'waait'
 import fetchMock from 'fetch-mock'
 
@@ -51,6 +52,58 @@ describe('CourseActivitySummaryStore', () => {
       CourseActivitySummaryStore.setState({streams: {1: {stream}}})
       expect(CourseActivitySummaryStore.getStateForCourse(1)).toEqual({stream})
     })
+
+    it('should call batchLoadSummaries when FF is enabled', () => {
+      window.ENV = {
+        FEATURES: {
+          dashboard_graphql_integration: true,
+        },
+        current_user_id: 123,
+      }
+      const batchSpy = jest
+        .spyOn(CourseActivitySummaryStore, '_batchLoadSummaries')
+        .mockImplementation(() => {})
+
+      const fetchSpy = jest
+        .spyOn(CourseActivitySummaryStore, '_fetchForCourse')
+        .mockImplementation(() => {})
+      expect(CourseActivitySummaryStore.getStateForCourse(1)).toEqual({})
+      expect(batchSpy).toHaveBeenCalled()
+      expect(fetchSpy).not.toHaveBeenCalled()
+    })
+
+    it('should not call batchLoadSummaries if already fetching', () => {
+      window.ENV = {
+        FEATURES: {
+          dashboard_graphql_integration: true,
+        },
+        current_user_id: 123,
+      }
+      const batchSpy = jest
+        .spyOn(CourseActivitySummaryStore, '_batchLoadSummaries')
+        .mockImplementation(() => {})
+
+      const fetchSpy = jest
+        .spyOn(CourseActivitySummaryStore, '_fetchForCourse')
+        .mockImplementation(() => {})
+      CourseActivitySummaryStore.setState({isFetching: true})
+      expect(CourseActivitySummaryStore.getStateForCourse(1)).toEqual({})
+      expect(batchSpy).not.toHaveBeenCalled()
+      expect(fetchSpy).not.toHaveBeenCalled()
+    })
+
+    it('should fall back to _fetchForCourse when user id not found', () => {
+      window.ENV = {
+        FEATURES: {
+          dashboard_graphql_integration: true,
+        },
+      }
+      const fetchSpy = jest
+        .spyOn(CourseActivitySummaryStore, '_fetchForCourse')
+        .mockImplementation(() => {})
+      expect(CourseActivitySummaryStore.getStateForCourse(1)).toEqual({})
+      expect(fetchSpy).toHaveBeenCalled()
+    })
   })
 
   describe('_fetchForCourse', () => {
@@ -68,7 +121,11 @@ describe('CourseActivitySummaryStore', () => {
       CourseActivitySummaryStore._fetchForCourse(1)
       await wait(1)
       expect(spy).toHaveBeenCalled()
-      expect(CourseActivitySummaryStore.getState()).toEqual({streams: {1: {stream}}})
+      expect(CourseActivitySummaryStore.getState()).toEqual(
+        expect.objectContaining({
+          streams: {1: {stream}},
+        })
+      )
     })
 
     it('handes 401 errors correctly', async () => {
@@ -108,6 +165,111 @@ describe('CourseActivitySummaryStore', () => {
       await wait(1)
       expect(errorFn).toHaveBeenCalled()
       expect(CourseActivitySummaryStore.getState().streams[1]).toBeUndefined()
+    })
+  })
+
+  describe('_batchLoadSummaries', () => {
+    const mockedStreamItems = ActivityStreamSummaryType.mock().summary
+    const mockResponse = {
+      legacyNode: {
+        favoriteCoursesConnection: {
+          nodes: [
+            {
+              _id: '123',
+              activityStream: {
+                summary: mockedStreamItems,
+              },
+            },
+            {
+              _id: '456',
+              activityStream: {
+                summary: mockedStreamItems,
+              },
+            },
+            {
+              _id: '789',
+              activityStream: {
+                summary: [],
+              },
+            },
+          ],
+        },
+      },
+    }
+    it('populates state for each course based on API response', async () => {
+      const spy = jest
+        .spyOn(CourseActivitySummaryStore, '_fetchActivityStreamSummaries')
+        .mockImplementation(() => Promise.resolve(mockResponse))
+
+      CourseActivitySummaryStore._batchLoadSummaries('123')
+      await wait(1)
+      expect(spy).toHaveBeenCalled()
+      expect(CourseActivitySummaryStore.getState()).toEqual(
+        expect.objectContaining({
+          streams: {
+            123: {
+              stream: mockedStreamItems.map(item => ({
+                count: item.count,
+                notification_category: item.notificationCategory,
+                type: item.type,
+                unread_count: item.unreadCount,
+              })),
+            },
+            456: {
+              stream: mockedStreamItems.map(item => ({
+                count: item.count,
+                notification_category: item.notificationCategory,
+                type: item.type,
+                unread_count: item.unreadCount,
+              })),
+            },
+            789: {
+              stream: [],
+            },
+          },
+        })
+      )
+    })
+  })
+
+  describe('_fetchActivityStreamSummaries', () => {
+    it('handles 401 errors correctly', async () => {
+      const errorResponse = {
+        ok: false,
+        status: 401,
+        statusText: 'Unauthorized',
+        json: () => Promise.reject(new Error('should never make it here')),
+      }
+
+      jest
+        .spyOn(CourseActivitySummaryStore, '_fetchActivityStreamSummaries')
+        .mockImplementation(() => Promise.reject(errorResponse))
+      const errorFn = jest.fn()
+      CourseActivitySummaryStore._fetchActivityStreamSummaries('123').catch(errorFn)
+      await wait(1)
+      expect(errorFn).toHaveBeenCalled()
+      expect(CourseActivitySummaryStore.getState().streams).toEqual({})
+      expect(CourseActivitySummaryStore.getState().isFetching).toBe(false)
+    })
+
+    it('handes 503 errors correctly ', async () => {
+      const errorResponse = {
+        ok: false,
+        status: 503,
+        statusText: 'Service Unavailable',
+        json: () => Promise.reject(new Error('should never make it here')),
+      }
+
+      jest
+        .spyOn(CourseActivitySummaryStore, '_fetchActivityStreamSummaries')
+        .mockImplementation(() => Promise.reject(errorResponse))
+
+      const errorFn = jest.fn()
+      CourseActivitySummaryStore._fetchActivityStreamSummaries('123').catch(errorFn)
+      await wait(1)
+      expect(errorFn).toHaveBeenCalled()
+      expect(CourseActivitySummaryStore.getState().streams).toEqual({})
+      expect(CourseActivitySummaryStore.getState().isFetching).toBe(false)
     })
   })
 })
