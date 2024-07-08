@@ -38,7 +38,12 @@ class GraphQLController < ApplicationController
     prep_page_view_for_submit
     prep_page_view_for_create_discussion_entry
 
-    RequestContext::Generator.add_meta_header("ge", result["errors"].blank? ? "f" : "t")
+    errors_is_blank = result["errors"].blank?
+    RequestContext::Generator.add_meta_header("ge", errors_is_blank ? "f" : "t")
+
+    unless errors_is_blank
+      Rails.logger.info "There are GraphQL errors: #{result["errors"].to_json}"
+    end
 
     render json: result
   end
