@@ -177,6 +177,21 @@ describe "quiz edit page assign to" do
     check_element_has_focus close_button
   end
 
+  it "does not recover a deleted card when adding an assignee" do
+    # Bug fix of LX-1619
+    get "/courses/#{@course.id}/quizzes/#{@classic_quiz.id}/edit"
+    click_manage_assign_to_button
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    click_add_assign_to_card
+    click_delete_assign_to_card(0)
+    select_module_item_assignee(0, @student2.name)
+
+    expect(selected_assignee_options.count).to be(1)
+  end
+
   context "sync to sis" do
     include AdminSettingsCommon
     include ItemsAssignToTray

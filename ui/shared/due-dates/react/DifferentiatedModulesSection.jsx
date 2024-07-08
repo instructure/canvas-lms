@@ -292,6 +292,9 @@ const DifferentiatedModulesSection = ({
     const newStagedCards = {...stagedCards}
     delete newStagedCards[cardId]
     setStagedCards(newStagedCards)
+
+    const newStagedOverrides = stagedOverrides.filter(override => override.rowKey !== cardId)
+    setStagedOverrides(newStagedOverrides)
   }
 
   const updateCard = (cardId, newOverrides, cardDates) => {
