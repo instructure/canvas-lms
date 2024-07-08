@@ -452,6 +452,15 @@ class Lti::RegistrationsController < ApplicationController
     set_active_tab "apps"
     add_crumb t("#crumbs.apps", "Apps")
 
+    # allows override of DR url hard-coded into Discover page
+    # todo: remove once Discover page retrieves and uses correct DR url
+    temp_dr_url = Setting.get("lti_discover_page_dyn_reg_url", "")
+    if temp_dr_url.present?
+      js_env({
+               dynamicRegistrationUrl: temp_dr_url
+             })
+    end
+
     render :index
   end
 

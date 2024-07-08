@@ -55,6 +55,7 @@ describe('RegistrationWizardModal', () => {
     beforeEach(() => {
       openRegistrationWizard({
         dynamicRegistrationUrl: '',
+        unifiedToolId: '',
         lti_version: '1p3',
         method: 'dynamic_registration',
         registering: false,
@@ -116,6 +117,7 @@ describe('RegistrationWizardModal', () => {
     it('should exit the modal when the cancel button is clicked & exitOnCancel is true', async () => {
       openRegistrationWizard({
         dynamicRegistrationUrl: 'http://example.com',
+        unifiedToolId: 'asdf',
         lti_version: '1p3',
         method: 'dynamic_registration',
         registering: true,
@@ -124,7 +126,7 @@ describe('RegistrationWizardModal', () => {
         exitOnCancel: true,
       })
       const accountId = ZAccountId.parse('123')
-      render(<RegistrationWizardModal accountId={accountId} />)
+      const screen = render(<RegistrationWizardModal accountId={accountId} />)
       const cancelButton = screen.getByRole('button', {
         name: /Cancel/i,
       })
