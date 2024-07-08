@@ -56,12 +56,21 @@ export const VerticalButtonDisplay = ({
 
         const min = criterionUseRange ? rangingFrom(ratings, index) : undefined
 
+        const getPossibleText = (points?: number) => {
+          return min != null ? possibleStringRange(min, points) : possibleString(points)
+        }
+
+        const buttonAriaLabel = `${rating.description} ${rating.longDescription} ${getPossibleText(
+          rating.points
+        )}`
+
         return (
           <Flex.Item key={`${rating.id}-${buttonDisplay}`} padding="xx-small 0 0 0">
             <Flex>
               <Flex.Item
                 align={isSelected ? 'start' : 'center'}
                 data-testid={`rating-button-${rating.id}-${index}`}
+                aria-label={buttonAriaLabel}
               >
                 <RatingButton
                   buttonDisplay={buttonDisplay}
@@ -102,9 +111,7 @@ export const VerticalButtonDisplay = ({
                     </View>
                     <View as="div" textAlign="end">
                       <Text size="x-small" weight="bold">
-                        {min != null
-                          ? possibleStringRange(min, rating.points)
-                          : possibleString(rating.points)}
+                        {getPossibleText(rating.points)}
                       </Text>
                     </View>
                   </View>
