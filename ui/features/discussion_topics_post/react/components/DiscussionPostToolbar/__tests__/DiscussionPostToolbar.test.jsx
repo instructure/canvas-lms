@@ -245,6 +245,16 @@ describe('DiscussionPostToolbar', () => {
       })
       expect(queryByRole('button', {name: 'Assign To'})).not.toBeInTheDocument()
     })
+
+    it('does not render the Assign To button if an ungraded group discussion in course context', () => {
+      const {queryByTestId} = setup({
+        manageAssignTo: true,
+        contextType: 'Course',
+        isGraded: false,
+        isGroupDiscussion: true,
+      })
+      expect(queryByTestId('manage-assign-to')).not.toBeInTheDocument()
+    })
   })
 
   describe('Discussion Summary', () => {
