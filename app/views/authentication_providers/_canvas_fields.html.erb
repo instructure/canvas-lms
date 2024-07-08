@@ -44,7 +44,7 @@
     </div>
     <% end %>
   </div>
-  <% if @domain_root_account.feature_enabled?(:password_complexity)%>
+  <% if @domain_root_account.feature_enabled?(:password_complexity) && !@domain_root_account.site_admin? %>
     <% js_bundle :password_complexity_configuration %>
     <div id="password_complexity_configuration"></div>
   <% end %>
