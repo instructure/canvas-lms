@@ -1433,7 +1433,8 @@ describe Canvas::LiveEvents do
       ContentMigration.create(context: course,
                               source_course:,
                               migration_type: "some_type",
-                              workflow_state: "imported")
+                              workflow_state: "imported",
+                              user: @user)
     end
 
     before do
