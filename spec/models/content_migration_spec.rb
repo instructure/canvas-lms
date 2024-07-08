@@ -1368,7 +1368,7 @@ describe ContentMigration do
           title: "bar",
           migration_id: CC::CCHelper.create_key(@old_wp, global: true)
         )
-        @cm = @dst.content_migrations.build(migration_type: "course_copy_importer")
+        @cm = @dst.content_migrations.build(migration_type: "course_copy_importer", user: @teacher)
         @cm.workflow_state = "imported"
         @cm.source_course = @src
         @cm.save!
@@ -1385,6 +1385,7 @@ describe ContentMigration do
         expect(json).to eq({ "source_course" => @src.id.to_s,
                              "source_host" => "pineapple.edu",
                              "contains_migration_ids" => false,
+                             "migration_user_uuid" => @cm.user.uuid,
                              "resource_mapping" => {
                                "assignments" => { @old.id.to_s => @new.id.to_s },
                                "pages" => { @old_wp.id.to_s => @new_wp.id.to_s }
@@ -1464,7 +1465,7 @@ describe ContentMigration do
           migration_id: CC::CCHelper.create_key(@old_wp, global: true)
         )
 
-        @cm = @dst.content_migrations.build(migration_type: "course_copy_importer")
+        @cm = @dst.content_migrations.build(migration_type: "course_copy_importer", user: @teacher)
         @cm.workflow_state = "imported"
         @cm.source_course = @src
         @cm.save!
@@ -1495,6 +1496,7 @@ describe ContentMigration do
                              "destination_course" => @dst.id.to_s,
                              "destination_hosts" => ["apple.edu", "kiwi.edu"],
                              "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
+                             "migration_user_uuid" => @cm.user.uuid,
                              "resource_mapping" => {
                                "assignments" => {
                                  @old.id.to_s => @new.id.to_s,
@@ -1542,6 +1544,7 @@ describe ContentMigration do
                              "destination_course" => @dst.id.to_s,
                              "destination_hosts" => ["apple.edu", "kiwi.edu"],
                              "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
+                             "migration_user_uuid" => @cm.user.uuid,
                              "resource_mapping" => {
                                "assignments" => {
                                  old_migration_id => {
@@ -1588,6 +1591,7 @@ describe ContentMigration do
                                "destination_course" => @dst.id.to_s,
                                "destination_hosts" => ["apple.edu", "kiwi.edu"],
                                "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
+                               "migration_user_uuid" => @cm.user.uuid,
                                "resource_mapping" => {
                                  "assignments" => {
                                    @old.id.to_s => @new.id.to_s,
@@ -1635,6 +1639,7 @@ describe ContentMigration do
                                "destination_course" => @dst.id.to_s,
                                "destination_hosts" => ["apple.edu", "kiwi.edu"],
                                "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
+                               "migration_user_uuid" => @cm.user.uuid,
                                "resource_mapping" => {
                                  "assignments" => {
                                    old_migration_id => {
