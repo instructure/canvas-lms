@@ -40,7 +40,9 @@
   </div>
   <%= render :partial => "shared/rubric", :object => nil, :locals => {:association => @assignment, :editable => can_do(@assignment, @current_user, :update), :has_assessments => false, :edit_view => true} %>
 
+  <% unless @current_user_submission&.has_submission? && @domain_root_account&.feature_enabled?(:lti_before_assignment_results) %>
   <div id="assignment_external_tools"></div>
+  <% end %>
 
   <% if can_do(@assignment, @current_user, :update) %>
     <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">

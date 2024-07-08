@@ -1,0 +1,406 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContentTypeExternalToolDrawer renders 1`] = `
+{
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <span
+        class="css-1yj0g2r-view--block"
+        dir="ltr"
+      >
+        <div
+          class="css-1mr0ucn-drawerLayout"
+          data-drawer-layout="DrawerLayout_0"
+        >
+          <div
+            aria-label="page-content-title"
+            class="css-1c66oc-drawerLayout__content"
+            data-drawer-content="DrawerLayout_0"
+            id="drawer-layout-content"
+            role="region"
+            style="margin-left: 0px; margin-right: 0px;"
+          >
+            <div>
+              <div
+                id="page-content-id"
+              >
+                page-content-text
+              </div>
+            </div>
+          </div>
+          <div
+            class="css-1wbrhzw-drawerTray transition--fade-entered"
+            data-drawer-tray="DrawerLayout_0"
+            data-testid="drawer-layout-tray"
+          >
+            <div
+              aria-label="First LTI"
+              class="css-1kfxijb-drawerTray__content"
+              role="region"
+            >
+              <span
+                class="css-ak7kr9-view--flex-flex"
+                dir="ltr"
+                direction="column"
+                wrap="no-wrap"
+              >
+                <span
+                  class="css-1kxbkbf-view-flexItem"
+                  dir="ltr"
+                >
+                  <span
+                    class="css-zh6k45-view--flex-flex"
+                    dir="ltr"
+                    direction="row-reverse"
+                    wrap="no-wrap"
+                  >
+                    <span
+                      class="css-1mruz11-view-flexItem"
+                      dir="ltr"
+                    >
+                      <span
+                        class="css-btw693-closeButton"
+                      >
+                        <button
+                          class="css-14jn3fd-view--inlineBlock-baseButton"
+                          cursor="pointer"
+                          dir="ltr"
+                          tabindex="0"
+                          type="button"
+                        >
+                          <span
+                            class="css-1leqwnv-baseButton__content"
+                          >
+                            <span
+                              class="css-qi8ml9-baseButton__childrenLayout"
+                            >
+                              <span
+                                class="css-5udsuu-baseButton__iconOnly"
+                              >
+                                <span
+                                  class="css-31gkb3-baseButton__iconSVG"
+                                >
+                                  <svg
+                                    aria-hidden="true"
+                                    class="css-1uh2md0-inlineSVG-svgIcon"
+                                    focusable="false"
+                                    height="1em"
+                                    name="IconX"
+                                    role="presentation"
+                                    rotate="0"
+                                    style="width: 1em; height: 1em;"
+                                    viewBox="0 0 1920 1920"
+                                    width="1em"
+                                  >
+                                    <g
+                                      role="presentation"
+                                    >
+                                      <path
+                                        d="M797.32 985.882 344.772 1438.43l188.561 188.562 452.549-452.549 452.548 452.549 188.562-188.562-452.549-452.548 452.549-452.549-188.562-188.561L985.882 797.32 533.333 344.772 344.772 533.333z"
+                                      />
+                                    </g>
+                                  </svg>
+                                </span>
+                                <span
+                                  class="css-1sr5vj2-screenReaderContent"
+                                >
+                                  Close
+                                </span>
+                              </span>
+                            </span>
+                          </span>
+                        </button>
+                      </span>
+                    </span>
+                    <span
+                      class="css-zqmt0g-view-flexItem"
+                      dir="ltr"
+                    >
+                      <h2
+                        class="css-13kv4mx-view-heading"
+                        dir="ltr"
+                      >
+                        <span
+                          class="css-1lvij29-truncateText"
+                        >
+                          <span>
+                            First LTI
+                          </span>
+                        </span>
+                      </h2>
+                    </span>
+                    <span
+                      class="css-1x4wvy9-view-flexItem"
+                      dir="ltr"
+                    >
+                      <svg
+                        alt="First LTI Icon"
+                        aria-hidden="true"
+                        class="css-1uh2md0-inlineSVG-svgIcon"
+                        focusable="false"
+                        height="1em"
+                        name="IconLti"
+                        role="presentation"
+                        rotate="0"
+                        style="width: 1em; height: 1em;"
+                        viewBox="0 0 1920 1920"
+                        width="1em"
+                      >
+                        <g
+                          role="presentation"
+                        >
+                          <path
+                            d="M1581.235 734.118c0 217.976-177.317 395.294-395.294 395.294H960.06c-217.977 0-395.294-177.318-395.294-395.294V564.706h1016.47v169.412Zm225.883-282.353h-338.824V0h-112.941v451.765H790.647V0H677.706v451.765H338.882v112.94h112.942v169.413c0 280.207 228.028 508.235 508.235 508.235h56.47v395.294c0 93.402-76.009 169.412-169.411 169.412-93.403 0-169.412-76.01-169.412-169.412 0-155.633-126.72-282.353-282.353-282.353S113 1482.014 113 1637.647V1920h112.941v-282.353c0-93.402 76.01-169.412 169.412-169.412s169.412 76.01 169.412 169.412c0 155.633 126.72 282.353 282.353 282.353 155.746 0 282.353-126.72 282.353-282.353v-395.294h56.47c280.207 0 508.235-228.028 508.235-508.235V564.706h112.942V451.765Z"
+                            fill-rule="evenodd"
+                          />
+                        </g>
+                      </svg>
+                    </span>
+                  </span>
+                </span>
+                <span
+                  class="css-17rmv1y-view-flexItem"
+                  dir="ltr"
+                >
+                  <iframe
+                    class="tool_launch"
+                    data-lti-launch="true"
+                    data-testid="ltiIframe"
+                    src="https://lti1.example.com/?display=borderless&placement=top_navigation"
+                    title="First LTI"
+                  />
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </span>
+    </div>
+  </body>,
+  "container": <div>
+    <span
+      class="css-1yj0g2r-view--block"
+      dir="ltr"
+    >
+      <div
+        class="css-1mr0ucn-drawerLayout"
+        data-drawer-layout="DrawerLayout_0"
+      >
+        <div
+          aria-label="page-content-title"
+          class="css-1c66oc-drawerLayout__content"
+          data-drawer-content="DrawerLayout_0"
+          id="drawer-layout-content"
+          role="region"
+          style="margin-left: 0px; margin-right: 0px;"
+        >
+          <div>
+            <div
+              id="page-content-id"
+            >
+              page-content-text
+            </div>
+          </div>
+        </div>
+        <div
+          class="css-1wbrhzw-drawerTray transition--fade-entered"
+          data-drawer-tray="DrawerLayout_0"
+          data-testid="drawer-layout-tray"
+        >
+          <div
+            aria-label="First LTI"
+            class="css-1kfxijb-drawerTray__content"
+            role="region"
+          >
+            <span
+              class="css-ak7kr9-view--flex-flex"
+              dir="ltr"
+              direction="column"
+              wrap="no-wrap"
+            >
+              <span
+                class="css-1kxbkbf-view-flexItem"
+                dir="ltr"
+              >
+                <span
+                  class="css-zh6k45-view--flex-flex"
+                  dir="ltr"
+                  direction="row-reverse"
+                  wrap="no-wrap"
+                >
+                  <span
+                    class="css-1mruz11-view-flexItem"
+                    dir="ltr"
+                  >
+                    <span
+                      class="css-btw693-closeButton"
+                    >
+                      <button
+                        class="css-14jn3fd-view--inlineBlock-baseButton"
+                        cursor="pointer"
+                        dir="ltr"
+                        tabindex="0"
+                        type="button"
+                      >
+                        <span
+                          class="css-1leqwnv-baseButton__content"
+                        >
+                          <span
+                            class="css-qi8ml9-baseButton__childrenLayout"
+                          >
+                            <span
+                              class="css-5udsuu-baseButton__iconOnly"
+                            >
+                              <span
+                                class="css-31gkb3-baseButton__iconSVG"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="css-1uh2md0-inlineSVG-svgIcon"
+                                  focusable="false"
+                                  height="1em"
+                                  name="IconX"
+                                  role="presentation"
+                                  rotate="0"
+                                  style="width: 1em; height: 1em;"
+                                  viewBox="0 0 1920 1920"
+                                  width="1em"
+                                >
+                                  <g
+                                    role="presentation"
+                                  >
+                                    <path
+                                      d="M797.32 985.882 344.772 1438.43l188.561 188.562 452.549-452.549 452.548 452.549 188.562-188.562-452.549-452.548 452.549-452.549-188.562-188.561L985.882 797.32 533.333 344.772 344.772 533.333z"
+                                    />
+                                  </g>
+                                </svg>
+                              </span>
+                              <span
+                                class="css-1sr5vj2-screenReaderContent"
+                              >
+                                Close
+                              </span>
+                            </span>
+                          </span>
+                        </span>
+                      </button>
+                    </span>
+                  </span>
+                  <span
+                    class="css-zqmt0g-view-flexItem"
+                    dir="ltr"
+                  >
+                    <h2
+                      class="css-13kv4mx-view-heading"
+                      dir="ltr"
+                    >
+                      <span
+                        class="css-1lvij29-truncateText"
+                      >
+                        <span>
+                          First LTI
+                        </span>
+                      </span>
+                    </h2>
+                  </span>
+                  <span
+                    class="css-1x4wvy9-view-flexItem"
+                    dir="ltr"
+                  >
+                    <svg
+                      alt="First LTI Icon"
+                      aria-hidden="true"
+                      class="css-1uh2md0-inlineSVG-svgIcon"
+                      focusable="false"
+                      height="1em"
+                      name="IconLti"
+                      role="presentation"
+                      rotate="0"
+                      style="width: 1em; height: 1em;"
+                      viewBox="0 0 1920 1920"
+                      width="1em"
+                    >
+                      <g
+                        role="presentation"
+                      >
+                        <path
+                          d="M1581.235 734.118c0 217.976-177.317 395.294-395.294 395.294H960.06c-217.977 0-395.294-177.318-395.294-395.294V564.706h1016.47v169.412Zm225.883-282.353h-338.824V0h-112.941v451.765H790.647V0H677.706v451.765H338.882v112.94h112.942v169.413c0 280.207 228.028 508.235 508.235 508.235h56.47v395.294c0 93.402-76.009 169.412-169.411 169.412-93.403 0-169.412-76.01-169.412-169.412 0-155.633-126.72-282.353-282.353-282.353S113 1482.014 113 1637.647V1920h112.941v-282.353c0-93.402 76.01-169.412 169.412-169.412s169.412 76.01 169.412 169.412c0 155.633 126.72 282.353 282.353 282.353 155.746 0 282.353-126.72 282.353-282.353v-395.294h56.47c280.207 0 508.235-228.028 508.235-508.235V564.706h112.942V451.765Z"
+                          fill-rule="evenodd"
+                        />
+                      </g>
+                    </svg>
+                  </span>
+                </span>
+              </span>
+              <span
+                class="css-17rmv1y-view-flexItem"
+                dir="ltr"
+              >
+                <iframe
+                  class="tool_launch"
+                  data-lti-launch="true"
+                  data-testid="ltiIframe"
+                  src="https://lti1.example.com/?display=borderless&placement=top_navigation"
+                  title="First LTI"
+                />
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </span>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;

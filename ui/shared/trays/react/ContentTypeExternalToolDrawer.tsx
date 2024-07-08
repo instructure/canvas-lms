@@ -27,6 +27,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
+import MutexManager from '@canvas/mutex-manager/MutexManager'
 import type {Tool} from '@canvas/global/env/EnvCommon'
 
 type Props = {
@@ -35,7 +36,7 @@ type Props = {
   pageContentTitle: string
   pageContentMinWidth: string
   pageContentHeight: string
-  trayPlacement: string
+  trayPlacement: 'start' | 'end'
   onDismiss: any
   onResize: any
   onExternalContentReady?: any
@@ -62,6 +63,7 @@ export default function ContentTypeExternalToolDrawer({
   const toolIconAlt = toolTitle ? `${toolTitle} Icon` : 'Tool Icon'
   const iframeRef = useRef()
   const pageContentRef = useRef()
+  const initDrawerLayoutMutex = window.ENV.INIT_DRAWER_LAYOUT_MUTEX
 
   useEffect(
     // setup DrawerLayout content
@@ -70,8 +72,15 @@ export default function ContentTypeExternalToolDrawer({
       if (pageContentRef.current && pageContent) {
         pageContentRef.current.appendChild(pageContent)
       }
+      /* Reparenting causes iFrames to reload or cancel load.
+       * This ensures that any tool launch iFrames are not loaded
+       * until after we complete reparenting.
+       */
+      if (initDrawerLayoutMutex) {
+        MutexManager.releaseMutex(initDrawerLayoutMutex)
+      }
     },
-    [pageContent]
+    [pageContent, initDrawerLayoutMutex]
   )
 
   useEffect(() => {
@@ -95,43 +104,52 @@ export default function ContentTypeExternalToolDrawer({
           <div ref={pageContentRef} />
         </DrawerLayout.Content>
         <DrawerLayout.Tray
-          label="Right Side Tray"
+          label={toolTitle}
           open={open}
           placement={trayPlacement}
           onDismiss={onDismiss}
           data-testid="drawer-layout-tray"
           shouldCloseOnDocumentClick={false}
           themeOverride={{
-            zIndex: '50',
+            zIndex: 50,
           }}
         >
-          <Flex
-            height="1.5rem"
-            justifyItems="space-between"
-            alignItems="center"
-            padding="medium small medium small"
-            width="320px"
-          >
-            <Flex.Item padding="none small none none">
-              {(toolIconUrl && <Img src={toolIconUrl} height="1rem" alt={toolIconAlt} />) || (
-                <IconLtiLine />
+          <Flex height="100%" direction="column" padding="none none none none">
+            <Flex.Item>
+              <Flex
+                height="1.5rem"
+                justifyItems="space-between"
+                alignItems="center"
+                padding="medium small medium small"
+                width="320px"
+                direction="row-reverse"
+              >
+                <Flex.Item padding="none none none small">
+                  <CloseButton size="small" onClick={onDismiss} screenReaderLabel="Close" />
+                </Flex.Item>
+                <Flex.Item shouldShrink={true} shouldGrow={true}>
+                  <Heading level="h4" as="h2">
+                    <TruncateText>{toolTitle}</TruncateText>
+                  </Heading>
+                </Flex.Item>
+                <Flex.Item padding="none small none none">
+                  {(toolIconUrl && <Img src={toolIconUrl} height="1rem" alt={toolIconAlt} />) || (
+                    <IconLtiLine alt={toolIconAlt} />
+                  )}
+                </Flex.Item>
+              </Flex>
+            </Flex.Item>
+            <Flex.Item shouldGrow={true}>
+              {tool && (
+                <ToolLaunchIframe
+                  data-testid="ltiIframe"
+                  ref={iframeRef}
+                  src={iframeUrl}
+                  title={toolTitle}
+                />
               )}
             </Flex.Item>
-            <Flex.Item shouldShrink={true} shouldGrow={true}>
-              <Heading level="h4">
-                <TruncateText>{toolTitle}</TruncateText>
-              </Heading>
-            </Flex.Item>
-            <Flex.Item padding="none none none small">
-              <CloseButton size="small" onClick={onDismiss} screenReaderLabel="Close" />
-            </Flex.Item>
           </Flex>
-          <ToolLaunchIframe
-            data-testid="ltiIframe"
-            ref={iframeRef}
-            src={iframeUrl}
-            title={toolTitle}
-          />
         </DrawerLayout.Tray>
       </DrawerLayout>
     </View>

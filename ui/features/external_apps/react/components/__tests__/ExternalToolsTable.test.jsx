@@ -20,13 +20,13 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import ExternalToolsTable from '../ExternalToolsTable'
 
-function renderTable(canAdd = true, canEdit = true, canDelete = true, canAddEdit = true) {
+function renderTable(canAdd = true, canEdit = true, canDelete = true, canAddEdit = true, FEATURES = {}) {
   window.ENV = {
     context_asset_string: 'account_1',
     ACCOUNT: {
       site_admin: false,
     },
-    FEATURES: {},
+    FEATURES: FEATURES,
   }
 
   const setFocusAbove = jest.fn()
@@ -53,6 +53,26 @@ describe('ExternalToolsTable', () => {
       const {queryByText} = renderTable(false, false, false, false)
       expect(queryByText('Name')).toBeInTheDocument()
       expect(queryByText('Add to RCE toolbar')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('top nav favorites toggle', function () {
+    it('shows if admin has permission', () => {
+      const {queryByText} = renderTable(true, true, true, true, {top_navigation_placement: true})
+      expect(queryByText('Name')).toBeInTheDocument()
+      expect(queryByText('Pin to Top Navigation')).toBeInTheDocument()
+    })
+
+    it('does not show if admin does not have permission', () => {
+      const {queryByText} = renderTable(false, false, false, false, {top_navigation_placement: true})
+      expect(queryByText('Name')).toBeInTheDocument()
+      expect(queryByText('Pin to Top Navigation')).not.toBeInTheDocument()
+    })
+
+    it('does not show if feature flag is off', () => {
+      const {queryByText} = renderTable(true, true, true, true, {top_navigation_placement: false})
+      expect(queryByText('Name')).toBeInTheDocument()
+      expect(queryByText('Pin to Top Navigation')).not.toBeInTheDocument()
     })
   })
 })

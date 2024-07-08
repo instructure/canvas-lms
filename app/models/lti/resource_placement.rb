@@ -47,13 +47,10 @@ module Lti
     LEGACY_DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION].freeze
 
     # Placements restricted so not advertised in the UI
-    NON_PUBLIC_PLACEMENTS = %i[submission_type_selection top_navigation].freeze
+    NON_PUBLIC_PLACEMENTS = %i[submission_type_selection].freeze
 
     # These placements require tools to be on an allow list
     RESTRICTED_PLACEMENTS = %i[submission_type_selection top_navigation].freeze
-
-    # These placements can be marked as pinned, which will influence their visibility in the UI
-    PINNABLE_PLACEMENTS = %i[top_navigation].freeze
 
     PLACEMENTS_BY_MESSAGE_TYPE = {
       LtiAdvantage::Messages::ResourceLinkRequest::MESSAGE_TYPE => %i[
@@ -75,7 +72,6 @@ module Lti
         file_index_menu
         file_menu
         global_navigation
-        top_navigation
         homework_submission
         link_selection
         migration_selection
@@ -92,6 +88,7 @@ module Lti
         student_context_card
         submission_type_selection
         tool_configuration
+        top_navigation
         user_navigation
         wiki_index_menu
         wiki_page_menu

@@ -93,6 +93,10 @@ export default class ExternalToolsTable extends React.Component {
       (accum, current) => accum + (current.is_rce_favorite ? 1 : 0),
       0
     )
+    const topNavFavCount = externalTools.reduce(
+      (accum, current) => accum + (current.is_top_nav_favorite ? 1 : 0),
+      0
+    )
     return externalTools.map(tool => {
       t = (
         <ExternalToolsTableRow
@@ -104,7 +108,8 @@ export default class ExternalToolsTable extends React.Component {
           canDelete={this.props.canDelete}
           canAddEdit={this.props.canAddEdit}
           setFocusAbove={this.setFocusAbove(t)}
-          favoriteCount={rceFavCount}
+          rceFavoriteCount={rceFavCount}
+          topNavFavoriteCount={topNavFavCount}
           contextType={this.assetContextType}
           showLTIFavoriteToggles={show_lti_favorite_toggles}
         />
@@ -119,6 +124,7 @@ export default class ExternalToolsTable extends React.Component {
       /^account_/.test(ENV.context_asset_string) &&
       !ENV.ACCOUNT?.site_admin &&
       (this.props.canAdd || this.props.canEdit || this.props.canDelete || this.props.canAddEdit)
+    const show_top_nav_toggles = !!ENV.FEATURES?.top_navigation_placement
 
     return (
       <div className="ExternalToolsTable">
@@ -139,6 +145,27 @@ export default class ExternalToolsTable extends React.Component {
                   <ScreenReaderContent>{I18n.t('Status')}</ScreenReaderContent>
                 </th>
                 <th scope="col">{I18n.t('Name')}</th>
+                {show_lti_favorite_toggles && show_top_nav_toggles && (
+                  <th scope="col" style={{width: '12rem', whiteSpace: 'nowrap'}}>
+                    {I18n.t('Pin to Top Navigation')}
+                    <Tooltip
+                      renderTip={I18n.t(
+                        'There is a 2 app limit for pinned tools in Top Navigation.'
+                      )}
+                      placement="top"
+                      on={['hover', 'focus']}
+                    >
+                      <IconButton
+                        renderIcon={IconQuestionLine}
+                        withBackground={false}
+                        withBorder={false}
+                        screenReaderLabel={I18n.t('Help')}
+                        size="small"
+                        margin="none none none xx-small"
+                      />
+                    </Tooltip>
+                  </th>
+                )}
                 {show_lti_favorite_toggles && (
                   <th scope="col" style={{width: '12rem', whiteSpace: 'nowrap'}}>
                     {I18n.t('Add to RCE toolbar')}

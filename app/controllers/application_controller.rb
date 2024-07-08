@@ -401,6 +401,7 @@ class ApplicationController < ActionController::Base
     enhanced_rubrics
     account_level_mastery_scales
     non_scoring_rubrics
+    top_navigation_placement
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -577,7 +578,7 @@ class ApplicationController < ActionController::Base
     end
 
     if type == :top_navigation
-      hash[:pinned] = tool.placement_pinned?(type)
+      hash[:pinned] = tool.top_nav_favorite_in_context?(context)
     end
 
     # Add the tool's postmessage scopes to the JS environment, if present.

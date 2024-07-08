@@ -30,9 +30,11 @@ const tools = [
     description: 'This is tool 1',
     name: 'Tool 1',
     is_rce_favorite: false,
+    is_top_nav_favorite: false,
     editor_button_settings: {enabled: true},
     installed_locally: true,
     restricted_by_master_course: false,
+    top_navigation_settings: {enabled: true},
   },
   {
     app_id: 2,
@@ -41,7 +43,9 @@ const tools = [
     description: 'This is tool 2',
     name: 'Tool 2',
     is_rce_favorite: true,
+    is_top_nav_favorite: true,
     editor_button_settings: {enabled: true},
+    top_navigation_settings: {enabled: true},
   },
   {
     app_id: 3,
@@ -57,7 +61,9 @@ const tools = [
     description: 'This is tool 4',
     name: 'Tool 4',
     is_rce_favorite: true,
+    is_top_nav_favorite: true,
     editor_button_settings: {enabled: false},
+    top_navigation_settings: {enabled: false},
   },
 ]
 
@@ -80,6 +86,7 @@ function renderRow(props) {
   const tbody = document.createElement('tbody')
   table.appendChild(tbody)
   document.body.appendChild(table)
+  window.ENV.FEATURES = {top_navigation_placement: true}
   return render(
     <ExternalToolsTableRow
       tool={tools[0]}
@@ -88,7 +95,8 @@ function renderRow(props) {
       canDelete={true}
       canAddEdit={true}
       setFocusAbove={() => {}}
-      favoriteCount={0}
+      rceFavoriteCount={0}
+      topNavFavoriteCount={0}
       contextType="account"
       {...props}
     />,
@@ -120,71 +128,94 @@ describe('ExternalToolsTableRow', () => {
   describe('without lti_favorites', () => {
     it('does not show the toggle', () => {
       const {queryByLabelText} = renderRow({showLTIFavoriteToggles: false})
-      expect(queryByLabelText('Favorite')).not.toBeInTheDocument()
+      expect(queryByLabelText('RCE Favorite')).not.toBeInTheDocument()
+      expect(queryByLabelText('Top Navigation Favorite')).not.toBeInTheDocument()
     })
   })
 
   describe('with the lti_favorites', () => {
     it('shows toggle with current tool favorite state when false and Editor placement is active', () => {
       const {getByLabelText} = renderRow({showLTIFavoriteToggles: true})
-      expect(getByLabelText('Favorite')).toBeInTheDocument()
-      const checkbox = getByLabelText('Favorite').closest('input[type="checkbox"]')
+      expect(getByLabelText('RCE Favorite')).toBeInTheDocument()
+      expect(getByLabelText('Top Navigation Favorite')).toBeInTheDocument()
+      const checkbox = getByLabelText('RCE Favorite').closest('input[type="checkbox"]')
       expect(checkbox.checked).toBe(false)
+      const checkbox2 = getByLabelText('Top Navigation Favorite').closest('input[type="checkbox"]')
+      expect(checkbox2.checked).toBe(false)
     })
 
     it('shows toggle with current tool favorite state when true and Editor placement is active', () => {
       const {getByLabelText} = renderRow({tool: tools[1], showLTIFavoriteToggles: true})
-      expect(getByLabelText('Favorite')).toBeInTheDocument()
-      const checkbox = getByLabelText('Favorite').closest('input[type="checkbox"]')
+      expect(getByLabelText('RCE Favorite')).toBeInTheDocument()
+      expect(getByLabelText('Top Navigation Favorite')).toBeInTheDocument()
+      const checkbox = getByLabelText('RCE Favorite').closest('input[type="checkbox"]')
       expect(checkbox.checked).toBe(true)
+      const checkbox2 = getByLabelText('Top Navigation Favorite').closest('input[type="checkbox"]')
+      expect(checkbox2.checked).toBe(true)
     })
 
     it('does not show the toggle when tool cannot be a favorite', () => {
-      const {getByText, queryByLabelText} = renderRow({
+      const {getAllByText, queryByLabelText} = renderRow({
         tool: tools[2],
         showLTIFavoriteToggles: true,
       })
-      expect(queryByLabelText('Favorite')).not.toBeInTheDocument()
-      expect(getByText('NA')).toBeInTheDocument()
+      expect(queryByLabelText('RCE Favorite')).not.toBeInTheDocument()
+      expect(queryByLabelText('Top Navigation Favorite')).not.toBeInTheDocument()
+      expect(getAllByText('NA')).toHaveLength(2)
     })
 
     it('does not show the toggle when Editor button placement is inactive', () => {
-      const {getByText, queryByLabelText} = renderRow({
+      const {getAllByText, queryByLabelText} = renderRow({
         tool: tools[3],
         showLTIFavoriteToggles: true,
       })
-      expect(queryByLabelText('Favorite')).not.toBeInTheDocument()
-      expect(getByText('NA')).toBeInTheDocument()
+      expect(queryByLabelText('RCE Favorite')).not.toBeInTheDocument()
+      expect(queryByLabelText('Top Navigation Favorite')).not.toBeInTheDocument()
+      expect(getAllByText('NA')).toHaveLength(2)
     })
 
     it('disables toggle if 2 tools are already favorites and this row is not a favorite', () => {
-      const {getByLabelText} = renderRow({favoriteCount: 2, showLTIFavoriteToggles: true})
+      const {getByLabelText} = renderRow({
+        rceFavoriteCount: 2,
+        topNavFavoriteCount: 2,
+        showLTIFavoriteToggles: true,
+      })
 
-      const checkbox = getByLabelText('Favorite').closest('input[type="checkbox"]')
+      const checkbox = getByLabelText('RCE Favorite').closest('input[type="checkbox"]')
       expect(checkbox.disabled).toBe(true)
+      const checkbox2 = getByLabelText('Top Navigation Favorite').closest('input[type="checkbox"]')
+      expect(checkbox2.disabled).toBe(true)
     })
 
     it('enables toggle if 2 tools are already favorites and this row is a favorite', () => {
       const {getByLabelText} = renderRow({
         tool: tools[1],
-        favoriteCount: 2,
+        rceFavoriteCount: 2,
+        topNavFavoriteCount: 2,
         showLTIFavoriteToggles: true,
       })
 
-      const checkbox = getByLabelText('Favorite').closest('input[type="checkbox"]')
+      const checkbox = getByLabelText('RCE Favorite').closest('input[type="checkbox"]')
       expect(checkbox.disabled).toBe(false)
+      const checkbox2 = getByLabelText('Top Navigation Favorite').closest('input[type="checkbox"]')
+      expect(checkbox2.disabled).toBe(false)
     })
 
     it('calls store.setAsFavorite when toggle is flipped', () => {
       const {getByLabelText} = renderRow({showLTIFavoriteToggles: true})
-      expect(getByLabelText('Favorite')).toBeInTheDocument()
+      expect(getByLabelText('RCE Favorite')).toBeInTheDocument()
+      expect(getByLabelText('Top Navigation Favorite')).toBeInTheDocument()
       const setAsFav = store.setAsFavorite
       store.setAsFavorite = jest.fn()
 
-      const checkbox = getByLabelText('Favorite').closest('input[type="checkbox"]')
+      const checkbox = getByLabelText('RCE Favorite').closest('input[type="checkbox"]')
       fireEvent.click(checkbox)
-
       expect(store.setAsFavorite).toHaveBeenCalled()
+
+      const checkbox2 = getByLabelText('Top Navigation Favorite').closest('input[type="checkbox"]')
+      fireEvent.click(checkbox2)
+      expect(store.setAsFavorite).toHaveBeenCalled()
+
       store.setAsFavorite = setAsFav
     })
 
@@ -195,11 +226,16 @@ describe('ExternalToolsTableRow', () => {
 
       const {getByLabelText} = renderRow({showLTIFavoriteToggles: true})
       expect(store.getState().externalTools[0].is_rce_favorite).toBe(false)
+      expect(store.getState().externalTools[0].is_top_nav_favorite).toBe(false)
       act(() => {
-        const checkbox = getByLabelText('Favorite').closest('input[type="checkbox"]')
+        const checkbox = getByLabelText('RCE Favorite').closest('input[type="checkbox"]')
         fireEvent.click(checkbox)
+        const checkbox2 =
+          getByLabelText('Top Navigation Favorite').closest('input[type="checkbox"]')
+        fireEvent.click(checkbox2)
       })
       await waitFor(() => expect(store.getState().externalTools[0].is_rce_favorite).toBe(true))
+      await waitFor(() => expect(store.getState().externalTools[0].is_top_nav_favorite).toBe(true))
     })
   })
 })

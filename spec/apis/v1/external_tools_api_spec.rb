@@ -27,6 +27,7 @@ describe ExternalToolsController, type: :request do
     before(:once) do
       course_with_teacher(active_all: true, user: user_with_pseudonym)
       @group = group_model(context: @course)
+      @tool_context = @course
     end
 
     it "shows an external tool" do
@@ -266,6 +267,7 @@ describe ExternalToolsController, type: :request do
       account_admin_user(active_all: true, user: user_with_pseudonym)
       @account = @user.account
       @group = group_model(context: @account)
+      @tool_context = @account
     end
 
     it "shows an external tool" do
@@ -1323,6 +1325,7 @@ describe ExternalToolsController, type: :request do
                                    end
     }
     example["is_rce_favorite"] = et.is_rce_favorite if et&.can_be_rce_favorite?
+    example["is_top_nav_favorite"] = et.top_nav_favorite_in_context?(@tool_context) if et&.can_be_top_nav_favorite?
     example
   end
 end

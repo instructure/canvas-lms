@@ -40,6 +40,7 @@ module Api::V1::ExternalTools
     json["url"] = tool.url_with_environment_overrides(tool.url, include_launch_url: true)
     json["domain"] = tool.domain_with_environment_overrides
     json["is_rce_favorite"] = tool.is_rce_favorite_in_context?(context) if tool.can_be_rce_favorite?
+    json["is_top_nav_favorite"] = tool.top_nav_favorite_in_context?(context) if tool.can_be_top_nav_favorite?
     json.merge!(tool.settings.with_indifferent_access.slice("selection_width", "selection_height", "prefer_sis_email"))
     json["icon_url"] = tool.icon_url if tool.icon_url
     json["not_selectable"] = tool.not_selectable

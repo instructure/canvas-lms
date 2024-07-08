@@ -24,6 +24,7 @@ import filterUselessConsoleMessages from '../../packages/filter-console-messages
 import moment from 'moment'
 import './initializers/fakeRequireJSFallback'
 import './initializers/ujsLinks'
+import './initializers/initMutexes'
 import {up as configureDateTimeMomentParser} from '@canvas/datetime/configureDateTimeMomentParser'
 import {up as configureDateTime} from '@canvas/datetime/configureDateTime'
 import {initSentry} from './initializers/initSentry'
