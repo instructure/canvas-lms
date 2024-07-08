@@ -317,7 +317,7 @@ export default function GradingResults({
             )}
             {dropped && (
               <p className="dropped muted" data-testid="dropped-assignment-message">
-                This grade is currently dropped for this student.
+                {I18n.t('This grade is currently dropped for this student.')}
               </p>
             )}
             {submission.gradeMatchesCurrentSubmission !== null &&
