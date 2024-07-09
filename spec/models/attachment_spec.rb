@@ -2452,16 +2452,21 @@ describe Attachment do
   end
 
   context "quota" do
+    def stub_text_data
+      $stub_file_counter ||= 0
+      stub_file_data("file.txt", "some data#{$stub_file_counter += 1}", "text/plain")
+    end
+
     it "gives small files a minimum quota size" do
       course_model
-      attachment_model(context: @course, uploaded_data: stub_png_data, size: 25)
+      attachment_model(context: @course, uploaded_data: stub_text_data, size: 25)
       quota = Attachment.get_quota(@course)
       expect(quota[:quota_used]).to eq Attachment::MINIMUM_SIZE_FOR_QUOTA
     end
 
     it "does not count attachments a student has used for submissions towards the quota" do
       course_with_student(active_all: true)
-      attachment_model(context: @user, uploaded_data: stub_png_data, filename: "homework.png")
+      attachment_model(context: @user, uploaded_data: stub_text_data, filename: "homework.txt")
       @attachment.update_attribute(:size, 1.megabyte)
 
       quota = Attachment.get_quota(@user)
@@ -2470,7 +2475,7 @@ describe Attachment do
       @assignment = @course.assignments.create!
       @assignment.submit_homework(@user, attachments: [@attachment])
 
-      attachment_model(context: @user, uploaded_data: stub_png_data, filename: "otherfile.png")
+      attachment_model(context: @user, uploaded_data: stub_text_data, filename: "otherfile.txt")
       @attachment.update_attribute(:size, 1.megabyte)
 
       quota = Attachment.get_quota(@user)
@@ -2479,7 +2484,7 @@ describe Attachment do
 
     it "does not count attachments a student has used for graded discussion replies towards the quota" do
       course_with_student(active_all: true)
-      attachment_model(context: @user, uploaded_data: stub_png_data, filename: "homework.png")
+      attachment_model(context: @user, uploaded_data: stub_text_data, filename: "homework.txt")
       @attachment.update_attribute(:size, 1.megabyte)
 
       quota = Attachment.get_quota(@user)
@@ -2491,7 +2496,7 @@ describe Attachment do
       entry.attachment = @attachment
       entry.save!
 
-      attachment_model(context: @user, uploaded_data: stub_png_data, filename: "otherfile.png")
+      attachment_model(context: @user, uploaded_data: stub_text_data, filename: "otherfile.txt")
       @attachment.update_attribute(:size, 1.megabyte)
 
       quota = Attachment.get_quota(@user)
@@ -2500,7 +2505,7 @@ describe Attachment do
 
     it "does not count attachments in submissions folders toward the quota" do
       user_model
-      attachment_model(context: @user, uploaded_data: stub_png_data, filename: "whatever.png", folder: @user.submissions_folder)
+      attachment_model(context: @user, uploaded_data: stub_text_data, filename: "whatever.txt", folder: @user.submissions_folder)
       @attachment.update_attribute(:size, 1.megabyte)
       quota = Attachment.get_quota(@user)
       expect(quota[:quota_used]).to eq 0
@@ -2508,7 +2513,7 @@ describe Attachment do
 
     it "does not count attachments in group submissions folders toward the quota" do
       group_model
-      attachment_model(context: @group, uploaded_data: stub_png_data, filename: "whatever.png", folder: @group.submissions_folder)
+      attachment_model(context: @group, uploaded_data: stub_text_data, filename: "whatever.txt", folder: @group.submissions_folder)
       @attachment.update_attribute(:size, 1.megabyte)
       quota = Attachment.get_quota(@group)
       expect(quota[:quota_used]).to eq 0
@@ -2517,7 +2522,7 @@ describe Attachment do
     it "returns available quota" do
       course_model
       @course.update storage_quota: 5.megabytes
-      attachment_model(context: @course, uploaded_data: stub_png_data, filename: "whatever.png")
+      attachment_model(context: @course, uploaded_data: stub_text_data, filename: "whatever.txt")
       @attachment.update_attribute :size, 1.megabyte
       expect(Attachment.quota_available(@course)).to eq 4.megabytes
 
