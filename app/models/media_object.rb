@@ -390,6 +390,7 @@ class MediaObject < ActiveRecord::Base
                               workflow_state: "pending_upload"
                             )
     attachment.handle_duplicates(:rename)
+    media_tracks.update_all(attachment_id: attachment.id)
   end
 
   def ensure_attachment_media_info
