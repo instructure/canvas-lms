@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -61,7 +61,7 @@ export const MarkAsRead = props => {
             as="button"
             onClick={() => props.onClick()}
             renderIcon={props.isRead ? <UnreadIcon /> : <ReadIcon />}
-            data-testid="threading-toolbar-reply"
+            data-testid="threading-toolbar-mark-as-read"
           >
             {!responsiveProps.isMobile && !props.isSplitScreenView && (
               <AccessibleContent alt={currentText}>
