@@ -25,13 +25,21 @@ import {IconEditLine, IconPlusLine, IconTrashLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
-import type {Enrollment, EnrollmentType, TempEnrollPermissions, User} from './types'
+import type {
+  Bookmark,
+  Enrollment,
+  Links,
+  EnrollmentType,
+  TempEnrollPermissions,
+  User,
+} from './types'
 import {MODULE_NAME, PROVIDER} from './types'
 import {deleteEnrollment} from './api/enrollment'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {createAnalyticPropsGenerator} from './util/analytics'
 import {TempEnrollAvatar} from './TempEnrollAvatar'
+import {TempEnrollNavigation} from './TempEnrollNavigation'
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -46,6 +54,8 @@ interface Props {
   onAddNew?: () => void
   enrollmentType: EnrollmentType
   tempEnrollPermissions: TempEnrollPermissions
+  updateBookmark: (bookmark: Bookmark) => void
+  links: Links
 }
 
 export function getRelevantUserFromEnrollment(enrollment: Enrollment) {
@@ -196,73 +206,87 @@ export function TempEnrollEdit(props: Props) {
     </Flex>
   )
 
+  const renderRows = () => {
+    const rows = []
+    for (const enrollment of props.enrollments) {
+      // iterate enrollments instead of enrollmentGroups to keep chronological order
+      const pairingId = enrollment.temporary_enrollment_pairing_id
+      const group = enrollmentGroups[pairingId]
+      const firstEnrollment = group[0]
+      rows.push(
+        <Table.Row key={pairingId}>
+          <Table.RowHeader>
+            <TempEnrollAvatar user={getRelevantUserFromEnrollment(firstEnrollment)} />
+          </Table.RowHeader>
+          <Table.Cell>
+            {`${formatDateTime(firstEnrollment.start_at)} - ${formatDateTime(
+              firstEnrollment.end_at
+            )}`}
+          </Table.Cell>
+          <Table.Cell>{firstEnrollment.type}</Table.Cell>
+          <Table.Cell>{renderEnrollmentPairingStatus(group)}</Table.Cell>
+          {canEditOrDelete && <Table.Cell>{renderActionIcons(group)}</Table.Cell>}
+        </Table.Row>
+      )
+    }
+    return rows
+  }
+
   return (
-    <Flex gap="medium" direction="column">
-      <Flex.Item overflowY="visible">
-        <Flex wrap="wrap" gap="x-small" justifyItems="space-between">
-          <Flex.Item>
-            <TempEnrollAvatar user={props.user} />
-          </Flex.Item>
-          {canAdd && props.enrollmentType === PROVIDER && (
+    <>
+      <Flex gap="medium" direction="column">
+        <Flex.Item overflowY="visible">
+          <Flex wrap="wrap" gap="x-small" justifyItems="space-between">
             <Flex.Item>
-              <Button
-                data-testid="add-button"
-                onClick={handleAddNewClick}
-                aria-label={I18n.t('Create temporary enrollment')}
-                {...analyticProps('Create')}
-                renderIcon={IconPlusLine}
-              >
-                {I18n.t('Recipient')}
-              </Button>
+              <TempEnrollAvatar user={props.user} />
             </Flex.Item>
-          )}
-        </Flex>
-      </Flex.Item>
-      <Flex.Item shouldGrow={true}>
-        <Table caption={<ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>}>
-          <Table.Head>
-            <Table.Row>
-              <Table.ColHeader id="usertable-name">
-                {enrollmentTypeLabel} {I18n.t('Name')}
-              </Table.ColHeader>
-              <Table.ColHeader id="usertable-email">
-                {I18n.t('Recipient Enrollment Period')}
-              </Table.ColHeader>
-              <Table.ColHeader id="usertable-loginid">
-                {I18n.t('Recipient Enrollment Type')}
-              </Table.ColHeader>
-              <Table.ColHeader id="usertable-status">{I18n.t('Status')}</Table.ColHeader>
-              {(canEdit || canDelete) && (
-                <Table.ColHeader id="header-user-option-links">
-                  <ScreenReaderContent>
-                    {I18n.t('Temporary enrollment option links')}
-                  </ScreenReaderContent>
+            {canAdd && props.enrollmentType === PROVIDER && (
+              <Flex.Item>
+                <Button
+                  data-testid="add-button"
+                  onClick={handleAddNewClick}
+                  aria-label={I18n.t('Create temporary enrollment')}
+                  {...analyticProps('Create')}
+                  renderIcon={IconPlusLine}
+                >
+                  {I18n.t('Recipient')}
+                </Button>
+              </Flex.Item>
+            )}
+          </Flex>
+        </Flex.Item>
+        <Flex.Item shouldGrow={true}>
+          <Table caption={<ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>}>
+            <Table.Head>
+              <Table.Row>
+                <Table.ColHeader id="usertable-name">
+                  {enrollmentTypeLabel} {I18n.t('Name')}
                 </Table.ColHeader>
-              )}
-            </Table.Row>
-          </Table.Head>
-          <Table.Body>
-            {Object.entries(enrollmentGroups).map(([pairingId, enrollmentGroup]) => {
-              const firstEnrollment: Enrollment = enrollmentGroup[0]
-              return (
-                <Table.Row key={pairingId}>
-                  <Table.RowHeader>
-                    <TempEnrollAvatar user={getRelevantUserFromEnrollment(firstEnrollment)} />
-                  </Table.RowHeader>
-                  <Table.Cell>
-                    {`${formatDateTime(firstEnrollment.start_at)} - ${formatDateTime(
-                      firstEnrollment.end_at
-                    )}`}
-                  </Table.Cell>
-                  <Table.Cell>{firstEnrollment.type}</Table.Cell>
-                  <Table.Cell>{renderEnrollmentPairingStatus(enrollmentGroup)}</Table.Cell>
-                  {canEditOrDelete && <Table.Cell>{renderActionIcons(enrollmentGroup)}</Table.Cell>}
-                </Table.Row>
-              )
-            })}
-          </Table.Body>
-        </Table>
-      </Flex.Item>
-    </Flex>
+                <Table.ColHeader id="usertable-email">
+                  {I18n.t('Recipient Enrollment Period')}
+                </Table.ColHeader>
+                <Table.ColHeader id="usertable-loginid">
+                  {I18n.t('Recipient Enrollment Type')}
+                </Table.ColHeader>
+                <Table.ColHeader id="usertable-status">{I18n.t('Status')}</Table.ColHeader>
+                {(canEdit || canDelete) && (
+                  <Table.ColHeader id="header-user-option-links">
+                    <ScreenReaderContent>
+                      {I18n.t('Temporary enrollment option links')}
+                    </ScreenReaderContent>
+                  </Table.ColHeader>
+                )}
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>{renderRows()}</Table.Body>
+          </Table>
+        </Flex.Item>
+      </Flex>
+      <TempEnrollNavigation
+        prev={props.links.prev}
+        next={props.links.next}
+        onPageClick={props.updateBookmark}
+      />
+    </>
   )
 }

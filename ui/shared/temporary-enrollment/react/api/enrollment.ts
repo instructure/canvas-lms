@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {Enrollment, TemporaryEnrollmentPairing} from '../types'
+import type {Enrollment, FetchedEnrollments, TemporaryEnrollmentPairing} from '../types'
 import {ITEMS_PER_PAGE} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -38,11 +38,13 @@ const I18n = useI18nScope('temporary_enrollment')
  */
 export async function fetchTemporaryEnrollments(
   userId: string,
-  isRecipient: boolean
-): Promise<Enrollment[]> {
+  isRecipient: boolean,
+  pageRequest: string
+): Promise<FetchedEnrollments> {
   const params: Record<string, any> = {
     state: ['current_future_and_restricted'],
     per_page: ITEMS_PER_PAGE,
+    page: pageRequest,
   }
 
   params.include = ['avatar_url']
@@ -53,13 +55,13 @@ export async function fetchTemporaryEnrollments(
     params.temporary_enrollment_recipients_for_provider = true
   }
 
-  const {response, json} = await doFetchApi({
+  const {response, json, link} = await doFetchApi<Enrollment[]>({
     path: `/api/v1/users/${userId}/enrollments`,
     params,
   })
 
   if (response.status === 204) {
-    return []
+    return {enrollments: []}
   } else if (!response.ok) {
     const errorMessage = isRecipient
       ? I18n.t('Failed to get temporary enrollments for recipient')
@@ -67,7 +69,7 @@ export async function fetchTemporaryEnrollments(
     throw new Error(errorMessage)
   }
 
-  return json
+  return {enrollments: json, link}
 }
 
 /**
