@@ -19209,6 +19209,7 @@ he:
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "קובץ זה מצריך הגדרת זכויות שימוש לפני שניתן יהיה לפרסמו"
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "התיקיה הזו נעולה כרגע ואינה זמינה לעיון"
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "ההערכה הזו שונה מזו שמוצגת לתלמיד כיון שכמה משימות הוקפאו"
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: "הערכה זו הושמטה בשלב זה לתלמיד הזה"
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "התמונה מופיעה כתמונת רקע שקופה על הדף שלך. הפורמטים המותרים: PNG, SVG, GIF, JPEG"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "זוהי רשימה המופרדת בפסיקים, של כתובות דפים שניתן לבטוח בהם. בטחון זה מאפשר לעקוף את אסימון CSRF כאשר מתחברים לקנבס."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "זהו קורס שסוכם, כך שרק רישום מסכם זמין"
