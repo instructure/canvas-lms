@@ -26,7 +26,6 @@ import {
   hideStudentNames,
   isAnonymous,
   resolveAuthorRoles,
-  responsiveQuerySizes,
   userNameToShow,
 } from '../../utils'
 import {RolePillContainer} from '../RolePillContainer/RolePillContainer'
@@ -37,7 +36,6 @@ import {User} from '../../../graphql/User'
 import {Avatar} from '@instructure/ui-avatar'
 import {Badge} from '@instructure/ui-badge'
 import {Flex} from '@instructure/ui-flex'
-import {Responsive} from '@instructure/ui-responsive'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
@@ -46,20 +44,20 @@ import {DiscussionEntryVersion} from '../../../graphql/DiscussionEntryVersion'
 import {DiscussionEntryVersionHistory} from '../DiscussionEntryVersionHistory/DiscussionEntryVersionHistory'
 import {ReportsSummaryBadge} from '../ReportsSummaryBadge/ReportsSummaryBadge'
 import theme from '@instructure/canvas-theme'
-import {CondensedButton} from '@instructure/ui-buttons'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 const I18n = useI18nScope('discussion_posts')
 
-export const AuthorInfo = props => {
+const AuthorInfoBase = ({breakpoints, ...props}) => {
   const {searchTerm} = useContext(SearchContext)
 
   const hasAuthor = Boolean(props.author || props.anonymousAuthor)
   const avatarUrl = isAnonymous(props) ? null : props.author?.avatarUrl
 
   const getUnreadBadgeOffset = avatarSize => {
-    if (avatarSize === 'medium') return '11px'
-    if (avatarSize === 'x-small') return '3px'
-    return '7px'
+    if (avatarSize === 'x-small') return '-8px'
+    if (avatarSize === 'small') return '-6px'
+    return '-5px'
   }
 
   // author is not a role found in courseroles,
@@ -67,64 +65,56 @@ export const AuthorInfo = props => {
   // the author in this component will have to roles (author, and the course role)
   const hasMultipleRoles = props.author?.courseRoles?.length > 0
 
+  const nameAndRoleDirection = breakpoints.desktopNavOpen ? 'row' : 'column'
+  const timestampTextSize = breakpoints.desktopNavOpen && !props.threadMode ? 'small' : 'x-small'
+  const authorNameTextSize = breakpoints.desktopNavOpen && props.threadMode ? 'small' : 'medium'
+  const authorInfoPadding = breakpoints.mobileOnly ? '0 0 0 x-small' : '0 0 0 small'
+  const authorNamePadding = breakpoints.mobileOnly ? 'xxx-small small xxx-small 0' : '0 small 0 0'
+  let avatarSize = 'small'
+
+  if (breakpoints.desktopNavOpen) {
+    avatarSize = props.threadMode && !props.threadParent ? 'small' : 'medium'
+  } else if (breakpoints.mobileOnly) {
+    avatarSize = 'small'
+  } else {
+    //tablet
+    avatarSize = props.threadMode ? 'x-small' : 'small'
+  }
+
   return (
-    <Responsive
-      match="media"
-      query={responsiveQuerySizes({tablet: true, desktop: true})}
-      props={{
-        tablet: {
-          authorNameTextSize: 'x-small',
-          timestampTextSize: 'x-small',
-          nameAndRoleDirection: 'column',
-          badgeMarginLeft: '-16px',
-          avatarSize: props.threadMode ? 'x-small' : 'small',
-        },
-        desktop: {
-          authorNameTextSize: props.threadMode ? 'small' : 'medium',
-          timestampTextSize: props.threadMode ? 'x-small' : 'small',
-          nameAndRoleDirection: 'row',
-          badgeMarginLeft: props.threadMode ? '-16px' : '-24px',
-          avatarSize: props.threadMode && !props.threadParent ? 'small' : 'medium',
-        },
-        mobile: {
-          authorNameTextSize: 'small',
-          timestampTextSize: 'x-small',
-          nameAndRoleDirection: 'column',
-          badgeMarginLeft: '-16px',
-          avatarSize: 'small',
-        },
-      }}
-      render={responsiveProps => (
-        <Flex>
-          <Flex.Item align="start">
-            {props.isUnread && (
-              <div
-                style={{
-                  float: 'left',
-                  marginLeft: responsiveProps.badgeMarginLeft,
-                  marginTop: hasAuthor ? getUnreadBadgeOffset(responsiveProps.avatarSize) : '2px',
-                }}
-                data-testid="is-unread"
-                data-isforcedread={props.isForcedRead}
-              >
-                <CondensedButton
-                  onClick={() => props.toggleUnread()}
-                  title={I18n.t('Mark as read')}
-                >
-                  <Badge
-                    type="notification"
-                    placement="start center"
-                    standalone={true}
-                    formatOutput={() => (
-                      <ScreenReaderContent>{I18n.t('Mark post as read')}</ScreenReaderContent>
-                    )}
-                  />
-                </CondensedButton>
-              </div>
-            )}
+    <Flex>
+      <Flex.Item align="start">
+        {props.isUnread && (
+          <div
+            style={{
+              float: 'left',
+              marginTop: hasAuthor ? getUnreadBadgeOffset(avatarSize) : '2px',
+              position: 'relative',
+              zIndex: 1,
+            }}
+            data-testid="is-unread"
+            data-isforcedread={props.isForcedRead}
+          >
+            <Badge
+              type="notification"
+              placement="start center"
+              standalone={true}
+              formatOutput={() => (
+                <ScreenReaderContent>{I18n.t('Mark post as read')}</ScreenReaderContent>
+              )}
+            />
+          </div>
+        )}
+        {hasAuthor && (
+          <div
+            style={{
+              marginLeft: props.isUnread ? '-12px' : '0',
+              display: 'initial',
+            }}
+          >
             {hasAuthor && !isAnonymous(props) && !hideStudentNames && (
               <Avatar
-                size={responsiveProps.avatarSize}
+                size={avatarSize}
                 name={getDisplayName(props)}
                 src={avatarUrl}
                 margin="0"
@@ -132,89 +122,85 @@ export const AuthorInfo = props => {
               />
             )}
             {hasAuthor && !isAnonymous(props) && hideStudentNames && (
-              <AnonymousAvatar seedString={props.author._id} size={responsiveProps.avatarSize} />
+              <AnonymousAvatar seedString={props.author._id} size={avatarSize} />
             )}
             {hasAuthor && isAnonymous(props) && (
-              <AnonymousAvatar
-                seedString={props.anonymousAuthor.shortName}
-                size={responsiveProps.avatarSize}
+              <AnonymousAvatar seedString={props.anonymousAuthor.shortName} size={avatarSize} />
+            )}
+          </div>
+        )}
+      </Flex.Item>
+      <Flex.Item shouldShrink={true}>
+        <Flex direction="column" margin={authorInfoPadding}>
+          {hasAuthor && (
+            <Flex.Item>
+              <Flex direction={hasMultipleRoles ? 'column' : nameAndRoleDirection}>
+                <Flex.Item padding={authorNamePadding}>
+                  <Text
+                    weight="bold"
+                    size={authorNameTextSize}
+                    lineHeight="condensed"
+                    data-testid="author_name"
+                    wrap="break-word"
+                  >
+                    {isAnonymous(props) ? (
+                      getDisplayName(props)
+                    ) : (
+                      <NameLink
+                        userType="author"
+                        user={props.author}
+                        authorNameTextSize={authorNameTextSize}
+                        searchTerm={searchTerm}
+                        discussionEntryProps={props}
+                        mobileOnly={breakpoints.mobileOnly}
+                      />
+                    )}
+                  </Text>
+                </Flex.Item>
+                <Flex.Item margin="0 0 0 xx-small" overflowY="hidden">
+                  <RolePillContainer
+                    discussionRoles={resolveAuthorRoles(
+                      props.isTopicAuthor,
+                      props.author?.courseRoles
+                    )}
+                    data-testid="pill-container"
+                  />
+                </Flex.Item>
+                {ENV.discussions_reporting &&
+                  props.reportTypeCounts &&
+                  props.reportTypeCounts.total && (
+                    <ReportsSummaryBadge reportTypeCounts={props.reportTypeCounts} />
+                  )}
+              </Flex>
+            </Flex.Item>
+          )}
+          <Flex.Item overflowX="hidden" padding="0 0 0 xx-small">
+            <Timestamps
+              author={props.author}
+              editor={props.editor}
+              createdAt={props.createdAt}
+              updatedAt={props.updatedAt}
+              timingDisplay={props.timingDisplay}
+              editedTimingDisplay={props.editedTimingDisplay}
+              lastReplyAtDisplay={props.lastReplyAtDisplay}
+              showCreatedAsTooltip={props.showCreatedAsTooltip}
+              timestampTextSize={timestampTextSize}
+              mobileOnly={breakpoints.mobileOnly}
+            />
+            {ENV.discussion_entry_version_history && props.discussionEntryVersions.length > 1 && (
+              <DiscussionEntryVersionHistory
+                textSize={timestampTextSize}
+                discussionEntryVersions={props.discussionEntryVersions}
               />
             )}
           </Flex.Item>
-          <Flex.Item shouldShrink={true}>
-            <Flex direction="column" margin="0 0 0 small">
-              {hasAuthor && (
-                <Flex.Item>
-                  <Flex
-                    direction={hasMultipleRoles ? 'column' : responsiveProps.nameAndRoleDirection}
-                  >
-                    <Flex.Item padding="0 small 0 0">
-                      <Text
-                        weight="bold"
-                        size={responsiveProps.authorNameTextSize}
-                        lineHeight="condensed"
-                        data-testid="author_name"
-                        wrap="break-word"
-                      >
-                        {isAnonymous(props) || hideStudentNames ? (
-                          getDisplayName(props)
-                        ) : (
-                          <NameLink
-                            userType="author"
-                            user={props.author}
-                            responsiveProps={responsiveProps}
-                            searchTerm={searchTerm}
-                            discussionEntryProps={props}
-                          />
-                        )}
-                      </Text>
-                    </Flex.Item>
-                    <Flex.Item margin="0 0 0 xx-small" overflowY="hidden">
-                      <RolePillContainer
-                        discussionRoles={resolveAuthorRoles(
-                          props.isTopicAuthor,
-                          props.author?.courseRoles
-                        )}
-                        data-testid="pill-container"
-                      />
-                    </Flex.Item>
-                    {ENV.discussions_reporting &&
-                      props.reportTypeCounts &&
-                      props.reportTypeCounts.total && (
-                        <ReportsSummaryBadge reportTypeCounts={props.reportTypeCounts} />
-                      )}
-                  </Flex>
-                </Flex.Item>
-              )}
-              <Flex.Item overflowX="hidden" padding="0 0 0 xx-small">
-                <Timestamps
-                  author={props.author}
-                  editor={props.editor}
-                  createdAt={props.createdAt}
-                  updatedAt={props.updatedAt}
-                  timingDisplay={props.timingDisplay}
-                  editedTimingDisplay={props.editedTimingDisplay}
-                  lastReplyAtDisplay={props.lastReplyAtDisplay}
-                  showCreatedAsTooltip={props.showCreatedAsTooltip}
-                  timestampTextSize={responsiveProps.timestampTextSize}
-                />
-                {ENV.discussion_entry_version_history &&
-                  props.discussionEntryVersions.length > 1 && (
-                    <DiscussionEntryVersionHistory
-                      textSize={responsiveProps.timestampTextSize}
-                      discussionEntryVersions={props.discussionEntryVersions}
-                    />
-                  )}
-              </Flex.Item>
-            </Flex>
-          </Flex.Item>
         </Flex>
-      )}
-    />
+      </Flex.Item>
+    </Flex>
   )
 }
 
-AuthorInfo.propTypes = {
+AuthorInfoBase.propTypes = {
   /**
    * Object containing author information
    */
@@ -270,6 +256,7 @@ AuthorInfo.propTypes = {
   threadMode: PropTypes.bool,
   threadParent: PropTypes.bool,
   toggleUnread: PropTypes.func,
+  breakpoints: breakpointsShape,
 }
 
 const Timestamps = props => {
@@ -306,20 +293,16 @@ const Timestamps = props => {
       })
     }
   }, [props.editedTimingDisplay, props.createdAt, props.updatedAt, props.editor, props.author])
-
+  const timestampsPadding = props.mobileOnly ? '0 xx-small 0 0' : 'xx-small xx-small xx-small 0'
   return (
     <Flex wrap="wrap">
       {(!props.showCreatedAsTooltip || !editText) && (
-        <Flex.Item overflowX="hidden" padding="xx-small xx-small xx-small 0">
+        <Flex.Item overflowX="hidden" padding={timestampsPadding}>
           <Text size={props.timestampTextSize}>{props.timingDisplay}</Text>
         </Flex.Item>
       )}
       {editText && props.showCreatedAsTooltip && (
-        <Flex.Item
-          data-testid="created-tooltip"
-          overflowX="hidden"
-          padding="xx-small xx-small xx-small 0"
-        >
+        <Flex.Item data-testid="created-tooltip" padding={timestampsPadding}>
           <Tooltip
             renderTip={I18n.t('Created %{timingDisplay}', {timingDisplay: props.timingDisplay})}
           >
@@ -331,12 +314,12 @@ const Timestamps = props => {
         </Flex.Item>
       )}
       {editText && !props.showCreatedAsTooltip && (
-        <Flex.Item overflowX="hidden" padding="xx-small xx-small xx-small 0">
+        <Flex.Item overflowX="hidden" padding={timestampsPadding}>
           <Text size={props.timestampTextSize}>{editText}</Text>
         </Flex.Item>
       )}
       {props.lastReplyAtDisplay && (
-        <Flex.Item overflowX="hidden">
+        <Flex.Item overflowX="hidden" padding="0 xx-small 0 0">
           <Text size={props.timestampTextSize}>
             {I18n.t('Last reply %{lastReplyAtDisplay}', {
               lastReplyAtDisplay: props.lastReplyAtDisplay,
@@ -358,19 +341,24 @@ Timestamps.propTypes = {
   lastReplyAtDisplay: PropTypes.string,
   showCreatedAsTooltip: PropTypes.bool,
   timestampTextSize: PropTypes.string,
+  mobileOnly: PropTypes.bool,
 }
 
 const NameLink = props => {
+  let classnames = ''
+  if (props.user?.courseRoles?.includes('StudentEnrollment'))
+    classnames = 'student_context_card_trigger'
+  if (props.mobileOnly) classnames += ' author_post'
+
+  const fontWeight = {fontWeight: props.mobileOnly ? 700 : 400}
   return (
     <div
-      className={
-        props.user?.courseRoles?.includes('StudentEnrollment') ? 'student_context_card_trigger' : ''
-      }
+      className={classnames}
       style={
         props.userType === 'author'
           ? {
-              marginBottom: '0.3rem',
-              marginTop: theme.variables.spacing.xxSmall,
+              marginBottom: props.mobileOnly ? '0' : '0.3rem',
+              marginTop: props.mobileOnly ? '0' : theme.variables.spacing.xxSmall,
               marginLeft: theme.variables.spacing.xxSmall,
               display: 'inline-block',
             }
@@ -380,7 +368,7 @@ const NameLink = props => {
       data-student_id={props.user?._id}
       data-course_id={ENV.course_id}
     >
-      <Link href={props.user?.htmlUrl} isWithinText={false}>
+      <Link href={props.user?.htmlUrl} isWithinText={false} themeOverride={fontWeight}>
         {props.userType === 'author' ? (
           <>
             <SearchSpan
@@ -391,7 +379,7 @@ const NameLink = props => {
             {props.user?.pronouns && (
               <Text
                 lineHeight="condensed"
-                size={props.responsiveProps.authorNameTextSize}
+                size={props.authorNameTextSize}
                 fontStyle="italic"
                 data-testid="author-pronouns"
               >
@@ -410,7 +398,9 @@ const NameLink = props => {
 NameLink.propTypes = {
   userType: PropTypes.string,
   user: User.shape,
-  responsiveProps: PropTypes.object,
   searchTerm: PropTypes.string,
-  discussionEntryProps: PropTypes.object,
+  timestampTextSize: PropTypes.string,
+  mobileOnly: PropTypes.bool,
 }
+
+export const AuthorInfo = WithBreakpoints(AuthorInfoBase)

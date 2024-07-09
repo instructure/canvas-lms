@@ -40,12 +40,10 @@ export const MarkAsRead = props => {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          textSize: 'small',
-          itemSpacing: '0 small 0 0',
+          itemSpacing: '0 xx-small 0 0',
           isMobile: true,
         },
         desktop: {
-          textSize: 'medium',
           itemSpacing: 'none',
           isMobile: false,
         },
@@ -65,7 +63,7 @@ export const MarkAsRead = props => {
           >
             {!responsiveProps.isMobile && !props.isSplitScreenView && (
               <AccessibleContent alt={currentText}>
-                <Text weight="bold" size={responsiveProps.textSize} style={{alignSelf: 'flex-end'}}>
+                <Text weight="bold" size="medium" style={{alignSelf: 'flex-end'}}>
                   {currentText}
                 </Text>
               </AccessibleContent>

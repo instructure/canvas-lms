@@ -330,15 +330,4 @@ describe('AuthorInfo', () => {
       expect(container.queryByText('View History')).not.toBeInTheDocument()
     })
   })
-
-  describe('Mark As Read badge interaction', () => {
-    it('clicks the Mark As Read badge', async () => {
-      const toggleUnread = jest.fn()
-      const container = setup({isUnread: true, toggleUnread})
-      const unreadBadge = container.getByTestId('is-unread')
-      expect(unreadBadge).toBeInTheDocument()
-      unreadBadge.firstChild.click()
-      expect(toggleUnread).toHaveBeenCalledTimes(1)
-    })
-  })
 })

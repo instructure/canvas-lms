@@ -317,7 +317,10 @@ const DiscussionTopicManager = props => {
   }
 
   // Used when replying to the Topic directly
-  const {createDiscussionEntry, isSubmitting} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
+  const {createDiscussionEntry, isSubmitting} = useCreateDiscussionEntry(
+    onEntryCreationCompletion,
+    updateCache
+  )
 
   // why || waitForUnreadFilter: when waitForUnreadFilter, discussionTopicQuery is skipped, but this does not set loading.
   // why && !searchTerm: this is for the search if you type it triggers useQuery and you lose the search.
@@ -355,9 +358,11 @@ const DiscussionTopicManager = props => {
           props={{
             mobile: {
               viewPortWidth: '100vw',
+              padding: 'medium x-small 0',
             },
             desktop: {
               viewPortWidth: '480px',
+              padding: 'medium medium 0 small',
             },
           }}
           render={responsiveProps => {
@@ -373,8 +378,8 @@ const DiscussionTopicManager = props => {
                 <DrawerLayout.Content label="Splitscreen View Content">
                   <View
                     display="block"
-                    padding="medium medium 0 small"
                     height={isModuleItem ? '85vh' : '90vh'}
+                    padding={responsiveProps.padding}
                   >
                     <DiscussionTopicHeaderContainer
                       discussionTopicTitle={discussionTopicQuery.data.legacyNode.title}

@@ -63,12 +63,12 @@ describe('PostMessage', () => {
     expect(queryByText('Thoughts')).toBeTruthy()
   })
 
-  it('displays the title h2', () => {
+  it('displays the title', () => {
     const {queryByText} = setup()
     const screenReaderText = queryByText('Discussion Topic: Thoughts')
 
     expect(screenReaderText).toBeTruthy()
-    expect(screenReaderText.parentElement.parentElement.parentElement.tagName).toBe('H2')
+    expect(screenReaderText.parentElement.parentElement.parentElement.tagName).toBe('SPAN')
   })
 
   it('displays the message', () => {
@@ -111,7 +111,7 @@ describe('PostMessage', () => {
     })
 
     it('updates the displayed message when the message prop changes', async () => {
-      const { rerender } = setup({ message: 'Initial message' })
+      const {rerender} = setup({message: 'Initial message'})
 
       // Check initial render
       expect(screen.getByText('Initial message')).toBeInTheDocument()
@@ -119,7 +119,7 @@ describe('PostMessage', () => {
       // Rerender with new props
       await act(async () => {
         rerender(
-          <SearchContext.Provider value={{ searchTerm: '' }}>
+          <SearchContext.Provider value={{searchTerm: ''}}>
             <PostMessage
               author={User.mock()}
               timingDisplay="Jan 1 2000"
