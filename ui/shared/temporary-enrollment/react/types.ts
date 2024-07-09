@@ -18,12 +18,28 @@
 
 export const MODULE_NAME = 'TempEnroll'
 
-export const ITEMS_PER_PAGE = 100
+export const ITEMS_PER_PAGE = 10
 export const MAX_ALLOWED_COURSES_PER_PAGE = 100
 
 export const TOOLTIP_MAX_WIDTH: string = '15rem'
 export const ENROLLMENT_TREE_SPACING: string = '1.75rem'
 export const ENROLLMENT_TREE_ICON_OFFSET: string = '-.25em'
+
+export interface Bookmark {
+  page: string
+  rel?: string
+}
+
+export interface Links {
+  prev?: Bookmark
+  next?: Bookmark
+  current: Bookmark
+}
+
+export interface FetchedEnrollments {
+  link?: Links
+  enrollments: Enrollment[]
+}
 
 export interface Course {
   id: string

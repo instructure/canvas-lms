@@ -63,6 +63,8 @@ describe('TempEnrollEdit component', () => {
       canDelete: true,
       canEdit: true,
     },
+    updateBookmark: jest.fn(),
+    links: {prev: {page: 'first'}, current: {page: 'current'}, next: {page: 'next'}},
   }
 
   afterEach(() => {
