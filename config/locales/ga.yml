@@ -2005,7 +2005,7 @@ ga:
   after_the_due_date_eee89c9c: "Tar éis an dáta dlite"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "Tar éis na chéad iarrachta, ní féidir leat ráitis a fhágáil go dtí go gcuirfidh tú an tasc isteach."
   after_throttling_the_selected_jobs_the_newly_creat_44952b37: "Tar éis na poist roghnaithe a bhrú, roghnófar an snáithe nuachruthaithe."
-  agenda_b010136d: "Clár Gníomhaíochta"
+  agenda_b010136d: "Clár Oibre an Lae"
   ai_driven_smart_search_feature_597dbd4f: "Gné cuardaigh cliste tiomáinte ag IS."
   ai_driven_translation_controls_for_courses_12eb6085: "Rialuithe aistriúcháin tiomáinte ag IS do chúrsaí"
   ajax_errors: 
@@ -4297,7 +4297,7 @@ ga:
       create_event: "Cruthaigh Imeacht Nua"
       done_go_back_to_list: "Arna dhéanamh, Téigh Ar Ais Go Liosta"
       links: 
-        calendar_agenda: "Clár Gníomhaíochta"
+        calendar_agenda: "Clár Oibre an Lae"
         calendar_month: Mí
         calendar_week: Seachtain
         improved_accessibility_recommend_agenda: "Rabhadh: Chun inrochtaineacht fheabhsaithe a fháil, bain úsáid as an bhFéilire \"Amharc ar an gClár\"."
@@ -7056,7 +7056,7 @@ ga:
         course_name: Ainm
         course_offline_export: "Cúrsa As Líne"
         course_paces: "Luas an Chúrsa"
-        course_section_name: "Cuir Grúpa Nua leis"
+        course_section_name: "Cuir roinn nua leis"
         course_status_published: "Tá Cúrsa Foilsithe"
         course_status_unpublished: "Tá an cúrsa neamhfhoilsithe"
         course_template: "Teimpléad Cúrsa"
@@ -7142,10 +7142,10 @@ ga:
         conclude: "Críochnaigh an Cúrsa seo"
         copy: "Cóipeáil an Cúrsa seo"
         delete: "Scrios an Cúrsa seo"
-        export_content: "Easpórtáil Ábhar an Chúrsa"
-        import: "Iompórtáil Ábhar an Chúrsa"
+        export_content: "Easpórtáil Ábhar Cúrsa"
+        import: "Iompórtáil Ábhar Cúrsa"
         reset: "Athshocraigh Ábhar an Chúrsa"
-        stats: "Staitisticí Cúrsa"
+        stats: "Staitisticí an Chúrsa"
       role: 
         inactive: neamhghníomhach
     show: 
@@ -9361,7 +9361,7 @@ ga:
   extensions_7250a0bb: Eisínteachtaí
   external_apps_account_course_settings_78de2b2f: "Aipeanna Seachtracha (Cuntas, Socruithe Cúrsa)"
   external_apps_course_settings_1f045644: "Aipeanna Seachtracha (Socruithe Cúrsa)"
-  external_apps_f5490181: "Apps Seachtracha"
+  external_apps_f5490181: "Aipeanna Seachtracha"
   external_collaborations_tool_a4899abb: "Uirlis Comhoibrithe Seachtracha"
   external_content: 
     cancel: 
@@ -10710,7 +10710,7 @@ ga:
   help_4c4968b1: Cabhair
   help_dialog: 
     Submitting_Ticket: "Ag Cuir Ticéad Isteach"
-    canvas_help_sub: "Aimsigh freagraí do cheisteanna coitianta"
+    canvas_help_sub: "Faigh freagraí ar cheisteanna coitianta"
     covid: "Acmhainní Canvas COVID-19"
     covid_sub: "Leideanna don teagasc agus don fhoghlaim ar líne"
     description: "Cur Síos"
@@ -10729,7 +10729,7 @@ ga:
     please_select_one: "Roghnaigh ceann amháin le do thoil..."
     report_problem: "Tuairiscigh Fadhb"
     report_problem_sub: "Má chliseann Canvas, inis dúinn faoi"
-    search_the_canvas_guides: "Cuardaigh na Treoracha Canvas"
+    search_the_canvas_guides: "Cuardaigh Treoracha Canvas"
     see_if_your_issue_is_addressed_in_the_canvas_guides: "Féach an dtugtar aghaidh ar do cheist sa *Treoracha Canvas*."
     send_message: "Seol Teachtaireacht"
     sending: "Ag seoladh..."
@@ -11997,6 +11997,7 @@ ga:
             
             Go raibh maith agat,
             Tacaíocht Canvas
+            
                       Reference: "%{ref}"
       locked_topic: 
         body: |-
@@ -12095,7 +12096,7 @@ ga:
   list_of_pseudonyms_to_get_report_for_af38e1c6: "Liosta de na ainmneacha bréige le tuarascáil a fháil le dóibh"
   list_of_students_and_observers_f7f1a58a: "Liosta de na mic léinn agus breathnóirí"
   list_view_430aecce: "Amharc Liosta"
-  little_lost_try_here_first_9e24e575: "Beagán caillte? Bain triail as anseo ar dtús!"
+  little_lost_try_here_first_9e24e575: "Tú Caillte? Triail anseo ar dtús!"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Níl seirbhís síntiúis imeachtaí beo cumraithe"
   liveassessments_92d9edc0: TascannaBeo
   load_bank: 
@@ -14727,8 +14728,8 @@ ga:
   nav_text_active_a924ae88: "Téacs Nascleanúna Gníomhach"
   navigate_to_speed_grader_for_name_f28cb5b1: "Déan nascleanúint chuig Luasmharcálaí le haghaidh %{name}"
   navigate_to_speed_grader_for_title_assignment_828b1366: "Déan nascleanúint chuig Luasmharcálaí le haghaidh tasc %{title}"
-  navigate_to_speedgrader_for_name_c6408892: "Déan nascleanúint chuig SpeedGrader le haghaidh %{name}"
-  navigate_to_speedgrader_for_title_assignment_47da92db: "Déan nascleanúint chuig SpeedGrader le haghaidh tasc %{title}"
+  navigate_to_speedgrader_for_name_c6408892: "Déan nascleanúint chuig LuasMharcálaí le haghaidh %{name}"
+  navigate_to_speedgrader_for_title_assignment_47da92db: "Déan nascleanúint chuig LuasMharcálaí le haghaidh tasc %{title}"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Ligeann nascleanúint don úsáideoir féachaint ar an nasc Daoine i Nascleanúint Cúrsa."
   navigation_menu_fd782ff8: "Roghchlár Nascleanúna"
   near_3282280c: "In aice"
@@ -20508,8 +20509,8 @@ ga:
   speed_grader: 
     alerts: 
       no_active_students: "Is oth linn nach bhfuil aon mhac léinn gníomhach sa chúrsa nó níl aon duine inmharcáilte agat."
-      no_students_in_groups_back: "Ár leithscéal, ní féidir uaslódálacha don tasc seo a mharcáil i SpeedGrader toisc nach bhfuil aon úsáideoirí sannta. Sann úsáideoirí don shraith grúpa seo le do thoil agus bain triail eile as. Cliceáil 'CGL' chun dul ar ais."
-      no_students_in_groups_close: "Ár leithscéal, ní féidir uaslódálacha don tasc seo a mharcáil i SpeedGrader toisc nach bhfuil aon úsáideoirí sannta. Sann úsáideoirí don shraith grúpa seo le do thoil agus bain triail eile as. Cliceáil 'CGL' chun an fhuinneog seo a dhúnadh."
+      no_students_in_groups_back: "Ár leithscéal, ní féidir uaslódálacha don tasc seo a mharcáil i LuasMharcálaí toisc nach bhfuil aon úsáideoirí sannta. Sann úsáideoirí don shraith grúpa seo le do thoil agus bain triail eile as. Cliceáil 'CGL' chun dul ar ais."
+      no_students_in_groups_close: "Ár leithscéal, ní féidir uaslódálacha don tasc seo a mharcáil i LuasMharcálaí toisc nach bhfuil aon úsáideoirí sannta. Sann úsáideoirí don shraith grúpa seo le do thoil agus bain triail eile as. Cliceáil 'CGL' chun an fhuinneog seo a dhúnadh."
       no_students_in_section: "Níorbh fhéidir aon mhac léinn a aimsiú sa rannán sin, ag titim siar ar gach rannán a thaispeáint."
     allow_message: "Cliceáil ar an gcnaipe \"Ceadaigh\" chun tús a chur leis an dtaifeadadh."
     begin_record_prompt: "Cliceáil ar an gcnaipe \"Taifead\" chun tús a chur leis."

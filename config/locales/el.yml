@@ -14673,6 +14673,7 @@ el:
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Πρέπει να έχουν οριστεί τα usage_rights του αρχείου πριν από τη δημοσίευσή του."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Ο φάκελος είναι προς το παρόν κλειδωμένος και δεν μπορείτε να τον δείτε."
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Ο βαθμός αυτός διαφέρει από τον βαθμό που βλέπει ο σπουδαστής, επειδή κάποιες εργασίες είναι σε σίγαση"
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: "Αυτός ο βαθμός έχει, προς το παρόν, απορριφθεί για αυτόν τον φοιτητή/τρια."
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "<mrk mid=\"1753\" mtype=\"seg\">Αυτή η εικόνα εμφανίζεται ως υδατογράφημα φόντου στη σελίδα σας.</mrk> <mrk mid=\"1754\" mtype=\"seg\">Αποδεκτοί τύποι αρχείων: png, svg, gif, jpeg</mrk>"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "<mrk mid=\"5832\" mtype=\"seg\">Αυτή είναι μια αξιόπιστη λίστα URL οριοθετούμενων από κόμματα.</mrk> <mrk mid=\"5833\" mtype=\"seg\">Αν θεωρηθεί αξιόπιστο κάθε URL που βρίσκεται σε αυτή τη λίστα, αυτό θα οδηγήσει στο να προσπεραστεί κάθε CSRF token κατά τη σύνδεσή σας στο Canvas.</mrk>"
   this_is_a_group_discussion_2f9acdae: "Αυτή είναι μια Ομαδική Συζήτηση"

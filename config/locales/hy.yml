@@ -16438,6 +16438,7 @@ hy:
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Մինչև այս ֆայլի հրապարակումը անհրաժեշտ է սահմանել usage_rights:"
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Այս թղթապանակը այս պահին արգելափակված է և հասանելի չէ դիտելու համար:"
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Այս գնահատականը տարբերվում է ունկնդրի համար տեսանելի գնահատականից, քանի որ որոշ հանձնարարությունների  \"համր\" ֆունկցիան միացված է:"
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: " Այս գնահատականը այս ունկնդրի համար ներկայումս հանվել է:"
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Այս պատկերը հանդիսանում է Ձեր էջ ֆոնային պատկերը: Ընդունելի ձևաչափեր՝ png, svg, gif, jpeg"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Սա URL-հասցեների ստորակետներով բաժանված վստահելի  ցուցակ է: Այս ցուցակում ընդգրկված որևէ URL-ին վստահելը կնշանակի, որ այնտեղից Canvas մուտք գործելիս բաց է թողնվելու CSRF token-ը:"
   this_is_a_group_discussion_2f9acdae: "Սա խմբային քննարկում է "
