@@ -23644,6 +23644,7 @@ fa:
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "این نمره با نمای نمره دانشجو فرق می کند، زیرا برخی تکلیف ها غیر فعال شده اند"
   this_grade_differs_from_the_student_s_view_of_the__f78d0023: "این نمره از نمای دانشجو نسبت به نمره متفاوت است زیرا برخی از نمرات تکالیف هنوز ارسال نشده اند."
   this_grade_has_negative_points_496400d4: "این نمره امتیازات منفی دارد"
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: "این نمره در حال حاضر برای این دانشجو حذف شده است."
   this_grade_is_invalid_8ab192c7: "این نمره نامعتبر است"
   this_grade_is_unusually_high_60533c20: "این نمره به طور غیر عادی زیاد است"
   this_group_was_successfully_removed_81178d51: "این گروه با موفقیت حذف شد."
