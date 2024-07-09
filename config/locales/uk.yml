@@ -17343,6 +17343,7 @@ uk:
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Цей файл повинен мати набір usage_rights перед тим, як буде опублікований. "
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Ця тека закрита та зараз не доступна для перегляду."
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Ця оцінка виглядає по-іншому зі сторони студента, бо деякі завдання були заблоковані."
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: "Оцінка цього студента зараз відсутня."
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Це зображення виглядає як водяний знак для вашої сторінки. Сприйнятні формати: png, svg, gif, jpeg"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Це список URL, яким можна довіряти, відокремлених комами. Кожна URL в цьому списку буде обходити CSRF токен при вході до Canvas."
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Це функція, яка дозволяє розробляти адаптивний макет"
