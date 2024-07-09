@@ -26367,6 +26367,7 @@ nn:
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Denne vurderinga er ulik vurderinga som er synleg for studentane fordi nokre oppgåver er skjulte"
   this_grade_differs_from_the_student_s_view_of_the__f78d0023: "Denne vurderinga er ulik vurderinga som er synleg for studentane fordi nokre vurderingsresultat ikkje er posta enno"
   this_grade_has_negative_points_496400d4: "Vurderinga har negative poeng"
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: "Vurderinga er fjerna for denne studenten akkurat no."
   this_grade_is_invalid_8ab192c7: "Denne vurderinga er ugyldig"
   this_grade_is_unread_fb79c002: "Denne vurderinga er ulest"
   this_grade_is_unusually_high_60533c20: "Dette vurderingsresultatat er unormalt høgt"
