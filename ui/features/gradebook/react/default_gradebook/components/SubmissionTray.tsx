@@ -119,6 +119,7 @@ export type SubmissionTrayProps = {
   pointsBasedGradingScheme: boolean
   onGradeSubmission: (submission: CamelizedSubmission, gradeInfo: GradeResult) => void
   onRequestClose: () => void
+  scalingFactor: number | null
   selectNextAssignment: () => void
   selectPreviousAssignment: () => void
   selectNextStudent: () => void
@@ -404,6 +405,7 @@ export default class SubmissionTray extends React.Component<
             pointsBasedGradingScheme={props.pointsBasedGradingScheme}
             pendingGradeInfo={props.pendingGradeInfo}
             onSubmissionUpdate={props.onGradeSubmission}
+            scalingFactor={props.scalingFactor}
             submission={submission}
             submissionUpdating={props.submissionUpdating}
             subAssignmentTag={subAssignmentTag}
@@ -564,6 +566,7 @@ export default class SubmissionTray extends React.Component<
                   pointsBasedGradingScheme={this.props.pointsBasedGradingScheme}
                   pendingGradeInfo={this.props.pendingGradeInfo}
                   onSubmissionUpdate={this.props.onGradeSubmission}
+                  scalingFactor={this.props.scalingFactor}
                   submission={this.props.submission}
                   submissionUpdating={this.props.submissionUpdating}
                   header={hasCheckpoints ? I18n.t('Current Total') : undefined}
@@ -575,6 +578,7 @@ export default class SubmissionTray extends React.Component<
                       enterGradesAs={this.props.enterGradesAs}
                       gradingScheme={this.props.gradingScheme}
                       pointsBasedGradingScheme={this.props.pointsBasedGradingScheme}
+                      scalingFactor={this.props.scalingFactor}
                       submission={this.props.submission}
                     />
                   </View>

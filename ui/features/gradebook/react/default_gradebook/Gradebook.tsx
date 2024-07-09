@@ -3570,6 +3570,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
     const isGroupWeightZero =
       this.assignmentGroups[assignment.assignment_group_id].group_weight === 0
+    const gradingScheme = this.getAssignmentGradingScheme(assignmentId)
     return {
       assignment: camelizeProperties(assignment),
       colors: this.state.gridColors,
@@ -3579,8 +3580,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       gradingDisabled: Boolean(
         !!(submissionState != null ? submissionState.locked : undefined) || student.isConcluded
       ),
-      gradingScheme: this.getAssignmentGradingScheme(assignmentId)?.data || null,
-      pointsBasedGradingScheme: this.getAssignmentGradingScheme(assignmentId)?.pointsBased || false,
+      gradingScheme: gradingScheme?.data || null,
+      pointsBasedGradingScheme: gradingScheme?.pointsBased || false,
+      scalingFactor: gradingScheme?.scalingFactor || null,
       isFirstAssignment,
       isInOtherGradingPeriod: !!(submissionState != null
         ? submissionState.inOtherGradingPeriod

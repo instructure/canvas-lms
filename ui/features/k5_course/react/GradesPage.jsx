@@ -47,6 +47,7 @@ export const GradesPage = ({
   gradingScheme,
   pointsBasedGradingScheme,
   restrictQuantitativeData,
+  scalingFactor,
 }) => {
   const [loadingGradingPeriods, setLoadingGradingPeriods] = useState(true)
   const [error, setError] = useState(null)
@@ -122,6 +123,7 @@ export const GradesPage = ({
         gradingScheme={gradingScheme}
         pointsBasedGradingScheme={pointsBasedGradingScheme}
         restrictQuantitativeData={restrictQuantitativeData}
+        scalingFactor={scalingFactor}
       />
     </>
   )
@@ -192,6 +194,7 @@ GradesPage.propTypes = {
   gradingScheme: PropTypes.array,
   pointsBasedGradingScheme: PropTypes.bool,
   restrictQuantitativeData: PropTypes.bool,
+  scalingFactor: PropTypes.number,
 }
 
 export default GradesPage

@@ -179,7 +179,7 @@ export default class TotalGradeCellFormatter {
     const scheme = this.options.getGradingStandard()
     if (grade.possible && scheme) {
       letterGrade = GradeFormatHelper.replaceDashWithMinus(
-        scoreToGrade(percentage, scheme.data, scheme.pointsBased)
+        scoreToGrade(percentage, scheme.data, scheme.pointsBased, scheme.scalingFactor)
       )
     }
 
@@ -201,7 +201,7 @@ export default class TotalGradeCellFormatter {
 
         const scaledPercentage = getGradePercentage(scaledScore, scaledPossible)
         letterGrade = GradeFormatHelper.replaceDashWithMinus(
-          scoreToGrade(scaledPercentage, scheme.data, scheme.pointsBased)
+          scoreToGrade(scaledPercentage, scheme.data, scheme.pointsBased, scheme.scalingFactor)
         )
       }
     }

@@ -41,7 +41,8 @@ function formatGrade(
   assignment,
   gradingScheme,
   pointsBasedGradingScheme,
-  enterGradesAs
+  enterGradesAs,
+  scalingFactor
 ) {
   const formatOptions = {
     defaultValue: '–',
@@ -49,6 +50,7 @@ function formatGrade(
     gradingScheme,
     pointsBasedGradingScheme,
     pointsPossible: assignment.pointsPossible,
+    scalingFactor,
     version: 'final',
   }
 
@@ -92,6 +94,7 @@ export default class ReadOnlyCell extends Component {
     gradingScheme: instanceOf(Array).isRequired,
     pointsBasedGradingScheme: bool,
     onToggleSubmissionTrayOpen: func.isRequired,
+    scalingFactor: number,
     student: shape({
       id: string.isRequired,
     }).isRequired,
@@ -155,6 +158,7 @@ export default class ReadOnlyCell extends Component {
       gradeIsVisible,
       gradingScheme,
       pointsBasedGradingScheme,
+      scalingFactor,
       submission,
     } = this.props
 
@@ -169,7 +173,8 @@ export default class ReadOnlyCell extends Component {
             assignment,
             gradingScheme,
             pointsBasedGradingScheme,
-            enterGradesAs
+            enterGradesAs,
+            scalingFactor
           )
         )
       }

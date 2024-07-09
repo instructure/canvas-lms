@@ -282,9 +282,11 @@ class UsersController < ApplicationController
     else
       grade_data[:grade] = enrollment.effective_current_score(opts)
     end
+    grading_standard = enrollment.course.grading_standard_or_default
     grade_data[:restrict_quantitative_data] = enrollment.course.restrict_quantitative_data?(@current_user)
-    grade_data[:grading_scheme] = enrollment.course.grading_standard_or_default.data
-    grade_data[:points_based_grading_scheme] = enrollment.course.grading_standard_or_default.points_based?
+    grade_data[:grading_scheme] = grading_standard.data
+    grade_data[:points_based_grading_scheme] = grading_standard.points_based?
+    grade_data[:scaling_factor] = grading_standard.scaling_factor
 
     render json: grade_data
   end

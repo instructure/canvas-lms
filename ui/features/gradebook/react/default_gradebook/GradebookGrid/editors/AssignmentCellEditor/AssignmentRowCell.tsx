@@ -72,6 +72,8 @@ type Props = {
     valid: boolean
   } | null
 
+  scalingFactor: number | null
+
   submission: Submission
 
   submissionIsUpdating: boolean
@@ -233,6 +235,7 @@ export default class AssignmentRowCell extends Component<Props> {
               pointsBasedGradingScheme={this.props.pointsBasedGradingScheme}
               pendingGradeInfo={this.props.pendingGradeInfo}
               ref={this.bindGradeInput}
+              scalingFactor={this.props.scalingFactor}
               submission={this.props.submission}
             />
           </div>
