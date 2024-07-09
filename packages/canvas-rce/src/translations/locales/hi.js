@@ -188,6 +188,9 @@ const locale = {
   "congruent_5a244acd": { "message": "सर्वांगसम" },
   "contains_311f37b7": { "message": "शामिल है" },
   "content_1440204b": { "message": "सामग्री" },
+  "content_in_the_editor_will_be_changed_press_cancel_d5bf3357": {
+    "message": "संपादक में सामग्री परिवर्तित हो जाएगी। मूल सामग्री को बनाए रखने के लिए रद्द करें दबाएं।"
+  },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "सामग्री अभी भी अपलोड की जा रही है, यदि आप जारी रखते हैं, तो इसे ठीक से एम्बेड नहीं किया जाएगा।"
   },
@@ -325,6 +328,8 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "खोजने के लिए कम से कम 3 कैरेक्टर दर्ज करें"
   },
+  "enter_replacement_text_17631bbc": { "message": "प्रतिस्थापन पाठ दर्ज करें" },
+  "enter_search_text_26cb4459": { "message": "खोज पाठ दर्ज करें" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (प्रकार)" },
   "equals_sign_c51bdc58": { "message": "बराबर चिह्न" },
@@ -367,6 +372,8 @@ const locale = {
   },
   "files_c300e900": { "message": "फ़ाइलें" },
   "files_index_af7c662b": { "message": "फ़ाइल सूचकांक" },
+  "find_8d605019": { "message": "ढूंढें" },
+  "find_and_replace_6e345933": { "message": "ढूंढें और बदलें" },
   "finish_bc343002": { "message": "खत्म करें" },
   "fix_heading_hierarchy_f60884c4": { "message": "हेडिंग पदानुक्रम ठीक करें" },
   "flat_music_76d5a5c3": { "message": "फ़्लैट (संगीत)" },
@@ -487,6 +494,7 @@ const locale = {
   "in_element_of_19ca2f33": { "message": "में (इसका तत्व)" },
   "increase_indent_6af90f7c": { "message": "इंडेंट बढ़ाएं" },
   "indefinite_integral_6623307e": { "message": "अनिश्चित अभिन्न" },
+  "index_of_max_80dcf7a5": { "message": "{ max }में से { index }" },
   "indigo_2035fc55": { "message": "इंडिगो" },
   "inference_fed5c960": { "message": "अनुमान" },
   "infinity_7a10f206": { "message": "अनंत" },
@@ -660,6 +668,7 @@ const locale = {
   "nested_less_than_27d17e58": { "message": "नीडिंत प्रविष्ट इससे कम:" },
   "new_quiz_34aacba6": { "message": "नई प्रश्नोत्तरी" },
   "next_40e12421": { "message": "अगला" },
+  "next_findtext_9d69f0fe": { "message": "अगला { findText }" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "कोई पहुंच संबंधी समस्या नहीं मिली।"
   },
@@ -695,6 +704,7 @@ const locale = {
   },
   "no_quizzes_found_c80c537a": { "message": "कोई प्रश्नोत्तरी नहीं मिली।" },
   "no_results_940393cf": { "message": "कोई नतीजा नहीं।" },
+  "no_results_found_58717065": { "message": "कोई नतीजा नहीं मिला" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "{ filterTerm } के लिए कोई नतीजा नहीं मिला"
   },
@@ -779,11 +789,16 @@ const locale = {
   "precedes_196b9aef": { "message": "पूर्ववर्ती" },
   "precedes_equal_20701e84": { "message": "समान से पूर्ववर्ती" },
   "preformatted_d0670862": { "message": "पूर्वस्वरूपित" },
+  "prepend_findtext_append_8e0e769a": {
+    "message": "{ prepend }{ findText }{ append }"
+  },
   "prev_f82cbc48": { "message": "पिछला" },
   "preview_53003fd2": { "message": "पूर्वावलोकन" },
   "preview_a3f8f854": { "message": "पूर्वावलोकन" },
   "preview_in_overlay_ed772c46": { "message": "ओवरले में पूर्वावलोकन करें" },
   "preview_inline_9787330": { "message": "इनलाइन पूर्वावलोकन करें" },
+  "previous_bd2ac015": { "message": "पिछला" },
+  "previous_findtext_8dfbfd30": { "message": "पिछला { findText }" },
   "prime_917ea60e": { "message": "अभाज्य" },
   "prime_numbers_13464f61": { "message": "अभाज्य संख्याएं" },
   "product_39cf144f": { "message": "उत्पाद" },
@@ -812,11 +827,28 @@ const locale = {
   "religion_icon_246e0be1": { "message": "धर्म आइकन" },
   "remove_heading_style_5fdc8855": { "message": "हेडिंग शैली निकालें" },
   "remove_link_d1f2f4d0": { "message": "लिंक निकालें" },
+  "replace_all_d3d68b3": { "message": "सभी को प्रतिस्थापित करें" },
+  "replace_all_findtext_with_replacetext_da574b32": {
+    "message": "सभी{ findText } को { replaceText } से प्रतिस्थापित करें"
+  },
   "replace_e61834a7": { "message": "प्रतिस्थापित करें" },
+  "replace_findtext_with_replacetext_7b5c7fb3": {
+    "message": "{ findText }को { replaceText } से प्रतिस्थापित करें"
+  },
+  "replace_with_eeff01ad": { "message": "इसके साथ प्रतिस्थापित करें:" },
+  "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+    "message": "{ alertFindText }को { alertReplaceText } से प्रतिस्थापित किया गया"
+  },
+  "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+    "message": "सभी{ alertFindText } को { alertReplaceText } से प्रतिस्थापित किया गया"
+  },
   "reset_95a81614": { "message": "रीसेट करें" },
   "resize_ec83d538": { "message": "साइज़ बदलें" },
   "restore_auto_save_deccd84b": {
     "message": "स्वत: सहेजें पुनर्स्थापित करें?"
+  },
+  "result_index_of_max_7db5ad8b": {
+    "message": "कुल{ max } में से { index } नतीजा।"
   },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "रिवर्स टर्नस्टाइल (प्रतिफल नहीं देता)"
