@@ -39,12 +39,10 @@ export function ThreadingToolbar({...props}) {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          itemSpacing: '0 small 0 0',
-          textSize: 'small',
+          itemSpacing: '0 xx-small 0 0',
         },
         desktop: {
           itemSpacing: 'none',
-          textSize: 'medium',
         },
       }}
       render={(responsiveProps, matches) =>

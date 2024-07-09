@@ -40,6 +40,10 @@
   background-color: $ic-color-light;
 }
 
+div.author_post a span.user_content{
+  font-weight: bold;
+}
+
 .toggle-button {
   @include ic-focus-base;
   &:focus-within {

@@ -82,14 +82,17 @@ export function PostMessage({...props}) {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          titleMargin: '0',
-          titleTextSize: 'small',
+          titleMargin: 'small 0',
+          titleDisplay: 'block',
+          titleTextSize: 'medium',
           titleTextWeight: 'bold',
-          messageTextSize: 'fontSizeXSmall',
+          messageTextSize: 'fontSizeMedium',
           messageLeftPadding: undefined,
+          isMobile: true,
         },
         desktop: {
           titleMargin: props.threadMode ? '0' : '0 0 small 0',
+          titleDisplay: 'inline',
           titleTextSize: props.threadMode ? 'medium' : 'x-large',
           titleTextWeight: props.threadMode ? 'bold' : 'normal',
           messageTextSize: props.threadMode ? 'fontSizeSmall' : 'fontSizeMedium',
@@ -97,17 +100,18 @@ export function PostMessage({...props}) {
             props.discussionEntry && props.discussionEntry.depth === 1 && !props.threadMode
               ? theme.variables.spacing.xxSmall
               : undefined,
+          isMobile: false,
         },
       }}
       render={responsiveProps => (
         <View>
           {props.title ? (
-            <View
-              as={heading}
-              margin={responsiveProps.titleMargin}
-              padding={props.isTopic ? 'small 0 0 0' : '0'}
-            >
-              <Text size={responsiveProps.titleTextSize} weight={responsiveProps.titleTextWeight}>
+            <View margin={responsiveProps.titleMargin} display={responsiveProps.titleDisplay}>
+              <Text
+                size={responsiveProps.titleTextSize}
+                weight={responsiveProps.titleTextWeight}
+                data-testid="message_title"
+              >
                 <AccessibleContent
                   alt={I18n.t('Discussion Topic: %{title}', {title: translatedTitle})}
                 >
@@ -158,6 +162,7 @@ export function PostMessage({...props}) {
           ) : (
             <>
               <div
+                className={'userMessage' + (responsiveProps.isMobile ? ' mobile' : '')}
                 style={{
                   marginLeft: responsiveProps.messageLeftPadding,
                   fontSize: theme.variables.typography[responsiveProps.messageTextSize],

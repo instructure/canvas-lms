@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, fireEvent} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import {Like} from '../Like'
 import {responsiveQuerySizes} from '../../../utils'
@@ -110,7 +110,7 @@ describe('Like', () => {
     it('uses mobile prop values', () => {
       const container = setup()
       expect(container.getByTestId('like-button').parentNode).toHaveStyle(
-        'margin: 0px 0.75rem 0px 0px'
+        'margin: 0px 0.375rem 0px 0px'
       )
     })
   })

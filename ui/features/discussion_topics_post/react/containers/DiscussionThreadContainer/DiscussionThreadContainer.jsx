@@ -200,6 +200,10 @@ export const DiscussionThreadContainer = props => {
   }
 
   const getReplyLeftMargin = responsiveProp => {
+    //In mobile we dont want any margin
+    if (responsiveProp.isMobile) {
+      return 0
+    }
     // If the entry is in threadMode, then we want the RCE to be aligned with the authorInfo
     const threadMode = props.discussionEntry?.depth > 1
     if (responsiveProp.padding === undefined || responsiveProp.padding === null || !threadMode) {
@@ -425,7 +429,7 @@ export const DiscussionThreadContainer = props => {
         // If you change the padding notation on these, please update the getReplyLeftMargin function
         mobile: {
           marginDepth: `calc(${theme.variables.spacing.medium} * ${props.depth})`,
-          padding: 'small xx-small small',
+          padding: '0',
           toolbarLeftPadding: undefined,
         },
         desktop: {

@@ -57,12 +57,10 @@ export function Like({...props}) {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          textSize: 'small',
-          itemSpacing: '0 small 0 0',
+          itemSpacing: '0 xx-small 0 0',
           isMobile: true,
         },
         desktop: {
-          textSize: 'medium',
           itemSpacing: 'none',
           isMobile: false,
         },
@@ -78,7 +76,7 @@ export function Like({...props}) {
             interaction={props.interaction}
           >
             <PresentationContent>
-              <Text weight="bold" data-testid="like-count" size={responsiveProps.textSize}>
+              <Text weight="bold" data-testid="like-count" size='medium'>
                 {props.likeCount > 0 && props.likeCount}
                 {!responsiveProps.isMobile &&
                   !props.isSplitScreenView &&

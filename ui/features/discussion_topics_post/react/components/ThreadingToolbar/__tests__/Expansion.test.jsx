@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, fireEvent} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import {Expansion} from '../Expansion'
 import {responsiveQuerySizes} from '../../../utils'
@@ -86,20 +86,5 @@ describe('Expansion', () => {
   it('displays as readonly if isReadOnly is true', () => {
     const {getByText} = setup({isExpanded: false, isReadOnly: true, expandText: '4 replies'})
     expect(getByText('4 replies').closest('button').hasAttribute('aria-disabled')).toBe(true)
-  })
-
-  describe('Mobile', () => {
-    beforeEach(() => {
-      responsiveQuerySizes.mockImplementation(() => ({
-        mobile: {maxWidth: '1024px'},
-      }))
-    })
-
-    it('uses mobile prop values', () => {
-      const container = setup()
-      const smallText = container.getByTestId('text-small')
-
-      expect(smallText).toBeTruthy()
-    })
   })
 })

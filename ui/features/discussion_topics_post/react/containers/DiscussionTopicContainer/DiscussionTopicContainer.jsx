@@ -23,16 +23,16 @@ import DirectShareCourseTray from '@canvas/direct-sharing/react/components/Direc
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {DiscussionSummary} from '../../components/DiscussionSummary/DiscussionSummary'
-import {getSpeedGraderUrl, getReviewLinkUrl, responsiveQuerySizes} from '../../utils'
+import {getReviewLinkUrl, getSpeedGraderUrl, responsiveQuerySizes} from '../../utils'
 import {Highlight} from '../../components/Highlight/Highlight'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {PeerReview} from '../../components/PeerReview/PeerReview'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import {
   DELETE_DISCUSSION_TOPIC,
-  UPDATE_DISCUSSION_TOPIC,
   SUBSCRIBE_TO_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_READ_STATE,
+  UPDATE_DISCUSSION_TOPIC
 } from '../../../graphql/Mutations'
 import {LockedDiscussion} from '../../components/LockedDiscussion/LockedDiscussion'
 import {PodcastFeed} from '../../components/PodcastFeed/PodcastFeed'
@@ -40,7 +40,7 @@ import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {SearchContext} from '../../utils/constants'
-import {useMutation, useApolloClient} from 'react-apollo'
+import {useApolloClient, useMutation} from 'react-apollo'
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {DiscussionTopicAlertManager} from '../../components/DiscussionTopicAlertManager/DiscussionTopicAlertManager'
@@ -58,7 +58,12 @@ const I18n = useI18nScope('discussion_posts')
 
 import('@canvas/rubrics/jquery/rubricEditBinding')
 
-export const DiscussionTopicContainer = ({createDiscussionEntry, setExpandedTopicReply, expandedTopicReply, ...props}) => {
+export const DiscussionTopicContainer = ({
+  createDiscussionEntry,
+  setExpandedTopicReply,
+  expandedTopicReply,
+  ...props
+}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [sendToOpen, setSendToOpen] = useState(false)
   const [copyToOpen, setCopyToOpen] = useState(false)
@@ -214,7 +219,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, setExpandedTopi
             radius: 'none',
           },
           container: {
-            padding: '0 xx-small',
+            padding: '0',
           },
           replyButton: {
             display: 'block',
@@ -510,7 +515,9 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, setExpandedTopi
                       margin="0 0 small 0"
                     >
                       <Flex direction="column" padding={responsiveProps?.container?.padding}>
-                        <DiscussionSummary onDisableSummaryClick={() => props.setIsSummaryEnabled(false)}/>
+                        <DiscussionSummary
+                          onDisableSummaryClick={() => props.setIsSummaryEnabled(false)}
+                        />
                       </Flex>
                     </View>
                   </Flex.Item>
@@ -585,5 +592,3 @@ DiscussionTopicContainer.propTypes = {
    */
   setIsSummaryEnabled: PropTypes.func,
 }
-
-export default DiscussionTopicContainer

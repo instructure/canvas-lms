@@ -39,8 +39,8 @@ export function Reply({...props}) {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          textSize: 'small',
-          itemSpacing: 'none small 0 none',
+          textSize: 'medium',
+          itemSpacing: 'none xx-small 0 none',
           isMobile: true,
         },
         desktop: {

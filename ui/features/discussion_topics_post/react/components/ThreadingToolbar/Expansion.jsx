@@ -22,26 +22,11 @@ import React from 'react'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
-import {Responsive} from '@instructure/ui-responsive'
-import {responsiveQuerySizes} from '../../utils'
 
 const I18n = useI18nScope('discussion_posts')
 
 export function Expansion({...props}) {
   return (
-    <Responsive
-      match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
-      props={{
-        mobile: {
-          textSize: 'small',
-        },
-        desktop: {
-          textSize: 'medium',
-          itemSpacing: 'none',
-        },
-      }}
-      render={responsiveProps => (
         <span className="discussion-expand-btn">
           <Link
             isWithinText={false}
@@ -67,15 +52,13 @@ export function Expansion({...props}) {
             </ScreenReaderContent>
             <Text
               weight="bold"
-              size={responsiveProps.textSize}
-              data-testid={`text-${responsiveProps.textSize}`}
+              size="medium"
+              data-testid={`text-medium`}
             >
               {props.expandText}
             </Text>
           </Link>
         </span>
-      )}
-    />
   )
 }
 

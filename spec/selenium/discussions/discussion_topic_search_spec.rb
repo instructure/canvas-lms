@@ -129,11 +129,11 @@ describe "Discussion Topic Search" do
       driver.execute_script("ENV.per_page = 1")
       # rubocop:enable Specs/NoExecuteScript
 
-      expect(fj("h2:contains('#{@topic_title}')")).to be_present
+      expect(fj("span:contains('#{@topic_title}')")).to be_present
       f("input[placeholder='Search entries or author...']").send_keys("foo")
       wait_for_ajaximations
 
-      expect(f("body")).not_to contain_jqcss("h2:contains('#{@topic_title}')")
+      expect(f("body")).not_to contain_jqcss("[data-testid=\"edit-event-button\"]:contains('#{@topic_title}')")
       expect(fj("span:contains('foo 2')")).to be_present
       expect(f("#content")).not_to contain_jqcss("span:contains('bar')")
 
@@ -145,7 +145,7 @@ describe "Discussion Topic Search" do
       f("button[data-testid='clear-search-button']").click
       wait_for_ajaximations
 
-      expect(fj("h2:contains('#{@topic_title}')")).to be_present
+      expect(fj("span:contains('#{@topic_title}')")).to be_present
       expect(fj("button[aria-current='page']:contains('1')")).to be_present
       expect(fj("span:contains('bar')")).to be_present
     end
