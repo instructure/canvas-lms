@@ -75,6 +75,7 @@ export default class AssignmentRowCellPropFactory {
     }
 
     const pendingGradeInfo = this.gradebook.getPendingGradeInfo(cleanSubmission)
+    const gradingScheme = this.gradebook.getAssignmentGradingScheme(assignment.id)
 
     return {
       assignment: {
@@ -85,9 +86,9 @@ export default class AssignmentRowCellPropFactory {
       enterGradesAs: this.gradebook.getEnterGradesAsSetting(assignment.id),
       gradeIsEditable: this.gradebook.isGradeEditable(student.id, assignment.id),
       gradeIsVisible: this.gradebook.isGradeVisible(student.id, assignment.id),
-      gradingScheme: this.gradebook.getAssignmentGradingScheme(assignment.id)?.data,
-      pointsBasedGradingScheme: this.gradebook.getAssignmentGradingScheme(assignment.id)
-        ?.pointsBased,
+      gradingScheme: gradingScheme?.data,
+      pointsBasedGradingScheme: gradingScheme?.pointsBased,
+      scalingFactor: gradingScheme?.scalingFactor,
       isSubmissionTrayOpen: isTrayOpen(this.gradebook, student, assignment),
 
       onToggleSubmissionTrayOpen: () => {

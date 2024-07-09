@@ -61,7 +61,13 @@ export default function RowScore({gradingScheme, name, possible, score, weight}:
     ? '-'
     : gradingScheme
     ? GradeFormatHelper.replaceDashWithMinus(
-        getLetterGrade(possible, score, gradingScheme.data, gradingScheme.pointsBased)
+        getLetterGrade(
+          possible,
+          score,
+          gradingScheme.data,
+          gradingScheme.pointsBased,
+          gradingScheme.scalingFactor
+        )
       )
     : '-'
 

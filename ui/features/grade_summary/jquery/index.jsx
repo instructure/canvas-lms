@@ -481,7 +481,8 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
       scoreToLetterGrade(
         scoreToUse,
         grading_scheme,
-        ENV.course_active_grading_scheme?.points_based
+        ENV.course_active_grading_scheme?.points_based,
+        ENV.course_active_grading_scheme?.scaling_factor
       ) || I18n.t('N/A')
 
     $('.final_grade .letter_grade').text(GradeFormatHelper.replaceDashWithMinus(letterGrade))
@@ -506,7 +507,8 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
             Number(scaledPointsPossible.toFixed(2))
           ),
           grading_scheme,
-          ENV.course_active_grading_scheme.points_based
+          ENV.course_active_grading_scheme.points_based,
+          scaledPointsPossible
         ) || I18n.t('N/A')
 
       $('.final_grade .letter_grade').text(GradeFormatHelper.replaceDashWithMinus(letterGrade))

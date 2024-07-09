@@ -213,19 +213,19 @@ describe('GradebookGrid AssignmentGradeInput', () => {
 
     test('sets the input value to the percentage value of the entered score of the submission', () => {
       mountComponent()
-      expect(getTextInputValue()).toBe('7.8')
+      expect(getTextInputValue()).toBe('78%')
     })
 
     test('rounds the input value to two decimal places', () => {
       props.submission.enteredScore = 7.8916
       mountComponent()
-      expect(getTextInputValue()).toBe('7.89')
+      expect(getTextInputValue()).toBe('78.92%')
     })
 
     test('strips insignificant zeros', () => {
       props.submission.enteredScore = 8.0
       mountComponent()
-      expect(getTextInputValue()).toBe('8')
+      expect(getTextInputValue()).toBe('80%')
     })
 
     test('keeps the input blank when the submission is not graded', () => {

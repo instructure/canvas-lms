@@ -56,6 +56,7 @@ const GradeDetails = ({
   gradingScheme,
   pointsBasedGradingScheme,
   restrictQuantitativeData,
+  scalingFactor,
 }) => {
   const [loadingTotalGrade, setLoadingTotalGrade] = useState(true)
   const [loadingAssignmentGroups, setLoadingAssignmentGroups] = useState(true)
@@ -76,7 +77,8 @@ const GradeDetails = ({
     observedUserId,
     restrictQuantitativeData,
     gradingScheme,
-    pointsBasedGradingScheme
+    pointsBasedGradingScheme,
+    scalingFactor
   )
   const grades = getAssignmentGrades(assignmentGroups, observedUserId)
   const totalGrade = getTotalGradeStringFromEnrollments(
@@ -85,7 +87,8 @@ const GradeDetails = ({
     observedUserId,
     restrictQuantitativeData,
     gradingScheme,
-    pointsBasedGradingScheme
+    pointsBasedGradingScheme,
+    scalingFactor
   )
   const include = ['assignments', 'submission', 'read_state', 'submission_comments']
   if (selectedGradingPeriodId) {
@@ -272,6 +275,7 @@ GradeDetails.propTypes = {
   gradingScheme: PropTypes.array,
   pointsBasedGradingScheme: PropTypes.bool,
   restrictQuantitativeData: PropTypes.bool,
+  scalingFactor: PropTypes.number,
 }
 
 export default GradeDetails

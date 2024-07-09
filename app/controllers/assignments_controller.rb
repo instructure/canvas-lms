@@ -67,6 +67,7 @@ class AssignmentsController < ApplicationController
         set_js_assignment_data
         set_tutorial_js_env
         set_section_list_js_env
+        grading_standard = @context.grading_standard_or_default
         hash = {
           WEIGHT_FINAL_GRADES: @context.apply_group_weights?,
           POST_TO_SIS_DEFAULT: @context.account.sis_default_grade_export[:value],
@@ -83,8 +84,9 @@ class AssignmentsController < ApplicationController
             newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
             show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
           },
-          grading_scheme: @context.grading_standard_or_default.data,
-          points_based: @context.grading_standard_or_default.points_based?,
+          grading_scheme: grading_standard.data,
+          points_based: grading_standard.points_based?,
+          scaling_factor: grading_standard.scaling_factor
         }
 
         set_default_tool_env!(@context, hash)
@@ -141,7 +143,7 @@ class AssignmentsController < ApplicationController
 
     peer_review_mode_enabled = @context.feature_enabled?(:peer_reviews_for_a2) && (params[:reviewee_id].present? || params[:anonymous_asset_id].present?)
     peer_review_available = submission.present? && @assignment.submitted?(submission:) && current_user_submission.present? && @assignment.submitted?(submission: current_user_submission)
-
+    grading_standard = @context.grading_standard_or_default
     js_env({
              a2_student_view: render_a2_student_view?,
              peer_review_mode_enabled: submission.present? && peer_review_mode_enabled,
@@ -149,8 +151,9 @@ class AssignmentsController < ApplicationController
              peer_display_name: @assignment.anonymous_peer_reviews? ? I18n.t("Anonymous student") : submission&.user&.name,
              originality_reports_for_a2_enabled: Account.site_admin.feature_enabled?(:originality_reports_for_a2),
              restrict_quantitative_data: @assignment.restrict_quantitative_data?(@current_user),
-             grading_scheme: @context.grading_standard_or_default.data,
-             points_based: @context.grading_standard_or_default.points_based?,
+             grading_scheme: grading_standard.data,
+             points_based: grading_standard.points_based?,
+             scaling_factor: grading_standard.scaling_factor
            })
 
     if peer_review_mode_enabled

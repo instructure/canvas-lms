@@ -34,6 +34,7 @@ function formatGrade(
   assignment,
   gradingScheme,
   pointsBasedGradingScheme,
+  scalingFactor,
   pendingGradeInfo
 ) {
   if (pendingGradeInfo) {
@@ -46,6 +47,7 @@ function formatGrade(
     gradingScheme,
     pointsBasedGradingScheme,
     pointsPossible: assignment.pointsPossible,
+    scalingFactor,
     version: 'entered',
   }
 
@@ -58,6 +60,7 @@ function getGradeInfo(value, props) {
     gradingScheme: props.gradingScheme,
     pointsBasedGradingScheme: props.pointsBasedGradingScheme,
     pointsPossible: props.assignment.pointsPossible,
+    scalingFactor: props.scalingFactor,
   })
 }
 
@@ -84,6 +87,7 @@ export default class GradingSchemeInput extends Component {
       grade: string,
       valid: bool.isRequired,
     }),
+    scalingFactor: number,
     submission: shape({
       enteredGrade: string,
       enteredScore: number,
@@ -98,6 +102,7 @@ export default class GradingSchemeInput extends Component {
     onMenuShow() {},
     pendingGradeInfo: null,
     pointsBasedGradingScheme: false,
+    scalingFactor: null,
   }
 
   constructor(props) {
@@ -115,13 +120,21 @@ export default class GradingSchemeInput extends Component {
     this.handleTextChange = this.handleTextChange.bind(this)
     this.handleToggle = this.handleToggle.bind(this)
 
-    const {assignment, gradingScheme, pointsBasedGradingScheme, pendingGradeInfo, submission} =
-      props
+    const {
+      assignment,
+      gradingScheme,
+      pointsBasedGradingScheme,
+      pendingGradeInfo,
+      scalingFactor,
+      submission,
+    } = props
+
     const value = formatGrade(
       submission,
       assignment,
       gradingScheme,
       pointsBasedGradingScheme,
+      scalingFactor,
       pendingGradeInfo
     )
 
@@ -133,6 +146,7 @@ export default class GradingSchemeInput extends Component {
         assignment,
         gradingScheme,
         pointsBasedGradingScheme,
+        scalingFactor,
         pendingGradeInfo
       ),
     }
@@ -140,13 +154,21 @@ export default class GradingSchemeInput extends Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.textInput !== document.activeElement) {
-      const {assignment, gradingScheme, pointsBasedGradingScheme, pendingGradeInfo, submission} =
-        nextProps
+      const {
+        assignment,
+        gradingScheme,
+        pointsBasedGradingScheme,
+        pendingGradeInfo,
+        scalingFactor,
+        submission,
+      } = nextProps
+
       const value = formatGrade(
         submission,
         assignment,
         gradingScheme,
         pointsBasedGradingScheme,
+        scalingFactor,
         pendingGradeInfo
       )
 
@@ -157,6 +179,7 @@ export default class GradingSchemeInput extends Component {
           assignment,
           gradingScheme,
           pointsBasedGradingScheme,
+          scalingFactor,
           pendingGradeInfo
         ),
       })
@@ -227,12 +250,14 @@ export default class GradingSchemeInput extends Component {
       return this.state.value.trim() !== this.props.pendingGradeInfo.grade
     }
 
-    const {assignment, gradingScheme, pointsBasedGradingScheme, submission} = this.props
+    const {assignment, gradingScheme, pointsBasedGradingScheme, scalingFactor, submission} =
+      this.props
     const formattedGrade = formatGrade(
       submission,
       assignment,
       gradingScheme,
-      pointsBasedGradingScheme
+      pointsBasedGradingScheme,
+      scalingFactor
     )
 
     if (formattedGrade === this.state.value.trim()) {

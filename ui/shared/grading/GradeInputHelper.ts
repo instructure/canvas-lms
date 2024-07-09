@@ -75,7 +75,12 @@ function parseAsGradingScheme(value: number, options): null | GradeInput {
     enteredAs: 'gradingScheme',
     percent: options.pointsPossible ? percentage : 0,
     points: options.pointsPossible ? pointsFromPercentage(percentage, options.pointsPossible) : 0,
-    schemeKey: scoreToGrade(percentage, options.gradingScheme, options.pointsBasedGradingScheme),
+    schemeKey: scoreToGrade(
+      percentage,
+      options.gradingScheme,
+      options.pointsBasedGradingScheme,
+      options.scalingFactor
+    ),
   }
 }
 
@@ -100,7 +105,12 @@ function parseAsPercent(value: string, options): null | GradeInput {
     enteredAs: 'percent',
     percent,
     points,
-    schemeKey: scoreToGrade(percent, options.gradingScheme, options.pointsBasedGradingScheme),
+    schemeKey: scoreToGrade(
+      percent,
+      options.gradingScheme,
+      options.pointsBasedGradingScheme,
+      options.scalingFactor
+    ),
   }
 }
 
@@ -116,7 +126,12 @@ function parseAsPoints(value: string, options): null | GradeInput {
     enteredAs: 'points',
     percent: null,
     points,
-    schemeKey: scoreToGrade(percent, options.gradingScheme, options.pointsBasedGradingScheme),
+    schemeKey: scoreToGrade(
+      percent,
+      options.gradingScheme,
+      options.pointsBasedGradingScheme,
+      options.scalingFactor
+    ),
   }
 }
 

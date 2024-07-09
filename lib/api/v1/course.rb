@@ -168,8 +168,12 @@ module Api::V1::Course
         end
       end
 
-      hash["grading_scheme"] = course.grading_standard_or_default.data if includes.include?("grading_scheme")
-      hash["points_based_grading_scheme"] = course.grading_standard_or_default.points_based? if includes.include?("grading_scheme")
+      if includes.include?("grading_scheme")
+        grading_standard = course.grading_standard_or_default
+        hash["grading_scheme"] = grading_standard.data
+        hash["points_based_grading_scheme"] = grading_standard.points_based?
+        hash["scaling_factor"] = grading_standard.scaling_factor
+      end
       hash["restrict_quantitative_data"] = course.restrict_quantitative_data?(user) if includes.include?("restrict_quantitative_data")
       if includes.include?("post_manually")
         hash["post_manually"] = course.post_manually?

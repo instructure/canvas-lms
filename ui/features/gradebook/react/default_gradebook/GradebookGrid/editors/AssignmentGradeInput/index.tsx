@@ -47,6 +47,7 @@ type Props = {
     grade: string
     valid: boolean
   }
+  scalingFactor: number
   submission: {
     enteredGrade: string
     enteredScore: number

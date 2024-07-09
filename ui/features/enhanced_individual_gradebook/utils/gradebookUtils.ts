@@ -415,14 +415,15 @@ export function getLetterGrade(
   possible?: number,
   score?: number,
   gradingStandards?: GradingStandard[] | null,
-  pointsBased?: boolean
+  pointsBased?: boolean,
+  gradingStandardScalingFactor?: number
 ) {
   if (!gradingStandards || !gradingStandards.length || !possible || !score) {
     return '-'
   }
   const rawPercentage = scoreToPercentage(score, possible)
   const percentage = parseFloat(Number(rawPercentage).toPrecision(4))
-  return scoreToGrade(percentage, gradingStandards, pointsBased)
+  return scoreToGrade(percentage, gradingStandards, pointsBased, gradingStandardScalingFactor)
 }
 
 type CalculateGradesForUserProps = {
