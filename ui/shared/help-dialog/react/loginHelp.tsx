@@ -77,11 +77,14 @@ export function renderLoginHelp(loginLink: Element): void {
   // wrap the help link in a span we can hang the modal off of.
   // then render the React modal into it. Be sure we're actually
   // getting an anchor element.
-  if (loginLink.tagName !== 'A') throw new TypeError('loginLink must be an <a> element')
-  const linkText = loginLink.textContent ?? ''
+  const anchorElement = loginLink.closest('a')
+  if (!anchorElement) {
+    throw new TypeError('Element must be an <a> element or a descendant of an <a> element')
+  }
+  const linkText = anchorElement.textContent ?? ''
   const wrapper = document.createElement('span')
-  loginLink.replaceWith(wrapper)
-  wrapper.appendChild(loginLink)
+  anchorElement.replaceWith(wrapper)
+  wrapper.appendChild(anchorElement)
   ReactDOM.render(
     <QueryProvider>
       <LoginHelp linkText={linkText} />
@@ -89,3 +92,5 @@ export function renderLoginHelp(loginLink: Element): void {
     wrapper
   )
 }
+
+export default LoginHelp
