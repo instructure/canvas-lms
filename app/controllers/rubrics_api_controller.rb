@@ -319,6 +319,25 @@ class RubricsApiController < ApplicationController
     render json: used_locations_for(rubric)
   end
 
+  def upload
+    return unless authorized_action(@context, @current_user, :manage_rubrics)
+
+    file_obj = params[:attachment]
+    if file_obj.nil?
+      render json: { message: "No file attached" }, status: :bad_request
+    end
+
+    import = RubricImport.create_with_attachment(
+      @context, file_obj, @current_user
+    )
+
+    import.schedule
+
+    import_response = api_json(import, @current_user, session)
+    import_response[:user] = user_json(import.user, @current_user, session) if import.user
+    render json: import_response
+  end
+
   private
 
   def rubric_assessments(rubric)
