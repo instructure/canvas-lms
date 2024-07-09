@@ -2502,6 +2502,8 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/rubrics/:id", action: :show
       get "courses/:course_id/rubrics/:id/used_locations", action: "used_locations", as: "rubrics_course_used_locations"
       get "accounts/:account_id/rubrics/:id/used_locations", action: "used_locations", as: "rubrics_account_used_locations"
+      post "courses/:course_id/rubrics/upload", action: "upload", as: "rubrics_course_upload"
+      post "accounts/:account_id/rubrics/upload", action: "upload", as: "rubrics_account_upload"
       post "courses/:course_id/rubrics", controller: :rubrics, action: :create
       put "courses/:course_id/rubrics/:id", controller: :rubrics, action: :update
       delete "courses/:course_id/rubrics/:id", controller: :rubrics, action: :destroy
