@@ -57,10 +57,18 @@ export default function RequirementForm({
     type: 'dropdown' | 'button' | 'radio'
     index?: number
   } | null>()
+  const availableRequirements: Requirement[] = useMemo(
+    () => requirements.filter(requirement => requirement.resource !== undefined),
+    [requirements]
+  )
+
   const availableModuleItems = useMemo(() => {
-    const requirementIds = new Set(requirements.map(requirement => requirement.id))
-    return moduleItems.filter(module => !requirementIds.has(module.id))
-  }, [moduleItems, requirements])
+    const requirementIds = new Set(availableRequirements.map(requirement => requirement.id))
+    const validModuleItems = moduleItems.filter(
+      module => !requirementIds.has(module.id) && module.resource !== undefined
+    )
+    return validModuleItems
+  }, [moduleItems, availableRequirements])
 
   // This avoids re-focusing after re-renders
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -69,18 +77,24 @@ export default function RequirementForm({
   })
 
   useEffect(() => {
-    if (internalLastAction.current?.action === 'add' && requirements.length > 1) {
-      setFocus({type: 'dropdown', index: requirements.length - 1})
-    } else if (internalLastAction.current?.action === 'add' && requirements.length === 1) {
+    if (internalLastAction.current?.action === 'add' && availableRequirements.length > 1) {
+      setFocus({type: 'dropdown', index: availableRequirements.length - 1})
+    } else if (internalLastAction.current?.action === 'add' && availableRequirements.length === 1) {
       setFocus({type: 'radio'})
-    } else if (internalLastAction.current?.action === 'delete' && requirements.length > 0) {
+    } else if (
+      internalLastAction.current?.action === 'delete' &&
+      availableRequirements.length > 0
+    ) {
       const deletedIndex = internalLastAction.current?.index
       setFocus({type: 'button', index: deletedIndex > 0 ? deletedIndex - 1 : 0})
-    } else if (internalLastAction.current?.action === 'delete' && requirements.length === 0) {
+    } else if (
+      internalLastAction.current?.action === 'delete' &&
+      availableRequirements.length === 0
+    ) {
       addRequirementButton.current?.focus()
     }
     internalLastAction.current = null
-  }, [addRequirementButton, requirements.length])
+  }, [addRequirementButton, availableRequirements.length, requirements.length])
 
   return (
     <FormFieldGroup
@@ -88,7 +102,7 @@ export default function RequirementForm({
       layout="stacked"
       data-testid="requirement-form"
     >
-      {requirements.length > 0 && (
+      {availableRequirements.length > 0 && (
         <RequirementCountInput
           requirementCount={requirementCount}
           requireSequentialProgress={requireSequentialProgress}
@@ -97,7 +111,7 @@ export default function RequirementForm({
           focus={focus?.type === 'radio'}
         />
       )}
-      {requirements.map((requirement, index) => (
+      {availableRequirements.map((requirement, index) => (
         <RequirementSelector
           // This is needed to keep focus in the component after re-rendering when module changed
           // eslint-disable-next-line react/no-array-index-key

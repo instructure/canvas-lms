@@ -33,7 +33,7 @@ export interface Module {
 }
 
 export interface ModuleItem extends Module {
-  resource: ResourceType
+  resource: ResourceType | undefined
 }
 
 export interface AssignmentOverride {
