@@ -282,6 +282,10 @@ export function handleContentItemResult(
   setJsonValueIfDefined('#external_tool_create_line_item', result.lineItem)
   setJsonValueIfDefined('#external_tool_create_submission', result.submission)
   setJsonValueIfDefined('#external_tool_create_available', result.available)
+  setJsonValueIfDefined(
+    '#external_tool_create_preserve_existing_assignment_name',
+    result['https://canvas.instructure.com/lti/preserveExistingAssignmentName']
+  )
   if ('text' in result && typeof result.text === 'string') {
     $('#external_tool_create_description').val(result.text)
   }
@@ -526,6 +530,9 @@ export function extractContextExternalToolItemData() {
     'item[description]': $('#external_tool_create_description').val(),
     'item[submission]': $('#external_tool_create_submission').val(),
     'item[available]': $('#external_tool_create_available').val(),
+    'item[preserveExistingAssignmentName]': $(
+      '#external_tool_create_preserve_existing_assignment_name'
+    ).val(),
   } as const
 }
 
@@ -540,6 +547,7 @@ export function resetExternalToolFields() {
   $('#external_tool_create_assignment_id').val('')
   $('#external_tool_create_iframe_width').val('')
   $('#external_tool_create_iframe_height').val('')
+  $('#external_tool_create_preserve_existing_assignment_name').val('')
 }
 
 export type SelectContentDialogOptions = {

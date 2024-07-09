@@ -121,6 +121,8 @@ const COPYRIGHT_HOLDER = '#copyrightHolder'
 const CREATIVE_COMMONS_SELECTION = '#creativeCommonsSelection'
 const LTI_EXT_MASTERY_CONNECT = 'https://canvas.instructure.com/lti/mastery_connect_assessment'
 
+const DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE = 'context_external_tool'
+
 /*
 xsslint safeString.identifier srOnly
  */
@@ -640,6 +642,7 @@ EditView.prototype.handleAssignmentSelectionSubmit = function (data) {
       height: data['item[iframe][height]'],
     },
     lineItem: tryJsonParse(data['item[line_item]']),
+    'https://canvas.instructure.com/lti/preserveExistingAssignmentName': tryJsonParse(data['item[preserveExistingAssignmentName]']),
   }
   this.handleContentItem(contentItem)
 }
@@ -651,7 +654,6 @@ EditView.prototype.handleAssignmentSelectionSubmit = function (data) {
  * @param {ResourceLinkContentItem} item
  */
 EditView.prototype.handleContentItem = function (item) {
-  const line_items_enabled = !!window.ENV.FEATURES.lti_assignment_page_line_items
   this.$externalToolsCustomParams.val(JSON.stringify(item.custom))
   this.$externalToolsContentType.val(item.type)
   this.$externalToolsContentId.val(item.id || this.selectedTool?.id)
@@ -661,33 +663,22 @@ EditView.prototype.handleContentItem = function (item) {
   this.$externalToolsIframeWidth.val(item.iframe?.width)
   this.$externalToolsIframeHeight.val(item.iframe?.height)
 
-  const line_item = item.lineItem
-  if (line_item) {
-    this.$externalToolsLineItem.val(JSON.stringify(line_item))
-    if (
-      'scoreMaximum' in line_item &&
-      (line_items_enabled || this.$assignmentPointsPossible.val() === '0')
-    ) {
-      this.$assignmentPointsPossible.val(line_item.scoreMaximum)
-    }
-    const new_assignment_name = 'label' in line_item ? line_item.label : item.title
-
-    if (new_assignment_name && (line_items_enabled || this.$name.val() === '')) {
-      this.$name.val(new_assignment_name)
-    }
-  } else {
-    const new_assignment_name = item.title
-    if (new_assignment_name && (line_items_enabled || this.$name.val() === '')) {
-      this.$name.val(new_assignment_name)
+  const lineItem = item.lineItem
+  if (lineItem) {
+    this.$externalToolsLineItem.val(JSON.stringify(lineItem))
+    if ('scoreMaximum' in lineItem) {
+      this.$assignmentPointsPossible.val(lineItem.scoreMaximum)
     }
   }
 
-  const description = item.text
-  if (description) {
-    const existing_desc = RichContentEditor.callOnRCE(this.$description, 'get_code')
-    if (line_items_enabled || existing_desc === '') {
-      RichContentEditor.callOnRCE(this.$description, 'set_code', description)
-    }
+  const newAssignmentName = (lineItem && 'label' in lineItem) ? lineItem.label : item.title
+  const replaceAssignmentName = !item['https://canvas.instructure.com/lti/preserveExistingAssignmentName']
+  if (newAssignmentName && (replaceAssignmentName || this.$name.val() === '')) {
+    this.$name.val(newAssignmentName)
+  }
+
+  if (item.text) {
+    RichContentEditor.callOnRCE(this.$description, 'set_code', item.text)
   }
 
   this.renderAssignmentSubmissionTypeContainer()
@@ -695,10 +686,27 @@ EditView.prototype.handleContentItem = function (item) {
   // TODO: add date prefill here
 }
 
+EditView.prototype.setDefaultSubmissionTypeSelectionContentType = function () {
+  return this.$externalToolsContentType.val(
+    DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE
+  )
+}
+
+EditView.prototype.submissionTypeSelectionHasResource = function () {
+  return this.$externalToolsContentType.val() !==
+    DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE
+}
+
+// used when loading an existing assignment with a resource link. otherwise
+// this is set in deep linking response
+EditView.prototype.setHasResourceLink = function () {
+  return this.$externalToolsContentType.val('ltiResourceLink')
+}
+
 EditView.prototype.handleRemoveResource = function () {
   // Restore things to how they were before the user pushed the button to
   // launch the submission_type_selection tool
-  this.$externalToolsContentType.val('context_external_tool')
+  this.setDefaultSubmissionTypeSelectionContentType()
   this.$externalToolsUrl.val(this.selectedTool.external_url)
   this.$externalToolsTitle.val('')
   this.$externalToolsCustomParams.val('')
@@ -1036,7 +1044,7 @@ EditView.prototype.handleMessageEvent = function (event) {
 EditView.prototype.handlePlacementExternalToolSelect = function (selection) {
   const toolId = selection.replace('external_tool_placement_', '')
   this.$externalToolsContentId.val(toolId)
-  this.$externalToolsContentType.val('context_external_tool')
+  this.setDefaultSubmissionTypeSelectionContentType()
   this.selectedTool = find(this.model.submissionTypeSelectionTools(), function (tool) {
     return toolId === tool.id
   })
@@ -1056,16 +1064,21 @@ EditView.prototype.handlePlacementExternalToolSelect = function (selection) {
     this.$externalToolsIframeWidth.val('')
     this.$externalToolsIframeHeight.val('')
     this.$externalToolsTitle.val('')
-  } else if (this.assignment.resourceLink() && this.assignment.resourceLink().title) {
-    // NOTE: not sure this is necessary, but not risking changing now.
-    this.$externalToolsTitle.val(this.assignment.resourceLink().title)
+  } else if (this.assignment.resourceLink()) {
+    this.setHasResourceLink()
+    if (this.assignment.resourceLink().title) {
+      this.$externalToolsTitle.val(this.assignment.resourceLink().title)
+    }
   }
 
   this.renderAssignmentSubmissionTypeContainer()
 }
 
 EditView.prototype.renderAssignmentSubmissionTypeContainer = function () {
-  const resource = {title: this.$externalToolsTitle.val()}
+   const resource=
+    this.submissionTypeSelectionHasResource() ?
+    {title: this.$externalToolsTitle.val() } :
+    undefined;
 
   const props = {
     tool: this.selectedTool,
@@ -1761,9 +1774,9 @@ EditView.prototype._validateExternalTool = function (data, errors) {
   //   (we reset content_type back to 'context_external_tool' then)
   if (
     typeof data.external_tool_tag_attributes === 'object' &&
-    !data.external_tool_tag_attributes.title &&
-    this.selectedTool &&
-    this.selectedTool.require_resource_selection
+    this.selectedTool?.require_resource_selection &&
+    data.external_tool_tag_attributes.content_type ===
+      DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE
   ) {
     const message = I18n.t('Please click below to launch the tool and select a resource.')
     errors.assignment_submission_container = [{message}]

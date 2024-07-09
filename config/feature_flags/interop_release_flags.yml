@@ -39,8 +39,7 @@ assignment_submission_type_card:
   state: hidden
   applies_to: SiteAdmin
   display_name: Allow submission type resource card to be shown in the assignment edit page
-  description: |-
-    When enabled, the new submission type resource card will be shown in the assignment edit page.
+  description: When enabled, the new submission type resource card will be shown in the assignment edit page.
   environments:
     development:
       state: allowed_on
@@ -145,11 +144,6 @@ lti_ags_remove_top_submitted_at:
       state: allowed_on
     ci:
       state: allowed_on
-lti_assignment_page_line_items:
-  state: hidden
-  display_name: LTI Deep Linking Line Items on Assignment create/edit page
-  description: If enabled, prefills the assignment form with values from deep link messages on the assignment create/edit page.
-  applies_to: RootAccount
 lti_before_assignment_results:
   state: hidden
   display_name: Display LTI placement before assignment description after submitting.
