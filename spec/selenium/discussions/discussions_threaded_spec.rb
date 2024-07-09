@@ -448,7 +448,7 @@ describe "threaded discussions" do
         it "replies correctly to second reply" do
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
-          ff("button[data-testid='threading-toolbar-reply']")[4].click
+          ff("button[data-testid='threading-toolbar-reply']")[2].click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 2nd level reply")
           f("button[data-testid='DiscussionEdit-submit'").click
@@ -471,7 +471,7 @@ describe "threaded discussions" do
           wait_for_ajaximations
           ff("button[data-testid='expand-button']")[2].click
           wait_for_ajaximations
-          ff("button[data-testid='threading-toolbar-reply']")[4].click
+          ff("button[data-testid='threading-toolbar-reply']")[2].click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 3rd level reply")
           f("button[data-testid='DiscussionEdit-submit'").click
@@ -500,7 +500,7 @@ describe "threaded discussions" do
           wait_for_ajaximations
           ff("button[data-testid='expand-button']")[1].click
           wait_for_ajaximations
-          ff("button[data-testid='threading-toolbar-reply']")[4].click
+          ff("button[data-testid='threading-toolbar-reply']")[2].click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 4th level reply")
           f("button[data-testid='DiscussionEdit-submit'").click
@@ -781,8 +781,8 @@ describe "threaded discussions" do
         it "replies correctly to third reply" do
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
-          wait_for(method: nil, timeout: 7) { ff("button[data-testid='threading-toolbar-reply']").length >= 5 }
-          ff("button[data-testid='threading-toolbar-reply']")[4].click
+          wait_for(method: nil, timeout: 7) { ff("button[data-testid='threading-toolbar-reply']").length >= 3 }
+          ff("button[data-testid='threading-toolbar-reply']")[2].click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 3rd level reply")
           f("button[data-testid='DiscussionEdit-submit'").click
@@ -806,8 +806,8 @@ describe "threaded discussions" do
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
           wait_for_ajaximations
-          wait_for(method: nil, timeout: 7) { ff("button[data-testid='threading-toolbar-reply']").length >= 8 }
-          ff("button[data-testid='threading-toolbar-reply']")[6].click
+          wait_for(method: nil, timeout: 7) { ff("button[data-testid='threading-toolbar-reply']").length >= 4 }
+          ff("button[data-testid='threading-toolbar-reply']")[3].click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 4th level reply")
           f("button[data-testid='DiscussionEdit-submit'").click
@@ -1120,8 +1120,8 @@ describe "threaded discussions" do
       expect(f("body")).not_to contain_jqcss("div:contains('2nd level reply')")
       f("button[data-testid='expand-button']").click
       wait_for_ajaximations
-      wait_for(method: nil, timeout: 5) { ff("button[data-testid='threading-toolbar-reply']").length >= 5 }
-      ff("button[data-testid='threading-toolbar-reply']")[4].click
+      wait_for(method: nil, timeout: 5) { ff("button[data-testid='threading-toolbar-reply']").length >= 3 }
+      ff("button[data-testid='threading-toolbar-reply']")[2].click
       wait_for_ajaximations
       type_in_tiny("textarea", "replying to 3rd level reply")
       f("button[data-testid='DiscussionEdit-submit'").click
