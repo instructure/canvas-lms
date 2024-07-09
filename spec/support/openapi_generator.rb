@@ -20,6 +20,9 @@
 
 module OpenApiGenerator
   def self.generate(running_context, example)
+    # remove when INTEROP-8721 is done
+    return unless running_context.response.code == "200"
+
     # This looks at the "request" variable that is available
     # inside of the test ("running_context"). It will throw an exception
     # if the test has a request variable defined that is not actually
@@ -28,13 +31,8 @@ module OpenApiGenerator
     begin
       # rubocop:enable Style/RedundantBegin
       CanvasRails::Application.routes.router.recognize(running_context.request) do |route|
-        path_parts_array = route.path.spec.to_s.sub(/\(\.:format\)$/, "").split("/")
-        path_parts_array.reject! { |part| ["", "api", "v1"].include?(part) }
-        first_part_of_path = path_parts_array.first
-        if first_part_of_path == "lti"
-          first_part_of_path = path_parts_array[0..1].join("/")
-        end
-        openapi_doc_file_location = "spec/openapi/#{first_part_of_path}.yaml"
+        controller_name = route.defaults[:controller]
+        openapi_doc_file_location = "spec/openapi/#{controller_name}.yaml"
         record = RSpec::OpenAPI::RecordBuilder.build(running_context, example:)
         RSpec::OpenAPI.path_records[openapi_doc_file_location] << record if record
       end
