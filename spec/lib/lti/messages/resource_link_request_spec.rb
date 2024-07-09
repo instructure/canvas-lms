@@ -398,14 +398,43 @@ describe Lti::Messages::ResourceLinkRequest do
 
     it_behaves_like "assignment resource link id check"
 
-    context "the resource link has a blank title but the assignment has a title" do
-      before do
-        expected_assignment_line_item.resource_link.update!(title: "")
-        assignment.update!(title: "foo")
+    context "uses the appropriate title for the resource link claim title" do
+      let(:content_tag) do
+        ContentTag.create!(
+          context: course,
+          title: "fake title",
+          url: "https://example.com",
+          associated_asset: expected_assignment_line_item.resource_link
+        )
       end
 
-      it "uses the assignment title for the resource link title" do
+      before do
+        content_tag
+        assignment.update!(title: "foo")
+        expected_assignment_line_item.resource_link.update!(title: "bar")
+        expected_assignment_line_item.resource_link.content_tag.update!(title: "baz")
+      end
+
+      it "prefers the assignment title over other options" do
         expect(jws[:post_payload].dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq assignment.title
+      end
+
+      it "uses the resource link title if assignment title is blank" do
+        assignment.title = ""
+        expect(jws[:post_payload].dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq expected_assignment_line_item.resource_link.title
+      end
+
+      it "uses the resource link tag for the title if the assignment title and the resource link title are blank" do
+        assignment.title = ""
+        expected_assignment_line_item.resource_link.update!(title: "")
+        expect(jws[:post_payload].dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq expected_assignment_line_item.resource_link.content_tag.title
+      end
+
+      it "uses the context name if all other options are blank" do
+        assignment.title = ""
+        expected_assignment_line_item.resource_link.update!(title: "")
+        expected_assignment_line_item.resource_link.content_tag.update!(title: "")
+        expect(jws[:post_payload].dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq course.name
       end
     end
   end
