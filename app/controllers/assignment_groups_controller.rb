@@ -148,6 +148,10 @@ class AssignmentGroupsController < ApplicationController
           submissions = submissions_hash(include_params, assignments)
         end
 
+        if assignments.any?
+          DatesOverridable.preload_override_data_for_objects(assignments)
+        end
+
         respond_to do |format|
           format.json do
             render json: index_groups_json(@context, @current_user, groups, assignments, submissions)
