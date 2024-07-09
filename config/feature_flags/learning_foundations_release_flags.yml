@@ -281,6 +281,11 @@ rce_find_replace:
   description: |-
     Enable a plugin which can find and replace content when editing in an RCE
   applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 
 dashboard_graphql_integration:
   state: hidden
