@@ -18,14 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Types
-  class DashboardObserveeFilterInputType < BaseInputObject
-    graphql_name "DashboardObserveeFilter"
-    argument :observed_user_id,
-             ID,
-             "Only view filtered user",
-             required: false
-  end
-
   class CourseDashboardCardLinkType < ApplicationObjectType
     graphql_name "CourseDashboardCardLink"
     description "A link on a course dashboard card"
@@ -39,45 +31,40 @@ module Types
 
   class CourseDashboardCardType < ApplicationObjectType
     include I18nUtilities
+    include Rails.application.routes.url_helpers
+    include UserPreferenceValue::UserMethods
+
     graphql_name "CourseDashboardCard"
 
     description "A card on the course dashboard"
     alias_method :course, :object
 
-    # Initialize the presenter
-    def initialize(object, context)
-      super
-      @presenter = initialize_presenter
-    end
-
     field :long_name, String, null: true
     def long_name
-      @presenter[:longName]
+      "#{course.name} - #{course.short_name}"
     end
 
     field :short_name, String, null: true
     def short_name
-      @presenter[:shortName]
+      Loaders::AssociationLoader.for(User, :user_preference_values).load(current_user).then do
+        current_user.get_preference(:course_nicknames, course.id)
+      end
     end
 
     field :original_name, String, null: true
     def original_name
-      @presenter[:originalName]
+      course.name
     end
 
     field :course_code, String, null: true
-    def course_code
-      @presenter[:courseCode]
-    end
+    delegate :course_code, to: :course
 
     field :asset_string, String, null: true
-    def asset_string
-      @presenter[:assetString]
-    end
+    delegate :asset_string, to: :course
 
     field :href, String, null: true
     def href
-      @presenter[:href]
+      course_path(course, invitation: course.read_attribute(:invitation))
     end
 
     field :term, TermType, null: true
@@ -87,137 +74,145 @@ module Types
 
     field :subtitle, String, null: true
     def subtitle
-      @presenter[:subtitle]
+      label = if course.primary_enrollment_state == "invited"
+                before_label("#shared.menu_enrollment.labels.invited_as", "invited as")
+              else
+                before_label("#shared.menu_enrollment.labels.enrolled_as", "enrolled as")
+              end
+
+      [label, course.primary_enrollment_role.try(:label)].join(" ")
     end
 
     field :enrollment_state, String, null: true
     def enrollment_state
-      @presenter[:enrollmentState]
+      course.primary_enrollment_state
     end
 
     field :enrollment_type, String, null: true
     def enrollment_type
-      @presenter[:enrollmentType]
+      course.primary_enrollment_type
     end
 
     field :observee, String, null: true
     def observee
-      @presenter[:observee]
+      if course.primary_enrollment_type == "ObserverEnrollment"
+        ObserverEnrollment.observed_students(course, current_user)&.keys&.map(&:name)&.join(", ")
+      end
     end
 
     field :is_favorited, Boolean, null: true
     def is_favorited
-      @presenter[:isFavorited]
+      Loaders::AssociationLoader.for(Course, :favorites).load(course).then do |favorites|
+        favorites.any? { |favorite| favorite.user_id == current_user.id }
+      end
     end
 
     field :is_k5_subject, Boolean, null: true
     def is_k5_subject
-      @presenter[:isK5Subject]
+      course.elementary_subject_course?
     end
 
     field :is_homeroom, Boolean, null: true
     def is_homeroom
-      @presenter[:isHomeroom]
+      course.homeroom_course
     end
 
     field :use_classic_font, Boolean, null: true
     def use_classic_font
-      @presenter[:useClassicFont]
+      course.account.use_classic_font_in_k5?
     end
 
     field :can_manage, Boolean, null: true
     def can_manage
-      @presenter[:canManage]
+      course.grants_any_right?(current_user, :manage_content, :manage_course_content_edit)
     end
 
     field :can_read_announcements, Boolean, null: true
     def can_read_announcements
-      @presenter[:canReadAnnouncements]
+      course.grants_right?(current_user, :read_announcements)
     end
 
     field :image, UrlType, null: true
-    def image
-      @presenter[:image]
-    end
+    delegate :image, to: :course
 
     field :color, String, null: true
     def color
-      @presenter[:color]
+      course.elementary_enabled? ? course.course_color : nil
     end
 
     field :position, Integer, null: true
     def position
-      @presenter[:position]
+      position = current_user.dashboard_positions[course.asset_string]
+      position.present? ? position.to_i : nil
     end
 
     field :published, Boolean, null: true
     def published
-      @presenter[:published]
+      course.published?
     end
 
     field :links, [CourseDashboardCardLinkType], null: true
     def links
-      return nil unless @presenter[:links].present?
+      dashboard_card_tabs = UsersController::DASHBOARD_CARD_TABS
 
-      @presenter[:links].map do |link|
-        {
-          css_class: link[:css_class],
-          hidden: link[:hidden],
-          icon: link[:icon],
-          label: link[:label],
-          path: link[:path]
-        }
-      end
+      tabs = course.tabs_available(current_user, {
+                                     session:,
+                                     only_check: dashboard_card_tabs,
+                                     precalculated_permissions: {
+                                       read: true
+                                     },
+                                     include_external: false,
+                                     include_hidden_unused: false
+                                   })
+
+      tabs.map { |tab| tab_to_link(tab) }
     end
 
     field :can_change_course_publish_state, Boolean, null: true
     def can_change_course_publish_state
-      @presenter[:canChangeCoursePublishState]
+      course.grants_any_right?(current_user, :change_course_state, :manage_courses_publish)
     end
 
     field :default_view, String, null: true
-    def default_view
-      @presenter[:defaultView]
-    end
+    delegate :default_view, to: :course
 
     field :pages_url, UrlType, null: true
     def pages_url
-      @presenter[:pagesUrl]
+      polymorphic_url([course, :wiki_pages])
     end
 
     field :front_page_title, String, null: true
     def front_page_title
-      @presenter[:frontPageTitle]
+      Loaders::AssociationLoader.for(Course, :wiki).load(course).then do |wiki|
+        wiki&.front_page&.title
+      end
     end
 
     private
 
-    # Initializes the presenter with dashboard card tabs and observed user
-    def initialize_presenter
-      opts = {}
+    def default_url_options
+      { protocol: HostUrl.protocol, host: HostUrl.context_host(course.root_account) }
+    end
 
-      dashboard_filter = context[:dashboard_filter]
-      if dashboard_filter&.dig(:observed_user_id).present?
-        observed_user_id = dashboard_filter[:observed_user_id]
-        observed_user = User.find_by(id: observed_user_id.to_i)
-        if observed_user.present?
-          opts[:observee_user] = observed_user
-        else
-          raise GraphQL::ExecutionError, "User with ID #{observed_user_id} not found"
-        end
-      elsif current_user.present?
-        opts[:observee_user] = current_user
-      end
+    def tab_to_link(tab)
+      {
+        css_class: tab[:css_class],
+        hidden: tab[:hidden] || tab[:hidden_unused],
+        icon: tab[:icon],
+        label: tab[:label],
+        path: get_path(tab)
+      }
+    end
 
-      opts[:tabs] = UsersController::DASHBOARD_CARD_TABS
+    def get_path(tab)
+      href = tab[:href]
+      args = tab[:args]
+      args = args.symbolize_keys if href.to_s == "course_basic_lti_launch_request_path"
+      args.instance_of?(Hash) ? send(href, args) : send(href, *path_args(tab))
+    end
 
-      CourseForMenuPresenter.new(
-        course,
-        current_user,
-        domain_root_account,
-        session,
-        opts
-      ).to_h
+    def path_args(tab)
+      tab[:args] || (tab[:no_args] && []) || course
     end
   end
 end

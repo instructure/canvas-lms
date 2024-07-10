@@ -84,4 +84,24 @@ describe UserPreferenceValue do
     expect(migrated_user.user_preference_values.where(key: subbed_key).pluck(:sub_key)).to eq(["a"])
     expect(migrated_user.preferences[subbed_key]).to eq(UserPreferenceValue::EXTERNAL)
   end
+
+  it "does not have to query to load preferences if already loaded in memory" do
+    migrated_user.set_preference(regular_key, "data")
+    migrated_user.set_preference(subbed_key, "subkey", "more data")
+
+    migrated_user.user_preference_values.load
+    expect(migrated_user.get_preference(regular_key)).to eq "data"
+    expect(migrated_user.get_preference(subbed_key, "subkey")).to eq "more data"
+
+    # Test with preferences that exist
+    expect do
+      migrated_user.get_preference(regular_key)
+      migrated_user.get_preference(subbed_key, "subkey")
+    end.not_to make_database_queries
+
+    # Test with preferences that do not exist
+    expect do
+      migrated_user.get_preference(:non_existent_key)
+    end.not_to make_database_queries
+  end
 end

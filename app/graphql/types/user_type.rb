@@ -19,6 +19,14 @@
 #
 
 module Types
+  class DashboardObserveeFilterInputType < BaseInputObject
+    graphql_name "DashboardObserveeFilter"
+    argument :observed_user_id,
+             ID,
+             "Only view filtered user",
+             required: false
+  end
+
   class UserType < ApplicationObjectType
     #
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -369,8 +377,10 @@ module Types
       ).load(object)
     end
 
-    field :favorite_courses_connection, Types::CourseType.connection_type, null: true
-    def favorite_courses_connection
+    field :favorite_courses_connection, Types::CourseType.connection_type, null: true do
+      argument :dashboard_filter, Types::DashboardObserveeFilterInputType, required: false
+    end
+    def favorite_courses_connection(dashboard_filter: nil)
       return unless object == current_user
 
       load_association(:enrollments).then do |enrollments|
@@ -378,7 +388,12 @@ module Types
                       Loaders::AssociationLoader.for(Enrollment, :course).load_many(enrollments),
                       load_association(:favorites)
                     ]).then do
-          object.menu_courses
+          opts = {}
+          if dashboard_filter&.dig(:observed_user_id).present?
+            observed_user_id = dashboard_filter[:observed_user_id].to_i
+            opts[:observee_user] = User.find_by(id: observed_user_id) || current_user
+          end
+          object.menu_courses(nil, opts)
         end
       end
     end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Favorite < ActiveRecord::Base
-  belongs_to :context, polymorphic: [:course, :group]
+  belongs_to :context, polymorphic: [:course, :group], inverse_of: :favorites
   belongs_to :user
   belongs_to :root_account, class_name: "Account", inverse_of: :favorites
   validates :context_type, inclusion: { allow_nil: true, in: ["Course", "Group"].freeze }
