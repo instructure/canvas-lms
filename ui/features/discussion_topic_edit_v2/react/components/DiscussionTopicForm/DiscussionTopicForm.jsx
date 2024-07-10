@@ -844,7 +844,7 @@ function DiscussionTopicForm({
               discussionAnonymousState={discussionAnonymousState}
               setDiscussionAnonymousState={setDiscussionAnonymousState}
               isSelectDisabled={
-                (isEditing && currentDiscussionTopic?.entryCounts?.repliesCount) || isGraded
+                (isEditing && currentDiscussionTopic?.entryCounts?.repliesCount > 0) || isGraded
               }
               setIsGraded={setIsGraded}
               setIsGroupDiscussion={setIsGroupDiscussion}
@@ -1071,12 +1071,10 @@ function DiscussionTopicForm({
                 )}
               </View>
             )}
-            {!canGroupDiscussion && isEditing && (
+            {!canGroupDiscussion && isEditing && !isAnnouncement && currentDiscussionTopic?.entryCounts?.repliesCount > 0 && (
               <View display="block" data-testid="group-category-not-editable">
                 <Alert variant="warning" margin="small none small none">
-                  {I18n.t(
-                    'Students have already submitted to this discussion, so group settings cannot be changed.'
-                  )}
+                  {I18n.t('Students have already submitted to this discussion, so group settings cannot be changed.')}
                 </Alert>
               </View>
             )}
