@@ -209,10 +209,6 @@ describe Lti::Messages::JwtMessage do
         expect(decoded_jwt).not_to include "iss"
       end
 
-      it 'does not set the "nonce" claim' do
-        expect(decoded_jwt).not_to include "nonce"
-      end
-
       it 'does not set the "sub" claim' do
         expect(decoded_jwt).not_to include "sub"
       end

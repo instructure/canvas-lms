@@ -92,9 +92,9 @@ module Lti::Messages
 
     def self.cached_hash_to_launch(launch_payload, nonce)
       post_payload = launch_payload["post_payload"]
+      post_payload["nonce"] = nonce
       assoc_tool_data = launch_payload["assoc_tool_data"]
       if assoc_tool_data["consumer_key"].present?
-        post_payload["nonce"] = nonce
         signature = Lti::Helpers::JwtMessageHelper.generate_oauth_consumer_key_sign(assoc_tool_data, post_payload, nonce)
         post_payload["https://purl.imsglobal.org/spec/lti/claim/lti1p1"]["oauth_consumer_key"] = assoc_tool_data["consumer_key"]
         post_payload["https://purl.imsglobal.org/spec/lti/claim/lti1p1"]["oauth_consumer_key_sign"] = signature
