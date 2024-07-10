@@ -987,12 +987,14 @@ describe GradebooksController do
       end
 
       it "renders screenreader gradebook when preferred with 'individual'" do
+        @course.root_account.disable_feature!(:individual_gradebook_enhancements)
         @admin.set_preference(:gradebook_version, "individual")
         get "show", params: { course_id: @course.id }
         expect(response).to render_template("gradebooks/individual")
       end
 
       it "renders screenreader gradebook when preferred with 'srgb'" do
+        @course.root_account.disable_feature!(:individual_gradebook_enhancements)
         # most a11y users will have this set from before New Gradebook existed
         @admin.set_preference(:gradebook_version, "srgb")
         get "show", params: { course_id: @course.id }
@@ -1014,6 +1016,20 @@ describe GradebooksController do
       it "renders enhanced individual gradebook when individual_enhanced & individual_gradebook_enhancements is enabled" do
         @course.root_account.enable_feature!(:individual_gradebook_enhancements)
         @admin.set_preference(:gradebook_version, "individual_enhanced")
+        get "show", params: { course_id: @course.id }
+        expect(response).to render_template("layouts/application")
+      end
+
+      it "renders enhanced individual gradebook when individual & individual_gradebook_enhancements is enabled" do
+        @course.root_account.enable_feature!(:individual_gradebook_enhancements)
+        @admin.set_preference(:gradebook_version, "individual")
+        get "show", params: { course_id: @course.id }
+        expect(response).to render_template("layouts/application")
+      end
+
+      it "renders enhanced individual gradebook when srgb & individual_gradebook_enhancements is enabled" do
+        @course.root_account.enable_feature!(:individual_gradebook_enhancements)
+        @admin.set_preference(:gradebook_version, "srgb")
         get "show", params: { course_id: @course.id }
         expect(response).to render_template("layouts/application")
       end
@@ -1111,6 +1127,7 @@ describe GradebooksController do
       end
 
       it "renders screenreader gradebook" do
+        @course.root_account.disable_feature!(:individual_gradebook_enhancements)
         get "show", params: { course_id: @course.id, version: "individual" }
         expect(response).to render_template("gradebooks/individual")
       end
@@ -1255,12 +1272,14 @@ describe GradebooksController do
       describe "show_message_students_with_observers_dialog" do
         shared_examples_for "environment variable" do
           it "is true when the feature is enabled" do
+            @course.root_account.disable_feature!(:individual_gradebook_enhancements)
             Account.site_admin.enable_feature!(:message_observers_of_students_who)
             get :show, params: { course_id: @course.id }
             expect(gradebook_options[:show_message_students_with_observers_dialog]).to be true
           end
 
           it "is false when the feature is not enabled" do
+            @course.root_account.disable_feature!(:individual_gradebook_enhancements)
             get :show, params: { course_id: @course.id }
             expect(gradebook_options[:show_message_students_with_observers_dialog]).to be false
           end
@@ -1674,6 +1693,7 @@ describe GradebooksController do
       end
 
       it "redirects to Individual View with a friendly URL" do
+        @course.root_account.disable_feature!(:individual_gradebook_enhancements)
         @teacher.set_preference(:gradebook_version, "srgb")
         get "show", params: { course_id: @course.id }
         expect(response).to render_template("gradebooks/individual")
@@ -1811,6 +1831,7 @@ describe GradebooksController do
         end
 
         it "renders 'individual' when the user uses individual view" do
+          @course.root_account.disable_feature!(:individual_gradebook_enhancements)
           update_preferred_gradebook_version!("individual")
           get "show", params: { course_id: @course.id }
           expect(response).to render_template("gradebooks/individual")
@@ -1869,6 +1890,7 @@ describe GradebooksController do
         end
 
         it "renders 'individual' when the user uses individual view" do
+          @course.root_account.disable_feature!(:individual_gradebook_enhancements)
           update_preferred_gradebook_version!("individual")
           get "show", params: { course_id: @course.id }
           expect(response).to render_template("gradebooks/individual")
@@ -1908,6 +1930,7 @@ describe GradebooksController do
         end
 
         it "renders 'individual' when the user uses individual view" do
+          @course.root_account.disable_feature!(:individual_gradebook_enhancements)
           update_preferred_gradebook_version!("individual")
           get "show", params: { course_id: @course.id }
           expect(response).to render_template("gradebooks/individual")

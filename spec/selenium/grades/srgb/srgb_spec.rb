@@ -92,6 +92,7 @@ describe "Screenreader Gradebook" do
 
   it "can select a student", priority: "1" do
     simple_setup
+    @course.root_account.disable_feature!(:individual_gradebook_enhancements)
     simple_grade
     SRGB.visit(@course.id)
 
@@ -109,6 +110,7 @@ describe "Screenreader Gradebook" do
 
   it "can select a student using buttons", priority: "1" do
     init_course_with_students 3
+    @course.root_account.disable_feature!(:individual_gradebook_enhancements)
     user_session(@teacher)
     SRGB.visit(@course.id)
 
@@ -136,6 +138,7 @@ describe "Screenreader Gradebook" do
 
   it "can select an assignment using buttons", priority: "2" do
     simple_setup
+    @course.root_account.disable_feature!(:individual_gradebook_enhancements)
     SRGB.visit(@course.id)
     SRGB.select_student(@students[0])
     SRGB.select_assignment(@assign1)
@@ -154,6 +157,7 @@ describe "Screenreader Gradebook" do
   it "links to assignment show page", priority: "2" do
     simple_setup
     simple_grade
+    @course.root_account.disable_feature!(:individual_gradebook_enhancements)
     @submission = @assign1.submit_homework(@students[0], body: "student submission")
     SRGB.visit(@course.id)
     SRGB.select_student(@students[0])
@@ -167,6 +171,7 @@ describe "Screenreader Gradebook" do
     skip_if_safari(:alert)
     num_of_students = 2
     simple_setup(num_of_students)
+    @course.root_account.disable_feature!(:individual_gradebook_enhancements)
     SRGB.visit(@course.id)
     SRGB.select_student(@students[0])
     SRGB.select_assignment(@assign1)
@@ -183,6 +188,7 @@ describe "Screenreader Gradebook" do
 
   it "can select an assignment", priority: "1" do
     a1 = basic_percent_setup
+    @course.root_account.disable_feature!(:individual_gradebook_enhancements)
     a2 = @course.assignments.create!(
       title: "Test 2",
       points_possible: 20
@@ -201,6 +207,7 @@ describe "Screenreader Gradebook" do
     skip "Skipped because this spec fails if not run in foreground\n" \
          "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
     assignment = basic_percent_setup
+    @course.root_account.disable_feature!(:individual_gradebook_enhancements)
     user_session @students[0]
     assignment.submit_homework @students[0], submission_type: "online_text_entry", body: "Hello!"
 
@@ -224,6 +231,7 @@ describe "Screenreader Gradebook" do
     skip "Skipped because this spec fails if not run in foreground\n" \
          "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
     a1 = basic_percent_setup
+    @course.root_account.disable_feature!(:individual_gradebook_enhancements)
     a2 = @course.assignments.create!(
       title: "Test 2",
       points_possible: 20
@@ -250,6 +258,7 @@ describe "Screenreader Gradebook" do
 
   it "can mute assignments", priority: "1" do
     assignment = basic_percent_setup
+    @course.root_account.disable_feature!(:individual_gradebook_enhancements)
     assignment.unmute!
     SRGB.visit(@course.id)
 
@@ -265,6 +274,7 @@ describe "Screenreader Gradebook" do
 
   it "can unmute assignments", priority: "1" do
     assignment = basic_percent_setup
+    @course.root_account.disable_feature!(:individual_gradebook_enhancements)
     assignment.mute!
     SRGB.visit(@course.id)
 
@@ -280,6 +290,7 @@ describe "Screenreader Gradebook" do
 
   it "can message students who...", priority: "1" do
     basic_percent_setup
+    @course.root_account.disable_feature!(:individual_gradebook_enhancements)
     SRGB.visit(@course.id)
 
     click_option "#assignment_select", "Test 1"
@@ -294,6 +305,7 @@ describe "Screenreader Gradebook" do
 
   it "has total graded submission", priority: "1" do
     assignment = basic_percent_setup 2
+    @course.root_account.disable_feature!(:individual_gradebook_enhancements)
 
     assignment.grade_student(@students[0], grade: 15, grader: @teacher)
     assignment.grade_student(@students[1], grade: 5, grader: @teacher)
@@ -337,12 +349,14 @@ describe "Screenreader Gradebook" do
     end
 
     it "shows all drop down options", priority: "2" do
+      @course.root_account.disable_feature!(:individual_gradebook_enhancements)
       SRGB.visit(@course.id)
       arrange_assignments.click
       expect(arrange_assignments).to include_text("By Assignment Group and Position\nAlphabetically\nBy Due Date")
     end
 
     it "keeps the assignment arrangement choice between reloads" do
+      @course.root_account.disable_feature!(:individual_gradebook_enhancements)
       SRGB.visit(@course.id)
 
       %w[assignment_group alpha due_date].each do |assignment_order|
@@ -354,6 +368,7 @@ describe "Screenreader Gradebook" do
     end
 
     it "focuses on accessible elements when setting default grades", priority: "1" do
+      @course.root_account.disable_feature!(:individual_gradebook_enhancements)
       skip_if_safari(:alert)
       SRGB.visit(@course.id)
       SRGB.select_assignment(@second_assignment)
@@ -394,6 +409,7 @@ describe "Screenreader Gradebook" do
       # online_text_entry, online_url, and online_quiz assignments. It should
       # not be displayed for any other types.
       it "is displayed for online assignments" do
+        @course.root_account.disable_feature!(:individual_gradebook_enhancements)
         SRGB.visit(@course.id)
 
         click_option "#assignment_select", "second assignment"
@@ -402,6 +418,7 @@ describe "Screenreader Gradebook" do
       end
 
       it "is not displayed for assignments which are not submitted online" do
+        @course.root_account.disable_feature!(:individual_gradebook_enhancements)
         SRGB.visit(@course.id)
 
         click_option "#assignment_select", @assignment.name
@@ -410,6 +427,7 @@ describe "Screenreader Gradebook" do
       end
 
       it "is displayed for assignments which allow both online and non-online submittion" do
+        @course.root_account.disable_feature!(:individual_gradebook_enhancements)
         SRGB.visit(@course.id)
         click_option "#assignment_select", "assignment three"
 
@@ -422,6 +440,7 @@ describe "Screenreader Gradebook" do
     it "curves grades", priority: "1" do
       skip_if_safari(:alert)
       basic_point_setup 3
+      @course.root_account.disable_feature!(:individual_gradebook_enhancements)
 
       grades = [12, 10, 11]
       3.times { |num| @curve_assignment.grade_student(@students[num], grade: grades[num], grader: @teacher) }
