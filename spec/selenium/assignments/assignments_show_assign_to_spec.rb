@@ -157,4 +157,19 @@ describe "assignments show page assign to" do
     get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
     expect(element_exists?(AssignmentPage.assign_to_button_selector)).to be_falsey
   end
+
+  it "does show mastery paths in the assign to list for assignments" do
+    @course.conditional_release = true
+    @course.save!
+
+    get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
+
+    AssignmentPage.click_assign_to_button
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    option_elements = INSTUI_Select_options(module_item_assignee[0])
+    option_names = option_elements.map(&:text)
+    expect(option_names).to include("Mastery Paths")
+  end
 end
