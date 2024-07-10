@@ -24,7 +24,8 @@ module DatesOverridable
                 :has_no_overrides,
                 :has_too_many_overrides,
                 :preloaded_override_students,
-                :has_course_overrides
+                :has_course_overrides,
+                :preloaded_module_ids
   attr_writer :without_overrides
 
   include DifferentiableAssignment
@@ -89,9 +90,7 @@ module DatesOverridable
   end
 
   def context_module_overrides
-    # plucking module IDs is important else we'll end up with a query with several nested subqueries
-    # that runs a full scan
-    AssignmentOverride.active.where(context_module_id: assignment_context_modules.pluck(:id))
+    AssignmentOverride.active.where(context_module_id: module_ids)
   end
 
   def visible_to_everyone
@@ -99,9 +98,9 @@ module DatesOverridable
       if is_a?(DiscussionTopic)
         # need to check if is_section_specific for ungraded discussions
         # this column will eventually be deprecated and then this can be removed
-        course_overrides? || ((!only_visible_to_overrides && !is_section_specific) && (assignment_context_modules.empty? || (assignment_context_modules.any? && assignment_context_modules_without_overrides.any?)))
+        course_overrides? || ((!only_visible_to_overrides && !is_section_specific) && (module_ids.empty? || (module_ids.any? && assignment_context_modules_without_overrides.any?)))
       else
-        course_overrides? || (!only_visible_to_overrides && (assignment_context_modules.empty? || (assignment_context_modules.any? && assignment_context_modules_without_overrides.any?)))
+        course_overrides? || (!only_visible_to_overrides && (module_ids.empty? || (module_ids.any? && assignment_context_modules_without_overrides.any?)))
       end
     else
       !only_visible_to_overrides
@@ -131,6 +130,7 @@ module DatesOverridable
     return if learning_objects.empty?
 
     preload_has_course_overrides(learning_objects)
+    preload_module_ids(learning_objects)
   end
 
   def self.preload_has_course_overrides(learning_objects)
@@ -151,6 +151,37 @@ module DatesOverridable
     end
   end
 
+  def self.preload_module_ids(learning_objects)
+    assignments = learning_objects.select { |lo| lo.is_a?(AbstractAssignment) }
+    quizzes = learning_objects.select { |lo| lo.is_a?(Quizzes::Quiz) } + Quizzes::Quiz.where(assignment_id: assignments.map(&:id))
+    discussion_topics = learning_objects.select { |lo| lo.is_a?(DiscussionTopic) } + DiscussionTopic.where(assignment_id: assignments.map(&:id))
+    wiki_pages = learning_objects.select { |lo| lo.is_a?(WikiPage) } + WikiPage.where(assignment_id: assignments.map(&:id))
+    tags_scope = ContentTag.not_deleted.where(tag_type: "context_module")
+    module_ids = tags_scope.where(content_type: "Assignment", content_id: assignments.map(&:id))
+                           .or(tags_scope.where(content_type: "Quizzes::Quiz", content_id: quizzes.map(&:id)))
+                           .or(tags_scope.where(content_type: "DiscussionTopic", content_id: discussion_topics.map(&:id)))
+                           .or(tags_scope.where(content_type: "WikiPage", content_id: wiki_pages.map(&:id)))
+                           .distinct
+                           .pluck(:content_type, :content_id, :context_module_id)
+    learning_objects.each do |lo|
+      lo.preloaded_module_ids = if lo.is_a?(Quizzes::Quiz)
+                                  module_ids.select { |m| m[0] == "Quizzes::Quiz" && m[1] == lo.id }.map(&:last)
+                                elsif lo.is_a?(DiscussionTopic)
+                                  module_ids.select { |m| m[0] == "DiscussionTopic" && m[1] == lo.id }.map(&:last)
+                                elsif lo.is_a?(WikiPage)
+                                  module_ids.select { |m| m[0] == "WikiPage" && m[1] == lo.id }.map(&:last)
+                                elsif lo.is_a?(AbstractAssignment) && lo.quiz.present?
+                                  module_ids.select { |m| m[0] == "Quizzes::Quiz" && m[1] == lo.quiz.id }.map(&:last)
+                                elsif lo.is_a?(AbstractAssignment) && lo.discussion_topic.present?
+                                  module_ids.select { |m| m[0] == "DiscussionTopic" && m[1] == lo.discussion_topic.id }.map(&:last)
+                                elsif lo.is_a?(AbstractAssignment) && lo.wiki_page.present?
+                                  module_ids.select { |m| m[0] == "WikiPage" && m[1] == lo.wiki_page.id }.map(&:last)
+                                else
+                                  module_ids.select { |m| m[0] == "Assignment" && m[1] == lo.id }.map(&:last)
+                                end
+    end
+  end
+
   def self.overrides_for_objects(learning_objects)
     AssignmentOverride.where(assignment_id: learning_objects.select { |lo| lo.is_a?(Assignment) }.map(&:id))
                       .or(AssignmentOverride.where(quiz_id: learning_objects.select { |lo| lo.is_a?(Quizzes::Quiz) }.map(&:id)))
@@ -162,6 +193,12 @@ module DatesOverridable
     return assignment_overrides.active.where(set_type: "Course").exists? if @has_course_overrides.nil?
 
     @has_course_overrides
+  end
+
+  def module_ids
+    return assignment_context_modules.pluck(:id) if @preloaded_module_ids.nil?
+
+    @preloaded_module_ids
   end
 
   def multiple_due_dates?
