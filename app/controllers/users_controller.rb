@@ -2294,11 +2294,17 @@ class UsersController < ApplicationController
 
   # @API Log users out of all mobile apps
   #
-  # Permanently expires any active mobile sessions for _all_ users, forcing them to re-authorize.
+  # Permanently expires any active mobile sessions, forcing them to re-authorize.
+  #
+  # The route that takes a user id will expire mobile sessions for that user.
+  # The route that doesn't take a user id will expire mobile sessions for *all* users
+  # in the institution.
+  #
   def expire_mobile_sessions
     return unless authorized_action(@domain_root_account, @current_user, :manage_user_logins)
 
-    AccessToken.delay_if_production.invalidate_mobile_tokens!(@domain_root_account)
+    user = api_find(User, params[:id]) if params.key?(:id)
+    AccessToken.delay_if_production.invalidate_mobile_tokens!(@domain_root_account, user:)
 
     render json: "ok"
   end

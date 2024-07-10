@@ -3345,13 +3345,17 @@ describe UsersController do
     let(:user2) { user_with_pseudonym(active_all: true) }
     let(:admin) { account_admin_user(active_all: true)  }
 
-    before do
+    def add_mobile_access_token(user)
       user.access_tokens.create!
 
       @sns_client = double
       allow(DeveloperKey).to receive(:sns).and_return(@sns_client)
       expect(@sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
       user.access_tokens.each_with_index { |ac, i| ac.notification_endpoints.create!(token: "token #{i}") }
+    end
+
+    before do
+      add_mobile_access_token(user)
     end
 
     it "rejects unauthenticated users" do
@@ -3385,6 +3389,16 @@ describe UsersController do
       expect(response).to have_http_status :ok
       expect(user.reload.access_tokens.take.permanent_expires_at).to be <= Time.zone.now
       expect(user.reload.notification_endpoints.count).to be < starting_notification_endpoints_count
+    end
+
+    it "allows admin to expire mobile sessions for one user" do
+      add_mobile_access_token(user2)
+      user_session(admin)
+      delete "expire_mobile_sessions", params: { id: user.id }, format: :json
+
+      expect(response).to have_http_status :ok
+      expect(user.reload.access_tokens.take.permanent_expires_at).to be <= Time.zone.now
+      expect(user2.reload.access_tokens.take.permanent_expires_at).to be_nil
     end
 
     it "only expires access tokens associated to mobile app developer keys" do

@@ -1973,6 +1973,8 @@
   path: "/api/v1/users/:id/merge_into/:destination_user_id"
 - verb: PUT
   path: "/api/v1/users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id"
+- verb: DELETE
+  path: "/api/v1/users/:id/mobile_sessions"
 - verb: GET
   path: "/api/v1/users/:id/new_user_tutorial_statuses"
 - verb: PUT

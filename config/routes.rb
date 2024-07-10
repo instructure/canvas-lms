@@ -1631,6 +1631,7 @@ CanvasRails::Application.routes.draw do
       delete "users/mobile_sessions", action: :expire_mobile_sessions
       delete "users/:id", action: :destroy, as: "destroy_user"
       delete "users/:id/sessions", action: :terminate_sessions
+      delete "users/:id/mobile_sessions", action: :expire_mobile_sessions
 
       post "users/:user_id/files", action: :create_file
       get  "users/:user_id/files", controller: :files, action: :api_index, as: "user_files"
