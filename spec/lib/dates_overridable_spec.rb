@@ -682,12 +682,14 @@ end
 describe "preload_override_data_for_objects" do
   before :once do
     @course = course_factory(active_all: true)
+    @module1 = @course.context_modules.create!(name: "Module 1")
+    @module2 = @course.context_modules.create!(name: "Module 2")
     @assignment1 = assignment_model(course: @course)
     @assignment2 = assignment_model(course: @course)
-    @quiz1 = quiz_model(course: @course)
-    @quiz2 = quiz_model(course: @course)
-    @discussion1 = discussion_topic_model(course: @course)
-    @discussion2 = discussion_topic_model(course: @course)
+    @quiz1 = assignment_quiz([], course: @course)
+    @quiz2 = assignment_quiz([], course: @course)
+    @discussion1 = discussion_topic_model(context: @course)
+    @discussion2 = discussion_topic_model(context: @course)
     @page1 = wiki_page_model(course: @course)
     @page2 = wiki_page_model(course: @course)
     @all_objects = [@assignment1, @assignment2, @quiz1, @quiz2, @discussion1, @discussion2, @page1, @page2]
@@ -728,6 +730,66 @@ describe "preload_override_data_for_objects" do
       @assignment1.assignment_overrides.create!(set: @course)
       expect(@assignment1.has_course_overrides).to be_nil
       expect(@assignment1.course_overrides?).to be true
+    end
+  end
+
+  describe "preload_module_ids" do
+    it "sets preloaded_module_ids to nil by default" do
+      @all_objects.each do |lo|
+        expect(lo.preloaded_module_ids).to be_nil
+      end
+    end
+
+    it "sets the preloaded_module_ids attribute correctly" do
+      @assignment1.context_module_tags.create!(context_module: @module1, context: @course, tag_type: "context_module")
+      @assignment1.context_module_tags.create!(context_module: @module2, context: @course, tag_type: "context_module")
+      @quiz1.context_module_tags.create!(context_module: @module1, context: @course, tag_type: "context_module")
+      @discussion2.context_module_tags.create!(context_module: @module2, context: @course, tag_type: "context_module")
+
+      DatesOverridable.preload_module_ids(@all_objects)
+      expected_values = [[@module1.id, @module2.id], [], [@module1.id], [], [], [@module2.id], [], []]
+      expect(@all_objects.map(&:preloaded_module_ids)).to eq expected_values
+      expect(@all_objects.map(&:module_ids)).to eq expected_values
+    end
+
+    it "works for assignments that are part of a quiz" do
+      @assignment1.context_module_tags.create!(context_module: @module1, context: @course, tag_type: "context_module")
+      @quiz1.context_module_tags.create!(context_module: @module2, context: @course, tag_type: "context_module")
+      DatesOverridable.preload_module_ids([@assignment1, @assignment2, @quiz1.assignment])
+      expect(@quiz1.assignment.preloaded_module_ids).to eq [@module2.id]
+      expect(@quiz1.assignment.module_ids).to eq [@module2.id]
+    end
+
+    it "works for assignments that are part of a discussion" do
+      @discussion1.assignment = @course.assignments.create!(title: "discussion")
+      @discussion1.save!
+      @discussion1.context_module_tags.create!(context_module: @module1, context: @course, tag_type: "context_module")
+      DatesOverridable.preload_module_ids([@discussion1.assignment])
+      expect(@discussion1.assignment.preloaded_module_ids).to eq [@module1.id]
+      expect(@discussion1.assignment.module_ids).to eq [@module1.id]
+    end
+
+    it "works for assignments that are part of a page" do
+      @page1.assignment = @course.assignments.create!(title: "page")
+      @page1.save!
+      @page1.context_module_tags.create!(context_module: @module1, context: @course, tag_type: "context_module")
+      DatesOverridable.preload_module_ids([@page1.assignment])
+      expect(@page1.assignment.preloaded_module_ids).to eq [@module1.id]
+      expect(@page1.assignment.module_ids).to eq [@module1.id]
+    end
+
+    it "ignores deleted ContentTags" do
+      @assignment1.context_module_tags.create!(context_module: @module1, context: @course, tag_type: "context_module", workflow_state: "deleted")
+      @assignment1.context_module_tags.create!(context_module: @module2, context: @course, tag_type: "context_module")
+      DatesOverridable.preload_module_ids(@all_objects)
+      expect(@assignment1.preloaded_module_ids).to eq [@module2.id]
+      expect(@assignment1.module_ids).to eq [@module2.id]
+    end
+
+    it "falls back to one-off calculation if not preloaded" do
+      @assignment1.context_module_tags.create!(context_module: @module1, context: @course, tag_type: "context_module")
+      expect(@assignment1.preloaded_module_ids).to be_nil
+      expect(@assignment1.module_ids).to eq [@module1.id]
     end
   end
 end
