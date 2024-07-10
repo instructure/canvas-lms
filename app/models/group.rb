@@ -75,6 +75,7 @@ class Group < ActiveRecord::Base
            inverse_of: :context,
            class_name: "Lti::ResourceLink",
            dependent: :destroy
+  has_many :favorites, as: :context, inverse_of: :context, dependent: :destroy
 
   before_validation :ensure_defaults
   before_save :update_max_membership_from_group_category

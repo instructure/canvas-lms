@@ -276,6 +276,7 @@ class Course < ActiveRecord::Base
 
   has_many :course_paces
   has_many :blackout_dates, as: :context, inverse_of: :context
+  has_many :favorites, as: :context, inverse_of: :context, dependent: :destroy
 
   prepend Profile::Association
 
