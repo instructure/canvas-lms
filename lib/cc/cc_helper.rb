@@ -481,7 +481,7 @@ module CC
         updates[:file_state] = "hidden"
       end
       if attachment.content_type.present? && File.extname(attachment.display_name).empty?
-        ext = Mime::Type.lookup(attachment.content_type).symbol.to_s
+        ext = Mime::Type.lookup(MediaObject.normalize_content_type(attachment.content_type)).symbol.to_s
         attachment.display_name = "#{attachment.display_name}.#{ext}" if ext.present?
       end
       attachment.handle_duplicates(:rename)
