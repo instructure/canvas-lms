@@ -213,7 +213,8 @@ export function convertToCheckpointsData(assignedInfoList) {
         id,
         item.replyToTopicDueDate,
         item.availableFrom,
-        item.availableUntil
+        item.availableUntil,
+        item.replyToTopicOverrideId
       )
 
       if (return_hash) {
@@ -228,7 +229,8 @@ export function convertToCheckpointsData(assignedInfoList) {
         id,
         item.requiredRepliesDueDate,
         item.availableFrom,
-        item.availableUntil
+        item.availableUntil,
+        item.replyToEntryOverrideId
       )
 
       if (return_hash) {
@@ -285,7 +287,7 @@ function extractTypeAndId(assignee) {
   return {type, id}
 }
 
-function createCheckPointsDatesHash(type, id, dueAt, unlockAt, lockAt) {
+function createCheckPointsDatesHash(type, id, dueAt, unlockAt, lockAt, overrideId = null) {
   const return_hash = {}
 
   if (type === 'everyone') {
@@ -295,6 +297,9 @@ function createCheckPointsDatesHash(type, id, dueAt, unlockAt, lockAt) {
     return_hash.setType =
       type === 'course_section' ? 'CourseSection' : type === 'group' ? 'Group' : 'Course'
     return_hash.setId = id
+    if (overrideId) {
+      return_hash.id = parseInt(overrideId, 10)
+    }
   }
   return_hash.dueAt = dueAt || null
   return_hash.unlockAt = unlockAt || null

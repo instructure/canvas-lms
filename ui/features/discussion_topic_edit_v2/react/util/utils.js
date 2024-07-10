@@ -135,9 +135,11 @@ export const buildAssignmentOverrides = discussion => {
         })[0]
         if (override) {
           if (checkpoint.tag === 'reply_to_topic') {
+            returnHash.replyToTopicOverrideId = override._id
             returnHash.replyToTopicDueDate = override.dueAt
           }
           if (checkpoint.tag === 'reply_to_entry') {
+            returnHash.replyToEntryOverrideId = override._id
             returnHash.requiredRepliesDueDate = override.dueAt
           }
           returnHash.dueDateId = returnHash.dueDateId || override._id || null

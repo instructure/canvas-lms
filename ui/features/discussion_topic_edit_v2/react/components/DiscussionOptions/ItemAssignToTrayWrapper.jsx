@@ -69,6 +69,8 @@ export const ItemAssignToTrayWrapper = () => {
       noop_id: null,
       stagedOverrideId: inputObj.stagedOverrideId || null,
       rowKey: inputObj.rowKey || null,
+      replyToEntryOverrideId: inputObj.replyToEntryOverrideId || null,
+      replyToTopicOverrideId: inputObj.replyToTopicOverrideId || null,
     }
 
     // Add context_module_id and context_module_name fields if they exist on inputObj
@@ -137,6 +139,8 @@ export const ItemAssignToTrayWrapper = () => {
       context_module_name: inputObj.context_module_name || null,
       stagedOverrideId: inputObj.stagedOverrideId || null,
       rowKey: inputObj.rowKey || null,
+      replyToEntryOverrideId: inputObj.replyToEntryOverrideId || null,
+      replyToTopicOverrideId: inputObj.replyToTopicOverrideId || null,
     }
 
     if (inputObj.noop_id === '1') {
