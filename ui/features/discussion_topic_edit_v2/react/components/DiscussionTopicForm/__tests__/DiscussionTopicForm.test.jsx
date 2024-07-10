@@ -442,7 +442,7 @@ describe('DiscussionTopicForm', () => {
       const document = setup({
         groupCategories: [{_id: '1', name: 'Mutant Power Training Group 1'}],
         isEditing: true,
-        currentDiscussionTopic: DiscussionTopic.mock({groupSet: GroupSet.mock(), canGroup: false}),
+        currentDiscussionTopic: DiscussionTopic.mock({groupSet: GroupSet.mock(), canGroup: false, entryCounts: {repliesCount: 1}}),
       })
 
       expect(document.queryByTestId('group-category-not-editable')).toBeTruthy()
