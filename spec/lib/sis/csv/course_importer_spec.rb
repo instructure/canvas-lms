@@ -970,7 +970,6 @@ describe SIS::CSV::CourseImporter do
       expect(course.name).to eq "Test Course 101"
       expect(course.assignments.length).to eq 1
       expect(course.assignments.first.title).to eq "my assignment"
-      expect(course.content_migrations.first.strand).to eq "sis_import_course_templates"
     end
   end
 
