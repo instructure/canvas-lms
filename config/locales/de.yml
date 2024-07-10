@@ -10989,7 +10989,7 @@ de:
       last_page: Letzte
     peer_reviews: 
       due_date: "fällig am %{date}"
-      peer_review_alert: "Ihnen wurde eine Peer-Korrektur für %{person} zugewiesen."
+      peer_review_alert: "Ihnen wurde ein Peer Review für %{person} zugewiesen."
     points_possible_number: "Der Wert für die möglichen Punkte muss eine Zahl sein."
     published_button: 
       buttons: 
@@ -28513,12 +28513,12 @@ de:
       media_comment: Medienkommentar
       media_comment_link: "Dies ist ein Medienkommentar, *zum Anzeigen hier klicken*."
       only_see_your_own_comments_muted: "Möglicherweise werden Ihnen momentan nicht alle Kommentare angezeigt, da diese Aufgabe gerade benotet wird."
-      only_see_your_own_comments_peer: "Als Peer-Korrektur-Studierende\\*r sehen Sie nur Ihre eigenen Kommentare."
+      only_see_your_own_comments_peer: "Als Peer-Review-Studierende\\*r sehen Sie nur Ihre eigenen Kommentare."
       options: 
         new_assessment: "[Neuer Leistungstest]"
       out_of_points: "von insgesamt %{points_possible}"
-      peer_review: Peer-Korrektur
-      peer_review_not_done: "**Diese Peer-Korrektur ist noch nicht abgeschlossen.** Um sie abzuschließen, müssen Sie mindestens einen Kommentar erstellen."
+      peer_review: "Peer Review"
+      peer_review_not_done: "**Dieser Peer Review ist noch nicht abgeschlossen.** Um ihn abzuschließen, müssen Sie mindestens einen Kommentar erstellen."
       peer_review_not_done_rubric: "**Diese Peer-Korrektur ist noch nicht abgeschlossen.**  Damit die Peer-Korrektur als abgeschlossen gilt, muss mindestens ein Kommentar erstellt und das Bewertungsschemaformular rechts ausgefüllt werden."
       peer_review_steps_complete: "Sie haben die erforderlichen Schritte für diese Peer-Korrektur abgeschlossen."
       see_vericite_results: "VeriCite-Ergebnisse ansehen"
