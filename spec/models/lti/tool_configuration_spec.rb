@@ -259,6 +259,19 @@ module Lti
       end
     end
 
+    describe "before_update" do
+      subject { tool_configuration.update!(changes) }
+      before { tool_configuration.update!(developer_key:) }
+
+      context "when root privacy_level is updated to nil but settings not changed" do
+        let(:changes) { { disabled_placements: [], privacy_level: nil } }
+
+        it "keeps the privacy_level value from extensions and not updates to nil" do
+          expect { subject }.not_to change { tool_configuration[:privacy_level] }
+        end
+      end
+    end
+
     describe "after_update" do
       subject { tool_configuration.update!(changes) }
 

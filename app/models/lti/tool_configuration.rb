@@ -80,15 +80,19 @@ module Lti
       end
     end
 
+    def extension_privacy_level
+      canvas_extensions["privacy_level"]
+    end
+
     # temporary measure since the actual privacy_level column is not fully backfilled
     # remove with INTEROP-8055
     def privacy_level
-      self[:privacy_level] || canvas_extensions["privacy_level"]
+      self[:privacy_level] || extension_privacy_level
     end
 
     def update_privacy_level_from_extensions
-      ext_privacy_level = canvas_extensions["privacy_level"]
-      if settings_changed? && self[:privacy_level] != ext_privacy_level && ext_privacy_level.present?
+      ext_privacy_level = extension_privacy_level
+      if (self[:privacy_level].nil? || settings_changed?) && self[:privacy_level] != ext_privacy_level && ext_privacy_level.present?
         self[:privacy_level] = ext_privacy_level
       end
     end
