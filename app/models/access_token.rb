@@ -319,13 +319,18 @@ class AccessToken < ActiveRecord::Base
     developer_key_id == DeveloperKey.default.id
   end
 
-  def self.invalidate_mobile_tokens!(account)
+  # if user is not provided, all user tokens in the account will be invalidated
+  def self.invalidate_mobile_tokens!(account, user: nil)
     return unless account.root_account?
 
     developer_key_ids = DeveloperKey.mobile_app_keys.map do |app_key|
       app_key.respond_to?(:global_id) ? app_key.global_id : app_key.id
     end
-    user_ids = User.active.joins(:pseudonyms).where(pseudonyms: { account_id: account }).ids
+    user_ids = if user
+                 [user.id]
+               else
+                 User.active.joins(:pseudonyms).where(pseudonyms: { account_id: account }).ids
+               end
     tokens = active.where(developer_key_id: developer_key_ids, user_id: user_ids)
 
     now = Time.zone.now
