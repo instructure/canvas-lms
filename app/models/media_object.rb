@@ -305,7 +305,7 @@ class MediaObject < ActiveRecord::Base
     entry = client.mediaGet(media_id)
     media_type = client.mediaTypeToSymbol(entry[:mediaType]).to_s if entry
     # attachment#build_content_types_sql assumes the content_type has a "/"
-    media_type = "#{media_type}/*" unless media_type.blank? || media_type.include?("/")
+    media_type = MediaObject.normalize_content_type(media_type)
     assets = client.flavorAssetGetByEntryId(media_id) || []
     process_retrieved_details(entry, media_type, assets)
   end
@@ -427,6 +427,12 @@ class MediaObject < ActiveRecord::Base
 
   def deleted?
     workflow_state == "deleted"
+  end
+
+  def self.normalize_content_type(content_type)
+    return content_type if content_type.blank? || content_type.include?("/")
+
+    "#{content_type}/*"
   end
 
   scope :active, -> { where("media_objects.workflow_state<>'deleted'") }
