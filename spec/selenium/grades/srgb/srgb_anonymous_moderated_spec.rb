@@ -52,6 +52,7 @@ describe "Individual View Gradebook" do
 
       # give a grade as non-final grader
       @student1_submission = @moderated_assignment.grade_student(@student1, grade: 13, grader: @teacher2, provisional: true).first
+      @course.root_account.disable_feature!(:individual_gradebook_enhancements)
     end
 
     before do
@@ -126,11 +127,13 @@ describe "Individual View Gradebook" do
     end
 
     before do
+      @course.root_account.disable_feature!(:individual_gradebook_enhancements)
       user_session(@teacher1)
       SRGB.visit(@course.id)
     end
 
     it "excludes the muted assignment from the assignment list", priority: "1" do
+      @course.root_account.disable_feature!(:individual_gradebook_enhancements)
       SRGB.select_student(@student1)
       SRGB.assignment_dropdown.click
 
@@ -141,6 +144,7 @@ describe "Individual View Gradebook" do
     end
 
     it "hides student names in speedgrader", priority: "2" do
+      @course.root_account.disable_feature!(:individual_gradebook_enhancements)
       # Open speedgrader for the anonymous assignment
       SRGB.select_assignment(@anonymous_assignment)
       scroll_into_view("#assignment-speedgrader-link")

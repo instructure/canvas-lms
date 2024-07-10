@@ -22,7 +22,7 @@ require_relative "../pages/srgb_page"
 require_relative "../setup/gradebook_setup"
 require_relative "../pages/gradebook_grade_detail_tray_page"
 
-describe "Screenreader Gradebook grading" do
+describe.skip "Screenreader Gradebook grading EVAL-4360 remove test file with FF individual_gradebook_enhancements" do
   include_context "in-process server selenium tests"
   include_context "reusable_gradebook_course"
   include GradebookCommon
@@ -38,6 +38,7 @@ describe "Screenreader Gradebook grading" do
     assignment_3
     assignment_4
     student_submission
+    @course.root_account.disable_feature!(:individual_gradebook_enhancements)
   end
 
   let(:login_to_srgb) do
@@ -240,6 +241,7 @@ describe "Screenreader Gradebook grading" do
       add_teacher_and_student
       associate_course_to_term(term_name)
       user_session(@teacher)
+      @course.root_account.disable_feature!(:individual_gradebook_enhancements)
     end
 
     it "assignment in ended gp should be gradable" do
@@ -271,6 +273,7 @@ describe "Screenreader Gradebook grading" do
       enroll_teacher_and_students
       proxy_permission
       assignment_1.update!(submission_types: "online_upload")
+      @course.root_account.disable_feature!(:individual_gradebook_enhancements)
     end
 
     it "displays submit for student button for file upload assignments" do
