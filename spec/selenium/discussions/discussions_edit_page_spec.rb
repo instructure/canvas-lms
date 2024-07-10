@@ -1746,26 +1746,26 @@ describe "discussions" do
             it "shows required replies input on graded discussion with sub assignments" do
               Account.site_admin.enable_feature!(:discussion_checkpoints)
               @course.root_account.enable_feature!(:discussion_checkpoints)
-              assignment = @course.assignments.create!(
-                name: "Assignment",
-                submission_types: ["online_text_entry"],
-                points_possible: 20
-              )
-              assignment.update!(has_sub_assignments: true)
-              assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 10, due_at: 3.days.from_now)
-              assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
-              graded_discussion = @course.discussion_topics.create!(
-                title: "Graded Discussion",
-                discussion_type: "threaded",
-                posted_at: "2017-07-09 16:32:34",
-                user: @teacher,
-                assignment:,
-                reply_to_entry_required_count: 1
-              )
+              @student1 = student_in_course(course:, active_all: true).user
+              @student2 = student_in_course(course:, active_all: true).user
+              @course_section = course.course_sections.create!(name: "section alpha")
+              @course_section_2 = course.course_sections.create!(name: "section Beta")
 
               # Open page and assignTo tray
-              get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}/edit"
+              get "/courses/#{@course.id}/discussion_topics/new"
+              title = "Graded Discussion Topic with letter grade type"
+              message = "replying to topic"
+
+              f("input[placeholder='Topic Title']").send_keys title
+              type_in_tiny("textarea", message)
+
+              force_click_native('input[type=checkbox][value="graded"]')
+              force_click_native('input[type=checkbox][value="checkpoints"]')
+
               Discussion.assign_to_button.click
+              click_add_assign_to_card
+              click_delete_assign_to_card(0)
+              select_module_item_assignee(0, @course_section_2.name)
 
               reply_to_topic_date = 3.days.from_now(Time.zone.now).to_date + 17.hours
               reply_to_topic_date_formatted = format_date_for_view(reply_to_topic_date, "%m/%d/%Y")
@@ -1794,16 +1794,17 @@ describe "discussions" do
 
               wait_for_assign_to_tray_spinner
               fj("button:contains('Save')").click
+              Discussion.section_warning_continue_button.click
               wait_for_ajaximations
 
               graded_discussion = DiscussionTopic.last
-              sub_assignments = graded_discussion.sub_assignments
+              sub_assignments = graded_discussion.assignment.sub_assignments
               sub_assignment1 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
               sub_assignment2 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
 
               expect(graded_discussion.assignment.sub_assignments.count).to eq(2)
-              expect(format_date_for_view(sub_assignment1.due_at, "%m/%d/%Y")).to eq(reply_to_topic_date_formatted)
-              expect(format_date_for_view(sub_assignment2.due_at, "%m/%d/%Y")).to eq(required_replies_date_formatted)
+              expect(format_date_for_view(sub_assignment1.assignment_overrides.active.first.due_at, "%m/%d/%Y")).to eq(reply_to_topic_date_formatted)
+              expect(format_date_for_view(sub_assignment2.assignment_overrides.active.first.due_at, "%m/%d/%Y")).to eq(required_replies_date_formatted)
 
               # renders update
               get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}/edit"
@@ -1815,6 +1816,46 @@ describe "discussions" do
               expect(displayed_override_dates.include?(required_replies_date)).to be_truthy
               expect(displayed_override_dates.include?(available_from_date)).to be_truthy
               expect(displayed_override_dates.include?(until_date)).to be_truthy
+
+              # updates dates and saves
+              reply_to_topic_date = 4.days.from_now(Time.zone.now).to_date + 17.hours
+              reply_to_topic_date_formatted = format_date_for_view(reply_to_topic_date, "%m/%d/%Y")
+              update_reply_to_topic_date(0, reply_to_topic_date_formatted)
+              update_reply_to_topic_time(0, "5:00 PM")
+
+              # required replies
+              required_replies_date = 5.days.from_now(Time.zone.now).to_date + 17.hours
+              required_replies_date_formatted = format_date_for_view(required_replies_date, "%m/%d/%Y")
+              update_required_replies_date(0, required_replies_date_formatted)
+              update_required_replies_time(0, "5:00 PM")
+
+              # available from
+              available_from_date = 3.days.from_now(Time.zone.now).to_date + 17.hours
+              available_from_date_formatted = format_date_for_view(available_from_date, "%m/%d/%Y")
+              update_available_date(0, available_from_date_formatted, true, false)
+              update_available_time(0, "5:00 PM", true, false)
+
+              # available until
+              until_date = 6.days.from_now(Time.zone.now).to_date + 17.hours
+              until_date_formatted = format_date_for_view(until_date, "%m/%d/%Y")
+              update_until_date(0, until_date_formatted, true, false)
+              update_until_time(0, "5:00 PM", true, false)
+
+              click_save_button("Apply")
+
+              wait_for_assign_to_tray_spinner
+              fj("button:contains('Save')").click
+              Discussion.section_warning_continue_button.click
+              wait_for_ajaximations
+
+              graded_discussion.reload
+              sub_assignments = graded_discussion.assignment.sub_assignments
+              sub_assignment1 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+              sub_assignment2 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+              expect(graded_discussion.assignment.sub_assignments.count).to eq(2)
+              expect(format_date_for_view(sub_assignment1.assignment_overrides.active.first.due_at, "%m/%d/%Y")).to eq(reply_to_topic_date_formatted)
+              expect(format_date_for_view(sub_assignment2.assignment_overrides.active.first.due_at, "%m/%d/%Y")).to eq(required_replies_date_formatted)
             end
 
             it "displays an error when the availability date is after the due date" do
