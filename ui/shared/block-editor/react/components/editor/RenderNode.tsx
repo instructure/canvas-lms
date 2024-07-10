@@ -114,7 +114,10 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
       dom: n.dom,
       name: n.data.custom.displayName || n.data.displayName,
       moveable: node_helpers.isDraggable(),
-      deletable: n.data.custom?.isDeletable?.(n.id, query) && node_helpers.isDeletable(),
+      deletable:
+        (typeof n.data.custom?.isDeletable === 'function'
+          ? n.data.custom.isDeletable?.(n.id, query)
+          : true) && node_helpers.isDeletable(),
       props: n.data.props,
     }
   })
