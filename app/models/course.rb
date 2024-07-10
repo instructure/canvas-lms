@@ -4466,10 +4466,7 @@ class Course < ActiveRecord::Base
       content_migration.migration_settings[:migration_ids_to_import] = { copy: { everything: true } }
       content_migration.workflow_state = "importing"
       priority = Delayed::LOW_PRIORITY
-      if saved_by == :sis_import
-        priority += 5
-        content_migration.strand = "sis_import_course_templates"
-      end
+      priority += 5 if saved_by == :sis_import
       content_migration.save!
       content_migration.queue_migration(priority:)
     end
