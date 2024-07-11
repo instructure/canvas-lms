@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, memo, useRef, useState} from 'react'
 import {Mask} from '@instructure/ui-overlays'
 import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
@@ -73,6 +73,32 @@ export interface ItemAssignToTrayContentProps
 function makeCardId(): string {
   return uid('assign-to-card', 3)
 }
+
+const ItemAssignToCardMemo = memo(
+  props => {
+    return <ItemAssignToCard {...props} />
+  },
+  (prevProps: ItemAssignToCardSpec, nextProps: ItemAssignToCardSpec) => {
+    return (
+      prevProps.everyoneOption.value === nextProps.everyoneOption.value &&
+      prevProps.selectedAssigneeIds === nextProps.selectedAssigneeIds &&
+      // prevProps.disabledOptionIds === nextProps.disabledOptionIds &&
+      prevProps.highlightCard === nextProps.highlightCard &&
+      prevProps.isOpen === nextProps.isOpen &&
+      prevProps.due_at === nextProps.due_at &&
+      prevProps.original_due_at === nextProps.original_due_at &&
+      prevProps.unlock_at === nextProps.unlock_at &&
+      prevProps.lock_at === nextProps.lock_at &&
+      prevProps.reply_to_topic_due_at === nextProps.reply_to_topic_due_at &&
+      prevProps.required_replies_due_at === nextProps.required_replies_due_at &&
+      prevProps.removeDueDateInput === nextProps.removeDueDateInput &&
+      prevProps.isCheckpointed === nextProps.isCheckpointed &&
+      prevProps.courseId === nextProps.courseId &&
+      prevProps.contextModuleId === nextProps.contextModuleId &&
+      prevProps.contextModuleName === nextProps.contextModuleName
+    )
+  }
+)
 
 const ItemAssignToTrayContent = ({
   open,
@@ -384,96 +410,109 @@ const ItemAssignToTrayContent = ({
     [assignToCards, setAssignToCards]
   )
 
-  const handleCardAssignment = (
-    cardId: string,
-    assignees: AssigneeOption[],
-    deletedAssignees: string[]
-  ) => {
-    const selectedAssigneeIds = assignees.map(({id}) => id)
-    const initialCard = initialCards.find(card => card.key === cardId)
-    const areEquals =
-      JSON.stringify(initialCard?.selectedAssigneeIds) === JSON.stringify(selectedAssigneeIds)
-    const cards = assignToCards.map(card =>
-      card.key === cardId
-        ? {
-            ...card,
-            selectedAssigneeIds,
-            highlightCard: !areEquals,
-            isEdited: !areEquals,
-            hasAssignees: assignees.length > 0,
-          }
-        : card
-    )
-    if (onAssigneesChange) {
-      handleCustomAssigneesChange(cardId, assignees, deletedAssignees)
-    }
+  const handleCustomAssigneesChange = useCallback(
+    (cardId: string, assignees: AssigneeOption[], deletedAssignees: string[]) => {
+      const newSelectedOption = assignees.filter(
+        assignee => !disabledOptionIds.includes(assignee.id)
+      )[0]
+      const idData = newSelectedOption?.id?.split('-')
+      const isEveryoneOption = newSelectedOption?.id === everyoneOption.id
+      const parsedCard =
+        newSelectedOption === undefined
+          ? ({} as exportedOverride)
+          : ({
+              id: isEveryoneOption ? defaultSectionId : idData[1],
+              name: newSelectedOption.value,
+            } as exportedOverride)
 
-    const allSelectedOptions = [...disabledOptionIds, ...assignees.map(({id}) => id)]
-    const uniqueOptions = [...new Set(allSelectedOptions)]
-    const newDisabled = uniqueOptions.filter(id =>
-      deletedAssignees.length > 0 ? !deletedAssignees.includes(id) : true
-    )
-
-    setAssignToCards(cards)
-    setDisabledOptionIds(newDisabled)
-  }
-
-  const handleCustomAssigneesChange = (
-    cardId: string,
-    assignees: AssigneeOption[],
-    deletedAssignees: string[]
-  ) => {
-    const newSelectedOption = assignees.filter(
-      assignee => !disabledOptionIds.includes(assignee.id)
-    )[0]
-    const idData = newSelectedOption?.id?.split('-')
-    const isEveryoneOption = newSelectedOption?.id === everyoneOption.id
-    const parsedCard =
-      newSelectedOption === undefined
-        ? ({} as exportedOverride)
-        : ({
-            id: isEveryoneOption ? defaultSectionId : idData[1],
-            name: newSelectedOption.value,
-          } as exportedOverride)
-
-    if (newSelectedOption?.id === everyoneOption.id) {
-      if (hasModuleOverrides) {
-        parsedCard.course_id = 'everyone'
-      } else {
-        parsedCard.course_section_id = defaultSectionId
+      if (newSelectedOption?.id === everyoneOption.id) {
+        if (hasModuleOverrides) {
+          parsedCard.course_id = 'everyone'
+        } else {
+          parsedCard.course_section_id = defaultSectionId
+        }
+      } else if (parsedCard.id && idData[0] === 'section') {
+        parsedCard.course_section_id = idData[1]
+      } else if (parsedCard.id && idData[0] === 'student') {
+        parsedCard.short_name = newSelectedOption.value
+      } else if (parsedCard.id && idData[0] === 'group') {
+        parsedCard.group_id = idData[1]
+        parsedCard.group_category_id = newSelectedOption.groupCategoryId
+      } else if (idData && idData[0] === 'mastery_paths') {
+        parsedCard.noop_id = '1'
       }
-    } else if (parsedCard.id && idData[0] === 'section') {
-      parsedCard.course_section_id = idData[1]
-    } else if (parsedCard.id && idData[0] === 'student') {
-      parsedCard.short_name = newSelectedOption.value
-    } else if (parsedCard.id && idData[0] === 'group') {
-      parsedCard.group_id = idData[1]
-      parsedCard.group_category_id = newSelectedOption.groupCategoryId
-    } else if (idData && idData[0] === 'mastery_paths') {
-      parsedCard.noop_id = '1'
-    }
 
-    const parsedDeletedCard = deletedAssignees.map(id => {
-      const card = allOptions.find(a => a.id === id)
-      const data = card?.id?.split('-')
-      const deleted = {name: card?.value, type: data?.[0]} as exportedOverride
+      const parsedDeletedCard = deletedAssignees.map(id => {
+        const card = allOptions.find(a => a.id === id)
+        const data = card?.id?.split('-')
+        const deleted = {name: card?.value, type: data?.[0]} as exportedOverride
 
-      if (id === everyoneOption.id) {
-        deleted.course_section_id = defaultSectionId
-      } else if (data?.[0] === 'section') {
-        deleted.course_section_id = data[1]
-      } else if (data?.[0] === 'student') {
-        deleted.short_name = card?.value
-        deleted.student_id = data[1]
-      } else if (data?.[0] === 'group') {
-        deleted.group_id = data[1]
-      } else if (data?.[0] === 'mastery_paths') {
-        deleted.noop_id = '1'
+        if (id === everyoneOption.id) {
+          deleted.course_section_id = defaultSectionId
+        } else if (data?.[0] === 'section') {
+          deleted.course_section_id = data[1]
+        } else if (data?.[0] === 'student') {
+          deleted.short_name = card?.value
+          deleted.student_id = data[1]
+        } else if (data?.[0] === 'group') {
+          deleted.group_id = data[1]
+        } else if (data?.[0] === 'mastery_paths') {
+          deleted.noop_id = '1'
+        }
+        return deleted
+      })
+      onAssigneesChange?.(cardId, parsedCard, parsedDeletedCard)
+    },
+    [
+      allOptions,
+      defaultSectionId,
+      disabledOptionIds,
+      everyoneOption.id,
+      hasModuleOverrides,
+      onAssigneesChange,
+    ]
+  )
+
+  const handleCardAssignment = useCallback(
+    (cardId: string, assignees: AssigneeOption[], deletedAssignees: string[]) => {
+      const selectedAssigneeIds = assignees.map(({id}) => id)
+      const initialCard = initialCards.find(card => card.key === cardId)
+      const areEquals =
+        JSON.stringify(initialCard?.selectedAssigneeIds) === JSON.stringify(selectedAssigneeIds)
+      const cards = assignToCards.map(card =>
+        card.key === cardId
+          ? {
+              ...card,
+              selectedAssigneeIds,
+              highlightCard: !areEquals,
+              isEdited: !areEquals,
+              hasAssignees: assignees.length > 0,
+            }
+          : card
+      )
+      if (onAssigneesChange) {
+        handleCustomAssigneesChange(cardId, assignees, deletedAssignees)
       }
-      return deleted
-    })
-    onAssigneesChange?.(cardId, parsedCard, parsedDeletedCard)
-  }
+
+      const allSelectedOptions = [...disabledOptionIds, ...assignees.map(({id}) => id)]
+      const uniqueOptions = [...new Set(allSelectedOptions)]
+      const newDisabled = uniqueOptions.filter(id =>
+        deletedAssignees.length > 0 ? !deletedAssignees.includes(id) : true
+      )
+
+      setAssignToCards(cards)
+      setDisabledOptionIds(newDisabled)
+    },
+    [
+      assignToCards,
+      disabledOptionIds,
+      handleCustomAssigneesChange,
+      initialCards,
+      onAssigneesChange,
+      setAssignToCards,
+      setDisabledOptionIds,
+    ]
+  )
 
   const handleDatesChange = useCallback(
     (cardId: string, dateAttribute: string, dateValue: string | null) => {
@@ -504,6 +543,73 @@ const ItemAssignToTrayContent = ({
   const allCardsAssigned = useCallback(() => {
     return assignToCards.every(card => card.hasAssignees)
   }, [assignToCards])
+
+  const stableCardRef = useCallback(
+    (card, cardRef) => {
+      if (cardRef) {
+        cardsRefs.current[card.key] = cardRef
+      }
+    },
+    [cardsRefs]
+  )
+
+  const renderCardsOptimized = useCallback(
+    (isOpen?: boolean) => {
+      const cardCount = assignToCards.length
+      return assignToCards.map((card, i) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <View key={`${card.key}-${i}`} as="div" margin="small 0 0 0">
+          <ItemAssignToCardMemo
+            ref={stableCardRef}
+            courseId={courseId}
+            contextModuleId={card.contextModuleId}
+            contextModuleName={card.contextModuleName}
+            removeDueDateInput={removeDueDateInput}
+            isCheckpointed={isCheckpointed}
+            cardId={card.key}
+            reply_to_topic_due_at={card.reply_to_topic_due_at}
+            required_replies_due_at={card.required_replies_due_at}
+            due_at={card.due_at}
+            original_due_at={card.original_due_at}
+            unlock_at={card.unlock_at}
+            lock_at={card.lock_at}
+            onDelete={cardCount === 1 ? undefined : handleDeleteCard}
+            onCardAssignmentChange={handleCardAssignment}
+            onCardDatesChange={handleDatesChange}
+            onValidityChange={handleCardValidityChange}
+            isOpen={isOpen}
+            disabledOptionIds={disabledOptionIds}
+            everyoneOption={everyoneOption}
+            selectedAssigneeIds={card.selectedAssigneeIds}
+            customAllOptions={allOptions}
+            customIsLoading={isLoadingAssignees}
+            customSetSearchTerm={setSearchTerm}
+            highlightCard={card.highlightCard}
+            blueprintDateLocks={blueprintDateLocks}
+            postToSIS={postToSIS}
+          />
+        </View>
+      ))
+    },
+    [
+      allOptions,
+      assignToCards,
+      blueprintDateLocks,
+      courseId,
+      disabledOptionIds,
+      everyoneOption,
+      handleCardAssignment,
+      handleCardValidityChange,
+      handleDatesChange,
+      handleDeleteCard,
+      isCheckpointed,
+      isLoadingAssignees,
+      postToSIS,
+      removeDueDateInput,
+      setSearchTerm,
+      stableCardRef,
+    ]
+  )
 
   function renderCards(isOpen?: boolean) {
     const cardCount = assignToCards.length
@@ -555,7 +661,9 @@ const ItemAssignToTrayContent = ({
         </Mask>
       ) : (
         <ApplyLocale locale={locale} timezone={timezone}>
-          {renderCards(open)}
+          {ENV.FEATURES?.selective_release_optimized_tray
+            ? renderCardsOptimized(open)
+            : renderCards(open)}
         </ApplyLocale>
       )}
 
