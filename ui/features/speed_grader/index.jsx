@@ -89,7 +89,7 @@ ready(() => {
               heroIcon: `/courses/${window.ENV.course_id}/gradebook`,
             },
             emojisDenyList: window.ENV.EMOJI_DENY_LIST?.split(','),
-            mediaSettings: window.INST.kalturaSettings
+            mediaSettings: window.INST.kalturaSettings,
           },
           features: {
             extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
