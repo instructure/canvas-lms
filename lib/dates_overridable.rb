@@ -152,9 +152,12 @@ module DatesOverridable
 
   def self.preload_module_ids(learning_objects)
     assignments = learning_objects.select { |lo| lo.is_a?(AbstractAssignment) }
-    quizzes = learning_objects.select { |lo| lo.is_a?(Quizzes::Quiz) } + Quizzes::Quiz.where(assignment_id: assignments.map(&:id))
-    discussion_topics = learning_objects.select { |lo| lo.is_a?(DiscussionTopic) } + DiscussionTopic.where(assignment_id: assignments.map(&:id))
-    wiki_pages = learning_objects.select { |lo| lo.is_a?(WikiPage) } + WikiPage.where(assignment_id: assignments.map(&:id))
+    quizzes_with_assignments = Quizzes::Quiz.where(assignment_id: assignments.map(&:id))
+    quizzes = learning_objects.select { |lo| lo.is_a?(Quizzes::Quiz) } + quizzes_with_assignments
+    discussions_with_assignments = DiscussionTopic.where(assignment_id: assignments.map(&:id))
+    discussion_topics = learning_objects.select { |lo| lo.is_a?(DiscussionTopic) } + discussions_with_assignments
+    pages_with_assignments = WikiPage.where(assignment_id: assignments.map(&:id))
+    wiki_pages = learning_objects.select { |lo| lo.is_a?(WikiPage) } + pages_with_assignments
     tags_scope = ContentTag.not_deleted.where(tag_type: "context_module")
     module_ids = tags_scope.where(content_type: "Assignment", content_id: assignments.map(&:id))
                            .or(tags_scope.where(content_type: "Quizzes::Quiz", content_id: quizzes.map(&:id)))
@@ -169,12 +172,15 @@ module DatesOverridable
                                   module_ids.select { |m| m[0] == "DiscussionTopic" && m[1] == lo.id }.map(&:last)
                                 elsif lo.is_a?(WikiPage)
                                   module_ids.select { |m| m[0] == "WikiPage" && m[1] == lo.id }.map(&:last)
-                                elsif lo.is_a?(AbstractAssignment) && lo.quiz.present?
-                                  module_ids.select { |m| m[0] == "Quizzes::Quiz" && m[1] == lo.quiz.id }.map(&:last)
-                                elsif lo.is_a?(AbstractAssignment) && lo.discussion_topic.present?
-                                  module_ids.select { |m| m[0] == "DiscussionTopic" && m[1] == lo.discussion_topic.id }.map(&:last)
-                                elsif lo.is_a?(AbstractAssignment) && lo.wiki_page.present?
-                                  module_ids.select { |m| m[0] == "WikiPage" && m[1] == lo.wiki_page.id }.map(&:last)
+                                elsif lo.is_a?(AbstractAssignment) && quizzes_with_assignments.map(&:assignment_id).include?(lo.id)
+                                  quiz_id = quizzes_with_assignments.find { |q| q.assignment_id == lo.id }.id
+                                  module_ids.select { |m| m[0] == "Quizzes::Quiz" && m[1] == quiz_id }.map(&:last)
+                                elsif lo.is_a?(AbstractAssignment) && discussions_with_assignments.map(&:assignment_id).include?(lo.id)
+                                  discussion_id = discussions_with_assignments.find { |d| d.assignment_id == lo.id }.id
+                                  module_ids.select { |m| m[0] == "DiscussionTopic" && m[1] == discussion_id }.map(&:last)
+                                elsif lo.is_a?(AbstractAssignment) && pages_with_assignments.map(&:assignment_id).include?(lo.id)
+                                  page_id = pages_with_assignments.find { |p| p.assignment_id == lo.id }.id
+                                  module_ids.select { |m| m[0] == "WikiPage" && m[1] == page_id }.map(&:last)
                                 else
                                   module_ids.select { |m| m[0] == "Assignment" && m[1] == lo.id }.map(&:last)
                                 end
