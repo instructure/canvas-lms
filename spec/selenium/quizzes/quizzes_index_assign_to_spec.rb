@@ -19,6 +19,7 @@ require_relative "../common"
 require_relative "../helpers/quizzes_common"
 require_relative "../../spec_helper"
 require_relative "page_objects/quizzes_index_page"
+require_relative "page_objects/quizzes_landing_page"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "../helpers/context_modules_common"
 require_relative "../../helpers/selective_release_common"
@@ -26,6 +27,7 @@ require_relative "../../helpers/selective_release_common"
 describe "quizzes selective_release assign to tray" do
   include_context "in-process server selenium tests"
   include QuizzesIndexPage
+  include QuizzesLandingPage
   include ItemsAssignToTray
   include QuizzesCommon
   include ContextModulesCommon
@@ -64,6 +66,9 @@ describe "quizzes selective_release assign to tray" do
     click_manage_quiz_button(@classic_quiz.id)
     click_assign_to_link(@classic_quiz.id)
 
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
     expect(item_tray_exists?).to be_truthy
     expect(tray_header.text).to eq("test quiz")
     expect(icon_type_exists?("Quiz")).to be true
@@ -73,6 +78,9 @@ describe "quizzes selective_release assign to tray" do
     visit_quizzes_index_page(@course.id)
     click_manage_quiz_button(@classic_quiz.id)
     click_assign_to_link(@classic_quiz.id)
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
 
     click_add_assign_to_card
     select_module_item_assignee(1, @student1.name)
@@ -97,6 +105,9 @@ describe "quizzes selective_release assign to tray" do
     click_manage_quiz_button(@classic_quiz.id)
     click_assign_to_link(@classic_quiz.id)
 
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
     expect(module_item_assign_to_card[0]).to be_displayed
     expect(module_item_assign_to_card[1]).to be_displayed
 
@@ -108,6 +119,9 @@ describe "quizzes selective_release assign to tray" do
     visit_quizzes_index_page(@course.id)
     click_manage_quiz_button(@classic_quiz.id)
     click_assign_to_link(@classic_quiz.id)
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
 
     expect(item_tray_exists?).to be true
 
@@ -124,7 +138,8 @@ describe "quizzes selective_release assign to tray" do
     click_manage_quiz_button(@classic_quiz.id)
     click_assign_to_link(@classic_quiz.id)
 
-    expect(item_tray_exists?).to be true
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
 
     expect(assign_to_due_date(0).attribute("value")).to eq("Dec 31, 2022")
     expect(assign_to_due_time(0).attribute("value")).to eq("5:00 PM")
@@ -142,6 +157,9 @@ describe "quizzes selective_release assign to tray" do
     visit_quizzes_index_page(@course.id)
     click_manage_quiz_button(new_quiz_assignment.id)
     click_assign_to_link(new_quiz_assignment.id)
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
 
     click_add_assign_to_card
     select_module_item_assignee(1, @student1.name)
@@ -166,6 +184,9 @@ describe "quizzes selective_release assign to tray" do
     click_manage_quiz_button(@classic_quiz.id)
     click_assign_to_link(@classic_quiz.id)
 
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
     select_module_item_assignee(1, @student2.name)
     update_due_date(1, "12/31/2022")
     update_due_time(1, "5:00 PM")
@@ -184,6 +205,9 @@ describe "quizzes selective_release assign to tray" do
     click_manage_quiz_button(@classic_quiz.id)
     click_assign_to_link(@classic_quiz.id)
 
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
     expect(item_tray_exists?).to be_truthy
 
     check_element_has_focus close_button
@@ -198,5 +222,35 @@ describe "quizzes selective_release assign to tray" do
     visit_quizzes_index_page(@course.id)
     click_manage_quiz_button(@classic_quiz.id)
     expect(element_exists?(assign_to_link_selector(@classic_quiz.id))).to be_falsey
+  end
+
+  it "assigns student only on index page and show page shows correct cords" do
+    visit_quizzes_index_page(@course.id)
+    click_manage_quiz_button(@classic_quiz.id)
+    click_assign_to_link(@classic_quiz.id)
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    click_delete_assign_to_item("Remove Everyone", 0)
+
+    select_module_item_assignee(0, @student1.name)
+    update_due_date(0, "12/31/2022")
+    update_due_time(0, "5:00 PM")
+    click_save_button
+
+    expect(element_exists?(module_item_edit_tray_selector)).to be_falsey
+    expect(@classic_quiz.assignment_overrides.last.assignment_override_students.count).to eq(1)
+
+    get "/courses/#{@course.id}/quizzes/#{@classic_quiz.id}"
+
+    click_quiz_assign_to_button
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    expect(module_item_assign_to_card.count).to eq(1)
+    expect(assign_to_in_tray("Remove #{@student1.name}")[0]).to be_displayed
+    expect(element_exists?(assign_to_in_tray_selector("Remove Everyone else"))).to be_falsey
   end
 end
