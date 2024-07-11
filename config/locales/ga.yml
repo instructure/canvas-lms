@@ -1336,7 +1336,7 @@ ga:
       rqd_screenreader: "Maidir le srian a chur ar shonraí cainníochtúla"
       select: 
         mfa: 
-          disabled: Míchumasaithe
+          disabled: Díchumasaithe
           optional: Roghnach
           required: "Ag teastáil"
           required_for_admins: "Riachtanach le haghaidh Riarthóirí"
@@ -2570,7 +2570,7 @@ ga:
   alphabetically_60ab47e4: "In ord aibítre"
   already_belongs_to_an_assignment_override_99fc6f36: "cheana féin a bhaineann le sárú tasc"
   already_have_a_canvas_account_c4368ac9: "An bhfuil Cuntas Canvas agat cheana féin?"
-  also_note_that_microsoft_teams_is_unable_to_suppor_5b3c65e1: "Tabhair faoi deara freisin nach bhfuil Microsoft Teams in ann tacú le cúrsaí a bhfuil rolluithe níos mó ná %{max_enrollments} nó níos mó ná úinéirí %{max_owners} acu. Má sháraíonn do chúrsa na teorainneacha seo, is dócha go gcuirfear isteach ar an sioncronú."
+  also_note_that_microsoft_teams_is_unable_to_suppor_5b3c65e1: "Tabhair faoi deara leis nach féidir le Microsoft Teams tacú le cúrsaí ina bhfuil níos mó ná %{max_enrollments} duine páirteach nó a bhfuil níos mó ná %{max_owners} úinéir acu. Má sháraíonn do chúrsa na teorainneacha seo, is cosúil go mbrisfear isteach ar do shioncronú."
   alumno_88c80e37: Alumno
   always_3a59e701: "I gcónaí"
   always_include_dates_1ae2935e: "Cuimsigh Dátaí i gcónaí"
@@ -2782,7 +2782,7 @@ ga:
   anonymous_discussion_54517e84: "Fóram Anaithnid"
   anonymous_e1b8ad27: Anaithnid
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Ní féidir marcáil gan ainm a chumasú le haghaidh tascanna grúpa"
-  anonymous_grading_ccb5045c: "Marcáil gan Ainm"
+  anonymous_grading_ccb5045c: "Marcáil anaithnid"
   anonymous_grading_with_new_quizzes_ba0391f3: "Marcáil gan Ainm le Quiz Nua"
   anonymous_id_2ef1c6d2: "Gan ainm %{id}"
   anonymous_id_you_cf43ab76: "Gan ainm %{id} (Tusa)"
@@ -3309,8 +3309,8 @@ ga:
       available: "Ar fáil"
       multiple_dates: "dátaí Iolracha"
     date_due_column_view: 
-      due: Deontas
-      due_date: Deontas
+      due: Dlite
+      due_date: Dlite
       multiple_dates: "dátaí Iolracha"
       todo_date: "A dhéanamh"
     delete_group: 
@@ -3462,7 +3462,7 @@ ga:
       allowed_attempts: "Iarrachtaí Ceadaithe"
       assignment_locked: "Tá an tasc seo faoi ghlas faoi láthair."
       available_from: "Ar fáil ó"
-      due: Deontas
+      due: Dlite
       for: "Le haghaidh"
       links: 
         add_rubric: Rúibric
@@ -3485,7 +3485,7 @@ ga:
       allowed_attempts: "Iarrachtaí Ceadaithe"
       attempts: Iarrachtaí
       date_time_by: "%{date} le %{time}"
-      due_at: Deontas
+      due_at: Dlite
       no_due_date: "Níl Dáta Dlite"
       no_points: "Ceann ar Bith"
       points: Pointí
@@ -3598,14 +3598,14 @@ ga:
       headers: 
         date: Dáta
         details: Sonraí
-        due: Deontas
+        due: Dlite
       instructions: 
         syllabus: |-
-            Taispeántar ar leathanach an tsiollabais radharc tábla-dhírithe ar sceideal an chúrsa, agus ar bhunghnéithe
-            mharcáil an chúrsa.  Is féidir leat aon ráitis, nótaí nó smaointe eile atá agat faoi struchtúr an chúrsa,
-            polasaithe an chúrsa nó aon rud eile a chur leis.
+            Léirítear sa leathanach siollabais seo radharc i bhfoirm tábla ar sceideal an chúrsa agus eolas bunúsach faoi
+            mharcáil cúrsa.  Is féidir leat ráitis, nótaí nó smaointe eile a chur anseo i dtaobh struchtúr an chúrsa,
+            pholasaithe an chúrsa nó rud ar bith eile.
             
-            Chun roinnt ráitis a chur leis, cliceáil ar an nasc "Cuir in eagar" ag an mbarr.
+            Chun ráitis bhreise a chur isteach, cliceáil ar an nasc "Cuir in eagar" thuas.
       labels: 
         assignments_summary: "Achoimre an Chúrsa"
         important_info_description: "Cur síos ar Eolas Tábhachtach"
@@ -4285,7 +4285,7 @@ ga:
     sample_final_answer: "Is sampla de fhreagra deiridh é an luach seo don chineál ceiste seo"
   calendar: 
     agenda_view: 
-      due: Deontas
+      due: Dlite
       loading: "Ag lódáil"
       no_events: "*Gan imeacht tar éis an dáta seo.*"
     agenda_view_displaying_start_end: "Ag taispeáint %{start} trí %{end} anois"
@@ -7156,7 +7156,7 @@ ga:
       send_failed: "Theip ar an iarratas. Déan iarracht arís."
       titles: 
         drop_course: "Scaoil an Cúrsa seo"
-        recent_feedback: "Aiseolas Déanaí"
+        recent_feedback: "Aiseolas is nuaí"
     sidebar_weighting: 
       default_name: Grúpa
       headings: 
@@ -7164,7 +7164,7 @@ ga:
         total: Iomlán
         weight: Ualú
       labels: 
-        assignments_weighting: "Déantar tascanna a ualú de réir grúpa"
+        assignments_weighting: "Ualaítear tascanna de réir grúpa"
       no_groups: "Níl Grúpaí ar bith ar bun"
       not_weighted: "Ní dhéantar tascanna cúrsa a ualú."
     statistics: 
@@ -7980,7 +7980,7 @@ ga:
   discussion_podcast_feed_d62cc56f: "Fotha Podchraoltaí Fóraim"
   discussion_post_count_report_2da4c6c: "Tuarascáil Iarmhairte Fóraim"
   discussion_posts_c998c9ad: "Postálacha Fóraim"
-  discussion_redesign_description: "Cuireann an ghné seo le taithí Canvas taobh istigh de Fhóraim agus Fógraí. Nuair a bheidh an bhratach seo cumasaithe, taispeánfar rochtain luath ar fheabhsuithe leanúnacha go huathoibríoch le gach eisiúint. Chun sonraí iomlána a fháil, féach le do thoil ar an ngrúpa úsáideoirí *Fóram/Fógraí Athdhearadh* sa Phobal Canvas"
+  discussion_redesign_description: "Feabhsaíonn an ghné seo taithí Canvas laistigh d’Fhóraim agus Fógraí. Nuair a chumasaítear an brat seo, cuirfear rochtain luath ar fheabhsuithe leanúnacha ar taispeáint ar bhonn uathoibríoch le gach eisiúint. Le haghaidh sonraí iomlána, féachtar ar *ghrúpa usáideoirí um Athdhearadh Fóram/Fógraí* i bPobal Canvas."
   discussion_redesign_discussion_entry_version_histo_f1878f4f: "Athdhearadh Plé - Stair Leagan Iontrála Fóram"
   discussion_redesign_grading_view_467bf307: "Amharc Marcáilte Athdhearadh Fóram"
   discussion_settings_2fbf0b95: "Socruithe Fóraim"
@@ -8005,7 +8005,7 @@ ga:
   discussion_topics: 
     assignment_details: 
       available_from: "Ar fáil ó"
-      due: Deontas
+      due: Dlite
       due_date: "dlite %{date}"
       for: "Le haghaidh"
       graded_discussion_and_points: 
@@ -8207,7 +8207,7 @@ ga:
             fóraim do mhic léinn chun smaointe a mhalartú agus fadhbanna a réiteach. Tá fóraim
             Shnáithithe foirfe chun fóraim domhain nó fadtéarmach a choinneáil
             eagraithe, cé gur fearr a n-oireann fóraim Dhírithe do mhalartuithe gearrthéarmacha.
-  discussions_announcements_redesign_901c5528: "Fóraim/Fógraí Athdhearadh"
+  discussions_announcements_redesign_901c5528: "Athdhearadh Fóram/Fógraí"
   discussions_create_94dff604: "Fóraim - cruthaigh"
   discussions_index_menu_42591bc9: "Roghchlár Innéacs Fóraim"
   discussions_menu_f18eb4a2: "Roghchlár Fóraim"
@@ -8617,7 +8617,7 @@ ga:
   enable_ai_translation_4e5a644b: "Cumasaigh Aistriúchán IS"
   enable_all_read_only_scopes_3ddc2bb5: "Cumasaigh gach scóip inléite amháin."
   enable_an_account_setting_which_toggles_push_notif_f3ccc7a1: "Cumasaigh socrú cuntais a scorálann brúfhógraí don chuntas sin"
-  enable_anonymous_grading_of_assignments_e18f75be: "Cumasaigh marcáil neamhainmhithe de thascanna."
+  enable_anonymous_grading_of_assignments_e18f75be: "Cumasaigh marcáil anaithnid ar thascanna."
   enable_cbcd2eef: "Cumasaigh "
   enable_close_e8001638: "Cumasaigh & Dún"
   enable_content_security_policy_8bd0b492: "Cumasaigh Beartas Slándála Ábhar"
@@ -9570,12 +9570,12 @@ ga:
     hide_celebrations: "Díchumasaigh Beochan Ceiliúrtha"
     high_contrast: "Comhéadan Úsáideora Ardchodarsnachta"
     k12: "K-12 Gnéithe Sonracha"
-    learning_mastery_gradebook: "Leabhar na Marcanna Forlámhas Foghlama"
+    learning_mastery_gradebook: "Leabhar Marcanna Forlámhais Foghlama"
     post_grades: "Postáil Marcanna chuig SIS"
     quiz_log_auditing: "Iniúchadh Loga Quiz"
     quizzes: 
       next: "Quizeanna Nua"
-    student_outcome_gradebook: "Leabhar Marcanna Fhorlámhas Foghlama na Mac Léinn"
+    student_outcome_gradebook: "Leabhar Marcanna Forlámhais Foghlama na Mac Léinn"
   features_2581da: Gnéithe
   february_f2c77675: Feabhra
   federated_attributes_5cbe6441: "Tréithe Cónaidhme"
@@ -10106,7 +10106,7 @@ ga:
       expand_title: Leathnaigh
       headers: 
         details: Sonraí
-        due: Deontas
+        due: Dlite
         name: Ainm
         score: Scór
         submission_progress_status: "Stádas Dul Chun Cinn uaslódáila"
@@ -11807,7 +11807,7 @@ ga:
   last_pushed_update_last_export_at_9f634f7c: "An Nuashonrú is Déanaí Brúite: %{last_export_at}"
   last_reply_lastreplyatdisplay_7a4af30: "Freagra is déanaí %{lastReplyAtDisplay}"
   last_submission_activity_64ada9d0: "Gníomhaíocht uaslódáila is déanaí"
-  last_sync_5aac1ff1: "Sioncronú is déanaí:"
+  last_sync_5aac1ff1: "An sioncronú deireanach:"
   last_synced_datetime_1c3e0295: "Sioncronaithe is déanaí: %{datetime}"
   last_synced_right_now_f6c2ab00: "An sioncronú is déanaí: faoi láthair"
   last_used_f9457313: "Úsáidte is déanaí:"
@@ -11882,12 +11882,12 @@ ga:
   learner_passport_prototype_1c3446b3: "Fréamhshamhail Pas Foghlaimeora"
   learning_mastery_5fc34276: "Ag Foghlaim Forlámhas"
   learning_mastery_context_name_a0b70957: "Ag Foghlaim Forlámhas - %{context_name}"
-  learning_mastery_gradebook_72097130: "Leabhar na Marcanna Forlámhas Foghlama"
+  learning_mastery_gradebook_72097130: "Leabhar Marcanna Forlámhais Foghlama"
   learning_mastery_gradebook_description: |-
-      Soláthraíonn Leabhar na Marcanna forlámhas Foghlama bealach do mhúinteoirí féachaint go tapa ar an mac léinn agus ar dhul chun cinn an gcúrsa
-      ar thorthaí foghlama an chúrsa. Cuirtear na torthaí i láthair i bhformáid ar nós Leabhar na Marcanna
-       agus léiritear dul chun cinn na mac léinn mar scór uimhriúil agus mar Fhorlámhas/gar don
-      Forlámhas/leasúcháin
+      Cuireann an Leabhar Marcanna Forlámhais Foghlama ar chumas múinteoirí spléachadh tapaidh a fháil ar dhul chun cinn na mac léinn agus an chúrsa
+      ó thaobh thorthaí foghlama an chúrsa de. Cuirtear torthaí ar fáil i leagan amach ar aon dul le Leabhar na Marcanna
+      agus léirítear dul chun cinn na mac léinn mar scór uimhriúil nó faoi na teidil forlámhaithe/nach mór
+      forlámhaithe/gá le feabhas.
   learning_mastery_gradebook_redesign_9ca88020: "Forlámhas Foghlama Athdhearadh Leabhar na Marcanna"
   learning_object_1f9e5dd8: "Cuspóir Foghlama"
   learning_object_dates_36b05acb: "Dátaí Cuspóir Foghlama"
@@ -14922,7 +14922,7 @@ ga:
   no_email_8585ad7e: "Níl aon Ríomhphost"
   no_emoji_found_4db2f53c: "Níor aimsíodh Emoji"
   no_end_date_2608075c: "Nil Dáta Deiridh"
-  no_errors_1ac47724: "Níl aon earráidí"
+  no_errors_1ac47724: "Gan earráidí"
   no_evidence_75853352: "Níl aon Fhianaise"
   no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "Níor sholáthair aon úsáideoir reatha logáil isteach le ID SIS %{user_id}"
   no_explainer_text_available_9d9a2f3c: "Níl téacs mínithe ar fáil"
@@ -15088,7 +15088,7 @@ ga:
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "Tabhair faoi deara: ní thagann roinnt míreanna amach ó dháta tosaigh agus/nó dáta deiridh an chúrsa"
   note_students_have_submitted_work_for_these_assign_7bc34e28: "TABHAIR FAOI DEARA: Chuir mic léinn obair isteach do na tascanna seo nach bhfuil Marcáilte. Má phostálann tú na Marcanna seo anois, beidh ort a scóir a athphostáil tar éis na huaslódálacha is déanaí a mharcáil."
   note_sub_account_themes_are_not_active_during_this_a5dd9da: "Tabhair faoi deara: níl téamaí fochuntais gníomhach le linn an réamhamharc seo."
-  note_syncing_is_triggered_by_changes_to_course_enr_4fa83ef3: "Tabhair faoi deara: Spreagtar an sioncronú de bharr athruithe ar rolluithe cúrsa. An chéad uair a chumasaíonn tú Microsoft Sync, seans go mbeidh ort sioncrónú a dhéanamh de láimh leis an gcnaipe thíos."
+  note_syncing_is_triggered_by_changes_to_course_enr_4fa83ef3: "Tabhair faoi deara: Tarlaíonn sioncronú nuair a athraítear rolla an chúrsa. An chéad uair a chumasaíonn tú Microsoft Sync, b’fhéidir go mbeadh ort sioncronú a dhéanamh tú féin ach an cnaipe thíos a bhrú."
   note_that_all_login_attributes_from_entra_id_login_8b0e3aa5: |-
       Tabhair faoi deara go bhféadfaí na tréithe logála isteach go léir ó ID logáil isteach Entra a mhodhnú seachas *tid* agus *oid*.
       Chun a chinntiú nach féidir cuntais úsáideora a chur i mbaol, níor cheart duit ach tréith a úsáid seachas *tid+oid* má tá tú cinnte
@@ -15695,7 +15695,7 @@ ga:
     outcomes_filename: Torthaí
   outcome_results_23a0a117: Torthaí
   outcome_results_title: Torthaí
-  outcome_service_results_to_canvas_reporting_749667bc: "Toradh Seirbhíse Torthaí go Tuairisciú Canvas"
+  outcome_service_results_to_canvas_reporting_749667bc: "Téadh Marcanna Sheirbhís na dTorthaí go dtí Tuairisciú Canvas"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Toradh: Tá stádas %{title} ag %{statusTooltip}"
   outcome_with_canvas_id_id_not_found_215c5227: "Níor aimsíodh an toradh “%{id}“ le hID canvas"
   outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "Toradh le ID %{guid} cheana féin i gcúrsa nó cuntas eile nach mbaineann (%{name})"
@@ -20665,7 +20665,7 @@ ga:
   starts_at_29843f98: "Tosaíonn sé ag"
   starts_ce584f1c: "Tosaíonn sé:"
   starttime_to_endtime_4c46601f: "%{startTime} go %{endTime}"
-  state_66a67ba2: Staid
+  state_66a67ba2: Stát
   state_published_e42697da: "staid: foilsithe"
   state_standards_c9b1affd: "Caighdeáin na Stát"
   state_unpublished_e19c06e6: "stát: neamhfhoilsithe"
@@ -20782,10 +20782,10 @@ ga:
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Ní mór ainmneacha na mic léinn a chur i bhfolach toisc gur suirbhé anaithnid é seo."
   student_number_db6f06c1: "Mac Léinn %{number}"
   student_outcome_gradebook_description: |-
-      Soláthraíonn Leabhar Marcanna Fhorlámhas Foghlama na Mac Léinn bealach do mhic léinn chun dul chun cinn a fheiceáil go tapa
-      ar thorthaí foghlama an chúrsa. Cuirtear na torthaí i láthair ar nós Leabhar na Marcanna
-      taispeántar formáid agus dul chun cinn mar scór uimhriúil agus mar mháistreacht/gar le
-      máistreacht/leasúcháin.
+      Cuireann Leabhar Marcanna Forlámhais Foghlama na Mac Léinn ar chumas na mac léinn spléachadh tapaidh a fháil ar dhul chun cinn
+      ó thaobh thorthaí foghlama an chúrsa de. Cuirtear torthaí ar fáil i leagan amach ar aon dul le Leabhar na Marcanna
+      agus léirítear dul chun cinn na mac léinn mar scór uimhriúil nó faoi na teidil forlámhaithe/nach mór
+      forlámhaithe/gá le feabhas.
   student_outcome_result_b26b7ab4: "Toradh an Mhic Léinn"
   student_pace_2200bf85: "Luas Mac Léinn"
   student_page_history_ce86b3c2: "Stair Leathanaigh an mhic Léinn"
@@ -22006,7 +22006,7 @@ ga:
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Taispeántar an íomhá seo mar comhartha uisce cúlra do do leathanach. Formáidí a nglactar leo: Grafaic Ghréasáin Iniompartha, svg, gif, jpeg"
   this_image_has_been_reported_9360e581: "Tuairiscíodh an íomhá seo."
   this_influences_the_user_interface_for_setting_due_be0f0273: "Beidh tionchar aige seo ar dhátaí dlite a shocrú. Ní athróidh sé an t-am dlite i gcás tascanna atá ann cheana."
-  this_integration_is_not_enabled_please_enable_it_t_b9e8a997: "Níl an comhtháthú seo cumasaithe. Cumasaigh é chun idirghníomhú le socruithe."
+  this_integration_is_not_enabled_please_enable_it_t_b9e8a997: "Níl an comhtháthú seo cumasaithe. Cumasaítear é chun idirghníomhú le socruithe."
   this_is_a_blueprint_course_5e7b47fe: "Is Treoirphlean Cúrsa é seo"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Seo liosta de URLanna le camóg a bhfuil muinín agat astu. Má chuirtear muinín in aon URLanna sa liosta seo, seachnófar an comhartha CSRF agus tú ag logáil isteach ar Canvas."
   this_is_a_course_template_99bbe698: "Is teimpléad cúrsa é seo"
@@ -23171,7 +23171,7 @@ ga:
             mír mhodúil eile, nó glasáil modúl iomlán go dtí dáta ar leith.
   use_new_improved_logic_to_fetch_all_accounts_a_use_ad988281: "Bain úsáid as loighic fheabhsaithe nua chun gach cuntas a fháil ar féidir le húsáideoir cúrsaí a chruthú ann."
   use_new_quizzes_as_the_default_quizzing_engine_rem_73020960: "Úsáid Quizeanna Nua mar an t-inneall Quiz réamhshocraithe. Baineann sé an cumas Quizeanna clasaiceacha a chruthú."
-  use_new_quizzes_as_the_default_quizzing_engine_whe_4ff11683: "Úsáid Quizeanna Nua mar an t-inneall quiz réamhshocraithe nuair atá tú ag cruthú quiz. Baineann sé an cumas Quizeanna clasaiceacha a chruthú."
+  use_new_quizzes_as_the_default_quizzing_engine_whe_4ff11683: "Úsáid Quizeanna Nua mar an t-inneall quiz réamhshocraithe nuair atá tú ag cruthú quiz. Baineann seo an cumas chun quizeanna clasaiceacha a chruthú."
   use_parent_account_setting_f25a721f: "Úsáid socrú an mháthair-chuntais"
   use_quizzes_to_challenge_student_understanding_and_a340ff1c: |-
       Bain úsáid as Quizeanna chun dúshlán a thabhairt do thuiscint na mac léinn agus chun tuiscint ar
