@@ -556,6 +556,18 @@ function initDropdown() {
   const hideStudentNames = utils.shouldHideStudentNames()
   $('#hide_student_names').prop('checked', hideStudentNames)
 
+  $('#show_new_sg_ui').on('click', function () {
+    const searchParams = new URLSearchParams(window.location.search)
+
+    if (searchParams.has('platform_sg')) {
+      searchParams.set('platform_sg', 'true')
+
+      const newUrl = window.location.pathname + '?' + searchParams.toString()
+
+      window.location.href = newUrl
+    }
+  })
+
   const optionsArray = window.jsonData.studentsWithSubmissions.map(
     (student: StudentWithSubmission) => {
       const {submission_state, submission} = student
