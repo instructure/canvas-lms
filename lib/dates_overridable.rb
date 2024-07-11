@@ -25,7 +25,8 @@ module DatesOverridable
                 :has_too_many_overrides,
                 :preloaded_override_students,
                 :has_course_overrides,
-                :preloaded_module_ids
+                :preloaded_module_ids,
+                :preloaded_module_overrides
   attr_writer :without_overrides
 
   include DifferentiableAssignment
@@ -83,14 +84,10 @@ module DatesOverridable
 
   def all_assignment_overrides
     if Account.site_admin.feature_enabled? :selective_release_backend
-      assignment_overrides.or(context_module_overrides)
+      assignment_overrides.or(AssignmentOverride.active.where(context_module_id: module_ids))
     else
       assignment_overrides.where.not(set_type: "Course")
     end
-  end
-
-  def context_module_overrides
-    AssignmentOverride.active.where(context_module_id: module_ids)
   end
 
   def visible_to_everyone
@@ -98,9 +95,9 @@ module DatesOverridable
       if is_a?(DiscussionTopic)
         # need to check if is_section_specific for ungraded discussions
         # this column will eventually be deprecated and then this can be removed
-        course_overrides? || ((!only_visible_to_overrides && !is_section_specific) && (module_ids.empty? || (module_ids.any? && assignment_context_modules_without_overrides.any?)))
+        course_overrides? || ((!only_visible_to_overrides && !is_section_specific) && (module_ids.empty? || (module_ids.any? && modules_without_overrides?)))
       else
-        course_overrides? || (!only_visible_to_overrides && (module_ids.empty? || (module_ids.any? && assignment_context_modules_without_overrides.any?)))
+        course_overrides? || (!only_visible_to_overrides && (module_ids.empty? || (module_ids.any? && modules_without_overrides?)))
       end
     else
       !only_visible_to_overrides
@@ -120,9 +117,10 @@ module DatesOverridable
     end
   end
 
-  def assignment_context_modules_without_overrides
-    context_modules_with_overrides = context_module_overrides.select(:context_module_id)
-    assignment_context_modules.where.not(id: context_modules_with_overrides)
+  def modules_without_overrides?
+    module_ids_with_overrides = context_module_overrides.map(&:context_module_id)
+    module_ids_without_overrides = module_ids.reject { |module_id| module_ids_with_overrides.include?(module_id) }
+    module_ids_without_overrides.any?
   end
 
   def self.preload_override_data_for_objects(learning_objects)
@@ -131,6 +129,7 @@ module DatesOverridable
 
     preload_has_course_overrides(learning_objects)
     preload_module_ids(learning_objects)
+    preload_module_overrides(learning_objects)
   end
 
   def self.preload_has_course_overrides(learning_objects)
@@ -182,6 +181,14 @@ module DatesOverridable
     end
   end
 
+  def self.preload_module_overrides(learning_objects)
+    all_module_ids = learning_objects.map(&:module_ids).flatten.uniq
+    all_module_overrides = AssignmentOverride.active.where(context_module_id: all_module_ids)
+    learning_objects.each do |lo|
+      lo.preloaded_module_overrides = all_module_overrides.select { |ao| lo.module_ids.include?(ao.context_module_id) }
+    end
+  end
+
   def self.overrides_for_objects(learning_objects)
     AssignmentOverride.where(assignment_id: learning_objects.select { |lo| lo.is_a?(Assignment) }.map(&:id))
                       .or(AssignmentOverride.where(quiz_id: learning_objects.select { |lo| lo.is_a?(Quizzes::Quiz) }.map(&:id)))
@@ -199,6 +206,12 @@ module DatesOverridable
     return assignment_context_modules.pluck(:id) if @preloaded_module_ids.nil?
 
     @preloaded_module_ids
+  end
+
+  def context_module_overrides
+    return AssignmentOverride.active.where(context_module_id: module_ids) if @preloaded_module_overrides.nil?
+
+    @preloaded_module_overrides
   end
 
   def multiple_due_dates?

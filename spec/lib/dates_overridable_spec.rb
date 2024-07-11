@@ -692,12 +692,13 @@ describe "preload_override_data_for_objects" do
     @discussion2 = discussion_topic_model(context: @course)
     @page1 = wiki_page_model(course: @course)
     @page2 = wiki_page_model(course: @course)
-    @all_objects = [@assignment1, @assignment2, @quiz1, @quiz2, @discussion1, @discussion2, @page1, @page2]
   end
+
+  let(:all_objects) { [@assignment1, @assignment2, @quiz1, @quiz2, @discussion1, @discussion2, @page1, @page2] }
 
   describe "preload_has_course_overrides" do
     it "sets has_course_overrides to nil by default" do
-      @all_objects.each do |lo|
+      all_objects.each do |lo|
         expect(lo.has_course_overrides).to be_nil
       end
     end
@@ -706,22 +707,22 @@ describe "preload_override_data_for_objects" do
       [@assignment1, @quiz2, @discussion1, @page2].each do |lo|
         lo.assignment_overrides.create!(set: @course)
       end
-      DatesOverridable.preload_has_course_overrides(@all_objects)
+      DatesOverridable.preload_has_course_overrides(all_objects)
       expected_values = [true, false, false, true, true, false, false, true]
-      expect(@all_objects.map(&:has_course_overrides)).to eq expected_values
-      expect(@all_objects.map(&:course_overrides?)).to eq expected_values
+      expect(all_objects.map(&:has_course_overrides)).to eq expected_values
+      expect(all_objects.map(&:course_overrides?)).to eq expected_values
     end
 
     it "ignores deleted overrides" do
       @assignment1.assignment_overrides.create!(set: @course, workflow_state: "deleted")
-      DatesOverridable.preload_has_course_overrides(@all_objects)
+      DatesOverridable.preload_has_course_overrides(all_objects)
       expect(@assignment1.has_course_overrides).to be false
       expect(@assignment1.course_overrides?).to be false
     end
 
     it "ignores non-course overrides" do
       @assignment1.assignment_overrides.create!(set: @course.default_section)
-      DatesOverridable.preload_has_course_overrides(@all_objects)
+      DatesOverridable.preload_has_course_overrides(all_objects)
       expect(@assignment1.has_course_overrides).to be false
       expect(@assignment1.course_overrides?).to be false
     end
@@ -735,7 +736,7 @@ describe "preload_override_data_for_objects" do
 
   describe "preload_module_ids" do
     it "sets preloaded_module_ids to nil by default" do
-      @all_objects.each do |lo|
+      all_objects.each do |lo|
         expect(lo.preloaded_module_ids).to be_nil
       end
     end
@@ -746,10 +747,10 @@ describe "preload_override_data_for_objects" do
       @quiz1.context_module_tags.create!(context_module: @module1, context: @course, tag_type: "context_module")
       @discussion2.context_module_tags.create!(context_module: @module2, context: @course, tag_type: "context_module")
 
-      DatesOverridable.preload_module_ids(@all_objects)
+      DatesOverridable.preload_module_ids(all_objects)
       expected_values = [[@module1.id, @module2.id], [], [@module1.id], [], [], [@module2.id], [], []]
-      expect(@all_objects.map(&:preloaded_module_ids)).to eq expected_values
-      expect(@all_objects.map(&:module_ids)).to eq expected_values
+      expect(all_objects.map(&:preloaded_module_ids)).to eq expected_values
+      expect(all_objects.map(&:module_ids)).to eq expected_values
     end
 
     it "works for assignments that are part of a quiz" do
@@ -781,7 +782,7 @@ describe "preload_override_data_for_objects" do
     it "ignores deleted ContentTags" do
       @assignment1.context_module_tags.create!(context_module: @module1, context: @course, tag_type: "context_module", workflow_state: "deleted")
       @assignment1.context_module_tags.create!(context_module: @module2, context: @course, tag_type: "context_module")
-      DatesOverridable.preload_module_ids(@all_objects)
+      DatesOverridable.preload_module_ids(all_objects)
       expect(@assignment1.preloaded_module_ids).to eq [@module2.id]
       expect(@assignment1.module_ids).to eq [@module2.id]
     end
@@ -790,6 +791,45 @@ describe "preload_override_data_for_objects" do
       @assignment1.context_module_tags.create!(context_module: @module1, context: @course, tag_type: "context_module")
       expect(@assignment1.preloaded_module_ids).to be_nil
       expect(@assignment1.module_ids).to eq [@module1.id]
+    end
+  end
+
+  describe "preload_module_overrides" do
+    before :once do
+      @assignment1.context_module_tags.create!(context_module: @module1, context: @course, tag_type: "context_module")
+      @assignment1.context_module_tags.create!(context_module: @module2, context: @course, tag_type: "context_module")
+      @quiz1.context_module_tags.create!(context_module: @module1, context: @course, tag_type: "context_module")
+      @discussion2.context_module_tags.create!(context_module: @module2, context: @course, tag_type: "context_module")
+      @ao1 = @module1.assignment_overrides.create!
+      @ao2 = @module1.assignment_overrides.create!
+      @ao3 = @module2.assignment_overrides.create!
+    end
+
+    it "sets preloaded_module_overrides to nil by default" do
+      all_objects.each do |lo|
+        expect(lo.preloaded_module_overrides).to be_nil
+      end
+    end
+
+    it "sets the preloaded_module_overrides attribute correctly" do
+      DatesOverridable.preload_module_ids(all_objects)
+      DatesOverridable.preload_module_overrides(all_objects)
+      expected_values = [[@ao1, @ao2, @ao3], [], [@ao1, @ao2], [], [], [@ao3], [], []]
+      expect(all_objects.map(&:preloaded_module_overrides)).to eq expected_values
+      expect(all_objects.map(&:context_module_overrides)).to eq expected_values
+    end
+
+    it "ignores deleted overrides" do
+      @ao1.destroy
+      DatesOverridable.preload_module_ids(all_objects)
+      DatesOverridable.preload_module_overrides(all_objects)
+      expect(@assignment1.preloaded_module_overrides).to eq [@ao2, @ao3]
+      expect(@assignment1.context_module_overrides).to eq [@ao2, @ao3]
+    end
+
+    it "falls back to one-off calculation if not preloaded" do
+      expect(@assignment1.preloaded_module_overrides).to be_nil
+      expect(@assignment1.context_module_overrides).to eq [@ao1, @ao2, @ao3]
     end
   end
 end
