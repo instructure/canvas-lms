@@ -18,6 +18,8 @@
 
 import {z} from 'zod'
 import getCookie from '@instructure/get-cookie'
+import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
+import type {Submission} from 'api'
 
 function transform(result: any) {
   if (result.errors?.length > 0) {
@@ -37,8 +39,10 @@ function transform(result: any) {
 export const ZUpdateSubmissionGradeParams = z.object({
   assignmentId: z.string(),
   userId: z.string(),
+  courseId: z.string(),
   gradedAnonymously: z.boolean(),
-  grade: z.string(),
+  grade: z.string().nullable(),
+  excuse: z.boolean(),
 })
 
 type UpdateSubmissionGradeParams = z.infer<typeof ZUpdateSubmissionGradeParams>
@@ -46,29 +50,28 @@ type UpdateSubmissionGradeParams = z.infer<typeof ZUpdateSubmissionGradeParams>
 export async function updateSubmissionGrade({
   assignmentId,
   userId,
+  courseId,
   gradedAnonymously,
   grade,
+  excuse,
 }: UpdateSubmissionGradeParams): Promise<any> {
-  const data = {
+  const body: Record<any, any> = {
+    originator: 'speed_grader',
     submission: {
       assignment_id: assignmentId,
       user_id: userId,
       graded_anonymously: gradedAnonymously,
-      originator: 'speed_grader',
-      grade,
     },
   }
-
-  const response = await fetch('/courses/1/gradebook/update_submission', {
+  if (excuse) {
+    body.submission.excuse = excuse
+  } else {
+    body.submission.grade = grade
+  }
+  const {data} = await executeApiRequest<Submission>({
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-Token': getCookie('_csrf_token'),
-      Accept: 'application/json',
-    },
-    body: JSON.stringify(data),
+    path: `/courses/${courseId}/gradebook/update_submission`,
+    body,
   })
-
-  const json = await response.json()
-  return transform(json)
+  return transform(data)
 }
