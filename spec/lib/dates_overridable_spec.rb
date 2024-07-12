@@ -696,40 +696,53 @@ describe "preload_override_data_for_objects" do
 
   let(:all_objects) { [@assignment1, @assignment2, @quiz1, @quiz2, @discussion1, @discussion2, @page1, @page2] }
 
-  describe "preload_has_course_overrides" do
-    it "sets has_course_overrides to nil by default" do
+  describe "preload_overrides" do
+    it "sets preloaded_overrides to nil by default" do
       all_objects.each do |lo|
-        expect(lo.has_course_overrides).to be_nil
+        expect(lo.preloaded_overrides).to be_nil
       end
     end
 
-    it "preloads the has_course_overrides attribute correctly" do
+    it "preloads the preloaded_overrides attribute correctly" do
+      ao1 = @assignment1.assignment_overrides.create!(set: @course.default_section)
+      ao2 = @quiz2.assignment_overrides.create!(set: @course)
+      ao3 = @discussion1.assignment_overrides.create!
+      ao4 = @page2.assignment_overrides.create!(set: @course)
+      ao5 = @assignment1.assignment_overrides.create!
+      DatesOverridable.preload_overrides(all_objects)
+      expect(all_objects.map(&:preloaded_overrides)).to eq [[ao1, ao5], [], [], [ao2], [ao3], [], [], [ao4]]
+    end
+
+    it "includes deleted overrides" do
+      ao = @assignment1.assignment_overrides.create!(set: @course, workflow_state: "deleted")
+      DatesOverridable.preload_overrides(all_objects)
+      expect(@assignment1.preloaded_overrides).to eq [ao]
+    end
+  end
+
+  describe "course_overrides?" do
+    it "returns true only for objects with course overrides" do
       [@assignment1, @quiz2, @discussion1, @page2].each do |lo|
         lo.assignment_overrides.create!(set: @course)
       end
-      DatesOverridable.preload_has_course_overrides(all_objects)
-      expected_values = [true, false, false, true, true, false, false, true]
-      expect(all_objects.map(&:has_course_overrides)).to eq expected_values
-      expect(all_objects.map(&:course_overrides?)).to eq expected_values
+      DatesOverridable.preload_overrides(all_objects)
+      expect(all_objects.map(&:course_overrides?)).to eq [true, false, false, true, true, false, false, true]
     end
 
     it "ignores deleted overrides" do
       @assignment1.assignment_overrides.create!(set: @course, workflow_state: "deleted")
-      DatesOverridable.preload_has_course_overrides(all_objects)
-      expect(@assignment1.has_course_overrides).to be false
+      DatesOverridable.preload_overrides(all_objects)
       expect(@assignment1.course_overrides?).to be false
     end
 
     it "ignores non-course overrides" do
       @assignment1.assignment_overrides.create!(set: @course.default_section)
-      DatesOverridable.preload_has_course_overrides(all_objects)
-      expect(@assignment1.has_course_overrides).to be false
+      DatesOverridable.preload_overrides(all_objects)
       expect(@assignment1.course_overrides?).to be false
     end
 
     it "falls back to one-off calculation if not preloaded" do
       @assignment1.assignment_overrides.create!(set: @course)
-      expect(@assignment1.has_course_overrides).to be_nil
       expect(@assignment1.course_overrides?).to be true
     end
   end
