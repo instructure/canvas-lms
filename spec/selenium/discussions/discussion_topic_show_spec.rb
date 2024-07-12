@@ -109,7 +109,7 @@ describe "Discussion Topic Show" do
         expect_no_flash_message :error
       end
 
-      it "truncates long group names in the middle" do
+      it "truncates long group names in the middle, and contains full name for screen readers" do
         group_category = @course.group_categories.create!(name: "category")
         group1 = @course.groups.create!(name: "justasmalltowngirllivinginalonelyworldshetookthemidnighttraingoinganywhere first", group_category:)
         group2 = @course.groups.create!(name: "justasmalltowngirllivinginalonelyworldshetookthemidnighttraingoinganywhere second", group_category:)
@@ -120,7 +120,10 @@ describe "Discussion Topic Show" do
         get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
         f("button[data-testid='groups-menu-btn']").click
         menu_items = ff("[data-testid='groups-menu-item']")
-        truncated_menu_items = ["justasmall…here first\n0 Unread", "justasmal…e second\n0 Unread"]
+        truncated_menu_items = [
+          "justasmall…here first\n0 Unread\n#{group1.name} 0 Unread",
+          "justasmal…e second\n0 Unread\n#{group2.name} 0 Unread"
+        ]
         menu_items.each do |item|
           expect(truncated_menu_items).to include item.text
           hover(item)
