@@ -1938,6 +1938,12 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/lti_registrations/:id/bind", action: :bind
     end
 
+    scope(controller: "lti/resource_links") do
+      get "courses/:course_id/lti_resource_links", action: :index
+      get "courses/:course_id/lti_resource_links/:id", action: :show
+      put "courses/:course_id/lti_resource_links/:id", action: :update
+    end
+
     scope(controller: :immersive_reader) do
       get "immersive_reader/authenticate", action: :authenticate
     end

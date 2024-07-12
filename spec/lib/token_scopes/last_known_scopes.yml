@@ -976,6 +976,12 @@
 - verb: GET
   path: "/api/v1/courses/:course_id/lti_apps/launch_definitions"
 - verb: GET
+  path: "/api/v1/courses/:course_id/lti_resource_links"
+- verb: GET
+  path: "/api/v1/courses/:course_id/lti_resource_links/:id"
+- verb: PUT
+  path: "/api/v1/courses/:course_id/lti_resource_links/:id"
+- verb: GET
   path: "/api/v1/courses/:course_id/mastery_paths/rules"
 - verb: POST
   path: "/api/v1/courses/:course_id/mastery_paths/rules"
