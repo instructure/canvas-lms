@@ -71,10 +71,10 @@ module DatesOverridable
 
   def has_overrides?
     if current_version?
-      all_assignment_overrides.loaded? ? all_assignment_overrides.any?(&:active?) : all_assignment_overrides.active.exists?
+      preloaded_all_overrides ? preloaded_all_overrides.any?(&:active?) : all_assignment_overrides.active.exists?
     else
       # the old version's overrides might have be deleted too but it's probably more trouble than it's worth to check here
-      all_assignment_overrides.loaded? ? all_assignment_overrides.any? : all_assignment_overrides.exists?
+      preloaded_all_overrides ? preloaded_all_overrides.any? : all_assignment_overrides.exists?
     end
   end
 
@@ -88,6 +88,13 @@ module DatesOverridable
     else
       assignment_overrides.where.not(set_type: "Course")
     end
+  end
+
+  def preloaded_all_overrides
+    return nil if @preloaded_overrides.nil? || @preloaded_module_overrides.nil?
+    return @preloaded_overrides.reject { |ao| ao.set_type == "Course" } unless Account.site_admin.feature_enabled? :selective_release_backend
+
+    @preloaded_overrides + @preloaded_module_overrides
   end
 
   def visible_to_everyone
@@ -235,7 +242,7 @@ module DatesOverridable
   end
 
   def all_due_dates
-    due_at_overrides = all_assignment_overrides.loaded? ? all_assignment_overrides.select { |ao| ao.active? && ao.due_at_overridden } : all_assignment_overrides.active.overriding_due_at
+    due_at_overrides = preloaded_all_overrides ? preloaded_all_overrides.select { |ao| ao.active? && ao.due_at_overridden } : all_assignment_overrides.active.overriding_due_at
     dates = due_at_overrides.map(&:as_hash)
     dates << base_due_date_hash unless differentiated_assignments_applies?
     dates
