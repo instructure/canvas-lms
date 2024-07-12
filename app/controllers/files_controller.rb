@@ -616,6 +616,9 @@ class FilesController < ApplicationController
   end
 
   def show
+    # Ensure these links are not indexed by search engines
+    response.headers["X-Robots-Tag"] = "noindex, nofollow" unless @allow_robot_indexing
+
     GuardRail.activate(:secondary) do
       params[:id] ||= params[:file_id]
 
