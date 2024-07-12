@@ -845,4 +845,43 @@ describe "preload_override_data_for_objects" do
       expect(@assignment1.context_module_overrides).to eq [@ao1, @ao2, @ao3]
     end
   end
+
+  describe "preloaded_all_overrides" do
+    it "is nil by default" do
+      all_objects.each do |lo|
+        expect(lo.preloaded_all_overrides).to be_nil
+      end
+    end
+
+    it "includes object's overrides and object's modules' overrides" do
+      ao1 = @assignment1.assignment_overrides.create!
+      ao2 = @assignment1.assignment_overrides.create!(set: @course)
+      @assignment1.context_module_tags.create!(context_module: @module1, context: @course, tag_type: "context_module")
+      ao3 = @module1.assignment_overrides.create!
+
+      # some unrelated overrides
+      @quiz2.assignment_overrides.create!
+      @module2.assignment_overrides.create!
+
+      DatesOverridable.preload_override_data_for_objects(all_objects)
+      expect(@assignment1.preloaded_all_overrides).to eq [ao1, ao2, ao3]
+    end
+
+    it "includes overrides for different types of learning objects" do
+      ao1 = @assignment1.assignment_overrides.create!
+      ao2 = @quiz1.assignment_overrides.create!
+      ao3 = @discussion1.assignment_overrides.create!
+      ao4 = @page1.assignment_overrides.create!
+      all_objects.each do |lo|
+        lo.context_module_tags.create!(context_module: @module1, context: @course, tag_type: "context_module")
+      end
+      ao5 = @module1.assignment_overrides.create!
+
+      DatesOverridable.preload_override_data_for_objects(all_objects)
+      expect(@assignment1.preloaded_all_overrides).to eq [ao1, ao5]
+      expect(@quiz1.preloaded_all_overrides).to eq [ao2, ao5]
+      expect(@discussion1.preloaded_all_overrides).to eq [ao3, ao5]
+      expect(@page1.preloaded_all_overrides).to eq [ao4, ao5]
+    end
+  end
 end
