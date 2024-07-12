@@ -211,12 +211,12 @@ describe('GradebookGrid AssignmentGradeInput', () => {
       expect(wrapper.container.querySelector('input[type="text"]')).toBeDisabled()
     })
 
-    test('sets the input value to the percentage value of the entered score of the submission', () => {
+    test('sets the input value to the percentage value of the submission score', () => {
       mountComponent()
       expect(getTextInputValue()).toBe('78%')
     })
 
-    test('rounds the input value to two decimal places', () => {
+    test('rounds the percentage value of the input to two decimal places', () => {
       props.submission.enteredScore = 7.8916
       mountComponent()
       expect(getTextInputValue()).toBe('78.92%')
