@@ -258,7 +258,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def check_for_out_of_office_participants
-    if Account.site_admin.feature_enabled?(:inbox_settings) && context.enable_inbox_auto_response?
+    if Account.site_admin.feature_enabled?(:inbox_settings) && context.enable_inbox_auto_response? && conversation.present?
       delay_if_production(
         priority: Delayed::LOW_PRIORITY,
         n_strand: ["inbox_auto_response", id]

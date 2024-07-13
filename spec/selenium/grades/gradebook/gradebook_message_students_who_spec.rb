@@ -60,6 +60,27 @@ describe "Gradebook - message students who" do
       expect(fxpath_table_cell("List of students and observers", 2, 2)).to include_text(@observer_2.name)
       expect(fxpath_table_cell("List of students and observers", 3, 1)).to include_text(@student_3.name)
     end
+
+    it "sends messages successfully" do
+      Gradebook.visit(@course)
+      Gradebook.click_assignment_header_menu_element(@third_assignment.id, "message students")
+
+      # Select "Have not submitted" option
+      f("input[data-testid='criterion-dropdown']").click
+      options = ff("[data-testid='criterion-dropdown-item']")
+      options[1].click
+
+      f("button[data-testid='show_all_recipients']").click
+
+      # Send a message
+      message_form = f("[data-testid='message-input']")
+      message_form.send_keys("This is a message")
+      f("button[data-testid='send-message-button']").click
+      wait_for_ajax_requests
+      run_jobs
+
+      expect(ConversationMessage.count).to eq(4)
+    end
   end
 
   it "sends messages" do

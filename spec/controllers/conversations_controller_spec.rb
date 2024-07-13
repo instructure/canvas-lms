@@ -638,6 +638,40 @@ describe ConversationsController do
       end
     end
 
+    it "does not trigger OOO responses on bulk messages" do
+      Account.site_admin.enable_feature! :inbox_settings
+      Account.default.settings[:enable_inbox_auto_response] = true
+      Account.default.save!
+
+      user_session(@student)
+
+      new_user1 = User.create
+      enrollment1 = @course.enroll_student(new_user1)
+      enrollment1.workflow_state = "active"
+      enrollment1.save
+
+      # Set up OOO for new_user1
+      Inbox::InboxService.update_inbox_settings_for_user(
+        user_id: new_user1.id,
+        root_account_id: Account.default.id,
+        use_signature: false,
+        signature: "",
+        use_out_of_office: true,
+        out_of_office_first_date: Time.zone.today,
+        out_of_office_last_date: Time.zone.tomorrow,
+        out_of_office_subject: "OOO",
+        out_of_office_message: "Out of Office"
+      )
+
+      new_user2 = User.create
+      enrollment2 = @course.enroll_student(new_user2)
+      enrollment2.workflow_state = "active"
+      enrollment2.save
+      post "create", params: { recipients: [new_user1.id.to_s, new_user2.id.to_s], body: "later", subject: "farewell", bulk_message: "1" }
+      expect(response).to be_successful
+      expect(ConversationMessage.count).to eq(3)
+    end
+
     context "user_notes" do
       before do
         Account.default.update_attribute :enable_user_notes, true

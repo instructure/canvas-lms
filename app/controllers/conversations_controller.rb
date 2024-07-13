@@ -455,6 +455,13 @@ class ConversationsController < ApplicationController
         mode = (params[:mode] == "async") ? :async : :sync
         message.relativize_attachment_ids(from_shard: message.shard, to_shard: shard)
         message.shard = shard
+
+        # Bulk Messages should not trigger OOO responses
+        # Marking the message with 'automated' will prevent this
+        if value_to_boolean(params[:bulk_message])
+          message.automated = true
+        end
+
         batch = ConversationBatch.generate(message,
                                            @recipients,
                                            mode,
