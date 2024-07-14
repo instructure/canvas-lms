@@ -1,0 +1,6 @@
+---
+commons_new_quizzes:
+  state: hidden
+  display_name: Commons New Quizzes Support
+  description: If enabled, Canvas will be able to share New Quizzes to Commons.
+  applies_to: SiteAdmin
