@@ -481,7 +481,7 @@ const ItemAssignToTrayContent = ({
       const initialCard = initialCards.find(card => card.key === cardId)
       const areEquals =
         JSON.stringify(initialCard?.selectedAssigneeIds) === JSON.stringify(selectedAssigneeIds)
-      const cards = assignToCards.map(card =>
+      const cards = assignToCardsRef.current.map(card =>
         card.key === cardId
           ? {
               ...card,
@@ -506,7 +506,7 @@ const ItemAssignToTrayContent = ({
       setDisabledOptionIds(newDisabled)
     },
     [
-      assignToCards,
+      assignToCardsRef,
       disabledOptionIds,
       handleCustomAssigneesChange,
       initialCards,
@@ -535,16 +535,16 @@ const ItemAssignToTrayContent = ({
       const areEquals = JSON.stringify(initialCard) === JSON.stringify(currentCard)
 
       const newCard = {...currentCard, highlightCard: !areEquals, isEdited: !areEquals}
-      const cards = assignToCards.map(card => (card.key === cardId ? newCard : card))
+      const cards = assignToCardsRef.current.map(card => (card.key === cardId ? newCard : card))
       setAssignToCards(cards)
       onDatesChange?.(cardId, dateAttribute, newDate ?? '')
     },
-    [assignToCards, initialCards, onDatesChange, setAssignToCards]
+    [assignToCards, assignToCardsRef, initialCards, onDatesChange, setAssignToCards]
   )
 
-  const allCardsAssigned = useCallback(() => {
-    return assignToCards.every(card => card.hasAssignees)
-  }, [assignToCards])
+  const allCardsAssigned = () => {
+    return assignToCardsRef.current.every(card => card.hasAssignees)
+  }
 
   const stableCardRef = useCallback(
     (card, cardRef) => {
