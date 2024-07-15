@@ -105,6 +105,7 @@ module Api::V1::DiscussionTopics
     )
 
     DiscussionTopic.preload_subentry_counts(topics)
+    DatesOverridable.preload_override_data_for_objects([*topics, *topics.filter_map(&:assignment)])
     opts[:use_preload] = true
     topics.each_with_object([]) do |topic, result|
       if topic.visible_for?(user)

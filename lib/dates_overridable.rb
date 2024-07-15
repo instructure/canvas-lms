@@ -23,7 +23,10 @@ module DatesOverridable
                 :overridden,
                 :has_no_overrides,
                 :has_too_many_overrides,
-                :preloaded_override_students
+                :preloaded_override_students,
+                :preloaded_overrides,
+                :preloaded_module_ids,
+                :preloaded_module_overrides
   attr_writer :without_overrides
 
   include DifferentiableAssignment
@@ -68,10 +71,10 @@ module DatesOverridable
 
   def has_overrides?
     if current_version?
-      all_assignment_overrides.loaded? ? all_assignment_overrides.any?(&:active?) : all_assignment_overrides.active.exists?
+      preloaded_all_overrides ? preloaded_all_overrides.any?(&:active?) : all_assignment_overrides.active.exists?
     else
       # the old version's overrides might have be deleted too but it's probably more trouble than it's worth to check here
-      all_assignment_overrides.loaded? ? all_assignment_overrides.any? : all_assignment_overrides.exists?
+      preloaded_all_overrides ? preloaded_all_overrides.any? : all_assignment_overrides.exists?
     end
   end
 
@@ -81,16 +84,17 @@ module DatesOverridable
 
   def all_assignment_overrides
     if Account.site_admin.feature_enabled? :selective_release_backend
-      assignment_overrides.or(context_module_overrides)
+      assignment_overrides.or(AssignmentOverride.active.where(context_module_id: module_ids))
     else
       assignment_overrides.where.not(set_type: "Course")
     end
   end
 
-  def context_module_overrides
-    # plucking module IDs is important else we'll end up with a query with several nested subqueries
-    # that runs a full scan
-    AssignmentOverride.active.where(context_module_id: assignment_context_modules.pluck(:id))
+  def preloaded_all_overrides
+    return nil if @preloaded_overrides.nil? || @preloaded_module_overrides.nil?
+    return @preloaded_overrides.reject { |ao| ao.set_type == "Course" } unless Account.site_admin.feature_enabled? :selective_release_backend
+
+    @preloaded_overrides + @preloaded_module_overrides
   end
 
   def visible_to_everyone
@@ -98,9 +102,9 @@ module DatesOverridable
       if is_a?(DiscussionTopic)
         # need to check if is_section_specific for ungraded discussions
         # this column will eventually be deprecated and then this can be removed
-        assignment_overrides.active.where(set_type: "Course").exists? || ((!only_visible_to_overrides && !is_section_specific) && (assignment_context_modules.empty? || (assignment_context_modules.any? && assignment_context_modules_without_overrides.any?)))
+        course_overrides? || ((!only_visible_to_overrides && !is_section_specific) && (module_ids.empty? || (module_ids.any? && modules_without_overrides?)))
       else
-        assignment_overrides.active.where(set_type: "Course").exists? || (!only_visible_to_overrides && (assignment_context_modules.empty? || (assignment_context_modules.any? && assignment_context_modules_without_overrides.any?)))
+        course_overrides? || (!only_visible_to_overrides && (module_ids.empty? || (module_ids.any? && modules_without_overrides?)))
       end
     else
       !only_visible_to_overrides
@@ -120,9 +124,100 @@ module DatesOverridable
     end
   end
 
-  def assignment_context_modules_without_overrides
-    context_modules_with_overrides = context_module_overrides.select(:context_module_id)
-    assignment_context_modules.where.not(id: context_modules_with_overrides)
+  def modules_without_overrides?
+    module_ids_with_overrides = context_module_overrides.map(&:context_module_id)
+    module_ids_without_overrides = module_ids.reject { |module_id| module_ids_with_overrides.include?(module_id) }
+    module_ids_without_overrides.any?
+  end
+
+  def self.preload_override_data_for_objects(learning_objects)
+    return unless Account.site_admin.feature_enabled? :selective_release_backend
+    return if learning_objects.empty?
+
+    preload_overrides(learning_objects)
+    preload_module_ids(learning_objects)
+    preload_module_overrides(learning_objects)
+  end
+
+  def self.preload_overrides(learning_objects)
+    learning_objects_overrides = AssignmentOverride.where(assignment_id: learning_objects.select { |lo| lo.is_a?(Assignment) }.map(&:id))
+                                                   .or(AssignmentOverride.where(quiz_id: learning_objects.select { |lo| lo.is_a?(Quizzes::Quiz) }.map(&:id)))
+                                                   .or(AssignmentOverride.where(discussion_topic_id: learning_objects.select { |lo| lo.is_a?(DiscussionTopic) }.map(&:id)))
+                                                   .or(AssignmentOverride.where(wiki_page_id: learning_objects.select { |lo| lo.is_a?(WikiPage) }.map(&:id)))
+    learning_objects.each do |lo|
+      lo.preloaded_overrides = if lo.is_a?(AbstractAssignment)
+                                 learning_objects_overrides.select { |ao| ao.assignment_id == lo.id }
+                               elsif lo.is_a?(Quizzes::Quiz)
+                                 learning_objects_overrides.select { |ao| ao.quiz_id == lo.id }
+                               elsif lo.is_a?(DiscussionTopic)
+                                 learning_objects_overrides.select { |ao| ao.discussion_topic_id == lo.id }
+                               elsif lo.is_a?(WikiPage)
+                                 learning_objects_overrides.select { |ao| ao.wiki_page_id == lo.id }
+                               end
+    end
+  end
+
+  def self.preload_module_ids(learning_objects)
+    assignments = learning_objects.select { |lo| lo.is_a?(AbstractAssignment) }
+    quizzes_with_assignments = Quizzes::Quiz.where(assignment_id: assignments.map(&:id))
+    quizzes = learning_objects.select { |lo| lo.is_a?(Quizzes::Quiz) } + quizzes_with_assignments
+    discussions_with_assignments = DiscussionTopic.where(assignment_id: assignments.map(&:id))
+    discussion_topics = learning_objects.select { |lo| lo.is_a?(DiscussionTopic) } + discussions_with_assignments
+    pages_with_assignments = WikiPage.where(assignment_id: assignments.map(&:id))
+    wiki_pages = learning_objects.select { |lo| lo.is_a?(WikiPage) } + pages_with_assignments
+    tags_scope = ContentTag.not_deleted.where(tag_type: "context_module")
+    module_ids = tags_scope.where(content_type: "Assignment", content_id: assignments.map(&:id))
+                           .or(tags_scope.where(content_type: "Quizzes::Quiz", content_id: quizzes.map(&:id)))
+                           .or(tags_scope.where(content_type: "DiscussionTopic", content_id: discussion_topics.map(&:id)))
+                           .or(tags_scope.where(content_type: "WikiPage", content_id: wiki_pages.map(&:id)))
+                           .distinct
+                           .pluck(:content_type, :content_id, :context_module_id)
+    learning_objects.each do |lo|
+      lo.preloaded_module_ids = if lo.is_a?(Quizzes::Quiz)
+                                  module_ids.select { |m| m[0] == "Quizzes::Quiz" && m[1] == lo.id }.map(&:last)
+                                elsif lo.is_a?(DiscussionTopic)
+                                  module_ids.select { |m| m[0] == "DiscussionTopic" && m[1] == lo.id }.map(&:last)
+                                elsif lo.is_a?(WikiPage)
+                                  module_ids.select { |m| m[0] == "WikiPage" && m[1] == lo.id }.map(&:last)
+                                elsif lo.is_a?(AbstractAssignment) && quizzes_with_assignments.map(&:assignment_id).include?(lo.id)
+                                  quiz_id = quizzes_with_assignments.find { |q| q.assignment_id == lo.id }.id
+                                  module_ids.select { |m| m[0] == "Quizzes::Quiz" && m[1] == quiz_id }.map(&:last)
+                                elsif lo.is_a?(AbstractAssignment) && discussions_with_assignments.map(&:assignment_id).include?(lo.id)
+                                  discussion_id = discussions_with_assignments.find { |d| d.assignment_id == lo.id }.id
+                                  module_ids.select { |m| m[0] == "DiscussionTopic" && m[1] == discussion_id }.map(&:last)
+                                elsif lo.is_a?(AbstractAssignment) && pages_with_assignments.map(&:assignment_id).include?(lo.id)
+                                  page_id = pages_with_assignments.find { |p| p.assignment_id == lo.id }.id
+                                  module_ids.select { |m| m[0] == "WikiPage" && m[1] == page_id }.map(&:last)
+                                else
+                                  module_ids.select { |m| m[0] == "Assignment" && m[1] == lo.id }.map(&:last)
+                                end
+    end
+  end
+
+  def self.preload_module_overrides(learning_objects)
+    all_module_ids = learning_objects.map(&:module_ids).flatten.uniq
+    all_module_overrides = AssignmentOverride.active.where(context_module_id: all_module_ids)
+    learning_objects.each do |lo|
+      lo.preloaded_module_overrides = all_module_overrides.select { |ao| lo.module_ids.include?(ao.context_module_id) }
+    end
+  end
+
+  def course_overrides?
+    return assignment_overrides.active.where(set_type: "Course").exists? if @preloaded_overrides.nil?
+
+    @preloaded_overrides.any? { |ao| ao.set_type == "Course" && ao.active? }
+  end
+
+  def module_ids
+    return assignment_context_modules.pluck(:id) if @preloaded_module_ids.nil?
+
+    @preloaded_module_ids
+  end
+
+  def context_module_overrides
+    return AssignmentOverride.active.where(context_module_id: module_ids) if @preloaded_module_overrides.nil?
+
+    @preloaded_module_overrides
   end
 
   def multiple_due_dates?
@@ -147,7 +242,7 @@ module DatesOverridable
   end
 
   def all_due_dates
-    due_at_overrides = all_assignment_overrides.loaded? ? all_assignment_overrides.select { |ao| ao.active? && ao.due_at_overridden } : all_assignment_overrides.active.overriding_due_at
+    due_at_overrides = preloaded_all_overrides ? preloaded_all_overrides.select { |ao| ao.active? && ao.due_at_overridden } : all_assignment_overrides.active.overriding_due_at
     dates = due_at_overrides.map(&:as_hash)
     dates << base_due_date_hash unless differentiated_assignments_applies?
     dates

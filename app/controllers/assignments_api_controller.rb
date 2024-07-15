@@ -1087,6 +1087,8 @@ class AssignmentsApiController < ApplicationController
 
       mc_status = setup_master_course_restrictions(assignments, context)
 
+      DatesOverridable.preload_override_data_for_objects(assignments)
+
       assignments.map do |assignment|
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]

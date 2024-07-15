@@ -254,8 +254,8 @@ module AssignmentOverrideApplicator
         end.pluck(:course_section_id).uniq
     end
 
-    overrides = if learning_object.all_assignment_overrides.loaded?
-                  learning_object.all_assignment_overrides.select { |o| o.set_type == "CourseSection" && section_ids.include?(o.set_id) }
+    overrides = if learning_object.preloaded_all_overrides
+                  learning_object.preloaded_all_overrides.select { |o| o.set_type == "CourseSection" && section_ids.include?(o.set_id) }
                 else
                   learning_object.all_assignment_overrides.where(set_type: "CourseSection", set_id: section_ids)
                 end
@@ -272,8 +272,8 @@ module AssignmentOverrideApplicator
       context = learning_object.context
       return nil if user.enrollments.active.where(course: context).empty?
 
-      if learning_object.all_assignment_overrides.loaded?
-        learning_object.all_assignment_overrides.select { |o| o.set_type == "Course" && o.set_id == context.id }
+      if learning_object.preloaded_all_overrides
+        learning_object.preloaded_all_overrides.select { |o| o.set_type == "Course" && o.set_id == context.id }
       else
         learning_object.all_assignment_overrides.where(set_type: "Course", set_id: context.id)
       end
