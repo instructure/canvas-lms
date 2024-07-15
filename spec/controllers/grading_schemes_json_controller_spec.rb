@@ -239,6 +239,28 @@ describe GradingSchemesJsonController, type: :request do
                                             "used_as_default" => false,
                                             "workflow_state" => "active" })
       end
+
+      it "doesn't return parent account grading schemes" do
+        data = GradingSchemesJsonController.to_grading_standard_data(test_data)
+        account_level_grading_standard = @account.grading_standards.build(title: "My Grading Scheme",
+                                                                          data:,
+                                                                          scaling_factor: 1.0,
+                                                                          points_based: false)
+        account_level_grading_standard.save
+
+        sub_account = Account.create(parent_account: @account, name: "Test subaccount")
+        sub_admin = account_admin_user(account: sub_account)
+
+        Account.site_admin.enable_feature!(:archived_grading_schemes)
+
+        user_session(sub_admin)
+
+        get "/accounts/#{sub_account.id}/grading_schemes", as: :json
+        expect(response).to have_http_status(:ok)
+
+        response_json = response.parsed_body
+        expect(response_json.first).to be_nil
+      end
     end
 
     describe "get grading scheme" do
