@@ -1369,7 +1369,7 @@ Assignment.prototype.endSearch = function () {
 }
 
 Assignment.prototype.parse = function (data) {
-  let overrides, turnitin_settings, vericite_settings
+  let overrides, turnitin_settings, vericite_settings, checkpoints
   data = Assignment.__super__.parse.call(this, data)
   if ((overrides = data.assignment_overrides) != null) {
     data.assignment_overrides = new AssignmentOverrideCollection(overrides)
@@ -1379,6 +1379,9 @@ Assignment.prototype.parse = function (data) {
   }
   if ((vericite_settings = data.vericite_settings) != null) {
     data.vericite_settings = new VeriCiteSettings(vericite_settings)
+  }
+  if ((checkpoints = data.checkpoints) != null) {
+    data.checkpoints = checkpoints
   }
   return data
 }
@@ -1630,4 +1633,104 @@ Assignment.prototype.quizzesRespondusEnabled = function () {
   return this.get('require_lockdown_browser') && this.isQuizLTIAssignment() && isStudent()
 }
 
+Assignment.prototype.getCheckpoints = function () {
+  return this.get('checkpoints') || []
+}
+
+Assignment.prototype.getDateSortGroup = function () {
+  if (!this.dueAt()) {
+    return 'undated'
+  }
+
+  const now = new Date()
+  const dueDate = Date.parse(this.dueAt())
+
+  if (now < dueDate) {
+    return 'upcoming'
+  }
+
+  const isOverdue = this.allowedToSubmit() && this.withoutGradedSubmission()
+  // only handles observer observing one student, this needs to change to handle multiple users in the future
+  const canHaveOverdueAssignment =
+    !ENV?.current_user_has_been_observer_in_this_course ||
+    (ENV?.observed_student_ids && ENV?.observed_student_ids.length === 1)
+
+  if (isOverdue && canHaveOverdueAssignment) {
+    return 'overdue'
+  }
+
+  return 'past'
+}
+
+Assignment.prototype.getCheckpointDateGroup = function () {
+  if (!this.getCheckpoints()) {
+    return null
+  }
+
+  const checkpoints = this.getCheckpoints()
+  if (checkpoints.length !== 2) {
+    return null
+  }
+
+  const [checkpoint1, checkpoint2] = checkpoints
+  const group1 = this.getCheckpointGroup(checkpoint1)
+  const group2 = this.getCheckpointGroup(checkpoint2)
+
+  // Helper functions
+  const allMatch = (groups, target) => groups.every(group => group === target)
+  const anyMatch = (groups, target) => groups.some(group => group === target)
+  const matchAll = (groups, targets) =>
+    groups.length === targets.length && targets.every(target => groups.includes(target))
+
+  const groups = [group1, group2]
+
+  if (allMatch(groups, 'undated')) {
+    return 'undated'
+  }
+
+  if (anyMatch(groups, 'overdue')) {
+    return 'overdue'
+  }
+
+  if (matchAll(groups, ['upcoming', 'upcoming']) || matchAll(groups, ['upcoming', 'undated'])) {
+    return 'upcoming'
+  }
+
+  return 'past'
+}
+
+Assignment.prototype.subAssignmentWithoutGradedSubmission = function (checkpointTag) {
+  const sub =
+    this.get('submission')?.attributes?.sub_assignment_submissions?.find(
+      submission => submission.sub_assignment_tag === checkpointTag
+    ) ?? null
+  return sub == null || sub.grade == null
+}
+
+Assignment.prototype.getCheckpointGroup = function (checkpoint) {
+  if (!checkpoint.due_at) {
+    return 'undated'
+  }
+
+  const now = new Date()
+  const dueDate = new Date(checkpoint.due_at)
+
+  if (now < dueDate) {
+    return 'upcoming'
+  }
+
+  const checkpointIsWithoutGradedSubmission = this.subAssignmentWithoutGradedSubmission(
+    checkpoint.tag
+  )
+  const isOverdue = this.allowedToSubmit() && checkpointIsWithoutGradedSubmission
+  const canHaveOverdueAssignment =
+    !ENV?.current_user_has_been_observer_in_this_course ||
+    (ENV?.observed_student_ids && ENV?.observed_student_ids.length === 1)
+
+  if (isOverdue && canHaveOverdueAssignment) {
+    return 'overdue'
+  }
+
+  return 'past'
+}
 export default Assignment
