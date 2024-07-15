@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useMemo, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -199,6 +199,11 @@ export default function ItemAssignToTray({
   const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
     undefined
   )
+  const assignToCardsRef = useRef(assignToCards)
+
+  useEffect(() => {
+    assignToCardsRef.current = assignToCards
+  }, [assignToCards])
 
   const everyoneOption = useMemo(() => {
     const hasOverrides =
@@ -231,7 +236,6 @@ export default function ItemAssignToTray({
     everyoneOption,
     checkMasteryPaths: masteryPathsAllowed,
     defaultValues: [],
-    requiredOptions: disabledOptionIds,
     onError: handleDismiss,
   })
 
@@ -420,6 +424,7 @@ export default function ItemAssignToTray({
             setGroupCategoryId={setGroupCategoryId}
             setOverridesFetched={setOverridesFetched}
             postToSIS={postToSIS}
+            assignToCardsRef={assignToCardsRef}
           />
         )}
         {Footer()}

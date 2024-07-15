@@ -68,10 +68,11 @@ export interface ItemAssignToTrayContentProps
     [cardId: string]: ItemAssignToCardRef
   }>
   postToSIS?: boolean
+  assignToCardsRef: React.MutableRefObject<ItemAssignToCardSpec[]>
 }
 
 function makeCardId(): string {
-  return uid('assign-to-card', 3)
+  return uid('assign-to-card', 12)
 }
 
 const ItemAssignToCardMemo = memo(
@@ -81,7 +82,7 @@ const ItemAssignToCardMemo = memo(
   (prevProps: ItemAssignToCardSpec, nextProps: ItemAssignToCardSpec) => {
     return (
       prevProps.everyoneOption.value === nextProps.everyoneOption.value &&
-      prevProps.selectedAssigneeIds === nextProps.selectedAssigneeIds &&
+      prevProps.selectedAssigneeIds?.length === nextProps.selectedAssigneeIds?.length &&
       // prevProps.disabledOptionIds === nextProps.disabledOptionIds &&
       prevProps.highlightCard === nextProps.highlightCard &&
       prevProps.isOpen === nextProps.isOpen &&
@@ -140,6 +141,7 @@ const ItemAssignToTrayContent = ({
   setGroupCategoryId,
   setOverridesFetched,
   postToSIS = false,
+  assignToCardsRef,
 }: ItemAssignToTrayContentProps) => {
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
@@ -382,17 +384,17 @@ const ItemAssignToTrayContent = ({
 
   const handleDeleteCard = useCallback(
     (cardId: string) => {
-      const cardIndex = assignToCards.findIndex(card => card.key === cardId)
-      const cardSelection = assignToCards.at(cardIndex)?.selectedAssigneeIds ?? []
+      const cardIndex = assignToCardsRef.current.findIndex(card => card.key === cardId)
+      const cardSelection = assignToCardsRef.current.at(cardIndex)?.selectedAssigneeIds ?? []
       const newDisabled = disabledOptionIds.filter(id => !cardSelection.includes(id))
-      const cards = assignToCards.filter(({key}) => key !== cardId)
+      const cards = assignToCardsRef.current.filter(({key}) => key !== cardId)
       lastPerformedAction.current = {action: 'delete', index: cardIndex}
       setAssignToCards(cards)
       setDisabledOptionIds(newDisabled)
       onCardRemove?.(cardId)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [assignToCards, disabledOptionIds, onCardRemove, setAssignToCards]
+    [disabledOptionIds, onCardRemove, setAssignToCards]
   )
 
   const handleCardValidityChange = useCallback(
@@ -556,9 +558,8 @@ const ItemAssignToTrayContent = ({
   const renderCardsOptimized = useCallback(
     (isOpen?: boolean) => {
       const cardCount = assignToCards.length
-      return assignToCards.map((card, i) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <View key={`${card.key}-${i}`} as="div" margin="small 0 0 0">
+      return assignToCards.map(card => (
+        <View key={`${card.key}`} as="div" margin="small 0 0 0">
           <ItemAssignToCardMemo
             ref={stableCardRef}
             courseId={courseId}
