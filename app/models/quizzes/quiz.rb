@@ -147,7 +147,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
     self.scoring_policy = "keep_highest" if scoring_policy.nil?
     self.ip_filter = nil if ip_filter && ip_filter.strip.empty?
-    if !available? && !survey?
+    if !available? && !survey? && !saved_by_new_quizzes_migration
       self.points_possible = current_points_possible
     end
     self.title = t("#quizzes.quiz.default_title", "Unnamed Quiz") if title.blank?
