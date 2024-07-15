@@ -1193,6 +1193,21 @@ module Lti
           end
         end
 
+        context "when a user has multiple enrollments in one course" do
+          let(:user) { user_factory }
+          let(:section) { add_section("section one", { course: }) }
+
+          before do
+            course.save!
+            create_enrollment(course, user, { section:, enrollment_type: "StudentEnrollment" })
+            create_enrollment(course, user, { section:, enrollment_type: "TaEnrollment" })
+          end
+
+          it "does not list duplicate sections" do
+            expect(JSON.parse(expand!("$com.instructure.User.sectionNames"))).to match_array ["section one"]
+          end
+        end
+
         context "when the course has groups" do
           let(:course_with_groups) do
             course = variable_expander.context

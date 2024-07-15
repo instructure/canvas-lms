@@ -303,7 +303,16 @@ module Lti
     #   ```
     register_expansion "com.instructure.User.sectionNames",
                        [],
-                       -> { @context.enrollments.active.joins(:course_section).where(user_id: @current_user.id).order(:course_section_id).pluck(:name)&.to_json },
+                       lambda {
+                         @context.enrollments.active
+                                 .joins(:course_section)
+                                 .where(user_id: @current_user.id)
+                                 .order(:course_section_id)
+                                 .pluck(:name, :course_section_id) # create pairs of [ [name, 1] , [other_name, 2] ]
+                                 .uniq(&:last) # the last element in the [name, 1] pairs is the ID. Only keep ones with unique IDs.
+                                 .map(&:first) # and now just get the first element of those pairs, which is the name
+                                 &.to_json
+                       },
                        ENROLLMENT_GUARD,
                        default_name: "com_instructure_user_section_names"
 
