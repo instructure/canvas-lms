@@ -285,7 +285,7 @@ module Importers
 
       item.generate_quiz_data if hash[:available] || item.published?
 
-      if hash.key?(:points_possible) && migration.quizzes_next_migration?
+      if hash.key?(:points_possible) && (migration.quizzes_next_migration? || hash["qti_new_quiz"] == true)
         item.points_possible = hash[:points_possible]
 
         # prevent overriding the points_possible field
