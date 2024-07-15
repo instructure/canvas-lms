@@ -35,6 +35,7 @@ import {ResourceCard, ResourceCardIcon} from '../user/blocks/ResourceCard'
 import {ImageBlock, ImageBlockIcon} from '../user/blocks/ImageBlock'
 import {IconBlock, IconBlockIcon} from '../user/blocks/IconBlock'
 import {RCEBlock, RCEBlockIcon} from '../user/blocks/RCEBlock'
+import {TabsBlock, TabsBlockIcon} from '../user/blocks/TabsBlock'
 
 type ToolboxProps = {
   open: boolean
@@ -136,6 +137,7 @@ export const Toolbox = ({open, container, onClose}: ToolboxProps) => {
           {renderBox('Heading', HeadingBlockIcon, <HeadingBlock />)}
           {renderBox('Resource Card', ResourceCardIcon, <ResourceCard />)}
           {renderBox('Image', ImageBlockIcon, <ImageBlock />)}
+          {renderBox('Tabs', TabsBlockIcon, <TabsBlock />)}
         </Flex>
       </View>
     </Tray>
