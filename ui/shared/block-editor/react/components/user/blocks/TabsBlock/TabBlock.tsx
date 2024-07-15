@@ -16,41 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {useEditor, useNode, type Node} from '@craftjs/core'
-import {useClassNames} from '../../../utils'
+import React, {useState} from 'react'
+import {Element, useEditor} from '@craftjs/core'
+import {Container} from '../Container'
+import {NoSections} from '../../common'
+import {useClassNames} from '../../../../utils'
 
-export type NoSectionsProps = {
-  className?: string
-  children?: React.ReactNode
+type TabBlockProps = {
+  tabId: string
 }
 
-export const NoSections = ({className = '', children}: NoSectionsProps) => {
+const TabBlock = ({tabId}: TabBlockProps) => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
-  const {
-    connectors: {connect},
-  } = useNode()
-  const clazz = useClassNames(enabled, {empty: !children}, [className])
-
+  const [cid] = useState<string>('tab-block')
+  const clazz = useClassNames(enabled, {empty: false}, ['block', 'tab-block'])
   return (
-    <div
-      ref={el => el && connect(el)}
-      className={clazz}
-      data-placeholder="Drop a block to add it here"
-    >
-      {children}
-    </div>
+    <Container id={tabId} className={clazz}>
+      <Element
+        id={`${cid}_nosection1`}
+        is={NoSections}
+        canvas={true}
+        className="tab-block__inner"
+      />
+    </Container>
   )
 }
 
-NoSections.craft = {
-  displayName: 'Column',
-  rules: {
-    canMoveIn: (nodes: Node[]) => !nodes.some(node => node.data.custom.isSection),
-  },
+TabBlock.craft = {
+  displayName: 'Tab',
   custom: {
     noToolbar: true,
   },
 }
+
+export {TabBlock}

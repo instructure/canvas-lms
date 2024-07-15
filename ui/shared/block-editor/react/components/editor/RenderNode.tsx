@@ -376,8 +376,8 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   return (
     <>
       {node.data.name === 'PageBlock' && renderSectionAdder(true)}
-      {selected && node.related && renderRelated()}
       {!selected && hovered && renderHoverTag()}
+      {selected && node.related && renderRelated()}
       {render}
       {node.data.custom?.isSection && renderSectionAdder()}
     </>

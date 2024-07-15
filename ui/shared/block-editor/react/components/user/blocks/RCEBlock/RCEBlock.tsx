@@ -23,9 +23,10 @@ import {useClassNames} from '../../../../utils'
 
 type RCEBlockProps = {
   text?: string
+  onContentChange?: (newContent: string) => void
 }
 
-export const RCEBlock = ({text = ''}: RCEBlockProps) => {
+export const RCEBlock = ({text = '', onContentChange}: RCEBlockProps) => {
   const {actions, enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
@@ -49,7 +50,7 @@ export const RCEBlock = ({text = ''}: RCEBlockProps) => {
       focusableElem.current?.focus()
     }
     setEditable(selected)
-  }, [editable, focusableElem, selected])
+  }, [editable, focusableElem, selected, text])
 
   const handleRCEFocus = useCallback(() => {
     actions.selectNode(id)
@@ -60,8 +61,9 @@ export const RCEBlock = ({text = ''}: RCEBlockProps) => {
       setProp(props => {
         props.text = content
       })
+      onContentChange?.(content)
     },
-    [setProp]
+    [onContentChange, setProp]
   )
 
   if (enabled && selected) {
@@ -86,7 +88,6 @@ export const RCEBlock = ({text = ''}: RCEBlockProps) => {
           height={300}
           textareaId="rceblock_text"
           onFocus={handleRCEFocus}
-          onBlur={() => {}}
           onContentChange={handleChange}
         />
       </div>
