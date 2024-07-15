@@ -25,6 +25,12 @@
   padding-#{direction(right)}: 10px;
   padding-#{direction(left)}: 10px;
 }
+.ic-discussion-row.mobile {
+  box-shadow: none;
+  padding: 16px;
+  border-radius: 5px;
+  border: $ic-border-color 1px solid;
+}
 
 .pinned-discussions-v2__wrapper,
 .unpinned-discussions-v2__wrapper {
