@@ -128,6 +128,7 @@ class SisBatch < ActiveRecord::Base
     state :restoring
     state :partially_restored
     state :restored
+    state :restore_failed
   end
 
   def process
@@ -209,12 +210,7 @@ class SisBatch < ActiveRecord::Base
 
     import_scheme[:callback].call(self)
   rescue => e
-    reload # might have failed trying to save
-    self.data ||= {}
-    self.data[:error_message] = e.to_s
-    self.data[:stack_trace] = "#{e}\n#{e.backtrace.join("\n")}"
-    self.workflow_state = "failed"
-    save
+    fail_with_error!(e)
   end
 
   def abort_batch
@@ -350,7 +346,7 @@ class SisBatch < ActiveRecord::Base
 
     self.diffing_threshold_exceeded = false
 
-    self.data[:diffed_against_sis_batch_id] = previous_batch.id
+    data[:diffed_against_sis_batch_id] = previous_batch.id
 
     self.generated_diff = Attachment.create_data_attachment(
       self,
@@ -376,8 +372,8 @@ class SisBatch < ActiveRecord::Base
   end
 
   def download_zip
-    @data_file = if self.data[:file_path]
-                   File.open(self.data[:file_path], "rb")
+    @data_file = if data[:file_path]
+                   File.open(data[:file_path], "rb")
                  else
                    attachment.open(integrity_check: true)
                  end
@@ -389,7 +385,7 @@ class SisBatch < ActiveRecord::Base
     @data_file = nil
     return self if workflow_state == "aborted"
 
-    if batch_mode? && import_finished && !self.data[:running_immediately]
+    if batch_mode? && import_finished && !data[:running_immediately]
       # in batch mode, there's still a lot of work left to do, and it needs to be done in a separate job
       # from the last ParallelImporter or a failed job will retry that bit of the import (and not the batch cleanup!)
       save!
@@ -416,7 +412,7 @@ class SisBatch < ActiveRecord::Base
     save!
     InstStatsd::Statsd.increment("sis_batch_completed", tags: { failed: @has_errors })
 
-    if !self.data[:running_immediately] && account.sis_batches.needs_processing.exists?
+    if !data[:running_immediately] && account.sis_batches.needs_processing.exists?
       self.class.queue_job_for_account(account) # check if there's anything that needs to be run
     end
   end
@@ -431,6 +427,19 @@ class SisBatch < ActiveRecord::Base
       self.workflow_state = :failed
       self.workflow_state = :failed_with_messages if @has_errors
     end
+  end
+
+  def fail_with_error!(error)
+    reload # might have failed trying to save; also ensure workflow_state is up to date
+    self.data ||= {}
+    self.data[:error_message] = error&.to_s
+    self.data[:stack_trace] = "#{error}\n#{error&.backtrace&.join("\n")}"
+    self.workflow_state = if %w[restoring restored partially_restored restore_failed].include?(workflow_state)
+                            "restore_failed"
+                          else
+                            "failed"
+                          end
+    save!
   end
 
   def statistics
@@ -907,6 +916,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def restore_states_for_batch(restore_progress = nil, batch_mode: false, undelete_only: false, unconclude_only: false)
+    capture_job_id
     restore_progress&.start
     update_attribute(:workflow_state, "restoring")
     roll_back = roll_back_data
