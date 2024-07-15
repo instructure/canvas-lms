@@ -17,10 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class BackfillLtiRegistrations < ActiveRecord::Migration[7.1]
+class BackfillLtiRegistrationsAndAccountBindings < ActiveRecord::Migration[7.1]
   tag :postdeploy
 
   def change
-    DataFixup::CreateLtiRegistrationsFromDeveloperKeys.delay_if_production(priority: Delayed::LOWER_PRIORITY).run
+    strand = "backfill_lti_registrations_and_account_bindings/shard_#{Shard.current.id}"
+    DataFixup::CreateLtiRegistrationsFromDeveloperKeys.delay_if_production(priority: Delayed::LOWER_PRIORITY, strand:).run
+    DataFixup::Lti::BackfillLtiRegistrationAccountBindings.delay_if_production(priority: Delayed::LOWER_PRIORITY, strand:).run
   end
 end
