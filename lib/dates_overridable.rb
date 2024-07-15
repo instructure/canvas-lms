@@ -389,6 +389,20 @@ module DatesOverridable
     without_overrides.due_date_hash.merge(base: true)
   end
 
+  def override_aware_due_date_hash(user, user_is_admin: false, assignment_object: self)
+    hash = {}
+
+    if user_is_admin && assignment_object.has_too_many_overrides
+      hash[:has_many_overrides] = true
+    elsif assignment_object.multiple_due_dates_apply_to?(user)
+      hash[:vdd_tooltip] = OverrideTooltipPresenter.new(assignment_object, user).as_json
+    elsif (due_date = assignment_object.overridden_for(user).due_at) ||
+          (user_is_admin && (due_date = assignment_object.all_due_dates.dig(0, :due_at)))
+      hash[:due_date] = due_date
+    end
+    hash
+  end
+
   def context_module_tag_info(user, context, user_is_admin: false, has_submission:)
     return {} unless user
 
@@ -398,16 +412,7 @@ module DatesOverridable
       batch_object: self,
       batched_keys: :availability
     ) do
-      hash = {}
-      if user_is_admin && has_too_many_overrides
-        hash[:has_many_overrides] = true
-      elsif multiple_due_dates_apply_to?(user)
-        hash[:vdd_tooltip] = OverrideTooltipPresenter.new(self, user).as_json
-      elsif (due_date = overridden_for(user).due_at) ||
-            (user_is_admin && (due_date = all_due_dates.dig(0, :due_at)))
-        hash[:due_date] = due_date
-      end
-      hash
+      override_aware_due_date_hash(user, user_is_admin:, assignment_object: self)
     end
     tag_info[:points_possible] = points_possible unless try(:quiz_type) == "survey"
 
@@ -420,6 +425,18 @@ module DatesOverridable
 
       tag_info[:due_date] = tag_info[:due_date].utc.iso8601
     end
+
+    if context.root_account&.feature_enabled?(:discussion_checkpoints) && discussion_topic && sub_assignments&.any?
+      tag_info[:sub_assignments] = sub_assignments.map do |sub_assignment|
+        sub_assignment_hash = {}
+        sub_assignment_hash[:sub_assignment_tag] = sub_assignment.sub_assignment_tag if sub_assignment.sub_assignment_tag
+        sub_assignment_hash[:points_possible] = sub_assignment.points_possible if sub_assignment.points_possible
+        sub_assignment_hash[:replies_required] = discussion_topic.reply_to_entry_required_count if sub_assignment_hash[:sub_assignment_tag] == CheckpointLabels::REPLY_TO_ENTRY
+
+        override_aware_due_date_hash(user, user_is_admin:, assignment_object: sub_assignment).merge(sub_assignment_hash)
+      end
+    end
+
     tag_info
   end
 

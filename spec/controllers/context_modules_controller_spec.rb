@@ -19,6 +19,8 @@
 #
 
 describe ContextModulesController do
+  include TextHelper
+
   describe "GET 'index'" do
     before :once do
       course_with_teacher(active_all: true)
@@ -1121,6 +1123,255 @@ describe ContextModulesController do
       @module.add_item type: "external_url", url: "http://lolcats", title: "lol"
       get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
       expect(response).to be_successful
+    end
+
+    context "discussion_checkpoints" do
+      before :once do
+        Account.default.enable_feature!(:discussion_checkpoints)
+      end
+
+      it "returns basic info for discussion checkpoints" do
+        course_with_teacher_logged_in(active_all: true)
+        mod = @course.context_modules.create!
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 1.week.from_now }],
+          points_possible: 5
+        )
+
+        c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 2.weeks.from_now }],
+          points_possible: 10,
+          replies_required: 2
+        )
+        mod.add_item(type: "discussion_topic", id: topic.id)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        content_tag_json = json[ContentTag.last.id.to_s]
+        expect(content_tag_json["points_possible"]).to eq 15
+        expect(content_tag_json["due_date"]).to be_nil
+        expect(content_tag_json["sub_assignments"].pluck("sub_assignment_tag")).to match_array([CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY])
+        expect(content_tag_json["sub_assignments"].pluck("due_date")).to match_array([c1.due_at.utc.iso8601, c2.due_at.utc.iso8601])
+        expect(content_tag_json["sub_assignments"].pluck("points_possible")).to match_array([c1.points_possible, c2.points_possible])
+        expect(content_tag_json["sub_assignments"].pluck("replies_required")).to match_array([nil, topic.reply_to_entry_required_count])
+      end
+
+      it "shows has_many_overrides instead of due dates for discussion checkpoints when over ALL_DATES_LIMIT" do
+        stub_const("Api::V1::Assignment::ALL_DATES_LIMIT", 1)
+
+        course_with_teacher_logged_in(active_all: true)
+        main_student = student_in_course(active_all: true)
+        other_student = student_in_course(active_all: true)
+        mod = @course.context_modules.create!
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [
+            {
+              type: "everyone",
+              due_at: 1.week.from_now
+            },
+            {
+              type: "override",
+              set_type: "ADHOC",
+              student_ids: [main_student.id],
+              due_at: 3.days.from_now
+            },
+            {
+              type: "override",
+              set_type: "ADHOC",
+              student_ids: [other_student.id],
+              due_at: 6.days.from_now
+            }
+          ],
+          points_possible: 5
+        )
+
+        c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [
+            {
+              type: "everyone",
+              due_at: 1.week.from_now
+            },
+            {
+              type: "override",
+              set_type: "ADHOC",
+              student_ids: [main_student.id],
+              due_at: 2.days.from_now
+            },
+            {
+              type: "override",
+              set_type: "ADHOC",
+              student_ids: [other_student.id],
+              due_at: 4.days.from_now
+            }
+          ],
+          points_possible: 10,
+          replies_required: 2
+        )
+        mod.add_item(type: "discussion_topic", id: topic.id)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        content_tag_json = json[ContentTag.last.id.to_s]
+        expect(content_tag_json["points_possible"]).to eq 15
+        expect(content_tag_json["due_date"]).to be_nil
+        expect(content_tag_json["sub_assignments"].pluck("sub_assignment_tag")).to match_array([CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY])
+        expect(content_tag_json["sub_assignments"].pluck("due_date")).to match_array([nil, nil])
+        expect(content_tag_json["sub_assignments"].pluck("has_many_overrides")).to match_array([true, true])
+        expect(content_tag_json["sub_assignments"].pluck("points_possible")).to match_array([c1.points_possible, c2.points_possible])
+        expect(content_tag_json["sub_assignments"].pluck("replies_required")).to match_array([nil, topic.reply_to_entry_required_count])
+      end
+
+      it "shows vdd_tooltip discussion checkpoints when under ALL_DATES_LIMIT" do
+        stub_const("Api::V1::Assignment::ALL_DATES_LIMIT", 25)
+
+        course_with_teacher_logged_in(active_all: true)
+        student_in_course(active_all: true)
+        student_in_course(active_all: true)
+
+        s1 = add_section("s1")
+        s2 = add_section("s2")
+
+        mod = @course.context_modules.create!
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [
+            {
+              type: "everyone",
+              due_at: "2012-01-07 12:00:00"
+            },
+            {
+              type: "override",
+              set_type: "CourseSection",
+              set_id: s1.id,
+              due_at: "2012-01-08 12:00:00"
+            },
+            {
+              type: "override",
+              set_type: "CourseSection",
+              set_id: s2.id,
+              due_at: "2012-01-09 12:00:00"
+            }
+          ],
+          points_possible: 5
+        )
+
+        c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [
+            {
+              type: "everyone",
+              due_at: "2012-02-07 12:00:00"
+            },
+            {
+              type: "override",
+              set_type: "CourseSection",
+              set_id: s1.id,
+              due_at: "2012-02-08 12:00:00"
+            },
+            {
+              type: "override",
+              set_type: "CourseSection",
+              set_id: s2.id,
+              due_at: "2012-02-09 12:00:00"
+            }
+          ],
+          points_possible: 10,
+          replies_required: 2
+        )
+        mod.add_item(type: "discussion_topic", id: topic.id)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        content_tag_json = json[ContentTag.last.id.to_s]
+        expect(content_tag_json["points_possible"]).to eq 15
+        expect(content_tag_json["due_date"]).to be_nil
+        expect(content_tag_json["sub_assignments"].pluck("due_date")).to match_array([nil, nil])
+        expect(content_tag_json["sub_assignments"].pluck("has_many_overrides")).to match_array([nil, nil])
+
+        reply_to_topic_tooltip = content_tag_json["sub_assignments"].find { |sub_assignment| sub_assignment["sub_assignment_tag"] == CheckpointLabels::REPLY_TO_TOPIC }["vdd_tooltip"]
+        expect(reply_to_topic_tooltip["selector"]).to eq "subassignment_#{c1.id}"
+        expect(reply_to_topic_tooltip["due_dates"].find { |dd| dd["due_for"] == "Everyone else" }["due_at"]).to eq(datetime_string(c1.due_at))
+        expect(reply_to_topic_tooltip["due_dates"].find { |dd| dd["due_for"] == s1.name }["due_at"]).to eq(datetime_string(c1.assignment_overrides.find_by(set_id: s1.id).due_at))
+        expect(reply_to_topic_tooltip["due_dates"].find { |dd| dd["due_for"] == s2.name }["due_at"]).to eq(datetime_string(c1.assignment_overrides.find_by(set_id: s2.id).due_at))
+
+        reply_to_entry_tooltip = content_tag_json["sub_assignments"].find { |sub_assignment| sub_assignment["sub_assignment_tag"] == CheckpointLabels::REPLY_TO_ENTRY }["vdd_tooltip"]
+        expect(reply_to_entry_tooltip["selector"]).to eq "subassignment_#{c2.id}"
+        expect(reply_to_entry_tooltip["due_dates"].find { |dd| dd["due_for"] == "Everyone else" }["due_at"]).to eq(datetime_string(c2.due_at))
+        expect(reply_to_entry_tooltip["due_dates"].find { |dd| dd["due_for"] == s1.name }["due_at"]).to eq(datetime_string(c2.assignment_overrides.find_by(set_id: s1.id).due_at))
+        expect(reply_to_entry_tooltip["due_dates"].find { |dd| dd["due_for"] == s2.name }["due_at"]).to eq(datetime_string(c2.assignment_overrides.find_by(set_id: s2.id).due_at))
+      end
+
+      it "shows vdd_tooltip for discussion checkpoints with AD-HOC overrides" do
+        course_with_teacher_logged_in(active_all: true)
+        student_in_course(active_all: true)
+
+        mod = @course.context_modules.create!
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [
+            {
+              type: "everyone",
+              due_at: "2012-01-07 12:00:00"
+            },
+            {
+              type: "override",
+              set_type: "ADHOC",
+              student_ids: [@student.id],
+              due_at: "2013-01-07 12:00:00"
+            }
+          ],
+          points_possible: 5
+        )
+
+        c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [
+            {
+              type: "everyone",
+              due_at: "2014-02-07 12:00:00"
+            },
+            {
+              type: "override",
+              set_type: "ADHOC",
+              student_ids: [@student.id],
+              due_at: "2015-01-07 12:00:00"
+            },
+          ],
+          points_possible: 10,
+          replies_required: 2
+        )
+        mod.add_item(type: "discussion_topic", id: topic.id)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        content_tag_json = json[ContentTag.last.id.to_s]
+
+        reply_to_topic_tooltip = content_tag_json["sub_assignments"].find { |sub_assignment| sub_assignment["sub_assignment_tag"] == CheckpointLabels::REPLY_TO_TOPIC }["vdd_tooltip"]
+        expect(reply_to_topic_tooltip["due_dates"].find { |dd| dd["due_for"] == "Everyone else" }["due_at"]).to eq(datetime_string(c1.due_at))
+        expect(reply_to_topic_tooltip["due_dates"].find { |dd| dd["due_for"] == "1 student" }["due_at"]).to eq(datetime_string(c1.assignment_overrides.find_by(set_type: "ADHOC").due_at))
+
+        reply_to_entry_tooltip = content_tag_json["sub_assignments"].find { |sub_assignment| sub_assignment["sub_assignment_tag"] == CheckpointLabels::REPLY_TO_ENTRY }["vdd_tooltip"]
+        expect(reply_to_entry_tooltip["due_dates"].find { |dd| dd["due_for"] == "Everyone else" }["due_at"]).to eq(datetime_string(c2.due_at))
+        expect(reply_to_entry_tooltip["due_dates"].find { |dd| dd["due_for"] == "1 student" }["due_at"]).to eq(datetime_string(c2.assignment_overrides.find_by(set_type: "ADHOC").due_at))
+      end
     end
 
     it "returns mastery connect objectives correctly" do
