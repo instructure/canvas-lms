@@ -250,8 +250,8 @@ lti_rce_postmessage_support:
 lti_registrations_discover_page:
   state: hidden
   applies_to: RootAccount
-  display_name: LTI Extensions Discover Page
-  description: When enabled, the LTI Extensions Discover page will be available in the Extensions view.
+  display_name: LTI Apps Discover Page
+  description: When enabled, the LTI Apps Discover page will be available in the Apps page.
   environments:
     development:
       state: hidden
@@ -259,8 +259,8 @@ lti_registrations_discover_page:
 lti_registrations_page:
   state: hidden
   applies_to: RootAccount
-  display_name: LTI Extensions Page
-  description: When enabled, the LTI Extensions page will be available in the Account navigation.
+  display_name: LTI Apps Page
+  description: When enabled, the LTI Apps page will be available in the Account navigation sidebar..
   environments:
     development:
       state: hidden
