@@ -70,6 +70,8 @@ module Api::V1::WikiPage
   end
 
   def wiki_pages_json(wiki_pages, current_user, session, include_body = false, opts = {})
+    ActiveRecord::Associations.preload(wiki_pages, :assignment)
+    DatesOverridable.preload_override_data_for_objects(wiki_pages.filter_map(&:assignment))
     wiki_pages.map { |page| wiki_page_json(page, current_user, session, include_body, opts) }
   end
 

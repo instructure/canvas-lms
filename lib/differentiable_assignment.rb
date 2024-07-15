@@ -19,7 +19,7 @@
 
 module DifferentiableAssignment
   def differentiated_assignments_applies?
-    differentiable.only_visible_to_overrides
+    !differentiable.visible_to_everyone
   end
 
   def visible_to_user?(user)

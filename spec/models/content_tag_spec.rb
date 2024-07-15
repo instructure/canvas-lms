@@ -736,12 +736,34 @@ describe ContentTag do
       end
     end
 
-    context "other" do
-      it "properly returns wiki pages" do
+    context "wiki pages" do
+      before do
         @page = @course.wiki_pages.create!(title: "some page")
         @module = @course.context_modules.create!(name: "module")
         @tag = @module.add_item({ type: "WikiPage", title: "oh noes!" * 35, id: @page.id })
+      end
+
+      it "includes pages without assignment that are assigned" do
         expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@tag)
+      end
+
+      it "includes pages with assignment that are assigned" do
+        @assignment = @course.assignments.create!(title: "some assignment")
+        @page.assignment = @assignment
+        @page.save!
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@tag)
+      end
+
+      it "does not include pages without assignment that are not assigned" do
+        @page.update!(only_visible_to_overrides: true)
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).not_to include(@tag)
+      end
+
+      it "does not include pages with assignment that are not assigned" do
+        @assignment = @course.assignments.create!(title: "some assignment", only_visible_to_overrides: true)
+        @page.assignment = @assignment
+        @page.save!
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).not_to include(@tag)
       end
     end
   end

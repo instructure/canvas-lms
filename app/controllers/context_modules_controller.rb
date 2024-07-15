@@ -813,6 +813,8 @@ class ContextModulesController < ApplicationController
     content_with_assignments = assignment_tags
                                .select { |ct| ct.content_type != "Assignment" && ct.content.assignment_id }.map(&:content)
     ActiveRecord::Associations.preload(content_with_assignments, :assignment) if content_with_assignments.any?
+    DatesOverridable.preload_override_data_for_objects(content_with_assignments.map(&:assignment))
+    DatesOverridable.preload_override_data_for_objects(tags.select { |ct| %w[Assignment Quizzes::Quiz WikiPage DiscussionTopic].include?(ct.content_type) }.map(&:content))
 
     if user_is_admin && should_preload_override_data?
       assignments = assignment_tags.filter_map(&:assignment)

@@ -791,17 +791,21 @@ class AssignmentsApiController < ApplicationController
   #   Return only New Quizzes assignments
   # @returns [Assignment]
   def index
-    error_or_array = get_assignments(@current_user)
-    render json: error_or_array unless performed?
+    GuardRail.activate(:secondary) do
+      error_or_array = get_assignments(@current_user)
+      render json: error_or_array unless performed?
+    end
   end
 
   # @API List assignments for user
   # Returns the paginated list of assignments for the specified user if the current user has rights to view.
   # See {api:AssignmentsApiController#index List assignments} for valid arguments.
   def user_index
-    @user.shard.activate do
-      error_or_array = get_assignments(@user)
-      render json: error_or_array unless performed?
+    GuardRail.activate(:secondary) do
+      @user.shard.activate do
+        error_or_array = get_assignments(@user)
+        render json: error_or_array unless performed?
+      end
     end
   end
 
@@ -1082,6 +1086,8 @@ class AssignmentsApiController < ApplicationController
       end
 
       mc_status = setup_master_course_restrictions(assignments, context)
+
+      DatesOverridable.preload_override_data_for_objects(assignments)
 
       assignments.map do |assignment|
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities

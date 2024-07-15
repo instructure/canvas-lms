@@ -1215,6 +1215,7 @@ class UsersController < ApplicationController
       planner_overrides = includes.include?("planner_overrides")
       include_course = includes.include?("course")
       ActiveRecord::Associations.preload(assignments, :context) if include_course
+      DatesOverridable.preload_override_data_for_objects(assignments)
 
       json = assignments.map do |as|
         assmt_json = assignment_json(as, user, session, include_planner_override: planner_overrides)

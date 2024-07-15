@@ -169,6 +169,7 @@ class Quizzes::QuizAssignmentOverridesController < ApplicationController
     scope = DifferentiableAssignment.scope_filter(scope, @current_user, @course)
 
     quizzes = Api.paginate(scope, self, api_route)
+    DatesOverridable.preload_override_data_for_objects(quizzes)
 
     render({
              json: {
