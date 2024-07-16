@@ -60,6 +60,8 @@ QUnit.module('GradebookGrid TotalGradeColumnHeader', suiteHooks => {
 
       showMessageStudentsWithObserversDialog: true,
 
+      getAllStudents: () => {},
+
       sortBySetting: {
         direction: 'ascending',
         disabled: false,

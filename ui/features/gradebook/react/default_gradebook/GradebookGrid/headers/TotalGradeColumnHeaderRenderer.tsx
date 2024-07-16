@@ -121,9 +121,8 @@ function getProps(_column, gradebook: Gradebook, gridSupport: GridSupport, optio
     viewUngradedAsZero: gradebook.viewUngradedAsZero(),
     isRunningScoreToUngraded: gradebook.isRunningScoreToUngraded,
     weightedGroups: gradebook.weightedGroups(),
-    allStudents: Object.keys(gradebook.students).map(key =>
-      processStudent(gradebook.students[key])
-    ),
+    getAllStudents: () =>
+      Object.keys(gradebook.students).map(key => processStudent(gradebook.students[key])),
     courseId: gradebook.options.context_id,
     messageAttachmentUploadFolderId: gradebook.options.message_attachment_upload_folder_id,
     userId: gradebook.options.currentUserId,

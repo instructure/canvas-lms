@@ -338,8 +338,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
       const criteriaLabels = getAllByRole('option').map(option => option.textContent)
-      expect(criteriaLabels).toContain('Have submitted')
       expect(criteriaLabels).toContain('Have not yet submitted')
+      expect(criteriaLabels).toContain('Have submitted')
       expect(criteriaLabels).toContain('Have not been graded')
       expect(criteriaLabels).toContain('Scored more than')
       expect(criteriaLabels).toContain('Scored less than')
@@ -357,8 +357,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
       const criteriaLabels = getAllByRole('option').map(option => option.textContent)
-      expect(criteriaLabels).toContain('Have submitted')
       expect(criteriaLabels).toContain('Have not yet submitted')
+      expect(criteriaLabels).toContain('Have submitted')
       expect(criteriaLabels).toContain('Have not been graded')
       expect(criteriaLabels).toContain('Marked incomplete')
       expect(criteriaLabels).not.toContain('Scored more than')
@@ -537,20 +537,20 @@ describe.skip('MessageStudentsWhoDialog', () => {
       students[1].grade = '10'
       const mocks = await makeMocks()
 
-      const {findByRole, getByLabelText, getByText} = render(
+      const {findByRole, getByLabelText, getByText, findByTestId} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
         </MockedProvider>
       )
-      expect(await findByRole('checkbox', {name: /Students/})).toHaveAccessibleName('4 Students')
-      expect(await findByRole('checkbox', {name: /Observers/})).toHaveAccessibleName('2 Observers')
+      expect(await findByTestId('total-student-checkbox')).toHaveAccessibleName('0 Students')
+      expect(await findByTestId('total-observer-checkbox')).toHaveAccessibleName('0 Observers')
 
       const button = getByLabelText(/For students who/)
       fireEvent.click(button)
       fireEvent.click(getByText(/Have not been graded/))
 
-      expect(await findByRole('checkbox', {name: /Students/})).toHaveAccessibleName('2 Students')
-      expect(await findByRole('checkbox', {name: /Observers/})).toHaveAccessibleName('0 Observers')
+      expect(await findByTestId('total-student-checkbox')).toHaveAccessibleName('2 Students')
+      expect(await findByTestId('total-observer-checkbox')).toHaveAccessibleName('0 Observers')
     })
 
     describe('"Have submitted"', () => {
@@ -891,16 +891,17 @@ describe.skip('MessageStudentsWhoDialog', () => {
       students[1].score = 5.2
       students[2].score = 4
       students[3].score = 0
-      const {getAllByRole, getByRole, getByLabelText, getByText, findByLabelText} = render(
-        <MockedProvider mocks={mocks} cache={createCache()}>
-          <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
-      )
+      const {getAllByRole, getByRole, getByLabelText, getByText, findByLabelText, getByTestId} =
+        render(
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <MessageStudentsWhoDialog {...makeProps()} />
+          </MockedProvider>
+        )
 
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
       fireEvent.click(getByText(/Scored more than/))
-      fireEvent.change(getByLabelText('Enter score cutoff'), {target: {value: '5.1'}})
+      fireEvent.change(getByTestId('cutoff-input'), {target: {value: '5.1'}})
 
       fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
       expect(getByRole('table')).toBeInTheDocument()
@@ -923,16 +924,17 @@ describe.skip('MessageStudentsWhoDialog', () => {
       students[1].score = 6
       students[2].score = 5.2
       students[3].score = 0
-      const {getAllByRole, getByRole, findByLabelText, getByLabelText, getByText} = render(
-        <MockedProvider mocks={mocks} cache={createCache()}>
-          <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
-      )
+      const {getAllByRole, getByRole, findByLabelText, getByLabelText, getByText, getByTestId} =
+        render(
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <MessageStudentsWhoDialog {...makeProps()} />
+          </MockedProvider>
+        )
 
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
       fireEvent.click(getByText(/Scored less than/))
-      fireEvent.change(getByLabelText('Enter score cutoff'), {target: {value: '5.1'}})
+      fireEvent.change(getByTestId('cutoff-input'), {target: {value: '5.1'}})
 
       fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
       expect(getByRole('table')).toBeInTheDocument()
@@ -961,8 +963,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
 
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
-      fireEvent.click(getByText(/Total Grade higher than/))
-      fireEvent.change(getByLabelText('Enter score cutoff'), {target: {value: '70'}})
+      fireEvent.click(getByText(/Have total grade higher than/))
+      fireEvent.change(getByTestId('cutoff-input'), {target: {value: '70'}})
 
       fireEvent.click(getByTestId('show_all_recipients'))
       expect(getByRole('table')).toBeInTheDocument()
@@ -992,8 +994,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
 
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
-      fireEvent.click(getByText(/Total Grade lower than/))
-      fireEvent.change(getByLabelText('Enter score cutoff'), {target: {value: '70'}})
+      fireEvent.click(getByText(/Have total grade lower than/))
+      fireEvent.change(getByTestId('cutoff-input'), {target: {value: '70'}})
 
       fireEvent.click(getByTestId('show_all_recipients'))
       expect(getByRole('table')).toBeInTheDocument()

@@ -112,7 +112,7 @@ type Props = {
   viewUngradedAsZero: any
   weightedGroups: any
   onMenuDismiss: any
-  allStudents: PartialStudent[]
+  getAllStudents: () => PartialStudent[]
   courseId: string
   messageAttachmentUploadFolderId: string
   userId: string
@@ -185,7 +185,7 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader<Props, Sta
   render() {
     const {assignmentGroup, sortBySetting, viewUngradedAsZero, weightedGroups} = this.props
     const selectedSortSetting = sortBySetting.isSortColumn && sortBySetting.settingKey
-    const allStudents = this.props.allStudents
+    const allStudents = this.props.getAllStudents()
     const courseId = this.props.courseId
     const classes = `Gradebook__ColumnHeaderAction ${this.state.menuShown ? 'menuShown' : ''}`
 
