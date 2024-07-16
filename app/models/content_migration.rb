@@ -628,6 +628,9 @@ class ContentMigration < ActiveRecord::Base
         MasterCourses::FolderHelper.update_folder_names_and_states(context, source_export)
         context.copy_attachments_from_course(source_export.context, content_export: source_export, content_migration: self)
         MasterCourses::FolderHelper.recalculate_locked_folders(context)
+      elsif for_course_template?
+        data = JSON.parse(exported_attachment.open, max_nesting: 50)
+        data = prepare_data(data)
       else
         @exported_data_zip = download_exported_data
         @zip_file = Zip::File.open(@exported_data_zip.path)
@@ -746,6 +749,10 @@ class ContentMigration < ActiveRecord::Base
 
   def for_course_copy?
     migration_type == "course_copy_importer" || for_master_course_import?
+  end
+
+  def for_course_template?
+    initiated_source == :course_template
   end
 
   def for_common_cartridge?
