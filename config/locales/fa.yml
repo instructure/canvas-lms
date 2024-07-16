@@ -21741,7 +21741,9 @@ fa:
       ways_to_contact_user: مخاطب
     recent_activity: 
       date_column: تاریخ
+      edit_group: "ویرایش گروه"
       message_column: پیام
+      new_announcement: اطلاعیه
       recent_activity: "فعالیت اخیر"
       recent_activity_in_course: "فعالیت اخیر در %{course_or_group}"
       unread_column: "خوانده نشده"
