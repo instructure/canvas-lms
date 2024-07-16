@@ -232,7 +232,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
     QUnit.module('when the assignment is only visible to overrides', contextHooks => {
       contextHooks.beforeEach(() => {
         const assignment = getAssignment('2301')
-        assignment.only_visible_to_overrides = true
+        assignment.visible_to_everyone = false
         assignment.assignment_visibility = []
       })
 
@@ -251,7 +251,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
 
     test('does not update assignment visibility when not only visible to overrides', () => {
       const assignment = getAssignment('2301')
-      assignment.only_visible_to_overrides = false
+      assignment.visible_to_everyone = true
       assignment.assignment_visibility = []
       gradebook.gotSubmissionsChunk(studentSubmissions)
       deepEqual(getAssignment('2301').assignment_visibility, [])
@@ -555,12 +555,12 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
         {
           assignment_visibility: null,
           id: '2301',
-          only_visible_to_overrides: false,
+          visible_to_everyone: true,
         },
         {
           assignment_visibility: null,
           id: '2302',
-          only_visible_to_overrides: false,
+          visible_to_everyone: true,
         },
       ]
 
