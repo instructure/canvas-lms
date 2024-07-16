@@ -884,6 +884,48 @@ he:
   number:
     format:
       round_mode: default
+hi:
+  bigeasy_locale: hi_IN
+  date:
+    abbr_month_names:
+    -
+    - जन
+    - फ़र
+    - मार्च
+    - अप्रैल
+    - मई
+    - जून
+    - जुलाई
+    - अग
+    - सित
+    - अक्तू
+    - नव
+    - दिस
+    formats:
+      date_at_time: "%b %-d %l:%M%P बजे"
+      default: "%Y-%m-%d"
+      full: "%b %-d, %Y %-l:%M%P"
+      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
+      long: "%B %-d, %Y"
+      long_with_weekday: "%A, %B %-d"
+      medium: "%b %-d, %Y"
+      medium_month: "%b %Y"
+      medium_with_weekday: "%a %b %-d, %Y"
+      short: "%b %-d"
+      short_month: "%b"
+      short_weekday: "%a"
+      short_with_weekday: "%a, %b %-d"
+      weekday: "%A"
+  locales:
+    hi: हिन्दी (Hindi)
+  time:
+    event: "%{date} को %{time} बजे"
+    formats:
+      tiny: "%l:%M%P"
+      tiny_on_the_hour: "%l%P"
+  number:
+    format:
+      round_mode: default
 ht:
   bigeasy_locale: ht_HT
   date:
