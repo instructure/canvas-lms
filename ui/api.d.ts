@@ -595,7 +595,7 @@ export type Account = Readonly<{
   name: string
 }>
 
-// '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments&sort=nickname',
+// '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname',
 export type Course = Readonly<{
   id: string
   name: string
@@ -606,6 +606,12 @@ export type Course = Readonly<{
   }
   homeroom_course: boolean
   sis_course_id: string | null
+  sections: [
+    {
+      id: string
+      name: string
+    }
+  ]
 }>
 
 // '/api/v1/users/self/tabs',
