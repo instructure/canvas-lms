@@ -94,6 +94,18 @@ const DifferentiatedModulesSection = ({
     [postToSIS]
   )
 
+  const stagedCardsRef = useRef(stagedCards)
+
+  useEffect(() => {
+    stagedCardsRef.current = stagedCards
+  }, [stagedCards])
+
+  const stagedOverridesRef = useRef(stagedOverrides)
+
+  useEffect(() => {
+    stagedOverridesRef.current = stagedOverrides
+  }, [stagedOverrides])
+
   const shouldRenderImportantDates = useMemo(
     () => type === 'assignment' || type === 'discussion' || type === 'quiz',
     [type]
@@ -253,7 +265,7 @@ const DifferentiatedModulesSection = ({
     // revert changes in the overrides of the page
     resetOverrides(overrides, preSavedOverrides)
     // revert changes in the tray cards
-    const preSaved = stagedOverrides.filter(o =>
+    const preSaved = stagedOverridesRef.current.filter(o =>
       preSavedOverrides.find(override => o.stagedOverrideId === override.stagedOverrideId)
     )
     const defaultState = getParsedOverrides(preSaved, checkPoint)
@@ -266,7 +278,7 @@ const DifferentiatedModulesSection = ({
         card.group_id
     )
     setStagedOverrides(checkPointOverrides)
-    const newStagedCards = resetStagedCards(stagedCards, checkPoint, defaultState)
+    const newStagedCards = resetStagedCards(stagedCardsRef.current, checkPoint, defaultState)
     setStagedCards(newStagedCards)
     linkRef.current.focus()
   }
@@ -275,8 +287,8 @@ const DifferentiatedModulesSection = ({
     const newCard = CardActions.handleAssigneeAdd({}, [], cardId, {})[0]
     delete newCard.student_ids
     newCard.draft = true
-    newCard.index = stagedOverrides.length + 1
-    const oldOverrides = getAllOverridesFromCards(stagedCards).filter(
+    newCard.index = cards[cards.length -1].index + 1
+    const oldOverrides = getAllOverridesFromCards(stagedCardsRef.current).filter(
       card =>
         card.course_section_id ||
         card.student_ids ||
@@ -289,26 +301,26 @@ const DifferentiatedModulesSection = ({
   }
 
   const handleCardRemove = cardId => {
-    const newStagedCards = {...stagedCards}
+    const newStagedCards = {...stagedCardsRef.current}
     delete newStagedCards[cardId]
     setStagedCards(newStagedCards)
 
-    const newStagedOverrides = stagedOverrides.filter(override => override.rowKey !== cardId)
+    const newStagedOverrides = stagedOverridesRef.current.filter(override => override.rowKey !== cardId)
     setStagedOverrides(newStagedOverrides)
   }
 
   const updateCard = (cardId, newOverrides, cardDates) => {
     const tmp = {}
     const dates = cardDates || datesFromOverride(newOverrides[0])
-    const currentIndex = stagedCards[cardId]?.index
+    const currentIndex = stagedCardsRef.current[cardId]?.index
     tmp[cardId] = {overrides: newOverrides, dates, index: currentIndex}
 
-    const newCards = _.extend({...stagedCards}, tmp)
+    const newCards = _.extend({...stagedCardsRef.current}, tmp)
     setStagedCards(newCards)
   }
 
   const addOverride = () => {
-    const cardsCount = stagedOverrides.length + 1
+    const cardsCount = cards[cards.length -1].index + 1
     generateCard(cardsCount)
   }
 
@@ -326,7 +338,7 @@ const DifferentiatedModulesSection = ({
   }
 
   const handleDatesUpdate = (cardId, dateType, newDate) => {
-    const card = {...stagedCards[cardId]}
+    const card = {...stagedCardsRef.current[cardId]}
     const oldOverrides = card.overrides || []
     const oldDates = card.dates
     const date = newDate === '' ? null : newDate
@@ -345,7 +357,7 @@ const DifferentiatedModulesSection = ({
 
     updateCard(cardId, newOverrides, newDates)
 
-    const updatedOverrides = [...stagedOverrides]
+    const updatedOverrides = [...stagedOverridesRef.current]
     updatedOverrides.forEach(override => {
       if (String(override.rowKey) === String(cardId)) {
         override[dateType] = newDate
@@ -355,7 +367,7 @@ const DifferentiatedModulesSection = ({
   }
 
   const handleAssigneeAddition = (cardId, newAssignee) => {
-    const targetedItemCard = stagedCards[cardId]
+    const targetedItemCard = stagedCardsRef.current[cardId]
     // returns all new overrides
     const newOverridesForCard = CardActions.handleAssigneeAdd(
       newAssignee,
@@ -373,7 +385,7 @@ const DifferentiatedModulesSection = ({
       : uid()
 
     // Create a copy of the stagedOverrides array
-    const updatedOverrides = [...stagedOverrides]
+    const updatedOverrides = [...stagedOverridesRef.current]
 
     // Check if stagedOverrides contains an object with the same stagedOverrideId
     const existingOverrideIndex = updatedOverrides.findIndex(
@@ -392,9 +404,9 @@ const DifferentiatedModulesSection = ({
   }
 
   const handleAssigneeDeletion = (cardId, tokenToRemove) => {
-    const targetedItemCard = stagedCards[cardId]
+    const targetedItemCard = stagedCardsRef.current[cardId]
     // These are unique overrides that are not associated with the card currently being edited
-    const nonTargetedOverrides = getAllOverridesFromCards(stagedCards).filter(
+    const nonTargetedOverrides = getAllOverridesFromCards(stagedCardsRef.current).filter(
       override => override.rowKey !== cardId
     )
 
