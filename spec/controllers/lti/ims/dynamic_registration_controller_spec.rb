@@ -107,7 +107,8 @@ describe Lti::IMS::DynamicRegistrationController do
           initiated_at: 1.minute.ago,
           root_account_global_id: Account.default.global_id,
           uuid: SecureRandom.uuid,
-          unified_tool_id: "asdf"
+          unified_tool_id: "asdf",
+          registration_url: "https://example.com/registration",
         }
       end
       let(:valid_token) do
@@ -158,6 +159,7 @@ describe Lti::IMS::DynamicRegistrationController do
           expect(parsed_body["https://purl.imsglobal.org/spec/lti-tool-configuration"]["https://canvas.instructure.com/lti/registration_config_url"]).to eq "http://test.host/api/lti/registrations/#{created_registration.global_id}/view"
           expect(created_registration.canvas_configuration["custom_fields"]).to eq({ "global_foo" => "global_bar" })
           expect(created_registration.unified_tool_id).to eq("asdf")
+          expect(created_registration.registration_url).to eq("https://example.com/registration")
         end
 
         it "fills in values on the developer key" do

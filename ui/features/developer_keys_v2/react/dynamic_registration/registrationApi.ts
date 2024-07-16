@@ -26,9 +26,9 @@ export type RegistrationToken = {
   uuid: string
 }
 
-export const getRegistrationToken = (accountId: string) =>
+export const getRegistrationToken = (accountId: string, registrationUrl: string) =>
   axios
-    .get(`/api/lti/accounts/${accountId}/registration_token`)
+    .get(`/api/lti/accounts/${accountId}/registration_token?registration_url=${registrationUrl}`)
     .then(resp => resp.data as unknown as RegistrationToken)
 
 export const getRegistrationByUUID = (accountId: string, registrationUuid: string) =>
