@@ -36,6 +36,8 @@ const locale = {
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "URL 相同的相鄰連結應為單一連結。"
   },
+  "ai_response_9624e8e8": { "message": "人工智慧反應" },
+  "ai_tools_fda01177": { "message": "人工智慧工具" },
   "aleph_f4ffd155": { "message": "Aleph" },
   "align_11050992": { "message": "對齊" },
   "alignment_and_lists_5cebcb69": { "message": "對齊及清單" },
@@ -53,6 +55,9 @@ const locale = {
   },
   "an_error_occurred_making_a_network_request_d1bda348": {
     "message": "發出連線請求時發生錯誤"
+  },
+  "an_error_occurred_processing_your_request_a3a38d84": {
+    "message": "處理您的申請時發生錯誤"
   },
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "上載媒體時發生錯誤。"
@@ -167,6 +172,7 @@ const locale = {
   "column_e1ae5c64": { "message": "欄" },
   "column_group_1c062368": { "message": "欄組" },
   "complex_numbers_a543d004": { "message": "複數" },
+  "compose_44c904f4": { "message": "撰寫" },
   "computer_1d7dfa6f": { "message": "電腦" },
   "congruent_5a244acd": { "message": "全等" },
   "contains_311f37b7": { "message": "含有" },
@@ -180,6 +186,7 @@ const locale = {
   "content_subtype_5ce35e88": { "message": "內容子類型" },
   "content_type_2cf90d95": { "message": "內容類型" },
   "coproduct_e7838082": { "message": "副產品" },
+  "copy_9748f9f": { "message": "複製" },
   "copyright_holder_66ee111": { "message": "版權持有人：" },
   "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
     "message": "無法插入內容：Canvas 中目前不支援「{ itemType }」項目。"
@@ -244,6 +251,7 @@ const locale = {
   "discussions_a5f96392": { "message": "討論區" },
   "discussions_index_6c36ced": { "message": "討論索引" },
   "disjoint_union_e74351a8": { "message": "互斥聯集" },
+  "dislike_14befc48": { "message": "取消按讚" },
   "display_options_315aba85": { "message": "顯示選項" },
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "顯示文字連結（在新標籤中開啟）"
@@ -303,6 +311,7 @@ const locale = {
   },
   "enter_replacement_text_17631bbc": { "message": "輸入取代文字" },
   "enter_search_text_26cb4459": { "message": "輸入搜尋文字" },
+  "enter_text_8b35c65b": { "message": "輸入文字" },
   "epsilon_54bb8afa": { "message": "ɛ" },
   "epsilon_variant_d31f1e77": { "message": "ɛ（變量）" },
   "equals_sign_c51bdc58": { "message": "等號" },
@@ -324,6 +333,7 @@ const locale = {
   "extracurricular_icon_67c8ca42": { "message": "課外活動圖示" },
   "f_function_fe422d65": { "message": "F（函數）" },
   "failed_getting_file_contents_e9ea19f4": { "message": "無法取得檔案內容" },
+  "failed_to_copy_response_d3def551": { "message": "無法複製反應" },
   "failed_to_retrieve_content_from_external_tool_5899c213": {
     "message": "無法從外部工具擷取內容"
   },
@@ -395,6 +405,12 @@ const locale = {
   "health_icon_8d292eb5": { "message": "健康圖示" },
   "hearts_suit_e50e04ca": { "message": "紅心（花色）" },
   "height_69b03e15": { "message": "高度" },
+  "hello_please_describe_the_modifications_you_would__49b19837": {
+    "message": "您好，請描述您想要對您的作文所做的修改。"
+  },
+  "hello_please_describe_the_modifications_you_would__600dbbf0": {
+    "message": "您好，請描述您想要對您的選擇進行的修改。"
+  },
   "hexagon_d8468e0d": { "message": "六邊形" },
   "hide_description_bfb5502e": { "message": "隱藏描述" },
   "hide_title_description_caf092ef": { "message": "隱藏 { title } 描述" },
@@ -408,6 +424,9 @@ const locale = {
     "message": "我已經獲得了該文檔的使用權限。"
   },
   "i_hold_the_copyright_71ee91b1": { "message": "我持有該版權" },
+  "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+    "message": "抱歉，我找不到人工智慧的答案"
+  },
   "icon_215a1dc6": { "message": "圖示" },
   "icon_8168b2f8": { "message": "圖示" },
   "icon_color_b86dd6d6": { "message": "圖示色彩" },
@@ -575,6 +594,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "+/-" },
   "misc_3b692ea7": { "message": "雜項" },
   "miscellaneous_e9818229": { "message": "雜項" },
+  "modify_6b0b13e3": { "message": "修改" },
   "module_90d9fd32": { "message": "單元" },
   "modules_c4325335": { "message": "單元" },
   "moving_image_to_crop_directionword_6f66cde2": {
@@ -701,6 +721,9 @@ const locale = {
   "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
     "message": "請允許 Canvas 存取您的麥克風和網路攝影機。"
   },
+  "please_decribe_what_you_would_like_to_compose_27a51be5": {
+    "message": "請描述您想創作什麼。"
+  },
   "plus_d43cd4ec": { "message": "+" },
   "plus_minus_f8be2e83": { "message": "+/-" },
   "posted_when_a578f5ab": { "message": "已公佈：{ when }" },
@@ -763,8 +786,10 @@ const locale = {
   },
   "reset_95a81614": { "message": "重設" },
   "resize_ec83d538": { "message": "調校大小" },
+  "response_copied_to_clipboard_130d66cd": { "message": "回應已複製到剪貼簿" },
   "restore_auto_save_deccd84b": { "message": "還原自動儲存？" },
   "result_index_of_max_7db5ad8b": { "message": "{ max } 的結果 { index }。" },
+  "retry_ebd5f8ba": { "message": "重試" },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "反向 T 形符號（不產生）"
   },
@@ -835,6 +860,7 @@ const locale = {
     "message": "按 Shift-O 開啟美觀 HTML 編輯器。"
   },
   "shortcut_911d6255": { "message": "快速鍵" },
+  "show_all_967a90f0": { "message": "全部顯示" },
   "show_audio_options_b489926b": { "message": "顯示音訊選項" },
   "show_image_options_1e2ecc6b": { "message": "顯示影像選項" },
   "show_link_options_545338fd": { "message": "顯示連結選項" },
@@ -1107,6 +1133,7 @@ const locale = {
   "view_word_and_character_counts_a743dd0c": {
     "message": "檢視文字和字元計數"
   },
+  "waiting_for_response_1efd0c50": { "message": "等待回應" },
   "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
     "message": "我們偵測不到與您的裝置連線的工作中麥克風。"
   },
@@ -1121,6 +1148,7 @@ const locale = {
   "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
     "message": "網頁應該僅有一個 H1，由頁面的標題自動使用。您的內容中的第一個標題應該是 H2。"
   },
+  "what_would_you_like_to_do_6dc0d541": { "message": "您想做什麼？" },
   "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
     "message": "如果使用標記使項目看起來像清單，但並未標示其清單關係，使用者瀏覽資訊時或會有困難。"
   },
@@ -1135,6 +1163,7 @@ const locale = {
   "word_count_c77fe3a6": { "message": "字數計算" },
   "words_b448b7d5": { "message": "文字" },
   "wreath_product_200b38ef": { "message": "花環產品" },
+  "writing_assistant_a30ac16a": { "message": "寫作助理" },
   "xi_149681d0": { "message": "ξ" },
   "yes_dde87d5": { "message": "是" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {

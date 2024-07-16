@@ -36,6 +36,8 @@ const locale = {
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "具有相同 URL 的相邻链接应该为一个单链接。"
   },
+  "ai_response_9624e8e8": { "message": "AI 响应" },
+  "ai_tools_fda01177": { "message": "AI 工具" },
   "aleph_f4ffd155": { "message": "Aleph" },
   "align_11050992": { "message": "协调" },
   "alignment_and_lists_5cebcb69": { "message": "对齐和列表" },
@@ -53,6 +55,9 @@ const locale = {
   },
   "an_error_occurred_making_a_network_request_d1bda348": {
     "message": "发出网络请求时出错"
+  },
+  "an_error_occurred_processing_your_request_a3a38d84": {
+    "message": "处理您的请求时出错"
   },
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "上传媒体时出错。"
@@ -165,6 +170,7 @@ const locale = {
   "column_e1ae5c64": { "message": "列" },
   "column_group_1c062368": { "message": "列组" },
   "complex_numbers_a543d004": { "message": "复数" },
+  "compose_44c904f4": { "message": "撰写" },
   "computer_1d7dfa6f": { "message": "计算机" },
   "congruent_5a244acd": { "message": "全等" },
   "contains_311f37b7": { "message": "包含" },
@@ -178,6 +184,7 @@ const locale = {
   "content_subtype_5ce35e88": { "message": "内容子类型" },
   "content_type_2cf90d95": { "message": "内容类型" },
   "coproduct_e7838082": { "message": "余积" },
+  "copy_9748f9f": { "message": "复制" },
   "copyright_holder_66ee111": { "message": "版权持有者：" },
   "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
     "message": "无法插入内容：Canvas 目前不支持“{ itemType }”项目。"
@@ -246,6 +253,7 @@ const locale = {
   "discussions_a5f96392": { "message": "讨论" },
   "discussions_index_6c36ced": { "message": "讨论索引" },
   "disjoint_union_e74351a8": { "message": "不交并" },
+  "dislike_14befc48": { "message": "不喜欢" },
   "display_options_315aba85": { "message": "显示选项" },
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "显示文本链接（在新标签页中打开）"
@@ -305,6 +313,7 @@ const locale = {
   },
   "enter_replacement_text_17631bbc": { "message": "输入替换文本" },
   "enter_search_text_26cb4459": { "message": "输入搜索文本" },
+  "enter_text_8b35c65b": { "message": "输入文本" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon（变体）" },
   "equals_sign_c51bdc58": { "message": "等号" },
@@ -326,6 +335,7 @@ const locale = {
   "extracurricular_icon_67c8ca42": { "message": "课外图标" },
   "f_function_fe422d65": { "message": "F（函数）" },
   "failed_getting_file_contents_e9ea19f4": { "message": "文件内容获取失败" },
+  "failed_to_copy_response_d3def551": { "message": "无法复制响应" },
   "failed_to_retrieve_content_from_external_tool_5899c213": {
     "message": "无法从外部工具检索内容"
   },
@@ -397,6 +407,12 @@ const locale = {
   "health_icon_8d292eb5": { "message": "健康图标" },
   "hearts_suit_e50e04ca": { "message": "红桃（花色）" },
   "height_69b03e15": { "message": "高度" },
+  "hello_please_describe_the_modifications_you_would__49b19837": {
+    "message": "您好。请描述您要对您撰写的内容进行的修改。"
+  },
+  "hello_please_describe_the_modifications_you_would__600dbbf0": {
+    "message": "您好。请描述您要对您的选择进行的修改。"
+  },
   "hexagon_d8468e0d": { "message": "六边形" },
   "hide_description_bfb5502e": { "message": "隐藏说明" },
   "hide_title_description_caf092ef": { "message": "隐藏{ title }说明" },
@@ -410,6 +426,9 @@ const locale = {
     "message": "我已获得使用此文件的权限。"
   },
   "i_hold_the_copyright_71ee91b1": { "message": "我持有版权" },
+  "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+    "message": "抱歉，找不到 AI 回答"
+  },
   "icon_215a1dc6": { "message": "图标" },
   "icon_8168b2f8": { "message": "图标" },
   "icon_color_b86dd6d6": { "message": "图标颜色" },
@@ -567,6 +586,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "减号/加号" },
   "misc_3b692ea7": { "message": "其他" },
   "miscellaneous_e9818229": { "message": "其他" },
+  "modify_6b0b13e3": { "message": "修改" },
   "module_90d9fd32": { "message": "单元" },
   "modules_c4325335": { "message": "单元" },
   "moving_image_to_crop_directionword_6f66cde2": {
@@ -693,6 +713,9 @@ const locale = {
   "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
     "message": "请允许 Canvas 访问您的麦克风和网络摄像头。"
   },
+  "please_decribe_what_you_would_like_to_compose_27a51be5": {
+    "message": "请描述您要撰写的内容。"
+  },
   "plus_d43cd4ec": { "message": "加号" },
   "plus_minus_f8be2e83": { "message": "加号/减号" },
   "posted_when_a578f5ab": { "message": "发布日期：{ when }" },
@@ -753,8 +776,10 @@ const locale = {
   },
   "reset_95a81614": { "message": "重置" },
   "resize_ec83d538": { "message": "调整大小" },
+  "response_copied_to_clipboard_130d66cd": { "message": "响应已复制到剪贴板" },
   "restore_auto_save_deccd84b": { "message": "是否恢复自动保存？" },
   "result_index_of_max_7db5ad8b": { "message": "结果 { index }/{ max }。" },
+  "retry_ebd5f8ba": { "message": "重试" },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "反十字转门（不产生）"
   },
@@ -825,6 +850,7 @@ const locale = {
     "message": "按 Shift-O 打开精美 HTML 编辑器。"
   },
   "shortcut_911d6255": { "message": "快捷方式" },
+  "show_all_967a90f0": { "message": "显示全部" },
   "show_audio_options_b489926b": { "message": "显示音频选项" },
   "show_image_options_1e2ecc6b": { "message": "显示图像选项" },
   "show_link_options_545338fd": { "message": "显示链接选项" },
@@ -1093,6 +1119,7 @@ const locale = {
   "view_keyboard_shortcuts_34d1be0b": { "message": "查看键盘快捷键" },
   "view_title_description_67940918": { "message": "查看{ title }说明" },
   "view_word_and_character_counts_a743dd0c": { "message": "查看字数和字符数" },
+  "waiting_for_response_1efd0c50": { "message": "正在等待响应" },
   "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
     "message": "我们未发现正常工作的麦克风连接到设备。"
   },
@@ -1107,6 +1134,7 @@ const locale = {
   "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
     "message": "网页应仅具有一个H1，自动供页面标题使用。内容中的第一个标题应该是H2。"
   },
+  "what_would_you_like_to_do_6dc0d541": { "message": "您想做什么？" },
   "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
     "message": "如果对使用列表格式显示的项目使用标记，但不指示列表关系，用户可能在浏览信息时会遇到困难。"
   },
@@ -1121,6 +1149,7 @@ const locale = {
   "word_count_c77fe3a6": { "message": "字数统计" },
   "words_b448b7d5": { "message": "字" },
   "wreath_product_200b38ef": { "message": "圈积" },
+  "writing_assistant_a30ac16a": { "message": "写作助手" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "是" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {

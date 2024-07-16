@@ -37,6 +37,8 @@ const locale = {
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "समान URL वाले निकटवर्ती लिंक एक ही लिंक होने चाहिए।"
   },
+  "ai_response_9624e8e8": { "message": "AI प्रतिक्रिया" },
+  "ai_tools_fda01177": { "message": "AI उपकरण" },
   "aleph_f4ffd155": { "message": "एलेफ़" },
   "align_11050992": { "message": "संरेखण करें" },
   "alignment_and_lists_5cebcb69": { "message": "संरेखण और सूचियां" },
@@ -54,6 +56,9 @@ const locale = {
   },
   "an_error_occurred_making_a_network_request_d1bda348": {
     "message": "नेटवर्क अनुरोध करते समय त्रुटि उत्पन्न हुई"
+  },
+  "an_error_occurred_processing_your_request_a3a38d84": {
+    "message": "आपके अनुरोध को प्रोसेस करते समय त्रुटि हुई"
   },
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "आपका मीडिया अपलोड करने के दौरान त्रुटि उत्पन्न हुई।"
@@ -184,6 +189,7 @@ const locale = {
   "column_e1ae5c64": { "message": "स्तंभ" },
   "column_group_1c062368": { "message": "स्तंभ ग्रुप" },
   "complex_numbers_a543d004": { "message": "सम्मिश्र संख्याएं" },
+  "compose_44c904f4": { "message": "लिखें" },
   "computer_1d7dfa6f": { "message": "कंप्यूटर" },
   "congruent_5a244acd": { "message": "सर्वांगसम" },
   "contains_311f37b7": { "message": "शामिल है" },
@@ -197,6 +203,7 @@ const locale = {
   "content_subtype_5ce35e88": { "message": "सामग्री उपप्रकार" },
   "content_type_2cf90d95": { "message": "सामग्री प्रकार" },
   "coproduct_e7838082": { "message": "सह-उत्पाद" },
+  "copy_9748f9f": { "message": "प्रति बनाएं" },
   "copyright_holder_66ee111": { "message": "कॉपीराइट धारक:" },
   "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
     "message": "सामग्री नहीं डाली जा सकी: \"{ itemType }\" आइटमें वर्तमान में Canvas में समर्थित नहीं हैं।"
@@ -267,6 +274,7 @@ const locale = {
   "discussions_a5f96392": { "message": "चर्चाएं" },
   "discussions_index_6c36ced": { "message": "चर्चाएं सूचकांक" },
   "disjoint_union_e74351a8": { "message": "असंयुक्त संघ" },
+  "dislike_14befc48": { "message": "नापसंद करें" },
   "display_options_315aba85": { "message": "डिस्प्ले के विकल्प" },
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "पाठ लिंक डिस्प्ले करें (नए टैब में खुलता है)"
@@ -330,6 +338,7 @@ const locale = {
   },
   "enter_replacement_text_17631bbc": { "message": "प्रतिस्थापन पाठ दर्ज करें" },
   "enter_search_text_26cb4459": { "message": "खोज पाठ दर्ज करें" },
+  "enter_text_8b35c65b": { "message": "पाठ दर्ज करें" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (प्रकार)" },
   "equals_sign_c51bdc58": { "message": "बराबर चिह्न" },
@@ -354,6 +363,9 @@ const locale = {
   "f_function_fe422d65": { "message": "F (फ़ंक्शन)" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "फ़ाइल की सामग्री पाने में विफल"
+  },
+  "failed_to_copy_response_d3def551": {
+    "message": "प्रतिक्रिया की प्रति नहीं बनाई जा सकी"
   },
   "failed_to_retrieve_content_from_external_tool_5899c213": {
     "message": "बाहरी उपकरण से सामग्री पुनर्प्राप्त करने में विफल"
@@ -442,6 +454,12 @@ const locale = {
   "health_icon_8d292eb5": { "message": "स्वास्थ्य आइकन" },
   "hearts_suit_e50e04ca": { "message": "पान (ताश का रंग)" },
   "height_69b03e15": { "message": "ऊंचाई" },
+  "hello_please_describe_the_modifications_you_would__49b19837": {
+    "message": "नमस्कार। कृपया बताएं कि आप अपनी रचना में क्या संशोधन करना चाहते हैं।"
+  },
+  "hello_please_describe_the_modifications_you_would__600dbbf0": {
+    "message": "नमस्कार। कृपया बताएं कि आप अपने चयन में क्या संशोधन करना चाहते हैं।"
+  },
   "hexagon_d8468e0d": { "message": "षटकोण" },
   "hide_description_bfb5502e": { "message": "विवरण छिपाएं" },
   "hide_title_description_caf092ef": { "message": "{ title } विवरण छिपाएं" },
@@ -455,6 +473,9 @@ const locale = {
     "message": "मैंने इस फ़ाइल का उपयोग करने की अनुमति प्राप्त कर ली है।"
   },
   "i_hold_the_copyright_71ee91b1": { "message": "मेरे पास कॉपीराइट है" },
+  "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+    "message": "मुझे खेद है, लेकिन मुझे AI का उत्तर नहीं मिल रहा है"
+  },
   "icon_215a1dc6": { "message": "आइकन" },
   "icon_8168b2f8": { "message": "आइकन" },
   "icon_color_b86dd6d6": { "message": "आइकन रंग" },
@@ -638,6 +659,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "ऋण/घन" },
   "misc_3b692ea7": { "message": "विविध" },
   "miscellaneous_e9818229": { "message": "विविध" },
+  "modify_6b0b13e3": { "message": "संशोधित करें" },
   "module_90d9fd32": { "message": "मॉड्यूल" },
   "modules_c4325335": { "message": "मॉड्यूल" },
   "moving_image_to_crop_directionword_6f66cde2": {
@@ -782,6 +804,9 @@ const locale = {
   "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
     "message": "कृपया Canvas को अपने माइक्रोफ़ोन और वेबकैम के लिए एक्सेस की अनुमति दें।"
   },
+  "please_decribe_what_you_would_like_to_compose_27a51be5": {
+    "message": "कृपया बताएं कि आप क्या लिखना चाहेंगे।"
+  },
   "plus_d43cd4ec": { "message": "घन" },
   "plus_minus_f8be2e83": { "message": "घन/ऋण" },
   "posted_when_a578f5ab": { "message": "पोस्ट किया गया: { when }" },
@@ -844,12 +869,16 @@ const locale = {
   },
   "reset_95a81614": { "message": "रीसेट करें" },
   "resize_ec83d538": { "message": "साइज़ बदलें" },
+  "response_copied_to_clipboard_130d66cd": {
+    "message": "प्रतिक्रिया की प्रति क्लिपबोर्ड पर बनाई गई"
+  },
   "restore_auto_save_deccd84b": {
     "message": "स्वत: सहेजें पुनर्स्थापित करें?"
   },
   "result_index_of_max_7db5ad8b": {
     "message": "कुल{ max } में से { index } नतीजा।"
   },
+  "retry_ebd5f8ba": { "message": "फिर से कोशिश करें" },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "रिवर्स टर्नस्टाइल (प्रतिफल नहीं देता)"
   },
@@ -924,6 +953,7 @@ const locale = {
     "message": "Shift-O दबा कर सुंदर HTML संपादक खोलें"
   },
   "shortcut_911d6255": { "message": "शॉर्टकट" },
+  "show_all_967a90f0": { "message": "सभी दिखाएं" },
   "show_audio_options_b489926b": { "message": "ऑडियो विकल्प दिखाएं" },
   "show_image_options_1e2ecc6b": { "message": "छवि विकल्प दिखाएं" },
   "show_link_options_545338fd": { "message": "लिंक विकल्प दिखाएं" },
@@ -1212,6 +1242,7 @@ const locale = {
   "view_word_and_character_counts_a743dd0c": {
     "message": "शब्द और कैरेक्टर गिनती देखें"
   },
+  "waiting_for_response_1efd0c50": { "message": "प्रतिक्रिया की प्रतिक्षा है" },
   "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
     "message": "हम आपकी डिवाइस से कनेक्ट कार्यशील माइक्रोफ़ोन का पता नहीं लगा सके।"
   },
@@ -1226,6 +1257,7 @@ const locale = {
   "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
     "message": "वेबपेजों में केवल एक H1 होना चाहिए, जो पेज के शीर्षक द्वारा स्वचालित रूप से उपयोग किया जाता है। आपकी सामग्री में पहली हेडिंग H2 होनी चाहिए।"
   },
+  "what_would_you_like_to_do_6dc0d541": { "message": "आप क्या करना चाहेंगे?" },
   "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
     "message": "जब मार्कअप का उपयोग किया जाता है जो आइटमों को एक सूची के रूप में दृश्य रूप से प्रारूपित करता है, लेकिन सूची संबंध को इंगित नहीं करता है, तो उपयोगकर्ताओं को जानकारी नेविगेट करने में कठिनाई हो सकती है।"
   },
@@ -1240,6 +1272,7 @@ const locale = {
   "word_count_c77fe3a6": { "message": "शब्दों की गिनती" },
   "words_b448b7d5": { "message": "शब्द" },
   "wreath_product_200b38ef": { "message": "पुष्पमाला उत्पाद" },
+  "writing_assistant_a30ac16a": { "message": "लेखन सहायक" },
   "xi_149681d0": { "message": "शी" },
   "yes_dde87d5": { "message": "हां" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {

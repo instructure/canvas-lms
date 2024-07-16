@@ -37,6 +37,8 @@ const locale = {
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Pautan berhampiran dengan URL yang sama sepatutnya dijadikan pautan tunggal."
   },
+  "ai_response_9624e8e8": { "message": "Maklum Balas AI" },
+  "ai_tools_fda01177": { "message": "Alat AI" },
   "aleph_f4ffd155": { "message": "Aleph" },
   "align_11050992": { "message": "Jajarkan" },
   "alignment_and_lists_5cebcb69": { "message": "Penjajaran dan Senarai" },
@@ -54,6 +56,9 @@ const locale = {
   },
   "an_error_occurred_making_a_network_request_d1bda348": {
     "message": "Ralat berlaku semasa membuat permintaan rangkaian"
+  },
+  "an_error_occurred_processing_your_request_a3a38d84": {
+    "message": "Ralat berlaku semasa memproses permintaan anda"
   },
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "Ralat berlaku semasa memuat naik media anda."
@@ -186,6 +191,7 @@ const locale = {
   "column_e1ae5c64": { "message": "Lajur" },
   "column_group_1c062368": { "message": "Kumpulan lajur" },
   "complex_numbers_a543d004": { "message": "Nombor Kompleks" },
+  "compose_44c904f4": { "message": "Karang" },
   "computer_1d7dfa6f": { "message": "Komputer" },
   "congruent_5a244acd": { "message": "Kongruen" },
   "contains_311f37b7": { "message": "Mengandungi" },
@@ -199,6 +205,7 @@ const locale = {
   "content_subtype_5ce35e88": { "message": "Sub-jenis Kandungan" },
   "content_type_2cf90d95": { "message": "Jenis Kandungan" },
   "coproduct_e7838082": { "message": "Produk Bersama" },
+  "copy_9748f9f": { "message": "Salin" },
   "copyright_holder_66ee111": { "message": "Pemegang Hak Cipta:" },
   "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
     "message": "Tidak dapat menyisipkan kandungan: \"{ itemType }\" item tidak disokong dalam Canvas buat masa ini."
@@ -267,6 +274,7 @@ const locale = {
   "discussions_a5f96392": { "message": "Perbincangan" },
   "discussions_index_6c36ced": { "message": "Indeks Perbincangan" },
   "disjoint_union_e74351a8": { "message": "Buka Cantuman Penyambung" },
+  "dislike_14befc48": { "message": "Tidak Suka" },
   "display_options_315aba85": { "message": "Paparkan Pilihan" },
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Paparkan Pautan Teks (Dibuka dalam tab baharu)"
@@ -330,6 +338,7 @@ const locale = {
   },
   "enter_replacement_text_17631bbc": { "message": "Masukkan teks gantian" },
   "enter_search_text_26cb4459": { "message": "masukkan teks carian" },
+  "enter_text_8b35c65b": { "message": "Masukkan teks" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Varian)" },
   "equals_sign_c51bdc58": { "message": "Tanda Sama Dengan" },
@@ -356,6 +365,9 @@ const locale = {
   "f_function_fe422d65": { "message": "F (fungsi)" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Gagal mendapatkan kandungan fail"
+  },
+  "failed_to_copy_response_d3def551": {
+    "message": "Gagal menyalin maklum balas"
   },
   "failed_to_retrieve_content_from_external_tool_5899c213": {
     "message": "Gagal mengambil kandungan daripada alat luar"
@@ -444,6 +456,12 @@ const locale = {
   "health_icon_8d292eb5": { "message": "Ikon Kesihatan" },
   "hearts_suit_e50e04ca": { "message": "Hati (Sut)" },
   "height_69b03e15": { "message": "Ketinggian" },
+  "hello_please_describe_the_modifications_you_would__49b19837": {
+    "message": "Helo Sila terangkan pengubahsuaian yang ingin anda lakukan pada karangan anda."
+  },
+  "hello_please_describe_the_modifications_you_would__600dbbf0": {
+    "message": "Helo Sila terangkan pengubahsuaian yang ingin anda lakukan pada pilihan anda."
+  },
   "hexagon_d8468e0d": { "message": "Heksagon" },
   "hide_description_bfb5502e": { "message": "Sembunyikan penerangan" },
   "hide_title_description_caf092ef": {
@@ -459,6 +477,9 @@ const locale = {
     "message": "Saya telah mendapatkan keizinan untuk menggunakan fail ini."
   },
   "i_hold_the_copyright_71ee91b1": { "message": "Saya memegang hak cipta" },
+  "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+    "message": "Maafkan saya, tetapi saya tidak dapat mencari jawapan AI"
+  },
   "icon_215a1dc6": { "message": "Ikon" },
   "icon_8168b2f8": { "message": "ikon" },
   "icon_color_b86dd6d6": { "message": "Warna Ikon" },
@@ -640,6 +661,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Tolak/Tambah" },
   "misc_3b692ea7": { "message": "Lain-lain" },
   "miscellaneous_e9818229": { "message": "Lain-lain" },
+  "modify_6b0b13e3": { "message": "Ubah suai" },
   "module_90d9fd32": { "message": "Modul" },
   "modules_c4325335": { "message": "Modul" },
   "moving_image_to_crop_directionword_6f66cde2": {
@@ -778,6 +800,9 @@ const locale = {
   "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
     "message": "Sila benarkan Canvas mengakses mikrofon dan kamera web anda."
   },
+  "please_decribe_what_you_would_like_to_compose_27a51be5": {
+    "message": "Sila terangkan apa yang ingin anda karang."
+  },
   "plus_d43cd4ec": { "message": "Tambah" },
   "plus_minus_f8be2e83": { "message": "Tambah/Tolak" },
   "posted_when_a578f5ab": { "message": "Disiarkan: { when }" },
@@ -840,12 +865,16 @@ const locale = {
   },
   "reset_95a81614": { "message": "Tetap Semula" },
   "resize_ec83d538": { "message": "Saiz Semula" },
+  "response_copied_to_clipboard_130d66cd": {
+    "message": "Maklum balas disalin ke papan klip"
+  },
   "restore_auto_save_deccd84b": {
     "message": "Pulihkan penyimpanan automatik?"
   },
   "result_index_of_max_7db5ad8b": {
     "message": "Keputusan { index } daripada { max }."
   },
+  "retry_ebd5f8ba": { "message": "Cuba semula" },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Paku Kiri (Tiada Keluaran)"
   },
@@ -924,6 +953,7 @@ const locale = {
     "message": "Shift+O untuk membuka editor HTML rapi."
   },
   "shortcut_911d6255": { "message": "Pintasan" },
+  "show_all_967a90f0": { "message": "Tunjuk semua" },
   "show_audio_options_b489926b": { "message": "Tunjuk pilihan audio" },
   "show_image_options_1e2ecc6b": { "message": "Tunjuk pilihan imej" },
   "show_link_options_545338fd": { "message": "Tunjuk pilihan pautan" },
@@ -1218,6 +1248,7 @@ const locale = {
   "view_word_and_character_counts_a743dd0c": {
     "message": "Lihat bilangan perkataan dan aksara"
   },
+  "waiting_for_response_1efd0c50": { "message": "Menunggu maklum balas" },
   "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
     "message": "Kami tidak dapat mengesan mikrofon berfungsi yang disambungkan dengan peranti anda."
   },
@@ -1231,6 +1262,9 @@ const locale = {
   "webcam_fe91b20f": { "message": "Kamera Web" },
   "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
     "message": "Halaman web sepatutnya hanya mempunyai satu H1 yang digunakan oleh Tajuk halaman secara automatik. Pengepala pertama dalam kandungan anda sepatutnya H2."
+  },
+  "what_would_you_like_to_do_6dc0d541": {
+    "message": "Apakah yang ingin anda lakukan?"
   },
   "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
     "message": "Apabila tanda digunakan untuk memformat item secara visual sebagai senarai tetapi petunjuk tidak diberikan tentang hubungan senarai, pengguna mungkin mengalami kesukaran dalam menavigasi maklumat."
@@ -1246,6 +1280,7 @@ const locale = {
   "word_count_c77fe3a6": { "message": "Bilangan Perkataan" },
   "words_b448b7d5": { "message": "Perkataan" },
   "wreath_product_200b38ef": { "message": "Produk Lingkaran Bunga" },
+  "writing_assistant_a30ac16a": { "message": "Pembantu Penulisan" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Ya" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
