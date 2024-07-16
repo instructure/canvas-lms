@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef, useState, type RefObject} from 'react'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -184,12 +184,19 @@ export default function ItemAssignToTray({
 }: ItemAssignToTrayProps) {
   const isPacedCourse = ENV.IN_PACED_COURSE
   const initialLoadRef = useRef(false)
-  const cardsRefs = useRef<{[cardId: string]: ItemAssignToCardRef}>({})
+  const cardsRefs = useRef<{[cardId: string]: RefObject<ItemAssignToCardRef>}>({})
   const [isLoading, setIsLoading] = useState(false)
   const [disabledOptionIds, setDisabledOptionIds] = useState<string[]>(
     defaultDisabledOptionIds ?? []
   )
-  const [assignToCards, setAssignToCards] = useState<ItemAssignToCardSpec[]>(defaultCards ?? [])
+  const [assignToCards, setAssignToCardsInner] = useState<ItemAssignToCardSpec[]>(
+    defaultCards ?? []
+  )
+  const setAssignToCards = (cards: ItemAssignToCardSpec[]) => {
+    assignToCardsRef.current = cards
+    setAssignToCardsInner(cards)
+  }
+
   const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
   const [moduleAssignees, setModuleAssignees] = useState<string[]>([])
   const [groupCategoryId, setGroupCategoryId] = useState<string | null>(defaultGroupCategoryId)
@@ -200,10 +207,6 @@ export default function ItemAssignToTray({
     undefined
   )
   const assignToCardsRef = useRef(assignToCards)
-
-  useEffect(() => {
-    assignToCardsRef.current = assignToCards
-  }, [assignToCards])
 
   const everyoneOption = useMemo(() => {
     const hasOverrides =
@@ -247,8 +250,8 @@ export default function ItemAssignToTray({
       if (!firstCardWithError) return
       const firstCardWithErrorRef = cardsRefs.current[firstCardWithError.key]
 
-      Object.values(cardsRefs.current).forEach(c => c.showValidations())
-      firstCardWithErrorRef?.focusInputs()
+      Object.values(cardsRefs.current).forEach(c => c.current?.showValidations())
+      firstCardWithErrorRef?.current?.focusInputs()
       return
     }
     // compare original module assignees to see if they were removed for unassign_item overrides
