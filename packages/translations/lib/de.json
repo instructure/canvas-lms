@@ -38,6 +38,12 @@
     "afrikaans_da0fe6ee": {
         "message": "Afrikaans"
     },
+    "ai_response_9624e8e8": {
+        "message": "KI-Antwort"
+    },
+    "ai_tools_fda01177": {
+        "message": "KI-Tools."
+    },
     "albanian_21ed929e": {
         "message": "Albanisch"
     },
@@ -76,6 +82,9 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Fehler beim einer Netzwerkanforderung"
+    },
+    "an_error_occurred_processing_your_request_a3a38d84": {
+        "message": "Fehler bei der Verarbeitung Ihrer Anfrage"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Fehler beim Hochladen der Medien."
@@ -347,6 +356,9 @@
     "complex_numbers_a543d004": {
         "message": "Komplexe Zahlen"
     },
+    "compose_44c904f4": {
+        "message": "Verfassen"
+    },
     "computer_1d7dfa6f": {
         "message": "Computer"
     },
@@ -373,6 +385,9 @@
     },
     "coproduct_e7838082": {
         "message": "Koprodukt"
+    },
+    "copy_9748f9f": {
+        "message": "Kopie"
     },
     "copyright_holder_66ee111": {
         "message": "Urheberrechtsinhaber:"
@@ -551,6 +566,9 @@
     "disjoint_union_e74351a8": {
         "message": "Disjunkte Vereinigung"
     },
+    "dislike_14befc48": {
+        "message": "Dislike"
+    },
     "display_options_315aba85": {
         "message": "Anzeigeoptionen"
     },
@@ -695,6 +713,9 @@
     "enter_search_text_26cb4459": {
         "message": "Suchtext eingeben"
     },
+    "enter_text_8b35c65b": {
+        "message": "Text eingeben"
+    },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
     },
@@ -760,6 +781,9 @@
     },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Abruf der Dateiinhalte fehlgeschlagen"
+    },
+    "failed_to_copy_response_d3def551": {
+        "message": "Kopieren der Antwort fehlgeschlagen"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Inhalt konnte nicht von externem Tool abgerufen werden"
@@ -962,6 +986,12 @@
     "height_69b03e15": {
         "message": "Höhe"
     },
+    "hello_please_describe_the_modifications_you_would__49b19837": {
+        "message": "Hallo. Bitte beschreiben Sie die Änderungen, die Sie an Ihrer Erstellung vornehmen möchten."
+    },
+    "hello_please_describe_the_modifications_you_would__600dbbf0": {
+        "message": "Hallo. Bitte beschreiben Sie die Änderungen, die Sie an Ihrer Auswahl vornehmen möchten."
+    },
     "hexagon_d8468e0d": {
         "message": "Sechseck"
     },
@@ -994,6 +1024,9 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Ich bin der Urheberrechtsinhaber"
+    },
+    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+        "message": "Es tut mir leid, aber ich kann die Antwort der KI nicht finden."
     },
     "icelandic_9d6d35de": {
         "message": "Isländisch"
@@ -1382,6 +1415,9 @@
     "miscellaneous_e9818229": {
         "message": "Verschiedenes"
     },
+    "modify_6b0b13e3": {
+        "message": "Ändern"
+    },
     "module_90d9fd32": {
         "message": "Modul"
     },
@@ -1682,6 +1718,9 @@
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Bitte erlauben Sie Canvas, auf Ihr Mikrofon und Ihre Webcam zuzugreifen."
     },
+    "please_decribe_what_you_would_like_to_compose_27a51be5": {
+        "message": "Bitte beschreiben Sie, was Sie erstellen möchten."
+    },
     "plus_d43cd4ec": {
         "message": "Plus"
     },
@@ -1832,11 +1871,17 @@
     "resize_ec83d538": {
         "message": "Größe ändern"
     },
+    "response_copied_to_clipboard_130d66cd": {
+        "message": "Antwort in die Zwischenablage kopiert"
+    },
     "restore_auto_save_deccd84b": {
         "message": "Automatisches Speichern wiederherstellen"
     },
     "result_index_of_max_7db5ad8b": {
         "message": "Ergebnis { index } von { max }"
+    },
+    "retry_ebd5f8ba": {
+        "message": "Erneut versuchen"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Reverses Drehkreuz (kein Ergebnis)"
@@ -1996,6 +2041,9 @@
     },
     "shortcut_911d6255": {
         "message": "Shortcut"
+    },
+    "show_all_967a90f0": {
+        "message": "Alle anzeigen"
     },
     "show_audio_options_b489926b": {
         "message": "Audiooptionen anzeigen"
@@ -2552,6 +2600,9 @@
     "view_word_and_character_counts_a743dd0c": {
         "message": "Wort- und Zeichenanzahl anzeigen"
     },
+    "waiting_for_response_1efd0c50": {
+        "message": "Warten auf Antwort"
+    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "Wir konnten kein funktionierendes mit Ihrem Gerät verbundenes Mikrofon erkennen."
     },
@@ -2572,6 +2623,9 @@
     },
     "welsh_42ab94b1": {
         "message": "Walisisch"
+    },
+    "what_would_you_like_to_do_6dc0d541": {
+        "message": "Was möchten Sie tun?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Wenn Markup verwendet wird, das die Elemente optisch als Liste formatiert, die Listenbeziehung jedoch nicht zeigt, haben Benutzer*innen möglicherweise Schwierigkeiten, in diesen Informationen zu navigieren."
@@ -2602,6 +2656,9 @@
     },
     "wreath_product_200b38ef": {
         "message": "Kranzprodukt"
+    },
+    "writing_assistant_a30ac16a": {
+        "message": "Schreibassistent"
     },
     "xi_149681d0": {
         "message": "Xi"
