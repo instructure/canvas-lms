@@ -302,3 +302,8 @@ selective_release_optimized_tray:
     If enabled, the tray that allows users to assign learning objects will be optimized for
     objects with large amounts of overrides.
   applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
