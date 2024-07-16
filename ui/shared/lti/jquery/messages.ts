@@ -55,8 +55,17 @@ const SUBJECT_ALLOW_LIST = [
   'toggleCourseNavigationMenu',
 ] as const
 
+/**
+ * A mapping of message subject to a list of scopes that grant permission
+ * for that subject.
+ * A tool only needs one of the scopes listed to be granted access.
+ * If a subject is not listed here, it is assumed to be allowed for all tools.
+ */
 const SCOPE_REQUIRED_SUBJECTS: {[key: string]: string[]} = {
-  'lti.getPageContent': ['http://canvas.instructure.com/lti/page_content/show'],
+  'lti.getPageContent': [
+    'https://canvas.instructure.com/lti/page_content/show',
+    'http://canvas.instructure.com/lti/page_content/show',
+  ],
 }
 
 type SubjectId = (typeof SUBJECT_ALLOW_LIST)[number]
@@ -70,10 +79,16 @@ const isIgnoredSubject = (subject: unknown): subject is SubjectId =>
 const isUnsupportedInRCE = (subject: unknown): subject is SubjectId =>
   typeof subject === 'string' && (UNSUPPORTED_IN_RCE as ReadonlyArray<string>).includes(subject)
 
+/**
+ * Checks that the tool for the given tool_id has the required
+ * scopes for the given message subject.
+ * If the subject is not in the SCOPE_REQUIRED_SUBJECTS object,
+ * it is assumed to be allowed for all tools.
+ */
 const toolIsAuthorized = (subject: string, tool_id: string) => {
   const tool_scopes = ENV.LTI_TOOL_SCOPES?.[tool_id]
   if (SCOPE_REQUIRED_SUBJECTS[subject]) {
-    return SCOPE_REQUIRED_SUBJECTS[subject].every(scope => tool_scopes?.includes(scope))
+    return SCOPE_REQUIRED_SUBJECTS[subject].some(scope => tool_scopes?.includes(scope))
   } else {
     return true
   }
