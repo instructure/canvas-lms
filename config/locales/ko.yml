@@ -12649,7 +12649,9 @@ ko:
       ways_to_contact_user: 연락처
     recent_activity: 
       date_column: 날짜
+      edit_group: "그룹 편집"
       message_column: 메시지
+      new_announcement: 공지
       recent_activity: "최근 활동"
       recent_activity_in_course: "%{course_or_group}의 최근 활동"
       unread_column: "읽지 않은 메시지"
