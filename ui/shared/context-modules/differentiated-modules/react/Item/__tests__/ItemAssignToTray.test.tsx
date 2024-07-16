@@ -842,4 +842,61 @@ describe('ItemAssignToTray', () => {
       expect(getByText('Assignment | 10 pts')).toBeInTheDocument()
     })
   })
+
+  it('fetches and combines multiple pages of overrides', async () => {
+    const page1 = {
+      id: '23',
+      overrides: [
+        {id: '1', title: 'Override 1'},
+        {id: '2', title: 'Override 2'},
+      ],
+    }
+    const response1 = {
+      body: page1,
+      headers: {
+        Link: '</api/v1/courses/1/assignments/23/date_details?page=2&per_page=100>; rel="next"',
+      },
+    }
+
+    const page2 = {
+      id: '23',
+      overrides: [
+        {id: '3', title: 'Override 3'},
+        {id: '4', title: 'Override 4'},
+      ],
+    }
+    const response2 = {
+      body: page2,
+      headers: {
+        Link: '</api/v1/courses/1/assignments/23/date_details?page=3&per_page=100>; rel="next"',
+      },
+    }
+
+    const page3 = {
+      id: '23',
+      overrides: [{id: '5', title: 'Override 5'}],
+    }
+    const response3 = {
+      body: page3,
+    }
+
+    fetchMock.get(OVERRIDES_URL, response1, {overwriteRoutes: true})
+    fetchMock.get(`/api/v1/courses/1/assignments/23/date_details?page=2&per_page=100`, response2)
+    fetchMock.get(`/api/v1/courses/1/assignments/23/date_details?page=3&per_page=100`, response3)
+
+    const {findAllByTestId} = renderComponent()
+
+    await waitFor(async () => {
+      expect(fetchMock.calls(OVERRIDES_URL).length).toBe(1)
+
+      expect(
+        fetchMock.calls(`/api/v1/courses/1/assignments/23/date_details?page=2&per_page=100`).length
+      ).toBe(1)
+      expect(
+        fetchMock.calls(`/api/v1/courses/1/assignments/23/date_details?page=3&per_page=100`).length
+      ).toBe(1)
+      const cards = await findAllByTestId('item-assign-to-card')
+      expect(cards).toHaveLength(5)
+    })
+  })
 })
