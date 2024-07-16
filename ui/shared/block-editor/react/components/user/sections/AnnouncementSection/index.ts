@@ -17,6 +17,7 @@
  */
 
 import {AnnouncementSection} from './AnnouncementSection'
+// @ts-expect-error
 import {IconAnnouncementSolid} from '@instructure/ui-icons/es/svg'
 
 const AnnouncementSectionIcon = IconAnnouncementSolid?.src

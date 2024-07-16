@@ -28,6 +28,7 @@ import {type ViewOwnProps} from '@instructure/ui-view'
 
 import {UploadFileModal} from '../../../../FileUpload/UploadFileModal'
 import {IconSizePopup} from './ImageSizePopup'
+import {type ImageBlockProps, type ImageConstraint} from './types'
 
 const ImageBlockToolbar = () => {
   const {
@@ -45,7 +46,8 @@ const ImageBlockToolbar = () => {
       _selected: MenuItemProps['selected'],
       _args: MenuItem
     ) => {
-      setProp(prps => (prps.constraint = value))
+      const constraint = value as ImageConstraint
+      setProp((prps: ImageBlockProps) => (prps.constraint = constraint))
     },
     [setProp]
   )
@@ -60,7 +62,7 @@ const ImageBlockToolbar = () => {
 
   const handleSave = useCallback(
     (imageURL: string | null) => {
-      setProp(prps => (prps.src = imageURL))
+      setProp((prps: ImageBlockProps) => (prps.src = imageURL || undefined))
       setShowUploadModal(false)
     },
     [setProp]

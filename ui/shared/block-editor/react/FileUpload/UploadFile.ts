@@ -19,7 +19,8 @@ import axios from '@canvas/axios'
 import {uploadFile} from '@canvas/upload-file'
 
 async function getUploadUrl() {
-  return fetch(`/api/v1/users/${ENV.current_user.id}/folders/root`)
+  // @ts-expect-error
+  return fetch(`/api/v1/users/${window.ENV.current_user.id}/folders/root`)
     .then(response => response.json())
     .then(data => ({
       parent_folder_id: data.id,

@@ -16,10 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {IframeBlock} from './IframeBlock'
-import {IframeBlockSettings} from './IframeBlockSettings'
-import {IconAssignmentLine} from '@instructure/ui-icons/es/svg'
-
-const IframeBlockIcon = IconAssignmentLine?.src
-
-export {IframeBlock, IframeBlockSettings, IframeBlockIcon}
+export type AnnouncementSectionProps = {
+  announcementId?: string
+}

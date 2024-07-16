@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,21 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-
-import BlockEditor from './BlockEditor'
-
-export default {
-  title: 'Examples/Shared/BlockEditor',
-  component: BlockEditor,
+export type RCEBlockProps = {
+  text?: string
+  onContentChange?: (newContent: string) => void
 }
-
-const Template = (args: JSX.IntrinsicAttributes) => {
-  return (
-    <>
-      <BlockEditor {...args} />
-    </>
-  )
-}
-
-export const DefaultEditor = Template.bind({})

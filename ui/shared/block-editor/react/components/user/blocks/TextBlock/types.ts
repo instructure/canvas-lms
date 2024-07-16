@@ -17,32 +17,10 @@
  */
 
 import React from 'react'
-import {useNode} from '@craftjs/core'
-import {Flex} from '@instructure/ui-flex'
-import {TextInput} from '@instructure/ui-text-input'
 
-const IframeBlockSettings = () => {
-  const {
-    actions: {setProp},
-    props,
-  } = useNode(node => ({
-    props: node.data.props,
-  }))
-
-  return (
-    <Flex direction="column" margin="small">
-      <TextInput
-        renderLabel="Source"
-        value={props.src}
-        onChange={(_event, value) => setProp(prps => (prps.src = value))}
-      />
-      <TextInput
-        renderLabel="Title"
-        value={props.title}
-        onChange={(_event, value) => setProp(prps => (prps.title = value))}
-      />
-    </Flex>
-  )
+export type TextBlockProps = {
+  text?: string
+  fontSize?: string
+  textAlign?: React.CSSProperties['textAlign']
+  color?: string
 }
-
-export {IframeBlockSettings}

@@ -20,13 +20,9 @@ import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useEditor, useNode} from '@craftjs/core'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {useClassNames} from '../../../../utils'
+import {type RCEBlockProps} from './types'
 
-type RCEBlockProps = {
-  text?: string
-  onContentChange?: (newContent: string) => void
-}
-
-export const RCEBlock = ({text = '', onContentChange}: RCEBlockProps) => {
+export const RCEBlock = ({text, onContentChange}: RCEBlockProps) => {
   const {actions, enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
@@ -58,8 +54,8 @@ export const RCEBlock = ({text = '', onContentChange}: RCEBlockProps) => {
 
   const handleChange = useCallback(
     (content: string) => {
-      setProp(props => {
-        props.text = content
+      setProp((prps: RCEBlockProps) => {
+        prps.text = content
       })
       onContentChange?.(content)
     },
@@ -93,10 +89,13 @@ export const RCEBlock = ({text = '', onContentChange}: RCEBlockProps) => {
       </div>
     )
   } else {
-    return <div className={clazz} dangerouslySetInnerHTML={{__html: text}} />
+    return <div className={clazz} dangerouslySetInnerHTML={{__html: text || ''}} />
   }
 }
 
 RCEBlock.craft = {
   displayName: 'Rich Text',
+  defaultProps: {
+    text: '',
+  },
 }

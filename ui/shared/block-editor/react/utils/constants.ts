@@ -16,12 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {IconCanvasLogoLine} from '@instructure/ui-icons/es/svg'
-
 const white = '#fff'
 const black = '#2d3b45'
-const blockHeaderBackground = '#1A2729'
 
-const CanvasLogoIcon = IconCanvasLogoLine?.src
-
-export {white, black, CanvasLogoIcon}
+export {white, black}

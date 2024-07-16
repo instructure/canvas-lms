@@ -28,14 +28,9 @@ import {
   removeLastParagraphTag,
 } from '../../../../utils'
 import {TextBlockToolbar} from './TextBlockToolbar'
-import {type TextBlockProps} from './common'
+import {type TextBlockProps} from './types'
 
-export const TextBlock = ({
-  text = '',
-  fontSize = TextBlock.craft.defaultProps.fontSize,
-  textAlign = TextBlock.craft.defaultProps.textAlign,
-  color = TextBlock.craft.defaultProps.color,
-}: TextBlockProps) => {
+export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProps) => {
   const {actions, enabled, query} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
@@ -70,8 +65,8 @@ export const TextBlock = ({
         html = `<p>${html}</p>`
       }
 
-      setProp(props => {
-        props.text = html
+      setProp((prps: TextBlockProps) => {
+        prps.text = html
       })
     },
     [setProp]
@@ -82,8 +77,8 @@ export const TextBlock = ({
       if (shouldAddNewNode(e, lastChar.current)) {
         e.preventDefault()
         removeLastParagraphTag(e.currentTarget)
-        setProp(props => {
-          props.text = e.currentTarget.innerHTML
+        setProp((prps: TextBlockProps) => {
+          prps.text = e.currentTarget.innerHTML
         })
         addNewNodeAsNextSibling(<TextBlock text="" />, id, actions, query)
       } else if (shouldDeleteNode(e)) {
@@ -136,7 +131,7 @@ TextBlock.craft = {
   displayName: 'Text',
   defaultProps: {
     fontSize: '12pt',
-    textAlign: 'start',
+    textAlign: 'initial' as React.CSSProperties['textAlign'],
     color: 'var(--ic-brand-font-color-dark)',
   },
   related: {

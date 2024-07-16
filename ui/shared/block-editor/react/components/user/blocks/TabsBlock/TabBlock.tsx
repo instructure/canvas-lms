@@ -21,10 +21,7 @@ import {Element, useEditor} from '@craftjs/core'
 import {Container} from '../Container'
 import {NoSections} from '../../common'
 import {useClassNames} from '../../../../utils'
-
-type TabBlockProps = {
-  tabId: string
-}
+import {type TabBlockProps} from './types'
 
 const TabBlock = ({tabId}: TabBlockProps) => {
   const {enabled} = useEditor(state => ({

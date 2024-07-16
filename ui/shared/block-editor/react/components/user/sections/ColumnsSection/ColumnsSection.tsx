@@ -24,14 +24,9 @@ import {NoSections} from '../../common'
 import {ColumnsSectionToolbar} from './ColumnsSectionToolbar'
 import {useClassNames} from '../../../../utils'
 import {SectionMenu} from '../../../editor/SectionMenu'
-import {type ColumnsSectionVariant} from './types'
+import {type ColumnsSectionProps} from './types'
 
-type ColumnsSectionProps = {
-  columns: number
-  variant?: ColumnsSectionVariant
-}
-
-export const ColumnsSection = ({columns = 2, variant = 'fixed'}: ColumnsSectionProps) => {
+export const ColumnsSection = ({columns, variant}: ColumnsSectionProps) => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
@@ -39,7 +34,7 @@ export const ColumnsSection = ({columns = 2, variant = 'fixed'}: ColumnsSectionP
   const clazz = useClassNames(enabled, {empty: false}, [
     'section',
     'columns-section',
-    variant,
+    variant || ColumnsSection.craft.defaultProps.variant,
     `columns-${columns}`,
   ])
 

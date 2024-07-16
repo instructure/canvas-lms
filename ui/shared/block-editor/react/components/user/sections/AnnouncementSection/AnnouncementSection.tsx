@@ -19,9 +19,7 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {useEditor, useNode} from '@craftjs/core'
 
-import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {AnnouncementModal} from './AnnouncementModal'
 import {AnnouncementSectionMenu} from './AnnouncementSectionMenu'
@@ -30,16 +28,13 @@ import {AnnouncementView} from './AnnouncementView'
 import {IconAnnouncementSolid} from '@instructure/ui-icons'
 import {useClassNames} from '@canvas/block-editor/react/utils'
 import {announcements} from '../../../../assets/data/announcements'
+import {type AnnouncementSectionProps} from './types'
 
 const WIDTH = 'auto'
 const HEIGHT = 'auto'
 
-type AnnouncementSectionProps = {
-  announcementId?: string
-}
-
 const AnnouncementSection = ({announcementId}: AnnouncementSectionProps) => {
-  const {actions, query, enabled} = useEditor(state => {
+  const {enabled} = useEditor(state => {
     return {
       enabled: state.options.enabled,
     }

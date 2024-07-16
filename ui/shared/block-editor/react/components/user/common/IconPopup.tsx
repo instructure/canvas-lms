@@ -20,7 +20,6 @@ import React, {useCallback, useState} from 'react'
 import {useNode} from '@craftjs/core'
 import {Button} from '@instructure/ui-buttons'
 import {Popover} from '@instructure/ui-popover'
-import {IconImageLine} from '@instructure/ui-icons'
 import {IconPicker} from '../blocks/IconBlock'
 
 type IconPopupProps = {

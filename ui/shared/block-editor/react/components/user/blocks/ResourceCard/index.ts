@@ -17,6 +17,7 @@
  */
 
 import {ResourceCard} from './ResourceCard'
+// @ts-expect-error
 import {IconBookmarkLine} from '@instructure/ui-icons/es/svg'
 
 const ResourceCardIcon = IconBookmarkLine?.src

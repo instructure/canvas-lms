@@ -16,9 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type TextBlockProps = {
-  text?: string
-  fontSize?: string
-  textAlign?: string
-  color?: string
+export type QuizSectionProps = {
+  questionId?: string
 }
