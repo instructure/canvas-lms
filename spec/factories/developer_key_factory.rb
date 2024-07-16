@@ -49,4 +49,47 @@ module Factories
     DeveloperKey.last.update!(opts)
     DeveloperKey.last
   end
+
+  def dev_key_model_dyn_reg(opts = {})
+    key = dev_key_model_1_3(opts)
+    registration(key)
+    key
+  end
+
+  def registration(key)
+    redirect_uris = ["http://example.com"]
+    initiate_login_uri = "http://example.com/login"
+    client_name = "Example Tool"
+    jwks_uri = "http://example.com/jwks"
+    logo_uri = "http://example.com/logo.png"
+    client_uri = "http://example.com/"
+    tos_uri = "http://example.com/tos"
+    policy_uri = "http://example.com/policy"
+    lti_tool_configuration = {
+      domain: "example.com",
+      messages: [
+        {
+          type: "LtiResourceLinkRequest",
+          target_link_uri: "http://example.com/launch",
+          placements: ["course_navigation"]
+        }
+      ],
+      claims: []
+    }
+    scopes = []
+    registration = Lti::IMS::Registration.new({
+      redirect_uris:,
+      initiate_login_uri:,
+      client_name:,
+      jwks_uri:,
+      logo_uri:,
+      client_uri:,
+      tos_uri:,
+      policy_uri:,
+      lti_tool_configuration:,
+      scopes:
+    }.compact)
+    registration.developer_key = key
+    registration
+  end
 end
