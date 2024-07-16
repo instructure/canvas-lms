@@ -48,6 +48,7 @@ class ContentExport < ActiveRecord::Base
   COMMON_CARTRIDGE = "common_cartridge"
   COURSE_COPY = "course_copy"
   MASTER_COURSE_COPY = "master_course_copy"
+  COURSE_TEMPLATE_COPY = "course_template_copy"
   QTI = "qti"
   USER_DATA = "user_data"
   ZIP = "zip"
@@ -393,11 +394,15 @@ class ContentExport < ActiveRecord::Base
   end
 
   def for_course_copy?
-    export_type == COURSE_COPY || export_type == MASTER_COURSE_COPY
+    export_type == COURSE_COPY || export_type == MASTER_COURSE_COPY || export_type == COURSE_TEMPLATE_COPY
   end
 
   def for_master_migration?
     export_type == MASTER_COURSE_COPY
+  end
+
+  def for_course_template?
+    export_type == COURSE_TEMPLATE_COPY
   end
 
   def master_migration

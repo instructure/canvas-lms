@@ -1353,7 +1353,7 @@ describe ContentMigration do
         # the wiki and root folder need to exist or the export will update the course
         @copy_from.wiki_pages.create! title: "one"
         Folder.root_folders(@copy_from)
-        @cm.update! user: nil # only course template copies are reused
+        @cm.update! user: nil, initiated_source: :course_template # only course template copies are reused
       end
 
       it "reuses the ContentExport if it's newer than the course" do
@@ -1361,16 +1361,7 @@ describe ContentMigration do
         @copy_to.wiki_pages.where(title: "one").delete_all
         Timecop.travel(1.minute.from_now) do
           expect { run_course_copy }.not_to change(ContentExport, :count)
-          expect(@copy_to.wiki_pages.where(title: "one")).to exist
-        end
-      end
-
-      it "does not reuse a ContentExport if launched by a user" do
-        run_course_copy
-        @copy_to.wiki_pages.where(title: "one").delete_all
-        @cm.update! user_id: @user.id
-        Timecop.travel(1.minute.from_now) do
-          expect { run_course_copy }.to change(ContentExport, :count).by(1)
+          expect { JSON.parse(@cm.reload.exported_attachment.open) }.not_to raise_error
           expect(@copy_to.wiki_pages.where(title: "one")).to exist
         end
       end

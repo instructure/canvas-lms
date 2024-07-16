@@ -87,7 +87,7 @@ module CC
         end
 
         @export_dirs = [@export_dir]
-        if @for_master_migration
+        if @for_master_migration || @content_export&.for_course_template?
           # for efficiency to the max, short-circuit the usual course copy process (i.e. zip up, save, and then unzip again)
           # and instead go straight to the intermediate json
           converter = CC::Importer::Canvas::Converter.new(unzipped_file_path: @export_dir, deletions: @deletions)
