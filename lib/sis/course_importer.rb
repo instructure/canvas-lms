@@ -299,6 +299,9 @@ module SIS
           when :updated
             Auditors::Course.record_updated(course, @batch_user, changes, options)
           when :concluded
+            if Account.site_admin.feature_enabled?(:default_account_grading_scheme) && course.grading_standard_id.nil? && course.root_account.grading_standard_id
+              course.update!(grading_standard_id: course.root_account.grading_standard_id)
+            end
             Auditors::Course.record_concluded(course, @batch_user, options)
           when :unconcluded
             Auditors::Course.record_unconcluded(course, @batch_user, options)

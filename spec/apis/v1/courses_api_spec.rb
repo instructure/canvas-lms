@@ -2177,6 +2177,20 @@ describe CoursesController, type: :request do
           expect(@course.workflow_state).to eql "completed"
         end
 
+        it "sets the grading standard id on concluding courses when inheriting a default scheme from the account level" do
+          expect(Auditors::Course).to receive(:record_concluded).once
+          gs = GradingStandard.new(context: @course.account, title: "My Grading Standard", data: { "A" => 0.94, "B" => 0, })
+          gs.save!
+          Account.site_admin.enable_feature!(:default_account_grading_scheme)
+          @course.update!(grading_standard_id: nil)
+          @course.root_account.update!(grading_standard_id: gs.id)
+          json = api_call(:delete, @path, @params, { event: "conclude" })
+          expect(json).to eq({ "conclude" => true })
+
+          @course.reload
+          expect(@course.grading_standard_id).to eql gs.id
+        end
+
         it "returns 400 if params[:event] is missing" do
           raw_api_call(:delete, @path, @params)
           expect(response).to have_http_status :bad_request
