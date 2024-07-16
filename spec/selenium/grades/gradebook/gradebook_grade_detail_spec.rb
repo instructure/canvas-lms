@@ -409,5 +409,20 @@ describe "Grade Detail Tray:" do
       expect(student0_reply_to_entry_submission.score).to eq 9
       expect(student0_parent_submission.score).to eq 12
     end
+
+    it "shows status selector for each checkpoint and shows Days Late input when selecting Late" do
+      Gradebook::Cells.open_tray(@students[0], @checkpoint_assignment)
+
+      reply_to_topic_select = f("[data-testid='reply_to_topic-checkpoint-status-select']")
+      reply_to_entry_select = f("[data-testid='reply_to_entry-checkpoint-status-select']")
+
+      expect(reply_to_topic_select).to be_displayed
+      expect(reply_to_entry_select).to be_displayed
+
+      reply_to_topic_select.click
+      fj("span[role='option']:contains('Late')").click
+
+      expect(f("[data-testid='reply_to_topic-checkpoint-time-late-input']")).to be_displayed
+    end
   end
 end
