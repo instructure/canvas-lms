@@ -63,5 +63,26 @@ describe "Gradebook" do
       cell = f(selector)
       expect(cell.find_element(:css, ".gradebook-cell")).to have_class("grayed-out")
     end
+
+    it "grays out cells properly for items that are part of assigned modules" do
+      assignment = assignment_model({
+                                      course: @course,
+                                      name: "In a module",
+                                      points_possible: @assignment_1_points,
+                                      submission_types: "online_text_entry",
+                                      assignment_group: @group,
+                                    })
+      module1 = @course.context_modules.create!(name: "Module")
+      override = module1.assignment_overrides.create!
+      override.assignment_override_students.create!(user: @student_1)
+      module1.add_item(id: assignment.id, type: "assignment")
+      Gradebook.visit(@course)
+      student1_cell = f("#gradebook_grid .container_1 .slick-row:nth-child(1) .b5 .gradebook-cell")
+      student2_cell = f("#gradebook_grid .container_1 .slick-row:nth-child(2) .b5 .gradebook-cell")
+      student3_cell = f("#gradebook_grid .container_1 .slick-row:nth-child(3) .b5 .gradebook-cell")
+      expect(student1_cell).not_to have_class("grayed-out")
+      expect(student2_cell).to have_class("grayed-out")
+      expect(student3_cell).to have_class("grayed-out")
+    end
   end
 end

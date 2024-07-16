@@ -31,10 +31,12 @@ describe('Gradebook Assignment Actions', () => {
       {
         id: '2301',
         submission_types: ['online_text_entry'],
+        visible_to_everyone: true,
       },
       {
         id: '2302',
         submission_types: ['online_text_entry'],
+        visible_to_everyone: true,
       },
     ]
 

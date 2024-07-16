@@ -232,6 +232,7 @@ export type Assignment = Readonly<{
   unlock_at: null | string
   unpublishable: boolean
   updated_at: string
+  visible_to_everyone: boolean
   workflow_state: WorkflowState
 }> & {
   anonymize_students: boolean

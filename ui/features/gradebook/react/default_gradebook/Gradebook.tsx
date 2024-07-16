@@ -692,7 +692,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const ref1 = this.assignments
     for (const assignmentId in ref1) {
       const a = ref1[assignmentId]
-      if (a.only_visible_to_overrides) {
+      if (!a.visible_to_everyone) {
         const hiddenStudentIds = hiddenStudentIdsForAssignment(studentIds, a)
         for (const studentId of hiddenStudentIds) {
           studentsWithHiddenAssignments.push(studentId)
@@ -959,7 +959,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       const allStudentsById: StudentMap = {...this.students, ...this.studentViewStudents}
 
       const assignment = this.getAssignment(assignmentId)
-      assignmentStudentVisibility[assignmentId] = assignment.only_visible_to_overrides
+      assignmentStudentVisibility[assignmentId] = !assignment.visible_to_everyone
         ? (pick(allStudentsById, ...assignment.assignment_visibility) as StudentMap)
         : allStudentsById
     }

@@ -159,7 +159,7 @@ module AssignmentVisibility
 
       # TODO: better name for this method, or a better location?
       def assignments_with_user_visibilities(course, assignments)
-        only_visible_to_overrides, visible_to_everyone = assignments.partition(&:only_visible_to_overrides)
+        visible_to_everyone, only_visible_to_overrides = assignments.partition(&:visible_to_everyone)
         assignment_visibilities = {}
 
         if only_visible_to_overrides.any?
