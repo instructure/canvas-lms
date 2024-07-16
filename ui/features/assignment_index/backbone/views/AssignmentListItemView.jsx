@@ -485,7 +485,12 @@ export default AssignmentListItemView = (function () {
         const isShareToCommons = (tool) => tool.canvas_icon_class === 'icon-commons'
         const tools = ENV.assignment_menu_tools || []
 
-        data.menu_tools =  isNewQuizzes ? tools.filter(tool => !isShareToCommons(tool)) : tools
+        if (!isNewQuizzes || ENV.FEATURES.commons_new_quizzes) {
+          data.menu_tools = tools
+        } else {
+          data.menu_tools = tools.filter(tool => !isShareToCommons(tool))
+        }
+
         data.menu_tools.forEach(tool => {
           return (tool.url = tool.base_url + `&assignments[]=${this.model.get('id')}`)
         })
