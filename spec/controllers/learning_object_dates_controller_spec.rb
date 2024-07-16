@@ -166,6 +166,17 @@ describe LearningObjectDatesController do
                                })
     end
 
+    it "returns date details for a graded discussion with groups" do
+      discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic groups")
+      category = @course.group_categories.create(name: "graded topic groups")
+      discussion.update!(group_category_id: category.id)
+      get :show, params: { course_id: @course.id, discussion_topic_id: discussion.id }
+      expect(response).to be_successful
+      json = json_parse
+      expect(category.id).not_to be_nil
+      expect(json["group_category_id"]).to eq category.id
+    end
+
     it "returns date details for an ungraded discussion" do
       discussion = @course.discussion_topics.create!(title: "ungraded topic",
                                                      unlock_at: "2022-01-05T12:00:00Z",

@@ -39,6 +39,10 @@ module Api::V1::LearningObjectDates
       hash[field] = overridable.send(field) if overridable.respond_to?(field)
     end
     hash[:graded] = graded?(learning_object)
+    if hash[:group_category_id].nil?
+      group_category_id = group_category_id(learning_object)
+      hash[:group_category_id] = group_category_id if group_category_id
+    end
     hash
   end
 
@@ -52,5 +56,9 @@ module Api::V1::LearningObjectDates
     return learning_object.assignment_id.present? if learning_object.is_a?(DiscussionTopic)
 
     GRADED_MODELS.include?(learning_object.class)
+  end
+
+  def group_category_id(learning_object)
+    learning_object.group_category_id if learning_object.is_a?(DiscussionTopic)
   end
 end

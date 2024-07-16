@@ -35,6 +35,7 @@ export const ItemAssignToTrayWrapper = () => {
     isGraded,
     isCheckpoints,
     postToSis,
+    groupCategoryId,
   } = useContext(DiscussionDueDatesContext)
 
   const [overrides, setOverrides] = useState([])
@@ -106,7 +107,7 @@ export const ItemAssignToTrayWrapper = () => {
       } else if (type === 'user') {
         studentIds.push(id)
       } else if (type === 'group') {
-        groupIds.push(id)
+        outputObj.group_id = id
       } else if (type === 'course') {
         outputObj.course_id = id
       }
@@ -117,9 +118,6 @@ export const ItemAssignToTrayWrapper = () => {
     }
     if (studentIds.length > 0) {
       outputObj.student_ids = studentIds
-    }
-    if (groupIds.length > 0) {
-      outputObj.group_ids = groupIds
     }
 
     return outputObj
@@ -157,13 +155,16 @@ export const ItemAssignToTrayWrapper = () => {
       })
     } else if (inputObj.course_id) {
       outputObj.assignedList.push('course_' + inputObj.course_id)
+    } else if (inputObj.group_id) {
+      outputObj.assignedList.push('group_' + inputObj.group_id)
     }
 
     if (
       !inputObj.course_section_id &&
       !inputObj.course_id &&
       !inputObj.student_ids &&
-      !inputObj.noop_id
+      !inputObj.noop_id &&
+      !inputObj.group_id
     ) {
       outputObj.assignedList.push('everyone')
     }
@@ -196,6 +197,7 @@ export const ItemAssignToTrayWrapper = () => {
       assignmentId={assignmentID}
       getAssignmentName={() => title}
       getPointsPossible={() => pointsPossible}
+      getGroupCategoryId={() => groupCategoryId}
       type="discussion"
       importantDates={importantDates}
       defaultSectionId={DEFAULT_SECTION_ID}
