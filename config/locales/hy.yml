@@ -15322,7 +15322,9 @@ hy:
       user_has_no_bio: "%{user}ը կենսագրական տվյալներ չի ավելացրել"
     recent_activity: 
       date_column: Ամսաթիվ
+      edit_group: "Խմբագրել խումբը"
       message_column: Հաղորդագրություն
+      new_announcement: Հայտարարություն
       recent_activity: "Վերջին գործունեությունն"
       recent_activity_in_course: "Վերջին Գործունեություններ %{course_or_group}"
       unread_column: Չընթերցված
