@@ -17803,7 +17803,9 @@ tr:
       ways_to_contact_user: İletişim
     recent_activity: 
       date_column: Tarih
+      edit_group: "Grubu Düzenle"
       message_column: Mesaj
+      new_announcement: Duyuru
       recent_activity: "En Son Etkinlik"
       recent_activity_in_course: "%{course_or_group} 'deki En Son Etkinlikler"
       unread_column: Okunmamış
