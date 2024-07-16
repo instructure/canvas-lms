@@ -36,7 +36,7 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconAddLine} from '@instructure/ui-icons'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {type DoFetchApiOpts} from '@canvas/do-fetch-api-effect'
 import type {
   AssigneeOption,
   BaseDateDetails,
@@ -82,6 +82,8 @@ export interface ItemAssignToTrayContentProps
   postToSIS?: boolean
   assignToCardsRef: React.MutableRefObject<ItemAssignToCardSpec[]>
 }
+
+const MAX_PAGES = 10
 
 function makeCardId(): string {
   return uid('assign-to-card', 12)
@@ -157,6 +159,7 @@ const ItemAssignToTrayContent = ({
 }: ItemAssignToTrayContentProps) => {
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
+  const [hasFetched, setHasFetched] = useState(false)
 
   const lastPerformedAction = useRef<{action: 'add' | 'delete'; index?: number} | null>(null)
   const addCardButtonRef = useRef<Element | null>(null)
@@ -170,23 +173,47 @@ const ItemAssignToTrayContent = ({
     )
       return
 
-    setFetchInFlight(true)
-    doFetchApi({
-      path: itemTypeToApiURL(courseId, itemType, itemContentId),
-      params: {per_page: 100},
-    })
-      .then((response: FetchDueDatesResponse) => {
-        const dateDetailsApiResponse = response.json
-        setBlueprintDateLocks(dateDetailsApiResponse.blueprint_date_locks)
-      })
-      .catch(() => {
+    const fetchAllPages = async () => {
+      let url = itemTypeToApiURL(courseId, itemType, itemContentId)
+      const allResponses = []
+      setFetchInFlight(true)
+      try {
+        let pageCount = 0
+        let args: DoFetchApiOpts = {
+          path: url,
+          params: {per_page: 100},
+        }
+        while (url && pageCount < MAX_PAGES) {
+          // eslint-disable-next-line no-await-in-loop
+          const response: FetchDueDatesResponse = await doFetchApi(args)
+          allResponses.push(response.json)
+          url = response.link?.next?.url || null
+          args = {
+            path: url,
+          }
+          pageCount++
+        }
+
+        const combinedResponse = allResponses.reduce(
+          (acc, response) => ({
+            blueprint_date_locks: [
+              ...(acc.blueprint_date_locks || []),
+              ...(response.blueprint_date_locks || []),
+            ],
+          }),
+          {}
+        )
+        setBlueprintDateLocks(combinedResponse.blueprint_date_locks)
+      } catch {
         showFlashError()()
         handleDismiss()
-      })
-      .finally(() => {
+      } finally {
+        setHasFetched(true)
         setFetchInFlight(false)
         initialLoadRef.current = true
-      })
+      }
+    }
+    !hasFetched && fetchAllPages()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -259,14 +286,42 @@ const ItemAssignToTrayContent = ({
       }
       return
     }
-    setFetchInFlight(true)
-    doFetchApi({
-      path: itemTypeToApiURL(courseId, itemType, itemContentId),
-      params: {per_page: 100},
-    })
-      .then((response: FetchDueDatesResponse) => {
-        // TODO: exhaust pagination
-        const dateDetailsApiResponse = response.json
+
+    const fetchAllPages = async () => {
+      setFetchInFlight(true)
+      let url = itemTypeToApiURL(courseId, itemType, itemContentId)
+      const allResponses = []
+
+      try {
+        let pageCount = 0
+        let args: DoFetchApiOpts = {
+          path: url,
+          params: {per_page: 100},
+        }
+        while (url && pageCount < MAX_PAGES) {
+          // eslint-disable-next-line no-await-in-loop
+          const response: FetchDueDatesResponse = await doFetchApi(args)
+          allResponses.push(response.json)
+          url = response.link?.next?.url || null
+          args = {
+            path: url,
+          }
+          pageCount++
+        }
+
+        const combinedResponse = allResponses.reduce(
+          (acc, response) => ({
+            ...response,
+            overrides: [...(acc.overrides || []), ...(response.overrides || [])],
+            blueprint_date_locks: [
+              ...(acc.blueprint_date_locks || []),
+              ...(response.blueprint_date_locks || []),
+            ],
+          }),
+          {}
+        )
+
+        const dateDetailsApiResponse = combinedResponse
         const overrides = dateDetailsApiResponse.overrides
         const overriddenTargets = getOverriddenAssignees(overrides)
         delete dateDetailsApiResponse.overrides
@@ -373,15 +428,16 @@ const ItemAssignToTrayContent = ({
         setInitialCards(cards)
         onInitialStateSet?.(cards)
         setAssignToCards(cards)
-      })
-      .catch(() => {
+      } catch {
         showFlashError()()
         handleDismiss()
-      })
-      .finally(() => {
+      } finally {
+        setHasFetched(true)
         setFetchInFlight(false)
         initialLoadRef.current = true
-      })
+      }
+    }
+    !hasFetched && fetchAllPages()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId, itemContentId, itemType, JSON.stringify(defaultCards)])
 
