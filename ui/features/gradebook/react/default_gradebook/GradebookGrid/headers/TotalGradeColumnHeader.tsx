@@ -193,7 +193,7 @@ export default class TotalGradeColumnHeader extends ColumnHeader<Props, State> {
     const displayAsPoints = gradeDisplay.currentDisplay === 'points'
     const showSeparator = !gradeDisplay.hidden
     const menuShown = this.state.menuShown
-    const allStudents = this.props.allStudents
+    const allStudents = this.props.getAllStudents()
     const courseId = this.props.courseId
     const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`
 

@@ -47,11 +47,6 @@ describe "Gradebook - message students who" do
       Gradebook.visit(@course)
       Gradebook.click_assignment_header_menu_element(@third_assignment.id, "message students")
 
-      # Select "Have not submitted" option
-      f("input[data-testid='criterion-dropdown']").click
-      options = ff("[data-testid='criterion-dropdown-item']")
-      options[1].click
-
       f("button[data-testid='show_all_recipients']").click
 
       expect(fxpath_table_cell("List of students and observers", 1, 1)).to include_text(@student_1.name)
@@ -64,11 +59,6 @@ describe "Gradebook - message students who" do
     it "sends messages successfully" do
       Gradebook.visit(@course)
       Gradebook.click_assignment_header_menu_element(@third_assignment.id, "message students")
-
-      # Select "Have not submitted" option
-      f("input[data-testid='criterion-dropdown']").click
-      options = ff("[data-testid='criterion-dropdown-item']")
-      options[1].click
 
       f("button[data-testid='show_all_recipients']").click
 

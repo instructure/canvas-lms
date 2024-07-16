@@ -60,6 +60,8 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeader', suiteHooks => {
         settingKey: 'grade',
       },
 
+      getAllStudents: () => {},
+
       isRunningScoreToUngraded: false,
 
       userId: '123',
