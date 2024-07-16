@@ -38,6 +38,8 @@ const locale = {
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Ba cheart go mbeadh naisc in aice leis an URL céanna ina nasc amháin."
   },
+  "ai_response_9624e8e8": { "message": "Freagra IS" },
+  "ai_tools_fda01177": { "message": "Uirlisí IS" },
   "aleph_f4ffd155": { "message": "Aleph" },
   "align_11050992": { "message": "Ailínigh" },
   "alignment_and_lists_5cebcb69": { "message": "Ailíniú agus Liostaí" },
@@ -55,6 +57,9 @@ const locale = {
   },
   "an_error_occurred_making_a_network_request_d1bda348": {
     "message": "Tharla earráid agus iarratas gréasáin á dhéanamh"
+  },
+  "an_error_occurred_processing_your_request_a3a38d84": {
+    "message": "Tharla earráid agus d''iarratas á phróiseáil"
   },
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "Tharla earráid agus do mheáin á uaslódáil."
@@ -189,6 +194,7 @@ const locale = {
   "column_e1ae5c64": { "message": "Colún" },
   "column_group_1c062368": { "message": "Grúpa colún" },
   "complex_numbers_a543d004": { "message": "Uimhreacha Coimpléascacha" },
+  "compose_44c904f4": { "message": "Cum" },
   "computer_1d7dfa6f": { "message": "Ríomhaire" },
   "congruent_5a244acd": { "message": "Iomchuí" },
   "contains_311f37b7": { "message": "Tá an méid seo ann" },
@@ -202,6 +208,7 @@ const locale = {
   "content_subtype_5ce35e88": { "message": "Fochineál Ábhar" },
   "content_type_2cf90d95": { "message": "Cineál Ábhar" },
   "coproduct_e7838082": { "message": "Comhtháirge" },
+  "copy_9748f9f": { "message": "Cóipeáil" },
   "copyright_holder_66ee111": { "message": "Sealbhóir Cóipchirt:" },
   "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
     "message": "Níorbh fhéidir ábhar a chur isteach: Ní thacaítear le míreanna \"{ itemType }\" i gCanvas faoi láthair."
@@ -280,6 +287,7 @@ const locale = {
   "discussions_a5f96392": { "message": "Fóraim" },
   "discussions_index_6c36ced": { "message": "Innéacs Fóraim" },
   "disjoint_union_e74351a8": { "message": "Aontas Scartha" },
+  "dislike_14befc48": { "message": "Tabhair ‘ní maith liom’ dó" },
   "display_options_315aba85": { "message": "Roghanna Taispeána" },
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Taispeáin Nasc Téacs (Osclaítear i táb nua é)"
@@ -347,6 +355,7 @@ const locale = {
     "message": "cuir isteach téacs athsholáthair"
   },
   "enter_search_text_26cb4459": { "message": "cuir isteach téacs cuardaigh" },
+  "enter_text_8b35c65b": { "message": "Cuir isteach téacs" },
   "epsilon_54bb8afa": { "message": "Eipsealón" },
   "epsilon_variant_d31f1e77": { "message": "Eipsealón (Athraithe)" },
   "equals_sign_c51bdc58": { "message": "Comhartha Comhionann" },
@@ -373,6 +382,9 @@ const locale = {
   "f_function_fe422d65": { "message": "F (feidhm)" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Theip ar ábhar an chomhaid a fháil"
+  },
+  "failed_to_copy_response_d3def551": {
+    "message": "Theip an freagra a choipeáil"
   },
   "failed_to_retrieve_content_from_external_tool_5899c213": {
     "message": "Theip ar ábhar a aisghabháil ón uirlis sheachtrach"
@@ -463,6 +475,12 @@ const locale = {
   "health_icon_8d292eb5": { "message": "Deilbhín Sláinte" },
   "hearts_suit_e50e04ca": { "message": "Hart (Dath)" },
   "height_69b03e15": { "message": "Airde" },
+  "hello_please_describe_the_modifications_you_would__49b19837": {
+    "message": "Dia duit. Déan cur síos le do thoil ar na mionathruithe ar mhaith leat a dhéanamh ar do phíosa."
+  },
+  "hello_please_describe_the_modifications_you_would__600dbbf0": {
+    "message": "Dia duit. Déan cur síos le do thoil ar na mionathruithe ar mhaith leat a dhéanamh ar do rogha."
+  },
   "hexagon_d8468e0d": { "message": "Heicseagán" },
   "hide_description_bfb5502e": { "message": "Cuir cur síos i bhfolach" },
   "hide_title_description_caf092ef": {
@@ -478,6 +496,9 @@ const locale = {
     "message": "Tá cead faighte agam an comhad seo a úsáid."
   },
   "i_hold_the_copyright_71ee91b1": { "message": "Tá an cóipcheart agam" },
+  "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+    "message": "Tá brón orm, ach ní féidir liom teacht ar fhreagra IS"
+  },
   "icon_215a1dc6": { "message": "Deilbhín" },
   "icon_8168b2f8": { "message": "deibhlín" },
   "icon_color_b86dd6d6": { "message": "Dath Deilbhín" },
@@ -663,6 +684,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Lúide/Móide" },
   "misc_3b692ea7": { "message": "Ilchineál" },
   "miscellaneous_e9818229": { "message": "Ilchineálach" },
+  "modify_6b0b13e3": { "message": "Athraigh" },
   "module_90d9fd32": { "message": "Modúl" },
   "modules_c4325335": { "message": "Modúil" },
   "moving_image_to_crop_directionword_6f66cde2": {
@@ -811,6 +833,9 @@ const locale = {
   "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
     "message": "Tabhair cead do Canvas rochtain a fháil ar do mhicreafón agus ceamara gréasáin."
   },
+  "please_decribe_what_you_would_like_to_compose_27a51be5": {
+    "message": "Déan cur síos le do thoil ar cad ba mhaith leat a chumadh."
+  },
   "plus_d43cd4ec": { "message": "Móide" },
   "plus_minus_f8be2e83": { "message": "Móide/Lúide" },
   "posted_when_a578f5ab": { "message": "Postáilte: { when }" },
@@ -873,10 +898,14 @@ const locale = {
   },
   "reset_95a81614": { "message": "Athshocraigh" },
   "resize_ec83d538": { "message": "Athraigh méid" },
+  "response_copied_to_clipboard_130d66cd": {
+    "message": "Cóipeáladh an freagra chuig an ngearrthaisce"
+  },
   "restore_auto_save_deccd84b": {
     "message": "Athchóirigh sábháil uathoibríoch?"
   },
   "result_index_of_max_7db5ad8b": { "message": "Toradh { index } de { max }." },
+  "retry_ebd5f8ba": { "message": "Bain triail eile as" },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Cas an Geata Droim ar Ais (Ní Ghéilltear)"
   },
@@ -963,6 +992,7 @@ const locale = {
     "message": "Shift-O chun an t-eagarthóir deas html a oscailt."
   },
   "shortcut_911d6255": { "message": "Aicearra" },
+  "show_all_967a90f0": { "message": "Taispeáin gach rud" },
   "show_audio_options_b489926b": { "message": "Taispeáin roghanna fuaime" },
   "show_image_options_1e2ecc6b": { "message": "Taispeáin roghanna íomhá" },
   "show_link_options_545338fd": { "message": "Taispeáin roghanna naisc" },
@@ -1261,6 +1291,7 @@ const locale = {
   "view_word_and_character_counts_a743dd0c": {
     "message": "Féach ar líon na bhfocal agus na gcarachtar"
   },
+  "waiting_for_response_1efd0c50": { "message": "Ag feitheamh ar fhreagra" },
   "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
     "message": "Níorbh fhéidir linn micreafón a bhí ag obair ceangailte le do ghléas a bhrath."
   },
@@ -1274,6 +1305,9 @@ const locale = {
   "webcam_fe91b20f": { "message": "Ceamara gréasáin" },
   "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
     "message": "Níor cheart ach H1 amháin a bheith ag leathanaigh ghréasáin, a úsáideann Teideal an leathanaigh go huathoibríoch. Ba cheart gur H2 an chéad cheannteideal i d’ábhar."
+  },
+  "what_would_you_like_to_do_6dc0d541": {
+    "message": "Céard ba mhaith leat a dhéanamh?"
   },
   "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
     "message": "Nuair a úsáidtear marcáil a dhéanann formáid amhairc ar mhíreanna mar liosta ach nach léiríonn an gaol liosta, d’fhéadfadh go mbeadh deacracht ag úsáideoirí an fhaisnéis a nascleanúint."
@@ -1289,6 +1323,7 @@ const locale = {
   "word_count_c77fe3a6": { "message": "Comhaireamh Focal" },
   "words_b448b7d5": { "message": "Focail" },
   "wreath_product_200b38ef": { "message": "Táirge Wreath" },
+  "writing_assistant_a30ac16a": { "message": "Cúntóir Scríbhneoireachta" },
   "xi_149681d0": { "message": "Xí" },
   "yes_dde87d5": { "message": "Tá" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
