@@ -1881,7 +1881,7 @@ RSpec.describe ApplicationController do
 
           controller.external_tools_display_hashes(:account_navigation, @course)
 
-          expect(controller.js_env[:LTI_TOOL_SCOPES]).to eq("http://example.com" => [TokenScopes::LTI_PAGE_CONTENT_SHOW_SCOPE])
+          expect(controller.js_env[:LTI_TOOL_SCOPES]).to eq("http://example.com" => TokenScopes::LTI_POSTMESSAGE_SCOPES)
         end
       end
 
