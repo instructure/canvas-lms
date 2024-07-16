@@ -157,8 +157,8 @@ export default forwardRef(function ItemAssignToCard(
 
   const deleteCardButtonRef = useRef<Element | null>(null)
   const assigneeSelectorRef = useRef<HTMLInputElement | null>(null)
-  const dateInputRefs = useRef<Record<string, HTMLInputElement | null>>({})
-  const timeInputRefs = useRef<Record<string, HTMLInputElement | null>>({})
+  const dateInputRefs = useRef<Record<string, HTMLInputElement>>({})
+  const timeInputRefs = useRef<Record<string, HTMLInputElement>>({})
   const dateValidator = useRef<DateValidator>(
     new DateValidator({
       date_range: {...ENV.VALID_DATE_RANGE},
