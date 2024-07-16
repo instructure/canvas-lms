@@ -21,6 +21,8 @@
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Ligações adjacentes com o mesmo URL devem ser uma única ligação."
   },
+  "ai_response_9624e8e8": { "message": "Resposta IA" },
+  "ai_tools_fda01177": { "message": "Ferramentas IA" },
   "aleph_f4ffd155": { "message": "Alef" },
   "align_11050992": { "message": "Alinhar" },
   "alignment_and_lists_5cebcb69": { "message": "Alinhamento e Listas" },
@@ -38,6 +40,9 @@
   },
   "an_error_occurred_making_a_network_request_d1bda348": {
     "message": "Ocorreu um erro ao fazer uma solicitação de rede"
+  },
+  "an_error_occurred_processing_your_request_a3a38d84": {
+    "message": "Ocorreu um erro ao processar o seu pedido"
   },
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "Ocorreu um erro ao carregar seu multimédia."
@@ -170,6 +175,7 @@
   "column_e1ae5c64": { "message": "Coluna" },
   "column_group_1c062368": { "message": "Grupo de coluna" },
   "complex_numbers_a543d004": { "message": "Números complexos" },
+  "compose_44c904f4": { "message": "Compor" },
   "computer_1d7dfa6f": { "message": "Computador" },
   "congruent_5a244acd": { "message": "Congruente" },
   "contains_311f37b7": { "message": "Contém" },
@@ -183,6 +189,7 @@
   "content_subtype_5ce35e88": { "message": "Subtipo de conteúdo" },
   "content_type_2cf90d95": { "message": "Tipo de conteúdo" },
   "coproduct_e7838082": { "message": "Co-produto" },
+  "copy_9748f9f": { "message": "Copiar" },
   "copyright_holder_66ee111": { "message": "Titular dos direitos de autor:" },
   "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
     "message": "Não foi possível inserir conteúdo: Os itens \"{ itemType }\" não são actualmente suportados no Canvas."
@@ -257,6 +264,7 @@
   "discussions_a5f96392": { "message": "Discussões" },
   "discussions_index_6c36ced": { "message": "Índice de discussões" },
   "disjoint_union_e74351a8": { "message": "União Desjunta" },
+  "dislike_14befc48": { "message": "Não gosto" },
   "display_options_315aba85": { "message": "Opções de exibição" },
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Exibir ligação de texto (abre em uma nova guia)"
@@ -324,6 +332,7 @@
     "message": "introduzir texto de substituição"
   },
   "enter_search_text_26cb4459": { "message": "introduzir texto de pesquisa" },
+  "enter_text_8b35c65b": { "message": "Introduzir texto" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Variante)" },
   "equals_sign_c51bdc58": { "message": "Sinal de igualdade" },
@@ -350,6 +359,9 @@
   "f_function_fe422d65": { "message": "F (função)" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Falha na obtenção do conteúdo do ficheiro"
+  },
+  "failed_to_copy_response_d3def551": {
+    "message": "Falha ao copiar a resposta"
   },
   "failed_to_retrieve_content_from_external_tool_5899c213": {
     "message": "Falha na recuperação de conteúdo de ferramenta externa"
@@ -438,6 +450,12 @@
   "health_icon_8d292eb5": { "message": "Ícone de saúde" },
   "hearts_suit_e50e04ca": { "message": "Corações (Fato)" },
   "height_69b03e15": { "message": "Altura" },
+  "hello_please_describe_the_modifications_you_would__49b19837": {
+    "message": "Olá. Por favor, descreva as modificações que gostava de fazer na sua composição."
+  },
+  "hello_please_describe_the_modifications_you_would__600dbbf0": {
+    "message": "Olá. Por favor, descreva as modificações que gostaria de fazer à sua seleção."
+  },
   "hexagon_d8468e0d": { "message": "Hexágono" },
   "hide_description_bfb5502e": { "message": "Ocultar descrição" },
   "hide_title_description_caf092ef": {
@@ -454,6 +472,9 @@
   },
   "i_hold_the_copyright_71ee91b1": {
     "message": "Sou o titular dos direitos de autor"
+  },
+  "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+    "message": "Lamento, mas não consigo encontrar a resposta da IA"
   },
   "icon_215a1dc6": { "message": "Ícone" },
   "icon_8168b2f8": { "message": "Ícone" },
@@ -640,6 +661,7 @@
   "minus_plus_3461f637": { "message": "Menos/Menos" },
   "misc_3b692ea7": { "message": "Diversos" },
   "miscellaneous_e9818229": { "message": "Diversos" },
+  "modify_6b0b13e3": { "message": "Modificar" },
   "module_90d9fd32": { "message": "Módulo" },
   "modules_c4325335": { "message": "Módulos" },
   "moving_image_to_crop_directionword_6f66cde2": {
@@ -796,6 +818,9 @@
   "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
     "message": "Por favor, permita que o Canvas aceda ao seu microfone e webcam."
   },
+  "please_decribe_what_you_would_like_to_compose_27a51be5": {
+    "message": "Por favor, descreva o que gostava de compor."
+  },
   "plus_d43cd4ec": { "message": "Mais" },
   "plus_minus_f8be2e83": { "message": "Mais/Menos" },
   "posted_when_a578f5ab": { "message": "Publicado: { when }" },
@@ -860,10 +885,14 @@
   },
   "reset_95a81614": { "message": "Redefinir" },
   "resize_ec83d538": { "message": "Redimensionar" },
+  "response_copied_to_clipboard_130d66cd": {
+    "message": "Resposta copiada para a área de transferência"
+  },
   "restore_auto_save_deccd84b": { "message": "Restaurar o auto-salvamento?" },
   "result_index_of_max_7db5ad8b": {
     "message": "Resultado { index } de { max }."
   },
+  "retry_ebd5f8ba": { "message": "Tentar novamente" },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Torniquete reverso (Não Rende)"
   },
@@ -944,6 +973,7 @@
     "message": "Shift-O para abrir o editor de html bonito."
   },
   "shortcut_911d6255": { "message": "Atalho" },
+  "show_all_967a90f0": { "message": "Mostrar tudo" },
   "show_audio_options_b489926b": { "message": "Mostrar opções de áudio" },
   "show_image_options_1e2ecc6b": { "message": "Mostrar opções de imagem" },
   "show_link_options_545338fd": { "message": "Mostrar opções de ligação" },
@@ -1242,6 +1272,7 @@
   "view_word_and_character_counts_a743dd0c": {
     "message": "Ver contagem de palavras e caracteres"
   },
+  "waiting_for_response_1efd0c50": { "message": "À espera de resposta" },
   "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
     "message": "Não conseguimos detectar um microfone a funcionar ligado ao seu dispositivo."
   },
@@ -1255,6 +1286,9 @@
   "webcam_fe91b20f": { "message": "Webcam" },
   "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
     "message": "As páginas web devem ter apenas um único H1, que é automaticamente utilizado pelo título da página. O primeiro título do seu conteúdo deve ser um H2."
+  },
+  "what_would_you_like_to_do_6dc0d541": {
+    "message": "O que você gostava de fazer?"
   },
   "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
     "message": "Quando a marcação é usada para formatar itens visualmente como uma lista, mas não indica o relacionamento da lista, os utilizadores podem ter dificuldade em navegar pelas informações."
@@ -1270,6 +1304,7 @@
   "word_count_c77fe3a6": { "message": "Contagem de palavras" },
   "words_b448b7d5": { "message": "Palavras" },
   "wreath_product_200b38ef": { "message": "Produto da coroa de flores" },
+  "writing_assistant_a30ac16a": { "message": "Assistente de redação" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Sim" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
