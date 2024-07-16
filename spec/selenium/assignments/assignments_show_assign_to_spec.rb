@@ -172,4 +172,22 @@ describe "assignments show page assign to" do
     option_names = option_elements.map(&:text)
     expect(option_names).to include("Mastery Paths")
   end
+
+  it "shows all the overrides if there are more than a page size for the assignment", custom_timeout: 30 do
+    @page_size = 5
+    stub_const("Api::MAX_PER_PAGE", @page_size)
+    create_users_in_course(@course, 20, return_type: :record, name_prefix: "Student")
+    Assignment.suspend_due_date_caching do
+      @course.students.each do |student|
+        ao = @assignment1.assignment_overrides.create!
+        ao.assignment_override_students.create!(user: student)
+      end
+    end
+    get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
+    AssignmentPage.click_assign_to_button
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+    # there were 2 existing users in the course, plus the Everyone Else card, so we expect 23 cards
+    expect(module_item_assign_to_card.length).to eq(23)
+  end
 end
