@@ -407,5 +407,5 @@ Currently, only `Assignments` and `Wiki Pages` are supported by getPageContent, 
 #### Security
 
 To control access to the **lti.getPageContent** postMessage function, we have introduced a new LTI
- scope `http://canvas.instructure.com/lti/page_content/show`, tools without this scope will not
+ scope `https://canvas.instructure.com/lti/page_content/show`, tools without this scope will not
  be able to invoke the postMessage function.
