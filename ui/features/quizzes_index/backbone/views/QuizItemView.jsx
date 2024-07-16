@@ -388,12 +388,19 @@ export default class ItemView extends Backbone.View {
   toJSON() {
     const base = extend(this.model.toJSON(), this.options)
     const isNewQuizzes = this.model.get('quiz_type') === 'quizzes.next'
+    const modelId = this.model.get('id')
+    const resourceQueryString = isNewQuizzes ? `assignments[]=${modelId}` : `quizzes[]=${modelId}`
     const isShareToCommons = (tool) => tool.canvas_icon_class === 'icon-commons'
     const tools = ENV.quiz_menu_tools || []
 
-    base.quiz_menu_tools = isNewQuizzes ? tools.filter(tool => !isShareToCommons(tool)) : tools
+    if (!isNewQuizzes || ENV.FEATURES.commons_new_quizzes) {
+      base.quiz_menu_tools = tools
+    } else {
+      base.quiz_menu_tools = tools.filter(tool => !isShareToCommons(tool))
+    }
+
     each(base.quiz_menu_tools, tool => {
-      tool.url = tool.base_url + `&quizzes[]=${this.model.get('id')}`
+      tool.url = `${tool.base_url}&${resourceQueryString}`
     })
 
     base.cyoe = CyoeHelper.getItemData(base.assignment_id, base.quiz_type === 'assignment')

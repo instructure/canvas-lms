@@ -57,6 +57,11 @@
     <% if module_item&.content&.respond_to?("can_duplicate?") %>
       <%= 'cannot-duplicate' if !module_item&.content&.can_duplicate?%>
     <% end %>
+    <% if module_item&.content&.is_a?(Assignment) %>
+      <% if !module_item.content.quiz_lti? || Account.site_admin.feature_enabled?(:commons_new_quizzes) %>
+        <%= 'show_assignment_menu' %>
+      <% end %>
+    <% end %>
     <%= module_item.content_type_class(@is_student) if module_item %>
     <%= 'also_assignment' if module_item && module_item.graded? %>
     indent_<%= module_item.try_rescue(:indent) || '0' %>
