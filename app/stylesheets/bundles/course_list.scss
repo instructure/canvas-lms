@@ -21,9 +21,6 @@
 .page_header {
   @include page_header;
 }
-.page_header_container {
-  @include page_header_container
-}
 
 .course-list-table {
   table-layout: fixed;

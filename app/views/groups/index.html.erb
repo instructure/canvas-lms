@@ -29,9 +29,7 @@
 </span>
 
   <% if @domain_root_account.feature_enabled?(:instui_nav) %>
-    <div class="page_header_container">
-      <h1 class="page_header"><%= t :heading_current_groups, 'Current Groups' %></h1>
-    </div>
+    <h1 class="page_header"><%= t :heading_current_groups, 'Current Groups' %></h1>
   <% else %>
     <h2><%= t :heading_current_groups, 'Current Groups' %></h2>
   <% end %>
