@@ -16,7 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useMemo, memo, useRef, useState} from 'react'
+import React, {
+  useCallback,
+  useEffect,
+  memo,
+  useRef,
+  useState,
+  type RefObject,
+  type MutableRefObject,
+  type RefAttributes,
+} from 'react'
 import {Mask} from '@instructure/ui-overlays'
 import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
@@ -36,9 +45,12 @@ import type {
   FetchDueDatesResponse,
   ItemAssignToCardSpec,
 } from './types'
-import ItemAssignToCard, {type ItemAssignToCardRef} from './ItemAssignToCard'
+import ItemAssignToCard, {
+  type ItemAssignToCardProps,
+  type ItemAssignToCardRef,
+} from './ItemAssignToCard'
 import {getOverriddenAssignees, itemTypeToApiURL} from '../../utils/assignToHelper'
-import {getEveryoneOption, ItemAssignToTrayProps} from './ItemAssignToTray'
+import {getEveryoneOption, type ItemAssignToTrayProps} from './ItemAssignToTray'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -64,8 +76,8 @@ export interface ItemAssignToTrayContentProps
   everyoneOption: AssigneeOption
   setGroupCategoryId: (id: string | null) => void
   setOverridesFetched: (flag: boolean) => void
-  cardsRefs: React.MutableRefObject<{
-    [cardId: string]: ItemAssignToCardRef
+  cardsRefs: MutableRefObject<{
+    [cardId: string]: RefObject<ItemAssignToCardRef>
   }>
   postToSIS?: boolean
   assignToCardsRef: React.MutableRefObject<ItemAssignToCardSpec[]>
@@ -75,13 +87,13 @@ function makeCardId(): string {
   return uid('assign-to-card', 12)
 }
 
+type OptimizedItemAssignToCardProps = ItemAssignToCardProps & RefAttributes<ItemAssignToCardRef>
+
 const ItemAssignToCardMemo = memo(
-  props => {
-    return <ItemAssignToCard {...props} />
-  },
-  (prevProps: ItemAssignToCardSpec, nextProps: ItemAssignToCardSpec) => {
+  ItemAssignToCard,
+  (prevProps: OptimizedItemAssignToCardProps, nextProps: OptimizedItemAssignToCardProps) => {
     return (
-      prevProps.everyoneOption.value === nextProps.everyoneOption.value &&
+      prevProps.everyoneOption?.value === nextProps.everyoneOption?.value &&
       prevProps.selectedAssigneeIds?.length === nextProps.selectedAssigneeIds?.length &&
       // prevProps.disabledOptionIds === nextProps.disabledOptionIds &&
       prevProps.highlightCard === nextProps.highlightCard &&
@@ -203,12 +215,29 @@ const ItemAssignToTrayContent = ({
       const card = assignToCards.at(focusIndex)
       if (card) {
         const cardRef = cardsRefs.current[card.key]
-        cardRef?.focusDeleteButton()
+        if (cardRef?.current) {
+          lastPerformedAction.current = null
+          cardRef.current.focusDeleteButton()
+        }
       }
     }
-    lastPerformedAction.current = null
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [assignToCards.length])
+  }, [assignToCards, cardsRefs])
+
+  useEffect(() => {
+    // Remove extra refs if cards array has shrunk
+    Object.keys(cardsRefs.current).forEach(key => {
+      if (!assignToCards.some(card => card.key === key)) {
+        delete cardsRefs.current[key]
+      }
+    })
+
+    // Ensure cardsRefs has refs for all items
+    assignToCards.forEach(card => {
+      if (!cardsRefs.current[card.key]) {
+        cardsRefs.current[card.key] = React.createRef<ItemAssignToCardRef>()
+      }
+    })
+  }, [assignToCards, cardsRefs])
 
   useEffect(() => {
     if (defaultCards !== undefined) {
@@ -520,11 +549,11 @@ const ItemAssignToTrayContent = ({
     (cardId: string, dateAttribute: string, dateValue: string | null) => {
       const newDate = dateValue // === null ? undefined : dateValue
       const initialCard = initialCards.find(card => card.key === cardId)
-      const {highlightCard, isEdited, ...currentCardProps} = assignToCards.find(
+      const currentCardProps = assignToCardsRef.current.find(
         card => card.key === cardId
       ) as ItemAssignToCardSpec
       const currentCard = {...currentCardProps, [dateAttribute]: newDate}
-      const priorCard = assignToCards.find(card => card.key === cardId)
+      const priorCard = assignToCardsRef.current.find(card => card.key === cardId)
       if (priorCard) {
         const dateChanged = priorCard[dateAttribute] !== dateValue
         if (!dateChanged) {
@@ -539,21 +568,12 @@ const ItemAssignToTrayContent = ({
       setAssignToCards(cards)
       onDatesChange?.(cardId, dateAttribute, newDate ?? '')
     },
-    [assignToCards, assignToCardsRef, initialCards, onDatesChange, setAssignToCards]
+    [assignToCardsRef, initialCards, onDatesChange, setAssignToCards]
   )
 
   const allCardsAssigned = () => {
     return assignToCardsRef.current.every(card => card.hasAssignees)
   }
-
-  const stableCardRef = useCallback(
-    (card, cardRef) => {
-      if (cardRef) {
-        cardsRefs.current[card.key] = cardRef
-      }
-    },
-    [cardsRefs]
-  )
 
   const renderCardsOptimized = useCallback(
     (isOpen?: boolean) => {
@@ -561,7 +581,7 @@ const ItemAssignToTrayContent = ({
       return assignToCards.map(card => (
         <View key={`${card.key}`} as="div" margin="small 0 0 0">
           <ItemAssignToCardMemo
-            ref={stableCardRef}
+            ref={cardsRefs.current[card.key]}
             courseId={courseId}
             contextModuleId={card.contextModuleId}
             contextModuleName={card.contextModuleName}
@@ -608,7 +628,7 @@ const ItemAssignToTrayContent = ({
       postToSIS,
       removeDueDateInput,
       setSearchTerm,
-      stableCardRef,
+      cardsRefs,
     ]
   )
 
@@ -619,9 +639,7 @@ const ItemAssignToTrayContent = ({
         // eslint-disable-next-line react/no-array-index-key
         <View key={`${card.key}-${i}`} as="div" margin="small 0 0 0">
           <ItemAssignToCard
-            ref={cardRef => {
-              if (cardRef) cardsRefs.current[card.key] = cardRef
-            }}
+            ref={cardsRefs.current[card.key]}
             courseId={courseId}
             contextModuleId={card.contextModuleId}
             contextModuleName={card.contextModuleName}
