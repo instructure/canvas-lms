@@ -1221,6 +1221,8 @@ class AccountsController < ApplicationController
           @account.settings[:emoji_deny_list] = emoji_deny_list
         end
 
+        set_app_center_access_token
+
         if @account.grants_right?(@current_user, :manage_site_settings)
           google_docs_domain = params[:account][:settings].try(:delete, :google_docs_domain)
           if @account.feature_enabled?(:google_docs_domain_restriction) &&
@@ -1388,8 +1390,14 @@ class AccountsController < ApplicationController
       else
         js_permissions[:create_tool_manually] = @account.grants_right?(@current_user, session, :create_tool_manually)
       end
+
+      can_set_token = true
+      if @account.root_account.feature_enabled?(:require_permission_for_app_center_token)
+        can_set_token = %i[add_tool_manually edit_tool_manually delete_tool_manually create_tool_manually].any? { |perm| js_permissions[perm] }
+      end
+
       js_env({
-               APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
+               APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled?, can_set_token: },
                LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
                EXTERNAL_TOOLS_CREATE_URL: url_for(controller: :external_tools, action: :create, account_id: @context.id),
                TOOL_CONFIGURATION_SHOW_URL: account_show_tool_configuration_url(account_id: @context.id, developer_key_id: ":developer_key_id"),
@@ -1851,6 +1859,20 @@ class AccountsController < ApplicationController
       # NOTE: Only _sets_ the property. It's up to the caller to `save` it
       @account.default_dashboard_view = new_view
     end
+  end
+
+  def set_app_center_access_token
+    # not touching params will allow it to be set as usual
+    return :ok unless @account.root_account.feature_enabled?(:require_permission_for_app_center_token)
+
+    token = params.dig(:account, :settings)&.delete(:app_center_access_token)
+    return if token.nil?
+
+    manage_lti_permissions = [:lti_add_edit, *RoleOverride::GRANULAR_MANAGE_LTI_PERMISSIONS]
+    return :unauthorized unless @account.grants_any_right?(@current_user, *manage_lti_permissions)
+
+    @account.settings[:app_center_access_token] = token
+    :ok
   end
 
   def set_course_template

@@ -145,10 +145,17 @@ describe('AppList', () => {
     expect(getByText('Filter by name')).not.toHaveFocus()
   })
 
-  it('renders manage app list button if context type is account', () => {
+  it('renders manage app list button if context type is account and user has permissions', () => {
+    window.ENV.APP_CENTER = {can_set_token: true}
     const stuff = renderAppList()
     const {getByText} = stuff
     expect(getByText('Manage App List')).toBeVisible()
+  })
+
+  it('does not render manage app list button if user has no permissions', () => {
+    window.ENV.APP_CENTER = {can_set_token: false}
+    const {queryByText} = renderAppList()
+    expect(queryByText('Manage App List')).not.toBeInTheDocument()
   })
 
   it('does not render manage app list button if context type is not account', () => {
