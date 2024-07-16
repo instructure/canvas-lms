@@ -32,7 +32,7 @@ import {useClassNames} from '../../../../utils'
 import type {TabsBlockTab, TabsBlockProps} from './types'
 import {TabsBlockToolbar} from './TabsBlockToolbar'
 
-const TabsBlock = ({tabs, variant = TabsBlock.custom.defaultProps.variant}: TabsBlockProps) => {
+const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
   const {actions, enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
@@ -157,7 +157,7 @@ const TabsBlock = ({tabs, variant = TabsBlock.custom.defaultProps.variant}: Tabs
   return (
     <Container className={clazz}>
       <Tabs
-        variant={variant === 'modern' ? 'default' : 'secondary'}
+        variant={variant === 'classic' ? 'secondary' : 'default'}
         onRequestTabChange={handleTabChange}
       >
         {renderTabs()}

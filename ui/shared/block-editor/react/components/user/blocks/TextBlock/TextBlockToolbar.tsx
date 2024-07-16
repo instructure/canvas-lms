@@ -35,7 +35,7 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import {useNode} from '@craftjs/core'
+import {useNode, type Node} from '@craftjs/core'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {
   IconBoldLine,
@@ -57,16 +57,16 @@ import {
   unboldElement,
 } from '../../../../utils'
 import {ColorModal} from '../../common/ColorModal'
-import {type TextBlockProps} from './common'
+import {type TextBlockProps} from './types'
 
 const TextBlockToolbar = () => {
   const {
     actions: {setProp},
     node,
     props,
-  } = useNode(node => ({
-    node,
-    props: node.data.props,
+  } = useNode((n: Node) => ({
+    node: n,
+    props: n.data.props as TextBlockProps,
   }))
   const [colorModalOpen, setColorModalOpen] = useState(false)
 
@@ -155,7 +155,6 @@ const TextBlockToolbar = () => {
         withBackground={false}
         withBorder={false}
         screenReaderLabel="Color"
-        disabled={props.variant === 'condensed'}
         onClick={handleColorButtonClick}
       >
         <IconTextColorLine size="x-small" />
@@ -163,7 +162,7 @@ const TextBlockToolbar = () => {
 
       <ColorModal
         open={colorModalOpen}
-        color={props.color}
+        color={props.color || 'var(--ic-brand-font-color-dark)'}
         variant="textcolor"
         onClose={handleCloseColorModal}
         onSubmit={handleColorChange}

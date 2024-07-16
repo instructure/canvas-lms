@@ -21,7 +21,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-import {iconMap} from '../../../../assets/icons'
+import {iconMap} from '../../../../assets/user-icons'
 
 type IconPickerProps = {
   iconName?: string

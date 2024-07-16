@@ -25,7 +25,7 @@ import {
   IconArrowUpLine,
   IconLikeLine,
 } from '@instructure/ui-icons'
-import {type IconProps} from '../iconTypes'
+import {type IconProps} from './iconTypes'
 
 export const IconAnnouncement = ({elementRef, size = 'small'}: IconProps) => {
   return <IconAnnouncementLine elementRef={elementRef} size={size} />

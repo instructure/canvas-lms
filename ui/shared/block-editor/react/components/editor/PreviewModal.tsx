@@ -33,7 +33,6 @@ type PreviewModalProps = {
 const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
   const {query} = useEditor()
   const [viewSize, setViewSize] = useState<ViewSize>('desktop')
-  const [container, setContainer] = useState<Element | null>(null)
 
   const handleKey = useCallback(
     (event: KeyboardEvent) => {
@@ -85,7 +84,6 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
             </RadioInputGroup>
           </div>
           <View
-            elementRef={el => setContainer(el)}
             as="div"
             className={`block-editor-view ${viewSize}`}
             maxWidth={getViewWidth()}

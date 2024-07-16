@@ -24,6 +24,7 @@ import {NumberInput} from '@instructure/ui-number-input'
 import {Popover} from '@instructure/ui-popover'
 import {IconTableInsertColumnAfterLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
+import {type ColumnsSectionProps} from './types'
 
 const MIN_COLS = 1
 const MAX_COLS = 4
@@ -56,7 +57,7 @@ const ColumnCountPopup = ({columns}: ColumnCountPopupProps) => {
     (value: number) => {
       setCols(value)
       setUserValue(value.toString())
-      setProp(prps => (prps.columns = value))
+      setProp((prps: ColumnsSectionProps) => (prps.columns = value))
     },
     [setProp]
   )
@@ -67,7 +68,7 @@ const ColumnCountPopup = ({columns}: ColumnCountPopupProps) => {
       const cols = parseInt(value, 10)
       setCols(cols)
       if (!Number.isNaN(cols) && cols >= MIN_COLS && cols <= MAX_COLS) {
-        setProp(prps => (prps.columns = value))
+        setProp((prps: ColumnsSectionProps) => (prps.columns = cols))
       } else {
         setMessages([{text: `Columns must be between 1 and ${MAX_COLS}`, type: 'error'}])
       }

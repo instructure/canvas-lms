@@ -27,11 +27,9 @@ import {type TabsBlockProps, type TabsBlockTab} from './types'
 const TabsBlockToolbar = () => {
   const {
     actions: {setProp},
-    node,
     props,
-  } = useNode(n => ({
-    node,
-    props: n.data.props,
+  } = useNode(node => ({
+    props: node.data.props,
   }))
   const [tabs, setTabs] = useState<TabsBlockTab[]>(props.tabs || [])
 

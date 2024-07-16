@@ -51,7 +51,7 @@ import {
   IconArrowUp,
   IconLike,
 } from './instuiIcons'
-import {type IconProps, type IconSize} from '../iconTypes'
+import {type IconProps, type IconSize} from './iconTypes'
 
 type IconType = React.FC<IconProps>
 

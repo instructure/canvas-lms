@@ -45,18 +45,11 @@ import ReactDOM from 'react-dom'
 import {useNode, useEditor, type Node} from '@craftjs/core'
 import {ROOT_NODE} from '@craftjs/utils'
 
-import {
-  IconArrowUpLine,
-  IconPlusLine,
-  IconTrashLine,
-  IconDragHandleLine,
-} from '@instructure/ui-icons'
-import {CondensedButton, IconButton} from '@instructure/ui-buttons'
+import {IconArrowUpLine, IconTrashLine, IconDragHandleLine} from '@instructure/ui-icons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View, type ViewProps} from '@instructure/ui-view'
 import {ToolbarSeparator} from './ToolbarSeparator'
-import {getScrollParent, getNodeIndex} from '../../utils'
-import {BlankSection} from '../user/sections/BlankSection'
 
 import type {AddSectionPlacement} from './types'
 import {SectionBrowser} from './SectionBrowser'
@@ -361,7 +354,7 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     setSectionBrowserOpen(where)
   }, [])
 
-  const renderSectionAdder = (isBefore: boolean = false) => {
+  const renderSectionAdder = () => {
     return (
       !!sectionBrowserOpen && (
         <SectionBrowser
@@ -375,7 +368,6 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
 
   return (
     <>
-      {node.data.name === 'PageBlock' && renderSectionAdder(true)}
       {!selected && hovered && renderHoverTag()}
       {selected && node.related && renderRelated()}
       {render}

@@ -23,7 +23,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
-import {isInstuiButtonColor} from '../blocks/ButtonBlock/common'
+import {isInstuiButtonColor} from '../blocks/ButtonBlock/types'
 import {ColorPicker} from '../../editor/ColorPicker'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 

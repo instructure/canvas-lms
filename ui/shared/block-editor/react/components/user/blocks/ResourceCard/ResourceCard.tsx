@@ -25,23 +25,15 @@ import {HeadingBlock} from '../HeadingBlock'
 import {TextBlock} from '../TextBlock'
 import {ButtonBlock} from '../ButtonBlock'
 import {IconBlock} from '../IconBlock'
-
-type ResourceCardProps = {
-  id?: string
-  title?: string
-  description?: string
-  iconName?: string
-  linkText?: string
-  linkUrl?: string
-}
+import {type ResourceCardProps} from './types'
 
 const ResourceCard = ({id, title, description, iconName, linkText, linkUrl}: ResourceCardProps) => {
   const [myId] = useState(id)
-  const [myTitle] = useState(title || 'Title')
-  const [myDescription] = useState(description || 'Description')
-  const [myIcon] = useState(iconName || 'apple')
-  const [myLinkText] = useState(linkText || 'Link')
-  const [myLinkUrl] = useState(linkUrl || '')
+  const [myTitle] = useState(title || ResourceCard.craft.defaultProps.title)
+  const [myDescription] = useState(description || ResourceCard.craft.defaultProps.description)
+  const [myIcon] = useState(iconName || ResourceCard.craft.defaultProps.iconName)
+  const [myLinkText] = useState(linkText || ResourceCard.craft.defaultProps.linkText)
+  const [myLinkUrl] = useState(linkUrl || ResourceCard.craft.defaultProps.linkUrl)
 
   return (
     <Container className="resource-card" id={myId} background="#fff">
@@ -90,6 +82,11 @@ ResourceCard.craft = {
   displayName: 'Resource Card',
   defaultProps: {
     id: uid('resource-card', 2),
+    title: 'Title',
+    description: 'Description',
+    iconName: 'apple',
+    linkText: 'Link',
+    linkUrl: '',
   },
   custom: {
     isDeletable: (myId: Node, query: any) => {

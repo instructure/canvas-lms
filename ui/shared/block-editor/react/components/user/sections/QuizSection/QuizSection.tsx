@@ -32,13 +32,10 @@ import {IconQuizSolid} from '@instructure/ui-icons'
 import {useClassNames} from '../../../../utils'
 import {QuizSectionMenu} from './QuizSectionMenu'
 import {QuizModal} from './QuizModal'
+import {type QuizSectionProps} from './types'
 
 const WIDTH = 'auto'
 const HEIGHT = 'auto'
-
-type QuizSectionProps = {
-  questionId?: string
-}
 
 const QuizSection = ({questionId}: QuizSectionProps) => {
   const {enabled} = useEditor(state => {
@@ -82,7 +79,7 @@ const QuizSection = ({questionId}: QuizSectionProps) => {
 
   const handleSelectQuestion = useCallback(
     (newQuestionId: string) => {
-      setProp(prps => {
+      setProp((prps: QuizSectionProps) => {
         prps.questionId = newQuestionId
       })
       setModalOpen(false)

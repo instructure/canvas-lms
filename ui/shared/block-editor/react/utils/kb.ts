@@ -102,7 +102,7 @@ const shouldAddNewNode = (e: React.KeyboardEvent, lastChar: string) => {
   )
 }
 
-const removeLastParagraphTag = elem => {
+const removeLastParagraphTag = (elem: HTMLElement) => {
   const paras = elem.querySelectorAll('p')
   if (paras.length > 0) {
     const lastPara = paras[paras.length - 1]

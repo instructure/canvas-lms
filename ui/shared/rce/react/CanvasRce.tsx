@@ -229,6 +229,11 @@ export interface CanvasRcePropTypes {
    * id of the resource where the RCE is used
    */
   resourceId?: number
+
+  /**
+   * any other props are passed through to the RCE
+   */
+  [key: string]: any
 }
 
 const defaultProps: Partial<CanvasRcePropTypes> = {

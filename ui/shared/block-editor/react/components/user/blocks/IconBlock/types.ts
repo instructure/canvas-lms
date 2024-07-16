@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {HeadingBlock} from './HeadingBlock'
+import {type IconSize} from '../../../../assets/user-icons'
 
-const HeadingBlockIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M5 0L5 12M5 24L5 12M5 12L19 12M19 0L19 12M19 24L19 12" stroke="black" stroke-width="2" stroke-linecap="round"/>
-</svg>`
+export {type IconSize}
 
-export {HeadingBlock, HeadingBlockIcon}
+export type IconBlockProps = {
+  iconName: string
+  size?: IconSize
+}

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useRef, useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import {useNode} from '@craftjs/core'
 
 import {IconButton} from '@instructure/ui-buttons'
@@ -27,8 +27,8 @@ import {IconLinkLine, IconButtonAndIconMakerLine, IconBoxLine} from '@instructur
 import {LinkModal} from '../../../editor/LinkModal'
 import {ColorModal} from '../../common/ColorModal'
 import {IconBackgroundColor} from '../../../../assets/internal-icons'
-import {isInstuiButtonColor} from './common'
-import type {ButtonBlockProps, ButtonSize, ButtonVariant} from './common'
+import {isInstuiButtonColor} from './types'
+import type {ButtonBlockProps, ButtonSize, ButtonVariant} from './types'
 import {IconPopup} from '../../common/IconPopup'
 
 const ButtonBlockToolbar = () => {

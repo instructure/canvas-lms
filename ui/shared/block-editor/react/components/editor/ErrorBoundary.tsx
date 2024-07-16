@@ -22,6 +22,10 @@ type ErrorBoundaryState = {
   hasError: boolean
 }
 
+type ErrorBoundaryProps = {
+  children: React.ReactNode[]
+}
+
 class ErrorBoundary extends React.Component {
   static propTypes = {
     children: PropTypes.node,
@@ -29,19 +33,19 @@ class ErrorBoundary extends React.Component {
 
   state: ErrorBoundaryState
 
-  constructor(props) {
+  constructor(props: ErrorBoundaryProps) {
     super(props)
     this.state = {hasError: false}
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(_error: Error) {
     // Update state so the next render will show the fallback UI.
     return {
       hasError: true,
     }
   }
 
-  componentDidCatch(error, info) {
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
     // eslint-disable-next-line no-console
     console.error(error, '\n', info.componentStack)
   }

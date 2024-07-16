@@ -21,7 +21,7 @@ import {useNode} from '@craftjs/core'
 import {IconButton} from '@instructure/ui-buttons'
 import {Menu, type MenuItemProps, type MenuItem} from '@instructure/ui-menu'
 import {IconCheckLine} from '@instructure/ui-icons'
-import {type ColumnsSectionVariant} from './types'
+import {type ColumnsSectionVariant, type ColumnsSectionProps} from './types'
 import {ColumnCountPopup} from './ColumnCountPopup'
 
 const ColumnsSectionToolbar = () => {
@@ -42,8 +42,9 @@ const ColumnsSectionToolbar = () => {
       _selected: MenuItemProps['selected'],
       _args: MenuItem
     ) => {
-      setVart(value as ColumnsSectionVariant)
-      setProp(prps => (prps.variant = value))
+      const vart = value as ColumnsSectionVariant
+      setVart(vart)
+      setProp((prps: ColumnsSectionProps) => (prps.variant = vart))
     },
     [setProp]
   )

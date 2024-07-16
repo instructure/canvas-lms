@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// @ts-expect-error
 import {IconBoxLine} from '@instructure/ui-icons/es/svg'
 import {BlankSection} from './BlankSection'
 

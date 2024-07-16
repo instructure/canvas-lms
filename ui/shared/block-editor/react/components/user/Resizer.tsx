@@ -152,30 +152,30 @@ export const Resizer = ({propKey, children, ...props}: any) => {
   })
 
   const updateInternalDimensionsInPx = useCallback(() => {
-    const {width: nodeWidth, height: nodeHeight} = nodeDimensions.current
+    const {width, height} = nodeDimensions.current
 
     const sz: SizeType = resizable.current?.resizable?.parentElement
       ? getElementDimensions(resizable.current.resizable.parentElement)
       : {width: Number.NaN, height: Number.NaN}
 
-    const width = percentToPx(nodeWidth, sz.width)
-    const height = percentToPx(nodeHeight, sz.height)
+    const new_width = percentToPx(width, sz.width)
+    const new_height = percentToPx(height, sz.height)
 
+    setInternalDimensions({
+      width: new_width,
+      height: new_height,
+    })
+  }, [])
+
+  const updateInternalDimensionsWithOriginal = useCallback(() => {
+    const {width, height} = nodeDimensions.current
     setInternalDimensions({
       width,
       height,
     })
   }, [])
 
-  const updateInternalDimensionsWithOriginal = useCallback(() => {
-    const {width: nodeWidth, height: nodeHeight} = nodeDimensions.current
-    setInternalDimensions({
-      width: nodeWidth,
-      height: nodeHeight,
-    })
-  }, [])
-
-  const getUpdatedDimensions = (width, height) => {
+  const getUpdatedDimensions = (width: number, height: number) => {
     const dom = resizable.current?.resizable
     if (!dom) return
 
@@ -183,8 +183,8 @@ export const Resizer = ({propKey, children, ...props}: any) => {
       currentHeight = parseInt(editingDimensions.current.height, 10)
 
     return {
-      width: currentWidth + parseInt(width, 10),
-      height: currentHeight + parseInt(height, 10),
+      width: currentWidth + width,
+      height: currentHeight + height,
     }
   }
 
