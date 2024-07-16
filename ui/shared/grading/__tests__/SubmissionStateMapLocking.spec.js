@@ -45,14 +45,14 @@ function createAndSetupMap(assignment, opts = {}) {
 
 describe('SubmissionStateMap without grading periods', () => {
   test('submission in an unpublished assignment is locked', () => {
-    const assignment = {id: '1', published: false, effectiveDueDates: {}}
+    const assignment = {id: '1', published: false, effectiveDueDates: {}, visible_to_everyone: true}
     const map = createAndSetupMap(assignment, {hasGradingPeriods: false})
     const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
     expect(state.locked).toBe(true)
   })
 
   test('submission in a published assignment is not locked', () => {
-    const assignment = {id: '1', published: true, effectiveDueDates: {}}
+    const assignment = {id: '1', published: true, effectiveDueDates: {}, visible_to_everyone: true}
     const map = createAndSetupMap(assignment, {hasGradingPeriods: false})
     const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
     expect(state.locked).toBe(false)
@@ -63,7 +63,7 @@ describe('SubmissionStateMap without grading periods', () => {
       id: '1',
       published: true,
       effectiveDueDates: {},
-      only_visible_to_overrides: true,
+      visible_to_everyone: false,
     }
     const map = createAndSetupMap(assignment, {hasGradingPeriods: false})
     const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
@@ -71,7 +71,7 @@ describe('SubmissionStateMap without grading periods', () => {
   })
 
   test('submission is unlocked for an assigned student', () => {
-    const assignment = {id: '1', published: true, effectiveDueDates: {}}
+    const assignment = {id: '1', published: true, effectiveDueDates: {}, visible_to_everyone: true}
     assignment.effectiveDueDates[student.id] = {
       due_at: null,
       grading_period_id: null,
@@ -94,7 +94,7 @@ describe('SubmissionStateMap with grading periods and all grading periods select
       id: '1',
       published: true,
       effectiveDueDates: {},
-      only_visible_to_overrides: true,
+      visible_to_everyone: false,
     }
     const map = createAndSetupMap(assignment, mapOptions)
     const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
@@ -102,7 +102,7 @@ describe('SubmissionStateMap with grading periods and all grading periods select
   })
 
   test('submission is locked for an assigned student with assignment due in a closed grading period', () => {
-    const assignment = {id: '1', published: true, effectiveDueDates: {}}
+    const assignment = {id: '1', published: true, effectiveDueDates: {}, visible_to_everyone: true}
     assignment.effectiveDueDates[student.id] = {
       due_at: DATE_IN_CLOSED_PERIOD,
       grading_period_id: '1',
@@ -115,7 +115,7 @@ describe('SubmissionStateMap with grading periods and all grading periods select
   })
 
   test('user is admin: submission is unlocked for an assigned student with assignment due in a closed grading period', () => {
-    const assignment = {id: '1', published: true, effectiveDueDates: {}}
+    const assignment = {id: '1', published: true, effectiveDueDates: {}, visible_to_everyone: true}
     assignment.effectiveDueDates[student.id] = {
       due_at: DATE_IN_CLOSED_PERIOD,
       grading_period_id: '1',
@@ -129,7 +129,7 @@ describe('SubmissionStateMap with grading periods and all grading periods select
   })
 
   test('submission is unlocked for an assigned student with assignment due outside of a closed grading period', () => {
-    const assignment = {id: '1', published: true, effectiveDueDates: {}}
+    const assignment = {id: '1', published: true, effectiveDueDates: {}, visible_to_everyone: true}
     assignment.effectiveDueDates[student.id] = {
       due_at: DATE_NOT_IN_CLOSED_PERIOD,
       grading_period_id: '1',
@@ -149,7 +149,7 @@ describe('SubmissionStateMap with grading periods and a non-closed grading perio
   const mapOptions = {hasGradingPeriods: true, selectedGradingPeriodID: SELECTED_PERIOD_ID}
 
   test('submission is locked for an assigned student with assignment due outside of the selected grading period', () => {
-    const assignment = {id: '1', published: true, effectiveDueDates: {}}
+    const assignment = {id: '1', published: true, effectiveDueDates: {}, visible_to_everyone: true}
     assignment.effectiveDueDates[student.id] = {
       due_at: DATE_NOT_IN_SELECTED_PERIOD,
       grading_period_id: '2',
@@ -162,7 +162,7 @@ describe('SubmissionStateMap with grading periods and a non-closed grading perio
   })
 
   test('submission is unlocked for an assigned student with assignment due in the selected grading period', () => {
-    const assignment = {id: '1', published: true, effectiveDueDates: {}}
+    const assignment = {id: '1', published: true, effectiveDueDates: {}, visible_to_everyone: true}
     assignment.effectiveDueDates[student.id] = {
       due_at: DATE_IN_SELECTED_PERIOD,
       grading_period_id: SELECTED_PERIOD_ID,
@@ -182,7 +182,7 @@ describe('SubmissionStateMap with grading periods and a closed grading period se
   const mapOptions = {hasGradingPeriods: true, selectedGradingPeriodID: SELECTED_PERIOD_ID}
 
   test('submission is locked for an assigned student with assignment due outside of the selected grading period', () => {
-    const assignment = {id: '1', published: true, effectiveDueDates: {}}
+    const assignment = {id: '1', published: true, effectiveDueDates: {}, visible_to_everyone: true}
     assignment.effectiveDueDates[student.id] = {
       due_at: DATE_NOT_IN_SELECTED_PERIOD,
       grading_period_id: '2',
@@ -195,7 +195,7 @@ describe('SubmissionStateMap with grading periods and a closed grading period se
   })
 
   test('submission is locked for an assigned student with assignment due in the selected grading period', () => {
-    const assignment = {id: '1', published: true, effectiveDueDates: {}}
+    const assignment = {id: '1', published: true, effectiveDueDates: {}, visible_to_everyone: true}
     assignment.effectiveDueDates[student.id] = {
       due_at: DATE_IN_SELECTED_PERIOD,
       grading_period_id: SELECTED_PERIOD_ID,
@@ -208,7 +208,7 @@ describe('SubmissionStateMap with grading periods and a closed grading period se
   })
 
   test('user is admin: submission is unlocked for an assigned student with assignment due in the selected grading period', () => {
-    const assignment = {id: '1', published: true, effectiveDueDates: {}}
+    const assignment = {id: '1', published: true, effectiveDueDates: {}, visible_to_everyone: true}
     assignment.effectiveDueDates[student.id] = {
       due_at: DATE_IN_SELECTED_PERIOD,
       grading_period_id: SELECTED_PERIOD_ID,

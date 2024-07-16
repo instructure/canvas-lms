@@ -49,7 +49,7 @@ export function submissionGradingPeriodInformation(assignment: Assignment, stude
 }
 
 export function isHiddenFromStudent(assignment: Assignment, student: Student) {
-  if (assignment.only_visible_to_overrides) {
+  if (!assignment.visible_to_everyone) {
     return !(assignment.assignment_visibility || []).includes(student.id)
   }
   return false

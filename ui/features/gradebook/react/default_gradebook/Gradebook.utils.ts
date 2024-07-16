@@ -81,7 +81,7 @@ export function compareAssignmentDueDates(assignment1: GridColumn, assignment2: 
 
 export function ensureAssignmentVisibility(assignment: Assignment, submission: Submission) {
   if (
-    assignment?.only_visible_to_overrides &&
+    assignment?.visible_to_everyone === false &&
     !assignment.assignment_visibility.includes(submission.user_id)
   ) {
     return assignment.assignment_visibility.push(submission.user_id)
