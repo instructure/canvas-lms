@@ -269,6 +269,67 @@ describe AccountsController do
       expect(@account.settings[:app_center_access_token]).to eq access_token
     end
 
+    it "does not clear 'app_center_access_token'" do
+      account_with_admin_logged_in
+      @account = @account.sub_accounts.create!
+      access_token = @account.settings[:app_center_access_token]
+      post "update", params: { id: @account.id,
+                               account: {
+                                 settings: {
+                                   setting: :set
+                                 }
+                               } }
+      @account.reload
+      expect(@account.settings[:app_center_access_token]).to eq access_token
+    end
+
+    context "when user does not have manage LTI permissions" do
+      let(:role_changes) do
+        {
+          manage_lti_add: false,
+          manage_lti_edit: false,
+          manage_lti_delete: false,
+          lti_add_edit: false,
+        }
+      end
+
+      before do
+        account_with_admin_logged_in
+        account_admin_user_with_role_changes(user: @admin, role_changes:)
+      end
+
+      it "does not update 'app_center_access_token'" do
+        @account = @account.sub_accounts.create!
+        access_token = SecureRandom.uuid
+        post "update", params: { id: @account.id,
+                                 account: {
+                                   settings: {
+                                     app_center_access_token: access_token
+                                   }
+                                 } }
+        @account.reload
+        expect(@account.settings[:app_center_access_token]).to be_nil
+      end
+
+      context "with flag disabled" do
+        before do
+          @account.disable_feature!(:require_permission_for_app_center_token)
+        end
+
+        it "updates 'app_center_access_token'" do
+          access_token = SecureRandom.uuid
+          post "update", params: { id: @account.id,
+                                   account: {
+                                     settings: {
+                                       app_center_access_token: access_token
+                                     }
+                                   } }
+          @account.reload
+          expect(@account.settings[:app_center_access_token]).to eq access_token
+        end
+      end
+    end
+
     it "updates 'emoji_deny_list'" do
       account_with_admin_logged_in
       @account.allow_feature!(:submission_comment_emojis)

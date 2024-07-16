@@ -319,6 +319,20 @@ remove_submission_type_selection_from_dev_keys_edit_page:
       state: allowed_on
     ci:
       state: allowed_on
+require_permission_for_app_center_token:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Require Manage LTI permissions to set External App Center token
+  description: |-
+    When enabled, requires any of the manage_lti_* permissions to see the
+    Manage App List button on the External Apps page and to update the token
+    from Eduappcenter, to prevent accidental changes to the app list.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 resource_link_uuid_in_custom_substitution:
   state: hidden
   display_name: Use a Resource link's resource_link_uuid in the $ResourceLink.id substitution parameter
