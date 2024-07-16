@@ -208,7 +208,7 @@ const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterPro
             }
             onClick={() => {
               loadingRegistrationToken()
-              getRegistrationToken(props.contextId)
+              getRegistrationToken(props.contextId, state.dynamicRegistrationUrl)
                 .then(token => {
                   register(props.contextId, token)
                 })

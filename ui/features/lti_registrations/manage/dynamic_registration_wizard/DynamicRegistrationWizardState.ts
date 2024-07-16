@@ -265,41 +265,43 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
       ) => {
         set(stateFor({_type: 'RequestingToken'}))
         // eslint-disable-next-line promise/catch-or-return
-        service.fetchRegistrationToken(accountId, unifiedToolId).then(resp => {
-          if (resp._type === 'success') {
-            set(stateFor({_type: 'WaitingForTool', registrationToken: resp.data}))
-            const onMessage = (message: MessageEvent) => {
-              if (
-                message.data &&
-                typeof message.data.subject === 'string' &&
-                message.data.subject === 'org.imsglobal.lti.close' &&
-                message.origin === originOfUrl(dynamicRegistrationUrl)
-              ) {
-                global.removeEventListener('message', onMessage)
-                set(
-                  stateForTag('LoadingRegistration', {
-                    registrationToken: resp.data,
+        service
+          .fetchRegistrationToken(accountId, dynamicRegistrationUrl, unifiedToolId)
+          .then(resp => {
+            if (resp._type === 'success') {
+              set(stateFor({_type: 'WaitingForTool', registrationToken: resp.data}))
+              const onMessage = (message: MessageEvent) => {
+                if (
+                  message.data &&
+                  typeof message.data.subject === 'string' &&
+                  message.data.subject === 'org.imsglobal.lti.close' &&
+                  message.origin === originOfUrl(dynamicRegistrationUrl)
+                ) {
+                  global.removeEventListener('message', onMessage)
+                  set(
+                    stateForTag('LoadingRegistration', {
+                      registrationToken: resp.data,
+                    })
+                  )
+                  // eslint-disable-next-line promise/catch-or-return
+                  service.getRegistrationByUUID(accountId, resp.data.uuid).then(reg => {
+                    if (reg._type === 'success') {
+                      const store: RegistrationOverlayStore = createRegistrationOverlayStore(
+                        reg.data.client_name,
+                        reg.data
+                      )
+                      set(stateFor(confirmationState('PermissionConfirmation')(reg.data, store)))
+                    } else {
+                      set(stateFor(errorState(formatApiResultError(reg))))
+                    }
                   })
-                )
-                // eslint-disable-next-line promise/catch-or-return
-                service.getRegistrationByUUID(accountId, resp.data.uuid).then(reg => {
-                  if (reg._type === 'success') {
-                    const store: RegistrationOverlayStore = createRegistrationOverlayStore(
-                      reg.data.client_name,
-                      reg.data
-                    )
-                    set(stateFor(confirmationState('PermissionConfirmation')(reg.data, store)))
-                  } else {
-                    set(stateFor(errorState(formatApiResultError(reg))))
-                  }
-                })
+                }
               }
+              global.addEventListener('message', onMessage)
+            } else {
+              set(stateFor(errorState(formatApiResultError(resp))))
             }
-            global.addEventListener('message', onMessage)
-          } else {
-            set(stateFor(errorState(formatApiResultError(resp))))
-          }
-        })
+          })
       },
       enableAndClose: async (
         accountId: AccountId,
