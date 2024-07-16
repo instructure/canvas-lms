@@ -244,6 +244,7 @@ pt-BR:
   a_new_annotation_has_been_made_by_author_on_the_as_63ad4351: "Uma nova observação foi feita por %{author} na tarefa %{assignment_name}."
   a_new_annotation_has_been_made_on_the_assignment_a_e473936e: "Uma nova anotação foi feita na tarefa %{assignment_name}."
   a_new_assignment_has_been_created_for_your_course__12b72639: "Uma nova tarefa foi criada para o seu curso, %{course_name}"
+  a_new_mobile_number_696a0943: "um novo número de celular"
   a_new_module_has_been_created_with_the_content_ret_b01468b2: "Um novo módulo foi criado com o conteúdo retornado da ferramenta. Se você gostaria de vê-lo, visite a página Módulos."
   a_page_with_this_title_already_exists_please_choos_19c53cc4: "Já existe uma página com este título. Escolha um título diferente."
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Uma ID do parceiro é necessária para usar Academic Benchmarks"
@@ -398,6 +399,7 @@ pt-BR:
   access_token_is_valid_until_d2f048cf: "Token de acesso está válido até"
   access_token_manage_a626f071: "Token de acesso - gerenciar"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Os tokens de acesso podem ser usados para permitir que outras aplicações façam chamadas de API em seu nome. Você também pode gerar tokens de acesso e *usar a API aberta do Canvas* para criar as suas próprias integrações."
+  access_tokens_eea7e69f: "Acessar tokens"
   access_your_courses_and_groups_using_any_ios_or_an_cdb6ad63: "Acesse seus cursos e grupos usando qualquer dispositivo móvel com iOS ou Android e encontre mais informações no menu de Ajuda."
   accessibility_checker_notifications_da5a49e6: "Notificações do verificador de acessibilidade: "
   accessible_sidebar_menu_b30baf97: "Menu da barra lateral acessível"
@@ -566,6 +568,8 @@ pt-BR:
   account_course_and_user_search_22bf297a: "Pesquisa de Conta do Curso e Usuário"
   account_creation_still_in_progress_ac0e0a18: "A criação da conta ainda está em andamento"
   account_custom_statuses_f9bbfb1f: "Status personalizados da conta"
+  account_default_grading_scheme_83bdc8fd: "Esquema de avaliação de contas padrão"
+  account_default_grading_scheme_was_successfully_sa_88d66a2e: "O esquema de avaliação padrão da conta foi salvo com sucesso."
   account_default_time_8c7ab62d: "Conta padrão (%{time})"
   account_domain_78f43049: "Domínio da Conta"
   account_domain_lookups_f9d1147e: "Pesquisas do domínio da conta"
@@ -2542,6 +2546,7 @@ pt-BR:
   admin_tray_3b680e7b: "Bandeja do administrador"
   admin_user_name_29dd115a: admin_user_name
   admin_view_a2f4cd5c: "Visualização do administrador"
+  administration_nickname_4b267ea2: "Apelido de administração"
   administrative_links_816228e2: "Links administrativos"
   administrator_f325c186: Administrador
   administrators_and_author_only_flagged_as_possible_42345cba: "Apenas administradores e autor (sinalizado como possível spam)"
@@ -2582,6 +2587,7 @@ pt-BR:
   ahead_21f22939: Adiante
   ai_driven_smart_search_feature_597dbd4f: "Recurso de pesquisa inteligente orientado por IA."
   ai_driven_translation_controls_for_courses_12eb6085: "Controles de tradução orientados por IA para cursos"
+  ai_text_tools_77911fa4: "Ferramentas de texto de IA"
   ajax_errors: 
     error_heading: "Erro Ajax: %{status_code}"
     errors: 
@@ -2832,6 +2838,8 @@ pt-BR:
       Permite que administradores visualizem um registro contendo informações sobre todas as mutações recentemente ocorridas 
       GraphQL
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Permite alinhar resultados a conteúdo sem pontuação"
+  allows_an_account_administrator_to_access_the_cour_b72f0b02: "Permite que um administrador de conta acesse o recurso Prontidão do Curso do Intelligent Insights."
+  allows_an_account_administrator_to_access_the_stud_4fd1f2d3: "Permite que um administrador de conta acesse o recurso Alunos que Precisam de Atenção do Intelligent Insights."
   allows_an_account_administrator_to_manage_the_impa_71112028: "Permite que um administrador de conta gerencie a integração do serviço Impact."
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Permite que avaliadores visualizem a bandeja de auditoria da avaliação no SpeedGrader para tarefas anônimas ou moderadas."
   allows_blueprint_course_settings_to_be_exported_an_a34bb7f: "Permite que as configurações do Curso do Modelo sejam exportadas e copiadas para outro Curso do Modelo"
@@ -3612,6 +3620,7 @@ pt-BR:
   an_error_occurred_while_deleting_the_appointment_g_aad99e47: "Um erro ocorreu ao excluir o grupo de compromissos"
   an_error_occurred_while_editing_this_group_please__8f4eeefe: "Ocorreu um erro ao editar este grupo. Por favor, tente novamente."
   an_error_occurred_while_editing_this_outcome_pleas_f0e403a9: "Ocorreu um erro ao editar este resultado. Por favor, tente novamente."
+  an_error_occurred_while_fetching_course_modules_9f87557e: "Ocorreu um erro ao buscar os módulos do curso."
   an_error_occurred_while_importing_these_outcomes_d4e6f13e: "Ocorreu um erro ao importar esses resultados."
   an_error_occurred_while_importing_these_outcomes_m_6a8052d1: "Ocorreu um erro ao importar esses resultados: %{message}."
   an_error_occurred_while_importing_this_group_9aef7c30: "Ocorreu um erro ao importar este grupo."
@@ -3676,6 +3685,7 @@ pt-BR:
   an_error_occurred_while_searching_for_your_institu_16a1ace4: "Ocorreu um erro ao pesquisar sua instituição"
   an_error_occurred_while_starting_migration_8e6015e2: "Um erro ocorreu ao iniciar a migração"
   an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: "Ocorreu um erro ao tentar alterar a UI"
+  an_error_occurred_while_unpublishing_course_408a0294: "Ocorreu um erro ao cancelar a publicação do curso"
   an_error_occurred_while_updating_announcements_loc_5a1c5dcf: "Ocorreu um erro ao atualizar o estado bloqueado dos avisos."
   an_error_occurred_while_updating_group_grouptitle_2072b3c9: "Ocorreu um erro ao atualizar o grupo \"%{groupTitle}\"."
   an_error_occurred_while_updating_group_grouptitle__6029f82d: "Ocorreu um erro ao atualizar o grupo \"%{groupTitle}\": %{message}."
@@ -3705,8 +3715,10 @@ pt-BR:
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Um usuário existente do Canvas com %{user_id} já reivindicou a integration_id solicitada de %{other_user_id}, ignorando"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "Um usuário existente não corresponde às ids de usuário existentes fornecidas para login com ID SIS %{user_id}, pulando"
   an_export_is_already_in_progress_54270f01: "Uma exportação já está em progresso."
+  an_image_showing_the_placement_placement_within_ca_42eb6187: "Uma imagem mostrando o posicionamento %{placement} no Canvas"
   an_in_progress_working_prototype_of_the_learner_pa_3a48568b: "Um protótipo funcional em andamento do recurso Learner Passport, Edição 2."
   an_in_progress_working_prototype_of_the_learner_pa_aa79f239: "Um protótipo funcional em andamento do recurso Learner Passport."
+  an_integer_value_is_required_e073bd46: "Um valor inteiro é obrigatório"
   an_internal_error_occurred_83b8a685: "Ocorreu um erro interno"
   an_item_named_name_already_exists_in_this_location_147b7312: "Um item chamado \"%{name}\" já existe neste local. Você quer substituir o arquivo existente?"
   an_object_of_type_graphql_type_was_hidden_due_to_i_60998e99: "Um objeto do tipo %{graphql_type} foi ocultado devido a escopos insuficientes no token de acesso"
@@ -3921,6 +3933,7 @@ pt-BR:
   app_appname_successfully_deleted_7243055f: "Aplicativo “%{appName}\" excluído com êxito"
   app_b157c2b3: Aplicativo
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "O App Center aparecerá na aba \"Aplicativos\" da página de configurações de um curso ou conta. O URL fornecido abaixo deve apontar para um endpoint válido do App Center (por exemplo, %{url} -- certifique-se de omitir a última barra"
+  app_installed_successfully_462cb60: "Aplicativo instalado com sucesso!"
   app_name_3f58de4f: "Nome do aplicativo"
   app_placements_6d877225: "Posicionamentos de Aplicativos"
   app_reregistration_87cc8817: "Recadastramento do Aplicativo"
@@ -5445,6 +5458,7 @@ pt-BR:
   back_to_attempt_attempt_ffb22bb8: "Voltar para a tentativa %{attempt}"
   back_to_production_fed09f33: "Voltar para a produção"
   back_to_ref_title_377ea1f0: "Voltar para %{ref_title}"
+  back_to_review_4df8e408: "Voltar para a revisão"
   back_to_subject_80a1eb: "Voltar para disciplina"
   back_to_table_of_contents_d878b315: "Voltar para Índice de Conteúdo"
   back_to_title_39e7a8f4: "Voltar para %{title}"
@@ -6296,24 +6310,36 @@ pt-BR:
   campus_vue_non_graded_assignment_report_1cd8999a: "Relatório de atribuição sem nota do Campus Vue"
   campus_vue_submission_data_18f72868: "Dados de envio do Campus Vue"
   campusvue_grade_export_b8140422: "CampusVue Exportação de série"
+  can_create_and_update_submission_results_for_assig_3ce90a3b: "Pode criar e atualizar resultados de envio para tarefas associadas à ferramenta"
   can_create_and_update_submission_results_for_assig_51e7033d: "Podem criar e atualizar resultados de envio para tarefas associadas à ferramenta."
+  can_create_and_view_assignment_data_in_the_gradebo_a06c853b: "Pode criar e visualizar dados de tarefa no boletim de notas associado à ferramenta"
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: "Podem criar e visualizar dados da tarefa no boletim associado à ferramenta."
   can_create_external_tools_4c293044: "Pode criar ferramentas externas."
+  can_create_external_tools_fcde47ea: "Pode criar ferramentas externas"
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: "podem criar, renomear e editar páginas por padrão"
+  can_create_subscription_to_data_service_data_53901a2e: "Pode criar uma assinatura para os dados do serviço de dados"
   can_create_subscription_to_data_service_data_bb2874f2: "Pode criar assinatura nos dados de serviço de dados."
+  can_destroy_external_tools_693e2ae0: "Pode destruir ferramentas externas"
   can_destroy_external_tools_cdb0e734: "Pode destruir ferramentas externas."
   can_destroy_subscription_to_data_service_data_b8dfca27: "Pode destruir assinatura nos dados de serviço de dados."
+  can_destroy_subscription_to_data_service_data_d68e4590: "Pode destruir a assinatura de dados do serviço de dados"
   can_edit_this_page_role_selection_6ccec3c7: "Seleção de papéis que podem editar esta página"
   can_include_translated_message_when_composing_mess_1e62054c: "Pode incluir a mensagem traduzida ao redigir mensagens."
   can_interact_with_users_in_their_section_only_48cb8c43: "Podem interagir com usuários somente na sua própria turma"
   can_list_categorized_event_types_52596f7: "Pode litar tipos de eventos categorizados."
+  can_list_categorized_event_types_e29c5f9: "Pode listar tipos de eventos categorizados"
   can_list_external_tools_9132ad0f: "Pode listar ferramentas externas."
+  can_list_external_tools_97fb14ee: "Pode listar ferramentas externas"
+  can_list_subscriptions_to_data_service_data_2efba3d3: "Pode listar assinaturas de dados de serviços de dados"
   can_list_subscriptions_to_data_service_data_b52d5e37: "Pode listas assinaturas nos dados de serviço de dados."
   can_lookup_account_information_13d69520: "Pode observar informações da conta"
   can_replace_the_entire_contents_of_the_rce_c6c97cba: "Pode substituir todo o conteúdo do RCE."
   can_request_page_content_using_postmessage_api_df6686e: "Pode solicitar o conteúdo da página usando a API postMessage."
+  can_retrieve_user_data_associated_with_the_context_c05905df: "Pode recuperar dados do usuário associados ao contexto em que a ferramenta está instalada"
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Podem recuperar dados de usuários associados ao contexto em que a ferramenta está instalada."
+  can_show_external_tools_83f54a15: "Pode mostrar ferramentas externas"
   can_show_external_tools_bb4988c5: "Pode exibir ferramentas externas."
+  can_show_subscription_to_data_service_data_4dceab6a: "Pode mostrar a assinatura de dados do serviço de dados"
   can_show_subscription_to_data_service_data_688ce3: "Pode mostrar assinatura nos dados de serviço de dados."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Não é possível computar a pontuação até que uma tarefa tenha pontos possíveis"
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\
@@ -6327,11 +6353,16 @@ pt-BR:
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Não é possível remover a publicação de %{item_name} se houver trabalhos submetidos pelos alunos"
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Não é possível remover a publicação de %{name} se houver trabalhos submetidos pelos alunos"
   can_update_external_tools_168c1abe: "Pode atualizar ferramentas externas."
+  can_update_external_tools_5c2ba614: "Pode atualizar ferramentas externas"
   can_update_public_jwk_for_lti_services_26037129: "Podem atualizar jwk público para serviços de LTI."
+  can_update_public_jwk_for_lti_services_7a6f677f: "Pode atualizar o jwk público para serviços de LTI"
   can_update_subscription_to_data_service_data_374a0c89: "Pode atualizar assinatura nos dados de serviço de dados."
+  can_update_subscription_to_data_service_data_e2949270: "Pode atualizar a assinatura dos dados do serviço de dados"
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: "Podem visualizar dados da tarefa no boletim associado à ferramenta."
+  can_view_assignment_data_in_the_gradebook_associat_c20b2280: "Pode visualizar os dados da tarefa no boletim de notas associado à ferramenta"
   can_view_feature_flags_c92e0aa9: "Pode visualizar sinalizações de recursos"
   can_view_progress_records_associated_with_the_cont_aa2cd9a2: "Pode ver os registros de progresso associados ao contexto em que a ferramenta está instalada"
+  can_view_submission_data_for_assignments_associate_485010ce: "Pode visualizar dados de envio para tarefas associadas à ferramenta"
   can_view_submission_data_for_assignments_associate_dd06f583: "Podem visualizar dados de envio para tarefas associadas à ferramenta."
   canada_1_921df67a: "Canadá (+1)"
   canada_aec587fa: Canadá
@@ -6663,9 +6694,12 @@ pt-BR:
   choose_a_course_home_page_8059c7b: "Escolher uma página inicial do curso"
   choose_a_csv_file_to_upload_9644480c: "Selecione um arquivo CSV para fazer upload:"
   choose_a_date_cd0263fe: "Escolha uma data"
+  choose_a_description_for_this_tool_to_display_in_t_d0eeef4e: "Escolha uma descrição para essa ferramenta a ser exibida nos posicionamentos Seleção de Link e Seleção de Tarefa para todas as contas."
   choose_a_due_date_and_time_90d7126b: "Escolha uma data e hora de vencimento"
   choose_a_file_to_upload_a63bac0f: "Selecione um arquivo para carregar"
   choose_a_file_to_upload_from_your_device_d1b50d4c: "Escolha um arquivo para enviar de seu dispositivo"
+  choose_a_name_override_for_each_placement_optional_477cfd2b: "Escolha uma substituição de nome para cada colocação (opcional)."
+  choose_a_nickname_for_toolname_11447f43: "Escolha um apelido para *%{toolName}*."
   choose_a_quiz_engine_8820d521: "Escolher um motor de questionário"
   choose_a_reply_to_topic_due_date_and_time_b908fd6: "Escolher a data e a hora de vencimento de uma resposta ao tópico"
   choose_a_submission_type_8f45651a: "Escolher um tipo de envio"
@@ -6675,6 +6709,8 @@ pt-BR:
   choose_an_authentication_service_47dc8875: "Escolha um serviço de autenticação"
   choose_an_available_from_date_and_time_c98fb260: "Escolha uma data “de” e hora disponível"
   choose_an_available_to_date_and_time_f8930aee: "Escolha uma data “até” e hora disponíveis"
+  choose_an_existing_number_a6062604: "Escolha um número existente"
+  choose_an_required_replies_due_date_and_time_b7206ace: "Escolha uma data e hora de vencimento das respostas obrigatórias"
   choose_and_publish_980812cb: "Escolher e publicar"
   choose_assignment_b0132c5e: "-- Escolher tarefa --"
   choose_assignment_group_9e7de13c: "Escolher grupo de tarefas"
@@ -6696,6 +6732,8 @@ pt-BR:
     one: "Escolha até 1 agenda de disciplina"
     other: "Escolha até %{count} agendas de disciplinas"
   choose_usage_rights_33683854: "Escolher direitos de uso..."
+  choose_what_icon_displays_in_each_placement_option_c03560c2: "Escolha o ícone exibido em cada colocação (opcional)."
+  choose_where_toolname_may_be_accessed_from_find_mo_66a6c8c2: "Escolha de onde o *%{toolName}* pode ser acessado. Encontre mais detalhes na **documentação de colocações.**"
   choose_which_calendars_are_visible_in_the_other_ca_30fae128: "Escolha quais calendários são visíveis na seção Outros Calendários no Calendário do Canvas. Os calendários de subcontas ficam visíveis para os usuários se estiverem associados à conta. Por padrão, todos os calendários ficam ocultos."
   choose_which_calendars_your_users_can_add_in_the_o_b73bbb17: "Escolha quais calendários seus usuários podem adicionar na seção \"Outros calendários\" do calendário do Canvas. Os usuários só poderão adicionar calendários habilitados para as contas às quais estão associados. Por padrão, todos os calendários estão desabilitados."
   choose_your_default_skin_tone_f09bf0bd: "Escolha seu tom de pele padrão"
@@ -6731,6 +6769,11 @@ pt-BR:
   clear_reply_to_topic_due_date_time_for_pilla_c38a25bd: "Limpar a data/hora de vencimento da resposta ao tópico para %{pillA}"
   clear_reply_to_topic_due_date_time_for_pilla_pillb_7a2aca42: "Limpar resposta à data/hora de vencimento do tópico para %{pillA}, %{pillB} e %{pillC}"
   clear_reply_to_topic_due_date_time_for_pilla_pillb_cb393342: "Limpar a data/hora de vencimento da resposta ao tópico para %{pillA}, %{pillB} e %{n} outros"
+  clear_required_replies_due_date_time_bce0fbc6: "Limpar data/hora de vencimento das respostas obrigatórias"
+  clear_required_replies_due_date_time_for_pilla_and_e6ceb180: "Limpar a data/hora de vencimento das respostas obrigatórias para %{pillA} e %{pillB}"
+  clear_required_replies_due_date_time_for_pilla_fe8ac0ad: "Limpar data/hora de vencimento das respostas obrigatórias para %{pillA}"
+  clear_required_replies_due_date_time_for_pilla_pil_acfbfe48: "Limpar data/hora de vencimento das respostas obrigatórias para %{pillA}, %{pillB} e %{pillC}"
+  clear_required_replies_due_date_time_for_pilla_pil_eb469ac1: "Limpar data/hora de vencimento das respostas obrigatórias para %{pillA}, %{pillB} e %{n} outros"
   clear_search_900e9c97: "Limpar pesquisa"
   clear_search_field_75f595c7: "Limpar campo de pesquisa"
   clear_selected_file_82388e50: "Limpar arquivo selecionado"
@@ -6803,6 +6846,8 @@ pt-BR:
   click_to_sort_by_number_of_students_descending_3600dc1f: "Clique para classificar por número de alunos em ordem decrescente"
   click_to_sort_by_sis_id_ascending_832c870: "Clique para ordenar por ID SIS em ordem crescente"
   click_to_sort_by_sis_id_descending_2d611236: "Clique para ordenar por ID SIS em ordem decrescente"
+  click_to_sort_by_status_ascending_bc5d9834: "Clique para classificar por status em ordem crescente"
+  click_to_sort_by_status_descending_5c64f8ef: "Clique para classificar por status em ordem decrescente"
   click_to_sort_by_sub_account_ascending_989b1ab: "Clique para ordenar por subconta em ordem crescente"
   click_to_sort_by_sub_account_descending_88c611db: "Clique para ordenar por subconta em ordem decrescente"
   click_to_sort_by_subaccount_ascending_11252bc4: "Clique para classificar por subconta em ordem crescente"
@@ -6823,6 +6868,7 @@ pt-BR:
   clicking_the_checkbox_will_cause_scopes_table_to_d_dbdbffd3: "Clicar nesta caixa de seleção fará com que a tabela de escopos desapareça abaixo"
   client_credentials_audience_218f2d93: "Audiência de credenciais do cliente"
   client_id_cb2502af: "ID do Cliente"
+  client_id_copied_44b1b5e9: "ID do cliente copiado"
   client_id_is_required_1afd54d1: "ID do cliente é necessária"
   clone_group_set_c2a40e15: "Clonar Conjunto de Grupos"
   clone_groupcategoryname_ef85ddb8: "(Clonar) %{groupCategoryName}"
@@ -7438,6 +7484,7 @@ pt-BR:
   confirm_unenrollment_64333263: "Confirmar cancelamento de matrícula"
   confirm_unfavorite_course_fa01966d: "Confirmar exclusão dos favoritos do curso"
   confirmation_code_required_22984955: "Código de confirmação (obrigatório)"
+  confirmation_failed_please_try_again_9b7bab7b: "Falha na confirmação. Por favor, tente novamente."
   confirmation_failed_please_try_again_ae566d37: "Falha na confirmação.  Por favor, tente novamente."
   confused_panda_questioning_what_to_do_next_42941484: "Panda confuso questionando o que fazer a seguir"
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Considere selecionar vários tipos de envio para acomodar os alunos que podem não ser capazes de criar observações."
@@ -7450,6 +7497,7 @@ pt-BR:
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Entre em contato com o administrador se precisar alterar a visibilidade do curso."
   content_1440204b: Conteúdo
   content_access_id_601d931e: "id de acesso ao conteúdo"
+  content_area_77b367d4: "Área de conteúdo"
   content_changed_exceptions_e8bff81e: "Conteúdo alterou as exceções:"
   content_choice_51f4ca0f: "Escolha de conteúdo"
   content_dbfd19d7: conteúdo
@@ -7687,6 +7735,7 @@ pt-BR:
         select_question_bank: "Selecionar banco de perguntas"
       select_content_checkbox: 
         select_all_content: "Todo o conteúdo"
+        select_all_content_subtext: "Observe que os seguintes tipos de conteúdo serão importados: Configurações do curso, corpo do programa de estudos, módulos, tarefas, testes, bancos de perguntas, tópicos de discussão, páginas, avisos, critérios de avaliação, arquivos e eventos de calendário."
         select_specific_content: "Selecionar conteúdo específico"
     unsupported_migration_type: "migration_type não suportado para o contexto"
     upload_warning: "Sair desta página cancelará o processo de envio"
@@ -8334,6 +8383,7 @@ pt-BR:
   copy_announcement_title_9d23ddde: "Copiar anúncio %{title}"
   copy_assignment_name_to_another_course_b62d0a54: "Copiar tarefa %{name} para outro curso"
   copy_blueprint_course_settings_31a97e96: "Copiar configurações do Curso do Modelo"
+  copy_client_id_8f4da3e2: "Copiar ID do cliente"
   copy_content_615608a7: "Copiar conteúdo"
   copy_list_of_shard_ids_d51cd846: "Copiar lista de IDs de fragmentos"
   copy_operation_started_successfully_b2f236a1: "Operação de cópia iniciada com sucesso"
@@ -8590,6 +8640,7 @@ pt-BR:
   count_participations_ac8f82b7: 
     one: "1 participação"
     other: "%{count} participações"
+  count_people_489946e7: "%{count} pessoas"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{user_name} matriculado com sucesso em *%{course_name}*."
     other: "%{count} pessoas matriculadas com sucesso em *%{course_name}*."
@@ -9040,6 +9091,7 @@ pt-BR:
   course_quiz_extensions_4102f98f: "Extensões do questionário do curso"
   course_quizzes_c337653c: "Testes do curso"
   course_readiness_60d7c923: "Prontidão para o curso"
+  course_readiness_is_part_of_the_intelligent_insigh_b38a1449: "A Prontidão do Curso faz parte da atualização do Intelligent Insights no Canvas."
   course_restore: 
     restore_error: "Ocorreu um erro ao tentar restaurar o curso. O curso não foi restaurado."
   course_results_updated_df9d1c95: "Resultados do curso atualizados."
@@ -9160,6 +9212,7 @@ pt-BR:
   course_view_change_logs_d62d5d9d: "Curso - visualizar logs de alterações"
   course_view_usage_reports_bbc9271d: "Curso - visualizar relatórios de uso"
   course_visibility_options_ca8ab3a8: "Opções de visibilidade do curso"
+  course_was_successfully_updated_1ab0e9f8: "O curso foi atualizado com sucesso."
   course_with_canvas_id_id_not_found_1ff06bec: "Curso com id do Canvas %{id} não encontrado"
   course_wizard_31c87552: "Assistente do curso"
   coursecontext_label_d563be4c: "%{courseContext} %{label}"
@@ -9211,6 +9264,7 @@ pt-BR:
         copy_course: "Copiar %{course}"
       name: Nome
       select_all_content: "Todo o conteúdo"
+      select_all_content_subtext: "Observe que os seguintes tipos de conteúdo serão importados: Configurações do curso, corpo do programa de estudos, módulos, tarefas, testes, bancos de perguntas, tópicos de discussão, páginas, avisos, critérios de avaliação, arquivos e eventos de calendário."
       select_specific_content: "Selecionar conteúdo específico"
       start_at: "Data de início"
       titles: 
@@ -10092,6 +10146,7 @@ pt-BR:
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "CSS e Javascript personalizados podem causar problemas de acessibilidade ou conflitos com as futuras atualizações de Canvas!"
   custom_fields_fc3e55af: "Campos personalizados"
   custom_gradebook_columns_81944594: "Colunas personalizadas do boletim"
+  custom_icon_91da31f7: "Ícone personalizado"
   custom_link_details_35fd38fc: "Detalhes do link personalizado"
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "Links customizados a incluir no popup de diálogo de ajuda"
   custom_lti_usage_uwf_b63978a5: "Uso de LTI personalizado - UWF"
@@ -10378,6 +10433,7 @@ pt-BR:
   default_grade_for_1283e89b: "Nota padrão para"
   default_grading_scheme_894a0eb: "Esquema de avaliação padrão"
   default_grading_scheme_for_accounts_6c9df019: "Esquema de avaliação padrão para contas"
+  default_icon_4d20a5a4: "Ícone Padrão"
   default_order_8c409051: "Ordem padrão"
   default_question_bank_c7bcc5e7: "Banco de perguntas padrão"
   default_question_name: Pergunta
@@ -10386,6 +10442,7 @@ pt-BR:
   default_skin_tone_f378d31c: "Tom de pele padrão"
   default_template_f2a759ed: "Modelo Padrão"
   default_templates_are_used_as_starting_points_for__f06f9e33: "Modelos padrão são usados como pontos de partida para novos temas e não podem ser excluídos."
+  default_to_hidden_4c7fc936: "Padrão para oculto"
   default_to_modules_for_the_course_home_page_d6a951a7: "Padrão para módulos para a página inicial do curso"
   default_to_new_quizzes_dac795a9: "Padrão para novos testes"
   default_view_for_dashboard_ea91b60f: "Visualização padrão para o painel de controle"
@@ -10519,6 +10576,7 @@ pt-BR:
       
       Esta ação é irreversível. Tem certeza que deseja excluir %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Excluir um usuário destruirá todos os seus ePortfolios. De outra forma, ePortfolios podem ser individualmente marcados como ‘spam’ ou ‘safe’ para modificar a visibilidade."
+  deleting_app_9b50f706: "Exclusão de aplicativo"
   deleting_assignment_22d5851d: "excluindo tarefa"
   deleting_b896f5f: excluindo
   deleting_custom_status_statusname_5bd7dfa9: "Excluindo status personalizado %{statusName}"
@@ -11244,6 +11302,7 @@ pt-BR:
             e facilmente oculte notas até estar pronto para os alunos
             visualizá-las. Para avaliação simplificada, use SpeedGrader para visualizar e avaliar envios.
   display_historical_view_of_achievements_of_users_53db5938: "Exibir visão histórica das conquistas dos usuários"
+  display_lti_placement_before_assignment_descriptio_66c709e3: "Exibir o posicionamento do LTI antes da descrição da tarefa após o envio."
   display_name_36e114d3: "%{display_name}"
   display_name_6c2cfc58: "Nome de exibição:"
   display_name_b80c243e: "Nome de exibição"
@@ -11360,6 +11419,7 @@ pt-BR:
   downloading_course_content_allows_access_to_conten_164d9336: "Baixar conteúdo do curso permite acesso ao conteúdo enquanto esteja offline. O conteúdo pode incluir arquivos, páginas, tarefas, assuntos do fórum ou testes. Clique em \"Gerar ePub\" para cada curso e abra com qualquer software de eReader para ler."
   draft_83493fcd: Rascunho
   draft_92507c72: (rascunho)
+  draft_b5dcd279: RASCUNHO
   draft_comment_b2376ea4: "Rascunhar comentário"
   draft_comment_warning_modal_in_speedgrader_ded232c1: "Modal de aviso de comentário de rascunho no SpeedGrader"
   draft_discussion_entries_98d93a9d: "Rascunho de entradas de fórum"
@@ -11493,6 +11553,7 @@ pt-BR:
   dynamic_concurrency_231dbdc5: "Simultaneidade dinâmica"
   dynamic_lti_1_1_environment_specific_override_urls_395db495: "URLs de substituição específicos do ambiente dinâmico LTI 1.1"
   dynamic_registration_31276d91: "Registro dinâmico"
+  dynamic_registration_error_87f98f8d: "Erro de registro dinâmico"
   dynamic_registration_url_5670504d: "URL de registro dinâmico"
   dynamic_registration_url_f89a5427: "URL de registro dinâmico"
   e_c2991d1b: e
@@ -11553,6 +11614,7 @@ pt-BR:
   edit_criterion_description_5828919: "Editar descrição de critério"
   edit_criterion_from_outcome_51b934de: "Editar critério do resultado"
   edit_current_message_da650d4c: "Editar Mensagem Atual"
+  edit_data_sharing_addacce6: "Editar compartilhamento de dados"
   edit_date_e3611030: "Editar data"
   edit_dates_ed31061: "Editar datas"
   edit_default_course_pace_e00f1b5b: "Editar ritmo do curso padrão"
@@ -11569,6 +11631,7 @@ pt-BR:
   edit_group_c8679dba: "Editar grupo"
   edit_history_917c1e08: "Editar história"
   edit_home_page_ee907de9: "Editar página inicial"
+  edit_icon_urls_e2885351: "Editar URLs de ícones"
   edit_important_info_for_coursename_bdb3eb6c: "Editar informações importantes para %{courseName}"
   edit_item_details_c9a7b9c5: "Editar detalhes do item"
   edit_key_developername_2980f240: "Editar chave %{developerName}"
@@ -11581,14 +11644,17 @@ pt-BR:
   edit_module_item_83258f6d: "Editar Módulo/Item"
   edit_module_settings_2bf11f7f: "Editar configurações do módulo"
   edit_name_cbdef0c2: "Editar %{name}"
+  edit_naming_9c05ee26: "Editar nomenclatura"
   edit_new_internal_setting_name_ce308469: "Editar novo nome de configuração interna"
   edit_new_internal_setting_value_f618a7f4: "Editar novo valor de configuração interna"
   edit_outcome_867a0381: "Editar Objetivo"
   edit_outcome_group_f82e0210: "Editar Grupo do Objetivo"
   edit_pagetitle_cd8abab9: "Editar %{pageTitle}"
+  edit_permissions_520f6ce1: "Editar permissões"
   edit_permissions_for_count_items_d65e3855: 
     one: "Editar permissões para: %{itemName}"
     other: "Editar permissões para %{count} itens"
+  edit_placements_27c957b1: "Editar colocações"
   edit_points_3a339cd8: "Editar pontos"
   edit_quiz_ededddd8: "Editar teste"
   edit_rating_c2ac31e5: "Editar avaliação"
@@ -11761,6 +11827,7 @@ pt-BR:
   enable_6f5d1328: Ativar
   enable_a_plugin_which_can_find_and_replace_content_59c15164: "Habilite um plug-in que possa localizar e substituir conteúdo ao editar em um RCE"
   enable_ability_to_alter_the_final_grade_for_the_en_e120f72d: "Habilite a capacidade de alterar a nota final para o curso inteiro sem alterar pontuações para tarefas."
+  enable_ai_text_tools_in_the_rich_content_editor_25ed4a6d: "Ativar ferramentas de texto de IA no Rich Content Editor"
   enable_ai_translation_4e5a644b: "Ativar tradução de IA"
   enable_all_read_only_scopes_3ddc2bb5: "Habilitar todos os escopos somente leitura."
   enable_an_account_setting_which_toggles_push_notif_f3ccc7a1: "Ativar uma configuração de conta que alterna as notificações push para essa conta"
@@ -11852,6 +11919,7 @@ pt-BR:
   enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "Habilita o botão Leitor Imersivo da Microsoft em áreas com suporte do Canvas. O botão ainda pode estar habilitado em um curso, independentemente dessa configuração, se o administrador da conta o tiver ativado para todos os usuários."
   enables_top_navigation_lti_placement_lti_1_3_only_f46e894: "Permite top_navigation inclusão de LTI. (Somente LTI 1.3)"
   enables_ui_features_for_managing_extended_submissi_841f45bc: "Ativa recursos de interface do usuário para gerenciar envios \"estendidos\"."
+  enabling_app_1d15f0ca: "Ativação do aplicativo"
   enabling_the_elementary_theme_will_change_the_font_c944b619: "Habilitar o Tema Elementar alterará a fonte na interface do Canvas e simplificará o uso do Menu de Navegação do Curso para todos os usuários no seu curso."
   enabling_this_option_automatically_moves_course_pa_15f755b3: "Ativar essa opção move automaticamente as datas de conclusão das tarefas do Andamento do Curso para depois da data de término. A entrada para hora, local e calendário será desativada."
   enabling_this_option_automatically_moves_course_pa_6ded6d4d: "Ativar essa opção move automaticamente as datas de conclusão das tarefas do Andamento do Curso para depois da data de término."
@@ -12041,6 +12109,7 @@ pt-BR:
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Digite um código hex aqui para usar uma cor personalizada."
   enter_a_letter_grade_536a8cef: "Insira uma nota de letra"
   enter_a_score_to_test_c6f89f4a: "Inserir uma pontuação para testar"
+  enter_a_section_name_adbe3099: "Inserir um nome de seção"
   enter_a_student_pairing_code_below_to_add_a_studen_15789251: "Digite um código de pareamento de alunos abaixo para adicionar um aluno para observar."
   enter_a_valid_date_46d77547: "Inserir uma data válida"
   enter_a_what_if_score_668c91a3: "Insira uma previsão de pontuação."
@@ -12314,6 +12383,20 @@ pt-BR:
         create: "Criar um ePortfolio"
       page_title: "$$Meus ePortfolios"
       what: 
+        details: |-
+            ePortfolios são locais onde é possível exibir e discutir envios
+            e experiências significativos que acontecem durante seu processo
+            de aprendizado. Você pode usar o ePortfolio para: 
+            
+            * Exiba os trabalhos dos quais você se orgulha para que mais do que apenas o seu instrutor os veja
+            * Fale sobre toda a reflexão e o trabalho que foram necessários para o envio de suas aulas
+            * Reúna uma visão geral de sua experiência educacional como um todo
+            * Compartilhe seu trabalho com amigos, futuros empregadores etc.
+            
+            Os ePortfolios podem ser públicos, para que todos possam ver, ou privados, para que somente aqueles que você
+            permite que possam ver, e você pode alterar essa configuração a qualquer momento.
+            
+            Pronto para começar?
         details1: |-
             ePortfolios são locais onde é possível exibir e discutir envios
             e experiências significativos que acontecem durante seu processo
@@ -12368,6 +12451,7 @@ pt-BR:
   error_59293a2c: erro
   error_98e81528: Erro
   error_adding_canvas_file_to_submission_draft_de258021: "Erro ao adicionar o arquivo do Canvas ao esboço de envio"
+  error_adding_file_ec2ba958: "Erro ao adicionar arquivo"
   error_adding_file_to_discussion_message_16feef3f: "Erro ao adicionar arquivo à mensagem de discussão"
   error_adding_files_2cd4d45: "Erro ao adicionar arquivos"
   error_adding_files_97ba198e: "Erro ao adicionar arquivos."
@@ -12377,6 +12461,8 @@ pt-BR:
   error_archiving_rubric_f6e6740e: "Erro ao arquivar rubrica"
   error_associating_assignment_assignment_name_with__d92e9acf: "Erro ao associar tarefa “%{assignment_name}” a uma ferramenta LTI."
   error_canceling_draft_ec3dbdc9: "Erro ao cancelar versão preliminar"
+  error_caption_request_failed_ba967c9a: "Erro - Falha na solicitação de legenda"
+  error_captions_not_found_545eb50c: "Erro - As legendas não foram encontradas"
   error_creating_comment_cbbfc0f0: "Erro ao criar comentário"
   error_creating_conversation_1d814618: "Erro ao criar conversa"
   error_creating_course_ae61c2bd: "Erro ao criar curso"
@@ -12396,6 +12482,8 @@ pt-BR:
   error_embedding_content_from_tool_49bb698e: "Erro ao incorporar conteúdo da ferramenta"
   error_exporting_gradebook_b6558e60: "Erro ao exportar o boletim de notas"
   error_exporting_gradebook_msg_6ea31e2f: "Erro ao exportar boletim: %{msg}"
+  error_failed_to_communicate_with_captioning_servic_823d2336: "Erro - Falha na comunicação com o serviço de legendas"
+  error_failed_to_request_304cfffd: "Erro - Falha ao solicitar"
   error_fetching_access_token_1445a9e3: "Erro ao buscar token de acesso"
   error_fetching_rubric_data_66432f54: "Erro ao buscar dados de rubrica"
   error_fetching_user_details_7c85d23: "Erro ao buscar detalhes do usuário"
@@ -12417,6 +12505,7 @@ pt-BR:
   error_loading_rollups_87115bc: "Erro ao carregar rollups"
   error_logging_in_error_msg_f61efaa3: "Erro ao fazer login em: %{error_msg}"
   error_message_2b9d12ee: "Erro: %{message}"
+  error_non_english_detected_c18a3e63: "Erro - Detectado idioma diferente do inglês"
   error_occurred_while_adding_message_to_conversatio_3dafd0e5: "Ocorreu um erro ao adicionar a mensagem à conversa"
   error_occurred_while_creating_conversation_message_43751479: "Ocorreu um erro ao criar mensagem de conversa"
   error_rendering_duplicated_module_db821097: "Erro ao renderizar módulo duplicado"
@@ -12437,6 +12526,7 @@ pt-BR:
   error_sending_messages_13c874eb: "Erro ao enviar mensagens"
   error_sending_submission_comment_dc15d24f: "Erro ao enviar comentário do envio"
   error_sending_submission_d32dc075: "Erro ao enviar envio"
+  error_something_went_wrong_5308115: "Erro - Algo deu errado"
   error_starting_content_share_18fb1532: "Erro ao iniciar compartilhamento de conteúdo"
   error_starting_save_operation_81bcb99: "Erro ao iniciar operação de salvar:"
   error_submitting_rubric_83daca8b: "Erro ao enviar rubrica"
@@ -12503,6 +12593,7 @@ pt-BR:
       not_an_integer: "deve ser um número inteiro"
       odd: "deve ser um número ímpar"
       other_than: "não pode ser %{count}"
+      password_too_long: "é muito longo"
       present: "deve estar em branco"
       required: "deve existir"
       taken: "já foi tomado"
@@ -13501,7 +13592,9 @@ pt-BR:
   generate_epub_80e89ea4: "Gerar ePub"
   generate_item_analysis_report_statuslabel_16e02c8: "Gerar relatório de análise de item %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "Gerar relatório de análise do aluno %{statusLabel}"
+  generate_summary_6d3d3b14: "Gerar resumo"
   generated_f26ee56b: "Gerado:"
+  generated_icon_d004f211: "Ícone gerado"
   generating_5b5e20f8: "Gerando:"
   generating_c2aabc02: Gerando...
   generating_pairing_code_251b7fc8: "Gerando código de emparelhamento..."
@@ -15342,6 +15435,8 @@ pt-BR:
   highest_28ad71e6: Maior
   highest_score_e080551e: "Pontuação mais alta"
   hindi_9bcd4b34: Hindi
+  historical_data_lacks_records_for_installed_by_9448a7b2: "Os dados históricos carecem de registros para \"instalado por\".\""
+  historical_data_lacks_records_for_updated_by_f9d9fe48: "Os dados históricos carecem de registros para \"atualizado por\".\""
   history_cd3f60a9: Histórico
   history_settings_c63dbaaf: "Configurações do histórico"
   hmm_we_can_t_find_any_matching_calendars_25983a51: "Hmm, não conseguimos encontrar nenhum calendário correspondente."
@@ -15508,6 +15603,7 @@ pt-BR:
   icon_url_e3d56e89: "URL do ícone"
   icon_url_ecce6557: "URL do ícone:"
   icon_url_required_unless_present_in_additional_set_e453ad8f: "URL do ícone (obrigatório, a menos que esteja presente nas configurações adicionais)"
+  icon_urls_e3ce9c63: "URLs de ícones"
   icons: 
     discussion_submission: "Envio do fórum"
     file_upload_submission: "Envio de upload de arquivo"
@@ -15656,6 +15752,10 @@ pt-BR:
       Em vez de retornar um 404 não encontrado genérico, a API retornará um 422
       junto com uma mensagem útil indicando que a ferramenta não pode acessar cursos
       concluídos.
+  if_enabled_the_assignment_view_lti_placement_ifram_7496911c: |-
+      Se ativado, o iframe de colocação de LTI assignment_view será mostrado acima da descrição da tarefa se o aluno tiver um envio
+      e puder visualizar a tarefa. Isso pode ser usado para tornar o posicionamento mais proeminente para ferramentas que exigem ação após
+      o envio de um trabalho.
   if_enabled_the_course_import_page_will_use_instui__84bad313: "Se ativado, a página de importação do curso usará componentes InstUI"
   if_enabled_the_course_link_tray_will_display_more__3b84590a: |-
       Se ativado, a bandeja de links do curso exibirá mensagens mais úteis
@@ -15698,6 +15798,9 @@ pt-BR:
       em vez de na tarefa. Isso fará com que os eventos sejam
       duplicados, a menos que as assinaturas nas tarefas associadas ao
       plágio sejam excluídas.
+  if_left_blank_a_default_icon_resembling_the_one_di_8bd1a3c4: "Se for deixado em branco, será fornecido um ícone padrão semelhante ao exibido. A cor pode variar."
+  if_left_blank_no_icon_will_display_e590a9c0: "Se deixado em branco, nenhum ícone será exibido."
+  if_left_blank_the_tool_s_default_icon_will_display_7784a202: "Se deixado em branco, o ícone padrão da ferramenta será exibido."
   if_left_blank_uses_due_date_e3d14dc1: "Se deixado em branco, usa data de vencimento"
   if_lti_add_is_disabled_users_can_still_install_app_78aa7908: "Se LTI - adicionar estiver desabilitado, os usuários ainda poderão instalar aplicativos aprovados por meio do Canvas App Center (se habilitado para sua instituição). No entanto, se LTI - delete não estiver ativado, eles não poderão excluir aplicativos externos adicionados manualmente."
   if_manage_courses_admin_manage_update_and_courses__d2f16831: "Se Gerenciar Cursos: Administração - gerenciar/atualizar e Cursos - desfazer exclusão também estão habilitados, um usuário em nível de conta poderá restaurar cursos excluídos em Ferramentas de Administração."
@@ -16194,6 +16297,7 @@ pt-BR:
   instructor_messages_a4c28674: "Mensagens de Instrutor"
   instructor_name_36bc0f39: "Nome do instrutor"
   instructor_points_2cd28bd1: "Pontos do instrutor"
+  instructor_points_pointsinputvalue_out_of_totalpoi_ab888d51: "Pontos do instrutor %{pointsInputValue} de %{totalPointsValue}"
   instructor_score_6e11587f: "Pontuação do instrutor"
   instructor_sis_id_899dd697: "Id do sis do instrutor"
   instructors_4b491a07: instrutores
@@ -16323,6 +16427,7 @@ pt-BR:
   intelligent_insights_ask_your_data_73b2c0b1: "Intelligent Insights - Pergunte aos seus dados"
   intelligent_insights_course_readiness_6d4c7ab0: "Intelligent Insights - Preparação para o curso"
   intelligent_insights_lti_usage_70c9c6b4: "Insights inteligentes - Uso de LTI"
+  intelligent_insights_lti_usage_dashboard_8dfa0a83: "Painel de uso do Intelligent Insights - LTI"
   intelligent_insights_students_in_need_of_attention_9ae46d7f: "Intelligent Insights - Alunos que precisam de atenção"
   interactions_report_47c1219e: "Relatório de interações"
   internal_analytics_f02b3fff: "Análise interna"
@@ -16428,6 +16533,7 @@ pt-BR:
   invalid_timestamp_timestamp_in_future_5bc855d7: "Carimbo de hora/data inválido - carimbo de hora/data no futuro"
   invalid_timestamp_timestamp_not_parseable_dae79e92: "Carimbo de hora/data inválido - carimbo de hora/data não analisável"
   invalid_until_until_date_55f29c82: "UNTIL '%{until_date}' inválido"
+  invalid_url_cbde79f: "URL inválido"
   invalid_url_in_xml: "URL inválida em xml. Ampersands deve ser escapado."
   invalid_username_or_password_b60aa240: "Usuário ou senha inválidos"
   invalid_username_or_password_trouble_logging_in_ch_7699399c: "Nome de usuário ou senha inválido. Problemas ao fazer login? *Confira perguntas frequentes sobre Login*."
@@ -16623,12 +16729,12 @@ pt-BR:
   k12_description: "Atualize os ícones no Menu de navegação global que fazem mais sentido especificamente em um ambiente de educação primária."
   k20_beta_538e64fb: "K20 - Beta"
   k20_beta_description: "Ativa os painéis preparação do curso e alunos que precisam de atenção para clientes beta fechados. Será preterido em favor dos sinalizadores de recursos do Intelligent Insights."
-  k20_course_readiness: "Habilita a Prontidão do Curso para clientes da versão beta fechada."
+  k20_course_readiness: "Habilita o recurso Intelligent Insights - Prontidão do curso e a permissão que o acompanha."
   k20_course_readiness_alpha_testing_description: "Esse sinalizador é para instituições que participam do teste alfa do Intelligent Insights. Este sinalizador habilita o painel de Prontidão do Curso para essas instituições."
   k20_course_readiness_alpha_testing_f45597b6: "K20 - Teste alfa de prontidão do curso"
   k20_course_readiness_description: "Ativa o painel de preparação do curso de análise avançada para testadores Alpha."
-  k20_lti_usage: "Habilita os painéis de uso de LTI para clientes da versão beta fechada."
-  k20_students_in_need_of_attention: "Habilita os painéis Alunos que Precisam de Atenção para clientes da versão beta fechada."
+  k20_lti_usage: "Habilita o Painel de Uso do LTI e a permissão que o acompanha."
+  k20_students_in_need_of_attention: "Habilita o recurso Intelligent Insights - Alunos que Precisam de Atenção e a permissão que o acompanha."
   k_2521301c: k
   kazakhstan_7_8fe892c: "Cazaquistão (+7)"
   keep_8f3e7c16: Manter
@@ -17003,6 +17109,10 @@ pt-BR:
   like_post_from_author_79b874f1: "Curtir postagem de %{author}"
   like_summary_5e20c025: "Como resumo"
   like_this_entry_60da41a5: "Curtir esta entrada"
+  likes_8cffe724: 
+    one: Curtida
+    other: Curtidas
+    zero: Curtida
   limit_assignment_names_lengths_max_255_5ee9ebb5: "Limitar comprimentos dos nomes das tarefas (máx.. 255)"
   limit_certain_lti_placements_to_authorized_tools_f4384cb6: "Limitar determinadas inclusões de LTI a ferramentas autorizadas"
   limit_course_participation_to_term_or_custom_cours_67797a86: "Limitar a participação no curso ao período letivo ou datas personalizadas do curso?"
@@ -17217,6 +17327,7 @@ pt-BR:
   loading_results_769c8819: "Carregando resultados"
   loading_results_spinner_73ef739c: "Carregando o Rotador de Resultados"
   loading_section_header_616c8cdd: "Carregando cabeçalho da seção"
+  loading_sections_463ebf7d: "Carregando seções"
   loading_staff_1ce7d803: "Carregando equipe..."
   loading_students_30b71301: "Carregando alunos"
   loading_sub_accounts_a284e8a1: "Carregando subcontas"
@@ -17360,7 +17471,8 @@ pt-BR:
           send_to_sms: "Enviar mensagens de texto para %{phone_number}"
         labels: 
           carrier: Operadora
-          phone_number: "Número de telefone"
+          otp_communication_channel_id: "Número de celular dos EUA"
+          phone_number: "Número de celular dos EUA"
           remember_me: "Lembrar deste computador"
           verification_code: "Código de verificação"
         links: 
@@ -19824,6 +19936,7 @@ pt-BR:
   mini_calendar_fe8003e4: "Mini calendário"
   minimize_global_navigation_2d839351: "Minimizar navegação global"
   minimum_character_length_minimum_8_maximum_120_587ed773: "Comprimento mínimo de caracteres (mínimo: 8 | máximo: 120)"
+  minimum_character_length_minimum_8_maximum_255_32f39a5d: "Comprimento mínimo de caracteres (mínimo: 8 | máximo: 255)"
   minimum_score_e6d1c134: "Pontuação mínima"
   minutes_4aee5a41: Minutos
   minutes_per_slot_5b7169e5: "Minutos por intervalo"
@@ -19859,6 +19972,7 @@ pt-BR:
   mobile_global_nav_logo_a189f7bb: "Logo de nav global móvel"
   mobile_homescreen_icon_f85d6b63: "Ícone de Tela Principal para Celular"
   mobile_javascript_file_c429158d: "Arquivo JavaScript móvel"
+  mobile_number_5fc2967d: "Número de celular"
   mobile_offline_mode_7eaff590: "Modo off-line móvel"
   modal_dialog_add_people_bc1c6e14: "Caixa de diálogo restrita: Adicionar pessoas"
   modal_dialog_add_to_course_aec33759: "Caixa de diálogo restrita: Adicionar ao curso"
@@ -19913,6 +20027,7 @@ pt-BR:
   modified_by_user_e6c8ade3: "modificado por: %{user}"
   modify_permissions_for_account_rubrics_6c3aee59: "Modificar permissões para rubricas da conta"
   modify_settings_ed8b9ccf: "Modificar configurações"
+  modify_the_placement_placement_cbf4f3b9: "Modificar a colocação de %{placement}"
   module_90d9fd32: Módulo
   module_access_updated_successfully_b21ed967: "Acesso ao módulo atualizado com sucesso."
   module_and_items_published_13ed5cd6: "Módulo e itens publicados"
@@ -20225,12 +20340,21 @@ pt-BR:
   mp3_c21c0f5f: MP3
   mp4_5c789afc: MP4
   msg_680333e2: "%{msg}"
+  multi_factor_authentication_1a6b3b3d: "Autenticação Multifator"
   multi_factor_authentication_backup_codes_4d781044: "Códigos de backup de autenticação multifator"
   multi_factor_authentication_configured_865b1bde: "Autenticação multifator configurada"
+  multi_factor_authentication_mfa_enhances_security__5c37b7e2: |-
+      A autenticação multifator (MFA) aumenta a segurança exigindo um dispositivo físico e sua senha de login do Canvas.
+      %{otp_via_sms_message}
+      
+      Configure a MFA escaneando o código QR com um aplicativo de senha única baseada em tempo (TOTP) no iPhone ou Android
+      (por exemplo, Google Authenticator, Microsoft Authenticator, Authy). Após a configuração, imprima códigos de backup de sua página de
+      perfil se o dispositivo MFA principal não estiver disponível.
   multi_select_gradebook_filters_95dbb4fc: "Filtros de boletim de seleção múltipla"
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: "Múltiplos são marcados como “tema atual” porque os mesmos valores foram salvos sob diversos nomes, isto é, eles são os mesmos que estão sendo atualmente aplicados"
   multiple_ba5220cd: Múltiplos(as)
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "Várias contas do Canvas estão associadas ao Clever District %{district_id}"
+  multiple_dates_e3a122f7: "Várias datas"
   multiple_dropdowns_read_surrounding_text_f61274b3: "Múltiplos menus suspensos, ler texto adjacente"
   multiple_due_dates_283dd861: "Vários prazos de entrega"
   multiple_due_dates_47416f7a: "(Múltiplas datas de vencimento)"
@@ -20251,6 +20375,8 @@ pt-BR:
   must_be_a_whole_number_887d8c51: "Deve ser um número inteiro"
   must_be_after_start_date_95e251a3: "deve ser após a data de início"
   must_be_at_least_8_characters_in_length_138a29e3: "Deve ter pelo menos 8 caracteres de comprimento."
+  must_be_at_least_min_attempts_or_greater_e2ce76fa: "Deve ser pelo menos %{min_attempts} ou maior"
+  must_be_at_least_min_length_or_greater_eb55cbf3: "Deve ser pelo menos %{min_length} ou maior"
   must_be_at_least_one_group_per_section_there_are_c_8e8b58e4: "Deve haver pelo menos um grupo por seção; existem %{count} seções"
   must_be_between_1_and_10_e99eb0d1: "deve estar entre 1 e 10"
   must_be_between_1_and_5_3b42aca1: "deve estar entre 1 e 5"
@@ -20279,6 +20405,8 @@ pt-BR:
   must_mark_assignment_as_done_e3e4af88: "Deve marcar tarefa como concluída"
   must_mark_this_module_item_done_in_order_to_comple_ca3c390f: "Deve marcar este item de módulo como feito para concluí-lo"
   must_not_be_empty_80fd90b8: "não deve ficar vazio"
+  must_not_exceed_max_attempts_30a13718: "Não deve exceder %{max_attempts}"
+  must_not_exceed_max_length_eb9fb376: "Não deve exceder %{max_length}"
   must_not_use_words_or_sequences_of_characters_comm_ba8f647: "Não deve usar palavras ou sequências de caracteres comuns em senhas (ex.: password, 12345, etc.)"
   must_provide_a_valid_url_26fe7e15: "Deve fornecer uma url válida."
   must_provide_valid_letter_grade_999219e3: "deve fornecer uma nota por conceito válida"
@@ -20391,6 +20519,7 @@ pt-BR:
   name_user_e44eebed: "%{name} Usuário"
   names_and_role_ebff0149: "Nomes e cargos"
   namespace_value_bc6ceca3: "Valor do namespace"
+  naming_1d7127cd: Nomeação
   nau_submission_data_cb3dc17c: "Dados de envio da NAU"
   nav_avatar_border_3246beb1: "Borda do Avatar do Navegador"
   nav_background_fd299145: "Fundo do Navegador"
@@ -20597,6 +20726,7 @@ pt-BR:
   nightingale_student_activity_tracking_f7d7c4cf: "Acompanhamento de atividade de alunos Nightingale"
   niles_student_activity_and_performance_eabf444d: "Atividade e desempenho do aluno Niles"
   no_74e9b590: não
+  no_account_default_a4eee3d4: "Nenhuma conta padrão"
   no_additional_details_were_added_for_this_assignme_547c0de7: "Nenhum detalhe adicional foi adicionado para esta tarefa."
   no_alignments_are_available_for_this_outcome_7f8346f9: "Nenhum alinhamento está disponível para este objetivo."
   no_allowed_domains_b6633d12: "Não há domínios permitidos"
@@ -20632,6 +20762,7 @@ pt-BR:
   no_date_bfeb2df7: "Sem Data"
   no_date_set_25edf0c1: "Nenhuma data definida"
   no_description_c2554c25: "Nenhuma descrição"
+  no_description_provided_a5b08c7a: "*Não há descrição fornecida.*"
   no_details_1ee29870: "Nenhum detalhe"
   no_details_d15fa1ec: "Sem detalhes"
   no_directory_is_selected_please_select_a_directory_46ded46: "Nenhum diretório é selecionado; selecione um diretório antes de clicar em 'mover'"
@@ -20670,11 +20801,13 @@ pt-BR:
   no_grading_periods_set_up_a20a8819: "Nenhuma Configuração do Período da Avaliação"
   no_grading_schemes_to_display_8b0e92e7: "Não há esquemas de pontuação a serem exibidos"
   no_icon_1f6ea5f4: "sem ícone"
+  no_icon_70e13356: "Nenhum ícone"
   no_integrations_available_6729d0ca: "Sem integrações disponíveis"
   no_items_found_870b2d0d: "Nenhum item encontrado"
   no_items_in_module_21f111a2: "Nenhum item no módulo"
   no_job_selected_d6c5e6f4: "Nenhum trabalho selecionado"
   no_label_date_ff3a372f: "Sem %{label} Data"
+  no_label_provided_2346f401: "**Não há rótulo fornecido.**"
   no_last_name_62c3e5e2: "<Sem sobrenome>"
   no_longer_available_1557d25d: "Não está mais disponível"
   no_longer_observing_user_efa5298a: "Não mais observando %{user}"
@@ -20844,6 +20977,7 @@ pt-BR:
   note_that_as_long_as_this_option_is_enabled_studen_9ed99069: "Note que, enquanto esta opção estiver ativa, os alunos podem ir de um grupo para outro."
   note_that_email_may_not_always_be_populated_in_the_bb4a1572: "Observe que e-mail não pode ser sempre preenchida no perfil do usuário da Microsoft. Oid não será preenchida para contas pessoais da Microsoft."
   note_that_some_attributes_may_not_be_populated_for_7c1f2854: "Observe que alguns atributos não podem ser preenchidos por todos os usuários no Clever."
+  note_the_following_content_types_will_be_imported__34541c86: "Observe que os seguintes tipos de conteúdo serão importados: Configurações do curso, corpo do programa de estudos, módulos, tarefas, testes, bancos de perguntas, tópicos de discussão, páginas, avisos, critérios de avaliação, arquivos e eventos de calendário."
   note_this_code_will_expire_in_15_minutes_c743de99: "*NOTA*: Esse código expirará em 15 minutos."
   note_this_is_not_your_official_score_f2d4582f: "*NOTA*: Esta NÃO é sua pontuação oficial."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Nota: Essa conta de login usa a autenticação externa, mas permite a autenticação de senha Canvas fallback. Os campos de senha neste formulário atualizam a senha de Canvas fallback, *não* a autenticação externa."
@@ -21162,6 +21296,7 @@ pt-BR:
       format: 
         delimiter: ","
         format: "%u%n"
+        negative_format: "-%u%n"
         precision: 2
         separator: "."
         significant: false
@@ -21201,6 +21336,7 @@ pt-BR:
           mb: MB
           pb: PB
           tb: TB
+          zb: ZB
     percentage: 
       format: 
         delimiter: ""
@@ -21417,6 +21553,7 @@ pt-BR:
   only_tid_oid_or_sub_are_supported_with_the_microso_fae17484: "Somente \"tid+oid\" ou \"sub\" são compatíveis com o locatário \"microsoft\"."
   only_tid_oid_sub_or_oid_are_supported_with_the_mic_d678f375: "Somente \"tid+oid\", \"sub\" ou \"oid\" são compatíveis com o locatário \"microsoft\"."
   only_ungraded_artifacts_that_are_past_due_eab9a83a: "Apenas artefatos não avaliados que estão vencidos"
+  only_us_mobile_numbers_are_supported_7ce4295d: "Somente números de celular dos EUA são compatíveis."
   only_users_with_no_enrollments_c636e6f9: "Somente usuários sem matrículas"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} no prazo, %{late} atrasado, %{missing} ausente"
   oops_something_went_wrong_importing_name_d382cac1: "Oops! Algo deu errado ao importar \"%{name}\""
@@ -22050,6 +22187,7 @@ pt-BR:
   permitted_api_endpoints_b092c4cc: "Terminais de API permitidos"
   persian_a8cadb95: Persa
   persists_the_used_authentication_provider_when_log_15113afc: "Persiste o provedor de autenticação usado ao fazer login e padroniza os novos logins para o provedor padrão"
+  personal_profile_settings_8d31f0dd: "Configurações do perfil pessoal"
   personal_pronouns_7d271f52: "Pronomes pessoais"
   peru_51_d3d38d1f: "Peru (+51)"
   peru_7dcfdc91: Peru
@@ -22064,6 +22202,7 @@ pt-BR:
   pin_discussion_title_67c84658: "Fixar fórum %{title}"
   pin_of_discussion_title_failed_6c2c32a5: "Fixar o fórum %{title} falhou"
   pin_of_discussion_title_succeeded_c7d59580: "Fixar o fórum %{title} bem-sucedido"
+  pin_to_top_navigation_671f70cc: "Fixar na navegação superior"
   pink_68ad45cb: Rosa
   pinned_discussions_a55c0cea: "Fóruns fixados"
   place_b128fa94: Lugar
@@ -22072,7 +22211,9 @@ pt-BR:
   place_title_2c183274: "Colocar \"%{title}\""
   placeholder_for_webhooks_access_in_canvas_catalog_b8c9d864: "Espaço reservado para acesso de webhooks no Catálogo do Canvas."
   placement_active_click_to_deactivate_47f8cf45: "Posicionamento ativo; clique para desativar"
+  placement_icon_1f87372: "Ícone %{placement}"
   placement_inactive_click_to_activate_f7fe8c30: "Posicionamento inativo; clique para ativar"
+  placement_names_ab17c1da: "Nomes de colocação"
   placement_values_c0a2cf56: "Valores de colocação"
   placements_5b5e056b: Posicionamentos
   places_a_button_in_the_top_right_corner_of_course__1ed5ea4: "Coloca um botão no canto superior direito das páginas do curso, permitindo que os professores mudem rapidamente para a Visualização do Aluno."
@@ -22110,6 +22251,7 @@ pt-BR:
   please_allow_canvas_to_access_your_microphone_and__dc2c3079: "Permita que o Canvas acesse o seu microfone e sua webcam."
   please_allow_canvas_to_access_your_webcam_f66bacb1: "Permita que o Canvas acesse a sua webcam."
   please_check_back_soon_37d45200: "Verifique novamente mais tarde."
+  please_check_your_email_if_your_sms_code_does_not__732060c1: "Verifique seu e-mail se o código SMS não chegar em breve."
   please_click_below_to_launch_the_tool_and_select_a_f66e14d: "Clique abaixo para iniciar a ferramenta e selecionar um recurso."
   please_contact_your_lms_administrator_for_more_det_635afd97: "Entre em contato com o administrador do LMS para obter mais detalhes."
   please_create_a_group_set_8db6e8fe: "Por favor, crie um conjunto de grupos"
@@ -22125,6 +22267,8 @@ pt-BR:
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Por favor, digite um URL válido. Protocolo é necessário (por exemplo, http://, https://, ftp://, tel:, mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__6dc0071c: "Por favor, digite uma URL válida. Protocolo é obrigatório (por exemplo, http://, https://, ftp://, tel:)."
   please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "Por favor, insira uma URL válida. O protocolo é necessário (por exemplo, http://, https://, ftp://)."
+  please_enter_the_verification_code_sent_to_your_mo_78b13f95: "Digite o código de verificação enviado para o número do seu celular."
+  please_enter_the_verification_code_shown_by_your_t_acc7c404: "Insira o código de verificação mostrado pelo seu token."
   please_enter_your_label_name_7745272d: "Por favor insira o seu %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Por favor insira o(a) seu(sua) %{label_name} e senha:"
   please_fix_errors_before_continuing_b1c13e7d: "Corrija os erros antes de continuar"
@@ -22158,6 +22302,7 @@ pt-BR:
   please_select_at_least_one_option_2b83cad: "Selecione pelo menos uma opção."
   please_select_one_f931e883: "Por favor, selecione um"
   please_select_the_level_of_privacy_desired_for_sup_7744af5: "Selecione o nível de privacidade desejado para acesso ao Suporte"
+  please_set_a_due_date_or_change_your_selection_for_3b94850c: "Defina uma data de vencimento ou altere sua seleção para a opção \"Sincronizar com o SIS\"."
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Especifique se deseja ativar ou desativar a sincronização do Microsoft Teams."
   please_try_again_4c3d11b4: "Por favor, tente novamente"
   please_try_another_search_term_8f7b5d69: "Tente outro termo de pesquisa"
@@ -22484,7 +22629,9 @@ pt-BR:
     learn_platform_settings: 
       labels: 
         base_url: "URL Base"
+        password: Senha
         token: "Token de acesso"
+        username: "Nome de usuário"
     learnplatform: 
       description: "Habilite o acesso à API LearnPlatform para obter informações sobre o produto"
       name: LearnPlatform
@@ -23272,6 +23419,8 @@ pt-BR:
       common: "Não é possível utilizar senhas comuns (p. ex., \"senha\")"
       invalid: "Pode conter somente letras, números ou os seguintes caracteres: %{characters}"
       mismatch: Incorreto
+      no_digits: "Deve incluir pelo menos um número"
+      no_symbols: "Deve incluir pelo menos um símbolo"
       not_email: "Não é um endereço de e-mail válido"
       repeated: "Não é possível ter o mesmo caractere mais de %{max} vezes seguidas"
       required: Obrigatório
@@ -24933,6 +25082,7 @@ pt-BR:
       pessoas que podem criar cursos manualmente para colocá-los em qualquer subconta
       onde tenham matrículas.
   rating_button_buttondisplay_8fb69a4e: "Botão de classificação %{buttonDisplay}"
+  rating_button_buttondisplay_selectedtext_658abbea: "Botão de avaliação %{buttonDisplay} %{selectedText}"
   rating_description_db6adf39: "Descrição da avaliação"
   rating_display_b0b574be: "Exibição de classificação"
   rating_max_score_eade1523: "Pontuação máxima da avaliação"
@@ -24941,6 +25091,7 @@ pt-BR:
   rating_order_e57f63ed: "Ordem de classificação"
   rating_points_be3e8682: "Pontos de avaliação"
   rating_scale_fc10d5f1: "Escala de avaliação"
+  rating_scale_ratingslength_25100b7a: "Escala de avaliação: %{ratingsLength}"
   rating_score_22cfc724: "Pontuação da avaliação"
   rating_selected_85c31e4c: "Avaliação selecionada"
   rating_tier_index_threshold_3f02a6d7: "limiar da camada de avaliação %{index}"
@@ -24959,6 +25110,7 @@ pt-BR:
   rce_contents_replace_display_name: "Substituição de conteúdo do RCE"
   rce_edit_closed_captions_de3ad169: "Editar legendas no RCE"
   rce_enhancements_5701e06: "Melhorias do RCE"
+  rce_favorite_4408b412: "Favorito do RCE"
   rce_icon_maker_2114f87: "Criador de ícones RCE"
   rce_initialization_fix_4f176bda: "Conserto de inicialização RCE"
   rce_limit_number_of_rces_initially_rendered_on_the_fba39a46: "RCE Limita o número de RCEs inicialmente renderizados na página"
@@ -25309,6 +25461,7 @@ pt-BR:
   remove_pronouns_5ff760ff: "Remover pronomes"
   remove_pronouns_pronoun_c8b03d78: "Remover pronomes %{pronoun}"
   remove_rating_cf9378eb: "Remover avaliação"
+  remove_ratingname_rating_c473af6a: "Remover %{ratingName} Avaliação"
   remove_recipient_name_a6b83cef: "Remover destinatário %{name}"
   remove_removablecount_out_of_totalcount_outcomes_3270d9c0: "Remover %{removableCount} de %{totalCount} resultados?"
   remove_requirement_32a89e23: "Remover requisito"
@@ -25336,6 +25489,7 @@ pt-BR:
   remove_this_student_pace_a5e7b3c5: "Remover este ritmo do aluno?"
   remove_top_level_submittedat_from_lti_ags_score_ap_4f969cc4: "Remover o submittedAt de nível superior da API de pontuação do LTI AGS"
   remove_user_from_section_5556f465: "Remover usuário da seção"
+  remove_user_from_sectionname_e73b51d1: "Remover usuário de %{sectionName}"
   remove_webcam_image_count_efee4a11: "Remover imagem da webcam %{count}"
   removed_assignment_assignment_name_835cc776: "Tarefa %{assignment_name} removida"
   removed_course_association_course_a233342c: "Associação do curso removida %{course}"
@@ -25479,6 +25633,7 @@ pt-BR:
   required_peer_review_index_b186729c: "Revisão por pares obrigatória %{index}"
   required_peer_reviews_23bea465: "Revisão por pares necessária"
   required_replies_8ec3e238: "Respostas necessárias"
+  required_replies_due_date_f976c9af: "Data de vencimento das respostas obrigatórias"
   required_replies_requiredreplies_d91bed30: "Respostas obrigatórias (%{requiredReplies})"
   required_to_view_quiz_results_dba7368b: "Necessário para exibir os resultados do teste"
   required_values_1eb5841f: "Valores requeridos"
@@ -25604,14 +25759,17 @@ pt-BR:
   revert_to_old_ui_3211da41: "Reverter para IU antiga"
   reverts_the_visible_assignments_scope_to_its_origi_87eb35d: "Reverte o escopo de atribuições visível para sua forma original"
   review_7197fba3: "Revisão "
+  review_e5be5adc: Revisão
   review_feedback_4b4abb38: "Revisão de feedback"
   review_now_318a6a3e: "Revisar agora"
+  review_your_changes_before_finalizing_f6dc0e5a: "Revise suas alterações antes de finalizar."
   reviewer_b993ce28: Avaliador
   reviewers_successfully_added_bd4b629a: "Avaliadores adionados com sucesso"
   reviews_due_5178cab6: "Avaliações vencidas"
   reviews_per_student_378292b3: "Avaliações por aluno"
   rich_content_editor_2708ef21: "Editor de conteúdo avançado"
   rich_content_editor_sidebar_enhancements_8bd945d3: "Melhorias da barra lateral do Editor de conteúdo avançado"
+  rich_text_editor_a0491c6e: "Editor de conteúdo enriquecido"
   right_sidebar_logo_5483dc0a: "Logotipo da Barra Lateral Direita"
   rocketship_on_launchpad_4011ea8c: "foguete na plataforma de lançamento"
   role: 
@@ -25829,6 +25987,7 @@ pt-BR:
   rubric_fc39da76: Rubrica
   rubric_name_e11b76de: "Nome da rubrica"
   rubric_options_c92d7130: "Opções de rubrica"
+  rubric_options_for_rubrictitle_309ab0f0: "Opções de avaliação para %{rubricTitle}"
   rubric_outcome_criterion_modal_3361e6d1: "Modal de critério de resultado da rubrica"
   rubric_rating_order_ead13c09: "Ordem de classificação da rubrica"
   rubric_read_state_change_failed_1a1e23da: "Falha na alteração do estado de leitura da rubrica"
@@ -26249,9 +26408,13 @@ pt-BR:
   secondary_id_822f5c52: "ID secundária"
   secondary_info_835a07dd: "Informações secundárias"
   secondary_navigation_f701dc45: "Navegação Secundária"
+  secret_key_2c9ea73c: "Chave secreta:"
   section: 
     confirms: 
       delete_enrollment: "Tem certeza de que deseja excluir esta matrícula permanentemente?"
+    course: 
+      sisid_term: "ID do SIS: %{course_sisid} | Termo: %{course_term}"
+      term: "Termo: %{course_term}"
     default_course_name: "ID do curso \"%{course_id}\""
     enrolled_as_designer: "inscrito como: Designer"
     enrolled_as_limited_designer: "inscrito como: Designer com acesso somente à seção"
@@ -27564,6 +27727,7 @@ pt-BR:
   shipping_country_code_as_reported_by_salesforce_631961fe: "Código do país de envio conforme informado pela Salesforce"
   short_name_42f454a1: "Nome curto"
   short_name_ad9bf84f: "nome abreviado"
+  should_be_10_digit_number_d30ef02d: "dever ser um número com 10 dígitos"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "deve ser auto-evidente, o ID de Canvas do usuário relatante"
   should_not_have_gotten_here_2d75f28a: "Não deveria ter chegado aqui"
   show_76c0ed1c: Mostrar
@@ -27630,6 +27794,7 @@ pt-BR:
   show_less_d5bbf728: "mostrar menos"
   show_links_to_unpublished_content_30c0450d: "Mostrar links para conteúdo não publicado"
   show_live_events_subscriptions_68b69a03: "Mostrar assinaturas de eventos ao vivo"
+  show_locations_used_cf905022: "Mostrar locais usados"
   show_lti_2_configuration_ui_94ce35a9: "Mostrar UI de configuração do LTI 2"
   show_lti_tools_from_federated_parent_accounts_47135c98: "Mostrar ferramentas LTI de contas primárias federadas"
   show_me_76823679: Mostre-me
@@ -27925,9 +28090,14 @@ pt-BR:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "Desculpe-nos, a ação realizada nesta gravação falhou. Tente novamente mais tarde"
   sorry_the_service_is_currently_busy_please_try_aga_cfc7e0df: "Desculpe, o serviço está ocupado no momento. Por favor, tente novamente mais tarde."
   sorry_we_are_currently_experiencing_high_demand_pl_a3eb8506: "Desculpe, estamos com alta demanda no momento. Por favor, tente novamente mais tarde."
+  sorry_we_are_unable_to_generate_rich_content_at_th_de6967e9: "Desculpe, mas não podemos gerar conteúdo avançado no momento. Por favor, tente novamente mais tarde."
+  sorry_we_are_unable_to_handle_this_request_at_this_df59331d: "Desculpe, mas não podemos atender a essa solicitação no momento. Por favor, tente novamente mais tarde."
+  sorry_we_are_unable_to_handle_your_request_as_it_i_4d3670cf: "Desculpe, não podemos atender à sua solicitação porque ela é muito longa."
   sorry_we_are_unable_to_summarize_this_discussion_a_25fbc4d2: "Desculpe, não é possível resumir esta discussão no momento. Por favor, tente novamente mais tarde."
   sorry_we_are_unable_to_summarize_this_discussion_a_47e02f: "Desculpe, não é possível resumir esta discussão porque ela é muito longa."
   sorry_we_couldn_t_find_anything_that_matched_91793bb7: "Não foi possível encontrar nada que corresponda."
+  sorry_you_have_reached_the_maximum_number_of_rich__ec5be787: "Desculpe, você atingiu o número máximo de gerações de conteúdo avançado permitido (%{limit}) por enquanto. Por favor, tente novamente mais tarde."
+  sorry_you_have_reached_the_maximum_number_of_summa_b3be4205: "Desculpe, você atingiu o número máximo de gerações de resumo permitidas (%{limit}) por enquanto. Por favor, tente novamente mais tarde."
   sort_15eac63f: Classificar
   sort_40afa70: "Ordenar:"
   sort_and_filter_developer_keys_tables_fa8d31b3: "Classificar e filtrar tabelas de chaves de desenvolvedor"
@@ -28370,6 +28540,7 @@ pt-BR:
   students_have_either_already_taken_or_started_taki_a076336: "Os alunos já fizeram ou iniciaram este teste, então cuidado ao editá-lo. Se você alterar qualquer pergunta do teste de forma significativa, considere reavaliar os alunos que fizeram a versão antiga do teste."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Os alunos têm a opção de responder anonimamente. Alguns nomes e fotos de perfil podem estar ocultos."
   students_in_need_of_attention_6aa63dc2: "Alunos que precisam de atenção"
+  students_in_need_of_attention_is_part_of_the_intel_fe568107: "Alunos que precisam de atenção faz parte da atualização do Intelligent Insights no Canvas."
   students_must_complete_all_of_these_requirements_15fa97f7: "Alunos devem completar todos esses requisitos"
   students_must_complete_all_of_these_requirements_e7268cf9: "Alunos devem completar todos esses requisitos."
   students_must_complete_one_of_these_requirements_10db0d1b: "Alunos devem completar um desses requisitos"
@@ -29242,6 +29413,9 @@ pt-BR:
   the_date_is_not_valid_b6285fb5: "A data não é válida."
   the_default_report_only_includes_course_section_da_729092f0: "O relatório padrão inclui apenas as datas do curso/seção se as restrições de matrícula estiverem habilitadas"
   the_desired_enrollment_state_to_apply_after_the_un_945ab68f: "O estado de matrícula desejado para matrícula após a data e hora “Até” passar."
+  the_device_can_be_a_code_generator_or_a_mobile_pho_c53f44b3: |-
+      O dispositivo pode ser um gerador de código ou um telefone celular que recebe mensagens de texto.
+      **É altamente recomendável usar um aplicativo autenticador para aumentar a segurança.**
   the_discussion_entry_was_successfully_created_7cddf67b: "A entrada do fórum foi criada com sucesso."
   the_discussion_topic_was_successfully_deleted_d8b93b70: "O tópico de fórum foi excluído com sucesso."
   the_download_process_has_started_this_can_take_a_w_cef4bb75: |-
@@ -29401,6 +29575,7 @@ pt-BR:
   the_module_item_is_locked_27fe420b: "O item do módulo está bloqueado"
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "As pontuações mais recentes para o usuário %{current_user_name} e objetivo %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "O próximo compromisso disponível neste curso é em *%{date}*"
+  the_nickname_will_always_appear_next_to_the_app_s__aa1e79a5: "O apelido sempre aparecerá ao lado do nome do aplicativo"
   the_number_of_additional_replies_required_must_be__c2a6fe33: "O número de respostas adicionais necessárias deve estar entre %{minimumReplies} e %{maximumReplies}."
   the_original_quizzes_interface_fcda53bc: "A interface de questionários original"
   the_outcome_group_was_successfully_imported_into_t_9c80a6fb: "O grupo de resultados foi importado com sucesso para este curso."
@@ -29543,6 +29718,7 @@ pt-BR:
   there_are_no_user_accounts_to_split_from_this_user_4e132eb1: "Não há contas de usuário para dividir deste usuário."
   there_are_unread_rubric_comments_337270ca: "Existem comentários de rubrica não lidos."
   there_are_unsaved_changes_to_a_grade_n_ncontinue_a_103d3b3c: "Há alterações não salvas em uma nota.\\n\\nContinuar mesmo assim?"
+  there_is_a_2_app_limit_for_pinned_tools_in_top_nav_4cadc458: "Há um limite de 2 aplicativos para ferramentas fixadas na Navegação Superior."
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Há um limite de 2 aplicativos para posicionamento na barra de ferramentas do RCE. Essa configuração se aplica apenas ao RCE aprimorado."
   there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: "Há um limite de 2 aplicativos para posicionamento na barra de ferramentas do RCE."
   there_is_already_a_page_in_this_course_with_this_t_5b37ecf2: "Já existe uma página neste curso com este título."
@@ -29667,9 +29843,11 @@ pt-BR:
   there_was_an_error_while_saving_the_grading_scheme_b6c1eb7: "Ocorreu um erro ao salvar o esquema de avaliação"
   there_was_an_error_while_saving_your_changes_5fa5eb65: "Ocorreu um erro ao salvar suas alterações"
   there_was_an_error_while_unarchiving_the_grading_s_92a74ee1: "Ocorreu um erro ao desarquivar o esquema de avaliação"
+  there_was_an_error_while_updating_the_default_grad_3d07a67c: "Ocorreu um erro ao atualizar o esquema de avaliação padrão"
   there_was_an_error_while_updating_the_grading_sche_99608d3a: "Ocorreu um erro ao atualizar o esquema de avaliação"
   there_was_an_error_with_your_import_please_examine_7b42f29d: "Houve um erro com a sua importação, examine o seu arquivo e tente o carregamento novamente. Verifique o seu e-mail para mais detalhes."
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Houve um erro com o sua consulta; por favor tente uma pesquisa diferente"
+  there_was_an_issue_copying_the_client_id_30b6f7b0: "Houve um problema ao copiar o ID do cliente"
   there_was_an_unexpected_error_creating_the_discuss_8811a868: "Ocorreu um erro inesperado ao criar a entrada de fórum."
   there_was_an_unexpected_error_deleting_the_convers_412fd621: "Ocorreu um erro inesperado ao excluir a mensagem da conversa"
   there_was_an_unexpected_error_deleting_the_discuss_fe1022cb: "Ocorreu um erro inesperado ao excluir o tópico de fórum."
@@ -29882,6 +30060,10 @@ pt-BR:
   this_grade_is_unread_fb79c002: "Esta nota não foi lida"
   this_grade_is_unusually_high_60533c20: "Esta nota está anormalmente alta"
   this_grade_may_differ_from_the_student_s_view_of_t_6cbb0e68: "Essa nota pode ser diferente da visão que o aluno tem da nota, pois algumas notas de exercícios ainda não foram publicadas"
+  this_grading_scheme_will_be_the_default_for_all_co_45934022: |-
+      Esse esquema de avaliação será o padrão para todos os cursos da conta.
+                    Cursos individuais podem substituí-lo por seu próprio padrão. As subcontas herdarão
+                    o esquema de avaliação padrão da conta principal, a menos que sejam substituídas.
   this_group_was_successfully_removed_81178d51: "Este grupo foi removido com sucesso."
   this_group_was_successfully_removed_from_this_acco_63abf7f0: "Este grupo foi removido com sucesso desta conta."
   this_group_was_successfully_removed_from_this_cour_8db261c4: "Este grupo foi removido com sucesso deste curso."
@@ -30098,8 +30280,10 @@ pt-BR:
   this_submission_is_not_in_any_grading_period_d4c728db: "Este envio não está em nenhum período de classificação."
   this_summary_is_generated_by_ai_and_is_up_to_date__c85774e1: "Esse resumo é gerado pela IA e está atualizado com as contribuições mais recentes para a discussão. Os resumos são visíveis apenas para os instrutores."
   this_summary_is_generated_by_ai_and_reflects_the_l_66aada34: "Este resumo é gerado pela IA e reflete as contribuições mais recentes para a discussão. Observe que o resultado pode nem sempre ser preciso. Os resumos são visíveis apenas para os instrutores."
+  this_tool_doesn_t_have_any_placements_with_configu_4b07dd16: "Esta ferramenta não tem posicionamentos com ícones configuráveis."
   this_tool_has_already_been_installed_in_this_conte_b73ea29c: "Essa ferramenta já foi instalada nesse contexto. Gostaria de instalá-la de qualquer forma?"
   this_tool_has_no_placements_66b3d7d6: "Essa ferramenta não tem posicionamentos"
+  this_tool_has_not_requested_access_to_any_placemen_727ebb80: "Esta ferramenta não solicitou acesso a nenhuma colocação. Se instalada, ela terá acesso às APIs de LTI, mas não estará visível para os usuários iniciarem. O aplicativo pode ser gerenciado por meio da página Gerenciar Aplicativos."
   this_tool_requires_no_permissions_cda22fff: "Essa ferramenta não requer permissões"
   this_topic_is_closed_for_comments_3dd10c00: "Este assunto está fechado para comentários."
   this_topic_is_closed_for_comments_5bacad6: "Este tópico está fechado para comentários"
@@ -30181,6 +30365,7 @@ pt-BR:
   timeValue: 
     event: "%{dateValue} %{timeValue}"
   time_2b5aac58: Tempo
+  time_based_one_time_password_totp_qr_code_ec73b19a: "Código QR de senha de uso único baseada em tempo (TOTP)"
   time_block_5a7cda5c: "Bloco de tempo"
   time_left_in_your_instant_trial_5dd0392b: "%{time} restante na sua Avaliação Instantânea"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} restante na sua Avaliação Instantânea *(ampliar agora)*"
@@ -31045,8 +31230,10 @@ pt-BR:
   tool_toolname_found_for_client_id_clientid_would_y_13f35b91: "Ferramenta “%{toolName}” encontrada para a ID do cliente %{clientId}. Gostaria de instalá-la?"
   tool_type_afa58fcb: "Tipo de Ferramenta"
   tool_type_tool_configured_tool_id_251c2959: "Tipo de ferramenta (\"tool_id” configurado pela ferramenta)"
+  toolname_hasn_t_requested_any_permissions_3c575c01: "*%{toolName}* não solicitou nenhuma permissão."
   toolname_is_requesting_permission_to_perform_the_f_f3ca90f4: "*%{toolName}* está solicitando permissão para executar as seguintes ações. Escolhemos as configurações padrão recomendadas pelo aplicativo. Observe que a alteração desses padrões pode afetar o desempenho do aplicativo."
   toolname_logo_6b639926: "Logo de %{toolName}"
+  tooltip_for_the_placement_placement_4198875d: "Dica de ferramenta para o posicionamento do %{placement}"
   tooltip_info_for_tenant_input_81a0eca8: "Informações de dicas para entrada do locatário"
   tooltip_that_contains_info_about_the_microsoft_tea_24d892cf: "Dica de ferramenta que contém informações sobre o Atributo de Login do Microsoft Teams Sync."
   tooltips: 
@@ -31059,6 +31246,7 @@ pt-BR:
   top_box_background_6db383e9: "Fundo da Caixa Superior"
   top_box_border_94cee4a7: "Borda da Caixa Superior"
   top_navigation_a925af8d: "Navegação superior"
+  top_navigation_favorite_eb8ff09e: "Favorito da navegação superior"
   top_navigation_placement_78239065: "Posicionamento da navegação superior"
   topic_podcast_feed_9ab6f5ac: "Tópico: Feed de podcast"
   topic_podcast_feed_dff98ab0: "Feed do Podcast do tópico"
@@ -31417,6 +31605,7 @@ pt-BR:
   unmatched_login_list_283ca77: "Lista de login não correspondido"
   unmute_assignment_29a49038: "Cancelar silenciamento da tarefa"
   unnamed_account_id_e688ad87: "Conta (%{id}) Sem Nome"
+  unnamed_document_4ebbffb0: "Documento sem nome"
   unnamed_filter_9ee5e654: "Filtro sem nome"
   unnamed_key_bef07058: "Chave sem nome"
   unnamed_tool_961cb95b: "Ferramenta sem nome"
@@ -31549,6 +31738,7 @@ pt-BR:
   updated_2c1e8615: Atualizado
   updated_after_3a81825c: "Atualizado após"
   updated_at_ab9f625d: updated_at
+  updated_by_7b77453c: "Atualizado por"
   updated_count_accounts_5fe53c96: 
     one: "1 conta atualizada"
     other: "Contas atualizadas %{count}"
@@ -31667,7 +31857,9 @@ pt-BR:
   use_attachment_ids_in_media_links_so_that_users_ar_1ba7845a: |-
       Use IDs de anexo em links de mídia para que os usuários sejam sempre direcionados para a instância correta da mídia
       em vez do original
+  use_authenticator_app_c77020b1: "Usar o aplicativo Authenticator"
   use_between_for_adding_multiple_users_26bff207: "Use “,”no meio para adicionar diversos usuários."
+  use_block_editor_b34ce3e6: "Usar o editor de blocos"
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Usar bookmarking para paginação de API no Índice de Matrículas"
   use_cloudfront_for_docviewer_f21b96db: "Use CloudFront para o DocViewer"
   use_comment_comment_136b5cb3: "Use o comentário %{comment}"
@@ -31713,6 +31905,7 @@ pt-BR:
   use_semicolons_instead_of_commas_to_separate_field_f50945f2: "Use pontos e vírgulas em vez de vírgulas para separar campos nas exportações do Boletim para que elas possam ser importadas no Excel para usuários em alguns locais."
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: "Use pontos e vírgulas para separar campos em exportações de planilhas compatíveis"
   use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: "Use pontos e vírgulas para separar campos em Exportações do Boletim"
+  use_sms_6ca0b993: "Usar SMS"
   use_the_import_content_tool_to_migrate_course_mate_41716290: "Use a ferramenta Importar Conteúdo para migrar materiais do curso de outras fontes para este curso."
   use_the_new_assignments_page_dd292b9d: "Usar a página de novas tarefas"
   use_the_new_assignments_student_page_944262af: "Usar a página do aluno para novas tarefas"
@@ -32304,6 +32497,7 @@ pt-BR:
   value_is_not_a_valid_standard_grade_status_99de23ac: "%{value} não é um status de nota padrão válido"
   value_is_not_a_valid_workflow_state_f75c5e59: "%{value} não é um workflow_state válido"
   value_is_not_valid_563afee6: "%{value} não é válida"
+  value_must_be_positive_3e086d5a: "O valor deve ser positivo"
   value_removed_bba9430c: "%{value} Removido"
   value_too_long_allowed_length_is_length_a81d4cf: "Valor muito longo, o tamanho permitido é %{length}"
   vanity_url_76f93382: "URL intuitiva"
@@ -32317,6 +32511,7 @@ pt-BR:
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite pontuação de similaridade -- mais informações"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Pontuação de similaridade – Ver relatório detalhado"
   verification_code_5acd64ef: "Código de verificação"
+  verify_3dd8f159: Verificar
   verify_ldap_tls_certificates_70241d8e: "Verifique os certificados TLS do LDAP"
   verify_tls_certificate_9cfa26d1: "Verificar certificado TLS"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Verifique os certificados TLS apresentados pelos provedores de autenticação LDAP."
@@ -33061,6 +33256,7 @@ pt-BR:
     one: "Você está pronto para sincronizar 1 tarefa."
     other: "Você está pronto para sincronizar %{count} tarefas."
   you_are_removing_the_app_from_the_entire_account_i_6841f2b1: "Você está removendo o aplicativo de toda a conta. Ele será removido de seus posicionamentos e todos os links de recursos para ele deixarão de funcionar. Para restabelecer posicionamentos e links, você precisará reinstalar o aplicativo."
+  you_are_required_to_set_up_multi_factor_authentica_cf56a7ea: "É necessário configurar a autenticação multifator."
   you_are_submitting_a_submissiontype_submission_onl_29c1cdc1: "Você está realizando um envio de %{submissionType}. Apenas um tipo de envio é permitido. Todos os outros tipos de envios serão excluídos."
   you_are_subscribed_and_will_be_notified_of_new_com_60b5b62b: "Você assinou e receberá notificações sobre novos comentários. Clique para cancelar assinatura."
   you_are_subscribed_to_this_topic_click_to_unsubscr_d6c09364: "Você assinou este tópico. Clique para cancelar assinatura."
@@ -33106,6 +33302,7 @@ pt-BR:
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "Você pode consultar os detalhes deste grupo clicando neste link: %{link}."
   you_can_see_which_groups_you_re_a_part_of_for_this_6efda22c: "É possível ver quais os grupos desta conta que você faz parte, clicando neste link: %{link}."
   you_can_see_which_groups_you_re_a_part_of_for_this_827a3706: "É possível ver de quais os grupos deste curso você faz parte clicando este link: %{link}."
+  you_can_t_archive_this_grading_scheme_because_it_i_c40e3d58: "Não é possível arquivar esse esquema de avaliação porque ele está definido como padrão para um curso ou conta."
   you_can_t_delete_a_root_account_5673c62d: "Você não pode excluir um(a) root_account."
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Não é possível excluir uma subconta que contenha cursos"
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "Você não pode excluir uma subconta que tenha subcontas nela."
