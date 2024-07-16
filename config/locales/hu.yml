@@ -22397,7 +22397,9 @@ hu:
       ways_to_contact_user: Kapcsolat
     recent_activity: 
       date_column: Dátum
+      edit_group: "Csoport szerkesztése"
       message_column: Üzenet
+      new_announcement: Hirdetmény
       recent_activity: "Legutóbbi tevékenységek"
       recent_activity_in_course: "Legutóbbi tevékenységek itt: %{course_or_group}"
       unread_column: Olvasatlan
