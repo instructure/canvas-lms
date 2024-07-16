@@ -23951,7 +23951,9 @@ nn:
       ways_to_contact_user: Kontakt
     recent_activity: 
       date_column: Dato
+      edit_group: "Rediger gruppe"
       message_column: Melding
+      new_announcement: Kunngjering
       recent_activity: "Nyleg aktivitet"
       recent_activity_in_course: "Nyleg aktivitet i %{course_or_group}"
       unread_column: "Ikkje lest"
