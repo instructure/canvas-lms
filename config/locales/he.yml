@@ -17850,7 +17850,9 @@ he:
       ways_to_contact_user: התקשרות
     recent_activity: 
       date_column: תאריך
+      edit_group: "עריכת קבוצה"
       message_column: הודעה
+      new_announcement: הכרזה
       recent_activity: "פעילות אחרונה"
       recent_activity_in_course: "פעילות אחרונה ב %{course_or_group}"
       unread_column: "לא נקרא"
