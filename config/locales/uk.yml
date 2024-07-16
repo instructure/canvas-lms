@@ -16038,7 +16038,9 @@ uk:
       ways_to_contact_user: Зв'язатися
     recent_activity: 
       date_column: Дата
+      edit_group: "Редагувати групу"
       message_column: Повідомлення
+      new_announcement: Оголошення
       recent_activity: "Недавня активність"
       recent_activity_in_course: "Остання активність в %{course_or_group}"
       unread_column: Непрочитані
