@@ -510,6 +510,20 @@ class Lti::RegistrationsController < ApplicationController
                          .eager_load(eager_load_models)
       end
 
+      consortia_registrations = if @account.root_account.primary_settings_root_account? || @account.root_account.consortium_parent_account.blank?
+                                  Lti::RegistrationAccountBinding.none
+                                else
+                                  @account.root_account.consortium_parent_account.shard.activate do
+                                    Lti::Registration.active
+                                                     .where(account: @account.consortium_parent_account)
+                                                     .where(lti_registration_account_bindings: {
+                                                              workflow_state: "on",
+                                                              account: @account.consortium_parent_account
+                                                            })
+                                                     .eager_load(eager_load_models)
+                                  end
+                                end
+
       # Get all registration account bindings in this account, then fetch the registrations from their own shards
       # Omit registrations that were found in the "account_registrations" list; we're only looking for ones that
       # are uniquely being inherited from a different account.
@@ -522,7 +536,7 @@ class Lti::RegistrationsController < ApplicationController
         Lti::Registration.where(id: registration_ids_for_shard).eager_load(eager_load_models)
       end.flatten
 
-      all_registrations = account_registrations + forced_on_in_site_admin + inherited_on_registrations
+      all_registrations = account_registrations + forced_on_in_site_admin + inherited_on_registrations + consortia_registrations
 
       search_terms = params[:query]&.downcase&.split
       all_registrations = filter_registrations_by_search_query(all_registrations, search_terms) if search_terms
