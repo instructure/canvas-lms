@@ -23,6 +23,7 @@ import {queryHelpers} from '@testing-library/dom'
 import keycode from 'keycode'
 import {FS_ENABLED} from '../../util/fullscreenHelpers'
 import StatusBar, {WYSIWYG_VIEW, PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW} from '../StatusBar'
+import {getStatusBarFeaturesForVariant} from '../RCEVariants'
 
 function defaultProps(props = {}) {
   return {
@@ -37,6 +38,7 @@ function defaultProps(props = {}) {
     onWordcountModalOpen: () => {},
     onFullscreen: () => {},
     onChangeView: () => {},
+    features: getStatusBarFeaturesForVariant('full'),
     ...props,
   }
 }
@@ -375,6 +377,31 @@ describe('RCE StatusBar', () => {
       const {queryByRole} = renderStatusBar({disabledPlugins: ['instructure_fullscreen']})
       const fullscreenBtn = queryByRole('button', {name: /fullscreen/i})
       expect(fullscreenBtn).not.toBeInTheDocument()
+    })
+  })
+
+  describe('rce lite feature set', () => {
+    it('shows limited buttons', () => {
+      const {container} = renderStatusBar({features: getStatusBarFeaturesForVariant('lite')})
+      expect(container.querySelector('[data-btn-id="rce-kbshortcut-btn"]')).toBeInTheDocument()
+      expect(container.querySelector('[data-btn-id="rce-a11y-btn"]')).toBeInTheDocument()
+      expect(container.querySelector('[data-btn-id="rce-wordcount-btn"]')).toBeInTheDocument()
+      expect(container.querySelector('[data-btn-id="rce-edit-btn"]')).not.toBeInTheDocument()
+      expect(container.querySelector('[data-btn-id="rce-fullscreen-btn"]')).not.toBeInTheDocument()
+      expect(container.querySelector('[data-btn-id="rce-resize-handle"]')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('rce text-only feature set', () => {
+    it('shows limited buttons', () => {
+      // currently the same as 'lite'
+      const {container} = renderStatusBar({features: getStatusBarFeaturesForVariant('text-only')})
+      expect(container.querySelector('[data-btn-id="rce-kbshortcut-btn"]')).toBeInTheDocument()
+      expect(container.querySelector('[data-btn-id="rce-a11y-btn"]')).toBeInTheDocument()
+      expect(container.querySelector('[data-btn-id="rce-wordcount-btn"]')).toBeInTheDocument()
+      expect(container.querySelector('[data-btn-id="rce-edit-btn"]')).not.toBeInTheDocument()
+      expect(container.querySelector('[data-btn-id="rce-fullscreen-btn"]')).not.toBeInTheDocument()
+      expect(container.querySelector('[data-btn-id="rce-resize-handle"]')).not.toBeInTheDocument()
     })
   })
 })

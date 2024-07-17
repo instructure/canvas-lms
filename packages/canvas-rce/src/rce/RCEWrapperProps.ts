@@ -18,6 +18,7 @@
 
 import PropTypes from 'prop-types'
 import {trayPropTypes} from './plugins/shared/CanvasContentTray'
+import {RCEVariantValues} from './RCEVariants'
 import {PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW, WYSIWYG_VIEW} from './StatusBar'
 
 // This file contains the prop types for the RCEWrapper component, so that types can be shared without having
@@ -206,6 +207,8 @@ export const rceWrapperPropTypes = {
   timezone: PropTypes.string,
   userCacheKey: PropTypes.string,
   externalToolsConfig: externalToolsConfigPropType,
+  ai_text_tools: PropTypes.bool,
+  variant: PropTypes.oneOf(RCEVariantValues),
 }
 
 export type RCEWrapperProps = PropTypes.InferProps<typeof rceWrapperPropTypes>
