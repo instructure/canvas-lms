@@ -86,7 +86,6 @@ export type ItemAssignToCardProps = {
     deletedAssignees: string[]
   ) => void
   onCardDatesChange?: (cardId: string, dateAttribute: string, dateValue: string | null) => void
-  disabledOptionIds: string[]
   selectedAssigneeIds: string[]
   isOpen?: boolean
   everyoneOption?: AssigneeOption
@@ -98,6 +97,7 @@ export type ItemAssignToCardProps = {
   isCheckpointed?: boolean
   blueprintDateLocks?: DateLockTypes[]
   postToSIS?: boolean
+  disabledOptionIdsRef?: React.MutableRefObject<string[]>
 }
 
 export type ItemAssignToCardRef = {
@@ -118,7 +118,6 @@ export default forwardRef(function ItemAssignToCard(
     onDelete,
     onValidityChange,
     onCardAssignmentChange,
-    disabledOptionIds,
     selectedAssigneeIds,
     isOpen,
     everyoneOption,
@@ -131,6 +130,7 @@ export default forwardRef(function ItemAssignToCard(
     isCheckpointed,
     original_due_at,
     postToSIS,
+    disabledOptionIdsRef,
   } = props
   const [
     requiredRepliesDueDate,
@@ -362,7 +362,7 @@ export default forwardRef(function ItemAssignToCard(
           clearAllDisabled={true}
           size="medium"
           messages={showValidations ? error : []}
-          disabledOptionIds={disabledOptionIds}
+          disabledOptionIds={disabledOptionIdsRef.current}
           disableFetch={!isOpen}
           customAllOptions={customAllOptions}
           customIsLoading={customIsLoading}
@@ -370,6 +370,7 @@ export default forwardRef(function ItemAssignToCard(
           inputRef={el => (assigneeSelectorRef.current = el)}
           onBlur={() => setShowValidations(true)}
           disabledWithGradingPeriod={isInClosedGradingPeriod}
+          disabledOptionIdsRef={disabledOptionIdsRef}
         />
         {!removeDueDateInput && !isCheckpointed && (
           <DueDateTimeInput
