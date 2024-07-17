@@ -64,7 +64,7 @@ StatusBar.propTypes = {
   a11yErrorsCount: number,
   onWordcountModalOpen: func.isRequired,
   disabledPlugins: arrayOf(string),
-  ai_text_tools: bool,
+  features: arrayOf(string), // StatusBarFeature[]
   onAI: func,
 }
 
@@ -138,6 +138,10 @@ export default function StatusBar(props) {
 
   function isAvailable(plugin) {
     return !props.disabledPlugins.includes(plugin)
+  }
+
+  function isFeature(feature_name) {
+    return props.features.includes(feature_name)
   }
 
   function preferredHtmlEditor() {
@@ -262,10 +266,15 @@ export default function StatusBar(props) {
 
   function renderIconButtons() {
     if (isHtmlView()) return null
+    const ai_tools = isFeature('ai_tools')
+    const kb_shortcuts = isFeature('keyboard_shortcuts')
+    const a11y_checker = isFeature('a11y_checker')
+    if (!(ai_tools || kb_shortcuts || a11y_checker)) return null
+
     const kbshortcut = formatMessage('View keyboard shortcuts')
     return (
       <View display="inline-block" padding="0 x-small">
-        {props.ai_text_tools && props.onAI && (
+        {ai_tools && props.onAI && (
           <IconButton
             data-btn-id="rce-ai-btn"
             color="primary"
@@ -286,24 +295,26 @@ export default function StatusBar(props) {
             </span>
           </IconButton>
         )}
-        <IconButton
-          data-btn-id="rce-kbshortcut-btn"
-          color="primary"
-          aria-haspopup="dialog"
-          title={kbshortcut}
-          tabIndex={tabIndexForBtn('rce-kbshortcut-btn')}
-          onClick={event => {
-            event.target.focus() // FF doesn't focus buttons on click
-            props.onKBShortcutModalOpen()
-          }}
-          onFocus={() => setFocusedBtnId('rce-kbshortcut-btn')}
-          screenReaderLabel={kbshortcut}
-          withBackground={false}
-          withBorder={false}
-        >
-          <IconKeyboardShortcutsLine />
-        </IconButton>
-        {!props.readOnly && isAvailable('ally_checker') && renderA11yButton()}
+        {kb_shortcuts && (
+          <IconButton
+            data-btn-id="rce-kbshortcut-btn"
+            color="primary"
+            aria-haspopup="dialog"
+            title={kbshortcut}
+            tabIndex={tabIndexForBtn('rce-kbshortcut-btn')}
+            onClick={event => {
+              event.target.focus() // FF doesn't focus buttons on click
+              props.onKBShortcutModalOpen()
+            }}
+            onFocus={() => setFocusedBtnId('rce-kbshortcut-btn')}
+            screenReaderLabel={kbshortcut}
+            withBackground={false}
+            withBorder={false}
+          >
+            <IconKeyboardShortcutsLine />
+          </IconButton>
+        )}
+        {a11y_checker && !props.readOnly && isAvailable('ally_checker') && renderA11yButton()}
       </View>
     )
   }
@@ -319,17 +330,31 @@ export default function StatusBar(props) {
       {count: props.wordCount}
     )
     return (
-      <View display="inline-block" padding="0 small" data-testid="status-bar-word-count">
-        <CondensedButton
-          data-btn-id="rce-wordcount-btn"
-          color="primary"
-          onClick={props.onWordcountModalOpen}
-          tabIndex={tabIndexForBtn('rce-wordcount-btn')}
-          title={formatMessage('View word and character counts')}
-        >
-          {wordCount}
-        </CondensedButton>
-      </View>
+      <>
+        <div className={css(styles.separator)} />
+        <View display="inline-block" padding="0 small" data-testid="status-bar-word-count">
+          <CondensedButton
+            data-btn-id="rce-wordcount-btn"
+            color="primary"
+            onClick={props.onWordcountModalOpen}
+            tabIndex={tabIndexForBtn('rce-wordcount-btn')}
+            title={formatMessage('View word and character counts')}
+          >
+            {wordCount}
+          </CondensedButton>
+        </View>
+      </>
+    )
+  }
+
+  function renderSection3(html_view, fullscreen, resize_handle) {
+    return (
+      <>
+        <div className={css(styles.separator)} />
+        {html_view && renderToggleHtml()}
+        {fullscreen && renderFullscreen()}
+        {resize_handle && renderResizeHandle()}
+      </>
     )
   }
 
@@ -431,6 +456,10 @@ export default function StatusBar(props) {
   }
 
   const flexJustify = isHtmlView() ? 'end' : 'start'
+  const html_view = isFeature('html_view') && isAvailable('instructure_html_view')
+  const fullscreen = isFeature('fullscreen') && isAvailable('instructure_fullscreen')
+  const resize_handle = isFeature('resize_handle')
+
   return (
     <Flex
       id={props.id}
@@ -446,12 +475,10 @@ export default function StatusBar(props) {
 
       <Flex.Item role="toolbar" title={formatMessage('Editor Statusbar')}>
         {renderIconButtons()}
-        <div className={css(styles.separator)} />
-        {isAvailable('instructure_wordcount') && renderWordCount()}
-        <div className={css(styles.separator)} />
-        {isAvailable('instructure_html_view') && renderToggleHtml()}
-        {isAvailable('instructure_fullscreen') && renderFullscreen()}
-        {renderResizeHandle()}
+
+        {isFeature('word_count') && isAvailable('instructure_wordcount') && renderWordCount()}
+        {(html_view || fullscreen || resize_handle) &&
+          renderSection3(html_view, fullscreen, resize_handle)}
       </Flex.Item>
     </Flex>
   )
