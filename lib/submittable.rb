@@ -56,6 +56,13 @@ module Submittable
       a.submission_types = name
       a.saved_by = name.to_sym
       a.workflow_state = published? ? "published" : "unpublished"
+      if a.has_sub_assignments
+        a.sub_assignments.each do |checkpoint|
+          checkpoint.workflow_state = published? ? "published" : "unpublished"
+          checkpoint.save!
+        end
+        Checkpoints::AssignmentAggregatorService.call(assignment: a)
+      end
     end
   end
 
