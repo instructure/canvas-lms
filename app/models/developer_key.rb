@@ -654,6 +654,10 @@ class DeveloperKey < ActiveRecord::Base
   def validate_scopes!
     return true if scopes.empty?
 
+    scopes.map! do |scope|
+      (scope == TokenScopes::LTI_PAGE_CONTENT_SHOW_SCOPE_DEPRECATED) ? TokenScopes::LTI_PAGE_CONTENT_SHOW_SCOPE : scope
+    end
+
     invalid_scopes = scopes - TokenScopes.all_scopes
     return true if invalid_scopes.empty?
 
