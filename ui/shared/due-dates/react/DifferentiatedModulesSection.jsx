@@ -66,9 +66,9 @@ const DifferentiatedModulesSection = ({
 }) => {
   const [open, setOpen] = useState(false)
   // stagedCards are the itemAssignToCards that will be saved when the assignment is saved
-  const [stagedCards, setStagedCards] = useState([])
+  const [stagedCards, setStagedCardsInner] = useState([])
   // stagedOverrides represent individual overrides to a student/section/group/etc that will be submitted.
-  const [stagedOverrides, setStagedOverrides] = useState(null)
+  const [stagedOverrides, setStagedOverridesInner] = useState(null)
   // preSavedOverrides are the state of the overrides as they are displayed and edited in the tray. Canceling the tray
   // Will causes these to reset to the last stagedOverrides
   const [preSavedOverrides, setPreSavedOverrides] = useState(null)
@@ -96,15 +96,17 @@ const DifferentiatedModulesSection = ({
 
   const stagedCardsRef = useRef(stagedCards)
 
-  useEffect(() => {
-    stagedCardsRef.current = stagedCards
-  }, [stagedCards])
+  const setStagedCards = (cards) => {
+    stagedCardsRef.current = cards
+    setStagedCardsInner(cards)
+  }
 
   const stagedOverridesRef = useRef(stagedOverrides)
 
-  useEffect(() => {
-    stagedOverridesRef.current = stagedOverrides
-  }, [stagedOverrides])
+  const setStagedOverrides = (overrides) => {
+    stagedOverridesRef.current = overrides
+    setStagedOverridesInner(overrides)
+  }
 
   const shouldRenderImportantDates = useMemo(
     () => type === 'assignment' || type === 'discussion' || type === 'quiz',
@@ -305,7 +307,7 @@ const DifferentiatedModulesSection = ({
     delete newStagedCards[cardId]
     setStagedCards(newStagedCards)
 
-    const newStagedOverrides = stagedOverridesRef.current.filter(override => override.rowKey !== cardId)
+    const newStagedOverrides = stagedOverridesRef.current.filter(override => override.rowKey.toString() !== cardId)
     setStagedOverrides(newStagedOverrides)
   }
 
