@@ -49,7 +49,7 @@ module Lti
 
     def media_type
       unless @media_type
-        if canvas_media_type == "module_item"
+        if module_item?
           case tag.content
           when Assignment
             @media_type = "assignment"
@@ -96,7 +96,7 @@ module Lti
                  when "file"
                    file.display_name
                  when "assignment"
-                   @context.assignments.where(id: @media_types[:assignments].first).first.title
+                   assignment_from_context.title
                  when "discussion_topic"
                    @context.discussion_topics.where(id: @media_types[:discussion_topics].first).first.title
                  when "module"
@@ -112,8 +112,16 @@ module Lti
                  end
     end
 
+    def media_type_for_content_type
+      return media_type unless Account.site_admin.feature_enabled?(:commons_new_quizzes)
+      return media_type unless assignment?
+
+      assignment = module_item? ? tag.content : assignment_from_context
+      assignment.quiz_lti? ? "quizzesnext" : "assignment"
+    end
+
     def content_type
-      @content_type ||= @media_types.include?(:files) ? file.content_type : "application/vnd.instructure.api.content-exports.#{media_type}"
+      @content_type ||= @media_types.include?(:files) ? file.content_type : "application/vnd.instructure.api.content-exports.#{media_type_for_content_type}"
     end
 
     def url
@@ -132,6 +140,18 @@ module Lti
     end
 
     private
+
+    def assignment?
+      media_type == "assignment"
+    end
+
+    def module_item?
+      canvas_media_type == "module_item"
+    end
+
+    def assignment_from_context
+      @context.assignments.where(id: @media_types[:assignments].first).first
+    end
 
     def canvas_media_type
       @canvas_media_type ||= if @media_types.keys.size == 1

@@ -183,6 +183,70 @@ describe Lti::ContentItemResponse do
     end
   end
 
+  describe "#media_type_for_content_type" do
+    let(:new_quizzes) { new_quizzes_assignment(course: context) }
+    let(:conext_module) { context.context_modules.create!(name: "a module for NQ") }
+    let(:tag) { conext_module.add_item(id: new_quizzes.id, type: "assignment") }
+    let(:nq_media_type) { "quizzesnext" }
+    let(:assignment_media_type) { "assignment" }
+
+    before do
+      allow(Account.site_admin)
+        .to receive(:feature_enabled?)
+        .and_call_original
+    end
+
+    context "when commons_new_quizzes feature flag is enabled" do
+      before do
+        allow(Account.site_admin)
+          .to receive(:feature_enabled?)
+          .with(:commons_new_quizzes)
+          .and_return(true)
+      end
+
+      it "returns 'quizzesnext' for a new quiz" do
+        media_type = subject({ assignments: [new_quizzes.id] }).media_type_for_content_type
+        expect(media_type).to eq nq_media_type
+      end
+
+      it "returns 'quizzesnext' for a new quiz with module context" do
+        media_type = subject({ module_items: [tag.id] }).media_type_for_content_type
+        expect(media_type).to eq nq_media_type
+      end
+
+      it "returns 'assignment' for a not new quizzes assignment" do
+        assignment = context.assignments.create!(name: "an assignment")
+        media_type = subject({ assignments: [assignment.id] }).media_type_for_content_type
+        expect(media_type).to eq assignment_media_type
+      end
+
+      it "does not modify other resources media type like old quizzes" do
+        quiz = context.quizzes.create!(title: "a quiz")
+        media_type = subject({ quizzes: [quiz.id] }).media_type_for_content_type
+        expect(media_type).to eq "quiz"
+      end
+    end
+
+    context "when commons_new_quizzes feature flag is disabled" do
+      before do
+        allow(Account.site_admin)
+          .to receive(:feature_enabled?)
+          .with(:commons_new_quizzes)
+          .and_return(false)
+      end
+
+      it "returns 'assignment' for a new quiz" do
+        media_type = subject({ assignments: [new_quizzes.id] }).media_type_for_content_type
+        expect(media_type).to eq assignment_media_type
+      end
+
+      it "returns 'assignment' for a new quiz with module context" do
+        media_type = subject({ module_items: [tag.id] }).media_type_for_content_type
+        expect(media_type).to eq assignment_media_type
+      end
+    end
+  end
+
   describe "#content_type" do
     it "gets the files content_type" do
       file = attachment_model(context:)
