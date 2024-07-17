@@ -795,30 +795,118 @@ describe "context modules" do
         modules = create_modules(1, true)
 
         @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
-        @c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+        modules[0].add_item({ id: @topic.id, type: "discussion_topic" })
+      end
+
+      it "shows checkpoint data in module item info section" do
+        c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @topic,
           checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
           dates: [{ type: "everyone", due_at: 5.years.ago }],
           points_possible: 5
         )
-        @c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+        c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @topic,
           checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
           dates: [{ type: "everyone", due_at: 5.years.ago }],
           points_possible: 5,
           replies_required: 2
         )
-        modules[0].add_item({ id: @topic.id, type: "discussion_topic" })
-      end
-
-      it "shows checkpoint data in module item info section" do
         get "/courses/#{@course.id}/modules"
         expect(f("span.item_name").text).to include @topic.title
         details = f("div.ig-details").text
-        expect(details).to include "Reply to Topic"
-        expect(details).to include datetime_string(@c1.due_at)
-        expect(details).to include "Required Replies (#{@topic.reply_to_entry_required_count})"
-        expect(details).to include datetime_string(@c2.due_at)
+        expect(details).to eq "Reply to Topic: #{date_string(c1.due_at)}\nRequired Replies (#{@topic.reply_to_entry_required_count}): #{date_string(c2.due_at)}\n#{@topic.assignment.points_possible.to_i} pts"
+      end
+
+      it "does not show due dates when the enable_course_paces is set to true" do
+        @course.enable_course_paces = true
+        @course.save!
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 5.years.ago }],
+          points_possible: 5
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 5.years.ago }],
+          points_possible: 5,
+          replies_required: 2
+        )
+
+        get "/courses/#{@course.id}/modules"
+        expect(f("span.item_name").text).to include @topic.title
+        details = f("div.ig-details").text
+        expect(details).to eq "Reply to Topic\nRequired Replies (2)\n10 pts"
+      end
+
+      it "shows multiple due dates as a hoverable link within each checkpoint" do
+        student_in_course(active_all: true)
+        sec1 = add_section("sec1")
+        sec2 = add_section("sec2")
+
+        c1due_at = 5.years.ago
+        c1o1due_at = c1due_at + 1.day
+        c1o2due_at = c1due_at + 2.days
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [
+            {
+              type: "everyone", due_at: c1due_at
+            },
+            {
+              type: "override", set_type: "CourseSection", due_at: c1o1due_at, set_id: sec1.id
+            },
+            {
+              type: "override", set_type: "CourseSection", due_at: c1o2due_at, set_id: sec2.id
+            }
+          ],
+          points_possible: 5
+        )
+
+        c2due_at = 4.years.ago
+        c2o1due_at = c2due_at + 1.day
+        c2o2due_at = c2due_at + 2.days
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [
+            {
+              type: "everyone", due_at: c2due_at
+            },
+            {
+              type: "override", set_type: "CourseSection", due_at: c2o1due_at, set_id: sec1.id
+            },
+            {
+              type: "override", set_type: "CourseSection", due_at: c2o2due_at, set_id: sec2.id
+            }
+          ],
+          points_possible: 5,
+          replies_required: 2
+        )
+
+        get "/courses/#{@course.id}/modules"
+
+        hover(f(".reply_to_topic_display a"))
+        rtt_tooltip_els = ff("[class*='vdd_tooltip_']")
+        expect(rtt_tooltip_els.first.text).to include "Multiple Due Dates"
+        expect(rtt_tooltip_els.last.text).to eq "Everyone else\n#{datetime_string(c1due_at)}\n#{sec1.name}\n#{datetime_string(c1o1due_at)}\n#{sec2.name}\n#{datetime_string(c1o2due_at)}"
+
+        hover(f(".reply_to_entry_display a"))
+        rte_tooltip_els = ff("[class*='vdd_tooltip_']")
+        expect(rte_tooltip_els.first.text).to include "Multiple Due Dates"
+        expect(rte_tooltip_els.last.text).to eq "Everyone else\n#{datetime_string(c2due_at)}\n#{sec1.name}\n#{datetime_string(c2o1due_at)}\n#{sec2.name}\n#{datetime_string(c2o2due_at)}"
+
+        stub_const("Api::V1::Assignment::ALL_DATES_LIMIT", 1)
+        get "/courses/#{@course.id}/modules"
+
+        expect(f("body")).not_to contain_jqcss(".reply_to_topic_display a")
+        expect(f(".ig-details").text).to eq "Reply to Topic: Multiple Due Dates\nRequired Replies (2): Multiple Due Dates\n10 pts"
       end
     end
   end
