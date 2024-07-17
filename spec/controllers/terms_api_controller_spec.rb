@@ -85,4 +85,25 @@ describe TermsApiController do
       expect(assigns[:terms]).to eq []
     end
   end
+
+  context "used_in_subaccount indicator" do
+    before do
+      account_model
+      account_admin_user(account: @account)
+      user_session(@user)
+    end
+
+    it "correctly sets used_in_subaccount indicator" do
+      2.times do |i|
+        @account.enrollment_terms.create!(id: i, name: "term #{i}", root_account_id: @account.id)
+      end
+      @account.courses.create!(account_id: @account.id, enrollment_term_id: 0)
+      get "index", params: { account_id: @account.id, subaccount_id: @account.id }, format: :json
+      expect(response).to be_successful
+      term_0 = response.parsed_body["enrollment_terms"].find { |term| term["id"] == 0 }
+      term_1 = response.parsed_body["enrollment_terms"].find { |term| term["id"] == 1 }
+      expect(term_0["used_in_subaccount"]).to be(true)
+      expect(term_1["used_in_subaccount"]).to be(false)
+    end
+  end
 end

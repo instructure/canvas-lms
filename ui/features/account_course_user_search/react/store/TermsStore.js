@@ -24,18 +24,22 @@ const TermsStore = createStore({
     return `/api/v1/accounts/${this.context.rootAccountId}/terms`
   },
 
+  getAccountId() {
+    return this.context.accountId
+  },
+
   jsonKey: 'enrollment_terms',
 })
 
+export const termType = shape({
+  id: string.isRequired,
+  name: string.isRequired,
+  end_at: string,
+  start_at: string,
+})
+
 export const propType = shape({
-  data: arrayOf(
-    shape({
-      id: string.isRequired,
-      name: string.isRequired,
-      end_at: string,
-      start_at: string,
-    })
-  ),
+  data: arrayOf(termType),
   loading: bool,
 }).isRequired
 

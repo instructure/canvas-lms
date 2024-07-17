@@ -20,7 +20,7 @@
 module Api::V1::EnrollmentTerm
   include Api::V1::Json
 
-  def enrollment_term_json(enrollment_term, user, session, enrollments = [], includes = [], course_counts = nil)
+  def enrollment_term_json(enrollment_term, user, session, enrollments = [], includes = [], course_counts = nil, filtered_terms = nil)
     api_json(enrollment_term, user, session, only: %w[id name start_at end_at workflow_state grading_period_group_id created_at]).tap do |hash|
       hash["sis_term_id"] = enrollment_term.sis_source_id if enrollment_term.root_account.grants_any_right?(user, :read_sis, :manage_sis)
       if enrollment_term.root_account.grants_right?(user, :manage_sis)
@@ -32,15 +32,25 @@ module Api::V1::EnrollmentTerm
         counts = course_counts || EnrollmentTerm.course_counts(enrollment_term)
         hash["course_count"] = counts[enrollment_term.id] || 0
       end
+      if filtered_terms
+        hash["used_in_subaccount"] = filtered_terms.include?(enrollment_term.id)
+      end
     end
   end
 
-  def enrollment_terms_json(enrollment_terms, user, session, enrollments = [], includes = [])
+  def enrollment_terms_json(enrollment_terms, user, session, root_account, enrollments = [], includes = [], subaccount_id = nil)
     if includes.include?("overrides")
       ActiveRecord::Associations.preload(enrollment_terms, :enrollment_dates_overrides)
     end
+    filtered_terms = nil
+    if subaccount_id
+      filtered_term_ids = Account.find(subaccount_id).associated_courses.pluck(:enrollment_term_id).uniq
+      default_id = root_account.default_enrollment_term.id
+      filtered_term_ids.append(default_id)
+      filtered_terms = filtered_term_ids.to_set
+    end
     course_counts = EnrollmentTerm.course_counts(enrollment_terms) if includes.include?("course_count")
-    enrollment_terms.map { |t| enrollment_term_json(t, user, session, enrollments, includes, course_counts) }
+    enrollment_terms.map { |t| enrollment_term_json(t, user, session, enrollments, includes, course_counts, filtered_terms) }
   end
 
   protected

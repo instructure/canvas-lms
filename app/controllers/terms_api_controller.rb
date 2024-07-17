@@ -151,7 +151,6 @@ class TermsApiController < ApplicationController
   def index
     add_crumb(t("Terms"))
     page_has_instui_topnav
-
     @terms = @context.enrollment_terms
 
     @term_name = params[:term_name]
@@ -185,8 +184,10 @@ class TermsApiController < ApplicationController
                            @terms,
                            @current_user,
                            session,
+                           @context.root_account,
                            nil,
-                           Array(params[:include])
+                           Array(params[:include]),
+                           params[:subaccount_id] || nil
                          ) }
       end
     end
