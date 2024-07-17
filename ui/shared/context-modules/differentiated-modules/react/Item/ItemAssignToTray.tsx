@@ -186,9 +186,7 @@ export default function ItemAssignToTray({
   const initialLoadRef = useRef(false)
   const cardsRefs = useRef<{[cardId: string]: RefObject<ItemAssignToCardRef>}>({})
   const [isLoading, setIsLoading] = useState(false)
-  const [disabledOptionIds, setDisabledOptionIds] = useState<string[]>(
-    defaultDisabledOptionIds ?? []
-  )
+
   const [assignToCards, setAssignToCardsInner] = useState<ItemAssignToCardSpec[]>(
     defaultCards ?? []
   )
@@ -208,13 +206,16 @@ export default function ItemAssignToTray({
   )
   const assignToCardsRef = useRef(assignToCards)
 
+  const disabledOptionIdsRef = useRef(defaultDisabledOptionIds)
+
   const everyoneOption = useMemo(() => {
     const hasOverrides =
-      (disabledOptionIds.length === 1 && !disabledOptionIds.includes('everyone')) ||
-      disabledOptionIds.length > 1 ||
+      (disabledOptionIdsRef.current.length === 1 &&
+        !disabledOptionIdsRef.current.includes('everyone')) ||
+      disabledOptionIdsRef.current.length > 1 ||
       assignToCards.length > 1
     return getEveryoneOption(hasOverrides)
-  }, [disabledOptionIds, assignToCards])
+  }, [disabledOptionIdsRef, assignToCards])
 
   const handleDismiss = useCallback(() => {
     if (defaultCards) {
@@ -256,7 +257,7 @@ export default function ItemAssignToTray({
     }
     // compare original module assignees to see if they were removed for unassign_item overrides
     const deletedModuleAssignees = moduleAssignees.filter(
-      override => !disabledOptionIds.includes(override)
+      override => !disabledOptionIdsRef.current.includes(override)
     )
 
     if (onSave !== undefined) {
@@ -290,7 +291,6 @@ export default function ItemAssignToTray({
     onSave,
     hasModuleOverrides,
     itemContentId,
-    disabledOptionIds,
     courseId,
     itemType,
     itemName,
@@ -415,8 +415,6 @@ export default function ItemAssignToTray({
             setHasModuleOverrides={setHasModuleOverrides}
             cardsRefs={cardsRefs}
             setModuleAssignees={setModuleAssignees}
-            disabledOptionIds={disabledOptionIds}
-            setDisabledOptionIds={setDisabledOptionIds}
             defaultGroupCategoryId={defaultGroupCategoryId}
             allOptions={allOptions}
             isLoadingAssignees={isLoadingAssignees}
@@ -428,6 +426,7 @@ export default function ItemAssignToTray({
             setOverridesFetched={setOverridesFetched}
             postToSIS={postToSIS}
             assignToCardsRef={assignToCardsRef}
+            disabledOptionIdsRef={disabledOptionIdsRef}
           />
         )}
         {Footer()}

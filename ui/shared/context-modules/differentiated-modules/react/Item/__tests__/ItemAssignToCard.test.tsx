@@ -23,7 +23,7 @@ import userEvent from '@testing-library/user-event'
 
 const props: ItemAssignToCardProps = {
   courseId: '1',
-  disabledOptionIds: [],
+  disabledOptionIdsRef: {current: []},
   selectedAssigneeIds: [],
   onCardAssignmentChange: () => {},
   cardId: 'assign-to-card-001',
@@ -35,6 +35,8 @@ const props: ItemAssignToCardProps = {
   removeDueDateInput: false,
   isCheckpointed: false,
   onValidityChange: () => {},
+  required_replies_due_at: null,
+  reply_to_topic_due_at: null,
 }
 
 const renderComponent = (overrides: Partial<ItemAssignToCardProps> = {}) =>
