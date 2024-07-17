@@ -717,9 +717,7 @@ class Enrollment < ActiveRecord::Base
     # this method was written by Alan Smithee
     user.shard.activate do
       if user.favorites.where(context_type: "Course").exists? # only add a favorite if they've ever favorited anything even if it's no longer in effect
-        Favorite.unique_constraint_retry do
-          user.favorites.where(context_type: "Course", context_id: course).first_or_create!
-        end
+        Favorite.create_or_find_by(user:, context: course)
       end
     end
   end
