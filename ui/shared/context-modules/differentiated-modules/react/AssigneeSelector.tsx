@@ -17,7 +17,7 @@
  */
 
 import CanvasMultiSelect, {type Size} from '@canvas/multi-select/react'
-import React, {type ReactElement, useEffect, useRef, useState} from 'react'
+import React, {type ReactElement, useEffect, useRef, useState, useCallback} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
@@ -53,6 +53,7 @@ interface Props {
   inputRef?: (inputElement: HTMLInputElement | null) => void
   onBlur?: () => void
   disabledWithGradingPeriod?: boolean
+  disabledOptionIdsRef?: React.MutableRefObject<string[]>
 }
 
 const AssigneeSelector = ({
@@ -74,6 +75,7 @@ const AssigneeSelector = ({
   inputRef,
   onBlur,
   disabledWithGradingPeriod,
+  disabledOptionIdsRef,
 }: Props) => {
   const listElementRef = useRef<HTMLElement | null>(null)
   const [options, setOptions] = useState<AssigneeOption[]>(defaultValues)
@@ -88,16 +90,17 @@ const AssigneeSelector = ({
     onError,
   })
   const [highlightedOptionId, setHighlightedOptionId] = useState<string | null>(null)
+  const disabledOptions = disabledOptionIdsRef?.current ?? disabledOptionIds
 
   const shouldUpdateOptions = [
     JSON.stringify(allOptions),
-    JSON.stringify(disabledOptionIds),
+    JSON.stringify(disabledOptions),
     JSON.stringify(selectedOptionIds),
   ]
 
   useEffect(() => {
     const newOptions = allOptions.filter(
-      option => selectedOptionIds.includes(option.id) || !disabledOptionIds.includes(option.id)
+      option => selectedOptionIds.includes(option.id) || !disabledOptions.includes(option.id)
     )
     setOptions(newOptions)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -138,6 +141,13 @@ const AssigneeSelector = ({
     )
   }
 
+  const handleFocus = useCallback(() => {
+    const newOptions = allOptions.filter(
+      option => selectedOptionIds.includes(option.id) || !disabledOptions.includes(option.id)
+    )
+    setOptions(newOptions)
+  }, [allOptions, selectedOptionIds, disabledOptions])
+
   return (
     <>
       <CanvasMultiSelect
@@ -156,6 +166,7 @@ const AssigneeSelector = ({
         setInputRef={inputRef}
         listRef={e => (listElementRef.current = e)}
         customOnRequestShowOptions={handleShowOptions}
+        onFocus={handleFocus}
         customRenderBeforeInput={tags =>
           tags?.map((tag: ReactElement) => (
             <View

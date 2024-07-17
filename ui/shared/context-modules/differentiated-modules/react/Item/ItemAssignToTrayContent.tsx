@@ -64,8 +64,6 @@ export interface ItemAssignToTrayContentProps
   hasModuleOverrides: boolean
   setHasModuleOverrides: (state: boolean) => void
   setModuleAssignees: (assignees: string[]) => void
-  disabledOptionIds: string[]
-  setDisabledOptionIds: (options: string[]) => void
   defaultGroupCategoryId: string | null
   initialLoadRef: React.MutableRefObject<boolean>
   allOptions: AssigneeOption[]
@@ -81,6 +79,7 @@ export interface ItemAssignToTrayContentProps
   }>
   postToSIS?: boolean
   assignToCardsRef: React.MutableRefObject<ItemAssignToCardSpec[]>
+  disabledOptionIdsRef: React.MutableRefObject<string[]>
 }
 
 const MAX_PAGES = 10
@@ -97,7 +96,6 @@ const ItemAssignToCardMemo = memo(
     return (
       prevProps.everyoneOption?.value === nextProps.everyoneOption?.value &&
       prevProps.selectedAssigneeIds?.length === nextProps.selectedAssigneeIds?.length &&
-      // prevProps.disabledOptionIds === nextProps.disabledOptionIds &&
       prevProps.highlightCard === nextProps.highlightCard &&
       prevProps.isOpen === nextProps.isOpen &&
       prevProps.due_at === nextProps.due_at &&
@@ -143,8 +141,6 @@ const ItemAssignToTrayContent = ({
   hasModuleOverrides,
   setHasModuleOverrides,
   setModuleAssignees,
-  disabledOptionIds,
-  setDisabledOptionIds,
   defaultGroupCategoryId,
   allOptions,
   setSearchTerm,
@@ -156,6 +152,7 @@ const ItemAssignToTrayContent = ({
   setOverridesFetched,
   postToSIS = false,
   assignToCardsRef,
+  disabledOptionIdsRef,
 }: ItemAssignToTrayContentProps) => {
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
@@ -275,7 +272,7 @@ const ItemAssignToTrayContent = ({
   }, [JSON.stringify(defaultCards)])
 
   useEffect(() => {
-    setDisabledOptionIds(defaultDisabledOptionIds)
+    disabledOptionIdsRef.current = defaultDisabledOptionIds
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(defaultDisabledOptionIds)])
 
@@ -424,7 +421,7 @@ const ItemAssignToTrayContent = ({
         setGroupCategoryId(dateDetailsApiResponse.group_category_id)
         setOverridesFetched(true)
         setBlueprintDateLocks(dateDetailsApiResponse.blueprint_date_locks)
-        setDisabledOptionIds(selectedOptionIds)
+        disabledOptionIdsRef.current = selectedOptionIds
         setInitialCards(cards)
         onInitialStateSet?.(cards)
         setAssignToCards(cards)
@@ -471,15 +468,15 @@ const ItemAssignToTrayContent = ({
     (cardId: string) => {
       const cardIndex = assignToCardsRef.current.findIndex(card => card.key === cardId)
       const cardSelection = assignToCardsRef.current.at(cardIndex)?.selectedAssigneeIds ?? []
-      const newDisabled = disabledOptionIds.filter(id => !cardSelection.includes(id))
+      const newDisabled = disabledOptionIdsRef.current.filter(id => !cardSelection.includes(id))
       const cards = assignToCardsRef.current.filter(({key}) => key !== cardId)
       lastPerformedAction.current = {action: 'delete', index: cardIndex}
       setAssignToCards(cards)
-      setDisabledOptionIds(newDisabled)
+      disabledOptionIdsRef.current = newDisabled
       onCardRemove?.(cardId)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [disabledOptionIds, onCardRemove, setAssignToCards]
+    [onCardRemove, setAssignToCards]
   )
 
   const handleCardValidityChange = useCallback(
@@ -500,7 +497,7 @@ const ItemAssignToTrayContent = ({
   const handleCustomAssigneesChange = useCallback(
     (cardId: string, assignees: AssigneeOption[], deletedAssignees: string[]) => {
       const newSelectedOption = assignees.filter(
-        assignee => !disabledOptionIds.includes(assignee.id)
+        assignee => !disabledOptionIdsRef.current.includes(assignee.id)
       )[0]
       const idData = newSelectedOption?.id?.split('-')
       const isEveryoneOption = newSelectedOption?.id === everyoneOption.id
@@ -553,7 +550,7 @@ const ItemAssignToTrayContent = ({
     [
       allOptions,
       defaultSectionId,
-      disabledOptionIds,
+      disabledOptionIdsRef,
       everyoneOption.id,
       hasModuleOverrides,
       onAssigneesChange,
@@ -579,25 +576,24 @@ const ItemAssignToTrayContent = ({
       )
       if (onAssigneesChange) {
         handleCustomAssigneesChange(cardId, assignees, deletedAssignees)
+      } else {
+        const allSelectedOptions = [...disabledOptionIdsRef.current, ...assignees.map(({id}) => id)]
+        const uniqueOptions = [...new Set(allSelectedOptions)]
+        const newDisabled = uniqueOptions.filter(id =>
+          deletedAssignees.length > 0 ? !deletedAssignees.includes(id) : true
+        )
+        disabledOptionIdsRef.current = newDisabled
       }
 
-      const allSelectedOptions = [...disabledOptionIds, ...assignees.map(({id}) => id)]
-      const uniqueOptions = [...new Set(allSelectedOptions)]
-      const newDisabled = uniqueOptions.filter(id =>
-        deletedAssignees.length > 0 ? !deletedAssignees.includes(id) : true
-      )
-
       setAssignToCards(cards)
-      setDisabledOptionIds(newDisabled)
     },
     [
       assignToCardsRef,
-      disabledOptionIds,
+      disabledOptionIdsRef,
       handleCustomAssigneesChange,
       initialCards,
       onAssigneesChange,
       setAssignToCards,
-      setDisabledOptionIds,
     ]
   )
 
@@ -655,7 +651,7 @@ const ItemAssignToTrayContent = ({
             onCardDatesChange={handleDatesChange}
             onValidityChange={handleCardValidityChange}
             isOpen={isOpen}
-            disabledOptionIds={disabledOptionIds}
+            disabledOptionIds={disabledOptionIdsRef.current}
             everyoneOption={everyoneOption}
             selectedAssigneeIds={card.selectedAssigneeIds}
             customAllOptions={allOptions}
@@ -664,27 +660,28 @@ const ItemAssignToTrayContent = ({
             highlightCard={card.highlightCard}
             blueprintDateLocks={blueprintDateLocks}
             postToSIS={postToSIS}
+            disabledOptionIdsRef={disabledOptionIdsRef}
           />
         </View>
       ))
     },
     [
-      allOptions,
       assignToCards,
-      blueprintDateLocks,
-      courseId,
-      disabledOptionIds,
-      everyoneOption,
-      handleCardAssignment,
-      handleCardValidityChange,
-      handleDatesChange,
-      handleDeleteCard,
-      isCheckpointed,
-      isLoadingAssignees,
-      postToSIS,
-      removeDueDateInput,
-      setSearchTerm,
       cardsRefs,
+      courseId,
+      removeDueDateInput,
+      isCheckpointed,
+      handleDeleteCard,
+      handleCardAssignment,
+      handleDatesChange,
+      handleCardValidityChange,
+      everyoneOption,
+      allOptions,
+      isLoadingAssignees,
+      setSearchTerm,
+      blueprintDateLocks,
+      postToSIS,
+      disabledOptionIdsRef,
     ]
   )
 
@@ -713,7 +710,7 @@ const ItemAssignToTrayContent = ({
             onCardDatesChange={handleDatesChange}
             onValidityChange={handleCardValidityChange}
             isOpen={isOpen}
-            disabledOptionIds={disabledOptionIds}
+            disabledOptionIds={disabledOptionIdsRef.current}
             everyoneOption={everyoneOption}
             selectedAssigneeIds={card.selectedAssigneeIds}
             customAllOptions={allOptions}
@@ -722,6 +719,7 @@ const ItemAssignToTrayContent = ({
             highlightCard={card.highlightCard}
             blueprintDateLocks={blueprintDateLocks}
             postToSIS={postToSIS}
+            disabledOptionIdsRef={disabledOptionIdsRef}
           />
         </View>
       )
