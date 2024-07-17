@@ -292,6 +292,9 @@ window.modules = (function () {
             $.each(data, (id, info) => {
               const $context_module_item = $('#context_module_item_' + id)
               const data = {}
+              if (info.sub_assignments) {
+                updateSubAssignmentData($context_module_item, info.sub_assignments)
+              }
               if (info.points_possible != null) {
                 data.points_possible_display = I18n.t('points_possible_short', '%{points} pts', {
                   points: I18n.n(info.points_possible),
@@ -2131,13 +2134,41 @@ function toggleModuleCollapse(event) {
   }
 }
 
-// THAT IS THE END
-
 function moduleContentIsHidden(contentEl) {
   return (
     contentEl.style.display === 'none' ||
     contentEl.parentElement.classList.contains('collapsed_module')
   )
+}
+
+function updateSubAssignmentData(contextModuleItem, subAssignments) {
+  subAssignments.forEach(subAssignment => {
+    const title =
+      subAssignment.sub_assignment_tag === 'reply_to_topic'
+        ? I18n.t('Reply to Topic')
+        : I18n.t('Required Replies (%{required_replies})', {
+            required_replies: subAssignment.replies_required,
+          })
+    let dueDate = ''
+    if (!(ENV.IN_PACED_COURSE && !ENV.IS_STUDENT)) {
+      if (subAssignment.has_many_overrides != null) {
+        dueDate = I18n.t('Multiple Due Dates')
+      } else if (subAssignment.vdd_tooltip != null) {
+        subAssignment.vdd_tooltip.link_href = contextModuleItem.find('a.title').attr('href')
+        dueDate = vddTooltipView(subAssignment.vdd_tooltip)
+      } else if (subAssignment.due_date) {
+        dueDate = dateString(subAssignment.due_date)
+      } else {
+        dueDate = I18n.t('No Due Date')
+      }
+
+      contextModuleItem
+        .find(`.${subAssignment.sub_assignment_tag}_display`)
+        .html(`<b>${title}:</b> ${dueDate}`)
+    } else {
+      contextModuleItem.find(`.${subAssignment.sub_assignment_tag}_display`).html(`<b>${title}</b>`)
+    }
+  })
 }
 
 // need the assignment data to check past due state
