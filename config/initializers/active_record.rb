@@ -783,6 +783,30 @@ class ActiveRecord::Base
     vector_schema = connection.extension("vector").schema
     connection.add_schema_to_search_path(vector_schema, &)
   end
+
+  def insert(on_conflict: -> { raise ActiveRecord::RecordNotUnique })
+    new_id = nil
+    timestamp = Time.now
+
+    run_callbacks :save do
+      self.created_at ||= timestamp
+      self.updated_at ||= timestamp
+
+      content = attributes.compact
+
+      result = self.class.insert(content)
+      new_id = result.first&.fetch("id")
+    end
+
+    if new_id
+      self.id = new_id
+      changes_applied
+      @new_record = false
+      self
+    else
+      on_conflict.call
+    end
+  end
 end
 
 module UsefulFindInBatches

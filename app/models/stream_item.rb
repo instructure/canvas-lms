@@ -60,7 +60,7 @@ class StreamItem < ActiveRecord::Base
 
     case type
     when "Announcement", "DiscussionTopic"
-      root_discussion_entries = data.delete(:root_discussion_entries)
+      root_discussion_entries = data.delete(:root_discussion_entries) || []
       root_discussion_entries = root_discussion_entries.map { |entry| reconstitute_ar_object("DiscussionEntry", entry) }
       res.association(:root_discussion_entries).target = root_discussion_entries
       res.attachment = reconstitute_ar_object("Attachment", data.delete(:attachment))
@@ -174,6 +174,7 @@ class StreamItem < ActiveRecord::Base
   end
 
   LATEST_ENTRY_LIMIT = 3
+
   def generate_data(object)
     self.context ||= object.try(:context) unless object.is_a?(Message)
 
@@ -247,10 +248,7 @@ class StreamItem < ActiveRecord::Base
 
     item = new
     item.generate_data(object)
-    StreamItem.unique_constraint_retry do |retry_count|
-      (retry_count == 0) ? item.save! : item = nil # if it fails just carry on - it got created somewhere else so grab it later
-    end
-    item ||= object.reload.stream_item
+    item.insert(on_conflict: -> { item = object.reload.stream_item })
 
     # prepopulate the reverse association
     # (mostly useful for specs that regenerate stream items

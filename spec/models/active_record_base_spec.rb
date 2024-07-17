@@ -906,6 +906,66 @@ describe ActiveRecord::Base do
       expect(c.discussion_topics.temp_record.course.name).to eq c.name
     end
   end
+
+  describe "#insert" do
+    let!(:base_user) { User.create! }
+
+    context "when the item is not present in the DB" do
+      let(:timestamp) { Time.utc(1991, 4, 25, 1, 2, 3) }
+
+      let!(:new_user) do
+        Timecop.freeze(timestamp) do
+          User.new(workflow_state: 0).insert
+        end
+      end
+
+      it "creates a new record" do
+        expect(User.all).to eq [base_user, new_user]
+      end
+
+      it "sets the timestamps correctly" do
+        expect(new_user.created_at).to eq timestamp
+        expect(new_user.updated_at).to eq timestamp
+      end
+
+      it "sets the ActiveRecord state properly" do
+        user = User.new(workflow_state: 0)
+        expect(user.persisted?).to be false
+
+        user.insert
+        expect(user.persisted?).to be true
+      end
+
+      it "invokes the save callbacks" do
+        user = User.new(workflow_state: 0)
+
+        expect(user).to receive(:assign_uuid)
+
+        user.insert
+      end
+    end
+
+    context "when the item is already present in the DB" do
+      it "it does not create a new record" do
+        base_user.insert(on_conflict: -> {})
+        expect(User.all).to eq [base_user]
+      end
+
+      context "when on_conflict is specified" do
+        it "calls the on_conflict callback" do
+          on_conflict = -> {}
+          expect(on_conflict).to receive(:call)
+          base_user.insert(on_conflict:)
+        end
+      end
+
+      context "when on_conflict is not specified" do
+        it "raises ActiveRecord::RecordNotUnique" do
+          expect { base_user.insert }.to raise_error ActiveRecord::RecordNotUnique
+        end
+      end
+    end
+  end
 end
 
 describe ActiveRecord::ConnectionAdapters::ConnectionPool do
