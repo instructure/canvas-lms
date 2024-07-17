@@ -30,6 +30,7 @@ describe Checkpoints::SubmissionAggregatorService do
     let(:service) { Checkpoints::SubmissionAggregatorService }
     let(:service_call) { service.call(assignment: @topic.assignment, student: @student) }
     let(:submission) { @topic.assignment.submissions.find_by(user: @student) }
+    let(:sub_assignment_submissions) { @topic.assignment.sub_assignment_submissions.where(user: @student) }
 
     describe "invalid states" do
       it "returns false when called with an assignment that is not checkpointed" do
@@ -677,6 +678,203 @@ describe Checkpoints::SubmissionAggregatorService do
         success = service_call
         expect(success).to be true
         expect(submission.workflow_state).to eq "unsubmitted"
+      end
+    end
+
+    describe "excused" do
+      it "sets excused to true when both checkpoints are excused" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          @topic.assignment.grade_student(@student, grader: @teacher, excused: true, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+          @topic.assignment.grade_student(@student, grader: @teacher, excused: true, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.excused).to be true
+      end
+
+      it "sets excused to true when only one checkpoint is excused" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          @topic.assignment.grade_student(@student, grader: @teacher, score: 5, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+          @topic.assignment.grade_student(@student, grader: @teacher, excused: true, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.excused).to be true
+      end
+
+      it "sets excused to true when one checkpoint is excused and the other is ungraded" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          @topic.assignment.grade_student(@student, grader: @teacher, excused: true, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.excused).to be true
+      end
+    end
+
+    describe "grading_period_id" do
+      before :once do
+        gpg = GradingPeriodGroup.create! title: "asdf",
+                                         root_account: @course.root_account
+        @course.enrollment_term.update grading_period_group: gpg
+        @term1 = gpg.grading_periods.create! title: "past grading period",
+                                             start_date: 2.weeks.ago,
+                                             end_date: 1.week.ago
+        @term2 = gpg.grading_periods.create! title: "current grading period",
+                                             start_date: 2.days.ago,
+                                             end_date: 2.days.from_now
+      end
+
+      it "sets the grading_period_id to the grading_period_id shared by both checkpoints" do
+        submission.grading_period_id = nil
+        submission.save!
+
+        # before running the service, make sure checkpoint submissions are still in @term2
+        expect(sub_assignment_submissions.first.grading_period_id).to eq @term2.id
+        expect(sub_assignment_submissions.last.grading_period_id).to eq @term2.id
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.reload.grading_period_id).to eq @term2.id
+      end
+
+      it "sets the grading_period_id to nil when checkpoints are in different grading periods" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          sub_assignment_submissions.first.update!(grading_period_id: @term1.id)
+          sub_assignment_submissions.last.update!(grading_period_id: @term2.id)
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.reload.grading_period_id).to be_nil
+      end
+    end
+
+    describe "late_policy_status" do
+      it "computes late + late = late" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          sub_assignment_submissions.update!(late_policy_status: "late")
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.late_policy_status).to eq "late"
+      end
+
+      it "computes late + missing = late" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          sub_assignment_submissions.first.update!(late_policy_status: "late")
+          sub_assignment_submissions.last.update!(late_policy_status: "missing")
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.late_policy_status).to eq "late"
+      end
+
+      it "computes late + extended = late" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          sub_assignment_submissions.first.update!(late_policy_status: "late")
+          sub_assignment_submissions.last.update!(late_policy_status: "extended")
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.late_policy_status).to eq "late"
+      end
+
+      it "computes late + none = late" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          sub_assignment_submissions.first.update!(late_policy_status: "late")
+          sub_assignment_submissions.last.update!(late_policy_status: "none")
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.late_policy_status).to eq "late"
+      end
+
+      it "computes missing + missing = missing" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          sub_assignment_submissions.update!(late_policy_status: "missing")
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.late_policy_status).to eq "missing"
+      end
+
+      it "computes missing + extended = missing" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          sub_assignment_submissions.first.update!(late_policy_status: "missing")
+          sub_assignment_submissions.last.update!(late_policy_status: "extended")
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.late_policy_status).to eq "missing"
+      end
+
+      it "computes missing + none = missing" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          sub_assignment_submissions.first.update!(late_policy_status: "missing")
+          sub_assignment_submissions.last.update!(late_policy_status: "none")
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.late_policy_status).to eq "missing"
+      end
+
+      it "computes extended + extended = extended" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          sub_assignment_submissions.update!(late_policy_status: "extended")
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.late_policy_status).to eq "extended"
+      end
+
+      it "computes extended + none = extended" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          sub_assignment_submissions.first.update!(late_policy_status: "extended")
+          sub_assignment_submissions.last.update!(late_policy_status: "none")
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.late_policy_status).to eq "extended"
+      end
+
+      it "computes none + none = none" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          sub_assignment_submissions.update!(late_policy_status: "none")
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.late_policy_status).to eq "none"
+      end
+
+      it "computes none + nil = none" do
+        Submission.suspend_callbacks(:aggregate_checkpoint_submissions) do
+          sub_assignment_submissions.first.update!(late_policy_status: "none")
+          sub_assignment_submissions.last.update!(late_policy_status: nil)
+        end
+
+        success = service_call
+        expect(success).to be true
+        expect(submission.late_policy_status).to eq "none"
+      end
+
+      it "computes nil + nil = nil" do
+        success = service_call
+        expect(success).to be true
+        expect(submission.late_policy_status).to be_nil
       end
     end
 

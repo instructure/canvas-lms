@@ -19,22 +19,14 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useEditor, useNode} from '@craftjs/core'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
-import {useClassNames, black} from '../../../../utils'
+import {useClassNames} from '../../../../utils'
 
 type RCEBlockProps = {
   text?: string
-  fontSize?: number
-  textAlign?: string
-  color?: string
 }
 
-export const RCEBlock = ({
-  text = '',
-  fontSize,
-  textAlign = 'start',
-  color = black,
-}: RCEBlockProps) => {
-  const {actions, enabled, query} = useEditor(state => ({
+export const RCEBlock = ({text = ''}: RCEBlockProps) => {
+  const {actions, enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
   const {
@@ -46,7 +38,7 @@ export const RCEBlock = ({
     id: state.id,
     selected: state.events.selected,
   }))
-  const clazz = useClassNames(enabled, {empty: !text}, 'text-block')
+  const clazz = useClassNames(enabled, {empty: !text}, ['block', 'rce-text-block'])
   const focusableElem = useRef<HTMLDivElement | null>(null)
 
   const [editable, setEditable] = useState(true)
@@ -100,13 +92,7 @@ export const RCEBlock = ({
       </div>
     )
   } else {
-    return (
-      <div
-        className={clazz}
-        style={{fontSize: `${fontSize}px`, textAlign, color}}
-        dangerouslySetInnerHTML={{__html: text}}
-      />
-    )
+    return <div className={clazz} dangerouslySetInnerHTML={{__html: text}} />
   }
 }
 

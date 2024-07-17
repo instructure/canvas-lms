@@ -48,6 +48,7 @@ export type GradingSchemeTableProps = {
   archiveOrUnarchiveScheme: (gradingScheme: GradingScheme) => void
   defaultScheme?: boolean
   archivedSchemes?: boolean
+  defaultAccountGradingSchemeEnabled: boolean
 }
 export const GradingSchemeTable = ({
   caption,
@@ -61,6 +62,7 @@ export const GradingSchemeTable = ({
   archiveOrUnarchiveScheme,
   defaultScheme = false,
   archivedSchemes = false,
+  defaultAccountGradingSchemeEnabled,
 }: GradingSchemeTableProps) => {
   const [ascending, setAscending] = useState(true)
   const [currentPage, setCurrentPage] = useState<number>(0)
@@ -73,6 +75,12 @@ export const GradingSchemeTable = ({
   }
   const handleSort = (_event: React.SyntheticEvent<Element, Event>, _param: {id: string}) => {
     setAscending(!ascending)
+  }
+  const canArchive = (gradingScheme: GradingScheme) => {
+    return defaultAccountGradingSchemeEnabled ? !gradingScheme.used_as_default : true
+  }
+  const canDelete = (gradingScheme: GradingScheme) => {
+    return !gradingScheme.assessed_assignment && canArchive(gradingScheme)
   }
   const currentPageSchemes = sortedSchemes.slice(currentPage * 10, currentPage * 10 + 10)
   const pages = [...Array(Math.ceil(sortedSchemes.length / 10)).keys()].map((v, index) => (
@@ -110,6 +118,20 @@ export const GradingSchemeTable = ({
       )}
       <Table.ColHeader id="actions" key="actions" width="20%" />
     </Table.Row>
+  )
+  const archiveGradingSchemeButton = (gradingScheme: GradingScheme): React.ReactElement => (
+    <IconButton
+      interaction={canArchive(gradingScheme) ? 'enabled' : 'disabled'}
+      withBorder={false}
+      withBackground={false}
+      screenReaderLabel={
+        archivedSchemes ? I18n.t('Unarchive Grading Scheme') : I18n.t('Archive Grading Scheme')
+      }
+      onClick={() => archiveOrUnarchiveScheme(gradingScheme)}
+      data-testid={`grading-scheme-${gradingScheme.id}-archive-button`}
+    >
+      {archivedSchemes ? <IconUnarchiveLine /> : <IconArchiveLine />}
+    </IconButton>
   )
   if (gradingSchemeCards.length === 0) {
     return (
@@ -157,13 +179,17 @@ export const GradingSchemeTable = ({
                     </Table.Cell>
                     {showUsedLocations && (
                       <Table.Cell>
-                        {gradingSchemeCard.gradingScheme.assessed_assignment ? (
+                        {gradingSchemeCard.gradingScheme.assessed_assignment ||
+                        (defaultAccountGradingSchemeEnabled &&
+                          gradingSchemeCard.gradingScheme.used_as_default) ? (
                           <Link
                             isWithinText={false}
                             onClick={() => viewUsedLocations(gradingSchemeCard.gradingScheme)}
                             data-testid={`grading-scheme-${gradingSchemeCard.gradingScheme.id}-view-locations-button`}
                           >
-                            {I18n.t('Show courses and assignments')}
+                            {defaultAccountGradingSchemeEnabled
+                              ? I18n.t('Show locations used')
+                              : I18n.t('Show courses and assignments')}
                           </Link>
                         ) : (
                           ''
@@ -191,21 +217,17 @@ export const GradingSchemeTable = ({
                           >
                             <IconEditLine />
                           </IconButton>
-                          <IconButton
-                            withBorder={false}
-                            withBackground={false}
-                            screenReaderLabel={
-                              archivedSchemes
-                                ? I18n.t('Unarchive Grading Scheme')
-                                : I18n.t('Archive Grading Scheme')
-                            }
-                            onClick={() =>
-                              archiveOrUnarchiveScheme(gradingSchemeCard.gradingScheme)
-                            }
-                            data-testid={`grading-scheme-${gradingSchemeCard.gradingScheme.id}-archive-button`}
-                          >
-                            {archivedSchemes ? <IconUnarchiveLine /> : <IconArchiveLine />}
-                          </IconButton>
+                          {!canArchive(gradingSchemeCard.gradingScheme) ? (
+                            <Tooltip
+                              renderTip={I18n.t(
+                                "You can't archive this grading scheme because it is set as a default for a course or account."
+                              )}
+                            >
+                              {archiveGradingSchemeButton(gradingSchemeCard.gradingScheme)}
+                            </Tooltip>
+                          ) : (
+                            archiveGradingSchemeButton(gradingSchemeCard.gradingScheme)
+                          )}
 
                           <IconButton
                             withBorder={false}
@@ -213,9 +235,9 @@ export const GradingSchemeTable = ({
                             screenReaderLabel={I18n.t('Delete Grading Scheme')}
                             onClick={() => openDeleteModal(gradingSchemeCard.gradingScheme)}
                             data-testid={`grading-scheme-${gradingSchemeCard.gradingScheme.id}-delete-button`}
-                            disabled={gradingSchemeCard.gradingScheme.assessed_assignment}
+                            disabled={!canDelete(gradingSchemeCard.gradingScheme)}
                           >
-                            {gradingSchemeCard.gradingScheme.assessed_assignment ? (
+                            {!canDelete(gradingSchemeCard.gradingScheme) ? (
                               <Tooltip
                                 renderTip={I18n.t(
                                   "You can't delete this grading scheme because it is in use."

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Suspense} from 'react'
+import React, {Lazy, Suspense} from 'react'
 import {Editor} from '@tinymce/tinymce-react'
 import _ from 'lodash'
 import {StoreProvider} from './plugins/shared/StoreContext'
@@ -252,6 +252,7 @@ class RCEWrapper extends React.Component {
         typeof IntersectionObserver === 'undefined' ||
         maxInitRenderedRCEs <= 0 ||
         currentRCECount < maxInitRenderedRCEs,
+      AIToolsOpen: false,
     }
     this._statusBarId = `${this.state.id}_statusbar`
 
@@ -275,6 +276,8 @@ class RCEWrapper extends React.Component {
     this.resizeObserver = new ResizeObserver(_entries => {
       this._handleFullscreenResize()
     })
+
+    this.AIToolsTray = undefined
   }
 
   // when the RCE is put into fullscreen we need to move the div
@@ -447,8 +450,15 @@ class RCEWrapper extends React.Component {
   }
 
   replaceCode(code) {
-    if (code !== "" && window.confirm(formatMessage('Content in the editor will be changed. Press Cancel to keep the original content.'))) {
-      this.mceInstance().setContent(code);
+    if (
+      code !== '' &&
+      window.confirm(
+        formatMessage(
+          'Content in the editor will be changed. Press Cancel to keep the original content.'
+        )
+      )
+    ) {
+      this.mceInstance().setContent(code)
     }
   }
 
@@ -613,7 +623,7 @@ class RCEWrapper extends React.Component {
     return this.state.id
   }
 
-   getHtmlEditorStorage() {
+  getHtmlEditorStorage() {
     const cookieValue = getCookie('rce.htmleditor')
     if (cookieValue) {
       document.cookie = `rce.htmleditor=${cookieValue};path=/;max-age=0`
@@ -1030,6 +1040,7 @@ class RCEWrapper extends React.Component {
       })
     }
   }
+
   /**
    * Fix keyboard navigation in the expanded toolbar
    *
@@ -1413,6 +1424,72 @@ class RCEWrapper extends React.Component {
       // launched from kb shortcut button on status bar
       this.state.KBShortcutFocusReturn?.focus()
     }
+  }
+
+  handleAIClick = () => {
+    import('./plugins/shared/ai_tools')
+      .then(module => {
+        this.AIToolsTray = module.AIToolsTray
+
+        this.setState({
+          AIToolsOpen: true,
+          AITToolsFocusReturn: document.activeElement,
+        })
+      })
+      .catch(ex => {
+        // eslint-disable-next-line no-console
+        console.error('Failed loading the AIToolsTray', ex)
+      })
+  }
+
+  closeAITools = () => {
+    this.setState({AIToolsOpen: false})
+  }
+
+  AIToolsExited = () => {
+    if (this.state.AITToolsFocusReturn === this.iframe) {
+      // launched using a kb shortcut
+      // the iframe has focus so we need to forward it on to tinymce editor
+      this.editor.focus(false)
+    } else if (
+      this.state.AITToolsFocusReturn === document.getElementById(`show-on-focus-btn-${this.id}`)
+    ) {
+      // launched from showOnFocus button
+      // edge case where focusing KBShortcutFocusReturn doesn't work
+      this._showOnFocusButton?.focus()
+    } else {
+      // launched from kb shortcut button on status bar
+      this.state.AITToolsFocusReturn?.focus()
+    }
+  }
+
+  handleInsertAIContent = content => {
+    const editor = this.mceInstance()
+    contentInsertion.insertContent(editor, content)
+  }
+
+  handleReplaceAIContent = content => {
+    const ed = this.mceInstance()
+    const selection = ed.selection
+    if (selection.getContent().length > 0) {
+      selection.setContent(content)
+    } else {
+      ed.selection.select(ed.getBody(), true)
+      selection.setContent(content)
+    }
+  }
+
+  getCurrentContentForAI = () => {
+    const selected = this.mceInstance().selection.getContent()
+    return selected
+      ? {
+          type: 'selection',
+          content: selected,
+        }
+      : {
+          type: 'full',
+          content: this.mceInstance().getContent(),
+        }
   }
 
   setFocusAbilityForHeader = focusable => {
@@ -1909,6 +1986,8 @@ class RCEWrapper extends React.Component {
                     launchWordcountModal(this.mceInstance(), document, {skipEditorFocus: true})
                   }
                   disabledPlugins={this.pluginsToExclude}
+                  ai_text_tools={this.props.ai_text_tools}
+                  onAI={this.handleAIClick}
                 />
                 {this.props.trayProps?.containingContext && (
                   <CanvasContentTray
@@ -1928,6 +2007,19 @@ class RCEWrapper extends React.Component {
                   onDismiss={this.closeKBShortcutModal}
                   open={this.state.KBShortcutModalOpen}
                 />
+                {this.props.ai_text_tools && this.AIToolsTray && (
+                  <this.AIToolsTray
+                    open={this.state.AIToolsOpen}
+                    container={document.querySelector('[role="main"]')}
+                    mountNode={instuiPopupMountNode}
+                    contextId={trayProps.contextId}
+                    contextType={trayProps.contextId}
+                    currentContent={this.getCurrentContentForAI()}
+                    onClose={this.closeAITools}
+                    onInsertContent={this.handleInsertAIContent}
+                    onReplaceContent={this.handleReplaceAIContent}
+                  />
+                )}
                 {this.state.confirmAutoSave ? (
                   <Suspense fallback={<Spinner renderTitle={renderLoading} size="small" />}>
                     <RestoreAutoSaveModal

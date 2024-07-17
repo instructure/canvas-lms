@@ -207,6 +207,7 @@ CanvasRails::Application.routes.draw do
     post "unconclude_user/:id" => "courses#unconclude_user", :as => :unconclude_user_enrollment
     resources :sections, except: %i[index edit new] do
       get "crosslist/confirm/:new_course_id" => "sections#crosslist_check", :as => :confirm_crosslist
+      get "user_count" => "sections#user_count", :on => :collection, :as => :user_count
       post :crosslist
       delete "crosslist" => "sections#uncrosslist", :as => :uncrosslist
     end
@@ -804,6 +805,8 @@ CanvasRails::Application.routes.draw do
     post "grading_schemes/:id/archive" => "grading_schemes_json#archive"
     post "grading_schemes/:id/unarchive" => "grading_schemes_json#unarchive"
     post "grading_schemes" => "grading_schemes_json#create"
+    get "grading_schemes/account_default" => "grading_schemes_json#show_account_default_grading_scheme"
+    put "grading_schemes/account_default" => "grading_schemes_json#update_account_default_grading_scheme"
     delete "grading_schemes/:id" => "grading_schemes_json#destroy"
     put "grading_schemes/:id" => "grading_schemes_json#update"
     get "grading_schemes/:id/used_locations" => "grading_schemes_json#used_locations", :as => :grading_schemes_used_locations
@@ -973,7 +976,7 @@ CanvasRails::Application.routes.draw do
   get "message_templates" => "messages#templates"
   resource :profile, controller: :profile, only: [:show, :update] do
     resources :pseudonyms, except: :index
-    resources :tokens, except: :index
+    resources :tokens, except: [:index, :destroy]
     member do
       put :update_profile
       get :communication
@@ -1274,6 +1277,10 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/terms", action: :create
       put "accounts/:account_id/terms/:id", action: :update
       delete "accounts/:account_id/terms/:id", action: :destroy
+    end
+
+    scope(controller: :tokens) do
+      delete "users/:user_id/tokens/:id", action: :destroy, as: "token"
     end
 
     scope(controller: :authentication_audit_api) do
@@ -2308,7 +2315,7 @@ CanvasRails::Application.routes.draw do
       get  "#{prefix}/products", action: :index
       get  "#{prefix}/products_categories", action: :index_by_category
       get  "#{prefix}/products/:id", action: :show
-      get  "#{prefix}/products/filters", action: :filters
+      get  "#{prefix}/filters", action: :filters
     end
 
     scope(controller: :feature_flags) do
@@ -2677,6 +2684,15 @@ CanvasRails::Application.routes.draw do
     scope(controller: "user_notes") do
       put "users/:user_id/user_notes/suppress_deprecation_notice", action: :suppress_deprecation_notice
     end
+
+    scope(controller: :plugins) do
+      put "plugins/:id", action: :update
+      get "plugins/:id", action: :show
+    end
+
+    scope(controller: :rich_content_api) do
+      post "rich_content/generate", action: :generate
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
@@ -2851,6 +2867,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/registration_token", action: :registration_token
       get "accounts/:account_id/registrations/uuid/:registration_uuid", action: :registration_by_uuid
       put "accounts/:account_id/registrations/:registration_id/overlay", action: :update_registration_overlay
+      get "accounts/:account_id/dr_iframe", action: :dr_iframe
       get "registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config
       post "registrations", action: :create, as: :create_lti_registration
     end

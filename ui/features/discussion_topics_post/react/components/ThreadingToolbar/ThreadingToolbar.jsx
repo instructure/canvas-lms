@@ -23,6 +23,7 @@ import {InlineList} from '@instructure/ui-list'
 import {Reply} from './Reply'
 import {Like} from './Like'
 import {Expansion} from './Expansion'
+import {MarkAsRead} from './MarkAsRead'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive'
@@ -101,5 +102,6 @@ ThreadingToolbar.propTypes = {
 ThreadingToolbar.Reply = Reply
 ThreadingToolbar.Like = Like
 ThreadingToolbar.Expansion = Expansion
+ThreadingToolbar.MarkAsRead = MarkAsRead
 
 export default ThreadingToolbar

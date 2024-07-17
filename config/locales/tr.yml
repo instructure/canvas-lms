@@ -10126,6 +10126,7 @@ tr:
   here_are_your_assignments_listed_by_due_date_7d8e98e6: "Teslim tarihine göre sıralanmış Ödevleriniz şunlar."
   here_f44564ee: burada.
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Takvimi daha iyi anlamak ve ödev olmayan olayları dersinize eklemek için harika bir fırsat. Merak etmeyin, size bu konuda yardımcı olacağız."
+  hh_mm_5faafa69: "ss:dd"
   hidden_130c3791: gizli
   hidden_14a032a7: Gizli
   hidden_available_with_a_link_65ef2bda: "Gizli. Bir bağlantı ile kullanılabilir"
@@ -17803,7 +17804,9 @@ tr:
       ways_to_contact_user: İletişim
     recent_activity: 
       date_column: Tarih
+      edit_group: "Grubu Düzenle"
       message_column: Mesaj
+      new_announcement: Duyuru
       recent_activity: "En Son Etkinlik"
       recent_activity_in_course: "%{course_or_group} 'deki En Son Etkinlikler"
       unread_column: Okunmamış
@@ -18992,6 +18995,7 @@ tr:
   this_file_9443cda1: "Bu dosya"
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Dosya yayınlanmadan önce usage_rigths ı ayarlanmış olmalı."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Bu klasör şu anda kilitli ve görüntülenemez."
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: "Bu not halihazırda bu öğrenci için düşürüldü."
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Bu, güvenilir URL'lerin virgülle ayrılmış bir listesidir. Bu listedeki herhangi bir URL'ye güvenmek Canvas'ta oturum açarken CSRF tokenlerını pas geçer"
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Bu ders bitirilmiştir bu yüzden sadece bitirmiş kayıtlar bulunmaktadır."
   this_is_a_group_discussion_2f9acdae: "Bu bir Grup Tartışmasıdır"
@@ -20257,6 +20261,7 @@ tr:
   your_submission_has_not_been_graded_yet_d6963e53: "Gönderiniz henüz notlandırılmadı"
   your_time_for_this_quiz_has_been_reduced_394652e9: "Bu sınav için zamanınız azaltıldı."
   your_webcam_may_already_be_in_use_6cd64c25: "Web kameranız kullanılıyor olabilir."
+  yyyy_mm_dd_cbbd9959: YYYY-MM-DD
   yyyy_mm_dd_hh_mm_a01b6081: "YYYY-MM-DD hh:mm"
   z_a_b48d8903: "Z - A"
   z_a_be2ab67c: Z–A

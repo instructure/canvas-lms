@@ -444,12 +444,22 @@ class Lti::RegistrationsController < ApplicationController
   before_action :require_manage_lti_registrations
   before_action :require_dynamic_registration, only: [:destroy, :update]
   before_action :validate_workflow_state, only: :bind
+  before_action :validate_list_params, only: :list
 
   include Api::V1::Lti::Registration
 
   def index
     set_active_tab "apps"
     add_crumb t("#crumbs.apps", "Apps")
+
+    # allows override of DR url hard-coded into Discover page
+    # todo: remove once Discover page retrieves and uses correct DR url
+    temp_dr_url = Setting.get("lti_discover_page_dyn_reg_url", "")
+    if temp_dr_url.present?
+      js_env({
+               dynamicRegistrationUrl: temp_dr_url
+             })
+    end
 
     render :index
   end
@@ -461,7 +471,15 @@ class Lti::RegistrationsController < ApplicationController
   # and those enabled 'on' at the parent root account level.
   #
   # @argument per_page [integer] The number of registrations to return per page. Defaults to 15.
+  #
   # @argument page [integer] The page number to return. Defaults to 1.
+  #
+  # @argument sort [String]
+  #   The field to sort by. Choices are: name, nickname, lti_version, installed,
+  #   installed_by, updated_by, and on. Defaults to installed.
+  #
+  # @argument dir [String, "asc"|"desc"]
+  #   The order to sort the given column by. Defaults to desc.
   #
   # @returns {"total": "integer", data: [Lti::Registration] }
   #
@@ -506,10 +524,35 @@ class Lti::RegistrationsController < ApplicationController
 
       all_registrations = account_registrations + forced_on_in_site_admin + inherited_on_registrations
 
-      # always sort by created_at descending for now
-      sorted_registrations = all_registrations.sort { |first, second| second.created_at - first.created_at }
+      search_terms = params[:query]&.downcase&.split
+      all_registrations = filter_registrations_by_search_query(all_registrations, search_terms) if search_terms
 
-      paginated_registrations, _metadata = Api.jsonapi_paginate(sorted_registrations, self, url_for(controller: "lti/registrations", action: "list"), { per_page: params[:per_page] || 15 })
+      # sort by the 'sort' parameter, or installed (a.k.a. created_at) if no parameter was given
+      sort_field = params[:sort]&.to_sym || :installed
+
+      sorted_registrations = all_registrations.sort_by do |reg|
+        case sort_field
+        when :name
+          reg.name.downcase
+        when :nickname
+          reg.admin_nickname&.downcase || ""
+        when :lti_version
+          reg.lti_version
+        when :installed
+          reg.created_at
+        when :installed_by
+          reg.created_by&.name&.downcase || ""
+        when :updated_by
+          reg.updated_by&.name&.downcase || ""
+        when :on
+          reg.account_binding_for(@account)&.workflow_state || ""
+        end
+      end
+
+      sorted_registrations.reverse! unless params[:dir] == "asc"
+
+      per_page = Api.per_page_for(self, default: 15)
+      paginated_registrations, _metadata = Api.jsonapi_paginate(sorted_registrations, self, url_for, { per_page: })
       render json: {
         total: all_registrations.size,
         data: lti_registrations_json(paginated_registrations, @current_user, session, @context, includes: [:account_binding])
@@ -638,6 +681,15 @@ class Lti::RegistrationsController < ApplicationController
     render_error(:invalid_workflow_state, "workflow_state must be one of 'on', 'off', or 'allow'")
   end
 
+  def validate_list_params
+    # Calling to_i on a non-number returns 0. This does mean we'll accept something like 10.5, though
+    render_error("invalid_page", "page param should be an integer") unless params[:page].nil? || params[:page].to_i > 0
+    render_error("invalid_dir", "dir param should be asc, desc, or empty") unless ["asc", "desc", nil].include?(params[:dir])
+
+    valid_sort_fields = %w[name nickname lti_version installed installed_by updated_by on]
+    render_error("invalid_sort", "#{params[:sort]} is not a valid field for sorting") unless [*valid_sort_fields, nil].include?(params[:sort])
+  end
+
   def require_dynamic_registration
     return if registration.dynamic_registration?
 
@@ -675,5 +727,23 @@ class Lti::RegistrationsController < ApplicationController
   def report_error(exception, code = nil)
     code ||= response_code_for_rescue(exception) if exception
     InstStatsd::Statsd.increment("canvas.lti_registrations_controller.request_error", tags: { action: action_name, code: })
+  end
+
+  def filter_registrations_by_search_query(registrations, search_terms)
+    # all search terms must appear, but each can be in either the name,
+    # admin_nickname, or vendor name. Remove the search terms from the list
+    # as they are found -- keep the registration as a matching result if the
+    # list is empty at the end.
+    registrations.select do |registration|
+      terms_to_find = search_terms.dup
+      terms_to_find.delete_if do |term|
+        attributes = %i[name admin_nickname vendor]
+        attributes.any? do |attribute|
+          registration[attribute]&.downcase&.include?(term)
+        end
+      end
+
+      terms_to_find.empty?
+    end
   end
 end

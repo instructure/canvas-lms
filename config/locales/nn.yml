@@ -13509,6 +13509,7 @@ nn:
   here_f44564ee: her."
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Dette er ein flott sjanse til å bli kjent med kalenderen og legge til hendingar i emnet som ikkje er oppgåver. Vi er der for å hjelpe deg heile vegen."
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "Her er nokre tips til korleis du kan komme i gang med Canvas! "
+  hh_mm_5faafa69: "tt:mm"
   hi_contrast_373b614f: Høgkontrast
   hidden_130c3791: skjult
   hidden_14a032a7: Skjult
@@ -23951,7 +23952,9 @@ nn:
       ways_to_contact_user: Kontakt
     recent_activity: 
       date_column: Dato
+      edit_group: "Rediger gruppe"
       message_column: Melding
+      new_announcement: Kunngjering
       recent_activity: "Nyleg aktivitet"
       recent_activity_in_course: "Nyleg aktivitet i %{course_or_group}"
       unread_column: "Ikkje lest"
@@ -26367,6 +26370,7 @@ nn:
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Denne vurderinga er ulik vurderinga som er synleg for studentane fordi nokre oppgåver er skjulte"
   this_grade_differs_from_the_student_s_view_of_the__f78d0023: "Denne vurderinga er ulik vurderinga som er synleg for studentane fordi nokre vurderingsresultat ikkje er posta enno"
   this_grade_has_negative_points_496400d4: "Vurderinga har negative poeng"
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: "Vurderinga er fjerna for denne studenten akkurat no."
   this_grade_is_invalid_8ab192c7: "Denne vurderinga er ugyldig"
   this_grade_is_unread_fb79c002: "Denne vurderinga er ulest"
   this_grade_is_unusually_high_60533c20: "Dette vurderingsresultatat er unormalt høgt"
@@ -29276,6 +29280,7 @@ nn:
   your_submission_has_not_been_graded_yet_d6963e53: "Innleveringa di er ikkje vurdert enno"
   your_time_for_this_quiz_has_been_reduced_394652e9: "Tida di for denne quizen er redusert."
   your_webcam_may_already_be_in_use_6cd64c25: "Ditt webkamera kan allereie være i bruk"
+  yyyy_mm_dd_cbbd9959: ÅÅÅÅ-MM-DD
   yyyy_mm_dd_hh_mm_a01b6081: "ÅÅÅÅ-MM-DD tt:mm"
   z_a_b48d8903: "Z - A"
   z_a_be2ab67c: Å–A

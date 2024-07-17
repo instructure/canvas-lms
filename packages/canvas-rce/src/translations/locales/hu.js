@@ -187,6 +187,7 @@ const locale = {
   "column_e1ae5c64": { "message": "Oszlop" },
   "column_group_1c062368": { "message": "Oszlopcsoport" },
   "complex_numbers_a543d004": { "message": "Komplex számok" },
+  "compose_44c904f4": { "message": "Összeállítani" },
   "computer_1d7dfa6f": { "message": "Számítógép" },
   "congruent_5a244acd": { "message": "Egybevágó" },
   "contains_311f37b7": { "message": "Tartalmaz" },
@@ -200,6 +201,7 @@ const locale = {
   "content_subtype_5ce35e88": { "message": "Tartalom altípusa" },
   "content_type_2cf90d95": { "message": "Tartalom típusa " },
   "coproduct_e7838082": { "message": "Társtermék" },
+  "copy_9748f9f": { "message": "Másolás" },
   "copyright_holder_66ee111": { "message": "Jog tulajdonosa:" },
   "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
     "message": "Nem sikerült beszúrni a tartalmat: \"{ itemType }\" elemek jelenleg nem támogatottak a Canvasban."
@@ -851,6 +853,7 @@ const locale = {
   "result_index_of_max_7db5ad8b": {
     "message": "Eredmény: { index } / { max }."
   },
+  "retry_ebd5f8ba": { "message": "Újra" },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Reverse Turnstile (Does Not Yield)"
   },
@@ -933,6 +936,7 @@ const locale = {
     "message": "Shift-O a szép html-szerkesztő megnyitásához."
   },
   "shortcut_911d6255": { "message": "Parancsikon" },
+  "show_all_967a90f0": { "message": "Mindent megmutat" },
   "show_audio_options_b489926b": { "message": "Hangbeállítások megjelenítése" },
   "show_image_options_1e2ecc6b": { "message": "Képbeállítások mutatása" },
   "show_link_options_545338fd": { "message": "Linkbeállítások mutatása" },

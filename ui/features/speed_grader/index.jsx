@@ -18,26 +18,32 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import ready from '@instructure/ready'
-import speedGrader from './jquery/speed_grader'
-import {getCurrentTheme} from '@instructure/theme-registry'
+
 import {captureException} from '@sentry/browser'
+import {Spinner} from '@instructure/ui-spinner'
+import ready from '@instructure/ready'
+import {getCurrentTheme} from '@instructure/theme-registry'
+
 import {getAssignment} from './queries/assignmentQuery'
 import {getCourse} from './queries/courseQuery'
 import {getSectionsByAssignment} from './queries/sectionsByAssignmentQuery'
 import {getSubmission} from './queries/submissionQuery'
 import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
+
 import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
 import {hideAssignmentGradesForSections} from './mutations/hideAssignmentGradesForSectionsMutation'
+import {postDraftSubmissionComment} from './mutations/postDraftSubmissionCommentMutation'
+import {deleteSubmissionComment} from './mutations/deleteSubmissionCommentMutation'
 import {
   postAssignmentGradesForSections,
   resolvePostAssignmentGradesStatus,
 } from './mutations/postAssignmentGradesForSectionsMutation'
+
+import {useScope as useI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import speedGrader from './jquery/speed_grader'
 
 const I18n = useI18nScope('speed_grader')
 
@@ -47,12 +53,18 @@ ready(() => {
     const theme = getCurrentTheme()
     const mountPoint = document.querySelector('#react-router-portals')
     const params = new URLSearchParams(window.location.search)
+    const postMessageAliases = {
+      'quizzesNext.register': 'tool.register',
+      'quizzesNext.nextStudent': 'tool.nextStudent',
+      'quizzesNext.previousStudent': 'tool.previousStudent',
+      'quizzesNext.submissionUpdate': 'tool.submissionUpdate',
+    }
 
     import('speedgrader/appInjector')
       .then(module => {
         module.render(mountPoint, {
           theme,
-          queries: {
+          queryFns: {
             getCourse,
             getAssignment,
             getSubmission,
@@ -60,12 +72,15 @@ ready(() => {
             getSectionsByAssignment,
             resolvePostAssignmentGradesStatus,
           },
-          mutations: {
+          mutationFns: {
             updateSubmissionGrade,
             createSubmissionComment,
+            deleteSubmissionComment,
             hideAssignmentGradesForSections,
             postAssignmentGradesForSections,
+            postDraftSubmissionComment,
           },
+          postMessageAliases,
           context: {
             courseId: window.ENV.course_id,
             assignmentId: params.get('assignment_id'),
@@ -76,6 +91,10 @@ ready(() => {
           },
           features: {
             extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
+            gradeByQuestion: {
+              supported: window.ENV.GRADE_BY_QUESTION_SUPPORTED,
+              enabled: window.ENV.GRADE_BY_QUESTION,
+            },
           },
         })
       })

@@ -4287,8 +4287,6 @@ class Course < ActiveRecord::Base
   end
 
   def post_manually?
-    return false unless post_policies_enabled?
-
     default_post_policy.present? && default_post_policy.post_manually?
   end
 
@@ -4375,10 +4373,6 @@ class Course < ActiveRecord::Base
         send(:"#{key}_visibility=", visibility)
       end
     end
-  end
-
-  def post_policies_enabled?
-    PostPolicy.feature_enabled?
   end
 
   def sections_hidden_on_roster_page?(current_user:)

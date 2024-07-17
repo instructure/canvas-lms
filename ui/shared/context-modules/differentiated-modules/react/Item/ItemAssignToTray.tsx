@@ -150,6 +150,7 @@ export interface ItemAssignToTrayProps {
   onDatesChange?: (cardId: string, dateType: string, newDate: string) => void
   onCardRemove?: (cardId: string) => void
   onInitialStateSet?: (cards: ItemAssignToCardSpec[]) => void
+  postToSIS?: boolean
 }
 
 export default function ItemAssignToTray({
@@ -179,6 +180,7 @@ export default function ItemAssignToTray({
   removeDueDateInput = false,
   isCheckpointed = false,
   onInitialStateSet,
+  postToSIS = false,
 }: ItemAssignToTrayProps) {
   const isPacedCourse = ENV.IN_PACED_COURSE
   const initialLoadRef = useRef(false)
@@ -417,6 +419,7 @@ export default function ItemAssignToTray({
             everyoneOption={everyoneOption}
             setGroupCategoryId={setGroupCategoryId}
             setOverridesFetched={setOverridesFetched}
+            postToSIS={postToSIS}
           />
         )}
         {Footer()}

@@ -253,11 +253,7 @@ class AssignmentsController < ApplicationController
     GuardRail.activate(:secondary) do
       @assignment ||= @context.assignments.find(params[:id])
 
-      js_env({
-               ASSIGNMENT_POINTS_POSSIBLE: nil,
-               POST_TO_SIS: Assignment.sis_grade_export_enabled?(@context),
-               DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context)
-             })
+      js_env({ ASSIGNMENT_POINTS_POSSIBLE: nil })
 
       if @assignment.deleted?
         flash[:notice] = t "notices.assignment_delete", "This assignment has been deleted"
@@ -434,17 +430,20 @@ class AssignmentsController < ApplicationController
 
         @similarity_pledge = pledge_text
 
-        js_env({
-                 EULA_URL: tool_eula_url,
-                 EXTERNAL_TOOLS: external_tools_json(@external_tools, @context, @current_user, session),
-                 PERMISSIONS: permissions,
-                 SIMILARITY_PLEDGE: @similarity_pledge,
-                 CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
-                 EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
-                 EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
-                 USER_ASSET_STRING: @current_user&.asset_string,
-                 OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
-               })
+        hash = {
+          EULA_URL: tool_eula_url,
+          EXTERNAL_TOOLS: external_tools_json(@external_tools, @context, @current_user, session),
+          PERMISSIONS: permissions,
+          SIMILARITY_PLEDGE: @similarity_pledge,
+          CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
+          EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
+          EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
+          USER_ASSET_STRING: @current_user&.asset_string,
+          OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
+        }
+
+        append_default_due_time_js_env(@context, hash)
+        js_env(hash)
 
         set_master_course_js_env_data(@assignment, @context)
         conditional_release_js_env(@assignment, includes: :rule)

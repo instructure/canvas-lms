@@ -61,6 +61,10 @@ module ItemsAssignToTray
     "[data-testid = 'reply_to_topic_due_at_input']"
   end
 
+  def required_replies_due_date_input_selector
+    "[data-testid = 'required_replies_due_at_input']"
+  end
+
   def assignee_selected_option_selector
     "[data-testid='assignee_selector_selected_option']"
   end

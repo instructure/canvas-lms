@@ -67,6 +67,7 @@ export interface ItemAssignToTrayContentProps
   cardsRefs: React.MutableRefObject<{
     [cardId: string]: ItemAssignToCardRef
   }>
+  postToSIS?: boolean
 }
 
 function makeCardId(): string {
@@ -112,6 +113,7 @@ const ItemAssignToTrayContent = ({
   everyoneOption,
   setGroupCategoryId,
   setOverridesFetched,
+  postToSIS = false,
 }: ItemAssignToTrayContentProps) => {
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
@@ -229,6 +231,7 @@ const ItemAssignToTrayContent = ({
             hasAssignees: true,
             due_at: baseDates.due_at,
             reply_to_topic_due_at: null,
+            required_replies_due_at: null,
             original_due_at: baseDates.due_at,
             unlock_at: baseDates.unlock_at,
             lock_at: baseDates.lock_at,
@@ -275,6 +278,7 @@ const ItemAssignToTrayContent = ({
             if (override.group_id) {
               defaultOptions.push(`group-${override.group_id}`)
             }
+            removeCard = removeCard || override.student_ids?.length === 0
             if (
               removeCard ||
               (override.context_module_id &&
@@ -290,6 +294,7 @@ const ItemAssignToTrayContent = ({
               hasAssignees: true,
               due_at: override.due_at,
               reply_to_topic_due_at: null,
+              required_replies_due_at: null,
               original_due_at: override.due_at,
               unlock_at: override.unlock_at,
               lock_at: override.lock_at,
@@ -336,6 +341,7 @@ const ItemAssignToTrayContent = ({
         isValid: true,
         hasAssignees: false,
         reply_to_topic_due_at: null,
+        required_replies_due_at: null,
         due_at: null,
         unlock_at: null,
         lock_at: null,
@@ -516,6 +522,7 @@ const ItemAssignToTrayContent = ({
             isCheckpointed={isCheckpointed}
             cardId={card.key}
             reply_to_topic_due_at={card.reply_to_topic_due_at}
+            required_replies_due_at={card.required_replies_due_at}
             due_at={card.due_at}
             original_due_at={card.original_due_at}
             unlock_at={card.unlock_at}
@@ -533,6 +540,7 @@ const ItemAssignToTrayContent = ({
             customSetSearchTerm={setSearchTerm}
             highlightCard={card.highlightCard}
             blueprintDateLocks={blueprintDateLocks}
+            postToSIS={postToSIS}
           />
         </View>
       )

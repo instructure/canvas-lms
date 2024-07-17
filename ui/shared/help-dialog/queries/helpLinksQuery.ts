@@ -16,30 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
-import type {HelpLink} from '../../../../api.d'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
-export default function helpLinksQuery(): Promise<HelpLink[]> {
-  return new Promise((resolve, reject) => {
-    const data: HelpLink[] = []
-    const firstPageUrl = '/help_links'
+import type {QueryFunctionContext} from '@tanstack/react-query'
+import type {HelpLink} from '../../../api.d'
 
-    function load(url: string) {
-      $.getJSON(
-        url,
-        (newData: HelpLink[], _: any, xhr: XMLHttpRequest) => {
-          data.push(...newData)
-          const link = parseLinkHeader(xhr)
-          if (link.next) {
-            load(link.next)
-          } else {
-            resolve(data)
-          }
-        },
-        reject
-      )
-    }
-    load(firstPageUrl)
-  })
+const HELP_LINKS_PATH = '/help_links'
+
+export default async function helpLinksQuery({signal}: QueryFunctionContext): Promise<HelpLink[]> {
+  const data: Array<HelpLink> = []
+  const fetchOpts = {signal}
+  let path = HELP_LINKS_PATH
+
+  while (path) {
+    // eslint-disable-next-line no-await-in-loop
+    const {json, link} = await doFetchApi<HelpLink[]>({path, fetchOpts})
+    if (json) data.push(...json)
+    path = link?.next?.url || null
+  }
+  return data
 }

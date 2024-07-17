@@ -18,16 +18,14 @@
 
 import React from 'react'
 
-import {Link, Outlet, useMatch, useNavigate} from 'react-router-dom'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Tabs} from '@instructure/ui-tabs'
-import {Flex} from '@instructure/ui-flex'
-import {Button} from '@instructure/ui-buttons'
+import {Link, Outlet, useMatch, useNavigate} from 'react-router-dom'
 import {openRegistrationWizard} from '../manage/registration_wizard/RegistrationWizardModalState'
-import {RegistrationWizardModal} from '../manage/registration_wizard/RegistrationWizardModal'
-import {ZAccountId} from '../manage/model/AccountId'
+import {refreshRegistrations} from '../manage/pages/manage/ManagePageLoadingState'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -42,10 +40,6 @@ export const LtiAppsLayout = React.memo(() => {
     [navigate]
   )
 
-  const queryClient = new QueryClient()
-
-  const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
-
   const open = React.useCallback(() => {
     openRegistrationWizard({
       dynamicRegistrationUrl: '',
@@ -54,11 +48,15 @@ export const LtiAppsLayout = React.memo(() => {
       registering: false,
       progress: 0,
       progressMax: 100,
+      exitOnCancel: true,
+      onSuccessfulInstallation: () => {
+        refreshRegistrations()
+      },
     })
   }, [])
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
       <Flex alignItems="start" justifyItems="space-between" margin="0 0 small 0">
         <Flex.Item>
           <Heading level="h1">{I18n.t('Apps')}</Heading>
@@ -71,7 +69,6 @@ export const LtiAppsLayout = React.memo(() => {
           </Flex.Item>
         ) : null}
       </Flex>
-      <RegistrationWizardModal accountId={accountId} />
       <Tabs margin="medium auto" padding="medium" onRequestTabChange={onTabClick}>
         {window.ENV.FEATURES.lti_registrations_discover_page && (
           <Tabs.Panel
@@ -103,6 +100,6 @@ export const LtiAppsLayout = React.memo(() => {
           <Outlet />
         </Tabs.Panel>
       </Tabs>
-    </QueryClientProvider>
+    </>
   )
 })

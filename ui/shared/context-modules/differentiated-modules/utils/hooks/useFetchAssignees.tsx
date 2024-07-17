@@ -233,8 +233,8 @@ const useFetchAssignees = ({
                 return option
               }),
               ...sectionsParsedResult,
-              ...studentsParsedResult,
               ...groupsParsedResult,
+              ...studentsParsedResult,
             ],
             'id'
           )

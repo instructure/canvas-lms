@@ -16,42 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {QueryKey} from '@tanstack/react-query'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
-const urls = {
+import type {QueryFunctionContext} from '@tanstack/react-query'
+
+const URL_MAP: Record<string, string> = {
   content_shares: '/api/v1/users/self/content_shares/unread_count',
   conversations: '/api/v1/conversations/unread_count',
   release_notes: '/api/v1/release_notes/unread_count',
 }
 
-const unreadCountTypes = Object.keys(urls) as (keyof typeof urls)[]
+const unreadCountTypes = Object.keys(URL_MAP)
 
-type UnreadCountType = (typeof unreadCountTypes)[number]
+// queryKey is e.g. ['unread_count', 'conversations'], the discriminator is at index 1
+// The discriminator i.e. the unreadCountType is always a string, we'll just coerce it
+// to be so because it's typed as `unknown` in Tanstack's QueryFunctionContext
+export async function getUnreadCount({queryKey, signal}: QueryFunctionContext): Promise<number> {
+  const unreadCountType = queryKey[1] as string
+  const fetchOpts = {signal}
 
-// e.g. ['unread_count', 'conversations']
-export function getUnreadCount({queryKey}: {queryKey: QueryKey}): Promise<number> {
-  const unreadCountType = queryKey[1] as UnreadCountType
+  if (!unreadCountTypes.includes(unreadCountType))
+    throw new Error(`Bad unreadCount type ${unreadCountType}`)
 
-  if (!unreadCountTypes.includes(unreadCountType)) {
-    throw new Error('Invalid unread count key')
+  const path = URL_MAP[unreadCountType]
+  // conversations count returns as string 😞    vvvvvvvvvvvvvvv
+  const {json} = await doFetchApi<{unread_count: number | string}>({path, fetchOpts})
+  if (json) {
+    const fetched = json.unread_count
+    // Make sure we're getting a number or a string that can be coerced to a number
+    const val = typeof fetched === 'number' ? fetched : parseInt(fetched, 10)
+
+    if (!Number.isNaN(val)) return val
   }
-
-  return (
-    fetch(urls[unreadCountType])
-      .then(res => res.json())
-      // conversations count returns as string :-(
-      .then((data: {unread_count: number | string}) => {
-        // ensure number type
-        const fetchedUnreadCount =
-          typeof data.unread_count === 'number'
-            ? data.unread_count
-            : parseInt(data.unread_count, 10)
-
-        if (Number.isNaN(fetchedUnreadCount)) {
-          throw new Error(`Invalid unread count for ${unreadCountType}`)
-        }
-
-        return fetchedUnreadCount
-      })
-  )
+  throw new Error(`Error while fetching unread count for ${unreadCountType}`)
 }

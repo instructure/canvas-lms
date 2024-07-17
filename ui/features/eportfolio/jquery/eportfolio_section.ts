@@ -18,7 +18,11 @@
 
 import JQuery from 'jquery'
 
-export function fetchContent($section: JQuery, section_type: string, name: string) {
+interface JQueryWithTemplateData extends JQuery<HTMLElement> {
+  getTemplateData(options: {textValues: string[]}): {[key: string]: unknown}
+}
+
+export function fetchContent($section: JQueryWithTemplateData, section_type: string, name: string) {
   const data: Record<string, unknown> = {}
   if (section_type === 'rich_text') {
     data[name + '[section_type]'] = 'rich_text'

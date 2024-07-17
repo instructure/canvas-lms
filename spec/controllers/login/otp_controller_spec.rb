@@ -57,18 +57,32 @@ describe Login::OtpController do
         expect(session[:pending_otp_secret_key]).to be_nil
       end
 
-      it "sends otp to sms channel" do
-        Account.default.settings[:mfa_settings] = :required
-        Account.default.save!
+      describe "sends otp to sms channel" do
+        before do
+          Account.default.settings[:mfa_settings] = :required
+          Account.default.save!
+          @user.otp_secret_key = ROTP::Base32.random
+        end
 
-        @user.otp_secret_key = ROTP::Base32.random
-        cc = @user.otp_communication_channel = @user.communication_channels.sms.create!(path: "1234567890@txt.att.net")
-        expect_any_instantiation_of(cc).to receive(:send_otp!)
-        @user.save!
+        it "with a carrier domain (deprecated)" do
+          cc = @user.otp_communication_channel = @user.communication_channels.sms.create!(path: "1234567890@txt.att.net")
+          expect_any_instantiation_of(cc).to receive(:send_otp!)
+          @user.save!
 
-        get :new
-        expect(response).to be_successful
-        expect(session[:pending_otp_secret_key]).to be_nil
+          get :new
+          expect(response).to be_successful
+          expect(session[:pending_otp_secret_key]).to be_nil
+        end
+
+        it "without a carrier domain" do
+          cc = @user.otp_communication_channel = @user.communication_channels.sms.create!(path: "1234567890")
+          expect_any_instantiation_of(cc).to receive(:send_otp!)
+          @user.save!
+
+          get :new
+          expect(response).to be_successful
+          expect(session[:pending_otp_secret_key]).to be_nil
+        end
       end
     end
 

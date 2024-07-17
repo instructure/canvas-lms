@@ -16,30 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+
+import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {ProfileTab} from '../../../../api.d'
 
-export default function profileQuery(): Promise<ProfileTab[]> {
-  return new Promise((resolve, reject) => {
-    const data: ProfileTab[] = []
-    const firstPageUrl = '/api/v1/users/self/tabs'
+const PROFILE_TABS_PATH = '/api/v1/users/self/tabs'
 
-    function load(url: string) {
-      $.getJSON(
-        url,
-        (newData: ProfileTab[], _: any, xhr: XMLHttpRequest) => {
-          data.push(...newData)
-          const link = parseLinkHeader(xhr)
-          if (link.next) {
-            load(link.next)
-          } else {
-            resolve(data)
-          }
-        },
-        reject
-      )
-    }
-    load(firstPageUrl)
-  })
+export default async function profileQuery({signal}: QueryFunctionContext): Promise<ProfileTab[]> {
+  const data: Array<ProfileTab> = []
+  const fetchOpts = {signal}
+  let path = PROFILE_TABS_PATH
+
+  while (path) {
+    // eslint-disable-next-line no-await-in-loop
+    const {json, link} = await doFetchApi<ProfileTab[]>({path, fetchOpts})
+    if (json) data.push(...json)
+    path = link?.next?.url || null
+  }
+  return data
 }

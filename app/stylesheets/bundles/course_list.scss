@@ -18,6 +18,10 @@
 
 @import "base/environment";
 
+.page_header {
+  @include page_header;
+}
+
 .course-list-table {
   table-layout: fixed;
   white-space: nowrap;

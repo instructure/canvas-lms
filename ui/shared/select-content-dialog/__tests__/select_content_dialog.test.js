@@ -247,6 +247,7 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
             <input type='text' id='external_tool_create_iframe_width' />
             <input type='text' id='external_tool_create_iframe_height' />
             <input type='checkbox' id='external_tool_create_new_tab' />
+            <input type='text' id='external_tool_create_preserve_existing_assignment_name' />
             <div id='context_external_tools_select'>
               <span class='domain_message' />
               <div class='tools'>
@@ -303,6 +304,7 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
       endDateTime: '2023-04-21T00:00:00.000Z',
     },
     text: 'Description text',
+    'https://canvas.instructure.com/lti/preserveExistingAssignmentName': true,
   }
   const makeDeepLinkingEvent = (additionalContentItemFields = {}, omitFields = []) => {
     const omittedContentItem = Object.fromEntries(
@@ -434,6 +436,7 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
       '{"startDateTime":"2023-04-12T00:00:00.000Z","endDateTime":"2023-04-21T00:00:00.000Z"}'
     )
     expect(data['item[description]']).toEqual('Description text')
+    expect(data['item[preserveExistingAssignmentName]']).toEqual('true')
   })
 
   it('recover assignment id from context external tool item data if given', async () => {

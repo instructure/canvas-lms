@@ -251,14 +251,13 @@ describe('DifferentiatedModulesSection', () => {
     beforeAll(() => {
       global.ENV = {
         ...global.ENV,
-        POST_TO_SIS: true,
-        DUE_DATE_REQUIRED_FOR_ACCOUNT: true
+        DUE_DATE_REQUIRED_FOR_ACCOUNT: true,
       }
     })
 
     it('validates if required due dates are set before applying changes', async () => {
-      const {getByTestId,queryByTestId, findAllByTestId, getByText, getAllByText} = render(
-        <DifferentiatedModulesSection {...props} />
+      const {getByTestId, queryByTestId, findAllByTestId, getByText, getAllByText} = render(
+        <DifferentiatedModulesSection {...props} postToSIS={true} />
       )
 
       act(() => getByTestId('manage-assign-to').click())

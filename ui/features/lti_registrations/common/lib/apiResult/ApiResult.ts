@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {ZodSchema, ZodTypeDef} from 'zod'
+import type {ZodSchema, ZodTypeDef, ZodError} from 'zod'
 
 export type ApiResult<A> =
   | {
@@ -24,7 +24,12 @@ export type ApiResult<A> =
       data: A
     }
   | {
-      _type: 'ApiParseError' | 'GenericError'
+      _type: 'ApiParseError'
+      url: string
+      error: ZodError<any>
+    }
+  | {
+      _type: 'GenericError'
       message: string
     }
   | {
@@ -37,9 +42,10 @@ export const success = <A>(data: A): ApiResult<A> => ({
   data,
 })
 
-export const apiParseError = (message: string): ApiResult<never> => ({
+export const apiParseError = (error: ZodError, url: string): ApiResult<never> => ({
   _type: 'ApiParseError',
-  message,
+  url,
+  error,
 })
 
 export const genericError = (message: string): ApiResult<never> => ({
@@ -66,7 +72,7 @@ export const parseFetchResult =
       .then(response => {
         if (response.ok) {
           try {
-            return response.json()
+            return response.json().then(json => [response, json] as const)
           } catch (e) {
             throw new Error('Failed to parse response as JSON.')
           }
@@ -74,22 +80,11 @@ export const parseFetchResult =
           throw new Error('Response was not ok.')
         }
       })
-      .then(schema.safeParse)
-      .then(response => {
-        return response.success
-          ? success(response.data)
-          : apiParseError(
-              response.error.errors
-                .map(e => {
-                  if (e.code === 'invalid_type') {
-                    const path = e.path.map(s => (typeof s === 'string' ? s : `[${s}]`)).join('.')
-                    return `${path}: Expected: ${e.expected}, Actual: ${e.received}`
-                  } else {
-                    return e.message
-                  }
-                })
-                .join('\n\n')
-            )
+      .then(([resp, json]) => [resp, schema.safeParse(json)] as const)
+      .then(([resp, parsedJson]) => {
+        return parsedJson.success
+          ? success(parsedJson.data)
+          : apiParseError(parsedJson.error, resp.url)
       })
       .catch(err => {
         if (err instanceof Error) {
@@ -99,3 +94,22 @@ export const parseFetchResult =
         }
       })
   }
+
+export const formatApiResultError = (
+  error: Exclude<ApiResult<unknown>, {_type: 'success'}>
+): string => {
+  if (error._type === 'Exception') {
+    return `${error.error.message}${error.error.stack ? `\n${error.error.stack}` : ''}`
+  } else if (error._type === 'GenericError') {
+    return error.message
+  } else {
+    const messages = error.error.errors
+      .map(issue => {
+        return `${issue.path.map(p => (typeof p === 'number' ? `[${p}]` : p)).join('.')} ${
+          issue.code
+        }: ${issue.message}`
+      })
+      .join('\n')
+    return `Error parsing response from ${error.url}:\n${messages}`
+  }
+}

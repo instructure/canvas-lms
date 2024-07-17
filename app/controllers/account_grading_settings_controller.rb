@@ -35,6 +35,7 @@ class AccountGradingSettingsController < ApplicationController
                ARCHIVED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:archived_grading_schemes),
                IS_ROOT_ACCOUNT: @account.root_account?,
                ROOT_ACCOUNT_ID: @account.root_account.id.to_s,
+               DEFAULT_ACCOUNT_GRADING_SCHEME_ENABLED: Account.site_admin.feature_enabled?(:default_account_grading_scheme),
              })
       css_bundle :grading_period_sets, :enrollment_terms
       render html: "".html_safe, layout: true

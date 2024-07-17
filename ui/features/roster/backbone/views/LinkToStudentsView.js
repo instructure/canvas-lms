@@ -22,6 +22,7 @@ import DialogBaseView from '@canvas/dialog-base-view'
 import RosterDialogMixin from './RosterDialogMixin'
 import linkToStudentsViewTemplate from '../../jst/LinkToStudentsView.handlebars'
 import '@canvas/jquery/jquery.disableWhileLoading'
+import '../../jquery/ContextSearch'
 
 const I18n = useI18nScope('course_settings')
 

@@ -91,7 +91,7 @@ class Pseudonym < ActiveRecord::Base
 
   validates_each :password,
                  if: :require_password?,
-                 &Canvas::PasswordPolicy.method(:validate)
+                 &Canvas::Security::PasswordPolicy.method(:validate)
   validates :password_confirmation,
             presence: true,
             if: :require_password?

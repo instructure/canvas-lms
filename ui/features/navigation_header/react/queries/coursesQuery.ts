@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+
+import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {Course} from '../../../../api.d'
 
 export function getFirstPageUrl() {
@@ -44,27 +45,16 @@ export const hideHomeroomCourseIfK5Student = (course: Pick<Course, 'homeroom_cou
   return !isK5Student || !course.homeroom_course
 }
 
-export default function coursesQuery(): Promise<Course[]> {
-  return new Promise((resolve, reject) => {
-    const data: Course[] = []
+export default async function coursesQuery({signal}: QueryFunctionContext): Promise<Course[]> {
+  const data: Array<Course> = []
+  const fetchOpts = {signal}
+  let path = getFirstPageUrl()
 
-    const firstPageUrl = getFirstPageUrl()
-
-    function load(url: string) {
-      $.getJSON(
-        url,
-        (newData: Course[], _: any, xhr: XMLHttpRequest) => {
-          data.push(...newData)
-          const link = parseLinkHeader(xhr)
-          if (link.next) {
-            load(link.next)
-          } else {
-            resolve(data)
-          }
-        },
-        reject
-      )
-    }
-    load(firstPageUrl)
-  })
+  while (path) {
+    // eslint-disable-next-line no-await-in-loop
+    const {json, link} = await doFetchApi<Course[]>({path, fetchOpts})
+    if (json) data.push(...json)
+    path = link?.next?.url || null
+  }
+  return data
 }

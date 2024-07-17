@@ -58,6 +58,7 @@ import {ToolbarSeparator} from './ToolbarSeparator'
 import {getScrollParent, getNodeIndex} from '../../utils'
 import {BlankSection} from '../user/sections/BlankSection'
 
+import type {AddSectionPlacement} from './types'
 import {SectionBrowser} from './SectionBrowser'
 
 const findUpNode = (node: Node, query: any): Node | undefined => {
@@ -103,22 +104,25 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     moveable,
     deletable,
     connectors: {drag},
-  } = useNode((n: Node) => ({
-    nodeActions: actions,
-    node: n,
-    hovered: n.events.hovered,
-    selected: n.events.selected,
-    dom: n.dom,
-    name: n.data.custom.displayName || n.data.displayName,
-    moveable: query.node(n.id).isDraggable(),
-    deletable: query.node(n.id).isDeletable(),
-    props: n.data.props,
-  }))
+  } = useNode((n: Node) => {
+    const node_helpers = query.node(n.id)
+    return {
+      nodeActions: actions,
+      node: n,
+      hovered: n.events.hovered,
+      selected: n.events.selected,
+      dom: n.dom,
+      name: n.data.custom.displayName || n.data.displayName,
+      moveable: node_helpers.isDraggable(),
+      deletable: n.data.custom?.isDeletable?.(n.id, query) && node_helpers.isDeletable(),
+      props: n.data.props,
+    }
+  })
 
   const [currentToolbarOrTagRef, setCurrentToolbarOrTagRef] = useState<HTMLDivElement | null>(null)
   const [currentMenuRef, setCurrentMenuRef] = useState<HTMLDivElement | null>(null)
   const [upnodeId] = useState<string | undefined>(findUpNode(node, query)?.id)
-  const [sectionBrowserOpen, setSectionBrowserOpen] = useState(false)
+  const [sectionBrowserOpen, setSectionBrowserOpen] = useState<AddSectionPlacement>(undefined)
 
   useEffect(() => {
     // get a newly dropped block selected
@@ -228,7 +232,7 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
   // TODO: this should be role="toolbar" and nav with arrow keys
   const renderBlockToolbar = () => {
     if (node.data?.custom?.noToolbar) return null
-    const mountPoint = document.querySelector('.block-editor-editor')
+    const mountPoint = document.querySelector('.block-editor-editor') as HTMLElement | null
     if (!mountPoint) return null
 
     return ReactDOM.createPortal(
@@ -306,7 +310,7 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
           className="section-menu"
           style={{left, top}}
         >
-          {React.createElement(node.related.sectionMenu)}
+          {React.createElement(node.related.sectionMenu, {onAddSection: handleAddSection})}
         </div>,
         mountPoint
       )
@@ -350,26 +354,19 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     )
   }
 
-  const handleAddSection = useCallback(() => {
-    setSectionBrowserOpen(true)
+  const handleAddSection = useCallback((where: AddSectionPlacement) => {
+    setSectionBrowserOpen(where)
   }, [])
 
   const renderSectionAdder = (isBefore: boolean = false) => {
     return (
-      <div className="section-adder">
-        <span>
-          <CondensedButton onClick={handleAddSection} renderIcon={<IconPlusLine size="x-small" />}>
-            Section
-          </CondensedButton>
-        </span>
-        {sectionBrowserOpen && (
-          <SectionBrowser
-            open={sectionBrowserOpen}
-            onClose={() => setSectionBrowserOpen(false)}
-            where={isBefore ? 'prepend' : 'append'}
-          />
-        )}
-      </div>
+      !!sectionBrowserOpen && (
+        <SectionBrowser
+          open={true}
+          onClose={() => setSectionBrowserOpen(undefined)}
+          where={sectionBrowserOpen}
+        />
+      )
     )
   }
 

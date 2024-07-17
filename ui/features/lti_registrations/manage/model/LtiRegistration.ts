@@ -21,25 +21,26 @@ import {ZAccountId} from './AccountId'
 import {ZLtiRegistrationId} from './LtiRegistrationId'
 import {ZDeveloperKeyId} from './developer_key/DeveloperKeyId'
 import {ZLtiRegistrationAccountBinding} from './LtiRegistrationAccountBinding'
+import {ZUser} from './User'
 
 export const ZLtiRegistration = z.object({
   id: ZLtiRegistrationId,
   account_id: ZAccountId,
-  icon_url: z.string().optional(),
+  icon_url: z.string().optional().nullable(),
   name: z.string(),
-  admin_nickname: z.string().optional(),
+  admin_nickname: z.string().optional().nullable(),
   workflow_state: z.string(),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
-  created_by: z.string(),
-  updated_by: z.string(),
-  vendor: z.string().optional(),
+  created_by: ZUser.optional().nullable(),
+  updated_by: ZUser.optional().nullable(),
+  vendor: z.string().optional().nullable(),
   internal_service: z.boolean(),
-  developer_key_id: ZDeveloperKeyId,
-  ims_registration_id: z.string(),
-  manual_configuration_id: z.string().nullable(),
-  legacy_configuration_id: z.string().nullable(),
-  account_binding: ZLtiRegistrationAccountBinding,
+  developer_key_id: ZDeveloperKeyId.optional().nullable(),
+  ims_registration_id: z.string().optional().nullable(),
+  manual_configuration_id: z.string().optional().nullable(),
+  legacy_configuration_id: z.string().optional().nullable(),
+  account_binding: ZLtiRegistrationAccountBinding.optional().nullable(),
 })
 
 export type LtiRegistration = z.infer<typeof ZLtiRegistration>

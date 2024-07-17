@@ -34,7 +34,7 @@ export type AssignmentSubmissionTypeContainerProps = {
     icon_url?: string
   }
   resource?: {
-    title: string
+    title?: string
   }
   onLaunchButtonClick: () => void
   onRemoveResource: () => void
@@ -49,7 +49,7 @@ export function AssignmentSubmissionTypeContainer(
 ): React.ReactElement | null {
   if (!props.tool) {
     return null
-  } else if (ENV.ASSIGNMENT_SUBMISSION_TYPE_CARD_ENABLED && props.resource?.title) {
+  } else if (ENV.ASSIGNMENT_SUBMISSION_TYPE_CARD_ENABLED && props.resource) {
     return (
       <AssignmentSubmissionTypeSelectionResourceLinkCard
         tool={props.tool}

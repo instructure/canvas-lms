@@ -306,6 +306,24 @@ describe FilesController do
       end
     end
 
+    describe "sets the X-Robots-Tag" do
+      it "sets the X-Robots-Tag header to noindex, nofollow" do
+        verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
+        get "show", params: { course_id: @course.id, id: @file.id, verifier: }, format: "json"
+        expect(response).to be_successful
+        expect(response.headers["X-Robots-Tag"]).to eq("noindex, nofollow")
+      end
+
+      it "does not set the X-Robots-Tag header if the account allows indexing" do
+        @course.root_account.settings[:enable_search_indexing] = true
+        @course.root_account.save!
+        verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
+        get "show", params: { course_id: @course.id, id: @file.id, verifier: }, format: "json"
+        expect(response).to be_successful
+        expect(response.headers["X-Robots-Tag"]).to be_nil
+      end
+    end
+
     it "assigns variables" do
       user_session(@teacher)
       get "show", params: { course_id: @course.id, id: @file.id }

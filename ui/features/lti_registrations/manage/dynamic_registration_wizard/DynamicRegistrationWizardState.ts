@@ -28,7 +28,8 @@ import {
   type RegistrationOverlayStore,
 } from '../registration_wizard/registration_settings/RegistrationOverlayState'
 import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
-import type {ApiResult} from 'features/lti_registrations/common/lib/apiResult/ApiResult'
+import {formatApiResultError, type ApiResult} from '../../common/lib/apiResult/ApiResult'
+import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 
 /**
  * Steps are:
@@ -41,7 +42,7 @@ import type {ApiResult} from 'features/lti_registrations/common/lib/apiResult/Ap
 /**
  * Actions for the dynamic registration modal
  */
-interface DynamicRegistrationActions {
+export interface DynamicRegistrationActions {
   /**
    * Loads a registration token from the BE for the given account.
    * Changes states to keep track of the loading process.
@@ -49,9 +50,14 @@ interface DynamicRegistrationActions {
    * @param accountId The account id the tool is being registered for
    *    can be a account id, shard-relative id, or the string 'site_admin'
    * @param dynamicRegistrationUrl The url to use for dynamic registration
+   * @param unifiedToolId Included in token if provided
    * @returns
    */
-  loadRegistrationToken: (accountId: AccountId, dynamicRegistrationUrl: string) => void
+  loadRegistrationToken: (
+    accountId: AccountId,
+    dynamicRegistrationUrl: string,
+    unifiedToolId?: string
+  ) => void
   /**
    * Enables the developer key for the given registration
    * and closes the modal
@@ -63,9 +69,12 @@ interface DynamicRegistrationActions {
    */
   enableAndClose: (
     accountId: AccountId,
-    registrationId: LtiImsRegistrationId,
+    imsRegistrationId: LtiImsRegistrationId,
+    registrationId: LtiRegistrationId,
     developerKeyId: DeveloperKeyId,
-    overlay: RegistrationOverlay
+    overlay: RegistrationOverlay,
+    adminNickname: string,
+    onSuccess: () => void
   ) => Promise<unknown>
 
   /**
@@ -91,9 +100,10 @@ interface DynamicRegistrationActions {
    */
   transitionToConfirmationState(
     prevState: ConfirmationStateType,
-    newState: ConfirmationStateType
+    newState: ConfirmationStateType,
+    reviewing?: boolean
   ): void
-  error: (error?: Error) => void
+  transitionToReviewingState(prevState: ConfirmationStateType): void
 }
 
 /**
@@ -118,7 +128,7 @@ export type DynamicRegistrationWizardState =
     }
   | {
       _type: 'Error'
-      error?: Error | string
+      message: string
     }
   | ConfirmationState<'PermissionConfirmation'>
   | ConfirmationState<'PrivacyLevelConfirmation'>
@@ -129,7 +139,7 @@ export type DynamicRegistrationWizardState =
   | ConfirmationState<'Enabling'>
   | ConfirmationState<'DeletingDevKey'>
 
-type ConfirmationStateType = Exclude<
+export type ConfirmationStateType = Exclude<
   DynamicRegistrationWizardState['_type'],
   'RequestingToken' | 'WaitingForTool' | 'LoadingRegistration' | 'Error'
 >
@@ -138,26 +148,16 @@ type ReviewingStateType = Exclude<ConfirmationStateType, 'Enabling' | 'DeletingD
 /**
  * Helper for constructing a 'confirmation' state (a substate of the confirmation screen)
  */
-type ConfirmationState<Tag extends string> = {
+export type ConfirmationState<Tag extends string> = {
   _type: Tag
   registration: LtiImsRegistration
   overlayStore: RegistrationOverlayStore
   reviewing: boolean
 }
 
-const errorState = (
-  error?:
-    | {
-        _type: 'ApiParseError' | 'GenericError'
-        message: string
-      }
-    | {
-        _type: 'Exception'
-        error: Error
-      }
-): DynamicRegistrationWizardState => ({
+const errorState = (message: string): DynamicRegistrationWizardState => ({
   _type: 'Error',
-  error: error ? (error._type === 'Exception' ? error.error : error.message) : undefined,
+  message,
 })
 
 /**
@@ -247,7 +247,7 @@ type StateUpdater = (
  */
 export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistrationWizardService) =>
   create<{state: DynamicRegistrationWizardState} & DynamicRegistrationActions>(
-    (set: StateUpdater) => ({
+    (set: StateUpdater, get) => ({
       state: {_type: 'RequestingToken'},
       /**
        * Fetches a registration token from the dynamic registration URL
@@ -256,11 +256,16 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
        *
        * @param accountId
        * @param dynamicRegistrationUrl
+       * @param unifiedToolId included in token. optional.
        */
-      loadRegistrationToken: (accountId: AccountId, dynamicRegistrationUrl: string) => {
+      loadRegistrationToken: (
+        accountId: AccountId,
+        dynamicRegistrationUrl: string,
+        unifiedToolId: string = ''
+      ) => {
         set(stateFor({_type: 'RequestingToken'}))
         // eslint-disable-next-line promise/catch-or-return
-        service.fetchRegistrationToken(accountId).then(resp => {
+        service.fetchRegistrationToken(accountId, unifiedToolId).then(resp => {
           if (resp._type === 'success') {
             set(stateFor({_type: 'WaitingForTool', registrationToken: resp.data}))
             const onMessage = (message: MessageEvent) => {
@@ -285,60 +290,69 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
                     )
                     set(stateFor(confirmationState('PermissionConfirmation')(reg.data, store)))
                   } else {
-                    set(stateFor(errorState(reg)))
+                    set(stateFor(errorState(formatApiResultError(reg))))
                   }
                 })
               }
             }
             global.addEventListener('message', onMessage)
-          } else if (resp._type === 'Exception') {
-            set(stateFor(errorState(resp)))
           } else {
-            set(stateFor({_type: 'Error'}))
+            set(stateFor(errorState(formatApiResultError(resp))))
           }
         })
       },
       enableAndClose: async (
         accountId: AccountId,
-        registrationId: LtiImsRegistrationId,
+        imsRegistrationId: LtiImsRegistrationId,
+        registrationId: LtiRegistrationId,
         developerKeyId: DeveloperKeyId,
-        overlay: RegistrationOverlay
+        overlay: RegistrationOverlay,
+        adminNickname: string,
+        onSuccess: () => void
       ) => {
         set(stateFrom('Reviewing')(state => enabling(state.registration, state.overlayStore)))
-        const [a, b] = await Promise.all([
-          service.updateRegistrationOverlay(accountId, registrationId, overlay),
+        const [a, b, c] = await Promise.all([
+          service.updateRegistrationOverlay(accountId, imsRegistrationId, overlay),
           service.updateDeveloperKeyWorkflowState(accountId, developerKeyId, 'on'),
+          service.updateAdminNickname(accountId, registrationId, adminNickname),
         ])
         if (a._type !== 'success') {
-          set(stateFor(errorState(a)))
+          set(stateFor(errorState(formatApiResultError(a))))
         } else if (b._type !== 'success') {
-          set(stateFor(errorState(b)))
+          set(stateFor(errorState(formatApiResultError(b))))
+        } else if (c._type !== 'success') {
+          set(stateFor(errorState(formatApiResultError(c))))
+        } else {
+          onSuccess()
         }
       },
       deleteKey: async (prevState: ReviewingStateType, developerKeyId: DeveloperKeyId) => {
         set(stateFrom(prevState)(state => deleting(state.registration, state.overlayStore)))
         const result = await service.deleteDeveloperKey(developerKeyId)
         if (result._type !== 'success') {
-          set(stateFor(errorState(result)))
+          set(stateFor(errorState(formatApiResultError(result))))
         }
         return result
       },
       transitionToConfirmationState: (
         prevState: ConfirmationStateType,
-        newState: ConfirmationStateType
+        newState: ConfirmationStateType,
+        reviewing?: boolean
       ) =>
         set(
           stateFrom(prevState)(a => ({
             ...a,
+            reviewing: reviewing ?? a.reviewing,
             _type: newState,
           }))
         ),
-      error: (error?: Error) =>
+      transitionToReviewingState: (prevState: ConfirmationStateType) =>
         set(
-          stateFor({
-            _type: 'Error',
-            error,
-          })
+          stateFrom(prevState)(a => ({
+            ...a,
+            _type: 'Reviewing',
+            reviewing: true,
+          }))
         ),
     })
   )

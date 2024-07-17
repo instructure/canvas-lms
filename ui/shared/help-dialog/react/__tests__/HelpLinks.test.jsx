@@ -18,6 +18,10 @@ import React from 'react'
 import {fireEvent, render as testingLibraryRender, waitFor} from '@testing-library/react'
 import HelpLinks from '../HelpLinks'
 import {QueryProvider, queryClient} from '@canvas/query'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+
+// Mock the API call
+jest.mock('@canvas/do-fetch-api-effect')
 
 const render = children => testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
 
@@ -77,6 +81,7 @@ describe('HelpLinks', () => {
     delete global.window.location
     global.window = Object.create(window)
     global.window.location = {replace: mockedReplace}
+    doFetchApi.mockResolvedValueOnce({response: {status: 200, ok: true}})
     queryClient.setQueryData(['helpLinks'], [featuredLink, newLink, regularLink])
   })
 

@@ -21,7 +21,7 @@
 class DeveloperKeysController < ApplicationController
   before_action :set_key, only: [:update, :destroy]
   before_action :require_manage_developer_keys
-  before_action :require_root_account, only: [:index, :create]
+  before_action :require_root_account, only: %i[index create]
 
   include Api::V1::DeveloperKey
 

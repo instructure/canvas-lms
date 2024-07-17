@@ -8713,6 +8713,7 @@ uk:
       submit: "Зберегти %{model}"
       update: "Оновити %{model}"
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Ось відмінний шанс познайомитися з календарем і додати будь-які події, які ще не призначені на певну дату в цьому курсі. Не хвилюйтеся, ми допоможемо вам."
+  hh_mm_5faafa69: "гг:хв"
   hidden_130c3791: прихований
   hidden_14a032a7: Приховано
   hidden_available_with_a_link_65ef2bda: "Приховано. Доступно за посиланням"
@@ -16038,7 +16039,9 @@ uk:
       ways_to_contact_user: Зв'язатися
     recent_activity: 
       date_column: Дата
+      edit_group: "Редагувати групу"
       message_column: Повідомлення
+      new_announcement: Оголошення
       recent_activity: "Недавня активність"
       recent_activity_in_course: "Остання активність в %{course_or_group}"
       unread_column: Непрочитані
@@ -17343,6 +17346,7 @@ uk:
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Цей файл повинен мати набір usage_rights перед тим, як буде опублікований. "
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Ця тека закрита та зараз не доступна для перегляду."
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Ця оцінка виглядає по-іншому зі сторони студента, бо деякі завдання були заблоковані."
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: "Оцінка цього студента зараз відсутня."
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Це зображення виглядає як водяний знак для вашої сторінки. Сприйнятні формати: png, svg, gif, jpeg"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Це список URL, яким можна довіряти, відокремлених комами. Кожна URL в цьому списку буде обходити CSRF токен при вході до Canvas."
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Це функція, яка дозволяє розробляти адаптивний макет"
@@ -18806,6 +18810,7 @@ uk:
     other: "У вашому пошуку виявлено такі помилки:"
   your_submission_has_not_been_graded_yet_d6963e53: "Ваше відправлення ще не оцінено"
   your_time_for_this_quiz_has_been_reduced_394652e9: "Ваш час для цієї контрольної роботи було скорочено."
+  yyyy_mm_dd_cbbd9959: РРРР-ММ-ДД
   yyyy_mm_dd_hh_mm_a01b6081: "РРРР-ММ-ДД гг:хв"
   z_a_b48d8903: "Я - A"
   z_a_be2ab67c: Я–A

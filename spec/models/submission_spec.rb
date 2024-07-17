@@ -170,6 +170,40 @@ describe Submission do
     end
   end
 
+  describe "#tool_default_query_params" do
+    context "new quiz submissions" do
+      before do
+        @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+
+        @assignment.quiz_lti!
+        @assignment.save!
+      end
+
+      let(:submission) { @assignment.submissions.find_by!(user: @student) }
+
+      it "returns grade_by_question_enabled: true when grade by question is enabled" do
+        @teacher.update!(preferences: { enable_speedgrader_grade_by_question: true })
+        query_params = submission.tool_default_query_params(@teacher)
+        expect(query_params[:grade_by_question_enabled]).to be true
+      end
+
+      it "returns grade_by_question_enabled: false when grade by question is disabled" do
+        query_params = submission.tool_default_query_params(@teacher)
+        expect(query_params[:grade_by_question_enabled]).to be false
+      end
+    end
+
+    it "returns an empty array for a non-new-quiz submission" do
+      expect(submission.tool_default_query_params(@teacher)).to be_empty
+    end
+  end
+
   describe "#anonymous_id" do
     subject { submission.anonymous_id }
 
@@ -1089,6 +1123,34 @@ describe Submission do
         expect { submission.update!(score: 3, late_policy_status: "missing") }.to change {
           submission.score
         }.from(5).to(3)
+      end
+
+      it "deducts nothing if the submission is for a checkpointed discussion" do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        cd = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: cd,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 3.hours.ago(@date) }],
+          points_possible: 5
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: cd,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 3.hours.ago(@date) }],
+          points_possible: 5,
+          replies_required: 1
+        )
+        cd_submission = cd.assignment.submissions.find_by!(user: @student)
+
+        Timecop.freeze(@date) do
+          cd.discussion_entries.create!(user: @student, message: "reply to topic")
+          cd.discussion_entries.create!(user: @student, message: "reply to entry", parent_id: cd.discussion_entries.first.id)
+          cd_submission.score = 10
+          cd_submission.save!
+          expect(cd_submission.points_deducted).to be_nil
+        end
       end
     end
 
@@ -3698,13 +3760,40 @@ describe Submission do
     end
   end
 
-  context "#external_tool_url" do
-    let(:submission) { Submission.new }
-    let(:lti_submission) { @assignment.submit_homework @user, submission_type: "basic_lti_launch", url: "http://www.example.com" }
+  describe "#not_submitted?" do
+    let(:submission) { @assignment.submissions.find_by(user: @student) }
 
-    context 'submission_type of "basic_lti_launch"' do
+    it "returns true if the workflow state is unsubmitted (same as unsubmitted?)" do
+      expect(submission).to be_unsubmitted
+      expect(submission).to be_not_submitted
+    end
+
+    it "returns true if the student has been graded but has not submitted (different from unsubmitted?)" do
+      @assignment.grade_student(@student, grade: 3, grader: @teacher)
+      expect(submission).not_to be_unsubmitted
+      expect(submission).to be_not_submitted
+    end
+
+    it "returns false if the student has submitted (same as unsubmitted?)" do
+      @assignment.submit_homework(@student, body: "hi")
+      expect(submission).not_to be_unsubmitted
+      expect(submission).not_to be_not_submitted
+    end
+  end
+
+  describe "#external_tool_url" do
+    let(:submission) { Submission.new }
+    let(:lti_submission) { @assignment.submit_homework(@user, submission_type: "basic_lti_launch", url: "http://www.example.com") }
+
+    context "submission_type of 'basic_lti_launch'" do
       it "returns a url containing the submitted url" do
         expect(lti_submission.external_tool_url).to eq(lti_submission.url)
+      end
+
+      it "accepts query params to be included in the URL" do
+        url = lti_submission.external_tool_url(query_params: { foo: false })
+        query_params = Rack::Utils.parse_query(URI(url).query)
+        expect(query_params["foo"]).to eq("false")
       end
     end
 

@@ -17,12 +17,34 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import {type EnrollmentType, PROVIDER, RECIPIENT} from '../types'
 import TempEnrollUsersListRow, {generateIcon, generateTooltipText} from '../TempEnrollUsersListRow'
 
 describe('TempEnrollUsersListRow', () => {
+  const defaultProps = {
+    user: {
+      id: '1',
+      name: 'user1',
+    },
+    permissions: {
+      can_add_teacher: true,
+      can_add_ta: true,
+      can_add_student: true,
+      can_add_observer: true,
+      can_add_designer: true,
+      can_read_sis: true,
+      can_manage_admin_users: true,
+      can_add_temporary_enrollments: true,
+      can_edit_temporary_enrollments: true,
+      can_delete_temporary_enrollments: true,
+    },
+    roles: [{id: '2', name: 'Student', label: 'student', base_role_name: 'StudentEnrollmnet'}],
+  }
+
+  const STATUS_URL = `/api/v1/users/${defaultProps.user.id}/temporary_enrollment_status`
+
   describe('helper functions', () => {
     describe('generateTooltipText', () => {
       it('returns correct tooltip for PROVIDER role', () => {
@@ -56,6 +78,94 @@ describe('TempEnrollUsersListRow', () => {
         const defaultIcon = generateIcon('some_other_role')
         expect(defaultIcon.props.color).toBeUndefined()
       })
+    })
+  })
+
+  describe('render tooltips', () => {
+    afterEach(() => {
+      fetchMock.restore()
+    })
+
+    it('no icons', async () => {
+      fetchMock.get(STATUS_URL, {is_provider: false, is_recipient: false, can_provide: false})
+      const {queryByTestId} = render(<TempEnrollUsersListRow {...defaultProps} />)
+      await waitFor(() => expect(queryByTestId('user-list-row-tooltip')).toBeNull())
+    })
+
+    it('only can provide', async () => {
+      fetchMock.get(STATUS_URL, {is_provider: false, is_recipient: false, can_provide: true})
+      const {findAllByText} = render(<TempEnrollUsersListRow {...defaultProps} />)
+      expect(
+        await findAllByText(`Create Temporary Enrollment Pairing for ${defaultProps.user.name}`)
+      ).toBeTruthy()
+    })
+
+    it('only recipient', async () => {
+      fetchMock.get(STATUS_URL, {is_provider: false, is_recipient: true, can_provide: false})
+      const {findAllByText} = render(<TempEnrollUsersListRow {...defaultProps} />)
+      expect(
+        await findAllByText(`Manage Temporary Enrollment Providers for ${defaultProps.user.name}`)
+      ).toBeTruthy()
+    })
+
+    it('can provide and is providing', async () => {
+      fetchMock.get(STATUS_URL, {is_provider: true, is_recipient: false, can_provide: true})
+      const {findAllByText} = render(<TempEnrollUsersListRow {...defaultProps} />)
+      expect(
+        await findAllByText(`Manage Temporary Enrollment Recipients for ${defaultProps.user.name}`)
+      ).toBeTruthy()
+    })
+
+    it('can provide and is recipient', async () => {
+      fetchMock.get(STATUS_URL, {is_provider: false, is_recipient: true, can_provide: true})
+      const {findAllByText} = render(<TempEnrollUsersListRow {...defaultProps} />)
+      expect(
+        await findAllByText(`Create Temporary Enrollment Pairing for ${defaultProps.user.name}`)
+      ).toBeTruthy()
+      expect(
+        await findAllByText(`Manage Temporary Enrollment Providers for ${defaultProps.user.name}`)
+      ).toBeTruthy()
+    })
+
+    it('is providing and is recipient', async () => {
+      fetchMock.get(STATUS_URL, {is_provider: true, is_recipient: true, can_provide: true})
+      const {findAllByText} = render(<TempEnrollUsersListRow {...defaultProps} />)
+      expect(
+        await findAllByText(`Manage Temporary Enrollment Recipients for ${defaultProps.user.name}`)
+      ).toBeTruthy()
+      expect(
+        await findAllByText(`Manage Temporary Enrollment Providers for ${defaultProps.user.name}`)
+      ).toBeTruthy()
+    })
+  })
+
+  describe('permissions', () => {
+    afterEach(() => {
+      fetchMock.restore()
+    })
+
+    beforeEach(() => {
+      fetchMock.get(STATUS_URL, {is_provider: true, can_provide: true, is_recipient: true})
+    })
+
+    it('renders all tooltips when permissions true', async () => {
+      const {findAllByTestId} = render(<TempEnrollUsersListRow {...defaultProps} />)
+      expect((await findAllByTestId('user-list-row-tooltip')).length).toBe(2)
+    })
+
+    it('renders no tooltips when permissions are false', async () => {
+      const noPermission = {
+        ...defaultProps,
+        permissions: {
+          ...defaultProps.permissions,
+          can_edit_users: false,
+          can_manage_admin_users: false,
+          can_masquerade: false,
+          can_message_users: false,
+        },
+      }
+      const {queryByTestId} = render(<TempEnrollUsersListRow {...noPermission} />)
+      await waitFor(() => expect(queryByTestId('user-list-row-tooltip')).toBeNull())
     })
   })
 
@@ -94,26 +204,6 @@ describe('TempEnrollUsersListRow', () => {
       expect(avatar?.getAttribute('src')).toBe(defaultProps.user.avatar_url)
     })
 
-    it('renders all tooltips when permissions true', async () => {
-      render(<TempEnrollUsersListRow {...defaultProps} />)
-      expect(screen.getAllByRole('tooltip').length).toBe(3)
-    })
-
-    it('renders no tooltips when permissions are false', async () => {
-      const noPermission = {
-        ...defaultProps,
-        permissions: {
-          ...defaultProps.permissions,
-          can_edit_users: false,
-          can_manage_admin_users: false,
-          can_masquerade: false,
-          can_message_users: false,
-        },
-      }
-      render(<TempEnrollUsersListRow {...noPermission} />)
-      expect(screen.queryByRole('tooltip')).toBeNull()
-    })
-
     describe('temporary enrollments', () => {
       let temporaryEnrollmentProps
 
@@ -144,11 +234,6 @@ describe('TempEnrollUsersListRow', () => {
 
       afterEach(() => {
         fetchMock.restore()
-      })
-
-      it('renders all tooltips when permissions true', async () => {
-        const tooltips = screen.getAllByRole('tooltip')
-        expect(tooltips.length).toBe(5)
       })
 
       describe('SVG Icons for temporary enrollments', () => {

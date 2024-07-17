@@ -101,7 +101,7 @@ export const RubricPopover = ({
         renderTrigger={
           <IconButton
             renderIcon={IconMoreLine}
-            screenReaderLabel={I18n.t('Rubric Options')}
+            screenReaderLabel={I18n.t('Rubric options for %{rubricTitle}', {rubricTitle: title})}
             data-testid={`rubric-options-${id}-button`}
           />
         }

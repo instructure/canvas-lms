@@ -74,7 +74,7 @@ describe('DynamicRegistrationModal', () => {
       expect(iframe).toBeInTheDocument()
       expect(iframe).toHaveAttribute(
         'src',
-        'http://localhost/?foo=bar&openid_configuration=http%3A%2F%2Fcanvas.instructure.com&registration_token=abc'
+        '/api/lti/accounts/1/dr_iframe?url=http%3A%2F%2Flocalhost%2F%3Ffoo%3Dbar%26openid_configuration%3Dhttp%253A%252F%252Fcanvas.instructure.com%26registration_token%3Dabc'
       )
     })
 

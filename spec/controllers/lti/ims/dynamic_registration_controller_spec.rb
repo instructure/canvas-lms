@@ -23,7 +23,7 @@ describe Lti::IMS::DynamicRegistrationController do
   let(:controller_routes) do
     dynamic_registration_routes = []
     CanvasRails::Application.routes.routes.each do |route|
-      dynamic_registration_routes << route if route.defaults[:controller] == "lti/ims/dynamic_registration"
+      dynamic_registration_routes << route if route.defaults[:controller] == "lti/ims/dynamic_registration" && route.defaults[:action] != "dr_iframe"
     end
 
     dynamic_registration_routes
@@ -105,6 +105,7 @@ describe Lti::IMS::DynamicRegistrationController do
           initiated_at: 1.minute.ago,
           root_account_global_id: Account.default.global_id,
           uuid: SecureRandom.uuid,
+          unified_tool_id: "asdf"
         }
       end
       let(:valid_token) do
@@ -140,6 +141,7 @@ describe Lti::IMS::DynamicRegistrationController do
           expect(created_registration).not_to be_nil
           expect(parsed_body["https://purl.imsglobal.org/spec/lti-tool-configuration"]["https://canvas.instructure.com/lti/registration_config_url"]).to eq "http://test.host/api/lti/registrations/#{created_registration.global_id}/view"
           expect(created_registration.canvas_configuration["custom_fields"]).to eq({ "global_foo" => "global_bar" })
+          expect(created_registration.unified_tool_id).to eq("asdf")
         end
 
         it "fills in values on the developer key" do
@@ -266,6 +268,8 @@ describe Lti::IMS::DynamicRegistrationController do
       get :registration_token, params: { account_id: Account.default.id }
     end
 
+    let(:token) { JSON::JWT.decode(response.parsed_body["token"], :skip_verification) }
+
     before do
       account_admin_user(account: Account.default)
       user_session(@admin)
@@ -279,6 +283,31 @@ describe Lti::IMS::DynamicRegistrationController do
     it "uses iss domain in config url" do
       subject
       expect(response.parsed_body["oidc_configuration_url"]).to include(Canvas::Security.config["lti_iss"])
+    end
+
+    it "does not include unified_tool_id in token" do
+      subject
+      expect(token[:unified_tool_id]).to be_nil
+    end
+
+    context "with unified_tool_id parameter" do
+      subject { get :registration_token, params: { account_id: Account.default.id, unified_tool_id: } }
+
+      let(:unified_tool_id) { "asdf" }
+
+      it "includes unified_tool_id in token" do
+        subject
+        expect(token[:unified_tool_id]).to eq(unified_tool_id)
+      end
+
+      context "is empty string" do
+        let(:unified_tool_id) { "" }
+
+        it "includes nil in token" do
+          subject
+          expect(token[:unified_tool_id]).to be_nil
+        end
+      end
     end
 
     context "in local dev" do
@@ -312,6 +341,63 @@ describe Lti::IMS::DynamicRegistrationController do
           expect(response.parsed_body["oidc_configuration_url"]).to include("https://")
         end
       end
+    end
+  end
+
+  describe "#dr_iframe" do
+    before do
+      account_admin_user(account: Account.default)
+      Account.default.root_account.enable_feature! :javascript_csp
+      Account.default.root_account.enable_csp!
+      user_session(@admin)
+    end
+
+    it "must include the url parameter" do
+      get :dr_iframe, params: { account_id: Account.default.id }
+      expect(response).to be_bad_request
+    end
+
+    it "returns unauthorized if jwt is expired" do
+      expired_jwt = Canvas::Security.create_jwt({
+                                                  user_id: @admin.id,
+                                                  root_account_global_id: Account.default.id
+                                                },
+                                                5.minutes.ago)
+      get :dr_iframe, params: { account_id: Account.default.id, url: "http://testexample.com?registration_token=#{expired_jwt}" }
+      expect(response).to be_unauthorized
+    end
+
+    it "returns unauthorized if jwt is issued for other account" do
+      expired_jwt = Canvas::Security.create_jwt({
+                                                  user_id: @admin.id,
+                                                  root_account_global_id: 123
+                                                },
+                                                5.minutes.from_now)
+      get :dr_iframe, params: { account_id: Account.default.id, url: "http://testexample.com?registration_token=#{expired_jwt}" }
+      expect(response).to be_unauthorized
+      expect(response.headers["Content-Security-Policy"]).not_to include("testexample.com")
+    end
+
+    it "returns unauthorized if jwt is issued for other user" do
+      expired_jwt = Canvas::Security.create_jwt({
+                                                  user_id: 123,
+                                                  root_account_global_id: Account.default.id
+                                                },
+                                                5.minutes.from_now)
+      get :dr_iframe, params: { account_id: Account.default.id, url: "http://testexample.com?registration_token=#{expired_jwt}" }
+      expect(response).to be_unauthorized
+      expect(response.headers["Content-Security-Policy"]).not_to include("testexample.com")
+    end
+
+    it "adds url to CSP whitelist if registration_token is valid" do
+      valid_jwt = Canvas::Security.create_jwt({
+                                                user_id: @admin.id,
+                                                root_account_global_id: Account.default.global_id
+                                              },
+                                              5.minutes.from_now)
+      get :dr_iframe, params: { account_id: Account.default.id, url: "http://testexample.com?registration_token=#{valid_jwt}" }
+      expect(response).to be_successful
+      expect(response.headers["Content-Security-Policy"]).to include("testexample.com")
     end
   end
 end

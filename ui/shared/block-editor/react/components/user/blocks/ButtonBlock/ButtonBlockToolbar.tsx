@@ -22,16 +22,11 @@ import {useNode} from '@craftjs/core'
 import {IconButton} from '@instructure/ui-buttons'
 import {Menu, type MenuItemProps, type MenuItem} from '@instructure/ui-menu'
 import {Flex} from '@instructure/ui-flex'
-import {
-  IconLinkLine,
-  IconTextBackgroundColorLine,
-  IconButtonAndIconMakerLine,
-  IconBoxLine,
-} from '@instructure/ui-icons'
+import {IconLinkLine, IconButtonAndIconMakerLine, IconBoxLine} from '@instructure/ui-icons'
 
 import {LinkModal} from '../../../editor/LinkModal'
 import {ColorModal} from '../../common/ColorModal'
-
+import {IconBackgroundColor} from '../../../../assets/internal-icons'
 import {isInstuiButtonColor} from './common'
 import type {ButtonBlockProps, ButtonSize, ButtonVariant} from './common'
 import {IconPopup} from '../../common/IconPopup'
@@ -181,7 +176,7 @@ const ButtonBlockToolbar = () => {
         disabled={props.variant === 'condensed'}
         onClick={handleColorButtonClick}
       >
-        <IconTextBackgroundColorLine size="x-small" />
+        <IconBackgroundColor size="x-small" />
       </IconButton>
 
       <IconPopup />

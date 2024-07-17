@@ -27,7 +27,12 @@ import {formatNumber, scorePercentageToLetterGrade, getTotal, filteredAssignment
 
 const I18n = useI18nScope('grade_summary')
 
-export const totalRow = (queryData, calculateOnlyGradedAssignments = false, courseLevelGrades) => {
+export const totalRow = (
+  queryData,
+  calculateOnlyGradedAssignments = false,
+  courseLevelGrades,
+  overrideGrade
+) => {
   const applicableAssignments = filteredAssignments(queryData, calculateOnlyGradedAssignments)
   let total = getTotal(
     applicableAssignments,
@@ -52,9 +57,10 @@ export const totalRow = (queryData, calculateOnlyGradedAssignments = false, cour
       : `${formatNumber(percentageFromCourseLevelGrades)}%`
 
   const letterGrade =
-    total === ASSIGNMENT_NOT_APPLICABLE
+    overrideGrade ||
+    (total === ASSIGNMENT_NOT_APPLICABLE
       ? total
-      : scorePercentageToLetterGrade(percentageFromCourseLevelGrades, queryData?.gradingStandard)
+      : scorePercentageToLetterGrade(percentageFromCourseLevelGrades, queryData?.gradingStandard))
 
   const earnedPoints = formatNumber(courseLevelScore) || '-'
   const totalPoints = formatNumber(courseLevelPossible) || '-'

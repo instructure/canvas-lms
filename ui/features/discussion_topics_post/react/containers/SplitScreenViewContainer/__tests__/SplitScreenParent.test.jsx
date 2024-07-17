@@ -302,4 +302,38 @@ describe('SplitScreenParent', () => {
       expect(container.getByText('Anonymous 1')).toBeInTheDocument()
     })
   })
+
+  describe('rating', () => {
+    it('should react on liked', async() => {
+      const onToggleRating = jest.fn()
+      const {queryByTestId} = setup(
+        defaultProps({
+            overrides: {onToggleRating}
+        })
+      )
+      const likeButton = await queryByTestId('not-liked-icon')
+      expect(likeButton).toBeInTheDocument();
+      fireEvent.click(likeButton)
+      expect(onToggleRating).toHaveBeenCalled()
+    })
+
+    it('should react on not_liked', async() => {
+      const onToggleRating = jest.fn()
+      const {queryByTestId} = setup(
+        defaultProps(
+          {
+            discussionEntryOverrides: {
+              entryParticipant: {
+                rating: true,
+              },
+            }, overrides: {onToggleRating}
+          })
+      )
+      const likeButton = await queryByTestId('liked-icon')
+      expect(likeButton).toBeInTheDocument();
+      fireEvent.click(likeButton)
+      expect(onToggleRating).toHaveBeenCalled()
+    })
+
+  })
 })

@@ -16,30 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+
+import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {HistoryEntry} from '../../../../api.d'
 
-export default function historyQuery(): Promise<HistoryEntry[]> {
-  return new Promise((resolve, reject) => {
-    const data: HistoryEntry[] = []
-    const firstPageUrl = '/api/v1/users/self/history'
+const HISTORY_PATH = '/api/v1/users/self/history'
 
-    function load(url: string) {
-      $.getJSON(
-        url,
-        (newData: HistoryEntry[], _: any, xhr: XMLHttpRequest) => {
-          data.push(...newData)
-          const link = parseLinkHeader(xhr)
-          if (link.next) {
-            load(link.next)
-          } else {
-            resolve(data)
-          }
-        },
-        reject
-      )
-    }
-    load(firstPageUrl)
-  })
+async function historyQuery({signal}: QueryFunctionContext): Promise<HistoryEntry[]> {
+  const data: Array<HistoryEntry> = []
+  const fetchOpts = {signal}
+  let path = HISTORY_PATH
+
+  while (path) {
+    // eslint-disable-next-line no-await-in-loop
+    const {json, link} = await doFetchApi<HistoryEntry[]>({path, fetchOpts})
+    if (json) data.push(...json)
+    path = link?.next?.url || null
+  }
+  return data
 }
+
+export default historyQuery

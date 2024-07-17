@@ -195,6 +195,29 @@ describe "Accounts API", type: :request do
                                         "Account 2"]
     end
 
+    it "includes course count if requested" do
+      2.times { course_factory(active_all: true, account: @a1.sub_accounts.find_by(name: "subby")) }
+      json = api_call(:get,
+                      "/api/v1/accounts/#{@a1.id}/sub_accounts?include[]=course_count",
+                      { controller: "accounts",
+                        action: "sub_accounts",
+                        account_id: @a1.id.to_s,
+                        format: "json",
+                        include: ["course_count"] })
+      expect(json.pluck("course_count")).to match_array([2, 0, 0, 0])
+    end
+
+    it "includes sub-account count if requested" do
+      json = api_call(:get,
+                      "/api/v1/accounts/#{@a1.id}/sub_accounts?include[]=sub_account_count",
+                      { controller: "accounts",
+                        action: "sub_accounts",
+                        account_id: @a1.id.to_s,
+                        format: "json",
+                        include: ["sub_account_count"] })
+      expect(json.pluck("sub_account_count")).to match_array([0, 0, 3, 3])
+    end
+
     it "adds sub account" do
       previous_sub_count = @a1.sub_accounts.size
       api_call(:post,
@@ -330,6 +353,23 @@ describe "Accounts API", type: :request do
                       { controller: "accounts", action: "index", format: "json", include: ["lti_guid"] },
                       {})
       expect(json[0]["lti_guid"]).to eq "hey"
+    end
+
+    it "includes course count if requested" do
+      2.times { course_factory(active_all: true, account: @a1) }
+      json = api_call(:get,
+                      "/api/v1/accounts?include[]=course_count",
+                      { controller: "accounts", action: "index", format: "json", include: ["course_count"] },
+                      {})
+      expect(json.pluck("course_count")).to match_array([2, 0])
+    end
+
+    it "includes sub-account count if requested" do
+      json = api_call(:get,
+                      "/api/v1/accounts?include[]=sub_account_count",
+                      { controller: "accounts", action: "index", format: "json", include: ["sub_account_count"] },
+                      {})
+      expect(json.pluck("sub_account_count")).to match_array([0, 2])
     end
 
     context "when the includes query param includes 'global_id'" do
@@ -997,6 +1037,96 @@ describe "Accounts API", type: :request do
                  "/api/v1/accounts/#{@a2.id}",
                  { controller: "accounts", action: "update", id: @a2.to_param, format: "json" },
                  { account: { course_template_id: 0 } })
+      end
+    end
+
+    context "PUT update_api" do
+      let_once(:valid_attributes) { { minimum_character_length: 10, maximum_login_attempts: 5 } }
+      let_once(:invalid_attributes) { { minimum_character_length: 2, maximum_login_attempts: 30 } }
+      let_once(:non_integer_attributes) { { minimum_character_length: "ten", maximum_login_attempts: "five" } }
+      let_once(:password_policy_settings) do
+        {
+          allow_login_suspension: true,
+          require_number_characters: true,
+          require_symbol_characters: true,
+          minimum_character_length: 10,
+          maximum_login_attempts: 5,
+          bogus_setting: "bogus"
+        }
+      end
+
+      context "when password complexity feature is enabled" do
+        before do
+          @a1.root_account.enable_feature!(:password_complexity)
+        end
+
+        it "accepts valid password policy settings" do
+          json = api_call(:put,
+                          "/api/v1/accounts/#{@a1.id}",
+                          { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                          { account: { settings: { password_policy: valid_attributes } } })
+
+          expect(response).to have_http_status(:ok)
+          expect(json).not_to have_key("errors")
+        end
+
+        it "rejects password policy settings outside allowed range" do
+          json = api_call(:put,
+                          "/api/v1/accounts/#{@a1.id}",
+                          { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                          { account: { settings: { password_policy: invalid_attributes } } })
+
+          expect(response).to have_http_status(:bad_request)
+          expect(json).to have_key("errors")
+          expect(json["errors"]["minimum_character_length"].first["message"]).to match(/must be at least/i)
+          expect(json["errors"]["maximum_login_attempts"].first["message"]).to match(/must not exceed/i)
+        end
+
+        it "rejects non-integer password policy settings" do
+          json = api_call(:put,
+                          "/api/v1/accounts/#{@a1.id}",
+                          { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                          { account: { settings: { password_policy: non_integer_attributes } } })
+
+          expect(response).to have_http_status(:bad_request)
+          expect(json).to have_key("errors")
+          expect(json["errors"]["minimum_character_length"].first["message"]).to match(/an integer value is required/i)
+          expect(json["errors"]["maximum_login_attempts"].first["message"]).to match(/an integer value is required/i)
+        end
+
+        it "merges password policy settings into account settings upon successful validation" do
+          api_call(:put,
+                   "/api/v1/accounts/#{@a1.id}",
+                   { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                   { account: { settings: { password_policy: password_policy_settings } } })
+
+          @a1.reload
+          expect(@a1.settings).to have_key(:password_policy)
+          expect(@a1.settings[:password_policy]).not_to have_key(:bogus_setting)
+          expect(@a1.settings[:password_policy][:allow_login_suspension]).to be_truthy
+          expect(@a1.settings[:password_policy][:require_number_characters]).to be_truthy
+          expect(@a1.settings[:password_policy][:require_symbol_characters]).to be_truthy
+          expect(@a1.settings[:password_policy][:minimum_character_length]).to eq("10")
+          expect(@a1.settings[:password_policy][:maximum_login_attempts]).to eq("5")
+        end
+      end
+
+      context "when password complexity feature is not enabled" do
+        before do
+          @a1.root_account.disable_feature!(:password_complexity)
+        end
+
+        it "only includes permitted API account settings" do
+          api_call(:put,
+                   "/api/v1/accounts/#{@a1.id}",
+                   { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                   { account: { settings: { restrict_student_past_view: { value: true, locked: false },
+                                            password_policy: password_policy_settings } } })
+
+          @a1.reload
+          expect(@a1.restrict_student_past_view).to eq({ value: true, locked: false })
+          expect(@a1.settings).not_to have_key(:password_policy)
+        end
       end
     end
   end
@@ -2027,6 +2157,35 @@ describe "Accounts API", type: :request do
       json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
       expect(json["microsoft_sync_enabled"]).to be(true)
       expect(json["microsoft_sync_tenant"]).to eq("testtenant.com")
+    end
+
+    context "password complexity" do
+      let_once(:policy_settings) do
+        {
+          allow_login_suspension: "true",
+          require_number_characters: "true",
+          require_symbol_characters: "true",
+          minimum_character_length: "10",
+          maximum_login_attempts: "3",
+        }
+      end
+
+      it "exposes password policy settings when feature is enabled" do
+        @a1.enable_feature!(:password_complexity)
+        @a1.settings = { password_policy: policy_settings }
+        @a1.save!
+        json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
+        expect(json["password_policy"]).to be_present
+        expect(json["password_policy"]).to eq policy_settings.stringify_keys
+      end
+
+      it "does not return password policy settings when feature is not enabled" do
+        @a1.disable_feature!(:password_complexity)
+        @a1.settings = { password_policy: policy_settings }
+        @a1.save!
+        json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
+        expect(json["password_policy"]).not_to be_present
+      end
     end
   end
 

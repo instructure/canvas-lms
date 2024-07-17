@@ -86,7 +86,6 @@ function renderRow(props) {
   const tbody = document.createElement('tbody')
   table.appendChild(tbody)
   document.body.appendChild(table)
-  window.ENV.FEATURES = {top_navigation_placement: true}
   return render(
     <ExternalToolsTableRow
       tool={tools[0]}

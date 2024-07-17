@@ -217,13 +217,14 @@ RSpec.shared_examples "DiscussionType" do
     expect(discussion_type.resolve("replyToEntryRequiredCount")).to eq discussion.reply_to_entry_required_count
   end
 
-  it "orders root_entries by last_reply_at" do
+  it "orders root_entries by their created_at" do
     de = discussion.discussion_entries.create!(message: "root entry", user: @teacher)
     de2 = discussion.discussion_entries.create!(message: "root entry", user: @teacher)
     de3 = discussion.discussion_entries.create!(message: "root entry", user: @teacher)
+    # adding a discussion entry should NOT impact sort order of root entries
     discussion.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: de2.id)
-    expect(discussion_type.resolve("discussionEntriesConnection(sortOrder: asc, rootEntries: true) { nodes { _id } }")).to eq [de.id, de3.id, de2.id].map(&:to_s)
-    expect(discussion_type.resolve("discussionEntriesConnection(sortOrder: desc, rootEntries: true) { nodes { _id } }")).to eq [de2.id, de3.id, de.id].map(&:to_s)
+    expect(discussion_type.resolve("discussionEntriesConnection(sortOrder: asc, rootEntries: true) { nodes { _id } }")).to eq [de.id, de2.id, de3.id].map(&:to_s)
+    expect(discussion_type.resolve("discussionEntriesConnection(sortOrder: desc, rootEntries: true) { nodes { _id } }")).to eq [de3.id, de2.id, de.id].map(&:to_s)
     discussion.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: de3.id)
     expect(discussion_type.resolve("discussionEntriesConnection(sortOrder: desc, rootEntries: true) { nodes { _id } }")).to eq [de3.id, de2.id, de.id].map(&:to_s)
   end

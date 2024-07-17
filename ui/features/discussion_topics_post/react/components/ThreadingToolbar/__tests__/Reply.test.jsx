@@ -66,6 +66,12 @@ describe('Reply', () => {
     expect(onClickMock.mock.calls.length).toBe(1)
   })
 
+  it('shows icon on desktop view', () => {
+    const {container} = setup()
+    const icon = container.querySelector('svg')
+    expect(icon).toBeTruthy()
+  })
+
   describe('Mobile', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
@@ -79,6 +85,12 @@ describe('Reply', () => {
       expect(container.getByTestId('threading-toolbar-reply').parentNode).toHaveStyle(
         'margin: 0px 0.75rem 0px 0px'
       )
+    })
+
+    it('does not show icon on desktop view', () => {
+      const {container} = setup()
+      const icon = container.querySelector('svg')
+      expect(icon).toBeFalsy()
     })
   })
 })

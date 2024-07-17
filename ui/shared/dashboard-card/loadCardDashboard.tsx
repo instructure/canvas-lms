@@ -25,8 +25,8 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {asJson, checkStatus, getPrefetchedXHR} from '@canvas/util/xhr'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {Card} from './types'
-import {fetchDashboardCardsAsync, mapDashboardResponseToCard} from './dashboardCardsQuery'
-import {sortByPosition} from './util/dashboardUtils'
+import {fetchDashboardCardsAsync} from './dashboardCardQueries'
+import {sortByPosition, mapDashboardResponseToCard} from './util/dashboardUtils'
 
 const I18n = useI18nScope('load_card_dashboard')
 

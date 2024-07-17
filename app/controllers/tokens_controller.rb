@@ -17,11 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# @API Access Tokens
 class TokensController < ApplicationController
+  include Api::V1::Json
+
   before_action :require_registered_user
   before_action { |c| c.active_tab = "profile" }
   before_action :require_password_session
-  before_action :require_non_masquerading, except: :show
+  before_action :require_non_masquerading, except: [:destroy, :show]
 
   def require_non_masquerading
     render_unauthorized_action if @real_current_user
@@ -38,12 +41,6 @@ class TokensController < ApplicationController
     end
   end
 
-  def destroy
-    @token = @current_user.access_tokens.find(params[:id])
-    @token.destroy
-    render json: @token.as_json(include_root: false)
-  end
-
   def update
     @token = @current_user.access_tokens.find(params[:id])
     if @token.update(access_token_params)
@@ -56,6 +53,29 @@ class TokensController < ApplicationController
   def show
     @token = @current_user.access_tokens.find(params[:id])
     render json: @token.as_json(include_root: false, methods: [:app_name, :visible_token])
+  end
+
+  #
+  # @API Delete an access token
+  #
+  # The ID can be the actual database ID of the token, or the 'token_hint' value.
+  #
+  def destroy
+    get_context
+    if (hint = AccessToken.token_hint?(params[:id]))
+      token = @context.access_tokens.find_by(token_hint: hint)
+    end
+    token ||= @context.access_tokens.find(params[:id])
+
+    # this is a unique API where we check against the real current user first if masquerading,
+    # since that's currently the only way that an admin can view another user's tokens at the moment
+    unless (@real_current_user && token.grants_right?(@real_current_user, session, :delete)) ||
+           token.grants_right?(@current_user, session, :delete)
+      return render_unauthorized_action
+    end
+
+    token.destroy
+    render json: api_json(token, @current_user, session)
   end
 
   private

@@ -8306,6 +8306,7 @@ hy:
   here_are_your_assignments_listed_by_due_date_7d8e98e6: "Սրանք Ձեր հանձնարարություններն են, որոնք թվարկված ըստ կատարման ժամկետների:"
   here_f44564ee: այստեղ
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Սահիանալի հնարավորություն է օրացույցին ծանոթանալու և հանձնարարությունների հետ չկապված միջոցառումներ ավելացնելու համար: Դրանք Դուք կարող եք կազմակերպել դասընթացի ժամանակ:  Մենք կարող ենք աջակցել Ձեզ այդ հարցում:  "
+  hh_mm_5faafa69: "hh:mm"
   hidden_130c3791: Անտեսանելի
   hidden_14a032a7: Անտեսանելի
   hidden_available_with_a_link_65ef2bda: "Անտեսանելի: Հասանելի է հղումն օգտագործելիս"
@@ -15322,7 +15323,9 @@ hy:
       user_has_no_bio: "%{user}ը կենսագրական տվյալներ չի ավելացրել"
     recent_activity: 
       date_column: Ամսաթիվ
+      edit_group: "Խմբագրել խումբը"
       message_column: Հաղորդագրություն
+      new_announcement: Հայտարարություն
       recent_activity: "Վերջին գործունեությունն"
       recent_activity_in_course: "Վերջին Գործունեություններ %{course_or_group}"
       unread_column: Չընթերցված
@@ -16438,6 +16441,7 @@ hy:
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Մինչև այս ֆայլի հրապարակումը անհրաժեշտ է սահմանել usage_rights:"
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Այս թղթապանակը այս պահին արգելափակված է և հասանելի չէ դիտելու համար:"
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Այս գնահատականը տարբերվում է ունկնդրի համար տեսանելի գնահատականից, քանի որ որոշ հանձնարարությունների  \"համր\" ֆունկցիան միացված է:"
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: " Այս գնահատականը այս ունկնդրի համար ներկայումս հանվել է:"
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Այս պատկերը հանդիսանում է Ձեր էջ ֆոնային պատկերը: Ընդունելի ձևաչափեր՝ png, svg, gif, jpeg"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Սա URL-հասցեների ստորակետներով բաժանված վստահելի  ցուցակ է: Այս ցուցակում ընդգրկված որևէ URL-ին վստահելը կնշանակի, որ այնտեղից Canvas մուտք գործելիս բաց է թողնվելու CSRF token-ը:"
   this_is_a_group_discussion_2f9acdae: "Սա խմբային քննարկում է "
@@ -17631,6 +17635,7 @@ hy:
     one: "Ձեր որոնումների ժամանակ տեղի է ունեցել հետևյալ սխալը."
     other: "Ձեր որոնման ժամանակ տեղի են ունեցել հետևյալ սխալները՝"
   your_submission_has_not_been_graded_yet_d6963e53: "Ձեր կողմից ուղարկված աշխատանքը դեռեւս չի գնահատվել"
+  yyyy_mm_dd_cbbd9959: YYYY-MM-DD
   yyyy_mm_dd_hh_mm_a01b6081: "տարի-ամիս-օր ժամ:րոպե"
   zendesk: 
     engine: 

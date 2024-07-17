@@ -2009,6 +2009,90 @@ describe "discussions" do
 
             expect(assignment.important_dates).to be(true)
           end
+
+          context "post to sis" do
+            before do
+              course.account.set_feature_flag! "post_grades", "on"
+              course.account.set_feature_flag! :new_sis_integrations, "on"
+              course.account.settings[:sis_syncing] = { value: true, locked: false }
+              course.account.settings[:sis_require_assignment_due_date] = { value: true }
+              course.account.save!
+            end
+
+            it "default value is false" do
+              get "/courses/#{course.id}/discussion_topics/new"
+              Discussion.click_graded_checkbox
+              expect(is_checked(Discussion.sync_to_sis_checkbox_selector)).to be_falsey
+            end
+
+            it "blocks when enabled", :ignore_js_errors do
+              get "/courses/#{course.id}/discussion_topics/new"
+
+              Discussion.update_discussion_topic_title
+              Discussion.click_graded_checkbox
+              Discussion.click_sync_to_sis_checkbox
+              Discussion.save_button.click
+              wait_for_ajaximations
+
+              expect(driver.current_url).to include("new")
+              expect_instui_flash_message("Please set a due date or change your selection for the “Sync to SIS” option.")
+
+              Discussion.click_assign_to_button
+
+              wait_for_assign_to_tray_spinner
+              keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+              expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
+              update_due_date(0, format_date_for_view(Time.zone.now, "%-m/%-d/%Y"))
+              update_due_time(0, "11:59 PM")
+              click_save_button("Apply")
+              keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+              expect_new_page_load { Discussion.save_button.click }
+              expect(driver.current_url).not_to include("new")
+              expect(DiscussionTopic.last.assignment.post_to_sis).to be_truthy
+            end
+
+            it "does not block when disabled" do
+              get "/courses/#{course.id}/discussion_topics/new"
+
+              Discussion.update_discussion_topic_title
+              Discussion.click_graded_checkbox
+              expect_new_page_load { Discussion.save_button.click }
+              expect(driver.current_url).not_to include("new")
+              expect(DiscussionTopic.last.assignment.post_to_sis).to be_falsey
+            end
+
+            it "validates due date when user checks/unchecks the box", :ignore_js_errors do
+              get "/courses/#{course.id}/discussion_topics/new"
+              Discussion.update_discussion_topic_title
+              Discussion.click_graded_checkbox
+              Discussion.click_sync_to_sis_checkbox
+              Discussion.click_assign_to_button
+              wait_for_assign_to_tray_spinner
+              keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+              expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
+              click_cancel_button
+              keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+              Discussion.click_sync_to_sis_checkbox
+              Discussion.click_assign_to_button
+              wait_for_assign_to_tray_spinner
+              keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+              expect(assign_to_date_and_time[0].text).not_to include("Please add a due date")
+
+              click_cancel_button
+              keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+              expect_new_page_load { Discussion.save_button.click }
+              expect(driver.current_url).not_to include("new")
+              expect(DiscussionTopic.last.assignment.post_to_sis).to be_falsey
+            end
+          end
         end
 
         context "checkpoints" do

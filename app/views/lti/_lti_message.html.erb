@@ -59,7 +59,7 @@
   </div>
 <% end %>
 
-<%= render partial: "shared/rubrics_component" if @assignment.present? && !@assignment.quiz_lti? %>
+<%= render partial: "shared/rubrics_component" if @assignment.present? && !@assignment.quiz_lti? && !@lti_launch.launch_type == 'window'  %>
 
 <%= render @append_template if @append_template %>
 <div id="module_sequence_footer"></div>

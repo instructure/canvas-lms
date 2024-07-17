@@ -61,10 +61,9 @@ class TokenScopes
     LTI_UPDATE_PUBLIC_JWK_SCOPE => I18n.t("Can update public jwk for LTI services."),
     LTI_ACCOUNT_LOOKUP_SCOPE => I18n.t("Can lookup Account information"),
     LTI_AGS_SHOW_PROGRESS_SCOPE => I18n.t("Can view Progress records associated with the context the tool is installed in"),
-    LTI_PAGE_CONTENT_SHOW_SCOPE => I18n.t("Can request page content using postMessage API."),
   }.freeze
   # These are scopes that are used to authorize postMessage calls
-  # Any scopes here also need to be added to LTI_SCOPES or LTI_HIDDEN_SCOPES
+  # Any scopes here also need to be added to LTI_SCOPES above
   LTI_POSTMESSAGE_SCOPES = [
     LTI_PAGE_CONTENT_SHOW_SCOPE
   ].freeze
@@ -88,6 +87,7 @@ class TokenScopes
     LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can destroy subscription to data service data."),
     LTI_LIST_EVENT_TYPES_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can list categorized event types."),
     LTI_SHOW_FEATURE_FLAG_SCOPE => I18n.t("Can view feature flags"),
+    LTI_PAGE_CONTENT_SHOW_SCOPE => I18n.t("Can request page content using postMessage API."),
     LTI_REPLACE_EDITOR_CONTENT_SCOPE => I18n.t("Can replace the entire contents of the RCE.")
   }.freeze
 

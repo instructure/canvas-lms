@@ -1,0 +1,13 @@
+@import "mixins/typography";
+
+@mixin page_header {
+  @include fontSize(38px);
+  margin-bottom: 36px;
+  font-weight: 700;
+  @media (max-width: 991px) {
+    @include fontSize(28px);
+    margin-bottom: 24px;
+  }
+}
+
+

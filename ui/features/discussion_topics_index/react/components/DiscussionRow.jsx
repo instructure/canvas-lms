@@ -485,10 +485,9 @@ class DiscussionRow extends Component {
       return (
         <span>
           <img
-            className="icon"
-            alt=""
+            alt={menuTool.title}
+            className="icon lti_tool_icon"
             src={menuTool.icon_url}
-            style={{width: '1.2rem', 'margin-right': '0.25rem'}}
           />
           &nbsp;&nbsp;{menuTool.title}
         </span>

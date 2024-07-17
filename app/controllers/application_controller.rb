@@ -392,7 +392,6 @@ class ApplicationController < ActionController::Base
     scheduled_page_publication
     send_usage_metrics
     rce_transform_loaded_content
-    lti_assignment_page_line_items
     mobile_offline_mode
     react_discussions_post
     instui_nav
@@ -401,7 +400,6 @@ class ApplicationController < ActionController::Base
     enhanced_rubrics
     account_level_mastery_scales
     non_scoring_rubrics
-    top_navigation_placement
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -495,6 +493,7 @@ class ApplicationController < ActionController::Base
     end
     account = Context.get_account(@context)
     rce_env_hash[:RICH_CONTENT_INST_RECORD_TAB_DISABLED] = account ? account.disable_rce_media_uploads? : false
+    rce_env_hash[:RICH_CONTENT_AI_TEXT_TOOLS] = account ? account.feature_enabled?(:ai_text_tools) : false
     js_env(rce_env_hash, true) # Allow overriding in case this gets called more than once
   end
   helper_method :rce_js_env
@@ -2983,7 +2982,7 @@ class ApplicationController < ActionController::Base
                    include: [
                      "assignments",
                      "discussion_topic",
-                     Account.site_admin.feature_enabled?(:discussion_checkpoints) && "checkpoints",
+                     @domain_root_account.feature_enabled?(:discussion_checkpoints) && "checkpoints",
                      (permissions[:manage] || current_user_has_been_observer_in_this_course) && "all_dates",
                      permissions[:manage] && "module_ids",
                      peer_reviews_for_a2_enabled? && "assessment_requests"

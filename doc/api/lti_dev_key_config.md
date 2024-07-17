@@ -342,7 +342,7 @@ also found in the placements sub-menu in the left-navigation of this documentati
 
       <td class="param-desc">
 
-<p>A description of the tool</p>
+<p>A description of the tool.</p>
 
       </td>
     </tr>
@@ -403,7 +403,7 @@ also found in the placements sub-menu in the left-navigation of this documentati
 
 <p>The <a href="https://www.imsglobal.org/spec/security/v1p0#step-1-third-party-initiated-login" target="_blank">target_link_uri</a> that Canvas should pass in the to the login initiation endpoint. This allows tools to determine which redirect_uri to pass Canvas in the authorization redirect request and should be <a href="https://www.imsglobal.org/spec/lti/v1p3/impl#verify-the-target_link_uri" target="_blank">verified during the final
 launch</a>. This can be set at the tool-level, or within the "placements" JSON
-object for placement-specific target_link_uri's</p>
+object for placement-specific target_link_uri's.</p>
 
       </td>
     </tr>
@@ -454,8 +454,7 @@ object for placement-specific target_link_uri's</p>
 
       <td class="param-desc">
 
-<p>The set of Canvas extensions, including placements, that the tool should use
-</p>
+<p>The set of Canvas extensions, including placements, that the tool should use.</p>
 
       </td>
     </tr>
@@ -473,7 +472,7 @@ object for placement-specific target_link_uri's</p>
 
       <td class="param-desc">
 
-<p>The domain Canvas should use to match clicked LTI links against. This is recommended if <a href="file.content_item.html">deep linking</a> is used</p>.
+<p>The domain Canvas should use to match clicked LTI links against. This is recommended if <a href="file.content_item.html">deep linking</a> is used.</p>
 
       </td>
     </tr>
@@ -491,7 +490,7 @@ object for placement-specific target_link_uri's</p>
 
       <td class="param-desc">
 
-<p>Allows tools to set a unique identifier for the tool.</p>.
+<p>Allows tools to set a unique identifier for the tool.</p>
 
       </td>
     </tr>
@@ -509,7 +508,7 @@ object for placement-specific target_link_uri's</p>
 
       <td class="param-desc">
 
-<p>The LMS platform that the extensions belong to. This should always be set to "canvas.instructure.com" for cloud-hosted Canvas</p>
+<p>The LMS platform that the extensions belong to. This should always be set to "canvas.instructure.com" for cloud-hosted Canvas.</p>
 
       </td>
     </tr>

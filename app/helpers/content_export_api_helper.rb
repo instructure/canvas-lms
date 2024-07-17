@@ -53,6 +53,7 @@ module ContentExportApiHelper
       end
     else
       export.export_type = ContentExport::COMMON_CARTRIDGE
+      export.prepare_new_quizzes_export
       export.selected_content = selected_content || { everything: true }
     end
     # recheck, since the export type influences permissions (e.g., students can download zips of non-locked files, but not common cartridges)

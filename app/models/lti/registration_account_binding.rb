@@ -28,7 +28,9 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
     state :deleted
   end
 
+  # Binding always lives on the shard of the account
   belongs_to :account, inverse_of: :lti_registration_account_bindings, optional: false
+  # Registration can be cross-shard
   belongs_to :registration, class_name: "Lti::Registration", inverse_of: :lti_registration_account_bindings, optional: false
   belongs_to :root_account, class_name: "Account"
   belongs_to :created_by, class_name: "User", inverse_of: :created_lti_registration_account_bindings
@@ -42,6 +44,52 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
   validate :restrict_federated_child_accounts
   validate :require_root_account
   validate :validate_inherited_registration_in_chain
+
+  after_update :clear_cache_if_site_admin
+
+  def self.find_in_site_admin(registration)
+    return nil unless registration.account.site_admin?
+
+    Shard.default.activate do
+      MultiCache.fetch(site_admin_cache_key(registration)) do
+        GuardRail.activate(:secondary) do
+          where.not(workflow_state: :allow).find_by(account: registration.account, registration:)
+        end
+      end
+    end
+  end
+
+  def self.find_all_in_site_admin(registrations)
+    registrations = registrations.select { |r| r.account.site_admin? }
+    return [] if registrations.empty?
+
+    Shard.default.activate do
+      MultiCache.fetch(site_admin_all_cache_key(registrations.first)) do
+        GuardRail.activate(:secondary) do
+          where.not(workflow_state: :allow).where(account: Account.site_admin, registration: registrations)
+        end
+      end
+    end
+  end
+
+  def self.clear_site_admin_cache(registration)
+    Shard.default.activate do
+      MultiCache.delete(site_admin_cache_key(registration))
+      MultiCache.delete(site_admin_all_cache_key(registration))
+    end
+  end
+
+  def self.site_admin_cache_key(registration)
+    "accounts/site_admin/lti_registration_account_bindings/#{registration.global_id}"
+  end
+
+  def self.site_admin_all_cache_key(registration)
+    "accounts/site_admin/lti_registration_account_bindings/all_registrations/#{registration.shard.id}"
+  end
+
+  def clear_cache_if_site_admin
+    self.class.clear_site_admin_cache(registration) if account.site_admin?
+  end
 
   # -- BEGIN SoftDeleteable --
   # adapting SoftDeleteable, but with no "active" state

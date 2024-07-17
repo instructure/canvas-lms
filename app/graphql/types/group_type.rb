@@ -74,6 +74,13 @@ module Types
         group_memberships.where(workflow_state: GroupMembershipsController::ALLOWED_MEMBERSHIP_FILTER)
       end
     end
+
+    field :activity_stream, ActivityStreamType, null: true
+    def activity_stream
+      context.scoped_set!(:context_type, "Group")
+      object
+    end
+
     private :members_scope
   end
 end

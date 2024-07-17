@@ -31,9 +31,7 @@ import {
   IconDuplicateLine,
   IconEditLine,
   IconLockLine,
-  IconMarkAsReadLine,
   IconMoreLine,
-  IconNextUnreadLine,
   IconNoSolid,
   IconPeerReviewLine,
   IconRubricSolid,
@@ -46,6 +44,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
+import {ReadIcon, UnreadIcon} from '../ThreadingToolbar/MarkAsReadIcons'
 
 const I18n = useI18nScope('discussion_posts')
 
@@ -168,7 +167,7 @@ const getMenuConfigs = props => {
   if (props.onReadAll) {
     options.push({
       key: 'read-all',
-      icon: <IconMarkAsReadLine />,
+      icon: <ReadIcon />,
       label: I18n.t('Mark All as Read'),
       selectionCallback: props.onReadAll,
     })
@@ -176,7 +175,7 @@ const getMenuConfigs = props => {
   if (props.onUnreadAll) {
     options.push({
       key: 'unread-all',
-      icon: <IconNextUnreadLine />,
+      icon: <UnreadIcon />,
       label: I18n.t('Mark All as Unread'),
       selectionCallback: props.onUnreadAll,
     })

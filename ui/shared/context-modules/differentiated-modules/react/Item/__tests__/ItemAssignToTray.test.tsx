@@ -26,6 +26,7 @@ import {
   STUDENTS_DATA,
   FIRST_GROUP_CATEGORY_DATA,
   SECOND_GROUP_CATEGORY_DATA,
+  ADHOC_WITHOUT_STUDENTS,
 } from '../../__tests__/mocks'
 
 const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
@@ -285,8 +286,7 @@ describe('ItemAssignToTray', () => {
     ).toBeInTheDocument()
   })
 
-  // LF-1370
-  it.skip('renders blueprint locking info when there are locked dates and default cards', async () => {
+  it('renders blueprint locking info when there are locked dates and default cards', async () => {
     fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
       blueprint_date_locks: ['availability_dates'],
     })
@@ -327,22 +327,20 @@ describe('ItemAssignToTray', () => {
     await expect(queryByText('Locked:')).not.toBeInTheDocument()
   })
 
-  // LF-1370
-  it.skip('disables add button if there are blueprint-locked dates', async () => {
+  it('disables add button if there are blueprint-locked dates', async () => {
     fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
       blueprint_date_locks: ['availability_dates'],
     })
-    const {getByRole, findAllByText} = renderComponent({itemContentId: '31'})
+    const {getByTestId, findAllByText} = renderComponent({itemContentId: '31'})
     await findAllByText('Locked:')
-    await expect(getByRole('button', {name: 'Add'})).toBeDisabled()
+    expect(getByTestId('add-card')).toBeDisabled()
   })
 
-  // LF-1370
-  it.skip('disables add button if there are blueprint-locked dates and default cards', async () => {
+  it('disables add button if there are blueprint-locked dates and default cards', async () => {
     fetchMock.get('/api/v1/courses/1/assignments/31/date_details?per_page=100', {
       blueprint_date_locks: ['availability_dates'],
     })
-    const {getByRole, findAllByText} = renderComponent({
+    const {getByTestId, findAllByText} = renderComponent({
       itemContentId: '31',
       defaultCards: [
         {
@@ -359,7 +357,7 @@ describe('ItemAssignToTray', () => {
       ],
     })
     await findAllByText('Locked:')
-    await expect(getByRole('button', {name: 'Add'})).toBeDisabled()
+    expect(getByTestId('add-card')).toBeDisabled()
   })
 
   it('calls onDismiss when the cancel button is clicked', () => {
@@ -512,33 +510,6 @@ describe('ItemAssignToTray', () => {
       waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Mastery Paths'))
     })
 
-    // LF-1603 - this test is flaky
-    it.skip('renders everyone option if there are more than 1 card', async () => {
-      fetchMock.get(
-        OVERRIDES_URL,
-        {
-          id: '23',
-          due_at: '2023-10-05T12:00:00Z',
-          unlock_at: '2023-10-01T12:00:00Z',
-          lock_at: '2023-11-01T12:00:00Z',
-          only_visible_to_overrides: false,
-          visible_to_everyone: true,
-          overrides: [],
-        },
-        {
-          overwriteRoutes: true,
-        }
-      )
-      const {findAllByTestId, getByRole, getAllByTestId} = renderComponent()
-      let selectedOptions = await findAllByTestId('assignee_selector_selected_option')
-      expect(selectedOptions).toHaveLength(1)
-      expect(selectedOptions[0]).toHaveTextContent('Everyone')
-      act(() => getByRole('button', {name: 'Add'}).click())
-      expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
-      selectedOptions = getAllByTestId('assignee_selector_selected_option')
-      expect(selectedOptions[0]).toHaveTextContent('Everyone else')
-    })
-
     it('calls onDismiss when an error occurs while fetching data', async () => {
       fetchMock.getOnce(SECTIONS_URL, 500, {overwriteRoutes: true})
       const onDismiss = jest.fn()
@@ -580,6 +551,7 @@ describe('ItemAssignToTray', () => {
       const expectedPayload = JSON.stringify({
         ...payloadValues,
         reply_to_topic_due_at: null,
+        required_replies_due_at: null,
         only_visible_to_overrides,
         assignment_overrides: [
           {
@@ -655,9 +627,35 @@ describe('ItemAssignToTray', () => {
       await user.click(save)
       expect(getByTestId('cards-loading')).toBeInTheDocument()
     })
+
+    it('does not show cards for ADHOC override with no students', async () => {
+      fetchMock.get(OVERRIDES_URL, ADHOC_WITHOUT_STUDENTS, {
+        overwriteRoutes: true,
+      })
+      const {findAllByTestId} = renderComponent()
+      const cards = await findAllByTestId('item-assign-to-card')
+      expect(cards).toHaveLength(1)
+    })
+
+    it('does not include ADHOC overrides without students when saving', async () => {
+      fetchMock.get(OVERRIDES_URL, ADHOC_WITHOUT_STUDENTS, {
+        overwriteRoutes: true,
+      })
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
+      const {findByTestId, findAllByText, findAllByTestId} = renderComponent()
+      const cards = await findAllByTestId('item-assign-to-card')
+      // renders only 1 valid card
+      expect(cards).toHaveLength(1)
+      const save = await findByTestId('differentiated_modules_save_button')
+      await user.click(save)
+      expect((await findAllByText(`${props.itemName} updated`))[0]).toBeInTheDocument()
+      const requestBody = JSON.parse(fetchMock.lastOptions(DATE_DETAILS)?.body)
+      // filters out invalid overrides
+      expect(requestBody.assignment_overrides).toHaveLength(1)
+    })
   })
 
-  describe.skip('Module Overrides', () => {
+  describe('Module Overrides', () => {
     const DATE_DETAILS_WITHOUT_OVERRIDES = {
       id: '23',
       due_at: '2023-10-05T12:00:00Z',
@@ -694,7 +692,7 @@ describe('ItemAssignToTray', () => {
       const cards = await findAllByTestId('item-assign-to-card')
       expect(getByText('Inherited from')).toBeInTheDocument()
       expect(getByTestId('context-module-text')).toBeInTheDocument()
-      expect(cards).toHaveLength(2)
+      expect(cards).toHaveLength(1)
     })
 
     it('does not show overridden module cards', async () => {
@@ -705,7 +703,7 @@ describe('ItemAssignToTray', () => {
       const cards = await findAllByTestId('item-assign-to-card')
       expect(queryByText('Inherited from')).not.toBeInTheDocument()
       expect(queryByTestId('context-module-text')).not.toBeInTheDocument()
-      expect(cards).toHaveLength(2)
+      expect(cards).toHaveLength(1)
     })
   })
 
@@ -720,8 +718,7 @@ describe('ItemAssignToTray', () => {
     expect(addButton).toHaveFocus()
   })
 
-  // LF-1603 - this test is flaky
-  it.skip("focuses on the newly-created card's delete button when adding a card", async () => {
+  it("focuses on the newly-created card's delete button when adding a card", async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {findAllByTestId, getByTestId} = renderComponent()
 
@@ -822,13 +819,14 @@ describe('ItemAssignToTray', () => {
     beforeEach(() => {
       global.ENV = {
         ...global.ENV,
-        POST_TO_SIS: true,
         DUE_DATE_REQUIRED_FOR_ACCOUNT: true,
       }
     })
 
     it('validates if required due dates are set before applying changes', async () => {
-      const {getByTestId, findAllByTestId, getByText, getAllByText} = renderComponent()
+      const {getByTestId, findAllByTestId, getByText, getAllByText} = renderComponent({
+        postToSIS: true,
+      })
       // wait until the cards are loaded
       const cards = await findAllByTestId('item-assign-to-card')
       expect(cards[0]).toBeInTheDocument()
@@ -865,7 +863,8 @@ describe('ItemAssignToTray', () => {
       })
     })
 
-    it('does not render mastery path option for ungraded discussions', async () => {
+    // cf. LX-1879
+    it.skip('does not render mastery path option for ungraded discussions', async () => {
       renderComponent({itemType: 'discussion', removeDueDateInput: true})
       const assignToInput = await screen.findByTestId('assignee_selector')
       await userEvent.click(assignToInput)

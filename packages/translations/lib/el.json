@@ -80,6 +80,9 @@
     "content_type_2cf90d95": {
         "message": "Τύπος Περιεχομένου"
     },
+    "copy_9748f9f": {
+        "message": "Αντιγραφή"
+    },
     "copyright_holder_66ee111": {
         "message": "Κάτοχος Πνευματικών Δικαιωμάτων:"
     },
@@ -355,6 +358,9 @@
     },
     "reset_95a81614": {
         "message": "Επαναφορά"
+    },
+    "retry_ebd5f8ba": {
+        "message": "Δοκιμάστε ξανά"
     },
     "rich_content_editor_2708ef21": {
         "message": "Επεξεργαστής Πλούσιου Περιεχομένου-rich content"

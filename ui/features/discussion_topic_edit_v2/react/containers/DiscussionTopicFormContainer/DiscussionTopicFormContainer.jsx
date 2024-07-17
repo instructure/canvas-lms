@@ -32,10 +32,8 @@ import {Heading} from '@instructure/ui-heading'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconCompleteSolid, IconUnpublishedLine} from '@instructure/ui-icons'
 import {Pill} from '@instructure/ui-pill'
-import {Tabs} from '@instructure/ui-tabs'
 import {SavingDiscussionTopicOverlay} from '../../components/SavingDiscussionTopicOverlay/SavingDiscussionTopicOverlay'
 import WithBreakpoints from '@canvas/with-breakpoints'
-import {SimpleSelect} from '@instructure/ui-simple-select'
 
 const I18n = useI18nScope('discussion_create')
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
@@ -46,10 +44,6 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const contextType = ENV.context_is_not_group ? 'Course' : 'Group'
   const {contextQueryToUse, contextQueryVariables} = getContextQuery(contextType)
-  const [selectedTabIndex, setSelectedTabIndex] = useState(0)
-  const handleTabChange = (event, {index}) => {
-    setSelectedTabIndex(index)
-  }
 
   const isAnnouncement = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
 
@@ -232,51 +226,15 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
         onSubmit={handleFormSubmit}
         isSubmitting={isSubmitting}
         setIsSubmitting={setIsSubmitting}
+        breakpoints={breakpoints}
       />
-    )
-  }
-
-  const renderSelect = () => {
-    return (
-      <Flex.Item margin="0 0 medium 0">
-        <SimpleSelect
-          value={selectedTabIndex}
-          onChange={(e, {_id, value}) => setSelectedTabIndex(value)}
-          renderLabel={<ScreenReaderContent>{I18n.t('Select View')}</ScreenReaderContent>}
-          margin="0 0 medium 0"
-        >
-          <SimpleSelect.Group renderLabel={I18n.t('View')}>
-            <SimpleSelect.Option id="opt1" value={0}>
-              {I18n.t('Details')}
-            </SimpleSelect.Option>
-          </SimpleSelect.Group>
-        </SimpleSelect>
-      </Flex.Item>
     )
   }
 
   return (
     <Flex direction="column">
       <Flex.Item>{renderHeading()}</Flex.Item>
-      {instUINavEnabled() ? (
-        <>
-          {breakpoints.mobileOnly ? (
-            renderSelect()
-          ) : (
-            <Tabs onRequestTabChange={handleTabChange}>
-              <Tabs.Panel
-                isSelected={selectedTabIndex === 0}
-                renderTitle={I18n.t('Details')}
-                textAlign="center"
-              />
-            </Tabs>
-          )}
-
-          {selectedTabIndex === 0 && renderForm()}
-        </>
-      ) : (
-        renderForm()
-      )}
+      {renderForm()}
       <SavingDiscussionTopicOverlay open={isSubmitting} />
     </Flex>
   )

@@ -158,6 +158,50 @@ describe ContentMigration do
       expect(page_to.body).to include %(src="/media_attachments_iframe/#{att_to.id}?type=video&embedded=true")
     end
 
+    it "copies media tracks from media objects that do not have associated attachments" do
+      mo = @copy_from.media_objects.create!(title: "cat_hugs.mp4", media_id: "m-cat_hugs")
+      mo.attachment.update(filename: "something_else.mp4", content_type: "unknown/unknown", media_entry_id: nil)
+      mo.update(attachment_id: nil)
+      mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "WEBVTT\n00:00.001 --> 00:00.900\n- Hi!\n", attachment_id: nil)
+      page = @copy_from.wiki_pages.create!(title: "watch this y'all", body: %(<iframe data-media-type="video" src="/media_objects_iframe/#{mo.media_id}" data-media-id="#{mo.media_id}"/>))
+
+      kaltura_session = double("kaltura_admin_session")
+      expect(CC::CCHelper).to receive_messages(kaltura_admin_session: kaltura_session)
+      expect(kaltura_session).to receive(:flavorAssetGetByEntryId).and_return([
+                                                                                {
+                                                                                  isOriginal: 1,
+                                                                                  containerFormat: "mp4",
+                                                                                  fileExt: "mp4",
+                                                                                  id: "one",
+                                                                                  size: 15,
+                                                                                }
+                                                                              ])
+      expect(kaltura_session).to receive(:flavorAssetGetOriginalAsset).and_return(kaltura_session.flavorAssetGetByEntryId.first)
+      expect(kaltura_session).to receive(:media_sources).and_return([{
+                                                                      isOriginal: "0",
+                                                                      fileExt: "mp4",
+                                                                      url: "http://example.com/media_path",
+                                                                      content_type: "video/mp4"
+                                                                    }])
+      expect(CanvasKaltura::ClientV3).to receive_messages(new: kaltura_session)
+      allow(kaltura_session).to receive_messages(media_sources:
+        [{ height: "240",
+           bitrate: "382",
+           isOriginal: "0",
+           width: "336",
+           content_type: "video/mp4",
+           containerFormat: "isom",
+           url: "https://kaltura.example.com/some/url",
+           size: "204",
+           fileExt: "mp4" }])
+      run_course_copy
+
+      att_to = @copy_to.attachments.find_by(media_entry_id: "m-cat_hugs")
+      page_to = @copy_to.wiki_pages.find_by(migration_id: mig_id(page))
+      expect(page_to.body).to include %(src="/media_attachments_iframe/#{att_to.id}?embedded=true&amp;type=video")
+      expect(att_to.media_tracks.first.slice(:kind, :locale, :content, :attachment_id)).to match({ kind: "subtitles", locale: "en", content: "WEBVTT\n00:00.001 --> 00:00.900\n- Hi!\n", attachment_id: att_to.id })
+    end
+
     it "references existing usage rights on course copy" do
       usage_rights = @copy_from.usage_rights.create! use_justification: "used_by_permission", legal_copyright: "(C) 2014 Incom Corp Ltd."
       att1 = Attachment.create(filename: "1.txt", uploaded_data: StringIO.new("1"), folder: Folder.root_folders(@copy_from).first, context: @copy_from)

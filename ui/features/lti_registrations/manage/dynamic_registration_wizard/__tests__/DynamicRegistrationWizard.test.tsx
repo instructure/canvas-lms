@@ -24,27 +24,17 @@ import {success} from '../../../common/lib/apiResult/ApiResult'
 import userEvent from '@testing-library/user-event'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {i18nLtiScope} from '../../model/LtiScope'
-import {mockRegistration} from './helpers'
+import {mockRegistration, mockService} from './helpers'
 import {htmlEscape} from '@instructure/html-escape'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 
 const mockAlert = showFlashAlert as jest.Mock<typeof showFlashAlert>
 
-const mockService = (
-  mocked?: Partial<DynamicRegistrationWizardService>
-): DynamicRegistrationWizardService => ({
-  fetchRegistrationToken: jest.fn(),
-  deleteDeveloperKey: jest.fn(),
-  getRegistrationByUUID: jest.fn(),
-  updateDeveloperKeyWorkflowState: jest.fn(),
-  updateRegistrationOverlay: jest.fn(),
-  ...mocked,
-})
-
 describe('DynamicRegistrationWizard', () => {
   it('renders a loading screen when fetching the registration token', () => {
     const accountId = ZAccountId.parse('123')
+    const unifiedToolId = 'asdf'
 
     const fetchRegistrationToken = jest.fn().mockImplementation(() => new Promise(() => {}))
 
@@ -57,17 +47,19 @@ describe('DynamicRegistrationWizard', () => {
         dynamicRegistrationUrl="https://example.com"
         service={service}
         accountId={accountId}
+        unifiedToolId={unifiedToolId}
         unregister={() => {}}
       />
     )
 
-    expect(fetchRegistrationToken).toHaveBeenCalledWith(accountId)
+    expect(fetchRegistrationToken).toHaveBeenCalledWith(accountId, unifiedToolId)
     // Ignore screenreader title.
     expect(screen.getByText(/Loading/i, {ignore: 'title'})).toBeInTheDocument()
   })
 
   it('forwards users to the tool', async () => {
     const accountId = ZAccountId.parse('123')
+    const unifiedToolId = 'asdf'
     const fetchRegistrationToken = jest.fn().mockResolvedValue(
       success({
         token: 'reg_token_value',
@@ -83,10 +75,11 @@ describe('DynamicRegistrationWizard', () => {
         dynamicRegistrationUrl="https://example.com?foo=bar"
         service={service}
         accountId={accountId}
+        unifiedToolId={unifiedToolId}
         unregister={() => {}}
       />
     )
-    expect(fetchRegistrationToken).toHaveBeenCalledWith(accountId)
+    expect(fetchRegistrationToken).toHaveBeenCalledWith(accountId, unifiedToolId)
     const frame = await waitFor(() => screen.getByTestId('dynamic-reg-wizard-iframe'))
     expect(frame).toBeInTheDocument()
     expect(frame).toBeInstanceOf(HTMLIFrameElement)

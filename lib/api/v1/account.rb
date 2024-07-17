@@ -68,6 +68,8 @@ module Api::V1::Account
       if includes.include?("services") && account.grants_right?(user, session, :manage_account_settings)
         hash["services"] = Account.services_exposed_to_ui_hash(nil, user, account).keys.index_with { |k| account.service_enabled?(k) }
       end
+      hash["course_count"] = account.course_count if includes.include?("course_count")
+      hash["sub_account_count"] = account.sub_account_count if includes.include?("sub_account_count")
 
       hash["global_id"] = account.global_id if includes.include?("global_id")
 

@@ -44,7 +44,7 @@ class LatePolicyApplicator
     @assignments = if assignments.present?
                      assignments.select { |a| a.published? && !a.has_sub_assignments? }
                    else
-                     @course.assignments.published.has_no_sub_assignments
+                     AbstractAssignment.where(context_id: course.id, context_type: "Course").published.has_no_sub_assignments
                    end
 
     @relevant_submissions = {}
@@ -55,7 +55,6 @@ class LatePolicyApplicator
 
     late_policy = @course.late_policy
     user_ids = []
-
     @assignments.each do |assignment|
       relevant_submissions(assignment).find_each do |submission|
         submission.assignment = assignment

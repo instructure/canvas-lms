@@ -59,9 +59,7 @@ module Types
 
     field :has_rubric_associations, Boolean, null: false, resolver_method: :rubric_assignment_associations?
     def rubric_assignment_associations?
-      load_association(:rubric_associations).then do
-        object.rubric_assignment_associations?
-      end
+      Loaders::RubricAssociationsLoader.for.load(object.id)
     end
 
     field :button_display, String, null: false

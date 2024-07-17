@@ -70,30 +70,6 @@ Returning postMessage includes the following properties:
 window.parent.postMessage({subject: 'lti.capabilities'}, '*')
 ```
 
-## lti.getPageContent
-
-Responds with an html object containing page content. This will contain all markup and children elements of the main content area of the page. Some content may be filtered from this response. The scope `http://canvas.instructure.com/lti/page_content/show` is required to use this functionality.
-
-**Required properties:**
-
-- subject: "lti.getPageContent"
-
-```js
-window.parent.postMessage({subject: 'lti.getPageContent'}, '*')
-```
-
-Returning postMessage includes the following properties:
-
-- subject: "lti.getPageContent"
-- pageContent: a string containing HTML
-
-```js
-{
-  subject: 'lti.getPageContent.response',
-  content: '<div>...</div>'
-}
-```
-
 ## lti.getPageSettings
 
 Responds with an object containing page settings. This includes the current locale, time zome, contrast settings, url to the active branding configuration file, and the width of the parent (Canvas) window.

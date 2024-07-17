@@ -347,6 +347,9 @@
     "complex_numbers_a543d004": {
         "message": "Komplex számok"
     },
+    "compose_44c904f4": {
+        "message": "Összeállítani"
+    },
     "computer_1d7dfa6f": {
         "message": "Számítógép"
     },
@@ -373,6 +376,9 @@
     },
     "coproduct_e7838082": {
         "message": "Társtermék"
+    },
+    "copy_9748f9f": {
+        "message": "Másolás"
     },
     "copyright_holder_66ee111": {
         "message": "Jog tulajdonosa:"
@@ -1814,6 +1820,9 @@
     "result_index_of_max_7db5ad8b": {
         "message": "Eredmény: { index } / { max }."
     },
+    "retry_ebd5f8ba": {
+        "message": "Újra"
+    },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Reverse Turnstile (Does Not Yield)"
     },
@@ -1972,6 +1981,9 @@
     },
     "shortcut_911d6255": {
         "message": "Parancsikon"
+    },
+    "show_all_967a90f0": {
+        "message": "Mindent megmutat"
     },
     "show_audio_options_b489926b": {
         "message": "Hangbeállítások megjelenítése"

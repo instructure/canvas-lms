@@ -78,7 +78,7 @@ module Api::V1::Submission
               end
           end
       elsif quizzes_next_submission?(submission)
-        hash["submission_history"] = quizzes_next_submission_history(submission)
+        hash["submission_history"] = quizzes_next_submission_history(submission, current_user)
       else
         histories = submission.submission_history
         ActiveRecord::Associations.preload(histories, :group) if includes.include?("group")
@@ -588,9 +588,10 @@ module Api::V1::Submission
       assignment.root_account.feature_enabled?(:quizzes_next_submission_history)
   end
 
-  def quizzes_next_submission_history(submission)
+  def quizzes_next_submission_history(submission, current_user)
     quiz_lti_submission =
       BasicLTI::QuizzesNextVersionedSubmission.new(submission.assignment, submission.user)
-    quiz_lti_submission.grade_history
+    hide_history_scores_on_manual_posting = !submission.grants_right?(current_user, :read_grade)
+    quiz_lti_submission.grade_history(hide_history_scores_on_manual_posting:)
   end
 end

@@ -16,6 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<% js_bundle :settings_sidebar
+   css_bundle :settings_sidebar
+%>
 <% blueprint_subscription ||= nil %>
 <% show_publish_controls ||= false %>
 <% if blueprint_subscription %>
@@ -39,7 +42,7 @@
       <h4>
         <%= t('headers.course_status', %{Course Status}) %>
       </h4>
-      <%= render :partial => 'publish_buttons', :locals => {redirect_to_settings: true} %>
+      <div class="course_publish_button" id="course_publish_button"></div>
     </div>
   <% end %>
 

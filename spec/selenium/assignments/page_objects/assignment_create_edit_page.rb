@@ -51,6 +51,10 @@ class AssignmentCreateEditPage
       ".error_text"
     end
 
+    def post_to_sis_checkbox_selector
+      "#assignment_post_to_sis"
+    end
+
     # Selectors
     def assignment_form
       f("#edit_assignment_form")
@@ -173,6 +177,10 @@ class AssignmentCreateEditPage
       f(pending_changes_pill_selector)
     end
 
+    def post_to_sis_checkbox
+      f(post_to_sis_checkbox_selector)
+    end
+
     # Methods & Actions
     def visit_assignment_edit_page(course, assignment)
       get "/courses/#{course}/assignments/#{assignment}/edit"
@@ -246,6 +254,10 @@ class AssignmentCreateEditPage
       options = group_categories
       option_element = id.blank? ? options.first : options[id]
       option_element.click
+    end
+
+    def select_post_to_sis_checkbox
+      post_to_sis_checkbox.click
     end
   end
 end

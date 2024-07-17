@@ -58,18 +58,16 @@ export const Toolbox = ({open, container, onClose}: ToolboxProps) => {
   })
 
   useEffect(() => {
-    const shrinking_selector = '#content' // '.block-editor-editor'
+    const shrinking_selector = '.edit-content' // '.block-editor-editor'
 
     if (open && trayRef) {
       const ed = document.querySelector(shrinking_selector) as HTMLElement | null
 
       if (!ed) return
-      const edstyle = window.getComputedStyle(ed)
       const ed_rect = ed.getBoundingClientRect()
-      const padding = parseInt(edstyle.paddingRight, 10)
       const tray_left = window.innerWidth - trayRef.offsetWidth
       if (ed_rect.right > tray_left) {
-        ed.style.width = `${ed_rect.width - (ed_rect.right - tray_left - padding)}px`
+        ed.style.width = `${ed_rect.width - (ed_rect.right - tray_left)}px`
       }
     } else {
       const ed = document.querySelector(shrinking_selector) as HTMLElement | null
@@ -131,13 +129,9 @@ export const Toolbox = ({open, container, onClose}: ToolboxProps) => {
         >
           {renderBox('Button', ButtonBlockIcon, <ButtonBlock text="Click me" />)}
           {renderBox('Text', TextBlockIcon, <TextBlock text="" />)}
-          {window.location.search.includes('showrce') &&
+          {/* @ts-expect-error */}
+          {window.ENV.RICH_CONTENT_AI_TEXT_TOOLS &&
             renderBox('RCE', RCEBlockIcon, <RCEBlock text="" />)}
-          {/* renderBox(
-                  'Container',
-                  ContainerIcon,
-                  <Element is={Container} background="#fff" canvas={true} layout="row" />
-                ) */}
           {renderBox('Icon', IconBlockIcon, <IconBlock iconName="apple" />)}
           {renderBox('Heading', HeadingBlockIcon, <HeadingBlock />)}
           {renderBox('Resource Card', ResourceCardIcon, <ResourceCard />)}

@@ -56,6 +56,8 @@ export interface Course {
   readonly default_view?: 'feed' | 'wiki' | 'modules' | 'assignments' | 'syllabus' | null
   readonly is_student?: boolean
   readonly is_instructor?: boolean
+  readonly front_page_title?: string
+  readonly pages_url?: string
 }
 
 /* Redux action types */

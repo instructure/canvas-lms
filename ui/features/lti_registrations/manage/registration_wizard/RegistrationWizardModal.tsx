@@ -31,22 +31,33 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {ProgressBar} from '@instructure/ui-progress'
 import {DynamicRegistrationWizard} from '../dynamic_registration_wizard/DynamicRegistrationWizard'
-import type {AccountId} from '../model/AccountId'
+import {type AccountId} from '../model/AccountId'
 import {
   fetchRegistrationToken,
   getRegistrationByUUID,
   updateRegistrationOverlay,
 } from '../api/ltiImsRegistration'
-import {deleteDeveloperKey, updateDeveloperKeyWorkflowState} from '../api/developerKey'
+import {
+  deleteDeveloperKey,
+  updateAdminNickname,
+  updateDeveloperKeyWorkflowState,
+} from '../api/developerKey'
+import type {DynamicRegistrationWizardService} from '../dynamic_registration_wizard/DynamicRegistrationWizardService'
+import {isValidHttpUrl} from '../../common/lib/validators/isValidHttpUrl'
+import {RegistrationModalBody} from './RegistrationModalBody'
+import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {refreshRegistrations} from '../pages/manage/ManagePageLoadingState'
 
 const I18n = useI18nScope('lti_registrations')
+
+export const MODAL_BODY_HEIGHT = '50vh'
 
 export type RegistrationWizardModalProps = {
   accountId: AccountId
 }
 
 export const RegistrationWizardModal = (props: RegistrationWizardModalProps) => {
-  const state = useRegistrationModalWizardState(state => state)
+  const state = useRegistrationModalWizardState(s => s)
 
   return (
     <Modal label={I18n.t('Install App')} open={state.open} size="medium">
@@ -59,22 +70,33 @@ export const RegistrationWizardModal = (props: RegistrationWizardModalProps) => 
         />
         <Heading>{I18n.t('Install App')}</Heading>
       </Modal.Header>
-      <ProgressBar
-        meterColor="info"
-        shouldAnimate={true}
-        size="x-small"
-        screenReaderLabel={I18n.t('Installation Progress')}
-        valueNow={state.progress}
-        valueMax={state.progressMax}
-        themeOverride={{
-          trackBottomBorderWidth: '0',
-        }}
-        margin="0 0 small"
-      />
+      {!state.registering ? (
+        <ProgressBar
+          meterColor="info"
+          shouldAnimate={true}
+          size="x-small"
+          screenReaderLabel={I18n.t('Installation Progress')}
+          valueNow={0}
+          valueMax={100}
+          themeOverride={{
+            trackBottomBorderWidth: '0',
+          }}
+          margin="0 0 small"
+        />
+      ) : null}
 
       <ModalBodyWrapper state={state} accountId={props.accountId} />
     </Modal>
   )
+}
+
+const dynamicRegistrationWizardService: DynamicRegistrationWizardService = {
+  deleteDeveloperKey,
+  fetchRegistrationToken,
+  getRegistrationByUUID,
+  updateDeveloperKeyWorkflowState,
+  updateAdminNickname,
+  updateRegistrationOverlay,
 }
 
 const ModalBodyWrapper = ({
@@ -86,16 +108,16 @@ const ModalBodyWrapper = ({
 }) => {
   return state.registering && state.method === 'dynamic_registration' ? (
     <DynamicRegistrationWizard
-      service={{
-        deleteDeveloperKey,
-        fetchRegistrationToken,
-        getRegistrationByUUID,
-        updateDeveloperKeyWorkflowState,
-        updateRegistrationOverlay,
-      }}
+      service={dynamicRegistrationWizardService}
       dynamicRegistrationUrl={state.dynamicRegistrationUrl}
       accountId={accountId}
+      unifiedToolId={state.unifiedToolId}
       unregister={state.unregister}
+      onSuccessfulRegistration={() => {
+        state.unregister()
+        showFlashSuccess(I18n.t('App installed successfully!'))()
+        state.onSuccessfulInstallation?.()
+      }}
     />
   ) : (
     <InitializationModalBody state={state} />
@@ -109,7 +131,7 @@ export type InitializationModalBodyProps = {
 const InitializationModalBody = (props: InitializationModalBodyProps) => {
   return (
     <>
-      <Modal.Body>
+      <RegistrationModalBody>
         <View display="block" margin="0 0 medium 0">
           <RadioInputGroup
             description={I18n.t('Select LTI Version')}
@@ -117,6 +139,7 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
               if (value === '1p3' || value === '1p1') {
                 props.state.updateLtiVersion(value)
               } else {
+                // eslint-disable-next-line no-console
                 console.warn(`Invalid value for lti_version: ${value}`)
               }
             }}
@@ -167,13 +190,14 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
             )}
           </>
         )}
-      </Modal.Body>
+      </RegistrationModalBody>
 
       <Modal.Footer>
         <Button
           color="primary"
           type="submit"
-          disabled={validForm(props.state) == false}
+          margin="small"
+          disabled={validForm(props.state) === false}
           onClick={() => {
             props.state.register()
           }}
@@ -189,15 +213,6 @@ const validForm = (state: RegistrationWizardModalState) => {
   if (state.lti_version === '1p3') {
     return isValidHttpUrl(state.dynamicRegistrationUrl)
   } else {
-    return false
-  }
-}
-
-const isValidHttpUrl = (str: string) => {
-  try {
-    const url = new URL(str)
-    return url.protocol === 'http:' || url.protocol === 'https:'
-  } catch (_) {
     return false
   }
 }

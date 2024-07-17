@@ -12364,6 +12364,7 @@ fa:
       update: "بهنگام سازی %{model}"
   here_f44564ee: اینجا.
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "اینجا فرصت بسیار خوبی برای آشنایی با تقویم و افزودن هر گونه رویداد غیر از تکلیف است که ممکن است در طول درس داشته باشید. نگران نباشید. شما را راهنمایی خواهیم کرد."
+  hh_mm_5faafa69: "hh:mm"
   hi_contrast_373b614f: "کنتراست بالا"
   hidden_130c3791: مخفی
   hidden_14a032a7: مخفی
@@ -21741,7 +21742,9 @@ fa:
       ways_to_contact_user: مخاطب
     recent_activity: 
       date_column: تاریخ
+      edit_group: "ویرایش گروه"
       message_column: پیام
+      new_announcement: اطلاعیه
       recent_activity: "فعالیت اخیر"
       recent_activity_in_course: "فعالیت اخیر در %{course_or_group}"
       unread_column: "خوانده نشده"
@@ -23644,6 +23647,7 @@ fa:
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "این نمره با نمای نمره دانشجو فرق می کند، زیرا برخی تکلیف ها غیر فعال شده اند"
   this_grade_differs_from_the_student_s_view_of_the__f78d0023: "این نمره از نمای دانشجو نسبت به نمره متفاوت است زیرا برخی از نمرات تکالیف هنوز ارسال نشده اند."
   this_grade_has_negative_points_496400d4: "این نمره امتیازات منفی دارد"
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: "این نمره در حال حاضر برای این دانشجو حذف شده است."
   this_grade_is_invalid_8ab192c7: "این نمره نامعتبر است"
   this_grade_is_unusually_high_60533c20: "این نمره به طور غیر عادی زیاد است"
   this_group_was_successfully_removed_81178d51: "این گروه با موفقیت حذف شد."
@@ -25844,6 +25848,7 @@ fa:
   your_submission_has_not_been_graded_yet_d6963e53: "مورد ارسالی شما هنوز نمره گذاری نشده است"
   your_time_for_this_quiz_has_been_reduced_394652e9: "زمان شما برای این آزمون کاهش یافته است."
   your_webcam_may_already_be_in_use_6cd64c25: "وب کم شما ممکن است در حال استفاده باشد."
+  yyyy_mm_dd_cbbd9959: YYYY-MM-DD
   yyyy_mm_dd_hh_mm_a01b6081: "YYYY-MM-DD hh:mm"
   z_a_b48d8903: Z-A
   z_a_be2ab67c: Z–A

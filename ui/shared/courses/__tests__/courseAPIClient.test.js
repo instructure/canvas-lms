@@ -101,4 +101,43 @@ describe('apiClient', () => {
       })
     })
   })
+
+  describe('unpublishCourse', () => {
+    it('reloads the window after upload with the proper param', done => {
+      moxios.stubRequest('/api/v1/courses/1', {
+        status: 200,
+        response: {},
+      })
+      apiClient.unpublishCourse({courseId: 1})
+      moxios.wait(() => {
+        expect(window.location.search).toBe('for_reload=1')
+        done()
+      })
+    })
+
+    it('calls onSuccess function on success if provided', done => {
+      moxios.stubRequest('/api/v1/courses/1', {
+        status: 200,
+        response: {},
+      })
+      const onSuccess = jest.fn()
+      apiClient.unpublishCourse({courseId: 1, onSuccess})
+      moxios.wait(() => {
+        expect(onSuccess).toHaveBeenCalled()
+        done()
+      })
+    })
+
+    it('flashes an error on failure', done => {
+      moxios.stubRequest('/api/v1/courses/1', {
+        status: 404,
+      })
+      apiClient.unpublishCourse({courseId: 1})
+      moxios.wait(() => {
+        expect(window.location.search).toBe('')
+        expect($.flashError).toHaveBeenCalledWith('An error occurred while unpublishing course')
+        done()
+      })
+    })
+  })
 })

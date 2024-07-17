@@ -10014,6 +10014,7 @@ he:
   here_are_your_assignments_listed_by_due_date_7d8e98e6: "להלן משימותיך, ממוינות לפי תאריך יעד."
   here_f44564ee: כאן.
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "זוהי הזדמנות טובה להכיר את היומן ולהוסיף אירועי הקורס שאינם תלויי משימה. אל דאגה, נעזור לך להתקדם בתהליך."
+  hh_mm_5faafa69: "hh:mm"
   hidden_130c3791: נסתר
   hidden_14a032a7: מוסתר
   hidden_available_with_a_link_65ef2bda: "מוסתר. זמין רק עם קישור יעודי."
@@ -17850,7 +17851,9 @@ he:
       ways_to_contact_user: התקשרות
     recent_activity: 
       date_column: תאריך
+      edit_group: "עריכת קבוצה"
       message_column: הודעה
+      new_announcement: הכרזה
       recent_activity: "פעילות אחרונה"
       recent_activity_in_course: "פעילות אחרונה ב %{course_or_group}"
       unread_column: "לא נקרא"
@@ -19209,6 +19212,7 @@ he:
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "קובץ זה מצריך הגדרת זכויות שימוש לפני שניתן יהיה לפרסמו"
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "התיקיה הזו נעולה כרגע ואינה זמינה לעיון"
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "ההערכה הזו שונה מזו שמוצגת לתלמיד כיון שכמה משימות הוקפאו"
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: "הערכה זו הושמטה בשלב זה לתלמיד הזה"
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "התמונה מופיעה כתמונת רקע שקופה על הדף שלך. הפורמטים המותרים: PNG, SVG, GIF, JPEG"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "זוהי רשימה המופרדת בפסיקים, של כתובות דפים שניתן לבטוח בהם. בטחון זה מאפשר לעקוף את אסימון CSRF כאשר מתחברים לקנבס."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "זהו קורס שסוכם, כך שרק רישום מסכם זמין"
@@ -20696,6 +20700,7 @@ he:
     two: "החיפוש שלך נתקל בשגיאות הבאות:"
   your_submission_has_not_been_graded_yet_d6963e53: "ההגשה שלך עדיין לא הוערכה."
   your_time_for_this_quiz_has_been_reduced_394652e9: "הזמן שהוקצה לך למשימה זו הופחת."
+  yyyy_mm_dd_cbbd9959: YYYY-MM-DD
   yyyy_mm_dd_hh_mm_a01b6081: "YYYY-MM-DD hh:mm"
   z_a_b48d8903: "ת - א"
   zendesk: 

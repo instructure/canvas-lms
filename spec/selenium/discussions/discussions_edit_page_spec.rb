@@ -582,7 +582,7 @@ describe "discussions" do
       end
     end
 
-    context "when :discussion_create feature flag is ON" do
+    context "when :discussion_create feature flag is ON", :ignore_js_errors do
       before do
         Account.site_admin.enable_feature!(:discussion_create)
         Account.site_admin.enable_feature!(:react_discussions_post)
@@ -1703,6 +1703,115 @@ describe "discussions" do
               wait_for_assign_to_tray_spinner
               expect(module_item_assign_to_card.last).to contain_css(reply_to_topic_due_date_input_selector)
             end
+
+            it "shows required replies input on graded discussion with sub assignments" do
+              Account.site_admin.enable_feature!(:discussion_checkpoints)
+              @course.root_account.enable_feature!(:discussion_checkpoints)
+              assignment = @course.assignments.create!(
+                name: "Assignment",
+                submission_types: ["online_text_entry"],
+                points_possible: 20
+              )
+              assignment.update!(has_sub_assignments: true)
+              assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 10, due_at: 3.days.from_now)
+              assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+              graded_discussion = @course.discussion_topics.create!(
+                title: "Graded Discussion",
+                discussion_type: "threaded",
+                posted_at: "2017-07-09 16:32:34",
+                user: @teacher,
+                assignment:,
+                reply_to_entry_required_count: 1
+              )
+
+              # Open page and assignTo tray
+              get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}/edit"
+              Discussion.assign_to_button.click
+
+              wait_for_assign_to_tray_spinner
+              expect(module_item_assign_to_card.last).to contain_css(required_replies_due_date_input_selector)
+            end
+          end
+
+          context "post to sis" do
+            before do
+              course.account.set_feature_flag! "post_grades", "on"
+              course.account.set_feature_flag! :new_sis_integrations, "on"
+              course.account.settings[:sis_syncing] = { value: true, locked: false }
+              course.account.settings[:sis_require_assignment_due_date] = { value: true }
+              course.account.save!
+            end
+
+            it "blocks when enabled", :ignore_js_errors do
+              graded_discussion = create_graded_discussion(course)
+              get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+              Discussion.click_sync_to_sis_checkbox
+              Discussion.save_button.click
+              wait_for_ajaximations
+
+              expect(driver.current_url).to include("edit")
+              expect_instui_flash_message("Please set a due date or change your selection for the “Sync to SIS” option.")
+
+              Discussion.click_assign_to_button
+
+              wait_for_assign_to_tray_spinner
+              keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+              expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
+              update_due_date(0, format_date_for_view(Time.zone.now, "%-m/%-d/%Y"))
+              update_due_time(0, "11:59 PM")
+              click_save_button("Apply")
+              keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+              expect_new_page_load { Discussion.save_button.click }
+              expect(driver.current_url).not_to include("edit")
+              expect(graded_discussion.reload.assignment.post_to_sis).to be_truthy
+              get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+              expect(is_checked(Discussion.sync_to_sis_checkbox_selector)).to be_truthy
+            end
+
+            it "does not block when disabled" do
+              graded_discussion = create_graded_discussion(course)
+              get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+
+              expect_new_page_load { Discussion.save_button.click }
+              expect(driver.current_url).not_to include("edit")
+              expect(graded_discussion.reload.assignment.post_to_sis).to be_falsey
+
+              get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+              expect(is_checked(Discussion.sync_to_sis_checkbox_selector)).to be_falsey
+            end
+
+            it "validates due date when user checks/unchecks the box", :ignore_js_errors do
+              graded_discussion = create_graded_discussion(course)
+              get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+
+              Discussion.click_assign_to_button
+              wait_for_assign_to_tray_spinner
+              keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+              expect(assign_to_date_and_time[0].text).not_to include("Please add a due date")
+
+              click_cancel_button
+              keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+              Discussion.click_sync_to_sis_checkbox
+              Discussion.click_assign_to_button
+              wait_for_assign_to_tray_spinner
+              keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+              expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
+              update_due_date(0, format_date_for_view(Time.zone.now, "%-m/%-d/%Y"))
+              update_due_time(0, "11:59 PM")
+              click_save_button("Apply")
+              keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+              expect_new_page_load { Discussion.save_button.click }
+              expect(driver.current_url).not_to include("edit")
+              expect(graded_discussion.reload.assignment.post_to_sis).to be_truthy
+            end
           end
         end
 
@@ -1813,6 +1922,96 @@ describe "discussions" do
             expect(assignment.sub_assignments.count).to eq 0
             expect(Assignment.last.has_sub_assignments).to be(false)
             expect(DiscussionTopic.last.assignment).to be_nil
+          end
+        end
+
+        context "mastery paths aka cyoe ake conditional release" do
+          def create_assignment(course, title, points_possible = 10)
+            course.assignments.create!(
+              title: "#{title} #{SecureRandom.alphanumeric(10)}",
+              description: "General Assignment",
+              points_possible:,
+              submission_types: "online_text_entry",
+              workflow_state: "published"
+            )
+          end
+
+          def create_discussion(course, creator, workflow_state = "published")
+            discussion_assignment = create_assignment(@course, "Discussion Assignment", 10)
+            course.discussion_topics.create!(
+              user: creator,
+              title: "Discussion Topic #{SecureRandom.alphanumeric(10)}",
+              message: "Discussion topic message",
+              assignment: discussion_assignment,
+              workflow_state:
+            )
+          end
+
+          it "loads connected mastery paths immediately is requested in url" do
+            course_with_teacher_logged_in
+            @course.conditional_release = true
+            @course.save!
+
+            @trigger_assignment = create_assignment(@course, "Mastery Path Main Assignment", 10)
+            @set1_assmt1 = create_assignment(@course, "Set 1 Assessment 1", 10)
+            @set2_assmt1 = create_assignment(@course, "Set 2 Assessment 1", 10)
+            @set2_assmt2 = create_assignment(@course, "Set 2 Assessment 2", 10)
+            @set3a_assmt = create_assignment(@course, "Set 3a Assessment", 10)
+            @set3b_assmt = create_assignment(@course, "Set 3b Assessment", 10)
+
+            graded_discussion = create_discussion(@course, @teacher)
+
+            course_module = @course.context_modules.create!(name: "Mastery Path Module")
+            course_module.add_item(id: @trigger_assignment.id, type: "assignment")
+            course_module.add_item(id: @set1_assmt1.id, type: "assignment")
+            course_module.add_item(id: graded_discussion.id, type: "discussion_topic")
+            course_module.add_item(id: @set2_assmt1.id, type: "assignment")
+            course_module.add_item(id: @set2_assmt2.id, type: "assignment")
+            course_module.add_item(id: @set3a_assmt.id, type: "assignment")
+            course_module.add_item(id: @set3b_assmt.id, type: "assignment")
+
+            ranges = [
+              ConditionalRelease::ScoringRange.new(lower_bound: 0.7, upper_bound: 1.0, assignment_sets: [
+                                                     ConditionalRelease::AssignmentSet.new(assignment_set_associations: [
+                                                                                             ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set1_assmt1.id),
+                                                                                             ConditionalRelease::AssignmentSetAssociation.new(assignment_id: graded_discussion.assignment_id)
+                                                                                           ])
+                                                   ]),
+              ConditionalRelease::ScoringRange.new(lower_bound: 0.4, upper_bound: 0.7, assignment_sets: [
+                                                     ConditionalRelease::AssignmentSet.new(assignment_set_associations: [
+                                                                                             ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set2_assmt1.id),
+                                                                                             ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set2_assmt2.id)
+                                                                                           ])
+                                                   ]),
+              ConditionalRelease::ScoringRange.new(lower_bound: 0, upper_bound: 0.4, assignment_sets: [
+                                                     ConditionalRelease::AssignmentSet.new(
+                                                       assignment_set_associations: [ConditionalRelease::AssignmentSetAssociation.new(
+                                                         assignment_id: @set3a_assmt.id
+                                                       )]
+                                                     ),
+                                                     ConditionalRelease::AssignmentSet.new(
+                                                       assignment_set_associations: [ConditionalRelease::AssignmentSetAssociation.new(
+                                                         assignment_id: @set3b_assmt.id
+                                                       )]
+                                                     )
+                                                   ])
+            ]
+            @rule = @course.conditional_release_rules.create!(trigger_assignment: @trigger_assignment, scoring_ranges: ranges)
+
+            mp_discussion = @course.discussion_topics.create!(assignment: @trigger_assignment, title: "graded discussion")
+
+            get "/courses/#{@course.id}/discussion_topics/#{mp_discussion.id}/edit#mastery-paths-editor"
+            fj("div[role='tab']:contains('Mastery Paths')").click
+
+            ui_ranges = ff("div.cr-scoring-range")
+            expect(ui_ranges[0].text).to include @set1_assmt1.title
+            expect(ui_ranges[0].text).to include graded_discussion.title
+
+            expect(ui_ranges[1].text).to include @set2_assmt1.title
+            expect(ui_ranges[1].text).to include @set2_assmt2.title
+
+            expect(ui_ranges[2].text).to include @set3a_assmt.title
+            expect(ui_ranges[2].text).to include @set3b_assmt.title
           end
         end
       end

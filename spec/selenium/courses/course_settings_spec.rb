@@ -577,8 +577,7 @@ describe "course settings" do
     it "shows publish/unpublish buttons in sidebar and no status badge if user can change publish state" do
       course_with_teacher_logged_in(active_all: true)
       get "/courses/#{@course.id}/settings"
-      expect(f("#course_status_form")).to be_present
-      expect(f("#course_status_form #continue_to")).to have_attribute("value", "#{course_url(@course)}/settings")
+      expect(f("#course_publish_button")).to be_present
       expect(f("#content")).not_to contain_css("#course-status")
     end
 
@@ -586,7 +585,7 @@ describe "course settings" do
       course_with_ta_logged_in(active_all: true)
       get "/courses/#{@course.id}/settings"
       expect(f("#course-status")).to be_present
-      expect(f("#content")).not_to contain_css("#course_status_form")
+      expect(f("#content")).not_to contain_css("#course_publish_button")
     end
   end
 

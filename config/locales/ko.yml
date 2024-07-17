@@ -6958,6 +6958,7 @@ ko:
       create: "%{model} 새로 만들기"
       submit: "%{model} 저장하기"
       update: "%{model} 업데이트"
+  hh_mm_5faafa69: "hh:mm"
   hidden_14a032a7: 비공개
   hide_all_details_61d7ebb: "모든 세부 정보 숨기기"
   hide_e057ff36: 숨기기
@@ -12649,7 +12650,9 @@ ko:
       ways_to_contact_user: 연락처
     recent_activity: 
       date_column: 날짜
+      edit_group: "그룹 편집"
       message_column: 메시지
+      new_announcement: 공지
       recent_activity: "최근 활동"
       recent_activity_in_course: "%{course_or_group}의 최근 활동"
       unread_column: "읽지 않은 메시지"
@@ -14401,6 +14404,7 @@ ko:
       %{url}
   your_message_was_sent_977f6583: "메세지가 전송되었습니다!"
   your_password_has_been_changed_df0e72aa: "비밀번호가 변경되었습니다."
+  yyyy_mm_dd_cbbd9959: YYYY-MM-DD
   yyyy_mm_dd_hh_mm_a01b6081: "YYYY-MM-DD hh:mm"
   zip_argument_error: ".zip 업로드는 업로드할 대상 폴더가 필요합니다."
   zip_file_display: "파일 가져오기"

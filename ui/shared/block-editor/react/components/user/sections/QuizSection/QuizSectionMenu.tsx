@@ -18,10 +18,10 @@
 
 import React, {useCallback, useState} from 'react'
 import {useEditor, useNode, type Node} from '@craftjs/core'
-import {SectionMenu} from '../../../editor/SectionMenu'
+import {SectionMenu, type SectionMenuProps} from '../../../editor/SectionMenu'
 import {QuizModal} from './QuizModal'
 
-const QuizSectionMenu = () => {
+const QuizSectionMenu = ({onAddSection}: SectionMenuProps) => {
   const {actions} = useEditor()
   const {
     actions: {setProp},
@@ -50,7 +50,7 @@ const QuizSectionMenu = () => {
 
   return (
     <>
-      <SectionMenu onEditSection={handleEditSection} />
+      <SectionMenu onEditSection={handleEditSection} onAddSection={onAddSection} />
       <QuizModal
         open={modalOpen}
         currentQuestionId={props.questionId}

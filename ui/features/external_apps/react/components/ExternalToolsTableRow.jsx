@@ -259,7 +259,6 @@ export default class ExternalToolsTableRow extends React.Component {
 
   render() {
     const {tool} = this.props
-    const show_top_nav_toggles = !!ENV.FEATURES?.top_navigation_placement
 
     return (
       <tr className="ExternalToolsTableRow external_tool_item">
@@ -271,7 +270,7 @@ export default class ExternalToolsTableRow extends React.Component {
         >
           {tool.name} {this.disabledFlag()}
         </td>
-        {this.props.showLTIFavoriteToggles && show_top_nav_toggles && (
+        {this.props.showLTIFavoriteToggles && (
           <td>
             {canBeTopNavFavorite(tool) ? (
               <Checkbox

@@ -22,9 +22,9 @@ import {ZPlatformSettings} from './PlatformSettings'
 export interface Extension extends z.infer<typeof ZExtension> {}
 
 export const ZExtension = z.object({
-  domain: z.string().optional(),
+  domain: z.string().optional().nullable(),
   platform: z.string(),
-  tool_id: z.string().optional(),
-  privacy_level: ZLtiPrivacyLevel.optional(),
+  tool_id: z.string().optional().nullable(),
+  privacy_level: ZLtiPrivacyLevel.optional().nullable(),
   settings: ZPlatformSettings,
 })

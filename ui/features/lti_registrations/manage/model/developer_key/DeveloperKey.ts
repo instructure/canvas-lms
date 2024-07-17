@@ -29,9 +29,9 @@ export const ZDeveloperKey = z.object({
   allow_includes: z.boolean(),
   api_key: z.string(),
   created_at: z.string(),
-  developer_key_account_binding: ZDeveloperKeyAccountBinding.optional(),
+  developer_key_account_binding: ZDeveloperKeyAccountBinding.optional().nullable(),
   scopes: z.array(ZLtiScope),
-  inherited_from: ZDeveloperKeyId.optional(),
+  inherited_from: ZDeveloperKeyId.optional().nullable(),
   notes: z.string().nullable(),
   icon_url: z.string().nullable(),
   vendor_code: z.string().nullable(),
@@ -42,12 +42,12 @@ export const ZDeveloperKey = z.object({
   email: z.string().nullable(),
   name: z.string().nullable(),
   require_scopes: z.boolean().nullable(),
-  tool_configuration: ZLtiConfiguration.optional(),
-  test_cluster_only: z.boolean().optional(),
+  tool_configuration: ZLtiConfiguration.optional().nullable(),
+  test_cluster_only: z.boolean().optional().nullable(),
   client_credentials_audience: z.string().nullable(),
   is_lti_key: z.boolean(),
   is_lti_registration: z.boolean(),
-  lti_registration: ZLtiImsRegistration.optional(),
+  lti_registration: ZLtiImsRegistration.optional().nullable(),
 })
 
 export interface DeveloperKey extends z.infer<typeof ZDeveloperKey> {}

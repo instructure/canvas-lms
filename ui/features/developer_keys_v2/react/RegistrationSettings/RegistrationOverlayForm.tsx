@@ -57,8 +57,8 @@ export const RegistrationOverlayForm = (props: {
   } = React.useMemo(() => actions, [actions])
 
   React.useEffect(() => {
-    props.store.subscribe(state => {
-      setState(state)
+    props.store.subscribe(s => {
+      setState(s)
     })
     return () => {
       props.store.destroy()
@@ -127,7 +127,7 @@ export const RegistrationOverlayForm = (props: {
                 return [placement, placementOverlay] as const
               }
             })
-            .map(([placement, placementOverlay]) => {
+            .map(([_placement, placementOverlay]) => {
               const disabled = state.registration.disabledPlacements.includes(placementOverlay.type)
               return (
                 <div>
@@ -201,8 +201,8 @@ const PlacementOverlayForm = React.memo((props: PlacementOverlayFormProps) => {
                       renderLabel={I18n.t('Title')}
                       value={placementOverlay.label}
                       onChange={(event, value) => {
-                        updatePlacement(placementOverlay.type)(placementOverlay => ({
-                          ...placementOverlay,
+                        updatePlacement(placementOverlay.type)(po => ({
+                          ...po,
                           label: value,
                         }))
                       }}
@@ -213,8 +213,8 @@ const PlacementOverlayForm = React.memo((props: PlacementOverlayFormProps) => {
                       renderLabel={I18n.t('Icon URL')}
                       value={placementOverlay.icon_url}
                       onChange={(event, value) => {
-                        updatePlacement(placementOverlay.type)(placementOverlay => ({
-                          ...placementOverlay,
+                        updatePlacement(placementOverlay.type)(po => ({
+                          ...po,
                           icon_url: value,
                         }))
                       }}
