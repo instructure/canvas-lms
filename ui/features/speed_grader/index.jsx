@@ -90,6 +90,7 @@ ready(() => {
             },
             emojisDenyList: window.ENV.EMOJI_DENY_LIST?.split(','),
             mediaSettings: window.INST.kalturaSettings,
+            lang: window.navigator.language || ENV.LOCALE || ENV.BIGEASY_LOCALE,
           },
           features: {
             extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
