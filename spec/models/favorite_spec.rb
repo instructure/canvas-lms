@@ -23,4 +23,29 @@ describe Favorite do
     favorite = @user.favorites.create!(context: @course)
     expect(favorite.root_account).to eq @course.root_account
   end
+
+  describe ".create_or_find_by" do
+    before do
+      student_in_course
+    end
+
+    context "when item is not present" do
+      it "inserts it into the DB" do
+        expect(Favorite.all).to eq []
+
+        fave = Favorite.create_or_find_by(user: @user, context: @course)
+        expect(Favorite.all).to eq [fave]
+      end
+    end
+
+    context "when item is present" do
+      before do
+        @fave = Favorite.create_or_find_by(user: @user, context: @course)
+      end
+
+      it "fetches it from the DB" do
+        expect(Favorite.create_or_find_by(user: @user, context: @course)).to eq @fave
+      end
+    end
+  end
 end

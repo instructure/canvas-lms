@@ -936,10 +936,24 @@ describe ActiveRecord::Base do
         expect(user.persisted?).to be true
       end
 
+      it "validates the model" do
+        user = User.new(workflow_state: 0, name: "a" * 256)
+
+        expect { user.insert }.to raise_error(/Name is too long/)
+      end
+
       it "invokes the save callbacks" do
         user = User.new(workflow_state: 0)
 
-        expect(user).to receive(:assign_uuid)
+        expect(user).to receive(:infer_defaults)
+
+        user.insert
+      end
+
+      it "invokes the create callbacks" do
+        user = User.new(workflow_state: 0)
+
+        expect(user).to receive(:set_default_feature_flags)
 
         user.insert
       end
