@@ -8713,6 +8713,7 @@ uk:
       submit: "Зберегти %{model}"
       update: "Оновити %{model}"
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Ось відмінний шанс познайомитися з календарем і додати будь-які події, які ще не призначені на певну дату в цьому курсі. Не хвилюйтеся, ми допоможемо вам."
+  hh_mm_5faafa69: "гг:хв"
   hidden_130c3791: прихований
   hidden_14a032a7: Приховано
   hidden_available_with_a_link_65ef2bda: "Приховано. Доступно за посиланням"
@@ -18809,6 +18810,7 @@ uk:
     other: "У вашому пошуку виявлено такі помилки:"
   your_submission_has_not_been_graded_yet_d6963e53: "Ваше відправлення ще не оцінено"
   your_time_for_this_quiz_has_been_reduced_394652e9: "Ваш час для цієї контрольної роботи було скорочено."
+  yyyy_mm_dd_cbbd9959: РРРР-ММ-ДД
   yyyy_mm_dd_hh_mm_a01b6081: "РРРР-ММ-ДД гг:хв"
   z_a_b48d8903: "Я - A"
   z_a_be2ab67c: Я–A
