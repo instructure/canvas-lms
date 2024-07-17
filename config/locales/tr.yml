@@ -10126,6 +10126,7 @@ tr:
   here_are_your_assignments_listed_by_due_date_7d8e98e6: "Teslim tarihine göre sıralanmış Ödevleriniz şunlar."
   here_f44564ee: burada.
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Takvimi daha iyi anlamak ve ödev olmayan olayları dersinize eklemek için harika bir fırsat. Merak etmeyin, size bu konuda yardımcı olacağız."
+  hh_mm_5faafa69: "ss:dd"
   hidden_130c3791: gizli
   hidden_14a032a7: Gizli
   hidden_available_with_a_link_65ef2bda: "Gizli. Bir bağlantı ile kullanılabilir"
@@ -20260,6 +20261,7 @@ tr:
   your_submission_has_not_been_graded_yet_d6963e53: "Gönderiniz henüz notlandırılmadı"
   your_time_for_this_quiz_has_been_reduced_394652e9: "Bu sınav için zamanınız azaltıldı."
   your_webcam_may_already_be_in_use_6cd64c25: "Web kameranız kullanılıyor olabilir."
+  yyyy_mm_dd_cbbd9959: YYYY-MM-DD
   yyyy_mm_dd_hh_mm_a01b6081: "YYYY-MM-DD hh:mm"
   z_a_b48d8903: "Z - A"
   z_a_be2ab67c: Z–A
