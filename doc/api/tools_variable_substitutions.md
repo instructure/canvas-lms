@@ -1071,10 +1071,23 @@ that a user has admin rights in, which fall under the root account that
 the tool was launched under. This list includes the IDs of
 all subaccounts of these accounts (and their subaccounts, etc.), since
 the admin privileges carry from an account to all its subaccounts.
+Root account admins are not supported by this variable,
+use `Canvas.user.isRootAccountAdmin` instead.
+
+### Example:
+* Root account
+    * Subaccount 1 (user is account admin)
+        * Subaccount 2
+            * Subaccount 3
+        * Subaccount 4
+    * Subaccount 5
+
+Result: `"1,2,4,3"`
 
 Will show a limit of 40000 characters. If the account IDs list is too big
 to fit into 40000 characters, 'truncated' will show at the end of the
 list.
+The result is cached for 5 minutes.
 
 **Availability**: *when launched by a logged in user*  
 
