@@ -7336,6 +7336,7 @@ el:
       submit: "Αποθήκευση %{model}"
       update: "Ενημέρωση %{model}"
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "<mrk mid=\"4305\" mtype=\"seg\">Αυτή είναι μια καταπληκτική ευκαιρία να γνωρίσετε το ημερολόγιο και να προσθέσετε σε αυτό γεγονότα που δεν έχουν να κάνουν με εργασίες αλλά αφορούν το μάθημα.</mrk> <mrk mid=\"4306\" mtype=\"seg\">Μην ανησυχείτε, θα σας βοηθήσουμε.</mrk>"
+  hh_mm_5faafa69: "ωω:λλ"
   hidden_130c3791: κρυφό
   hidden_14a032a7: Κρυφό
   hidden_available_with_a_link_65ef2bda: "<mrk mid=\"7575\" mtype=\"seg\">Κρυφό.</mrk> <mrk mid=\"7576\" mtype=\"seg\">Διατίθεται με σύνδεσμο</mrk>"
@@ -15798,6 +15799,7 @@ el:
     other: "Η εύρεσή σας αντιμετώπισε τα ακόλουθα σφάλματα:"
   your_submission_has_not_been_graded_yet_d6963e53: "Η υποβολή σας δεν έχει βαθμολογηθεί ακόμα"
   your_time_for_this_quiz_has_been_reduced_394652e9: "Ο χρόνος σας για αυτό το κουίζ έχει μειωθεί."
+  yyyy_mm_dd_cbbd9959: ΕΕΕΕ-ΜΜ-ΗΗ
   yyyy_mm_dd_hh_mm_a01b6081: "DD-MM-YYYY hh:mm"
   zendesk: 
     engine: 
