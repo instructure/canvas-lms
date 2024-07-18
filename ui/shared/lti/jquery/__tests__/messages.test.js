@@ -162,7 +162,7 @@ describe('ltiMessageHander', () => {
       })
     })
 
-    describe('when tool has other scopes', () => {
+    describe('when tool has only other scopes', () => {
       it('returns unauthorized error', async () => {
         const event = postMessageEvent({subject, origin})
         ENV.LTI_TOOL_SCOPES = {origin: ['http://canvas.instructure.com/lti/something/else']}
@@ -179,10 +179,15 @@ describe('ltiMessageHander', () => {
       })
     })
 
-    describe('when tool has the required scope', () => {
+    describe('when tool has a required scope', () => {
       it('processes message', async () => {
         const event = postMessageEvent({subject, origin})
-        ENV.LTI_TOOL_SCOPES = {origin: ['http://canvas.instructure.com/lti/page_content/show']}
+        ENV.LTI_TOOL_SCOPES = {
+          origin: [
+            'http://canvas.instructure.com/lti/something/else',
+            'https://canvas.instructure.com/lti/page_content/show',
+          ],
+        }
 
         await ltiMessageHandler(event)
         expect(event.source.postMessage).toHaveBeenCalledWith(
