@@ -439,10 +439,10 @@ class WebConference < ActiveRecord::Base
     []
   end
 
-  def craft_url(user = nil, session = nil, return_to = "http://www.instructure.com")
+  def craft_url(user = nil, session = nil, return_to = "https://www.instructure.com")
     user ||= self.user
     (initiate_conference and touch) or return nil
-    if user == self.user || grants_right?(user, session, :initiate)
+    if user.present? && (user == self.user || grants_right?(user, session, :initiate))
       admin_join_url(user, return_to)
     else
       participant_join_url(user, return_to)
