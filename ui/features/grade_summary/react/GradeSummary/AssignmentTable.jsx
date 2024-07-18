@@ -87,7 +87,7 @@ const AssignmentTable = ({
     )
   )
   const overrideGrade =
-    queryData?.usersConnection?.nodes[0]?.enrollments[0]?.grades.overrideGrade || null
+    queryData?.usersConnection?.nodes[0]?.enrollments[0]?.grades?.overrideGrade || null
 
   useEffect(() => {
     const grades = calculateCourseGrade(
