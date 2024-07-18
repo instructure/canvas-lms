@@ -279,6 +279,7 @@ export type RootAccountFeatureId =
   | 'usage_rights_discussion_topics'
   | 'account_level_mastery_scales'
   | 'non_scoring_rubrics'
+  | 'rubric_criterion_range'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES
