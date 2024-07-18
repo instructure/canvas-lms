@@ -1,6 +1,7 @@
 ---
 smart_search:
-  state: hidden
+  state: allowed
+  root_opt_in: true
   applies_to: Course
   display_name: Smart Search
   description: AI driven smart search feature.
