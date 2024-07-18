@@ -19,6 +19,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {useNode} from '@craftjs/core'
 import {ButtonBlock} from '../ButtonBlock'
 import {ButtonBlockToolbar} from '../ButtonBlockToolbar'
