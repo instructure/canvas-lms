@@ -341,12 +341,12 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
       {
         id: '2301',
         assignment_visibility: null,
-        only_visible_to_overrides: false,
+        visible_to_everyone: true,
       },
       {
         id: '2302',
         assignment_visibility: ['1102'],
-        only_visible_to_overrides: true,
+        visible_to_everyone: false,
       },
     ]
 

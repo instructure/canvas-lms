@@ -843,65 +843,60 @@ describe('ItemAssignToTray', () => {
     })
   })
 
-  describe('mastery paths option', () => {
-    beforeEach(() => {
-      fetchMock.getOnce(
-        '/api/v1/courses/1/settings',
-        {conditional_release: true},
-        {overwriteRoutes: true}
-      )
-      ;['assignments', 'quizzes', 'discussion_topics', 'pages'].forEach(itemType => {
-        fetchMock.getOnce(
-          `/api/v1/courses/1/${itemType}/23/date_details?per_page=100`,
-          {
-            only_visible_to_overrides: false,
-            visible_to_everyone: true,
-            overrides: [],
-          },
-          {overwriteRoutes: true}
-        )
-      })
-    })
+  it('fetches and combines multiple pages of overrides', async () => {
+    const page1 = {
+      id: '23',
+      overrides: [
+        {id: '1', title: 'Override 1'},
+        {id: '2', title: 'Override 2'},
+      ],
+    }
+    const response1 = {
+      body: page1,
+      headers: {
+        Link: '</api/v1/courses/1/assignments/23/date_details?page=2&per_page=100>; rel="next"',
+      },
+    }
 
-    // cf. LX-1879
-    it.skip('does not render mastery path option for ungraded discussions', async () => {
-      renderComponent({itemType: 'discussion', removeDueDateInput: true})
-      const assignToInput = await screen.findByTestId('assignee_selector')
-      await userEvent.click(assignToInput)
-      expect(await screen.findByText('Ben')).toBeInTheDocument()
-      expect(screen.queryByText('Mastery Paths')).not.toBeInTheDocument()
-    })
+    const page2 = {
+      id: '23',
+      overrides: [
+        {id: '3', title: 'Override 3'},
+        {id: '4', title: 'Override 4'},
+      ],
+    }
+    const response2 = {
+      body: page2,
+      headers: {
+        Link: '</api/v1/courses/1/assignments/23/date_details?page=3&per_page=100>; rel="next"',
+      },
+    }
 
-    it('does render mastery path option for graded discussions', async () => {
-      renderComponent({itemType: 'discussion', removeDueDateInput: false})
-      const assignToInput = await screen.findByTestId('assignee_selector')
-      await userEvent.click(assignToInput)
-      expect(await screen.findByText('Ben')).toBeInTheDocument()
-      expect(screen.getByText('Mastery Paths')).toBeInTheDocument()
-    })
+    const page3 = {
+      id: '23',
+      overrides: [{id: '5', title: 'Override 5'}],
+    }
+    const response3 = {
+      body: page3,
+    }
 
-    it('does render mastery path option for pages', async () => {
-      renderComponent({itemType: 'wiki_page', removeDueDateInput: true})
-      const assignToInput = await screen.findByTestId('assignee_selector')
-      await userEvent.click(assignToInput)
-      expect(await screen.findByText('Ben')).toBeInTheDocument()
-      expect(screen.getByText('Mastery Paths')).toBeInTheDocument()
-    })
+    fetchMock.get(OVERRIDES_URL, response1, {overwriteRoutes: true})
+    fetchMock.get(`/api/v1/courses/1/assignments/23/date_details?page=2&per_page=100`, response2)
+    fetchMock.get(`/api/v1/courses/1/assignments/23/date_details?page=3&per_page=100`, response3)
 
-    it('does render mastery path option for assignments', async () => {
-      renderComponent({itemType: 'assignment', removeDueDateInput: false})
-      const assignToInput = await screen.findByTestId('assignee_selector')
-      await userEvent.click(assignToInput)
-      expect(await screen.findByText('Ben')).toBeInTheDocument()
-      expect(screen.getByText('Mastery Paths')).toBeInTheDocument()
-    })
+    const {findAllByTestId} = renderComponent()
 
-    it('does render mastery path option for quizzes', async () => {
-      renderComponent({itemType: 'quiz', removeDueDateInput: false})
-      const assignToInput = await screen.findByTestId('assignee_selector')
-      await userEvent.click(assignToInput)
-      expect(await screen.findByText('Ben')).toBeInTheDocument()
-      expect(screen.getByText('Mastery Paths')).toBeInTheDocument()
+    await waitFor(async () => {
+      expect(fetchMock.calls(OVERRIDES_URL).length).toBe(1)
+
+      expect(
+        fetchMock.calls(`/api/v1/courses/1/assignments/23/date_details?page=2&per_page=100`).length
+      ).toBe(1)
+      expect(
+        fetchMock.calls(`/api/v1/courses/1/assignments/23/date_details?page=3&per_page=100`).length
+      ).toBe(1)
+      const cards = await findAllByTestId('item-assign-to-card')
+      expect(cards).toHaveLength(5)
     })
   })
 })

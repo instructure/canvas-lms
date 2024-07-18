@@ -217,6 +217,20 @@ shared_examples_for "item assign to tray during assignment creation/update" do
     expect(item_type_text.text).to include("100 pts")
   end
 
+  it "does not recover a deleted card when adding an assignee" do
+    # Bug fix of LX-1619
+    AssignmentCreateEditPage.click_manage_assign_to_button
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    click_add_assign_to_card
+    click_delete_assign_to_card(0)
+    select_module_item_assignee(0, @section1.name)
+
+    expect(selected_assignee_options.count).to be(1)
+  end
+
   context "Module overrides" do
     before do
       @context_module = @course.context_modules.create! name: "Mod"
@@ -503,6 +517,85 @@ describe "assignments show page assign to", :ignore_js_errors do
       AssignmentCreateEditPage.save_assignment
 
       expect(@nq_assignment.assignment_overrides.last.assignment_override_students.count).to eq(1)
+    end
+  end
+
+  context "post to sis" do
+    before do
+      @course.account.set_feature_flag! "post_grades", "on"
+      @course.account.set_feature_flag! :new_sis_integrations, "on"
+      @course.account.settings[:sis_syncing] = { value: true, locked: false }
+      @course.account.settings[:sis_require_assignment_due_date] = { value: true }
+      @course.account.save!
+
+      @assignment_ = @course.assignments.create(name: "assignment")
+    end
+
+    it "blocks saving empty due dates when enabled", :ignore_js_errors do
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment_.id)
+
+      AssignmentCreateEditPage.click_post_to_sis_checkbox
+
+      wait_for_ajaximations
+
+      expect(driver.current_url).to include("edit")
+
+      AssignmentCreateEditPage.save_assignment
+
+      expect_instui_flash_message("Please set a due date or change your selection for the “Sync to SIS” option.")
+
+      AssignmentCreateEditPage.click_manage_assign_to_button
+
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
+      update_due_date(0, format_date_for_view(Time.zone.now, "%-m/%-d/%Y"))
+      update_due_time(0, "11:59 PM")
+      click_save_button("Apply")
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      expect(is_checked(AssignmentCreateEditPage.post_to_sis_checkbox_selector)).to be_truthy
+    end
+
+    it "does not block empty due dates when disabled" do
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment_.id)
+
+      AssignmentCreateEditPage.save_assignment
+      expect(driver.current_url).not_to include("edit")
+      expect(@assignment_.post_to_sis).to be_falsey
+
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment_.id)
+      expect(is_checked(AssignmentCreateEditPage.post_to_sis_checkbox_selector)).to be_falsey
+    end
+
+    it "validates due date when user checks/unchecks the option", :ignore_js_errors do
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment_.id)
+
+      AssignmentCreateEditPage.click_manage_assign_to_button
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      expect(assign_to_date_and_time[0].text).not_to include("Please add a due date")
+
+      click_cancel_button
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      AssignmentCreateEditPage.click_post_to_sis_checkbox
+      AssignmentCreateEditPage.click_manage_assign_to_button
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      expect(assign_to_date_and_time[0].text).to include("Please add a due date")
+
+      update_due_date(0, format_date_for_view(Time.zone.now, "%-m/%-d/%Y"))
+      update_due_time(0, "11:59 PM")
+      click_save_button("Apply")
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      AssignmentCreateEditPage.save_assignment
+      expect(driver.current_url).not_to include("edit")
     end
   end
 end

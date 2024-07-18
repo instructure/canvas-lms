@@ -174,6 +174,7 @@ export default class ItemView extends Backbone.View {
   }
 
   renderItemAssignToTray(open, returnFocusTo, itemProps) {
+    const quizItemType = this.model.get('quiz_type') !== 'quizzes.next' ? 'quiz' : 'assignment'
     ReactDOM.render(
       <ItemAssignToTray
         open={open}
@@ -184,7 +185,7 @@ export default class ItemView extends Backbone.View {
           this.renderItemAssignToTray(false, returnFocusTo, itemProps)
           returnFocusTo.focus()
         }}
-        itemType="assignment"
+        itemType={quizItemType}
         locale={ENV.LOCALE || 'en'}
         timezone={ENV.TIMEZONE || 'UTC'}
         {...itemProps}

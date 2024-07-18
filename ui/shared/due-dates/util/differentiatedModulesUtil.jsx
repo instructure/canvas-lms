@@ -30,7 +30,7 @@ const I18n = useI18nScope('DueDateOverrideView')
 
 export const cloneObject = object => JSON.parse(JSON.stringify(object))
 
-const combinedDates = override => {
+export const combinedDates = override => {
   const overrideId = override.id == null ? '0' : override.id
   const dueAt = override.due_at == null ? '' : override.due_at
   const unlockAt = override.unlock_at == null ? '' : override.unlock_at

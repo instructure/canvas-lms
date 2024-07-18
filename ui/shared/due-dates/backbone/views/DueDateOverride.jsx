@@ -33,6 +33,7 @@ import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import * as tz from '@instructure/moment-utils'
 import '@canvas/jquery/jquery.instructure_forms'
 import sanitizeData from '../../../forms/sanitizeData'
+import {showPostToSisFlashAlert, combinedDates} from '../../util/differentiatedModulesUtil'
 
 const I18n = useI18nScope('DueDateOverrideView')
 
@@ -170,9 +171,17 @@ DueDateOverrideView.prototype.validateBeforeSave = function (data, errors) {
   if (!data) {
     return errors
   }
+  if(ENV.FEATURES?.selective_release_ui_api){
+    data = {...data, assignment_overrides: data.assignment_overrides.map(o => ({...o, rowKey: combinedDates(o) }))}
+  }
   errors = this.validateDatetimes(data, errors)
   errors = this.validateTokenInput(data, errors)
   errors = this.validateGroupOverrides(data, errors)
+  const hasEmptyDueDates = data.assignment_overrides.some(o => o.due_at === null)
+  const requiredDueDates = ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
+  if(hasEmptyDueDates && data.postToSIS && requiredDueDates){
+    showPostToSisFlashAlert('manage-assign-to')()
+  }
   return errors
 }
 
@@ -324,7 +333,7 @@ DueDateOverrideView.prototype.validateGroupOverrides = function (data, errors) {
 DueDateOverrideView.prototype.showError = function (element, message) {
   // some forms will already handle this on their own, this exists
   // as a fallback for forms that do not
-  if (!element) {
+  if (!element || element.length === 0) {
     return
   }
   return element.errorBox(message).css('z-index', '20').attr('role', 'alert')

@@ -172,7 +172,7 @@ describe('SubmissionStateMap with grading periods', () => {
 
   beforeEach(() => {
     options = {hasGradingPeriods: true, selectedGradingPeriodID: '0'}
-    assignment = {id: '1', published: true, effectiveDueDates: {}}
+    assignment = {id: '1', published: true, effectiveDueDates: {}, visible_to_everyone: true}
   })
 
   describe('inNoGradingPeriod', () => {

@@ -106,6 +106,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         points_possible: 10,
         published: true,
         submission_types: ['online_text_entry'],
+        visible_to_everyone: true,
       }
       submission = {
         assignment_id: '2301',
@@ -282,6 +283,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         grades_published: true,
         id: '2301',
         name: 'Math 1.1',
+        visible_to_everyone: true,
       }
       submission = {
         assignment_id: '2301',
@@ -475,6 +477,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         post_manually: true,
         published: true,
         submission_types: ['online_text_entry'],
+        visible_to_everyone: true,
       }
       gradebook.setAssignments({2301: assignment})
 
@@ -629,6 +632,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         post_manually: false,
         published: true,
         submission_types: ['online_text_entry'],
+        visible_to_everyone: true,
       }
 
       const assignment2 = {
@@ -645,6 +649,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         post_manually: false,
         published: true,
         submission_types: ['online_text_entry'],
+        visible_to_everyone: true,
       }
 
       gradebook.setAssignments({2301: assignment1, 2302: assignment2})

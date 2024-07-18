@@ -16,7 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import React, {
+  useCallback,
+  useEffect,
+  memo,
+  useRef,
+  useState,
+  type RefObject,
+  type MutableRefObject,
+  type RefAttributes,
+} from 'react'
 import {Mask} from '@instructure/ui-overlays'
 import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
@@ -27,7 +36,7 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconAddLine} from '@instructure/ui-icons'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {type DoFetchApiOpts} from '@canvas/do-fetch-api-effect'
 import type {
   AssigneeOption,
   BaseDateDetails,
@@ -36,9 +45,12 @@ import type {
   FetchDueDatesResponse,
   ItemAssignToCardSpec,
 } from './types'
-import ItemAssignToCard, {type ItemAssignToCardRef} from './ItemAssignToCard'
+import ItemAssignToCard, {
+  type ItemAssignToCardProps,
+  type ItemAssignToCardRef,
+} from './ItemAssignToCard'
 import {getOverriddenAssignees, itemTypeToApiURL} from '../../utils/assignToHelper'
-import {getEveryoneOption, ItemAssignToTrayProps} from './ItemAssignToTray'
+import {getEveryoneOption, type ItemAssignToTrayProps} from './ItemAssignToTray'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -52,8 +64,6 @@ export interface ItemAssignToTrayContentProps
   hasModuleOverrides: boolean
   setHasModuleOverrides: (state: boolean) => void
   setModuleAssignees: (assignees: string[]) => void
-  disabledOptionIds: string[]
-  setDisabledOptionIds: (options: string[]) => void
   defaultGroupCategoryId: string | null
   initialLoadRef: React.MutableRefObject<boolean>
   allOptions: AssigneeOption[]
@@ -64,15 +74,44 @@ export interface ItemAssignToTrayContentProps
   everyoneOption: AssigneeOption
   setGroupCategoryId: (id: string | null) => void
   setOverridesFetched: (flag: boolean) => void
-  cardsRefs: React.MutableRefObject<{
-    [cardId: string]: ItemAssignToCardRef
+  cardsRefs: MutableRefObject<{
+    [cardId: string]: RefObject<ItemAssignToCardRef>
   }>
   postToSIS?: boolean
+  assignToCardsRef: React.MutableRefObject<ItemAssignToCardSpec[]>
+  disabledOptionIdsRef: React.MutableRefObject<string[]>
 }
 
+const MAX_PAGES = 10
+
 function makeCardId(): string {
-  return uid('assign-to-card', 3)
+  return uid('assign-to-card', 12)
 }
+
+type OptimizedItemAssignToCardProps = ItemAssignToCardProps & RefAttributes<ItemAssignToCardRef>
+
+const ItemAssignToCardMemo = memo(
+  ItemAssignToCard,
+  (prevProps: OptimizedItemAssignToCardProps, nextProps: OptimizedItemAssignToCardProps) => {
+    return (
+      prevProps.everyoneOption?.value === nextProps.everyoneOption?.value &&
+      prevProps.selectedAssigneeIds?.length === nextProps.selectedAssigneeIds?.length &&
+      prevProps.highlightCard === nextProps.highlightCard &&
+      prevProps.isOpen === nextProps.isOpen &&
+      prevProps.due_at === nextProps.due_at &&
+      prevProps.original_due_at === nextProps.original_due_at &&
+      prevProps.unlock_at === nextProps.unlock_at &&
+      prevProps.lock_at === nextProps.lock_at &&
+      prevProps.reply_to_topic_due_at === nextProps.reply_to_topic_due_at &&
+      prevProps.required_replies_due_at === nextProps.required_replies_due_at &&
+      prevProps.removeDueDateInput === nextProps.removeDueDateInput &&
+      prevProps.isCheckpointed === nextProps.isCheckpointed &&
+      prevProps.courseId === nextProps.courseId &&
+      prevProps.contextModuleId === nextProps.contextModuleId &&
+      prevProps.contextModuleName === nextProps.contextModuleName
+    )
+  }
+)
 
 const ItemAssignToTrayContent = ({
   open,
@@ -102,8 +141,6 @@ const ItemAssignToTrayContent = ({
   hasModuleOverrides,
   setHasModuleOverrides,
   setModuleAssignees,
-  disabledOptionIds,
-  setDisabledOptionIds,
   defaultGroupCategoryId,
   allOptions,
   setSearchTerm,
@@ -114,9 +151,12 @@ const ItemAssignToTrayContent = ({
   setGroupCategoryId,
   setOverridesFetched,
   postToSIS = false,
+  assignToCardsRef,
+  disabledOptionIdsRef,
 }: ItemAssignToTrayContentProps) => {
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
+  const [hasFetched, setHasFetched] = useState(false)
 
   const lastPerformedAction = useRef<{action: 'add' | 'delete'; index?: number} | null>(null)
   const addCardButtonRef = useRef<Element | null>(null)
@@ -130,23 +170,47 @@ const ItemAssignToTrayContent = ({
     )
       return
 
-    setFetchInFlight(true)
-    doFetchApi({
-      path: itemTypeToApiURL(courseId, itemType, itemContentId),
-      params: {per_page: 100},
-    })
-      .then((response: FetchDueDatesResponse) => {
-        const dateDetailsApiResponse = response.json
-        setBlueprintDateLocks(dateDetailsApiResponse.blueprint_date_locks)
-      })
-      .catch(() => {
+    const fetchAllPages = async () => {
+      let url = itemTypeToApiURL(courseId, itemType, itemContentId)
+      const allResponses = []
+      setFetchInFlight(true)
+      try {
+        let pageCount = 0
+        let args: DoFetchApiOpts = {
+          path: url,
+          params: {per_page: 100},
+        }
+        while (url && pageCount < MAX_PAGES) {
+          // eslint-disable-next-line no-await-in-loop
+          const response: FetchDueDatesResponse = await doFetchApi(args)
+          allResponses.push(response.json)
+          url = response.link?.next?.url || null
+          args = {
+            path: url,
+          }
+          pageCount++
+        }
+
+        const combinedResponse = allResponses.reduce(
+          (acc, response) => ({
+            blueprint_date_locks: [
+              ...(acc.blueprint_date_locks || []),
+              ...(response.blueprint_date_locks || []),
+            ],
+          }),
+          {}
+        )
+        setBlueprintDateLocks(combinedResponse.blueprint_date_locks)
+      } catch {
         showFlashError()()
         handleDismiss()
-      })
-      .finally(() => {
+      } finally {
+        setHasFetched(true)
         setFetchInFlight(false)
         initialLoadRef.current = true
-      })
+      }
+    }
+    !hasFetched && fetchAllPages()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -175,12 +239,29 @@ const ItemAssignToTrayContent = ({
       const card = assignToCards.at(focusIndex)
       if (card) {
         const cardRef = cardsRefs.current[card.key]
-        cardRef?.focusDeleteButton()
+        if (cardRef?.current) {
+          lastPerformedAction.current = null
+          cardRef.current.focusDeleteButton()
+        }
       }
     }
-    lastPerformedAction.current = null
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [assignToCards.length])
+  }, [assignToCards, cardsRefs])
+
+  useEffect(() => {
+    // Remove extra refs if cards array has shrunk
+    Object.keys(cardsRefs.current).forEach(key => {
+      if (!assignToCards.some(card => card.key === key)) {
+        delete cardsRefs.current[key]
+      }
+    })
+
+    // Ensure cardsRefs has refs for all items
+    assignToCards.forEach(card => {
+      if (!cardsRefs.current[card.key]) {
+        cardsRefs.current[card.key] = React.createRef<ItemAssignToCardRef>()
+      }
+    })
+  }, [assignToCards, cardsRefs])
 
   useEffect(() => {
     if (defaultCards !== undefined) {
@@ -191,7 +272,7 @@ const ItemAssignToTrayContent = ({
   }, [JSON.stringify(defaultCards)])
 
   useEffect(() => {
-    setDisabledOptionIds(defaultDisabledOptionIds)
+    disabledOptionIdsRef.current = defaultDisabledOptionIds
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(defaultDisabledOptionIds)])
 
@@ -202,14 +283,42 @@ const ItemAssignToTrayContent = ({
       }
       return
     }
-    setFetchInFlight(true)
-    doFetchApi({
-      path: itemTypeToApiURL(courseId, itemType, itemContentId),
-      params: {per_page: 100},
-    })
-      .then((response: FetchDueDatesResponse) => {
-        // TODO: exhaust pagination
-        const dateDetailsApiResponse = response.json
+
+    const fetchAllPages = async () => {
+      setFetchInFlight(true)
+      let url = itemTypeToApiURL(courseId, itemType, itemContentId)
+      const allResponses = []
+
+      try {
+        let pageCount = 0
+        let args: DoFetchApiOpts = {
+          path: url,
+          params: {per_page: 100},
+        }
+        while (url && pageCount < MAX_PAGES) {
+          // eslint-disable-next-line no-await-in-loop
+          const response: FetchDueDatesResponse = await doFetchApi(args)
+          allResponses.push(response.json)
+          url = response.link?.next?.url || null
+          args = {
+            path: url,
+          }
+          pageCount++
+        }
+
+        const combinedResponse = allResponses.reduce(
+          (acc, response) => ({
+            ...response,
+            overrides: [...(acc.overrides || []), ...(response.overrides || [])],
+            blueprint_date_locks: [
+              ...(acc.blueprint_date_locks || []),
+              ...(response.blueprint_date_locks || []),
+            ],
+          }),
+          {}
+        )
+
+        const dateDetailsApiResponse = combinedResponse
         const overrides = dateDetailsApiResponse.overrides
         const overriddenTargets = getOverriddenAssignees(overrides)
         delete dateDetailsApiResponse.overrides
@@ -312,19 +421,20 @@ const ItemAssignToTrayContent = ({
         setGroupCategoryId(dateDetailsApiResponse.group_category_id)
         setOverridesFetched(true)
         setBlueprintDateLocks(dateDetailsApiResponse.blueprint_date_locks)
-        setDisabledOptionIds(selectedOptionIds)
+        disabledOptionIdsRef.current = selectedOptionIds
         setInitialCards(cards)
         onInitialStateSet?.(cards)
         setAssignToCards(cards)
-      })
-      .catch(() => {
+      } catch {
         showFlashError()()
         handleDismiss()
-      })
-      .finally(() => {
+      } finally {
+        setHasFetched(true)
         setFetchInFlight(false)
         initialLoadRef.current = true
-      })
+      }
+    }
+    !hasFetched && fetchAllPages()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId, itemContentId, itemType, JSON.stringify(defaultCards)])
 
@@ -356,17 +466,17 @@ const ItemAssignToTrayContent = ({
 
   const handleDeleteCard = useCallback(
     (cardId: string) => {
-      const cardIndex = assignToCards.findIndex(card => card.key === cardId)
-      const cardSelection = assignToCards.at(cardIndex)?.selectedAssigneeIds ?? []
-      const newDisabled = disabledOptionIds.filter(id => !cardSelection.includes(id))
-      const cards = assignToCards.filter(({key}) => key !== cardId)
+      const cardIndex = assignToCardsRef.current.findIndex(card => card.key === cardId)
+      const cardSelection = assignToCardsRef.current.at(cardIndex)?.selectedAssigneeIds ?? []
+      const newDisabled = disabledOptionIdsRef.current.filter(id => !cardSelection.includes(id))
+      const cards = assignToCardsRef.current.filter(({key}) => key !== cardId)
       lastPerformedAction.current = {action: 'delete', index: cardIndex}
       setAssignToCards(cards)
-      setDisabledOptionIds(newDisabled)
+      disabledOptionIdsRef.current = newDisabled
       onCardRemove?.(cardId)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [assignToCards, disabledOptionIds, onCardRemove, setAssignToCards]
+    [onCardRemove, setAssignToCards]
   )
 
   const handleCardValidityChange = useCallback(
@@ -384,106 +494,118 @@ const ItemAssignToTrayContent = ({
     [assignToCards, setAssignToCards]
   )
 
-  const handleCardAssignment = (
-    cardId: string,
-    assignees: AssigneeOption[],
-    deletedAssignees: string[]
-  ) => {
-    const selectedAssigneeIds = assignees.map(({id}) => id)
-    const initialCard = initialCards.find(card => card.key === cardId)
-    const areEquals =
-      JSON.stringify(initialCard?.selectedAssigneeIds) === JSON.stringify(selectedAssigneeIds)
-    const cards = assignToCards.map(card =>
-      card.key === cardId
-        ? {
-            ...card,
-            selectedAssigneeIds,
-            highlightCard: !areEquals,
-            isEdited: !areEquals,
-            hasAssignees: assignees.length > 0,
-          }
-        : card
-    )
-    if (onAssigneesChange) {
-      handleCustomAssigneesChange(cardId, assignees, deletedAssignees)
-    }
+  const handleCustomAssigneesChange = useCallback(
+    (cardId: string, assignees: AssigneeOption[], deletedAssignees: string[]) => {
+      const newSelectedOption = assignees.filter(
+        assignee => !disabledOptionIdsRef.current.includes(assignee.id)
+      )[0]
+      const idData = newSelectedOption?.id?.split('-')
+      const isEveryoneOption = newSelectedOption?.id === everyoneOption.id
+      const parsedCard =
+        newSelectedOption === undefined
+          ? ({} as exportedOverride)
+          : ({
+              id: isEveryoneOption ? defaultSectionId : idData[1],
+              name: newSelectedOption.value,
+            } as exportedOverride)
 
-    const allSelectedOptions = [...disabledOptionIds, ...assignees.map(({id}) => id)]
-    const uniqueOptions = [...new Set(allSelectedOptions)]
-    const newDisabled = uniqueOptions.filter(id =>
-      deletedAssignees.length > 0 ? !deletedAssignees.includes(id) : true
-    )
+      if (newSelectedOption?.id === everyoneOption.id) {
+        if (hasModuleOverrides) {
+          parsedCard.course_id = 'everyone'
+        } else {
+          parsedCard.course_section_id = defaultSectionId
+        }
+      } else if (parsedCard.id && idData[0] === 'section') {
+        parsedCard.course_section_id = idData[1]
+      } else if (parsedCard.id && idData[0] === 'student') {
+        parsedCard.short_name = newSelectedOption.value
+      } else if (parsedCard.id && idData[0] === 'group') {
+        parsedCard.group_id = idData[1]
+        parsedCard.group_category_id = newSelectedOption.groupCategoryId
+      } else if (idData && idData[0] === 'mastery_paths') {
+        parsedCard.noop_id = '1'
+      }
 
-    setAssignToCards(cards)
-    setDisabledOptionIds(newDisabled)
-  }
+      const parsedDeletedCard = deletedAssignees.map(id => {
+        const card = allOptions.find(a => a.id === id)
+        const data = card?.id?.split('-')
+        const deleted = {name: card?.value, type: data?.[0]} as exportedOverride
 
-  const handleCustomAssigneesChange = (
-    cardId: string,
-    assignees: AssigneeOption[],
-    deletedAssignees: string[]
-  ) => {
-    const newSelectedOption = assignees.filter(
-      assignee => !disabledOptionIds.includes(assignee.id)
-    )[0]
-    const idData = newSelectedOption?.id?.split('-')
-    const isEveryoneOption = newSelectedOption?.id === everyoneOption.id
-    const parsedCard =
-      newSelectedOption === undefined
-        ? ({} as exportedOverride)
-        : ({
-            id: isEveryoneOption ? defaultSectionId : idData[1],
-            name: newSelectedOption.value,
-          } as exportedOverride)
+        if (id === everyoneOption.id) {
+          deleted.course_section_id = defaultSectionId
+        } else if (data?.[0] === 'section') {
+          deleted.course_section_id = data[1]
+        } else if (data?.[0] === 'student') {
+          deleted.short_name = card?.value
+          deleted.student_id = data[1]
+        } else if (data?.[0] === 'group') {
+          deleted.group_id = data[1]
+        } else if (data?.[0] === 'mastery_paths') {
+          deleted.noop_id = '1'
+        }
+        return deleted
+      })
+      onAssigneesChange?.(cardId, parsedCard, parsedDeletedCard)
+    },
+    [
+      allOptions,
+      defaultSectionId,
+      disabledOptionIdsRef,
+      everyoneOption.id,
+      hasModuleOverrides,
+      onAssigneesChange,
+    ]
+  )
 
-    if (newSelectedOption?.id === everyoneOption.id) {
-      if (hasModuleOverrides) {
-        parsedCard.course_id = 'everyone'
+  const handleCardAssignment = useCallback(
+    (cardId: string, assignees: AssigneeOption[], deletedAssignees: string[]) => {
+      const selectedAssigneeIds = assignees.map(({id}) => id)
+      const initialCard = initialCards.find(card => card.key === cardId)
+      const areEquals =
+        JSON.stringify(initialCard?.selectedAssigneeIds) === JSON.stringify(selectedAssigneeIds)
+      const cards = assignToCardsRef.current.map(card =>
+        card.key === cardId
+          ? {
+              ...card,
+              selectedAssigneeIds,
+              highlightCard: !areEquals,
+              isEdited: !areEquals,
+              hasAssignees: assignees.length > 0,
+            }
+          : card
+      )
+      if (onAssigneesChange) {
+        handleCustomAssigneesChange(cardId, assignees, deletedAssignees)
       } else {
-        parsedCard.course_section_id = defaultSectionId
+        const allSelectedOptions = [...disabledOptionIdsRef.current, ...assignees.map(({id}) => id)]
+        const uniqueOptions = [...new Set(allSelectedOptions)]
+        const newDisabled = uniqueOptions.filter(id =>
+          deletedAssignees.length > 0 ? !deletedAssignees.includes(id) : true
+        )
+        disabledOptionIdsRef.current = newDisabled
       }
-    } else if (parsedCard.id && idData[0] === 'section') {
-      parsedCard.course_section_id = idData[1]
-    } else if (parsedCard.id && idData[0] === 'student') {
-      parsedCard.short_name = newSelectedOption.value
-    } else if (parsedCard.id && idData[0] === 'group') {
-      parsedCard.group_id = idData[1]
-      parsedCard.group_category_id = newSelectedOption.groupCategoryId
-    } else if (idData && idData[0] === 'mastery_paths') {
-      parsedCard.noop_id = '1'
-    }
 
-    const parsedDeletedCard = deletedAssignees.map(id => {
-      const card = allOptions.find(a => a.id === id)
-      const data = card?.id?.split('-')
-      const deleted = {name: card?.value, type: data?.[0]} as exportedOverride
-
-      if (id === everyoneOption.id) {
-        deleted.course_section_id = defaultSectionId
-      } else if (data?.[0] === 'section') {
-        deleted.course_section_id = data[1]
-      } else if (data?.[0] === 'student') {
-        deleted.short_name = card?.value
-        deleted.student_id = data[1]
-      } else if (data?.[0] === 'group') {
-        deleted.group_id = data[1]
-      } else if (data?.[0] === 'mastery_paths') {
-        deleted.noop_id = '1'
-      }
-      return deleted
-    })
-    onAssigneesChange?.(cardId, parsedCard, parsedDeletedCard)
-  }
+      setAssignToCards(cards)
+    },
+    [
+      assignToCardsRef,
+      disabledOptionIdsRef,
+      handleCustomAssigneesChange,
+      initialCards,
+      onAssigneesChange,
+      setAssignToCards,
+    ]
+  )
 
   const handleDatesChange = useCallback(
     (cardId: string, dateAttribute: string, dateValue: string | null) => {
       const newDate = dateValue // === null ? undefined : dateValue
       const initialCard = initialCards.find(card => card.key === cardId)
-      const {highlightCard, isEdited, ...currentCardProps} = assignToCards.find(
+      const currentCardProps = assignToCardsRef.current.find(
         card => card.key === cardId
       ) as ItemAssignToCardSpec
       const currentCard = {...currentCardProps, [dateAttribute]: newDate}
-      const priorCard = assignToCards.find(card => card.key === cardId)
+      const priorCard = assignToCardsRef.current.find(card => card.key === cardId)
       if (priorCard) {
         const dateChanged = priorCard[dateAttribute] !== dateValue
         if (!dateChanged) {
@@ -494,27 +616,24 @@ const ItemAssignToTrayContent = ({
       const areEquals = JSON.stringify(initialCard) === JSON.stringify(currentCard)
 
       const newCard = {...currentCard, highlightCard: !areEquals, isEdited: !areEquals}
-      const cards = assignToCards.map(card => (card.key === cardId ? newCard : card))
+      const cards = assignToCardsRef.current.map(card => (card.key === cardId ? newCard : card))
       setAssignToCards(cards)
       onDatesChange?.(cardId, dateAttribute, newDate ?? '')
     },
-    [assignToCards, initialCards, onDatesChange, setAssignToCards]
+    [assignToCardsRef, initialCards, onDatesChange, setAssignToCards]
   )
 
-  const allCardsAssigned = useCallback(() => {
-    return assignToCards.every(card => card.hasAssignees)
-  }, [assignToCards])
+  const allCardsAssigned = () => {
+    return assignToCardsRef.current.every(card => card.hasAssignees)
+  }
 
-  function renderCards(isOpen?: boolean) {
-    const cardCount = assignToCards.length
-    return assignToCards.map((card, i) => {
-      return (
-        // eslint-disable-next-line react/no-array-index-key
-        <View key={`${card.key}-${i}`} as="div" margin="small 0 0 0">
-          <ItemAssignToCard
-            ref={cardRef => {
-              if (cardRef) cardsRefs.current[card.key] = cardRef
-            }}
+  const renderCardsOptimized = useCallback(
+    (isOpen?: boolean) => {
+      const cardCount = assignToCards.length
+      return assignToCards.map(card => (
+        <View key={`${card.key}`} as="div" margin="small 0 0 0">
+          <ItemAssignToCardMemo
+            ref={cardsRefs.current[card.key]}
             courseId={courseId}
             contextModuleId={card.contextModuleId}
             contextModuleName={card.contextModuleName}
@@ -532,7 +651,7 @@ const ItemAssignToTrayContent = ({
             onCardDatesChange={handleDatesChange}
             onValidityChange={handleCardValidityChange}
             isOpen={isOpen}
-            disabledOptionIds={disabledOptionIds}
+            disabledOptionIds={disabledOptionIdsRef.current}
             everyoneOption={everyoneOption}
             selectedAssigneeIds={card.selectedAssigneeIds}
             customAllOptions={allOptions}
@@ -541,6 +660,66 @@ const ItemAssignToTrayContent = ({
             highlightCard={card.highlightCard}
             blueprintDateLocks={blueprintDateLocks}
             postToSIS={postToSIS}
+            disabledOptionIdsRef={disabledOptionIdsRef}
+          />
+        </View>
+      ))
+    },
+    [
+      assignToCards,
+      cardsRefs,
+      courseId,
+      removeDueDateInput,
+      isCheckpointed,
+      handleDeleteCard,
+      handleCardAssignment,
+      handleDatesChange,
+      handleCardValidityChange,
+      everyoneOption,
+      allOptions,
+      isLoadingAssignees,
+      setSearchTerm,
+      blueprintDateLocks,
+      postToSIS,
+      disabledOptionIdsRef,
+    ]
+  )
+
+  function renderCards(isOpen?: boolean) {
+    const cardCount = assignToCards.length
+    return assignToCards.map((card, i) => {
+      return (
+        // eslint-disable-next-line react/no-array-index-key
+        <View key={`${card.key}-${i}`} as="div" margin="small 0 0 0">
+          <ItemAssignToCard
+            ref={cardsRefs.current[card.key]}
+            courseId={courseId}
+            contextModuleId={card.contextModuleId}
+            contextModuleName={card.contextModuleName}
+            removeDueDateInput={removeDueDateInput}
+            isCheckpointed={isCheckpointed}
+            cardId={card.key}
+            reply_to_topic_due_at={card.reply_to_topic_due_at}
+            required_replies_due_at={card.required_replies_due_at}
+            due_at={card.due_at}
+            original_due_at={card.original_due_at}
+            unlock_at={card.unlock_at}
+            lock_at={card.lock_at}
+            onDelete={cardCount === 1 ? undefined : handleDeleteCard}
+            onCardAssignmentChange={handleCardAssignment}
+            onCardDatesChange={handleDatesChange}
+            onValidityChange={handleCardValidityChange}
+            isOpen={isOpen}
+            disabledOptionIds={disabledOptionIdsRef.current}
+            everyoneOption={everyoneOption}
+            selectedAssigneeIds={card.selectedAssigneeIds}
+            customAllOptions={allOptions}
+            customIsLoading={isLoadingAssignees}
+            customSetSearchTerm={setSearchTerm}
+            highlightCard={card.highlightCard}
+            blueprintDateLocks={blueprintDateLocks}
+            postToSIS={postToSIS}
+            disabledOptionIdsRef={disabledOptionIdsRef}
           />
         </View>
       )
@@ -555,7 +734,9 @@ const ItemAssignToTrayContent = ({
         </Mask>
       ) : (
         <ApplyLocale locale={locale} timezone={timezone}>
-          {renderCards(open)}
+          {ENV.FEATURES?.selective_release_optimized_tray
+            ? renderCardsOptimized(open)
+            : renderCards(open)}
         </ApplyLocale>
       )}
 

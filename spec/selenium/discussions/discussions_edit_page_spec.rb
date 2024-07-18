@@ -767,6 +767,14 @@ describe "discussions" do
             expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
           end
 
+          it "does not display 'Assign To' section for an ungraded group discussion" do
+            group = course.groups.create!(name: "group")
+            group_ungraded = course.discussion_topics.create!(title: "no options enabled - topic", group_category: group.group_category)
+            get "/courses/#{course.id}/discussion_topics/#{group_ungraded.id}/edit"
+            expect(Discussion.select_date_input_exists?).to be_truthy
+            expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
+          end
+
           it "does not display 'Post To' section and Available From/Until inputs" do
             get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
             expect(Discussion.select_date_input_exists?).to be_falsey
@@ -894,8 +902,6 @@ describe "discussions" do
           end
 
           it "transitions from graded to ungraded and overrides are ok", :ignore_js_errors do
-            skip("LX-1761 this test should work but doesn't right now")
-
             discussion_assignment_options = {
               name: "assignment",
               points_possible: 10,
@@ -930,10 +936,27 @@ describe "discussions" do
             keep_trying_until { expect(item_tray_exists?).to be_truthy }
 
             expect(assign_to_date_and_time[1].text).not_to include("Due Date")
-            expect(assign_to_available_from_date(1, false).attribute("value")).to eq(format_date_for_view(available_from, "%b %-e, %Y"))
-            expect(assign_to_available_from_time(1, false).attribute("value")).to eq(available_from.strftime("%-l:%M %p"))
-            expect(assign_to_until_date(1, false).attribute("value")).to eq(format_date_for_view(available_until, "%b %-e, %Y"))
-            expect(assign_to_until_time(1, false).attribute("value")).to eq(available_until.strftime("%-l:%M %p"))
+            expect(assign_to_available_from_date(1, true).attribute("value")).to eq(format_date_for_view(available_from, "%b %-e, %Y"))
+            expect(assign_to_available_from_time(1, true).attribute("value")).to eq(available_from.strftime("%-l:%M %p"))
+            expect(assign_to_until_date(1, true).attribute("value")).to eq(format_date_for_view(available_until, "%b %-e, %Y"))
+            expect(assign_to_until_time(1, true).attribute("value")).to eq(available_until.strftime("%-l:%M %p"))
+          end
+
+          it "does not recover a deleted card when adding an assignee", :ignore_js_errors do
+            # Bug fix of LX-1619
+            student1 = course.enroll_student(User.create!, enrollment_state: "active").user
+
+            get "/courses/#{course.id}/discussion_topics/#{@topic_all_options.id}/edit"
+
+            Discussion.click_assign_to_button
+            wait_for_assign_to_tray_spinner
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            click_add_assign_to_card
+            click_delete_assign_to_card(0)
+            select_module_item_assignee(0, student1.name)
+
+            expect(selected_assignee_options.count).to be(1)
           end
         end
       end
@@ -1673,6 +1696,22 @@ describe "discussions" do
             RoleOverride.create!(context: @course.account, permission: "manage_assignments_edit", role: teacher_role, enabled: false)
             get "/courses/#{course.id}/discussion_topics/#{discussion.id}/edit"
             expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
+          end
+
+          it "does not recover a deleted card when adding an assignee", :ignore_js_errors do
+            # Bug fix of LX-1619
+            discussion = create_graded_discussion(course)
+            get "/courses/#{course.id}/discussion_topics/#{discussion.id}/edit"
+
+            Discussion.click_assign_to_button
+            wait_for_assign_to_tray_spinner
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            click_add_assign_to_card
+            click_delete_assign_to_card(0)
+            select_module_item_assignee(0, @course_section_2.name)
+
+            expect(selected_assignee_options.count).to be(1)
           end
 
           context "checkpoints" do

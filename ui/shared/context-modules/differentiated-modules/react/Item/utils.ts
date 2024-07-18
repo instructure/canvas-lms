@@ -38,17 +38,36 @@ type UseDatesHookArgs = {
 }
 
 type UseDatesHookResult = [
+  // requiredRepliesDueDate
   string | null,
+  // setRequiredRepliesDueDate
   (requiredRepliesDueDate: string | null) => void,
+  // handleRequiredRepliesDueDateChange
+  (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => void,
+  // replyToTopicDueDate
+  string | null,
+  // setReplyToTopicDueDate
   (replyToTopicDueDate: string | null) => void,
+  // handleReplyToTopicDueDateChange
+  (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => void,
+  // dueDate
+  string | null,
+  // setDueDate
   (dueDate: string | null) => void,
-  (_event: React.SyntheticEvent, value: string | undefined) => void,
+  // handleDueDateChange
+  (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => void,
+  // availableFromDate
   string | null,
+  // setAvailableFromDate
   (availableFromDate: string | null) => void,
-  (_event: React.SyntheticEvent, value: string | undefined) => void,
+  // handleAvailableFromDateChange
+  (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => void,
+  // availableToDate
   string | null,
+  // setAvailableToDate
   (availableToDate: string | null) => void,
-  (_event: React.SyntheticEvent, value: string | undefined) => void
+  // handleAvailableToDateChange
+  (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => void
 ]
 
 function setTimeToStringDate(time: string, date: string | undefined): string | undefined {
@@ -305,7 +324,7 @@ export const generateCardActionLabels = (selected: string[]) => {
           pillA: selected[0],
         }),
         clearRequiredRepliesDueAt: I18n.t('Clear required replies due date/time for %{pillA}', {
-          pillA: selected[0]
+          pillA: selected[0],
         }),
         clearAvailableFrom: I18n.t('Clear available from date/time for %{pillA}', {
           pillA: selected[0],
@@ -330,7 +349,7 @@ export const generateCardActionLabels = (selected: string[]) => {
           }
         ),
         clearRequiredRepliesDueAt: I18n.t(
-          'Clear required replies due date/time for %{pillA} and %{pillB}', 
+          'Clear required replies due date/time for %{pillA} and %{pillB}',
           {
             pillA: selected[0],
             pillB: selected[1],
@@ -366,7 +385,7 @@ export const generateCardActionLabels = (selected: string[]) => {
           }
         ),
         clearRequiredRepliesDueAt: I18n.t(
-          'Clear required replies due date/time for %{pillA}, %{pillB}, and %{pillC}', 
+          'Clear required replies due date/time for %{pillA}, %{pillB}, and %{pillC}',
           {
             pillA: selected[0],
             pillB: selected[1],
@@ -404,7 +423,7 @@ export const generateCardActionLabels = (selected: string[]) => {
           }
         ),
         clearRequiredRepliesDueAt: I18n.t(
-          'Clear required replies due date/time for %{pillA}, %{pillB}, and %{n} others', 
+          'Clear required replies due date/time for %{pillA}, %{pillB}, and %{n} others',
           {
             pillA: selected[0],
             pillB: selected[1],

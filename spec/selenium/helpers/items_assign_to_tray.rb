@@ -275,6 +275,10 @@ module ItemsAssignToTray
     assign_to_card_delete_button[card_number].click
   end
 
+  def click_delete_assign_to_item(item_title, item_number = 0)
+    assign_to_in_tray(item_title)[item_number].click
+  end
+
   def click_cancel_button
     cancel_button.click
   end

@@ -459,7 +459,6 @@ function DiscussionTopicForm({
 
     if (
       !isGraded &&
-      !currentDiscussionTopic?.assignment &&
       ENV.FEATURES?.selective_release_ui_api &&
       !isAnnouncement
     ) {
@@ -674,7 +673,7 @@ function DiscussionTopicForm({
           </DiscussionDueDatesContext.Provider>
         </View>
       )
-    } else if (shouldShowAssignToForUngradedDiscussions) {
+    } else if (shouldShowAssignToForUngradedDiscussions && !isGroupDiscussion) {
       return (
         <View as="div" data-testid="assignment-settings-section">
           <Text weight="bold">{I18n.t('Assign Access')}</Text>
