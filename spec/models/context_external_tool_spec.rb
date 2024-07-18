@@ -2983,6 +2983,12 @@ describe ContextExternalTool do
       expect(@tool.label_for(nil)).to eq "tool"
     end
 
+    it "returns the tool name if nothing else is set and text is an empty string" do
+      @tool.settings = { text: "" }
+      @tool.save!
+      expect(@tool.label_for(nil)).to eq "tool"
+    end
+
     it "returns the tool name if nothing is configured on the sent key" do
       @tool.settings = { course_navigation: { bob: "asfd" } }
       @tool.save!
