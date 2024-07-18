@@ -68,7 +68,7 @@ const ColorModal = ({open, color, variant, onClose, onSubmit}: ColorModalProps) 
   }
 
   return (
-    <Modal open={open} onDismiss={onClose} label="Link" size="small">
+    <Modal open={open} onDismiss={onClose} label="Color" size="small">
       <Modal.Header>
         {renderModalHeading()}
         <CloseButton placement="end" onClick={onClose} screenReaderLabel="Close" />
