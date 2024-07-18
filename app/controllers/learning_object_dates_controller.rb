@@ -214,8 +214,8 @@ class LearningObjectDatesController < ApplicationController
                  @context.context_modules.not_deleted.find(params[:context_module_id])
                elsif params[:discussion_topic_id]
                  @context.discussion_topics.find(params[:discussion_topic_id])
-               elsif params[:page_id]
-                 @context.wiki_pages.not_deleted.find(params[:page_id])
+               elsif params[:url_or_id]
+                 @context.wiki.find_page(params[:url_or_id]) || not_found
                elsif params[:attachment_id]
                  @context.attachments.not_deleted.find(params[:attachment_id])
                end
