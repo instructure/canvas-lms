@@ -23,6 +23,8 @@ module DataFixup
       # examples:
       # "url:POST|/api/v1/courses/:course_id/pages/:url/duplicate" => "url:POST|/api/v1/courses/:course_id/pages/:url_or_id/duplicate",
       # "url:GET|/api/v1/image_search" => "DELETED",
+      "url:GET|api/v1/courses/:course_id/pages/:page_id/date_details" => "url:GET|api/v1/courses/:course_id/pages/:url_or_id/date_details",
+      "url:PUT|api/v1/courses/:course_id/pages/:page_id/date_details" => "url:PUT|api/v1/courses/:course_id/pages/:url_or_id/date_details",
     }.freeze
 
     def self.create_scope_query(old_route)

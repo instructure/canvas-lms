@@ -1111,16 +1111,16 @@
   path: "/api/v1/courses/:course_id/pages"
 - verb: POST
   path: "/api/v1/courses/:course_id/pages"
-- verb: GET
-  path: "/api/v1/courses/:course_id/pages/:page_id/date_details"
-- verb: PUT
-  path: "/api/v1/courses/:course_id/pages/:page_id/date_details"
 - verb: DELETE
   path: "/api/v1/courses/:course_id/pages/:url_or_id"
 - verb: GET
   path: "/api/v1/courses/:course_id/pages/:url_or_id"
 - verb: PUT
   path: "/api/v1/courses/:course_id/pages/:url_or_id"
+- verb: GET
+  path: "/api/v1/courses/:course_id/pages/:url_or_id/date_details"
+- verb: PUT
+  path: "/api/v1/courses/:course_id/pages/:url_or_id/date_details"
 - verb: POST
   path: "/api/v1/courses/:course_id/pages/:url_or_id/duplicate"
 - verb: GET
