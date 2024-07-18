@@ -15,10 +15,10 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {render, screen, waitFor, cleanup} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {QueryProvider} from '@canvas/query'
-import LoginHelp, {renderLoginHelp} from '../loginHelp'
+import LoginHelp, {getVisibleTextContent, renderLoginHelp} from '../loginHelp'
 
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,
@@ -30,61 +30,76 @@ jest.mock('@canvas/do-fetch-api-effect', () => ({
   ),
 }))
 
-beforeEach(() => {
-  document.body.innerHTML = ''
-  jest.clearAllMocks()
-})
-
-afterEach(() => {
-  document.body.innerHTML = ''
-  cleanup()
-})
-
-describe('renderLoginHelp', () => {
-  it('renders', () => {
-    render(
-      <QueryProvider>
-        <LoginHelp linkText="Help" />
-      </QueryProvider>
-    )
-    expect(screen.getByText('Help')).toBeInTheDocument()
+describe('LoginHelp Component and Helpers', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
   })
 
-  it('opens modal when link is clicked', () => {
-    render(
-      <QueryProvider>
-        <LoginHelp linkText="Help" />
-      </QueryProvider>
-    )
-    userEvent.click(screen.getByText('Help'))
-    expect(screen.getByText('Login Help for Canvas LMS')).toBeInTheDocument()
-  })
+  describe('getVisibleTextContent() utility', () => {
+    it('returns text content for a simple element', () => {
+      const div = document.createElement('div')
+      div.textContent = 'Visible Text'
+      expect(getVisibleTextContent(div)).toBe('Visible Text')
+    })
 
-  it('closes modal when close button is clicked', async () => {
-    render(
-      <QueryProvider>
-        <LoginHelp linkText="Help" />
-      </QueryProvider>
-    )
-    userEvent.click(screen.getByText('Help'))
-    expect(screen.getByText('Login Help for Canvas LMS')).toBeInTheDocument()
-    await userEvent.click(screen.getByTestId('login-help-close-button'))
-    await waitFor(() => {
-      expect(screen.queryByText('Login Help for Canvas LMS')).not.toBeInTheDocument()
+    it('excludes text content of hidden elements', () => {
+      const div = document.createElement('div')
+      div.innerHTML =
+        '<span> Visible </span><span>Text</span> <span style="display:none;"> Hidden Text </span>'
+      expect(getVisibleTextContent(div)).toBe('Visible Text')
+    })
+
+    it('returns concatenated text content of nested elements', () => {
+      const div = document.createElement('div')
+      div.innerHTML = '<span>Visible</span> <span>Text</span>'
+      expect(getVisibleTextContent(div)).toBe('Visible Text')
+    })
+
+    it('excludes text content of elements with screenreader-only class', () => {
+      const div = document.createElement('div')
+      div.innerHTML =
+        '<span>Visible Text</span><span class="screenreader-only">Screenreader Only Text</span>'
+      const screenReaderOnlyElement = div.querySelector('.screenreader-only') as HTMLElement
+      screenReaderOnlyElement.style.display = 'none'
+      expect(getVisibleTextContent(div)).toBe('Visible Text')
     })
   })
 
-  it('renders modal label correctly', () => {
-    render(
-      <QueryProvider>
-        <LoginHelp linkText="Help" />
-      </QueryProvider>
-    )
-    userEvent.click(screen.getByText('Help'))
-    expect(screen.getByText('Login Help for Canvas LMS')).toBeInTheDocument()
+  describe('LoginHelp Component', () => {
+    it('renders the link text correctly', () => {
+      render(
+        <QueryProvider>
+          <LoginHelp linkText="Help" />
+        </QueryProvider>
+      )
+      expect(screen.getByText('Help')).toBeInTheDocument()
+    })
+
+    it('opens and closes the modal correctly', async () => {
+      render(
+        <QueryProvider>
+          <LoginHelp linkText="Help" />
+        </QueryProvider>
+      )
+      userEvent.click(screen.getByText('Help'))
+      expect(screen.getByText('Login Help for Canvas LMS')).toBeInTheDocument()
+      await userEvent.click(screen.getByTestId('login-help-close-button'))
+      await waitFor(() => {
+        expect(screen.queryByText('Login Help for Canvas LMS')).not.toBeInTheDocument()
+      })
+    })
   })
 
   describe('renderLoginHelp()', () => {
+    beforeEach(() => {
+      document.body.innerHTML = ''
+    })
+
+    afterEach(() => {
+      document.body.innerHTML = ''
+      cleanup()
+    })
+
     it('renders modal with link text for simple anchor tag', async () => {
       const anchorElement = document.createElement('a')
       anchorElement.href = '#'
@@ -109,10 +124,10 @@ describe('renderLoginHelp', () => {
       document.body.appendChild(anchorElement)
       // simulate clicking the span element and pass event.target to renderLoginHelp
       anchorElement.addEventListener('click', event => {
-        expect(event.target.textContent).toBe('Help')
-        renderLoginHelp(event.target)
+        expect((event.target as HTMLElement).textContent).toBe('Help')
+        renderLoginHelp(anchorElement)
       })
-      userEvent.click(spanElement) // not perfect, but it works
+      userEvent.click(spanElement)
       await waitFor(() => {
         expect(screen.getByText('Login Help for Canvas LMS')).toBeInTheDocument()
       })
