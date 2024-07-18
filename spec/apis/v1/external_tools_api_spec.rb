@@ -1023,7 +1023,7 @@ describe ExternalToolsController, type: :request do
         "url" => "http://www.example.com/ims/lti/resource",
         "selection_height" => 50,
         "selection_width" => 50,
-        "label" => ""
+        "label" => "External Tool Eh"
       },
       "privacy_level" => "public",
       "editor_button" => {

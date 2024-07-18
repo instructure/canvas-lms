@@ -503,7 +503,7 @@ class ContextExternalTool < ActiveRecord::Base
     labels = settings[key] && settings[key][:labels]
     (labels && labels[lang]) ||
       (labels && lang && labels[lang.split("-").first]) ||
-      (settings[key] && settings[key][:text]) ||
+      settings.dig(key, :text).presence ||
       default_label(lang)
   end
 
@@ -512,7 +512,7 @@ class ContextExternalTool < ActiveRecord::Base
     default_labels = settings[:labels]
     (default_labels && default_labels[lang]) ||
       (default_labels && lang && default_labels[lang.split("-").first]) ||
-      settings[:text] || name || "External Tool"
+      settings[:text].presence || name || "External Tool"
   end
 
   def check_for_xml_error
