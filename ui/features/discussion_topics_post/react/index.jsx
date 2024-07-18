@@ -23,9 +23,9 @@ import ErrorBoundary from '@canvas/error-boundary'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
 import PropTypes from 'prop-types'
 import React, {useEffect, useState} from 'react'
+import {LoadingSpinner} from './components/LoadingSpinner/LoadingSpinner'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -47,7 +47,7 @@ export const DiscussionTopicsPost = props => {
   }, [])
 
   if (loading) {
-    return <LoadingIndicator />
+    return <LoadingSpinner />
   }
 
   return (

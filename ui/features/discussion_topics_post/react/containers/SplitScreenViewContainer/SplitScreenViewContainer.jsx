@@ -48,13 +48,13 @@ import {Heading} from '@instructure/ui-heading'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {SplitScreenThreadsContainer} from '../SplitScreenThreadsContainer/SplitScreenThreadsContainer'
 import {SplitScreenParent} from './SplitScreenParent'
-import LoadingIndicator from '@canvas/loading-indicator'
 import PropTypes from 'prop-types'
 import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import * as ReactDOMServer from 'react-dom/server'
 import useCreateDiscussionEntry from '../../hooks/useCreateDiscussionEntry'
+import {LoadingSpinner} from '../../components/LoadingSpinner/LoadingSpinner'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -378,7 +378,7 @@ export const SplitScreenViewContainer = props => {
 
   const renderErrorOrLoading = useMemo(() => {
     if (entriesAreLoading()) {
-      return <LoadingIndicator />
+      return <LoadingSpinner />
     } else {
       return (
         <GenericErrorPage
