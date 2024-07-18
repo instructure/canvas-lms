@@ -89,6 +89,7 @@ const IconPicker = ({iconName, onSelect}: IconPickerProps) => {
               role="button"
               style={style}
               tabIndex={0}
+              title={icon}
               onClick={() => handleSelectIcon(icon)}
               onKeyDown={(event: React.KeyboardEvent) => handleKey(event, icon)}
             >

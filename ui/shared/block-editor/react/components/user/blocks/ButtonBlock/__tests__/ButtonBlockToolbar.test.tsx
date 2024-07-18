@@ -21,14 +21,20 @@ import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {useNode} from '@craftjs/core'
-import {ButtonBlock} from '../ButtonBlock'
+import {ButtonBlock, type ButtonBlockProps} from '..'
 import {ButtonBlockToolbar} from '../ButtonBlockToolbar'
+
+let props: Partial<ButtonBlockProps>
+
+const mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => {
+  callback(props)
+})
 
 jest.mock('@craftjs/core', () => {
   return {
     useNode: jest.fn(_node => {
       return {
-        actions: {setProp: jest.fn()},
+        actions: {setProp: mockSetProp},
         props: ButtonBlock.craft.defaultProps,
       }
     }),
@@ -36,6 +42,10 @@ jest.mock('@craftjs/core', () => {
 })
 
 describe('ButtonBlockToolbar', () => {
+  beforeEach(() => {
+    props = {...ButtonBlock.craft.defaultProps} as Partial<ButtonBlockProps>
+  })
+
   it('should render', () => {
     const {getByText} = render(<ButtonBlockToolbar />)
 
@@ -64,7 +74,20 @@ describe('ButtonBlockToolbar', () => {
     expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
   })
 
-  it('checks the right style', async () => {
+  it('changes the size prop', async () => {
+    const {getByText} = render(<ButtonBlockToolbar />)
+
+    const btn = getByText('Size').closest('button') as HTMLButtonElement
+    await userEvent.click(btn)
+
+    const lgMenuItem = screen.getByText('Large')
+    await userEvent.click(lgMenuItem)
+
+    expect(mockSetProp).toHaveBeenCalled()
+    expect(props.size).toBe('large')
+  })
+
+  it('checks the right variant', async () => {
     const {getByText} = render(<ButtonBlockToolbar />)
 
     const btn = getByText('Style').closest('button') as HTMLButtonElement
@@ -80,6 +103,47 @@ describe('ButtonBlockToolbar', () => {
 
     const li = filledMenuItem.closest('li') as HTMLLIElement
     expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
+  })
+
+  it('changes the variant prop', async () => {
+    const {getByText} = render(<ButtonBlockToolbar />)
+
+    const btn = getByText('Style').closest('button') as HTMLButtonElement
+    await userEvent.click(btn)
+
+    const outlinedMenuItem = screen.getByText('Outlined')
+    await userEvent.click(outlinedMenuItem)
+
+    expect(mockSetProp).toHaveBeenCalled()
+    expect(props.variant).toBe('outlined')
+  })
+
+  it('selects the right icon', async () => {
+    props.iconName = 'apple'
+    const {getByText} = render(<ButtonBlockToolbar />)
+
+    const btn = getByText('Select Icon').closest('button') as HTMLButtonElement
+    await userEvent.click(btn)
+
+    const icon = screen.getByTitle('apple')
+    expect(icon).toBeInTheDocument()
+    expect(icon).toHaveStyle({borderColor: '--var(ic-brand-primary)'})
+
+    const otherIcon = screen.getByTitle('alarm')
+    expect(otherIcon).toBeInTheDocument()
+    expect(otherIcon).toHaveStyle({borderColor: 'transparent'})
+  })
+
+  it('chages the icon prop', async () => {
+    const {getByText} = render(<ButtonBlockToolbar />)
+
+    const btn = getByText('Select Icon').closest('button') as HTMLButtonElement
+    await userEvent.click(btn)
+
+    const icon = screen.getByTitle('apple')
+    expect(icon).toBeInTheDocument()
+    await userEvent.click(icon)
+    expect(props.iconName).toBe('apple')
   })
 
   // jest is loading the commonjs version
