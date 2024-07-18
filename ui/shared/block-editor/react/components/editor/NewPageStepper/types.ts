@@ -16,6 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type PageStandardSection = 'navigation' | 'heroWithText' | 'about' | 'resources' | 'footer'
+export type PageStandardSection =
+  | 'navigation'
+  | 'heroWithText'
+  | 'about'
+  | 'resources'
+  | 'footer'
+  | 'tabs'
 export type PageCanvasSection = 'question' | 'announcement' | 'discussion' | 'assignment' | 'module'
 export type PageSection = PageStandardSection | PageCanvasSection

@@ -53,7 +53,7 @@ Rails.application.configure do
   config.cache_store = :null_store
 
   # Raise exceptions instead of rendering exception templates
-  config.action_dispatch.show_exceptions = ($canvas_rails == "7.1") ? :all : true
+  config.action_dispatch.show_exceptions = :all
 
   # Print deprecation notices to both stderr and the log
   config.active_support.deprecation = [:stderr, :log]

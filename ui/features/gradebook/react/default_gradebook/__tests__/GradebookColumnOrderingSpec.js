@@ -63,6 +63,7 @@ QUnit.module('Gradebook Grid Column Ordering', suiteHooks => {
           position: 1,
           published: true,
           submission_types: ['online_text_entry'],
+          visible_to_everyone: true,
         },
         {
           id: '2303',
@@ -79,6 +80,7 @@ QUnit.module('Gradebook Grid Column Ordering', suiteHooks => {
           position: 2,
           published: true,
           submission_types: ['online_text_entry'],
+          visible_to_everyone: true,
         },
       ],
 
@@ -98,6 +100,7 @@ QUnit.module('Gradebook Grid Column Ordering', suiteHooks => {
           position: 1,
           published: true,
           submission_types: ['online_quiz'],
+          visible_to_everyone: true,
         },
         {
           id: '2304',
@@ -114,6 +117,7 @@ QUnit.module('Gradebook Grid Column Ordering', suiteHooks => {
           position: 2,
           published: true,
           submission_types: ['online_quiz'],
+          visible_to_everyone: true,
         },
       ],
     }

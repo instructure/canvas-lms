@@ -44,6 +44,7 @@ const baseAssignment = fromJS({
   effectiveDueDates: {
     1: {due_at: new Date(), grading_period_id: '2', in_closed_grading_period: true},
   },
+  visible_to_everyone: true,
 })
 const unpublishedAssignment = baseAssignment.merge({published: false})
 const anonymousMutedAssignment = baseAssignment.merge({
@@ -56,7 +57,7 @@ const moderatedAndGradesUnpublishedAssignment = baseAssignment.merge({
   grades_published: false,
 })
 const hiddenFromStudent = baseAssignment.merge({
-  only_visible_to_overrides: true,
+  visible_to_everyone: false,
   assignment_visibility: [],
 })
 const hasGradingPeriodsAssignment = baseAssignment
@@ -111,7 +112,7 @@ describe('#setSubmissionCellState', () => {
     const assignment = {
       id: '1',
       published: true,
-      only_visible_to_overrides: true,
+      visible_to_everyone: false,
       assignment_visibility: [],
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
@@ -126,7 +127,7 @@ describe('#setSubmissionCellState', () => {
     const assignment = {
       id: '1',
       published: true,
-      only_visible_to_overrides: true,
+      visible_to_everyone: false,
       assignment_visibility: [],
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
@@ -141,7 +142,7 @@ describe('#setSubmissionCellState', () => {
     const assignment = {
       id: '1',
       published: true,
-      only_visible_to_overrides: false,
+      visible_to_everyone: true,
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
@@ -155,7 +156,7 @@ describe('#setSubmissionCellState', () => {
     const assignment = {
       id: '1',
       published: true,
-      only_visible_to_overrides: false,
+      visible_to_everyone: true,
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
@@ -169,7 +170,7 @@ describe('#setSubmissionCellState', () => {
     const assignment = {
       id: '1',
       published: true,
-      only_visible_to_overrides: true,
+      visible_to_everyone: false,
       assignment_visibility: ['2'],
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
@@ -185,6 +186,7 @@ describe('#setSubmissionCellState', () => {
       id: '1',
       published: true,
       moderated_grading: false,
+      visible_to_everyone: true,
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
@@ -199,6 +201,7 @@ describe('#setSubmissionCellState', () => {
       id: '1',
       published: true,
       moderated_grading: false,
+      visible_to_everyone: true,
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
@@ -214,6 +217,7 @@ describe('#setSubmissionCellState', () => {
       published: true,
       moderated_grading: true,
       grades_published: true,
+      visible_to_everyone: true,
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
@@ -229,6 +233,7 @@ describe('#setSubmissionCellState', () => {
       published: true,
       moderated_grading: true,
       grades_published: true,
+      visible_to_everyone: true,
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
@@ -272,7 +277,7 @@ describe('#setSubmissionCellState', () => {
     let assignment
 
     beforeEach(() => {
-      assignment = {id: '1', published: true, anonymous_grading: true}
+      assignment = {id: '1', published: true, anonymous_grading: true, visible_to_everyone: true}
     })
 
     test('the submission state is locked when anonymize_students is true', () => {

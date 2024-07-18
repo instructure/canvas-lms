@@ -91,5 +91,17 @@ describe('DashboardHeader', () => {
       await findByText('Loading planner items')
       expect(loadPlannerSpy).toHaveBeenCalledTimes(1)
     })
+
+    it('does not call loadCardDashboard if preloaded cards passed in', async () => {
+      window.ENV = {
+        ...defaultEnv,
+        FEATURES: {
+          dashboard_graphql_integration: true,
+        },
+      }
+      const loadCardDashboardSpy = jest.spyOn(DashboardHeader.prototype, 'loadCardDashboard')
+      render(<FakeDashboardHeader {...defaultProps} preloadedCards={[]} />)
+      expect(loadCardDashboardSpy).not.toHaveBeenCalled()
+    })
   })
 })

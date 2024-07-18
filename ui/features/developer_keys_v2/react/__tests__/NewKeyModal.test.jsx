@@ -604,7 +604,7 @@ describe('NewKeyModal', () => {
     const createModalAndSaveKey = modalProps => {
       const {ref} = renderDeveloperKeyModal(modalProps)
 
-      ref.current.setState({configurationMethod: 'json'})
+      ref.current.setState({configurationMethod: 'json', toolConfiguration: {key: 'value'}})
       ref.current.saveLtiToolConfiguration()
     }
 
@@ -629,7 +629,7 @@ describe('NewKeyModal', () => {
 
       const modalProps = {
         createLtiKeyState,
-        createOrEditDeveloperKeyState: {...editDeveloperKeyState, editing: true},
+        createOrEditDeveloperKeyState: {...editDeveloperKeyState, editing: true, isLtiKey: true},
         listDeveloperKeyScopesState,
         actions: {...devKeyActions, developerKeysModalClose: closeModal},
         handleSuccessfulSave,
@@ -667,7 +667,7 @@ describe('NewKeyModal', () => {
 
       const modalProps = {
         createLtiKeyState,
-        createOrEditDeveloperKeyState: {...editDeveloperKeyState, editing: true},
+        createOrEditDeveloperKeyState: {...editDeveloperKeyState, editing: true, isLtiKey: true},
         listDeveloperKeyScopesState,
         actions: {...devKeyActions, developerKeysModalClose: closeModal},
       }
@@ -813,5 +813,46 @@ describe('NewKeyModal', () => {
 
     expect(saveLtiToolConfigurationSpy).toHaveBeenCalled()
     expect(flashStub).not.toHaveBeenCalledWith('A redirect_uri is required, please supply one.')
+  })
+
+  describe('saving a LTI key in json view', () => {
+    it('does not save if lti configuration is empty', () => {
+      const saveLtiToolConfigurationSpy = jest.fn()
+      const actions = {
+        ...fakeActions,
+        saveLtiToolConfiguration: () => () => ({then: saveLtiToolConfigurationSpy}),
+      }
+      const {ref} = renderDeveloperKeyModal({
+        createLtiKeyState: {},
+        createOrEditDeveloperKeyState: {...editDeveloperKeyState, isLtiKey: true},
+        listDeveloperKeyScopesState,
+        actions,
+        selectedScopes: [],
+        state: {},
+      })
+      ref.current.setState({configurationMethod: 'json', toolConfiguration: {}})
+      ref.current.saveLtiToolConfiguration()
+      expect(saveLtiToolConfigurationSpy).not.toHaveBeenCalled()
+    })
+
+    it('does not save if lti configuration json is invalid', () => {
+      const saveLtiToolConfigurationSpy = jest.fn()
+      const actions = {
+        ...fakeActions,
+        saveLtiToolConfiguration: () => () => ({then: saveLtiToolConfigurationSpy}),
+      }
+      const {ref} = renderDeveloperKeyModal({
+        createLtiKeyState: {},
+        createOrEditDeveloperKeyState: {...editDeveloperKeyState, isLtiKey: true},
+        listDeveloperKeyScopesState,
+        actions,
+        selectedScopes: [],
+        state: {},
+      })
+      ref.current.setState({configurationMethod: 'json', toolConfiguration: {key: 'value'}})
+      ref.current.newForm.valid = () => false
+      ref.current.saveLtiToolConfiguration()
+      expect(saveLtiToolConfigurationSpy).not.toHaveBeenCalled()
+    })
   })
 })

@@ -75,15 +75,14 @@ export const useAccountGradingStatuses = (accountId: string, isExtendedStatusEna
       return
     }
 
-    if (!fetchStatusesData?.account) {
-      return
-    }
-
-    const {account} = fetchStatusesData
-    const {customGradeStatusesConnection, standardGradeStatusesConnection} = account
-    setCustomStatuses(mapCustomStatusQueryResults(customGradeStatusesConnection.nodes))
+    const {account} = fetchStatusesData ?? {}
+    const {customGradeStatusesConnection, standardGradeStatusesConnection} = account ?? {}
+    setCustomStatuses(mapCustomStatusQueryResults(customGradeStatusesConnection?.nodes ?? []))
     setStandardStatuses(
-      mapStandardStatusQueryResults(standardGradeStatusesConnection.nodes, isExtendedStatusEnabled)
+      mapStandardStatusQueryResults(
+        standardGradeStatusesConnection?.nodes ?? [],
+        isExtendedStatusEnabled
+      )
     )
   }, [fetchStatusesData, fetchStatusesError, isExtendedStatusEnabled])
 

@@ -819,10 +819,11 @@ class ContextModulesController < ApplicationController
     if user_is_admin && should_preload_override_data?
       assignments = assignment_tags.filter_map(&:assignment)
       plain_quizzes = assignment_tags.select { |ct| ct.content.is_a?(Quizzes::Quiz) && !ct.content.assignment }.map(&:content)
-
+      sub_assignments = assignments.flat_map(&:sub_assignments)
       preload_has_too_many_overrides(assignments, :assignment_id)
+      preload_has_too_many_overrides(sub_assignments, :assignment_id)
       preload_has_too_many_overrides(plain_quizzes, :quiz_id)
-      overrideables = (assignments + plain_quizzes).reject(&:has_too_many_overrides)
+      overrideables = (assignments + plain_quizzes + sub_assignments).reject(&:has_too_many_overrides)
 
       if overrideables.any?
         ActiveRecord::Associations.preload(overrideables, :assignment_overrides)
@@ -848,7 +849,6 @@ class ContextModulesController < ApplicationController
       ids = AssignmentOverride.active.where(override_column => assignments_or_quizzes)
                               .group(override_column).having("COUNT(*) > ?", Api::V1::Assignment::ALL_DATES_LIMIT)
                               .active.pluck(override_column)
-
       if ids.any?
         assignments_or_quizzes.each { |o| o.has_too_many_overrides = true if ids.include?(o.id) }
       end

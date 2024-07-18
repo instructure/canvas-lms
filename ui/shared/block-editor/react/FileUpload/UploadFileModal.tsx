@@ -32,10 +32,7 @@ import {View} from '@instructure/ui-view'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {RocketSVG} from '@instructure/canvas-media'
 import {doFileUpload} from './UploadFile'
-import {
-  HeroImageHeight,
-  type ImageConstraint,
-} from '../components/user/blocks/ImageBlock/ImageBlock'
+import {HeroImageHeight, type ImageConstraint} from '../components/user/blocks/ImageBlock/types'
 
 function readFile(theFile: File): Promise<string> {
   const p: Promise<string> = new Promise((resolve, reject) => {
@@ -262,14 +259,15 @@ const UploadFileModal = ({imageUrl, open, variant, onDismiss, onSave}: UploadFil
     }
     return (
       <Flex as="div" direction="column">
-        <Flex.Item
-          as="div"
-          width="792px"
-          maxHeight={variant === 'hero' ? HeroImageHeight : '350px'}
-          shouldGrow={true}
+        <div
+          style={{
+            width: '792px',
+            maxHeight: variant === 'hero' ? HeroImageHeight : '350px',
+            flexGrow: 1,
+          }}
         >
           {renderImage()}
-        </Flex.Item>
+        </div>
 
         <Flex as="div" margin="small 0 large 0" justifyItems="center" gap="small">
           <Button renderIcon={<IconEditLine />} onClick={handleChangeClick}>

@@ -1187,7 +1187,7 @@ RSpec.describe ApplicationController do
               end
 
               it "caches the LTI 1.3 launch" do
-                expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+                expect(cached_launch["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
               end
 
               it "creates a login message" do
@@ -1287,7 +1287,7 @@ RSpec.describe ApplicationController do
 
               it_behaves_like "a placement that caches the launch" do
                 it "sets link-level custom parameters" do
-                  expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/custom"]).to include("abc" => "def")
+                  expect(cached_launch["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/custom"]).to include("abc" => "def")
                 end
               end
             end
@@ -1881,7 +1881,7 @@ RSpec.describe ApplicationController do
 
           controller.external_tools_display_hashes(:account_navigation, @course)
 
-          expect(controller.js_env[:LTI_TOOL_SCOPES]).to eq("http://example.com" => [TokenScopes::LTI_PAGE_CONTENT_SHOW_SCOPE])
+          expect(controller.js_env[:LTI_TOOL_SCOPES]).to eq("http://example.com" => TokenScopes::LTI_POSTMESSAGE_SCOPES)
         end
       end
 

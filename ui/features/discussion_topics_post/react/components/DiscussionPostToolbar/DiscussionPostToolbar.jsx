@@ -81,6 +81,8 @@ export const DiscussionPostToolbar = props => {
   const [showAssignToTray, setShowAssignToTray] = useState(false)
   const {translationLanguages} = useContext(DiscussionManagerUtilityContext)
 
+  const showAssignTo = !props.isAnnouncement && props.contextType === 'Course' && (props.isGraded || (!props.isGraded && !props.isGroupDiscussion))
+
   const clearButton = () => {
     return getClearButton({
       handleClear: () => {
@@ -305,8 +307,7 @@ export const DiscussionPostToolbar = props => {
                 )}
                 {props.manageAssignTo &&
                   ENV.FEATURES?.selective_release_ui_api &&
-                  !props.isAnnouncement &&
-                  props.contextType === 'Course' && (
+                  showAssignTo && (
                     <Flex.Item shouldGrow={true} textAlign="end">
                       <Button
                         data-testid="manage-assign-to"
@@ -368,6 +369,7 @@ DiscussionPostToolbar.propTypes = {
   pointsPossible: PropTypes.number,
   contextType: PropTypes.oneOf(['Course', 'Group']),
   manageAssignTo: PropTypes.bool,
+  isGroupDiscussion: PropTypes.bool,
 }
 
 DiscussionPostToolbar.defaultProps = {

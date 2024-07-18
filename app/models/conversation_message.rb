@@ -268,7 +268,7 @@ class ConversationMessage < ActiveRecord::Base
         author,
         context_id,
         context_type,
-        root_account_id.to_s
+        root_account_id
       )
     end
   end

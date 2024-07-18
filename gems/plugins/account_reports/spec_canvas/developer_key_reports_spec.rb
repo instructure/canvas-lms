@@ -26,6 +26,7 @@ describe AccountReports::DeveloperKeyReports do
   subject do
     first_key
     second_key
+    third_key
     site_admin_key
     read_report(report_type, report_opts)
   end
@@ -52,6 +53,13 @@ describe AccountReports::DeveloperKeyReports do
     disable_developer_key_account_binding! dk
     dk
   end
+  let_once(:third_key) do
+    dk = dev_key_model_dyn_reg({ name: "Third Key",
+                                 public_jwk_url: "http://test.com/jwks",
+                                 account: })
+    enable_developer_key_account_binding! dk
+    dk
+  end
   let_once(:site_admin_key) do
     dk = dev_key_model({ name: "Site Admin Key" })
     disable_developer_key_account_binding! dk
@@ -67,7 +75,6 @@ describe AccountReports::DeveloperKeyReports do
   end
   let(:expected_result) do
     [
-
       [
         first_key.global_id,
         first_key.name,
@@ -87,8 +94,17 @@ describe AccountReports::DeveloperKeyReports do
         second_key.tool_configuration.placements.pluck("placement"),
         "Off",
         second_key.scopes
+      ].map(&:to_s),
+      [
+        third_key.global_id,
+        third_key.name,
+        false,
+        third_key.email,
+        "LTI Key",
+        third_key.tool_configuration.placements.pluck(:placement),
+        "On",
+        third_key.scopes
       ].map(&:to_s)
-
     ]
   end
 

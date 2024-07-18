@@ -23,10 +23,11 @@ import $ from 'jquery'
 import customPropTypes from '../modules/customPropTypes'
 import Folder from '../../backbone/models/Folder'
 import File from '../../backbone/models/File'
-import accessibleDateFormat from '@canvas/datetime/accessibleDateFormat'
 import filesEnv from '../modules/filesEnv'
-import {datetimeString} from '@canvas/datetime/date-functions'
+import { dateString, timeString} from '@canvas/datetime/date-functions'
 import { renderDatetimeField } from '@canvas/datetime/jquery/DatetimeField'
+import { mergeTimeAndDate } from '@instructure/moment-utils'
+import classnames from 'classnames'
 
 const I18n = useI18nScope('restrict_student_access')
 
@@ -53,6 +54,8 @@ class RestrictedRadioButtons extends React.Component {
     initialState = {}
     if (allAreEqual(props.models, permissionAttributes)) {
       initialState = props.models[0].pick(permissionAttributes)
+      initialState.lock_at_time = timeString(initialState.lock_at) || ''
+      initialState.unlock_at_time = timeString(initialState.unlock_at) || ''
       if (initialState.locked) {
         initialState.selectedOption = 'unpublished'
       } else if (initialState.lock_at || initialState.unlock_at) {
@@ -110,18 +113,22 @@ class RestrictedRadioButtons extends React.Component {
   ]
 
   componentDidMount() {
-    renderDatetimeField($(this.unlock_at))
-    renderDatetimeField($(this.lock_at))
+    renderDatetimeField($(this.unlock_at), {dateOnly: true})
+    renderDatetimeField($(this.unlock_at_time), {timeOnly: true})
+    renderDatetimeField($(this.lock_at), {dateOnly: true})
+    renderDatetimeField($(this.lock_at_time), {timeOnly: true})
   }
 
   extractFormValues = () => {
+    const unlock_at_datetime = $(this.unlock_at_time).val() && $(this.unlock_at).data('unfudged-date') ? mergeTimeAndDate($(this.unlock_at_time).val(), $(this.unlock_at).data('unfudged-date')) : ''
+    const lock_at_datetime = $(this.lock_at_time).val() && $(this.lock_at).data('unfudged-date') ? mergeTimeAndDate($(this.lock_at_time).val(), $(this.lock_at).data('unfudged-date')) : ''
     const opts = {
       hidden: this.state.selectedOption === 'link_only',
       unlock_at:
-        (this.state.selectedOption === 'date_range' && $(this.unlock_at).data('unfudged-date')) ||
+        (this.state.selectedOption === 'date_range' && unlock_at_datetime) ||
         '',
       lock_at:
-        (this.state.selectedOption === 'date_range' && $(this.lock_at).data('unfudged-date')) || '',
+        (this.state.selectedOption === 'date_range' && lock_at_datetime) || '',
       locked: this.state.selectedOption === 'unpublished',
     }
 
@@ -151,7 +158,7 @@ class RestrictedRadioButtons extends React.Component {
   renderPermissionOptions = () => (
     <div>
       <label className="control-label label-offline" htmlFor="availabilitySelector">
-        {I18n.t('Availability:')}
+        <b>{I18n.t('Availability:')}</b>
       </label>
       <div>
         {this.permissionOptions.map((option, index) => (
@@ -176,47 +183,77 @@ class RestrictedRadioButtons extends React.Component {
   )
 
   renderDatePickers = () => {
-    const styleObj = {}
-    if (this.state.selectedOption !== 'date_range') {
-      styleObj.visibility = 'hidden'
-    }
-
+    const styleObj = classnames(
+      "RestrictedRadioButtons__dates_wrapper",
+      {"RestrictedRadioButtons__dates_wrapper_hidden": this.state.selectedOption !== 'date_range'}
+    )
     return (
-      <div style={styleObj}>
+      <div className={styleObj}>
         <label
           htmlFor="dateSelectInput"
-          className="control-label dialog-adapter-form-calendar-label"
         >
-          {I18n.t('Available From')}
+          <b>{I18n.t('Available From')}</b>
         </label>
         <div className="dateSelectInputContainer controls">
           <input
             id="dateSelectInput"
             ref={e => (this.unlock_at = e)}
-            defaultValue={this.state.unlock_at ? datetimeString(this.state.unlock_at) : ''}
+            defaultValue={this.state.unlock_at ? dateString(this.state.unlock_at) : ''}
             className="form-control dateSelectInput"
             type="text"
-            title={accessibleDateFormat()}
+            title={I18n.t('YYYY-MM-DD')}
             data-tooltip=""
             aria-label={I18n.t('Available From Date')}
           />
         </div>
+        <label
+          htmlFor="timeSelectInput"
+        >
+          <b>{I18n.t('From Time')}</b>
+        </label>
+        <div className="dateSelectInputContainer controls">
+          <input
+            id="timeSelectInput"
+            ref={e => (this.unlock_at_time = e)}
+            defaultValue={this.state.unlock_at_time}
+            className="form-control timeSelectInput"
+            type="text"
+            title={I18n.t('hh:mm')}
+            data-tooltip=""
+            aria-label={I18n.t('Available From Time')}
+          />
+        </div>
         <div>
-          <label htmlFor="lockDate" className="control-label dialog-adapter-form-calendar-label">
-            {I18n.t('Available Until')}
+          <label htmlFor="lockDate">
+            <b>{I18n.t('Available Until')}</b>
           </label>
           <div className="dateSelectInputContainer controls">
             <input
               id="lockDate"
               ref={e => (this.lock_at = e)}
-              defaultValue={this.state.lock_at ? datetimeString(this.state.lock_at) : ''}
+              defaultValue={this.state.lock_at ? dateString(this.state.lock_at) : ''}
               className="form-control dateSelectInput"
               type="text"
-              title={accessibleDateFormat()}
+              title={I18n.t('YYYY-MM-DD')}
               data-tooltip=""
               aria-label={I18n.t('Available Until Date')}
             />
           </div>
+        </div>
+        <label htmlFor="lockDateTime">
+          <b>{I18n.t('Until Time')}</b>
+        </label>
+        <div className="dateSelectInputContainer controls">
+          <input
+            id="lockDateTime"
+            ref={e => (this.lock_at_time = e)}
+            defaultValue={this.state.lock_at_time}
+            className="form-control timeSelectInput"
+            type="text"
+            title={I18n.t('hh:mm')}
+            data-tooltip=""
+            aria-label={I18n.t('Available Until Time')}
+          />
         </div>
       </div>
     )
@@ -231,7 +268,7 @@ class RestrictedRadioButtons extends React.Component {
     return (
       <div className="control-group">
         <label className="control-label label-offline" htmlFor="visibilitySelector">
-          {I18n.t('Visibility:')}
+          <b>{I18n.t('Visibility:')}</b>
         </label>
         <select
           id="visibilitySelector"

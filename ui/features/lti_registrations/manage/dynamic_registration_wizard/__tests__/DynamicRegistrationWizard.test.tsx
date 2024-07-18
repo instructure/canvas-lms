@@ -19,7 +19,6 @@ import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {ZAccountId} from '../../model/AccountId'
 import {DynamicRegistrationWizard} from '../DynamicRegistrationWizard'
-import type {DynamicRegistrationWizardService} from '../DynamicRegistrationWizardService'
 import {success} from '../../../common/lib/apiResult/ApiResult'
 import userEvent from '@testing-library/user-event'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -27,9 +26,7 @@ import {i18nLtiScope} from '../../model/LtiScope'
 import {mockRegistration, mockService} from './helpers'
 import {htmlEscape} from '@instructure/html-escape'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
-
-const mockAlert = showFlashAlert as jest.Mock<typeof showFlashAlert>
+const mockAlert = jest.fn() as jest.Mock<typeof showFlashAlert>
 
 describe('DynamicRegistrationWizard', () => {
   it('renders a loading screen when fetching the registration token', () => {
@@ -49,10 +46,15 @@ describe('DynamicRegistrationWizard', () => {
         accountId={accountId}
         unifiedToolId={unifiedToolId}
         unregister={() => {}}
+        onSuccessfulRegistration={() => {}}
       />
     )
 
-    expect(fetchRegistrationToken).toHaveBeenCalledWith(accountId, unifiedToolId)
+    expect(fetchRegistrationToken).toHaveBeenCalledWith(
+      accountId,
+      'https://example.com',
+      unifiedToolId
+    )
     // Ignore screenreader title.
     expect(screen.getByText(/Loading/i, {ignore: 'title'})).toBeInTheDocument()
   })
@@ -77,9 +79,14 @@ describe('DynamicRegistrationWizard', () => {
         accountId={accountId}
         unifiedToolId={unifiedToolId}
         unregister={() => {}}
+        onSuccessfulRegistration={() => {}}
       />
     )
-    expect(fetchRegistrationToken).toHaveBeenCalledWith(accountId, unifiedToolId)
+    expect(fetchRegistrationToken).toHaveBeenCalledWith(
+      accountId,
+      'https://example.com?foo=bar',
+      unifiedToolId
+    )
     const frame = await waitFor(() => screen.getByTestId('dynamic-reg-wizard-iframe'))
     expect(frame).toBeInTheDocument()
     expect(frame).toBeInstanceOf(HTMLIFrameElement)
@@ -107,6 +114,7 @@ describe('DynamicRegistrationWizard', () => {
         dynamicRegistrationUrl="https://example.com/"
         accountId={accountId}
         unregister={() => {}}
+        onSuccessfulRegistration={() => {}}
       />
     )
 
@@ -161,6 +169,7 @@ describe('DynamicRegistrationWizard', () => {
           dynamicRegistrationUrl="https://example.com/"
           accountId={accountId}
           unregister={() => {}}
+          onSuccessfulRegistration={() => {}}
         />
       )
 

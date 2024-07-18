@@ -68,10 +68,10 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       muted: false,
       name: 'Math Assignment',
       omit_from_final_grade: false,
-      only_visible_to_overrides: false,
       post_manually: false,
       published: true,
       submission_types: ['online_text_entry'],
+      visible_to_everyone: true,
     }
 
     submission = {

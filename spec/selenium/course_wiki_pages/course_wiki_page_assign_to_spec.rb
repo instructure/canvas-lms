@@ -169,6 +169,21 @@ describe "wiki pages show page assign to" do
       visit_wiki_page_view(@course.id, @page.title)
       expect(element_exists?(assign_to_btn_selector)).to be_falsey
     end
+
+    it "does show mastery paths in the assign to list for pages" do
+      @course.conditional_release = true
+      @course.save!
+
+      visit_wiki_page_view(@course.id, @page.title)
+
+      assign_to_btn.click
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      option_elements = INSTUI_Select_options(module_item_assignee[0])
+      option_names = option_elements.map(&:text)
+      expect(option_names).to include("Mastery Paths")
+    end
   end
 
   context "as a student" do

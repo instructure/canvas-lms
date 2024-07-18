@@ -18,8 +18,12 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
+import * as uploadFileModule from '@canvas/upload-file'
 import {AttachmentDisplay} from '../AttachmentDisplay'
 import {responsiveQuerySizes} from '../../../utils'
+import userEvent from '@testing-library/user-event'
+
+jest.mock('@canvas/upload-file')
 
 const setup = props => {
   return render(
@@ -80,5 +84,27 @@ describe('AttachmentDisplay', () => {
 
     expect(queryByText('Attach')).toBeFalsy()
     expect(queryByText('Fundamentals of Differential E...')).toBeTruthy()
+  })
+
+  it('uploads file with submit intent if we do not pass the checkContextQuota param', async () => {
+    uploadFileModule.uploadFile = jest.fn()
+    const {findByTestId} = setup({canAttach: true})
+    const input = await findByTestId('attachment-input')
+    await userEvent.upload(input, new File(['file'], 'file.txt', {type: 'text/plain'}))
+
+    expect(uploadFileModule.uploadFile).toHaveBeenCalledTimes(1)
+    const attachmentProps = uploadFileModule.uploadFile.mock.calls[0][1]
+    expect(attachmentProps['attachment[intent]']).toEqual('submit')
+  })
+
+  it('uploads file with upload intent if we pass the checkContextQuota param', async () => {
+    uploadFileModule.uploadFile = jest.fn()
+    const {findByTestId} = setup({canAttach: true, checkContextQuota: true})
+    const input = await findByTestId('attachment-input')
+    await userEvent.upload(input, new File(['file'], 'file.txt', {type: 'text/plain'}))
+
+    expect(uploadFileModule.uploadFile).toHaveBeenCalledTimes(1)
+    const attachmentProps = uploadFileModule.uploadFile.mock.calls[0][1]
+    expect(attachmentProps['attachment[intent]']).toEqual('upload')
   })
 })

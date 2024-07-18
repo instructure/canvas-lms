@@ -57,6 +57,13 @@ class AccessToken < ActiveRecord::Base
   end
 
   set_policy do
+    given do |user|
+      !user.account.feature_enabled?(:admin_manage_access_tokens) ||
+        !user.account.limit_personal_access_tokens? ||
+        self.user.check_accounts_right?(user, :manage_access_tokens)
+    end
+    can :create and can :update
+
     given { |user| user.id == user_id }
     can :delete
 
@@ -312,13 +319,18 @@ class AccessToken < ActiveRecord::Base
     developer_key_id == DeveloperKey.default.id
   end
 
-  def self.invalidate_mobile_tokens!(account)
+  # if user is not provided, all user tokens in the account will be invalidated
+  def self.invalidate_mobile_tokens!(account, user: nil)
     return unless account.root_account?
 
     developer_key_ids = DeveloperKey.mobile_app_keys.map do |app_key|
       app_key.respond_to?(:global_id) ? app_key.global_id : app_key.id
     end
-    user_ids = User.active.joins(:pseudonyms).where(pseudonyms: { account_id: account }).ids
+    user_ids = if user
+                 [user.id]
+               else
+                 User.active.joins(:pseudonyms).where(pseudonyms: { account_id: account }).ids
+               end
     tokens = active.where(developer_key_id: developer_key_ids, user_id: user_ids)
 
     now = Time.zone.now

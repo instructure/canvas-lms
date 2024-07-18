@@ -1,0 +1,24 @@
+services:
+  webpack:
+    command: yarn serve
+    # There are a couple of environment variables that you can set to customize the rspack-dev-server
+    environment:
+      # If HMR isn't working for you, try updating this so that it points to the correct domain.
+      # Note that if you have HTTPS running locally, you'll need to use wss:// instead of ws://
+      # RSPACK_WEBSOCKET_URL: wss://canvas-web.$INST_DOMAIN/ws
+      # If you need to add additional allowed hosts, you can do so by adding them to the allowedHosts comma-separated list.
+      # RSPACK_DEV_SERVER_ADDITIONAL_ALLOWED_HOSTS: your-domain.inst.test,other-domain.inst.test
+      # If you need to change the port that the rspack-dev-server runs on, you can do so by setting this environment variable.
+      # Typically, this won't need to be changed, as it's never exposed outside the container. If you do change it, make sure
+      # to update the traefik configuration as well.
+      # RSPACK_DEV_SERVER_PORT: 9090
+      INST_DOMAIN: ${INST_DOMAIN:-inst.test}
+    labels:
+      - 'traefik.http.services.webpack.loadbalancer.server.port=${RSPACK_DEV_SERVER_PORT:-80}'
+      # Ensure that all frontend assets are loaded through the rspack-dev-server and that the websocket is available
+      - 'traefik.http.routers.webpack.rule=HostRegexp(`canvas-web.$INST_DOMAIN`, `{subdomain:[A-Za-z0-9_-]+}.canvas-web.$INST_DOMAIN`) && (PathPrefix(`/dist/webpack-dev`) || Path(`/ws`))'
+  web:
+    labels:
+      - 'traefik.http.services.web.loadbalancer.server.port=80'
+      # Ensure that any requests for frontend assets are routed to the rspack-dev-server
+      - 'traefik.http.routers.web.rule=HostRegexp(`canvas-web.$INST_DOMAIN`, `{subdomain:[A-Za-z0-9_-]+}.canvas-web.$INST_DOMAIN`) && !PathPrefix(`/dist/webpack-dev`)'

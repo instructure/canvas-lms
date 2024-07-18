@@ -152,6 +152,7 @@ export const UPDATE_DISCUSSION_ENTRY = gql`
     $message: String
     $fileId: ID
     $removeAttachment: Boolean
+    $quotedEntryId: ID
   ) {
     updateDiscussionEntry(
       input: {
@@ -159,6 +160,7 @@ export const UPDATE_DISCUSSION_ENTRY = gql`
         message: $message
         fileId: $fileId
         removeAttachment: $removeAttachment
+        quotedEntryId: $quotedEntryId
       }
     ) {
       discussionEntry {

@@ -156,6 +156,11 @@ class SubmissionsController < SubmissionsBaseController
   # @argument comment[text_comment] [String]
   #   Include a textual comment with the submission.
   #
+  # @argument submission[group_comment] [Boolean]
+  #   Whether or not this comment should be sent to the entire group (defaults
+  #   to false). Ignored if this is not a group assignment or if no text_comment
+  #   is provided.
+  #
   # @argument submission[submission_type] [Required, String, "online_text_entry"|"online_url"|"online_upload"|"media_recording"|"basic_lti_launch"|"student_annotation"]
   #   The type of submission being made. The assignment submission_types must
   #   include this submission type as an allowed option, or the submission will be rejected with a 400 error.

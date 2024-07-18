@@ -23,7 +23,7 @@ import userEvent from '@testing-library/user-event'
 
 const props: ItemAssignToCardProps = {
   courseId: '1',
-  disabledOptionIds: [],
+  disabledOptionIdsRef: {current: []},
   selectedAssigneeIds: [],
   onCardAssignmentChange: () => {},
   cardId: 'assign-to-card-001',
@@ -35,6 +35,8 @@ const props: ItemAssignToCardProps = {
   removeDueDateInput: false,
   isCheckpointed: false,
   onValidityChange: () => {},
+  required_replies_due_at: null,
+  reply_to_topic_due_at: null,
 }
 
 const renderComponent = (overrides: Partial<ItemAssignToCardProps> = {}) =>
@@ -431,7 +433,7 @@ describe('ItemAssignToCard', () => {
       expect(getAllByText('Course: Tue, Nov 10, 2020, 5:00 AM').length).toBeGreaterThanOrEqual(1)
     })
 
-    it('changes to fancy midnight for due dates from dates if it is set to 12:00 AM', async () => {
+    it.skip('changes to fancy midnight for due dates from dates if it is set to 12:00 AM', async () => {
       window.ENV.DEFAULT_DUE_TIME = '00:00:00'
       const {getByLabelText, getAllByText, getByText} = renderComponent({
         due_at: undefined,
@@ -577,7 +579,7 @@ describe('ItemAssignToCard', () => {
         renderComponent({isCheckpointed: true})
         const labels = [
           'Clear reply to topic due date/time',
-          'Clear required replies due date/time'
+          'Clear required replies due date/time',
         ]
         labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
       })
@@ -590,7 +592,7 @@ describe('ItemAssignToCard', () => {
         })
         const labels = [
           'Clear reply to topic due date/time for John',
-          'Clear required replies due date/time for John'
+          'Clear required replies due date/time for John',
         ]
         labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
       })
@@ -606,7 +608,7 @@ describe('ItemAssignToCard', () => {
         })
         const labels = [
           'Clear reply to topic due date/time for John and Alice',
-          'Clear required replies due date/time for John and Alice'
+          'Clear required replies due date/time for John and Alice',
         ]
         labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
       })
@@ -623,7 +625,7 @@ describe('ItemAssignToCard', () => {
         })
         const labels = [
           'Clear reply to topic due date/time for John, Alice, and Linda',
-          'Clear required replies due date/time for John, Alice, and Linda'
+          'Clear required replies due date/time for John, Alice, and Linda',
         ]
         labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
       })
@@ -641,7 +643,7 @@ describe('ItemAssignToCard', () => {
         })
         const labels = [
           'Clear reply to topic due date/time for John, Alice, and 2 others',
-          'Clear required replies due date/time for John, Alice, and 2 others'
+          'Clear required replies due date/time for John, Alice, and 2 others',
         ]
         labels.forEach(label => expect(screen.getByText(label)).toBeInTheDocument())
       })

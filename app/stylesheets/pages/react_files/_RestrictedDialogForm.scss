@@ -27,9 +27,14 @@
     margin-#{direction(left)}: 0px;
   }
 }
-.dateSelectInput { width: 100px }
-.controls.dateSelectInputContainer{ margin-#{direction(left)}: 120px }
+.dateSelectInput { width: 200px }
 
+.timeSelectInput { width: 245px }
+
+.controls.dateSelectInputContainer{
+  margin-#{direction(bottom)}: 15px;
+  margin-#{direction(left)}: 0px 
+}
 
 .RestrictedDialogForm__warning {
   color: $ic-color-alert;

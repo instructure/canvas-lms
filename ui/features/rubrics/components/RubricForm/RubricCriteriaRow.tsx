@@ -20,7 +20,7 @@ import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
 import {possibleString, possibleStringRange} from '@canvas/rubrics/react/Points'
-import {escapeNewLineText, rangingFrom} from '@canvas/rubrics/react/RubricAssessment'
+import {OutcomeTag, escapeNewLineText, rangingFrom} from '@canvas/rubrics/react/RubricAssessment'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
@@ -60,7 +60,8 @@ export const RubricCriteriaRow = ({
   onDuplicateCriterion,
   onEditCriterion,
 }: RubricCriteriaRowProps) => {
-  const {description, longDescription, outcome, learningOutcomeId, points} = criterion
+  const {description, longDescription, outcome, learningOutcomeId, points, masteryPoints} =
+    criterion
 
   return (
     <Draggable draggableId={criterion.id || Date.now().toString()} index={rowIndex - 1}>
@@ -88,24 +89,7 @@ export const RubricCriteriaRow = ({
                 {learningOutcomeId ? (
                   <>
                     <View as="div">
-                      <Tag
-                        text={
-                          <AccessibleContent alt={I18n.t('View outcome')}>
-                            <Text>
-                              {I18n.t('%{display_name}', {
-                                display_name: outcome?.title,
-                              })}
-                            </Text>
-                          </AccessibleContent>
-                        }
-                        size="small"
-                        themeOverride={{
-                          defaultBackground: 'white',
-                          defaultBorderColor: 'rgb(3, 116, 181)',
-                          defaultColor: 'rgb(3, 116, 181)',
-                        }}
-                        data-testid="rubric-criteria-row-outcome-tag"
-                      />
+                      <OutcomeTag displayName={criterion.description} />
                       <Tooltip
                         renderTip={I18n.t("An outcome can't be edited")}
                         data-testid={`outcome-tooltip-${criterion.id}`}
@@ -132,6 +116,13 @@ export const RubricCriteriaRow = ({
                     >
                       {/* html sanitized by server */}
                       <Text dangerouslySetInnerHTML={{__html: longDescription ?? ''}} />
+                    </View>
+                    <View as="div" margin="small 0 0 0" data-testid="rubric-criteria-row-threshold">
+                      <Text>
+                        {I18n.t('Threshold: %{threshold}', {
+                          threshold: possibleString(masteryPoints),
+                        })}
+                      </Text>
                     </View>
                   </>
                 ) : (
@@ -304,7 +295,10 @@ const RatingScaleAccordionItem = ({rating, scale, spacing, min}: RatingScaleAcco
         </Flex.Item>
         <Flex.Item shouldShrink={true} shouldGrow={true} align="start">
           <View as="div">
-            <Text dangerouslySetInnerHTML={escapeNewLineText(rating.longDescription)} />
+            <Text
+              dangerouslySetInnerHTML={escapeNewLineText(rating.longDescription)}
+              themeOverride={{paragraphMargin: 0}}
+            />
           </View>
         </Flex.Item>
         <Flex.Item align="start">

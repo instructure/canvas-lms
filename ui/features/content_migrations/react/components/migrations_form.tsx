@@ -66,6 +66,7 @@ type MigratorProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
   fileUploadProgress: number | null
+  isSubmitting: boolean
 }
 
 const renderMigrator = (props: MigratorProps) => {
@@ -99,25 +100,32 @@ export const ContentMigrationsForm = ({
   setMigrations: Dispatch<SetStateAction<ContentMigrationItem[]>>
 }) => {
   const [migrators, setMigrators] = useState<any>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [chosenMigrator, setChosenMigrator] = useState<string | null>(null)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleFileProgress = (json: any, {loaded, total}: AttachmentProgressResponse) => {
-    setFileUploadProgress(Math.trunc((loaded / total) * 100))
-    if (loaded === total) {
-      onResetForm()
-      setMigrations(prevMigrations => [json as ContentMigrationItem].concat(prevMigrations))
-    }
-  }
+
   const [fileUploadProgress, setFileUploadProgress] = useState<number | null>(null)
+  const onResetForm = useCallback(() => {
+    setChosenMigrator(null)
+    setIsSubmitting(false)
+  }, [])
 
-  const onResetForm = useCallback(() => setChosenMigrator(null), [])
-
+  const handleFileProgress = useCallback(
+    (json: ContentMigrationItem, {loaded, total}: AttachmentProgressResponse) => {
+      setFileUploadProgress(Math.trunc((loaded / total) * 100))
+      if (loaded === total) {
+        onResetForm()
+        setMigrations(prevMigrations => [json].concat(prevMigrations))
+      }
+    },
+    [setFileUploadProgress, onResetForm, setMigrations]
+  )
   const onSubmitForm: onSubmitMigrationFormCallback = useCallback(
     async (formData, preAttachmentFile) => {
       const courseId = window.ENV.COURSE_ID
       if (!chosenMigrator || !courseId || formData.errored) {
         return
       }
+      setIsSubmitting(true)
       delete formData.errored
       const requestBody: RequestBody = {
         course_id: courseId,
@@ -180,6 +188,7 @@ export const ContentMigrationsForm = ({
       <View as="div" margin="medium 0" maxWidth="22.5rem">
         {migrators.length > 0 ? (
           <SimpleSelect
+            disabled={isSubmitting}
             value={chosenMigrator || 'empty'}
             renderLabel={I18n.t('Select Content Type')}
             onChange={(_e: any, {value}: any) =>
@@ -207,6 +216,7 @@ export const ContentMigrationsForm = ({
             onSubmit: onSubmitForm,
             onCancel: onResetForm,
             fileUploadProgress,
+            isSubmitting,
           })}
           <hr role="presentation" aria-hidden="true" />
         </>

@@ -525,7 +525,8 @@ class DiscussionRow extends Component {
       )
     }
 
-    if (this.props.displayDifferentiatedModulesTray) {
+    const showAssignTo = this.props.discussion.assignment_id || (!this.props.discussion.assignment_id && !this.props.discussion.group_category_id)
+    if (this.props.displayDifferentiatedModulesTray && showAssignTo) {
       menuList.push(
         this.createMenuItem(
           'assignTo',

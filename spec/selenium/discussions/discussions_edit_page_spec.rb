@@ -767,6 +767,14 @@ describe "discussions" do
             expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
           end
 
+          it "does not display 'Assign To' section for an ungraded group discussion" do
+            group = course.groups.create!(name: "group")
+            group_ungraded = course.discussion_topics.create!(title: "no options enabled - topic", group_category: group.group_category)
+            get "/courses/#{course.id}/discussion_topics/#{group_ungraded.id}/edit"
+            expect(Discussion.select_date_input_exists?).to be_truthy
+            expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
+          end
+
           it "does not display 'Post To' section and Available From/Until inputs" do
             get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
             expect(Discussion.select_date_input_exists?).to be_falsey
@@ -894,8 +902,6 @@ describe "discussions" do
           end
 
           it "transitions from graded to ungraded and overrides are ok", :ignore_js_errors do
-            skip("LX-1761 this test should work but doesn't right now")
-
             discussion_assignment_options = {
               name: "assignment",
               points_possible: 10,
@@ -930,10 +936,27 @@ describe "discussions" do
             keep_trying_until { expect(item_tray_exists?).to be_truthy }
 
             expect(assign_to_date_and_time[1].text).not_to include("Due Date")
-            expect(assign_to_available_from_date(1, false).attribute("value")).to eq(format_date_for_view(available_from, "%b %-e, %Y"))
-            expect(assign_to_available_from_time(1, false).attribute("value")).to eq(available_from.strftime("%-l:%M %p"))
-            expect(assign_to_until_date(1, false).attribute("value")).to eq(format_date_for_view(available_until, "%b %-e, %Y"))
-            expect(assign_to_until_time(1, false).attribute("value")).to eq(available_until.strftime("%-l:%M %p"))
+            expect(assign_to_available_from_date(1, true).attribute("value")).to eq(format_date_for_view(available_from, "%b %-e, %Y"))
+            expect(assign_to_available_from_time(1, true).attribute("value")).to eq(available_from.strftime("%-l:%M %p"))
+            expect(assign_to_until_date(1, true).attribute("value")).to eq(format_date_for_view(available_until, "%b %-e, %Y"))
+            expect(assign_to_until_time(1, true).attribute("value")).to eq(available_until.strftime("%-l:%M %p"))
+          end
+
+          it "does not recover a deleted card when adding an assignee", :ignore_js_errors do
+            # Bug fix of LX-1619
+            student1 = course.enroll_student(User.create!, enrollment_state: "active").user
+
+            get "/courses/#{course.id}/discussion_topics/#{@topic_all_options.id}/edit"
+
+            Discussion.click_assign_to_button
+            wait_for_assign_to_tray_spinner
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            click_add_assign_to_card
+            click_delete_assign_to_card(0)
+            select_module_item_assignee(0, student1.name)
+
+            expect(selected_assignee_options.count).to be(1)
           end
         end
       end
@@ -1675,6 +1698,22 @@ describe "discussions" do
             expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
           end
 
+          it "does not recover a deleted card when adding an assignee", :ignore_js_errors do
+            # Bug fix of LX-1619
+            discussion = create_graded_discussion(course)
+            get "/courses/#{course.id}/discussion_topics/#{discussion.id}/edit"
+
+            Discussion.click_assign_to_button
+            wait_for_assign_to_tray_spinner
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            click_add_assign_to_card
+            click_delete_assign_to_card(0)
+            select_module_item_assignee(0, @course_section_2.name)
+
+            expect(selected_assignee_options.count).to be(1)
+          end
+
           context "checkpoints" do
             it "shows reply to topic input on graded discussion with sub assignments" do
               Account.site_admin.enable_feature!(:discussion_checkpoints)
@@ -1707,6 +1746,121 @@ describe "discussions" do
             it "shows required replies input on graded discussion with sub assignments" do
               Account.site_admin.enable_feature!(:discussion_checkpoints)
               @course.root_account.enable_feature!(:discussion_checkpoints)
+              @student1 = student_in_course(course:, active_all: true).user
+              @student2 = student_in_course(course:, active_all: true).user
+              @course_section = course.course_sections.create!(name: "section alpha")
+              @course_section_2 = course.course_sections.create!(name: "section Beta")
+
+              # Open page and assignTo tray
+              get "/courses/#{@course.id}/discussion_topics/new"
+              title = "Graded Discussion Topic with letter grade type"
+              message = "replying to topic"
+
+              f("input[placeholder='Topic Title']").send_keys title
+              type_in_tiny("textarea", message)
+
+              force_click_native('input[type=checkbox][value="graded"]')
+              force_click_native('input[type=checkbox][value="checkpoints"]')
+
+              Discussion.assign_to_button.click
+              click_add_assign_to_card
+              click_delete_assign_to_card(0)
+              select_module_item_assignee(0, @course_section_2.name)
+
+              reply_to_topic_date = 3.days.from_now(Time.zone.now).to_date + 17.hours
+              reply_to_topic_date_formatted = format_date_for_view(reply_to_topic_date, "%m/%d/%Y")
+              update_reply_to_topic_date(0, reply_to_topic_date_formatted)
+              update_reply_to_topic_time(0, "5:00 PM")
+
+              # required replies
+              required_replies_date = 4.days.from_now(Time.zone.now).to_date + 17.hours
+              required_replies_date_formatted = format_date_for_view(required_replies_date, "%m/%d/%Y")
+              update_required_replies_date(0, required_replies_date_formatted)
+              update_required_replies_time(0, "5:00 PM")
+
+              # available from
+              available_from_date = 2.days.from_now(Time.zone.now).to_date + 17.hours
+              available_from_date_formatted = format_date_for_view(available_from_date, "%m/%d/%Y")
+              update_available_date(0, available_from_date_formatted, true, false)
+              update_available_time(0, "5:00 PM", true, false)
+
+              # available until
+              until_date = 5.days.from_now(Time.zone.now).to_date + 17.hours
+              until_date_formatted = format_date_for_view(until_date, "%m/%d/%Y")
+              update_until_date(0, until_date_formatted, true, false)
+              update_until_time(0, "5:00 PM", true, false)
+
+              click_save_button("Apply")
+
+              wait_for_assign_to_tray_spinner
+              fj("button:contains('Save')").click
+              Discussion.section_warning_continue_button.click
+              wait_for_ajaximations
+
+              graded_discussion = DiscussionTopic.last
+              sub_assignments = graded_discussion.assignment.sub_assignments
+              sub_assignment1 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+              sub_assignment2 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+              expect(graded_discussion.assignment.sub_assignments.count).to eq(2)
+              expect(format_date_for_view(sub_assignment1.assignment_overrides.active.first.due_at, "%m/%d/%Y")).to eq(reply_to_topic_date_formatted)
+              expect(format_date_for_view(sub_assignment2.assignment_overrides.active.first.due_at, "%m/%d/%Y")).to eq(required_replies_date_formatted)
+
+              # renders update
+              get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}/edit"
+              Discussion.assign_to_button.click
+
+              displayed_override_dates = all_displayed_assign_to_date_and_time
+              # Check that the due dates are correctly displayed
+              expect(displayed_override_dates.include?(reply_to_topic_date)).to be_truthy
+              expect(displayed_override_dates.include?(required_replies_date)).to be_truthy
+              expect(displayed_override_dates.include?(available_from_date)).to be_truthy
+              expect(displayed_override_dates.include?(until_date)).to be_truthy
+
+              # updates dates and saves
+              reply_to_topic_date = 4.days.from_now(Time.zone.now).to_date + 17.hours
+              reply_to_topic_date_formatted = format_date_for_view(reply_to_topic_date, "%m/%d/%Y")
+              update_reply_to_topic_date(0, reply_to_topic_date_formatted)
+              update_reply_to_topic_time(0, "5:00 PM")
+
+              # required replies
+              required_replies_date = 5.days.from_now(Time.zone.now).to_date + 17.hours
+              required_replies_date_formatted = format_date_for_view(required_replies_date, "%m/%d/%Y")
+              update_required_replies_date(0, required_replies_date_formatted)
+              update_required_replies_time(0, "5:00 PM")
+
+              # available from
+              available_from_date = 3.days.from_now(Time.zone.now).to_date + 17.hours
+              available_from_date_formatted = format_date_for_view(available_from_date, "%m/%d/%Y")
+              update_available_date(0, available_from_date_formatted, true, false)
+              update_available_time(0, "5:00 PM", true, false)
+
+              # available until
+              until_date = 6.days.from_now(Time.zone.now).to_date + 17.hours
+              until_date_formatted = format_date_for_view(until_date, "%m/%d/%Y")
+              update_until_date(0, until_date_formatted, true, false)
+              update_until_time(0, "5:00 PM", true, false)
+
+              click_save_button("Apply")
+
+              wait_for_assign_to_tray_spinner
+              fj("button:contains('Save')").click
+              Discussion.section_warning_continue_button.click
+              wait_for_ajaximations
+
+              graded_discussion.reload
+              sub_assignments = graded_discussion.assignment.sub_assignments
+              sub_assignment1 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+              sub_assignment2 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+              expect(graded_discussion.assignment.sub_assignments.count).to eq(2)
+              expect(format_date_for_view(sub_assignment1.assignment_overrides.active.first.due_at, "%m/%d/%Y")).to eq(reply_to_topic_date_formatted)
+              expect(format_date_for_view(sub_assignment2.assignment_overrides.active.first.due_at, "%m/%d/%Y")).to eq(required_replies_date_formatted)
+            end
+
+            it "displays an error when the availability date is after the due date" do
+              Account.site_admin.enable_feature!(:discussion_checkpoints)
+              @course.root_account.enable_feature!(:discussion_checkpoints)
               assignment = @course.assignments.create!(
                 name: "Assignment",
                 submission_types: ["online_text_entry"],
@@ -1728,8 +1882,48 @@ describe "discussions" do
               get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}/edit"
               Discussion.assign_to_button.click
 
-              wait_for_assign_to_tray_spinner
-              expect(module_item_assign_to_card.last).to contain_css(required_replies_due_date_input_selector)
+              reply_to_topic_date_formatted = format_date_for_view(1.day.from_now(Time.zone.now).to_date, "%m/%d/%Y")
+              update_reply_to_topic_date(0, reply_to_topic_date_formatted)
+              update_reply_to_topic_time(0, "5:00 PM")
+
+              # available from
+              available_from_date_formatted = format_date_for_view(2.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
+              update_available_date(0, available_from_date_formatted, true, false)
+              update_available_time(0, "5:00 PM", true, false)
+              expect(assign_to_date_and_time[2].text).to include("Unlock date cannot be after reply to topic due date")
+
+              # correct reply to topic
+              reply_to_topic_date_formatted = format_date_for_view(3.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
+              update_reply_to_topic_date(0, reply_to_topic_date_formatted)
+              update_reply_to_topic_time(0, "5:00 PM")
+
+              # required replies
+              required_replies_date_formatted = format_date_for_view(1.day.from_now(Time.zone.now).to_date, "%m/%d/%Y")
+              update_required_replies_date(0, required_replies_date_formatted)
+              update_required_replies_time(0, "5:00 PM")
+              expect(assign_to_date_and_time[2].text).to include("Unlock date cannot be after required replies due date")
+
+              # available until
+              until_date = 5.days.from_now(Time.zone.now).to_date + 17.hours
+              until_date_formatted = format_date_for_view(until_date, "%m/%d/%Y")
+              update_until_date(0, until_date_formatted, true, false)
+              update_until_time(0, "5:00 PM", true, false)
+
+              reply_to_topic_date_formatted = format_date_for_view(6.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
+              update_reply_to_topic_date(0, reply_to_topic_date_formatted)
+              update_reply_to_topic_time(0, "5:00 PM")
+              expect(assign_to_date_and_time[3].text).to include("Lock date cannot be before reply to topic due date")
+
+              # correct reply to topic
+              reply_to_topic_date_formatted = format_date_for_view(3.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
+              update_reply_to_topic_date(0, reply_to_topic_date_formatted)
+              update_reply_to_topic_time(0, "5:00 PM")
+
+              # required replies
+              required_replies_date_formatted = format_date_for_view(6.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
+              update_required_replies_date(0, required_replies_date_formatted)
+              update_required_replies_time(0, "5:00 PM")
+              expect(assign_to_date_and_time[3].text).to include("Lock date cannot be before required replies due date")
             end
           end
 

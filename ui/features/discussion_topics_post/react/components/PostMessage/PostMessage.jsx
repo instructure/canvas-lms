@@ -149,6 +149,7 @@ export function PostMessage({...props}) {
                 onCancel={props.onCancel}
                 value={translatedMessage}
                 attachment={props.attachment}
+                quotedEntry={props.discussionEntry.quotedEntry}
                 onSubmit={props.onSave}
                 isEdit={true}
                 isAnnouncement={props.discussionTopic?.isAnnouncement}

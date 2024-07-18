@@ -70,6 +70,14 @@ class UserPreferenceValue < ActiveRecord::Base
 
   module UserMethods
     def get_preference(key, sub_key = nil)
+      if association(:user_preference_values).loaded?
+        # Use the in-memory loaded values
+        preference_value = user_preference_values.find do |pv|
+          pv.key.to_s == key.to_s && (sub_key.nil? || pv.sub_key.to_s == sub_key.to_s)
+        end
+        return preference_value&.value # returns nil if not found
+      end
+
       value = preferences[key]
       if value == EXTERNAL
         id, value = user_preference_values.where(key:, sub_key:).pick(:id, :value)

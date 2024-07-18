@@ -18,7 +18,6 @@
 import React from 'react'
 import {useEditor, useNode} from '@craftjs/core'
 import {useClassNames} from '../../../../utils'
-import {ContainerSettings} from './ContainerSettings'
 import {type ContainerProps} from './types'
 
 export const Container = ({
@@ -58,8 +57,4 @@ export const Container = ({
   )
 }
 
-Container.craft = {
-  related: {
-    settings: ContainerSettings,
-  },
-}
+Container.craft = {}

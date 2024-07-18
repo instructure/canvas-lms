@@ -34,7 +34,6 @@ import vddTooltipView from '../jst/_vddTooltip.handlebars'
 import Publishable from '../backbone/models/Publishable'
 import PublishButtonView from '@canvas/publish-button-view'
 import htmlEscape from '@instructure/html-escape'
-import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import get from 'lodash/get'
 import axios from '@canvas/axios'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -2405,8 +2404,6 @@ $(document).ready(function () {
     // menu tools click handler for the old UI
     $('.menu_tray_tool_link').click(openExternalTool)
   }
-
-  monitorLtiMessages()
 
   function renderCopyToTray(open, contentSelection, returnFocusTo) {
     ReactDOM.render(

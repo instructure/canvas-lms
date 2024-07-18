@@ -23,10 +23,6 @@ require_relative "../../helpers/k5_common"
 describe Types::CourseDashboardCardType do
   include K5Common
 
-  before do
-    Account.site_admin.enable_feature! :dashboard_graphql_integration
-  end
-
   let_once(:course) do
     course_with_student(active_all: true)
     @course
@@ -186,5 +182,17 @@ describe Types::CourseDashboardCardType do
         cur_resolver.resolve("dashboardCard { term { startAt } }")
       ).to eq course.enrollment_term.start_at.iso8601
     end
+  end
+
+  it "front page title is null if not set" do
+    cur_resolver = GraphQLTypeTester.new(course, current_user: @student)
+    expect(cur_resolver.resolve("dashboardCard { frontPageTitle }")).to be_nil
+  end
+
+  it "front page title is set if set" do
+    wp = @course.wiki_pages.create!(title: "something")
+    wp.set_as_front_page!
+    cur_resolver = GraphQLTypeTester.new(course, current_user: @student)
+    expect(cur_resolver.resolve("dashboardCard { frontPageTitle }")).to eq "something"
   end
 end

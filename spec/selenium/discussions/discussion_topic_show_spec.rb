@@ -405,6 +405,45 @@ describe "Discussion Topic Show" do
         get "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
         expect(element_exists?(Discussion.assign_to_button_selector)).to be_falsey
       end
+
+      it "does not show mastery paths in the assign to list when ungraded" do
+        @course.conditional_release = true
+        @course.save!
+
+        get "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
+        Discussion.click_assign_to_button
+        wait_for_assign_to_tray_spinner
+
+        option_elements = INSTUI_Select_options(module_item_assignee[0])
+        option_names = option_elements.map(&:text)
+        expect(option_names).not_to include("Mastery Paths")
+      end
+
+      it "does show mastery paths in the assign to list when graded" do
+        @course.conditional_release = true
+        @course.save!
+
+        assignment = @course.assignments.create!(
+          name: "Assignment",
+          submission_types: ["online_text_entry"],
+          points_possible: 20
+        )
+        dt = @course.discussion_topics.create!(
+          title: "Graded Discussion",
+          discussion_type: "threaded",
+          posted_at: "2017-07-09 16:32:34",
+          user: @teacher,
+          assignment:
+        )
+
+        get "/courses/#{@course.id}/discussion_topics/#{dt.id}"
+        Discussion.click_assign_to_button
+        wait_for_assign_to_tray_spinner
+
+        option_elements = INSTUI_Select_options(module_item_assignee[0])
+        option_names = option_elements.map(&:text)
+        expect(option_names).to include("Mastery Paths")
+      end
     end
 
     context "student availability" do

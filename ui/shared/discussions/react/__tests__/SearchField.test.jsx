@@ -16,24 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import {SearchField} from '../components/SearchField'
 import '@testing-library/jest-dom/extend-expect'
 import {DEFAULT_SEARCH_DELAY} from '../utils/constants'
+import userEvent from '@testing-library/user-event'
 
 jest.mock('lodash', () => ({
   debounce: fn => {
     fn.cancel = jest.fn()
     return fn
   },
-}))
-
-jest.mock('@instructure/ui-a11y-content', () => ({
-  ScreenReaderContent: ({children}) => <div>{children}</div>,
-}))
-
-jest.mock('@instructure/ui-icons', () => ({
-  IconSearchLine: () => <div>Icon</div>,
 }))
 
 jest.mock('@instructure/ui-text-input', () => ({
@@ -63,7 +56,7 @@ describe('SearchField Component', () => {
     )
     const inputElement = getByPlaceholderText('Search...')
 
-    fireEvent.change(inputElement, {target: {value: 'test'}})
+    await userEvent.type(inputElement, 'test')
 
     await waitFor(
       () => {

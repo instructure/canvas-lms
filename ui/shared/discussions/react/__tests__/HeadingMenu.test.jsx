@@ -16,15 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import {HeadingMenu} from '../components/HeadingMenu'
-import { DEFAULT_SEARCH_DELAY } from '../utils/constants'
+import {DEFAULT_SEARCH_DELAY} from '../utils/constants'
+import userEvent from '@testing-library/user-event'
 
 const defaultProps = () => ({
   name: 'Discussion Filter',
   filters: {
-    all: 'All Discussions',
-    unread: 'Unread Discussions'
+    all: {name: 'All Discussions', title: 'Discussions'},
+    unread: {name: 'Unread Discussions', title: 'Unread Discussions'},
   },
   defaultSelectedFilter: 'all',
   onSelectFilter: () => {},
@@ -57,13 +58,13 @@ describe('Heading Menu', () => {
 
     // Click the toggle button to open the filter menu
     const toggleButton = getByTestId('toggle-filter-menu')
-    fireEvent.click(toggleButton)
+    await userEvent.click(toggleButton)
 
     // Check that the filter menu is open
     expect(getByTestId('filter-menu')).toBeInTheDocument()
 
     const filterElement = queryByTestId('menu-filter-all')
-    fireEvent.click(filterElement)
+    await userEvent.click(filterElement)
     await waitFor(
       () => {
         expect(onSelectFilterMock).toHaveBeenCalledWith({id: 'all', value: 'all'})

@@ -820,6 +820,24 @@ module Canvas::LiveEvents
     end
   end
 
+  def self.learning_outcome_result_artifact_updated_and_created_at_data(result)
+    # Like associated_asset, learning outcome result artifact can be nil as there is nothing on a model
+    # that forces it to be present. This seems like an oversight as by definition an artifact is the
+    # the submission for the assessable content that contains the grade/score. i.e. RubricAssessment,
+    # Submission, Quizzes::QuizSubmission, or LiveAssessments::Submission.  May be there is some legacy
+    # knowledge that has been lost as to why to allow this to be nullable?  Until then, we will need to
+    # treat this as a possiblity.
+    # Since artifact can be nil, which inturn means that result.artifact_id and result.artifact_type would
+    # be nil, we need to check if artifact is nil and if so, do not include the artifact's updated_at and
+    # created_at attributes.
+    return {} if result.artifact.nil?
+
+    {
+      artifact_updated_at: result.artifact.updated_at,
+      artifact_created_at: result.artifact.created_at,
+    }
+  end
+
   def self.get_learning_outcome_result_data(result)
     {
       id: result.id,
@@ -840,10 +858,10 @@ module Canvas::LiveEvents
       percent: result.percent,
       workflow_state: result.workflow_state,
       user_uuid: result.user_uuid,
-      artifact_id: result.artifact_id,
-      artifact_type: result.artifact_type,
       associated_asset_id: result.associated_asset_id,
-      associated_asset_type: result.associated_asset_type
+      associated_asset_type: result.associated_asset_type,
+      artifact_id: result.artifact_id,
+      artifact_type: result.artifact_type
     }
   end
 
@@ -855,7 +873,7 @@ module Canvas::LiveEvents
     # Given this, if the learning outcome results workflow state is deleted, do not worry about updating
     # the associated asset information as the rubric association no longer exists.
     rubric_assessment_learning_outcome_result_associated_asset(result) unless result.workflow_state == "deleted"
-    post_event_stringified("learning_outcome_result_updated", get_learning_outcome_result_data(result).merge(updated_at: result.updated_at))
+    post_event_stringified("learning_outcome_result_updated", get_learning_outcome_result_data(result).merge(updated_at: result.updated_at).merge(learning_outcome_result_artifact_updated_and_created_at_data(result)))
   end
 
   def self.learning_outcome_result_created(result)
@@ -866,7 +884,7 @@ module Canvas::LiveEvents
     # Given this, if the learning outcome results workflow state is deleted, do not worry about updating
     # the associated asset information as the rubric association no longer exists.
     rubric_assessment_learning_outcome_result_associated_asset(result) unless result.workflow_state == "deleted"
-    post_event_stringified("learning_outcome_result_created", get_learning_outcome_result_data(result))
+    post_event_stringified("learning_outcome_result_created", get_learning_outcome_result_data(result).merge(learning_outcome_result_artifact_updated_and_created_at_data(result)))
   end
 
   # Since outcome service canvas learning_outcome global id record won't match outcomes service shard

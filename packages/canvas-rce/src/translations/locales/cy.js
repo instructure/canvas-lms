@@ -40,6 +40,8 @@ const locale = {
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Dylai dolenni cyfagos â’r un URL fod yn un ddolen."
   },
+  "ai_response_9624e8e8": { "message": "Ymateb AI" },
+  "ai_tools_fda01177": { "message": "Adnoddau AI" },
   "aleph_f4ffd155": { "message": "Aleph" },
   "align_11050992": { "message": "Alinio" },
   "alignment_and_lists_5cebcb69": { "message": "Aliniad a Rhestrau" },
@@ -57,6 +59,9 @@ const locale = {
   },
   "an_error_occurred_making_a_network_request_d1bda348": {
     "message": "Gwall wrth wneud cais ar gyfer y rhwydwaith"
+  },
+  "an_error_occurred_processing_your_request_a3a38d84": {
+    "message": "Gwall wrth brosesu eich cais"
   },
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "Gwall wrth lwytho eich cyfryngau i fyny."
@@ -189,6 +194,7 @@ const locale = {
   "column_e1ae5c64": { "message": "Colofn" },
   "column_group_1c062368": { "message": "Grŵp y golofn" },
   "complex_numbers_a543d004": { "message": "Rhifau Cymhleth" },
+  "compose_44c904f4": { "message": "Creu" },
   "computer_1d7dfa6f": { "message": "Cyfrifiadur" },
   "congruent_5a244acd": { "message": "Cyfath" },
   "contains_311f37b7": { "message": "Yn cynnwys" },
@@ -202,6 +208,7 @@ const locale = {
   "content_subtype_5ce35e88": { "message": "Is-fath o Gynnwys" },
   "content_type_2cf90d95": { "message": "Math o Gynnwys" },
   "coproduct_e7838082": { "message": "Cyd-gynnyrch" },
+  "copy_9748f9f": { "message": "Copïo" },
   "copyright_holder_66ee111": { "message": "Perchennog yr Hawlfraint:" },
   "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
     "message": "Doedd dim modd mewnosod y cynnwys: Nid yw Canvas yn gallu delio â \"{ itemType }\" eitem ar hyn o bryd."
@@ -274,6 +281,7 @@ const locale = {
   "discussions_a5f96392": { "message": "Trafodaethau" },
   "discussions_index_6c36ced": { "message": "Mynegai Trafodaethau" },
   "disjoint_union_e74351a8": { "message": "Uniad Arwahan" },
+  "dislike_14befc48": { "message": "Dad-hoffi" },
   "display_options_315aba85": { "message": "Dangos Opsiynau" },
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Dangos Dolen Testun (Yn agor mewn tab newydd)"
@@ -339,6 +347,7 @@ const locale = {
   },
   "enter_replacement_text_17631bbc": { "message": "rhowch destun newydd" },
   "enter_search_text_26cb4459": { "message": "rhowch destun chwilio" },
+  "enter_text_8b35c65b": { "message": "Rhoi testun" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Amrywiad)" },
   "equals_sign_c51bdc58": { "message": "Hafalnod" },
@@ -364,6 +373,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Wedi methu cael cynnwys ffeil"
   },
+  "failed_to_copy_response_d3def551": { "message": "Wedi methu copïo ymateb" },
   "failed_to_retrieve_content_from_external_tool_5899c213": {
     "message": "Wedi methu nôl cynnwys o adnodd allanol"
   },
@@ -451,6 +461,12 @@ const locale = {
   "health_icon_8d292eb5": { "message": "Eicon Iechyd" },
   "hearts_suit_e50e04ca": { "message": "Hearts (Suit)" },
   "height_69b03e15": { "message": "Uchder" },
+  "hello_please_describe_the_modifications_you_would__49b19837": {
+    "message": "Helo. Disgrifiwch yr addasiadau yr hoffech chi eu gwneud i’ch cyfansoddiad."
+  },
+  "hello_please_describe_the_modifications_you_would__600dbbf0": {
+    "message": "Helo. Disgrifiwch yr addasiadau yr hoffech chi eu gwneud i’ch dewis."
+  },
   "hexagon_d8468e0d": { "message": "Hecsagon" },
   "hide_description_bfb5502e": { "message": "Cuddio disgrifiad" },
   "hide_title_description_caf092ef": {
@@ -466,6 +482,9 @@ const locale = {
     "message": "Rydw i wedi cael caniatâd i ddefnyddio’r ffeil hon."
   },
   "i_hold_the_copyright_71ee91b1": { "message": "Fi sydd biau’r hawlfraint" },
+  "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+    "message": "Yn anffodus, alla i ddim dod o hyd i’r ateb AI"
+  },
   "icon_215a1dc6": { "message": "Eicon" },
   "icon_8168b2f8": { "message": "eicon" },
   "icon_color_b86dd6d6": { "message": "Lliw Eicon" },
@@ -655,6 +674,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Minws/Plws" },
   "misc_3b692ea7": { "message": "Amrywiol" },
   "miscellaneous_e9818229": { "message": "Amrywiol" },
+  "modify_6b0b13e3": { "message": "Addasu" },
   "module_90d9fd32": { "message": "Modiwl" },
   "modules_c4325335": { "message": "Modiwlau" },
   "moving_image_to_crop_directionword_6f66cde2": {
@@ -807,6 +827,9 @@ const locale = {
   "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
     "message": "Gadewch i Canvas gael mynediad at eich microffon a gwe-gamera."
   },
+  "please_decribe_what_you_would_like_to_compose_27a51be5": {
+    "message": "Disgrifiwch beth yr hoffech chi ei gyfansoddi."
+  },
   "plus_d43cd4ec": { "message": "Plws" },
   "plus_minus_f8be2e83": { "message": "Plws/Minws" },
   "posted_when_a578f5ab": { "message": "Wedi postio: { when }" },
@@ -871,10 +894,14 @@ const locale = {
   },
   "reset_95a81614": { "message": "Ailosod" },
   "resize_ec83d538": { "message": "Ailfeintio" },
+  "response_copied_to_clipboard_130d66cd": {
+    "message": "Ymateb wedi''i gopïo i''r clipfwrdd."
+  },
   "restore_auto_save_deccd84b": { "message": "Adfer cadw’n awtomatig?" },
   "result_index_of_max_7db5ad8b": {
     "message": "Canlyniad { index } o { max }."
   },
+  "retry_ebd5f8ba": { "message": "Ailgynnig" },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Giât Dro yn ôl (Ddim yn rhoi)"
   },
@@ -955,6 +982,7 @@ const locale = {
     "message": "Shift-O i agor y golygydd html hardd."
   },
   "shortcut_911d6255": { "message": "Llwybr byr" },
+  "show_all_967a90f0": { "message": "Dangos pob un" },
   "show_audio_options_b489926b": { "message": "Dangos opsiynau sain" },
   "show_image_options_1e2ecc6b": { "message": "Dangos opsiynau delwedd" },
   "show_link_options_545338fd": { "message": "Dangos opsiynau dolen" },
@@ -1255,6 +1283,7 @@ const locale = {
   "view_word_and_character_counts_a743dd0c": {
     "message": "Gweld y cyfrif geiriau a’r cyfrif nodau"
   },
+  "waiting_for_response_1efd0c50": { "message": "Yn aros yn ymateb" },
   "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
     "message": "Does dim microffon sy’n gweithio’n gysylltiedig â’ch dyfais."
   },
@@ -1268,6 +1297,9 @@ const locale = {
   "webcam_fe91b20f": { "message": "Gwe-gamera" },
   "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
     "message": "Dim ond un H1 ddylai tudalennau gwe eu cael, sy’n cael ei ddefnyddion awtomatig gan Deitl y dudalen. Dylai’r pennawd cyntaf yn eich cynnwys fod yn H2."
+  },
+  "what_would_you_like_to_do_6dc0d541": {
+    "message": "Beth ydych chi am ei wneud?"
   },
   "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
     "message": "Pan fydd marcio’n cael ei ddefnyddio, sy’n fformatio eitemau’n weledol ar ffurf rhestr ond sydd ddim yn nodi perthynas y rhestr, mae’n bosib y bydd defnyddwyr yn cael trafferth i ddod o hyd i’r wybodaeth."
@@ -1283,6 +1315,7 @@ const locale = {
   "word_count_c77fe3a6": { "message": "Cyfrif Geiriau" },
   "words_b448b7d5": { "message": "Geiriau" },
   "wreath_product_200b38ef": { "message": "Lluoswm Torch" },
+  "writing_assistant_a30ac16a": { "message": "Cynorthwyydd Ysgrifennu" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Iawn" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {

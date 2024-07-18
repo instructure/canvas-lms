@@ -17,6 +17,8 @@
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "يجب أن تكون الروابط المتجاورة بنفس عنوان URL رابطًا فرديًا."
   },
+  "ai_response_9624e8e8": { "message": "استجابة الذكاء الاصطناعي" },
+  "ai_tools_fda01177": { "message": "أدوات الذكاء الاصطناعي" },
   "aleph_f4ffd155": { "message": "Aleph" },
   "align_11050992": { "message": "محاذاة" },
   "alignment_and_lists_5cebcb69": { "message": "المحاذاة والقوائم" },
@@ -34,6 +36,9 @@
   },
   "an_error_occurred_making_a_network_request_d1bda348": {
     "message": "حدث خطأ أثناء إجراء طلب شبكة"
+  },
+  "an_error_occurred_processing_your_request_a3a38d84": {
+    "message": "حدث خطأ أثناء معالجة طلبك"
   },
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "حدث خطأ أثناء تحميل الوسائط."
@@ -154,6 +159,7 @@
   "column_e1ae5c64": { "message": "عمود" },
   "column_group_1c062368": { "message": "مجموعة العمود" },
   "complex_numbers_a543d004": { "message": "أعداد مركبة" },
+  "compose_44c904f4": { "message": "إنشاء" },
   "computer_1d7dfa6f": { "message": "الكمبيوتر" },
   "congruent_5a244acd": { "message": "Congruent" },
   "contains_311f37b7": { "message": "يحتوي على" },
@@ -167,6 +173,7 @@
   "content_subtype_5ce35e88": { "message": "النوع الفرعي للمحتوى" },
   "content_type_2cf90d95": { "message": "نوع المحتوى" },
   "coproduct_e7838082": { "message": "منتج مشترك" },
+  "copy_9748f9f": { "message": "نسخ" },
   "copyright_holder_66ee111": { "message": "مالك حق النشر:" },
   "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
     "message": "تعذر إدراج المحتوى: عناصر \"{ itemType }\" غير مدعومة حاليًا في Canvas."
@@ -237,6 +244,7 @@
   "discussions_a5f96392": { "message": "النقاشات" },
   "discussions_index_6c36ced": { "message": "فهرس المناقشات" },
   "disjoint_union_e74351a8": { "message": "Disjoint Union" },
+  "dislike_14befc48": { "message": "عدم إعجاب" },
   "display_options_315aba85": { "message": "عرض الخيارات" },
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "عرض ارتباط النص (يفتح في علامة تبويب جديدة)"
@@ -302,6 +310,7 @@
   },
   "enter_replacement_text_17631bbc": { "message": "أدخل نص استبدال" },
   "enter_search_text_26cb4459": { "message": "أدخل نص البحث" },
+  "enter_text_8b35c65b": { "message": "أدخل نصًا" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (متغير)" },
   "equals_sign_c51bdc58": { "message": "علامة يساوي" },
@@ -327,6 +336,7 @@
   "failed_getting_file_contents_e9ea19f4": {
     "message": "تعذر الحصول على محتويات الملف"
   },
+  "failed_to_copy_response_d3def551": { "message": "تعذر نسخ الاستجابة" },
   "failed_to_retrieve_content_from_external_tool_5899c213": {
     "message": "تعذر استرداد المحتوى من الأداة الخارجية"
   },
@@ -410,6 +420,12 @@
   "health_icon_8d292eb5": { "message": "أيقونة الصحة" },
   "hearts_suit_e50e04ca": { "message": "Hearts (Suit)" },
   "height_69b03e15": { "message": "الارتفاع" },
+  "hello_please_describe_the_modifications_you_would__49b19837": {
+    "message": "مرحبًا. يرجى وصف التعديلات التي ترغب في إجرائها للإنشاء."
+  },
+  "hello_please_describe_the_modifications_you_would__600dbbf0": {
+    "message": "مرحبًا. يرجى وصف التعديلات التي ترغب في إجرائها للتحديد."
+  },
   "hexagon_d8468e0d": { "message": "سداسي" },
   "hide_description_bfb5502e": { "message": "إخفاء الوصف" },
   "hide_title_description_caf092ef": { "message": "إخفاء وصف { title }" },
@@ -423,6 +439,9 @@
     "message": "لقد حصلت على إذن لاستخدام هذا الملف."
   },
   "i_hold_the_copyright_71ee91b1": { "message": "أمتلك حق النشر" },
+  "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+    "message": "عذرًا، لا يمكنني العثور على إجابة الذكاء الاصطناعي"
+  },
   "icon_215a1dc6": { "message": "الأيقونة" },
   "icon_8168b2f8": { "message": "الأيقونة" },
   "icon_color_b86dd6d6": { "message": "لون الأيقونة" },
@@ -598,6 +617,7 @@
   "minus_plus_3461f637": { "message": "سالب/موجب" },
   "misc_3b692ea7": { "message": "متنوع" },
   "miscellaneous_e9818229": { "message": "متنوعات" },
+  "modify_6b0b13e3": { "message": "تعديل" },
   "module_90d9fd32": { "message": "الوحدة" },
   "modules_c4325335": { "message": "الوحدات النمطية" },
   "moving_image_to_crop_directionword_6f66cde2": {
@@ -746,6 +766,9 @@
   "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
     "message": "يرجى السماح لـ Canvas بالوصول إلى الميكروفون وكاميرا الويب لديك."
   },
+  "please_decribe_what_you_would_like_to_compose_27a51be5": {
+    "message": "يرجى وصف ما ترغب في إنشائه."
+  },
   "plus_d43cd4ec": { "message": "موجب" },
   "plus_minus_f8be2e83": { "message": "موجب/سالب" },
   "posted_when_a578f5ab": { "message": "المنشور: { when }" },
@@ -808,8 +831,12 @@
   },
   "reset_95a81614": { "message": "إعادة التعيين" },
   "resize_ec83d538": { "message": "تغيير الحجم" },
+  "response_copied_to_clipboard_130d66cd": {
+    "message": "تم نسخ الاستجابة إلى الحافظة"
+  },
   "restore_auto_save_deccd84b": { "message": "استعادة الحفظ التلقائي؟" },
   "result_index_of_max_7db5ad8b": { "message": "نتيجة { index } من { max }." },
+  "retry_ebd5f8ba": { "message": "إعادة المحاولة" },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Reverse Turnstile (Does Not Yield)"
   },
@@ -886,6 +913,7 @@
     "message": "اضغط على Shift-O لفتح محرر HTML الأنيق."
   },
   "shortcut_911d6255": { "message": "اختصار" },
+  "show_all_967a90f0": { "message": "إظهار الكل" },
   "show_audio_options_b489926b": { "message": "إظهار خيارات الصوت" },
   "show_image_options_1e2ecc6b": { "message": "إظهار خيارات الصورة" },
   "show_link_options_545338fd": { "message": "إظهار خيارات الارتباطات" },
@@ -1170,6 +1198,7 @@
   "view_word_and_character_counts_a743dd0c": {
     "message": "عرض عدد الكلمات والأحرف"
   },
+  "waiting_for_response_1efd0c50": { "message": "بانتظار الاستجابة" },
   "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
     "message": "لم نتمكن من اكتشاف ميكروفون يعمل متصل بجهازك."
   },
@@ -1184,6 +1213,7 @@
   "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
     "message": "يجب أن تقتصر صفحات الويب على H1 فردي، والذي يستخدمه عنوان الصفحة تلقائيًا. يجب أن يكون أول عنوان في المحتوى الخاص بك هو H2."
   },
+  "what_would_you_like_to_do_6dc0d541": { "message": "ما الذي ترغب في فعله؟" },
   "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
     "message": "عند استخدام العلامة التي تنسق العناصر في صورة قوائم ولكنها لا تشير إلى علاقة القوائم، فقد يواجه المستخدمون صعوبة في التنقل بين المعلومات."
   },
@@ -1198,6 +1228,7 @@
   "word_count_c77fe3a6": { "message": "عدد الكلمات" },
   "words_b448b7d5": { "message": "الكلمات" },
   "wreath_product_200b38ef": { "message": "Wreath Product" },
+  "writing_assistant_a30ac16a": { "message": "مساعد الكتابة" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "نعم" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {

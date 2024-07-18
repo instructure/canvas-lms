@@ -215,8 +215,8 @@ export function completeUpload(preflightResponse, file, options = {}) {
  * @returns an array of attachment objects. The attachment objects contain ids
  * that a submissions comment can link to
  */
-export function submissionCommentAttachmentsUpload(files, courseId, assignmentId) {
-  const preflightFileUploadUrl = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/self/comments/files`
+export function submissionCommentAttachmentsUpload(files, courseId, assignmentId, userId = 'self') {
+  const preflightFileUploadUrl = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${userId}/comments/files`
   const uploadPromises = files.map(currentFile => {
     const preflightFileData = {
       name: currentFile.name,

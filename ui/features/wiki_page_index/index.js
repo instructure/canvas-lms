@@ -22,7 +22,6 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import WikiPageCollection from './backbone/collections/WikiPageCollection'
 import WikiPageIndexView from './backbone/views/WikiPageIndexView'
 import 'jquery.cookie'
-import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 const I18n = useI18nScope('pages')
 
@@ -54,5 +53,3 @@ ready(() => {
   $('#content').append(view.$el)
   view.render()
 })
-
-monitorLtiMessages()

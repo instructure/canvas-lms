@@ -21,7 +21,9 @@
     "score": "The student's score.",
     "user_uuid": "The unique identifier for the user that the outcome was assessed.",
     "artifact_id": "The id of the artifact that contains the outcome assessment. Value will be an string representation of an integer or nil.",
-    "artifact_type": "The type of artifact that contains the outcome assessment.  Value will be one of the following: RubricAssessment, Submission, Quizzes::QuizSubmission, or LiveAssessments::Submission.",
+    "artifact_type": "The type of artifact that contains the outcome assessment.  Value will be one of the following: RubricAssessment, Submission, Quizzes::QuizSubmission, LiveAssessments::Submission or nil.",
+    "artifact_updated_at": "The date when the artifact was last updated or nil.",
+    "artifact_created_at": "The date when the artifact was created or nil.",
     "associated_asset_id": "The id of the asset that the outcome is aligned to. Value will be an string representation of an integer or nil.",
     "associated_asset_type": "The type of the asset that the outcome is aligned to. Value will be one of the following: AssessmentQuestion, Assignment, Quizzes::Quiz, LiveAssessments::Assessment or nil."
   },
@@ -58,6 +60,8 @@
           "user_uuid": "elXwFPr6uKGaiVxchQSsqV6YZy5HBtlq8O2vqMXM",
           "artifact_id": "22",
           "artifact_type": "RubricAssessment",
+          "artifact_updated_at": "2019-08-09T21:33:05Z",
+          "artifact_created_at": "2019-08-09T21:33:05Z",
           "associated_asset_id": "56",
           "associated_asset_type": "Assignment"
         }

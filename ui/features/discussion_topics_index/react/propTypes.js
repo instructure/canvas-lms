@@ -50,4 +50,6 @@ propTypes.userSettings = shape({
   manual_mark_as_read: bool,
 })
 
+propTypes.buttonText = string
+
 export default propTypes

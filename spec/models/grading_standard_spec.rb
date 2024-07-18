@@ -239,6 +239,11 @@ describe GradingStandard do
   end
 
   context "score_to_grade" do
+    it "blows up when passed nil" do
+      standard = GradingStandard.new
+      expect { standard.score_to_grade(nil) }.to raise_error(NoMethodError)
+    end
+
     it "computes correct grades" do
       input = [["A", 0.90], ["B+", 0.886], ["B", 0.80], ["C", 0.695], ["D", 0.555], ["E", 0.545], ["M", 0.00]]
       standard = GradingStandard.new
@@ -275,6 +280,29 @@ describe GradingStandard do
       expect(standard.score_to_grade(66.66666666667)).to eql("B")
       expect(standard.score_to_grade(46.66666666667)).to eql("C")
       expect(standard.score_to_grade(0)).to eql("D")
+    end
+
+    it "scales grades for points-based grading schemes" do
+      input = [["A", 0.9], ["B", 0.7], ["C+", 0.5], ["C-", 0.3], ["D", 0]]
+      standard = GradingStandard.new
+      standard.data = input
+      standard.points_based = true
+      standard.scaling_factor = 10.0
+      # 49.98% -> 4.998 out of 10 ("scaling" step) -> 5.00 out of 10 (rounding step) -> 50% (to percentage) -> 50% (round percentage step) -> C+ (grading scheme conversion)
+      expect(standard.score_to_grade(49.98)).to eql("C+")
+
+      standard.scaling_factor = 90.0
+      # 49.98% -> 44.982 out of 90 ("scaling" step) -> 44.98 out of 90 (rounding step) -> 49.9777...% (to percentage) -> 49.98% (round percentage step) -> C- (grading scheme conversion)
+      expect(standard.score_to_grade(49.98)).to eql("C-")
+    end
+
+    it "doesn't blow up when given an invalid points-based scheme" do
+      input = [["A", 0.9], ["B", 0.7], ["C+", 0.5], ["C-", 0.3], ["D", 0]]
+      standard = GradingStandard.new
+      standard.data = input
+      standard.points_based = true
+      standard.scaling_factor = 0.00 # invalid scaling factor
+      expect(standard.score_to_grade(49.98)).to eql("C-")
     end
 
     it "assigns the lowest grade to below-scale scores" do

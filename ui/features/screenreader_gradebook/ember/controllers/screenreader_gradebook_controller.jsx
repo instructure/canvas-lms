@@ -1063,7 +1063,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     if (assignment == null) {
       return false
     }
-    if (!assignment.only_visible_to_overrides) {
+    if (assignment.visible_to_everyone) {
       return true
     }
     return includes(assignment.assignment_visibility, student_id)
@@ -1071,7 +1071,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
   studentsThatCanSeeAssignment(assignment) {
     const students = this.studentsHash()
-    if (!(assignment != null ? assignment.only_visible_to_overrides : undefined)) {
+    if (!(assignment != null ? !assignment.visible_to_everyone : undefined)) {
       return students
     }
     return assignment.assignment_visibility.reduce((result, id) => {

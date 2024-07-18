@@ -24,7 +24,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {debounce} from 'lodash'
 import {DEFAULT_SEARCH_DELAY} from '../utils/constants'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = useI18nScope('searchfiled')
 
 interface CustomTextInput extends TextInput {
   inputRef: RefObject<TextInput>
@@ -34,6 +34,7 @@ type Props = {
   name: string
   onSearchEvent: (data: {searchTerm: string}) => void
   searchInputRef?: (input: TextInput | null) => void
+  placeholder?: string
   searchDelay?: number
 }
 
@@ -41,6 +42,7 @@ export const SearchField: React.FC<Props> = ({
   name,
   onSearchEvent,
   searchInputRef,
+  placeholder = '',
   searchDelay = DEFAULT_SEARCH_DELAY,
 }) => {
   const inputRef = useRef<TextInput | null>(null)
@@ -86,7 +88,7 @@ export const SearchField: React.FC<Props> = ({
       renderLabel={
         <ScreenReaderContent>{I18n.t('Search discussions by title')}</ScreenReaderContent>
       }
-      placeholder={I18n.t('Search...')}
+      placeholder={placeholder}
       renderBeforeInput={<IconSearchLine />}
       ref={handleRef}
       onChange={handleSearch}

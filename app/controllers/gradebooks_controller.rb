@@ -828,13 +828,7 @@ class GradebooksController < ApplicationController
         return
       end
 
-      submissions = if $canvas_rails == "7.1"
-                      params[:submissions] ? params[:submissions].values : [params[:submission]]
-                    elsif params[:submissions]
-                      params[:submissions].values.map { |s| ActionController::Parameters.new(s) }
-                    else
-                      [params[:submission]]
-                    end
+      submissions = params[:submissions] ? params[:submissions].values : [params[:submission]]
 
       # decorate submissions with user_ids if not present
       submissions_without_user_ids = submissions.select { |s| s[:user_id].blank? }
@@ -1107,6 +1101,7 @@ class GradebooksController < ApplicationController
           media_comment_asset_string: @current_user.asset_string,
           late_policy: @context.late_policy&.as_json(include_root: false),
           assignment_missing_shortcut: Account.site_admin.feature_enabled?(:assignment_missing_shortcut),
+          rubric_outcome_data: @domain_root_account.feature_enabled?(:enhanced_rubrics) ? rubric&.outcome_data : []
         }
         if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
@@ -1170,7 +1165,9 @@ class GradebooksController < ApplicationController
           )
         end
 
-        if Account.site_admin.feature_enabled?(:platform_service_speedgrader) &&
+        append_sis_data(env)
+
+        if @context.feature_enabled?(:platform_service_speedgrader) &&
            (params[:platform_sg].nil? || value_to_boolean(params[:platform_sg]))
 
           @page_title = t("SpeedGrader")
@@ -1180,13 +1177,12 @@ class GradebooksController < ApplicationController
 
           env[:GRADE_BY_QUESTION_SUPPORTED] = @assignment.supports_grade_by_question?
           js_env(env)
+
           deferred_js_bundle :platform_speedgrader
 
           render html: "".html_safe, layout: "bare"
         else
-          append_sis_data(env)
           js_env(env)
-
           render :speed_grader, locals: {
             anonymize_students: @assignment.anonymize_students?
           }

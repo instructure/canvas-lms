@@ -40,38 +40,41 @@ const ProductCard = (props: ProductCardProps) => {
       <View
         key={product.id}
         as="div"
-        width={340}
         height="100%"
         borderColor="primary"
         borderRadius="medium"
         borderWidth="small"
         padding="medium"
+        onClick={() => {
+          window.location.href = `/accounts/${accountId}/apps/product_detail/${product.global_product_id}`
+        }}
+        cursor="pointer"
       >
         <Flex direction="column" height="100%">
           <Flex gap="small" margin="0 0 medium 0">
-            <div style={{borderRadius: '50%', overflow: 'hidden'}}>
+            <div style={{borderRadius: '8px', overflow: 'hidden'}}>
               <Img src={product.logo_url} width={48} height={48} />
             </div>
             <div>
-              <Text weight="bold" size="large">
+              <Text weight="bold" size="medium">
                 <Link
                   isWithinText={false}
                   themeOverride={{fontWeight: 700, color: 'black'}}
                   href={`/accounts/${accountId}/apps/product_detail/${product.global_product_id}`}
                 >
-                  {product.name}
+                  {product?.name}
                 </Link>
               </Text>
               <div>
-                by{' '}
-                <Text weight="bold" color="secondary">
-                  {product.company.name}
+                <span style={{fontSize: '14px'}}>by </span>
+                <Text weight="bold" color="secondary" size="small">
+                  {product?.company?.name}
                 </Text>
               </div>
             </div>
           </Flex>
           <View margin="0 0 medium 0">
-            <Text>
+            <Text size="small">
               <TruncateText maxLines={3} ellipsis=" (...)">
                 {product.tagline}
               </TruncateText>

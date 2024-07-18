@@ -359,6 +359,7 @@ class ApplicationController < ActionController::Base
     featured_help_links
     account_level_blackout_dates
     render_both_to_do_lists
+    commons_new_quizzes
     course_paces_redesign
     course_paces_for_students
     explicit_latex_typesetting
@@ -366,6 +367,7 @@ class ApplicationController < ActionController::Base
     permanent_page_links
     selective_release_backend
     selective_release_ui_api
+    selective_release_optimized_tray
     enhanced_course_creation_account_fetching
     instui_for_import_page
     multiselect_gradebook_filters
@@ -376,6 +378,7 @@ class ApplicationController < ActionController::Base
     courses_popout_sisid
     dashboard_graphql_integration
     discussion_checkpoints
+    speedgrader_studio_media_capture
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
@@ -400,6 +403,7 @@ class ApplicationController < ActionController::Base
     enhanced_rubrics
     account_level_mastery_scales
     non_scoring_rubrics
+    top_navigation_placement
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes

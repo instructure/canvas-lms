@@ -46,6 +46,11 @@ export const HorizontalButtonDisplay = ({
 }: HorizontalButtonDisplayProps) => {
   const selectedRating = ratings[selectedRatingIndex]
   const min = criterionUseRange ? rangingFrom(ratings, selectedRatingIndex) : undefined
+
+  const getPossibleText = (points?: number) => {
+    return min != null ? possibleStringRange(min, points) : possibleString(points)
+  }
+
   return (
     <View as="div" data-testid="rubric-assessment-horizontal-display">
       {selectedRatingIndex >= 0 && (
@@ -67,14 +72,13 @@ export const HorizontalButtonDisplay = ({
           <View as="div" display="block">
             <Text
               size="x-small"
+              themeOverride={{paragraphMargin: 0}}
               dangerouslySetInnerHTML={escapeNewLineText(selectedRating?.longDescription)}
             />
           </View>
           <View as="div" textAlign="end">
             <Text size="x-small" weight="bold">
-              {min != null
-                ? possibleStringRange(min, ratings[selectedRatingIndex]?.points)
-                : possibleString(ratings[selectedRatingIndex]?.points)}
+              {getPossibleText(selectedRating?.points)}
             </Text>
           </View>
         </View>
@@ -82,11 +86,15 @@ export const HorizontalButtonDisplay = ({
       <Flex direction={ratingOrder === 'ascending' ? 'row-reverse' : 'row'}>
         {ratings.map((rating, index) => {
           const buttonDisplay = (ratings.length - (index + 1)).toString()
+          const buttonAriaLabel = `${rating.description} ${
+            rating.longDescription
+          } ${getPossibleText(rating.points)}`
 
           return (
             <Flex.Item
               key={`${rating.id}-${buttonDisplay}`}
               data-testid={`rating-button-${rating.id}-${index}`}
+              aria-label={buttonAriaLabel}
             >
               <RatingButton
                 buttonDisplay={buttonDisplay}

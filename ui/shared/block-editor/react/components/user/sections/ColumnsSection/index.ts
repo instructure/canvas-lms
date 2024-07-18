@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// @ts-expect-error
 import {IconTableInsertColumnAfterLine} from '@instructure/ui-icons/es/svg'
 import {ColumnsSection} from './ColumnsSection'
 import {type ColumnsSectionVariant} from './types'

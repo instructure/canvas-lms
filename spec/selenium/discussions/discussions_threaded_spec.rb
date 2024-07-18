@@ -448,7 +448,7 @@ describe "threaded discussions" do
         it "replies correctly to second reply" do
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
-          ff("button[data-testid='threading-toolbar-reply']")[4].click
+          ff("button[data-testid='threading-toolbar-reply']")[2].click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 2nd level reply")
           f("button[data-testid='DiscussionEdit-submit'").click
@@ -471,7 +471,7 @@ describe "threaded discussions" do
           wait_for_ajaximations
           ff("button[data-testid='expand-button']")[2].click
           wait_for_ajaximations
-          ff("button[data-testid='threading-toolbar-reply']")[4].click
+          ff("button[data-testid='threading-toolbar-reply']")[2].click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 3rd level reply")
           f("button[data-testid='DiscussionEdit-submit'").click
@@ -500,7 +500,7 @@ describe "threaded discussions" do
           wait_for_ajaximations
           ff("button[data-testid='expand-button']")[1].click
           wait_for_ajaximations
-          ff("button[data-testid='threading-toolbar-reply']")[4].click
+          ff("button[data-testid='threading-toolbar-reply']")[2].click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 4th level reply")
           f("button[data-testid='DiscussionEdit-submit'").click
@@ -781,8 +781,8 @@ describe "threaded discussions" do
         it "replies correctly to third reply" do
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
-          wait_for(method: nil, timeout: 7) { ff("button[data-testid='threading-toolbar-reply']").length >= 5 }
-          ff("button[data-testid='threading-toolbar-reply']")[4].click
+          wait_for(method: nil, timeout: 7) { ff("button[data-testid='threading-toolbar-reply']").length >= 3 }
+          ff("button[data-testid='threading-toolbar-reply']")[2].click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 3rd level reply")
           f("button[data-testid='DiscussionEdit-submit'").click
@@ -806,8 +806,8 @@ describe "threaded discussions" do
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
           wait_for_ajaximations
-          wait_for(method: nil, timeout: 7) { ff("button[data-testid='threading-toolbar-reply']").length >= 8 }
-          ff("button[data-testid='threading-toolbar-reply']")[6].click
+          wait_for(method: nil, timeout: 7) { ff("button[data-testid='threading-toolbar-reply']").length >= 4 }
+          ff("button[data-testid='threading-toolbar-reply']")[3].click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 4th level reply")
           f("button[data-testid='DiscussionEdit-submit'").click
@@ -977,6 +977,70 @@ describe "threaded discussions" do
       expect(entry.reload.message).to match(edit_text)
     end
 
+    it "preserves quoted reply when editing a reply" do
+      user_session(@teacher)
+
+      entry = @topic.discussion_entries.create!(
+        user: @teacher,
+        message: "new reply from teacher"
+      )
+      response = @topic.discussion_entries.create!(
+        user: @teacher,
+        message: "quoted reply from teacher",
+        parent_entry: entry,
+        quoted_entry: entry
+      )
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      f("button[data-testid='expand-button']").click
+      wait_for_ajaximations
+      wait_for(method: nil, timeout: 5) { ff("button[data-testid='thread-actions-menu']").length >= 2 }
+      ff("button[data-testid='thread-actions-menu']")[1].click
+      f("span[data-testid='edit']").click
+      wait_for_ajaximations
+
+      edit_text = "edit message"
+      type_in_tiny("textarea", edit_text)
+      fj("button:contains('Save')").click
+      wait_for_ajaximations
+
+      response.reload
+      expect(response.message).to match(edit_text)
+      expect(response.quoted_entry_id).to eq(entry.id)
+    end
+
+    it "allows users to remove quote from reply when editing" do
+      user_session(@teacher)
+
+      entry = @topic.discussion_entries.create!(
+        user: @teacher,
+        message: "new reply from teacher"
+      )
+      response = @topic.discussion_entries.create!(
+        user: @teacher,
+        message: "quoted reply from teacher",
+        parent_entry: entry,
+        quoted_entry: entry
+      )
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      f("button[data-testid='expand-button']").click
+      wait_for_ajaximations
+      wait_for(method: nil, timeout: 5) { ff("button[data-testid='thread-actions-menu']").length >= 2 }
+      ff("button[data-testid='thread-actions-menu']")[1].click
+      f("span[data-testid='edit']").click
+      wait_for_ajaximations
+
+      # The toggle to include quoted reply, I cannot click the input directly, as a random
+      # span intercepts the click event and selenium raises an error....
+      f("svg[name='IconCheck']").click
+
+      fj("button:contains('Save')").click
+
+      wait_for_ajaximations
+
+      response.reload
+      expect(response.quoted_entry_id).to be_nil
+    end
+
     context "concluded student" do
       before do
         student_enrollment = course_with_student(
@@ -1056,8 +1120,8 @@ describe "threaded discussions" do
       expect(f("body")).not_to contain_jqcss("div:contains('2nd level reply')")
       f("button[data-testid='expand-button']").click
       wait_for_ajaximations
-      wait_for(method: nil, timeout: 5) { ff("button[data-testid='threading-toolbar-reply']").length >= 5 }
-      ff("button[data-testid='threading-toolbar-reply']")[4].click
+      wait_for(method: nil, timeout: 5) { ff("button[data-testid='threading-toolbar-reply']").length >= 3 }
+      ff("button[data-testid='threading-toolbar-reply']")[2].click
       wait_for_ajaximations
       type_in_tiny("textarea", "replying to 3rd level reply")
       f("button[data-testid='DiscussionEdit-submit'").click

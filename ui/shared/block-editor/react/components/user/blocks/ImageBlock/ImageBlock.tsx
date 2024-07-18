@@ -23,17 +23,7 @@ import {Img} from '@instructure/ui-img'
 
 import {ImageBlockToolbar} from './ImageBlockToolbar'
 import {useClassNames} from '../../../../utils'
-
-export type ImageConstraint = 'cover' | 'contain'
-export type ImageVariant = 'default' | 'hero'
-export const HeroImageHeight = '184px'
-
-type ImageBlockProps = {
-  src?: string
-  width?: number
-  height?: number
-  constraint?: ImageConstraint
-}
+import {type ImageBlockProps, type ImageVariant, type ImageConstraint} from './types'
 
 const ImageBlock = ({src, width, height, constraint}: ImageBlockProps) => {
   const {enabled} = useEditor(state => ({
@@ -51,7 +41,7 @@ const ImageBlock = ({src, width, height, constraint}: ImageBlockProps) => {
       <div className={clazz} ref={el => el && connect(drag(el as HTMLDivElement))}>
         <Img
           display="inline-block"
-          src={src || ImageBlock.craft.defaultProps.imageSrc}
+          src={src || ImageBlock.craft.defaultProps.src}
           constrain={constraint || ImageBlock.craft.defaultProps.constraint}
           width={`${width}px`}
           height={`${height}px`}
@@ -64,7 +54,7 @@ const ImageBlock = ({src, width, height, constraint}: ImageBlockProps) => {
 ImageBlock.craft = {
   displayName: 'Image',
   defaultProps: {
-    imageSrc: '',
+    src: '',
     variant: 'default' as ImageVariant,
     constraint: 'cover' as ImageConstraint,
   },

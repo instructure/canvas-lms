@@ -18,6 +18,7 @@
 
 import {AboutSection} from './AboutSection'
 import {AboutTextHalf} from './AboutTextHalf'
+// @ts-expect-error
 import {IconInfoLine} from '@instructure/ui-icons/es/svg'
 
 const AboutSectionIcon = IconInfoLine?.src

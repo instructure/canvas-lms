@@ -485,7 +485,12 @@ export default AssignmentListItemView = (function () {
         const isShareToCommons = (tool) => tool.canvas_icon_class === 'icon-commons'
         const tools = ENV.assignment_menu_tools || []
 
-        data.menu_tools =  isNewQuizzes ? tools.filter(tool => !isShareToCommons(tool)) : tools
+        if (!isNewQuizzes || ENV.FEATURES.commons_new_quizzes) {
+          data.menu_tools = tools
+        } else {
+          data.menu_tools = tools.filter(tool => !isShareToCommons(tool))
+        }
+
         data.menu_tools.forEach(tool => {
           return (tool.url = tool.base_url + `&assignments[]=${this.model.get('id')}`)
         })
@@ -854,14 +859,15 @@ export default AssignmentListItemView = (function () {
           if (json.pointsPossible === 0 && json.submission.score < 0) {
             grade = json.submission.score
           } else if (json.pointsPossible === 0 && json.submission.score > 0) {
-            grade = scoreToGrade(100, ENV.grading_scheme, ENV.points_based)
+            grade = scoreToGrade(100, ENV.grading_scheme, ENV.points_based, ENV.scaling_factor)
           } else if (json.pointsPossible === 0 && json.submission.score === 0) {
             grade = 'complete'
           } else {
             grade = scoreToGrade(
               scoreToPercentage(json.submission.score, json.pointsPossible),
               ENV.grading_scheme,
-              ENV.points_based
+              ENV.points_based,
+              ENV.scaling_factor
             )
           }
         }

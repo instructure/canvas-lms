@@ -570,8 +570,8 @@ class Attachment < ActiveRecord::Base
     self.file_state ||= "available"
     assert_file_extension
     self.folder_id = nil if !folder || folder.context != context
-    self.folder_id ||= Folder.unfiled_folder(context).id rescue nil
-    self.folder_id ||= Folder.root_folders(context).first.id rescue nil
+    self.folder_id ||= Folder.unfiled_folder(context)&.id
+    self.folder_id ||= Folder.root_folders(context).first.try(:id)
     if root_attachment && new_record?
       %i[md5 size content_type].each do |key|
         send(:"#{key}=", root_attachment.send(key))
@@ -860,15 +860,9 @@ class Attachment < ActiveRecord::Base
             existing_names = folder.active_file_attachments.where.not(id:).pluck(:display_name)
             new_name = opts[:name] || self.display_name
             self.display_name = Attachment.make_unique_filename(new_name, existing_names, iter_count)
-
             if Attachment.where(id: self)
                          .where.not(
-                           Attachment.where("id <> ? AND display_name = ? AND folder_id = ? AND file_state <> ?",
-                                            self,
-                                            display_name,
-                                            folder_id,
-                                            "deleted")
-                                     .arel.exists
+                           Attachment.where.not(id: self).where.not(file_state: "deleted").where(display_name:, folder_id:).arel.exists
                          )
                          .limit(1)
                          .update_all(display_name:) > 0

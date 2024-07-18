@@ -391,7 +391,7 @@ export const buildQuotedReply = (nodes, previewId) => {
   nodes.every(reply => {
     if (reply._id === previewId) {
       preview = {
-        id: previewId,
+        _id: previewId,
         author: {shortName: getDisplayName(reply)},
         createdAt: reply.createdAt,
         message: reply.message,
@@ -478,4 +478,4 @@ export const getTranslation = async (
   setIsTranslating(false)
 }
 
-export const translationSeparator = "\n\n----------\n\n\n"
+export const translationSeparator = '\n\n----------\n\n\n'

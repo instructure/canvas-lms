@@ -81,8 +81,25 @@ module Lti::Messages
       @message
     end
 
-    def generate_post_payload
-      generate_post_payload_message.to_h
+    def to_cached_hash
+      post_payload = generate_post_payload_message.to_h
+      assoc_tool_data = {
+        shared_secret: associated_1_1_tool&.shared_secret,
+        consumer_key: associated_1_1_tool&.consumer_key
+      }
+      { post_payload:, assoc_tool_data: }
+    end
+
+    def self.cached_hash_to_launch(launch_payload, nonce)
+      post_payload = launch_payload["post_payload"]
+      post_payload["nonce"] = nonce
+      assoc_tool_data = launch_payload["assoc_tool_data"]
+      if assoc_tool_data["consumer_key"].present?
+        signature = Lti::Helpers::JwtMessageHelper.generate_oauth_consumer_key_sign(assoc_tool_data, post_payload, nonce)
+        post_payload["https://purl.imsglobal.org/spec/lti/claim/lti1p1"]["oauth_consumer_key"] = assoc_tool_data["consumer_key"]
+        post_payload["https://purl.imsglobal.org/spec/lti/claim/lti1p1"]["oauth_consumer_key_sign"] = signature
+      end
+      post_payload
     end
 
     private
@@ -137,7 +154,7 @@ module Lti::Messages
 
     def add_i18n_claims!
       # Repeated as @message.launch_presentation.locale above. Separated b/c often want one or the other but not both,
-      # e.g. NRPS v2 only wants this one and none of the launch_presention fields.
+      # e.g. NRPS v2 only wants this one and none of the launch_presentation fields.
       @message.locale = I18n.locale || I18n.default_locale.to_s
     end
 
@@ -174,11 +191,8 @@ module Lti::Messages
     end
 
     def add_lti1p1_claims!
+      # The oauth_consumer_key_sign will be written later in the process (in `cached_hash_to_launch`) once we have the nonce
       @message.lti1p1.user_id = @user&.lti_context_id
-      if associated_1_1_tool.present?
-        @message.lti1p1.oauth_consumer_key = associated_1_1_tool.consumer_key
-        @message.lti1p1.oauth_consumer_key_sign = Lti::Helpers::JwtMessageHelper.generate_oauth_consumer_key_sign(associated_1_1_tool, @message)
-      end
     end
 
     # Following the spec https://www.imsglobal.org/spec/lti/v1p3/migr#remapping-parameters
@@ -211,8 +225,6 @@ module Lti::Messages
     end
 
     def associated_1_1_tool
-      return nil unless Account.site_admin.feature_enabled?(:include_oauth_consumer_key_in_lti_launch)
-
       @associated_1_1_tool ||= @tool&.associated_1_1_tool(@context, target_link_uri)
     end
 

@@ -268,6 +268,10 @@ class ContentTag < ActiveRecord::Base
     end
   end
 
+  def show_assign_to?
+    ["Assignment", "Quizzes::Quiz", "WikiPage"].include?(content_type) || (content_type == "DiscussionTopic" && (graded? || (!graded? && content&.group_category_id.blank?)))
+  end
+
   def direct_shareable?
     content_id.to_i > 0 && direct_share_type
   end

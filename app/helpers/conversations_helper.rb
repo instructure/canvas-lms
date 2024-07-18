@@ -345,7 +345,7 @@ module ConversationsHelper
 
     # Compare setting snapshots of message and current settings for user
     # If they differ, then we need to send an automated response
-    message.inbox_settings_ooo_snapshot != Inbox::InboxService.inbox_settings_ooo_snapshot(user_id: user.id, root_account_id: message.root_account_id)
+    message.inbox_settings_ooo_hash != Inbox::InboxService.inbox_settings_ooo_hash(user_id: user.id, root_account_id: message.root_account_id)
   end
 
   def trigger_out_of_office_auto_responses(participant_ids, date, author, context_id, context_type, root_account_id)
@@ -369,7 +369,7 @@ module ConversationsHelper
                                       author_id: ooo_message_author.id,
                                       user_id: ooo_message_recipient.id,
                                       root_account_ids: root_account_ids.map(&:to_s),
-                                      start: settings.out_of_office_first_date).order("created_at DESC").limit(1).first
+                                      start: settings.out_of_office_first_date).order("created_at DESC").first
 
       next unless should_send_auto_response?(ooo_message_author, last_sent_ooo_response)
 

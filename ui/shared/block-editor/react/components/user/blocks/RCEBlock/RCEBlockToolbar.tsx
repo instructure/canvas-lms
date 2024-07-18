@@ -35,7 +35,7 @@
  */
 
 import React, {useCallback} from 'react'
-import {useNode} from '@craftjs/core'
+import {useNode, type Node} from '@craftjs/core'
 import {IconButton} from '@instructure/ui-buttons'
 import {
   IconBoldLine,
@@ -50,15 +50,14 @@ import {
   unstyleSelection,
   unboldElement,
 } from '../../../../utils'
+import {type RCEBlockProps} from './types'
 
 const RCEBlockToolbar = () => {
   const {
     actions: {setProp},
     node,
-    props,
-  } = useNode(node => ({
-    node,
-    props: node.data.props,
+  } = useNode((n: Node) => ({
+    node: n,
   }))
 
   const handleBold = useCallback(() => {
@@ -67,7 +66,7 @@ const RCEBlockToolbar = () => {
     } else {
       makeSelectionBold()
     }
-    setProp(prps => (prps.text = node.dom?.firstElementChild?.innerHTML))
+    setProp((prps: RCEBlockProps) => (prps.text = node.dom?.firstElementChild?.innerHTML))
   }, [node.dom, setProp])
 
   return (

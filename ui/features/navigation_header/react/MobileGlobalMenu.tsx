@@ -27,17 +27,18 @@ import {Heading} from '@instructure/ui-heading'
 import {IconButton} from '@instructure/ui-buttons'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {
-  IconXLine,
   IconAdminLine,
-  IconCoursesLine,
-  IconGroupLine,
-  IconDashboardLine,
-  IconLockLine,
-  IconQuestionLine,
-  IconInboxLine,
   IconCalendarMonthLine,
   IconClockLine,
+  IconCoursesLine,
+  IconDashboardLine,
+  IconExternalLinkLine,
+  IconGroupLine,
   IconHomeLine,
+  IconInboxLine,
+  IconLockLine,
+  IconQuestionLine,
+  IconXLine,
 } from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import HelpDialog from '@canvas/help-dialog'
@@ -49,7 +50,7 @@ import ProfileTabsList from './lists/ProfileTabsList'
 import HistoryList from './lists/HistoryList'
 import {useQuery} from '@canvas/query'
 import {getUnreadCount} from './queries/unreadCountQuery'
-import {getExternalApps} from './utils'
+import {filterAndProcessTools, getExternalApps, type ProcessedTool} from './utils'
 import {SVGIcon} from '@instructure/ui-svg-images'
 import {Img} from '@instructure/ui-img'
 
@@ -73,12 +74,16 @@ export default function MobileGlobalMenu(props: Props) {
     avatar_image_url: string
   } = window.ENV.current_user
 
-  const {data: externalTools} = useQuery({
+  const {data: externalToolsData} = useQuery({
     queryKey: ['external_tools'],
     queryFn: getExternalApps,
     staleTime: 2 * 60 * 1000, // two minutes,
     enabled: true,
   })
+  const processedTools = useMemo(
+    () => filterAndProcessTools(externalToolsData || []),
+    [externalToolsData]
+  )
 
   const {data: unreadConversationsCount, isSuccess: unreadConversationsCountHasLoaded} = useQuery({
     queryKey: ['unread_count', 'conversations'],
@@ -260,36 +265,33 @@ export default function MobileGlobalMenu(props: Props) {
           </Link>
         </List.Item>
 
-        {Array.isArray(externalTools) &&
-          [...externalTools].map(tool => {
-            const toolId = tool.label.toLowerCase().replaceAll(' ', '-')
-            const toolImg = tool.imgSrc ? tool.imgSrc : ''
-            return (
-              <List.Item key={toolId}>
-                <Link href={tool.href || ''} isWithinText={false} display="block">
-                  <Flex>
-                    <Flex.Item width="3rem">
-                      {'svgPath' in tool ? (
-                        <SVGIcon
-                          size="small"
-                          viewBox="0 0 64 64"
-                          title="svg-external-tool"
-                          color="auto"
-                        >
-                          <path d={tool.svgPath} />
-                        </SVGIcon>
-                      ) : (
-                        <Img width="26px" height="26px" src={toolImg} alt="" />
-                      )}
-                    </Flex.Item>
-                    <Flex.Item>
-                      <Text size="medium">{tool.label}</Text>
-                    </Flex.Item>
-                  </Flex>
-                </Link>
-              </List.Item>
-            )
-          })}
+        {processedTools.map((tool: ProcessedTool) => (
+          <List.Item key={tool.toolId}>
+            <Link href={tool.href || '#'} isWithinText={false} display="block">
+              <Flex>
+                <Flex.Item width="3rem">
+                  {tool.svgPath ? (
+                    <SVGIcon
+                      size="small"
+                      viewBox="0 0 64 64"
+                      title="svg-external-tool"
+                      color="auto"
+                    >
+                      <path d={tool.svgPath} />
+                    </SVGIcon>
+                  ) : tool.toolImg ? (
+                    <Img width="26px" height="26px" src={tool.toolImg} alt="" />
+                  ) : (
+                    <IconExternalLinkLine data-testid="IconExternalLinkLine" size="small" />
+                  )}
+                </Flex.Item>
+                <Flex.Item>
+                  <Text size="medium">{tool.label}</Text>
+                </Flex.Item>
+              </Flex>
+            </Link>
+          </List.Item>
+        ))}
 
         <List.Item>
           <ToggleDetails

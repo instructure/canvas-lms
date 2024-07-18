@@ -175,70 +175,27 @@ module CanvasRails
     end
 
     module PostgreSQLEarlyExtensions
-      module ConnectionHandling
-        if $canvas_rails == "7.0"
-          def postgresql_connection(config)
-            conn_params = config.symbolize_keys
-
-            hosts = Array(conn_params[:host]).presence || [nil]
-            hosts.each_with_index do |host, index|
-              conn_params[:host] = host
-
-              begin
-                return super(conn_params)
-              rescue ::ActiveRecord::ActiveRecordError, ::PG::Error => e
-                # If exception occurs using parameters from a predefined pg service, retry without
-                if conn_params.key?(:service)
-                  CanvasErrors.capture(e, { tags: { pg_service: conn_params[:service] } }, :warn)
-                  Rails.logger.warn("Error connecting to database using pg service `#{conn_params[:service]}`; retrying without... (error: #{e.message})")
-                  conn_params.delete(:service)
-                  conn_params[:sslmode] = "disable"
-                  retry
-                else
-                  raise
-                end
-              end
-              # we _shouldn't_ be catching a NoDatabaseError, but that's what Rails raises
-              # for an error where the database name is in the message (i.e. a hostname lookup failure)
-            rescue ::ActiveRecord::NoDatabaseError, ::ActiveRecord::ConnectionNotEstablished
-              raise if index == hosts.length - 1
-              # else try next host
-            end
-          end
+      def initialize(config)
+        unless config.key?(:prepared_statements)
+          config = config.dup
+          config[:prepared_statements] = false
         end
-      end
-
-      if Rails.version < "7.1"
-        def initialize(connection, logger, connection_parameters, config)
-          unless config.key?(:prepared_statements)
-            config = config.dup
-            config[:prepared_statements] = false
-          end
-          super
+        if config[:host].is_a?(Array)
+          config = config.dup
+          config[:host] = config[:host].join(",")
         end
-      else
-        def initialize(config)
-          unless config.key?(:prepared_statements)
-            config = config.dup
-            config[:prepared_statements] = false
-          end
-          if config[:host].is_a?(Array)
-            config = config.dup
-            config[:host] = config[:host].join(",")
-          end
-          super
-        end
+        super
       end
 
       def connect
         super
 
         raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00 # rubocop:disable Style/NumericLiterals
-      rescue ::ActiveRecord::ActiveRecordError, ::ActiveRecord::ConnectionFailed, ::PG::Error => e
+      rescue ::ActiveRecord::ActiveRecordError, ::ActiveRecord::ConnectionFailed, ::ActiveRecord::ConnectionNotEstablished, ::PG::Error => e
         # If exception occurs using parameters from a predefined pg service, retry without
         if @connection_parameters.key?(:service)
           CanvasErrors.capture(e, { tags: { pg_service: @connection_parameters[:service] } }, :warn)
-          Rails.logger.warn("Error connecting to database using pg service `#{connection_parameters[:service]}`; retrying without... (error: #{e.message})")
+          Rails.logger.warn("Error connecting to database using pg service `#{@connection_parameters[:service]}`; retrying without... (error: #{e.message})")
           @connection_parameters.delete(:service)
           @connection_parameters[:sslmode] = "disable"
           retry
@@ -258,9 +215,6 @@ module CanvasRails
       end
     end
 
-    Autoextend.hook(:"ActiveRecord::Base",
-                    PostgreSQLEarlyExtensions::ConnectionHandling,
-                    singleton: true)
     Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQLAdapter",
                     PostgreSQLEarlyExtensions,
                     method: :prepend)
@@ -377,13 +331,11 @@ module CanvasRails
       DummyKeyGenerator
     end
 
-    # # This also depends on secret_key_base and is not a feature we use or currently intend to support
-    unless Rails.version < "7.1"
-      initializer "canvas.ignore_generated_token_verifier", before: "active_record.generated_token_verifier" do
-        config.after_initialize do
-          ActiveSupport.on_load(:active_record) do
-            self.generated_token_verifier = "UNUSED"
-          end
+    # This also depends on secret_key_base and is not a feature we use or currently intend to support
+    initializer "canvas.ignore_generated_token_verifier", before: "active_record.generated_token_verifier" do
+      config.after_initialize do
+        ActiveSupport.on_load(:active_record) do
+          self.generated_token_verifier = "UNUSED"
         end
       end
     end

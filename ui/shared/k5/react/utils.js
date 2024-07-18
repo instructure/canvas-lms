@@ -54,6 +54,7 @@ export const transformGrades = courses =>
       gradingScheme: course.grading_scheme,
       pointsBasedGradingScheme: course.points_based_grading_scheme,
       restrictQuantitativeData: course.restrict_quantitative_data,
+      scalingFactor: course.scaling_factor,
     }
     return getCourseGrades(basicCourseInfo)
   })
@@ -175,7 +176,8 @@ export const getAssignmentGroupTotals = (
   observedUserId,
   restrictQuantitativeData = false,
   gradingScheme = [],
-  pointsBasedGradingScheme = false
+  pointsBasedGradingScheme = false,
+  scalingFactor = null
 ) => {
   if (gradingPeriodId) {
     data = data.filter(group =>
@@ -209,7 +211,7 @@ export const getAssignmentGroupTotals = (
     } else {
       const tempScore = (groupScores.current.score / groupScores.current.possible) * 100
       score = restrictQuantitativeData
-        ? scoreToGrade(tempScore, gradingScheme, pointsBasedGradingScheme)
+        ? scoreToGrade(tempScore, gradingScheme, pointsBasedGradingScheme, scalingFactor)
         : I18n.n(tempScore, {percentage: true, precision: 2})
     }
 
@@ -235,6 +237,7 @@ const formatGradeToRQD = (assignment, submission) => {
       restrict_quantitative_data: ENV.RESTRICT_QUANTITATIVE_DATA,
       grading_scheme: ENV.GRADING_SCHEME,
       points_based_grading_scheme: ENV.POINTS_BASED,
+      scaling_factor: ENV.SCALING_FACTOR,
     })
   }
 
@@ -289,7 +292,8 @@ export const getTotalGradeStringFromEnrollments = (
   observedUserId,
   restrictQuantitativeData = false,
   gradingScheme = [],
-  pointsBasedGradingScheme
+  pointsBasedGradingScheme,
+  scalingFactor
 ) => {
   let grades
   if (observedUserId) {
@@ -304,7 +308,12 @@ export const getTotalGradeStringFromEnrollments = (
     return I18n.t('n/a')
   }
   if (restrictQuantitativeData) {
-    return scoreToGrade(grades.current_score, gradingScheme, pointsBasedGradingScheme)
+    return scoreToGrade(
+      grades.current_score,
+      gradingScheme,
+      pointsBasedGradingScheme,
+      scalingFactor
+    )
   }
   const score = I18n.n(grades.current_score, {percentage: true, precision: 2})
   return grades.current_grade == null

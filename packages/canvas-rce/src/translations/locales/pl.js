@@ -38,6 +38,8 @@ const locale = {
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Sąsiadujące łącza o tym samym adresie URL powinny stanowić pojedyncze łącze."
   },
+  "ai_response_9624e8e8": { "message": "Odpowiedź AI" },
+  "ai_tools_fda01177": { "message": "Narzędzia IA" },
   "aleph_f4ffd155": { "message": "Alef" },
   "align_11050992": { "message": "Dostosuj" },
   "alignment_and_lists_5cebcb69": { "message": "Wyrównanie i listy" },
@@ -55,6 +57,9 @@ const locale = {
   },
   "an_error_occurred_making_a_network_request_d1bda348": {
     "message": "Wystąpił błąd podczas przesyłania żądania sieciowego"
+  },
+  "an_error_occurred_processing_your_request_a3a38d84": {
+    "message": "Podczas przetwarzania żądania wystąpił błąd."
   },
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "Podczas wysyłania multimediów wystąpił błąd."
@@ -185,6 +190,7 @@ const locale = {
   "column_e1ae5c64": { "message": "Kolumna" },
   "column_group_1c062368": { "message": "Grupa kolumn" },
   "complex_numbers_a543d004": { "message": "Liczby zespolone" },
+  "compose_44c904f4": { "message": "Utwórz" },
   "computer_1d7dfa6f": { "message": "Komputer" },
   "congruent_5a244acd": { "message": "Przystające" },
   "contains_311f37b7": { "message": "Zawiera" },
@@ -198,6 +204,7 @@ const locale = {
   "content_subtype_5ce35e88": { "message": "Podtyp zawartości" },
   "content_type_2cf90d95": { "message": "Typ zawartości" },
   "coproduct_e7838082": { "message": "Suma" },
+  "copy_9748f9f": { "message": "Kopiuj" },
   "copyright_holder_66ee111": { "message": "Właściciel praw autorskich:" },
   "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
     "message": "Nie można wstawić zawartości: Elementy obecnie nieobsługiwane w Canvas: \"{ itemType }\"."
@@ -268,6 +275,7 @@ const locale = {
   "discussions_a5f96392": { "message": "Dyskusje" },
   "discussions_index_6c36ced": { "message": "Spis dyskusji" },
   "disjoint_union_e74351a8": { "message": "Suma rozłączna" },
+  "dislike_14befc48": { "message": "Odrzuć" },
   "display_options_315aba85": { "message": "Opcje wyświetlania" },
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Wyświetl łącze tekstowe (otwiera się w nowej karcie)"
@@ -333,6 +341,7 @@ const locale = {
   },
   "enter_replacement_text_17631bbc": { "message": "Wpisz tekst zastępczy" },
   "enter_search_text_26cb4459": { "message": "Wpisz tekst do wyszukania" },
+  "enter_text_8b35c65b": { "message": "Wpisz tekst" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (wariant)" },
   "equals_sign_c51bdc58": { "message": "Znak równości" },
@@ -359,6 +368,9 @@ const locale = {
   "f_function_fe422d65": { "message": "F (funkcja)" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Nie udało się pobrać zawartości pliku"
+  },
+  "failed_to_copy_response_d3def551": {
+    "message": "Nie udało się skopiować odpowiedzi"
   },
   "failed_to_retrieve_content_from_external_tool_5899c213": {
     "message": "Nie udało się pobrać zawartości z zewnętrznego narzędzia"
@@ -447,6 +459,12 @@ const locale = {
   "health_icon_8d292eb5": { "message": "Ikona zdrowia" },
   "hearts_suit_e50e04ca": { "message": "Kier (kolor)" },
   "height_69b03e15": { "message": "Wysokość" },
+  "hello_please_describe_the_modifications_you_would__49b19837": {
+    "message": "Witaj. Opisz, co powinno zmienić się w Twoim wypracowaniu."
+  },
+  "hello_please_describe_the_modifications_you_would__600dbbf0": {
+    "message": "Witaj. Opisz, co powinno zmienić się w Twoich wyborach."
+  },
   "hexagon_d8468e0d": { "message": "Sześciobok" },
   "hide_description_bfb5502e": { "message": "Ukryj opis" },
   "hide_title_description_caf092ef": { "message": "Ukryj opis { title }" },
@@ -460,6 +478,9 @@ const locale = {
     "message": "Mam uprawnienie do korzystania z tego pliku."
   },
   "i_hold_the_copyright_71ee91b1": { "message": "Posiadam prawa autorskie" },
+  "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+    "message": "Przepraszam, nie mogę znaleźć odpowiedzi AI"
+  },
   "icon_215a1dc6": { "message": "Ikona" },
   "icon_8168b2f8": { "message": "ikona" },
   "icon_color_b86dd6d6": { "message": "Kolor ikony" },
@@ -641,6 +662,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Minus/Plus" },
   "misc_3b692ea7": { "message": "Różne" },
   "miscellaneous_e9818229": { "message": "Różne" },
+  "modify_6b0b13e3": { "message": "Zmień" },
   "module_90d9fd32": { "message": "Moduł" },
   "modules_c4325335": { "message": "Moduły" },
   "moving_image_to_crop_directionword_6f66cde2": {
@@ -793,6 +815,9 @@ const locale = {
   "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
     "message": "Zezwól Canvas na łączenie się z kamerą sieciową i mikrofonem."
   },
+  "please_decribe_what_you_would_like_to_compose_27a51be5": {
+    "message": "Opisz, jakie chcesz stworzyć wypracowanie."
+  },
   "plus_d43cd4ec": { "message": "Plus" },
   "plus_minus_f8be2e83": { "message": "Plus/Minus" },
   "posted_when_a578f5ab": { "message": "Opublikował(a): { when }" },
@@ -857,10 +882,14 @@ const locale = {
   },
   "reset_95a81614": { "message": "Resetuj" },
   "resize_ec83d538": { "message": "Zmień rozmiar" },
+  "response_copied_to_clipboard_130d66cd": {
+    "message": "Skopiowano odpowiedź do schowka."
+  },
   "restore_auto_save_deccd84b": {
     "message": "Przywrócić automatycznie zapisaną zawartość?"
   },
   "result_index_of_max_7db5ad8b": { "message": "Wynik { index } z { max }." },
+  "retry_ebd5f8ba": { "message": "Ponów próbę" },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Kołowrót zwrotny (nie spełnia)"
   },
@@ -939,6 +968,7 @@ const locale = {
     "message": "Naciśnij Shift-O, aby otworzyć ulepszony edytor HTML."
   },
   "shortcut_911d6255": { "message": "Skrót" },
+  "show_all_967a90f0": { "message": "Pokaż wszystko" },
   "show_audio_options_b489926b": { "message": "Pokaż opcje audio" },
   "show_image_options_1e2ecc6b": { "message": "Pokaż opcje obrazów" },
   "show_link_options_545338fd": { "message": "Pokaż opcje łącza" },
@@ -1247,6 +1277,7 @@ const locale = {
   "view_word_and_character_counts_a743dd0c": {
     "message": "Wyświetl liczbę słów i znaków"
   },
+  "waiting_for_response_1efd0c50": { "message": "Oczekiwanie na odpowiedź" },
   "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
     "message": "Nie udało się wykryć działającego mikrofonu podłączonego do urządzenia."
   },
@@ -1261,6 +1292,7 @@ const locale = {
   "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
     "message": "Strony internetowe powinny mieć tylko jeden nagłówek H1, który jest automatycznie używany przez tytuł strony. Pierwszym nagłówkiem zawartości powinien być H2."
   },
+  "what_would_you_like_to_do_6dc0d541": { "message": "Co chcesz robić?" },
   "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
     "message": "Gdy używane jest oznaczenie, które wizualnie formatuje elementy jako listę, ale nie wskazuje na relacje w liście, użytkownicy mogą mieć problem z nawigowaniem po informacjach."
   },
@@ -1275,6 +1307,7 @@ const locale = {
   "word_count_c77fe3a6": { "message": "Liczba słów" },
   "words_b448b7d5": { "message": "Słowa" },
   "wreath_product_200b38ef": { "message": "Produkt splotowy" },
+  "writing_assistant_a30ac16a": { "message": "Asystent pisania" },
   "xi_149681d0": { "message": "Ksi" },
   "yes_dde87d5": { "message": "Tak" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {

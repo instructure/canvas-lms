@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useState} from 'react'
 
 import {useQuery, useMutation} from 'react-apollo'
 import {DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
@@ -34,6 +34,7 @@ import {IconCompleteSolid, IconUnpublishedLine} from '@instructure/ui-icons'
 import {Pill} from '@instructure/ui-pill'
 import {SavingDiscussionTopicOverlay} from '../../components/SavingDiscussionTopicOverlay/SavingDiscussionTopicOverlay'
 import WithBreakpoints from '@canvas/with-breakpoints'
+import {flushSync} from 'react-dom'
 
 const I18n = useI18nScope('discussion_create')
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
@@ -45,7 +46,25 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
   const contextType = ENV.context_is_not_group ? 'Course' : 'Group'
   const {contextQueryToUse, contextQueryVariables} = getContextQuery(contextType)
 
+  const [latestDiscussionContextType, setLatestDiscussionContextType] = useState(null)
+  const [latestDiscussionTopicId, setLatestDiscussionTopicId] = useState(null)
+
+  const navigateToDiscussionTopicEvent = useCallback(() => {
+    navigateToDiscussionTopic(latestDiscussionContextType, latestDiscussionTopicId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [latestDiscussionContextType, latestDiscussionTopicId])
+
+  useEffect(() => {
+    window.addEventListener('navigateToDiscussionTopic', navigateToDiscussionTopicEvent)
+
+    return () => {
+      window.removeEventListener('navigateToDiscussionTopic', navigateToDiscussionTopicEvent)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [latestDiscussionContextType, latestDiscussionTopicId])
+
   const isAnnouncement = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
+  const shouldSaveMasteryPaths = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !isAnnouncement
 
   const {data: contextData, loading: courseIsLoading} = useQuery(contextQueryToUse, {
     variables: contextQueryVariables,
@@ -106,16 +125,44 @@ function DiscussionTopicFormContainer({apolloClient, breakpoints}) {
     const {_id: discussionTopicId, contextType: discussionContextType, attachment} = discussionTopic
 
     if (discussionTopicId && discussionContextType) {
+      let shouldNavigateToDiscussionTopic = true
+
       try {
         if (ENV?.USAGE_RIGHTS_REQUIRED) {
           await saveUsageRights(usageRightData, attachment)
+        }
+
+        if (shouldSaveMasteryPaths && discussionTopic.assignment) {
+          const {assignment} = discussionTopic
+
+          const assignmentInfo = {
+            id: assignment._id,
+            grading_standard_id: assignment?.gradingStandard?.id,
+            grading_type: assignment.gradingType,
+            points_possible: assignment.pointsPossible,
+            submission_types: 'discussion_topic',
+          }
+
+          shouldNavigateToDiscussionTopic = false
+          flushSync(() => {
+            setLatestDiscussionContextType(discussionContextType)
+            setLatestDiscussionTopicId(discussionTopicId)
+          })
+
+          window.dispatchEvent(
+            new CustomEvent('triggerMasteryPathsUpdateAssignment', {detail: {assignmentInfo}})
+          )
+          window.dispatchEvent(new CustomEvent('triggerMasteryPathsSave'))
         }
       } catch (error) {
         // Handle error on saving usage rights
         setOnFailure(error)
       } finally {
         // Always navigate to the discussion topic on a successful mutation
-        navigateToDiscussionTopic(discussionContextType, discussionTopicId)
+        // In some scenarios, like when saving mastery paths, we don't want to navigate unless it happens via event
+        if (shouldNavigateToDiscussionTopic) {
+          navigateToDiscussionTopic(discussionContextType, discussionTopicId)
+        }
       }
     } else {
       setIsSubmitting(false)

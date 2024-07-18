@@ -127,7 +127,7 @@ describe Inbox::InboxService do
     end
 
     it "retrieves hash snaphsot of inbox settings for OOO" do
-      snapshot = Inbox::InboxService.inbox_settings_ooo_snapshot(user_id:, root_account_id:)
+      snapshot = Inbox::InboxService.inbox_settings_ooo_hash(user_id:, root_account_id:)
 
       expect(snapshot).not_to be_nil
     end

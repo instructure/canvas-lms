@@ -102,6 +102,9 @@ export const DiscussionTopic = {
     assignment: Assignment.shape,
     canGroup: bool,
     ungradedDiscussionOverrides: AssignmentOverride.shape(),
+    entryCounts: shape({
+      repliesCount: number,
+    }),
   }),
 
   mock: ({
@@ -130,6 +133,7 @@ export const DiscussionTopic = {
     assignment = null,
     canGroup = false,
     ungradedDiscussionOverrides = null,
+    entryCounts = {repliesCount: 0},
   } = {}) => ({
     _id,
     id,
@@ -157,5 +161,6 @@ export const DiscussionTopic = {
     canGroup,
     ungradedDiscussionOverrides,
     __typename: 'Discussion',
+    entryCounts,
   }),
 }

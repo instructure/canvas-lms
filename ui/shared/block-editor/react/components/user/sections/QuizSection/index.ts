@@ -18,6 +18,7 @@
 
 import {QuizSection} from './QuizSection'
 import {QuizModal} from './QuizModal'
+// @ts-expect-error
 import {IconQuizSolid} from '@instructure/ui-icons/es/svg'
 
 const QuizSectionIcon = IconQuizSolid?.src

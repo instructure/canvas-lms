@@ -21,6 +21,6 @@ export type FilterItem = {
   name: string
 }
 
-export type LtiFilter = {
+export type LtiFilters = {
   [key: string]: Array<FilterItem>
 }

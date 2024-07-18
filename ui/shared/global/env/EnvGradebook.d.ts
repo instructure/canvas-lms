@@ -98,6 +98,7 @@ export interface EnvGradebookSpeedGrader {
   assignment_title: string
   custom_grade_statuses: any
   rubric: null | unknown
+  rubric_outcome_data: null | unknown
   nonScoringRubrics: boolean
   outcome_extra_credit_enabled: boolean
   outcome_proficiency: unknown

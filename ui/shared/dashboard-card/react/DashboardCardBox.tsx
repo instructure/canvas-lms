@@ -25,6 +25,7 @@ import DashboardCardBackgroundStore from './DashboardCardBackgroundStore'
 import MovementUtils from './MovementUtils'
 import {showNoFavoritesAlert} from './ConfirmUnfavoriteCourseModal'
 import type {Card} from '../types'
+import {clearDashboardCache} from '../dashboardCardQueries'
 
 const I18n = useI18nScope('dashcards')
 
@@ -97,6 +98,9 @@ export default class DashboardCardBox extends React.Component<Props, State> {
   colorForCard = (assetString: string) => DashboardCardBackgroundStore.colorForCourse(assetString)
 
   handleColorChange = (assetString: string, newColor: string) => {
+    if (window?.ENV?.FEATURES?.dashboard_graphql_integration) {
+      clearDashboardCache()
+    }
     DashboardCardBackgroundStore.setColorForCourse(assetString, newColor)
   }
 
@@ -104,6 +108,9 @@ export default class DashboardCardBox extends React.Component<Props, State> {
     this.state.courseCards.findIndex(c => c.assetString === assetString)
 
   moveCard = (assetString: string, atIndex: number, cb: () => void) => {
+    if (window?.ENV?.FEATURES?.dashboard_graphql_integration) {
+      clearDashboardCache()
+    }
     const cardIndex = this.state.courseCards.findIndex(card => card.assetString === assetString)
     let newCards = this.state.courseCards.slice()
     newCards.splice(atIndex, 0, newCards.splice(cardIndex, 1)[0])
@@ -150,6 +157,9 @@ export default class DashboardCardBox extends React.Component<Props, State> {
     const cardIndex = this.state.courseCards.findIndex(card => card.id === courseId)
     const newCards = this.state.courseCards.slice()
     newCards[cardIndex].published = true
+    if (window?.ENV?.FEATURES?.dashboard_graphql_integration) {
+      clearDashboardCache()
+    }
     this.setState(() => {
       return {
         courseCards: newCards,

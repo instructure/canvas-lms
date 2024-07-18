@@ -53,7 +53,7 @@ describe('DiscussionsSettings', () => {
         },
         saveSettings() {},
         toggleModalOpen() {},
-        applicationElement: () => document.getElementById('fixtures'),
+        applicationElement: () => document.getElementById('fixtures')
       },
       props
     )
@@ -73,6 +73,13 @@ describe('DiscussionsSettings', () => {
     expect(() => {
       render(<DiscussionSettings {...makeProps()} />)
     }).not.toThrow()
+  })
+
+  it('should render discussion settings with buttonText', () => {
+    render(<DiscussionSettings {...makeProps({buttonText: 'Settings'})} />)
+
+    const settingsButton = screen.getByTestId('discussion-setting-button')
+    expect(settingsButton).toHaveTextContent('Settings')
   })
 
   it('should find 0 checked boxes', () => {

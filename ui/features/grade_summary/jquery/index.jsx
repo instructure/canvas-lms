@@ -481,7 +481,8 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
       scoreToLetterGrade(
         scoreToUse,
         grading_scheme,
-        ENV.course_active_grading_scheme?.points_based
+        ENV.course_active_grading_scheme?.points_based,
+        ENV.course_active_grading_scheme?.scaling_factor
       ) || I18n.t('N/A')
 
     $('.final_grade .letter_grade').text(GradeFormatHelper.replaceDashWithMinus(letterGrade))
@@ -506,7 +507,8 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
             Number(scaledPointsPossible.toFixed(2))
           ),
           grading_scheme,
-          ENV.course_active_grading_scheme.points_based
+          ENV.course_active_grading_scheme.points_based,
+          scaledPointsPossible
         ) || I18n.t('N/A')
 
       $('.final_grade .letter_grade').text(GradeFormatHelper.replaceDashWithMinus(letterGrade))
@@ -793,7 +795,7 @@ function setup() {
       $('#grades_summary .revert_score_link').each(function () {
         $(this).trigger('click', {skipEval: true, refocus: false})
       })
-      $('#.show_guess_grades.exists').show()
+      $('.show_guess_grades.exists').show()
       GradeSummary.updateStudentGrades()
       showAllWhatIfButton.focus()
       $.screenReaderFlashMessageExclusive(I18n.t('Grades are now reverted to original scores'))

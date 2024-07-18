@@ -37,6 +37,7 @@ export const CriteriaReadonlyComment = ({commentText}: CriteriaReadonlyCommentPr
       )}
       <Text
         data-testid="comment-preview-text-area"
+        themeOverride={{paragraphMargin: 0}}
         dangerouslySetInnerHTML={escapeNewLineText(commentText ?? '')}
       />
     </View>
