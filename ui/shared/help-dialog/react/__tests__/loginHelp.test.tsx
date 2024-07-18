@@ -18,7 +18,7 @@ import React from 'react'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {QueryProvider} from '@canvas/query'
-import LoginHelp, {getVisibleTextContent, renderLoginHelp} from '../loginHelp'
+import LoginHelp, {renderLoginHelp} from '../loginHelp'
 
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,
@@ -33,36 +33,6 @@ jest.mock('@canvas/do-fetch-api-effect', () => ({
 describe('LoginHelp Component and Helpers', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-  })
-
-  describe('getVisibleTextContent() utility', () => {
-    it('returns text content for a simple element', () => {
-      const div = document.createElement('div')
-      div.textContent = 'Visible Text'
-      expect(getVisibleTextContent(div)).toBe('Visible Text')
-    })
-
-    it('excludes text content of hidden elements', () => {
-      const div = document.createElement('div')
-      div.innerHTML =
-        '<span> Visible </span><span>Text</span> <span style="display:none;"> Hidden Text </span>'
-      expect(getVisibleTextContent(div)).toBe('Visible Text')
-    })
-
-    it('returns concatenated text content of nested elements', () => {
-      const div = document.createElement('div')
-      div.innerHTML = '<span>Visible</span> <span>Text</span>'
-      expect(getVisibleTextContent(div)).toBe('Visible Text')
-    })
-
-    it('excludes text content of elements with screenreader-only class', () => {
-      const div = document.createElement('div')
-      div.innerHTML =
-        '<span>Visible Text</span><span class="screenreader-only">Screenreader Only Text</span>'
-      const screenReaderOnlyElement = div.querySelector('.screenreader-only') as HTMLElement
-      screenReaderOnlyElement.style.display = 'none'
-      expect(getVisibleTextContent(div)).toBe('Visible Text')
-    })
   })
 
   describe('LoginHelp Component', () => {

@@ -25,6 +25,7 @@ import filterUselessConsoleMessages from '@instructure/filter-console-messages'
 import rceFormatMessage from '@instructure/canvas-rce/es/format-message'
 import {up as configureDateTime} from '@canvas/datetime/configureDateTime'
 import {up as configureDateTimeMomentParser} from '@canvas/datetime/configureDateTimeMomentParser'
+import {up as installNodeDecorations} from '../ui/boot/initializers/installNodeDecorations'
 import {useTranslations} from '@canvas/i18n'
 import MockBroadcastChannel from './MockBroadcastChannel'
 
@@ -106,6 +107,7 @@ document.documentElement.setAttribute('dir', 'ltr')
 
 configureDateTime()
 configureDateTimeMomentParser()
+installNodeDecorations()
 
 // because everyone implements `flat()` and `flatMap()` except JSDOM 🤦🏼‍♂️
 if (!Array.prototype.flat) {
