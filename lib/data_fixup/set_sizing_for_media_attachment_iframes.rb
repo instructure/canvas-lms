@@ -32,8 +32,8 @@ module DataFixup::SetSizingForMediaAttachmentIframes
     { WikiPage => :body }
   ].freeze
 
-  def self.update_active_records(model, field, where_clause, start_at, end_at)
-    model.where(id: start_at..end_at).where(*where_clause).find_each(strategy: :pluck_ids) do |active_record|
+  def self.update_active_records(model, field, where_clause, batch)
+    model.where(id: batch).where(*where_clause).find_each do |active_record|
       next unless (field && active_record[field]) || active_record.is_a?(Quizzes::Quiz)
 
       if active_record.is_a?(AssessmentQuestion) || active_record.is_a?(Quizzes::QuizQuestion)
@@ -59,12 +59,26 @@ module DataFixup::SetSizingForMediaAttachmentIframes
   end
 
   def self.update_dataset(model, field)
-    where_clause = (model == Quizzes::Quiz) ? ["description LIKE ? OR quiz_data LIKE ?", "%width: px;%", "%width: px;%"] : ["#{field} LIKE ?", "%width: px;%"]
-    model.where(*where_clause).find_ids_in_ranges(batch_size: 100_000) do |start_at, end_at|
+    where_clause = if model == Quizzes::Quiz
+                     [
+                       "description LIKE ? OR quiz_data LIKE ? OR description LIKE ? OR quiz_data LIKE ?",
+                       "%width:px; height:px;%",
+                       "%width:px; height:px;%",
+                       "%width: px; height: px;%",
+                       "%width: px; height: px;%"
+                     ]
+                   else
+                     [
+                       "#{field} LIKE ? OR #{field} LIKE ?",
+                       "%width:px; height:px;%",
+                       "%width: px; height: px;%"
+                     ]
+                   end
+    model.where(*where_clause).find_ids_in_batches do |batch|
       delay_if_production(
         priority: Delayed::LOW_PRIORITY,
         n_strand: ["DataFixup::SetSizingForMediaAttachmentIframes", Shard.current.database_server.id]
-      ).update_active_records(model, field, where_clause, start_at, end_at)
+      ).update_active_records(model, field, where_clause, batch)
     end
   end
 
@@ -80,29 +94,33 @@ module DataFixup::SetSizingForMediaAttachmentIframes
   end
 
   def self.update_ar(active_record, field)
-    active_record.update! field => fix_html(active_record[field])
+    active_record.update_columns(field => fix_html(active_record[field]))
   end
 
   def self.update_quiz(active_record)
-    active_record.description = fix_html(active_record.description)
-    active_record.quiz_data = active_record.quiz_data.map do |question|
-      question = question.merge({ "question_text" => fix_html(question["question_text"]) })
-      question["answers"] = question["answers"].map do |a|
-        a.merge({ "text" => fix_html(a["text"]) })
+    active_record.update_columns description: fix_html(active_record.description)
+    if active_record.quiz_data
+      quiz_data = active_record.quiz_data.map do |question|
+        question = question.merge({ "question_text" => fix_html(question["question_text"]) })
+        if question["answers"]
+          question["answers"] = question["answers"].map do |a|
+            a.merge({ "text" => fix_html(a["text"]) })
+          end
+        end
+        question
       end
-      question
+      active_record.update_columns quiz_data:
     end
-    active_record.save
   end
 
   def self.update_question(active_record)
-    question_data = active_record.question_data
+    question_data = active_record.question_data.to_hash
     question_data["question_text"] = fix_html(question_data["question_text"])
     if question_data && question_data["answers"]
       question_data["answers"] = active_record["question_data"]["answers"].map do |a|
         a.merge({ "text" => fix_html(a["text"]) })
       end
     end
-    active_record.update! question_data:
+    active_record.update_columns question_data:
   end
 end
