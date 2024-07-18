@@ -243,6 +243,7 @@ describe "Api::V1::Assignment" do
           @student = @assignment.course.enroll_student(User.create!, enrollment_state: "active").user
           @students = [@student]
 
+          create_adhoc_override_for_assignment(@c1, @students, due_at: 2.days.from_now)
           create_adhoc_override_for_assignment(@c2, @students, due_at: 2.days.from_now)
         end
 
@@ -257,9 +258,9 @@ describe "Api::V1::Assignment" do
           expect(checkpoints).to be_present
           expect(checkpoints.pluck(:tag)).to match_array [@c1.sub_assignment_tag, @c2.sub_assignment_tag]
           expect(checkpoints.pluck(:points_possible)).to match_array [@c1.points_possible, @c2.points_possible]
-          expect(checkpoints.pluck(:due_at)).to match_array [@c1.due_at, @c2.due_at]
+          expect(checkpoints.pluck(:due_at)).to match_array [@c1.assignment_overrides.first.due_at, @c2.assignment_overrides.first.due_at]
           expect(checkpoints.pluck(:only_visible_to_overrides)).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]
-          expect(first_checkpoint[:overrides].length).to eq 0
+          expect(first_checkpoint[:overrides].length).to eq 1
           expect(second_checkpoint[:overrides].length).to eq 1
           expect(second_checkpoint[:overrides].first[:assignment_id]).to eq @c2.id
           expect(second_checkpoint[:overrides].first[:student_ids]).to match_array @students.map(&:id)
@@ -354,7 +355,7 @@ describe "Api::V1::Assignment" do
         end
 
         it "returns all_dates associated with a checkpointed assignment's sub_assignments" do
-          json = api.assignment_json(@topic.assignment, @teacher, session, { include_all_dates: true, include_discussion_topic: false })
+          json = api.assignment_json(@topic.assignment, @teacher, session, { include_all_dates: true, include_discussion_topic: false, override_dates: false })
 
           # Should return dates for sub_assignment overrides and the checkpointed due dates
           expect(json["all_dates"].length).to eq 4
