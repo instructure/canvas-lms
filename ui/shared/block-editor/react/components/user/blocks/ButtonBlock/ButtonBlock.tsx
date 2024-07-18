@@ -23,7 +23,7 @@ import {getIcon} from '../../../../assets/user-icons'
 import {Button, CondensedButton} from '@instructure/ui-buttons'
 import {type ViewProps} from '@instructure/ui-view'
 import {darken, lighten} from '@instructure/ui-color-utils'
-import {getContrastingColor, white} from '../../../../utils'
+import {getContrastingColor, white} from '../../../../utils/colorUtils'
 import {isInstuiButtonColor} from './types'
 import type {
   InstuiButtonColor,
