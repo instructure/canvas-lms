@@ -103,11 +103,13 @@ const stripPTags = (htmlString: string) => {
 type RubricFormComponentProp = {
   rootOutcomeGroup: GroupOutcome
   canManageRubrics?: boolean
+  criterionUseRangeEnabled: boolean
   onLoadRubric?: (rubricTitle: string) => void
 }
 
 export const RubricForm = ({
   canManageRubrics = false,
+  criterionUseRangeEnabled,
   rootOutcomeGroup,
   onLoadRubric,
 }: RubricFormComponentProp) => {
@@ -513,6 +515,7 @@ export const RubricForm = ({
 
       <CriterionModal
         criterion={selectedCriterion}
+        criterionUseRangeEnabled={criterionUseRangeEnabled}
         isOpen={isCriterionModalOpen}
         unassessed={rubricForm.unassessed}
         onDismiss={() => setIsCriterionModalOpen(false)}

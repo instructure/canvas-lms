@@ -32,6 +32,7 @@ describe('CriterionModal tests', () => {
       <CriterionModal
         isOpen={true}
         unassessed={true}
+        criterionUseRangeEnabled={true}
         onDismiss={() => {}}
         onSave={() => {}}
         {...props}
@@ -203,6 +204,12 @@ describe('CriterionModal tests', () => {
       expect(totalRatingPoints[1].value).toEqual('6')
       expect(totalRatingPoints[2].value).toEqual('4')
       expect(totalRatingPoints[3].value).toEqual('2')
+    })
+
+    it('should not render range checkbox if FF is false', () => {
+      const {queryByTestId, queryAllByTestId} = renderComponent({criterionUseRangeEnabled: false})
+
+      expect(queryByTestId('enable-range-checkbox')).toBeNull()
     })
   })
 

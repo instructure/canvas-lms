@@ -404,6 +404,7 @@ class ApplicationController < ActionController::Base
     account_level_mastery_scales
     non_scoring_rubrics
     top_navigation_placement
+    rubric_criterion_range
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
