@@ -175,8 +175,10 @@ RSpec.describe Mutations::AddConversationMessage do
     result = run_mutation(conversation_id: @conversation.conversation_id, body: "This should be delayed", recipients: [@teacher.id.to_s])
 
     expect(result["errors"]).to be_nil
-    # a nil result with no errors implies that the message was delayed and will be processed later
-    expect(result.dig("data", "addConversationMessage", "conversationMessage")).to be_nil
+    # although the process being delayed, a preview of the conversation message should be send
+    expect(result.dig("data", "addConversationMessage", "conversationMessage")).to be_present
+    # the preview should not have a true id because the message is not processed yet
+    expect(result.dig("data", "addConversationMessage", "conversationMessage", "_id")).to eq "0"
     expect(@conversation.reload.messages.count(:all)).to eq 1
     run_jobs
     expect(@conversation.reload.messages.count(:all)).to eq 2
