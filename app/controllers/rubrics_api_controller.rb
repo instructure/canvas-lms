@@ -319,6 +319,9 @@ class RubricsApiController < ApplicationController
     render json: used_locations_for(rubric)
   end
 
+  # @API Creates a rubric using a CSV file
+  # Returns the rubric import object that was created
+  # @returns RubricImport
   def upload
     return unless authorized_action(@context, @current_user, :manage_rubrics)
 
@@ -336,6 +339,26 @@ class RubricsApiController < ApplicationController
     import_response = api_json(import, @current_user, session)
     import_response[:user] = user_json(import.user, @current_user, session) if import.user
     render json: import_response
+  end
+
+  # @API Get the status of a rubric import
+  # Can return the latest rubric import for an account or course, or a specific import by id
+  # @returns RubricImport
+  def upload_status
+    return unless authorized_action(@context, @current_user, :manage_rubrics)
+
+    begin
+      import = if params[:id] == "latest"
+                 RubricImport.find_latest_rubric_import(@context) or raise ActiveRecord::RecordNotFound
+               else
+                 RubricImport.find_specific_rubric_import(@context, params[:id]) or raise ActiveRecord::RecordNotFound
+               end
+      import_response = api_json(import, @current_user, session)
+      import_response[:user] = user_json(import.user, @current_user, session) if import.user
+      render json: import_response
+    rescue ActiveRecord::RecordNotFound => e
+      render json: { message: e.message }, status: :not_found
+    end
   end
 
   private
