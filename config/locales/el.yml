@@ -13694,6 +13694,7 @@ el:
     recent_activity: 
       date_column: Ημερομηνία
       message_column: Μήνυμα
+      new_announcement: Ανακοίνωση
       recent_activity: "Πρόσφατη Δραστηριότητα"
       recent_activity_in_course: "Πρόσφατη Δραστηριότητα στο μάθημα/στην ομάδα %{course_or_group}"
       unread_column: "Μη αναγνωσμένα"
