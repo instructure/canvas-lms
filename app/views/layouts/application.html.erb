@@ -326,7 +326,7 @@
       // Please use Strings, Numbers, or Bools for value types.
 
         let visitor = {
-            id:              '<%= @current_user.pseudonyms&.where.not(integration_id: nil).first&.integration_id || lti_opaque_hash_for_current_user %>',
+            id:              '<%= ((@current_user.pseudonyms&.where.not(integration_id: nil).first&.integration_id) if @current_user) || lti_opaque_hash_for_current_user %>',
             name:            '<%= @current_user.name if @current_user%>',
             email:           '<%= @current_user.email  if @current_user%>',
             school_name:     '<%= Account.find(1).name %>',
