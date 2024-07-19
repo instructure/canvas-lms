@@ -27,6 +27,10 @@ import {View} from '@instructure/ui-view'
 import {IconResize} from '../../../../assets/internal-icons'
 import {type ImageBlockProps} from './types'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/image-block')
+
 type IconSizePopupProps = {
   width: number
   height: number
@@ -101,7 +105,7 @@ const IconSizePopup = ({width, height}: IconSizePopupProps) => {
           size="small"
           withBackground={false}
           withBorder={false}
-          screenReaderLabel="Button Icon"
+          screenReaderLabel={I18n.t('Image Size')}
         >
           <IconResize size="x-small" />
         </IconButton>
@@ -110,7 +114,7 @@ const IconSizePopup = ({width, height}: IconSizePopupProps) => {
       onShowContent={handleShowContent}
       onHideContent={handleHideContent}
       on="click"
-      screenReaderLabel="Popover Dialog Example"
+      screenReaderLabel={I18n.t('Popover Dialog Example')}
       shouldContainFocus={true}
       shouldReturnFocus={true}
       shouldCloseOnDocumentClick={true}
@@ -122,7 +126,7 @@ const IconSizePopup = ({width, height}: IconSizePopupProps) => {
           layout="stacked"
         >
           <RangeInput
-            label="Width"
+            label={I18n.t('Width')}
             value={widthValue}
             width="15rem"
             min={1}
@@ -133,7 +137,7 @@ const IconSizePopup = ({width, height}: IconSizePopupProps) => {
             onChange={handleChangeWidth}
           />
           <RangeInput
-            label="height"
+            label={I18n.t('Height')}
             value={heightValue}
             width="15rem"
             min={1}
@@ -145,7 +149,7 @@ const IconSizePopup = ({width, height}: IconSizePopupProps) => {
           />
         </FormFieldGroup>
         <View as="div" textAlign="end" margin="x-small 0 0 0">
-          <Button onClick={setImageSize}>Set</Button>
+          <Button onClick={setImageSize}>{I18n.t('Set')}</Button>
         </View>
       </View>
     </Popover>
