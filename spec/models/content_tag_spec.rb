@@ -1344,6 +1344,12 @@ describe ContentTag do
 
             expect(subject).to contain_exactly(direct_tag, unpublished_direct)
           end
+
+          it "does not find items non-tool related items" do
+            direct_tag.update!(content_type: Assignment)
+
+            expect(subject).to be_empty
+          end
         end
 
         context "in account" do

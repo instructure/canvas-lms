@@ -1247,7 +1247,7 @@ class AbstractAssignment < ActiveRecord::Base
   # filtered by context during migrate_content_to_1_3
   # @see Lti::Migratable
   def self.directly_associated_items(tool_id)
-    Assignment.nondeleted.joins(:external_tool_tag).where(content_tags: { content_id: tool_id })
+    Assignment.nondeleted.joins(:external_tool_tag).where(content_tags: { content_type: ContextExternalTool, content_id: tool_id })
   end
 
   # filtered by context during migrate_content_to_1_3
