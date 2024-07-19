@@ -35,14 +35,35 @@ module Types
     def initialize(object, context)
       super
       @context_type = context[:context_type]
+      unless VALID_CONTEXTS.include?(@context_type)
+        raise GraphQL::ExecutionError, I18n.t("Invalid context type")
+      end
     end
 
     field :summary, [StreamSummaryItemType], null: true, description: "Returns a summary of the activity stream items for the current context"
     def summary
       @current_user = context[:current_user]
-      opts = resolve_context
-      # TODO: address this in LX-1855 to remove bulk load activity stream items
-      items = calculate_stream_summary(opts)
+      case @context_type
+      when "User"
+        only_active_courses = context[:only_active_courses] || false
+        opts = { only_active_courses: }
+        items = calculate_stream_summary(opts)
+        format_items(items)
+      when "Group"
+        opts = { contexts: object }
+        items = calculate_stream_summary(opts)
+        format_items(items)
+      else
+        # batch load course stream summaries
+        Loaders::ActivityStreamSummaryLoader.for(current_user:).load(object).then do |items|
+          format_items(items)
+        end
+      end
+    end
+
+    private
+
+    def format_items(items)
       items.map do |item|
         {
           type: item[:type],
@@ -50,24 +71,6 @@ module Types
           unread_count: item[:unread_count],
           notification_category: item[:notification_category]
         }
-      end
-    end
-
-    private
-
-    def resolve_context
-      unless VALID_CONTEXTS.include?(@context_type)
-        raise GraphQL::ExecutionError, I18n.t("Invalid context type")
-      end
-
-      case @context_type
-      when "User"
-        only_active_courses = context[:only_active_courses] || false
-        { only_active_courses: }
-
-      # Course or Group
-      else
-        { contexts: object }
       end
     end
   end
