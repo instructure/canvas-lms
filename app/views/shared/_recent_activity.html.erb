@@ -24,21 +24,29 @@
         <%= t :recent_activity_in_course, "Recent Activity in %{course_or_group}", :course_or_group => @context.nickname_for(@current_user, :short_name) %>
       <% end %>
     </h1>
-    <div class="actions_buttons-container">
-      <% if !@context.nil? && can_do(@context.announcements.temp_record, @current_user, :create) %>
-        <a href="<%= group_announcements_path(@context) %>#new" title="Add Announcement" id="add-announcement" class="Button button-sidebar-wide">
-          <i class="icon-plus" role="presentation"></i>
-          <%= t 'new_announcement', "Announcement" %>
-        </a>
-      <% end %>
-      <% if can_do(@context, @current_user, :update) %>
-        <a href="#" id="edit_group" title="Edit Group" class="Button Button--primary button-sidebar-wide">
-          <i class="icon-edit" role="presentation"></i>
-          <%= t 'edit_group',"Edit Group" %>
-        </a>
-        <div id="student-group-dialog-mount-point"></div>
-       <% end %>
-     </div>
+    <% if @context.is_a?(Group) %>
+      <div class="actions_buttons-container">
+        <% if can_do(@context.announcements.temp_record, @current_user, :create) %>
+          <a href="<%= group_announcements_path(@context) %>#new" title="Add Announcement" id="add-announcement" class="Button button-sidebar-wide hide-on-mobile">
+            <i class="icon-plus" role="presentation"></i>
+            <%= t 'new_announcement', "Announcement" %>
+          </a>
+        <% end %>
+        <% if can_do(@context, @current_user, :update) %>
+          <a href="#" id="edit_group" title="Edit Group" class="Button Button--primary button-sidebar-wide">
+            <i class="icon-edit" role="presentation"></i>
+            <%= t 'edit_group',"Edit Group" %>
+          </a>
+          <div id="student-group-dialog-mount-point"></div>
+         <% end %>
+         <% if can_do(@context.announcements.temp_record, @current_user, :create) %>
+           <a href="<%= group_announcements_path(@context) %>#new" title="Add Announcement" id="add-announcement" class="Button button-sidebar-wide show-only-on-mobile">
+             <i class="icon-plus" role="presentation"></i>
+             <%= t 'new_announcement', "Announcement" %>
+           </a>
+         <% end %>
+       </div>
+     <% end %>
   <% else %>
     <h2 class="recent-activity-header">
       <% if @context.nil? || @context.is_a?(User) %>
