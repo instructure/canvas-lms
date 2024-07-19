@@ -76,7 +76,7 @@ module SmartSearchable
     delete_embeddings(version: SmartSearch::EMBEDDING_VERSION)
     chunk_content(SmartSearch::CHUNK_MAX_LENGTH) do |chunk|
       embedding = SmartSearch.generate_embedding(chunk)
-      embeddings.create!(embedding:, version: SmartSearch::EMBEDDING_VERSION)
+      embeddings.create!(embedding: embedding.to_json, version: SmartSearch::EMBEDDING_VERSION)
     end
   end
   handle_asynchronously :generate_embeddings, priority: Delayed::LOW_PRIORITY

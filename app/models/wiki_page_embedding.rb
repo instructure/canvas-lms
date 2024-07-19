@@ -18,7 +18,6 @@
 
 class WikiPageEmbedding < ApplicationRecord
   belongs_to :wiki_page, inverse_of: :embeddings
-  has_neighbors :embedding # TODO: Implement has_neighbors on wikipage object instead (with through?)
 
   extend RootAccountResolver
   resolves_root_account through: :wiki_page
