@@ -18,10 +18,15 @@
 
 import React, {useCallback} from 'react'
 import {Flex} from '@instructure/ui-flex'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import {iconMap} from '../../../../assets/user-icons'
+
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/icon-block')
 
 type IconPickerProps = {
   iconName?: string
@@ -68,7 +73,7 @@ const IconPicker = ({iconName, onSelect}: IconPickerProps) => {
         onClick={() => handleSelectIcon('')}
         onKeyDown={(event: React.KeyboardEvent) => handleKey(event, '')}
       >
-        <Text size="small">No Icon</Text>
+        <Text size="small">{I18n.t('No Icon')}</Text>
       </div>
     )
   }
@@ -76,6 +81,7 @@ const IconPicker = ({iconName, onSelect}: IconPickerProps) => {
   return (
     <View as="div" margin="small" borderWidth="small" maxWidth="17rem">
       <Flex wrap="wrap" gap="small" justifyItems="space-between" margin="x-small">
+        <ScreenReaderContent>{I18n.t('Select an icon')}</ScreenReaderContent>
         {Object.keys(iconMap).map(icon => {
           const Icon = iconMap[icon]
           const isSelected = icon === iconName
