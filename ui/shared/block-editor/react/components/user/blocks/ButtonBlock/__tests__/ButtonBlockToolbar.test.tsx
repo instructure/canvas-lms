@@ -125,11 +125,11 @@ describe('ButtonBlockToolbar', () => {
     const btn = getByText('Select Icon').closest('button') as HTMLButtonElement
     await userEvent.click(btn)
 
-    const icon = screen.getByTitle('apple')
+    const icon = screen.getAllByTitle('apple')[0]
     expect(icon).toBeInTheDocument()
     expect(icon).toHaveStyle({borderColor: '--var(ic-brand-primary)'})
 
-    const otherIcon = screen.getByTitle('alarm')
+    const otherIcon = screen.getAllByTitle('alarm')[0]
     expect(otherIcon).toBeInTheDocument()
     expect(otherIcon).toHaveStyle({borderColor: 'transparent'})
   })
@@ -140,7 +140,7 @@ describe('ButtonBlockToolbar', () => {
     const btn = getByText('Select Icon').closest('button') as HTMLButtonElement
     await userEvent.click(btn)
 
-    const icon = screen.getByTitle('apple')
+    const icon = screen.getAllByTitle('apple')[0]
     expect(icon).toBeInTheDocument()
     await userEvent.click(icon)
     expect(props.iconName).toBe('apple')
