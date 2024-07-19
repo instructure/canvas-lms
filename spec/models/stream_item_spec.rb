@@ -233,4 +233,29 @@ describe StreamItem do
       end
     end
   end
+
+  it "gets stream items for multiple courses" do
+    user_factory
+    course1 = Course.create!
+    course2 = Course.create!
+
+    dt1 = DiscussionTopic.create!(context: course1)
+    dt2 = DiscussionTopic.create!(context: course2)
+
+    dt1.generate_stream_items([@user])
+    dt2.generate_stream_items([@user])
+
+    opts = { contexts: [course1, course2], current_user: @user }
+    stream_item_instances = @user.visible_stream_item_instances(opts)
+
+    expect(stream_item_instances.count).to eq 2
+
+    stream_items = stream_item_instances.map(&:stream_item)
+
+    expect(stream_items.map(&:asset_type)).to all(eq "DiscussionTopic")
+    expect(stream_items.map(&:asset_id)).to match_array([dt1.id, dt2.id])
+
+    context_ids = stream_item_instances.map(&:context_id)
+    expect(context_ids).to match_array([course1.id, course2.id])
+  end
 end
