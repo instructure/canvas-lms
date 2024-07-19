@@ -140,7 +140,7 @@ export const DiscussionThreadContainer = props => {
     }
   }
 
-  const {createDiscussionEntry} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
+  const {createDiscussionEntry, isSubmitting} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
 
   const [deleteDiscussionEntry] = useMutation(DELETE_DISCUSSION_ENTRY, {
     onCompleted: data => {
@@ -604,6 +604,7 @@ export const DiscussionThreadContainer = props => {
                       replyButtonRef?.current?.focus()
                     }, 0)
                   }}
+                  isSubmitting={isSubmitting}
                   quotedEntry={buildQuotedReply([props.discussionEntry], replyFromId)}
                   value={
                     !!ENV.rce_mentions_in_discussions && props.discussionEntry.depth > 2
