@@ -572,6 +572,65 @@ describe ContentMigration do
     end
   end
 
+  it "imports question bank media correctly" do
+    skip unless Qti.qti_enabled?
+
+    cm = @cm
+    cm.migration_type = "qti_converter"
+    cm.migration_settings["import_immediately"] = true
+    cm.save!
+
+    package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/media_quiz_qti.zip")
+    attachment = Attachment.new
+    attachment.context = cm
+    attachment.uploaded_data = File.open(package_path, "rb")
+    attachment.filename = "file.zip"
+    attachment.save!
+
+    cm.attachment = attachment
+    cm.save!
+
+    cm.queue_migration
+    run_jobs
+
+    expect(cm.migration_issues).to be_empty
+
+    expect(@course.quizzes.count).to eq 1
+    quiz = @course.quizzes.first
+    expect(quiz.quiz_questions.count).to eq 1
+    question = quiz.quiz_questions.first
+    image = @course.attachments.find_by(display_name: "pug.jpg")
+    expect(question.question_data[:question_text]).to eq %(<p>What is the difference between a duck?</p>
+              <p><img src="/courses/#{@course.id}/files/#{image.id}/preview" alt="pug.jpg" width="500" height="333"></p>)
+  end
+
+  it "imports rich content media correctly" do
+    cm = @cm
+    cm.migration_type = "canvas_cartridge_importer"
+    cm.migration_settings["import_immediately"] = true
+    cm.save!
+
+    package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/page-with-media.imscc")
+    attachment = Attachment.new
+    attachment.context = cm
+    attachment.uploaded_data = File.open(package_path, "rb")
+    attachment.filename = "file.zip"
+    attachment.save!
+
+    cm.attachment = attachment
+    cm.save!
+
+    cm.queue_migration
+    run_jobs
+
+    expect(cm.migration_issues).to be_empty
+
+    expect(@course.wiki_pages.count).to eq 1
+    page = @course.wiki_pages.first
+    image = @course.attachments.find_by(display_name: "pug.jpg")
+    expect(page.body).to eq %(<p><img src="/courses/#{@course.id}/files/#{image.id}/preview" alt="pug.jpg" width="72" height="72"></p>)
+  end
+
   it "does not overwrite deleted quizzes unless overwrite_quizzes is true" do
     skip unless Qti.qti_enabled?
 
