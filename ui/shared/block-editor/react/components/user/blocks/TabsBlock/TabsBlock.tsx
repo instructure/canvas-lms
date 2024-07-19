@@ -32,6 +32,10 @@ import {useClassNames} from '../../../../utils'
 import type {TabsBlockTab, TabsBlockProps} from './types'
 import {TabsBlockToolbar} from './TabsBlockToolbar'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/tabs-block')
+
 const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
   const {actions, enabled} = useEditor(state => ({
     enabled: state.options.enabled,
@@ -106,7 +110,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
     return enabled ? (
       <Flex gap="small">
         <ContentEditable
-          data-placeholder="Tab Title"
+          data-placeholder={I18n.t('Tab Title')}
           html={title}
           tagName="span"
           onChange={handleTabTitleChange}
@@ -117,7 +121,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
           <div style={{marginBlockStart: '-.5rem'}}>
             <IconButton
               themeOverride={{smallHeight: '.75rem'}}
-              screenReaderLabel="Delete Tab"
+              screenReaderLabel={I18n.t('Delete Tab')}
               size="small"
               withBackground={false}
               withBorder={false}
@@ -167,7 +171,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
 }
 
 TabsBlock.craft = {
-  displayName: 'Tabs',
+  displayName: I18n.t('Tabs'),
   defaultProps: {
     tabs: [
       {
