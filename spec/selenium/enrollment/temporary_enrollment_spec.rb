@@ -121,7 +121,6 @@ describe "temporary enrollment" do
       f("button[data-analytics='TempEnrollSubmit']").click
 
       # reopen modal to confirm change
-      load_people_page
       wait_for_ajax_requests
       is_recipient.click
       expect(f("body")).not_to contain_css("svg[role='img'] circle")

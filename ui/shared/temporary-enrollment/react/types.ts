@@ -140,13 +140,13 @@ export const EMPTY_USER: User = {
   sis_user_id: null,
 }
 
-export interface TempEnrollPermissions {
+export interface ModifyPermissions {
   canEdit: boolean
   canAdd: boolean
   canDelete: boolean
 }
 
-export interface Permissions {
+export interface RolePermissions {
   teacher: boolean
   ta: boolean
   student: boolean
@@ -162,4 +162,10 @@ export interface SelectedEnrollment {
 export interface TemporaryEnrollmentPairing {
   id: string
   ending_enrollment_state: string
+}
+
+export interface TemporaryEnrollmentStatus {
+  is_provider: boolean
+  is_recipient: boolean
+  can_provide: boolean
 }

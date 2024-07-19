@@ -45,7 +45,7 @@ import type {
   Enrollment,
   EnrollmentType,
   NodeStructure,
-  Permissions,
+  RolePermissions,
   Role,
   SelectedEnrollment,
   TemporaryEnrollmentPairing,
@@ -85,7 +85,7 @@ interface EnrollmentRole {
 export interface Props {
   enrollment: User | any
   user: User
-  permissions: Permissions
+  rolePermissions: RolePermissions
   roles: Role[]
   goBack: Function
   doSubmit: () => boolean
@@ -294,7 +294,7 @@ export function TempEnrollAssign(props: Props) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await doFetchApi({
+        const {json} = await doFetchApi<Course[]>({
           path: `/api/v1/users/${userProps.id}/courses`,
           params: {
             enrollment_state: 'active',
@@ -303,7 +303,7 @@ export function TempEnrollAssign(props: Props) {
             ...(ENV.ACCOUNT_ID !== ENV.ROOT_ACCOUNT_ID && {account_id: ENV.ACCOUNT_ID}),
           },
         })
-        setEnrollmentsByCourse(result.json)
+        setEnrollmentsByCourse(json)
       } catch (error: any) {
         showFlashError(
           I18n.t('There was an error while requesting user enrollments, please try again')
@@ -515,7 +515,7 @@ export function TempEnrollAssign(props: Props) {
     const permissionName = rolePermissionMapping[role.base_role_name as RoleName]
 
     if (permissionName) {
-      const hasPermission = props.permissions[permissionName]
+      const hasPermission = props.rolePermissions[permissionName]
 
       if (hasPermission) {
         roleOptions.push(

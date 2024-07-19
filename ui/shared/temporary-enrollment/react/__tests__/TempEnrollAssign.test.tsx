@@ -100,7 +100,7 @@ const props: Props = {
     name: 'John Smith',
     avatar_url: '',
   } as User,
-  permissions: truePermissions,
+  rolePermissions: truePermissions,
   roles: [
     {id: '91', name: 'StudentEnrollment', label: 'Student', base_role_name: 'StudentEnrollment'},
     {id: '92', name: 'TeacherEnrollment', label: 'Teacher', base_role_name: 'TeacherEnrollment'},
@@ -237,7 +237,9 @@ describe('TempEnrollAssign', () => {
     })
 
     it('hides roles the user does not have permission to enroll', async () => {
-      const {queryByText} = render(<TempEnrollAssign {...props} permissions={falsePermissions} />)
+      const {queryByText} = render(
+        <TempEnrollAssign {...props} rolePermissions={falsePermissions} />
+      )
       expect(queryByText('No roles available')).not.toBeInTheDocument()
     })
 

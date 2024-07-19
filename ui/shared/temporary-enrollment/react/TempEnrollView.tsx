@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Pill} from '@instructure/ui-pill'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -25,21 +25,17 @@ import {IconEditLine, IconPlusLine, IconTrashLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
-import type {
-  Bookmark,
-  Enrollment,
-  Links,
-  EnrollmentType,
-  TempEnrollPermissions,
-  User,
-} from './types'
-import {MODULE_NAME, PROVIDER} from './types'
-import {deleteEnrollment} from './api/enrollment'
+import type {Bookmark, Enrollment, EnrollmentType, User, ModifyPermissions} from './types'
+import {MODULE_NAME, PROVIDER, RECIPIENT} from './types'
+import {deleteEnrollment, fetchTemporaryEnrollments} from './api/enrollment'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {createAnalyticPropsGenerator} from './util/analytics'
 import {TempEnrollAvatar} from './TempEnrollAvatar'
 import {TempEnrollNavigation} from './TempEnrollNavigation'
+import {Alert} from '@instructure/ui-alerts'
+import {Spinner} from '@instructure/ui-spinner'
+import {captureException} from '@sentry/browser'
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -47,15 +43,12 @@ const I18n = useI18nScope('temporary_enrollment')
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
 interface Props {
-  enrollments: Enrollment[]
   user: User
   onEdit?: (enrollment: User, tempEnrollments: Enrollment[]) => void
-  onDelete?: (enrollmentIds: string[]) => void
   onAddNew?: () => void
   enrollmentType: EnrollmentType
-  tempEnrollPermissions: TempEnrollPermissions
-  updateBookmark: (bookmark: Bookmark) => void
-  links: Links
+  modifyPermissions: ModifyPermissions
+  disableModal: (isDisabled: boolean) => void
 }
 
 export function getRelevantUserFromEnrollment(enrollment: Enrollment) {
@@ -118,18 +111,81 @@ async function handleConfirmAndDeleteEnrollment(
   }
 }
 
-export function TempEnrollEdit(props: Props) {
+export function TempEnrollView(props: Props) {
   const formatDateTime = useDateTimeFormat('date.formats.short_with_time')
+  const [currentBookmark, setCurrentBookmark] = useState(0)
+  const [allBookmarks, setAllBookmarks] = useState<Bookmark[]>([])
+  const [enrollmentData, setEnrollmentData] = useState<Enrollment[]>([])
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
 
   // destructure and cache permission checks (for use in eager and lazy evaluations)
-  const {canEdit, canDelete, canAdd} = props.tempEnrollPermissions
+  const {canEdit, canDelete, canAdd} = props.modifyPermissions
 
   const canEditOrDelete = canEdit || canDelete
 
   const enrollmentTypeLabel =
     props.enrollmentType === PROVIDER ? I18n.t('Recipient') : I18n.t('Provider')
 
-  const enrollmentGroups = groupEnrollmentsByPairingId(props.enrollments)
+  const enrollmentGroups = groupEnrollmentsByPairingId(enrollmentData)
+
+  const fetchAndSetEnrollments = useCallback(
+    async (bookmark: Bookmark) => {
+      const isRecipient = props.enrollmentType === RECIPIENT
+      props.disableModal(true)
+      setLoading(true)
+      try {
+        const fetchedEnrollments = await fetchTemporaryEnrollments(
+          props.user.id,
+          isRecipient,
+          bookmark.page
+        )
+        setEnrollmentData(fetchedEnrollments.enrollments)
+        // clicked next
+        if (bookmark.rel === 'next') {
+          if (
+            allBookmarks.length - 1 <= currentBookmark + 1 &&
+            fetchedEnrollments.link?.next != null
+          ) {
+            setAllBookmarks([...allBookmarks, fetchedEnrollments.link?.next])
+          }
+          setCurrentBookmark(currentBookmark + 1)
+          // clicked previous
+        } else if (bookmark.rel === 'prev') {
+          const newIndex = currentBookmark - 1
+          setCurrentBookmark(newIndex)
+        }
+        // first request
+        else {
+          let updatedBookmarks = [
+            ...allBookmarks,
+            fetchedEnrollments.link?.current ?? {page: 'first'},
+          ]
+          if (fetchedEnrollments.link?.next != null) {
+            updatedBookmarks = [...updatedBookmarks, fetchedEnrollments.link?.next]
+          }
+          setAllBookmarks(updatedBookmarks)
+        }
+        props.disableModal(false)
+      } catch (error) {
+        setErrorMessage('An unexpected error occurred, please try again later.')
+        // eslint-disable-next-line no-console
+        console.error(`Failed to fetch enrollments for user ${props.user.id}:`, error)
+        captureException(error)
+      }
+      setLoading(false)
+    },
+    [allBookmarks, currentBookmark, props]
+  )
+
+  useEffect(() => {
+    fetchAndSetEnrollments({page: 'first'})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.user.id])
+
+  const handleBookmarkChange = async (bookmark: Bookmark) => {
+    await fetchAndSetEnrollments(bookmark)
+  }
 
   const handleEditClick = (enrollments: Enrollment[]) => {
     if (canEdit) {
@@ -140,9 +196,14 @@ export function TempEnrollEdit(props: Props) {
     }
   }
 
+  const handleEnrollmentDeletion = (enrollmentIds: string[]) => {
+    // remove/update multiple enrollments from internal state
+    setEnrollmentData(prevData => prevData.filter(item => !enrollmentIds.includes(item.id)))
+  }
+
   const handleDeleteClick = (enrollments: Enrollment[]) => {
     if (canDelete) {
-      handleConfirmAndDeleteEnrollment(enrollments, props.onDelete)
+      handleConfirmAndDeleteEnrollment(enrollments, handleEnrollmentDeletion)
     } else {
       // eslint-disable-next-line no-console
       console.error('User does not have permission to delete enrollment')
@@ -208,7 +269,7 @@ export function TempEnrollEdit(props: Props) {
 
   const renderRows = () => {
     const rows = []
-    for (const enrollment of props.enrollments) {
+    for (const enrollment of enrollmentData) {
       // iterate enrollments instead of enrollmentGroups to keep chronological order
       const pairingId = enrollment.temporary_enrollment_pairing_id
       const group = enrollmentGroups[pairingId]
@@ -231,6 +292,23 @@ export function TempEnrollEdit(props: Props) {
     }
     return rows
   }
+
+  if (errorMessage) {
+    return (
+      <Alert variant="error" margin="0">
+        {errorMessage}
+      </Alert>
+    )
+  }
+  if (loading) {
+    return (
+      <Flex justifyItems="center" alignItems="center">
+        <Spinner renderTitle={I18n.t('Loading')} />
+      </Flex>
+    )
+  }
+
+  const links = {prev: allBookmarks[currentBookmark - 1], next: allBookmarks[currentBookmark + 1]}
 
   return (
     <>
@@ -283,9 +361,9 @@ export function TempEnrollEdit(props: Props) {
         </Flex.Item>
       </Flex>
       <TempEnrollNavigation
-        prev={props.links.prev}
-        next={props.links.next}
-        onPageClick={props.updateBookmark}
+        prev={links.prev}
+        next={links.next}
+        onPageClick={handleBookmarkChange}
       />
     </>
   )
