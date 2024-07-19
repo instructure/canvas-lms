@@ -24,6 +24,10 @@ import {Menu} from '@instructure/ui-menu'
 import {uid} from '@instructure/uid'
 import {type TabsBlockProps, type TabsBlockTab} from './types'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/tabs-block')
+
 const TabsBlockToolbar = () => {
   const {
     actions: {setProp},
@@ -62,18 +66,27 @@ const TabsBlockToolbar = () => {
             <IconFolderLine size="x-small" />
           </IconButton>
         }
-        onSelect={handleSelectVariant}
       >
-        <Menu.Item type="checkbox" value="modern" selected={props.variant === 'modern'}>
-          Modern
+        <Menu.Item
+          type="checkbox"
+          value="modern"
+          onSelect={handleSelectVariant}
+          selected={props.variant === 'modern'}
+        >
+          {I18n.t('Modern')}
         </Menu.Item>
-        <Menu.Item type="checkbox" value="classic" selected={props.variant === 'classic'}>
-          Classic
+        <Menu.Item
+          type="checkbox"
+          value="classic"
+          onSelect={handleSelectVariant}
+          selected={props.variant === 'classic'}
+        >
+          {I18n.t('Classic')}
         </Menu.Item>
       </Menu>
 
       <IconButton
-        screenReaderLabel="Add Tab"
+        screenReaderLabel={I18n.t('Add Tab')}
         withBackground={false}
         withBorder={false}
         onClick={handleAddTab}
