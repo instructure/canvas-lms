@@ -18,7 +18,6 @@
 
 class DiscussionTopicEmbedding < ApplicationRecord
   belongs_to :discussion_topic, inverse_of: :embeddings
-  has_neighbors :embedding
 
   extend RootAccountResolver
   resolves_root_account through: :discussion_topic
