@@ -71,6 +71,14 @@
 
 .block {
   position: relative;
+  line-height: 1.2rem;
+  min-height: 1.2rem;
+  &.empty {
+    border: 1px dotted #ababab;
+  }
+  &.rce-text-block {
+    min-width: 50%;
+  }
 }
 
 .page-block {
@@ -185,9 +193,6 @@
   padding: .25rem;
   min-height: 2.5rem;
   min-width: 2.5rem;
-  &.empty {
-    border: 1px dotted #ababab;
-  }
 }
 
 .paragraph-block {

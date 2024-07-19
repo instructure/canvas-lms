@@ -17,6 +17,7 @@
  */
 
 export type RCEBlockProps = {
+  id?: string
   text?: string
   onContentChange?: (newContent: string) => void
 }

@@ -18,21 +18,26 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useEditor, useNode} from '@craftjs/core'
+import {uid} from '@instructure/uid'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {useClassNames} from '../../../../utils'
 import {type RCEBlockProps} from './types'
 
-export const RCEBlock = ({text, onContentChange}: RCEBlockProps) => {
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/rce-block')
+
+export const RCEBlock = ({id, text, onContentChange}: RCEBlockProps) => {
   const {actions, enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
   const {
     connectors: {connect, drag},
     actions: {setProp},
-    id,
+    nodeid,
     selected,
   } = useNode(state => ({
-    id: state.id,
+    nodeid: state.id,
     selected: state.events.selected,
   }))
   const clazz = useClassNames(enabled, {empty: !text}, ['block', 'rce-text-block'])
@@ -49,8 +54,8 @@ export const RCEBlock = ({text, onContentChange}: RCEBlockProps) => {
   }, [editable, focusableElem, selected, text])
 
   const handleRCEFocus = useCallback(() => {
-    actions.selectNode(id)
-  }, [actions, id])
+    actions.selectNode(nodeid)
+  }, [actions, nodeid])
 
   const handleChange = useCallback(
     (content: string) => {
@@ -66,11 +71,13 @@ export const RCEBlock = ({text, onContentChange}: RCEBlockProps) => {
     return (
       // eslint-disable-next-line jsx-a11y/interactive-supports-focus, jsx-a11y/click-events-have-key-events
       <div
+        id={id}
         ref={el => {
           if (el) {
             connect(drag(el))
           }
         }}
+        className={clazz}
         role="textbox"
         onClick={e => setEditable(true)}
       >
@@ -82,20 +89,28 @@ export const RCEBlock = ({text, onContentChange}: RCEBlockProps) => {
             focus: false,
           }}
           height={300}
-          textareaId="rceblock_text"
+          textareaId={`rceblock_text-${id}`}
           onFocus={handleRCEFocus}
           onContentChange={handleChange}
         />
       </div>
     )
   } else {
-    return <div className={clazz} dangerouslySetInnerHTML={{__html: text || ''}} />
+    return (
+      <div
+        id={id}
+        className={clazz}
+        data-placeholder={I18n.t('Click to enter rich text')}
+        dangerouslySetInnerHTML={{__html: text || ''}}
+      />
+    )
   }
 }
 
 RCEBlock.craft = {
-  displayName: 'Rich Text',
+  displayName: I18n.t('Rich Text'),
   defaultProps: {
+    id: uid('rce-block', 2),
     text: '',
   },
 }
