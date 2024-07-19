@@ -317,7 +317,7 @@ const DiscussionTopicManager = props => {
   }
 
   // Used when replying to the Topic directly
-  const {createDiscussionEntry} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
+  const {createDiscussionEntry, isSubmitting} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
 
   // why || waitForUnreadFilter: when waitForUnreadFilter, discussionTopicQuery is skipped, but this does not set loading.
   // why && !searchTerm: this is for the search if you type it triggers useQuery and you lose the search.
@@ -413,6 +413,7 @@ const DiscussionTopicManager = props => {
                       replyToEntrySubmission={replyToEntrySubmission}
                       isSummaryEnabled={ENV.user_can_summarize && isSummaryEnabled}
                       setIsSummaryEnabled={setIsSummaryEnabled}
+                      isSubmitting={isSubmitting}
                     />
 
                     {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes

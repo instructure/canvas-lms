@@ -63,7 +63,7 @@ export default function useCreateDiscussionEntry(onCompleteCallback, updateCache
   return {
     createDiscussionEntry,
     data,
-    loading,
+    isSubmitting: loading,
     error,
   }
 }

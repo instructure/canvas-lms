@@ -98,7 +98,7 @@ export const SplitScreenViewContainer = props => {
     }
   }
 
-  const {createDiscussionEntry} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
+  const {createDiscussionEntry, isSubmitting} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
 
   const [deleteDiscussionEntry] = useMutation(DELETE_DISCUSSION_ENTRY, {
     onCompleted: data => {
@@ -459,6 +459,7 @@ export const SplitScreenViewContainer = props => {
                 onSubmit={(message, quotedEntryId, file, anonymousAuthorState) => {
                   onReplySubmit(message, file, quotedEntryId, anonymousAuthorState)
                 }}
+                isSubmitting={isSubmitting}
                 onCancel={() => {
                   props.setRCEOpen(false)
                   setTimeout(() => {
