@@ -127,6 +127,7 @@ export type CamelizedSubmission = {
   url: null | string
   userId: string
   workflowState: WorkflowState
+  subAssignmentTag?: string
 }
 
 export type CamelizedGradingPeriod = {

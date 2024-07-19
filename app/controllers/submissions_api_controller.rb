@@ -926,7 +926,9 @@ class SubmissionsApiController < ApplicationController
           custom_status = @context.custom_grade_statuses.find(submission[:custom_grade_status_id])
         end
 
-        @submissions.each do |sub|
+        @submissions.each do |original_sub|
+          sub = effective_submission(original_sub, submission[:sub_assignment_tag])
+
           if custom_status
             sub.custom_grade_status = custom_status
           elsif submission.key?(:late_policy_status)
@@ -1039,6 +1041,19 @@ class SubmissionsApiController < ApplicationController
       end
       render json:
     end
+  end
+
+  def effective_submission(sub, sub_assignment_tag)
+    assignment = sub.assignment
+
+    return sub unless sub_assignment_tag.present?
+    return sub unless assignment.checkpoints_parent?
+
+    sub_assignment = assignment.find_checkpoint(sub_assignment_tag)
+
+    return sub if sub_assignment.nil?
+
+    sub_assignment.all_submissions.find_by(user: sub.user) || sub
   end
 
   # @API Grade or comment on a submission by anonymous id
