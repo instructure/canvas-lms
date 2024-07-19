@@ -156,4 +156,20 @@ class RubricImport < ApplicationRecord
     end
     error_data
   end
+
+  def self.find_latest_rubric_import(context)
+    if context.is_a?(Account)
+      RubricImport.where(account: context).last
+    else
+      RubricImport.where(course: context).last
+    end
+  end
+
+  def self.find_specific_rubric_import(context, id)
+    if context.is_a?(Account)
+      RubricImport.find_by(account: context, id:)
+    else
+      RubricImport.find_by(course: context, id:)
+    end
+  end
 end
