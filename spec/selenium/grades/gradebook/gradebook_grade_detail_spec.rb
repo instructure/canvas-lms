@@ -426,6 +426,33 @@ describe "Grade Detail Tray:" do
       expect(f("[data-testid='reply_to_topic-checkpoint-time-late-input']")).to be_displayed
     end
 
+    it "changes statuses as expected and persist it" do
+      Gradebook.visit(@course)
+      Gradebook::Cells.open_tray(@students[0], @checkpoint_assignment)
+
+      reply_to_topic_select = f("[data-testid='reply_to_topic-checkpoint-status-select']")
+
+      reply_to_topic_select.click
+      fj("span[role='option']:contains('Late')").click
+
+      reply_to_topic_assignment = @checkpoint_assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_topic")
+      reply_to_topic_submission = reply_to_topic_assignment.submissions.find_by(user: @students[0])
+
+      expect(reply_to_topic_submission.late_policy_status).to eq "late"
+
+      reply_to_topic_time_late_input = f("[data-testid='reply_to_topic-checkpoint-time-late-input']")
+      reply_to_topic_time_late_input.send_keys("5")
+      reply_to_topic_time_late_input.send_keys(:tab)
+
+      # 5 days * 24 hours * 60 minutes * 60 seconds = 432000
+      expect(reply_to_topic_submission.reload.seconds_late_override).to eq 432_000
+
+      reply_to_topic_select.click
+      fj("span[role='option']:contains('Excused')").click
+
+      expect(reply_to_topic_submission.reload.excused).to be_truthy
+    end
+
     context "sub submissions context" do
       it "displays late status with separate late times" do
         # Set late times for each checkpoint

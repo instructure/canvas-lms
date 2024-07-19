@@ -39,7 +39,9 @@ import SimilarityScore from './SimilarityScore'
 import SubmissionCommentListItem from './SubmissionCommentListItem'
 import SubmissionCommentCreateForm from './SubmissionCommentCreateForm'
 import SubmissionStatus from './SubmissionStatus'
-import SubmissionTrayRadioInputGroup from './SubmissionTrayRadioInputGroup'
+import SubmissionTrayRadioInputGroup, {
+  type PendingUpdateData,
+} from './SubmissionTrayRadioInputGroup'
 import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
 import {extractSimilarityInfo} from '@canvas/grading/SubmissionHelper'
 import type {
@@ -475,6 +477,21 @@ export default class SubmissionTray extends React.Component<
             : timeLate * 24 * 3600
 
         updateCheckpointStates(subAssignmentTag, 'secondsLate', secondsLate)
+      } else if (field === 'status') {
+        const data: PendingUpdateData = {subAssignmentTag}
+
+        if (value === EXCUSED) {
+          data.excuse = true
+        } else {
+          data.excuse = false
+          data.latePolicyStatus = value
+        }
+
+        this.props.updateSubmission(data)
+      } else if (field === 'secondsLate') {
+        const data: PendingUpdateData = {subAssignmentTag, secondsLateOverride: value}
+
+        this.props.updateSubmission(data)
       }
     }
 
