@@ -30,6 +30,10 @@ import {
 import {TextBlockToolbar} from './TextBlockToolbar'
 import {type TextBlockProps} from './types'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/text-block')
+
 export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProps) => {
   const {actions, enabled, query} = useEditor(state => ({
     enabled: state.options.enabled,
@@ -43,7 +47,7 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
     id: state.id,
     selected: state.events.selected,
   }))
-  const clazz = useClassNames(enabled, {empty: !text}, 'text-block')
+  const clazz = useClassNames(enabled, {empty: !text}, ['block', 'text-block'])
   const focusableElem = useRef<HTMLDivElement | null>(null)
 
   const [editable, setEditable] = useState(true)
@@ -59,10 +63,8 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
   const handleChange = useCallback(
     e => {
       let html = e.target.value
-      // TODO: this does not work as expected in firefox.
-      // maybe it's not such a good idea.
-      if (html.length === 1) {
-        html = `<p>${html}</p>`
+      if (html === '<p><br></p>' || html === '<div><br></div>') {
+        html = ''
       }
 
       setProp((prps: TextBlockProps) => {
@@ -105,7 +107,7 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
       >
         <ContentEditable
           innerRef={focusableElem}
-          data-placeholder="Type something"
+          data-placeholder={I18n.t('Type something')}
           className={clazz}
           disabled={!editable}
           html={text}
@@ -128,7 +130,7 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
 }
 
 TextBlock.craft = {
-  displayName: 'Text',
+  displayName: I18n.t('Text'),
   defaultProps: {
     fontSize: '12pt',
     textAlign: 'initial' as React.CSSProperties['textAlign'],
