@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {getVisibleTextContent} from '../installNodeDecorations'
+import {getVisibleTextContent, up} from '../installNodeDecorations'
 
 describe('getVisibleTextContent() utility', () => {
   it('returns text content for a simple element', () => {
@@ -43,5 +43,16 @@ describe('getVisibleTextContent() utility', () => {
     const screenReaderOnlyElement = div.querySelector('.screenreader-only') as HTMLElement
     screenReaderOnlyElement.style.display = 'none'
     expect(getVisibleTextContent(div)).toBe('Visible Text')
+  })
+})
+
+describe('up() installer', () => {
+  it('is idempotent and only defines the visibleTextContent property once', () => {
+    // Our initializers are automagically run by Jest, so assert the state we expect.
+    expect(typeof Object.getOwnPropertyDescriptor(Node.prototype, 'visibleTextContent')!.get).toBe(
+      'function'
+    )
+
+    expect(() => up()).not.toThrow()
   })
 })
