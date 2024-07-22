@@ -621,7 +621,8 @@ GEM
     hashery (2.1.2)
     hashie (5.0.0)
     headless (2.3.1)
-    highline (3.0.1)
+    highline (3.1.0)
+      reline
     httparty (0.22.0)
       csv
       mini_mime (>= 1.0.0)
