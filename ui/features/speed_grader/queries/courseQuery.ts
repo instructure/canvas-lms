@@ -18,65 +18,63 @@
 
 import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
+import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 import gql from 'graphql-tag'
 import {omit} from 'lodash'
 
 const QUERY = gql`
-  query GradebookQuery($courseId: ID!) {
+  query CourseData($courseId: ID!) {
     course(id: $courseId) {
-      enrollmentsConnection(
-        filter: {
-          states: [active, invited, completed]
-          types: [StudentEnrollment, StudentViewEnrollment]
-        }
-      ) {
-        nodes {
-          user {
-            id: _id
-            name
-            sortableName
-          }
-          courseSectionId
-          state
-        }
-      }
-      sectionsConnection {
+      customGradeStatusesConnection {
         nodes {
           id: _id
           name
-        }
-      }
-      assignmentGroupsConnection {
-        nodes {
-          id: _id
-          name
-          state
-          position
-          assignmentsConnection(filter: {gradingPeriodId: null}) {
-            nodes {
-              id: _id
-              name
-            }
-          }
         }
       }
     }
   }
 `
 
+const defaultStandardStatusesMap: Record<string, Pick<GradeStatus, 'id' | 'name'>> = {
+  late: {
+    id: '-1',
+    name: 'late',
+  },
+  missing: {
+    id: '-2',
+    name: 'missing',
+  },
+  resubmitted: {
+    id: '-3',
+    name: 'resubmitted',
+  },
+  dropped: {
+    id: '-4',
+    name: 'dropped',
+  },
+  excused: {
+    id: '-5',
+    name: 'excused',
+  },
+  extended: {
+    id: '-6',
+    name: 'extended',
+  },
+  none: {
+    id: '-7',
+    name: 'none',
+  },
+}
+
 function transform(result: any) {
+  const customGradeStatuses = result.course.customGradeStatusesConnection.nodes.map(
+    (status: any) => {
+      return omit(status, ['__typename'])
+    }
+  )
+
   return {
-    assignmentGroups: result.course.assignmentGroupsConnection.nodes.map((group: any) =>
-      omit(
-        {
-          ...group,
-          assignments: group.assignmentsConnection.nodes,
-        },
-        ['assignmentsConnection']
-      )
-    ),
-    enrollments: result.course.enrollmentsConnection.nodes,
-    sections: result.course.sectionsConnection.nodes,
+    gradeStatuses: [...Object.values(defaultStandardStatusesMap), ...customGradeStatuses],
   }
 }
 
