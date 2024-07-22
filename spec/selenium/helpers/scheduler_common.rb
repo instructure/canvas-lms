@@ -139,6 +139,9 @@ module SchedulerCommon
 
   def open_select_courses_modal(course_name)
     f("#FindAppointmentButton").click
+    # making the element into focus
+    # the INSTUI modal hijack the click event without selecting the value
+    f(".ic-Input").click
     click_option(".ic-Input", course_name)
     f('[role="dialog"][aria-label="Select Course"] button[type="submit"]').click
   end
