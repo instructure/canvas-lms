@@ -63,6 +63,8 @@ import ImportantDates from './ImportantDates'
 import ObserverOptions, {ObservedUsersListShape} from '@canvas/observer-picker'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
+import {useFetchDashboardCards} from '@canvas/dashboard-card/dashboardCardQueries'
+import {handleDashboardCardError} from '@canvas/dashboard-card/util/dashboardUtils'
 
 const componentOverrides = getK5ThemeOverrides()
 
@@ -240,13 +242,38 @@ const K5Dashboard = ({
   }
 
   useEffect(() => {
-    // don't call on the initial load when we know we're in observer mode but don't have the ID yet
-    if (!observerMode || (observerMode && observedUserId)) {
-      const dcl = new CardDashboardLoader()
-      dcl.loadCardDashboard(loadCardDashboardCallBack, observerMode ? observedUserId : undefined)
-      setCardDashboardLoader(dcl)
+    if (!ENV?.FEATURES?.dashboard_graphql_integration) {
+      // don't call on the initial load when we know we're in observer mode but don't have the ID yet
+      if (!observerMode || (observerMode && observedUserId)) {
+        const dcl = new CardDashboardLoader()
+        dcl.loadCardDashboard(loadCardDashboardCallBack, observerMode ? observedUserId : undefined)
+        setCardDashboardLoader(dcl)
+      }
     }
   }, [observedUserId, observerMode])
+
+  const {
+    data: dashCardData,
+    isSuccess: dashCardSuccess,
+    isError: isDashCardError,
+    error: dashCardError,
+  } = useFetchDashboardCards(
+    currentUser.id,
+    observedUserId,
+    !observerMode || (observerMode && observedUserId != null)
+  )
+
+  useEffect(() => {
+    if (dashCardSuccess && dashCardData) {
+      try {
+        loadCardDashboardCallBack(dashCardData, true)
+      } catch (err) {
+        handleDashboardCardError(err)
+      }
+    } else if (isDashCardError) {
+      handleDashboardCardError(dashCardError)
+    }
+  }, [dashCardSuccess, dashCardData, dashCardError, isDashCardError, observerMode, observedUserId])
 
   useFetchApi({
     path: '/api/v1/announcements',

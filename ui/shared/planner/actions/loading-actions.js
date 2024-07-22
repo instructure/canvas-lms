@@ -29,6 +29,9 @@ import {
 import {alert} from '../utilities/alertUtils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {itemsToDays} from '../utilities/daysUtils'
+import {processDashboardCards} from '@canvas/dashboard-card/util/dashboardUtils'
+import {queryClient} from '@canvas/query'
+import {fetchDashboardCardsAsync} from '@canvas/dashboard-card/dashboardCardQueries'
 
 const I18n = useI18nScope('planner')
 
@@ -182,6 +185,24 @@ export function getCourseList() {
     }
     const observeeId = observedUserId(getState())
     const observeeParam = observeeId ? `?observed_user_id=${observeeId}` : ''
+
+    if (ENV?.FEATURES?.dashboard_graphql_integration) {
+      const queryKey = ['dashboard_cards', {userID: ENV?.current_user_id}]
+      if (observeeId) queryKey[1].observedUserID = observeeId
+      const data = queryClient.getQueryData(queryKey)
+      // If data exists in query cache, return it
+      if (data) {
+        const processedData = processDashboardCards(data)
+        return Promise.resolve({data: processedData})
+      } else {
+        // If data doesn't exist in query cache, fetch it and set it in query cache
+        return fetchDashboardCardsAsync({queryKey}).then(fetchedData => {
+          queryClient.setQueryData(queryKey, fetchedData)
+          const processedData = processDashboardCards(fetchedData)
+          return {data: processedData}
+        })
+      }
+    }
     const url = `/api/v1/dashboard/dashboard_cards${observeeParam}`
     const request = asAxios(getPrefetchedXHR(url)) || axios.get(url)
     return request

@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import type {Card, ActivityStreamSummary} from './types'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 interface HasPosition {
   position: number | undefined
@@ -60,10 +62,25 @@ export function mapDashboardResponseToCard(data: any): Card[] {
           frontPageTitle: card.frontPageTitle,
           isK5Subject: card.isK5Subject,
           isHomeroom: card.isHomeroom,
+          canReadAnnouncements: card.canReadAnnouncements,
+          canManage: card.canManage,
+          longName: card.longName,
         }
       })
       .filter((card: any) => card !== null) || []
   )
+}
+
+// This is used as a selector in the useFetchDashboardCards hook
+export function processDashboardCards(data: any): Card[] {
+  const mapped = mapDashboardResponseToCard(data)
+  return mapped.sort(sortByPosition)
+}
+
+const dashboard_I18n = useI18nScope('load_card_dashboard')
+
+export const handleDashboardCardError = (e: Error) => {
+  showFlashAlert({message: dashboard_I18n.t('Failed loading course cards'), err: e, type: 'error'})
 }
 
 export function mapActivityStreamSummaries(data: any): ActivityStreamSummary[] {

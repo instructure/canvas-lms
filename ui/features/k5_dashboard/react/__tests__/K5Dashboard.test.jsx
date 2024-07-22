@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import moxios from 'moxios'
-import {act, render, screen, waitFor} from '@testing-library/react'
+import {act, render as testingLibraryRender, screen, waitFor} from '@testing-library/react'
 import {resetCardCache} from '@canvas/dashboard-card'
 import {resetPlanner} from '@canvas/planner'
 import fetchMock from 'fetch-mock'
@@ -32,10 +32,16 @@ import {
   MOCK_CARDS,
   MOCK_EVENTS,
   MOCK_ACCOUNT_CALENDAR_EVENT,
+  MOCK_QUERY_CARDS_RESPONSE,
 } from '@canvas/k5/react/__tests__/fixtures'
 
 import K5Dashboard from '../K5Dashboard'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+
+import {QueryProvider, queryClient} from '@canvas/query'
+import * as ReactQuery from '@tanstack/react-query'
+
+const render = children => testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
 
 const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
 const EVENTS_URL = /\/api\/v1\/calendar_events\?type=event&important_dates=true&.*/
@@ -478,6 +484,121 @@ describe('K-5 Dashboard', () => {
       ;['Morning Yoga', 'Football Game', 'CSU'].forEach(label =>
         expect(getByText(label)).toBeInTheDocument()
       )
+    })
+  })
+})
+
+// These are the tests that needed to be modified when
+// the dashboard_graphql_integration feature flag was turned on
+describe('K-5 Dashboard with dashboard_graphql_integration on', () => {
+  const queryKey = [
+    'dashboard_cards',
+    {userID: defaultEnv.current_user_id, observedUserID: undefined},
+  ]
+
+  beforeEach(() => {
+    global.ENV = {
+      ...defaultEnv,
+      FEATURES: {
+        ...defaultEnv?.FEATURES,
+        dashboard_graphql_integration: true,
+      },
+    }
+    queryClient.setQueryData(queryKey, MOCK_QUERY_CARDS_RESPONSE)
+  })
+  describe('Homeroom Section', () => {
+    it('shows the latest announcement for each subject course if one exists', async () => {
+      render(<K5Dashboard {...defaultProps} />)
+      await waitFor(() => {
+        const announcementLink = screen.getByText("This sure isn't a homeroom")
+        expect(announcementLink).toBeInTheDocument()
+        expect(announcementLink.closest('a')).toHaveAttribute('href', '/courses/1/announcements/21')
+      })
+    })
+    it('shows loading skeletons for course cards while they load', () => {
+      queryClient.clear()
+      // Hack to prevent the useQuery hook from returning data
+      jest
+        .spyOn(ReactQuery, 'useQuery')
+        .mockImplementation(jest.fn().mockReturnValue({isLoading: true}))
+      const {getAllByText} = render(<K5Dashboard {...defaultProps} />)
+      expect(getAllByText('Loading Card')[0]).toBeInTheDocument()
+    })
+    it('only fetches announcements based on cards once per page load', async () => {
+      render(<K5Dashboard {...defaultProps} />)
+      await waitFor(() => {
+        expect(fetchMock.calls(/\/api\/v1\/announcements.*latest_only=true.*/).length).toBe(1)
+      })
+    })
+
+    it('only fetches announcements and apps if there are any cards', async () => {
+      queryClient.setQueryData(queryKey, [])
+      await waitFor(() => {
+        expect(fetchMock.calls(/\/api\/v1\/announcements.*/).length).toBe(0)
+        expect(
+          fetchMock.calls(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/).length
+        ).toBe(0)
+      })
+    })
+  })
+  describe('Important Dates', () => {
+    it('filters important dates to those selected', async () => {
+      // set all cards to active
+      const updatedMockResponse = {
+        ...MOCK_QUERY_CARDS_RESPONSE,
+        legacyNode: {
+          ...MOCK_QUERY_CARDS_RESPONSE.legacyNode,
+          favoriteCoursesConnection: {
+            ...MOCK_QUERY_CARDS_RESPONSE.legacyNode.favoriteCoursesConnection,
+            nodes: MOCK_QUERY_CARDS_RESPONSE.legacyNode.favoriteCoursesConnection.nodes.map(
+              node => ({
+                ...node,
+                dashboardCard: {
+                  ...node.dashboardCard,
+                  enrollmentState: 'active',
+                },
+              })
+            ),
+          },
+        },
+      }
+      queryClient.setQueryData(queryKey, updatedMockResponse)
+      // Only return assignments associated with course_1 on next call
+      fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS.slice(0, 1), {overwriteRoutes: true})
+      const {getByLabelText, getByTestId, getByText, queryByText} = render(
+        <K5Dashboard
+          {...defaultProps}
+          selectedContextsLimit={1}
+          selectedContextCodes={['course_1']}
+        />
+      )
+      await waitFor(() => {
+        expect(getByText('Algebra 2')).toBeInTheDocument()
+        expect(queryByText('History Discussion')).not.toBeInTheDocument()
+        expect(queryByText('History Exam')).not.toBeInTheDocument()
+      })
+      expect(fetchMock.lastUrl(ASSIGNMENTS_URL)).toMatch('context_codes%5B%5D=course_1')
+      expect(fetchMock.lastUrl(ASSIGNMENTS_URL)).not.toMatch('context_codes%5B%5D=course_3')
+      // Only return assignments associated with course_3 on next call
+      fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS.slice(1, 3), {overwriteRoutes: true})
+      act(() => getByTestId('filter-important-dates-button').click())
+
+      const subjectCalendarEconomics = getByLabelText('Economics 101', {selector: 'input'})
+      expect(subjectCalendarEconomics).toBeChecked()
+
+      const subjectCalendarMaths = getByLabelText('The Maths', {selector: 'input'})
+      expect(subjectCalendarMaths).not.toBeChecked()
+
+      act(() => subjectCalendarEconomics.click())
+      act(() => subjectCalendarMaths.click())
+      act(() => getByText('Submit').click())
+      await waitFor(() => {
+        expect(queryByText('Algebra 2')).not.toBeInTheDocument()
+        expect(getByText('History Discussion')).toBeInTheDocument()
+        expect(getByText('History Exam')).toBeInTheDocument()
+      })
+      expect(fetchMock.lastUrl(ASSIGNMENTS_URL)).not.toMatch('context_codes%5B%5D=course_1')
+      expect(fetchMock.lastUrl(ASSIGNMENTS_URL)).toMatch('context_codes%5B%5D=course_3')
     })
   })
 })

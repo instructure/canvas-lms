@@ -22,6 +22,8 @@ import {moxiosWait, moxiosRespond} from '@canvas/jest-moxios-utils'
 import * as Actions from '../loading-actions'
 import {initialize as alertInitialize} from '../../utilities/alertUtils'
 import configureStore from '../../store/configureStore'
+import {queryClient} from '@canvas/query'
+import {MOCK_QUERY_CARDS_RESPONSE} from '@canvas/k5/react/__tests__/fixtures'
 
 jest.mock('../../utilities/apiUtils', () => ({
   ...jest.requireActual('../../utilities/apiUtils'),
@@ -618,5 +620,44 @@ describe('api actions', () => {
       expect(moxios.requests.at(2).url).not.toContain('observed_user_id')
       expect(moxios.requests.at(3).url).not.toContain('observed_user_id')
     })
+  })
+})
+
+jest.mock('@canvas/dashboard-card/dashboardCardQueries', () => ({
+  fetchDashboardCardsAsync: jest.fn(() => Promise.resolve(MOCK_QUERY_CARDS_RESPONSE)),
+}))
+
+describe('getCourseList with GraphQL integration', () => {
+  let mockDispatch
+  beforeEach(() => {
+    mockDispatch = jest.fn()
+    global.ENV = {
+      FEATURES: {dashboard_graphql_integration: true},
+      current_user_id: '1',
+    }
+  })
+
+  const assertCorrectCourseData = data => {
+    expect(data.length).toBe(3)
+    expect(data).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({id: '1', shortName: 'Economics 101'}),
+        expect.objectContaining({id: '2', shortName: 'Home Room'}),
+        expect.objectContaining({id: '3', shortName: 'The Maths'}),
+      ])
+    )
+  }
+
+  it('returns dashboard cards from cache when available', async () => {
+    const queryKey = ['dashboard_cards', {userID: '1', observedUserID: undefined}]
+    queryClient.setQueryData(queryKey, MOCK_QUERY_CARDS_RESPONSE)
+    const result = await Actions.getCourseList()(mockDispatch, getBasicState)
+    assertCorrectCourseData(result.data)
+  })
+
+  it('fetches dashboard cards via GraphQL when cache is empty', async () => {
+    queryClient.clear()
+    const result = await Actions.getCourseList()(mockDispatch, getBasicState)
+    assertCorrectCourseData(result.data)
   })
 })
