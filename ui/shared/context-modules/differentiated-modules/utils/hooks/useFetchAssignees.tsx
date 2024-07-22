@@ -35,7 +35,6 @@ interface Props {
   defaultValues: AssigneeOption[]
   customAllOptions?: AssigneeOption[]
   customIsLoading?: boolean
-  requiredOptions?: string[]
   customSetSearchTerm?: (term: string) => void
   onError?: () => void
 }
@@ -101,7 +100,6 @@ const useFetchAssignees = ({
   checkMasteryPaths = false,
   customAllOptions,
   customIsLoading,
-  requiredOptions,
   customSetSearchTerm,
   onError = () => {},
 }: Props) => {
@@ -130,16 +128,11 @@ const useFetchAssignees = ({
           path: `/api/v1/courses/${courseId}/sections`,
           params,
         })
-      const students =
-        requiredOptions?.filter(o => o.includes('student'))?.map(o => o.split('-')[1]) ?? []
       const fetchStudents =
         (!loaded || searchTerm !== '') &&
         doFetchApi({
           path: `/api/v1/courses/${courseId}/users`,
-          params:
-            students.length > 0 && searchTerm === ''
-              ? {...params, enrollment_type: 'student', user_ids: students.join(',')}
-              : {...params, enrollment_type: 'student'},
+          params: {...params, enrollment_type: 'student'},
         })
 
       const fetchCourseSettings =
