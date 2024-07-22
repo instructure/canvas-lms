@@ -454,6 +454,7 @@ describe ExternalToolsController, type: :request do
       ContextExternalTool.create!(
         context: account,
         consumer_key: "key",
+        developer_key: dev_key_model_1_3,
         shared_secret: "secret",
         name: "test tool",
         url: "http://www.tool.com/launch",
@@ -531,6 +532,28 @@ describe ExternalToolsController, type: :request do
                         {},
                         { expected_status: 400 })
         expect(json["message"]).to eq "Cannot have more than 2 favorited tools"
+      end
+
+      it "allows adding on_by_default tools even if there are already 2 favorited tools" do
+        tool2 = create_editor_tool(Account.default)
+        tool3 = create_editor_tool(Account.default)
+        Account.default.tap do |ra|
+          ra.settings[:rce_favorite_tool_ids] = { value: [tool2.global_id, tool3.global_id] }
+          ra.save!
+        end
+        Setting.set("rce_always_on_developer_key_ids", @root_tool.developer_key.global_id.to_s)
+
+        json = api_call(:post,
+                        "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
+                        { controller: "external_tools",
+                          action: "add_rce_favorite",
+                          format: "json",
+                          account_id: Account.default.id.to_s,
+                          id: @root_tool.id.to_s },
+                        {},
+                        {},
+                        { expected_status: 200 })
+        expect(json["rce_favorite_tool_ids"]).to include(@root_tool.id)
       end
 
       describe "handling deleted tools" do
