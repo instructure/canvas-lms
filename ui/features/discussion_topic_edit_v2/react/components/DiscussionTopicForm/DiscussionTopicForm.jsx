@@ -977,6 +977,7 @@ function DiscussionTopicForm({
                       value={todoDate}
                       invalidDateTimeMessage={I18n.t('Invalid date and time')}
                       layout="columns"
+                      allowNonStepInput={true}
                     />
                   </View>
                 )}

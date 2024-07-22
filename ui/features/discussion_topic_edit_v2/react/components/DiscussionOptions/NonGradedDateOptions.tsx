@@ -72,6 +72,7 @@ export const NonGradedDateOptions = ({
         datePlaceholder={I18n.t('Select Date')}
         invalidDateTimeMessage={I18n.t('Invalid date and time')}
         layout="columns"
+        allowNonStepInput={true}
       />
       <Button
         type="button"
@@ -106,6 +107,7 @@ export const NonGradedDateOptions = ({
         messages={availabilityValidationMessages}
         layout="columns"
         dateInputRef={setDateInputRef}
+        allowNonStepInput={true}
       />
       <Button
         type="button"
