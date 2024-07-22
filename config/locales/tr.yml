@@ -10033,6 +10033,7 @@ tr:
       event: "%{date} %{time}"
   handler_7912052f: İşleyici
   has_turnitin_score_3e1cacf6: "Turnitin puanı"
+  height_69b03e15: Yükseklik
   helpDialog: 
     Back: Geri
     Help: Yardım
@@ -10575,6 +10576,7 @@ tr:
     due: Bitiş
     lock_module_until: "Bu tarihe kadar kilitle"
   language_6b3e2c7c: Dil
+  large_9c5e80e7: Büyük
   last_activity_a983e541: "Son Etkinlik"
   last_enrollment_activity_10fe15ba: "Son Derse Kayıt Etkinliği"
   last_error_a3832668: "En Son Hata"
@@ -20015,6 +20017,7 @@ tr:
       upload_media_track_form_step2_label: "Adım 2:"
       upload_media_track_form_step3_label: "Adım 3:"
       upload_media_track_info: "*Yönergeler:* Videonuza altyazı dosyası oluşturmanız için şu üç adımı takip ediniz ve ardından buraya yükleyiniz. Eğer zaten SRT uzantılı bir altyazı dosyasına sahipseniz 3. adıma atlayabilirsiniz."
+  width_492fec76: Genişlik
   wiki: 
     default_course_wiki_name: "%{course_name} Wiki"
     default_group_wiki_name: "%{group_name} Wiki"
