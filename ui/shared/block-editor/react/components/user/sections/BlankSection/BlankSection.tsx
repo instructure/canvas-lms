@@ -23,6 +23,10 @@ import {Container} from '../../blocks/Container'
 import {SectionMenu} from '../../../editor/SectionMenu'
 import {useClassNames} from '../../../../utils'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/blank-section')
+
 export const BlankSection = () => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
@@ -43,7 +47,7 @@ export const BlankSection = () => {
 }
 
 BlankSection.craft = {
-  displayName: 'Blank Section',
+  displayName: I18n.t('Blank Section'),
   custom: {
     isSection: true,
   },
