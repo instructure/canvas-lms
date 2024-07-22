@@ -2143,6 +2143,16 @@ function moduleContentIsHidden(contentEl) {
 
 function updateSubAssignmentData(contextModuleItem, subAssignments) {
   subAssignments.forEach(subAssignment => {
+    const replyToTopicElement = contextModuleItem.find('.reply_to_topic_display')
+    if (!replyToTopicElement.length && !ENV.IS_STUDENT) {
+      // prepending reply to topic last so that it is listed first
+      contextModuleItem
+        .find('.ig-details')
+        .prepend('<div class="ig-details__item reply_to_entry_display"></div>')
+      contextModuleItem
+        .find('.ig-details')
+        .prepend('<div class="ig-details__item reply_to_topic_display"></div>')
+    }
     const title =
       subAssignment.sub_assignment_tag === 'reply_to_topic'
         ? I18n.t('Reply to Topic')
@@ -2161,7 +2171,6 @@ function updateSubAssignmentData(contextModuleItem, subAssignments) {
       } else {
         dueDate = I18n.t('No Due Date')
       }
-
       contextModuleItem
         .find(`.${subAssignment.sub_assignment_tag}_display`)
         .html(`<b>${title}:</b> ${dueDate}`)

@@ -792,13 +792,13 @@ describe "context modules" do
     context "with discussion_checkpoints enabled" do
       before :once do
         @course.root_account.enable_feature! :discussion_checkpoints
-        modules = create_modules(1, true)
+        @modules = create_modules(1, true)
 
         @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
-        modules[0].add_item({ id: @topic.id, type: "discussion_topic" })
       end
 
       it "shows checkpoint data in module item info section" do
+        @modules[0].add_item({ id: @topic.id, type: "discussion_topic" })
         c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @topic,
           checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
@@ -819,6 +819,7 @@ describe "context modules" do
       end
 
       it "does not show due dates when the enable_course_paces is set to true" do
+        @modules[0].add_item({ id: @topic.id, type: "discussion_topic" })
         @course.enable_course_paces = true
         @course.save!
 
@@ -843,6 +844,7 @@ describe "context modules" do
       end
 
       it "shows multiple due dates as a hoverable link within each checkpoint" do
+        @modules[0].add_item({ id: @topic.id, type: "discussion_topic" })
         student_in_course(active_all: true)
         sec1 = add_section("sec1")
         sec2 = add_section("sec2")
@@ -907,6 +909,27 @@ describe "context modules" do
 
         expect(f("body")).not_to contain_jqcss(".reply_to_topic_display a")
         expect(f(".ig-details").text).to eq "Reply to Topic: Multiple Due Dates\nRequired Replies (2): Multiple Due Dates\n10 pts"
+      end
+
+      it "shows due dates when newly added" do
+        c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 5.years.ago }],
+          points_possible: 5
+        )
+        c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 5.years.ago }],
+          points_possible: 5,
+          replies_required: 2
+        )
+
+        get "/courses/#{@course.id}/modules"
+        add_new_module_item_and_yield("#discussion_topics_select", "Discussion", @topic.title)
+        details = f("div.ig-details").text
+        expect(details).to eq "Reply to Topic: #{date_string(c1.due_at)}\nRequired Replies (#{@topic.reply_to_entry_required_count}): #{date_string(c2.due_at)}"
       end
     end
   end
