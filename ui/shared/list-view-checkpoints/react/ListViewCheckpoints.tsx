@@ -25,6 +25,7 @@ import type {Assignment, Checkpoint} from '../../../api.d'
 const I18n = useI18nScope('assignment')
 
 const REPLY_TO_TOPIC: string = 'reply_to_topic'
+const REPLY_TO_ENTRY: string = 'reply_to_entry'
 
 export type AssignmentCheckpoints = Pick<Assignment, 'id' | 'checkpoints' | 'discussion_topic'>
 
@@ -48,9 +49,18 @@ const createDateTimeFormatter = () => {
 const dateFormatter = createDateTimeFormatter()
 
 export const ListViewCheckpoints = ({assignment}: StudentViewCheckpointProps) => {
+  const sortCheckpoints = (a: Checkpoint, b: Checkpoint) => {
+    const order = {
+      [REPLY_TO_TOPIC]: 1,
+      [REPLY_TO_ENTRY]: 2,
+    }
+
+    return order[a.tag] - order[b.tag]
+  }
+
   return (
     <>
-      {assignment.checkpoints.map(checkpoint => (
+      {assignment.checkpoints.sort(sortCheckpoints).map(checkpoint => (
         <CheckpointItem
           checkpoint={checkpoint}
           assignment={assignment}
