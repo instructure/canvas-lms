@@ -13381,6 +13381,7 @@ nn:
   he_him_99aea1a8: Han
   heads_up_a_valid_salesforce_account_id_should_be_a_999cbf7d: "Obs! Ein gyldig Salesforce konto-ID er mellom 15 og 18 alfanumeriske teikn lang."
   hebrew_88fbf778: Hebraisk
+  height_69b03e15: Høgde
   hello_name_cabdd4ce: "Hei %{name}!"
   hello_name_your_outcomes_import_failed_due_to_an_e_385db5d3: |-
       Hei %{name},
@@ -14607,6 +14608,7 @@ nn:
   language_6b3e2c7c: Språk
   language_arts_35b79a8b: Språkvitskap
   languages_835813f0: Språk
+  large_9c5e80e7: Stort
   large_balsamiq_font_5fe45fae: "Skrifttype Stor Balsamiq"
   large_course_db3d58b: "Stort emne:"
   last_7_days_bd411f1f: "Siste 7 dagar"
@@ -15594,6 +15596,7 @@ nn:
   median_9b4a2bd8: "Median:"
   median_ed291842: Median
   median_score_4657e907: "Median: %{score}"
+  medium_5a8e9ead: Medium
   medium_dark_skin_tone_5134edbc: "Mellommørk hudfarge"
   medium_light_skin_tone_6c4a27fb: "Mellomlys hudfarge"
   medium_skin_tone_8608d74e: "Middels hudfarge"
@@ -24555,6 +24558,7 @@ nn:
       forward: Vidaresend
   slovak_69f48e1b: Slovakisk
   slovenian_30ae5208: Slovensk
+  small_b070434a: Liten
   smaller_numbers_mean_higher_priority_c69f4d0a: "Lavare tall betyr høg prioritet"
   smart_alerts_44db622e: Smart-varsel
   smart_assignment_alerts_abc2224: "Smart oppgåvevarsel"
@@ -28738,6 +28742,7 @@ nn:
       upload_media_track_form_step2_label: "Trinn 2:"
       upload_media_track_form_step3_label: "Trinn 3:"
       upload_media_track_info: "*Instruksjonar:* Følg desse tre trinna for å opprette ei undertittelfil for videoen, og last han opp her. Om du allereie har ei SRT-undertittelfil, kan du hoppe til trinn 3."
+  width_492fec76: Vidde
   wiki: 
     default_course_wiki_name: "%{course_name}-wiki"
     default_group_wiki_name: "%{group_name}-wiki"

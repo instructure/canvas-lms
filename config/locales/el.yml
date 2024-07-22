@@ -13693,6 +13693,7 @@ el:
       user_has_no_bio: "Ο χρήστης %{user} δεν έχει προσθέσει βιογραφικό"
     recent_activity: 
       date_column: Ημερομηνία
+      edit_group: "Επεξεργασία Ομάδας"
       message_column: Μήνυμα
       new_announcement: Ανακοίνωση
       recent_activity: "Πρόσφατη Δραστηριότητα"

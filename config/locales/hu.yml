@@ -12175,6 +12175,7 @@ hu:
   he_him_99aea1a8: Ő
   heads_up_a_valid_salesforce_account_id_should_be_a_999cbf7d: "Fel a fejjel! Az érvényes Salesforce-fiókazonosítónak 15–18 alfanumerikus karakterből álló sorozatnak kell lennie."
   hebrew_88fbf778: Héber
+  height_69b03e15: Magasság
   hello_name_cabdd4ce: "Hello%{name}!"
   hello_name_your_outcomes_import_failed_due_to_an_e_385db5d3: "Üdvözöljük %{name}! Az eredmények importálása meghiúsult az importálás során történt hiba miatt. Kérjük, vizsgálja meg a fájlt, és próbálja meg újra feltölteni itt: %{url} A következő hiba történt: %{row} A megfelelő importálási formátum megtekintéséhez tekintse át a Canvas API-dokumentumokat a következő címen: %{doc_url} Köszönjük, Instructure"
   hello_name_your_outcomes_were_successfully_importe_a510e0d: "Üdvözöljük %{name}! Eredményei sikeresen importálva. Mostantól a %{url} címen kezelheti őket. Köszönjük, Instructure"
@@ -13405,6 +13406,7 @@ hu:
   language_6b3e2c7c: Nyelv
   language_arts_35b79a8b: "Nyelvi művészet"
   languages_835813f0: Nyelvek
+  large_9c5e80e7: Nagy
   large_balsamiq_font_5fe45fae: "Nagy Balsamiq betűtípus"
   large_course_db3d58b: "Nagy Kurzus:"
   last_7_days_bd411f1f: "Utolsó 7 nap"
@@ -14366,6 +14368,7 @@ hu:
   median_ed291842: Medián
   median_median_high_high_low_low_f356c5f1: "Medián %{median}, Legnagyobb %{high}, Legkisebb %{low}"
   median_score_4657e907: "Medián: %{score}"
+  medium_5a8e9ead: Közepes
   medium_dark_skin_tone_5134edbc: "Közepes-sötét bőrszín"
   medium_light_skin_tone_6c4a27fb: "Közepes-fényes bőrtónus"
   medium_skin_tone_8608d74e: "Közepes bőrtónus"
@@ -22942,6 +22945,7 @@ hu:
   slack_notifications_3a0288e6: "Slack értesítések"
   slovak_69f48e1b: Szlovák
   slovenian_30ae5208: Szlovén
+  small_b070434a: Kicsi
   smaller_numbers_mean_higher_priority_c69f4d0a: "A kisebb számok magasabb prioritást jelentenek"
   smart_alerts_44db622e: "Intelligens figyelmeztetések"
   smart_assignment_alerts_abc2224: "Intelligens hozzárendelési riasztások"
@@ -26923,6 +26927,7 @@ hu:
       upload_media_track_form_step2_label: "2. lépés:"
       upload_media_track_form_step3_label: "3. lépés:"
       upload_media_track_info: "*Utasítások:* Kövesse az alábbi három lépést, hogy feliratfájlt készítsen a videójához, majd töltse fel itt. Ha már rendelkezik SRT felirat fájllal, ugorjon a 3. lépéshez."
+  width_492fec76: Szélesség
   wiki: 
     default_course_wiki_name: "%{course_name} Wiki"
     default_group_wiki_name: "%{group_name} Wiki"
