@@ -74,6 +74,7 @@ class ContextExternalTool < ActiveRecord::Base
   # should always be the last field change callback to run
   before_save :infer_defaults, :validate_vendor_help_link, :add_identity_hash
   after_save :touch_context, :check_global_navigation_cache, :clear_tool_domain_cache
+  after_commit :update_unified_tool_id, if: :update_unified_tool_id?
   validate :check_for_xml_error
 
   scope :disabled, -> { where(workflow_state: DISABLED_STATE) }
@@ -1682,5 +1683,37 @@ class ContextExternalTool < ActiveRecord::Base
     if saved_change_to_domain? || saved_change_to_url? || saved_change_to_workflow_state?
       context.clear_tool_domain_cache
     end
+  end
+
+  def update_unified_tool_id
+    return unless context.root_account.feature_enabled?(:update_unified_tool_id)
+
+    unified_tool_id = if use_1_3? && (utid = developer_key.tool_configuration.unified_tool_id)
+                        utid
+                      else
+                        LearnPlatform::GlobalApi.get_unified_tool_id(**params_for_unified_tool_id)
+                      end
+    update_column(:unified_tool_id, unified_tool_id) if unified_tool_id
+  end
+  handle_asynchronously :update_unified_tool_id, priority: Delayed::LOW_PRIORITY
+
+  def params_for_unified_tool_id
+    params = {
+      lti_name: name,
+      lti_tool_id: tool_id,
+      lti_domain: domain,
+      lti_version:,
+      lti_url: url,
+    }
+    params[:lti_redirect_url] = settings.dig(:custom_fields, :url) if tool_id == "redirect"
+    params
+  end
+  private :params_for_unified_tool_id
+
+  def update_unified_tool_id?
+    return false if workflow_state == "deleted"
+
+    fields_for_utid = %w[tool_id name domain url settings]
+    !!saved_changes.keys.intersect?(fields_for_utid)
   end
 end
