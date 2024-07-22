@@ -18,13 +18,16 @@
 
 import React, {useCallback, useState} from 'react'
 import {useNode} from '@craftjs/core'
-import {type FormMessage} from '@instructure/ui-form-field'
 import {IconButton} from '@instructure/ui-buttons'
-import {NumberInput} from '@instructure/ui-number-input'
+import {RangeInput} from '@instructure/ui-range-input'
 import {Popover} from '@instructure/ui-popover'
 import {IconTableInsertColumnAfterLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {type ColumnsSectionProps} from './types'
+
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/columnss-block')
 
 const MIN_COLS = 1
 const MAX_COLS = 4
@@ -36,13 +39,8 @@ type ColumnCountPopupProps = {
 const ColumnCountPopup = ({columns}: ColumnCountPopupProps) => {
   const {
     actions: {setProp},
-    props,
-  } = useNode(node => ({
-    props: node.data.props,
-  }))
-  const [userValue, setUserValue] = useState<string>(columns.toString())
+  } = useNode()
   const [cols, setCols] = useState<number>(columns)
-  const [messages, setMessages] = useState<FormMessage[]>([])
   const [isShowingContent, setIsShowingContent] = useState(false)
 
   const handleShowContent = useCallback(() => {
@@ -53,39 +51,14 @@ const ColumnCountPopup = ({columns}: ColumnCountPopupProps) => {
     setIsShowingContent(false)
   }, [])
 
-  const setColumns = useCallback(
-    (value: number) => {
-      setCols(value)
-      setUserValue(value.toString())
-      setProp((prps: ColumnsSectionProps) => (prps.columns = value))
-    },
-    [setProp]
-  )
-
   const handleChangeColumnns = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-      setUserValue(value)
-      const cols = parseInt(value, 10)
-      setCols(cols)
-      if (!Number.isNaN(cols) && cols >= MIN_COLS && cols <= MAX_COLS) {
-        setProp((prps: ColumnsSectionProps) => (prps.columns = cols))
-      } else {
-        setMessages([{text: `Columns must be between 1 and ${MAX_COLS}`, type: 'error'}])
-      }
+    (value: number | string) => {
+      const ncols = Number(value)
+      setCols(ncols)
+      setProp((prps: ColumnsSectionProps) => (prps.columns = ncols))
     },
     [setProp]
   )
-
-  const handleDecrementCols = useCallback(() => {
-    if (Number.isNaN(cols)) return
-    if (cols === null) setColumns(MIN_COLS)
-    if (cols > MIN_COLS) setColumns(cols - 1)
-  }, [cols, setColumns])
-
-  const handleIncrementCols = useCallback(() => {
-    if (Number.isNaN(cols)) return
-    if (cols < MAX_COLS) setColumns(cols + 1)
-  }, [cols, setColumns])
 
   return (
     <Popover
@@ -94,7 +67,7 @@ const ColumnCountPopup = ({columns}: ColumnCountPopupProps) => {
           size="small"
           withBackground={false}
           withBorder={false}
-          screenReaderLabel="Button Icon"
+          screenReaderLabel={I18n.t('Columns')}
         >
           <IconTableInsertColumnAfterLine size="x-small" />
         </IconButton>
@@ -103,21 +76,20 @@ const ColumnCountPopup = ({columns}: ColumnCountPopupProps) => {
       onShowContent={handleShowContent}
       onHideContent={handleHideContent}
       on="click"
-      screenReaderLabel="Popover Dialog Example"
+      screenReaderLabel={I18n.t('Set the number of columns')}
       shouldContainFocus={true}
       shouldReturnFocus={true}
       shouldCloseOnDocumentClick={true}
     >
       <View as="div" padding="x-small">
-        <NumberInput
-          renderLabel={`Columns (1-${MAX_COLS})`}
-          isRequired={true}
-          messages={messages}
-          value={userValue}
-          width="15rem"
+        <RangeInput
+          label={I18n.t('Columns 1-%{max}', {max: MAX_COLS})}
+          size="medium"
+          thumbVariant="accessible"
+          value={cols}
+          min={MIN_COLS}
+          max={MAX_COLS}
           onChange={handleChangeColumnns}
-          onIncrement={handleIncrementCols}
-          onDecrement={handleDecrementCols}
         />
       </View>
     </Popover>
