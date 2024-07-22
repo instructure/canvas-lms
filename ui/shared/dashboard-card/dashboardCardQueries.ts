@@ -22,6 +22,7 @@ import {
   DASHBOARD_ACTIVITY_STREAM_SUMMARY_QUERY,
 } from './graphql/Queries'
 import {queryClient, useQuery} from '@canvas/query'
+import {processDashboardCards} from './util/dashboardUtils'
 
 const DASHBOARD_CARD_QUERY_KEY = 'dashboard_cards'
 
@@ -29,11 +30,17 @@ export function clearDashboardCache() {
   queryClient.removeQueries({queryKey: [DASHBOARD_CARD_QUERY_KEY]})
 }
 
-export const useFetchDashboardCards = (userID: string | null, observedUserID: string | null) => {
+export const useFetchDashboardCards = (
+  userID: string | null,
+  observedUserID: string | null,
+  observerSettled?: boolean
+) => {
   return useQuery({
     queryKey: ['dashboard_cards', {userID, observedUserID}] as DashboardQueryKey,
     queryFn: fetchDashboardCardsAsync,
-    enabled: userID !== null && !!ENV?.FEATURES?.dashboard_graphql_integration,
+    enabled: userID !== null && !!ENV?.FEATURES?.dashboard_graphql_integration && observerSettled,
+    staleTime: 1000 * 60, // 1 minute
+    select: processDashboardCards,
   })
 }
 

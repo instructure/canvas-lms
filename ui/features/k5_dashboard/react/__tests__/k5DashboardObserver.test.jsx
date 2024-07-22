@@ -19,7 +19,7 @@
 import React from 'react'
 import {MOCK_OBSERVED_USERS_LIST} from '@canvas/observer-picker/react/__tests__/fixtures'
 import {OBSERVER_COOKIE_PREFIX, clearObservedId} from '@canvas/observer-picker/ObserverGetObservee'
-import {act, render, waitFor} from '@testing-library/react'
+import {act, render as testingLibraryRender, waitFor} from '@testing-library/react'
 import K5Dashboard from '../K5Dashboard'
 import moxios from 'moxios'
 import {
@@ -32,6 +32,7 @@ import {resetCardCache} from '@canvas/dashboard-card'
 import {MOCK_CARDS, MOCK_CARDS_2} from '@canvas/k5/react/__tests__/fixtures'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+import {QueryProvider} from '@canvas/query'
 
 injectGlobalAlertContainers()
 
@@ -40,6 +41,8 @@ jest.mock('@canvas/observer-picker/react/utils', () => ({
   ...jest.requireActual('@canvas/observer-picker/react/utils'),
   fetchShowK5Dashboard: jest.fn(),
 }))
+
+const render = children => testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
 
 const currentUserId = defaultProps.currentUser.id
 const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${currentUserId}`
