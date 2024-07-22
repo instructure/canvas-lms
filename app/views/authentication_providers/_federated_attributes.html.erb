@@ -42,6 +42,23 @@ TEXT
           <span class="screenreader-only"><%= t 'What does Provisioning Only mean?' %></span>
         </a>
       </th>
+      <th scope="col">
+        <%= t 'Autoconfirm' %>
+        <a
+          class="icon-info"
+          tabindex="0"
+          data-tooltip='{"tooltipClass":"popover popover-padded", "position":"right"}'
+          title= "<%= t <<~TEXT
+        If the email attribute is not set to autoconfirm, users will be sent an email to confirm
+        ownership of their email address. This should only be enabled if you are confident that
+        your authentication provider is providing email addresses that are both valid and not
+        user-provided (or that have already had their ownership confirmed).
+        TEXT
+        %>"
+          >
+          <span class="screenreader-only"><%= t 'What does Autoconfirm mean?' %></span>
+        </a>
+      </td>
       <td scope="col">&nbsp;</td>
     </thead>
     <tbody>
@@ -54,6 +71,14 @@ TEXT
           <td class="provisioning_only_column<%= ' federated_attributes_none' unless aac.jit_provisioning? %>">
             <label class="ic-Label screenreader-only" for="aacfa_<%= canvas_attribute %>_provisioning_only_<%= presenter.id_suffix(aac) %>"><%= t 'Provisioning Only' %></label>
             <input type="checkbox" id="aacfa_<%= canvas_attribute %>_provisioning_only_<%= presenter.id_suffix(aac) %>" name="authentication_provider[federated_attributes][<%= canvas_attribute %>][provisioning_only]" <%= 'checked="checked"'.html_safe if provider_attribute['provisioning_only'] %>/>
+          </td>
+          <td class="autoconfirm_column">
+            <% if canvas_attribute == "email" %>
+              <label class="ic-Label screenreader-only" for="aacfa_email_autoconfirm_<%= presenter.id_suffix(aac) %>"><%= t 'Autoconfirm' %></label>
+              <input type="checkbox" id="aacfa_email_autoconfirm_<%= presenter.id_suffix(aac) %>" name="authentication_provider[federated_attributes][email][autoconfirm]" <%= 'checked="checked"'.html_safe if provider_attribute['autoconfirm'] %>/>
+            <% else %>
+              &nbsp;
+            <% end %>
           </td>
           <td>
             <button type="button" class="Button Button--icon-action remove_federated_attribute"><i class="icon-trash"><span class="screenreader-only"><%= t 'Remove Attribute' %></span></i></button>
@@ -70,6 +95,10 @@ TEXT
         </td>
         <td class="provisioning_only_column<%= ' federated_attributes_none' unless aac.jit_provisioning? %>">
           <label class="ic-Label screenreader-only"><%= t 'Provisioning Only' %></label>
+          <input type="checkbox" />
+        </td>
+        <td class="autoconfirm_column">
+          <label class="ic-Label screenreader-only"><%= t 'Autoconfirm' %></label>
           <input type="checkbox" />
         </td>
         <td>
