@@ -120,7 +120,8 @@ export interface ItemAssignToTrayProps {
   onSave?: (
     overrides: ItemAssignToCardSpec[],
     hasModuleOverrides: boolean,
-    deletedModuleAssignees: String[]
+    deletedModuleAssignees: String[],
+    disabledOptionIds?: String[]
   ) => void
   onClose: () => void
   onDismiss: () => void
@@ -271,7 +272,12 @@ export default function ItemAssignToTray({
     )
 
     if (onSave !== undefined) {
-      onSave(assignToCards, hasModuleOverrides, deletedModuleAssignees)
+      onSave(
+        assignToCards,
+        hasModuleOverrides,
+        deletedModuleAssignees,
+        disabledOptionIdsRef.current
+      )
       return
     }
     const filteredCards = assignToCards.filter(
