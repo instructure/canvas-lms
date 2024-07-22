@@ -42,10 +42,15 @@ declare global {
 }
 
 export function up(): void {
-  Object.defineProperty(Node.prototype, 'visibleTextContent', {
-    get() {
-      return getVisibleTextContent(this)
-    },
-    enumerable: true,
-  })
+  if (
+    typeof Object.getOwnPropertyDescriptor(Node.prototype, 'visibleTextContent')?.get ===
+    'undefined'
+  ) {
+    Object.defineProperty(Node.prototype, 'visibleTextContent', {
+      get() {
+        return getVisibleTextContent(this)
+      },
+      enumerable: true,
+    })
+  }
 }
