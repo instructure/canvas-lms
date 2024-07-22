@@ -561,6 +561,7 @@ GEM
       rake
     ffi-icu (0.5.3)
       ffi (~> 1.0, >= 1.0.9)
+    fiber-storage (1.0.0)
     find_a_port (1.0.1)
     flakey_spec_catcher (0.12.1)
       rspec (~> 3.10)
@@ -607,8 +608,9 @@ GEM
       multi_json (~> 1.11)
       os (>= 0.9, < 2.0)
       signet (>= 0.16, < 2.a)
-    graphql (2.3.7)
+    graphql (2.3.16)
       base64
+      fiber-storage
     graphql-batch (0.6.0)
       graphql (>= 1.12.18, < 3)
       promise.rb (~> 0.7.2)
