@@ -98,6 +98,7 @@ export type ItemAssignToCardProps = {
   blueprintDateLocks?: DateLockTypes[]
   postToSIS?: boolean
   disabledOptionIdsRef?: React.MutableRefObject<string[]>
+  isOpenRef?: React.MutableRefObject<boolean>
 }
 
 export type ItemAssignToCardRef = {
@@ -131,6 +132,7 @@ export default forwardRef(function ItemAssignToCard(
     original_due_at,
     postToSIS,
     disabledOptionIdsRef,
+    isOpenRef,
   } = props
   const [
     requiredRepliesDueDate,
@@ -363,7 +365,7 @@ export default forwardRef(function ItemAssignToCard(
           size="medium"
           messages={showValidations ? error : []}
           disabledOptionIds={disabledOptionIdsRef.current}
-          disableFetch={!isOpen}
+          disableFetch={isOpenRef ? !isOpenRef.current : !isOpen}
           customAllOptions={customAllOptions}
           customIsLoading={customIsLoading}
           customSetSearchTerm={customSetSearchTerm}
