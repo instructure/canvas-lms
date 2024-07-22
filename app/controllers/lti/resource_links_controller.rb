@@ -19,13 +19,14 @@
 #
 
 # @API LTI Resource Links
-# @internal
 # @beta
 #
 # API that exposes LTI Resource Links for viewing and editing.
 # LTI Resource Links are artifacts created by the LTI 1.3 Deep Linking
 # process, where a user selects a content item that is returned to
 # Canvas for future launches.
+#
+# <b>Available in production on August 17, 2024</b>
 #
 # Resource Links can be associated with Assignments, Module Items,
 # Collaborations, and Rich Content embeddings.
