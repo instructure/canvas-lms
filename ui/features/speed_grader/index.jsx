@@ -83,6 +83,7 @@ ready(() => {
           postMessageAliases,
           context: {
             courseId: window.ENV.course_id,
+            userId: window.ENV.current_user_id,
             assignmentId: params.get('assignment_id'),
             studentId: params.get('student_id'),
             hrefs: {
