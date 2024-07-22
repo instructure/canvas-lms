@@ -1326,7 +1326,10 @@ class ExternalToolsController < ApplicationController
         valid_ids.map! { |id| Shard.global_id_for(id) }
         favorite_ids &= valid_ids # try to clear out any possibly deleted tool references first before causing a fuss
       end
-      if favorite_ids.length > 2
+      # On_by_default tools don't count towards the limit
+      client_ids = ContextExternalTool.find_external_tool_client_id(favorite_ids, @context)
+      on_by_default_ids = ContextExternalTool.on_by_default_ids
+      if (client_ids - on_by_default_ids).length > 2
         render json: { message: "Cannot have more than 2 favorited tools" }, status: :bad_request
       else
         @context.settings[:rce_favorite_tool_ids] = { value: favorite_ids }

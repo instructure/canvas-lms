@@ -375,15 +375,39 @@ describe('RceExternalToolHelper', () => {
       mruTools
     )
 
-    const alwaysOnTool = new RceToolWrapper(
+    const favoriteTool2 = new RceToolWrapper(
       externalToolsEnvFor(fakeEditor),
       {
         id: '2',
+        name: 'BBB tool',
+        description: 'this is tool 2',
+        favorite: true,
+        icon_url: '/path/to/cool_icon',
+      },
+      mruTools
+    )
+
+    const favoriteTool3 = new RceToolWrapper(
+      externalToolsEnvFor(fakeEditor),
+      {
+        id: '3',
+        name: 'BBB tool',
+        description: 'this is tool 3',
+        favorite: true,
+        icon_url: '/path/to/cool_icon',
+      },
+      mruTools
+    )
+
+    const onByDefaultTool = new RceToolWrapper(
+      externalToolsEnvFor(fakeEditor),
+      {
+        id: '4',
         name: 'AAA tool',
         description: 'this is tool 2',
         favorite: false,
         icon_url: '/path/to/cool_icon',
-        always_on: true,
+        on_by_default: true,
       },
       mruTools
     )
@@ -391,11 +415,11 @@ describe('RceExternalToolHelper', () => {
     const regularTool = new RceToolWrapper(
       externalToolsEnvFor(fakeEditor),
       {
-        id: '3',
+        id: '5',
         name: 'a great tool',
         description: 'tool 3',
         favorite: false,
-        always_on: false,
+        on_by_default: false,
         icon_url: '/path/to/cool_icon',
       },
       mruTools
@@ -404,11 +428,11 @@ describe('RceExternalToolHelper', () => {
     const favoriteAndOn = new RceToolWrapper(
       externalToolsEnvFor(fakeEditor),
       {
-        id: '4',
+        id: '6',
         name: 'a great tool',
         description: 'tool 4',
         favorite: true,
-        always_on: true,
+        on_by_default: true,
         icon_url: '/path/to/cool_icon',
       },
       mruTools
@@ -416,14 +440,14 @@ describe('RceExternalToolHelper', () => {
 
     beforeEach(() => {
       fakeEditor = createDeepMockProxy<ExternalToolsEditor>()
-      tools = [favoriteTool, alwaysOnTool, regularTool, favoriteAndOn]
+      tools = [favoriteTool, favoriteAndOn, onByDefaultTool, favoriteTool2, favoriteTool3, regularTool, favoriteTool]
     })
 
-    it('pulls out both favorite and always_on tools and deduplicates', () => {
+    it('pulls out both favorite and on_by_default tools and deduplicates', () => {
       const result = externalToolsForToolbar(tools)
 
       expect(result.map(e => e.id)).toStrictEqual(
-        [alwaysOnTool, favoriteAndOn, favoriteTool].map(e => e.id)
+        [favoriteAndOn, favoriteTool, favoriteTool2].map(e => e.id)
       )
     })
   })

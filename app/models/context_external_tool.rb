@@ -231,7 +231,7 @@ class ContextExternalTool < ActiveRecord::Base
     def editor_button_json(tools, context, user, session, default_tool_icon_base_url)
       tools.select! { |tool| visible?(tool.editor_button["visibility"], user, context, session) }
       markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new({ link_attributes: { target: "_blank" } }))
-      always_on_ids = Setting.get("rce_always_on_developer_key_ids", "").split(",").map(&:to_i)
+      on_by_default_ids = ContextExternalTool.on_by_default_ids
       tools.map do |tool|
         canvas_icon_class = tool.editor_button(:canvas_icon_class)
         icon_url = tool.editor_button(:icon_url)
@@ -251,7 +251,7 @@ class ContextExternalTool < ActiveRecord::Base
           width: tool.editor_button(:selection_width),
           height: tool.editor_button(:selection_height),
           use_tray: tool.editor_button(:use_tray) == "true",
-          always_on: always_on_ids.include?(tool.global_developer_key_id),
+          on_by_default: tool.on_by_default?(on_by_default_ids),
           description: if tool.description
                          Sanitize.clean(markdown.render(tool.description), CanvasSanitize::SANITIZE)
                        else
@@ -259,6 +259,10 @@ class ContextExternalTool < ActiveRecord::Base
                        end
         }
       end
+    end
+
+    def on_by_default_ids
+      Setting.get("rce_always_on_developer_key_ids", "").split(",").reject(&:empty?).map(&:to_i)
     end
 
     private
@@ -1087,6 +1091,10 @@ class ContextExternalTool < ActiveRecord::Base
     where(id:, context: contexts_to_search(context)).first
   end
 
+  def self.find_external_tool_client_id(id, context)
+    where(id:, context: contexts_to_search(context)).pluck(:developer_key_id).map { Shard.global_id_for _1 }
+  end
+
   # Order of precedence: Basic LTI defines precedence as first
   # checking for a match on domain.  Subdomains count as a match
   # on less-specific domains, but the most-specific domain will
@@ -1660,6 +1668,10 @@ class ContextExternalTool < ActiveRecord::Base
         # wildcard domains: allowed_domain "*.foo.com" -> domain.end_with? ".foo.com"
         allowed_domain.start_with?("*.") && domain.end_with?(allowed_domain[1..])
       end
+  end
+
+  def on_by_default?(on_by_default_ids)
+    on_by_default_ids.include?(global_developer_key_id)
   end
 
   private

@@ -33,27 +33,27 @@ export interface ExternalToolMenuItem {
 
 interface ExternalToolData {
   id: string;
-  always_on?: boolean | null;
+  on_by_default?: boolean | null;
   favorite?: boolean | null;
 }
 
 export function externalToolsForToolbar<T extends ExternalToolData>(tools: T[]): T[] {
-  const favorited = tools.filter(it => it.favorite).slice(0, 2) || []
-  // There's no limit to always on apps, but in practice there shouldn't be more than 2 as well.
-  const alwaysOn = tools.filter(it => it.always_on) || []
+  // Limit of not on_by_default but favorited tools is 2
+  const favorited = tools.filter(it => it.favorite && !it.on_by_default).slice(0, 2) || []
+  const onByDefault = tools.filter(it => it.on_by_default && it.favorite) || []
 
   const set = new Map<string, T>()
 
-  // Remove possible overlaps between favorited and alwaysOn, otherwise
+  // Remove possible overlaps between favorited and onByDefault, otherwise
   // we'd have duplicate buttons in the toolbar.
-  for (const toolInfo of favorited.concat(alwaysOn)) {
+  for (const toolInfo of favorited.concat(onByDefault)) {
     set.set(toolInfo.id, toolInfo)
   }
 
   return Array.from(set.values()).sort((a, b) => {
-    if (a.always_on && !b.always_on) {
+    if (a.on_by_default && !b.on_by_default) {
       return -1;
-    } else if (!a.always_on && b.always_on) {
+    } else if (!a.on_by_default && b.on_by_default) {
       return 1;
     } else {
       // This *should* always be a string, but there might be cases where it isn't,
@@ -124,8 +124,8 @@ export class RceToolWrapper {
     return this.toolInfo.use_tray
   }
 
-  get always_on() {
-    return this.toolInfo.always_on
+  get on_by_default() {
+    return this.toolInfo.on_by_default
   }
 
   asToolbarButton() {

@@ -308,7 +308,7 @@ export default class ExternalToolsTableRow extends React.Component {
                 value={tool.app_id}
                 onChange={this.handleFavoriteChange('rce')}
                 checked={tool.is_rce_favorite}
-                disabled={!tool.is_rce_favorite && this.props.rceFavoriteCount >= MAX_FAVS}
+                disabled={!tool.is_rce_favorite && this.props.rceFavoriteCount >= MAX_FAVS && !INST.editorButtons?.find(b => b.id === tool.app_id)?.on_by_default}
               />
             ) : (
               I18n.t('NA')

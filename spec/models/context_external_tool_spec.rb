@@ -3494,16 +3494,16 @@ describe ContextExternalTool do
       expect(json[0][:use_tray]).to be true
     end
 
-    it "includes a boolean false for always_on" do
+    it "includes a boolean false for on_by_default" do
       Setting.set("rce_always_on_developer_key_ids", "90000000000001,90000000000002")
       json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym, nil, "")
-      expect(json[0][:always_on]).to be false
+      expect(json[0][:on_by_default]).to be false
     end
 
-    it "includes a boolean true for always_on" do
+    it "includes a boolean true for on_by_default" do
       Setting.set("rce_always_on_developer_key_ids", "90000000000001,#{tool.developer_key.global_id}")
       json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym, nil, "")
-      expect(json[0][:always_on]).to be true
+      expect(json[0][:on_by_default]).to be true
     end
 
     describe "includes the description" do
