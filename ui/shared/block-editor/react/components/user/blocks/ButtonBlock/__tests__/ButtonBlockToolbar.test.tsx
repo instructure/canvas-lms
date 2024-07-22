@@ -35,7 +35,7 @@ jest.mock('@craftjs/core', () => {
     useNode: jest.fn(_node => {
       return {
         actions: {setProp: mockSetProp},
-        props: ButtonBlock.craft.defaultProps,
+        props,
       }
     }),
   }
@@ -125,13 +125,15 @@ describe('ButtonBlockToolbar', () => {
     const btn = getByText('Select Icon').closest('button') as HTMLButtonElement
     await userEvent.click(btn)
 
-    const icon = screen.getAllByTitle('apple')[0]
+    // the selected icon
+    const icon = screen.getByTitle('apple').closest('div[role="button"]') as HTMLElement
     expect(icon).toBeInTheDocument()
-    expect(icon).toHaveStyle({borderColor: '--var(ic-brand-primary)'})
+    expect(icon).toHaveAttribute('class', 'icon-picker__icon selected')
 
-    const otherIcon = screen.getAllByTitle('alarm')[0]
+    // not selected icon
+    const otherIcon = screen.getByTitle('alarm').closest('div[role="button"]') as HTMLElement
     expect(otherIcon).toBeInTheDocument()
-    expect(otherIcon).toHaveStyle({borderColor: 'transparent'})
+    expect(otherIcon).toHaveAttribute('class', 'icon-picker__icon')
   })
 
   it('chages the icon prop', async () => {

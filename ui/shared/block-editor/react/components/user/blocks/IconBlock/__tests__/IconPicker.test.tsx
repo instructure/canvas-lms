@@ -22,20 +22,30 @@ import {IconPicker} from '..'
 
 describe('IconPicker', () => {
   it('should render', () => {
-    const {getByText, getAllByTitle} = render(<IconPicker onSelect={() => {}} />)
+    const {getByText, getByTitle} = render(<IconPicker onSelect={() => {}} />)
 
     expect(getByText('Select an icon')).toBeInTheDocument()
     expect(getByText('No Icon')).toBeInTheDocument()
-    expect(getAllByTitle('idea')).toHaveLength(2) // the div and the svg
+    expect(getByTitle('idea')).toBeInTheDocument() // an arbitrary icon
   })
 
   it('should call onSelect with the selected icon', () => {
     const onSelect = jest.fn()
-    const {getAllByTitle} = render(<IconPicker onSelect={onSelect} />)
+    const {getByTitle} = render(<IconPicker onSelect={onSelect} />)
 
-    const icon = getAllByTitle('glasses')[0]
+    const icon = getByTitle('glasses').closest('div[role="button"]') as HTMLButtonElement
     icon.click()
 
     expect(onSelect).toHaveBeenCalledWith('glasses')
+  })
+
+  it('should select the given icon', () => {
+    const {getByTitle} = render(<IconPicker iconName="idea" onSelect={() => {}} />)
+
+    const some_icon = getByTitle('calendar').closest('div[role="button"]') as HTMLButtonElement
+    expect(some_icon).toHaveAttribute('class', 'icon-picker__icon')
+
+    const selected_icon = getByTitle('idea').closest('div[role="button"]') as HTMLButtonElement
+    expect(selected_icon).toHaveAttribute('class', 'icon-picker__icon selected')
   })
 })

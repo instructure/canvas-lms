@@ -144,6 +144,7 @@
 }
 
 .selected, .hovered {
+  border-radius: 4px;
   outline-offset: 1px;
   outline-width: 1px;
   outline-style: dashed;
@@ -485,6 +486,19 @@
 }
 .columns-section__inner.empty::before {
   content: "Drop a block to add it to this column";
+}
+
+.icon-picker__icon {
+  padding:2px;
+  display:inline-block;
+  cursor:pointer;
+  border-radius:4px;
+  &.selected {
+
+  }
+  &:focus {
+    border: 2px solid var(--ic-brand-primary);
+  }
 }
 
 @container block-editor-view (width <= 320px) {

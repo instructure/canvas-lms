@@ -89,7 +89,7 @@ describe('IconBlockToolbar', () => {
     const btn = getByText('Select Icon').closest('button') as HTMLButtonElement
     await userEvent.click(btn)
 
-    const atom_icon = screen.getAllByTitle('atom')[0]
+    const atom_icon = screen.getByTitle('atom')
     await userEvent.click(atom_icon)
 
     expect(mockSetProp).toHaveBeenCalled()

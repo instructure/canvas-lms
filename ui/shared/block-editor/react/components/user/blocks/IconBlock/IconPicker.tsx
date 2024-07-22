@@ -17,6 +17,7 @@
  */
 
 import React, {useCallback} from 'react'
+import classNames from 'classnames'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -49,26 +50,15 @@ const IconPicker = ({iconName, onSelect}: IconPickerProps) => {
     [handleSelectIcon]
   )
 
-  const selectedStyle = {borderColor: 'var(--ic-brand-primary)'}
-  const iconButtonStyle = {
-    padding: '2px',
-    display: 'inline-block',
-    cursor: 'pointer',
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: 'transparent',
-    borderRadius: '4px',
-  }
-
   const renderNoIcon = () => {
     const isSelected = !iconName
-    let style = {...iconButtonStyle}
-    if (isSelected) style = {...style, ...selectedStyle}
 
     return (
       <div
+        className={classNames('icon-picker__icon', {
+          selected: isSelected,
+        })}
         role="button"
-        style={style}
         tabIndex={0}
         onClick={() => handleSelectIcon('')}
         onKeyDown={(event: React.KeyboardEvent) => handleKey(event, '')}
@@ -85,17 +75,14 @@ const IconPicker = ({iconName, onSelect}: IconPickerProps) => {
         {Object.keys(iconMap).map(icon => {
           const Icon = iconMap[icon]
           const isSelected = icon === iconName
-          let style = {...iconButtonStyle}
-          if (isSelected) {
-            style = {...style, ...selectedStyle}
-          }
           return (
             <div
+              className={classNames('icon-picker__icon', {
+                selected: isSelected,
+              })}
               key={icon}
               role="button"
-              style={style}
               tabIndex={0}
-              title={icon}
               onClick={() => handleSelectIcon(icon)}
               onKeyDown={(event: React.KeyboardEvent) => handleKey(event, icon)}
             >

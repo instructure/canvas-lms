@@ -74,7 +74,7 @@ const IconBlockToolbar = () => {
           {I18n.t('Large')}
         </Menu.Item>
       </Menu>
-      <IconPopup />
+      <IconPopup iconName={props.iconName} />
     </Flex>
   )
 }
