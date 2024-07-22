@@ -97,7 +97,6 @@ const ItemAssignToCardMemo = memo(
       prevProps.everyoneOption?.value === nextProps.everyoneOption?.value &&
       prevProps.selectedAssigneeIds?.length === nextProps.selectedAssigneeIds?.length &&
       prevProps.highlightCard === nextProps.highlightCard &&
-      prevProps.isOpen === nextProps.isOpen &&
       prevProps.due_at === nextProps.due_at &&
       prevProps.original_due_at === nextProps.original_due_at &&
       prevProps.unlock_at === nextProps.unlock_at &&
@@ -160,6 +159,12 @@ const ItemAssignToTrayContent = ({
 
   const lastPerformedAction = useRef<{action: 'add' | 'delete'; index?: number} | null>(null)
   const addCardButtonRef = useRef<Element | null>(null)
+
+  const isOpenRef = useRef<boolean>(false)
+
+  useEffect(() => {
+    isOpenRef.current = open
+  }, [open])
 
   useEffect(() => {
     if (
@@ -651,6 +656,7 @@ const ItemAssignToTrayContent = ({
             onCardDatesChange={handleDatesChange}
             onValidityChange={handleCardValidityChange}
             isOpen={isOpen}
+            isOpenRef={isOpenRef}
             disabledOptionIds={disabledOptionIdsRef.current}
             everyoneOption={everyoneOption}
             selectedAssigneeIds={card.selectedAssigneeIds}

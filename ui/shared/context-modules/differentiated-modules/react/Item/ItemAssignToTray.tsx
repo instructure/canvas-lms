@@ -208,6 +208,16 @@ export default function ItemAssignToTray({
 
   const disabledOptionIdsRef = useRef(defaultDisabledOptionIds)
 
+  useEffect(() => {
+    // When tray closes and the initial load already happened,
+    // the next time it opens it will show the loading spinner
+    // because the cards rendering is a heavy process, letting
+    // the user knows the tray is loading instead of being frozen
+    if (!open && initialLoadRef.current) {
+      setIsLoading(true)
+    }
+  }, [open])
+
   const everyoneOption = useMemo(() => {
     const hasOverrides =
       (disabledOptionIdsRef.current.length === 1 &&
@@ -301,6 +311,14 @@ export default function ItemAssignToTray({
     return assignToCards.every(card => card.isValid)
   }, [assignToCards])
 
+  const handleEntered = useCallback(() => {
+    // When tray entered and the initial load already happened,
+    // this will start the cards render process
+    if (open && initialLoadRef.current) {
+      setIsLoading(false)
+    }
+  }, [open])
+
   const renderPointsPossible = () =>
     pointsPossible === 1 ? I18n.t('1 pt') : I18n.t('%{pointsPossible} pts', {pointsPossible})
 
@@ -370,6 +388,7 @@ export default function ItemAssignToTray({
       data-testid="module-item-edit-tray"
       onClose={onClose}
       onExited={onExited}
+      onEntered={handleEntered}
       label={I18n.t('Edit assignment %{name}', {
         name: itemName,
       })}
