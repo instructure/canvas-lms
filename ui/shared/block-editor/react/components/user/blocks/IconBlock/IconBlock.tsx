@@ -22,6 +22,10 @@ import {getIcon, IconAlarm} from '../../../../assets/user-icons'
 import {IconBlockToolbar} from './IconBlockToolbar'
 import {type IconBlockProps, type IconSize} from './types'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor/icon-block')
+
 const IconBlock = ({iconName, size}: IconBlockProps) => {
   const {
     connectors: {connect, drag},
@@ -38,7 +42,7 @@ const IconBlock = ({iconName, size}: IconBlockProps) => {
 }
 
 IconBlock.craft = {
-  displayName: 'Icon',
+  displayName: I18n.t('Icon'),
   defaultProps: {
     iconName: 'apple',
     size: 'small' as IconSize,
