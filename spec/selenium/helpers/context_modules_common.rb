@@ -284,20 +284,22 @@ module ContextModulesCommon
     click_add_tray_add_module_button
   end
 
-  def add_new_module_item_and_yield(item_select_selector, module_name, new_item_text, item_title_text)
+  def add_new_module_item_and_yield(item_select_selector, module_name, new_item_text, item_title_text = nil)
     f(".ig-header-admin .al-trigger").click
     f(".add_module_item_link").click
     select_module_item("#add_module_item_select", module_name)
     select_module_item(item_select_selector + " .module_item_select", new_item_text)
-    item_title = fj(".item_title:visible")
-    expect(item_title).to be_displayed
-    replace_content(item_title, item_title_text)
-    yield if block_given?
+    if item_title_text
+      item_title = fj(".item_title:visible")
+      expect(item_title).to be_displayed
+      replace_content(item_title, item_title_text)
+      yield if block_given?
+    end
     f(".add_item_button.ui-button").click
     wait_for_ajaximations
     tag = ContentTag.last
     module_item = f("#context_module_item_#{tag.id}")
-    expect(module_item).to include_text(item_title_text)
+    item_title_text ? expect(module_item).to(include_text(item_title_text)) : expect(module_item).to(include_text(new_item_text))
   end
 
   def add_new_external_item(module_item, url_text, page_name_text)
