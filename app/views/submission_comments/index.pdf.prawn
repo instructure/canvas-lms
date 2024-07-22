@@ -43,6 +43,15 @@ prawn_document(page_layout: :portrait, page_size:) do |pdf|
   end
   pdf.fallback_fonts(fallback_fonts)
 
+  # Add DejaVuSans font for Unicode support
+  pdf.font_families.update(
+    "DejaVuSans" => {
+      normal: "#{File.dirname(__FILE__)}/fonts/DejaVuSans.ttf"
+    }
+  )
+
+  pdf.fallback_fonts(fallback_fonts + ["DejaVuSans"])
+
   pdf.font_size 8
   pdf.text assignment_title, size: pdf.font_size * 2.375
   pdf.text course_name
