@@ -69,7 +69,8 @@ const AssignToOption = (props: Props) => {
   const handleSave = (
     assignToCards: ItemAssignToCardSpec[],
     hasModuleOverrides: boolean,
-    deletedModuleAssignees: string[]
+    deletedModuleAssignees: string[],
+    newDisabledOptionIds: string[]
   ) => {
     const hasChanges =
       assignToCards.some(({highlightCard}) => highlightCard) ||
@@ -87,6 +88,7 @@ const AssignToOption = (props: Props) => {
     )
     props.onSync(overrides)
     setCheckPoint(assignToCards)
+    setDisabledOptionIds(newDisabledOptionIds)
     handleClose()
   }
 
