@@ -29,6 +29,7 @@ import {getCourse} from './queries/courseQuery'
 import {getSectionsByAssignment} from './queries/sectionsByAssignmentQuery'
 import {getSubmission} from './queries/submissionQuery'
 import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
+import {getSubmissionsByStudentIds} from './queries/submissionsByStudentsIdsQuery'
 
 import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
@@ -65,11 +66,12 @@ ready(() => {
         module.render(mountPoint, {
           theme,
           queryFns: {
-            getCourse,
             getAssignment,
+            getCourse,
+            getSectionsByAssignment,
             getSubmission,
             getSubmissionsByAssignment,
-            getSectionsByAssignment,
+            getSubmissionsByStudentIds,
             resolvePostAssignmentGradesStatus,
           },
           mutationFns: {
