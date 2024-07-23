@@ -931,6 +931,39 @@ describe "context modules" do
         details = f("div.ig-details").text
         expect(details).to eq "Reply to Topic: #{date_string(c1.due_at)}\nRequired Replies (#{@topic.reply_to_entry_required_count}): #{date_string(c2.due_at)}"
       end
+
+      it "can duplicate modules with checkpointed discussions" do
+        @modules[0].add_item({ id: @topic.id, type: "discussion_topic" })
+
+        c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 5.years.ago }],
+          points_possible: 5
+        )
+        c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 5.years.ago }],
+          points_possible: 5,
+          replies_required: 2
+        )
+
+        get "/courses/#{@course.id}/modules"
+        f("button[aria-label='Manage #{@modules[0].name}']").click
+        fj("li:contains('Duplicate')").click
+        wait_for_ajaximations
+        duplicate_module = ContextModule.last
+        expect(duplicate_module.name).to eq "#{@modules[0].name} Copy"
+        duplicate_discussion = duplicate_module.content_tags.first.content
+        expect(duplicate_discussion).not_to eq @topic
+        expect(duplicate_discussion.reply_to_topic_checkpoint).not_to eq c1
+        expect(duplicate_discussion.reply_to_entry_checkpoint).not_to eq c2
+
+        # check that due dates are still equal to the original checkpoints' due dates
+        details = f("div.ig-details").text
+        expect(details).to eq "Reply to Topic: #{date_string(c1.due_at)}\nRequired Replies (#{@topic.reply_to_entry_required_count}): #{date_string(c2.due_at)}\n10 pts"
+      end
     end
   end
 end
