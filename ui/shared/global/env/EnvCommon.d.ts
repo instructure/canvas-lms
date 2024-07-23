@@ -222,6 +222,7 @@ export interface EnvCommon {
     classes?: string
   }>
   breadcrumbs: {name: string; url: string | null}[]
+  enhanced_rubrics_enabled?: boolean
 
   /**
    * Used by ui/features/top_navigation_tools/react/TopNavigationTools.tsx
@@ -242,7 +243,6 @@ export type SiteAdminFeatureId =
   | 'selective_release_ui_api'
   | 'selective_release_edit_page'
   | 'enhanced_course_creation_account_fetching'
-  | 'enhanced_rubrics'
   | 'explicit_latex_typesetting'
   | 'featured_help_links'
   | 'instui_for_import_page'

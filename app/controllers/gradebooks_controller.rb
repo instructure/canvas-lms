@@ -1057,6 +1057,8 @@ class GradebooksController < ApplicationController
 
     @can_reassign_submissions = @assignment.can_reassign?(@current_user)
 
+    enhanced_rubrics_enabled = @context.account.feature_enabled?(:enhanced_rubrics)
+
     respond_to do |format|
       format.html do
         grading_role_for_user = grading_role(assignment: @assignment)
@@ -1101,7 +1103,8 @@ class GradebooksController < ApplicationController
           media_comment_asset_string: @current_user.asset_string,
           late_policy: @context.late_policy&.as_json(include_root: false),
           assignment_missing_shortcut: Account.site_admin.feature_enabled?(:assignment_missing_shortcut),
-          rubric_outcome_data: @domain_root_account.feature_enabled?(:enhanced_rubrics) ? rubric&.outcome_data : []
+          enhanced_rubrics_enabled:,
+          rubric_outcome_data: enhanced_rubrics_enabled ? rubric&.outcome_data : []
         }
         if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")

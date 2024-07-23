@@ -28,7 +28,7 @@ describe "teacher shared rubric specs" do
 
   before do
     course_with_teacher_logged_in
-    @course.root_account.disable_feature!(:enhanced_rubrics)
+    @course.account.disable_feature!(:enhanced_rubrics)
   end
 
   it "deletes a rubric" do
@@ -59,7 +59,7 @@ describe "course rubrics" do
   context "as a teacher" do
     before do
       course_with_teacher_logged_in
-      @course.root_account.disable_feature!(:enhanced_rubrics)
+      @course.account.disable_feature!(:enhanced_rubrics)
     end
 
     it "ignores outcome rubric lines when calculating total" do

@@ -40,7 +40,7 @@ end
   # Collapse the course menu according to user preference, unless a certain action
   # requests that it default to collapsed for that page
   @collapse_course_menu ||= @current_user&.reload&.collapse_course_nav?
-  @enhanced_rubrics_enabled = !!@domain_root_account&.feature_enabled?(:enhanced_rubrics)
+  @enhanced_rubrics_enabled = Rubric.enhanced_rubrics_enabled_for_context?(@context)
 
   if @collapse_course_menu
     subnav_menu_text = t('Show Navigation Menu')

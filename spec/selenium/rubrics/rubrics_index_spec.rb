@@ -28,7 +28,7 @@ describe "Rubric index page" do
   before do
     course_with_teacher_logged_in
     @assignment = @course.assignments.create!(name: "Assignment 1", points_possible: 30)
-    @course.root_account.enable_feature!(:enhanced_rubrics)
+    @course.account.enable_feature!(:enhanced_rubrics)
     @rubric1 = @course.rubrics.create!(title: "Rubric 1", user: @user, context: @course, data: larger_rubric_data, points_possible: 12)
     @rubric2 = @course.rubrics.create!(title: "Rubric 2", user: @user, context: @course, data: largest_rubric_data, points_possible: 30)
     @rubric3 = @course.rubrics.create!(title: "Rubric 3", user: @user, context: @course, data: smallest_rubric_data, points_possible: 10)

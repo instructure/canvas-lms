@@ -93,7 +93,7 @@ export default function RubricTab(props) {
     freeFormCriterionComments: props.rubric?.free_form_criterion_comments,
   }
 
-  const enhancedRubricsEnabled = ENV.FEATURES.enhanced_rubrics
+  const enhancedRubricsEnabled = ENV.enhanced_rubrics_enabled
   const showEnhancedRubricPeerReview = props.peerReviewModeEnabled && enhancedRubricsEnabled
   const hidePoints = props.rubricAssociation?.hide_points
 
