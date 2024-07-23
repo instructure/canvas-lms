@@ -32,6 +32,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {ReplyPreview} from '../../components/ReplyPreview/ReplyPreview'
+import theme from '@instructure/canvas-theme'
 
 export const DiscussionEntryContainer = props => {
   const {searchTerm} = useContext(SearchContext)
@@ -187,6 +188,12 @@ export const DiscussionEntryContainer = props => {
               {props.children}
             </PostMessage>
           </Flex.Item>
+          {!props.isTopic &&
+              <hr data-testid="post-separator" style={{
+                height: theme.variables.borders.widthSmall,
+                color: theme.variables.colors.borderMedium,
+              }}/>
+            }
         </Flex>
       )}
     />
