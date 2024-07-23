@@ -182,6 +182,47 @@ export default class SubmissionTray extends React.Component<
     checkpointStates: DEFAULT_CHECKPOINT_STATES,
   }
 
+  componentDidMount() {
+    this.initializeCheckpointStates()
+  }
+
+  initializeCheckpointStates = () => {
+    const {submission, latePolicy} = this.props
+
+    if (submission.hasSubAssignmentSubmissions && submission.subAssignmentSubmissions.length > 0) {
+      const checkpointStates = submission.subAssignmentSubmissions.map(subSubmission => {
+        let status = NONE
+        let timeLate = '0'
+        const secondsLate = subSubmission.seconds_late || 0
+
+        if (subSubmission.late_policy_status === 'extended') {
+          status = EXTENDED
+        } else if (subSubmission.late) {
+          status = LATE
+          timeLate =
+            latePolicy.lateSubmissionInterval === 'hour'
+              ? (secondsLate / 3600).toString()
+              : (secondsLate / (24 * 3600)).toString()
+        } else if (subSubmission.missing) {
+          status = MISSING
+        } else if (subSubmission.excused) {
+          status = EXCUSED
+        }
+
+        return {
+          label: subSubmission.sub_assignment_tag,
+          status,
+          timeLate,
+          secondsLate,
+        }
+      })
+
+      this.setState({checkpointStates})
+    } else {
+      this.setState({checkpointStates: DEFAULT_CHECKPOINT_STATES})
+    }
+  }
+
   cancelCommenting = () => {
     this.props.editSubmissionComment(null)
   }
@@ -500,7 +541,7 @@ export default class SubmissionTray extends React.Component<
     )
 
     const resetCheckpointStates = () => {
-      this.setState({checkpointStates: DEFAULT_CHECKPOINT_STATES})
+      this.initializeCheckpointStates()
     }
 
     const onRequestClose = () => {

@@ -382,10 +382,10 @@ describe "Grade Detail Tray:" do
       create_checkpoint_assignment
 
       user_session(@teacher)
-      Gradebook.visit(@course)
     end
 
     it "can be graded on Traditional Gradebook using the SubmissionTray" do
+      Gradebook.visit(@course)
       Gradebook::Cells.open_tray(@students[0], @checkpoint_assignment)
 
       reply_to_topic_input = Gradebook::GradeDetailTray.grade_inputs[0]
@@ -411,6 +411,7 @@ describe "Grade Detail Tray:" do
     end
 
     it "shows status selector for each checkpoint and shows Days Late input when selecting Late" do
+      Gradebook.visit(@course)
       Gradebook::Cells.open_tray(@students[0], @checkpoint_assignment)
 
       reply_to_topic_select = f("[data-testid='reply_to_topic-checkpoint-status-select']")
@@ -423,6 +424,56 @@ describe "Grade Detail Tray:" do
       fj("span[role='option']:contains('Late')").click
 
       expect(f("[data-testid='reply_to_topic-checkpoint-time-late-input']")).to be_displayed
+    end
+
+    context "sub submissions context" do
+      it "displays late status with separate late times" do
+        # Set late times for each checkpoint
+        reply_to_topic = @checkpoint_assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_topic")
+        reply_to_entry = @checkpoint_assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_entry")
+
+        reply_to_topic.grade_student(@students[0], grade: 3, grader: @teacher)
+        reply_to_entry.grade_student(@students[0], grade: 9, grader: @teacher)
+
+        reply_to_topic.submissions.find_by(user: @students[0]).update!(late_policy_status: "late", seconds_late_override: 1.day)
+        reply_to_entry.submissions.find_by(user: @students[0]).update!(late_policy_status: "late", seconds_late_override: 2.days)
+
+        Gradebook.visit(@course)
+        Gradebook::Cells.open_tray(@students[0], @checkpoint_assignment)
+
+        expect(f("[data-testid='reply_to_topic-checkpoint-status-select']")).to have_attribute("value", "Late")
+        expect(f("[data-testid='reply_to_entry-checkpoint-status-select']")).to have_attribute("value", "Late")
+
+        expect(f("[data-testid='reply_to_topic-checkpoint-time-late-input']")).to have_value("1")
+        expect(f("[data-testid='reply_to_entry-checkpoint-time-late-input']")).to have_value("2")
+      end
+
+      it "displays missing and excused status" do
+        reply_to_topic = @checkpoint_assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_topic")
+        reply_to_entry = @checkpoint_assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_entry")
+
+        reply_to_topic.submissions.find_by(user: @students[0]).update!(late_policy_status: "missing")
+        reply_to_entry.submissions.find_by(user: @students[0]).update!(excused: true)
+
+        Gradebook.visit(@course)
+        Gradebook::Cells.open_tray(@students[0], @checkpoint_assignment)
+
+        expect(f("[data-testid='reply_to_topic-checkpoint-status-select']")).to have_attribute("value", "Missing")
+        expect(f("[data-testid='reply_to_entry-checkpoint-status-select']")).to have_attribute("value", "Excused")
+      end
+
+      it "displays extended and none statuses" do
+        reply_to_topic = @checkpoint_assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_topic")
+        @checkpoint_assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_entry")
+
+        reply_to_topic.submissions.find_by(user: @students[0]).update!(late_policy_status: "extended")
+        # 'None' status is the default, so we don't need to set it explicitly
+        Gradebook.visit(@course)
+        Gradebook::Cells.open_tray(@students[0], @checkpoint_assignment)
+
+        expect(f("[data-testid='reply_to_topic-checkpoint-status-select']")).to have_attribute("value", "Extended")
+        expect(f("[data-testid='reply_to_entry-checkpoint-status-select']")).to have_attribute("value", "None")
+      end
     end
   end
 end
