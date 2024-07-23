@@ -11417,8 +11417,9 @@ describe Assignment do
   describe "checkpointed assignments" do
     before do
       @course.root_account.enable_feature!(:discussion_checkpoints)
-      @parent = @course.assignments.create!(has_sub_assignments: true)
-      @child = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      @parent = @course.assignments.create!(has_sub_assignments: true, workflow_state: "published")
+      @first_checkpoint = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      @second_checkpoint = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
     end
 
     it "does not allow assignments to have parent assignments (only sub assignments can have parent assignments)" do
@@ -11429,16 +11430,30 @@ describe Assignment do
     end
 
     it "excludes soft-deleted child assignments from the sub_assignments association" do
-      expect { @child.destroy }.to change { @parent.sub_assignments.exists? }.from(true).to(false)
+      expect do
+        @first_checkpoint.destroy
+        @second_checkpoint.destroy
+      end.to change { @parent.sub_assignments.count }.from(2).to(0)
     end
 
     it "soft-deletes child assignments when the parent assignment is soft-deleted" do
-      expect { @parent.destroy }.to change { @child.reload.deleted? }.from(false).to(true)
+      expect { @parent.destroy }.to(
+        change { @first_checkpoint.reload.deleted? }.from(false).to(true)
+        .and(change { @second_checkpoint.reload.deleted? }.from(false).to(true))
+      )
     end
 
     it "has correct values for is_checkpoints_parent?" do
       expect(@parent.checkpoints_parent?).to be true
-      expect(@child.checkpoints_parent?).to be false
+      expect(@first_checkpoint.checkpoints_parent?).to be false
+    end
+
+    it "will update the sub_assignment workflow_state when parent updates" do
+      expect(@first_checkpoint.reload.workflow_state).to eq "published"
+      expect(@second_checkpoint.reload.workflow_state).to eq "published"
+      @parent.update!(workflow_state: "unpublished")
+      expect(@first_checkpoint.reload.workflow_state).to eq "unpublished"
+      expect(@second_checkpoint.reload.workflow_state).to eq "unpublished"
     end
   end
 
