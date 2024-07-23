@@ -718,8 +718,6 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       total_sub_assignments = SubAssignment.count
       @graded_topic.unpublish!
       @graded_topic.assignment.unpublish!
-      @checkpoint1.unpublish!
-      @checkpoint2.unpublish!
 
       expect(@graded_topic.published?).to be false
       expect(@graded_topic.assignment.published?).to be false
