@@ -110,7 +110,7 @@ The client can then make a follow-up request to the `sessionless_launch` endpoin
 
 **Action Summary**
 
-While these actions differ in a few ways, they each perform similar steps do launch the LTI tool. Each of the above actions to the following:
+While these actions differ in a few ways, they each perform similar steps to launch the LTI tool. Each of the above actions do the following:
 
 **I. Lookup the correct ContextExternalTool record**.
 
