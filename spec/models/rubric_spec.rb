@@ -359,7 +359,7 @@ describe Rubric do
 
   it "changes workflow state properly when archiving when enhanced_rubrics FF enabled" do
     course_with_teacher
-    @course.root_account.enable_feature!(:enhanced_rubrics)
+    @course.account.enable_feature!(:enhanced_rubrics)
     rubric = rubric_model({ context: @course })
     rubric.archive
     expect(rubric.workflow_state).to eq "archived"
@@ -367,7 +367,7 @@ describe Rubric do
 
   it "changes workflow state propertly when unarchiving when enhanced_rubrics FF enabled" do
     course_with_teacher
-    @course.root_account.enable_feature!(:enhanced_rubrics)
+    @course.account.enable_feature!(:enhanced_rubrics)
     rubric = rubric_model({ context: @course })
     rubric.archive
     expect(rubric.workflow_state).to eq "archived"
@@ -378,11 +378,11 @@ describe Rubric do
   it "does not change workflow state when archiving when enhanced_rubrics FF disabled" do
     # remove this test when FF is removed
     course_with_teacher
-    @course.root_account.disable_feature!(:enhanced_rubrics)
+    @course.account.disable_feature!(:enhanced_rubrics)
     rubric = rubric_model({ context: @course })
     rubric.archive
     expect(rubric.workflow_state).to eq "active"
-    @course.root_account.enable_feature!(:enhanced_rubrics)
+    @course.account.enable_feature!(:enhanced_rubrics)
   end
 
   it "is cool about duplicate titles" do

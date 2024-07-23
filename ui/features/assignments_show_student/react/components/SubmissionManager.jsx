@@ -285,7 +285,7 @@ const SubmissionManager = ({
   }, [submission.attempt])
 
   useEffect(() => {
-    if (isSavingRubricAssessment && ENV.FEATURES.enhanced_rubrics) {
+    if (isSavingRubricAssessment && ENV.enhanced_rubrics_enabled) {
       if (isRubricComplete(displayedAssessment)) {
         handleSubmitPeerReviewButton()
       } else {
@@ -471,7 +471,7 @@ const SubmissionManager = ({
       assignment.env.peerReviewAvailable &&
       hasRubrics &&
       !hasSubmittedAssessment() &&
-      !ENV.FEATURES.enhanced_rubrics
+      !ENV.enhanced_rubrics_enabled
     )
   }
 

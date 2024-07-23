@@ -57,7 +57,7 @@ const portalRouter = createBrowserRouter(
           />
         ))}
 
-      {window.ENV.FEATURES.enhanced_rubrics && RubricRoutes}
+      {window.ENV.enhanced_rubrics_enabled && RubricRoutes}
 
       {window.ENV.FEATURES.learner_passport && LearnerPassportLearnerRoutes}
       {window.ENV.FEATURES.learner_passport && LearnerPassportAdminRoutes}

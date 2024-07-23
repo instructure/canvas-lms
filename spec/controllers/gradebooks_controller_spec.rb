@@ -3311,7 +3311,7 @@ describe GradebooksController do
 
       describe "rubric_outcome_data" do
         before do
-          @course.root_account.enable_feature!(:enhanced_rubrics)
+          @course.account.enable_feature!(:enhanced_rubrics)
         end
 
         it "does not include rubric_outcome_data when the assignment does not have a rubric" do
@@ -3334,7 +3334,7 @@ describe GradebooksController do
         end
 
         it "does not include rubric_outcome_data when the enhanced_rubric feature is disabled" do
-          @course.root_account.disable_feature!(:enhanced_rubrics)
+          @course.account.disable_feature!(:enhanced_rubrics)
           rubric = Rubric.create!(context: @course, title: "testing")
           RubricAssociation.create!(context: @course, rubric:, purpose: :grading, association_object: @assignment)
 

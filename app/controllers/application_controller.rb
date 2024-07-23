@@ -400,7 +400,6 @@ class ApplicationController < ActionController::Base
     instui_nav
     enhanced_developer_keys_tables
     lti_registrations_discover_page
-    enhanced_rubrics
     account_level_mastery_scales
     non_scoring_rubrics
     top_navigation_placement

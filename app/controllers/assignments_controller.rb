@@ -153,7 +153,8 @@ class AssignmentsController < ApplicationController
              restrict_quantitative_data: @assignment.restrict_quantitative_data?(@current_user),
              grading_scheme: grading_standard.data,
              points_based: grading_standard.points_based?,
-             scaling_factor: grading_standard.scaling_factor
+             scaling_factor: grading_standard.scaling_factor,
+             enhanced_rubrics_enabled: Rubric.enhanced_rubrics_enabled_for_context?(@context),
            })
 
     if peer_review_mode_enabled
