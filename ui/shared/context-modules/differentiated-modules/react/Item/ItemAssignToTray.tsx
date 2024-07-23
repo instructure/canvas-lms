@@ -376,8 +376,10 @@ export default function ItemAssignToTray({
   }
 
   function Footer() {
+    const masqueradeBar = document.querySelector('body.is-masquerading-or-student-view')
+    const padding = masqueradeBar ? '0 0 x-large 0' : 'none'
     return (
-      <Flex.Item data-testid="module-item-edit-tray-footer" width="100%">
+      <Flex.Item data-testid="module-item-edit-tray-footer" width="100%" padding={padding}>
         <TrayFooter
           disableSave={isPacedCourse}
           saveButtonLabel={useApplyButton ? I18n.t('Apply') : I18n.t('Save')}
