@@ -12593,6 +12593,9 @@ hu:
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Ha egyik sincs kiválasztva, mutasd meg mindenkinek a teljes fiókban)"
   if_one_or_all_permissions_are_disabled_user_can_st_f83271b3: "Ha egy vagy az összes engedély le van tiltva, a felhasználó továbbra is megtekintheti és letöltheti a fájlokat zip fájlba."
   if_provided_this_name_will_be_used_in_preference_t_4079100a: "Ha megadja, akkor ez a név kerül előnyben a kurzus tényleges nevével szemben a vezérlőpulton  és az értesítésekben."
+  if_restrict_view_of_quantitative_data_is_enabled_t_29613e6f: |-
+      Ha a "Mennyiségi adatok megtekintésének korlátozása" opció engedélyezve van, akkor a kurzusnak
+                alapértelmezett osztályozási sémát kell engedélyeznie.
   if_set_allows_submission_status_to_be_changed_from_156f57f: "Ha be van állítva, lehetővé teszi a beküldés állapotának módosítását a Gyorsértékelő belsejéből"
   if_set_deprioritizes_using_due_dates_lock_dates_an_b7303ae9: |-
       Ha be van állítva, akkor az olyan szekciófelülírásokból származó esedékességi, zárolási és feloldási
