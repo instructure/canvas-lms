@@ -50,7 +50,7 @@ export const LtiScopes = {
   AccountExternalToolsShow: 'https://canvas.instructure.com/lti/account_external_tools/scope/show',
   AccountExternalToolsDestroy:
     'https://canvas.instructure.com/lti/account_external_tools/scope/destroy',
-  AccessPageContent: 'http://canvas.instructure.com/lti/page_content/show',
+  AccessPageContent: 'https://canvas.instructure.com/lti/page_content/show',
 } as const
 
 const AllLtiScopes = [
