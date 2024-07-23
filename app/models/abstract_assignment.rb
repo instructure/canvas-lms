@@ -128,8 +128,8 @@ class AbstractAssignment < ActiveRecord::Base
   has_many :enrollments_for_assigned_students, -> { active.not_fake.where("enrollments.course_id = submissions.course_id") }, through: :assigned_students, source: :enrollments
   has_many :sections_for_assigned_students, -> { active.distinct }, through: :enrollments_for_assigned_students, source: :course_section
 
-  belongs_to :duplicate_of, class_name: "Assignment", optional: true, inverse_of: :duplicates
-  has_many :duplicates, class_name: "Assignment", inverse_of: :duplicate_of, foreign_key: "duplicate_of_id"
+  belongs_to :duplicate_of, class_name: "AbstractAssignment", optional: true, inverse_of: :duplicates
+  has_many :duplicates, class_name: "AbstractAssignment", inverse_of: :duplicate_of, foreign_key: "duplicate_of_id"
 
   has_many :assignment_configuration_tool_lookups, dependent: :delete_all, inverse_of: :assignment, foreign_key: :assignment_id
   has_many :tool_settings_context_external_tools, through: :assignment_configuration_tool_lookups, source: :tool, source_type: "ContextExternalTool"
@@ -320,6 +320,7 @@ class AbstractAssignment < ActiveRecord::Base
     return self if new_record?
 
     default_opts = {
+      discussion_topic_for_checkpoints: nil,
       duplicate_wiki_page: true,
       duplicate_discussion_topic: true,
       duplicate_plagiarism_tool_association: true,
@@ -365,6 +366,21 @@ class AbstractAssignment < ActiveRecord::Base
                                                              copy_title: result.title,
                                                              user: opts_with_default[:user]
                                                            })
+    end
+
+    if checkpoints_parent? && opts_with_default[:discussion_topic_for_checkpoints]
+      result.discussion_topic = opts_with_default[:discussion_topic_for_checkpoints]
+
+      # we have to save result here because we have to set it as a parent_assignment
+      result.save!
+      sub_assignments.each do |sub_assignment|
+        new_sa = sub_assignment.duplicate({
+                                            duplicate_wiki_page: false,
+                                            duplicate_discussion_topic: false,
+                                          })
+        new_sa.parent_assignment = result
+        new_sa.save!
+      end
     end
 
     result.discussion_topic&.assignment = result

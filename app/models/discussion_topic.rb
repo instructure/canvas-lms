@@ -499,7 +499,8 @@ class DiscussionTopic < ActiveRecord::Base
                           sort_by_rating:,
                           todo_date:,
                           is_section_specific:,
-                          anonymous_state:
+                          anonymous_state:,
+                          reply_to_entry_required_count:
                         })
   end
 
@@ -530,7 +531,8 @@ class DiscussionTopic < ActiveRecord::Base
     if assignment && opts_with_default[:duplicate_assignment]
       result.assignment = assignment.duplicate({
                                                  duplicate_discussion_topic: false,
-                                                 copy_title: result.title
+                                                 copy_title: result.title,
+                                                 discussion_topic_for_checkpoints: result
                                                })
     end
 
