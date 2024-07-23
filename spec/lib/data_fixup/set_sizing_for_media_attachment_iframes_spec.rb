@@ -33,13 +33,13 @@ describe DataFixup::SetSizingForMediaAttachmentIframes do
     quiz_description = "<iframe style=\"width: px; height: px;\" src=\"/media_attachments_iframe/whatever\"></iframe>"
     question_text_1 = "<iframe style=\"width: px; height: px;\" src=\"/media_attachments_iframe/whatever\"></iframe>"
     question_text_2 = "<iframe style=\"width: px; height: px;\" src=\"/media_attachments_iframe/whatever\"></iframe>"
-    question_text_3 = "<iframe style=\"width: px; height: px;\" src=\"/media_attachments_iframe/whatever\"></iframe>"
+    question_text_3 = "<iframe style=\"width:px; height:px;\" src=\"/media_attachments_iframe/whatever\"></iframe>"
     answer_text_1 = "<iframe style=\"width: px; height: px;\" src=\"/media_attachments_iframe/whatever\"></iframe>"
     answer_text_2 = "<iframe style=\"width: px; height: px;\" src=\"/media_attachments_iframe/whatever\"></iframe>"
     answer_text_3 = "<iframe style=\"width: px; height: px;\" src=\"/media_attachments_iframe/whatever\"></iframe>"
     answer_text_4 = "<iframe style=\"width: px; height: px;\" src=\"/media_attachments_iframe/whatever\"></iframe>"
     answer_text_5 = "<iframe style=\"width: px; height: px;\" src=\"/media_attachments_iframe/whatever\"></iframe>"
-    answer_text_6 = "<iframe style=\"width: px; height: px;\" src=\"/media_attachments_iframe/whatever\"></iframe>"
+    answer_text_6 = "<iframe style=\"width:px; height:px;\" src=\"/media_attachments_iframe/whatever\"></iframe>"
     quiz_data = [
       {
         "question_text" => question_text_1,
