@@ -184,6 +184,13 @@ describe Lti::RegistrationsController do
           expect(response_data.last["name"]).to eq("created an hour ago")
         end
 
+        it "only queries for account bindings once" do
+          # With LRABs being preloaded, it should not call either of these "find" methods
+          expect(Lti::RegistrationAccountBinding).not_to receive(:find_in_site_admin)
+          expect(Lti::RegistrationAccountBinding).not_to receive(:find_by)
+          subject
+        end
+
         context "when sorting by installed_by" do
           subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=installed_by" }
 

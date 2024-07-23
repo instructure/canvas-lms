@@ -530,6 +530,8 @@ class Lti::RegistrationsController < ApplicationController
       # sort by the 'sort' parameter, or installed (a.k.a. created_at) if no parameter was given
       sort_field = params[:sort]&.to_sym || :installed
 
+      Lti::Registration.preload_account_bindings(all_registrations, @account)
+
       sorted_registrations = all_registrations.sort_by do |reg|
         case sort_field
         when :name
