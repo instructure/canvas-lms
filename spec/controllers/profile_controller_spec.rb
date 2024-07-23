@@ -207,6 +207,8 @@ describe ProfileController do
     end
 
     it "alert is set to failed when user profile validation fails" do
+      Account.default.settings[:enable_name_pronunciation] = true
+      Account.default.save!
       pronunciation = "a" * 1000
       put "update_profile",
           params: { user: { short_name: "Monsturd", name: "Jenkins" },

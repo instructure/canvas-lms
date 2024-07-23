@@ -2134,6 +2134,50 @@ describe "Users API", type: :request do
         expect(user.profile.reload.title).to eq another_title
       end
 
+      it "can update name pronunciation in user's profile if name pronunciation is enabled" do
+        Account.default.tap do |a|
+          a.settings[:enable_profiles] = true
+          a.settings[:enable_name_pronunciation] = true
+          a.save!
+        end
+
+        new_pronunciation = "Burni Nator"
+        json = api_call(:put, @path, @path_options, {
+                          user: { pronunciation: new_pronunciation }
+                        })
+        expect(json["pronunciation"]).to eq new_pronunciation
+        user = User.find(json["id"])
+        expect(user.profile.pronunciation).to eq new_pronunciation
+
+        another_pronunciation = "another pronunciation"
+        api_call(:put, @path, @path_options, {
+                   user: { pronunciation: another_pronunciation }
+                 })
+        expect(user.reload.profile.pronunciation).to eq another_pronunciation
+      end
+
+      it "will get an error when updating name pronunciation in user's profile if name pronunciation is disabled" do
+        Account.default.tap do |a|
+          a.settings[:enable_profiles] = true
+          a.settings[:enable_name_pronunciation] = false
+          a.save!
+        end
+
+        @student.profile.pronunciation = "My name pronunciation"
+        @student.profile.save!
+
+        original_pronunciation = @student.reload.profile.pronunciation
+        new_pronunciation = "Burni Nator"
+
+        raw_api_call(:put, @path, @path_options, { user: { pronunciation: new_pronunciation } })
+        json = JSON.parse(response.body)
+
+        expect(response).to have_http_status :unauthorized
+        expect(json["status"]).to eq "unauthorized"
+        expect(json["errors"][0]["message"]).to eq "user not authorized to perform that action"
+        expect(@student.reload.profile.pronunciation).to eq original_pronunciation
+      end
+
       it "is able to update a user's profile with email" do
         Account.default.tap do |a|
           a.settings[:enable_profiles] = true
