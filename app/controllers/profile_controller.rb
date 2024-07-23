@@ -51,6 +51,11 @@
 #         "bio": {
 #           "type": "string"
 #         },
+#         "pronunciation": {
+#           "description": "Name pronunciation",
+#           "example": "Sample name pronunciation",
+#           "type": "string"
+#         },
 #         "primary_email": {
 #           "description": "sample_user@example.com",
 #           "example": "sample_user@example.com",
@@ -464,6 +469,7 @@ class ProfileController < ApplicationController
     if params[:user_profile] && @user.user_can_edit_profile?
       user_profile_params = params[:user_profile].permit(:title, :pronunciation, :bio)
       user_profile_params.delete(:title) unless @user.user_can_edit_name?
+      user_profile_params.delete(:pronunciation) unless @domain_root_account.enable_name_pronunciation?
       @profile.attributes = user_profile_params
     end
 
