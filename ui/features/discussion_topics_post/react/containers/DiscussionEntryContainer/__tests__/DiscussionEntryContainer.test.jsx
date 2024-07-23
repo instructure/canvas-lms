@@ -169,5 +169,15 @@ describe('DiscussionEntryContainer', () => {
       const container = setup(defaultProps())
       expect(container.queryByText('288777.jpeg')).not.toBeInTheDocument()
     })
+
+    it('should render a line if it is not a topic', () => {
+      const container = setup(defaultProps({isTopic: false}))
+      expect(container.queryByTestId('post-separator')).toBeInTheDocument()
+    })
+
+    it('should not render a line if it is a topic', () => {
+      const container = setup(defaultProps())
+      expect(container.queryByTestId('post-separator')).not.toBeInTheDocument()
+    })
   })
 })
