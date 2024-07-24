@@ -72,6 +72,10 @@ module Api::V1::AssignmentGroup
         ActiveRecord::Associations.preload(assignments, :score_statistic)
       end
 
+      if includes.include?("checkpoints")
+        ActiveRecord::Associations.preload(assignments, :sub_assignments)
+      end
+
       hash["assignments"] = assignments.map do |assignment|
         overrides = if opts[:overrides].present?
                       opts[:overrides].select { |override| override.assignment_id == assignment.id }

@@ -1085,6 +1085,10 @@ class AssignmentsApiController < ApplicationController
         ActiveRecord::Associations.preload(assignments, rubric: { learning_outcome_alignments: :learning_outcome })
       end
 
+      if include_params.include?("checkpoints")
+        ActiveRecord::Associations.preload(assignments, :sub_assignments)
+      end
+
       mc_status = setup_master_course_restrictions(assignments, context)
 
       DatesOverridable.preload_override_data_for_objects(assignments)
