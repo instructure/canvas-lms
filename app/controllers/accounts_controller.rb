@@ -314,6 +314,7 @@ class AccountsController < ApplicationController
   include Api::V1::Account
   include CustomSidebarLinksHelper
   include DefaultDueTimeHelper
+  include Api::V1::QuizIpFilter
 
   INTEGER_REGEX = /\A[+-]?\d+\z/
   SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
@@ -922,6 +923,16 @@ class AccountsController < ApplicationController
                                precalculated_permissions: all_precalculated_permissions&.dig(c.global_id),
                                prefer_friendly_name: false)
                  }
+  end
+
+  def quiz_ip_filters
+    if authorized_action(@account, @current_user, :read)
+      available_filters = @account.available_ip_filters(params[:search_term]) || []
+
+      paginated_set = Api.paginate(available_filters, self, api_v1_quiz_ip_filters_url)
+      renderable = quiz_ip_filters_json(paginated_set, @context, @current_user, session)
+      render json: renderable
+    end
   end
 
   # Delegated to by the update action (when the request is an api_request?)
