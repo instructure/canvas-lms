@@ -45,7 +45,7 @@ function transform(result: any) {
 }
 
 export const ZGetSubmissionsByStudentIdsParams = z.object({
-  studentIds: z.array(z.string()),
+  studentIds: z.array(z.string().min(1)),
 })
 
 type GetSubmissionsByStudentIdsParams = z.infer<typeof ZGetSubmissionsByStudentIdsParams>

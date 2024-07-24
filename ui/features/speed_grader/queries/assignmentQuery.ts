@@ -107,7 +107,7 @@ function transform(result: any) {
 }
 
 export const ZGetAssignmentParams = z.object({
-  assignmentId: z.string(),
+  assignmentId: z.string().min(1),
 })
 
 type GetAssignmentParams = z.infer<typeof ZGetAssignmentParams>
