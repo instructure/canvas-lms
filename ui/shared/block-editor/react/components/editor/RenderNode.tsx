@@ -49,7 +49,6 @@ import {IconArrowUpLine, IconTrashLine, IconDragHandleLine} from '@instructure/u
 import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View, type ViewProps} from '@instructure/ui-view'
-import {ToolbarSeparator} from './ToolbarSeparator'
 
 import type {AddSectionPlacement, RenderNodeProps} from './types'
 import {SectionBrowser} from './SectionBrowser'
@@ -265,13 +264,13 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
         )}
         {node.related.toolbar && (
           <>
-            <ToolbarSeparator />
+            <div className="toolbar-separator" />
             {React.createElement(node.related.toolbar)}
           </>
         )}
         {deletable ? (
           <>
-            <ToolbarSeparator />
+            <div className="toolbar-separator" />
             <IconButton
               cursor="pointer"
               size="small"
