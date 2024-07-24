@@ -51,7 +51,7 @@ import {Text} from '@instructure/ui-text'
 import {View, type ViewProps} from '@instructure/ui-view'
 import {ToolbarSeparator} from './ToolbarSeparator'
 
-import type {AddSectionPlacement} from './types'
+import type {AddSectionPlacement, RenderNodeProps} from './types'
 import {SectionBrowser} from './SectionBrowser'
 
 const findUpNode = (node: Node, query: any): Node | undefined => {
@@ -69,10 +69,6 @@ const findContainingSection = (node: Node, query: any): Node | undefined => {
     upnode = findUpNode(upnode, query)
   }
   return upnode && upnode.data.custom?.isSection ? upnode : undefined
-}
-
-interface RenderNodeProps {
-  render: React.ReactElement
 }
 
 interface RenderNodeComponent extends React.FC<RenderNodeProps> {
