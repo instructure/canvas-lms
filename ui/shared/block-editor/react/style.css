@@ -107,6 +107,17 @@
   border-style: solid solid solid none;
 }
 
+.block-editor-editor .block-toolbar {
+  .toolbar-separator {
+    display: inline-block;
+    box-sizing: border-box;
+    border-inline-end: 1px solid #C7CDD1;
+    width: 1px;
+    height: 1.5rem;
+    background: #ababab;
+    margin-inline-end: 2px;
+  }
+}
 .block-editor-editor .block-toolbar, .block-editor-editor .block-tag {
   position: absolute;
   display: flex;
