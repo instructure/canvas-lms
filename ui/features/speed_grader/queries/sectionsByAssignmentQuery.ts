@@ -56,8 +56,8 @@ function transform(result: any) {
 }
 
 export const ZGetSectionsParams = z.object({
-  assignmentId: z.string(),
-  courseId: z.string(),
+  assignmentId: z.string().min(1),
+  courseId: z.string().min(1),
 })
 
 type GetSectionsParams = z.infer<typeof ZGetSectionsParams>

@@ -79,7 +79,7 @@ function transform(result: any) {
 }
 
 export const ZParams = z.object({
-  courseId: z.string(),
+  courseId: z.string().min(1),
 })
 
 type Params = z.infer<typeof ZParams>
