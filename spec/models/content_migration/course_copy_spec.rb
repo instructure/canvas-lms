@@ -954,7 +954,7 @@ describe ContentMigration do
 
         @copy_from.wiki_pages.create!(title: "page", body: <<~HTML.strip)
           undefined data-media-id: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="undefined" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_objects_iframe/m-index0?type=video&amp;embedded=true"></iframe>
-          no data-media-id: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_objects_iframe/m-index1?type=video&amp;embedded=true"></iframe>
+          no data-media-id: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_objects_iframe/m-index1?type=video&amp;embedded=true"></iframe>
         HTML
 
         run_course_copy
@@ -964,7 +964,7 @@ describe ContentMigration do
 
         translated_body = <<~HTML.strip
           undefined data-media-id: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video"></iframe>
-          no data-media-id: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file1.id}?embedded=true" data-media-id="m-index1"></iframe>
+          no data-media-id: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video" data-media-id="m-index1"></iframe>
         HTML
         expect(@copy_to.wiki_pages.take.body).to eq translated_body
       end
