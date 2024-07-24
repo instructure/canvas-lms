@@ -177,16 +177,16 @@
 </div>
 </div>
 <div id="communication_channels" style="display: none;">
-  <ul>
-    <li><a href="#register_email_address"><%= t("Email") %></a></li>
-    <% if mfa_settings != :disabled && otp_via_sms_in_us_region? %>
-      <li><a href="#register_sms_number"><%= t("Text (SMS)") %></a></li>
-    <% end %>
-    <% if @user.account.feature_enabled?(:slack_notifications)%>
-      <li><a href="#register_slack_handle"><%= t("Slack Email") %></a></li>
-    <% end %>
-  </ul>
-  <%= form_tag communication_channels_url, {:id => "register_email_address", :class => 'form-horizontal'} do %>
+<ul>
+  <li><a href="#register_email_address"><%= t('links.email', "Email") %></a></li>
+  <% if otp_via_sms_in_us_region? %>
+  <li><a href="#register_sms_number"><%= t('links.text_sms', "Text (SMS)") %></a></li>
+  <% end %>
+  <% if @user.account.feature_enabled?(:slack_notifications)%>
+    <li><a href="#register_slack_handle"><%= t("Slack Email") %></a></li>
+  <% end %>
+</ul>
+<%= form_tag communication_channels_url, {:id => "register_email_address", :class => 'form-horizontal'} do %>
     <input type="hidden" name="communication_channel[type]" value="email"/>
     <div class="control-group">
       <%= label :communication_channel, :address, t('labels.email_address', 'Email Address'), :class => 'control-label' %>
@@ -226,7 +226,7 @@
   <% end %>
 <% end %>
 
-<% if mfa_settings != :disabled && otp_via_sms_in_us_region? %>
+<% if otp_via_sms_in_us_region? %>
   <%= form_tag communication_channels_url, {:id => "register_sms_number", :class => 'form-horizontal'} do %>
     <input type="hidden" name="communication_channel[type]" value="sms">
 
