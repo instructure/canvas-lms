@@ -1724,6 +1724,7 @@ CanvasRails::Application.routes.draw do
       get "manually_created_courses_account", action: :manually_created_courses_account
       delete "accounts/:account_id/users/:user_id", action: :remove_user
       put "accounts/:account_id/users/:user_id/restore", action: :restore_user
+      get "accounts/:account_id/quiz_ip_filters", action: :quiz_ip_filters, as: "quiz_ip_filters"
     end
 
     scope(controller: :sub_accounts) do
