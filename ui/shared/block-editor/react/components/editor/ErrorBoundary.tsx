@@ -18,6 +18,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
+
 type ErrorBoundaryState = {
   hasError: boolean
 }
@@ -54,7 +58,7 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div style={{margin: '1rem'}}>
-          <h2>Something went wrong.</h2>
+          <h2>{I18n.t('Something went wrong.')}</h2>
         </div>
       )
     }

@@ -22,6 +22,10 @@ import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {TextInput} from '@instructure/ui-text-input'
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
+
 type LinkModalProps = {
   open: boolean
   text?: string
@@ -50,24 +54,29 @@ const LinkModal = ({open, text = '', url = '', onClose, onSubmit}: LinkModalProp
   return (
     <Modal open={open} onDismiss={onClose} label="Link" size="medium">
       <Modal.Header>
-        <Heading level="h2">Select an Icon</Heading>
+        <Heading level="h2">{I18n.t('Select an Icon')}</Heading>
         <CloseButton placement="end" onClick={onClose} screenReaderLabel="Close" />
       </Modal.Header>
       <Modal.Body padding="medium">
         <TextInput
-          renderLabel="Text"
-          placeholder="Text"
+          renderLabel={I18n.t('Text')}
+          placeholder={I18n.t('Text')}
           value={currText}
           onChange={handleTextChange}
         />
-        <TextInput renderLabel="URL" placeholder="URL" value={currUrl} onChange={handleUrlChange} />
+        <TextInput
+          renderLabel={I18n.t('URL')}
+          placeholder={I18n.t('URL')}
+          value={currUrl}
+          onChange={handleUrlChange}
+        />
       </Modal.Body>
       <Modal.Footer>
         <Button color="secondary" onClick={onClose}>
-          Cancel
+          {I18n.t('Cancel')}
         </Button>
         <Button color="primary" onClick={handleSubmit} margin="0 0 0 small">
-          Submit
+          {I18n.t('Submit')}
         </Button>
       </Modal.Footer>
     </Modal>
