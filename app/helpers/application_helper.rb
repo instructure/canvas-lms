@@ -1373,12 +1373,18 @@ module ApplicationHelper
     render json: { location:, token: file_authenticator.instfs_bearer_token }
   end
 
+  def authenticated_url_options(attachment)
+    options = { original_url: request.original_url }
+    options[:tenant_auth] = attachment.instfs_tenant_auth if attachment&.instfs_tenant_auth.present?
+    options
+  end
+
   def authenticated_download_url(attachment)
-    file_authenticator.download_url(attachment, options: { original_url: request.original_url })
+    file_authenticator.download_url(attachment, options: authenticated_url_options(attachment))
   end
 
   def authenticated_inline_url(attachment)
-    file_authenticator.inline_url(attachment, options: { original_url: request.original_url })
+    file_authenticator.inline_url(attachment, options: authenticated_url_options(attachment))
   end
 
   def authenticated_thumbnail_url(attachment, options = {})

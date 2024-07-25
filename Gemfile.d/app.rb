@@ -69,7 +69,7 @@ gem "ims-lti", "~> 2.3", require: "ims"
 gem "rrule", "~> 0.5", require: false
 gem "inst_llm", "~> 0.2.4"
 
-gem "inst_access", "0.4.3"
+gem "inst_access", "0.4.4"
 gem "inst_statsd", "~> 3.0"
 gem "inst-jobs", "~> 3.1"
 gem "inst-jobs-autoscaling", "2.1.1"

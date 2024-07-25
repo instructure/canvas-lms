@@ -19,6 +19,7 @@
 #
 
 require_relative "../helpers/k5_common"
+require "webmock/rspec"
 
 def new_valid_tool(course)
   tool = course.context_external_tools.new(
@@ -336,6 +337,64 @@ describe FilesController do
         allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return "stubby"
         expect(Canvas::LiveEvents).to receive(:asset_access).with(@file, "files", nil, nil)
         get "show", params: { course_id: @course.id, id: @file.id, verifier: @file.uuid, download: 1 }, format: "json"
+      end
+    end
+
+    describe "with JWT access token" do
+      include_context "InstAccess setup"
+
+      before do
+        @file.update!(file_state: "hidden")
+        user_with_pseudonym
+        jwt_payload = {
+          resource: "/courses/#{@course.id}/files/#{@file.id}?instfs_id=stuff",
+          aud: [@course.root_account.uuid],
+          sub: @user.uuid,
+          tenant_auth: { location: "location" },
+          iss: "instructure:inst_access",
+          exp: 1.hour.from_now.to_i,
+          iat: Time.now.to_i
+        }
+        @token_string = InstAccess::Token.send(:new, jwt_payload).to_unencrypted_token_string
+        allow(Canvadocs).to receive(:enabled?).and_return(true)
+        allow(InstFS).to receive_messages(enabled?: true, app_host: "http://instfs.test")
+        stub_request(:get, "http://instfs.test/files/stuff/metadata").to_return(status: 200, body: { url: "http://instfs.test/stuff" }.to_json)
+      end
+
+      it "allows access" do
+        get "show", params: { course_id: @course.id, id: @file.id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        expect(response).to be_successful
+        expect(json_parse["attachment"]["canvadoc_session_url"]).to match %r{/api/v1/canvadoc_session.+?access_token=#{@token_string}}
+      end
+
+      it "allows access to files in deleted contexts" do
+        @course.delete
+
+        get "show", params: { course_id: @course.id, id: @file.id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        expect(response).to be_successful
+        expect(json_parse["attachment"]["canvadoc_session_url"]).to match %r{/api/v1/canvadoc_session.+?access_token=#{@token_string}}
+      end
+
+      it "allows access to deleted files" do
+        @file.destroy
+
+        get "show", params: { course_id: @course.id, id: @file.id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        expect(response).to be_successful
+        expect(json_parse["attachment"]["canvadoc_session_url"]).to match %r{/api/v1/canvadoc_session.+?access_token=#{@token_string}}
+      end
+
+      it "does not allow access if the resource in the token does not match the resource being accessed" do
+        file2 = user_file
+
+        get "show", params: { course_id: @course.id, id: file2.id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        expect(response).to be_not_found
+      end
+
+      it "does not allow access if InstFS doesn't return metadata for the tenant auth" do
+        stub_request(:get, "http://instfs.test/files/stuff/metadata").to_return(status: 404, body: { error: "weird" }.to_json)
+
+        get "show", params: { course_id: @course.id, id: @file.id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        expect(response).to be_unauthorized
       end
     end
 
