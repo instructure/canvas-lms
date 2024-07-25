@@ -95,7 +95,7 @@ const ItemAssignToCardMemo = memo(
   ItemAssignToCard,
   (prevProps: OptimizedItemAssignToCardProps, nextProps: OptimizedItemAssignToCardProps) => {
     return (
-      prevProps.everyoneOption?.value === nextProps.everyoneOption?.value &&
+      nextProps.persistEveryoneOption &&
       prevProps.selectedAssigneeIds?.length === nextProps.selectedAssigneeIds?.length &&
       prevProps.highlightCard === nextProps.highlightCard &&
       prevProps.due_at === nextProps.due_at &&
@@ -640,6 +640,11 @@ const ItemAssignToTrayContent = ({
       return assignToCards.map(card => (
         <View key={`${card.key}`} as="div" margin="small 0 0 0">
           <ItemAssignToCardMemo
+            // Make sure the cards get rendered when there is only one card or when jumping to two cards
+            // since the everyone option needs to be updated.
+            // Having cardCount > 2 will prevent the cards to be rendered when having more cards
+            // since in that snacerio the everyone option won't change.
+            persistEveryoneOption={cardCount !== 1 && cardCount > 2}
             ref={cardsRefs.current[card.key]}
             courseId={courseId}
             contextModuleId={card.contextModuleId}

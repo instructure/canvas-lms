@@ -99,6 +99,7 @@ export type ItemAssignToCardProps = {
   postToSIS?: boolean
   disabledOptionIdsRef?: React.MutableRefObject<string[]>
   isOpenRef?: React.MutableRefObject<boolean>
+  persistEveryoneOption?: boolean
 }
 
 export type ItemAssignToCardRef = {
