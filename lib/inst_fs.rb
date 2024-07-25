@@ -291,6 +291,16 @@ module InstFS
       true
     end
 
+    def get_file_metadata(attachment)
+      token = metadata_file_jwt(attachment)
+      url = metadata_url(attachment, {})
+
+      response = CanvasHttp.get(url, { "Authorization" => "Bearer #{token}" })
+      return JSON.parse(response.body) if response.code.to_i == 200
+
+      raise InstFS::MetadataError, "received code \"#{response.code}\" from service, with message \"#{response.body}\""
+    end
+
     private
 
     def setting(key)
@@ -398,6 +408,7 @@ module InstFS
         jti: SecureRandom.uuid,
         host: options[:oauth_host]
       }
+      claims[:tenant_auth] = @token.tenant_auth if @token&.tenant_auth.present?
       original_url = parse_original_url(options[:original_url])
       claims[:original_url] = original_url if original_url.present?
       if options[:acting_as] && options[:acting_as] != options[:user]
@@ -479,6 +490,15 @@ module InstFS
                   SHORT_JWT_EXPIRATION)
     end
 
+    def metadata_file_jwt(attachment)
+      jwt_contents = {
+        iat: Time.now.utc.to_i,
+        resource: metadata_path(attachment)
+      }
+      jwt_contents[:tenant_auth] = attachment.instfs_tenant_auth if attachment.instfs_tenant_auth.present?
+      service_jwt(jwt_contents, SHORT_JWT_EXPIRATION)
+    end
+
     def parse_original_url(url)
       if url
         uri = Addressable::URI.parse(url)
@@ -540,4 +560,6 @@ module InstFS
   class DuplicationError < StandardError; end
 
   class DeletionError < StandardError; end
+
+  class MetadataError < StandardError; end
 end

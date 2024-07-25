@@ -74,7 +74,7 @@ class Attachment < ActiveRecord::Base
   restrict_columns :settings, %i[folder_id locked lock_at unlock_at usage_rights_id]
   restrict_columns :state, [:locked, :file_state]
 
-  attr_accessor :podcast_associated_asset, :export_id
+  attr_accessor :podcast_associated_asset, :export_id, :instfs_tenant_auth
 
   # this is a gross hack to work around freaking SubmissionComment#attachments=
   attr_accessor :ok_for_submission_comment
@@ -2460,10 +2460,10 @@ class Attachment < ActiveRecord::Base
     canvadoc.try(:available?)
   end
 
-  def canvadoc_url(user, opts = {})
+  def canvadoc_url(user, opts = {}, access_token: nil)
     return unless canvadocable?
 
-    "/api/v1/canvadoc_session?#{preview_params(user, "canvadoc", opts)}"
+    "/api/v1/canvadoc_session?#{preview_params(user, "canvadoc", opts, access_token:)}"
   end
 
   def crocodoc_url(user, opts = {})
@@ -2476,7 +2476,7 @@ class Attachment < ActiveRecord::Base
     self.content_type && (self.content_type.match(/\A(video|audio)/) || self.content_type == "application/x-flash-video")
   end
 
-  def preview_params(user, type, opts = {})
+  def preview_params(user, type, opts = {}, access_token: nil)
     h = opts.merge({
                      user_id: user.try(:global_id),
                      attachment_id: id,
@@ -2484,7 +2484,9 @@ class Attachment < ActiveRecord::Base
                    })
     blob = h.to_json
     hmac = Canvas::Security.hmac_sha1(blob)
-    "blob=#{URI::DEFAULT_PARSER.escape blob}&hmac=#{URI::DEFAULT_PARSER.escape hmac}"
+    param_string = "blob=#{URI::DEFAULT_PARSER.escape blob}&hmac=#{URI::DEFAULT_PARSER.escape hmac}"
+    param_string += "&access_token=#{URI::DEFAULT_PARSER.escape access_token}" if access_token
+    param_string
   end
   private :preview_params
 

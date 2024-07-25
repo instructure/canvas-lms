@@ -42,12 +42,12 @@ module AuthenticationMethods
   end
 
   def load_pseudonym_from_inst_access_token(token_string)
-    token = ::AuthenticationMethods::InstAccessToken.parse(token_string)
-    return false unless token
+    @token = ::AuthenticationMethods::InstAccessToken.parse(token_string)
+    return false unless @token
 
-    auth_context = ::AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(token, @domain_root_account)
+    auth_context = ::AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(@token, @domain_root_account)
 
-    raise AccessTokenError unless ::AuthenticationMethods::InstAccessToken.usable_developer_key?(token, @domain_root_account)
+    raise AccessTokenError unless ::AuthenticationMethods::InstAccessToken.usable_developer_key?(@token, @domain_root_account)
 
     @current_user = auth_context[:current_user]
     @current_pseudonym = auth_context[:current_pseudonym]
@@ -61,8 +61,12 @@ module AuthenticationMethods
     @authenticated_with_jwt = @authenticated_with_inst_access_token = true
   end
 
+  def services_jwt_auth_allowed
+    false
+  end
+
   def load_pseudonym_from_jwt
-    return unless api_request?
+    return unless api_request? || services_jwt_auth_allowed
 
     token_string = AuthenticationMethods.access_token(request)
     return unless token_string.present?
