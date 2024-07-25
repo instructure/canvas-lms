@@ -10945,6 +10945,7 @@ hy:
   moderated_grading_setting_cannot_be_enabled_for_un_e40e6cd4: "Չգնահատվող հանձնարարությունների համար մոդերացվող գնահատումը չի կարող կարգաբերվել"
   moderator_49b9f2e1: Մոդերատոր
   modified_by_c1584b3c: "Ում կողմից է փոփոխվել"
+  module_9775f804: մոդուլ
   module_completed_50c50762: "Մոդուլն ավարտված է"
   module_in_progress_fa600662: "Մոդուլի աշխատանքը կատարվում է"
   module_item_module_item_name_was_successfully_dele_8626d846: "%{module_item_name} մոդուլի տարրը հաջողությամբ ջնջվել է:"
