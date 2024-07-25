@@ -188,6 +188,12 @@ export default class SubmissionTray extends React.Component<
     this.initializeCheckpointStates()
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.submission !== this.props.submission) {
+      this.initializeCheckpointStates()
+    }
+  }
+
   initializeCheckpointStates = () => {
     const {submission, latePolicy} = this.props
 
@@ -557,18 +563,12 @@ export default class SubmissionTray extends React.Component<
       REPLY_TO_ENTRY
     )
 
-    const resetCheckpointStates = () => {
-      this.initializeCheckpointStates()
-    }
-
     const onRequestClose = () => {
       this.props.onRequestClose()
-      resetCheckpointStates()
     }
 
     const onClose = () => {
       this.props.onClose()
-      resetCheckpointStates()
     }
 
     return (
