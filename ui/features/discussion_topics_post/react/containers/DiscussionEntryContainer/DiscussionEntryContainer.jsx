@@ -22,7 +22,7 @@ import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPos
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
-import {responsiveQuerySizes} from '../../utils'
+import {responsiveQuerySizes, userNameToShow} from '../../utils'
 import {SearchContext} from '../../utils/constants'
 import {Attachment} from '../../../graphql/Attachment'
 import {User} from '../../../graphql/User'
@@ -37,10 +37,15 @@ import theme from '@instructure/canvas-theme'
 export const DiscussionEntryContainer = props => {
   const {searchTerm} = useContext(SearchContext)
 
+  const getDeletedDisplayName = (author, editor = null) => {
+    const user = editor || author
+    return userNameToShow(user.displayName, author._id, user.courseRoles)
+  }
+
   if (props.deleted) {
     return (
       <DeletedPostMessage
-        deleterName={props.editor ? props.editor?.displayName : props.author?.displayName}
+        deleterName={getDeletedDisplayName(props.author, props.editor)}
         timingDisplay={props.timingDisplay}
         deletedTimingDisplay={props.editedTimingDisplay}
       >
@@ -188,12 +193,15 @@ export const DiscussionEntryContainer = props => {
               {props.children}
             </PostMessage>
           </Flex.Item>
-          {!props.isTopic &&
-              <hr data-testid="post-separator" style={{
+          {!props.isTopic && (
+            <hr
+              data-testid="post-separator"
+              style={{
                 height: theme.variables.borders.widthSmall,
                 color: theme.variables.colors.borderMedium,
-              }}/>
-            }
+              }}
+            />
+          )}
         </Flex>
       )}
     />

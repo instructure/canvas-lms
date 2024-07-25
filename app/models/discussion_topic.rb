@@ -1855,6 +1855,14 @@ class DiscussionTopic < ActiveRecord::Base
     entries
   end
 
+  def all_child_entries_from_user(user)
+    return [] unless for_group_discussion?
+
+    child_topics.map do |t|
+      t.discussion_entries.active.for_user(user)
+    end.flatten.sort_by(&:created_at)
+  end
+
   def self.podcast_elements(messages, context)
     attachment_ids = []
     media_object_ids = []
