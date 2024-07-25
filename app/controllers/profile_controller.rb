@@ -161,6 +161,7 @@ class ProfileController < ApplicationController
   include Api::V1::UserProfile
 
   include TextHelper
+  include ProfileHelper
 
   def show
     unless @current_user && @domain_root_account.enable_profiles?
