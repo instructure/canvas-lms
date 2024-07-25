@@ -32,7 +32,7 @@ import PropTypes from 'prop-types'
 import {CURRENT_USER, DiscussionManagerUtilityContext} from '../../utils/constants'
 import React, {useContext, useState} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
-import {responsiveQuerySizes} from '../../utils'
+import {hideStudentNames, responsiveQuerySizes} from '../../utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {SplitScreenButton} from './SplitScreenButton'
@@ -81,7 +81,10 @@ export const DiscussionPostToolbar = props => {
   const [showAssignToTray, setShowAssignToTray] = useState(false)
   const {translationLanguages} = useContext(DiscussionManagerUtilityContext)
 
-  const showAssignTo = !props.isAnnouncement && props.contextType === 'Course' && (props.isGraded || (!props.isGraded && !props.isGroupDiscussion))
+  const showAssignTo =
+    !props.isAnnouncement &&
+    props.contextType === 'Course' &&
+    (props.isGraded || (!props.isGraded && !props.isGroupDiscussion))
 
   const clearButton = () => {
     return getClearButton({
@@ -171,27 +174,29 @@ export const DiscussionPostToolbar = props => {
                   </Flex.Item>
                 )}
                 {/* Search */}
-                <Flex.Item
-                  shouldGrow={responsiveProps?.search?.shouldGrow}
-                  shouldShrink={responsiveProps?.search?.shouldShrink}
-                  padding={responsiveProps.padding}
-                >
-                  <span className="discussions-search-filter">
-                    <TextInput
-                      data-testid="search-filter"
-                      onChange={event => {
-                        props.onSearchChange(event.target.value)
-                      }}
-                      renderLabel={<ScreenReaderContent>{searchElementText}</ScreenReaderContent>}
-                      value={props.searchTerm}
-                      renderBeforeInput={<IconSearchLine display="block" />}
-                      renderAfterInput={clearButton}
-                      placeholder={searchElementText}
-                      shouldNotWrap={true}
-                      width={responsiveProps?.search?.width}
-                    />
-                  </span>
-                </Flex.Item>
+                {!hideStudentNames && (
+                  <Flex.Item
+                    shouldGrow={responsiveProps?.search?.shouldGrow}
+                    shouldShrink={responsiveProps?.search?.shouldShrink}
+                    padding={responsiveProps.padding}
+                  >
+                    <span className="discussions-search-filter">
+                      <TextInput
+                        data-testid="search-filter"
+                        onChange={event => {
+                          props.onSearchChange(event.target.value)
+                        }}
+                        renderLabel={<ScreenReaderContent>{searchElementText}</ScreenReaderContent>}
+                        value={props.searchTerm}
+                        renderBeforeInput={<IconSearchLine display="block" />}
+                        renderAfterInput={clearButton}
+                        placeholder={searchElementText}
+                        shouldNotWrap={true}
+                        width={responsiveProps?.search?.width}
+                      />
+                    </span>
+                  </Flex.Item>
+                )}
               </Flex>
             </Flex.Item>
 
@@ -305,19 +310,17 @@ export const DiscussionPostToolbar = props => {
                     </Flex>
                   </Flex.Item>
                 )}
-                {props.manageAssignTo &&
-                  ENV.FEATURES?.selective_release_ui_api &&
-                  showAssignTo && (
-                    <Flex.Item shouldGrow={true} textAlign="end">
-                      <Button
-                        data-testid="manage-assign-to"
-                        renderIcon={IconPermissionsLine}
-                        onClick={() => setShowAssignToTray(!showAssignToTray)}
-                      >
-                        {I18n.t('Assign To')}
-                      </Button>
-                    </Flex.Item>
-                  )}
+                {props.manageAssignTo && ENV.FEATURES?.selective_release_ui_api && showAssignTo && (
+                  <Flex.Item shouldGrow={true} textAlign="end">
+                    <Button
+                      data-testid="manage-assign-to"
+                      renderIcon={IconPermissionsLine}
+                      onClick={() => setShowAssignToTray(!showAssignToTray)}
+                    >
+                      {I18n.t('Assign To')}
+                    </Button>
+                  </Flex.Item>
+                )}
               </Flex>
             </Flex.Item>
           </Flex>
