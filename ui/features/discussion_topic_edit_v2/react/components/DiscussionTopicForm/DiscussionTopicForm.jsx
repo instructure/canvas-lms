@@ -404,6 +404,7 @@ function DiscussionTopicForm({
     shouldShowPodcastFeedOption,
     shouldShowCheckpointsOptions,
     shouldShowAssignToForUngradedDiscussions,
+    shouldShowAllowParticipantsToCommentOption,
   } = useShouldShowContent(
     isGraded,
     isAnnouncement,
@@ -854,7 +855,7 @@ function DiscussionTopicForm({
             />
           )}
           <FormFieldGroup description="" rowSpacing="small">
-            {shouldShowAnnouncementOnlyOptions && (
+            {shouldShowAllowParticipantsToCommentOption && (
               <Checkbox
                 label={I18n.t('Allow Participants to Comment')}
                 value="enable-participants-commenting"

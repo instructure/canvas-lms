@@ -142,6 +142,9 @@ export const useShouldShowContent = (
     ENV.FEATURES?.selective_release_ui_api &&
     ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_ASSIGN_TO_UNGRADED
 
+  const shouldShowAllowParticipantsToCommentOption =
+    !ENV?.ANNOUNCEMENTS_COMMENTS_DISABLED && shouldShowAnnouncementOnlyOptions
+
   return {
     shouldShowTodoSettings,
     shouldShowPostToSectionOption,
@@ -157,5 +160,6 @@ export const useShouldShowContent = (
     shouldShowPodcastFeedOption,
     shouldShowCheckpointsOptions,
     shouldShowAssignToForUngradedDiscussions,
+    shouldShowAllowParticipantsToCommentOption,
   }
 }
