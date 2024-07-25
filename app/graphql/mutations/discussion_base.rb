@@ -107,7 +107,8 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
       discussion_topic.group_category_id = input[:group_category_id] if input.key?(:group_category_id)
     end
 
-    if input.key?(:file_id)
+    # In case the attachment tis not changed, skip who the owner is
+    if input.key?(:file_id) && (input[:file_id].to_i != discussion_topic.attachment_id)
       attachment = Attachment.find(input[:file_id])
       raise ActiveRecord::RecordNotFound unless attachment.user == current_user
 
