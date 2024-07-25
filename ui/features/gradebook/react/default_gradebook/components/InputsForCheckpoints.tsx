@@ -23,7 +23,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {
   type CheckpointState,
@@ -70,8 +70,14 @@ export const InputsForCheckpoints = (props: Props) => {
   const checkpointState = props.checkpointStates.find(
     checkpoint => checkpoint.label === props.subAssignmentTag
   )
+
+  const [localTimeLate, setLocalTimeLate] = useState(checkpointState?.timeLate || '')
   const checkpointStatus = checkpointState?.status
   const isStatusLate = checkpointStatus === LATE
+
+  useEffect(() => {
+    setLocalTimeLate(checkpointState?.timeLate)
+  }, [checkpointState.timeLate])
 
   const getSubAssignment = (
     hasCheckpoints: boolean,
@@ -180,9 +186,12 @@ export const InputsForCheckpoints = (props: Props) => {
                     </Text>
                   </div>
                 }
-                value={checkpointState?.timeLate}
-                onChange={(e: any) => {
-                  props.updateCheckpointStates(props.subAssignmentTag, 'timeLate', e.target.value)
+                value={localTimeLate}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setLocalTimeLate(e.target.value)
+                }}
+                onBlur={() => {
+                  props.updateCheckpointStates(props.subAssignmentTag, 'timeLate', localTimeLate)
                 }}
                 width="45%"
                 data-testid={props.subAssignmentTag + '-checkpoint-time-late-input'}

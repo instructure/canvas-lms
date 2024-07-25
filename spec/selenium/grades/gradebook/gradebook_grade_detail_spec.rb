@@ -453,7 +453,7 @@ describe "Grade Detail Tray:" do
       expect(reply_to_topic_submission.reload.excused).to be_truthy
     end
 
-    context "sub submissions context" do
+    context "sub submissions context", :ignore_js_errors do
       it "displays late status with separate late times" do
         # Set late times for each checkpoint
         reply_to_topic = @checkpoint_assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_topic")
@@ -500,6 +500,28 @@ describe "Grade Detail Tray:" do
 
         expect(f("[data-testid='reply_to_topic-checkpoint-status-select']")).to have_attribute("value", "Extended")
         expect(f("[data-testid='reply_to_entry-checkpoint-status-select']")).to have_attribute("value", "None")
+      end
+
+      it "displays statuses correctly when opening different cells" do
+        checkpointed_assignment_late = @checkpoint_assignment
+        reply_to_entry = checkpointed_assignment_late.sub_assignments.find_by(sub_assignment_tag: "reply_to_entry")
+        reply_to_entry.grade_student(@students[0], grade: 9, grader: @teacher)
+        reply_to_entry.submissions.find_by(user: @students[0]).update!(late_policy_status: "late", seconds_late_override: 2.days)
+
+        checkpointed_assignment_excused = create_checkpoint_assignment
+        reply_to_entry = checkpointed_assignment_excused.sub_assignments.find_by(sub_assignment_tag: "reply_to_entry")
+        reply_to_entry.submissions.find_by(user: @students[0]).update!(excused: true)
+
+        Gradebook.visit(@course)
+        Gradebook::Cells.open_tray(@students[0], checkpointed_assignment_late)
+        expect(f("[data-testid='reply_to_topic-checkpoint-status-select']")).to have_attribute("value", "None")
+        expect(f("[data-testid='reply_to_entry-checkpoint-status-select']")).to have_attribute("value", "Late")
+        expect(f("[data-testid='reply_to_entry-checkpoint-time-late-input']")).to have_value("2")
+
+        Gradebook::GradeDetailTray.click_close_tray_button
+        Gradebook::Cells.open_tray(@students[0], checkpointed_assignment_excused)
+        expect(f("[data-testid='reply_to_topic-checkpoint-status-select']")).to have_attribute("value", "None")
+        expect(f("[data-testid='reply_to_entry-checkpoint-status-select']")).to have_attribute("value", "Excused")
       end
     end
   end
