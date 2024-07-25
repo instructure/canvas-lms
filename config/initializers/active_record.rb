@@ -1513,7 +1513,9 @@ module UpdateAndDeleteAllWithLimit
   def delete_all(*args)
     if limit_value || offset_value
       scope = lock_for_subquery_update.except(:select).select(primary_key)
-      return base_class.unscoped.where(primary_key => scope).delete_all
+      deleted_rows_count = base_class.unscoped.where(primary_key => scope).delete_all
+      track_limit_clause_anomaly(scope.class.to_s, deleted_rows_count, limit_value)
+      return deleted_rows_count
     end
     super
   end
@@ -1521,7 +1523,9 @@ module UpdateAndDeleteAllWithLimit
   def update_all(updates, *args)
     if limit_value || offset_value
       scope = lock_for_subquery_update.except(:select).select(primary_key)
-      return base_class.unscoped.where(primary_key => scope).update_all(updates)
+      updated_rows_count = base_class.unscoped.where(primary_key => scope).update_all(updates)
+      track_limit_clause_anomaly(scope.class.to_s, updated_rows_count, limit_value)
+      return updated_rows_count
     end
     super
   end
@@ -1533,6 +1537,20 @@ module UpdateAndDeleteAllWithLimit
 
     # make sure to lock the proper table
     lock("#{lock_type_clause(lock_type)} OF #{connection.quote_local_table_name(klass.table_name)}")
+  end
+
+  # Introduced temporarily by BUDA-26 to monitor whether the limit clause is ignored or not by the update_all or delete_all functions.
+  def track_limit_clause_anomaly(scope_class, affected_rows_count, limit_value)
+    return unless affected_rows_count > limit_value
+
+    Sentry.with_scope do |scope|
+      scope.set_context("Anomaly details", {
+                          affected_rows: affected_rows_count,
+                          limit: limit_value,
+                          scope_class:
+                        })
+      Sentry.capture_message("Limit clause got ignored", level: :warning)
+    end
   end
 end
 Switchman::ActiveRecord::Relation.include(UpdateAndDeleteAllWithLimit)
