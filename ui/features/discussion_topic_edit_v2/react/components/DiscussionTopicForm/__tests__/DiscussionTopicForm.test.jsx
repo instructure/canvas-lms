@@ -485,6 +485,24 @@ describe('DiscussionTopicForm', () => {
 
       expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
     })
+
+    it('does not display "Allow Participants to Comment" when the setting is turned off', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+      window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = true
+
+      const {queryByText} = setup()
+
+      expect(queryByText('Allow Participants to Comment')).not.toBeInTheDocument()
+    })
+
+    it('displays "Allow Participants to Comment" when the setting is turned on', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+      window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = false
+
+      const {queryByText} = setup()
+
+      expect(queryByText('Allow Participants to Comment')).toBeInTheDocument()
+    })
   })
 
   describe('Graded', () => {
