@@ -9285,6 +9285,7 @@ ko:
     no_recipients_choose_another_group: "이 그룹에 수신인이 없습니다. 다른 그룹을 선택하시기 바랍니다."
   modified_by_c1584b3c: "수정한 사람"
   modified_by_user_e6c8ade3: "수정한 사람: %{user}"
+  module_9775f804: 모듈
   module_item_types: 
     assignment: 과제
     disuccsion: 토론
