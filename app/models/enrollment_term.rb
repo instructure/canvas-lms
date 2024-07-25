@@ -20,7 +20,6 @@
 
 class EnrollmentTerm < ActiveRecord::Base
   DEFAULT_TERM_NAME = "Default Term"
-
   include Workflow
 
   belongs_to :root_account, class_name: "Account"
@@ -200,6 +199,10 @@ class EnrollmentTerm < ActiveRecord::Base
     if read_attribute(:grading_period_group_id).present? && (root_account_id != grading_period_group.account_id)
       errors.add(:grading_period_group, t("cannot be associated with a different account"))
     end
+  end
+
+  def filter_courses_by_term
+    "/accounts/#{root_account_id}?enrollment_term_id=#{id}"
   end
 
   scope :active, -> { where("enrollment_terms.workflow_state<>'deleted'") }
