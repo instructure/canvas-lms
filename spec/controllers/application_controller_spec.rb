@@ -1911,12 +1911,12 @@ RSpec.describe ApplicationController do
 
       context "when external tool has postMessage scopes" do
         it "adds tool scopes to the js_env" do
-          @tool.developer_key = DeveloperKey.create!(scopes: [TokenScopes::LTI_PAGE_CONTENT_SHOW_SCOPE])
+          @tool.developer_key = DeveloperKey.create!(scopes: TokenScopes::LTI_POSTMESSAGE_SCOPES)
           @tool.save!
 
           controller.external_tools_display_hashes(:account_navigation, @course)
 
-          expect(controller.js_env[:LTI_TOOL_SCOPES]).to eq("http://example.com" => [TokenScopes::LTI_PAGE_CONTENT_SHOW_SCOPE])
+          expect(controller.js_env[:LTI_TOOL_SCOPES]).to eq("http://example.com" => TokenScopes::LTI_POSTMESSAGE_SCOPES)
         end
       end
 
