@@ -1802,6 +1802,7 @@ hy:
   angel_file_description: "Zip ֆորմատով Angel-ի արտահանում "
   announcement: 
     no_title: "Առանց անվանման"
+  announcement_e37d6dbd: հայտարարություն
   announcement_ends_at_4ccc2a7e: "Հայտարարության ժամկետը ավարտվում է "
   announcement_fb4cb645: Հայտարարություն
   announcement_starts_at_2e987a38: "Հայտարարության ժամկետը սկսվում է"
@@ -16357,6 +16358,7 @@ hy:
   text_entry_e1808b2f: "Տեքստի մուտքագրում"
   text_entry_submission_cannot_be_empty_3d187cae: "Տեքստային դաշտը չի կարող դատարկ լինել"
   text_input_d3480b8c: "Տեքստի մուտք"
+  text_sms_4e2d82a7: "Տեքստ (SMS)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Օգտատիրոջ այդ հաշիվը ջնջվել է: Խնդրում ենք դիմել ձեր համակարգի ադմինիստրատորին կրկին ակտիվացնելու ձեր հաշիվը:"
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "Հաշվի ID, որի հետ կապված է հաշվետու օգտատերը"
   the_app_was_activated_a84e055f: "Հավելվածը ակտիվացվել է"
