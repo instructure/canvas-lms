@@ -2919,6 +2919,7 @@ fa:
   announcement: 
     no_title: "عنوان موجود نیست"
   announcement_creation_failed_f7d227f5: "ایجاد اطلاعیه انجام نشد"
+  announcement_e37d6dbd: اطلاعیه
   announcement_ends_at_4ccc2a7e: "اطلاعیه خاتمه می یابد در"
   announcement_external_feeds_5be3f36b: "خوراک‌های خبری بیرونی اطلاعیه "
   announcement_fb4cb645: اطلاعیه
@@ -23276,6 +23277,7 @@ fa:
   text_entry_submission_7b0ae0c5: "ارسال ورودی متن"
   text_entry_submission_cannot_be_empty_3d187cae: "مورد ارسالی ورود متن نمی تواند خالی باشد"
   text_input_d3480b8c: "ورودی متن"
+  text_sms_4e2d82a7: "متن (پیامک)"
   thai_8f9bc548: تایلندی
   thailand_66_5b3ef324: "تایلند (+66)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "این حساب کاربری حذف شده است. لطفا با مدیر سیستم خود تماس بگیرید تا حساب شما دوباره فعال شود."
