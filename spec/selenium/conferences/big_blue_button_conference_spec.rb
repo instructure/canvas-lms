@@ -356,7 +356,6 @@ describe "BigBlueButton conferences" do
     end
 
     it "sets start and end date on WebConference when created and edited from the calendar" do
-      skip "FOO-3804 (10/6/2023)"
       get "/calendar"
 
       # Create calendar event with conference
@@ -396,13 +395,13 @@ describe "BigBlueButton conferences" do
       fj("a:contains('BBB Conference from Calendar')").click
       fj('button:contains("Edit")').click
 
-      f("input[data-testid='event-form-start-time']").click
-      5.times { f("input[data-testid='event-form-start-time']").send_keys(:arrow_down) }
-      f("input[data-testid='event-form-start-time']").send_keys(:enter)
-
       f("input[data-testid='event-form-end-time']").click
       10.times { f("input[data-testid='event-form-end-time']").send_keys(:arrow_down) }
       f("input[data-testid='event-form-end-time']").send_keys(:enter)
+
+      f("input[data-testid='event-form-start-time']").click
+      5.times { f("input[data-testid='event-form-start-time']").send_keys(:arrow_down) }
+      f("input[data-testid='event-form-start-time']").send_keys(:enter)
 
       f("button[type=submit]").click
       wait_for_ajaximations
