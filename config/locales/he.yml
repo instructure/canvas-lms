@@ -2246,6 +2246,7 @@ he:
   announcement: 
     no_title: "אין כותרת"
   announcement_creation_failed_f7d227f5: "יצירת הכרזה נכשלה"
+  announcement_e37d6dbd: הכרזה
   announcement_ends_at_4ccc2a7e: "תוקף ההכרזה מסתיים במועד"
   announcement_fb4cb645: הכרזה
   announcement_not_found_d6d124c3: "ההכרזה לא נמצאה"
@@ -19063,6 +19064,7 @@ he:
   text_entry_submission_7b0ae0c5: "הגשת מלל מוקלד"
   text_entry_submission_cannot_be_empty_3d187cae: "הגשת תוכן מילולי אינה יכולה להשאר ריקה"
   text_input_d3480b8c: "קלט מילולי"
+  text_sms_4e2d82a7: "טקסט (מסרון)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "חשבון המשתמש בוטל. יש ליצור קשר עם מנהל המערכת שלך כדי שיפעיל את החשבון מחדש."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "מזהה החשבון של החשבון אליו המשתמש המדווח שייך"
   the_announcement_title_could_not_be_linked_to_the__78c747f3: "לא ניתן היה לקשר את ההכרזה \"%{title}\" למודול \"%{mod_title}\""
