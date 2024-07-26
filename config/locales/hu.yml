@@ -3081,6 +3081,7 @@ hu:
   announcement: 
     no_title: "Nincs cím"
   announcement_creation_failed_f7d227f5: "A hirdetmény létrehozása sikertelen"
+  announcement_e37d6dbd: hirdetmény
   announcement_ends_at_4ccc2a7e: "Hirdetmény befejeződik ekkor"
   announcement_external_feeds_5be3f36b: "hirdetmények Külső Hírfolyamok"
   announcement_fb4cb645: Hirdetmény
@@ -24092,6 +24093,7 @@ hu:
   text_file_73d8d08c: "Szöveges fájl"
   text_input_d3480b8c: "Szöveges bemenet"
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "A szöveg No Question átkerült egy Stimulusba; kérjük, adjon hozzá egy kérdést, hogy megjelenhessen a kvízben."
+  text_sms_4e2d82a7: "Szöveg (SMS)"
   thai_8f9bc548: Thai
   thailand_66_5b3ef324: "Thaiföld (+66)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "A felhasználói fiók törlésre került. Lépjen kapcsolatba a rendszer-adminisztrátorral, a fiók újraaktiválása érdekében."
