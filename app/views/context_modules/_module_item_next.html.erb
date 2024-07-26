@@ -275,7 +275,7 @@
                 </li>
               <% end %>
               <% if Account.site_admin.feature_enabled?(:selective_release_ui_api) %>
-                <li class="assign-to-option <%= (module_item.present? && module_item.content&.grants_right?(@current_user, :manage_assign_to) && (module_item.show_assign_to?)) ? "" : "hidden" %>" role="presentation">
+                <li class="assign-to-option <%= (module_item.present? && (module_item.show_assign_to?) && module_item.content&.grants_right?(@current_user, :manage_assign_to) ) ? "" : "hidden" %>" role="presentation">
                   <a
                     class="module-item-assign-to-link"
                     href="#<%= module_item ? module_item.id : "{{ id }}" %>"
