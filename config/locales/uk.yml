@@ -2076,6 +2076,7 @@ uk:
   announcement: 
     no_title: "Без назви"
   announcement_creation_failed_f7d227f5: "Створити Оголошення не вдалося"
+  announcement_e37d6dbd: Оголошення
   announcement_ends_at_4ccc2a7e: "Оголошення закінчується в "
   announcement_fb4cb645: Оголошення
   announcement_not_found_d6d124c3: "Оголошення не знайдено"
@@ -17175,6 +17176,7 @@ uk:
   text_entry_submission_7b0ae0c5: "Відправлення текстового елементу"
   text_entry_submission_cannot_be_empty_3d187cae: "Текстовий елемент відправлення не може бути пустим "
   text_input_d3480b8c: "Поле вводу тексту"
+  text_sms_4e2d82a7: "Текст (SMS)"
   thailand_66_5b3ef324: "Таїланд (+66)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Цей профіль користувача було видалено. Будь ласка,  зв'яжіться з вашим системним адміністратором для повторної активації вашого облікового запису."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "ID облікового запису, до якого належить звітний користувач"
