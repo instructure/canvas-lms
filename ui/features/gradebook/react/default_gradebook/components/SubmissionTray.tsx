@@ -147,6 +147,7 @@ export type CheckpointState = {
   status: 'none' | 'late' | 'missing' | 'excused'
   timeLate: string
   secondsLate: number
+  customGradeStatusId: string | null
 }
 
 type SubmissionTrayState = {
@@ -164,8 +165,8 @@ export const REPLY_TO_TOPIC = 'reply_to_topic'
 export const REPLY_TO_ENTRY = 'reply_to_entry'
 
 const DEFAULT_CHECKPOINT_STATES = [
-  {label: REPLY_TO_TOPIC, status: NONE, timeLate: '0', secondsLate: 0},
-  {label: REPLY_TO_ENTRY, status: NONE, timeLate: '0', secondsLate: 0},
+  {label: REPLY_TO_TOPIC, status: NONE, timeLate: '0', secondsLate: 0, customGradeStatusId: null},
+  {label: REPLY_TO_ENTRY, status: NONE, timeLate: '0', secondsLate: 0, customGradeStatusId: null},
 ]
 
 export default class SubmissionTray extends React.Component<
@@ -202,6 +203,7 @@ export default class SubmissionTray extends React.Component<
         let status = NONE
         let timeLate = '0'
         const secondsLate = subSubmission.seconds_late || 0
+        const customGradeStatusId = subSubmission.custom_grade_status_id || null
 
         if (subSubmission.late_policy_status === 'extended') {
           status = EXTENDED
@@ -222,6 +224,7 @@ export default class SubmissionTray extends React.Component<
           status,
           timeLate,
           secondsLate,
+          customGradeStatusId,
         }
       })
 
@@ -498,6 +501,10 @@ export default class SubmissionTray extends React.Component<
         const data: PendingUpdateData = {subAssignmentTag, secondsLateOverride: value}
 
         this.props.updateSubmission(data)
+      } else if (field === 'customGradeStatusId') {
+        const data: PendingUpdateData = {subAssignmentTag, customGradeStatusId: value}
+
+        this.props.updateSubmission(data)
       }
     }
 
@@ -526,6 +533,8 @@ export default class SubmissionTray extends React.Component<
           header={header}
           updateCheckpointStates={updateCheckpointStates}
           latePolicy={props.latePolicy}
+          customGradeStatusesEnabled={props.customGradeStatusesEnabled}
+          customGradeStatuses={props.customGradeStatuses}
         />
       )
     }
