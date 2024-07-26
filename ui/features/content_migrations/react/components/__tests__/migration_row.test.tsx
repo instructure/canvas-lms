@@ -55,6 +55,21 @@ const runningMigration = {
   ...{progress_url: 'https://mock.progress.url', workflow_state: 'running'},
 }
 
+const completedMigration = {
+  ...migration,
+  ...{workflow_state: 'completed'},
+}
+
+const failedMigration = {
+  ...migration,
+  ...{workflow_state: 'failed'},
+}
+
+const waitingForSelectMigration = {
+  ...migration,
+  ...{workflow_state: 'waiting_for_select'},
+}
+
 const progressHit = {method: 'GET', path: 'https://mock.progress.url'}
 
 jest.mock('@canvas/do-fetch-api-effect')
@@ -141,5 +156,131 @@ describe('MigrationRow', () => {
         [expect.anything(), {completion: 100}],
       ])
     )
+  })
+
+  describe('Status scenarios', () => {
+    // this is needed because the initial state triggers the fetchProgress function
+    const mockFetchProgressPolling = () => {
+      doFetchApi.mockReturnValueOnce(
+        Promise.resolve({json: {completion: 100, workflow_state: 'completed'}})
+      )
+    }
+
+    describe('initial state setting', () => {
+      describe('queued', () => {
+        beforeEach(() => {
+          mockFetchProgressPolling()
+        })
+
+        it('should render queued state', () => {
+          renderComponent({migration: queuedMigration, updateMigrationItem: jest.fn()})
+          expect(screen.getByText('Queued')).toBeInTheDocument()
+        })
+
+        it('should start polling', async () => {
+          const mockCallback = jest.fn()
+          renderComponent({migration: queuedMigration, updateMigrationItem: mockCallback})
+          await waitFor(() => expect(mockCallback).toHaveBeenCalled())
+        })
+      })
+
+      describe('running', () => {
+        beforeEach(() => {
+          mockFetchProgressPolling()
+        })
+
+        it('should render running state', () => {
+          renderComponent({migration: runningMigration, updateMigrationItem: jest.fn()})
+          expect(screen.getByText('Running')).toBeInTheDocument()
+        })
+
+        it('should start polling', async () => {
+          const mockCallback = jest.fn()
+          renderComponent({migration: runningMigration, updateMigrationItem: mockCallback})
+          await waitFor(() => expect(mockCallback).toHaveBeenCalled())
+        })
+      })
+
+      describe('completed', () => {
+        it('should render completed state', () => {
+          renderComponent({migration: completedMigration, updateMigrationItem: jest.fn()})
+          expect(screen.getByText('Completed')).toBeInTheDocument()
+        })
+
+        it('should not start polling', async () => {
+          const mockCallback = jest.fn()
+          renderComponent({migration: completedMigration, updateMigrationItem: mockCallback})
+          await waitFor(() => expect(mockCallback).not.toHaveBeenCalled())
+        })
+      })
+
+      describe('failed', () => {
+        it('should render completed state', () => {
+          renderComponent({migration: failedMigration, updateMigrationItem: jest.fn()})
+          expect(screen.getByText('Failed')).toBeInTheDocument()
+        })
+
+        it('should not start polling', async () => {
+          const mockCallback = jest.fn()
+          renderComponent({migration: failedMigration, updateMigrationItem: mockCallback})
+          await waitFor(() => expect(mockCallback).not.toHaveBeenCalled())
+        })
+      })
+
+      describe('wait_for_selection', () => {
+        it('should render completed state', () => {
+          renderComponent({migration: waitingForSelectMigration, updateMigrationItem: jest.fn()})
+          expect(screen.getByText('Waiting for selection')).toBeInTheDocument()
+        })
+
+        it('should not start polling', async () => {
+          const mockCallback = jest.fn()
+          renderComponent({migration: waitingForSelectMigration, updateMigrationItem: mockCallback})
+          await waitFor(() => expect(mockCallback).not.toHaveBeenCalled())
+        })
+      })
+    })
+
+    describe('update status on progress done state', () => {
+      describe('when content_migration update result is not waiting_for_select', () => {
+        it('should render progress state', async () => {
+          // Content migration returns completed
+          const mockCallback = jest
+            .fn()
+            .mockReturnValue(Promise.resolve({workflow_state: 'completed'}))
+          // Progress returns fails
+          doFetchApi.mockReturnValueOnce(
+            Promise.resolve({json: {completion: 100, workflow_state: 'failed'}})
+          )
+          renderComponent({migration: queuedMigration, updateMigrationItem: mockCallback})
+          await waitFor(() => {
+            expect(mockCallback).toHaveBeenCalled()
+            // Progress workflow_state should be rendered
+            expect(screen.getByText('Failed')).toBeInTheDocument()
+          })
+        })
+      })
+
+      describe('when content_migration update result is waiting_for_select', () => {
+        it('should not render progress state', async () => {
+          // Content migration returns waiting_for_select
+          const mockCallback = jest
+            .fn()
+            .mockReturnValue(Promise.resolve({workflow_state: 'waiting_for_select'}))
+          // Progress returns completed
+          doFetchApi.mockReturnValueOnce(
+            Promise.resolve({json: {completion: 100, workflow_state: 'completed'}})
+          )
+          // The initial status
+          renderComponent({migration: queuedMigration, updateMigrationItem: mockCallback})
+          // await waitFor(() => expect(doFetchApi.mock.calls).toEqual([[progressHit], [progressHit]]))
+          await waitFor(() => {
+            expect(mockCallback).toHaveBeenCalled()
+            // The initial status should stay
+            expect(screen.getByText('Queued')).toBeInTheDocument()
+          })
+        })
+      })
+    })
   })
 })

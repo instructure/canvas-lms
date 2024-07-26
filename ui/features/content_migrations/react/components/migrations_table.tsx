@@ -27,17 +27,20 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Responsive} from '@instructure/ui-responsive'
-import type {ContentMigrationItem} from './types'
+import type {ContentMigrationItem, UpdateMigrationItemType} from './types'
 import MigrationRow from './migration_row'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
 type MigrationsResponse = {json: ContentMigrationItem[]}
-type MigrationResponse = {json: ContentMigrationItem}
 
 type ContentMigrationsTableViewProps = {
   migrations: ContentMigrationItem[]
-  updateMigrationItem: (migrationId: string, data: any, noXHR: boolean | undefined) => void
+  updateMigrationItem: (
+    migrationId: string,
+    data: any,
+    noXHR: boolean | undefined
+  ) => Promise<ContentMigrationItem | undefined>
 }
 
 const ContentMigrationsTableCondensedView = ({
@@ -95,8 +98,8 @@ export const ContentMigrationsTable = ({
       .catch(showFlashError(I18n.t("Couldn't load previous content migrations")))
   }, [setMigrations])
 
-  const updateMigrationItem = useCallback(
-    (migrationId: string, data: any, noXHR: boolean | undefined) => {
+  const updateMigrationItem: UpdateMigrationItemType = useCallback(
+    async (migrationId: string, data: any, noXHR: boolean | undefined) => {
       if (noXHR) {
         setMigrations(prevMigrations =>
           prevMigrations.map((m: ContentMigrationItem) =>
@@ -104,17 +107,20 @@ export const ContentMigrationsTable = ({
           )
         )
       } else {
-        doFetchApi({
-          path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations/${migrationId}`,
-        })
-          .then((response: MigrationResponse) => {
-            setMigrations(prevMigrations =>
-              prevMigrations.map((m: ContentMigrationItem) =>
-                m.id === migrationId ? {...response.json, ...data} : m
-              )
-            )
+        try {
+          const response = await doFetchApi<ContentMigrationItem>({
+            path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations/${migrationId}`,
           })
-          .catch(showFlashError(I18n.t("Couldn't update content migrations")))
+          const json = response.json
+          setMigrations(prevMigrations =>
+            prevMigrations.map((m: ContentMigrationItem) =>
+              m.id === migrationId ? {...json, ...data} : m
+            )
+          )
+          return json
+        } catch {
+          showFlashError(I18n.t("Couldn't update content migrations"))
+        }
       }
     },
     [setMigrations]
