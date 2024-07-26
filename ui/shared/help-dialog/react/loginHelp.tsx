@@ -83,13 +83,12 @@ export function renderLoginHelp(loginLink: Element): void {
   if (!anchorElement) {
     throw new TypeError('Element must be an <a> element or a descendant of an <a> element')
   }
-  const linkText = anchorElement.visibleTextContent
   const wrapper = document.createElement('span')
   anchorElement.replaceWith(wrapper)
   wrapper.appendChild(anchorElement)
   ReactDOM.render(
     <QueryProvider>
-      <LoginHelp linkText={linkText} />
+      <LoginHelp linkText={anchorElement.innerText} />
     </QueryProvider>,
     wrapper
   )

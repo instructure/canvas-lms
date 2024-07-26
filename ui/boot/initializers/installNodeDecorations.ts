@@ -16,10 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// This adds a new property to the DOM Node prototype that returns the visible
-// text content of the node. node.visibleTextContent will work just like node.textContent
-// but will omit any non-displayed text nodes (e.g. text nodes inside hidden elements
-// such as screenreader content.)
+// This is a polyfill for Node.prototype.innerText, which is not supported in JSDOM.
+// It will run at boot time if the browser does not support innerText,
+// which should never happen for a "real" browser but definitely willl
+// happen in Jest tests using JSDOM.
+//
+// Written so that other DOM polyfills can be easily added here as needed.
 
 // exported for tests only
 export const getVisibleTextContent = (element: Node): string =>
@@ -35,22 +37,17 @@ export const getVisibleTextContent = (element: Node): string =>
     .join(' ')
     .trim()
 
-declare global {
-  interface Node {
-    visibleTextContent: string
-  }
+function polyfillInnerText(): void {
+  // be careful that this is idempotent
+  if ('innerText' in document.body) return
+  Object.defineProperty(Node.prototype, 'innerText', {
+    get() {
+      return getVisibleTextContent(this)
+    },
+    enumerable: true,
+  })
 }
 
 export function up(): void {
-  if (
-    typeof Object.getOwnPropertyDescriptor(Node.prototype, 'visibleTextContent')?.get ===
-    'undefined'
-  ) {
-    Object.defineProperty(Node.prototype, 'visibleTextContent', {
-      get() {
-        return getVisibleTextContent(this)
-      },
-      enumerable: true,
-    })
-  }
+  polyfillInnerText()
 }

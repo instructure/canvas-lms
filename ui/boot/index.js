@@ -45,7 +45,7 @@ try {
   console.error('Failed to init Sentry, errors will not be captured', e)
 }
 
-// add our custom method(s) to the DOM Node class
+// add our custom method(s) to DOM classes if necessary
 installNodeDecorations()
 
 // we already put a <script> tag for the locale corresponding ENV.MOMENT_LOCALE
