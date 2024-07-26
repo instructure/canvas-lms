@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,13 +18,15 @@
 
 import React, {useEffect, useReducer, useState} from 'react'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {Button} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconInfoLine} from '@instructure/ui-icons'
+import {Modal} from '@instructure/ui-modal'
 import type {GradingScheme} from '../../../gradingSchemeApiModel'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 
 const I18n = useI18nScope('GradingSchemeManagement')
 
@@ -65,6 +67,7 @@ export const AccountDefaultSelector = ({
   const [isButtonVisible, showButton] = useReducer(() => true, false)
   const [isButtonEnabled, setIsButtonEnabled] = useState<boolean>(false)
   const [applyButtonText, setApplyButtonText] = useState<string>(I18n.t('Apply'))
+  const [isModalOpen, setModalOpen] = useState<boolean>(false)
 
   useEffect(() => {
     setSelectedId(defaultGradingSchemeId)
@@ -83,9 +86,18 @@ export const AccountDefaultSelector = ({
   }
 
   const handleSchemeChange = () => {
+    setModalOpen(true)
+  }
+
+  const handleModalConfirm = () => {
     setIsButtonEnabled(false)
     setApplyButtonText(I18n.t('Applied'))
     onChange?.(selectedId)
+    setModalOpen(false)
+  }
+
+  const handleModalClose = () => {
+    setModalOpen(false)
   }
 
   return (
@@ -122,6 +134,34 @@ export const AccountDefaultSelector = ({
           {applyButtonText}
         </Button>
       )}
+      <Modal
+        open={isModalOpen}
+        onDismiss={handleModalClose}
+        label={I18n.t('Confirm Default Grading Scheme Change')}
+        size="small"
+      >
+        <Modal.Header>
+          <CloseButton
+            screenReaderLabel={I18n.t('Close')}
+            placement="end"
+            offset="small"
+            onClick={handleModalClose}
+            data-testid="confirm-default-grading-scheme-change-modal-close-button"
+          />
+          <Heading>{I18n.t('Confirm Default Grading Scheme Change')}</Heading>
+        </Modal.Header>
+        <Modal.Body>
+          {I18n.t(
+            'This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.'
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button margin="0 x-small" color="primary" onClick={handleModalConfirm}>
+            {I18n.t('Confirm')}
+          </Button>
+          <Button onClick={handleModalClose}>{I18n.t('Cancel')}</Button>
+        </Modal.Footer>
+      </Modal>
     </Flex>
   )
 }
