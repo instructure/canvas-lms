@@ -35,7 +35,7 @@ import {
   cloneObject,
   getParsedOverrides,
   removeOverriddenAssignees,
-  processModuleOverrides
+  processModuleOverridesV2,
 } from '../util/differentiatedModulesUtil'
 import {uid} from '@instructure/uid'
 import DateValidator from '@canvas/grading/DateValidator'
@@ -65,6 +65,7 @@ const AssignToContent = ({
   const [stagedImportantDates, setStagedImportantDates] = useState(importantDates)
   const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
   const [moduleAssignees, setModuleAssignees] = useState([])
+  const [initialModuleOverrides, setInitialModuleOverrides] = useState([])
   const dateValidator = useMemo(
     () =>
       new DateValidator({
@@ -132,7 +133,13 @@ const AssignToContent = ({
       // initialState is set only 1 time to check if the overrides have pending changes
       setInitialState(state)
       // hasModuleOverrides and module assignees are only set once since they don't change
-      setHasModuleOverrides(overrides.some(card => card.context_module_id))
+      let moduleOverrides = []
+      for (const card in state){
+        moduleOverrides = moduleOverrides.concat(state[card].overrides.filter(o => o.context_module_id))
+      }
+      setInitialModuleOverrides(moduleOverrides)
+
+      setHasModuleOverrides(moduleOverrides.length > 0)
       const allModuleAssignees = overrides
         .filter(override => override.context_module_id)
         ?.map(moduleOverride => {
@@ -186,12 +193,12 @@ const AssignToContent = ({
       })
     }
 
-    // TODO: ensure that editing a module override produces a new override
-    // const withoutModuleOverrides = processModuleOverrides(newOverrides, [])
-    // resetOverrides(newOverrides, withoutModuleOverrides)
+    const withoutModuleOverrides = processModuleOverridesV2(newOverrides, initialModuleOverrides)
+    resetOverrides(newOverrides, withoutModuleOverrides)
+    stagedOverridesRef.current = newOverrides
 
     onSync(newOverrides, stagedImportantDates)
-  }, [stagedCards])
+  }, [stagedOverrides])
 
   const cards = useMemo(() => {
     const selectedOptionIds = []
@@ -430,7 +437,7 @@ const AssignToContent = ({
 
   const importantDatesCheckbox = useCallback(() => {
     if (supportDueDates && (ENV.K5_SUBJECT_COURSE || ENV.K5_HOMEROOM_COURSE)) {
-      const disabled = !stagedOverrides?.some(override => override.due_at)
+      const disabled = !stagedOverridesRef.current?.some(override => override.due_at)
       const checked = !disabled && stagedImportantDates
       return (
         <div id="important-dates">
@@ -448,7 +455,7 @@ const AssignToContent = ({
         </div>
       )
     }
-  }, [handleImportantDatesChange, stagedOverrides, supportDueDates, stagedImportantDates])
+  }, [handleImportantDatesChange, supportDueDates, stagedImportantDates])
 
   return (
     <>
