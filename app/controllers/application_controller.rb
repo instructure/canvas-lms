@@ -406,6 +406,7 @@ class ApplicationController < ActionController::Base
     non_scoring_rubrics
     top_navigation_placement
     rubric_criterion_range
+    lti_migration_info
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes

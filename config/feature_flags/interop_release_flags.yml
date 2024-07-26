@@ -202,6 +202,17 @@ lti_login_required_error_page:
       state: allowed_on
     ci:
       state: allowed_on
+lti_migration_info:
+  state: hidden
+  display_name: LTI 1.1 to 1.3 Migration Info
+  shadow: true
+  description: When enabled, allows users to view LTI 1.1 to 1.3 migration info on the External Apps page.
+  applies_to: RootAccount
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_multiple_assignment_deep_linking:
   state: hidden
   display_name: LTI Multiple Assignment Deep Linking

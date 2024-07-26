@@ -30,6 +30,7 @@ class Progress < ActiveRecord::Base
        :epub_export,
        :sis_batch,
        :course_pace,
+       :context_external_tool,
        { context_user: "User", quiz_statistics: "Quizzes::QuizStatistics" }]
   belongs_to :user
   belongs_to :delayed_job, class_name: "::Delayed::Job", optional: true
