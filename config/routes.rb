@@ -1533,6 +1533,10 @@ CanvasRails::Application.routes.draw do
       %w[course account].each do |context|
         get "#{context}s/:#{context}_id/external_tools/sessionless_launch", action: :generate_sessionless_launch, as: "#{context}_external_tool_sessionless_launch"
         get "#{context}s/:#{context}_id/external_tools/:external_tool_id", action: :show, as: "#{context}_external_tool_show"
+
+        # Migration URL
+        get "#{context}s/:#{context}_id/external_tools/:external_tool_id/migration_info", action: :migration_info, as: "#{context}_external_tool_migration_info"
+
         get "#{context}s/:#{context}_id/external_tools", action: :index, as: "#{context}_external_tools"
         post "#{context}s/:#{context}_id/external_tools", action: :create, as: "#{context}_external_tools_create"
         post "#{context}s/:#{context}_id/create_tool_with_verification", action: :create_tool_with_verification, as: "#{context}_create_tool_with_verification"
