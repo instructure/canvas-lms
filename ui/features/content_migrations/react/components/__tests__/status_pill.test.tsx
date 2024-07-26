@@ -18,55 +18,89 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import StatusPill from '../status_pill'
+import StatusPill, {getColor} from '../status_pill'
 
 describe('StatusPill', () => {
-  describe('when the workflowState is pre_processing', () => {
-    it('renders the correct text', () => {
-      render(<StatusPill workflowState="pre_processing" hasIssues={false} />)
-      expect(screen.getByText('Created')).toBeInTheDocument()
-    })
-  })
-
   describe('when the workflowState is running', () => {
-    it('renders the correct text', () => {
-      render(<StatusPill workflowState="running" hasIssues={false} />)
+    const workflowState = 'running'
+
+    it('renders the Running text', () => {
+      render(<StatusPill workflowState={workflowState} hasIssues={false} />)
       expect(screen.getByText('Running')).toBeInTheDocument()
+    })
+
+    it('renders with the info color', () => {
+      const color = getColor({workflowState, hasIssues: false})
+      expect(color).toEqual('info')
     })
   })
 
   describe('when the workflowState is failed', () => {
-    it('renders the correct text', () => {
-      render(<StatusPill workflowState="failed" hasIssues={false} />)
+    const workflowState = 'failed'
+
+    it('renders the Failed text', () => {
+      render(<StatusPill workflowState={workflowState} hasIssues={false} />)
       expect(screen.getByText('Failed')).toBeInTheDocument()
+    })
+
+    it('renders with the danger color', () => {
+      const color = getColor({workflowState, hasIssues: false})
+      expect(color).toEqual('danger')
     })
   })
 
   describe('when the workflowState is completed', () => {
-    it('renders the correct text', () => {
-      render(<StatusPill workflowState="completed" hasIssues={false} />)
+    const workflowState = 'completed'
+
+    it('renders the Completed text', () => {
+      render(<StatusPill workflowState={workflowState} hasIssues={false} />)
       expect(screen.getByText('Completed')).toBeInTheDocument()
+    })
+
+    describe('when there was no issue', () => {
+      const hasIssues = false
+
+      it('renders with the success color', () => {
+        const color = getColor({workflowState, hasIssues})
+        expect(color).toEqual('success')
+      })
+    })
+
+    describe('when there was issue', () => {
+      const hasIssues = true
+
+      it('renders with the warning color', () => {
+        const color = getColor({workflowState, hasIssues})
+        expect(color).toEqual('warning')
+      })
     })
   })
 
   describe('when the workflowState is queued', () => {
-    it('renders the correct text', () => {
-      render(<StatusPill workflowState="queued" hasIssues={false} />)
+    const workflowState = 'queued'
+
+    it('renders the Queued text', () => {
+      render(<StatusPill workflowState={workflowState} hasIssues={false} />)
       expect(screen.getByText('Queued')).toBeInTheDocument()
     })
-  })
 
-  describe('when the workflowState is pre_processed', () => {
-    it('renders the correct text', () => {
-      render(<StatusPill workflowState="pre_processed" hasIssues={false} />)
-      expect(screen.getByText('Running')).toBeInTheDocument()
+    it('renders with the primary color', () => {
+      const color = getColor({workflowState, hasIssues: false})
+      expect(color).toEqual('primary')
     })
   })
 
   describe('when the workflowState is waiting_for_select', () => {
+    const workflowState = 'waiting_for_select'
+
     it('renders the correct text', () => {
-      render(<StatusPill workflowState="waiting_for_select" hasIssues={false} />)
+      render(<StatusPill workflowState={workflowState} hasIssues={false} />)
       expect(screen.getByText('Waiting for selection')).toBeInTheDocument()
+    })
+
+    it('renders with the primary color', () => {
+      const color = getColor({workflowState, hasIssues: false})
+      expect(color).toEqual('primary')
     })
   })
 })
