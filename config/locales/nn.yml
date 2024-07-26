@@ -3410,6 +3410,7 @@ nn:
   announcement: 
     no_title: "Ingen tittel"
   announcement_creation_failed_f7d227f5: "Oppretting av kunngjering mislukkast"
+  announcement_e37d6dbd: kunngjering
   announcement_ends_at_4ccc2a7e: "Kunngjering sluttar på"
   announcement_external_feeds_5be3f36b: "Eksterne straumar for kunngjering"
   announcement_fb4cb645: Kunngjering
@@ -25758,6 +25759,7 @@ nn:
   text_file_73d8d08c: Tekstfil
   text_input_d3480b8c: Tekstoppføring
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Spørsmålstypen Utan Spørsmål har blitt gjort om til eit Stimulusspørsmål; ver god og legg til eit spørsmål så det kan visast i quizen."
+  text_sms_4e2d82a7: "Tekst (SMS)"
   thai_8f9bc548: Thai
   thailand_66_5b3ef324: "Thailand (+66)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Brukarkontoen er sletta.  Kontakt systemansvarleg og få kontoen aktivert på nytt."
