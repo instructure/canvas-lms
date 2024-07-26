@@ -127,20 +127,6 @@ export const AddressBookContainer = props => {
   }, [loading, data, searchTerm])
 
   useEffect(() => {
-    if (
-      props.activeCourseFilter?.contextID === null &&
-      props.activeCourseFilter?.contextName === null
-    ) {
-      setInputValue('')
-      setFilterHistory([
-        {
-          context: null,
-        },
-      ])
-    }
-  }, [props.activeCourseFilter])
-
-  useEffect(() => {
     props.onInputValueChange(searchTerm)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm])
@@ -213,7 +199,18 @@ export const AddressBookContainer = props => {
   }
 
   useEffect(() => {
-    if (props.activeCourseFilter && !filterHistory[filterHistory.length - 1]?.context) {
+    if (
+      props.activeCourseFilter?.contextID === null &&
+      props.activeCourseFilter?.contextName === null
+    ) {
+      setInputValue('')
+      setFilterHistory([
+        {
+          context: null,
+        },
+      ])
+    }
+    if (props.activeCourseFilter?.contextID && props.activeCourseFilter?.contextName) {
       addFilterHistory({
         context: {
           contextID: props.activeCourseFilter.contextID,
