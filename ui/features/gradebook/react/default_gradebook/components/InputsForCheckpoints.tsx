@@ -42,6 +42,7 @@ import {
   type SubmissionData,
 } from '@canvas/grading/grading.d'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
+import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')
 
@@ -64,15 +65,19 @@ type Props = {
   latePolicy: {
     lateSubmissionInterval: string
   }
+  customGradeStatusesEnabled: boolean
+  customGradeStatuses?: GradeStatus[]
 }
 
 export const InputsForCheckpoints = (props: Props) => {
+  const standardStatuses: string[] = [NONE, LATE, MISSING, EXCUSED, EXTENDED]
+
   const checkpointState = props.checkpointStates.find(
     checkpoint => checkpoint.label === props.subAssignmentTag
   )
 
   const [localTimeLate, setLocalTimeLate] = useState(checkpointState?.timeLate || '')
-  const checkpointStatus = checkpointState?.status
+  const checkpointStatus = checkpointState?.customGradeStatusId || checkpointState?.status
   const isStatusLate = checkpointStatus === LATE
 
   useEffect(() => {
@@ -146,11 +151,15 @@ export const InputsForCheckpoints = (props: Props) => {
             value={checkpointStatus}
             onChange={(_e, {value}) => {
               props.updateCheckpointStates(props.subAssignmentTag, 'timeLate', '0')
-              props.updateCheckpointStates(
-                props.subAssignmentTag,
-                'status',
-                value?.toString() || NONE
-              )
+              if (standardStatuses.includes(value)) {
+                props.updateCheckpointStates(
+                  props.subAssignmentTag,
+                  'status',
+                  value?.toString() || NONE
+                )
+              } else {
+                props.updateCheckpointStates(props.subAssignmentTag, 'customGradeStatusId', value)
+              }
             }}
             data-testid={props.subAssignmentTag + '-checkpoint-status-select'}
           >
@@ -169,6 +178,12 @@ export const InputsForCheckpoints = (props: Props) => {
             <SimpleSelect.Option id={EXTENDED} value={EXTENDED}>
               {I18n.t('Extended')}
             </SimpleSelect.Option>
+            {props.customGradeStatusesEnabled &&
+              props.customGradeStatuses?.map(status => (
+                <SimpleSelect.Option key={status.id} id={status.id} value={status.id}>
+                  {status.name}
+                </SimpleSelect.Option>
+              ))}
           </SimpleSelect>
         </Flex.Item>
       </Flex>

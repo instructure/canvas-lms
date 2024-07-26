@@ -453,6 +453,21 @@ describe "Grade Detail Tray:" do
       expect(reply_to_topic_submission.reload.excused).to be_truthy
     end
 
+    it "changes custom status as expected and persist it" do
+      Gradebook.visit(@course)
+      Gradebook::Cells.open_tray(@students[0], @checkpoint_assignment)
+
+      reply_to_topic_select = f("[data-testid='reply_to_topic-checkpoint-status-select']")
+
+      reply_to_topic_select.click
+      fj("span[role='option']:contains('Custom Status')").click
+
+      reply_to_topic_assignment = @checkpoint_assignment.sub_assignments.find_by(sub_assignment_tag: "reply_to_topic")
+      reply_to_topic_submission = reply_to_topic_assignment.submissions.find_by(user: @students[0])
+
+      expect(reply_to_topic_submission.custom_grade_status_id).to eq @custom_status.id
+    end
+
     context "sub submissions context", :ignore_js_errors do
       it "displays late status with separate late times" do
         # Set late times for each checkpoint
