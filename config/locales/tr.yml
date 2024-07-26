@@ -2374,6 +2374,7 @@ tr:
   announcement: 
     no_title: "Başlık Yok"
   announcement_creation_failed_f7d227f5: "Duyuru oluşturma işlemi başarısız oldu"
+  announcement_e37d6dbd: duyuru
   announcement_ends_at_4ccc2a7e: "Duyuru bitiş tarihi"
   announcement_external_feeds_5be3f36b: "Duyuru Harici Beslemeleri"
   announcement_fb4cb645: Duyuru
@@ -18928,6 +18929,7 @@ tr:
   text_entry_e1808b2f: "Metin Girişi"
   text_entry_submission_cannot_be_empty_3d187cae: "Metin girişli gönderi boş olamaz"
   text_input_d3480b8c: "Metin Girişi"
+  text_sms_4e2d82a7: "Metin (SMS)"
   thailand_66_5b3ef324: "Tayland (+66)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Bu kullanıcı hesabı silindi. Lütfen sistem yöneticisi ile kullanıcı hesabınızın tekrardan aktive edilmesi için iletişime geçiniz."
   the_ability_for_users_to_receive_notifications_fro_bbcf487b: "Kullanıcıların slack'ten bildirim alma yeteneği"
