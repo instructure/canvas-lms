@@ -269,6 +269,7 @@ export type RootAccountFeatureId =
   | 'instui_nav'
   | 'lti_deep_linking_module_index_menu_modal'
   | 'lti_dynamic_registration'
+  | 'lti_registrations_next'
   | 'lti_multiple_assignment_deep_linking'
   | 'lti_overwrite_user_url_input_select_content_dialog'
   | 'mobile_offline_mode'

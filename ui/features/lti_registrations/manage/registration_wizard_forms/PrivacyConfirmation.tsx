@@ -22,34 +22,39 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import type {RegistrationOverlayStore} from '../../registration_wizard/registration_settings/RegistrationOverlayState'
 import {htmlEscape} from '@instructure/html-escape'
 import {
   AllLtiPrivacyLevels,
   i18nLtiPrivacyLevel,
   i18nLtiPrivacyLevelDescription,
   isLtiPrivacyLevel,
-} from '../../model/LtiPrivacyLevel'
-import {Flex} from '@instructure/ui-flex'
-
-export type PrivacyConfirmationProps = {
-  toolName: string
-  overlayStore: RegistrationOverlayStore
-}
+  type LtiPrivacyLevel,
+} from '../model/LtiPrivacyLevel'
 
 const I18n = useI18nScope('lti_registration.wizard')
 
-export const PrivacyConfirmation = ({toolName, overlayStore}: PrivacyConfirmationProps) => {
-  const [{state, ...actions}, setState] = React.useState(overlayStore.getState())
-  React.useEffect(
-    () =>
-      overlayStore.subscribe(s => {
-        setState(s)
-      }),
-    [overlayStore]
-  )
+export type PrivacyConfirmationProps = {
+  /**
+   * The name of the app being configured
+   */
+  appName: string
+  /**
+   * The privacy level which the user has selected
+   */
+  selectedPrivacyLevel: LtiPrivacyLevel
+  /**
+   * Called when the user changes the privacy level
+   * @param privacyLevel
+   * @returns
+   */
+  privacyLevelOnChange: (privacyLevel: LtiPrivacyLevel) => void
+}
 
-  const selectedPrivacyLevel = state.registration.privacy_level
+export const PrivacyConfirmation = ({
+  appName,
+  selectedPrivacyLevel,
+  privacyLevelOnChange,
+}: PrivacyConfirmationProps) => {
   const messages = isLtiPrivacyLevel(selectedPrivacyLevel)
     ? [
         {
@@ -71,7 +76,7 @@ export const PrivacyConfirmation = ({toolName, overlayStore}: PrivacyConfirmatio
       <Text
         dangerouslySetInnerHTML={{
           __html: I18n.t('Select what data *%{toolName}* has access to.', {
-            toolName: htmlEscape(toolName),
+            toolName: htmlEscape(appName),
             wrapper: ['<strong>$1</strong>'],
           }),
         }}
@@ -80,10 +85,10 @@ export const PrivacyConfirmation = ({toolName, overlayStore}: PrivacyConfirmatio
         <SimpleSelect
           messages={messages}
           renderLabel={I18n.t('User Data Shared With This App')}
-          value={selectedPrivacyLevel === null ? undefined : selectedPrivacyLevel}
+          value={selectedPrivacyLevel}
           onChange={(_, {value}) => {
             if (isLtiPrivacyLevel(value)) {
-              actions.updatePrivacyLevel(value)
+              privacyLevelOnChange(value)
             }
           }}
         >

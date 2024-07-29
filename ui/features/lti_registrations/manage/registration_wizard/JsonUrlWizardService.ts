@@ -15,14 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import * as z from 'zod'
-import {ZPlacementConfig} from './LtiPlacementConfig'
 
-export interface PlatformSettings extends z.infer<typeof ZPlatformSettings> {}
+import type {fetchThirdPartyToolConfiguration} from '../api/registrations'
 
-export const ZPlatformSettings = z.object({
-  text: z.string().optional().nullable(),
-  icon_url: z.string().optional().nullable(),
-  platform: z.string().optional().nullable(),
-  placements: z.array(ZPlacementConfig),
-})
+export interface JsonUrlWizardService {
+  fetchThirdPartyToolConfiguration: typeof fetchThirdPartyToolConfiguration
+}

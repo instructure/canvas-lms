@@ -275,6 +275,14 @@ lti_registrations_page:
   environments:
     development:
       state: hidden
+lti_registrations_next:
+  state: hidden
+  applies_to: RootAccount
+  display_name: LTI Apps Page Features In-Development
+  description: When enabled, the LTI Apps page will have features that are currently in-development.
+  environments:
+    development:
+      state: allowed_on
 lti_resource_link_id_speedgrader_launches_reference_assignment:
   state: hidden
   applies_to: RootAccount

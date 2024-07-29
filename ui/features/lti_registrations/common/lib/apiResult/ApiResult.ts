@@ -29,6 +29,11 @@ export type ApiResult<A> =
       error: ZodError<any>
     }
   | {
+      _type: 'InvalidJson'
+      url: string
+      error?: Error
+    }
+  | {
       _type: 'GenericError'
       message: string
     }
@@ -58,6 +63,12 @@ export const exception = (error: Error): ApiResult<never> => ({
   error,
 })
 
+export const invalidJson = (url: string, error?: Error): ApiResult<never> => ({
+  _type: 'InvalidJson',
+  url,
+  error,
+})
+
 /**
  * Takes a Zod schema and a `fetch` response
  * and returns a promise that resolves to an `ApiResult`
@@ -71,20 +82,21 @@ export const parseFetchResult =
     return result
       .then(response => {
         if (response.ok) {
-          try {
-            return response.json().then(json => [response, json] as const)
-          } catch (e) {
-            throw new Error('Failed to parse response as JSON.')
-          }
+          return response
+            .json()
+            .then(json => [response, json] as const)
+            .then(([resp, json]) => [resp, schema.safeParse(json)] as const)
+            .then(([resp, parsedJson]) => {
+              return parsedJson.success
+                ? success(parsedJson.data)
+                : apiParseError(parsedJson.error, resp.url)
+            })
+            .catch(err => {
+              return invalidJson(response.url, err instanceof Error ? err : undefined)
+            })
         } else {
-          throw new Error('Response was not ok.')
+          return genericError('Response was not ok.')
         }
-      })
-      .then(([resp, json]) => [resp, schema.safeParse(json)] as const)
-      .then(([resp, parsedJson]) => {
-        return parsedJson.success
-          ? success(parsedJson.data)
-          : apiParseError(parsedJson.error, resp.url)
       })
       .catch(err => {
         if (err instanceof Error) {
@@ -102,6 +114,8 @@ export const formatApiResultError = (
     return `${error.error.message}${error.error.stack ? `\n${error.error.stack}` : ''}`
   } else if (error._type === 'GenericError') {
     return error.message
+  } else if (error._type === 'InvalidJson') {
+    return `Error parsing response from ${error.url}:\nResult was not valid JSON.`
   } else {
     const messages = error.error.errors
       .map(issue => {
