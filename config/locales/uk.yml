@@ -171,6 +171,7 @@ uk:
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Таблиця містить дані схеми оцінювання. Кожен рядок містить ім'я, максимальний і мінімальний відсотки. Крім того, кожен рядок містить кнопки для додавання нового та видалення поточного рядків."
   a_z_243c3301: "А – Я"
   a_z_29d8e67c: "А - Я"
+  about_70c18bba: Про
   about_this_service_b10bc808: "Про цю послугу"
   academic_benchmark: 
     plugin_settings: 
@@ -11734,6 +11735,7 @@ uk:
   nav_logo_background_ba33fb7f: "Фон логотипу навігації"
   nav_text_94206145: "Текст навігації"
   nav_text_active_a924ae88: "Текст навігації активовано"
+  navigation_ee9af92d: Навігація
   near_mastery_f25174a4: "Майже майстерність"
   need_a_canvas_account_221d18ed: "Необхідний обліковий запис Canvas?"
   netherlands_31_63e4f1b9: "Нідерланди (+31)"
