@@ -52,7 +52,7 @@ class VideoCaptionService < ApplicationService
   def pass_initial_checks
     return false unless config["app-host"].present?
     return false unless auth_token.present?
-    return false unless @type.include?("video")
+    return false unless @type&.include?("video")
     return false unless @media_id
     return false if @media_object.media_tracks.where(kind: "subtitles").exists?
     return false if url.nil?
