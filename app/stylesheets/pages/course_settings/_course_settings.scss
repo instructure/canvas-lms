@@ -220,9 +220,11 @@ ul.user_list div.enrollment_type.pending {
   li.navitem {
     color: $section_tabs_color;
     cursor: pointer;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     @include fontSize($ic-font-size--small);
-    padding: direction-sides(4px 0 4px 25px);
+    padding: direction-sides(4px 0 4px 10px);
     border: solid $section_tabs_border_bottom_color;
     border-width: 0 1px 1px;
     &:hover {
@@ -233,6 +235,18 @@ ul.user_list div.enrollment_type.pending {
       .disabled_message {
         display: none;
       }
+    }
+    .draggable_handle {
+      display: inline-block;
+      padding: 10px 0px;
+      margin-right: 10px;
+      width: 25px;
+      min-width: 25px;
+    }
+    .navitem_content {
+      display: inline-block;
+      padding: 10px 0px;
+      flex-grow: 1
     }
     .disabled_message {
       display: none;
@@ -250,7 +264,7 @@ ul.user_list div.enrollment_type.pending {
     .disabled_message {
       display: block;
       font-size: 0.8em;
-      padding-#{direction(left)}: 10px;
+      padding-#{direction(left)}: 0px;
       line-height: 0.7em;
       font-style: italic;
     }
