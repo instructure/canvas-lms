@@ -328,7 +328,6 @@ resource_link_uuid_in_custom_substitution:
   applies_to: RootAccount
 top_navigation_placement:
   state: hidden
-  shadow: true
   applies_to: RootAccount
   display_name: Top Navigation Placement
   description: Enables top_navigation LTI placement. (LTI 1.3 Only)
