@@ -332,6 +332,7 @@ nb-x-k12:
   a_z_29d8e67c: "A - Å"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Evne til å sende inn annoterte dokumentoppgaver."
   ability_to_submit_student_annotation_assignments_9ee47e3f: "Evne til å sende inn elevoppgaver."
+  about_smart_search_c8e7fcb4: "Om Smart søk"
   about_this_service_b10bc808: "Angående denne tjenesten"
   above_max_rating_64b29915: "Over maks. vurdering"
   academic_benchmark: 
@@ -2608,6 +2609,7 @@ nb-x-k12:
       Tillat abonnement på live arrangementer som kan settes opp til å bli levert
       via HTTPS webhooks.
   allow_lor_tools: "Tillat brukere å vise og bruke eksterne verktøy som er konfigurert for LOR."
+  allow_lti_1_3_resource_links_api_341599b: "Tillat LTI 1.3 ressurslenker API"
   allow_lti_tools_to_have_an_editor_button_icon_with_15c1342a: "Tillat LTI-verktøy å ha et redigeringsknapp-ikon uten plassering (bruk et standardikon)"
   allow_migration_of_quizzes_during_course_copy_and__35d80756: "Tillat migrering av quizer i løpet av kopiering og importering av fag"
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "La moderator gi flere uavhengige tilbakemeldinger for valgte innleveringer"
@@ -3886,6 +3888,7 @@ nb-x-k12:
   are_you_sure_you_want_to_delete_this_enrollment_74ecfeb1: "Er du sikker på at du vil slette denne påmeldingen?"
   are_you_sure_you_want_to_delete_this_entry_9aecd6d3: "Er du sikker på at du vil slette denne innlegget?"
   are_you_sure_you_want_to_delete_this_event_824b1e33: "Er du sikker på at du ønsker å slette denne hendelsen?"
+  are_you_sure_you_want_to_delete_this_event_deletin_30f256d2: "Er du sikker på at du ønsker å slette denne hendelsen? Sletting av denne hendelsen vil også slette den tilknyttede oppgaven."
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Er du sikker på at du ønsker å slette dette settet med vurderingsperiode?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Er du sikker på at du vil slette denne vurderingsperioden?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Er du sikker på at du vil slette denne vurderingsskalaen?"
@@ -3944,6 +3947,7 @@ nb-x-k12:
   as_of_a036fa2e: "Fra og med"
   as_of_date_the_lti_1_3_oidc_auth_endpoint_has_chan_a8783bc6: "Fra og med %{date}, har LTI 1.3 OIDC Auth-endepunktet endret seg fra https://canvas.instructure.com/api/lti/authorize_redirect til https://sso.canvaslms.com/api/lti/authorize_redirect. Begrunnelsen og omfanget av denne endringen er detaljert i *denne Canvas Community-artikkelen*, og ytterligere informasjon er tilgjengelig i våre API-dokumenter. Denne endringen er liten og vil ikke ta så lang tid, men krever konfigurasjonsendring på verktøysiden for hvert LTI 1.3-verktøy som er installert i Canvas."
   as_of_date_the_lti_1_3_platform_storage_specificat_74b82d8d: "Fra og med %{date}, støttes LTI 1.3-plattformlagringsspesifikasjonen fullt ut av Canvas. Verktøy som ønsker å implementere den, må endre OIDC Auth-endepunktet de lagrer for Canvas fra *https://canvas.instructure.com/api/lti/authorize_redirect* til *https://sso.canvaslms.com/api/lti/authorize_redirect*. OIDC Auth-endepunktet som anbefales for nye 1.3-verktøyinstallasjoner er også endret, og vi anbefaler at alle 1.3-verktøy bytter konfigurasjon til dette nye endepunktet så snart som mulig."
+  as_of_june_1_2024_searchable_items_include_content_62e31b5a: "Fra 1. juni 2024 inkluderer søkbare elementer innholdssider, beskjeder, diskusjonsforespørsler og oppgavebeskrivelser, med planer om å utvide."
   as_of_june_1_2024_the_smart_search_feature_is_quer_cced176f: "Fra 1. juni 2024 spør Smart søk-funksjonen etter følgende elementer (inkludert titler) i et fag: innholdssider, beskjeder, diskusjonsforespørsler, oppgavebeskrivelser."
   as_primary_c07e9394: "Som primær"
   as_secondary_ab10dec8: "Som sekundær"
@@ -5052,6 +5056,7 @@ nb-x-k12:
   available_from_date_must_precede_available_until_c9f9e533: "\"Tilgjengelig fra\" dato må gå foran \"Tilgjengelig inntil\""
   available_from_f84e4611: "Tilgjengelig fra"
   available_from_field_for_styleguide_7ced3861: "Tilgjengelig fra felt for styleguide"
+  available_from_time_86bf4e22: "Tilgjengelig fra klokkeslett"
   available_pronouns_b45330b1: "Tilgjengelige pronomener"
   available_submission_types_1c577ae5: "Tilgjengelige innleveringstyper"
   available_to_b7350e02: "Tilgjengelig til"
@@ -5061,6 +5066,7 @@ nb-x-k12:
   available_until_f3b9c4ed: "Tilgjengelig frem til"
   available_until_field_for_styleguide_85d5d65a: "Tilgjengelighetsfelt for stil-veileder"
   available_until_lock_at_ab022445: "Tilgjengelig til %{lock_at}"
+  available_until_time_818f35d: "Tilgjengelig til klokkeslett"
   available_until_untildate_b926fe11: "Tilgjengelig til %{untilDate}"
   availableslots_available_87b8b69d: "%{availableSlots} Tilgjengelig"
   availableslots_more_available_be5193a8: "%{availableSlots} mer tilgjengelig"
@@ -6109,6 +6115,7 @@ nb-x-k12:
   cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
       Begrens antallet RCE-er som blir gjengitt ved første sideinnlasting. Initialiser deretter
       hver av dem i det de er i ferd med å gå inn i visningsporten.
+  captcha_failed_to_load_52251e9f: "Captcha kunne ikke lastes inn"
   caption_1cf95987: Bildetekst
   captions_inherited_from_a_parent_course_cannot_be__9248fa3a: "Bildetekster som er arvet fra et overordnet fag, kan ikke fjernes."
   captions_subtitles_af2c47e: Teksting/underteksting
@@ -6609,6 +6616,7 @@ nb-x-k12:
   common_cartridge_qti_new_quizzes_import_58b786ce: "Standardformat QTI for import av Nye quizer"
   common_timezones_2b00baba: "Vanlige tidssoner"
   commons_ed0252fb: Commons
+  commons_new_quizzes_support_cb162314: "Commons støtte for nye quizer"
   communicate_course_objectives_f457158c: "Kommunisere fagets målsetting"
   communicate_grading_expectations_484a1f01: "Kommuniser vurderingsforventninger"
   communicate_to_your_students_exactly_what_will_be__7312d45d: |-
@@ -6942,6 +6950,7 @@ nb-x-k12:
   confetti_for_valid_links_7506df83: "Konfetti for gyldige koblinger"
   config_url_e96ceaf3: Konfig-URL
   configuration_error_906691a5: Konfigurasjonsfeil
+  configuration_json_cannot_be_empty_f3664d30: "Konfigurasjon-JSON kan ikke være tom."
   configuration_location_ee0f6592: Konfigurasjonslokalisasjon
   configuration_type_25a084a4: Konfigurasjonstype
   configure_ecb97e30: Konfigurer
@@ -7586,6 +7595,7 @@ nb-x-k12:
   contribute_4730e633: Bidra
   contribute_to_the_page_2116bf3b: "Bidra til siden"
   contributed_to_this_module_item_and_is_complete_2799d5c: "Bidratt til dette modulelementet og er fullført"
+  contributing_to_development_4647b24e: "Bidrar til utvikling"
   controls_the_final_changes_needed_to_fully_conform_8398b749: |-
       Styrer de endelige endringene som er nødvendige for å fullstendig overholde LTI Platform Storage
       -spesifikasjonen, inkludert mottak av meldinger adressert til riktig OIDC Auth
@@ -9172,7 +9182,7 @@ nb-x-k12:
     registered_services: "Registrerte tjenester"
     revisions: Revisjoner
     rubrics: Vurderingskriterier
-    search: Søk
+    search: "Smart søk"
     settings: Innstillinger
     site_admin: Nettstedadministrator
     stats: Statistikk
@@ -10374,6 +10384,7 @@ nb-x-k12:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Vis verdier"
   displaying_to_students_b1e92058: "Viser til elever"
+  displayname_9410813e: "%{displayName}"
   displayname_loaded_14d71a0a: "%{displayName} lastet inn"
   displayname_loading_in_progress_2be325fd: "Lasting av %{displayName} pågår"
   displayname_loading_pending_3aa2723e: "Lasting av %{displayName} venter"
@@ -10968,6 +10979,7 @@ nb-x-k12:
   english_united_kingdom_a613f831: "Engelsk (Storbritannia)"
   enhance_color_contrast_of_content_685ddd49: "Forbedre fargekontrast på innholdet"
   enhance_password_options_efbf3e48: "Forbedre passordalternativer"
+  enhance_your_canvas_experience_with_apps_that_offe_ba956afb: "Forbedre Canvas-opplevelsen din med apper som tilbyr innholdsbibliotek, samarbeidsverktøy, analyser og mer. Denne siden er knutepunktet for alle app-funksjoner! Bruk Oppdag-siden for å finne og installere nye apper, og Administrer-siden for å se gjennom og endre de installerte appene dine."
   enhanced_docviewer_url_security_72e9baa9: "Forbedret DocViewer URL-sikkerhet"
   enhanced_grade_change_auditing_2b155dfa: "Forbedret revisjon av vurderingsendring"
   enhanced_gradebook_filters_a3be5e7d: "Forbedrede vurderingsoveriktsfiltre"
@@ -12270,6 +12282,7 @@ nb-x-k12:
   finland_358_abeffc8a: "Finland (+358)"
   finnish_4df2923d: Finsk
   first_9685680a: første
+  first_item_last_item_of_total_items_displayed_a21552d9: "%{first_item} – %{last_item} av %{total_items} vises"
   first_last_name_9820d256: "For, Etternavn"
   first_name_d5c12500: Fornavn
   first_reviewer_sortorder_e2184140: "Første sensor %{sortOrder}"
@@ -12378,6 +12391,7 @@ nb-x-k12:
   from_gravatar_58372d5a: "Fra Gravatar"
   from_grouptitle_860dff95: "Fra %{groupTitle}"
   from_the_provider_of_the_enrollments_834d5ae4: "fra leverandøren av påmeldingene"
+  from_time_e23bdd0f: "Fra klokkeslett"
   front_page_50cae87e: Forside
   front_page_must_be_set_first_4dbbfdbe: "Forsiden må etableres først"
   front_page_must_be_set_first_c5246f7d: "Fremside må settes opp først"
@@ -12854,6 +12868,7 @@ nb-x-k12:
       all_sections: "Alle seksjoner"
       buttons: 
         save_settings: "Lagre innstillinger"
+        show_new_sg_ui: "Bruk speedgraders nye grensesnitt"
       comment_submitted: "Din kommentar har blitt sendt inn."
       crocodoc_pending: "Crocodoc behander fortsatt dette dokumentet."
       headers: 
@@ -13646,6 +13661,7 @@ nb-x-k12:
   helps_administrators_and_teachers_make_more_meanin_c458bcf7: "Hjelper administratorer og lærere å ta mer meningsfulle beslutninger når de importerer, organiserer og redigerer mål på kontoen og i fagene sine."
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Her er en flott mulighet til å bli kjent med kalenderen og legge til ikke-oppgave-relaterte hendelser du kanskje har til faget. Ikke bekymre deg, vi vil hjelpe deg gjennom det."
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "Her er noen raske tips for å komme i gang med Canvas!"
+  hh_mm_5faafa69: "tt:mm"
   hi_contrast_373b614f: "Høy kontrast"
   hidden_130c3791: skjult
   hidden_14a032a7: Skjult
@@ -13976,6 +13992,7 @@ nb-x-k12:
       Hvis det er aktivert, vil Canvas tillate at verktøy viser flere innholdstyper
       i én og samme forespørsel på fagmodulsiden
   if_enabled_canvas_will_be_able_to_export_new_quizz_504132df: "Hvis aktivert, vil Canvas kunne eksportere Nye quizer som en del av Common Cartridge eksportpakker."
+  if_enabled_canvas_will_be_able_to_share_new_quizze_784525a: "Hvis aktivert, vil Canvas kunne dele Nye quizer med Commons."
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Hvis aktivert, vil importører av Common Cartridge konvertere HTML-filer til sider"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Dersom aktivert, må innholdsdesignere gi informasjon om opphavsrett og lisens for filer før de publiseres. Gjelder kun om bedre fil-søk er aktivert."
   if_enabled_creates_assignments_from_lineitems_in_d_90089a84: "Hvis aktivert, oppretter oppgaver fra LineItems i dyplenke-meldinger."
@@ -14051,6 +14068,9 @@ nb-x-k12:
   if_enabled_the_tool_installation_and_configuration_c974cdb2: |-
       Hvis aktivert, vil verktøyets installasjons- og konfigurasjonsskjemaer på sidene for Konto- og Faginnstillinger bruke
       InstUI-komponenter i stedet for de eldre, mindre tilgjengelige egenutviklede komponentene.
+  if_enabled_the_tray_that_allows_users_to_assign_le_7197db0a: |-
+      Hvis aktivert, vil skuffen som lar brukere tilordne læringsobjekter bli optimalisert for
+      objekter med store mengder overstyringer.
   if_enabled_the_user_s_lti_url_input_on_the_select__fa539830: |-
       Hvis aktivert, vil brukerens LTI URL-inndata i dialogen for å velge innhold bli overskrevet
       hvis verktøyet svarer med en gyldig LTI URL.
@@ -15318,6 +15338,7 @@ nb-x-k12:
   limit_group_members_to_leave_blank_for_no_limit_c341e248: "Begrens gruppemedlemer til (la stå tomt for ingen grense)"
   limit_groups_to_group_limit_members_40651ea7: "Begrens grupper til %{group_limit} medlemmer"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Begrens deltakere til å delta i %{num_appointments} møter."
+  limit_personal_access_token_creation_to_admins_a9b8d7fe: "Begrens opprettelse av personlig tilgangstoken til administratorer."
   limit_search_to_activity_after_c1ac2449: "Begrens søk til aktivitet etter"
   limit_search_to_activity_before_e05aad05: "Begrens søk til aktivitet før"
   limit_section_privileges_e6425dfd: limit_section_privileges
@@ -15538,6 +15559,8 @@ nb-x-k12:
   lock_date_cannot_be_after_section_end_d37da70c: "Låsedato kan ikke være etter seksjonslutt"
   lock_date_cannot_be_after_term_end_cf1a188f: "Låsedato kan ikke være etter avslutning av termin"
   lock_date_cannot_be_before_due_date_ac30f54: "Låsedato kan ikke være før forfallsdato"
+  lock_date_cannot_be_before_reply_to_topic_due_date_fa73db43: "Låsedato kan ikke være før forfallsdatoen for svar på tema."
+  lock_date_cannot_be_before_required_replies_due_da_d2763f71: "Låsedato kan ikke være før forfallsdatoen for påkrevde svar"
   lock_discussion_title_failed_9d49f2d: "Låse diskusjoner %{title} mislyktes"
   lock_discussion_title_succeeded_fb24ebfc: "Låse diskusjoner %{title} lykkes"
   lock_questions_after_answering_5aecef9d: "Lås spørsmålene etter at svar er avgitt"
@@ -15727,6 +15750,8 @@ nb-x-k12:
   lti_add_e3bc0049: "LTI – legg til"
   lti_add_edit_delete_15905170: "LTI - legg til / rediger / slett"
   lti_advantage_services_c1746cb4: "LTI-fordel tjenester"
+  lti_apps_discover_page_cd95458b: "Oppdagelsesside for LTI-apper"
+  lti_apps_page_bd3867af: "Side for LTI-apper"
   lti_context_id_should_be_unique_7437a74d: "lti_context_id må være unik"
   lti_deep_linking_for_module_index_menu_881feeee: "LTI dyp kobling for modulens indeksmeny"
   lti_deep_linking_line_items_5e0079f7: "LTI dyplenke-linjeelementer"
@@ -15880,6 +15905,7 @@ nb-x-k12:
   march_2020_responsiveness_f810a65b: "Mars 2020 Ansvar"
   march_bbe310ee: Mars
   mark_all_announcement_read_eda5292b: "Merk alle beskjeder som lest"
+  mark_all_announcement_read_f4fc9137: "Merk alle beskjeder som lest"
   mark_all_as_read_8f3bdf57: "Merk alle som lest"
   mark_all_as_read_a995ffbe: "Merk alle som lest"
   mark_all_as_unread_10e7f0fe: "Merk alle som ulest"
@@ -19462,6 +19488,7 @@ nb-x-k12:
   outcome_mastery_scales_8c3a814d: "Ekspertiseskalaer for mål"
   outcome_mastery_scales_add_edit_171551c: "Mestringsskalaer for mål - Legg til/rediger"
   outcome_menu_4fe5813: Målmeny
+  outcome_name_27d81c86: "Navn på mål"
   outcome_outcome_id_is_not_available_in_context_con_2143db54: "Mål %{outcome_id} er ikke tilgjengelig i kontekst %{context_type}#%{context_id}"
   outcome_path_mastery_points: "%{path} mestringspoeng"
   outcome_path_result: "%{path} resultat"
@@ -22980,6 +23007,8 @@ nb-x-k12:
   required_peer_reviews_23bea465: "Obligatoriske medelevvurderinger"
   required_replies_8ec3e238: "Nødvendige svar"
   required_replies_due_date_f976c9af: "Krever forfallsdato for svar"
+  required_replies_number_d941ee4c: "Påkrevde svar (%{number})"
+  required_replies_required_replies_ab82825e: "Påkrevde svar (%{required_replies})"
   required_replies_requiredreplies_d91bed30: "Påkrevde svar (%{requiredReplies})"
   required_to_view_quiz_results_dba7368b: "Kreves for å vise quizresultater"
   required_values_1eb5841f: "Påkrevde verdier"
@@ -23630,6 +23659,7 @@ nb-x-k12:
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: "Søk etter oppgaver i Vurderingsoversikt og nytt design for oppgaver og elevsøk"
   search_by_99d1ba5f: "Søk etter"
   search_by_app_name_company_name_8ea86de: "Søk etter appnavn og firmanavn"
+  search_by_app_or_company_name_ad468715: "Søk etter app- eller firmanavn"
   search_by_extension_name_company_name_345e690c: "Søk etter utvidelsesnavn og firmanavn"
   search_by_name_email_or_id_5fd43dc9: "Søk etter navn, e-post eller ID"
   search_by_name_or_id_3bdab12e: "Søk etter navn eller ID"
@@ -23686,6 +23716,7 @@ nb-x-k12:
   search_totalaccounts_calendars_b26322e0: "Søk i %{totalAccounts} kalendere"
   search_within_grouptitle_4d38272f: "Søk i %{groupTitle}"
   search_within_outcome_group_7ac6ac88: "Søk i målsgruppe"
+  searchable_content_7a9e0f33: "Søkbart innhold"
   searching_b0207e7f: Søker
   searching_for_announcements_in_sections_must_span__80e4dfe4: "Lete etter beskjeder i seksjoner må vare nøyaktig et fag"
   second_2d4ecf45: andre
@@ -24014,6 +24045,7 @@ nb-x-k12:
       MÅ være aktivert før dette flagget kan aktiveres. Når dette flagget er aktivert,
       vil brukergrensesnittet og API-en som lar brukere lage modultype AssignmentOverrides være 
       aktivert, og dermed vil funksjonen være fullt funksjonell.
+  selective_release_optimized_tray_873075ff: "Selektiv utgivelse – Optimalisert skuff"
   selective_release_ui_api_changes_a60b681a: "Selektiv utgivelse – UI/API-endringer"
   self_enrollments: 
     already_enrolled: 
@@ -24507,7 +24539,8 @@ nb-x-k12:
       name_pronunciation_header_tip: "For å bekrefte riktig uttale av navnet, skriv inn en fonetisk uttale."
       name_pronunciation_label: "Navneuttale:"
       name_pronunciation_label_tip: "For å bekrefte riktig uttale av navnet, skriv inn en fonetisk uttale."
-      no_links: "%{name} har ikke lagt til noen lenker"
+      no_links: "Ingen lenger er lagt til"
+      no_name_pronunciation: "Ingen navneuttale oppgitt"
       nothing_in_common: "Dere har ingenting felles"
       save_profile: "Lagre profil"
       service_contact: "kontakt %{user} med %{service}"
@@ -24516,7 +24549,7 @@ nb-x-k12:
       titles: 
         click_to_change_profile_pic: "Klikk for å endre profilbilde"
       user_enrolled: Påmeldinger
-      user_has_no_bio: "%{user} har ikke laget en biografi"
+      user_has_no_bio: "Ingen biografi er lagt til"
       ways_to_contact_user: Kontakt
     recent_activity: 
       date_column: Dato
@@ -25086,8 +25119,12 @@ nb-x-k12:
     threshold_24h: 24h
     threshold_36h: 36h
   smart_assignment_alerts_abc2224: "Smart oppgave-varsler"
+  smart_search_community_c2a115a2: "Smart søk-fellesskap"
+  smart_search_currently_in_development_for_canvas_u_541c3754: "Smart søk, som for tiden er under utvikling for Canvas, bruker semantiske algoritmer og AI for å forstå søkekontekst og semantisk betydning, ikke bare samsvar med søkeord."
+  smart_search_employs_embeddings_to_mathematically__3c20cdd1: "Smart søk bruker «innbygginger» for matematisk å representere innhold og spørringer for sammenligning, forståelse av nøkkelord eller generelle spørringer på alle språk, takker være den flerspråklige AI-modellen. Skriv søkeord ved å bruke nøkkelord, spørsmål, setninger eller det som er mest naturlig for deg for å beskrive det du prøver å finne."
   smart_search_fd7cd4: "Smart søk"
   smart_search_is_a_feature_of_canvas_that_is_curren_31f7d35d: "Smart søk er en funksjon i Canvas som er under utvikling.  Ved hjelp av semantiske algoritmer og AI, forstår den nye Smart søk-funksjonen konteksten til søk, og gir mer nøyaktige og relevante resultater uten behov for tradisjonelle boolske operatorer eller andre søkeverktøy."
+  smart_search_is_in_feature_preview_feedback_can_be_7a80049d: "Smart søk er i funksjonsforhåndsvisning. Tilbakemelding kan gis gjennom resultatvurderinger og Canvas fellesskapsområdet for Smart søk beta. Canvas fellesskapsområdet er tilgjengelig her: "
   smileys_emotion_edc2beac: "Smilefjes og følelser"
   sms_f0ddceeb: sms
   sms_is_only_used_for_multi_factor_authentication_i_73a11abc: "SMS brukes kun for flerfaktorautentisering (hvis aktivert for kontoen din)."
@@ -26074,7 +26111,7 @@ nb-x-k12:
     quizzes: Quizer
     rubrics: Vurderingskriterier
     schedule: Planlegger
-    search: Søk
+    search: "Smart søk"
     settings: Innstillinger
     syllabus: Fagoversikt
     tab_location_error: "Den faneplasseringen er ugyldig"
@@ -26998,6 +27035,7 @@ nb-x-k12:
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Denne vurderingen er forskjellig fra elevenes visning av vurderingen fordi noen oppgaver er skjult"
   this_grade_differs_from_the_student_s_view_of_the__f78d0023: "Denne vurderingen er annerledes enn den som vises til eleven fordi noen av oppgavevurderingene ikke er publisert ennå"
   this_grade_has_negative_points_496400d4: "Denne vurderingen har negative poeng"
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: "Denne vurderingen er for tiden droppet for denne eleven."
   this_grade_is_invalid_8ab192c7: "Denne vurderingen er ugyldig"
   this_grade_is_unread_fb79c002: "Denne vurderingen er ulest"
   this_grade_is_unusually_high_60533c20: "Denne vurderingen er uvanlig høy"
@@ -27265,6 +27303,7 @@ nb-x-k12:
   thread_addd9799: Tråd
   threshold_in_hours_to_notify_students_within_f33820aa: "Terskel (i timer) å varsle elever innen"
   threshold_pts_45f0e5d8: "terskel: %{pts}"
+  threshold_threshold_a67e73a1: "Terskel: %{threshold}"
   throttle_jobs_f61be56: "Strupe jobber"
   throttle_tag_tag_ba5b9b50: "Strupe-tag \"%{tag}\""
   throttling_jobs_4a90578c: "Struper jobber"
@@ -28498,6 +28537,8 @@ nb-x-k12:
   unlock_date_can_t_be_blank_43efb114: "Opplåsningsdatoen kan ikke være tom"
   unlock_date_cannot_be_after_due_date_8829d9ca: "Publiseringsdatoen kan ikke være etter forfallsdato"
   unlock_date_cannot_be_after_lock_date_591f7fda: "Publiseringsdatoen kan ikke være etter lås dato"
+  unlock_date_cannot_be_after_reply_to_topic_due_dat_37eee496: "Opplåsningsdato kan ikke være etter forfallsdatoen for svar på tema."
+  unlock_date_cannot_be_after_required_replies_due_d_df13dbc7: "Opplåsningsdato kan ikke være etter forfallsdatoen for påkrevde svar"
   unlock_date_cannot_be_before_course_start_9c7b8524: "Publiseringsdato kan ikke være før fagstart"
   unlock_date_cannot_be_before_section_start_793ddc66: "Publiseringsdato kan ikke være før seksjonsstart"
   unlock_date_cannot_be_before_term_start_d3c01813: "Publiseringsdato kan ikke være før terminstart"
@@ -28593,6 +28634,7 @@ nb-x-k12:
   until_date_must_be_after_the_available_date_8670dfcd: "Til-dato må være etter tilgjengelig dato"
   until_date_must_be_after_the_due_date_d961566c: "Til-dato må være etter forfallsdato"
   until_date_must_be_after_the_event_start_date_972f759d: "Til-dato må være etter startdatoen for hendelsen"
+  until_time_a6cade90: Til-tidspunkt
   untitled_16aa4f2b: "Uten navn"
   untitled_assignment_59354b34: "Uten tittel oppgave"
   untitled_filter_c07b8ddc: "Ikke navngitt filter"
@@ -29300,6 +29342,7 @@ nb-x-k12:
   using_login_attribute_integration_id_9067ea54: "Bruker innloggingsattributt: integrasjons-ID"
   using_login_attribute_sis_user_id_b5ec538f: "Bruker innloggingsattributt: SIS bruker-ID"
   using_login_attribute_unique_user_id_a307a9f: "Bruker innloggingsattributt: unik bruker-ID"
+  using_smart_search_aecf6c76: "Bruke Smart søk"
   utc_e44049af: UTC
   uuid_has_been_provisioned_ab0c6c9: "UUID er provisjonert."
   val_percent_c2ca6679: "%val prosent"
@@ -29585,6 +29628,7 @@ nb-x-k12:
   what_content_is_searchable_375a0670: "Hvilket innhold er søkbart?"
   what_does_provisioning_only_mean_eac9a4a1: "Hva betyr kun provisjonering?"
   what_happened_322d8259: "Hva skjedde?"
+  what_if_grades_7ad8ce0b: Hva-om-vurderinger
   what_if_score_change_operation_failed_b81afd6d: "Endring av hva-om-poengberegning mislyktes"
   what_if_score_input_for_assignmentname_d4092efe: "Hva-om-poengberegning for %{assignmentName}"
   what_if_score_updated_7565581d: "Hva-om-poengberegning oppdatert"
@@ -29683,11 +29727,16 @@ nb-x-k12:
   when_enabled_teachers_can_choose_to_allow_observer_320b555e: |-
       Når aktivert, kan lærere velge å tillate observatører å planlegge avtaler
       når de oppretter avtalegrupper i kalenderen.
+  when_enabled_the_canvas_api_for_lti_resource_links_25c51eb0: |-
+      Når aktivert, kan Canvas API for LTI ressurslenker brukes. Administratorer kan
+      bruke denne API-en for synlighet i innhold som returneres fra verktøy.
   when_enabled_the_hidden_html_forms_that_are_used_t_c5edd929: |-
       Når det er aktivert, vil de skjulte HTML-skjemaene som brukes til å utløse en LTI-start,
       få tilfeldige tall lagt til deres id. Når det er deaktivert, vil hver
       ha samme id som tool_form.
   when_enabled_the_internal_access_manager_will_be_u_bc470109: "Når aktivert, vil intern tilgangsbehandling brukes for å regulere tilgangen til visse forespørsler"
+  when_enabled_the_lti_apps_discover_page_will_be_av_39ad751c: "Når aktivert, vil Oppdag-siden for LTI-apper være tilgjengelig på Apper-siden."
+  when_enabled_the_lti_apps_page_will_be_available_i_23ec031f: "Når aktivert, vil siden for LTI-apper være tilgjengelig i sidefeltet Kontonavigering."
   when_enabled_the_lti_extensions_discover_page_will_8bb57ff6: "Når aktivert, vil Oppdagelsessiden for LTI-utvidelser være tilgjengelig i Utvidelsesvisningen."
   when_enabled_the_lti_extensions_page_will_be_avail_ac8ed3fa: "Når aktivert, vil siden for LTI-utvidelser være tilgjengelig i Kontonavigering."
   when_enabled_the_new_submission_type_resource_card_c0f45d0d: "Når de er aktivert, vil nye ressurskort for innleveringstype vises på redigeringssiden for oppgaven."
@@ -30336,6 +30385,7 @@ nb-x-k12:
   your_azure_active_directory_tenant_name_d8bb31fa: "Ditt Azure Active Directory-brukernavn"
   your_browser_connectivity_may_be_slow_or_unstable__97c1f4c5: "Tilkoblingen til nettleseren din kan være treg eller ustabil. Til tross for at nettleserens timer kobles fra, blir svarene dine registrert i fem minutter utover den opprinnelige tidsgrensen for dette forsøket."
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Din nettleser imøtekommer ikke minstekravene til Canvas. Vennligst besøk *Canvas Community* for en fullstendig liste over støttede nettlesere."
+  your_canvas_administrators_have_chosen_to_limit_yo_41a4187: "Canvas-administratorene dine har valgt å begrense muligheten til å generere din egen tilgangsnøkkel. Ta kontakt med Canvas-administratorene dine for å få dem til å generere en tilgangsnøkkel på dine vegne."
   your_classic_quizzes_have_been_migrated_to_new_qui_e49244da: "Dine Klassiske tester har migrert til Nye tester!"
   your_comment_is_not_posted_12677035: "Kommentaren din er ikke publisert"
   your_comment_was_auto_saved_as_a_draft_c49d3510: "Din kommentar ble auto-lagret som et utkast."
@@ -30390,6 +30440,7 @@ nb-x-k12:
   your_unpublished_changes_will_be_reverted_to_their_fd4ba075: "De upubliserte endringene dine vil bli tilbakestilt til tidligere lagret tilstand."
   your_webcam_may_already_be_in_use_6cd64c25: "Webkameraet ditt kan allerede være i bruk."
   your_work_has_been_submitted_519058f8: "Arbeidet ditt er sendt inn."
+  yyyy_mm_dd_cbbd9959: ÅÅÅÅ-MM-DD
   yyyy_mm_dd_hh_mm_a01b6081: "DD-MM-ÅÅÅÅ tt:mm"
   z_a_b48d8903: "Å - A"
   z_a_be2ab67c: Z–A
