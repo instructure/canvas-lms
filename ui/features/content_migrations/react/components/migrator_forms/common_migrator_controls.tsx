@@ -42,6 +42,7 @@ type CommonMigratorControlsProps = {
   onCancel: () => void
   fileUploadProgress: number | null
   isSubmitting: boolean
+  setIsQuestionBankDisabled?: (isDisabled: boolean) => void
 }
 
 const generateNewQuizzesLabel = () => (
@@ -103,6 +104,7 @@ export const CommonMigratorControls = ({
   onSubmit,
   onCancel,
   isSubmitting,
+  setIsQuestionBankDisabled,
 }: CommonMigratorControlsProps) => {
   const [selectiveImport, setSelectiveImport] = useState<null | boolean>(null)
   const [importBPSettings, setImportBPSettings] = useState<null | boolean>(null)
@@ -124,6 +126,15 @@ export const CommonMigratorControls = ({
     },
   })
   const [contentError, setContentError] = useState<boolean>(false)
+
+  const onCanImportAsNewQuizzesChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const target = e.target as HTMLInputElement
+      setImportAsNewQuizzes(target.checked)
+      setIsQuestionBankDisabled?.(target.checked)
+    },
+    [setImportAsNewQuizzes, setIsQuestionBankDisabled]
+  )
 
   const handleSubmit = useCallback(() => {
     const data: any = {settings: {}}
@@ -152,63 +163,50 @@ export const CommonMigratorControls = ({
     onSubmit,
   ])
 
-  const options = useMemo(() => {
-    const result = []
-    canImportAsNewQuizzes &&
-      result.push(
-        <Checkbox
-          key="existing_quizzes_as_new_quizzes"
-          name="existing_quizzes_as_new_quizzes"
-          value="existing_quizzes_as_new_quizzes"
-          label={generateNewQuizzesLabel()}
-          disabled={!ENV.QUIZZES_NEXT_ENABLED || isSubmitting}
-          defaultChecked={!!ENV.NEW_QUIZZES_MIGRATION_DEFAULT}
-          onChange={(e: React.SyntheticEvent<Element, Event>) => {
-            const target = e.target as HTMLInputElement
-            setImportAsNewQuizzes(target.checked)
-          }}
-        />
-      )
-    canOverwriteAssessmentContent &&
-      result.push(
-        <Checkbox
-          key="overwrite_assessment_content"
-          name="overwrite_assessment_content"
-          value="overwrite_assessment_content"
-          disabled={isSubmitting}
-          label={generateOverwriteLabel()}
-          onChange={(e: React.SyntheticEvent<Element, Event>) => {
-            const target = e.target as HTMLInputElement
-            setOverwriteAssessmentContent(target.checked)
-          }}
-        />
-      )
-    canAdjustDates &&
-      result.push(
-        <Checkbox
-          key="adjust_dates[enabled]"
-          name="adjust_dates[enabled]"
-          value="adjust_dates[enabled]"
-          disabled={isSubmitting}
-          label={I18n.t('Adjust events and due dates')}
-          onChange={(e: React.SyntheticEvent<Element, Event>) => {
-            const target = e.target as HTMLInputElement
-            setShowAdjustDates(target.checked)
-
-            const tmp = JSON.parse(JSON.stringify(dateAdjustments))
-            tmp.adjust_dates.enabled = target.checked ? 1 : 0
-            setDateAdjustments(tmp)
-          }}
-        />
-      )
-    return result
-  }, [
-    canImportAsNewQuizzes,
-    canOverwriteAssessmentContent,
-    canAdjustDates,
-    dateAdjustments,
-    isSubmitting,
-  ])
+  const options = [
+    ...(canImportAsNewQuizzes
+      ? [
+          <Checkbox
+            key="existing_quizzes_as_new_quizzes"
+            name="existing_quizzes_as_new_quizzes"
+            value="existing_quizzes_as_new_quizzes"
+            label={generateNewQuizzesLabel()}
+            disabled={!ENV.QUIZZES_NEXT_ENABLED || isSubmitting}
+            defaultChecked={!!ENV.NEW_QUIZZES_MIGRATION_DEFAULT}
+            onChange={onCanImportAsNewQuizzesChange}
+          />,
+        ]
+      : []),
+    ...(canOverwriteAssessmentContent
+      ? [
+          <Checkbox
+            key="overwrite_assessment_content"
+            name="overwrite_assessment_content"
+            value="overwrite_assessment_content"
+            disabled={isSubmitting}
+            label={generateOverwriteLabel()}
+            onChange={e => setOverwriteAssessmentContent(e.target.checked)}
+          />,
+        ]
+      : []),
+    ...(canAdjustDates
+      ? [
+          <Checkbox
+            key="adjust_dates[enabled]"
+            name="adjust_dates[enabled]"
+            value="adjust_dates[enabled]"
+            disabled={isSubmitting}
+            label={I18n.t('Adjust events and due dates')}
+            onChange={({target}) => {
+              setShowAdjustDates(target.checked)
+              const tmp = JSON.parse(JSON.stringify(dateAdjustments))
+              tmp.adjust_dates.enabled = target.checked ? 1 : 0
+              setDateAdjustments(tmp)
+            }}
+          />,
+        ]
+      : []),
+  ]
 
   const allContentText = (
     <>

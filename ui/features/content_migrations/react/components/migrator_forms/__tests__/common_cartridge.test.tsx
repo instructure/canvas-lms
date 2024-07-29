@@ -111,4 +111,21 @@ describe('CommonCartridgeImporter', () => {
       expect(getByRole('button', {name: 'Add substitution'})).toBeDisabled()
     })
   })
+
+  it('disable question bank inputs if "Import existing quizzes as New Quizzes" is checked', async () => {
+    window.ENV.NEW_QUIZZES_MIGRATION = true
+    window.ENV.NEW_QUIZZES_IMPORT = true
+    window.ENV.QUIZZES_NEXT_ENABLED = true
+    const {getByRole, queryByLabelText} = renderComponent()
+
+    await userEvent.click(getByRole('combobox', {name: 'Default Question bank'}))
+    await userEvent.click(getByRole('option', {name: 'Create new question bank...'}))
+    await userEvent.click(getByRole('checkbox', {name: /Import existing quizzes as New Quizzes/}))
+
+    await waitFor(() => {
+      expect(getByRole('combobox', {name: 'Default Question bank'})).toBeInTheDocument()
+      expect(getByRole('combobox', {name: 'Default Question bank'})).toBeDisabled()
+      expect(queryByLabelText('New question bank')).not.toBeInTheDocument()
+    })
+  })
 })
