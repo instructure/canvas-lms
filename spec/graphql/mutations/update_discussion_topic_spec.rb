@@ -287,6 +287,16 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(result["errors"]).to be_nil
       expect(@topic.reload.attachment_id).to eq attachment.id
     end
+
+    it "allows update by a different teacher, even if there is an attachment" do
+      teacher2 = teacher_in_course.user
+
+      # The frontend sends the file_id always, as a string
+      result = run_mutation({ id: @topic.id, title: "Updated Title", file_id: @attachment.id.to_s }, teacher2)
+
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.title).to eq "Updated Title"
+    end
   end
 
   it "allow to update the anonymous state if there is no reply" do
