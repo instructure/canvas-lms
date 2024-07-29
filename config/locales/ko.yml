@@ -133,6 +133,7 @@ ko:
   _5a374287: "..."
   _at_the_bottom__4360f2b4: "-- 맨 밑으로 --"
   _b4455c8b: "%"
+  about_70c18bba: 정보
   academic_benchmark: 
     api_error: "기관 %{auth}에 대한 표준을 업데이트할 수 없습니다."
     bad_ab_file: "제공한 Academic Benchmark 파일에 오류가 있습니다."
@@ -9435,6 +9436,7 @@ ko:
   name_1aed4a1b: 이름
   name_3806192d: "이름:"
   name_only_5f56718e: 이름만
+  navigation_ee9af92d: 탐색
   never_1ed1244d: "한 적 없음"
   new_13daf639: "새 항목"
   new_discussion_dae4fae3: "새 토론"
