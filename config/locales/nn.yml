@@ -297,6 +297,7 @@ nn:
   a_yearly_rrule_must_include_byday_or_bymonthday_b56649f4: "Ein årleg RRULE må inkludere BYDAY eller BYMONTHDAY"
   a_z_243c3301: A–Å
   a_z_29d8e67c: "A - Å"
+  about_70c18bba: Om
   about_this_service_b10bc808: "Om denne tenesta"
   above_max_rating_64b29915: "Over maksimal vurdering"
   academic_benchmark: 
@@ -17875,6 +17876,7 @@ nn:
   nav_text_94206145: Navigeringstekst
   nav_text_active_a924ae88: "Navigeringstekst, aktiv"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigasjon gir brukar løyve til å sjå personmenyvalet i emnemenyen."
+  navigation_ee9af92d: Navigasjon
   navigation_icon_45db938e: Navigasjonsikon
   navigation_menu_fd782ff8: Navigeringsmeny
   near_3282280c: Nær
