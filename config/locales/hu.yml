@@ -287,6 +287,7 @@ hu:
   a_yearly_rrule_must_include_byday_or_bymonthday_b56649f4: "Az éves RRULE-nak tartalmaznia kell a BYDAY vagy BYMONTHDAY kifejezést."
   a_z_243c3301: A–Z
   a_z_29d8e67c: A–Z
+  about_70c18bba: Névjegy
   about_this_service_b10bc808: "A szolgáltatásról"
   above_max_rating_64b29915: "Maximum érték felett"
   academic_benchmark: 
@@ -16603,6 +16604,7 @@ hu:
   navigate_to_speedgrader_for_title_assignment_47da92db: "Navigáljon a Gyorsértékelőben ehhez a feladathoz: %{title}"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigáció Engedélyezi a felhasználó számára a személyek link megtekintését a kurzusnavigációban.\n\
       \x20       "
+  navigation_ee9af92d: Navigáció
   navigation_menu_fd782ff8: "Navigációs menü"
   near_3282280c: Közel
   near_mastery_f25174a4: "Közel a jártassági szinthez"
