@@ -32,8 +32,14 @@ class Mutations::UpdateSubmissionGradeStatus < Mutations::BaseMutation
     if submission.grants_right?(current_user, :grade)
       if input[:custom_grade_status_id]
         submission.update(custom_grade_status_id: input[:custom_grade_status_id])
-      elsif input[:late_policy_status]
-        submission.update(late_policy_status: input[:late_policy_status])
+      elsif input[:late_policy_status] && input[:late_policy_status] != "none"
+        if input[:late_policy_status] == "excused"
+          submission.update(late_policy_status: nil, custom_grade_status_id: nil, excused: true)
+        else
+          submission.update(late_policy_status: input[:late_policy_status])
+        end
+      elsif (input[:custom_grade_status_id].nil? && input[:late_policy_status].nil?) || input[:late_policy_status] == "none"
+        submission.update(custom_grade_status_id: nil, late_policy_status: nil)
       end
     else
       errors[submission.id.to_s] = "Not authorized to set submission status"
