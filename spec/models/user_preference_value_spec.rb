@@ -21,6 +21,7 @@
 describe UserPreferenceValue do
   let(:regular_key) { :custom_colors }
   let(:subbed_key) { :course_nicknames }
+  let(:sub_key) {  123 }
 
   let(:migrated_user) do
     u = User.create!
@@ -38,6 +39,34 @@ describe UserPreferenceValue do
     expect(u.user_preference_values.count).to eq 2
     expect(u.get_preference(regular_key)).to eq "data"
     expect(u.get_preference(subbed_key, "subkey")).to eq "more data"
+  end
+
+  context "on multiple attempts to create a new row" do
+    context "with key and sub_key" do
+      it "calculates the value of the row based on the latest update" do
+        u = User.create!
+        expect(u.user_preference_values.count).to eq 0
+
+        u.set_preference(subbed_key, sub_key, "initial_data")
+        u.upsert_user_preference_value(subbed_key, sub_key, "updated_data")
+        expect(u.user_preference_values.count).to eq 1
+
+        expect(u.get_preference(subbed_key, sub_key)).to eq "updated_data"
+      end
+    end
+
+    context "with key without sub_key" do
+      it "calculates the value of the row based on the latest update" do
+        u = User.create!
+        expect(u.user_preference_values.count).to eq 0
+
+        u.set_preference(regular_key, nil, "initial_data")
+        u.upsert_user_preference_value(regular_key, nil, "updated_data")
+        expect(u.user_preference_values.count).to eq 1
+
+        expect(u.get_preference(regular_key, nil)).to eq "updated_data"
+      end
+    end
   end
 
   it "updates an existing row when setting a new value" do
