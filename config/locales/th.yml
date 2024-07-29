@@ -310,6 +310,7 @@ th:
   a_yearly_rrule_must_include_byday_or_bymonthday_b56649f4: "RRULE ประจำปีจะต้องประกอบไปด้วย BYDAY หรือ BYMONTHDAY"
   a_z_243c3301: A–Z
   ability_to_submit_student_annotation_assignments_9ee47e3f: สามารถส่งภารกิจการทำหมายเหตุกำกับสำหรับผู้เรียน
+  about_smart_search_c8e7fcb4: เกี่ยวกับระบบค้นหาอัจฉริยะ
   about_this_service_b10bc808: เกี่ยวกับบริการนี้
   above_max_rating_64b29915: เกินกว่าคะแนนประเมินสูงสุด
   academic_benchmark: 
@@ -2273,6 +2274,7 @@ th:
   allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       อนุญาตให้กำหนดการสมัครกิจกรรมไลฟ์ที่จะนำส่ง
       ผ่านเว็บฮุ้ค HTTPS
+  allow_lti_1_3_resource_links_api_341599b: "รองรับ API ลิงค์แหล่งข้อมูล LTI 1.3"
   allow_lti_tools_to_have_an_editor_button_icon_with_15c1342a: "อนุญาตให้เครื่องมือ LTI มีไอคอนปุ่มระบบแก้ไขโดยไม่ต้องจัดวาง (ใช้ไอคอนเครื่องมือเริ่มต้น)"
   allow_migration_of_quizzes_during_course_copy_and__35d80756: อนุญาตการโอนย้ายแบบทดสอบระหว่างการคัดลอกและนำเข้าบทเรียน
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "อนุญาตให้ผู้ควบคุมพิจารณาเกรดหลาย ๆ รายการสำหรับผลงานจัดส่งที่เลือกแบบเป็นอิสระ"
@@ -3125,6 +3127,7 @@ th:
   are_you_sure_you_want_to_delete_this_enrollment_74ecfeb1: แน่ใจว่าต้องการลบการลงทะเบียนนี้หรือไม่
   are_you_sure_you_want_to_delete_this_entry_9aecd6d3: แน่ใจว่าต้องการลบรายการนี้หรือไม่
   are_you_sure_you_want_to_delete_this_event_824b1e33: แน่ใจว่าต้องการลบกิจกรรมนี้หรือไม่
+  are_you_sure_you_want_to_delete_this_event_deletin_30f256d2: "แน่ใจว่าต้องการลบกิจกรรมนี้หรือไม่ การลบกิจกรรมนี้จะเป็นการลบภารกิจที่เกี่ยวข้องด้วย"
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: แน่ใจว่าต้องการลบชุดระยะเวลาการให้เกรดนี้หรือไม่
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: แน่ใจว่าต้องการลบระยะเวลาการให้เกรดนี้หรือไม่
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: แน่ใจว่าต้อกงารลบรูปแบบการให้เกรดนี้หรือไม่
@@ -3179,6 +3182,7 @@ th:
   as_of_a036fa2e: ณ
   as_of_date_the_lti_1_3_oidc_auth_endpoint_has_chan_a8783bc6: "เมื่อวันที่ %{date} LTI 1.3 OIDC Auth มีการเปลี่ยนแปลงจาก https://canvas.instructure.com/api/lti/authorize_redirect เป็น https://sso.canvaslms.com/api/lti/authorize_redirect สาเหตุและขอบเขตของการเปลี่ยนแปลงนี้มีระบุไว้ใน *บทความสำหรับกลุ่ม Canvas (Canvas Community) นี้* ข้อมูลเพิ่มเติมมีเผยแพร่ไว้ในเอกสาร API ของเรา นี่เป็นการเปลี่ยนแปลงเล็ก ๆ น้อย ๆ และไม่ใช้เวลานาน แต่ต้องมีการปรับเปลี่ยนค่าทางฝั่งของเครื่องมือสำหรับเครื่องมือ LTI 1.3 ทุก ๆ ตัวที่ติดตั้งใน Canvas"
   as_of_date_the_lti_1_3_platform_storage_specificat_74b82d8d: "ณ วันที่ %{date} LTI 1.3 Platform Storage รองรับการทำงานกับ Canvas อย่างสมบูรณ์แบบ ชุดเครื่องมือที่ต้องการดำเนินการจะต้องปรับเปลี่ยนปลายทาง OIDC Auth ที่ตนเองจัดเก็บข้อมูลสำหรับ Canvas จาก *https://canvas.instructure.com/api/lti/authorize_redirect* เป็น *https://sso.canvaslms.com/api/lti/authorize_redirect* ปลายทาง OIDC Auth ที่แนะนำสำหรับส่วนการติดตั้งเครื่องมือ 1.3 ใหม่มีการเปลี่ยนแปลงด้วยเช่นกัน และเราขอแนะนำให้ส่วนกำหนดค่าเครื่องมือ 1.3 ทั้งหมดใช้ปลายทางใหม่โดยเร็วที่สุด"
+  as_of_june_1_2024_searchable_items_include_content_62e31b5a: "ณ วันที่ 1 มิถุนายน 2024 รายการที่ค้นหาได้ประกอบไปด้วยเพจเนื้อหา ประกาศ การแจ้งในระบบสำหรับส่วนการพูดคุยและรายละเอียดภารกิจ และรายละเอียดเพิ่มเติมอื่น ๆ ในอนาคต"
   as_of_june_1_2024_the_smart_search_feature_is_quer_cced176f: "ตั้งแต่วันที่ 1 มิถุนายน 2024 ระบบค้นหาอัจฉริยะ (Smart Search) จะสืบค้นรายการต่อไปนี้ (รวมทั้งชื่อที่เกี่ยวข้อง) ภายในบทเรียน: หน้าเนื้อหา ประกาศ การแจ้งที่เกี่ยวกับส่วนการพูดคุย รายละเอียดภารกิจ"
   as_primary_c07e9394: เป้นรายการหลัก
   as_secondary_ab10dec8: เป็นรายการรอง
@@ -4099,6 +4103,7 @@ th:
   available_from_date_43b5e11d: "วันที่ ใช้ได้จาก"
   available_from_date_must_precede_available_until_c9f9e533: "\"วันที่ ใช้ได้จาก\" จะต้องอยู่ก่อน \"พร้อมใช้จนถึง\""
   available_from_f84e4611: ใช้ได้จาก
+  available_from_time_86bf4e22: ใช้ได้จากเวลา
   available_pronouns_b45330b1: สรรพนามที่ใช้ได้
   available_submission_types_1c577ae5: ประเภทผลงานจัดส่งที่มี
   available_to_b7350e02: พร้อมสำหรับ
@@ -4107,6 +4112,7 @@ th:
   available_until_date_d2fe6cb1: "ใช้ได้จนถึง %{date}"
   available_until_f3b9c4ed: ใช้ได้จนถึง
   available_until_lock_at_ab022445: "ใช้ได้จนถึง %{lock_at}"
+  available_until_time_818f35d: ใช้ได้จนถึงเวลา
   available_until_untildate_b926fe11: "ใช้ได้จนถึง %{untilDate}"
   availableslots_available_87b8b69d: "พร้อมใช้ %{availableSlots} รายการ"
   availableslots_more_available_be5193a8: "พร้อมใช้อีก %{availableSlots} รายการ"
@@ -4974,6 +4980,7 @@ th:
   cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
       บันทึกจำนวน REC ที่มีการเรนเดอร์ระหว่างโหลดเพจครั้งแรกไว้ หลังจากนั้น
       เริ่มดำเนินการแต่ละส่วนขณะที่กำลังจะเข้าสู่พื้นที่จัดแสดง
+  captcha_failed_to_load_52251e9f: "ไม่สามารถโหลด Captcha"
   caption_1cf95987: คำบรรยาย
   captions_inherited_from_a_parent_course_cannot_be__9248fa3a: คำบรรยายที่รับต่อมาจากบทเรียนต้นทางไม่สามารถลบได้
   captions_subtitles_af2c47e: คำบรรยาย/บทบรรยาย
@@ -5455,6 +5462,7 @@ th:
   common_cartridge_qti_new_quizzes_import_58b786ce: "การนำเข้าแบบทดสอบใหม่ของ Common Cartridge QTI"
   common_timezones_2b00baba: เขตเวลาร่วม
   commons_ed0252fb: Commons
+  commons_new_quizzes_support_cb162314: "บริการรองรับแบบทดสอบใหม่ Commons"
   communicate_course_objectives_f457158c: แจ้งวัตถุประสงค์สำหรับบทเรียน
   communicate_grading_expectations_484a1f01: แจ้งความคาดหวังในการให้เกรด
   communication_5255723c: การสื่อสาร
@@ -5768,6 +5776,7 @@ th:
   confetti_for_valid_links_7506df83: การแสดงความยินดีสำหรับลิงค์ที่ถูกต้อง
   config_url_e96ceaf3: "กำหนดค่า URL"
   configuration_error_906691a5: ข้อผิดพลาดการกำหนดค่า
+  configuration_json_cannot_be_empty_f3664d30: "JSON การกำหนดค่าจะปล่อยว่างไม่ได้"
   configuration_location_ee0f6592: ตำแหน่งการกำหนดค่า
   configuration_type_25a084a4: ประเภทการกำหนดค่า
   configure_ecb97e30: กำหนดค่า
@@ -6352,6 +6361,7 @@ th:
   contribute_4730e633: เข้าร่วม
   contribute_to_the_page_2116bf3b: มีส่วนร่วมในเพจนี้
   contributed_to_this_module_item_and_is_complete_2799d5c: มีส่วนร่วมในหน่วยการเรียนนี้และเสร็จสิ้นแล้ว
+  contributing_to_development_4647b24e: กำลังมีส่วนร่วมในการพัฒนา
   controls_the_final_changes_needed_to_fully_conform_8398b749: |-
       ควบคุมการเปลี่ยนแปลงขั้นสุดท้ายที่จำเป็นเพื่อให้เป็นไปตามรายละเอียดทางเทคนิคสำหรับพื้นที่จัดเก็บข้อมูลของแพลตฟอร์ม LTI (LTI Platform Storage)
       รวมทั้งการรับข้อความที่ส่งถึง OIDC Auth
@@ -7718,7 +7728,7 @@ th:
     registered_services: บริการที่ลงทะเบียนไว้
     revisions: ฉบับแก้ไข
     rubrics: เกณฑ์การให้คะแนน
-    search: ค้นหา
+    search: ระบบค้นหาอัจฉริยะ
     settings: ค่าปรับตั้ง
     site_admin: ผู้ดูแลไซต์
     stats: สถิติ
@@ -8685,6 +8695,7 @@ th:
   display_totals_for_all_grading_periods_option_4a72586: แสดงยอดรวมสำหรับตัวเลือกระยะเวลาการให้เกรดทั้งหมด
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: แสดงค่า
+  displayname_9410813e: "%{displayName}"
   displayname_loaded_14d71a0a: "%{displayName} โหลดแล้ว"
   displayname_loading_in_progress_2be325fd: "%{displayName} กำลังโหลด"
   displayname_loading_pending_3aa2723e: "%{displayName} รอการโหลด"
@@ -9207,6 +9218,7 @@ th:
   english_united_kingdom_a613f831: "อังกฤษ (สหราชอาณาจักร)"
   enhance_color_contrast_of_content_685ddd49: ปรับคอนทราสต์สีสำหรับเนื้อหา
   enhance_password_options_efbf3e48: ตัวเลือกการปรับปรุงรหัสผ่าน
+  enhance_your_canvas_experience_with_apps_that_offe_ba956afb: "เพิ่มความประทับใจในการใช้งาน Canvas ของคุณผ่านแอพที่นำเสนอไลบรารี่ข้อมูล เครื่องมือประสานการทำงาน ข้อมูลวิเคราะห์ ฯลฯ เพจนี้คือศูนย์รวมคุณสมบัติการใช้งานทั้งหมดจากแอพ! ใช้เพจ สืบค้น (Discover) เพื่อค้นหาและติดตั้งแอพใหม่ ๆ และเพจ จัดการ (Manage) เพื่อพิจารณารายละเอียดและแก้ไขแอพที่คุณติดตั้งไว้"
   enhanced_docviewer_url_security_72e9baa9: "ระบบรักษาความปลอดภัย DocViewer URL ที่เหนือกว่าเดิม"
   enhanced_gradebook_filters_a3be5e7d: ตัวกรองสมุดบันทีกเกรดแบบปรับปรุง
   enhanced_gradebook_filters_description: "คุณสมบัตินี้ประกอบไปด้วยตัวเลือกในการคัดกรองที่ดีกว่าในสมุดบันทึกเกรดของ Canvas ขณะเปิดใช้งานหมายเหตุกำกับนี้ การสืบค้นส่วนการปรับปรุงเนื้อหาที่กำลังดำเนินการตั้งแต่เนิ่น ๆ จะมีแจ้งให้ทราบอัตโนมัติสำหรับทุกชุดเนื้อหาเผยแพร่ ดูรายละเอียดทั้งหมดได้จาก*กลุ่มผู้ใช้ตัวกรองสมุดบันทึกเกรด (Gradebook Filters User Group)* จากกลุ่มใน Canvas (Canvas Community)"
@@ -10352,6 +10364,7 @@ th:
   finland_358_abeffc8a: "ฟินแลนด์ (+358)"
   finnish_4df2923d: ฟินแลนด์
   first_9685680a: ที่หนึ่ง
+  first_item_last_item_of_total_items_displayed_a21552d9: "จัดแสดง %{first_item} - %{last_item} จาก %{total_items}"
   first_last_name_9820d256: "ชื่อตัว นามสกุล"
   first_name_d5c12500: ชื่อ
   fix_missing_policy_applicator_gradebook_history_f3e62bc1: แก้ไขประวัติสมุดบันทึกเกรดส่วนการปรับใช้นโยบายที่ขาดหาย
@@ -10448,6 +10461,7 @@ th:
   from_gravatar_58372d5a: "จาก Gravatar"
   from_grouptitle_860dff95: "จาก %{groupTitle}"
   from_the_provider_of_the_enrollments_834d5ae4: จากผู้ให้บริการลงทะเบียน
+  from_time_e23bdd0f: จากเวลา
   front_page_50cae87e: หน้าแรก
   front_page_must_be_set_first_c5246f7d: จะต้องกำหนดหน้าแรกก่อน
   full_article_9296bb6f: บทความเต็ม
@@ -10771,6 +10785,7 @@ th:
       all_sections: กลุ่มย่อยทั้งหมด
       buttons: 
         save_settings: บันทึกค่าปรับตั้ง
+        show_new_sg_ui: "ใช้ speedgrader UI ใหม่"
       comment_submitted: จัดส่งความเห็นของคุณแล้ว
       crocodoc_pending: "Crocodoc ยังประมวลผลเอกสารนี้อยู่"
       headers: 
@@ -11453,6 +11468,7 @@ th:
   helps_administrators_and_teachers_make_more_meanin_c458bcf7: "ช่วยให้ผู้ดูแลระบบและผู้สอนสามารถตัดสินใจได้อย่างรอบด้านมากขึ้นขณะนำเข้า กำหนดโครงสร้าง และแก้ไขผลลัพธ์ในบัญชีและบทเรียนของตน"
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "นี่เป็นโอกาสที่สำคัญในการเรียนรู้เกี่ยวกับปฏิทินและเพิ่มกิจกรรมที่ไม่เกี่ยวข้องกับภารกิจที่คุณอาจมีสำหรับบทเรียน ไม่ต้องกังวล เราพร้อมช่วยคุณ"
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "ต่อไปนี้เป็นคำแนะนำอย่างง่าย ๆ เพื่อเริ่มใช้งาน Canvas!"
+  hh_mm_5faafa69: "hh:mm"
   hi_contrast_373b614f: คอนทราสต์สูง
   hidden_130c3791: ซ่อนไว้
   hidden_14a032a7: ซ่อนไว้
@@ -11747,6 +11763,7 @@ th:
       ฟิลด์ “สถานะ” จะไม่ถูกปรับเนื้อหาตามท้องถิ่น โดยจะเป็น
       ภาษาอังกฤษเสมอ
   if_enabled_canvas_will_be_able_to_export_new_quizz_504132df: "หากเปิดใช้งานไว้ Canvas จะสามารถส่งออก แบบทดสอบใหม่ (New Quizzes) ในแพคเกจส่งออก Common Cartridge (Common Cartridge Export Packages)"
+  if_enabled_canvas_will_be_able_to_share_new_quizze_784525a: "หากเปิดใช้งานไว้ Canvas จะสามารถแชร์แบบทดสอบใหม่ (New Quizzes) ไปยัง Commons"
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "หากเปิดใช้งานไว้ ผู้นำเข้า Common Cartridge จะแปลงไฟล์ HTML เป็น หน้าเพจ"
   if_enabled_creates_assignments_from_lineitems_in_d_90089a84: "หากเปิดใช้งานไว้ จะเป็นการจัดทำภารกิจจาก LineItems ในข้อความแบบ deep link"
   if_enabled_creates_assignments_from_lineitems_in_d_eebd3e13: "หากเปิดใช้งานไว้ จะเป็นการจัดทำภารกิจจาก LineItems ในข้อความดีพลิงค์ที่หน้าแก้ไขภารกิจ"
@@ -11815,6 +11832,9 @@ th:
   if_enabled_the_tool_installation_and_configuration_c974cdb2: |-
       หากเปิดใช้งานไว้ การติดตั้งเครื่องมือและแบบฟอร์มการกำหนดค่าการทำงานในเพจ บัญชีผู้ใช้และบทเรียนจะใช้
       ส่วนประกอบ InstUI แทนรายการเดิม ยกเว้นหากมีส่วนประกอบจากต้นทางที่สามารถเรียกใช้ได้
+  if_enabled_the_tray_that_allows_users_to_assign_le_7197db0a: |-
+      หากเปิดใช้งานไว้ ถาดรายการที่ผู้ใช้สามารถจัดสรรออบเจคต์การเรียนรู้จะถูกปรับประประสิทธิภาพสำหรับ
+      ออบเจคต์ที่มีการบอกล้างเป็นจำนวนมาก
   if_enabled_the_user_s_lti_url_input_on_the_select__fa539830: |-
       หากเปิดใช้งานไว้ ข้อมูล LTI URL ของผู้ใช้ในรายการสำหรับเนื้อหาที่เลือกจะถูกเขียนทับ
       หากเครื่องมือแจ้ง LTI URL ที่ถูกต้องกลับมา
@@ -12878,6 +12898,7 @@ th:
   limit_group_members_to_leave_blank_for_no_limit_c341e248: "จำกัดสมาชิกกลุ่มไว้ที่ (ปล่อยว่างหากไม่มีข้อจำกัด)"
   limit_groups_to_group_limit_members_40651ea7: "จำกัดสมาชิกกลุ่มที่ %{group_limit} คน"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "จำกัดผู้เข้าร่วมในการเข้าร่วม %{num_appointments} นัดหมาย"
+  limit_personal_access_token_creation_to_admins_a9b8d7fe: "จำกัดการจัดทำชุดข้อมูลการใช้งานส่วนตัวสำหรับผู้ดูแลระบบ (Admins)"
   limit_search_to_activity_after_c1ac2449: จำกัดการค้นหาสำหรับกิจกรรมหลังจาก
   limit_search_to_activity_before_e05aad05: จำกัดการค้นหาสำหรับกิจกรรมก่อน
   limit_section_privileges_e6425dfd: limit_section_privileges
@@ -13079,6 +13100,8 @@ th:
   lock_date_cannot_be_after_section_end_d37da70c: วันที่ล็อคจะอยู่หลังจากสิ้นสุดกลุ่มย่อยไม่ได้
   lock_date_cannot_be_after_term_end_cf1a188f: วันที่ล็อคจะอยู่หลังจากสิ้นสุดเทอมไม่ได้
   lock_date_cannot_be_before_due_date_ac30f54: วันที่ล็อคจะอยู่ก่อนวันครบกำหนดไม่ได้
+  lock_date_cannot_be_before_reply_to_topic_due_date_fa73db43: วันที่ล็อคจะอยู่ก่อนวันครบกำหนดการตอบกลับหัวข้อไม่ได้
+  lock_date_cannot_be_before_required_replies_due_da_d2763f71: วันที่ล็อคจะอยู่ก่อนวันครบกำหนดการตอบกลับที่กำหนดไม่ได้
   lock_discussion_title_failed_9d49f2d: "ล็อคการพูดคุย %{title} ล้มเหลว"
   lock_discussion_title_succeeded_fb24ebfc: "ล็อคการพูดคุย %{title} เสร็จสิ้น"
   lock_questions_after_answering_5aecef9d: ล็อคคำถามหลังตอบ
@@ -13261,6 +13284,8 @@ th:
   lti_add_e3bc0049: "LTI - เพิ่ม"
   lti_add_edit_delete_15905170: "LTI - เพิ่ม / แก้ไข / ลบ"
   lti_advantage_services_c1746cb4: "LTI Advantage Services"
+  lti_apps_discover_page_cd95458b: "เพจ สืบค้น (Discover) แอพ LTI"
+  lti_apps_page_bd3867af: "เพจ แอพ LTI (LTI Apps)"
   lti_context_id_should_be_unique_7437a74d: "lti_context_id ควรเป็นข้อมูลที่ไม่ซ้ำใคร"
   lti_deep_linking_for_module_index_menu_881feeee: "การเชื่อมโยง LTI แบบซับซ้อนสำหรับเมนูดัชนีหน่วยการเรียน"
   lti_deep_linking_line_items_5e0079f7: "รายการบรรทัด LTI แบบ Deep Linking"
@@ -13403,6 +13428,7 @@ th:
   maori_new_zealand_5380a95f: "เมารี (นิวซีแลนด์)"
   march_bbe310ee: มีนาคม
   mark_all_announcement_read_eda5292b: กำกับประกาศทั้งหมดว่าอ่านแล้ว
+  mark_all_announcement_read_f4fc9137: กำกับประกาศทั้งหมดว่าอ่านแล้ว
   mark_all_as_read_8f3bdf57: กำกับทั้งหมดว่าอ่านแล้ว
   mark_all_as_read_a995ffbe: กำกับทั้งหมดว่าอ่านแล้ว
   mark_all_as_unread_10e7f0fe: กำกับทั้งหมดว่ายังไม่ได้อ่าน
@@ -16694,6 +16720,7 @@ th:
   outcome_information_936c59ef: ข้อมูลผลลัพธ์
   outcome_mastery_scales_add_edit_171551c: "คะแนนความเชี่ยวชาญสำหรับผลลัพธ์ - เพิ่ม / แก้ไข"
   outcome_menu_4fe5813: เมนูผลลัพธ์
+  outcome_name_27d81c86: ชื่อผลลัพธ์
   outcome_outcome_id_is_not_available_in_context_con_2143db54: "ผลลัพธ์ %{outcome_id} ไม่พร้อมใช้งานในเนื้อหา %{context_type}#%{context_id}"
   outcome_path_mastery_points: "%{path} คะแนนความเชี่ยวชาญ"
   outcome_path_result: "%{path} ผลลัพธ์"
@@ -19846,6 +19873,8 @@ th:
   required_peer_reviews_23bea465: ความคิดเห็นจากผู้เกี่ยวข้องที่กำหนด
   required_replies_8ec3e238: การตอบกลับที่กำหนด
   required_replies_due_date_f976c9af: วันครบกำหนดการตอบกลับที่ระบุ
+  required_replies_number_d941ee4c: "การตอบกลับที่กำหนด (%{number})"
+  required_replies_required_replies_ab82825e: "การตอบกลับที่กำหนด (%{required_replies})"
   required_replies_requiredreplies_d91bed30: "การตอบกลับที่กำหนด (%{requiredReplies})"
   required_to_view_quiz_results_dba7368b: ต้องดูผลลัพธ์แบบทดสอบ
   required_values_1eb5841f: ค่าที่กำหนด
@@ -20414,6 +20443,7 @@ th:
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: ค้นหาภารกิจในสมุดบันทึกเกรดและรูปแบบใหม่สำหรับภารกิจและการค้นหาผู้เรียน
   search_by_99d1ba5f: ค้นหาจาก
   search_by_app_name_company_name_8ea86de: ค้นหาจากชื่อแอพและชื่อบริษัท
+  search_by_app_or_company_name_ad468715: ค้นหาจากชื่อแอพหรือชื่อบริษัท
   search_by_extension_name_company_name_345e690c: ค้นหาจากชื่อส่วนการทำงานเสริมและชื่อบริษัท
   search_by_name_email_or_id_5fd43dc9: "ค้นหาจากชื่อ อีเมลหรือ ID"
   search_by_name_or_id_3bdab12e: "ค้นหาจากชื่อหรือ ID"
@@ -20468,6 +20498,7 @@ th:
   search_term_must_be_at_least_num_characters_669098ed: "คำค้นหาจะต้องยาวอย่างน้อย %{num} ตัวอักษร"
   search_totalaccounts_calendars_b26322e0: "ค้นหา %{totalAccounts} ปฏิทิน"
   search_within_grouptitle_4d38272f: "ค้นหาจากใน %{groupTitle}"
+  searchable_content_7a9e0f33: เนื้อหาที่ค้นหาได้
   searching_b0207e7f: กำลังค้นหา
   searching_for_announcements_in_sections_must_span__80e4dfe4: การค้นหาประกาศในกลุ่มย่อยจะต้องครอบคลุมหนึ่งบทเรียนพอดี
   second_2d4ecf45: ที่สอง
@@ -20776,6 +20807,7 @@ th:
       จะต้องเปิดใช้งานก่อนที่จะเปิดใช้งานหมายเหตุกำกับนี้ได้ ขณะเปิดใช้งานหมายเหตุกำกับนี้
       UI และ API ที่ผู้ใช้สามารถใช้เพื่อจัดทำหน่วยการเรียน AssignmentOverrides จะ
       ถูกเปิดใช้งานและคุณสมบัตินี้จะสามารถใช้งานได้อย่างสมบูรณ์แบบ
+  selective_release_optimized_tray_873075ff: "รายการเผยแพร่เฉพาะ - ถาดรายการปรับแต่ง"
   selective_release_ui_api_changes_a60b681a: "ส่วนการเผยแพร่ที่กำหนด - การปรับเปลี่ยน UI/API"
   self_enrollments: 
     already_enrolled: 
@@ -21200,7 +21232,8 @@ th:
       name_pronunciation_header_tip: ยืนยันการออกเสียงชื่อของคุณที่ถูกต้องโดยกรอกข้อมูลการออกเสียง
       name_pronunciation_label: "การออกเสียงชื่อ:"
       name_pronunciation_label_tip: ยืนยันการออกเสียงชื่อของคุณที่ถูกต้องโดยกรอกข้อมูลการออกเสียง
-      no_links: "%{name} ยังไม่ได้เพิ่มลิงค์ใด ๆ"
+      no_links: ไม่มีลิงค์ที่เพิ่มเข้ามา
+      no_name_pronunciation: ไม่ได้แจ้งการออกเสียงชื่อไว้
       nothing_in_common: คุณไม่มีอะไรที่เชื่อมโยงกัน
       save_profile: บันทึกโพรไฟล์
       service_contact: "ติดต่อ %{user} ผ่าน %{service}"
@@ -21209,7 +21242,7 @@ th:
       titles: 
         click_to_change_profile_pic: คลิกเพื่อแก้ไขภาพโพรไฟล์
       user_enrolled: การลงทะเบียน
-      user_has_no_bio: "%{user} ยังไม่ได้เพิ่มประวัติส่วนตัว"
+      user_has_no_bio: ไม่ได้เพิ่มประวัติส่วนตัวไว้
       ways_to_contact_user: ข้อมูลติดต่อ
     recent_activity: 
       date_column: วันที่
@@ -21645,8 +21678,12 @@ th:
   smaller_numbers_mean_higher_priority_c69f4d0a: จำนวนที่ต่ำหมายถึงลำดับที่สูงกว่า
   smart_alerts_44db622e: ระบบแจ้งเตือนอัจฉริยะ
   smart_assignment_alerts_abc2224: ระบบแจ้งเตือนภารกิจอัจฉริยะ
+  smart_search_community_c2a115a2: กลุ่มของระบบค้นหาอัจฉริยะ
+  smart_search_currently_in_development_for_canvas_u_541c3754: "ระบบค้นหาอัจฉริยะ (Smart Search) ปัจจุบันอยู่ระหว่างการพัฒนาใน Canvas โดยจะใช้อัลกอริทึมแบบอิงตามความหมายและ AI เพื่อทำความเข้าใจบริบทในการสืบค้นและความหมายบ่งชี้ ไม่เฉพาะการเทียบคำค้นหาเท่านั้น"
+  smart_search_employs_embeddings_to_mathematically__3c20cdd1: "ระบบค้นหาอัจฉริยะ (Smart Search) เลือกใช้วิธีการ \"ผนวกข้อมูล\" เข้ากับเนื้อหาและส่วนการสืบค้นที่นำเสนอในทางคณิตศาสตร์สำหรับการเปรียบเทียบ ทำความเข้าใจคำค้นหาหรือส่วนการสืบค้นทั่วไปในภาษาต่าง ๆ โดยอาศัยระบบ AI ที่รองรับหลายภาษาช่วย เขียนเนื้อหาการสืบค้นโดยใช้คำค้นหา คำถาม ประโยคหรือสิ่งที่คุณคุ้นเคยเพื่อระบุรายละเอียดสิ่งที่คุณต้องการค้นหา"
   smart_search_fd7cd4: ระบบค้นหาอัจฉริยะ
   smart_search_is_a_feature_of_canvas_that_is_curren_31f7d35d: "ระบบค้นหาอัจฉริยะ (Smart Search) เป็นคุณสมบัติการทำงานใน Canvas ที่อยู่ระหว่างการพัฒนาในปัจจุบัน  การใช้อัลกอริทึมทางตรรกะและภาษา (semantic) และ AI ทำให้ระบบค้นหาอัจฉริยะ (Smart Search) สามารถเข้าใจบริบทของส่วนการสืบค้นเพื่อให้ผลการค้นหาแม่นยำและสอดคล้องมากยิ่งขึ้นโดยไม่ต้องอาศัยส่วนปฏิบัติการบูลีนแบบเดิม ๆ หรือเครื่องมือค้นหาอื่น ๆ"
+  smart_search_is_in_feature_preview_feedback_can_be_7a80049d: "ระบบค้นหาอัจฉริยะ (Smart Search) อยู่ในโหมดแสดงตัวอย่างคุณสมบัติการทำงาน สามารถแจ้งผลตอบรับได้ผ่านคะแนนผลลัพธ์และ กลุ่ม Canvas (Canvas Community) สำหรับเวอร์ชั่นเบต้าของระบบค้นหาอัจฉริยะ (Smart Search) กลุ่ม Canvas มีจัดแสดงไว้ที่นี่: "
   smileys_emotion_edc2beac: หน้ายิ้มและอารมณ์
   sms_f0ddceeb: SMS
   sms_is_only_used_for_multi_factor_authentication_i_73a11abc: "SMS ใช้เฉพาะสำหรับการตรวจรับรองแบบหลายชั้น (หากเปิดใช้งานไว้สำหรับบัญชีของคุณ)"
@@ -22563,7 +22600,7 @@ th:
     quizzes: แบบทดสอบ
     rubrics: เกณฑ์การให้คะแนน
     schedule: กำหนดเวลา
-    search: ค้นหา
+    search: ระบบค้นหาอัจฉริยะ
     settings: ค่าปรับตั้ง
     syllabus: หลักสูตร
     tab_location_error: ตำแหน่งแท็บดังกล่าวไม่ถูกต้อง
@@ -23376,6 +23413,7 @@ th:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: โฟลเดอร์นี้ปัจจุบันล็อคอยู่และไม่พร้อมสำหรับเรียกดู
   this_grade_differs_from_the_student_s_view_of_the__f78d0023: เกรดนี้แตกต่างจากมุมมองเกรดของผู้เรียนเนื่องจากเกรดสำหรับภารกิจบางส่วนยังไม่ได้แจ้งไว้
   this_grade_has_negative_points_496400d4: เกรดนี้มีคะแนนเป็นลบ
+  this_grade_is_currently_dropped_for_this_student_7bc78b78: เกรดนี้ปัจจุบันถูกดรอปไว้สำหรับผู้เรียนนี้
   this_grade_is_invalid_8ab192c7: เกรดนี้ไม่ถูกต้อง
   this_grade_is_unread_fb79c002: เกรดนี้ยังไม่ได้อ่าน
   this_grade_is_unusually_high_60533c20: เกรดนี้สูงผิดปกติ
@@ -23588,6 +23626,7 @@ th:
   this_will_update_all_student_mastery_results_withi_934580d1: นี่เป็นการอัพเดตผลความเชี่ยวชาญสำหรับผู้เรียนทั้งหมดภายในบทเรียนนี้
   thread_addd9799: ชุดข้อความ
   threshold_pts_45f0e5d8: "เกณฑ์ขั้นต่ำ: %{pts}"
+  threshold_threshold_a67e73a1: "เกณฑ์ขั้นต่ำ: %{threshold}"
   throttle_jobs_f61be56: ส่งข้อมูลงาน
   throttle_tag_tag_ba5b9b50: "ส่งข้อมูลแท็ก \"%{tag}\""
   throttling_jobs_4a90578c: กำลังส่งข้อมูลงาน
@@ -24422,6 +24461,8 @@ th:
   unlock_date_can_t_be_blank_43efb114: วันที่ปลดล็อคปล่อยว่างไม่ได้
   unlock_date_cannot_be_after_due_date_8829d9ca: วันที่ปลดล็อคจะอยู่หลังจากวันครบกำหนดไม่ได้
   unlock_date_cannot_be_after_lock_date_591f7fda: วันที่ปลดล็อคจะอยู่หลังจากวันที่ล็อคไม่ได้
+  unlock_date_cannot_be_after_reply_to_topic_due_dat_37eee496: วันที่ปลดล็อคจะอยู่หลังจากวันครบกำหนดการตอบกลับหัวข้อไม่ได้
+  unlock_date_cannot_be_after_required_replies_due_d_df13dbc7: วันที่ปลดล็อคจะอยู่หลังจากวันครบกำหนดการตอบกลับที่กำหนดไม่ได้
   unlock_date_cannot_be_before_course_start_9c7b8524: วันที่ปลดล็อคจะอยู่ก่อนวันที่เริ่มต้นบทเรียนไม่ได้
   unlock_date_cannot_be_before_section_start_793ddc66: วันที่ปลดล็อคจะอยู่ก่อนวันที่เริ่มต้นกลุ่มย่อยไม่ได้
   unlock_date_cannot_be_before_term_start_d3c01813: วันที่ปลดล็อคจะอยู่ก่อนวันที่เริ่มต้นเทอมไม่ได้
@@ -24514,6 +24555,7 @@ th:
   until_date_must_be_after_the_available_date_8670dfcd: วันที่จนถึงจะต้องอยู่หลังจากวันที่พร้อมใช้งาน
   until_date_must_be_after_the_due_date_d961566c: วันที่จนถึงจะต้องอยู่หลังจากวันครบกำหนด
   until_date_must_be_after_the_event_start_date_972f759d: "วันที่ จนถึง (Until) จะต้องอยู่หลังจากวันที่เริ่มต้นกิจกรรม"
+  until_time_a6cade90: จนถึงเวลา
   untitled_16aa4f2b: ไม่มีชื่อ
   untitled_assignment_59354b34: ภารกิจที่ไม่มีชื่อ
   untitled_filter_c07b8ddc: ตัวกรองไม่ระบุชื่อ
@@ -25144,6 +25186,7 @@ th:
   using_login_attribute_integration_id_9067ea54: "ใช้ login attribute: integration ID"
   using_login_attribute_sis_user_id_b5ec538f: "ใช้ login attribute: SIS user ID"
   using_login_attribute_unique_user_id_a307a9f: "ใ login attribute: unique user ID"
+  using_smart_search_aecf6c76: "การใช้ระบบค้นหาอัจฉริยะ (Smart Search)"
   utc_e44049af: UTC
   uuid_has_been_provisioned_ab0c6c9: "UUID ได้รับการจัดสรรแล้ว"
   val_percent_c2ca6679: "%val เปอร์เซ็นต์"
@@ -25413,6 +25456,7 @@ th:
   what_content_is_searchable_375a0670: เนื้อหาอะไรบ้างที่สามารถค้นหาได้
   what_does_provisioning_only_mean_eac9a4a1: "เฉพาะส่วนการจัดสรร หมายถึงอะไร"
   what_happened_322d8259: เกิดอะไรขึ้น
+  what_if_grades_7ad8ce0b: "เกรด What If"
   what_if_score_change_operation_failed_b81afd6d: "เปลี่ยนแปลงคะแนน What-If ล้มเหลว"
   what_if_score_input_for_assignmentname_d4092efe: "ข้อมูลคะแนน What if สำหรับ %{assignmentName}"
   what_if_score_updated_7565581d: "อัพเดตคะแนน What if แล้ว"
@@ -25508,11 +25552,16 @@ th:
   when_enabled_teachers_can_choose_to_allow_observer_320b555e: |-
       หากเปิดใช้งาน ผู้สอนสามารถเลือกอนุญาตผู้สังเการณ์ในการทำนัดหมาย
       ขณะจัดทำกลุ่มนัดหมายในปฏิทิน
+  when_enabled_the_canvas_api_for_lti_resource_links_25c51eb0: |-
+      หากเปิดใช้งานไว้ ลิงค์ Canvas API สำหรับแหล่งข้อมูล LTI (Canvas API for LTI Resource Links) จะสามารถใช้งานได้ ผู้ดูแลระบบสามารถ
+      ใช้ API นี้สำหรับจัดแสดงในเนื้อหาที่แจ้งมาจากชุดเครื่องมือ
   when_enabled_the_hidden_html_forms_that_are_used_t_c5edd929: |-
       ขณะเปิดใช้งาน แบบฟอร์ม HTML ที่ซ่อนไว้ที่ใช้เพื่อสั่งการเรียกใช้ LTI
       จะมีหมายเลขสุ่มผนวกไว้กับ ID ของตน หากปิดใช้งาน
       แต่ละรายการจะมี ID one has the same id of tool_form เหมือนกัน
   when_enabled_the_internal_access_manager_will_be_u_bc470109: "หากเปิดใช้งาน ระบบจัดการการใช้งานภายในจะถูกใช้เพื่อกำกับการใช้งานสำหรับคำขอบางรายการ"
+  when_enabled_the_lti_apps_discover_page_will_be_av_39ad751c: "หากเปิดใช้งานไว้ เพจ สืบค้นแอพ LIT (LTI Apps Discover) จะพร้อมใช้งานในเพจ แอพ (Apps)"
+  when_enabled_the_lti_apps_page_will_be_available_i_23ec031f: "หากเปิดใช้งานไว้ เพจ แอพ LTI (LTI Apps) จะพร้อมใช้งานในแถบสืบค้นเนื้อหาด้านข้างสำหรับบัญชีผู้ใช้ (Account)"
   when_enabled_the_lti_extensions_discover_page_will_8bb57ff6: "หากเปิดใช้งานไว้ เพจ การสืบค้นส่วนต่อขยาย LTI (LTI Extensions Discover) จะมีแสดงอยู่ในมุมมอง ส่วนต่อขยาย (Extensions)"
   when_enabled_the_lti_extensions_page_will_be_avail_ac8ed3fa: "หากเปิดใช้งานไว้ เพจ ส่วนต่อขยาย LTI (LTI Extensions) จะมีแสดงอยู่ในส่วนการสืบค้นบัญชีผู้ใช้ (Account)"
   when_enabled_the_new_submission_type_resource_card_c0f45d0d: "ขณะเปิดใช้งาน การ์ดข้อมูลประเภทผลงานจัดส่งใหม่จะถูกแสดงไว้ที่เพจแก้ไขภารกิจ"
@@ -26087,6 +26136,7 @@ th:
   your_azure_active_directory_tenant_name_d8bb31fa: "ชื่อ Tenant สำหรับ Azure Active Directory ของคุณ"
   your_browser_connectivity_may_be_slow_or_unstable__97c1f4c5: "การเชื่อมต่อเบราเซอร์ของคุณอาจช้าหรือไม่เสถียร แม้ว่าระบบจับเวลาของเบราเซอร์จะไม่ได้เชื่อมต่ออยู่ แต่คำตอบของคุณจะถูกบันทึกไว้เพิ่มอีก 5 นาทีจากจำกัดเวลาเดิมสำหรับการดำเนินการนี้"
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "เบราเซอร์ของคุณไม่ผ่านเงื่อนไขขั้นต่ำสำหรับ Canvas กรุณาเข้าไปที่*กลุ่ม Canvas* เพื่อดูรายชื่อเบราเซอร์ที่รองรับ"
+  your_canvas_administrators_have_chosen_to_limit_yo_41a4187: "ผู้ดูแลระบบ Canvas ของคุณเลือกจำกัดความสามารถของคุณในการจัดทำชุดข้อมูลการเข้าใช้งานของคุณเอง กรุณาติดต่อผู้ดูแลระบบ Canvas ของคุณเพื่อให้จัดทำชุดข้อมูลการเข้าใช้งานให้กับคุณ"
   your_classic_quizzes_have_been_migrated_to_new_qui_e49244da: "แบบทดสอบคลาสสิค (Classic Quizzes) ของคุณถูกโอนย้ายไปยังแบบทดสอบใหม่ (New Quizzes) แล้ว!"
   your_comment_is_not_posted_12677035: ความเห็นของคุณไม่มีการโพสต์
   your_comment_was_auto_saved_as_a_draft_c49d3510: ความเห็นของคุณถูกบันทึกอัตโนมัติเป็นร่าง
@@ -26138,6 +26188,7 @@ th:
   your_unpublished_changes_will_be_reverted_to_their_fd4ba075: การเปลี่ยนแปลงที่ไม่ได้เผยแพร่ของคุณจะถูกแปลงกลับเป็นสถานะที่บันทึกไว้ก่อนหน้านี้
   your_webcam_may_already_be_in_use_6cd64c25: เว็บแคมของคุณอาจใช้งานอยู่
   your_work_has_been_submitted_519058f8: จัดส่งงานของคุณแล้ว
+  yyyy_mm_dd_cbbd9959: YYYY-MM-DD
   yyyy_mm_dd_hh_mm_a01b6081: "YYYY-MM-DD hh:mm"
   z_a_be2ab67c: Z–A
   zendesk: 
