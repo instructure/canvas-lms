@@ -57,6 +57,15 @@ describe "threaded discussions" do
     @deleted_reply.destroy
   end
 
+  it "does not render the SpeedGraderNavigator if not in the speedgrader" do
+    user_session(@teacher)
+    Discussion.visit(@course, @topic)
+
+    expect(element_exists?("[data-testid=previous-in-speedgrader]")).to be_falsey
+    expect(element_exists?("[data-testid=next-in-speedgrader]")).to be_falsey
+    expect(element_exists?("[data-testid=jump-to-speedgrader-navigation]")).to be_falsey
+  end
+
   it "toggles from inline to split-screen" do
     # initially set user preference discussions_split_screen, so 'Inline will be the initial View'
     @teacher.preferences[:discussions_splitscreen_view] = false
