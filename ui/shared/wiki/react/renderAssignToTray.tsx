@@ -106,7 +106,7 @@ const AssignToOption = (props: Props) => {
           onClick={() => (open ? handleClose() : handleOpen())}
         >
           <View as="div">
-            {I18n.t('Manage Assign To')}
+            {I18n.t('Manage Due Dates and Assign To')}
             {showPendingChangesPill && (
               <Pill data-testid="pending_changes_pill" color="info" margin="auto small">
                 {I18n.t('Pending Changes')}
