@@ -17,6 +17,7 @@
  */
 
 import {
+  generateDateTimeMessage,
   getDayBoundaries,
   getFromLocalStorage,
   removeStringAffix,
@@ -124,6 +125,91 @@ describe('helpers.ts', () => {
 
         expect(start).toEqual(new Date(2023, 8, 13, 0, 1, 0, 0))
         expect(end).toEqual(new Date(2023, 8, 13, 23, 59, 59, 999))
+      })
+    })
+
+    describe('generateDateTimeMessage', () => {
+      const date = '2023-08-30T19:30:00.000Z' // July 30th, 2023 at 6:30 pm
+
+      afterAll(() => {
+        // @ts-expect-error
+        window.ENV = {}
+      })
+
+      it('returns only local time if the context timezone is null', () => {
+        // @ts-expect-error
+        window.ENV = {
+          CONTEXT_TIMEZONE: null,
+          context_asset_string: 'account_1',
+          TIMEZONE: 'America/Denver',
+        }
+        const messages = generateDateTimeMessage(date, false)
+        const messageText = messages.map(function (msg) {
+          return msg.text
+        })
+
+        expect(messageText).toContain('Wed, Aug 30, 2023, 1:30 PM')
+      })
+
+      it('returns only local time if the context isnt account', () => {
+        // @ts-expect-error
+        window.ENV = {
+          CONTEXT_TIMEZONE: 'Asia/Brunei',
+          context_asset_string: 'users_1',
+          TIMEZONE: 'America/Denver',
+        }
+        const messages = generateDateTimeMessage(date, false)
+        const messageText = messages.map(function (msg) {
+          return msg.text
+        })
+
+        expect(messageText).toContain('Wed, Aug 30, 2023, 1:30 PM')
+      })
+
+      it('returns only local time if the context timezone is the same as the system timezone', () => {
+        // @ts-expect-error
+        window.ENV = {
+          CONTEXT_TIMEZONE: 'America/Denver',
+          context_asset_string: 'account_1',
+          TIMEZONE: 'America/Denver',
+        }
+        const messages = generateDateTimeMessage(date, false)
+        const messageText = messages.map(function (msg) {
+          return msg.text
+        })
+
+        expect(messageText).toContain('Wed, Aug 30, 2023, 1:30 PM')
+      })
+
+      it('returns local and account times', () => {
+        // @ts-expect-error
+        window.ENV = {
+          CONTEXT_TIMEZONE: 'Asia/Brunei',
+          context_asset_string: 'account_1',
+          TIMEZONE: 'America/Denver',
+        }
+        const messages = generateDateTimeMessage(date, false)
+        const messageText = messages.map(function (msg) {
+          return msg.text
+        })
+
+        expect(messageText).toContain('Local: Wed, Aug 30, 2023, 1:30 PM')
+        expect(messageText).toContain('Account: Thu, Aug 31, 2023, 3:30 AM')
+      })
+
+      it('returns error message if isInvalid', () => {
+        // @ts-expect-error
+        window.ENV = {
+          CONTEXT_TIMEZONE: 'Asia/Brunei',
+          context_asset_string: 'account_1',
+          TIMEZONE: 'America/Denver',
+        }
+        const messages = generateDateTimeMessage(date, true)
+        const messageText = messages.map(function (msg) {
+          return msg.text
+        })
+
+        expect(messageText).toContain('The chosen date and time is invalid.')
       })
     })
   })

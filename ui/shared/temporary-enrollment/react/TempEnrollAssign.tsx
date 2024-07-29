@@ -32,6 +32,7 @@ import {Button} from '@instructure/ui-buttons'
 import {EnrollmentTree} from './EnrollmentTree'
 import {Flex} from '@instructure/ui-flex'
 import {
+  generateDateTimeMessage,
   getDayBoundaries,
   getFromLocalStorage,
   removeStringAffix,
@@ -98,6 +99,11 @@ export interface Props {
 interface RoleChoice {
   id: string
   name: string
+}
+
+interface DateErrors {
+  invalidStart: boolean
+  invalidEnd: boolean
 }
 
 interface StoredData {
@@ -239,6 +245,7 @@ export function TempEnrollAssign(props: Props) {
   const [endDate, setEndDate] = useState<Date>(storedData.endDate)
   const [roleChoice, setRoleChoice] = useState<RoleChoice>(storedData.roleChoice)
   const [stateChoice, setStateChoice] = useState<EnrollmentStateOption>(storedData.stateChoice)
+  const [dateErrors, setDateErrors] = useState<DateErrors>({invalidEnd: false, invalidStart: false})
 
   // reminders …
   // enrollmentProps = recipient user object
@@ -348,13 +355,11 @@ export function TempEnrollAssign(props: Props) {
     if (validatedDate) {
       setDateState(validatedDate)
       updateLocalStorageObject(tempEnrollAssignData, {[localStorageKey]: validatedDate})
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('Invalid date in handleDateChange:', dateValue)
-      captureException(
-        new Error(`Invalid date in handleDateChange: ${dateValue} for ${localStorageKey}`)
-      )
     }
+    // set error state for DateTime
+    localStorageKey === 'startDate'
+      ? setDateErrors({...dateErrors, invalidStart: !validatedDate})
+      : setDateErrors({...dateErrors, invalidEnd: !validatedDate})
   }
 
   const handleStartDateChange = (event: SyntheticEvent<Element, Event>, dateValue?: string) => {
@@ -602,6 +607,11 @@ export function TempEnrollAssign(props: Props) {
                   nextMonthLabel={I18n.t('Next')}
                   value={startDate.toISOString()}
                   onChange={handleStartDateChange}
+                  messages={generateDateTimeMessage(
+                    startDate.toISOString(),
+                    dateErrors.invalidStart
+                  )}
+                  showMessages={false}
                   invalidDateTimeMessage={I18n.t('The chosen date and time is invalid.')}
                   dateInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('StartDate'))}
                   timeInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('StartTime'))}
@@ -626,6 +636,8 @@ export function TempEnrollAssign(props: Props) {
                   nextMonthLabel={I18n.t('Next')}
                   value={endDate.toISOString()}
                   onChange={handleEndDateChange}
+                  messages={generateDateTimeMessage(endDate.toISOString(), dateErrors.invalidEnd)}
+                  showMessages={false}
                   invalidDateTimeMessage={I18n.t('The chosen date and time is invalid.')}
                   dateInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('EndDate'))}
                   timeInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('EndTime'))}
