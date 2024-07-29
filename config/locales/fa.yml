@@ -218,6 +218,7 @@ fa:
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "یک جدول که حاوی داده های طرح نمره گذاری است. هر ردیف حاوی نام، درصد حداکثری و درصد حداقلی است. افزون بر این، هر ردیف حاوی یک دکمه برای افزودن ردیف جدید در قسمت پایین و یک دکمه برای حذف ردیف فعلی است."
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Z"
+  about_70c18bba: درباره
   about_this_service_b10bc808: "درباره این خدمت"
   above_max_rating_64b29915: "امتیاز بیش از حد مجاز"
   academic_benchmark: 
@@ -16252,6 +16253,7 @@ fa:
   nav_text_94206145: "متن پیمایش"
   nav_text_active_a924ae88: "متن پیمایش فعال است"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "پیمایش به کاربر اجازه می‎دهد لینک افراد را در پیمایش درس مشاهده کند."
+  navigation_ee9af92d: پیمایش
   navigation_icon_45db938e: "نماد پیمایش"
   navigation_menu_fd782ff8: "منوی پیمایش"
   near_mastery_f25174a4: "نزدیک به تسلط"
