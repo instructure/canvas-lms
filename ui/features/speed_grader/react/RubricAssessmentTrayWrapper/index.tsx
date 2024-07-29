@@ -82,12 +82,14 @@ export default ({
     !!studentAssessment?.assessor_id &&
     studentAssessment.assessor_id !== ENV.RUBRIC_ASSESSMENT?.assessor_id
 
+  const isPeerReview = studentAssessment?.assessment_type === 'peer_review'
+
   return (
     <RubricAssessmentTray
       hidePoints={rubricHidePoints}
       isOpen={rubricAssessmentTrayOpen}
       isPreviewMode={isPreviewPeerMode}
-      isPeerReview={isPreviewPeerMode}
+      isPeerReview={isPeerReview}
       rubric={mapRubricUnderscoredKeysToCamelCase(rubric, rubricOutcomeData)}
       rubricAssessmentData={mapRubricAssessmentDataUnderscoredKeysToCamelCase(
         studentAssessment?.data ?? []
