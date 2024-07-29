@@ -263,7 +263,7 @@ export const showPostToSisFlashAlert = assignToButtonId => () =>
             isWithinText={false}
             onClick={() => document.getElementById(assignToButtonId)?.click()}
           >
-            {I18n.t('Manage Assign To')}
+            {I18n.t('Manage Due Dates and Assign To')}
           </Link>
         </View>
       </>
