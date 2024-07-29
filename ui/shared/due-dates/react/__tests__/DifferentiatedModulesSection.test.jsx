@@ -86,7 +86,7 @@ describe('DifferentiatedModulesSection', () => {
 
   it('renders', () => {
     const {getByText} = render(<DifferentiatedModulesSection {...props} />)
-    expect(getByText('Manage Assign To')).toBeInTheDocument()
+    expect(getByText('Manage Due Dates and Assign To')).toBeInTheDocument()
   })
 
   it('opens ItemAssignToTray', () => {
