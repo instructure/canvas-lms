@@ -15,14 +15,24 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import * as z from 'zod'
-import {ZPlacementConfig} from './LtiPlacementConfig'
 
-export interface PlatformSettings extends z.infer<typeof ZPlatformSettings> {}
+import type {LtiConfiguration} from '../../model/lti_tool_configuration/LtiConfiguration'
+import type {JsonUrlWizardService} from '../JsonUrlWizardService'
 
-export const ZPlatformSettings = z.object({
-  text: z.string().optional().nullable(),
-  icon_url: z.string().optional().nullable(),
-  platform: z.string().optional().nullable(),
-  placements: z.array(ZPlacementConfig),
+export const mockJsonUrlWizardService = (
+  mocked?: Partial<JsonUrlWizardService>
+): JsonUrlWizardService => ({
+  fetchThirdPartyToolConfiguration: jest.fn(),
+  ...mocked,
+})
+
+export const mockToolConfiguration = (config?: Partial<LtiConfiguration>): LtiConfiguration => ({
+  title: '',
+  target_link_uri: '',
+  oidc_initiation_url: '',
+  custom_fields: {},
+  is_lti_key: true,
+  scopes: [],
+  extensions: [],
+  ...config,
 })

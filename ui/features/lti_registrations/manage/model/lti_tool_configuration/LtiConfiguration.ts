@@ -30,10 +30,11 @@ export const ZLtiConfiguration = z.object({
   target_link_uri: z.string(),
   oidc_initiation_url: z.string(),
   custom_fields: z.record(z.string()).optional().nullable(),
+  /** A record of canvas regions to oidc initiation urls */
   oidc_initiation_urls: z.record(z.unknown()).optional().nullable(),
   public_jwk_url: z.string().optional().nullable(),
   is_lti_key: z.boolean().optional().nullable(),
   icon_url: z.string().optional().nullable(),
-  scopes: z.array(ZLtiScope),
+  scopes: z.array(ZLtiScope).optional().nullable(),
   extensions: z.array(ZExtension),
 })

@@ -26,6 +26,19 @@ import {ManageRoutes} from './manage'
 import ProductDetail from './discover/components/ProductDetail/ProductDetail'
 import {ZAccountId} from './manage/model/AccountId'
 import {RegistrationWizardModal} from './manage/registration_wizard/RegistrationWizardModal'
+import type {DynamicRegistrationWizardService} from './manage/dynamic_registration_wizard/DynamicRegistrationWizardService'
+import {
+  fetchRegistrationToken,
+  getRegistrationByUUID,
+  updateRegistrationOverlay,
+} from './manage/api/ltiImsRegistration'
+import {
+  deleteDeveloperKey,
+  updateAdminNickname,
+  updateDeveloperKeyWorkflowState,
+} from './manage/api/developerKey'
+import {fetchThirdPartyToolConfiguration} from './manage/api/registrations'
+import type {JsonUrlWizardService} from './manage/registration_wizard/JsonUrlWizardService'
 
 const getBasename = () => {
   const path = window.location.pathname
@@ -59,9 +72,26 @@ const router = createBrowserRouter(
 
 const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
 
+const dynamicRegistrationWizardService: DynamicRegistrationWizardService = {
+  deleteDeveloperKey,
+  fetchRegistrationToken,
+  getRegistrationByUUID,
+  updateDeveloperKeyWorkflowState,
+  updateAdminNickname,
+  updateRegistrationOverlay,
+}
+
+const jsonUrlWizardService: JsonUrlWizardService = {
+  fetchThirdPartyToolConfiguration,
+}
+
 ReactDOM.render(
   <QueryClientProvider client={queryClient}>
-    <RegistrationWizardModal accountId={accountId} />
+    <RegistrationWizardModal
+      accountId={accountId}
+      dynamicRegistrationWizardService={dynamicRegistrationWizardService}
+      jsonUrlWizardService={jsonUrlWizardService}
+    />
     <RouterProvider router={router} />
   </QueryClientProvider>,
   document.getElementById('reactContent')

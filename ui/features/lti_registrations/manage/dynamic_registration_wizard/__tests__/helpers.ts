@@ -25,7 +25,7 @@ import {ZLtiImsRegistrationId} from '../../model/lti_ims_registration/LtiImsRegi
 import type {LtiConfiguration} from '../../model/lti_tool_configuration/LtiConfiguration'
 import type {DynamicRegistrationWizardService} from '../DynamicRegistrationWizardService'
 
-export const mockService = (
+export const mockDynamicRegistrationWizardService = (
   mocked?: Partial<DynamicRegistrationWizardService>
 ): DynamicRegistrationWizardService => ({
   fetchRegistrationToken: jest.fn(),

@@ -24,6 +24,10 @@ import {mockFetchSampleLtiRegistrations, mockDeleteRegistration} from './sampleL
 import type {AccountId} from '../model/AccountId'
 import {defaultFetchOptions} from '@canvas/util/xhr'
 import * as z from 'zod'
+import {
+  ZLtiConfiguration,
+  type LtiConfiguration,
+} from '../model/lti_tool_configuration/LtiConfiguration'
 
 export type AppsSortProperty =
   | 'name'
@@ -31,6 +35,7 @@ export type AppsSortProperty =
   | 'lti_version'
   | 'installed'
   | 'installed_by'
+  | 'updated_by'
   | 'on'
 
 export type AppsSortDirection = 'asc' | 'desc'
@@ -56,6 +61,22 @@ export const fetchRegistrations: FetchRegistrations = options =>
           per_page: options.limit.toString(),
         }),
       defaultFetchOptions()
+    )
+  )
+
+export type FetchThirdPartyToolConfiguration = (
+  url: string,
+  accountId: AccountId
+) => Promise<ApiResult<LtiConfiguration>>
+
+export const fetchThirdPartyToolConfiguration: FetchThirdPartyToolConfiguration = (
+  url,
+  accountId
+) =>
+  parseFetchResult(ZLtiConfiguration)(
+    fetch(
+      `/api/v1/accounts/${accountId}/lti_registrations/fetch_lti_configuration?` +
+        new URLSearchParams({url})
     )
   )
 

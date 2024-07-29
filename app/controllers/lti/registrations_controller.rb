@@ -579,6 +579,13 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
+  # @internal
+  def fetch_lti_configuration
+    result = CanvasHttp.get(params[:url])
+
+    render json: result.body
+  end
+
   # @API Show an LTI Registration
   # Return details about the specified LTI registration, including the
   # configuration and account binding.
