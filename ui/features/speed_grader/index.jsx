@@ -35,6 +35,7 @@ import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
 import {hideAssignmentGradesForSections} from './mutations/hideAssignmentGradesForSectionsMutation'
 import {postDraftSubmissionComment} from './mutations/postDraftSubmissionCommentMutation'
+import {updateSubmissionGradeStatus} from './mutations/updateSubmissionGradeStatusMutation'
 import {deleteSubmissionComment} from './mutations/deleteSubmissionCommentMutation'
 import {
   postAssignmentGradesForSections,
@@ -81,6 +82,7 @@ ready(() => {
             hideAssignmentGradesForSections,
             postAssignmentGradesForSections,
             postDraftSubmissionComment,
+            updateSubmissionGradeStatus,
           },
           postMessageAliases,
           context: {

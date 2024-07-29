@@ -43,6 +43,7 @@ export const SUBMISSION_FRAGMENT = gql`
     wordCount
     late
     missing
+    latePolicyStatus
     submissionStatus
     customGradeStatus
     submittedAt
