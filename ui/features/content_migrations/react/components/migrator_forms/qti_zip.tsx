@@ -42,6 +42,7 @@ const QTIZipImporter = ({
   const [file, setFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<boolean>(false)
   const [questionBankSettings, setQuestionBankSettings] = useState<QuestionBankSettings | null>()
+  const [isQuestionBankDisabled, setIsQuestionBankDisabled] = useState(false)
   const [questionBankError, setQuestionBankError] = useState<boolean>(false)
 
   const handleSubmit = useCallback(
@@ -84,7 +85,9 @@ const QTIZipImporter = ({
       <QuestionBankSelector
         onChange={setQuestionBankSettings}
         questionBankError={questionBankError}
-        disable={isSubmitting}
+        disable={isSubmitting || isQuestionBankDisabled}
+        notCompatible={isQuestionBankDisabled}
+        questionBankSettings={questionBankSettings}
       />
       <CommonMigratorControls
         fileUploadProgress={fileUploadProgress}
@@ -93,6 +96,7 @@ const QTIZipImporter = ({
         canOverwriteAssessmentContent={true}
         onSubmit={handleSubmit}
         onCancel={onCancel}
+        setIsQuestionBankDisabled={setIsQuestionBankDisabled}
       />
     </>
   )
