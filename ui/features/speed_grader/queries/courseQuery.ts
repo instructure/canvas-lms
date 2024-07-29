@@ -44,14 +44,6 @@ const defaultStandardStatusesMap: Record<string, Pick<GradeStatus, 'id' | 'name'
     id: '-2',
     name: 'missing',
   },
-  resubmitted: {
-    id: '-3',
-    name: 'resubmitted',
-  },
-  dropped: {
-    id: '-4',
-    name: 'dropped',
-  },
   excused: {
     id: '-5',
     name: 'excused',
