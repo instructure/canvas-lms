@@ -348,11 +348,16 @@ class MediaObject < ActiveRecord::Base
     return unless Account.site_admin.feature_enabled?(:speedgrader_studio_media_capture)
 
     # On error, the job is scheduled again in 5 seconds + N ** 4, where N is the number of attempts
-    delay(max_attempts: 10).request_captions
+    delay(max_attempts: 10, on_permanent_failure: :fail_without_reporting_to_sentry).request_captions
+  end
+
+  def fail_without_reporting_to_sentry(error)
+    # only :error level errors are reported to sentry
+    Canvas::Errors.capture(error, { media_object_id: global_id }, :warn)
   end
 
   def request_captions
-    raise VideoCaptionServiceError unless media_sources.any?
+    raise VideoCaptionServiceError, "No media_sources to generate captions for" unless media_sources.any?
 
     VideoCaptionService.call(self)
   end
