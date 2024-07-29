@@ -30,14 +30,28 @@
 
 <% unless @render_alternatives %>
   <% if can_do(WebConference.new(:context => @context), @current_user, :create) %>
-    <div class="ic-Action-header ic-Action-header--before-item-groups">
-      <div class="ic-Action-header__Secondary">
-        <button type="button" class="btn btn-primary new-conference-btn" title="<%= t(:new_conference, 'New Conference') %>" aria-label="<%= t(:new_conference, 'New Conference') %>">
-          <i class="icon-plus"></i>
-          <%= t(:conference, 'Conference') %>
-        </button>
+    <% if @domain_root_account.feature_enabled?(:instui_nav) %>
+      <div class="page_header_container">
+        <h1 class="page_header">
+          <%= t(:conferences, 'Conferences')%>
+        </h1>
+        <div class="actions_buttons-container">
+          <button type="button" id="new-conference" title="Create Conference" class="btn btn-primary new-conference-btn">
+            <i class="icon-plus" role="presentation"></i>
+            <%= t(:conference, 'Conference') %>
+          </button>
+        </div>
       </div>
-    </div>
+    <% else %>
+      <div class="ic-Action-header ic-Action-header--before-item-groups">
+        <div class="ic-Action-header__Secondary">
+          <button type="button" class="btn btn-primary new-conference-btn" title="<%= t(:new_conference, 'New Conference') %>" aria-label="<%= t(:new_conference, 'New Conference') %>">
+            <i class="icon-plus"></i>
+            <%= t(:conference, 'Conference') %>
+          </button>
+        </div>
+      </div>
+    <% end %>
   <% end %>
 <% end %>
 
