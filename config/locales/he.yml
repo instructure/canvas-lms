@@ -182,6 +182,7 @@ he:
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "טבלה שכוללת את נתוני סכימת ההערכה. כל שורה כוללת שם, אחוז מרבי, ואחוז מזערי. בנוסף, כל שורה כוללת כפתור להוספה של שורה חדשה מתחת, וכפתור לביטול השורה הנוכחית."
   a_z_243c3301: A-Z
   a_z_29d8e67c: "א - ת"
+  about_70c18bba: אודות
   about_this_service_b10bc808: "אודות שירות זה"
   academic_benchmark: 
     no_api_key: "נדרש מפתח API כדי להשתמש באמות מדה אקדמיות"
@@ -13206,6 +13207,7 @@ he:
   nav_logo_background_ba33fb7f: "רקע לוגו ניווט"
   nav_text_94206145: "כותרת ניווט"
   nav_text_active_a924ae88: "מלל ניווט במצב פעיל"
+  navigation_ee9af92d: ניווט
   near_mastery_f25174a4: "קרוב להתמחות"
   need_a_canvas_account_221d18ed: "זקוקים לחשבון קנבס?"
   need_help_setting_up_your_course_2b763141: "יש צורך בעזרה בהקמת הקורס שלך?"
