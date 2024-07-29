@@ -634,7 +634,7 @@ const ItemAssignToTrayContent = ({
     return assignToCardsRef.current.every(card => card.hasAssignees)
   }
 
-  const renderCardsOptimized = useCallback(
+  const renderCards = useCallback(
     (isOpen?: boolean) => {
       const cardCount = assignToCards.length
       return assignToCards.map(card => (
@@ -678,6 +678,7 @@ const ItemAssignToTrayContent = ({
         </View>
       ))
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       assignToCards,
       cardsRefs,
@@ -695,49 +696,9 @@ const ItemAssignToTrayContent = ({
       blueprintDateLocks,
       postToSIS,
       disabledOptionIdsRef,
+      defaultGroupCategoryId,
     ]
   )
-
-  function renderCards(isOpen?: boolean) {
-    const cardCount = assignToCards.length
-    return assignToCards.map((card, i) => {
-      return (
-        // eslint-disable-next-line react/no-array-index-key
-        <View key={`${card.key}-${i}`} as="div" margin="small 0 0 0">
-          <ItemAssignToCard
-            ref={cardsRefs.current[card.key]}
-            courseId={courseId}
-            contextModuleId={card.contextModuleId}
-            contextModuleName={card.contextModuleName}
-            removeDueDateInput={removeDueDateInput}
-            isCheckpointed={isCheckpointed}
-            cardId={card.key}
-            reply_to_topic_due_at={card.reply_to_topic_due_at}
-            required_replies_due_at={card.required_replies_due_at}
-            due_at={card.due_at}
-            original_due_at={card.original_due_at}
-            unlock_at={card.unlock_at}
-            lock_at={card.lock_at}
-            onDelete={cardCount === 1 ? undefined : handleDeleteCard}
-            onCardAssignmentChange={handleCardAssignment}
-            onCardDatesChange={handleDatesChange}
-            onValidityChange={handleCardValidityChange}
-            isOpen={isOpen}
-            disabledOptionIds={disabledOptionIdsRef.current}
-            everyoneOption={everyoneOption}
-            selectedAssigneeIds={card.selectedAssigneeIds}
-            customAllOptions={allOptions}
-            customIsLoading={isLoadingAssignees}
-            customSetSearchTerm={setSearchTerm}
-            highlightCard={card.highlightCard}
-            blueprintDateLocks={blueprintDateLocks}
-            postToSIS={postToSIS}
-            disabledOptionIdsRef={disabledOptionIdsRef}
-          />
-        </View>
-      )
-    })
-  }
 
   return (
     <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
@@ -751,9 +712,7 @@ const ItemAssignToTrayContent = ({
         )
       ) : (
         <ApplyLocale locale={locale} timezone={timezone}>
-          {ENV.FEATURES?.selective_release_optimized_tray
-            ? renderCardsOptimized(open)
-            : renderCards(open)}
+          {renderCards(open)}
         </ApplyLocale>
       )}
       <Button
