@@ -200,9 +200,33 @@ describe "SpeedGrader - discussion submissions" do
     end
 
     context "discussion_checkpoints" do
-      it "displays whole discussion with hidden student names" do
+      before do
         Account.site_admin.enable_feature!(:react_discussions_post)
         @course.root_account.enable_feature!(:discussion_checkpoints)
+      end
+
+      it "displays the SpeedGraderNavigator" do
+        Speedgrader.visit(@course.id, @assignment.id)
+
+        in_frame("speedgrader_iframe") do
+          in_frame("discussion_preview_iframe") do
+            wait_for_ajaximations
+
+            expect(f("[data-testid='previous-in-speedgrader']")).not_to be_displayed
+            expect(f("[data-testid='next-in-speedgrader']")).not_to be_displayed
+            expect(f("[data-testid='jump-to-speedgrader-navigation']")).not_to be_displayed
+
+            driver.execute_script("document.querySelector('[data-testid=\"previous-in-speedgrader\"]').focus()")
+            wait_for_ajaximations
+
+            expect(f("[data-testid='previous-in-speedgrader']")).to be_displayed
+            expect(f("[data-testid='next-in-speedgrader']")).to be_displayed
+            expect(f("[data-testid='jump-to-speedgrader-navigation']")).to be_displayed
+          end
+        end
+      end
+
+      it "displays whole discussion with hidden student names" do
         Speedgrader.visit(@course.id, @assignment.id)
 
         Speedgrader.click_settings_link
