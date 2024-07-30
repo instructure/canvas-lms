@@ -180,28 +180,43 @@ module CanvasRails
           config = config.dup
           config[:prepared_statements] = false
         end
-        if config[:host].is_a?(Array)
-          config = config.dup
-          config[:host] = config[:host].join(",")
-        end
         super
       end
 
       def connect
-        super
+        hosts = Array(@connection_parameters[:host]).presence || [nil]
+        hosts.each_with_index do |host, index|
+          connection_parameters = @connection_parameters.dup
+          connection_parameters[:host] = host
 
-        raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00 # rubocop:disable Style/NumericLiterals
-      rescue ::ActiveRecord::ActiveRecordError, ::ActiveRecord::ConnectionFailed, ::ActiveRecord::ConnectionNotEstablished, ::PG::Error => e
-        # If exception occurs using parameters from a predefined pg service, retry without
-        if @connection_parameters.key?(:service)
-          CanvasErrors.capture(e, { tags: { pg_service: @connection_parameters[:service] } }, :warn)
-          Rails.logger.warn("Error connecting to database using pg service `#{@connection_parameters[:service]}`; retrying without... (error: #{e.message})")
-          @connection_parameters.delete(:service)
-          @connection_parameters[:sslmode] = "disable"
-          retry
+          begin
+            @raw_connection = self.class.new_client(connection_parameters)
+          rescue ::ActiveRecord::ActiveRecordError, ::ActiveRecord::ConnectionFailed, ::ActiveRecord::ConnectionNotEstablished, ::PG::Error => e
+            # If exception occurs using parameters from a predefined pg service, retry without
+            if connection_parameters.key?(:service)
+              CanvasErrors.capture(e, { tags: { pg_service: connection_parameters[:service] } }, :warn)
+              Rails.logger.warn("Error connecting to database using pg service `#{connection_parameters[:service]}`; retrying without... (error: #{e.message})")
+              connection_parameters.delete(:service)
+              connection_parameters[:sslmode] = "disable"
+              retry
+            else
+              raise
+            end
+          end
+
+          raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00 # rubocop:disable Style/NumericLiterals
+
+          break
+          # we _shouldn't_ be catching a NoDatabaseError, but that's what Rails raises
+          # for an error where the database name is in the message (i.e. a hostname lookup failure)
+        rescue ActiveRecord::NoDatabaseError, ::ActiveRecord::ConnectionFailed, ActiveRecord::ConnectionNotEstablished, ::PG::Error => e
+          if e.is_a?(::PG::Error) && e.message.include?("does not exist")
+            raise ActiveRecord::NoDatabaseError, e.message
+          elsif index == hosts.length - 1
+            raise
+          end
+          # else try next host
         end
-
-        raise
       end
     end
 
