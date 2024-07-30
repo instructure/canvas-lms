@@ -137,9 +137,10 @@ export const resetStagedCards = (cards, newCardsState, defaultState) => {
   const newState = cloneObject(newCardsState)
   Object.keys(newState).forEach(rowKey => {
     const card = cards[rowKey] ?? defaultState[rowKey]
+    if(!card) return undefined;
     const newCard = newState[rowKey]
     const validOverrides = card.overrides.filter(o =>
-      newCard.overrides.find(override => o.stagedOverrideId === override.stagedOverrideId)
+      newCard?.overrides.find(override => o.stagedOverrideId === override.stagedOverrideId)
     )
 
     newCard.overrides = resetOverrides(validOverrides, newCard.overrides)
