@@ -107,14 +107,20 @@ describe "announcements" do
         expect(Message.last.body).not_to include "Hi, this is my EDITED message"
       end
 
-      it "for delayed posting notification sending is not available", :ignore_js_errors do
+      it "for delayed posting don't send notifications", :ignore_js_errors do
         @announcement.delayed_post_at = 1.day.from_now
         @announcement.save!
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
 
         type_in_tiny("#discussion-topic-message-body", "Hi, this is my EDITED message")
 
-        expect_new_page_load { AnnouncementNewEdit.submit_button.click }
+        AnnouncementNewEdit.save_button.click
+
+        expect(AnnouncementNewEdit.notification_modal).to be_displayed
+
+        AnnouncementNewEdit.notification_modal_dont_send.click
+
+        expect(Message.last.body).not_to include "Hi, this is my EDITED message"
       end
 
       it "should not send notifications at all if we hit Cancel", :ignore_js_errors do
