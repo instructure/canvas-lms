@@ -2654,7 +2654,12 @@ class Submission < ActiveRecord::Base
 
   # Note that this will return an Array (not an ActiveRecord::Relation) if comments are preloaded
   def comments_excluding_drafts_for(user)
-    comments = (user_can_read_grade?(user) && !self.course.user_is_student?(user)) ? submission_comments : visible_submission_comments
+    comments =
+      if user_can_read_grade?(user) && course.present? && !self.course.user_is_student?(user)
+        submission_comments
+      else
+        visible_submission_comments
+      end
     comments.loaded? ? comments.reject(&:draft?) : comments.published
   end
 
