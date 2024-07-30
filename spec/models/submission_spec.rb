@@ -7148,6 +7148,11 @@ describe Submission do
     end
 
     describe "#comments_excluding_drafts_for" do
+      it "doesn't blow up when the submission has no course" do
+        @submission.course = nil
+        expect { @submission.comments_excluding_drafts_for(@teacher) }.not_to raise_error
+      end
+
       it "returns non-draft comments, filtering out draft comments" do
         comments = @submission.comments_excluding_drafts_for(@teacher)
         expect(comments).to include @student_comment, @ta_comment
