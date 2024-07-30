@@ -56,7 +56,6 @@ const I18n = useI18nScope('differentiated_modules')
 
 export interface ItemAssignToTrayContentProps
   extends Omit<ItemAssignToTrayProps, 'iconType' | 'itemName'> {
-  assignToCards: ItemAssignToCardSpec[]
   setAssignToCards: (cards: ItemAssignToCardSpec[]) => void
   blueprintDateLocks?: DateLockTypes[]
   setBlueprintDateLocks: (locks?: DateLockTypes[]) => void
@@ -115,7 +114,6 @@ const ItemAssignToCardMemo = memo(
 
 const ItemAssignToTrayContent = ({
   open,
-  assignToCards,
   initialLoadRef,
   setAssignToCards,
   courseId,
@@ -226,24 +224,24 @@ const ItemAssignToTrayContent = ({
   }, [defaultGroupCategoryId, setGroupCategoryId])
 
   useEffect(() => {
-    if (assignToCards.length === 0 && !lastPerformedAction.current) return
+    if (assignToCardsRef.current.length === 0 && !lastPerformedAction.current) return
     const action = lastPerformedAction.current?.action
     const index = lastPerformedAction.current?.index || 0
     // If only a card remains, we should focus the add button
-    const shouldFocusAddButton = action === 'delete' && assignToCards.length <= 1
+    const shouldFocusAddButton = action === 'delete' && assignToCardsRef.current.length <= 1
     let focusIndex
     if (shouldFocusAddButton && addCardButtonRef?.current instanceof HTMLButtonElement) {
       addCardButtonRef.current.disabled = false // so it can be focused
       addCardButtonRef.current.focus()
     } else if (action === 'add') {
       // Focus the last card
-      focusIndex = assignToCards.length - 1
+      focusIndex = assignToCardsRef.current.length - 1
     } else if (action === 'delete') {
       // Focus the previous card
       focusIndex = index <= 0 ? 0 : index - 1
     }
     if (focusIndex !== undefined) {
-      const card = assignToCards.at(focusIndex)
+      const card = assignToCardsRef.current.at(focusIndex)
       if (card) {
         const cardRef = cardsRefs.current[card.key]
         if (cardRef?.current) {
@@ -252,23 +250,25 @@ const ItemAssignToTrayContent = ({
         }
       }
     }
-  }, [assignToCards, cardsRefs])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assignToCardsRef.current, cardsRefs])
 
   useEffect(() => {
     // Remove extra refs if cards array has shrunk
     Object.keys(cardsRefs.current).forEach(key => {
-      if (!assignToCards.some(card => card.key === key)) {
+      if (!assignToCardsRef.current.some(card => card.key === key)) {
         delete cardsRefs.current[key]
       }
     })
 
     // Ensure cardsRefs has refs for all items
-    assignToCards.forEach(card => {
+    assignToCardsRef.current.forEach(card => {
       if (!cardsRefs.current[card.key]) {
         cardsRefs.current[card.key] = React.createRef<ItemAssignToCardRef>()
       }
     })
-  }, [assignToCards, cardsRefs])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assignToCardsRef.current, cardsRefs])
 
   useEffect(() => {
     if (defaultCards !== undefined) {
@@ -340,7 +340,7 @@ const ItemAssignToTrayContent = ({
         if (!onlyOverrides && !hasCourseOverride) {
           // only add the regular everyone card if there isn't a course override
           const cardId = makeCardId()
-          const selectedOption = [getEveryoneOption(assignToCards.length > 1).id]
+          const selectedOption = [getEveryoneOption(assignToCardsRef.current.length > 1).id]
           cards.push({
             key: cardId,
             isValid: true,
@@ -452,7 +452,7 @@ const ItemAssignToTrayContent = ({
     }
     const cardId = makeCardId()
     const cards: ItemAssignToCardSpec[] = [
-      ...assignToCards,
+      ...assignToCardsRef.current,
       {
         key: cardId,
         isValid: true,
@@ -488,17 +488,19 @@ const ItemAssignToTrayContent = ({
 
   const handleCardValidityChange = useCallback(
     (cardId: string, isValid: boolean) => {
-      const priorCard = assignToCards.find(card => card.key === cardId)
+      const priorCard = assignToCardsRef.current.find(card => card.key === cardId)
       if (priorCard) {
         const validityChanged = priorCard.isValid !== isValid
         if (!validityChanged) {
           return
         }
       }
-      const cards = assignToCards.map(card => (card.key === cardId ? {...card, isValid} : card))
+      const cards = assignToCardsRef.current.map(card =>
+        card.key === cardId ? {...card, isValid} : card
+      )
       setAssignToCards(cards)
     },
-    [assignToCards, setAssignToCards]
+    [assignToCardsRef, setAssignToCards]
   )
 
   const handleCustomAssigneesChange = useCallback(
@@ -635,9 +637,9 @@ const ItemAssignToTrayContent = ({
   }
 
   const renderCards = useCallback(
-    (isOpen?: boolean) => {
-      const cardCount = assignToCards.length
-      return assignToCards.map(card => (
+    () => {
+      const cardCount = assignToCardsRef.current.length
+      return assignToCardsRef.current.map(card => (
         <View key={`${card.key}`} as="div" margin="small 0 0 0">
           <ItemAssignToCardMemo
             // Make sure the cards get rendered when there is only one card or when jumping to two cards
@@ -662,7 +664,6 @@ const ItemAssignToTrayContent = ({
             onCardAssignmentChange={handleCardAssignment}
             onCardDatesChange={handleDatesChange}
             onValidityChange={handleCardValidityChange}
-            isOpen={isOpen}
             isOpenRef={isOpenRef}
             disabledOptionIds={disabledOptionIdsRef.current}
             everyoneOption={everyoneOption}
@@ -680,7 +681,7 @@ const ItemAssignToTrayContent = ({
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      assignToCards,
+      assignToCardsRef,
       cardsRefs,
       courseId,
       removeDueDateInput,
@@ -712,7 +713,7 @@ const ItemAssignToTrayContent = ({
         )
       ) : (
         <ApplyLocale locale={locale} timezone={timezone}>
-          {renderCards(open)}
+          {renderCards()}
         </ApplyLocale>
       )}
       <Button

@@ -226,9 +226,10 @@ export default function ItemAssignToTray({
       (disabledOptionIdsRef.current.length === 1 &&
         !disabledOptionIdsRef.current.includes('everyone')) ||
       disabledOptionIdsRef.current.length > 1 ||
-      assignToCards.length > 1
+      assignToCardsRef.current.length > 1
     return getEveryoneOption(hasOverrides)
-  }, [disabledOptionIdsRef, assignToCards])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabledOptionIdsRef, assignToCardsRef.current])
 
   const handleDismiss = useCallback(() => {
     if (defaultCards) {
@@ -257,10 +258,10 @@ export default function ItemAssignToTray({
   })
 
   const handleUpdate = useCallback(() => {
-    const hasErrors = assignToCards.some(card => !card.isValid)
+    const hasErrors = assignToCardsRef.current.some(card => !card.isValid)
     // If a card has errors it should not save and the respective card should be focused
     if (hasErrors) {
-      const firstCardWithError = assignToCards.find(card => !card.isValid)
+      const firstCardWithError = assignToCardsRef.current.find(card => !card.isValid)
       if (!firstCardWithError) return
       const firstCardWithErrorRef = cardsRefs.current[firstCardWithError.key]
 
@@ -275,14 +276,14 @@ export default function ItemAssignToTray({
 
     if (onSave !== undefined) {
       onSave(
-        assignToCards,
+        assignToCardsRef.current,
         hasModuleOverrides,
         deletedModuleAssignees,
         disabledOptionIdsRef.current
       )
       return
     }
-    const filteredCards = assignToCards.filter(
+    const filteredCards = assignToCardsRef.current.filter(
       card =>
         [null, undefined, ''].includes(card.contextModuleId) ||
         (card.contextModuleId !== null && card.isEdited)
@@ -304,7 +305,7 @@ export default function ItemAssignToTray({
       })
     }
   }, [
-    assignToCards,
+    assignToCardsRef,
     moduleAssignees,
     onSave,
     hasModuleOverrides,
@@ -316,8 +317,8 @@ export default function ItemAssignToTray({
   ])
 
   const allCardsValid = useCallback(() => {
-    return assignToCards.every(card => card.isValid)
-  }, [assignToCards])
+    return assignToCardsRef.current.every(card => card.isValid)
+  }, [assignToCardsRef])
 
   const handleEntered = useCallback(() => {
     // When tray entered and the initial load already happened,
@@ -435,7 +436,6 @@ export default function ItemAssignToTray({
             onAssigneesChange={onAssigneesChange}
             onDatesChange={onDatesChange}
             onCardRemove={onCardRemove}
-            assignToCards={assignToCards}
             setAssignToCards={setAssignToCards}
             blueprintDateLocks={blueprintDateLocks}
             setBlueprintDateLocks={setBlueprintDateLocks}
@@ -501,7 +501,6 @@ export default function ItemAssignToTray({
           onAssigneesChange={onAssigneesChange}
           onDatesChange={onDatesChange}
           onCardRemove={onCardRemove}
-          assignToCards={assignToCards}
           setAssignToCards={setAssignToCards}
           blueprintDateLocks={blueprintDateLocks}
           setBlueprintDateLocks={setBlueprintDateLocks}
