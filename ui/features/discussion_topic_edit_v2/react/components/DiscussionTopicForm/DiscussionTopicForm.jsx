@@ -1110,7 +1110,7 @@ function DiscussionTopicForm({
           published={published}
           shouldShowSaveAndPublishButton={shouldShowSaveAndPublishButton}
           submitForm={publish => {
-            if (isAnnouncement && isEditing && willAnnouncementPostRightAway) {
+            if (isAnnouncement && isEditing) {
               // remember publish value for SendEditNotificationModal later
               setShowEditAnnouncementModal(true)
               setShouldPublish(publish)
