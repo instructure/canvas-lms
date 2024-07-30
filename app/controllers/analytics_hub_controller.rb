@@ -40,12 +40,16 @@ class AnalyticsHubController < ApplicationController
     deferred_js_bundle :analytics_hub
 
     env = {
-      accountID: @account.id.to_s,
-      permissions: @context.granted_rights(@current_user, :view_ask_questions_analytics, :view_students_in_need, :view_course_readiness, :view_lti_usage),
-      feature_advanced_analytics_ask_questions_enabled: @account.feature_enabled?(:advanced_analytics_ask_questions),
-      feature_k20_students_in_need_of_attention_enabled: @account.feature_enabled?(:k20_students_in_need_of_attention),
-      feature_k20_course_readiness_enabled: @account.feature_enabled?(:k20_course_readiness),
-      feature_k20_lti_usage_enabled: @account.feature_enabled?(:k20_lti_usage)
+      ANALYTICS_HUB: {
+        ACCOUNT_ID: @account.id.to_s,
+        PERMISSIONS: @context.granted_rights(@current_user, :view_ask_questions_analytics, :view_students_in_need, :view_course_readiness, :view_lti_usage),
+        FEATURE_FLAGS: {
+          ADVANCED_ANALYTICS_ASK_QUESTIONS_ENABLED: @account.feature_enabled?(:advanced_analytics_ask_questions),
+          K20_STUDENTS_IN_NEED_OF_ATTENTION_ENABLED: @account.feature_enabled?(:k20_students_in_need_of_attention),
+          K20_COURSE_READINESS_ENABLED: @account.feature_enabled?(:k20_course_readiness),
+          K20_LTI_USAGE_ENABLED: @account.feature_enabled?(:k20_lti_usage)
+        }
+      }
     }
 
     js_env(env)
