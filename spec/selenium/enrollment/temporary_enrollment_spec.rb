@@ -126,5 +126,16 @@ describe "temporary enrollment" do
       expect(f("body")).not_to contain_css("svg[role='img'] circle")
       expect(fj("span[role='dialog']:contains('DesignerEnrollment')")).to be_displayed
     end
+
+    it "views pairing from user page" do
+      # load page
+      get "/users/#{@teacher.id}"
+
+      wait_for_ajax_requests
+      f("#manage-temp-enrollments-mount-point > button").click
+
+      expect(f("body")).not_to contain_css("svg[role='img'] circle")
+      expect(f("span[name='temp_teacher']")).to be_displayed
+    end
   end
 end
