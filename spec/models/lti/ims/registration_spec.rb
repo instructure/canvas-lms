@@ -444,6 +444,12 @@ module Lti::IMS
 
             expect(subject.find { |p| p[:placement] == "course_navigation" }[:default]).to eq("disabled")
           end
+
+          it "uses the overlay value for a placement when the placement has the canvas URL prefix and the overlay does not" do
+            other_icon_url = "http://example.com/other_icon.png"
+            registration.registration_overlay["placements"] = [{ "type" => "assignment_edit", "icon_url" => other_icon_url }]
+            expect(subject.find { |p| p[:placement] == "assignment_edit" }[:icon_url]).to eq(other_icon_url)
+          end
         end
       end
 

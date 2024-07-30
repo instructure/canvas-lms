@@ -186,7 +186,7 @@ class Lti::IMS::Registration < ApplicationRecord
       window_target = "_blank"
     end
 
-    placement_overlay = lookup_placement_overlay(placement_type) || {}
+    placement_overlay = lookup_placement_overlay(placement_name) || {}
 
     text = apply_overlay ? (placement_overlay["label"] || message["label"]) : message["label"]
     icon_url = apply_overlay ? (placement_overlay["icon_url"] || message["icon_uri"]) : message["icon_uri"]
