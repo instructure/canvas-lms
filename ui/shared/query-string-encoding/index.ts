@@ -41,6 +41,15 @@ export type QueryParameterRecord = {[k: string]: QueryParameterElement}
 export function toQueryString(params: QueryParameterRecord): string {
   const paramsWithIndexes: Array<[k: string, v: string]> = []
 
+  // encode each key/value pair using encodeURIComponent, to ensure that each
+  // key and value are properly encoded URI componeent strings. Otherwise,
+  // URLSearchParams will convert blanks into '+' which is not what we want.
+  const asStringValue = (parms: URLSearchParams): string => {
+    return Array.from(parms)
+      .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+      .join('&')
+  }
+
   // fix up the array/object indexes to match the PHP standard
   const fixIndexes = (elt: [string, string]): [string, string] => [
     elt[0]
@@ -60,16 +69,17 @@ export function toQueryString(params: QueryParameterRecord): string {
     } else if (typeof elt === 'boolean' || typeof elt === 'number') {
       paramsWithIndexes.push([k + suffix, elt.toString()])
     } else if (typeof elt === 'undefined') {
-      paramsWithIndexes.push([k + suffix, 'undefined'])
+      paramsWithIndexes.push([k + suffix, ''])
     } else if (elt === null) {
-      paramsWithIndexes.push([k + suffix, 'null'])
+      paramsWithIndexes.push([k + suffix, ''])
     } else if (typeof elt === 'string') {
       paramsWithIndexes.push([k + suffix, elt])
     }
   }
 
   Object.keys(params).forEach(k => serialize(k, params[k], ''))
-  return new URLSearchParams(paramsWithIndexes.map(fixIndexes)).toString()
+  const parms = new URLSearchParams(paramsWithIndexes.map(fixIndexes))
+  return asStringValue(parms)
 }
 
 // This is just to implement backward-compatibility from the old package. Almost
