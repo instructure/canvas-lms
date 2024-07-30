@@ -791,7 +791,7 @@ describe('DiscussionTopicForm', () => {
         expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
         expect(document.queryByLabelText('Add to student to-do')).toBeInTheDocument()
         expect(document.queryByTestId('group-discussion-checkbox')).toBeTruthy()
-        expect(document.queryAllByText('Manage Assign To')).toBeTruthy()
+        expect(document.queryAllByText('Manage Due Dates and Assign To')).toBeTruthy()
 
         // Hides announcement options
         expect(document.queryByLabelText('Delay Posting')).not.toBeInTheDocument()
