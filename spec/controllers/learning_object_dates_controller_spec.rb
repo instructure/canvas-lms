@@ -102,6 +102,8 @@ describe LearningObjectDatesController do
     it "returns date details for a module" do
       context_module = @course.context_modules.create!(name: "module")
       @override.assignment_id = nil
+      @override.due_at = nil
+      @override.due_at_overridden = false
       @override.context_module_id = context_module.id
       @override.save!
 
@@ -119,9 +121,6 @@ describe LearningObjectDatesController do
                                    "context_module_name" => "module",
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
-                                   "due_at" => "2022-02-01T01:00:00Z",
-                                   "all_day" => false,
-                                   "all_day_date" => "2022-02-01",
                                    "unassign_item" => false
                                  }]
                                })

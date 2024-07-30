@@ -75,7 +75,7 @@ shared_examples_for "a differentiable_object" do
         @section = @course.course_sections.create!(name: "test section")
         @section2 = @course.course_sections.create!(name: "second test section")
         student_in_section(@section, user: @student1)
-        create_section_override_for_assignment(differentiable, { course_section: @section })
+        create_section_override_for_assignment(differentiable, { course_section: @section, due_at: nil, due_at_overridden: false })
         @course.reload
         @observer = User.create(name: "observer")
       end

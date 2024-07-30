@@ -125,6 +125,13 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
+  validate do |record|
+    if record.context_module? && (record.due_at || record.unlock_at || record.lock_at ||
+      record.due_at_overridden || record.unlock_at_overridden || record.lock_at_overridden)
+      record.errors.add :base, "cannot set dates for context module overrides"
+    end
+  end
+
   after_save :touch_assignment, if: :assignment
   after_save :update_grading_period_grades
   after_save :update_due_date_smart_alerts, if: :update_cached_due_dates?
