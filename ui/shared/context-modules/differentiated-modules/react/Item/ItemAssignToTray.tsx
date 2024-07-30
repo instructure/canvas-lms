@@ -56,6 +56,7 @@ import type {IconType, ItemType} from '../types'
 import ItemAssignToTrayContent from './ItemAssignToTrayContent'
 import CoursePacingNotice from '@canvas/due-dates/react/CoursePacingNotice'
 import useFetchAssignees from '../../utils/hooks/useFetchAssignees'
+import {calculateMasqueradeHeight} from '../../utils/miscHelpers'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -444,8 +445,8 @@ export default function ItemAssignToTray({
   }
 
   function Footer() {
-    const masqueradeBar = document.querySelector('body.is-masquerading-or-student-view')
-    const padding = masqueradeBar ? '0 0 x-large 0' : 'none'
+    const masqueradeBar = calculateMasqueradeHeight()
+    const padding = masqueradeBar > 0 ? '0 0 x-large 0' : 'none'
     return (
       <Flex.Item data-testid="module-item-edit-tray-footer" width="100%" padding={padding}>
         <TrayFooter
