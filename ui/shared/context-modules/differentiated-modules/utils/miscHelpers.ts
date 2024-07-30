@@ -23,7 +23,12 @@ import type {ModuleItem, Requirement, DiscussionRequirement} from '../react/type
 export function calculatePanelHeight(withinTabs: boolean): string {
   let headerHeight = 79.5
   headerHeight += withinTabs ? 48 : 0 // height of the tab selector
+  headerHeight += calculateMasqueradeHeight()
   return `calc(100vh - ${headerHeight}px)`
+}
+
+export function calculateMasqueradeHeight(): number {
+  return document.body.className.match(/\bis-masquerading-or-student-view\b/) ? 52 : 0
 }
 
 export function convertFriendlyDatetimeToUTC(date: string | null | undefined): string | undefined {
