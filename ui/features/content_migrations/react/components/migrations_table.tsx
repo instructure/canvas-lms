@@ -166,13 +166,13 @@ const renderTableHeader = () => {
         <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="date_imported">
           {I18n.t('Date Imported')}
         </Table.ColHeader>
-        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="status">
+        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} textAlign="center" id="status">
           {I18n.t('Status')}
         </Table.ColHeader>
-        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="progress">
+        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} textAlign="center" id="progress">
           {I18n.t('Progress')}
         </Table.ColHeader>
-        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="action">
+        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} textAlign="center" id="action">
           {I18n.t('Action')}
         </Table.ColHeader>
       </Table.Row>

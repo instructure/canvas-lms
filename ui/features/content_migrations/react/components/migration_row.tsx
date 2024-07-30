@@ -94,24 +94,23 @@ const extendedMarkup = (
   migration: ContentMigrationItem,
   updateMigrationItem: UpdateMigrationItemType
 ) => {
+  const cellPaddingStyle = {padding: '1.1rem 0rem'}
   return (
     <Table.Row key={migration.id}>
-      <Table.Cell themeOverride={{padding: '1.1rem 0rem'}}>
-        {migration.migration_type_title}
-      </Table.Cell>
-      <Table.Cell>
+      <Table.Cell themeOverride={cellPaddingStyle}>{migration.migration_type_title}</Table.Cell>
+      <Table.Cell themeOverride={cellPaddingStyle}>
         <SourceLink item={migration} />
       </Table.Cell>
-      <Table.Cell>
+      <Table.Cell themeOverride={cellPaddingStyle}>
         {datetimeString(migration.created_at, {timezone: ENV.CONTEXT_TIMEZONE})}
       </Table.Cell>
-      <Table.Cell>
+      <Table.Cell themeOverride={cellPaddingStyle} textAlign="center">
         <StatusPill
           hasIssues={migration.migration_issues_count !== 0}
           workflowState={migration.workflow_state}
         />
       </Table.Cell>
-      <Table.Cell>
+      <Table.Cell themeOverride={cellPaddingStyle} textAlign="center">
         {['failed', 'completed'].includes(migration.workflow_state) &&
         migration.migration_issues_count > 0 ? (
           <Text>{I18n.t('%{count} issues', {count: migration.migration_issues_count})}</Text>
@@ -126,7 +125,7 @@ const extendedMarkup = (
           updateMigrationItem={updateMigrationItem}
         />
       </Table.Cell>
-      <Table.Cell>
+      <Table.Cell themeOverride={cellPaddingStyle} textAlign="center">
         <ActionButton
           migration_type_title={migration.migration_type_title}
           migration_issues_count={migration.migration_issues_count}
