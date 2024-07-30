@@ -155,14 +155,14 @@ export default function RubricTab(props) {
               rubric={rubricData}
               onSubmit={assessment => {
                 const updatedState = {
-                  score: assessment.reduce((prev, curr) => prev + curr.points, 0),
+                  score: assessment.reduce((prev, curr) => prev + (curr.points ?? 0), 0),
                   data: assessment.map(criterionAssessment => {
                     const {points} = criterionAssessment
                     const valid = !Number.isNaN(points)
                     return {
                       ...criterionAssessment,
                       points: {
-                        text: points.toString(),
+                        text: points?.toString(),
                         valid,
                         value: points,
                       },
