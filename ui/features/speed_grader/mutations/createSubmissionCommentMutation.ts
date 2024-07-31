@@ -28,6 +28,8 @@ export const CREATE_SUBMISSION_COMMENT = gql`
     $fileIds: [ID!]
     $groupComment: Boolean!
     $draftComment: Boolean
+    $mediaObjectType: String
+    $mediaObjectId: ID
   ) {
     __typename
     createSubmissionComment(
@@ -37,6 +39,8 @@ export const CREATE_SUBMISSION_COMMENT = gql`
         fileIds: $fileIds
         groupComment: $groupComment
         draftComment: $draftComment
+        mediaObjectType: $mediaObjectType
+        mediaObjectId: $mediaObjectId
       }
     ) {
       submissionComment {
@@ -45,6 +49,7 @@ export const CREATE_SUBMISSION_COMMENT = gql`
         comment
         read
         draft
+        mediaCommentId
         author {
           _id
           id
@@ -71,6 +76,8 @@ export const ZCreateSubmissionCommentParams = z.object({
   userId: z.string(),
   files: z.array(z.object({})),
   draftComment: z.boolean().optional(),
+  mediaObjectType: z.string().optional(),
+  mediaObjectId: z.string().optional(),
 })
 
 type CreateSubmissionCommentParams = z.infer<typeof ZCreateSubmissionCommentParams>
@@ -84,6 +91,8 @@ export async function createSubmissionComment({
   userId,
   files,
   draftComment,
+  mediaObjectType,
+  mediaObjectId,
 }: CreateSubmissionCommentParams): Promise<any> {
   let fileIds = []
   if (files.length > 0) {
@@ -101,6 +110,8 @@ export async function createSubmissionComment({
     groupComment,
     fileIds,
     draftComment,
+    mediaObjectType,
+    mediaObjectId,
   })
 
   return result
