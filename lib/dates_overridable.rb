@@ -425,7 +425,7 @@ module DatesOverridable
       tag_info[:due_date] = tag_info[:due_date].utc.iso8601
     end
 
-    if context.root_account&.feature_enabled?(:discussion_checkpoints) && discussion_topic && sub_assignments&.any?
+    if is_a?(Assignment) && checkpoints_parent?
       tag_info[:sub_assignments] = sub_assignments.map do |sub_assignment|
         sub_assignment_hash = {}
         sub_assignment_hash[:sub_assignment_tag] = sub_assignment.sub_assignment_tag if sub_assignment.sub_assignment_tag
