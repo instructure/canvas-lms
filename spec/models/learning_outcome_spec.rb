@@ -1661,5 +1661,18 @@ describe LearningOutcome do
       o3.update(copied_from_outcome_id: o1.id)
       expect(o3.fetch_outcome_copies.length).to eq 4
     end
+
+    it "it avoids creating a loop if one of the copies is already on the list" do
+      o1 = LearningOutcome.create!(title: "outcome1")
+      o2 = LearningOutcome.create!(title: "outcome2")
+      o3 = LearningOutcome.create!(title: "outcome3")
+      o4 = LearningOutcome.create!(title: "outcome4")
+      # manually adding a loop making o1 a child of o4
+      o1.update(copied_from_outcome_id: o4.id)
+      o2.update(copied_from_outcome_id: o1.id)
+      o3.update(copied_from_outcome_id: o2.id)
+      o4.update(copied_from_outcome_id: o3.id)
+      expect(o4.fetch_outcome_copies.count).to eq 4
+    end
   end
 end

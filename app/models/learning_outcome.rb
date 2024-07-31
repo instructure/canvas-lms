@@ -513,13 +513,13 @@ class LearningOutcome < ActiveRecord::Base
       WITH RECURSIVE parents AS (
         SELECT id, copied_from_outcome_id
         FROM #{LearningOutcome.quoted_table_name} WHERE id = #{id}
-        UNION ALL
+        UNION
         SELECT lo.id, lo.copied_from_outcome_id FROM #{LearningOutcome.quoted_table_name} lo
         JOIN parents p ON lo.id = p.copied_from_outcome_id
       ), children AS (
         SELECT id, copied_from_outcome_id
         FROM parents
-        UNION ALL
+        UNION
         SELECT lo.id, lo.copied_from_outcome_id
         FROM #{LearningOutcome.quoted_table_name} lo
         JOIN children c ON lo.copied_from_outcome_id = c.id
