@@ -23,8 +23,8 @@ if $ruby_version_warning.nil? && !ENV["SUPPRESS_RUBY_WARNING"]
   $ruby_version_warning = true
   if RUBY_ENGINE == "truffleruby"
     warn "TruffleRuby support is experimental"
-  elsif RUBY_VERSION >= "3.2.0"
-    warn "Ruby 3.2+ support is experimental"
+  elsif RUBY_VERSION >= "3.4.0"
+    warn "Ruby 3.4+ support is experimental"
   end
 end
 # rubocop:enable Style/GlobalVars
