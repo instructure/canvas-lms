@@ -148,7 +148,7 @@ class User < ActiveRecord::Base
   has_many :associated_accounts, -> { order("user_account_associations.depth") }, source: :account, through: :user_account_associations
   has_many :associated_root_accounts, -> { merge(Account.root_accounts.active) }, source: :account, through: :user_account_associations, multishard: true
   has_many :developer_keys
-  has_many :access_tokens, -> { where(workflow_state: "active") }, inverse_of: :user, multishard: true
+  has_many :access_tokens, -> { where(workflow_state: ["active", "pending"]) }, inverse_of: :user, multishard: true
   has_many :masquerade_tokens, -> { where(workflow_state: "active") }, class_name: "AccessToken", inverse_of: :real_user
   has_many :notification_endpoints, -> { merge(AccessToken.active) }, through: :access_tokens, multishard: true
   has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy

@@ -19,6 +19,9 @@
 <% access_token ||= nil %>
 <tr class="access_token <%= 'blank' unless access_token %>" style="<%= hidden unless access_token %>">
   <td class="app_name"><%= access_token&.app_name || t(:default_app_name, "No App") %></td>
+  <% if @current_user&.account.feature_enabled?(:admin_manage_access_tokens) %>
+    <td class="state"><%= access_token&.expired? ? t("expired") : access_token&.workflow_state%></td>
+  <% end %>
   <td class="purpose"><%= access_token&.purpose || nbsp %></td>
   <td class="dates">
     <table class="subtable" role="presentation">

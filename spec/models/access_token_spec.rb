@@ -213,6 +213,11 @@ describe AccessToken do
 
       expect(@at.reload.usable?(:crypted_refresh_token)).to be false
     end
+
+    it "is not usable if pending" do
+      @at.update!(workflow_state: "pending")
+      expect(@at.reload.usable?).to be false
+    end
   end
 
   describe "visible tokens" do

@@ -432,6 +432,9 @@ TEXT
       <thead>
         <tr>
           <th scope="col"><%= t('headers.application_abbrev', "App") %></th>
+          <% if @current_user&.account.feature_enabled?(:admin_manage_access_tokens) %>
+            <th scope="col"><%= t('headers.state', "Status") %></th>
+          <% end %>
           <th scope="col"><%= t('headers.purpose', "Purpose") %></th>
           <th scope="col"><%= t('headers.dates', "Dates") %></th>
           <th scope="col"><%= t('headers.action', "Details") %></th>
