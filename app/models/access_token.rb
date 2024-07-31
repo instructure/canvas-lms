@@ -23,6 +23,9 @@ class AccessToken < ActiveRecord::Base
   extend RootAccountResolver
 
   workflow do
+    state :pending do
+      event :activate, transitions_to: :active
+    end
     state :active
     state :deleted
   end
@@ -77,7 +80,7 @@ class AccessToken < ActiveRecord::Base
   # yet been implemented)
 
   scope :active, -> { not_deleted.where("permanent_expires_at IS NULL OR permanent_expires_at>?", Time.now.utc) }
-  scope :not_deleted, -> { where(workflow_state: "active") }
+  scope :not_deleted, -> { where.not(workflow_state: "deleted") }
 
   TOKEN_SIZE = 64
   TOKEN_TYPES = [:crypted_token, :crypted_refresh_token].freeze
@@ -141,7 +144,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def usable?(token_key = :crypted_token)
-    return false if expired?
+    return false if expired? || pending?
 
     if !developer_key_id || developer_key&.usable?
       return false if token_key != :crypted_refresh_token && needs_refresh?
