@@ -237,6 +237,7 @@ module Interfaces::SubmissionInterface
   field :seconds_late, Float, null: true
   field :posted, Boolean, method: :posted?, null: false
   field :state, Types::SubmissionStateType, method: :workflow_state, null: false
+  field :redo_request, Boolean, null: true
 
   field :grade_hidden, Boolean, null: false
   def grade_hidden
