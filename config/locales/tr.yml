@@ -4795,6 +4795,7 @@ tr:
       concluded_conferences: "Tamamlanmış Canlı Dersler"
       conference: "Canlı Ders"
       conference_header: "Canlı Dersler"
+      conferences: "Canlı Dersler"
       new_conference: "Yeni Canlı Ders"
       new_conferences: "Yeni Canlı Dersler"
       page_title: "Web Üzerinden Canlı Dersler"
