@@ -34,10 +34,32 @@ export const escapeNewLineText = (text?: string) => {
 }
 
 export const rangingFrom = (ratings: RubricRating[], index: number, ratingOrder?: string) => {
+  const previousRatingPoints = ratings[index - 1]?.points
+  const previousPointModifier = getAdjustedDecimalRatingModifier(previousRatingPoints)
+  const nextRatingPoints = ratings[index + 1]?.points
+  const nextPointModifier = getAdjustedDecimalRatingModifier(nextRatingPoints)
+
   if (ratingOrder === 'ascending') {
-    return index > 0 ? ratings[index - 1].points + 0.1 : undefined
+    return index > 0
+      ? roundToTwoDecimalPlaces(previousRatingPoints + previousPointModifier)
+      : undefined
   }
-  return index < ratings.length - 1 ? ratings[index + 1].points + 0.1 : undefined
+
+  return index < ratings.length - 1
+    ? roundToTwoDecimalPlaces(nextRatingPoints + nextPointModifier)
+    : undefined
+}
+
+const getAdjustedDecimalRatingModifier = (points: number) => {
+  if (points == null) {
+    return 0
+  }
+  const twoDecimalRegex = /^\d+\.\d{2}$/
+  return twoDecimalRegex.test(points.toString()) ? 0.01 : 0.1
+}
+
+const roundToTwoDecimalPlaces = (num: number) => {
+  return Math.round(num * 100) / 100
 }
 
 export const findCriterionMatchingRatingIndex = (

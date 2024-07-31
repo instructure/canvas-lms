@@ -155,15 +155,16 @@ describe('CriterionModal tests', () => {
     it('should reorder ratings when a rating is changed to be higher than the top rating', () => {
       const ratings = [
         {id: '1', description: 'First Rating', points: 10, longDescription: ''},
-        {id: '1', description: 'Second Rating', points: 8, longDescription: ''},
-        {id: '1', description: 'Third Rating', points: 6, longDescription: ''},
-        {id: '1', description: 'Fourth Rating', points: 4, longDescription: ''},
+        {id: '2', description: 'Second Rating', points: 8, longDescription: ''},
+        {id: '3', description: 'Third Rating', points: 6, longDescription: ''},
+        {id: '4', description: 'Fourth Rating', points: 4, longDescription: ''},
       ]
       const criterion = getCriterion({ratings})
       const {queryAllByTestId} = renderComponent({criterion})
       const ratingPoints = queryAllByTestId(`rating-points`)[2] as HTMLInputElement
 
       fireEvent.change(ratingPoints, {target: {value: '20'}})
+      fireEvent.focus(ratingPoints)
       fireEvent.blur(ratingPoints)
 
       const totalRatingNames = queryAllByTestId('rating-name') as HTMLInputElement[]
@@ -182,15 +183,16 @@ describe('CriterionModal tests', () => {
     it('should reorder ratings when a rating is changed to be lower than a previous rating', () => {
       const ratings = [
         {id: '1', description: 'First Rating', points: 10, longDescription: ''},
-        {id: '1', description: 'Second Rating', points: 8, longDescription: ''},
-        {id: '1', description: 'Third Rating', points: 6, longDescription: ''},
-        {id: '1', description: 'Fourth Rating', points: 4, longDescription: ''},
+        {id: '2', description: 'Second Rating', points: 8, longDescription: ''},
+        {id: '3', description: 'Third Rating', points: 6, longDescription: ''},
+        {id: '4', description: 'Fourth Rating', points: 4, longDescription: ''},
       ]
       const criterion = getCriterion({ratings})
       const {queryAllByTestId} = renderComponent({criterion})
       const ratingPoints = queryAllByTestId(`rating-points`)[0] as HTMLInputElement
 
       fireEvent.change(ratingPoints, {target: {value: '2'}})
+      fireEvent.focus(ratingPoints)
       fireEvent.blur(ratingPoints)
 
       const totalRatingNames = queryAllByTestId('rating-name') as HTMLInputElement[]
@@ -210,6 +212,51 @@ describe('CriterionModal tests', () => {
       const {queryByTestId, queryAllByTestId} = renderComponent({criterionUseRangeEnabled: false})
 
       expect(queryByTestId('enable-range-checkbox')).toBeNull()
+    })
+
+    it('should allow for decimal ratings', () => {
+      const ratings = [
+        {id: '1', description: 'First Rating', points: 10, longDescription: ''},
+        {id: '2', description: 'Second Rating', points: 8, longDescription: ''},
+        {id: '3', description: 'Third Rating', points: 6, longDescription: ''},
+        {id: '4', description: 'Fourth Rating', points: 4, longDescription: ''},
+      ]
+      const criterion = getCriterion({ratings})
+      const {queryAllByTestId} = renderComponent({criterion})
+
+      const ratingToUpdate = queryAllByTestId(`rating-points`)[2] as HTMLInputElement
+
+      const typeValue = (value: string) => {
+        value.split('').forEach(char => {
+          fireEvent.keyDown(ratingToUpdate, {
+            key: char,
+            code: `Key${char}`,
+            charCode: char.charCodeAt(0),
+          })
+          fireEvent.keyPress(ratingToUpdate, {
+            key: char,
+            code: `Key${char}`,
+            charCode: char.charCodeAt(0),
+          })
+          fireEvent.keyUp(ratingToUpdate, {
+            key: char,
+            code: `Key${char}`,
+            charCode: char.charCodeAt(0),
+          })
+
+          // Update the input value manually because React Testing Library doesn't update the value automatically
+          fireEvent.change(ratingToUpdate, {target: {value: ratingToUpdate.value + char}})
+        })
+      }
+      fireEvent.change(ratingToUpdate, {target: {value: ''}})
+      typeValue('10.5')
+      fireEvent.blur(ratingToUpdate)
+
+      const totalRatingPoints = queryAllByTestId('rating-points') as HTMLInputElement[]
+      expect(totalRatingPoints[0].value).toEqual('10.5')
+      expect(totalRatingPoints[1].value).toEqual('10')
+      expect(totalRatingPoints[2].value).toEqual('8')
+      expect(totalRatingPoints[3].value).toEqual('4')
     })
   })
 
