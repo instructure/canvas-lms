@@ -39,12 +39,18 @@ jest.mock('../../../utils', () => ({
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
+jest.mock('../../../utils/constants', () => ({
+  ...jest.requireActual('../../../utils/constants'),
+  HIGHLIGHT_TIMEOUT: 0
+}))
+
 describe('DiscussionThreadContainer', () => {
   const onFailureStub = jest.fn()
   const onSuccessStub = jest.fn()
   const openMock = jest.fn()
   beforeAll(() => {
     delete window.location
+    window.location = {search: ''}
     window.open = openMock
     window.ENV = {
       course_id: '1',

@@ -42,6 +42,7 @@ describe('DiscussionsAttachment', () => {
   const openMock = jest.fn()
   beforeAll(() => {
     delete window.location
+    window.location = {search: ''}
     window.open = openMock
     window.ENV = {
       course_id: '1',
