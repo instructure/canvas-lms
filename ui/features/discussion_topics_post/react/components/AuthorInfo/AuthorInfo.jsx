@@ -225,7 +225,6 @@ AuthorInfoBase.propTypes = {
    * Boolean to determine if we are in the split view
    */
   createdAt: PropTypes.string,
-  updatedAt: PropTypes.string,
   /**
    * Display text for the relative time information. This prop is expected
    * to be provided as a string of the exact text to be displayed, not a
@@ -261,7 +260,7 @@ AuthorInfoBase.propTypes = {
 
 const Timestamps = props => {
   const editText = useMemo(() => {
-    if (!props.editedTimingDisplay || props.createdAt === props.updatedAt) {
+    if (!props.editedTimingDisplay) {
       return null
     }
 
@@ -292,7 +291,7 @@ const Timestamps = props => {
         editedTimingDisplay: props.editedTimingDisplay,
       })
     }
-  }, [props.editedTimingDisplay, props.createdAt, props.updatedAt, props.editor, props.author])
+  }, [props.editedTimingDisplay, props.createdAt, props.editor, props.author])
   const timestampsPadding = props.mobileOnly ? '0 xx-small 0 0' : 'xx-small xx-small xx-small 0'
   return (
     <Flex wrap="wrap">
@@ -335,7 +334,6 @@ Timestamps.propTypes = {
   author: User.shape,
   editor: User.shape,
   createdAt: PropTypes.string,
-  updatedAt: PropTypes.string,
   timingDisplay: PropTypes.string,
   editedTimingDisplay: PropTypes.string,
   lastReplyAtDisplay: PropTypes.string,

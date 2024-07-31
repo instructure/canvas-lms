@@ -69,6 +69,7 @@ module Types
     field :context_id, ID, null: false
     field :context_type, String, null: false
     field :delayed_post_at, Types::DateTimeType, null: true
+    field :edited_at, Types::DateTimeType, null: true
     field :lock_at, Types::DateTimeType, null: true
     field :locked, Boolean, null: false
     field :last_reply_at, Types::DateTimeType, null: true

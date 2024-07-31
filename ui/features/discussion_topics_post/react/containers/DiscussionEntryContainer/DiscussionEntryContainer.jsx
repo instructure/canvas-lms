@@ -180,7 +180,6 @@ DiscussionEntryContainerBase.propTypes = {
   isUnread: PropTypes.bool,
   isForcedRead: PropTypes.bool,
   createdAt: PropTypes.string,
-  updatedAt: PropTypes.string,
   timingDisplay: PropTypes.string,
   editedTimingDisplay: PropTypes.string,
   lastReplyAtDisplay: PropTypes.string,

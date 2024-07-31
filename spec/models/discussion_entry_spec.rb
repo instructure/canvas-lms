@@ -1075,10 +1075,30 @@ describe DiscussionEntry do
     reply3 = reply1.reply_from(user: @teacher, html: "sub-sub sibling entry")
     reply4 = reply2.reply_from(user: @teacher, html: "sub-sub-sub entry")
 
-    expect(root.depth).to eq 1
-    expect(reply1.depth).to eq 2
-    expect(reply2.depth).to eq 3
-    expect(reply3.depth).to eq 3
-    expect(reply4.depth).to eq 4
+    expect(root.depth).to be 1
+    expect(reply1.depth).to be 2
+    expect(reply2.depth).to be 3
+    expect(reply3.depth).to be 3
+    expect(reply4.depth).to be 4
+  end
+
+  describe "edited_at" do
+    it "returns null if no change to the title or message occurred" do
+      topic = discussion_topic_model
+      root = topic.reply_from(user: @teacher, text: "root entry")
+      expect(root.edited_at).to be_nil
+      root.depth = 3
+      root.save!
+      expect(root.edited_at).to be_nil
+    end
+
+    it "returns not null if a change to the message occured" do
+      topic = discussion_topic_model
+      root = topic.reply_from(user: @teacher, text: "root entry")
+      expect(root.edited_at).to be_nil
+      root.message = "Brand new shinny message"
+      root.save!
+      expect(root.edited_at).not_to be_nil
+    end
   end
 end
