@@ -3176,6 +3176,7 @@ ko:
     index: 
       concluded_conferences: "종결된 회의"
       conference_header: 회의
+      conferences: 회의
       new_conference: "새 회의"
       new_conferences: "새 회의"
       page_title: "웹 회의"
