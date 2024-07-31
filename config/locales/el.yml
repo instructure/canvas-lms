@@ -3584,6 +3584,7 @@ el:
       concluded_conferences: "Ολοκληρωμένες Συνδιασκέψεις"
       conference: Συνεδρία
       conference_header: Συνέδρια
+      conferences: Συνέδρια
       new_conference: "Νέα Συνδιάσκεψη"
       new_conferences: "Νέες Συνδιασκέψεις"
       page_title: "Συνεδρίες Διαδικτύου"
