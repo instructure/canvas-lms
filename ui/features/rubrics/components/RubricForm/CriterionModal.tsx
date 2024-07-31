@@ -18,6 +18,7 @@
 
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {rangingFrom} from '@canvas/rubrics/react/RubricAssessment'
 import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
@@ -353,8 +354,7 @@ export const CriterionModal = ({
                   <div ref={provided.innerRef} {...provided.droppableProps}>
                     {ratings.map((rating, index) => {
                       const scale = ratings.length - (index + 1)
-                      const nextRating = ratings[index + 1]
-                      const rangeStart = nextRating ? nextRating.points + 0.1 : undefined
+                      const rangeStart = rangingFrom(ratings, index)
 
                       return (
                         // eslint-disable-next-line react/no-array-index-key
@@ -450,6 +450,8 @@ const RatingRow = ({
   onRemove,
   onPointsBlur,
 }: RatingRowProps) => {
+  const [pointsInputText, setPointsInputText] = useState<string | number>(rating.points)
+
   function setRatingForm<K extends keyof RubricRating>(key: K, value: RubricRating[K]) {
     onChange({...rating, [key]: value})
   }
@@ -494,15 +496,31 @@ const RatingRow = ({
                       renderLabel={
                         <ScreenReaderContent>{I18n.t('Rating Points')}</ScreenReaderContent>
                       }
-                      value={rating.points}
-                      onIncrement={() => setRatingForm('points', setNumber(rating.points + 1))}
-                      onDecrement={() => setRatingForm('points', setNumber(rating.points - 1))}
-                      onChange={(e, value) =>
-                        setRatingForm('points', setNumber(Number(value ?? 0)))
-                      }
+                      value={pointsInputText}
+                      onIncrement={() => {
+                        const newNumber = setNumber(Math.floor(rating.points) + 1)
+
+                        setPointsInputText(newNumber)
+                        setRatingForm('points', newNumber)
+                      }}
+                      onDecrement={() => {
+                        const newNumber = setNumber(Math.floor(rating.points) - 1)
+
+                        setPointsInputText(newNumber)
+                        setRatingForm('points', newNumber)
+                      }}
+                      onChange={(e, value) => {
+                        if (!/^\d*[.,]?\d{0,2}$/.test(value)) return
+
+                        const newNumber = setNumber(Number(value.replace(',', '.')))
+                        setRatingForm('points', newNumber)
+                        setPointsInputText(value.toString())
+                      }}
                       data-testid="rating-points"
                       width="4.938rem"
-                      onBlur={onPointsBlur}
+                      onBlur={() => {
+                        onPointsBlur()
+                      }}
                     />
                   </Flex.Item>
                 ) : (
