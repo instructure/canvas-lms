@@ -296,10 +296,8 @@ class StreamItem < ActiveRecord::Base
           owner_insert[:hidden] = true
         end
 
-        StreamItemInstance.unique_constraint_retry do
-          StreamItemInstance.where(stream_item_id:, user_id: sliced_user_ids).delete_all
-          StreamItemInstance.bulk_insert(inserts)
-        end
+        StreamItemInstance.where(stream_item_id:, user_id: sliced_user_ids).delete_all
+        StreamItemInstance.insert_all(inserts)
 
         # reset caches manually because the observer wont trigger off of the above mass inserts
         sliced_user_ids.each do |user_id|

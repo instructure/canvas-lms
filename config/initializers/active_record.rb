@@ -1596,21 +1596,6 @@ ActiveRecord::Associations::CollectionProxy.class_eval do
   end
 end
 
-ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
-  def bulk_insert(table_name, records)
-    keys = records.first.keys
-    quoted_keys = keys.map { |k| quote_column_name(k) }.join(", ")
-    records.each do |record|
-      execute <<~SQL.squish
-        INSERT INTO #{quote_table_name(table_name)}
-          (#{quoted_keys})
-        VALUES
-          (#{keys.map { |k| quote(record[k]) }.join(", ")})
-      SQL
-    end
-  end
-end
-
 class ActiveRecord::ConnectionAdapters::AbstractAdapter
   # for functions that differ from one adapter to the next, use the following
   # method (overriding as needed in non-standard adapters), e.g.
