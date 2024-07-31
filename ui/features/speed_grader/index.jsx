@@ -53,6 +53,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import speedGrader from './jquery/speed_grader'
+import SGUploader from './sg_uploader'
 
 const I18n = useI18nScope('speed_grader')
 
@@ -117,6 +118,8 @@ ready(() => {
     'quizzesNext.submissionUpdate': 'tool.submissionUpdate',
   }
 
+  const sgUploader = new SGUploader('any', {defaultTItle: 'Upload Media'})
+
   import('speedgrader/appInjector')
     .then(module => {
       module.render(mountPoint, {
@@ -145,6 +148,7 @@ ready(() => {
           updateCommentBankItem,
           updateCommentSuggestionsEnabled,
           updateSpeedGraderSettings,
+          postSubmissionCommentMedia: sgUploader.doUploadByFile,
         },
         postMessageAliases,
         context: {

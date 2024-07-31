@@ -50,6 +50,7 @@ module Types
     field :submission_id, ID, null: false
 
     field :author, Types::UserType, null: true
+    field :media_comment_id, String, null: true
     def author
       # We are preloading submission and assignment here for the permission check.
       # Not ideal as that could be cached in redis, but in most cases the assignment
