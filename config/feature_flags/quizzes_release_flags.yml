@@ -80,3 +80,9 @@ common_cartridge_qti_new_quizzes_import:
   display_name: Common Cartridge QTI New Quizzes Import
   description: If enabled, users will be able to import a Common Cartridge with New Quizzes in QTI format, users will be able to select the option to import existing quizzes as New Quizzes or import as the current quiz type.
   applies_to: SiteAdmin
+impact_integration:
+  state: hidden
+  display_name: Impact integration for New Quizzes
+  description: Allow Impact services to reach New Quizzes
+  applies_to: SiteAdmin
+  shadow: true
